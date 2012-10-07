@@ -7,6 +7,5 @@ ${title_block()}
 <form method="POST">
     <fieldset>
     ${render_form(form)}
-    <input type="submit" value="Добавить"/>
     </fieldset>
 </form>

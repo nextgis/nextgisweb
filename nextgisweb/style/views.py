@@ -12,6 +12,7 @@ class StyleNewForm(Form):
         u"Наименование",
         [validators.required(u"Необходимо указать наименование стиля"), ]
     )
+    submit = fields.SubmitField()
 
 Style.__new_form = StyleNewForm
 

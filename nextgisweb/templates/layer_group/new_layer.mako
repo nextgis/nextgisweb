@@ -7,6 +7,5 @@ ${title_block()}
 <form method="POST" enctype="multipart/form-data">
     <fieldset>
     ${render_form(form)}
-    <input type="submit" />
     </fieldset>
 </form>

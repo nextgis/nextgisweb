@@ -46,6 +46,7 @@ class LayerNewForm(Form):
         [validators.required(u"Необходимо указать наименование слоя"), ]
     )
     keyname = fields.KeynameField()
+    submit = fields.SubmitField()
 
 Layer.__new_form = LayerNewForm
 Layer.__show_template = 'layer/show.mako'

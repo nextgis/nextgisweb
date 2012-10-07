@@ -52,6 +52,7 @@ LayerGroup.__action_panel = __action_panel
 class LayerGroupNewForm(Form):
     display_name = fields.TextField(u"Наименование", [validators.required()])
     keyname = fields.KeynameField()
+    submit = fields.SubmitField()
 
 
 @view_config(route_name='layer_group')
