@@ -1,0 +1,15 @@
+div.header { height: 48px; }
+div.caption { font-size: 20px; padding-top: 8px; font-weight: bold;}
+
+/* Cтрока меню */
+ul.menu { list-style: none; padding: 0; margin: 0 0 8px 0; border-bottom: 1px solid #ddd; background-color: #eee; }
+ul.menu li { display: float; float: left; padding: .2ex 1ex; }
+
+/* Панель действий справа */
+ul.panel { list-style: none; padding: 0px; margin: 0 0 8px 0; background-color: #f6f6f6; }
+ul.panel li { margin: 2px 4px; }
+ul.panel li.group { margin-top: 1ex; border-bottom: 1px solid #ddd; }
+
+
+h1 { font-size: 18px; border-bottom: 1px solid #ddd; margin-top: 1ex; padding-bottom: 8px;}
+h2 { font-size: 16px; border-bottom: 1px solid #ddd; margin-top: 1ex; padding-bottom: 6px;}
