@@ -19,6 +19,7 @@ requires = [
     'psycopg2',
     'geoalchemy',
     'PIL',
+    'wtforms',
     
     ]
 
