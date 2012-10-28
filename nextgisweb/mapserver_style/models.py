@@ -13,8 +13,10 @@ class MapserverStyle(Style):
     cls_display_name = u"Mapserver"
 
     style_id = sa.Column(sa.Integer, sa.ForeignKey('style.id'), primary_key=True)
-    stroke_color = sa.Column(sa.Unicode)
-    fill_color = sa.Column(sa.Unicode)
+    opacity = sa.Column(sa.Integer, nullable=False, default=100)
+    stroke_color = sa.Column(sa.Unicode, nullable=False)
+    stroke_width = sa.Column(sa.Integer, nullable=False, default=1)
+    fill_color = sa.Column(sa.Unicode, nullable=False)
 
     __mapper_args__ = dict(
         polymorphic_identity=identity,
@@ -93,12 +95,8 @@ class MapserverStyle(Style):
                     END
                     EXTENT -20037508.34 -20037508.34 20037508.34 20037508.34
 
-                    CLASS
-                        STYLE
-                            COLOR %(fill_color)s
-                            OUTLINECOLOR %(stroke_color)s
-                        END
-                    END
+                    %(mapfile_class)s
+
                 END
             END
         """
@@ -116,6 +114,26 @@ class MapserverStyle(Style):
             connection=' '.join(connection),
             type={"Point": 'point', 'Linestring': 'line', 'Polygon': 'polygon'}[self.layer.geom_type],
             table='vector_layer.id%04d' % self.layer.id,
-            fill_color=self.fill_color,
-            stroke_color=self.stroke_color,
+            mapfile_class=self._mapfile_class(),
         )
+
+    def _mapfile_class(self):
+        result = ''
+
+        if self.opacity:
+            result += "OPACITY %d\n" % self.opacity
+
+        result += "CLASS\n\tSTYLE\n"
+
+        if self.fill_color != '':
+            result += "\t\tCOLOR %s\n" % self.fill_color
+
+        if self.stroke_color != '':
+            result += "\t\tOUTLINECOLOR %s\n" % self.stroke_color
+
+        if self.stroke_width != '':
+            result += "\t\tWIDTH %d\n" % self.stroke_width
+
+        result += "\tEND\nEND\n"
+
+        return result

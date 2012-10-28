@@ -7,7 +7,7 @@ from .models import MapserverStyle
 
 
 _COLORS = [
-    (None, u"Нет"),
+    ('', u"Нет"),
     ('0 0 0', u"Черная"),
     ('255 0 0', u"Красная"),
     ('0 255 0', u"Зеленая"),
@@ -16,8 +16,10 @@ _COLORS = [
 
 
 class MapserverStyleNewForm(StyleNewForm):
-    stroke_color = fields.SelectField(u"Обводка", choices=_COLORS)
-    fill_color = fields.SelectField(u"Заливка", choices=_COLORS)
+    opacity = fields.IntegerField(u"Насыщенность, %", default=100)
+    stroke_color = fields.SelectField(u"Цвет контура", choices=_COLORS)
+    stroke_width = fields.IntegerField(u"Толщина контура", default=1)
+    fill_color = fields.SelectField(u"Цвет заливки", choices=_COLORS)
 
 
 MapserverStyle.__new_form = MapserverStyleNewForm
