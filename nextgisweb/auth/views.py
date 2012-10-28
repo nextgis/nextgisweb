@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from pyramid.security import remember, forget
 
 from ..models import DBSession
@@ -19,6 +19,7 @@ class LoginForm(Form):
 
 
 @view_config(route_name="auth.login", renderer="auth/login.mako")
+@view_config(context=HTTPForbidden, renderer='auth/login.mako')
 def login(request):
     form = LoginForm(request.POST)
     next = request.params.get('next', request.application_url)
