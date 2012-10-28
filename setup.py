@@ -33,7 +33,6 @@ components = (
     'layer_group.root',
     'vector_layer',
     'raster_layer',
-    'mapnik_style',
     'mapserver_style',
 )
 
