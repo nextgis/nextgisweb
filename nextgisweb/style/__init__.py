@@ -11,3 +11,4 @@ class StyleComponent(object):
     @classmethod
     def setup_routes(cls, config):
         config.add_route('style.show', '/style/{id}')
+        config.add_route('style.tms', '/style/{id}/tms')

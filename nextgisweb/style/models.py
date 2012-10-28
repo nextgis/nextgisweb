@@ -37,6 +37,6 @@ class Style(Base):
         """ Проверяет, возможна ли отрисовка слоя layer стилем этого класса """
         return False
 
-    def render_image(cls, layer, extent, image_size):
+    def render_image(cls, extent, image_size, settings):
         """ Рендеринг картинки """
         pass
