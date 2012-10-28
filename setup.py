@@ -34,7 +34,6 @@ components = (
     'vector_layer',
     'raster_layer',
     'mapnik_style',
-    'pil_style',
     'mapserver_style',
 )
 
