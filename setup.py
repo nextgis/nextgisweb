@@ -34,6 +34,7 @@ components = (
     'raster_layer',
     'mapnik_style',
     'pil_style',
+    'mapserver_style',
 )
 
 entry_points = {
