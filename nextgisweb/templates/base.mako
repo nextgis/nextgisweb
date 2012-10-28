@@ -8,16 +8,24 @@
 
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/blueprint/screen.css')}" type="text/css" media="screen, projection">
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/default.css')}" type="text/css" media="screen, projection">
+  
+  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
+  <script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.0/dojo/dojo.js"></script>
 
   <script type="text/javascript">
     var application_url = ${request.application_url | json.dumps};
   </script>
+
   %if hasattr(self, 'assets'):
     ${self.assets()}
   %endif
+
+  %if hasattr(self, 'head'):
+    ${self.head()}
+  %endif
 </head>
 
-<body>
+<body class="claro">
   <div class="container">
     <div class="span-24 header caption">
       Геоинформационная система

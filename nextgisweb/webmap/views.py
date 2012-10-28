@@ -4,6 +4,8 @@ from pyramid.view import view_config
 from ..models import DBSession
 from .models import WebMap
 
+from ..layer_group import LayerGroup
+
 from ..views import model_loader
 
 @view_config(route_name='webmap.browse', renderer='webmap/browse.mako')
@@ -22,4 +24,7 @@ def show(request, obj):
 @view_config(route_name='webmap.display', renderer='webmap/display.mako')
 @model_loader(WebMap)
 def display(request, obj):
-    return dict(obj=obj)
+    return dict(
+        obj=obj,
+        root_layer_group=DBSession.query(LayerGroup).filter_by(id=0).one(),
+    )
