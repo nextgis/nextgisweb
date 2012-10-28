@@ -17,7 +17,9 @@ class StyleNewForm(Form):
         u"Наименование",
         [validators.required(u"Необходимо указать наименование стиля"), ]
     )
+    default = fields.BooleanField(u"Использовать по-умолчанию")
     submit = fields.SubmitField()
+
 
 Style.__new_form = StyleNewForm
 
@@ -52,7 +54,6 @@ def tms(reqest, obj):
     img = obj.render_image(box, (256, 256), reqest.registry.settings)
 
     return Response(img.getBytes(), content_type='image/png')
-
 
 
 permalinker(Style, 'style.show')

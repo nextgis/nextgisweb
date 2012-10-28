@@ -23,7 +23,11 @@ class Style(Base):
         'polymorphic_on': cls
     }
 
-    layer = orm.relationship('Layer', backref=orm.backref('styles'))
+    layer = orm.relationship(
+        'Layer',
+        primaryjoin=(Layer.id == layer_id),
+        backref=orm.backref('styles'),
+    )
 
     def __unicode__(self):
         return self.display_name

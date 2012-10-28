@@ -89,6 +89,9 @@ def new_style(request, obj):
         DBSession.add(style)
         DBSession.flush()
 
+        if form.default.data:
+            obj.default_style = style
+
     return dict(obj=obj, form=form)
 
 

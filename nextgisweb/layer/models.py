@@ -14,11 +14,16 @@ class Layer(Base):
     keyname = sa.Column(sa.Unicode, unique=True)
     layer_group_id = sa.Column(sa.Integer, sa.ForeignKey('layer_group.id'), nullable=False)
     acl_id = sa.Column(sa.Integer, sa.ForeignKey(ACL.id), nullable=False)
+    default_style_id = sa.Column(sa.Integer, sa.ForeignKey('style.id', use_alter=True, name='fk_layer_default_style'))
     cls = sa.Column(sa.Unicode, nullable=False)
     display_name = sa.Column(sa.Unicode, nullable=False)
     description = sa.Column(sa.Unicode, default=u'', nullable=False)
 
     acl = orm.relationship(ACL, cascade='all')
+    default_style = orm.relationship(
+        'Style',
+        primaryjoin='Style.id == Layer.default_style_id'
+    )
 
     identity = __tablename__
     registry = registry_maker()
