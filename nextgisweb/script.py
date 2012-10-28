@@ -31,6 +31,13 @@ def main(argv=sys.argv):
     setup_logging(config_uri)
     settings = get_appsettings(config_uri)
 
+    settings['sqlalchemy.url'] = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
+        user=settings['database.user'],
+        password=(':' + settings['database.password']) if 'database.password' in settings else '',
+        host=settings['database.host'],
+        name=settings['database.name'],
+    )
+
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
 

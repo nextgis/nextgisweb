@@ -11,8 +11,17 @@ from .models import (
 
 from .component import Component, load_all
 
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application. """
+
+    settings['sqlalchemy.url'] = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
+        user=settings['database.user'],
+        password=(':' + settings['database.password']) if 'database.password' in settings else '',
+        host=settings['database.host'],
+        name=settings['database.name'],
+    )
+
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
