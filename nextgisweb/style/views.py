@@ -44,9 +44,9 @@ def tms(reqest, obj):
 
     box = (
         EPSG_3857_BOX[0] + x * step,
-        EPSG_3857_BOX[1] + y * step,
+        EPSG_3857_BOX[3] - (y + 1) * step,
         EPSG_3857_BOX[0] + (x + 1) * step,
-        EPSG_3857_BOX[1] + (y + 1) * step,
+        EPSG_3857_BOX[3] - y * step,
     )
 
     img = obj.render_image(box, (256, 256), reqest.registry.settings)
