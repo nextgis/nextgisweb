@@ -38,7 +38,7 @@ class MapserverStyle(Style):
         req.setParameter("format", 'image/png')
         req.setParameter("layers", 'main')
         req.setParameter("request", "GetMap")
-        req.setParameter('transparent', 'FALSE')
+        req.setParameter('transparent', 'TRUE')
 
         mapobj.loadOWSParameters(req)
 
@@ -59,7 +59,7 @@ class MapserverStyle(Style):
                     EXTENSION "png"
                     MIMETYPE "image/png"
                     DRIVER AGG/PNG
-                    IMAGEMODE RGB
+                    IMAGEMODE RGBA
                     FORMATOPTION "INTERLACE=OFF"
                 END
 
