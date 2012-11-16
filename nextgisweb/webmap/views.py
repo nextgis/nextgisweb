@@ -28,3 +28,25 @@ def display(request, obj):
         obj=obj,
         root_layer_group=DBSession.query(LayerGroup).filter_by(id=0).one(),
     )
+
+
+@view_config(route_name='webmap.layer_hierarchy', renderer='json')
+@model_loader(WebMap)
+def layer_hierarchy(request, obj):
+    def children(parent):
+        result = []
+        for i in parent.children:
+            result.append(dict(id='G-%d' % i.id, type='parent', layer_group_id=i.id, display_name=i.display_name, children=children(i)))
+
+        for i in parent.layers:
+            layer_info = dict(id='L-%d' % i.id, type='parent', layer_id=i.id, display_name=i.display_name, checked=False)
+            layer_info['style_id'] = i.styles[0].id if len(i.styles) > 0 else None
+            result.append(layer_info)
+
+        return result
+
+    return dict(
+        identifier='id',
+        label='display_name',
+        items=children(DBSession.query(LayerGroup).filter_by(id=0).one())
+    )

@@ -12,6 +12,7 @@ class WebMapComponent(object):
         config.add_route('webmap.browse', '/webmap/')
         config.add_route('webmap.show', '/webmap/{id}')
         config.add_route('webmap.display', '/webmap/{id}/display')
+        config.add_route('webmap.layer_hierarchy', '/webmap/{id}/layer_hierarchy')
 
     @classmethod
     def initialize_db(cls, dbsession):
