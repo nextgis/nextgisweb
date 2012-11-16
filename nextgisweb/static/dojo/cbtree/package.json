@@ -1,0 +1,28 @@
+{
+	"name": "cbtree",
+	"author": "Peter Jekel",
+	"version":"0.9.2",
+	"description": "Dijit Tree with Multi State Checkboxes and custom styling",
+	"licenses": [
+		 {
+			 "type": "BSD-2-Clause",
+			 "url": "http://thejekels.com/cbtree/LICENSE"
+		 },
+		 {
+			 "type": "BSD",
+			 "url": "http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L13"
+		 },
+		 {
+			 "type": "AFLv2.1",
+			 "url": "http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L43"
+		 }
+	],
+	"dependencies": {
+		"dojo" : "1.8",
+		"dijit" : "1.8"
+	},
+	"keywords": [ "Checkbox", "CheckboxTree", "FileStore", "Dijit", "Dojo", "Tree" ],
+	"homepage": "http://thejekels.com",
+	"icon":"http://thejekels.com/cbtree32.png",
+	"dojoBuild": "cbtree.profile.js"
+}

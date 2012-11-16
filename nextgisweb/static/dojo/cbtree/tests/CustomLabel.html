@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>Dijit Tree Custom Label Test</title>
+
+  <style type="text/css">
+    @import "../../dijit/themes/claro/claro.css";
+    @import "../../dijit/themes/claro/document.css";
+    @import "../../dijit/tests/css/dijitTests.css";
+    @import "../themes/claro/claro.css";
+  </style>
+
+  <!-- required: dojo.js -->
+  <script type="text/javascript" src="../../dojo/dojo.js"
+    data-dojo-config="parseOnLoad: true, isDebug: true"></script>
+
+  <script type="text/javascript">
+    dojo.require("doh.runner");
+    dojo.require("dijit.dijit"); // optimize: load dijit layer
+    dojo.require("dojo.data.ItemFileWriteStore");
+    dojo.require("cbtree.Tree");
+    dojo.require("cbtree.models.ForestStoreModel");
+    dojo.require("dojo.parser");  // scan page for widgets and instantiate them
+    
+    dojo.ready(function(){
+      doh.register("Test custom label",
+        [
+          {
+            name: "testLabels",
+            timeout: 1000,
+            runTest: function(){
+              var d = new doh.Deferred();
+
+              setTimeout(d.getTestCallback(function(){
+                var nameTree = dijit.byId("nameTree");
+                var nameChildren = nameTree.rootNode.getChildren();
+                doh.is("Arizona", nameChildren[3].label);
+                doh.is("Colorado", nameChildren[9].label);
+
+                var codeTree = dijit.byId("codeTree");
+                var codeChildren = codeTree.rootNode.getChildren();
+                doh.is("AZ", codeChildren[3].label);
+                doh.is("CO", codeChildren[9].label);
+                
+              }), 500);
+              
+              return d;
+            }
+          }
+        ]
+      );
+
+      doh.run();
+    });
+
+  </script>
+</head>
+<body class="claro">
+
+  <h1 class="testTitle">Dijit CheckBox Tree Custom Label Test</h1>
+
+  <div data-dojo-id="store" data-dojo-type="dojo.data.ItemFileWriteStore" data-dojo-props='url:"../../dijit/tests/_data/states.json"'></div>
+
+  <h2>Standard label (state names)</h2>
+  <div data-dojo-id="nameModel" data-dojo-type="cbtree.models.ForestStoreModel" data-dojo-props='store:store, rootLabel:"States", checkedRoot:true'></div>
+  <div id="nameTree" data-dojo-type="cbtree.Tree" data-dojo-props='model:nameModel, openOnClick:true'></div>
+
+  <h2>LabelAttr (state abbreviation)</h2>
+  <div data-dojo-id="codeModel" data-dojo-type="cbtree.models.ForestStoreModel" data-dojo-props='store:store, rootLabel:"States-2", checkedRoot:true, labelAttr:"abbreviation"'></div>
+  <div id="codeTree" data-dojo-type="cbtree.Tree" data-dojo-props='model:codeModel, openOnClick:true'></div>
+
+</body>
+</html>

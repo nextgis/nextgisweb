@@ -6,15 +6,27 @@
 <head>
   <title>Page title</title>
 
-  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/blueprint/screen.css')}" type="text/css" media="screen, projection">
-  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/default.css')}" type="text/css" media="screen, projection">
+  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/blueprint/screen.css')}" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/default.css')}" type="text/css" media="screen, projection" />
   
-  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css" media="screen">
-  <script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.0/dojo/dojo.js"></script>
+  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/dojo/dijit/themes/claro/claro.css')}" media="screen" />
+  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/dojo/cbtree/themes/claro/claro.css')}" media="screen" />
 
   <script type="text/javascript">
     var application_url = ${request.application_url | json.dumps};
+    var dojoConfig = {
+      async: true,
+      baseUrl: ${request.static_url('nextgisweb:static/dojo') | json.dumps},
+      packages: [
+        {name: 'dojo', location: 'dojo'},
+        {name: 'dijit', location: 'dijit'},
+        {name: 'dojox', location: 'dojox'},
+        {name: 'cbtree', location: 'cbtree'}
+      ]
+    };
   </script>
+
+  <script src="${request.static_url('nextgisweb:static/dojo/dojo/dojo.js')}"></script>
 
   %if hasattr(self, 'assets'):
     ${self.assets()}
