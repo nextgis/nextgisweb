@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..component import Component
 
-from .models import WebMap
+from .models import WebMap, WebMapItem
 
 
 @Component.registry.register
@@ -14,6 +14,11 @@ class WebMapComponent(object):
         config.add_route('webmap.display', '/webmap/{id}/display')
         config.add_route('webmap.layer_hierarchy', '/webmap/{id}/layer_hierarchy')
 
+        config.add_route('api.webmap.item.retrive', '/api/webmap/{id}', request_method='GET')
+        config.add_route('api.webmap.item.replace', '/api/webmap/{id}', request_method='PUT')
+
     @classmethod
     def initialize_db(cls, dbsession):
-        dbsession.add(WebMap(display_name=u"Основная веб-карта"))
+        root_item = WebMapItem(item_type='root')
+        webmap = WebMap(display_name=u"Основная веб-карта", root_item=root_item)
+        dbsession.add(webmap)

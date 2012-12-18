@@ -50,3 +50,15 @@ def layer_hierarchy(request, obj):
         label='display_name',
         items=children(DBSession.query(LayerGroup).filter_by(id=0).one())
     )
+
+
+@view_config(route_name='api.webmap.item.retrive', renderer='json')
+@model_loader(WebMap)
+def api_webmap_item_retrive(request, obj):
+    return obj.to_dict()
+
+
+@view_config(route_name='api.webmap.item.replace', renderer='json')
+@model_loader(WebMap)
+def api_webmap_item_replace(request, obj):
+    obj.from_dict(request.json_body)
