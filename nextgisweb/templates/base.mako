@@ -8,7 +8,7 @@
 
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/blueprint/screen.css')}" type="text/css" media="screen, projection" />
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/default.css')}" type="text/css" media="screen, projection" />
-  
+ 
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/dojo/dijit/themes/claro/claro.css')}" media="screen" />
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/dojo/cbtree/themes/claro/claro.css')}" media="screen" />
 
@@ -21,7 +21,9 @@
         {name: 'dojo', location: 'dojo'},
         {name: 'dijit', location: 'dijit'},
         {name: 'dojox', location: 'dojox'},
-        {name: 'cbtree', location: 'cbtree'}
+        {name: 'cbtree', location: 'cbtree'},
+        {name: 'webmap', location: '../webmap'},
+        {name: 'layer', location: '../layer'},
       ]
     };
   </script>

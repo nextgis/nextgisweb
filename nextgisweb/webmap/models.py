@@ -17,6 +17,9 @@ class WebMap(Base):
 
     root_item = orm.relationship('WebMapItem', cascade='all')
 
+    def __unicode__(self):
+        return self.display_name
+
     def to_dict(self):
         return dict(
             id=self.id,

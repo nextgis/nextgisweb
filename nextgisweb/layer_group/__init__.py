@@ -25,6 +25,8 @@ class LayerGroupComponent(object):
         config.add_route('layer_group.new_layer', '/layer_group/{id}/new-layer')
         config.add_route('layer_group.delete', '/layer_group/{id}/delete')
 
+        config.add_route('api.layer_group.tree', '/api/layer_group/{id}/tree')
+
     # SecurityProvider
     # =================================
 

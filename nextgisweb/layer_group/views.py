@@ -163,3 +163,29 @@ def delete(request, obj):
 def edit_security_proxy(request, obj):
     from ..security.views import acl_editor_view
     return acl_editor_view(request, obj, obj.acl)
+
+
+@view_config(route_name="api.layer_group.tree", renderer='json')
+@model_context(LayerGroup)
+def api_layer_group_tree(request, obj):
+
+    def traverse(layer_group):
+        return dict(
+            type='layer_group', id=layer_group.id,
+            display_name=layer_group.display_name,
+            children=[traverse(c) for c in layer_group.children],
+            layers=[
+                dict(
+                    type='layer', id=l.id,
+                    display_name=l.display_name,
+                    styles=[
+                        dict(
+                            type='style', id=s.id,
+                            display_name=s.display_name
+                        ) for s in l.styles
+                    ]
+                ) for l in layer_group.layers
+            ]
+        )
+
+    return traverse(obj)
