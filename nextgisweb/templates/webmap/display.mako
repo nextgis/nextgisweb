@@ -39,14 +39,14 @@
         require(['dojo/ready', 'dojox/geo/openlayers/Map'], function (ready, Map) {
             ready(function() {
                 dojoMap = new Map("map");
-
                 ${layer_group_js(root_layer_group)}
             })
         });
 
         require(
-            ['dojo/domReady', 'dojo/data/ItemFileWriteStore', 'cbtree/Tree', 'cbtree/models/ForestStoreModel', 'dojo/_base/connect'],
-            function (domReady, ItemFileWriteStore, Tree, ForestStoreModel, connect) {
+            ['dojo/parser', 'dojo/domReady', 'dojo/data/ItemFileWriteStore', 'cbtree/Tree', 'cbtree/models/ForestStoreModel', 'dojo/_base/connect'],
+            function (parser, domReady, ItemFileWriteStore, Tree, ForestStoreModel, connect) {
+                parser.parse(); 
 
                 function checkBoxClicked( item, nodeWidget, evt ) {
                     console.log(item);
@@ -74,14 +74,19 @@
             layers[id].setVisibility(visibility);
         };
     </script>
+
+    <style type="text/css">
+        body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; }
+    </style>
 </%def>
 
-<div class="span-6">
-    <div id="layer_tree"></div>
-    &nbsp;
-</div>
-
-<div class="span-18 last">
-    <div id="map" style="height: 600px;"></div>
-</div>
+    <div id="11" data-dojo-type="dijit/layout/BorderContainer" style="height: 100%">
+        <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
+            <div data-dojo-type="dijit/form/Button">Идентификация</div>
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'left', splitter: true" style="width: 250px; padding: 0;" id="layer_tree"></div>
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'" style="padding: 0;">
+            <div style="width: 100%; height: 100%;" id="map"></div>
+        </div>
+    </div>
 

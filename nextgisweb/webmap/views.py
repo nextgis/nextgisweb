@@ -15,7 +15,7 @@ def browse(request):
         obj_list=obj_list
     )
 
-@view_config(route_name='webmap.show', renderer='obj.mako')
+@view_config(route_name='webmap.show', renderer='webmap/show.mako')
 @model_loader(WebMap)
 def show(request, obj):
     return dict(obj=obj)
@@ -27,6 +27,7 @@ def display(request, obj):
     return dict(
         obj=obj,
         root_layer_group=DBSession.query(LayerGroup).filter_by(id=0).one(),
+        custom_layout=True
     )
 
 
