@@ -40,6 +40,9 @@
 </head>
 
 <body class="claro">
+
+  %if not custom_layout:
+
   <div class="container">
     <div class="span-24 header caption">
       Геоинформационная система
@@ -58,7 +61,6 @@
           ${request.user} [<a href="${request.route_url('auth.logout')}">выход</a>]
       %endif
       </li>
-
     </ul>
 
     <% has_action_panel = (action_panel or (obj and hasattr(obj,'__action_panel'))) %>
@@ -78,6 +80,13 @@
     %endif
 
   </div>
+
+  %else:
+  
+    ${next.body()}
+  
+  %endif
+
 </body>
 
 </html>
