@@ -115,7 +115,7 @@ define([
                     {
                         "item_type": "layer",
                         "display_name": widget.wgtLayer.selectedItem.display_name,
-                        "style_id": widget.wgtLayer.selectedItem.id
+                        "layer_style_id": widget.wgtLayer.selectedItem.id
                     }, {
                         parent: widget.getAddParent(),
                         attribute: "children"    
@@ -157,6 +157,7 @@ define([
                     item_type: widget.itemStore.getValue(itm, "item_type"),
                     display_name: widget.itemStore.getValue(itm, "display_name"),
                     group_expanded: widget.itemStore.getValue(itm, "group_expanded"),
+                    layer_style_id: widget.itemStore.getValue(itm, "layer_style_id"),
                     layer_enabled: widget.itemStore.getValue(itm, "layer_enabled"),
                     children: array.map(widget.itemStore.getValues(itm, "children"), function (i) { return traverseItem(i) })
                 }
