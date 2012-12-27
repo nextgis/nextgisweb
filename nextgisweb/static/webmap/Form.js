@@ -176,7 +176,9 @@ define([
 
         // значение аттрибута текущего элемента
         getItemValue: function (attr) {
-            return this.itemStore.getValue(this.widgetTree.selectedItem, attr);  
+            if (this.widgetTree.selectedItem) {
+                return this.itemStore.getValue(this.widgetTree.selectedItem, attr);
+            };
         }
     });
 });
