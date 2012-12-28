@@ -2,7 +2,7 @@
 from ..component import Component
 
 from .models import WebMap, WebMapItem
-
+from .adapter import WebMapAdapter
 
 @Component.registry.register
 class WebMapComponent(object):

@@ -33,36 +33,71 @@
 <%def name="head()">
     <% import json %>
     <script type="text/javascript">
+        var layerConfig = ${layer_config | json.dumps, n};
+        var treeConfig = ${tree_config | json.dumps, n};
+
         var dojoMap;
+        var adapters = {};
         var layers = {};
 
-        require(['dojo/ready', 'dojox/geo/openlayers/Map'], function (ready, Map) {
+        var treeStore;
+        var treeModel;
+
+        require([
+            "dojo/_base/array",
+            "dojo/parser",
+            "dojo/ready",
+            "dojo/data/ItemFileWriteStore",
+            "cbtree/models/TreeStoreModel",
+            "dojox/geo/openlayers/Map",
+            // чтобы не заморачиваться с асинхронной загрузкой адаптеров
+            // генерим js код, который загрузит их разом
+            ${', '.join([ json.dumps(v) for k, v in adapters]) | n}
+        ], function (
+            array,
+            parser,
+            ready,
+            ItemFileWriteStore,
+            TreeStoreModel,
+            Map,
+            ${', '.join([ "adapter_%s" % k for k, v in adapters]) }
+        ) {
+            // перенос адаптеров в переменную adapters
+            ${';\n'.join([ ("adapters.%s = adapter_%s") % (k, k) for k, v in adapters]) | n} ;
+
+            parser.parse();
+
+            treeStore = new ItemFileWriteStore({
+                data: { 
+                    label: "display_name",
+                    items: [ treeConfig ]
+                }
+            });
+
+            treeModel = new TreeStoreModel({
+                store: treeStore,
+                query: {item_type: 'root'},
+                checkedAll: false
+            });
+
+            array.forEach(layerConfig, function (l) {
+                layers[l.id] = new adapters.tms(l);
+            });
+
             ready(function() {
                 dojoMap = new Map("map");
-                ${layer_group_js(root_layer_group)}
-            })
+                array.forEach(layerConfig, function(l) {
+                    dojoMap.olMap.addLayer(layers[l.id].olLayer);
+                });
+            });
         });
 
         require(
-            ['dojo/parser', 'dojo/domReady', 'dojo/data/ItemFileWriteStore', 'cbtree/Tree', 'cbtree/models/ForestStoreModel', 'dojo/_base/connect'],
-            function (parser, domReady, ItemFileWriteStore, Tree, ForestStoreModel, connect) {
-                parser.parse(); 
-
-                function checkBoxClicked( item, nodeWidget, evt ) {
-                    console.log(item);
-                  alert( "The new state for " + this.getLabel(item) + " is: " + nodeWidget.get("checked") );
-                };
-
-                var store = new ItemFileWriteStore({url: ${request.route_url('webmap.layer_hierarchy', id=obj.id) | json.dumps}});
-                var model = new ForestStoreModel({
-                    store: store,
-                    query: {type: 'parent'},
-                    checkedAll: false
-                }); 
-
-                var tree = new Tree({model: model, autoExpand: true, showRoot: false, branchReadOnly: true});
-                connect.connect(tree, "onCheckBoxClick", model, function (item, nodeWidget, evt) {
-                    layers[item.layer_id].setVisibility(nodeWidget.get("checked"));
+            ['dojo/parser', 'dojo/domReady', 'dojo/data/ItemFileWriteStore', 'cbtree/Tree', "dijit/tree/dndSource", 'cbtree/models/ForestStoreModel', 'dojo/_base/connect'],
+            function (parser, domReady, ItemFileWriteStore, Tree, dndSource, ForestStoreModel, connect) {
+                var tree = new Tree({model: treeModel, autoExpand: true, showRoot: false, branchReadOnly: true, dndController: dndSource});
+                connect.connect(tree, "onCheckBoxClick", treeModel, function (item, nodeWidget, evt) {
+                    layers[item.id].olLayer.setVisibility(nodeWidget.get("checked"));
                 });
 
                 domReady(function () {

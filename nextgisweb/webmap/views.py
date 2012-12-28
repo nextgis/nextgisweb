@@ -24,8 +24,44 @@ def show(request, obj):
 @view_config(route_name='webmap.display', renderer='webmap/display.mako')
 @model_loader(WebMap)
 def display(request, obj):
+
+    # подготовим список и дерево слоев
+    display.idx = 1
+    def traverse(item):
+        display.idx += 1
+        result = dict(
+            id=display.idx,
+            item_type=item.item_type,
+            display_name=item.display_name
+        )
+        children = []
+        layers = []
+
+        if item.item_type == 'group':
+            result['group_expanded'] = item.group_expanded
+        elif item.item_type == 'layer':
+            result['layer_style_id'] = item.layer_style_id
+            result['layer_enabled'] = item.layer_enabled
+            result['checked'] = item.layer_enabled
+            layers.append(result)
+
+        for i in item.children:
+            c, l = traverse(i)
+            children.append(c)
+            layers.extend(l)
+
+        if item.item_type in ('group', 'root'):
+            result['children'] = children
+
+        return (result, layers)
+
+    tree_config, layer_config = traverse(obj.root_item)
+
     return dict(
         obj=obj,
+        adapters=(('tms', 'webmap/TMSAdapter'), ),
+        layer_config=layer_config,
+        tree_config=tree_config,
         root_layer_group=DBSession.query(LayerGroup).filter_by(id=0).one(),
         custom_layout=True
     )
