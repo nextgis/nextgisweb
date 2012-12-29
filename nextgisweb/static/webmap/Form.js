@@ -32,6 +32,8 @@ define([
         templateString: template,
 
         constructor: function (options) {
+            this.data = options.data;
+
             this.itemStore = new ItemFileWriteStore({
                 data: {items: [options.data.root_item ]}
             });
@@ -55,6 +57,8 @@ define([
         },
 
         postCreate: function () {
+            this.widgetDisplayName.setValue(this.data.display_name);
+
             // создать дерево без model не получается, поэтому создаем его вручную
             this.widgetTree.placeAt(this.containerTree).startup();
 
