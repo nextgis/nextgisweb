@@ -41,6 +41,8 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
 
+    config.add_route('amd_package', '/amd_package/*subpath')
+
     for impl in Component.registry:
         if hasattr(impl, 'setup_routes'):
             impl.setup_routes(config)
@@ -48,3 +50,15 @@ def main(global_config, **settings):
     config.scan()
     return config.make_wsgi_app()
 
+
+def amd_packages():
+    return (
+        ('dojo', 'nextgisweb:amd_packages/dojo'),
+        ('dijit', 'nextgisweb:amd_packages/dijit'),
+        ('dojox', 'nextgisweb:amd_packages/dojox'),
+        ('cbtree', 'nextgisweb:amd_packages/cbtree'),
+        ('layer', 'nextgisweb:amd_packages/layer'),
+        ('style', 'nextgisweb:amd_packages/style'),
+        ('webmap', 'nextgisweb:amd_packages/webmap'),
+        ('mapserver_style', 'nextgisweb:amd_packages/mapserver_style'),
+    )

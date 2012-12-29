@@ -9,28 +9,18 @@
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/blueprint/screen.css')}" type="text/css" media="screen, projection" />
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/default.css')}" type="text/css" media="screen, projection" />
  
-  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/dojo/dijit/themes/claro/claro.css')}" media="screen" />
-  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/dojo/cbtree/themes/claro/claro.css')}" media="screen" />
+  <link rel="stylesheet" href="${request.route_url('amd_package', subpath='dijit/themes/claro/claro.css')}" media="screen" />
+  <link rel="stylesheet" href="${request.route_url('amd_package', subpath='cbtree/themes/claro/claro.css')}" media="screen" />
 
   <script type="text/javascript">
     var application_url = ${request.application_url | json.dumps};
     var dojoConfig = {
       async: true,
-      baseUrl: ${request.static_url('nextgisweb:static/dojo') | json.dumps},
-      packages: [
-        {name: 'dojo', location: 'dojo'},
-        {name: 'dijit', location: 'dijit'},
-        {name: 'dojox', location: 'dojox'},
-        {name: 'cbtree', location: 'cbtree'},
-        {name: 'webmap', location: '../webmap'},
-        {name: 'layer', location: '../layer'},
-        {name: 'style', location: '../style'},
-        {name: 'mapserver_style', location: '../mapserver_style'}
-      ]
+      baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n}
     };
   </script>
 
-  <script src="${request.static_url('nextgisweb:static/dojo/dojo/dojo.js')}"></script>
+  <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
 
   %if hasattr(self, 'assets'):
     ${self.assets()}
@@ -42,7 +32,6 @@
 </head>
 
 <body class="claro">
-
   %if not custom_layout:
 
   <div class="container">

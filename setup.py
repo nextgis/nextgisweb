@@ -44,7 +44,11 @@ entry_points = {
         'initialize_nextgisweb_db = nextgisweb.scripts.initializedb:main',
         'nextgisweb = nextgisweb.script:main',
     ],
-    'nextgisweb.component': ['%s = nextgisweb.%s' % (i, i) for i in components]
+    'nextgisweb.component': ['%s = nextgisweb.%s' % (i, i) for i in components],
+
+    'nextgisweb.amd_packages': [
+        'nextgisweb = nextgisweb:amd_packages',
+    ],
 }
 
 setup(name='nextgisweb',
