@@ -129,7 +129,7 @@ define([
             });
 
             on(this.btnSave, "click", function() {
-                xhr(application_url + '/api/webmap/' + widget.id, {
+                xhr(application_url + '/api/webmap/' + widget.data.id, {
                     data: json.stringify(widget.getData()),
                     method: "PUT",
                     handleAs: "json"
