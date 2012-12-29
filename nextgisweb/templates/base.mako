@@ -24,6 +24,8 @@
         {name: 'cbtree', location: 'cbtree'},
         {name: 'webmap', location: '../webmap'},
         {name: 'layer', location: '../layer'},
+        {name: 'style', location: '../style'},
+        {name: 'mapserver_style', location: '../mapserver_style'}
       ]
     };
   </script>

@@ -23,7 +23,6 @@ class LayerComponent():
     def setup_routes(cls, config):
         config.add_route('layer', '/layer/')
         config.add_route('layer.show', '/layer/{id}')
-        config.add_route('layer.new_style', '/layer/{id}/new-style')
         config.add_route('layer.security', '/layer/{id}/security')
 
     # SecurityProvider

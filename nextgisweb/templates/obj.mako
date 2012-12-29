@@ -36,7 +36,7 @@
 
 %if subtitle:
     <h1>${subtitle}</h1>
-%else:
+%elif obj:
     <h1>
         ${obj}
     </h1>

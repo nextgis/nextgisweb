@@ -20,7 +20,7 @@ def __action_panel(self, request):
         if style.is_layer_supported(self):
             new_style_items.append(ap.I(
                 style.cls_display_name,
-                request.route_url('layer.new_style', id=self.id, _query=dict(identity=style.identity))
+                request.route_url('style.new', layer_id=self.id, _query=dict(identity=style.identity))
             ))
 
     panel = ap.P((
@@ -73,26 +73,6 @@ def show(request, obj):
 
 
 permalinker(Layer, 'layer.show')
-
-
-@view_config(route_name="layer.new_style", renderer="layer/new_style.mako")
-@model_context(Layer)
-def new_style(request, obj):
-    from ..style import Style
-    style_cls = Style.registry[request.GET['identity']]
-    form = style_cls.__new_form(request.POST)
-
-    if request.method == 'POST' and form.validate():
-        style = style_cls(layer=obj)
-        form.populate_obj(style)
-
-        DBSession.add(style)
-        DBSession.flush()
-
-        if form.default.data:
-            obj.default_style = style
-
-    return dict(obj=obj, form=form)
 
 
 @view_config(route_name='layer.security')

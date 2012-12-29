@@ -14,13 +14,36 @@ class MapserverStyle(Style):
 
     style_id = sa.Column(sa.Integer, sa.ForeignKey('style.id'), primary_key=True)
     opacity = sa.Column(sa.Integer, nullable=False, default=100)
-    stroke_color = sa.Column(sa.Unicode, nullable=False)
     stroke_width = sa.Column(sa.Integer, nullable=False, default=1)
+    stroke_color = sa.Column(sa.Unicode, nullable=False)
     fill_color = sa.Column(sa.Unicode, nullable=False)
 
     __mapper_args__ = dict(
         polymorphic_identity=identity,
     )
+
+    widget_module = 'mapserver_style/Widget'
+
+    def to_dict(self):
+        result = Style.to_dict(self)
+        result['mapserver_style'] = dict(
+            opacity=self.opacity,
+            stroke_color=self.stroke_color,
+            stroke_width=self.stroke_width,
+            fill_color=self.fill_color,
+        )
+
+        return result
+
+    def from_dict(self, data):
+        Style.from_dict(self, data)
+
+        if 'mapserver_style' in data:
+            mapserver_style = data['mapserver_style']
+
+            for k in ('opacity', 'stroke_color', 'stroke_width', 'fill_color'):
+                if k in mapserver_style:
+                    setattr(self, k, mapserver_style[k])
 
     @classmethod
     def is_layer_supported(cls, layer):
@@ -120,20 +143,28 @@ class MapserverStyle(Style):
     def _mapfile_class(self):
         result = ''
 
+        def color_h2d(h):
+            return ("%d %d %d" % (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)))
+
         if self.opacity:
             result += "OPACITY %d\n" % self.opacity
 
         result += "CLASS\n\tSTYLE\n"
 
         if self.fill_color != '':
-            result += "\t\tCOLOR %s\n" % self.fill_color
+            result += "\t\tCOLOR %s\n" % color_h2d(self.fill_color)
 
         if self.stroke_color != '':
-            result += "\t\tOUTLINECOLOR %s\n" % self.stroke_color
+            result += "\t\tOUTLINECOLOR %s\n" % color_h2d(self.stroke_color)
 
         if self.stroke_width != '':
             result += "\t\tWIDTH %d\n" % self.stroke_width
 
         result += "\tEND\nEND\n"
 
+        return result
+
+    @classmethod
+    def widget_config(cls, layer):
+        result = Style.widget_config(layer)
         return result

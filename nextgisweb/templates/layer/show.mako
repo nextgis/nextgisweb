@@ -13,7 +13,7 @@
 <ul>
 %for style in obj.styles:
     <li>
-        <a href="${style.permalink(request)}">
+        <a href="${request.route_url('style.show', id=style.id, layer_id=style.layer_id)}">
             ${style.display_name}
         </a>
     </li>
