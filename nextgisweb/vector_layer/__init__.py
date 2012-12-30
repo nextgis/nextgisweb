@@ -7,4 +7,6 @@ from .models import VectorLayer
 
 @Component.registry.register
 class VectorLayerComponent(Component):
+    identity = 'vector_layer'
+
     pass

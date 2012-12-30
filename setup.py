@@ -24,6 +24,8 @@ requires = [
     ]
 
 components = (
+    'core',
+    'pyramidcomp',
     'auth',
     'security',
     'layer_group',
@@ -42,7 +44,6 @@ entry_points = {
         'main = nextgisweb:main'
     ],
     'console_scripts': [
-        'initialize_nextgisweb_db = nextgisweb.scripts.initializedb:main',
         'nextgisweb = nextgisweb.script:main',
     ],
     'nextgisweb.component': ['%s = nextgisweb.%s' % (i, i) for i in components],

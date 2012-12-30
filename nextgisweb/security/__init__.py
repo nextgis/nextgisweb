@@ -5,7 +5,8 @@ from .models import PermissionCategory, Permission, PermissionScope, ACL, ACLIte
 
 
 @Component.registry.register
-class SecurityComponent():
+class SecurityComponent(Component):
+    identity = 'security'
 
     @classmethod
     def initialize_db(cls, dbsession):

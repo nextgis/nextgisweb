@@ -5,5 +5,7 @@ from .models import Style
 
 
 @Component.registry.register
-class MapserverStyleComponent(object):
+class MapserverStyleComponent(Component):
+    identity = 'mapserver_style'
+
     pass

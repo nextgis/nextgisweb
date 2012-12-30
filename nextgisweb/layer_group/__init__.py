@@ -8,7 +8,8 @@ from . import views
 
 @Component.registry.register
 @SecurityProvider.registry.register
-class LayerGroupComponent(object):
+class LayerGroupComponent(Component):
+    identity = 'layer_group'
 
     # Component
     # =================================

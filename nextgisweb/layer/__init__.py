@@ -10,7 +10,8 @@ from .views import LayerNewForm
 
 @Component.registry.register
 @SecurityProvider.registry.register
-class LayerComponent():
+class LayerComponent(Component):
+    identity = 'layer'
 
     # Component
     # =================================

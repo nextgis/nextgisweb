@@ -1,50 +1,44 @@
 # -*- coding: utf-8 -*-
-import uuid
-import os
-import os.path
 import pickle
-from shutil import copyfileobj
 import json
+from shutil import copyfileobj
 
 from pyramid.view import view_config
 from pyramid.response import Response
 
 
-@view_config(route_name='file_upload.test', renderer='file_upload/test.mako')
-def file_upload_test(request):
-    return dict(custom_layout=False)
+def includeme(config, comp, env):
 
+    def test(request):
+        return dict(custom_layout=False)
 
-@view_config(route_name='file_upload.upload')
-def file_upload_upload(request):
-    print request.POST
-    ufile = request.POST['file']
+    config.add_route('file_upload.test', '/file_upload/test')
+    config.add_view(test, route_name='file_upload.test', renderer='file_upload/test.mako')
 
-    meta = dict(
-        mime_type=str(request.POST['type']),
-        size=int(request.POST['size']),
-        name=str(request.POST['name'])
-    )
+    def upload(request):
+        ufile = request.POST['file']
 
-    path = request.registry.settings['file_upload.path']
+        meta = dict(
+            mime_type=str(request.POST['type']),
+            size=int(request.POST['size']),
+            name=str(request.POST['name'])
+        )
 
-    file_uuid = str(uuid.uuid4())
-    meta['id'] = file_uuid
+        fileid = comp.fileid()
+        meta['id'] = fileid
 
-    levels = (file_uuid[0:2], file_uuid[2:4])
-    levels_path = os.path.join(path, *levels)
-    if not os.path.isdir(levels_path):
-        os.makedirs(levels_path)
+        fn_data, fn_meta = comp.get_filename(fileid, makedirs=True)
 
-    file_path = os.path.join(levels_path, file_uuid)
+        with open(fn_data, 'wb') as fd:
+            copyfileobj(ufile.file, fd)
 
-    with open(file_path + '.data', 'wb') as fd:
-        copyfileobj(ufile.file, fd)
+        with open(fn_meta, 'wb') as fm:
+            fm.write(pickle.dumps(meta))
 
-    with open(file_path + '.meta', 'wb') as fm:
-        fm.write(pickle.dumps(meta))
+        # TODO: Добавить поддержку IFrame для IE и Flash uploader
+        return Response(
+            "%s" % json.dumps(meta)
+        )
 
-    # TODO: Добавить поддержку IFrame для IE и Flash uploader
-    return Response(
-        "%s" % json.dumps(meta)
-    )
+    config.add_route('file_upload.upload', '/file_upload/upload')
+    config.add_view(upload, route_name='file_upload.upload')

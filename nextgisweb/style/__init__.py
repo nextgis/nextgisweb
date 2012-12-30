@@ -5,7 +5,8 @@ from .models import Style
 
 
 @Component.registry.register
-class StyleComponent(object):
+class StyleComponent(Component):
+    identity = 'style'
 
     @classmethod
     def setup_routes(cls, config):

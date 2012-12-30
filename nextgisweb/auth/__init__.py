@@ -7,7 +7,8 @@ from ..models import DBSession
 from .models import Principal, User, Group
 
 @Component.registry.register
-class AuthComponent(object):
+class AuthComponent(Component):
+    identity = 'auth'
 
     @classmethod
     def initialize_db(cls, dbsession):

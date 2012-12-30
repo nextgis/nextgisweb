@@ -6,6 +6,20 @@ class Component(object):
 
     registry = registry_maker()
 
+    def __init__(self, env, settings):
+        self._env = env
+        self._settings = settings
+
+    def initialize(self):
+        pass
+
+    def setup_pyramid(self, config):
+        pass
+
+    @property
+    def settings(self):
+        return self._settings
+
     @classmethod
     def initialize_database(cls, dbsession):
         pass

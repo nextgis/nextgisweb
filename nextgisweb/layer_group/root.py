@@ -7,7 +7,8 @@ from ..auth import User
 
 
 @Component.registry.register
-class LayerGroupRootComponent(object):
+class LayerGroupRootComponent(Component):
+    identity = 'layer_group_root'
 
     @classmethod
     def initialize_db(cls, dbsession):
