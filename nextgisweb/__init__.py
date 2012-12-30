@@ -38,5 +38,4 @@ def amd_packages():
         ('layer', 'nextgisweb:amd_packages/layer'),
         ('style', 'nextgisweb:amd_packages/style'),
         ('webmap', 'nextgisweb:amd_packages/webmap'),
-        ('mapserver_style', 'nextgisweb:amd_packages/mapserver_style'),
     )

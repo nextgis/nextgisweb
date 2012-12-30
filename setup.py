@@ -35,7 +35,6 @@ components = (
     'layer_group.root',
     'vector_layer',
     'raster_layer',
-    'mapserver_style',
     'file_upload',
 )
 
