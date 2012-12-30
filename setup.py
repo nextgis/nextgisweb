@@ -34,6 +34,7 @@ components = (
     'vector_layer',
     'raster_layer',
     'mapserver_style',
+    'file_upload',
 )
 
 entry_points = {

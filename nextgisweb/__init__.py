@@ -53,6 +53,7 @@ def main(global_config, **settings):
 
 def amd_packages():
     return (
+        ('ngw', 'nextgisweb:amd_packages/ngw'),
         ('dojo', 'nextgisweb:amd_packages/dojo'),
         ('dijit', 'nextgisweb:amd_packages/dijit'),
         ('dojox', 'nextgisweb:amd_packages/dojox'),
