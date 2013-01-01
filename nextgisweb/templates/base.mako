@@ -16,6 +16,7 @@
     var application_url = ${request.application_url | json.dumps};
     var dojoConfig = {
       async: true,
+      isDebug: true,
       baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n}
     };
   </script>
