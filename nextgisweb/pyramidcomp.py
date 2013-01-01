@@ -19,6 +19,9 @@ class PyramidComponent(Component):
 
         config = Configurator(settings=settings)
 
+        # возможность доступа к Env через request.env
+        config.set_request_property(lambda (req): self._env, 'env')
+
         config.include(pyramid_tm)
 
         assert 'secret' in settings, 'Secret not set!'
@@ -40,4 +43,3 @@ class PyramidComponent(Component):
         config.scan()
 
         return config
-
