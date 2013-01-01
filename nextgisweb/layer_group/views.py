@@ -25,9 +25,8 @@ def __action_panel(self, request):
             ap.I(
                 c.cls_display_name,
                 request.route_url(
-                    'layer_group.new_layer',
-                    id=self.id,
-                    _query=dict(identity=c.identity)
+                    'layer.new',
+                    _query=dict(identity=c.identity, layer_group_id=self.id)
                 )
             )
         )
@@ -90,30 +89,6 @@ def new_group(request, obj):
         subtitle=u"Новая группа слоёв",
         form=form,
     )
-
-
-@view_config(route_name='layer_group.new_layer', renderer='layer_group/new_layer.mako')
-@model_context(LayerGroup)
-@model_permission('layer_group:layer-add')
-def group_new_layer(request, obj):
-    from ..layer import Layer
-    layer_cls = Layer.registry[request.GET['identity']]
-
-    form = layer_cls.__new_form(request.POST)
-
-    if request.method == 'POST' and form.validate():
-        layer = layer_cls(layer_group=obj)
-        form.populate_obj(layer)
-
-        DBSession.add(layer)
-        DBSession.flush()
-        return HTTPFound(location=request.route_url('layer.show', id=layer.id))
-
-    return dict(
-        obj=obj,
-        form=form
-    )
-
 
 @view_config(route_name='layer_group.delete', renderer='layer_group/delete.mako')
 @model_context(LayerGroup)

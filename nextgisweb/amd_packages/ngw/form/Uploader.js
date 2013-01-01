@@ -63,6 +63,10 @@ define([
             this.uploading = false;
             this.data = undefined;
             this.fileInfo.innerHTML = "Не удалось загрузить файл!";
+        },
+
+        _getValueAttr: function () {
+            return this.data;
         }
     });
 });

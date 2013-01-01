@@ -40,16 +40,44 @@ def __action_panel(self, request):
 Layer.__action_panel = __action_panel
 
 
-class LayerNewForm(Form):
-    display_name = fields.TextField(
-        u"Наименование",
-        [validators.required(u"Необходимо указать наименование слоя"), ]
-    )
-    keyname = fields.KeynameField()
-    submit = fields.SubmitField()
+class LayerWidget(object):
 
-Layer.__new_form = LayerNewForm
-Layer.__show_template = 'layer/show.mako'
+    def __init__(self, obj=None):
+        self.obj = obj
+
+    def bind(self, obj=None, data=None, request=None):
+        if obj:
+            self.obj = obj
+
+        if data:
+            self.data = data
+
+        if request:
+            self.request = request
+
+    def widget_modules(self):
+        return ('layer/Widget', )
+
+    def validate(self):
+        pass
+
+    def populate_obj(self):
+        if 'layer' in self.data:
+            self.obj.display_name = self.data['layer']['display_name']
+            self.obj.keyname = self.data['layer']['keyname']
+
+    def populate_widget(self, data):
+        if not ('layer' in data):
+            layer_data = dict()
+            data['layer'] = layer_data
+        else:
+            layer_data = data['layer']
+
+        layer_data['display_name'] = self.obj.display_name
+        layer_data['keyname'] = self.obj.keyname
+
+
+Layer.widget = LayerWidget
 
 
 @view_config(route_name='layer')
@@ -68,6 +96,33 @@ def show(request, obj):
     return render_to_response(
         actual_class.__show_template,
         dict(obj=obj),
+        request
+    )
+
+
+@view_config(route_name='layer.new')
+def new(request):
+    layer_group_id=int(request.GET['layer_group_id'])
+    identity=request.GET['identity']
+
+    cls = Layer.registry[identity]
+    widget = cls.widget()
+
+    if request.method == 'POST':
+        widget.bind(data=request.json_body, request=request)
+        widget.validate()
+
+        obj = cls(layer_group_id=layer_group_id)
+        DBSession.add(obj)
+
+        widget.bind(obj=obj)
+        widget.populate_obj()
+
+        return render_to_response('json', dict(url=obj.permalink(request)))
+
+    return render_to_response(
+        'layer/new.mako',
+        dict(widget=widget),
         request
     )
 

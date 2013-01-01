@@ -5,8 +5,9 @@ from ..security import SecurityProvider
 from .. import layer_group
 
 from .models import Layer
-from .views import LayerNewForm
+from .views import LayerWidget
 
+__all__ = ["LayerComponent", "Layer", "LayerWidget"]
 
 @Component.registry.register
 @SecurityProvider.registry.register
@@ -23,8 +24,10 @@ class LayerComponent(Component):
     @classmethod
     def setup_routes(cls, config):
         config.add_route('layer', '/layer/')
+        config.add_route('layer.new', '/layer/new')
         config.add_route('layer.show', '/layer/{id}')
         config.add_route('layer.security', '/layer/{id}/security')
+
 
     # SecurityProvider
     # =================================

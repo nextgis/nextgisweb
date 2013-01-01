@@ -38,4 +38,5 @@ def amd_packages():
         ('layer', 'nextgisweb:amd_packages/layer'),
         ('style', 'nextgisweb:amd_packages/style'),
         ('webmap', 'nextgisweb:amd_packages/webmap'),
+        ('vector_layer', 'nextgisweb:amd_packages/vector_layer'),
     )
