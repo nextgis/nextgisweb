@@ -6,7 +6,8 @@ define([
     "dojo/text!./templates/Widget.html",
     // template
     "dojox/layout/TableContainer",
-    "ngw/form/Uploader"
+    "ngw/form/Uploader",
+    "dijit/form/ComboBox"
 ], function (
     declare,
     _WidgetBase,
@@ -20,7 +21,10 @@ define([
         title: "Векторный слой",
 
         _getValueAttr: function () {
-            return {file: this.wFile.get("value")};
+            return {
+                file: this.wFile.get("value"),
+                encoding: this.wEncoding.get("value")
+            };
         }
     });
 })
