@@ -44,6 +44,7 @@ entry_points = {
     ],
     'console_scripts': [
         'nextgisweb = nextgisweb.script:main',
+        'nextgisweb-config = nextgisweb.script:config',
     ],
     'nextgisweb.component': ['%s = nextgisweb.%s' % (i, i) for i in components],
 

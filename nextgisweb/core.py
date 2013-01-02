@@ -4,6 +4,7 @@ from .component import Component
 from .models import DBSession, Base
 from sqlalchemy import create_engine
 
+
 @Component.registry.register
 class CoreComponent(Component):
     identity = 'core'
@@ -19,3 +20,10 @@ class CoreComponent(Component):
         self._sa_engine = create_engine(sa_url)
         DBSession.configure(bind=self._sa_engine)
         Base.metadata.bind = self._sa_engine
+
+    settings_info = (
+        dict(key='database.host', default='localhost', desc=u"Имя сервера БД"),
+        dict(key='database.name', default='nextgisweb', desc=u"Имя БД на сервере"),
+        dict(key='database.user', default='nextgisweb', desc=u"Имя пользователя БД"),
+        dict(key='database.password', desc=u"Пароль пользователя БД"),
+    )

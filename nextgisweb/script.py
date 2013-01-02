@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import codecs
 from argparse import ArgumentParser
 from ConfigParser import ConfigParser
 
@@ -36,3 +37,23 @@ def main(argv=sys.argv):
     env.initialize()
 
     args.command.execute(args, env)
+
+
+def config(argv=sys.argv):
+    from .component import Component, load_all
+    load_all()
+
+    for comp in Component.registry:
+        if hasattr(comp, 'settings_info'):
+            print u'[%s]' % comp.identity
+            print u''
+            for s in comp.settings_info:
+                if 'desc' in s:
+                    print '# %s ' % s['desc']
+                if 'default' in s:
+                    print '%s = %s' % (s['key'], s['default'])
+                else:
+                    print '# %s = ' % s['key']
+
+            print ''
+

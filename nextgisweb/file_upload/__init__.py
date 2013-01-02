@@ -6,6 +6,10 @@ from ..component import Component
 
 from .views import includeme
 
+
+__all__ = ["FileUploadComponent", ]
+
+
 @Component.registry.register
 class FileUploadComponent(Component):
     identity = 'file_upload'
@@ -19,9 +23,9 @@ class FileUploadComponent(Component):
 
     def get_filename(self, fileid, makedirs=False):
         """ Возвращает имена файлов (данные и метаданные), в котором
-        хранится загружаемый файл с указанным fileid. 
+        хранится загружаемый файл с указанным fileid.
 
-        При makedirs == True так же создаются необходимые директории. 
+        При makedirs == True так же создаются необходимые директории.
         Полезно в случае, когда имена файлов нужны для записи. """
 
         assert ('path' in self.settings) and os.path.isdir(self.settings['path']), \
@@ -39,3 +43,7 @@ class FileUploadComponent(Component):
 
         base_filename = os.path.join(level_path, fileid)
         return (base_filename + '.data', base_filename + '.meta')
+
+    settings_info = (
+        dict(key='path', desc=u"Директория для временного хранения загруженных файлов"),
+    )

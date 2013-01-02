@@ -43,3 +43,7 @@ class PyramidComponent(Component):
         config.scan()
 
         return config
+
+    settings_info = (
+        dict(key='secret', desc="Ключ, используемый для шифрования cookies"),
+    )
