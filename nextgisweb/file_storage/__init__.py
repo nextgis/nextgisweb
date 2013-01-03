@@ -13,8 +13,6 @@ class FileStorageComponent(Component):
 
     def fileobj(self, component):
         obj = FileObj(component=component)
-        DBSession.add(obj)
-        DBSession.flush((obj, ))
         return obj
 
     def filename(self, fileobj, makedirs=False):
@@ -23,13 +21,15 @@ class FileStorageComponent(Component):
 
         base_path = self.settings['path']
 
-        path = os.path.join(base_path, fileobj.component)
+        # разделяем на два уровня директорий по первым символам id
+        levels = (fileobj.uuid[0:2], fileobj.uuid[2:4])
+        path = os.path.join(base_path, fileobj.component, *levels)
 
         # создаем директории если нужно
         if makedirs and not os.path.isdir(path):
             os.makedirs(path)
 
-        return os.path.join(path, str(fileobj.id))
+        return os.path.join(path, str(fileobj.uuid))
 
     settings_info = (
         dict(key='path', desc=u"Директория для хранения файлов"),
