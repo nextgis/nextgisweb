@@ -1,6 +1,7 @@
 from ConfigParser import ConfigParser
 
 from pyramid.config import Configurator
+from pyramid.paster import setup_logging
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
@@ -17,6 +18,9 @@ from .env import Env
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application. """
+
+    if 'logging' in settings:
+        setup_logging(settings['logging'])
 
     cfg = ConfigParser()
     cfg.read((settings['config']))
