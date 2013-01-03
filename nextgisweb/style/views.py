@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from StringIO import StringIO
+
 from pyramid.view import view_config
 from pyramid.response import Response
 
@@ -64,7 +66,11 @@ def tms(reqest, obj):
 
     img = obj.render_image(box, (256, 256), reqest.registry.settings)
 
-    return Response(img.getBytes(), content_type='image/png')
+    buf = StringIO()
+    img.save(buf, 'png')
+    buf.seek(0)
+
+    return Response(body_file=buf, content_type='image/png')
 
 
 permalinker(Style, 'style.show')

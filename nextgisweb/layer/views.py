@@ -118,6 +118,7 @@ def new(request):
         widget.bind(obj=obj)
         widget.populate_obj()
 
+        DBSession.flush()
         return render_to_response('json', dict(url=obj.permalink(request)))
 
     return render_to_response(

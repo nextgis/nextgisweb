@@ -17,6 +17,10 @@ class Component(object):
         pass
 
     @property
+    def env(self):
+        return self._env
+
+    @property
     def settings(self):
         return self._settings
 

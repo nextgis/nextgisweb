@@ -10,6 +10,8 @@ class CoreComponent(Component):
     identity = 'core'
 
     def initialize(self):
+        Component.initialize(self)
+
         sa_url = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
             user=self._settings['database.user'],
             password=(':' + self._settings['database.password']) if 'database.password' in self._settings else '',
@@ -20,6 +22,8 @@ class CoreComponent(Component):
         self._sa_engine = create_engine(sa_url)
         DBSession.configure(bind=self._sa_engine)
         Base.metadata.bind = self._sa_engine
+
+        self.DBSession = DBSession
 
     settings_info = (
         dict(key='database.host', default='localhost', desc=u"Имя сервера БД"),

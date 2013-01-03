@@ -5,8 +5,6 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "style/StyleWidgetBase",
     "dojo/text!./templates/Widget.html",
-    "dojox/layout/TableContainer",
-    "ngw/form/DisplayNameTextBox",
 ], function (
     declare,
     _WidgetBase,
@@ -17,16 +15,10 @@ define([
 ) {
     return declare("style.Widget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, StyleWidgetBase], {
         templateString: template,
-        identity: "style",
-
-        postCreate: function () {
-            if (this.iData.display_name) { this.wDisplayName.setValue(this.iData.display_name) };
-        },
+        identity: "raster_style",
 
         getIData: function () {
-            return {
-                display_name: this.wDisplayName.getValue()
-            };
+            return {};
         }
     });
 })

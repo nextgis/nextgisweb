@@ -3,13 +3,11 @@ from ..component import Component
 
 
 @Component.registry.register
-class RasterLayerComponent(Component):
-    identity = 'raster_layer'
+class RasterStyleComponent(Component):
+    identity = 'raster_style'
 
     def initialize(self):
         Component.initialize(self)
 
-        from . import models, views
-
+        from . import models
         models.include(self)
-        views.include(self)

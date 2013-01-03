@@ -15,6 +15,7 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
 
+    'numpy',
     'gdal',
     'psycopg2',
     'geoalchemy',
@@ -34,8 +35,10 @@ components = (
     'style',
     'webmap',
     'layer_group.root',
+    'file_storage',
     'vector_layer',
     'raster_layer',
+    'raster_style',
     'file_upload',
 )
 
