@@ -50,10 +50,8 @@ def include(comp):
             reproject = not src_osr.IsSame(dst_osr)
 
             fobj = FileObj(component='raster_layer')
-            DBSession.add(fobj)
-            DBSession.flush((fobj, ))
 
-            dst_file = env.file_storage.filename(fobj)
+            dst_file = env.file_storage.filename(fobj, makedirs=True)
             self.fileobj = fobj
 
             if reproject:
