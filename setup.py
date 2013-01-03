@@ -30,6 +30,7 @@ components = (
     'security',
     'layer_group',
     'layer',
+    'spatial_ref_sys',
     'style',
     'webmap',
     'layer_group.root',
