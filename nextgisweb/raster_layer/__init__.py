@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from ..component import Component
+from ..component import Component, require
 
 
 @Component.registry.register
 class RasterLayerComponent(Component):
     identity = 'raster_layer'
 
+    @require('layer', 'file_storage')
     def initialize(self):
         Component.initialize(self)
 

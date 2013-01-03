@@ -33,6 +33,19 @@ class Component(object):
         pass
 
 
+def require(*comp_ident):
+
+    def subdecorator(defn):
+    
+        def wrapper(*args, **kwargs):
+            return defn(*args, **kwargs)
+        
+        wrapper._require = comp_ident
+        
+        return wrapper
+
+    return subdecorator
+
 def load_all():
     for ep in pkg_resources.iter_entry_points(group='nextgisweb.component'):
         ep.load()
