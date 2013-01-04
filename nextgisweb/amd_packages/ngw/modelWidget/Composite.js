@@ -1,19 +1,22 @@
 define([
     "dojo/_base/declare",
-    "ngw/ObjectWidget",
+    "./Widget",
     "dojo/_base/array",
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/when"
 ], function (
     declare,
-    ObjectWidget,
+    Widget,
     array,
     Deferred,
     all,
     when
 ) {
-    return declare("ngw.CompositeWidget", [ObjectWidget], {
+    // Виджет привязанный к модели, состоящий из других виджетов,
+    // привязанных к этой же модели.
+
+    return declare([Widget], {
 
         constructor: function (params) {
             this.subwidgets = {};
@@ -24,6 +27,7 @@ define([
             })
 
             this.subwidget = {};
+            this._subwidgets = [];
 
             var pSubWidgetCreated = {};
 
@@ -33,7 +37,11 @@ define([
                 pSubWidgetCreated[k] = d;
                 require([widget.subwidgets[k]], function (WM) {
                     var w = new WM(params[k]);
+                    w.__composite_key = k;
+
                     widget.subwidget[k] = w;
+                    widget._subwidgets.push(w);
+
                     d.resolve(w);
                 });
             });
@@ -77,20 +85,19 @@ define([
             return all(promises);
         },
 
-
-        validate: function () {
-            // Аналогично _getValueAttr проверка может быть асинхронной
-
-            var promises = [];
+        // Асинхронная проверка данных виджета, имя выбрано специально,
+        // чтобы не пересекалось со стандартным validate
+        validateWidget: function () {
+            var promises = {};
 
             var widget = this;
             array.forEach(Object.keys(this.subwidget), function (key) {
                 var subw = widget.subwidget[key];
-                if (subw.validate) {
+                if (subw.validateWidget) {
                     var subwPromise = new Deferred();
-                    promises.push(subwPromise);
+                    promises[key] = subwPromise;
 
-                    when(subw.validate(),
+                    when(subw.validateWidget(),
                         subwPromise.resolve,
                         subwPromise.reject
                     );
@@ -101,15 +108,28 @@ define([
 
             all(promises).then(
                 function (data) {
+                    var result = { isValid: true, error: {} };
 
-                    var f = true;
-                    array.forEach(data, function(wf) { f = f && wf });
-                    promise.resolve(f);
+                    array.forEach(Object.keys(data), function(wkey) {
+                        result.isValid = result.isValid && data[wkey].isValid;
+                        result.error[wkey] = data[wkey].error;
+                    });
+
+                    console.log(result);
+                    promise.resolve(result);
                 },
                 promise.reject
             );
 
             return promise;
+        },
+
+        _setErrorAttr: function (value) {
+            var widget = this;
+            array.forEach(Object.keys(this.subwidget), function (key) {
+                var subw = widget.subwidget[key];
+                subw.set("error", value[key]);
+            });
         },
 
         _setDisabledAttr: function (value) {

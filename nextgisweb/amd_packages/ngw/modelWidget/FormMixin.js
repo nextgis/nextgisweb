@@ -15,7 +15,11 @@ define([
     ContentPane,
     Button
 ) {
-    return declare("ngw.ObjectFormMixin", [], {
+    // Mixin превращающий ngw/modelWidget/Widget в форму редактирования
+    // модели с соответствующими кнопками и реализующий функционал сохранения
+    // или добавления.
+
+    return declare([], {
 
         constructor: function (params) {
             this.buttonPane = new ContentPane({style: "padding: 0"});
@@ -37,23 +41,28 @@ define([
             // заблокируем форму на всякий случай
             this.set("disabled", true);
 
-            var validate = function () { return true };
-            if (this.validate) {
-                var validate = function () { return widget.validate() };
+            var validate = function () { return { isValid: true, error: [] } };
+            if (this.validateWidget) {
+                var validate = function () { return widget.validateWidget() };
             };
 
             var d = new Deferred();
 
             // при любом исходе разблокируем форму
             d.then(
-                function () { widget.set("disabled", false) },
-                function () { widget.set("disabled", false) }
+                function (success) { widget.set("disabled", false) },
+                function (errinfo) {
+                    alert("К сожалению, во время выполнения операции произошла непредвиденная ошибка. \n" +
+                          "Возможно это вызвано неполадками в работе сети. Сообщение об ошибке:\n\n" + errinfo);
+
+                    widget.set("disabled", false);
+                }
             );
 
             // валидация формы может быть асинхронной
             when(validate(),
-                function (isValid) {
-                    if (isValid) {
+                function (result) {
+                    if (result.isValid) {
                         // получение значения может быть асинхронным
                         when(widget.get("value"),
                             function (value) {
@@ -63,20 +72,24 @@ define([
                                     headers: { "Content-Type": "application/json" }
                                 }).then(
                                     function (response) {
-                                        d.resolve(response);
-                                        // TODO: может потребоваться что-то более полезное чем редирект
-                                        window.location = response.url;
+                                        if (response.status_code == 200) {
+                                            d.resolve(true);
+                                            window.location = response.redirect;
+                                        } else if (response.status_code == 400) {
+                                            d.resolve(false);
+                                            widget.set("error", response.error);
+                                        } else {
+                                            // что-то странное с ответом
+                                            d.reject();
+                                        };
                                     }, 
-                                    function (error) {
-                                        alert(error);
-                                        d.reject(error);
-                                    }
+                                    d.reject
                                 );
                             }, d.reject
                         )
                     } else {
-                        alert("Не удалось выполнить действие, так как форма содержит ошибки.");
-                        d.reject();
+                        widget.set("error", result.error);
+                        d.resolve(false);
                     };
                 }, d.reject
             );

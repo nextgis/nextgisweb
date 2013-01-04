@@ -1,15 +1,10 @@
 define([
     "dojo/_base/declare",
-    "dijit/_WidgetBase",
-    "dojo/_base/array",
-    "dojo/_base/Deferred",
-    "dojo/promise/all"
+    "dijit/_WidgetBase"
 ], function (
     declare,
-    _WidgetBase,
-    array,
-    Deferred,
-    all
+    _WidgetBase
 ) {
-    return declare("ngw.ObjectWidget", [_WidgetBase], {});
+	// Базовый класс для виджета привязанного к модели
+    return declare([_WidgetBase], {});
 });

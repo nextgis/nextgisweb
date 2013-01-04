@@ -1,17 +1,16 @@
 define([
     "dojo/_base/declare",
-    "dijit/_WidgetBase",
-    "dijit/layout/ContentPane",
     "dijit/TitlePane",
     "dojo/dom-style"
 ], function (
     declare,
-    _WidgetBase,
-    ContentPane,
     TitlePane,
     domStyle
 ) {
-    return declare("ngw.CompositeTitlePaneMixin", [], {
+    // Mixin обеспечивающей расположение под-виджетов Composite на
+    // dijit/form/TitlePane - под одной на под-виждет.
+
+    return declare([], {
         placeWidget: function (key, widget) {
             var pane = new TitlePane({title: widget.title});
             this.watch("disabled", function (attr, oldVal, newVal) {
