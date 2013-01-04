@@ -40,44 +40,20 @@ def __action_panel(self, request):
 Layer.__action_panel = __action_panel
 
 
-class LayerWidget(object):
+from ..object_widget import ObjectWidget, CompositeWidget
 
-    def __init__(self, obj=None):
-        self.obj = obj
-
-    def bind(self, obj=None, data=None, request=None):
-        if obj:
-            self.obj = obj
-
-        if data:
-            self.data = data
-
-        if request:
-            self.request = request
-
-    def widget_modules(self):
-        return ('layer/Widget', )
-
-    def validate(self):
-        pass
+class LayerObjectWidget(ObjectWidget):
 
     def populate_obj(self):
-        if 'layer' in self.data:
-            self.obj.display_name = self.data['layer']['display_name']
-            self.obj.keyname = self.data['layer']['keyname']
+        ObjectWidget.populate_obj(self)
 
-    def populate_widget(self, data):
-        if not ('layer' in data):
-            layer_data = dict()
-            data['layer'] = layer_data
-        else:
-            layer_data = data['layer']
+        self.obj.display_name = self.data['display_name']
+        self.obj.keyname = self.data['keyname']
 
-        layer_data['display_name'] = self.obj.display_name
-        layer_data['keyname'] = self.obj.keyname
+    def widget_module(self):
+        return 'layer/Widget'
 
-
-Layer.widget = LayerWidget
+Layer.object_widget = LayerObjectWidget
 
 
 @view_config(route_name='layer')
@@ -106,11 +82,15 @@ def new(request):
     identity=request.GET['identity']
 
     cls = Layer.registry[identity]
-    widget = cls.widget()
+
+    widget = CompositeWidget((
+        ('layer', Layer.object_widget),
+        (identity, cls.object_widget),
+    ))
 
     if request.method == 'POST':
         widget.bind(data=request.json_body, request=request)
-        widget.validate()
+        # TODO: widget.validate()
 
         obj = cls(layer_group_id=layer_group_id)
         DBSession.add(obj)

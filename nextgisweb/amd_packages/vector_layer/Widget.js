@@ -1,21 +1,25 @@
 define([
     "dojo/_base/declare",
-    "dijit/_WidgetBase",
+    "ngw/ObjectWidget",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dojo/text!./templates/Widget.html",
+    "dojo/Deferred",
+    "dojo/when",
     // template
     "dojox/layout/TableContainer",
     "ngw/form/Uploader",
     "dijit/form/ComboBox"
 ], function (
     declare,
-    _WidgetBase,
+    ObjectWidget,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    template
+    template,
+    Deferred,
+    when
 ) {
-    return declare("vector_layer.Widget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare("vector_layer.Widget", [ObjectWidget, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "vector_layer",
         title: "Векторный слой",
@@ -25,6 +29,18 @@ define([
                 file: this.wFile.get("value"),
                 encoding: this.wEncoding.get("value")
             };
+        },
+
+        validate: function () {
+            var promise = new Deferred();
+
+            when(this.wFile.get("value"),
+                function (value) { promise.resolve(value != undefined) },
+                promise.reject
+            );
+
+            return promise;
         }
+
     });
 })

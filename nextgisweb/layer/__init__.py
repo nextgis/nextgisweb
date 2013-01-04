@@ -5,7 +5,7 @@ from ..security import SecurityProvider
 from .. import layer_group
 
 from .models import Layer
-from .views import LayerWidget
+from . import views
 
 __all__ = ["LayerComponent", "Layer", "LayerWidget"]
 

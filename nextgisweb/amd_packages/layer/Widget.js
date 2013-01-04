@@ -1,25 +1,51 @@
 define([
     "dojo/_base/declare",
-    "dijit/_WidgetBase",
+    "dojo/_base/array",
+    "ngw/ObjectWidget",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "dojo/on",
     "dojo/text!./templates/Widget.html",
     // template
     "dojox/layout/TableContainer",
-    "dijit/form/TextBox",
+    "ngw/form/DisplayNameTextBox",
     "ngw/form/KeynameTextBox",
     "dijit/form/Textarea"
 ], function (
     declare,
-    _WidgetBase,
+    array,
+    ObjectWidget,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    on,
     template
 ) {
-    return declare("layer.Widget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare("layer.Widget", [ObjectWidget, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "layer",
         title: "Слой",
+
+        postCreate: function () {
+            this.watch("disabled", function (attr, oldVal, newVal) {
+                array.forEach([this.wDisplayName, this.wKeyname, this.wDescription], function (w) {
+                    w.set(attr, newVal);
+                });
+            });
+        },
+
+        validate: function () {
+            var widget = this;
+
+            var isValid = true;
+            array.forEach(['wDisplayName', 'wKeyname'], function (k) {
+                var w = widget[k];
+                w._hasBeenBlurred = true;
+                w.validate();
+                isValid = isValid && w.isValid();
+            });
+
+            return isValid;
+        },
 
         _setValueAttr: function (value) {
             this.wDisplayName.set("value", value["display_name"]);

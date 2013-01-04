@@ -1,19 +1,19 @@
 define([
     "dojo/_base/declare",
-    "dijit/_WidgetBase",
+    "ngw/ObjectWidget",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "style/StyleWidgetBase",
     "dojo/text!./templates/Widget.html",
 ], function (
     declare,
-    _WidgetBase,
+    ObjectWidget,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     StyleWidgetBase,
     template
 ) {
-    return declare("style.Widget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, StyleWidgetBase], {
+    return declare("style.Widget", [ObjectWidget, _TemplatedMixin, _WidgetsInTemplateMixin, StyleWidgetBase], {
         templateString: template,
         identity: "raster_style",
 

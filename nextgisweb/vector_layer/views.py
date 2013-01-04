@@ -7,20 +7,19 @@ from osgeo import ogr
 from wtforms import form, fields, validators
 
 from ..models import DBSession
-from ..layer import Layer, LayerWidget
+from ..layer import Layer
 
 from .models import VectorLayer
 
+from ..object_widget import ObjectWidget
 
-class VectorLayerWiget(LayerWidget):
 
-    def widget_modules(self):
-        return LayerWidget.widget_modules(self) + ('vector_layer/Widget', )
+class VectorLayerObjectWidget(ObjectWidget):
 
     def populate_obj(self):
-        LayerWidget.populate_obj(self)
+        ObjectWidget.populate_obj(self)
 
-        datafile, metafile = self.request.env.file_upload.get_filename(self.data['vector_layer']['file']['id'])
+        datafile, metafile = self.request.env.file_upload.get_filename(self.data['file']['id'])
 
         tmpdir = tempfile.mkdtemp()
         try:
@@ -42,9 +41,10 @@ class VectorLayerWiget(LayerWidget):
         finally:
             shutil.rmtree(tmpdir)
 
+    def widget_module(self):
+        return 'vector_layer/Widget'
 
-VectorLayer.widget = VectorLayerWiget
-
+VectorLayer.object_widget = VectorLayerObjectWidget
 
 def validate_datafile(form, field):
     # проверяем что это zip-архив и файл загружен
