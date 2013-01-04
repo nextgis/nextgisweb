@@ -10,11 +10,11 @@
         require([
             "dojo/_base/declare",
             "dojo/ready",
-            "ngw/CompositeWidget",
-            "ngw/ObjectFormMixin",
-            "ngw/CompositeTitlePaneMixin"
-        ], function (declare, ready, Widget, ObjectFormMixin, LayoutMixin) {
-            var FormClass = declare("", [Widget, ObjectFormMixin, LayoutMixin]);
+            "ngw/modelWidget/Composite",
+            "ngw/modelWidget/FormMixin",
+            "ngw/modelWidget/CompositeTitlePaneMixin"
+        ], function (declare, ready, Composite, FormMixin, CompositeTitlePaneMixin) {
+            var FormClass = declare([Composite, FormMixin, CompositeTitlePaneMixin]);
             form = new FormClass(formParams);
             ready(function() {
                 form.placeAt('form').startup();

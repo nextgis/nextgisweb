@@ -1,9 +1,11 @@
 define([
     "dojo/_base/declare",
-    "ngw/ObjectWidget",
+    "ngw/modelWidget/Widget",
+    "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dojo/text!./templates/Widget.html",
+    // util
     "dojo/Deferred",
     "dojo/when",
     // template
@@ -12,14 +14,15 @@ define([
     "dijit/form/ComboBox"
 ], function (
     declare,
-    ObjectWidget,
+    Widget,
+    ErrorDisplayMixin,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     template,
     Deferred,
     when
 ) {
-    return declare("vector_layer.Widget", [ObjectWidget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "vector_layer",
         title: "Векторный слой",
@@ -31,11 +34,20 @@ define([
             };
         },
 
-        validate: function () {
+        validateWidget: function () {
             var promise = new Deferred();
 
             when(this.wFile.get("value"),
-                function (value) { promise.resolve(value != undefined) },
+                function (value) {
+                    if (value) {
+                        promise.resolve({ isValid: true, error: [] });
+                    } else {
+                        promise.resolve({
+                            isValid: false,
+                            error: [{ message: "Необходимо загрузить файл!" }]
+                        });
+                    };
+                },
                 promise.reject
             );
 

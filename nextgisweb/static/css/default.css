@@ -13,3 +13,7 @@ ul.panel li.group { margin-top: 1ex; border-bottom: 1px solid #ddd; }
 
 h1 { font-size: 18px; border-bottom: 1px solid #ddd; margin-top: 1ex; padding-bottom: 8px;}
 h2 { font-size: 16px; border-bottom: 1px solid #ddd; margin-top: 1ex; padding-bottom: 6px;}
+
+
+ul.ngwModelWidgetError { border: 1px solid #D46464; margin: 0 0 1ex 0;}
+ul.ngwModelWidgetError li { padding: .5ex 0;}

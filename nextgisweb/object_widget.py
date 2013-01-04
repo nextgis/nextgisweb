@@ -1,11 +1,19 @@
 # -*- coding: utf-8 -*-
 
 
+class ValidationError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 class ObjectWidget(object):
 
     def __init__(self, obj=None):
         self.obj = obj
         self.is_new = (obj == None)
+
+    def __del__(self):
+        pass
 
     def bind(self, obj=None, data=None, request=None):
         if obj:
@@ -17,14 +25,21 @@ class ObjectWidget(object):
         if request:
             self.request = request
 
+    def validate(self):
+        self.error = None
+        return True
+
     def populate_obj(self):
         pass
 
     def widget_module(self):
-        return 'ngw/ObjectWidget'
+        pass
 
     def widget_params(self):
         return dict(is_new=self.is_new)
+
+    def widget_error(self):
+        return self.error
 
 
 class CompositeWidget(ObjectWidget):
@@ -39,6 +54,14 @@ class CompositeWidget(ObjectWidget):
         for k, s in self.subwidgets:
             s.bind(obj=obj, data=data[k] if data else None, request=request)
 
+    def validate(self):
+        result = ObjectWidget.validate(self)
+
+        for k, s in self.subwidgets:
+            result = result and s.validate()
+
+        return result
+
     def populate_obj(self):
         ObjectWidget.populate_obj(self)
 
@@ -46,7 +69,7 @@ class CompositeWidget(ObjectWidget):
             s.populate_obj()
 
     def widget_module(self):
-        return 'ngw/CompositeWidget'
+        return 'ngw/modelWidget/Composite'
 
     def widget_params(self):
         result = ObjectWidget.widget_params(self)
@@ -57,3 +80,6 @@ class CompositeWidget(ObjectWidget):
             result[k] = s.widget_params()
 
         return result
+
+    def widget_error(self):
+        return dict([(k, s.widget_error()) for k, s in self.subwidgets])

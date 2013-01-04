@@ -50,6 +50,12 @@ class LayerObjectWidget(ObjectWidget):
         self.obj.display_name = self.data['display_name']
         self.obj.keyname = self.data['keyname']
 
+    def validate(self):
+        result = ObjectWidget.validate(self)
+        self.error = [];
+
+        return result
+
     def widget_module(self):
         return 'layer/Widget'
 
@@ -90,16 +96,24 @@ def new(request):
 
     if request.method == 'POST':
         widget.bind(data=request.json_body, request=request)
-        # TODO: widget.validate()
+        
+        if widget.validate():
+            obj = cls(layer_group_id=layer_group_id)
+            DBSession.add(obj)
 
-        obj = cls(layer_group_id=layer_group_id)
-        DBSession.add(obj)
+            widget.bind(obj=obj)
+            widget.populate_obj()
 
-        widget.bind(obj=obj)
-        widget.populate_obj()
-
-        DBSession.flush()
-        return render_to_response('json', dict(url=obj.permalink(request)))
+            DBSession.flush()
+            return render_to_response('json', dict(
+                status_code=200,
+                redirect=obj.permalink(request),
+            ))
+        else:
+            return render_to_response('json', dict(
+                status_code=400,
+                error=widget.widget_error(),
+            ))
 
     return render_to_response(
         'layer/new.mako',

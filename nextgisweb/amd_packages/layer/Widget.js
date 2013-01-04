@@ -1,11 +1,12 @@
 define([
     "dojo/_base/declare",
-    "dojo/_base/array",
-    "ngw/ObjectWidget",
+    "ngw/modelWidget/Widget",
+    "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/on",
     "dojo/text!./templates/Widget.html",
+    "dojo/_base/array",
+    "dojo/on",
     // template
     "dojox/layout/TableContainer",
     "ngw/form/DisplayNameTextBox",
@@ -13,14 +14,15 @@ define([
     "dijit/form/Textarea"
 ], function (
     declare,
-    array,
-    ObjectWidget,
+    Widget,
+    ErrorDisplayMixin,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    on,
-    template
+    template,
+    array,
+    on
 ) {
-    return declare("layer.Widget", [ObjectWidget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "layer",
         title: "Слой",
@@ -33,18 +35,23 @@ define([
             });
         },
 
-        validate: function () {
+        validateWidget: function () {
             var widget = this;
 
-            var isValid = true;
-            array.forEach(['wDisplayName', 'wKeyname'], function (k) {
-                var w = widget[k];
-                w._hasBeenBlurred = true;
-                w.validate();
-                isValid = isValid && w.isValid();
+            var result = { isValid: true, error: [] };
+
+            array.forEach([this.wDisplayName, this.wKeyname], function (subw) {
+                // форсируем показ значка при проверке
+                subw._hasBeenBlurred = true;
+                subw.validate();   
+
+                // если есть ошибки, фиксируем их
+                if ( !subw.isValid() ) {
+                    result.isValid = false;
+                };
             });
 
-            return isValid;
+            return result;
         },
 
         _setValueAttr: function (value) {

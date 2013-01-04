@@ -2,7 +2,7 @@ define([
     "dojo/_base/declare",
     "dijit/form/Select"
 ], function (declare, Select) {
-    return declare("ngw.form.SpatialRefSysSelect", [Select], {
+    return declare([Select], {
 
         preamble: function (kwArgs) {
             kwArgs.options = [

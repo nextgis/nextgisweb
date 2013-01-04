@@ -1,25 +1,27 @@
 define([
     "dojo/_base/declare",
-    "dojo/Deferred",
-    "dojo/when",
-    "ngw/ObjectWidget",
+    "ngw/modelWidget/Widget",
+    "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dojo/text!./templates/Widget.html",
+    "dojo/Deferred",
+    "dojo/when",
     // template
     "dojox/layout/TableContainer",
     "ngw/form/SpatialRefSysSelect",
     "ngw/form/Uploader"
 ], function (
     declare,
-    Deferred,
-    when,
-    ObjectWidget,
+    Widget,
+    DisplayErrorMixin,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    template
+    template,
+    Deferred,
+    when
 ) {
-    return declare("raster_layer.Widget", [ObjectWidget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([Widget, DisplayErrorMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "raster_layer",
         title: "Растровый слой",
@@ -40,11 +42,20 @@ define([
             return promise;
         },
 
-        validate: function () {
+        validateWidget: function () {
             var promise = new Deferred();
 
             when(this.wFile.get("value"),
-                function (value) { promise.resolve(value != undefined) },
+                function (value) {
+                    if (value) {
+                        promise.resolve({ isValid: true, error: [] });
+                    } else {
+                        promise.resolve({
+                            isValid: false,
+                            error: [{ message: "Необходимо загрузить файл!" }]
+                        });
+                    };
+                },
                 promise.reject
             );
 

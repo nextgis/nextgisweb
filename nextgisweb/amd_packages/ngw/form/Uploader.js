@@ -20,7 +20,7 @@ define([
     // Uploader AMD workaround
     Uploader = dojox.form.Uploader;
 
-    return declare("ngw.form.Uploader", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
 
         constructor: function () {

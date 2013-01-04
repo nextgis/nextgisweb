@@ -2,7 +2,7 @@ define([
     "dojo/_base/declare",
     "dijit/form/ValidationTextBox"
 ], function (declare, ValidationTextBox) {
-    return declare("ngw/form/DisplayNameTextBox", [ValidationTextBox], {
+    return declare([ValidationTextBox], {
 
         preamble: function (kwArgs) {
             kwArgs.required = true;

@@ -19,36 +19,61 @@ class VectorLayerObjectWidget(ObjectWidget):
     def populate_obj(self):
         ObjectWidget.populate_obj(self)
 
+        self.obj.setup_from_ogr(self._ogrlayer)
+
+        DBSession.flush()
+        metadata, table = self.obj.metadata_and_table()
+        metadata.create_all(bind=DBSession.bind)
+
+        self.obj.load_from_ogr(self._ogrlayer)
+
+    def validate(self):
+        result = ObjectWidget.validate(self)
+        self.error = []
+
         datafile, metafile = self.request.env.file_upload.get_filename(self.data['file']['id'])
 
-        tmpdir = tempfile.mkdtemp()
-        try:
-            fa = zipfile.ZipFile(datafile, 'r')
-            fa.extractall(path=tmpdir)
+        if not zipfile.is_zipfile(datafile):
+            self.error.append(dict(message=u"Загруженный файл не является ZIP-архивом."))
+            result = False
+        else:
+            self._unzip_tmpdir = tempfile.mkdtemp()
 
-            ds = ogr.Open(tmpdir)
-            ogrlayer = ds.GetLayer()
+            zipfile.ZipFile(datafile, 'r').extractall(path=self._unzip_tmpdir)
 
-            self.obj.setup_from_ogr(ogrlayer)
+            self._ogrds = ogr.Open(self._unzip_tmpdir)
+            if not self._ogrds:
+                self.error.append(dict(message=u"Библиотеке GDAL/OGR не удалось открыть файл."))
+                result = False
 
-            DBSession.flush()
+            else:
+                if self._ogrds.GetLayerCount() < 1:
+                    self.error.append(dict(message=u"Набор данных не содержит слоёв."))
+                    result = False
 
-            metadata, table = self.obj.metadata_and_table()
-            metadata.create_all(bind=DBSession.bind)
+                elif self._ogrds.GetLayerCount() > 1:
+                    self.error.append(dict(message=u"Набор данных содержит более одного слоя."))
+                    result = False
 
-            self.obj.load_from_ogr(ogrlayer)
+                else:
+                    self._ogrlayer = self._ogrds.GetLayer(0)
+                    if not self._ogrlayer:
+                        self.error.append(dict(message=u"Не удалось открыть слой."))
+                        result = False
 
-        finally:
-            shutil.rmtree(tmpdir)
+        return result
+
+    def __del__(self):
+        # Если создавалась временная папка, в которую распаковали ZIP-архив,
+        # то ее нужно удалить.
+        if hasattr(self, '_unzip_tmpdir'):
+            shutil.rmtree(self._unzip_tmpdir)
+
+        ObjectWidget.__del__(self)
 
     def widget_module(self):
         return 'vector_layer/Widget'
 
 VectorLayer.object_widget = VectorLayerObjectWidget
-
-def validate_datafile(form, field):
-    # проверяем что это zip-архив и файл загружен
-    if isinstance(field.data, basestring) or not zipfile.is_zipfile(field.data.file):
-        raise validators.ValidationError(u"Необходимо загрузить ZIP-архив!")
 
 VectorLayer.__show_template = 'vector_layer/show.mako'
