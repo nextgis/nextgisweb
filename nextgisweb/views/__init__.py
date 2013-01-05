@@ -58,4 +58,4 @@ def amd_package(request):
         if p == amd_package_name:
             py_package, path = asset.split(':', 1)
             file_path = resource_filename(py_package, '/'.join((path, amd_package_path)))
-            return FileResponse(file_path)
+            return FileResponse(file_path, cache_max_age=3600)
