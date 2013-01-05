@@ -42,7 +42,7 @@ class ModelController(object):
         context = self.create_context(request)
 
         widget_class = self.widget_class(context, 'create')
-        widget = widget_class()
+        widget = widget_class(operation='create')
 
         if request.method == 'POST':
             widget.bind(data=request.json_body, request=request)
@@ -82,7 +82,7 @@ class ModelController(object):
         obj = self.query_object(context)
 
         widget_class = self.widget_class(context, 'edit')
-        widget = widget_class(obj=obj)
+        widget = widget_class(obj=obj, operation='edit')
 
         if request.method == 'POST':
             widget.bind(data=request.json_body, request=request)

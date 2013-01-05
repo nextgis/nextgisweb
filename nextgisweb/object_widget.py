@@ -8,9 +8,14 @@ class ValidationError(Exception):
 
 class ObjectWidget(object):
 
-    def __init__(self, obj=None):
+    def __init__(self, obj=None, operation=None):
+        if not obj and not operation:
+            operation = 'create'
+        elif not operation:
+            operation = 'edit'
+
         self.obj = obj
-        self.is_new = (obj == None)
+        self.operation = operation
 
     def __del__(self):
         pass
@@ -36,7 +41,9 @@ class ObjectWidget(object):
         pass
 
     def widget_params(self):
-        return dict(is_new=self.is_new)
+        return dict(
+            operation=self.operation,
+        )
 
     def widget_error(self):
         return self.error
