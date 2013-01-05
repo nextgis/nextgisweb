@@ -14,28 +14,41 @@ class ObjectWidget(object):
         elif not operation:
             operation = 'edit'
 
-        self.obj = obj
+        self.__validate_flag = False
+        self.__obj_bind_flag = (obj is not None)
+        self.__data_bind_flag = False
+
         self.operation = operation
+        self.obj = obj
 
     def __del__(self):
         pass
 
     def bind(self, obj=None, data=None, request=None):
         if obj:
+            assert not self.__obj_bind_flag
             self.obj = obj
+            self.__obj_bind_flag = True
 
         if data:
+            assert not self.__data_bind_flag
             self.data = data
+            self.__data_bind_flag = True
 
         if request:
             self.request = request
 
     def validate(self):
+        # Валидация должна выполняться один раз
+        assert not self.__validate_flag
+        self.__validate_flag = True
+
         self.error = None
         return True
 
     def populate_obj(self):
-        pass
+        # Только после validate() и bind(data=data)
+        assert self.__validate_flag and self.__obj_bind_flag
 
     def widget_module(self):
         pass
@@ -46,6 +59,9 @@ class ObjectWidget(object):
         )
 
     def widget_error(self):
+        # Ошибки могут быть только после валидации
+        assert self.__validate_flag
+
         return self.error
 
 
@@ -53,13 +69,13 @@ class CompositeWidget(ObjectWidget):
 
     def __init__(self, obj=None, operation=None):
         ObjectWidget.__init__(self, obj=obj, operation=operation)
-        self.subwidgets = tuple([(k, c(obj=obj)) for k, c in self.subwidgets])
+        self.subwidgets = tuple([(k, c(obj=obj)) for k, c in self.subwidget_config])
 
     def bind(self, obj=None, data=None, request=None):
         ObjectWidget.bind(self, obj=obj, data=data, request=request)
 
         for k, s in self.subwidgets:
-            s.bind(obj=obj, data=data[k] if data else None, request=request)
+            s.bind(obj=obj, data=data[k] if (data and k in data) else None, request=request)
 
     def validate(self):
         result = ObjectWidget.validate(self)
