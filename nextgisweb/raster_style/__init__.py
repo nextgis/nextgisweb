@@ -12,3 +12,7 @@ class RasterStyleComponent(Component):
 
         from . import models
         models.include(self)
+
+    def setup_pyramid(self, config):
+    	from . import views
+    	views.setup_pyramid(self, config)

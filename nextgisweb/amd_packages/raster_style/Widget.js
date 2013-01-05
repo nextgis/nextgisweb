@@ -1,24 +1,21 @@
 define([
     "dojo/_base/declare",
     "ngw/modelWidget/Widget",
+    "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "style/StyleWidgetBase",
     "dojo/text!./templates/Widget.html",
 ], function (
     declare,
     Widget,
+    ErrorDisplayMixin,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    StyleWidgetBase,
     template
 ) {
-    return declare([Widget, _TemplatedMixin, _WidgetsInTemplateMixin, StyleWidgetBase], {
+    return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "raster_style",
-
-        getIData: function () {
-            return {};
-        }
+        title: "Растровый стиль"
     });
 })

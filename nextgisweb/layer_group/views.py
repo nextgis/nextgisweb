@@ -68,7 +68,7 @@ class LayerGroupObjectWidget(ObjectWidget):
         return result
 
     def widget_params(self):
-        result = super(LayerGroupObjectWidget, self).widget_params()
+        result = ObjectWidget.widget_params(self)
 
         if self.obj:
             result['value'] = dict(

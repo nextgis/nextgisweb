@@ -59,9 +59,3 @@ class Style(Base):
     def render_image(cls, extent, image_size, settings):
         """ Рендеринг картинки """
         pass
-
-    @classmethod
-    def widget_config(cls, layer):
-        return dict(
-            style=dict(layer_id=layer.id)
-        )

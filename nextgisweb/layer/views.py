@@ -22,7 +22,7 @@ def __action_panel(self, request):
         if style.is_layer_supported(self):
             new_style_items.append(ap.I(
                 style.cls_display_name,
-                request.route_url('style.new', layer_id=self.id, _query=dict(identity=style.identity))
+                request.route_url('style.create', layer_id=self.id, _query=dict(identity=style.identity))
             ))
 
     panel = ap.P((
@@ -124,7 +124,7 @@ def includeme(comp, config):
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):
-                subwidgets = _subwidgets(context['cls'])
+                subwidget_config = _subwidgets(context['cls'])
                 
             return Composite
 

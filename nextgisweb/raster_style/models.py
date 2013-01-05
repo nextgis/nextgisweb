@@ -95,3 +95,5 @@ def include(comp):
             result.paste(wnd, (offset_left, offset_top))
 
             return result
+
+    comp.RasterStyle = RasterStyle

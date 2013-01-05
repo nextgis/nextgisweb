@@ -1,32 +1,57 @@
 define([
     "dojo/_base/declare",
-    "dijit/_WidgetBase",
+    "ngw/modelWidget/Widget",
+    "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "style/StyleWidgetBase",
     "dojo/text!./templates/Widget.html",
+    "dojo/_base/array",
+    // template
     "dojox/layout/TableContainer",
     "ngw/form/DisplayNameTextBox",
 ], function (
     declare,
-    _WidgetBase,
+    Widget,
+    ErrorDisplayMixin,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    StyleWidgetBase,
-    template
+    template,
+    array
 ) {
-    return declare("style.Widget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, StyleWidgetBase], {
+    return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "style",
+        title: "Стиль",
 
-        postCreate: function () {
-            if (this.iData.display_name) { this.wDisplayName.setValue(this.iData.display_name) };
+        _getValueAttr: function () {
+            return {
+                display_name: this.wDisplayName.get("value")
+            };
         },
 
-        getIData: function () {
-            return {
-                display_name: this.wDisplayName.getValue()
-            };
+        _setValueAttr: function (value) {
+            this.inherited(arguments);
+            this.wDisplayName.set("value", value.display_name);
+        },
+
+        validateWidget: function () {
+            var widget = this;
+
+            var result = { isValid: true, error: [] };
+
+            array.forEach([this.wDisplayName], function (subw) {
+                // форсируем показ значка при проверке
+                subw._hasBeenBlurred = true;
+                subw.validate();   
+
+                // если есть ошибки, фиксируем их
+                if ( !subw.isValid() ) {
+                    result.isValid = false;
+                };
+            });
+
+            return result;
         }
+
     });
 })
