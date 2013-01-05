@@ -8,7 +8,7 @@ from ..wtforms import Form, fields, validators
 from ..models import DBSession
 from ..views import model_context, permalinker, ModelController
 from .. import action_panel as ap
-from ..object_widget import CompositeWidget
+from ..object_widget import ObjectWidget, CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
 
 from .models import Layer
@@ -81,6 +81,20 @@ def security_proxy(request, obj):
     from ..security.views import acl_editor_view
     return acl_editor_view(request, obj, obj.acl)
 
+def _subwidgets(model_class):
+    result = []
+    while issubclass(model_class, Layer):
+        if hasattr(model_class, 'object_widget'):
+            val = model_class.object_widget
+            if issubclass(val, ObjectWidget):
+                result.append((model_class.identity, val))
+            elif isinstance(val, tuple):
+                result.append(val)
+
+        model_class = model_class.__base__
+
+    return result
+
 def includeme(comp, config):
     from ..layer_group import LayerGroup
 
@@ -90,6 +104,10 @@ def includeme(comp, config):
             layer_group = DBSession.query(LayerGroup).filter_by(id=request.GET['layer_group_id']).one()
             identity = request.GET['identity']
             cls = Layer.registry[identity]
+            template_context = dict(
+                obj=layer_group,
+                subtitle=u"Новый слой",
+            )
             return locals()
 
         def edit_context(self, request):
@@ -97,14 +115,14 @@ def includeme(comp, config):
             identity = obj.cls
             cls = Layer.registry[identity]
             obj = DBSession.query(cls).get(obj.id)
+            template_context = dict(
+                obj=obj,
+            )
             return locals()
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):
-                subwidgets = (
-                    ('layer', Layer.object_widget),
-                    (context['identity'], context['cls'].object_widget),
-                )
+                subwidgets = _subwidgets(context['cls'])
                 
             return Composite
 
@@ -115,6 +133,9 @@ def includeme(comp, config):
 
         def query_object(self, context):
             return context['obj']
+
+        def template_context(self, context):
+            return context['template_context']
 
     LayerController('layer') \
         .includeme(config)

@@ -181,19 +181,32 @@ def includeme(comp, config):
     class LayerGroupController(ModelController):
         
         def create_context(self, request):
-            return DBSession.query(LayerGroup).filter_by(id=request.GET['parent_id']).one()
+            parent = DBSession.query(LayerGroup).filter_by(id=request.GET['parent_id']).one()
+            template_context = dict(
+                obj=parent,
+                subtitle=u"Новая группа слоёв",
+            )
+            return locals()
+
 
         def edit_context(self, request):
-            return DBSession.query(LayerGroup).filter_by(**request.matchdict).one()
+            obj = DBSession.query(LayerGroup).filter_by(**request.matchdict).one()
+            template_context = dict(
+                obj=obj,
+            )
+            return locals()
 
         def widget_class(self, context, operation):
             return LayerGroupObjectWidget
 
         def create_object(self, context):
-            return LayerGroup(parent=context)
+            return LayerGroup(parent=context['parent'])
 
         def query_object(self, context):
-            return context
+            return context['obj']
+
+        def template_context(self, context):
+            return context['template_context']
 
     LayerGroupController('layer_group') \
         .includeme(config)

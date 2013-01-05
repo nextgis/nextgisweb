@@ -38,6 +38,9 @@ class ModelController(object):
     def query_object(self, context):
         pass
 
+    def template_context(self, context):
+        return dict()
+
     def create(self, request):
         context = self.create_context(request)
 
@@ -73,7 +76,7 @@ class ModelController(object):
 
         return render_to_response(
             'model_widget.mako',
-            dict(widget=widget),
+            dict(self.template_context(context), widget=widget),
             request
         )
 
@@ -108,6 +111,6 @@ class ModelController(object):
 
         return render_to_response(
             'model_widget.mako',
-            dict(widget=widget),
+            dict(self.template_context(context), widget=widget),
             request
         )
