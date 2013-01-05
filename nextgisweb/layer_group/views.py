@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
+from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound
 
 from ..models import DBSession
@@ -14,7 +15,7 @@ def __action_panel(self, request):
     new_items = [
         ap.I(
             u"Группа слоев",
-            request.route_url('layer_group.new_group', id=self.id)
+            request.route_url('layer_group.new', _query=dict(parent_id=self.id))
         ),
     ]
 
@@ -48,10 +49,27 @@ def __action_panel(self, request):
 LayerGroup.__action_panel = __action_panel
 
 
-class LayerGroupNewForm(Form):
-    display_name = fields.TextField(u"Наименование", [validators.required()])
-    keyname = fields.KeynameField()
-    submit = fields.SubmitField()
+from ..object_widget import ObjectWidget
+
+class LayerGroupObjectWidget(ObjectWidget):
+
+    def populate_obj(self):
+        ObjectWidget.populate_obj(self)
+
+        self.obj.display_name = self.data['display_name']
+        self.obj.keyname = self.data['keyname']
+
+    def validate(self):
+        result = ObjectWidget.validate(self)
+        self.error = [];
+
+        return result
+
+    def widget_module(self):
+        # Временно используем тот же виджет, что и для слоя
+        return 'layer/Widget'
+
+LayerGroup.object_widget = LayerGroupObjectWidget
 
 
 @view_config(route_name='layer_group')
@@ -70,25 +88,43 @@ def show(request, obj):
 permalinker(LayerGroup, 'layer_group.show')
 
 
-@view_config(route_name='layer_group.new_group', renderer='layer_group/new_group.mako')
-@model_context(LayerGroup)
-@model_permission('layer_group:group-add')
-def new_group(request, obj):
-    form = LayerGroupNewForm(request.POST)
-    if request.method == 'POST' and form.validate():
-        newobj = LayerGroup(parent=obj)
-        newobj.acl.user = request.user
-        form.populate_obj(newobj)
+@view_config(route_name='layer_group.new')
+def new(request):
+    parent = DBSession.query(LayerGroup).filter_by(id=request.GET['parent_id']).one()
 
-        DBSession.add(newobj)
-        DBSession.flush()
-        return HTTPFound(location=request.route_url('layer_group.show', id=newobj.id))
+    widget = LayerGroupObjectWidget()
 
-    return dict(
-        obj=obj,
-        subtitle=u"Новая группа слоёв",
-        form=form,
+    if request.method == 'POST':
+        widget.bind(data=request.json_body, request=request)
+        
+        if widget.validate():
+            obj = LayerGroup(parent=parent)
+            DBSession.add(obj)
+
+            widget.bind(obj=obj)
+            widget.populate_obj()
+
+            DBSession.flush()
+            return render_to_response('json', dict(
+                status_code=200,
+                redirect=obj.permalink(request),
+            ))
+        else:
+            return render_to_response('json', dict(
+                status_code=400,
+                error=widget.widget_error(),
+            ))
+
+    return render_to_response(
+        'layer_group/new.mako',
+        dict(
+            obj=parent,
+            subtitle=u"Новая группа слоёв",
+            widget=widget
+        ),
+        request
     )
+
 
 @view_config(route_name='layer_group.delete', renderer='layer_group/delete.mako')
 @model_context(LayerGroup)

@@ -18,12 +18,13 @@ class LayerGroupComponent(Component):
     def setup_routes(cls, config):
         config.add_route('layer_group', '/layer_group/')
 
+        config.add_route('layer_group.new', '/layer_group/new')
         config.add_route('layer_group.show', '/layer_group/{id}')
+        config.add_route('layer_group.delete', '/layer_group/{id}/delete')
+        
         config.add_route('layer_group.edit_security', '/layer_group/{id}/edit-security')
         config.add_route('layer_group.show_security', '/layer_group/{id}/show-security')
 
-        config.add_route('layer_group.new_group', '/layer_group/{id}/group/new')
-        config.add_route('layer_group.delete', '/layer_group/{id}/delete')
 
         config.add_route('api.layer_group.tree', '/api/layer_group/{id}/tree')
 

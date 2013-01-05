@@ -87,6 +87,9 @@ def new(request):
     layer_group_id=int(request.GET['layer_group_id'])
     identity=request.GET['identity']
 
+    from ..layer_group import LayerGroup
+    layer_group = DBSession.query(LayerGroup).filter_by(id=layer_group_id).one()
+
     cls = Layer.registry[identity]
 
     widget = CompositeWidget((
@@ -117,7 +120,11 @@ def new(request):
 
     return render_to_response(
         'layer/new.mako',
-        dict(widget=widget),
+        dict(
+            obj=layer_group,
+            subtitle=u"Новый слой",
+            widget=widget,
+        ),
         request
     )
 
