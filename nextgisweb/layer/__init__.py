@@ -26,6 +26,7 @@ class LayerComponent(Component):
         config.add_route('layer', '/layer/')
         config.add_route('layer.new', '/layer/new')
         config.add_route('layer.show', '/layer/{id}')
+        config.add_route('layer.edit', '/layer/{id}/edit')
         config.add_route('layer.security', '/layer/{id}/security')
 
 

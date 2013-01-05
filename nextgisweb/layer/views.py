@@ -31,6 +31,7 @@ def __action_panel(self, request):
             ap.I(u"Управление доступом", request.route_url('layer.security', id=self.id)),
         )),
         ap.S('operation', u"Операции", (
+            ap.I(u"Редактировать", request.route_url('layer.edit', id=self.id)),
             ap.I(u"Переместить", '#'),
             ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
         )),
@@ -116,6 +117,48 @@ def new(request):
         ),
         request
     )
+
+@view_config(route_name='layer.edit')
+@model_context(Layer)
+def edit(request, obj):
+    actual_class = Layer.registry[obj.cls]
+    obj = DBSession.query(Layer) \
+        .with_polymorphic((actual_class, ))\
+        .filter_by(id=obj.id).one()
+
+    widget = CompositeWidget((
+        ('layer', Layer.object_widget),
+        (obj.cls, actual_class.object_widget),
+    ), obj=obj)
+
+    if request.method == 'POST':
+        widget.bind(data=request.json_body, request=request)
+
+        if widget.validate():
+            widget.bind(obj=obj)
+            widget.populate_obj()
+
+            DBSession.flush()
+            return render_to_response('json', dict(
+                status_code=200,
+                redirect=obj.permalink(request),
+            ))
+        else:
+            return render_to_response('json', dict(
+                status_code=400,
+                error=widget.widget_error(),
+            ))
+
+    return render_to_response(
+        'model_widget.mako',
+        dict(
+            obj=obj,
+            subtitle=u"Новый слой",
+            widget=widget,
+        ),
+        request
+    )
+
 
 
 permalinker(Layer, 'layer.show')
