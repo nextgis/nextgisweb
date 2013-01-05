@@ -93,6 +93,8 @@ def _subwidgets(model_class):
 
         model_class = model_class.__base__
 
+    result.reverse()
+    
     return result
 
 def includeme(comp, config):
