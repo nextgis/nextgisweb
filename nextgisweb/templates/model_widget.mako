@@ -1,4 +1,4 @@
-<%inherit file='../obj.mako' />
+<%inherit file='obj.mako' />
 
 <%def name="head()">
     <% import json %>

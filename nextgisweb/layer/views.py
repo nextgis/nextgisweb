@@ -119,7 +119,7 @@ def new(request):
             ))
 
     return render_to_response(
-        'layer/new.mako',
+        'model_widget.mako',
         dict(
             obj=layer_group,
             subtitle=u"Новый слой",

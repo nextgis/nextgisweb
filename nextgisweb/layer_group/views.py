@@ -116,7 +116,7 @@ def new(request):
             ))
 
     return render_to_response(
-        'layer_group/new.mako',
+        'model_widget.mako',
         dict(
             obj=parent,
             subtitle=u"Новая группа слоёв",
