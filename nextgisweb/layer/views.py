@@ -8,6 +8,8 @@ from ..wtforms import Form, fields, validators
 from ..models import DBSession
 from ..views import model_context, permalinker
 from .. import action_panel as ap
+from ..object_widget import CompositeWidget
+from ..layer_group.views import LayerGroupObjectWidget
 
 from .models import Layer
 
@@ -40,24 +42,11 @@ def __action_panel(self, request):
 Layer.__action_panel = __action_panel
 
 
-from ..object_widget import ObjectWidget, CompositeWidget
+class LayerObjectWidget(LayerGroupObjectWidget):
+    # Виджет редактирования основных параметров слоя -
+    # по сути одно и то же.
+    pass
 
-class LayerObjectWidget(ObjectWidget):
-
-    def populate_obj(self):
-        ObjectWidget.populate_obj(self)
-
-        self.obj.display_name = self.data['display_name']
-        self.obj.keyname = self.data['keyname']
-
-    def validate(self):
-        result = ObjectWidget.validate(self)
-        self.error = [];
-
-        return result
-
-    def widget_module(self):
-        return 'layer/Widget'
 
 Layer.object_widget = LayerObjectWidget
 
@@ -84,8 +73,8 @@ def show(request, obj):
 
 @view_config(route_name='layer.new')
 def new(request):
-    layer_group_id=int(request.GET['layer_group_id'])
-    identity=request.GET['identity']
+    layer_group_id = int(request.GET['layer_group_id'])
+    identity = request.GET['identity']
 
     from ..layer_group import LayerGroup
     layer_group = DBSession.query(LayerGroup).filter_by(id=layer_group_id).one()
@@ -99,7 +88,7 @@ def new(request):
 
     if request.method == 'POST':
         widget.bind(data=request.json_body, request=request)
-        
+
         if widget.validate():
             obj = cls(layer_group_id=layer_group_id)
             DBSession.add(obj)

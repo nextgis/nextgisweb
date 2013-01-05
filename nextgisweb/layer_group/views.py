@@ -69,17 +69,18 @@ class LayerGroupObjectWidget(ObjectWidget):
 
     def widget_params(self):
         result = super(LayerGroupObjectWidget, self).widget_params()
-        result['value'] = dict(
-            display_name=self.obj.display_name,
-            keyname=self.obj.keyname,
-            description=self.obj.description,
-        )
+
+        if self.obj:
+            result['value'] = dict(
+                display_name=self.obj.display_name,
+                keyname=self.obj.keyname,
+                description=self.obj.description,
+            )
 
         return result
 
     def widget_module(self):
-        # Временно используем тот же виджет, что и для слоя
-        return 'layer/Widget'
+        return 'layer_group/Widget'
 
 LayerGroup.object_widget = LayerGroupObjectWidget
 
