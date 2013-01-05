@@ -39,6 +39,7 @@ def __action_panel(self, request):
             ap.I(u"Права пользователя", request.route_url('layer_group.show_security', id=self.id)),
         )),
         ap.S('operation', u"Операции", (
+            ap.I(u"Редактировать", request.route_url('layer_group.edit', id=self.id)),
             ap.I(u"Переместить", '#'),
             ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
         )),
@@ -58,10 +59,21 @@ class LayerGroupObjectWidget(ObjectWidget):
 
         self.obj.display_name = self.data['display_name']
         self.obj.keyname = self.data['keyname']
+        self.obj.description = self.data['description']
 
     def validate(self):
         result = ObjectWidget.validate(self)
         self.error = [];
+
+        return result
+
+    def widget_params(self):
+        result = super(LayerGroupObjectWidget, self).widget_params()
+        result['value'] = dict(
+            display_name=self.obj.display_name,
+            keyname=self.obj.keyname,
+            description=self.obj.description,
+        )
 
         return result
 
@@ -125,6 +137,38 @@ def new(request):
         request
     )
 
+@view_config(route_name='layer_group.edit')
+@model_context(LayerGroup)
+def edit(request, obj):
+    widget = LayerGroupObjectWidget(obj=obj)
+
+    if request.method == 'POST':
+        widget.bind(data=request.json_body, request=request)
+
+        if widget.validate():
+            widget.bind(obj=obj)
+            widget.populate_obj()
+
+            DBSession.flush()
+            return render_to_response('json', dict(
+                status_code=200,
+                redirect=obj.permalink(request),
+            ))
+
+        else:
+            return render_to_response('json', dict(
+                status_code=400,
+                error=widget.widget_error(),
+            ))
+
+    return render_to_response(
+        'model_widget.mako',
+        dict(
+            obj=obj,
+            widget=widget,
+        ),
+        request
+    )
 
 @view_config(route_name='layer_group.delete', renderer='layer_group/delete.mako')
 @model_context(LayerGroup)

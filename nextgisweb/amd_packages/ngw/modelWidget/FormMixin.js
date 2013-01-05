@@ -26,8 +26,13 @@ define([
             this.submitUrl = params.url;
 
             widget = this;
-            var btnCreate = new Button({label: "Добавить"}).placeAt(this.buttonPane)
-                .on("click", function () { widget.submit() });
+            if (params.is_new) {
+                new Button({label: "Добавить"}).placeAt(this.buttonPane)
+                    .on("click", function () { widget.submit() });
+            } else {
+                new Button({label: "Сохранить"}).placeAt(this.buttonPane)
+                    .on("click", function () { widget.submit() });
+            }
         },
 
         startup: function () {

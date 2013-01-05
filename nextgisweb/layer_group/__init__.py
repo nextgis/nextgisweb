@@ -20,6 +20,7 @@ class LayerGroupComponent(Component):
 
         config.add_route('layer_group.new', '/layer_group/new')
         config.add_route('layer_group.show', '/layer_group/{id}')
+        config.add_route('layer_group.edit', '/layer_group/{id}/edit')
         config.add_route('layer_group.delete', '/layer_group/{id}/delete')
         
         config.add_route('layer_group.edit_security', '/layer_group/{id}/edit-security')
