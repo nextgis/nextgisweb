@@ -6,7 +6,7 @@ from pyramid.renderers import render_to_response
 from ..wtforms import Form, fields, validators
 
 from ..models import DBSession
-from ..views import model_context, permalinker
+from ..views import model_context, permalinker, ModelController
 from .. import action_panel as ap
 from ..object_widget import CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
@@ -72,95 +72,6 @@ def show(request, obj):
     )
 
 
-@view_config(route_name='layer.new')
-def new(request):
-    layer_group_id = int(request.GET['layer_group_id'])
-    identity = request.GET['identity']
-
-    from ..layer_group import LayerGroup
-    layer_group = DBSession.query(LayerGroup).filter_by(id=layer_group_id).one()
-
-    cls = Layer.registry[identity]
-
-    widget = CompositeWidget((
-        ('layer', Layer.object_widget),
-        (identity, cls.object_widget),
-    ))
-
-    if request.method == 'POST':
-        widget.bind(data=request.json_body, request=request)
-
-        if widget.validate():
-            obj = cls(layer_group_id=layer_group_id)
-            DBSession.add(obj)
-
-            widget.bind(obj=obj)
-            widget.populate_obj()
-
-            DBSession.flush()
-            return render_to_response('json', dict(
-                status_code=200,
-                redirect=obj.permalink(request),
-            ))
-        else:
-            return render_to_response('json', dict(
-                status_code=400,
-                error=widget.widget_error(),
-            ))
-
-    return render_to_response(
-        'model_widget.mako',
-        dict(
-            obj=layer_group,
-            subtitle=u"Новый слой",
-            widget=widget,
-        ),
-        request
-    )
-
-@view_config(route_name='layer.edit')
-@model_context(Layer)
-def edit(request, obj):
-    actual_class = Layer.registry[obj.cls]
-    obj = DBSession.query(Layer) \
-        .with_polymorphic((actual_class, ))\
-        .filter_by(id=obj.id).one()
-
-    widget = CompositeWidget((
-        ('layer', Layer.object_widget),
-        (obj.cls, actual_class.object_widget),
-    ), obj=obj)
-
-    if request.method == 'POST':
-        widget.bind(data=request.json_body, request=request)
-
-        if widget.validate():
-            widget.bind(obj=obj)
-            widget.populate_obj()
-
-            DBSession.flush()
-            return render_to_response('json', dict(
-                status_code=200,
-                redirect=obj.permalink(request),
-            ))
-        else:
-            return render_to_response('json', dict(
-                status_code=400,
-                error=widget.widget_error(),
-            ))
-
-    return render_to_response(
-        'model_widget.mako',
-        dict(
-            obj=obj,
-            subtitle=u"Новый слой",
-            widget=widget,
-        ),
-        request
-    )
-
-
-
 permalinker(Layer, 'layer.show')
 
 
@@ -169,3 +80,42 @@ permalinker(Layer, 'layer.show')
 def security_proxy(request, obj):
     from ..security.views import acl_editor_view
     return acl_editor_view(request, obj, obj.acl)
+
+def includeme(comp, config):
+    from ..layer_group import LayerGroup
+
+    class LayerController(ModelController):
+        
+        def create_context(self, request):
+            layer_group = DBSession.query(LayerGroup).filter_by(id=request.GET['layer_group_id']).one()
+            identity = request.GET['identity']
+            cls = Layer.registry[identity]
+            return locals()
+
+        def edit_context(self, request):
+            obj = DBSession.query(Layer).filter_by(**request.matchdict).one()
+            identity = obj.cls
+            cls = Layer.registry[identity]
+            obj = DBSession.query(cls).get(obj.id)
+            return locals()
+
+        def widget_class(self, context, operation):
+            class Composite(CompositeWidget):
+                subwidgets = (
+                    ('layer', Layer.object_widget),
+                    (context['identity'], context['cls'].object_widget),
+                )
+                
+            return Composite
+
+        def create_object(self, context):
+            return context['cls'](
+                layer_group=context['layer_group']
+            )
+
+        def query_object(self, context):
+            return context['obj']
+
+    LayerController('layer') \
+        .includeme(config)
+

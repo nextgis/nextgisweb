@@ -5,7 +5,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from ..models import DBSession
 from ..wtforms import Form, fields, validators
-from ..views import model_context, model_permission, permalinker
+from ..views import model_context, model_permission, permalinker, ModelController
 from .. import action_panel as ap
 
 from .models import LayerGroup
@@ -15,7 +15,7 @@ def __action_panel(self, request):
     new_items = [
         ap.I(
             u"Группа слоев",
-            request.route_url('layer_group.new', _query=dict(parent_id=self.id))
+            request.route_url('layer_group.create', _query=dict(parent_id=self.id))
         ),
     ]
 
@@ -26,7 +26,7 @@ def __action_panel(self, request):
             ap.I(
                 c.cls_display_name,
                 request.route_url(
-                    'layer.new',
+                    'layer.create',
                     _query=dict(identity=c.identity, layer_group_id=self.id)
                 )
             )
@@ -100,76 +100,6 @@ def show(request, obj):
 
 permalinker(LayerGroup, 'layer_group.show')
 
-
-@view_config(route_name='layer_group.new')
-def new(request):
-    parent = DBSession.query(LayerGroup).filter_by(id=request.GET['parent_id']).one()
-
-    widget = LayerGroupObjectWidget()
-
-    if request.method == 'POST':
-        widget.bind(data=request.json_body, request=request)
-        
-        if widget.validate():
-            obj = LayerGroup(parent=parent)
-            DBSession.add(obj)
-
-            widget.bind(obj=obj)
-            widget.populate_obj()
-
-            DBSession.flush()
-            return render_to_response('json', dict(
-                status_code=200,
-                redirect=obj.permalink(request),
-            ))
-        else:
-            return render_to_response('json', dict(
-                status_code=400,
-                error=widget.widget_error(),
-            ))
-
-    return render_to_response(
-        'model_widget.mako',
-        dict(
-            obj=parent,
-            subtitle=u"Новая группа слоёв",
-            widget=widget
-        ),
-        request
-    )
-
-@view_config(route_name='layer_group.edit')
-@model_context(LayerGroup)
-def edit(request, obj):
-    widget = LayerGroupObjectWidget(obj=obj)
-
-    if request.method == 'POST':
-        widget.bind(data=request.json_body, request=request)
-
-        if widget.validate():
-            widget.bind(obj=obj)
-            widget.populate_obj()
-
-            DBSession.flush()
-            return render_to_response('json', dict(
-                status_code=200,
-                redirect=obj.permalink(request),
-            ))
-
-        else:
-            return render_to_response('json', dict(
-                status_code=400,
-                error=widget.widget_error(),
-            ))
-
-    return render_to_response(
-        'model_widget.mako',
-        dict(
-            obj=obj,
-            widget=widget,
-        ),
-        request
-    )
 
 @view_config(route_name='layer_group.delete', renderer='layer_group/delete.mako')
 @model_context(LayerGroup)
@@ -245,3 +175,26 @@ def api_layer_group_tree(request, obj):
         )
 
     return traverse(obj)
+
+def includeme(comp, config):
+    
+    class LayerGroupController(ModelController):
+        
+        def create_context(self, request):
+            return DBSession.query(LayerGroup).filter_by(id=request.GET['parent_id']).one()
+
+        def edit_context(self, request):
+            return DBSession.query(LayerGroup).filter_by(**request.matchdict).one()
+
+        def widget_class(self, context, operation):
+            return LayerGroupObjectWidget
+
+        def create_object(self, context):
+            return LayerGroup(parent=context)
+
+        def query_object(self, context):
+            return context
+
+    LayerGroupController('layer_group') \
+        .includeme(config)
+

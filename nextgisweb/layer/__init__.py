@@ -24,10 +24,12 @@ class LayerComponent(Component):
     @classmethod
     def setup_routes(cls, config):
         config.add_route('layer', '/layer/')
-        config.add_route('layer.new', '/layer/new')
         config.add_route('layer.show', '/layer/{id}')
-        config.add_route('layer.edit', '/layer/{id}/edit')
         config.add_route('layer.security', '/layer/{id}/security')
+
+    def setup_pyramid(self, config):
+        from . import views
+        views.includeme(self, config)
 
 
     # SecurityProvider

@@ -7,6 +7,8 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
 from ..models import DBSession
 from ..package import amd_packages
 
+from .model_controller import ModelController
+
 def model_context(cls, key='id'):
     def wrap(f):
         def wrapped_f(request, *args, **kwargs):
