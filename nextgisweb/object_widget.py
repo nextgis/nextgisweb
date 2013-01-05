@@ -51,8 +51,8 @@ class ObjectWidget(object):
 
 class CompositeWidget(ObjectWidget):
 
-    def __init__(self, obj=None):
-        ObjectWidget.__init__(self, obj)
+    def __init__(self, obj=None, operation=None):
+        ObjectWidget.__init__(self, obj=obj, operation=operation)
         self.subwidgets = tuple([(k, c(obj=obj)) for k, c in self.subwidgets])
 
     def bind(self, obj=None, data=None, request=None):
