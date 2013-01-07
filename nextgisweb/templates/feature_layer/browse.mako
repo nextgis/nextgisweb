@@ -1,12 +1,8 @@
 <%inherit file="../obj.mako" />
-<% import geojson %>
-
-${geojson.dumps(features)}
 
 <table>
     <tr>
         <th>ID</th>
-        <th>WKT</th>
         %for k in features.fields:
             <th>${k.keyname}</th>
         %endfor

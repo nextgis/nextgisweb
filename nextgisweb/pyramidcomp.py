@@ -66,9 +66,12 @@ class PyramidComponent(Component):
         config.add_static_view('static%s/asset' % static_key, 'static', cache_max_age=3600)
         config.add_route('amd_package', 'static%s/amd/*subpath' % static_key)
 
+        for comp in self._env.chain('setup_pyramid'):
+            comp.setup_pyramid(config)
+
         # TODO: не лезть в приватные переменные _env
         for comp in self._env._components.itervalues():
-            comp.setup_pyramid(config)
+            # comp.setup_pyramid(config)
             comp.__class__.setup_routes(config)
 
         config.scan()

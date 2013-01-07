@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
-
-from ..views import model_context
 from shapely import wkt
 
+from ..views import model_context
+
+from .interface import IFeatureLayer
 
 def setup_pyramid(comp, config):
 
@@ -35,3 +36,10 @@ def setup_pyramid(comp, config):
 
     config.add_route('feature_layer.browse', '/layer/{id}/feature/')
     config.add_view(browse, route_name='feature_layer.browse', renderer='feature_layer/browse.mako')
+
+    comp.env.layer.layer_page_sections.register(
+        key='fields',
+        title=u"Аттрибуты",
+        template="nextgisweb:templates/feature_layer/layer_section_fields.mako",
+        is_applicable=lambda (obj): IFeatureLayer.providedBy(obj)
+    )

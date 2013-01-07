@@ -10,6 +10,7 @@ from ..views import model_context, permalinker, ModelController
 from .. import action_panel as ap
 from ..object_widget import ObjectWidget, CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
+from ..psection import PageSections
 
 from .models import Layer
 
@@ -57,7 +58,7 @@ def home(request):
     raise HTTPFound(location=request.route_url('layer_group'))
 
 
-@view_config(route_name='layer.show')
+@view_config(route_name='layer.show', renderer='psection.mako')
 @model_context(Layer)
 def show(request, obj):
     actual_class = Layer.registry[obj.cls]
@@ -65,10 +66,9 @@ def show(request, obj):
         .with_polymorphic((actual_class, ))\
         .filter_by(id=obj.id).one()
 
-    return render_to_response(
-        actual_class.__show_template,
-        dict(obj=obj),
-        request
+    return dict(
+        obj=obj,
+        sections=request.env.layer.layer_page_sections,
     )
 
 
@@ -141,4 +141,32 @@ def includeme(comp, config):
 
     LayerController('layer') \
         .includeme(config)
+
+    comp.env.layer_group.layer_group_page_sections.register(
+        key='layers',
+        title=u"Слои",
+        template="nextgisweb:templates/layer/layer_group_section.mako"
+    )
+    
+    comp.env.layer_group.layer_group_page_sections.register(
+        key='description',
+        priority=100,
+        title=u"Описание",
+        template="nextgisweb:templates/layer_group/section_description.mako"
+    )
+
+    comp.layer_page_sections = PageSections()
+
+    comp.layer_page_sections.register(
+        key='properties',
+        priority=0,
+        template="nextgisweb:templates/layer/section_properties.mako"
+    )
+
+    comp.layer_page_sections.register(
+        key='description',
+        priority=100,
+        title=u"Описание",
+        template="nextgisweb:templates/layer/section_description.mako"
+    )
 

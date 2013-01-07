@@ -87,7 +87,7 @@ def api_style_collection_create(request, layer):
 
     return dict(id=obj.id)
 
-def setup_pyramid(self, config):
+def setup_pyramid(comp, config):
 
     class StyleObjectWidget(ObjectWidget):
         
@@ -180,3 +180,10 @@ def setup_pyramid(self, config):
         return panel
 
     Style.__action_panel = _action_panel
+
+    comp.env.layer.layer_page_sections.register(
+        key='styles',
+        priority=20,
+        title=u"Стили",
+        template="nextgisweb:templates/style/layer_section.mako"
+    )

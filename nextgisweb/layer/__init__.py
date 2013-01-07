@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..component import Component
+from ..component import Component, require
 from ..security import SecurityProvider
 
 from .. import layer_group
@@ -25,9 +25,11 @@ class LayerComponent(Component):
         config.add_route('layer.show', '/layer/{id}')
         config.add_route('layer.security', '/layer/{id}/security')
 
+    @require('layer_group')
     def initialize(self):
         self.Layer = Layer
 
+    @require('layer_group')
     def setup_pyramid(self, config):
         from . import views
         views.includeme(self, config)

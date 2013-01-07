@@ -7,6 +7,7 @@ from ..models import DBSession
 from ..wtforms import Form, fields, validators
 from ..views import model_context, model_permission, permalinker, ModelController
 from .. import action_panel as ap
+from ..psection import PageSections
 
 from .models import LayerGroup
 
@@ -90,12 +91,13 @@ def home(request):
     return HTTPFound(location=request.route_url('layer_group.show', id=0))
 
 
-@view_config(route_name='layer_group.show', renderer='layer_group/show.mako')
+@view_config(route_name='layer_group.show', renderer='psection.mako')
 @model_context(LayerGroup)
 @model_permission('layer_group:read')
 def show(request, obj):
     return dict(
         obj=obj,
+        sections=request.env.layer_group.layer_group_page_sections
     )
 
 permalinker(LayerGroup, 'layer_group.show')
@@ -210,4 +212,12 @@ def includeme(comp, config):
 
     LayerGroupController('layer_group') \
         .includeme(config)
+
+    comp.layer_group_page_sections = PageSections()
+
+    comp.layer_group_page_sections.register(
+        key='children',
+        priority=0,
+        template="nextgisweb:templates/layer_group/section_children.mako"
+    )
 
