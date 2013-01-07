@@ -5,6 +5,7 @@ import sqlalchemy.orm as orm
 from ..registry import registry_maker
 from ..models import Base
 from ..security import ACL
+from ..spatial_ref_sys import SRSMixin
 
 
 class Layer(Base):
@@ -55,6 +56,16 @@ class Layer(Base):
         return self.layer_group.parents + (self.layer_group, )
 
     def get_info(self):
-        return (
+        s = super(Layer, self)
+        return (s.get_info() if hasattr(s, 'get_info') else ()) + (
             (u"Тип слоя", self.cls_display_name),
+        )
+
+
+class SpatialLayerMixin(SRSMixin):
+
+    def get_info(self):
+        s = super(SpatialLayerMixin, self)
+        return (s.get_info() if hasattr(s, 'get_info') else ()) + (
+            (u"Система координат", self.srs_id),
         )

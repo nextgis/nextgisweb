@@ -7,7 +7,7 @@ import geoalchemy as ga
 
 from osgeo import gdal, gdalconst, osr
 
-from ..layer import Layer
+from ..layer import Layer, SpatialLayerMixin
 from ..spatial_ref_sys import SRS
 from ..file_storage import FileObj
 from ..models import DBSession
@@ -18,21 +18,19 @@ def include(comp):
     file_storage = comp.env.file_storage
 
     @Layer.registry.register
-    class RasterLayer(Layer):
+    class RasterLayer(Layer, SpatialLayerMixin):
         __tablename__ = 'raster_layer'
 
         identity = __tablename__
         cls_display_name = u"Растровый слой"
 
         layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
-        srs_id = sa.Column(sa.Integer, sa.ForeignKey(SRS.id), nullable=True)
         fileobj_id = sa.Column(sa.Integer, sa.ForeignKey(FileObj.id), nullable=True)
 
         xsize = sa.Column(sa.Integer, nullable=False)
         ysize = sa.Column(sa.Integer, nullable=False)
         band_count = sa.Column(sa.Integer, nullable=False)
 
-        srs = orm.relationship(SRS)
         fileobj = orm.relationship(FileObj, cascade='all')
 
         __mapper_args__ = dict(

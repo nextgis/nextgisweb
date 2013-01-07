@@ -10,8 +10,8 @@
 
     %for field in obj.fields:
         <tr>
-            <td>${field.name}</td>
-            <td>${field.ftype}</td>
+            <td>${field.keyname}</td>
+            <td>${field.datatype}</td>
         </tr>
     %endfor
 </table>

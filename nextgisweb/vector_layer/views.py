@@ -8,6 +8,7 @@ from wtforms import form, fields, validators
 
 from ..models import DBSession
 from ..layer import Layer
+from ..spatial_ref_sys import SRS
 
 from .models import VectorLayer
 
@@ -19,12 +20,9 @@ class VectorLayerObjectWidget(ObjectWidget):
     def populate_obj(self):
         ObjectWidget.populate_obj(self)
 
+        self.obj.srs_id = self.data['srs_id']
+
         self.obj.setup_from_ogr(self._ogrlayer)
-
-        DBSession.flush()
-        metadata, table = self.obj.metadata_and_table()
-        metadata.create_all(bind=DBSession.bind)
-
         self.obj.load_from_ogr(self._ogrlayer)
 
     def validate(self):

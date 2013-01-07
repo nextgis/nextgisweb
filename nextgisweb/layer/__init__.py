@@ -4,10 +4,8 @@ from ..security import SecurityProvider
 
 from .. import layer_group
 
-from .models import Layer
+from .models import Layer, SpatialLayerMixin
 from . import views
-
-__all__ = ["LayerComponent", "Layer", "LayerWidget"]
 
 @Component.registry.register
 @SecurityProvider.registry.register
@@ -26,6 +24,9 @@ class LayerComponent(Component):
         config.add_route('layer', '/layer/')
         config.add_route('layer.show', '/layer/{id}')
         config.add_route('layer.security', '/layer/{id}/security')
+
+    def initialize(self):
+        self.Layer = Layer
 
     def setup_pyramid(self, config):
         from . import views

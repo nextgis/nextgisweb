@@ -10,6 +10,7 @@ define([
     "dojo/when",
     // template
     "dojox/layout/TableContainer",
+    "ngw/form/SpatialRefSysSelect",
     "ngw/form/Uploader",
     "dijit/form/ComboBox"
 ], function (
@@ -28,11 +29,19 @@ define([
         title: "Векторный слой",
 
         _getValueAttr: function () {
-            return {
-                file: this.wFile.get("value"),
-                encoding: this.wEncoding.get("value")
-            };
-        },
+            var result = { srs_id: this.wSRS.get("value") };
+
+            // В общем случае файл имеет тип Promise,
+            // поэтому используем асинхронный вариант
+
+            var promise = new Deferred();
+
+            when(this.wFile.get("value"),
+                function (value) { result['file'] = value; promise.resolve(result) },
+                promise.reject
+            );
+
+            return promise;        },
 
         validateWidget: function () {
             var promise = new Deferred();

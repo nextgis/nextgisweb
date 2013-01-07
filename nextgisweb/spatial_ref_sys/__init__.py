@@ -2,7 +2,7 @@
 
 from ..component import Component
 
-from .models import SRS
+from .models import SRS, SRSMixin
 
 
 @Component.registry.register
