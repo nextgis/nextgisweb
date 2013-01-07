@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<title>Test Widget Instantiation</title>
+	<style>
+	@import '../ext.css';
+	/* Using XStyle to create a page to try out XStyle. */
+	x-property {
+		save-parser: require(xstyle/test/converter);
+	}
+	converter {
+		save-parser: true;
+		bind: require(xstyle/test/converter);
+	}
+	data {
+		from: converter.parsed;
+	}
+	body {=>
+		h1 'XStyle',
+		p 'Try it out',
+		div.column {=>
+			h2 'Data:',
+			textarea[data-continuous].live-source {
+				from: converter.data;
+			},
+			span.error {
+				from: converter.data.error 
+			}
+		},
+		div.column {=>
+			h2 'Presentation:',
+			textarea[data-continuous].live-source {
+				from: converter.ui;
+			},
+			span.error {
+				from: converter.ui.error 
+			}
+		},
+		div.column {=>
+			h2 'Result: #target',
+			div#target {
+				from: converter.result;
+			}
+		},
+		p 'more information about XStyle' {
+			clear: both;
+		};
+		font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif;
+	}
+	h1, h2 {
+		font-weight: 100;
+	}
+	.live-source {
+	}
+	.column {
+		float: left;
+		width: 300px;
+	}
+	.live-source {
+		width: 280px;
+		height: 200px;
+	}
+	</style>
+	
+	<script src="../../dojo/dojo.js" data-dojo-config="async:true"></script>
+	<script>
+		require(['xstyle/xstyle'], function(layout){
+		});
+	
+	</script>
+	
+	</head>
+	<body>
+	</body>
+</html>
