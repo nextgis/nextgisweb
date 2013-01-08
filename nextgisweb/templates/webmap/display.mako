@@ -95,14 +95,35 @@
     </style>
 </%def>
 
+<div data-dojo-type="dijit/layout/TabContainer" style="width: 100%; height: 100%;"
+        data-dojo-props="tabPosition: 'bottom'">
 
-<div data-dojo-type="dijit/layout/BorderContainer" style="height: 100%">
-    <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
-        <div data-dojo-type="dijit/form/Button">Идентификация</div>
+    <div data-dojo-type="dijit/layout/BorderContainer" style="height: 100%" title="Карта"
+            data-dojo-props="closable: false">
+
+        <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
+            <div data-dojo-type="dijit/form/Button">Идентификация</div>
+        </div>
+        
+        <div data-dojo-type="dijit/layout/BorderContainer" style="height: 100%; width: 250px; padding: 0"  data-dojo-props="region: 'left', splitter: true">
+            <div id="layer_tree" data-dojo-type="dijit/layout/ContentPane"
+                    data-dojo-props="region: 'center'"
+                    style="padding: 0;">
+            </div>
+            <div data-dojo-type="dijit/layout/ContentPane" style="padding: 0; border: none;"
+                    data-dojo-props="region: 'bottom'">
+                <select data-dojo-type="dijit/form/Select" style="width: 99%;">
+                    <option>OSM - Mapnik</option>
+                    <option>Google</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'" style="padding: 0;">
+            <div style="width: 100%; height: 100%;" id="map"></div>
+        </div>
+
     </div>
-    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'left', splitter: true" style="width: 250px; padding: 0;" id="layer_tree"></div>
-    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'" style="padding: 0;">
-        <div style="width: 100%; height: 100%;" id="map"></div>
-    </div>
+
 </div>
-
