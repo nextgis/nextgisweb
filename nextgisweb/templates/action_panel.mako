@@ -3,11 +3,12 @@
         <div class="section">
             <div class="section-title">${section.title}</div>
             <div class="section-body">
-            <ul>
-                %for itm in section.items:
-                    <li><a href="${itm.link}">${itm.text}</a></li>
-                %endfor
-            </ul>
+                <ul>
+                    %for itm in section.items:
+                        <li><a href="${itm.link}">${itm.text}</a></li>
+                    %endfor
+                </ul>
+            </div>
         </div>
     %endfor
 </%def>
