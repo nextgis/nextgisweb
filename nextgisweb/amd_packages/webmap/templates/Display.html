@@ -1,0 +1,82 @@
+<div data-dojo-type="${baseClass}"
+    data-dojo-attach-point="focusNode"
+    style="width: 100%; height: 100%;">
+
+    <div data-dojo-attach-point="tabContainer"
+        data-dojo-type="dijit/layout/TabContainer"
+        data-dojo-props="tabPosition: 'top'"
+        style="width: 100%; height: 100%;">
+
+        <!-- Незакрываемый таб для размещения карты и дерева слоев -->
+        <div data-dojo-attach-point="mainPane" title="Карта"
+            data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="closable: false"
+            style="width: 100%; height: 100%; padding: 0">
+
+            <div data-dojo-type="dijit/layout/BorderContainer"
+                data-dojo-props="gutters: false"
+                style="width: 100%; height: 100%;">
+                
+                <!-- Панель для размещения OL карты -->
+                <div data-dojo-type="dijit/layout/BorderContainer"
+                    data-dojo-props="region: 'center'"
+                    style="padding-left: 0;">
+
+                    <div data-dojo-attach-point="mapPane"
+                        data-dojo-type="dijit/layout/ContentPane"
+                        data-dojo-props="region: 'center'"
+                        style="width: 100%; padding: 0;">
+
+                        <div data-dojo-attach-point="mapNode" style="width: 100%; height: 100%; padding: 0;"></div>
+
+                    </div>
+
+                </div>
+
+                <div data-dojo-type="dijit/layout/BorderContainer"
+                    data-dojo-props="region: 'left', splitter: true, gutters: false"
+                    style="width: 250px; padding: 0;">
+
+                    <div data-dojo-type="dijit/layout/BorderContainer"
+                        data-dojo-props="region: 'center'"
+                        style="padding-bottom: 0; padding-right: 0">
+
+                        <!-- Панель для размещения дерева слоев -->
+                        <div data-dojo-attach-point="layerTreePane"
+                            data-dojo-type="dijit/layout/ContentPane"
+                            data-dojo-props="region: 'center'"
+                            style="padding: 0">
+                        </div>
+
+                    </div>
+
+                    <!-- Панель для размещения переключателя подложки -->
+                    <div data-dojo-attach-point="basemapPane"
+                        data-dojo-type="dijit/layout/ContentPane"
+                        data-dojo-props="region: 'bottom', border: false"
+                        style="padding-left: 5px; padding-right: 2px;">
+
+                        <select data-dojo-type="dijit/form/Select" style="width: 100%;">
+                            <option>OSM - Mapnik</option>
+                            <option>Google</option>
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <!-- Тулбар над картой -->
+                <div data-dojo-attach-point="mapToolbar"
+                    data-dojo-type="dijit/Toolbar"
+                    data-dojo-props="region: 'top'">
+
+                    <div data-dojo-type="dijit/form/Button">Идентификация</div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
