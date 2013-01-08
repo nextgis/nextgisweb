@@ -32,18 +32,26 @@ define([
             var pSubWidgetCreated = {};
 
             var widget = this;
+            var idx = 0;
             array.forEach(Object.keys(this.subwidgets), function (k) {
                 var d = new Deferred();
                 pSubWidgetCreated[k] = d;
+
+                // Используем эту переменную, чтобы сохранить порядок
+                // вложенных виждетов
+                var subwIndex = idx;
+
                 require([widget.subwidgets[k]], function (WM) {
                     var w = new WM(params[k]);
-                    w.__composite_key = k;
+                    w._composite_key = k;
 
                     widget.subwidget[k] = w;
-                    widget._subwidgets.push(w);
+                    widget._subwidgets[subwIndex] = w;
 
                     d.resolve(w);
                 });
+
+                idx++;
             });
 
             this._pAllSubwidgetsCreated = all(pSubWidgetCreated);
@@ -54,11 +62,15 @@ define([
 
             var widget = this;
             this._pAllSubwidgetsCreated.then(function (data) {
-                array.forEach(Object.keys(data), function (k) {
-                    var w = data[k];
+                array.forEach(widget._subwidgets, function (w) {
                     if (widget.placeWidget) {
-                        widget.placeWidget(k, w);
+                        // Если у нас у нас есть метод placeWidget,
+                        // используем его, чтобы разместить вложенный
+                        // виджет.
+                        widget.placeWidget(w._composite_key, w);
                     } else {
+                        // Если метода placeWidget нет, то помещаем
+                        // вложенный виджет в конец domNode.
                         w.placeAt(widget.domNode);
                     };
                     w.startup();
