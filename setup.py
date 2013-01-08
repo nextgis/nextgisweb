@@ -20,6 +20,7 @@ requires = [
     'geojson',
     'PIL',
     'wtforms',
+    'lxml',
     
     ]
 
