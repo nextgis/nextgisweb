@@ -8,6 +8,9 @@ from ..layer_group import LayerGroup
 from ..object_widget import ObjectWidget
 from ..views import ModelController, model_loader, permalinker
 
+from .plugin import WebmapPlugin
+
+
 @view_config(route_name='webmap.browse', renderer='webmap/browse.mako')
 def browse(request):
     obj_list = DBSession.query(WebMap)
@@ -22,6 +25,7 @@ def display(request, obj):
 
     # подготовим список и дерево слоев
     display.idx = 1
+
     def traverse(item):
         display.idx += 1
         result = dict(
@@ -36,8 +40,18 @@ def display(request, obj):
             result['group_expanded'] = item.group_expanded
         elif item.item_type == 'layer':
             result['layer_style_id'] = item.layer_style_id
+            result['layer_id'] = item.style.layer_id
             result['layer_enabled'] = item.layer_enabled
             result['checked'] = item.layer_enabled
+
+            plugins = dict()
+            for Plugin in WebmapPlugin.registry:
+                plugin_data = Plugin.is_layer_supported(item.style.layer, obj)
+                if plugin_data:
+                    plugins[plugin_data[0]] = plugin_data[1]
+
+            result['plugins'] = plugins
+
             layers.append(result)
 
         for i in item.children:

@@ -72,6 +72,7 @@ def show(request, obj):
     return dict(
         obj=obj,
         sections=request.env.layer.layer_page_sections,
+        custom_layout=True if 'no_layout' in request.GET else False,
     )
 
 

@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+from ...registry import registry_maker
+
+
+class WebmapPlugin(object):
+
+    registry = registry_maker()

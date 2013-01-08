@@ -53,6 +53,8 @@ class WebMapItem(Base):
         backref=orm.backref('children', cascade='all')
     )
 
+    style = orm.relationship('Style')
+
     def to_dict(self):
         if self.item_type in ('root', 'group'):
             children = list(self.children)

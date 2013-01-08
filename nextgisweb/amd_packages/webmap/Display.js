@@ -5,6 +5,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "dojo/text!./templates/Display.html",
     "dojo/_base/array",
+    "dojo/Deferred",
     "dojox/geo/openlayers/Map",
     "dijit/form/DropDownButton",
     "dijit/DropDownMenu",
@@ -22,8 +23,7 @@ define([
     "dijit/Toolbar",
     "dijit/form/Button",
     "dijit/form/Select",
-    "dijit/form/DropDownButton",
-    "dijit/tree/dndSource"
+    "dijit/form/DropDownButton"
 ], function (
     declare,
     _WidgetBase,
@@ -31,6 +31,7 @@ define([
     _WidgetsInTemplateMixin,
     template,
     array,
+    Deferred,
     Map,
     DropDownButton,
     DropDownMenu,
@@ -76,6 +77,7 @@ define([
             this._layers = {};
 
             var display = this;
+
             this.treeWidget.on("checkBoxClick", function (item, nodeWidget, evt) {
                 display._layers[item.id].olLayer.setVisibility(nodeWidget.get("checked"));
             });
@@ -84,42 +86,7 @@ define([
                 display._layers[l.id] = new options.adapterClasses.tms(l);
             });
 
-            // Класс реализующий динамическое модменю "Слой"
-            var LayerDropDown = declare([DropDownButton], {
-                label: "Слой",
-                mapDisplay: this,
-
-                // Метод динамически формирующий меню, потом
-                // его нужно будет заменить чем-то содержательным.
-                loadDropDown: function (callback) {
-                    var mapDisplay = this.mapDisplay;
-                    var menu = new DropDownMenu({ style: "display: none;"});
-
-                    menu.addChild(MenuItem({
-                        label: "Описание",
-                        onClick: function () {
-                            mapDisplay.tabContainer.addChild(ContentPane({
-                                title: "Описание слоя",
-                                closable: false
-                            }));
-                        }
-                    }));
-
-                    menu.addChild(MenuItem({
-                        label: "Объекты",
-                        onClick: function () {
-                            mapDisplay.tabContainer.addChild(ContentPane({
-                                title: "Объекты слоя",
-                                closable: true
-                            }));
-                        }
-                    }));
-
-                    this.dropDown = menu;
-                    callback();
-                }
-            });
-            this.layerDropDown = new LayerDropDown({});
+            this.loadLayerPlugins();
 
         },
 
@@ -138,9 +105,31 @@ define([
                 dojoMap.olMap.addLayer(display._layers[l.id].olLayer);
             });
 
-            // Добавляем меню "Слой" в начало тулбара
-            this.mapToolbar.addChild(this.layerDropDown, 0);
+            // Плагины
+            this.loadLayerPlugins();            
+        },
 
+        loadLayerPlugins: function () {
+            this.layerPlugins = {}
+
+            var display = this;
+            array.forEach(this.layerConfig, function (lcfg) {
+                array.forEach(Object.keys(lcfg.plugins), function (plugin_mid) {
+                    if ( display.layerPlugins[plugin_mid] == undefined ) {
+                        display.layerPlugins[plugin_mid] = null;
+                        require([plugin_mid], function (plugin_mod) {
+                            if ( display.layerPlugins[plugin_mid] == undefined ) {
+                                var plugin = new plugin_mod({
+                                    webmapDisplay: display,
+                                    identity: plugin_mid
+                                });
+                                display.layerPlugins[plugin_mid] = plugin;
+                                plugin.postCreate();
+                            };
+                        });
+                    }
+                });
+            });
         }
     });
 });

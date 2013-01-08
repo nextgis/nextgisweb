@@ -9,7 +9,7 @@
 <%def name="head()">
     <% import json %>
     <script type="text/javascript">
-        var layerConfig = ${layer_config | json.dumps, n};
+        var layerConfig = ${ json.dumps(layer_config, indent=4) | n};
         var treeConfig = ${tree_config | json.dumps, n};
         var adapterClasses = {};
     </script>
