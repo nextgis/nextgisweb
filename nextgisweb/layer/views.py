@@ -6,7 +6,7 @@ from pyramid.renderers import render_to_response
 from ..wtforms import Form, fields, validators
 
 from ..models import DBSession
-from ..views import model_context, permalinker, ModelController
+from ..views import model_context, permalinker, ModelController, DescriptionObjectWidget
 from .. import action_panel as ap
 from ..object_widget import ObjectWidget, CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
@@ -50,7 +50,10 @@ class LayerObjectWidget(LayerGroupObjectWidget):
     pass
 
 
-Layer.object_widget = LayerObjectWidget
+Layer.object_widget = (
+    (Layer.identity, LayerObjectWidget),
+    ('description', DescriptionObjectWidget),
+)
 
 
 @view_config(route_name='layer')

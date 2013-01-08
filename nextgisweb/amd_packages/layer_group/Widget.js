@@ -10,8 +10,7 @@ define([
     // template
     "dojox/layout/TableContainer",
     "ngw/form/DisplayNameTextBox",
-    "ngw/form/KeynameTextBox",
-    "dijit/form/Textarea"
+    "ngw/form/KeynameTextBox"
 ], function (
     declare,
     Widget,
@@ -29,7 +28,7 @@ define([
 
         postCreate: function () {
             this.watch("disabled", function (attr, oldVal, newVal) {
-                array.forEach([this.wDisplayName, this.wKeyname, this.wDescription], function (w) {
+                array.forEach([this.wDisplayName, this.wKeyname], function (w) {
                     w.set(attr, newVal);
                 });
             });
@@ -57,14 +56,12 @@ define([
         _setValueAttr: function (value) {
             this.wDisplayName.set("value", value["display_name"]);
             this.wKeyname.set("value", value["keyname"]);
-            this.wDescription.set("value", value["description"]);
         },
 
         _getValueAttr: function () {
             return {
                 display_name: this.wDisplayName.get("value"),
                 keyname: this.wKeyname.get("value"),
-                description: this.wDescription.get("value")
             }
         }
     });

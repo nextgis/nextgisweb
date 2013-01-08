@@ -5,7 +5,8 @@ from pyramid.httpexceptions import HTTPFound
 
 from ..models import DBSession
 from ..wtforms import Form, fields, validators
-from ..views import model_context, model_permission, permalinker, ModelController
+from ..views import model_context, model_permission, permalinker, ModelController, DescriptionObjectWidget
+from ..object_widget import CompositeWidget
 from .. import action_panel as ap
 from ..psection import PageSections
 
@@ -60,7 +61,6 @@ class LayerGroupObjectWidget(ObjectWidget):
 
         self.obj.display_name = self.data['display_name']
         self.obj.keyname = self.data['keyname']
-        self.obj.description = self.data['description']
 
     def validate(self):
         result = ObjectWidget.validate(self)
@@ -75,7 +75,6 @@ class LayerGroupObjectWidget(ObjectWidget):
             result['value'] = dict(
                 display_name=self.obj.display_name,
                 keyname=self.obj.keyname,
-                description=self.obj.description,
             )
 
         return result
@@ -83,7 +82,10 @@ class LayerGroupObjectWidget(ObjectWidget):
     def widget_module(self):
         return 'layer_group/Widget'
 
-LayerGroup.object_widget = LayerGroupObjectWidget
+LayerGroup.object_widget = (
+    ('layer_group', LayerGroupObjectWidget),
+    ('description', DescriptionObjectWidget),
+)
 
 
 @view_config(route_name='layer_group')
@@ -199,7 +201,10 @@ def includeme(comp, config):
             return locals()
 
         def widget_class(self, context, operation):
-            return LayerGroupObjectWidget
+            class Composite(CompositeWidget):
+                model_class = LayerGroup
+
+            return Composite
 
         def create_object(self, context):
             return LayerGroup(parent=context['parent'])

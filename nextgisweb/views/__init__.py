@@ -6,6 +6,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
 
 from ..models import DBSession
 from ..package import amd_packages
+from ..object_widget import ObjectWidget
 
 from .model_controller import ModelController
 
@@ -63,3 +64,20 @@ def amd_package(request):
             py_package, path = asset.split(':', 1)
             file_path = resource_filename(py_package, '/'.join((path, amd_package_path)))
             return FileResponse(file_path, cache_max_age=3600)
+
+
+class DescriptionObjectWidget(ObjectWidget):
+
+    def populate_obj(self):
+        self.obj.description = self.data
+
+    def widget_module(self):
+        return 'ngw/modelWidget/DescriptionWidget'
+
+    def widget_params(self):
+        result = super(DescriptionObjectWidget, self).widget_params()
+
+        if self.obj:
+            result['value'] = self.obj.description
+
+        return result

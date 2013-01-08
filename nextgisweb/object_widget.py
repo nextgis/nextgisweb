@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import inspect
 
 
 class ValidationError(Exception):
@@ -98,11 +99,12 @@ class CompositeWidget(ObjectWidget):
             if hasattr(model_cls, attr):
                 val = getattr(model_cls, attr)
 
-                if issubclass(val, ObjectWidget):
+                if inspect.isclass(val) and issubclass(val, ObjectWidget):
                     result.append((model_cls.identity, val))
-
-                elif isinstance(val, tuple):
-                    result.append(val)
+                else:
+                    tmp = list(val)
+                    tmp.reverse()
+                    result.extend(tmp)
 
             # На след итерации рассматриваем предка.
             # TODO: Разобраться как это работает с миксинами

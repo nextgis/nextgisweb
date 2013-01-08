@@ -1,0 +1,46 @@
+<div class="${baseClass}" data-dojo-attach-point="focusNode" role="menuitem" tabIndex="-1">
+    <div data-dojo-type="dojox.layout.TableContainer" data-dojo-props="cols:1">
+        <div data-dojo-type="dijit.form.TextBox" title="Наименование:" data-dojo-attach-point="widgetDisplayName" style="width: 100%"></div>
+    </div>
+    <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design: 'headline', gutters: true" style="height: 400px;">
+        <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnAddLayer">Добавить слой</div>
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnAddGroup">Добавить группу</div>
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnDeleteItem" data-dojo-props="iconClass: 'dijitEditorIcon dijitEditorIconDelete'">Удалить</div>
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'" data-dojo-attach-point="containerTree"></div>
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'right'" style="width: 33%">
+            <div data-dojo-type="dijit/form/TextBox" data-dojo-attach-point="widgetItemDisplayName" style="width: 100%"></div>
+            <div data-dojo-type="dijit/layout/StackContainer" data-dojo-attach-point="widgetProperties">
+                <div data-dojo-type="dijit/layout/ContentPane" data-dojo-attach-point="paneLayer">
+                    <div data-dojo-type="dijit/form/CheckBox" data-dojo-attach-point="wdgtItemLayerEnabled" id="wdgtLayerEnabled"></div>
+                    <label for="wdgtLayerEnabled">Включить по-умолчанию</label>
+                </div>
+                <div data-dojo-type="dijit/layout/ContentPane" data-dojo-attach-point="paneGroup">
+                    <div data-dojo-type="dijit/form/CheckBox" data-dojo-attach-point="widgetItemGroupExpanded" id="wgtGroupExpanded"></div>
+                    <label for="wgtGroupExpanded">Развернуть по-умолчанию</label>
+                </div>
+            </div>
+        </div>
+        <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'bottom'">
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnSave" data-dojo-props="iconClass: 'dijitEditorIcon dijitEditorIconSave'">Сохранить</div>
+        </div>
+    </div>
+
+    <span data-dojo-attach-point="containerNode"></span>
+
+    <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="dlgAddLayer" title="Добавить слой">
+        <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design: 'headline', gutters: false" style="width: 600px; height: 400px;">
+            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">
+                Для добавления слоя на веб-карту необходимо выбрать стиль слоя.
+            </div>
+            <div data-dojo-type="layer/LayerTree" data-dojo-props="region: 'center'" data-dojo-attach-point="wgtLayer"></div>
+            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'bottom'">
+                <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
+                    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnDlgAddLayer" data-dojo-props="disabled: true">Добавить</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
