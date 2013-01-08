@@ -1,41 +1,48 @@
 define([
     "dojo/_base/declare",
-    "dojo/_base/array",
-    "dojo/aspect",
-    "dojo/request/xhr",
-    "dojo/json",
-    "dijit/_WidgetBase",
+    "ngw/modelWidget/Widget",
+    "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/Form.html",
+    "dojo/text!./templates/Widget.html",
+    "dojo/_base/array",
     "dojo/data/ItemFileWriteStore",
-    "dijit/tree/ForestStoreModel",
     "dijit/tree/TreeStoreModel",
-    "dojo/store/Memory",
-    "dijit/tree/ObjectStoreModel",
-    "dojo/store/Observable",
-    "dojo/on",
     "dijit/Tree",
     "dijit/tree/dndSource",
-    "dijit/form/Button",
-    "dijit/form/CheckBox",
-    "dijit/form/TextBox",
-    "dijit/layout/BorderContainer",
-    "dijit/layout/ContentPane",
+    // template
+    "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
+    "dijit/layout/BorderContainer",
     "dijit/layout/StackContainer",
-    "dijit/Toolbar",
+    "dijit/layout/ContentPane",
     "dijit/Dialog",
+    "dijit/Toolbar",
+    "ngw/form/DisplayNameTextBox",
+    "dijit/form/TextBox",
+    "dijit/form/CheckBox",
     "layer/LayerTree"
-], function(declare, array, aspect, xhr, json, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template, ItemFileWriteStore, ForestStoreModel, TreeStoreModel, Memory, ObjectStoreModel, Observable, on, Tree, dndSource) {
-    return declare("webmap.Form", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+], function (
+    declare,
+    Widget,
+    ErrorDisplayMixin,
+    _TemplatedMixin,
+    _WidgetsInTemplateMixin,
+    template,
+    array,
+    ItemFileWriteStore,
+    TreeStoreModel,
+    Tree,
+    dndSource
+) {
+    return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
 
         constructor: function (options) {
-            this.data = options.data;
+            this.value = options.value;
 
             this.itemStore = new ItemFileWriteStore({
-                data: {items: [options.data.root_item ]}
+                data: {items: [options.value.root_item ]}
             });
 
             this.itemModel = new TreeStoreModel({
@@ -57,15 +64,17 @@ define([
         },
 
         postCreate: function () {
-            this.widgetDisplayName.setValue(this.data.display_name);
+            this.inherited(arguments);
 
-            // создать дерево без model не получается, поэтому создаем его вручную
+            this.wDisplayName.set("value", this.value.display_name);
+
+            // Создать дерево без model не получается, поэтому создаем его вручную
             this.widgetTree.placeAt(this.containerTree).startup();
 
             var widget = this;
 
-            // добавление новой группы
-            on(this.btnAddGroup, "click", function () {
+            // Добавление новой группы
+            this.btnAddGroup.on("click", function () {
                 widget.itemStore.newItem(
                     {
                         display_name: "Новая группа",
@@ -77,44 +86,50 @@ define([
                 );
             });
 
-            // добавление нового слоя
-            on(this.btnAddLayer, "click", function () {
+            // Добавление нового слоя
+            this.btnAddLayer.on("click", function () {
                 widget.dlgAddLayer.show();
             });
 
-            // удаление слоя или группы
-            on(this.btnDeleteItem, "click", function() {
+            // Удаление слоя или группы
+            this.btnDeleteItem.on("click", function() {
                 widget.itemStore.deleteItem(widget.widgetTree.selectedItem);
             });
 
-            on(this.widgetTree, "click", function (item) {
-                widget.widgetItemDisplayName.setValue(item.display_name);
-                if (widget.widgetTree.selectedItem.item_type == "group") {
+            this.widgetTree.watch("selectedItem", function (attr, oldValue, newValue) {
+                // При изменении выделенного элемента перенесем значения в виджеты
+                // и покажем нужную панель: для слоев одну, для групп другую.
+                widget.widgetItemDisplayName.set("value", widget.getItemValue("display_name"));
+                
+                if (newValue.item_type == "group") {
                     widget.widgetProperties.selectChild(widget.paneGroup);
-                    widget.widgetItemGroupExpanded.setValue(widget.itemStore.getValue(item, "group_expanded"));
-                } else if (widget.widgetTree.selectedItem.item_type == "layer") {
+                    widget.widgetItemGroupExpanded.set("checked", widget.getItemValue("group_expanded"));
+                } else if (newValue.item_type == "layer") {
                     widget.widgetProperties.selectChild(widget.paneLayer);
-                    widget.wdgtItemLayerEnabled.setValue(widget.getItemValue("layer_enabled"));
+                    widget.wdgtItemLayerEnabled.set("checked", widget.getItemValue("layer_enabled"));
                 };
             });
 
-            on(this.widgetItemDisplayName, "change", function (evt) {
-                widget.setItemValue("display_name", widget.widgetItemDisplayName.value);
+            // При изменении значений переносим их в модель
+            this.widgetItemDisplayName.watch("value", function (attr, oldValue, newValue) {
+                widget.setItemValue("display_name", newValue);
             });
 
-            on(this.widgetItemGroupExpanded, "change", function () {
-                widget.setItemValue("group_expanded", widget.widgetItemGroupExpanded.value);
+            // NB: Именно "checked", "value" не работает
+            this.widgetItemGroupExpanded.watch("checked", function (attr, oldValue, newValue) {
+                widget.setItemValue("group_expanded", newValue);
             });
 
-            on(this.wdgtItemLayerEnabled, "change", function () {
-                widget.setItemValue("layer_enabled", widget.wdgtItemLayerEnabled.value);
+            // NB: Именно "checked", "value" не работает
+            this.wdgtItemLayerEnabled.watch("checked", function (attr, oldValue, newValue) {
+                widget.setItemValue("layer_enabled", newValue);
             });
 
-            on(this.wgtLayer, "click", function (item) {
-                widget.btnDlgAddLayer.setDisabled(item.type != 'style');
+            this.wgtLayer.on("click", function (item) {
+                widget.btnDlgAddLayer.set("disabled", item.type != 'style');
             });
 
-            on(this.btnDlgAddLayer, "click", function() {
+            this.btnDlgAddLayer.on("click", function() {
                 widget.itemStore.newItem(
                     {
                         "item_type": "layer",
@@ -127,35 +142,13 @@ define([
                 );
                 widget.dlgAddLayer.hide();
             });
-
-            on(this.btnSave, "click", function() {
-                xhr(application_url + '/api/webmap/' + widget.data.id, {
-                    data: json.stringify(widget.getData()),
-                    method: "PUT",
-                    handleAs: "json"
-                });
-            });
         },
 
-        getAddParent: function () {
-            if (this.getItemValue("item_type") == "group") {
-                return this.widgetTree.selectedItem;
-            } else {
-                return this.itemModel.root;
-            }
-        },
-
-        setData: function (data) {
-            this.id = data.id;
-            this.widgetDisplayName.setValue(data.display_name);
-        },
-
-        
-        getData: function () {
+        _getValueAttr: function () {
             var widget = this;
 
-            // простого способа сделать дамп данных из itemStore
-            // почему-то нет, поэтому обходим рекурсивно
+            // Простого способа сделать дамп данных из itemStore
+            // почему-то нет, поэтому обходим рекурсивно.
             function traverseItem(itm) {
                 return {
                     item_type: widget.itemStore.getValue(itm, "item_type"),
@@ -168,9 +161,17 @@ define([
             }
 
             return {
-                display_name: this.widgetDisplayName.value,
+                display_name: this.wDisplayName.value,
                 root_item: traverseItem(this.itemModel.root)
             };
+        },
+
+        getAddParent: function () {
+            if (this.getItemValue("item_type") == "group") {
+                return this.widgetTree.selectedItem;
+            } else {
+                return this.itemModel.root;
+            }
         },
 
         // установить значение аттрибута текущего элемента
@@ -184,5 +185,7 @@ define([
                 return this.itemStore.getValue(this.widgetTree.selectedItem, attr);
             };
         }
-    });
-});
+
+
+    })
+})

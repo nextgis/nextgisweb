@@ -11,12 +11,15 @@ class WebMapComponent(Component):
     @classmethod
     def setup_routes(cls, config):
         config.add_route('webmap.browse', '/webmap/')
-        config.add_route('webmap.show', '/webmap/{id}')
         config.add_route('webmap.display', '/webmap/{id}/display')
         config.add_route('webmap.layer_hierarchy', '/webmap/{id}/layer_hierarchy')
 
         config.add_route('api.webmap.item.retrive', '/api/webmap/{id}', request_method='GET')
         config.add_route('api.webmap.item.replace', '/api/webmap/{id}', request_method='PUT')
+
+    def setup_pyramid(self, config):
+        from . import views
+        views.setup_pyramid(self, config)
 
     @classmethod
     def initialize_db(cls, dbsession):

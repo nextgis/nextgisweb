@@ -5,8 +5,8 @@ from ..models import DBSession
 from .models import WebMap
 
 from ..layer_group import LayerGroup
-
-from ..views import model_loader
+from ..object_widget import ObjectWidget
+from ..views import ModelController, model_loader, permalinker
 
 @view_config(route_name='webmap.browse', renderer='webmap/browse.mako')
 def browse(request):
@@ -14,11 +14,6 @@ def browse(request):
     return dict(
         obj_list=obj_list
     )
-
-@view_config(route_name='webmap.show', renderer='webmap/show.mako')
-@model_loader(WebMap)
-def show(request, obj):
-    return dict(obj=obj)
 
 
 @view_config(route_name='webmap.display', renderer='webmap/display.mako')
@@ -99,3 +94,71 @@ def api_webmap_item_retrive(request, obj):
 @model_loader(WebMap)
 def api_webmap_item_replace(request, obj):
     obj.from_dict(request.json_body)
+
+
+
+class WebmapObjectWidget(ObjectWidget):
+
+    def populate_obj(self):
+        super(WebmapObjectWidget, self).populate_obj()
+
+        self.obj.from_dict(self.data)
+
+    def validate(self):
+        result = super(WebmapObjectWidget, self).validate()
+        self.error = [];
+
+        return result
+
+    def widget_params(self):
+        result = super(WebmapObjectWidget, self).widget_params()
+
+        if self.obj:
+            result['value'] = self.obj.to_dict()
+
+        return result
+
+    def widget_module(self):
+        return 'webmap/Widget'
+
+
+def setup_pyramid(comp, config):
+
+    permalinker(WebMap, "webmap.show")
+
+    @model_loader(WebMap)
+    def show(request, obj):
+        return dict(obj=obj)
+
+    config.add_route('webmap.show', '/webmap/{id}')
+    config.add_view(show, route_name='webmap.show', renderer='obj.mako')
+
+    class WebmapController(ModelController):
+        def create_context(self, request):
+            parent = DBSession.query(WebMap).filter_by(id=request.GET['parent_id']).one()
+            template_context = dict(
+                subtitle=u"Новая веб-карта",
+            )
+            return locals()
+
+        def edit_context(self, request):
+            obj = DBSession.query(WebMap).filter_by(**request.matchdict).one()
+            template_context = dict(
+                obj=obj,
+            )
+            return locals()
+
+        def widget_class(self, context, operation):
+            return WebmapObjectWidget
+
+        def create_object(self, context):
+            return WebMap()
+
+        def query_object(self, context):
+            return context['obj']
+
+        def template_context(self, context):
+            return context['template_context']
+
+    WebmapController('webmap') \
+        .includeme(config)
