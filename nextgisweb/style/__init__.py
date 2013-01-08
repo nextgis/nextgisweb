@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..component import Component
+from ..component import Component, require
 
 from .models import Style
 
@@ -7,6 +7,13 @@ from .models import Style
 @Component.registry.register
 class StyleComponent(Component):
     identity = 'style'
+
+    @require('layer')
+    def initialize(self):
+        super(StyleComponent, self).initialize()
+
+        from . import models
+        models.initialize(self)
 
     @classmethod
     def setup_routes(cls, config):

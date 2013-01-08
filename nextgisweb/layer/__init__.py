@@ -27,7 +27,10 @@ class LayerComponent(Component):
 
     @require('layer_group')
     def initialize(self):
-        self.Layer = Layer
+        super(LayerComponent, self).initialize()
+
+        from . import models
+        models.initialize(self)
 
     @require('layer_group')
     def setup_pyramid(self, config):

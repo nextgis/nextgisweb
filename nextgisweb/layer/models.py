@@ -69,3 +69,6 @@ class SpatialLayerMixin(SRSMixin):
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
             (u"Система координат", self.srs_id),
         )
+
+def initialize(comp):
+    comp.Layer = Layer

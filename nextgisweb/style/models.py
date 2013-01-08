@@ -59,3 +59,8 @@ class Style(Base):
     def render_image(cls, extent, image_size, settings):
         """ Рендеринг картинки """
         pass
+
+
+def initialize(comp):
+
+    comp.Style = Style
