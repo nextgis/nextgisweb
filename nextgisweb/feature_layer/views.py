@@ -7,6 +7,7 @@ from ..views import model_context
 from .interface import IFeatureLayer
 
 def setup_pyramid(comp, config):
+    DBSession = comp.env.core.DBSession
 
     @model_context(comp.env.layer.Layer)
     def browse(request, layer):
@@ -30,16 +31,36 @@ def setup_pyramid(comp, config):
 
         return dict(
             obj=layer,
-            subtitle=u"Элементы",
+            subtitle=u"Объекты",
             features=query(),
         )
 
-    config.add_route('feature_layer.browse', '/layer/{id}/feature/')
-    config.add_view(browse, route_name='feature_layer.browse', renderer='feature_layer/browse.mako')
+    config.add_route('feature_layer.feature.browse', '/layer/{id}/feature/')
+    config.add_view(browse, route_name='feature_layer.feature.browse', renderer='feature_layer/feature_browse.mako')
+
+    def feature_show(request):
+        layer = DBSession.query(comp.env.layer.Layer) \
+            .filter_by(id=request.matchdict['layer_id']) \
+            .one()
+
+        fquery = layer.feature_query()
+        fquery.filter_by(id=request.matchdict['id'])
+
+        feature = fquery().one()
+
+        return dict(
+            obj=layer,
+            subtitle=u"Объект #%d" % feature.id,
+            feature=feature,
+        )
+
+
+    config.add_route('feature_layer.feature.show', '/layer/{layer_id}/feature/{id}')
+    config.add_view(feature_show, route_name='feature_layer.feature.show', renderer='feature_layer/feature_show.mako')
 
     comp.env.layer.layer_page_sections.register(
         key='fields',
-        title=u"Аттрибуты",
+        title=u"Атрибуты",
         template="nextgisweb:templates/feature_layer/layer_section_fields.mako",
         is_applicable=lambda (obj): IFeatureLayer.providedBy(obj)
     )

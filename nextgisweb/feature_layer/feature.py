@@ -28,6 +28,10 @@ class Feature(object):
 
 
 class FeatureSet(object):
+
+    def one(self):
+        data = list(self.__iter__())
+        return data[0]
     
     @property
     def __geo_interface__(self):

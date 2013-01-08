@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from ConfigParser import ConfigParser
 
 from pyramid.config import Configurator
@@ -34,11 +35,17 @@ def main(global_config, **settings):
 
 def amd_packages():
     return (
-        ('ngw', 'nextgisweb:amd_packages/ngw'),
+        # Сторонние пакеты
         ('dojo', 'nextgisweb:amd_packages/dojo'),
         ('dijit', 'nextgisweb:amd_packages/dijit'),
         ('dojox', 'nextgisweb:amd_packages/dojox'),
         ('cbtree', 'nextgisweb:amd_packages/cbtree'),
+        ('xstyle', 'nextgisweb:amd_packages/xstyle'),
+        ('put-selector', 'nextgisweb:amd_packages/put-selector'),
+        ('dgrid', 'nextgisweb:amd_packages/dgrid'),
+
+        # Пакеты nextgisweb
+        ('ngw', 'nextgisweb:amd_packages/ngw'),
         ('layer_group', 'nextgisweb:amd_packages/layer_group'),
         ('layer', 'nextgisweb:amd_packages/layer'),
         ('style', 'nextgisweb:amd_packages/style'),
