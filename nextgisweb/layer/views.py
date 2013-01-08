@@ -81,21 +81,6 @@ def security_proxy(request, obj):
     from ..security.views import acl_editor_view
     return acl_editor_view(request, obj, obj.acl)
 
-def _subwidgets(model_class):
-    result = []
-    while issubclass(model_class, Layer):
-        if hasattr(model_class, 'object_widget'):
-            val = model_class.object_widget
-            if issubclass(val, ObjectWidget):
-                result.append((model_class.identity, val))
-            elif isinstance(val, tuple):
-                result.append(val)
-
-        model_class = model_class.__base__
-
-    result.reverse()
-    
-    return result
 
 def includeme(comp, config):
     from ..layer_group import LayerGroup
@@ -124,7 +109,7 @@ def includeme(comp, config):
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):
-                subwidget_config = _subwidgets(context['cls'])
+                model_class = context['cls']
                 
             return Composite
 

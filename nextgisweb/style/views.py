@@ -30,6 +30,7 @@ def show(reqest, obj):
         obj=obj,
     )
 
+
 @view_config(route_name='style.tms')
 @model_context(Style)
 def tms(reqest, obj):
@@ -87,10 +88,11 @@ def api_style_collection_create(request, layer):
 
     return dict(id=obj.id)
 
+
 def setup_pyramid(comp, config):
 
     class StyleObjectWidget(ObjectWidget):
-        
+
         def populate_obj(self):
             ObjectWidget.populate_obj(self)
 
@@ -109,26 +111,13 @@ def setup_pyramid(comp, config):
 
     Style.object_widget = StyleObjectWidget
 
-    def _subwidgets(model_class):
-        result = []
-        while issubclass(model_class, Style):
-            if hasattr(model_class, 'object_widget'):
-                val = model_class.object_widget
-                if issubclass(val, ObjectWidget):
-                    result.append((model_class.identity, val))
-                elif isinstance(val, tuple):
-                    result.append(val)
-
-            model_class = model_class.__base__
-
-        result.reverse()
-
-        return result
-
     class StyleController(ModelController):
 
         def create_context(self, request):
-            layer = DBSession.query(Layer).filter_by(id=request.matchdict['layer_id']).one()
+            layer = DBSession.query(Layer) \
+                .filter_by(id=request.matchdict['layer_id']) \
+                .one()
+
             identity = request.GET['identity']
             cls = Style.registry[identity]
             template_context = dict(
@@ -149,8 +138,8 @@ def setup_pyramid(comp, config):
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):
-                subwidget_config = _subwidgets(context['cls'])
-                
+                model_class = context['cls']
+
             return Composite
 
         def create_object(self, context):

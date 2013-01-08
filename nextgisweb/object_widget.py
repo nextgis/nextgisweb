@@ -66,16 +66,58 @@ class ObjectWidget(object):
 
 
 class CompositeWidget(ObjectWidget):
+    subwidget_config = None
+    model_class = None
 
     def __init__(self, obj=None, operation=None):
         ObjectWidget.__init__(self, obj=obj, operation=operation)
-        self.subwidgets = tuple([(k, c(obj=obj)) for k, c in self.subwidget_config])
+
+        # Если у класса не установлен аттрибут subwidget_config,
+        # то вычислим его исходя из model_class, если он есть.
+        if not self.subwidget_config and self.model_class:
+            self.subwidget_config = self.scan_model(self.model_class)
+
+        self.subwidgets = tuple([
+            (k, c(obj=obj, operation=operation))
+            for k, c in self.subwidget_config
+        ])
+
+    @classmethod
+    def scan_model(cls, model_cls, attr='object_widget'):
+        result = []
+
+        # Пробегаем по все предкам класса model_cls
+        while model_cls and issubclass(model_cls, object):
+            # Проверяем наличие атрибута attr у класса
+            if hasattr(model_cls, attr):
+                val = getattr(model_cls, attr)
+
+                if issubclass(val, ObjectWidget):
+                    result.append((model_cls.identity, val))
+
+                elif isinstance(val, tuple):
+                    result.append(val)
+
+            # На след итерации рассматриваем предка.
+            # TODO: Разобраться как это работает с миксинами
+            model_cls = model_cls.__base__
+
+        # Перед тем как вернуть список, перевернем его,
+        # чтобы виждеты полученные от базового класса
+        # оказались вначале.
+        result.reverse()
+
+        return result
 
     def bind(self, obj=None, data=None, request=None):
         ObjectWidget.bind(self, obj=obj, data=data, request=request)
 
         for k, s in self.subwidgets:
-            s.bind(obj=obj, data=data[k] if (data and k in data) else None, request=request)
+            s.bind(
+                obj=obj,
+                data=data[k] if (data and k in data) else None,
+                request=request,
+            )
 
     def validate(self):
         result = ObjectWidget.validate(self)
