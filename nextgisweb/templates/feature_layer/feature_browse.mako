@@ -6,7 +6,15 @@
     var gridOptions = {
         selectionMode: "single",
         columns: {
-            id: "#"
+            id: {
+                label: "#",
+                formatter: function (value) {
+                    return '<a href="'
+                        + ${request.route_url('feature_layer.feature.browse', id=obj.id) | json.dumps, n}
+                        + value
+                    + '">' + value + '</a>'
+                }
+            }
         }
     };
 
@@ -25,11 +33,6 @@
         function (declare, Grid, Selection){
             var CustomGrid = declare([Grid, Selection])
             grid = new CustomGrid(gridOptions, "grid");
-
-            grid.on("dgrid-select", function (event) {
-                window.location = ${request.route_url('feature_layer.feature.browse', id=obj.id) | json.dumps, n}
-                    + event.rows[0].data.id;
-            });
 
             grid.renderArray(gridData);
         }
