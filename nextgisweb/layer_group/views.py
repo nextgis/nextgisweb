@@ -36,14 +36,14 @@ def __action_panel(self, request):
 
     panel = ap.P((
         ap.S('new', u"Добавить", new_items),
-        ap.S('permission', u"Управление доступом", (
-            ap.I(u"Изменить права", request.route_url('layer_group.edit_security', id=self.id)),
-            ap.I(u"Права пользователя", request.route_url('layer_group.show_security', id=self.id)),
-        )),
+        # ap.S('permission', u"Управление доступом", (
+        #     ap.I(u"Изменить права", request.route_url('layer_group.edit_security', id=self.id)),
+        #     ap.I(u"Права пользователя", request.route_url('layer_group.show_security', id=self.id)),
+        # )),
         ap.S('operation', u"Операции", (
             ap.I(u"Редактировать", request.route_url('layer_group.edit', id=self.id)),
-            ap.I(u"Переместить", '#'),
-            ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
+            # ap.I(u"Переместить", '#'),
+            # ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
         )),
     ))
     return panel

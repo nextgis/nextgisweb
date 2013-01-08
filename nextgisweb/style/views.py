@@ -162,7 +162,7 @@ def setup_pyramid(comp, config):
         panel = ap.P((
             ap.S('operation', u"Операции", (
                 ap.I(u"Редактировать", request.route_url('style.edit', id=self.id, layer_id=self.layer_id)),
-                ap.I(u"Удалить", '#'),
+                # ap.I(u"Удалить", '#'),
             )),
         ))
 

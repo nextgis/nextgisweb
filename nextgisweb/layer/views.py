@@ -28,13 +28,13 @@ def __action_panel(self, request):
 
     panel = ap.P((
         ap.S('style-new', u"Добавить стиль", new_style_items),
-        ap.S('manage', u"Управление", (
-            ap.I(u"Управление доступом", request.route_url('layer.security', id=self.id)),
-        )),
+        # ap.S('manage', u"Управление", (
+        #     ap.I(u"Управление доступом", request.route_url('layer.security', id=self.id)),
+        # )),
         ap.S('operation', u"Операции", (
             ap.I(u"Редактировать", request.route_url('layer.edit', id=self.id)),
-            ap.I(u"Переместить", '#'),
-            ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
+            # ap.I(u"Переместить", '#'),
+            # ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
         )),
     ))
 
