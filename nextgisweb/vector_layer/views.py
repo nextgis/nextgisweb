@@ -17,6 +17,14 @@ from ..object_widget import ObjectWidget
 
 class VectorLayerObjectWidget(ObjectWidget):
 
+    def is_applicable(self):
+        """ На текущий момент загрузка данных поддерживается
+        только на этапе создания слоя, а этот виджет только
+        загрузку данных и реализует. Поэтому отключим его,
+        выполняется что-то отличное от создания объекта. """
+
+        return self.operation == 'create'
+
     def populate_obj(self):
         ObjectWidget.populate_obj(self)
 

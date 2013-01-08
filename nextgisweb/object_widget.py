@@ -21,6 +21,9 @@ class ObjectWidget(object):
         self.operation = operation
         self.obj = obj
 
+    def is_applicable(self):
+        return True
+
     def __del__(self):
         pass
 
@@ -77,10 +80,13 @@ class CompositeWidget(ObjectWidget):
         if not self.subwidget_config and self.model_class:
             self.subwidget_config = self.scan_model(self.model_class)
 
-        self.subwidgets = tuple([
-            (k, c(obj=obj, operation=operation))
-            for k, c in self.subwidget_config
-        ])
+        subwidgets = []
+        for k, cls in self.subwidget_config:
+            instance = cls(obj=obj, operation=operation)
+            if instance.is_applicable():
+                subwidgets.append((k, instance))
+
+        self.subwidgets = tuple(subwidgets)
 
     @classmethod
     def scan_model(cls, model_cls, attr='object_widget'):

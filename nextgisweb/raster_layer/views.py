@@ -10,6 +10,14 @@ def include(comp):
     file_upload = comp.env.file_upload
 
     class RasterLayerObjectWidget(ObjectWidget):
+        
+        def is_applicable(self):
+            """ На текущий момент загрузка данных поддерживается
+            только на этапе создания слоя, а этот виджет только
+            загрузку данных и реализует. Поэтому отключим его,
+            выполняется что-то отличное от создания объекта. """
+
+            return self.operation == 'create'
 
         def validate(self):
             result = ObjectWidget.validate(self)
