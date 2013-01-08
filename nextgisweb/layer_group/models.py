@@ -20,8 +20,8 @@ class LayerGroup(Base):
     description = sa.Column(sa.Unicode, default=u'', nullable=False)
 
     parent = orm.relationship(
-        'LayerGroup', remote_side=[id], uselist=False,
-        backref=orm.backref('children', uselist=True)
+        'LayerGroup', remote_side=[id],
+        backref=orm.backref('children', order_by=display_name)
     )
     acl = orm.relationship('ACL', cascade='all', lazy='joined')
 

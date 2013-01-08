@@ -36,7 +36,7 @@ class Layer(Base):
 
     layer_group = orm.relationship(
         'LayerGroup', uselist=False,
-        backref=orm.backref('layers', uselist=True)
+        backref=orm.backref('layers', order_by=display_name)
     )
 
     def __init__(self, *args, **kwargs):
