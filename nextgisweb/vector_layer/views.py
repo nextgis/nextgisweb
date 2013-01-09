@@ -2,6 +2,8 @@
 import tempfile
 import shutil
 import zipfile
+import ctypes
+
 from osgeo import ogr
 
 from wtforms import form, fields, validators
@@ -38,6 +40,7 @@ class VectorLayerObjectWidget(ObjectWidget):
         self.error = []
 
         datafile, metafile = self.request.env.file_upload.get_filename(self.data['file']['id'])
+        self._encoding = self.data['encoding']
 
         if not zipfile.is_zipfile(datafile):
             self.error.append(dict(message=u"Загруженный файл не является ZIP-архивом."))
@@ -47,7 +50,9 @@ class VectorLayerObjectWidget(ObjectWidget):
 
             zipfile.ZipFile(datafile, 'r').extractall(path=self._unzip_tmpdir)
 
-            self._ogrds = ogr.Open(self._unzip_tmpdir)
+            with _set_encoding(self._encoding):
+                self._ogrds = ogr.Open(self._unzip_tmpdir)
+
             if not self._ogrds:
                 self.error.append(dict(message=u"Библиотеке GDAL/OGR не удалось открыть файл."))
                 result = False
@@ -79,6 +84,56 @@ class VectorLayerObjectWidget(ObjectWidget):
 
     def widget_module(self):
         return 'vector_layer/Widget'
+
+
+def _set_encoding(encoding):
+
+    class encoding_section(object):
+
+        def __init__(self, encoding):
+            self.encoding = encoding
+
+            if self.encoding:
+                # Загружаем библиотеку только в том случае,
+                # если нам нужно перекодировать
+                self.lib = ctypes.CDLL('libgdal.so')
+
+                # Обертки для функций cpl_conv.h
+                # см. http://www.gdal.org/cpl__conv_8h.html
+
+                # CPLGetConfigOption
+                self.get_option = self.lib.CPLGetConfigOption
+                self.get_option.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+                self.get_option.restype = ctypes.c_char_p
+
+                # CPLStrdup
+                self.strdup = self.lib.CPLStrdup
+                self.strdup.argtypes = [ctypes.c_char_p, ]
+                self.strdup.restype = ctypes.c_char_p
+
+                # CPLSetThreadLocalConfigOption
+                # Используем именно thread local вариант функции, чтобы
+                # минимизировать побочные эффекты.
+                self.set_option = self.lib.CPLSetThreadLocalConfigOption
+                self.set_option.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+                self.set_option.restype = None
+
+        def __enter__(self):
+            if encoding:
+                # Оставим копию текущего значения себе
+                tmp = self.get_option('SHAPE_ENCODING', None)
+                self.old_value = self.strdup(tmp)
+
+                # Установим новое
+                self.set_option('SHAPE_ENCODING', self.encoding)
+
+        def __exit__(self, type, value, traceback):
+            if encoding:
+                # Возвращаем на место старое значение
+                self.set_option('SHAPE_ENCODING', self.old_value)
+                
+    return encoding_section(encoding)
+
 
 VectorLayer.object_widget = VectorLayerObjectWidget
 

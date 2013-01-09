@@ -29,7 +29,10 @@ define([
         title: "Векторный слой",
 
         _getValueAttr: function () {
-            var result = { srs_id: this.wSRS.get("value") };
+            var result = { 
+                srs_id: this.wSRS.get("value"),
+                encoding: this.wEncoding.get("value")
+            };
 
             // В общем случае файл имеет тип Promise,
             // поэтому используем асинхронный вариант

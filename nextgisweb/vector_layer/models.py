@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from osgeo import ogr, osr
 import uuid
 
 from zope.interface import implements
+from osgeo import ogr, osr
 
 import sqlalchemy as sa
 import geoalchemy as ga
@@ -189,7 +189,7 @@ class VectorLayer(Layer, SpatialLayerMixin, LayerFieldsMixin):
     def _tablename(self):
         return 'layer_%08x' % self.id
 
-    def setup_from_ogr(self, ogrlayer):
+    def setup_from_ogr(self, ogrlayer, encoding=None):
         tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs_id)
         tableinfo.setup_layer(self)
 
