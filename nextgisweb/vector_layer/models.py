@@ -57,7 +57,7 @@ class TableInfo(object):
         self.model = None
 
     @classmethod
-    def from_ogrlayer(cls, ogrlayer, srs_id):
+    def from_ogrlayer(cls, ogrlayer, srs_id, strdecode):
         self = cls(srs_id)
 
         self.geometry_type = _GEOM_OGR_2_TYPE[ogrlayer.GetGeomType()]
@@ -129,7 +129,7 @@ class TableInfo(object):
         self.table = table
         self.model = model
 
-    def load_from_ogr(self, ogrlayer):
+    def load_from_ogr(self, ogrlayer, strdecode):
         source_osr = ogrlayer.GetSpatialRef()
         target_osr = osr.SpatialReference()
         target_osr.ImportFromEPSG(self.srs_id)
@@ -160,7 +160,8 @@ class TableInfo(object):
                 elif fld_type == ogr.OFTReal:
                     fld_value = feature.GetFieldAsDouble(i)
                 elif fld_type == ogr.OFTString:
-                    fld_value = feature.GetFieldAsString(i)
+                    fld_value = strdecode(feature.GetFieldAsString(i))
+                    
                 fld_values[self[feature.GetFieldDefnRef(i).GetNameRef()].key] = fld_value
 
             obj = self.model(fid=fid, geom=ga.WKTSpatialElement(str(geom), self.srs_id), **fld_values)
@@ -189,8 +190,8 @@ class VectorLayer(Layer, SpatialLayerMixin, LayerFieldsMixin):
     def _tablename(self):
         return 'layer_%08x' % self.id
 
-    def setup_from_ogr(self, ogrlayer, encoding=None):
-        tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs_id)
+    def setup_from_ogr(self, ogrlayer, strdecode):
+        tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs_id, strdecode)
         tableinfo.setup_layer(self)
 
         DBSession.flush()
@@ -199,8 +200,8 @@ class VectorLayer(Layer, SpatialLayerMixin, LayerFieldsMixin):
 
         self.tableinfo = tableinfo
 
-    def load_from_ogr(self, ogrlayer):
-        self.tableinfo.load_from_ogr(ogrlayer)
+    def load_from_ogr(self, ogrlayer, strdecode):
+        self.tableinfo.load_from_ogr(ogrlayer, strdecode)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (

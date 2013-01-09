@@ -4,6 +4,7 @@ import shutil
 import zipfile
 import ctypes
 
+import osgeo
 from osgeo import ogr
 
 from wtforms import form, fields, validators
@@ -32,8 +33,8 @@ class VectorLayerObjectWidget(ObjectWidget):
 
         self.obj.srs_id = self.data['srs_id']
 
-        self.obj.setup_from_ogr(self._ogrlayer)
-        self.obj.load_from_ogr(self._ogrlayer)
+        self.obj.setup_from_ogr(self._ogrlayer, self._strdecode)
+        self.obj.load_from_ogr(self._ogrlayer, self._strdecode)
 
     def validate(self):
         result = ObjectWidget.validate(self)
@@ -50,7 +51,8 @@ class VectorLayerObjectWidget(ObjectWidget):
 
             zipfile.ZipFile(datafile, 'r').extractall(path=self._unzip_tmpdir)
 
-            with _set_encoding(self._encoding):
+            with _set_encoding(self._encoding) as strdecode:
+                self._strdecode = strdecode
                 self._ogrds = ogr.Open(self._unzip_tmpdir)
 
             if not self._ogrds:
@@ -93,7 +95,10 @@ def _set_encoding(encoding):
         def __init__(self, encoding):
             self.encoding = encoding
 
-            if self.encoding:
+            if self.encoding and osgeo.__version__ >= '1.9':
+                # Для GDAL 1.9 и выше пытаемся установить SHAPE_ENCODING
+                # через ctypes и libgdal
+
                 # Загружаем библиотеку только в том случае,
                 # если нам нужно перекодировать
                 self.lib = ctypes.CDLL('libgdal.so')
@@ -118,8 +123,16 @@ def _set_encoding(encoding):
                 self.set_option.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
                 self.set_option.restype = None
 
+            elif encoding:
+                # Для други версий GDAL вернем функцию обертку, которая
+                # умеет декодировать строки в unicode, см. __enter__
+                pass
+
         def __enter__(self):
-            if encoding:
+
+            if self.encoding and osgeo.__version__ >= '1.9':
+                # Для GDAL 1.9 устанавливаем значение SHAPE_ENCODING
+
                 # Оставим копию текущего значения себе
                 tmp = self.get_option('SHAPE_ENCODING', None)
                 self.old_value = self.strdup(tmp)
@@ -127,8 +140,16 @@ def _set_encoding(encoding):
                 # Установим новое
                 self.set_option('SHAPE_ENCODING', self.encoding)
 
+                return lambda (x): x
+
+            elif self.encoding:
+                # Функция обертка для других версий GDAL
+                return lambda (x): x.decode(self.encoding)
+
+
         def __exit__(self, type, value, traceback):
-            if encoding:
+
+            if encoding and osgeo.__version__ >= '1.9':
                 # Возвращаем на место старое значение
                 self.set_option('SHAPE_ENCODING', self.old_value)
                 
