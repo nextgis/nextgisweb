@@ -14,7 +14,8 @@ define([
     FeatureGrid
 ) {
     var Pane = declare([ContentPane], {
-        closable: true, 
+        closable: true,
+        iconClass: "dijitIconFile",
 
         postCreate: function () {
             domConstruct.create("iframe", {
@@ -36,7 +37,7 @@ define([
                 onClick: function () {
 
                     var pane = new Pane({
-                        title: store.getValue(display.treeWidget.selectedItem, "display_name") + ": Информация",
+                        title: store.getValue(display.treeWidget.selectedItem, "display_name"),
                         layer_id: store.getValue(display.treeWidget.selectedItem, "layer_id")
                     });
                     pane.placeAt(display.tabContainer);

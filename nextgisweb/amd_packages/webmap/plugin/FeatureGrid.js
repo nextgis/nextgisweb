@@ -16,7 +16,8 @@ define([
     FeatureGrid
 ) {
     var Pane = declare([ContentPane], {
-        closable: true, 
+        closable: true,
+        iconClass: "dijitIconTable",
 
         constructor: function (params) {
             declare.safeMixin(this, params);
@@ -52,7 +53,7 @@ define([
                     var pluginData = store.dumpItem(store.getValue(plugins, identity));
 
                     var pane = new Pane({
-                        title: store.getValue(display.treeWidget.selectedItem, "display_name") + ": Объекты",
+                        title: store.getValue(display.treeWidget.selectedItem, "display_name"),
                         gridParams: pluginData
                     });
 
