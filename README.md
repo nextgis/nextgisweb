@@ -28,8 +28,10 @@
 В дистрибутивах на базе debian пакет GDAL скорее всего не установится. В этом случае можно
 попробовать сделать следующее:
 
-    $ env/bin/pip install numpy
-    $ CPATH=/usr/include/gdal env/bin/pip install GDAL
+    $ env/bin/pip install --no-install GDAL
+    $ cd env/build/GDAL
+    $ env/bin/python setup.py build_ext --include-dirs="/usr/include/gdal/"
+    $ env/bin/pip install --no-download GDAL
 
 
 ### Конфигурационный файл
