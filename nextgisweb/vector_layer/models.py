@@ -267,7 +267,7 @@ class FeatureQueryBase(object):
         table = tableinfo.table
 
         columns = [table.columns.id, table.columns.geom.label('geom'), ]
-        select_args = []
+        where = []
 
         selected_fields = []
         for f in tableinfo.fields:
@@ -278,13 +278,13 @@ class FeatureQueryBase(object):
         if self._filter_by:
             for k, v in self._filter_by.iteritems():
                 if k == 'id':
-                    select_args.append(table.columns.id == v)
+                    where.append(table.columns.id == v)
                 else:
-                    select_args.append(table.columns[tableinfo[k].key] == v)
+                    where.append(table.columns[tableinfo[k].key] == v)
 
         if self._intersects:
             geom = ga.WKTSpatialElement(self._intersects.wkt, self._intersects.srid)
-            select_args.append(geom.intersects(table.columns.geom))
+            where.append(geom.intersects(table.columns.geom))
 
         class QueryFeatureSet(FeatureSet):
             fields = selected_fields
@@ -293,7 +293,12 @@ class FeatureQueryBase(object):
             _offset = self._offset
 
             def __iter__(self):
-                query = sql.select(*[columns + select_args], limit=self._limit, offset=self._offset)
+                query = sql.select(
+                    columns,
+                    whereclause=sa.and_(*where),
+                    limit=self._limit,
+                    offset=self._offset
+                )
                 rows = DBSession.connection().execute(query)
                 for row in rows:
                     fdict = dict([(f.keyname, row[f.keyname]) for f in selected_fields])
@@ -301,7 +306,10 @@ class FeatureQueryBase(object):
 
             @property
             def total_count(self):
-                query = sql.select([sa.func.count(table.columns.id), ] + select_args)
+                query = sql.select(
+                    [sa.func.count(table.columns.id), ],
+                    whereclause=sa.and_(*where)
+                )
                 res = DBSession.connection().execute(query)
                 for row in res:
                     return row[0]
