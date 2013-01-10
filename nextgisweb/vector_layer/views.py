@@ -146,6 +146,7 @@ def _set_encoding(encoding):
                 # Функция обертка для других версий GDAL
                 return lambda (x): x.decode(self.encoding)
 
+            return lambda (x): x
 
         def __exit__(self, type, value, traceback):
 
