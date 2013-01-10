@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
+import json
+
 from shapely import wkt
+
+from pyramid.response import Response
 
 from ..views import model_context
 
@@ -11,32 +15,41 @@ def setup_pyramid(comp, config):
 
     @model_context(comp.env.layer.Layer)
     def browse(request, layer):
-        query = layer.feature_query()
-
-        fields = request.GET['fields'].split(',') if 'fields' in request.GET else None
-        if fields:
-            query.fields(*fields)
-
-        filter_by = dict()
-        for k, v in request.GET.iteritems():
-            m = re.match(ur'filter_by\[(.+)\]', k)
-            if m:
-                filter_by[m.group(1)] = v
-
-        query.filter_by(**filter_by)
-
-        if 'intersects' in request.GET:
-            gwkt, gsrs = request.GET['intersects'].split(':')
-            query.intersects(wkt.loads(gwkt), gsrs)
-
         return dict(
             obj=layer,
             subtitle=u"Объекты",
-            features=query(),
         )
 
     config.add_route('feature_layer.feature.browse', '/layer/{id}/feature/')
     config.add_view(browse, route_name='feature_layer.feature.browse', renderer='feature_layer/feature_browse.mako')
+
+    @model_context(comp.env.layer.Layer)
+    def store_api(request, layer):
+
+        http_range = request.headers.get('range', None)
+        if http_range and http_range.startswith('items='):
+            qrange = map(int, http_range[len('items='): ].split('-', 1))
+        else:
+            qrange = (None, None)
+        
+        query = layer.feature_query()
+
+        full = [dict(f.fields, id=f.id) for f in query()]
+        result = full[qrange[0]:qrange[1]]
+
+        total = len(full)
+        last = min(qrange[1], total - 1) if qrange[1] else total - 1
+
+        return Response(
+            json.dumps(result),
+            content_type='application/json',
+            headerlist=[
+                ('Content-Range', 'items %d-%s/%d' % (qrange[0], last, total)),
+            ]
+        )
+
+    config.add_route('feature_layer.store_api', '/layer/{id}/store_api')
+    config.add_view(store_api, route_name='feature_layer.store_api')
 
     def feature_show(request):
         layer = DBSession.query(comp.env.layer.Layer) \

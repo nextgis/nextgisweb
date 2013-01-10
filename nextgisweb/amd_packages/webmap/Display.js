@@ -42,6 +42,49 @@ define([
     Tree,
     dndSource
 ) {
+    var CustomItemFileWriteStore = declare([ItemFileWriteStore], {
+        dumpItem: function (item) {
+            var obj = {};
+
+            if (item) {
+                var attributes = this.getAttributes(item);
+
+                if (attributes && attributes.length > 0) {
+                    var i;
+
+                    for(i = 0; i < attributes.length; i++){
+                        var values = this.getValues(item, attributes[i]);
+
+                        if (values) {
+                            if(values.length > 1 ){
+                                var j;
+
+                                obj[attributes[i]] = [];
+                                for (j = 0; j < values.length; j++ ) {
+                                    var value = values[j];
+
+                                    if (this.isItem(value)) {
+                                        obj[attributes[i]].push(this.dumpItem(value));
+                                    } else {
+                                        obj[attributes[i]].push(value);
+                                    };
+                                };
+                            } else {
+                                if (this.isItem(values[0])) {
+                                    obj[attributes[i]] = this.dumpItem(values[0]);
+                                } else {
+                                    obj[attributes[i]] = values[0];
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+
+            return obj;
+        }
+    });
+
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
 
@@ -50,7 +93,7 @@ define([
             this.layerConfig = options.layerConfig;
 
             // Хранилище значений для дерева слоев
-            this._treeStore = new ItemFileWriteStore({
+            this._treeStore = new CustomItemFileWriteStore({
                 data: { 
                     label: "display_name",
                     items: [ options.treeConfig ]

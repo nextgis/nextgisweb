@@ -3,15 +3,17 @@ define([
     "./_PluginBase",
     "dijit/layout/ContentPane",
     "dojo/dom-construct",
-    "dijit/MenuItem"
+    "dijit/MenuItem",
+    "feature_layer/FeatureGrid"
 ], function (
     declare,
     _PluginBase,
     ContentPane,
     domConstruct,
-    MenuItem
+    MenuItem,
+    FeatureGrid
 ) {
-    var PaneClass = declare([ContentPane], {
+    var Pane = declare([ContentPane], {
         closable: true, 
 
         postCreate: function () {
@@ -33,7 +35,7 @@ define([
                 label: "Информация",
                 onClick: function () {
 
-                    var pane = new PaneClass({
+                    var pane = new Pane({
                         title: store.getValue(display.treeWidget.selectedItem, "display_name") + ": Информация",
                         layer_id: store.getValue(display.treeWidget.selectedItem, "layer_id")
                     });

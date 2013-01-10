@@ -49,6 +49,7 @@ def amd_packages():
         ('layer_group', 'nextgisweb:amd_packages/layer_group'),
         ('layer', 'nextgisweb:amd_packages/layer'),
         ('style', 'nextgisweb:amd_packages/style'),
+        ('feature_layer', 'nextgisweb:amd_packages/feature_layer'),
         ('webmap', 'nextgisweb:amd_packages/webmap'),
         ('vector_layer', 'nextgisweb:amd_packages/vector_layer'),
         ('raster_layer', 'nextgisweb:amd_packages/raster_layer'),
