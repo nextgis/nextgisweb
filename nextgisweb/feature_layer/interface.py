@@ -25,7 +25,7 @@ class IFeatureLayer(Interface):
 
     geometry_type = Attribute(""" Тип геометрии слоя GEOM_TYPE """)
     fields = Attribute(""" Список полей """)
-    
+
     feature_query = Attribute(""" Класс запроса объектов """)
 
     def field_by_keyname(self, keyname):
@@ -38,6 +38,10 @@ class IFeatureQuery(Interface):
     def fields(self, *args):
         """ Установить список полей запроса. Если список полей
         не установлен, то запрос должен возращать все поля элемента. """
+
+    def limit(self, limit, offset=0):
+        """ Установить лимит запроса наподобие SQL инструкции
+        LIMIT limit OFFSET offset """
 
 
 class IFeatureQueryFilterBy(IFeatureQuery):

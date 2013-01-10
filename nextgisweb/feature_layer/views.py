@@ -25,27 +25,29 @@ def setup_pyramid(comp, config):
 
     @model_context(comp.env.layer.Layer)
     def store_api(request, layer):
+        query = layer.feature_query()
 
         http_range = request.headers.get('range', None)
         if http_range and http_range.startswith('items='):
-            qrange = map(int, http_range[len('items='): ].split('-', 1))
-        else:
-            qrange = (None, None)
+            first, last = map(int, http_range[len('items='): ].split('-', 1))
+            query.limit(last - first + 1, first)
         
-        query = layer.feature_query()
+        features = query()
+        
+        result = [dict(f.fields, id=f.id) for f in features]
 
-        full = [dict(f.fields, id=f.id) for f in query()]
-        result = full[qrange[0]:qrange[1]]
-
-        total = len(full)
-        last = min(qrange[1], total - 1) if qrange[1] else total - 1
+        headerlist = []
+        if http_range:
+            total = features.total_count
+            last = min(total - 1, last)
+            headerlist.append(
+                ('Content-Range', 'items %d-%s/%d' % (first, last, total))
+            )
 
         return Response(
             json.dumps(result),
             content_type='application/json',
-            headerlist=[
-                ('Content-Range', 'items %d-%s/%d' % (qrange[0], last, total)),
-            ]
+            headerlist=headerlist
         )
 
     config.add_route('feature_layer.store_api', '/layer/{id}/store_api')

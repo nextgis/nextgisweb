@@ -238,12 +238,19 @@ class FeatureQueryBase(object):
     implements(IFeatureQuery, IFeatureQueryFilterBy)
     
     def __init__(self):
-        self._filter_by = None
         self._fields = None
+        self._limit = None
+        self._offset = None
+
+        self._filter_by = None
         self._intersects = None
 
     def fields(self, *args):
         self._fields = args
+
+    def limit(self, limit, offset=0):
+        self._limit = limit
+        self._offset = offset
 
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
@@ -260,7 +267,7 @@ class FeatureQueryBase(object):
         table = tableinfo.table
 
         columns = [table.columns.id, table.columns.geom.label('geom'), ]
-        select_args = [columns, ]
+        select_args = []
 
         selected_fields = []
         for f in tableinfo.fields:
@@ -282,11 +289,22 @@ class FeatureQueryBase(object):
         class QueryFeatureSet(FeatureSet):
             fields = selected_fields
 
+            _limit = self._limit
+            _offset = self._offset
+
             def __iter__(self):
-                query = sql.select(*select_args)
-                res = DBSession.connection().execute(query)
-                for row in res:
+                query = sql.select(*[columns + select_args], limit=self._limit, offset=self._offset)
+                rows = DBSession.connection().execute(query)
+                for row in rows:
                     fdict = dict([(f.keyname, row[f.keyname]) for f in selected_fields])
                     yield Feature(id=row.id, fields=fdict, geom=geom_from_wkb(str(row.geom.geom_wkb)))
+
+            @property
+            def total_count(self):
+                query = sql.select([sa.func.count(table.columns.id), ] + select_args)
+                res = DBSession.connection().execute(query)
+                for row in res:
+                    return row[0]
+
 
         return QueryFeatureSet()
