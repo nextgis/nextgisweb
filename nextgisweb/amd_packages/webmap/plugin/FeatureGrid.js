@@ -5,7 +5,8 @@ define([
     "dijit/MenuItem",
     "dojo/dom-construct",
     "dojo/dom-style",
-    "feature_layer/FeatureGrid"
+    "feature_layer/FeatureGrid",
+    "dijit/form/Button"
 ], function (
     declare,
     _PluginBase,
@@ -13,11 +14,24 @@ define([
     MenuItem,
     domConstruct,
     domStyle,
-    FeatureGrid
+    FeatureGrid,
+    Button
 ) {
     var Pane = declare([FeatureGrid], {
         closable: true,
-        iconClass: "dijitIconTable"
+        iconClass: "dijitIconTable",
+
+        postCreate: function () {
+            this.toolbar.addChild(new Button({
+                label: "Открыть",
+                iconClass: "dijitIconApplication"
+            }));
+
+            this.toolbar.addChild(new Button({
+                label: "Показать",
+                iconClass: "dijitIconSearch"
+            }));
+        }
     });
 
     return declare([_PluginBase], {
@@ -34,6 +48,7 @@ define([
 
                     var pane = new Pane({
                         title: store.getValue(display.treeWidget.selectedItem, "display_name"),
+                        gutters: false,
                         layerId: store.getValue(display.treeWidget.selectedItem, "layer_id"),
                     });
 

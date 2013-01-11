@@ -1,6 +1,9 @@
 define([
     'dojo/_base/declare',
-    'dijit/layout/ContentPane',
+    "dijit/layout/BorderContainer",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
+    "dojo/text!./templates/FeatureGrid.html",
     // dgrid & plugins
     'dgrid/OnDemandGrid',
     'dgrid/Selection',
@@ -11,10 +14,16 @@ define([
     'dojo/promise/all',
     'dojo/store/JsonRest',
     'dojo/store/Observable',
-    'dojo/dom-style'
+    'dojo/dom-style',
+    // template
+    "dijit/layout/ContentPane",
+    "dijit/Toolbar"
 ], function (
     declare,
-    ContentPane,
+    BorderContainer,
+    _TemplatedMixin,
+    _WidgetsInTemplateMixin,
+    template,
     // dgrid & plugins
     OnDemandGrid,
     Selection,
@@ -32,7 +41,9 @@ define([
         selectionMode: "single"
     });
 
-    return declare([ContentPane], {
+    return declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
+        templateString: template,
+
         constructor: function (params) {
             declare.safeMixin(this, params);
 
@@ -82,7 +93,7 @@ define([
             var widget = this;
             this._gridInitialized.then(
                 function () {
-                    widget.set("content", widget._grid.domNode);
+                    widget.gridPane.set("content", widget._grid.domNode);
                     widget._grid.startup();
                 }
             );
