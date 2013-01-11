@@ -43,6 +43,9 @@ class IFeatureQuery(Interface):
         """ Установить лимит запроса наподобие SQL инструкции
         LIMIT limit OFFSET offset """
 
+    def geom(self):
+        """ Включать геометрию объекта в результат запроса """
+
 
 class IFeatureQueryFilterBy(IFeatureQuery):
 

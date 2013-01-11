@@ -238,12 +238,17 @@ class FeatureQueryBase(object):
     implements(IFeatureQuery, IFeatureQueryFilterBy)
     
     def __init__(self):
+        self._geom = None
+        
         self._fields = None
         self._limit = None
         self._offset = None
 
         self._filter_by = None
         self._intersects = None
+
+    def geom(self):
+        self._geom = True
 
     def fields(self, *args):
         self._fields = args
@@ -266,8 +271,11 @@ class FeatureQueryBase(object):
         tableinfo.setup_metadata(tablename=self.layer._tablename)
         table = tableinfo.table
 
-        columns = [table.columns.id, table.columns.geom.label('geom'), ]
+        columns = [table.columns.id, ]
         where = []
+
+        if self._geom:
+            columns.append(table.columns.geom.label('geom'))
 
         selected_fields = []
         for f in tableinfo.fields:
@@ -289,6 +297,7 @@ class FeatureQueryBase(object):
         class QueryFeatureSet(FeatureSet):
             fields = selected_fields
 
+            _geom = self._geom
             _limit = self._limit
             _offset = self._offset
 
@@ -302,7 +311,11 @@ class FeatureQueryBase(object):
                 rows = DBSession.connection().execute(query)
                 for row in rows:
                     fdict = dict([(f.keyname, row[f.keyname]) for f in selected_fields])
-                    yield Feature(id=row.id, fields=fdict, geom=geom_from_wkb(str(row.geom.geom_wkb)))
+                    yield Feature(
+                        id=row.id,
+                        fields=fdict,
+                        geom=geom_from_wkb(str(row.geom.geom_wkb)) if self._geom else None
+                    )
 
             @property
             def total_count(self):
