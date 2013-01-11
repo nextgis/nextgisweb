@@ -15,28 +15,9 @@ define([
     domStyle,
     FeatureGrid
 ) {
-    var Pane = declare([ContentPane], {
+    var Pane = declare([FeatureGrid], {
         closable: true,
-        iconClass: "dijitIconTable",
-
-        constructor: function (params) {
-            declare.safeMixin(this, params);
-        },
-
-        startup: function () {
-            this.inherited(arguments);
-
-            var grid = new FeatureGrid(this.gridParams);
-            domStyle.set(grid.domNode, "height", "100%");
-            this.set("content", grid.domNode);
-            
-            // Любопытно, что startup тут не работает, вернее работает, но
-            // в результате заголовок сливается с первой строкой. Почему при
-            // этом работает refresh() не очень понятно, но побочный эффект - 
-            // первая порция данных запрашивается дважды.
-            grid.refresh();
-
-        }
+        iconClass: "dijitIconTable"
     });
 
     return declare([_PluginBase], {
@@ -50,11 +31,10 @@ define([
                 label: "Объекты",
                 onClick: function () {
                     var plugins = store.getValue(display.treeWidget.selectedItem, "plugins");
-                    var pluginData = store.dumpItem(store.getValue(plugins, identity));
 
                     var pane = new Pane({
                         title: store.getValue(display.treeWidget.selectedItem, "display_name"),
-                        gridParams: pluginData
+                        layerId: store.getValue(display.treeWidget.selectedItem, "layer_id"),
                     });
 
                     pane.placeAt(display.tabContainer);

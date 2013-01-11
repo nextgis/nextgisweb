@@ -9,6 +9,7 @@ from ..layer import Layer
 
 from .interface import FIELD_TYPE
 
+
 class LayerField(Base):
     __tablename__ = 'layer_field'
 
@@ -35,6 +36,15 @@ class LayerField(Base):
 
     def __unicode__(self):
         return self.display_name
+
+    def to_dict(self):
+        return dict([
+            (c, getattr(self, c))
+            for c in (
+                'id', 'layer_id', 'cls',
+                'idx', 'keyname', 'datatype', 'display_name'
+            )
+        ])
 
 
 class LayerFieldsMixin(object):

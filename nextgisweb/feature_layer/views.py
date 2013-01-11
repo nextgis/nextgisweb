@@ -18,10 +18,18 @@ def setup_pyramid(comp, config):
         return dict(
             obj=layer,
             subtitle=u"Объекты",
+            custom_layout=True
         )
 
     config.add_route('feature_layer.feature.browse', '/layer/{id}/feature/')
     config.add_view(browse, route_name='feature_layer.feature.browse', renderer='feature_layer/feature_browse.mako')
+
+    @model_context(comp.env.layer.Layer)
+    def field(request, layer):
+        return [f.to_dict() for f in layer.fields]
+
+    config.add_route('feature_layer.field', 'layer/{id}/field/')
+    config.add_view(field, route_name='feature_layer.field', renderer='json')
 
     @model_context(comp.env.layer.Layer)
     def store_api(request, layer):

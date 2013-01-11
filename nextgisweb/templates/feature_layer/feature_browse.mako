@@ -1,38 +1,21 @@
-<%inherit file="../obj.mako" />
+<%inherit file='../base.mako' />
 <% import json %>
 
+<%def name="head()">
+    <style type="text/css">
+        body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; }
+    </style>
+</%def>
+
 <script type="text/javascript">
-    var grid;
-    var gridOptions = {
-        layer_id: ${ obj.id | json.dumps, n },
-        selectionMode: "single",
-        columns: {
-            id: {
-                label: "#",
-                formatter: function (value) {
-                    return '<a href="'
-                        + ${request.route_url('feature_layer.feature.browse', id=obj.id) | json.dumps, n}
-                        + value
-                    + '">' + value + '</a>'
-                }
-            }
-        }
-    };
-
-    %for f in obj.fields:
-    gridOptions.columns[${ f.keyname | json.dumps, n}] = ${ f.keyname | json.dumps, n};
-    %endfor
-
-    require(["dojo/parser"], function (parser) { parser.parse() });
-
-    require([
-        "feature_layer/FeatureGrid"
-    ],
-        function (FeatureGrid){
-            grid = new FeatureGrid(gridOptions, "grid");
-        }
-    );
-
+    require(["dojo/parser"], function (parser) {
+        parser.parse();
+    });
 </script>
 
-<div id="grid"></div>
+<div data-dojo-id="grid"
+    data-dojo-type="feature_layer/FeatureGrid"
+    data-dojo-props="layerId: ${obj.id}"
+    style="width: 100%; height: 100%; padding: 0;">
+
+</div>
