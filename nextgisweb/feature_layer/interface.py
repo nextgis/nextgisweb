@@ -46,6 +46,9 @@ class IFeatureQuery(Interface):
     def geom(self):
         """ Включать геометрию объекта в результат запроса """
 
+    def box(self):
+        """ Включать охват объекта в результат запроса """
+
 
 class IFeatureQueryFilterBy(IFeatureQuery):
 

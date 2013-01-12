@@ -44,17 +44,16 @@ define([
     return declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
 
+        // Текущая веделенная строка
+        selectedRow: null,
+
         constructor: function (params) {
             declare.safeMixin(this, params);
-
-            this._store = new Observable(new JsonRest({
-                target: application_url + '/layer/' + this.layerId + '/store_api'
-            }));
 
             this._gridInitialized = new Deferred();
 
             var widget = this;
-            xhr.get(application_url + '/layer/' + this.layerId + '/field/', {
+            xhr.get(application_url + '/layer/' + this.layer + '/field/', {
                 handleAs: 'json'
             }).then(
                 function (data) {
@@ -69,20 +68,39 @@ define([
                 field: "id",
                 label: "#"
             }];
+
+            var fields = [];
+
             array.forEach(this._fields, function (f) {
                 columns.push({
                     field: f.keyname,
                     label: f.keyname
                 });
+                fields.push(f.keyname);
             });
 
+            this.store = new Observable(new JsonRest({
+                target: application_url + '/layer/' + this.layer + '/store_api/',
+                headers: { "X-Fields": fields }
+            }));
+
             this._grid = new GridClass({
-                store: this._store,
-                columns: columns
+                store: this.store,
+                columns: columns,
+                queryOptions: this.queryOptions
             });
 
             domStyle.set(this._grid.domNode, "height", "100%");
             domStyle.set(this._grid.domNode, "border", "none");
+
+            var widget = this;
+            this._grid.on("dgrid-select", function (event) {
+                widget.set("selectedRow", event.rows[0].data);
+            });
+
+            this._grid.on("dgrid-deselect", function (event) {
+                widget.set("selectedRow", null);
+            })
 
             this._gridInitialized.resolve();
         },

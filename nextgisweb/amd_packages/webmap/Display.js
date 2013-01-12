@@ -140,12 +140,12 @@ define([
             this.treeWidget.placeAt(this.layerTreePane);
 
             // Инициализируем карту, без DOM она похоже не умеет
-            var dojoMap = new Map(this.mapNode);
+            this.map = new Map(this.mapNode);
 
             // Добавляем OL-слои на веб-карту
             var display = this;
             array.forEach(layerConfig, function(l) {
-                dojoMap.olMap.addLayer(display._layers[l.id].olLayer);
+                display.map.olMap.addLayer(display._layers[l.id].olLayer);
             });
 
             // Плагины

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 class Feature(object):
 
-    def __init__(self, id=None, fields=None, geom=None):
+    def __init__(self, id=None, fields=None, geom=None, box=None):
         self._id = int(id)
-        self._fields = dict(fields)
+
         self._geom = geom
+        self._box = box
+
+        self._fields = dict(fields)
 
     @property
     def id(self):
@@ -17,6 +20,10 @@ class Feature(object):
     @property
     def geom(self):
         return self._geom
+
+    @property
+    def box(self):
+        return self._box
 
     @property
     def __geo_interface__(self):

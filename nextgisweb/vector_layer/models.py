@@ -9,7 +9,7 @@ import geoalchemy as ga
 import sqlalchemy.orm as orm
 import sqlalchemy.sql as sql
 
-from ..geometry import geom_from_wkb
+from ..geometry import geom_from_wkb, box
 from ..models.base import Base, DBSession
 from ..layer import Layer, SpatialLayerMixin
 
@@ -239,6 +239,7 @@ class FeatureQueryBase(object):
     
     def __init__(self):
         self._geom = None
+        self._box = None
         
         self._fields = None
         self._limit = None
@@ -249,6 +250,9 @@ class FeatureQueryBase(object):
 
     def geom(self):
         self._geom = True
+
+    def box(self):
+        self._box = True
 
     def fields(self, *args):
         self._fields = args
@@ -277,6 +281,14 @@ class FeatureQueryBase(object):
         if self._geom:
             columns.append(table.columns.geom.label('geom'))
 
+        if self._box:
+            columns.extend((
+                sa.func.st_xmin(sa.text('geom')).label('box_left'),
+                sa.func.st_ymin(sa.text('geom')).label('box_bottom'),
+                sa.func.st_xmax(sa.text('geom')).label('box_right'),
+                sa.func.st_ymax(sa.text('geom')).label('box_top'),
+            ))
+
         selected_fields = []
         for f in tableinfo.fields:
             if not self._fields or f.keyname in self._fields:
@@ -298,6 +310,7 @@ class FeatureQueryBase(object):
             fields = selected_fields
 
             _geom = self._geom
+            _box = self._box
             _limit = self._limit
             _offset = self._offset
 
@@ -314,7 +327,8 @@ class FeatureQueryBase(object):
                     yield Feature(
                         id=row.id,
                         fields=fdict,
-                        geom=geom_from_wkb(str(row.geom.geom_wkb)) if self._geom else None
+                        geom=geom_from_wkb(str(row.geom.geom_wkb)) if self._geom else None,
+                        box=box(row.box_left, row.box_bottom, row.box_right, row.box_top) if self._box else None
                     )
 
             @property

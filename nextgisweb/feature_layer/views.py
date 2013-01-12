@@ -58,8 +58,33 @@ def setup_pyramid(comp, config):
             headerlist=headerlist
         )
 
-    config.add_route('feature_layer.store_api', '/layer/{id}/store_api')
+    config.add_route('feature_layer.store_api', '/layer/{id}/store_api/')
     config.add_view(store_api, route_name='feature_layer.store_api')
+
+    @model_context(comp.env.layer.Layer)
+    def store_get_item(request, layer):
+        box = request.headers.get('x-feature-box', None)
+
+        query = layer.feature_query()
+        query.filter_by(id=request.matchdict['feature_id'])
+
+        if box:
+            query.box()
+        
+        feature = list(query())[0]
+
+        result = dict(feature.fields, id=feature.id)
+
+        if box:
+            result['box'] = feature.box.bounds
+
+        return Response(
+            json.dumps(result),
+            content_type='application/json'
+        )
+
+    config.add_route('feature_layer.feature_get', '/layer/{id}/store_api/{feature_id}')
+    config.add_view(store_get_item, route_name='feature_layer.feature_get')
 
     def feature_show(request):
         layer = DBSession.query(comp.env.layer.Layer) \

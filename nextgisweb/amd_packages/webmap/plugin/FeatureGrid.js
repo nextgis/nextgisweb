@@ -5,6 +5,7 @@ define([
     "dijit/MenuItem",
     "dojo/dom-construct",
     "dojo/dom-style",
+    "dojo/request/xhr",
     "feature_layer/FeatureGrid",
     "dijit/form/Button"
 ], function (
@@ -14,6 +15,7 @@ define([
     MenuItem,
     domConstruct,
     domStyle,
+    xhr,
     FeatureGrid,
     Button
 ) {
@@ -22,15 +24,43 @@ define([
         iconClass: "dijitIconTable",
 
         postCreate: function () {
-            this.toolbar.addChild(new Button({
-                label: "Открыть",
-                iconClass: "dijitIconApplication"
-            }));
+            var widget = this;
 
-            this.toolbar.addChild(new Button({
-                label: "Показать",
-                iconClass: "dijitIconSearch"
-            }));
+            this.btnOpenFeatureTab = new Button({
+                label: "Открыть",
+                iconClass: "dijitIconApplication",
+                disabled: true
+            });
+            this.toolbar.addChild(this.btnOpenFeatureTab);
+
+            this.btnZoomToFeature = new Button({
+                label: "Перейти",
+                iconClass: "dijitIconSearch",
+                disabled: true,
+                onClick: function() {
+                    widget.zoomToFeature();
+                }
+            });
+            this.toolbar.addChild(this.btnZoomToFeature);
+
+            // При изменении выделенной строки изменяем доступность кнопок
+            this.watch("selectedRow", function (attr, oldVal, newVal) {
+                widget.btnOpenFeatureTab.set("disabled", newVal == null);
+                widget.btnZoomToFeature.set("disabled", newVal == null);
+            });
+        },
+
+        zoomToFeature: function () {
+            var display = this.display;
+            xhr.get(application_url + '/layer/' + this.layer + '/store_api/' + this.get("selectedRow").id, {
+                handleAs: 'json',
+                headers: { 'X-Feature-Box': true }
+            }).then(
+                function data(data) {
+                    display.map.olMap.zoomToExtent(data.box);
+                    display.tabContainer.selectChild(display.mainPane);
+                }
+            )
         }
     });
 
@@ -41,15 +71,19 @@ define([
             var display = this.webmapDisplay;
             var store = this.webmapDisplay._treeStore;
 
+            var plugin = this;
             var itm = new MenuItem({
                 label: "Объекты",
                 onClick: function () {
                     var plugins = store.getValue(display.treeWidget.selectedItem, "plugins");
 
                     var pane = new Pane({
+                        plugin: plugin,
+                        display: display,
+                        layer: store.getValue(display.treeWidget.selectedItem, "layer_id"),
+                        // Параметры отображения таба
                         title: store.getValue(display.treeWidget.selectedItem, "display_name"),
-                        gutters: false,
-                        layerId: store.getValue(display.treeWidget.selectedItem, "layer_id"),
+                        gutters: false
                     });
 
                     pane.placeAt(display.tabContainer);
