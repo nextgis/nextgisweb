@@ -6,7 +6,7 @@ from pyramid.renderers import render_to_response
 from ..wtforms import Form, fields, validators
 
 from ..models import DBSession
-from ..views import model_context, permalinker, ModelController, DescriptionObjectWidget
+from ..views import model_context, permalinker, ModelController, DescriptionObjectWidget, DeleteObjectWidget
 from .. import action_panel as ap
 from ..object_widget import ObjectWidget, CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
@@ -34,7 +34,7 @@ def __action_panel(self, request):
         ap.S('operation', u"Операции", (
             ap.I(u"Редактировать", request.route_url('layer.edit', id=self.id)),
             # ap.I(u"Переместить", '#'),
-            # ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
+            ap.I(u"Удалить", request.route_url('layer.delete', id=self.id)),
         )),
     ))
 
@@ -53,6 +53,7 @@ class LayerObjectWidget(LayerGroupObjectWidget):
 Layer.object_widget = (
     (Layer.identity, LayerObjectWidget),
     ('description', DescriptionObjectWidget),
+    ('delete', DeleteObjectWidget),
 )
 
 
@@ -110,6 +111,9 @@ def includeme(comp, config):
                 obj=obj,
             )
             return locals()
+
+        def delete_context(self, request):
+            return self.edit_context(request)
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):

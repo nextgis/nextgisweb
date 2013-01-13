@@ -23,10 +23,16 @@ class ModelController(object):
         config.add_route(route('edit'), '%s/%s/edit' % (self.url_base, self.item_path))
         config.add_view(self.edit, route_name=route('edit'))
 
+        config.add_route(route('delete'), '%s/%s/delete' % (self.url_base, self.item_path))
+        config.add_view(self.delete, route_name=route('delete'))
+
     def create_context(self, request):
         pass
 
     def edit_context(self, request):
+        pass
+
+    def delete_context(self, request):
         pass
 
     def widget_class(self, context, operation):
@@ -86,6 +92,41 @@ class ModelController(object):
 
         widget_class = self.widget_class(context, 'edit')
         widget = widget_class(obj=obj, operation='edit')
+
+        if request.method == 'POST':
+            widget.bind(data=request.json_body, request=request)
+
+            if widget.validate():
+                widget.populate_obj()
+                request.env.core.DBSession.flush()
+
+                return render_to_response(
+                    'json',
+                    dict(
+                        status_code=200,
+                        redirect=obj.permalink(request),
+                    ),
+                    request
+                )
+
+            else:
+                return render_to_response('json', dict(
+                    status_code=400,
+                    error=widget.widget_error(),
+                ))
+
+        return render_to_response(
+            'model_widget.mako',
+            dict(self.template_context(context), widget=widget),
+            request
+        )
+
+    def delete(self, request):
+        context = self.delete_context(request)
+        obj = self.query_object(context)
+
+        widget_class = self.widget_class(context, 'delete')
+        widget = widget_class(obj=obj, operation='delete')
 
         if request.method == 'POST':
             widget.bind(data=request.json_body, request=request)

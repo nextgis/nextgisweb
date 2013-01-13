@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pkg_resources import resource_filename
 
 from pyramid.response import Response, FileResponse
@@ -9,6 +10,7 @@ from ..package import amd_packages
 from ..object_widget import ObjectWidget
 
 from .model_controller import ModelController
+
 
 def model_context(cls, key='id'):
     def wrap(f):
@@ -66,7 +68,38 @@ def amd_package(request):
             return FileResponse(file_path, cache_max_age=3600)
 
 
+class DeleteObjectWidget(ObjectWidget):
+
+    def is_applicable(self):
+        return self.operation == 'delete'
+
+    def validate(self):
+        result = super(DeleteObjectWidget, self).validate()
+
+        self.error = []
+        
+        if not self.data:
+            result = False
+            self.error.append(dict(message=u"Необходимо подтвердить удаление объекта."))
+
+        return result
+
+    def populate_obj(self):
+        DBSession.delete(self.obj)
+
+    def widget_module(self):
+        return 'ngw/modelWidget/DeleteWidget'
+
+    def widget_params(self):
+        result = super(DeleteObjectWidget, self).widget_params()
+        result['clsDisplayName'] = self.obj.cls_display_name
+        return result
+
+
 class DescriptionObjectWidget(ObjectWidget):
+
+    def is_applicable(self):
+        return self.operation in ('create', 'edit')
 
     def populate_obj(self):
         self.obj.description = self.data

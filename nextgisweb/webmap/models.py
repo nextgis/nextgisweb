@@ -53,7 +53,11 @@ class WebMapItem(Base):
         backref=orm.backref('children', cascade='all')
     )
 
-    style = orm.relationship('Style')
+    style = orm.relationship('Style',
+        # Временное решение, позволяющее при удалении стиля автоматически
+        # удалять элементы веб-карты.
+        backref=orm.backref('webmap_items', cascade='all')
+    )
 
     def to_dict(self):
         if self.item_type in ('root', 'group'):

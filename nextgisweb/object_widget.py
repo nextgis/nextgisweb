@@ -29,12 +29,12 @@ class ObjectWidget(object):
         pass
 
     def bind(self, obj=None, data=None, request=None):
-        if obj:
+        if obj is not None:
             assert not self.__obj_bind_flag
             self.obj = obj
             self.__obj_bind_flag = True
 
-        if data:
+        if data is not None:
             assert not self.__data_bind_flag
             self.data = data
             self.__data_bind_flag = True

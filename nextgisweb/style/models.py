@@ -26,7 +26,7 @@ class Style(Base):
     layer = orm.relationship(
         'Layer',
         primaryjoin=(Layer.id == layer_id),
-        backref=orm.backref('styles', order_by=display_name),
+        backref=orm.backref('styles', order_by=display_name, cascade='all'),
     )
 
     def __unicode__(self):

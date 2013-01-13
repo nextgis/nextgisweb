@@ -54,7 +54,11 @@ LayerGroup.__action_panel = __action_panel
 
 from ..object_widget import ObjectWidget
 
+
 class LayerGroupObjectWidget(ObjectWidget):
+
+    def is_applicable(self):
+        return self.operation in ('create', 'edit')
 
     def populate_obj(self):
         ObjectWidget.populate_obj(self)
@@ -64,7 +68,7 @@ class LayerGroupObjectWidget(ObjectWidget):
 
     def validate(self):
         result = ObjectWidget.validate(self)
-        self.error = [];
+        self.error = []
 
         return result
 
@@ -105,47 +109,6 @@ def show(request, obj):
 permalinker(LayerGroup, 'layer_group.show')
 
 
-@view_config(route_name='layer_group.delete', renderer='layer_group/delete.mako')
-@model_context(LayerGroup)
-@model_permission('layer_group:delete')
-def delete(request, obj):
-    context = dict(obj=obj)
-
-    if obj.id == 0:
-        context['no_delete'] = True
-        return context
-
-    form = DeleteGroupForm(request.POST)
-    context['form'] = form
-
-    if request.method == 'POST' and form.validate():
-        parent_id = obj.parent_id
-
-        try:
-            if form.child.data == 'move_to_parent':
-                for child in obj.children:
-                    child.parent = obj.parent
-                for layer in obj.layers:
-                    layer.layer_group = obj.parent
-            elif form.child.data == 'delete_cascade':
-                def cascade(o):
-                    for child in list(o.children):
-                        DBSession.delete(child)
-
-                    for layer in o.layers:
-                        DBSession.delete(layer)
-
-                cascade(obj)
-
-            DBSession.delete(obj)
-            DBSession.flush()
-        except IntegrityError:
-            context['error'] = u"Не удалось удалить группу слоёв. Возможно данные были изменены."
-            return context
-
-    return context
-
-
 @view_config(route_name='layer_group.edit_security')
 @view_config(route_name='layer_group.show_security')
 @model_context(LayerGroup)
@@ -180,10 +143,11 @@ def api_layer_group_tree(request, obj):
 
     return traverse(obj)
 
+
 def includeme(comp, config):
-    
+
     class LayerGroupController(ModelController):
-        
+
         def create_context(self, request):
             parent = DBSession.query(LayerGroup).filter_by(id=request.GET['parent_id']).one()
             template_context = dict(
@@ -191,7 +155,6 @@ def includeme(comp, config):
                 subtitle=u"Новая группа слоёв",
             )
             return locals()
-
 
         def edit_context(self, request):
             obj = DBSession.query(LayerGroup).filter_by(**request.matchdict).one()
@@ -225,4 +188,3 @@ def includeme(comp, config):
         priority=0,
         template="nextgisweb:templates/layer_group/section_children.mako"
     )
-

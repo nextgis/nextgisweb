@@ -29,9 +29,12 @@ define([
             if (params.operation == 'create') {
                 new Button({label: "Создать"}).placeAt(this.buttonPane)
                     .on("click", function () { widget.submit() });
-            } else {
+            } else if (params.operation == 'edit') {
                 new Button({label: "Сохранить"}).placeAt(this.buttonPane)
                     .on("click", function () { widget.submit() });
+            } else if (params.operation == 'delete') {
+                new Button({label: "Удалить"}).placeAt(this.buttonPane)
+                    .on("click", function () { widget.submit() });               
             }
         },
 
