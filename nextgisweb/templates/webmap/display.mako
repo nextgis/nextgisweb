@@ -1,11 +1,6 @@
 <%inherit file='../base.mako' />
 
 
-<%def name="assets()">
-    <script type="text/javascript" src="${request.static_url('nextgisweb:static/openlayers/OpenLayers.js')}"></script>
-</%def>
-
-
 <%def name="head()">
     <% import json %>
     <script type="text/javascript">

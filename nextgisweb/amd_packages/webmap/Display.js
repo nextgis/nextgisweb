@@ -6,7 +6,7 @@ define([
     "dojo/text!./templates/Display.html",
     "dojo/_base/array",
     "dojo/Deferred",
-    "dojox/geo/openlayers/Map",
+    "ngw/openlayers/Map",
     "dijit/form/DropDownButton",
     "dijit/DropDownMenu",
     "dijit/MenuItem",

@@ -15,6 +15,12 @@
 
   <script type="text/javascript">
     var application_url = ${request.application_url | json.dumps};
+
+    var ngwConfig = {
+      applicationUrl: ${request.application_url | json.dumps, n},
+      assetUrl: ${request.static_url('nextgisweb:static/') | json.dumps, n }
+    };
+
     var dojoConfig = {
       async: true,
       isDebug: true,
