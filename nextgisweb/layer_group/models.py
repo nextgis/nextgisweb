@@ -12,6 +12,8 @@ class LayerGroup(Base):
         sa.CheckConstraint('(id = 0 AND parent_id IS NULL) OR (id <> 0 AND parent_id IS NOT NULL)'),
     )
 
+    cls_display_name = u"Группа слоёв"
+
     id = sa.Column(sa.Integer, primary_key=True)
     parent_id = sa.Column(sa.Integer, sa.ForeignKey('layer_group.id', ondelete='restrict'))
     keyname = sa.Column(sa.Unicode, unique=True)
@@ -21,7 +23,7 @@ class LayerGroup(Base):
 
     parent = orm.relationship(
         'LayerGroup', remote_side=[id],
-        backref=orm.backref('children', order_by=display_name)
+        backref=orm.backref('children', order_by=display_name, cascade="all")
     )
     acl = orm.relationship('ACL', cascade='all', lazy='joined')
 

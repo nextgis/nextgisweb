@@ -5,7 +5,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from ..models import DBSession
 from ..wtforms import Form, fields, validators
-from ..views import model_context, model_permission, permalinker, ModelController, DescriptionObjectWidget
+from ..views import model_context, model_permission, permalinker, ModelController, DescriptionObjectWidget, DeleteObjectWidget
 from ..object_widget import CompositeWidget
 from .. import action_panel as ap
 from ..psection import PageSections
@@ -43,7 +43,7 @@ def __action_panel(self, request):
         ap.S('operation', u"Операции", (
             ap.I(u"Редактировать", request.route_url('layer_group.edit', id=self.id)),
             # ap.I(u"Переместить", '#'),
-            # ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
+            ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
         )),
     ))
     return panel
@@ -89,6 +89,7 @@ class LayerGroupObjectWidget(ObjectWidget):
 LayerGroup.object_widget = (
     ('layer_group', LayerGroupObjectWidget),
     ('description', DescriptionObjectWidget),
+    ('delete', DeleteObjectWidget),
 )
 
 
@@ -162,6 +163,8 @@ def includeme(comp, config):
                 obj=obj,
             )
             return locals()
+
+        delete_context = edit_context
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):
