@@ -7,11 +7,48 @@ from shapely import wkt
 from pyramid.response import Response
 
 from ..views import model_context
+from ..geometry import geom_from_wkt
 
 from .interface import IFeatureLayer
 
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
+    Layer = comp.env.layer.Layer
+
+    def identify(request):
+        """ Сервис идентификации объектов на слоях, поддерживающих интерфейс
+        IFeatureLayer """
+
+        srs = int(request.json_body['srs'])
+        geom = geom_from_wkt(request.json_body['geom'], srid=srs)
+        layers = map(int, request.json_body['layers'])
+
+        layers = DBSession.query(Layer)
+
+        result = dict()
+
+        for layer in layers:
+
+            if not IFeatureLayer.providedBy(layer):
+                result[layer.id] = dict(error="Not implemented")
+
+            else:
+                query = layer.feature_query()
+                query.intersects(geom)
+                
+                # Ограничиваем кол-во идентифицируемых объектов по 10 на слой,
+                # иначе ответ может оказаться очень большим.
+                query.limit(10)
+
+                result[layer.id] = dict(
+                    features=[dict(f.fields, id=f.id) for f in query()]
+                )
+
+        return result
+
+
+    config.add_route('feature_layer.identify', '/feature_layer/identify')
+    config.add_view(identify, route_name='feature_layer.identify', renderer='json')
 
     @model_context(comp.env.layer.Layer)
     def browse(request, layer):

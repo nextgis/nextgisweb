@@ -47,6 +47,9 @@ define([
         // Текущая веделенная строка
         selectedRow: null,
 
+        // Показывать ли тулбар
+        showToolbar: true,
+
         constructor: function (params) {
             declare.safeMixin(this, params);
 
@@ -61,6 +64,12 @@ define([
                     widget.initializeGrid();
                 }
             );
+        },
+
+        postCreate: function () {
+            if (!this.showToolbar) {
+                domStyle.set(this.toolbar.domNode, "display", "none");
+            }
         },
 
         initializeGrid: function () {
@@ -79,16 +88,22 @@ define([
                 fields.push(f.keyname);
             });
 
-            this.store = new Observable(new JsonRest({
-                target: application_url + '/layer/' + this.layer + '/store_api/',
-                headers: { "X-Fields": fields }
-            }));
+            if (this.data == undefined) {
+                this.store = new Observable(new JsonRest({
+                    target: application_url + '/layer/' + this.layer + '/store_api/',
+                    headers: { "X-Fields": fields }
+                }));
+            };
 
             this._grid = new GridClass({
-                store: this.store,
+                store: this.store ? this.store : undefined,
                 columns: columns,
                 queryOptions: this.queryOptions
             });
+
+            if (this.data) {
+                this._grid.renderArray(this.data);
+            };
 
             domStyle.set(this._grid.domNode, "height", "100%");
             domStyle.set(this._grid.domNode, "border", "none");

@@ -7,7 +7,8 @@ define([
     "dojo/dom-style",
     "dojo/request/xhr",
     "feature_layer/FeatureGrid",
-    "dijit/form/Button"
+    "dijit/form/Button",
+    "./../tool/Identify"
 ], function (
     declare,
     _PluginBase,
@@ -17,7 +18,8 @@ define([
     domStyle,
     xhr,
     FeatureGrid,
-    Button
+    Button,
+    Identify
 ) {
     var Pane = declare([FeatureGrid], {
         closable: true,
@@ -99,6 +101,9 @@ define([
                 var plugins = store.getValue(newVal, "plugins");
                 itm.set("disabled", !(plugins && store.getValue(plugins, identity)));
             });
+
+            var identifyTool = new Identify({display: display});
+            display.addTool(identifyTool);
         }
     });
 });

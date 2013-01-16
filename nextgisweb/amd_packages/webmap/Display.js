@@ -11,6 +11,7 @@ define([
     "dijit/DropDownMenu",
     "dijit/MenuItem",
     "dijit/layout/ContentPane",
+    "dijit/form/ToggleButton",
     // дерево слоев
     "dojo/data/ItemFileWriteStore",
     "cbtree/models/TreeStoreModel",
@@ -23,7 +24,8 @@ define([
     "dijit/Toolbar",
     "dijit/form/Button",
     "dijit/form/Select",
-    "dijit/form/DropDownButton"
+    "dijit/form/DropDownButton",
+    "dijit/ToolbarSeparator"
 ], function (
     declare,
     _WidgetBase,
@@ -37,6 +39,7 @@ define([
     DropDownMenu,
     MenuItem,
     ContentPane,
+    ToggleButton,
     ItemFileWriteStore,
     TreeStoreModel,
     Tree,
@@ -131,6 +134,7 @@ define([
 
             this.loadLayerPlugins();
 
+            this.tools = [];
         },
 
         startup: function () {
@@ -173,6 +177,31 @@ define([
                     }
                 });
             });
+        },
+
+        addTool: function (tool) {
+            var btn = new ToggleButton({
+                label: tool.label
+            }).placeAt(this.mapToolbar);
+
+            this.tools.push(tool);
+
+            var display = this;
+            btn.watch("checked", function (attr, oldVal, newVal) {
+                array.forEach(display.tools, function (t) {
+                    var state = newVal;
+                    
+                    if (t != tool) {
+                        state = !state;
+                    };
+
+                    if (state) {
+                        t.activate();
+                    } else {
+                        t.deactivate();
+                    };
+                });
+            })
         }
     });
 });
