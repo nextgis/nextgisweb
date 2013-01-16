@@ -12,6 +12,21 @@
     <style type="text/css">
         body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; }
     </style>
+
+    <script type="text/javascript">
+        <% import json %>
+        require([
+            "dojo/parser",
+            ${', '.join([ json.dumps(v) for k, v in adapters]) | n}
+        ], function (
+            parser,
+            ${', '.join([ "adapter_%s" % k for k, v in adapters]) }
+        ) {
+            ${';\n'.join([ ("adapterClasses.%s = adapter_%s") % (k, k) for k, v in adapters]) | n} ;
+            parser.parse();
+        });
+    </script>
+
 </%def>
 
 
@@ -21,16 +36,3 @@
     style="width: 100%; height: 100%">
 </div>
 
-<script type="text/javascript">
-    <% import json %>
-    require([
-        "dojo/parser",
-        ${', '.join([ json.dumps(v) for k, v in adapters]) | n}
-    ], function (
-        parser,
-        ${', '.join([ "adapter_%s" % k for k, v in adapters]) }
-    ) {
-        ${';\n'.join([ ("adapterClasses.%s = adapter_%s") % (k, k) for k, v in adapters]) | n} ;
-        parser.parse()
-    });
-</script>

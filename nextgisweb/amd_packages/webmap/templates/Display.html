@@ -28,7 +28,7 @@
                         data-dojo-props="region: 'center'"
                         style="width: 100%; padding: 0;">
 
-                        <div data-dojo-attach-point="mapNode" style="width: 100%; height: 100%; padding: 0;"></div>
+                        <div id="map" data-dojo-attach-point="mapNode" style="width: 100%; height: 100%; padding: 0;"></div>
 
                     </div>
 
@@ -57,9 +57,9 @@
                         data-dojo-props="region: 'bottom', border: false"
                         style="padding-left: 5px; padding-right: 2px;">
 
-                        <select data-dojo-type="dijit/form/Select" style="width: 100%;">
-                            <option>OSM - Mapnik</option>
-                            <option>Google</option>
+                        <select data-dojo-attach-point="basemapSelect"
+                            data-dojo-type="dijit/form/Select" 
+                            style="width: 100%;">
                         </select>
 
                     </div>

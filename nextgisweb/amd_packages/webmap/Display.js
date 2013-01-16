@@ -144,7 +144,26 @@ define([
             this.treeWidget.placeAt(this.layerTreePane);
 
             // Инициализируем карту, без DOM она похоже не умеет
-            this.map = new Map(this.mapNode);
+            this.map = new Map(this.mapNode, {});
+
+            // Добавляем подложки в виджет выбора подложки
+            var map = this.map,
+                basemapSelect = this.basemapSelect,
+                layers = this.map.layers;
+            
+            array.forEach(Object.keys(layers), function (k) {
+                basemapSelect.addOption({
+                    disabled: false,
+                    value: k,
+                    label: layers[k].title
+                });
+            });
+
+            // Привязываем выбор подложки
+            basemapSelect.watch("value", function (attr, oldVal, newVal) {
+                map.olMap.setBaseLayer(layers[newVal].olLayer);
+            });
+
 
             // Добавляем OL-слои на веб-карту
             var display = this;
