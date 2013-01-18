@@ -89,7 +89,7 @@ define([
                     });
 
                     pane.placeAt(display.tabContainer);
-                    pane.startup();
+                    //pane.startup();
 
                     display.tabContainer.selectChild(pane);
                 }

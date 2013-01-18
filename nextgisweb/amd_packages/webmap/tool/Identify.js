@@ -137,7 +137,7 @@ define([
                             gutters: false,
                             style: "width: 100%; height: 100%;"
                         });
-                        tool._grid.placeAt(tool.centerPane).startup();
+                        tool._grid.placeAt(tool.centerPane);
                         tool._grid.resize();
                     };
 
