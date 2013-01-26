@@ -139,7 +139,7 @@ class ModelController(object):
                     'json',
                     dict(
                         status_code=200,
-                        redirect=obj.permalink(request),
+                        redirect=self.url_base + '/',
                     ),
                     request
                 )
