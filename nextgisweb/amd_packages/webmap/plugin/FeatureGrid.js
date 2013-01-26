@@ -31,7 +31,10 @@ define([
             this.btnOpenFeatureTab = new Button({
                 label: "Открыть",
                 iconClass: "dijitIconApplication",
-                disabled: true
+                disabled: true,
+                onClick: function () {
+                    widget.openFeature();
+                }
             });
             this.toolbar.addChild(this.btnOpenFeatureTab);
 
@@ -63,6 +66,14 @@ define([
                     display.tabContainer.selectChild(display.mainPane);
                 }
             )
+        },
+
+        openFeature: function () {
+            // TODO: Пока открываем в новом окне, сделать вкладку
+            window.open(
+                ngwConfig.applicationUrl + "/layer/" + this.layer 
+                + "/feature/" + this.get("selectedRow").id + "/edit"
+            );
         }
     });
 
