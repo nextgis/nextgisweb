@@ -29,10 +29,10 @@
 
 </%def>
 
-
+<% import json %>
 <div data-dojo-id="display"
     data-dojo-type="webmap/Display"
-    data-dojo-props="treeConfig: treeConfig, layerConfig: layerConfig, adapterClasses: adapterClasses"
+    data-dojo-props="treeConfig: treeConfig, layerConfig: layerConfig, adapterClasses: adapterClasses, bookmarkLayerId: ${obj.bookmark_layer_id | json.dumps, n}"
     style="width: 100%; height: 100%">
 </div>
 

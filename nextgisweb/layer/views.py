@@ -135,6 +135,16 @@ def includeme(comp, config):
     LayerController('layer') \
         .includeme(config)
 
+    def store_api(request):
+        query = DBSession.query(Layer)
+        return [
+            dict(id=l.id, display_name=l.display_name)
+            for l in query
+        ]
+
+    config.add_route('layer.store_api', '/layer/store_api')
+    config.add_view(store_api, route_name='layer.store_api', renderer='json')
+
     comp.env.layer_group.layer_group_page_sections.register(
         key='layers',
         title=u"Слои",

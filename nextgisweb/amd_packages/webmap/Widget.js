@@ -19,6 +19,7 @@ define([
     "dijit/Dialog",
     "dijit/Toolbar",
     "ngw/form/DisplayNameTextBox",
+    "ngw/form/LayerSelect",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
     "layer/LayerTree"
@@ -67,6 +68,7 @@ define([
             this.inherited(arguments);
 
             this.wDisplayName.set("value", this.value.display_name);
+            this.wBookmarkLayer.set("value", this.value.bookmark_layer_id);
 
             // Создать дерево без model не получается, поэтому создаем его вручную
             this.widgetTree.placeAt(this.containerTree).startup();
@@ -161,7 +163,8 @@ define([
             }
 
             return {
-                display_name: this.wDisplayName.value,
+                display_name: this.wDisplayName.get("value"),
+                bookmark_layer_id: this.wBookmarkLayer.get("value") != "" ? this.wBookmarkLayer.get("value") : null,
                 root_item: traverseItem(this.itemModel.root)
             };
         },

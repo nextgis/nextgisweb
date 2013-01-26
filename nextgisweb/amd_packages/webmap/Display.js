@@ -12,6 +12,9 @@ define([
     "dijit/MenuItem",
     "dijit/layout/ContentPane",
     "dijit/form/ToggleButton",
+    "dojo/dom-style",
+    "dojo/store/JsonRest",
+    "dojo/request/xhr",
     // дерево слоев
     "dojo/data/ItemFileWriteStore",
     "cbtree/models/TreeStoreModel",
@@ -40,6 +43,9 @@ define([
     MenuItem,
     ContentPane,
     ToggleButton,
+    domStyle,
+    JsonRest,
+    xhr,
     ItemFileWriteStore,
     TreeStoreModel,
     Tree,
@@ -94,6 +100,7 @@ define([
         constructor: function (options) {
             this.treeConfig = options.treeConfig;
             this.layerConfig = options.layerConfig;
+            this.bookmarkLayerId = options.bookmarkLayerId;
 
             // Хранилище значений для дерева слоев
             this._treeStore = new CustomItemFileWriteStore({
@@ -131,8 +138,6 @@ define([
             array.forEach(this.layerConfig, function (l) {
                 display._layers[l.id] = new options.adapterClasses.tms(l);
             });
-
-            this.loadLayerPlugins();
 
             this.tools = [];
         },
@@ -173,6 +178,7 @@ define([
 
             // Плагины
             this.loadLayerPlugins();            
+            this.loadBookmarks();
         },
 
         loadLayerPlugins: function () {
@@ -221,6 +227,51 @@ define([
                     };
                 });
             })
+        },
+
+        loadBookmarks: function () {
+            if (this.bookmarkLayerId) {
+                var store = new JsonRest({
+                    target: ngwConfig.applicationUrl + '/layer/' + this.bookmarkLayerId + '/store_api/'
+                });
+
+                var display = this;
+
+                store.query().then(
+                    function (data) {
+                        array.forEach(data, function (f) {
+
+                            // Собираем подпись из всех-подряд полей, кроме id
+                            var labelParts = [];
+                            array.forEach(Object.keys(f), function (k) {
+                                if (k != 'id') {
+                                    labelParts.push(f[k]);
+                                };
+                            });
+                            var label = labelParts.join(" ");
+
+                            display.bookmarkMenu.addChild(new MenuItem({
+                                label: label,
+                                onClick: function () {
+                                    
+                                    // Отдельно запрашиваем экстент объекта
+                                    xhr.get(ngwConfig.applicationUrl + '/layer/' + display.bookmarkLayerId + '/store_api/' + f.id, {
+                                        handleAs: 'json',
+                                        headers: { 'X-Feature-Box': true }
+                                    }).then(
+                                        function data(data) {
+                                            display.map.olMap.zoomToExtent(data.box);
+                                        }
+                                    );
+                                }
+                            }));
+                        });
+                    }
+                );
+            } else {
+                // Если слой с закладками не указан, то прячем кнопку
+                domStyle.set(this.bookmarkButton.domNode, 'display', 'none');
+            }
         }
     });
 });

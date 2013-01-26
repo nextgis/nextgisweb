@@ -13,8 +13,10 @@ class WebMap(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     display_name = sa.Column(sa.Unicode, nullable=False)
+    bookmark_layer_id = sa.Column(sa.Integer, sa.ForeignKey('layer.id'), nullable=True)
     root_item_id = sa.Column(sa.Integer, sa.ForeignKey('webmap_item.id'), nullable=False)
 
+    bookmark_layer = orm.relationship('Layer')
     root_item = orm.relationship('WebMapItem', cascade='all')
 
     def __unicode__(self):
@@ -24,12 +26,17 @@ class WebMap(Base):
         return dict(
             id=self.id,
             display_name=self.display_name,
+            bookmark_layer_id=self.bookmark_layer_id,
             root_item=self.root_item.to_dict(),
         )
 
     def from_dict(self, data):
         if 'display_name' in data:
             self.display_name = data['display_name']
+            
+        if 'bookmark_layer_id' in data:
+            self.bookmark_layer_id = data['bookmark_layer_id']
+
         if 'root_item' in data:
             DBSession.delete(self.root_item)
             self.root_item = WebMapItem(item_type='root')
