@@ -27,13 +27,13 @@ define([
 
             widget = this;
             if (params.operation == 'create') {
-                new Button({label: "Создать"}).placeAt(this.buttonPane)
+                new Button({label: "Создать", iconClass: "dijitIconNewTask"}).placeAt(this.buttonPane)
                     .on("click", function () { widget.submit() });
             } else if (params.operation == 'edit') {
-                new Button({label: "Сохранить"}).placeAt(this.buttonPane)
+                new Button({label: "Сохранить", iconClass: "dijitIconSave"}).placeAt(this.buttonPane)
                     .on("click", function () { widget.submit() });
             } else if (params.operation == 'delete') {
-                new Button({label: "Удалить"}).placeAt(this.buttonPane)
+                new Button({label: "Удалить", iconClass: "dijitIconDelete"}).placeAt(this.buttonPane)
                     .on("click", function () { widget.submit() });               
             }
         },
