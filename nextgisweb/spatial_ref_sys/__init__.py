@@ -12,7 +12,8 @@ class SpatialRefSysComponent(Component):
     @classmethod
     def initialize_db(cls, DBSession):
         srs_list = (
-            SRS(id=4326, display_name="WGS 84 / Lon-lat (EPSG:4326)"),
+            # TODO: Закомментировано до лучших времен
+            # SRS(id=4326, display_name="WGS 84 / Lon-lat (EPSG:4326)"),
             SRS(id=3857, display_name="WGS 84 / Pseudo-Mercator (EPSG:3857)"),
         )
 
