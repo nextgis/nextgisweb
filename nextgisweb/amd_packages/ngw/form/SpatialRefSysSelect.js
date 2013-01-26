@@ -1,14 +1,15 @@
 define([
     "dojo/_base/declare",
-    "dijit/form/Select"
-], function (declare, Select) {
+    "dijit/form/Select",
+    "dojo/_base/array",
+    "ngw/settings!spatial_ref_sys"
+], function (declare, Select, array, settings) {
     return declare([Select], {
 
-        preamble: function (kwArgs) {
-            kwArgs.options = [
-                {label: "WGS 84 / Lon-lat (EPSG:4326)", value: 4326},
-                {label: "WGS 84 / Pseudo-Mercator (EPSG:3857)", value: 3857},
-            ];
+        constructor: function (params) {
+            this.options = array.map(settings.srs, function (itm) {
+                return {value: itm.id, label: itm.displayName}
+            });
         }
     });
 });

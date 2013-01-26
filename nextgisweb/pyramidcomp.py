@@ -78,6 +78,15 @@ class PyramidComponent(Component):
 
         return config
 
+    def setup_pyramid(self, config):
+
+        def settings(request):
+            comp = self.env._components[request.GET['component']]
+            return comp.client_settings(request)
+
+        config.add_route('pyramid.settings', '/settings')
+        config.add_view(settings, route_name='pyramid.settings', renderer='json')
+
     settings_info = (
         dict(key='secret', desc=u"Ключ, используемый для шифрования cookies"),
     )

@@ -12,6 +12,7 @@ class SRS(Base):
     __tablename__ = 'srs'
 
     id = sa.Column(sa.Integer, primary_key=True)
+    display_name = sa.Column(sa.Unicode, nullable=False)
 
     def as_osr(self):
         return osr.ImportFromEPSG(self.id)
