@@ -4,7 +4,7 @@ from zope.interface import Interface, Attribute
 
 class GEOM_TYPE(object):
     POINT = 'POINT'
-    LINESTING = 'LINESTING'
+    LINESTING = 'LINESTRING'
     POLYGON = 'POLYGON'
 
     enum = (POINT, LINESTING, POLYGON)
