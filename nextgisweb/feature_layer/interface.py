@@ -33,6 +33,16 @@ class IFeatureLayer(Interface):
         вызываться исключение KeyError. """
 
 
+class IWritableFeatureLayer(IFeatureLayer):
+    """ Слой объектов, поддерживающий запись """
+
+    def feature_create(self):
+        """ Создать новый объект в слое """
+
+    def feature_put(self, feature):
+        """ Сохранить объект в слое """
+
+
 class IFeatureQuery(Interface):
 
     def fields(self, *args):

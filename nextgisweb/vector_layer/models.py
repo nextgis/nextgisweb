@@ -20,7 +20,7 @@ from ..feature_layer import (
     LayerFieldsMixin,
     GEOM_TYPE,
     FIELD_TYPE,
-    IFeatureLayer,
+    IWritableFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilterBy,
 )
@@ -172,7 +172,7 @@ class TableInfo(object):
 
 @Layer.registry.register
 class VectorLayer(Layer, SpatialLayerMixin, LayerFieldsMixin):
-    implements(IFeatureLayer)
+    implements(IWritableFeatureLayer)
 
     __tablename__ = 'vector_layer'
 
@@ -224,6 +224,19 @@ class VectorLayer(Layer, SpatialLayerMixin, LayerFieldsMixin):
                 return f
 
         raise KeyError("Field '%s' not found!" % keyname)
+
+    # IWritableFeatureLayer
+
+    def feature_put(self, feature):
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(tablename=self._tablename)
+
+        obj = tableinfo.model(id=feature.id)
+        for f in tableinfo.fields:
+            if f.keyname in feature.fields:
+                setattr(obj, f.key, feature.fields[f.keyname])
+
+        DBSession.merge(obj)
 
 
 def __create_schema(event, schema_item, bind):

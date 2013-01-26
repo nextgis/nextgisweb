@@ -6,5 +6,6 @@ define([
     _WidgetBase
 ) {
 	// Базовый класс для виджета привязанного к модели
-    return declare([_WidgetBase], {});
+    return declare([_WidgetBase], {
+    });
 });

@@ -25,6 +25,7 @@ class CoreComponent(Component):
         Base.metadata.bind = self._sa_engine
 
         self.DBSession = DBSession
+        self.Base = Base
 
     settings_info = (
         dict(key='database.host', default='localhost', desc=u"Имя сервера БД"),

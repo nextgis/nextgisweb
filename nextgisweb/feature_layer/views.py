@@ -5,11 +5,14 @@ import json
 from shapely import wkt
 
 from pyramid.response import Response
+from pyramid.renderers import render_to_response
 
 from ..views import model_context
 from ..geometry import geom_from_wkt
+from ..object_widget import CompositeWidget
 
 from .interface import IFeatureLayer
+from .extension import FeatureExtension
 
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
@@ -60,6 +63,57 @@ def setup_pyramid(comp, config):
 
     config.add_route('feature_layer.feature.browse', '/layer/{id}/feature/')
     config.add_view(browse, route_name='feature_layer.feature.browse', renderer='feature_layer/feature_browse.mako')
+
+    @model_context(comp.env.layer.Layer)
+    def edit(request, layer):
+        query = layer.feature_query()
+        query.filter_by(id=request.matchdict['feature_id'])
+        feature = list(query())[0]
+
+        swconfig = [
+            ('feature_layer', layer.feature_widget()),
+        ]
+
+        for k, v in FeatureExtension.registry._dict.iteritems():
+            swconfig.append((k, v(layer).feature_widget))
+
+        class Widget(CompositeWidget):
+            subwidget_config = swconfig
+
+        widget = Widget(obj=feature, operation='edit')
+        widget.bind(request=request)
+
+        if request.method == 'POST':
+            widget.bind(data=request.json_body)
+
+            if widget.validate():
+                widget.populate_obj()
+
+                return render_to_response('json',
+                    dict(
+                        status_code=200,
+                        redirect=request.url
+                    ),
+                    request 
+                )
+
+            else:
+                return render_to_response('json',
+                    dict(
+                        status_code=400,
+                        error=widget.widget_error()
+                    ),
+                    request
+                )
+
+        return dict(
+            widget=widget,
+            obj=layer,
+            subtitle=u"Объект #%d" % feature.id,
+        )
+
+    config.add_route('feature_layer.feature.edit', '/layer/{id}/feature/{feature_id}/edit')
+    config.add_view(edit, route_name='feature_layer.feature.edit', renderer='model_widget.mako')
 
     @model_context(comp.env.layer.Layer)
     def field(request, layer):

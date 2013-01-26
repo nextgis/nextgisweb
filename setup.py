@@ -33,6 +33,8 @@ components = (
     'layer_group',
     'layer',
     'feature_layer',
+    'feature_description',
+    'feature_photo',
     'style',
     'webmap',
     'layer_group.root',

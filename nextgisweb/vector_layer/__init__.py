@@ -9,4 +9,6 @@ from .models import VectorLayer
 class VectorLayerComponent(Component):
     identity = 'vector_layer'
 
-    pass
+    def setup_pyramid(self, config):
+        from . import views
+        views.setup_pyramid(self, config)

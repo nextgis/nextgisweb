@@ -8,14 +8,32 @@
 </%def>
 
 <script type="text/javascript">
-    require(["dojo/parser"], function (parser) {
-        parser.parse();
+    require([
+        "dojo/dom",
+        "feature_layer/FeatureGrid",
+        "dijit/form/Button",
+        "dojo/domReady!"
+    ], function (dom, FeatureGrid, Button) {
+        var grid = new FeatureGrid({layer: ${obj.id}, style: "width: 100%; height: 100%; padding: 0"});
+        grid.placeAt(dom.byId("grid"));
+
+        var btn = new Button({
+            label: "Открыть",
+            iconClass: "dijitIconApplication",
+            disabled: true,
+            onClick: function () {
+                window.location = grid.selectedRow.id + '/edit';
+            }
+        });
+
+        grid.watch("selectedRow", function (attr, oldVal, newVal) {
+            btn.set("disabled", newVal == null);
+        });
+
+        grid.toolbar.addChild(btn);
+
+        grid.startup();
     });
 </script>
 
-<div data-dojo-id="grid"
-    data-dojo-type="feature_layer/FeatureGrid"
-    data-dojo-props="layer: ${obj.id}"
-    style="width: 100%; height: 100%; padding: 0;">
-
-</div>
+<div id="grid" style="width: 100%; height: 100%; padding: 0;"></div>
