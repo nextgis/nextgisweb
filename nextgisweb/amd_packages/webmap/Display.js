@@ -120,6 +120,7 @@ define([
             // Из за необходимости модели дерево не получается создать
             // в декларативном стиле, создаем вручную
             this.treeWidget = new Tree({
+                style: "height: 100%",
                 model: this._treeModel,
                 autoExpand: true,
                 showRoot: false,
