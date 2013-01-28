@@ -35,7 +35,7 @@ class LayerComponent(Component):
     @require('layer_group')
     def setup_pyramid(self, config):
         from . import views
-        views.includeme(self, config)
+        views.setup_pyramid(self, config)
 
 
     # SecurityProvider

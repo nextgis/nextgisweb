@@ -1,5 +1,4 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%namespace file="action_panel.mako" import="render_action_panel" />
 <% import json %>
 <html>
 
@@ -62,19 +61,23 @@
       </li>
     </ul>
 
-    <% has_action_panel = (action_panel or (obj and hasattr(obj,'__action_panel'))) %>
-
-    <div class="span-${18 if has_action_panel else 24}">
+    <% from bunch import Bunch %>
+    %if obj and hasattr(obj,'__dynmenu__'):
+        <%
+            has_dynmenu = True
+            dynmenu = (obj.__dynmenu__, Bunch(obj=obj, request=request))
+        %>
+    %else:
+        <% has_dynmenu = False %>
+    %endif
+    
+    <div class="span-${18 if has_dynmenu else 24}">
         ${next.body()}
     </div>
 
-    %if has_action_panel:
+    %if has_dynmenu:
     <div class="span-6 last panel">
-      %if action_panel:
-        ${render_action_panel(action_panel)}
-      %else:
-        ${render_action_panel(obj.__action_panel(request))}
-      %endif
+        <%include file="dynmenu.mako" args="dynmenu=obj.__dynmenu__, args=Bunch(obj=obj, request=request)" />
     </div>
     %endif
 

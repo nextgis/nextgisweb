@@ -10,6 +10,7 @@ from pyramid.renderers import render_to_response
 from ..views import model_context
 from ..geometry import geom_from_wkt
 from ..object_widget import CompositeWidget
+from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
@@ -48,7 +49,6 @@ def setup_pyramid(comp, config):
                 )
 
         return result
-
 
     config.add_route('feature_layer.identify', '/feature_layer/identify')
     config.add_view(identify, route_name='feature_layer.identify', renderer='json')
@@ -196,6 +196,21 @@ def setup_pyramid(comp, config):
 
     config.add_route('feature_layer.feature.show', '/layer/{layer_id}/feature/{id}')
     config.add_view(feature_show, route_name='feature_layer.feature.show', renderer='feature_layer/feature_show.mako')
+
+    # Расширения меню слоя
+    class LayerMenuExt(dm.DynItem):
+
+        def build(self, args):
+            if IFeatureLayer.providedBy(args.obj):
+                yield dm.Link(
+                    'data/browse-feature', u"Таблица объектов",
+                    lambda args: args.request.route_url(
+                        "feature_layer.feature.browse",
+                        id=args.obj.id
+                    )
+                )
+
+    comp.env.layer.layer_menu.add(LayerMenuExt())
 
     comp.env.layer.layer_page_sections.register(
         key='fields',

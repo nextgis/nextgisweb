@@ -3,45 +3,16 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
 
-from ..wtforms import Form, fields, validators
+from bunch import Bunch
 
 from ..models import DBSession
 from ..views import model_context, permalinker, ModelController, DescriptionObjectWidget, DeleteObjectWidget
-from .. import action_panel as ap
+from .. import dynmenu as dm
 from ..object_widget import ObjectWidget, CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
 from ..psection import PageSections
 
 from .models import Layer
-
-
-def __action_panel(self, request):
-    from ..style import Style
-
-    new_style_items = []
-    for style in Style.registry:
-        if style.is_layer_supported(self):
-            new_style_items.append(ap.I(
-                style.cls_display_name,
-                request.route_url('style.create', layer_id=self.id, _query=dict(identity=style.identity))
-            ))
-
-    panel = ap.P((
-        ap.S('style-new', u"Добавить стиль", new_style_items),
-        # ap.S('manage', u"Управление", (
-        #     ap.I(u"Управление доступом", request.route_url('layer.security', id=self.id)),
-        # )),
-        ap.S('operation', u"Операции", (
-            ap.I(u"Редактировать", request.route_url('layer.edit', id=self.id)),
-            # ap.I(u"Переместить", '#'),
-            ap.I(u"Удалить", request.route_url('layer.delete', id=self.id)),
-        )),
-    ))
-
-    return panel
-
-
-Layer.__action_panel = __action_panel
 
 
 class LayerObjectWidget(LayerGroupObjectWidget):
@@ -87,7 +58,7 @@ def security_proxy(request, obj):
     return acl_editor_view(request, obj, obj.acl)
 
 
-def includeme(comp, config):
+def setup_pyramid(comp, config):
     from ..layer_group import LayerGroup
 
     class LayerController(ModelController):
@@ -144,6 +115,37 @@ def includeme(comp, config):
 
     config.add_route('layer.store_api', '/layer/store_api')
     config.add_view(store_api, route_name='layer.store_api', renderer='json')
+
+    comp.layer_menu = dm.DynMenu(
+        dm.Label('operation', u"Операции"),
+        dm.Link(
+            'operation/edit', u"Редактировать",
+            lambda args: args.request.route_url('layer.edit', id=args.obj.id)
+        ),
+        dm.Link(
+            'operation/delete', u"Удалить",
+            lambda args: args.request.route_url('layer.delete', id=args.obj.id)
+        ),
+        
+        dm.Label('data', u"Данные"),
+    )
+
+    comp.Layer.__dynmenu__ = comp.layer_menu
+
+    class AddLayerDynMenu(dm.DynItem):
+
+        def build(self, args):
+            for cls in comp.Layer.registry:
+                yield dm.Link(
+                    'add/%s' % cls.identity, cls.cls_display_name,
+                    lambda args: args.request.route_url(
+                        'layer.create', _query=dict(
+                            layer_group_id=args.obj.id,
+                            identity=cls.identity,
+                        )
+                    ))
+
+    comp.env.layer_group.LayerGroup.__dynmenu__.add(AddLayerDynMenu())
 
     comp.env.layer_group.layer_group_page_sections.register(
         key='layers',

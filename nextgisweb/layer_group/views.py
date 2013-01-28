@@ -3,53 +3,16 @@ from pyramid.view import view_config
 from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound
 
+from bunch import Bunch
+
 from ..models import DBSession
 from ..wtforms import Form, fields, validators
 from ..views import model_context, model_permission, permalinker, ModelController, DescriptionObjectWidget, DeleteObjectWidget
 from ..object_widget import CompositeWidget
-from .. import action_panel as ap
+from .. import dynmenu as dm
 from ..psection import PageSections
 
 from .models import LayerGroup
-
-
-def __action_panel(self, request):
-    new_items = [
-        ap.I(
-            u"Группа слоев",
-            request.route_url('layer_group.create', _query=dict(parent_id=self.id))
-        ),
-    ]
-
-    from ..layer import Layer
-
-    for c in Layer.registry:
-        new_items.append(
-            ap.I(
-                c.cls_display_name,
-                request.route_url(
-                    'layer.create',
-                    _query=dict(identity=c.identity, layer_group_id=self.id)
-                )
-            )
-        )
-
-    panel = ap.P((
-        ap.S('new', u"Добавить", new_items),
-        # ap.S('permission', u"Управление доступом", (
-        #     ap.I(u"Изменить права", request.route_url('layer_group.edit_security', id=self.id)),
-        #     ap.I(u"Права пользователя", request.route_url('layer_group.show_security', id=self.id)),
-        # )),
-        ap.S('operation', u"Операции", (
-            ap.I(u"Редактировать", request.route_url('layer_group.edit', id=self.id)),
-            # ap.I(u"Переместить", '#'),
-            ap.I(u"Удалить", request.route_url('layer_group.delete', id=self.id)),
-        )),
-    ))
-    return panel
-
-
-LayerGroup.__action_panel = __action_panel
 
 
 from ..object_widget import ObjectWidget
@@ -145,7 +108,7 @@ def api_layer_group_tree(request, obj):
     return traverse(obj)
 
 
-def includeme(comp, config):
+def setup_pyramid(comp, config):
 
     class LayerGroupController(ModelController):
 
@@ -183,6 +146,27 @@ def includeme(comp, config):
 
     LayerGroupController('layer_group') \
         .includeme(config)
+
+    comp.LayerGroup.__dynmenu__ = dm.DynMenu(
+        dm.Label('add', u"Добавить"),
+        dm.Link(
+            'add/layer_group', u"Группа слоёв",
+            lambda args: args.request.route_url(
+                'layer_group.create', _query=dict(
+                    parent_id=args.obj.id,
+                )
+            )
+        ),
+        dm.Label('operation', u"Операции"),
+        dm.Link(
+            'operation/edit', u"Редактировать",
+            lambda args: args.request.route_url('layer_group.edit', id=args.obj.id)
+        ),
+        dm.Link(
+            'operation/delete', u"Удалить",
+            lambda args: args.request.route_url('layer_group.edit', id=args.obj.id)
+        ),
+   )
 
     comp.layer_group_page_sections = PageSections()
 

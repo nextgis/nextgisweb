@@ -4,8 +4,10 @@ from StringIO import StringIO
 from pyramid.view import view_config
 from pyramid.response import Response
 
+from bunch import Bunch
+
 from ..views import model_context, permalinker, model_loader, ModelController
-from .. import action_panel as ap
+from .. import dynmenu as dm
 from ..models import DBSession
 from ..wtforms import Form, fields, validators
 from ..object_widget import ObjectWidget, CompositeWidget
@@ -122,6 +124,10 @@ def setup_pyramid(comp, config):
             cls = Style.registry[identity]
             template_context = dict(
                 obj=layer,
+                dynmenu=(comp.env.layer.layer_menu, Bunch(
+                    obj=layer,
+                    request=request,
+                )),
                 subtitle=u"Новый стиль",
             )
             return locals()
@@ -158,17 +164,44 @@ def setup_pyramid(comp, config):
         url_base='/layer/{layer_id}/style',
     ).includeme(config)
 
-    def _action_panel(self, request):
-        panel = ap.P((
-            ap.S('operation', u"Операции", (
-                ap.I(u"Редактировать", request.route_url('style.edit', id=self.id, layer_id=self.layer_id)),
-                # ap.I(u"Удалить", '#'),
-            )),
-        ))
+    comp.Style.__dynmenu__ = dm.DynMenu(
+        dm.Label('operation', u"Операции"),
+        dm.Link(
+            'operation/edit', u"Редактировать",
+            lambda args: args.request.route_url(
+                'style.edit',
+                id=args.obj.id,
+                layer_id=args.obj.layer_id
+            )
+        ),
+        dm.Link(
+            'operation/delete', u"Удалить",
+            lambda args: args.request.route_url(
+                'style.delete',
+                id=args.obj.id,
+                layer_id=args.obj.layer_id
+            )
+        ),
+    )
 
-        return panel
+    class LayerMenuExt(dm.DynItem):
 
-    Style.__action_panel = _action_panel
+        def build(self, kwargs):
+            yield dm.Label('add-style', u"Добавить стиль")
+
+            for cls in comp.Style.registry:
+                if cls.is_layer_supported(kwargs.obj):
+                    yield dm.Link(
+                        'add-style/%s' % cls.identity, cls.cls_display_name,
+                        lambda kwargs: kwargs.request.route_url(
+                            'style.create',
+                            layer_id=kwargs.obj.id,
+                            _query=dict(
+                                identity=cls.identity,
+                            )
+                        ))
+
+    comp.env.layer.Layer.__dynmenu__.add(LayerMenuExt())
 
     comp.env.layer.layer_page_sections.register(
         key='styles',

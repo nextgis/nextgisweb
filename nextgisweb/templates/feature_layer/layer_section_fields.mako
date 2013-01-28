@@ -14,7 +14,3 @@
         </tr>
     %endfor
 </table>
-
-<a href="${request.route_url('feature_layer.feature.browse', id=obj.id)}">
-    Открыть таблицу объектов
-</a>

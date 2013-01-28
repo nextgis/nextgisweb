@@ -26,9 +26,13 @@ class LayerGroupComponent(Component):
 
         config.add_route('api.layer_group.tree', '/api/layer_group/{id}/tree')
 
+    def initialize(self):
+        from . import models
+        self.LayerGroup = models.LayerGroup
+
     def setup_pyramid(self, config):
         from . import views
-        views.includeme(self, config)
+        views.setup_pyramid(self, config)
 
     # SecurityProvider
     # =================================

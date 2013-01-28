@@ -10,6 +10,7 @@ requires = [
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'zope.interface',
+    'bunch',
     'waitress',
 
     'numpy',
