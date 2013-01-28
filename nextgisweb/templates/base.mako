@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/default.css')}" type="text/css" media="screen, projection" />
  
   <link rel="stylesheet" href="${request.route_url('amd_package', subpath='dijit/themes/claro/claro.css')}" media="screen" />
-  <link rel="stylesheet" href="${request.route_url('amd_package', subpath='dojox/grid/resources/claroGrid.css')}" media="screen" />  
   <link rel="stylesheet" href="${request.route_url('amd_package', subpath='cbtree/themes/claro/claro.css')}" media="screen" />
 
   <script type="text/javascript">
@@ -17,7 +16,8 @@
 
     var ngwConfig = {
       applicationUrl: ${request.application_url | json.dumps, n},
-      assetUrl: ${request.static_url('nextgisweb:static/') | json.dumps, n }
+      assetUrl: ${request.static_url('nextgisweb:static/') | json.dumps, n },
+      amdUrl: ${request.route_url('amd_package', subpath="") | json.dumps, n}
     };
 
     var dojoConfig = {

@@ -102,7 +102,8 @@ class TableInfo(object):
         for f in self.fields:
             layer.fields.append(LayerField(
                 keyname=f.keyname,
-                datatype=f.datatype
+                datatype=f.datatype,
+                display_name=f.keyname,
             ))
 
     def setup_metadata(self, tablename=None):

@@ -183,11 +183,14 @@ def _set_encoding(encoding):
     return encoding_section(encoding)
 
 
-VectorLayer.object_widget = VectorLayerObjectWidget
-
 VectorLayer.__show_template = 'vector_layer/show.mako'
 
 def setup_pyramid(comp, config):
+
+    VectorLayer.object_widget = (
+        (VectorLayer.identity, VectorLayerObjectWidget),
+        ('feature_layer.fields', comp.env.feature_layer.LayerFieldsWidget),
+    )
 
     def feature_widget(xlayer):
 

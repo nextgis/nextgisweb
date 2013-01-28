@@ -20,7 +20,8 @@ class LayerField(Base):
     idx = sa.Column(sa.Integer, nullable=False)
     keyname = sa.Column(sa.Unicode, nullable=False)
     datatype = sa.Column(sa.Enum(*FIELD_TYPE.enum, native_enum=False), nullable=False)
-    display_name = sa.Column(sa.Unicode, nullable=False, default=u'')
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    grid_visibility = sa.Column(sa.Boolean, nullable=False, default=True)
 
     identity = __tablename__
 
@@ -42,7 +43,8 @@ class LayerField(Base):
             (c, getattr(self, c))
             for c in (
                 'id', 'layer_id', 'cls',
-                'idx', 'keyname', 'datatype', 'display_name'
+                'idx', 'keyname', 'datatype',
+                'display_name', 'grid_visibility',
             )
         ])
 
@@ -52,6 +54,7 @@ class LayerFieldsMixin(object):
     def fields(cls):
         return orm.relationship(
             'LayerField',
+            order_by=LayerField.idx,
             collection_class=ordering_list('idx'),
             cascade='all'
         )

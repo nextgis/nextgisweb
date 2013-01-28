@@ -9,15 +9,47 @@ from pyramid.renderers import render_to_response
 
 from ..views import model_context
 from ..geometry import geom_from_wkt
-from ..object_widget import CompositeWidget
+from ..object_widget import ObjectWidget, CompositeWidget
 from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
 
+
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
     Layer = comp.env.layer.Layer
+
+    class LayerFieldsWidget(ObjectWidget):
+
+        def is_applicable(self):
+            return self.operation == 'edit'
+
+        def populate_obj(self):
+            fields = dict(map(lambda fd: (fd['id'], fd), self.data['fields']))
+            for f in self.obj.fields:
+                if f.id in fields:
+
+                    if 'display_name' in fields[f.id]:
+                        f.display_name = fields[f.id]['display_name']
+
+                    if 'grid_visibility' in fields[f.id]:
+                        f.grid_visibility = fields[f.id]['grid_visibility']
+
+        def widget_module(self):
+            return 'feature_layer/LayerFieldsWidget'
+
+        def widget_params(self):
+            result = super(LayerFieldsWidget, self).widget_params()
+
+            if self.obj:
+                result['value'] = dict(
+                    fields=map(lambda f: f.to_dict(), self.obj.fields),
+                )
+
+            return result
+
+    comp.LayerFieldsWidget = LayerFieldsWidget
 
     def identify(request):
         """ Сервис идентификации объектов на слоях, поддерживающих интерфейс
@@ -192,7 +224,6 @@ def setup_pyramid(comp, config):
             subtitle=u"Объект #%d" % feature.id,
             feature=feature,
         )
-
 
     config.add_route('feature_layer.feature.show', '/layer/{layer_id}/feature/{id}')
     config.add_view(feature_show, route_name='feature_layer.feature.show', renderer='feature_layer/feature_show.mako')

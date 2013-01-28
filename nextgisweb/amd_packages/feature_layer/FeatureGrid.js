@@ -7,6 +7,7 @@ define([
     // dgrid & plugins
     'dgrid/OnDemandGrid',
     'dgrid/Selection',
+    "dgrid/extensions/ColumnHider",
     // other
     'dojo/_base/array',
     'dojo/request/xhr',
@@ -27,6 +28,7 @@ define([
     // dgrid & plugins
     OnDemandGrid,
     Selection,
+    ColumnHider,
     // other
     array,
     xhr,
@@ -37,7 +39,7 @@ define([
     domStyle
 ) {
     // Базовый класс ggrid над которым затем делается обертка в dijit виджет
-    var GridClass = declare([OnDemandGrid, Selection], {
+    var GridClass = declare([OnDemandGrid, Selection, ColumnHider], {
         selectionMode: "single"
     });
 
@@ -75,7 +77,8 @@ define([
         initializeGrid: function () {
             var columns = [{
                 field: "id",
-                label: "#"
+                label: "#",
+                unhidable: true
             }];
 
             var fields = [];
@@ -83,7 +86,8 @@ define([
             array.forEach(this._fields, function (f) {
                 columns.push({
                     field: f.keyname,
-                    label: f.keyname
+                    label: f.display_name,
+                    hidden: !f.grid_visibility
                 });
                 fields.push(f.keyname);
             });
