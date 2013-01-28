@@ -65,7 +65,12 @@
     %if obj and hasattr(obj,'__dynmenu__'):
         <%
             has_dynmenu = True
-            dynmenu = (obj.__dynmenu__, Bunch(obj=obj, request=request))
+            dynmenu, dynmenu_kwargs = (obj.__dynmenu__, Bunch(obj=obj, request=request))
+        %>
+    %elif 'dynmenu' in context.keys():
+        <%
+            has_dynmenu = True
+            dynmenu, dynmenu_kwargs = (context['dynmenu'], context['dynmenu_kwargs'])
         %>
     %else:
         <% has_dynmenu = False %>
@@ -77,7 +82,7 @@
 
     %if has_dynmenu:
     <div class="span-6 last panel">
-        <%include file="dynmenu.mako" args="dynmenu=obj.__dynmenu__, args=Bunch(obj=obj, request=request)" />
+        <%include file="dynmenu.mako" args="dynmenu=dynmenu, args=dynmenu_kwargs" />
     </div>
     %endif
 

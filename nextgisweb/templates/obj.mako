@@ -10,7 +10,7 @@
         else:
             current = None
 
-    if subtitle:
+    if subtitle and obj:
         parents.append(obj)
 
 %>

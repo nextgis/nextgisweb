@@ -38,7 +38,7 @@ class WebMap(Base):
             self.bookmark_layer_id = data['bookmark_layer_id']
 
         if 'root_item' in data:
-            DBSession.delete(self.root_item)
+            # DBSession.delete(self.root_item)
             self.root_item = WebMapItem(item_type='root')
             self.root_item.from_dict(data['root_item'])
 
@@ -107,4 +107,7 @@ class WebMapItem(Base):
             if a in data:
                 setattr(self, a, data[a])
 
+def initialize(comp):
+    comp.WebMap = WebMap
+    comp.WebMapItem = WebMapItem
 

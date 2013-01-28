@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
 
+from bunch import Bunch
+
 from ..models import DBSession
 from .models import WebMap
 
 from ..layer_group import LayerGroup
 from ..object_widget import ObjectWidget
 from ..views import ModelController, model_loader, permalinker
+from .. import dynmenu as dm
 
 from .plugin import WebmapPlugin
 
@@ -15,7 +18,9 @@ from .plugin import WebmapPlugin
 def browse(request):
     obj_list = DBSession.query(WebMap)
     return dict(
-        obj_list=obj_list
+        obj_list=obj_list,
+        dynmenu=request.env.webmap.WebMap.__dynmenu__,
+        dynmenu_kwargs=Bunch(request=request),
     )
 
 
@@ -140,16 +145,9 @@ def setup_pyramid(comp, config):
 
     permalinker(WebMap, "webmap.show")
 
-    @model_loader(WebMap)
-    def show(request, obj):
-        return dict(obj=obj)
-
-    config.add_route('webmap.show', '/webmap/{id}')
-    config.add_view(show, route_name='webmap.show', renderer='obj.mako')
 
     class WebmapController(ModelController):
         def create_context(self, request):
-            parent = DBSession.query(WebMap).filter_by(id=request.GET['parent_id']).one()
             template_context = dict(
                 subtitle=u"Новая веб-карта",
             )
@@ -166,7 +164,7 @@ def setup_pyramid(comp, config):
             return WebmapObjectWidget
 
         def create_object(self, context):
-            return WebMap()
+            return WebMap(root_item=comp.WebMapItem(item_type='root'))
 
         def query_object(self, context):
             return context['obj']
@@ -176,3 +174,42 @@ def setup_pyramid(comp, config):
 
     WebmapController('webmap') \
         .includeme(config)
+
+    @model_loader(WebMap)
+    def show(request, obj):
+        return dict(obj=obj)
+
+    config.add_route('webmap.show', '/webmap/{id}')
+    config.add_view(show, route_name='webmap.show', renderer='obj.mako')
+
+    class WebMapMenu(dm.DynItem):
+
+        def build(self, kwargs):
+            if 'obj' in kwargs:
+                yield dm.Label('operation', u"Операции")
+
+                yield dm.Link(
+                    'operation/edit',
+                    u"Редактировать",
+                    lambda kwargs: kwargs.request.route_url(
+                        'webmap.edit',
+                        id=kwargs.obj.id
+                    )
+                )
+                yield dm.Link(
+                    'operation/display',
+                    u"Показать",
+                    lambda kwargs: kwargs.request.route_url(
+                        'webmap.display',
+                        id=kwargs.obj.id
+                    )
+                )
+
+    comp.WebMap.__dynmenu__ = dm.DynMenu(
+        dm.Link(
+            'create',
+            u"Создать",
+            lambda kwargs: kwargs.request.route_url('webmap.create')
+        ),
+        WebMapMenu()
+    )

@@ -42,8 +42,9 @@ define([
         constructor: function (options) {
             this.value = options.value;
 
+            var items = options.value ? options.value.root_item : {item_type: "root"};
             this.itemStore = new ItemFileWriteStore({
-                data: {items: [options.value.root_item ]}
+                data: {items: [items]}
             });
 
             this.itemModel = new TreeStoreModel({
@@ -67,8 +68,10 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            this.wDisplayName.set("value", this.value.display_name);
-            this.wBookmarkLayer.set("value", this.value.bookmark_layer_id);
+            if (this.value) {
+                this.wDisplayName.set("value", this.value.display_name);
+                this.wBookmarkLayer.set("value", this.value.bookmark_layer_id);
+            };
 
             // Создать дерево без model не получается, поэтому создаем его вручную
             this.widgetTree.placeAt(this.containerTree).startup();

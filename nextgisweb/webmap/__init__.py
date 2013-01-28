@@ -17,6 +17,10 @@ class WebMapComponent(Component):
         config.add_route('api.webmap.item.retrive', '/api/webmap/{id}', request_method='GET')
         config.add_route('api.webmap.item.replace', '/api/webmap/{id}', request_method='PUT')
 
+    def initialize(self):
+        from . import models
+        models.initialize(self)
+
     def setup_pyramid(self, config):
         from . import views
         views.setup_pyramid(self, config)
