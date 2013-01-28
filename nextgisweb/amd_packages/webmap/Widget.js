@@ -22,6 +22,8 @@ define([
     "ngw/form/LayerSelect",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
+    "dijit/form/NumberTextBox",
+    "dijit/_WidgetBase",
     "layer/LayerTree"
 ], function (
     declare,
@@ -71,6 +73,10 @@ define([
             if (this.value) {
                 this.wDisplayName.set("value", this.value.display_name);
                 this.wBookmarkLayer.set("value", this.value.bookmark_layer_id);
+                this.wExtentLeft.set("value", this.value.extent[0]);
+                this.wExtentBottom.set("value", this.value.extent[1]);
+                this.wExtentRight.set("value", this.value.extent[2]);
+                this.wExtentTop.set("value", this.value.extent[3]);
             };
 
             // Создать дерево без model не получается, поэтому создаем его вручную
@@ -167,8 +173,11 @@ define([
 
             return {
                 display_name: this.wDisplayName.get("value"),
+                root_item: traverseItem(this.itemModel.root),
                 bookmark_layer_id: this.wBookmarkLayer.get("value") != "" ? this.wBookmarkLayer.get("value") : null,
-                root_item: traverseItem(this.itemModel.root)
+                extent: array.map(['Left', 'Bottom', 'Right', 'Top'], function (e) {
+                    return this['wExtent' + e].get('value')
+                }, this)
             };
         },
 

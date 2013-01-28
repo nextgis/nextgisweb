@@ -6,6 +6,7 @@ define([
     "dojo/text!./templates/Display.html",
     "dojo/_base/array",
     "dojo/Deferred",
+    "ngw/openlayers",
     "ngw/openlayers/Map",
     "dijit/form/DropDownButton",
     "dijit/DropDownMenu",
@@ -37,6 +38,7 @@ define([
     template,
     array,
     Deferred,
+    openlayers,
     Map,
     DropDownButton,
     DropDownMenu,
@@ -98,9 +100,16 @@ define([
         templateString: template,
 
         constructor: function (options) {
+            this.config = options.config;
             this.treeConfig = options.treeConfig;
             this.layerConfig = options.layerConfig;
             this.bookmarkLayerId = options.bookmarkLayerId;
+
+            this.displayProjection = new openlayers.Projection('EPSG:3857');
+            this.lonlatProjection = new openlayers.Projection('EPSG:4326');
+
+            this._extent = new openlayers.Bounds(this.config.extent)
+                .transform(this.lonlatProjection, this.displayProjection);
 
             // Хранилище значений для дерева слоев
             this._treeStore = new CustomItemFileWriteStore({
@@ -151,6 +160,9 @@ define([
 
             // Инициализируем карту, без DOM она похоже не умеет
             this.map = new Map(this.mapNode, {});
+
+            // Переходим к экстенту
+            this.map.olMap.zoomToExtent(this._extent);
 
             // Добавляем подложки в виджет выбора подложки
             var map = this.map,

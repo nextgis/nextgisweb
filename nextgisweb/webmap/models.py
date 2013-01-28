@@ -13,8 +13,12 @@ class WebMap(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     display_name = sa.Column(sa.Unicode, nullable=False)
-    bookmark_layer_id = sa.Column(sa.Integer, sa.ForeignKey('layer.id'), nullable=True)
     root_item_id = sa.Column(sa.Integer, sa.ForeignKey('webmap_item.id'), nullable=False)
+    bookmark_layer_id = sa.Column(sa.Integer, sa.ForeignKey('layer.id'), nullable=True)
+    extent_left = sa.Column(sa.Float, default=-180)
+    extent_right = sa.Column(sa.Float, default=+180)
+    extent_bottom = sa.Column(sa.Float, default=-90)
+    extent_top = sa.Column(sa.Float, default=+90)
 
     bookmark_layer = orm.relationship('Layer')
     root_item = orm.relationship('WebMapItem', cascade='all')
@@ -26,21 +30,26 @@ class WebMap(Base):
         return dict(
             id=self.id,
             display_name=self.display_name,
-            bookmark_layer_id=self.bookmark_layer_id,
             root_item=self.root_item.to_dict(),
+            bookmark_layer_id=self.bookmark_layer_id,
+            extent=(self.extent_left, self.extent_bottom, self.extent_right, self.extent_top),
         )
 
     def from_dict(self, data):
         if 'display_name' in data:
             self.display_name = data['display_name']
             
-        if 'bookmark_layer_id' in data:
-            self.bookmark_layer_id = data['bookmark_layer_id']
-
         if 'root_item' in data:
             # DBSession.delete(self.root_item)
             self.root_item = WebMapItem(item_type='root')
             self.root_item.from_dict(data['root_item'])
+
+        if 'bookmark_layer_id' in data:
+            self.bookmark_layer_id = data['bookmark_layer_id']
+
+        if 'extent' in data:
+            self.extent_left, self.extent_bottom, \
+                self.extent_right, self.extent_top = data['extent']
 
 
 class WebMapItem(Base):
@@ -106,6 +115,7 @@ class WebMapItem(Base):
         for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_style_id'):
             if a in data:
                 setattr(self, a, data[a])
+
 
 def initialize(comp):
     comp.WebMap = WebMap

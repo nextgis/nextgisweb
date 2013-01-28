@@ -4,7 +4,8 @@
 <%def name="head()">
     <% import json %>
     <script type="text/javascript">
-        var layerConfig = ${ json.dumps(layer_config, indent=4) | n};
+        var displayConfig = ${json.dumps(obj.to_dict()) | n};
+        var layerConfig = ${json.dumps(layer_config, indent=4) | n};
         var treeConfig = ${tree_config | json.dumps, n};
         var adapterClasses = {};
     </script>
@@ -32,7 +33,7 @@
 <% import json %>
 <div data-dojo-id="display"
     data-dojo-type="webmap/Display"
-    data-dojo-props="treeConfig: treeConfig, layerConfig: layerConfig, adapterClasses: adapterClasses, bookmarkLayerId: ${obj.bookmark_layer_id | json.dumps, n}"
+    data-dojo-props="config: displayConfig, treeConfig: treeConfig, layerConfig: layerConfig, adapterClasses: adapterClasses, bookmarkLayerId: ${obj.bookmark_layer_id | json.dumps, n}"
     style="width: 100%; height: 100%">
 </div>
 
