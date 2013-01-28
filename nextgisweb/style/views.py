@@ -192,14 +192,19 @@ def setup_pyramid(comp, config):
             for cls in comp.Style.registry:
                 if cls.is_layer_supported(kwargs.obj):
                     yield dm.Link(
-                        'add-style/%s' % cls.identity, cls.cls_display_name,
-                        lambda kwargs: kwargs.request.route_url(
-                            'style.create',
-                            layer_id=kwargs.obj.id,
-                            _query=dict(
-                                identity=cls.identity,
-                            )
-                        ))
+                        'add-style/%s' % cls.identity,
+                        cls.cls_display_name,
+                        self._create_url(cls)
+                    )
+
+        def _create_url(self, cls):
+            return lambda kwargs: kwargs.request.route_url(
+                'style.create',
+                layer_id=kwargs.obj.id,
+                _query=dict(
+                    identity=cls.identity,
+                )
+            )
 
     comp.env.layer.Layer.__dynmenu__.add(LayerMenuExt())
 

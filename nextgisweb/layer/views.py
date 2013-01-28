@@ -138,12 +138,16 @@ def setup_pyramid(comp, config):
             for cls in comp.Layer.registry:
                 yield dm.Link(
                     'add/%s' % cls.identity, cls.cls_display_name,
-                    lambda args: args.request.route_url(
-                        'layer.create', _query=dict(
-                            layer_group_id=args.obj.id,
-                            identity=cls.identity,
-                        )
-                    ))
+                    self._create_url(cls)
+                )
+
+        def _create_url(self, cls):
+            return lambda kwargs: kwargs.request.route_url(
+                'layer.create', _query=dict(
+                    layer_group_id=kwargs.obj.id,
+                    identity=cls.identity,
+                )
+            )
 
     comp.env.layer_group.LayerGroup.__dynmenu__.add(AddLayerDynMenu())
 
