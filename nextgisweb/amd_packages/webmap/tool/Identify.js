@@ -68,11 +68,10 @@ define([
 
             var lonlat = olMap.getLonLatFromPixel(new OpenLayers.Pixel(point[0], point[1]));
 
-            this.popup = new Popup(null,
-               lonlat,
-               new OpenLayers.Size(300,200),
-               null,
-               false);
+            this.popup = new Popup({
+                point: lonlat,
+                size: [300, 200]
+            });
 
             this.container = new BorderContainer({
                 style: "width: 100%; height: 100%; padding: 0",
@@ -122,7 +121,7 @@ define([
 
                     var layerSelect = new Select({
                         options: options,
-                        style: "width: 99%"
+                        style: "width: 99%; font-size: 80%;"
                     }).placeAt(tool.topPane);
 
                     var selectLayer = function (layer) {
