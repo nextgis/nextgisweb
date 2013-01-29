@@ -148,7 +148,7 @@ def setup_pyramid(comp, config):
         return dict(
             widget=widget,
             obj=layer,
-            subtitle=u"Объект #%d" % feature.id,
+            subtitle=u"Объект: %s" % unicode(feature),
         )
 
     config.add_route('feature_layer.feature.edit', '/layer/{id}/feature/{feature_id}/edit')

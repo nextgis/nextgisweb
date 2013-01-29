@@ -322,6 +322,7 @@ class FeatureQueryBase(object):
 
         class QueryFeatureSet(FeatureSet):
             fields = selected_fields
+            layer = self.layer
 
             _geom = self._geom
             _box = self._box
@@ -339,6 +340,7 @@ class FeatureQueryBase(object):
                 for row in rows:
                     fdict = dict([(f.keyname, row[f.keyname]) for f in selected_fields])
                     yield Feature(
+                        layer=self.layer,
                         id=row.id,
                         fields=fdict,
                         geom=geom_from_wkb(str(row.geom.geom_wkb)) if self._geom else None,
