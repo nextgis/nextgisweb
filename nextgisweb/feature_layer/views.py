@@ -26,8 +26,14 @@ def setup_pyramid(comp, config):
             return self.operation == 'edit'
 
         def populate_obj(self):
-            fields = dict(map(lambda fd: (fd['id'], fd), self.data['fields']))
-            for f in self.obj.fields:
+            obj = self.obj
+            data = self.data
+
+            if 'feature_label_field_id' in data:
+                obj.feature_label_field_id = data['feature_label_field_id']
+
+            fields = dict(map(lambda fd: (fd['id'], fd), data['fields']))
+            for f in obj.fields:
                 if f.id in fields:
 
                     if 'display_name' in fields[f.id]:
@@ -45,6 +51,7 @@ def setup_pyramid(comp, config):
             if self.obj:
                 result['value'] = dict(
                     fields=map(lambda f: f.to_dict(), self.obj.fields),
+                    feature_label_field_id=self.obj.feature_label_field_id,
                 )
 
             return result

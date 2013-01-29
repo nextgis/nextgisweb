@@ -50,11 +50,32 @@ class LayerField(Base):
 
 
 class LayerFieldsMixin(object):
+    __field_class__ = LayerField
+    
     @declared_attr
     def fields(cls):
         return orm.relationship(
-            'LayerField',
-            order_by=LayerField.idx,
+            cls.__field_class__,
+            foreign_keys=cls.__field_class__.layer_id,
+            order_by=cls.__field_class__.idx,
             collection_class=ordering_list('idx'),
+            cascade='all'
+        )
+
+    @declared_attr
+    def feature_label_field_id(cls):
+        return sa.Column(
+            "feature_label_field_id",
+            sa.ForeignKey(cls.__field_class__.id)
+        )
+
+    @declared_attr
+    def feature_label_field(cls):
+        return orm.relationship(
+            cls.__field_class__,
+            uselist=False,
+            primaryjoin="%s.id == %s.feature_label_field_id" % (
+                cls.__field_class__.__name__, cls.__name__
+            ),
             cascade='all'
         )

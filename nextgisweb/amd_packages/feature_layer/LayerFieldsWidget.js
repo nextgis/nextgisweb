@@ -6,10 +6,13 @@ define([
     "dojo/text!./templates/LayerFieldsWidget.html",
     "dojo/_base/lang",
     "dojo/_base/array",
+    "dijit/form/FilteringSelect",
     "dojox/grid/DataGrid",
     "dojox/grid/cells",
     "dojo/data/ItemFileWriteStore",
     "xstyle/css!" + ngwConfig.amdUrl + 'dojox/grid/resources/claroGrid.css',
+    // template
+    "dojox/layout/TableContainer"    
 ], function (
     declare,
     Widget,
@@ -18,6 +21,7 @@ define([
     template,
     lang,
     array,
+    FilteringSelect,
     DataGrid,
     cells,
     ItemFileWriteStore
@@ -50,11 +54,11 @@ define([
 
         constructor: function (params) {
             declare.safeMixin(this, params);
-            console.log(cells);
 
             var data = {
-              identifier: "id",
-              items: lang.clone(this.value.fields)
+                identifier: "id",
+                label: "keyname",
+                items: lang.clone(this.value.fields)
             };
 
             this.store = new ItemFileWriteStore({data: data});
@@ -65,17 +69,32 @@ define([
                 autoHeight: true,
                 singleClickEdit: true,
                 canSort: function () { return false; }
-            });            
+            });
+
+            this.wFeatureLabelField = new FilteringSelect({
+                store: this.store,
+                searchAttr: "keyname",
+                required: false,
+                label: "Наименование",
+                style: "width: 100%"
+            });
         },
 
         postCreate: function () {
             this.inherited(arguments);
-            this.grid.placeAt(this.domNode);
+
+            this.grid.placeAt(this.gridNode);
+
+            this.tableContainer.addChild(this.wFeatureLabelField);
         },
 
         startup: function () {
             this.inherited(arguments);
+
             this.grid.startup();
+
+            this.wFeatureLabelField.startup();
+            this.wFeatureLabelField.set("value", this.value.feature_label_field_id);
         },
 
         _getValueAttr: function () {
@@ -91,7 +110,9 @@ define([
                         display_name: this.getValue(f, "display_name"),
                         grid_visibility: this.getValue(f, "grid_visibility")
                     }
-                }, this.store)
+                }, this.store),
+
+                feature_label_field_id: this.wFeatureLabelField.get("value")
             };
         }
     });
