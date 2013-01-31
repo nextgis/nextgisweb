@@ -1,10 +1,13 @@
 /* Делаем кнопки внутри StackController со спец классом компактней */
 
-.ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode {
+.ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode,
+.ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode {
     font-size: 90%; 
     padding: 1px;
+    height: 18px;
 }
 
-.ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode .dijitButtonText {
+.ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode .dijitButtonText,
+.ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode .dijitButtonText {
     padding: 1px 1px;
 }

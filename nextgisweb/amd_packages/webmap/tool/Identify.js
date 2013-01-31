@@ -13,6 +13,7 @@ define([
     "dijit/layout/StackContainer",
     "dijit/layout/StackController",
     "dijit/form/Select",
+    "dijit/form/Button",
     "ngw/openlayers",
     "ngw/openlayers/Popup",
     "feature_layer/FieldsDisplayWidget",
@@ -34,6 +35,7 @@ define([
     StackContainer,
     StackController,
     Select,
+    Button,
     openlayers,
     Popup,
     FieldsDisplayWidget,
@@ -92,6 +94,7 @@ define([
             });
             this.addChild(this.container);
 
+
             this.controller = new StackController({
                 region: "top",
                 layoutPriority: 2,
@@ -99,6 +102,8 @@ define([
             });
             domClass.add(this.controller.domNode, "ngwWebmapToolIdentify-controller");
             this.addChild(this.controller);
+
+
 
             this.fieldsWidget = new FieldsDisplayWidget({
                 style: "padding: 2px;"
@@ -126,6 +131,23 @@ define([
             }, this);
 
             this._widgetsDeferred = all(deferreds);
+
+            this._widgetsDeferred.then(function () {
+                // Если не дождаться пока все панели будут добавлены,
+                // то новая кнопка будет в случайном месте.
+                widget.editButton = new Button({
+                    iconClass:'dijitIconEdit',
+                    showLabel: true,
+                    onClick: function () {
+                        // TODO: Пока открываем в новом окне, сделать вкладку
+                        feature = widget._featureResponse(widget.select.get("value"));
+                        window.open(
+                            ngwConfig.applicationUrl + "/layer/" + feature.layerId 
+                            + "/feature/" + feature.id + "/edit"
+                        );
+                    }
+                }).placeAt(widget.controller, "last");
+            });
         },
 
         startup: function () {
