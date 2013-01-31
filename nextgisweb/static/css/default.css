@@ -24,3 +24,9 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
 
 .dijitTableLayout tr td.tableContainer-labelCell:first-child { padding-left: 2px; }
 .dijitTableLayout tr td.tableContainer-valueCell:last-child { padding-right: 2px; }
+
+
+table.data {}
+
+table.data tr th { background-color: #eee; font-weight: bold; }
+table.data tr th, table.data tr td { padding: 0.2ex 0.5ex; }

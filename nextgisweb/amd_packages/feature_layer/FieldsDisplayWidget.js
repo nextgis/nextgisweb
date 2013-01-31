@@ -2,7 +2,9 @@ define([
     "dojo/_base/declare",
     "./DisplayWidget",
     "dojo/_base/array",
-    "put-selector/put"
+    "put-selector/put",
+    // css
+    "xstyle/css!./resources/FieldsDisplayWidget.css"
 ], function (
     declare,
     DisplayWidget,
@@ -24,14 +26,14 @@ define([
                 function (fields) {
                     var tbody = put(
                         containerNode,
-                        "table thead tr th $ < th $ <<< tbody",
-                        "Атрибут", "Значение"
+                        "table.data.ngwFeatureLayer-fieldTable.ngwFeatureLayer-fieldTable-compact tbody"
                     );
 
                     array.forEach(fields, function (f) {
                         put(tbody,
-                            "tr th $ < td $",
+                            "tr th.display_name $ < td.value.$ $",
                             f.display_name,
+                            "datatype-" + f.datatype,
                             feature.fields[f.keyname]
                         )
                     });
