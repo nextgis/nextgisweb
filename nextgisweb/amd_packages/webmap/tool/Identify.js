@@ -7,6 +7,7 @@ define([
     "dojo/promise/all",
     "dojo/json",
     "dojo/request/xhr",
+    "dojo/dom-class",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/StackContainer",
@@ -15,7 +16,9 @@ define([
     "ngw/openlayers",
     "ngw/openlayers/Popup",
     "feature_layer/FieldsDisplayWidget",
-    "ngw/settings!feature_layer"
+    "ngw/settings!feature_layer",
+    // css
+    "xstyle/css!./resources/Identify.css"
 ], function (
     declare,
     Base,
@@ -25,6 +28,7 @@ define([
     all,
     json,
     xhr,
+    domClass,
     BorderContainer,
     ContentPane,
     StackContainer,
@@ -93,6 +97,7 @@ define([
                 layoutPriority: 2,
                 containerId: this.container.id
             });
+            domClass.add(this.controller.domNode, "ngwWebmapToolIdentify-controller");
             this.addChild(this.controller);
 
             this.fieldsWidget = new FieldsDisplayWidget({
