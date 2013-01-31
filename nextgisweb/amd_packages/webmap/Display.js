@@ -192,7 +192,6 @@ define([
                 model: this.itemModel,
                 autoExpand: true,
                 showRoot: false,
-                branchReadOnly: true,
                 dndController: dndSource
             });
 
