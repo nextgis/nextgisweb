@@ -1,4 +1,4 @@
-<table style="width: 100%">
+<table class="data" style="width: 100%">
     <thead><tr>
         <th>Ключ</th>
         <th>Тип</th>
