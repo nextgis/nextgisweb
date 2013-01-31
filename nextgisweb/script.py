@@ -31,7 +31,7 @@ def main(argv=sys.argv):
         setup_logging(args.logging)
 
     cfg = ConfigParser()
-    cfg.read((args.config, ))
+    cfg.readfp(codecs.open(args.config, 'r', 'utf-8'))
 
     env = Env(cfg=cfg)
     env.initialize()

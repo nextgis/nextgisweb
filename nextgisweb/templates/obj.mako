@@ -15,6 +15,15 @@
 
 %>
 
+<%def name="title()">
+    %if subtitle:
+        ${subtitle}
+    %else:
+        ${obj}
+    %endif
+</%def>
+
+
 %if len(parents) > 0:
     <div class="span-24 path">
         <% first = True %>

@@ -28,6 +28,9 @@ class CoreComponent(Component):
         self.Base = Base
 
     settings_info = (
+        dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),
+        dict(key='system.full_name', default=u"Геоинформационная система NextGIS", desc=u"Полное название системы"),
+
         dict(key='database.host', default='localhost', desc=u"Имя сервера БД"),
         dict(key='database.name', default='nextgisweb', desc=u"Имя БД на сервере"),
         dict(key='database.user', default='nextgisweb', desc=u"Имя пользователя БД"),

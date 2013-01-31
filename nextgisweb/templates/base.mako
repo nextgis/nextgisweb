@@ -3,7 +3,15 @@
 <html>
 
 <head>
-  <title>Page title</title>
+  <title>
+
+    %if hasattr(self, 'title'):
+        ${self.title()} :: 
+    %endif
+
+    ${request.env.core.settings['system.name']}
+
+  </title>
 
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/blueprint/screen.css')}" type="text/css" media="screen, projection" />
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/default.css')}" type="text/css" media="screen, projection" />
@@ -43,7 +51,7 @@
 
   <div class="container">
     <div class="span-24 header caption">
-      Геоинформационная система
+      ${request.env.core.settings['system.full_name']}
     </div>
 
     <ul class="span-24 menu">

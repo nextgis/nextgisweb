@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import codecs
 from ConfigParser import ConfigParser
 
 from pyramid.config import Configurator
@@ -24,7 +25,7 @@ def main(global_config, **settings):
         setup_logging(settings['logging'])
 
     cfg = ConfigParser()
-    cfg.read((settings['config']))
+    cfg.readfp(codecs.open(settings['config'], 'r', 'utf-8'))
 
     env = Env(cfg)
     env.initialize()
