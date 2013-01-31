@@ -334,7 +334,8 @@ class FeatureQueryBase(object):
                     columns,
                     whereclause=sa.and_(*where),
                     limit=self._limit,
-                    offset=self._offset
+                    offset=self._offset,
+                    order_by=table.columns.id,
                 )
                 rows = DBSession.connection().execute(query)
                 for row in rows:
