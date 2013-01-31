@@ -11,9 +11,12 @@ define([
         render: function () {
             var widget = this,
                 feature = this._feature,
+                ext = feature ? feature.ext.feature_description : null,
                 containerNode = this.containerNode;
 
-            containerNode.innerHTML = feature.ext.feature_description;
+            this.set("disabled", !ext);
+
+            containerNode.innerHTML = ext;
         }
     });
 });

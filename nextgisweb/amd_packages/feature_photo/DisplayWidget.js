@@ -20,6 +20,8 @@ define([
 
             containerNode.innerHTML = "";
 
+            this.set("disabled", !ext);
+
             for (var idx in ext) {
                 var pid = ext[idx];
 
