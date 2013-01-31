@@ -17,3 +17,10 @@ h2 { font-size: 16px; border-bottom: 1px solid #ddd; margin-top: 1ex; padding-bo
 
 ul.ngwModelWidgetError { border: 1px solid #D46464; margin: 0 0 1ex 0;}
 ul.ngwModelWidgetError li { padding: .5ex 0;}
+
+
+.dijitTableLayout td.tableContainer-labelCell { padding: 4px; }
+.dijitTableLayout td.tableContainer-valueCell { padding: 4px; }
+
+.dijitTableLayout tr td.tableContainer-labelCell:first-child { padding-left: 2px; }
+.dijitTableLayout tr td.tableContainer-valueCell:last-child { padding-right: 2px; }
