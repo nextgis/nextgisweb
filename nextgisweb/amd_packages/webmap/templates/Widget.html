@@ -3,55 +3,59 @@
     <div data-dojo-type="dijit/layout/TabContainer"
         style="height: 400px">
 
-        <div data-dojo-type="dojox/layout/TableContainer"
-            data-dojo-props="cols:2"
+        <div data-dojo-type="dijit/layout/ContentPane"
             title="Веб-карта">
-            
-            <div data-dojo-type="ngw/form/DisplayNameTextBox"
-                data-dojo-attach-point="wDisplayName"
-                data-dojo-props="colspan: 2"
-                title="Наименование"
-                style="width: 100%">
-            </div>
 
-            <div data-dojo-attach-point="wBookmarkLayer"
-                data-dojo-type="ngw/form/LayerSelect"
-                data-dojo-props="colspan: 2"
-                title="Слой закладок"
-                style="width: 100%">
-            </div>
+            <div data-dojo-type="dojox/layout/TableContainer"
+                data-dojo-props="cols:2">
+                
+                <div data-dojo-type="ngw/form/DisplayNameTextBox"
+                    data-dojo-attach-point="wDisplayName"
+                    data-dojo-props="colspan: 2"
+                    title="Наименование"
+                    style="width: 100%">
+                </div>
 
-            <div data-dojo-type="dijit/_WidgetBase"
-                data-dojo-props="colspan: 2">
-                <strong>Начальный охват</strong>
-            </div>
+                <div data-dojo-attach-point="wBookmarkLayer"
+                    data-dojo-type="ngw/form/LayerSelect"
+                    data-dojo-props="colspan: 2"
+                    title="Слой закладок"
+                    style="width: 100%">
+                </div>
 
-            <div data-dojo-attach-point="wExtentLeft"
-                data-dojo-type="dijit/form/NumberTextBox"
-                data-dojo-props="constraints: {min: -180, max: +180}"
-                title="Лево, град."
-                style="width: 100%">
-            </div>
+                <div data-dojo-type="dijit/_WidgetBase"
+                    data-dojo-props="colspan: 2">
+                    <strong>Начальный охват</strong>
+                </div>
 
-            <div data-dojo-attach-point="wExtentBottom"
-                data-dojo-type="dijit/form/NumberTextBox"
-                data-dojo-props="constraints: {min: -90, max: +90}"
-                title="Низ, град."
-                style="width: 100%">
-            </div>
+                <div data-dojo-attach-point="wExtentLeft"
+                    data-dojo-type="dijit/form/NumberTextBox"
+                    data-dojo-props="constraints: {min: -180, max: +180}"
+                    title="Лево, град."
+                    style="width: 100%">
+                </div>
 
-            <div data-dojo-attach-point="wExtentRight"
-                data-dojo-type="dijit/form/NumberTextBox"
-                data-dojo-props="constraints: {min: -180, max: +180}"
-                title="Право, град."
-                style="width: 100%">
-            </div>
+                <div data-dojo-attach-point="wExtentBottom"
+                    data-dojo-type="dijit/form/NumberTextBox"
+                    data-dojo-props="constraints: {min: -90, max: +90}"
+                    title="Низ, град."
+                    style="width: 100%">
+                </div>
 
-            <div data-dojo-attach-point="wExtentTop"
-                data-dojo-type="dijit/form/NumberTextBox"
-                data-dojo-props="constraints: {min: -90, max: +90}"
-                title="Верх, град."
-                style="width: 100%">
+                <div data-dojo-attach-point="wExtentRight"
+                    data-dojo-type="dijit/form/NumberTextBox"
+                    data-dojo-props="constraints: {min: -180, max: +180}"
+                    title="Право, град."
+                    style="width: 100%">
+                </div>
+
+                <div data-dojo-attach-point="wExtentTop"
+                    data-dojo-type="dijit/form/NumberTextBox"
+                    data-dojo-props="constraints: {min: -90, max: +90}"
+                    title="Верх, град."
+                    style="width: 100%">
+                </div>
+
             </div>
 
         </div>
