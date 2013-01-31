@@ -14,7 +14,7 @@
         "dijit/form/Button",
         "dojo/domReady!"
     ], function (dom, FeatureGrid, Button) {
-        var grid = new FeatureGrid({layer: ${obj.id}, style: "width: 100%; height: 100%; padding: 0"});
+        var grid = new FeatureGrid({layerId: ${obj.id}, style: "width: 100%; height: 100%; padding: 0"});
         grid.placeAt(dom.byId("grid"));
 
         var btn = new Button({

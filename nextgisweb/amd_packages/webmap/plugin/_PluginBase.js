@@ -6,6 +6,14 @@ define([
     return declare([], {
         constructor: function (options) {
             declare.safeMixin(this, options);
+        },
+
+        postCreate: function () {
+
+        },
+
+        startup: function () {
+            
         }
     })
 });

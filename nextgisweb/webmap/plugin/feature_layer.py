@@ -5,9 +5,9 @@ from ...feature_layer import IFeatureLayer
 
 
 @WebmapPlugin.registry.register
-class FeatureGridPlugin(WebmapPlugin):
+class FeatureLayerPlugin(WebmapPlugin):
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):
         if IFeatureLayer.providedBy(layer):
-            return ("webmap/plugin/FeatureGrid", True)
+            return ("webmap/plugin/FeatureLayer", True)

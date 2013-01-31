@@ -1,7 +1,9 @@
 define([
     "dojo/_base/declare",
 ], function (declare) {
-    return declare("webmap.Adapter", [], {
-
+    return declare(null, {
+        constructor: function (options) {
+            declare.safeMixin(options);
+        }
     });
 })

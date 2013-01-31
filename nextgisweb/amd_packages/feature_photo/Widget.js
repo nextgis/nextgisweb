@@ -11,7 +11,8 @@ define([
     "dojox/layout/TableContainer",
     // template
     "dijit/TitlePane",
-    "ngw/form/Uploader"    
+    "ngw/form/Uploader"
+    // css   
 ], function (
     declare,
     Widget,

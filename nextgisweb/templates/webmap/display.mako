@@ -4,7 +4,7 @@
 <%def name="head()">
     <% import json %>
     <script type="text/javascript">
-        var displayConfig = ${json.dumps(obj.to_dict()) | n};
+        var displayConfig = ${json.dumps(display_config, indent=4).replace('\n', '\n' + (8 * ' ')) | n};
         var layerConfig = ${json.dumps(layer_config, indent=4) | n};
         var treeConfig = ${tree_config | json.dumps, n};
         var adapterClasses = {};

@@ -3,12 +3,13 @@ define([
 ], function (
     declare
 ) {
-    return declare([], {
-        display: undefined,
+    return declare(null, {
+        display: null,
+
         label: "Инструмент",
 
-        constructor: function (params) {
-            declare.safeMixin(this, params);
+        constructor: function (options) {
+            declare.safeMixin(this, options);
         },
 
         activate: function () {

@@ -58,7 +58,7 @@ define([
             this._gridInitialized = new Deferred();
 
             var widget = this;
-            xhr.get(application_url + '/layer/' + this.layer + '/field/', {
+            xhr.get(application_url + '/layer/' + this.layerId + '/field/', {
                 handleAs: 'json'
             }).then(
                 function (data) {
@@ -94,7 +94,7 @@ define([
 
             if (this.data == undefined) {
                 this.store = new Observable(new JsonRest({
-                    target: application_url + '/layer/' + this.layer + '/store_api/',
+                    target: application_url + '/layer/' + this.layerId + '/store_api/',
                     headers: { "X-Fields": fields }
                 }));
             };

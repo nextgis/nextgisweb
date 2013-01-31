@@ -1,30 +1,43 @@
 define([
     "dojo/_base/declare",
     "./Base",
-    "ngw/openlayers/Popup",
-    "feature_layer/FeatureGrid",
-    "dojo/request/xhr",
-    "dojo/json",
+    "dojo/_base/lang",
     "dojo/_base/array",
+    "dojo/Deferred",
+    "dojo/promise/all",
+    "dojo/json",
+    "dojo/request/xhr",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
-    "dijit/form/Select"
+    "dijit/layout/StackContainer",
+    "dijit/layout/StackController",
+    "dijit/form/Select",
+    "ngw/openlayers",
+    "ngw/openlayers/Popup",
+    "feature_layer/FieldsDisplayWidget",
+    "ngw/settings!feature_layer"
 ], function (
     declare,
     Base,
-    Popup,
-    FeatureGrid,
-    xhr,
-    json,
+    lang,
     array,
+    Deferred,
+    all,
+    json,
+    xhr,
     BorderContainer,
     ContentPane,
-    Select
+    StackContainer,
+    StackController,
+    Select,
+    openlayers,
+    Popup,
+    FieldsDisplayWidget,
+    settings
 ) {
 
     var Control = OpenLayers.Class(OpenLayers.Control, {
-        
-        initialize: function(options) {
+       initialize: function(options) {
             OpenLayers.Control.prototype.initialize.apply(this, [options]);
 
             this.handler = new OpenLayers.Handler.Click(this, {
@@ -37,10 +50,128 @@ define([
         }
     });
 
+    var Widget = declare([BorderContainer], {
+        style: "width: 100%; height: 100%",
+        gutters: false,
+
+        postCreate: function () {
+            this.inherited(arguments);
+
+            this.selectOptions = [];
+
+            array.forEach(Object.keys(this.response), function (layerId) {
+                var layerResponse = this.response[layerId];
+                var idx = 0;
+                array.forEach(layerResponse.features, function (feature) {
+                    this.selectOptions.push({
+                        label: feature.label,
+                        value: layerId + "/" + idx
+                    });
+                    idx ++;
+                }, this);
+            }, this);
+
+            this.selectPane = new ContentPane({
+                region: "top",
+                layoutPriority: 1,
+                style: "padding: 0px 4px;"
+            });
+            this.addChild(this.selectPane);
+
+            this.select = new Select({
+                style: "width: 100%",
+                options: this.selectOptions
+            }).placeAt(this.selectPane);
+
+            this.container = new StackContainer({
+                region: "center"
+            });
+            this.addChild(this.container);
+
+            this.controller = new StackController({
+                region: "top",
+                layoutPriority: 2,
+                containerId: this.container.id
+            });
+            this.addChild(this.controller);
+
+            this.fieldsWidget = new FieldsDisplayWidget({
+                style: "padding: 2px;"
+            });
+            this.container.addChild(this.fieldsWidget);
+
+            // создаем виждеты для всех расширений IFeatureLayer
+            this._extWidgets = {};
+            var deferreds = [this._startupDeferred];
+            var widget = this;
+            array.forEach(Object.keys(settings.extensions), function (key) {
+                var ext = settings.extensions[key];
+                
+                var deferred = new Deferred();
+                deferreds.push(deferred);
+
+                require([ext.displayWidget], function (cls) {
+                    var extWidget = new cls({
+                        style: "padding: 2px;"
+                    });
+                    widget.container.addChild(extWidget);
+                    widget._extWidgets[key] = extWidget;
+                    deferred.resolve(widget);
+                });
+            }, this);
+
+            this._widgetsDeferred = all(deferreds);
+        },
+
+        startup: function () {
+            this.inherited(arguments);
+
+            var widget = this;
+            this.select.watch("value", function (attr, oldVal, newVal) {
+                widget._displayFeature(widget._featureResponse(newVal));
+            });
+
+            this._displayFeature(this._featureResponse(this.select.get("value")));
+        },
+
+        _featureResponse: function(selectValue) {
+            var keys = selectValue.split("/");
+            return this.response[keys[0]].features[keys[1]];
+        },
+
+        _displayFeature: function (feature) {
+            var widget = this;
+
+            xhr.get(ngwConfig.applicationUrl + "/layer/" + feature.layerId + "/store_api/" + feature.id, {
+                handleAs: "json",
+                headers: { "X-Feature-Ext": "*" }
+            }).then(function (feature) {
+                widget._widgetsDeferred.then(function () {
+                    widget.fieldsWidget.set("feature", feature);
+                    for (var ident in widget._extWidgets) {
+                        widget._extWidgets[ident].set("feature", feature);
+                    };
+                }).then(null, function (error) { console.error(error) });
+            });
+        }
+
+    });
+
     return declare(Base, {
         label: "Идентификация",
 
-        constructor: function (params) {
+        // Радиус для поиска объектов в пикселях
+        pixelRadius: 2,
+
+        // Ширина popup
+        popupWidth: 300,
+
+        // Высота popup,
+        popupHeight: 200,
+
+        constructor: function (options) {
+            this.map = this.display.map;
+
             this.control = new Control({tool: this});
             this.display.map.olMap.addControl(this.control);
         },
@@ -58,102 +189,79 @@ define([
             }
         },
 
-        execute: function (point) {
-            var olMap = this.display.map.olMap;
+        execute: function (pixel) {
+            var tool = this,
+                olMap = this.display.map.olMap,
+                point = olMap.getLonLatFromPixel(new OpenLayers.Pixel(pixel[0], pixel[1]));
 
-            if (this.popup) {
-                olMap.removePopup(this.popup);
-                this.popup = null;
-            };
-
-            var lonlat = olMap.getLonLatFromPixel(new OpenLayers.Pixel(point[0], point[1]));
-
-            this.popup = new Popup({
-                point: lonlat,
-                size: [300, 200]
-            });
-
-            this.container = new BorderContainer({
-                style: "width: 100%; height: 100%; padding: 0",
-                gutters: false
-            });
-
-            this.topPane = new ContentPane({
-                region: "top",
-                style: "width: 100%; padding: 0; padding-bottom: 8px;"
-            });
-            this.container.addChild(this.topPane);
-
-            this.centerPane = new ContentPane({
-                region: "center",
-                style: "padding: 0; font-size: 8pt;"
-            });
-            this.container.addChild(this.centerPane);
-
-            // Запрашиваем объекты в окрестностях +/- одной точки
-            var bounds = new OpenLayers.Bounds();
-            bounds.extend(olMap.getLonLatFromPixel({x: point[0] - 2, y: point[1] - 2}));
-            bounds.extend(olMap.getLonLatFromPixel({x: point[0] + 2, y: point[1] + 2}));
-
-            var req = {
-                // TODO: Учитывать СК веб-карты
+            var request = {
                 srs: 3857,
-                // TODO: Только видимые элементы веб-карты
-                layers: [], 
-                geom: bounds.toGeometry().toString()
+                geom: this._requestGeomString(pixel)
             };
 
-
-            var tool = this;
-            xhr.post(ngwConfig.applicationUrl + '/feature_layer/identify', {
-                handleAs: "json",
-                data: json.stringify(req)
-            }).then(
-                function (data) {
-                    var options = [];
-                    
-                    array.forEach(Object.keys(data), function (lid) {
-                        var ldata = data[lid];
-                        if (ldata.features && ldata.features.length > 0) {
-                            options.push({label: "Слой #" + lid + " (" + ldata.features.length + ")", value: lid});
-                        };
+            this.display.getVisibleItems().then(function (items) {
+                if (items.length == 0) {
+                    // Никаких видимых элементов сейчас нет
+                    console.log("Visible items not found!");
+                } else {
+                    // Добавляем список видимых элементов в запрос
+                    request.layers = array.map(items, function (i) {
+                        return this.display.itemStore.getValue(i, "layerId")
                     });
 
-                    var layerSelect = new Select({
-                        options: options,
-                        style: "width: 99%; font-size: 80%;"
-                    }).placeAt(tool.topPane);
-
-                    var selectLayer = function (layer) {
-                        if (tool._grid) {
-                            tool.centerPane.removeChild(tool._grid);
-                        };
-
-                        tool._grid = new FeatureGrid({
-                            layer: layer,
-                            data: data[layer].features,
-                            showToolbar: false,
-                            gutters: false,
-                            style: "width: 100%; height: 100%;"
-                        });
-                        tool._grid.placeAt(tool.centerPane);
-                        tool._grid.resize();
-                    };
-
-                    layerSelect.watch("value", function (attr, oldVal, newVal) {
-                        selectLayer(newVal);
+                    // XHR-запрос к сервису
+                    xhr.post(ngwConfig.applicationUrl + '/feature_layer/identify', {
+                        handleAs: "json",
+                        data: json.stringify(request)
+                    }).then(function (response) {
+                        tool._responsePopup(response, point);
                     });
-
-                    tool.container.placeAt(tool.popup.contentDiv);
-                    tool.container.startup();
-       
-                    olMap.addPopup(tool.popup);
-                    selectLayer(options[0].value);
-
-                    tool.container.resize();
                 }
-            );
-          
-        }
+            });
+
+        },
+
+        // WKT-строка геометрии поиска объектов для точки pixel
+        _requestGeomString: function (pixel) {
+            var olMap = this.map.olMap,
+                bounds = new openlayers.Bounds();
+
+            bounds.extend(olMap.getLonLatFromPixel({x: pixel[0] - this.pixelRadius, y: pixel[1] - this.pixelRadius}));
+            bounds.extend(olMap.getLonLatFromPixel({x: pixel[0] + this.pixelRadius, y: pixel[1] + this.pixelRadius}));
+
+            return bounds.toGeometry().toString();
+        },
+
+        _removePopup: function () {
+            if (this._popup) {
+                this.map.olMap.removePopup(this._popup);
+                this._popup = null;
+            };
+        },
+
+        _responsePopup: function (response, point) {
+            // TODO: Проверить, есть ли какой-нибудь результат
+            // и показывать popup только если он есть.
+
+            this._removePopup();
+
+            this._popup = new Popup({
+                title: "Идентификация",
+                point: point,
+                size: [this.popupWidth, this.popupHeight]
+            });
+
+            var widget = new Widget({
+                response: response,
+                tool: this
+            });
+
+            widget.placeAt(this._popup.contentDiv).startup();
+
+            this.map.olMap.addPopup(this._popup);
+            widget.resize();
+            widget.select.resize();
+        },
+
     });
 });

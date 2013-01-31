@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
 
+from collections import namedtuple
 from bunch import Bunch
 
 from ..models import DBSession
@@ -71,8 +72,65 @@ def display(request, obj):
 
     tree_config, layer_config = traverse(obj.root_item)
 
+    MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
+
+    display.mid = MID(
+        set(),
+        set(),
+        set(),
+    )
+
+    def traverse(item):
+        data = dict(
+            id=item.id,
+            type=item.item_type,
+            label=item.display_name
+        )
+
+        if item.item_type == 'layer':
+
+            # Основные параметры элемента
+            data.update(
+                layerId=item.style.layer_id,
+                styleId=item.layer_style_id,
+                visibility=bool(item.layer_enabled),
+            )
+
+            # Адаптер слоя пока один
+            data.update(adapter="webmap/TMSAdapter")
+            display.mid.adapter.add(data['adapter'])
+
+            # Плагины уровня слоя
+            plugin = dict()
+            for pcls in WebmapPlugin.registry:
+                p_mid_data = pcls.is_layer_supported(item.style.layer, obj)
+                if p_mid_data:
+                    plugin.update((p_mid_data, ))
+
+            data.update(plugin=plugin)
+            display.mid.plugin.update(plugin.keys())
+
+
+        elif item.item_type in ('root', 'group'):
+            data.update(children=map(traverse, item.children))
+
+        return data
+
+    tmp = obj.to_dict()
+
+    config = dict(
+        extent=tmp["extent"],
+        rootItem=traverse(obj.root_item),
+        mid=dict(
+            adapter=tuple(display.mid.adapter),
+            basemap=tuple(display.mid.basemap),
+            plugin=tuple(display.mid.plugin)
+        )
+    )
+
     return dict(
         obj=obj,
+        display_config=config,
         adapters=(('tms', 'webmap/TMSAdapter'), ),
         layer_config=layer_config,
         tree_config=tree_config,
@@ -144,7 +202,6 @@ class WebmapObjectWidget(ObjectWidget):
 def setup_pyramid(comp, config):
 
     permalinker(WebMap, "webmap.show")
-
 
     class WebmapController(ModelController):
         def create_context(self, request):

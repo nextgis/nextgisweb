@@ -21,8 +21,9 @@ define([
     Button,
     Identify
 ) {
-    var Pane = declare([FeatureGrid], {
+    var _Pane = declare([FeatureGrid], {
         closable: true,
+        gutters: false,
         iconClass: "dijitIconTable",
 
         postCreate: function () {
@@ -56,8 +57,9 @@ define([
         },
 
         zoomToFeature: function () {
-            var display = this.display;
-            xhr.get(application_url + '/layer/' + this.layer + '/store_api/' + this.get("selectedRow").id, {
+            var display = this.plugin.display;
+
+            xhr.get(application_url + '/layer/' + this.layerId + '/store_api/' + this.get("selectedRow").id, {
                 handleAs: 'json',
                 headers: { 'X-Feature-Box': true }
             }).then(
@@ -71,7 +73,7 @@ define([
         openFeature: function () {
             // TODO: Пока открываем в новом окне, сделать вкладку
             window.open(
-                ngwConfig.applicationUrl + "/layer/" + this.layer 
+                ngwConfig.applicationUrl + "/layer/" + this.layerId 
                 + "/feature/" + this.get("selectedRow").id + "/edit"
             );
         }
@@ -79,42 +81,45 @@ define([
 
     return declare([_PluginBase], {
 
-        postCreate: function () {
-            var identity = this.identity;
-            var display = this.webmapDisplay;
-            var store = this.webmapDisplay._treeStore;
-
+        constructor: function (options) {
             var plugin = this;
-            var itm = new MenuItem({
-                label: "Объекты",
+
+            this.menuItem = new MenuItem({
+                label: "Таблица объектов",
+                disabled: true,
                 onClick: function () {
-                    var plugins = store.getValue(display.treeWidget.selectedItem, "plugins");
-
-                    var pane = new Pane({
-                        plugin: plugin,
-                        display: display,
-                        layer: store.getValue(display.treeWidget.selectedItem, "layer_id"),
-                        // Параметры отображения таба
-                        title: store.getValue(display.treeWidget.selectedItem, "display_name"),
-                        gutters: false
-                    });
-
-                    pane.placeAt(display.tabContainer);
-                    //pane.startup();
-
-                    display.tabContainer.selectChild(pane);
+                    plugin.openFeatureGrid();
                 }
             });
 
-            display.selectedLayerMenu.addChild(itm);
+            var store = this.itemStore,
+                menuItem = this.menuItem;
 
-            display.treeWidget.watch("selectedItem", function (attr, oldVal, newVal) {
-                var plugins = store.getValue(newVal, "plugins");
-                itm.set("disabled", !(plugins && store.getValue(plugins, identity)));
+            this.display.watch("item", function (attr, oldVal, newVal) {
+                var type = store.getValue(newVal, "type");
+                menuItem.set("disabled", type != "layer");
+            });            
+
+            
+            this.tool = new Identify({display: this.display});
+        },
+
+        postCreate: function () {
+            this.display.itemMenu.addChild(this.menuItem);
+            this.display.addTool(this.tool);
+        },
+
+        openFeatureGrid: function () {
+            var item = this.display.get("item");
+            
+            var pane = new _Pane({
+                layerId: this.itemStore.getValue(item, "layerId"),
+                plugin: this,
+                title: this.itemStore.getValue(item, "label")
             });
 
-            var identifyTool = new Identify({display: display});
-            display.addTool(identifyTool);
+            this.display.tabContainer.addChild(pane);
+            this.display.tabContainer.selectChild(pane);
         }
     });
 });

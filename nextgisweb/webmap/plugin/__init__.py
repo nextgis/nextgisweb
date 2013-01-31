@@ -3,4 +3,4 @@
 from .base import WebmapPlugin
 
 from .layer_info import LayerInfoPlugin
-from .feature_grid import FeatureGridPlugin
+from .feature_layer import FeatureLayerPlugin

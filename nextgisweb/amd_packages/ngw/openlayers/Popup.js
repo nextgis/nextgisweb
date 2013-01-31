@@ -14,7 +14,7 @@ define([
     var Popup = OpenLayers.Class(OpenLayers.Popup, {
         displayClass: "ngwPopup dijitTooltipBelow",
         contentDisplayClass: "dijitTooltipContainer",
-        padding: new OpenLayers.Bounds([1, 2, 1, 36]),
+        padding: new OpenLayers.Bounds([2, 2, 2, 36]),
 
         setBorder: function () {
             // заглушка, чтобы OL не портили popup border
@@ -30,6 +30,8 @@ define([
                 null
             ]);
 
+            this.title = params.title;
+
             // СontentDiv, который создает родительский класс
             // мы используем для внутренних нужд.
             this._contentDiv = this.contentDiv;
@@ -44,13 +46,14 @@ define([
                 style: {
                     width: params.size[0],
                     height: params.size[1],
-                    padding: "1px"
+                    padding: "0",
+                    margin: "1px"
                 }
             }, this._contentDiv, "last");
 
             // Заголовок
             this.titleDiv = domConstruct.create("div", {
-                innerHTML: "&nbsp;",
+                innerHTML: this.title ? this.title : "&nbsp;",
                 style: "background-color: #eee; margin: 1px 1px 2px 1px;"
             }, this._contentDiv, "first");
 
@@ -61,8 +64,9 @@ define([
             }, this.titleDiv, "last");
 
             // Обработчик закрытия
+            var popup = this;
             on(this._closeSpan, 'click', function () {
-                // TODO: close
+                popup.map.removePopup(popup);
             });
 
             // Соединительная стрелка
@@ -82,6 +86,7 @@ define([
             px.y = px.y - 8;
             OpenLayers.Popup.prototype.moveTo.apply(this, [px]);
         }
+
     });
 
     return Popup;

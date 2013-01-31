@@ -16,7 +16,18 @@ class FeaturePhotoComponent(Component):
         @FeatureExtension.registry.register
         class FeaturePhotoExtension(FeatureExtension):
             identity = 'feature_photo'
+            display_widget = 'feature_photo/DisplayWidget'
+            
             comp = self
+
+            def feature_data(self, feature):
+                DBSession = self.comp.env.core.DBSession
+                q = DBSession.query(self.comp.FeaturePhoto.id) \
+                    .filter_by(layer_id=self.layer.id, feature_id=feature.id)
+
+                photo_ids = map(lambda row: row[0], q)
+                if len(photo_ids) > 0:
+                    return photo_ids
 
             @property
             def feature_widget(self):

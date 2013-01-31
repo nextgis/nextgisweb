@@ -1,17 +1,19 @@
 define([
     "dojo/_base/declare",
+    "dojo/Stateful",
     "dojo/dom",
     "../openlayers",
     "./layer/OSM",
     "./layer/Google"
 ], function (
     declare,
+    Stateful,
     dom,
     openlayers,
     OSM,
     Google
 ) {
-    return declare(null, {
+    return declare(Stateful, {
         srs: 3857,
 
         constructor: function (div, options) {
@@ -55,6 +57,14 @@ define([
                 type: "terrain"
             });
             this.addLayer(lGoogleT);
+
+            var widget = this, olMap=this.olMap;
+            
+            this.olMap.events.on({
+                zoomend: function (evt) {
+                    widget.set("scaleDenom", olMap.getScale());
+                }
+            });
             
             this.olMap.zoomToMaxExtent();
         },

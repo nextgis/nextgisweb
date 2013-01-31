@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import json
+from types import MethodType
 
 from shapely import wkt
 
@@ -66,11 +67,15 @@ def setup_pyramid(comp, config):
         geom = geom_from_wkt(request.json_body['geom'], srid=srs)
         layers = map(int, request.json_body['layers'])
 
-        layers = DBSession.query(Layer)
+        layer_list = DBSession.query(Layer).filter(Layer.id.in_(layers))
 
         result = dict()
+        
+        # Количество объектов для всех слоев
+        feature_count = 0
 
-        for layer in layers:
+        for layer in layer_list:
+            # TODO: Права доступа проверять первым делом
 
             if not IFeatureLayer.providedBy(layer):
                 result[layer.id] = dict(error="Not implemented")
@@ -83,9 +88,19 @@ def setup_pyramid(comp, config):
                 # иначе ответ может оказаться очень большим.
                 query.limit(10)
 
+                features = [
+                    dict(id=f.id, layerId=layer.id, label=f.label, fields=f.fields)
+                    for f in query() 
+                ]
+
                 result[layer.id] = dict(
-                    features=[dict(f.fields, id=f.id) for f in query()]
+                    features=features,
+                    featureCount=len(features)
                 )
+
+                feature_count += len(features)
+
+        result["featureCount"] = feature_count
 
         return result
 
@@ -194,6 +209,7 @@ def setup_pyramid(comp, config):
     @model_context(comp.env.layer.Layer)
     def store_get_item(request, layer):
         box = request.headers.get('x-feature-box', None)
+        ext = request.headers.get('x-feature-ext', None)
 
         query = layer.feature_query()
         query.filter_by(id=request.matchdict['feature_id'])
@@ -203,10 +219,20 @@ def setup_pyramid(comp, config):
         
         feature = list(query())[0]
 
-        result = dict(feature.fields, id=feature.id)
+        result = dict(
+            feature.fields, 
+            id=feature.id, layerId=layer.id,
+            fields=feature.fields
+        )
 
         if box:
             result['box'] = feature.box.bounds
+
+        if ext:
+            result['ext'] = dict()
+            for extcls in FeatureExtension.registry:
+                extension = extcls(layer=layer)
+                result['ext'][extcls.identity] = extension.feature_data(feature)
 
         return Response(
             json.dumps(result),
@@ -234,6 +260,20 @@ def setup_pyramid(comp, config):
 
     config.add_route('feature_layer.feature.show', '/layer/{layer_id}/feature/{id}')
     config.add_view(feature_show, route_name='feature_layer.feature.show', renderer='feature_layer/feature_show.mako')
+
+    def client_settings(self, request):
+        return dict(
+            extensions=dict(
+                map(
+                    lambda ext: (ext.identity, dict(
+                        displayWidget=ext.display_widget
+                    )),
+                    FeatureExtension.registry
+                )
+            )
+        )
+
+    comp.client_settings = MethodType(client_settings, comp, comp.__class__)
 
     # Расширения меню слоя
     class LayerMenuExt(dm.DynItem):

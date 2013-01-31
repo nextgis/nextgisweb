@@ -13,13 +13,13 @@ define([
     MenuItem,
     FeatureGrid
 ) {
-    var Pane = declare([ContentPane], {
+    var _Pane = declare([ContentPane], {
         closable: true,
         iconClass: "dijitIconFile",
 
         postCreate: function () {
             domConstruct.create("iframe", {
-                src: application_url + "/layer/" + this.layer_id + '?no_layout',
+                src: ngwConfig.applicationUrl + "/layer/" + this.layerId + '?no_layout',
                 style: "width: 100%; height: 100%;"
             }, this.domNode);
         }
@@ -27,32 +27,41 @@ define([
 
     return declare([_PluginBase], {
 
-        postCreate: function () {
-            var identity = this.identity;
-            var display = this.webmapDisplay;
-            var store = this.webmapDisplay._treeStore;
+        constructor: function (params) {
+            var plugin = this;
 
-            var itm = new MenuItem({
+            this.menuItem = new MenuItem({
                 label: "Информация",
+                disabled: true,
                 onClick: function () {
-
-                    var pane = new Pane({
-                        title: store.getValue(display.treeWidget.selectedItem, "display_name"),
-                        layer_id: store.getValue(display.treeWidget.selectedItem, "layer_id")
-                    });
-                    pane.placeAt(display.tabContainer);
-                    pane.startup();
-
-                    display.tabContainer.selectChild(pane);
+                    plugin.openLayerInfo();
                 }
             });
 
-            display.selectedLayerMenu.addChild(itm);
+            var store = this.itemStore,
+                menuItem = this.menuItem;
 
-            display.treeWidget.watch("selectedItem", function (attr, oldVal, newVal) {
-                var plugins = store.getValue(newVal, "plugins");
-                itm.set("disabled", !(plugins && store.getValue(plugins, identity)));
+            this.display.watch("item", function (attr, oldVal, newVal) {
+                var type = store.getValue(newVal, "type");
+                menuItem.set("disabled", type != "layer");
             });
+
+        },
+
+        postCreate: function () {
+            this.display.itemMenu.addChild(this.menuItem);
+        },
+
+        openLayerInfo: function () {
+            var item = this.display.get("item");
+
+            var pane = new _Pane({
+                title: this.itemStore.getValue(item, "label"),
+                layerId: this.itemStore.getValue(item, "layerId")
+            });
+
+            this.display.tabContainer.addChild(pane);
+            this.display.tabContainer.selectChild(pane);
         }
     });
 });
