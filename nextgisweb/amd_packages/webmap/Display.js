@@ -27,6 +27,7 @@ define([
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
+    "dojox/layout/TableContainer",
     "dijit/Toolbar",
     "dijit/form/Button",
     "dijit/form/Select",

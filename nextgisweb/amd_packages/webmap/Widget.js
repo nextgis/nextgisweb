@@ -20,6 +20,7 @@ define([
     "dijit/Toolbar",
     "ngw/form/DisplayNameTextBox",
     "ngw/form/LayerSelect",
+    "ngw/form/ScaleTextBox",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
@@ -118,6 +119,8 @@ define([
                 } else if (newValue.item_type == "layer") {
                     widget.widgetProperties.selectChild(widget.paneLayer);
                     widget.wdgtItemLayerEnabled.set("checked", widget.getItemValue("layer_enabled"));
+                    widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale"));
+                    widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale"));
                 };
             });
 
@@ -134,6 +137,14 @@ define([
             // NB: Именно "checked", "value" не работает
             this.wdgtItemLayerEnabled.watch("checked", function (attr, oldValue, newValue) {
                 widget.setItemValue("layer_enabled", newValue);
+            });
+
+            this.wLayerMinScale.watch("value", function (attr, oldVal, newVal) {
+                widget.setItemValue("layer_min_scale", newVal);
+            });
+
+            this.wLayerMaxScale.watch("value", function (attr, oldVal, newVal) {
+                widget.setItemValue("layer_max_scale", newVal);
             });
 
             this.wgtLayer.on("click", function (item) {
@@ -167,6 +178,8 @@ define([
                     group_expanded: widget.itemStore.getValue(itm, "group_expanded"),
                     layer_style_id: widget.itemStore.getValue(itm, "layer_style_id"),
                     layer_enabled: widget.itemStore.getValue(itm, "layer_enabled"),
+                    layer_min_scale: widget.itemStore.getValue(itm, "layer_min_scale"),
+                    layer_max_scale: widget.itemStore.getValue(itm, "layer_max_scale"),
                     children: array.map(widget.itemStore.getValues(itm, "children"), function (i) { return traverseItem(i) })
                 }
             }

@@ -63,6 +63,8 @@ class WebMapItem(Base):
     group_expanded = sa.Column(sa.Boolean, nullable=True)
     layer_style_id = sa.Column(sa.Integer, sa.ForeignKey('style.id'), nullable=True)
     layer_enabled = sa.Column(sa.Boolean, nullable=True)
+    layer_min_scale = sa.Column(sa.Float, nullable=True)
+    layer_max_scale = sa.Column(sa.Float, nullable=True)
 
     parent = orm.relationship('WebMapItem',
         remote_side=[id],
@@ -100,6 +102,8 @@ class WebMapItem(Base):
                 display_name=self.display_name,
                 layer_enabled=self.layer_enabled,
                 layer_style_id=self.layer_style_id,
+                layer_min_scale=self.layer_min_scale,
+                layer_max_scale=self.layer_max_scale,
             )
 
     def from_dict(self, data):
@@ -112,7 +116,7 @@ class WebMapItem(Base):
                 child.from_dict(i)
                 self.children.append(child)
                 pos += 1
-        for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_style_id'):
+        for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_style_id', 'layer_min_scale', 'layer_max_scale'):
             if a in data:
                 setattr(self, a, data[a])
 
