@@ -29,49 +29,6 @@ def browse(request):
 @model_loader(WebMap)
 def display(request, obj):
 
-    # подготовим список и дерево слоев
-    display.idx = 1
-
-    def traverse(item):
-        display.idx += 1
-        result = dict(
-            id=display.idx,
-            item_type=item.item_type,
-            display_name=item.display_name
-        )
-        children = []
-        layers = []
-
-        if item.item_type == 'group':
-            result['group_expanded'] = item.group_expanded
-        elif item.item_type == 'layer':
-            result['layer_style_id'] = item.layer_style_id
-            result['layer_id'] = item.style.layer_id
-            result['layer_enabled'] = item.layer_enabled
-            result['checked'] = item.layer_enabled
-
-            plugins = dict()
-            for Plugin in WebmapPlugin.registry:
-                plugin_data = Plugin.is_layer_supported(item.style.layer, obj)
-                if plugin_data:
-                    plugins[plugin_data[0]] = plugin_data[1]
-
-            result['plugins'] = plugins
-
-            layers.append(result)
-
-        for i in item.children:
-            c, l = traverse(i)
-            children.append(c)
-            layers.extend(l)
-
-        if item.item_type in ('group', 'root'):
-            result['children'] = children
-
-        return (result, layers)
-
-    tree_config, layer_config = traverse(obj.root_item)
-
     MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
 
     display.mid = MID(
@@ -131,10 +88,6 @@ def display(request, obj):
     return dict(
         obj=obj,
         display_config=config,
-        adapters=(('tms', 'webmap/TMSAdapter'), ),
-        layer_config=layer_config,
-        tree_config=tree_config,
-        root_layer_group=DBSession.query(LayerGroup).filter_by(id=0).one(),
         custom_layout=True
     )
 
@@ -243,8 +196,6 @@ def setup_pyramid(comp, config):
 
         def build(self, kwargs):
             if 'obj' in kwargs:
-                yield dm.Label('operation', u"Операции")
-
                 yield dm.Link(
                     'operation/edit',
                     u"Редактировать",
@@ -255,7 +206,7 @@ def setup_pyramid(comp, config):
                 )
                 yield dm.Link(
                     'operation/display',
-                    u"Показать",
+                    u"Открыть",
                     lambda kwargs: kwargs.request.route_url(
                         'webmap.display',
                         id=kwargs.obj.id
@@ -263,8 +214,9 @@ def setup_pyramid(comp, config):
                 )
 
     comp.WebMap.__dynmenu__ = dm.DynMenu(
+        dm.Label('operation', u"Операции"),
         dm.Link(
-            'create',
+            'operation/create',
             u"Создать",
             lambda kwargs: kwargs.request.route_url('webmap.create')
         ),

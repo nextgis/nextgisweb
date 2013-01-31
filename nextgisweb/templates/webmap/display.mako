@@ -1,39 +1,23 @@
 <%inherit file='../base.mako' />
 
-
 <%def name="head()">
     <% import json %>
+
     <script type="text/javascript">
         var displayConfig = ${json.dumps(display_config, indent=4).replace('\n', '\n' + (8 * ' ')) | n};
-        var layerConfig = ${json.dumps(layer_config, indent=4) | n};
-        var treeConfig = ${tree_config | json.dumps, n};
-        var adapterClasses = {};
+
+        require(["dojo/parser"], function (parser) { parser.parse(); });
     </script>
 
     <style type="text/css">
         body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; }
     </style>
 
-    <script type="text/javascript">
-        <% import json %>
-        require([
-            "dojo/parser",
-            ${', '.join([ json.dumps(v) for k, v in adapters]) | n}
-        ], function (
-            parser,
-            ${', '.join([ "adapter_%s" % k for k, v in adapters]) }
-        ) {
-            ${';\n'.join([ ("adapterClasses.%s = adapter_%s") % (k, k) for k, v in adapters]) | n} ;
-            parser.parse();
-        });
-    </script>
-
 </%def>
 
-<% import json %>
 <div data-dojo-id="display"
     data-dojo-type="webmap/Display"
-    data-dojo-props="config: displayConfig, treeConfig: treeConfig, layerConfig: layerConfig, adapterClasses: adapterClasses, bookmarkLayerId: ${obj.bookmark_layer_id | json.dumps, n}"
+    data-dojo-props="config: displayConfig"
     style="width: 100%; height: 100%">
 </div>
 
