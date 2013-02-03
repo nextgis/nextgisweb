@@ -9,7 +9,6 @@ class LayerGroupRootComponent(Component):
 
     @require('layer_group', 'security', 'auth')
     def initialize_db(self):
-        DBSession = self.env.core.DBSession
         ACL = self.env.security.ACL
         ACLItem = self.env.security.ACLItem
         User = self.env.auth.User
@@ -17,9 +16,9 @@ class LayerGroupRootComponent(Component):
 
         LayerGroup = self.env.layer_group.LayerGroup
 
-        administrator = DBSession.query(User).filter_by(keyname='administrator').one()
-        administrators = DBSession.query(Group).filter_by(keyname='administrators').one()
-        owner = DBSession.query(User).filter_by(keyname='owner').one()
+        administrator = User.filter_by(keyname='administrator').one()
+        administrators = Group.filter_by(keyname='administrators').one()
+        owner = User.filter_by(keyname='owner').one()
 
         acl = ACL(
             owner_user=administrator,
@@ -35,6 +34,4 @@ class LayerGroupRootComponent(Component):
             id=0,
             acl=acl,
             display_name=u"Основная группа слоёв"
-        )
-
-        DBSession.add(root)
+        ).persist()

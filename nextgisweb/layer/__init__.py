@@ -27,19 +27,18 @@ class LayerComponent(Component):
 
     @require('layer_group_root', 'auth')
     def initialize_db(self):
-        DBSession = self.env.core.DBSession
         LayerGroup = self.env.layer_group.LayerGroup
         User = self.env.auth.User
         Group = self.env.auth.Group
 
-        root = DBSession.query(LayerGroup).filter_by(id=0).one()
+        root = LayerGroup.filter_by(id=0).one()
 
-        administrators = DBSession.query(Group).filter_by(keyname='administrators').one()
+        administrators = Group.filter_by(keyname='administrators').one()
         root.acl.update((
             (administrators.id, 'layer', PERMISSION_ALL, 'allow-subtree'),
         ))
 
-        owner = DBSession.query(User).filter_by(keyname='owner').one()
+        owner = User.filter_by(keyname='owner').one()
         root.acl.update((
             (owner.id, 'layer', PERMISSION_ALL, 'allow-subtree'),
         ))

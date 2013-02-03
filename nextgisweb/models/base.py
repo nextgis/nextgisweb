@@ -10,4 +10,24 @@ from sqlalchemy.orm import (
 from zope.sqlalchemy import ZopeTransactionExtension
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-Base = declarative_base()
+
+
+class BaseClass(object):
+
+    @classmethod
+    def query(cls, *args):
+        return DBSession.query(cls, *args)
+
+    @classmethod
+    def filter(cls, *args):
+        return DBSession.query(cls).filter(*args)
+
+    @classmethod
+    def filter_by(cls, **kwargs):
+        return DBSession.query(cls).filter_by(**kwargs)
+
+    def persist(self):
+        DBSession.add(self)
+
+
+Base = declarative_base(cls=BaseClass)
