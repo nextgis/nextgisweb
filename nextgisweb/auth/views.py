@@ -18,26 +18,37 @@ class LoginForm(Form):
     submit = fields.SubmitField(u"Войти")
 
 
-@view_config(route_name="auth.login", renderer="auth/login.mako")
-@view_config(context=HTTPForbidden, renderer='auth/login.mako')
-def login(request):
-    form = LoginForm(request.POST)
-    next = request.params.get('next', request.application_url)
-
-    if request.method == 'POST' and form.validate():
-        headers = remember(request, form.username.data.principal_id)
-
-        return HTTPFound(location=next, headers=headers)
-
-    return dict(form=form)
-
-
-@view_config(route_name="auth.logout")
-def logout(request):
-    headers = forget(request)
-    return HTTPFound(location=request.application_url, headers=headers)
-
 def setup_pyramid(comp, config):
+
+    def login(request):
+        next = request.params.get('next', request.application_url)
+
+        if request.method == 'POST':
+            user = User.filter_by(keyname=request.POST['login']).one()
+            headers = remember(request, user.id)
+
+            return HTTPFound(location=next, headers=headers)
+
+        return dict()
+
+    config.add_route('auth.login', '/login') \
+        .add_view(login, renderer='auth/login.mako')
+    
+    def logout(request):
+        headers = forget(request)
+        return HTTPFound(location=request.application_url, headers=headers)
+
+    config.add_route('auth.logout', '/logout').add_view(logout)
+
+    def forbidden(request):
+        # Если это гость, то аутентификация может ему помочь
+        if request.user.keyname == 'guest':
+            return HTTPFound(location=request.route_url('auth.login'))
+
+        # Уже аутентифицированным пользователям показываем сообщение об ошибке
+        return dict(subtitle=u"Отказано в доступе")
+
+    config.add_view(forbidden, context=HTTPForbidden, renderer='auth/forbidden.mako')
 
     def principal_dump(request):
         query = DBSession.query(Principal).with_polymorphic('*')
@@ -48,5 +59,5 @@ def setup_pyramid(comp, config):
 
         return result
 
-    config.add_route('auth.principal_dump', '/auth/principal/dump')
-    config.add_view(principal_dump, route_name='auth.principal_dump', renderer='json')
+    config.add_route('auth.principal_dump', '/auth/principal/dump') \
+        .add_view(principal_dump, renderer='json')

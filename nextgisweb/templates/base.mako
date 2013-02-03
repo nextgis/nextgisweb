@@ -61,7 +61,7 @@
       <li><a href="/group/">Группы</a></li>
 
       <li style="float: right;">
-      %if request.user.keyname == 'anonymous':
+      %if request.user.keyname == 'guest':
           <a href="${request.route_url('auth.login')}">Вход</a>
       %else:
           ${request.user} [<a href="${request.route_url('auth.logout')}">выход</a>]

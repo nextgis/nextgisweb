@@ -1,85 +1,58 @@
 # -*- coding: utf-8 -*-
 from pyramid.security import authenticated_userid
-
 from ..component import Component
-from ..models import DBSession
 
-from .models import Principal, User, Group
 
 @Component.registry.register
 class AuthComponent(Component):
     identity = 'auth'
 
-
-    @classmethod
-    def setup_routes(cls, config):
-        config.set_request_property(property_user, 'user', reify=True)
-
-        config.add_route('auth.login', '/login')
-        config.add_route('auth.logout', '/logout')
-
     def initialize_db(self):
-        DBSession = self.env.core.DBSession
-
-        guest = User(
+        self.User(
             system=True,
             keyname='guest',
             display_name=u"Гость"
-        )
-        DBSession.add(guest)
+        ).persist()
 
-        owner = User(
+        self.User(
             system=True,
             keyname='owner',
             display_name=u"Владелец"
-        )
-        DBSession.add(owner)
+        ).persist()
 
-        administrator = User(
-            keyname='administrator',
-            display_name=u"Администратор"
-        )
-        DBSession.add(administrator)
-
-
-        everyone = Group(
+        self.User(
             system=True,
             keyname='everyone',
-            display_name=u"Все пользователи"
-        )
-        DBSession.add(everyone)
+            display_name=u"Любой пользователь"
+        ).persist()
 
-        authorized = Group(
-            system=True,
-            keyname='authorized',
-            display_name=u"Авторизованные пользователи"
-        )
-        DBSession.add(authorized)
-
-        administrators = Group(
-            system=True,
+        self.Group(
             keyname='administrators',
             display_name=u"Администраторы",
-            members=[administrator, ]
-        )
-        DBSession.add(administrators)
+            members=[self.User(
+                keyname='administrator',
+                display_name=u"Администратор"
+            ), ]
+        ).persist()
 
-        DBSession.add(User(display_name=u"Иванов А.А."))
-        DBSession.add(User(display_name=u"Петров Б.Б."))
-        DBSession.add(User(display_name=u"Сидоров В.В."))
+        self.User(display_name=u"Иванов А.А.").persist()
+        self.User(display_name=u"Петров Б.Б.").persist()
+        self.User(display_name=u"Сидоров В.В.").persist()
 
     def initialize(self):
         from . import models
         models.initialize(self)
 
     def setup_pyramid(self, config):
+
+        def user(request):
+            user_id = authenticated_userid(request)
+            if user_id:
+                return self.User.filter_by(id=user_id).one()
+            else:
+                return self.User.filter_by(keyname='guest').one()
+
+        config.set_request_property(user, 'user', reify=True)
+
         from . import views
         views.setup_pyramid(self, config)
-
-
-def property_user(request):
-    user_id = authenticated_userid(request)
-    if user_id:
-        return DBSession.query(User).get(user_id)
-    else:
-        return DBSession.query(User).filter_by(keyname='guest').one()

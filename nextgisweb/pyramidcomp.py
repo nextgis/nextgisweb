@@ -19,7 +19,10 @@ class RouteHelper(object):
         self.name = name
 
     def add_view(self, view=None, **kwargs):
-        self.config.add_view(view=view, route_name=self.name, **kwargs)
+        if 'route_name' not in kwargs:
+            kwargs['route_name'] = self.name
+
+        self.config.add_view(view=view, **kwargs)
         return self
 
 

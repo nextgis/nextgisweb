@@ -6,8 +6,6 @@ from ..views import model_loader, model_context
 
 from ..models import DBSession
 
-from ..auth import Principal
-
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
 
