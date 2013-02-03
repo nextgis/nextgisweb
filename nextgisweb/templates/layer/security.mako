@@ -1,2 +1,0 @@
-<%inherit file='../base.mako' />
-
