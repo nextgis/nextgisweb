@@ -50,9 +50,6 @@ define([
         console.error(error);
     };
 
-    var _gridStructure = [
-    ];
-
     var _userGridStructure = [
         { field: "principal_id", name: "#", width: "24px" },
         { field: "principal_cls", name: "Т", width: "24px" },
@@ -66,7 +63,7 @@ define([
         },
 
         constructor: function (options) {
-            var store = this;
+            this.resource = options.resource;
 
             this.on("New", this._updateFlags);
             this.on("Set", this._fixFlags);
@@ -109,12 +106,12 @@ define([
             }
         },
 
-        complementPrincipal: function (principal_id, currentResource) {
+        complementPrincipal: function (principal_id) {
             var store = this;
 
-            var resources = lang.clone(securitySchema[currentResource].children);
-            if (resources.indexOf(currentResource) < 0) {
-                resources.push(currentResource);
+            var resources = lang.clone(securitySchema[this.resource].children);
+            if (resources.indexOf(this.resource) < 0) {
+                resources.push(this.resource);
             };
 
             for (var idx in resources) {
@@ -153,7 +150,7 @@ define([
 
             this.defaultOperation = "inherit-subtree";
 
-            this.itemStore = new ItemStore({});
+            this.itemStore = new ItemStore({resource: this.resource});
 
             this.principalStore = new ItemFileWriteStore({
                 data: { items: [] }
@@ -187,15 +184,14 @@ define([
             loadDeferred.then(function () {
                 principalStore.on("New", function (item) {
                     itemStore.complementPrincipal(
-                        principalStore.getValue(item, "principal_id"),
-                        widget.resource
+                        principalStore.getValue(item, "principal_id")
                     );
                 });
 
                 principalStore.fetch({
                     onItem: function (item) {
                         var pid = principalStore.getValue(item, 'principal_id');
-                        itemStore.complementPrincipal(pid, widget.resource);
+                        itemStore.complementPrincipal(pid);
                     }
                 });
 
