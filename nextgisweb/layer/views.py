@@ -37,7 +37,7 @@ def setup_pyramid(comp, config):
             layer_group = DBSession.query(LayerGroup).filter_by(id=request.GET['layer_group_id']).one()
             identity = request.GET['identity']
             cls = Layer.registry[identity]
-            user = request.user
+            owner_user = request.user
             template_context = dict(
                 obj=layer_group,
                 subtitle=u"Новый слой",
@@ -66,6 +66,7 @@ def setup_pyramid(comp, config):
         def create_object(self, context):
             return context['cls'](
                 layer_group=context['layer_group'],
+                owner_user=context['owner_user']
             )
 
         def query_object(self, context):
