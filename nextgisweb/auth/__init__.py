@@ -35,9 +35,9 @@ class AuthComponent(Component):
             ), ]
         ).persist()
 
-        self.User(display_name=u"Иванов А.А.").persist()
-        self.User(display_name=u"Петров Б.Б.").persist()
-        self.User(display_name=u"Сидоров В.В.").persist()
+        self.User(display_name=u"Иванов А.А.", keyname="ivanov").persist()
+        self.User(display_name=u"Петров Б.Б.", keyname="petrov").persist()
+        self.User(display_name=u"Сидоров В.В.", keyname="sidorov").persist()
 
     def initialize(self):
         from . import models
