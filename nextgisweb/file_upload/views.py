@@ -3,7 +3,6 @@ import pickle
 import json
 from shutil import copyfileobj
 
-from pyramid.view import view_config
 from pyramid.response import Response
 
 

@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-
 from collections import namedtuple
 from bunch import Bunch
 
@@ -12,107 +10,6 @@ from ..views import ModelController, model_loader, permalinker
 from .. import dynmenu as dm
 
 from .plugin import WebmapPlugin
-
-
-@view_config(route_name='webmap.browse', renderer='webmap/browse.mako')
-def browse(request):
-    obj_list = DBSession.query(WebMap)
-    return dict(
-        obj_list=obj_list,
-        dynmenu=request.env.webmap.WebMap.__dynmenu__,
-        dynmenu_kwargs=Bunch(request=request),
-    )
-
-
-@view_config(route_name='webmap.display', renderer='webmap/display.mako')
-@model_loader(WebMap)
-def display(request, obj):
-
-    MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
-
-    display.mid = MID(
-        set(),
-        set(),
-        set(),
-    )
-
-    def traverse(item):
-        data = dict(
-            id=item.id,
-            type=item.item_type,
-            label=item.display_name
-        )
-
-        if item.item_type == 'layer':
-
-            # Основные параметры элемента
-            data.update(
-                layerId=item.style.layer_id,
-                styleId=item.layer_style_id,
-                visibility=bool(item.layer_enabled),
-            )
-
-            # Адаптер слоя пока один
-            data.update(adapter="webmap/TMSAdapter")
-            display.mid.adapter.add(data['adapter'])
-
-            # Плагины уровня слоя
-            plugin = dict()
-            for pcls in WebmapPlugin.registry:
-                p_mid_data = pcls.is_layer_supported(item.style.layer, obj)
-                if p_mid_data:
-                    plugin.update((p_mid_data, ))
-
-            data.update(plugin=plugin)
-            display.mid.plugin.update(plugin.keys())
-
-
-        elif item.item_type in ('root', 'group'):
-            data.update(children=map(traverse, item.children))
-
-        return data
-
-    tmp = obj.to_dict()
-
-    config = dict(
-        extent=tmp["extent"],
-        rootItem=traverse(obj.root_item),
-        mid=dict(
-            adapter=tuple(display.mid.adapter),
-            basemap=tuple(display.mid.basemap),
-            plugin=tuple(display.mid.plugin)
-        )
-    )
-
-    return dict(
-        obj=obj,
-        display_config=config,
-        custom_layout=True
-    )
-
-
-@view_config(route_name='webmap.layer_hierarchy', renderer='json')
-@model_loader(WebMap)
-def layer_hierarchy(request, obj):
-    LayerGroup = request.env.layer_group.LayerGroup
-
-    def children(parent):
-        result = []
-        for i in parent.children:
-            result.append(dict(id='G-%d' % i.id, type='parent', layer_group_id=i.id, display_name=i.display_name, children=children(i)))
-
-        for i in parent.layers:
-            layer_info = dict(id='L-%d' % i.id, type='parent', layer_id=i.id, display_name=i.display_name, checked=False)
-            layer_info['style_id'] = i.styles[0].id if len(i.styles) > 0 else None
-            result.append(layer_info)
-
-        return result
-
-    return dict(
-        identifier='id',
-        label='display_name',
-        items=children(DBSession.query(LayerGroup).filter_by(id=0).one())
-    )
 
 
 class WebmapObjectWidget(ObjectWidget):
@@ -180,6 +77,17 @@ def setup_pyramid(comp, config):
     config.add_route('webmap.show', '/webmap/{id:\d+}')
     config.add_view(show, route_name='webmap.show', renderer='obj.mako')
 
+    def browse(request):
+        obj_list = DBSession.query(WebMap)
+        return dict(
+            obj_list=obj_list,
+            dynmenu=request.env.webmap.WebMap.__dynmenu__,
+            dynmenu_kwargs=Bunch(request=request),
+        )
+
+    config.add_route('webmap.browse', '/webmap/') \
+        .add_view(browse, renderer='webmap/browse.mako')
+
     class WebMapMenu(dm.DynItem):
 
         def build(self, kwargs):
@@ -200,6 +108,74 @@ def setup_pyramid(comp, config):
                         id=kwargs.obj.id
                     )
                 )
+
+    @model_loader(WebMap)
+    def display(request, obj):
+
+        MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
+
+        display.mid = MID(
+            set(),
+            set(),
+            set(),
+        )
+
+        def traverse(item):
+            data = dict(
+                id=item.id,
+                type=item.item_type,
+                label=item.display_name
+            )
+
+            if item.item_type == 'layer':
+
+                # Основные параметры элемента
+                data.update(
+                    layerId=item.style.layer_id,
+                    styleId=item.layer_style_id,
+                    visibility=bool(item.layer_enabled),
+                )
+
+                # Адаптер слоя пока один
+                data.update(adapter="webmap/TMSAdapter")
+                display.mid.adapter.add(data['adapter'])
+
+                # Плагины уровня слоя
+                plugin = dict()
+                for pcls in WebmapPlugin.registry:
+                    p_mid_data = pcls.is_layer_supported(item.style.layer, obj)
+                    if p_mid_data:
+                        plugin.update((p_mid_data, ))
+
+                data.update(plugin=plugin)
+                display.mid.plugin.update(plugin.keys())
+
+
+            elif item.item_type in ('root', 'group'):
+                data.update(children=map(traverse, item.children))
+
+            return data
+
+        tmp = obj.to_dict()
+
+        config = dict(
+            extent=tmp["extent"],
+            rootItem=traverse(obj.root_item),
+            mid=dict(
+                adapter=tuple(display.mid.adapter),
+                basemap=tuple(display.mid.basemap),
+                plugin=tuple(display.mid.plugin)
+            )
+        )
+
+        return dict(
+            obj=obj,
+            display_config=config,
+            custom_layout=True
+        )
+
+    config.add_route('webmap.display', '/webmap/{id:\d+}/display') \
+        .add_view(display, renderer='webmap/display.mako')
 
     comp.WebMap.__dynmenu__ = dm.DynMenu(
         dm.Label('operation', u"Операции"),

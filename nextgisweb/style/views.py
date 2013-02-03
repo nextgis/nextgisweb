@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from StringIO import StringIO
 
-from pyramid.view import view_config
 from pyramid.response import Response
 
 from bunch import Bunch

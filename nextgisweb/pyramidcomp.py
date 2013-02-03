@@ -74,7 +74,8 @@ class PyramidComponent(Component):
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)
 
-        config.add_route('home', '/')
+        config.add_route('home', '/') \
+            .add_view('nextgisweb.views.amd_package')
 
         # Чтобы не приходилось вручную чистить кеш статики, сделаем
         # так, чтобы у них всегда были разные URL. В качестве ключа
@@ -103,17 +104,15 @@ class PyramidComponent(Component):
             sys.stdout = stdout
 
         config.add_static_view('static%s/asset' % static_key, 'static', cache_max_age=3600)
-        config.add_route('amd_package', 'static%s/amd/*subpath' % static_key)
+        config.add_route('amd_package', 'static%s/amd/*subpath' % static_key) \
+            .add_view('nextgisweb.views.amd_package')
 
         for comp in self._env.chain('setup_pyramid'):
             comp.setup_pyramid(config)
 
         # TODO: не лезть в приватные переменные _env
         for comp in self._env._components.itervalues():
-            # comp.setup_pyramid(config)
             comp.__class__.setup_routes(config)
-
-        config.scan()
 
         return config
 

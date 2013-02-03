@@ -2,7 +2,6 @@
 from pkg_resources import resource_filename
 
 from pyramid.response import Response, FileResponse
-from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
 
 from ..models import DBSession
@@ -59,12 +58,10 @@ def permalinker(model, route_name, keys=('id', )):
     model.permalink = _permalink
 
 
-@view_config(route_name='home', renderer='base.mako')
 def home(request):
     return HTTPFound(location=request.route_url('layer'))
 
 
-@view_config(route_name="amd_package")
 def amd_package(request):
     amd_package_name = request.matchdict['subpath'][0]
     amd_package_path = '/'.join(request.matchdict['subpath'][1:])
