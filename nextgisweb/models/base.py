@@ -28,6 +28,7 @@ class BaseClass(object):
 
     def persist(self):
         DBSession.add(self)
+        return self
 
 
 Base = declarative_base(cls=BaseClass)
