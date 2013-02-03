@@ -70,7 +70,7 @@ class SecurityComponent(Component):
     def setup_pyramid(self, config):
         
         def require_permission(request, model, *permissions):
-            if not model.acl.has_permission(request.user, *permissions):
+            if not model.has_permission(request.user, *permissions):
                 raise HTTPForbidden()
 
         config.add_request_method(require_permission, 'require_permission')

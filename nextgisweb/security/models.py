@@ -278,4 +278,18 @@ def initialize(comp):
 
             super(ACLMixin, self).__init__(*args, **kwargs)
 
+        def permission_set(self, *args, **kwargs):
+            return self.acl.permission_set(*args, **kwargs)
+
+        def has_permission(self, *args, **kwargs):
+            return self.acl.has_permission(*args, **kwargs)
+
+        def owner_user():
+            def fget(self):
+                return self.acl.owner_user
+            def fset(self, value):
+                self.acl.owner_user = value
+            return locals()
+        owner_user = property(**owner_user())
+
     comp.ACLMixin = ACLMixin
