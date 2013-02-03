@@ -16,8 +16,8 @@ class LayerGroupRootComponent(Component):
 
         LayerGroup = self.env.layer_group.LayerGroup
 
-        administrator = User.filter_by(keyname='administrator').one()
         administrators = Group.filter_by(keyname='administrators').one()
+        administrator = User.filter_by(keyname='administrator').one()
         owner = User.filter_by(keyname='owner').one()
 
         root = LayerGroup(

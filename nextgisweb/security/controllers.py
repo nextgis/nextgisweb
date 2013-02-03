@@ -74,34 +74,4 @@ def setup_pyramid(comp, config):
             return DBSession.query(self._resource) \
                 .filter_by(**request.matchdict).one()
 
-
-    # @model_context(ACL)
-    # def edit_acl_post(request, obj):
-    #     new_items = dict()
-
-    #     for r in request.json_body:
-    #         pk = (obj.id, r['principal_id'], r['resource'], r['permission'])
-    #         new_items[pk] = r['operation']
-
-    #     # Исправляем существующие записи
-    #     seen = set()
-    #     for item in obj.items:
-    #         pk = (item.acl_id, item.principal_id, item.resource, item.permission)
-    #         if pk in new_items:
-    #             item.operation = new_items[pk]
-    #             seen.add(pk)
-    #         else:
-    #             DBSession.delete(item)
-
-    #     # Добавляем новые
-    #     for pk, operation in new_items.iteritems():
-    #         if pk not in seen:
-    #             print pk
-    #             obj.items.append(ACLItem(
-    #                 **dict(zip(
-    #                     ('acl_id', 'principal_id', 'resource', 'permission'),
-    #                     pk
-    #                 ), operation=operation)
-    #             ))
-
     comp.ACLController = ACLController

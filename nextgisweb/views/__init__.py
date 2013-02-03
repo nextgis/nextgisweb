@@ -13,7 +13,9 @@ from .model_controller import ModelController
 
 
 def model_context(cls, key='id'):
+    
     def wrap(f):
+    
         def wrapped_f(request, *args, **kwargs):
             obj = DBSession.query(cls).get(request.matchdict[key])
 
@@ -30,11 +32,16 @@ def model_context(cls, key='id'):
 model_loader = model_context
 
 
-def model_permission(permission):
+def model_permission(*permissions):
+    
     def wrap(f):
+    
         def wrapped_f(request, model, *args, **kwargs):
-            if not (permission in model.acl.get_effective_permissions(request.user)):
-                raise HTTPForbidden()
+            permission_set = model.acl.permission_set(request.user)
+
+            for permission in permissions:
+                if permission not in permission_set:
+                    raise HTTPForbidden()
 
             return f(request, model, *args, **kwargs)
 

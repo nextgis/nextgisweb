@@ -62,6 +62,8 @@ def setup_pyramid(comp, config):
 
     @model_context(LayerGroup)
     def show(request, obj):
+        request.require_permission(obj, 'read')
+
         return dict(
             obj=obj,
             sections=request.env.layer_group.layer_group_page_sections
@@ -108,7 +110,9 @@ def setup_pyramid(comp, config):
     class LayerGroupController(ModelController):
 
         def create_context(self, request):
-            parent = DBSession.query(LayerGroup).filter_by(id=request.GET['parent_id']).one()
+            parent = LayerGroup.filter_by(id=request.GET['parent_id']).one()
+            request.require_permission(parent, 'create')
+
             template_context = dict(
                 obj=parent,
                 subtitle=u"Новая группа слоёв",
@@ -116,13 +120,22 @@ def setup_pyramid(comp, config):
             return locals()
 
         def edit_context(self, request):
-            obj = DBSession.query(LayerGroup).filter_by(**request.matchdict).one()
+            obj = LayerGroup.filter_by(**request.matchdict).one()
+            request.require_permission(obj, 'update')
+
             template_context = dict(
                 obj=obj,
             )
             return locals()
 
-        delete_context = edit_context
+        def delete_context(self, request):
+            obj = LayerGroup.filter_by(**request.matchdict).one()
+            request.require_permission(obj, 'delete')
+
+            template_context = dict(
+                obj=obj,
+            )
+            return locals()
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):

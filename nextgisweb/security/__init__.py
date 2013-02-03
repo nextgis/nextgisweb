@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from pyramid.httpexceptions import HTTPForbidden
+
 from ..registry import registry_maker
 from ..component import Component, require
 
@@ -66,6 +68,13 @@ class SecurityComponent(Component):
         self._permissions[resource][permission] = kwargs
 
     def setup_pyramid(self, config):
+        
+        def require_permission(request, model, *permissions):
+            if not model.acl.has_permission(request.user, *permissions):
+                raise HTTPForbidden()
+
+        config.add_request_method(require_permission, 'require_permission')
+
         from . import views, controllers
         views.setup_pyramid(self, config)
         controllers.setup_pyramid(self, config)
