@@ -16,12 +16,6 @@ class AuthComponent(Component):
 
         self.User(
             system=True,
-            keyname='owner',
-            display_name=u"Владелец"
-        ).persist()
-
-        self.User(
-            system=True,
             keyname='everyone',
             display_name=u"Любой пользователь"
         ).persist()

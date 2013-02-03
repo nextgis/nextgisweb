@@ -6,6 +6,7 @@ from ..component import Component, require
 
 from .models import PERMISSION_ALL
 
+
 @Component.registry.register
 class SecurityComponent(Component):
     identity = 'security'
@@ -21,6 +22,14 @@ class SecurityComponent(Component):
     def initialize(self):
         from . import models
         models.initialize(self)
+
+    @require('auth')
+    def initialize_db(self):
+        self.env.auth.User(
+            system=True,
+            keyname='owner',
+            display_name=u"Владелец"
+        ).persist()
 
     @property
     def resources(self):
@@ -68,7 +77,7 @@ class SecurityComponent(Component):
         self._permissions[resource][permission] = kwargs
 
     def setup_pyramid(self, config):
-        
+
         def require_permission(request, model, *permissions):
             if not model.has_permission(request.user, *permissions):
                 raise HTTPForbidden()
