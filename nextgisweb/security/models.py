@@ -89,6 +89,8 @@ def permission_set(itemstack, permissions=None):
 
 def initialize(comp):
     Base = comp.env.core.Base
+
+    Principal = comp.env.auth.Principal
     User = comp.env.auth.User
     Group = comp.env.auth.Group
 
@@ -96,8 +98,8 @@ def initialize(comp):
         __tablename__ = 'acl'
 
         id = sa.Column(sa.Integer, primary_key=True)
-        parent_id = sa.Column(sa.Integer, sa.ForeignKey('acl.id'), nullable=True)
-        owner_user_id = sa.Column(sa.ForeignKey('auth_user.principal_id'))
+        parent_id = sa.Column(sa.ForeignKey(id))
+        owner_user_id = sa.Column(sa.ForeignKey(User.principal_id))
         resource = sa.Column(sa.Unicode, nullable=False)
 
         parent = orm.relationship('ACL', remote_side=[id, ])
@@ -166,12 +168,13 @@ def initialize(comp):
                     if itm.resource != self.resource:
                         continue
 
-                    print itm.principal.keyname
-
                     if (
                         isinstance(itm.principal, User)
                         and (
+                            # Сравнение с учетом виртуальных пользователей
                             itm.principal.compare(user)
+
+                            # Специальный случай: в ACL указан владелец
                             or (
                                 itm.principal.keyname == 'owner'
                                 and user == self.owner_user
@@ -220,8 +223,8 @@ def initialize(comp):
     class ACLItem(Base):
         __tablename__ = 'acl_item'
 
-        acl_id = sa.Column(sa.Integer, sa.ForeignKey(ACL.id, ondelete="CASCADE"), primary_key=True)
-        principal_id = sa.Column(sa.Integer, sa.ForeignKey('auth_principal.id'), primary_key=True)
+        acl_id = sa.Column(sa.ForeignKey(ACL.id), primary_key=True)
+        principal_id = sa.Column(sa.ForeignKey(Principal.id), primary_key=True)
         resource = sa.Column(sa.Unicode, primary_key=True)
         permission = sa.Column(sa.Unicode, primary_key=True)
         operation = sa.Column(sa.Unicode, primary_key=True)
@@ -293,11 +296,15 @@ def initialize(comp):
             return self.acl.has_permission(*args, **kwargs)
 
         def owner_user():
+
             def fget(self):
                 return self.acl.owner_user
+
             def fset(self, value):
                 self.acl.owner_user = value
+
             return locals()
+
         owner_user = property(**owner_user())
 
     comp.ACLMixin = ACLMixin
