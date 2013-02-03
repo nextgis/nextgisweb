@@ -19,7 +19,7 @@
     %endfor
     %if len(obj.layers) == 0:
         <tr>
-            <td colspan="3">
+            <td colspan="4">
                 <i>В этой группе пока нет слоёв.</i>
             </td>
         </tr>
