@@ -166,9 +166,17 @@ def initialize(comp):
                     if itm.resource != self.resource:
                         continue
 
+                    print itm.principal.keyname
+
                     if (
                         isinstance(itm.principal, User)
-                        and itm.principal == user
+                        and (
+                            itm.principal.compare(user)
+                            or (
+                                itm.principal.keyname == 'owner'
+                                and user == self.owner_user
+                            )
+                        )
                     ):
                         match = PMATCH.USER
 

@@ -26,6 +26,12 @@ class AuthComponent(Component):
             display_name=u"Любой пользователь"
         ).persist()
 
+        self.User(
+            system=True,
+            keyname='authenticated',
+            display_name=u"Прошедший проверку"
+        ).persist()
+
         self.Group(
             keyname='administrators',
             display_name=u"Администраторы",

@@ -39,6 +39,33 @@ class User(Principal):
     def __unicode__(self):
         return self.display_name
 
+    def compare(self, other):
+        """ Сравнение двух пользователей с учетом особых пользователей """
+
+        # Если ни один из пользователей не особый, то обычное сравнение
+        if not self.system and not other.system:
+            return self == other
+
+        elif self.system:
+            a, b = self, other
+
+        elif other.system:
+            a, b = other, self
+
+        # Теперь a - особый пользователь, b - обычный
+
+        if a.keyname == 'everyone':
+            return True
+
+        elif a.keyname == 'authenticated':
+            return b.keyname != 'guest'
+
+        elif b.keyname == 'authenticated':
+            return a.keyname != 'guest'
+
+        else:
+            return a == b
+
 
 class Group(Principal):
     __tablename__ = 'auth_group'
