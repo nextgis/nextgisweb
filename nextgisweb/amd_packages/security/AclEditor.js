@@ -6,11 +6,14 @@ define([
     "dojo/request/xhr",
     "dojo/json",
     "dojo/data/ItemFileWriteStore",
+    "dojo/on",
+    "dojo/mouse",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/BorderContainer",
     "dijit/popup",
+    "dijit/Tooltip",
     "dijit/form/Button",
     "dojox/grid/DataGrid",
     "dojox/grid/cells",
@@ -34,11 +37,14 @@ define([
     xhr,
     json,
     ItemFileWriteStore,
+    on,
+    mouse,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     BorderContainer,
     popup,
+    Tooltip,
     Button,
     DataGrid,
     cells,
@@ -222,16 +228,16 @@ define([
                             .label
                     }
                 }, { 
-                    field: "_item", name: "Разрешение", width: "70%",
+                    field: "_item", name: "Право", width: "70%",
                     formatter: function (item) {
                         return securitySchema[itemStore.getValue(item, 'resource')]
                             .permissions[itemStore.getValue(item, 'permission')]
                             .label
                     }
                 },
-                { field: "allow", name: 'Р', width: "16px", editable: true, cellType: cells.Bool},
-                { field: "deny", name: 'З', width: "16px", editable: true, cellType: cells.Bool},
-                { field: "node", name: 'О', width: "16px", editable: true, cellType: cells.Bool}
+                { field: "allow", name: 'Р', width: "16px", editable: true, cellType: cells.Bool, styles: 'text-align: center;'},
+                { field: "deny", name: 'З', width: "16px", editable: true, cellType: cells.Bool, styles: 'text-align: center;'},
+                { field: "node", name: 'О', width: "16px", editable: true, cellType: cells.Bool, styles: 'text-align: center;'}
                 /* DEBUG: , { field: "operation"} */
             ];
             this._principalGridStruct = _userGridStructure;
@@ -243,6 +249,22 @@ define([
             
             if (this.items.length > 0) {
                 this._principalSelect();
+            };
+        },
+
+        _headerCellMouseOver: function (e) {
+            var msg = 
+                (e.cellNode.cellIndex == '4') ? "Разрешить" : (
+                (e.cellNode.cellIndex == '5') ? "Запретить" : (
+                (e.cellNode.cellIndex == '6') ? "Ограничить распространение" : null
+            ));
+
+            if (msg) {
+                Tooltip.show(msg, e.cellNode);
+                on.once(e.cellNode, mouse.leave, function(){
+                    Tooltip.hide(e.cellNode);
+                });
+
             };
         },
 
