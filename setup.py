@@ -21,7 +21,6 @@ requires = [
     'shapely',
     'geojson',
     'PIL',
-    'wtforms',
     'lxml',
     
     ]

@@ -5,7 +5,6 @@ from pyramid.httpexceptions import HTTPFound
 from bunch import Bunch
 
 from ..models import DBSession
-from ..wtforms import Form, fields, validators
 from ..views import model_context, model_permission, permalinker, ModelController, DescriptionObjectWidget, DeleteObjectWidget
 from ..object_widget import CompositeWidget
 from .. import dynmenu as dm

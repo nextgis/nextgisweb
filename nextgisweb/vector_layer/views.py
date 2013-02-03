@@ -7,11 +7,8 @@ import ctypes
 import osgeo
 from osgeo import ogr
 
-from wtforms import form, fields, validators
-
 from ..models import DBSession
 from ..spatial_ref_sys import SRS
-
 
 from ..object_widget import ObjectWidget
 

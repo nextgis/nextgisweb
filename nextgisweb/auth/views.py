@@ -3,18 +3,12 @@ from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from pyramid.security import remember, forget
 
 from ..models import DBSession
-from ..wtforms import Form, fields
 
 from .models import Principal, User
 
 
 def query_users():
     return DBSession.query(User).filter_by(system=False)
-
-
-class LoginForm(Form):
-    username = fields.QuerySelectField(u"Имя пользователя", query_factory=query_users)
-    submit = fields.SubmitField(u"Войти")
 
 
 def setup_pyramid(comp, config):
@@ -50,7 +44,7 @@ def setup_pyramid(comp, config):
     config.add_view(forbidden, context=HTTPForbidden, renderer='auth/forbidden.mako')
 
     def principal_dump(request):
-        query = DBSession.query(Principal).with_polymorphic('*')
+        query = Principal.query().with_polymorphic('*')
         result = []
 
         for p in query:
