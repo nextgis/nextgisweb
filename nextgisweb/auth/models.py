@@ -6,8 +6,8 @@ from ..models import Base
 
 tab_group_user = sa.Table(
     'auth_group_user', Base.metadata,
-    sa.Column('group_id', sa.Integer, sa.ForeignKey('auth_group.principal_id'), nullable=False),
-    sa.Column('user_id', sa.Integer, sa.ForeignKey('auth_user.principal_id'), nullable=False)
+    sa.Column('group_id', sa.Integer, sa.ForeignKey('auth_group.principal_id'), primary_key=True),
+    sa.Column('user_id', sa.Integer, sa.ForeignKey('auth_user.principal_id'), primary_key=True)
 )
 
 
@@ -54,3 +54,20 @@ class Group(Principal):
 
     def __unicode__(self):
         return self.display_name
+
+    def is_member(self, user):
+        if self.keyname == 'authorized':
+            return user is not None and user.keyname != 'guest'
+
+        elif self.keyname == 'everyone':
+            return user is not None
+
+        else:
+            return user in self.members
+
+
+def initialize(comp):
+
+    comp.Principal = Principal
+    comp.User = User
+    comp.Group = Group

@@ -8,90 +8,15 @@ from bunch import Bunch
 
 from ..views import model_context, permalinker, model_loader, ModelController
 from .. import dynmenu as dm
-from ..models import DBSession
-from ..wtforms import Form, fields, validators
 from ..object_widget import ObjectWidget, CompositeWidget
-
-from ..layer import Layer
-
-from .models import Style
 
 
 EPSG_3857_BOX = (-20037508.34, -20037508.34, 20037508.34, 20037508.34)
 
-
-@view_config(route_name='style.show', renderer='obj.mako')
-@model_context(Style)
-def show(reqest, obj):
-    actual_class = Style.registry[obj.cls]
-    obj = DBSession.query(Style) \
-        .with_polymorphic((actual_class, ))\
-        .filter_by(id=obj.id).one()
-
-    return dict(
-        obj=obj,
-    )
-
-
-@view_config(route_name='style.tms')
-@model_context(Style)
-def tms(reqest, obj):
-    actual_class = Style.registry[obj.cls]
-    obj = DBSession.query(Style) \
-        .with_polymorphic((actual_class, ))\
-        .filter_by(id=obj.id).one()
-
-    z = int(reqest.GET['z'])
-    x = int(reqest.GET['x'])
-    y = int(reqest.GET['y'])
-
-    step = (EPSG_3857_BOX[2] - EPSG_3857_BOX[0]) / 2 ** z
-
-    box = (
-        EPSG_3857_BOX[0] + x * step,
-        EPSG_3857_BOX[3] - (y + 1) * step,
-        EPSG_3857_BOX[0] + (x + 1) * step,
-        EPSG_3857_BOX[3] - y * step,
-    )
-
-    img = obj.render_image(box, (256, 256), reqest.registry.settings)
-
-    buf = StringIO()
-    img.save(buf, 'png')
-    buf.seek(0)
-
-    return Response(body_file=buf, content_type='image/png')
-
-
-permalinker(Style, 'style.show', keys=('id', 'layer_id'))
-
-
-@view_config(route_name='api.style.item.retrive', renderer='json')
-@model_loader(Style)
-def api_style_item_retrive(request, obj):
-    return obj.to_dict()
-
-
-@view_config(route_name='api.style.item.replace', renderer='json')
-@model_loader(Style)
-def api_style_item_replace(request, obj):
-    obj.from_dict(request.json_body)
-
-
-@view_config(route_name='api.style.collection.create', renderer='json')
-@model_loader(Layer, key='layer_id')
-def api_style_collection_create(request, layer):
-    data = request.json_body
-    cls = Style.registry[data['cls']]
-    obj = cls(layer_id=layer.id)
-    obj.from_dict(request.json_body)
-    DBSession.add(obj)
-    DBSession.flush()
-
-    return dict(id=obj.id)
-
-
 def setup_pyramid(comp, config):
+    DBSession = comp.env.core.DBSession
+    Layer = comp.env.layer.Layer
+    Style = comp.Style
 
     class StyleObjectWidget(ObjectWidget):
 
@@ -161,8 +86,53 @@ def setup_pyramid(comp, config):
 
     StyleController(
         'style',
-        url_base='/layer/{layer_id}/style',
+        url_base='/layer/{layer_id:\d+}/style',
     ).includeme(config)
+
+
+    @model_context(Style)
+    def tms(reqest, obj):
+        actual_class = Style.registry[obj.cls]
+        obj = DBSession.query(Style) \
+            .with_polymorphic((actual_class, ))\
+            .filter_by(id=obj.id).one()
+
+        z = int(reqest.GET['z'])
+        x = int(reqest.GET['x'])
+        y = int(reqest.GET['y'])
+
+        step = (EPSG_3857_BOX[2] - EPSG_3857_BOX[0]) / 2 ** z
+
+        box = (
+            EPSG_3857_BOX[0] + x * step,
+            EPSG_3857_BOX[3] - (y + 1) * step,
+            EPSG_3857_BOX[0] + (x + 1) * step,
+            EPSG_3857_BOX[3] - y * step,
+        )
+
+        img = obj.render_image(box, (256, 256), reqest.registry.settings)
+
+        buf = StringIO()
+        img.save(buf, 'png')
+        buf.seek(0)
+
+        return Response(body_file=buf, content_type='image/png')
+
+    config.add_route('style.tms', '/style/{id:\d+}/tms').add_view(tms)
+
+    @model_context(Style)
+    def show(reqest, obj):
+        actual_class = Style.registry[obj.cls]
+        obj = DBSession.query(Style) \
+            .with_polymorphic((actual_class, ))\
+            .filter_by(id=obj.id).one()
+
+        return dict(
+            obj=obj,
+        )
+
+    config.add_route('style.show', '/layer/{layer_id:\d+}/style/{id:\d+}') \
+        .add_view(show, renderer='obj.mako')
 
     comp.Style.__dynmenu__ = dm.DynMenu(
         dm.Label('operation', u"Операции"),
@@ -214,3 +184,5 @@ def setup_pyramid(comp, config):
         title=u"Стили",
         template="nextgisweb:templates/style/layer_section.mako"
     )
+
+    permalinker(Style, 'style.show', keys=('id', 'layer_id'))

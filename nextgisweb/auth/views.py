@@ -6,7 +6,7 @@ from pyramid.security import remember, forget
 from ..models import DBSession
 from ..wtforms import Form, fields
 
-from .models import User
+from .models import Principal, User
 
 
 def query_users():
@@ -36,3 +36,17 @@ def login(request):
 def logout(request):
     headers = forget(request)
     return HTTPFound(location=request.application_url, headers=headers)
+
+def setup_pyramid(comp, config):
+
+    def principal_dump(request):
+        query = DBSession.query(Principal).with_polymorphic('*')
+        result = []
+
+        for p in query:
+            result.append(dict(id=p.id, cls=p.cls, keyname=p.keyname, display_name=p.display_name))
+
+        return result
+
+    config.add_route('auth.principal_dump', '/auth/principal/dump')
+    config.add_view(principal_dump, route_name='auth.principal_dump', renderer='json')

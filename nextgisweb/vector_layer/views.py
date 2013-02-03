@@ -10,10 +10,8 @@ from osgeo import ogr
 from wtforms import form, fields, validators
 
 from ..models import DBSession
-from ..layer import Layer
 from ..spatial_ref_sys import SRS
 
-from .models import VectorLayer
 
 from ..object_widget import ObjectWidget
 
@@ -21,7 +19,7 @@ from ..object_widget import ObjectWidget
 class VectorLayerObjectWidget(ObjectWidget):
 
     def is_applicable(self):
-        """ На текущий момент загрузка данных поддерживается
+        """ На текущий момент загрузки данных поддерживается
         только на этапе создания слоя, а этот виджет только
         загрузку данных и реализует. Поэтому отключим его,
         выполняется что-то отличное от создания объекта. """
@@ -183,9 +181,8 @@ def _set_encoding(encoding):
     return encoding_section(encoding)
 
 
-VectorLayer.__show_template = 'vector_layer/show.mako'
-
 def setup_pyramid(comp, config):
+    VectorLayer = comp.VectorLayer
 
     VectorLayer.object_widget = (
         (VectorLayer.identity, VectorLayerObjectWidget),

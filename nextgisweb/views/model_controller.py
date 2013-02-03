@@ -6,7 +6,7 @@ from ..models import DBSession
 
 class ModelController(object):
 
-    def __init__(self, route_prefix, url_base=None, item_path='{id}'):
+    def __init__(self, route_prefix, url_base=None, item_path='{id:\d+}'):
         if not url_base:
             url_base = '/%s' % route_prefix
 

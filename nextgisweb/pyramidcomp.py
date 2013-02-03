@@ -12,6 +12,42 @@ from pyramid.authorization import ACLAuthorizationPolicy
 import pyramid_tm
 
 
+class RouteHelper(object):
+
+    def __init__(self, name, config):
+        self.config = config
+        self.name = name
+
+    def add_view(self, view=None, **kwargs):
+        self.config.add_view(view=view, route_name=self.name, **kwargs)
+        return self
+
+
+class ExtendedConfigurator(Configurator):
+    
+    def add_route(self, name, pattern=None, **kwargs):
+        """ Расширенное добавление маршрута
+
+        Синтаксический сахар, позволяющий записать часто встречающуюся
+        конструкцию вида:
+
+            config.add_route('foo', '/foo')
+            config.add_view(foo_get, route_name='foo', request_method='GET')
+            config.add_view(foo_post, route_name='foo', request_method='POST')
+
+
+        Более компактным способом:
+
+            config.add_route('foo', '/foo') \
+                .add_view(foo_get, request_method='GET') \
+                .add_view(foo_post, request_method='POST')
+
+        """
+        
+        super(ExtendedConfigurator, self).add_route(name, pattern=pattern, **kwargs)
+        return RouteHelper(name, self)
+
+
 @Component.registry.register
 class PyramidComponent(Component):
     identity = 'pyramid'
@@ -21,7 +57,7 @@ class PyramidComponent(Component):
 
         settings['mako.directories'] = 'nextgisweb:templates/'
 
-        config = Configurator(settings=settings)
+        config = ExtendedConfigurator(settings=settings)
 
         # возможность доступа к Env через request.env
         config.set_request_property(lambda (req): self._env, 'env')

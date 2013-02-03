@@ -1,0 +1,74 @@
+<div class="${baseClass}">
+
+    <div data-dojo-attach-point="toolbar"
+        data-dojo-type="dijit/Toolbar"
+        data-dojo-props="region: 'top'">
+
+        <div data-dojo-type="dijit/form/Button"
+            data-dojo-props="iconClass: 'dijitIconSave'"
+            data-dojo-attach-event="onClick: save">
+            Сохранить
+        </div>
+
+        <div data-dojo-type="dijit/form/DropDownButton"
+            data-dojo-props="iconClass: 'dijitIconUsers'">
+            <span>Добавить</span>
+            <div data-dojo-attach-point="principalDialog"
+                data-dojo-type="dijit/TooltipDialog">
+
+                <table role="presentation"><tr>
+                    <td>
+                        <div data-dojo-attach-point="principalSelect" 
+                            data-dojo-type="ngw/form/PrincipalSelect"
+                            style="width: 20em;" />
+                    </td>
+                    <td>
+                        <div data-dojo-type="dijit/form/Button"
+                            data-dojo-attach-event="onClick: _principalAdd">
+                            Ok
+                        </div>                                            
+                </tr></table>
+
+            </div>
+        </div>
+
+        <div data-dojo-type="dijit/form/Button"
+            data-dojo-props="iconClass: 'dijitIconDelete'"
+            data-dojo-attach-event="onClick: _principalDelete">
+            Удалить
+        </div>
+
+
+    </div>
+
+    <div data-dojo-attach-point="itemGrid"
+        data-dojo-type="dojox/grid/DataGrid"
+        data-dojo-props="
+            store: this.itemStore,
+            structure: this._gridStructure,
+            singleClickEdit: true,
+            selectionMode: 'single',
+            region: 'center',
+            clientSort: true,
+            sortInfo: 2,
+            canSort: function () { return false; }
+        ">
+
+    </div>
+
+    <div data-dojo-attach-point="principalGrid"
+        data-dojo-type="dojox/grid/DataGrid"
+        data-dojo-props="
+            store: this.principalStore,
+            structure: this._principalGridStruct,
+            singleClickEdit: true,
+            selectionMode: 'single',
+            region: 'left',
+            canSort: function () { return false; }
+        "
+        data-dojo-attach-event="onCellClick: _principalSelected"
+        style="width: 30%">
+
+    </div>
+
+</div>

@@ -101,5 +101,5 @@ def setup_pyramid(comp, config):
 
         return Response(body_file=buf, content_type="image/jpeg")
 
-    config.add_route('feature_photo.image', '/layer/{layer_id}/feature/{feature_id}/photo/{id}')
-    config.add_view(image, route_name='feature_photo.image')
+    config.add_route('feature_photo.image', '/layer/{layer_id:\d+}/feature/{feature_id:\d+}/photo/{id:\d+}') \
+        .add_view(image)

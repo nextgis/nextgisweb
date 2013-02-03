@@ -12,9 +12,6 @@ from ..object_widget import CompositeWidget
 from .. import dynmenu as dm
 from ..psection import PageSections
 
-from .models import LayerGroup
-
-
 from ..object_widget import ObjectWidget
 
 
@@ -49,66 +46,64 @@ class LayerGroupObjectWidget(ObjectWidget):
     def widget_module(self):
         return 'layer_group/Widget'
 
-LayerGroup.object_widget = (
-    ('layer_group', LayerGroupObjectWidget),
-    ('description', DescriptionObjectWidget),
-    ('delete', DeleteObjectWidget),
-)
-
-
-@view_config(route_name='layer_group')
-def home(request):
-    return HTTPFound(location=request.route_url('layer_group.show', id=0))
-
-
-@view_config(route_name='layer_group.show', renderer='psection.mako')
-@model_context(LayerGroup)
-@model_permission('layer_group:read')
-def show(request, obj):
-    return dict(
-        obj=obj,
-        sections=request.env.layer_group.layer_group_page_sections
-    )
-
-permalinker(LayerGroup, 'layer_group.show')
-
-
-@view_config(route_name='layer_group.edit_security')
-@view_config(route_name='layer_group.show_security')
-@model_context(LayerGroup)
-@model_permission('layer_group:security')
-def edit_security_proxy(request, obj):
-    from ..security.views import acl_editor_view
-    return acl_editor_view(request, obj, obj.acl)
-
-
-@view_config(route_name="api.layer_group.tree", renderer='json')
-@model_context(LayerGroup)
-def api_layer_group_tree(request, obj):
-
-    def traverse(layer_group):
-        return dict(
-            type='layer_group', id=layer_group.id,
-            display_name=layer_group.display_name,
-            children=[traverse(c) for c in layer_group.children],
-            layers=[
-                dict(
-                    type='layer', id=l.id,
-                    display_name=l.display_name,
-                    styles=[
-                        dict(
-                            type='style', id=s.id,
-                            display_name=s.display_name
-                        ) for s in l.styles
-                    ]
-                ) for l in layer_group.layers
-            ]
-        )
-
-    return traverse(obj)
-
 
 def setup_pyramid(comp, config):
+    DBSession = comp.env.core.DBSession
+    ACLController = comp.env.security.ACLController
+
+    LayerGroup = comp.LayerGroup
+
+    ACLController(LayerGroup).includeme(config)
+    
+    def layer_group_home(request):
+        return HTTPFound(location=request.route_url('layer_group.show', id=0))
+
+    config.add_route('layer_group', '/layer_group/').add_view(layer_group_home)
+
+    @model_context(LayerGroup)
+    def show(request, obj):
+        return dict(
+            obj=obj,
+            sections=request.env.layer_group.layer_group_page_sections
+        )
+
+    config.add_route('layer_group.show', '/layer_group/{id:\d+}') \
+        .add_view(show, renderer="psection.mako")
+
+    @model_context(LayerGroup)
+    def api_layer_group_tree(request, obj):
+
+        def traverse(layer_group):
+            return dict(
+                type='layer_group', id=layer_group.id,
+                display_name=layer_group.display_name,
+                children=[traverse(c) for c in layer_group.children],
+                layers=[
+                    dict(
+                        type='layer', id=l.id,
+                        display_name=l.display_name,
+                        styles=[
+                            dict(
+                                type='style', id=s.id,
+                                display_name=s.display_name
+                            ) for s in l.styles
+                        ]
+                    ) for l in layer_group.layers
+                ]
+            )
+
+        return traverse(obj)
+
+    config.add_route('api.layer_group.tree', '/api/layer_group/{id:\d+}/tree') \
+        .add_view(api_layer_group_tree, renderer="json")
+
+    permalinker(LayerGroup, 'layer_group.show')
+    
+    LayerGroup.object_widget = (
+        ('layer_group', LayerGroupObjectWidget),
+        ('description', DescriptionObjectWidget),
+        ('delete', DeleteObjectWidget),
+    )
 
     class LayerGroupController(ModelController):
 
@@ -164,7 +159,11 @@ def setup_pyramid(comp, config):
         ),
         dm.Link(
             'operation/delete', u"Удалить",
-            lambda args: args.request.route_url('layer_group.edit', id=args.obj.id)
+            lambda args: args.request.route_url('layer_group.delete', id=args.obj.id)
+        ),
+        dm.Link(
+            'operation/acl', u"Управление доступом",
+            lambda args: args.request.route_url('layer_group.acl', id=args.obj.id)
         ),
    )
 
@@ -174,4 +173,11 @@ def setup_pyramid(comp, config):
         key='children',
         priority=0,
         template="nextgisweb:templates/layer_group/section_children.mako"
+    )
+
+    comp.layer_group_page_sections.register(
+        key='permissions',
+        priority=90,
+        title=u"Права пользователя",
+        template="security/section_resource_permissions.mako"
     )

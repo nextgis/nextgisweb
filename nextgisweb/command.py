@@ -28,7 +28,5 @@ class InitializeDBCmd():
 
             Base.metadata.create_all(DBSession.connection())
 
-            # TODO: Использовать компоненты из env
-            for impl in Component.registry:
-                if hasattr(impl, 'initialize_db'):
-                    impl.initialize_db(DBSession)
+            for comp in env.chain('initialize_db'):
+                comp.initialize_db()

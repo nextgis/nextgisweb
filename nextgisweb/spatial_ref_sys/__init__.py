@@ -9,8 +9,10 @@ from .models import SRS, SRSMixin
 class SpatialRefSysComponent(Component):
     identity = 'spatial_ref_sys'
 
-    @classmethod
-    def initialize_db(cls, DBSession):
+    def initialize_db(self):
+        DBSession = self.env.core.DBSession
+        SRS = self.SRS
+
         srs_list = (
             # TODO: Закомментировано до лучших времен
             # SRS(id=4326, display_name="WGS 84 / Lon-lat (EPSG:4326)"),

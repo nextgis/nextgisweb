@@ -12,6 +12,7 @@ requires = [
     'zope.interface',
     'bunch',
     'waitress',
+    'nose',
 
     'numpy',
     'gdal',

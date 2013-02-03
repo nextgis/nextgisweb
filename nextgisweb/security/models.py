@@ -1,119 +1,215 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
+
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
-from ..models.base import Base
 
-tab_scope_category = sa.Table(
-    'permission_scope_category', Base.metadata,
-    sa.Column('scope_keyname', sa.Unicode, sa.ForeignKey('permission_scope.keyname'), nullable=False),
-    sa.Column('category_keyname', sa.Unicode, sa.ForeignKey('permission_category.keyname'), nullable=False)
-)
+class PMATCH(object):
+    USER = 'U'
+    GROUP = 'G'
 
 
-class PermissionScope(Base):
-    """
-    Область применения прав доступа, состояща из групп.
-
-    Идея состоит в следующем. Одни и те же группы прав могут применяться к
-    различным объектам, особеннов случае наследования прав по иерархии.  """
-
-    __tablename__ = 'permission_scope'
-
-    keyname = sa.Column(sa.Unicode, primary_key=True)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-
-    categories = orm.relationship(
-        'PermissionCategory',
-        secondary=tab_scope_category,
-        backref=orm.backref('scopes')
-    )
+class POPER(object):
+    DENY = 'D'
+    ALLOW = 'A'
+    INHERIT = 'I'
 
 
-class PermissionCategory(Base):
-    __tablename__ = 'permission_category'
-
-    keyname = sa.Column(sa.Unicode, primary_key=True)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-
-    permissions = orm.relationship('Permission', lazy='joined')
+PERMISSION_ALL = ''
 
 
-class Permission(Base):
-    __tablename__ = 'permission'
+def permission_set(itemstack, permissions=None):
+    slots = defaultdict(dict)
 
-    category_keyname = sa.Column(
-        sa.Unicode,
-        sa.ForeignKey(PermissionCategory.keyname),
-        primary_key=True)
-    keyname = sa.Column(sa.Unicode, primary_key=True)
-    display_name = sa.Column(sa.Unicode, nullable=False)
+    resetnext = set()
 
-    category = orm.relationship(PermissionCategory)
+    for level_items in itemstack:
 
-    def __unicode__(self):
-        return '%s:%s' % (self.category.display_name, self.display_name)
+        # Разворачиваем элементы с PERMISSION_ALL
+        items = []
+        for itm in level_items:
+            perm, match, oper, prop = itm
 
+            if perm != PERMISSION_ALL:
+                items.append(itm)
 
-class ACL(Base):
-    __tablename__ = 'acl'
+            else:
+                assert permissions is not None
+                for perm in permissions:
+                    items.append((perm, match, oper, prop))
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    parent_id = sa.Column(sa.Integer, sa.ForeignKey('acl.id'))
-    user_id = sa.Column(sa.Integer, sa.ForeignKey('auth_user.principal_id'))
-    scope_keyname = sa.Column(sa.Unicode, sa.ForeignKey(PermissionScope.keyname))
+        # Сбрасываем элементы без распространения
+        for perm, match, oper in resetnext:
+            reset = []
 
-    parent = orm.relationship('ACL', remote_side=[id, ])
-    user = orm.relationship('User')
-    items = orm.relationship('ACLItem')
+            if oper == POPER.INHERIT:
+                reset.append((match, POPER.ALLOW))
+                reset.append((match, POPER.DENY))
 
-    def get_effective_permissions(self, user):
-        resultset = set()
+                # Сброс распространенных разрешений по пользователю
+                # так же сбрасывет разрешения полученные по группе
+                if match == PMATCH.USER:
+                    reset.append((PMATCH.GROUP, POPER.ALLOW))
+                    reset.append((PMATCH.GROUP, POPER.DENY))
 
-        def traverse_items(start):
-            if start.parent:
-                for i in traverse_items(start.parent):
-                    yield i
+            else:
+                # Предотвращаем распространение
+                reset.append((match, oper))
 
-            for i in start.items:
-                yield i
+            for row in reset:
+                slots[perm][row] = False
 
-        for item in traverse_items(self):
-            if item.principal == user or item.principal in user.member_of:
-                if item.permission_keyname == '*':
-                    for p in item.category.permissions:
-                        if p.keyname != '*':
-                            resultset.add('%s:%s' % (item.category_keyname, p.keyname))
-                else:
-                    resultset.add('%s:%s' % (item.category_keyname, item.permission_keyname))
+        resetnext = set()
 
-        return resultset
+        for item in items:
+            perm, match, oper, prop = item
 
+            if oper in (POPER.DENY, POPER.ALLOW):
+                slots[perm][(match, oper)] = True
 
-class ACLItem(Base):
-    __tablename__ = 'acl_item'
+            # На следующей итерации пректарим распространение
+            if not prop:
+                resetnext.add((perm, match, oper))
 
-    acl_id = sa.Column(sa.Integer, sa.ForeignKey(ACL.id), primary_key=True)
-    principal_id = sa.Column(sa.Integer, sa.ForeignKey('auth_principal.id'), primary_key=True)
-    category_keyname = sa.Column(sa.Unicode, sa.ForeignKey(PermissionCategory.keyname), primary_key=True)
-    permission_keyname = sa.Column(sa.Unicode, primary_key=True)
+    result = set()
 
-    __table_args__ = (
-        sa.ForeignKeyConstraint(
-            (category_keyname, permission_keyname),
-            (Permission.category_keyname, Permission.keyname)
-        ),
-    )
+    for perm, val in slots.iteritems():
+        v = lambda k: val.get(tuple(k), False)
 
-    acl = orm.relationship('ACL')
-    principal = orm.relationship('Principal')
-    category = orm.relationship('PermissionCategory', lazy='joined')
-    permission = orm.relationship('Permission', lazy='joined')
+        if (
+            (v('UA') and not v('UD'))
+            or (v('GA') and not v('GD') and not v('UD'))
+        ):
+            result.add(perm)
+
+    return result
 
 
-class ACLGlobal(Base):
-    __tablename__ = 'acl_global'
+def initialize(comp):
+    Base = comp.env.core.Base
+    User = comp.env.auth.User
+    Group = comp.env.auth.Group
 
-    keyname = sa.Column(sa.Unicode, primary_key=True)
-    acl_id = sa.Column(sa.Integer, sa.ForeignKey(ACL.id), nullable=False)
-    display_name = sa.Column(sa.Unicode)
+    class ACL(Base):
+        __tablename__ = 'acl'
+
+        id = sa.Column(sa.Integer, primary_key=True)
+        parent_id = sa.Column(sa.Integer, sa.ForeignKey('acl.id'), nullable=True)
+        owner_user_id = sa.Column(sa.ForeignKey('auth_user.principal_id'))
+        resource = sa.Column(sa.Unicode, nullable=False)
+
+        parent = orm.relationship('ACL', remote_side=[id, ])
+        owner_user = orm.relationship('User')
+        items = orm.relationship(
+            'ACLItem',
+            cascade='all, delete-orphan',
+            passive_deletes=True,
+            backref=orm.backref('acl')
+        )
+
+        def update(self, items, replace=False):
+            operations = dict(map(lambda itm: (itm[:-1], itm[-1]), items))
+
+            # Исправляем существующие записи
+            seen = set()
+            remove = list()
+            for item in self.items:
+                key = (item.principal_id, item.resource, item.permission)
+
+                if key in operations:
+                    item.operation = operations[key]
+                    seen.add(key)
+
+                elif replace:
+                    remove.append(item)
+
+            # Удаляем отмеченные для удаления записи
+            for i in remove:
+                self.items.remove(i)
+
+            # Добавляем новые
+            for key, operation in operations.iteritems():
+                if key not in seen:
+                    self.items.append(ACLItem(
+                        **dict(zip(
+                            ('principal_id', 'resource', 'permission'),
+                            key
+                        ), operation=operation)
+                    ))
+
+        def permission_set(self, user):
+            itemstack = []
+
+            acl = self
+            while acl:
+                items = []
+                itemstack.insert(0, items)
+
+                for itm in acl.items:
+                    if itm.resource != self.resource:
+                        continue
+
+                    if (
+                        isinstance(itm.principal, User)
+                        and itm.principal == user
+                    ):
+                        match = PMATCH.USER
+                    
+                    elif (
+                        isinstance(itm.principal, Group)
+                        and itm.principal.is_member(user)
+                    ):
+                        match = PMATCH.GROUP
+                    
+                    else:
+                        continue
+
+                    items.append((
+                        itm.permission,
+                        match,
+                        itm.poper,
+                        itm.propagate
+                    ))
+
+                acl = acl.parent
+
+            print itemstack
+            return permission_set(
+                itemstack,
+                permissions=comp.permissions[self.resource].keys()
+            )
+
+    comp.ACL = ACL
+
+    class ACLItem(Base):
+        __tablename__ = 'acl_item'
+
+        acl_id = sa.Column(sa.Integer, sa.ForeignKey(ACL.id, ondelete="CASCADE"), primary_key=True)
+        principal_id = sa.Column(sa.Integer, sa.ForeignKey('auth_principal.id'), primary_key=True)
+        resource = sa.Column(sa.Unicode, primary_key=True)
+        permission = sa.Column(sa.Unicode, primary_key=True)
+        operation = sa.Column(sa.Unicode, primary_key=True)
+
+        principal = orm.relationship('Principal')
+
+        @property
+        def poper(self):
+            if self.operation.startswith('allow-'):
+                return POPER.ALLOW
+
+            elif self.operation.startswith('deny-'):
+                return POPER.DENY
+
+            elif self.operation.startswith('inherit-'):
+                return POPER.INHERIT
+
+        @property
+        def propagate(self):
+            if self.operation.endswith('-subtree'):
+                return True
+
+            elif self.operation.endswith('-node'):
+                return False
+
+    comp.ACLItem = ACLItem

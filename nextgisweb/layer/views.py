@@ -12,8 +12,6 @@ from ..object_widget import ObjectWidget, CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
 from ..psection import PageSections
 
-from .models import Layer
-
 
 class LayerObjectWidget(LayerGroupObjectWidget):
     # Виджет редактирования основных параметров слоя -
@@ -21,45 +19,18 @@ class LayerObjectWidget(LayerGroupObjectWidget):
     pass
 
 
-Layer.object_widget = (
-    (Layer.identity, LayerObjectWidget),
-    ('description', DescriptionObjectWidget),
-    ('delete', DeleteObjectWidget),
-)
-
-
-@view_config(route_name='layer')
-def home(request):
-    raise HTTPFound(location=request.route_url('layer_group'))
-
-
-@view_config(route_name='layer.show', renderer='psection.mako')
-@model_context(Layer)
-def show(request, obj):
-    actual_class = Layer.registry[obj.cls]
-    obj = DBSession.query(Layer) \
-        .with_polymorphic((actual_class, ))\
-        .filter_by(id=obj.id).one()
-
-    return dict(
-        obj=obj,
-        sections=request.env.layer.layer_page_sections,
-        custom_layout=True if 'no_layout' in request.GET else False,
-    )
-
-
-permalinker(Layer, 'layer.show')
-
-
-@view_config(route_name='layer.security')
-@model_context(Layer)
-def security_proxy(request, obj):
-    from ..security.views import acl_editor_view
-    return acl_editor_view(request, obj, obj.acl)
-
 
 def setup_pyramid(comp, config):
-    from ..layer_group import LayerGroup
+    ACL = comp.env.security.ACL
+    ACLController = comp.env.security.ACLController
+    LayerGroup = comp.env.layer_group.LayerGroup
+    Layer = comp.Layer
+ 
+    Layer.object_widget = (
+        (Layer.identity, LayerObjectWidget),
+        ('description', DescriptionObjectWidget),
+        ('delete', DeleteObjectWidget),
+    )
 
     class LayerController(ModelController):
         
@@ -67,6 +38,7 @@ def setup_pyramid(comp, config):
             layer_group = DBSession.query(LayerGroup).filter_by(id=request.GET['layer_group_id']).one()
             identity = request.GET['identity']
             cls = Layer.registry[identity]
+            user = request.user
             template_context = dict(
                 obj=layer_group,
                 subtitle=u"Новый слой",
@@ -94,7 +66,7 @@ def setup_pyramid(comp, config):
 
         def create_object(self, context):
             return context['cls'](
-                layer_group=context['layer_group']
+                layer_group=context['layer_group'],
             )
 
         def query_object(self, context):
@@ -103,8 +75,14 @@ def setup_pyramid(comp, config):
         def template_context(self, context):
             return context['template_context']
 
-    LayerController('layer') \
-        .includeme(config)
+    LayerController('layer').includeme(config)
+
+    ACLController(Layer).includeme(config)
+
+    def layer_home(request):
+        raise HTTPFound(location=request.route_url('layer_group'))
+
+    config.add_route('layer', '/layer/').add_view(layer_home)
 
     def store_api(request):
         query = DBSession.query(Layer)
@@ -116,6 +94,22 @@ def setup_pyramid(comp, config):
     config.add_route('layer.store_api', '/layer/store_api')
     config.add_view(store_api, route_name='layer.store_api', renderer='json')
 
+    @model_context(Layer)
+    def show(request, obj):
+        actual_class = Layer.registry[obj.cls]
+        obj = DBSession.query(Layer) \
+            .with_polymorphic((actual_class, ))\
+            .filter_by(id=obj.id).one()
+
+        return dict(
+            obj=obj,
+            sections=request.env.layer.layer_page_sections,
+            custom_layout=True if 'no_layout' in request.GET else False,
+        )
+
+    config.add_route('layer.show', '/layer/{id:\d+}') \
+        .add_view(show, renderer='psection.mako')
+
     comp.layer_menu = dm.DynMenu(
         dm.Label('operation', u"Операции"),
         dm.Link(
@@ -125,6 +119,10 @@ def setup_pyramid(comp, config):
         dm.Link(
             'operation/delete', u"Удалить",
             lambda args: args.request.route_url('layer.delete', id=args.obj.id)
+        ),
+        dm.Link(
+            'operation/acl', u"Управление доступом",
+            lambda args: args.request.route_url('layer.acl', id=args.obj.id)
         ),
         
         dm.Label('data', u"Данные"),
@@ -173,9 +171,17 @@ def setup_pyramid(comp, config):
     )
 
     comp.layer_page_sections.register(
+        key='permissions',
+        priority=90,
+        title=u"Права пользователя",
+        template="security/section_resource_permissions.mako"
+    )
+
+    comp.layer_page_sections.register(
         key='description',
         priority=100,
         title=u"Описание",
         template="nextgisweb:templates/layer/section_description.mako"
     )
 
+    permalinker(Layer, 'layer.show')

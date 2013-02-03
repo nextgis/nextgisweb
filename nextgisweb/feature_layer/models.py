@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
 from ..models import Base
-from ..layer import Layer
 
 from .interface import FIELD_TYPE
 
@@ -14,7 +13,7 @@ class LayerField(Base):
     __tablename__ = 'layer_field'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), nullable=False)
+    layer_id = sa.Column(sa.Integer, sa.ForeignKey('layer.id'), nullable=False)
     cls = sa.Column(sa.Unicode, nullable=False)
 
     idx = sa.Column(sa.Integer, nullable=False)
@@ -32,7 +31,7 @@ class LayerField(Base):
 
     layer = orm.relationship(
         'Layer',
-        primaryjoin=(Layer.id == layer_id),
+        primaryjoin='Layer.id == LayerField.layer_id',
     )
 
     def __unicode__(self):

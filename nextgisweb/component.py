@@ -13,6 +13,9 @@ class Component(object):
     def initialize(self):
         pass
 
+    def initialize_db(self):
+        pass
+
     def setup_pyramid(self, config):
         pass
 
@@ -23,10 +26,6 @@ class Component(object):
     @property
     def settings(self):
         return self._settings
-
-    @classmethod
-    def initialize_database(cls, dbsession):
-        pass
 
     @classmethod
     def setup_routes(cls, dbsession):

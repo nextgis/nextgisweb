@@ -7,14 +7,14 @@ import geoalchemy as ga
 
 from osgeo import gdal, gdalconst, osr
 
-from ..layer import Layer, SpatialLayerMixin
+from ..layer import SpatialLayerMixin
 from ..spatial_ref_sys import SRS
 from ..file_storage import FileObj
 from ..models import DBSession
 
 
 def include(comp):
-
+    Layer = comp.env.layer.Layer
     file_storage = comp.env.file_storage
 
     @Layer.registry.register

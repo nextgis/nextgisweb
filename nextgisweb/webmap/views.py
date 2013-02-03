@@ -7,7 +7,6 @@ from bunch import Bunch
 from ..models import DBSession
 from .models import WebMap
 
-from ..layer_group import LayerGroup
 from ..object_widget import ObjectWidget
 from ..views import ModelController, model_loader, permalinker
 from .. import dynmenu as dm
@@ -95,6 +94,8 @@ def display(request, obj):
 @view_config(route_name='webmap.layer_hierarchy', renderer='json')
 @model_loader(WebMap)
 def layer_hierarchy(request, obj):
+    LayerGroup = request.env.layer_group.LayerGroup
+
     def children(parent):
         result = []
         for i in parent.children:
@@ -112,19 +113,6 @@ def layer_hierarchy(request, obj):
         label='display_name',
         items=children(DBSession.query(LayerGroup).filter_by(id=0).one())
     )
-
-
-@view_config(route_name='api.webmap.item.retrive', renderer='json')
-@model_loader(WebMap)
-def api_webmap_item_retrive(request, obj):
-    return obj.to_dict()
-
-
-@view_config(route_name='api.webmap.item.replace', renderer='json')
-@model_loader(WebMap)
-def api_webmap_item_replace(request, obj):
-    obj.from_dict(request.json_body)
-
 
 
 class WebmapObjectWidget(ObjectWidget):
@@ -189,7 +177,7 @@ def setup_pyramid(comp, config):
     def show(request, obj):
         return dict(obj=obj)
 
-    config.add_route('webmap.show', '/webmap/{id}')
+    config.add_route('webmap.show', '/webmap/{id:\d+}')
     config.add_view(show, route_name='webmap.show', renderer='obj.mako')
 
     class WebMapMenu(dm.DynItem):

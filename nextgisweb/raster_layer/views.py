@@ -3,10 +3,10 @@ from shutil import copyfileobj
 
 from osgeo import gdal, gdalconst
 
-from ..layer import Layer
 from ..object_widget import ObjectWidget
 
 def include(comp):
+    Layer = comp.env.layer.Layer
     file_upload = comp.env.file_upload
 
     class RasterLayerObjectWidget(ObjectWidget):

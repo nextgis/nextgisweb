@@ -115,7 +115,7 @@ def setup_pyramid(comp, config):
             custom_layout=True
         )
 
-    config.add_route('feature_layer.feature.browse', '/layer/{id}/feature/')
+    config.add_route('feature_layer.feature.browse', '/layer/{id:\d+}/feature/')
     config.add_view(browse, route_name='feature_layer.feature.browse', renderer='feature_layer/feature_browse.mako')
 
     @model_context(comp.env.layer.Layer)
@@ -166,14 +166,14 @@ def setup_pyramid(comp, config):
             subtitle=u"Объект: %s" % unicode(feature),
         )
 
-    config.add_route('feature_layer.feature.edit', '/layer/{id}/feature/{feature_id}/edit')
+    config.add_route('feature_layer.feature.edit', '/layer/{id:\d+}/feature/{feature_id}/edit')
     config.add_view(edit, route_name='feature_layer.feature.edit', renderer='model_widget.mako')
 
     @model_context(comp.env.layer.Layer)
     def field(request, layer):
         return [f.to_dict() for f in layer.fields]
 
-    config.add_route('feature_layer.field', 'layer/{id}/field/')
+    config.add_route('feature_layer.field', 'layer/{id:\d+}/field/')
     config.add_view(field, route_name='feature_layer.field', renderer='json')
 
     @model_context(comp.env.layer.Layer)
@@ -203,7 +203,7 @@ def setup_pyramid(comp, config):
             headerlist=headerlist
         )
 
-    config.add_route('feature_layer.store_api', '/layer/{id}/store_api/')
+    config.add_route('feature_layer.store_api', '/layer/{id:\d+}/store_api/')
     config.add_view(store_api, route_name='feature_layer.store_api')
 
     @model_context(comp.env.layer.Layer)
@@ -239,7 +239,7 @@ def setup_pyramid(comp, config):
             content_type='application/json'
         )
 
-    config.add_route('feature_layer.feature_get', '/layer/{id}/store_api/{feature_id}')
+    config.add_route('feature_layer.feature_get', '/layer/{id:\d+}/store_api/{feature_id:\d+}')
     config.add_view(store_get_item, route_name='feature_layer.feature_get')
 
     def feature_show(request):
@@ -258,7 +258,7 @@ def setup_pyramid(comp, config):
             feature=feature,
         )
 
-    config.add_route('feature_layer.feature.show', '/layer/{layer_id}/feature/{id}')
+    config.add_route('feature_layer.feature.show', '/layer/{layer_id:\d+}/feature/{id:\d+}')
     config.add_view(feature_show, route_name='feature_layer.feature.show', renderer='feature_layer/feature_show.mako')
 
     def client_settings(self, request):

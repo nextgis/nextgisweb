@@ -1,71 +1,50 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
-from ..security import SecurityProvider
+from ..security import PERMISSION_ALL
 
-from .. import layer_group
-
-from .models import Layer, SpatialLayerMixin
+from .models import SpatialLayerMixin
 from . import views
 
 @Component.registry.register
-@SecurityProvider.registry.register
 class LayerComponent(Component):
     identity = 'layer'
 
-    # Component
-    # =================================
-
-    @classmethod
-    def initialize_db(cls, dbsession):
-        pass
-
-    @classmethod
-    def setup_routes(cls, config):
-        config.add_route('layer', '/layer/')
-        config.add_route('layer.show', '/layer/{id}')
-        config.add_route('layer.security', '/layer/{id}/security')
-
-    @require('layer_group')
+    @require('layer_group', 'security')
     def initialize(self):
-        super(LayerComponent, self).initialize()
-
         from . import models
         models.initialize(self)
+
+        security = self.env.security
+
+        security.add_resource('layer', label=u"Слой")
+
+        security.add_permission('layer', 'data-read', label=u"Чтение данных")
+        security.add_permission('layer', 'data-edit', label=u"Изменение данных")
+        security.add_permission('layer', 'metadata-view', label=u"Чтение метаданных")
+        security.add_permission('layer', 'metadata-edit', label=u"Изменение метаданных")
+
+        security.add_resource_child('layer_group', 'layer')
+
+    @require('layer_group_root', 'auth')
+    def initialize_db(self):
+        DBSession = self.env.core.DBSession
+        LayerGroup = self.env.layer_group.LayerGroup
+        User = self.env.auth.User
+        Group = self.env.auth.Group
+
+        root = DBSession.query(LayerGroup).filter_by(id=0).one()
+
+        administrators = DBSession.query(Group).filter_by(keyname='administrators').one()
+        root.acl.update((
+            (administrators.id, 'layer', PERMISSION_ALL, 'allow-subtree'),
+        ))
+
+        owner = DBSession.query(User).filter_by(keyname='owner').one()
+        root.acl.update((
+            (owner.id, 'layer', PERMISSION_ALL, 'allow-subtree'),
+        ))
 
     @require('layer_group')
     def setup_pyramid(self, config):
         from . import views
         views.setup_pyramid(self, config)
-
-
-    # SecurityProvider
-    # =================================
-
-    @classmethod
-    def permission_scopes(cls):
-        return (
-            ('layer', u"Слой"),
-        )
-
-    @classmethod
-    def permission_categories(cls):
-        return (
-            ('layer', u"Слой", ('layer_group', 'layer')),
-        )
-
-    @classmethod
-    def permission_caterories(cls):
-        return (
-            ('layer', 'layer'),
-            ('layer_group', 'layer'),
-        )
-
-    @classmethod
-    def permissions(cls):
-        return (
-            ('layer', 'meta_read', u"Чтение метаданных"),
-            ('layer', 'meta_write', u"Изменение метаданных"),
-            ('layer', 'data_read', u"Чтение данных"),
-            ('layer', 'data_write', u"Изменение данных"),
-            ('layer', 'data_export', u"Экспорт данных"),
-        )

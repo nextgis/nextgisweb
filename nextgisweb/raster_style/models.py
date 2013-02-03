@@ -5,12 +5,13 @@ import numpy
 from osgeo import gdal_array
 import PIL
 
-from ..style import Style
 
 
 def include(comp):
-    RasterLayer = comp.env.raster_layer.RasterLayer
     DBSession = comp.env.core.DBSession
+    Style = comp.env.style.Style
+    
+    RasterLayer = comp.env.raster_layer.RasterLayer
 
     @Style.registry.register
     class RasterStyle(Style):
