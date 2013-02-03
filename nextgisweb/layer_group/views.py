@@ -112,6 +112,8 @@ def setup_pyramid(comp, config):
             parent = LayerGroup.filter_by(id=request.GET['parent_id']).one()
             request.require_permission(parent, 'create')
 
+            owner_user = request.user
+
             template_context = dict(
                 obj=parent,
                 subtitle=u"Новая группа слоёв",
@@ -143,7 +145,10 @@ def setup_pyramid(comp, config):
             return Composite
 
         def create_object(self, context):
-            return LayerGroup(parent=context['parent'])
+            return LayerGroup(
+                parent=context['parent'],
+                owner_user=context['owner_user']
+            )
 
         def query_object(self, context):
             return context['obj']
