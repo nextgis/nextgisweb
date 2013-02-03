@@ -224,15 +224,23 @@ define([
                 { 
                     field: "_item", name: "Ресурс", width: "30%",
                     formatter: function (item) {
-                        return securitySchema[itemStore.getValue(item, 'resource')]
-                            .label
+                        var resource = itemStore.getValue(item, 'resource'),
+                            permission = itemStore.getValue(item, 'permission');
+
+                        return (permission == '' ? '<b>' : '' ) +
+                            securitySchema[resource].label +
+                            (permission == '' ? '</b>' : '' )
                     }
                 }, { 
                     field: "_item", name: "Право", width: "70%",
                     formatter: function (item) {
-                        return securitySchema[itemStore.getValue(item, 'resource')]
-                            .permissions[itemStore.getValue(item, 'permission')]
-                            .label
+                        var resource = itemStore.getValue(item, 'resource'),
+                            permission = itemStore.getValue(item, 'permission');
+
+                        return (permission == '' ? '<b>' : '' ) +
+                            securitySchema[resource]
+                            .permissions[permission]
+                            .label + (permission == '' ? '</b>' : '' )
                     }
                 },
                 { field: "allow", name: 'Р', width: "16px", editable: true, cellType: cells.Bool, styles: 'text-align: center;'},
