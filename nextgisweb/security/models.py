@@ -3,6 +3,7 @@ from collections import defaultdict
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from sqlalchemy.ext.declarative import declared_attr
 
 
 class PMATCH(object):
@@ -108,6 +109,15 @@ def initialize(comp):
             backref=orm.backref('acl')
         )
 
+        def __init__(self, *args, **kwargs):
+            super(ACL, self).__init__(*args, **kwargs)
+
+            self._permset_cache = dict()
+
+        @orm.reconstructor
+        def orm_init(self):
+            self._permset_cache = dict()
+
         def update(self, items, replace=False):
             operations = dict(map(lambda itm: (itm[:-1], itm[-1]), items))
 
@@ -138,7 +148,13 @@ def initialize(comp):
                         ), operation=operation)
                     ))
 
+            # Сбрасываем кэш
+            self._permset_cache = dict()
+
         def permission_set(self, user):
+            if user.id in self._permset_cache:
+                return self._permset_cache[user.id]
+
             itemstack = []
 
             acl = self
@@ -155,13 +171,13 @@ def initialize(comp):
                         and itm.principal == user
                     ):
                         match = PMATCH.USER
-                    
+
                     elif (
                         isinstance(itm.principal, Group)
                         and itm.principal.is_member(user)
                     ):
                         match = PMATCH.GROUP
-                    
+
                     else:
                         continue
 
@@ -174,11 +190,22 @@ def initialize(comp):
 
                 acl = acl.parent
 
-            print itemstack
-            return permission_set(
+            result = permission_set(
                 itemstack,
                 permissions=comp.permissions[self.resource].keys()
             )
+
+            self._permset_cache = result
+            return result
+
+        def has_permission(self, user, *permissions):
+            permset = self.permission_set(user)
+
+            for permission in permissions:
+                if permission not in permset:
+                    return False
+
+            return True
 
     comp.ACL = ACL
 
@@ -213,3 +240,42 @@ def initialize(comp):
                 return False
 
     comp.ACLItem = ACLItem
+
+    class ACLMixin(object):
+
+        @declared_attr
+        def acl_id(cls):
+            return sa.Column(sa.ForeignKey(ACL.id), nullable=False)
+
+        @declared_attr
+        def acl(cls):
+            return orm.relationship(
+                ACL,
+                cascade='all',
+                lazy='joined'
+            )
+
+        def __init__(self, *args, **kwargs):
+
+            if 'acl' not in kwargs and 'acl_id' not in kwargs:
+
+                parent_attr = self.__acl_parent_attr__
+                aclkwargs = dict(resource=self.__acl_resource__)
+
+                if parent_attr in kwargs:
+                    aclkwargs['parent_id'] = kwargs[parent_attr].acl_id
+
+                if 'owner_user' in kwargs:
+                    aclkwargs['owner_user'] = kwargs['owner_user']
+                    del kwargs['owner_user']
+
+                elif 'owner_user_id' in kwargs:
+                    aclkwargs['owner_user_id'] = kwargs['owner_user_id']
+                    del kwargs['owner_user_id']
+
+                acl = ACL(**aclkwargs)
+                kwargs['acl'] = acl
+
+            super(ACLMixin, self).__init__(*args, **kwargs)
+
+    comp.ACLMixin = ACLMixin

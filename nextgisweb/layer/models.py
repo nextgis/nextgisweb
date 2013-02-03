@@ -9,20 +9,20 @@ from ..spatial_ref_sys import SRSMixin
 
 def initialize(comp):
     LayerGroup = comp.env.layer_group.LayerGroup
-    ACL = comp.env.security.ACL
+    ACLMixin = comp.env.security.ACLMixin
 
-    class Layer(Base):
+    class Layer(ACLMixin, Base):
         __tablename__ = 'layer'
+
+        __acl_resource__ = 'layer'
+        __acl_parent_attr__ = 'layer_group'
 
         id = sa.Column(sa.Integer, primary_key=True)
         keyname = sa.Column(sa.Unicode, unique=True)
         layer_group_id = sa.Column(sa.Integer, sa.ForeignKey(LayerGroup.id), nullable=False)
-        acl_id = sa.Column(sa.Integer, sa.ForeignKey('acl.id'), nullable=False)
         cls = sa.Column(sa.Unicode, nullable=False)
         display_name = sa.Column(sa.Unicode, nullable=False)
         description = sa.Column(sa.Unicode, default=u'', nullable=False)
-
-        acl = orm.relationship('ACL', cascade='all')
 
         identity = __tablename__
         registry = registry_maker()
@@ -36,16 +36,6 @@ def initialize(comp):
             LayerGroup, uselist=False,
             backref=orm.backref('layers', order_by=display_name, cascade="all")
         )
-
-        def __init__(self, *args, **kwargs):
-            if not 'acl' in kwargs and not 'acl_id' in kwargs:
-                if 'layer_group' in kwargs:
-                    parent_acl = kwargs['layer_group'].acl
-                kwargs['acl'] = ACL(
-                    parent=parent_acl,
-                    resource='layer'
-                )
-            Base.__init__(self, *args, **kwargs)
 
         def __unicode__(self):
             return self.display_name
