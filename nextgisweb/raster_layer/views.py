@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
-from shutil import copyfileobj
-
 from osgeo import gdal, gdalconst
 
 from ..object_widget import ObjectWidget
 
+
 def include(comp):
-    Layer = comp.env.layer.Layer
     file_upload = comp.env.file_upload
 
     class RasterLayerObjectWidget(ObjectWidget):
-        
+
         def is_applicable(self):
             """ На текущий момент загрузка данных поддерживается
             только на этапе создания слоя, а этот виджет только
@@ -24,8 +22,10 @@ def include(comp):
             self.error = []
 
             supported_gdt = (gdalconst.GDT_Byte, )
-            supported_gdt_names = ''.join([gdal.GetDataTypeName(i) for i in supported_gdt])
-            
+            supported_gdt_names = ''.join(
+                [gdal.GetDataTypeName(i) for i in supported_gdt]
+            )
+
             def error(msg):
                 self.error.append(dict(message=msg))
 
@@ -36,8 +36,8 @@ def include(comp):
                 error(u"Библиотеке GDAL не удалось открыть загруженный файл.")
 
             else:
-                if self._ds.RasterCount != 3:
-                    error(u"Поддерживаются только растры из трех каналов.")
+                if self._ds.RasterCount not in (3, 4):
+                    error(u"Поддерживаются только растровые файлы RGB и RGBA.")
 
                 for b in range(1, self._ds.RasterCount + 1):
                     band = self._ds.GetRasterBand(b)
@@ -55,7 +55,6 @@ def include(comp):
 
             return result and (len(self.error) == 0)
 
-
         def populate_obj(self):
             ObjectWidget.populate_obj(self)
 
@@ -63,7 +62,7 @@ def include(comp):
 
             datafile, metafile = file_upload.get_filename(self.data['file']['id'])
             self.obj.load_file(datafile, self.request.env)
-        
+
         def widget_module(self):
             return 'raster_layer/Widget'
 
