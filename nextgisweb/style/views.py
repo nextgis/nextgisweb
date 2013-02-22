@@ -5,12 +5,13 @@ from pyramid.response import Response
 
 from bunch import Bunch
 
-from ..views import model_context, permalinker, model_loader, ModelController
+from ..views import model_context, permalinker, ModelController, DeleteObjectWidget
 from .. import dynmenu as dm
 from ..object_widget import ObjectWidget, CompositeWidget
 
 
 EPSG_3857_BOX = (-20037508.34, -20037508.34, 20037508.34, 20037508.34)
+
 
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
@@ -18,6 +19,9 @@ def setup_pyramid(comp, config):
     Style = comp.Style
 
     class StyleObjectWidget(ObjectWidget):
+
+        def is_applicable(self):
+            return self.operation in ('create', 'edit')
 
         def populate_obj(self):
             ObjectWidget.populate_obj(self)
@@ -35,7 +39,10 @@ def setup_pyramid(comp, config):
 
             return result
 
-    Style.object_widget = StyleObjectWidget
+    Style.object_widget = (
+        (Style.identity, StyleObjectWidget),
+        ('delete', DeleteObjectWidget),
+    )
 
     class StyleController(ModelController):
 
@@ -66,6 +73,9 @@ def setup_pyramid(comp, config):
             )
             return locals()
 
+        def delete_context(self, request):
+            return self.edit_context(request)
+
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):
                 model_class = context['cls']
@@ -87,7 +97,6 @@ def setup_pyramid(comp, config):
         'style',
         url_base='/layer/{layer_id:\d+}/style',
     ).includeme(config)
-
 
     @model_context(Style)
     def tms(reqest, obj):
