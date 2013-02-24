@@ -9,7 +9,7 @@ class ValidationError(Exception):
 
 class ObjectWidget(object):
 
-    def __init__(self, obj=None, operation=None):
+    def __init__(self, obj=None, operation=None, options=None):
         if not obj and not operation:
             operation = 'create'
         elif not operation:
@@ -19,8 +19,9 @@ class ObjectWidget(object):
         self.__obj_bind_flag = (obj is not None)
         self.__data_bind_flag = False
 
-        self.operation = operation
         self.obj = obj
+        self.operation = operation
+        self.options = options
 
     def is_applicable(self):
         return True
@@ -73,8 +74,8 @@ class CompositeWidget(ObjectWidget):
     subwidget_config = None
     model_class = None
 
-    def __init__(self, obj=None, operation=None):
-        ObjectWidget.__init__(self, obj=obj, operation=operation)
+    def __init__(self, obj=None, operation=None, options=None):
+        ObjectWidget.__init__(self, obj=obj, operation=operation, options=options)
 
         # Если у класса не установлен аттрибут subwidget_config,
         # то вычислим его исходя из model_class, если он есть.
@@ -83,7 +84,7 @@ class CompositeWidget(ObjectWidget):
 
         subwidgets = []
         for k, cls in self.subwidget_config:
-            instance = cls(obj=obj, operation=operation)
+            instance = cls(obj=obj, operation=operation, options=options)
             if instance.is_applicable():
                 subwidgets.append((k, instance))
 

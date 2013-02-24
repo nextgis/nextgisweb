@@ -51,7 +51,10 @@ class ModelController(object):
         context = self.create_context(request)
 
         widget_class = self.widget_class(context, 'create')
-        widget = widget_class(operation='create')
+        widget = widget_class(
+            operation='create',
+            options=context.get('widget_options', None)
+        )
 
         if request.method == 'POST':
             widget.bind(data=request.json_body, request=request)
@@ -91,7 +94,11 @@ class ModelController(object):
         obj = self.query_object(context)
 
         widget_class = self.widget_class(context, 'edit')
-        widget = widget_class(obj=obj, operation='edit')
+        widget = widget_class(
+            obj=obj,
+            operation='edit',
+            options=context.get('widget_options', None)
+        )
 
         if request.method == 'POST':
             widget.bind(data=request.json_body, request=request)
@@ -126,7 +133,11 @@ class ModelController(object):
         obj = self.query_object(context)
 
         widget_class = self.widget_class(context, 'delete')
-        widget = widget_class(obj=obj, operation='delete')
+        widget = widget_class(
+            obj=obj,
+            operation='delete',
+            options=context.get('widget_options', None)
+        )
 
         if request.method == 'POST':
             widget.bind(data=request.json_body, request=request)

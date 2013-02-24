@@ -61,6 +61,9 @@ def setup_pyramid(comp, config):
                 )),
                 subtitle=u"Новый стиль",
             )
+
+            widget_options = dict(layer=layer)
+            
             return locals()
 
         def edit_context(self, request):
@@ -68,9 +71,13 @@ def setup_pyramid(comp, config):
             identity = obj.cls
             cls = Style.registry[identity]
             obj = DBSession.query(cls).get(obj.id)
+            
             template_context = dict(
                 obj=obj,
             )
+
+            widget_options = dict(layer=obj.layer)
+
             return locals()
 
         def delete_context(self, request):
