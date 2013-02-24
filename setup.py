@@ -22,8 +22,7 @@ requires = [
     'geojson',
     'PIL',
     'lxml',
-    
-    ]
+]
 
 components = (
     'core',
@@ -37,6 +36,7 @@ components = (
     'feature_description',
     'feature_photo',
     'style',
+    'marker_library',
     'webmap',
     'layer_group.root',
     'file_storage',

@@ -2,7 +2,6 @@
 import os
 
 from ..component import Component
-from ..models import DBSession
 
 from .models import FileObj
 
@@ -10,6 +9,10 @@ from .models import FileObj
 @Component.registry.register
 class FileStorageComponent(Component):
     identity = 'file_storage'
+
+    def initialize(self):
+        super(FileStorageComponent, self).initialize()
+        self.FileObj = FileObj
 
     def fileobj(self, component):
         obj = FileObj(component=component)
