@@ -20,7 +20,7 @@ class MarkerLibraryComponent(Component):
 
     @require('file_storage')
     def initialize_db(self):
-        pass
+        self.load_collection('nextgisweb', 'marker_library/sjjb')
 
     def load_collection(self, package, path, keyname=None, display_name=None):
         if not keyname:
