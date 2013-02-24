@@ -467,7 +467,7 @@ define([
                 queryOptions: {deep: true},
                 onItem: function (item) {
                     widget._layerSetup(item);
-                    widget._layer_order.push(store.getValue(item, "id"));
+                    widget._layer_order.unshift(store.getValue(item, "id"));
                 },
                 onComplete: function () {
                     widget._layersDeferred.resolve();
