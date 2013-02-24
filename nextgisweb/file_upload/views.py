@@ -18,9 +18,9 @@ def includeme(config, comp, env):
         ufile = request.POST['file']
 
         meta = dict(
-            mime_type=str(request.POST['type']),
+            mime_type=unicode(request.POST['type']),
             size=int(request.POST['size']),
-            name=str(request.POST['name'])
+            name=unicode(request.POST['name'])
         )
 
         fileid = comp.fileid()
