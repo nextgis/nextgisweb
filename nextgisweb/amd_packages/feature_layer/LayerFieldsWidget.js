@@ -1,3 +1,4 @@
+/*global define, ngwConfig*/
 define([
     "dojo/_base/declare",
     "ngw/modelWidget/Widget",
@@ -12,7 +13,7 @@ define([
     "dojo/data/ItemFileWriteStore",
     "xstyle/css!" + ngwConfig.amdUrl + 'dojox/grid/resources/claroGrid.css',
     // template
-    "dojox/layout/TableContainer"    
+    "dojox/layout/TableContainer"
 ], function (
     declare,
     Widget,
@@ -47,7 +48,8 @@ define([
             }, {
                 field: "grid_visibility",
                 name: "Список",
-                editable: true, cellType: cells.Bool,
+                editable: true,
+                cellType: cells.Bool,
                 width: "12.5%"
             }
         ],
@@ -98,6 +100,9 @@ define([
         },
 
         _getValueAttr: function () {
+            var feature_label_field_id = this.wFeatureLabelField.get("value");
+            if (feature_label_field_id === '') { feature_label_field_id = null; }
+
             return {
                 // Это не очень хорошая идея, но залезем во приватные переменные
                 // store, чтобы получить текущие данные. Все остальные способы
@@ -109,10 +114,10 @@ define([
                         datatype: this.getValue(f, "datatype"),
                         display_name: this.getValue(f, "display_name"),
                         grid_visibility: this.getValue(f, "grid_visibility")
-                    }
+                    };
                 }, this.store),
 
-                feature_label_field_id: this.wFeatureLabelField.get("value")
+                feature_label_field_id: feature_label_field_id
             };
         }
     });
