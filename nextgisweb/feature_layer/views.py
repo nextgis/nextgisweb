@@ -187,7 +187,7 @@ def setup_pyramid(comp, config):
         
         features = query()
         
-        result = [dict(f.fields, id=f.id) for f in features]
+        result = [dict(f.fields, id=f.id, label=f.label) for f in features]
 
         headerlist = []
         if http_range:
