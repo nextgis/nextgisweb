@@ -63,6 +63,9 @@ class SecurityComponent(Component):
 
         self.add_permission(resource, PERMISSION_ALL, label=u"Все права")
 
+        self.add_permission(resource, 'security-view', label=u"Просмотр прав доступа")
+        self.add_permission(resource, 'security-edit', label=u"Изменение прав доступа")
+
     def add_resource_child(self, parent, child):
         parent = self.resource_name(parent)
         child = self.resource_name(child)

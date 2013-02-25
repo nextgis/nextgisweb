@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound
 
-from bunch import Bunch
-
-from ..models import DBSession
-from ..views import model_context, model_permission, permalinker, ModelController, DescriptionObjectWidget, DeleteObjectWidget
+from ..views import (
+    model_context,
+    permalinker,
+    ModelController,
+    DescriptionObjectWidget,
+    DeleteObjectWidget,
+)
 from ..object_widget import CompositeWidget
 from .. import dynmenu as dm
 from ..psection import PageSections
@@ -46,13 +48,12 @@ class LayerGroupObjectWidget(ObjectWidget):
 
 
 def setup_pyramid(comp, config):
-    DBSession = comp.env.core.DBSession
     ACLController = comp.env.security.ACLController
 
     LayerGroup = comp.LayerGroup
 
     ACLController(LayerGroup).includeme(config)
-    
+
     def layer_group_home(request):
         return HTTPFound(location=request.route_url('layer_group.show', id=0))
 
@@ -94,11 +95,12 @@ def setup_pyramid(comp, config):
 
         return traverse(obj)
 
-    config.add_route('api.layer_group.tree', '/api/layer_group/{id:\d+}/tree') \
-        .add_view(api_layer_group_tree, renderer="json")
+    config.add_route(
+        'api.layer_group.tree', '/api/layer_group/{id:\d+}/tree'
+    ).add_view(api_layer_group_tree, renderer="json")
 
     permalinker(LayerGroup, 'layer_group.show')
-    
+
     LayerGroup.object_widget = (
         ('layer_group', LayerGroupObjectWidget),
         ('description', DescriptionObjectWidget),
@@ -111,31 +113,32 @@ def setup_pyramid(comp, config):
             parent = LayerGroup.filter_by(id=request.GET['parent_id']).one()
             request.require_permission(parent, 'create')
 
-            owner_user = request.user
-
-            template_context = dict(
-                obj=parent,
-                subtitle=u"Новая группа слоёв",
+            return dict(
+                parent=parent,
+                owner_user=request.user,
+                template_context=dict(
+                    obj=parent,
+                    subtitle=u"Новая группа слоёв",
+                )
             )
-            return locals()
 
         def edit_context(self, request):
             obj = LayerGroup.filter_by(**request.matchdict).one()
             request.require_permission(obj, 'update')
 
-            template_context = dict(
+            return dict(
                 obj=obj,
+                template_context=dict(obj=obj),
             )
-            return locals()
 
         def delete_context(self, request):
             obj = LayerGroup.filter_by(**request.matchdict).one()
             request.require_permission(obj, 'delete')
 
-            template_context = dict(
+            return dict(
                 obj=obj,
+                template_context=dict(obj=obj),
             )
-            return locals()
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):
@@ -171,17 +174,23 @@ def setup_pyramid(comp, config):
         dm.Label('operation', u"Операции"),
         dm.Link(
             'operation/edit', u"Редактировать",
-            lambda args: args.request.route_url('layer_group.edit', id=args.obj.id)
+            lambda args: args.request.route_url(
+                'layer_group.edit', id=args.obj.id
+            )
         ),
         dm.Link(
             'operation/delete', u"Удалить",
-            lambda args: args.request.route_url('layer_group.delete', id=args.obj.id)
+            lambda args: args.request.route_url(
+                'layer_group.delete', id=args.obj.id
+            )
         ),
         dm.Link(
             'operation/acl', u"Управление доступом",
-            lambda args: args.request.route_url('layer_group.acl', id=args.obj.id)
+            lambda args: args.request.route_url(
+                'layer_group.acl', id=args.obj.id
+            )
         ),
-   )
+    )
 
     comp.layer_group_page_sections = PageSections()
 

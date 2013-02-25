@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from pyramid.httpexceptions import HTTPFound
-from pyramid.renderers import render_to_response
-
-from bunch import Bunch
 
 from ..models import DBSession
-from ..views import model_context, permalinker, ModelController, DescriptionObjectWidget, DeleteObjectWidget
+from ..views import (
+    model_context,
+    permalinker,
+    ModelController,
+    DescriptionObjectWidget,
+    DeleteObjectWidget
+)
 from .. import dynmenu as dm
-from ..object_widget import ObjectWidget, CompositeWidget
+from ..object_widget import CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
 from ..psection import PageSections
 
@@ -18,13 +21,11 @@ class LayerObjectWidget(LayerGroupObjectWidget):
     pass
 
 
-
 def setup_pyramid(comp, config):
-    ACL = comp.env.security.ACL
     ACLController = comp.env.security.ACLController
     LayerGroup = comp.env.layer_group.LayerGroup
     Layer = comp.Layer
- 
+
     Layer.object_widget = (
         (Layer.identity, LayerObjectWidget),
         ('description', DescriptionObjectWidget),
@@ -32,35 +33,43 @@ def setup_pyramid(comp, config):
     )
 
     class LayerController(ModelController):
-        
+
         def create_context(self, request):
-            layer_group = DBSession.query(LayerGroup).filter_by(id=request.GET['layer_group_id']).one()
-            identity = request.GET['identity']
-            cls = Layer.registry[identity]
-            owner_user = request.user
-            template_context = dict(
-                obj=layer_group,
-                subtitle=u"Новый слой",
+            layer_group = DBSession.query(LayerGroup) \
+                .filter_by(id=request.GET['layer_group_id']).one()
+            request.require_permission(layer_group, 'update')
+
+            return dict(
+                layer_group=layer_group,
+                cls=Layer.registry[request.GET['identity']],
+                owner_user=request.user,
+                template_context=dict(
+                    obj=layer_group,
+                    subtitle=u"Новый слой",
+                )
             )
-            return locals()
 
         def edit_context(self, request):
             obj = DBSession.query(Layer).filter_by(**request.matchdict).one()
+            request.require_permission(obj, 'metadata-edit')
             identity = obj.cls
             cls = Layer.registry[identity]
             obj = DBSession.query(cls).get(obj.id)
-            template_context = dict(
+
+            return dict(
                 obj=obj,
+                cls=cls,
+                template_context=dict(obj=obj),
             )
-            return locals()
 
         def delete_context(self, request):
+            # TODO: Права доступа
             return self.edit_context(request)
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):
                 model_class = context['cls']
-                
+
             return Composite
 
         def create_object(self, context):
@@ -96,6 +105,7 @@ def setup_pyramid(comp, config):
 
     @model_context(Layer)
     def show(request, obj):
+        request.require_permission(obj, 'metadata-view')
         actual_class = Layer.registry[obj.cls]
         obj = DBSession.query(Layer) \
             .with_polymorphic((actual_class, ))\
@@ -124,7 +134,7 @@ def setup_pyramid(comp, config):
             'operation/acl', u"Управление доступом",
             lambda args: args.request.route_url('layer.acl', id=args.obj.id)
         ),
-        
+
         dm.Label('data', u"Данные"),
     )
 
@@ -154,7 +164,7 @@ def setup_pyramid(comp, config):
         title=u"Слои",
         template="nextgisweb:templates/layer/layer_group_section.mako"
     )
-    
+
     comp.env.layer_group.layer_group_page_sections.register(
         key='description',
         priority=100,

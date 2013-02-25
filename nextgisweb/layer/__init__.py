@@ -20,6 +20,7 @@ class LayerComponent(Component):
 
         security.add_permission('layer', 'data-read', label=u"Чтение данных")
         security.add_permission('layer', 'data-edit', label=u"Изменение данных")
+        
         security.add_permission('layer', 'metadata-view', label=u"Чтение метаданных")
         security.add_permission('layer', 'metadata-edit', label=u"Изменение метаданных")
 

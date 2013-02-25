@@ -11,13 +11,11 @@ def setup_pyramid(comp, config):
         def __init__(
             self, resource,
             route_name='%(resource)s.acl',
-            pattern='%(resource)s/{id:\d+}/acl',
-            permission='%(resource)s:acl',
+            pattern='%(resource)s/{id:\d+}/acl'
         ):
             self._resource = resource
             self._route_name = route_name
             self._pattern = pattern
-            self._permission = permission
 
             self._resource_name = comp.resource_name(resource)
 
@@ -36,6 +34,8 @@ def setup_pyramid(comp, config):
 
         def view_get(self, request):
             obj = self.context(request)
+            request.require_permission(obj, 'security-view')
+
             acl_items = [
                 dict(
                     principal_id=i.principal_id,
@@ -59,6 +59,8 @@ def setup_pyramid(comp, config):
 
         def view_post(self, request):
             obj = self.context(request)
+            request.require_permission(obj, 'security-edit')
+
             acl = obj.acl
 
             def iteritems():
