@@ -165,7 +165,8 @@ def setup_pyramid(comp, config):
                 adapter=tuple(display.mid.adapter),
                 basemap=tuple(display.mid.basemap),
                 plugin=tuple(display.mid.plugin)
-            )
+            ),
+            bookmarkLayerId=obj.bookmark_layer_id,
         )
 
         return dict(

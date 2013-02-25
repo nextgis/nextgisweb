@@ -201,6 +201,11 @@ define([
                 function () { widget.itemTree.placeAt(widget.layerTreePane); }
             );
 
+            // Загружаем закладки, когда кнопка будет готова
+            this._postCreateDeferred.then(
+                function () { widget.loadBookmarks(); }
+            );
+
             // Выбранный элемент
             this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
                 widget.set("item", newVal);
@@ -307,9 +312,9 @@ define([
         },
 
         loadBookmarks: function () {
-            if (this.bookmarkLayerId) {
+            if (this.config.bookmarkLayerId) {
                 var store = new JsonRest({
-                    target: ngwConfig.applicationUrl + '/layer/' + this.bookmarkLayerId + '/store_api/'
+                    target: ngwConfig.applicationUrl + '/layer/' + this.config.bookmarkLayerId + '/store_api/'
                 });
 
                 var display = this;
@@ -317,22 +322,12 @@ define([
                 store.query().then(
                     function (data) {
                         array.forEach(data, function (f) {
-
-                            // Собираем подпись из всех-подряд полей, кроме id
-                            var labelParts = [];
-                            array.forEach(Object.keys(f), function (k) {
-                                if (k != 'id') {
-                                    labelParts.push(f[k]);
-                                };
-                            });
-                            var label = labelParts.join(" ");
-
                             display.bookmarkMenu.addChild(new MenuItem({
-                                label: label,
+                                label: f.label,
                                 onClick: function () {
                                     
                                     // Отдельно запрашиваем экстент объекта
-                                    xhr.get(ngwConfig.applicationUrl + '/layer/' + display.bookmarkLayerId + '/store_api/' + f.id, {
+                                    xhr.get(ngwConfig.applicationUrl + '/layer/' + display.config.bookmarkLayerId + '/store_api/' + f.id, {
                                         handleAs: 'json',
                                         headers: { 'X-Feature-Box': true }
                                     }).then(
