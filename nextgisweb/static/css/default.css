@@ -26,10 +26,9 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
 .dijitTableLayout tr td.tableContainer-valueCell:last-child { padding-right: 2px; }
 
 
-.CodeMirror { font-size: 12px; }
+.CodeMirror { font-size: 12px; border: 1px solid #eee; }
 
 .CodeMirror-autoHeight .CodeMirror {
-  border: 1px solid #eee;
   height: auto;    
 }
 
