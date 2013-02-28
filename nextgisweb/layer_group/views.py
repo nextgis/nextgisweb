@@ -138,6 +138,7 @@ def setup_pyramid(comp, config):
             return dict(
                 obj=obj,
                 template_context=dict(obj=obj),
+                redirect=obj.parent.permalink(request),
             )
 
         def widget_class(self, context, operation):

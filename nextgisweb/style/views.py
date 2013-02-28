@@ -81,7 +81,11 @@ def setup_pyramid(comp, config):
             return locals()
 
         def delete_context(self, request):
-            return self.edit_context(request)
+            edit_context = self.edit_context(request)
+            return dict(
+                edit_context,
+                redirect=edit_context['obj'].layer.permalink(request)
+            )
 
         def widget_class(self, context, operation):
             class Composite(CompositeWidget):

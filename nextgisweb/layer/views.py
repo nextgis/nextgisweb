@@ -60,6 +60,7 @@ def setup_pyramid(comp, config):
                 obj=obj,
                 cls=cls,
                 template_context=dict(obj=obj),
+                redirect=obj.layer_group.permalink(request),
             )
 
         def delete_context(self, request):

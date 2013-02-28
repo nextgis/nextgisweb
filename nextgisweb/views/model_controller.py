@@ -150,7 +150,10 @@ class ModelController(object):
                     'json',
                     dict(
                         status_code=200,
-                        redirect=self.url_base + '/',
+                        redirect=context.get(
+                            'redirect',
+                            request.application_url
+                        ),
                     ),
                     request
                 )
