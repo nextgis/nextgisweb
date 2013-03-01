@@ -1,3 +1,4 @@
+/*global define, require, console, ngwConfig*/
 define([
     "dojo/_base/declare",
     "dijit/_WidgetBase",
@@ -68,34 +69,34 @@ define([
                 if (attributes && attributes.length > 0) {
                     var i;
 
-                    for(i = 0; i < attributes.length; i++){
+                    for (i = 0; i < attributes.length; i++) {
                         var values = this.getValues(item, attributes[i]);
 
                         if (values) {
-                            if(values.length > 1 ){
+                            if (values.length > 1) {
                                 var j;
 
                                 obj[attributes[i]] = [];
-                                for (j = 0; j < values.length; j++ ) {
+                                for (j = 0; j < values.length; j++) {
                                     var value = values[j];
 
                                     if (this.isItem(value)) {
                                         obj[attributes[i]].push(this.dumpItem(value));
                                     } else {
                                         obj[attributes[i]].push(value);
-                                    };
-                                };
+                                    }
+                                }
                             } else {
                                 if (this.isItem(values[0])) {
                                     obj[attributes[i]] = this.dumpItem(values[0]);
                                 } else {
                                     obj[attributes[i]] = values[0];
-                                };
-                            };
-                        };
-                    };
-                };
-            };
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             return obj;
         }
@@ -105,14 +106,14 @@ define([
         constructor: function (name) {
             this.then(
                 function () {
-                    console.log("Deferred object [%s] resolved", name)
+                    console.log("Deferred object [%s] resolved", name);
                 },
                 function () {
-                    console.error("Deferred object [%s] rejected", name)
+                    console.error("Deferred object [%s] rejected", name);
                 }
             );
         }
-    })
+    });
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
@@ -156,9 +157,10 @@ define([
                 var midarr = this.config.mid[k];
                 require(midarr, function () {
                     var obj = {};
-                    for (var i = 0; i < arguments.length; i++) {
+                    var i;
+                    for (i = 0; i < arguments.length; i++) {
                         obj[midarr[i]] = arguments[i];
-                    };
+                    }
 
                     widget._mid[k] = obj;
 
@@ -168,7 +170,7 @@ define([
 
             // Хранилище
             this._itemStoreSetup();
-            
+
             this._mapDeferred.then(
                 function () { widget._itemStorePrepare(); }
             );
@@ -186,7 +188,7 @@ define([
             this._extent = new openlayers.Bounds(this.config.extent)
                 .transform(this.lonlatProjection, this.displayProjection);
 
-            
+
             // Дерево элементов слоя
             this.itemTree = new Tree({
                 style: "height: 100%",
@@ -209,7 +211,7 @@ define([
             // Выбранный элемент
             this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
                 widget.set("item", newVal);
-            })
+            });
 
             // Карта
             all([this._midDeferred.basemap, this._startupDeferred]).then(
@@ -228,7 +230,7 @@ define([
                                 value: key,
                                 label: layer.title
                             });
-                        };
+                        }
                     });
 
                     // И добавляем возможность переключения
@@ -253,7 +255,7 @@ define([
                     // Связываем изменение чекбокса с видимостью слоя
                     var store = widget.itemStore;
                     store.on("Set", function (item, attr, oldVal, newVal) {
-                        if (attr == "checked" && store.getValue(item, "type") == "layer") {
+                        if (attr === "checked" && store.getValue(item, "type") === "layer") {
                             var id = store.getValue(item, "id");
                             var layer = widget._layers[id];
                             layer.set("visibility", newVal);
@@ -262,11 +264,11 @@ define([
                 }
             );
 
-            
+
             // Плагины
             all([this._midDeferred.plugin, this._postCreateDeferred]).then(
                 function () {
-                    widget._pluginsSetup()
+                    widget._pluginsSetup();
                 }
             );
 
@@ -297,18 +299,18 @@ define([
             btn.watch("checked", function (attr, oldVal, newVal) {
                 array.forEach(display.tools, function (t) {
                     var state = newVal;
-                    
-                    if (t != tool) {
+
+                    if (t !== tool) {
                         state = !state;
-                    };
+                    }
 
                     if (state) {
                         t.activate();
                     } else {
                         t.deactivate();
-                    };
+                    }
                 });
-            })
+            });
         },
 
         loadBookmarks: function () {
@@ -325,14 +327,14 @@ define([
                             display.bookmarkMenu.addChild(new MenuItem({
                                 label: f.label,
                                 onClick: function () {
-                                    
+
                                     // Отдельно запрашиваем экстент объекта
                                     xhr.get(ngwConfig.applicationUrl + '/layer/' + display.config.bookmarkLayerId + '/store_api/' + f.id, {
                                         handleAs: 'json',
                                         headers: { 'X-Feature-Box': true }
                                     }).then(
-                                        function data(data) {
-                                            display.map.olMap.zoomToExtent(data.box);
+                                        function data(featuredata) {
+                                            display.map.olMap.zoomToExtent(featuredata.box);
                                         }
                                     );
                                 }
@@ -358,22 +360,22 @@ define([
                     label: item.label
                 };
 
-                if (copy.type == 'layer') {
+                if (copy.type === 'layer') {
                     copy.layerId = item.layerId;
                     copy.styleId = item.styleId;
 
                     copy.visibility = null;
                     copy.checked = item.visibility;
-                    
-                } else if (copy.type == 'group' || copy.type == 'root') {
+
+                } else if (copy.type === 'group' || copy.type === 'root') {
                     copy.children = array.map(item.children, function (c) { return prepare_item(c); });
-                };
+                }
 
                 // Для всего остального строим индекс
                 itemConfigById[item.id] = item;
 
                 return copy;
-            };
+            }
 
             var rootItem = prepare_item(this.config.rootItem);
 
@@ -398,7 +400,7 @@ define([
                     widget.itemStore.on("Set", function (item, attr, oldVal, newVal) {
                         // При изменении атрибута checked следим за изменениями
                         // в списке видимых слоев
-                        if (attr == "checked") { widget._itemStoreVisibility(item); };
+                        if (attr === "checked") { widget._itemStoreVisibility(item); }
                     });
 
                     widget._itemStoreDeferred.resolve();
@@ -406,7 +408,7 @@ define([
                 onError: function (error) {
                     widget._itemStoreDeferred.reject();
                 }
-            })
+            });
         },
 
         _itemStorePrepareItem: function (item) {
@@ -416,13 +418,13 @@ define([
         _itemStoreVisibility: function (item) {
             var store = this.itemStore;
 
-            if (store.getValue(item, "type") == "layer") {
+            if (store.getValue(item, "type") === "layer") {
                 var newVal = store.getValue(item, "checked");
-                if (store.getValue(item, "visibility") != newVal) {
+                if (store.getValue(item, "visibility") !== newVal) {
                     console.log("Layer [%s] visibility has changed to [%s]", store.getValue(item, "id"), newVal);
                     store.setValue(item, "visibility", newVal);
-                };
-            };
+                }
+            }
         },
 
         _mapSetup: function () {
@@ -444,7 +446,7 @@ define([
             array.forEach(Object.keys(this._mid.adapter), function (k) {
                 this._adapters[k] = new this._mid.adapter[k]({
                     display: this
-                })
+                });
             }, this);
         },
 
@@ -455,7 +457,7 @@ define([
 
             this._layers = {};              // Список всех слоев по id
             this._layer_order = [];         // Порядок слоев от нижнего к верхнему
-            
+
             // Инициализация слоев
             store.fetch({
                 query: {type: 'layer'},
@@ -471,12 +473,12 @@ define([
                     console.error(error);
                     widget._layersDeferred.reject();
                 }
-            })
+            });
         },
 
         _layerSetup: function (item) {
             var store = this.itemStore;
-            
+
             var data = this._itemConfigById[store.getValue(item, "id")];
             var adapter = this._adapters[data.adapter];
 
@@ -490,15 +492,15 @@ define([
 
         _pluginsSetup: function () {
             this._plugins = {};
-            
+
             var widget = this;
-            array.forEach(Object.keys(this._mid.plugin), function(key) {
+            array.forEach(Object.keys(this._mid.plugin), function (key) {
                 console.log("Plugin [%s]::constructor...", key);
 
                 var plugin =  new this._mid.plugin[key]({
                     identity: key,
                     display: this,
-                    itemStore: this.itemStore,
+                    itemStore: this.itemStore
                 });
 
                 widget._postCreateDeferred.then(
@@ -520,22 +522,7 @@ define([
             }, this);
         },
 
-        _itemGetter: function () {
-            return this._item;
-        },
-
-        _itemSetter: function (value) {
-            // TODO: Выделение элемента в дереве по значению
-            this._item = value;
-        },
-
-        _itemConfigGetter: function () {
-            return this._itemConfigById[
-                this.itemStore.getValue(this._item, "id")
-            ]
-        },
-
-        getVisibleItems: function() {
+        getVisibleItems: function () {
             var store = this.itemStore,
                 deferred = new Deferred();
 
