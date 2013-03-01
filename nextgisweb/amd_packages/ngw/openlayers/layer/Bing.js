@@ -1,17 +1,17 @@
 define([
     "dojo/_base/declare",
-    "./_Base",
-    "ngw/async!http://maps.google.com/maps/api/js?v=3&sensor=false"
+    "./_Base"
 ], function (
     declare,
     _Base
 ) {
 
     return declare([_Base], {
-        olClassName: "OpenLayers.Layer.Google",
+        olClassName: "OpenLayers.Layer.Bing",
 
         constructor: function (name, options) {
-            this.olArgs = [name, options];
+            options.name = name;
+            this.olArgs = [options];
             this.inherited(arguments);
         } 
     })

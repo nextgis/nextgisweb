@@ -24,7 +24,7 @@ define([
             this.isBaseLayer = !!options.isBaseLayer;
 
             var cls = lang.getObject(this.olClassName, true);
-            this.olLayer = new cls(name, this.olArgs[0], this.olArgs[1], this.olArgs[2]);
+            this.olLayer = new cls(this.olArgs[0], this.olArgs[1], this.olArgs[2]);
 
             var layer = this;
 

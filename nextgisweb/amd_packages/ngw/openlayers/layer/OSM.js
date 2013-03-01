@@ -9,7 +9,7 @@ define([
         olClassName: "OpenLayers.Layer.OSM",
 
         constructor: function (name, options) {
-            this.olArgs = [options.url, options];
+            this.olArgs = [name, options.url, options];
             this.inherited(arguments);
         } 
     })
