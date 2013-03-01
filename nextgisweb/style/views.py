@@ -50,6 +50,7 @@ def setup_pyramid(comp, config):
             layer = DBSession.query(Layer) \
                 .filter_by(id=request.matchdict['layer_id']) \
                 .one()
+            request.require_permission(layer, 'style-write')
 
             identity = request.GET['identity']
             cls = Style.registry[identity]
@@ -68,6 +69,8 @@ def setup_pyramid(comp, config):
 
         def edit_context(self, request):
             obj = DBSession.query(Style).filter_by(**request.matchdict).one()
+            request.require_permission(obj.layer, 'style-write')
+
             identity = obj.cls
             cls = Style.registry[identity]
             obj = DBSession.query(cls).get(obj.id)
@@ -110,15 +113,17 @@ def setup_pyramid(comp, config):
     ).includeme(config)
 
     @model_context(Style)
-    def tms(reqest, obj):
+    def tms(request, obj):
         actual_class = Style.registry[obj.cls]
         obj = DBSession.query(Style) \
             .with_polymorphic((actual_class, ))\
             .filter_by(id=obj.id).one()
 
-        z = int(reqest.GET['z'])
-        x = int(reqest.GET['x'])
-        y = int(reqest.GET['y'])
+        request.require_permission(obj.layer, 'style-read')
+
+        z = int(request.GET['z'])
+        x = int(request.GET['x'])
+        y = int(request.GET['y'])
 
         step = (EPSG_3857_BOX[2] - EPSG_3857_BOX[0]) / 2 ** z
 
@@ -129,7 +134,7 @@ def setup_pyramid(comp, config):
             EPSG_3857_BOX[3] - y * step,
         )
 
-        img = obj.render_image(box, (256, 256), reqest.registry.settings)
+        img = obj.render_image(box, (256, 256), request.registry.settings)
 
         buf = StringIO()
         img.save(buf, 'png')
@@ -140,11 +145,12 @@ def setup_pyramid(comp, config):
     config.add_route('style.tms', '/style/{id:\d+}/tms').add_view(tms)
 
     @model_context(Style)
-    def show(reqest, obj):
+    def show(request, obj):
         actual_class = Style.registry[obj.cls]
         obj = DBSession.query(Style) \
             .with_polymorphic((actual_class, ))\
             .filter_by(id=obj.id).one()
+        request.require_permission(obj.layer, 'style-read')
 
         return dict(
             obj=obj,

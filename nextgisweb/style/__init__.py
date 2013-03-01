@@ -13,6 +13,10 @@ class StyleComponent(Component):
         from . import models
         models.initialize(self)
 
+        security = self.env.security
+        security.add_permission('layer', 'style-read', label=u"Чтение стилей")
+        security.add_permission('layer', 'style-write', label=u"Изменение стилей")
+
     def setup_pyramid(self, config):
-    	from . import views
-    	views.setup_pyramid(self, config)
+        from . import views
+        views.setup_pyramid(self, config)
