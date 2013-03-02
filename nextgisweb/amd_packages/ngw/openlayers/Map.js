@@ -3,6 +3,7 @@ define([
     "dojo/Stateful",
     "dojo/dom",
     "../openlayers",
+    "./layer/XYZ",
     "./layer/OSM",
     "./layer/Google"
 ], function (
@@ -10,6 +11,7 @@ define([
     Stateful,
     dom,
     openlayers,
+    XYZ,
     OSM,
     Google
 ) {
@@ -57,6 +59,12 @@ define([
                 type: "terrain"
             });
             this.addLayer(lGoogleT);
+
+            var lBlank = new XYZ('blank', {
+                isBaseLayer: true,
+                title: "Пустой"
+            });
+            this.addLayer(lBlank);
 
             var widget = this, olMap=this.olMap;
             
