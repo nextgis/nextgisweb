@@ -115,6 +115,7 @@ define([
 
             var pane = new Pane({
                 title: item.label,
+                tooltip: "Таблица объектов слоя \"" + item.label + "\"",
                 layerId: item.layerId,
                 plugin: this
             });

@@ -61,6 +61,7 @@ define([
 
             var pane = new Pane({
                 title: item.label,
+                tooltip: "Описание слоя \"" + item.label + "\"",
                 layerId: item.layerId,
                 data: data
             });
