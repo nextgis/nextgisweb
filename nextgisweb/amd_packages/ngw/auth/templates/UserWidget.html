@@ -1,0 +1,34 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
+    <div data-dojo-type="dojox/layout/TableContainer"
+        data-dojo-props="cols:1, labelWidth: 150">
+
+        <input data-dojo-attach-point="displayName"
+            data-dojo-type="ngw/form/DisplayNameTextBox"
+            title="Полное имя"
+            style="width: 100%">
+        </input>
+
+        <input data-dojo-attach-point="keyname"
+            data-dojo-type="ngw/form/KeynameTextBox"
+            data-dojo-props="required: true"
+            title="Имя пользователя"
+            style="width: 100%">
+        </input>
+
+        <input data-dojo-attach-point="password"
+            data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="pattern: '.{5,25}'"
+            type="password"
+            title="Пароль"
+            style="width: 100%">
+        </input>
+
+        <select data-dojo-attach-point="memberOf"
+            data-dojo-type="dojox/form/CheckedMultiSelect"
+            multiple="true"
+            title="Член групп"
+            style="width: 100%">
+        </select>
+
+    </div>
+</div>

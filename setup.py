@@ -22,6 +22,7 @@ requires = [
     'geojson',
     'PIL',
     'lxml',
+    'passlib',
 ]
 
 components = (

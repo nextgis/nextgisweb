@@ -33,24 +33,10 @@ class AuthComponent(Component):
             display_name=u"Администраторы",
             members=[self.initialize_user(
                 keyname='administrator',
-                display_name=u"Администратор"
+                display_name=u"Администратор",
+                password='admin'
             ), ]
         ).persist()
-
-        self.initialize_user(
-            keyname="ivanov",
-            display_name=u"Иванов А.А."
-        )
-
-        self.initialize_user(
-            keyname="petrov",
-            display_name=u"Петров Б.Б."
-        )
-
-        self.initialize_user(
-            keyname="sidorov",
-            display_name=u"Сидоров В.В."
-        )
 
     def initialize(self):
         from . import models
