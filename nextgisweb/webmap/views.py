@@ -43,17 +43,16 @@ def setup_pyramid(comp, config):
 
     class WebmapController(ModelController):
         def create_context(self, request):
-            template_context = dict(
-                subtitle=u"Новая веб-карта",
+            return dict(
+                template_context=dict(subtitle=u"Новая веб-карта")
             )
-            return locals()
 
         def edit_context(self, request):
             obj = DBSession.query(WebMap).filter_by(**request.matchdict).one()
-            template_context = dict(
+            return dict(
                 obj=obj,
+                template_context=dict(obj=obj),
             )
-            return locals()
 
         def widget_class(self, context, operation):
             return WebmapObjectWidget
