@@ -121,8 +121,8 @@ define([
                 } else if (newValue.item_type == "layer") {
                     widget.widgetProperties.selectChild(widget.paneLayer);
                     widget.wdgtItemLayerEnabled.set("checked", widget.getItemValue("layer_enabled"));
-                    widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale"));
-                    widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale"));
+                    widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale_denom"));
+                    widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale_denom"));
                 };
 
                 // Изначально боковая панель со свойствами текущего элемента
@@ -149,11 +149,11 @@ define([
             });
 
             this.wLayerMinScale.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("layer_min_scale", newVal);
+                widget.setItemValue("layer_min_scale_denom", newVal);
             });
 
             this.wLayerMaxScale.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("layer_max_scale", newVal);
+                widget.setItemValue("layer_max_scale_denom", newVal);
             });
 
             this.wgtLayer.on("click", function (item) {
@@ -187,8 +187,8 @@ define([
                     group_expanded: widget.itemStore.getValue(itm, "group_expanded"),
                     layer_style_id: widget.itemStore.getValue(itm, "layer_style_id"),
                     layer_enabled: widget.itemStore.getValue(itm, "layer_enabled"),
-                    layer_min_scale: widget.itemStore.getValue(itm, "layer_min_scale"),
-                    layer_max_scale: widget.itemStore.getValue(itm, "layer_max_scale"),
+                    layer_min_scale_denom: widget.itemStore.getValue(itm, "layer_min_scale_denom"),
+                    layer_max_scale_denom: widget.itemStore.getValue(itm, "layer_max_scale_denom"),
                     children: array.map(widget.itemStore.getValues(itm, "children"), function (i) { return traverseItem(i) })
                 }
             }

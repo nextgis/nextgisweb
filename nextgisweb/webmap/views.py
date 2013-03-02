@@ -134,6 +134,8 @@ def setup_pyramid(comp, config):
                     layerId=item.style.layer_id,
                     styleId=item.layer_style_id,
                     visibility=bool(item.layer_enabled),
+                    minScaleDenom=item.layer_min_scale_denom,
+                    maxScaleDenom=item.layer_max_scale_denom,
                 )
 
                 # Адаптер слоя пока один
