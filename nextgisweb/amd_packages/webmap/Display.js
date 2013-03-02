@@ -11,6 +11,7 @@ define([
     "dojo/promise/all",
     "ngw/openlayers",
     "ngw/openlayers/Map",
+    "dijit/registry",
     "dijit/form/DropDownButton",
     "dijit/DropDownMenu",
     "dijit/MenuItem",
@@ -46,6 +47,7 @@ define([
     all,
     openlayers,
     Map,
+    registry,
     DropDownButton,
     DropDownMenu,
     MenuItem,
@@ -195,7 +197,15 @@ define([
                 model: this.itemModel,
                 autoExpand: true,
                 showRoot: false,
-                dndController: dndSource
+                dndController: dndSource,
+                checkItemAcceptance: function (node, source, position) {
+                    var item = registry.getEnclosingWidget(node).item,
+                        item_type = widget.itemStore.getValue(item, 'type');
+                    // Блокируем возможность перетащить элемент внутрь слоя,
+                    // перенос внутрь допустим только для группы
+                    return item_type === 'group' || (item_type === 'layer' && position !== 'over');
+                },
+                betweenThreshold: 6
             });
 
             // Размещаем дерево, когда виджет будет готов           
