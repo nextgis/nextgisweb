@@ -11,6 +11,7 @@ define([
     "dijit/tree/TreeStoreModel",
     "dijit/Tree",
     "dijit/tree/dndSource",
+    "dijit/registry",
     // template
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
@@ -39,7 +40,8 @@ define([
     ItemFileWriteStore,
     TreeStoreModel,
     Tree,
-    dndSource
+    dndSource,
+    registry
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
@@ -57,6 +59,8 @@ define([
                 query: {}
             });
 
+            var widget = this;
+
             this.widgetTree = new Tree({
                 model: this.itemModel,
                 showRoot: false,
@@ -64,9 +68,16 @@ define([
                 getIconClass: function(item, opened){
                     return item.item_type == 'group' ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
                 },
+                persist: false,
                 dndController: dndSource,
+                checkItemAcceptance: function (node, source, position) {
+                    var item = registry.getEnclosingWidget(node).item,
+                        item_type = widget.itemStore.getValue(item, 'item_type');
+                    // Блокируем возможность перетащить элемент внутрь слоя,
+                    // перенос внутрь допустим только для группы
+                    return item_type === 'group' || (item_type === 'layer' && position !== 'over');
+                },
                 betweenThreshold: 5,
-                persist: false
             });
         },
 
