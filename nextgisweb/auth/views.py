@@ -82,6 +82,69 @@ def setup_pyramid(comp, config):
     config.add_route('auth.principal_dump', '/auth/principal/dump') \
         .add_view(principal_dump, renderer='json')
 
+    class AuthGroupWidget(ObjectWidget):
+
+        def is_applicable(self):
+            return self.operation in ('create', 'edit')
+
+        def populate_obj(self):
+            super(AuthGroupWidget, self).populate_obj()
+
+            self.obj.display_name = self.data['display_name']
+            self.obj.keyname = self.data['keyname']
+
+        def validate(self):
+            result = super(AuthGroupWidget, self).validate()
+            self.error = []
+
+            return result
+
+        def widget_params(self):
+            result = super(AuthGroupWidget, self).widget_params()
+
+            if self.obj:
+                result['value'] = dict(
+                    display_name=self.obj.display_name,
+                    keyname=self.obj.keyname,
+                )
+
+            return result
+
+        def widget_module(self):
+            return 'ngw/auth/GroupWidget'
+
+    class GroupController(ModelController):
+
+        def create_context(self, request):
+            check_permission(request)
+            return dict(
+                template=dict(subtitle=u"Новая группа")
+            )
+
+        def edit_context(self, request):
+            check_permission(request)
+            obj = Group.filter_by(**request.matchdict) \
+                .filter_by(system=False).one()
+
+            return dict(
+                obj=obj,
+                template=dict(obj=obj)
+            )
+
+        def create_object(self, context):
+            return Group()
+
+        def query_object(self, context):
+            return context['obj']
+
+        def widget_class(self, context, operation):
+            return AuthGroupWidget
+
+        def template_context(self, context):
+            return context['template']
+
+    GroupController('auth.group', '/auth/group').includeme(config)
+
     class AuthUserWidget(ObjectWidget):
 
         def is_applicable(self):
@@ -137,7 +200,7 @@ def setup_pyramid(comp, config):
         def widget_module(self):
             return 'ngw/auth/UserWidget'
 
-    class UserModelController(ModelController):
+    class AuthUserModelController(ModelController):
 
         def create_context(self, request):
             check_permission(request)
@@ -167,9 +230,9 @@ def setup_pyramid(comp, config):
         def template_context(self, context):
             return context['template']
 
-    UserModelController('auth.user', '/auth/user') \
-        .includeme(config)
+    AuthUserModelController('auth.user', '/auth/user').includeme(config)
 
+    permalinker(Group, "auth.group.edit")
     permalinker(User, "auth.user.edit")
 
     def user_browse(request):
@@ -182,6 +245,17 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.user.browse', '/auth/user/') \
         .add_view(user_browse, renderer='auth/user_browse.mako')
+
+    def group_browse(request):
+        check_permission(request)
+        return dict(
+            obj_list=Group.filter_by(system=False).order_by(Group.display_name),
+            dynmenu=Group.__dynmenu__,
+            dynmenu_kwargs=Bunch(request=request),
+        )
+
+    config.add_route('auth.group.browse', '/auth/group/') \
+        .add_view(group_browse, renderer='auth/group_browse.mako')
 
     class UserMenu(dm.DynItem):
 
@@ -196,6 +270,19 @@ def setup_pyramid(comp, config):
                     )
                 )
 
+    class GroupMenu(dm.DynItem):
+
+        def build(self, kwargs):
+            if 'obj' in kwargs:
+                yield dm.Link(
+                    'operation/edit',
+                    u"Редактировать",
+                    lambda kwargs: kwargs.request.route_url(
+                        'auth.group.edit',
+                        id=kwargs.obj.id
+                    )
+                )
+
     User.__dynmenu__ = dm.DynMenu(
         dm.Label('operation', u"Операции"),
         dm.Link(
@@ -205,3 +292,14 @@ def setup_pyramid(comp, config):
         ),
         UserMenu()
     )
+
+    Group.__dynmenu__ = dm.DynMenu(
+        dm.Label('operation', u"Операции"),
+        dm.Link(
+            'operation/create',
+            u"Создать",
+            lambda kwargs: kwargs.request.route_url('auth.group.create')
+        ),
+        GroupMenu()
+    )
+

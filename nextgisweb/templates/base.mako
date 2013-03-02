@@ -58,7 +58,7 @@
       <li><a href="${request.route_url('webmap.browse')}">Веб-карты</a></li>
       <li><a href="${request.route_url('layer')}">Слои</a></li>
       <li><a href="${request.route_url('auth.user.browse')}">Пользователи</a></li>
-      <li><a href="/group/">Группы</a></li>
+      <li><a href="${request.route_url('auth.group.browse')}">Группы</a></li>
 
       <li style="float: right;">
       %if request.user.keyname == 'guest':
