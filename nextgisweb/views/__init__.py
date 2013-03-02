@@ -106,7 +106,7 @@ class DescriptionObjectWidget(ObjectWidget):
         return self.operation in ('create', 'edit')
 
     def populate_obj(self):
-        self.obj.description = self.data
+        self.obj.description = self.data if self.data != '' else None
 
     def widget_module(self):
         return 'ngw/modelWidget/DescriptionWidget'
@@ -115,6 +115,9 @@ class DescriptionObjectWidget(ObjectWidget):
         result = super(DescriptionObjectWidget, self).widget_params()
 
         if self.obj:
-            result['value'] = self.obj.description
+            result['value'] = (
+                self.obj.description
+                if self.obj.description else ''
+            )
 
         return result
