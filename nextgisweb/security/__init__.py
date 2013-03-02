@@ -25,11 +25,11 @@ class SecurityComponent(Component):
 
     @require('auth')
     def initialize_db(self):
-        self.env.auth.User(
+        self.env.auth.initialize_user(
             system=True,
             keyname='owner',
             display_name=u"Владелец"
-        ).persist()
+        )
 
     @property
     def resources(self):

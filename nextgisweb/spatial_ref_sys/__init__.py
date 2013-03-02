@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component
 
@@ -10,7 +11,6 @@ class SpatialRefSysComponent(Component):
     identity = 'spatial_ref_sys'
 
     def initialize_db(self):
-        DBSession = self.env.core.DBSession
         SRS = self.SRS
 
         srs_list = (
@@ -19,8 +19,11 @@ class SpatialRefSysComponent(Component):
             SRS(id=3857, display_name="WGS 84 / Pseudo-Mercator (EPSG:3857)"),
         )
 
-        for o in srs_list:
-            DBSession.add(o)
+        for srs in srs_list:
+            try:
+                SRS.filter_by(id=srs.id).one()
+            except NoResultFound:
+                srs.persist()
 
     def initialize(self):
         self.SRS = SRS

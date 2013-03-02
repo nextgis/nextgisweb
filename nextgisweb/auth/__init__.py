@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid.security import authenticated_userid
+from sqlalchemy.orm.exc import NoResultFound
+
 from ..component import Component
 
 
@@ -8,36 +10,47 @@ class AuthComponent(Component):
     identity = 'auth'
 
     def initialize_db(self):
-        self.User(
+        self.initialize_user(
             system=True,
             keyname='guest',
             display_name=u"Гость"
-        ).persist()
+        )
 
-        self.User(
+        self.initialize_user(
             system=True,
             keyname='everyone',
             display_name=u"Любой пользователь"
         ).persist()
 
-        self.User(
+        self.initialize_user(
             system=True,
             keyname='authenticated',
             display_name=u"Прошедший проверку"
         ).persist()
 
-        self.Group(
+        self.initialize_group(
             keyname='administrators',
             display_name=u"Администраторы",
-            members=[self.User(
+            members=[self.initialize_user(
                 keyname='administrator',
                 display_name=u"Администратор"
             ), ]
         ).persist()
 
-        self.User(display_name=u"Иванов А.А.", keyname="ivanov").persist()
-        self.User(display_name=u"Петров Б.Б.", keyname="petrov").persist()
-        self.User(display_name=u"Сидоров В.В.", keyname="sidorov").persist()
+        self.initialize_user(
+            keyname="ivanov",
+            display_name=u"Иванов А.А."
+        )
+
+        self.initialize_user(
+            keyname="petrov",
+            display_name=u"Петров Б.Б."
+        )
+
+        self.initialize_user(
+            keyname="sidorov",
+            display_name=u"Сидоров В.В."
+        )
 
     def initialize(self):
         from . import models
@@ -56,3 +69,25 @@ class AuthComponent(Component):
 
         from . import views
         views.setup_pyramid(self, config)
+
+    def initialize_user(self, keyname, **kwargs):
+        """ Проверяет наличие в БД пользователя с keyname и в случае
+        отсутствия создает его с параметрами kwargs """
+
+        try:
+            obj = self.User.filter_by(keyname=keyname).one()
+        except NoResultFound:
+            obj = self.User(keyname=keyname, **kwargs).persist()
+
+        return obj
+
+    def initialize_group(self, keyname, **kwargs):
+        """ Проверяет наличие в БД группы пользователей с keyname и в случае
+        отсутствия создает ее с параметрами kwargs """
+
+        try:
+            obj = self.Group.filter_by(keyname=keyname).one()
+        except NoResultFound:
+            obj = self.Group(keyname=keyname, **kwargs).persist()
+
+        return obj

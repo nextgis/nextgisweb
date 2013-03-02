@@ -13,12 +13,15 @@ class WebMapComponent(Component):
         models.initialize(self)
 
     def initialize_db(self):
-        self.WebMap(
-            display_name=u"Основная веб-карта",
-            root_item=self.WebMapItem(item_type='root')
-        ).persist()
+        if self.WebMap.filter_by().first() is None:
+            # Создаем веб-карту по-умолчанию только в том случае,
+            # если нет ни одиной карты.
+
+            self.WebMap(
+                display_name=u"Основная веб-карта",
+                root_item=self.WebMapItem(item_type='root')
+            ).persist()
 
     def setup_pyramid(self, config):
         from . import views
         views.setup_pyramid(self, config)
-

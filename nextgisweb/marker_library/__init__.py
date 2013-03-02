@@ -28,10 +28,13 @@ class MarkerLibraryComponent(Component):
         if not display_name:
             display_name = keyname
 
-        collection = self.MarkerCollection(
-            keyname=keyname,
-            display_name=display_name
-        ).persist()
+        try:
+            collection = self.MarkerCollection.filter_by(keyname=keyname).one()
+        except NoResultFound:
+            collection = self.MarkerCollection(
+                keyname=keyname,
+                display_name=display_name
+            ).persist()
 
         for catname in resource_listdir(package, path):
             if not resource_isdir(package, path + '/' + catname):
