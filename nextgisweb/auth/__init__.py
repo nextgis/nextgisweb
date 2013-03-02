@@ -11,25 +11,26 @@ class AuthComponent(Component):
 
     def initialize_db(self):
         self.initialize_user(
-            system=True,
             keyname='guest',
+            system=True,
             display_name=u"Гость"
         )
 
         self.initialize_user(
-            system=True,
             keyname='everyone',
+            system=True,
             display_name=u"Любой пользователь"
         ).persist()
 
         self.initialize_user(
-            system=True,
             keyname='authenticated',
+            system=True,
             display_name=u"Прошедший проверку"
         ).persist()
 
         self.initialize_group(
             keyname='administrators',
+            system=True,
             display_name=u"Администраторы",
             members=[self.initialize_user(
                 keyname='administrator',
