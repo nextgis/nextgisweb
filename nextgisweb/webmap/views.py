@@ -21,7 +21,7 @@ class WebmapObjectWidget(ObjectWidget):
 
     def validate(self):
         result = super(WebmapObjectWidget, self).validate()
-        self.error = [];
+        self.error = []
 
         return result
 
@@ -128,11 +128,23 @@ def setup_pyramid(comp, config):
             )
 
             if item.item_type == 'layer':
+                style = item.style
+                layer = style.layer
+
+                # При отсутствии необходимых прав пропускаем элемент веб-карты,
+                # таким образом он просто не будет показан при отображении и
+                # в дереве слоев
+                if not layer.has_permission(
+                    request.user,
+                    'style-read',
+                    'data-read',
+                ):
+                    return None
 
                 # Основные параметры элемента
                 data.update(
-                    layerId=item.style.layer_id,
-                    styleId=item.layer_style_id,
+                    layerId=style.layer_id,
+                    styleId=style.id,
                     visibility=bool(item.layer_enabled),
                     minScaleDenom=item.layer_min_scale_denom,
                     maxScaleDenom=item.layer_max_scale_denom,
@@ -145,16 +157,20 @@ def setup_pyramid(comp, config):
                 # Плагины уровня слоя
                 plugin = dict()
                 for pcls in WebmapPlugin.registry:
-                    p_mid_data = pcls.is_layer_supported(item.style.layer, obj)
+                    p_mid_data = pcls.is_layer_supported(layer, obj)
                     if p_mid_data:
                         plugin.update((p_mid_data, ))
 
                 data.update(plugin=plugin)
                 display.mid.plugin.update(plugin.keys())
 
-
             elif item.item_type in ('root', 'group'):
-                data.update(children=map(traverse, item.children))
+                # Рекурсивно пробегаем по всем элементам, исключая те,
+                # на которые нет необходимых прав доступа
+                data.update(children=filter(
+                    None,
+                    map(traverse, item.children)
+                ))
 
             return data
 
