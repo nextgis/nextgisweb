@@ -1,3 +1,4 @@
+/*global define, dojox, ngwConfig*/
 define([
     "dojo/_base/declare",
     "dojo/Deferred",
@@ -6,6 +7,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "dojo/text!./templates/Uploader.html",
     "dojox/form/Uploader",
+    "dojox/form/uploader/plugins/HTML5",
     "dojox/form/uploader/plugins/Flash"
 ], function (
     declare,
@@ -32,14 +34,15 @@ define([
                 label: "Выбрать",
                 multiple: false,
                 uploadOnSelect: true,
-                url: application_url + '/file_upload/upload',
+                url: ngwConfig.applicationUrl + '/file_upload/upload',
                 name: "file"
             }).placeAt(this.fileUploader);
 
             var widget = this;
-            this.uploaderWidget.on("begin", function() { widget.uploadBegin() });
-            this.uploaderWidget.on("complete", function(data) { widget.uploadComplete(data) });
-            this.uploaderWidget.on("error", function () { widget.uploaderError() });
+            this.uploaderWidget.on("begin", function () { widget.uploadBegin(); });
+            this.uploaderWidget.on("progress", function (evt) { widget.uploadProgress(evt); });
+            this.uploaderWidget.on("complete", function (data) { widget.uploadComplete(data); });
+            this.uploaderWidget.on("error", function () { widget.uploaderError(); });
 
             this.fileInfo.innerHTML = "Файл не выбран!";
         },
@@ -54,6 +57,12 @@ define([
             this.uploading = true;
             this.data = undefined;
             this.fileInfo.innerHTML = "Идет загрузка...";
+        },
+
+        uploadProgress: function (evt) {
+            if (evt.type === "progress") {
+                this.fileInfo.innerHTML = evt.percent + " загружено...";
+            }
         },
 
         uploadComplete: function (data) {
@@ -71,11 +80,15 @@ define([
         },
 
         _getValueAttr: function () {
-            if (this.upload_promise == undefined || this.upload_promise.isResolved()) {
-                return this.data
+            var result;
+
+            if (this.upload_promise === undefined || this.upload_promise.isResolved()) {
+                result = this.data;
             } else {
-                return this.upload_promise
-            };
+                result = this.upload_promise;
+            }
+
+            return result;
         }
     });
 });
