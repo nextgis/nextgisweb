@@ -21,3 +21,8 @@
     style="width: 100%; height: 100%">
 </div>
 
+<div style="position: absolute; right: 0; top: 0">
+    <a href="http://nextgis.ru" target="_blank">
+        <img src="${request.static_url('nextgisweb:static/img/nextgis.png')}" />
+    </a>
+</div>
