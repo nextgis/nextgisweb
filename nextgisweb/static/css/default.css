@@ -38,6 +38,17 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
 }
 
 
+/* Не очень понятно почему так происходит, но user-select для dijit.Tree
+автоматически не выставляется, хотя для других элементов управления
+выставляется вполне корректно. Пока добавляем его вручную. */
+.dijitTree {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+}
+
+
 table.data {}
 
 table.data tr th { background-color: #eee; font-weight: bold; }
