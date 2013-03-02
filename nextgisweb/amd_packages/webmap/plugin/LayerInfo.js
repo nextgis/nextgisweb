@@ -1,3 +1,4 @@
+/*global define, ngwConfig*/
 define([
     "dojo/_base/declare",
     "./_PluginBase",
@@ -13,15 +14,17 @@ define([
     MenuItem,
     FeatureGrid
 ) {
-    var _Pane = declare([ContentPane], {
+    var Pane = declare([ContentPane], {
         closable: true,
         iconClass: "dijitIconFile",
 
         postCreate: function () {
-            domConstruct.create("iframe", {
-                src: ngwConfig.applicationUrl + "/layer/" + this.layerId + '?no_layout',
-                style: "width: 100%; height: 100%;"
-            }, this.domNode);
+            if (this.data.description) {
+                domConstruct.create("div", {
+                    style: 'max-width: 60em',
+                    innerHTML: this.data.description
+                }, this.domNode);
+            }
         }
     });
 
@@ -31,7 +34,7 @@ define([
             var plugin = this;
 
             this.menuItem = new MenuItem({
-                label: "Информация",
+                label: "Описание",
                 disabled: true,
                 onClick: function () {
                     plugin.openLayerInfo();
@@ -43,7 +46,7 @@ define([
 
             this.display.watch("item", function (attr, oldVal, newVal) {
                 var type = store.getValue(newVal, "type");
-                menuItem.set("disabled", type != "layer");
+                menuItem.set("disabled", type !== "layer");
             });
 
         },
@@ -53,11 +56,13 @@ define([
         },
 
         openLayerInfo: function () {
-            var item = this.display.get("item");
+            var item = this.display.dumpItem(),
+                data = this.display.get('itemConfig').plugin[this.identity];
 
-            var pane = new _Pane({
-                title: this.itemStore.getValue(item, "label"),
-                layerId: this.itemStore.getValue(item, "layerId")
+            var pane = new Pane({
+                title: item.label,
+                layerId: item.layerId,
+                data: data
             });
 
             this.display.tabContainer.addChild(pane);

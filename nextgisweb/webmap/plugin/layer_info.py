@@ -7,4 +7,9 @@ class LayerInfoPlugin(WebmapPlugin):
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):
-        return ("webmap/plugin/LayerInfo", True)
+        return (
+            "webmap/plugin/LayerInfo",
+            dict(
+                description=layer.description,
+            )
+        )

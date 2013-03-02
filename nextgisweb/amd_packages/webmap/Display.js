@@ -211,6 +211,10 @@ define([
             // Выбранный элемент
             this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
                 widget.set("item", newVal);
+                widget.set(
+                    "itemConfig",
+                    widget._itemConfigById[widget.itemStore.getValue(newVal, 'id')]
+                );
             });
 
             // Карта
@@ -538,6 +542,11 @@ define([
             });
 
             return deferred;
+        },
+
+        dumpItem: function () {
+            // Выгружает значение выбранного слоя из itemStore в виде Object
+            return this.itemStore.dumpItem(this.item);
         }
     });
 });

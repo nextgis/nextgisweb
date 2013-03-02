@@ -1,3 +1,4 @@
+/*global define*/
 define([
     "dojo/_base/declare"
 ], function (
@@ -8,12 +9,8 @@ define([
             declare.safeMixin(this, options);
         },
 
-        postCreate: function () {
+        postCreate: function () { },
 
-        },
-
-        startup: function () {
-            
-        }
-    })
+        startup: function () { }
+    });
 });

@@ -1,3 +1,4 @@
+/*global define, ngwConfig*/
 define([
     "dojo/_base/declare",
     "./_PluginBase",
@@ -21,7 +22,7 @@ define([
     Button,
     Identify
 ) {
-    var _Pane = declare([FeatureGrid], {
+    var Pane = declare([FeatureGrid], {
         closable: true,
         gutters: false,
         iconClass: "dijitIconTable",
@@ -43,7 +44,7 @@ define([
                 label: "Перейти",
                 iconClass: "dijitIconSearch",
                 disabled: true,
-                onClick: function() {
+                onClick: function () {
                     widget.zoomToFeature();
                 }
             });
@@ -51,30 +52,30 @@ define([
 
             // При изменении выделенной строки изменяем доступность кнопок
             this.watch("selectedRow", function (attr, oldVal, newVal) {
-                widget.btnOpenFeatureTab.set("disabled", newVal == null);
-                widget.btnZoomToFeature.set("disabled", newVal == null);
+                widget.btnOpenFeatureTab.set("disabled", newVal === null);
+                widget.btnZoomToFeature.set("disabled", newVal === null);
             });
         },
 
         zoomToFeature: function () {
             var display = this.plugin.display;
 
-            xhr.get(application_url + '/layer/' + this.layerId + '/store_api/' + this.get("selectedRow").id, {
+            xhr.get(ngwConfig.applicationUrl + '/layer/' + this.layerId + '/store_api/' + this.get("selectedRow").id, {
                 handleAs: 'json',
                 headers: { 'X-Feature-Box': true }
             }).then(
-                function data(data) {
-                    display.map.olMap.zoomToExtent(data.box);
+                function data(featuredata) {
+                    display.map.olMap.zoomToExtent(featuredata.box);
                     display.tabContainer.selectChild(display.mainPane);
                 }
-            )
+            );
         },
 
         openFeature: function () {
             // TODO: Пока открываем в новом окне, сделать вкладку
             window.open(
-                ngwConfig.applicationUrl + "/layer/" + this.layerId 
-                + "/feature/" + this.get("selectedRow").id + "/edit"
+                ngwConfig.applicationUrl + "/layer/" + this.layerId
+                    + "/feature/" + this.get("selectedRow").id + "/edit"
             );
         }
     });
@@ -97,10 +98,10 @@ define([
 
             this.display.watch("item", function (attr, oldVal, newVal) {
                 var type = store.getValue(newVal, "type");
-                menuItem.set("disabled", type != "layer");
-            });            
+                menuItem.set("disabled", type !== "layer");
+            });
 
-            
+
             this.tool = new Identify({display: this.display});
         },
 
@@ -110,12 +111,12 @@ define([
         },
 
         openFeatureGrid: function () {
-            var item = this.display.get("item");
-            
-            var pane = new _Pane({
-                layerId: this.itemStore.getValue(item, "layerId"),
-                plugin: this,
-                title: this.itemStore.getValue(item, "label")
+            var item = this.display.dumpItem();
+
+            var pane = new Pane({
+                title: item.label,
+                layerId: item.layerId,
+                plugin: this
             });
 
             this.display.tabContainer.addChild(pane);
