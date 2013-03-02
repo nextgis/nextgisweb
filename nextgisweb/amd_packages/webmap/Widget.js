@@ -1,5 +1,6 @@
 define([
     "dojo/_base/declare",
+    "dojo/dom-style",
     "ngw/modelWidget/Widget",
     "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
@@ -28,6 +29,7 @@ define([
     "layer/LayerTree"
 ], function (
     declare,
+    domStyle,
     Widget,
     ErrorDisplayMixin,
     _TemplatedMixin,
@@ -121,6 +123,13 @@ define([
                     widget.wdgtItemLayerEnabled.set("checked", widget.getItemValue("layer_enabled"));
                     widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale"));
                     widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale"));
+                };
+
+                // Изначально боковая панель со свойствами текущего элемента
+                // спрятана. Поскольку элемент уже выбран - ее нужно показать.
+                if (!oldValue) {
+                    domStyle.set(widget.itemPane.domNode, 'display', 'block');
+                    widget.treeLayoutContainer.addChild(widget.itemPane);
                 };
             });
 
