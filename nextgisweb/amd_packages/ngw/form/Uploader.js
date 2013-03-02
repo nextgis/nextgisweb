@@ -22,6 +22,16 @@ define([
     // Uploader AMD workaround
     Uploader = dojox.form.Uploader;
 
+    function readableFileSize(size) {
+        var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        var i = 0;
+        while (size >= 1024) {
+            size /= 1024;
+            ++i;
+        }
+        return size.toFixed(1) + ' ' + units[i];
+    }
+
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
 
@@ -69,7 +79,7 @@ define([
             this.upload_promise.resolve(data);
             this.uploading = false;
             this.data = data;
-            this.fileInfo.innerHTML = data.name + " (" + data.size + " байт)";
+            this.fileInfo.innerHTML = data.name + " (" + readableFileSize(data.size) + ")";
         },
 
         uploadError: function (error) {
