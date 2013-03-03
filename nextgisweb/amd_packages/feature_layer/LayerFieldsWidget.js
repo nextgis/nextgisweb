@@ -77,7 +77,7 @@ define([
                 store: this.store,
                 searchAttr: "keyname",
                 required: false,
-                label: "Наименование",
+                label: "Атрибут наименования",
                 style: "width: 100%"
             });
         },
