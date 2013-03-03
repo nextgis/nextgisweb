@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-import re
 import json
 from types import MethodType
-
-from shapely import wkt
 
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
@@ -70,27 +67,28 @@ def setup_pyramid(comp, config):
         layer_list = DBSession.query(Layer).filter(Layer.id.in_(layers))
 
         result = dict()
-        
+
         # Количество объектов для всех слоев
         feature_count = 0
 
         for layer in layer_list:
-            # TODO: Права доступа проверять первым делом
+            if not layer.has_permission(request.user, 'data-read'):
+                result[layer.id] = dict(error="Forbidden")
 
-            if not IFeatureLayer.providedBy(layer):
+            elif not IFeatureLayer.providedBy(layer):
                 result[layer.id] = dict(error="Not implemented")
 
             else:
                 query = layer.feature_query()
                 query.intersects(geom)
-                
+
                 # Ограничиваем кол-во идентифицируемых объектов по 10 на слой,
                 # иначе ответ может оказаться очень большим.
                 query.limit(10)
 
                 features = [
                     dict(id=f.id, layerId=layer.id, label=f.label, fields=f.fields)
-                    for f in query() 
+                    for f in query()
                 ]
 
                 result[layer.id] = dict(
@@ -109,6 +107,7 @@ def setup_pyramid(comp, config):
 
     @model_context(comp.env.layer.Layer)
     def browse(request, layer):
+        request.require_permission(layer, 'data-read')
         return dict(
             obj=layer,
             subtitle=u"Объекты",
@@ -120,6 +119,8 @@ def setup_pyramid(comp, config):
 
     @model_context(comp.env.layer.Layer)
     def edit(request, layer):
+        request.require_permission(layer, 'data-read', 'data-edit')
+
         query = layer.feature_query()
         query.filter_by(id=request.matchdict['feature_id'])
         feature = list(query())[0]
@@ -143,17 +144,17 @@ def setup_pyramid(comp, config):
             if widget.validate():
                 widget.populate_obj()
 
-                return render_to_response('json',
-                    dict(
+                return render_to_response(
+                    'json', dict(
                         status_code=200,
                         redirect=request.url
                     ),
-                    request 
+                    request
                 )
 
             else:
-                return render_to_response('json',
-                    dict(
+                return render_to_response(
+                    'json', dict(
                         status_code=400,
                         error=widget.widget_error()
                     ),
@@ -171,6 +172,7 @@ def setup_pyramid(comp, config):
 
     @model_context(comp.env.layer.Layer)
     def field(request, layer):
+        request.require_permission(layer, 'metadata-view')
         return [f.to_dict() for f in layer.fields]
 
     config.add_route('feature_layer.field', 'layer/{id:\d+}/field/')
@@ -178,15 +180,17 @@ def setup_pyramid(comp, config):
 
     @model_context(comp.env.layer.Layer)
     def store_api(request, layer):
+        request.require_permission(layer, 'data-read')
+
         query = layer.feature_query()
 
         http_range = request.headers.get('range', None)
         if http_range and http_range.startswith('items='):
-            first, last = map(int, http_range[len('items='): ].split('-', 1))
+            first, last = map(int, http_range[len('items='):].split('-', 1))
             query.limit(last - first + 1, first)
-        
+
         features = query()
-        
+
         result = [dict(f.fields, id=f.id, label=f.label) for f in features]
 
         headerlist = []
@@ -208,6 +212,8 @@ def setup_pyramid(comp, config):
 
     @model_context(comp.env.layer.Layer)
     def store_get_item(request, layer):
+        request.require_permission(layer, 'data-read')
+
         box = request.headers.get('x-feature-box', None)
         ext = request.headers.get('x-feature-ext', None)
 
@@ -216,11 +222,11 @@ def setup_pyramid(comp, config):
 
         if box:
             query.box()
-        
+
         feature = list(query())[0]
 
         result = dict(
-            feature.fields, 
+            feature.fields,
             id=feature.id, layerId=layer.id,
             fields=feature.fields
         )
@@ -246,6 +252,8 @@ def setup_pyramid(comp, config):
         layer = DBSession.query(comp.env.layer.Layer) \
             .filter_by(id=request.matchdict['layer_id']) \
             .one()
+
+        request.require_permission(layer, 'data-read')
 
         fquery = layer.feature_query()
         fquery.filter_by(id=request.matchdict['id'])
