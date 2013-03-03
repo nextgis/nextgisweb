@@ -65,6 +65,7 @@ def initialize(comp):
         group_expanded = sa.Column(sa.Boolean, nullable=True)
         layer_style_id = sa.Column(sa.Integer, sa.ForeignKey('style.id'), nullable=True)
         layer_enabled = sa.Column(sa.Boolean, nullable=True)
+        layer_opacity = sa.Column(sa.Float, nullable=True)
         layer_min_scale_denom = sa.Column(sa.Float, nullable=True)
         layer_max_scale_denom = sa.Column(sa.Float, nullable=True)
 
