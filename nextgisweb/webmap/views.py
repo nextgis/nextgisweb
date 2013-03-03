@@ -3,11 +3,12 @@ from collections import namedtuple
 from bunch import Bunch
 
 from ..models import DBSession
-from .models import WebMap
 
 from ..object_widget import ObjectWidget
 from ..views import ModelController, model_loader, permalinker
+from ..psection import PageSections
 from .. import dynmenu as dm
+
 
 from .plugin import WebmapPlugin
 
@@ -38,17 +39,24 @@ class WebmapObjectWidget(ObjectWidget):
 
 
 def setup_pyramid(comp, config):
+    WebMap = comp.WebMap
+    ACLController = comp.env.security.ACLController
 
     permalinker(WebMap, "webmap.show")
 
     class WebmapController(ModelController):
         def create_context(self, request):
+            request.require_permission(WebMap.acl_root, 'write')
+
             return dict(
+                owner_user=request.user,
                 template_context=dict(subtitle=u"Новая веб-карта")
             )
 
         def edit_context(self, request):
             obj = DBSession.query(WebMap).filter_by(**request.matchdict).one()
+            request.require_permission(obj, 'write')
+
             return dict(
                 obj=obj,
                 template_context=dict(obj=obj),
@@ -58,7 +66,10 @@ def setup_pyramid(comp, config):
             return WebmapObjectWidget
 
         def create_object(self, context):
-            return WebMap(root_item=comp.WebMapItem(item_type='root'))
+            return WebMap(
+                owner_user=context['owner_user'],
+                root_item=comp.WebMapItem(item_type='root'),
+            )
 
         def query_object(self, context):
             return context['obj']
@@ -66,18 +77,25 @@ def setup_pyramid(comp, config):
         def template_context(self, context):
             return context['template_context']
 
-    WebmapController('webmap') \
-        .includeme(config)
+    WebmapController('webmap').includeme(config)
+
+    ACLController(WebMap).includeme(config)
 
     @model_loader(WebMap)
     def show(request, obj):
-        return dict(obj=obj)
+        request.require_permission(obj, 'read')
+        return dict(
+            obj=obj,
+            sections=WebMap.__psections__,
+        )
 
-    config.add_route('webmap.show', '/webmap/{id:\d+}')
-    config.add_view(show, route_name='webmap.show', renderer='obj.mako')
+    config.add_route('webmap.show', '/webmap/{id:\d+}') \
+        .add_view(show, renderer='psection.mako')
 
     def browse(request):
+        request.require_permission(WebMap.acl_root, 'read')
         obj_list = DBSession.query(WebMap)
+
         return dict(
             obj_list=obj_list,
             dynmenu=request.env.webmap.WebMap.__dynmenu__,
@@ -90,26 +108,38 @@ def setup_pyramid(comp, config):
     class WebMapMenu(dm.DynItem):
 
         def build(self, kwargs):
+            yield dm.Link(
+                'create', u"Создать",
+                lambda kwargs: kwargs.request.route_url('webmap.create')
+            )
+
             if 'obj' in kwargs:
                 yield dm.Link(
-                    'operation/edit',
-                    u"Редактировать",
+                    'edit', u"Редактировать",
                     lambda kwargs: kwargs.request.route_url(
                         'webmap.edit',
                         id=kwargs.obj.id
                     )
                 )
+
                 yield dm.Link(
-                    'operation/display',
-                    u"Открыть",
+                    'display', u"Открыть",
                     lambda kwargs: kwargs.request.route_url(
                         'webmap.display',
                         id=kwargs.obj.id
                     )
                 )
 
+                yield dm.Link(
+                    'acl', u"Управление доступом",
+                    lambda args: args.request.route_url(
+                        'webmap.acl', id=args.obj.id
+                    )
+                )
+
     @model_loader(WebMap)
     def display(request, obj):
+        request.require_permission(obj, 'read')
 
         MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
 
@@ -195,12 +225,13 @@ def setup_pyramid(comp, config):
     config.add_route('webmap.display', '/webmap/{id:\d+}/display') \
         .add_view(display, renderer='webmap/display.mako')
 
-    comp.WebMap.__dynmenu__ = dm.DynMenu(
-        dm.Label('operation', u"Операции"),
-        dm.Link(
-            'operation/create',
-            u"Создать",
-            lambda kwargs: kwargs.request.route_url('webmap.create')
-        ),
-        WebMapMenu()
+    comp.WebMap.__dynmenu__ = WebMapMenu()
+
+    WebMap.__psections__ = PageSections()
+
+    WebMap.__psections__.register(
+        key='permissions',
+        priority=90,
+        title=u"Права пользователя",
+        template="security/section_resource_permissions.mako"
     )
