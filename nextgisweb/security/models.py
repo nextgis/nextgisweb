@@ -252,6 +252,20 @@ def initialize(comp):
 
     comp.ACLItem = ACLItem
 
+    class ResourceRootACL(Base):
+        __tablename__ = 'resource_root_acl'
+
+        resource = sa.Column(sa.Unicode, primary_key=True)
+        acl_id = sa.Column(sa.ForeignKey(ACL.id), nullable=False)
+
+        acl = orm.relationship(ACL, lazy='joined')
+
+        def __init__(self, resource, **kwargs):
+            self.resource = resource
+            self.acl = ACL(resource=resource)
+
+    comp.ResourceRootACL = ResourceRootACL
+
     class ACLMixin(object):
 
         @declared_attr
@@ -270,11 +284,21 @@ def initialize(comp):
 
             if 'acl' not in kwargs and 'acl_id' not in kwargs:
 
-                parent_attr = self.__acl_parent_attr__
+                parent_attr = (
+                    self.__acl_parent_attr__
+                    if hasattr(self, '__acl_parent_attr__')
+                    else None
+                )
                 aclkwargs = dict(resource=self.__acl_resource__)
 
-                if parent_attr in kwargs:
+                if kwargs.get(parent_attr) is not None:
+                    # Если у элемента есть ресурс-родитель, используем его ACL
                     aclkwargs['parent_id'] = kwargs[parent_attr].acl_id
+
+                else:
+                    # Если нет используем ACL коренного элемент ресурса
+                    aclkwargs['parent_id'] = ResourceRootACL.query() \
+                        .get(self.__acl_resource__).acl_id
 
                 if 'owner_user' in kwargs:
                     aclkwargs['owner_user'] = kwargs['owner_user']

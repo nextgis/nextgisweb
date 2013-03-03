@@ -9,7 +9,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 
 import pyramid_tm
 
-from .component import Component, require
+from .component import Component
 from . import dynmenu as dm
 
 
@@ -117,7 +117,6 @@ class PyramidComponent(Component):
 
         return config
 
-    @require('security')
     def setup_pyramid(self, config):
 
         def settings(request):

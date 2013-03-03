@@ -61,8 +61,6 @@ def setup_pyramid(comp, config):
             obj = self.context(request)
             request.require_permission(obj, 'security-edit')
 
-            acl = obj.acl
-
             def iteritems():
                 for r in request.json_body:
                     yield (
@@ -70,7 +68,7 @@ def setup_pyramid(comp, config):
                         r['permission'], r['operation']
                     )
 
-            acl.update(iteritems(), replace=True)
+            obj.acl.update(iteritems(), replace=True)
 
         def context(self, request):
             return DBSession.query(self._resource) \

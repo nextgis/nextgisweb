@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
-from pyramid.renderers import render_to_response
+from pyramid.httpexceptions import HTTPForbidden
 
-from ..views import model_loader, model_context
+from .. import dynmenu as dm
 
-from ..models import DBSession
 
 def setup_pyramid(comp, config):
-    DBSession = comp.env.core.DBSession
-
-    ACL = comp.ACL
-    ACLItem = comp.ACLItem
 
     def security_schema(request):
         resources = comp.resources
@@ -25,7 +20,6 @@ def setup_pyramid(comp, config):
 
             return children
 
-
         return dict([
             (rkey, dict(
                 permissions=dict([
@@ -33,12 +27,81 @@ def setup_pyramid(comp, config):
                     for k, v in comp.permissions[rkey].iteritems()
                 ]),
                 children=_children(rkey),
-                **rval                
+                **rval
             ))
             for rkey, rval in resources.iteritems()
         ])
-        
 
     config.add_route("security.schema", "/security/schema") \
         .add_view(security_schema, renderer="json")
 
+    def resource_root_acl_get(request):
+        if not request.user.is_administrator:
+            raise HTTPForbidden()
+
+        root_acl = comp.ResourceRootACL \
+            .filter_by(**request.matchdict).one()
+
+        acl_items = [
+            dict(
+                principal_id=i.principal_id,
+                resource=i.resource,
+                permission=i.permission,
+                operation=i.operation,
+                # Доп. поля для отображения
+                principal_cls=i.principal.cls,
+                principal_keyname=i.principal.keyname,
+                principal_display_name=i.principal.display_name,
+            )
+            for i in root_acl.acl.items
+        ]
+        return dict(
+            acl_items=acl_items,
+            resource=root_acl.resource,
+        )
+
+    def resource_root_acl_post(request):
+        if not request.user.is_administrator:
+            raise HTTPForbidden()
+
+        root_acl = comp.ResourceRootACL \
+            .filter_by(**request.matchdict).one()
+
+        def iteritems():
+            for r in request.json_body:
+                yield (
+                    r['principal_id'], r['resource'],
+                    r['permission'], r['operation']
+                )
+
+        root_acl.acl.update(iteritems(), replace=True)
+
+    config.add_route("security.resource_root_acl", r'/{resource:[^\/]+}/acl') \
+        .add_view(resource_root_acl_get, request_method='GET',
+                  renderer='security/resource_root_acl.mako') \
+        .add_view(resource_root_acl_post, request_method='POST',
+                  renderer='json')
+
+    class ResourceRootACLMenu(dm.DynItem):
+
+        def build(self, kwargs):
+
+            for resource, resopt in comp.resources.iteritems():
+                if resopt.get('parent_required', False):
+                    continue
+
+                yield dm.Link(
+                    self.sub(resource), resopt.get('label', resource),
+                    self._create_url(resource)
+                )
+
+        def _create_url(self, resource):
+            return lambda kwargs: kwargs.request.route_url(
+                'security.resource_root_acl',
+                resource=resource,
+            )
+
+    comp.env.pyramid.control_panel.add(
+        dm.Label('resource-root-acl', u"Базовые права доступа"),
+        ResourceRootACLMenu('resource-root-acl'),
+    )

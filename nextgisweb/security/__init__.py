@@ -31,6 +31,39 @@ class SecurityComponent(Component):
             display_name=u"Владелец"
         )
 
+        def _children(resource, children=None):
+            if not children:
+                children = list()
+
+            for c in self.children[resource]:
+                if not c in children:
+                    children.append(c)
+                    _children(c, children)
+
+            return children
+
+        administrators = self.env.auth.Group \
+            .filter_by(keyname='administrators').one()
+
+        # Создаем записи ResourceRootACL для всех видов ресурсов, которые
+        # могут использоваться без ресурса-родителя
+        for resource, resopt in self.resources.iteritems():
+            if resopt.get('parent_required', False):
+                continue
+
+            root_acl = self.ResourceRootACL.query().get(resource)
+            if root_acl:
+                continue
+
+            # Добавляем полные права администраторам для всех дочерних ресурсов
+            root_acl = self.ResourceRootACL(resource)
+            root_acl.acl.update([
+                (administrators.id, child, PERMISSION_ALL, 'allow-subtree')
+                for child in _children(resource) + [resource, ]
+            ])
+
+            root_acl.persist()
+
     @property
     def resources(self):
         return self._resources
@@ -79,6 +112,7 @@ class SecurityComponent(Component):
         assert permission not in self.permissions[resource]
         self._permissions[resource][permission] = kwargs
 
+    @require('pyramid')
     def setup_pyramid(self, config):
 
         def require_permission(request, model, *permissions):
