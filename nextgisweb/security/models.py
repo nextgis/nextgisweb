@@ -252,8 +252,8 @@ def initialize(comp):
 
     comp.ACLItem = ACLItem
 
-    class ResourceRootACL(Base):
-        __tablename__ = 'resource_root_acl'
+    class ResourceACLRoot(Base):
+        __tablename__ = 'resource_acl_root'
 
         resource = sa.Column(sa.Unicode, primary_key=True)
         acl_id = sa.Column(sa.ForeignKey(ACL.id), nullable=False)
@@ -264,7 +264,7 @@ def initialize(comp):
             self.resource = resource
             self.acl = ACL(resource=resource)
 
-    comp.ResourceRootACL = ResourceRootACL
+    comp.ResourceACLRoot = ResourceACLRoot
 
     class ACLMixin(object):
 
@@ -297,7 +297,7 @@ def initialize(comp):
 
                 else:
                     # Если нет используем ACL коренного элемент ресурса
-                    aclkwargs['parent_id'] = ResourceRootACL.query() \
+                    aclkwargs['parent_id'] = ResourceACLRoot.query() \
                         .get(self.__acl_resource__).acl_id
 
                 if 'owner_user' in kwargs:

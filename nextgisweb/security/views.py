@@ -35,11 +35,11 @@ def setup_pyramid(comp, config):
     config.add_route("security.schema", "/security/schema") \
         .add_view(security_schema, renderer="json")
 
-    def resource_root_acl_get(request):
+    def resource_acl_root_get(request):
         if not request.user.is_administrator:
             raise HTTPForbidden()
 
-        root_acl = comp.ResourceRootACL \
+        root_acl = comp.ResourceACLRoot \
             .filter_by(**request.matchdict).one()
 
         acl_items = [
@@ -60,11 +60,11 @@ def setup_pyramid(comp, config):
             resource=root_acl.resource,
         )
 
-    def resource_root_acl_post(request):
+    def resource_acl_root_post(request):
         if not request.user.is_administrator:
             raise HTTPForbidden()
 
-        root_acl = comp.ResourceRootACL \
+        root_acl = comp.ResourceACLRoot \
             .filter_by(**request.matchdict).one()
 
         def iteritems():
@@ -76,13 +76,13 @@ def setup_pyramid(comp, config):
 
         root_acl.acl.update(iteritems(), replace=True)
 
-    config.add_route("security.resource_root_acl", r'/{resource:[^\/]+}/acl') \
-        .add_view(resource_root_acl_get, request_method='GET',
-                  renderer='security/resource_root_acl.mako') \
-        .add_view(resource_root_acl_post, request_method='POST',
+    config.add_route("security.resource_acl_root", r'/{resource:[^\/]+}/acl') \
+        .add_view(resource_acl_root_get, request_method='GET',
+                  renderer='security/resource_acl_root.mako') \
+        .add_view(resource_acl_root_post, request_method='POST',
                   renderer='json')
 
-    class ResourceRootACLMenu(dm.DynItem):
+    class ResourceACLRootMenu(dm.DynItem):
 
         def build(self, kwargs):
 
@@ -97,11 +97,11 @@ def setup_pyramid(comp, config):
 
         def _create_url(self, resource):
             return lambda kwargs: kwargs.request.route_url(
-                'security.resource_root_acl',
+                'security.resource_acl_root',
                 resource=resource,
             )
 
     comp.env.pyramid.control_panel.add(
-        dm.Label('resource-root-acl', u"Базовые права доступа"),
-        ResourceRootACLMenu('resource-root-acl'),
+        dm.Label('resource-acl-root', u"Базовые права доступа"),
+        ResourceACLRootMenu('resource-acl-root'),
     )

@@ -45,18 +45,18 @@ class SecurityComponent(Component):
         administrators = self.env.auth.Group \
             .filter_by(keyname='administrators').one()
 
-        # Создаем записи ResourceRootACL для всех видов ресурсов, которые
+        # Создаем записи ResourceACLRoot для всех видов ресурсов, которые
         # могут использоваться без ресурса-родителя
         for resource, resopt in self.resources.iteritems():
             if resopt.get('parent_required', False):
                 continue
 
-            root_acl = self.ResourceRootACL.query().get(resource)
+            root_acl = self.ResourceACLRoot.query().get(resource)
             if root_acl:
                 continue
 
             # Добавляем полные права администраторам для всех дочерних ресурсов
-            root_acl = self.ResourceRootACL(resource)
+            root_acl = self.ResourceACLRoot(resource)
             root_acl.acl.update([
                 (administrators.id, child, PERMISSION_ALL, 'allow-subtree')
                 for child in _children(resource) + [resource, ]
