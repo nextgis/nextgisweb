@@ -6,6 +6,7 @@ from StringIO import StringIO
 from pyramid.config import Configurator
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.httpexceptions import HTTPForbidden
 
 import pyramid_tm
 
@@ -127,6 +128,9 @@ class PyramidComponent(Component):
             .add_view(settings, renderer='json')
 
         def control_panel(request):
+            if not request.user.is_administrator:
+                raise HTTPForbidden()
+
             return dict(
                 title=u"Панель управления",
                 control_panel=self.control_panel,
