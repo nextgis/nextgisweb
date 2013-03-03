@@ -4,6 +4,7 @@ from collections import defaultdict
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class PMATCH(object):
@@ -330,5 +331,11 @@ def initialize(comp):
             return locals()
 
         owner_user = property(**owner_user())
+
+        @hybrid_property
+        def acl_root(self):
+            """ Быстрый способ доступа к базовому списку контроля доступа """
+
+            return ResourceACLRoot.query().get(self.__acl_resource__).acl
 
     comp.ACLMixin = ACLMixin
