@@ -57,8 +57,10 @@
     <ul class="span-24 menu">
       <li><a href="${request.route_url('webmap.browse')}">Веб-карты</a></li>
       <li><a href="${request.route_url('layer')}">Слои</a></li>
-      <li><a href="${request.route_url('auth.user.browse')}">Пользователи</a></li>
-      <li><a href="${request.route_url('auth.group.browse')}">Группы</a></li>
+
+      %if request.user.is_administrator:
+        <li><a href="${request.route_url('pyramid.control_panel')}">Панель управления</a></li>
+      %endif
 
       <li style="float: right;">
       %if request.user.keyname == 'guest':

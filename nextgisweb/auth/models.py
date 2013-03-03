@@ -81,6 +81,17 @@ def initialize(comp):
                 return a == b
 
         @property
+        def is_administrator(self):
+            """ Является ли пользователь членом группы 'administrators' """
+
+            # Чтобы хоть как-то минимизировать кол-во обращений к БД, кешируем
+            # группу 'administrators' в инстансе
+            if not hasattr(self, '_admins'):
+                self._admins = Group.filter_by(keyname='administrators').one()
+
+            return (self in self._admins.members)
+
+        @property
         def password(self):
             class PasswordHashValue(object):
                 def __init__(self, value):

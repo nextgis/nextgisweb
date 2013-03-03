@@ -3,13 +3,14 @@ import sys
 from hashlib import md5
 from StringIO import StringIO
 
-from .component import Component
-
 from pyramid.config import Configurator
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
 import pyramid_tm
+
+from .component import Component, require
+from . import dynmenu as dm
 
 
 class RouteHelper(object):
@@ -27,7 +28,7 @@ class RouteHelper(object):
 
 
 class ExtendedConfigurator(Configurator):
-    
+
     def add_route(self, name, pattern=None, **kwargs):
         """ Расширенное добавление маршрута
 
@@ -46,7 +47,7 @@ class ExtendedConfigurator(Configurator):
                 .add_view(foo_post, request_method='POST')
 
         """
-        
+
         super(ExtendedConfigurator, self).add_route(name, pattern=pattern, **kwargs)
         return RouteHelper(name, self)
 
@@ -116,14 +117,26 @@ class PyramidComponent(Component):
 
         return config
 
+    @require('security')
     def setup_pyramid(self, config):
 
         def settings(request):
             comp = self.env._components[request.GET['component']]
             return comp.client_settings(request)
 
-        config.add_route('pyramid.settings', '/settings')
-        config.add_view(settings, route_name='pyramid.settings', renderer='json')
+        config.add_route('pyramid.settings', '/settings') \
+            .add_view(settings, renderer='json')
+
+        def control_panel(request):
+            return dict(
+                title=u"Панель управления",
+                control_panel=self.control_panel,
+            )
+
+        config.add_route('pyramid.control_panel', '/control-panel') \
+            .add_view(control_panel, renderer="pyramid/control_panel.mako")
+
+        self.control_panel = dm.DynMenu()
 
     settings_info = (
         dict(key='secret', desc=u"Ключ, используемый для шифрования cookies"),

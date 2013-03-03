@@ -9,8 +9,8 @@ class DynMenu(object):
         for item in args:
             self.add(item)
 
-    def add(self, item):
-        self._items.append(item)
+    def add(self, *items):
+        self._items.extend(items)
 
     def build(self, args):
         result = list()
@@ -50,6 +50,14 @@ class DynItem(Item):
 
     def __init__(self, key=None):
         super(DynItem, self).__init__(key)
+
+    def sub(self, value):
+        if not self.key:
+            return value
+        else:
+            if isinstance(value, basestring):
+                value = tuple(value.split('/'))
+            return self.key + value
 
     def build(self, args):
         pass

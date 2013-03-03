@@ -20,9 +20,8 @@ def setup_pyramid(comp, config):
         auth и security, права доступа к редактированию пользователей
         ограничиваются по критерию членства в группе administrators """
 
-        administrators = Group.filter_by(keyname='administrators').one()
-        if request.user not in administrators.members:
-            raise HTTPForbidden()
+        if not request.user.is_administrator:
+            raise HTTPForbidden("Membership in group 'administrators' required!")
 
     def login(request):
         next = request.params.get('next', request.application_url)
@@ -260,10 +259,19 @@ def setup_pyramid(comp, config):
     class UserMenu(dm.DynItem):
 
         def build(self, kwargs):
+            yield dm.Link(
+                self.sub('browse'), u"Список",
+                lambda kwargs: kwargs.request.route_url('auth.user.browse')
+            )
+
+            yield dm.Link(
+                self.sub('create'), u"Создать",
+                lambda kwargs: kwargs.request.route_url('auth.user.create')
+            )
+
             if 'obj' in kwargs:
                 yield dm.Link(
-                    'operation/edit',
-                    u"Редактировать",
+                    self.sub('edit'), u"Редактировать",
                     lambda kwargs: kwargs.request.route_url(
                         'auth.user.edit',
                         id=kwargs.obj.id
@@ -273,33 +281,32 @@ def setup_pyramid(comp, config):
     class GroupMenu(dm.DynItem):
 
         def build(self, kwargs):
+            yield dm.Link(
+                self.sub('browse'), u"Список",
+                lambda kwargs: kwargs.request.route_url('auth.group.browse')
+            )
+
+            yield dm.Link(
+                self.sub('create'), u"Создать",
+                lambda kwargs: kwargs.request.route_url('auth.group.create')
+            )
+
             if 'obj' in kwargs:
                 yield dm.Link(
-                    'operation/edit',
-                    u"Редактировать",
+                    self.sub('edit'), u"Редактировать",
                     lambda kwargs: kwargs.request.route_url(
                         'auth.group.edit',
                         id=kwargs.obj.id
                     )
                 )
 
-    User.__dynmenu__ = dm.DynMenu(
-        dm.Label('operation', u"Операции"),
-        dm.Link(
-            'operation/create',
-            u"Создать",
-            lambda kwargs: kwargs.request.route_url('auth.user.create')
-        ),
-        UserMenu()
-    )
+    User.__dynmenu__ = UserMenu()
+    Group.__dynmenu__ = GroupMenu()
 
-    Group.__dynmenu__ = dm.DynMenu(
-        dm.Label('operation', u"Операции"),
-        dm.Link(
-            'operation/create',
-            u"Создать",
-            lambda kwargs: kwargs.request.route_url('auth.group.create')
-        ),
-        GroupMenu()
-    )
+    comp.env.pyramid.control_panel.add(
+        dm.Label('auth-user', u"Пользователи"),
+        UserMenu('auth-user'),
 
+        dm.Label('auth-group', u"Группы пользователей"),
+        GroupMenu('auth-group'),
+    )
