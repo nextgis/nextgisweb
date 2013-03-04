@@ -54,6 +54,8 @@ def include(comp):
 
             if reproject:
                 cmd = ['gdalwarp', '-of', 'GTiff', '-t_srs', 'EPSG:%d' % self.srs_id]
+                if ds.RasterCount == 3:
+                    cmd.append('-dstalpha')
             else:
                 cmd = ['gdal_translate', '-of', 'GTiff']
 
