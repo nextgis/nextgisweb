@@ -22,7 +22,7 @@ def initialize(comp):
         parent_id = sa.Column(sa.Integer, sa.ForeignKey('layer_group.id', ondelete='restrict'))
         keyname = sa.Column(sa.Unicode, unique=True)
         display_name = sa.Column(sa.Unicode, nullable=False)
-        description = sa.Column(sa.Unicode, default=u'', nullable=False)
+        description = sa.Column(sa.Unicode)
 
         parent = orm.relationship(
             'LayerGroup', remote_side=[id],

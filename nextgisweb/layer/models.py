@@ -22,7 +22,7 @@ def initialize(comp):
         layer_group_id = sa.Column(sa.Integer, sa.ForeignKey(LayerGroup.id), nullable=False)
         cls = sa.Column(sa.Unicode, nullable=False)
         display_name = sa.Column(sa.Unicode, nullable=False)
-        description = sa.Column(sa.Unicode, default=u'', nullable=False)
+        description = sa.Column(sa.Unicode)
 
         identity = __tablename__
         registry = registry_maker()
