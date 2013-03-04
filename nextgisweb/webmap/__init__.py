@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from ..component import Component, require
+import codecs
+import json
+from pkg_resources import resource_filename
 
+from ..component import Component, require
 from .adapter import WebMapAdapter
 
 
@@ -10,6 +13,11 @@ class WebMapComponent(Component):
 
     @require('security')
     def initialize(self):
+        # Настройки по умолчанию
+        if 'basemaps' not in self.settings:
+            self.settings['basemaps'] = resource_filename(
+                'nextgisweb', 'webmap/basemaps.json')
+
         security = self.env.security
 
         security.add_resource('webmap', label=u"Веб-карта")
@@ -38,3 +46,9 @@ class WebMapComponent(Component):
     def setup_pyramid(self, config):
         from . import views
         views.setup_pyramid(self, config)
+
+    def client_settings(self, request):
+        with codecs.open(self.settings['basemaps'], 'rb', 'utf-8') as fp:
+            basemaps = json.load(fp)
+
+        return dict(basemaps=basemaps)

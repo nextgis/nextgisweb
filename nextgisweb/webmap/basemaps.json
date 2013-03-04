@@ -1,0 +1,34 @@
+[{
+    "keyname": "osm-mapnik",
+    "mid": "ngw/openlayers/layer/OSM",
+    "title": "OpenStreetMap"
+}, {
+    "keyname": "google-satellite",
+    "mid": "ngw/openlayers/layer/Google",
+    "title": "Google - Спутник",
+    "type": "satellite"
+}, {
+    "keyname": "google-roadmap",
+    "mid": "ngw/openlayers/layer/Google",
+    "title": "Google - Схема",
+    "type": "roadmap"
+}, {
+    "keyname": "google-hybrid",
+    "mid": "ngw/openlayers/layer/Google",
+    "title": "Google - Гибрид",
+    "type": "hybrid"
+}, {
+    "keyname": "google-terrain",
+    "mid": "ngw/openlayers/layer/Google",
+    "title": "Google - Рельеф",
+    "type": "terrain"
+}, {
+    "keyname": "google-terrain",
+    "mid": "ngw/openlayers/layer/Google",
+    "title": "Google - Рельеф",
+    "type": "terrain"
+}, {
+    "keyname": "blank",
+    "mid": "ngw/openlayers/layer/XYZ",
+    "title": "Пустой"
+}]

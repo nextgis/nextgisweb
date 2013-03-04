@@ -25,6 +25,8 @@ define([
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
     "dijit/tree/dndSource",
+    // settings
+    "ngw/settings!webmap",
     // template
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",
@@ -59,8 +61,10 @@ define([
     ItemFileWriteStore,
     TreeStoreModel,
     Tree,
-    dndSource
+    dndSource,
+    clientSettings
 ) {
+
     var CustomItemFileWriteStore = declare([ItemFileWriteStore], {
         dumpItem: function (item) {
             var obj = {};
@@ -152,11 +156,18 @@ define([
             // Асинхронная загрузка необходимых модулей
             this._midDeferred = {};
             this._mid = {};
-            array.forEach(Object.keys(this.config.mid), function (k) {
+            var mids = this.config.mid;
+
+            // Добавляем MID базовых карт
+            array.forEach(clientSettings.basemaps, function (bm) {
+                mids.basemap.push(bm.mid);
+            });
+
+            array.forEach(Object.keys(mids), function (k) {
                 var deferred = new LoggedDeferred("_midDeferred." + k);
                 this._midDeferred[k] = deferred;
 
-                var midarr = this.config.mid[k];
+                var midarr = mids[k];
                 require(midarr, function () {
                     var obj = {};
                     var i;
@@ -442,8 +453,26 @@ define([
         },
 
         _mapSetup: function () {
-            // Инициализация карты и базовых слоев
+            // Инициализация карты
             this.map = new Map(this.mapNode, {});
+
+            // Инициализация базовых слоев
+            var idx = 0;
+            array.forEach(clientSettings.basemaps, function (bm) {
+                var MID = this._mid.basemap[bm.mid];
+                var layerOptions = lang.clone(bm);
+
+                layerOptions.isBaseLayer = true;
+                if (layerOptions.keyname === undefined) {
+                    layerOptions.keyname = 'basemap_' + idx;
+                }
+
+                var layer = new MID(layerOptions.keyname, layerOptions);
+                this.map.addLayer(layer);
+
+                idx = idx + 1;
+            }, this);
+
             this.map.olMap.zoomToExtent(this._extent);
             this._mapDeferred.resolve();
         },
