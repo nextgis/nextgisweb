@@ -23,10 +23,20 @@
     "title": "Google - Рельеф",
     "type": "terrain"
 }, {
-    "keyname": "google-terrain",
-    "mid": "ngw/openlayers/layer/Google",
-    "title": "Google - Рельеф",
-    "type": "terrain"
+    "keyname": "bing-satellite",
+    "mid": "ngw/openlayers/layer/Bing",
+    "title": "Bing - Снимки",
+    "type": "Aerial"
+}, {
+    "keyname": "bing-hybrid",
+    "mid": "ngw/openlayers/layer/Bing",
+    "title": "Bing - Гибрид",
+    "type": "AerialWithLabels"
+}, {
+    "keyname": "bing-road",
+    "mid": "ngw/openlayers/layer/Bing",
+    "title": "Bing - Схема",
+    "type": "Road"
 }, {
     "keyname": "blank",
     "mid": "ngw/openlayers/layer/XYZ",

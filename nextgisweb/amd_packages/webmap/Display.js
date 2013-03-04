@@ -467,8 +467,12 @@ define([
                     layerOptions.keyname = 'basemap_' + idx;
                 }
 
-                var layer = new MID(layerOptions.keyname, layerOptions);
-                this.map.addLayer(layer);
+                try {
+                    var layer = new MID(layerOptions.keyname, layerOptions);
+                    this.map.addLayer(layer);
+                } catch (err) {
+                    console.warn("Can't initialize layer [" + layerOptions.keyname + "]: " + err);
+                }
 
                 idx = idx + 1;
             }, this);

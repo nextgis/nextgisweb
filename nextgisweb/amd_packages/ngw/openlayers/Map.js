@@ -26,6 +26,15 @@ define([
             this.olMap.events.on({
                 zoomend: function (evt) {
                     widget.set("scaleDenom", olMap.getScale());
+                },
+                changebaselayer: function (evt) {
+                    // Костыль для Bing (см. #315)
+                    var overlays = olMap.getLayersBy('isBaseLayer', false);
+                    if (evt.layer.CLASS_NAME === 'OpenLayers.Layer.Bing') {
+                        overlays.forEach(function (l) { l.zoomOffset = 1; });
+                    } else {
+                        overlays.forEach(function (l) { l.zoomOffset = 0; });
+                    }
                 }
             });
 

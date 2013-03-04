@@ -51,4 +51,11 @@ class WebMapComponent(Component):
         with codecs.open(self.settings['basemaps'], 'rb', 'utf-8') as fp:
             basemaps = json.load(fp)
 
-        return dict(basemaps=basemaps)
+        return dict(
+            basemaps=basemaps,
+            bing_apikey=self.settings.get('bing_apikey'),
+        )
+
+    settings_info = (
+        dict(key='bing_apikey', desc=u"Bing maps API key"),
+    )
