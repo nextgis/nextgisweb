@@ -37,6 +37,9 @@ def setup_pyramid(comp, config):
             if self.obj:
                 result['value'] = dict(display_name=self.obj.display_name)
 
+            elif len(self.options['layer'].styles) == 0:
+                result['value'] = dict(display_name=u"Основной")
+
             return result
 
     Style.object_widget = (
