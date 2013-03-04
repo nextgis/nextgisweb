@@ -12,6 +12,8 @@ def initialize(comp):
 
         __acl_resource__ = 'webmap'
 
+        cls_display_name = u"Веб-карта"
+
         id = sa.Column(sa.Integer, primary_key=True)
         display_name = sa.Column(sa.Unicode, nullable=False)
         root_item_id = sa.Column(sa.Integer, sa.ForeignKey('webmap_item.id'), nullable=False)

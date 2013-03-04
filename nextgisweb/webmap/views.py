@@ -5,7 +5,12 @@ from bunch import Bunch
 from ..models import DBSession
 
 from ..object_widget import ObjectWidget
-from ..views import ModelController, model_loader, permalinker
+from ..views import (
+    ModelController,
+    DeleteObjectWidget,
+    model_loader,
+    permalinker,
+)
 from ..psection import PageSections
 from .. import dynmenu as dm
 
@@ -62,8 +67,24 @@ def setup_pyramid(comp, config):
                 template_context=dict(obj=obj),
             )
 
+        def delete_context(self, request):
+            request.require_permission(WebMap.acl_root, 'write')
+
+            obj = WebMap.filter_by(**request.matchdict).one()
+            request.require_permission(obj, 'write')
+
+            return dict(
+                obj=obj,
+                template_context=dict(obj=obj),
+                redirect=request.route_url('webmap.browse'),
+            )
+
         def widget_class(self, context, operation):
-            return WebmapObjectWidget
+            return (
+                DeleteObjectWidget
+                if operation == 'delete'
+                else WebmapObjectWidget
+            )
 
         def create_object(self, context):
             return WebMap(
@@ -118,6 +139,14 @@ def setup_pyramid(comp, config):
                     'edit', u"Редактировать",
                     lambda kwargs: kwargs.request.route_url(
                         'webmap.edit',
+                        id=kwargs.obj.id
+                    )
+                )
+
+                yield dm.Link(
+                    'delete', u"Удалить",
+                    lambda kwargs: kwargs.request.route_url(
+                        'webmap.delete',
                         id=kwargs.obj.id
                     )
                 )
