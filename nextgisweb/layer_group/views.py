@@ -86,7 +86,10 @@ def setup_pyramid(comp, config):
                         styles=[
                             dict(
                                 type='style', id=s.id,
-                                display_name=s.display_name
+                                display_name=s.display_name,
+                                # Данные слоя
+                                layer_id=s.layer_id,
+                                layer_display_name=s.layer.display_name,
                             ) for s in l.styles
                         ]
                     ) for l in layer_group.layers

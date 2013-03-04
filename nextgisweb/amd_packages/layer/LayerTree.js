@@ -77,7 +77,8 @@ function (declare, array, Button, Tree, Memory, Observable, ObjectStoreModel, xh
                                     "type": "style",
                                     "id": s.id,
                                     "parent": l.type + '-' + l.id,
-                                    "display_name": s.display_name
+                                    "display_name": s.display_name,
+                                    "layer_display_name": s.layer_display_name
                                 });
                             })
                         });

@@ -172,10 +172,10 @@ define([
             });
 
             this.btnDlgAddLayer.on("click", function() {
-                widget.itemStore.newItem(
+                var item = widget.itemStore.newItem(
                     {
                         "item_type": "layer",
-                        "display_name": widget.wgtLayer.selectedItem.display_name,
+                        "display_name": widget.wgtLayer.selectedItem.layer_display_name,
                         "layer_style_id": widget.wgtLayer.selectedItem.id
                     }, {
                         parent: widget.getAddParent(),
