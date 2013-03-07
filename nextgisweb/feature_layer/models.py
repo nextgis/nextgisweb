@@ -76,5 +76,6 @@ class LayerFieldsMixin(object):
             primaryjoin="%s.id == %s.feature_label_field_id" % (
                 cls.__field_class__.__name__, cls.__name__
             ),
-            cascade='all'
+            cascade='all',
+            post_update=True
         )
