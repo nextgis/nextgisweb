@@ -1,3 +1,4 @@
+/*global console, define, require, OpenLayers, ngwConfig*/
 define([
     "dojo/_base/declare",
     "./Base",
@@ -43,7 +44,7 @@ define([
 ) {
 
     var Control = OpenLayers.Class(OpenLayers.Control, {
-       initialize: function(options) {
+        initialize: function (options) {
             OpenLayers.Control.prototype.initialize.apply(this, [options]);
 
             this.handler = new OpenLayers.Handler.Click(this, {
@@ -73,7 +74,7 @@ define([
                         label: feature.label,
                         value: layerId + "/" + idx
                     });
-                    idx ++;
+                    idx++;
                 }, this);
             }, this);
 
@@ -103,25 +104,24 @@ define([
             domClass.add(this.controller.domNode, "ngwWebmapToolIdentify-controller");
             this.addChild(this.controller);
 
+            this._extWidgets = {};
 
-
-            this.fieldsWidget = new FieldsDisplayWidget({
-                style: "padding: 2px;"
-            });
-            this.container.addChild(this.fieldsWidget);
+            if (settings.identify.attributes) {
+                this._extWidgets['feature_layer/FieldsDisplayWidget'] = new FieldsDisplayWidget({style: "padding: 2px;"});
+                this.container.addChild(this._extWidgets['feature_layer/FieldsDisplayWidget']);
+            }
 
             // создаем виждеты для всех расширений IFeatureLayer
-            this._extWidgets = {};
             var deferreds = [this._startupDeferred];
             var widget = this;
             array.forEach(Object.keys(settings.extensions), function (key) {
                 var ext = settings.extensions[key];
-                
+
                 var deferred = new Deferred();
                 deferreds.push(deferred);
 
-                require([ext.displayWidget], function (cls) {
-                    var extWidget = new cls({
+                require([ext.displayWidget], function (Cls) {
+                    var extWidget = new Cls({
                         style: "padding: 2px;"
                     });
                     widget.container.addChild(extWidget);
@@ -136,14 +136,14 @@ define([
                 // Если не дождаться пока все панели будут добавлены,
                 // то новая кнопка будет в случайном месте.
                 widget.editButton = new Button({
-                    iconClass:'dijitIconEdit',
+                    iconClass: 'dijitIconEdit',
                     showLabel: true,
                     onClick: function () {
                         // TODO: Пока открываем в новом окне, сделать вкладку
-                        feature = widget._featureResponse(widget.select.get("value"));
+                        var feature = widget._featureResponse(widget.select.get("value"));
                         window.open(
-                            ngwConfig.applicationUrl + "/layer/" + feature.layerId 
-                            + "/feature/" + feature.id + "/edit"
+                            ngwConfig.applicationUrl + "/layer/" + feature.layerId
+                                + "/feature/" + feature.id + "/edit"
                         );
                     }
                 }).placeAt(widget.controller, "last");
@@ -161,7 +161,7 @@ define([
             this._displayFeature(this._featureResponse(this.select.get("value")));
         },
 
-        _featureResponse: function(selectValue) {
+        _featureResponse: function (selectValue) {
             var keys = selectValue.split("/");
             return this.response[keys[0]].features[keys[1]];
         },
@@ -174,11 +174,16 @@ define([
                 headers: { "X-Feature-Ext": "*" }
             }).then(function (feature) {
                 widget._widgetsDeferred.then(function () {
-                    widget.fieldsWidget.set("feature", feature);
-                    for (var ident in widget._extWidgets) {
+                    var selected = false;
+                    array.forEach(Object.keys(widget._extWidgets), function (ident) {
                         widget._extWidgets[ident].set("feature", feature);
-                    };
-                }).then(null, function (error) { console.error(error) });
+
+                        if (!selected && !widget._extWidgets[ident].get('disabled')) {
+                            widget.container.selectChild(widget._extWidgets[ident]);
+                            selected = true;
+                        }
+                    }, this);
+                }).then(null, function (error) { console.error(error); });
             });
         }
 
@@ -227,13 +232,13 @@ define([
             };
 
             this.display.getVisibleItems().then(function (items) {
-                if (items.length == 0) {
+                if (items.length === 0) {
                     // Никаких видимых элементов сейчас нет
                     console.log("Visible items not found!");
                 } else {
                     // Добавляем список видимых элементов в запрос
                     request.layers = array.map(items, function (i) {
-                        return this.display.itemStore.getValue(i, "layerId")
+                        return this.display.itemStore.getValue(i, "layerId");
                     });
 
                     // XHR-запрос к сервису
@@ -263,7 +268,7 @@ define([
             if (this._popup) {
                 this.map.olMap.removePopup(this._popup);
                 this._popup = null;
-            };
+            }
         },
 
         _responsePopup: function (response, point) {
@@ -288,7 +293,7 @@ define([
             this.map.olMap.addPopup(this._popup);
             widget.resize();
             widget.select.resize();
-        },
+        }
 
     });
 });

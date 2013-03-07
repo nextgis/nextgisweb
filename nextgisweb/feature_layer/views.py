@@ -278,7 +278,10 @@ def setup_pyramid(comp, config):
                     )),
                     FeatureExtension.registry
                 )
-            )
+            ),
+            identify=dict(
+                attributes=self.settings['identify.attributes']
+            ),
         )
 
     comp.client_settings = MethodType(client_settings, comp, comp.__class__)
