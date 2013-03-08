@@ -12,7 +12,8 @@ define([
                 type: "png",
                 visibility: item.visibility,
                 minScale: item.minScaleDenom ? (1 / item.minScaleDenom) : undefined,
-                maxScale: item.maxScaleDenom ? (1 / item.maxScaleDenom) : undefined
+                maxScale: item.maxScaleDenom ? (1 / item.maxScaleDenom) : undefined,
+                opacity: item.transparency ? (1 - item.transparency / 100) : 1.0
             });
         }
     });

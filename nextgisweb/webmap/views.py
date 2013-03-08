@@ -204,6 +204,7 @@ def setup_pyramid(comp, config):
                     layerId=style.layer_id,
                     styleId=style.id,
                     visibility=bool(item.layer_enabled),
+                    transparency=item.layer_transparency,
                     minScaleDenom=item.layer_min_scale_denom,
                     maxScaleDenom=item.layer_max_scale_denom,
                 )
