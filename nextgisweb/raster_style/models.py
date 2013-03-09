@@ -1,26 +1,44 @@
 # -*- coding: utf-8 -*-
 import sqlalchemy as sa
-import sqlalchemy.orm as orm
 import numpy
 from osgeo import gdal_array
 import PIL
+from zope.interface import implements
 
+from ..style import (
+    IRenderableStyle,
+    IExtentRenderRequest,
+    ITileRenderRequest,
+)
 
 
 def include(comp):
-    DBSession = comp.env.core.DBSession
     Style = comp.env.style.Style
-    
-    RasterLayer = comp.env.raster_layer.RasterLayer
+
+    class RenderRequest(object):
+        implements(IExtentRenderRequest, ITileRenderRequest)
+
+        def __init__(self, style, srs):
+            self.style = style
+            self.srs = srs
+
+        def render_extent(self, extent, size):
+            return self.style.render_image(extent, size)
+
+        def render_tile(self, tile, size):
+            extent = self.srs.tile_extent(tile)
+            return self.style.render_image(extent, (size, size))
 
     @Style.registry.register
     class RasterStyle(Style):
+        implements(IRenderableStyle)
+
         __tablename__ = 'raster_style'
 
         identity = __tablename__
         cls_display_name = u"Растровый стиль"
 
-        style_id = sa.Column(sa.Integer, sa.ForeignKey(Style.id), primary_key=True)
+        style_id = sa.Column(sa.ForeignKey(Style.id), primary_key=True)
 
         __mapper_args__ = dict(
             polymorphic_identity=identity,
@@ -32,16 +50,19 @@ def include(comp):
         def is_layer_supported(cls, layer):
             return layer.cls == 'raster_layer'
 
+        def render_request(self, srs):
+            return RenderRequest(self, srs)
+
         @classmethod
         def widget_config(cls, layer):
             result = Style.widget_config(layer)
             return result
 
-        def render_image(self, extent, img_size, settings):
+        def render_image(self, extent, size):
             ds = self.layer.gdal_dataset()
             gt = ds.GetGeoTransform()
 
-            result = PIL.Image.new("RGBA", img_size, (0, 0, 0, 0))
+            result = PIL.Image.new("RGBA", size, (0, 0, 0, 0))
 
             # пересчитываем координаты в пикселы
             off_x = int((extent[0] - gt[0]) / gt[1])
@@ -50,7 +71,7 @@ def include(comp):
             width_y = int(((extent[1] - gt[3]) / gt[5]) - off_y)
 
             # проверяем, чтобы пикселы не вылезали за пределы изображения
-            target_width, target_height = img_size
+            target_width, target_height = size
             offset_left = offset_top = 0
 
             # правая граница
@@ -90,7 +111,12 @@ def include(comp):
             array = numpy.zeros((target_height, target_width, band_count), numpy.uint8)
 
             for i in range(band_count):
-                array[:, :, i] = gdal_array.BandReadAsArray(ds.GetRasterBand(i + 1), off_x, off_y, width_x, width_y, target_width, target_height)
+                array[:, :, i] = gdal_array.BandReadAsArray(
+                    ds.GetRasterBand(i + 1),
+                    off_x, off_y,
+                    width_x, width_y,
+                    target_width, target_height
+                )
 
             wnd = PIL.Image.fromarray(array)
             result.paste(wnd, (offset_left, offset_top))

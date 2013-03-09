@@ -10,9 +10,6 @@ from .. import dynmenu as dm
 from ..object_widget import ObjectWidget, CompositeWidget
 
 
-EPSG_3857_BOX = (-20037508.34, -20037508.34, 20037508.34, 20037508.34)
-
-
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
     Layer = comp.env.layer.Layer
@@ -67,7 +64,7 @@ def setup_pyramid(comp, config):
             )
 
             widget_options = dict(layer=layer)
-            
+
             return locals()
 
         def edit_context(self, request):
@@ -77,7 +74,7 @@ def setup_pyramid(comp, config):
             identity = obj.cls
             cls = Style.registry[identity]
             obj = DBSession.query(cls).get(obj.id)
-            
+
             template_context = dict(
                 obj=obj,
             )
@@ -128,16 +125,8 @@ def setup_pyramid(comp, config):
         x = int(request.GET['x'])
         y = int(request.GET['y'])
 
-        step = (EPSG_3857_BOX[2] - EPSG_3857_BOX[0]) / 2 ** z
-
-        box = (
-            EPSG_3857_BOX[0] + x * step,
-            EPSG_3857_BOX[3] - (y + 1) * step,
-            EPSG_3857_BOX[0] + (x + 1) * step,
-            EPSG_3857_BOX[3] - y * step,
-        )
-
-        img = obj.render_image(box, (256, 256), request.registry.settings)
+        req = obj.render_request(obj.layer.srs)
+        img = req.render_tile((z, x, y), 256)
 
         buf = StringIO()
         img.save(buf, 'png')

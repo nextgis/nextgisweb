@@ -16,7 +16,12 @@ class SpatialRefSysComponent(Component):
         srs_list = (
             # TODO: Закомментировано до лучших времен
             # SRS(id=4326, display_name="WGS 84 / Lon-lat (EPSG:4326)"),
-            SRS(id=3857, display_name="WGS 84 / Pseudo-Mercator (EPSG:3857)"),
+            SRS(
+                id=3857,
+                display_name=u"WGS 84 / Pseudo-Mercator (EPSG:3857)",
+                minx=-20037508.34, miny=-20037508.34,
+                maxx=20037508.34, maxy=20037508.34
+            ),
         )
 
         for srs in srs_list:

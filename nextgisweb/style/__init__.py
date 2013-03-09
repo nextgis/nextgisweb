@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
 
+from .interface import (
+    IRenderableStyle,
+    IExtentRenderRequest,
+    ITileRenderRequest,
+)
 
 @Component.registry.register
 class StyleComponent(Component):
