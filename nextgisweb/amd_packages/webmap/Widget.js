@@ -12,6 +12,7 @@ define([
     "dijit/Tree",
     "dijit/tree/dndSource",
     "dijit/registry",
+    "ngw/settings!webmap",
     // template
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
@@ -26,6 +27,7 @@ define([
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
+    "dijit/form/Select",
     "dijit/_WidgetBase",
     "layer/LayerTree"
 ], function (
@@ -41,7 +43,8 @@ define([
     TreeStoreModel,
     Tree,
     dndSource,
-    registry
+    registry,
+    settings
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
@@ -83,6 +86,13 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
+
+            array.forEach(Object.keys(settings.adapters), function (key) {
+                this.wLayerAdapter.addOption({
+                    value: key,
+                    label: settings.adapters[key].display_name
+                });
+            }, this);
 
             if (this.value) {
                 this.wDisplayName.set("value", this.value.display_name);
@@ -135,6 +145,7 @@ define([
                     widget.wLayerTransparency.set("value", widget.getItemValue("layer_transparency"));
                     widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale_denom"));
                     widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale_denom"));
+                    widget.wLayerAdapter.set("value", widget.getItemValue("layer_adapter"));
                 };
 
                 // Изначально боковая панель со свойствами текущего элемента
@@ -160,8 +171,8 @@ define([
                 widget.setItemValue("layer_enabled", newValue);
             });
 
-            this.wLayerTransparency.watch("value", function (attr, oldVal, newValue) {
-                widget.setItemValue("layer_transparency", newValue);
+            this.wLayerTransparency.watch("value", function (attr, oldVal, newVal) {
+                widget.setItemValue("layer_transparency", newVal);
             });
 
             this.wLayerMinScale.watch("value", function (attr, oldVal, newVal) {
@@ -172,6 +183,10 @@ define([
                 widget.setItemValue("layer_max_scale_denom", newVal);
             });
 
+            this.wLayerAdapter.watch("value", function (attr, oldVal, newVal) {
+                widget.setItemValue("layer_adapter", newVal);
+            })
+
             this.wgtLayer.on("click", function (item) {
                 widget.btnDlgAddLayer.set("disabled", item.type != 'style');
             });
@@ -181,7 +196,8 @@ define([
                     {
                         "item_type": "layer",
                         "display_name": widget.wgtLayer.selectedItem.layer_display_name,
-                        "layer_style_id": widget.wgtLayer.selectedItem.id
+                        "layer_style_id": widget.wgtLayer.selectedItem.id,
+                        "layer_adapter": "image"
                     }, {
                         parent: widget.getAddParent(),
                         attribute: "children"    
@@ -206,6 +222,7 @@ define([
                     layer_transparency: widget.itemStore.getValue(itm, "layer_transparency"),
                     layer_min_scale_denom: widget.itemStore.getValue(itm, "layer_min_scale_denom"),
                     layer_max_scale_denom: widget.itemStore.getValue(itm, "layer_max_scale_denom"),
+                    layer_adapter: widget.itemStore.getValue(itm, "layer_adapter"),
                     children: array.map(widget.itemStore.getValues(itm, "children"), function (i) { return traverseItem(i) })
                 }
             }

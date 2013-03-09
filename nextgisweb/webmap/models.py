@@ -65,11 +65,12 @@ def initialize(comp):
         position = sa.Column(sa.Integer, nullable=True)
         display_name = sa.Column(sa.Unicode, nullable=True)
         group_expanded = sa.Column(sa.Boolean, nullable=True)
-        layer_style_id = sa.Column(sa.Integer, sa.ForeignKey('style.id'), nullable=True)
+        layer_style_id = sa.Column(sa.ForeignKey('style.id'), nullable=True)
         layer_enabled = sa.Column(sa.Boolean, nullable=True)
         layer_transparency = sa.Column(sa.Float, nullable=True)
         layer_min_scale_denom = sa.Column(sa.Float, nullable=True)
         layer_max_scale_denom = sa.Column(sa.Float, nullable=True)
+        layer_adapter = sa.Column(sa.Unicode, nullable=True)
 
         parent = orm.relationship(
             'WebMapItem',
@@ -112,6 +113,7 @@ def initialize(comp):
                     layer_style_id=self.layer_style_id,
                     layer_min_scale_denom=self.layer_min_scale_denom,
                     layer_max_scale_denom=self.layer_max_scale_denom,
+                    layer_adapter=self.layer_adapter,
                 )
 
         def from_dict(self, data):
@@ -124,7 +126,7 @@ def initialize(comp):
                     child.from_dict(i)
                     self.children.append(child)
                     pos += 1
-            for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_transparency', 'layer_style_id', 'layer_min_scale_denom', 'layer_max_scale_denom'):
+            for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_transparency', 'layer_style_id', 'layer_min_scale_denom', 'layer_max_scale_denom', 'layer_adapter'):
                 if a in data:
                     setattr(self, a, data[a])
 

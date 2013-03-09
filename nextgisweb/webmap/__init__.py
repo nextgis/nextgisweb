@@ -54,6 +54,10 @@ class WebMapComponent(Component):
         return dict(
             basemaps=basemaps,
             bing_apikey=self.settings.get('bing_apikey'),
+            adapters=dict([
+                (i.identity, dict(display_name=i.display_name))
+                for i in WebMapAdapter.registry
+            ])
         )
 
     settings_info = (

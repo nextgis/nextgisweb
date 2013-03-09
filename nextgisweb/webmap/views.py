@@ -16,6 +16,7 @@ from .. import dynmenu as dm
 
 
 from .plugin import WebmapPlugin
+from .adapter import WebMapAdapter
 
 
 class WebmapObjectWidget(ObjectWidget):
@@ -209,8 +210,8 @@ def setup_pyramid(comp, config):
                     maxScaleDenom=item.layer_max_scale_denom,
                 )
 
-                # Адаптер слоя пока один
-                data.update(adapter="webmap/TMSAdapter")
+                data['adapter'] = WebMapAdapter.registry.get(
+                    item.layer_adapter, 'image').mid
                 display.mid.adapter.add(data['adapter'])
 
                 # Плагины уровня слоя

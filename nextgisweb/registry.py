@@ -19,4 +19,7 @@ def registry_maker():
         def __getitem__(self, identity):
             return self._dict[identity]
 
+        def get(self, identity, default=None):
+            return self._dict.get(identity, default)
+
     return ClassRegistry()

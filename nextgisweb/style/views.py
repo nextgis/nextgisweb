@@ -137,6 +137,36 @@ def setup_pyramid(comp, config):
     config.add_route('style.tms', '/style/{id:\d+}/tms').add_view(tms)
 
     @model_context(Style)
+    def image(request, obj):
+        actual_class = Style.registry[obj.cls]
+        obj = DBSession.query(Style) \
+            .with_polymorphic((actual_class, ))\
+            .filter_by(id=obj.id).one()
+        
+        request.require_permission(obj.layer, 'style-read')
+
+        extent = map(float, request.GET['extent'].split(','))
+        size = map(int, request.GET['size'].split(','))
+
+        if extent[0] < obj.layer.srs.minx:
+            # Костыль для 180
+            extent = (
+                extent[0] + obj.layer.srs.maxx - obj.layer.srs.minx, extent[1],
+                extent[2] + obj.layer.srs.maxx - obj.layer.srs.minx, extent[3],
+            )
+
+        req = obj.render_request(obj.layer.srs)
+        img = req.render_extent(extent, size)
+
+        buf = StringIO()
+        img.save(buf, 'png')
+        buf.seek(0)
+
+        return Response(body_file=buf, content_type='image/png')
+
+    config.add_route('style.image', '/style/{id:\d+}/image').add_view(image)
+
+    @model_context(Style)
     def show(request, obj):
         actual_class = Style.registry[obj.cls]
         obj = DBSession.query(Style) \

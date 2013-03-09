@@ -13,19 +13,20 @@ class WebMapAdapter(object):
 
 
 @WebMapAdapter.registry.register
-class TMSAdapter(object):
-    """ Адаптер, реализующий отображение стиля слоя через TMS-подобный
-    сервис, однако сам TMS-подобный сервис реализуется другим компонентов. """
+class TileAdapter(object):
+    """ Адаптер, реализующий отображение стиля слоя через тайловый сервис,
+    однако сам сервис реализуется другим компонентом. """
 
-    identity = 'tms'
-    js_module = 'webmap/TMSAdapter'
+    identity = 'tile'
+    mid = 'webmap/TMSAdapter'
+    display_name = u"Тайлы"
 
 
 @WebMapAdapter.registry.register
 class ImageAdapter(object):
     """ Адаптер, реализующий отображение стиля слоя через сервис подобный
-    WMS-запросу GetImage, однако сам WMS-подобный сервис реализуется другим
-    компонентом. """
+    WMS-запросу GetImage, однако сам сервис реализуется другим компонентом. """
 
     identity = 'image'
-    js_module = 'webmap/ImageAdapter'
+    mid = 'webmap/ImageAdapter'
+    display_name = u"Изображение"
