@@ -7,9 +7,6 @@ import ctypes
 import osgeo
 from osgeo import ogr
 
-from ..models import DBSession
-from ..spatial_ref_sys import SRS
-
 from ..object_widget import ObjectWidget
 
 
@@ -40,34 +37,41 @@ class VectorLayerObjectWidget(ObjectWidget):
 
         if not zipfile.is_zipfile(datafile):
             self.error.append(dict(message=u"Загруженный файл не является ZIP-архивом."))
-            result = False
-        else:
-            self._unzip_tmpdir = tempfile.mkdtemp()
+            return  False
 
-            zipfile.ZipFile(datafile, 'r').extractall(path=self._unzip_tmpdir)
+        self._unzip_tmpdir = tempfile.mkdtemp()
+        zipfile.ZipFile(datafile, 'r').extractall(path=self._unzip_tmpdir)
 
-            with _set_encoding(self._encoding) as strdecode:
-                self._strdecode = strdecode
-                self._ogrds = ogr.Open(self._unzip_tmpdir)
+        with _set_encoding(self._encoding) as strdecode:
+            self._strdecode = strdecode
+            self._ogrds = ogr.Open(self._unzip_tmpdir)
 
-            if not self._ogrds:
-                self.error.append(dict(message=u"Библиотеке GDAL/OGR не удалось открыть файл."))
-                result = False
+        if not self._ogrds:
+            self.error.append(dict(message=u"Библиотеке GDAL/OGR не удалось открыть файл."))
+            return False
 
-            else:
-                if self._ogrds.GetLayerCount() < 1:
-                    self.error.append(dict(message=u"Набор данных не содержит слоёв."))
-                    result = False
+        if self._ogrds.GetLayerCount() < 1:
+            self.error.append(dict(message=u"Набор данных не содержит слоёв."))
+            return False
 
-                elif self._ogrds.GetLayerCount() > 1:
-                    self.error.append(dict(message=u"Набор данных содержит более одного слоя."))
-                    result = False
+        if self._ogrds.GetLayerCount() > 1:
+            self.error.append(dict(message=u"Набор данных содержит более одного слоя."))
+            return False
 
-                else:
-                    self._ogrlayer = self._ogrds.GetLayer(0)
-                    if not self._ogrlayer:
-                        self.error.append(dict(message=u"Не удалось открыть слой."))
-                        result = False
+        self._ogrlayer = self._ogrds.GetLayer(0)
+        if not self._ogrlayer:
+            self.error.append(dict(message=u"Не удалось открыть слой."))
+            return False
+
+        feat = self._ogrlayer.GetNextFeature()
+        while feat:
+            geom = feat.GetGeometryRef()
+            if not geom:
+                self.error.append(dict(message=u"Объект FID = %d не содержит геометрии." % feat.GetFID()))
+                return False
+            feat = self._ogrlayer.GetNextFeature()
+
+        self._ogrlayer.ResetReading()
 
         return result
 
@@ -99,7 +103,8 @@ class VectorLayerFeatureWidget(ObjectWidget):
     def widget_params(self):
         result = super(VectorLayerFeatureWidget, self).widget_params()
 
-        result['fields'] = [dict(keyname=f.keyname, label=f.display_name)
+        result['fields'] = [
+            dict(keyname=f.keyname, label=f.display_name)
             for f in self.layer.fields
         ]
 
@@ -174,7 +179,7 @@ def _set_encoding(encoding):
             if encoding and osgeo.__version__ >= '1.9':
                 # Возвращаем на место старое значение
                 self.set_option('SHAPE_ENCODING', self.old_value)
-                
+
     return encoding_section(encoding)
 
 
