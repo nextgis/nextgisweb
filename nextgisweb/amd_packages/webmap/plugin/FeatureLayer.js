@@ -25,14 +25,14 @@ define([
     var Pane = declare([FeatureGrid], {
         closable: true,
         gutters: false,
-        iconClass: "dijitIconTable",
+        iconClass: "iconTable",
 
         postCreate: function () {
             var widget = this;
 
             this.btnOpenFeatureTab = new Button({
                 label: "Открыть",
-                iconClass: "dijitIconApplication",
+                iconClass: "iconFeatureEdit",
                 disabled: true,
                 onClick: function () {
                     widget.openFeature();
@@ -42,7 +42,7 @@ define([
 
             this.btnZoomToFeature = new Button({
                 label: "Перейти",
-                iconClass: "dijitIconSearch",
+                iconClass: "iconZoom",
                 disabled: true,
                 onClick: function () {
                     widget.zoomToFeature();
@@ -87,6 +87,7 @@ define([
 
             this.menuItem = new MenuItem({
                 label: "Таблица объектов",
+                iconClass: "iconTable",
                 disabled: true,
                 onClick: function () {
                     plugin.openFeatureGrid();

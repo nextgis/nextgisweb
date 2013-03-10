@@ -191,6 +191,7 @@ define([
 
     return declare(Base, {
         label: "Идентификация",
+        iconClass: "iconIdentify",
 
         // Радиус для поиска объектов в пикселях
         pixelRadius: 2,

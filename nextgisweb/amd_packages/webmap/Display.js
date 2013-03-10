@@ -315,7 +315,8 @@ define([
 
         addTool: function (tool) {
             var btn = new ToggleButton({
-                label: tool.label
+                label: tool.label,
+                iconClass: tool.iconClass
             }).placeAt(this.mapToolbar);
 
             this.tools.push(tool);

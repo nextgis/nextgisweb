@@ -16,7 +16,7 @@ define([
 ) {
     var Pane = declare([ContentPane], {
         closable: true,
-        iconClass: "dijitIconFile",
+        iconClass: "iconDescription",
 
         postCreate: function () {
             if (this.data.description) {
@@ -35,6 +35,7 @@ define([
 
             this.menuItem = new MenuItem({
                 label: "Описание",
+                iconClass: "iconDescription",
                 disabled: true,
                 onClick: function () {
                     plugin.openLayerInfo();
