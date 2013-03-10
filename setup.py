@@ -20,7 +20,7 @@ requires = [
     'geoalchemy',
     'shapely',
     'geojson',
-    'PIL',
+    'pillow',
     'lxml',
     'passlib',
 ]
