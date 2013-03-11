@@ -3,14 +3,10 @@ import subprocess
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-import geoalchemy as ga
 
 from osgeo import gdal, gdalconst, osr
 
 from ..layer import SpatialLayerMixin
-from ..spatial_ref_sys import SRS
-from ..file_storage import FileObj
-from ..models import DBSession
 
 
 def include(comp):
@@ -25,13 +21,13 @@ def include(comp):
         cls_display_name = u"Растровый слой"
 
         layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
-        fileobj_id = sa.Column(sa.Integer, sa.ForeignKey(FileObj.id), nullable=True)
+        fileobj_id = sa.Column(sa.ForeignKey(file_storage.FileObj.id), nullable=True)
 
         xsize = sa.Column(sa.Integer, nullable=False)
         ysize = sa.Column(sa.Integer, nullable=False)
         band_count = sa.Column(sa.Integer, nullable=False)
 
-        fileobj = orm.relationship(FileObj, cascade='all')
+        fileobj = orm.relationship(file_storage.FileObj, cascade='all')
 
         __mapper_args__ = dict(
             polymorphic_identity=identity,
@@ -47,7 +43,7 @@ def include(comp):
 
             reproject = not src_osr.IsSame(dst_osr)
 
-            fobj = FileObj(component='raster_layer')
+            fobj = file_storage.FileObj(component='raster_layer')
 
             dst_file = env.file_storage.filename(fobj, makedirs=True)
             self.fileobj = fobj
@@ -72,5 +68,11 @@ def include(comp):
         def gdal_dataset(self):
             fn = file_storage.filename(self.fileobj)
             return gdal.Open(fn, gdalconst.GA_ReadOnly)
+
+        def get_info(self):
+            s = super(RasterLayer, self)
+            return (s.get_info() if hasattr(s, 'get_info') else ()) + (
+                (u"Идентификатор файла", self.fileobj.uuid),
+            )
 
     comp.RasterLayer = RasterLayer
