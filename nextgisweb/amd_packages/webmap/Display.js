@@ -299,7 +299,7 @@ define([
 
             // Свернем те элементы дерева, которые не отмечены как развернутые.
             // По-умолчанию все элементы развернуты за счет autoExpand у itemTree
-            all([this._itemStoreDeferred, this._startupDeferred]).then(
+            all([this._itemStoreDeferred, widget.itemTree.onLoadDeferred]).then(
                 function () {
                     widget.itemStore.fetch({
                         queryOptions: { deep: true },
