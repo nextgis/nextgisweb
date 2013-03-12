@@ -227,10 +227,13 @@ def setup_pyramid(comp, config):
             elif item.item_type in ('root', 'group'):
                 # Рекурсивно пробегаем по всем элементам, исключая те,
                 # на которые нет необходимых прав доступа
-                data.update(children=filter(
-                    None,
-                    map(traverse, item.children)
-                ))
+                data.update(
+                    expanded=item.group_expanded,
+                    children=filter(
+                        None,
+                        map(traverse, item.children)
+                    )
+                )
 
             return data
 

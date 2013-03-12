@@ -297,6 +297,23 @@ define([
                 }
             );
 
+            // Свернем те элементы дерева, которые не отмечены как развернутые.
+            // По-умолчанию все элементы развернуты за счет autoExpand у itemTree
+            all([this._itemStoreDeferred, this._startupDeferred]).then(
+                function () {
+                    widget.itemStore.fetch({
+                        queryOptions: { deep: true },
+                        onItem: function (item) {
+                            var node = widget.itemTree.getNodesByItem(item)[0],
+                                config = widget._itemConfigById[widget.itemStore.getValue(item, 'id')];
+                            if (node && config.type === 'group' && !config.expanded) {
+                                node.collapse();
+                            }
+                        }
+                    });
+                }
+            ).then(undefined, function (err) { console.error(err); });
+
 
             // Инструменты
             this.tools = [];
