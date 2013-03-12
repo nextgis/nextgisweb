@@ -54,6 +54,14 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
     width: 100%;
 }
 
+
+/* Двигаем OL ScaleLine в правый верхний угол, левый нижний занят гуглом */
+.olMap .olControlScaleLine {
+    left: auto; bottom: auto;
+    right: 8px; top: 8px;
+}
+
+
 table.data {}
 
 table.data tr th { background-color: #eee; font-weight: bold; }

@@ -474,6 +474,9 @@ define([
             // Инициализация карты
             this.map = new Map(this.mapNode, {});
 
+            // Масштабная линейка
+            this.map.olMap.addControl(new OpenLayers.Control.ScaleLine());
+
             // Инициализация базовых слоев
             var idx = 0;
             array.forEach(clientSettings.basemaps, function (bm) {
