@@ -63,6 +63,10 @@ class VectorLayerObjectWidget(ObjectWidget):
             self.error.append(dict(message=u"Не удалось открыть слой."))
             return False
 
+        if self._ogrlayer.GetSpatialRef() is None:
+            self.error.append(dict(message=u"Не указана система координат слоя."))
+            return False
+
         feat = self._ogrlayer.GetNextFeature()
         while feat:
             geom = feat.GetGeometryRef()
