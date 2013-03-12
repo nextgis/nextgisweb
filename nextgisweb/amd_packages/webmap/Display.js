@@ -9,6 +9,7 @@ define([
     "dojo/_base/array",
     "dojo/Deferred",
     "dojo/promise/all",
+    "dojo/number",
     "ngw/openlayers",
     "ngw/openlayers/Map",
     "dijit/registry",
@@ -47,6 +48,7 @@ define([
     array,
     Deferred,
     all,
+    number,
     openlayers,
     Map,
     registry,
@@ -471,11 +473,18 @@ define([
         },
 
         _mapSetup: function () {
+            var widget = this;
+
             // Инициализация карты
             this.map = new Map(this.mapNode, {});
 
             // Масштабная линейка
             this.map.olMap.addControl(new OpenLayers.Control.ScaleLine());
+
+            // Обновление подписи масштаба
+            this.map.watch("scaleDenom", function (attr, oldVal, newVal) {
+                widget.scaleInfoNode.innerHTML = "1 : " + number.format(newVal, {places: 0});
+            });
 
             // Инициализация базовых слоев
             var idx = 0;
