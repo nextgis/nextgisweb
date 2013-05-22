@@ -224,12 +224,12 @@ define([
             // Размещаем дерево, когда виджет будет готов           
             this._postCreateDeferred.then(
                 function () { widget.itemTree.placeAt(widget.layerTreePane); }
-            );
+            ).then(undefined, function (err) { console.error(err); });
 
             // Загружаем закладки, когда кнопка будет готова
             this._postCreateDeferred.then(
                 function () { widget.loadBookmarks(); }
-            );
+            ).then(undefined, function (err) { console.error(err); });
 
             // Выбранный элемент
             this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
@@ -245,7 +245,7 @@ define([
                 function () {
                     widget._mapSetup();
                 }
-            );
+            ).then(undefined, function (err) { console.error(err); });
 
             all([this._mapDeferred, this._postCreateDeferred]).then(
                 function () {
@@ -265,14 +265,14 @@ define([
                         widget.map.olMap.setBaseLayer(widget.map.layers[newVal].olLayer);
                     });
                 }
-            );
+            ).then(undefined, function (err) { console.error(err); });
 
             // Слои элементов
             all([this._midDeferred.adapter, this._itemStoreDeferred]).then(
                 function () {
                     widget._layersSetup();
                 }
-            );
+            ).then(undefined, function (err) { console.error(err); });
 
             all([this._layersDeferred, this._mapSetup]).then(
                 function () {
@@ -289,7 +289,7 @@ define([
                         }
                     });
                 }
-            );
+            ).then(undefined, function (err) { console.error(err); });
 
 
             // Плагины
@@ -297,7 +297,7 @@ define([
                 function () {
                     widget._pluginsSetup();
                 }
-            );
+            ).then(undefined, function (err) { console.error(err); });
 
             // Свернем те элементы дерева, которые не отмечены как развернутые.
             // По-умолчанию все элементы развернуты за счет autoExpand у itemTree
