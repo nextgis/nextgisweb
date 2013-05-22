@@ -293,7 +293,7 @@ define([
 
 
             // Плагины
-            all([this._midDeferred.plugin, this._postCreateDeferred]).then(
+            all([this._midDeferred.plugin, this._layersDeferred]).then(
                 function () {
                     widget._pluginsSetup();
                 }
