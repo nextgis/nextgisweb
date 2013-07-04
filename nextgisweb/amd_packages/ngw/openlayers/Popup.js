@@ -32,6 +32,9 @@ define([
 
             this.title = params.title;
 
+            // Сдвигаем карту в случае, если popup выходит за границу 
+            this.panMapIfOutOfView = true;
+
             // СontentDiv, который создает родительский класс
             // мы используем для внутренних нужд.
             this._contentDiv = this.contentDiv;
