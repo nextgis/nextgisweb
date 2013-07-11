@@ -194,7 +194,7 @@ define([
         iconClass: "iconIdentify",
 
         // Радиус для поиска объектов в пикселях
-        pixelRadius: 2,
+        pixelRadius: 3,
 
         // Ширина popup
         popupWidth: 300,
