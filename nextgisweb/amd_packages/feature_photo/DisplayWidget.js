@@ -1,12 +1,17 @@
 define([
     "dojo/_base/declare",
     "dojo/dom-construct",
+    "dojo/on",
+    "dojox/image/Lightbox",
     "feature_layer/DisplayWidget",
     // css
+    "xstyle/css!" + ngwConfig.amdUrl + "dojox/image/resources/Lightbox.css",
     "xstyle/css!./resources/Widget.css"
 ], function (
     declare,
     domConstruct,
+    on,
+    Lightbox,
     DisplayWidget
 ) {
     return declare(DisplayWidget, {
@@ -22,10 +27,18 @@ define([
 
             this.set("disabled", !ext);
 
+            // LighboxDialog не экспортируется через AMD,
+            // поэтому берем класс по полному имени
+            var dialog = new dojox.image.LightboxDialog({});
+            dialog.startup();
+
             for (var idx in ext) {
                 var pid = ext[idx];
 
-                var src = ngwConfig.applicationUrl + '/layer/' + feature.layerId + '/feature/' + feature.id + '/photo/' + pid;
+                var src = ngwConfig.applicationUrl
+                    + '/layer/' + feature.layerId
+                    + '/feature/' + feature.id 
+                    + '/photo/' + pid;
 
                 var surface = domConstruct.create("div", {
                     class: "ngwFeaturePhoto-surface ngwFeaturePhoto-inline"
@@ -42,8 +55,17 @@ define([
                 }, align);
 
                 var img = domConstruct.create("img", {
-                    src: src + "?size=64x64"
+                    src: src + "?size=64x64",
+                    title: ""
                 }, a);
+
+                dialog.addImage({href: src, title: ""}, "main");
+
+                on(a, "click", function (evt) {
+                    dialog.show({group: "main", href: this.href, title: ""});
+                    evt.preventDefault();
+                });
+
             };
         }
     });
