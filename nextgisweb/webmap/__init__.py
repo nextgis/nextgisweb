@@ -18,6 +18,9 @@ class WebMapComponent(Component):
             self.settings['basemaps'] = resource_filename(
                 'nextgisweb', 'webmap/basemaps.json')
 
+        self.settings['identify_radius'] = int(self.settings.get(
+            'identify_radius', 3))
+
         security = self.env.security
 
         security.add_resource('webmap', label=u"Веб-карта")
@@ -54,6 +57,7 @@ class WebMapComponent(Component):
         return dict(
             basemaps=basemaps,
             bing_apikey=self.settings.get('bing_apikey'),
+            identify_radius=self.settings.get('identify_radius'),
             adapters=dict([
                 (i.identity, dict(display_name=i.display_name))
                 for i in WebMapAdapter.registry
@@ -62,4 +66,5 @@ class WebMapComponent(Component):
 
     settings_info = (
         dict(key='bing_apikey', desc=u"Bing maps API key"),
+        dict(key='identify_radius', desc=u"Identify tool radius"),
     )

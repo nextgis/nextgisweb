@@ -18,7 +18,9 @@ define([
     "ngw/openlayers",
     "ngw/openlayers/Popup",
     "feature_layer/FieldsDisplayWidget",
+    // settings
     "ngw/settings!feature_layer",
+    "ngw/settings!webmap",
     // css
     "xstyle/css!./resources/Identify.css"
 ], function (
@@ -40,7 +42,8 @@ define([
     openlayers,
     Popup,
     FieldsDisplayWidget,
-    settings
+    featureLayersettings,
+    webmapSettings
 ) {
 
     var Control = OpenLayers.Class(OpenLayers.Control, {
@@ -106,7 +109,7 @@ define([
 
             this._extWidgets = {};
 
-            if (settings.identify.attributes) {
+            if (featureLayersettings.identify.attributes) {
                 this._extWidgets['feature_layer/FieldsDisplayWidget'] = new FieldsDisplayWidget({style: "padding: 2px;"});
                 this.container.addChild(this._extWidgets['feature_layer/FieldsDisplayWidget']);
             }
@@ -114,8 +117,8 @@ define([
             // создаем виждеты для всех расширений IFeatureLayer
             var deferreds = [this._startupDeferred];
             var widget = this;
-            array.forEach(Object.keys(settings.extensions), function (key) {
-                var ext = settings.extensions[key];
+            array.forEach(Object.keys(featureLayersettings.extensions), function (key) {
+                var ext = featureLayersettings.extensions[key];
 
                 var deferred = new Deferred();
                 deferreds.push(deferred);
@@ -194,7 +197,7 @@ define([
         iconClass: "iconIdentify",
 
         // Радиус для поиска объектов в пикселях
-        pixelRadius: 3,
+        pixelRadius: webmapSettings.identify_radius,
 
         // Ширина popup
         popupWidth: 300,
