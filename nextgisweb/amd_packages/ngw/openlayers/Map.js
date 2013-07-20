@@ -27,6 +27,9 @@ define([
                 zoomend: function (evt) {
                     widget.set("scaleDenom", olMap.getScale());
                 },
+                moveend: function (evt) {
+                    widget.set("center", olMap.getCenter());
+                },
                 changebaselayer: function (evt) {
                     // Костыль для Bing (см. #315)
                     var overlays = olMap.getLayersBy('isBaseLayer', false);

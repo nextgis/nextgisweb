@@ -481,6 +481,13 @@ define([
             // Масштабная линейка
             this.map.olMap.addControl(new OpenLayers.Control.ScaleLine());
 
+            // Обновление подписи центра карты
+            this.map.watch("center", function (attr, oldVal, newVal) {
+                var lonlat = newVal.transform(widget.displayProjection, widget.lonlatProjection);
+                widget.centerLonNode.innerHTML = number.format(newVal.lon, {places: 3});
+                widget.centerLatNode.innerHTML = number.format(newVal.lat, {places: 3});
+            });
+
             // Обновление подписи масштаба
             this.map.watch("scaleDenom", function (attr, oldVal, newVal) {
                 widget.scaleInfoNode.innerHTML = "1 : " + number.format(newVal, {places: 0});
