@@ -1,17 +1,23 @@
-/* glue: 0.3 hash: f889734f2a */
+/* glue: 0.3 hash: 94d5a5f222 */
+.iconZoomOut,
+.iconZoomIn,
 .iconZoom,
 .iconTable,
 .iconRulerSquare,
 .iconRuler,
+.iconPan,
 .iconMap,
 .iconIdentify,
 .iconFeatureEdit,
 .iconDescription{background-image:url('../img/icon.png');background-repeat:no-repeat}
-.iconZoom{background-position:0px 0px;width:16px;height:16px;}
-.iconTable{background-position:-16px 0px;width:16px;height:16px;}
-.iconRulerSquare{background-position:0px -16px;width:16px;height:16px;}
-.iconRuler{background-position:-16px -16px;width:16px;height:16px;}
-.iconMap{background-position:-32px 0px;width:16px;height:16px;}
-.iconIdentify{background-position:-32px -16px;width:16px;height:16px;}
-.iconFeatureEdit{background-position:0px -32px;width:16px;height:16px;}
-.iconDescription{background-position:-16px -32px;width:16px;height:16px;}
+.iconZoomOut{background-position:0px 0px;width:16px;height:16px;}
+.iconZoomIn{background-position:-16px 0px;width:16px;height:16px;}
+.iconZoom{background-position:0px -16px;width:16px;height:16px;}
+.iconTable{background-position:-16px -16px;width:16px;height:16px;}
+.iconRulerSquare{background-position:-32px 0px;width:16px;height:16px;}
+.iconRuler{background-position:-32px -16px;width:16px;height:16px;}
+.iconPan{background-position:0px -32px;width:16px;height:16px;}
+.iconMap{background-position:-16px -32px;width:16px;height:16px;}
+.iconIdentify{background-position:-32px -32px;width:16px;height:16px;}
+.iconFeatureEdit{background-position:-48px 0px;width:16px;height:16px;}
+.iconDescription{background-position:-48px -16px;width:16px;height:16px;}

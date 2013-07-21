@@ -27,6 +27,8 @@ define([
     "cbtree/Tree",
     "dijit/tree/dndSource",
     // tools
+    "./tool/Base",
+    "./tool/Zoom",
     "./tool/Measure",
     // settings
     "ngw/settings!webmap",
@@ -66,7 +68,9 @@ define([
     TreeStoreModel,
     Tree,
     dndSource,
-    Measure,
+    ToolBase,
+    ToolZoom,
+    ToolMeasure,
     clientSettings
 ) {
 
@@ -492,23 +496,8 @@ define([
             });
 
             // Навигация по-умолчанию
-            this.defNavigation = new openlayers.Control.Navigation({zoomBoxEnabled: false});
-            this.map.olMap.addControl(this.defNavigation);
-
-            // Альтернативная навигация с масштабированием
-            this.altNavigation = new openlayers.Control.Navigation({autoActivate: false, zoomBoxKeyMask: null});
-            this.map.olMap.addControl(this.altNavigation);
-
-            // Переключение между основной и альтернативной навигацией
-            this.altNavigationButton.watch("checked", function (attr, oldVal, newVal) {
-                if (newVal) {
-                    widget.defNavigation.deactivate();
-                    widget.altNavigation.activate();
-                } else {
-                    widget.altNavigation.deactivate();
-                    widget.defNavigation.activate();
-                }
-            });
+            this.navigationControl = new openlayers.Control.Navigation({zoomBoxEnabled: false});
+            this.map.olMap.addControl(this.navigationControl);
 
             // Масштабная линейка
             this.map.olMap.addControl(new OpenLayers.Control.ScaleLine());
@@ -607,8 +596,17 @@ define([
         },
 
         _toolsSetup: function () {
-            this.addTool(new Measure({display: this, order: 1}));
-            this.addTool(new Measure({display: this, order: 2}));
+            this.addTool(new ToolBase({
+                display: this,
+                label: "Перемещение",
+                iconClass: "iconPan"
+            }));
+
+            this.addTool(new ToolZoom({display: this, out: false}));
+            this.addTool(new ToolZoom({display: this, out: true}));
+
+            this.addTool(new ToolMeasure({display: this, order: 1}));
+            this.addTool(new ToolMeasure({display: this, order: 2}));
         },
 
         _pluginsSetup: function () {
