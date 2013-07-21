@@ -17,11 +17,51 @@
             <div data-dojo-type="dijit/layout/BorderContainer"
                 data-dojo-props="gutters: false"
                 style="width: 100%; height: 100%;">
-                
+
                 <!-- Панель для размещения OL карты -->
                 <div data-dojo-type="dijit/layout/BorderContainer"
                     data-dojo-props="region: 'center'"
                     style="padding-left: 0;">
+
+                    <!-- Тулбар над картой -->
+                    <div data-dojo-attach-point="mapToolbar"
+                        data-dojo-type="dijit/Toolbar"
+                        data-dojo-props="region: 'top'">
+
+                        <div style="padding: 0 4px; float: right;">
+
+                            <div data-dojo-attach-point="bookmarkButton" 
+                                data-dojo-type="dijit/form/DropDownButton"
+                                data-dojo-props="label: 'Закладки', iconClass: 'dijitIconBookmark'">
+
+                                <div data-dojo-attach-point="bookmarkMenu"
+                                    data-dojo-type="dijit/Menu">
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Распорка по высоте -->
+                        <div data-dojo-type="dijit/form/Button" style="width: 0;">&nbsp;</div>
+
+                        <div data-dojo-attach-point="infoNode"
+                            style="display: inline-block; vertical-align: middle; float: right; padding: 0 4px;">
+
+                            <div data-dojo-type="dijit/form/Button" style="width: 0;">&nbsp;</div>
+
+                            <span style="color: #999">Долгота</span>
+                            <span data-dojo-attach-point="centerLonNode"></span>
+                            
+                            <span style="color: #999">Широта</span>
+                            <span data-dojo-attach-point="centerLatNode"></span>
+
+                            <span style="color: #999">Масштаб</span>
+                            <span data-dojo-attach-point="scaleInfoNode"></span>
+                            
+                        </div>
+
+
+                    </div>
 
                     <div data-dojo-attach-point="mapPane"
                         data-dojo-type="dijit/layout/ContentPane"
@@ -44,6 +84,21 @@
                     <div data-dojo-type="dijit/layout/BorderContainer"
                         data-dojo-props="region: 'center'"
                         style="padding-bottom: 0; padding-right: 0">
+            
+                        <!-- Тулбар над деревом слоев -->
+                        <div data-dojo-type="dijit/Toolbar"
+                            data-dojo-props="region: 'top'">
+
+                            <div data-dojo-type="dijit/form/DropDownButton"
+                                data-dojo-props="label: 'Слой'">
+                                
+                                <div data-dojo-attach-point="itemMenu"
+                                    data-dojo-type="dijit/Menu">
+                                </div>
+
+                            </div>
+
+                        </div>
 
                         <!-- Панель для размещения дерева слоев -->
                         <div data-dojo-attach-point="layerTreePane"
@@ -69,53 +124,10 @@
 
                 </div>
 
-                <!-- Тулбар над картой -->
-                <div data-dojo-attach-point="mapToolbar"
-                    data-dojo-type="dijit/Toolbar"
-                    data-dojo-props="region: 'top'">
-
-                    <div data-dojo-type="dijit/form/DropDownButton"
-                        data-dojo-props="label: 'Слой'">
-                        
-                        <div data-dojo-attach-point="itemMenu"
-                            data-dojo-type="dijit/Menu">
-
-                        </div>
-
-                    </div>
-
-                    <div data-dojo-type="dijit/ToolbarSeparator"></div>
-
-                    <div data-dojo-attach-point="infoNode"
-                        style="display: inline-block; vertical-align: middle">
-
-                        Д <span data-dojo-attach-point="centerLonNode"></span>
-                        Ш <span data-dojo-attach-point="centerLatNode"></span>
-                        М <span data-dojo-attach-point="scaleInfoNode"></span>
-                        
-                    </div>
-
-                    <div data-dojo-type="dijit/ToolbarSeparator"></div>
-
-                    <div style="padding: 0 4px; float: right;">
-
-                        <div data-dojo-attach-point="bookmarkButton" 
-                            data-dojo-type="dijit/form/DropDownButton"
-                            data-dojo-props="label: 'Закладки', iconClass: 'dijitIconBookmark'">
-
-                            <div data-dojo-attach-point="bookmarkMenu"
-                                data-dojo-type="dijit/Menu">
-
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-
             </div>
 
         </div>
 
     </div>
+
 </div>
