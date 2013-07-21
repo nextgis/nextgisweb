@@ -26,6 +26,8 @@ define([
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
     "dijit/tree/dndSource",
+    // tools
+    "./tool/Measure",
     // settings
     "ngw/settings!webmap",
     // template
@@ -64,6 +66,7 @@ define([
     TreeStoreModel,
     Tree,
     dndSource,
+    Measure,
     clientSettings
 ) {
 
@@ -292,9 +295,10 @@ define([
             ).then(undefined, function (err) { console.error(err); });
 
 
-            // Плагины
+            // Иструменты по-умолчанию и плагины
             all([this._midDeferred.plugin, this._layersDeferred]).then(
                 function () {
+                    widget._toolsSetup();
                     widget._pluginsSetup();
                 }
             ).then(undefined, function (err) { console.error(err); });
@@ -335,26 +339,30 @@ define([
         addTool: function (tool) {
             var btn = new ToggleButton({
                 label: tool.label,
+                showLabel: false,
                 iconClass: tool.iconClass
             }).placeAt(this.mapToolbar);
+
+            tool.toolbarBtn = btn;
 
             this.tools.push(tool);
 
             var display = this;
             btn.watch("checked", function (attr, oldVal, newVal) {
-                array.forEach(display.tools, function (t) {
-                    var state = newVal;
+                if (newVal) {
+                    // При включении инструмента все остальные инструменты
+                    // выключаем, а этот включаем
+                    array.forEach(display.tools, function (t) {
+                        if (t != tool && t.toolbarBtn.get("checked")) {
+                            t.toolbarBtn.set("checked", false);
+                        };
+                    });
+                    tool.activate(); 
+                } else {
+                    // При выключении остальные инструменты не трогаем
+                    tool.deactivate()
+                };
 
-                    if (t !== tool) {
-                        state = !state;
-                    }
-
-                    if (state) {
-                        t.activate();
-                    } else {
-                        t.deactivate();
-                    }
-                });
             });
         },
 
@@ -596,6 +604,11 @@ define([
             layer.itemConfig = data;
 
             this._layers[data.id] = layer;
+        },
+
+        _toolsSetup: function () {
+            this.addTool(new Measure({display: this, order: 1}));
+            this.addTool(new Measure({display: this, order: 2}));
         },
 
         _pluginsSetup: function () {
