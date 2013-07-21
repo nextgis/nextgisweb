@@ -17,7 +17,8 @@ define([
 
         constructor: function (div, options) {
             this.olMap = new openlayers.Map(div, {
-                projection: 'EPSG:' + this.srs
+                projection: 'EPSG:' + this.srs,
+                controls: options.controls
             });
 
             this.layers = {};

@@ -476,7 +476,31 @@ define([
             var widget = this;
 
             // Инициализация карты
-            this.map = new Map(this.mapNode, {});
+            this.map = new Map(this.mapNode, {
+                controls: [
+                    new openlayers.Control.Attribution(),
+                    new openlayers.Control.Zoom()
+                ]
+            });
+
+            // Навигация по-умолчанию
+            this.defNavigation = new openlayers.Control.Navigation({zoomBoxEnabled: false});
+            this.map.olMap.addControl(this.defNavigation);
+
+            // Альтернативная навигация с масштабированием
+            this.altNavigation = new openlayers.Control.Navigation({autoActivate: false, zoomBoxKeyMask: null});
+            this.map.olMap.addControl(this.altNavigation);
+
+            // Переключение между основной и альтернативной навигацией
+            this.altNavigationButton.watch("checked", function (attr, oldVal, newVal) {
+                if (newVal) {
+                    widget.defNavigation.deactivate();
+                    widget.altNavigation.activate();
+                } else {
+                    widget.altNavigation.deactivate();
+                    widget.defNavigation.activate();
+                }
+            });
 
             // Масштабная линейка
             this.map.olMap.addControl(new OpenLayers.Control.ScaleLine());
