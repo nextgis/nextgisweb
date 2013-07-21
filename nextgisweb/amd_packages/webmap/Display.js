@@ -535,7 +535,12 @@ define([
                 idx = idx + 1;
             }, this);
 
-            this.map.olMap.zoomToExtent(this._extent);
+            this.zoomToInitialExtentButton.on("click", function() {
+                widget._zoomToInitialExtent()
+            });
+            
+            this._zoomToInitialExtent();
+
             this._mapDeferred.resolve();
         },
 
@@ -662,6 +667,10 @@ define([
         dumpItem: function () {
             // Выгружает значение выбранного слоя из itemStore в виде Object
             return this.itemStore.dumpItem(this.item);
+        },
+
+        _zoomToInitialExtent: function () {
+            this.map.olMap.zoomToExtent(this._extent)
         }
     });
 });

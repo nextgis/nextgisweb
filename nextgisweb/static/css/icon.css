@@ -1,4 +1,4 @@
-/* glue: 0.3 hash: 94d5a5f222 */
+/* glue: 0.3 hash: 6cfff3b74c */
 .iconZoomOut,
 .iconZoomIn,
 .iconZoom,
@@ -9,7 +9,8 @@
 .iconMap,
 .iconIdentify,
 .iconFeatureEdit,
-.iconDescription{background-image:url('../img/icon.png');background-repeat:no-repeat}
+.iconDescription,
+.iconArrowInOut{background-image:url('../img/icon.png');background-repeat:no-repeat}
 .iconZoomOut{background-position:0px 0px;width:16px;height:16px;}
 .iconZoomIn{background-position:-16px 0px;width:16px;height:16px;}
 .iconZoom{background-position:0px -16px;width:16px;height:16px;}
@@ -21,3 +22,4 @@
 .iconIdentify{background-position:-32px -32px;width:16px;height:16px;}
 .iconFeatureEdit{background-position:-48px 0px;width:16px;height:16px;}
 .iconDescription{background-position:-48px -16px;width:16px;height:16px;}
+.iconArrowInOut{background-position:-48px -32px;width:16px;height:16px;}
