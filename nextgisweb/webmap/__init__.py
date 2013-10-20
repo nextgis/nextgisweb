@@ -20,6 +20,11 @@ class WebMapComponent(Component):
 
         self.settings['identify_radius'] = int(self.settings.get(
             'identify_radius', 3))
+        self.settings['popup_width'] = int(self.settings.get(
+            'popup_width', 300))
+        self.settings['popup_height'] = int(self.settings.get(
+            'popup_height', 200))
+
 
         security = self.env.security
 
@@ -58,6 +63,8 @@ class WebMapComponent(Component):
             basemaps=basemaps,
             bing_apikey=self.settings.get('bing_apikey'),
             identify_radius=self.settings.get('identify_radius'),
+            popup_width=self.settings.get('popup_width'),
+            popup_height=self.settings.get('popup_height'),
             adapters=dict([
                 (i.identity, dict(display_name=i.display_name))
                 for i in WebMapAdapter.registry
@@ -67,4 +74,6 @@ class WebMapComponent(Component):
     settings_info = (
         dict(key='bing_apikey', desc=u"Bing maps API key"),
         dict(key='identify_radius', desc=u"Identify tool radius"),
+        dict(key='popup_width', desc=u"Popup window width (px)"),
+        dict(key='popup_height', desc=u"Popup window height (px)"),
     )

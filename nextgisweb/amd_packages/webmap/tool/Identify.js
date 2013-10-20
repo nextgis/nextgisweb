@@ -200,10 +200,10 @@ define([
         pixelRadius: webmapSettings.identify_radius,
 
         // Ширина popup
-        popupWidth: 300,
+        popupWidth: webmapSettings.popup_width,
 
         // Высота popup,
-        popupHeight: 200,
+        popupHeight: webmapSettings.popup_height,
 
         constructor: function (options) {
             this.map = this.display.map;
