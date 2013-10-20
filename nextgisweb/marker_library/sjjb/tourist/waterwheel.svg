@@ -371,47 +371,7 @@
        style="fill:#111;stroke:#eee;stroke-width:3.40799999"
        id="path1329" />
   </g>
-  <g
-     id="layer3"
-     inkscape:label="Layout"
-     style="stroke:#757575;stroke-opacity:1;display:none"
-     transform="matrix(48.14969,0,0,48.14969,-1210.2219,-51.870914)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4134"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4136"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
-  <g
-     id="g9828"
-     inkscape:label="Layout"
-     style="stroke:#757575;stroke-opacity:1;display:none"
-     transform="matrix(48.14969,0,0,48.14969,-1870.5198,102.97115)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect9830"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect9832"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
-  <g
+   <g
      id="g12333"
      transform="matrix(0.9361877,-0.2985096,0.2985096,0.9361877,-34.084117,65.027545)">
     <path

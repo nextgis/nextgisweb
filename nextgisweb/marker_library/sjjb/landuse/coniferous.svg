@@ -304,49 +304,10 @@
        style="fill:#111;stroke:#eee;stroke-width:3.40799999"
        id="path1329" />
   </g>
-  <g
-     id="layer3"
-     inkscape:label="Layout"
-     style="stroke:#757575;stroke-opacity:1;display:none"
-     transform="matrix(48.14969,0,0,48.14969,-1210.2219,-51.870914)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4134"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4136"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
   <path
      style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:4.25836277;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      d="M 295.87458,82.814272 L 206.98127,274.57366 L 236.54312,266.57366 L 195.40384,331.13004 L 228.55869,323.13004 L 181.56417,392.344 L 273.9174,378.50433 L 273.9174,476.71281 L 295.87458,476.71281 L 295.87458,82.814272 z M 296.14073,82.814272 L 296.14073,476.71281 L 318.09791,476.71281 L 318.09791,378.50433 L 410.58423,392.344 L 363.5897,323.13004 L 396.61148,331.13004 L 357.4722,266.57366 L 385.16713,274.57366 L 296.14073,82.814272 z"
      id="path8893"
      sodipodi:nodetypes="cccccccccccccccccccc" />
-  <g
-     id="g9828"
-     inkscape:label="Layout"
-     style="stroke:#757575;stroke-opacity:1;display:none"
-     transform="matrix(48.14969,0,0,48.14969,-1870.5198,102.97115)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect9830"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect9832"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
+  
 </svg>

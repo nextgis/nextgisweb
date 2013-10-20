@@ -442,26 +442,6 @@
        style="fill:#111;stroke:#eee;stroke-width:3.40799999"
        id="path1329" />
   </g>
-  <g
-     id="layer3"
-     inkscape:label="Layout"
-     style="display:none;stroke:#757575;stroke-opacity:1"
-     transform="matrix(48.14969,0,0,48.14969,-536.27327,-33.306752)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.10000000000000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4134"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.10000000000000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4136"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
   <path
      inkscape:connector-curvature="0"
      d="m 119.57491,340.96706 72.14862,-73.37816 -0.33141,-42.8298 -53.10716,51.9294 C 136.52345,193.62295 208.04872,123.85744 275.22781,114.88454 L 269.27608,78.943071 C 151.32199,102.29056 103.82062,194.5016 101.55105,276.3844 l -53.611966,-52.12297 -0.24396,44.53925 71.879786,72.16638 z"

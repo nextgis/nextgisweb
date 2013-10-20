@@ -372,46 +372,7 @@
        style="fill:#111;stroke:#eee;stroke-width:3.40799999"
        id="path1329" />
   </g>
-  <g
-     id="layer3"
-     inkscape:label="Layout"
-     style="stroke:#757575;stroke-opacity:1;display:none"
-     transform="matrix(48.14969,0,0,48.14969,-1210.2219,-51.870914)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4134"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4136"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
-  <g
-     id="g9828"
-     inkscape:label="Layout"
-     style="stroke:#757575;stroke-opacity:1;display:none"
-     transform="matrix(48.14969,0,0,48.14969,-1870.5198,102.97115)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect9830"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect9832"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
+    
   <path
      style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd"
      d="M 105 138.5625 C 82.455636 139.04808 61.42436 153.68047 39.6875 153.5625 C 39.477692 153.55754 39.27222 153.53876 39.0625 153.53125 L 39.0625 197.15625 C 61.302883 197.02121 82.818963 181.68267 106 182.15625 C 129.44843 182.79644 154.8153 199.06962 177.78125 200.1875 C 200.43961 200.80612 224.32047 186.55857 240.9375 186.4375 C 257.16223 186.30388 265.77336 196.91758 275.46875 199.40625 C 285.01176 201.72301 292.31781 202.22622 298.03125 200.65625 L 298.15625 169.9375 C 301.99997 171.95999 320.23864 173.93213 288.375 154.71875 C 274.40607 144.84293 258.32295 142.6086 242.09375 142.90625 C 225.47492 143.0272 201.65835 157.27487 179 156.65625 C 156.03404 155.53837 130.63594 139.20268 107.1875 138.5625 C 106.45705 138.54774 105.72724 138.54684 105 138.5625 z "

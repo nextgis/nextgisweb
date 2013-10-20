@@ -119,27 +119,7 @@
        style="fill:#111;stroke:#eee;stroke-width:3.40799999"
        id="path1329" />
   </g>
-  <g
-     id="layer3"
-     inkscape:label="Layout"
-     style="display:none;stroke:#757575;stroke-opacity:1"
-     transform="matrix(48.14969,0,0,48.14969,-536.27327,-33.306752)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.10000000000000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4134"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.10000000000000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4136"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
-  <path
+    <path
      style="opacity:0.2;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:12.77865886999999923;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
      d="m 292.93639,126.60507 c -138.92248,0 -251.535355,38.0229 -251.535355,84.93686 0,37.95775 73.747745,70.08101 175.477935,80.97022 l -25.47378,0 -83.40842,195.96613 373.48196,0 -75.18403,-195.96613 -37.2645,0 c 101.73019,-10.88921 175.44154,-43.01247 175.44154,-80.97022 0,-46.91396 -112.61287,-84.93686 -251.53535,-84.93686 z"
      id="rect2911" />

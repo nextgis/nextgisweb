@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -13,40 +11,28 @@
    height="580"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="accommodation_youth_hostel.svg"
-   sodipodi:docbase="s:\Data\FacilityIcons"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="youth_hostel.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
-  <metadata
-     id="metadata2975">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1003"
-     inkscape:window-width="1400"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     guidetolerance="10.0"
-     gridtolerance="10.0"
-     objecttolerance="10.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
      pagecolor="#ffffff"
-     id="base"
-     inkscape:zoom="0.23041928"
-     inkscape:cx="506.34091"
-     inkscape:cy="981.98023"
-     inkscape:window-x="0"
-     inkscape:window-y="20"
-     inkscape:current-layer="svg2"
-     showgrid="false" />
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview31"
+     showgrid="false"
+     inkscape:zoom="0.40689655"
+     inkscape:cx="290"
+     inkscape:cy="290"
+     inkscape:window-x="49"
+     inkscape:window-y="24"
+     inkscape:window-maximized="0">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -182,26 +168,6 @@
      d="M 139.89087,116.7585 L 50.997556,308.51789 L 70.55941,308.51789 L 39.420133,365.07427 L 62.574981,365.07427 L 25.580455,426.28823 L 117.93369,412.44856 L 117.93369,510.65704 L 139.89087,510.65704 L 139.89087,116.7585 z M 140.15702,116.7585 L 140.15702,510.65704 L 162.1142,510.65704 L 162.1142,412.44856 L 254.60052,426.28823 L 217.60599,365.07427 L 240.62777,365.07427 L 209.48849,308.51789 L 229.18342,308.51789 L 140.15702,116.7585 z"
      id="path8893"
      sodipodi:nodetypes="cccccccccccccccccccc" />
-  <g
-     id="layer3"
-     inkscape:label="Layout"
-     style="stroke:#757575;stroke-opacity:1;display:none"
-     transform="matrix(48.14969,0,0,48.14969,-1210.2219,-51.870914)">
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4134"
-       width="10"
-       height="10"
-       x="1"
-       y="1" />
-    <rect
-       style="fill:none;stroke:#757575;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       id="rect4136"
-       width="8"
-       height="8"
-       x="2"
-       y="2" />
-  </g>
   <path
      style="font-size:12px;opacity:0.35096154;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.06959641;stroke-opacity:1"
      d="M 372.18138,65.671684 L 185.1347,257.64784 L 222.54379,257.64784 L 222.54379,505.61192 L 334.77205,505.61192 L 334.77205,359.27141 L 412.15582,359.27141 L 412.15608,505.61192 L 521.81898,505.61192 L 521.81898,257.64784 L 559.22832,257.64784 L 372.18138,65.671684 L 372.18138,65.671684 L 372.18138,65.671684 z"
