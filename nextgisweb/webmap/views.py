@@ -116,7 +116,10 @@ def setup_pyramid(comp, config):
 
     def browse(request):
         request.require_permission(WebMap.acl_root, 'read')
-        obj_list = DBSession.query(WebMap)
+        
+        # В список карт попадают только те карты,
+        # для которых у пользователя есть право на чтение
+        obj_list = filter(lambda obj: obj.has_permission(request.user, 'read'), DBSession.query(WebMap))
 
         return dict(
             obj_list=obj_list,
