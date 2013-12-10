@@ -8,6 +8,7 @@ requires = [
     'transaction',
     'pyramid_tm',
     'pyramid_debugtoolbar',
+    'pyramid_mako',
     'zope.sqlalchemy',
     'zope.interface',
     'bunch',

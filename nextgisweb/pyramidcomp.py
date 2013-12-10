@@ -9,6 +9,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.httpexceptions import HTTPForbidden
 
 import pyramid_tm
+import pyramid_mako
 
 from .component import Component
 from . import dynmenu as dm
@@ -68,6 +69,7 @@ class PyramidComponent(Component):
         config.set_request_property(lambda (req): self._env, 'env')
 
         config.include(pyramid_tm)
+        config.include(pyramid_mako)
 
         assert 'secret' in settings, 'Secret not set!'
         authn_policy = AuthTktAuthenticationPolicy(secret=settings['secret'])
