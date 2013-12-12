@@ -1,14 +1,16 @@
-/*global define, dojox, ngwConfig*/
 define([
     "dojo/_base/declare",
     "dojo/Deferred",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/Uploader.html",
+    "dojo/text!./templates/UploaderList.html",
     "dojox/form/Uploader",
+    "dojox/form/uploader/FileList",
     "dojox/form/uploader/plugins/HTML5",
-    "dojox/form/uploader/plugins/Flash"
+    "dojox/form/uploader/plugins/Flash",
+    // css
+    "xstyle/css!./resources/UploaderList.css"
 ], function (
     declare,
     Deferred,
@@ -17,79 +19,62 @@ define([
     _WidgetsInTemplateMixin,
     template,
     Uploader,
-    FlashUploader
+    FileList
 ) {
-    // Uploader AMD workaround
+    // TODO: Убрать после обновления Dojo до 1.9
     Uploader = dojox.form.Uploader;
-
-    function readableFileSize(size) {
-        var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        var i = 0;
-        while (size >= 1024) {
-            size /= 1024;
-            ++i;
-        }
-        return size.toFixed(1) + ' ' + units[i];
-    }
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
 
-        constructor: function () {
-            this.upload_promise = undefined;
-        },
-
-        postCreate: function () {
+        postCreate: function() {
             this.uploaderWidget = new Uploader({
                 label: "Выбрать",
-                multiple: false,
+                multiple: true,
                 uploadOnSelect: true,
                 url: ngwConfig.applicationUrl + '/file_upload/upload',
                 name: "file"
             }).placeAt(this.fileUploader);
+
+            this.fileListWidget = new FileList({
+                uploader: this.uploaderWidget,
+                headerIndex: "№",
+                headerFilename: "Имя файла",
+                headerType: "Тип",
+                headerFilesize: "Размер"
+            }).placeAt(this.fileList);
 
             var widget = this;
             this.uploaderWidget.on("begin", function () { widget.uploadBegin(); });
             this.uploaderWidget.on("progress", function (evt) { widget.uploadProgress(evt); });
             this.uploaderWidget.on("complete", function (data) { widget.uploadComplete(data); });
             this.uploaderWidget.on("error", function () { widget.uploaderError(); });
-
-            this.fileInfo.innerHTML = "Файл не выбран!";
         },
 
         startup: function () {
             this.inherited(arguments);
             this.uploaderWidget.startup();
+            this.fileListWidget.startup();
         },
 
         uploadBegin: function () {
             this.upload_promise = new Deferred();
             this.uploading = true;
             this.data = undefined;
-            this.fileInfo.innerHTML = "Идет загрузка...";
         },
 
-        uploadProgress: function (evt) {
-            if (evt.type === "progress") {
-                this.fileInfo.innerHTML = evt.percent + " загружено...";
-            }
-        },
+        uploadProgress: function (evt) {},
 
         uploadComplete: function (data) {
             this.upload_promise.resolve(data);
             this.uploading = false;
-
-            // Поскольку данный виджет используется для загрузки
-            // отдельных файлов, то извлекаем первый элемент из списка
-            this.data = data.upload_meta[0];
-            this.fileInfo.innerHTML = this.data.name + " (" + readableFileSize(this.data.size) + ")";
+            this.data = data;
         },
 
         uploadError: function (error) {
             this.upload_promise.reject(error);
             this.uploading = false;
             this.data = undefined;
-            this.fileInfo.innerHTML = "Не удалось загрузить файл!";
         },
 
         _getValueAttr: function () {
@@ -105,3 +90,4 @@ define([
         }
     });
 });
+

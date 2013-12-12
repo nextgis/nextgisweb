@@ -11,7 +11,7 @@ define([
     "dojox/layout/TableContainer",
     // template
     "dijit/TitlePane",
-    "ngw/form/Uploader"
+    "ngw/form/UploaderList"
     // css   
 ], function (
     declare,
@@ -51,11 +51,11 @@ define([
                 };
             };
 
-            for (var i = 1; i <= 5; i++) {
-                var value = this["wFile" + i].get("value");
-                if (value) {
-                    result.push({upload: value.id});
-                };
+            var value = this.wFiles.get("value");
+            if (value) {
+                array.forEach(value.upload_meta, function(meta) {
+                    result.push({upload: meta.id});
+                });
             };
 
             return result;
