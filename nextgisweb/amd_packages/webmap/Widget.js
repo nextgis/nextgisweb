@@ -130,6 +130,7 @@ define([
             // Удаление слоя или группы
             this.btnDeleteItem.on("click", function() {
                 widget.itemStore.deleteItem(widget.widgetTree.selectedItem);
+                widget.btnDeleteItem.set("disabled", true);
             });
 
             this.widgetTree.watch("selectedItem", function (attr, oldValue, newValue) {
@@ -156,6 +157,9 @@ define([
                         domStyle.set(widget.itemPane.domNode, 'display', 'block');
                         widget.treeLayoutContainer.addChild(widget.itemPane);
                     };
+
+                    // Активируем кнопку удаления слоя или группы
+                    widget.btnDeleteItem.set("disabled", false);
                 }
             });
 
