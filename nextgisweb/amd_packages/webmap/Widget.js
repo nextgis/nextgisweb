@@ -130,6 +130,7 @@ define([
             // Удаление слоя или группы
             this.btnDeleteItem.on("click", function() {
                 widget.itemStore.deleteItem(widget.widgetTree.selectedItem);
+                widget.treeLayoutContainer.removeChild(widget.itemPane);
                 widget.btnDeleteItem.set("disabled", true);
             });
 
