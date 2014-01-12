@@ -39,6 +39,6 @@
     "type": "Road"
 }, {
     "keyname": "blank",
-    "mid": "ngw/openlayers/layer/XYZ",
+    "mid": "ngw/openlayers/layer/Layer",
     "title": "Пустой"
 }]
