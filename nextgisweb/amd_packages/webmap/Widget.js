@@ -113,7 +113,8 @@ define([
                 widget.itemStore.newItem(
                     {
                         display_name: "Новая группа",
-                        item_type: "group"
+                        item_type: "group",
+                        group_expanded: null
                     }, {
                         parent: widget.getAddParent(),
                         attribute: "children"    
@@ -132,28 +133,30 @@ define([
             });
 
             this.widgetTree.watch("selectedItem", function (attr, oldValue, newValue) {
-                // При изменении выделенного элемента перенесем значения в виджеты
-                // и покажем нужную панель: для слоев одну, для групп другую.
-                widget.widgetItemDisplayName.set("value", widget.getItemValue("display_name"));
-                
-                if (newValue.item_type == "group") {
-                    widget.widgetProperties.selectChild(widget.paneGroup);
-                    widget.widgetItemGroupExpanded.set("checked", widget.getItemValue("group_expanded"));
-                } else if (newValue.item_type == "layer") {
-                    widget.widgetProperties.selectChild(widget.paneLayer);
-                    widget.wdgtItemLayerEnabled.set("checked", widget.getItemValue("layer_enabled"));
-                    widget.wLayerTransparency.set("value", widget.getItemValue("layer_transparency"));
-                    widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale_denom"));
-                    widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale_denom"));
-                    widget.wLayerAdapter.set("value", widget.getItemValue("layer_adapter"));
-                };
+                if (newValue) {
+                    // При изменении выделенного элемента перенесем значения в виджеты
+                    // и покажем нужную панель: для слоев одну, для групп другую.
+                    widget.widgetItemDisplayName.set("value", widget.getItemValue("display_name"));
+                    
+                    if (newValue.item_type == "group") {
+                        widget.widgetProperties.selectChild(widget.paneGroup);
+                        widget.widgetItemGroupExpanded.set("checked", widget.getItemValue("group_expanded"));
+                    } else if (newValue.item_type == "layer") {
+                        widget.widgetProperties.selectChild(widget.paneLayer);
+                        widget.wdgtItemLayerEnabled.set("checked", widget.getItemValue("layer_enabled"));
+                        widget.wLayerTransparency.set("value", widget.getItemValue("layer_transparency"));
+                        widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale_denom"));
+                        widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale_denom"));
+                        widget.wLayerAdapter.set("value", widget.getItemValue("layer_adapter"));
+                    };
 
-                // Изначально боковая панель со свойствами текущего элемента
-                // спрятана. Поскольку элемент уже выбран - ее нужно показать.
-                if (!oldValue) {
-                    domStyle.set(widget.itemPane.domNode, 'display', 'block');
-                    widget.treeLayoutContainer.addChild(widget.itemPane);
-                };
+                    // Изначально боковая панель со свойствами текущего элемента
+                    // спрятана. Поскольку элемент уже выбран - ее нужно показать.
+                    if (!oldValue) {
+                        domStyle.set(widget.itemPane.domNode, 'display', 'block');
+                        widget.treeLayoutContainer.addChild(widget.itemPane);
+                    };
+                }
             });
 
             // При изменении значений переносим их в модель
@@ -197,6 +200,10 @@ define([
                         "item_type": "layer",
                         "display_name": widget.wgtLayer.selectedItem.layer_display_name,
                         "layer_style_id": widget.wgtLayer.selectedItem.id,
+                        "layer_enabled": false,
+                        "layer_transparency": null,
+                        "layer_min_scale_denom": null,
+                        "layer_max_scale_denom": null,
                         "layer_adapter": "image"
                     }, {
                         parent: widget.getAddParent(),
