@@ -24,7 +24,11 @@ function (declare, array, Button, Tree, Memory, Observable, ObjectStoreModel, xh
                 return this.query({parent: object.xid});
             };
 
-            this.model = new ObjectStoreModel({store: this.store, query: {"xid": "layer_group-0"}});
+            this.model = new ObjectStoreModel({
+                store: this.store,
+                query: {"xid": "layer_group-0"},
+                mayHaveChildren: function(object) { return object.type != 'style'; }
+            });
 
             // TODO: разобраться как модифицировать arguments
             this.showRoot = false;
