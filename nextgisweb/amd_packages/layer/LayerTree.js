@@ -34,7 +34,14 @@ function (declare, array, Button, Tree, Memory, Observable, ObjectStoreModel, xh
             this.showRoot = false;
             this.getLabel = function (item) { return item.display_name; };
             this.getIconClass = function(item, opened){
-               return item.type == 'layer_group' ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
+                switch(item.type) {
+                    case 'layer_group':
+                        return opened ? "dijitFolderOpened" : "dijitFolderClosed";
+                    case 'layer':
+                        return "iconLayers";
+                    default:
+                        return "dijitLeaf";
+                }
             };
         },
 
