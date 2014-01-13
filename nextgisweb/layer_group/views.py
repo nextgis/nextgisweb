@@ -73,7 +73,8 @@ def setup_pyramid(comp, config):
 
     @model_context(LayerGroup)
     def api_layer_group_tree(request, obj):
-
+        request.require_permission(obj, 'read')
+        
         def traverse(layer_group):
             return dict(
                 type='layer_group', id=layer_group.id,
