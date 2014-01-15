@@ -125,9 +125,10 @@ def setup_pyramid(comp, config):
         query.filter_by(id=request.matchdict['feature_id'])
         feature = list(query())[0]
 
-        swconfig = [
-            ('feature_layer', layer.feature_widget()),
-        ]
+        swconfig = []
+
+        if hasattr(layer, 'feature_widget'):
+            swconfig.append(('feature_layer', layer.feature_widget()))
 
         for k, v in FeatureExtension.registry._dict.iteritems():
             swconfig.append((k, v(layer).feature_widget))

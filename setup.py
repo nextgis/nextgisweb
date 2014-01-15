@@ -43,6 +43,7 @@ components = (
     'layer_group.root',
     'file_storage',
     'vector_layer',
+    'postgis_layer',
     'raster_layer',
     'raster_style',
     'file_upload',

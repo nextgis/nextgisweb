@@ -56,6 +56,7 @@ def amd_packages():
         ('feature_photo', 'nextgisweb:amd_packages/feature_photo'),
         ('webmap', 'nextgisweb:amd_packages/webmap'),
         ('vector_layer', 'nextgisweb:amd_packages/vector_layer'),
+        ('postgis_layer', 'nextgisweb:amd_packages/postgis_layer'),
         ('raster_layer', 'nextgisweb:amd_packages/raster_layer'),
         ('raster_style', 'nextgisweb:amd_packages/raster_style'),
     )
