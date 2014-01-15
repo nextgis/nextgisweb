@@ -48,6 +48,7 @@ class Feature(object):
     @property
     def __geo_interface__(self):
         return dict(
+            type="Feature",
             id=self.id,
             properties=self.fields,
             geometry=self.geom,
@@ -64,5 +65,5 @@ class FeatureSet(object):
     def __geo_interface__(self):
         return dict(
             type="FeatureCollection",
-            features=list(self.__iter__())
+            features=[f.__geo_interface__ for f in self]
         )
