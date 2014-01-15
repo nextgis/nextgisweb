@@ -57,7 +57,7 @@ define([
             var widget = this;
             var result = { isValid: true, error: [] };
 
-            array.forEach([this.wTable, this.wColumnId, this.wColumnGeom], function (subw) {
+            array.forEach([this.wSchema, this.wTable, this.wColumnId, this.wColumnGeom], function (subw) {
                 // форсируем показ значка при проверке
                 subw._hasBeenBlurred = true;
                 subw.validate();   
