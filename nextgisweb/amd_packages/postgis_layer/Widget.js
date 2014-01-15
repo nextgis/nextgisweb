@@ -43,6 +43,7 @@ define([
         _getValueAttr: function () {
             var result = { 
                 connection: this.wConnection.get("value"),
+                schema: this.wSchema.get("value"),
                 table: this.wTable.get("value"),
                 column_id: this.wColumnId.get("value"),
                 column_geom: this.wColumnGeom.get("value"),

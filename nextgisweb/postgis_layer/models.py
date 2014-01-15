@@ -34,6 +34,7 @@ def initialize(comp):
 
         layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
         connection = sa.Column(sa.Unicode, nullable=False)
+        schema = sa.Column(sa.Unicode, default=u'public', nullable=False)
         table = sa.Column(sa.Unicode, nullable=False)
         column_id = sa.Column(sa.Unicode, nullable=False)
         column_geom = sa.Column(sa.Unicode, nullable=False)
@@ -49,9 +50,10 @@ def initialize(comp):
             try:
                 result = conn.execute(
                     """SELECT type, srid FROM geometry_columns
-                    WHERE f_table_schema = 'public'
+                    WHERE f_table_schema = %s
                         AND f_table_name = %s
                         AND f_geometry_column = %s""",
+                    self.schema,
                     self.table,
                     self.column_geom
                 )
@@ -64,9 +66,10 @@ def initialize(comp):
                 result = conn.execute(
                     """SELECT column_name, data_type
                     FROM information_schema.columns
-                    WHERE table_schema = 'public'
+                    WHERE table_schema = %s
                         AND table_name = %s
                     ORDER BY ordinal_position""",
+                    self.schema,
                     self.table
                 )
                 for row in result:
@@ -200,8 +203,9 @@ def initialize(comp):
                     for k, v in columns.iteritems():
                         cols.append('%s AS "%s"' % (v, k))
 
-                    sql = """SELECT %(cols)s FROM %(table)s WHERE %(cond)s""" % dict(
+                    sql = """SELECT %(cols)s FROM %(schema)s.%(table)s WHERE %(cond)s""" % dict(
                         cols=", ".join(cols),
+                        schema=self.layer.schema,
                         table=self.layer.table,
                         cond=' AND '.join(cond)
                     )
@@ -230,8 +234,9 @@ def initialize(comp):
 
                 @property
                 def total_count(self):
-                    sql = """SELECT COUNT("%(column_id)s") FROM %(table)s WHERE %(cond)s""" % dict(
+                    sql = """SELECT COUNT("%(column_id)s") FROM %(schema)s.%(table)s WHERE %(cond)s""" % dict(
                         column_id=self.layer.column_id,
+                        schema=self.layer.schema,
                         table=self.layer.table,
                         cond=' AND '.join(cond)
                     )

@@ -12,6 +12,7 @@ class PostgisLayerObjectWidget(ObjectWidget):
         ObjectWidget.populate_obj(self)
 
         self.obj.connection = self.data['connection']
+        self.obj.schema = self.data['schema']
         self.obj.table = self.data['table']
         self.obj.column_id = self.data['column_id']
         self.obj.column_geom = self.data['column_geom']
