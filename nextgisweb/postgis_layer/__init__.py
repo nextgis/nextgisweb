@@ -5,7 +5,7 @@ from ..component import Component, require
 
 
 @Component.registry.register
-class VectorLayerComponent(Component):
+class PostgisLayerComponent(Component):
     identity = 'postgis_layer'
 
     def initialize(self):
