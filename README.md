@@ -21,18 +21,39 @@
 
     $ virtualenv --no-site-packages env
 
+Два пакета, необходимых для работы системы, в автоматическом режиме не
+устанавливаются, поэтому их нужно установить вручную: GDAL и mapscript.
+
+Устанавливаем GDAL. Прежде всего необходимо проверить версию GDAL, установленную
+в системе:
+
+    $ gdalinfo --version
+
+А также определить директорию с заголовочными файлами GDAL:
+
+    $ locate include | grep gdal.h
+
+Устанавливаем GDAL необходимой версии (пример установки на сервере
+NextGIS):
+
+    $ env/bin/pip install --no-install GDAL==1.8.1
+    $ cd env/build/GDAL
+    $ env/bin/python setup.py build_ext --include-dirs="/usr/include/gdal/"
+    $ env/bin/pip install install --no-download GDAL
+
+В дистрибутивах на базе Debian заголовочные файлы вероятнее всего будут
+в директории `/usr/include/gdal/`.
+
+Устанавливаем mapscript. mapscript должен быть установлен в системе, для
+того чтобы обеспечить его функционал в виртуальном окружении, выполняем следующие
+шаги (пример установки на сервере NextGIS):
+
+    $ cp -r `python -c "import mapscript, os.path; print os.path.split(mapscript.__file__)[0]"` env/lib/python2.7/site-packages/mapscript.egg
+    $ echo "./mapscript.egg" > env/lib/python2.7/site-packages/mapscript.pth
+
 Устанавливаем пакет в режиме разработки, при этом будут установлены все необходимые пакеты:
 
     $ env/bin/pip install -e ./nextgisweb
-
-В дистрибутивах на базе debian пакет GDAL скорее всего не установится. В этом случае можно
-попробовать сделать следующее:
-
-    $ env/bin/pip install --no-install GDAL
-    $ cd env/build/GDAL
-    $ env/bin/python setup.py build_ext --include-dirs="/usr/include/gdal/"
-    $ env/bin/pip install --no-download GDAL
-
 
 ### Конфигурационный файл
 
