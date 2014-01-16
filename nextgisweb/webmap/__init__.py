@@ -72,8 +72,9 @@ class WebMapComponent(Component):
         )
 
     settings_info = (
-        dict(key='bing_apikey', desc=u"Bing maps API key"),
-        dict(key='identify_radius', desc=u"Identify tool radius"),
-        dict(key='popup_width', desc=u"Popup window width (px)"),
-        dict(key='popup_height', desc=u"Popup window height (px)"),
+        dict(key='basemaps', desc=u"Файл с описанием базовых слоёв"),
+        dict(key='bing_apikey', desc=u"Bing Maps API-ключ"),
+        dict(key='identify_radius', desc=u"Чувствительность инструмента идентификации (px)"),
+        dict(key='popup_width', desc=u"Ширина всплывающего окна (px)"),
+        dict(key='popup_height', desc=u"Высота всплывающего окна (px)"),
     )
