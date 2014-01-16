@@ -26,3 +26,5 @@ class VectorLayerComponent(Component):
 
     def client_settings(self, request):
         return dict(connections=self.connection.keys())
+
+    settings_info = ()
