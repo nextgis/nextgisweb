@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 requires = [
     'pyramid',
-    'SQLAlchemy',
+    'SQLAlchemy==0.8.4',
     'transaction',
     'pyramid_tm',
     'pyramid_debugtoolbar',
