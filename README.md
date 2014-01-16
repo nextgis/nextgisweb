@@ -15,7 +15,7 @@
 
 Клонируем репозиторий:
 
-    $ git clone git@bitbucket.org:nextgis/nextgisweb.git
+    $ git clone git@github.com:nextgis/nextgisweb.git
 
 Создаем виртуальное окружение virtualenv в директории `~/ngw/env`:
 
@@ -38,7 +38,7 @@ NextGIS):
 
     $ env/bin/pip install --no-install GDAL==1.8.1
     $ cd env/build/GDAL
-    $ env/bin/python setup.py build_ext --include-dirs="/usr/include/gdal/"
+    $ env/bin/python setup.py build_ext --include-dirs="/usr/local/include/"
     $ env/bin/pip install install --no-download GDAL
 
 В дистрибутивах на базе Debian заголовочные файлы вероятнее всего будут
