@@ -219,6 +219,24 @@ define([
             });
         },
 
+        validateWidget: function () {
+            var widget = this;
+            var result = { isValid: true, error: [] };
+
+            array.forEach([this.wDisplayName], function (subw) {
+                // форсируем показ значка при проверке
+                subw._hasBeenBlurred = true;
+                subw.validate();   
+
+                // если есть ошибки, фиксируем их
+                if ( !subw.isValid() ) {
+                    result.isValid = false;
+                };
+            });
+
+            return result;
+        },
+
         _getValueAttr: function () {
             var widget = this;
 
