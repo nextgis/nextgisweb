@@ -152,7 +152,7 @@ def initialize(comp):
         def __call__(self):
             columns = dict(id=self.layer.column_id)
 
-            geomexpr = 'ST_Transform(ST_RemoveRepeatedPoints(%s), %s)' % (
+            geomexpr = 'ST_Transform(%s, %s)' % (
                     self.layer.column_geom, self.layer.srs_id)
 
             if self._geom:
