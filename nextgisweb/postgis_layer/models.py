@@ -98,6 +98,8 @@ def initialize(comp):
                             datatype = FIELD_TYPE.REAL
                         elif row['data_type'] == 'character varying':
                             datatype = FIELD_TYPE.STRING
+                        elif row['data_type'] == 'uuid':
+                            datatype = FIELD_TYPE.STRING
 
                         if datatype is not None:
                             self.fields.append(LayerField(
