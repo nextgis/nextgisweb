@@ -19,6 +19,9 @@ from ..feature_layer import (
 )
 
 
+GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
+
+
 def initialize(comp):
 
     Layer = comp.env.layer.Layer
@@ -44,6 +47,16 @@ def initialize(comp):
         __mapper_args__ = dict(
             polymorphic_identity=identity,
         )
+
+        def get_info(self):
+            return super(PostgisLayer, self).get_info() + (
+                (u"Тип геометрии", dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type]),
+                (u"Подключение", self.connection),
+                (u"Схема", self.schema),
+                (u"Таблица", self.table),
+                (u"Поле ID", self.column_id),
+                (u"Поле геометрии", self.column_geom),
+            )
 
         def setup(self):
             conn = comp.connection[self.connection].connect()
