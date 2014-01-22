@@ -46,6 +46,7 @@ components = (
     'postgis_layer',
     'raster_layer',
     'raster_style',
+    'wmsclient',
     'file_upload',
 )
 
