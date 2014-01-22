@@ -4,7 +4,7 @@ class Feature(object):
     def __init__(self, layer=None, id=None, fields=None, geom=None, box=None):
         self._layer = layer
 
-        self._id = int(id)
+        self._id = int(id) if id else None
 
         self._geom = geom
         self._box = box
