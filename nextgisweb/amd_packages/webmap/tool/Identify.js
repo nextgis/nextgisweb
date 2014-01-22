@@ -74,7 +74,7 @@ define([
                 var idx = 0;
                 array.forEach(layerResponse.features, function (feature) {
                     this.selectOptions.push({
-                        label: feature.label,
+                        label: feature.label + " <span style=\"color: gray;\">(" + this.layerLabels[layerId] + ")</span>",
                         value: layerId + "/" + idx
                     });
                     idx++;
@@ -245,12 +245,17 @@ define([
                         return this.display.itemStore.getValue(i, "layerId");
                     });
 
+                    var layerLabels = {};
+                    array.forEach(items, function (i) {
+                        layerLabels[this.display.itemStore.getValue(i, "layerId")] = this.display.itemStore.getValue(i, "label");
+                    }, this);
+
                     // XHR-запрос к сервису
                     xhr.post(ngwConfig.applicationUrl + '/feature_layer/identify', {
                         handleAs: "json",
                         data: json.stringify(request)
                     }).then(function (response) {
-                        tool._responsePopup(response, point);
+                        tool._responsePopup(response, point, layerLabels);
                     });
                 }
             });
@@ -275,7 +280,7 @@ define([
             }
         },
 
-        _responsePopup: function (response, point) {
+        _responsePopup: function (response, point, layerLabels) {
             // TODO: Проверить, есть ли какой-нибудь результат
             // и показывать popup только если он есть.
 
@@ -289,7 +294,8 @@ define([
 
             var widget = new Widget({
                 response: response,
-                tool: this
+                tool: this,
+                layerLabels: layerLabels
             });
 
             widget.placeAt(this._popup.contentDiv).startup();
