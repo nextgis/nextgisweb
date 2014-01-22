@@ -53,7 +53,12 @@ def setup_pyramid(comp, config):
     def forbidden(request):
         # Если это гость, то аутентификация может ему помочь
         if request.user.keyname == 'guest':
-            return HTTPFound(location=request.route_url('auth.login'))
+            return HTTPFound(
+                location=request.route_url(
+                    'auth.login',
+                    _query=dict(next=request.url)
+                )
+            )
 
         # Уже аутентифицированным пользователям показываем сообщение об ошибке
         return dict(subtitle=u"Отказано в доступе")
