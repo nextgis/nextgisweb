@@ -216,7 +216,7 @@ def initialize(comp):
                     for k, v in columns.iteritems():
                         cols.append('%s AS "%s"' % (v, k))
 
-                    sql = """SELECT %(cols)s FROM %(schema)s.%(table)s WHERE %(cond)s""" % dict(
+                    sql = """SELECT %(cols)s FROM "%(schema)s"."%(table)s" WHERE %(cond)s""" % dict(
                         cols=", ".join(cols),
                         schema=self.layer.schema,
                         table=self.layer.table,
@@ -247,7 +247,7 @@ def initialize(comp):
 
                 @property
                 def total_count(self):
-                    sql = """SELECT COUNT("%(column_id)s") FROM %(schema)s.%(table)s WHERE %(cond)s""" % dict(
+                    sql = """SELECT COUNT("%(column_id)s") FROM "%(schema)s"."%(table)s" WHERE %(cond)s""" % dict(
                         column_id=self.layer.column_id,
                         schema=self.layer.schema,
                         table=self.layer.table,
