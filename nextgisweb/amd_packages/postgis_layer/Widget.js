@@ -38,6 +38,13 @@ define([
             this.wConnection.addOption(array.map(settings.connections, function(item) {
                 return { value: item, label: item}
             }));
+
+            this.wGeometryType.addOption([
+                { value: "", label: "Автоматически" },
+                { value: "POINT", label: "Точка" },
+                { value: "LINESTRING", label: "Линия" },
+                { value: "POLYGON", label: "Полигон" }
+            ]);
         },
 
         _getValueAttr: function () {
@@ -48,6 +55,12 @@ define([
                 column_id: this.wColumnId.get("value"),
                 column_geom: this.wColumnGeom.get("value"),
                 srs_id: this.wSRS.get("value"),
+            };
+
+            if (this.wGeometryType.get("value") != "") {
+                result.geometry_type = this.wGeometryType.get("value");
+            } else {
+                result.geometry_type = null;
             };
 
             return result;

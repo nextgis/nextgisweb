@@ -16,6 +16,7 @@ class PostgisLayerObjectWidget(ObjectWidget):
         self.obj.table = self.data['table']
         self.obj.column_id = self.data['column_id']
         self.obj.column_geom = self.data['column_geom']
+        self.obj.geometry_type = self.data['geometry_type']
         self.obj.srs_id = self.data['srs_id']
 
         self.obj.setup()

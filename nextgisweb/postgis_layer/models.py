@@ -74,7 +74,27 @@ def initialize(comp):
                 row = result.first()
                 if row:
                     self.geometry_srid = row['srid']
-                    self.geometry_type = row['type'].replace('MULTI', '')
+
+                    table_geometry_type = row['type'].replace('MULTI', '')
+                    print self.geometry_type
+
+                    # Если тип геометрии не указан в базе,
+                    # то он должен быть указан заранее
+                    assert not (
+                        table_geometry_type == 'GEOMETRY'
+                        and self.geometry_type is None
+                    )
+                    
+                    # Если тип геометрии указан в базе,
+                    # то заранее не должен быть указан другой
+                    assert not (
+                        self.geometry_type is not None
+                        and table_geometry_type != 'GEOMETRY'
+                        and self.geometry_type != table_geometry_type
+                    )
+
+                    if self.geometry_type is None:
+                        self.geometry_type = table_geometry_type
 
                 result = conn.execute(
                     """SELECT column_name, data_type
@@ -181,6 +201,11 @@ def initialize(comp):
                         cond.append('"%s" = %d' % (self.layer.column_id, int(v)))
                     else:
                         cond.append('"%s" = %s' % (k, adapt(v)))
+
+            cond.append(
+                """(GeometryType("%(gc)s") IN ('%(gt)s', 'MULTI%(gt)s'))""" %
+                dict(gc=self.layer.column_geom, gt=self.layer.geometry_type)
+            )
 
             if len(cond) == 0:
                 cond.append('true')
