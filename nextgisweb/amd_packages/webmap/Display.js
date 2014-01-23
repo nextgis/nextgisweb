@@ -10,6 +10,7 @@ define([
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/number",
+    "dojo/aspect",
     "ngw/openlayers",
     "ngw/openlayers/Map",
     "dijit/registry",
@@ -53,6 +54,7 @@ define([
     Deferred,
     all,
     number,
+    aspect,
     openlayers,
     Map,
     registry,
@@ -512,6 +514,11 @@ define([
             // Обновление подписи масштаба
             this.map.watch("scaleDenom", function (attr, oldVal, newVal) {
                 widget.scaleInfoNode.innerHTML = "1 : " + number.format(newVal, {places: 0});
+            });
+
+            // При изменении размеров контейнера пересчитываем размер карты
+            aspect.after(this.mapPane, "resize", function() {
+                widget.map.olMap.updateSize();
             });
 
             // Инициализация базовых слоев
