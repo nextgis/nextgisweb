@@ -21,6 +21,11 @@ class CoreComponent(Component):
         )
 
         self._sa_engine = create_engine(sa_url)
+
+        if self._settings.get('database.check_at_startup', 'no').lower() in ('yes', 'true'):
+            conn = self._sa_engine.connect()
+            conn.close()
+
         DBSession.configure(bind=self._sa_engine)
         Base.metadata.bind = self._sa_engine
 
@@ -35,4 +40,6 @@ class CoreComponent(Component):
         dict(key='database.name', default='nextgisweb', desc=u"Имя БД на сервере"),
         dict(key='database.user', default='nextgisweb', desc=u"Имя пользователя БД"),
         dict(key='database.password', desc=u"Пароль пользователя БД"),
+
+        dict(key='database.check_at_startup', desc=u"Проверять подключение при запуске"),
     )
