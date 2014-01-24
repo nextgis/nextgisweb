@@ -107,7 +107,7 @@ def initialize(comp):
                 )
                 for row in result:
                     if row['column_name'] == self.column_id:
-                        assert row['data_type'] != 'integer'
+                        assert row['data_type'] == 'integer'
                     elif row['column_name'] == self.column_geom:
                         pass
                     else:
