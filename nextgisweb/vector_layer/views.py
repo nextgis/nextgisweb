@@ -7,6 +7,8 @@ import ctypes
 import osgeo
 from osgeo import ogr
 
+from distutils.version import LooseVersion
+
 from ..object_widget import ObjectWidget
 
 
@@ -125,7 +127,7 @@ def _set_encoding(encoding):
         def __init__(self, encoding):
             self.encoding = encoding
 
-            if self.encoding and osgeo.__version__ >= '1.9':
+            if self.encoding and LooseVersion(osgeo.__version__) >= LooseVersion('1.9'):
                 # Для GDAL 1.9 и выше пытаемся установить SHAPE_ENCODING
                 # через ctypes и libgdal
 
@@ -160,7 +162,7 @@ def _set_encoding(encoding):
 
         def __enter__(self):
 
-            if self.encoding and osgeo.__version__ >= '1.9':
+            if self.encoding and LooseVersion(osgeo.__version__) >= LooseVersion('1.9'):
                 # Для GDAL 1.9 устанавливаем значение SHAPE_ENCODING
 
                 # Оставим копию текущего значения себе
@@ -180,7 +182,7 @@ def _set_encoding(encoding):
 
         def __exit__(self, type, value, traceback):
 
-            if encoding and osgeo.__version__ >= '1.9':
+            if self.encoding and LooseVersion(osgeo.__version__) >= LooseVersion('1.9'):
                 # Возвращаем на место старое значение
                 self.set_option('SHAPE_ENCODING', self.old_value)
 
