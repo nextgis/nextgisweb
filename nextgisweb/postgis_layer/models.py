@@ -76,7 +76,6 @@ def initialize(comp):
                     self.geometry_srid = row['srid']
 
                     table_geometry_type = row['type'].replace('MULTI', '')
-                    print self.geometry_type
 
                     # Если тип геометрии не указан в базе,
                     # то он должен быть указан заранее
