@@ -26,7 +26,6 @@ define([
     "dojo/data/ItemFileWriteStore",
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
-    "dijit/tree/dndSource",
     // tools
     "./tool/Base",
     "./tool/Zoom",
@@ -69,7 +68,6 @@ define([
     ItemFileWriteStore,
     TreeStoreModel,
     Tree,
-    dndSource,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -218,16 +216,7 @@ define([
                 style: "height: 100%",
                 model: this.itemModel,
                 autoExpand: true,
-                showRoot: false,
-                dndController: dndSource,
-                checkItemAcceptance: function (node, source, position) {
-                    var item = registry.getEnclosingWidget(node).item,
-                        item_type = widget.itemStore.getValue(item, 'type');
-                    // Блокируем возможность перетащить элемент внутрь слоя,
-                    // перенос внутрь допустим только для группы
-                    return item_type === 'group' || (item_type === 'layer' && position !== 'over');
-                },
-                betweenThreshold: 6
+                showRoot: false
             });
 
             // Размещаем дерево, когда виджет будет готов           
