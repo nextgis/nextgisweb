@@ -84,7 +84,7 @@ def initialize(comp):
                         table_geometry_type == 'GEOMETRY'
                         and self.geometry_type is None
                     )
-                    
+
                     # Если тип геометрии указан в базе,
                     # то заранее не должен быть указан другой
                     assert not (
@@ -106,9 +106,9 @@ def initialize(comp):
                     self.table
                 )
                 for row in result:
-                    if row['column_name'] in (self.column_id, self.column_geom):
-                        pass
-                    elif row['column_name'] in ('id', 'geom'):
+                    if row['column_name'] == self.column_id:
+                        assert row['data_type'] != 'integer'
+                    elif row['column_name'] == self.column_geom:
                         pass
                     else:
                         datatype = None
