@@ -45,6 +45,12 @@ def require(*comp_ident):
 
     return subdecorator
 
+
 def load_all():
     for ep in pkg_resources.iter_entry_points(group='nextgisweb.component'):
         ep.load()
+
+    for ep in pkg_resources.iter_entry_points(group='nextgisweb.packages'):
+        pkginfo = ep.load()()
+        for component, module_name in pkginfo['components'].iteritems():
+            __import__(module_name)

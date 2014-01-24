@@ -18,6 +18,37 @@ from .component import Component, load_all
 from .env import Env
 
 
+def pkginfo():
+    components = (
+        'core',
+        'pyramidcomp',
+        'auth',
+        'security',
+        'spatial_ref_sys',
+        'layer_group',
+        'layer',
+        'feature_layer',
+        'feature_description',
+        'feature_photo',
+        'style',
+        'marker_library',
+        'webmap',
+        'layer_group.root',
+        'file_storage',
+        'vector_layer',
+        'postgis_layer',
+        'raster_layer',
+        'raster_style',
+        'file_upload',
+    )
+
+    return dict(
+        components=dict(map(
+            lambda (i): (i, "nextgisweb.%s" % i),
+            components)
+        )
+    )
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application. """
 

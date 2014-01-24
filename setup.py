@@ -26,38 +26,17 @@ requires = [
     'passlib',
 ]
 
-components = (
-    'core',
-    'pyramidcomp',
-    'auth',
-    'security',
-    'spatial_ref_sys',
-    'layer_group',
-    'layer',
-    'feature_layer',
-    'feature_description',
-    'feature_photo',
-    'style',
-    'marker_library',
-    'webmap',
-    'layer_group.root',
-    'file_storage',
-    'vector_layer',
-    'postgis_layer',
-    'raster_layer',
-    'raster_style',
-    'file_upload',
-)
-
 entry_points = {
     'paste.app_factory': [
         'main = nextgisweb:main'
     ],
+
     'console_scripts': [
         'nextgisweb = nextgisweb.script:main',
         'nextgisweb-config = nextgisweb.script:config',
     ],
-    'nextgisweb.component': ['%s = nextgisweb.%s' % (i, i) for i in components],
+
+    'nextgisweb.packages': ['nextgisweb = nextgisweb:pkginfo', ],
 
     'nextgisweb.amd_packages': [
         'nextgisweb = nextgisweb:amd_packages',
@@ -69,11 +48,11 @@ setup(name='nextgisweb',
       description='nextgisweb',
       long_description="",
       classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pyramid",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+          "Programming Language :: Python",
+          "Framework :: Pyramid",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      ],
       author='',
       author_email='',
       url='',
@@ -85,4 +64,3 @@ setup(name='nextgisweb',
       install_requires=requires,
       entry_points=entry_points,
       )
-
