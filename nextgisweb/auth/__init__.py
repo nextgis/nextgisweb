@@ -4,6 +4,11 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component
 
+from .models import Principal, User, Group
+
+
+__all__ = ['Principal', 'User', 'Group']
+
 
 @Component.registry.register
 class AuthComponent(Component):
