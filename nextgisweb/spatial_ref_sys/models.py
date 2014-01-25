@@ -5,7 +5,10 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from osgeo import osr
 
-from ..models import Base
+from ..models import declarative_base
+
+
+Base = declarative_base()
 
 
 class SRS(Base):
