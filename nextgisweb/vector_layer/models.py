@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 import uuid
+import types
 
 from zope.interface import implements
 from osgeo import ogr, osr
 
 import sqlalchemy as sa
+from sqlalchemy import event
 import geoalchemy as ga
 import sqlalchemy.orm as orm
 import sqlalchemy.sql as sql
 
 from ..geometry import geom_from_wkb, box
-from ..models.base import Base, DBSession
+from ..models.base import DBSession
 from ..layer import SpatialLayerMixin
 
 from ..feature_layer import (
@@ -116,7 +118,7 @@ class TableInfo(object):
                     setattr(self, k, v)
 
         table = sa.Table(
-            tablename if tablename else ('lvd_' + str(uuid4().hex)), metadata,
+            tablename if tablename else ('lvd_' + str(uuid.uuid4().hex)), metadata,
             sa.Column('id', sa.Integer, primary_key=True),
             ga.GeometryExtensionColumn('geom', _GEOM_TYPE_2_GA[geom_fldtype](2, srid=self.srs_id)),
             *map(lambda (fld): sa.Column(fld.key, _FIELD_TYPE_2_DB[fld.datatype]), self.fields)
@@ -162,7 +164,7 @@ class TableInfo(object):
                     fld_value = feature.GetFieldAsDouble(i)
                 elif fld_type == ogr.OFTString:
                     fld_value = strdecode(feature.GetFieldAsString(i))
-                    
+
                 fld_values[self[feature.GetFieldDefnRef(i).GetNameRef()].key] = fld_value
 
             obj = self.model(fid=fid, geom=ga.WKTSpatialElement(str(geom), self.srs_id), **fld_values)
@@ -242,13 +244,28 @@ def initialize(comp):
 
             DBSession.merge(obj)
 
+    def _vector_layer_listeners(table):
+        event.listen(
+            table, "after_create",
+            sa.DDL("CREATE SCHEMA vector_layer")
+        )
 
-    def __create_schema(event, schema_item, bind):
-        bind.execute("""
-            DROP SCHEMA IF EXISTS vector_layer CASCADE; CREATE SCHEMA vector_layer;
-        """)
+        event.listen(
+            table, "after_drop",
+            sa.DDL("DROP SCHEMA IF EXISTS vector_layer CASCADE")
+        )
 
-    VectorLayer.__table__.append_ddl_listener('after-create', __create_schema)
+    _vector_layer_listeners(VectorLayer.__table__)
+
+    # Инициализация БД использует table.tometadata(), однако
+    # SA не копирует подписки на события в этом случае.
+
+    def tometadata(self, metadata):
+        result = sa.Table.tometadata(self, metadata)
+        _vector_layer_listeners(result)
+
+    VectorLayer.__table__.tometadata = types.MethodType(
+        tometadata, VectorLayer.__table__)
 
     comp.VectorLayer = VectorLayer
 
@@ -361,6 +378,5 @@ def initialize(comp):
                     res = DBSession.connection().execute(query)
                     for row in res:
                         return row[0]
-
 
             return QueryFeatureSet()
