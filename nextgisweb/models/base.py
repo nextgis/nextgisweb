@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base as sa_declarative_base
 
 from sqlalchemy.orm import (
     scoped_session,
@@ -31,4 +31,13 @@ class BaseClass(object):
         return self
 
 
-Base = declarative_base(cls=BaseClass)
+_CLASS_REGISTRY = dict()
+
+
+def declarative_base():
+    return sa_declarative_base(
+        cls=BaseClass,
+        class_registry=_CLASS_REGISTRY,
+    )
+
+Base = declarative_base()

@@ -20,7 +20,8 @@ class CoreComponent(Component):
             name=self._settings['database.name'],
         )
 
-        self._sa_engine = create_engine(sa_url)
+        self.engine = create_engine(sa_url)
+        self._sa_engine = self.engine
 
         if self._settings.get('database.check_at_startup', 'no').lower() in ('yes', 'true'):
             conn = self._sa_engine.connect()

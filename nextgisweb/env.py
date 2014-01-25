@@ -2,6 +2,7 @@
 
 from .component import Component, load_all
 
+
 class Env(object):
 
     def __init__(self, cfg):
@@ -37,3 +38,6 @@ class Env(object):
 
         for c in seq:
             c.initialize()
+
+            if hasattr(c, 'metadata'):
+                c.metadata.bind = self.core.engine
