@@ -2,8 +2,7 @@
 import os
 
 from ..component import Component
-
-from .models import FileObj
+from .models import Base, FileObj
 
 
 @Component.registry.register
@@ -12,6 +11,7 @@ class FileStorageComponent(Component):
 
     def initialize(self):
         super(FileStorageComponent, self).initialize()
+        self.metadata = Base.metadata
         self.FileObj = FileObj
 
     def fileobj(self, component):

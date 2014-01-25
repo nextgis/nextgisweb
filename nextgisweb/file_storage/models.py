@@ -2,9 +2,10 @@
 import uuid
 
 import sqlalchemy as sa
-import sqlalchemy.orm as orm
 
-from ..models import Base
+from ..models import declarative_base
+
+Base = declarative_base()
 
 
 class FileObj(Base):
@@ -15,5 +16,5 @@ class FileObj(Base):
     uuid = sa.Column(sa.Unicode(32), nullable=False)
 
     def __init__(self, *args, **kwargs):
-    	Base.__init__(self, *args, **kwargs)
-    	self.uuid = str(uuid.uuid4().hex)
+        Base.__init__(self, *args, **kwargs)
+        self.uuid = str(uuid.uuid4().hex)
