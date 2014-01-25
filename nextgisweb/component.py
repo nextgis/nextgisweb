@@ -2,6 +2,7 @@
 import pkg_resources
 from .registry import registry_maker
 
+
 class Component(object):
 
     registry = registry_maker()
@@ -46,11 +47,20 @@ def require(*comp_ident):
     return subdecorator
 
 
-def load_all():
+def load_all(packages_ignore=None, components_ignore=None):
+    if packages_ignore is None:
+        packages_ignore = ()
+
+    if components_ignore is None:
+        components_ignore = ()
+
     for ep in pkg_resources.iter_entry_points(group='nextgisweb.component'):
-        ep.load()
+        if ep.name not in components_ignore:
+            ep.load()
 
     for ep in pkg_resources.iter_entry_points(group='nextgisweb.packages'):
-        pkginfo = ep.load()()
-        for component, module_name in pkginfo['components'].iteritems():
-            __import__(module_name)
+        if ep.name not in packages_ignore:
+            pkginfo = ep.load()()
+            for component, module_name in pkginfo['components'].iteritems():
+                if component not in components_ignore:
+                    __import__(module_name)

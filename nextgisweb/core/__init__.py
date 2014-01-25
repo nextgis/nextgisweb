@@ -42,4 +42,7 @@ class CoreComponent(Component):
         dict(key='database.password', desc=u"Пароль пользователя БД"),
 
         dict(key='database.check_at_startup', desc=u"Проверять подключение при запуске"),
+
+        dict(key='packages.ignore', desc=u"Не загружать перечисленные пакеты"),
+        dict(key='components.ignore', desc=u"Не загружать перечисленные компоненты"),
     )
