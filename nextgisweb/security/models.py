@@ -6,6 +6,12 @@ import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from ..models import declarative_base
+from ..auth import Principal, User, Group
+
+
+Base = declarative_base()
+
 
 class PMATCH(object):
     USER = 'U'
@@ -88,254 +94,253 @@ def permission_set(itemstack, permissions=None):
     return result
 
 
-def initialize(comp):
-    Base = comp.env.core.Base
+class ACL(Base):
+    __tablename__ = 'acl'
 
-    Principal = comp.env.auth.Principal
-    User = comp.env.auth.User
-    Group = comp.env.auth.Group
+    id = sa.Column(sa.Integer, primary_key=True)
+    parent_id = sa.Column(sa.ForeignKey(id))
+    owner_user_id = sa.Column(sa.ForeignKey(User.principal_id))
+    resource = sa.Column(sa.Unicode, nullable=False)
 
-    class ACL(Base):
-        __tablename__ = 'acl'
+    parent = orm.relationship('ACL', remote_side=[id, ])
+    owner_user = orm.relationship('User')
+    items = orm.relationship(
+        'ACLItem',
+        cascade='all, delete-orphan',
+        passive_deletes=True,
+        backref=orm.backref('acl')
+    )
 
-        id = sa.Column(sa.Integer, primary_key=True)
-        parent_id = sa.Column(sa.ForeignKey(id))
-        owner_user_id = sa.Column(sa.ForeignKey(User.principal_id))
-        resource = sa.Column(sa.Unicode, nullable=False)
+    def __init__(self, *args, **kwargs):
+        super(ACL, self).__init__(*args, **kwargs)
 
-        parent = orm.relationship('ACL', remote_side=[id, ])
-        owner_user = orm.relationship('User')
-        items = orm.relationship(
-            'ACLItem',
-            cascade='all, delete-orphan',
-            passive_deletes=True,
-            backref=orm.backref('acl')
-        )
+        self._permset_cache = dict()
 
-        def __init__(self, *args, **kwargs):
-            super(ACL, self).__init__(*args, **kwargs)
+    @orm.reconstructor
+    def orm_init(self):
+        self._permset_cache = dict()
 
-            self._permset_cache = dict()
+    def update(self, items, replace=False):
+        operations = dict(map(lambda itm: (itm[:-1], itm[-1]), items))
 
-        @orm.reconstructor
-        def orm_init(self):
-            self._permset_cache = dict()
+        # Исправляем существующие записи
+        seen = set()
+        remove = list()
+        for item in self.items:
+            key = (item.principal_id, item.resource, item.permission)
 
-        def update(self, items, replace=False):
-            operations = dict(map(lambda itm: (itm[:-1], itm[-1]), items))
+            if key in operations:
+                item.operation = operations[key]
+                seen.add(key)
 
-            # Исправляем существующие записи
-            seen = set()
-            remove = list()
-            for item in self.items:
-                key = (item.principal_id, item.resource, item.permission)
+            elif replace:
+                remove.append(item)
 
-                if key in operations:
-                    item.operation = operations[key]
-                    seen.add(key)
+        # Удаляем отмеченные для удаления записи
+        for i in remove:
+            self.items.remove(i)
 
-                elif replace:
-                    remove.append(item)
+        # Добавляем новые
+        for key, operation in operations.iteritems():
+            if key not in seen:
+                self.items.append(ACLItem(
+                    **dict(zip(
+                        ('principal_id', 'resource', 'permission'),
+                        key
+                    ), operation=operation)
+                ))
 
-            # Удаляем отмеченные для удаления записи
-            for i in remove:
-                self.items.remove(i)
+        # Сбрасываем кэш
+        self._permset_cache = dict()
 
-            # Добавляем новые
-            for key, operation in operations.iteritems():
-                if key not in seen:
-                    self.items.append(ACLItem(
-                        **dict(zip(
-                            ('principal_id', 'resource', 'permission'),
-                            key
-                        ), operation=operation)
-                    ))
+    def permission_set(self, user):
+        if user.id in self._permset_cache:
+            return self._permset_cache[user.id]
 
-            # Сбрасываем кэш
-            self._permset_cache = dict()
+        itemstack = []
 
-        def permission_set(self, user):
-            if user.id in self._permset_cache:
-                return self._permset_cache[user.id]
+        acl = self
+        while acl:
+            items = []
+            itemstack.insert(0, items)
 
-            itemstack = []
+            for itm in acl.items:
+                if itm.resource != self.resource:
+                    continue
 
-            acl = self
-            while acl:
-                items = []
-                itemstack.insert(0, items)
+                if (
+                    isinstance(itm.principal, User)
+                    and (
+                        # Сравнение с учетом виртуальных пользователей
+                        itm.principal.compare(user)
 
-                for itm in acl.items:
-                    if itm.resource != self.resource:
-                        continue
-
-                    if (
-                        isinstance(itm.principal, User)
-                        and (
-                            # Сравнение с учетом виртуальных пользователей
-                            itm.principal.compare(user)
-
-                            # Специальный случай: в ACL указан владелец
-                            or (
-                                itm.principal.keyname == 'owner'
-                                and user == self.owner_user
-                            )
+                        # Специальный случай: в ACL указан владелец
+                        or (
+                            itm.principal.keyname == 'owner'
+                            and user == self.owner_user
                         )
-                    ):
-                        match = PMATCH.USER
+                    )
+                ):
+                    match = PMATCH.USER
 
-                    elif (
-                        isinstance(itm.principal, Group)
-                        and itm.principal.is_member(user)
-                    ):
-                        match = PMATCH.GROUP
-
-                    else:
-                        continue
-
-                    items.append((
-                        itm.permission,
-                        match,
-                        itm.poper,
-                        itm.propagate
-                    ))
-
-                acl = acl.parent
-
-            result = permission_set(
-                itemstack,
-                permissions=comp.permissions[self.resource].keys()
-            )
-
-            self._permset_cache = result
-            return result
-
-        def has_permission(self, user, *permissions):
-            permset = self.permission_set(user)
-
-            for permission in permissions:
-                if permission not in permset:
-                    return False
-
-            return True
-
-    comp.ACL = ACL
-
-    class ACLItem(Base):
-        __tablename__ = 'acl_item'
-
-        acl_id = sa.Column(sa.ForeignKey(ACL.id), primary_key=True)
-        principal_id = sa.Column(sa.ForeignKey(Principal.id), primary_key=True)
-        resource = sa.Column(sa.Unicode, primary_key=True)
-        permission = sa.Column(sa.Unicode, primary_key=True)
-        operation = sa.Column(sa.Unicode, primary_key=True)
-
-        principal = orm.relationship('Principal')
-
-        @property
-        def poper(self):
-            if self.operation.startswith('allow-'):
-                return POPER.ALLOW
-
-            elif self.operation.startswith('deny-'):
-                return POPER.DENY
-
-            elif self.operation.startswith('inherit-'):
-                return POPER.INHERIT
-
-        @property
-        def propagate(self):
-            if self.operation.endswith('-subtree'):
-                return True
-
-            elif self.operation.endswith('-node'):
-                return False
-
-    comp.ACLItem = ACLItem
-
-    class ResourceACLRoot(Base):
-        __tablename__ = 'resource_acl_root'
-
-        resource = sa.Column(sa.Unicode, primary_key=True)
-        acl_id = sa.Column(sa.ForeignKey(ACL.id), nullable=False)
-
-        acl = orm.relationship(ACL, lazy='joined')
-
-        def __init__(self, resource, **kwargs):
-            self.resource = resource
-            self.acl = ACL(resource=resource)
-
-    comp.ResourceACLRoot = ResourceACLRoot
-
-    class ACLMixin(object):
-
-        @declared_attr
-        def acl_id(cls):
-            return sa.Column(sa.ForeignKey(ACL.id), nullable=False)
-
-        @declared_attr
-        def acl(cls):
-            return orm.relationship(
-                ACL,
-                cascade='all',
-                lazy='joined'
-            )
-
-        def __init__(self, *args, **kwargs):
-
-            if 'acl' not in kwargs and 'acl_id' not in kwargs:
-
-                parent_attr = (
-                    self.__acl_parent_attr__
-                    if hasattr(self, '__acl_parent_attr__')
-                    else None
-                )
-                aclkwargs = dict(resource=self.__acl_resource__)
-
-                if kwargs.get(parent_attr) is not None:
-                    # Если у элемента есть ресурс-родитель, используем его ACL
-                    aclkwargs['parent_id'] = kwargs[parent_attr].acl_id
+                elif (
+                    isinstance(itm.principal, Group)
+                    and itm.principal.is_member(user)
+                ):
+                    match = PMATCH.GROUP
 
                 else:
-                    # Если нет используем ACL коренного элемент ресурса
-                    aclkwargs['parent_id'] = ResourceACLRoot.query() \
-                        .get(self.__acl_resource__).acl_id
+                    continue
 
-                if 'owner_user' in kwargs:
-                    aclkwargs['owner_user'] = kwargs['owner_user']
-                    del kwargs['owner_user']
+                items.append((
+                    itm.permission,
+                    match,
+                    itm.poper,
+                    itm.propagate
+                ))
 
-                elif 'owner_user_id' in kwargs:
-                    aclkwargs['owner_user_id'] = kwargs['owner_user_id']
-                    del kwargs['owner_user_id']
+            acl = acl.parent
 
-                acl = ACL(**aclkwargs)
-                kwargs['acl'] = acl
+        result = permission_set(
+            itemstack,
+            permissions=self._comp.permissions[self.resource].keys()
+        )
 
-            super(ACLMixin, self).__init__(*args, **kwargs)
+        self._permset_cache = result
+        return result
 
-        def permission_set(self, *args, **kwargs):
-            return self.acl.permission_set(*args, **kwargs)
+    def has_permission(self, user, *permissions):
+        permset = self.permission_set(user)
 
-        def has_permission(self, *args, **kwargs):
-            return self.acl.has_permission(*args, **kwargs)
+        for permission in permissions:
+            if permission not in permset:
+                return False
 
-        def owner_user():
+        return True
 
-            def fget(self):
-                return self.acl.owner_user
 
-            def fset(self, value):
-                self.acl.owner_user = value
+class ACLItem(Base):
+    __tablename__ = 'acl_item'
 
-            return locals()
+    acl_id = sa.Column(sa.ForeignKey(ACL.id), primary_key=True)
+    principal_id = sa.Column(sa.ForeignKey(Principal.id), primary_key=True)
+    resource = sa.Column(sa.Unicode, primary_key=True)
+    permission = sa.Column(sa.Unicode, primary_key=True)
+    operation = sa.Column(sa.Unicode, primary_key=True)
 
-        owner_user = property(**owner_user())
+    principal = orm.relationship('Principal')
 
-        @hybrid_property
-        def acl_root(self):
-            """ Быстрый способ доступа к базовому списку контроля доступа """
+    @property
+    def poper(self):
+        if self.operation.startswith('allow-'):
+            return POPER.ALLOW
 
-            return ResourceACLRoot.query().get(self.__acl_resource__).acl
+        elif self.operation.startswith('deny-'):
+            return POPER.DENY
 
+        elif self.operation.startswith('inherit-'):
+            return POPER.INHERIT
+
+    @property
+    def propagate(self):
+        if self.operation.endswith('-subtree'):
+            return True
+
+        elif self.operation.endswith('-node'):
+            return False
+
+
+class ResourceACLRoot(Base):
+    __tablename__ = 'resource_acl_root'
+
+    resource = sa.Column(sa.Unicode, primary_key=True)
+    acl_id = sa.Column(sa.ForeignKey(ACL.id), nullable=False)
+
+    acl = orm.relationship(ACL, lazy='joined')
+
+    def __init__(self, resource, **kwargs):
+        self.resource = resource
+        self.acl = ACL(resource=resource)
+
+
+class ACLMixin(object):
+
+    @declared_attr
+    def acl_id(cls):
+        return sa.Column(sa.ForeignKey(ACL.id), nullable=False)
+
+    @declared_attr
+    def acl(cls):
+        return orm.relationship(
+            ACL,
+            cascade='all',
+            lazy='joined'
+        )
+
+    def __init__(self, *args, **kwargs):
+
+        if 'acl' not in kwargs and 'acl_id' not in kwargs:
+
+            parent_attr = (
+                self.__acl_parent_attr__
+                if hasattr(self, '__acl_parent_attr__')
+                else None
+            )
+            aclkwargs = dict(resource=self.__acl_resource__)
+
+            if kwargs.get(parent_attr) is not None:
+                # Если у элемента есть ресурс-родитель, используем его ACL
+                aclkwargs['parent_id'] = kwargs[parent_attr].acl_id
+
+            else:
+                # Если нет используем ACL коренного элемент ресурса
+                aclkwargs['parent_id'] = ResourceACLRoot.query() \
+                    .get(self.__acl_resource__).acl_id
+
+            if 'owner_user' in kwargs:
+                aclkwargs['owner_user'] = kwargs['owner_user']
+                del kwargs['owner_user']
+
+            elif 'owner_user_id' in kwargs:
+                aclkwargs['owner_user_id'] = kwargs['owner_user_id']
+                del kwargs['owner_user_id']
+
+            acl = ACL(**aclkwargs)
+            kwargs['acl'] = acl
+
+        super(ACLMixin, self).__init__(*args, **kwargs)
+
+    def permission_set(self, *args, **kwargs):
+        return self.acl.permission_set(*args, **kwargs)
+
+    def has_permission(self, *args, **kwargs):
+        return self.acl.has_permission(*args, **kwargs)
+
+    def owner_user():
+
+        def fget(self):
+            return self.acl.owner_user
+
+        def fset(self, value):
+            self.acl.owner_user = value
+
+        return locals()
+
+    owner_user = property(**owner_user())
+
+    @hybrid_property
+    def acl_root(self):
+        """ Быстрый способ доступа к базовому списку контроля доступа """
+
+        return ResourceACLRoot.query().get(self.__acl_resource__).acl
+
+
+def initialize(comp):
+    comp.metadata = Base.metadata
+
+    ACL._comp = comp
+
+    comp.ACL = ACL
+    comp.ACLItem = ACLItem
+    comp.ResourceACLRoot = ResourceACLRoot
     comp.ACLMixin = ACLMixin
