@@ -5,6 +5,9 @@ from sqlalchemy import create_engine
 from ..component import Component
 from ..models import DBSession, Base
 
+from .command import BackupCommand
+from .backup import BackupBase, TableBackup, SequenceBackup
+
 
 @Component.registry.register
 class CoreComponent(Component):
@@ -31,6 +34,29 @@ class CoreComponent(Component):
 
         self.DBSession = DBSession
         self.Base = Base
+
+    def backup(self):
+        conn = DBSession.connection()
+
+        for tab in self.Base.metadata.sorted_tables:
+            yield TableBackup(self, tab.key)
+
+            # Ищем sequence созданные автоматически для PK
+            # по маске "table_field_seq" и добавляем их в архив
+            for col in tab.columns:
+                if col.primary_key:
+                    test_seq_name = tab.name + "_" + col.name + "_seq"
+                    res = conn.execute(
+                        """SELECT relname FROM pg_class
+                        WHERE relkind = 'S' AND relname = %s""",
+                        test_seq_name)
+
+                    row = res.fetchone()
+                    if row:
+                        yield SequenceBackup(self, test_seq_name)
+
+        for seq in self.Base.metadata._sequences.itervalues():
+            yield SequenceBackup(self, seq.name)
 
     settings_info = (
         dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),

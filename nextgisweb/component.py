@@ -20,6 +20,9 @@ class Component(object):
     def setup_pyramid(self, config):
         pass
 
+    def backup(self):
+        return ()
+
     @property
     def env(self):
         return self._env
