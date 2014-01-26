@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import re
 from os.path import join as ptjoin
 from tempfile import NamedTemporaryFile
@@ -9,6 +10,7 @@ from shutil import copyfileobj
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import pip
 
 from ..registry import registry_maker
 from ..models import Base as MainBase
@@ -117,6 +119,15 @@ def backup(env, dst, nozip=False):
 
     sqlitefile = openfile('db.sqlite')
     engine = sa.create_engine('sqlite:///' + sqlitefile.name)
+
+    try:
+        buf = openfile('requirements')
+        stdout = sys.stdout
+        sys.stdout = buf
+        pip.main(['freeze', ])
+        putfile(buf)
+    finally:
+        sys.stdout = stdout
 
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
