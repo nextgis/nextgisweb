@@ -88,7 +88,6 @@ define([
             this.wColumnId.set("value", value["column_id"]);
             this.wColumnGeom.set("value", value["column_geom"]);
             this.wGeometryType.set("value", value["geometry_type"]);
-            console.log(2);
         },        
 
         validateWidget: function () {
