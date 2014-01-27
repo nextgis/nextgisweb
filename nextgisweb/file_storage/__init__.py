@@ -1,9 +1,33 @@
 # -*- coding: utf-8 -*-
 import os
+from shutil import copyfileobj
 
 from ..component import Component
+from ..core import BackupBase
 
 from .models import FileObj
+
+
+@BackupBase.registry.register
+class FileObjBackup(BackupBase):
+    identity = 'fileobj'
+
+    def is_binary(self):
+        return True
+
+    def backup(self):
+        fileobj = FileObj.filter_by(uuid=self.key).one()
+        with open(self.comp.filename(fileobj), 'rb') as fd:
+            copyfileobj(fd, self.binfd)
+
+    def restore(self):
+        fileobj = FileObj.filter_by(uuid=self.key).one()
+        fn = self.comp.filename(fileobj, makedirs=True)
+        if os.path.isfile(fn):
+            pass
+        else:
+            with open(fn, 'wb') as fd:
+                copyfileobj(self.binfd, fd)
 
 
 @Component.registry.register
@@ -13,6 +37,13 @@ class FileStorageComponent(Component):
     def initialize(self):
         super(FileStorageComponent, self).initialize()
         self.FileObj = FileObj
+
+    def backup(self):
+        for i in super(FileStorageComponent, self).backup():
+            yield i
+
+        for fileobj in FileObj.query():
+            yield FileObjBackup(self, fileobj.uuid)
 
     def fileobj(self, component):
         obj = FileObj(component=component)
