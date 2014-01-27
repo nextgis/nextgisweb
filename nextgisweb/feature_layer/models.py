@@ -58,7 +58,8 @@ class LayerFieldsMixin(object):
             foreign_keys=cls.__field_class__.layer_id,
             order_by=cls.__field_class__.idx,
             collection_class=ordering_list('idx'),
-            cascade='all'
+            cascade='all, delete-orphan',
+            single_parent=True
         )
 
     @declared_attr
@@ -76,6 +77,7 @@ class LayerFieldsMixin(object):
             primaryjoin="%s.id == %s.feature_label_field_id" % (
                 cls.__field_class__.__name__, cls.__name__
             ),
-            cascade='all',
+            cascade='all, delete-orphan',
+            single_parent=True,
             post_update=True
         )

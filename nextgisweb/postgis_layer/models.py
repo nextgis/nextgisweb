@@ -59,6 +59,17 @@ def initialize(comp):
             )
 
         def setup(self):
+            fdata = dict()
+            for f in self.fields:
+                fdata[f.keyname] = dict(
+                    display_name=f.display_name,
+                    grid_visibility=f.grid_visibility)
+
+            for f in list(self.fields):
+                self.fields.remove(f)
+
+            self.feature_label_field = None
+
             conn = comp.connection[self.connection].connect()
             try:
                 result = conn.execute(
@@ -74,7 +85,6 @@ def initialize(comp):
                 row = result.first()
                 if row:
                     self.geometry_srid = row['srid']
-
                     table_geometry_type = row['type'].replace('MULTI', '')
 
                     # Если тип геометрии не указан в базе,
@@ -121,10 +131,12 @@ def initialize(comp):
                             datatype = FIELD_TYPE.STRING
 
                         if datatype is not None:
+                            fopts = dict(display_name=row['column_name'])
+                            fopts.update(fdata.get(row['column_name'], dict()))
                             self.fields.append(LayerField(
                                 keyname=row['column_name'],
-                                display_name=row['column_name'],
-                                datatype=datatype))
+                                datatype=datatype,
+                                **fopts))
             finally:
                 conn.close()
 

@@ -45,6 +45,20 @@ define([
                 { value: "LINESTRING", label: "Линия" },
                 { value: "POLYGON", label: "Полигон" }
             ]);
+
+            if (this.operation == 'edit') {
+                this.wFieldDefs.addOption([{value: 'keep', label: 'Сохранить текущие'}]);
+            };            
+            this.wFieldDefs.addOption([{value: 'update', label: 'Прочитать из базы данных'}]);
+
+            this.wGeometryType.set('disabled', this.operation == 'edit');
+            this.wSRS.set('disabled', this.operation == 'edit');
+
+            if (this.value) {
+                this.wConnection.set("value", this.value.connection);
+                this.wGeometryType.set("value", this.value.geometry_type);
+                this.wSRS.set("value", this.value.srs_id);
+            };
         },
 
         _getValueAttr: function () {
@@ -55,6 +69,7 @@ define([
                 column_id: this.wColumnId.get("value"),
                 column_geom: this.wColumnGeom.get("value"),
                 srs_id: this.wSRS.get("value"),
+                field_defs: this.wFieldDefs.get("value")
             };
 
             if (this.wGeometryType.get("value") != "") {
@@ -65,6 +80,16 @@ define([
 
             return result;
         },
+
+        _setValueAttr: function (value) {
+            this.wConnection.set("value", value["connection"]);
+            this.wSchema.set("value", value["schema"]);
+            this.wTable.set("value", value["table"]);
+            this.wColumnId.set("value", value["column_id"]);
+            this.wColumnGeom.set("value", value["column_geom"]);
+            this.wGeometryType.set("value", value["geometry_type"]);
+            console.log(2);
+        },        
 
         validateWidget: function () {
             var widget = this;
