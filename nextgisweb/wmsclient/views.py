@@ -53,9 +53,12 @@ class WMSClientStyleObjectWidget(ObjectWidget):
         result['imgformat'] = client.getOperationByName('GetMap').formatOptions
 
         wmslayers = []
-        for l in client.contents:
+        for id, layer in client.contents.iteritems():
             wmslayers.append(dict(
-                id=l, title=client[l].title))
+                id=id, title=layer.title,
+                index=layer.index))
+
+        wmslayers.sort(key=lambda x: x['index'])
 
         result['wmslayers'] = wmslayers
 
