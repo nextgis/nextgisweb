@@ -11,6 +11,7 @@ class WMSClientLayerObjectWidget(ObjectWidget):
     def populate_obj(self):
         ObjectWidget.populate_obj(self)
         self.obj.url = self.data['url']
+        self.obj.version = self.data['version']
         self.obj.srs_id = self.data['srs_id']
 
     def widget_params(self):
@@ -19,6 +20,7 @@ class WMSClientLayerObjectWidget(ObjectWidget):
         if self.obj:
             result['value'] = dict(
                 url=self.obj.url,
+                version=self.obj.version,
                 srs_id=self.obj.srs_id,
             )
 
@@ -36,6 +38,7 @@ class WMSClientStyleObjectWidget(ObjectWidget):
     def populate_obj(self):
         ObjectWidget.populate_obj(self)
         self.obj.wmslayers = self.data['wmslayers']
+        self.obj.imgformat = self.data['imgformat']
 
     def widget_params(self):
         result = ObjectWidget.widget_params(self)
@@ -43,7 +46,18 @@ class WMSClientStyleObjectWidget(ObjectWidget):
         if self.obj:
             result['value'] = dict(
                 wmslayers=self.obj.wmslayers,
+                imgformat=self.obj.imgformat,
             )
+
+        client = self.options['layer'].client
+        result['imgformat'] = client.getOperationByName('GetMap').formatOptions
+
+        wmslayers = []
+        for l in client.contents:
+            wmslayers.append(dict(
+                id=l, title=client[l].title))
+
+        result['wmslayers'] = wmslayers
 
         return result
 

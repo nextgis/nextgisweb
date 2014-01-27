@@ -5,6 +5,7 @@ from io import BytesIO
 
 from zope.interface import implements
 import PIL
+from owslib.wms import WebMapService
 
 import sqlalchemy as sa
 
@@ -14,6 +15,8 @@ from ..style import (
     IExtentRenderRequest,
     ITileRenderRequest
 )
+
+WMS_VERSIONS = ('1.1.1', )
 
 
 def initialize(comp):
@@ -32,6 +35,13 @@ def initialize(comp):
 
         layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
         url = sa.Column(sa.Unicode, nullable=False)
+        version = sa.Column(sa.Enum(*WMS_VERSIONS, native_enum=False), nullable=False)
+
+        @property
+        def client(self):
+            if not hasattr(self, '_client'):
+                self._client = WebMapService(self.url, version=self.version)
+            return self._client
 
     comp.WMSClientLayer = WMSClientLayer
 
@@ -64,6 +74,7 @@ def initialize(comp):
 
         style_id = sa.Column(sa.ForeignKey(Style.id), primary_key=True)
         wmslayers = sa.Column(sa.Unicode, nullable=False)
+        imgformat = sa.Column(sa.Unicode, nullable=False)
 
         __mapper_args__ = dict(
             polymorphic_identity=identity,
@@ -86,7 +97,7 @@ def initialize(comp):
                 srs="EPSG:%d" % self.layer.srs_id,
                 bbox=','.join(map(str, extent)),
                 width=size[0], height=size[1],
-                format="image/png32",
+                format=self.imgformat,
                 transparent="true"
             )
 

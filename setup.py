@@ -24,6 +24,7 @@ requires = [
     'pillow',
     'lxml',
     'passlib',
+    'owslib',
 ]
 
 components = (
