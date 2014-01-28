@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import transaction
-import sqlalchemy as sa
 
 from .registry import registry_maker
 
@@ -21,17 +20,9 @@ class InitializeDBCmd():
 
     @classmethod
     def execute(cls, args, env):
-        from .models import Base, DBSession
+        from .models import DBSession
 
-        metadata = sa.MetaData()
-
-        for key, tab in Base.metadata.tables.iteritems():
-            tab.tometadata(metadata)
-
-        for c in env.chain('initialize'):
-            if hasattr(c, 'metadata'):
-                for key, tab in c.metadata.tables.iteritems():
-                    tab.tometadata(metadata)
+        metadata = env.metadata()
 
         with transaction.manager:
             connection = DBSession.connection()

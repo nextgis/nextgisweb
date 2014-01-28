@@ -33,6 +33,8 @@ class CoreComponent(Component):
         self.DBSession = DBSession
         self.Base = Base
 
+        self.metadata = Base.metadata
+
     settings_info = (
         dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),
         dict(key='system.full_name', default=u"Геоинформационная система NextGIS", desc=u"Полное название системы"),

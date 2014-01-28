@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sqlalchemy as sa
 
 from .component import Component, load_all
 
@@ -41,3 +42,16 @@ class Env(object):
 
             if hasattr(c, 'metadata'):
                 c.metadata.bind = self.core.engine
+
+    def metadata(self):
+        """ Возвращает объект sa.MetaData объединяющий метаданные всех
+        компонентов из этого окружения """
+
+        metadata = sa.MetaData()
+
+        for comp in self.chain('initialize'):
+            if hasattr(comp, 'metadata'):
+                for key, tab in comp.metadata.tables.iteritems():
+                    tab.tometadata(metadata)
+
+        return metadata
