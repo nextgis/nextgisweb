@@ -119,6 +119,10 @@ def initialize(comp):
                         assert row['data_type'] == 'integer'
                     elif row['column_name'] == self.column_geom:
                         pass
+                    elif row['column_name'] in ('id', 'geom'):
+                        # FIXME: На данный момент наличие полей id или
+                        # geom полностью ломает векторный слой
+                        pass
                     else:
                         datatype = None
                         if row['data_type'] == 'integer':
