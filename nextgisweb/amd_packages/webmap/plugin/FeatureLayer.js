@@ -28,21 +28,13 @@ define([
         iconClass: "iconTable",
 
         postCreate: function () {
-            var widget = this;
+            this.inherited(arguments);
 
-            this.btnOpenFeatureTab = new Button({
-                label: "Открыть",
-                iconClass: "iconFeatureEdit",
-                disabled: true,
-                onClick: function () {
-                    widget.openFeature();
-                }
-            });
-            this.toolbar.addChild(this.btnOpenFeatureTab);
+            var widget = this;
 
             this.btnZoomToFeature = new Button({
                 label: "Перейти",
-                iconClass: "iconZoom",
+                iconClass: "iconArrowInOut",
                 disabled: true,
                 onClick: function () {
                     widget.zoomToFeature();
@@ -52,7 +44,6 @@ define([
 
             // При изменении выделенной строки изменяем доступность кнопок
             this.watch("selectedRow", function (attr, oldVal, newVal) {
-                widget.btnOpenFeatureTab.set("disabled", newVal === null);
                 widget.btnZoomToFeature.set("disabled", newVal === null);
             });
         },
@@ -69,15 +60,8 @@ define([
                     display.tabContainer.selectChild(display.mainPane);
                 }
             );
-        },
-
-        openFeature: function () {
-            // TODO: Пока открываем в новом окне, сделать вкладку
-            window.open(
-                ngwConfig.applicationUrl + "/layer/" + this.layerId
-                    + "/feature/" + this.get("selectedRow").id + "/edit"
-            );
         }
+
     });
 
     return declare([_PluginBase], {

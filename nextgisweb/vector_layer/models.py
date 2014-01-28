@@ -25,6 +25,7 @@ from ..feature_layer import (
     IWritableFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilterBy,
+    IFeatureQueryLike,
 )
 
 GEOM_TYPE_GA = (ga.MultiPoint, ga.MultiLineString, ga.MultiPolygon)
@@ -270,7 +271,7 @@ def initialize(comp):
     comp.VectorLayer = VectorLayer
 
     class FeatureQueryBase(object):
-        implements(IFeatureQuery, IFeatureQueryFilterBy)
+        implements(IFeatureQuery, IFeatureQueryFilterBy, IFeatureQueryLike)
         
         def __init__(self):
             self._geom = None
@@ -281,6 +282,7 @@ def initialize(comp):
             self._offset = None
 
             self._filter_by = None
+            self._like = None
             self._intersects = None
 
         def geom(self):
@@ -304,6 +306,9 @@ def initialize(comp):
 
         def intersects(self, geom):
             self._intersects = geom
+
+        def like(self, value):
+            self._like = value
 
         def __call__(self):
             tableinfo = TableInfo.from_layer(self.layer)
@@ -336,6 +341,15 @@ def initialize(comp):
                         where.append(table.columns.id == v)
                     else:
                         where.append(table.columns[tableinfo[k].key] == v)
+
+            if self._like:
+                l = []
+                for f in tableinfo.fields:
+                    if f.datatype == FIELD_TYPE.STRING:
+                        l.append(table.columns[f.key].ilike(
+                            '%' + self._like + '%'))
+
+                where.append(sa.or_(*l))
 
             if self._intersects:
                 geom = ga.WKTSpatialElement(self._intersects.wkt, self._intersects.srid)

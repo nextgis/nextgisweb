@@ -9,6 +9,7 @@ define([
     'dgrid/Selection',
     "dgrid/extensions/ColumnHider",
     // other
+    'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/request/xhr',
     'dojo/Deferred',
@@ -18,7 +19,9 @@ define([
     'dojo/dom-style',
     // template
     "dijit/layout/ContentPane",
-    "dijit/Toolbar"
+    "dijit/Toolbar",
+    "dijit/form/Button",
+    "dijit/form/TextBox"
 ], function (
     declare,
     BorderContainer,
@@ -30,6 +33,7 @@ define([
     Selection,
     ColumnHider,
     // other
+    lang,
     array,
     xhr,
     Deferred,
@@ -58,6 +62,7 @@ define([
             this._gridInitialized = new Deferred();
 
             var widget = this;
+
             xhr.get(application_url + '/layer/' + this.layerId + '/field/', {
                 handleAs: 'json'
             }).then(
@@ -66,12 +71,28 @@ define([
                     widget.initializeGrid();
                 }
             );
+
         },
 
         postCreate: function () {
             if (!this.showToolbar) {
                 domStyle.set(this.toolbar.domNode, "display", "none");
-            }
+            };
+
+            this.watch("selectedRow", lang.hitch(this, function (attr, oldVal, newVal) {
+                this.btnOpenFeature.set("disabled", newVal == null);
+            }));
+
+            this.btnOpenFeature.on("click", lang.hitch(this, this.openFeature));
+
+            this.tbSearch.on("input", lang.hitch(this, function () {
+                if (this._timer != undefined) { clearInterval(this._timer) };
+                this._timer = setInterval(lang.hitch(this, this.updateSearch), 750);
+            }));
+
+            this.tbSearch.watch("value", lang.hitch(this, function(attr, oldVal, newVal) {
+                this.updateSearch();
+            }));
         },
 
         initializeGrid: function () {
@@ -134,6 +155,22 @@ define([
                     widget._grid.startup();
                 }
             );
+        },
+
+        openFeature: function() {
+            window.open(ngwConfig.applicationUrl + "/layer/" + this.layerId
+                + "/feature/" + this.get("selectedRow").id + "/edit");
+        },
+
+        updateSearch: function () {
+            if (this._timer != undefined) { clearInterval(this._timer) };
+
+            var value = this.tbSearch.get("value");
+            if (this._search != value) {
+                this._search = value;
+                this._grid.set("query", {like: this.tbSearch.get("value")});
+            };
         }
+
     })
 });

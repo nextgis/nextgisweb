@@ -1,14 +1,22 @@
 <div data-dojo-type="${baseClass}">
 
-    <div data-dojo-attach-point="gridPane"
-        data-dojo-type="dijit/layout/ContentPane"
-        data-dojo-props="region: 'center'"
-        style="padding: 0;">
+    <div data-dojo-attach-point="gridPane" data-dojo-type="dijit/layout/ContentPane"
+        data-dojo-props="region: 'center'" style="padding: 0;">
     </div>
 
-    <div data-dojo-attach-point="toolbar"
-        data-dojo-type="dijit/Toolbar"
+    <div data-dojo-attach-point="toolbar" data-dojo-type="dijit/Toolbar"
         data-dojo-props="region: 'top'">
+
+        <div data-dojo-attach-point="btnOpenFeature" data-dojo-type="dijit/form/Button"
+            data-dojo-props="iconClass: 'dijitIconApplication', disabled: true" label="Открыть">
+        </div>
+
+        <div style="float: right">
+            <div data-dojo-attach-point="tbSearch" data-dojo-type="dijit/form/TextBox"
+                data-dojo-props="placeHolder: 'Поиск...'"
+                style="margin-right: 2px; width: 20em;">
+            </div>
+        </div>
     </div>
 
 </div>
