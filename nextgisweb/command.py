@@ -11,7 +11,7 @@ class InitializeDBCmd():
     identity = 'initialize_db'
 
     @classmethod
-    def argparser_setup(cls, parser):
+    def argparser_setup(cls, parser, env):
         parser.add_argument('--drop', action="store_true", default=False,
             help=u"Удалить существующие объекты из БД")
 

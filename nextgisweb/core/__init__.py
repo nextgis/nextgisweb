@@ -35,6 +35,9 @@ class CoreComponent(Component):
         self.DBSession = DBSession
         self.Base = Base
 
+        if 'backup.filename' not in self.settings:
+            self.settings['backup.filename'] = '%y%m%d-%H%M%S'
+
     def backup(self):
         conn = DBSession.connection()
 
@@ -71,4 +74,7 @@ class CoreComponent(Component):
 
         dict(key='packages.ignore', desc=u"Не загружать перечисленные пакеты"),
         dict(key='components.ignore', desc=u"Не загружать перечисленные компоненты"),
+
+        dict(key='backup.path', desc=u"Директория для резервных копий по-умолчанию"),
+        dict(key='backup.filename', default='%y%m%d-%H%M%S', desc=u"Шаблон имени файла резервной копии, в котором можно использовать подстановки strftime")
     )
