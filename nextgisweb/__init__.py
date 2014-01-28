@@ -39,6 +39,7 @@ def pkginfo():
         'postgis_layer',
         'raster_layer',
         'raster_style',
+        'wmsclient',
         'file_upload',
     )
 
@@ -90,4 +91,5 @@ def amd_packages():
         ('postgis_layer', 'nextgisweb:amd_packages/postgis_layer'),
         ('raster_layer', 'nextgisweb:amd_packages/raster_layer'),
         ('raster_style', 'nextgisweb:amd_packages/raster_style'),
+        ('wmsclient', 'nextgisweb:amd_packages/wmsclient'),
     )
