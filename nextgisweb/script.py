@@ -19,7 +19,30 @@ def main(argv=sys.argv):
     argparser.add_argument('--logging', default=os.environ['NEXTGISWEB_LOGGING'] if 'NEXTGISWEB_LOGGING' in os.environ else None,
                            help=u"Конфигруционный файл библиотеки logging")
 
+    config = None
+    logging = None
+
+    i = 1
+
+    while i < len(argv):
+        if argv[i] == '--config' and (i < len(argv) - 1):
+            config = argv[i + 1]
+        if argv[i] == '--logging' and (i < len(argv) - 1):
+            logging = argv[i + 1]
+
+        i += 2 if argv[i].startswith('--') else 1
+
+    if logging:
+        setup_logging(logging)
+
+    cfg = ConfigParser()
+    cfg.readfp(codecs.open(config, 'r', 'utf-8'))
+
+    env = Env(cfg=cfg)
+    env.initialize()
+
     subparsers = argparser.add_subparsers()
+
     for cmd in Command.registry:
         subparser = subparsers.add_parser(cmd.identity)
         cmd.argparser_setup(subparser)
@@ -27,14 +50,8 @@ def main(argv=sys.argv):
 
     args = argparser.parse_args(argv[1:])
 
-    if args.logging: 
+    if args.logging:
         setup_logging(args.logging)
-
-    cfg = ConfigParser()
-    cfg.readfp(codecs.open(args.config, 'r', 'utf-8'))
-
-    env = Env(cfg=cfg)
-    env.initialize()
 
     args.command.execute(args, env)
 
