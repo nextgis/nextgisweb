@@ -4,6 +4,7 @@ define([
     "dojo/request/xhr",
     "dojo/json",
     "dojo/when",
+    "dojo/dom-construct",
     "dijit/layout/ContentPane",
     "dijit/form/Button"
 ], function (
@@ -12,6 +13,7 @@ define([
     xhr,
     json,
     when,
+    domConstruct,
     ContentPane,
     Button
 ) {
@@ -35,13 +37,35 @@ define([
             } else if (params.operation == 'delete') {
                 new Button({label: "Удалить", iconClass: "dijitIconDelete"}).placeAt(this.buttonPane)
                     .on("click", function () { widget.submit() });               
-            }
+            };
+
+        },
+
+        postCreate: function () { 
+            // Создаем дополнительный div, в который будут
+            // попадать дочерние виджеты
+            this.containerNode = domConstruct.create('div', null, this.domNode);
+
+            // Вызываем базовый класс после, мало ли кто там
+            // тоже захочит разместить дочерний виджет
+            this.inherited(arguments);
+        },
+
+        addChild: function (child) {
+            if (child == this.buttonPane) {
+                // Панель с кнопками добавляем в корень
+                child.placeAt(this.domNode);
+            } else {
+                // Все остальное добавляем в спец. контейнер
+                child.placeAt(this.containerNode);
+            };
         },
 
         startup: function () {
             this.inherited(arguments);
-            this.buttonPane.placeAt(this.domNode);
+            this.buttonPane.placeAt(this);
         },
+
 
         submit: function () {
             var widget = this;

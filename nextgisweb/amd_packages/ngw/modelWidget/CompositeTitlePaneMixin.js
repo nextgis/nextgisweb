@@ -17,7 +17,7 @@ define([
                 widget.set("disabled", newVal);
             });
             widget.placeAt(pane);
-            pane.placeAt(this.domNode).startup();
+            pane.placeAt(this).startup();
             domStyle.set(pane.domNode, "margin", "0 0 1ex 0");
         }
     });
