@@ -304,11 +304,11 @@ def initialize(comp):
         def order_by(self, *args):
             self._order_by = args
 
-        def intersects(self, geom):
-            self._intersects = geom
-
         def like(self, value):
             self._like = value
+
+        def intersects(self, geom):
+            self._intersects = geom
 
         def __call__(self):
             tableinfo = TableInfo.from_layer(self.layer)
