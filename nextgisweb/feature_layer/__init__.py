@@ -11,8 +11,8 @@ from .interface import (
     IFeatureQuery,
     IFeatureQueryFilterBy,
     IFeatureQueryOrderBy,
+    IFeatureQueryLike,
 )
-
 
 @Component.registry.register
 class FeatureLayerComponent(Component):

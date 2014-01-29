@@ -16,6 +16,7 @@ from ..feature_layer import (
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilterBy,
+    IFeatureQueryLike,
 )
 
 
@@ -164,7 +165,7 @@ def initialize(comp):
     comp.PostgisLayer = PostgisLayer
 
     class FeatureQueryBase(object):
-        implements(IFeatureQuery, IFeatureQueryFilterBy)
+        implements(IFeatureQuery, IFeatureQueryFilterBy, IFeatureQueryLike)
 
         def __init__(self):
             self._geom = None
@@ -175,6 +176,7 @@ def initialize(comp):
             self._offset = None
 
             self._filter_by = None
+            self._like = None
             self._intersects = None
 
         def geom(self):
@@ -195,6 +197,9 @@ def initialize(comp):
 
         def order_by(self, *args):
             self._order_by = args
+
+        def like(self, value):
+            self._like = value
 
         def intersects(self, geom):
             self._intersects = geom
@@ -233,6 +238,15 @@ def initialize(comp):
                         select.append_whereclause(idcol == v)
                     else:
                         select.append_whereclause(sql.column(k) == v)
+
+            if self._like:
+                l = []
+                for fld in self.layer.fields:
+                    if fld.datatype == FIELD_TYPE.STRING:
+                        l.append(sql.column(fld.keyname).ilike(
+                            '%' + self._like + '%'))
+
+                select.append_whereclause(sa.or_(*l))
 
             if self._intersects:
                 intgeom = sa.func.st_setsrid(sa.func.st_geomfromtext(

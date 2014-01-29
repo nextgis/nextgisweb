@@ -190,6 +190,10 @@ def setup_pyramid(comp, config):
             first, last = map(int, http_range[len('items='):].split('-', 1))
             query.limit(last - first + 1, first)
 
+        like = request.params.get('like', '')
+        if like != '':
+            query.like(like)
+
         features = query()
 
         result = [dict(f.fields, id=f.id, label=f.label) for f in features]
