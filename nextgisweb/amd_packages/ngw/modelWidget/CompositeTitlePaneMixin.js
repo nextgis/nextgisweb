@@ -12,7 +12,10 @@ define([
 
     return declare([], {
         placeWidget: function (key, widget) {
-            var pane = new TitlePane({title: widget.title});
+            var pane = new TitlePane({
+                title: widget.title,
+                open: widget.hasData()
+            });
             this.watch("disabled", function (attr, oldVal, newVal) {
                 widget.set("disabled", newVal);
             });
