@@ -50,7 +50,7 @@ class LayerField(Base):
 
 class LayerFieldsMixin(object):
     __field_class__ = LayerField
-    
+
     @declared_attr
     def fields(cls):
         return orm.relationship(
@@ -77,7 +77,6 @@ class LayerFieldsMixin(object):
             primaryjoin="%s.id == %s.feature_label_field_id" % (
                 cls.__field_class__.__name__, cls.__name__
             ),
-            cascade='all, delete-orphan',
-            single_parent=True,
+            cascade='all',
             post_update=True
         )
