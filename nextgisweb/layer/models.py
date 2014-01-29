@@ -48,6 +48,10 @@ def initialize(comp):
         def parents(self):
             return self.layer_group.parents + (self.layer_group, )
 
+        @property
+        def source(self):
+            return dict()
+
         def get_info(self):
             s = super(Layer, self)
             return (s.get_info() if hasattr(s, 'get_info') else ()) + (

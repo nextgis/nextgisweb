@@ -82,8 +82,9 @@ def setup_pyramid(comp, config):
                 children=[traverse(c) for c in layer_group.children],
                 layers=[
                     dict(
-                        type='layer', id=l.id,
+                        type='layer', id=l.id, cls=l.cls,
                         display_name=l.display_name,
+                        source=l.source,
                         styles=[
                             dict(
                                 type='style', id=s.id,
