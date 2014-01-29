@@ -8,11 +8,15 @@
 
     require([
         "dojo/parser",
+        "dojo/ready",
         "security/AclEditor"
     ], function (
-        parser
+        parser,
+        ready
     ) {
-        parser.parse();
+        ready(function() {
+            parser.parse();
+        });
     });
 </script> 
 

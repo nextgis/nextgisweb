@@ -12,11 +12,15 @@
 <script>
     require([
         "dojo/parser",
-        "webmap/Form"
+        "dojo/ready",
+        "webmap/Form",
     ], function (
-        parser
+        parser,
+        ready
     ) {
-        parser.parse();
+        ready(function() {
+            parser.parse();
+        });
     });
 
 </script>

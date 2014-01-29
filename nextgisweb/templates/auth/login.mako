@@ -3,14 +3,18 @@
 <script>
     require([
         "dojo/parser",
+        "dojo/ready",
         "dijit/_WidgetBase",
         "dijit/TitlePane",
         "dijit/form/Button",
         "dojox/layout/TableContainer"
     ], function (
-        parser
+        parser,
+        ready
     ) {
-        parser.parse();
+        ready(function() {
+            parser.parse();
+        });
     });
 </script>
 

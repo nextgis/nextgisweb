@@ -8,11 +8,15 @@
 
         require([
             "dojo/parser",
+            "dojo/ready",
             "webmap/Display"
         ], function (
-            parser
+            parser,
+            ready
         ) {
-            parser.parse();
+            ready(function() {
+                parser.parse();
+            });
         });
     </script>
 
