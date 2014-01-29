@@ -6,7 +6,12 @@
     var aclItems = ${ acl_items | json.dumps, n},
         resource = ${ resource | json.dumps, n};
 
-    require(["dojo/parser"], function (parser) {
+    require([
+        "dojo/parser",
+        "security/AclEditor"
+    ], function (
+        parser
+    ) {
         parser.parse();
     });
 </script> 

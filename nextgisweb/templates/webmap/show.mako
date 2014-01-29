@@ -10,7 +10,12 @@
 <div data-dojo-type="webmap/Form" data-dojo-id="form" data-dojo-props="data: objData"></div>
 
 <script>
-    require(["dojo/parser"], function(parser) { 
+    require([
+        "dojo/parser",
+        "webmap/Form"
+    ], function (
+        parser
+    ) {
         parser.parse();
     });
 

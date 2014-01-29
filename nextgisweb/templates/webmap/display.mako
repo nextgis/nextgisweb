@@ -6,7 +6,14 @@
     <script type="text/javascript">
         var displayConfig = ${json.dumps(display_config, indent=4).replace('\n', '\n' + (8 * ' ')) | n};
 
-        require(["dojo/parser"], function (parser) { parser.parse(); });
+        require([
+            "dojo/parser",
+            "webmap/Display"
+        ], function (
+            parser
+        ) {
+            parser.parse();
+        });
     </script>
 
     <style type="text/css">

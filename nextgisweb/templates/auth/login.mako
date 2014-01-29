@@ -1,7 +1,17 @@
 <%inherit file="../base.mako" />
 
 <script>
-    require(["dojo/parser"], function (parser) { parser.parse(); });
+    require([
+        "dojo/parser",
+        "dijit/_WidgetBase",
+        "dijit/TitlePane",
+        "dijit/form/Button",
+        "dojox/layout/TableContainer"
+    ], function (
+        parser
+    ) {
+        parser.parse();
+    });
 </script>
 
 
