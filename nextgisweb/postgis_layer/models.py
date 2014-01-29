@@ -2,7 +2,7 @@
 from zope.interface import implements
 
 import sqlalchemy as sa
-from psycopg2.extensions import adapt
+from sqlalchemy import sql, func
 
 from ..geometry import geom_from_wkt, box
 from ..layer import SpatialLayerMixin
@@ -184,49 +184,58 @@ def initialize(comp):
             self._intersects = geom
 
         def __call__(self):
-            columns = dict(id=self.layer.column_id)
+            tab = sql.table(self.layer.table)
+            tab.schema = self.layer.schema
 
-            geomexpr = 'ST_Transform(%s, %s)' % (
-                    self.layer.column_geom, self.layer.srs_id)
+            tab.quote = True
+            tab.quote_schema = True
+
+            select = sa.select([], tab)
+
+            def addcol(col):
+                select.append_column(col)
+
+            idcol = sql.column(self.layer.column_id)
+            addcol(idcol.label('id'))
+
+            geomcol = sql.column(self.layer.column_geom)
+            geomexpr = sa.func.st_transform(geomcol, self.layer.srs_id)
 
             if self._geom:
-                columns['geom'] = "ST_AsText(%s)" % geomexpr
+                addcol(sa.func.st_astext(geomexpr).label('geom'))
 
-            cond = []
+            fieldmap = []
+            for idx, fld in enumerate(self.layer.fields, start=1):
+                if not self._fields or fld.keyname in self._fields:
+                    clabel = 'f%d' % idx
+                    addcol(sql.column(fld.keyname).label(clabel))
+                    fieldmap.append((fld.keyname, clabel))
 
             if self._filter_by:
                 for k, v in self._filter_by.iteritems():
                     if k == 'id':
-                        cond.append('"%s" = %d' % (self.layer.column_id, int(v)))
+                        select.append_whereclause(idcol == v)
                     else:
-                        cond.append('"%s" = %s' % (k, adapt(v)))
-
-            cond.append(
-                """(GeometryType("%(gc)s") IN ('%(gt)s', 'MULTI%(gt)s'))""" %
-                dict(gc=self.layer.column_geom, gt=self.layer.geometry_type)
-            )
-
-            if len(cond) == 0:
-                cond.append('true')
-
-            if self._box:
-                columns['box_left'] = "ST_XMin(%s)" % geomexpr
-                columns['box_bottom'] = "ST_YMin(%s)" % geomexpr
-                columns['box_right'] = "ST_XMax(%s)" % geomexpr
-                columns['box_top'] = "ST_YMax(%s)" % geomexpr
-
-            selected_fields = []
-            for fld in self.layer.fields:
-                if not self._fields or fld.keyname in self._fields:
-                    columns[fld.keyname] = '"%s"' % fld.keyname
-                    selected_fields.append(fld)
+                        select.append_whereclause(sql.column(k) == v)
 
             if self._intersects:
-                cond.append('ST_Intersects("%s", ST_Transform(ST_SetSRID(ST_GeomFromText(\'%s\'), %d), %s))' % (
-                    self.layer.column_geom,
-                    self._intersects.wkt,
-                    self._intersects.srid,
-                    self.layer.geometry_srid))
+                intgeom = sa.func.st_setsrid(sa.func.st_geomfromtext(
+                    self._intersects.wkt), self._intersects.srid)
+                select.append_whereclause(sa.func.st_intersects(
+                    geomcol, sa.func.st_transform(
+                        intgeom, self.layer.geometry_srid)))
+
+            if self._box:
+                addcol(func.st_xmin(geomexpr).label('box_left'))
+                addcol(func.st_ymin(geomexpr).label('box_bottom'))
+                addcol(func.st_xmax(geomexpr).label('box_right'))
+                addcol(func.st_ymax(geomexpr).label('box_top'))
+
+            gt = self.layer.geometry_type
+            select.append_whereclause(sa.func.geometrytype(sql.column(
+                self.layer.column_geom)).in_((gt, 'MULTI' + gt)))
+
+            select.append_order_by(idcol)
 
             class QueryFeatureSet(FeatureSet):
                 layer = self.layer
@@ -238,52 +247,41 @@ def initialize(comp):
                 _offset = self._offset
 
                 def __iter__(self):
-                    cols = []
-                    for k, v in columns.iteritems():
-                        cols.append('%s AS "%s"' % (v, k))
-
-                    sql = """SELECT %(cols)s FROM "%(schema)s"."%(table)s" WHERE %(cond)s""" % dict(
-                        cols=", ".join(cols),
-                        schema=self.layer.schema,
-                        table=self.layer.table,
-                        cond=' AND '.join(cond)
-                    )
-
                     if self._limit:
-                        sql = sql + " LIMIT %d OFFSET %d" % (self._limit, self._offset)
-
-                    conn = comp.connection[self.layer.connection].connect()
-                    result = conn.execute(sql)
-
-                    for row in result:
-                        fdict = dict([(f.keyname, row[f.keyname]) for f in selected_fields])
-
-                        yield Feature(
-                            layer=self.layer,
-                            id=row['id'],
-                            fields=fdict,
-                            geom=geom_from_wkt(row['geom']) if self._geom else None,
-                            box=box(
-                                row['box_left'], row['box_bottom'],
-                                row['box_right'], row['box_top']
-                            ) if self._box else None
-                        )
-
-                    conn.close()
-
-                @property
-                def total_count(self):
-                    sql = """SELECT COUNT("%(column_id)s") FROM "%(schema)s"."%(table)s" WHERE %(cond)s""" % dict(
-                        column_id=self.layer.column_id,
-                        schema=self.layer.schema,
-                        table=self.layer.table,
-                        cond=' AND '.join(cond)
-                    )
+                        query = select.limit(self._limit).offset(self._offset)
+                    else:
+                        query = select
 
                     conn = comp.connection[self.layer.connection].connect()
 
                     try:
-                        result = conn.execute(sql)
+                        for row in conn.execute(query):
+                            fdict = dict([(k, row[l]) for k, l in fieldmap])
+
+                            if self._geom:
+                                geom = geom_from_wkt(row['geom'])
+                            else:
+                                geom = None
+
+                            yield Feature(
+                                layer=self.layer, id=row['id'],
+                                fields=fdict, geom=geom,
+                                box=box(
+                                    row['box_left'], row['box_bottom'],
+                                    row['box_right'], row['box_top']
+                                ) if self._box else None
+                            )
+
+                    finally:
+                        conn.close()
+
+                @property
+                def total_count(self):
+                    conn = comp.connection[self.layer.connection].connect()
+                    try:
+                        result = conn.execute(sa.select(
+                            [sql.text('COUNT(id)'), ],
+                            from_obj=select.alias('all')))
                         for row in result:
                             return row[0]
                     finally:
