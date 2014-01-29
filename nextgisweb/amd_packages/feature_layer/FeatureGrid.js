@@ -56,6 +56,9 @@ define([
         // Показывать ли тулбар
         showToolbar: true,
 
+        // Показывать ли строку поиска
+        likeSearch: true,
+
         constructor: function (params) {
             declare.safeMixin(this, params);
 
@@ -85,14 +88,20 @@ define([
 
             this.btnOpenFeature.on("click", lang.hitch(this, this.openFeature));
 
-            this.tbSearch.on("input", lang.hitch(this, function () {
-                if (this._timer != undefined) { clearInterval(this._timer) };
-                this._timer = setInterval(lang.hitch(this, this.updateSearch), 750);
-            }));
+            if (this.likeSearch) {
+                // Поиск нужен, настраиваем обработчики строки поиска
+                this.tbSearch.on("input", lang.hitch(this, function () {
+                    if (this._timer != undefined) { clearInterval(this._timer) };
+                    this._timer = setInterval(lang.hitch(this, this.updateSearch), 750);
+                }));
 
-            this.tbSearch.watch("value", lang.hitch(this, function(attr, oldVal, newVal) {
-                this.updateSearch();
-            }));
+                this.tbSearch.watch("value", lang.hitch(this, function(attr, oldVal, newVal) {
+                    this.updateSearch();
+                }));
+            } else {
+                // Поиск не нужен, прячем строку поиска
+                domStyle.set(this.tbSearch.domNode, 'display', 'none');                
+            };
         },
 
         initializeGrid: function () {

@@ -96,14 +96,18 @@ define([
         },
 
         openFeatureGrid: function () {
-            var item = this.display.dumpItem();
+            var item = this.display.dumpItem(),
+                data = this.display.get('itemConfig').plugin[this.identity];
 
             var pane = new Pane({
                 title: item.label,
                 tooltip: "Таблица объектов слоя \"" + item.label + "\"",
                 layerId: item.layerId,
+                likeSearch: data.likeSearch,
                 plugin: this
             });
+
+            console.log(data);
 
             this.display.tabContainer.addChild(pane);
             this.display.tabContainer.selectChild(pane);
