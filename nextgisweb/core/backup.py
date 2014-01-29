@@ -13,7 +13,6 @@ from sqlalchemy.orm import sessionmaker
 import pip
 
 from ..registry import registry_maker
-from ..models import Base as MainBase
 
 Base = declarative_base()
 
@@ -192,8 +191,10 @@ def restore(env, src):
     conn = env.core.DBSession.connection()
     conn.execute("BEGIN")
 
-    MainBase.metadata.drop_all(conn)
-    MainBase.metadata.create_all(conn)
+    metadata = env.metadata()
+
+    metadata.drop_all(conn)
+    metadata.create_all(conn)
 
     for objrec in session.query(BackupObject):
         cls = BackupBase.registry[objrec.identity]

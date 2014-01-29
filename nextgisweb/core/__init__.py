@@ -39,7 +39,7 @@ class CoreComponent(Component):
         self.metadata = Base.metadata
 
     def backup(self):
-		metadata = self.env.metadata()
+        metadata = self.env.metadata()
 
         conn = DBSession.connection()
 

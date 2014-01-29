@@ -5,7 +5,7 @@ from shutil import copyfileobj
 from ..component import Component
 from ..core import BackupBase
 
-from .models import FileObj
+from .models import Base, FileObj
 
 
 @BackupBase.registry.register
