@@ -66,7 +66,8 @@ def initialize(comp):
                 schema=self.schema,
                 table=self.table,
                 column_id=self.column_id,
-                column_geom=self.column_geom)
+                column_geom=self.column_geom.lower(),
+                geometry_type=self.geometry_type)
             )
             return source_meta
 
