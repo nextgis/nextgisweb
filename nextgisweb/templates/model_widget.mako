@@ -14,9 +14,11 @@
             "ngw/modelWidget/FormMixin",
             "ngw/modelWidget/CompositeTitlePaneMixin"
         ], function (declare, ready, Base, FormMixin, CompositeTitlePaneMixin) {
-            ready(function() {
+            ready(100, function() {
                 var FormClass = declare([Base, FormMixin, CompositeTitlePaneMixin]);
                 form = new FormClass(formParams);
+            });
+            ready(200, function() {
                 form.placeAt('form').startup();
             });
         });
