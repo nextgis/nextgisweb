@@ -82,8 +82,8 @@ define([
                 menuItem = this.menuItem;
 
             this.display.watch("item", function (attr, oldVal, newVal) {
-                var type = store.getValue(newVal, "type");
-                menuItem.set("disabled", type !== "layer");
+                var itemConfig = plugin.display.get("itemConfig");
+                menuItem.set("disabled", !(itemConfig.type == "layer" && itemConfig.plugin[plugin.identity]));
             });
 
 
@@ -106,8 +106,6 @@ define([
                 likeSearch: data.likeSearch,
                 plugin: this
             });
-
-            console.log(data);
 
             this.display.tabContainer.addChild(pane);
             this.display.tabContainer.selectChild(pane);
