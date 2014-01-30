@@ -42,7 +42,7 @@ var _16=null;
 for(var i=_15.childNodes.length-1;i>=0;i--){
 var c=_15.childNodes[i];
 if(c.nodeType===1){
-var _17=c.getAttribute("fixed")||(_c.byNode(c)&&_c.byNode(c).fixed);
+var _17=c.getAttribute("fixed")||c.getAttribute("data-mobile-fixed")||(_c.byNode(c)&&_c.byNode(c).fixed);
 if(_17==="bottom"){
 _16=c;
 break;
@@ -91,7 +91,7 @@ this.openExternalView(_1d,_1f);
 return;
 }else{
 if(_1d.href){
-if(_1d.hrefTarget){
+if(_1d.hrefTarget&&_1d.hrefTarget!="_self"){
 _6.global.open(_1d.href,_1d.hrefTarget);
 }else{
 var _20;

@@ -6,7 +6,7 @@ define("dojox/mdnd/adapter/DndFromDojo", ["dojo/_base/kernel",
 	"dojo/_base/window",
 	"dojox/mdnd/AreaManager",
 	"dojo/dnd/Manager"
-],function(dojo, declare, connect, array, domClass){
+],function(dojo, declare, connect, array, domClass, win, AreaManager, Manager){
 	var dfd = declare(
 		"dojox.mdnd.adapter.DndFromDojo",
 		null,
@@ -48,7 +48,7 @@ define("dojox/mdnd/adapter/DndFromDojo", ["dojo/_base/kernel",
 	
 		constructor: function(){
 			this._areaManager = dojox.mdnd.areaManager();
-			this._dojoManager = dojo.dnd.manager();
+			this._dojoManager = Manager.manager();
 			this._currentArea = null;
 			this._moveHandler = null;
 			this.subscribeDnd();

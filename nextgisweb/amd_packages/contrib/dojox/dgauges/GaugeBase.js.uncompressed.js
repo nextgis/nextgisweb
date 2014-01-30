@@ -29,10 +29,65 @@ define("dojox/dgauges/GaugeBase", ["dojo/_base/lang", "dojo/_base/declare", "doj
 		_node: null,
 
 		// value: Number
-		//		A convenient way for setting the value of the first indicator of the first
-		//		scale declared in the gauge. It must be changed using the set method.
-		//		For other indicators, you have to set their value explicitly.
+		//		This property acts as a top-level wrapper for the value of the first indicator added to 
+		//		its scale with the name "indicator", i.e. myScale.addIndicator("indicator", myIndicator).
+		//		This property must be manipulated with get("value") and set("value", xxx).
 		value: 0,
+		_mainIndicator: null,
+		
+		_getValueAttr: function(){
+			// summary:
+			//		Internal method.
+			// tags:
+			//		private			
+			if(this._mainIndicator){
+				return this._mainIndicator.get("value");
+			}else{
+				this._setMainIndicator();
+				if(this._mainIndicator){
+					return this._mainIndicator.get("value");
+				}
+			}
+			return this.value;
+		},
+		
+		_setValueAttr: function(value){
+			// summary:
+			//		Internal method.
+			// tags:
+			//		private			
+			this._set("value", value);
+			if(this._mainIndicator){
+				this._mainIndicator.set("value", value);
+			}else{
+				this._setMainIndicator();
+				if(this._mainIndicator){
+					this._mainIndicator.set("value", value);
+				}
+			}
+		},
+		
+		_setMainIndicator: function(){
+			// summary:
+			//		Internal method.
+			// tags:
+			//		private	
+			var indicator;
+			for(var i=0; i<this._scales.length; i++){
+				indicator = this._scales[i].getIndicator("indicator");
+				if(indicator){
+					this._mainIndicator = indicator;
+				}
+			}
+		},
+		
+		_resetMainIndicator: function(){
+			// summary:
+			//		Internal method.
+			// tags:
+			//		private
+			this._mainIndicator = null;
+		},
 		
 		// font: Object
 		//		The font of the gauge used by elements if not overridden.
@@ -91,29 +146,28 @@ define("dojox/dgauges/GaugeBase", ["dojo/_base/lang", "dojo/_base/declare", "doj
 			//		Resize the gauge to the dimensions of width and height.
 			// description:
 			//		Resize the gauge and its surface to the width and height dimensions.
-			//		If no width/height or box is provided, resize the surface to the marginBox of the gauge.
-			// width: Number
-			//		The new width of the gauge.
-			// height: Number
+			//		If a single argument of the form {w: value1, h: value2} is provided take that argument as the dimensions to use.
+			//		Finally if no argument is provided, resize the surface to the marginBox of the gauge.
+			// width: Number|Object?
+			//		The new width of the gauge or the box definition.
+			// height: Number?
 			//		The new height of the gauge.
 			// returns: dojox/dgauges/GaugeBase
 			//		A reference to the current gauge for functional chaining.
-			var box;
 			switch(arguments.length){
 				// case 0, do not resize the div, just the surface
 				case 1:
 					// argument, override node box
-					box = lang.mixin({}, width);
-					domGeom.setMarginBox(this._node, box);
+					domGeom.setMarginBox(this._node, width);
 					break;
 				case 2:
-					box = {w: width, h: height};
+
 					// argument, override node box
-					domGeom.setMarginBox(this._node, box);
+					domGeom.setMarginBox(this._node, {w: width, h: height});
 					break;
 			}
 			// in all cases take back the computed box
-			box = domGeom.getMarginBox(this._node);
+			var box = domGeom.getMarginBox(this._node);
 			this._widgetBox = box;
 			var d = this.surface.getDimensions();
 			if(d.width != box.w || d.height != box.h){
@@ -189,6 +243,7 @@ define("dojox/dgauges/GaugeBase", ["dojo/_base/lang", "dojo/_base/declare", "doj
 				if(element instanceof ScaleBase){
 					var idxs = this._scales.indexOf(element);
 					this._scales.splice(idxs, 1);
+					this._resetMainIndicator();
 				}
 				delete this._elementsIndex[name];
 				delete this._elementsRenderers[name];

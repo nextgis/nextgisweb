@@ -348,7 +348,7 @@ define("dojox/widget/ColorPicker", [
 			}
 		},
 
-		_updateColor: function(){
+		_updateColor: function(fireChange){
 			// summary:
 			//		update the previewNode color, and input values [optional]
 			
@@ -364,7 +364,7 @@ define("dojox/widget/ColorPicker", [
 			;
 			
 			this._updateColorInputs(col);
-			this._updateValue(col, true);
+			this._updateValue(col, fireChange);
 			
 			// update hue, not all the pickers
 			if(h!=this._hue){
@@ -508,7 +508,7 @@ define("dojox/widget/ColorPicker", [
 					duration:this.slideDuration,
 					top: ypos,
 					left: 0,
-					onEnd: lang.hitch(this, function(){ this._updateColor(true); FocusManager.focus(this.hueCursorNode); })
+					onEnd: lang.hitch(this, function(){ this._updateColor(false); FocusManager.focus(this.hueCursorNode); })
 				}).play();
 			}else{
 				html.style(this.hueCursorNode, "top", ypos + "px");

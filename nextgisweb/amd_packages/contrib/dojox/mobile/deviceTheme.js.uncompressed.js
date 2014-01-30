@@ -15,37 +15,51 @@
 		//		Automatic theme loader.
 		// description:
 		//		This module detects the user agent of the browser and loads the
-		//		appropriate theme files. It can be enabled by simply requiring
-		//		dojox/mobile/deviceTheme from your application.
+		//		appropriate theme files. It can be enabled by simply including 
+		//		the dojox/mobile/deviceTheme script in your application as follows:
 		//
-		//		You can also pass an additional query parameter string,
-		//		device={theme id} to force a specific theme through the browser
-		//		URL input. The available theme ids are Android, BlackBerry,
-		//		Custom, iPhone, and iPad. The names are case-sensitive. If the given
+		//	|	<script src="dojox/mobile/deviceTheme.js"></script>
+		//	|	<script src="dojo/dojo.js" data-dojo-config="parseOnLoad: true"></script>
+		//
+		//		Using the script tag as above is the recommended way to load the 
+		//		deviceTheme. Trying to load it using the AMD loader can lead to styles 
+		//		being applied too late, because the loading of the theme files would 
+		//		be performed asynchronously by the browser, so you could not assume 
+		//		that the loading has been completed when your widgets are initialized.
+		//		However, loading deviceTheme using the script tag has the drawback that 
+		//		deviceTheme.js cannot be included in a build.
+		//
+		//		You can also pass an additional query parameter string:
+		//		theme={theme id} to force a specific theme through the browser
+		//		URL input. The available theme ids are Android, Holodark (theme introduced in Android 3.0), 
+		//		BlackBerry, Custom, iPhone, and iPad. The theme names are case-sensitive. If the given
 		//		id does not match, the iPhone theme is used.
 		//
 		//	|	http://your.server.com/yourapp.html // automatic detection
 		//	|	http://your.server.com/yourapp.html?theme=Android // forces Android theme
+		//	|	http://your.server.com/yourapp.html?theme=Holodark // forces Holodark theme
+		//	|	http://your.server.com/yourapp.html?theme=BlackBerry // forces Blackberry theme
+		//	|	http://your.server.com/yourapp.html?theme=Custom // forces Custom theme
+		//	|	http://your.server.com/yourapp.html?theme=iPhone // forces iPhone theme
+		//	|	http://your.server.com/yourapp.html?theme=iPad // forces iPad theme
 		//
-		//		To simulate a particular device, the user agent may be
-		//		overridden by setting dojoConfig.mblUserAgent.
+		//		To simulate a particular device from the application code, the user agent
+		//		can be forced by setting dojoConfig.mblUserAgent as follows:
+		//
+		//	|	<script src="dojox/mobile/deviceTheme.js" data-dojo-config="mblUserAgent: 'Holodark'"></script>
+		//	|	<script src="dojo/dojo.js" data-dojo-config="parseOnLoad: true"></script>
 		//
 		//		By default, an all-in-one theme file (e.g. themes/iphone/iphone.css) is
 		//		loaded. The all-in-one theme files contain style sheets for all the
 		//		dojox/mobile widgets regardless of whether they are used in your
 		//		application or not.
+		//
 		//		If you want to choose what theme files to load, you can specify them
-		//		via dojoConfig as shown in the following example:
+		//		via dojoConfig or data-dojo-config as shown in the following example:
 		//
-		//	|	data-dojo-config="parseOnLoad:true, mblThemeFiles:['base','Button']"
-		//
-		//		Or you may want to use dojox/mobile/themeFiles as follows to get the
-		//		same result. Note that the assignment has to be done before loading
-		//		deviceTheme.js.
-		//
-		//	|	dojo.require("dojox.mobile");
-		//	|	dojox.mobile.themeFiles = ['base','Button'];
-		//	|	dojo.require("dojox.mobile.deviceTheme");
+		//	|	<script src="dojox/mobile/deviceTheme.js"
+		//	|		data-dojo-config="mblThemeFiles:['base','Button']"></script>
+		//	|	<script src="dojo/dojo.js" data-dojo-config="parseOnLoad: true"></script>
 		//
 		//		In the case of this example, if iphone is detected, for example, the
 		//		following files will be loaded:
@@ -68,42 +82,11 @@
 		//
 		//	|	['@theme',['com.acme','MyWidget']]
 		//
-		//		will load the following files.
+		//		will load the following files:
 		//
 		//	|	dojox/mobile/themes/iphone/iphone.css
 		//	|	com/acme/themes/iphone/MyWidget.css
-		//
-		//		Note that loading of the theme files is performed asynchronously by
-		//		the browser, so you cannot assume that the load has been completed
-		//		when your application is initialized. For example, if some widget in
-		//		your application uses node dimensions that cannot be determined
-		//		without CSS styles being applied to them to calculate its layout at
-		//		initialization, the layout calculation may fail.
-		//
-		//		A possible workaround for this problem is to use dojo.require to load
-		//		deviceTheme.js and place it in a separate `<script>` block immediately
-		//		below the script tag that loads dojo.js as below. However, this is not
-		//		guaranteed to solve the problem.
-		//
-		//	|	<script src="dojo.js"></script>
-		//	|	<script>
-		//	|		dojo.require("dojox.mobile.deviceTheme");
-		//	|	</script>
-		//	|	<script>
-		//	|		dojo.require("dojox.mobile");
-		//	|		....
-		//
-		//		Another option is to use deviceTheme.js as non-dojo JavaScript code.
-		//		You could load deviceTheme.js prior to loading dojo.js using a
-		//		script tag as follows.
-		//
-		//	|	<script src="dojox/mobile/deviceTheme.js"
-		//	|		 data-dojo-config="mblThemeFiles:['base','Button']"></script>
-		//	|	<script src="dojo/dojo.js" data-dojo-config="parseOnLoad: true"></script>
-		//
-		//		A safer solution would be to not use deviceTheme and use `<link>`
-		//		or `@import` instead to load the theme files.
-
+		
 		if(!win){
 			win = window;
 			win.doc = document;
@@ -173,12 +156,32 @@
 			//		The matching is performed in the array order, and stops after the
 			//		first match.
 			[
+				"Holodark",
+				"holodark",
+				[]
+			],
+			[
+				"Android 3",
+				"holodark",
+				[]
+			],
+			[
+				"Android 4",
+				"holodark",
+				[]
+			],
+			[
 				"Android",
 				"android",
 				[]
 			],
 			[
 				"BlackBerry",
+				"blackberry",
+				[]
+			],
+			[
+				"BB10",
 				"blackberry",
 				[]
 			],
@@ -191,6 +194,21 @@
 				"iPad",
 				"iphone",
 				[this.toUrl("dojox/mobile/themes/iphone/ipad.css")]
+			],
+			[
+				"WindowsPhone",
+				"windows",
+				[]
+			],
+			[
+				"MSIE [6-9]",
+				"iphone",
+				[]
+			],
+			[
+				"Trident",
+				"windows",
+				[]
 			],
 			[
 				"Custom",
@@ -219,6 +237,9 @@
 			for(i = 0; i < m.length; i++){
 				if(ua.match(new RegExp(m[i][0]))){
 					var theme = m[i][1];
+					if(theme == "windows" && config.mblDisableWindowsTheme){
+						continue;
+					}
 					var cls = win.doc.documentElement.className;
 					cls = cls.replace(new RegExp(" *" + dm.currentTheme + "_theme"), "") + " " + theme + "_theme";
 					win.doc.documentElement.className = cls;
@@ -245,6 +266,15 @@
 					}
 					dm.loadedCssFiles = [];
 					for(j = 0; j < files.length; j++){
+						// dojox.mobile mirroring support
+						var cssFilePath = files[j].toString();
+						if(config["dojo-bidi"] == true && cssFilePath.indexOf("_rtl") == -1){
+							var rtlCssList = "android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css";
+							var cssName = cssFilePath.substr(cssFilePath.lastIndexOf('/') + 1);
+							if(rtlCssList.indexOf(cssName) != -1){
+								this.loadCssFile(cssFilePath.replace(".css","_rtl.css"));
+							}
+						}
 						this.loadCssFile(files[j].toString());
 					}
 

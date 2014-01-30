@@ -34,31 +34,25 @@ define("dijit/_Templated", [
 			kernel.deprecated(this.declaredClass + ": dijit._Templated deprecated, use dijit._TemplatedMixin and if necessary dijit._WidgetsInTemplateMixin", "", "2.0");
 		},
 
-		_attachTemplateNodes: function(rootNode, getAttrFunc){
-
-			this.inherited(arguments);
+		_processNode: function(baseNode, getAttrFunc){
+			var ret = this.inherited(arguments);
 
 			// Do deprecated waiRole and waiState
-			var nodes = lang.isArray(rootNode) ? rootNode : (rootNode.all || rootNode.getElementsByTagName("*"));
-			var x = lang.isArray(rootNode) ? 0 : -1;
-			for(; x<nodes.length; x++){
-				var baseNode = (x == -1) ? rootNode : nodes[x];
-
-				// waiRole, waiState
-				var role = getAttrFunc(baseNode, "waiRole");
-				if(role){
-					baseNode.setAttribute("role", role);
-				}
-				var values = getAttrFunc(baseNode, "waiState");
-				if(values){
-					array.forEach(values.split(/\s*,\s*/), function(stateValue){
-						if(stateValue.indexOf('-') != -1){
-							var pair = stateValue.split('-');
-							baseNode.setAttribute("aria-"+pair[0], pair[1]);
-						}
-					});
-				}
+			var role = getAttrFunc(baseNode, "waiRole");
+			if(role){
+				baseNode.setAttribute("role", role);
 			}
+			var values = getAttrFunc(baseNode, "waiState");
+			if(values){
+				array.forEach(values.split(/\s*,\s*/), function(stateValue){
+					if(stateValue.indexOf('-') != -1){
+						var pair = stateValue.split('-');
+						baseNode.setAttribute("aria-"+pair[0], pair[1]);
+					}
+				});
+			}
+
+			return ret;
 		}
 	});
 });

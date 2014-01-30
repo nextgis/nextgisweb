@@ -1,42 +1,7 @@
 define(
 "dojo/cldr/nls/ar/buddhist", //begin v1.x content
 {
-	"eraAbbr": [
-		"التقويم البوذي"
-	],
-	"dateFormat-full": "EEEE، d MMMM، y G",
-	"dateFormat-long": "d MMMM، y G",
-	"dateFormat-medium": "dd‏/MM‏/y G",
-	"dateFormat-short": "d‏/M‏/y G",
-	"dateFormatItem-d": "d",
-	"dateFormatItem-Ed": "E، d",
-	"dateFormatItem-Hm": "HH:mm",
-	"dateFormatItem-M": "L",
-	"dateFormatItem-Md": "d/‏M",
-	"dateFormatItem-MMdd": "dd‏/MM",
-	"dateFormatItem-MMM": "LLL",
-	"dateFormatItem-MMMd": "d MMM",
-	"dateFormatItem-MMMEd": "E d MMM",
-	"dateFormatItem-MMMMd": "d MMMM",
-	"dateFormatItem-MMMMEd": "E d MMMM",
-	"dateFormatItem-ms": "mm:ss",
-	"dateFormatItem-y": "y G",
-	"dateFormatItem-yM": "M‏/y G",
-	"dateFormatItem-yMd": "d/‏M/‏y G",
-	"dateFormatItem-yMEd": "E، d/‏M/‏y G",
-	"dateFormatItem-yMMM": "MMM y G",
-	"dateFormatItem-yMMMd": "d MMM، y G",
-	"dateFormatItem-yMMMEd": "E، d MMM، y G",
-	"dateFormatItem-yMMMM": "MMMM y G",
-	"dateFormatItem-yyyyMM": "MM‏/y G",
-	"dateFormatItem-yyyyMMMM": "MMMM، y G",
-	"eraNames": [
-		"التقويم البوذي"
-	],
-	"eraNarrow": [
-		"التقويم البوذي"
-	],
-	"days-format-abbr": [
+	"days-standAlone-short": [
 		"الأحد",
 		"الاثنين",
 		"الثلاثاء",
@@ -44,43 +9,6 @@ define(
 		"الخميس",
 		"الجمعة",
 		"السبت"
-	],
-	"days-format-wide": [
-		"الأحد",
-		"الاثنين",
-		"الثلاثاء",
-		"الأربعاء",
-		"الخميس",
-		"الجمعة",
-		"السبت"
-	],
-	"days-standAlone-abbr": [
-		"الأحد",
-		"الاثنين",
-		"الثلاثاء",
-		"الأربعاء",
-		"الخميس",
-		"الجمعة",
-		"السبت"
-	],
-	"days-standAlone-narrow": [
-		"ح",
-		"ن",
-		"ث",
-		"ر",
-		"خ",
-		"ج",
-		"س"
-	],
-	"days-standAlone-wide": [
-		"الأحد",
-		"الاثنين"
-	],
-	"quarters-format-wide": [
-		"الربع الأول",
-		"الربع الثاني",
-		"الربع الثالث",
-		"الربع الرابع"
 	],
 	"quarters-standAlone-narrow": [
 		"١",
@@ -88,15 +16,22 @@ define(
 		"٣",
 		"٤"
 	],
-	"dayPeriods-format-wide-am": "ص",
-	"dayPeriods-format-wide-pm": "م",
-	"dateFormatItem-MEd": "E، d/M",
-	"dateFormatItem-yQ": "yyyy Q",
-	"dateFormatItem-yQQQ": "y QQQ",
-	"timeFormat-full": "zzzz h:mm:ss a",
-	"timeFormat-long": "z h:mm:ss a",
-	"timeFormat-medium": "h:mm:ss a",
-	"timeFormat-short": "h:mm a",
+	"field-weekday": "اليوم",
+	"dateFormatItem-GyMMMEd": "E، d MMM، y G",
+	"dateFormatItem-MMMEd": "E، d MMM",
+	"eraNarrow": [
+		"التقويم البوذي"
+	],
+	"days-format-short": [
+		"الأحد",
+		"الاثنين",
+		"الثلاثاء",
+		"الأربعاء",
+		"الخميس",
+		"الجمعة",
+		"السبت"
+	],
+	"dateFormat-long": "d MMMM، y G",
 	"months-format-wide": [
 		"يناير",
 		"فبراير",
@@ -111,6 +46,119 @@ define(
 		"نوفمبر",
 		"ديسمبر"
 	],
+	"dateFormatItem-yyyyQQQ": "QQQ y G",
+	"dayPeriods-format-wide-pm": "م",
+	"dateFormat-full": "EEEE، d MMMM، y G",
+	"dateFormatItem-yyyyMEd": "E، d/M/y G",
+	"dateFormatItem-Md": "d/M",
+	"field-era": "العصر",
+	"months-standAlone-wide": [
+		"يناير",
+		"فبراير",
+		"مارس",
+		"أبريل",
+		"مايو",
+		"يونيو",
+		"يوليو",
+		"أغسطس",
+		"سبتمبر",
+		"أكتوبر",
+		"نوفمبر",
+		"ديسمبر"
+	],
+	"timeFormat-short": "h:mm a",
+	"quarters-format-wide": [
+		"الربع الأول",
+		"الربع الثاني",
+		"الربع الثالث",
+		"الربع الرابع"
+	],
+	"timeFormat-long": "h:mm:ss a z",
+	"field-year": "السنة",
+	"field-hour": "الساعات",
+	"months-format-abbr": [
+		"يناير",
+		"فبراير",
+		"مارس",
+		"أبريل",
+		"مايو",
+		"يونيو",
+		"يوليو",
+		"أغسطس",
+		"سبتمبر",
+		"أكتوبر",
+		"نوفمبر",
+		"ديسمبر"
+	],
+	"timeFormat-full": "h:mm:ss a zzzz",
+	"field-day-relative+0": "اليوم",
+	"field-day-relative+1": "غدًا",
+	"dateFormatItem-GyMMMd": "d MMM، y G",
+	"field-day-relative+2": "بعد الغد",
+	"months-standAlone-abbr": [
+		"يناير",
+		"فبراير",
+		"مارس",
+		"أبريل",
+		"مايو",
+		"يونيو",
+		"يوليو",
+		"أغسطس",
+		"سبتمبر",
+		"أكتوبر",
+		"نوفمبر",
+		"ديسمبر"
+	],
+	"dateFormatItem-Gy": "y G",
+	"dateFormatItem-yyyyMMMEd": "E، d MMM، y G",
+	"days-standAlone-wide": [
+		"الأحد",
+		"الاثنين",
+		"الثلاثاء",
+		"الأربعاء",
+		"الخميس",
+		"الجمعة",
+		"السبت"
+	],
+	"dateFormatItem-yyyyMMM": "MMM y G",
+	"dateFormatItem-yyyyMMMd": "d MMM، y G",
+	"timeFormat-medium": "h:mm:ss a",
+	"eraAbbr": [
+		"التقويم البوذي"
+	],
+	"field-minute": "الدقائق",
+	"field-dayperiod": "ص/م",
+	"days-standAlone-abbr": [
+		"الأحد",
+		"الاثنين",
+		"الثلاثاء",
+		"الأربعاء",
+		"الخميس",
+		"الجمعة",
+		"السبت"
+	],
+	"quarters-format-narrow": [
+		"١",
+		"٢",
+		"٣",
+		"٤"
+	],
+	"field-day-relative+-1": "أمس",
+	"field-day-relative+-2": "أول أمس",
+	"dateFormatItem-MMMd": "d MMM",
+	"dateFormatItem-MEd": "E، d/M",
+	"field-day": "يوم",
+	"days-format-wide": [
+		"الأحد",
+		"الاثنين",
+		"الثلاثاء",
+		"الأربعاء",
+		"الخميس",
+		"الجمعة",
+		"السبت"
+	],
+	"field-zone": "التوقيت",
+	"dateFormatItem-y": "y G",
 	"months-standAlone-narrow": [
 		"ي",
 		"ف",
@@ -124,7 +172,49 @@ define(
 		"ك",
 		"ب",
 		"د"
-	]
+	],
+	"field-year-relative+-1": "السنة الماضية",
+	"field-month-relative+-1": "الشهر الماضي",
+	"days-format-abbr": [
+		"الأحد",
+		"الاثنين",
+		"الثلاثاء",
+		"الأربعاء",
+		"الخميس",
+		"الجمعة",
+		"السبت"
+	],
+	"eraNames": [
+		"التقويم البوذي"
+	],
+	"dateFormatItem-yyyyMd": "d/M/y G",
+	"field-month": "الشهر",
+	"days-standAlone-narrow": [
+		"ح",
+		"ن",
+		"ث",
+		"ر",
+		"خ",
+		"ج",
+		"س"
+	],
+	"dayPeriods-format-wide-am": "ص",
+	"dateFormat-short": "d/M/y GGGGG",
+	"field-second": "الثواني",
+	"field-month-relative+0": "هذا الشهر",
+	"field-month-relative+1": "الشهر التالي",
+	"dateFormatItem-Ed": "E، d",
+	"field-week": "الأسبوع",
+	"dateFormat-medium": "dd/MM/y G",
+	"field-year-relative+0": "هذه السنة",
+	"field-week-relative+-1": "الأسبوع الماضي",
+	"dateFormatItem-yyyyM": "M/y G",
+	"field-year-relative+1": "السنة التالية",
+	"dateFormatItem-yyyyQQQQ": "QQQQ y G",
+	"dateFormatItem-GyMMM": "MMM y G",
+	"dateFormatItem-yyyy": "y G",
+	"field-week-relative+0": "هذا الأسبوع",
+	"field-week-relative+1": "الأسبوع التالي"
 }
 //end v1.x content
 );

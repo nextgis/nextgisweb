@@ -16,6 +16,7 @@ saturationPickerTitle: "Saturation Selector"
 ,
 "zh": true,
 "zh-tw": true,
+"uk": true,
 "tr": true,
 "th": true,
 "sv": true,
@@ -43,6 +44,7 @@ saturationPickerTitle: "Saturation Selector"
 "da": true,
 "cs": true,
 "ca": true,
+"bg": true,
 "az": true,
 "ar": true
 });

@@ -4,12 +4,13 @@ define("dojox/mobile/_compat", [
 	"dojo/_base/connect",	// connect.connect
 	"dojo/_base/fx",	// fx.fadeOut, fx.fadeIn
 	"dojo/_base/lang",	// lang.extend, lang.isArray
-	"dojo/_base/sniff",		// has("webkit"), has("ie")
+	"dojo/sniff",		// has("webkit"), has("ie")
 	"dojo/_base/window",	// win.doc, win.body
 	"dojo/dom-class",
 	"dojo/dom-construct",
 	"dojo/dom-geometry",
 	"dojo/dom-style",
+	"dojo/dom-attr",
 	"dojo/fx",
 	"dojo/fx/easing",
 	"dojo/ready",
@@ -25,8 +26,9 @@ define("dojox/mobile/_compat", [
 	"./ScrollableView",
 	"./Switch",
 	"./View",
+	"./Heading",
 	"require"
-], function(array, config, connect, bfx, lang, has, win, domClass, domConstruct, domGeometry, domStyle, fx, easing, ready, uacss, registry, xfx, flip, EdgeToEdgeList, IconContainer, ProgressIndicator, RoundRect, RoundRectList, ScrollableView, Switch, View, require){
+], function(array, config, connect, bfx, lang, has, win, domClass, domConstruct, domGeometry, domStyle, domAttr, fx, easing, ready, uacss, registry, xfx, flip, EdgeToEdgeList, IconContainer, ProgressIndicator, RoundRect, RoundRectList, ScrollableView, Switch, View, Heading, require){
 
 	// module:
 	//		dojox/mobile/compat
@@ -71,7 +73,7 @@ return {
 
 	var dm = lang.getObject("dojox.mobile", true);
 
-	if(!has("webkit")){
+	if(!(has("webkit") || has("ie") === 10 || (!has("ie") && has("trident") > 6))){
 		lang.extend(View, {
 			_doTransition: function(fromNode, toNode, transition, dir){
 				var anim;
@@ -101,6 +103,7 @@ return {
 					toNode.style.display = "";
 					anim = fx.combine([s1,s2]);
 					connect.connect(anim, "onEnd", this, function(){
+						if(!this._inProgress){ return; } // transition has been aborted
 						fromNode.style.display = "none";
 						fromNode.style.left = "0px";
 						toNode.style.position = "relative";
@@ -132,6 +135,7 @@ return {
 					toNode.style.display = "";
 					anim = fx.combine([s1,s2]);
 					connect.connect(anim, "onEnd", this, function(){
+						if(!this._inProgress){ return; } // transition has been aborted
 						fromNode.style.display = "none";
 						toNode.style.position = "relative";
 						this.invokeCallback();
@@ -147,6 +151,7 @@ return {
 					toNode.style.position = "absolute";
 					toNode.style.left = "0px";
 					connect.connect(anim, "onEnd", this, function(){
+						if(!this._inProgress){ return; } // transition has been aborted
 						fromNode.style.display = "none";
 						toNode.style.position = "relative";
 						toNode.style.display = "";
@@ -170,6 +175,7 @@ return {
 					toNode.style.display = "";
 					domStyle.set(toNode, "opacity", 0);
 					connect.connect(anim, "onEnd", this, function(){
+						if(!this._inProgress){ return; } // transition has been aborted
 						fromNode.style.display = "none";
 						toNode.style.position = "relative";
 						domStyle.set(fromNode, "opacity", 1);
@@ -218,9 +224,9 @@ return {
 
 				var pos;
 				if(!on){
-					pos = -this.inner.firstChild.firstChild.offsetWidth;
+					pos = this.isLeftToRight() ? -domStyle.get(this.right,"left") : 0;
 				}else{
-					pos = 0;
+					pos = this.isLeftToRight() ? 0 : -domStyle.get(this.right,"left");
 				}
 
 				this.left.style.display = "";
@@ -232,6 +238,7 @@ return {
 					domClass.add(_this.domNode, on ? "mblSwitchOn" : "mblSwitchOff");
 					_this.left.style.display = on ? "" : "none";
 					_this.right.style.display = !on ? "" : "none";
+					domAttr.set(_this.domNode, "aria-checked", on ? "true" : "false"); //a11y
 				};
 
 				if(anim){
@@ -243,7 +250,7 @@ return {
 					});
 					a.play();
 				}else{
-					if(on || pos){
+					if((this.isLeftToRight() ? on : !on) || pos){
 						this.inner.style.left = pos + "px";
 					}
 					f();
@@ -297,6 +304,9 @@ return {
 					//		protected
 					dm.createRoundRect(this, true);
 					this.domNode.className = "mblRoundRectList";
+					if(has("ie") && has("dojo-bidi") && !this.isLeftToRight()){
+						this.domNode.className = "mblRoundRectList mblRoundRectListRtl"
+					}
 				},
 
 				postCreate: function(){
@@ -401,6 +411,20 @@ return {
 						marginBottom: "-2px",
 						fontSize: "1px"
 					});
+				}
+			});
+
+			// #13846: on IE<10, setSelectable(false) sets unselectable="on" on all children,
+			// which makes INPUT elements uneditable.
+			Heading._buildRendering = Heading.prototype.buildRendering;
+			lang.extend(Heading, {
+				buildRendering: function(){
+					Heading._buildRendering.apply(this);
+					var nodes = this.domNode.getElementsByTagName("INPUT"),
+						i = nodes.length;
+					while(i--){
+						nodes[i].removeAttribute("unselectable");
+					}
 				}
 			});
 		} // if	(has("ie"))
@@ -545,6 +569,10 @@ return {
 			}
 			dm._loadedCss = undefined;
 			var paths = dm.getCssPaths();
+			// dojox.mobile mirroring support
+			if(has("dojo-bidi")){
+				paths = dm.loadRtlCssFiles(paths);
+			}
 			for(var i = 0; i < paths.length; i++){
 				var href = paths[i];
 				// Load the -compat.css only for css files that belong to a theme. For that, by default
@@ -560,7 +588,28 @@ return {
 				}
 			}
 		};
-
+		if(has("dojo-bidi")){
+			dm.loadRtlCssFiles = function(/*Array*/paths){
+				// summary:
+				//		Function to load the corresponding *_rtl.css file for every *.css file.
+				//		Enable mobile mirroring support
+				// paths: Array
+				//		Array of css files within the page.
+				for(var i = 0; i < paths.length; i++){
+					var href = paths[i];
+					if(href.indexOf("_rtl") == -1){
+						var rtlCssList = "android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css";
+						var cssName = href.substr(href.lastIndexOf('/') + 1);
+						if(rtlCssList.indexOf(cssName) != -1){
+							var rtlPath = href.replace(".css", "_rtl.css");
+							paths.push(rtlPath);
+							dm.loadCss(rtlPath);
+						}
+					}
+				}
+				return paths;
+			};
+		}
 		dm.hideAddressBar = function(/*Event?*/evt, /*Boolean?*/doResize){
 			if(doResize !== false){ dm.resizeAll(); }
 		};

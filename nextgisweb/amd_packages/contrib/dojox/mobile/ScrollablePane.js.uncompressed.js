@@ -1,14 +1,15 @@
 define("dojox/mobile/ScrollablePane", [
 	"dojo/_base/array",
 	"dojo/_base/declare",
-	"dojo/_base/sniff",
+	"dojo/sniff",
 	"dojo/_base/window",
 	"dojo/dom",
 	"dojo/dom-construct",
 	"dojo/dom-style",
 	"./_ScrollableMixin",
-	"./Pane"
-], function(array, declare, has, win, dom, domConstruct, domStyle, ScrollableMixin, Pane){
+	"./Pane",
+	"./_maskUtils"
+], function(array, declare, has, win, dom, domConstruct, domStyle, ScrollableMixin, Pane, maskUtils){
 
 	// module:
 	//		dojox/mobile/ScrollablePane
@@ -46,13 +47,10 @@ define("dojox/mobile/ScrollablePane", [
 				}
 			}
 
-			if(this.roundCornerMask && has("webkit")){
+			if(this.roundCornerMask && (has("webkit")||has("svg"))){
 				var node = this.containerNode;
 				var mask = this.maskNode = domConstruct.create("div", {
-					className: "mblScrollablePaneMask",
-					style: {
-						webkitMaskImage: "-webkit-canvas(" + this.id + "_mask)"
-					}
+					className: "mblScrollablePaneMask"
 				});
 				mask.appendChild(node);
 				c = mask;
@@ -88,7 +86,7 @@ define("dojox/mobile/ScrollablePane", [
 			// description:
 			//		Creates a rounded corner rectangle mask.
 			//		This function works only on WebKit-based browsers.
-			if(has("webkit")){
+			if(has("webkit")||has("svg")){
 				if(this.domNode.offsetHeight == 0){ return; } // in a hidden view
 				this.maskNode.style.height = this.domNode.offsetHeight + "px";
 				var child = this.getChildren()[0],
@@ -116,17 +114,8 @@ define("dojox/mobile/ScrollablePane", [
 					t = domStyle.get(node, "marginTop"),
 					b = domStyle.get(node, "marginBottom"),
 					l = domStyle.get(node, "marginLeft");
-
-				var ctx = win.doc.getCSSCanvasContext("2d", this.id + "_mask", pw, h);
-				ctx.fillStyle = "#000000";
-				ctx.beginPath();
-				ctx.moveTo(l + r, t);
-				ctx.arcTo(l + w, t, l + w, h - b - r, r);
-				ctx.arcTo(l + w, h - b, l + r, h - b, r);
-				ctx.arcTo(l, h - b, l, t  +  r, r);
-				ctx.arcTo(l, t, l + r, t, r);
-				ctx.closePath();
-				ctx.fill();
+				
+				maskUtils.createRoundMask(this.maskNode, l, t, 0, b, w, h - b - t, r, r);
 			}
 		}
 	});

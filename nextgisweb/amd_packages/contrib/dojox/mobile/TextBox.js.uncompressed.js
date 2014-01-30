@@ -3,10 +3,12 @@ define("dojox/mobile/TextBox", [
 	"dojo/dom-construct",
 	"dijit/_WidgetBase",
 	"dijit/form/_FormValueMixin",
-	"dijit/form/_TextBoxMixin"
-], function(declare, domConstruct, WidgetBase, FormValueMixin, TextBoxMixin){
+	"dijit/form/_TextBoxMixin",
+	"dojo/has",
+	"dojo/has!dojo-bidi?dojox/mobile/bidi/TextBox"
+], function(declare, domConstruct, WidgetBase, FormValueMixin, TextBoxMixin, has, BidiTextBox){
 
-	return declare("dojox.mobile.TextBox",[WidgetBase, FormValueMixin, TextBoxMixin],{
+	var TextBox = declare(has("dojo-bidi") ? "dojox.mobile.NonBidiTextBox" : "dojox.mobile.TextBox", [WidgetBase, FormValueMixin, TextBoxMixin],{
 		// summary:
 		//		A non-templated base class for textbox form inputs
 
@@ -19,6 +21,7 @@ define("dojox/mobile/TextBox", [
 		// Map widget attributes to DOMNode attributes.
 		_setPlaceHolderAttr: function(/*String*/value){
 			value = this._cv ? this._cv(value) : value;
+			this._set("placeHolder", value);
 			this.textbox.setAttribute("placeholder", value);
 		},
 
@@ -41,4 +44,5 @@ define("dojox/mobile/TextBox", [
 			this.connect(this.textbox, "onblur", "_onBlur");
 		}
 	});
+	return has("dojo-bidi") ? declare("dojox.mobile.TextBox", [TextBox, BidiTextBox]) : TextBox;	
 });

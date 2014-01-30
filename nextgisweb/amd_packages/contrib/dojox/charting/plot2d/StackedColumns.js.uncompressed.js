@@ -15,16 +15,17 @@ define("dojox/charting/plot2d/StackedColumns", ["dojo/_base/declare", "./Columns
 			return stats; // Object
 		},
 		getValue: function(value, index, seriesIndex, indexed){
-			var y,x;
+			var x, y;
 			if(indexed){
 				x = index;
 				y = commonStacked.getIndexValue(this.series, seriesIndex, x);
 			}else{
 				x = value.x - 1;
 				y = commonStacked.getValue(this.series, seriesIndex, value.x);
-				y = y ? y.y: null;
+				y = [  y[0]?y[0].y:null, y[1]?y[1]:null ];
 			}
-			return {y:y, x:x};
+			// in py we return the previous stack value as we need it to position labels on columns
+			return { x: x, y: y[0], py: y[1] };
 		}
 	});
 });

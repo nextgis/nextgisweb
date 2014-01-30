@@ -1,7 +1,7 @@
 define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare", 
-		"./Base", "./_PlotEvents", "./common", "../axis2d/common",
-		"dojox/gfx", "dojox/gfx/matrix", "dojox/lang/functional", "dojox/lang/utils"],
-	function(lang, arr, declare, Base, PlotEvents, dc, da, g, m, df, du){
+		"./Base", "./_PlotEvents", "./common",
+		"dojox/gfx", "dojox/gfx/matrix", "dojox/lang/functional", "dojox/lang/utils","dojo/has"],
+	function(lang, arr, declare, Base, PlotEvents, dc, g, m, df, du, has){
 
 	/*=====
 	declare("dojox.charting.plot2d.__PieCtorArgs", dojox.charting.plot2d.__DefaultCtorArgs, {
@@ -17,11 +17,11 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 		ticks:			false,
 	
 		// fixed: Boolean?
-		//		TODO
+		//		Whether a fixed precision must be applied to data values for display. Default is true.
 		fixed:			true,
 	
 		// precision: Number?
-		//		The precision at which to sum/add data values. Default is 1.
+		//		The precision at which to round data values for display. Default is 0.
 		precision:		1,
 	
 		// labelOffset: Number?
@@ -64,6 +64,11 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 		//		Any fill to be used for elements on the plot.
 		fill:		{},
 
+		// filter: dojox.gfx.Filter?
+		//		An SVG filter to be used for elements on the plot. gfx SVG renderer must be used and dojox/gfx/svgext must
+		//		be required for this to work.
+		filter:		{},
+
 		// styleFunc: Function?
 		//		A function that returns a styling object for the a given data item.
 		styleFunc:	null
@@ -95,6 +100,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 			outline:	{},
 			shadow:		{},
 			fill:		{},
+			filter:     {},
 			styleFunc:	null,
 			font:		"",
 			fontColor:	"",
@@ -175,7 +181,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 				labelFont = "font" in this.opt ? this.opt.font : t.series.font,
 				size,
 				startAngle = m._degToRad(this.opt.startAngle),
-				start = startAngle, step, filteredRun, slices, labels, shift, labelR,
+				start = startAngle, filteredRun, slices, labels, shift, labelR,
 				run = this.run.data,
 				events = this.events();
 
@@ -198,6 +204,9 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 				scircle.cx += shadow.dx;
 				scircle.cy += shadow.dy;
 				s.createCircle(scircle).setFill(shadow.color).setStroke(shadow);
+			}
+			if(s.setFilter && (this.opt.filter || t.filter)){
+				s.createCircle(circle).setFill(t.series.stroke).setFilter(this.opt.filter || t.filter);
 			}
 
 			if(typeof run[0] == "number"){
@@ -298,7 +307,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 						eventSeries[i] = o;
 					}
 
-					return true;	// stop iteration
+					return false;	// we continue because we want to collect null data points for legend
 				}
 				// calculate the geometry of the slice
 				var end = start + slice * 2 * Math.PI;
@@ -320,8 +329,8 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 						var fansx = j == 0 ? x1 : circle.cx + r * Math.cos(start + (j - FUDGE_FACTOR) * delta),
 							fansy = j == 0 ? y1 : circle.cy + r * Math.sin(start + (j - FUDGE_FACTOR) * delta),
 							fanex = j == nfans - 1 ? x2 : circle.cx + r * Math.cos(start + (j + 1 + FUDGE_FACTOR) * delta),
-							faney = j == nfans - 1 ? y2 : circle.cy + r * Math.sin(start + (j + 1 + FUDGE_FACTOR) * delta),
-							fan = group.createPath().
+							faney = j == nfans - 1 ? y2 : circle.cy + r * Math.sin(start + (j + 1 + FUDGE_FACTOR) * delta);
+						group.createPath().
 								moveTo(circle.cx, circle.cy).
 								lineTo(fansx, fansy).
 								arcTo(r, r, 0, delta > Math.PI, true, fanex, faney).
@@ -381,22 +390,18 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 			}, this);
 			// draw labels
 			if(this.opt.labels){
-				if(this.opt.labelStyle == "default"){
+				var isRtl = has("dojo-bidi") && this.chart.isRightToLeft(); 
+				if(this.opt.labelStyle == "default"){ // inside or outside based on labelOffset
 					start = startAngle;
 					arr.some(slices, function(slice, i){
 						if(slice <= 0){
 							// degenerated slice
 							return false;	// continue
 						}
-						var theme = themes[i], elem;
+						var theme = themes[i];
 						if(slice >= 1){
 							// whole pie
-							elem = da.createText[this.opt.htmlLabels && g.renderer != "vml" ? "html" : "gfx"](
-									this.chart, s, circle.cx, circle.cy + size / 2, "middle", labels[i],
-									theme.series.font, theme.series.fontColor);
-							if(this.opt.htmlLabels){
-								this.htmlElements.push(elem);
-							}
+							this.renderLabel(s, circle.cx, circle.cy + size / 2, labels[i], theme, this.opt.labelOffset > 0);
 							return true;	// stop iteration
 						}
 						// calculate the geometry of the slice
@@ -411,11 +416,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 							x = circle.cx + labelR * Math.cos(labelAngle),
 							y = circle.cy + labelR * Math.sin(labelAngle) + size / 2;
 						// draw the label
-						elem = da.createText[this.opt.htmlLabels && g.renderer != "vml" ? "html" : "gfx"]
-								(this.chart, s, x, y, "middle", labels[i], theme.series.font, theme.series.fontColor);
-						if(this.opt.htmlLabels){
-							this.htmlElements.push(elem);
-						}
+						this.renderLabel(s, isRtl ? dim.width - x : x, y, labels[i], theme, this.opt.labelOffset > 0);
 						start = end;
 						return false;	// continue
 					}, this);
@@ -457,11 +458,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 								wiring.lineTo(x, y);
 							}
 							wiring.lineTo(jointX, y).setStroke(slice.theme.series.labelWiring);
-							var elem = da.createText[this.opt.htmlLabels && g.renderer != "vml" ? "html" : "gfx"](
-								this.chart, s, labelX, y, "left", labels[i], slice.theme.series.font, slice.theme.series.fontColor);
-							if(this.opt.htmlLabels){
-								this.htmlElements.push(elem);
-							}
+							this.renderLabel(s, isRtl ? dim.width - labelWidth - labelX : labelX, y, labels[i], slice.theme, false, "left");
 						}
 					},this);
 				}
@@ -471,9 +468,13 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 			this._eventSeries[this.run.name] = df.map(run, function(v){
 				return v <= 0 ? null : eventSeries[esi++];
 			});
+			// chart mirroring starts
+			if(has("dojo-bidi")){
+				this._checkOrientation(this.group, dim, offsets);
+			}
+			// chart mirroring ends
 			return this;	//	dojox/charting/plot2d/Pie
 		},
-		
 		_getProperLabelRadius: function(slices, labelHeight, minRidius){
 			var leftCenterSlice, rightCenterSlice,
 				leftMinSIN = 1, rightMinSIN = 1;
@@ -524,10 +525,6 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 				i = (i < 0)?i+slices.length:i;
 				j = (j < 0)?j+slices.length:j;
 			}
-		},
-		// utilities
-		_getLabel: function(number){
-			return dc.getLabel(number, this.opt.fixed, this.opt.precision);
 		}
 	});
 });

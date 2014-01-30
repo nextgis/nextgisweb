@@ -14,6 +14,7 @@ define("dojox/editor/plugins/nls/LocalImage", { root:
 ,
 "zh": true,
 "zh-tw": true,
+"uk": true,
 "tr": true,
 "th": true,
 "sv": true,
@@ -41,5 +42,6 @@ define("dojox/editor/plugins/nls/LocalImage", { root:
 "da": true,
 "cs": true,
 "ca": true,
+"bg": true,
 "ar": true
 });

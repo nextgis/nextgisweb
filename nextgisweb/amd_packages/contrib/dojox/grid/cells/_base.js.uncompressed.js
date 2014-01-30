@@ -105,7 +105,7 @@ define("dojox/grid/cells/_base", [
 			var f, i=this.grid.edit.info, d=this.get ? this.get(inRowIndex, inItem) : (this.value || this.defaultValue);
 			d = (d && d.replace && this.grid.escapeHTMLInData) ? d.replace(/&/g, '&amp;').replace(/</g, '&lt;') : d;
 			if(this.editable && (this.alwaysEditing || (i.rowIndex==inRowIndex && i.cell==this))){
-				return this.formatEditing(d, inRowIndex);
+				return this.formatEditing(i.value ? i.value : d, inRowIndex);
 			}else{
 				return this._defaultFormat(d, [d, inRowIndex, this]);
 			}
@@ -318,7 +318,7 @@ define("dojox/grid/cells/_base", [
 		getStrAttr("cellClasses", cellDef);
 	};
 
-	var Cell = declare("dojox.grid.cells.Cell", BaseCell, {
+	var Cell = BaseCell.Cell = declare("dojox.grid.cells.Cell", BaseCell, {
 		// summary:
 		//		grid cell that provides a standard text input box upon editing
 		constructor: function(){
@@ -360,7 +360,7 @@ define("dojox/grid/cells/_base", [
 		}
 	};
 
-	var RowIndex = declare("dojox.grid.cells.RowIndex", Cell, {
+	var RowIndex = BaseCell.RowIndex = declare("dojox.grid.cells.RowIndex", Cell, {
 		name: 'Row',
 
 		postscript: function(){
@@ -374,7 +374,7 @@ define("dojox/grid/cells/_base", [
 		Cell.markupFactory(node, cellDef);
 	};
 
-	var Select = declare("dojox.grid.cells.Select", Cell, {
+	var Select = BaseCell.Select = declare("dojox.grid.cells.Select", Cell, {
 		// summary:
 		//		grid cell that provides a standard select for editing
 
@@ -442,7 +442,7 @@ define("dojox/grid/cells/_base", [
 		}
 	};
 
-	var AlwaysEdit = declare("dojox.grid.cells.AlwaysEdit", Cell, {
+	var AlwaysEdit = BaseCell.AlwaysEdit = declare("dojox.grid.cells.AlwaysEdit", Cell, {
 		// summary:
 		//		grid cell that is always in an editable state, regardless of grid editing state
 		alwaysEditing: true,
@@ -459,7 +459,7 @@ define("dojox/grid/cells/_base", [
 		Cell.markupFactory(node, cell);
 	};
 
-	var Bool = declare("dojox.grid.cells.Bool", AlwaysEdit, {
+	var Bool = BaseCell.Bool = declare("dojox.grid.cells.Bool", AlwaysEdit, {
 		// summary:
 		//		grid cell that provides a standard checkbox that is always on for editing
 		_valueProp: "checked",

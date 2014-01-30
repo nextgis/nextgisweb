@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2012, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -44,6 +44,8 @@ _a.sort(typeof _b=="function"?_b:function(a,b){
 for(var _c,i=0;_c=_b[i];i++){
 var _d=a[_c.attribute];
 var _e=b[_c.attribute];
+_d=_d!=null?_d.valueOf():_d;
+_e=_e!=null?_e.valueOf():_e;
 if(_d!=_e){
 return !!_c.descending==(_d==null||_d>_e)?-1:1;
 }

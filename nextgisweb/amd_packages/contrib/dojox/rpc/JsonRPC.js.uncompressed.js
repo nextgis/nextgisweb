@@ -1,4 +1,4 @@
-define("dojox/rpc/JsonRPC", ["dojo", "dojox", "dojox/rpc/Service"], function(dojo, dojox) {
+define("dojox/rpc/JsonRPC", ["dojo", "dojox", "dojox/rpc/Service", "dojo/errors/RequestError"], function(dojo, dojox, Service, RequestError) {
 
 	function jsonRpcEnvelope(version){
 		return {
@@ -23,7 +23,9 @@ define("dojox/rpc/JsonRPC", ["dojo", "dojox", "dojox/rpc/Service"], function(doj
 			},
 	
 			deserialize: function(obj){
-				if ('Error' == obj.name){
+				if ('Error' == obj.name // old xhr
+					|| obj instanceof RequestError // new xhr
+				){
 					obj = dojo.fromJson(obj.responseText);
 				}
 				if(obj.error) {
@@ -40,7 +42,7 @@ define("dojox/rpc/JsonRPC", ["dojo", "dojox", "dojox/rpc/Service"], function(doj
 		function(str){
 			return str == "JSON-RPC-1.0";
 		},
-		dojo.mixin({namedParams:false},jsonRpcEnvelope()) // 1.0 will only work with ordered params
+		dojo.mixin({namedParams:false}, jsonRpcEnvelope()) // 1.0 will only work with ordered params
 	);
 
 	dojox.rpc.envelopeRegistry.register(
@@ -48,7 +50,7 @@ define("dojox/rpc/JsonRPC", ["dojo", "dojox", "dojox/rpc/Service"], function(doj
 		function(str){
 			return str == "JSON-RPC-2.0";
 		},
-		jsonRpcEnvelope("2.0")
+		dojo.mixin({namedParams:true }, jsonRpcEnvelope("2.0")) // 2.0 supports named params
 	);
 
 });

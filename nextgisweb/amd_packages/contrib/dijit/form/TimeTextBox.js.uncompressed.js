@@ -42,6 +42,9 @@ define("dijit/form/TimeTextBox", [
 		value: new Date(""),		// value.toString()="NaN"
 		//FIXME: in markup, you have no control over daylight savings
 
+		// Add scrollbars if necessary so that dropdown doesn't cover the <input>
+		maxHeight: -1,
+
 		_onKey: function(evt){
 			if(this.disabled || this.readOnly){ return; }
 			this.inherited(arguments);

@@ -1,67 +1,49 @@
 define(
 "dojo/cldr/nls/tr/islamic", //begin v1.x content
 {
-	"months-format-wide": [
-		"Muharrem",
-		"Safer",
-		"Rebiülevvel",
-		"Rebiülahir",
-		"Cemaziyelevvel",
-		"Cemaziyelahir",
-		"Recep",
-		"Şaban",
-		"Ramazan",
-		"Şevval",
-		"Zilkade",
-		"Zilhicce"
+	"field-dayperiod": "ÖÖ/ÖS",
+	"dateFormatItem-yyyyMMMEd": "d MMM y G E",
+	"dayPeriods-format-wide-pm": "ÖS",
+	"field-minute": "Dakika",
+	"dateFormatItem-MMMEd": "d MMMM E",
+	"field-day-relative+-1": "Dün",
+	"field-weekday": "Haftanın Günü",
+	"field-day-relative+-2": "Evvelsi gün",
+	"days-standAlone-wide": [
+		"Pazar",
+		"Pazartesi",
+		"Salı",
+		"Çarşamba",
+		"Perşembe",
+		"Cuma",
+		"Cumartesi"
 	],
-	"dateFormat-full": "dd MMMM y G EEEE",
-	"dateFormat-long": "dd MMMM y G",
-	"dateFormat-medium": "dd MMM y G",
-	"dateFormat-short": "dd.MM.yyyy G",
-	"dateFormatItem-d": "d",
-	"dateFormatItem-Ed": "d E",
-	"dateFormatItem-H": "HH",
-	"dateFormatItem-hm": "h:mm a",
-	"dateFormatItem-Hm": "HH:mm",
-	"dateFormatItem-hms": "h:mm:ss a",
-	"dateFormatItem-Hms": "HH:mm:ss",
-	"dateFormatItem-M": "L",
-	"dateFormatItem-Md": "dd.MM",
-	"dateFormatItem-MEd": "dd.MM E",
-	"dateFormatItem-MMM": "LLL",
-	"dateFormatItem-MMMd": "dd MMM",
-	"dateFormatItem-MMMEd": "dd MMM E",
-	"dateFormatItem-mmss": "mm:ss",
-	"dateFormatItem-ms": "mm:ss",
-	"dateFormatItem-yyMM": "MM.yy G",
-	"dateFormatItem-yyMMM": "MMM yy G",
-	"dateFormatItem-yyQ": "Q yy G",
-	"dateFormatItem-yyQQQQ": "QQQQ yy G",
+	"months-standAlone-narrow": [
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+		"10",
+		"11",
+		"12"
+	],
+	"field-era": "Miladi Dönem",
+	"dateFormatItem-Gy": "y G",
+	"field-hour": "Saat",
+	"dayPeriods-format-wide-am": "ÖÖ",
+	"quarters-standAlone-abbr": [
+		"Ç1",
+		"Ç2",
+		"Ç3",
+		"Ç4"
+	],
+	"dateFormatItem-y": "y G",
 	"dateFormatItem-yyyy": "y G",
-	"dateFormatItem-yyyyM": "MM.y G",
-	"dateFormatItem-yyyyMd": "dd.MM.y G",
-	"dateFormatItem-yyyyMEd": "dd.MM.y G E",
-	"dateFormatItem-yyyyMMM": "MMM y G",
-	"dateFormatItem-yyyyMMMd": "dd MMM y G",
-	"dateFormatItem-yyyyMMMEd": "dd MMM y G E",
-	"dateFormatItem-yyyyMMMM": "MMMM y G",
-	"dateFormatItem-yyyyQ": "Q y G",
-	"dateFormatItem-yyyyQQQ": "QQQ y G",
-	"months-format-abbr": [
-		"Muharrem",
-		"Safer",
-		"Rebiülevvel",
-		"Rebiülahir",
-		"Cemaziyelevvel",
-		"Cemaziyelahir",
-		"Recep",
-		"Şaban",
-		"Ramazan",
-		"Şevval",
-		"Zilkade",
-		"Zilhicce"
-	],
 	"months-standAlone-abbr": [
 		"Muharrem",
 		"Safer",
@@ -76,6 +58,41 @@ define(
 		"Zilkade",
 		"Zilhicce"
 	],
+	"dateFormatItem-Ed": "d E",
+	"field-day-relative+0": "Bugün",
+	"field-day-relative+1": "Yarın",
+	"days-standAlone-narrow": [
+		"P",
+		"P",
+		"S",
+		"Ç",
+		"P",
+		"C",
+		"C"
+	],
+	"field-day-relative+2": "Öbür gün",
+	"dateFormatItem-GyMMMd": "dd MMM y G",
+	"dateFormat-long": "d MMMM y G",
+	"field-zone": "Saat Dilimi",
+	"field-week-relative+-1": "Geçen hafta",
+	"dateFormat-medium": "d MMM y G",
+	"field-year-relative+0": "Bu yıl",
+	"field-year-relative+1": "Gelecek yıl",
+	"quarters-standAlone-wide": [
+		"1. çeyrek",
+		"2. çeyrek",
+		"3. çeyrek",
+		"4. çeyrek"
+	],
+	"field-year-relative+-1": "Geçen yıl",
+	"field-year": "Yıl",
+	"dateFormatItem-yyyyQQQQ": "G y/QQQQ",
+	"quarters-standAlone-narrow": [
+		"1.",
+		"2.",
+		"3.",
+		"4."
+	],
 	"months-standAlone-wide": [
 		"Muharrem",
 		"Safer",
@@ -89,6 +106,42 @@ define(
 		"Şevval",
 		"Zilkade",
 		"Zilhicce"
+	],
+	"field-week": "Hafta",
+	"dateFormatItem-yyyyMMMd": "dd MMM y G",
+	"dateFormatItem-yyyyMd": "dd.MM.y G",
+	"dateFormatItem-yyyyMEd": "dd.MM.y G E",
+	"field-week-relative+0": "Bu hafta",
+	"dateFormatItem-MMMd": "d MMMM",
+	"quarters-format-narrow": [
+		"1.",
+		"2.",
+		"3.",
+		"4."
+	],
+	"field-week-relative+1": "Gelecek hafta",
+	"months-format-abbr": [
+		"Muharrem",
+		"Safer",
+		"Rebiülevvel",
+		"Rebiülahir",
+		"Cemaziyelevvel",
+		"Cemaziyelahir",
+		"Recep",
+		"Şaban",
+		"Ramazan",
+		"Şevval",
+		"Zilkade",
+		"Zilhicce"
+	],
+	"field-month-relative+0": "Bu ay",
+	"field-month": "Ay",
+	"field-month-relative+1": "Gelecek ay",
+	"quarters-format-abbr": [
+		"Ç1",
+		"Ç2",
+		"Ç3",
+		"Ç4"
 	],
 	"days-format-abbr": [
 		"Paz",
@@ -108,14 +161,20 @@ define(
 		"C",
 		"C"
 	],
-	"days-format-wide": [
-		"Pazar",
-		"Pazartesi",
-		"Salı",
-		"Çarşamba",
-		"Perşembe",
-		"Cuma",
-		"Cumartesi"
+	"field-second": "Saniye",
+	"dateFormatItem-GyMMMEd": "d MMM y G E",
+	"dateFormatItem-GyMMM": "MMM y G",
+	"field-day": "Gün",
+	"dateFormatItem-yyyyQQQ": "G y/QQQ",
+	"dateFormatItem-MEd": "dd.MM E",
+	"days-standAlone-short": [
+		"Pa",
+		"Pt",
+		"Sa",
+		"Ça",
+		"Pe",
+		"Cu",
+		"Ct"
 	],
 	"days-standAlone-abbr": [
 		"Paz",
@@ -126,16 +185,42 @@ define(
 		"Cum",
 		"Cmt"
 	],
-	"days-standAlone-narrow": [
-		"P",
-		"P",
-		"S",
-		"Ç",
-		"P",
-		"C",
-		"C"
+	"dateFormat-short": "d.MM.y G",
+	"dateFormatItem-yyyyM": "MM.y G",
+	"dateFormat-full": "d MMMM y G EEEE",
+	"dateFormatItem-Md": "dd.MM",
+	"months-format-wide": [
+		"Muharrem",
+		"Safer",
+		"Rebiülevvel",
+		"Rebiülahir",
+		"Cemaziyelevvel",
+		"Cemaziyelahir",
+		"Recep",
+		"Şaban",
+		"Ramazan",
+		"Şevval",
+		"Zilkade",
+		"Zilhicce"
 	],
-	"days-standAlone-wide": [
+	"days-format-short": [
+		"Pa",
+		"Pt",
+		"Sa",
+		"Ça",
+		"Pe",
+		"Cu",
+		"Ct"
+	],
+	"dateFormatItem-yyyyMMM": "MMM y G",
+	"field-month-relative+-1": "Geçen ay",
+	"quarters-format-wide": [
+		"1. çeyrek",
+		"2. çeyrek",
+		"3. çeyrek",
+		"4. çeyrek"
+	],
+	"days-format-wide": [
 		"Pazar",
 		"Pazartesi",
 		"Salı",
@@ -143,39 +228,7 @@ define(
 		"Perşembe",
 		"Cuma",
 		"Cumartesi"
-	],
-	"quarters-format-abbr": [
-		"Ç1",
-		"Ç2",
-		"Ç3",
-		"Ç4"
-	],
-	"quarters-format-wide": [
-		"1. çeyrek",
-		"2. çeyrek",
-		"3. çeyrek",
-		"4. çeyrek"
-	],
-	"quarters-standAlone-abbr": [
-		"Ç1",
-		"Ç2",
-		"Ç3",
-		"Ç4"
-	],
-	"quarters-standAlone-wide": [
-		"1. çeyrek",
-		"2. çeyrek",
-		"3. çeyrek",
-		"4. çeyrek"
-	],
-	"dateFormatItem-yM": "MM.yy",
-	"dateFormatItem-yMd": "dd.MM.yyyy",
-	"dateFormatItem-yMEd": "dd.MM.yyyy E",
-	"dateFormatItem-yMMM": "MMM y",
-	"dateFormatItem-yMMMd": "dd MMM y",
-	"dateFormatItem-yMMMEd": "d MMM y E",
-	"dateFormatItem-yQ": "y-Q",
-	"dateFormatItem-yQQQ": "y-QQQ"
+	]
 }
 //end v1.x content
 );

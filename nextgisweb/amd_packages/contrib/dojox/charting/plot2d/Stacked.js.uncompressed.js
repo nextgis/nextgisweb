@@ -24,12 +24,12 @@ define("dojox/charting/plot2d/Stacked", ["dojo/_base/declare", "./Default", "./c
 			// except if interpolates is false in which case ignore null between valid data
 			for(var j = min; j <= max; j++){
 				var value = indexed ? commonStacked.getIndexValue(this.series, i, j) : commonStacked.getValue(this.series, i, run.data[j] ?run.data[j].x: null);
-				if(value != null && (indexed || value.y != null)){
+				if(value[0] != null && (indexed || value[0].y != null)){
 					if(!rseg){
 						rseg = [];
 						segments.push({index: j, rseg: rseg});
 					}
-					rseg.push(value);
+					rseg.push(value[0]);
 				}else{
 					if(!this.opt.interpolate || indexed){
 						// we break the line only if not interpolating or if we have indexed data

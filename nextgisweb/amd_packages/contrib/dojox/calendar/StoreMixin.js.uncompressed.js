@@ -14,7 +14,11 @@ define("dojox/calendar/StoreMixin", ["dojo/_base/declare", "dojo/_base/array", "
 		// query: Object
 		//		A query that can be passed to when querying the store.
 		query: {},
-		
+
+		// queryOptions: dojo/store/api/Store.QueryOptions?
+		//		Options to be applied when querying the store.
+		queryOptions: null,
+
 		// startTimeAttr: String
 		//		The attribute of the store item that contains the start time of 
 		//		the events represented by this item.	Default is "startTime". 
@@ -53,7 +57,7 @@ define("dojox/calendar/StoreMixin", ["dojo/_base/declare", "dojo/_base/array", "
 		// tags:
 		//		protected
 		displayedItemsInvalidated: false,
-				
+									
 		itemToRenderItem: function(item, store){
 			// summary:
 			//		Creates the render item based on the dojo.store item. It must be of the form:
@@ -110,7 +114,7 @@ define("dojox/calendar/StoreMixin", ["dojo/_base/declare", "dojo/_base/array", "
 			item[this.summaryAttr] = renderItem.summary;
 			item[this.startTimeAttr] = (this.encodeDate && this.encodeDate(renderItem.startTime)) || renderItem.startTime;
 			item[this.endTimeAttr] = (this.encodeDate && this.encodeDate(renderItem.endTime)) || renderItem.endTime;
-			return lang.mixin(store.get(renderItem.id), item);
+			return this.getItemStoreState(renderItem) == "unstored" ? item : lang.mixin(renderItem._item, item);
 		},			
 		
 		_computeVisibleItems: function(renderData){
@@ -149,6 +153,11 @@ define("dojox/calendar/StoreMixin", ["dojo/_base/declare", "dojo/_base/array", "
 			var layoutCanChange = true;
 			var oldItem = null;
 			var newItem = this.itemToRenderItem(object, this.store);
+			// keep a reference on the store data item. 
+			newItem._item = object;
+			
+			// set the item as in the store
+			
 			if(previousIndex!=-1){
 				if(newIndex!=previousIndex){
 					// this is a remove or a move
@@ -169,28 +178,75 @@ define("dojox/calendar/StoreMixin", ["dojo/_base/declare", "dojo/_base/array", "
 					lang.mixin(oldItem, newItem); 
 				}
 			}else if(newIndex!=-1){
-				// this is a add 
-				this.items.splice(newIndex, 0, newItem);				
-			}
-			if(layoutCanChange){
-				this._refreshItemsRendering();			
-			}else{
-				// just update the item
-				this.updateRenderers(oldItem);
+				// this is a add
+				
+				var tempId = object.temporaryId;
+				if(tempId){
+					// this item had a temporary id that was changed
+					var l = this.items.length; 
+					for(var i=l-1; i>=0; i--){
+						if(this.items[i].id == tempId){
+							this.items[i] = newItem;
+							break;
+						}
+					}
+					this._cleanItemStoreState(tempId);
+					this._setItemStoreState(newItem, "storing");
+				}
+				
+				var s = this._getItemStoreStateObj(newItem);
+				if(s){
+					// if the item is at the correct index (creation)
+					// we must fix it. Should not occur but ensure integrity.
+					if(this.items[newIndex].id != newItem.id){						
+						var l = this.items.length; 
+						for(var i=l-1; i>=0; i--){
+							if(this.items[i].id == newItem.id){
+								this.items.splice(i, 1);
+								break;
+							}
+						}						
+						this.items.splice(newIndex, 0, newItem);						
+					}
+					// update with the latest values from the store.
+					lang.mixin(s.renderItem, newItem);
+				}else{
+					this.items.splice(newIndex, 0, newItem);					
+				}
+				this.set("items", this.items);
+			}	
+			
+			this._setItemStoreState(newItem, "stored");
+			
+			if(!this._isEditing){
+				if(layoutCanChange){				
+					this._refreshItemsRendering();			
+				}else{
+					// just update the item
+					this.updateRenderers(oldItem);
+				}
 			}
 		},
 		
 		_setStoreAttr: function(value){
 			this.displayedItemsInvalidated = true;
 			var r;
-			if(value){
-				var results = value.query(this.query);
+
+			if(this._observeHandler){
+				this._observeHandler.remove();
+				this._observeHandler = null;
+			}
+			if(value){				
+				var results = value.query(this.query, this.queryOptions);
 				if(results.observe){
 					// user asked us to observe the store
-					results.observe(lang.hitch(this, this._updateItems), true);
+					this._observeHandler = results.observe(lang.hitch(this, this._updateItems), true);
 				}				
 				results = results.map(lang.hitch(this, function(item){
-					return this.itemToRenderItem(item, value);
+					var renderItem = this.itemToRenderItem(item, value);
+					// keep a reference on the store data item.
+					renderItem._item = item;
+					return renderItem;
 				}));
 				r = when(results, lang.hitch(this, this._initItems));
 			}else{
@@ -199,8 +255,103 @@ define("dojox/calendar/StoreMixin", ["dojo/_base/declare", "dojo/_base/array", "
 			}
 			this._set("store", value);
 			return r;
-		}
-				
+		},
+		
+		_getItemStoreStateObj: function(/*Object*/item){
+			// tags
+			//		private
+			
+			if(this.owner){
+				return this.owner._getItemStoreStateObj(item);
+			}
+			
+			var store = this.get("store");
+			if(store != null && this._itemStoreState != null){
+				var id = item.id == undefined ? store.getIdentity(item) : item.id;
+				return this._itemStoreState[id];
+			}
+			return null;
+		},
+		
+		getItemStoreState: function(item){
+			//	summary:
+			//		Returns the creation state of an item. 
+			//		This state is changing during the interactive creation of an item.
+			//		Valid values are:
+			//		- "unstored": The event is being interactively created. It is not in the store yet.
+			//		- "storing": The creation gesture has ended, the event is being added to the store.
+			//		- "stored": The event is not in the two previous states, and is assumed to be in the store 
+			//		(not checking because of performance reasons, use store API for testing existence in store).
+			// item: Object
+			//		The item.
+			// returns: String
+			
+			if(this.owner){
+				return this.owner.getItemStoreState(item);
+			}
+
+			if(this._itemStoreState == null){
+				return "stored";
+			}
+			
+			var store = this.get("store");
+			var id = item.id == undefined ? store.getIdentity(item) : item.id;
+			var s = this._itemStoreState[id];
+			
+			if(store != null && s != undefined){				
+				return s.state;								
+			}
+			return "stored";		
+		},
+		
+		_setItemStoreState: function(/*Object*/item, /*String*/state){
+			// tags
+			//		private
+			
+			if(this.owner){
+				this.owner._setItemStoreState(item, state);
+				return;
+			}
+			
+			if(this._itemStoreState == undefined){
+				this._itemStoreState = {};
+			}
+			
+			var store = this.get("store");
+			var id = item.id == undefined ? store.getIdentity(item) : item.id;
+			var s = this._itemStoreState[id];
+			
+						
+			if(state == "stored" || state == null){
+				if(s != undefined){
+					delete this._itemStoreState[id];					
+				}
+				return;	
+			}
+
+			if(store){				
+				this._itemStoreState[id] = {
+						id: id,
+						item: item,
+						renderItem: this.itemToRenderItem(item, store),
+						state: state
+				};						
+			}
+		},
+		
+		_cleanItemStoreState: function(id){  
+			      
+			if(this.owner){
+				return this.owner._cleanItemStoreState(id);        
+			}			
+			var s = this._itemStoreState[id];
+			if(s){
+				delete this._itemStoreState[id];
+				return true;
+			}
+			return false;
+		} 
+
 	});
 
 });

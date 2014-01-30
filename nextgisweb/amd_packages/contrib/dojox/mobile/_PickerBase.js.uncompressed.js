@@ -60,8 +60,10 @@ define("dojox/mobile/_PickerBase", [
 
 		startup: function(){
 			if(this._started){ return; }
+			this._duringStartup = true;
 			this.inherited(arguments);
 			this.reset();
+			delete this._duringStartup;
 		},
 
 		getSlots: function(){

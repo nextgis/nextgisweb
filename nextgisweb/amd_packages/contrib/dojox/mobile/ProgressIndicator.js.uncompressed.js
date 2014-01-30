@@ -8,8 +8,9 @@ define("dojox/mobile/ProgressIndicator", [
 	"dojo/dom-style",
 	"dojo/has",
 	"dijit/_Contained",
-	"dijit/_WidgetBase"
-], function(config, declare, lang, domClass, domConstruct, domGeometry, domStyle, has, Contained, WidgetBase){
+	"dijit/_WidgetBase",
+	"./_css3"
+], function(config, declare, lang, domClass, domConstruct, domGeometry, domStyle, has, Contained, WidgetBase, css3){
 
 	// module:
 	//		dojox/mobile/ProgressIndicator
@@ -26,8 +27,10 @@ define("dojox/mobile/ProgressIndicator", [
 		//		indicator.
 		interval: 100,
 
-		// size: Number
+		// size: [const] Number
 		//		The size of the indicator in pixels.
+		//		Note that changing the value of the property after the widget
+		//		creation has no effect.
 		size: 40,
 
 		// removeOnStop: Boolean
@@ -85,10 +88,10 @@ define("dojox/mobile/ProgressIndicator", [
 			// size:
 			//		The size of the indicator in pixels.
 			var scale = size / 40;
-			domStyle.set(this.containerNode, {
-				webkitTransform: "scale(" + scale + ")",
-				webkitTransformOrigin: "0 0"
-			});
+			domStyle.set(this.containerNode, css3.add({}, {
+				transform: "scale(" + scale + ")",
+				transformOrigin: "0 0"
+			}));
 			domGeometry.setMarginBox(this.domNode, {w:size, h:size});
 			domGeometry.setMarginBox(this.containerNode, {w:size / scale, h:size / scale});
 		},

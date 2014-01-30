@@ -244,6 +244,8 @@ define("dojox/widget/Toaster", [
 				style.left = (view.w - nodeSize.w - 1 - view.l)+"px";
 			}else if(pd.match(/^[tb]l-/)){
 				style.left = 0 + "px";
+			}else if(pd.match(/^[tb]c-/)){
+				style.left = Math.round((view.w - nodeSize.w - 1 - view.l)/2)+"px";
 			}
 
 			style.clip = "rect(0px, " + nodeSize.w + "px, " + nodeSize.h + "px, 0px)";

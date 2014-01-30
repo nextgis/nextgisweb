@@ -85,41 +85,6 @@ define("dijit/form/RangeBoundTextBox", [
 				this.messages = i18n.getLocalization("dijit.form", "validate", this.lang);
 				this.rangeMessage = this.messages.rangeMessage;
 			}
-		},
-
-		_setConstraintsAttr: function(/*Object*/ constraints){
-			this.inherited(arguments);
-			if(this.focusNode){ // not set when called from postMixInProperties
-				if(this.constraints.min !== undefined){
-					this.focusNode.setAttribute("aria-valuemin", this.constraints.min);
-				}else{
-					this.focusNode.removeAttribute("aria-valuemin");
-				}
-				if(this.constraints.max !== undefined){
-					this.focusNode.setAttribute("aria-valuemax", this.constraints.max);
-				}else{
-					this.focusNode.removeAttribute("aria-valuemax");
-				}
-			}
-		},
-
-		_setValueAttr: function(/*Number*/ value, /*Boolean?*/ priorityChange){
-			// summary:
-			//		Hook so set('value', ...) works.
-
-			this.focusNode.setAttribute("aria-valuenow", value);
-			this.inherited(arguments);
-		},
-
-		applyTextDir: function(/*===== element, text =====*/){
-			// summary:
-			//		The function overridden in the _BidiSupport module,
-			//		originally used for setting element.dir according to this.textDir.
-			//		In this case does nothing.
-			// element: Object
-			// text: String
-			// tags:
-			//		protected.
 		}
 	});
 	/*=====

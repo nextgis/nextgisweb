@@ -216,7 +216,9 @@ var FloatingPane = declare("dojox.layout.FloatingPane", [ ContentPane, Templated
 				}
 			})
 		}).play();
-		this.resize(domGeom.position(this.domNode));
+		// use w / h from content box dimensions and x / y from position
+		var contentBox = domGeom.getContentBox(this.domNode)
+		this.resize(lang.mixin(domGeom.position(this.domNode), {w: contentBox.w, h: contentBox.h}));
 		this._onShow(); // lazy load trigger
 	},
 

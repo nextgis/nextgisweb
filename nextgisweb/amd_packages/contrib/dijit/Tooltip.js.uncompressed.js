@@ -1,5 +1,5 @@
 require({cache:{
-'url:dijit/templates/Tooltip.html':"<div class=\"dijitTooltip dijitTooltipLeft\" id=\"dojoTooltip\"\n\t><div class=\"dijitTooltipContainer dijitTooltipContents\" data-dojo-attach-point=\"containerNode\" role='alert'></div\n\t><div class=\"dijitTooltipConnector\" data-dojo-attach-point=\"connectorNode\"></div\n></div>\n"}});
+'url:dijit/templates/Tooltip.html':"<div class=\"dijitTooltip dijitTooltipLeft\" id=\"dojoTooltip\"\n\t><div class=\"dijitTooltipConnector\" data-dojo-attach-point=\"connectorNode\"></div\n\t><div class=\"dijitTooltipContainer dijitTooltipContents\" data-dojo-attach-point=\"containerNode\" role='alert'></div\n></div>\n"}});
 define("dijit/Tooltip", [
 	"dojo/_base/array", // array.forEach array.indexOf array.map
 	"dojo/_base/declare", // declare
@@ -230,36 +230,40 @@ define("dijit/Tooltip", [
 				this.show.apply(this, this._onDeck);
 				this._onDeck=null;
 			}
-		},
-
-		_setAutoTextDir: function(/*Object*/node){
-			// summary:
-			//		Resolve "auto" text direction for children nodes
-			// tags:
-			//		private
-
-			this.applyTextDir(node, has("ie") ? node.outerText : node.textContent);
-			array.forEach(node.children, function(child){this._setAutoTextDir(child); }, this);
-		},
-
-		_setTextDirAttr: function(/*String*/ textDir){
-			// summary:
-			//		Setter for textDir.
-			// description:
-			//		Users shouldn't call this function; they should be calling
-			//		set('textDir', value)
-			// tags:
-			//		private
-
-			this._set("textDir", textDir);
-
-			if (textDir == "auto"){
-				this._setAutoTextDir(this.containerNode);
-			}else{
-				this.containerNode.dir = this.textDir;
-			}
 		}
 	});
+
+	if(has("dojo-bidi")){
+		MasterTooltip.extend({
+			_setAutoTextDir: function(/*Object*/node){
+				// summary:
+				//		Resolve "auto" text direction for children nodes
+				// tags:
+				//		private
+
+				this.applyTextDir(node);
+				array.forEach(node.children, function(child){ this._setAutoTextDir(child); }, this);
+			},
+
+			_setTextDirAttr: function(/*String*/ textDir){
+				// summary:
+				//		Setter for textDir.
+				// description:
+				//		Users shouldn't call this function; they should be calling
+				//		set('textDir', value)
+				// tags:
+				//		private
+
+				this._set("textDir", textDir);
+
+				if (textDir == "auto"){
+					this._setAutoTextDir(this.containerNode);
+				}else{
+					this.containerNode.dir = this.textDir;
+				}
+			}
+		});
+	}
 
 	dijit.showTooltip = function(innerHTML, aroundNode, position, rtl, textDir){
 		// summary:
@@ -302,7 +306,7 @@ define("dijit/Tooltip", [
 		//		Also provides static show() and hide() methods that can be used without instantiating a dijit/Tooltip.
 
 		// label: String
-		//		Text to display in the tooltip.
+		//		HTML to display in the tooltip.
 		//		Specified as innerHTML when creating the widget from markup.
 		label: "",
 
@@ -332,7 +336,7 @@ define("dijit/Tooltip", [
 		// TODO: in 2.0 remove support for multiple connectIds.   selector gives the same effect.
 		// So, change connectId to a "", remove addTarget()/removeTarget(), etc.
 
-		_setConnectIdAttr: function(/*String|String[]}DomNode|DomNode[]*/ newId){
+		_setConnectIdAttr: function(/*String|String[]|DomNode|DomNode[]*/ newId){
 			// summary:
 			//		Connect to specified node(s)
 

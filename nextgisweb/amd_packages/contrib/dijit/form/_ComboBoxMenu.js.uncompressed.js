@@ -24,7 +24,9 @@ define("dijit/form/_ComboBoxMenu", [
 		// tags:
 		//		private
 
-		templateString: "<div class='dijitReset dijitMenu' data-dojo-attach-point='containerNode' style='overflow: auto; overflow-x: hidden;'>"
+		// TODO for 2.0 or earlier: stop putting stuff inside this.containerNode.   Switch to using this.domNode
+		// or a different attach point.    See _TemplatedMixin::searchContainerNode.
+		templateString: "<div class='dijitReset dijitMenu' data-dojo-attach-point='containerNode' style='overflow: auto; overflow-x: hidden;' role='listbox'>"
 				+"<div class='dijitMenuItem dijitMenuPreviousButton' data-dojo-attach-point='previousButton' role='option'></div>"
 				+"<div class='dijitMenuItem dijitMenuNextButton' data-dojo-attach-point='nextButton' role='option'></div>"
 				+"</div>",
@@ -37,6 +39,7 @@ define("dijit/form/_ComboBoxMenu", [
 				domClass.add(this.previousButton, "dijitMenuItemRtl");
 				domClass.add(this.nextButton, "dijitMenuItemRtl");
 			}
+			this.containerNode.setAttribute("role","listbox");
 		},
 
 		_createMenuItem: function(){

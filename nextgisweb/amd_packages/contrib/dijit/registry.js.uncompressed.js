@@ -1,10 +1,9 @@
 define("dijit/registry", [
 	"dojo/_base/array", // array.forEach array.map
 	"dojo/sniff", // has("ie")
-	"dojo/_base/unload", // unload.addOnWindowUnload
 	"dojo/_base/window", // win.body
 	"./main"	// dijit._scopeName
-], function(array, has, unload, win, dijit){
+], function(array, has, win, dijit){
 
 	// module:
 	//		dijit/registry
@@ -141,7 +140,7 @@ define("dijit/registry", [
 			//		Returns the widget whose DOM tree contains the specified DOMNode, or null if
 			//		the node is not contained within the DOM tree of any widget
 			while(node){
-				var id = node.getAttribute && node.getAttribute("widgetId");
+				var id = node.nodeType == 1 && node.getAttribute("widgetId");
 				if(id){
 					return hash[id];
 				}

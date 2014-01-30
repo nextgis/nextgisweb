@@ -10,7 +10,7 @@
   background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   background-image: -o-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: -ms-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   _background-image: none;
 }
 .claro .dijitSelect .dijitArrowButton .dijitArrowButtonInner {
@@ -21,11 +21,8 @@
   background-image: -moz-linear-gradient(rgba(127, 127, 127, 0.2) 0%, rgba(127, 127, 127, 0) 2px);
   background-image: -webkit-linear-gradient(rgba(127, 127, 127, 0.2) 0%, rgba(127, 127, 127, 0) 2px);
   background-image: -o-linear-gradient(rgba(127, 127, 127, 0.2) 0%, rgba(127, 127, 127, 0) 2px);
-  background-image: -ms-linear-gradient(rgba(127, 127, 127, 0.2) 0%, rgba(127, 127, 127, 0) 2px);
+  background-image: linear-gradient(rgba(127, 127, 127, 0.2) 0%, rgba(127, 127, 127, 0) 2px);
   background-repeat: repeat-x;
-}
-.claro .dijitSelectFocused, .claro .dijitSelectHover {
-  border-color: #759dc0;
 }
 .claro .dijitSelectHover .dijitArrowButton {
   background-color: #abd6ff;
@@ -40,7 +37,7 @@
   background-image: -moz-linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
   background-image: -webkit-linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
   background-image: -o-linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
-  background-image: -ms-linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
+  background-image: linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
   _background-image: none;
 }
 .claro .dijitSelectFocused .dijitArrowButton {
@@ -59,7 +56,8 @@
 .claro .dijitSelectDisabled .dijitArrowButton .dijitArrowButtonInner {
   background-position: 0 53%;
 }
-.claro .dijitSelectMenu td.dijitMenuItemIconCell, .claro .dijitSelectMenu td.dijitMenuArrowCell {
+.claro .dijitSelectMenu td.dijitMenuItemIconCell,
+.claro .dijitSelectMenu td.dijitMenuArrowCell {
   
   display: none;
 }

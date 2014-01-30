@@ -35,8 +35,8 @@ return;
 var sc=this.selectedChildWidget;
 if(this.doLayout){
 var _a=this.tabPosition.replace(/-h/,"");
-this.tablist.layoutAlign=_a;
-var _b=[this.tablist,{domNode:this.tablistSpacer,layoutAlign:_a},{domNode:this.containerNode,layoutAlign:"client"}];
+this.tablist.region=_a;
+var _b=[this.tablist,{domNode:this.tablistSpacer,region:_a},{domNode:this.containerNode,region:"center"}];
 _3.layoutChildren(this.domNode,this._contentBox,_b);
 this._containerContentBox=_3.marginBox2contentBox(this.containerNode,_b[2]);
 if(sc&&sc.resize){
@@ -54,9 +54,9 @@ if(sc&&sc.resize){
 sc.resize();
 }
 }
-},destroy:function(){
+},destroy:function(_d){
 if(this.tablist){
-this.tablist.destroy();
+this.tablist.destroy(_d);
 }
 this.inherited(arguments);
 }});

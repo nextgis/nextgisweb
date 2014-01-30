@@ -33,26 +33,28 @@
   background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   background-image: -o-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: -ms-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   _background-image: none;
   padding: 1px;
   border: solid 1px #759dc0;
   color: #000000;
 }
-.claro .dojoDndItemAnchor, .claro .dojoDndItemSelected {
+.claro .dojoDndItemAnchor,
+.claro .dojoDndItemSelected {
   background-color: #cfe5fa;
   background-image: url("images/standardGradient.png");
   background-repeat: repeat-x;
   background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   background-image: -o-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: -ms-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
   _background-image: none;
   padding: 1px;
   border: solid 1px #759dc0;
   color: #000000;
 }
-.claro .dojoDndItemBefore, .claro .dojoDndItemAfter {
+.claro .dojoDndItemBefore,
+.claro .dojoDndItemAfter {
   border-color: #759dc0;
 }
 .claro table.dojoDndAvatar {
@@ -67,7 +69,8 @@
   height: 20px;
   padding-left: 21px;
 }
-.claro.dojoDndMove .dojoDndAvatarHeader, .claro.dojoDndCopy .dojoDndAvatarHeader {
+.claro.dojoDndMove .dojoDndAvatarHeader,
+.claro.dojoDndCopy .dojoDndAvatarHeader {
   background-image: url("images/dnd.png");
   background-repeat: no-repeat;
   background-position: 2px -122px;

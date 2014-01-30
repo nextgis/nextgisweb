@@ -3,10 +3,14 @@ define("dojox/dtl/tag/logic", [
 	"../_base"
 ], function(lang, dd){
 
-	lang.getObject("dojox.dtl.tag.logic", true);
+	var ddtl = lang.getObject("tag.logic", true, dd);
+	/*=====
+	 ddtl = {
+	 	// TODO: summary
+	 };
+	 =====*/
 
 	var ddt = dd.text;
-	var ddtl = dd.tag.logic;
 
 	ddtl.IfNode = lang.extend(function(bools, trues, falses, type){
 		this.bools = bools;
@@ -125,12 +129,6 @@ define("dojox/dtl/tag/logic", [
 			}
 
 			var items = this.loop.resolve(context) || [];
-			for(i = items.length; i < this.pool.length; i++){
-				this.pool[i].unrender(context, buffer, this);
-			}
-			if(this.reversed){
-				items = items.slice(0).reverse();
-			}
 
 			var isObject = lang.isObject(items) && !lang.isArrayLike(items);
 			var arred = [];
@@ -140,6 +138,13 @@ define("dojox/dtl/tag/logic", [
 				}
 			}else{
 				arred = items;
+			}
+
+			for(i = arred.length; i < this.pool.length; i++){
+				this.pool[i].unrender(context, buffer, this);
+			}
+			if(this.reversed){
+				arred = arred.slice(0).reverse();
 			}
 
 			var forloop = context.forloop = {
@@ -274,5 +279,6 @@ define("dojox/dtl/tag/logic", [
 			return new ddtl.ForNode(loopvars, parts[parts.length + index + 1], reversed, nodelist);
 		}
 	});
-	return dojox.dtl.tag.logic;
+
+	return ddtl;
 });

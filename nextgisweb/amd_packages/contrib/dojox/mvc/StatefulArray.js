@@ -7,9 +7,8 @@ a._watchElementCallbacks();
 return a;
 };
 var _4=function(a){
-var _5=_1._toArray(a);
+var _5=_1._toArray(a||[]);
 var _6=_4;
-_6._meta={bases:[_2]};
 _5.constructor=_6;
 return _1.mixin(_5,{pop:function(){
 return this.splice(this.get("length")-1,1)[0];
@@ -23,10 +22,12 @@ return this.splice(0,1)[0];
 },sort:function(){
 return _3([].sort.apply(this,_1._toArray(arguments)));
 },splice:function(_7,n){
-var l=this.get("length"),p=Math.min(_7,l),_8=this.slice(_7,_7+n),_9=_1._toArray(arguments).slice(2);
+var l=this.get("length");
+_7+=_7<0?l:0;
+var p=Math.min(_7,l),_8=this.slice(_7,_7+n),_9=_1._toArray(arguments).slice(2);
 [].splice.apply(this,[_7,n].concat(new Array(_9.length)));
 for(var i=0;i<_9.length;i++){
-this.set(p+i,_9[i]);
+this[p+i]=_9[i];
 }
 if(this._watchElementCallbacks){
 this._watchElementCallbacks(_7,_8,_9);
@@ -39,7 +40,7 @@ return _8;
 this.splice.apply(this,[0,0].concat(_1._toArray(arguments)));
 return this.get("length");
 },concat:function(a){
-return new _4([].concat(this).concat(a));
+return new _4([].concat.apply(this,arguments));
 },join:function(_a){
 var _b=[];
 for(var l=this.get("length"),i=0;i<l;i++){
@@ -47,7 +48,10 @@ _b.push(this.get(i));
 }
 return _b.join(_a);
 },slice:function(_c,_d){
-var _e=[],_d=typeof _d==="undefined"?this.get("length"):_d;
+var l=this.get("length");
+_c+=_c<0?l:0;
+_d=(_d===void 0?l:_d)+(_d<0?l:0);
+var _e=[];
 for(var i=_c||0;i<Math.min(_d,this.get("length"));i++){
 _e.push(this.get(i));
 }
@@ -79,7 +83,7 @@ var old=this.get("length");
 if(old<_17){
 this.splice.apply(this,[old,0].concat(new Array(_17-old)));
 }else{
-if(_17>old){
+if(_17<old){
 this.splice.apply(this,[_17,old-_17]);
 }
 }
@@ -92,7 +96,10 @@ _2.prototype.set.call(this,"length",this.length);
 }
 return this;
 }
+},isInstanceOf:function(cls){
+return _2.prototype.isInstanceOf.apply(this,arguments)||cls==_4;
 }});
 };
+_4._meta={bases:[_2]};
 return _1.setObject("dojox.mvc.StatefulArray",_4);
 });

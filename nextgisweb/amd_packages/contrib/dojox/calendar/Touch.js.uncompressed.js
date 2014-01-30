@@ -17,21 +17,14 @@ define("dojox/calendar/Touch", ["dojo/_base/array", "dojo/_base/lang", "dojo/_ba
 		
 		postMixInProperties: function(){
 			
-			this.on("rendererCreated", lang.hitch(this, function(ir){
+			this.on("rendererCreated", lang.hitch(this, function(irEvent){
 				
-				var renderer = ir.renderer;
-				
-				
-				var h;
-				if(!renderer.__handles){
-					renderer.__handles = [];
-				}
-											
-				h = on(renderer.domNode, "touchstart", lang.hitch(this, function(e){
+				var renderer = irEvent.renderer.renderer;
+						
+				this.own(on(renderer.domNode, "touchstart", lang.hitch(this, function(e){
 					this._onRendererTouchStart(e, renderer);
-				}));
+				})));
 				
-				renderer.__handles.push(h);
 			}));
 		},
 		
@@ -109,7 +102,7 @@ define("dojox/calendar/Touch", ["dojo/_base/array", "dojo/_base/lang", "dojo/_ba
 					
 					this._saveSelectedItems = this.get("selectedItems");
 							
-					var changed = this.selectFromEvent(e, this.renderItemToItem(theItem, this.get("store")), renderer, false);
+					var changed = this.selectFromEvent(e, theItem._item, renderer, false);
 					
 					if(changed){					
 						this._pendingSelectedItem = theItem;
@@ -136,7 +129,7 @@ define("dojox/calendar/Touch", ["dojo/_base/array", "dojo/_base/lang", "dojo/_ba
 							delete this._saveSelectedItems;
 							delete this._pendingSelectedItem;
 						}else{							
-							this.selectFromEvent(e, this.renderItemToItem(theItem, this.get("store")), renderer);
+							this.selectFromEvent(e, theItem._item, renderer);
 						}
 																					
 						this._startItemEditing(p.item, "touch", e);
@@ -282,7 +275,7 @@ define("dojox/calendar/Touch", ["dojo/_base/array", "dojo/_base/lang", "dojo/_ba
 				if(this._touchSelectionTimer){					
 					// selection timer was not reached to a proper selection.
 					clearTimeout(this._touchSelectionTimer);
-					this.selectFromEvent(e, this.renderItemToItem(p.item, this.get("store")), p.renderer, true);
+					this.selectFromEvent(e, p.item._item, p.renderer, true);
 					
 				}else if(this._pendingSelectedItem){
 					// selection timer was reached, dispatch change event
@@ -296,7 +289,7 @@ define("dojox/calendar/Touch", ["dojo/_base/array", "dojo/_base/lang", "dojo/_ba
 					this._onItemDoubleClick({
 						triggerEvent: e,
 						renderer: p.renderer,
-						item: this.itemToRenderItem(p.item, this.get("store"))
+						item: p.item._item
 					});
 					
 					clearTimeout(this._pendingDoubleTap.timer);
@@ -315,7 +308,7 @@ define("dojox/calendar/Touch", ["dojo/_base/array", "dojo/_base/lang", "dojo/_ba
 					this._onItemClick({
 						triggerEvent: e,
 						renderer: p.renderer,
-						item: this.itemToRenderItem(p.item, this.get("store"))
+						item: p.item._item
 					});
 				}
 								
@@ -367,21 +360,15 @@ define("dojox/calendar/Touch", ["dojo/_base/array", "dojo/_base/lang", "dojo/_ba
 					this.getTime(e, -1, -1, p.resizeEndTouchIndex)], 
 					p.editKind, "touch", e);
 
-				return;
-
 			}else if(fromResizeStart && p.touchesLen == 1 && !this._editingGesture){
 
 				this._startItemEditingGesture([this.getTime(e, -1, -1, p.resizeStartTouchIndex)], 
 					"resizeStart", "touch", e);
 
-				return;
-
 			}else if(fromResizeEnd && p.touchesLen == 1 && !this._editingGesture){
 
 				this._startItemEditingGesture([this.getTime(e, -1, -1, p.resizeEndTouchIndex)], 
 					"resizeEnd", "touch", e);
-
-				return;
 
 			} else {
 				// A move gesture is initiated even if we don't move 

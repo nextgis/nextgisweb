@@ -9,10 +9,9 @@ define("dijit/_Contained", [
 	return declare("dijit._Contained", null, {
 		// summary:
 		//		Mixin for widgets that are children of a container widget
-		//
 		// example:
-		//	|	// make a basic custom widget that knows about it's parents
-		//	|	declare("my.customClass",[dijit._Widget,dijit._Contained],{});
+		//	|	// make a basic custom widget that knows about its parents
+		//	|	declare("my.customClass",[dijit._WidgetBase, dijit._Contained],{});
 
 		_getSibling: function(/*String*/ which){
 			// summary:
@@ -48,7 +47,7 @@ define("dijit/_Contained", [
 			// summary:
 			//		Returns the index of this widget within its container parent.
 			//		It returns -1 if the parent does not exist, or if the parent
-			//		is not a dijit._Container
+			//		is not a dijit/_Container
 
 			var p = this.getParent();
 			if(!p || !p.getIndexOfChild){

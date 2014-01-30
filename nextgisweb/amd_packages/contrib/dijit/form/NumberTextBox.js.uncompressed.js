@@ -17,7 +17,11 @@ define("dijit/form/NumberTextBox", [
 
 		// Override ValidationTextBox.pattern.... we use a reg-ex generating function rather
 		// than a straight regexp to deal with locale (plus formatting options too?)
-		pattern: number.regexp,
+		pattern: function(constraints){
+			// if focused, accept either currency data or NumberTextBox format
+			return '(' + (this.focused && this.editOptions ? this._regExpGenerator(lang.delegate(constraints, this.editOptions)) + '|' : '')
+				+ this._regExpGenerator(constraints) + ')';
+		},
 
 		/*=====
 		// constraints: NumberTextBox.__Constraints
@@ -61,6 +65,20 @@ define("dijit/form/NumberTextBox", [
 		 =====*/
 		_formatter: number.format,
 
+		/*=====
+		_regExpGenerator: function(constraints){
+			// summary:
+			//		Generate a localized regular expression as a string, according to constraints.
+			// constraints: number.__ParseOptions
+			//		Formatting options
+			// tags:
+			//		protected
+
+			return "(\d*).(\d*)";	// string
+		},
+		=====*/
+		_regExpGenerator: number.regexp,
+
 		postMixInProperties: function(){
 			this.inherited(arguments);
 			this._set("type", "text"); // in case type="number" was specified which messes up parse/format
@@ -82,7 +100,7 @@ define("dijit/form/NumberTextBox", [
 		},
 
 		_onFocus: function(){
-			if(this.disabled){ return; }
+			if(this.disabled || this.readOnly){ return; }
 			var val = this.get('value');
 			if(typeof val == "number" && !isNaN(val)){
 				var formattedValue = this.format(val, this.constraints);
@@ -165,7 +183,7 @@ define("dijit/form/NumberTextBox", [
 		},
 
 		_setBlurValue: function(){
-			var val = lang.hitch(lang.mixin({}, this, { focused: true }), "get")('value'); // parse with editOptions
+			var val = lang.hitch(lang.delegate(this, { focused: true }), "get")('value'); // parse with editOptions
 			this._setValueAttr(val, true);
 		},
 
@@ -201,7 +219,7 @@ define("dijit/form/NumberTextBox", [
 			// Returning undefined prevents user text from being overwritten when doing _setValueAttr(_getValueAttr()).
 			// A blank displayed value is still returned as NaN.
 			if(isNaN(v) && this.textbox.value !== ''){
-				if(this.constraints.exponent !== false && /\de[-+]?\d/i.test(this.textbox.value) && (new RegExp("^"+number._realNumberRegexp(lang.mixin({}, this.constraints))+"$").test(this.textbox.value))){	// check for exponential notation that parse() rejected (erroneously?)
+				if(this.constraints.exponent !== false && /\de[-+]?\d/i.test(this.textbox.value) && (new RegExp("^"+number._realNumberRegexp(lang.delegate(this.constraints))+"$").test(this.textbox.value))){	// check for exponential notation that parse() rejected (erroneously?)
 					var n = Number(this.textbox.value);
 					return isNaN(n) ? undefined : n; // return exponential Number or undefined for random text (may not be possible to do with the above RegExp check)
 				}else{

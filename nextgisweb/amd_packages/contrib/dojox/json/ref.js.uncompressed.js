@@ -287,7 +287,7 @@ return dojox.json.ref = {
 						}
 						var refObject = {};
 						refObject[refAttribute] = ref;
-						return serialize(refObject,'#');
+						return djson.toJson(refObject, prettyPrint);
 					}
 					path = id;
 				}else{

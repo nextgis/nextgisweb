@@ -24,9 +24,10 @@ define("dojox/charting/plot2d/StackedBars", ["dojo/_base/declare", "./Bars", "./
 			}else{
 				x = value.x - 1;
 				y = commonStacked.getValue(this.series, seriesIndex, value.x);
-				y = y ? y.y: null;
+				y = [  y[0]?y[0].y:null, y[1]?y[1]:null ];
 			}
-			return {y:y, x:x};
+			// in py we return the previous stack value as we need it to position labels on columns
+			return { x: x, y: y[0], py: y[1] };
 		}
 	});
 });

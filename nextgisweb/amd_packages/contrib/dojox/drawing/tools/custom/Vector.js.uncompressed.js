@@ -162,7 +162,7 @@ var Vector = oo.declare(
 				};
 			}
 			var radius = this.util.length(obj);
-			var angle = positioning.angle(obj);
+			var angle = positioning.angle(obj.start, obj);
 			angle<0 ? angle = 360 + angle : angle;
 			
 			angle = angle > 135 && angle < 315 ? this.style.zAngle : this.util.oppAngle(this.style.zAngle);
@@ -178,7 +178,7 @@ var Vector = oo.declare(
 			var obj = {start:{x:p[0].x, y:p[0].y}, x:p[1].x, y:p[1].y};
 			if(this.style.zAxis && (this.util.length(obj)>this.minimumSize)){
 				
-				var angle = positioning.angle(obj);
+				var angle = positioning.angle(obj.start, obj);
 				angle<0 ? angle = 360 + angle : angle;
 				cosphi = angle > 135 && angle < 315 ? 1 : -1;
 			}

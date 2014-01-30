@@ -1,4 +1,4 @@
-define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./has"], function(aspect, dojo, has){
+define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./sniff"], function(aspect, dojo, has){
 
 	"use strict";
 	if( 1 ){ // check to make sure we are in a browser, this module should work anywhere
@@ -6,6 +6,28 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 		has.add("jscript", major && (major() + ScriptEngineMinorVersion() / 10));
 		has.add("event-orientationchange", has("touch") && !has("android")); // TODO: how do we detect this?
 		has.add("event-stopimmediatepropagation", window.Event && !!window.Event.prototype && !!window.Event.prototype.stopImmediatePropagation);
+		has.add("event-focusin", function(global, doc, element){
+			return 'onfocusin' in element || (element.addEventListener && (function () {
+				var hasFocusInEvent = false;
+				function testFocus() {
+					hasFocusInEvent = true;
+				}
+
+				try {
+					var element = doc.createElement('input'),
+						activeElement = doc.activeElement;
+					element.style.position = 'fixed';
+					element.addEventListener('focusin', testFocus, false);
+					doc.body.appendChild(element);
+					element.focus();
+					doc.body.removeChild(element);
+					element.removeEventListener('focusin', testFocus, false);
+					activeElement.focus();
+				} catch (e) {}
+
+				return hasFocusInEvent;
+			})());
+		});
 	}
 	var on = function(target, type, listener, dontFix){
 		// summary:
@@ -39,8 +61,10 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 		//		|	obj.onfoo({key:"value"});
 		//		If you use on.emit on a DOM node, it will use native event dispatching when possible.
 
-		if(typeof target.on == "function" && typeof type != "function"){
-			// delegate to the target's on() method, so it can handle it's own listening if it wants
+		if(typeof target.on == "function" && typeof type != "function" && !target.nodeType){
+			// delegate to the target's on() method, so it can handle it's own listening if it wants (unless it 
+			// is DOM node and we may be dealing with jQuery or Prototype's incompatible addition to the
+			// Element prototype 
 			return target.on(type, listener);
 		}
 		// delegate to main listener code
@@ -176,7 +200,7 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 			var matchesTarget = typeof selector == "function" ? {matches: selector} : this,
 				bubble = eventType.bubble;
 			function select(eventTarget){
-				// see if we have a valid matchesTarget or default to dojo.query
+				// see if we have a valid matchesTarget or default to dojo/query
 				matchesTarget = matchesTarget && matchesTarget.matches ? matchesTarget : dojo.query;
 				// there is a selector, so make sure it matches
 				while(!matchesTarget.matches(eventTarget, selector, target)){
@@ -202,6 +226,7 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 
 	function syntheticPreventDefault(){
 		this.cancelable = false;
+		this.defaultPrevented = true;
 	}
 	function syntheticStopPropagation(){
 		this.bubbles = false;
@@ -212,7 +237,7 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 		//		Fires an event on the target object.
 		// target:
 		//		The target object to fire the event on. This can be a DOM element or a plain 
-		//		JS object. If the target is a DOM element, native event emiting mechanisms
+		//		JS object. If the target is a DOM element, native event emitting mechanisms
 		//		are used when possible.
 		// type:
 		//		The event type name. You can emulate standard native events like "click" and 
@@ -235,25 +260,28 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 		// details:
 		//		Note that this is designed to emit events for listeners registered through
 		//		dojo/on. It should actually work with any event listener except those
-		//		added through IE's attachEvent (IE8 and below's non-W3C event emiting
+		//		added through IE's attachEvent (IE8 and below's non-W3C event emitting
 		//		doesn't support custom event types). It should work with all events registered
 		//		through dojo/on. Also note that the emit method does do any default
 		//		action, it only returns a value to indicate if the default action should take
-		//		place. For example, emiting a keypress event would not cause a character
+		//		place. For example, emitting a keypress event would not cause a character
 		//		to appear in a textbox.
 		// example:
 		//		To fire our own click event
-		//	|	on.emit(dojo.byId("button"), "click", {
-		//	|		cancelable: true,
-		//	|		bubbles: true,
-		//	|		screenX: 33,
-		//	|		screenY: 44
-		//	|	});
+		//	|	require(["dojo/on", "dojo/dom"
+		//	|	], function(on, dom){
+		//	|		on.emit(dom.byId("button"), "click", {
+		//	|			cancelable: true,
+		//	|			bubbles: true,
+		//	|			screenX: 33,
+		//	|			screenY: 44
+		//	|		});
 		//		We can also fire our own custom events:
-		//	|	on.emit(dojo.byId("slider"), "slide", {
-		//	|		cancelable: true,
-		//	|		bubbles: true,
-		//	|		direction: "left-to-right"
+		//	|		on.emit(dom.byId("slider"), "slide", {
+		//	|			cancelable: true,
+		//	|			bubbles: true,
+		//	|			direction: "left-to-right"
+		//	|		});
 		//	|	});
 		var args = slice.call(arguments, 2);
 		var method = "on" + type;
@@ -276,7 +304,7 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 		}while(event && event.bubbles && (target = target.parentNode));
 		return event && event.cancelable && event; // if it is still true (was cancelable and was cancelled), return the event to indicate default action should happen
 	};
-	var captures = {};
+	var captures = has("event-focusin") ? {} : {focusin: "focus", focusout: "blur"};
 	if(!has("event-stopimmediatepropagation")){
 		var stopImmediatePropagation =function(){
 			this.immediatelyStopped = true;
@@ -292,19 +320,10 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 		}
 	} 
 	if(has("dom-addeventlistener")){
-		// normalize focusin and focusout
-		captures = {
-			focusin: "focus",
-			focusout: "blur"
-		};
-		if(has("opera")){
-			captures.keydown = "keypress"; // this one needs to be transformed because Opera doesn't support repeating keys on keydown (and keypress works because it incorrectly fires on all keydown events)
-		}
-
-		// emiter that works with native event handling
+		// emitter that works with native event handling
 		on.emit = function(target, type, event){
 			if(target.dispatchEvent && document.createEvent){
-				// use the native event emiting mechanism if it is available on the target object
+				// use the native event emitting mechanism if it is available on the target object
 				// create a generic event				
 				// we could create branch into the different types of event constructors, but 
 				// that would be a lot of extra code, with little benefit that I can see, seems 
@@ -314,7 +333,6 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 				nativeEvent.initEvent(type, !!event.bubbles, !!event.cancelable);
 				// and copy all our properties over
 				for(var i in event){
-					var value = event[i];
 					if(!(i in nativeEvent)){
 						nativeEvent[i] = event[i];
 					}
@@ -338,9 +356,15 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 				evt = w.event;
 			}
 			if(!evt){return evt;}
-			if(lastEvent && evt.type == lastEvent.type){
-				// should be same event, reuse event object (so it can be augmented)
-				evt = lastEvent;
+			try{
+				if(lastEvent && evt.type == lastEvent.type  && evt.srcElement == lastEvent.target){
+					// should be same event, reuse event object (so it can be augmented);
+					// accessing evt.srcElement rather than evt.target since evt.target not set on IE until fixup below
+					evt = lastEvent;
+				}
+			}catch(e){
+				// will occur on IE on lastEvent.type reference if lastEvent points to a previous event that already
+				// finished bubbling, but the setTimeout() to clear lastEvent hasn't fired yet
 			}
 			if(!evt.target){ // check to see if it has been fixed yet
 				evt.target = evt.srcElement;
@@ -409,19 +433,19 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 				if(typeof _dojoIEListeners_ == "undefined"){
 					_dojoIEListeners_ = [];
 				}
-				var emiter = target[type];
-				if(!emiter || !emiter.listeners){
-					var oldListener = emiter;
-					emiter = Function('event', 'var callee = arguments.callee; for(var i = 0; i<callee.listeners.length; i++){var listener = _dojoIEListeners_[callee.listeners[i]]; if(listener){listener.call(this,event);}}');
-					emiter.listeners = [];
-					target[type] = emiter;
-					emiter.global = this;
+				var emitter = target[type];
+				if(!emitter || !emitter.listeners){
+					var oldListener = emitter;
+					emitter = Function('event', 'var callee = arguments.callee; for(var i = 0; i<callee.listeners.length; i++){var listener = _dojoIEListeners_[callee.listeners[i]]; if(listener){listener.call(this,event);}}');
+					emitter.listeners = [];
+					target[type] = emitter;
+					emitter.global = this;
 					if(oldListener){
-						emiter.listeners.push(_dojoIEListeners_.push(oldListener) - 1);
+						emitter.listeners.push(_dojoIEListeners_.push(oldListener) - 1);
 					}
 				}
 				var handle;
-				emiter.listeners.push(handle = (emiter.global._dojoIEListeners_.push(listener) - 1));
+				emitter.listeners.push(handle = (emitter.global._dojoIEListeners_.push(listener) - 1));
 				return new IESignal(handle);
 			}
 			return aspect.after(target, type, listener, true);
@@ -453,6 +477,7 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 			}
 			this.defaultPrevented = true;
 			this.returnValue = false;
+			this.modified = true; // mark it as modified  (for defaultPrevented flag) so the event will be cached in IE
 		};
 	}
 	if(has("touch")){ 
@@ -462,7 +487,7 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 			return function(originalEvent){ 
 				//Event normalization(for ontouchxxx and resize): 
 				//1.incorrect e.pageX|pageY in iOS 
-				//2.there are no "e.rotation", "e.scale" and "onorientationchange" in Andriod
+				//2.there are no "e.rotation", "e.scale" and "onorientationchange" in Android
 				//3.More TBD e.g. force | screenX | screenX | clientX | clientY | radiusX | radiusY
 
 				// see if it has already been corrected
@@ -474,8 +499,17 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 					}catch(e){} 
 					if(originalEvent.type){
 						// deleting properties doesn't work (older iOS), have to use delegation
-						Event.prototype = originalEvent;
-						var event = new Event;
+						if(has('mozilla')){
+							// Firefox doesn't like delegated properties, so we have to copy
+							var event = {};
+							for(var name in originalEvent){
+								event[name] = originalEvent[name];
+							}
+						}else{
+							// old iOS branch
+							Event.prototype = originalEvent;
+							var event = new Event;
+						}
 						// have to delegate methods to make them work
 						event.preventDefault = function(){
 							originalEvent.preventDefault();
@@ -491,7 +525,7 @@ define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./
 					originalEvent.corrected = event;
 					if(type == 'resize'){
 						if(windowOrientation == window.orientation){ 
-							return null;//double tap causes an unexpected 'resize' in Andriod 
+							return null;//double tap causes an unexpected 'resize' in Android
 						} 
 						windowOrientation = window.orientation;
 						event.type = "orientationchange"; 

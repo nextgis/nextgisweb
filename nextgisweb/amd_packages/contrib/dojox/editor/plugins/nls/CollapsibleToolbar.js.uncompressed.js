@@ -8,6 +8,7 @@ define("dojox/editor/plugins/nls/CollapsibleToolbar", { root:
 ,
 "zh": true,
 "zh-tw": true,
+"uk": true,
 "tr": true,
 "th": true,
 "sv": true,
@@ -35,5 +36,6 @@ define("dojox/editor/plugins/nls/CollapsibleToolbar", { root:
 "da": true,
 "cs": true,
 "ca": true,
+"bg": true,
 "ar": true
 });

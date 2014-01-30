@@ -3,9 +3,10 @@ define("dijit/_editor/plugins/ToggleDir", [
 	"dojo/dom-style", // domStyle.getComputedStyle
 	"dojo/_base/kernel", // kernel.experimental
 	"dojo/_base/lang", // lang.hitch
+	"dojo/on",
 	"../_Plugin",
 	"../../form/ToggleButton"
-], function(declare, domStyle, kernel, lang, _Plugin, ToggleButton){
+], function(declare, domStyle, kernel, lang, on, _Plugin, ToggleButton){
 
 	// module:
 	//		dijit/_editor/plugins/ToggleDir
@@ -37,7 +38,7 @@ define("dijit/_editor/plugins/ToggleDir", [
 				editDoc = editDoc.getElementsByTagName("body")[0];
 				var isLtr = domStyle.getComputedStyle(editDoc).direction == "ltr";
 				this.button.set("checked", !isLtr);
-				this.connect(this.button, "onChange", "_setRtl");
+				this.own(this.button.on("change", lang.hitch(this, "_setRtl")));
 			}));
 		},
 

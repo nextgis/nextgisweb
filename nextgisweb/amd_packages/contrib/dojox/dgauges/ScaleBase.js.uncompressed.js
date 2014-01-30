@@ -169,6 +169,9 @@ define("dojox/dgauges/ScaleBase", ["dojo/_base/lang", "dojo/_base/declare", "doj
 				delete this._indicatorsIndex[name];
 				delete this._indicatorsRenderers[name];
 			}
+			if(this._gauge){
+				this._gauge._resetMainIndicator();
+			}
 			this.invalidateRendering();
 			return indicator;
 		},
@@ -233,3 +236,4 @@ define("dojox/dgauges/ScaleBase", ["dojo/_base/lang", "dojo/_base/declare", "doj
 		}
 	});
 });
+

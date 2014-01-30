@@ -4,10 +4,10 @@ define("dojox/calendar/ColumnViewSecondarySheet", ["./MatrixView", "dojo/text!./
 	"dojo/_base/html", "dojo/_base/declare", "dojo/_base/event", "dojo/_base/lang", 
 	"dojo/_base/sniff", "dojo/dom", "dojo/dom-class", "dojo/dom-geometry", "dojo/dom-construct", 
 	"dojo/date", "dojo/date/locale", "dojo/query", "dojox/html/metrics", "dojo/_base/fx", "dojo/on", 
-	"dojo/i18n", "dojo/window"],
+	"dojo/window"],
 	
 	function(MatrixView, template, html, declare, event, lang, has, dom, domClass, domGeometry, domConstruct, 
-		date, locale, query, metrics, fx, on, i18n, win){
+		date, locale, query, metrics, fx, on, win){
 	
 	return declare("dojox.calendar.ColumnViewSecondarySheet", MatrixView, {
 		

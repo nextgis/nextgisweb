@@ -2,16 +2,13 @@ define("dojox/editor/plugins/AutoUrlLink", [
 	"dojo",
 	"dijit",
 	"dojox",
-	"dijit/_editor/range",
-	"dijit/_editor/selection",
 	"dijit/_editor/_Plugin",
 	"dijit/form/Button",
-	"dojo/_base/connect",
 	"dojo/_base/declare",
 	"dojo/string"
-], function(dojo, dijit, dojox, range, selection, _Plugin) {
+], function(dojo, dijit, dojox, _Plugin) {
 
-dojo.declare("dojox.editor.plugins.AutoUrlLink", [_Plugin], {
+var AutoUrlLink = dojo.declare("dojox.editor.plugins.AutoUrlLink", [_Plugin], {
 	// summary:
 	//		This plugin can recognize a URL like string
 	//		(such as http://www.website.com) and turn it into
@@ -226,10 +223,10 @@ dojo.subscribe(dijit._scopeName + ".Editor.getPlugin",null,function(o){
 	if(o.plugin){ return; }
 	var name = o.args.name.toLowerCase();
 	if(name ===  "autourllink"){
-		o.plugin = new dojox.editor.plugins.AutoUrlLink();
+		o.plugin = new AutoUrlLink();
 	}
 });
 
-return dojox.editor.plugins.AutoUrlLink;
+return AutoUrlLink;
 
 });

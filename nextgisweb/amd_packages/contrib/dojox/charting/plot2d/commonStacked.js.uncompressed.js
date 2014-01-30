@@ -13,12 +13,12 @@ define("dojox/charting/plot2d/commonStacked", [
 					var x, y;
 					if(run.data[j] !== null){
 						if(typeof run.data[j] == "number" || !run.data[j].hasOwnProperty("x")){
-							y = commonStacked.getIndexValue(series, i, j);
+							y = commonStacked.getIndexValue(series, i, j)[0];
 							x = j+1;
 						}else{
 							x = run.data[j].x;
 							if(x !== null){
-								y = commonStacked.getValue(series, i, x);
+								y = commonStacked.getValue(series, i, x)[0];
 								y = y != null && y.y ? y.y:null; 
 							}
 						}
@@ -26,28 +26,28 @@ define("dojox/charting/plot2d/commonStacked", [
 						stats.hmax = Math.max(stats.hmax, x);
 						stats.vmin = Math.min(stats.vmin, y);
 						stats.vmax = Math.max(stats.vmax, y);
-					
 					}
 				}
 			}
 			return stats;
 		},
 		getIndexValue: function(series, i, index){
-			var value = 0, v, j;
+			var value = 0, v, j, pvalue;
 			for(j = 0; j <= i; ++j){
+				pvalue = value;
 				v = series[j].data[index];
 				if(v != null){
 					if(isNaN(v)){ v = v.y || 0; }
 					value += v;
 				}
 			}
-			return value;
+			return [value , pvalue];
 		},
-		
 		getValue: function(series, i, x){
-			var value = null, j, z;
+			var value = null, j, z, v, pvalue;
 			for(j = 0; j <= i; ++j){
 				for(z = 0; z < series[j].data.length; z++){
+					pvalue = value;
 					v = series[j].data[z];
 					if(v !== null){
 						if(v.x == x){
@@ -65,9 +65,7 @@ define("dojox/charting/plot2d/commonStacked", [
 					}
 				}
 			}
-			return value;
+			return [value, pvalue];
 		}
-
-		
 	});
 });

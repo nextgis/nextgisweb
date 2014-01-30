@@ -1,7 +1,7 @@
-define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", 
+define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has", 
 		"./CartesianBase", "./_PlotEvents", "./common", "dojox/lang/functional", "dojox/lang/functional/reversed",
 		"dojox/lang/utils", "dojox/gfx/fx"], 
-	function(lang, declare, arr, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
+	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
 
 	var purgeGroup = dfr.lambda("item.purgeGroup()");
 
@@ -10,8 +10,6 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 		//		A plot representing bubbles.  Note that data for Bubbles requires 3 parameters,
 		//		in the form of:  { x, y, size }, where size determines the size of the bubble.
 		defaultParams: {
-			hAxis: "x",		// use a horizontal axis named "x"
-			vAxis: "y",		// use a vertical axis named "y"
 			animate: null   // animate bars into place
 		},
 		optionalParams: {
@@ -20,9 +18,11 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 			outline:	{},
 			shadow:		{},
 			fill:		{},
+			filter:     {},
 			styleFunc:	null,
 			font:		"",
-			fontColor:	""
+			fontColor:	"",
+			labelFunc: null
 		},
 
 		constructor: function(chart, kwArgs){
@@ -32,12 +32,14 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 			//		The chart this plot belongs to.
 			// kwArgs: dojox.charting.plot2d.__DefaultCtorArgs?
 			//		Optional keyword arguments object to help define plot parameters.
-			this.opt = lang.clone(this.defaultParams);
+			this.opt = lang.clone(lang.mixin(this.opt, this.defaultParams));
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
-			this.series = [];
-			this.hAxis = this.opt.hAxis;
-			this.vAxis = this.opt.vAxis;
+			if(!this.opt.labelFunc){
+				this.opt.labelFunc = function(value, fixed, precision){
+					return this._getLabel(value.size, fixed, precision);
+				};
+			}
 			this.animate = this.opt.animate;
 		},
 
@@ -51,6 +53,7 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 			//		An object of the form { l, r, t, b}.
 			// returns: dojox/charting/plot2d/Bubble
 			//		A reference to this plot for functional chaining.
+			var s;
 			if(this.zoom && !this.isDataDirty()){
 				return this.performZoom(dim, offsets);
 			}
@@ -60,7 +63,7 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 				arr.forEach(this.series, purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
-				var s = this.group;
+				s = this.getGroup();
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 
@@ -88,8 +91,9 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 					continue;
 				}
 
-				var theme = t.next("circle", [this.opt, run]), s = run.group,
-					points = arr.map(run.data, function(v, i){
+				s = run.group;
+				var theme = t.next("circle", [this.opt, run]),
+					points = arr.map(run.data, function(v){
 						return v ? {
 							x: ht(v.x) + offsets.l,
 							y: dim.height - offsets.b - vt(v.y),
@@ -164,9 +168,13 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 						var shape = s.createCircle({
 							cx: item.x, cy: item.y, r: item.radius
 						}).setFill(specialFill).setStroke(finalTheme.series.stroke);
+						if(shape.setFilter && finalTheme.series.filter){
+							shape.setFilter(finalTheme.series.filter);
+						}
 						if(this.animate){
 							this._animateBubble(shape, dim.height - offsets.b, item.radius);
 						}
+						this.createLabel(s, run.data[i], rect, finalTheme);
 						return shape;
 					}
 					return null;
@@ -206,6 +214,11 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 				run.dirty = false;
 			}
 			this.dirty = false;
+			// chart mirroring starts
+			if(has("dojo-bidi")){
+				this._checkOrientation(this.group, dim, offsets);
+			}
+			// chart mirroring ends
 			return this;	//	dojox/charting/plot2d/Bubble
 		},
 		_animateBubble: function(shape, offset, size){

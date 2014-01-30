@@ -1,6 +1,6 @@
-define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./CartesianBase", "./_PlotEvents", "./common",
+define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
 		"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"], 
-	function(lang, arr, declare, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
 
 	var purgeGroup = dfr.lambda("item.purgeGroup()");
 
@@ -8,8 +8,6 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 		// summary:
 		//		The plot object representing a column chart (vertical bars).
 		defaultParams: {
-			hAxis: "x",		// use a horizontal axis named "x"
-			vAxis: "y",		// use a vertical axis named "y"
 			gap:	0,		// gap between columns in pixels
 			animate: null,  // animate bars into place
 			enableCache: false
@@ -22,6 +20,7 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 			outline:	{},
 			shadow:		{},
 			fill:		{},
+			filter:     {},
 			styleFunc:  null,
 			font:		"",
 			fontColor:	""
@@ -34,12 +33,9 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 			//		The chart this plot belongs to.
 			// kwArgs: dojox.charting.plot2d.__BarCtorArgs?
 			//		An optional keyword arguments object to help define the plot.
-			this.opt = lang.clone(this.defaultParams);
+			this.opt = lang.clone(lang.mixin(this.opt, this.defaultParams));
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
-			this.series = [];
-			this.hAxis = this.opt.hAxis;
-			this.vAxis = this.opt.vAxis;
 			this.animate = this.opt.animate;
 		},
 
@@ -82,8 +78,6 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 			if(this.zoom && !this.isDataDirty()){
 				return this.performZoom(dim, offsets);
 			}
-			// TODO do we need to call this? This is not done in Bars.js
-			this.getSeriesStats();
 			this.resetEvents();
 			this.dirty = this.isDirty();
 			var s;
@@ -91,7 +85,7 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 				arr.forEach(this.series, purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
-				s = this.group;
+				s = this.getGroup();
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 			var t = this.chart.theme,
@@ -163,6 +157,9 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 							var specialFill = this._plotFill(finalTheme.series.fill, dim, offsets);
 							specialFill = this._shapeFill(specialFill, rect);
 							var shape = this.createRect(run, s, rect).setFill(specialFill).setStroke(finalTheme.series.stroke);
+							if(shape.setFilter && finalTheme.series.filter){
+								shape.setFilter(finalTheme.series.filter);
+							}
 							run.dyn.fill   = shape.getFill();
 							run.dyn.stroke = shape.getStroke();
 							if(events){
@@ -172,12 +169,20 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 									run:     run,
 									shape:   shape,
 									shadow:  sshape,
-									x:       val.x + 0.5,
-									y:       val.y
+									cx:      val.x + 0.5,
+									cy:      val.y,
+									x:	     indexed?j:run.data[j].x,
+									y:	 	 indexed?run.data[j]:run.data[j].y
 								};
 								this._connectEvents(o);
 								eventSeries[j] = o;
 							}
+							// if val.py is here, this means we are stacking and we need to subtract previous
+							// value to get the high in which we will lay out the label
+							if(!isNaN(val.py) && val.py > baseline){
+								rect.height = vv - vt(val.py);
+							}
+							this.createLabel(s, value, rect, finalTheme);
 							if(this.animate){
 								this._animateColumn(shape, dim.height - offsets.b - baselineHeight, h);
 							}
@@ -188,6 +193,11 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 				run.dirty = false;
 			}
 			this.dirty = false;
+			// chart mirroring starts
+			if(has("dojo-bidi")){
+				this._checkOrientation(this.group, dim, offsets);
+			}
+			// chart mirroring ends
 			return this;	//	dojox/charting/plot2d/Columns
 		},
 		getValue: function(value, j, seriesIndex, indexed){
@@ -203,13 +213,12 @@ define("dojox/charting/plot2d/Columns", ["dojo/_base/lang", "dojo/_base/array", 
 				y = value.y;
 				x = value.x - 1;
 			}
-			return {y:y, x:x};
+			return { x: x, y: y };
 		},
 		getBarProperties: function(){
 			var f = dc.calculateBarSize(this._hScaler.bounds.scale, this.opt);
 			return {gap: f.gap, width: f.size, thickness: 0};
 		},
-		
 		_animateColumn: function(shape, voffset, vsize){
 			if(vsize==0){
 				vsize = 1;

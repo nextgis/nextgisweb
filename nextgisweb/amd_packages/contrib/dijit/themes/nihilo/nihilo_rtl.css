@@ -1,4 +1,9 @@
 
+.dijitRtl .dijitOffScreen {
+	
+	left: auto !important;
+	right: -10000px !important;
+}
 .dijitRtl .dijitPlaceHolder {
 	left: auto;
 	right: 0;
@@ -31,6 +36,9 @@
 .dijitValidationTextBoxRtl .dijitValidationContainer,
 .dijitTextBoxRtl .dijitArrowButtonContainer {
 	float: left;
+}
+div.dijitNumberTextBoxRtl {
+	text-align: right;
 }
 .dijitCalendarRtl .dijitCalendarNextYear {
 	margin:0 0.55em 0 0;
@@ -105,6 +113,9 @@
 .dijitSelectRtl .dijitButtonContents {
 	border-style: none none none solid;
 	text-align: right;
+}
+.dijitTreeRtl .dijitTreeContainer {
+	float: right;	
 }
 .dijitRtl .dojoDndHorizontal .dojoDndItemBefore {
     border-width: 0 2px 0 0;
@@ -203,10 +214,7 @@
 	
 	background-image: url("images/spriteTree_rtl.gif");
 }
-.dijitRtl .nihilo .dijitTitlePane .dijitClosed .dijitArrowNode {
-	background-position: 0 top;
-}
-.dj_ie6-rtl .nihilo .dijitTitlePane .dijitClosed .dijitArrowNode {
+.nihilo .dijitTitlePaneRtl .dijitClosed .dijitArrowNode, .nihilo .dijitFieldsetRtl .dijitFieldsetTitleClosed .dijitArrowNode {
 	background-position: 0 top;
 }
 .dijitRtl .nihilo .dijitCalendarDecrease {
@@ -222,6 +230,10 @@
 .dijitRtl .nihilo .dijitDialogTitleBar .dijitDialogCloseIcon {
 	right: auto;
 	left: 5px;
+}
+.nihilo .dijitProgressBarRtl .dijitProgressBarFull {
+	border-left-width: 1px;
+	border-right: 0px;
 }
 .dijitRtl .nihilo .dijitMenuItem .dijitMenuItemIcon {
 	padding-left: 3px;

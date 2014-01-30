@@ -9,6 +9,7 @@ define("dojox/atom/widget/nls/PeopleEditor", { root:
 ,
 "ar": true,
 "az": true,
+"bg": true,
 "ca": true,
 "cs": true,
 "da": true,
@@ -36,6 +37,7 @@ define("dojox/atom/widget/nls/PeopleEditor", { root:
 "sv": true,
 "th": true,
 "tr": true,
+"uk": true,
 "zh": true,
 "zh-tw": true
 });

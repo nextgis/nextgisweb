@@ -8,6 +8,7 @@ define("dojox/form/nls/PasswordValidator", { root:
 ,
 "ar": true,
 "az": true,
+"bg": true,
 "ca": true,
 "cs": true,
 "da": true,
@@ -35,6 +36,7 @@ define("dojox/form/nls/PasswordValidator", { root:
 "sv": true,
 "th": true,
 "tr": true,
+"uk": true,
 "zh": true,
 "zh-tw": true
 });

@@ -1,38 +1,35 @@
 define(
 "dojo/cldr/nls/pt/hebrew", //begin v1.x content
 {
-	"months-format-abbr": [
-		"Tishri",
-		"Heshvan",
-		"Kislev",
-		"Tevet",
-		"Shevat",
-		"Adar I",
-		"Adar",
-		"Nisan",
-		"Iyar",
-		"Sivan",
-		"Tamuz",
-		"Av",
-		"Elul"
+	"field-dayperiod": "Período do dia",
+	"dateFormatItem-yyyyMMMEd": "E, d 'de' MMM 'de' y G",
+	"months-standAlone-abbr-leap": "Adar II",
+	"field-minute": "Minuto",
+	"dateFormatItem-MMMEd": "E, d 'de' MMM",
+	"field-day-relative+-1": "Ontem",
+	"field-weekday": "Dia da semana",
+	"field-day-relative+-2": "Anteontem",
+	"days-standAlone-wide": [
+		"domingo",
+		"segunda-feira",
+		"terça-feira",
+		"quarta-feira",
+		"quinta-feira",
+		"sexta-feira",
+		"sábado"
 	],
+	"field-era": "Era",
+	"dateFormatItem-Gy": "y G",
+	"field-hour": "Hora",
 	"months-format-abbr-leap": "Adar II",
-	"months-format-wide": [
-		"Tishri",
-		"Heshvan",
-		"Kislev",
-		"Tevet",
-		"Shevat",
-		"Adar I",
-		"Adar",
-		"Nisan",
-		"Iyar",
-		"Sivan",
-		"Tamuz",
-		"Av",
-		"Elul"
+	"quarters-standAlone-abbr": [
+		"T1",
+		"T2",
+		"T3",
+		"T4"
 	],
-	"months-format-wide-leap": "Adar II",
+	"dateFormatItem-y": "y G",
+	"dateFormatItem-yyyy": "y G",
 	"months-standAlone-abbr": [
 		"Tishri",
 		"Heshvan",
@@ -48,7 +45,36 @@ define(
 		"Av",
 		"Elul"
 	],
-	"months-standAlone-abbr-leap": "Adar II",
+	"dateFormatItem-Ed": "E, d",
+	"field-day-relative+0": "Hoje",
+	"field-day-relative+1": "Amanhã",
+	"days-standAlone-narrow": [
+		"D",
+		"S",
+		"T",
+		"Q",
+		"Q",
+		"S",
+		"S"
+	],
+	"field-day-relative+2": "Depois de amanhã",
+	"dateFormatItem-GyMMMd": "d 'de' MMM 'de' y G",
+	"dateFormat-long": "d 'de' MMMM 'de' y G",
+	"field-zone": "Fuso",
+	"field-week-relative+-1": "Semana passada",
+	"dateFormat-medium": "dd/MM/y G",
+	"dayPeriods-format-narrow-pm": "p",
+	"field-year-relative+0": "Este ano",
+	"field-year-relative+1": "Próximo ano",
+	"quarters-standAlone-wide": [
+		"1º trimestre",
+		"2º trimestre",
+		"3º trimestre",
+		"4º trimestre"
+	],
+	"field-year-relative+-1": "Ano passado",
+	"field-year": "Ano",
+	"dayPeriods-format-narrow-am": "a",
 	"months-standAlone-wide": [
 		"Tishri",
 		"Heshvan",
@@ -64,7 +90,37 @@ define(
 		"Av",
 		"Elul"
 	],
-	"months-standAlone-wide-leap": "Adar II",
+	"field-week": "Semana",
+	"dateFormatItem-yyyyMd": "dd/MM/y GGGGG",
+	"dateFormatItem-yyyyMMMd": "d 'de' MMM 'de' y G",
+	"dateFormatItem-yyyyMEd": "E, dd/MM/y GGGGG",
+	"dateFormatItem-MMMd": "d 'de' MMM",
+	"field-week-relative+0": "Esta semana",
+	"field-week-relative+1": "Próxima semana",
+	"months-format-abbr": [
+		"Tishri",
+		"Heshvan",
+		"Kislev",
+		"Tevet",
+		"Shevat",
+		"Adar I",
+		"Adar",
+		"Nisan",
+		"Iyar",
+		"Sivan",
+		"Tamuz",
+		"Av",
+		"Elul"
+	],
+	"field-month-relative+0": "Este mês",
+	"field-month": "Mês",
+	"field-month-relative+1": "Próximo mês",
+	"quarters-format-abbr": [
+		"T1",
+		"T2",
+		"T3",
+		"T4"
+	],
 	"days-format-abbr": [
 		"dom",
 		"seg",
@@ -74,16 +130,7 @@ define(
 		"sex",
 		"sáb"
 	],
-	"days-format-wide": [
-		"domingo",
-		"segunda-feira",
-		"terça-feira",
-		"quarta-feira",
-		"quinta-feira",
-		"sexta-feira",
-		"sábado"
-	],
-	"days-standAlone-narrow": [
+	"days-format-narrow": [
 		"D",
 		"S",
 		"T",
@@ -92,46 +139,76 @@ define(
 		"S",
 		"S"
 	],
-	"quarters-format-abbr": [
-		"T1",
-		"T2",
-		"T3",
-		"T4"
+	"field-second": "Segundo",
+	"dateFormatItem-GyMMMEd": "E, d 'de' MMM 'de' y G",
+	"dateFormatItem-GyMMM": "MMM 'de' y G",
+	"field-day": "Dia",
+	"dateFormatItem-MEd": "E, dd/MM",
+	"days-standAlone-short": [
+		"dom",
+		"seg",
+		"ter",
+		"qua",
+		"qui",
+		"sex",
+		"sáb"
 	],
+	"days-standAlone-abbr": [
+		"dom",
+		"seg",
+		"ter",
+		"qua",
+		"qui",
+		"sex",
+		"sáb"
+	],
+	"months-standAlone-wide-leap": "Adar II",
+	"dateFormat-short": "dd/MM/yy GGGGG",
+	"dateFormatItem-yyyyM": "MM/y GGGGG",
+	"dateFormatItem-Md": "d/M",
+	"dateFormat-full": "EEEE, d 'de' MMMM 'de' y G",
+	"months-format-wide": [
+		"Tishri",
+		"Heshvan",
+		"Kislev",
+		"Tevet",
+		"Shevat",
+		"Adar I",
+		"Adar",
+		"Nisan",
+		"Iyar",
+		"Sivan",
+		"Tamuz",
+		"Av",
+		"Elul"
+	],
+	"days-format-short": [
+		"dom",
+		"seg",
+		"ter",
+		"qua",
+		"qui",
+		"sex",
+		"sáb"
+	],
+	"dateFormatItem-yyyyMMM": "MMM 'de' y G",
+	"months-format-wide-leap": "Adar II",
+	"field-month-relative+-1": "Mês passado",
 	"quarters-format-wide": [
 		"1º trimestre",
 		"2º trimestre",
 		"3º trimestre",
 		"4º trimestre"
 	],
-	"quarters-standAlone-wide": [
-		"1º trimestre",
-		"2º trimestre",
-		"3º trimestre",
-		"4º trimestre"
-	],
-	"dayPeriods-format-narrow-am": "a",
-	"dayPeriods-format-narrow-pm": "p",
-	"dateFormat-full": "EEEE, d 'de' MMMM 'de' y",
-	"dateFormat-long": "d 'de' MMMM 'de' y",
-	"dateFormat-medium": "dd/MM/yyyy",
-	"dateFormat-short": "dd/MM/yy",
-	"dateFormatItem-Ed": "E, d",
-	"dateFormatItem-Hm": "HH'h'mm",
-	"dateFormatItem-Md": "d/M",
-	"dateFormatItem-MEd": "E, dd/MM",
-	"dateFormatItem-MMMd": "d 'de' MMM",
-	"dateFormatItem-MMMEd": "E, d 'de' MMM",
-	"dateFormatItem-ms": "mm'min'ss's'",
-	"dateFormatItem-yM": "MM/yyyy",
-	"dateFormatItem-yMd": "dd/MM/yyyy",
-	"dateFormatItem-yMEd": "E, dd/MM/yyyy",
-	"dateFormatItem-yMMM": "MMM 'de' y",
-	"dateFormatItem-yMMMd": "d 'de' MMM 'de' y",
-	"dateFormatItem-yMMMEd": "E, d 'de' MMM 'de' y",
-	"dateFormatItem-yQ": "yyyy Q",
-	"timeFormat-full": "HH'h'mm'min'ss's' zzzz",
-	"timeFormat-long": "HH'h'mm'min'ss's' z"
+	"days-format-wide": [
+		"domingo",
+		"segunda-feira",
+		"terça-feira",
+		"quarta-feira",
+		"quinta-feira",
+		"sexta-feira",
+		"sábado"
+	]
 }
 //end v1.x content
 );

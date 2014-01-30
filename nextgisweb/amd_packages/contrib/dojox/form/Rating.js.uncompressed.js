@@ -36,7 +36,7 @@ define("dojox/form/Rating", [
 			//		Build the templateString. The number of stars is given by this.numStars,
 			//		which is normally an attribute to the widget node.
 
-			// The focusNode is normally used to store the value, i dont know if that is right here, but seems standard for _FormWidgets
+			// The hidden value node is attached as "focusNode" because tabIndex, id, etc. are getting mapped there.
 			var tpl = '<div dojoAttachPoint="domNode" class="dojoxRating dijitInline">' +
 				'<input type="hidden" value="0" dojoAttachPoint="focusNode" /><ul data-dojo-attach-point="list">${stars}</ul>' +
 				'</div>';
@@ -110,6 +110,7 @@ define("dojox/form/Rating", [
 		},
 
 		_setValueAttr: function(val){
+			this.focusNode.value = val;		// reflect the value in our hidden field, for form submission
 			this._set("value", val);
 			this._renderStars(val);
 			this.onChange(val); // Do I really have to call this by hand? :-(

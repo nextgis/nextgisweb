@@ -6,13 +6,15 @@ define("dojox/mobile/_ComboBoxMenu", [
 	"dijit/form/_ComboBoxMenuMixin",
 	"dijit/_WidgetBase",
 	"./_ListTouchMixin",
-	"./scrollable"
+	"./scrollable",
+	"dojo/has",
+	"dojo/has!dojo-bidi?dojox/mobile/bidi/_ComboBoxMenu"
 ],
-	function(dojo, declare, domClass, domConstruct, ComboBoxMenuMixin, WidgetBase, ListTouchMixin, Scrollable){
+	function(dojo, declare, domClass, domConstruct, ComboBoxMenuMixin, WidgetBase, ListTouchMixin, Scrollable, has, BidiComboBoxMenu){
 	// module:
 	//		dojox/mobile/_ComboBoxMenu
 
-	return declare("dojox.mobile._ComboBoxMenu", [WidgetBase, ListTouchMixin, ComboBoxMenuMixin], {
+	var _ComboBoxMenu = declare(has("dojo-bidi") ? "dojox.mobile._NonBidiComboBoxMenu" : "dojox.mobile._ComboBoxMenu", [WidgetBase, ListTouchMixin, ComboBoxMenuMixin], {
 		// summary:
 		//		Focus-less menu for internal use in dojox/mobile/ComboBox.
 		//		Abstract methods that must be defined externally:
@@ -85,4 +87,5 @@ define("dojox/mobile/_ComboBoxMenu", [
 			this.scrollable.resize = function(){}; // resize changes the height rudely
 		}
 	});
+	return has("dojo-bidi") ? declare("dojox.mobile._ComboBoxMenu", [_ComboBoxMenu, BidiComboBoxMenu]) : _ComboBoxMenu;
 });

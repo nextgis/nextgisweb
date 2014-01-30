@@ -1,20 +1,28 @@
 define(
 "dojo/cldr/nls/hu/islamic", //begin v1.x content
 {
-	"months-format-narrow": [
-		"1",
-		"2",
-		"3",
-		"4",
-		"5",
-		"6",
-		"7",
-		"8",
-		"9",
-		"10",
-		"11",
-		"12"
+	"days-standAlone-short": [
+		"V",
+		"H",
+		"K",
+		"Sze",
+		"Cs",
+		"P",
+		"Szo"
 	],
+	"quarters-standAlone-narrow": [
+		"1.",
+		"2.",
+		"3.",
+		"4."
+	],
+	"field-weekday": "hét napja",
+	"dateFormatItem-GyMMMEd": "G y. MMM d., E",
+	"dateFormatItem-MMMEd": "MMM d., E",
+	"eraNarrow": [
+		"MF"
+	],
+	"dateFormat-long": "G y. MMMM d.",
 	"months-format-wide": [
 		"Moharrem",
 		"Safar",
@@ -29,20 +37,12 @@ define(
 		"Dsül kade",
 		"Dsül hedse"
 	],
-	"months-standAlone-abbr": [
-		"Muh.",
-		"Saf.",
-		"Rab. I",
-		"Rab. II",
-		"Jum. I",
-		"Jum. II",
-		"Raj.",
-		"Sha.",
-		"Ram.",
-		"Shaw.",
-		"Dsül-Q.",
-		"Dsül-H."
-	],
+	"dateFormatItem-yyyyQQQ": "G y. QQQ",
+	"dayPeriods-format-wide-pm": "du.",
+	"dateFormat-full": "G y. MMMM d., EEEE",
+	"dateFormatItem-yyyyMEd": "G y.MM.dd., E",
+	"dateFormatItem-Md": "M. d.",
+	"field-era": "éra",
 	"months-standAlone-wide": [
 		"Moharrem",
 		"Safar",
@@ -57,122 +57,51 @@ define(
 		"Dsül kade",
 		"Dsül hedse"
 	],
-	"eraAbbr": [
-		"MF"
-	],
-	"dateFormat-full": "y. MMMM d., EEEE",
-	"dateFormat-long": "y. MMMM d.",
-	"dateFormat-medium": "yyyy.MM.dd.",
-	"dateFormat-short": "yyyy.MM.dd.",
-	"dateFormatItem-d": "d",
-	"dateFormatItem-Ed": "d E",
-	"dateFormatItem-h": "a h",
-	"dateFormatItem-H": "HH",
-	"dateFormatItem-hm": "a h:mm",
-	"dateFormatItem-Hm": "H:mm",
-	"dateFormatItem-hms": "a h:mm:ss",
-	"dateFormatItem-Hms": "H:mm:ss",
-	"dateFormatItem-M": "L",
-	"dateFormatItem-Md": "M. d.",
-	"dateFormatItem-MEd": "M. d., E",
-	"dateFormatItem-MMMd": "MMM d.",
-	"dateFormatItem-MMMEd": "MMM. d., E",
-	"dateFormatItem-MMMMd": "MMMM d.",
-	"dateFormatItem-ms": "mm:ss",
-	"dateFormatItem-y": "y",
-	"dateFormatItem-yM": "y-M",
-	"dateFormatItem-yMEd": "yyyy.MM.dd., E",
-	"dateFormatItem-yMMM": "y MMM",
-	"dateFormatItem-yMMMEd": "y. MMM d., E",
-	"dateFormatItem-yQ": "y Q",
-	"dateFormatItem-yQQQ": "y QQQ",
-	"months-format-abbr": [
-		"Moharrem",
-		"Safar",
-		"Rébi el avvel",
-		"Rébi el accher",
-		"Dsemádi el avvel",
-		"Dsemádi el accher",
-		"Redseb",
-		"Sabán",
-		"Ramadán",
-		"Sevvál",
-		"Dsül kade",
-		"Dsül hedse"
-	],
-	"eraNames": [
-		"MF"
-	],
-	"eraNarrow": [
-		"MF"
-	],
-	"days-format-abbr": [
-		"V",
-		"H",
-		"K",
-		"Sze",
-		"Cs",
-		"P",
-		"Szo"
-	],
-	"days-format-narrow": [
-		"V",
-		"H",
-		"K",
-		"Sz",
-		"Cs",
-		"P",
-		"Sz"
-	],
-	"days-format-wide": [
-		"vasárnap",
-		"hétfő",
-		"kedd",
-		"szerda",
-		"csütörtök",
-		"péntek",
-		"szombat"
-	],
-	"days-standAlone-abbr": [
-		"V",
-		"H",
-		"K",
-		"Sze",
-		"Cs",
-		"P",
-		"Szo"
-	],
-	"days-standAlone-narrow": [
-		"V",
-		"H",
-		"K",
-		"Sz",
-		"Cs",
-		"P",
-		"Sz"
-	],
-	"days-standAlone-wide": [
-		"vasárnap",
-		"hétfő",
-		"kedd",
-		"szerda",
-		"csütörtök",
-		"péntek",
-		"szombat"
-	],
-	"quarters-format-abbr": [
-		"N1",
-		"N2",
-		"N3",
-		"N4"
-	],
+	"timeFormat-short": "H:mm",
 	"quarters-format-wide": [
 		"I. negyedév",
 		"II. negyedév",
 		"III. negyedév",
 		"IV. negyedév"
 	],
-	"quarters-standAlone-abbr": [
+	"timeFormat-long": "H:mm:ss z",
+	"field-year": "év",
+	"field-hour": "óra",
+	"months-format-abbr": [
+		"Moh.",
+		"Saf.",
+		"Rébi I",
+		"Rébi II",
+		"Dsem. I",
+		"Dsem. II",
+		"Red.",
+		"Sab.",
+		"Ram.",
+		"Sev.",
+		"Dsül k.",
+		"Dsül h."
+	],
+	"timeFormat-full": "H:mm:ss zzzz",
+	"field-day-relative+0": "ma",
+	"field-day-relative+1": "holnap",
+	"dateFormatItem-GyMMMd": "G y. MMM d.",
+	"field-day-relative+2": "holnapután",
+	"dateFormatItem-H": "H",
+	"months-standAlone-abbr": [
+		"Moh.",
+		"Saf.",
+		"Rébi I",
+		"Rébi II",
+		"Dsem. I",
+		"Dsem. II",
+		"Red.",
+		"Sab.",
+		"Ram.",
+		"Sev.",
+		"Dsül k.",
+		"Dsül h."
+	],
+	"quarters-format-abbr": [
 		"N1",
 		"N2",
 		"N3",
@@ -184,16 +113,125 @@ define(
 		"3. negyedév",
 		"4. negyedév"
 	],
-	"dayPeriods-format-narrow-am": "de.",
-	"dayPeriods-format-narrow-pm": "du.",
-	"dayPeriods-format-wide-am": "de.",
-	"dayPeriods-format-wide-pm": "du.",
-	"dateFormatItem-yMd": "yyyy.MM.dd.",
-	"dateFormatItem-yMMMd": "y. MMM d.",
-	"timeFormat-full": "H:mm:ss zzzz",
-	"timeFormat-long": "H:mm:ss z",
+	"dateFormatItem-yyyyMMMEd": "G y. MMM d., E",
+	"days-standAlone-wide": [
+		"vasárnap",
+		"hétfő",
+		"kedd",
+		"szerda",
+		"csütörtök",
+		"péntek",
+		"szombat"
+	],
+	"dateFormatItem-yyyyMMM": "G y. MMM",
+	"dateFormatItem-yyyyMMMd": "G y. MMM d.",
 	"timeFormat-medium": "H:mm:ss",
-	"timeFormat-short": "H:mm"
+	"dateFormatItem-Hm": "H:mm",
+	"quarters-standAlone-abbr": [
+		"N1",
+		"N2",
+		"N3",
+		"N4"
+	],
+	"eraAbbr": [
+		"MF"
+	],
+	"field-minute": "perc",
+	"field-dayperiod": "napszak",
+	"days-standAlone-abbr": [
+		"V",
+		"H",
+		"K",
+		"Sze",
+		"Cs",
+		"P",
+		"Szo"
+	],
+	"field-day-relative+-1": "tegnap",
+	"dateFormatItem-h": "a h",
+	"dayPeriods-format-narrow-am": "de.",
+	"field-day-relative+-2": "tegnapelőtt",
+	"dateFormatItem-MMMd": "MMM d.",
+	"dateFormatItem-MEd": "M. d., E",
+	"field-day": "nap",
+	"days-format-wide": [
+		"vasárnap",
+		"hétfő",
+		"kedd",
+		"szerda",
+		"csütörtök",
+		"péntek",
+		"szombat"
+	],
+	"field-zone": "időzóna",
+	"months-standAlone-narrow": [
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+		"10",
+		"11",
+		"12"
+	],
+	"field-year-relative+-1": "Előző év",
+	"field-month-relative+-1": "Előző hónap",
+	"dateFormatItem-hm": "a h:mm",
+	"days-format-abbr": [
+		"V",
+		"H",
+		"K",
+		"Sze",
+		"Cs",
+		"P",
+		"Szo"
+	],
+	"eraNames": [
+		"MF"
+	],
+	"days-format-narrow": [
+		"V",
+		"H",
+		"K",
+		"Sz",
+		"Cs",
+		"P",
+		"Sz"
+	],
+	"dateFormatItem-yyyyMd": "G y.MM.dd.",
+	"field-month": "hónap",
+	"days-standAlone-narrow": [
+		"V",
+		"H",
+		"K",
+		"Sz",
+		"Cs",
+		"P",
+		"Sz"
+	],
+	"dayPeriods-format-wide-am": "de.",
+	"dateFormat-short": "GGGGG y.MM.dd.",
+	"field-second": "másodperc",
+	"field-month-relative+0": "Ez a hónap",
+	"field-month-relative+1": "Következő hónap",
+	"dateFormatItem-Ed": "d., E",
+	"field-week": "hét",
+	"dateFormat-medium": "G y.MM.dd.",
+	"field-year-relative+0": "Ez az év",
+	"field-week-relative+-1": "Előző hét",
+	"dateFormatItem-yyyyM": "G y.M.",
+	"field-year-relative+1": "Következő év",
+	"dayPeriods-format-narrow-pm": "du.",
+	"dateFormatItem-yyyyQQQQ": "G y. QQQQ",
+	"dateFormatItem-Hms": "H:mm:ss",
+	"dateFormatItem-hms": "a h:mm:ss",
+	"dateFormatItem-GyMMM": "G y. MMM",
+	"field-week-relative+0": "Ez a hét",
+	"field-week-relative+1": "Következő hét"
 }
 //end v1.x content
 );

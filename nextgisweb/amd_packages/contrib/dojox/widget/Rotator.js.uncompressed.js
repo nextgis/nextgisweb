@@ -154,7 +154,7 @@ define("dojox/widget/Rotator", [
 			var pp = _t.panes = [];
 
 			// find and initialize the panes
-			query(">", node).forEach(function(n, i){
+			query("> *", node).forEach(function(n, i){
 				var q = { node: n, idx: i, params: lang.mixin({}, tp, eval("({ " + (domAttr.get(n, "transitionParams") || "") + " })")) },
 					r = q.trans = domAttr.get(n, "transition") || _t.transition;
 

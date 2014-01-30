@@ -1,8 +1,9 @@
-define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/sniff", "dojo/_base/declare",
+define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", "dojo/sniff", "dojo/_base/declare",
 	"dojo/_base/connect", "dojo/dom-geometry", "./Invisible",
-	"../scaler/common", "../scaler/linear", "./common", "dojox/gfx", "dojox/lang/utils", "dojox/lang/functional"],
-	function(lang, arr, has, declare, connect, domGeom, Invisible, scommon,
-			lin, acommon, g, du, df){
+	"../scaler/linear", "./common", "dojox/gfx", "dojox/lang/utils", "dojox/lang/functional",
+	"dojo/has!dojo-bidi?../bidi/axis2d/Default"],
+	function(lang, arr, has, declare, connect, domGeom, Invisible,
+			lin, acommon, g, du, df, BidiDefault){
 
 	/*=====
 	var __AxisCtorArgs = {
@@ -98,7 +99,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 
 	var centerAnchorLimit = 45;	// in degrees
 
-	return declare("dojox.charting.axis2d.Default", Invisible, {
+	var Default = declare(has("dojo-bidi")? "dojox.charting.axis2d.NonBidiDefault" : "dojox.charting.axis2d.Default", Invisible, {
 		// summary:
 		//		The default axis object used in dojox.charting.  See dojox.charting.Chart.addAxis for details.
 
@@ -383,9 +384,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 			if(!s){
 				return offsets;
 			}
-			var o = this.opt, a, b, c, d,
-				gl = scommon.getNumericLabel,
-				offset = 0, ma = s.major, mi = s.minor,
+			var o = this.opt,
 				ta = this.chart.theme.axis,
 				labelGap = this.chart.theme.axis.tick.labelGap,
 				// TODO: we use one font --- of major tick, we need to use major and minor fonts
@@ -441,7 +440,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 							}
 							break;
 					}
-					offsets[side] += labelGap + Math.max(taMajorTick.length, taMinorTick.length) + (o.title ? (tsize + taTitleGap) : 0);
+					offsets[side] += labelGap + Math.max(taMajorTick.length > 0?taMajorTick.length:0,
+														 taMinorTick.length > 0?taMinorTick.length:0) + (o.title ? (tsize + taTitleGap) : 0);
 				}else{
 					side = leftBottom ? "b" : "t";
 					switch(rotation){
@@ -473,7 +473,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 							}
 							break;
 					}
-					offsets[side] += labelGap + Math.max(taMajorTick.length, taMinorTick.length) + (o.title ? (tsize + taTitleGap) : 0);
+					offsets[side] += labelGap + Math.max(taMajorTick.length > 0?taMajorTick.length:0,
+														 taMinorTick.length > 0?taMinorTick.length:0) + (o.title ? (tsize + taTitleGap) : 0);
 				}
 			}
 			return offsets;	//	Object
@@ -502,7 +503,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 					);
 			}
 			var text;
-			if (this._textFreePool.length > 0){
+			if(this._textFreePool.length > 0){
 				text = this._textFreePool.pop();
 				text.setShape({x: x, y: y, text: textContent, align: align});
 				// For now all items share the same font, no need to re-set it
@@ -548,6 +549,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 			//		An object of the form { l, r, t, b }.
 			// returns: dojox/charting/axis2d/Default
 			//		The reference to the axis for functional chaining.
+			
+			var isRtl = this._isRtl();	// chart mirroring
 			if(!this.dirty || !this.scaler){
 				return this;	//	dojox/charting/axis2d/Default
 			}
@@ -567,7 +570,6 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 				taMinorTick = this.chart.theme.getTick("minor", o),
 				taMicroTick = this.chart.theme.getTick("micro", o),
 
-				tickSize = Math.max(taMajorTick.length, taMinorTick.length, taMicroTick.length),
 				taStroke = "stroke" in o ? o.stroke : ta.stroke,
 				size = taFont ? g.normalizedLength(g.splitFontString(taFont).size) : 0,
 				cosr = Math.abs(Math.cos(rotation * Math.PI / 180)),
@@ -585,7 +587,9 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 				start = {y: dim.height - offsets.b};
 				stop  = {y: offsets.t};
 				titlePos = {y: (dim.height - offsets.b + offsets.t)/2};
-				titleOffset = size * sinr + (cachedLabelW || 0) * cosr + labelGap + Math.max(taMajorTick.length, taMinorTick.length) + tsize + taTitleGap;
+				titleOffset = size * sinr + (cachedLabelW || 0) * cosr + labelGap + Math.max(taMajorTick.length > 0?taMajorTick.length:0,
+																		 					 taMinorTick.length > 0?taMinorTick.length:0) +
+					tsize + taTitleGap;
 				axisVector = {x: 0, y: -1};
 				labelOffset = {x: 0, y: 0};
 				tickVector = {x: 1, y: 0};
@@ -655,8 +659,10 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 				start = {x: offsets.l};
 				stop  = {x: dim.width - offsets.r};
 				titlePos = {x: (dim.width - offsets.r + offsets.l)/2};
-				titleOffset = size * cosr + (cachedLabelW || 0) * sinr + labelGap + Math.max(taMajorTick.length, taMinorTick.length) + tsize + taTitleGap;
-				axisVector = {x: 1, y: 0};
+				titleOffset = size * cosr + (cachedLabelW || 0) * sinr + labelGap + Math.max(taMajorTick.length > 0?taMajorTick.length:0,
+																		 					 taMinorTick.length > 0?taMinorTick.length:0) +
+					tsize + taTitleGap;
+				axisVector = {x: isRtl ? -1 : 1, y: 0}; 	// chart mirroring
 				labelOffset = {x: 0, y: 0};
 				tickVector = {x: 0, y: 1};
 				anchorOffset = {x: 0, y: labelGap};
@@ -774,7 +780,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 			var canLabel = this.opt.majorLabels;
 			arr.forEach(t.major, function(tick, i){
 				var offset = f(tick.value), elem,
-					x = start.x + axisVector.x * offset,
+					x = (isRtl ? stop.x : start.x) + axisVector.x * offset, // chart mirroring
 					y = start.y + axisVector.y * offset;
 				i += rel;
 				this.createLine(s, {
@@ -790,8 +796,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 					label = o.maxLabelSize ? this.getTextWithLimitLength(label.text, taFont, o.maxLabelSize, label.truncated) : label;
 					elem = this.createText(labelType,
 						s,
-						x + dx + anchorOffset.x + (rotation ? 0 : labelOffset.x),
-						y + dy + anchorOffset.y + (rotation ? 0 : labelOffset.y),
+						x + (taMajorTick.length > 0 ? dx : 0) + anchorOffset.x + (rotation ? 0 : labelOffset.x),
+						y + (taMajorTick.length > 0 ? dy : 0) + anchorOffset.y + (rotation ? 0 : labelOffset.y),
 						labelAlign,
 						label.text,
 						taFont,
@@ -803,8 +809,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 					// Fool label: 111111W (W for bidi character)
 					// truncated label: 11...
 					// in this case for auto textDir the dir will be "ltr" which is wrong.
-					if(this.chart.truncateBidi  && label.truncated){
-						this.chart.truncateBidi(elem, tick.label, labelType);
+					if(label.truncated){
+						this.chart.formatTruncatedLabel(elem, tick.label, labelType);
 					}
 					label.truncated && this.labelTooltip(elem, this.chart, tick.label, label.text, taFont, labelType);
 					if(labelType == "html"){
@@ -814,8 +820,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 							{dx: labelOffset.x, dy: labelOffset.y},
 							g.matrix.rotategAt(
 								rotation,
-								x + dx + anchorOffset.x,
-								y + dy + anchorOffset.y
+								x + (taMajorTick.length > 0 ? dx : 0) + anchorOffset.x,
+								y + (taMajorTick.length > 0 ? dy : 0) + anchorOffset.y
 							)
 						]);
 					}
@@ -827,8 +833,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 			canLabel = this.opt.minorLabels && c.minMinorStep <= c.minor.tick * c.bounds.scale;
 			arr.forEach(t.minor, function(tick){
 				var offset = f(tick.value), elem,
-					x = start.x + axisVector.x * offset,
-					y = start.y + axisVector.y * offset;
+					x = (isRtl ? stop.x : start.x)  + axisVector.x * offset,
+					y = start.y + axisVector.y * offset; // chart mirroring
 				this.createLine(s, {
 					x1: x, y1: y,
 					x2: x + dx,
@@ -842,8 +848,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 					label = o.maxLabelSize ? this.getTextWithLimitLength(label.text, taFont, o.maxLabelSize, label.truncated) : label;
 					elem = this.createText(labelType,
 						s,
-						x + dx + anchorOffset.x + (rotation ? 0 : labelOffset.x),
-						y + dy + anchorOffset.y + (rotation ? 0 : labelOffset.y),
+						x + (taMinorTick.length > 0 ? dx : 0) + anchorOffset.x + (rotation ? 0 : labelOffset.x),
+						y + (taMinorTick.length  > 0 ? dy : 0) + anchorOffset.y + (rotation ? 0 : labelOffset.y),
 						labelAlign,
 						label.text,
 						taFont,
@@ -855,8 +861,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 					// Fool label: 111111W (W for bidi character)
 					// truncated label: 11...
 					// in this case for auto textDir the dir will be "ltr" which is wrong.
-					if(this.chart.getTextDir && label.truncated){
-						this.chart.truncateBidi(elem, tick.label, labelType);
+					if(label.truncated){
+						this.chart.formatTruncatedLabel(elem, tick.label, labelType);
 					}
 					label.truncated && this.labelTooltip(elem, this.chart, tick.label, label.text, taFont, labelType);
 					if(labelType == "html"){
@@ -866,8 +872,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 							{dx: labelOffset.x, dy: labelOffset.y},
 							g.matrix.rotategAt(
 								rotation,
-								x + dx + anchorOffset.x,
-								y + dy + anchorOffset.y
+								x + (taMinorTick.length > 0 ? dx : 0) + anchorOffset.x,
+								y + (taMinorTick.length > 0 ? dy : 0) + anchorOffset.y
 							)
 						]);
 					}
@@ -877,7 +883,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 			dx = tickVector.x * taMicroTick.length;
 			dy = tickVector.y * taMicroTick.length;
 			arr.forEach(t.micro, function(tick){
-				var offset = f(tick.value), elem,
+				var offset = f(tick.value),
 					x = start.x + axisVector.x * offset,
 					y = start.y + axisVector.y * offset;
 					this.createLine(s, {
@@ -945,6 +951,10 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 					})
 				});
 			}
+		},
+		_isRtl: function(){
+			return false;
 		}
 	});
+	return has("dojo-bidi")? declare("dojox.charting.axis2d.Default", [Default, BidiDefault]) : Default;
 });

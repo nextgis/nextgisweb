@@ -15,7 +15,7 @@ define("dojox/widget/MultiSelectCalendar", [
 
 dojo.experimental("dojox.widget.MultiSelectCalendar");
 
-dojo.declare(
+var MultiSelectCalendar = dojo.declare(
 	"dojox.widget.MultiSelectCalendar",
 	[_Widget, _TemplatedMixin, _WidgetsInTemplateMixin, _CssStateMixin],
 	{
@@ -120,8 +120,8 @@ dojo.declare(
 						this.value[element] = 1;
 					}else{
 						//We have a slash somewhere in the string so this is an ISO date range
-						var dateA=new dojo.date.stamp.fromISOString(element.substr(0,10));
-						var dateB=new dojo.date.stamp.fromISOString(element.substr(11,10));
+						var dateA = dojo.date.stamp.fromISOString(element.substr(0,10));
+						var dateB = dojo.date.stamp.fromISOString(element.substr(11,10));
 						
 						this.toggleDate(dateA,[],[]);
 						if((dateA - dateB) > 0){
@@ -350,7 +350,7 @@ dojo.declare(
 
 			var dateObj = new this.dateClassObj(this.currentFocus);
 
-			this.monthDropDownButton.dropDown = new dojox.widget._MonthDropDown({
+			this.monthDropDownButton.dropDown = new MonthDropDown({
 				id: this.id + "_mdd",
 				onChange: dojo.hitch(this, "_onMonthSelect")
 			});
@@ -409,7 +409,7 @@ dojo.declare(
 			}
 
 			// set tabIndex=0 on new cell, and focus it (but only if Calendar itself is focused)
-			var newCell = dojo.query("[dijitDateValue=" + date.valueOf() + "]", this.domNode)[0];
+			var newCell = dojo.query("[dijitDateValue='" + date.valueOf() + "']", this.domNode)[0];
 			newCell.setAttribute("tabIndex", this.tabIndex);
 			if(this._focused || forceFocus){
 				newCell.focus();
@@ -945,7 +945,8 @@ dojo.declare(
 );
 
 //FIXME: can we use dijit.Calendar._MonthDropDown directly?
-dojo.declare("dojox.widget._MonthDropDown", [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+var MonthDropDown = MultiSelectCalendar._MonthDropDown = dojo.declare("dojox.widget._MonthDropDown",
+    [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
 	// summary:
 	//		The month drop down
 
@@ -977,5 +978,6 @@ dojo.declare("dojox.widget._MonthDropDown", [_Widget, _TemplatedMixin, _WidgetsI
 	}
 });
 
-return dojox.widget.MultiSelectCalendar;
+return MultiSelectCalendar;
+
 });
