@@ -23,7 +23,7 @@ define([
 		// module:
 		//		cbtree/models/FileStoreModel
 		// summary:
-		//		Interface between a CheckBox Tree and a cbtree File store that doesn't have a 
+		//		Interface between a CheckBox Tree and a cbtree File store that doesn't have a
 		//		root item, a.k.a. a store that can have multiple "top level" items.
 
 	return declare([TreeStoreModel], {
@@ -51,7 +51,7 @@ define([
 		// sort: Object[]
 		//		An array of sort fields, each sort field is a JavaScript 'property:value' pair
 		//		object. The sort field properties supported are: 'attribute', 'descending' and
-		//		'ignoreCase'. 
+		//		'ignoreCase'.
 		//		Each sort field object must at least have the 'attribute' property defined, the
 		//		default value for both 'descending' and 'ignoreCase' is false.
 		//		The sort operation is performed in the order in which the sort field objects
@@ -59,7 +59,7 @@ define([
 		//
 		//		Example: [ {attribute:'directory', descending:true}, {attribute:'name', ignoreCase: true} ]
 		sort: null,
-		
+
 		// rootLabel: String
 		//		Label of fabricated root item
 		rootLabel: "ROOT",
@@ -72,7 +72,7 @@ define([
 
 		// End of parameters to constructor
 		//=================================
-		
+
 		moduleName: "cbTree/models/FileStoreModel",
 
 		constructor: function (params) {
@@ -111,6 +111,7 @@ define([
 					aspect.after(store, "onClose", lang.hitch(this, "onStoreClose"), true)
 				]);
 			}
+			console.warn("cbTree/models/FileStoreModel has been deprecated and will be removed with dojo 2.0 !!");
 		},
 
 		// =======================================================================
@@ -151,8 +152,8 @@ define([
 					onComplete(this.root.children);
 				} else {
 					this.store.fetch( { query: this.query,
-															queryOptions: this.queryOptions, 
-															sort: this.sort,	
+															queryOptions: this.queryOptions,
+															sort: this.sort,
 															onComplete: lang.hitch(this, function(items){
 																this.root.children = items;
 																onComplete(items);
@@ -161,11 +162,11 @@ define([
 														}	);
 				}
 			} else {
-				store.fetchChildren( { item: parentItem, 
-															 query: this.query, 
-															 queryOptions: this.queryOptions, 
-															 sort: this.sort,	
-															 onError: onError, 
+				store.fetchChildren( { item: parentItem,
+															 query: this.query,
+															 queryOptions: this.queryOptions,
+															 sort: this.sort,
+															 onError: onError,
 															 scope: scope,
 															 onComplete: function (items) {
 																 onComplete(items);
@@ -177,7 +178,7 @@ define([
 
 		getParents: function (/*dojo.data.item*/ storeItem) {
 			// summary:
-			//		Get the parent(s) of a store item.	
+			//		Get the parent(s) of a store item.
 			// storeItem:
 			//		The dojo.data.item whose parent(s) will be returned.
 			// tags:
@@ -248,13 +249,13 @@ define([
 				}
 			} else {
 				return this.inherited(arguments);
-			}			
+			}
 		},
-		
+
 		// =======================================================================
 		// Write interface
 
-		deleteItem: function(/*item*/ item, /*Callback*/ onBegin, /*Callback*/ onComplete, 
+		deleteItem: function(/*item*/ item, /*Callback*/ onBegin, /*Callback*/ onComplete,
 													/*Callback*/ onError, /*Context*/ scope) {
 			// summary:
 			//		Delete an item from the file store.
@@ -284,7 +285,7 @@ define([
 			if (item === this.root) {
 				var children = this.root.children || [];
 				var i;
-				
+
 				if (children.length > 0) {
 					if (onBegin) {
 						if (!onBegin.call(scope, item)) {
@@ -304,7 +305,7 @@ define([
 			throw new Error(this.moduleName+"::newItem(): Operation not allowed on a File Store.");
 		},
 
-		pasteItem: function (/*dojo.data.item*/ childItem, /*dojo.data.item*/ oldParentItem, /*dojo.data.item*/ newParentItem, 
+		pasteItem: function (/*dojo.data.item*/ childItem, /*dojo.data.item*/ oldParentItem, /*dojo.data.item*/ newParentItem,
 												 /*Boolean*/ bCopy, /*int?*/ insertIndex, /*String?*/ childrenAttr){
 			// summary:
 			//		Move or copy an item from one parent item to another.
@@ -313,7 +314,7 @@ define([
 			//		extension
 			var newParentDir = "",
 					childItemDir = "";
-					
+
 			// The child item MUST be an existing item in this.store
 			if (this.store.isItem(childItem)) {
 				childItemDir = this.store.getDirectory(childItem);
@@ -357,7 +358,7 @@ define([
 			//
 			// tags:
 			//		extension
-		
+
 			// Call onChildrenChange() on parent (ie, existing) item with new list of children
 			// In the common case, the new list of children is simply parentInfo.newValue or
 			// [ parentInfo.newValue ], although if items in the store has multiple
@@ -373,16 +374,16 @@ define([
 			}
 		},
 
-		onSetItem: function (/*dojo.data.item*/ storeItem, /*string*/ attribute, /*AnyType*/ oldValue, 
+		onSetItem: function (/*dojo.data.item*/ storeItem, /*string*/ attribute, /*AnyType*/ oldValue,
 													/*AnyType*/ newValue){
 			// summary:
 			//		Updates the tree view according to changes in the data store.
 			// description:
 			//		Handles updates to a store item's children by calling onChildrenChange(), and
 			//		other updates to a store item by calling onChange().
-			// storeItem: 
+			// storeItem:
 			//		Store item
-			// attribute: 
+			// attribute:
 			//		attribute-name-string
 			// oldValue:
 			//		Old attribute value
@@ -412,14 +413,14 @@ define([
 			//		private
 
 			var oldChildren = this.root.children || [];
-			this.store.fetch(	{	query: this.query, 
-													queryOptions: this.queryOptions,	
+			this.store.fetch(	{	query: this.query,
+													queryOptions: this.queryOptions,
 													sort: this.sort,
 													onComplete: lang.hitch(this, function (newChildren){
 														this.root.children = newChildren;
 														// If the list of children or the order of children has changed...
 														if (oldChildren.length != newChildren.length ||
-															array.some(oldChildren, function (item, idx){ 
+															array.some(oldChildren, function (item, idx){
 																	return newChildren[idx] != item;
 																})) {
 															this.onChildrenChange(this.root, newChildren);

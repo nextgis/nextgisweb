@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+ <html>
+	<head>
+		<meta charset="utf-8">
+		<title>Submit a HTML form with a Checkbox Tree</title>
+		<style type="text/css">
+			@import "../../../dijit/themes/claro/claro.css";
+			@import "../../../dijit/themes/claro/document.css";
+			@import "../../../dijit/tests/css/dijitTests.css";
+			@import "../../themes/claro/claro.css";
+		</style>
+
+		<script type="text/javascript">
+			var dojoConfig = {
+				async: true,
+				baseUrl: "../../../",
+				packages: [
+					{ name: "dojo",	location: "dojo" },
+					{ name: "dijit", location: "dijit" },
+					{ name: "cbtree",location: "cbtree" }
+				]
+			};
+		</script>
+		<script type="text/javascript" src="../../../dojo/dojo.js"></script>
+		<script type="text/javascript">
+			require([
+				"dojo/ready",
+				"cbtree/Tree",
+				"cbtree/model/TreeStoreModel",
+				"cbtree/store/Hierarchy"
+			], function(ready, Tree, Model, Store) {
+
+				var data = [
+					{ id: "earth", name:"The earth", type:"planet", population: "6 billion"},
+					{ id: "AF", name:"Africa", type:"continent", parent: "earth"},
+						{ id: "EG", name:"Egypt", type:"country", parent: "AF" },
+						{ id: "KE", name:"Kenya", type:"country", parent: "AF" },
+							{ id: "Nairobi", name:"Nairobi", type:"city", parent: "KE" },
+							{ id: "Mombasa", name:"Mombasa", type:"city", parent: "KE" },
+						{ id: "SD", name:"Sudan", type:"country", parent: "AF" },
+							{ id: "Khartoum", name:"Khartoum", type:"city", parent: "SD" },
+					{ id: "AS", name:"Asia", type:"continent", parent: "earth" },
+						{ id: "CN", name:"China", type:"country", parent: "AS", bingo: false },
+						{ id: "IN", name:"India", type:"country", parent: "AS" },
+						{ id: "RU", name:"Russia", type:"country", parent: "AS" },
+						{ id: "MN", name:"Mongolia", type:"country", parent: "AS" },
+					{ id: "OC", name:"Oceania", type:"continent", population:"21 million", parent: "earth"},
+						{ id: "AU", name:"Australia", type:"country", population:"21 million", parent: "OC"},
+					{ id: "EU", name:"Europe", type:"continent", parent: "earth" },
+						{ id: "DE", name:"Germany", type:"country", parent: "EU" },
+						{ id: "FR", name:"France", type:"country", parent: "EU" },
+						{ id: "ES", name:"Spain", type:"country", parent: "EU" },
+						{ id: "IT", name:"Italy", type:"country", parent: "EU" }
+				];
+
+				var store = new Store( { data: data });
+				var model = new Model( { store: store, query: {id: "earth"}, rootLabel: "Earth", checkedRoot: true});
+
+				ready(function() {
+					var tree = new Tree({
+						model: model,
+					    attachToForm: {
+							checked: ["mixed", true],
+							name: "checkboxes"
+						}
+					}, "CheckboxTree" );
+					tree.startup();
+				});
+			});
+		</script>
+	</head>
+
+	<body class="claro">
+	  <h1 class="DemoTitle">Submit a HTML form with a Checkbox Tree</h1>
+	  <p>
+		All store items with a <em>"mixed"</em> or checked state are submitted in the form"
+	  </p>
+	  <form id="myForm" action="submitForm.php" method="post">
+		<div id="CheckboxTree" name="hello"></div>
+		<p>
+			<input type="submit" value="Submit ...">
+		</p>
+	  </form>
+	</body>
+</html>

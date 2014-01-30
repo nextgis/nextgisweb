@@ -24,13 +24,13 @@ define([
 		//		provide support to the cbtree/models/TreeStoreModel API,
 
 	lang.extend( ItemFileWriteStore, {
-	
+
 		// _validated: [private] Boolean
 		//		Indicates if the store has been validated. This property has no real
 		//		value to the store itself but is used by the model(s) operating on
 		//		the store. It is as a shared variable amongst models.
 		_validated: false,
-		
+
 		addReference: function (/*dojo.data.item*/ refItem, /*dojo.data.item*/ parentItem, /*String*/ attribute, /*Number?*/ index) {
 			// summary:
 			//		Add an existing item to the parentItem by reference.
@@ -68,13 +68,11 @@ define([
 				// Fire off an event..
 				this.onSet( parentItem, attribute, oldValue, parentItem[attribute] );
 				return true;
-			} else {
-				throw new Error( "ItemWriteStoreEX::addReference(): parent and reference items are identical" );
 			}
-			return false;
+			throw new Error( "ItemWriteStoreEX::addReference(): parent and reference items are identical" );
 		},
-		 
-		attachToRoot: function (/*dojo.data.item*/ item) {
+
+		attachToRoot: function (/*dojo.data.item*/ item, insertIndex ) {
 			// summary:
 			//		Promote a store item to a top level item.
 			// item:
@@ -84,7 +82,11 @@ define([
 
 			if ( !this.isRootItem(/*dojo.data.item*/ item) ) {
 				item[this._rootItemPropName] = true;
-				this._arrayOfTopLevelItems.push(item);
+				if (insertIndex !== undefined) {
+					this._arrayOfTopLevelItems.splice(insertIndex, 0, item);
+				} else {
+					this._arrayOfTopLevelItems.push(item);
+				}
 				this.onRoot( item, "attach" );
 			}
 		},
@@ -104,7 +106,7 @@ define([
 				this.onRoot( item, "detach" );
 			}
 		},
-		
+
 		getIdentifierAttr: function() {
 			// summary:
 			//		Returns the store identifier attribute is defined.
@@ -116,10 +118,10 @@ define([
 			}
 			return this._getIdentifierAttribute();
 		},
-		
+
 		getParents: function (/*dojo.data.item*/ item) {
 			// summary:
-			//		Get the parent(s) of a dojo.data.item.	
+			//		Get the parent(s) of a dojo.data.item.
 			// description:
 			//		Get the parent(s) of a dojo.data item.	Either the '_reverseRefMap' or
 			//		'backup_reverseRefMap' property is used to fetch the parent(s). In the
@@ -155,14 +157,14 @@ define([
 			//		public
 
 			this._assertIsItem(item);
-			return item[this._rootItemPropName] ? true : false; 
+			return item[this._rootItemPropName] ? true : false;
 		},
 
 		isValidated: function () {
 			// summary:
 			//		Returns true if a model has signalled the store has successfully been
 			//		validated. The attribute _validated is part of the store and not of a
-			//		model as multiple models may operate on this store. 
+			//		model as multiple models may operate on this store.
 			return this._validated;
 		},
 
@@ -179,11 +181,11 @@ define([
 			//		The dojo.data.item if is exist
 			// tag:
 			//		public
-			
+
 			var identifierAttr,
 					itemIdentity,
 					item;
-			
+
 			if (typeof keywordArgs != "object" && typeof keywordArgs != "undefined"){
 				throw new Error("ItemWriteStoreEX::itemExist(): argument is not an object");
 			}
@@ -203,7 +205,7 @@ define([
 			}
 			return item;
 		},
-		
+
 		loadStore: function ( keywordArgs ) {
 			// summary:
 			//		Try a forced load of the entire store but only if it has not
@@ -226,7 +228,7 @@ define([
 			//		public
 			var scope = keywordArgs.scope || window.global;
 			var self  = this;
-			
+
 			function loadComplete( count, requestArgs ) {
 				// summary:
 				var loadArgs = requestArgs.loadArgs || null;
@@ -242,10 +244,10 @@ define([
 			}
 
 			if (!this._loadFinished) {
-				var request  = { queryOptions: {deep: true}, 
-												 loadArgs: keywordArgs, 
-												 onBegin: loadComplete, 
-												 onError: keywordArgs.onError, 
+				var request  = { queryOptions: {deep: true},
+												 loadArgs: keywordArgs,
+												 onBegin: loadComplete,
+												 onError: keywordArgs.onError,
 												 scope: this};
 				try {
 					this.fetch(request);
@@ -262,7 +264,7 @@ define([
 				}
 			}
 		},
-		
+
 		onDelete: function(/*dojo.data.item*/ deletedItem){
 			// summary:
 			//		See dojo.data.api.Notification.onDelete()
@@ -274,7 +276,7 @@ define([
 				this.onRoot( deletedItem, "delete" );
 			}
 		},
-		
+
 		onNew: function(/*dojo.data.item*/ item, parentInfo ){
 			// summary:
 			//		See dojo.data.api.Notification.onNew()
@@ -284,7 +286,7 @@ define([
 				this.onRoot( item, "new" );
 			}
 		},
-		
+
 		onLoad: function ( count ) {
 			// summary:
 			//		Invoked when loading the store completes. This method is only called
@@ -294,24 +296,24 @@ define([
 			// tag:
 			//		callback.
 		},
-		
+
 		onRoot: function(/*dojo.data.item*/ item, /*string*/ action ) {
 			// summary:
 			//		Invoked whenever a item is added to, or removed from the root.
 			// item:
 			//		Store item.
 			// action:
-			//		Event action which can be: "new", "delete", "attach" or "detach" 
+			//		Event action which can be: "new", "delete", "attach" or "detach"
 			// tag:
 			//		callback.
 		},
-		
+
 		setValidated: function (/*Boolean*/ value) {
 			// summary:
 			//		Mark the store as successfully been validated.
 			this._validated = Boolean(value);
 		},
-		
+
 		removeReference: function ( /*dojo.data.item*/ refItem, /*dojo.data.item*/ parentItem, /*String*/ attribute ){
 			// summary:
 			//		Remove a item reference from its parent. Only the references are
@@ -347,5 +349,5 @@ define([
 		}
 
 	}); /* end lang.extend() */
-	
+
 }); /* end define() */

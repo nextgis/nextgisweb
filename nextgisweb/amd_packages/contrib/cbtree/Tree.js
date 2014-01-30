@@ -1,128 +1,86 @@
 //
-// Copyright (c) 2010-2012, Peter Jekel
+// Copyright (c) 2010-2013, Peter Jekel
 // All rights reserved.
 //
-//	The Checkbox Tree (cbtree), also known as the 'Dijit Tree with Multi State Checkboxes'
-//	is released under to following three licenses:
+//	The Checkbox Tree (cbtree) is released under to following three licenses:
 //
-//	1 - BSD 2-Clause							 (http://thejekels.com/cbtree/LICENSE)
-//	2 - The "New" BSD License			 (http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L13)
-//	3 - The Academic Free License	 (http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L43)
+//	1 - BSD 2-Clause				(http://thejekels.com/cbtree/LICENSE)
+//	2 - The "New" BSD License		(http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L13)
+//	3 - The Academic Free License	(http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L43)
 //
-//	In case of doubt, the BSD 2-Clause license takes precedence.
-//
-define([
-	"dojo/_base/array",
-	"dojo/_base/declare",
-	"dojo/_base/event",
-	"dojo/_base/lang", 
-	"dojo/DeferredList",
-	"dojo/dom-construct",
-	"dojo/text!./templates/cbtreeNode.html",
-	"dijit/_Container",
-	"dijit/registry",
-	"dijit/Tree",
-	"./CheckBox",
-	"./models/_dndSelector",  // Fixed dijit tree issue...
-	"require"
-], function (array, declare, event, lang, DeferredList, domConstruct, NodeTemplate, 
-							_Container, registry, Tree, CheckBox, _dndSelector, require) {
+define(["module",
+        "require",
+        "dojo/_base/connect",
+        "dojo/_base/declare",
+        "dojo/_base/lang",
+        "dojo/aspect",
+        "dojo/Deferred",
+        "dojo/dom-construct",
+        "dojo/has",
+        "dojo/keys",
+        "dojo/on",
+        "dojo/topic",
+        "dojo/text!./templates/cbtreeNode.html",
+        "dijit/registry",
+        "dijit/Tree",
+        "./CheckBox",
+        "./errors/createError!./errors/CBTErrors.json",
+        "./util/IE8_Event",
+        "./util/shim/Array"                 // ECMA-262 Array shim
+    ], function (module, require, connect, declare, lang, aspect, Deferred, domConstruct,
+                 has, keys, on, topic, NodeTemplate, registry, Tree, CheckBox,
+                 createError, IE8_Event) {
 
 	// module:
-	//		cbtree/Tree
+	//		cbtree/Tree 0.9.4
 	// note:
-	//		This implementation is compatible with dojo 1.8
+	//		This implementation is compatible with dojo 1.8 and 1.9
+
+	var CBTError = createError(module.id);		// Create the CBTError type.
+	var ie = has("ie");
+	var dojoVers = 0;
 
 	var TreeNode = declare([Tree._TreeNode], {
 		// templateString: String
 		//		Specifies the HTML template to be used.
 		templateString: NodeTemplate,
 
-		moduleName: "cbTree/_TreeNode",
-		
-		// _checkBox: [private] widget 
-		//		Checkbox or custome widget instance.
+		// _checkBox: [private] widget
+		//		Checkbox or custom widget instance.
 		_checkBox: null,
 
 		// _toggle: [private] Boolean
 		//		Indicates if the checkbox widget supports the toggle function.
 		_toggle: true,
-		
+
 		// _widget: [private] Object
-		//		Specifies the widget to be instanciated for the tree node. The default
+		//		Specifies the widget to be instantiated for the tree node. The default
 		//		is the cbtree CheckBox widget.
 		_widget: null,
-		
-		constructor: function (args){
+
+		constructor: function (args) {
 			// summary:
 			//		If a custom widget is specified, it is used instead of the default
 			//		cbtree checkbox. Any optional arguments are appended to the default
 			//		widget argument list.
 
 			var checkBoxWidget = { type: CheckBox, target: 'INPUT', mixin: null, postCreate: null };
-			var widgetArgs		 = { multiState: null, checked: undefined, value: 'on' };
-			var customWidget	 = args.widget;
+			var widgetArgs	   = { multiState: null, checked: undefined, value: 'on' };
+			var customWidget   = args.widget;
 
 			if (customWidget) {
-				lang.mixin( widgetArgs, customWidget.args );
+				lang.mixin(widgetArgs, customWidget.args);
 				lang.mixin(checkBoxWidget, customWidget);
 			}
 			checkBoxWidget.args = widgetArgs;
-			
+
 			// Test if the widget supports the toggle() method.
-			this._toggle = lang.isFunction (checkBoxWidget.type.prototype.toggle);
+			this._toggle = (typeof checkBoxWidget.type.prototype.toggle == "function");
 			this._widget = checkBoxWidget;
 		},
 
-		_createCheckBox: function (/*Boolean*/ multiState) {
-			// summary:
-			//		Create a checkbox on the TreeNode if a checkbox style is specified.
-			// description:
-			//		Create a checkbox on the tree node. A checkbox is only created if
-			//		the data item has a valid 'checked' attribute OR the model has the
-			//		'checkboxAll' attribute enabled.
-			//
-			// multiState:
-			//			Indicate of multi state checkboxes are to be used (true/false).
-			// tags:
-			//		private
-
-			var itemState = this.tree.model.getItemState(this.item);
-			var checked   = itemState.checked;
-			var enabled   = itemState.enabled;
-			var widget	  = this._widget;
-			var args		  = widget.args;
-			
-			if (checked !== undefined) {
-				// Initialize the default checkbox/widget attributes.
-				args.multiState = multiState;
-				args.checked		= checked;
-				args.value			= this.label;
-
-				if (lang.isFunction(widget.mixin)) {
-					lang.hitch(this, widget.mixin)(args);
-				}
-
-				this._checkBox = new widget.type( args );
-				if (this._checkBox) {
-					if (lang.isFunction(this._widget.postCreate)) {
-						lang.hitch(this._checkBox, this._widget.postCreate)(this);
-					}
-					domConstruct.place(this._checkBox.domNode, this.checkBoxNode, 'replace');
-				}
-			}
-			if (this._checkBox) {
-				if (this.isExpandable) {
-          if (this.tree.branchReadOnly || !enabled) {
-            this._checkBox.set("readOnly", true);
-          }
-				} else {
-          if (this.tree.leafReadOnly || !enabled) {
-            this._checkBox.set("readOnly", true);
-          }
-				}
-			}
-		},
+		// =======================================================================
+		// Node getters and setters
 
 		_getCheckedAttr: function () {
 			// summary:
@@ -130,10 +88,19 @@ define([
 			//		get("checked").
 			// tags:
 			//		private
-			
+
 			if (this._checkBox) {
 				return this.tree.model.getChecked(this.item);
 			}
+		},
+
+		_getEnabledAttr: function () {
+			// summary:
+			//		Get the current 'enabled' state of the item associated with this
+			//		tree node. This method provides the hook for get("enabled").
+			// tag:
+			//		Private
+			return this.tree.model.getEnabled(this.item);
 		},
 
 		_set_checked_Attr: function (newState) {
@@ -149,31 +116,7 @@ define([
 				this._checkBox.set("checked", newState);
 			}
 		},
-		
-		_setCheckedAttr: function (/*String|Boolean*/ newState) {
-			// summary:
-			//		Set a new state for the tree node checkbox. This method implements
-			//		the set("checked", newState). These requests are recieved from the
-			//		API and therefore we need to inform the model.
-			//	newState:
-			//		The checked state: 'mixed', true or false.
-			// tags:
-			//		private
 
-			if (this._checkBox) {
-				return this.tree.model.setChecked(this.item, newState);
-			}
-		},
-
-		_getEnabledAttr: function () {
-			// summary:
-			//		Get the current 'enabled' state of the item associated with this
-			//		tree node. This method provides the hook for get("enabled").
-			// tag:
-			//		Private
-			return this.tree.model.getEnabled(this.item);
-		},
-		
 		_set_enabled_Attr: function (enabled) {
 			// summary:
 			//		Set the 'Read Only' property of the checkbox. This method handles
@@ -183,24 +126,164 @@ define([
 			//		The new enabled state.
 			// tags:
 			//		private
-      this._checkBox.set("readOnly", !enabled);
+			if (this._checkBox) {
+				this._checkBox.set("readOnly", !enabled);
+			}
 		},
 
-		_setEnabledAttr: function (/*Boolean*/ newState) {
+		_setCheckedAttr: function (newState) {
+			// summary:
+			//		Set a new state for the tree node checkbox. This method implements
+			//		the set("checked", newState). These requests are received from the
+			//		API and therefore we need to inform the model.
+			//	newState: String|Boolean
+			//		The checked state: 'mixed', true or false.
+			// tags:
+			//		private
+
+			if (this._checkBox) {
+				return this.tree.model.setChecked(this.item, newState);
+			}
+		},
+
+		_setEnabledAttr: function (newState) {
 			// summary:
 			//		Set the new 'enabled' state of the item associated with this tree
 			//		node. This method provides the hook for set("enabled", newState).
-			// newState:
+			// newState: Boolean
 			//		Boolean, true or false.
 			// tag:
 			//		Private.
-			return this.tree.model.setEnabled(this.item, newState);
+			if (this.tree.model.setEnabled(this.item, newState) === undefined) {
+				this.set("_enabled_", !!newState);
+			}
 		},
-		
-		_toggleCheckBox: function (){
+
+		// =======================================================================
+		// Node private methods
+
+		_createCheckBox: function (multiState) {
+			// summary:
+			//		Create a checkbox on the TreeNode if a checkbox style is specified.
+			// description:
+			//		Create a checkbox on the tree node. A checkbox is only created if
+			//		the data item has a valid 'checked' attribute OR the model has the
+			//		'checkboxAll' attribute enabled.
+			//
+			// multiState: Boolean
+			//		Indicate of multi state checkboxes are to be used (true/false).
+			// tags:
+			//		private
+
+			var attach   = (this.tree.attachToForm === true);
+			var model    = this.tree.model;
+			var enabled  = true;
+			var checked  = model.getChecked(this.item);
+			var widget   = this._widget;
+			var args     = widget.args;
+
+			if (typeof model.getEnabled == "function") {
+				enabled = model.getEnabled(this.item);
+			}
+
+			if (checked !== undefined) {
+				// Initialize the default checkbox/widget attributes.
+				args.multiState = multiState;
+				args.checked    = checked;
+				args.value      = this.label;
+
+				if (typeof widget.mixin == "function") {
+					lang.hitch(this, widget.mixin)(args);
+				}
+
+				this._checkBox = new widget.type(args);
+				if (this._checkBox) {
+					if (attach) {
+						// Set name on both the widget and associated DOM node
+						this._checkBox.set("name", this._checkBox.id);
+					} else {
+						// Set name on the widget only (for backward compatibility)
+						this._checkBox.name = this._checkBox.id;
+					}
+					this._checkBox.item = this.item;
+
+					if ((!this.isExpandable && !this.tree.leafCheckBox) ||
+							(this.isExpandable && !this.tree.branchCheckBox)) {
+						this._checkBox.domNode.style.display = "none";
+					}
+					if (typeof this._widget.postCreate == "function") {
+						lang.hitch(this._checkBox, this._widget.postCreate)(this);
+					}
+				    domConstruct.place(this._checkBox.domNode, this.checkBoxNode, 'replace');
+				}
+			}
+			if (this._checkBox) {
+				if (this.isExpandable) {
+					if (this.tree.branchReadOnly || !enabled) {
+						this._checkBox.set("readOnly", true);
+					}
+				} else {
+					if (this.tree.leafReadOnly || !enabled) {
+						this._checkBox.set("readOnly", true);
+					}
+				}
+			}
+		},
+
+		_remove: function () {
+			// summary:
+			//		Remove node and all its descendants.
+			// tag:
+			//		Private
+			var parent = this.getParent();
+			var tree   = this.tree;
+			var model  = tree.model;
+
+			function removeNode(node) {
+				if (!node._destroyed) {
+					var itemId = model.getIdentity(node.item);
+					var nodes  = tree._itemNodesMap[itemId];
+					// Remove item from the mapping table.
+					if (nodes.length == 1) {
+						delete tree._itemNodesMap[itemId];
+					} else {
+						var index = nodes.indexOf(node);
+						if (index != -1) {
+							nodes.splice(index, 1);
+						}
+					}
+					// Remove node from the list of selected items..
+					tree.dndController.removeTreeNode(node);
+					node.getChildren().forEach(removeNode);
+
+					if (tree.persist && node.isExpanded) {
+						tree._state(node, false);
+					}
+				}
+			}
+			removeNode(this);
+			if (parent && this != tree.rootNode) {
+				parent.removeChild(this);
+			}
+			// Destroy DOM node and its descendants
+			this.destroyRecursive();
+		},
+
+		_setExpando: function () {
+			// summary:
+			//		Expose the "isExpandable" property as an attribute of the rowNode.
+			//		The attribute can be used in selectors, for example:
+			//			dojo.query(".dijitTreeRow[expandable='true']);
+			// tag:
+			//		Private
+			this.rowNode.setAttribute("expandable", this.isExpandable.toString());
+			this.inherited(arguments);
+		},
+
+		_toggleCheckBox: function () {
 			// summary:
 			//		Toggle the current checkbox checked attribute and update the model
-			//		accordingly. Typically called when the spacebar is pressed. 
+			//		accordingly. Typically called when the spacebar is pressed.
 			//		If a custom widget does not support toggle() we will just mimic it.
 			// tags:
 			//		private
@@ -213,17 +296,20 @@ define([
 					oldState = this._checkBox.get("checked");
 					newState = (oldState == "mixed" ? true : !oldState);
 				}
-				this.tree.model.setChecked(this.item, newState);
+				this._checkBox.set("checked", newState);
 			}
 			return newState;
 		},
-		
+
+		// =======================================================================
+		// Node public methods
+
 		destroy: function () {
 			// summary:
 			//		Destroy the checkbox of the tree node widget.
 			//
 			if (this._checkbox) {
-				this._checkbox.destroy();
+				this._checkbox.destroyRecursive();
 				delete this._checkbox;
 			}
 			this.inherited(arguments);
@@ -232,15 +318,13 @@ define([
 		postCreate: function () {
 			// summary:
 			//		Handle the creation of the checkbox and node specific icons after
-			//		the tree node has been instanciated.
+			//		the tree node has been instantiated.
 			// description:
 			//		Handle the creation of the checkbox after the tree node has been
-			//		instanciated. If the item has a custom icon specified, overwrite
+			//		instantiated. If the item has a custom icon specified, overwrite
 			//		the current icon.
 			//
-			var tree	= this.tree,
-					itemIcon = null,
-					nodeIcon;
+			var tree = this.tree, itemIcon = null;
 
 			if (tree.checkBoxes === true) {
 				this._createCheckBox(tree._multiState);
@@ -248,163 +332,40 @@ define([
 			// If Tree styling is loaded and the model has its iconAttr set go see if
 			// there is a custom icon amongst the item attributes.
 			if (tree._hasStyling && tree._iconAttr) {
-				var itemIcon = tree.get("icon", this.item);
+				itemIcon = tree.get("icon", this.item);
 				if (itemIcon) {
-					this.set("_icon_",itemIcon);
+					this.set("_icon_", itemIcon);
 				}
 			}
 			// Just in case one is available, set the tooltip.
 			this.set("tooltip", this.title);
 			this.inherited(arguments);
-		},
-
-		setChildItems: function(/* Object[] */ items){
-			// summary:
-			//		Sets the child items of this node, removing/adding nodes
-			//		from current children to match specified items[] array.
-			//		Also, if this.persist == true, expands any children that were previously
-			//		opened.
-			// returns:
-			//		Deferred object that fires after all previously opened children
-			//		have been expanded again (or fires instantly if there are no such children).
-
-			var tree = this.tree,
-				model = tree.model,
-				defs = [];	// list of deferreds that need to fire before I am complete
-
-			// Orphan all my existing children.
-			// If items contains some of the same items as before then we will reattach them.
-			// Don't call this.removeChild() because that will collapse the tree etc.
-			var oldChildren = this.getChildren();
-			array.forEach(oldChildren, function(child){
-				_Container.prototype.removeChild.call(this, child);
-			}, this);
-
-			// All the old children of this TreeNode are subject for destruction if
-			//		1) they aren't listed in the new children array (items)
-			//		2) they aren't immediately adopted by another node (DnD)
-			this.defer(function(){
-				array.forEach(oldChildren, function(node){
-					if(!node._destroyed && !node.getParent()){
-						// If node is in selection then remove it.
-						tree.dndController.removeTreeNode(node);
-
-						// Deregister mapping from item id --> this node
-						var id = model.getIdentity(node.item),
-							ary = tree._itemNodesMap[id];
-						if(ary.length == 1){
-							delete tree._itemNodesMap[id];
-						}else{
-							var index = array.indexOf(ary, node);
-							if(index != -1){
-								ary.splice(index, 1);
-							}
-						}
-						// And finally we can destroy the node
-						node.destroyRecursive();
-					}
-				});
-			});
-
-			this.state = "LOADED";
-
-			if(items && items.length > 0){
-				this.isExpandable = true;
-				// Create _TreeNode widget for each specified tree node, unless one already
-				// exists and isn't being used (presumably it's from a DnD move and was recently
-				// released
-				array.forEach(items, function(item){	// MARKER: REUSE NODE
-					var id = model.getIdentity(item),
-						existingNodes = tree._itemNodesMap[id],
-						node;
-					if(existingNodes){
-						for(var i=0;i<existingNodes.length;i++){
-							// FIX 1 - Don't re-used destroyed nodes, instead clean them up.
-							if (!existingNodes[i] || existingNodes[i]._beingDestroyed) {
-								existingNodes.splice(i,1);
-								if (existingNodes.length == 0) {
-									delete tree._itemNodesMap[id];
-								}
-							} else {
-								if(!existingNodes[i].getParent()) {
-									node = existingNodes[i];
-									node.set('indent', this.indent+1);
-									break;
-								}
-							}
-						}
-					}
-					if(!node){
-						node = this.tree._createTreeNode({
-							item: item,
-							tree: tree,
-							isExpandable: model.mayHaveChildren(item),
-							label: tree.getLabel(item),
-							tooltip: tree.getTooltip(item),
-							ownerDocument: tree.ownerDocument,
-							dir: tree.dir,
-							lang: tree.lang,
-							textDir: tree.textDir,
-							indent: this.indent + 1
-						});
-						if(existingNodes){
-							existingNodes.push(node);
-						}else{
-							tree._itemNodesMap[id] = [node];
-						}
-					}
-					this.addChild(node);
-
-					// If node was previously opened then open it again now (this may trigger
-					// more data store accesses, recursively)
-					if(this.tree.autoExpand || this.tree._state(node)){
-						defs.push(tree._expandNode(node));
-					}
-				}, this);
-
-				// note that updateLayout() needs to be called on each child after
-				// _all_ the children exist
-				array.forEach(this.getChildren(), function(child){
-					child._updateLayout();
-				});
-			}else{
-				// FIX 2 - If no children, delete _expandNodeDeferred if any...
-				tree._collapseNode(this);
-				this.isExpandable=false;
-			}
-
-			if(this._setExpando){
-				// change expando to/from dot or + icon, as appropriate
-				this._setExpando(false);
-			}
-
-			// Set leaf icon or folder icon, as appropriate
-			this._updateItemClasses(this.item);
-
-			// On initial tree show, make the selected TreeNode as either the root node of the tree,
-			// or the first child, if the root node is hidden
-			if(this == tree.rootNode){
-				var fc = this.tree.showRoot ? this : this.getChildren()[0];
-				if(fc){
-					fc.setFocusable(true);
-					tree.lastFocused = fc;
-				}else{
-					// fallback: no nodes in tree so focus on Tree <div> itself
-					tree.domNode.setAttribute("tabIndex", "0");
-				}
-			}
-
-			var def =  new DeferredList(defs);
-			this.tree._startPaint(def);		// to reset TreeNode widths after an item is added/removed from the Tree
-			return def;		// dojo/_base/Deferred
 		}
 
 	});	/* end declare() _TreeNode*/
 
-	return declare([Tree], {
+	var CBTree = declare([Tree], {
 
 		//==============================
 		// Parameters to constructor
+
+		// attachToForm: Boolean | Object
+		//		Include CheckBox Tree checkboxes in the form data set to be submitted.
+		// 		If boolean true, all visible checked checkboxes will be included.
+		//		The form data set is submitted as a series of parameters in either the
+		//		HTTP GET URL _Query String_ or the HTTP POST request body. If boolean
+		//		false, no Checkbox Tree checkboxes will be included in the from data set.
+		//		If specified as a JavaScript key:value pairs object, some or all store
+		//		objects checked states are included in the form data set as a single
+		//		parameter. The parameter value is a JSON encoded array of objects, each
+		//		object representing the checked state of a store object.
+		attachToForm: false,
+
+		// branchCheckBox: Boolean
+		//		If true, the checkbox associated with a tree branch will be displayed,
+		//		otherwise the checkbox will be hidden but still available for checking
+		//		its state.
+		branchCheckBox: true,
 
 		// branchIcons: Boolean
 		//		Determines if the FolderOpen/FolderClosed icon or their custom equivalent
@@ -413,48 +374,74 @@ define([
 
 		// branchReadOnly: Boolean
 		//		Determines if branch checkboxes are read only. If true, the user must
-		//		check/uncheck every child checkbox individually. 
+		//		check/uncheck every child checkbox individually.
 		branchReadOnly: false,
-		
+
 		// checkBoxes: String
 		//		If true it enables the creation of checkboxes, If a tree node actually
 		//		gets a checkbox depends on the configuration of the model. If false no
 		//		 checkboxes will be created regardless of the model configuration.
 		checkBoxes: true,
 
+		// clickEventCheckBox: Boolean
+		//		If true, both the 'click' and 'checkBoxClick' events will be generated
+		//		when a checkbox is clicked. If false only the 'checkBoxClick' event is
+		//		generated.
+		clickEventCheckBox: true,
+
+		// closeOnUnchecked: Boolean
+		//		If true, unchecking a branch node checkbox will close/collapse the branch.
+		// 		In addition, when all children of a given branch are unchecked the branch
+		//		will also collapse if the model property checkedStrict is enabled (default).
+		closeOnUnchecked: false,
+
+		// deleteRecursive: Boolean
+		//		Determines if a delete operation, initiated from the keyboard, should
+		//		include all descendants of the selected item(s). If false, only the
+		//		selected item(s) are deleted from the store. This property has only
+		//		effect when 'enableDelete' is true.
+		deleteRecursive: false,
+
+		// enableDelete: Boolean
+		//		Determines if deleting tree nodes using the keyboard is allowed. By
+		//		default items can only be deleted using the store interface. If set
+		//		to true the user can also delete tree items by selecting the desired
+		//		tree node(s) and pressing the CTRL+DELETE keys.
+		enableDelete: false,
+
+		// leafCheckBox: Boolean
+		//		If true, the checkbox associated with a tree leaf will be displayed,
+		//		otherwise the checkbox will be hidden but still available for checking
+		//		its state.
+		leafCheckBox: true,
+
+		// leafIcons: Boolean
+		//		Determines if the Leaf icon, or its custom equivalent, is displayed.
+		leafIcons: true,
+
 		// leafReadOnly: Boolean
 		//		Determines if leaf checkboxes are read only. If true, the user can only
 		//		check/uncheck branch checkboxes and thus overwriting the per store item
 		//		'enabled' features for any store item associated with a tree leaf.
 		leafReadOnly: false,
-		
-		// nodeIcons: Boolean
-		//		Determines if the Leaf icon, or its custom equivalent, is displayed.
-		nodeIcons: true,
 
-		// FIX: 3 - Force tree to use the modified _dndSelector (see ./models/_dndSelector)
-		dndController: _dndSelector,
+		// openOnChecked: Boolean
+		//		If true, clicking a folder node's label will open it, rather than calling
+		//		tree's callback method onClick().
+		openOnChecked: false,
 
 		// End Parameters to constructor
 		//==============================
-
-		moduleName: "cbTree/Tree",
 
 		// _multiState: [private] Boolean
 		//		Determines if the checked state needs to be maintained as multi state or
 		//		or as a dual state. ({"mixed",true,false} vs {true,false}). Its value is
 		//		fetched from the tree model.
 		_multiState: true,
-		
-		// _checkedAttr: [private] String
-		//		Attribute name associated with the checkbox checked state of a data item.
-		//		The value is retrieved from the models 'checkedAttr' property and added
-		//		to the list of model events.
-		_checkedAttr: "",
-		
+
 		// _customWidget: [private]
-		//		A custom widget to be used instead of the cbtree CheckBox widget. Any 
-		//		custom widget MUST have a 'checked' property and provide support for 
+		//		A custom widget to be used instead of the cbtree CheckBox widget. Any
+		//		custom widget MUST have a 'checked' property and provide support for
 		//		both the get() and set() methods.
 		_customWidget: null,
 
@@ -468,12 +455,16 @@ define([
 		//		Specifies the minimum and maximum dojo version required to run this
 		//		implementation of the cbtree.
 		//
-		//			vers-required	::= '{' (min-version | max-version | min-version ',' max-version) '}'
-		//			min-version		::= version
-		//			max-version		::= version
-		//			version				::= '{' "major" ':' number ',' "minor" ':' number '}'
+		//		vers-required ::= '{' (min-version | max-version | min-version ',' max-version) '}'
+		//		min-version   ::= "min:" version
+		//		max-version   ::= "max:" version
+		//		version       ::= '{' "major" ':' number ',' "minor" ':' number '}'
 		//
-		_dojoRequired: { min: {major:1, minor:8}, max: {major:1, minor:9}},
+		_dojoRequired: { min: {major: 1, minor: 8}, max: {major: 1, minor: 99}},
+
+		// _widgetBaseClass:
+		//		The default baseClass
+		_checkboxBaseClass: CheckBox.prototype.baseClass,
 
 		_assertVersion: function () {
 			// summary:
@@ -481,26 +472,25 @@ define([
 			// tag:
 			//		Private
 			if (dojo.version) {
-				var dojoVer = (dojo.version.major * 10) + dojo.version.minor,
-						dojoMax = 999,
-						dojoMin = 0;
-						
+				var dojoMax = 199, dojoMin = 0;
+
+				dojoVers = (dojo.version.major * 100) + dojo.version.minor;
 				if (this._dojoRequired) {
 					if (this._dojoRequired.min !== undefined) {
-						dojoMin = (this._dojoRequired.min.major * 10) + this._dojoRequired.min.minor;
+						dojoMin = (this._dojoRequired.min.major * 100) + this._dojoRequired.min.minor;
 					}
 					if (this._dojoRequired.max !== undefined) {
-						dojoMax = (this._dojoRequired.max.major * 10) + this._dojoRequired.max.minor;
+						dojoMax = (this._dojoRequired.max.major * 100) + this._dojoRequired.max.minor;
 					}
-					if (dojoVer < dojoMin || dojoVer > dojoMax) { 
-						throw new Error(this.moduleName+"::_assertVersion(): invalid dojo version.");
+					if (dojoVers < dojoMin || dojoVers > dojoMax) {
+						throw new CBTError("InvalidVersion", "_assertVersion");
 					}
 				}
 			} else {
-				throw new Error(this.moduleNmae+"::_assertVersion(): unable to determine dojo version.");
+				throw new CBTError("UnknownVersion", "_assertVersion");
 			}
 		},
-		
+
 		_createTreeNode: function (args) {
 			// summary:
 			//		Create a new cbtreeTreeNode instance.
@@ -509,14 +499,14 @@ define([
 			// tags:
 			//		private
 
-			args["widget"] = this._customWidget;		/* Mixin the custom widget */
+			args.widget = this._customWidget;		/* Mixin the custom widget */
 			if (this._hasStyling && this._icon) {
-				args["icon"] = this._icon;
+				args.icon = this._icon;
 			}
 			return new TreeNode(args);
 		},
 
-		_onCheckBoxClick: function (/*TreeNode*/ nodeWidget, /*Boolean|String*/ newState, /*Event*/ evt) {
+		_onCheckBoxClick: function (evt, nodeWidget) {
 			// summary:
 			//		Translates checkbox click events into commands for the controller
 			//		to process.
@@ -524,42 +514,43 @@ define([
 			//		the _onCheckBoxClick function is called whenever a mouse 'click'
 			//		on a checkbox is detected. Because the click was on the checkbox
 			//		we are not dealing with any node expansion or collapsing here.
+			// evt: Event
+			// nodeWidget: TreeNode
 			// tags:
 			//		private
+			var newState = nodeWidget._checkBox.get("checked");
+			var item     = nodeWidget.item;
 
-			var item = nodeWidget.item;
-				
-			this._publish("checkbox", { item: item, node: nodeWidget, state: newState, evt: evt});
-			// Generate events incase any listeners are tuned in...
+			this.model.setChecked(item, newState);
+			if (newState && this.openOnChecked) {
+				this.expandChecked();
+			} else if (!newState && this.closeOnUnchecked) {
+				this.collapseUnchecked();
+			}
 			this.onCheckBoxClick(item, nodeWidget, evt);
-			this.onClick(nodeWidget.item, nodeWidget, evt);
+			if (this.clickEventCheckBox) {
+				this.onClick(item, nodeWidget, evt);
+			}
 			this.focusNode(nodeWidget);
-			event.stop(evt);
+
+			topic.publish("checkbox", { item: item, node: nodeWidget, state: newState, evt: evt});
+			evt.stopPropagation();		// ONLY stop propagation, not the default actions...
+			return newState;
 		},
 
-		_onClick: function(/*TreeNode*/ nodeWidget, /*Event*/ evt){
+		_onClick: function (nodeWidget, evt) {
 			// summary:
-			//		Handler for onclick event on a tree node
-			// description:
-			//		If the click event occured on a checkbox, get the new checkbox checked
-			//		state, update the model and generate the checkbox click related events
-			//		otherwise pass the event on to the tree as a regular click event.
-			// evt:
-			//		Event object.
-			// tags:
-			//		private extension
-			var checkedWidget = nodeWidget._widget;
-
-			if (evt.target.nodeName == checkedWidget.target) {
-				var newState = nodeWidget._checkBox.get("checked");				
-				this.model.setChecked(nodeWidget.item, newState);
-				this._onCheckBoxClick(nodeWidget, newState, evt);
-			} else {
+			//		Translates click events into commands for the controller to process
+			//		For dojo 1.8 compatibility only (remove in 2.0)
+			// nodeWidget: TreeNode
+			// evt: Event
+			var node = registry.getEnclosingWidget(evt.target);
+			if (node.isInstanceOf(TreeNode)) {
 				this.inherited(arguments);
 			}
 		},
-		
-		_onItemChange: function (/*data.Item*/ item, /*String*/ attr, /*AnyType*/ value){
+
+		_onItemChange: function (item, attr, value) {
 			// summary:
 			//		Processes notification of a change to an data item's scalar values and
 			//		internally generated events which effect the presentation of an item.
@@ -571,24 +562,24 @@ define([
 			//		only if a mapping is available is the event passed on to the appropriate
 			//		tree node otherwise the event is considered of no impact to the tree
 			//		presentation.
-			// item:
+			// item: data.Item
 			//		A valid data item
-			// attr:
+			// attr: String
 			//		Attribute/event name
-			// value:
+			// value: any
 			//		New value of the item attribute
 			// tags:
 			//		private extension
- 
+
 			var nodeProp = this._eventAttrMap[attr];
 			if (nodeProp) {
 				var identity = this.model.getIdentity(item),
-						nodes		= this._itemNodesMap[identity],
-						request	= {};
+					nodes    = this._itemNodesMap[identity],
+					request  = {};
 
-				if (nodes){
+				if (nodes) {
 					if (nodeProp.value) {
-						if (lang.isFunction(nodeProp.value)) {
+						if (typeof nodeProp.value == "function") {
 							request[nodeProp.attribute] = lang.hitch(this, nodeProp.value)(item, nodeProp.attribute, value);
 						} else {
 							request[nodeProp.attribute] = nodeProp.value;
@@ -596,43 +587,203 @@ define([
 					} else {
 						request[nodeProp.attribute] = value;
 					}
-					array.forEach(nodes, function (node){
-							node.set(request);
-						}, this);
+					// For each node update the item, in case a store hands out cloned
+					// objects, and issue a set request.
+					nodes.forEach(function (node) {
+						node.item = item;
+						node.set(request);
+					}, this);
 				}
 			}
 		},
 
-		_onKeyPress: function (/*Event*/ evt){
+		_onItemDelete: function (item) {
 			// summary:
-			//		Toggle the checkbox state when the user pressed the spacebar.
-			// description:
+			//		Processes notification of a deletion of an item.
+			// item:
+			//		The deleted item
+			// tag:
+			//		Private
+			var	identity = this.model.getIdentity(item);
+			var	nodes    = this._itemNodesMap[identity];
+
+			if (nodes) {
+				nodes = nodes.slice(0);
+				nodes.forEach(function (node) {
+					node._remove();
+				});
+			}
+		},
+
+		_onDeleteKey: function (/*message || evt, node*/) {
+			// summary:
+			//		Delete key pressed. Delete selected items if delete is enabled AND
+			//		the model supports the deleteItem() method.
+			// evt:
+			//		Keyboard event.
+			// node:
+			//		The tree node that has focus. (not used).
+			// tag:
+			//		Private
+			var evt = arguments[0];
+			if (dojoVers < 109) {
+				evt = evt.evt;
+			}
+			if (connect.isCopyKey(evt)) {
+				if (this.enableDelete && typeof this.model.deleteItem == "function") {
+					var items = this.paths.map(function (path) {
+						return path[path.length - 1];
+					});
+					if (items.length) {
+						this.model.deleteItem(items, this.deleteRecursive);
+					}
+				}
+			}
+		},
+
+		_onEnterKey: function (message) {
+			// summary:
+			//		Dojo 1.8 only.
+			// tags:
+			//		private
+			var node = message.node;
+			var evt  = message.evt;
+
+			if (!evt.altKey && evt.keyCode == keys.SPACE) {
+				this._onSpaceKey(evt, node);
+			}
+			this.inherited(arguments);
+		},
+
+		_onSpaceKey: function (evt, node) {
+			// summary:
 			//		Toggle the checkbox state when the user pressed the spacebar.
 			//		The spacebar is only processed if the widget that has focus is
 			//		a tree node and has a checkbox.
 			// tags:
-			//		private extension
-
-			if (!evt.altKey) {
-				var treeNode = registry.getEnclosingWidget(evt.target);
-				if (lang.isString(evt.charOrCode) && (evt.charOrCode == ' ')) {
-					treeNode._toggleCheckBox();
+			//		private
+			if (node && node._checkBox) {
+				if (!evt.altKey && evt.keyCode == keys.SPACE) {
+					node._toggleCheckBox();
+					this._onCheckBoxClick(evt, node);
 				}
 			}
-			this.inherited(arguments);	/* Pass it on to the parent tree... */
 		},
 
-		_onLabelChange: function (/*String*/ oldValue, /*String*/ newValue) {
+		_onLabelChange: function (oldValue, newValue) {
 			// summary:
 			//		Handler called when the model changed its label attribute property.
 			//		Map the new label attribute to "label"
+			// oldValue: String
+			// newValue: String
 			// tags:
 			//		private
 
+			// Remove with 2.0
 			this.mapEventToAttr(oldValue, newValue, "label");
 		},
-		
-		_setWidgetAttr: function (/*String|Function|Object*/ widget) {
+
+		_onModelReset: function () {
+			// summary:
+			//		Handler called when a model reset event is received. A model reset
+			//		is typically due to a store close/flush event.
+			// tag:
+			//		Private.
+
+			var expanded = lang.clone(this._openedNodes);
+			var model    = this.model;
+			var tree     = this;
+			// Wait until the tree is fully loaded. Canceling an ongoing tree load
+			// will cause the dijit/Tree to throw all sorts of exceptions it doesn't
+			// recover from, sad face :( (trust me I've tried).
+			this.onLoadDeferred.always(function () {
+				if (tree.rootNode && !tree.rootNode._destroyed) {
+					// Mimic an 'onDelete()' event from the model using the tree root item
+					// which will clear out and reset the whole shebang....
+					tree._onItemDelete(tree.rootNode.item);
+				}
+				// Next, wait until the model is ready again.
+				model.ready().then(
+					function () {
+						tree.expandChildrenDeferred  = new Deferred();
+						tree.pendingCommandsDeferred = tree.expandChildrenDeferred;
+
+						if (tree.persist) {
+							// restore the expanded paths, if any.
+							tree._openedNodes = expanded;
+						}
+						tree._load();		// Reload the tree
+
+						tree.onLoadDeferred = tree.pendingCommandsPromise;
+						tree.onLoadDeferred.then(lang.hitch(tree, "onLoad"));
+					},
+					function (err) {
+						// Model failed to get ready, this is likely due to a fatal store
+						// reload error (http errors are not fatal!)
+						throw err;
+					}
+				);
+			});
+		},
+
+		_onSubmit: function (evt) {
+			// summary:
+			//		This method is called when the submit button on a form is clicked.
+			//		Only if this tree is a child of the form will the onSubmit method
+			//		be called. If onSubmit() returns false, the event is canceled.
+			// evt: Event
+			//		DOM Event (submit)
+			// return: Boolean
+			// tag:
+			//		EventListener
+			var event = evt;
+
+			// If IE < 9 fabricate a DOM4 style event
+			if (ie && ie < 9) {
+				event = new IE8_Event(this.formNode, "submit", {cancelable: true}, evt);
+				event.defaultPrevented = !!evt.returnValue;
+			}
+			if (!event.defaultPrevented) {
+				if (this.onSubmit(this.formNode, this, event) === false) {
+					event.preventDefault();
+				}
+			};
+			return !event.defaultPrevented;
+		},
+
+		_setAttachToFormAttr: function (value) {
+			// summary:
+			//		This method is the hook for set("attachToForm", value). If the
+			//		value is an object and the TreeOnSubmit extension has not been
+			//		loaded, it will be loaded automatically.
+			// value: Boolean | Object
+			// tag:
+			//		private
+			var extension = "./extensions/TreeOnSubmit";
+			var tree = this;
+
+			if (value) {
+				if (typeof value === "boolean" || typeof value === "object") {
+					// Do we need to load the TreeOnSubmit extension ?
+					if (typeof value === "object" && !this._hasOnSubmit) {
+						require([value.extension || extension], function (extendedTree) {
+							// Make sure the extension is called first.
+							aspect.around(tree, "onSubmit", function () {
+								return extendedTree.prototype.onSubmit;
+							});
+							this._hasOnSubmit = true;
+						});
+					}
+					this.attachToForm = value;
+				} else {
+					throw new CBTError("InvalidType", "_setAttachToFormAttr");
+				}
+			} else {
+				this.attachToForm = false;
+			}
+		},
+
+		_setWidgetAttr: function (widget) {
 			// summary:
 			//		Set the custom widget. This method is the hook for set("widget",widget).
 			// description:
@@ -640,32 +791,33 @@ define([
 			//		AND methods get() and set() otherwise the widget is rejected and an
 			//		error is thrown. If valid, the widget is used instead of the default
 			//		cbtree checkbox.
-			// widget: 
+			// widget: String|Function|Object
 			//		An String, object or function. In case of an object, the object can
 			//		have the following properties:
-			//			type			:	Function | String, the widget constructor or a module Id string
-			//			args			:	Object, arguments passed to the constructor (optional)
-			//			target		:	String, mouse click target nodename (optional)
-			//			mixin		 :	Function, called prior to widget instantiation.
+			//			type	  :	Function | String, the widget constructor or a module Id string
+			//			args	  :	Object, arguments passed to the constructor (optional)
+			//			target	  :	String, mouse click target nodename (optional)
+			//			mixin	  :	Function, called prior to widget instantiation.
 			//			postCreate: Function, called after widget instantiation
 			// tag:
 			//		experimental
 			var customWidget = widget,
-					property = "checked",
-					message,
-					proto;
+				property = "checked",
+				message,
+				proto;
 
-			if (lang.isString(widget)) {
+			if (typeof widget == "string") {
 				return this._setWidgetAttr({ type: widget });
 			}
 
 			if (lang.isObject(widget) && widget.hasOwnProperty("type")) {
 				customWidget = widget.type;
-				if (lang.isFunction (customWidget)) {
+				if (typeof customWidget == "function") {
 					proto = customWidget.prototype;
-					if (proto && typeof proto[property] !== "undefined"){
+					this._checkboxBaseClass = customWidget.prototype.baseClass;
+					if (proto && proto[property] !== undefined) {
 						// See if the widget has a getter and setter methods...
-						if (lang.isFunction (proto.get) && lang.isFunction (proto.set)) {
+						if (typeof proto.get == "function" && typeof proto.set == "function") {
 							this._customWidget = widget;
 							return;
 						} else {
@@ -674,38 +826,83 @@ define([
 					} else {
 						message = "widget MUST have a 'checked' property";
 					}
-				}else{
+				} else {
 					// Test for module id string to support declarative definition of tree
-					if (lang.isString(customWidget) && ~customWidget.indexOf('/')) {
+					if (typeof customWidget == "string" && ~customWidget.indexOf('/')) {
 						var self = this;
-							require([customWidget], function(newWidget) {
-								widget.type = newWidget;
-								self._setWidgetAttr( widget );
-							});
-							return;
+						require([customWidget], function (newWidget) {
+							widget.type = newWidget;
+							self._setWidgetAttr(widget);
+						});
+						return;
+					} else {
+						message = "argument is not a valid module id";
 					}
-					message = "argument is not a valid module id";
 				}
 			} else {
 				message = "Object is missing required 'type' property";
 			}
-			throw new Error(this.moduleName+"::_setWidgetAttr(): " + message);
+			throw new CBTError("InvalidWidget", "_setWidgetAttr", message);
 		},
 
-		create: function() {
+		collapseUnchecked: function (node) {
+			// summary:
+			//		Collapse a node if the associated item is unchecked.
+			// node: TreeNode?
+			//		The tree node the collapse. If omitted the tree root node is used.
+			// tag:
+			//		public
+			node = node || this.rootNode;
+			if (node && node.isExpandable && node.isExpanded) {
+				var children = node.getChildren(node);
+				children.forEach(function (child) {
+					this.collapseUnchecked(child);
+				}, this);
+				if (this.model.getChecked(node.item) === false) {
+					this._collapseNode(node);
+				}
+			}
+		},
+
+		create: function () {
 			this._assertVersion();
 			this.inherited(arguments);
 		},
-		
-		destroy: function() {
+
+		destroy: function () {
 			this.model = null;
 			this.inherited(arguments);
 		},
-		
-		getIconStyle:function (/*data.item*/ item, /*Boolean*/ opened) {
+
+		expandChecked: function (node) {
 			// summary:
-			//		Return the DOM style for the node Icon. 
-			// item:
+			//		Expand a node if the associated item is checked.
+			// node: TreeNode?
+			//		The tree node the expand. If omitted the tree root node is used.
+			// tag:
+			//		public
+			var expand = false;
+
+			if (!node) {
+				node   = this.rootNode;
+				expand = !node._checkBox;
+			}
+
+			if (node && node.isExpandable && (expand || this.model.getChecked(node.item))) {
+				if (!node.isExpanded) {
+					this._expandNode(node);
+				}
+				var children = node.getChildren(node);
+				children.forEach(function (child) {
+					this.expandChecked(child);
+				}, this);
+			}
+		},
+
+		getIconStyle: function (item /*=====, opened =====*/) {
+			// summary:
+			//		Return the DOM style for the node Icon.
+			// item: data.item
 			//		A valid data item
 			// opened:
 			//		Indicates if the tree node is expanded.
@@ -716,43 +913,45 @@ define([
 
 			if (isExpandable) {
 				if (!this.branchIcons) {
-					style["display"] = "none";
+					style.display = "none";
 				}
 			} else {
-				if (!this.nodeIcons) {
-					style["display"] = "none";
+				if (!this.leafIcons) {
+					style.display = "none";
 				}
 			}
 			return style;
 		},
 
-		mixinEvent: function (/*data.Item*/ item, /*String*/ event, /*AnyType*/ value) {
+		mixinEvent: function (item, event, value) {
 			// summary:
 			//		Mixin a user generated event into the tree event stream. This method
 			//		allows users to inject events as if they came from the model.
-			// item:
+			// item: data.Item
 			//		A valid data item
-			// event:
+			// event: String
 			//		Event/attribute name. An entry in the event mapping table must be present.
 			//		(see mapEventToAttr())
-			// value:
+			// value: any
 			//		Value to be assigned to the mapped _TreeNode attribute.
 			// tag:
 			//		public
-			
+
+			// TODO: remove with dojo 2.0
 			if (this.model.isItem(item) && this._eventAttrMap[event]) {
 				this._onItemChange(item, event, value);
 				this.onEvent(item, event, value);
 			}
 		},
 
-		onCheckBoxClick: function (/*data.item*/ item, /*treeNode*/ treeNode, /*Event*/ evt) {
+		onCheckBoxClick: function (/*===== item, treeNode, evt =====*/) {
 			// summary:
-			//		Callback when a checkbox on a tree node is clicked.
+			//		Callback when a checkbox on a tree node is clicked or when the tree
+			//		node has focus and the spacebar is pressed.
 			// tags:
 			//		callback
 		},
-		
+
 		onEvent: function (/*===== item, event, value =====*/) {
 			// summary:
 			//		Callback when an event was succesfully mixed in.
@@ -766,7 +965,16 @@ define([
 			//		callback
 		},
 
-		postMixInProperties: function(){
+		onSubmit: function (/*===== formNode, treeWidget =====*/) {
+			// summary:
+			// 		Callback when the document submit button was clicked. This
+			//		method will be overwritten when cbtree/extension/TreeOnSubmit
+			//		is loaded.
+			// tags:
+			//		callback
+		},
+
+		postMixInProperties: function () {
 			this._eventAttrMap = {};		/* Create event mapping object */
 
 			this.inherited(arguments);
@@ -775,70 +983,113 @@ define([
 		postCreate: function () {
 			// summary:
 			//		Handle any specifics related to the tree and model after the
-			//		instanciation of the Tree. 
+			//		instanciation of the Tree.
 			// description:
 			//		Whenever checkboxes are requested Validate if we have a model
 			//		capable of updating item attributes.
-			var model = this.model;
+			var target = this.domNode.parentNode;
+			var model  = this.model;
+			var self   = this;
 
 			if (this.model) {
 				if (this.checkBoxes === true) {
-					if (!this._modelOk()) {
-						throw new Error(this.moduleName+"::postCreate(): model does not support getChecked() and/or setChecked().");
-					}
-					this._multiState	= model.multiState;
-					this._checkedAttr = model.checkedAttr;
+					if (this._modelOk()) {
+						this._multiState  = model.multiState;
 
-					// Add item attributes and other attributes of interest to the mapping
-					// table. Checkbox checked events from the model are mapped to the 
-					// internal '_checked_' event so a Tree node is able to distinguesh
-					// between events coming from the model and those coming from the API
-					// like set("checked",true)
-					
-					this.mapEventToAttr(null,(this._checkedAttr || "checked"), "_checked_");
-					model.validateData();
+						// Add item attributes and other attributes of interest to the mapping
+						// table. Checkbox checked events from the model are mapped to the
+						// internal '_checked_' event so a Tree node is able to distinguesh
+						// between events coming from the model and those coming from the API
+						// like set("checked",true)
+
+						this.mapEventToAttr(null, (model.get("checkedAttr") || "checked"), "_checked_");
+						model.validateData();		// Remove with dojo 2.0
+					} else {
+						console.warn(model.id + "::postCreate(): model does not support getChecked() and/or setChecked().");
+						this.checkBoxes = false;
+					}
 				}
 				// Monitor any changes to the models label attribute and add the current
 				// 'label' and 'enabled' attribute to the mapping table.
-				this.connect(model, "onLabelChange", "_onLabelChange");
+
+				aspect.after(model, "onLabelChange", lang.hitch(this, "_onLabelChange"), true);	// Remove with 2.0
+
+				aspect.after(model, "onReset", lang.hitch(this, "_onModelReset"), true);
 
 				this.mapEventToAttr(null, model.get("enabledAttr"), "_enabled_");
 				this.mapEventToAttr(null, model.get("labelAttr"), "label");
 
 				this.inherited(arguments);
-			} 
-			else // The CheckBox Tree requires a model.
-			{
-				throw new Error(this.moduleName+"::postCreate(): no model was specified.");
+
+				var cbSelector = "." + this._checkboxBaseClass;
+				if (dojoVers < 109) {
+					// dojo 1.8
+					this.own(
+						// Register a dedicated checkbox click event listener.
+						on(this.domNode, on.selector(cbSelector, "click"), function (evt) {
+							self._onCheckBoxClick(evt, registry.getEnclosingWidget(this.parentNode));
+						})
+					);
+					// Add support for CTRL+DELETE
+					this._onKeyDown(null, {});
+					this._keyHandlerMap[keys.DELETE] = "_onDeleteKey";
+				} else {
+					// dojo 1.9
+					this.own(
+						on(this.containerNode, on.selector(cbSelector, "click"), function (evt) {
+							self._onCheckBoxClick(evt, registry.getEnclosingWidget(this.parentNode));
+						})
+					);
+					this._keyNavCodes[keys.DELETE] = lang.hitch(this, "_onDeleteKey");
+					this._keyNavCodes[keys.SPACE]  = lang.hitch(this, "_onSpaceKey");
+				}
+				this.on("load", function () {
+					if (!self.autoExpand && self.openOnChecked) {
+						self.expandChecked();
+					}
+				});
+				// Listen for submit events in case the tree sits inside a form.
+				while (target) {
+					if (target.nodeName === "FORM") {
+						on(target, "submit", lang.hitch(this, "_onSubmit"));
+						break;
+					}
+					target = target.parentNode;
+				}
+				this.formNode = target;
+			} else {
+				throw new CBTError("PropertyMissing", "postCreate", "no model was specified");
 			}
 		},
-		
+
 		// =======================================================================
 		// Misc helper functions/methods
 
-		mapEventToAttr: function (/*String*/ oldAttr, /*String*/ attr, /*String*/ nodeAttr, /*anything?*/ value) {
+		mapEventToAttr: function (oldAttr, attr, nodeAttr, value) {
 			// summary:
 			//		Add an event mapping to the mapping table.
 			//description:
 			//		Any event, triggered by the model or some other extension, can be
 			//		mapped to a _TreeNode attribute resulting a 'set' request for the
 			//		associated _TreeNode attribute.
-			// oldAttr:
+			// oldAttr: String
 			//		Original attribute name. If present in the mapping table it is deleted
 			//		and replace with 'attr'.
-			// attr:
+			// attr: String
 			//		Attribute/event name that needs mapping.
-			// nodeAttr:
+			// nodeAttr: String
 			//		Name of a _TreeNode attribute to which 'attr' is mapped.
-			// value:
+			// value: any
 			//		If specified the value to be assigned to the _TreeNode attribute. If
-			//		value is a function the function is called as: 
+			//		value is a function the function is called as:
 			//
-			//			function(item, nodeAttr, newValue)
+			//			function (item, nodeAttr, newValue)
 			//
 			//		and the result returned is assigned to the _TreeNode attribute.
-			
-			if (lang.isString(attr) && lang.isString(nodeAttr)) {
+
+			// TODO: remove with dojo 2.0
+
+			if (typeof attr == "string" && typeof nodeAttr == "string") {
 				if (attr.length && nodeAttr.length) {
 					if (oldAttr) {
 						delete this._eventAttrMap[oldAttr];
@@ -855,13 +1106,16 @@ define([
 			// tags:
 			//		private
 
-			if ((this.model.getChecked && lang.isFunction( this.model.getChecked )) &&
-					(this.model.setChecked && lang.isFunction( this.model.setChecked ))) {
+			if ((this.model.getChecked && typeof this.model.getChecked == "function") &&
+					(this.model.setChecked && typeof this.model.setChecked == "function")) {
 				return true;
 			}
 			return false;
 		}
-				
-	});	/* end declare() Tree */
+
+	});	/* end declare() CBTree */
+
+	CBTree._TreeNode = TreeNode;
+	return CBTree;
 
 });	/* end define() */

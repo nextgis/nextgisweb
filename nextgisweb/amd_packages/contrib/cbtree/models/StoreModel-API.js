@@ -18,7 +18,7 @@ define([
 	"./TreeStoreModel"
 ], function (array, lang, has, TreeStoreModel) {
 
-	// Add cbTree model API to the available features list 
+	// Add cbTree model API to the available features list
 	has.add("cbtree-storeModel-API", true);
 
 	lang.extend(TreeStoreModel, {
@@ -26,7 +26,7 @@ define([
 		// =======================================================================
 		// Private Methods related to checked states
 
-		_checkOrUncheck: function (/*String|Object*/ query, /*Boolean*/ newState, /*Callback*/ onComplete, 
+		_checkOrUncheck: function (/*String|Object*/ query, /*Boolean*/ newState, /*Callback*/ onComplete,
 																/*Context*/ scope, /*Boolean*/ storeOnly) {
 			// summary:
 			//		Check or uncheck the checked state of all store items that match the
@@ -43,7 +43,7 @@ define([
 			//		New state to be applied to the store items.
 			// onComplete:
 			//		If an onComplete callback function is provided, the callback function
-			//		will be called just once, after the last storeItem has been updated as: 
+			//		will be called just once, after the last storeItem has been updated as:
 			//		onComplete(matches, updates).
 			// scope:
 			//		If a scope object is provided, the function onComplete will be invoked
@@ -51,7 +51,7 @@ define([
 			//		the value of the "this" keyword will be the scope object. If no scope is
 			//		is provided, onComplete will be called in the context of tree.model.
 			// storeOnly:
-			//		See fetchItemsWithChecked() 
+			//		See fetchItemsWithChecked()
 			// tag:
 			//		private
 
@@ -62,7 +62,7 @@ define([
 				array.forEach(storeItems, function (storeItem) {
 					if (this.store.getValue(storeItem, this.checkedAttr) != newState) {
 						this._ItemCheckedSetter(storeItem, newState);
-						updates += 1; 
+						updates += 1;
 					}
 					matches += 1;
 				}, this)
@@ -74,7 +74,7 @@ define([
 
 		// =======================================================================
 		// Data store item getters and setters
-		
+
 		_ItemCheckedGetter: function (/*dojo.data.Item*/ storeItem) {
 			// summary:
 			//		Get the current checked state from the data store for the specified item.
@@ -110,13 +110,13 @@ define([
 			//		private
 			//	example:
 			//		model.set(item,"checked",newState);
-			
+
 			this.setChecked(storeItem, newState);
 		},
 
 		_ItemIdentityGetter: function (storeItem){
 			// summary:
-			//		Provide the hook for getItemAttr(storeItem,"identity") calls. The 
+			//		Provide the hook for getItemAttr(storeItem,"identity") calls. The
 			//		getItemAttr() interface is the preferred method over the legacy
 			//		getIdentity() method.
 			// storeItem:
@@ -124,7 +124,7 @@ define([
 			// tag:
 			//		private
 
-			if (this.store.isItem(storeItem)) {			
+			if (this.store.isItem(storeItem)) {
 				return this.store.getIdentity(storeItem);	// Object
 			} else {
 				if (storeItem === this.root){
@@ -136,7 +136,7 @@ define([
 
 		_ItemIdentitySetter: function (storeItem, value){
 			// summary:
-			//		Hook for setItemAttr(storeItem,"identity",value) calls. However, changing 
+			//		Hook for setItemAttr(storeItem,"identity",value) calls. However, changing
 			//		the identity of a store item is NOT allowed.
 			// tags:
 			//		private
@@ -173,7 +173,7 @@ define([
 			//		New label value.
 			// tags:
 			//		private
-			
+
 			var labelAttr = this.get("labelAttr");
 
 			if (labelAttr){
@@ -193,7 +193,7 @@ define([
 
 		getItemAttr: function (/*dojo.data.Item*/ storeItem , /*String*/ attribute){
 			// summary:
-			//		Provide the getter capabilities for store items thru the model. 
+			//		Provide the getter capabilities for store items thru the model.
 			//		The getItemAttr() method strictly operates on store items not
 			//		the model itself.
 			// storeItem:
@@ -202,7 +202,7 @@ define([
 			//		Name of property to get
 			// tag:
 			//		public
-			
+
 			var attr = (attribute == this.checkedAttr ? "checked" : attribute);
 
 			if (this.isItem(storeItem) || storeItem === this.root) {
@@ -232,7 +232,7 @@ define([
 			//		Value to be applied.
 			// tag:
 			//		public
-			
+
 			if (this._writeEnabled) {
 				var attr = (attribute == this.checkedAttr ? "checked" : attribute);
 				if (this.isItem(storeItem)) {
@@ -249,7 +249,7 @@ define([
 				throw new Error(this.moduleName+"::setItemAttr(): store is not write enabled.");
 			}
 		},
-		 
+
 		// =======================================================================
 		// Inspecting nad validating items
 
@@ -266,7 +266,7 @@ define([
 			//		used.
 			// tag:
 			//		public
-			
+
 			var identifier = this.store.getIdentifierAttr();
 			var idQuery		= this._anyToQuery(args, identAttr);
 
@@ -277,11 +277,11 @@ define([
 				return this.root;
 			}
 		},
-		
-		fetchItemsWithChecked: function (/*String|Object*/ query, /*Callback?*/ onComplete, /*Context?*/ scope, 
+
+		fetchItemsWithChecked: function (/*String|Object*/ query, /*Callback?*/ onComplete, /*Context?*/ scope,
 																			/*Boolean?*/ storeOnly) {
 			// summary:
-			//		Get the list of store items that match the query and have a checked 
+			//		Get the list of store items that match the query and have a checked
 			//		state, that is, a checkedAttr property.
 			// description:
 			//		Get the list of store items that match the query and have a checked
@@ -299,24 +299,24 @@ define([
 			//	scope:
 			//		If a scope object is provided, the function onComplete will be invoked
 			//		in the context of the scope object. In the body of the callback function,
-			//		the value of the "this" keyword will be the scope object. If no scope 
+			//		the value of the "this" keyword will be the scope object. If no scope
 			//		object is provided, onComplete will be called in the context of tree.model.
 			// storeOnly:
 			//		Indicates if the fetch operation should be limited to the in-memory store
 			//		only. Some stores may fetch data from a back-end server when perfroming a
 			//		deep search. However, when querying attributes, some attributes may only
-			//		be available in the in-memory store such is the case with a FileStore 
+			//		be available in the in-memory store such is the case with a FileStore
 			//		having custom attributes. (See FileStore.fetch() for additional details).
 			// tag:
 			//		public
-			
+
 			var storeQuery = this._anyToQuery( query, null );
 			var storeItems = [];
 			var storeOnly  = (storeOnly !== undefined) ? storeOnly : true;
 			var scope      = scope || this;
-			
+
 			if (lang.isObject(storeQuery)){
-				this.store.fetch({	
+				this.store.fetch({
 					query: storeQuery,
 					//	Make sure ALL items are searched, not just top level items.
 					queryOptions: { deep: true, storeOnly: storeOnly },
@@ -355,7 +355,7 @@ define([
 			//		A valid dojo.data.store item.
 			// tag:
 			//		public
-			
+
 			if (something !== this.root){
 				return this.store.isRootItem(something);
 			}
@@ -391,23 +391,23 @@ define([
 			//		A valid dojo.data.store item.
 			// tag:
 			//		public
-			
+
 			if (storeItem !== this.root){
 				this.store.attachToRoot(storeItem);
 			}
 		},
-		
+
 		check: function (/*Object|String*/ query, /*Callback*/ onComplete, /*Context*/ scope, /*Boolean?*/ storeOnly) {
 			// summary:
 			//		Check all store items that match the query and have a checked state.
 			// description:
 			//		See description _checkOrUncheck()
 			//	example:
-			//		model.check({ name: "John" }); 
+			//		model.check({ name: "John" });
 			//	| model.check("John", myCallback, this);
 			// tag:
 			//		public
-			
+
 			// If in strict checked mode the store is already loaded and therefore no
 			// need to fetch the store again.
 			if (this.checkedStrict) {
@@ -415,7 +415,7 @@ define([
 			}
 			this._checkOrUncheck(query, true, onComplete, scope, storeOnly);
 		},
-		
+
 		detachFromRoot: function (/*dojo.data.item*/ storeItem) {
 			// summary:
 			//		Detach item from the root by removing it from the stores top level item
@@ -424,7 +424,7 @@ define([
 			//		A valid dojo.data.store item.
 			// tag:
 			//		public
-			
+
 			if (storeItem !== this.root){
 				this.store.detachFromRoot(storeItem);
 			}
@@ -447,7 +447,7 @@ define([
 			//		If specified the location in the parents list of child items.
 			// tag:
 			//		public
-			
+
 			var newItem;
 
 			newItem = this.newItem(args, parent, insertIndex);
@@ -468,7 +468,7 @@ define([
 			// childrenAttr:
 			// tag:
 			//		public
-			
+
 			var listAttr = childrenAttr || this.childrenAttrs[0];
 			if (this.store.removeReference(childItem, parentItem, listAttr)){
 				// If any children are left get the first and update the parent checked state.
@@ -481,7 +481,7 @@ define([
 				); /* end getChildren() */
 			}
 		},
-		
+
 		uncheck: function (/*Object|String*/ query, /*Callback*/ onComplete, /*Context*/ scope, /*Boolean?*/ storeOnly) {
 			// summary:
 			//		Uncheck all store items that match the query and have a checked state.
@@ -492,7 +492,7 @@ define([
 			//	| uncheck("John", myCallback, this);
 			// tag:
 			//		public
-			
+
 			// If in strict checked mode the store is already loaded and therefore no
 			// need to fetch the store again.
 			if (this.checkedStrict) {
@@ -518,14 +518,14 @@ define([
 			//		private
 
 			var identAttr = this.store.getIdentifierAttr();
-					
+
 			if (identAttr){
 				var objAttr = attribute ? attribute : identAttr,
 						query = {};
 				if (lang.isString(args)) {
 					query[identAttr] = args;
 					return query;
-				} 
+				}
 				if (lang.isObject(args)){
 					lang.mixin( query, args );
 					if (args[objAttr]) {
