@@ -28,17 +28,16 @@ define([
             this.submitUrl = params.url;
 
             widget = this;
+
             if (params.operation == 'create') {
-                new Button({label: "Создать", iconClass: "dijitIconNewTask"}).placeAt(this.buttonPane)
-                    .on("click", function () { widget.submit() });
+                this.btn = new Button({label: "Создать", iconClass: "dijitIconNewTask"});
             } else if (params.operation == 'edit') {
-                new Button({label: "Сохранить", iconClass: "dijitIconSave"}).placeAt(this.buttonPane)
-                    .on("click", function () { widget.submit() });
+                this.btn = new Button({label: "Сохранить", iconClass: "dijitIconSave"});
             } else if (params.operation == 'delete') {
-                new Button({label: "Удалить", iconClass: "dijitIconDelete"}).placeAt(this.buttonPane)
-                    .on("click", function () { widget.submit() });               
+                this.btn = new Button({label: "Удалить", iconClass: "dijitIconDelete"});
             };
 
+            this.btn.placeAt(this.buttonPane).on("click", function () { widget.submit() });
         },
 
         postCreate: function () { 
@@ -66,7 +65,6 @@ define([
             this.buttonPane.placeAt(this);
         },
 
-
         submit: function () {
             var widget = this;
 
@@ -82,7 +80,7 @@ define([
 
             // при любом исходе разблокируем форму
             d.then(
-                function (success) { widget.set("disabled", false) },
+                function (success) { /* Всегда заканчивается редиректом */ },
                 function (errinfo) {
                     alert("К сожалению, во время выполнения операции произошла непредвиденная ошибка. \n" +
                           "Возможно это вызвано неполадками в работе сети. Сообщение об ошибке:\n\n" + errinfo);
@@ -127,6 +125,11 @@ define([
             );
 
             return d;
+        },
+
+        _setDisabledAttr: function (value) {
+            this.inherited(arguments);
+            this.btn.set('disabled', value);
         }
     });
 });
