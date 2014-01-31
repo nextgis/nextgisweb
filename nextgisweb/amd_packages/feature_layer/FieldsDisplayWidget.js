@@ -29,7 +29,7 @@ define([
                         "table.data.ngwFeatureLayer-fieldTable.ngwFeatureLayer-fieldTable-compact tbody"
                     );
 
-                    array.forEach(fields, function (f) {
+                    array.forEach(array.filter(fields, function(f){ return f.grid_visibility; }), function (f) {
                         put(tbody,
                             "tr th.display_name $ < td.value.$ $",
                             f.display_name,
