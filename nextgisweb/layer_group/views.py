@@ -74,7 +74,7 @@ def setup_pyramid(comp, config):
     @model_context(LayerGroup)
     def api_layer_group_tree(request, obj):
         request.require_permission(obj, 'read')
-        
+
         def traverse(layer_group):
             return dict(
                 type='layer_group', id=layer_group.id,
@@ -167,6 +167,18 @@ def setup_pyramid(comp, config):
     LayerGroupController('layer_group') \
         .includeme(config)
 
+    class LayerGroupDeleteMenuItem(dm.DynItem):
+
+        def build(self, args):
+            # Пропускаем основную группу слоев (корень)
+            if args.obj.id == 0:
+                return
+
+            yield dm.Link(
+                'operation/delete', u"Удалить",
+                lambda args: args.request.route_url(
+                    'layer_group.delete', id=args.obj.id))
+
     comp.LayerGroup.__dynmenu__ = dm.DynMenu(
         dm.Label('add', u"Добавить"),
         dm.Link(
@@ -185,17 +197,13 @@ def setup_pyramid(comp, config):
             )
         ),
         dm.Link(
-            'operation/delete', u"Удалить",
-            lambda args: args.request.route_url(
-                'layer_group.delete', id=args.obj.id
-            )
-        ),
-        dm.Link(
             'operation/acl', u"Управление доступом",
             lambda args: args.request.route_url(
                 'layer_group.acl', id=args.obj.id
             )
         ),
+
+        LayerGroupDeleteMenuItem(),
     )
 
     comp.layer_group_page_sections = PageSections()

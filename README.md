@@ -103,3 +103,5 @@ NextGIS):
 ### Запуск веб-сервера pserve:
 
     $ env/bin/pserve development.ini
+    
+Обновлённая версия руководства - в вики    
