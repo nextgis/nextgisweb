@@ -2,26 +2,46 @@
 define([
     "dojo/_base/declare",
     "./_PluginBase",
+    "dojo/_base/lang",
+    "dojo/_base/array",
+    "dojo/Deferred",
+    'dojo/store/JsonRest',
     "dijit/layout/ContentPane",
+    "dijit/Menu",
     "dijit/MenuItem",
     "dojo/dom-construct",
     "dojo/dom-style",
     "dojo/request/xhr",
     "feature_layer/FeatureGrid",
     "dijit/form/Button",
+    "dijit/form/TextBox",
+    "dijit/ToolbarSeparator",
+    "dijit/popup",
+    "put-selector/put",
     "./../tool/Identify"
 ], function (
     declare,
     _PluginBase,
+    lang,
+    array,
+    Deferred,
+    JsonRest,
     ContentPane,
+    Menu,
     MenuItem,
     domConstruct,
     domStyle,
     xhr,
     FeatureGrid,
     Button,
+    TextBox,
+    ToolbarSeparator,
+    popup,
+    put,
     Identify
 ) {
+    var MAX_SEARCH_RESULTS = 15;
+
     var Pane = declare([FeatureGrid], {
         closable: true,
         gutters: false,
@@ -86,13 +106,50 @@ define([
                 menuItem.set("disabled", !(itemConfig.type == "layer" && itemConfig.plugin[plugin.identity]));
             });
 
-
             this.tool = new Identify({display: this.display});
-        },
+
+            this.tbSearch = new TextBox({
+                placeHolder: "Поиск..."
+            });
+
+            var inputTimer, blurTimer;
+
+            this.tbSearch.on("blur", lang.hitch(this, function () {
+                var searchResults = this.searchResults;
+                if (searchResults && inputTimer == undefined) {
+                    blurTimer = setInterval(function() {
+                        popup.close(this.searchResults);
+                        clearInterval(blurTimer);
+                    }, 500);
+                };
+            }));
+
+            this.tbSearch.on("focus", lang.hitch(this, function () {
+                if (this.searchResults) {
+                    popup.open({
+                        popup: this.searchResults,
+                        around: this.tbSearch.domNode
+                    });
+                };
+                clearInterval(blurTimer);
+            }));
+
+            this.tbSearch.on("input", lang.hitch(this, function () {
+                if (inputTimer) { clearInterval(inputTimer) };
+                inputTimer = setInterval(lang.hitch(this, function () {
+                    clearInterval(inputTimer);
+                    this.search();
+                    inputTimer = undefined;
+                }), 750);
+            }));
+       },
 
         postCreate: function () {
             this.display.itemMenu.addChild(this.menuItem);
             this.display.addTool(this.tool);
+
+            new ToolbarSeparator().placeAt(this.display.infoNode, 'first');
+            this.tbSearch.placeAt(this.display.infoNode, 'first');
         },
 
         openFeatureGrid: function () {
@@ -109,6 +166,112 @@ define([
 
             this.display.tabContainer.addChild(pane);
             this.display.tabContainer.selectChild(pane);
+        },
+
+        search: function () {
+            var criteria = this.tbSearch.get('value');
+
+            if (this.searchResults) { popup.close(this.searchResults) };
+
+            if (criteria == "") { return };
+
+            this.searchResults = new Menu({});
+            
+            var searchResults = this.searchResults;
+            domStyle.set(searchResults.domNode, "width", domStyle.get(this.tbSearch.domNode, "width") + "px");
+
+            popup.open({
+                popup: this.searchResults,
+                around: this.tbSearch.domNode
+            });
+
+            var statusItem = new MenuItem({label: "", disabled: true});
+            statusItem.placeAt(searchResults);
+
+
+            var addResult = function (feature) {
+                var mItm = new MenuItem({
+                    label: put("span $", feature.label).outerHTML,
+                    onClick: lang.hitch(this, function () {
+                        display.map.olMap.zoomToExtent(feature.box);
+                        popup.close(this.searchResults);
+                    })
+                });
+                mItm.placeAt(statusItem, 'before');
+            };
+
+            var setStatus = function (status) {
+                if (status == undefined) {
+                    domStyle.set(statusItem.domNode, 'display', 'none');
+                } else {
+                    statusItem.set("label", status);
+                };
+            };
+
+            var breakOrError = function (value) {
+                if (value != undefined) {
+                    console.error(value)
+                }
+            };
+
+            setStatus("Идет поиск...");
+
+            this.display.getVisibleItems().then(lang.hitch(this, function (items) {
+                var deferred = new Deferred(),
+                    fdeferred = deferred;
+
+                array.forEach(items, function (itm) {
+                    var id = this.display.itemStore.getValue(itm, 'id'),
+                        layerId = this.display.itemStore.getValue(itm, 'layerId'),
+                        itmConfig = this.display._itemConfigById[id],
+                        pluginConfig = itmConfig.plugin["webmap/plugin/FeatureLayer"];
+                    
+                    if (pluginConfig != undefined && pluginConfig.likeSearch) {
+                        var store = new JsonRest({
+                            target: ngwConfig.applicationUrl + '/layer/' + layerId + '/store_api/',
+                            headers: {"X-Feature-Box": true}
+                        });
+
+                        var cdeferred = deferred,
+                            ndeferred = new Deferred();
+
+                        deferred.then(function (limit) {
+                            console.log("Searching layer=" + layerId + " with limit=" + limit);
+                            store.query({ like: criteria }, {
+                                start: 0,
+                                count: limit + 1
+                            }).forEach(lang.hitch(this, function(itm) {
+                                if (limit > 0) { addResult(itm); };
+                                limit = limit - 1;
+                            })).then(function () {
+                                if (limit >= 0) {
+                                    ndeferred.resolve(limit);
+                                } else {
+                                    setStatus("Уточните критерий поиска");
+                                    ndeferred.reject();
+                                };
+                            }, function (err) {
+                                // Если что-то пошло не так с конкретным слоем,
+                                // то все равно продолжаем поиск по следующему
+                                ndeferred.resolve(limit);
+                            }).otherwise(breakOrError);
+                        }).otherwise(breakOrError);
+
+                        deferred = ndeferred;
+                    };
+                }, this);
+
+                deferred.then(function (limit) {
+                    if (limit == MAX_SEARCH_RESULTS) {
+                        setStatus("Ничего не найдено");
+                    } else {
+                        setStatus(undefined);
+                    }
+                }).otherwise(breakOrError);
+
+                fdeferred.resolve(MAX_SEARCH_RESULTS);
+
+            })).otherwise(console.error);
         }
     });
 });
