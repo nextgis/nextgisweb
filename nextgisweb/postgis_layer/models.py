@@ -255,7 +255,9 @@ def initialize(comp):
                 l = []
                 for fld in self.layer.fields:
                     if fld.datatype == FIELD_TYPE.STRING:
-                        l.append(sql.column(fld.keyname).ilike(
+                        l.append(sql.cast(
+                            sql.column(fld.keyname),
+                            sa.Unicode).ilike(
                             '%' + self._like + '%'))
 
                 select.append_whereclause(sa.or_(*l))
