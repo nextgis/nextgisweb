@@ -322,12 +322,44 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
+
+            // Модифицируем TabContainer так, чтобы он показывал табы только 
+            // в том случае, если их больше одного, т.е. один таб не показываем
+            declare.safeMixin(this.tabContainer, {
+                updateTabVisibility: function () {
+                    var currstate = domStyle.get(this.tablist.domNode, 'display') != 'none',
+                        newstate = this.getChildren().length > 1;
+
+                    if (currstate && !newstate) {
+                        // Скрываем панель с табами
+                        domStyle.set(this.tablist.domNode, 'display', 'none');
+                        this.resize();
+                    } else if (!currstate && newstate) {
+                        // Показываем панель с табами
+                        domStyle.set(this.tablist.domNode, 'display', 'block');
+                        this.resize();                        
+                    };
+                },
+
+                addChild: function () {
+                    this.inherited(arguments);
+                    this.updateTabVisibility();
+                },
+                removeChild: function () {
+                    this.inherited(arguments);
+                    this.updateTabVisibility();
+                },
+                startup: function () {
+                    this.inherited(arguments);
+                    this.updateTabVisibility();
+                }
+            });
+
             this._postCreateDeferred.resolve();
         },
 
         startup: function () {
             this.inherited(arguments);
-            // this.loadBookmarks();
             this._startupDeferred.resolve();
         },
 
