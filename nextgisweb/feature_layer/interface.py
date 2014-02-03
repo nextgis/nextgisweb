@@ -70,3 +70,9 @@ class IFeatureQueryOrderBy(IFeatureQuery):
 
     def order_by(self, *args):
         """ Установить порядок сортировки """
+
+
+class IFeatureQueryLike(IFeatureQuery):
+
+    def like(self, value):
+        """ Установить отбор по подстроке """

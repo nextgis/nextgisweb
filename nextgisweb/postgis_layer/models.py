@@ -16,6 +16,7 @@ from ..feature_layer import (
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilterBy,
+    IFeatureQueryLike,
 )
 
 
@@ -59,6 +60,17 @@ def initialize(comp):
             )
 
         def setup(self):
+            fdata = dict()
+            for f in self.fields:
+                fdata[f.keyname] = dict(
+                    display_name=f.display_name,
+                    grid_visibility=f.grid_visibility)
+
+            for f in list(self.fields):
+                self.fields.remove(f)
+
+            self.feature_label_field = None
+
             conn = comp.connection[self.connection].connect()
             try:
                 result = conn.execute(
@@ -109,6 +121,10 @@ def initialize(comp):
                         assert row['data_type'] == 'integer'
                     elif row['column_name'] == self.column_geom:
                         pass
+                    elif row['column_name'] in ('id', 'geom'):
+                        # FIXME: На данный момент наличие полей id или
+                        # geom полностью ломает векторный слой
+                        pass
                     else:
                         datatype = None
                         if row['data_type'] == 'integer':
@@ -121,10 +137,12 @@ def initialize(comp):
                             datatype = FIELD_TYPE.STRING
 
                         if datatype is not None:
+                            fopts = dict(display_name=row['column_name'])
+                            fopts.update(fdata.get(row['column_name'], dict()))
                             self.fields.append(LayerField(
                                 keyname=row['column_name'],
-                                display_name=row['column_name'],
-                                datatype=datatype))
+                                datatype=datatype,
+                                **fopts))
             finally:
                 conn.close()
 
@@ -148,7 +166,7 @@ def initialize(comp):
     comp.PostgisLayer = PostgisLayer
 
     class FeatureQueryBase(object):
-        implements(IFeatureQuery, IFeatureQueryFilterBy)
+        implements(IFeatureQuery, IFeatureQueryFilterBy, IFeatureQueryLike)
 
         def __init__(self):
             self._geom = None
@@ -159,6 +177,7 @@ def initialize(comp):
             self._offset = None
 
             self._filter_by = None
+            self._like = None
             self._intersects = None
 
         def geom(self):
@@ -179,6 +198,9 @@ def initialize(comp):
 
         def order_by(self, *args):
             self._order_by = args
+
+        def like(self, value):
+            self._like = value
 
         def intersects(self, geom):
             self._intersects = geom
@@ -217,6 +239,15 @@ def initialize(comp):
                         select.append_whereclause(idcol == v)
                     else:
                         select.append_whereclause(sql.column(k) == v)
+
+            if self._like:
+                l = []
+                for fld in self.layer.fields:
+                    if fld.datatype == FIELD_TYPE.STRING:
+                        l.append(sql.column(fld.keyname).ilike(
+                            '%' + self._like + '%'))
+
+                select.append_whereclause(sa.or_(*l))
 
             if self._intersects:
                 intgeom = sa.func.st_setsrid(sa.func.st_geomfromtext(

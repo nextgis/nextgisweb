@@ -45,7 +45,7 @@ def main(argv=sys.argv):
 
     for cmd in Command.registry:
         subparser = subparsers.add_parser(cmd.identity)
-        cmd.argparser_setup(subparser)
+        cmd.argparser_setup(subparser, env)
         subparser.set_defaults(command=cmd)
 
     args = argparser.parse_args(argv[1:])

@@ -12,25 +12,11 @@
         "dojo/dom",
         "feature_layer/FeatureGrid",
         "dijit/form/Button",
+        "dijit/form/TextBox",
         "dojo/domReady!"
-    ], function (dom, FeatureGrid, Button) {
+    ], function (dom, FeatureGrid, Button, TextBox) {
         var grid = new FeatureGrid({layerId: ${obj.id}, style: "width: 100%; height: 100%; padding: 0"});
         grid.placeAt(dom.byId("grid"));
-
-        var btn = new Button({
-            label: "Открыть",
-            iconClass: "dijitIconApplication",
-            disabled: true,
-            onClick: function () {
-                window.location = grid.selectedRow.id + '/edit';
-            }
-        });
-
-        grid.watch("selectedRow", function (attr, oldVal, newVal) {
-            btn.set("disabled", newVal == null);
-        });
-
-        grid.toolbar.addChild(btn);
 
         grid.startup();
     });

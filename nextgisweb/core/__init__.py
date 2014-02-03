@@ -38,6 +38,9 @@ class CoreComponent(Component):
 
         self.metadata = Base.metadata
 
+        if 'backup.filename' not in self.settings:
+            self.settings['backup.filename'] = '%y%m%d-%H%M%S'
+
     def backup(self):
         metadata = self.env.metadata()
 

@@ -1,14 +1,16 @@
 <table class="data" style="width: 100%">
     <thead>
         <tr>
+            <th>#</th>
             <th>Наименование</th>
             <th>Тип</th>
             <th>Владелец</th>
             <th>Операции</th>
         </tr>
     </thead>
-    %for layer in obj.layers:
+    %for idx, layer in enumerate(obj.layers, start=1):
         <tr>
+            <td>${idx}</td>
             <td><a href="${layer.permalink(request)}">${layer.display_name}</a></td>
             <td>${request.env.layer.Layer.registry[layer.cls].cls_display_name}</td>
             <td>${layer.owner_user}</td>
@@ -19,7 +21,7 @@
     %endfor
     %if len(obj.layers) == 0:
         <tr>
-            <td colspan="4">
+            <td colspan="5">
                 <i>В этой группе пока нет слоёв.</i>
             </td>
         </tr>

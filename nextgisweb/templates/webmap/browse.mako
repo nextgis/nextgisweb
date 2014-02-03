@@ -1,16 +1,18 @@
 <%inherit file='../base.mako' />
 
-<table style="width: 100%;">
+<table class="data" style="width: 100%;">
     <thead>
         <tr>
+            <th>#</th>
             <th>Наименование</th>
             <th>Владелец</th>
             <th>Операции</th>
         </tr>
     </thead>
     <tbody>
-        %for obj in obj_list:
+        %for idx, obj in enumerate(obj_list, start=1):
             <tr>
+                <td>${idx}</td>
                 <td>
                     <a href="${request.route_url('webmap.show', id=obj.id)}">${obj.display_name}</a>
                 </td>

@@ -24,7 +24,7 @@ requires = [
     'pillow',
     'lxml',
     'passlib',
-    'pip',
+    'owslib',
 ]
 
 entry_points = {
@@ -65,3 +65,4 @@ setup(name='nextgisweb',
       install_requires=requires,
       entry_points=entry_points,
       )
+
