@@ -10,7 +10,7 @@ declare("cbtree.models.model", null,
 	//		it's just a black box so it could be anything. The generic type of
 	//		an item is therefore referred to as 'data.Item'
 	//
-	//		This (like `dojo.data.api.Read`) is just documentation, and not 
+	//		This (like `dojo.data.api.Read`) is just documentation, and not
 	//		meant to be used.
 
 	destroy: function(){
@@ -127,7 +127,7 @@ declare("cbtree.models.model", null,
 		// tag:
 		//		public
 	},
-		
+
 	setChecked: function (item, newState) {
 		// summary:
 		//		Update the checked state for the store item and the associated parents
@@ -155,7 +155,7 @@ declare("cbtree.models.model", null,
 	// =======================================================================
 	// Write interface
 
-	newItem: function(args, parent, insertIndex){
+	newItem: function(args, parent, insertIndex, before){
 		// summary:
 		//		Creates a new item.	 See `dojo.data.api.Write` for details on args.
 		// args:
@@ -163,11 +163,12 @@ declare("cbtree.models.model", null,
 		// parent:
 		//		Item
 		// insertIndex: int?
+		// before: boolean?
 		// tags:
 		//		public
 	},
 
-	pasteItem: function(childItem, oldParentItem, newParentItem, bCopy){
+	pasteItem: function(childItem, oldParentItem, newParentItem, bCopy,  insertIndex, before){
 		// summary:
 		//		Move or copy an item from one parent item to another.
 		//		Used in drag & drop.
@@ -177,6 +178,8 @@ declare("cbtree.models.model", null,
 		// oldParentItem: Item
 		// newParentItem: Item
 		// bCopy: Boolean
+		// insertIndex: int?
+		// before: boolean?
 		// tags:
 		//		public
 	},

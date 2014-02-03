@@ -2,13 +2,11 @@ define([
     "dojo/dom-construct",
     "dojo/dom-style",
     "dojo/dom-geometry",
-    "dojo/on",
     "./../openlayers",
 ], function (
     domConstruct,
     domStyle,
     domGeom,
-    on,
     openlayers
 ) {
     var Popup = OpenLayers.Class(OpenLayers.Popup, {
@@ -65,12 +63,6 @@ define([
                 class: "dijitDialogCloseIcon",
                 style: "margin-top: 2px"
             }, this.titleDiv, "last");
-
-            // Обработчик закрытия
-            var popup = this;
-            on(this._closeSpan, 'click', function () {
-                popup.map.removePopup(popup);
-            });
 
             // Соединительная стрелка
             this._connectorDiv = domConstruct.create("div", {

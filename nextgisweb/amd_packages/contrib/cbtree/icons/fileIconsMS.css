@@ -1,7 +1,7 @@
 /*
  *  Sample cbtree custom file icon CSS
  *
- *  Usage:  See README.md
+ *  Usage:  See https://github.com/pjekel/cbtree/wiki/Tree-Styling
  *
  */
 
@@ -134,7 +134,7 @@
 .fileIconJs {
 	background-image: url('images/fileIconsMS.gif');
 	background-repeat: no-repeat;
-	background-position: -1746px;
+	background-position: -360px;
 	width: 18px;
 }
 
@@ -306,21 +306,21 @@
 	width: 18px;
 }
 
-/*
-Document with IE logo
 .fileIconHtm, .fileIconHtml, .fileIconShtml {
 	background-image: url('images/fileIconsMS.gif');
 	background-repeat: no-repeat;
 	background-position: -972px;
 	width: 18px;
 }
-*/
+
+/*
 .fileIconHtm, .fileIconHtml, .fileIconShtml {
 	background-image: url('images/fileIconsMS.gif');
 	background-repeat: no-repeat;
 	background-position: -990px;
 	width: 18px;
 }
+*/
 
 .fileIconDoc {
 	background-image: url('images/fileIconsMS.gif');
@@ -364,7 +364,7 @@ Document with IE logo
 	width: 18px;
 }
 
-.fileIconXls {
+.fileIconXls, .fileIconCsv {
 	background-image: url('images/fileIconsMS.gif');
 	background-repeat: no-repeat;
 	background-position: -1134px;

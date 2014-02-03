@@ -22,7 +22,7 @@ define([
 		// module:
 		//		cbtree/models/ForestStoreModel
 		// summary:
-		//		Interface between a CheckBox Tree and a dojo.data store that doesn't have a 
+		//		Interface between a CheckBox Tree and a dojo.data store that doesn't have a
 		//		root item, a.k.a. a store that has multiple "top level" items.
 
 	return declare([TreeStoreModel], {
@@ -49,7 +49,7 @@ define([
 
 		// End of parameters to constructor
 		//=================================
-		
+
 		moduleName: "cbTree/models/ForestStoreModel",
 
 		constructor: function (params) {
@@ -73,7 +73,7 @@ define([
 		// =======================================================================
 		// Methods for traversing hierarchy
 
-		getChildren: function(/*dojo.data.Item*/ parentItem, /*function(items)*/ callback, /*function*/ onError, 
+		getChildren: function(/*dojo.data.Item*/ parentItem, /*function(items)*/ callback, /*function*/ onError,
 													 /*(String|String[])?*/ childrenLists ){
 			// summary:
 			//		 Calls onComplete() with array of child items of given parent item, all loaded.
@@ -100,7 +100,7 @@ define([
 
 		getParents: function (/*dojo.data.item*/ storeItem) {
 			// summary:
-			//		Get the parent(s) of a store item.	
+			//		Get the parent(s) of a store item.
 			// storeItem:
 			//		The dojo.data.item whose parent(s) will be returned.
 			// tags:
@@ -171,9 +171,9 @@ define([
 				}
 			} else {
 				return this.inherited(arguments);
-			}			
+			}
 		},
-		
+
 		// =======================================================================
 		// Write interface
 
@@ -187,7 +187,7 @@ define([
 			if (item === this.root) {
 				var children = this.root.children || [];
 				var i;
-				
+
 				for(i=0;i<children.length; i++) {
 					this.store.deleteItem( children[i] );
 				}
@@ -209,21 +209,20 @@ define([
 			}
 		},
 
-		pasteItem: function (/*dojo.data.item*/ childItem, /*dojo.data.item*/ oldParentItem, /*dojo.data.item*/ newParentItem, 
+		pasteItem: function (/*dojo.data.item*/ childItem, /*dojo.data.item*/ oldParentItem, /*dojo.data.item*/ newParentItem,
 												 /*Boolean*/ bCopy, /*int?*/ insertIndex, /*String?*/ childrenAttr){
 			// summary:
 			//		Move or copy an item from one parent item to another.
 			//		Used in drag & drop
 			// tags:
 			//		extension
-
 			if (oldParentItem === this.root){
 				if (!bCopy){
 					this.store.detachFromRoot(childItem);
 				}
 			}
 			if (newParentItem === this.root){
-				this.store.attachToRoot(childItem);
+				this.store.attachToRoot(childItem, insertIndex);
 			}
 			this.inherited(arguments, [childItem,
 				oldParentItem === this.root ? null : oldParentItem,
@@ -260,7 +259,7 @@ define([
 			//
 			// tags:
 			//		extension
-		
+
 			// Call onChildrenChange() on parent (ie, existing) item with new list of children
 			// In the common case, the new list of children is simply parentInfo.newValue or
 			// [ parentInfo.newValue ], although if items in the store has multiple
@@ -276,16 +275,16 @@ define([
 			}
 		},
 
-		onSetItem: function (/*dojo.data.item*/ storeItem, /*string*/ attribute, /*AnyType*/ oldValue, 
+		onSetItem: function (/*dojo.data.item*/ storeItem, /*string*/ attribute, /*AnyType*/ oldValue,
 													/*AnyType*/ newValue){
 			// summary:
 			//		Updates the tree view according to changes in the data store.
 			// description:
 			//		Handles updates to a store item's children by calling onChildrenChange(), and
 			//		other updates to a store item by calling onChange().
-			// storeItem: 
+			// storeItem:
 			//		Store item
-			// attribute: 
+			// attribute:
 			//		attribute-name-string
 			// oldValue:
 			//		Old attribute value
@@ -340,7 +339,7 @@ define([
 						this.root.children = newChildren;
 						// If the list of children or the order of children has changed...
 						if (oldChildren.length != newChildren.length ||
-							array.some(oldChildren, function (item, idx){ 
+							array.some(oldChildren, function (item, idx){
 									return newChildren[idx] != item;
 								})) {
 							this.onChildrenChange(this.root, newChildren);

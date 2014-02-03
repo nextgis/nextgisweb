@@ -231,11 +231,11 @@ define([
 
             // Выбранный элемент
             this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
-                widget.set("item", newVal);
                 widget.set(
                     "itemConfig",
                     widget._itemConfigById[widget.itemStore.getValue(newVal, 'id')]
                 );
+                widget.set("item", newVal);
             });
 
             // Карта

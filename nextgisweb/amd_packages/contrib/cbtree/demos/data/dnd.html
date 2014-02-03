@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>The CheckBox Tree Drag-n-Drop</title>
+    <style type="text/css">
+      @import "../../../dijit/themes/claro/claro.css";
+      @import "../../../dijit/themes/claro/document.css";
+      @import "../../../dijit/tests/css/dijitTests.css";
+      @import "../../themes/claro/claro.css";
+    </style>
+
+    <script type="text/javascript">
+      var dojoConfig = {
+            async: true,
+            parseOnLoad: true,
+            isDebug: true,
+            baseUrl: "../../../",
+            packages: [
+              { name: "dojo",  location: "dojo" },
+              { name: "dijit", location: "dijit" },
+              { name: "cbtree",location: "cbtree" }
+            ]
+      };
+    </script>
+
+    <script type="text/javascript" src="../../../dojo/dojo.js"></script>
+		<script type="text/javascript">
+			require(["dojo/_base/lang",
+					 "dojo/ready",
+					 "dijit/tree/dndSource",
+					 "dijit/registry",
+					 "cbtree/Tree",
+					 "cbtree/models/ForestStoreModel",
+					 "dojo/data/ItemFileWriteStore"
+					], function (lang, ready, dndSource, registry, Tree, ForestStoreModel, Store) {
+
+            var data = {
+				"identifier": "name",
+				 "label": "name",
+				 "items": [
+					{ "name":"Africa", "type":"continent", "children":[
+					  { "name":"Egypt", "type":"country" },
+					  { "name":"Kenya", "type":"country", "children":[
+						{ "name":"Nairobi", "type":"city" },
+						{ "name":"Mombasa", "type":"city" } ]
+					  },
+					  { "name":"Sudan", "type":"country", "children":
+						{ "name":"Khartoum", "type":"city" }
+					  } ]
+					},
+					{ "name":"Asia", "type":"continent", "children":[
+					  { "name":"China", "type":"country" },
+					  { "name":"India", "type":"country" },
+					  { "name":"Russia", "type":"country" },
+					  { "name":"Mongolia", "type":"country" } ]
+					},
+					{ "name":"Australia", "type":"continent", "children":
+					  { "name":"Commonwealth of Australia", "type":"country"}
+					},
+					{ "name":"Europe", "type":"continent", "children":[
+					  { "name":"Germany", "type":"country" },
+					  { "name":"France", "type":"country" },
+					  { "name":"Spain", "type":"country" },
+					  { "name":"Italy", "type":"country" } ]
+					},
+					{ "name":"North America", "type":"continent", "children":[
+					  { "name":"Mexico", "type":"country", "children":[
+						{ "name":"Mexico City", "type":"city" },
+						{ "name":"Guadalajara", "type":"city" } ]
+					  },
+					  { "name":"Canada", "type":"country", "children":[
+						{ "name":"Ottawa", "type":"city"},
+						{ "name":"Toronto", "type":"city"}]
+					  },
+					  { "name":"United States of America", "type":"country" } ]
+					},
+					{ "name":"South America", "type":"continent", "children":[
+					  { "name":"Brazil", "type":"country" },
+					  { "name":"Argentina", "type":"country" } ]
+					}
+				]
+			  };
+
+				var store = new Store({data: data});
+				var model = new ForestStoreModel({ store: store, query: {type:"continent"}});
+				var contTree, earthTree;
+
+				acceptItem = function (target, source, position) {
+					var targetWidget = registry.getEnclosingWidget(target);
+					return (targetWidget.tree == earthTree);
+				}
+
+				domNodeToItem = function (nodes, target, source ) {
+					// Convert DOM nodes dropped on a tree to data items. Because we know the
+					// source is a tree associated with a very simple store we don't have to
+					// go fancy here, just create a shallow copy of the item....
+
+					return nodes.map( function (node) {
+						var nodeWidget  = dijit.byId(node.id);
+						return lang.mixin( {}, nodeWidget.item );
+					});
+				}
+
+				ready(function() {
+					// Allow items to be dropped on the earth tree but only if the source is another tree.
+					earthTree = new Tree({
+						id:"tree06_0",
+						model: model,
+						checkItemAcceptance: acceptItem,
+						itemCreator: domNodeToItem,
+						dndController: dndSource,
+						betweenThreshold:5,
+						checkAcceptance: function (source, nodes) {
+							return !!source.tree;
+						}
+					});
+					earthTree.placeAt("divEarth");
+					earthTree.startup();
+				});
+			});
+		</script>
+  </head>
+
+  <body class="claro">
+    <h1 class="DemoTitle">The CheckBox Tree Drag-n-Drop</h1>
+    <p>
+			A basic CheckBox Tree and cbtree/store Hierarchy store demonstrating Drag-n-Drop features.
+		</p>
+		<div id="content">
+			<div id="divEarth" style="width:250px; float:left;">
+			</div>
+			<div id="divContinents">
+			</div>
+		</div>
+		<div id="second">
+		</div>
+  </body>
+</html>

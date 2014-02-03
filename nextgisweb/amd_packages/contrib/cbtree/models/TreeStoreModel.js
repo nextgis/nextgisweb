@@ -19,7 +19,7 @@ define([
 	"dojo/has",						// has.add
 	"dojo/json",					// json.stringify
 	"dojo/Stateful",			// get() and set()
-	"./ItemWriteStoreEX"	// ItemFileWriteStore extensions.	
+	"./ItemWriteStoreEX"	// ItemFileWriteStore extensions.
 ], function(array, declare, lang, aspect, has, json, Stateful, ItemWriteStoreEX){
 
 		// module:
@@ -47,15 +47,15 @@ define([
 		//		If true, the root node will receive a checked state eventhough it's not
 		//		a true entry in the store. This attribute is independent of the showRoot
 		//		attribute of the tree itself. If the tree attribute 'showRoot' is set to
-		//		false the checked state for the root will not show either.	
+		//		false the checked state for the root will not show either.
 		checkedRoot: false,
 
 		// checkedStrict: Boolean
-		//		If true, a strict parent-child relation is maintained. For example, 
+		//		If true, a strict parent-child relation is maintained. For example,
 		//		if all children are checked the parent will automatically recieve the
 		//		same checked state or if any of the children are unchecked the parent
 		//		will, depending if multi state is enabled, recieve either a mixed or
-		//		unchecked state. 
+		//		unchecked state.
 		//		If set to true it overwrites deferItemLoadingUntilExpand.
 		checkedStrict: true,
 
@@ -65,9 +65,9 @@ define([
 		//		example: { name:'Egypt', type:'country', checked: true } If a store item
 		//		has no 'checked' attribute specified it will depend on the model property
 		//		'checkedAll' if one will be created automatically and if so, its initial
-		//		state will be set as specified by 'checkedState'. 
+		//		state will be set as specified by 'checkedState'.
 		checkedAttr: "checked",
-		
+
 		// childrenAttrs: String[]
 		//		One or more attribute names (attributes in the dojo.data item) that specify
 		//		that item's children
@@ -84,19 +84,19 @@ define([
 
 		// enabledAttr: String (1.8)
 		//		The attribute name (property of the store item) that holds the 'enabled'
-		//		state of the checkbox or alternative widget. 
-		//		Note: Eventhough it is referred to as the 'enabled' state the tree will 
+		//		state of the checkbox or alternative widget.
+		//		Note: Eventhough it is referred to as the 'enabled' state the tree will
 		//		only use this property to enable/disable the 'ReadOnly' property of a
 		//		checkbox. This because disabling a widget may exclude it from HTTP POST
 		//		operations.
 		enabledAttr:"",
-		
+
 		// excludeChildrenAttrs: String[]
 		//		If multiple childrenAttrs have been specified excludeChildrenAttrs determines
 		//		which of those childrenAttrs are excluded from: a) getting a checked state.
 		//		b) compiling the composite state of a parent item.
 		excludeChildrenAttrs: null,
-		
+
 		// iconAttr: String
 		//		If specified, get the icon from an item using this attribute name.
 		iconAttr: "",
@@ -126,24 +126,24 @@ define([
 		//		is, true or false. When normalization is enabled checkboxes associated with
 		//		tree leafs can never have a mixed state.
 		normalize: true,
-		
+
 		// query: String
 		//		Specifies the set of children of the root item.
 		// example:
 		//		{type:'continent'}
 		query: null,
-		
+
 		// store: dojo.data.Store
 		//		Underlying store
 		store: null,
 
 		// End Parameters to constructor
 		//==============================
-		
+
 		moduleName: "cbTree/models/TreeStoreModel",
 
 		// hasFakeRoot: Boolean
-		//		Indicates if the model has a fabricated root item. (this is not a constructor 
+		//		Indicates if the model has a fabricated root item. (this is not a constructor
 		//		parameter).	Typically set by models like the ForestStoreModel.
 		hasFakeRoot: false,
 
@@ -214,6 +214,7 @@ define([
 					this._queryAttrs.push(attr);
 				}
 			}
+			dojo.deprecated("{cbtree/models/TreeStoreModel}", "Migrate to the new models in cbtree/model/", "2.0");
 		},
 
 		destroy: function(){
@@ -230,7 +231,7 @@ define([
 		_checkedStrictSetter: function (value){
 			// summary:
 			//		Hook for the set("checkedStrict",value) calls. Note: A full store
-			//		re-evaluation is only kicked off when the current value is false 
+			//		re-evaluation is only kicked off when the current value is false
 			//		and the new value is true.
 			// value:
 			//		New value applied to 'checkedStrict'. Any value is converted to a boolean.
@@ -269,7 +270,7 @@ define([
 			}
 			return this.enabledAttr;
 		},
-		
+
 		_labelAttrGetter: function() {
 			// summary:
 			//		Return the label attribute associated with the store, if available.
@@ -313,7 +314,7 @@ define([
 		// =======================================================================
 		// Methods for traversing hierarchy
 
-		getChildren: function(/*dojo.data.item*/ parentItem, /*Function*/ onComplete, /*Function*/ onError, 
+		getChildren: function(/*dojo.data.item*/ parentItem, /*Function*/ onComplete, /*Function*/ onError,
 													 /*String[]?*/ childrenLists ){
 			// summary:
 			//		 Calls onComplete() with array of child items of given parent item,
@@ -330,17 +331,17 @@ define([
 			//		If ommitted, childrenAttrs is used instead returning all children.
 			// tags:
 			//		public
-			
+
 			var store = this.store;
 			var scope = this;
-			
+
 			if(!store.isItemLoaded(parentItem)){
 				// The parent is not loaded yet, we must be in deferItemLoadingUntilExpand
 				// mode, so we will load it and just return the children (without loading each
 				// child item)
 				var getChildren = lang.hitch(this, arguments.callee);
-				store.loadItem( scope._mixinFetch( 
-					{	
+				store.loadItem( scope._mixinFetch(
+					{
 						item: parentItem,
 						onItem: function(parentItem) {
 											getChildren(parentItem, onComplete, onError);
@@ -357,7 +358,7 @@ define([
 					vals = store.getValues(parentItem, this.childrenAttrs[i]);
 					childItems = childItems.concat(vals);
 				}
-			} 
+			}
 			else // Get children from specfied list(s) only.
 			{
 				var lists = lang.isArray(childrenLists) ? childrenLists : [childrenLists];
@@ -379,7 +380,7 @@ define([
 				// still waiting for some or all of the items to load
 				array.forEach(childItems, function(item, idx){
 					if (!store.isItemLoaded(item)) {
-						store.loadItem( scope._mixinFetch( 
+						store.loadItem( scope._mixinFetch(
 							{
 								item: item,
 								onItem: function(item){
@@ -399,7 +400,7 @@ define([
 
 		getParents: function (/*dojo.data.item*/ storeItem) {
 			// summary:
-			//		Get the parent(s) of a store item.	
+			//		Get the parent(s) of a store item.
 			// storeItem:
 			//		The dojo.data.item whose parent(s) will be returned.
 			// tags:
@@ -417,11 +418,11 @@ define([
 			//		Function called with the root item for the tree.
 			// onError:
 			//		Function called in case an error occurred.
-			
+
 			if(this.root){
 				onItem(this.root);
 			}else{
-				this.store.fetch( this._mixinFetch( 
+				this.store.fetch( this._mixinFetch(
 					{
 						query: this.query,
 						onComplete: lang.hitch(this, function(items){
@@ -456,18 +457,18 @@ define([
 
 		// =======================================================================
 		// Private Checked state handling
-		
+
 		_getCompositeState: function (/*dojo.data.item[]*/ children) {
 			// summary:
 			//		Compile the composite state based on the checked state of a group
 			//		of children.	If any child has a mixed state, the composite state
 			//		will always be mixed, on the other hand, if none of the children
 			//		has a checked state the composite state will be undefined.
-			// children: 
+			// children:
 			//		Array of dojo.data items
 			// tags:
 			//		private
-			
+
 			var hasChecked	 = false,
 					hasUnchecked = false,
 					isMixed			= false,
@@ -481,7 +482,7 @@ define([
 					case true:
 						hasChecked = true;
 						break;
-					case false: 
+					case false:
 						hasUnchecked = true;
 						break;
 				}
@@ -494,7 +495,7 @@ define([
 			}
 			return newState;
 		},
-		
+
 		_normalizeState: function (/*dojo.data.item*/ storeItem, /*Boolean|String*/ state) {
 			// summary:
 			//		Normalize the checked state value so we don't store an invalid state
@@ -505,7 +506,7 @@ define([
 			//		The checked state: 'mixed', true or false.
 			// tags:
 			//		private
-			
+
 			if (typeof state == "boolean") {
 				return state;
 			}
@@ -524,15 +525,15 @@ define([
 			//		the checked state changed otherwise false.
 			// description:
 			//		Set/update the checked state on the dojo.data.store.	Retreive the
-			//		current checked state	and validate if an update is required, this 
+			//		current checked state	and validate if an update is required, this
 			//		will keep store updates to a minimum. If the current checked state
-			//		is undefined (ie: no checked attribute specified in the store) the 
+			//		is undefined (ie: no checked attribute specified in the store) the
 			//		'checkedAll' attribute is tested to see if a checked state needs to
 			//		be created.	In case of the root node the 'checkedRoot' attribute
 			//		is checked.
 			//
 			//		NOTE: The store.setValue() method will add the attribute for the
-			//					item if none exists.	 
+			//					item if none exists.
 			//
 			//	storeItem:
 			//		The item in the dojo.data.store whose checked state is updated.
@@ -552,7 +553,7 @@ define([
 					this.store.setValue(storeItem, this.checkedAttr, normState);
 					return true;
 				}
-			} 
+			}
 			else // Test for fabricated root.
 			{
 				if (storeItem === this.root && this.hasFakeRoot) {
@@ -567,7 +568,7 @@ define([
 			}
 			return false;
 		},
-		
+
 		_updateCheckedChild: function (/*dojo.data.item*/ storeItem, /*Boolean*/ newState) {
 			//	summary:
 			//		Set the parent (the storeItem) and all childrens states to true/false.
@@ -589,12 +590,12 @@ define([
 			this._setChecked(storeItem, newState);
 
 			if (this.mayHaveChildren(storeItem)) {
-				this.getChildren(storeItem, lang.hitch(this, 
+				this.getChildren(storeItem, lang.hitch(this,
 						function (children) {
 							array.forEach(children, function (child) {
 									this._updateCheckedChild(child, newState);
-								}, 
-							this 
+								},
+							this
 							);
 						}
 					), // end hitch()
@@ -614,7 +615,7 @@ define([
 			//		state of the child.
 			//	tag:
 			//		private
-			
+
 			if (!this.checkedStrict || !storeItem) {
 				return;
 			}
@@ -640,7 +641,7 @@ define([
 							this.onError,
 							this._checkedChildrenAttrs); /* end getChildren() */
 					}
-				}						
+				}
 			}, this); /* end forEach() */
 		},
 
@@ -651,7 +652,7 @@ define([
 			//		All parent checked states are set to the appropriate state according to
 			//		the actual state(s) of their children. This will potentionally overwrite
 			//		whatever was specified for the parent in the dojo.data store. This will
-			//		garantee the tree is in a consistent state after startup. 
+			//		garantee the tree is in a consistent state after startup.
 			//	parent:
 			//		The parent item of children.
 			//	children:
@@ -666,13 +667,13 @@ define([
 			this._validating += 1;
 
 			children	= lang.isArray(children) ? children : [children];
-			array.forEach(children, 
+			array.forEach(children,
 				function (child) {
 					if (this.mayHaveChildren(child)) {
 						this.getChildren( child, lang.hitch(this, function(children) {
 								this._validateChildren( child, children, childrenLists);
-							}),	
-							this.onError, 
+							}),
+							this.onError,
 							childrenLists);
 					} else {
 						currState = this.getChecked(child);
@@ -680,7 +681,7 @@ define([
 							child[this.checkedAttr] = [this._normalizeState(child, currState)];
 						}
 					}
-				}, 
+				},
 				this
 			);
 			newState	= this._getCompositeState(children);
@@ -724,7 +725,7 @@ define([
 			//		private
 
 			var checked;
-			
+
 			if (this.excludeChildrenAttrs) {
 				if (this.isMemberOf(storeItem, this.excludeChildrenAttrs)) {
 					return;
@@ -739,7 +740,7 @@ define([
 						return this.checkedState;
 					}
 				}
-			} 
+			}
 			else // Test for fabricated root.
 			{
 				if (storeItem === this.root && this.hasFakeRoot) {
@@ -761,9 +762,9 @@ define([
 			// tag:
 			//		Public
 			var enabled = true;
-			
+
 			if (this.enabledAttr) {
-				if (this.store.isItem(item)) {			
+				if (this.store.isItem(item)) {
 					enabled = this.store.getValue(item, this.enabledAttr);
 				} else {
 					if (item === this.root) {
@@ -784,7 +785,7 @@ define([
 			//		The store or root item.
 			// tag:
 			//		Public
-			return { checked: this.getChecked(item), 
+			return { checked: this.getChecked(item),
 								enabled: this.getEnabled(item) };
 		},
 
@@ -803,7 +804,7 @@ define([
 			//		The new checked state: 'mixed', true or false
 			// tags:
 			//		private
-			
+
 			if (!this.checkedStrict) {
 				this._setChecked(storeItem, newState);		// Just update the checked state
 			} else {
@@ -819,7 +820,7 @@ define([
 			// tag:
 			//		Public
 			if (this.enabledAttr) {
-				if (this.store.isItem(item)) {			
+				if (this.store.isItem(item)) {
 					return this.store.setValue(item, this.enabledAttr, Boolean(value));
 				} else {
 					if (item === this.root) {
@@ -827,7 +828,7 @@ define([
 					} else {
 						throw new TypeError(this.moduleName+"::setEnabled(): invalid item specified.");
 					}
-				}				
+				}
 			}
 		},
 
@@ -839,7 +840,7 @@ define([
 			//		load of the Json dataObject dramatically improving the startup time.
 			//	tag:
 			//		private
-		
+
 			if (this.checkedStrict) {
 				// In case multiple models operate on the same store, the store may have
 				// already been validated.
@@ -858,11 +859,11 @@ define([
 													} else {
 														console.warn(this.moduleName+"::validateData(): store is not write enabled.");
 													}
-												}, 
-						onError: function (err) {}, 
+												},
+						onError: function (err) {},
 						scope: this
 					});
-				} 
+				}
 				else	// Store already validated.
 				{
 					if (this.hasFakeRoot) {
@@ -873,8 +874,8 @@ define([
 					}
 					this.onDataValidated();
 				}
-			} 
-			else 
+			}
+			else
 			{
 				this.store.setValidated(false);
 			}
@@ -895,7 +896,7 @@ define([
 			//		model is set.
 			// item:
 			//		A valid dojo.data.store item.
-			
+
 			if (this.iconAttr) {
 				return this.store.getValue(item, this.iconAttr);
 			}
@@ -915,7 +916,7 @@ define([
 				return this.store.getLabel(item);	// String
 			}
 		},
-	
+
 		isItem: function(/*anything*/ something){
 			return this.store.isItem(something);	// Boolean
 		},
@@ -927,11 +928,11 @@ define([
 				return this.isChildOf(this.root, item);
 			}
 		},
-		
+
 		isChildOf: function (/*dojo.data.item*/ parent,/*dojo.data.item*/ item) {
 			// summary:
 			//		Returns true if item is a child of parent in the context of this model
-			//		otherwise false. 
+			//		otherwise false.
 			//
 			//		Note: An item may have been added as a child by another model with
 			//					a different set of 'childrenAttrs'. Therefore, item may be a
@@ -965,7 +966,7 @@ define([
 			}
 			return isMember;
 		},
-		
+
 		// =======================================================================
 		// Write interface
 
@@ -976,7 +977,7 @@ define([
 			//		The store item to be delete.
 			// tag:
 			//		public
-			
+
 			return this.store.deleteItem(storeItem);
 		},
 
@@ -1002,7 +1003,7 @@ define([
 			//		If specified the childrens list attribute to which the new item will
 			//		be added.	 If ommitted, the first entry in the models childrenAttrs
 			//		property is used.
-			
+
 			var pInfo = {parent: parent, attribute: (childrenAttr ? childrenAttr : this.childrenAttrs[0])},
 					newItem;
 
@@ -1020,11 +1021,11 @@ define([
 				}
 			} catch(err) {
 				throw new Error(this.moduleName+"::newItem(): " + err);
-			} 
+			}
 			return newItem;
 		},
 
-		pasteItem: function(/*Item*/ childItem, /*Item*/ oldParentItem, /*Item*/ newParentItem, /*Boolean*/ bCopy, 
+		pasteItem: function(/*Item*/ childItem, /*Item*/ oldParentItem, /*Item*/ newParentItem, /*Boolean*/ bCopy,
 												 /*int?*/ insertIndex, /*String?*/ childrenAttr){
 			// summary:
 			//		Move or copy an item from one parent item to another.
@@ -1032,7 +1033,7 @@ define([
 			var parentAttr = childrenAttr ? childrenAttr : this.childrenAttrs[0],	// name of "children" attr in parent item
 					store = this.store,
 					firstChild;
-				
+
 			// remove child from source item, and record the attribute that child occurred in
 			if(oldParentItem){
 				array.forEach(this.childrenAttrs, function(attr){
@@ -1051,7 +1052,7 @@ define([
 		},
 
 		// =======================================================================
-		// Label Attribute 
+		// Label Attribute
 
 		getLabelAttr: function () {
 			// summary:
@@ -1147,7 +1148,7 @@ define([
 			//
 			// tags:
 			//		extension
-			
+
 			// Call onChildrenChange() on parent (ie, existing) item with new list of children
 			// In the common case, the new list of children is simply parentInfo.newValue or
 			// [ parentInfo.newValue ], although if items in the store has multiple
@@ -1178,16 +1179,16 @@ define([
 			console.error(this, err);
 		},
 
-		onSetItem: function (/*dojo.data.item*/ storeItem, /*string*/ attribute, /*AnyType*/ oldValue, 
+		onSetItem: function (/*dojo.data.item*/ storeItem, /*string*/ attribute, /*AnyType*/ oldValue,
 													/*AnyType*/ newValue){
 			// summary:
 			//		Updates the tree view according to changes in the data store.
 			// description:
 			//		Handles updates to a store item's children by calling onChildrenChange(), and
 			//		other updates to a store item by calling onChange().
-			// storeItem: 
+			// storeItem:
 			//		Store item
-			// attribute: 
+			// attribute:
 			//		attribute-name-string
 			// oldValue:
 			//		Old attribute value
@@ -1241,7 +1242,7 @@ define([
 			// storeItem:
 			//		The store item that was attached to, or detached from, the root.
 			// action:
-			//		String detailing the type of event: "new", "delete", "attach" or 
+			//		String detailing the type of event: "new", "delete", "attach" or
 			//		"detach"
 			// tag:
 			//		callback
@@ -1266,9 +1267,9 @@ define([
 			//		is to be removed from the new item properties.
 			// tags:
 			//		private
-			
+
 			var identifierAttr = this.store.getIdentifierAttr();
-			
+
 			if (identifierAttr) {
 				if (!args[identifierAttr] && (this.newItemIdAttr && args[this.newItemIdAttr])) {
 					args[identifierAttr] = args[this.newItemIdAttr];
@@ -1284,7 +1285,7 @@ define([
 			}
 			return false;
 		},
-		
+
 		_diffArrays: function (/*array*/ orgArray, /*array*/ elements) {
 			// summary:
 			//		Returns a new array which is 'orgArray' with all 'elements' removed.
@@ -1294,7 +1295,7 @@ define([
 			var elemList = elements ? (lang.isArray(elements) ? elements : [elements]) :[];
 			var newArray = orgArray.slice(0);
 			var index, i;
-			
+
 			if (newArray.length && elemList.length) {
 				for(i=0; i<elemList.length; i++) {
 					index = array.indexOf(newArray, elemList[i]);
@@ -1305,7 +1306,7 @@ define([
 			}
 			return newArray;
 		},
-		
+
 		_mixinFetch: function (/*object*/ fetchArgs ) {
 			// summary:
 			//		Any model that inherits from this model (TreeStoreModel) and requires

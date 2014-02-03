@@ -9,6 +9,7 @@ define([
     "dojo/json",
     "dojo/request/xhr",
     "dojo/dom-class",
+    "dojo/on",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/StackContainer",
@@ -33,6 +34,7 @@ define([
     json,
     xhr,
     domClass,
+    on,
     BorderContainer,
     ContentPane,
     StackContainer,
@@ -275,9 +277,11 @@ define([
 
         _removePopup: function () {
             if (this._popup) {
+                this._popup.widget.select.closeDropDown(true);
+                this._popup.widget.destroyRecursive();
                 this.map.olMap.removePopup(this._popup);
                 this._popup = null;
-            }
+            };
         },
 
         _responsePopup: function (response, point, layerLabels) {
@@ -297,12 +301,17 @@ define([
                 tool: this,
                 layerLabels: layerLabels
             });
+            this._popup.widget = widget;
 
             widget.placeAt(this._popup.contentDiv).startup();
 
             this.map.olMap.addPopup(this._popup);
             widget.resize();
-            widget.select.resize();
+
+            // Обработчик закрытия
+            on(this._popup._closeSpan, 'click', lang.hitch(this, function () {
+                this._removePopup();
+            }));
         }
 
     });
