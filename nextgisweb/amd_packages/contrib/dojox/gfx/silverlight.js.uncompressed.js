@@ -1,7 +1,7 @@
 define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/Color", 
-		"dojo/_base/array", "dojo/dom-geometry", "dojo/dom", "dojo/_base/sniff", 
-		"./_base", "./shape", "./path"], 
-  function(kernel,lang,declare,color,arr,domGeom,dom,has,g,gs,pathLib){
+		"dojo/on", "dojo/_base/array", "dojo/dom-geometry", "dojo/dom", "dojo/_base/sniff",
+		"./_base", "./shape", "./path", "./registry"],
+  function(kernel,lang,declare,color,on,arr,domGeom,dom,has,g,gs,pathLib){
 	var sl = g.silverlight = {
 		// summary:
 		//		This the graphics rendering bridge for the Microsoft Silverlight plugin.
@@ -51,8 +51,13 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 		//		Silverlight-specific implementation of dojox/gfx/shape.Shape methods
 
 		destroy: function(){
+			// summary:
+			//		Releases all internal resources owned by this shape. Once this method has been called,
+			//		the instance is considered destroyed and should not be used anymore.
+			if(has("gfxRegistry")){
+				gs.dispose(this);
+			}
 			this.rawNode = null;
-			gs.Shape.prototype.destroy.apply(this, arguments);
 		},
 
 		setFill: function(fill){
@@ -224,7 +229,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			rawNode.fill = null;
 			rawNode.stroke = null;
 			this.rawNode = rawNode;
-			this.rawNode.tag = this.getUID();						
+			this.rawNode.tag = this.getUID();
 		},
 
 		// move family
@@ -322,7 +327,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			// rawNode: Node
 			//		a Sliverlight node
 			this.rawNode = rawNode;
-			this.rawNode.tag = this.getUID();						
+			this.rawNode.tag = this.getUID();
 			
 		},
 		destroy: function(){
@@ -481,7 +486,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			//		shape. Once set, transforms, gradients, etc, can be applied.
 			//		(no fill & stroke by default)
 			this.rawNode = rawNode;
-			this.rawNode.tag = this.getUID();						
+			this.rawNode.tag = this.getUID();
 		}
 	});
 	sl.Image.nodeType = "Image";
@@ -556,12 +561,35 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			//		shape. Once set, transforms, gradients, etc, can be applied.
 			//		(no fill & stroke by default)
 			this.rawNode = rawNode;
-			this.rawNode.tag = this.getUID();						
+			this.rawNode.tag = this.getUID();
 		},
 		getTextWidth: function(){
 			// summary:
 			//		get the text width in pixels
 			return this.rawNode.actualWidth;
+		},
+		getBoundingBox: function(){
+			var bbox = null, text = this.getShape().text, r = this.rawNode, w = 0, h = 0;
+			if(!g._base._isRendered(this)){
+				return {x:0, y:0, width:0, height:0};
+			}
+			if(text){
+				try{
+					w = r.actualWidth;
+					h = r.actualHeight;
+				}catch(e){
+					// bail out if the node is hidden
+					return null;
+				}
+				var loc = g._base._computeTextLocation(this.getShape(), w, h, true);
+				bbox = {
+					x: loc.x,
+					y: loc.y,
+					width : w,
+					height: h
+				};
+			}
+			return bbox;
 		}
 	});
 	sl.Text.nodeType = "TextBlock";
@@ -696,7 +724,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 		s._onLoadName = onLoadName;
 		window[onLoadName] = function(sender){
 			if(!s.rawNode){
-				s.rawNode = dom.byId(pluginName).content.root;
+				s.rawNode = dom.byId(pluginName, parentNode.ownerDocument).content.root;
 				// register the plugin with its parent node
 				surfaces[s._nodeName] = parentNode;
 				s.onLoad(s);
@@ -725,7 +753,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 		}
 		parentNode.innerHTML = obj;
 
-		var pluginNode = dom.byId(pluginName);
+		var pluginNode = dom.byId(pluginName, parentNode.ownerDocument);
 		if(pluginNode.content && pluginNode.content.root){
 			// the plugin was created synchronously
 			s.rawNode = pluginNode.content.root;
@@ -920,23 +948,32 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 	
 	var eventsProcessing = {
 		connect: function(name, object, method){
-			var token, n = name in eventNames ? eventNames[name] :
-				{name: name, fix: function(){ return {}; }};
-			if(arguments.length > 2){
-				token = this.getEventSource().addEventListener(n.name,
-					function(s, a){ lang.hitch(object, method)(n.fix(s, a)); });
-			}else{
-				token = this.getEventSource().addEventListener(n.name,
-					function(s, a){ object(n.fix(s, a)); });
-			}
-			return {name: n.name, token: token};
+			return this.on(name, method ? lang.hitch(object, method) : object);
 		},
-		disconnect: function(token){
-			try{
-				this.getEventSource().removeEventListener(token.name, token.token);
-			}catch(e){
-				// bail out if the node is hidden
+
+		on: function(name, listener){
+			if(typeof name === "string"){
+				if(name.indexOf("mouse") === 0){
+					name = "on" + name;
+				}
+				var token, n = name in eventNames ? eventNames[name] :
+					{name: name, fix: function(){ return {}; }};
+				token = this.getEventSource().addEventListener(n.name, function(s, a){ listener(n.fix(s, a)); });
+				return {
+					name: n.name,
+					token: token,
+					remove: lang.hitch(this, function(){
+						this.getEventSource().removeEventListener(n.name, token);
+					})
+				};
+			}else{
+				// pass this so that it gets back in this.on with the event name
+				return on(this, name, listener);
 			}
+		},
+
+		disconnect: function(token){
+			return token.remove();
 		}
 	};
 	

@@ -1,6 +1,6 @@
-define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./CartesianBase", "./_PlotEvents", "./common",
+define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
 	"dojox/gfx/fx", "dojox/lang/utils", "dojox/lang/functional", "dojox/lang/functional/reversed"], 
-	function(dojo, lang, arr, declare, CartesianBase, _PlotEvents, dc, fx, du, df, dfr){
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, fx, du, df, dfr){
 		
 	/*=====
 	declare("dojox.charting.plot2d.__BarCtorArgs", dojox.charting.plot2d.__DefaultCtorArgs, {
@@ -31,6 +31,11 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 		//		Any fill to be used for elements on the plot.
 		fill:		{},
 
+		// filter: dojox.gfx.Filter?
+	 	//		An SVG filter to be used for elements on the plot. gfx SVG renderer must be used and dojox/gfx/svgext must
+	 	//		be required for this to work.
+	 	filter:		{},
+
 		// styleFunc: Function?
 		//		A function that returns a styling object for the a given data item.
 		styleFunc:	null,
@@ -55,8 +60,6 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 		// summary:
 		//		The plot object representing a bar chart (horizontal bars).
 		defaultParams: {
-			hAxis: "x",		// use a horizontal axis named "x"
-			vAxis: "y",		// use a vertical axis named "y"
 			gap:	0,		// gap between columns in pixels
 			animate: null,   // animate bars into place
 			enableCache: false
@@ -69,6 +72,7 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 			outline:	{},
 			shadow:		{},
 			fill:		{},
+			filter:	    {},
 			styleFunc:  null,
 			font:		"",
 			fontColor:	""
@@ -81,12 +85,9 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 			//		The chart this plot belongs to.
 			// kwArgs: dojox.charting.plot2d.__BarCtorArgs?
 			//		An optional keyword arguments object to help define the plot.
-			this.opt = lang.clone(this.defaultParams);
+			this.opt = lang.clone(lang.mixin(this.opt, this.defaultParams));
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
-			this.series = [];
-			this.hAxis = this.opt.hAxis;
-			this.vAxis = this.opt.vAxis;
 			this.animate = this.opt.animate;
 		},
 
@@ -119,6 +120,16 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 			return rect;
 		},
 
+		createLabel: function(group, value, bbox, theme){
+			if(this.opt.labels && this.opt.labelStyle == "outside"){
+				var y = bbox.y + bbox.height / 2;
+				var x = bbox.x + bbox.width + this.opt.labelOffset;
+				this.renderLabel(group, x, y, this._getLabel(isNaN(value.y)?value:value.y), theme, "start");
+          	}else{
+				this.inherited(arguments);
+			}
+		},
+
 		render: function(dim, offsets){
 			// summary:
 			//		Run the calculations for any axes for this plot.
@@ -138,7 +149,7 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 				arr.forEach(this.series, purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
-				s = this.group;
+				s = this.getGroup();
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 			var t = this.chart.theme,
@@ -207,6 +218,9 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 							var specialFill = this._plotFill(finalTheme.series.fill, dim, offsets);
 							specialFill = this._shapeFill(specialFill, rect);
 							var shape = this.createRect(run, s, rect).setFill(specialFill).setStroke(finalTheme.series.stroke);
+							if(shape.setFilter && finalTheme.series.filter){
+								shape.setFilter(finalTheme.series.filter);
+							}
 							run.dyn.fill   = shape.getFill();
 							run.dyn.stroke = shape.getStroke();
 							if(events){
@@ -216,12 +230,21 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 									run:     run,
 									shape:   shape,
 									shadow:	 sshape,
-									x:       val.y,
-									y:       val.x + 1.5
+									cx:      val.y,
+									cy:      val.x + 1.5,
+									x:	     indexed?j:run.data[j].x,
+									y:	 	 indexed?run.data[j]:run.data[j].y
 								};
 								this._connectEvents(o);
 								eventSeries[j] = o;
 							}
+							// if val.py is here, this means we are stacking and we need to subtract previous
+							// value to get the high in which we will lay out the label
+							if(!isNaN(val.py) && val.py > baseline){
+								rect.x += ht(val.py);
+								rect.width -= ht(val.py);
+							}
+							this.createLabel(s, value, rect, finalTheme);
 							if(this.animate){
 								this._animateBar(shape, offsets.l + baselineWidth, -w);
 							}
@@ -232,10 +255,15 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/kernel", "dojo/_base/lang", "d
 				run.dirty = false;
 			}
 			this.dirty = false;
+			// chart mirroring starts
+			if(has("dojo-bidi")){
+				this._checkOrientation(this.group, dim, offsets);
+			}
+			// chart mirroring ends
 			return this;	//	dojox/charting/plot2d/Bars
 		},
 		getValue: function(value, j, seriesIndex, indexed){
-			var y,x;
+			var y, x;
 			if(indexed){
 				if(typeof value == "number"){
 					y = value;

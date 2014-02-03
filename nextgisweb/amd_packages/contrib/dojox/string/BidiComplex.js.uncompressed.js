@@ -311,5 +311,5 @@ define("dojox/string/BidiComplex", ["dojo/_base/kernel", "dojo/_base/lang", "doj
 		}
 		return segmentsPointers;
 	};
-	return dojox.string.BidiComplex;
+	return bdc;
 });

@@ -129,9 +129,10 @@ define("dojo/request/script", [
 		});
 
 		if(options.jsonp){
-			var queryParameter = (~url.indexOf('?') ? '&' : '?') + options.jsonp + '=';
-			if(url.indexOf(queryParameter) === -1){
-				url += queryParameter +
+			var queryParameter = new RegExp('[?&]' + options.jsonp + '=');
+			if(!queryParameter.test(url)){
+				url += (~url.indexOf('?') ? '&' : '?') +
+					options.jsonp + '=' +
 					(options.frameDoc ? 'parent.' : '') +
 					mid + '_callbacks.' + dfd.id;
 			}

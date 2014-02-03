@@ -9,6 +9,7 @@ define([
     "dojo/json",
     "dojo/request/xhr",
     "dojo/dom-class",
+    "dojo/dom-style",
     "dojo/on",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -16,6 +17,7 @@ define([
     "dijit/layout/StackController",
     "dijit/form/Select",
     "dijit/form/Button",
+    "put-selector/put",
     "ngw/openlayers",
     "ngw/openlayers/Popup",
     "feature_layer/FieldsDisplayWidget",
@@ -34,6 +36,7 @@ define([
     json,
     xhr,
     domClass,
+    domStyle,
     on,
     BorderContainer,
     ContentPane,
@@ -41,6 +44,7 @@ define([
     StackController,
     Select,
     Button,
+    put,
     openlayers,
     Popup,
     FieldsDisplayWidget,
@@ -75,8 +79,10 @@ define([
                 var layerResponse = this.response[layerId];
                 var idx = 0;
                 array.forEach(layerResponse.features, function (feature) {
+                    var label = put("div[style='overflow: hidden; display: inline-block; text-align: left;'] $ span[style='color: gray'] $ <", feature.label, ' (' + this.layerLabels[layerId] + ')');
+                    domStyle.set(label, 'width', (this.popupSize[0] - 32) + 'px');
                     this.selectOptions.push({
-                        label: feature.label + " <span style=\"color: gray;\">(" + this.layerLabels[layerId] + ")</span>",
+                        label: label.outerHTML,
                         value: layerId + "/" + idx
                     });
                     idx++;
@@ -299,7 +305,8 @@ define([
             var widget = new Widget({
                 response: response,
                 tool: this,
-                layerLabels: layerLabels
+                layerLabels: layerLabels,
+                popupSize: [this.popupWidth, this.popupHeight]
             });
             this._popup.widget = widget;
 

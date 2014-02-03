@@ -111,7 +111,7 @@ define("dojox/mobile/_DatePickerMixin", [
 			var now = new Date();
 			var v = array.map(this.slots, function(w){ return w.format(now); });
 			this.set("colors", v);
-			this.disableValues(this.onDaySet());
+			this._disableEndDaysOfMonth();
 			if(this.value){
 				this.set("value", this.value);
 				this.value = null;
@@ -123,36 +123,96 @@ define("dojox/mobile/_DatePickerMixin", [
 			}
 		},
 
+		_onYearSet: function(){
+			// summary:
+			//		An internal handler called when the year value is changed.
+			// tags:
+			//		private
+			var slot = this.slots[0];
+			var newValue = slot.get("value");
+			if(!(slot._previousValue && newValue == slot._previousValue)){ // do nothing if the value is unchanged
+				this._disableEndDaysOfMonth();
+				slot._previousValue = newValue;
+				slot._set("value", newValue);
+				this.onYearSet();
+			}
+		},
+		
 		onYearSet: function(){
 			// summary:
 			//		A handler called when the year value is changed.
-			this.disableValues(this.onDaySet());
+		},
+
+		_onMonthSet: function(){
+			// summary:
+			//		An internal handler called when the month value is changed.
+			// tags:
+			//		private
+			var slot = this.slots[1];
+			var newValue = slot.get("value");
+			if(!(slot._previousValue && newValue == slot._previousValue)){ // do nothing if the value is unchanged
+				this._disableEndDaysOfMonth();
+				slot._previousValue = newValue;
+				slot._set("value", newValue); // notify watches
+				this.onMonthSet();
+			}
 		},
 
 		onMonthSet: function(){
 			// summary:
 			//		A handler called when the month value is changed.
-			this.disableValues(this.onDaySet());
+		},
+
+		_onDaySet: function(){
+			// summary:
+			//		An internal handler called when the day value is changed.
+			// tags:
+			//		private
+			var slot = this.slots[2];
+			var newValue = slot.get("value");
+			if(!(slot._previousValue && newValue == slot._previousValue)){ // do nothing if the value is unchanged
+				if(!this._disableEndDaysOfMonth()){
+					// If _disableEndDaysOfMonth has changed the day value,
+					// skip notifications till next call of _onDaySet, to
+					// avoid the extra notification for the (invalid)
+					// intermediate value of the day.
+					slot._previousValue = newValue;
+					slot._set("value", newValue); // notify watches
+					this.onDaySet();
+				}
+			}
 		},
 
 		onDaySet: function(){
 			// summary:
 			//		A handler called when the day value is changed.
-			var v = this.get("values"), // [year, month, day]
-				pat = this.slots[0].pattern + "/" + this.slots[1].pattern,
+		},
+
+		_disableEndDaysOfMonth: function(){
+			// summary:
+			//		Disables the end days of the month to match the specified
+			//		number of days of the month. Returns true if the day value is changed.
+			// tags:
+			//		private
+			var pat = this.slots[0].pattern + "/" + this.slots[1].pattern,
+				v = this.get("values"),
 				date = datelocale.parse(v[0] + "/" + v[1], {datePattern:pat, selector:"date"}),
 				daysInMonth = ddate.getDaysInMonth(date);
+			var changedDay = false;
 			if(daysInMonth < v[2]){
-				this.slots[2].set("value", daysInMonth);
+				// day value is invalid for this month, change it
+				changedDay = true;
+				this.slots[2]._spinToValue(daysInMonth, false/*applyValue*/);
 			}
-			return daysInMonth;
+			this.disableValues(daysInMonth);
+			return changedDay;
 		},
 
 		_getDateAttr: function(){
 			// summary:
-			//		Returns a Date object for the current values
+			//		Returns a Date object for the current values.
 			// tags:
-			//		private			
+			//		private
 			var v = this.get("values"), // [year, month, day]
 				s = this.slots,
 				pat = s[0].pattern + "/" + s[1].pattern + "/" + s[2].pattern;

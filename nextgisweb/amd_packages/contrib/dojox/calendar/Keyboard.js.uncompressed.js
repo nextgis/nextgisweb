@@ -22,19 +22,19 @@ define("dojox/calendar/Keyboard", ["dojo/_base/array", "dojo/_base/lang", "dojo/
 		//		Unit used during editing of an event using the keyboard and the left or right keys were pressed.		
 		keyboardLeftRightSteps: 1,
 
-		// allDayKeyboardUpDownSteps: Integer
+		// allDayKeyboardUpDownUnit: Integer
 		//		Steps used during editing of an all day event using the keyboard and the up or down keys were pressed.
 		allDayKeyboardUpDownUnit: "day",
 		
-		// allDayKeyboardUpDownUnit: String
+		// allDayKeyboardUpDownSteps: String
 		//		Unit used during editing of an all day event using the keyboard and the up or down keys were pressed. Valid values are "week", "day", "hours" "minute".		
 		allDayKeyboardUpDownSteps: 7,
 		
-		// allDayKeyboardUpDownSteps: Integer
+		// allDayKeyboardLeftRightUnit: Integer
 		//		Steps used during editing of an all day event using the keyboard and the up or down keys were pressed.
 		allDayKeyboardLeftRightUnit: "day",
 		
-		// allDayKeyboardLeftRightUnit: String
+		// allDayKeyboardLeftRightSteps: String
 		//		Unit used during editing of an all day event using the keyboard and the left or right keys were pressed. Valid values are "week", "day", "hours" "minute".
 		allDayKeyboardLeftRightSteps: 1,
 
@@ -43,7 +43,7 @@ define("dojox/calendar/Keyboard", ["dojo/_base/array", "dojo/_base/lang", "dojo/
 			this._viewHandles.push(on(this.domNode, "keydown", lang.hitch(this, this._onKeyDown)));
 		},
 		
-		// resizeModfier: "ctrl"
+		// resizeModfier: String
 		//		The modifier used to determine if the item is resized instead moved during the editing on an item.
 		resizeModifier: "ctrl",
 

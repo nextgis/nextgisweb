@@ -20,7 +20,7 @@ return d;
 if(typeof _6=="string"){
 d=_4.fromISOString(_6);
 if(d===null){
-d=new _7(_6);
+throw new Error("Cannot parse date string ("+_6+"), specify a \"decodeDate\" function that translates this string into a Date object");
 }else{
 if(_7!==Date){
 d=new _7(d.getTime());
@@ -57,7 +57,7 @@ var day=d.getDay();
 if(day==fd){
 return d;
 }
-return _5.floorToDay(_d.add(d,"day",day>fd?-day+fd:fd-day),true,_c);
+return _5.floorToDay(_d.add(d,"day",day>fd?-day+fd:-day+fd-7),true,_c);
 };
 _5.floor=function(_10,_11,_12,_13,_14){
 var d=_5.floorToDay(_10,_13,_14);

@@ -16,7 +16,7 @@ define("dojox/rpc/JsonRest", ["dojo", "dojox", "dojox/json/ref", "dojox/rpc/Rest
 			index: Rest._index,
 			timeStamps: timeStamp && Rest._timeStamps,
 			time: timeStamp,
-			idPrefix: service.servicePath.replace(/[^\/]*$/,''),
+			idPrefix: service._store.allowNoTrailingSlash ? service.servicePath + '/' : service.servicePath.replace(/[^\/]*$/,''),
 			idAttribute: jr.getIdAttribute(service),
 			schemas: jr.schemas,
 			loader:	jr._loader,

@@ -9,6 +9,7 @@ done: "Done"
 ,
 "zh": true,
 "zh-tw": true,
+"uk": true,
 "tr": true,
 "th": true,
 "sv": true,
@@ -36,6 +37,7 @@ done: "Done"
 "da": true,
 "cs": true,
 "ca": true,
+"bg": true,
 "az": true,
 "ar": true
 });

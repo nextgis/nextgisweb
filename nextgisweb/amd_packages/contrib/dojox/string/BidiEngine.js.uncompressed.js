@@ -2,7 +2,7 @@ define("dojox/string/BidiEngine", ["dojo/_base/lang", "dojo/_base/declare"],
   function(lang,declare){
 lang.getObject("string", true, dojox);
 
-declare("dojox.string.BidiEngine", null, {
+var BidiEngine = declare("dojox.string.BidiEngine", null, {
 	// summary:
 	//		This class provides a bidi transformation engine, i.e.
 	//		functions for reordering and shaping bidi text.
@@ -1533,5 +1533,5 @@ delete LRO;
 delete RLO;
 delete BN;
 
-return dojox.string.BidiEngine;
+return BidiEngine;
 });

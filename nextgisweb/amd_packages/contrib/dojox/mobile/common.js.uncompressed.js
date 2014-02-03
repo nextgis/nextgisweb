@@ -4,18 +4,46 @@ define("dojox/mobile/common", [
 	"dojo/_base/connect",
 	"dojo/_base/lang",
 	"dojo/_base/window",
+	"dojo/_base/kernel",
 	"dojo/dom-class",
 	"dojo/dom-construct",
+	"dojo/domReady",
 	"dojo/ready",
+	"dojo/touch",
 	"dijit/registry",
 	"./sniff",
 	"./uacss" // (no direct references)
-], function(array, config, connect, lang, win, domClass, domConstruct, ready, registry, has){
+], function(array, config, connect, lang, win, kernel, domClass, domConstruct, domReady, ready, touch, registry, has){
 
 	// module:
 	//		dojox/mobile/common
 
 	var dm = lang.getObject("dojox.mobile", true);
+
+	// tell dojo/touch to generate synthetic clicks immediately
+	// and regardless of preventDefault() calls on touch events
+	win.doc.dojoClick = true;
+	/// ... but let user disable this by removing dojoClick from the document
+	if(has("touch")){
+		// Do we need to send synthetic clicks when preventDefault() is called on touch events?
+		// This is normally true on anything except Android 4.1+ and IE10+, but users reported
+		// exceptions like Galaxy Note 2. So let's use a has("clicks-prevented") flag, and let
+		// applications override it through data-dojo-config="has:{'clicks-prevented':true}" if needed.
+		has.add("clicks-prevented", !(has("android") >= 4.1 || (has("ie") === 10) || (!has("ie") && has("trident") > 6)));
+		if(has("clicks-prevented")){
+			dm._sendClick = function(target, e){
+				// dojo/touch will send a click if dojoClick is set, so don't do it again.
+				for(var node = target; node; node = node.parentNode){
+					if(node.dojoClick){
+						return;
+					}
+				}
+				var ev = win.doc.createEvent("MouseEvents"); 
+				ev.initMouseEvent("click", true, true, win.global, 1, e.screenX, e.screenY, e.clientX, e.clientY); 
+				target.dispatchEvent(ev);
+			};
+		}
+	}
 
 	dm.getScreenSize = function(){
 		// summary:
@@ -104,7 +132,7 @@ define("dojox/mobile/common", [
 		//		finishes.
 		if(dm.disableHideAddressBar || dm._hiding){ return; }
 		dm._hiding = true;
-		dm._hidingTimer = has('iphone') ? 200 : 0; // Need to wait longer in case of iPhone
+		dm._hidingTimer = has("ios") ? 200 : 0; // Need to wait longer in case of iPhone
 		var minH = screen.availHeight;
 		if(has('android')){
 			minH = outerHeight / devicePixelRatio;
@@ -184,6 +212,68 @@ define("dojox/mobile/common", [
 		win.global.open(url, target || "_blank");
 	};
 
+	dm._detectWindowsTheme = function(){
+		// summary:
+		//		Detects if the "windows" theme is used,
+		//		if it is used, set has("windows-theme") and
+		//		add the .windows_theme class on the document.
+		
+		// Avoid unwanted (un)zoom on some WP8 devices (at least Nokia Lumia 920) 
+		if(navigator.userAgent.match(/IEMobile\/10\.0/)){
+			domConstruct.create("style", 
+				{innerHTML: "@-ms-viewport {width: auto !important}"}, win.doc.head);
+		}
+
+		var setWindowsTheme = function(){
+			domClass.add(win.doc.documentElement, "windows_theme");
+			kernel.experimental("Dojo Mobile Windows theme", "Behavior and appearance of the Windows theme are experimental.");
+		};
+
+		// First see if the "windows-theme" feature has already been set explicitly
+		// in that case skip aut-detect
+		var windows = has("windows-theme");
+		if(windows !== undefined){
+			if(windows){
+				setWindowsTheme();
+			}
+			return;
+		}
+
+		// check css
+		var i, j;
+
+		var check = function(href){
+			// TODO: find a better regexp to match?
+			if(href && href.indexOf("/windows/") !== -1){
+				has.add("windows-theme", true);
+				setWindowsTheme();
+				return true;
+			}
+			return false;
+		};
+
+		// collect @import
+		var s = win.doc.styleSheets;
+		for(i = 0; i < s.length; i++){
+			if(s[i].href){ continue; }
+			var r = s[i].cssRules || s[i].imports;
+			if(!r){ continue; }
+			for(j = 0; j < r.length; j++){
+				if(check(r[j].href)){
+					return;
+				}
+			}
+		}
+
+		// collect <link>
+		var elems = win.doc.getElementsByTagName("link");
+		for(i = 0; i < elems.length; i++){
+			if(check(elems[i].href)){
+				return;
+			}
+		}
+	};
+
 	if(config["mblApplyPageStyles"] !== false){
 		domClass.add(win.doc.documentElement, "mobile");
 	}
@@ -207,59 +297,87 @@ define("dojox/mobile/common", [
 	has.add('mblAndroid3Workaround', 
 			config["mblAndroid3Workaround"] !== false && has('android') >= 3, undefined, true);
 
+	dm._detectWindowsTheme();
+	
+	// Set the background style using dojo/domReady, not dojo/ready, to ensure it is already
+	// set at widget initialization time. (#17418) 
+	domReady(function(){
+		domClass.add(win.body(), "mblBackground");
+	});
+
 	ready(function(){
 		dm.detectScreenSize(true);
-
 		if(config["mblAndroidWorkaroundButtonStyle"] !== false && has('android')){
 			// workaround for the form button disappearing issue on Android 2.2-4.0
-			domConstruct.create("style", {innerHTML:"BUTTON,INPUT[type='button'],INPUT[type='submit'],INPUT[type='reset'],INPUT[type='file']::-webkit-file-upload-button{-webkit-appearance:none;}"}, win.doc.head, "first");
+			domConstruct.create("style", {innerHTML:"BUTTON,INPUT[type='button'],INPUT[type='submit'],INPUT[type='reset'],INPUT[type='file']::-webkit-file-upload-button{-webkit-appearance:none;} audio::-webkit-media-controls-play-button,video::-webkit-media-controls-play-button{-webkit-appearance:media-play-button;} video::-webkit-media-controls-fullscreen-button{-webkit-appearance:media-fullscreen-button;}"}, win.doc.head, "first");
 		}
 		if(has('mblAndroidWorkaround')){
 			// add a css class to show view offscreen for android flicker workaround
 			domConstruct.create("style", {innerHTML:".mblView.mblAndroidWorkaround{position:absolute;top:-9999px !important;left:-9999px !important;}"}, win.doc.head, "last");
 		}
 
-		//	You can disable hiding the address bar with the following dojoConfig.
-		//	var dojoConfig = { mblHideAddressBar: false };
 		var f = dm.resizeAll;
-		if(config["mblHideAddressBar"] !== false &&
-			navigator.appVersion.indexOf("Mobile") != -1 ||
+		// Address bar hiding
+		var isHidingPossible =
+			navigator.appVersion.indexOf("Mobile") != -1 && // only mobile browsers
+			// #17455: hiding Safari's address bar works in iOS < 7 but this is 
+			// no longer possible since iOS 7. Hence, exclude iOS 7 and later: 
+			!(has("ios") >= 7);
+		// You can disable the hiding of the address bar with the following dojoConfig:
+		// var dojoConfig = { mblHideAddressBar: false };
+		// If unspecified, the flag defaults to true.
+		if((config["mblHideAddressBar"] !== false && isHidingPossible) ||
 			config["mblForceHideAddressBar"] === true){
 			dm.hideAddressBar();
 			if(config["mblAlwaysHideAddressBar"] === true){
 				f = dm.hideAddressBar;
 			}
 		}
-		if((has('android') || has('iphone') >= 6) && win.global.onorientationchange !== undefined){
+
+		var ios6 = has("ios") >= 6; // Full-screen support for iOS6 or later
+		if((has('android') || ios6) && win.global.onorientationchange !== undefined){
 			var _f = f;
-			f = function(evt){
-				var _conn = connect.connect(null, "onresize", null, function(e){
-					connect.disconnect(_conn);
-					_f(e);
-				});
+			var curSize, curClientWidth, curClientHeight;
+			if(ios6){
+				curClientWidth = win.doc.documentElement.clientWidth;
+				curClientHeight = win.doc.documentElement.clientHeight;
+			}else{ // Android
+				// Call resize for the first resize event after orientationchange
+				// because the size information may not yet be up to date when the 
+				// event orientationchange occurs.
+				f = function(evt){
+					var _conn = connect.connect(null, "onresize", null, function(e){
+						connect.disconnect(_conn);
+						_f(e);
+					});
+				}
+				curSize = dm.getScreenSize();
 			};
-			var curSize = dm.getScreenSize();
-			var threshold = has('android') ? 100 : 20;
 			// Android: Watch for resize events when the virtual keyboard is shown/hidden.
 			// The heuristic to detect this is that the screen width does not change
 			// and the height changes by more than 100 pixels.
 			//
 			// iOS >= 6: Watch for resize events when entering or existing the new iOS6 
-			// full-screen mode. The heuristic to detect this is that the screen width does not
-			// change and the height changes by more than 20 pixels (the actual value depends on
-			// whether the address bar is hidden or shown). Note that there are 2 resize events 
-			// when entering the full-screen mode; the height is already changed when we get
-			// the first event; no further height change at the second event (that we skip 
-			// thanks to the height change test). Differently, there is only one resize event
-			// when exiting the full-screen mode. (Tested on iPhone 4S under iOS 6.0.)
+			// full-screen mode. The heuristic to detect this is that clientWidth does not
+			// change while the clientHeight does change.
 			connect.connect(null, "onresize", null, function(e){
-				var newSize = dm.getScreenSize();
-				if(newSize.w == curSize.w && Math.abs(newSize.h - curSize.h) >= threshold){
-					// keyboard has been shown/hidden (Android), or full-screen mode has
-					// been entered/exited (iOS >= 6). 
-					_f(e);
+				if(ios6){
+					var newClientWidth = win.doc.documentElement.clientWidth,
+						newClientHeight = win.doc.documentElement.clientHeight;
+					if(newClientWidth == curClientWidth && newClientHeight != curClientHeight){
+						// full-screen mode has been entered/exited (iOS6)
+						_f(e);
+					}
+					curClientWidth = newClientWidth;
+					curClientHeight = newClientHeight;
+				}else{ // Android
+					var newSize = dm.getScreenSize();
+					if(newSize.w == curSize.w && Math.abs(newSize.h - curSize.h) >= 100){
+						// keyboard has been shown/hidden (Android)
+						_f(e);
+					}
+					curSize = newSize;
 				}
-				curSize = newSize;
 			});
 		}
 		

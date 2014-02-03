@@ -35,7 +35,7 @@ define("dojox/mobile/PageIndicator", [
 			this.inherited(arguments);
 			this._tblNode = domConstruct.create("table", {className:"mblPageIndicatorContainer"}, this.domNode);
 			this._tblNode.insertRow(-1);
-			this._clickHandle = this.connect(this.domNode, "onclick", "_onClick");
+			this.connect(this.domNode, "onclick", "_onClick");
 			this.subscribe("/dojox/mobile/viewChanged", function(view){
 				this.reset();
 			});
@@ -43,9 +43,9 @@ define("dojox/mobile/PageIndicator", [
 
 		startup: function(){
 			var _this = this;
-			setTimeout(function(){ // to wait until views' visibility is determined
+			_this.defer(function(){ // to wait until views' visibility is determined
 				_this.reset();
-			}, 0);
+			});
 		},
 
 		reset: function(){

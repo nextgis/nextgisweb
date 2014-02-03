@@ -33,6 +33,11 @@ define("dijit/tree/ObjectStoreModel", [
 		//		Get label for tree node from this attribute
 		labelAttr: "name",
 
+		// labelType: [const] String
+		//		Specifies how to interpret the labelAttr in the data store items.
+		//		Can be "html" or "text".
+		labelType: "text",
+
 		// root: [readonly] Object
 		//		Pointer to the root item from the dojo/store/api/Store (read only, not a parameter)
 		root: null,
@@ -100,13 +105,18 @@ define("dijit/tree/ObjectStoreModel", [
 
 		mayHaveChildren: function(/*===== item =====*/){
 			// summary:
-			//		Tells if an item has or may have children.  Implementing logic here
-			//		avoids showing +/- expando icon for nodes that we know don't have children.
+			//		Tells if an item has or might have children.  Implementing logic here
+			//		avoids showing +/- expando icon for nodes that we know won't have children.
 			//		(For efficiency reasons we may not want to check if an element actually
 			//		has children until user clicks the expando node).
 			//
 			//		Application code should override this method based on the data, for example
 			//		it could be `return item.leaf == true;`.
+			//
+			//		Note that mayHaveChildren() must return true for an item if it could possibly
+			//		have children in the future, due to drag-an-drop or some other data store update.
+			//		Also note that it may return true if it's just too expensive to check during tree
+			//		creation whether or not the item has children.
 			// item: Object
 			//		Item from the dojo/store
 			return true;
@@ -153,13 +163,6 @@ define("dijit/tree/ObjectStoreModel", [
 
 		isItem: function(/*===== something =====*/){
 			return true;	// Boolean
-		},
-
-		fetchItemByIdentity: function(/* object */ keywordArgs){
-			this.store.get(keywordArgs.identity).then(
-				lang.hitch(keywordArgs.scope, keywordArgs.onItem),
-				lang.hitch(keywordArgs.scope, keywordArgs.onError)
-			);
 		},
 
 		getIdentity: function(/* item */ item){

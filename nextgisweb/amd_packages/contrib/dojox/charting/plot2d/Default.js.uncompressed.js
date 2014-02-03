@@ -1,19 +1,11 @@
-define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", 
+define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has", 
 		"./CartesianBase", "./_PlotEvents", "./common", "dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"],
-	function(lang, declare, arr, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
+	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
 
 	/*=====
-	declare("dojox.charting.plot2d.__DefaultCtorArgs", dojox.charting.plot2d.__PlotCtorArgs, {
+	declare("dojox.charting.plot2d.__DefaultCtorArgs", dojox.charting.plot2d.__CartesianCtorArgs, {
 		// summary:
 		//		The arguments used for any/most plots.
-	
-		// hAxis: String?
-		//		The horizontal axis name.
-		hAxis: "x",
-	
-		// vAxis: String?
-		//		The vertical axis name
-		vAxis: "y",
 	
 		// lines: Boolean?
 		//		Whether or not to draw lines on this plot.  Defaults to true.
@@ -34,8 +26,9 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 		//		is used, the more accurate smoothing algorithm is used.
 		tension: "",
 	
-		// animate: Boolean?
-		//		Whether or not to animate the chart to place.
+		// animate: Boolean?|Number?
+		//		Whether or not to animate the chart to place. When a Number it specifies the duration of the animation.
+		//		Default is false.
 		animate: false,
 	
 		// stroke: dojox.gfx.Stroke?
@@ -53,6 +46,11 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 		// fill: dojox.gfx.Fill?
 		//		Any fill to be used for elements on the plot (such as areas).
 		fill:		{},
+
+		// filter: dojox.gfx.Filter?
+		//		An SVG filter to be used for elements on the plot. gfx SVG renderer must be used and dojox/gfx/svgext must
+		//		be required for this to work.
+		filter:		{},
 
 		// styleFunc: Function?
 		//		A function that returns a styling object for the a given data item.
@@ -111,8 +109,6 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 		// defaultParams:
 		//		The default parameters of this plot.
 		defaultParams: {
-			hAxis: "x",		// use a horizontal axis named "x"
-			vAxis: "y",		// use a vertical axis named "y"
 			lines:   true,	// draw lines
 			areas:   false,	// draw areas
 			markers: false,	// draw markers
@@ -130,6 +126,7 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 			outline:	{},
 			shadow:		{},
 			fill:		{},
+			filter:     {},
 			styleFunc: null,
 			font:		"",
 			fontColor:	"",
@@ -149,13 +146,9 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 			//		The chart this plot belongs to.
 			// kwArgs: dojox.charting.plot2d.__DefaultCtorArgs?
 			//		An optional arguments object to help define this plot.
-			this.opt = lang.clone(this.defaultParams);
+			this.opt = lang.clone(lang.mixin(this.opt, this.defaultParams));
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
-			this.series = [];
-			this.hAxis = this.opt.hAxis;
-			this.vAxis = this.opt.vAxis;
-
 			// animation properties
 			this.animate = this.opt.animate;
 		},
@@ -223,11 +216,11 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 				arr.forEach(this.series, purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
-				this.group.setTransform(null);
-				s = this.group;
+				this.getGroup().setTransform(null);
+				s = this.getGroup();
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
-			var t = this.chart.theme, stroke, outline, marker, events = this.events();
+			var t = this.chart.theme, stroke, outline, events = this.events();
 
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
@@ -347,6 +340,7 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 						}
 					}
 					if(this.opt.lines && lpoly.length > 1){
+						var shape;
 						if(outline){
 							if(this.opt.tension){
 								run.dyn.outline = s.createPath(lpath).setStroke(outline).getStroke();
@@ -355,11 +349,15 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 							}
 						}
 						if(this.opt.tension){
-							run.dyn.stroke = s.createPath(lpath).setStroke(stroke).getStroke();
+							run.dyn.stroke = (shape = s.createPath(lpath)).setStroke(stroke).getStroke();
 						} else {
-							run.dyn.stroke = s.createPolyline(lpoly).setStroke(stroke).getStroke();
+							run.dyn.stroke = (shape = s.createPolyline(lpoly)).setStroke(stroke).getStroke();
+						}
+						if(shape.setFilter && theme.series.filter){
+							shape.setFilter(theme.series.filter);
 						}
 					}
+					var markerBox = null;
 					if(this.opt.markers){
 						var markerTheme = theme; 
 						frontMarkers = new Array(lpoly.length);
@@ -387,6 +385,9 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 						}, this);
 						run.dyn.markerFill = markerTheme.marker.fill;
 						run.dyn.markerStroke = markerTheme.marker.stroke;
+						if(!markerBox && this.opt.labels){
+							markerBox = frontMarkers[0].getBoundingBox();
+						}
 						if(events){
 							arr.forEach(frontMarkers, function(s, i){
 								var o = {
@@ -401,10 +402,10 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 								};
 								if(indexed){
 									o.x = i + rsegment.index + 1;
-									o.y = rsegment.rseg[i];
+									o.y = run.data[i + rsegment.index];
 								}else{
 									o.x = rsegment.rseg[i].x;
-									o.y = rsegment.rseg[i].y;
+									o.y = run.data[i + rsegment.index].y;
 								}
 								this._connectEvents(o);
 								eventSeries[i + rsegment.index] = o;
@@ -413,12 +414,34 @@ define("dojox/charting/plot2d/Default", ["dojo/_base/lang", "dojo/_base/declare"
 							delete this._eventSeries[run.name];
 						}
 					}
+					if(this.opt.labels){
+						var labelBoxW = markerBox?markerBox.width:2;
+						var labelBoxH = markerBox?markerBox.height:2;
+						arr.forEach(lpoly, function(c, i){
+							if(this.opt.styleFunc || typeof c.data != "number"){
+								var tMixin = typeof c.data != "number" ? [c.data] : [];
+								if(this.opt.styleFunc){
+									tMixin.push(this.opt.styleFunc(c.data));
+								}
+								markerTheme = t.addMixin(theme, "marker", tMixin, true);
+							}else{
+								markerTheme = t.post(theme, "marker");
+							}
+							this.createLabel(s, rsegment.rseg[i], { x: c.x - labelBoxW / 2, y: c.y - labelBoxH / 2,
+								width: labelBoxW , height: labelBoxH }, markerTheme);
+						}, this);
+					}
 				}
 				run.dirty = false;
 			}
+			// chart mirroring starts
+			if(has("dojo-bidi")){
+				this._checkOrientation(this.group, dim, offsets);
+			}
+			// chart mirroring ends
 			if(this.animate){
 				// grow from the bottom
-				var plotGroup = this.group;
+				var plotGroup = this.getGroup();
 				fx.animateTransform(lang.delegate({
 					shape: plotGroup,
 					duration: DEFAULT_ANIMATION_LENGTH,

@@ -4,15 +4,17 @@ define("dojox/mobile/Slider", [
 	"dojo/_base/declare",
 	"dojo/_base/lang",
 	"dojo/_base/window",
+	"dojo/sniff",
 	"dojo/dom-class",
 	"dojo/dom-construct",
 	"dojo/dom-geometry",
 	"dojo/dom-style",
 	"dojo/keys",
+	"dojo/touch",
 	"dijit/_WidgetBase",
 	"dijit/form/_FormValueMixin"
 ],
-	function(array, connect, declare, lang, win, domClass, domConstruct, domGeometry, domStyle, keys, WidgetBase, FormValueMixin){
+	function(array, connect, declare, lang, win, has, domClass, domConstruct, domGeometry, domStyle, keys, touch, WidgetBase, FormValueMixin){
 
 	return declare("dojox.mobile.Slider", [WidgetBase, FormValueMixin], {
 		// summary:
@@ -58,13 +60,19 @@ define("dojox/mobile/Slider", [
 		halo: "8pt",
 
 		buildRendering: function(){
-			this.focusNode = this.domNode = domConstruct.create("div", {});
-			this.valueNode = domConstruct.create("input", (this.srcNodeRef && this.srcNodeRef.name) ? { type: "hidden", name: this.srcNodeRef.name } : { type: "hidden" }, this.domNode, "last");
-			var relativeParent = domConstruct.create("div", { style: { position:"relative", height:"100%", width:"100%" } }, this.domNode, "last");
-			this.progressBar = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderProgressBar" }, relativeParent, "last");
-			this.touchBox = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderTouchBox" }, relativeParent, "last");
-			this.handle = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderHandle" }, relativeParent, "last");
+			if(!this.templateString){ // true if this widget is not templated
+				this.focusNode = this.domNode = domConstruct.create("div", {});
+				this.valueNode = domConstruct.create("input", (this.srcNodeRef && this.srcNodeRef.name) ? { type: "hidden", name: this.srcNodeRef.name } : { type: "hidden" }, this.domNode, "last");
+				var relativeParent = domConstruct.create("div", { style: { position:"relative", height:"100%", width:"100%" } }, this.domNode, "last");
+				this.progressBar = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderProgressBar" }, relativeParent, "last");
+				this.touchBox = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderTouchBox" }, relativeParent, "last");
+				this.handle = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderHandle" }, relativeParent, "last");
+			}
 			this.inherited(arguments);
+			// prevent browser scrolling on IE10 (evt.preventDefault() is not enough)
+			if(typeof this.domNode.style.msTouchAction != "undefined"){
+				this.domNode.style.msTouchAction = "none";
+			}
 		},
 
 		_setValueAttr: function(/*Number*/ value, /*Boolean?*/ priorityChange){
@@ -122,9 +130,9 @@ define("dojox/mobile/Slider", [
 				e.preventDefault();
 				var isMouse = e.type == "mousedown";
 				var box = domGeometry.position(node, false); // can't use true since the added docScroll and the returned x are body-zoom incompatibile
-				var bodyZoom = domStyle.get(win.body(), "zoom") || 1;
+				var bodyZoom = (has("ie") || has("trident") > 6) ? 1 : (domStyle.get(win.body(), "zoom") || 1);
 				if(isNaN(bodyZoom)){ bodyZoom = 1; }
-				var nodeZoom = domStyle.get(node, "zoom") || 1;
+				var nodeZoom = (has("ie") || has("trident") > 6) ? 1 : (domStyle.get(node, "zoom") || 1);
 				if(isNaN(nodeZoom)){ nodeZoom = 1; }
 				var startPixel = box[this._attrs.x] * nodeZoom * bodyZoom + domGeometry.docScroll()[this._attrs.x];
 				var maxPixels = box[this._attrs.w] * nodeZoom * bodyZoom;
@@ -135,8 +143,8 @@ define("dojox/mobile/Slider", [
 				array.forEach(actionHandles, connect.disconnect);
 				var root = win.doc.documentElement;
 				var actionHandles = [
-					this.connect(root, isMouse ? "onmousemove" : "ontouchmove", continueDrag),
-					this.connect(root, isMouse ? "onmouseup" : "ontouchend", endDrag)
+					this.connect(root, touch.move, continueDrag),
+					this.connect(root, touch.release, endDrag)
 				];
 			}
 
@@ -188,10 +196,8 @@ define("dojox/mobile/Slider", [
 			this._reversed = !((horizontal && ((ltr && !flip) || (!ltr && flip))) || (!horizontal && flip));
 			this._attrs = horizontal ? { x:'x', w:'w', l:'l', r:'r', pageX:'pageX', clientX:'clientX', handleLeft:"left", left:this._reversed ? "right" : "left", width:"width" } : { x:'y', w:'h', l:'t', r:'b', pageX:'pageY', clientX:'clientY', handleLeft:"top", left:this._reversed ? "bottom" : "top", width:"height" };
 			this.progressBar.style[this._attrs.left] = "0px";
-			this.connect(this.touchBox, "ontouchstart", beginDrag);
-			this.connect(this.touchBox, "onmousedown", beginDrag); // in case this works
-			this.connect(this.handle, "ontouchstart", beginDrag);
-			this.connect(this.handle, "onmousedown", beginDrag); // in case this works
+			this.connect(this.touchBox, touch.press, beginDrag);
+			this.connect(this.handle, touch.press, beginDrag);
 			this.connect(this.domNode, "onkeypress", keyPress); // for desktop a11y
 			this.connect(this.domNode, "onkeyup", keyUp); // fire onChange on desktop
 			this.startup();

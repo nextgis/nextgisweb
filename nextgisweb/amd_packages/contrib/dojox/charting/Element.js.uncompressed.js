@@ -1,5 +1,5 @@
-define("dojox/charting/Element", ["dojo/_base/lang", "dojo/_base/array", "dojo/dom-construct","dojo/_base/declare", "dojox/gfx", "dojox/gfx/shape"],
-	function(lang, arr, domConstruct, declare, gfx, shape){
+define("dojox/charting/Element", ["dojo/_base/array", "dojo/dom-construct","dojo/_base/declare", "dojox/gfx", "dojox/gfx/shape"],
+	function(arr, domConstruct, declare, gfx, shape){
 
 	return declare("dojox.charting.Element", null, {
 		// summary:
@@ -39,13 +39,33 @@ define("dojox/charting/Element", ["dojo/_base/lang", "dojo/_base/array", "dojo/d
 			this.destroyHtmlElements();
 			if(this.group){
 				// since 1.7.x we need dispose shape otherwise there is a memoryleak
-				this.group.removeShape();
-				var children = this.group.children;
-				for(var i = 0; i < children.length;++i){
-					shape.dispose(children[i]);
+				this.getGroup().removeShape();
+				var children = this.getGroup().children;
+				// starting with 1.9 the registry is optional and thus dispose is
+				if(shape.dispose){
+					for(var i = 0; i < children.length;++i){
+						shape.dispose(children[i], true);
+					}
 				}
-				this.group.clear();
-				shape.dispose(this.group);
+				if(this.getGroup().rawNode){
+					domConstruct.empty(this.getGroup().rawNode);
+				}
+				this.getGroup().clear();
+				// starting with 1.9 the registry is optional and thus dispose is
+				if(shape.dispose){
+					shape.dispose(this.getGroup(), true);
+				}
+				if(this.getGroup() != this.group){
+					// we do have an intermediary clipping group (see CartesianBase)
+					if(this.group.rawNode){
+						domConstruct.empty(this.group.rawNode);
+					}
+					this.group.clear();
+					// starting with 1.9 the registry is optional and thus dispose is
+					if(shape.dispose){
+						shape.dispose(this.group, true);
+					}
+				}
 				this.group = null;
 			}
 			this.dirty = true;
@@ -67,16 +87,30 @@ define("dojox/charting/Element", ["dojo/_base/lang", "dojo/_base/array", "dojo/d
 			this.destroyHtmlElements();
 			if(!creator){ creator = this.chart.surface; }
 			if(this.group){
-				var children = this.group.children;
-				for(var i = 0; i < children.length;++i){
-					shape.dispose(children[i]);
+				var bgnode;
+				var children = this.getGroup().children;
+				// starting with 1.9 the registry is optional and thus dispose is
+				if(shape.dispose){
+					for(var i = 0; i < children.length;++i){
+						shape.dispose(children[i], true);
+					}
 				}
-				this.group.clear();
+				if(this.getGroup().rawNode){
+					bgnode = this.getGroup().bgNode;
+					domConstruct.empty(this.getGroup().rawNode);
+				}
+				this.getGroup().clear();
+				if(bgnode){
+					this.getGroup().rawNode.appendChild(bgnode);
+				}
 			}else{
 				this.group = creator.createGroup();
 			}
 			this.dirty = true;
 			return this;	//	dojox.charting.Element
+		},
+		getGroup: function(){
+			return this.group;
 		},
 		destroyHtmlElements: function(){
 			// summary:
@@ -351,7 +385,6 @@ define("dojox/charting/Element", ["dojo/_base/lang", "dojo/_base/array", "dojo/d
 				y2: center.y + fill.r * radius * Math.sin(angle) / 100,
 				colors: fill.colors
 			};
-			return fill;
 		}
 	});
 });

@@ -1,6 +1,6 @@
 define("dojox/testing/DocTest", ["dojo/string"], function() {
 
-dojo.declare(
+return dojo.declare(
 	"dojox.testing.DocTest",
 	null,
 	{
@@ -278,5 +278,4 @@ dojo.declare(
 	}
 );
 
-return dojox.testing.DocTest;
 });

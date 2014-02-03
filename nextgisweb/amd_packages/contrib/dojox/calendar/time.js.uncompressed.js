@@ -1,4 +1,4 @@
-define("dojox/calendar/time", ["dojo/_base/lang", "dojo/date", "dojo/cldr/supplemental", "dojo/date/stamp"], function(lang, date, cldr, stamp) {
+define("dojox/calendar/time", ["dojo/_base/lang", "dojo/date", "dojo/cldr/supplemental","dojo/date/stamp"], function(lang, date, cldr, stamp) {
 
 // summary: Advanced date manipulation utilities.
 
@@ -33,13 +33,13 @@ time.newDate = function(obj, dateClassObj){
 	}else if(typeof obj == "string"){
 		d = stamp.fromISOString(obj);
 		if(d === null){
-			d = new dateClassObj(obj); // kept for backward compat, will throw error in dojo 1.9
+			throw new Error("Cannot parse date string ("+obj+"), specify a \"decodeDate\" function that translates this string into a Date object"); // cannot build date
 		}else if(dateClassObj !== Date){ // from Date to dateClassObj
 			d = new dateClassObj(d.getTime());
 		}
 		return d;
 	}
-	
+
 };
 
 time.floorToDay = function(d, reuse, dateClassObj){
@@ -108,7 +108,7 @@ time.floorToWeek = function(d, dateClassObj, dateModule, firstDayOfWeek, locale)
 		return d;
 	}
 	return time.floorToDay(
-		dateModule.add(d, "day", day > fd ? -day+fd : fd-day),
+		dateModule.add(d, "day", day > fd ? -day+fd : -day+fd-7),
 		true, dateClassObj);
 };
 

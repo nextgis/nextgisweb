@@ -190,13 +190,23 @@ def setup_pyramid(comp, config):
             first, last = map(int, http_range[len('items='):].split('-', 1))
             query.limit(last - first + 1, first)
 
+        box = request.headers.get('x-feature-box', None)
+        if box:
+            query.box()
+
         like = request.params.get('like', '')
         if like != '':
             query.like(like)
 
         features = query()
 
-        result = [dict(f.fields, id=f.id, label=f.label) for f in features]
+        result = []
+        for fobj in features:
+            fdata = dict(fobj.fields, id=fobj.id, label=fobj.label)
+            if box:
+                fdata['box'] = fobj.box.bounds
+
+            result.append(fdata)
 
         headerlist = []
         if http_range:

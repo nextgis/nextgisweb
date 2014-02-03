@@ -14,6 +14,7 @@ define("dojox/grid/enhanced/nls/EnhancedGrid", { root:
 //end v1.x content
 ,
 "ar": true,
+"bg": true,
 "ca": true,
 "cs": true,
 "da": true,
@@ -42,6 +43,7 @@ define("dojox/grid/enhanced/nls/EnhancedGrid", { root:
 "sv": true,
 "th": true,
 "tr": true,
+"uk": true,
 "zh": true,
 "zh-tw": true
 });

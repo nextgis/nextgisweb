@@ -87,6 +87,8 @@ define("dojox/charting/SimpleTheme", ["dojo/_base/lang", "dojo/_base/array","doj
 	//	|		outline: {width: 0.1, color: "#ccc"},		// outline
 	//	|		//shadow:  {dx: 1, dy: 1, width: 2, color: [0, 0, 0, 0.3]},
 	//	|		shadow: null,								// no shadow
+	//	|		//filter:  dojox/gfx/filters.createFilter(),
+	//	|		filter: null,								// no filter, to use a filter you must use gfx SVG render and require dojox/gfx/svgext
 	//	|		fill:    "#ccc",							// fill, if appropriate
 	//	|		font:    "normal normal normal 8pt Tahoma",	// if there's a label
 	//	|		fontColor: "#000"							// color of labels
@@ -111,12 +113,15 @@ define("dojox/charting/SimpleTheme", ["dojo/_base/lang", "dojo/_base/array","doj
 	//	|			color:     "#666",
 	//	|			width:  0.8,
 	//	|			length: 3
-	//	|		}
+	//	|		},
+	//	|		fill: "grey",  // every other stripe
+	//	|		alternateFill: "grey" // alternate stripe
 	//	|	},
 	//	|	indicator: {
 	//	|		lineStroke:  {width: 1.5, color: "#333"},		// line
 	//	|		lineOutline: {width: 0.1, color: "#ccc"},		// line outline
 	//	|		lineShadow: null,								// no line shadow
+	//	|		lineFill: null,									// fill between lines for dual indicators
 	//	|		stroke:  {width: 1.5, color: "#333"},			// label background stroke
 	//	|		outline: {width: 0.1, color: "#ccc"},			// label background outline
 	//	|		shadow: null,									// no label background shadow
@@ -328,7 +333,7 @@ define("dojox/charting/SimpleTheme", ["dojo/_base/lang", "dojo/_base/array","doj
 					lang.setObject("series.fill", mixin.color, t);
 				}
 			}
-			arr.forEach(["stroke", "outline", "shadow", "fill", "font", "fontColor", "labelWiring"], function(name){
+			arr.forEach(["stroke", "outline", "shadow", "fill", "filter", "font", "fontColor", "labelWiring"], function(name){
 				var markerName = "marker" + name.charAt(0).toUpperCase() + name.substr(1),
 					b = markerName in mixin;
 				if(name in mixin){
@@ -551,6 +556,7 @@ lang.mixin(SimpleTheme, {
 			lineStroke:  {width: 1.5, color: "#333"},		
 			lineOutline: {width: 0.1, color: "#ccc"},		
 			lineShadow: null,
+			lineFill: null,
 			stroke:  {width: 1.5, color: "#333"},		
 			outline: {width: 0.1, color: "#ccc"},		
 			shadow: null,								

@@ -10,7 +10,14 @@ define("dojox/dtl/_base", [
 	function(kernel, lang, Tokenize, json, dom, xhr, StringBuilder, deferred){
 
 	kernel.experimental("dojox.dtl");
+
 	var dd = lang.getObject("dojox.dtl", true);
+/*=====
+	dd = {
+		// TODO: summary
+	};
+=====*/
+
 	dd._base = {};
 
 	dd.TOKEN_BLOCK = -1;
@@ -777,6 +784,7 @@ define("dojox/dtl/_base", [
 	dd.register.filters("dojox.dtl", {
 		"_base": ["escape", "safe"]
 	});
+
 	return dd;
 });
 

@@ -3,7 +3,7 @@ require({cache:{
 define("dojox/layout/GridContainerLite", [
 	"dojo/_base/kernel",
 	"dojo/text!./resources/GridContainer.html",
-	"dojo/_base/declare", // declare 
+	"dojo/_base/declare", // declare
 	"dojo/query",
 	"dojo/_base/sniff",
 	"dojo/dom-class",
@@ -135,7 +135,7 @@ define("dojox/layout/GridContainerLite", [
 				this._border = {
 					h: has("ie") ? geom.getBorderExtents(this.gridContainerTable).h : 0,
 					w: (has("ie") == 6) ? 1 : 0
-				}
+				};
 			}else{
 				domStyle.set(this.domNode, "overflowY", "hidden");
 				domStyle.set(this.gridContainerTable, "height", "auto");
@@ -155,7 +155,7 @@ define("dojox/layout/GridContainerLite", [
 
 			// Need to call getChildren because getChildren return null
 			// The children are not direct children because of _organizeChildren method
-			array.forEach(this.getChildren(), function(child){ 
+			array.forEach(this.getChildren(), function(child){
 			  child.startup();
 			});
 
@@ -226,7 +226,7 @@ define("dojox/layout/GridContainerLite", [
 			if(registry.getEnclosingWidget(sourceArea.node) == this){
 				this._draggedNode = node;
 				if(this.doLayout){
-					geom.getMarginBox(this.gridContainerTable, {
+					geom.setMarginBox(this.gridContainerTable, {
 						h: geom.getContentBox(this.gridContainerDiv).h - this._border.h
 					});
 				}
@@ -277,10 +277,10 @@ define("dojox/layout/GridContainerLite", [
 			//console.log("dojox.layout.GridContainerLite ::: layout");
 			if(this.doLayout){
 				var contentBox = this._contentBox;
-				geom.getMarginBox(this.gridContainerTable, {
+				geom.setMarginBox(this.gridContainerTable, {
 					h: contentBox.h - this._border.h
 				});
-				geom.getContentBox(this.domNode, {
+				geom.setContentSize(this.domNode, {
 					w: contentBox.w - this._border.w
 				});
 			}
@@ -322,25 +322,8 @@ define("dojox/layout/GridContainerLite", [
 			var accept = this.acceptTypes.join(","),
 				i = 0;
 
-			var origWidths = this.colWidths || [];
-			var widths = [];
-			var colWidth;
-			var widthSum = 0;
+			var widths = this._computeColWidth();
 
-			// Calculate the widths of each column.
-			for(i = 0; i < this.nbZones; i++){
-				if(widths.length < origWidths.length){
-					widthSum += origWidths[i];
-					widths.push(origWidths[i]);
-				}else{
-					if(!colWidth){
-						colWidth = (100 - widthSum)/(this.nbZones - i);
-					}
-					widths.push(colWidth);
-				}
-			}
-
-			i = 0;
 			while(i < this.nbZones){
 				// Add the parameter accept in each zone used by AreaManager
 				// (see method dojox.mdnd.AreaManager:registerByNode)
@@ -454,7 +437,7 @@ define("dojox/layout/GridContainerLite", [
 			//console.log("dojox.layout.GridContainerLite ::: _insertChild", child, column, p);
 			var zone = this._grid[column].node,
 				length = zone.childNodes.length;
-			if(typeof(p) == undefined || p > length){
+			if(typeof p === "undefined" || p > length){
 				p = length;
 			}
 			if(this._disabled){
@@ -505,7 +488,7 @@ define("dojox/layout/GridContainerLite", [
 			//console.log("dojox.layout.GridContainerLite ::: addChild");
 			child.domNode.id = child.id;
 			dojox.layout.GridContainerLite.superclass.addChild.call(this, child, 0);
-			if(column < 0 || column == undefined){ column = 0; }
+			if(column < 0 || column === undefined){ column = 0; }
 			if(p <= 0){ p = 0; }
 			try{
 				return this._insertChild(child, column, p);
@@ -535,6 +518,15 @@ define("dojox/layout/GridContainerLite", [
 			//console.log("dojox.layout.GridContainer ::: _updateColumnsWidth");
 			var length = this._grid.length;
 
+			var widths = this._computeColWidth();
+
+			// Set the widths of each node
+			for (var i = 0; i < length; i++){
+				this._grid[i].node.style.width = widths[i] + "%";
+			}
+		},
+
+		_computeColWidth: function(){
 			var origWidths = this.colWidths || [];
 			var widths = [];
 			var colWidth;
@@ -542,7 +534,7 @@ define("dojox/layout/GridContainerLite", [
 			var i;
 
 			// Calculate the widths of each column.
-			for(i = 0; i < length; i++){
+			for(i = 0; i < this.nbZones; i++){
 				if(widths.length < origWidths.length){
 					widthSum += origWidths[i] * 1;
 					widths.push(origWidths[i]);
@@ -569,11 +561,7 @@ define("dojox/layout/GridContainerLite", [
 					widths[i] *= divisor;
 				}
 			}
-
-			// Set the widths of each node
-			for(i = 0; i < length; i++){
-				this._grid[i].node.style.width = widths[i] + "%";
-			}
+			return widths;
 		},
 
 		_selectFocus: function(/*Event*/event){
@@ -609,7 +597,7 @@ define("dojox/layout/GridContainerLite", [
 							children = area[i].childNodes;
 							for(j = 0; j < children.length; j++){
 								zone = children[j];
-								if(zone != null && zone.style.display != "none"){
+								if(zone !== null && zone.style.display != "none"){
 									focus.focus(zone);
 									events.stop(event);
 									found = true;
@@ -618,7 +606,7 @@ define("dojox/layout/GridContainerLite", [
 							}
 							if(found){ break };
 						}
-					break;
+						break;
 					case k.UP_ARROW:
 					case k.LEFT_ARROW:
 						area = this.gridNode.childNodes;
@@ -627,7 +615,7 @@ define("dojox/layout/GridContainerLite", [
 							children = area[i].childNodes;
 							for(j = children.length; j >= 0; j--){
 								zone = children[j];
-								if(zone != null && zone.style.display != "none"){
+								if(zone !== null && zone.style.display != "none"){
 									focus.focus(zone);
 									events.stop(event);
 									found = true;
@@ -638,8 +626,7 @@ define("dojox/layout/GridContainerLite", [
 						}
 					break;
 				}
-			}
-			else{
+			}else{
 				if(focusNode.parentNode.parentNode == this.gridNode){
 					var child = (key == k.UP_ARROW || key == k.LEFT_ARROW) ? "lastChild" : "firstChild";
 					var pos = (key == k.UP_ARROW || key == k.LEFT_ARROW) ? "previousSibling" : "nextSibling";
@@ -653,11 +640,11 @@ define("dojox/layout/GridContainerLite", [
 								children = focusTemp.parentNode.childNodes;
 								var num = 0;
 								for(i = 0; i < children.length; i++){
-									if(children[i].style.display != "none"){ num++ };
+									if(children[i].style.display != "none"){ num++; }
 									if(num > 1){ break; }
 								}
 								if(num == 1){ return; }
-								if(focusTemp[pos] == null){
+								if(focusTemp[pos] === null){
 									zone = focusTemp.parentNode[child];
 								}
 								else{
@@ -683,7 +670,7 @@ define("dojox/layout/GridContainerLite", [
 										break;
 									}
 								}
-								if(has("mozilla") || has("webkit")){ i-- };
+								if(has("mozilla") || has("webkit")){ i--; }
 
 								widget = registry.byNode(focusNode);
 								if(!widget.dragRestriction){
@@ -705,7 +692,7 @@ define("dojox/layout/GridContainerLite", [
 							events.stop(event);
 							if(event.shiftKey){
 								var z = 0;
-								if(focusNode.parentNode[pos] == null){
+								if(focusNode.parentNode[pos] === null){
 									if(has("ie") && key == k.LEFT_ARROW){
 										z = this.gridNode.childNodes.length-1;
 									}
@@ -720,11 +707,11 @@ define("dojox/layout/GridContainerLite", [
 										}
 										z++;
 									}
-									if(has("mozilla") || has("webkit")){ z-- };
+									if(has("mozilla") || has("webkit")){ z--; }
 								}
 								widget = registry.byNode(focusNode);
 								var _dndType = focusNode.getAttribute("dndtype");
-								if(_dndType == null){
+								if(_dndType === null){
 									//check if it's a dijit object
 									if(widget && widget.dndType){
 										_dndType = widget.dndType.split(/\s*,\s*/);
@@ -750,7 +737,7 @@ define("dojox/layout/GridContainerLite", [
 										place = 0;
 									if(k.LEFT_ARROW == key){
 										var t = z;
-										if(has("mozilla") || has("webkit")){ t = z + 1 };
+										if(has("mozilla") || has("webkit")){ t = z + 1; }
 										place = this.gridNode.childNodes[t].childNodes.length;
 									}
 									// delete of manager :

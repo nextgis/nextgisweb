@@ -1,6 +1,6 @@
-define("dojox/charting/action2d/MoveSlice", ["dojo/_base/connect", "dojo/_base/declare", "./PlotAction", "dojo/fx/easing", "dojox/gfx/matrix", 
-	"dojox/gfx/fx", "dojox/lang/functional", "dojox/lang/functional/scan", "dojox/lang/functional/fold"], 
-	function(hub, declare, PlotAction, dfe, m, gf, df, dfs, dff){
+define("dojox/charting/action2d/MoveSlice", ["dojo/_base/connect", "dojo/_base/declare", "dojo/_base/array", "./PlotAction", "dojo/fx/easing", "dojox/gfx/matrix",
+	"dojox/gfx/fx", "dojox/lang/functional", "dojox/lang/functional/scan", "dojox/lang/functional/fold"],
+	function(hub, declare, array, PlotAction, dfe, m, gf, df){
 
 	/*=====
 	var __MoveSliceCtorArgs = {
@@ -61,12 +61,15 @@ define("dojox/charting/action2d/MoveSlice", ["dojo/_base/connect", "dojo/_base/d
 				// calculate the running total of slice angles
 				var startAngle = m._degToRad(o.plot.opt.startAngle);
 				if(typeof o.run.data[0] == "number"){
-					this.angles = df.map(df.scanl(o.run.data, "+", startAngle),
+					this.angles = df.map(df.scanl(o.run.data, "+", 0),
 						"* 2 * Math.PI / this", df.foldl(o.run.data, "+", 0));
 				}else{
-					this.angles = df.map(df.scanl(o.run.data, "a + b.y", startAngle),
+					this.angles = df.map(df.scanl(o.run.data, "a + b.y", 0),
 						"* 2 * Math.PI / this", df.foldl(o.run.data, "a + b.y", 0));
 				}
+				this.angles = array.map(this.angles, function(item){
+					return item + startAngle;
+				});
 			}
 
 			var index = o.index, anim, startScale, endScale, startOffset, endOffset,

@@ -1,8 +1,7 @@
 define("dijit/form/_CheckBoxMixin", [
 	"dojo/_base/declare", // declare
-	"dojo/dom-attr", // domAttr.set
-	"dojo/_base/event" // event.stop
-], function(declare, domAttr, event){
+	"dojo/dom-attr" // domAttr.set
+], function(declare, domAttr){
 
 	// module:
 	//		dijit/form/_CheckBoxMixin
@@ -33,14 +32,13 @@ define("dijit/form/_CheckBoxMixin", [
 		//		In markup, this is specified as "readOnly".
 		//		Similar to disabled except readOnly form values are submitted.
 		readOnly: false,
-		
+
 		// aria-pressed for toggle buttons, and aria-checked for checkboxes
 		_aria_attr: "aria-checked",
 
 		_setReadOnlyAttr: function(/*Boolean*/ value){
 			this._set("readOnly", value);
 			domAttr.set(this.focusNode, 'readOnly', value);
-			this.focusNode.setAttribute("aria-readonly", value);
 		},
 
 		// Override dijit/form/Button._setLabelAttr() since we don't even have a containerNode.
@@ -48,7 +46,7 @@ define("dijit/form/_CheckBoxMixin", [
 		_setLabelAttr: undefined,
 
 		_getSubmitValue: function(/*String*/ value){
-			return !value && value !== 0 ? "on" : value;
+			return (value == null || value === "") ? "on" : value;
 		},
 
 		_setValueAttr: function(newValue){
@@ -60,7 +58,7 @@ define("dijit/form/_CheckBoxMixin", [
 		reset: function(){
 			this.inherited(arguments);
 			// Handle unlikely event that the <input type=checkbox> value attribute has changed
-			this._set("value", this.params.value || "on");
+			this._set("value", this._getSubmitValue(this.params.value));
 			domAttr.set(this.focusNode, 'value', this.value);
 		},
 
@@ -69,7 +67,8 @@ define("dijit/form/_CheckBoxMixin", [
 			//		Internal function to handle click actions - need to check
 			//		readOnly, since button no longer does that check.
 			if(this.readOnly){
-				event.stop(e);
+				e.stopPropagation();
+				e.preventDefault();
 				return false;
 			}
 			return this.inherited(arguments);

@@ -68,14 +68,14 @@ define([
                     if (widget.placeWidget) {
                         // Если у нас у нас есть метод placeWidget,
                         // используем его, чтобы разместить вложенный
-                        // виджет.
+                        // виджет и активировать его (startup).
                         widget.placeWidget(w._composite_key, w);
                     } else {
                         // Если метода placeWidget нет, то помещаем
                         // вложенный виджет в конец domNode.
                         w.placeAt(widget.domNode);
+                        w.startup();
                     };
-                    w.startup();
                 });
             });
         },

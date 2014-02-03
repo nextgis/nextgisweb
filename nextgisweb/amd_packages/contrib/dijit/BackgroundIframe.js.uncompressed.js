@@ -6,12 +6,18 @@ define("dijit/BackgroundIframe", [
 	"dojo/dom-style", // domStyle.set
 	"dojo/_base/lang", // lang.extend lang.hitch
 	"dojo/on",
-	"dojo/sniff", // has("ie"), has("mozilla"), has("quirks")
-	"dojo/_base/window" // win.doc.createElement
-], function(require, dijit, config, domConstruct, domStyle, lang, on, has, win){
+	"dojo/sniff" // has("ie"), has("mozilla"), has("quirks")
+], function(require, dijit, config, domConstruct, domStyle, lang, on, has){
 
 	// module:
 	//		dijit/BackgroundIFrame
+
+	// Flag for whether to create background iframe behind popups like Menus and Dialog.
+	// A background iframe is useful to prevent problems with popups appearing behind applets/pdf files,
+	// and is also useful on older versions of IE (IE6 and IE7) to prevent the "bleed through select" problem.
+	// TODO: For 2.0, make this false by default.  Also, possibly move definition to has.js so that this module can be
+	// conditionally required via  dojo/has!bgIfame?dijit/BackgroundIframe
+	has.add("config-bgIframe", !has("touch"));
 
 	// TODO: remove _frames, it isn't being used much, since popups never release their
 	// iframes (see [22236])
@@ -27,12 +33,13 @@ define("dijit/BackgroundIframe", [
 				iframe = queue.pop();
 				iframe.style.display="";
 			}else{
+				// transparency needed for DialogUnderlay and for tooltips on IE (to see screen near connector)
 				if(has("ie") < 9){
 					var burl = config["dojoBlankHtmlUrl"] || require.toUrl("dojo/resources/blank.html") || "javascript:\"\"";
 					var html="<iframe src='" + burl + "' role='presentation'"
 						+ " style='position: absolute; left: 0px; top: 0px;"
 						+ "z-index: -1; filter:Alpha(Opacity=\"0\");'>";
-					iframe = win.doc.createElement(html);
+					iframe = document.createElement(html);
 				}else{
 					iframe = domConstruct.create("iframe");
 					iframe.src = 'javascript:""';
@@ -54,7 +61,7 @@ define("dijit/BackgroundIframe", [
 
 	dijit.BackgroundIframe = function(/*DomNode*/ node){
 		// summary:
-		//		For IE/FF z-index schenanigans. id attribute is required.
+		//		For IE/FF z-index shenanigans. id attribute is required.
 		//
 		// description:
 		//		new dijit.BackgroundIframe(node).
@@ -63,14 +70,12 @@ define("dijit/BackgroundIframe", [
 		//		area (and position) of node
 
 		if(!node.id){ throw new Error("no id"); }
-		if(has("ie") || has("mozilla")){
+		if(has("config-bgIframe")){
 			var iframe = (this.iframe = _frames.pop());
 			node.appendChild(iframe);
 			if(has("ie")<7 || has("quirks")){
 				this.resize(node);
-				this._conn = on(node, 'resize', lang.hitch(this, function(){
-					this.resize(node);
-				}));
+				this._conn = on(node, 'resize', lang.hitch(this, "resize", node));
 			}else{
 				domStyle.set(iframe, {
 					width: '100%',

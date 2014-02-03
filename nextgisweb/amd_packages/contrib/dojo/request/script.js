@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2012, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -79,9 +79,9 @@ _2a=_2c.options;
 var dfd=_3.deferred(_2c,_1c,_1f,_2a.jsonp?null:(_2a.checkString?_24:_22),_27);
 _5.mixin(dfd,{id:_d+(_e++),canDelete:false});
 if(_2a.jsonp){
-var _2d=(~url.indexOf("?")?"&":"?")+_2a.jsonp+"=";
-if(url.indexOf(_2d)===-1){
-url+=_2d+(_2a.frameDoc?"parent.":"")+_d+"_callbacks."+dfd.id;
+var _2d=new RegExp("[?&]"+_2a.jsonp+"=");
+if(!_2d.test(url)){
+url+=(~url.indexOf("?")?"&":"?")+_2a.jsonp+"="+(_2a.frameDoc?"parent.":"")+_d+"_callbacks."+dfd.id;
 }
 dfd.canDelete=true;
 _11[dfd.id]=function(_2e){

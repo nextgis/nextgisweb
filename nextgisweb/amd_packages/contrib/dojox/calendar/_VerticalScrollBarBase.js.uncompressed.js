@@ -19,16 +19,11 @@ function(declare, event, lang, on, domStyle, _WidgetBase){
 		
 		buildRendering: function(){
 			this.inherited(arguments);
-			this._scrollHandle = on(this.domNode, "scroll", lang.hitch(this, function(param) {
+			this.own(on(this.domNode, "scroll", lang.hitch(this, function(param) {
 				this.value = this._getDomScrollerValue();
 				this.onChange(this.value);
 				this.onScroll(this.value);
-			}));
-		},
-		
-		destroy: function(preserveDom){
-			this._scrollHandle.remove();
-			this.inherited(arguments);
+			})));
 		},
 
 		_getDomScrollerValue : function() {

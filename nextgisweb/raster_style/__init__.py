@@ -6,7 +6,7 @@ from ..component import Component, require
 class RasterStyleComponent(Component):
     identity = 'raster_style'
 
-    @require('raster_layer')
+    @require('style')
     def initialize(self):
         Component.initialize(self)
 

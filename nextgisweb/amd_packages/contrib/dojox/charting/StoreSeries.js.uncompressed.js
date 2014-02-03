@@ -69,7 +69,6 @@ define("dojox/charting/StoreSeries", ["dojo/_base/array", "dojo/_base/declare", 
 		fetch: function(){
 			// summary:
 			//		Fetches data from the store and updates a chart.
-			var objects = this.objects = [];
 			var self = this;
 			if(this.observeHandle){
 				this.observeHandle.remove();

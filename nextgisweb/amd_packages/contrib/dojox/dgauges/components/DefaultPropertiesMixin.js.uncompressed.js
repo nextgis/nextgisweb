@@ -47,34 +47,31 @@ define("dojox/dgauges/components/DefaultPropertiesMixin", ["dojo/_base/declare",
 		animationDuration: 0,
 
 		_setMinimumAttr: function(v){
-			this.getElement("scale").scaler.minimum = v;
+			this.getElement("scale").scaler.set("minimum", v);
 		},
 		_setMaximumAttr: function(v){
-			this.getElement("scale").scaler.maximum = v;
+			this.getElement("scale").scaler.set("maximum", v);
 		},
 		_setSnapIntervalAttr: function(v){
-			this.getElement("scale").scaler.snapInterval = v;
+			this.getElement("scale").scaler.set("snapInterval", v);
 		},
 		_setMajorTickIntervalAttr: function(v){
-			this.getElement("scale").scaler.majorTickInterval = v;
+			this.getElement("scale").scaler.set("majorTickInterval", v);
 		},
 		_setMinorTickIntervalAttr: function(v){
-			this.getElement("scale").scaler.minorTickInterval = v;
+			this.getElement("scale").scaler.set("minorTickInterval", v);
 		},
 		_setMinorTicksEnabledAttr: function(v){
-			this.getElement("scale").scaler.minorTicksEnabled = v;
-		},
-		_setValueAttr: function(v){
-			this.getElement("scale").getIndicator("indicator").value = v;
+			this.getElement("scale").scaler.set("minorTicksEnabled", v);
 		},
 		_setInteractionAreaAttr: function(v){
-			this.getElement("scale").getIndicator("indicator").interactionArea = v;
+			this.getElement("scale").getIndicator("indicator").set("interactionArea", v);
 		},
 		_setInteractionModeAttr: function(v){
-			this.getElement("scale").getIndicator("indicator").interactionMode = v;
+			this.getElement("scale").getIndicator("indicator").set("interactionMode", v);
 		},
 		_setAnimationDurationAttr: function(v){
-			this.getElement("scale").getIndicator("indicator").animationDuration = v;
+			this.getElement("scale").getIndicator("indicator").set("animationDuration", v);
 		},
 		_setBorderColorAttr: function(v){
 			this.borderColor = new Color(v);

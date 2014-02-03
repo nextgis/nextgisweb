@@ -8,8 +8,9 @@ var _6="destroyRecursive" in _5?"destroyRecursive":"destroy" in _5?"destroy":"re
 var _7=_2.before(this,"destroy",function(_8){
 _5[_6](_8);
 });
-_2.after(_5,_6,function(){
+var _9=_2.after(_5,_6,function(){
 _7.remove();
+_9.remove();
 },true);
 },this);
 return arguments;

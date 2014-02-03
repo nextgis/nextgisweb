@@ -9,8 +9,9 @@ define("dojox/grid/_Builder", [
 	"dojo/dnd/Moveable",
 	"dojox/html/metrics",
 	"./util",
-	"dojo/_base/html"
-], function(dojox, array, lang, win, event, has, connect, Moveable, metrics, util, html){
+	"dojo/_base/html",
+	"dojo/dom-geometry"
+], function(dojox, array, lang, win, event, has, connect, Moveable, metrics, util, html, domGeometry){
 
 	var dg = dojox.grid;
 
@@ -74,7 +75,7 @@ define("dojox/grid/_Builder", [
 					inCell.id = this.grid.id + "Hdr" + inCell.index;
 				}
 				// column headers are not editable, mark as aria-readonly=true
-				html = ['<th tabIndex="-1" aria-readonly="true" role="columnheader"', sortInfo, 'id="', inCell.id, '"'];
+				html = ['<th tabIndex="-1" aria-readonly="true" role="columnheader"', sortInfo, ' id="', inCell.id, '"'];
 			}else{
 				// cells inherit grid aria-readonly property; default value for aria-readonly is false(grid is editable)
 				// if grid is editable (had any editable cells), mark non editable cells as aria-readonly=true
@@ -225,6 +226,12 @@ define("dojox/grid/_Builder", [
 			if (e.cellNode)
 				this.grid.onMouseDown(e);
 			this.grid.onMouseDownRow(e);
+		},
+
+		_getTextDirStyle: function(textDir, inCell, inRowIndex){
+			// summary:
+			//		 Get BiDi text dir, just a placeholder, defined in dojox/grid/bidi/_BidiMixin
+			return "";
 		}
 	});
 
@@ -255,7 +262,7 @@ define("dojox/grid/_Builder", [
 		generateHtml: function(inDataIndex, inRowIndex){
 			var
 				html = this.getTableArray(),
-				v = this.view,
+				v = this.view, dir,
 				cells = v.structure.cells,
 				item = this.grid.getItem(inRowIndex);
 
@@ -273,6 +280,10 @@ define("dojox/grid/_Builder", [
 					m[1] = cc.join(' ');
 					// styles
 					m[3] = cs.join(';');
+					dir = cell.textDir || this.grid.textDir;
+					if(dir){
+					    m[3] += this._getTextDirStyle(dir, cell, inRowIndex);
+					}
 					// in-place concat
 					html.push.apply(html, m);
 				}
@@ -311,7 +322,7 @@ define("dojox/grid/_Builder", [
 		},
 
 		generateHtml: function(inGetValue, inValue){
-			var html = this.getTableArray(), cells = this.view.structure.cells;
+			var dir, html = this.getTableArray(), cells = this.view.structure.cells;
 			
 			util.fire(this.view, "onBeforeRow", [-1, cells]);
 			for(var j=0, row; (row=cells[j]); j++){
@@ -345,6 +356,10 @@ define("dojox/grid/_Builder", [
 					markup[5] = (inValue != undefined ? inValue : inGetValue(cell));
 					// styles
 					markup[3] = cell.customStyles.join(';');
+					dir = cell.textDir || this.grid.textDir;
+					if(dir){
+					    markup[3] += this._getTextDirStyle(dir, cell, inValue);
+					}
 					// classes
 					markup[1] = cell.customClasses.join(' '); //(cell.customClasses ? ' ' + cell.customClasses : '');
 					html.push(markup.join(''));
@@ -357,28 +372,17 @@ define("dojox/grid/_Builder", [
 
 		// event helpers
 		getCellX: function(e){
-			var n, x = e.layerX;
-			if(has('mozilla') || has('ie') >= 9){
-				n = ascendDom(e.target, makeNotTagName("th"));
-				x -= (n && n.offsetLeft) || 0;
-				var t = e.sourceView.getScrollbarWidth();
-				if(!this.grid.isLeftToRight()/*&& e.sourceView.headerNode.scrollLeft < t*/){
-					//fix #11253
-					table = ascendDom(n,makeNotTagName("table"));
-					x -= (table && table.offsetLeft) || 0;
-				}
-				//x -= getProp(ascendDom(e.target, mkNotTagName("td")), "offsetLeft") || 0;
+			var n, x, pos;
+			// Calculate starting x position
+			n = ascendDom(e.target, makeNotTagName("th"));
+			if(n){
+				// We have a proper parent node, use that for position
+				pos = domGeometry.position(n);
+				x = e.clientX - pos.x;
+			}else{
+				// Fall back to layerX
+				x = e.layerX;
 			}
-			n = ascendDom(e.target, function(){
-				if(!n || n == e.cellNode){
-					return false;
-				}
-				// Mozilla 1.8 (FF 1.5) has a bug that makes offsetLeft = -parent border width
-				// when parent has border, overflow: hidden, and is positioned
-				// handle this problem here ... not a general solution!
-				x += (n.offsetLeft < 0 ? 0 : n.offsetLeft);
-				return true;
-			});
 			return x;
 		},
 

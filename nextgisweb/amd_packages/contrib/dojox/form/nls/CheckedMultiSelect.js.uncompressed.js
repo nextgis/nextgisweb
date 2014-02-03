@@ -8,6 +8,7 @@ define("dojox/form/nls/CheckedMultiSelect", { root:
 ,
 "zh": true,
 "zh-tw": true,
+"uk": true,
 "tr": true,
 "th": true,
 "sv": true,
@@ -33,5 +34,6 @@ define("dojox/form/nls/CheckedMultiSelect", { root:
 "de": true,
 "da": true,
 "cs": true,
-"ca": true
+"ca": true,
+"bg": true
 });

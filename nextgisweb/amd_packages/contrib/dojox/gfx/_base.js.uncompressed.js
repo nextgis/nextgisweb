@@ -139,6 +139,50 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 		}
 	};
 
+	b._computeTextLocation = function(/*g.defaultTextShape*/textShape, /*Number*/width, /*Number*/height, /*Boolean*/fixHeight) {
+		var loc = {}, align = textShape.align;
+		switch (align) {
+			case 'end':
+				loc.x = textShape.x - width;
+				break;
+			case 'middle':
+				loc.x = textShape.x - width / 2;
+				break;
+			default:
+				loc.x = textShape.x;
+				break;
+		}
+		var c = fixHeight ? 0.75 : 1;
+		loc.y = textShape.y - height*c; // **rough** approximation of the ascent...
+		return loc;
+	};
+	b._computeTextBoundingBox = function(/*shape.Text*/s){
+		// summary:
+		//		Compute the bbox of the given shape.Text instance. Note that this method returns an
+		//		approximation of the bbox, and should be used when the underlying renderer cannot provide precise metrics.
+		if(!g._base._isRendered(s)){
+			return {x:0, y:0, width:0, height:0};
+		}
+		var loc, textShape = s.getShape(),
+			font = s.getFont() || g.defaultFont,
+			w = s.getTextWidth(),
+			h = g.normalizedLength(font.size);
+		loc = b._computeTextLocation(textShape, w, h, true);
+		return {
+			x: loc.x,
+			y: loc.y,
+			width: w,
+			height: h
+		};
+	};
+	b._isRendered = function(/*Shape*/s){
+		var p = s.parent;
+		while(p && p.getParent){
+			p = p.parent;
+		}
+		return p !== null;
+	};
+
 	// candidate for dojo.dom
 
 	var uniqueId = 0;
@@ -150,6 +194,14 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 			id = kernel._scopeName + "xUnique" + (++uniqueId);
 		}while(dom.byId(id));
 		return id;
+	};
+
+	// IE10
+
+	b._fixMsTouchAction = function(/*dojox/gfx/shape.Surface*/surface){
+		var r = surface.rawNode;
+		if (typeof r.style.msTouchAction != 'undefined')
+			r.style.msTouchAction = "none";
 	};
 
 	/*=====
@@ -930,6 +982,13 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 						"Surface", "createSurface", "fixTarget"], function(name){
 					g[name] = ns[name];
 				});
+				if(typeof renderer == "string"){
+					g.renderer = renderer;
+				}else{
+					arr.some(["svg","vml","canvas","canvasWithEvents","silverlight"], function(r){
+						return (g.renderer = g[r] && g[r].Surface === g.Surface ? r : null);
+					});
+				}
 			}
 		}
 	});

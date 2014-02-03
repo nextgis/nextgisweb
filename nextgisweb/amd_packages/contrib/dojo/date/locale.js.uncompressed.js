@@ -258,7 +258,7 @@ exports.format = function(/*Date*/ dateObject, /*__FormatOptions?*/ options){
 		if(pattern){str.push(_processPattern(pattern, sauce));}
 	}
 
-	return str.length == 1 ? str[0] : bundle["dateTimeFormat-"+formatLength].replace(/\{(\d+)\}/g,
+	return str.length == 1 ? str[0] : bundle["dateTimeFormat-"+formatLength].replace(/\'/g,'').replace(/\{(\d+)\}/g,
 		function(match, key){ return str[key]; }); // String
 };
 
@@ -555,7 +555,7 @@ function _buildDateTimeRE(tokens, bundle, options, pattern){
 			case 'E':
 			case 'e':
 			case 'c':
-				s = '\\S+';
+				s = '.+?'; // match anything including spaces until the first pattern delimiter is found such as a comma or space
 				break;
 			case 'h': //hour (1-12)
 				s = '1[0-2]|'+p2+'[1-9]';

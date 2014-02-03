@@ -31,6 +31,10 @@ define("dojox/calendar/_RendererMixin", ["dojo/_base/declare", "dojo/_base/lang"
 		//		Indicates that the item displayed by this renderer is selected.
 		selected: false,
 		
+		// storeState: Boolean
+		//		Indicates that the item displayed by this renderer is not in the store, being saved to the store or in the store.
+		storeState: false,
+		
 		// moveEnabled: Boolean
 		//		Whether the event displayed by this renderer can be moved.
 		moveEnabled: true,
@@ -52,7 +56,7 @@ define("dojox/calendar/_RendererMixin", ["dojo/_base/declare", "dojo/_base/lang"
 			endTimeLabel: 50
 		},		
 		
-		_setSelectedAttr: function(value){
+		_setSelectedAttr: function(value){			
 			this._setState("selected", value, "Selected");
 		},
 		
@@ -68,10 +72,33 @@ define("dojox/calendar/_RendererMixin", ["dojo/_base/declare", "dojo/_base/lang"
 			this._setState("hovered", value, "Hovered");
 		},
 		
+		_setStoreStateAttr: function(value){
+			var cssClass = null;
+			switch(value){
+				case "storing":
+					cssClass = "Storing";
+					break;
+				case "unstored":
+					cssClass = "Unstored";
+					break;
+				default:
+					cssClass = null;
+			}
+			var tn = this.stateNode || this.domNode;				
+			domClass.remove(tn, "Storing");
+			domClass.remove(tn, "Unstored");
+			
+			this._set("storeState", value);
+			
+			if(cssClass != null){		
+				domClass.add(tn, cssClass);
+			}
+		},
+		
 		_setState: function(prop, value, cssClass){
 			if(this[prop] != value){
-				var tn = this.stateNode || this.domNode;
-				domClass[value ? "add" : "remove"](tn, cssClass);
+				var tn = this.stateNode || this.domNode;				
+				domClass[value ? "add" : "remove"](tn, cssClass);			
 				this._set(prop, value);
 			}	
 		},
@@ -188,8 +215,8 @@ define("dojox/calendar/_RendererMixin", ["dojo/_base/declare", "dojo/_base/lang"
 			//		protected
 			if(this.owner){
 				var f = this.owner.get("formatItemTimeFunc");
-				if(f != null){
-					return this.owner.formatItemTimeFunc(d, rd);
+				if(f != null && typeof f === "function"){
+					return f(d, rd);
 				}
 			}
 			return rd.dateLocaleModule.format(d, {selector: 'time'});
@@ -224,7 +251,7 @@ define("dojox/calendar/_RendererMixin", ["dojo/_base/declare", "dojo/_base/lang"
 			var startHidden = rd.dateModule.compare(this.item.range[0], this.item.startTime) != 0;
 			var endHidden =  rd.dateModule.compare(this.item.range[1], this.item.endTime) != 0;
 			
-			var visible, limit;
+			var visible;
 			
 			if(this.beforeIcon != null) {
 				visible = this._orientation != "horizontal" || this.isLeftToRight() ? startHidden : endHidden;

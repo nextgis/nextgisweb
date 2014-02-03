@@ -708,7 +708,8 @@ define("dojox/mdnd/AreaManager", ["dojo/_base/kernel",
 			dndType : "text"
 		});
 	}
-	
+
+	// TODO for 2.0 (or earlier): these values should be set on "am", the export of this module, not in dojox.mdnd
 	dojox.mdnd._areaManager = null;
 	dojox.mdnd.areaManager = function(){
 		// summary:

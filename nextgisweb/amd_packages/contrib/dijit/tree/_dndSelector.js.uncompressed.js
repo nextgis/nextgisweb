@@ -2,23 +2,22 @@ define("dijit/tree/_dndSelector", [
 	"dojo/_base/array", // array.filter array.forEach array.map
 	"dojo/_base/connect", // connect.isCopyKey
 	"dojo/_base/declare", // declare
-	"dojo/_base/Deferred", // Deferred
 	"dojo/_base/kernel",	// global
 	"dojo/_base/lang", // lang.hitch
-	"dojo/cookie", // cookie
+	"dojo/dom", // isDescendant
 	"dojo/mouse", // mouse.isLeft
 	"dojo/on",
 	"dojo/touch",
+	"../a11yclick",
 	"./_dndContainer"
-], function(array, connect, declare, Deferred, kernel, lang, cookie, mouse, on, touch, _dndContainer){
+], function(array, connect, declare, kernel, lang, dom, mouse, on, touch, a11yclick, _dndContainer){
 
 	// module:
 	//		dijit/tree/_dndSelector
 
-
 	return declare("dijit.tree._dndSelector", _dndContainer, {
 		// summary:
-		//		This is a base class for `dijit/tree/dndSource` , and isn't meant to be used directly.
+		//		This is a base class for `dijit/tree/dndSource`, and isn't meant to be used directly.
 		//		It's based on `dojo/dnd/Selector`.
 		// tags:
 		//		protected
@@ -39,14 +38,15 @@ define("dijit/tree/_dndSelector", [
 			this.selection={};
 			this.anchor = null;
 
-			if(!this.cookieName && this.tree.id){
-				this.cookieName = this.tree.id + "SaveSelectedCookie";
-			}
-
 			this.events.push(
+				// listeners setup here but no longer used (left for backwards compatibility
 				on(this.tree.domNode, touch.press, lang.hitch(this,"onMouseDown")),
 				on(this.tree.domNode, touch.release, lang.hitch(this,"onMouseUp")),
-				on(this.tree.domNode, touch.move, lang.hitch(this,"onMouseMove"))
+
+				// listeners used in this module
+				on(this.tree.domNode, touch.move, lang.hitch(this,"onMouseMove")),
+				on(this.tree.domNode, a11yclick.press, lang.hitch(this,"onClickPress")),
+				on(this.tree.domNode, a11yclick.release, lang.hitch(this,"onClickRelease"))
 			);
 		},
 
@@ -99,10 +99,13 @@ define("dijit/tree/_dndSelector", [
 		},
 		removeTreeNode: function(/*dijit/Tree._TreeNode*/ node){
 			// summary:
-			//		remove node from current selection
+			//		remove node and it's descendants from current selection
 			// node: Node
 			//		node to remove
-			this.setSelection(this._setDifference(this.getSelectedTreeNodes(), [node]));
+			var newSelection = array.filter(this.getSelectedTreeNodes(), function(selectedNode){
+				return !dom.isDescendant(selectedNode.domNode, node.domNode); // also matches when selectedNode == node
+			});
+			this.setSelection(newSelection);
 			return node;
 		},
 		isTreeNodeSelected: function(/*dijit/Tree._TreeNode*/ node){
@@ -172,43 +175,35 @@ define("dijit/tree/_dndSelector", [
 			this.tree._set("selectedNode", nodes[0] || null);
 			this.tree._set("selectedItems", items);
 			this.tree._set("selectedItem", items[0] || null);
-            if (this.tree.persist && selects.length > 0) {
-                cookie(this.cookieName, selects.join(","), {expires:365});
-            }
 		},
-		_getSavedPaths: function(){
-			// summary:
-			//		Returns paths of nodes that were selected previously and saved in the cookie.
 
-			var tree = this.tree;
-			if(tree.persist && tree.dndController.cookieName){
-				var oreo, paths = [];
-				oreo = cookie(tree.dndController.cookieName);
-				if(oreo){
-					paths = array.map(oreo.split(","), function(path){
-					   return path.split("/");
-					})
-				}
-				return paths;
-			}
-		},
-		// mouse events
-		onMouseDown: function(e){
+		// selection related events
+		onClickPress: function(e){
 			// summary:
-			//		Event processor for onmousedown/ontouchstart
+			//		Event processor for onmousedown/ontouchstart/onkeydown corresponding to a click event
 			// e: Event
-			//		onmousedown/ontouchstart event
+			//		onmousedown/ontouchstart/onkeydown event
 			// tags:
 			//		protected
 
-			// ignore click on expando node
-			if(!this.current || this.tree.isExpandoNode(e.target, this.current)){ return; }
+			// ignore mouse or touch on expando node
+			if(this.current && this.current.isExpandable && this.tree.isExpandoNode(e.target, this.current)){ return; }
 
-			// ignore right-click
-			if(e.type != "touchstart" && !mouse.isLeft(e)){ return; }
+			if(mouse.isLeft(e)){
+				// Prevent text selection while dragging on desktop, see #16328.   But don't call preventDefault()
+				// for mobile because it will break things completely, see #15838.
+				e.preventDefault();
+			}
 
-			var treeNode = this.current,
-			  copy = connect.isCopyKey(e), id = treeNode.id;
+			var treeNode = e.type == "keydown" ? this.tree.focusedChild : this.current;
+
+			if(!treeNode){
+				// Click must be on the Tree but not on a TreeNode, happens especially when Tree is stretched to fill
+				// a pane of a BorderContainer, etc.
+				return;
+			}
+
+			var copy = connect.isCopyKey(e), id = treeNode.id;
 
 			// if shift key is not pressed, and the node is already in the selection,
 			// delay deselection until onmouseup so in the case of DND, deselection
@@ -222,22 +217,22 @@ define("dijit/tree/_dndSelector", [
 			this.userSelect(treeNode, copy, e.shiftKey);
 		},
 
-		onMouseUp: function(e){
+		onClickRelease: function(e){
 			// summary:
-			//		Event processor for onmouseup/ontouchend
+			//		Event processor for onmouseup/ontouchend/onkeyup corresponding to a click event
 			// e: Event
-			//		onmouseup/ontouchend event
+			//		onmouseup/ontouchend/onkeyup event
 			// tags:
 			//		protected
 
 			// _doDeselect is the flag to indicate that the user wants to either ctrl+click on
-			// a already selected item (to deselect the item), or click on a not-yet selected item
+			// an already selected item (to deselect the item), or click on a not-yet selected item
 			// (which should remove all current selection, and add the clicked item). This can not
 			// be done in onMouseDown, because the user may start a drag after mousedown. By moving
-			// the deselection logic here, the user can drags an already selected item.
+			// the deselection logic here, the user can drag an already selected item.
 			if(!this._doDeselect){ return; }
 			this._doDeselect = false;
-			this.userSelect(this.current, connect.isCopyKey(e), e.shiftKey);
+			this.userSelect(e.type == "keyup" ? this.tree.focusedChild : this.current, connect.isCopyKey(e), e.shiftKey);
 		},
 		onMouseMove: function(/*===== e =====*/){
 			// summary:
@@ -245,6 +240,24 @@ define("dijit/tree/_dndSelector", [
 			// e: Event
 			//		onmousemove/ontouchmove event
 			this._doDeselect = false;
+		},
+
+		// mouse/touch events that are no longer used
+		onMouseDown: function(){
+			// summary:
+			//		Event processor for onmousedown/ontouchstart
+			// e: Event
+			//		onmousedown/ontouchstart event
+			// tags:
+			//		protected
+		},
+		onMouseUp: function(){
+			// summary:
+			//		Event processor for onmouseup/ontouchend
+			// e: Event
+			//		onmouseup/ontouchend event
+			// tags:
+			//		protected
 		},
 
 		_compareNodes: function(n1, n2){
@@ -304,7 +317,7 @@ define("dijit/tree/_dndSelector", [
 					//add everything betweeen begin and end inclusively
 					while(begin != end){
 						nodes.push(begin);
-						begin = this.tree._getNextNode(begin);
+						begin = this.tree._getNext(begin);
 					}
 					nodes.push(end);
 

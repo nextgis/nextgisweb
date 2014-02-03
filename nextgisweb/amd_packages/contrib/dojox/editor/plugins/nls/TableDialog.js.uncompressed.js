@@ -28,12 +28,17 @@ define("dojox/editor/plugins/nls/TableDialog", { root:
 	insertTableColumnBeforeLabel: "Add Column Before",
 	insertTableColumnAfterLabel: "Add Column After",
 	deleteTableRowLabel: "Delete Row",
-	deleteTableColumnLabel: "Delete Column"
+	deleteTableColumnLabel: "Delete Column",
+	
+	colorTableCellTitle: "Background Color Table Cell",
+	tableContextMenuTitle: "Table Context Menu"
+	
 })
 //end v1.x content
 ,
 "zh": true,
 "zh-tw": true,
+"uk": true,
 "tr": true,
 "th": true,
 "sv": true,
@@ -61,6 +66,7 @@ define("dojox/editor/plugins/nls/TableDialog", { root:
 "da": true,
 "cs": true,
 "ca": true,
+"bg": true,
 "az": true,
 "ar": true
 });

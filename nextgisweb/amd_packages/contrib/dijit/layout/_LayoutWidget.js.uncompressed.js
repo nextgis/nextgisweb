@@ -39,7 +39,7 @@ define("dijit/layout/_LayoutWidget", [
 		startup: function(){
 			// summary:
 			//		Called after all the widgets have been instantiated and their
-			//		dom nodes have been inserted somewhere under win.doc.body.
+			//		dom nodes have been inserted somewhere under <body>.
 			//
 			//		Widgets should override this method to do any initialization
 			//		dependent on other widgets existing, and then call

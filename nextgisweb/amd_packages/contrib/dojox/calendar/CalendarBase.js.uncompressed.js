@@ -9,6 +9,7 @@ define("dojox/calendar/CalendarBase", [
 "dojo/dom-class", 
 "dojo/dom-style",
 "dojo/dom-construct", 
+"dojo/dom-geometry",
 "dojo/date", 
 "dojo/date/locale", 
 "dojo/_base/fx", 
@@ -33,6 +34,7 @@ dom,
 domClass, 
 domStyle,
 domConstruct, 
+domGeometry,
 date, 
 locale,
 coreFx,
@@ -104,7 +106,9 @@ _nls){
 		// summary:
 		//		An item editing event.
 		// item: Object
-		//		The date item that is being edited.
+		//		The render item that is being edited. Set/get the startTime and/or endTime properties to customize editing behavior.
+		// storeItem: Object
+		//		The real data from the store. DO NOT change properties, but you may use properties of this item in the editing behavior logic.
 		// editKind: String
 		//		Kind of edit: "resizeBoth", "resizeStart", "resizeEnd" or "move".
 		// dates: Date[]
@@ -114,7 +118,7 @@ _nls){
 		// endTime: Date?
 		//		The end time of data item.
 		// sheet: String
-		//		For views with several sheets (columns view for example), the sheet when the event occured.
+		//		For views with several sheets (columns view for example), the sheet when the event occurred.
 		// source: dojox/calendar/ViewBase
 		//		The view where the event occurred.
 		// eventSource: String
@@ -125,6 +129,34 @@ _nls){
 		//		- "touch"		
 		// triggerEvent: Event
 		//		The event at the origin of this event.
+	};
+	=====*/
+	
+	/*=====
+	var __rendererLifecycleEventArgs = {
+		// summary:
+		//		A renderer lifecycle event.
+		// renderer: Object
+		//		The renderer.		
+		// source: dojox/calendar/ViewBase
+		//		The view where the event occurred.
+		// item:Object?
+		//		The item that will be displayed by the renderer for the "rendererCreated" and "rendererReused" events.
+	};
+	=====*/
+	
+	/*=====
+	var __ExpandRendererClickEventArgs = {
+		// summary:
+		//		A expand renderer click event.
+		// columnIndex: Integer
+		//		The column index of the cell. 
+		// rowIndex: Integer
+		//		The row index of the cell.
+		// date: Date
+		//		The date displayed by the cell.
+		// triggerEvent: Event
+		//		The origin event.
 	};
 	=====*/
 
@@ -158,7 +190,7 @@ _nls){
 		//		Valid values are "day", "week" (default value) and "month".
 		dateInterval: "week",
 		
-		// dateInterval:Integer
+		// dateIntervalSteps:Integer
 		//		The number of date intervals used to compute along with the <code>date</code> and 
 		//		<code>dateInterval</code> the time interval to display.
 		//		Default value is 1.		
@@ -225,6 +257,11 @@ _nls){
 		//		- view: the current view,
 		//		- d: the date at the clicked location.
 		createItemFunc: null,
+		
+		// currentView: ViewBase
+		//		The current view displayed by the Calendar object.
+		//		The currentViewChange event can be used to react on a view change.
+		currentView: null,
 				
 		_currentViewIndex: -1,
 		
@@ -242,16 +279,9 @@ _nls){
 			this._calendar = args.datePackage ? args.datePackage.substr(args.datePackage.lastIndexOf(".")+1) : this._calendar;
 			this.dateModule = args.datePackage ? lang.getObject(args.datePackage, false) : date; 
 			this.dateClassObj = this.dateModule.Date || Date; 
-			this.dateLocaleModule = args.datePackage ? lang.getObject(args.datePackage+".locale", false) : locale; 
-						
+			this.dateLocaleModule = args.datePackage ? lang.getObject(args.datePackage+".locale", false) : locale;
+								
 			this.invalidateRendering();
-		},
-		
-		destroy: function(preserveDom){
-			arr.forEach(this._buttonHandles, function(h){
-				h.remove();
-			});
-			this.inherited(arguments);
 		},
 				
 		buildRendering: function(){
@@ -331,6 +361,16 @@ _nls){
 				this.currentView._refreshItemsRendering();
 			}
 		},
+		
+		resize: function(changeSize){
+			if(changeSize){
+				domGeometry.setMarginBox(this.domNode, changeSize);
+			}
+			if(this.currentView){
+				// must not pass the size, children are sized depending on the parent by CSS.
+				this.currentView.resize();  
+			}
+		},
 				
 		_validateProperties: function(){
 			// tags:
@@ -394,8 +434,8 @@ _nls){
 				var timeInterval = this.computeTimeInterval();
 				
 				if(this._timeInterval == null || 
-					 cal.compare(this._timeInterval[0], timeInterval[0] != 0) || 
-					 cal.compare(this._timeInterval[1], timeInterval[1] != 0)){
+					 cal.compare(this._timeInterval[0], timeInterval[0]) != 0 || 
+					 cal.compare(this._timeInterval[1], timeInterval[1]) != 0){
 					this.onTimeIntervalChange({
 						oldStartTime: this._timeInterval == null ? null : this._timeInterval[0],
 						oldEndTime: this._timeInterval == null ? null : this._timeInterval[1],
@@ -491,28 +531,27 @@ _nls){
 			
 			if(d == null){
 				return [ this.floorToDay(this.get("startDate")), cal.add(this.get("endDate"), "day", 1) ];
-			}else{
+			}
 				
-				var s = this.floorToDay(d);
-				var di = this.get("dateInterval");
-				var dis = this.get("dateIntervalSteps");
-				var e;
-				
-				switch(di){
-					case "day":						
-						e = cal.add(s, "day", dis);
-						break;
-					case "week":
-						s = this.floorToWeek(s);
-						e = cal.add(s, "week", dis);
-						break;
-					case "month":
-						s.setDate(1);
-						e = cal.add(s, "month", dis);						
-						break;
-				}				
-				return [s, e];
-			}			
+			var s = this.floorToDay(d);
+			var di = this.get("dateInterval");
+			var dis = this.get("dateIntervalSteps");
+			var e;
+			
+			switch(di){
+				case "day":						
+					e = cal.add(s, "day", dis);
+					break;
+				case "week":
+					s = this.floorToWeek(s);
+					e = cal.add(s, "week", dis);
+					break;
+				case "month":
+					s.setDate(1);
+					e = cal.add(s, "month", dis);						
+					break;
+			}				
+			return [s, e];						
 		},
 		
 		onTimeIntervalChange: function(e){
@@ -811,7 +850,9 @@ _nls){
 			this._set("items", value);
 			if(this.currentView){
 				this.currentView.set("items", value);
-				this.currentView.invalidateRendering();
+				if(!this._isEditing){
+					this.currentView.invalidateRendering();
+				}
 			}
 		},
 		
@@ -1019,21 +1060,19 @@ _nls){
 			// tags:
 			//		protected
 
-			
-			var h = [];
 			var rtl = !this.isLeftToRight();
 			
 			if(this.previousButton){
 				this.previousButton.set("label", _nls[rtl?"nextButton":"previousButton"]);
-				h.push(
-					on(this.previousButton, "click", lang.hitch(this, rtl?this.nextRange:this.previousRange))
+				this.own(
+					on(this.previousButton, "click", lang.hitch(this, this.previousRange))
 				);	
 			}
 			
 			if(this.nextButton){
 				this.nextButton.set("label", _nls[rtl?"previousButton":"nextButton"]);
-				h.push(
-					on(this.nextButton, "click", lang.hitch(this, rtl?this.previousRange:this.nextRange))
+				this.own(
+					on(this.nextButton, "click", lang.hitch(this, this.nextRange))
 				);	
 			}
 			
@@ -1045,40 +1084,38 @@ _nls){
 			
 			if(this.todayButton){
 				this.todayButton.set("label", _nls.todayButton);
-				h.push(
+				this.own(
 					on(this.todayButton, "click", lang.hitch(this, this.todayButtonClick))
 				);	
 			}
 			
 			if(this.dayButton){
 				this.dayButton.set("label", _nls.dayButton);
-				h.push(
+				this.own(
 					on(this.dayButton, "click", lang.hitch(this, this.dayButtonClick))
 				);
 			}		
 			
 			if(this.weekButton){
 				this.weekButton.set("label", _nls.weekButton);
-				h.push(
+				this.own(
 					on(this.weekButton, "click", lang.hitch(this, this.weekButtonClick))
 				);	
 			}		
 
 			if(this.fourDaysButton){
 				this.fourDaysButton.set("label", _nls.fourDaysButton);
-				h.push(
+				this.own(
 					on(this.fourDaysButton, "click", lang.hitch(this, this.fourDaysButtonClick))
 				);
 			}
 			
 			if(this.monthButton){
 				this.monthButton.set("label", _nls.monthButton);
-				h.push(
+				this.own(
 					on(this.monthButton, "click", lang.hitch(this, this.monthButtonClick))
 				);	
 			}	
-			
-			this._buttonHandles = h;
 		},
 		
 		todayButtonClick: function(e){
@@ -1150,12 +1187,14 @@ _nls){
 				
 				this.updateRenderers([old, this.hoveredItem], true);
 				
-				if(item && renderer){
-					this.currentView._updateEditingCapabilities(item, renderer);
+				if(item && renderer){					
+					this.currentView._updateEditingCapabilities(item._item ? item._item : item, renderer);
 				}
 			}
 		},
 		
+		// hoveredItem: Object
+		//		Current render item which is under the mouse cursor.
 		hoveredItem: null,
 		
 		isItemHovered: function(item){
@@ -1178,7 +1217,7 @@ _nls){
 			//		Computes whether particular item renderer can be edited.
 			//		By default it is using the editable property value.
 			// item: Object
-			//		The item represented by the renderer.
+			//		The data item represented by the renderer.
 			// rendererKind: String
 			//		The kind of renderer.
 			// returns: Boolean
@@ -1190,11 +1229,11 @@ _nls){
 			//		Computes whether particular item renderer can be moved.
 			//		By default it is using the moveEnabled property value.
 			// item: Object
-			//		The item represented by the renderer.
+			//		The data item represented by the renderer.
 			// rendererKind: String
 			//		The kind of renderer.
 			// returns: Boolean
-			return this.isItemEditable() && this.moveEnabled;
+			return this.isItemEditable(item, rendererKind) && this.moveEnabled;
 		},
 		
 		isItemResizeEnabled: function(item, rendererKind){
@@ -1202,13 +1241,14 @@ _nls){
 			//		Computes whether particular item renderer can be resized.
 			//		By default it is using the resizedEnabled property value.
 			// item: Object
-			//		The item represented by the renderer.
+			//		The data item represented by the renderer.
 			// rendererKind: String
 			//		The kind of renderer.
 			// returns: Boolean
 			
-			return this.isItemEditable() && this.resizeEnabled;
-		},			
+			return this.isItemEditable(item, rendererKind) && this.resizeEnabled;
+		},
+		
 
 		////////////////////////////////////////////////////////////////////////
 		//
@@ -1350,42 +1390,71 @@ _nls){
 			//		Header click event.
 			// tags:
 			//		callback
-		},		
+		},
 		
-		onRendererCreated: function(renderer){
+		onExpandRendererClick: function(e){
+			// summary:
+			//		Event dispatched when an expand renderer is clicked.
+			// e: __ExpandRendererClickEventArgs
+			//		Expand renderer click event.
+			// tags:
+			//		callback
+		},
+		
+		_onRendererCreated: function(e){
+			this.onRendererCreated(e);
+		},
+		
+		onRendererCreated: function(e){
 			// summary:
 			//		Event dispatched when an item renderer has been created.
-			// renderer: dojox/calendar/_RendererMixin
-			//		The renderer created.
+			// e: __rendererLifecycleEventArgs
+			//		The renderer lifecycle event.
 			// tags:
 			//		callback
 		},
 		
-		onRendererRecycled: function(renderer){
+		_onRendererRecycled: function(e){
+			this.onRendererRecycled(e);
+		},
+		
+		onRendererRecycled: function(e){
 			// summary:
 			//		Event dispatched when an item renderer has been recycled.
-			// renderer: dojox/calendar/_RendererMixin
-			//		The renderer created.
+			// e: __rendererLifecycleEventArgs
+			//		The renderer lifecycle event.
 			// tags:
 			//		callback
 		},
 		
-		onRendererReused: function(renderer){
+		_onRendererReused: function(e){
+			this.onRendererReused(e);
+		},
+		
+		onRendererReused: function(e){
 			// summary:
 			//		Event dispatched when an item renderer that was recycled is reused.
-			// renderer: dojox/calendar/_RendererMixin
-			//		The renderer created.
+			// e: __rendererLifecycleEventArgs
+			//		The renderer lifecycle event.
 			// tags:
 			//		callback
 		},
 		
-		onRendererDestroyed: function(renderer){
+		_onRendererDestroyed: function(e){
+			this.onRendererDestroyed(e);
+		},
+		
+		onRendererDestroyed: function(e){
 			// summary:
 			//		Event dispatched when an item renderer is destroyed.
-			// renderer: dojox/calendar/_RendererMixin
-			//		The renderer created.
+			// e: __rendererLifecycleEventArgs
+			//		The renderer lifecycle event.
 			// tags:
 			//		callback
+		},
+		
+		_onRenderersLayoutDone: function(view){
+			this.onRenderersLayoutDone(view);
 		},
 		
 		onRenderersLayoutDone: function(view){
@@ -1397,5 +1466,5 @@ _nls){
 			//		callback
 		}
 
-	}) 
+	});
 });

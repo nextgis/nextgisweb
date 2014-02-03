@@ -55,6 +55,9 @@ _17._disconnectListeners();
 delete this._indicatorsIndex[_16];
 delete this._indicatorsRenderers[_16];
 }
+if(this._gauge){
+this._gauge._resetMainIndicator();
+}
 this.invalidateRendering();
 return _17;
 },getIndicator:function(_18){

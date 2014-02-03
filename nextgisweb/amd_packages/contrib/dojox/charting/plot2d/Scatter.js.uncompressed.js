@@ -1,6 +1,6 @@
-define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./CartesianBase", "./_PlotEvents", "./common",
+define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
 	"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx", "dojox/gfx/gradutils"],
-	function(lang, arr, declare, CartesianBase, _PlotEvents, dc, df, dfr, du, fx, gradutils){
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx, gradutils){
 
 	var purgeGroup = dfr.lambda("item.purgeGroup()");
 
@@ -8,8 +8,6 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 		// summary:
 		//		A plot object representing a typical scatter chart.
 		defaultParams: {
-			hAxis: "x",		// use a horizontal axis named "x"
-			vAxis: "y",		// use a vertical axis named "y"
 			shadows: null,	// draw shadows
 			animate: null	// animate chart to place
 		},
@@ -31,12 +29,9 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 			//		The chart this plot belongs to.
 			// kwArgs: dojox.charting.plot2d.__DefaultCtorArgs?
 			//		An optional keyword arguments object to help define this plot's parameters.
-			this.opt = lang.clone(this.defaultParams);
+			this.opt = lang.clone(lang.mixin(this.opt, this.defaultParams));
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
-			this.series = [];
-			this.hAxis = this.opt.hAxis;
-			this.vAxis = this.opt.vAxis;
 			this.animate = this.opt.animate;
 		},
 
@@ -54,11 +49,12 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 			}
 			this.resetEvents();
 			this.dirty = this.isDirty();
+			var s;
 			if(this.dirty){
 				arr.forEach(this.series, purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
-				var s = this.group;
+				s = this.getGroup();
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 			var t = this.chart.theme, events = this.events();
@@ -76,9 +72,10 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 					continue;
 				}
 
-				var theme = t.next("marker", [this.opt, run]), s = run.group, lpoly,
+				var theme = t.next("marker", [this.opt, run]), lpoly,
 					ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
 					vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler);
+				s = run.group;
 				if(typeof run.data[0] == "number"){
 					lpoly = arr.map(run.data, function(v, i){
 						return {
@@ -138,6 +135,10 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 					}else{
 						frontMarkers[i] = s.createPath(path).setStroke(stroke).setFill(fill);
 					}
+					if(this.opt.labels){
+						var markerBox = frontMarkers[i].getBoundingBox();
+						this.createLabel(s, value, markerBox, finalTheme);
+					}
 					if(this.animate){
 						this._animateScatter(frontMarkers[i], dim.height - offsets.b);
 					}
@@ -178,6 +179,11 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 				run.dirty = false;
 			}
 			this.dirty = false;
+			// chart mirroring starts
+			if(has("dojo-bidi")){
+				this._checkOrientation(this.group, dim, offsets);
+			}
+			// chart mirroring ends
 			return this;	//	dojox/charting/plot2d/Scatter
 		},
 		_animateScatter: function(shape, offset){

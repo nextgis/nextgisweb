@@ -11,7 +11,7 @@ define("dojox/mobile/Rating", [
 
 	return declare("dojox.mobile.Rating", WidgetBase, {
 		// summary:
-		//		A widget that shows rating with stars.
+		//		A widget that displays a rating, usually with stars.
 		// description:
 		//		This widget simply shows the specified number of stars. It is a
 		//		read-only widget, and has no editing capability.

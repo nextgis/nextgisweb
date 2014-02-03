@@ -7,6 +7,7 @@ define("dojox/atom/widget/nls/FeedViewerEntry", { root:
 ,
 "ar": true,
 "az": true,
+"bg": true,
 "ca": true,
 "cs": true,
 "da": true,
@@ -34,6 +35,7 @@ define("dojox/atom/widget/nls/FeedViewerEntry", { root:
 "sv": true,
 "th": true,
 "tr": true,
+"uk": true,
 "zh": true,
 "zh-tw": true
 });

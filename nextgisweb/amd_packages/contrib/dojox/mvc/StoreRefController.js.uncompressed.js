@@ -79,6 +79,9 @@ define("dojox/mvc/StoreRefController", [
 				_self.set(_self._refSourceModelProp, results);
 				return results;
 			});
+			if(result.then){
+				result = lang.delegate(result);
+			}
 			// For dojo/store/Observable, which adds a function to query result
 			for(var s in queryResult){
 				if(isNaN(s) && queryResult.hasOwnProperty(s) && lang.isFunction(queryResult[s])){
@@ -101,10 +104,13 @@ define("dojox/mvc/StoreRefController", [
 			if(!(this.store || {}).get){ return; }
 			if(this._queryObserveHandle){ this._queryObserveHandle.cancel(); }
 			var _self = this;
-			return when(this.store.get(id, options), function(result){
+			result = when(this.store.get(id, options), function(result){
 				if(_self._beingDestroyed){ return; }
-				_self.set(_self._refSourceModelProp, getStateful(result, _self.getStatefulOptions));
+				result = getStateful(result, _self.getStatefulOptions);
+				_self.set(_self._refSourceModelProp, result);
+				return result;
 			});
+			return result;
 		},
 
 		putStore: function(/*Object*/ object, /*dojo/store/api/Store.PutDirectives?*/ options){

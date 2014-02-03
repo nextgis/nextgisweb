@@ -62,8 +62,8 @@ function(
 		secondarySheetProps: null,
 		
 		// headerPadding: Integer
-		//	Padding between the header (composed of the secondary sheet and the column header) 
-		//	and the primary sheet.
+		//		Padding between the header (composed of the secondary sheet and the column header) 
+		//		and the primary sheet.
 		headerPadding: 3,
 		
 		buildRendering: function(){
@@ -92,6 +92,18 @@ function(
 			}
 		},
 		
+		
+		resize: function(changedSize){
+			// tags:
+			//		private
+			
+			this.inherited(arguments);
+			if(this.secondarySheet){
+				// secondary sheet is sized by CSS
+				this.secondarySheet.resize();
+			}
+		},
+
 		invalidateLayout: function(){
 			// tags:
 			//		private
@@ -162,10 +174,11 @@ function(
 			}
 		},
 		
-		_getHorizontalRendererAttr: function(value){
+		_getHorizontalRendererAttr: function(){
 			if(this.secondarySheet){
 				return this.secondarySheet.get("horizontalRenderer");
 			}
+            return null;
 		},
 		
 		_setExpandRendererAttr: function(value){
@@ -174,10 +187,11 @@ function(
 			}
 		},
 		
-		_getExpandRendererAttr: function(value){
+		_getExpandRendererAttr: function(){
 			if(this.secondarySheet){
 				return this.secondarySheet.get("expandRenderer");
 			}
+            return null;
 		},
 					
 		_setTextDirAttr: function(value){

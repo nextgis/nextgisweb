@@ -1,13 +1,13 @@
 //>>built
-define("dijit/a11y",["dojo/_base/array","dojo/_base/config","dojo/_base/declare","dojo/dom","dojo/dom-attr","dojo/dom-style","dojo/sniff","./main"],function(_1,_2,_3,_4,_5,_6,_7,_8){
-var _9=(_8._isElementShown=function(_a){
-var s=_6.get(_a);
-return (s.visibility!="hidden")&&(s.visibility!="collapsed")&&(s.display!="none")&&(_5.get(_a,"type")!="hidden");
-});
-_8.hasDefaultTabStop=function(_b){
+define("dijit/a11y",["dojo/_base/array","dojo/dom","dojo/dom-attr","dojo/dom-style","dojo/_base/lang","dojo/sniff","./main"],function(_1,_2,_3,_4,_5,_6,_7){
+var _8;
+var _9={_isElementShown:function(_a){
+var s=_4.get(_a);
+return (s.visibility!="hidden")&&(s.visibility!="collapsed")&&(s.display!="none")&&(_3.get(_a,"type")!="hidden");
+},hasDefaultTabStop:function(_b){
 switch(_b.nodeName.toLowerCase()){
 case "a":
-return _5.has(_b,"href");
+return _3.has(_b,"href");
 case "area":
 case "button":
 case "input":
@@ -36,72 +36,74 @@ return _c&&(_c.contentEditable=="true"||(_c.firstChild&&_c.firstChild.contentEdi
 default:
 return _b.contentEditable=="true";
 }
-};
-var _e=(_8.isTabNavigable=function(_f){
-if(_5.get(_f,"disabled")){
-return false;
+},effectiveTabIndex:function(_e){
+if(_3.get(_e,"disabled")){
+return _8;
 }else{
-if(_5.has(_f,"tabIndex")){
-return _5.get(_f,"tabIndex")>=0;
+if(_3.has(_e,"tabIndex")){
+return +_3.get(_e,"tabIndex");
 }else{
-return _8.hasDefaultTabStop(_f);
+return _9.hasDefaultTabStop(_e)?0:_8;
 }
 }
-});
-_8._getTabNavigable=function(_10){
-var _11,_12,_13,_14,_15,_16,_17={};
-function _18(_19){
-return _19&&_19.tagName.toLowerCase()=="input"&&_19.type&&_19.type.toLowerCase()=="radio"&&_19.name&&_19.name.toLowerCase();
+},isTabNavigable:function(_f){
+return _9.effectiveTabIndex(_f)>=0;
+},isFocusable:function(_10){
+return _9.effectiveTabIndex(_10)>=-1;
+},_getTabNavigable:function(_11){
+var _12,_13,_14,_15,_16,_17,_18={};
+function _19(_1a){
+return _1a&&_1a.tagName.toLowerCase()=="input"&&_1a.type&&_1a.type.toLowerCase()=="radio"&&_1a.name&&_1a.name.toLowerCase();
 };
-var _1a=function(_1b){
-for(var _1c=_1b.firstChild;_1c;_1c=_1c.nextSibling){
-if(_1c.nodeType!=1||(_7("ie")&&_1c.scopeName!=="HTML")||!_9(_1c)){
+var _1b=_9._isElementShown,_1c=_9.effectiveTabIndex;
+var _1d=function(_1e){
+for(var _1f=_1e.firstChild;_1f;_1f=_1f.nextSibling){
+if(_1f.nodeType!=1||(_6("ie")<=9&&_1f.scopeName!=="HTML")||!_1b(_1f)){
 continue;
 }
-if(_e(_1c)){
-var _1d=+_5.get(_1c,"tabIndex");
-if(!_5.has(_1c,"tabIndex")||_1d==0){
-if(!_11){
-_11=_1c;
+var _20=_1c(_1f);
+if(_20>=0){
+if(_20==0){
+if(!_12){
+_12=_1f;
 }
-_12=_1c;
+_13=_1f;
 }else{
-if(_1d>0){
-if(!_13||_1d<_14){
-_14=_1d;
-_13=_1c;
+if(_20>0){
+if(!_14||_20<_15){
+_15=_20;
+_14=_1f;
 }
-if(!_15||_1d>=_16){
-_16=_1d;
-_15=_1c;
-}
-}
-}
-var rn=_18(_1c);
-if(_5.get(_1c,"checked")&&rn){
-_17[rn]=_1c;
+if(!_16||_20>=_17){
+_17=_20;
+_16=_1f;
 }
 }
-if(_1c.nodeName.toUpperCase()!="SELECT"){
-_1a(_1c);
+}
+var rn=_19(_1f);
+if(_3.get(_1f,"checked")&&rn){
+_18[rn]=_1f;
+}
+}
+if(_1f.nodeName.toUpperCase()!="SELECT"){
+_1d(_1f);
 }
 }
 };
-if(_9(_10)){
-_1a(_10);
+if(_1b(_11)){
+_1d(_11);
 }
-function rs(_1e){
-return _17[_18(_1e)]||_1e;
+function rs(_21){
+return _18[_19(_21)]||_21;
 };
-return {first:rs(_11),last:rs(_12),lowest:rs(_13),highest:rs(_15)};
-};
-_8.getFirstInTabbingOrder=function(_1f,doc){
-var _20=_8._getTabNavigable(_4.byId(_1f,doc));
-return _20.lowest?_20.lowest:_20.first;
-};
-_8.getLastInTabbingOrder=function(_21,doc){
-var _22=_8._getTabNavigable(_4.byId(_21,doc));
-return _22.last?_22.last:_22.highest;
-};
-return {hasDefaultTabStop:_8.hasDefaultTabStop,isTabNavigable:_8.isTabNavigable,_getTabNavigable:_8._getTabNavigable,getFirstInTabbingOrder:_8.getFirstInTabbingOrder,getLastInTabbingOrder:_8.getLastInTabbingOrder};
+return {first:rs(_12),last:rs(_13),lowest:rs(_14),highest:rs(_16)};
+},getFirstInTabbingOrder:function(_22,doc){
+var _23=_9._getTabNavigable(_2.byId(_22,doc));
+return _23.lowest?_23.lowest:_23.first;
+},getLastInTabbingOrder:function(_24,doc){
+var _25=_9._getTabNavigable(_2.byId(_24,doc));
+return _25.last?_25.last:_25.highest;
+}};
+1&&_5.mixin(_7,_9);
+return _9;
 });

@@ -1,6 +1,6 @@
-define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "./CartesianBase", "./_PlotEvents", "./common",
+define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
 		"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"], 
-	function(lang, declare, arr, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
+	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
 
 	var purgeGroup = dfr.lambda("item.purgeGroup()");
 
@@ -17,8 +17,6 @@ define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/dec
 		//		x and mid are optional parameters.  If x is not provided, the index of the
 		//		data array is used.
 		defaultParams: {
-			hAxis: "x",		// use a horizontal axis named "x"
-			vAxis: "y",		// use a vertical axis named "y"
 			gap:	2,		// gap between columns in pixels
 			animate: null   // animate bars into place
 		},
@@ -44,9 +42,6 @@ define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/dec
 			this.opt = lang.clone(this.defaultParams);
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
-			this.series = [];
-			this.hAxis = this.opt.hAxis;
-			this.vAxis = this.opt.vAxis;
 			this.animate = this.opt.animate;
 		},
 
@@ -109,18 +104,17 @@ define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/dec
 			}
 			this.resetEvents();
 			this.dirty = this.isDirty();
+			var s;
 			if(this.dirty){
 				arr.forEach(this.series, purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
-				var s = this.group;
+				s = this.getGroup();
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 			var t = this.chart.theme, f, gap, width,
 				ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
 				vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler),
-				baseline = Math.max(0, this._vScaler.bounds.lower),
-				baselineHeight = vt(baseline),
 				events = this.events();
 			f = dc.calculateBarSize(this._hScaler.bounds.scale, this.opt);
 			gap = f.gap;
@@ -133,7 +127,8 @@ define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/dec
 					continue;
 				}
 				run.cleanGroup();
-				var theme = t.next("candlestick", [this.opt, run]), s = run.group,
+				s = run.group;
+				var theme = t.next("candlestick", [this.opt, run]),
 					eventSeries = new Array(run.data.length);
 				for(var j = 0; j < run.data.length; ++j){
 					var v = run.data[j];
@@ -208,8 +203,24 @@ define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/dec
 				run.dirty = false;
 			}
 			this.dirty = false;
+			// chart mirroring starts
+			if(has("dojo-bidi")){
+				this._checkOrientation(this.group, dim, offsets);
+			}
+			// chart mirroring ends
 			return this;	//	dojox/charting/plot2d/Candlesticks
 		},
+
+		tooltipFunc: function(o){
+			return '<table cellpadding="1" cellspacing="0" border="0" style="font-size:0.9em;">'
+						+ '<tr><td>Open:</td><td align="right"><strong>' + o.data.open + '</strong></td></tr>'
+						+ '<tr><td>High:</td><td align="right"><strong>' + o.data.high + '</strong></td></tr>'
+						+ '<tr><td>Low:</td><td align="right"><strong>' + o.data.low + '</strong></td></tr>'
+						+ '<tr><td>Close:</td><td align="right"><strong>' + o.data.close + '</strong></td></tr>'
+						+ (o.data.mid !== undefined ? '<tr><td>Mid:</td><td align="right"><strong>' + o.data.mid + '</strong></td></tr>' : '')
+						+ '</table>';
+		},
+
 		_animateCandlesticks: function(shape, voffset, vsize){
 			fx.animateTransform(lang.delegate({
 				shape: shape,

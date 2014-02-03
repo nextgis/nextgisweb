@@ -1,5 +1,5 @@
 require({cache:{
-'url:dijit/form/templates/DropDownBox.html':"<div class=\"dijit dijitReset dijitInline dijitLeft\"\n\tid=\"widget_${id}\"\n\trole=\"combobox\"\n\t><div class='dijitReset dijitRight dijitButtonNode dijitArrowButton dijitDownArrowButton dijitArrowButtonContainer'\n\t\tdata-dojo-attach-point=\"_buttonNode, _popupStateNode\" role=\"presentation\"\n\t\t><input class=\"dijitReset dijitInputField dijitArrowButtonInner\" value=\"&#9660; \" type=\"text\" tabIndex=\"-1\" readonly=\"readonly\" role=\"presentation\"\n\t\t\t${_buttonInputDisabled}\n\t/></div\n\t><div class='dijitReset dijitValidationContainer'\n\t\t><input class=\"dijitReset dijitInputField dijitValidationIcon dijitValidationInner\" value=\"&#935; \" type=\"text\" tabIndex=\"-1\" readonly=\"readonly\" role=\"presentation\"\n\t/></div\n\t><div class=\"dijitReset dijitInputField dijitInputContainer\"\n\t\t><input class='dijitReset dijitInputInner' ${!nameAttrSetting} type=\"text\" autocomplete=\"off\"\n\t\t\tdata-dojo-attach-point=\"textbox,focusNode\" role=\"textbox\" aria-haspopup=\"true\"\n\t/></div\n></div>\n"}});
+'url:dijit/form/templates/DropDownBox.html':"<div class=\"dijit dijitReset dijitInline dijitLeft\"\n\tid=\"widget_${id}\"\n\trole=\"combobox\"\n\taria-haspopup=\"true\"\n\tdata-dojo-attach-point=\"_popupStateNode\"\n\t><div class='dijitReset dijitRight dijitButtonNode dijitArrowButton dijitDownArrowButton dijitArrowButtonContainer'\n\t\tdata-dojo-attach-point=\"_buttonNode\" role=\"presentation\"\n\t\t><input class=\"dijitReset dijitInputField dijitArrowButtonInner\" value=\"&#9660; \" type=\"text\" tabIndex=\"-1\" readonly=\"readonly\" role=\"button presentation\" aria-hidden=\"true\"\n\t\t\t${_buttonInputDisabled}\n\t/></div\n\t><div class='dijitReset dijitValidationContainer'\n\t\t><input class=\"dijitReset dijitInputField dijitValidationIcon dijitValidationInner\" value=\"&#935; \" type=\"text\" tabIndex=\"-1\" readonly=\"readonly\" role=\"presentation\"\n\t/></div\n\t><div class=\"dijitReset dijitInputField dijitInputContainer\"\n\t\t><input class='dijitReset dijitInputInner' ${!nameAttrSetting} type=\"text\" autocomplete=\"off\"\n\t\t\tdata-dojo-attach-point=\"textbox,focusNode\" role=\"textbox\"\n\t/></div\n></div>\n"}});
 define("dijit/form/_DateTimeTextBox", [
 	"dojo/date", // date date.compare
 	"dojo/date/locale", // locale.regexp
@@ -65,7 +65,7 @@ define("dijit/form/_DateTimeTextBox", [
 		},
 
 		// flag to _HasDropDown to make drop down Calendar width == <input> width
-		forceWidth: true,
+		autoWidth: true,
 
 		format: function(/*Date*/ value, /*locale.__FormatOptions*/ constraints){
 			// summary:
@@ -190,7 +190,8 @@ define("dijit/form/_DateTimeTextBox", [
 
 		_set: function(attr, value){
 			// Avoid spurious watch() notifications when value is changed to new Date object w/the same value
-			if(attr == "value" && this.value instanceof Date && this.compare(value, this.value) == 0){
+			var oldValue = this._get("value");
+			if(attr == "value" && oldValue instanceof Date && this.compare(value, oldValue) == 0){
 				return;
 			}
 			this.inherited(arguments);
@@ -201,7 +202,7 @@ define("dijit/form/_DateTimeTextBox", [
 				// convert null setting into today's date, since there needs to be *some* default at all times.
 				 val = new this.dateClassObj();
 			}
-			this.dropDownDefaultValue = val;
+			this._set("dropDownDefaultValue", val);
 		},
 
 		openDropDown: function(/*Function*/ callback){
@@ -221,6 +222,7 @@ define("dijit/form/_DateTimeTextBox", [
 				dir: textBox.dir,
 				lang: textBox.lang,
 				value: value,
+				textDir: textBox.textDir,
 				currentFocus: !this._isInvalidDate(value) ? value : this.dropDownDefaultValue,
 				constraints: textBox.constraints,
 				filterString: textBox.filterString, // for TimeTextBox, to filter times shown
