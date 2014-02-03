@@ -151,6 +151,9 @@ define([
         // Вызов после startup
         _startupDeferred: undefined,
 
+        // Для загрузки изображения
+        assetUrl: ngwConfig.assetUrl,
+
         constructor: function (options) {
             declare.safeMixin(this, options);
 
