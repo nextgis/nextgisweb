@@ -487,7 +487,7 @@ define([
             });
 
             // Навигация по-умолчанию
-            this.navigationControl = new openlayers.Control.Navigation({zoomBoxEnabled: false});
+            this.navigationControl = new openlayers.Control.Navigation({zoomBoxEnabled: true});
             this.map.olMap.addControl(this.navigationControl);
 
             // Масштабная линейка
