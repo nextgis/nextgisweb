@@ -173,7 +173,8 @@ define([
 
             if (this.searchResults) { popup.close(this.searchResults) };
 
-            if (criteria == "") { return };
+            if (criteria == "" || this._lastCriteria == criteria) { return };
+            this._lastCriteria = criteria;
 
             this.searchResults = new Menu({});
             
@@ -187,7 +188,6 @@ define([
 
             var statusItem = new MenuItem({label: "", disabled: true});
             statusItem.placeAt(searchResults);
-
 
             var addResult = function (feature) {
                 var mItm = new MenuItem({

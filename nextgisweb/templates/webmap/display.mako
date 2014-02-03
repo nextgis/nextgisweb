@@ -31,9 +31,3 @@
     data-dojo-props="config: displayConfig"
     style="width: 100%; height: 100%">
 </div>
-
-<div style="position: absolute; right: 0; top: 0">
-    <a href="http://nextgis.ru/nextgis-web/" target="_blank">
-        <img src="${request.static_url('nextgisweb:static/img/nextgis.png')}" />
-    </a>
-</div>
