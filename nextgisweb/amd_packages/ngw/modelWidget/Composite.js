@@ -41,14 +41,16 @@ define([
                 // вложенных виждетов
                 var subwIndex = idx;
 
-                require([widget.subwidgets[k]], function (WM) {
-                    var w = new WM(params[k]);
-                    w._composite_key = k;
+                require([widget.subwidgets[k], "dojo/ready"], function (WM, ready) {
+                    ready(function() {
+                        var w = new WM(params[k]);
+                        w._composite_key = k;
 
-                    widget.subwidget[k] = w;
-                    widget._subwidgets[subwIndex] = w;
+                        widget.subwidget[k] = w;
+                        widget._subwidgets[subwIndex] = w;
 
-                    d.resolve(w);
+                        d.resolve(w);
+                    });
                 });
 
                 idx++;

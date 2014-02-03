@@ -59,6 +59,18 @@ def initialize(comp):
                 (u"Поле геометрии", self.column_geom),
             )
 
+        @property
+        def source(self):
+            source_meta = super(PostgisLayer, self).source
+            source_meta.update(dict(
+                schema=self.schema,
+                table=self.table,
+                column_id=self.column_id,
+                column_geom=self.column_geom,
+                geometry_type=self.geometry_type)
+            )
+            return source_meta
+
         def setup(self):
             fdata = dict()
             for f in self.fields:

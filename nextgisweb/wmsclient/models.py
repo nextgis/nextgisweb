@@ -43,6 +43,15 @@ def initialize(comp):
                 self._client = WebMapService(self.url, version=self.version)
             return self._client
 
+        @property
+        def source(self):
+            source_meta = super(WMSClientLayer, self).source
+            source_meta.update(dict(
+                url=self.url,
+                version=self.version)
+            )
+            return source_meta
+
     comp.WMSClientLayer = WMSClientLayer
 
     Style = comp.env.style.Style

@@ -4,7 +4,11 @@ from bunch import Bunch
 
 from ..models import DBSession
 
-from ..object_widget import ObjectWidget
+from ..object_widget import (
+    ObjectWidget,
+    CompositeWidget
+)
+
 from ..views import (
     ModelController,
     DeleteObjectWidget,
@@ -50,6 +54,10 @@ def setup_pyramid(comp, config):
 
     permalinker(WebMap, "webmap.show")
 
+    WebMap.object_widget = (
+        ('delete', DeleteObjectWidget),
+    )
+
     class WebmapController(ModelController):
         def create_context(self, request):
             request.require_permission(WebMap.acl_root, 'write')
@@ -81,8 +89,11 @@ def setup_pyramid(comp, config):
             )
 
         def widget_class(self, context, operation):
+            class Composite(CompositeWidget):
+                model_class = WebMap
+
             return (
-                DeleteObjectWidget
+                Composite
                 if operation == 'delete'
                 else WebmapObjectWidget
             )

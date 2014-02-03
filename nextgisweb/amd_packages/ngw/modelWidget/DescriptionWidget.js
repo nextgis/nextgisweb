@@ -1,13 +1,19 @@
 /*global define*/
 define([
     "dojo/_base/declare",
+    "./Widget",
     "dijit/Editor"
 ], function (
     declare,
+    Widget,
     Editor
 ) {
-    return declare([Editor], {
+    return declare([Widget, Editor], {
         title: "Описание",
+
+        hasData: function () {
+            return this.get('value') != '';
+        },
 
         _getValueAttr: function () {
             var value = this.value;

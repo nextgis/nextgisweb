@@ -2,8 +2,8 @@
 
 <%def name="head()">
     <script>
-        require(["dojo/parser"], function (parser) {
-            parser.parse();
+        require(["dojo/parser", "dojo/ready"], function (parser, ready) {
+            ready(function() { parser.parse(); });
         });
     </script>
 </%def>
