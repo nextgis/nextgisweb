@@ -24,7 +24,7 @@ class FeatureDescriptionComponent(Component):
 
             def feature_data(self, feature):
                 DBSession = self.comp.env.core.DBSession
-                obj = DBSession.query(self.comp.FeatureDescription) \
+                obj = DBSession.query(FeatureDescription) \
                     .get((self.layer.id, feature.id))
 
                 if obj:

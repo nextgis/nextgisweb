@@ -24,7 +24,7 @@ class FeaturePhotoComponent(Component):
 
             def feature_data(self, feature):
                 DBSession = self.comp.env.core.DBSession
-                q = DBSession.query(self.comp.FeaturePhoto.id) \
+                q = DBSession.query(FeaturePhoto.id) \
                     .filter_by(layer_id=self.layer.id, feature_id=feature.id)
 
                 photo_ids = map(lambda row: row[0], q)
