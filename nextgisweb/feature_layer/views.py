@@ -190,6 +190,13 @@ def setup_pyramid(comp, config):
             first, last = map(int, http_range[len('items='):].split('-', 1))
             query.limit(last - first + 1, first)
 
+        field_prefix = json.loads(request.headers.get('x-field-prefix', '""'))
+        pref = lambda (f): field_prefix + f
+
+        field_list = json.loads(request.headers.get('x-field-list', "[]"))
+        if len(field_list) > 0:
+            query.fields(*field_list)
+
         box = request.headers.get('x-feature-box', None)
         if box:
             query.box()
@@ -202,25 +209,23 @@ def setup_pyramid(comp, config):
 
         result = []
         for fobj in features:
-            fdata = dict(fobj.fields, id=fobj.id, label=fobj.label)
+            fdata = dict(
+                [(pref(k), v) for k, v in fobj.fields.iteritems()],
+                id=fobj.id, label=fobj.label)
             if box:
                 fdata['box'] = fobj.box.bounds
 
             result.append(fdata)
 
-        headerlist = []
+        headers = dict()
+        headers["Content-Type"] = 'application/json'
+
         if http_range:
             total = features.total_count
             last = min(total - 1, last)
-            headerlist.append(
-                ('Content-Range', 'items %d-%s/%d' % (first, last, total))
-            )
+            headers['Content-Range'] = 'items %d-%s/%d' % (first, last, total)
 
-        return Response(
-            json.dumps(result),
-            content_type='application/json',
-            headerlist=headerlist
-        )
+        return Response(json.dumps(result), headers=headers)
 
     config.add_route('feature_layer.store_api', '/layer/{id:\d+}/store_api/')
     config.add_view(store_api, route_name='feature_layer.store_api')

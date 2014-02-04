@@ -5,7 +5,6 @@ define([
     "dojo/_base/lang",
     "dojo/_base/array",
     "dojo/Deferred",
-    'dojo/store/JsonRest',
     "dijit/layout/ContentPane",
     "dijit/Menu",
     "dijit/MenuItem",
@@ -18,6 +17,7 @@ define([
     "dijit/ToolbarSeparator",
     "dijit/popup",
     "put-selector/put",
+    "feature_layer/FeatureStore",
     "./../tool/Identify"
 ], function (
     declare,
@@ -25,7 +25,6 @@ define([
     lang,
     array,
     Deferred,
-    JsonRest,
     ContentPane,
     Menu,
     MenuItem,
@@ -38,6 +37,7 @@ define([
     ToolbarSeparator,
     popup,
     put,
+    FeatureStore,
     Identify
 ) {
     var MAX_SEARCH_RESULTS = 15;
@@ -227,9 +227,9 @@ define([
                         pluginConfig = itmConfig.plugin["webmap/plugin/FeatureLayer"];
                     
                     if (pluginConfig != undefined && pluginConfig.likeSearch) {
-                        var store = new JsonRest({
-                            target: ngwConfig.applicationUrl + '/layer/' + layerId + '/store_api/',
-                            headers: {"X-Feature-Box": true}
+                        var store = new FeatureStore({
+                            layer: layerId,
+                            featureBox: true
                         });
 
                         var cdeferred = deferred,

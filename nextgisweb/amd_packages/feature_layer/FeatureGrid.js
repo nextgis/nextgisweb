@@ -14,9 +14,10 @@ define([
     'dojo/request/xhr',
     'dojo/Deferred',
     'dojo/promise/all',
-    'dojo/store/JsonRest',
     'dojo/store/Observable',
     'dojo/dom-style',
+    // ngw
+    './FeatureStore',
     // template
     "dijit/layout/ContentPane",
     "dijit/Toolbar",
@@ -38,9 +39,10 @@ define([
     xhr,
     Deferred,
     all,
-    JsonRest,
     Observable,
-    domStyle
+    domStyle,
+    // ngw
+    FeatureStore
 ) {
     // Базовый класс ggrid над которым затем делается обертка в dijit виджет
     var GridClass = declare([OnDemandGrid, Selection, ColumnHider], {
@@ -115,7 +117,7 @@ define([
 
             array.forEach(this._fields, function (f) {
                 columns.push({
-                    field: f.keyname,
+                    field: 'F:' + f.keyname,
                     label: f.display_name,
                     hidden: !f.grid_visibility
                 });
@@ -123,9 +125,10 @@ define([
             });
 
             if (this.data == undefined) {
-                this.store = new Observable(new JsonRest({
-                    target: application_url + '/layer/' + this.layerId + '/store_api/',
-                    headers: { "X-Fields": fields }
+                this.store = new Observable(new FeatureStore({
+                    layer: this.layerId,
+                    fieldList: fields,
+                    fieldPrefix: 'F:'
                 }));
             };
 
