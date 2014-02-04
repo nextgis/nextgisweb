@@ -7,7 +7,7 @@ from ConfigParser import ConfigParser
 
 from pyramid.paster import setup_logging
 
-from .env import Env
+from .env import Env, setenv
 from .command import Command
 
 
@@ -40,6 +40,8 @@ def main(argv=sys.argv):
 
     env = Env(cfg=cfg)
     env.initialize()
+
+    setenv(env)
 
     subparsers = argparser.add_subparsers()
 

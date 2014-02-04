@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-from ..component import Component, require
+from ..component import Component
+
+from .models import Base, RasterLayer
+
+__all__ = ['RasterLayerComponent', 'RasterLayer']
 
 
 @Component.registry.register
 class RasterLayerComponent(Component):
     identity = 'raster_layer'
+    metadata = Base.metadata
 
-    @require('layer', 'file_storage')
-    def initialize(self):
-        Component.initialize(self)
-
-        from . import models, views
-
-        models.include(self)
-        views.include(self)
+    def setup_pyramid(self, config):
+        from . import views
+        views.setup_pyramid(self, config)

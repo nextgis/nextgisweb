@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 from types import MethodType
 
+from .models import SRS
+
 
 def setup_pyramid(comp, config):
-    DBSession = comp.env.core.DBSession
-    SRS = comp.SRS
 
     def client_settings(self, request):
         return dict(
             srs=[
                 dict(id=srs.id, displayName=srs.display_name)
-                for srs in DBSession.query(SRS)
+                for srs in SRS.query()
             ]
         )
 

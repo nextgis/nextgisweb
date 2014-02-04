@@ -2,25 +2,24 @@
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
+from ..models import declarative_base
+from ..layer import Layer
+from ..file_storage import FileObj
 
-def initialize(comp):
-    Base = comp.env.core.Base
-    Layer = comp.env.layer.Layer
-    FileObj = comp.env.file_storage.FileObj
+Base = declarative_base()
 
-    class FeaturePhoto(Base):
-        __tablename__ = 'feature_photo'
 
-        id = sa.Column(sa.Integer, primary_key=True)
-        layer_id = sa.Column(sa.ForeignKey(Layer.id), nullable=False)
-        feature_id = sa.Column(sa.Integer, nullable=False)
-        fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
+class FeaturePhoto(Base):
+    __tablename__ = 'feature_photo'
 
-        fileobj = orm.relationship(FileObj)
+    id = sa.Column(sa.Integer, primary_key=True)
+    layer_id = sa.Column(sa.ForeignKey(Layer.id), nullable=False)
+    feature_id = sa.Column(sa.Integer, nullable=False)
+    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
 
-        layer = orm.relationship(
-            Layer,
-            backref=orm.backref('__feature_photo', cascade='all')
-        )
+    fileobj = orm.relationship(FileObj)
 
-    comp.FeaturePhoto = FeaturePhoto
+    layer = orm.relationship(
+        Layer,
+        backref=orm.backref('__feature_photo', cascade='all')
+    )

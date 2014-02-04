@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
-from ..component import Component, require
+from ..component import Component
+
+from .models import Base, RasterStyle
+
+__all__ = ['RasterStyleComponent', 'RasterStyle']
 
 
 @Component.registry.register
 class RasterStyleComponent(Component):
     identity = 'raster_style'
-
-    @require('style')
-    def initialize(self):
-        Component.initialize(self)
-
-        from . import models
-        models.include(self)
+    metadata = Base.metadata
 
     def setup_pyramid(self, config):
-    	from . import views
-    	views.setup_pyramid(self, config)
+        from . import views
+        views.setup_pyramid(self, config)

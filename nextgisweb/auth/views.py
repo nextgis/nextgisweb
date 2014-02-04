@@ -9,11 +9,10 @@ from ..object_widget import ObjectWidget
 from ..views import ModelController, permalinker
 from .. import dynmenu as dm
 
+from .models import Principal, User, Group
+
 
 def setup_pyramid(comp, config):
-    Principal = comp.Principal
-    User = comp.User
-    Group = comp.Group
 
     def check_permission(request):
         """ Чтобы избежать перекрестной зависимости двух компонентов -

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from ..object_widget import ObjectWidget
 
+from .models import FeatureDescription
+
 
 def setup_pyramid(comp, config):
-    Base = comp.env.core.Base
     DBSession = comp.env.core.DBSession
-
-    FeatureDescription = comp.FeatureDescription
 
     class FeatureDescriptionEditWidget(ObjectWidget):
         identity = 'feature_description'

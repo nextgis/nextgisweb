@@ -2,7 +2,7 @@
 from ..component import Component, require
 from ..core import BackupBase, TableBackup
 
-from .models import TableInfo
+from .models import Base, TableInfo, VectorLayer
 
 
 @BackupBase.registry.register
@@ -23,10 +23,7 @@ class VectorLayerBackup(BackupBase):
 @Component.registry.register
 class VectorLayerComponent(Component):
     identity = 'vector_layer'
-
-    def initialize(self):
-        from . import models
-        models.initialize(self)
+    metadata = Base.metadata
 
     @require('feature_layer')
     def setup_pyramid(self, config):
@@ -37,6 +34,6 @@ class VectorLayerComponent(Component):
         for i in super(VectorLayerComponent, self).backup():
             yield i
 
-        for l in self.VectorLayer.query():
+        for l in VectorLayer.query():
             yield VectorLayerBackup(self, l.layer_id)
             yield TableBackup(self, 'vector_layer.' + l._tablename)

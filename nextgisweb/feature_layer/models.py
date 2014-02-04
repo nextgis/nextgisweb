@@ -4,16 +4,19 @@ import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
-from ..models import Base
+from ..models import declarative_base
+from ..layer import Layer
 
 from .interface import FIELD_TYPE
+
+Base = declarative_base()
 
 
 class LayerField(Base):
     __tablename__ = 'layer_field'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    layer_id = sa.Column(sa.Integer, sa.ForeignKey('layer.id'), nullable=False)
+    layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), nullable=False)
     cls = sa.Column(sa.Unicode, nullable=False)
 
     idx = sa.Column(sa.Integer, nullable=False)

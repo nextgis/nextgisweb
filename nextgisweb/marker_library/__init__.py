@@ -6,17 +6,18 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component, require
 
+from .models import Base, MarkerCollection, MarkerCategory, Marker
+
+__all__ = [
+    'MarkerLibraryComponent', 'MarkerCollection',
+    'MarkerCategory', 'Marker'
+]
+
 
 @Component.registry.register
 class MarkerLibraryComponent(Component):
     identity = 'marker_library'
-
-    @require('file_storage')
-    def initialize(self):
-        super(MarkerLibraryComponent, self).initialize()
-
-        from . import models
-        models.initialize(self)
+    metadata = Base.metadata
 
     @require('file_storage')
     def initialize_db(self):
@@ -29,9 +30,9 @@ class MarkerLibraryComponent(Component):
             display_name = keyname
 
         try:
-            collection = self.MarkerCollection.filter_by(keyname=keyname).one()
+            collection = MarkerCollection.filter_by(keyname=keyname).one()
         except NoResultFound:
-            collection = self.MarkerCollection(
+            collection = MarkerCollection(
                 keyname=keyname,
                 display_name=display_name
             ).persist()
@@ -41,9 +42,9 @@ class MarkerLibraryComponent(Component):
                 continue
 
             try:
-                category = self.MarkerCategory.filter_by(keyname=catname).one()
+                category = MarkerCategory.filter_by(keyname=catname).one()
             except NoResultFound:
-                category = self.MarkerCategory(
+                category = MarkerCategory(
                     keyname=catname,
                     display_name=catname
                 ).persist()
@@ -58,7 +59,7 @@ class MarkerLibraryComponent(Component):
                 mkeyname = re.sub(r'\.svg$', '', fn)
 
                 try:
-                    marker = self.Marker.filter_by(keyname=mkeyname).one()
+                    marker = Marker.filter_by(keyname=mkeyname).one()
 
                     assert marker.collection == collection, \
                         "Marker '%s' found in collection '%s'!" \
@@ -69,7 +70,7 @@ class MarkerLibraryComponent(Component):
                         % (mkeyname, marker.category.keyname)
 
                 except NoResultFound:
-                    marker = self.Marker(
+                    marker = Marker(
                         collection=collection,
                         category=category,
                         keyname=mkeyname,

@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
 
-from .models import SpatialLayerMixin
+from .models import Base, Layer, SpatialLayerMixin
+
+__all__ = ['LayerComponent', 'Layer', 'SpatialLayerMixin']
 
 
 @Component.registry.register
 class LayerComponent(Component):
     identity = 'layer'
+    metadata = Base.metadata
 
     @require('layer_group', 'security')
     def initialize(self):
-        from . import models
-        models.initialize(self)
+        super(LayerComponent, self).initialize()
 
         security = self.env.security
 
@@ -19,7 +21,7 @@ class LayerComponent(Component):
 
         security.add_permission('layer', 'data-read', label=u"Чтение данных")
         security.add_permission('layer', 'data-edit', label=u"Изменение данных")
-        
+
         security.add_permission('layer', 'metadata-view', label=u"Чтение метаданных")
         security.add_permission('layer', 'metadata-edit', label=u"Изменение метаданных")
 

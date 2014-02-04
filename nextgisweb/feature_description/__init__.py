@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
 
+from .models import Base, FeatureDescription
+
+__all__ = ['FeatureDescriptionComponent', 'FeatureDescription']
+
 
 @Component.registry.register
 class FeatureDescriptionComponent(Component):
     identity = 'feature_description'
+    metadata = Base.metadata
 
     @require('feature_layer')
     def initialize(self):
-        from . import models
-        models.initialize(self)
-
         FeatureExtension = self.env.feature_layer.FeatureExtension
 
         @FeatureExtension.registry.register

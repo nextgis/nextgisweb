@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pkg_resources
+
 from .registry import registry_maker
 
 
@@ -39,12 +40,12 @@ class Component(object):
 def require(*comp_ident):
 
     def subdecorator(defn):
-    
+
         def wrapper(*args, **kwargs):
             return defn(*args, **kwargs)
-        
+
         wrapper._require = comp_ident
-        
+
         return wrapper
 
     return subdecorator

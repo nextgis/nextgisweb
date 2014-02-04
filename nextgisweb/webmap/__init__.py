@@ -4,15 +4,23 @@ import json
 from pkg_resources import resource_filename
 
 from ..component import Component, require
+from ..auth import User
+
+from .models import Base, WebMap, WebMapItem
 from .adapter import WebMapAdapter
+
+__all__ = ['WebMapComponent', 'WebMap', 'WebMapItem']
 
 
 @Component.registry.register
 class WebMapComponent(Component):
     identity = 'webmap'
+    metadata = Base.metadata
 
     @require('security')
     def initialize(self):
+        super(WebMapComponent, self).initialize()
+
         # Настройки по умолчанию
         if 'basemaps' not in self.settings:
             self.settings['basemaps'] = resource_filename(
@@ -25,30 +33,24 @@ class WebMapComponent(Component):
         self.settings['popup_height'] = int(self.settings.get(
             'popup_height', 200))
 
-
         security = self.env.security
 
         security.add_resource('webmap', label=u"Веб-карта")
         security.add_permission('webmap', 'read', label=u"Чтение")
         security.add_permission('webmap', 'write', label=u"Запись")
 
-        from . import models
-        models.initialize(self)
-
     @require('security', 'auth')
     def initialize_db(self):
-        auth = self.env.auth
-
-        if self.WebMap.filter_by().first() is None:
+        if WebMap.filter_by().first() is None:
             # Создаем веб-карту по-умолчанию только в том случае,
             # если нет ни одиной карты.
 
-            admin = auth.User.filter_by(keyname='administrator').one()
+            admin = User.filter_by(keyname='administrator').one()
 
-            self.WebMap(
+            WebMap(
                 owner_user=admin,
                 display_name=u"Основная веб-карта",
-                root_item=self.WebMapItem(item_type='root')
+                root_item=WebMapItem(item_type='root')
             ).persist()
 
     def setup_pyramid(self, config):

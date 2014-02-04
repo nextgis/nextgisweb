@@ -3,13 +3,14 @@ import tempfile
 import shutil
 import zipfile
 import ctypes
+from distutils.version import LooseVersion
 
 import osgeo
 from osgeo import ogr
 
-from distutils.version import LooseVersion
-
 from ..object_widget import ObjectWidget
+
+from .models import VectorLayer
 
 
 class VectorLayerObjectWidget(ObjectWidget):
@@ -39,7 +40,7 @@ class VectorLayerObjectWidget(ObjectWidget):
 
         if not zipfile.is_zipfile(datafile):
             self.error.append(dict(message=u"Загруженный файл не является ZIP-архивом."))
-            return  False
+            return False
 
         self._unzip_tmpdir = tempfile.mkdtemp()
         zipfile.ZipFile(datafile, 'r').extractall(path=self._unzip_tmpdir)
@@ -190,7 +191,6 @@ def _set_encoding(encoding):
 
 
 def setup_pyramid(comp, config):
-    VectorLayer = comp.VectorLayer
 
     VectorLayer.object_widget = (
         (VectorLayer.identity, VectorLayerObjectWidget),

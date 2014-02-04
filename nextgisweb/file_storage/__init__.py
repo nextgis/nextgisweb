@@ -7,6 +7,8 @@ from ..core import BackupBase
 
 from .models import Base, FileObj
 
+__all__ = ['FileStorageComponent', 'FileObj']
+
 
 @BackupBase.registry.register
 class FileObjBackup(BackupBase):
@@ -33,11 +35,7 @@ class FileObjBackup(BackupBase):
 @Component.registry.register
 class FileStorageComponent(Component):
     identity = 'file_storage'
-
-    def initialize(self):
-        super(FileStorageComponent, self).initialize()
-        self.metadata = Base.metadata
-        self.FileObj = FileObj
+    metadata = Base.metadata
 
     def backup(self):
         for i in super(FileStorageComponent, self).backup():

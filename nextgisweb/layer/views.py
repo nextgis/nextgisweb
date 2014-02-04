@@ -13,6 +13,9 @@ from .. import dynmenu as dm
 from ..object_widget import CompositeWidget
 from ..layer_group.views import LayerGroupObjectWidget
 from ..psection import PageSections
+from ..layer_group import LayerGroup
+
+from .models import Layer
 
 
 class LayerObjectWidget(LayerGroupObjectWidget):
@@ -23,8 +26,6 @@ class LayerObjectWidget(LayerGroupObjectWidget):
 
 def setup_pyramid(comp, config):
     ACLController = comp.env.security.ACLController
-    LayerGroup = comp.env.layer_group.LayerGroup
-    Layer = comp.Layer
 
     Layer.object_widget = (
         (Layer.identity, LayerObjectWidget),
@@ -139,12 +140,12 @@ def setup_pyramid(comp, config):
         dm.Label('data', u"Данные"),
     )
 
-    comp.Layer.__dynmenu__ = comp.layer_menu
+    Layer.__dynmenu__ = comp.layer_menu
 
     class AddLayerDynMenu(dm.DynItem):
 
         def build(self, args):
-            for cls in comp.Layer.registry:
+            for cls in Layer.registry:
                 yield dm.Link(
                     'add/%s' % cls.identity, cls.cls_display_name,
                     self._create_url(cls)
@@ -158,7 +159,7 @@ def setup_pyramid(comp, config):
                 )
             )
 
-    comp.env.layer_group.LayerGroup.__dynmenu__.add(AddLayerDynMenu())
+    LayerGroup.__dynmenu__.add(AddLayerDynMenu())
 
     comp.env.layer_group.layer_group_page_sections.register(
         key='layers',

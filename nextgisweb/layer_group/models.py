@@ -2,38 +2,37 @@
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
+from ..models import declarative_base
+from ..security import ACLMixin
 
-def initialize(comp):
-    Base = comp.env.core.Base
-    ACLMixin = comp.env.security.ACLMixin
+Base = declarative_base()
 
-    class LayerGroup(ACLMixin, Base):
-        __tablename__ = 'layer_group'
-        __table_args__ = (
-            sa.CheckConstraint('(id = 0 AND parent_id IS NULL) OR (id <> 0 AND parent_id IS NOT NULL)'),
-        )
 
-        cls_display_name = u"Группа слоёв"
+class LayerGroup(Base, ACLMixin):
+    __tablename__ = 'layer_group'
+    __table_args__ = (
+        sa.CheckConstraint('(id = 0 AND parent_id IS NULL) OR (id <> 0 AND parent_id IS NOT NULL)'),
+    )
 
-        __acl_resource__ = 'layer_group'
-        __acl_parent_attr__ = 'parent'
+    cls_display_name = u"Группа слоёв"
 
-        id = sa.Column(sa.Integer, primary_key=True)
-        parent_id = sa.Column(sa.Integer, sa.ForeignKey('layer_group.id', ondelete='restrict'))
-        keyname = sa.Column(sa.Unicode, unique=True)
-        display_name = sa.Column(sa.Unicode, nullable=False)
-        description = sa.Column(sa.Unicode)
+    __acl_resource__ = 'layer_group'
+    __acl_parent_attr__ = 'parent'
 
-        parent = orm.relationship(
-            'LayerGroup', remote_side=[id],
-            backref=orm.backref('children', order_by=display_name, cascade="all")
-        )
+    id = sa.Column(sa.Integer, primary_key=True)
+    parent_id = sa.Column(sa.Integer, sa.ForeignKey('layer_group.id', ondelete='restrict'))
+    keyname = sa.Column(sa.Unicode, unique=True)
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    description = sa.Column(sa.Unicode)
 
-        def __unicode__(self):
-            return self.display_name
+    parent = orm.relationship(
+        'LayerGroup', remote_side=[id],
+        backref=orm.backref('children', order_by=display_name, cascade="all")
+    )
 
-        @property
-        def parents(self):
-            return (self.parent.parents + (self.parent, )) if self.parent else ()
+    def __unicode__(self):
+        return self.display_name
 
-    comp.LayerGroup = LayerGroup
+    @property
+    def parents(self):
+        return (self.parent.parents + (self.parent, )) if self.parent else ()

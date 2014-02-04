@@ -95,7 +95,8 @@ class CompositeWidget(ObjectWidget):
         result = []
 
         # Пробегаем по все предкам класса model_cls
-        while model_cls and issubclass(model_cls, object):
+        for model_cls in model_cls.__mro__:
+
             # Проверяем наличие атрибута attr у класса
             if hasattr(model_cls, attr):
                 val = getattr(model_cls, attr)
@@ -106,10 +107,6 @@ class CompositeWidget(ObjectWidget):
                     tmp = list(val)
                     tmp.reverse()
                     result.extend(tmp)
-
-            # На след итерации рассматриваем предка.
-            # TODO: Разобраться как это работает с миксинами
-            model_cls = model_cls.__base__
 
         # Перед тем как вернуть список, перевернем его,
         # чтобы виждеты полученные от базового класса

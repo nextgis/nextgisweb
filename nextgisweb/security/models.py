@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..models import declarative_base
+from ..env import env
 from ..auth import Principal, User, Group
 
 
@@ -203,7 +204,7 @@ class ACL(Base):
 
         result = permission_set(
             itemstack,
-            permissions=self._comp.permissions[self.resource].keys()
+            permissions=env.security.permissions[self.resource].keys()
         )
 
         self._permset_cache = result
@@ -277,8 +278,7 @@ class ACLMixin(object):
             lazy='joined'
         )
 
-    def __init__(self, *args, **kwargs):
-
+    def postinit(self, **kwargs):
         if 'acl' not in kwargs and 'acl_id' not in kwargs:
 
             parent_attr = (
@@ -299,16 +299,13 @@ class ACLMixin(object):
 
             if 'owner_user' in kwargs:
                 aclkwargs['owner_user'] = kwargs['owner_user']
-                del kwargs['owner_user']
 
             elif 'owner_user_id' in kwargs:
                 aclkwargs['owner_user_id'] = kwargs['owner_user_id']
-                del kwargs['owner_user_id']
 
-            acl = ACL(**aclkwargs)
-            kwargs['acl'] = acl
+            self.acl = ACL(**aclkwargs)
 
-        super(ACLMixin, self).__init__(*args, **kwargs)
+        super(ACLMixin, self).postinit(**kwargs)
 
     def permission_set(self, *args, **kwargs):
         return self.acl.permission_set(*args, **kwargs)
@@ -333,14 +330,3 @@ class ACLMixin(object):
         """ Быстрый способ доступа к базовому списку контроля доступа """
 
         return ResourceACLRoot.query().get(self.__acl_resource__).acl
-
-
-def initialize(comp):
-    comp.metadata = Base.metadata
-
-    ACL._comp = comp
-
-    comp.ACL = ACL
-    comp.ACLItem = ACLItem
-    comp.ResourceACLRoot = ResourceACLRoot
-    comp.ACLMixin = ACLMixin

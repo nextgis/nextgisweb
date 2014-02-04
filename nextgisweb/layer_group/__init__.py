@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
 
+from .models import Base, LayerGroup
+
+__all__ = ['LayerGroupComponent', 'LayerGroup']
+
 
 @Component.registry.register
 class LayerGroupComponent(Component):
     identity = 'layer_group'
+    metadata = Base.metadata
 
     @require('security')
     def initialize(self):
-        from . import models
-        models.initialize(self)
+        super(LayerGroupComponent, self).initialize()
 
         security = self.env.security
 

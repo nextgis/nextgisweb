@@ -3,13 +3,24 @@ from pyramid.httpexceptions import HTTPForbidden
 
 from ..registry import registry_maker
 from ..component import Component, require
+from ..auth import Group
 
-from .models import PERMISSION_ALL
+from .models import (
+    Base,
+    PERMISSION_ALL,
+    ACL,
+    ACLItem,
+    ResourceACLRoot,
+    ACLMixin,
+)
+
+__all__ = ['PERMISSION_ALL', 'ACL', 'ACLItem', 'ResourceACLRoot', 'ACLMixin']
 
 
 @Component.registry.register
 class SecurityComponent(Component):
     identity = 'security'
+    metadata = Base.metadata
 
     def __init__(self, env, settings):
         super(SecurityComponent, self).__init__(env, settings)
@@ -17,11 +28,6 @@ class SecurityComponent(Component):
         self._resources = dict()
         self._permissions = dict()
         self._children = dict()
-
-    @require('auth')
-    def initialize(self):
-        from . import models
-        models.initialize(self)
 
     @require('auth')
     def initialize_db(self):
@@ -42,7 +48,7 @@ class SecurityComponent(Component):
 
             return children
 
-        administrators = self.env.auth.Group \
+        administrators = Group \
             .filter_by(keyname='administrators').one()
 
         # Создаем записи ResourceACLRoot для всех видов ресурсов, которые
@@ -51,12 +57,12 @@ class SecurityComponent(Component):
             if resopt.get('parent_required', False):
                 continue
 
-            root_acl = self.ResourceACLRoot.query().get(resource)
+            root_acl = ResourceACLRoot.query().get(resource)
             if root_acl:
                 continue
 
             # Добавляем полные права администраторам для всех дочерних ресурсов
-            root_acl = self.ResourceACLRoot(resource)
+            root_acl = ResourceACLRoot(resource)
             root_acl.acl.update([
                 (administrators.id, child, PERMISSION_ALL, 'allow-subtree')
                 for child in _children(resource) + [resource, ]

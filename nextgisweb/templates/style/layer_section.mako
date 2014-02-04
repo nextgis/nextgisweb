@@ -7,11 +7,14 @@
             <th>Операции</th>
         </tr>
     </thead>
+
+    <% from nextgisweb.style import Style %>
+
     %for idx, style in enumerate(obj.styles, start=1):
         <tr>
             <td>${idx}</td>
             <td><a href="${style.permalink(request)}">${style.display_name}</a></td>
-            <td>${request.env.style.Style.registry[style.cls].cls_display_name}</td>
+            <td>${Style.registry[style.cls].cls_display_name}</td>
             <td>
                 <a href="${request.route_url('style.edit', id=style.id, layer_id=style.layer_id)}">редактировать</a>
             </td>

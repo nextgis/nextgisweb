@@ -3,16 +3,17 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component
 
-from .models import SRS, SRSMixin
+from .models import Base, SRS, SRSMixin
+
+__all__ = ['SpatialRefSysComponent', 'SRS', 'SRSMixin']
 
 
 @Component.registry.register
 class SpatialRefSysComponent(Component):
     identity = 'spatial_ref_sys'
+    metadata = Base.metadata
 
     def initialize_db(self):
-        SRS = self.SRS
-
         srs_list = (
             # TODO: Закомментировано до лучших времен
             # SRS(id=4326, display_name="WGS 84 / Lon-lat (EPSG:4326)"),
@@ -29,12 +30,6 @@ class SpatialRefSysComponent(Component):
                 SRS.filter_by(id=srs.id).one()
             except NoResultFound:
                 srs.persist()
-
-    def initialize(self):
-        from . import models
-        self.metadata = models.Base.metadata
-
-        self.SRS = models.SRS
 
     def setup_pyramid(self, config):
         from . import views

@@ -2,6 +2,8 @@
 
 from ..object_widget import ObjectWidget
 
+from .models import WMSClientLayer, WMSClientStyle
+
 
 class WMSClientLayerObjectWidget(ObjectWidget):
 
@@ -69,13 +71,9 @@ class WMSClientStyleObjectWidget(ObjectWidget):
 
 
 def setup_pyramid(comp, config):
-    WMSClientLayer = comp.WMSClientLayer
-
     WMSClientLayer.object_widget = (
         (WMSClientLayer.identity, WMSClientLayerObjectWidget),
     )
-
-    WMSClientStyle = comp.WMSClientStyle
 
     WMSClientStyle.object_widget = (
         (WMSClientStyle.identity, WMSClientStyleObjectWidget),

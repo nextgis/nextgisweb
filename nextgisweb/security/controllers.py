@@ -4,8 +4,6 @@
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
 
-    ACL, ACLItem = comp.ACL, comp.ACLItem
-
     class ACLController(object):
 
         def __init__(

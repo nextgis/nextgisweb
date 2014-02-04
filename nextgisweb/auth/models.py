@@ -143,11 +143,3 @@ class Group(Principal):
 
         else:
             return user in self.members
-
-
-def initialize(comp):
-    comp.metadata = Base.metadata
-
-    comp.Principal = Principal
-    comp.User = User
-    comp.Group = Group

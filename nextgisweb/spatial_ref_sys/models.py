@@ -7,7 +7,6 @@ from osgeo import osr
 
 from ..models import declarative_base
 
-
 Base = declarative_base()
 
 

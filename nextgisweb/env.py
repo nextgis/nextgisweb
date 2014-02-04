@@ -4,6 +4,7 @@ import re
 
 from .component import Component, load_all
 
+
 class Env(object):
 
     def __init__(self, cfg):
@@ -21,7 +22,7 @@ class Env(object):
 
         for comp_class in Component.registry:
             identity = comp_class.identity
-            
+
             if identity not in components_ign:
                 settings = dict(
                     cfg.items(identity)
@@ -31,7 +32,9 @@ class Env(object):
                 instance = comp_class(env=self, settings=settings)
                 self._components[comp_class.identity] = instance
 
-                assert not hasattr(self, identity), "Attribute name %s already used" % identity
+                assert not hasattr(self, identity), \
+                    "Attribute name %s already used" % identity
+
                 setattr(self, identity, instance)
 
     def chain(self, method):
@@ -41,7 +44,8 @@ class Env(object):
             for c in components:
                 if not c.identity in traverse.seq:
                     if hasattr(getattr(c, method), '_require'):
-                        traverse([self._components[i] for i in getattr(c, method)._require])
+                        traverse([self._components[i] for i in getattr(
+                            c, method)._require])
                     traverse.seq.append(c.identity)
 
         traverse.seq = seq
@@ -67,6 +71,34 @@ class Env(object):
         for comp in self.chain('initialize'):
             if hasattr(comp, 'metadata'):
                 for key, tab in comp.metadata.tables.iteritems():
-                    tab.tometadata(metadata)
+                    ctab = tab.tometadata(metadata)
+                    sa.event.listen(
+                        ctab, 'after_create',
+                        # После создания таблицы запишем имя компонента
+                        # в комментарий, скорее для отладки.
+                        sa.DDL(
+                            "COMMENT ON TABLE %(fullname)s IS "
+                            + "'" + comp.identity + "'"
+                        ))
 
         return metadata
+
+
+_env = None
+
+
+def setenv(env):
+    global _env
+    _env = env
+
+
+class EnvMetaClass(type):
+    def __getattr__(cls, name):
+        return getattr(_env, name)
+
+    def __call__(cls):
+        return _env
+
+
+class env(object):
+    __metaclass__ = EnvMetaClass

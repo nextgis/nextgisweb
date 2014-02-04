@@ -11,8 +11,9 @@ from ..views import (
 from ..object_widget import CompositeWidget
 from .. import dynmenu as dm
 from ..psection import PageSections
-
 from ..object_widget import ObjectWidget
+
+from .models import LayerGroup
 
 
 class LayerGroupObjectWidget(ObjectWidget):
@@ -49,8 +50,6 @@ class LayerGroupObjectWidget(ObjectWidget):
 
 def setup_pyramid(comp, config):
     ACLController = comp.env.security.ACLController
-
-    LayerGroup = comp.LayerGroup
 
     ACLController(LayerGroup).includeme(config)
 
@@ -179,7 +178,7 @@ def setup_pyramid(comp, config):
                 lambda args: args.request.route_url(
                     'layer_group.delete', id=args.obj.id))
 
-    comp.LayerGroup.__dynmenu__ = dm.DynMenu(
+    LayerGroup.__dynmenu__ = dm.DynMenu(
         dm.Label('add', u"Добавить"),
         dm.Link(
             'add/layer_group', u"Группа слоёв",

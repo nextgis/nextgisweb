@@ -2,6 +2,8 @@
 
 from ..object_widget import ObjectWidget
 
+from .models import RasterStyle
+
 
 def setup_pyramid(comp, config):
 
@@ -10,4 +12,4 @@ def setup_pyramid(comp, config):
         def widget_module(self):
             return 'raster_style/Widget'
 
-    comp.RasterStyle.object_widget = RasterStyleObjectWidget
+    RasterStyle.object_widget = RasterStyleObjectWidget

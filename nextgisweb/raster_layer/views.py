@@ -3,8 +3,11 @@ from osgeo import gdal, gdalconst
 
 from ..object_widget import ObjectWidget
 
+from .models import RasterLayer
 
-def include(comp):
+
+def setup_pyramid(comp, config):
+
     file_upload = comp.env.file_upload
 
     class RasterLayerObjectWidget(ObjectWidget):
@@ -66,6 +69,6 @@ def include(comp):
         def widget_module(self):
             return 'raster_layer/Widget'
 
-    comp.RasterLayer.object_widget = RasterLayerObjectWidget
+    RasterLayer.object_widget = RasterLayerObjectWidget
 
-    comp.RasterLayer.__show_template = 'layer/show.mako'
+    RasterLayer.__show_template = 'layer/show.mako'

@@ -4,8 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component
 
-from .models import Principal, User, Group
-
+from .models import Base, Principal, User, Group
 
 __all__ = ['Principal', 'User', 'Group']
 
@@ -13,6 +12,7 @@ __all__ = ['Principal', 'User', 'Group']
 @Component.registry.register
 class AuthComponent(Component):
     identity = 'auth'
+    metadata = Base.metadata
 
     def initialize_db(self):
         self.initialize_user(
@@ -44,18 +44,14 @@ class AuthComponent(Component):
             ), ]
         ).persist()
 
-    def initialize(self):
-        from . import models
-        models.initialize(self)
-
     def setup_pyramid(self, config):
 
         def user(request):
             user_id = authenticated_userid(request)
             if user_id:
-                return self.User.filter_by(id=user_id).one()
+                return User.filter_by(id=user_id).one()
             else:
-                return self.User.filter_by(keyname='guest').one()
+                return User.filter_by(keyname='guest').one()
 
         config.set_request_property(user, 'user', reify=True)
 
@@ -67,9 +63,9 @@ class AuthComponent(Component):
         отсутствия создает его с параметрами kwargs """
 
         try:
-            obj = self.User.filter_by(keyname=keyname).one()
+            obj = User.filter_by(keyname=keyname).one()
         except NoResultFound:
-            obj = self.User(keyname=keyname, **kwargs).persist()
+            obj = User(keyname=keyname, **kwargs).persist()
 
         return obj
 
@@ -78,8 +74,8 @@ class AuthComponent(Component):
         отсутствия создает ее с параметрами kwargs """
 
         try:
-            obj = self.Group.filter_by(keyname=keyname).one()
+            obj = Group.filter_by(keyname=keyname).one()
         except NoResultFound:
-            obj = self.Group(keyname=keyname, **kwargs).persist()
+            obj = Group(keyname=keyname, **kwargs).persist()
 
         return obj

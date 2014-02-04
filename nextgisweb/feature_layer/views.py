@@ -9,6 +9,7 @@ from ..views import model_context
 from ..geometry import geom_from_wkt
 from ..object_widget import ObjectWidget, CompositeWidget
 from .. import dynmenu as dm
+from ..layer import Layer
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
@@ -16,7 +17,6 @@ from .extension import FeatureExtension
 
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
-    Layer = comp.env.layer.Layer
 
     class LayerFieldsWidget(ObjectWidget):
 
@@ -105,7 +105,7 @@ def setup_pyramid(comp, config):
     config.add_route('feature_layer.identify', '/feature_layer/identify')
     config.add_view(identify, route_name='feature_layer.identify', renderer='json')
 
-    @model_context(comp.env.layer.Layer)
+    @model_context(Layer)
     def browse(request, layer):
         request.require_permission(layer, 'data-read')
         return dict(
@@ -117,7 +117,7 @@ def setup_pyramid(comp, config):
     config.add_route('feature_layer.feature.browse', '/layer/{id:\d+}/feature/')
     config.add_view(browse, route_name='feature_layer.feature.browse', renderer='feature_layer/feature_browse.mako')
 
-    @model_context(comp.env.layer.Layer)
+    @model_context(Layer)
     def edit(request, layer):
         request.require_permission(layer, 'data-read', 'data-edit')
 
@@ -171,7 +171,7 @@ def setup_pyramid(comp, config):
     config.add_route('feature_layer.feature.edit', '/layer/{id:\d+}/feature/{feature_id}/edit')
     config.add_view(edit, route_name='feature_layer.feature.edit', renderer='model_widget.mako')
 
-    @model_context(comp.env.layer.Layer)
+    @model_context(Layer)
     def field(request, layer):
         request.require_permission(layer, 'metadata-view')
         return [f.to_dict() for f in layer.fields]
@@ -179,7 +179,7 @@ def setup_pyramid(comp, config):
     config.add_route('feature_layer.field', 'layer/{id:\d+}/field/')
     config.add_view(field, route_name='feature_layer.field', renderer='json')
 
-    @model_context(comp.env.layer.Layer)
+    @model_context(Layer)
     def store_api(request, layer):
         request.require_permission(layer, 'data-read')
 
@@ -225,7 +225,7 @@ def setup_pyramid(comp, config):
     config.add_route('feature_layer.store_api', '/layer/{id:\d+}/store_api/')
     config.add_view(store_api, route_name='feature_layer.store_api')
 
-    @model_context(comp.env.layer.Layer)
+    @model_context(Layer)
     def store_get_item(request, layer):
         request.require_permission(layer, 'data-read')
 
@@ -264,9 +264,7 @@ def setup_pyramid(comp, config):
     config.add_view(store_get_item, route_name='feature_layer.feature_get')
 
     def feature_show(request):
-        layer = DBSession.query(comp.env.layer.Layer) \
-            .filter_by(id=request.matchdict['layer_id']) \
-            .one()
+        layer = Layer.filter_by(id=request.matchdict['layer_id']).one()
 
         request.require_permission(layer, 'data-read')
 

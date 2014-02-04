@@ -12,8 +12,8 @@ import sqlalchemy.orm as orm
 import sqlalchemy.sql as sql
 
 from ..geometry import geom_from_wkb, box
-from ..models.base import DBSession
-from ..layer import SpatialLayerMixin
+from ..models import declarative_base, DBSession
+from ..layer import Layer, SpatialLayerMixin
 
 from ..feature_layer import (
     Feature,
@@ -41,6 +41,8 @@ _GEOM_TYPE_2_GA = dict(zip(GEOM_TYPE_DB, GEOM_TYPE_GA))
 
 _FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
 _FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
+
+Base = declarative_base()
 
 
 class FieldDef(object):
@@ -174,223 +176,222 @@ class TableInfo(object):
             feature = ogrlayer.GetNextFeature()
 
 
-def initialize(comp):
-    Layer = comp.env.layer.Layer
+@Layer.registry.register
+class VectorLayer(Base, Layer, SpatialLayerMixin, LayerFieldsMixin):
+    implements(IWritableFeatureLayer)
 
-    @Layer.registry.register
-    class VectorLayer(Layer, SpatialLayerMixin, LayerFieldsMixin):
-        implements(IWritableFeatureLayer)
+    __tablename__ = 'vector_layer'
 
-        __tablename__ = 'vector_layer'
+    identity = __tablename__
+    cls_display_name = u"Векторный слой"
 
-        identity = __tablename__
-        cls_display_name = u"Векторный слой"
+    layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
+    geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False), nullable=False)
 
-        layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
-        geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False), nullable=False)
+    __mapper_args__ = dict(
+        polymorphic_identity=identity,
+    )
 
-        __mapper_args__ = dict(
-            polymorphic_identity=identity,
+    @property
+    def _tablename(self):
+        return 'layer_%08x' % self.id
+
+    def setup_from_ogr(self, ogrlayer, strdecode):
+        tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs_id, strdecode)
+        tableinfo.setup_layer(self)
+
+        DBSession.flush()
+        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.metadata.create_all(bind=DBSession.connection())
+
+        self.tableinfo = tableinfo
+
+    def load_from_ogr(self, ogrlayer, strdecode):
+        self.tableinfo.load_from_ogr(ogrlayer, strdecode)
+
+    def get_info(self):
+        return super(VectorLayer, self).get_info() + (
+            (u"Тип геометрии", dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type]),
         )
 
-        @property
-        def _tablename(self):
-            return 'layer_%08x' % self.id
+    # IFeatureLayer
 
-        def setup_from_ogr(self, ogrlayer, strdecode):
-            tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs_id, strdecode)
-            tableinfo.setup_layer(self)
+    @property
+    def feature_query(self):
 
-            DBSession.flush()
-            tableinfo.setup_metadata(tablename=self._tablename)
-            tableinfo.metadata.create_all(bind=DBSession.connection())
+        class BoundFeatureQuery(FeatureQueryBase):
+            layer = self
 
-            self.tableinfo = tableinfo
+        return BoundFeatureQuery
 
-        def load_from_ogr(self, ogrlayer, strdecode):
-            self.tableinfo.load_from_ogr(ogrlayer, strdecode)
+    def field_by_keyname(self, keyname):
+        for f in self.fields:
+            if f.keyname == keyname:
+                return f
 
-        def get_info(self):
-            return super(VectorLayer, self).get_info() + (
-                (u"Тип геометрии", dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type]),
-            )
+        raise KeyError("Field '%s' not found!" % keyname)
 
-        # IFeatureLayer
+    # IWritableFeatureLayer
 
-        @property
-        def feature_query(self):
+    def feature_put(self, feature):
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(tablename=self._tablename)
 
-            class BoundFeatureQuery(FeatureQueryBase):
-                layer = self
+        obj = tableinfo.model(id=feature.id)
+        for f in tableinfo.fields:
+            if f.keyname in feature.fields:
+                setattr(obj, f.key, feature.fields[f.keyname])
 
-            return BoundFeatureQuery
+        DBSession.merge(obj)
 
-        def field_by_keyname(self, keyname):
-            for f in self.fields:
-                if f.keyname == keyname:
-                    return f
 
-            raise KeyError("Field '%s' not found!" % keyname)
+def _vector_layer_listeners(table):
+    event.listen(
+        table, "after_create",
+        sa.DDL("CREATE SCHEMA vector_layer")
+    )
 
-        # IWritableFeatureLayer
+    event.listen(
+        table, "after_drop",
+        sa.DDL("DROP SCHEMA IF EXISTS vector_layer CASCADE")
+    )
 
-        def feature_put(self, feature):
-            tableinfo = TableInfo.from_layer(self)
-            tableinfo.setup_metadata(tablename=self._tablename)
+_vector_layer_listeners(VectorLayer.__table__)
 
-            obj = tableinfo.model(id=feature.id)
+# Инициализация БД использует table.tometadata(), однако
+# SA не копирует подписки на события в этом случае.
+
+
+def tometadata(self, metadata):
+    result = sa.Table.tometadata(self, metadata)
+    _vector_layer_listeners(result)
+    return result
+
+VectorLayer.__table__.tometadata = types.MethodType(
+    tometadata, VectorLayer.__table__)
+
+
+class FeatureQueryBase(object):
+    implements(IFeatureQuery, IFeatureQueryFilterBy, IFeatureQueryLike)
+
+    def __init__(self):
+        self._geom = None
+        self._box = None
+
+        self._fields = None
+        self._limit = None
+        self._offset = None
+
+        self._filter_by = None
+        self._like = None
+        self._intersects = None
+
+    def geom(self):
+        self._geom = True
+
+    def box(self):
+        self._box = True
+
+    def fields(self, *args):
+        self._fields = args
+
+    def limit(self, limit, offset=0):
+        self._limit = limit
+        self._offset = offset
+
+    def filter_by(self, **kwargs):
+        self._filter_by = kwargs
+
+    def order_by(self, *args):
+        self._order_by = args
+
+    def like(self, value):
+        self._like = value
+
+    def intersects(self, geom):
+        self._intersects = geom
+
+    def __call__(self):
+        tableinfo = TableInfo.from_layer(self.layer)
+        tableinfo.setup_metadata(tablename=self.layer._tablename)
+        table = tableinfo.table
+
+        columns = [table.columns.id, ]
+        where = []
+
+        if self._geom:
+            columns.append(table.columns.geom.label('geom'))
+
+        if self._box:
+            columns.extend((
+                sa.func.st_xmin(sa.text('geom')).label('box_left'),
+                sa.func.st_ymin(sa.text('geom')).label('box_bottom'),
+                sa.func.st_xmax(sa.text('geom')).label('box_right'),
+                sa.func.st_ymax(sa.text('geom')).label('box_top'),
+            ))
+
+        selected_fields = []
+        for f in tableinfo.fields:
+            if not self._fields or f.keyname in self._fields:
+                columns.append(table.columns[f.key].label(f.keyname))
+                selected_fields.append(f)
+
+        if self._filter_by:
+            for k, v in self._filter_by.iteritems():
+                if k == 'id':
+                    where.append(table.columns.id == v)
+                else:
+                    where.append(table.columns[tableinfo[k].key] == v)
+
+        if self._like:
+            l = []
             for f in tableinfo.fields:
-                if f.keyname in feature.fields:
-                    setattr(obj, f.key, feature.fields[f.keyname])
+                if f.datatype == FIELD_TYPE.STRING:
+                    l.append(table.columns[f.key].ilike(
+                        '%' + self._like + '%'))
 
-            DBSession.merge(obj)
+            where.append(sa.or_(*l))
 
-    def _vector_layer_listeners(table):
-        event.listen(
-            table, "after_create",
-            sa.DDL("CREATE SCHEMA vector_layer")
-        )
+        if self._intersects:
+            geom = ga.WKTSpatialElement(self._intersects.wkt, self._intersects.srid)
+            where.append(geom.intersects(table.columns.geom))
 
-        event.listen(
-            table, "after_drop",
-            sa.DDL("DROP SCHEMA IF EXISTS vector_layer CASCADE")
-        )
+        class QueryFeatureSet(FeatureSet):
+            fields = selected_fields
+            layer = self.layer
 
-    _vector_layer_listeners(VectorLayer.__table__)
+            _geom = self._geom
+            _box = self._box
+            _limit = self._limit
+            _offset = self._offset
 
-    # Инициализация БД использует table.tometadata(), однако
-    # SA не копирует подписки на события в этом случае.
-
-    def tometadata(self, metadata):
-        result = sa.Table.tometadata(self, metadata)
-        _vector_layer_listeners(result)
-
-    VectorLayer.__table__.tometadata = types.MethodType(
-        tometadata, VectorLayer.__table__)
-
-    comp.VectorLayer = VectorLayer
-
-    class FeatureQueryBase(object):
-        implements(IFeatureQuery, IFeatureQueryFilterBy, IFeatureQueryLike)
-        
-        def __init__(self):
-            self._geom = None
-            self._box = None
-            
-            self._fields = None
-            self._limit = None
-            self._offset = None
-
-            self._filter_by = None
-            self._like = None
-            self._intersects = None
-
-        def geom(self):
-            self._geom = True
-
-        def box(self):
-            self._box = True
-
-        def fields(self, *args):
-            self._fields = args
-
-        def limit(self, limit, offset=0):
-            self._limit = limit
-            self._offset = offset
-
-        def filter_by(self, **kwargs):
-            self._filter_by = kwargs
-
-        def order_by(self, *args):
-            self._order_by = args
-
-        def like(self, value):
-            self._like = value
-
-        def intersects(self, geom):
-            self._intersects = geom
-
-        def __call__(self):
-            tableinfo = TableInfo.from_layer(self.layer)
-            tableinfo.setup_metadata(tablename=self.layer._tablename)
-            table = tableinfo.table
-
-            columns = [table.columns.id, ]
-            where = []
-
-            if self._geom:
-                columns.append(table.columns.geom.label('geom'))
-
-            if self._box:
-                columns.extend((
-                    sa.func.st_xmin(sa.text('geom')).label('box_left'),
-                    sa.func.st_ymin(sa.text('geom')).label('box_bottom'),
-                    sa.func.st_xmax(sa.text('geom')).label('box_right'),
-                    sa.func.st_ymax(sa.text('geom')).label('box_top'),
-                ))
-
-            selected_fields = []
-            for f in tableinfo.fields:
-                if not self._fields or f.keyname in self._fields:
-                    columns.append(table.columns[f.key].label(f.keyname))
-                    selected_fields.append(f)
-
-            if self._filter_by:
-                for k, v in self._filter_by.iteritems():
-                    if k == 'id':
-                        where.append(table.columns.id == v)
-                    else:
-                        where.append(table.columns[tableinfo[k].key] == v)
-
-            if self._like:
-                l = []
-                for f in tableinfo.fields:
-                    if f.datatype == FIELD_TYPE.STRING:
-                        l.append(table.columns[f.key].ilike(
-                            '%' + self._like + '%'))
-
-                where.append(sa.or_(*l))
-
-            if self._intersects:
-                geom = ga.WKTSpatialElement(self._intersects.wkt, self._intersects.srid)
-                where.append(geom.intersects(table.columns.geom))
-
-            class QueryFeatureSet(FeatureSet):
-                fields = selected_fields
-                layer = self.layer
-
-                _geom = self._geom
-                _box = self._box
-                _limit = self._limit
-                _offset = self._offset
-
-                def __iter__(self):
-                    query = sql.select(
-                        columns,
-                        whereclause=sa.and_(*where),
-                        limit=self._limit,
-                        offset=self._offset,
-                        order_by=table.columns.id,
+            def __iter__(self):
+                query = sql.select(
+                    columns,
+                    whereclause=sa.and_(*where),
+                    limit=self._limit,
+                    offset=self._offset,
+                    order_by=table.columns.id,
+                )
+                rows = DBSession.connection().execute(query)
+                for row in rows:
+                    fdict = dict([(f.keyname, row[f.keyname]) for f in selected_fields])
+                    yield Feature(
+                        layer=self.layer,
+                        id=row.id,
+                        fields=fdict,
+                        geom=geom_from_wkb(str(row.geom.geom_wkb)) if self._geom else None,
+                        box=box(row.box_left, row.box_bottom, row.box_right, row.box_top) if self._box else None
                     )
-                    rows = DBSession.connection().execute(query)
-                    for row in rows:
-                        fdict = dict([(f.keyname, row[f.keyname]) for f in selected_fields])
-                        yield Feature(
-                            layer=self.layer,
-                            id=row.id,
-                            fields=fdict,
-                            geom=geom_from_wkb(str(row.geom.geom_wkb)) if self._geom else None,
-                            box=box(row.box_left, row.box_bottom, row.box_right, row.box_top) if self._box else None
-                        )
 
-                @property
-                def total_count(self):
-                    query = sql.select(
-                        [sa.func.count(table.columns.id), ],
-                        whereclause=sa.and_(*where)
-                    )
-                    res = DBSession.connection().execute(query)
-                    for row in res:
-                        return row[0]
+            @property
+            def total_count(self):
+                query = sql.select(
+                    [sa.func.count(table.columns.id), ],
+                    whereclause=sa.and_(*where)
+                )
+                res = DBSession.connection().execute(query)
+                for row in res:
+                    return row[0]
 
-            return QueryFeatureSet()
+        return QueryFeatureSet()

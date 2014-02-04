@@ -15,7 +15,7 @@ from .models import (
 )
 
 from .component import Component, load_all
-from .env import Env
+from .env import Env, setenv
 
 
 def pkginfo():
@@ -50,6 +50,7 @@ def pkginfo():
         )
     )
 
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application. """
 
@@ -61,6 +62,8 @@ def main(global_config, **settings):
 
     env = Env(cfg)
     env.initialize()
+
+    setenv(env)
 
     config = env.pyramid.make_app(settings)
     return config.make_wsgi_app()

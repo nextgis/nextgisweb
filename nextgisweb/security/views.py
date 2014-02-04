@@ -3,6 +3,8 @@ from pyramid.httpexceptions import HTTPForbidden
 
 from .. import dynmenu as dm
 
+from .models import ResourceACLRoot
+
 
 def setup_pyramid(comp, config):
 
@@ -22,10 +24,8 @@ def setup_pyramid(comp, config):
 
         return dict([
             (rkey, dict(
-                permissions=dict([
-                    (k, v)
-                    for k, v in comp.permissions[rkey].iteritems()
-                ]),
+                permissions=dict(
+                    [(k, v) for k, v in comp.permissions[rkey].iteritems()]),
                 children=_children(rkey),
                 **rval
             ))
@@ -39,7 +39,7 @@ def setup_pyramid(comp, config):
         if not request.user.is_administrator:
             raise HTTPForbidden()
 
-        root_acl = comp.ResourceACLRoot \
+        root_acl = ResourceACLRoot \
             .filter_by(**request.matchdict).one()
 
         acl_items = [
@@ -64,7 +64,7 @@ def setup_pyramid(comp, config):
         if not request.user.is_administrator:
             raise HTTPForbidden()
 
-        root_acl = comp.ResourceACLRoot \
+        root_acl = ResourceACLRoot \
             .filter_by(**request.matchdict).one()
 
         def iteritems():

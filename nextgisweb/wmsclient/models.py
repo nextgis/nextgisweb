@@ -9,108 +9,103 @@ from owslib.wms import WebMapService
 
 import sqlalchemy as sa
 
-from ..layer import SpatialLayerMixin
+from ..models import declarative_base
+from ..layer import Layer, SpatialLayerMixin
 from ..style import (
+    Style,
     IRenderableStyle,
     IExtentRenderRequest,
     ITileRenderRequest
 )
 
+Base = declarative_base()
+
 WMS_VERSIONS = ('1.1.1', )
 
 
-def initialize(comp):
+@Layer.registry.register
+class WMSClientLayer(Base, Layer, SpatialLayerMixin):
+    __tablename__ = 'wmsclient_layer'
 
-    Layer = comp.env.layer.Layer
+    identity = __tablename__
+    __mapper_args__ = dict(polymorphic_identity=identity)
 
-    @Layer.registry.register
-    class WMSClientLayer(Layer, SpatialLayerMixin):
+    cls_display_name = u"WMS-клиент"
 
-        __tablename__ = 'wmsclient_layer'
+    layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
+    url = sa.Column(sa.Unicode, nullable=False)
+    version = sa.Column(sa.Enum(*WMS_VERSIONS, native_enum=False), nullable=False)
 
-        identity = __tablename__
-        __mapper_args__ = dict(polymorphic_identity=identity)
+    @property
+    def client(self):
+        if not hasattr(self, '_client'):
+            self._client = WebMapService(self.url, version=self.version)
+        return self._client
 
-        cls_display_name = u"WMS-клиент"
+    @property
+    def source(self):
+        source_meta = super(WMSClientLayer, self).source
+        source_meta.update(dict(
+            url=self.url,
+            version=self.version)
+        )
+        return source_meta
 
-        layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
-        url = sa.Column(sa.Unicode, nullable=False)
-        version = sa.Column(sa.Enum(*WMS_VERSIONS, native_enum=False), nullable=False)
 
-        @property
-        def client(self):
-            if not hasattr(self, '_client'):
-                self._client = WebMapService(self.url, version=self.version)
-            return self._client
+class RenderRequest(object):
+    implements(IExtentRenderRequest, ITileRenderRequest)
 
-        @property
-        def source(self):
-            source_meta = super(WMSClientLayer, self).source
-            source_meta.update(dict(
-                url=self.url,
-                version=self.version)
-            )
-            return source_meta
+    def __init__(self, style, srs):
+        self.style = style
+        self.srs = srs
 
-    comp.WMSClientLayer = WMSClientLayer
+    def render_extent(self, extent, size):
+        return self.style.render_image(extent, size)
 
-    Style = comp.env.style.Style
+    def render_tile(self, tile, size):
+        extent = self.srs.tile_extent(tile)
+        return self.style.render_image(extent, (size, size))
 
-    class RenderRequest(object):
-        implements(IExtentRenderRequest, ITileRenderRequest)
 
-        def __init__(self, style, srs):
-            self.style = style
-            self.srs = srs
+@Style.registry.register
+class WMSClientStyle(Base, Style):
+    implements(IRenderableStyle)
 
-        def render_extent(self, extent, size):
-            return self.style.render_image(extent, size)
+    __tablename__ = 'wmsclient_style'
 
-        def render_tile(self, tile, size):
-            extent = self.srs.tile_extent(tile)
-            return self.style.render_image(extent, (size, size))
+    identity = __tablename__
+    __mapper_args__ = dict(polymorphic_identity=identity)
 
-    @Style.registry.register
-    class WMSClientStyle(Style):
-        implements(IRenderableStyle)
+    cls_display_name = u"WMS-стиль"
 
-        __tablename__ = 'wmsclient_style'
+    style_id = sa.Column(sa.ForeignKey(Style.id), primary_key=True)
+    wmslayers = sa.Column(sa.Unicode, nullable=False)
+    imgformat = sa.Column(sa.Unicode, nullable=False)
 
-        identity = __tablename__
-        __mapper_args__ = dict(polymorphic_identity=identity)
+    __mapper_args__ = dict(
+        polymorphic_identity=identity,
+    )
 
-        cls_display_name = u"WMS-стиль"
+    @classmethod
+    def is_layer_supported(cls, layer):
+        return layer.cls == 'wmsclient_layer'
 
-        style_id = sa.Column(sa.ForeignKey(Style.id), primary_key=True)
-        wmslayers = sa.Column(sa.Unicode, nullable=False)
-        imgformat = sa.Column(sa.Unicode, nullable=False)
+    def render_request(self, srs):
+        return RenderRequest(self, srs)
 
-        __mapper_args__ = dict(
-            polymorphic_identity=identity,
+    def render_image(self, extent, size):
+        query = dict(
+            service="WMS",
+            version="1.1.0",
+            request="GetMap",
+            layers=self.wmslayers,
+            styles="",
+            srs="EPSG:%d" % self.layer.srs_id,
+            bbox=','.join(map(str, extent)),
+            width=size[0], height=size[1],
+            format=self.imgformat,
+            transparent="true"
         )
 
-        @classmethod
-        def is_layer_supported(cls, layer):
-            return layer.cls == 'wmsclient_layer'
-
-        def render_request(self, srs):
-            return RenderRequest(self, srs)
-
-        def render_image(self, extent, size):
-            query = dict(
-                service="WMS",
-                version="1.1.0",
-                request="GetMap",
-                layers=self.wmslayers,
-                styles="",
-                srs="EPSG:%d" % self.layer.srs_id,
-                bbox=','.join(map(str, extent)),
-                width=size[0], height=size[1],
-                format=self.imgformat,
-                transparent="true"
-            )
-
-            url = self.layer.url + "?" + urllib.urlencode(query)
-            return PIL.Image.open(BytesIO(urllib2.urlopen(url).read()))
-
-    comp.WMSClientStyle = WMSClientStyle
+        url = self.layer.url + "?" + urllib.urlencode(query)
+        return PIL.Image.open(BytesIO(urllib2.urlopen(url).read()))

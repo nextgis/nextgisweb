@@ -8,12 +8,13 @@ from bunch import Bunch
 from ..views import model_context, permalinker, ModelController, DeleteObjectWidget
 from .. import dynmenu as dm
 from ..object_widget import ObjectWidget, CompositeWidget
+from ..layer import Layer
+
+from .models import Style
 
 
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
-    Layer = comp.env.layer.Layer
-    Style = comp.Style
 
     class StyleObjectWidget(ObjectWidget):
 
@@ -142,7 +143,7 @@ def setup_pyramid(comp, config):
         obj = DBSession.query(Style) \
             .with_polymorphic((actual_class, ))\
             .filter_by(id=obj.id).one()
-        
+
         request.require_permission(obj.layer, 'style-read')
 
         extent = map(float, request.GET['extent'].split(','))
@@ -181,7 +182,7 @@ def setup_pyramid(comp, config):
     config.add_route('style.show', '/layer/{layer_id:\d+}/style/{id:\d+}') \
         .add_view(show, renderer='obj.mako')
 
-    comp.Style.__dynmenu__ = dm.DynMenu(
+    Style.__dynmenu__ = dm.DynMenu(
         dm.Label('operation', u"Операции"),
         dm.Link(
             'operation/edit', u"Редактировать",
@@ -206,7 +207,7 @@ def setup_pyramid(comp, config):
         def build(self, kwargs):
             yield dm.Label('add-style', u"Добавить стиль")
 
-            for cls in comp.Style.registry:
+            for cls in Style.registry:
                 if cls.is_layer_supported(kwargs.obj):
                     yield dm.Link(
                         'add-style/%s' % cls.identity,
@@ -223,7 +224,7 @@ def setup_pyramid(comp, config):
                 )
             )
 
-    comp.env.layer.Layer.__dynmenu__.add(LayerMenuExt())
+    Layer.__dynmenu__.add(LayerMenuExt())
 
     comp.env.layer.layer_page_sections.register(
         key='styles',

@@ -8,11 +8,14 @@
             <th>Операции</th>
         </tr>
     </thead>
+
+    <% from nextgisweb.layer import Layer %>
+    
     %for idx, layer in enumerate(obj.layers, start=1):
         <tr>
             <td>${idx}</td>
             <td><a href="${layer.permalink(request)}">${layer.display_name}</a></td>
-            <td>${request.env.layer.Layer.registry[layer.cls].cls_display_name}</td>
+            <td>${Layer.registry[layer.cls].cls_display_name}</td>
             <td>${layer.owner_user}</td>
             <td>
                 <a href="${request.route_url('layer.edit', id=layer.id)}">редактировать</a>

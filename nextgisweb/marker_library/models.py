@@ -5,6 +5,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
 from ..models import declarative_base
+from ..env import env
 from ..file_storage import FileObj
 
 Base = declarative_base()
@@ -41,20 +42,10 @@ class Marker(Base):
     fileobj = orm.relationship(FileObj)
 
     def load_file(self, fp):
-        fileobj = self._file_storage.fileobj('marker_library')
-        filename = self._file_storage.filename(fileobj, makedirs=True)
+        fileobj = env.file_storage.fileobj('marker_library')
+        filename = env.file_storage.filename(fileobj, makedirs=True)
 
         with open(filename, 'wb') as fd:
             copyfileobj(fp, fd)
 
         self.fileobj = fileobj
-
-
-def initialize(comp):
-    Marker._file_storage = comp.env.file_storage
-
-    comp.metadata = Base.metadata
-
-    comp.MarkerCollection = MarkerCollection
-    comp.MarkerCategory = MarkerCategory
-    comp.Marker = Marker

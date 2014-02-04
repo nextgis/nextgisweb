@@ -2,7 +2,7 @@
 from ..component import Component
 
 from .feature import Feature, FeatureSet
-from .models import LayerField, LayerFieldsMixin
+from .models import Base, LayerField, LayerFieldsMixin
 from .interface import (
     GEOM_TYPE,
     FIELD_TYPE,
@@ -14,9 +14,11 @@ from .interface import (
     IFeatureQueryLike,
 )
 
+
 @Component.registry.register
 class FeatureLayerComponent(Component):
     identity = 'feature_layer'
+    metadata = Base.metadata
 
     def initialize(self):
         self.settings['identify.attributes'] = \

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from ..object_widget import ObjectWidget
+
+from .models import PostgisLayer
 
 
 class PostgisLayerObjectWidget(ObjectWidget):
@@ -50,8 +51,6 @@ class PostgisLayerObjectWidget(ObjectWidget):
 
 
 def setup_pyramid(comp, config):
-    PostgisLayer = comp.PostgisLayer
-
     PostgisLayer.object_widget = (
         (PostgisLayer.identity, PostgisLayerObjectWidget),
         ('feature_layer.fields', comp.env.feature_layer.LayerFieldsWidget),

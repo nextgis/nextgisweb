@@ -19,6 +19,7 @@ from ..psection import PageSections
 from .. import dynmenu as dm
 
 
+from .models import WebMap, WebMapItem
 from .plugin import WebmapPlugin
 from .adapter import WebMapAdapter
 
@@ -49,7 +50,6 @@ class WebmapObjectWidget(ObjectWidget):
 
 
 def setup_pyramid(comp, config):
-    WebMap = comp.WebMap
     ACLController = comp.env.security.ACLController
 
     permalinker(WebMap, "webmap.show")
@@ -101,7 +101,7 @@ def setup_pyramid(comp, config):
         def create_object(self, context):
             return WebMap(
                 owner_user=context['owner_user'],
-                root_item=comp.WebMapItem(item_type='root'),
+                root_item=WebMapItem(item_type='root'),
             )
 
         def query_object(self, context):
@@ -127,14 +127,14 @@ def setup_pyramid(comp, config):
 
     def browse(request):
         request.require_permission(WebMap.acl_root, 'read')
-        
+
         # В список карт попадают только те карты,
         # для которых у пользователя есть право на чтение
         obj_list = filter(lambda obj: obj.has_permission(request.user, 'read'), DBSession.query(WebMap))
 
         return dict(
             obj_list=obj_list,
-            dynmenu=request.env.webmap.WebMap.__dynmenu__,
+            dynmenu=WebMap.__dynmenu__,
             dynmenu_kwargs=Bunch(request=request),
         )
 
@@ -273,7 +273,7 @@ def setup_pyramid(comp, config):
     config.add_route('webmap.display', '/webmap/{id:\d+}/display') \
         .add_view(display, renderer='webmap/display.mako')
 
-    comp.WebMap.__dynmenu__ = WebMapMenu()
+    WebMap.__dynmenu__ = WebMapMenu()
 
     WebMap.__psections__ = PageSections()
 

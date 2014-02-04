@@ -7,10 +7,11 @@ from pyramid.response import Response
 
 from ..object_widget import ObjectWidget
 
+from .models import FeaturePhoto
+
 
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
-    FeaturePhoto = comp.FeaturePhoto
 
     file_upload = comp.env.file_upload
     file_storage = comp.env.file_storage
@@ -50,7 +51,7 @@ def setup_pyramid(comp, config):
                     keep.append(photo['id'])
 
             # Выбираем все файлы для удаления
-            query = DBSession.query(FeaturePhoto) \
+            query = FeaturePhoto.query() \
                 .filter_by(layer_id=self.layer.id, feature_id=self.obj.id) \
                 .filter(~FeaturePhoto.id.in_(keep))
 
