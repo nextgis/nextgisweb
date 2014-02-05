@@ -305,7 +305,9 @@ class ACLMixin(object):
 
             self.acl = ACL(**aclkwargs)
 
-        super(ACLMixin, self).postinit(**kwargs)
+        spr = super(ACLMixin, self)
+        if hasattr(spr, 'postinit'):
+            spr.postinit(**kwargs)
 
     def permission_set(self, *args, **kwargs):
         return self.acl.permission_set(*args, **kwargs)
