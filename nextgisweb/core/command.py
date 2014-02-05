@@ -1,9 +1,43 @@
 # -*- coding: utf-8 -*-
 from os.path import join as pthjoin
 from datetime import datetime
+import transaction
 
 from ..command import Command
+from ..models import DBSession
+
 from .backup import backup, restore
+
+
+@Command.registry.register
+class InitializeDBCmd():
+    identity = 'initialize_db'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        parser.add_argument('--drop', action="store_true", default=False,
+            help=u"Удалить существующие объекты из БД")
+
+    @classmethod
+    def execute(cls, args, env):
+        metadata = env.metadata()
+
+        with transaction.manager:
+            connection = DBSession.connection()
+
+            if args.drop:
+                metadata.drop_all(connection)
+
+            metadata.create_all(connection)
+
+            for comp in env.chain('initialize_db'):
+                comp.initialize_db()
+
+            # Не очень понятно почему так, но если в транзакции
+            # выполнялись только DDL операторы, то транзакция не
+            # записывается, форсируем костылем
+
+            connection.execute("COMMIT")
 
 
 @Command.registry.register
