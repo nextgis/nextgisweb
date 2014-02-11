@@ -11,6 +11,8 @@ define([
     "dojo/dom-construct",
     "dojo/dom-style",
     "dojo/request/xhr",
+    "dojo/io/script",
+    "ngw/openlayers",   //??? можно ли обойтись без импорта (нужен для перепроецирования)
     "feature_layer/FeatureGrid",
     "dijit/form/Button",
     "dijit/form/TextBox",
@@ -31,6 +33,8 @@ define([
     domConstruct,
     domStyle,
     xhr,
+    script,
+    openlayers,
     FeatureGrid,
     Button,
     TextBox,
@@ -260,6 +264,54 @@ define([
                         deferred = ndeferred;
                     };
                 }, this);
+
+                // Посылаем запрос на геокодирование
+                deferred.then(function (limit) {
+
+                    var NOMINATIM_SEARCH_URL = "http://nominatim.openstreetmap.org/search/";
+                    var CALLBACK = "json_callback";
+                    var url = NOMINATIM_SEARCH_URL + encodeURIComponent(criteria);
+
+                    var jsonpArgs = {
+                        url: url,
+                        callbackParamName: CALLBACK,
+                        content: {
+                            format: "json",
+                            jsonp: CALLBACK
+                        },
+                        error: function(error) {
+                            console.log('Error', error);
+                        },
+                        load: function (data) {
+                            array.forEach(data, function (place) {
+                                if (limit > 0) {
+                                    // Отформатируем ответ в виде удобном для отображения
+                                    // и покажем в списке ответов:
+
+                                    // Координаты приходят в WGS84
+                                    var extent = new openlayers.Bounds(
+                                        left=place.boundingbox[2],
+                                        bottom=place.boundingbox[0],
+                                        right=place.boundingbox[3],
+                                        top=place.boundingbox[1]
+                                    );
+                                    extent = extent.transform(
+                                        display.lonlatProjection,
+                                        display.displayProjection
+                                    );
+                                    var feature = {
+                                        label: place['display_name'],
+                                        box: extent
+                                    }
+                                    addResult(feature);
+                                };
+                                limit = limit - 1;
+                            });
+                        }
+                    };
+                    // TODO: выяснить, как работать с jsonp через xhr
+                    script.get(jsonpArgs);
+                }).otherwise(breakOrError);
 
                 deferred.then(function (limit) {
                     if (limit == MAX_SEARCH_RESULTS) {
