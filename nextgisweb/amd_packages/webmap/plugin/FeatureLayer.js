@@ -11,6 +11,8 @@ define([
     "dojo/dom-construct",
     "dojo/dom-style",
     "dojo/request/xhr",
+    "dojo/request/script",
+    "ngw/openlayers",
     "feature_layer/FeatureGrid",
     "dijit/form/Button",
     "dijit/form/TextBox",
@@ -31,6 +33,8 @@ define([
     domConstruct,
     domStyle,
     xhr,
+    script,
+    openlayers,
     FeatureGrid,
     Button,
     TextBox,
@@ -244,7 +248,7 @@ define([
                                 if (limit > 0) { addResult(itm); };
                                 limit = limit - 1;
                             })).then(function () {
-                                if (limit >= 0) {
+                                if (limit > 0) {
                                     ndeferred.resolve(limit);
                                 } else {
                                     setStatus("Уточните критерий поиска");
@@ -260,6 +264,62 @@ define([
                         deferred = ndeferred;
                     };
                 }, this);
+
+                var ndeferred = new Deferred();
+
+                // Посылаем запрос на геокодирование
+                deferred.then(function (limit) {
+
+                    var NOMINATIM_SEARCH_URL = "http://nominatim.openstreetmap.org/search/";
+                    var CALLBACK = "json_callback";
+                    var url = NOMINATIM_SEARCH_URL + encodeURIComponent(criteria);
+
+                    jsonpArgs = {
+                        jsonp: CALLBACK,
+                        query: {format: "json"}
+                    };
+
+                    script.get(url, jsonpArgs).then(function (data) {
+                        array.forEach(data, function (place) {
+                            if (limit > 0) {
+                                // Отформатируем ответ в виде удобном для отображения
+                                // и покажем в списке ответов:
+
+                                // Координаты приходят в WGS84
+                                var extent = new openlayers.Bounds(
+                                    place.boundingbox[2], place.boundingbox[0],
+                                    place.boundingbox[3], place.boundingbox[1]
+                                );
+
+                                extent = extent.transform(
+                                    display.lonlatProjection,
+                                    display.displayProjection
+                                );
+
+                                var feature = {
+                                    label: place['display_name'],
+                                    box: extent
+                                };
+
+                                addResult(feature);
+                            };
+                            limit = limit - 1;
+                        });
+
+                        if (limit > 0) {
+                            ndeferred.resolve(limit);
+                        } else {
+                            setStatus("Уточните критерий поиска");
+                            ndeferred.reject();
+                        };
+                     });
+                }, function (err) {
+                    // Если что-то пошло не так с конкретным слоем,
+                    // то все равно продолжаем поиск по следующему
+                    ndeferred.resolve(limit);
+                }).otherwise(breakOrError);
+
+                deferred = ndeferred;
 
                 deferred.then(function (limit) {
                     if (limit == MAX_SEARCH_RESULTS) {
