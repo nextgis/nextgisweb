@@ -32,7 +32,7 @@ def setup_pyramid(comp, config):
 
         def view_get(self, request):
             obj = self.context(request)
-            request.require_permission(obj, 'security-view')
+            # request.require_permission(obj, 'security-view')
 
             acl_items = [
                 dict(
@@ -57,7 +57,7 @@ def setup_pyramid(comp, config):
 
         def view_post(self, request):
             obj = self.context(request)
-            request.require_permission(obj, 'security-edit')
+            # request.require_permission(obj, 'security-edit')
 
             def iteritems():
                 for r in request.json_body:

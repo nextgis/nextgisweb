@@ -2,6 +2,7 @@ define([
     "dojo/_base/declare",
     "dojo/store/JsonRest",
     "dojo/json",
+    "ngw/route",
 ], function (
     declare,
     JsonRest,

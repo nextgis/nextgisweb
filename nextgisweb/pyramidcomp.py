@@ -15,6 +15,69 @@ from .component import Component
 from . import dynmenu as dm
 
 
+def viewargs(**kw):
+
+    def wrap(f):
+
+        def wrapped(request, *args, **kwargs):
+            return f(request, *args, **kwargs)
+
+        wrapped.__name__ = 'args(%s)' % f.__name__
+        wrapped.__viewargs__ = kw
+
+        return wrapped
+
+    return wrap
+
+
+class RequestMethodPredicate(object):
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return 'method = %s' % (self.val,)
+
+    phash = text
+
+    def __call__(self, context, request):
+        return getattr(request, 'method', None) == self.val
+
+
+class JsonPredicate(object):
+    target = ('application/json', )
+    test = (
+        'text/html',
+        'application/xhtml+xml',
+        'application/xml'
+    )
+
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return 'json'
+
+    phash = text
+
+    def __call__(self, context, request):
+        return self.val and (
+            request.accept.best_match(self.target + self.test) in self.target
+            or request.GET.get('format', None) == 'json')
+
+
+class ClientRoutePredicate(object):
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return 'client'
+
+    phash = text
+
+    def __call__(self, context, request):
+        return True
+
+
 class RouteHelper(object):
 
     def __init__(self, name, config):
@@ -53,6 +116,13 @@ class ExtendedConfigurator(Configurator):
         super(ExtendedConfigurator, self).add_route(name, pattern=pattern, **kwargs)
         return RouteHelper(name, self)
 
+    def add_view(self, view=None, **kwargs):
+        vargs = getattr(view, '__viewargs__', None)
+        if vargs:
+            kwargs = dict(vargs, **kwargs)
+
+        super(ExtendedConfigurator, self).add_view(view=view, **kwargs)
+
 
 @Component.registry.register
 class PyramidComponent(Component):
@@ -64,6 +134,11 @@ class PyramidComponent(Component):
         settings['mako.directories'] = 'nextgisweb:templates/'
 
         config = ExtendedConfigurator(settings=settings)
+
+        config.add_route_predicate('client', ClientRoutePredicate)
+
+        config.add_view_predicate('method', RequestMethodPredicate)
+        config.add_view_predicate('json', JsonPredicate)
 
         # возможность доступа к Env через request.env
         config.set_request_property(lambda (req): self._env, 'env')
@@ -128,6 +203,24 @@ class PyramidComponent(Component):
 
         config.add_route('pyramid.settings', '/settings') \
             .add_view(settings, renderer='json')
+
+        def routes(request):
+            result = dict()
+            introspector = request.registry.introspector
+            for itm in introspector.get_category('routes'):
+                route = itm['introspectable']['object']
+                for p in route.predicates:
+                    if isinstance(p, ClientRoutePredicate):
+                        result[route.name] = dict(
+                            pattern=route.generate(dict(
+                                [(k, '__%s__' % k)
+                                 for k in p.val])),
+                            keys=p.val)
+
+            return result
+
+        config.add_route('pyramid.routes', '/pyramid/routes') \
+            .add_view(routes, renderer='json', json=True)
 
         def control_panel(request):
             if not request.user.is_administrator:

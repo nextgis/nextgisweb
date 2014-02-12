@@ -6,8 +6,8 @@ import PIL
 from zope.interface import implements
 
 from ..models import declarative_base
+from ..resource import Resource, DataScope
 from ..style import (
-    Style,
     IRenderableStyle,
     IExtentRenderRequest,
     ITileRenderRequest,
@@ -31,37 +31,29 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
-@Style.registry.register
-class RasterStyle(Base, Style):
+@Resource.registry.register
+class RasterStyle(Base, DataScope, Resource):
     implements(IRenderableStyle)
 
-    __tablename__ = 'raster_style'
-
-    identity = __tablename__
+    identity = 'raster_style'
     cls_display_name = u"Растровый стиль"
 
-    style_id = sa.Column(sa.ForeignKey(Style.id), primary_key=True)
+    __tablename__ = identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
 
-    __mapper_args__ = dict(
-        polymorphic_identity=identity,
-    )
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     widget_module = 'raster_style/Widget'
 
     @classmethod
-    def is_layer_supported(cls, layer):
-        return layer.cls == 'raster_layer'
+    def check_parent(self, parent):
+        return parent.cls == 'raster_layer'
 
     def render_request(self, srs):
         return RenderRequest(self, srs)
 
-    @classmethod
-    def widget_config(cls, layer):
-        result = Style.widget_config(layer)
-        return result
-
     def render_image(self, extent, size):
-        ds = self.layer.gdal_dataset()
+        ds = self.parent.gdal_dataset()
         gt = ds.GetGeoTransform()
 
         result = PIL.Image.new("RGBA", size, (0, 0, 0, 0))
@@ -93,7 +85,8 @@ class RasterStyle(Base, Style):
         # нижняя граница
         if off_y + width_y > ds.RasterYSize:
             oversize_bottom = off_y + width_y - ds.RasterYSize
-            target_height -= round(float(oversize_bottom) / width_y * target_height)
+            target_height -= round(float(oversize_bottom)
+                                   / width_y * target_height)
             width_y -= oversize_bottom
 
         # верхняя граница
@@ -110,7 +103,8 @@ class RasterStyle(Base, Style):
             return result
 
         band_count = ds.RasterCount
-        array = numpy.zeros((target_height, target_width, band_count), numpy.uint8)
+        array = numpy.zeros((target_height, target_width, band_count),
+                            numpy.uint8)
 
         for i in range(band_count):
             array[:, :, i] = gdal_array.BandReadAsArray(

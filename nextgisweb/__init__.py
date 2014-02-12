@@ -24,6 +24,7 @@ def pkginfo():
         'pyramidcomp',
         'auth',
         'security',
+        'resource',
         'spatial_ref_sys',
         'layer_group',
         'layer',
@@ -95,4 +96,7 @@ def amd_packages():
         ('raster_layer', 'nextgisweb:amd_packages/raster_layer'),
         ('raster_style', 'nextgisweb:amd_packages/raster_style'),
         ('wmsclient', 'nextgisweb:amd_packages/wmsclient'),
+
+        # Пакеты компонентов
+        ('ngw-resource', 'nextgisweb:resource/amdmod'),
     )

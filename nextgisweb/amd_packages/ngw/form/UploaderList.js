@@ -9,6 +9,7 @@ define([
     "dojox/form/uploader/FileList",
     "dojox/form/uploader/plugins/HTML5",
     "dojox/form/uploader/plugins/Flash",
+    "ngw/route",
     // css
     "xstyle/css!./resources/UploaderList.css"
 ], function (
@@ -19,7 +20,10 @@ define([
     _WidgetsInTemplateMixin,
     template,
     Uploader,
-    FileList
+    FileList,
+    HTML5,
+    Flash,
+    route
 ) {
     // TODO: Убрать после обновления Dojo до 1.9
     Uploader = dojox.form.Uploader;
@@ -32,7 +36,7 @@ define([
                 label: "Выбрать",
                 multiple: true,
                 uploadOnSelect: true,
-                url: ngwConfig.applicationUrl + '/file_upload/upload',
+                url: route("file_upload.upload"),
                 name: "file"
             }).placeAt(this.fileUploader);
 

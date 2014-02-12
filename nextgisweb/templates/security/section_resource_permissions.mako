@@ -1,6 +1,6 @@
 <%
     permissions = request.env.security.permissions[obj.acl.resource]
-    permission_set = obj.acl.permission_set(request.user)
+    permission_set = 
 %>
 
 <table class="data" style="width: 100%">

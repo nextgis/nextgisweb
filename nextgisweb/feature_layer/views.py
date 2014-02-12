@@ -114,8 +114,11 @@ def setup_pyramid(comp, config):
             custom_layout=True
         )
 
-    config.add_route('feature_layer.feature.browse', '/layer/{id:\d+}/feature/')
-    config.add_view(browse, route_name='feature_layer.feature.browse', renderer='feature_layer/feature_browse.mako')
+    config.add_route('feature_layer.feature.browse', '/layer/{id:\d+}/feature/',
+                     client=('id', ))
+
+    config.add_view(browse, route_name='feature_layer.feature.browse',
+                    renderer='feature_layer/feature_browse.mako')
 
     @model_context(Layer)
     def edit(request, layer):

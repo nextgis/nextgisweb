@@ -55,5 +55,5 @@ def includeme(config, comp, env):
             "%s" % json.dumps(dict(upload_meta=metas))
         )
 
-    config.add_route('file_upload.upload', '/file_upload/upload')\
+    config.add_route('file_upload.upload', '/file_upload/upload', client=()) \
         .add_view(upload)

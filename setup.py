@@ -12,6 +12,7 @@ requires = [
     'zope.sqlalchemy',
     'zope.interface',
     'bunch',
+    'flufl.enum',
     'waitress',
     'nose',
 

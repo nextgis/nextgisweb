@@ -15,7 +15,7 @@ def model_context(cls, key='id'):
     
     def wrap(f):
     
-        def wrapped_f(request, *args, **kwargs):
+        def wrapped(request, *args, **kwargs):
             obj = DBSession.query(cls).get(request.matchdict[key])
 
             if not obj:
@@ -23,7 +23,9 @@ def model_context(cls, key='id'):
 
             return f(request, *(args + (obj, )), **kwargs)
 
-        return wrapped_f
+        wrapped.__name__ = 'model(%s, %s)' % (cls.__name__, f.__name__)
+
+        return wrapped
 
     return wrap
 

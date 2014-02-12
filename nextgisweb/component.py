@@ -13,6 +13,12 @@ class Component(object):
         self._settings = settings
 
     def initialize(self):
+        """ Первая стадия инициализации, вызывается перед запуском системы """
+        pass
+
+    def configure(self):
+        """ Вторая стадия инициализации, вызывается после того, как для всех
+        компонентов выполнена первая стадия (initialize) """
         pass
 
     def initialize_db(self):

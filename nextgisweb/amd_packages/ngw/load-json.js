@@ -5,8 +5,9 @@ define([
 ) {
     return {
         load: function (id, require, load) {
-            xhr.get(ngwConfig.applicationUrl + '/' + id, {
-                handleAs: 'json'
+            xhr.get(ngwConfig.applicationUrl + "/" + id, {
+                handleAs: "json",
+                headers: { "Accept": "application/json" }
             }).then(
                 function (data) {
                     load(data);

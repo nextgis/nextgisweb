@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from zope.interface import Interface
 
+from ..resource import IResourceInterface
 
-class IRenderableStyle(Interface):
+
+class IRenderableStyle(IResourceInterface):
 
     def render_request(self, srs):
         pass

@@ -8,20 +8,23 @@ from osgeo import gdal, gdalconst, osr
 
 from ..models import declarative_base
 from ..env import env
-from ..layer import Layer, SpatialLayerMixin
+from ..resource import Resource, DataScope
+from ..layer import SpatialLayerMixin
 from ..file_storage import FileObj
 
 Base = declarative_base()
 
 
-@Layer.registry.register
-class RasterLayer(Base, Layer, SpatialLayerMixin):
-    __tablename__ = 'raster_layer'
-
-    identity = __tablename__
+@Resource.registry.register
+class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
+    identity = 'raster_layer'
     cls_display_name = u"Растровый слой"
 
-    layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
+    __tablename__ = identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
+
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 
     xsize = sa.Column(sa.Integer, nullable=False)
@@ -30,9 +33,9 @@ class RasterLayer(Base, Layer, SpatialLayerMixin):
 
     fileobj = orm.relationship(FileObj, cascade='all')
 
-    __mapper_args__ = dict(
-        polymorphic_identity=identity,
-    )
+    @classmethod
+    def check_parent(self, parent):
+        return parent.cls == 'resource_group'
 
     def load_file(self, filename, env):
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)

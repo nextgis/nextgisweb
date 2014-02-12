@@ -111,6 +111,7 @@ def setup_pyramid(comp, config):
     StyleController(
         'style',
         url_base='/layer/{layer_id:\d+}/style',
+        client_base=('layer_id', )
     ).includeme(config)
 
     @model_context(Style)

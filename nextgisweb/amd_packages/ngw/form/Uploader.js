@@ -1,4 +1,4 @@
-/*global define, dojox, ngwConfig*/
+/*global define, dojox */
 define([
     "dojo/_base/declare",
     "dojo/Deferred",
@@ -8,7 +8,8 @@ define([
     "dojo/text!./templates/Uploader.html",
     "dojox/form/Uploader",
     "dojox/form/uploader/plugins/HTML5",
-    "dojox/form/uploader/plugins/Flash"
+    "dojox/form/uploader/plugins/Flash",
+    "ngw/route"
 ], function (
     declare,
     Deferred,
@@ -17,19 +18,21 @@ define([
     _WidgetsInTemplateMixin,
     template,
     Uploader,
-    FlashUploader
+    HTML5Uploader,
+    FlashUploader,
+    route
 ) {
     // Uploader AMD workaround
     Uploader = dojox.form.Uploader;
 
     function readableFileSize(size) {
-        var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        var units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
         var i = 0;
         while (size >= 1024) {
             size /= 1024;
             ++i;
         }
-        return size.toFixed(1) + ' ' + units[i];
+        return size.toFixed(1) + " " + units[i];
     }
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -44,7 +47,7 @@ define([
                 label: "Выбрать",
                 multiple: false,
                 uploadOnSelect: true,
-                url: ngwConfig.applicationUrl + '/file_upload/upload',
+                url: route("file_upload.upload"),
                 name: "file"
             }).placeAt(this.fileUploader);
 

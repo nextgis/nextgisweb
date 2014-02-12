@@ -56,6 +56,7 @@
     </div>
 
     <ul class="span-24 menu">
+      <li><a href="${request.route_url('resource')}">Ресурсы</a></li>
       <li><a href="${request.route_url('webmap.browse')}">Веб-карты</a></li>
       <li><a href="${request.route_url('layer')}">Слои</a></li>
 

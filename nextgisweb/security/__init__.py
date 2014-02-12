@@ -95,7 +95,9 @@ class SecurityComponent(Component):
     def add_resource(self, resource, **kwargs):
         resource = self.resource_name(resource)
 
-        assert resource not in self._resources
+        assert resource not in self._resources, \
+            "Resource already exists: %s" % resource
+
         self._resources[resource] = kwargs
         self._children[resource] = list()
         self._permissions[resource] = dict()

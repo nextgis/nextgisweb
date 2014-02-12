@@ -6,7 +6,8 @@ from ..models import DBSession
 
 class ModelController(object):
 
-    def __init__(self, route_prefix, url_base=None, item_path='{id:\d+}'):
+    def __init__(self, route_prefix, url_base=None, item_path='{id:\d+}',
+                 client_base=(), client=('id', )):
         if not url_base:
             url_base = '/%s' % route_prefix
 
@@ -14,16 +15,27 @@ class ModelController(object):
         self.url_base = url_base
         self.item_path = item_path
 
+        self.client_base = client_base
+        self.client = client
+
     def includeme(self, config):
         route = lambda (s): self.route_prefix + '.' + s
 
-        config.add_route(route('create'), self.url_base + '/create')
+        config.add_route(route('create'), self.url_base + '/create',
+                         client=self.client_base)
+
         config.add_view(self.create, route_name=route('create'))
 
-        config.add_route(route('edit'), '%s/%s/edit' % (self.url_base, self.item_path))
+        config.add_route(route('edit'),
+                         '%s/%s/edit' % (self.url_base, self.item_path),
+                         client=self.client_base + self.client)
+
         config.add_view(self.edit, route_name=route('edit'))
 
-        config.add_route(route('delete'), '%s/%s/delete' % (self.url_base, self.item_path))
+        config.add_route(route('delete'),
+                         '%s/%s/delete' % (self.url_base, self.item_path),
+                         client=self.client_base + self.client)
+
         config.add_view(self.delete, route_name=route('delete'))
 
     def create_context(self, request):

@@ -54,13 +54,14 @@ class Env(object):
         return [self._components[i] for i in traverse.seq]
 
     def initialize(self):
-        seq = list(self.chain('initialize'))
-
-        for c in seq:
+        for c in list(self.chain('initialize')):
             c.initialize()
 
             if hasattr(c, 'metadata'):
                 c.metadata.bind = self.core.engine
+
+        for c in list(self.chain('configure')):
+            c.configure()
 
     def metadata(self):
         """ Возвращает объект sa.MetaData объединяющий метаданные всех
