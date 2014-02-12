@@ -11,6 +11,7 @@ define([
     "dojo/promise/all",
     "dojo/number",
     "dojo/aspect",
+    "dojo/io-query",
     "ngw/openlayers",
     "ngw/openlayers/Map",
     "dijit/registry",
@@ -41,7 +42,8 @@ define([
     "dijit/form/Button",
     "dijit/form/Select",
     "dijit/form/DropDownButton",
-    "dijit/ToolbarSeparator"
+    "dijit/ToolbarSeparator",
+    "dijit/Dialog"
 ], function (
     declare,
     _WidgetBase,
@@ -54,6 +56,7 @@ define([
     all,
     number,
     aspect,
+    ioQuery,
     openlayers,
     Map,
     registry,
@@ -151,11 +154,25 @@ define([
         // Вызов после startup
         _startupDeferred: undefined,
 
+        // GET-параметры: подложка, слои, стартовый охват
+        _getParams: undefined,
+
         // Для загрузки изображения
         assetUrl: ngwConfig.assetUrl,
 
         constructor: function (options) {
             declare.safeMixin(this, options);
+
+            // Извлекаем GET-параметры из URL
+            this._getParams = (function(){
+                var url, query;
+                url = window.location.toString();
+                if (url.indexOf("?") !== -1) {
+                    query = url.substring(url.indexOf("?") + 1, url.length);
+                    return ioQuery.queryToObject(query);
+                }
+                return {};
+            })();
 
             this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
             this._mapDeferred = new LoggedDeferred("_mapDeferred");
@@ -210,7 +227,7 @@ define([
             this.displayProjection = new openlayers.Projection('EPSG:3857');
             this.lonlatProjection = new openlayers.Projection('EPSG:4326');
 
-            this._extent = new openlayers.Bounds(this.config.extent)
+            this._extent = this._getParams.bbox ? new openlayers.Bounds.fromString(this._getParams.bbox) : new openlayers.Bounds(this.config.extent)
                 .transform(this.lonlatProjection, this.displayProjection);
 
 
@@ -265,6 +282,7 @@ define([
                     widget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
                         widget.map.olMap.setBaseLayer(widget.map.layers[newVal].olLayer);
                     });
+                    if (widget._getParams.base) { widget.basemapSelect.set("value", widget._getParams.base); }
                 }
             ).then(undefined, function (err) { console.error(err); });
 
@@ -448,10 +466,25 @@ define([
                     copy.styleId = item.styleId;
 
                     copy.visibility = null;
-                    copy.checked = item.visibility;
+
+                    var visibleLayers = this._getParams.layers;
+                    if (visibleLayers) {
+                        visibleLayers = visibleLayers instanceof Array ? visibleLayers : [visibleLayers];
+                        if (array.indexOf(
+                            array.map(visibleLayers, function (i) {
+                                return parseInt(i, 10);
+                            }),
+                            copy.layerId) !== -1) {
+                            copy.checked = true;
+                        } else {
+                            copy.checked = false;
+                        }
+                    } else {
+                        copy.checked = item.visibility;
+                    }
 
                 } else if (copy.type === 'group' || copy.type === 'root') {
-                    copy.children = array.map(item.children, function (c) { return prepare_item(c); });
+                    copy.children = array.map(item.children, lang.hitch(this, function (c) { return prepare_item.call(this, c); }));
                 }
 
                 // Для всего остального строим индекс
@@ -460,7 +493,7 @@ define([
                 return copy;
             }
 
-            var rootItem = prepare_item(this.config.rootItem);
+            var rootItem = prepare_item.call(this, this.config.rootItem);
 
             this.itemStore = new CustomItemFileWriteStore({data: {
                 identifier: "id",
@@ -702,6 +735,36 @@ define([
 
         _zoomToInitialExtent: function () {
             this.map.olMap.zoomToExtent(this._extent)
+        },
+
+        _getPermalink: function () {
+            all({
+                visbleItems: this.getVisibleItems(),
+                map: this._mapDeferred
+            }).then(
+                lang.hitch(this, function (results) {
+                    var visibleLayers, queryStr, permalink;
+
+                    visibleLayers = array.map(
+                        results.visbleItems,
+                        lang.hitch(this, function (i) {
+                            return this.itemStore.dumpItem(i).layerId;
+                        })
+                    );
+                    
+                    queryStr = ioQuery.objectToQuery({
+                        base: this.map.olMap.baseLayer.keyname,
+                        bbox: this.map.olMap.getExtent(),
+                        layers: visibleLayers
+                    });
+
+                    permalink = ngwConfig.applicationUrl + window.location.pathname + "?" + queryStr;
+
+                    this.permalinkDialog.set("content", permalink);
+                    this.permalinkDialog.show();
+                }),
+                function (error) { console.log(error); }
+            );
         }
     });
 });
