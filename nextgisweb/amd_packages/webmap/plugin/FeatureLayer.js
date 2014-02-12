@@ -12,7 +12,7 @@ define([
     "dojo/dom-style",
     "dojo/request/xhr",
     "dojo/request/script",
-    "ngw/openlayers",   //??? можно ли обойтись без импорта (нужен для перепроецирования)
+    "ngw/openlayers",
     "feature_layer/FeatureGrid",
     "dijit/form/Button",
     "dijit/form/TextBox",
@@ -248,7 +248,7 @@ define([
                                 if (limit > 0) { addResult(itm); };
                                 limit = limit - 1;
                             })).then(function () {
-                                if (limit >= 0) {
+                                if (limit > 0) {
                                     ndeferred.resolve(limit);
                                 } else {
                                     setStatus("Уточните критерий поиска");
@@ -265,6 +265,8 @@ define([
                     };
                 }, this);
 
+                var ndeferred = new Deferred();
+
                 // Посылаем запрос на геокодирование
                 deferred.then(function (limit) {
 
@@ -276,8 +278,8 @@ define([
                         jsonp: CALLBACK,
                         query: {format: "json"}
                     };
-                    script.get(url, jsonpArgs).then(function (data)
-                    {
+
+                    script.get(url, jsonpArgs).then(function (data) {
                         array.forEach(data, function (place) {
                             if (limit > 0) {
                                 // Отформатируем ответ в виде удобном для отображения
@@ -285,25 +287,39 @@ define([
 
                                 // Координаты приходят в WGS84
                                 var extent = new openlayers.Bounds(
-                                    left=place.boundingbox[2],
-                                    bottom=place.boundingbox[0],
-                                    right=place.boundingbox[3],
-                                    top=place.boundingbox[1]
+                                    place.boundingbox[2], place.boundingbox[0],
+                                    place.boundingbox[3], place.boundingbox[1]
                                 );
+
                                 extent = extent.transform(
                                     display.lonlatProjection,
                                     display.displayProjection
                                 );
+
                                 var feature = {
                                     label: place['display_name'],
                                     box: extent
-                                }
+                                };
+
                                 addResult(feature);
                             };
                             limit = limit - 1;
                         });
+
+                        if (limit > 0) {
+                            ndeferred.resolve(limit);
+                        } else {
+                            setStatus("Уточните критерий поиска");
+                            ndeferred.reject();
+                        };
                      });
+                }, function (err) {
+                    // Если что-то пошло не так с конкретным слоем,
+                    // то все равно продолжаем поиск по следующему
+                    ndeferred.resolve(limit);
                 }).otherwise(breakOrError);
+
+                deferred = ndeferred;
 
                 deferred.then(function (limit) {
                     if (limit == MAX_SEARCH_RESULTS) {
