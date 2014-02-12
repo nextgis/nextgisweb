@@ -758,7 +758,7 @@ define([
                         layers: visibleLayers
                     });
 
-                    permalink = ngwConfig.applicationUrl + window.location.pathname + "?" + queryStr;
+                    permalink = window.location.origin + window.location.pathname + "?" + queryStr;
 
                     this.permalinkDialog.set("content", permalink);
                     this.permalinkDialog.show();
