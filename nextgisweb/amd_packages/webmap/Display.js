@@ -466,25 +466,10 @@ define([
                     copy.styleId = item.styleId;
 
                     copy.visibility = null;
-
-                    var visibleLayers = this._getParams.layers;
-                    if (visibleLayers) {
-                        visibleLayers = visibleLayers instanceof Array ? visibleLayers : [visibleLayers];
-                        if (array.indexOf(
-                            array.map(visibleLayers, function (i) {
-                                return parseInt(i, 10);
-                            }),
-                            copy.layerId) !== -1) {
-                            copy.checked = true;
-                        } else {
-                            copy.checked = false;
-                        }
-                    } else {
-                        copy.checked = item.visibility;
-                    }
+                    copy.checked = item.visibility;
 
                 } else if (copy.type === 'group' || copy.type === 'root') {
-                    copy.children = array.map(item.children, lang.hitch(this, function (c) { return prepare_item.call(this, c); }));
+                    copy.children = array.map(item.children, function (c) { return prepare_item(c); });
                 }
 
                 // Для всего остального строим индекс
@@ -493,7 +478,7 @@ define([
                 return copy;
             }
 
-            var rootItem = prepare_item.call(this, this.config.rootItem);
+            var rootItem = prepare_item(this.config.rootItem);
 
             this.itemStore = new CustomItemFileWriteStore({data: {
                 identifier: "id",
