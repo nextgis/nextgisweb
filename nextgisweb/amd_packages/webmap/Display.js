@@ -759,7 +759,7 @@ define([
 
                     permalink = window.location.origin + window.location.pathname + "?" + queryStr;
 
-                    this.permalinkDialog.set("content", permalink);
+                    this.permalinkContent.set("content", permalink);
                     this.permalinkDialog.show();
                 }),
                 function (error) { console.log(error); }
