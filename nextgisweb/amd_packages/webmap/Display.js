@@ -43,7 +43,8 @@ define([
     "dijit/form/Select",
     "dijit/form/DropDownButton",
     "dijit/ToolbarSeparator",
-    "dijit/Dialog"
+    "dijit/Dialog",
+    "dijit/form/TextBox"
 ], function (
     declare,
     _WidgetBase,
@@ -759,8 +760,9 @@ define([
 
                     permalink = window.location.origin + window.location.pathname + "?" + queryStr;
 
-                    this.permalinkContent.set("content", permalink);
+                    this.permalinkContent.set("value", permalink);
                     this.permalinkDialog.show();
+
                 }),
                 function (error) { console.log(error); }
             );
