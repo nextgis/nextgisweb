@@ -155,7 +155,7 @@ define([
         _startupDeferred: undefined,
 
         // GET-параметры: подложка, слои, стартовый охват
-        _getParams: undefined,
+        _urlParams: undefined,
 
         // Для загрузки изображения
         assetUrl: ngwConfig.assetUrl,
@@ -164,12 +164,15 @@ define([
             declare.safeMixin(this, options);
 
             // Извлекаем GET-параметры из URL
-            this._getParams = (function(){
-                var url, query;
+            this._urlParams = (function(){
+                var url, query, queryObject;
                 url = window.location.toString();
                 if (url.indexOf("?") !== -1) {
                     query = url.substring(url.indexOf("?") + 1, url.length);
-                    return ioQuery.queryToObject(query);
+                    queryObject = ioQuery.queryToObject(query);
+                    queryObject.layers = queryObject.layers instanceof Array ? queryObject.layers : [queryObject.layers];
+                    queryObject.layers = array.map(queryObject.layers, function(i){ return parseInt(i, 10); });
+                    return queryObject;
                 }
                 return {};
             })();
@@ -227,7 +230,7 @@ define([
             this.displayProjection = new openlayers.Projection('EPSG:3857');
             this.lonlatProjection = new openlayers.Projection('EPSG:4326');
 
-            this._extent = this._getParams.bbox ? new openlayers.Bounds.fromString(this._getParams.bbox) : new openlayers.Bounds(this.config.extent)
+            this._extent = this._urlParams.bbox ? new openlayers.Bounds.fromString(this._urlParams.bbox) : new openlayers.Bounds(this.config.extent)
                 .transform(this.lonlatProjection, this.displayProjection);
 
 
@@ -240,7 +243,7 @@ define([
             });
 
             // Размещаем дерево, когда виджет будет готов           
-            this._postCreateDeferred.then(
+            all([this._layersDeferred, this._postCreateDeferred]).then(
                 function () { widget.itemTree.placeAt(widget.layerTreePane); }
             ).then(undefined, function (err) { console.error(err); });
 
@@ -282,7 +285,7 @@ define([
                     widget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
                         widget.map.olMap.setBaseLayer(widget.map.layers[newVal].olLayer);
                     });
-                    if (widget._getParams.base) { widget.basemapSelect.set("value", widget._getParams.base); }
+                    if (widget._urlParams.base) { widget.basemapSelect.set("value", widget._urlParams.base); }
                 }
             ).then(undefined, function (err) { console.error(err); });
 
@@ -624,6 +627,17 @@ define([
                 onItem: function (item) {
                     widget._layerSetup(item);
                     widget._layer_order.unshift(store.getValue(item, "id"));
+                    
+                    // Включаем слои, указанные в URL
+                    var cond,
+                        layer = widget._layers[store.getValue(item, "id")],
+                        visibleLayers = widget._urlParams.layers;
+                    if (visibleLayers) {
+                        cond = array.indexOf(visibleLayers, store.getValue(item, "layerId")) !== -1;
+                        layer.olLayer.setVisibility(cond);
+                        layer.visibility = cond;
+                        store.setValue(item, "checked", cond);
+                    }
                 },
                 onComplete: function () {
                     widget._layersDeferred.resolve();
