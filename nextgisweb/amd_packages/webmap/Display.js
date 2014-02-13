@@ -170,8 +170,8 @@ define([
                 if (url.indexOf("?") !== -1) {
                     query = url.substring(url.indexOf("?") + 1, url.length);
                     queryObject = ioQuery.queryToObject(query);
-                    queryObject.layers = queryObject.layers instanceof Array ? queryObject.layers : [queryObject.layers];
-                    queryObject.layers = array.map(queryObject.layers, function(i){ return parseInt(i, 10); });
+                    queryObject.styles = queryObject.styles instanceof Array ? queryObject.styles : [queryObject.styles];
+                    queryObject.styles = array.map(queryObject.styles, function(i){ return parseInt(i, 10); });
                     return queryObject;
                 }
                 return {};
@@ -631,9 +631,9 @@ define([
                     // Включаем слои, указанные в URL
                     var cond,
                         layer = widget._layers[store.getValue(item, "id")],
-                        visibleLayers = widget._urlParams.layers;
-                    if (visibleLayers) {
-                        cond = array.indexOf(visibleLayers, store.getValue(item, "layerId")) !== -1;
+                        visibleStyles = widget._urlParams.styles;
+                    if (visibleStyles) {
+                        cond = array.indexOf(visibleStyles, store.getValue(item, "styleId")) !== -1;
                         layer.olLayer.setVisibility(cond);
                         layer.visibility = cond;
                         store.setValue(item, "checked", cond);
@@ -744,17 +744,17 @@ define([
                 lang.hitch(this, function (results) {
                     var visibleLayers, queryStr, permalink;
 
-                    visibleLayers = array.map(
+                    visibleStyles = array.map(
                         results.visbleItems,
                         lang.hitch(this, function (i) {
-                            return this.itemStore.dumpItem(i).layerId;
+                            return this.itemStore.dumpItem(i).styleId;
                         })
                     );
                     
                     queryStr = ioQuery.objectToQuery({
                         base: this.map.olMap.baseLayer.keyname,
                         bbox: this.map.olMap.getExtent(),
-                        layers: visibleLayers
+                        styles: visibleStyles
                     });
 
                     permalink = window.location.origin + window.location.pathname + "?" + queryStr;
