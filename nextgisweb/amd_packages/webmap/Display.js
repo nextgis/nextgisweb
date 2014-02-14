@@ -171,7 +171,7 @@ define([
                 if (url.indexOf("?") !== -1) {
                     query = url.substring(url.indexOf("?") + 1, url.length);
                     queryObject = ioQuery.queryToObject(query);
-                    queryObject.styles = queryObject.styles instanceof Array ? queryObject.styles : [queryObject.styles];
+                    queryObject.styles = queryObject.styles.split(",");
                     queryObject.styles = array.map(queryObject.styles, function(i){ return parseInt(i, 10); });
                     return queryObject;
                 }
@@ -755,12 +755,12 @@ define([
                     queryStr = ioQuery.objectToQuery({
                         base: this.map.olMap.baseLayer.keyname,
                         bbox: this.map.olMap.getExtent(),
-                        styles: visibleStyles
+                        styles: visibleStyles.join(",")
                     });
 
                     permalink = window.location.origin + window.location.pathname + "?" + queryStr;
 
-                    this.permalinkContent.set("value", permalink);
+                    this.permalinkContent.set("value", decodeURIComponent(permalink));
                     this.permalinkDialog.show();
 
                 }),
