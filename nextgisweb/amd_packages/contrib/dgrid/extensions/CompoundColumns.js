@@ -1,5 +1,9 @@
-define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put", "xstyle/css!../css/extensions/CompoundColumns.css"],
-		function(lang, declare, Grid, put){
+define([
+	"dojo/_base/lang",
+	"dojo/_base/declare",
+	"../util/misc",
+	"xstyle/css!../css/extensions/CompoundColumns.css"
+], function(lang, declare, miscUtil){
 	return declare(null, {
 		// summary:
 		//		Extension allowing for specification of columns with additional
@@ -21,29 +25,37 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 			// the first row is a special spacer row
 			var columns = (this.subRows && this.subRows[0]) || this.columns,
 				headerRows = [[]],
+				topHeaderRow = headerRows[0],
 				contentColumns = [];
 			// This first row is spacer row that will be made invisible (zero height)
 			// with CSS, but it must be rendered as the first row since that is what
 			// the table layout is driven by.
 			headerRows[0].className = "dgrid-spacer-row";
 			
-			function processColumns(columns, level, hasLabel){
+			function processColumns(columns, level, hasLabel, parent){
 				var numColumns = 0,
 					noop = function(){},
-					i, column, children, hasChildLabels;
+					column, children, hasChildLabels;
 				
-				for(i in columns){
-					column = columns[i];
+				function processColumn(column, i){
 					children = column.children;
 					hasChildLabels = column.children && (column.showChildHeaders !== false);
+					// Set a reference to the parent column so later the children's ids can
+					// be updated to indicate the parent-child relationship.
+					column.parentColumn = parent;
 					if(children){
-						// it has children, recursively process the children
-						numColumns += (column.colSpan = processColumns(children, level + 1, hasChildLabels));
+						// it has children
+						// make sure the column has an id
+						if(column.id == null){
+							column.id = ((parent && parent.id) || level-1) + "-" + topHeaderRow.length;
+						}
+						// recursively process the children
+						numColumns += (column.colSpan = processColumns(children, level + 1, hasChildLabels, column));
 					}else{
 						// it has no children, it is a normal header, add it to the content columns
 						contentColumns.push(column);
 						// add each one to the first spacer header row for proper layout of the header cells
-						headerRows[0].push(lang.delegate(column, {renderHeaderCell: noop}));
+						topHeaderRow.push(lang.delegate(column, {renderHeaderCell: noop}));
 						numColumns++;
 					}
 					if(!hasChildLabels){
@@ -54,8 +66,9 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 					// add the column to the header rows at the appropriate level
 					if(hasLabel){
 						(headerRows[level] || (headerRows[level] = [])).push(column);
-					}					
+					}
 				}
+				miscUtil.each(columns, processColumn, this);
 				return numColumns;
 			}
 			processColumns(columns, 1, true);
@@ -80,6 +93,20 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 			contentColumns.headerRows = headerRows;  
 			this.subRows = contentColumns;
 			this.inherited(arguments);
+		},
+
+		_configColumn: function(column, columnId, rowColumns, prefix){
+			// Updates the id on a column definition that is a child to include
+			// the parent's id.
+			var parent = column.parentColumn;
+			if(parent){
+				// Adjust the id to incorporate the parent's id.
+				// Remove the prefix if it was used to create the id
+				var id = columnId.indexOf(prefix) === 0 ? columnId.substring(prefix.length) : columnId;
+				prefix = parent.id + "-";
+				columnId = column.id = prefix + id;
+			}
+			this.inherited(arguments, [column, columnId, rowColumns, prefix]);
 		}
 	});
 });

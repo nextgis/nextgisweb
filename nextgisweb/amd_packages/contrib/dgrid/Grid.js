@@ -1,7 +1,7 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
-function(kernel, declare, listen, has, put, List){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
+function(kernel, declare, listen, has, put, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;	
+	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
@@ -20,7 +20,7 @@ function(kernel, declare, listen, has, put, List){
 		column: function(target){
 			// summary:
 			//		Get the column object by node, or event, or a columnId
-			if(typeof target == "string"){
+			if(typeof target != "object"){
 				return this.columns[target];
 			}else{
 				return this.cell(target).column;
@@ -31,7 +31,7 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
 			
-			if(target.row && target.row instanceof this._Row){ return target; }
+			if(target.column && target.element){ return target; }
 			
 			if(target.target && target.target.nodeType){
 				// event
@@ -55,8 +55,8 @@ function(kernel, declare, listen, has, put, List){
 			}
 			if(!element && typeof columnId != "undefined"){
 				var row = this.row(target),
-					rowElement = row.element;
-				if(rowElement){ 
+					rowElement = row && row.element;
+				if(rowElement){
 					var elements = rowElement.getElementsByTagName("td");
 					for(var i = 0; i < elements.length; i++){
 						if(elements[i].columnId == columnId){
@@ -75,7 +75,7 @@ function(kernel, declare, listen, has, put, List){
 			}
 		},
 		
-		createRowCells: function(tag, each, subRows){
+		createRowCells: function(tag, each, subRows, object){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var row = put("table.dgrid-row-table[role=presentation]"),
@@ -84,7 +84,8 @@ function(kernel, declare, listen, has, put, List){
 				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
 				tr,
 				si, sl, i, l, // iterators
-				subRow, column, id, extraClassName, cell, innerCell, colSpan, rowSpan; // used inside loops
+				subRow, column, id, extraClasses, className,
+				cell, innerCell, colSpan, rowSpan; // used inside loops
 			
 			// Allow specification of custom/specific subRows, falling back to
 			// those defined on the instance.
@@ -94,20 +95,27 @@ function(kernel, declare, listen, has, put, List){
 				subRow = subRows[si];
 				// for single-subrow cases in modern browsers, TR can be skipped
 				// http://jsperf.com/table-without-trs
-				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
+				tr = put(tbody, "tr");
 				if(subRow.className){
 					put(tr, "." + subRow.className);
 				}
-				
+
 				for(i = 0, l = subRow.length; i < l; i++){
 					// iterate through the columns
 					column = subRow[i];
 					id = column.id;
-					extraClassName = column.className || (column.field && "field-" + column.field);
+
+					extraClasses = column.field ? ".field-" + column.field : "";
+					className = typeof column.className === "function" ?
+						column.className(object) : column.className;
+					if(className){
+						extraClasses += "." + className;
+					}
+
 					cell = put(tag + (
 							".dgrid-cell.dgrid-cell-padding" +
 							(id ? ".dgrid-column-" + id : "") +
-							(extraClassName ? "." + extraClassName : "")
+							extraClasses.replace(/ +/g, ".")
 						).replace(invalidClassChars,"-") +
 						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
 					cell.columnId = id;
@@ -144,24 +152,24 @@ function(kernel, declare, listen, has, put, List){
 		},
 		
 		renderRow: function(object, options){
+			var self = this;
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
-				// we support the field, get, and formatter properties like the DataGrid
+				// Support get function or field property (similar to DataGrid)
 				if(column.get){
 					data = column.get(object);
 				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
-				if(column.formatter){
-					td.innerHTML = column.formatter(data);
-				}else if(column.renderCell){
-					// A column can provide a renderCell method to do its own DOM manipulation, 
+				
+				if(column.renderCell){
+					// A column can provide a renderCell method to do its own DOM manipulation,
 					// event handling, etc.
 					appendIfNode(td, column.renderCell(object, data, td, options));
-				}else if(data != null){
-					td.appendChild(document.createTextNode(data));
+				}else{
+					defaultRenderCell.call(column, object, data, td, options);
 				}
-			}, options && options.subRows);
+			}, options && options.subRows, object);
 			// row gets a wrapper div for a couple reasons:
 			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
@@ -196,8 +204,9 @@ function(kernel, declare, listen, has, put, List){
 				// allow for custom header content manipulation
 				if(column.renderHeaderCell){
 					appendIfNode(contentNode, column.renderHeaderCell(contentNode));
-				}else if(column.label || column.field){
-					contentNode.appendChild(document.createTextNode(column.label || column.field));
+				}else if("label" in column || column.field){
+					contentNode.appendChild(document.createTextNode(
+						"label" in column ? column.label : column.field));
 				}
 				if(column.sortable !== false && field && field != "_item"){
 					th.sortable = true;
@@ -206,12 +215,18 @@ function(kernel, declare, listen, has, put, List){
 			}, this.subRows && this.subRows.headerRows);
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
 			headerNode.appendChild(row);
-			// if it columns are sortable, resort on clicks
-			listen(row, "click,keydown", function(event){
+			
+			// If the columns are sortable, re-sort on clicks.
+			// Use a separate listener property to be managed by renderHeader in case
+			// of subsequent calls.
+			if(this._sortListener){
+				this._sortListener.remove();
+			}
+			this._sortListener = listen(row, "click,keydown", function(event){
 				// respond to click, space keypress, or enter keypress
 				if(event.type == "click" || event.keyCode == 32 /* space bar */ || (!has("opera") && event.keyCode == 13) /* enter */){
 					var target = event.target,
-						parentNode, field, sort, newSort, eventObj;
+						field, sort, newSort, eventObj;
 					do{
 						if(target.sortable){
 							// If the click is on the same column as the active sort,
@@ -222,7 +237,7 @@ function(kernel, declare, listen, has, put, List){
 									!sort.descending
 							}];
 							
-							// Emit an event with the new sort 
+							// Emit an event with the new sort
 							eventObj = {
 								bubbles: true,
 								cancelable: true,
@@ -231,7 +246,7 @@ function(kernel, declare, listen, has, put, List){
 								sort: newSort
 							};
 							
-							if (listen.emit(target, "dgrid-sort", eventObj)){
+							if (listen.emit(event.target, "dgrid-sort", eventObj)){
 								// Stash node subject to DOM manipulations,
 								// to be referenced then removed by sort()
 								grid._sortNode = target;
@@ -274,6 +289,10 @@ function(kernel, declare, listen, has, put, List){
 		destroy: function(){
 			// Run _destroyColumns first to perform any column plugin tear-down logic.
 			this._destroyColumns();
+			if(this._sortListener){
+				this._sortListener.remove();
+			}
+			
 			this.inherited(arguments);
 		},
 		
@@ -347,7 +366,8 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
-			return this.addCssRule("#" + this.domNode.id + " .dgrid-column-" + colId, css);
+			return this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
+				" .dgrid-column-" + colId, css);
 		},
 		
 		/*=====
@@ -361,10 +381,9 @@ function(kernel, declare, listen, has, put, List){
 		_configColumns: function(prefix, rowColumns){
 			// configure the current column
 			var subRow = [],
-				isArray = rowColumns instanceof Array,
-				columnId, column;
-			for(columnId in rowColumns){
-				column = rowColumns[columnId];
+				isArray = rowColumns instanceof Array;
+			
+			function configColumn(column, columnId){
 				if(typeof column == "string"){
 					rowColumns[columnId] = column = {label:column};
 				}
@@ -372,19 +391,22 @@ function(kernel, declare, listen, has, put, List){
 					column.field = columnId;
 				}
 				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
-				if(isArray){ this.columns[columnId] = column; }
-				
 				// allow further base configuration in subclasses
 				if(this._configColumn){
 					this._configColumn(column, columnId, rowColumns, prefix);
+					// Allow the subclasses to modify the column id.
+					columnId = column.id;
 				}
-				
+				if(isArray){ this.columns[columnId] = column; }
+
 				// add grid reference to each column object for potential use by plugins
 				column.grid = this;
 				if(typeof column.init === "function"){ column.init(); }
 				
 				subRow.push(column); // make sure it can be iterated on
 			}
+			
+			miscUtil.each(rowColumns, configColumn, this);
 			return isArray ? rowColumns : subRow;
 		},
 		
@@ -394,7 +416,9 @@ function(kernel, declare, listen, has, put, List){
 			//		destroy methods (defined by plugins) and calls them.  This is called
 			//		immediately before configuring a new column structure.
 			
-			var subRowsLength = this.subRows.length,
+			var subRows = this.subRows,
+				// if we have column sets, then we don't need to do anything with the missing subRows, ColumnSet will handle it
+				subRowsLength = subRows && subRows.length,
 				i, j, column, len;
 			
 			// First remove rows (since they'll be refreshed after we're done),
@@ -403,8 +427,8 @@ function(kernel, declare, listen, has, put, List){
 			this.cleanup();
 			
 			for(i = 0; i < subRowsLength; i++){
-				for(j = 0, len = this.subRows[i].length; j < len; j++){
-					column = this.subRows[i][j];
+				for(j = 0, len = subRows[i].length; j < len; j++){
+					column = subRows[i][j];
 					if(typeof column.destroy === "function"){ column.destroy(); }
 				}
 			}
@@ -451,11 +475,11 @@ function(kernel, declare, listen, has, put, List){
 		},
 		
 		setColumns: function(columns){
-			kernel.deprecated("setColumns(...)", 'use set("columns", ...) instead', "dgrid 1.0");
+			kernel.deprecated("setColumns(...)", 'use set("columns", ...) instead', "dgrid 0.4");
 			this.set("columns", columns);
 		},
 		setSubRows: function(subrows){
-			kernel.deprecated("setSubRows(...)", 'use set("subRows", ...) instead', "dgrid 1.0");
+			kernel.deprecated("setSubRows(...)", 'use set("subRows", ...) instead', "dgrid 0.4");
 			this.set("subRows", subrows);
 		},
 		
@@ -465,23 +489,40 @@ function(kernel, declare, listen, has, put, List){
 			
 			this.configStructure();
 			this.renderHeader();
-			// After re-rendering the header, re-apply the sort arrow if needed.
-			if (this._started && this._sort && this._sort.length){
-				this.updateSortArrow(this._sort);
-			}
 			
 			this.refresh();
 			// re-render last collection if present
 			this._lastCollection && this.renderArray(this._lastCollection);
-			this.resize();
+			
+			// After re-rendering the header, re-apply the sort arrow if needed.
+			if(this._started){
+				if(this._sort && this._sort.length){
+					this.updateSortArrow(this._sort);
+				} else {
+					// Only call resize directly if we didn't call updateSortArrow,
+					// since that calls resize itself when it updates.
+					this.resize();
+				}
+			}
 		}
 	});
+	
+	function defaultRenderCell(object, data, td, options){
+		if(this.formatter){
+			// Support formatter, with or without formatterScope
+			var formatter = this.formatter,
+				formatterScope = this.grid.formatterScope;
+			td.innerHTML = typeof formatter === "string" && formatterScope ?
+				formatterScope[formatter](data, object) : this.formatter(data, object);
+		}else if(data != null){
+			td.appendChild(document.createTextNode(data)); 
+		}
+	}
 	
 	// expose appendIfNode and default implementation of renderCell,
 	// e.g. for use by column plugins
 	Grid.appendIfNode = appendIfNode;
-	Grid.defaultRenderCell = function(object, data, td, options){
-		if(data != null){ td.appendChild(document.createTextNode(data)); }
-	};
+	Grid.defaultRenderCell = defaultRenderCell;
+	
 	return Grid;
 });

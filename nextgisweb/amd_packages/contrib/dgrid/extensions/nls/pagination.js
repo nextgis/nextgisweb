@@ -8,6 +8,14 @@ define({
 		gotoPage: "Go to page",
 		jumpPage: "Jump to page"
 	},
+	ar: true,
+	de: true,
 	es: true,
-	ja: true
+	fr: true,
+	pt: true,
+	ja: true,
+	sk: true,
+	th: true,
+	"zh-cn": true,
+	"zh-hk": true
 });

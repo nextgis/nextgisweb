@@ -7,7 +7,9 @@ define(["put-selector/put"], function(put){
 	// plus an array to track actual indices in stylesheet for removal
 	var extraRules = [],
 		extraSheet,
-		removeMethod;
+		removeMethod,
+		rulesProperty,
+		invalidCssChars = /([^A-Za-z0-9_\u00A0-\uFFFF-])/g;
 	
 	function removeRule(index){
 		// Function called by the remove method on objects returned by addCssRule.
@@ -31,6 +33,8 @@ define(["put-selector/put"], function(put){
 	}
 	
 	var util = {
+		// Throttle/debounce functions
+		
 		defaultDelay: 15,
 		throttle: function(cb, context, delay){
 			// summary:
@@ -79,6 +83,34 @@ define(["put-selector/put"], function(put){
 			};
 		},
 		
+		// Iterative functions
+		
+		each: function(arrayOrObject, callback, context){
+			// summary:
+			//		Given an array or object, iterates through its keys.
+			//		Does not use hasOwnProperty (since even Dojo does not
+			//		consistently use it), but will iterate using a for or for-in
+			//		loop as appropriate.
+			
+			var i, len;
+			
+			if(!arrayOrObject){
+				return;
+			}
+			
+			if(typeof arrayOrObject.length === "number"){
+				for(i = 0, len = arrayOrObject.length; i < len; i++){
+					callback.call(context, arrayOrObject[i], i, arrayOrObject);
+				}
+			}else{
+				for(i in arrayOrObject){
+					callback.call(context, arrayOrObject[i], i, arrayOrObject);
+				}
+			}
+		},
+		
+		// CSS-related functions
+		
 		addCssRule: function(selector, css){
 			// summary:
 			//		Dynamically adds a style rule to the document.  Returns an object
@@ -87,10 +119,12 @@ define(["put-selector/put"], function(put){
 			if(!extraSheet){
 				// First time, create an extra stylesheet for adding rules
 				extraSheet = put(document.getElementsByTagName("head")[0], "style");
-				// Keep reference to actual StyleSheet object (.styleSheet for IE < 9)
+				// Keep reference to actual StyleSheet object (`styleSheet` for IE < 9)
 				extraSheet = extraSheet.sheet || extraSheet.styleSheet;
-				// Store name of method used to remove rules (removeRule for IE < 9)
+				// Store name of method used to remove rules (`removeRule` for IE < 9)
 				removeMethod = extraSheet.deleteRule ? "deleteRule" : "removeRule";
+				// Store name of property used to access rules (`rules` for IE < 9)
+				rulesProperty = extraSheet.cssRules ? "cssRules" : "rules";
 			}
 			
 			var index = extraRules.length;
@@ -98,9 +132,30 @@ define(["put-selector/put"], function(put){
 			extraSheet.addRule ?
 				extraSheet.addRule(selector, css) :
 				extraSheet.insertRule(selector + '{' + css + '}', extraRules[index]);
+			
 			return {
-				remove: function(){ removeRule(index); }
+				get: function(prop) {
+					return extraSheet[rulesProperty][extraRules[index]].style[prop];
+				},
+				set: function(prop, value) {
+					if (typeof extraRules[index] !== "undefined") {
+						extraSheet[rulesProperty][extraRules[index]].style[prop] = value;
+					}
+				},
+				remove: function(){
+					removeRule(index);
+				}
 			};
+		},
+		
+		escapeCssIdentifier: function(id){
+			// summary:
+			//		Escapes normally-invalid characters in a CSS identifier (such as .);
+			//		see http://www.w3.org/TR/CSS2/syndata.html#value-def-identifier
+			// id: String
+			//		CSS identifier (e.g. tag name, class, or id) to be escaped
+			
+			return id.replace(invalidCssChars, "\\$1");
 		}
 	};
 	return util;

@@ -1,11 +1,10 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-	"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<title>Test JsonRest store</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<meta name="viewport" content="width=570">
+		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/skins/claro.css";
 			h2 {
@@ -19,9 +18,9 @@
 				margin: 10px;
 			}
 		</style>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
+		<script>
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory", "dojo/domReady!"], 
 				function(List, Grid, Selection, editor, Keyboard, tree, declare, JsonRest, Observable, Cache, Memory){
 					var testStore = Observable(Cache(JsonRest({
@@ -33,6 +32,9 @@
 								query = "parent=" + query.parent;
 							}
 							return JsonRest.prototype.query.call(this, query, options);
+						},
+						put: function(object){
+							return object;
 						}
 					}), Memory()));
 					testStore.getChildren = function(parent, options){
@@ -40,13 +42,14 @@
 					};
 					var columns = [
 						tree({label:'Name', field:'name', sortable: false}),
-						{label:'Id', field:'id', sortable: false},
+						{label:'Id', field:'id'},
 						editor({label:'Comment', field:'comment', sortable: false}, "text"),
 						editor({label:'Boolean', field:'boo', sortable: false, autoSave: true}, "checkbox")
 					];
 
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
+						sort: "id",
 						getBeforePut: false,
 						columns: columns
 					}, "grid");
@@ -54,6 +57,13 @@
 						for(var i in grid.selection){
 							testStore.remove(i);
 						}
+					}
+					addPage = function(){
+						var selectedId = 0;
+						for(var i in grid.selection){
+							selectedId = +i;
+						}
+						testStore.put({name:"new item", id: selectedId + Math.random()});
 					}
 				});
 				
@@ -63,6 +73,7 @@
 		<h2>A basic grid with JsonRest store</h2>
 		<div id="grid"></div>
 		<button onclick='deleteSelected()'>Delete Page</div>
+		<button onclick='addPage()'>Add Page</div>
 		<button onclick='grid.save();'>Save</div>
 		<button onclick='grid.revert();'>Revert</div>
 	</body>
