@@ -734,7 +734,7 @@ define([
         },
 
         _zoomToInitialExtent: function () {
-            this.map.olMap.zoomToExtent(this._extent)
+            this.map.olMap.zoomToExtent(this._extent, true);
         },
 
         _getPermalink: function () {
