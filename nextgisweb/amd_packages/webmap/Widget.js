@@ -29,7 +29,7 @@ define([
     "dijit/form/NumberTextBox",
     "dijit/form/Select",
     "dijit/_WidgetBase",
-    "layer/LayerTree"
+    "ngw-resource/Tree"
 ], function (
     declare,
     domStyle,
@@ -47,6 +47,7 @@ define([
     settings
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
+        title: "Веб-карта",
         templateString: template,
 
         constructor: function (options) {
@@ -95,7 +96,6 @@ define([
             }, this);
 
             if (this.value) {
-                this.wDisplayName.set("value", this.value.display_name);
                 this.wBookmarkLayer.set("value", this.value.bookmark_layer_id);
                 this.wExtentLeft.set("value", this.value.extent[0]);
                 this.wExtentBottom.set("value", this.value.extent[1]);
@@ -193,17 +193,17 @@ define([
 
             this.wLayerAdapter.watch("value", function (attr, oldVal, newVal) {
                 widget.setItemValue("layer_adapter", newVal);
-            })
+            });
 
             this.wgtLayer.on("click", function (item) {
-                widget.btnDlgAddLayer.set("disabled", item.type != 'style');
+                widget.btnDlgAddLayer.set("disabled",
+                    item.interfaces.indexOf("IRenderableStyle") == -1);
             });
 
             this.btnDlgAddLayer.on("click", function() {
-                var item = widget.itemStore.newItem(
-                    {
+                widget.itemStore.newItem({
                         "item_type": "layer",
-                        "display_name": widget.wgtLayer.selectedItem.layer_display_name,
+                        "display_name": widget.wgtLayer.selectedItem.display_name,
                         "layer_style_id": widget.wgtLayer.selectedItem.id,
                         "layer_enabled": false,
                         "layer_transparency": null,
@@ -212,7 +212,7 @@ define([
                         "layer_adapter": "image"
                     }, {
                         parent: widget.getAddParent(),
-                        attribute: "children"    
+                        attribute: "children"
                     }
                 );
                 widget.dlgAddLayer.hide();
@@ -223,7 +223,7 @@ define([
             var widget = this;
             var result = { isValid: true, error: [] };
 
-            array.forEach([this.wDisplayName], function (subw) {
+            array.forEach([], function (subw) {
                 // форсируем показ значка при проверке
                 subw._hasBeenBlurred = true;
                 subw.validate();   
@@ -258,7 +258,6 @@ define([
             }
 
             return {
-                display_name: this.wDisplayName.get("value"),
                 root_item: traverseItem(this.itemModel.root),
                 bookmark_layer_id: this.wBookmarkLayer.get("value") != "" ? this.wBookmarkLayer.get("value") : null,
                 extent: array.map(['Left', 'Bottom', 'Right', 'Top'], function (e) {

@@ -3,22 +3,22 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
 from ..models import declarative_base
-from ..security import ACLMixin
+from ..resource import Resource, MetaDataScope
 from ..layer import Layer
-from ..style import Style
 
 Base = declarative_base()
 
 
-class WebMap(Base, ACLMixin):
-    __tablename__ = 'webmap'
-
-    __acl_resource__ = 'webmap'
-
+@Resource.registry.register
+class WebMap(Base, MetaDataScope, Resource):
+    identity = 'webmap'
     cls_display_name = u"Веб-карта"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    display_name = sa.Column(sa.Unicode, nullable=False)
+    __tablename__ = 'webmap'
+    __mapper_args__ = dict(polymorphic_identity=identity)
+
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+
     root_item_id = sa.Column(sa.Integer, sa.ForeignKey('webmap_item.id'), nullable=False)
     bookmark_layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), nullable=True)
     extent_left = sa.Column(sa.Float, default=-180)
@@ -29,8 +29,9 @@ class WebMap(Base, ACLMixin):
     bookmark_layer = orm.relationship(Layer)
     root_item = orm.relationship('WebMapItem', cascade='all')
 
-    def __unicode__(self):
-        return self.display_name
+    @classmethod
+    def check_parent(self, parent):
+        return parent.cls == 'resource_group'
 
     def to_dict(self):
         return dict(
@@ -66,7 +67,7 @@ class WebMapItem(Base):
     position = sa.Column(sa.Integer, nullable=True)
     display_name = sa.Column(sa.Unicode, nullable=True)
     group_expanded = sa.Column(sa.Boolean, nullable=True)
-    layer_style_id = sa.Column(sa.ForeignKey(Style.id), nullable=True)
+    layer_style_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
     layer_enabled = sa.Column(sa.Boolean, nullable=True)
     layer_transparency = sa.Column(sa.Float, nullable=True)
     layer_min_scale_denom = sa.Column(sa.Float, nullable=True)
@@ -80,9 +81,9 @@ class WebMapItem(Base):
     )
 
     style = orm.relationship(
-        'Style',
+        'Resource',
         # Временное решение, позволяющее при удалении стиля автоматически
-        # удалять элементы веб-карты.
+        # удалять элементы веб-карты
         backref=orm.backref('webmap_items', cascade='all')
     )
 

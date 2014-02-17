@@ -9,6 +9,7 @@ from ..views import model_context, permalinker, ModelController, DeleteObjectWid
 from .. import dynmenu as dm
 from ..object_widget import ObjectWidget, CompositeWidget
 from ..layer import Layer
+from ..resource import Resource
 
 from .models import Style
 
@@ -138,26 +139,28 @@ def setup_pyramid(comp, config):
 
     config.add_route('style.tms', '/style/{id:\d+}/tms').add_view(tms)
 
-    @model_context(Style)
+    @model_context(Resource)
     def image(request, obj):
-        actual_class = Style.registry[obj.cls]
-        obj = DBSession.query(Style) \
+        actual_class = Resource.registry[obj.cls]
+        obj = DBSession.query(Resource) \
             .with_polymorphic((actual_class, ))\
             .filter_by(id=obj.id).one()
 
-        request.require_permission(obj.layer, 'style-read')
+        # request.resource_permission(obj.layer, 'view')
 
         extent = map(float, request.GET['extent'].split(','))
         size = map(int, request.GET['size'].split(','))
 
-        if extent[0] < obj.layer.srs.minx:
+        layer = obj.parent
+
+        if extent[0] < layer.srs.minx:
             # Костыль для 180
             extent = (
-                extent[0] + obj.layer.srs.maxx - obj.layer.srs.minx, extent[1],
-                extent[2] + obj.layer.srs.maxx - obj.layer.srs.minx, extent[3],
+                extent[0] + layer.srs.maxx - layer.srs.minx, extent[1],
+                extent[2] + layer.srs.maxx - layer.srs.minx, extent[3],
             )
 
-        req = obj.render_request(obj.layer.srs)
+        req = obj.render_request(layer.srs)
         img = req.render_extent(extent, size)
 
         buf = StringIO()

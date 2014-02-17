@@ -1,103 +1,87 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" style="width: 100%; height: 400px;">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" style="width: 100%;">
 
-    <div data-dojo-type="dijit/layout/TabContainer"
-        style="height: 400px">
+    <div data-dojo-attach-point="treeLayoutContainer" 
+        data-dojo-type="dijit/layout/BorderContainer"
+        data-dojo-props="design: 'headline', gutters: true"
+        style="height: 400px; margin-top: 1em;">
 
-        <div data-dojo-type="dijit/layout/ContentPane"
-            title="Веб-карта">
-
-            <div data-dojo-type="dojox/layout/TableContainer"
-                data-dojo-props="cols:2">
-                
-                <div data-dojo-type="ngw/form/DisplayNameTextBox"
-                    data-dojo-attach-point="wDisplayName"
-                    data-dojo-props="colspan: 2"
-                    title="Наименование"
-                    style="width: 100%">
-                </div>
-
-                <div data-dojo-attach-point="wBookmarkLayer"
-                    data-dojo-type="ngw/form/LayerSelect"
-                    data-dojo-props="colspan: 2"
-                    title="Слой закладок"
-                    style="width: 100%">
-                </div>
-
-                <div data-dojo-type="dijit/_WidgetBase"
-                    data-dojo-props="colspan: 2">
-                    <strong>Начальный охват</strong>
-                </div>
-
-                <div data-dojo-attach-point="wExtentLeft"
-                    data-dojo-type="dijit/form/NumberTextBox"
-                    data-dojo-props="constraints: {min: -180, max: +180}"
-                    title="Лево, град."
-                    style="width: 100%">
-                </div>
-
-                <div data-dojo-attach-point="wExtentBottom"
-                    data-dojo-type="dijit/form/NumberTextBox"
-                    data-dojo-props="constraints: {min: -90, max: +90}"
-                    title="Низ, град."
-                    style="width: 100%">
-                </div>
-
-                <div data-dojo-attach-point="wExtentRight"
-                    data-dojo-type="dijit/form/NumberTextBox"
-                    data-dojo-props="constraints: {min: -180, max: +180}"
-                    title="Право, град."
-                    style="width: 100%">
-                </div>
-
-                <div data-dojo-attach-point="wExtentTop"
-                    data-dojo-type="dijit/form/NumberTextBox"
-                    data-dojo-props="constraints: {min: -90, max: +90}"
-                    title="Верх, град."
-                    style="width: 100%">
-                </div>
-
-            </div>
-
+        <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnAddLayer">Добавить слой</div>
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnAddGroup">Добавить группу</div>
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnDeleteItem" data-dojo-props="iconClass: 'dijitEditorIcon dijitEditorIconDelete'" disabled="disabled">Удалить</div>
         </div>
 
-        <div data-dojo-attach-point="treeLayoutContainer" 
-            data-dojo-type="dijit/layout/BorderContainer"
-            data-dojo-props="design: 'headline', gutters: true"
-            title="Дерево слоев"
-            style="height: 100%">
+        <div data-dojo-attach-point="containerTree"
+                data-dojo-type="dijit/layout/ContentPane"
+                data-dojo-props="region: 'center'"
+                style="padding: 0;">
+        </div>
 
-            <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
-                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnAddLayer">Добавить слой</div>
-                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnAddGroup">Добавить группу</div>
-                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnDeleteItem" data-dojo-props="iconClass: 'dijitEditorIcon dijitEditorIconDelete'" disabled="disabled">Удалить</div>
-            </div>
+    </div>
 
-            <div data-dojo-attach-point="containerTree"
-                    data-dojo-type="dijit/layout/ContentPane"
-                    data-dojo-props="region: 'center'"
-                    style="padding: 0;">
-            </div>
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2">
+        
+        <div data-dojo-attach-point="wBookmarkLayer"
+            data-dojo-type="ngw/form/LayerSelect"
+            data-dojo-props="colspan: 2"
+            title="Слой закладок"
+            style="width: 100%">
+        </div>
 
+        <div data-dojo-type="dijit/_WidgetBase"
+            data-dojo-props="colspan: 2">
+            <strong>Начальный охват</strong>
+        </div>
 
+        <div data-dojo-attach-point="wExtentLeft"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -180, max: +180}"
+            title="Лево, град."
+            style="width: 100%">
+        </div>
 
+        <div data-dojo-attach-point="wExtentBottom"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -90, max: +90}"
+            title="Низ, град."
+            style="width: 100%">
+        </div>
+
+        <div data-dojo-attach-point="wExtentRight"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -180, max: +180}"
+            title="Право, град."
+            style="width: 100%">
+        </div>
+
+        <div data-dojo-attach-point="wExtentTop"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -90, max: +90}"
+            title="Верх, град."
+            style="width: 100%">
         </div>
 
     </div>
 
     <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="dlgAddLayer" title="Добавить слой">
-        <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design: 'headline', gutters: false" style="width: 600px; height: 400px;">
 
-            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">
-                Для добавления слоя на веб-карту необходимо выбрать стиль слоя.
-            </div>
+            <div class="dijitDialogPaneContentArea"><div data-dojo-type="ngw-resource/Tree"
+                data-dojo-attach-point="wgtLayer"
+                data-dojo-props="resourceId: 0"
+                class="dijitBorderContainer-child"
+                style="width: 400px; height: 300px">
+            </div></div>
             
-            <div data-dojo-type="layer/LayerTree" data-dojo-props="region: 'center'" data-dojo-attach-point="wgtLayer"></div>
-            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'bottom'">
-                <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
-                    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnDlgAddLayer" data-dojo-props="disabled: true">Добавить</div>
+            <div class="dijitDialogPaneActionBar">
+                
+                <div data-dojo-type="dijit/form/Button"
+                    data-dojo-attach-point="btnDlgAddLayer"
+                    data-dojo-props="disabled: true">
+                    Добавить
                 </div>
+
             </div>
-        </div>
+
     </div>
 
     <div data-dojo-attach-point="itemPane"
