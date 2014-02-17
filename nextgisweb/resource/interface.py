@@ -5,17 +5,17 @@ import zope.interface
 from zope.interface import implements
 
 __all__ = [
-    'IResourceInterface',
+    'IResourceBase',
     'implements',
     'providedBy',
 ]
 
 
-class IResourceInterface(zope.interface.Interface):
+class IResourceBase(zope.interface.Interface):
     pass
 
 
 def providedBy(obj):
     for i in zope.interface.providedBy(obj):
-        if issubclass(i, IResourceInterface) and i != IResourceInterface:
+        if issubclass(i, IResourceBase) and i != IResourceBase:
             yield i

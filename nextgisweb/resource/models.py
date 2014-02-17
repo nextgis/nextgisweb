@@ -12,7 +12,6 @@ from ..auth import Principal, User, Group
 
 from .scope import clscopes
 from .permission import register_permission, scope_permissions
-from .interface import IResourceInterface, implements
 
 Base = declarative_base()
 
@@ -24,8 +23,6 @@ PermissionSets = namedtuple('PermissionSets', ('allow', 'deny'))
 
 @resource_registry.register
 class Resource(Base):
-    implements(IResourceInterface)
-
     identity = 'resource'
     cls_display_name = "Ресурс"
 
