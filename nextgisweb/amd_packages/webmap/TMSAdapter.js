@@ -1,13 +1,14 @@
-/*global define, ngwConfig*/
+/* global define */
 define([
     "dojo/_base/declare",
     "webmap/Adapter",
+    "ngw/route",
     "ngw/openlayers/layer/XYZ"
-], function (declare, Adapter, XYZ) {
+], function (declare, Adapter, route, XYZ) {
     return declare(Adapter, {
         createLayer: function (item) {
             return new XYZ(item.id, {
-                url: ngwConfig.applicationUrl + "/style/" + item.styleId + '/tms?z=${z}&x=${x}&y=${y}',
+                url: route("style.tms", {id: item.styleId}) + "?z=${z}&x=${x}&y=${y}",
                 isBaseLayer: false,
                 type: "png",
                 visibility: item.visibility,

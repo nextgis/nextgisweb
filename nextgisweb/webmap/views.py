@@ -3,7 +3,8 @@ from collections import namedtuple
 
 from ..object_widget import ObjectWidget
 
-from ..views import model_loader
+from ..resource import resource_factory
+from ..dynmenu import DynItem, Label, Link
 
 from .models import WebMap
 from .plugin import WebmapPlugin
@@ -39,8 +40,7 @@ def setup_pyramid(comp, config):
 
     WebMap.object_widget = WebmapObjectWidget
 
-    @model_loader(WebMap)
-    def display(request, obj):
+    def display(obj, request):
         MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
 
         display.mid = MID(
@@ -63,6 +63,9 @@ def setup_pyramid(comp, config):
                 # При отсутствии необходимых прав пропускаем элемент веб-карты,
                 # таким образом он просто не будет показан при отображении и
                 # в дереве слоев
+
+                # TODO: Security
+
                 # if not layer.has_permission(
                 #     request.user,
                 #     'style-read',
@@ -126,5 +129,23 @@ def setup_pyramid(comp, config):
             custom_layout=True
         )
 
-    config.add_route('webmap.display', '/webmap/{id:\d+}/display') \
-        .add_view(display, renderer='webmap/display.mako')
+    config.add_route(
+        'webmap.display', '/resource/{id:\d+}/display',
+        factory=resource_factory, client=('id',)
+    ).add_view(display, context=WebMap, renderer='webmap/display.mako')
+
+    class DisplayMenu(DynItem):
+        def build(self, args):
+            print args
+            if isinstance(args.obj, WebMap):
+                yield Label('webmap', u"Веб-карта")
+
+                yield Link(
+                    'webmap/display', u"Просмотр",
+                    self._url())
+
+        def _url(self):
+            return lambda (args): args.request.route_url(
+                'webmap.display', id=args.obj.id)
+
+    WebMap.__dynmenu__.add(DisplayMenu())

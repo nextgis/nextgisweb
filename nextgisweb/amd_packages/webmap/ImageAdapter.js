@@ -1,13 +1,14 @@
-/*global define, ngwConfig*/
+/* global define */
 define([
     "dojo/_base/declare",
     "webmap/Adapter",
+    "ngw/route",
     "ngw/openlayers/layer/Grid"
-], function (declare, Adapter, Grid) {
+], function (declare, Adapter, route, Grid) {
     return declare(Adapter, {
         createLayer: function (item) {
             var layer = new Grid(item.id, {
-                url: ngwConfig.applicationUrl + "/style/" + item.styleId + '/image',
+                url: route("style.image", {id: item.styleId}),
                 params: {},
                 singleTile: true,
                 ratio: 1.25,
@@ -21,8 +22,8 @@ define([
 
             layer.olLayer.getURL = function (bounds) {
                 var size = this.getImageSize();
-                return this.url + "?extent=" + bounds.toArray().join(',')
-                    + "&size=" + size.w + ',' + size.h;
+                return this.url + "?extent=" + bounds.toArray().join(",") +
+                    "&size=" + size.w + "," + size.h;
             };
 
             return layer;

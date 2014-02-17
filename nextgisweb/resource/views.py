@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 
 from ..views import (
-    model_context,
     ModelController,
     DescriptionObjectWidget,
     DeleteObjectWidget,
@@ -19,6 +18,20 @@ from .models import Resource, ResourceACLRule, MetaDataScope
 from .scope import clscopes, scopeid
 from .permission import scope_permissions
 from .interface import providedBy
+
+
+def resource_factory(request):
+
+    # Вначале загружаем ресурс базового класса
+    base = Resource.filter_by(id=request.matchdict['id']).one()
+
+    # После чего загружаем ресурс того класса,
+    # к которому этот ресурс и относится
+    obj = Resource.query().with_polymorphic(
+        Resource.registry[base.cls]).filter_by(
+        id=request.matchdict['id']).one()
+
+    return obj
 
 
 class ResourceController(ModelController):
@@ -107,10 +120,9 @@ class ResourceObjectWidget(ObjectWidget):
 
 
 @viewargs(renderer='psection.mako')
-@model_context(Resource)
-def show(request, obj):
-    request.resource_permission(obj, Resource, 'identify')
-    return dict(obj=obj, sections=obj.__psection__)
+def show(request):
+    request.resource_permission(request.context, Resource, 'identify')
+    return dict(obj=request.context, sections=request.context.__psection__)
 
 
 @viewargs(renderer='json', json=True)
@@ -145,35 +157,33 @@ def schema(request):
 
 
 @viewargs(renderer='nextgisweb:resource/template/acl.mako')
-@model_context(Resource)
-def security(request, obj):
-    request.resource_permission(obj, Resource, 'permissions')
+def security(request):
+    request.resource_permission(request.context, Resource, 'permissions')
     return dict(
-        obj=obj,
+        obj=request.context,
         subtitle="Управление доступом")
 
 
 @viewargs(renderer='json', method='GET', json=True)
-@model_context(Resource)
-def security_get(request, obj):
-    request.resource_permission(obj, Resource, 'permissions')
+def security_get(request):
+    request.resource_permission(request.context, Resource, 'permissions')
     return [dict([
         (k, getattr(i, k))
         for k in (
             'principal_id', 'identity', 'scope',
             'permission', 'propagate', 'action')
-    ]) for i in obj.acl]
+    ]) for i in request.context.acl]
 
 
 @viewargs(renderer='json', method='PUT', json=True)
-@model_context(Resource)
-def security_put(request, obj):
-    request.resource_permission(obj, Resource, 'permissions')
-    for r in list(obj.acl):
-        obj.acl.remove(r)
+def security_put(request):
+    request.resource_permission(request.context, Resource, 'permissions')
+
+    for r in list(request.context.acl):
+        request.context.acl.remove(r)
 
     for itm in request.json_body:
-        obj.acl.append(ResourceACLRule(
+        request.context.acl.append(ResourceACLRule(
             principal_id=itm['principal_id'],
             identity=itm['identity'],
             scope=itm['scope'],
@@ -185,8 +195,8 @@ def security_put(request, obj):
 
 
 @viewargs(renderer='nextgisweb:resource/template/tree.mako')
-@model_context(Resource)
-def tree(request, obj):
+def tree(request):
+    obj = request.context
     return dict(obj=obj, custom_layout=True)
 
 
@@ -229,38 +239,39 @@ def setup_pyramid(comp, config):
 
     config.add_request_method(resource_permission, 'resource_permission')
 
-    config.add_route('resource.schema', '/resource/schema', client=()) \
-        .add_view(schema)
+    def _route(route_name, route_path, **kwargs):
+        return config.add_route(
+            'resource.' + route_name,
+            '/resource/' + route_path,
+            **kwargs)
 
-    config.add_route('resource', '/resource') \
-        .add_view(lambda (req): HTTPFound(
-            req.route_url('resource.show', id=0)))
+    def _resource_route(route_name, route_path, **kwargs):
+        return _route(
+            route_name, route_path,
+            factory=resource_factory,
+            **kwargs)
 
-    config.add_route('resource.show', '/resource/{id:\d+}', client=('id', )) \
-        .add_view(show)
+    _route('schema', 'schema', client=()).add_view(schema)
 
-    config.add_route('resource.tree', '/resource/{id:\d+}/tree', client=('id', )) \
-        .add_view(tree)
+    _route('root', '').add_view(
+        lambda (r): HTTPFound(r.route_url('resource.show', id=0)))
 
-    config.add_route('resource.store', '/resource/store', client=()) \
-        .add_view(store)
+    _resource_route('show', '{id:\d+}', client=('id', )).add_view(show)
+
+    _resource_route('tree', '{id:\d+}/tree', client=('id', )).add_view(tree)
+
+    _route('store', 'store', client=()).add_view(store)
 
     permalinker(Resource, 'resource.show')
 
-    ResourceController('resource').includeme(config)
-
     # ACL
 
-    config.add_route(
-        'resource.security',
-        '/resource/{id:\d+}/security',
-        client=('id', )
-    ) \
-        .add_view(security_get) \
-        .add_view(security_put) \
-        .add_view(security)
+    _resource_route('security', '{id:\d+}/security', client=('id', )) \
+        .add_view(security_get).add_view(security_put).add_view(security)
 
     # Виджет редактирования
+
+    ResourceController('resource').includeme(config)
 
     Resource.object_widget = (
         ('resource', ResourceObjectWidget),
@@ -326,8 +337,10 @@ def setup_pyramid(comp, config):
             lambda args: args.request.route_url(
                 'resource.delete', id=args.obj.id)),
 
+        Label('security', "Права доступа"),
+
         Link(
-            'operation/security', "Управление доступом",
+            'security/edit', "Редактировать",
             lambda args: args.request.route_url(
                 'resource.security', id=args.obj.id)),
 

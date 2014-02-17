@@ -12,6 +12,7 @@ from .models import (
 
 from .permission import register_permission
 from .interface import IResourceInterface
+from .views import resource_factory
 
 __all__ = [
     'ResourceComponent',
@@ -21,7 +22,8 @@ __all__ = [
     'DataScope',
 
     'register_permission',
-    'IResourceInterface'
+    'IResourceInterface',
+    'resource_factory',
 ]
 
 
