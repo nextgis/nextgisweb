@@ -11,9 +11,10 @@ import geoalchemy as ga
 import sqlalchemy.orm as orm
 import sqlalchemy.sql as sql
 
+from ..resource import Resource
 from ..geometry import geom_from_wkb, box
 from ..models import declarative_base, DBSession
-from ..layer import Layer, SpatialLayerMixin
+from ..layer import SpatialLayerMixin
 
 from ..feature_layer import (
     Feature,
@@ -176,21 +177,24 @@ class TableInfo(object):
             feature = ogrlayer.GetNextFeature()
 
 
-@Layer.registry.register
-class VectorLayer(Base, Layer, SpatialLayerMixin, LayerFieldsMixin):
-    implements(IWritableFeatureLayer)
-
-    __tablename__ = 'vector_layer'
-
-    identity = __tablename__
+@Resource.registry.register
+class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
+    identity = 'vector_layer'
     cls_display_name = u"Векторный слой"
 
-    layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
-    geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False), nullable=False)
+    __tablename__ = identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
 
-    __mapper_args__ = dict(
-        polymorphic_identity=identity,
-    )
+    implements(IWritableFeatureLayer)
+
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    
+    geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False),
+                              nullable=False)
+
+    @classmethod
+    def check_parent(self, parent):
+        return parent.cls == 'resource_group'
 
     @property
     def _tablename(self):

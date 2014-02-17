@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..component import Component
+from ..component import Component, require
 
 from .feature import Feature, FeatureSet
 from .models import Base, LayerField, LayerFieldsMixin
@@ -27,6 +27,7 @@ class FeatureLayerComponent(Component):
         from .extension import FeatureExtension
         self.FeatureExtension = FeatureExtension
 
+    @require('resource')
     def setup_pyramid(self, config):
         from . import views
         views.setup_pyramid(self, config)

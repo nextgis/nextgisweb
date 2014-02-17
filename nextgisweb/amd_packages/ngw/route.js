@@ -5,6 +5,9 @@ define([
     routes
 ) {
     return function (route, args) {
-        return ngwConfig.applicationUrl + routes[route].pattern.replace(/__(\w+)__/, function (match, a) { return args[a]; });
+        return ngwConfig.applicationUrl +
+            routes[route].pattern.replace(/__(\w+)__/g, function (match, a) {
+                return args[a];
+            });
     };
 });

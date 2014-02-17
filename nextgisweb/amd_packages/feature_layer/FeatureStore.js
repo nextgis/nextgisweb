@@ -6,17 +6,18 @@ define([
 ], function (
     declare,
     JsonRest,
-    json
+    json,
+    route
 ) {
     return declare(JsonRest, {
         constructor: function (options) {
-            this.target = ngwConfig.applicationUrl + '/layer/' + options.layer + '/store_api/';
+            this.target = route("feature_layer.store", {id: options.layer});
 
-            if (this.fieldList) { this.headers["X-Field-List"] = json.stringify(this.fieldList) };
-            if (this.fieldPrefix) { this.headers["X-Field-Prefix"] = json.stringify(this.fieldPrefix) };
+            if (this.fieldList) { this.headers["X-Field-List"] = json.stringify(this.fieldList); }
+            if (this.fieldPrefix) { this.headers["X-Field-Prefix"] = json.stringify(this.fieldPrefix); }
 
-            if (this.featureBox) { this.headers["X-Feature-Box"] = true };
-            if (this.featureExt) { this.headers["X-Feature-Ext"] = this.featureExt };
+            if (this.featureBox) { this.headers["X-Feature-Box"] = true; }
+            if (this.featureExt) { this.headers["X-Feature-Ext"] = this.featureExt; }
         }
     });
 });

@@ -1,23 +1,25 @@
+/* globals define, console */
 define([
-    'dojo/_base/declare',
+    "dojo/_base/declare",
     "dijit/layout/BorderContainer",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dojo/text!./templates/FeatureGrid.html",
     // dgrid & plugins
-    'dgrid/OnDemandGrid',
-    'dgrid/Selection',
+    "dgrid/OnDemandGrid",
+    "dgrid/Selection",
     "dgrid/extensions/ColumnHider",
     // other
-    'dojo/_base/lang',
-    'dojo/_base/array',
-    'dojo/request/xhr',
-    'dojo/Deferred',
-    'dojo/promise/all',
-    'dojo/store/Observable',
-    'dojo/dom-style',
+    "dojo/_base/lang",
+    "dojo/_base/array",
+    "dojo/request/xhr",
+    "dojo/Deferred",
+    "dojo/promise/all",
+    "dojo/store/Observable",
+    "dojo/dom-style",
     // ngw
-    './FeatureStore',
+    "ngw/route",
+    "./FeatureStore",
     // template
     "dijit/layout/ContentPane",
     "dijit/Toolbar",
@@ -42,6 +44,7 @@ define([
     Observable,
     domStyle,
     // ngw
+    route,
     FeatureStore
 ) {
     // Базовый класс ggrid над которым затем делается обертка в dijit виджет
@@ -68,14 +71,14 @@ define([
 
             var widget = this;
 
-            xhr.get(application_url + '/layer/' + this.layerId + '/field/', {
-                handleAs: 'json'
+            xhr.get(route("feature_layer.field", {id: this.layerId}), {
+                handleAs: "json"
             }).then(
                 function (data) {
                     widget._fields = data;
                     widget.initializeGrid();
                 }
-            );
+            ).otherwise(console.error);
 
         },
 
@@ -102,7 +105,7 @@ define([
                 }));
             } else {
                 // Поиск не нужен, прячем строку поиска
-                domStyle.set(this.tbSearch.domNode, 'display', 'none');                
+                domStyle.set(this.tbSearch.domNode, "display", "none");                
             };
         },
 
@@ -117,7 +120,7 @@ define([
 
             array.forEach(this._fields, function (f) {
                 columns.push({
-                    field: 'F:' + f.keyname,
+                    field: "F:" + f.keyname,
                     label: f.display_name,
                     hidden: !f.grid_visibility
                 });
@@ -128,7 +131,7 @@ define([
                 this.store = new Observable(new FeatureStore({
                     layer: this.layerId,
                     fieldList: fields,
-                    fieldPrefix: 'F:'
+                    fieldPrefix: "F:"
                 }));
             };
 
@@ -140,7 +143,7 @@ define([
 
             if (this.data) {
                 this._grid.renderArray(this.data);
-            };
+            }
 
             domStyle.set(this._grid.domNode, "height", "100%");
             domStyle.set(this._grid.domNode, "border", "none");
@@ -150,9 +153,9 @@ define([
                 widget.set("selectedRow", event.rows[0].data);
             });
 
-            this._grid.on("dgrid-deselect", function (event) {
+            this._grid.on("dgrid-deselect", function () {
                 widget.set("selectedRow", null);
-            })
+            });
 
             this._gridInitialized.resolve();
         },
@@ -170,8 +173,10 @@ define([
         },
 
         openFeature: function() {
-            window.open(ngwConfig.applicationUrl + "/layer/" + this.layerId
-                + "/feature/" + this.get("selectedRow").id + "/edit");
+            window.open(route("feature_layer.feature.show", {
+                id: this.layerId,
+                feature_id: this.get("selectedRow").id
+            }));
         },
 
         updateSearch: function () {

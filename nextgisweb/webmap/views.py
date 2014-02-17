@@ -136,7 +136,6 @@ def setup_pyramid(comp, config):
 
     class DisplayMenu(DynItem):
         def build(self, args):
-            print args
             if isinstance(args.obj, WebMap):
                 yield Label('webmap', u"Веб-карта")
 

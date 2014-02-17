@@ -5,7 +5,7 @@ from types import MethodType
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
-from ..views import model_context
+from ..resource import Resource, resource_factory
 from ..geometry import geom_from_wkt
 from ..object_widget import ObjectWidget, CompositeWidget
 from .. import dynmenu as dm
@@ -13,6 +13,166 @@ from ..layer import Layer
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
+
+
+def feature_browse(layer, request):
+    # TODO: Security
+    return dict(
+        obj=layer,
+        subtitle=u"Объекты",
+        custom_layout=True)
+
+
+def feature_show(layer, request):
+    # TODO: Security
+
+    fquery = layer.feature_query()
+    fquery.filter_by(id=request.matchdict['feature_id'])
+
+    feature = fquery().one()
+
+    return dict(
+        obj=layer,
+        subtitle=u"Объект #%d" % feature.id,
+        feature=feature)
+
+
+def feature_edit(layer, request):
+    # TODO: Security
+
+    query = layer.feature_query()
+    query.filter_by(id=request.matchdict['feature_id'])
+    feature = list(query())[0]
+
+    swconfig = []
+
+    if hasattr(layer, 'feature_widget'):
+        swconfig.append(('feature_layer', layer.feature_widget()))
+
+    for k, v in FeatureExtension.registry._dict.iteritems():
+        swconfig.append((k, v(layer).feature_widget))
+
+    class Widget(CompositeWidget):
+        subwidget_config = swconfig
+
+    widget = Widget(obj=feature, operation='edit')
+    widget.bind(request=request)
+
+    if request.method == 'POST':
+        widget.bind(data=request.json_body)
+
+        if widget.validate():
+            widget.populate_obj()
+
+            return render_to_response(
+                'json', dict(
+                    status_code=200,
+                    redirect=request.url
+                ),
+                request
+            )
+
+        else:
+            return render_to_response(
+                'json', dict(
+                    status_code=400,
+                    error=widget.widget_error()
+                ),
+                request
+            )
+
+    return dict(
+        widget=widget,
+        obj=layer,
+        subtitle=u"Объект: %s" % unicode(feature),
+    )
+
+
+def field_collection(layer, request):
+    # TODO: Security
+    return [f.to_dict() for f in layer.fields]
+
+
+def store_collection(layer, request):
+    # TODO: Security
+
+    query = layer.feature_query()
+
+    http_range = request.headers.get('range', None)
+    if http_range and http_range.startswith('items='):
+        first, last = map(int, http_range[len('items='):].split('-', 1))
+        query.limit(last - first + 1, first)
+
+    field_prefix = json.loads(request.headers.get('x-field-prefix', '""'))
+    pref = lambda (f): field_prefix + f
+
+    field_list = json.loads(request.headers.get('x-field-list', "[]"))
+    if len(field_list) > 0:
+        query.fields(*field_list)
+
+    box = request.headers.get('x-feature-box', None)
+    if box:
+        query.box()
+
+    like = request.params.get('like', '')
+    if like != '':
+        query.like(like)
+
+    features = query()
+
+    result = []
+    for fobj in features:
+        fdata = dict(
+            [(pref(k), v) for k, v in fobj.fields.iteritems()],
+            id=fobj.id, label=fobj.label)
+        if box:
+            fdata['box'] = fobj.box.bounds
+
+        result.append(fdata)
+
+    headers = dict()
+    headers["Content-Type"] = 'application/json'
+
+    if http_range:
+        total = features.total_count
+        last = min(total - 1, last)
+        headers['Content-Range'] = 'items %d-%s/%d' % (first, last, total)
+
+    return Response(json.dumps(result), headers=headers)
+
+
+def store_item(layer, request):
+    # TODO: Security
+
+    box = request.headers.get('x-feature-box', None)
+    ext = request.headers.get('x-feature-ext', None)
+
+    query = layer.feature_query()
+    query.filter_by(id=request.matchdict['feature_id'])
+
+    if box:
+        query.box()
+
+    feature = list(query())[0]
+
+    result = dict(
+        feature.fields,
+        id=feature.id, layerId=layer.id,
+        fields=feature.fields
+    )
+
+    if box:
+        result['box'] = feature.box.bounds
+
+    if ext:
+        result['ext'] = dict()
+        for extcls in FeatureExtension.registry:
+            extension = extcls(layer=layer)
+            result['ext'][extcls.identity] = extension.feature_data(feature)
+
+    return Response(
+        json.dumps(result),
+        content_type='application/json')
 
 
 def setup_pyramid(comp, config):
@@ -105,190 +265,52 @@ def setup_pyramid(comp, config):
     config.add_route('feature_layer.identify', '/feature_layer/identify')
     config.add_view(identify, route_name='feature_layer.identify', renderer='json')
 
-    @model_context(Layer)
-    def browse(request, layer):
-        request.require_permission(layer, 'data-read')
-        return dict(
-            obj=layer,
-            subtitle=u"Объекты",
-            custom_layout=True
-        )
+    config.add_route(
+        'feature_layer.feature.browse',
+        '/resource/{id:\d+}/feature/',
+        factory=resource_factory,
+        client=('id', )
+    ).add_view(
+        feature_browse, context=IFeatureLayer,
+        renderer='feature_layer/feature_browse.mako')
 
-    config.add_route('feature_layer.feature.browse', '/layer/{id:\d+}/feature/',
-                     client=('id', ))
+    config.add_route(
+        'feature_layer.field', '/resource/{id:\d+}/field/',
+        factory=resource_factory,
+        client=('id', )
+    ).add_view(field_collection, context=IFeatureLayer, renderer='json')
 
-    config.add_view(browse, route_name='feature_layer.feature.browse',
-                    renderer='feature_layer/feature_browse.mako')
+    config.add_route(
+        'feature_layer.store',
+        '/resource/{id:\d+}/store/',
+        factory=resource_factory, client=('id', )
+    ).add_view(store_collection, context=IFeatureLayer)
 
-    @model_context(Layer)
-    def edit(request, layer):
-        request.require_permission(layer, 'data-read', 'data-edit')
+    config.add_route(
+        'feature_layer.store.item',
+        '/resource/{id:\d+}/store/{feature_id:\d+}',
+        factory=resource_factory
+    ).add_view(store_item, context=IFeatureLayer)
 
-        query = layer.feature_query()
-        query.filter_by(id=request.matchdict['feature_id'])
-        feature = list(query())[0]
+    config.add_route(
+        'feature_layer.feature.show',
+        '/resource/{id:\d+}/feature/{feature_id:\d+}',
+        factory=resource_factory,
+        client=('id', 'feature_id')
+    ).add_view(
+        feature_show,
+        context=IFeatureLayer,
+        renderer='feature_layer/feature_show.mako')
 
-        swconfig = []
-
-        if hasattr(layer, 'feature_widget'):
-            swconfig.append(('feature_layer', layer.feature_widget()))
-
-        for k, v in FeatureExtension.registry._dict.iteritems():
-            swconfig.append((k, v(layer).feature_widget))
-
-        class Widget(CompositeWidget):
-            subwidget_config = swconfig
-
-        widget = Widget(obj=feature, operation='edit')
-        widget.bind(request=request)
-
-        if request.method == 'POST':
-            widget.bind(data=request.json_body)
-
-            if widget.validate():
-                widget.populate_obj()
-
-                return render_to_response(
-                    'json', dict(
-                        status_code=200,
-                        redirect=request.url
-                    ),
-                    request
-                )
-
-            else:
-                return render_to_response(
-                    'json', dict(
-                        status_code=400,
-                        error=widget.widget_error()
-                    ),
-                    request
-                )
-
-        return dict(
-            widget=widget,
-            obj=layer,
-            subtitle=u"Объект: %s" % unicode(feature),
-        )
-
-    config.add_route('feature_layer.feature.edit', '/layer/{id:\d+}/feature/{feature_id}/edit')
-    config.add_view(edit, route_name='feature_layer.feature.edit', renderer='model_widget.mako')
-
-    @model_context(Layer)
-    def field(request, layer):
-        request.require_permission(layer, 'metadata-view')
-        return [f.to_dict() for f in layer.fields]
-
-    config.add_route('feature_layer.field', 'layer/{id:\d+}/field/')
-    config.add_view(field, route_name='feature_layer.field', renderer='json')
-
-    @model_context(Layer)
-    def store_api(request, layer):
-        request.require_permission(layer, 'data-read')
-
-        query = layer.feature_query()
-
-        http_range = request.headers.get('range', None)
-        if http_range and http_range.startswith('items='):
-            first, last = map(int, http_range[len('items='):].split('-', 1))
-            query.limit(last - first + 1, first)
-
-        field_prefix = json.loads(request.headers.get('x-field-prefix', '""'))
-        pref = lambda (f): field_prefix + f
-
-        field_list = json.loads(request.headers.get('x-field-list', "[]"))
-        if len(field_list) > 0:
-            query.fields(*field_list)
-
-        box = request.headers.get('x-feature-box', None)
-        if box:
-            query.box()
-
-        like = request.params.get('like', '')
-        if like != '':
-            query.like(like)
-
-        features = query()
-
-        result = []
-        for fobj in features:
-            fdata = dict(
-                [(pref(k), v) for k, v in fobj.fields.iteritems()],
-                id=fobj.id, label=fobj.label)
-            if box:
-                fdata['box'] = fobj.box.bounds
-
-            result.append(fdata)
-
-        headers = dict()
-        headers["Content-Type"] = 'application/json'
-
-        if http_range:
-            total = features.total_count
-            last = min(total - 1, last)
-            headers['Content-Range'] = 'items %d-%s/%d' % (first, last, total)
-
-        return Response(json.dumps(result), headers=headers)
-
-    config.add_route('feature_layer.store_api', '/layer/{id:\d+}/store_api/')
-    config.add_view(store_api, route_name='feature_layer.store_api')
-
-    @model_context(Layer)
-    def store_get_item(request, layer):
-        request.require_permission(layer, 'data-read')
-
-        box = request.headers.get('x-feature-box', None)
-        ext = request.headers.get('x-feature-ext', None)
-
-        query = layer.feature_query()
-        query.filter_by(id=request.matchdict['feature_id'])
-
-        if box:
-            query.box()
-
-        feature = list(query())[0]
-
-        result = dict(
-            feature.fields,
-            id=feature.id, layerId=layer.id,
-            fields=feature.fields
-        )
-
-        if box:
-            result['box'] = feature.box.bounds
-
-        if ext:
-            result['ext'] = dict()
-            for extcls in FeatureExtension.registry:
-                extension = extcls(layer=layer)
-                result['ext'][extcls.identity] = extension.feature_data(feature)
-
-        return Response(
-            json.dumps(result),
-            content_type='application/json'
-        )
-
-    config.add_route('feature_layer.feature_get', '/layer/{id:\d+}/store_api/{feature_id:\d+}')
-    config.add_view(store_get_item, route_name='feature_layer.feature_get')
-
-    def feature_show(request):
-        layer = Layer.filter_by(id=request.matchdict['layer_id']).one()
-
-        request.require_permission(layer, 'data-read')
-
-        fquery = layer.feature_query()
-        fquery.filter_by(id=request.matchdict['id'])
-
-        feature = fquery().one()
-
-        return dict(
-            obj=layer,
-            subtitle=u"Объект #%d" % feature.id,
-            feature=feature,
-        )
-
-    config.add_route('feature_layer.feature.show', '/layer/{layer_id:\d+}/feature/{id:\d+}')
-    config.add_view(feature_show, route_name='feature_layer.feature.show', renderer='feature_layer/feature_show.mako')
+    config.add_route(
+        'feature_layer.feature.edit',
+        '/resource/{id:\d+}/feature/{feature_id}/edit',
+        factory=resource_factory,
+        client=('id', 'feature_id')
+    ).add_view(
+        feature_edit,
+        context=IFeatureLayer,
+        renderer='model_widget.mako')
 
     def client_settings(self, request):
         return dict(
@@ -313,14 +335,14 @@ def setup_pyramid(comp, config):
         def build(self, args):
             if IFeatureLayer.providedBy(args.obj):
                 yield dm.Link(
-                    'data/browse-feature', u"Таблица объектов",
+                    'extra/feature-browse', u"Таблица объектов",
                     lambda args: args.request.route_url(
                         "feature_layer.feature.browse",
                         id=args.obj.id
                     )
                 )
 
-    comp.env.layer.layer_menu.add(LayerMenuExt())
+    Resource.__dynmenu__.add(LayerMenuExt())
 
     comp.env.layer.layer_page_sections.register(
         key='fields',
