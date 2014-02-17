@@ -53,11 +53,6 @@ def setup_pyramid(comp, config):
 
     ACLController(LayerGroup).includeme(config)
 
-    def layer_group_home(request):
-        return HTTPFound(location=request.route_url('layer_group.show', id=0))
-
-    config.add_route('layer_group', '/layer_group/').add_view(layer_group_home)
-
     @model_context(LayerGroup)
     def show(request, obj):
         request.require_permission(obj, 'read')

@@ -61,7 +61,7 @@ def permalinker(model, route_name, keys=('id', )):
 
 
 def home(request):
-    return HTTPFound(location=request.route_url('layer'))
+    return HTTPFound(location=request.route_url('resource.show', id=0))
 
 
 def amd_package(request):
