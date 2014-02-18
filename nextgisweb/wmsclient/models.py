@@ -10,36 +10,43 @@ from owslib.wms import WebMapService
 import sqlalchemy as sa
 
 from ..models import declarative_base
-from ..layer import Layer, SpatialLayerMixin
+from ..resource import Resource, MetaDataScope
+from ..layer import SpatialLayerMixin
+
 from ..style import (
-    Style,
     IRenderableStyle,
     IExtentRenderRequest,
-    ITileRenderRequest
-)
+    ITileRenderRequest)
 
 Base = declarative_base()
+
 
 WMS_VERSIONS = ('1.1.1', )
 
 
-@Layer.registry.register
-class WMSClientLayer(Base, Layer, SpatialLayerMixin):
-    __tablename__ = 'wmsclient_layer'
-
-    identity = __tablename__
-    __mapper_args__ = dict(polymorphic_identity=identity)
-
+@Resource.registry.register
+class WMSClientLayer(Base, MetaDataScope, Resource, SpatialLayerMixin):
+    identity = 'wmsclient_layer'
     cls_display_name = u"WMS-клиент"
 
-    layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
+    __tablename__ = identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
+
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+
     url = sa.Column(sa.Unicode, nullable=False)
-    version = sa.Column(sa.Enum(*WMS_VERSIONS, native_enum=False), nullable=False)
+    version = sa.Column(sa.Enum(*WMS_VERSIONS, native_enum=False),
+                        nullable=False)
+
+    @classmethod
+    def check_parent(self, parent):
+        return parent.cls == 'resource_group'
 
     @property
     def client(self):
         if not hasattr(self, '_client'):
             self._client = WebMapService(self.url, version=self.version)
+
         return self._client
 
     @property
@@ -67,28 +74,24 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
-@Style.registry.register
-class WMSClientStyle(Base, Style):
-    implements(IRenderableStyle)
-
-    __tablename__ = 'wmsclient_style'
-
-    identity = __tablename__
-    __mapper_args__ = dict(polymorphic_identity=identity)
-
+@Resource.registry.register
+class WMSClientStyle(Base, MetaDataScope, Resource):
+    identity = 'wmsclient_style'
     cls_display_name = u"WMS-стиль"
 
-    style_id = sa.Column(sa.ForeignKey(Style.id), primary_key=True)
+    implements(IRenderableStyle)
+
+    __tablename__ = identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
+
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+
     wmslayers = sa.Column(sa.Unicode, nullable=False)
     imgformat = sa.Column(sa.Unicode, nullable=False)
 
-    __mapper_args__ = dict(
-        polymorphic_identity=identity,
-    )
-
     @classmethod
-    def is_layer_supported(cls, layer):
-        return layer.cls == 'wmsclient_layer'
+    def check_parent(self, parent):
+        return parent.cls == 'wmsclient_layer'
 
     def render_request(self, srs):
         return RenderRequest(self, srs)
@@ -100,12 +103,12 @@ class WMSClientStyle(Base, Style):
             request="GetMap",
             layers=self.wmslayers,
             styles="",
-            srs="EPSG:%d" % self.layer.srs_id,
+            srs="EPSG:%d" % self.parent.srs_id,
             bbox=','.join(map(str, extent)),
             width=size[0], height=size[1],
             format=self.imgformat,
             transparent="true"
         )
 
-        url = self.layer.url + "?" + urllib.urlencode(query)
+        url = self.parent.url + "?" + urllib.urlencode(query)
         return PIL.Image.open(BytesIO(urllib2.urlopen(url).read()))

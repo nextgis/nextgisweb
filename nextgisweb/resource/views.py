@@ -50,7 +50,10 @@ class ResourceController(ModelController):
             owner_user=request.user,
             template_context=dict(
                 obj=parent,
-                subtitle="Новый ресурс: %s" % cls.cls_display_name))
+                subtitle="Новый ресурс: %s" % cls.cls_display_name),
+            widget_options=dict(
+                parent=parent,
+                user=request.user))
 
     def edit_context(self, request):
         obj = Resource.filter_by(**request.matchdict).one()

@@ -51,7 +51,11 @@ class WMSClientStyleObjectWidget(ObjectWidget):
                 imgformat=self.obj.imgformat,
             )
 
-        client = self.options['layer'].client
+        if self.obj:
+            client = self.obj.parent.client
+        else:
+            client = self.options['parent'].client
+
         result['imgformat'] = client.getOperationByName('GetMap').formatOptions
 
         wmslayers = []
