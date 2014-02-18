@@ -23,6 +23,7 @@ from ..feature_layer import (
     LayerFieldsMixin,
     GEOM_TYPE,
     FIELD_TYPE,
+    IFeatureLayer,
     IWritableFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilterBy,
@@ -185,7 +186,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     __tablename__ = identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    implements(IWritableFeatureLayer)
+    implements(IFeatureLayer, IWritableFeatureLayer)
 
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
     

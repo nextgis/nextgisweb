@@ -120,7 +120,7 @@ def setup_pyramid(comp, config):
                 basemap=tuple(display.mid.basemap),
                 plugin=tuple(display.mid.plugin)
             ),
-            bookmarkLayerId=obj.bookmark_layer_id,
+            bookmarkLayerId=obj.bookmark_resource_id,
         )
 
         return dict(

@@ -4,7 +4,6 @@ import sqlalchemy.orm as orm
 
 from ..models import declarative_base
 from ..resource import Resource, MetaDataScope
-from ..layer import Layer
 
 Base = declarative_base()
 
@@ -15,18 +14,25 @@ class WebMap(Base, MetaDataScope, Resource):
     cls_display_name = u"Веб-карта"
 
     __tablename__ = 'webmap'
-    __mapper_args__ = dict(polymorphic_identity=identity)
 
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
-    root_item_id = sa.Column(sa.Integer, sa.ForeignKey('webmap_item.id'), nullable=False)
-    bookmark_layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), nullable=True)
+    root_item_id = sa.Column(sa.ForeignKey('webmap_item.id'), nullable=False)
+    bookmark_resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
+
     extent_left = sa.Column(sa.Float, default=-180)
     extent_right = sa.Column(sa.Float, default=+180)
     extent_bottom = sa.Column(sa.Float, default=-90)
     extent_top = sa.Column(sa.Float, default=+90)
 
-    bookmark_layer = orm.relationship(Layer)
+    __mapper_args__ = dict(
+        polymorphic_identity=identity,
+        inherit_condition=(resource_id == Resource.id)
+    )
+
+    bookmark_resource = orm.relationship(
+        Resource, foreign_keys=bookmark_resource_id)
+
     root_item = orm.relationship('WebMapItem', cascade='all')
 
     @classmethod
@@ -38,20 +44,21 @@ class WebMap(Base, MetaDataScope, Resource):
             id=self.id,
             display_name=self.display_name,
             root_item=self.root_item.to_dict(),
-            bookmark_layer_id=self.bookmark_layer_id,
-            extent=(self.extent_left, self.extent_bottom, self.extent_right, self.extent_top),
+            bookmark_resource_id=self.bookmark_resource_id,
+            extent=(self.extent_left, self.extent_bottom,
+                    self.extent_right, self.extent_top),
         )
 
     def from_dict(self, data):
         if 'display_name' in data:
             self.display_name = data['display_name']
-            
+
         if 'root_item' in data:
             self.root_item = WebMapItem(item_type='root')
             self.root_item.from_dict(data['root_item'])
 
-        if 'bookmark_layer_id' in data:
-            self.bookmark_layer_id = data['bookmark_layer_id']
+        if 'bookmark_resource_id' in data:
+            self.bookmark_resource_id = data['bookmark_resource_id']
 
         if 'extent' in data:
             self.extent_left, self.extent_bottom, \
@@ -63,7 +70,8 @@ class WebMapItem(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     parent_id = sa.Column(sa.Integer, sa.ForeignKey('webmap_item.id'))
-    item_type = sa.Column(sa.Enum('root', 'group', 'layer', native_enum=False), nullable=False)
+    item_type = sa.Column(sa.Enum('root', 'group', 'layer', native_enum=False),
+                          nullable=False)
     position = sa.Column(sa.Integer, nullable=True)
     display_name = sa.Column(sa.Unicode, nullable=True)
     group_expanded = sa.Column(sa.Boolean, nullable=True)
@@ -97,7 +105,7 @@ class WebMapItem(Base):
                     item_type=self.item_type,
                     children=[i.to_dict() for i in children],
                 )
-            
+
             elif self.item_type == 'group':
                 return dict(
                     item_type=self.item_type,
@@ -124,10 +132,17 @@ class WebMapItem(Base):
             self.children = []
             pos = 1
             for i in data['children']:
-                child = WebMapItem(parent=self, item_type=i['item_type'], position=pos)
+                child = WebMapItem(parent=self,
+                                   item_type=i['item_type'],
+                                   position=pos)
+
                 child.from_dict(i)
                 self.children.append(child)
                 pos += 1
-        for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_transparency', 'layer_style_id', 'layer_min_scale_denom', 'layer_max_scale_denom', 'layer_adapter'):
+
+        for a in ('display_name', 'group_expanded', 'layer_enabled',
+                  'layer_adapter', 'layer_style_id', 'layer_transparency'
+                  'layer_min_scale_denom', 'layer_max_scale_denom'):
+
             if a in data:
                 setattr(self, a, data[a])

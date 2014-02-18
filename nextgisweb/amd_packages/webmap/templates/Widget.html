@@ -6,7 +6,17 @@
         style="height: 400px; margin-bottom: 1em">
 
         <div data-dojo-type="dijit/Toolbar" data-dojo-props="region: 'top'">
-            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnAddLayer">Добавить слой</div>
+            <div data-dojo-type="dijit/form/Button"
+                data-dojo-attach-point="btnAddLayer"
+                data-dojo-props="label: 'Добавить слой'">
+
+                <div data-dojo-type="ngw-resource/ResourcePicker"
+                    data-dojo-attach-point="layerPicker"
+                    data-dojo-props="interface: 'IRenderableStyle'">
+                </div>
+
+            </div>
+
             <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnAddGroup">Добавить группу</div>
             <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnDeleteItem" data-dojo-props="iconClass: 'dijitEditorIcon dijitEditorIconDelete'" disabled="disabled">Удалить</div>
         </div>
@@ -20,12 +30,17 @@
     </div>
 
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2">
-        
+
         <div data-dojo-attach-point="wBookmarkLayer"
-            data-dojo-type="ngw/form/LayerSelect"
+            data-dojo-type="ngw/form/PickerBox"
             data-dojo-props="colspan: 2"
             title="Слой закладок"
             style="width: 100%">
+
+            <div data-dojo-type="ngw-resource/ResourcePicker"
+                data-dojo-attach-point="bookmarkPicker"
+                data-dojo-props="interface: 'IFeatureLayer'">
+            </div>
         </div>
 
         <div data-dojo-type="dijit/_WidgetBase"
@@ -60,27 +75,6 @@
             title="Верх, град."
             style="width: 100%">
         </div>
-
-    </div>
-
-    <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="dlgAddLayer" title="Добавить слой">
-
-            <div class="dijitDialogPaneContentArea"><div data-dojo-type="ngw-resource/Tree"
-                data-dojo-attach-point="wgtLayer"
-                data-dojo-props="resourceId: 0"
-                class="dijitBorderContainer-child"
-                style="width: 400px; height: 300px">
-            </div></div>
-            
-            <div class="dijitDialogPaneActionBar">
-                
-                <div data-dojo-type="dijit/form/Button"
-                    data-dojo-attach-point="btnDlgAddLayer"
-                    data-dojo-props="disabled: true">
-                    Добавить
-                </div>
-
-            </div>
 
     </div>
 

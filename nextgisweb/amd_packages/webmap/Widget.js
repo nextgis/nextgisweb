@@ -1,5 +1,7 @@
+/* globals define, console */
 define([
     "dojo/_base/declare",
+    "dojo/_base/lang",
     "dojo/dom-style",
     "ngw/modelWidget/Widget",
     "ngw/modelWidget/ErrorDisplayMixin",
@@ -12,6 +14,8 @@ define([
     "dijit/Tree",
     "dijit/tree/dndSource",
     "dijit/registry",
+    "ngw-resource/ResourceStore",
+    "ngw-resource/ResourcePicker",
     "ngw/settings!webmap",
     // template
     "dijit/layout/TabContainer",
@@ -22,16 +26,17 @@ define([
     "dijit/Dialog",
     "dijit/Toolbar",
     "ngw/form/DisplayNameTextBox",
-    "ngw/form/LayerSelect",
     "ngw/form/ScaleTextBox",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
     "dijit/form/Select",
     "dijit/_WidgetBase",
-    "ngw-resource/Tree"
+    "ngw-resource/Tree",
+    "ngw/form/PickerBox"
 ], function (
     declare,
+    lang,
     domStyle,
     Widget,
     ErrorDisplayMixin,
@@ -44,6 +49,8 @@ define([
     Tree,
     dndSource,
     registry,
+    ResourceStore,
+    ResourcePicker,
     settings
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -85,6 +92,17 @@ define([
             });
         },
 
+        buildRendering: function () {
+            this.inherited(arguments);
+
+            this.wBookmarkLayer.set("store", new ResourceStore());
+            this.wBookmarkLayer.on("pick", lang.hitch(this, function () {
+                this.bookmarkPicker.pick().then(lang.hitch(this, function (itm) {
+                    this.wBookmarkLayer.set("value", itm.id);
+                })).otherwise(console.error);
+            }));
+        },
+
         postCreate: function () {
             this.inherited(arguments);
 
@@ -96,7 +114,7 @@ define([
             }, this);
 
             if (this.value) {
-                this.wBookmarkLayer.set("value", this.value.bookmark_layer_id);
+                this.wBookmarkLayer.set("value", this.value.bookmark_resource_id);
                 this.wExtentLeft.set("value", this.value.extent[0]);
                 this.wExtentBottom.set("value", this.value.extent[1]);
                 this.wExtentRight.set("value", this.value.extent[2]);
@@ -123,9 +141,24 @@ define([
             });
 
             // Добавление нового слоя
-            this.btnAddLayer.on("click", function () {
-                widget.dlgAddLayer.show();
-            });
+            this.btnAddLayer.on("click", lang.hitch(this, function () {
+                this.layerPicker.pick().then(lang.hitch(this, function (itm) {
+                    this.itemStore.newItem({
+                            "item_type": "layer",
+                            "display_name": itm.display_name,
+                            "layer_style_id": itm.id,
+                            "layer_enabled": false,
+                            "layer_transparency": null,
+                            "layer_min_scale_denom": null,
+                            "layer_max_scale_denom": null,
+                            "layer_adapter": "image"
+                        }, {
+                            parent: widget.getAddParent(),
+                            attribute: "children"
+                        }
+                    );
+                }));
+            }));
 
             // Удаление слоя или группы
             this.btnDeleteItem.on("click", function() {
@@ -194,29 +227,6 @@ define([
             this.wLayerAdapter.watch("value", function (attr, oldVal, newVal) {
                 widget.setItemValue("layer_adapter", newVal);
             });
-
-            this.wgtLayer.on("click", function (item) {
-                widget.btnDlgAddLayer.set("disabled",
-                    item.interfaces.indexOf("IRenderableStyle") == -1);
-            });
-
-            this.btnDlgAddLayer.on("click", function() {
-                widget.itemStore.newItem({
-                        "item_type": "layer",
-                        "display_name": widget.wgtLayer.selectedItem.display_name,
-                        "layer_style_id": widget.wgtLayer.selectedItem.id,
-                        "layer_enabled": false,
-                        "layer_transparency": null,
-                        "layer_min_scale_denom": null,
-                        "layer_max_scale_denom": null,
-                        "layer_adapter": "image"
-                    }, {
-                        parent: widget.getAddParent(),
-                        attribute: "children"
-                    }
-                );
-                widget.dlgAddLayer.hide();
-            });
         },
 
         validateWidget: function () {
@@ -259,7 +269,7 @@ define([
 
             return {
                 root_item: traverseItem(this.itemModel.root),
-                bookmark_layer_id: this.wBookmarkLayer.get("value") != "" ? this.wBookmarkLayer.get("value") : null,
+                bookmark_resource_id: this.wBookmarkLayer.get("value") != "" ? this.wBookmarkLayer.get("value") : null,
                 extent: array.map(['Left', 'Bottom', 'Right', 'Top'], function (e) {
                     return this['wExtent' + e].get('value')
                 }, this)

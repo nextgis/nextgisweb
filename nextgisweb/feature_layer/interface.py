@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from zope.interface import Interface, Attribute
 
+from ..resource import IResourceBase
+
 
 class GEOM_TYPE(object):
     POINT = 'POINT'
@@ -21,7 +23,7 @@ class FIELD_TYPE(object):
     enum = (INTEGER, REAL, STRING, DATE, TIME, DATETIME)
 
 
-class IFeatureLayer(Interface):
+class IFeatureLayer(IResourceBase):
 
     geometry_type = Attribute(""" Тип геометрии слоя GEOM_TYPE """)
     fields = Attribute(""" Список полей """)
