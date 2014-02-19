@@ -1,6 +1,11 @@
-import os
-
+from subprocess import check_output, CalledProcessError
 from setuptools import setup, find_packages
+
+try:
+    gdalver = '==' + check_output(['gdal-config', '--version']).strip()
+
+except CalledProcessError:
+    gdalver = ''
 
 requires = [
     'pyramid',
@@ -16,8 +21,7 @@ requires = [
     'waitress',
     'nose',
 
-    'numpy',
-    'gdal',
+    'pygdal' + gdalver,
     'psycopg2',
     'geoalchemy',
     'shapely',
@@ -66,4 +70,3 @@ setup(name='nextgisweb',
       install_requires=requires,
       entry_points=entry_points,
       )
-
