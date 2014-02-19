@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
 
-from .models import Base, Style
 from .interface import (
     IRenderableStyle,
     IExtentRenderRequest,
@@ -9,15 +8,16 @@ from .interface import (
 )
 
 __all__ = [
-    'StyleComponent', 'Style', 'IRenderableStyle',
-    'IExtentRenderRequest', 'ITileRenderRequest'
+    'StyleComponent',
+    'IRenderableStyle',
+    'IExtentRenderRequest',
+    'ITileRenderRequest'
 ]
 
 
 @Component.registry.register
 class StyleComponent(Component):
     identity = 'style'
-    metadata = Base.metadata
 
     @require('layer', 'security')
     def initialize(self):
