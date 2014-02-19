@@ -34,7 +34,6 @@ def pkginfo():
         'style',
         'marker_library',
         'webmap',
-        'layer_group.root',
         'file_storage',
         'vector_layer',
         'postgis_layer',
