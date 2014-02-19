@@ -26,7 +26,6 @@ def pkginfo():
         'security',
         'resource',
         'spatial_ref_sys',
-        'layer_group',
         'layer',
         'feature_layer',
         'feature_description',

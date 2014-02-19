@@ -57,7 +57,6 @@
 
     <ul class="span-24 menu">
       <li><a href="${request.route_url('resource.root')}">Ресурсы</a></li>
-      <li><a href="${request.route_url('layer')}">Слои</a></li>
 
       %if request.user.is_administrator:
         <li><a href="${request.route_url('pyramid.control_panel')}">Панель управления</a></li>

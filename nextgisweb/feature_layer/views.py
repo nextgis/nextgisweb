@@ -9,7 +9,6 @@ from ..resource import Resource, resource_factory
 from ..geometry import geom_from_wkt
 from ..object_widget import ObjectWidget, CompositeWidget
 from .. import dynmenu as dm
-from ..layer import Layer
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
@@ -224,7 +223,7 @@ def setup_pyramid(comp, config):
         geom = geom_from_wkt(request.json_body['geom'], srid=srs)
         layers = map(int, request.json_body['layers'])
 
-        layer_list = DBSession.query(Layer).filter(Layer.id.in_(layers))
+        layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
 
         result = dict()
 
@@ -344,9 +343,9 @@ def setup_pyramid(comp, config):
 
     Resource.__dynmenu__.add(LayerMenuExt())
 
-    comp.env.layer.layer_page_sections.register(
-        key='fields',
-        title=u"Атрибуты",
-        template="nextgisweb:templates/feature_layer/layer_section_fields.mako",
-        is_applicable=lambda (obj): IFeatureLayer.providedBy(obj)
-    )
+    # comp.env.layer.layer_page_sections.register(
+    #     key='fields',
+    #     title=u"Атрибуты",
+    #     template="nextgisweb:templates/feature_layer/layer_section_fields.mako",
+    #     is_applicable=lambda (obj): IFeatureLayer.providedBy(obj)
+    # )
