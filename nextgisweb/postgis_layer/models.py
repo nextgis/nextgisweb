@@ -5,9 +5,10 @@ import sqlalchemy as sa
 from sqlalchemy import sql, func
 
 from ..models import declarative_base
+from ..resource import Resource, DataScope
 from ..env import env
 from ..geometry import geom_from_wkt, box
-from ..layer import Layer, SpatialLayerMixin
+from ..layer import SpatialLayerMixin
 from ..feature_layer import (
     Feature,
     FeatureSet,
@@ -27,16 +28,21 @@ Base = declarative_base()
 GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
 
 
-@Layer.registry.register
-class PostgisLayer(Base, Layer, SpatialLayerMixin, LayerFieldsMixin):
-    implements(IFeatureLayer)
-
-    __tablename__ = 'postgis_layer'
-
-    identity = __tablename__
+@Resource.registry.register
+class PostgisLayer(
+    Base, DataScope, Resource,
+    SpatialLayerMixin, LayerFieldsMixin
+):
+    identity = 'postgis_layer'
     cls_display_name = u"Cлой PostGIS"
 
-    layer_id = sa.Column(sa.Integer, sa.ForeignKey(Layer.id), primary_key=True)
+    implements(IFeatureLayer)
+
+    __tablename__ = identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
+
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+
     connection = sa.Column(sa.Unicode, nullable=False)
     schema = sa.Column(sa.Unicode, default=u'public', nullable=False)
     table = sa.Column(sa.Unicode, nullable=False)
@@ -45,9 +51,9 @@ class PostgisLayer(Base, Layer, SpatialLayerMixin, LayerFieldsMixin):
     geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False), nullable=False)
     geometry_srid = sa.Column(sa.Integer, nullable=False)
 
-    __mapper_args__ = dict(
-        polymorphic_identity=identity,
-    )
+    @classmethod
+    def check_parent(self, parent):
+        return parent.cls == 'resource_group'
 
     def get_info(self):
         return super(PostgisLayer, self).get_info() + (
