@@ -1,0 +1,57 @@
+
+/* -- BASE STYLES -- */
+
+body { font-size: 12px; }
+
+/* -- LAYOUT STYLES -- */
+
+.header { }
+
+    .header .pure-menu { background: #2D3E50; }
+    
+    .header li a:hover,
+    .header li a:focus {
+        background: none;
+        border: none;
+        color: #AECFE5; }
+    
+    .header .pure-menu a {
+        padding: 0.5ex 1ex;
+        color: #6FBEF3; }
+
+    .header .pure-menu .pure-menu-heading {
+        color: white;
+        font-weight: 400;
+        font-size: 14px;
+        text-transform: none; }
+
+    .header .pure-menu ul { float: right; }
+
+    .header .pure-menu ul li.user { color: white; }
+
+.title {
+    padding: 0.5ex 1ex;
+    background: #F1F3F9;
+    border-bottom: 1px solid #CBCBCB; }
+
+    .title h1, .title h2, .title h3 {
+        margin: 0; padding: 0;
+        border: none;
+        font-weight: normal;
+        vertical-align: middle; }
+
+    .title h1 { font-size: 14pt; }
+
+/* -- MENU STYLES -- */
+
+.pure-menu a { color: inherit; }
+
+.pure-menu li a, .pure-menu .pure-menu-heading { padding: 0.25ex 0.25ex; }
+
+/* -- CONTENT STYLES -- */
+
+.content { padding: 1em; }
+
+.content-wrapper {
+    max-width: 1280px;
+    margin: 0 auto; }

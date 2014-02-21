@@ -13,7 +13,9 @@
 
   </title>
 
-  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/blueprint/screen.css')}" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.4.2/pure-min.css">
+  <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/layout.css')}" type="text/css"/>
+
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/default.css')}" type="text/css" media="screen, projection" />
   <link rel="stylesheet" href="${request.static_url('nextgisweb:static/css/icon.css')}" type="text/css" media="screen, projection" />
  
@@ -50,26 +52,39 @@
 <body class="claro">
   %if not custom_layout:
 
-  <div class="container">
-    <div class="span-24 header caption">
-      ${request.env.core.settings['system.full_name']}
-    </div>
-
-    <ul class="span-24 menu">
+<div class="header">
+  <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal">
+    <a class="pure-menu-heading" href="${request.application_url}">${request.env.core.settings['system.full_name']}</a>
+    <ul>
       <li><a href="${request.route_url('resource.root')}">Ресурсы</a></li>
 
       %if request.user.is_administrator:
         <li><a href="${request.route_url('pyramid.control_panel')}">Панель управления</a></li>
       %endif
 
-      <li style="float: right;">
       %if request.user.keyname == 'guest':
-          <a href="${request.route_url('auth.login')}">Вход</a>
+        <li><a href="${request.route_url('auth.login')}">Вход</a></li>
       %else:
-          ${request.user} [<a href="${request.route_url('auth.logout')}">выход</a>]
+        <li class="user">${request.user}</li>
+        <li><a href="${request.route_url('auth.logout')}">Выход</a></li>
       %endif
-      </li>
     </ul>
+  </div>
+</div>
+
+%if hasattr(next, 'title_block'):
+  <div class="title">
+    <%block name="title_block"></%block>
+  </div>
+%endif
+
+
+
+<div class="content-wrapper">
+
+  <div class="content">
+
+    <div class="pure-g">
 
     <% from bunch import Bunch %>
     %if obj and hasattr(obj,'__dynmenu__'):
@@ -86,14 +101,14 @@
         <% has_dynmenu = False %>
     %endif
     
-    <div class="span-${18 if has_dynmenu else 24}">
+    <div class="pure-u-${"20-24" if has_dynmenu else "1"}">
         ${next.body()}
     </div>
 
     %if has_dynmenu:
-    <div class="span-6 last panel">
+    <div class="pure-u-4-24"><div style="padding-left: 1em;">
         <%include file="dynmenu.mako" args="dynmenu=dynmenu, args=dynmenu_kwargs" />
-    </div>
+    </div></div>
     %endif
 
   </div>
@@ -103,6 +118,11 @@
     ${next.body()}
   
   %endif
+
+    </div>
+  </div>
+</div>
+
 
 </body>
 

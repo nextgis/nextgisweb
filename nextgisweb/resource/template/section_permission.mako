@@ -6,13 +6,14 @@ from nextgisweb.resource.permission import scope_permissions
 
 %>
 
-<table class="data" style="width: 100%">
+<table class="pure-table pure-table-horizontal" style="width: 100%">
     %for scope in reversed(list(clscopes(obj.__class__))):
-        <tr>
+        <thead><tr>
             <th>${scope.cls_display_name}</th>
             <th><tt>${scope.identity}</tt></th>
             <th>&nbsp;</th>
-        </tr>
+        </tr></thead>
+        <tbody>
         %for perm in scope_permissions(scope).itervalues():
         <tr>
             <td>${perm.label}</td>
@@ -31,5 +32,6 @@ from nextgisweb.resource.permission import scope_permissions
             </td>
         </tr>
         %endfor
+        </tbody>
     %endfor
 </table>

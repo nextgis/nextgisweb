@@ -2,13 +2,15 @@
 
 <% from nextgisweb import dynmenu as dm %>
 
+<div class="pure-menu pure-menu-open" style="border: none;"><ul>
 %for item in dynmenu.build(args):
     %if isinstance(item, dm.Label):
-        <div style="padding-left: ${item.level}em; margin: 0.5ex 0;">${item.label}</div>
+        <li class="pure-menu-heading">${item.label}</li>
     %elif isinstance(item, dm.Link):
         <% url = item.url(args) %>
-        <div style="padding-left: ${item.level}em; margin: 0.5ex 0;">
-            <a href="${url}" style="${ 'color: black; text-decoration: none; font-weight: bold;' if url == request.url else '' | n}">${item.label}</a>
-        </div>
+        <li class="${'pure-menu-selected' if url == request.url else ''}">
+            <a href="${url}">${item.label}</a>
+        </li>
     %endif
 %endfor
+</ul></div>
