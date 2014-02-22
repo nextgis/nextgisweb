@@ -343,9 +343,7 @@ def setup_pyramid(comp, config):
 
     Resource.__dynmenu__.add(LayerMenuExt())
 
-    # comp.env.layer.layer_page_sections.register(
-    #     key='fields',
-    #     title=u"Атрибуты",
-    #     template="nextgisweb:templates/feature_layer/layer_section_fields.mako",
-    #     is_applicable=lambda (obj): IFeatureLayer.providedBy(obj)
-    # )
+    Resource.__psection__.register(
+        key='fields', title=u"Атрибуты",
+        template="nextgisweb:feature_layer/template/section_fields.mako",
+        is_applicable=lambda (obj): IFeatureLayer.providedBy(obj))

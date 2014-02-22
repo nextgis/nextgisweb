@@ -1,4 +1,4 @@
-<table class="data" style="width: 100%">
+<table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead><tr>
         <th>Ключ</th>
         <th>Тип</th>
@@ -10,7 +10,7 @@
             <td>${field.keyname}</td>
             <td>${field.datatype}</td>
             <td>${field.display_name}</td>
-            <td style="text-align: center;">${'&#9899;' if field.grid_visibility else '&#9898;' | n}</td>
+            <td style="text-align: center;">${u"Да" if field.grid_visibility else u"Нет" | n}</td>
         </tr>
     %endfor
 </table>
