@@ -62,6 +62,7 @@ define([
         checkItemAcceptance: function (itm) {
             if (itm === undefined || itm === null) { return false; }
             if (this.interface !== undefined && itm.interfaces.indexOf(this.interface) == -1) { return false; }
+            if (this.cls !== undefined && itm.cls != this.cls) { return false; }
 
             return true;
         },

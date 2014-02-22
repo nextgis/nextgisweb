@@ -35,7 +35,7 @@ define([
         title: "Слой PostGIS",
 
         constructor: function () {
-            this.connectionPicker = new ResourcePicker({});
+            this.connectionPicker = new ResourcePicker({cls: "postgis_connection"});
         },
 
         postCreate: function () {
