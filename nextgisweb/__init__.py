@@ -95,6 +95,6 @@ def amd_packages():
         ('wmsclient', 'nextgisweb:amd_packages/wmsclient'),
 
         # Пакеты компонентов
-        ('ngw-resource', 'nextgisweb:resource/amdmod'),
+        ('ngw-resource', 'nextgisweb:resource/amd/ngw-resource'),
         ('ngw-postgis', 'nextgisweb:postgis/amd/ngw-postgis'),
     )
