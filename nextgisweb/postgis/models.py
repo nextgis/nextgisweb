@@ -2,10 +2,12 @@
 from zope.interface import implements
 
 import sqlalchemy as sa
+import sqlalchemy.orm as orm
+from sqlalchemy.engine.url import URL as EngineURL, make_url as make_engine_url
 from sqlalchemy import sql, func
 
 from ..models import declarative_base
-from ..resource import Resource, DataScope
+from ..resource import Resource, MetaDataScope, DataScope
 from ..env import env
 from ..geometry import geom_from_wkt, box
 from ..layer import SpatialLayerMixin
@@ -29,27 +31,86 @@ GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
 
 
 @Resource.registry.register
+class PostgisConnection(Base, MetaDataScope, Resource):
+    identity = 'postgis_connection'
+    cls_display_name = u"Соединение PostGIS"
+
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+
+    hostname = sa.Column(sa.Unicode, nullable=False)
+    username = sa.Column(sa.Unicode, nullable=False)
+    password = sa.Column(sa.Unicode, nullable=False)
+    database = sa.Column(sa.Unicode, nullable=False)
+
+    __tablename__ = identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
+
+    @classmethod
+    def check_parent(self, parent):
+        return parent.cls == 'resource_group'
+
+    def get_engine(self):
+        comp = env.postgis
+
+        # На случай, если параметры подключения изменинись
+        # их нужно проверять при каждом запросе подключения
+        credhash = (self.hostname, self.database, self.username, self.password)
+
+        if self.resource_id in comp._engine:
+            engine = comp._engine[self.resource_id]
+
+            if engine._credhash == credhash:
+                return engine
+
+            else:
+                del comp._engine[self.resource_id]
+
+        engine = sa.create_engine(make_engine_url(EngineURL(
+            'postgresql+psycopg2',
+            host=self.hostname, database=self.database,
+            username=self.username, password=self.password)))
+
+        engine._credhash = credhash
+
+        comp._engine[self.resource_id] = engine
+        return engine
+
+    def get_connection(self):
+        return self.get_engine().connect()
+
+
+@Resource.registry.register
 class PostgisLayer(
     Base, DataScope, Resource,
     SpatialLayerMixin, LayerFieldsMixin
 ):
     identity = 'postgis_layer'
-    cls_display_name = u"Cлой PostGIS"
+    cls_display_name = u"Слой PostGIS"
 
     implements(IFeatureLayer)
 
     __tablename__ = identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
 
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
-    connection = sa.Column(sa.Unicode, nullable=False)
+    connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
     schema = sa.Column(sa.Unicode, default=u'public', nullable=False)
     table = sa.Column(sa.Unicode, nullable=False)
     column_id = sa.Column(sa.Unicode, nullable=False)
     column_geom = sa.Column(sa.Unicode, nullable=False)
-    geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False), nullable=False)
+    geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False),
+                              nullable=False)
     geometry_srid = sa.Column(sa.Integer, nullable=False)
+
+    __mapper_args__ = dict(
+        polymorphic_identity=identity,
+        inherit_condition=(resource_id == Resource.id)
+    )
+
+    connection = orm.relationship(
+        Resource,
+        foreign_keys=connection_id,
+        cascade=False, cascade_backrefs=False)
 
     @classmethod
     def check_parent(self, parent):
@@ -57,7 +118,8 @@ class PostgisLayer(
 
     def get_info(self):
         return super(PostgisLayer, self).get_info() + (
-            (u"Тип геометрии", dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type]),
+            (u"Тип геометрии", dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
+                self.geometry_type]),
             (u"Подключение", self.connection),
             (u"Схема", self.schema),
             (u"Таблица", self.table),
@@ -89,7 +151,8 @@ class PostgisLayer(
 
         self.feature_label_field = None
 
-        conn = env.postgis_layer.connection[self.connection].connect()
+        conn = self.connection.get_connection()
+
         try:
             result = conn.execute(
                 """SELECT type, srid FROM geometry_columns
@@ -302,7 +365,7 @@ class FeatureQueryBase(object):
                 else:
                     query = select
 
-                conn = env.postgis_layer.connection[self.layer.connection].connect()
+                conn = self.layer.connection.get_connection()
 
                 try:
                     for row in conn.execute(query):
@@ -327,7 +390,8 @@ class FeatureQueryBase(object):
 
             @property
             def total_count(self):
-                conn = env.postgis_layer.connection[self.layer.connection].connect()
+                conn = self.layer.connection.get_connection()
+
                 try:
                     result = conn.execute(sa.select(
                         [sql.text('COUNT(id)'), ],

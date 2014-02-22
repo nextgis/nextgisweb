@@ -1,6 +1,9 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
-        <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="wConnection" title="Подключение" style="width: 100%"></div>
+        <div data-dojo-attach-point="wConnectionId" 
+            data-dojo-type="ngw/form/PickerBox"
+            title="Подключение" style="width: 100%"></div>
+
         <div data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="wSchema" data-dojo-props="required: true, value: 'public'" title="Схема" style="width: 100%"></div>
         <div data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="wTable" data-dojo-props="required: true" title="Таблица" style="width: 100%"></div>
         <div data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="wColumnId" data-dojo-props="required: true" title="Поле ID" style="width: 100%"></div>

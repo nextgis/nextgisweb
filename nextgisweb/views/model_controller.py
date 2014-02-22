@@ -73,10 +73,11 @@ class ModelController(object):
 
             if widget.validate():
                 obj = self.create_object(context)
-                DBSession.add(obj)
 
                 widget.bind(obj=obj)
                 widget.populate_obj()
+
+                DBSession.add(obj)
 
                 DBSession.flush()
 
