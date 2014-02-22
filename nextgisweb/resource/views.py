@@ -296,8 +296,12 @@ def setup_pyramid(comp, config):
     Resource.__psection__ = PageSections()
 
     Resource.__psection__.register(
-        key='children',
-        priority=0,
+        key='summary', priority=10,
+        template='nextgisweb:resource/template/section_summary.mako')
+
+    Resource.__psection__.register(
+        key='children', priority=20,
+        title="Дочерние ресурсы",
         is_applicable=lambda obj: len(obj.children) > 0,
         template='nextgisweb:resource/template/section_children.mako')
 
@@ -333,7 +337,7 @@ def setup_pyramid(comp, config):
                     parent=args.obj.id, cls=cls))
 
     Resource.__dynmenu__ = DynMenu(
-        Label('add', "Добавить"),
+        Label('add', "Добавить ресурс"),
 
         AddMenu(),
 
