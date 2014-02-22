@@ -5,7 +5,6 @@ from ..registry import registry_maker
 
 
 class SerializerBase(object):
-
     registry = registry_maker()
 
     def __init__(self, obj, user):

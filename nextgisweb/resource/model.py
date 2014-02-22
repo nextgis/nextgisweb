@@ -5,17 +5,17 @@ from collections import namedtuple
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
-from ...models import DBSession
-from ...registry import registry_maker
-from ...auth import Principal, User, Group
+from ..models import declarative_base, DBSession
+from ..registry import registry_maker
+from ..auth import Principal, User, Group
 
-from ..scope import clscopes, scopeid
-from ..interface import providedBy
-from ..serialize import SerializerBase
-from ..permission import register_permission, scope_permissions
-from ..exc import ResourceError, AccessDenied
+from .scope import clscopes, scopeid
+from .interface import providedBy
+from .serialize import SerializerBase
+from .permission import register_permission, scope_permissions
+from .exc import ResourceError, AccessDenied
 
-from .base import Base
+Base = declarative_base()
 
 resource_registry = registry_maker()
 
@@ -305,3 +305,24 @@ register_permission(
 register_permission(
     DataScope, 'edit',
     "Изменение данных")
+
+
+@Resource.registry.register
+class ResourceGroup(MetaDataScope, Resource):
+
+    identity = 'resource_group'
+    cls_display_name = "Группа ресурсов"
+
+    __tablename__ = identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
+
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+
+    def check_child(self, child):
+        # Принимаем любые дочерние ресурсы
+        return True
+
+    @classmethod
+    def check_parent(self, parent):
+        # Группа может быть либо корнем, либо подгруппой в другой группе
+        return (parent is None) or isinstance(parent, ResourceGroup)
