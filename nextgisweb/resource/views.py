@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 
+from ..models import DBSession
+
 from ..views import (
     ModelController,
     DescriptionObjectWidget,
@@ -14,10 +16,14 @@ from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
 from ..pyramidcomp import viewargs
 
-from .models import Resource, ResourceACLRule, MetaDataScope
+from .model import (
+    Resource,
+    ResourceACLRule,
+    MetaDataScope,
+    ResourceSerializer)
 from .scope import clscopes, scopeid
 from .permission import scope_permissions
-from .interface import providedBy
+from .serialize import CompositeSerializer
 
 
 def resource_factory(request):
@@ -128,6 +134,15 @@ def show(request):
     return dict(obj=request.context, sections=request.context.__psection__)
 
 
+@viewargs(renderer='nextgisweb:resource/template/json.mako')
+def objjson(request):
+    request.resource_permission(request.context, Resource, 'identify')
+    serializer = CompositeSerializer(obj=request.context, user=request.user)
+    return dict(obj=request.context,
+                subtitle="Представление JSON",
+                objjson=serializer.serialize())
+
+
 @viewargs(renderer='json', json=True)
 def schema(request):
     resources = dict()
@@ -223,17 +238,8 @@ def store(request):
         if not res.has_permission(Resource, 'identify', request.user):
             continue
 
-        itm = dict(
-            id=res.id, cls=res.identity,
-            parent_id=res.parent_id,
-            display_name=res.display_name,
-            keyname=res.keyname, scopes=[],
-            interfaces=map(lambda i: i.getName(), providedBy(res)))
-
-        for scope in clscopes(res.__class__):
-            itm['scopes'].append(scopeid(scope))
-
-        itm['children'] = len(res.children) > 0
+        serializer = ResourceSerializer(res, request.user)
+        itm = serializer.serialize()
 
         if oid is not None:
             return itm
@@ -241,6 +247,64 @@ def store(request):
             result.append(itm)
 
     return result
+
+
+@viewargs(renderer='json', json=True)
+def children_get(request):
+    # TODO: Security
+
+    child_id = request.matchdict['child_id']
+    child_id = None if child_id == '' else child_id
+
+    query = Resource.query().with_polymorphic('*') \
+        .filter_by(parent_id=request.context.id)
+
+    if child_id is not None:
+        query = query.filter_by(id=child_id)
+
+    result = []
+
+    for child in query:
+        serializer = CompositeSerializer(child, request.user)
+        data = serializer.serialize()
+
+        if child_id is not None:
+            return data
+        else:
+            result.append(data)
+
+    return result
+
+
+@viewargs(renderer='json', json=True)
+def children_patch(request):
+    child_id = request.matchdict['child_id']
+    assert child_id != ''
+
+    child = Resource.query().with_polymorphic('*') \
+        .filter_by(id=child_id).one()
+
+    serializer = CompositeSerializer(child, request.user)
+    result = serializer.deserialize(request.json_body)
+
+    return result
+
+
+@viewargs(renderer='json', json=True)
+def children_post(request):
+    child_id = request.matchdict['child_id']
+    assert child_id == ''
+
+    data = request.json_body
+
+    cls = Resource.registry[data['resource']['cls']]
+    child = cls()
+
+    serializer = CompositeSerializer(child, request.user)
+    serializer.deserialize(data)
+
+    child.persist()
+    DBSession.flush()
 
 
 def setup_pyramid(comp, config):
@@ -270,9 +334,17 @@ def setup_pyramid(comp, config):
 
     _resource_route('show', '{id:\d+}', client=('id', )).add_view(show)
 
+    _resource_route('json', '{id:\d+}/json', client=('id', )) \
+        .add_view(objjson)
+
     _resource_route('tree', '{id:\d+}/tree', client=('id', )).add_view(tree)
 
     _route('store', 'store/{id:\d*}', client=('id', )).add_view(store)
+
+    _resource_route('children', '{id:\d+}/children/{child_id:\d*}') \
+        .add_view(children_get, method='GET') \
+        .add_view(children_patch, method='PATCH') \
+        .add_view(children_post, method='POST')
 
     permalinker(Resource, 'resource.show')
 
@@ -364,5 +436,9 @@ def setup_pyramid(comp, config):
 
         Link('extra/tree', "Дерево ресурсов",
             lambda args: args.request.route_url(
-                'resource.tree', id=args.obj.id))
+                'resource.tree', id=args.obj.id)),
+
+        Link('extra/json', "Представление JSON",
+            lambda args: args.request.route_url(
+                'resource.json', id=args.obj.id)),
     )

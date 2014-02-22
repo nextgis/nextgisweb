@@ -4,19 +4,20 @@ from collections import namedtuple
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-from sqlalchemy.orm.exc import NoResultFound
 
-from ..models import declarative_base
-from ..registry import registry_maker
-from ..auth import Principal, User, Group
+from ...models import DBSession
+from ...registry import registry_maker
+from ...auth import Principal, User, Group
 
-from .scope import clscopes
-from .permission import register_permission, scope_permissions
+from ..scope import clscopes, scopeid
+from ..interface import providedBy
+from ..serialize import SerializerBase
+from ..permission import register_permission, scope_permissions
+from ..exc import ResourceError, AccessDenied
 
-Base = declarative_base()
+from .base import Base
 
 resource_registry = registry_maker()
-
 
 PermissionSets = namedtuple('PermissionSets', ('allow', 'deny'))
 
@@ -62,16 +63,6 @@ class Resource(Base):
     def __unicode__(self):
         return self.display_name
 
-    @property
-    def parents(self):
-        result = []
-        current = self
-        while current.parent:
-            current = current.parent
-            result.append(current)
-
-        return reversed(result)
-
     def check_child(self, child):
         """ Может ли этот ресурс принять child в качестве дочернего """
         return False
@@ -80,6 +71,17 @@ class Resource(Base):
     def check_parent(self, parent):
         """ Может ли этот ресурс быть дочерним для parent """
         return False
+
+    @property
+    def parents(self):
+        """ Список всех родителей от корня до непосредственного родителя """
+        result = []
+        current = self
+        while current.parent:
+            current = current.parent
+            result.append(current)
+
+        return reversed(result)
 
     # Права доступа
 
@@ -127,6 +129,89 @@ class Resource(Base):
         )
 
 
+@SerializerBase.registry.register
+class ResourceSerializer(SerializerBase):
+    identity = Resource.identity
+
+    def is_applicable(self):
+        return isinstance(self.obj, Resource)
+
+    def serialize(self):
+        if not self.has_permission(Resource, 'identify'):
+            return dict()
+
+        result = dict(map(lambda k: (k, getattr(self.obj, k)), (
+            'id', 'cls', 'parent_id', 'keyname', 'display_name',
+            'owner_user_id', 'description')))
+
+        result['children'] = len(self.obj.children) > 0
+        result['interfaces'] = map(lambda i: i.getName(), providedBy(self.obj))
+        result['scopes'] = map(scopeid, clscopes(self.obj.__class__))
+
+        return result
+
+    def deserialize(self, data):
+
+        # Атрибут parent обрабатываем вначале, он может влиять на права
+        if 'parent_id' in data:
+
+            if data['parent_id'] is not None:
+                parent = Resource.query().with_polymorphic('*') \
+                    .filter_by(id=data['parent_id']).one()
+
+                if not parent.has_permission(Resource, 'children', self.user):
+                    raise AccessDenied()
+                if not self.obj.check_parent(parent):
+                    raise ResourceError("Parent verification failed")
+
+                # TODO: check_child
+
+                self.obj.parent_id = parent.id
+                self.obj.parent = parent
+
+            else:
+                self.obj.parent_id = None
+                self.obj.parent = None
+
+        if (
+            self.obj.parent_id is None
+            and (self.obj not in DBSession or 'parent_id' in data)
+            and not self.user.is_administrator
+        ):
+            raise AccessDenied("Only administrator can create resource root")
+
+        for key, val in data.iteritems():
+
+            if key in ('cls', 'parent_id'):
+                pass
+
+            elif key == 'keyname':
+                res = Resource.filter(Resource.keyname == val) \
+                    .filter(Resource.id != self.obj.id).first()
+
+                if res is not None:
+                    raise ResourceError("Keyname already exists")
+
+                self.obj.keyname = val
+
+            elif key == 'display_name':
+                self.obj.display_name = val
+
+            elif key == 'description':
+                self.obj.description = val
+
+            elif key == 'owner_user_id':
+                if not self.user.is_administrator:
+                    raise AccessDenied("Only administrator can set owner")
+                self.obj.owner_user_id = val
+
+            else:
+                raise ResourceError("Unknown key: %s" % key)
+
+        if self.obj.owner_user_id is None and self.obj not in DBSession:
+            self.obj.owner_user_id = self.user.id
+
+
 register_permission(
     Resource, 'identify',
     "Идентификация ресурса")
@@ -134,6 +219,10 @@ register_permission(
 register_permission(
     Resource, 'create',
     "Создание ресурса")
+
+register_permission(
+    Resource, 'edit',
+    "Изменение ресурса")
 
 register_permission(
     Resource, 'delete',
@@ -216,39 +305,3 @@ register_permission(
 register_permission(
     DataScope, 'edit',
     "Изменение данных")
-
-
-@Resource.registry.register
-class ResourceGroup(MetaDataScope, Resource):
-
-    identity = 'resource_group'
-    cls_display_name = "Группа ресурсов"
-
-    __tablename__ = identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
-
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-
-    def check_child(self, child):
-        # Принимаем любые дочерние ресурсы
-        return True
-
-    @classmethod
-    def check_parent(self, parent):
-        # Группа может быть либо корнем, либо подгруппой в другой группе
-        return (parent is None) or isinstance(parent, ResourceGroup)
-
-
-def initialize_db(comp):
-    administrator = User.filter_by(keyname='administrator').one()
-
-    try:
-        ResourceGroup.filter_by(id=0).one()
-    except NoResultFound:
-        obj = ResourceGroup(id=0, owner_user=administrator,
-                            display_name="Основная группа ресурсов")
-
-        obj.acl.append(ResourceACLRule(
-            principal=administrator, action='allow'))
-
-        obj.persist()

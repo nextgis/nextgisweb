@@ -6,8 +6,13 @@ import sqlalchemy.orm as orm
 from sqlalchemy.engine.url import URL as EngineURL, make_url as make_engine_url
 from sqlalchemy import sql, func
 
-from ..models import declarative_base
-from ..resource import Resource, MetaDataScope, DataScope
+from ..models import declarative_base, DBSession
+from ..resource import (
+    Resource,
+    MetaDataScope,
+    DataScope,
+    SerializerBase,
+    AccessDenied)
 from ..env import env
 from ..geometry import geom_from_wkt, box
 from ..layer import SpatialLayerMixin
@@ -21,8 +26,7 @@ from ..feature_layer import (
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilterBy,
-    IFeatureQueryLike,
-)
+    IFeatureQueryLike)
 
 Base = declarative_base()
 
@@ -243,6 +247,41 @@ class PostgisLayer(
                 return f
 
         raise KeyError("Field '%s' not found!" % keyname)
+
+
+@SerializerBase.registry.register
+class PostgisLayerSerializer(SerializerBase):
+    identity = PostgisLayer.identity
+
+    attrlist = (
+        'connection_id',
+        'schema',
+        'table',
+        'column_id',
+        'column_geom',
+        'geometry_type',
+        'geometry_srid',
+        'srs_id')
+
+    def is_applicable(self):
+        return isinstance(self.obj, PostgisLayer)
+
+    def serialize(self):
+        if not self.has_permission(Resource, 'identify'):
+            return None
+
+        return dict(map(lambda a: (a, getattr(self.obj, a)), self.attrlist))
+
+    def deserialize(self, data):
+        if not self.has_permission(Resource, 'edit'):
+            raise AccessDenied()
+
+        for k in self.attrlist:
+            if k in data:
+                setattr(self.obj, k, data[k])
+
+        if (self.obj not in DBSession or data['fields'] == 'update'):
+            self.obj.setup()
 
 
 class FeatureQueryBase(object):
