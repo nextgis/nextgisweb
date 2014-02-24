@@ -16,8 +16,12 @@ from .model import (
 )
 from .permission import register_permission
 from .interface import IResourceBase
-from .serialize import SerializerBase
-from .exc import ResourceError, AccessDenied
+from .serialize import (
+    Serializer,
+    SerializedProperty,
+    SerializedRelationship,
+    SerializedResourceRelationship)
+from .exception import ResourceError, AccessDenied
 from .views import resource_factory
 
 __all__ = [
@@ -29,7 +33,10 @@ __all__ = [
 
     'register_permission',
     'IResourceBase',
-    'SerializerBase',
+    'Serializer',
+    'SerializedProperty',
+    'SerializedRelationship',
+    'SerializedResourceRelationship',
     'ResourceError',
     'AccessDenied',
     'resource_factory',

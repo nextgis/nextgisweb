@@ -11,7 +11,10 @@ from ..resource import (
     Resource,
     MetaDataScope,
     DataScope,
-    SerializerBase,
+    register_permission,
+    Serializer,
+    SerializedProperty as SP,
+    SerializedResourceRelationship as SRR,
     AccessDenied)
 from ..env import env
 from ..geometry import geom_from_wkt, box
@@ -42,9 +45,9 @@ class PostgisConnection(Base, MetaDataScope, Resource):
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     hostname = sa.Column(sa.Unicode, nullable=False)
+    database = sa.Column(sa.Unicode, nullable=False)
     username = sa.Column(sa.Unicode, nullable=False)
     password = sa.Column(sa.Unicode, nullable=False)
-    database = sa.Column(sa.Unicode, nullable=False)
 
     __tablename__ = identity
     __mapper_args__ = dict(polymorphic_identity=identity)
@@ -81,6 +84,29 @@ class PostgisConnection(Base, MetaDataScope, Resource):
 
     def get_connection(self):
         return self.get_engine().connect()
+
+
+register_permission(
+    PostgisConnection, 'read',
+    u"Чтение параметров соединения")
+
+register_permission(
+    PostgisConnection, 'write',
+    u"Запись параметров соединения")
+
+register_permission(
+    PostgisConnection, 'connect',
+    u"Использование соединения")
+
+
+class PostgisConnectionSerializer(Serializer):
+    identity = PostgisConnection.identity
+    resclass = PostgisConnection
+
+    hostname = SP(read='read', write='write')
+    database = SP(read='read', write='write')
+    username = SP(read='read', write='write')
+    password = SP(read='read', write='write')
 
 
 @Resource.registry.register
@@ -249,28 +275,21 @@ class PostgisLayer(
         raise KeyError("Field '%s' not found!" % keyname)
 
 
-@SerializerBase.registry.register
-class PostgisLayerSerializer(SerializerBase):
+class PostgisLayerSerializer(Serializer):
     identity = PostgisLayer.identity
+    resclass = PostgisLayer
 
-    attrlist = (
-        'connection_id',
-        'schema',
-        'table',
-        'column_id',
-        'column_geom',
-        'geometry_type',
-        'geometry_srid',
-        'srs_id')
+    __metadata = dict(read='view', write='edit', scope=MetaDataScope)
 
-    def is_applicable(self):
-        return isinstance(self.obj, PostgisLayer)
+    connection = SRR(**__metadata)
 
-    def serialize(self):
-        if not self.has_permission(Resource, 'identify'):
-            return None
+    schema = SP(**__metadata)
+    table = SP(**__metadata)
+    column_id = SP(**__metadata)
+    column_geom = SP(**__metadata)
 
-        return dict(map(lambda a: (a, getattr(self.obj, a)), self.attrlist))
+    geometry_type = SP(**__metadata)
+    geometry_srid = SP(**__metadata)
 
     def deserialize(self, data):
         if not self.has_permission(Resource, 'edit'):

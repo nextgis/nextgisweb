@@ -8,3 +8,7 @@ class ResourceError(Exception):
 
 class AccessDenied(ResourceError):
     pass
+
+
+class Forbidden(ResourceError):
+    pass

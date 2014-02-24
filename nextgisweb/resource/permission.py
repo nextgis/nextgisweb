@@ -13,19 +13,19 @@ Permission = namedtuple('Permission', (
 
 
 PermissionInfo = namedtuple('PermissionInfo', (
-    'scope', 'permission',
+    'cls', 'scope', 'permission',
     'label', 'description'))
 
 
 def register_permission(cls, permission, label, description=None):
     global _scope_permissions
     _scope_permissions[cls][permission] = PermissionInfo(
-        scope=scopeid(cls), permission=permission,
+        cls=cls, scope=scopeid(cls), permission=permission,
         label=label, description=description)
 
 
 def permission(cls, permission):
-    return scope_permissions[cls][permission]
+    return _scope_permissions[cls][permission]
 
 
 def scope_permissions(cls):

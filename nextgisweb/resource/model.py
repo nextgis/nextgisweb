@@ -5,15 +5,19 @@ from collections import namedtuple
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
-from ..models import declarative_base, DBSession
+from ..models import declarative_base
 from ..registry import registry_maker
 from ..auth import Principal, User, Group
 
 from .scope import clscopes, scopeid
 from .interface import providedBy
-from .serialize import SerializerBase
+from .serialize import (
+    Serializer,
+    SerializedProperty as SP,
+    SerializedRelationship as SR,
+    SerializedResourceRelationship as SRR)
 from .permission import register_permission, scope_permissions
-from .exc import ResourceError, AccessDenied
+from .exception import ResourceError, Forbidden
 
 Base = declarative_base()
 
@@ -129,89 +133,6 @@ class Resource(Base):
         )
 
 
-@SerializerBase.registry.register
-class ResourceSerializer(SerializerBase):
-    identity = Resource.identity
-
-    def is_applicable(self):
-        return isinstance(self.obj, Resource)
-
-    def serialize(self):
-        if not self.has_permission(Resource, 'identify'):
-            return dict()
-
-        result = dict(map(lambda k: (k, getattr(self.obj, k)), (
-            'id', 'cls', 'parent_id', 'keyname', 'display_name',
-            'owner_user_id', 'description')))
-
-        result['children'] = len(self.obj.children) > 0
-        result['interfaces'] = map(lambda i: i.getName(), providedBy(self.obj))
-        result['scopes'] = map(scopeid, clscopes(self.obj.__class__))
-
-        return result
-
-    def deserialize(self, data):
-
-        # Атрибут parent обрабатываем вначале, он может влиять на права
-        if 'parent_id' in data:
-
-            if data['parent_id'] is not None:
-                parent = Resource.query().with_polymorphic('*') \
-                    .filter_by(id=data['parent_id']).one()
-
-                if not parent.has_permission(Resource, 'children', self.user):
-                    raise AccessDenied()
-                if not self.obj.check_parent(parent):
-                    raise ResourceError("Parent verification failed")
-
-                # TODO: check_child
-
-                self.obj.parent_id = parent.id
-                self.obj.parent = parent
-
-            else:
-                self.obj.parent_id = None
-                self.obj.parent = None
-
-        if (
-            self.obj.parent_id is None
-            and (self.obj not in DBSession or 'parent_id' in data)
-            and not self.user.is_administrator
-        ):
-            raise AccessDenied("Only administrator can create resource root")
-
-        for key, val in data.iteritems():
-
-            if key in ('cls', 'parent_id'):
-                pass
-
-            elif key == 'keyname':
-                res = Resource.filter(Resource.keyname == val) \
-                    .filter(Resource.id != self.obj.id).first()
-
-                if res is not None:
-                    raise ResourceError("Keyname already exists")
-
-                self.obj.keyname = val
-
-            elif key == 'display_name':
-                self.obj.display_name = val
-
-            elif key == 'description':
-                self.obj.description = val
-
-            elif key == 'owner_user_id':
-                if not self.user.is_administrator:
-                    raise AccessDenied("Only administrator can set owner")
-                self.obj.owner_user_id = val
-
-            else:
-                raise ResourceError("Unknown key: %s" % key)
-
-        if self.obj.owner_user_id is None and self.obj not in DBSession:
-            self.obj.owner_user_id = self.user.id
-
-
 register_permission(
     Resource, 'identify',
     "Идентификация ресурса")
@@ -235,6 +156,57 @@ register_permission(
 register_permission(
     Resource, 'children',
     "Управление дочерними ресурсами")
+
+
+class _parent_attr(SRR):
+
+    def writeperm(self, srlzr):
+        return True
+
+    def setter(self, srlzr, value):
+        super(_parent_attr, self).setter(srlzr, value)
+        ref = srlzr.obj.parent
+
+        if not ref.has_permission(Resource, 'children', srlzr.user):
+            raise Forbidden()
+
+        if not srlzr.obj.check_parent(ref):
+            raise ResourceError("Parentship error")
+
+        # TODO: check_child
+
+
+class _children_attr(SP):
+    def getter(self, srlzr):
+        return len(srlzr.obj.children) > 0
+
+
+class _interfaces_attr(SP):
+    def getter(self, srlzr):
+        return map(lambda i: i.getName(), providedBy(srlzr.obj))
+
+
+class _scopes_attr(SP):
+    def getter(self, srlzr):
+        return map(scopeid, clscopes(srlzr.obj.__class__))
+
+
+class ResourceSerializer(Serializer):
+    identity = Resource.identity
+    resclass = Resource
+
+    id = SP(read='identify')
+    cls = SP(read='identify')
+
+    parent = _parent_attr(read='identify', write='identify')
+    owner_user = SR(read='identify')
+
+    keyname = SP(read='identify', write='edit')
+    display_name = SP(read='identify', write='edit')
+
+    children = _children_attr(read='identify')
+    interfaces = _interfaces_attr(read='identify')
+    scopes = _scopes_attr(read='identify')
 
 
 class ResourceACLRule(Base):

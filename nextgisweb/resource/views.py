@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import json
+from collections import OrderedDict
 
+from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 
 from ..models import DBSession
@@ -10,7 +13,6 @@ from ..views import (
     DescriptionObjectWidget,
     DeleteObjectWidget,
     permalinker)
-
 from ..object_widget import ObjectWidget, CompositeWidget
 from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
@@ -27,6 +29,8 @@ from .serialize import CompositeSerializer
 
 
 def resource_factory(request):
+    if request.matchdict['id'] == '-':
+        return None
 
     # Вначале загружаем ресурс базового класса
     base = Resource.filter_by(id=request.matchdict['id']).one()
@@ -138,9 +142,10 @@ def show(request):
 def objjson(request):
     request.resource_permission(request.context, Resource, 'identify')
     serializer = CompositeSerializer(obj=request.context, user=request.user)
+    serializer.serialize()
     return dict(obj=request.context,
                 subtitle="Представление JSON",
-                objjson=serializer.serialize())
+                objjson=serializer.data)
 
 
 @viewargs(renderer='json', json=True)
@@ -249,15 +254,15 @@ def store(request):
     return result
 
 
-@viewargs(renderer='json', json=True)
-def children_get(request):
+@viewargs(renderer='json')
+def child_get(request):
     # TODO: Security
 
     child_id = request.matchdict['child_id']
     child_id = None if child_id == '' else child_id
 
-    query = Resource.query().with_polymorphic('*') \
-        .filter_by(parent_id=request.context.id)
+    query = Resource.query().with_polymorphic('*').filter_by(
+        parent_id=request.context.id if request.context else None)
 
     if child_id is not None:
         query = query.filter_by(id=child_id)
@@ -266,45 +271,59 @@ def children_get(request):
 
     for child in query:
         serializer = CompositeSerializer(child, request.user)
-        data = serializer.serialize()
+        serializer.serialize()
 
         if child_id is not None:
-            return data
+            return serializer.data
         else:
-            result.append(data)
+            result.append(serializer.data)
 
     return result
 
 
 @viewargs(renderer='json', json=True)
-def children_patch(request):
+def child_patch(request):
     child_id = request.matchdict['child_id']
     assert child_id != ''
+
+    data = request.json_body
 
     child = Resource.query().with_polymorphic('*') \
         .filter_by(id=child_id).one()
 
-    serializer = CompositeSerializer(child, request.user)
-    result = serializer.deserialize(request.json_body)
+    serializer = CompositeSerializer(child, request.user, data)
+    result = serializer.deserialize()
 
     return result
 
 
-@viewargs(renderer='json', json=True)
-def children_post(request):
+def child_post(request):
     child_id = request.matchdict['child_id']
     assert child_id == ''
 
     data = request.json_body
 
     cls = Resource.registry[data['resource']['cls']]
-    child = cls()
+    child = cls(owner_user=request.user)
 
-    serializer = CompositeSerializer(child, request.user)
-    serializer.deserialize(data)
+    deserializer = CompositeSerializer(child, request.user, data)
+    deserializer.members['resource'].mark('cls')
+    deserializer.deserialize()
 
     child.persist()
     DBSession.flush()
+
+    location = request.route_url(
+        'resource.child',
+        id=child.parent_id,
+        child_id=child.id)
+
+    data = OrderedDict(id=child.id)
+    data['parent'] = dict(id=child.parent_id)
+
+    return Response(json.dumps(data), status_code=201, headerlist=[
+        (b"Content-Type", b"application/json"),
+        (b"Location", bytes(location))])
 
 
 def setup_pyramid(comp, config):
@@ -341,10 +360,10 @@ def setup_pyramid(comp, config):
 
     _route('store', 'store/{id:\d*}', client=('id', )).add_view(store)
 
-    _resource_route('children', '{id:\d+}/children/{child_id:\d*}') \
-        .add_view(children_get, method='GET') \
-        .add_view(children_patch, method='PATCH') \
-        .add_view(children_post, method='POST')
+    _resource_route('child', '{id:\d+|-}/child/{child_id:\d*}') \
+        .add_view(child_get, method='GET') \
+        .add_view(child_patch, method='PATCH') \
+        .add_view(child_post, method='POST')
 
     permalinker(Resource, 'resource.show')
 
