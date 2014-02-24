@@ -21,7 +21,7 @@ from .serialize import (
     SerializedProperty,
     SerializedRelationship,
     SerializedResourceRelationship)
-from .exception import ResourceError, AccessDenied
+from .exception import ResourceError, Forbidden
 from .views import resource_factory
 
 __all__ = [
@@ -38,7 +38,7 @@ __all__ = [
     'SerializedRelationship',
     'SerializedResourceRelationship',
     'ResourceError',
-    'AccessDenied',
+    'Forbidden',
     'resource_factory',
 ]
 

@@ -6,7 +6,7 @@ import sqlalchemy.orm as orm
 from sqlalchemy.engine.url import URL as EngineURL, make_url as make_engine_url
 from sqlalchemy import sql, func
 
-from ..models import declarative_base, DBSession
+from ..models import declarative_base
 from ..resource import (
     Resource,
     MetaDataScope,
@@ -15,7 +15,8 @@ from ..resource import (
     Serializer,
     SerializedProperty as SP,
     SerializedResourceRelationship as SRR,
-    AccessDenied)
+    ResourceError,
+    Forbidden)
 from ..env import env
 from ..geometry import geom_from_wkt, box
 from ..layer import SpatialLayerMixin
@@ -275,6 +276,22 @@ class PostgisLayer(
         raise KeyError("Field '%s' not found!" % keyname)
 
 
+class _fields_action(SP):
+    """ Специальный write-only атрибут, обеспечивающий обновление
+    списка полей с сервера """
+
+    def setter(self, srlzr, value):
+        if value == 'update':
+            if srlzr.obj.connection.has_permission(
+                PostgisConnection, 'connect', srlzr.user
+            ):
+                srlzr.obj.setup()
+            else:
+                raise Forbidden()
+        elif value != 'keep':
+            raise ResourceError()
+
+
 class PostgisLayerSerializer(Serializer):
     identity = PostgisLayer.identity
     resclass = PostgisLayer
@@ -291,16 +308,7 @@ class PostgisLayerSerializer(Serializer):
     geometry_type = SP(**__metadata)
     geometry_srid = SP(**__metadata)
 
-    def deserialize(self, data):
-        if not self.has_permission(Resource, 'edit'):
-            raise AccessDenied()
-
-        for k in self.attrlist:
-            if k in data:
-                setattr(self.obj, k, data[k])
-
-        if (self.obj not in DBSession or data['fields'] == 'update'):
-            self.obj.setup()
+    fields = _fields_action(write="edit", scope=MetaDataScope)
 
 
 class FeatureQueryBase(object):

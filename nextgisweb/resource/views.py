@@ -281,7 +281,7 @@ def child_get(request):
     return result
 
 
-@viewargs(renderer='json', json=True)
+@viewargs(renderer='json')
 def child_patch(request):
     child_id = request.matchdict['child_id']
     assert child_id != ''
