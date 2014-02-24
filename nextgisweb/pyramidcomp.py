@@ -226,10 +226,8 @@ class PyramidComponent(Component):
             if not request.user.is_administrator:
                 raise HTTPForbidden()
 
-            return dict(
-                title=u"Панель управления",
-                control_panel=self.control_panel,
-            )
+            return dict(title=u"Панель управления",
+                        control_panel=self.control_panel)
 
         config.add_route('pyramid.control_panel', '/control-panel') \
             .add_view(control_panel, renderer="pyramid/control_panel.mako")

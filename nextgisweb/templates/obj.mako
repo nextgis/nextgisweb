@@ -23,7 +23,7 @@
     %endif
 </%def>
 
-<%block name="title_block">
+<%def name="title_block()">
 <%
     current = obj
     parents = []
@@ -64,7 +64,7 @@
             ${obj}
         </h1>
     %endif
-</%block>
+</%def>
 
 
 %if hasattr(next, 'body'):

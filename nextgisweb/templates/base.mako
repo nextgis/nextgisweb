@@ -74,11 +74,17 @@
 
 %if hasattr(next, 'title_block'):
   <div class="title">
-    <%block name="title_block"></%block>
+    ${next.title_block()}
+  </div>
+%elif hasattr(next, 'title'):
+  <div class="title">
+    <h1>${next.title()}</h1>
+  </div>
+%elif title:
+  <div class="title">
+    <h1>${title}</h1>
   </div>
 %endif
-
-
 
 <div class="content-wrapper">
 
@@ -95,14 +101,19 @@
     %elif 'dynmenu' in context.keys():
         <%
             has_dynmenu = True
-            dynmenu, dynmenu_kwargs = (context['dynmenu'], context['dynmenu_kwargs'])
+            dynmenu, dynmenu_kwargs = (
+                context['dynmenu'],
+                context.get('dynmenu_kwargs', Bunch(request=request))
+            )
         %>
     %else:
         <% has_dynmenu = False %>
     %endif
     
     <div class="pure-u-${"20-24" if has_dynmenu else "1"}">
-        ${next.body()}
+        %if hasattr(next, 'body'):
+          ${next.body()}
+        %endif
     </div>
 
     %if has_dynmenu:

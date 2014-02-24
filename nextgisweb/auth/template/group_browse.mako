@@ -1,12 +1,12 @@
-<%inherit file='../base.mako' />
+<%inherit file='nextgisweb:templates/base.mako' />
 
-<table class="data" style="width: 100%;">
+<table class="pure-table pure-table-horizontal" style="width: 100%;">
     <thead>
         <tr>
-            <th>#</th>
-            <th>Наименование</th>
-            <th>Имя группы</th>
-            <th>Операции</th>
+            <th style="width: 2em;">ID</th>
+            <th style="width: 50%;">Наименование</th>
+            <th style="width: 50%">Имя пользователя</th>
+            <th style="width: 0px;">&nbsp;</th>
         </tr>
     </thead>
     <tbody>

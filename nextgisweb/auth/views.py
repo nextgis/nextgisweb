@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.orm.exc import NoResultFound
-from bunch import Bunch
 
 from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from pyramid.security import remember, forget
@@ -120,9 +119,9 @@ def setup_pyramid(comp, config):
 
         def create_context(self, request):
             check_permission(request)
-            return dict(
-                template=dict(subtitle=u"Новая группа")
-            )
+            return dict(template=dict(
+                subtitle=u"Создать группу пользователей",
+                dynmenu=Group.__dynmenu__))
 
         def edit_context(self, request):
             check_permission(request)
@@ -207,9 +206,9 @@ def setup_pyramid(comp, config):
 
         def create_context(self, request):
             check_permission(request)
-            return dict(
-                template=dict(subtitle=u"Новый пользователь")
-            )
+            return dict(template=dict(
+                subtitle=u"Создать пользователя",
+                dynmenu=User.__dynmenu__))
 
         def edit_context(self, request):
             check_permission(request)
@@ -241,24 +240,22 @@ def setup_pyramid(comp, config):
     def user_browse(request):
         check_permission(request)
         return dict(
+            title=u"Пользователи",
             obj_list=User.filter_by(system=False).order_by(User.display_name),
-            dynmenu=User.__dynmenu__,
-            dynmenu_kwargs=Bunch(request=request),
-        )
+            dynmenu=request.env.pyramid.control_panel)
 
     config.add_route('auth.user.browse', '/auth/user/') \
-        .add_view(user_browse, renderer='auth/user_browse.mako')
+        .add_view(user_browse, renderer='nextgisweb:auth/template/user_browse.mako')
 
     def group_browse(request):
         check_permission(request)
         return dict(
+            title=u"Группы пользователей",
             obj_list=Group.filter_by(system=False).order_by(Group.display_name),
-            dynmenu=Group.__dynmenu__,
-            dynmenu_kwargs=Bunch(request=request),
-        )
+            dynmenu=request.env.pyramid.control_panel)
 
     config.add_route('auth.group.browse', '/auth/group/') \
-        .add_view(group_browse, renderer='auth/group_browse.mako')
+        .add_view(group_browse, renderer='nextgisweb:auth/template/group_browse.mako')
 
     class UserMenu(dm.DynItem):
 
@@ -304,8 +301,8 @@ def setup_pyramid(comp, config):
                     )
                 )
 
-    User.__dynmenu__ = UserMenu()
-    Group.__dynmenu__ = GroupMenu()
+    User.__dynmenu__ = comp.env.pyramid.control_panel
+    Group.__dynmenu__ = comp.env.pyramid.control_panel
 
     comp.env.pyramid.control_panel.add(
         dm.Label('auth-user', u"Пользователи"),
