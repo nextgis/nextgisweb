@@ -22,7 +22,9 @@ from .serialize import (
     SerializedRelationship,
     SerializedResourceRelationship)
 from .exception import ResourceError, Forbidden
-from .views import resource_factory
+from .view import resource_factory
+from .widget import Widget
+
 
 __all__ = [
     'ResourceComponent',
@@ -40,6 +42,7 @@ __all__ = [
     'ResourceError',
     'Forbidden',
     'resource_factory',
+    'Widget',
 ]
 
 
@@ -62,5 +65,5 @@ class ResourceComponent(Component):
 
     @require('security')
     def setup_pyramid(self, config):
-        from .views import setup_pyramid
+        from .view import setup_pyramid
         setup_pyramid(self, config)

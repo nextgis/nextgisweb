@@ -1,15 +1,42 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+
         <div data-dojo-attach-point="wConnectionId" 
             data-dojo-type="ngw/form/PickerBox"
             title="Подключение" style="width: 100%"></div>
 
-        <div data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="wSchema" data-dojo-props="required: true, value: 'public'" title="Схема" style="width: 100%"></div>
-        <div data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="wTable" data-dojo-props="required: true" title="Таблица" style="width: 100%"></div>
-        <div data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="wColumnId" data-dojo-props="required: true" title="Поле ID" style="width: 100%"></div>
-        <div data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="wColumnGeom" data-dojo-props="required: true" title="Поле геометрии" style="width: 100%"></div>
-        <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="wGeometryType" title="Тип геометрии" style="width: 100%"></div>
-        <div data-dojo-type="ngw/form/SpatialRefSysSelect" data-dojo-attach-point="wSRS" title="Система&nbsp;координат" style="width: 100%"></div>
-        <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="wFieldDefs" title="Описания&nbsp;атрибутов" style="width: 100%"></div>
+        <div data-dojo-attach-point="wSchema"
+            data-dojo-type="dijit/form/ValidationTextBox"            
+            data-dojo-props="required: true, value: 'public'"
+            title="Схема" style="width: 100%"></div>
+        
+        <div data-dojo-attach-point="wTable"
+            data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            title="Таблица" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wColumnId"
+            data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            title="Поле ID" style="width: 100%"></div>
+        
+        <div data-dojo-attach-point="wColumnGeom"
+            data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            title="Поле геометрии" style="width: 100%"></div>
+        
+        <div data-dojo-attach-point="wGeometryType"
+            data-dojo-type="dijit/form/Select"
+            title="Тип геометрии" style="width: 100%"></div>
+        
+        <div data-dojo-attach-point="wSRS"
+            data-dojo-type="ngw/form/SpatialRefSysSelect"
+            title="Система&nbsp;координат" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wFieldDefs"
+            data-dojo-type="dijit/form/Select"
+            title="Описания&nbsp;атрибутов"
+            style="width: 100%"></div>
+
     </div>
 </div>

@@ -1,0 +1,69 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from collections import OrderedDict
+
+from .model import Resource
+
+_registry = []
+
+
+class WidgetMeta(type):
+    def __init__(cls, name, bases, nmspc):
+        super(WidgetMeta, cls).__init__(name, bases, nmspc)
+        if not nmspc.get('__abstract__', False):
+            _registry.append(cls)
+
+
+class WidgetBase(object):
+
+    def __init__(self, operation, obj, request):
+        self.operation = operation
+        self.obj = obj
+        self.request = request
+
+
+class Widget(WidgetBase):
+    __metaclass__ = WidgetMeta
+    __abstract__ = True
+
+    def is_applicable(self):
+        return (self.operation in self.__class__.operation
+                and isinstance(self.obj, self.__class__.resource))
+
+    def config(self):
+        return OrderedDict()
+
+
+class CompositeWidget(WidgetBase):
+
+    def __init__(self, *args, **kwargs):
+        super(CompositeWidget, self).__init__(*args, **kwargs)
+        self.members = []
+        for mcls in _registry:
+            member = mcls(*args, **kwargs)
+            if member.is_applicable():
+                self.members.append(member)
+
+    def config(self):
+        result = OrderedDict()
+        for m in self.members:
+            result[m.amdmod] = m.config()
+        return result
+
+
+class ResourceWidget(Widget):
+    resource = Resource
+    operation = ('create', 'update')
+    amdmod = 'ngw-resource/Widget'
+
+
+class ResourceDescriptionWiget(Widget):
+    resource = Resource
+    operation = ('create', 'update')
+    amdmod = 'ngw-resource/DescriptionWidget'
+
+
+class ResourceDeleteWidget(Widget):
+    resource = Resource
+    operation = ('delete', )
+    amdmod = 'ngw-resource/DeleteWidget'

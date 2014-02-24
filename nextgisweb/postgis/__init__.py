@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
-from .models import Base, PostgisConnection, PostgisLayer
+from .model import Base, PostgisConnection, PostgisLayer
 
 __all__ = ['PostgisConnection', 'PostgisLayer']
 
@@ -16,5 +16,4 @@ class PostgisComponent(Component):
 
     @require('feature_layer')
     def setup_pyramid(self, config):
-        from . import views
-        views.setup_pyramid(self, config)
+        from . import view # NOQA

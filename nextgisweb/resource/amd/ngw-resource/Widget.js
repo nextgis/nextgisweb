@@ -25,6 +25,7 @@ define([
         templateString: template,
         identity: "resource",
         title: "Ресурс",
+        style: "margin: 1ex;",
 
         postCreate: function () {
             this.watch("disabled", function (attr, oldVal, newVal) {
@@ -35,34 +36,31 @@ define([
         },
 
         validateWidget: function () {
-            var widget = this;
-
             var result = { isValid: true, error: [] };
 
             array.forEach([this.wDisplayName, this.wKeyname], function (subw) {
                 // форсируем показ значка при проверке
                 subw._hasBeenBlurred = true;
-                subw.validate();   
+                subw.validate();
 
                 // если есть ошибки, фиксируем их
                 if ( !subw.isValid() ) {
                     result.isValid = false;
-                };
+                }
             });
 
             return result;
         },
 
-        _setValueAttr: function (value) {
-            this.wDisplayName.set("value", value["display_name"]);
-            this.wKeyname.set("value", value["keyname"]);
+        serialize: function (data) {
+            if (data.resource === undefined) { data.resource = {}; }
+            data.resource.display_name = this.wDisplayName.get("value");
+            data.resource.keyname = this.wKeyname.get("value");
         },
 
-        _getValueAttr: function () {
-            return {
-                display_name: this.wDisplayName.get("value"),
-                keyname: this.wKeyname.get("value"),
-            }
+        deserialize: function (data) {
+            this.wDisplayName.set("value", data.resource.display_name);
+            this.wKeyname.set("value", data.resource.keyname);
         }
     });
-})
+});

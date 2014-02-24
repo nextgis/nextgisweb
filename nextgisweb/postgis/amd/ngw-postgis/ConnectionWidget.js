@@ -2,10 +2,9 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
+    "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "ngw/modelWidget/Widget",
-    "ngw/modelWidget/ErrorDisplayMixin",
     "dojo/text!./templates/ConnectionWidget.html",
     // template
     "dijit/form/ValidationTextBox",
@@ -13,28 +12,28 @@ define([
 ], function (
     declare,
     array,
+    _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    Widget,
-    ErrorDisplayMixin,
     template
 ) {
-    return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "postgis_connection",
         title: "Соединение PostGIS",
 
-        _getValueAttr: function () {
-            var result = {
-                hostname: this.wHostname.get("value"),
-                username: this.wUsername.get("value"),
-                password: this.wPassword.get("value"),
-                database: this.wDatabase.get("value")
-            };
-            return result;
+        serialize: function (data) {
+            if (data.postgis_connection === undefined) { data.postgis_connection = {}; }
+            var value = data.postgis_connection;
+
+            value.hostname = this.wHostname.get("value");
+            value.username = this.wUsername.get("value");
+            value.password = this.wPassword.get("value");
+            value.database = this.wDatabase.get("value");
         },
 
-        _setValueAttr: function (value) {
+        deserialize: function (data) {
+            var value = data.postgis_connection;
             this.wHostname.set("value", value.hostname);
             this.wUsername.set("value", value.username);
             this.wPassword.set("value", value.password);

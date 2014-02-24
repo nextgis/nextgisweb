@@ -4,16 +4,11 @@ import json
 from collections import OrderedDict
 
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden
+from pyramid import httpexceptions
 
 from ..models import DBSession
 
-from ..views import (
-    ModelController,
-    DescriptionObjectWidget,
-    DeleteObjectWidget,
-    permalinker)
-from ..object_widget import ObjectWidget, CompositeWidget
+from ..views import permalinker
 from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
 from ..pyramidcomp import viewargs
@@ -21,11 +16,11 @@ from ..pyramidcomp import viewargs
 from .model import (
     Resource,
     ResourceACLRule,
-    MetaDataScope,
     ResourceSerializer)
 from .scope import clscopes, scopeid
 from .permission import scope_permissions
 from .serialize import CompositeSerializer
+from .widget import CompositeWidget
 
 
 def resource_factory(request):
@@ -42,94 +37,6 @@ def resource_factory(request):
         id=request.matchdict['id']).one()
 
     return obj
-
-
-class ResourceController(ModelController):
-    def create_context(self, request):
-        parent = Resource.filter_by(id=request.GET['parent']).one()
-        request.resource_permission(parent, Resource, 'children')
-
-        cls = Resource.registry[request.GET['cls']]
-
-        tmpobj = cls(parent=parent, owner_user=request.user)
-        request.resource_permission(tmpobj, Resource, 'create')
-
-        return dict(
-            cls=cls,
-            parent=parent,
-            owner_user=request.user,
-            template_context=dict(
-                obj=parent,
-                subtitle="Новый ресурс: %s" % cls.cls_display_name),
-            widget_options=dict(
-                parent=parent,
-                user=request.user))
-
-    def edit_context(self, request):
-        obj = Resource.filter_by(**request.matchdict).one()
-        request.resource_permission(obj, MetaDataScope, 'edit')
-
-        cls = Resource.registry[obj.cls]
-        obj = cls.filter_by(resource_id=obj.id).one()
-
-        return dict(
-            obj=obj,
-            cls=cls,
-            template_context=dict(obj=obj)
-        )
-
-    def delete_context(self, request):
-        # TODO: Права доступа
-        return self.edit_context(request)
-
-    def widget_class(self, context, operation):
-        class Composite(CompositeWidget):
-            model_class = context['cls']
-
-        return Composite
-
-    def create_object(self, context):
-        return context['cls'](
-            parent=context['parent'],
-            owner_user=context['owner_user'])
-
-    def query_object(self, context):
-        return context['obj']
-
-    def template_context(self, context):
-        return context['template_context']
-
-
-class ResourceObjectWidget(ObjectWidget):
-
-    def is_applicable(self):
-        return self.operation in ('create', 'edit')
-
-    def populate_obj(self):
-        ObjectWidget.populate_obj(self)
-
-        self.obj.display_name = self.data['display_name']
-        self.obj.keyname = self.data['keyname']
-
-    def validate(self):
-        result = ObjectWidget.validate(self)
-        self.error = []
-
-        return result
-
-    def widget_params(self):
-        result = ObjectWidget.widget_params(self)
-
-        if self.obj:
-            result['value'] = dict(
-                display_name=self.obj.display_name,
-                keyname=self.obj.keyname,
-            )
-
-        return result
-
-    def widget_module(self):
-        return 'ngw-resource/Widget'
 
 
 @viewargs(renderer='psection.mako')
@@ -244,7 +151,8 @@ def store(request):
             continue
 
         serializer = ResourceSerializer(res, request.user)
-        itm = serializer.serialize()
+        serializer.serialize()
+        itm = serializer.data
 
         if oid is not None:
             return itm
@@ -326,11 +234,76 @@ def child_post(request):
         (b"Location", bytes(location))])
 
 
+@viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
+def create(request):
+    return dict(
+        obj=request.context, subtitle="Создать ресурс",
+        query=dict(operation='create', cls=request.GET.get('cls'),
+                   parent=request.context.id))
+
+
+@viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
+def update(request):
+    return dict(
+        obj=request.context,
+        query=dict(operation='update', id=request.context.id))
+
+
+@viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
+def delete(request):
+    return dict(
+        obj=request.context, subtitle="Удалить ресурс",
+        query=dict(operation='delete', id=request.context.id))
+
+
+@viewargs(renderer='json')
+def widget(request):
+    operation = request.GET.get('operation', None)
+    resid = request.GET.get('id', None)
+    clsid = request.GET.get('cls', None)
+    parent_id = request.GET.get('parent', None)
+
+    def url(parent_id, child_id=''):
+        return request.route_url(
+            'resource.child',
+            id=parent_id,
+            child_id=child_id)
+
+    if operation == 'create':
+        if resid is not None or clsid is None or parent_id is None:
+            raise httpexceptions.HTTPBadRequest()
+
+        if clsid not in Resource.registry._dict:
+            raise httpexceptions.HTTPBadRequest()
+
+        parent = Resource.query().with_polymorphic('*') \
+            .filter_by(id=parent_id).one()
+
+        obj = Resource.registry[clsid](parent=parent, owner_user=request.user)
+
+    elif operation in ('update', 'delete'):
+        if resid is None or clsid is not None or parent_id is not None:
+            raise httpexceptions.HTTPBadRequest()
+
+        obj = Resource.query().with_polymorphic('*') \
+            .filter_by(id=resid).one()
+
+        parent = obj.parent
+
+    else:
+        raise httpexceptions.HTTPBadRequest()
+
+    widget = CompositeWidget(operation=operation, obj=obj, request=request)
+    return dict(
+        operation=operation, config=widget.config(), id=resid,
+        cls=clsid, parent=parent.id if parent else None)
+
+
 def setup_pyramid(comp, config):
 
     def resource_permission(request, resource, cls, permission):
         if not resource.has_permission(cls, permission, request.user):
-            raise HTTPForbidden()
+            raise httpexceptions.HTTPForbidden()
 
     config.add_request_method(resource_permission, 'resource_permission')
 
@@ -349,7 +322,8 @@ def setup_pyramid(comp, config):
     _route('schema', 'schema', client=()).add_view(schema)
 
     _route('root', '').add_view(
-        lambda (r): HTTPFound(r.route_url('resource.show', id=0)))
+        lambda (r): httpexceptions.HTTPFound(
+            r.route_url('resource.show', id=0)))
 
     _resource_route('show', '{id:\d+}', client=('id', )).add_view(show)
 
@@ -360,10 +334,17 @@ def setup_pyramid(comp, config):
 
     _route('store', 'store/{id:\d*}', client=('id', )).add_view(store)
 
-    _resource_route('child', '{id:\d+|-}/child/{child_id:\d*}') \
+    _resource_route('child', '{id:\d+|-}/child/{child_id:\d*}', client=('id', 'child_id')) \
         .add_view(child_get, method='GET') \
         .add_view(child_patch, method='PATCH') \
         .add_view(child_post, method='POST')
+
+    _route('widget', 'widget', client=()).add_view(widget)
+
+    # CRUD
+    _resource_route('create', '{id:\d+}/create').add_view(create)
+    _resource_route('update', '{id:\d+}/update').add_view(update)
+    _resource_route('delete', '{id:\d+}/delete').add_view(delete)
 
     permalinker(Resource, 'resource.show')
 
@@ -371,16 +352,6 @@ def setup_pyramid(comp, config):
 
     _resource_route('security', '{id:\d+}/security', client=('id', )) \
         .add_view(security_get).add_view(security_put).add_view(security)
-
-    # Виджет редактирования
-
-    ResourceController('resource').includeme(config)
-
-    Resource.object_widget = (
-        ('resource', ResourceObjectWidget),
-        ('resource:description', DescriptionObjectWidget),
-        ('resource:delete', DeleteObjectWidget),
-    )
 
     # Секции
 
@@ -418,26 +389,26 @@ def setup_pyramid(comp, config):
                     continue
 
                 yield Link(
-                    'add/%s' % ident,
+                    'create/%s' % ident,
                     cls.cls_display_name,
                     self._url(ident))
 
         def _url(self, cls):
             return lambda (args): args.request.route_url(
-                'resource.create', _query=dict(
-                    parent=args.obj.id, cls=cls))
+                'resource.create', id=args.obj.id,
+                _query=dict(cls=cls))
 
     Resource.__dynmenu__ = DynMenu(
-        Label('add', "Добавить ресурс"),
+        Label('create', "Создать ресурс"),
 
         AddMenu(),
 
         Label('operation', "Операции"),
 
         Link(
-            'operation/edit', "Редактировать",
+            'operation/update', "Изменить",
             lambda args: args.request.route_url(
-                'resource.edit', id=args.obj.id)),
+                'resource.update', id=args.obj.id)),
 
         Link(
             'operation/delete', "Удалить",

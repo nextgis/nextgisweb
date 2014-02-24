@@ -203,6 +203,7 @@ class ResourceSerializer(Serializer):
 
     keyname = SP(read='identify', write='edit')
     display_name = SP(read='identify', write='edit')
+    description = SP(read='identify', write='edit')
 
     children = _children_attr(read='identify')
     interfaces = _interfaces_attr(read='identify')

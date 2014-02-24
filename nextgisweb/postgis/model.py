@@ -14,6 +14,7 @@ from ..resource import (
     register_permission,
     Serializer,
     SerializedProperty as SP,
+    SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
     ResourceError,
     Forbidden)
@@ -307,6 +308,8 @@ class PostgisLayerSerializer(Serializer):
 
     geometry_type = SP(**__metadata)
     geometry_srid = SP(**__metadata)
+
+    srs = SR(**__metadata)
 
     fields = _fields_action(write="edit", scope=MetaDataScope)
 
