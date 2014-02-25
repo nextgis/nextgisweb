@@ -7,8 +7,12 @@ import sqlalchemy.orm as orm
 from osgeo import gdal, gdalconst, osr
 
 from ..models import declarative_base
+from ..resource import (
+    Resource,
+    DataScope,
+    Serializer,
+    SerializedProperty as SP)
 from ..env import env
-from ..resource import Resource, DataScope
 from ..layer import SpatialLayerMixin
 from ..file_storage import FileObj
 
@@ -78,3 +82,8 @@ class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
             (u"Идентификатор файла", self.fileobj.uuid),
         )
+
+
+class RasterLayerSerializer(Serializer):
+    identity = RasterLayer.identity
+    resclass = RasterLayer

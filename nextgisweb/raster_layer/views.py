@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
 from osgeo import gdal, gdalconst
 
+from ..resource import Widget
 from ..object_widget import ObjectWidget
 
 from .models import RasterLayer
+
+
+class RasterLayerWidget(Widget):
+    resource = RasterLayer
+    operation = ('create', )
+    amdmod = 'ngw-raster-layer/Widget'
 
 
 def setup_pyramid(comp, config):
