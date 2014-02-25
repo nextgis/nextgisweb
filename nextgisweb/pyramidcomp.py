@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from hashlib import md5
+import re
 from StringIO import StringIO
 
 from pyramid.config import Configurator
@@ -113,7 +114,9 @@ class ExtendedConfigurator(Configurator):
 
         """
 
-        super(ExtendedConfigurator, self).add_route(name, pattern=pattern, **kwargs)
+        super(ExtendedConfigurator, self).add_route(
+            name, pattern=pattern, **kwargs)
+
         return RouteHelper(name, self)
 
     def add_view(self, view=None, **kwargs):
@@ -178,11 +181,31 @@ class PyramidComponent(Component):
             h = md5()
             h.update(buf.getvalue())
             static_key = '/' + h.hexdigest()
-
         finally:
             sys.stdout = stdout
 
-        config.add_static_view('/static%s/asset' % static_key, 'static', cache_max_age=3600)
+        self.pkginfo = []
+
+        # Так же из вывода pip freeze читаем список
+        # установленных пакетов
+
+        buf.seek(0)
+
+        for l in buf:
+            l = l.strip().lower()
+
+            mpkg = re.match(r'(.+)==(.+)', l)
+            if mpkg:
+                self.pkginfo.append(tuple(mpkg.groups()))
+
+            mgit = re.match(r'-e\sgit\+git\@.+?\@.+(.{8})\#egg=(\w+).*', l)
+            if mgit:
+                self.pkginfo.append(tuple(reversed(mgit.groups())))
+
+        config.add_static_view(
+            '/static%s/asset' % static_key,
+            'static', cache_max_age=3600)
+
         config.add_route('amd_package', '/static%s/amd/*subpath' % static_key) \
             .add_view('nextgisweb.views.amd_package')
 
@@ -232,7 +255,20 @@ class PyramidComponent(Component):
         config.add_route('pyramid.control_panel', '/control-panel') \
             .add_view(control_panel, renderer="pyramid/control_panel.mako")
 
-        self.control_panel = dm.DynMenu()
+        def pkginfo(request):
+            return dict(title=u"Версии пакетов",
+                        pkginfo=self.pkginfo,
+                        dynmenu=self.control_panel)
+
+        config.add_route('pyramid.pkginfo', '/sys/pkginfo') \
+            .add_view(pkginfo, renderer="pyramid/pkginfo.mako")
+
+        self.control_panel = dm.DynMenu(
+            dm.Label('sys', u"Информация о системе"),
+
+            dm.Link('sys/pkginfo', u"Версии пакетов", lambda args: (
+                args.request.route_url('pyramid.pkginfo'))),
+        )
 
     settings_info = (
         dict(key='secret', desc=u"Ключ, используемый для шифрования cookies"),
