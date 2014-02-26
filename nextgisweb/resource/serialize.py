@@ -129,10 +129,13 @@ class SerializedRelationship(SerializedProperty):
         mapper = self.relationship.mapper
         cls = mapper.class_
 
-        obj = cls.filter_by(**dict(map(
-            lambda k: (k.name, value[k.name]),
-            mapper.primary_key))
-        ).one()
+        if value is not None:
+            obj = cls.filter_by(**dict(map(
+                lambda k: (k.name, value[k.name]),
+                mapper.primary_key))
+            ).one()
+        else:
+            obj = None
 
         setattr(srlzr.obj, self.attrname, obj)
 
@@ -191,7 +194,7 @@ class CompositeSerializer(SerializerBase):
     def __init__(self, obj, user, data=None):
         super(CompositeSerializer, self).__init__(obj, user, data)
 
-        self.members = dict()
+        self.members = OrderedDict()
         for ident, mcls in self.registry._dict.iteritems():
             if data is None or ident in data:
                 mdata = data[ident] if data else None
