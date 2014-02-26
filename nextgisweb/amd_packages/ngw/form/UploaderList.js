@@ -7,8 +7,6 @@ define([
     "dojo/text!./templates/UploaderList.html",
     "dojox/form/Uploader",
     "dojox/form/uploader/FileList",
-    "dojox/form/uploader/plugins/HTML5",
-    "dojox/form/uploader/plugins/Flash",
     "ngw/route",
     // css
     "xstyle/css!./resources/UploaderList.css"
@@ -21,8 +19,6 @@ define([
     template,
     Uploader,
     FileList,
-    HTML5,
-    Flash,
     route
 ) {
     // TODO: Убрать после обновления Dojo до 1.9

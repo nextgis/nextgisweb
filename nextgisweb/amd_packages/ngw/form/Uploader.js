@@ -7,8 +7,6 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "dojo/text!./templates/Uploader.html",
     "dojox/form/Uploader",
-    "dojox/form/uploader/plugins/HTML5",
-    "dojox/form/uploader/plugins/Flash",
     "ngw/route"
 ], function (
     declare,
@@ -18,8 +16,6 @@ define([
     _WidgetsInTemplateMixin,
     template,
     Uploader,
-    HTML5Uploader,
-    FlashUploader,
     route
 ) {
     // Uploader AMD workaround
