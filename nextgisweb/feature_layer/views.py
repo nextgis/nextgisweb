@@ -16,10 +16,8 @@ from .extension import FeatureExtension
 
 def feature_browse(layer, request):
     # TODO: Security
-    return dict(
-        obj=layer,
-        subtitle=u"Объекты",
-        custom_layout=True)
+    return dict(obj=layer, subtitle=u"Объекты",
+                maxwidth=True, maxheight=True)
 
 
 def feature_show(layer, request):
@@ -271,7 +269,7 @@ def setup_pyramid(comp, config):
         client=('id', )
     ).add_view(
         feature_browse, context=IFeatureLayer,
-        renderer='feature_layer/feature_browse.mako')
+        renderer='nextgisweb:feature_layer/template/feature_browse.mako')
 
     config.add_route(
         'feature_layer.field', '/resource/{id:\d+}/field/',

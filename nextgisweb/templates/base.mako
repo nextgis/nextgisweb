@@ -52,7 +52,7 @@
 <body class="claro">
   %if not custom_layout:
 
-<div class="header">
+<div id="header" class="header">
   <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal">
     <a class="pure-menu-heading" href="${request.application_url}">${request.env.core.settings['system.full_name']}</a>
     <ul>
@@ -73,24 +73,24 @@
 </div>
 
 %if hasattr(next, 'title_block'):
-  <div class="title">
+  <div id="title" class="title">
     ${next.title_block()}
   </div>
 %elif hasattr(next, 'title'):
-  <div class="title">
+  <div id="title" class="title">
     <h1>${next.title()}</h1>
   </div>
 %elif title:
-  <div class="title">
+  <div id="title" class="title">
     <h1>${title}</h1>
   </div>
 %endif
 
-<div class="content-wrapper">
+<div id="content-wrapper" class="content-wrapper ${'maxwidth' if maxwidth else ''} ${'content-maxheight' if maxheight else ''}">
 
-  <div class="content">
+  <div class="content expand">
 
-    <div class="pure-g">
+    <div class="pure-g expand">
 
     <% from bunch import Bunch %>
     %if obj and hasattr(obj,'__dynmenu__'):
@@ -110,7 +110,7 @@
         <% has_dynmenu = False %>
     %endif
     
-    <div class="pure-u-${"20-24" if has_dynmenu else "1"}">
+    <div class="pure-u-${"20-24" if has_dynmenu else "1"} expand">
         %if hasattr(next, 'body'):
           ${next.body()}
         %endif
@@ -134,6 +134,33 @@
   </div>
 </div>
 
+%if maxheight:
+    <script type="text/javascript">
+        require(["dojo/dom", "dojo/dom-style", "dojo/dom-geometry", "dojo/on", "dojo/domReady!"],
+        function (dom, domStyle, domGeom, on) {
+            var content = dom.byId("content-wrapper"),
+                header = [ ];
+
+            for (var id in {"header": true, "title": true}) {
+                var node = dom.byId(id);
+                if (node) { header.push(node) }
+            }
+
+            function resize() {
+                var h = 0;
+                for (var i = 0; i < header.length; i++) {
+                    var n = header[i], cs = domStyle.getComputedStyle(n);
+                    h = h + domGeom.getMarginBox(n, cs).h;
+                }
+                domStyle.set(content, "top", h + "px");
+            }
+
+            resize();
+
+            on(window, 'resize', resize);
+        });
+    </script>
+%endif
 
 </body>
 

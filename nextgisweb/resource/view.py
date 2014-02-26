@@ -236,24 +236,21 @@ def child_post(request):
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def create(request):
-    return dict(
-        obj=request.context, subtitle="Создать ресурс",
-        query=dict(operation='create', cls=request.GET.get('cls'),
-                   parent=request.context.id))
+    return dict(obj=request.context, subtitle="Создать ресурс", maxheight=True,
+                query=dict(operation='create', cls=request.GET.get('cls'),
+                           parent=request.context.id))
 
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def update(request):
-    return dict(
-        obj=request.context,
-        query=dict(operation='update', id=request.context.id))
+    return dict(obj=request.context, maxheight=True,
+                query=dict(operation='update', id=request.context.id))
 
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def delete(request):
-    return dict(
-        obj=request.context, subtitle="Удалить ресурс",
-        query=dict(operation='delete', id=request.context.id))
+    return dict(obj=request.context, subtitle="Удалить ресурс", maxheight=True,
+                query=dict(operation='delete', id=request.context.id))
 
 
 @viewargs(renderer='json')

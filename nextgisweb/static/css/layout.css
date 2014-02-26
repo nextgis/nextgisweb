@@ -54,8 +54,19 @@ body { font-size: 12px; }
 
 /* -- CONTENT STYLES -- */
 
-.content { padding: 1em; }
+.content { padding: 6px; }
 
-.content-wrapper {
-    max-width: 1280px;
-    margin: 0 auto; }
+.content-wrapper { max-width: 1280px; margin: 0 auto; }
+
+.content-wrapper.maxwidth { max-width: none; margin: 0; }
+
+.content-maxheight {
+    position: absolute;
+    left: 0; top: 0;
+    bottom: 0; right: 0;
+    padding: 6px 0; }
+
+    .content-maxheight .expand {
+        height: 100%;
+        padding-top: 0px;
+        padding-bottom: 0px; }

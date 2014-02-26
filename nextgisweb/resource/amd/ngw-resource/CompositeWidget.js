@@ -31,7 +31,7 @@ define([
     route
 ) {
     var CompositeWidget = declare("ngw.resource.CompositeWidget", BorderContainer, {
-        style: "width: 100%; height: 400px; padding: 1px;",
+        style: "width: 100%; height: 100%; padding: 1px;",
         gutters: false,
 
         buildRendering: function () {

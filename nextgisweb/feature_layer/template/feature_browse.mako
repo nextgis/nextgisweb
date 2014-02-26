@@ -1,11 +1,6 @@
-<%inherit file='../base.mako' />
-<% import json %>
+<%inherit file='nextgisweb:templates/obj.mako' />
 
-<%def name="head()">
-    <style type="text/css">
-        body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; }
-    </style>
-</%def>
+<% import json %>
 
 <script type="text/javascript">
     require([
@@ -17,7 +12,6 @@
     ], function (dom, FeatureGrid, Button, TextBox) {
         var grid = new FeatureGrid({layerId: ${obj.id}, style: "width: 100%; height: 100%; padding: 0"});
         grid.placeAt(dom.byId("grid"));
-
         grid.startup();
     });
 </script>
