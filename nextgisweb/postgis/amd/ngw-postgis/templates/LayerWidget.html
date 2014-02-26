@@ -1,42 +1,63 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${prefix}">
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, labelWidth: 150">
 
         <div data-dojo-attach-point="wConnectionId" 
             data-dojo-type="ngw/form/PickerBox"
+            data-dojo-props="colspan: 2"
             title="Подключение" style="width: 100%"></div>
 
-        <div data-dojo-attach-point="wSchema"
-            data-dojo-type="dijit/form/ValidationTextBox"            
-            data-dojo-props="required: true, value: 'public'"
-            title="Схема" style="width: 100%"></div>
-        
-        <div data-dojo-attach-point="wTable"
-            data-dojo-type="dijit/form/ValidationTextBox"
+        <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
+            data-ngw-serialize="table"
             title="Таблица" style="width: 100%"></div>
 
-        <div data-dojo-attach-point="wColumnId"
-            data-dojo-type="dijit/form/ValidationTextBox"
+        <div data-dojo-type="dijit/form/ValidationTextBox"            
+            data-dojo-props="required: true, value: 'public'"
+            data-ngw-serialize="schema"
+            title="Схема" style="width: 100%"></div>
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
+            data-ngw-serialize="column_id"
             title="Поле ID" style="width: 100%"></div>
         
-        <div data-dojo-attach-point="wColumnGeom"
-            data-dojo-type="dijit/form/ValidationTextBox"
+        <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
+            data-ngw-serialize="column_geom"
             title="Поле геометрии" style="width: 100%"></div>
         
-        <div data-dojo-attach-point="wGeometryType"
+        <select data-dojo-attach-point="geometryType" 
             data-dojo-type="dijit/form/Select"
-            title="Тип геометрии" style="width: 100%"></div>
+            data-dojo-props="colspan: 2"
+            data-ngw-serialize="geometry_type"
+            title="Тип геометрии" style="width: 100%">
+            
+            <option value="">Автоматически</option>
+            <option value="POINT">Точка</option>
+            <option value="LINESTRING">Линия</option>
+            <option value="POLYGON">Полигон</option>
+
+        </select>
         
-        <div data-dojo-attach-point="wSRS"
+        <div data-dojo-attach-point="srs"
             data-dojo-type="ngw/form/SpatialRefSysSelect"
+            data-dojo-props="colspan: 2"
             title="Система&nbsp;координат" style="width: 100%"></div>
 
-        <div data-dojo-attach-point="wFieldDefs"
+        <select data-dojo-attach-point="fields"
             data-dojo-type="dijit/form/Select"
+            data-dojo-props="colspan: 2"
+            data-ngw-serialize="fields"
             title="Описания&nbsp;атрибутов"
-            style="width: 100%"></div>
+            style="width: 100%">
+
+            <option value="keep">Сохранить текущие</option>
+            <option value="update">Прочитать из базы данных</option>
+
+        </div>
 
     </div>
+
 </div>

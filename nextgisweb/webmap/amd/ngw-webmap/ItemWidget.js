@@ -12,6 +12,7 @@ define([
     "dijit/Tree",
     "dijit/tree/dndSource",
     "dijit/registry",
+    "ngw-resource/serialize",
     "ngw-resource/ResourceStore",
     "ngw-resource/ResourcePicker",
     // resource
@@ -45,12 +46,13 @@ define([
     Tree,
     dndSource,
     registry,
+    serialize,
     ResourceStore,
     ResourcePicker,
     template,
     settings
 ) {
-    return declare([ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: "Слои",
         templateString: template,
 
@@ -245,7 +247,7 @@ define([
             }
         },
 
-        serialize: function (data) {
+        serializeInMixin: function (data) {
             if (data.webmap === undefined) { data.webmap = {}; }
             var store = this.itemStore;
 
@@ -269,7 +271,7 @@ define([
             data.webmap.root_item = traverse(this.itemModel.root);
         },
 
-        deserialize: function (data) {
+        deserializeInMixin: function (data) {
             var value = data.webmap.root_item;
             if (value === undefined) { return; }
 

@@ -1,21 +1,26 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" style="padding: 1ex;">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${prefix}" style="padding: 1ex;">
+
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
 
-        <div data-dojo-attach-point="wHostname"
-            data-dojo-type="dijit/form/ValidationTextBox"
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            data-ngw-serialize="hostname"
             title="Сервер" style="width: 100%"></div>
 
-        <div data-dojo-attach-point="wDatabase"
-            data-dojo-type="dijit/form/ValidationTextBox"
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            data-ngw-serialize="database"
             title="База данных" style="width: 100%"></div>
 
-        <div data-dojo-attach-point="wUsername"
-            data-dojo-type="dijit/form/ValidationTextBox"
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            data-ngw-serialize="username"
             title="Пользователь" style="width: 100%"></div>
 
-        <div data-dojo-attach-point="wPassword"
-            data-dojo-type="dijit/form/ValidationTextBox"
-            data-dojo-props="type: 'password'"
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true, type: 'password'"
+            data-ngw-serialize="password"
             title="Пароль" style="width: 100%"></div>
 
     </div>

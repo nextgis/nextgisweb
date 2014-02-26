@@ -89,8 +89,60 @@ define([
             }
         },
 
-        // Serialization and validation
-        // ============================
+        // Сериализация и валидация
+        // ========================
+
+        validateData: function () {
+            var deferred = new Deferred(),
+                promises = [],
+                errors = [];
+
+            // Регистрация ошибки, эта функция передается дочерним
+            // виджетам в качестве параметра
+            function errback(err) {
+                errors.push(err);
+            }
+
+            array.forEach(this.members, function (member) {
+                // Валидация может быть асинхронной, в этом случае
+                // member.validate вернет deferred, собираем их в массив
+                promises.push(when(member.validateData(errback)).then(
+                    function /* callback */ (success) {
+                        // Если валидация завершилась с ошибкой,
+                        // отмечаем заголовок красным цветом
+
+                        // TODO: Наверное есть способ сделать это как-то
+                        // получше, например вешать специальный класс на
+                        // ноду таба, но непонятно как ее обнаружить.
+                        if (!success) { member.set("title", "<span style=\"color: #d00\">" + member.get("title") + "</span>"); }
+                        return success;
+                    }
+                ));
+            });
+
+            all(promises).then(
+                function /* callback */ (results) {
+                    var success = true;
+
+                    // Проверяем результаты всех членов, все должны
+                    // вернуть истинное выражение
+                    array.forEach(results, function (res) {
+                        success = success && res;
+                    });
+
+                    // Так же как и дочерние виждеты составной виджет
+                    // возвращает истину или ложь, и reject в случае ошибки.
+                    deferred.resolve(success);
+                },
+
+                function /* errback */ (err) {
+                    deferred.reject(err);
+                }
+
+            ).then(null, deferred.reject);
+
+            return deferred;
+        },
 
         serialize: function () {
             var promises = [];
@@ -107,7 +159,7 @@ define([
 
             return all(promises).then(function () {
                 return data;
-            }, console.error).otherwise(console.error);
+            }, console.error);
         },
 
         deserialize: function (data) {
@@ -116,8 +168,20 @@ define([
             }
         },
 
-        // REST API interaction
-        // ====================
+        // REST API 
+        // ========
+
+        request: function (args) {
+            return xhr(args.url, {
+                method: args.method,
+                handleAs: "json",
+                data: json.stringify(args.data),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            });
+        },
 
         itemUrl: function () {
             return route("resource.child", {
@@ -133,35 +197,63 @@ define([
             });
         },
 
-        // Widget action and buttons
-        // =========================
+        apiReq: function (args) {
+            var widget = this,
+                deferred = new Deferred();
+
+            this.validateData().then(
+                function /* callback */ (success) {
+                    if (success) {
+                        console.debug("Validation completed");
+                        widget.serialize().then(
+                            function /* callback */ (data) {
+                                console.debug("Serialization completed");
+                                widget.request({
+                                    url: args.url,
+                                    method: args.method,
+                                    data: data
+                                }).then(
+                                    function /* callback */ (response) {
+                                        console.debug("REST API request completed");
+                                        deferred.resolve(response);
+                                    },
+                                    function /* errback */ (err) { console.error(err); }
+                                );
+                            },
+                            function /* errback */ (err) { console.error(err); }
+                        );
+                    } else {
+                        console.info("Validation failed");
+                    }
+                },
+                function /* errback */ (err) { console.error(err); }
+            ).then(null, console.error);
+
+            return deferred;
+        },
+
+
+        // Всякие действия и кнопки
+        // ========================
         
         createObj: function () {
-            this.serialize().then(lang.hitch(this, function (data) {
-                xhr(this.collectionUrl(), {
-                    method: "POST",
-                    data: json.stringify(data),
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    handleAs: "json"
-                });
-            })).otherwise(console.error);
+            this.tabContainer.set("disabled", true);
+
+            this.apiReq({
+                url: this.collectionUrl(),
+                method: "POST"
+            }).then(function /* callback */ (data) {
+                window.location = route("resource.show", {id: data.id});
+            });
         },
 
         updateObj: function () {
-            this.serialize().then(lang.hitch(this, function (data) {
-                xhr(this.itemUrl(), {
-                    method: "PATCH",
-                    data: json.stringify(data),
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    handleAs: "json"
-                });
-            })).otherwise(console.error);
+            this.tabContainer.set("disabled", true);
+            // TODO: PATCH заменить на POST
+            this.apiReq({
+                url: this.itemUrl(),
+                method: "PATCH"
+            });
         },
 
         refreshObj: function () {
@@ -183,7 +275,6 @@ define([
                 var cls = arguments[i];
                 options.config[amdmod[i]].cls = cls;
             }
-
             deferred.resolve(new CompositeWidget(options));
         });
         

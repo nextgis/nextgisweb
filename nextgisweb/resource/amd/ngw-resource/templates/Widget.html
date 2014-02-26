@@ -1,6 +1,16 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" title="Слой">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="resource" title="Слой">
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
-        <div data-dojo-type="ngw/form/DisplayNameTextBox" data-dojo-attach-point="wDisplayName" title="Наименование" style="width: 100%"></div>
-        <div data-dojo-type="ngw/form/KeynameTextBox" data-dojo-attach-point="wKeyname" title="Ключ" style="width: 100%"></div>
+        
+        <div data-dojo-type="ngw/form/DisplayNameTextBox"
+            data-dojo-attach-point="wDisplayName"
+            data-ngw-serialize="display_name"
+            title="Наименование" style="width: 100%"></div>
+
+        <div data-dojo-type="ngw/form/KeynameTextBox"
+            data-dojo-attach-point="wKeyname"
+            data-ngw-serialize="keyname"
+            title="Ключ" style="width: 100%"></div>
+
     </div>
 </div>

@@ -4,6 +4,7 @@ define([
     "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "ngw-resource/serialize",
     // resource
     "dojo/text!./template/ConnectionWidget.html",
     "ngw/settings!wmsclient",
@@ -17,14 +18,14 @@ define([
     ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    serialize,
     template,
     settings
 ) {
-    var IDENTITY = "wmsclient_connection";
-
-    return declare([ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         title: "WMS-клиент",
+        serializePrefix: "wmsclient_connection",
 
         postCreate: function () {
             this.inherited(arguments);
@@ -36,35 +37,6 @@ define([
             if (this.value) {
                 this.wVersion.set("value", this.value.version);
             }
-        },
-
-        validateWidget: function () {
-            var result = { isValid: true, error: [] };
-
-            array.forEach([this.wURL], function (subw) {
-                // форсируем показ значка при проверке
-                subw._hasBeenBlurred = true;
-                subw.validate();
-
-                // если есть ошибки, фиксируем их
-                if ( !subw.isValid() ) { result.isValid = false; }
-            });
-
-            return result;
-        },
-
-        serialize: function (data) {
-            if (data[IDENTITY] === undefined) { data[IDENTITY] = {}; }
-            var value = data[IDENTITY];
-
-            value.url = this.wURL.get("value");
-            value.version = this.wVersion.get("value");
-        },
-
-        deserialize: function (data) {
-            var value = data[IDENTITY];
-            this.wURL.set("value", value.url);
-            this.wVersion.set("value", value.url);
         }
 
     });

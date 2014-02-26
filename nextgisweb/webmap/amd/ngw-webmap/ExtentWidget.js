@@ -5,6 +5,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "ngw-resource/serialize",
     "ngw-resource/ResourceStore",
     // resource
     "dojo/text!./template/ExtentWidget.html",
@@ -19,10 +20,11 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    serialize,
     ResourceStore,
     template
 ) {
-    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: "Охват и закладки",
         templateString: template,
 
@@ -37,7 +39,7 @@ define([
             }));
         },
 
-        serialize: function (data) {
+        serializeInMixin: function (data) {
             if (data.webmap === undefined) { data.webmap = {}; }
             var value = data.webmap;
 
@@ -50,7 +52,7 @@ define([
             value.bookmark_resource = ( brid !== null) ? { id: brid } : null;
         },
 
-        deserialize: function (data) {
+        deserializeInMixin: function (data) {
             var value = data.webmap;
             this.wExtentLeft.set("value", value.extent_left);
             this.wExtentRight.set("value", value.extent_right);

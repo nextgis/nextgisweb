@@ -10,6 +10,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "put-selector/put",
+    "ngw-resource/serialize",
     "ngw-resource/ResourceStore",
     // resource
     "dojo/text!./template/LayerWidget.html",
@@ -31,14 +32,14 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     put,
+    serialize,
     ResourceStore,
     template
 ) {
-    var IDENTITY = 'wmsclient_layer';
-
-    return declare([ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: template,
+    return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: "WMS",
+        templateString: template,
+        serializePrefix: "wmsclient_layer",
 
         postCreate: function () {
             this.inherited(arguments);
@@ -87,24 +88,9 @@ define([
             this.wImgFormat.set("value", value.imgformat);
         },
 
-        validateWidget: function () {
-            var result = { isValid: true, error: [] };
-
-            array.forEach([this.wWMSLayers, this.wImgFormat], function (subw) {
-                // форсируем показ значка при проверке
-                subw._hasBeenBlurred = true;
-                subw.validate();
-
-                // если есть ошибки, фиксируем их
-                if ( !subw.isValid() ) { result.isValid = false; }
-            });
-
-            return result;
-        },
-
-        serialize: function (data) {
-            if (data[IDENTITY] === undefined) { data[IDENTITY] = {}; }
-            var value = data[IDENTITY];
+        serializeInMixin: function (data) {
+            if (data[this.serializePrefix] === undefined) { data[this.serializePrefix] = {}; }
+            var value = data[this.serializePrefix];
 
             value.connection = {id: this.wConnection.get("value")};
             value.srs = {id: this.wSRS.get("value")};
@@ -112,8 +98,8 @@ define([
             value.imgformat = this.wImgFormat.get("value");
         },
 
-        deserialize: function (data) {
-            var value = data[IDENTITY];
+        deserializeInMixin: function (data) {
+            var value = data[this.serializePrefix];
             if (value === undefined) { return; }
 
             this.wConnection.set("value", value.connection.id);

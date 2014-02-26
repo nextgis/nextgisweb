@@ -1,24 +1,36 @@
-/* global define */
 define([
     "dojo/_base/declare",
-    "dijit/Editor"
+    "dijit/Editor",
+    "ngw-resource/serialize"
 ], function (
     declare,
-    Editor
+    Editor,
+    serialize
 ) {
-    return declare("ngw.resource.DescriptionWidget", Editor, {
+    return declare("ngw.resource.DescriptionWidget", [Editor, serialize.Mixin], {
         title: "Описание",
-        value: "<br/>",
 
-        deserialize: function (data) {
-            var value = data.resource.description;
-            value = value === null ? "" : value;
-            this.set("value", value);
+        constructor: function () {
+            this.value = "";
         },
 
-        serialize: function (data) {
-            if (data.resource === undefined) {data.resource = {}; }
-            data.resource.description = this.get("value");
+        postCreate: function () {
+            this.inherited(arguments);
+            this.serattrmap.push({key: "resource.description", widget: this});
+        },
+
+        _getValueAttr: function () {
+            var value = this._get("value");
+            if (value === "") { return null; }
+            return value;
+        },
+
+        _setValueAttr: function (value) {
+            if (value !== null) {
+                this.inherited(arguments);
+            } else {
+                this.set("value", "");
+            }
         }
     });
 });

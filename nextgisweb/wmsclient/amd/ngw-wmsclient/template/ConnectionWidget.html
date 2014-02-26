@@ -1,13 +1,16 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${serializePrefix}">
+
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
         
         <div data-dojo-type="dijit/form/ValidationTextBox"
-            data-dojo-attach-point="wURL"
             data-dojo-props="required: true"
+            data-ngw-serialize="url"
             title="URL" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/Select"
             data-dojo-attach-point="wVersion"
+            data-ngw-serialize="version"
             title="Версия" style="width: 100%"></div>
 
     </div>
