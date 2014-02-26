@@ -22,6 +22,10 @@ define([
 
         required: false,
 
+        constructor: function () {
+            this._value = null;
+        },
+
         buildRendering: function () {
             this.inherited(arguments);
             this.textbox.disabled = true;
