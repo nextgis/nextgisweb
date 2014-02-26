@@ -9,9 +9,11 @@ from osgeo import gdal, gdalconst, osr
 from ..models import declarative_base
 from ..resource import (
     Resource,
+    MetaDataScope,
     DataScope,
     Serializer,
-    SerializedProperty as SP)
+    SerializedProperty as SP,
+    SerializedRelationship as SR)
 from ..env import env
 from ..layer import SpatialLayerMixin
 from ..file_storage import FileObj
@@ -28,7 +30,7 @@ class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
     __mapper_args__ = dict(polymorphic_identity=identity)
 
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    
+
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 
     xsize = sa.Column(sa.Integer, nullable=False)
@@ -47,7 +49,7 @@ class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
         src_osr = osr.SpatialReference()
         src_osr.ImportFromWkt(ds.GetProjection())
         dst_osr = osr.SpatialReference()
-        src_osr.ImportFromEPSG(int(self.srs_id))
+        src_osr.ImportFromEPSG(int(self.srs.id))
 
         reproject = not src_osr.IsSame(dst_osr)
 
@@ -57,7 +59,8 @@ class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
         self.fileobj = fobj
 
         if reproject:
-            cmd = ['gdalwarp', '-of', 'GTiff', '-t_srs', 'EPSG:%d' % self.srs_id]
+            cmd = ['gdalwarp', '-of', 'GTiff',
+                   '-t_srs', 'EPSG:%d' % self.srs.id]
             if ds.RasterCount == 3:
                 cmd.append('-dstalpha')
         else:
@@ -84,6 +87,21 @@ class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
         )
 
 
+class _source_attr(SP):
+
+    def setter(self, srlzr, value):
+        filedata, filemeta = env.file_upload.get_filename(value['id'])
+        srlzr.obj.load_file(filedata, env)
+
+
 class RasterLayerSerializer(Serializer):
     identity = RasterLayer.identity
     resclass = RasterLayer
+
+    srs = SR(read='view', write='edit', scope=DataScope)
+
+    xsize = SP(read='view', write=None, scope=MetaDataScope)
+    ysize = SP(read='view', write=None, scope=MetaDataScope)
+    band_count = SP(read='view', write=None, scope=MetaDataScope)
+
+    source = _source_attr(read=None, write='edit', scope=DataScope)

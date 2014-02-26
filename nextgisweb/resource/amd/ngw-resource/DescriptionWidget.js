@@ -11,7 +11,9 @@ define([
         value: "<br/>",
 
         deserialize: function (data) {
-            this.set("value", data.resource.description);
+            var value = data.resource.description;
+            value = value === null ? "" : value;
+            this.set("value", value);
         },
 
         serialize: function (data) {

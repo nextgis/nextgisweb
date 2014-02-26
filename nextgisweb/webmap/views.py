@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import namedtuple
 
-from ..object_widget import ObjectWidget
-
-from ..resource import resource_factory
+from ..resource import Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
 
 from .models import WebMap
@@ -11,34 +9,19 @@ from .plugin import WebmapPlugin
 from .adapter import WebMapAdapter
 
 
-class WebmapObjectWidget(ObjectWidget):
+class ExtentWidget(Widget):
+    resource = WebMap
+    operation = ('create', 'update')
+    amdmod = 'ngw-webmap/ExtentWidget'
 
-    def populate_obj(self):
-        super(WebmapObjectWidget, self).populate_obj()
 
-        self.obj.from_dict(self.data)
-
-    def validate(self):
-        result = super(WebmapObjectWidget, self).validate()
-        self.error = []
-
-        return result
-
-    def widget_params(self):
-        result = super(WebmapObjectWidget, self).widget_params()
-
-        if self.obj:
-            result['value'] = self.obj.to_dict()
-
-        return result
-
-    def widget_module(self):
-        return 'webmap/Widget'
+class ItemWidget(Widget):
+    resource = WebMap
+    operation = ('create', 'update')
+    amdmod = 'ngw-webmap/ItemWidget'
 
 
 def setup_pyramid(comp, config):
-
-    WebMap.object_widget = WebmapObjectWidget
 
     def display(obj, request):
         MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])

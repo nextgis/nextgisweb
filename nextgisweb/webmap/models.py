@@ -3,7 +3,12 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
 from ..models import declarative_base
-from ..resource import Resource, MetaDataScope
+from ..resource import (
+    Resource,
+    MetaDataScope,
+    Serializer,
+    SerializedProperty as SP,
+    SerializedResourceRelationship as SRR)
 
 Base = declarative_base()
 
@@ -146,3 +151,32 @@ class WebMapItem(Base):
 
             if a in data:
                 setattr(self, a, data[a])
+
+
+_mdargs = dict(read='view', write='edit', scope=MetaDataScope)
+
+
+class _root_item_attr(SP):
+
+    def getter(self, srlzr):
+        return srlzr.obj.root_item.to_dict()
+
+    def setter(self, srlzr, value):
+        if srlzr.obj.root_item is None:
+            srlzr.obj.root_item = WebMapItem(item_type='root')
+
+        srlzr.obj.root_item.from_dict(value)
+
+
+class WebMapSerializer(Serializer):
+    identity = WebMap.identity
+    resclass = WebMap
+
+    extent_left = SP(**_mdargs)
+    extent_right = SP(**_mdargs)
+    extent_bottom = SP(**_mdargs)
+    extent_top = SP(**_mdargs)
+
+    bookmark_resource = SRR(**_mdargs)
+
+    root_item = _root_item_attr(**_mdargs)

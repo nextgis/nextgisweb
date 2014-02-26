@@ -1,14 +1,12 @@
 /* globals define, console */
 define([
     "dojo/_base/declare",
+    "dojo/_base/array",
     "dojo/_base/lang",
     "dojo/dom-style",
-    "ngw/modelWidget/Widget",
-    "ngw/modelWidget/ErrorDisplayMixin",
+    "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/Widget.html",
-    "dojo/_base/array",
     "dojo/data/ItemFileWriteStore",
     "dijit/tree/TreeStoreModel",
     "dijit/Tree",
@@ -16,6 +14,8 @@ define([
     "dijit/registry",
     "ngw-resource/ResourceStore",
     "ngw-resource/ResourcePicker",
+    // resource
+    "dojo/text!./template/ItemWidget.html",
     "ngw/settings!webmap",
     // template
     "dijit/layout/TabContainer",
@@ -31,19 +31,15 @@ define([
     "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
     "dijit/form/Select",
-    "dijit/_WidgetBase",
-    "ngw-resource/Tree",
-    "ngw/form/PickerBox"
+    "ngw-resource/Tree"
 ], function (
     declare,
+    array,
     lang,
     domStyle,
-    Widget,
-    ErrorDisplayMixin,
+    ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    template,
-    array,
     ItemFileWriteStore,
     TreeStoreModel,
     Tree,
@@ -51,19 +47,17 @@ define([
     registry,
     ResourceStore,
     ResourcePicker,
+    template,
     settings
 ) {
-    return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        title: "Веб-карта",
+    return declare([ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
+        title: "Слои",
         templateString: template,
 
-        constructor: function (options) {
-            this.value = options.value;
-
-            var items = options.value ? options.value.root_item : {item_type: "root"};
-            this.itemStore = new ItemFileWriteStore({
-                data: {items: [items]}
-            });
+        constructor: function () {
+            this.itemStore = new ItemFileWriteStore({data: {
+                items: [{item_type: "root"}]
+            }});
 
             this.itemModel = new TreeStoreModel({
                 store: this.itemStore,
@@ -77,30 +71,19 @@ define([
                 showRoot: false,
                 getLabel: function (item) { return item.display_name; },
                 getIconClass: function(item, opened){
-                    return item.item_type == 'group' ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
+                    return item.item_type == "group" ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
                 },
                 persist: false,
                 dndController: dndSource,
                 checkItemAcceptance: function (node, source, position) {
                     var item = registry.getEnclosingWidget(node).item,
-                        item_type = widget.itemStore.getValue(item, 'item_type');
+                        item_type = widget.itemStore.getValue(item, "item_type");
                     // Блокируем возможность перетащить элемент внутрь слоя,
                     // перенос внутрь допустим только для группы
-                    return item_type === 'group' || (item_type === 'layer' && position !== 'over');
+                    return item_type === "group" || (item_type === "layer" && position !== "over");
                 },
-                betweenThreshold: 5,
+                betweenThreshold: 5
             });
-        },
-
-        buildRendering: function () {
-            this.inherited(arguments);
-
-            this.wBookmarkLayer.set("store", new ResourceStore());
-            this.wBookmarkLayer.on("pick", lang.hitch(this, function () {
-                this.bookmarkPicker.pick().then(lang.hitch(this, function (itm) {
-                    this.wBookmarkLayer.set("value", itm.id);
-                })).otherwise(console.error);
-            }));
         },
 
         postCreate: function () {
@@ -112,14 +95,6 @@ define([
                     label: settings.adapters[key].display_name
                 });
             }, this);
-
-            if (this.value) {
-                this.wBookmarkLayer.set("value", this.value.bookmark_resource_id);
-                this.wExtentLeft.set("value", this.value.extent[0]);
-                this.wExtentBottom.set("value", this.value.extent[1]);
-                this.wExtentRight.set("value", this.value.extent[2]);
-                this.wExtentTop.set("value", this.value.extent[3]);
-            };
 
             // Создать дерево без model не получается, поэтому создаем его вручную
             this.widgetTree.placeAt(this.containerTree).startup();
@@ -135,7 +110,7 @@ define([
                         group_expanded: null
                     }, {
                         parent: widget.getAddParent(),
-                        attribute: "children"    
+                        attribute: "children"
                     }
                 );
             });
@@ -183,14 +158,14 @@ define([
                         widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale_denom"));
                         widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale_denom"));
                         widget.wLayerAdapter.set("value", widget.getItemValue("layer_adapter"));
-                    };
+                    }
 
                     // Изначально боковая панель со свойствами текущего элемента
                     // спрятана. Поскольку элемент уже выбран - ее нужно показать.
                     if (!oldValue) {
-                        domStyle.set(widget.itemPane.domNode, 'display', 'block');
+                        domStyle.set(widget.itemPane.domNode, "display", "block");
                         widget.treeLayoutContainer.addChild(widget.itemPane);
-                    };
+                    }
 
                     // Активируем кнопку удаления слоя или группы
                     widget.btnDeleteItem.set("disabled", false);
@@ -229,51 +204,25 @@ define([
             });
         },
 
+        startup: function () {
+            this.inherited(arguments);
+        },
+
         validateWidget: function () {
-            var widget = this;
             var result = { isValid: true, error: [] };
 
             array.forEach([], function (subw) {
                 // форсируем показ значка при проверке
                 subw._hasBeenBlurred = true;
-                subw.validate();   
+                subw.validate();
 
                 // если есть ошибки, фиксируем их
                 if ( !subw.isValid() ) {
                     result.isValid = false;
-                };
+                }
             });
 
             return result;
-        },
-
-        _getValueAttr: function () {
-            var widget = this;
-
-            // Простого способа сделать дамп данных из itemStore
-            // почему-то нет, поэтому обходим рекурсивно.
-            function traverseItem(itm) {
-                return {
-                    item_type: widget.itemStore.getValue(itm, "item_type"),
-                    display_name: widget.itemStore.getValue(itm, "display_name"),
-                    group_expanded: widget.itemStore.getValue(itm, "group_expanded"),
-                    layer_style_id: widget.itemStore.getValue(itm, "layer_style_id"),
-                    layer_enabled: widget.itemStore.getValue(itm, "layer_enabled"),
-                    layer_transparency: widget.itemStore.getValue(itm, "layer_transparency"),
-                    layer_min_scale_denom: widget.itemStore.getValue(itm, "layer_min_scale_denom"),
-                    layer_max_scale_denom: widget.itemStore.getValue(itm, "layer_max_scale_denom"),
-                    layer_adapter: widget.itemStore.getValue(itm, "layer_adapter"),
-                    children: array.map(widget.itemStore.getValues(itm, "children"), function (i) { return traverseItem(i) })
-                }
-            }
-
-            return {
-                root_item: traverseItem(this.itemModel.root),
-                bookmark_resource_id: this.wBookmarkLayer.get("value") != "" ? this.wBookmarkLayer.get("value") : null,
-                extent: array.map(['Left', 'Bottom', 'Right', 'Top'], function (e) {
-                    return this['wExtent' + e].get('value')
-                }, this)
-            };
         },
 
         getAddParent: function () {
@@ -293,9 +242,40 @@ define([
         getItemValue: function (attr) {
             if (this.widgetTree.selectedItem) {
                 return this.itemStore.getValue(this.widgetTree.selectedItem, attr);
-            };
+            }
+        },
+
+        serialize: function (data) {
+            if (data.webmap === undefined) { data.webmap = {}; }
+            var store = this.itemStore;
+
+            // Простого способа сделать дамп данных из itemStore
+            // почему-то нет, поэтому обходим рекурсивно.
+            function traverse(itm) {
+                return {
+                    item_type: store.getValue(itm, "item_type"),
+                    display_name: store.getValue(itm, "display_name"),
+                    group_expanded: store.getValue(itm, "group_expanded"),
+                    layer_style_id: store.getValue(itm, "layer_style_id"),
+                    layer_enabled: store.getValue(itm, "layer_enabled"),
+                    layer_transparency: store.getValue(itm, "layer_transparency"),
+                    layer_min_scale_denom: store.getValue(itm, "layer_min_scale_denom"),
+                    layer_max_scale_denom: store.getValue(itm, "layer_max_scale_denom"),
+                    layer_adapter: store.getValue(itm, "layer_adapter"),
+                    children: array.map(store.getValues(itm, "children"), function (i) { return traverse(i); })
+                };
+            }
+
+            data.webmap.root_item = traverse(this.itemModel.root);
+        },
+
+        deserialize: function (data) {
+            var value = data.webmap.root_item;
+            if (value === undefined) { return; }
+
+            array.forEach(value.children, function (i) {
+                this.itemStore.newItem(i, {parent: this.itemModel.root, attribute: "children"});
+            }, this);
         }
-
-
-    })
-})
+    });
+});

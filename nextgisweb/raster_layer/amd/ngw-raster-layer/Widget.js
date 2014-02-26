@@ -21,45 +21,16 @@ define([
     _WidgetsInTemplateMixin,
     template
 ) {
-    return declare("ngw.raster_layer.Widget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare("ngw.raster.layer.Widget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
-        title: "Растровый слой"
+        title: "Растровый слой",
 
-        // _getValueAttr: function () {
-        //     var result = { srs_id: this.wSrs.get("value") };
-
-        //     // В общем случае файл имеет тип Promise,
-        //     // поэтому используем асинхронный вариант
-
-        //     var promise = new Deferred();
-
-        //     when(this.wFile.get("value"),
-        //         function (value) { result.file = value; promise.resolve(result); },
-        //         promise.reject
-        //     );
-
-        //     return promise;
-        // },
-
-        // validateWidget: function () {
-        //     var promise = new Deferred();
-
-        //     when(this.wFile.get("value"),
-        //         function (value) {
-        //             if (value) {
-        //                 promise.resolve({ isValid: true, error: [] });
-        //             } else {
-        //                 promise.resolve({
-        //                     isValid: false,
-        //                     error: [{ message: "Необходимо загрузить файл!" }]
-        //                 });
-        //             }
-        //         },
-        //         promise.reject
-        //     );
-
-        //     return promise;
-        // }
-
+        serialize: function (data) {
+            if (data.raster_layer === undefined) { data.raster_layer = {}; }
+            var value = data.raster_layer;
+            
+            value.srs = { id: this.wSrs.get("value") };
+            value.source = this.wFile.data;
+        }
     });
 });
