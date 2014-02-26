@@ -1,0 +1,33 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+
+        <div data-dojo-attach-point="wConnection" 
+            data-dojo-type="ngw/form/PickerBox"
+            title="Соединение WMS" style="width: 100%">
+
+            <div data-dojo-type="ngw-resource/ResourcePicker"
+                data-dojo-attach-point="connectionPicker"
+                data-dojo-props="cls: 'wmsclient_connection'"></div>
+
+        </div>
+
+        <div data-dojo-attach-point="wSRS"
+            data-dojo-type="ngw/form/SpatialRefSysSelect"
+            title="Система&nbsp;координат" style="width: 100%"></div>
+
+        <div  data-dojo-attach-point="wWMSLayers"
+            data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            title="WMS-слои" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wLayerSelect"
+            data-dojo-type="dijit/layout/ContentPane"
+            style="padding: 0"></div>
+
+        <div data-dojo-attach-point="wImgFormat"
+            data-dojo-type="dijit/form/ComboBox"
+            data-dojo-props="required: true"
+            title="Формат" style="width: 100%"></div>
+
+    </div>
+</div>

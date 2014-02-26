@@ -1,9 +1,12 @@
+from collections import OrderedDict
+
+
 def registry_maker():
     class ClassRegistry(object):
 
         def __init__(self):
             self._items = []
-            self._dict = dict()
+            self._dict = OrderedDict()
 
         def register(self, cls):
             self._items.append(cls)

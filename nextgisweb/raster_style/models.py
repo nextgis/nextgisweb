@@ -49,6 +49,10 @@ class RasterStyle(Base, DataScope, Resource):
     def check_parent(self, parent):
         return parent.cls == 'raster_layer'
 
+    @property
+    def srs(self):
+        return self.parent.srs
+
     def render_request(self, srs):
         return RenderRequest(self, srs)
 
