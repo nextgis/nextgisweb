@@ -8,12 +8,14 @@ define([
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/when",
+    "dojo/dom-class",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
     "dijit/TitlePane",
-    "ngw/route"
+    "ngw/route",
+    "xstyle/css!./resource/CompositeWidget.css"
 ], function (
     declare,
     lang,
@@ -23,6 +25,7 @@ define([
     Deferred,
     all,
     when,
+    domClass,
     Button,
     BorderContainer,
     ContentPane,
@@ -46,6 +49,8 @@ define([
                 style: "padding: 0; margin-top: 1ex;"
             }).placeAt(this);
 
+            domClass.add(this.btnContainer.domNode, "ngwButtonStrip");
+
             this.members = [];
 
             for (var k in this.config) {
@@ -67,6 +72,7 @@ define([
 
                 new Button({
                     label: "Сохранить",
+                    iconClass: "dijitIconSave",
                     onClick: lang.hitch(this, this.updateObj)
                 }).placeAt(this.btnContainer);
 
@@ -75,6 +81,7 @@ define([
             if (this.operation === "read" || this.operation === "update") {
                 new Button({
                     label: "Обновить",
+                    iconClass: "dijitIconConnector",
                     onClick: lang.hitch(this, this.refreshObj)
                 }).placeAt(this.btnContainer);
             }

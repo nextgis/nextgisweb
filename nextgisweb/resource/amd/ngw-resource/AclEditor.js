@@ -25,7 +25,7 @@ define([
     "ngw/load-json!auth/principal/dump",
     "ngw/load-json!resource/schema",
 
-    "xstyle/css!./resources/AclEditor.css"
+    "xstyle/css!./resource/AclEditor.css"
 ], function (
     declare,
     lang,
