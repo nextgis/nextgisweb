@@ -9,11 +9,11 @@ define([
     "dojo/promise/all",
     "dojo/when",
     "dojo/dom-class",
+    "dojo/dom-style",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
-    "dijit/TitlePane",
     "ngw/route",
     "xstyle/css!./resource/CompositeWidget.css"
 ], function (
@@ -26,11 +26,11 @@ define([
     all,
     when,
     domClass,
+    domStyle,
     Button,
     BorderContainer,
     ContentPane,
     TabContainer,
-    TitlePane,
     route
 ) {
     var CompositeWidget = declare("ngw.resource.CompositeWidget", BorderContainer, {
@@ -42,6 +42,12 @@ define([
 
             this.tabContainer = new TabContainer({
                 region: "center"
+            }).placeAt(this);
+
+            this.lockContainer = new ContentPane({
+                region: "center",
+                style: "display: none; border: 1px solid silver;",
+                content: "Подождите, идет обработка запроса..."
             }).placeAt(this);
             
             this.btnContainer = new ContentPane({
@@ -61,29 +67,33 @@ define([
                 this.members.push(member);
             }
 
+            this.buttons = [];
+
             if (this.operation === "create") {
 
-                new Button({
+                this.buttons.push(new Button({
                     label: "Создать",
+                    iconClass: "dijitIconNewTask",
                     onClick: lang.hitch(this, this.createObj)
-                }).placeAt(this.btnContainer);
+                }).placeAt(this.btnContainer));
 
             } else if (this.operation === "update") {
 
-                new Button({
+                this.buttons.push(new Button({
                     label: "Сохранить",
                     iconClass: "dijitIconSave",
                     onClick: lang.hitch(this, this.updateObj)
-                }).placeAt(this.btnContainer);
-
+                }).placeAt(this.btnContainer));
             }
 
             if (this.operation === "read" || this.operation === "update") {
-                new Button({
+
+                this.buttons.push(new Button({
                     label: "Обновить",
                     iconClass: "dijitIconConnector",
                     onClick: lang.hitch(this, this.refreshObj)
-                }).placeAt(this.btnContainer);
+                }).placeAt(this.btnContainer));
+
             }
 
         },
@@ -231,6 +241,7 @@ define([
                         );
                     } else {
                         console.info("Validation failed");
+                        deferred.reject();
                     }
                 },
                 function /* errback */ (err) { console.error(err); }
@@ -242,25 +253,55 @@ define([
 
         // Всякие действия и кнопки
         // ========================
+
+        lock: function () {
+            domStyle.set(this.tabContainer.domNode, "display", "none");
+            domStyle.set(this.lockContainer.domNode, "display", "block");
+            array.forEach(this.buttons, function (btn) {
+                btn.set("disabled", true);
+            });
+        },
+
+        unlock: function () {
+            domStyle.set(this.lockContainer.domNode, "display", "none");
+            domStyle.set(this.tabContainer.domNode, "display", "block");
+            array.forEach(this.buttons, function (btn) {
+                btn.set("disabled", false);
+            });
+            this.tabContainer.resize();
+        },
         
         createObj: function () {
-            this.tabContainer.set("disabled", true);
+            this.lock();
 
             this.apiReq({
                 url: this.collectionUrl(),
                 method: "POST"
-            }).then(function /* callback */ (data) {
-                window.location = route("resource.show", {id: data.id});
-            });
+            }).then(
+                /* callback */ lang.hitch(this, function (data) {
+                    window.location = route("resource.show", {id: data.id});
+                }),
+                /* errback  */ lang.hitch(this, function () {
+                    this.unlock();
+                })
+            );
         },
 
         updateObj: function () {
-            this.tabContainer.set("disabled", true);
+            this.lock();
+
             // TODO: PATCH заменить на POST
             this.apiReq({
                 url: this.itemUrl(),
                 method: "PATCH"
-            });
+            }).then(
+                /* callback */ lang.hitch(this, function () {
+                    this.unlock();
+                }),
+                /* errback  */ lang.hitch(this, function () {
+                    this.unlock();
+                })
+            ).then(null, console.error);
         },
 
         refreshObj: function () {
