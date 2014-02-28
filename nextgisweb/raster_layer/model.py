@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import subprocess
 
 import sqlalchemy as sa
@@ -14,11 +15,18 @@ from ..resource import (
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR)
+from ..resource.exception import ValidationError
 from ..env import env
 from ..layer import SpatialLayerMixin
 from ..file_storage import FileObj
 
 Base = declarative_base()
+
+SUPPORTED_GDT = (gdalconst.GDT_Byte, )
+
+SUPPORTED_GDT_NAMES = ', '.join([
+    gdal.GetDataTypeName(i)
+    for i in SUPPORTED_GDT])
 
 
 @Resource.registry.register
@@ -45,9 +53,30 @@ class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
 
     def load_file(self, filename, env):
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
+        if not ds:
+            raise ValidationError("Библиотеке GDAL не удалось открыть файл")
+
+        if ds.RasterCount not in (3, 4):
+            raise ValidationError("Поддерживаются только растры RGB и RGBA")
+
+        for bidx in range(1, ds.RasterCount + 1):
+            band = ds.GetRasterBand(bidx)
+
+            if not band.DataType in SUPPORTED_GDT:
+                raise ValidationError(
+                    "Канал #%d имеет тип %s, однако поддерживаются " +
+                    "только каналы следующих типов: %s." % (
+                        bidx, gdal.GetDataTypeName(band.DataType),
+                        SUPPORTED_GDT_NAMES))
+
+        dsproj = ds.GetProjection()
+        dsgtran = ds.GetGeoTransform()
+
+        if not dsproj or not dsgtran:
+            raise ValidationError("Растры без проекции не поддерживаются")
 
         src_osr = osr.SpatialReference()
-        src_osr.ImportFromWkt(ds.GetProjection())
+        src_osr.ImportFromWkt(dsproj)
         dst_osr = osr.SpatialReference()
         src_osr.ImportFromEPSG(int(self.srs.id))
 
@@ -67,7 +96,6 @@ class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
             cmd = ['gdal_translate', '-of', 'GTiff']
 
         cmd.extend(('-co', 'TILED=YES', filename, dst_file))
-
         subprocess.check_call(cmd)
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
@@ -90,6 +118,7 @@ class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
 class _source_attr(SP):
 
     def setter(self, srlzr, value):
+
         filedata, filemeta = env.file_upload.get_filename(value['id'])
         srlzr.obj.load_file(filedata, env)
 

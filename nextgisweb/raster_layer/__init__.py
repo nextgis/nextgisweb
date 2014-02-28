@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..component import Component
 
-from .models import Base, RasterLayer
+from .model import Base, RasterLayer
 
 __all__ = ['RasterLayerComponent', 'RasterLayer']
 
@@ -12,5 +12,4 @@ class RasterLayerComponent(Component):
     metadata = Base.metadata
 
     def setup_pyramid(self, config):
-        from . import views
-        views.setup_pyramid(self, config)
+        from . import view # NOQA

@@ -6,9 +6,9 @@ class ResourceError(Exception):
     pass
 
 
-class AccessDenied(ResourceError):
+class Forbidden(ResourceError):
     pass
 
 
-class Forbidden(ResourceError):
+class ValidationError(ResourceError):
     pass
