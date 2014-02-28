@@ -3,9 +3,9 @@
 
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, labelWidth: 150">
 
-        <div data-dojo-attach-point="wConnectionId" 
-            data-dojo-type="ngw/form/PickerBox"
-            data-dojo-props="colspan: 2"
+        <div data-dojo-type="ngw-resource/ResourceBox"
+            data-dojo-props="cls: 'postgis_connection', colspan: 2"
+            data-ngw-serialize="connection"
             title="Подключение" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/ValidationTextBox"

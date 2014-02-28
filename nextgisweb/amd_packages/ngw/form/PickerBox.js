@@ -31,8 +31,11 @@ define([
             this.textbox.disabled = true;
         },
 
-        updateLabel: function (itm) {
-            this.textbox.value = (itm === null) ? "" : itm.display_name;
+        getLabel: function (value) {
+            if (value === null) { return ""; }
+            return this.store.get(value).then(function (data) {
+                return data.display_name;
+            });
         },
 
         _setValueAttr: function (value) {
@@ -41,9 +44,9 @@ define([
             this._value = value;
             this.valueNode.value = json.stringify(value);
 
-            when(this.store.get(value)).then(
-                lang.hitch(this, this.updateLabel)
-            ).otherwise(console.error);
+            when(this.getLabel(value)).then(lang.hitch(this, function (value) {
+                this.textbox.value = value;
+            })).then(null, console.error);
         },
 
         _getValueAttr: function () {

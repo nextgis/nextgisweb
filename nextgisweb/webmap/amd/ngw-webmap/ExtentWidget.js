@@ -1,4 +1,4 @@
-/* globals define, console */
+/* globals define */
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -12,8 +12,7 @@ define([
     // template
     "dijit/form/NumberTextBox",
     "dojox/layout/TableContainer",
-    "ngw/form/PickerBox",
-    "ngw-resource/ResourcePicker"
+    "ngw-resource/ResourceBox"
 ], function (
     declare,
     lang,
@@ -27,17 +26,6 @@ define([
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: "Охват и закладки",
         templateString: template,
-
-        buildRendering: function () {
-            this.inherited(arguments);
-
-            this.wBookmarkResource.set("store", new ResourceStore());
-            this.wBookmarkResource.on("pick", lang.hitch(this, function () {
-                this.bookmarkPicker.pick().then(lang.hitch(this, function (itm) {
-                    this.wBookmarkResource.set("value", itm.id);
-                })).otherwise(console.error);
-            }));
-        },
 
         serializeInMixin: function (data) {
             if (data.webmap === undefined) { data.webmap = {}; }

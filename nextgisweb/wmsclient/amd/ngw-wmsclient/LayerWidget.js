@@ -18,8 +18,8 @@ define([
     "dijit/form/ValidationTextBox",
     "dijit/form/ComboBox",
     "dojox/layout/TableContainer",
-    "ngw/form/PickerBox",
     "ngw/form/SpatialRefSysSelect",
+    "ngw-resource/ResourceBox",
     "ngw-resource/ResourcePicker"
 ], function (
     declare,
@@ -58,17 +58,6 @@ define([
             }, this);
         },
         
-        buildRendering: function () {
-            this.inherited(arguments);
-
-            this.wConnection.set("store", new ResourceStore());
-            this.wConnection.on("pick", lang.hitch(this, function () {
-                this.connectionPicker.pick().then(lang.hitch(this, function (itm) {
-                    this.wConnection.set("value", itm.id);
-                })).otherwise(console.error);
-            }));
-        },
-
         toggleLayer: function (id) {
             var arr = this.wWMSLayers.get("value").split(/,\s*/);
             if (arr.length === 1 && arr[0] === "") {
@@ -92,7 +81,7 @@ define([
             if (data[this.serializePrefix] === undefined) { data[this.serializePrefix] = {}; }
             var value = data[this.serializePrefix];
 
-            value.connection = {id: this.wConnection.get("value")};
+            value.connection = this.wConnection.get("value");
             value.srs = {id: this.wSRS.get("value")};
             value.wmslayers = this.wWMSLayers.get("value").split(/,\s*/).join();
             value.imgformat = this.wImgFormat.get("value");
@@ -102,7 +91,7 @@ define([
             var value = data[this.serializePrefix];
             if (value === undefined) { return; }
 
-            this.wConnection.set("value", value.connection.id);
+            this.wConnection.set("value", value.connection);
             this.wSRS.set("value", value.srs.id);
             this.wWMSLayers.set("value", value.wmslayers.split(/,\s*/).join(", "));
             this.wImgFormat.set("value", value.imgformat);

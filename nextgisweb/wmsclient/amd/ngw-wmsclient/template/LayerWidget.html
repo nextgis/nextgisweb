@@ -1,15 +1,10 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
 
-        <div data-dojo-attach-point="wConnection" 
-            data-dojo-type="ngw/form/PickerBox"
-            title="Соединение WMS" style="width: 100%">
-
-            <div data-dojo-type="ngw-resource/ResourcePicker"
-                data-dojo-attach-point="connectionPicker"
-                data-dojo-props="cls: 'wmsclient_connection'"></div>
-
-        </div>
+        <div data-dojo-attach-point="wConnection"
+            data-dojo-type="ngw-resource/ResourceBox"
+            data-dojo-props="cls: 'wmsclient_connection'"
+            title="Соединение WMS" style="width: 100%"></div>
 
         <div data-dojo-attach-point="wSRS"
             data-dojo-type="ngw/form/SpatialRefSysSelect"
