@@ -1,11 +1,11 @@
 /*global define, require, ngwConfig*/
 define([
-    'dojo/_base/declare',
-    'dijit/_WidgetBase',
-    'dojo/dom-class',
+    "dojo/_base/declare",
+    "dijit/_WidgetBase",
+    "dojo/dom-class",
     // CodeMirror
     ngwConfig.assetUrl + "codemirror/lib/codemirror.js",
-    'xstyle/css!' + ngwConfig.assetUrl + 'codemirror/lib/codemirror.css'
+    "xstyle/css!" + ngwConfig.assetUrl + "codemirror/lib/codemirror.css"
 ], function (declare, _WidgetBase, domClass) {
     var CodeMirror = window.CodeMirror;
 
@@ -30,14 +30,19 @@ define([
             this._cm.refresh();
         },
 
+        resize: function () {
+            this.inherited(arguments);
+            this._cm.refresh();
+        },
+
         _setModeAttr: function (value) {
-            this._set('mode', value);
+            this._set("mode", value);
             if (this._cm) {
                 var widget = this;
                 require([
                     ngwConfig.assetUrl + "codemirror/mode/" + value + "/" + value + ".js"
                 ], function () {
-                    widget._cm.setOption('mode', value);
+                    widget._cm.setOption("mode", value);
                 });
             }
         },
@@ -47,11 +52,8 @@ define([
         },
 
         _setValueAttr: function (value) {
-            this._set('value', value);
-
-            if (this._cm) {
-                this._cm.doc.setValue(value);
-            }
+            this._set("value", value);
+            if (this._cm) { this._cm.doc.setValue(value); }
         }
     });
 
