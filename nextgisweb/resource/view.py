@@ -17,6 +17,7 @@ from .model import (
     Resource,
     ResourceACLRule,
     ResourceSerializer)
+from .exception import ValidationError, Forbidden
 from .scope import clscopes, scopeid
 from .permission import scope_permissions
 from .serialize import CompositeSerializer
@@ -162,6 +163,20 @@ def store(request):
     return result
 
 
+def exception_to_response(exception):
+    if isinstance(exception, ValidationError):
+        return Response(
+            json.dumps(dict(message=exception.message)), status_code=400,
+            content_type=b'application/json')
+
+    elif isinstance(exception, Forbidden):
+        return Response(
+            json.dumps(dict(message=exception.message)), status_code=403,
+            content_type=b'application/json')
+
+    raise exception
+
+
 @viewargs(renderer='json')
 def child_get(request):
     # TODO: Security
@@ -189,7 +204,6 @@ def child_get(request):
     return result
 
 
-@viewargs(renderer='json')
 def child_patch(request):
     child_id = request.matchdict['child_id']
     assert child_id != ''
@@ -200,9 +214,16 @@ def child_patch(request):
         .filter_by(id=child_id).one()
 
     serializer = CompositeSerializer(child, request.user, data)
-    result = serializer.deserialize()
 
-    return result
+    try:
+        result = serializer.deserialize()
+        DBSession.flush()
+        return Response(
+            json.dumps(result), status_code=200,
+            content_type=b'application/json')
+
+    except Exception as e:
+        return exception_to_response(e)
 
 
 def child_post(request):
@@ -214,24 +235,29 @@ def child_post(request):
     cls = Resource.registry[data['resource']['cls']]
     child = cls(owner_user=request.user)
 
-    deserializer = CompositeSerializer(child, request.user, data)
-    deserializer.members['resource'].mark('cls')
-    deserializer.deserialize()
+    try:
+        deserializer = CompositeSerializer(child, request.user, data)
+        deserializer.members['resource'].mark('cls')
+        deserializer.deserialize()
 
-    child.persist()
-    DBSession.flush()
+        child.persist()
+        DBSession.flush()
 
-    location = request.route_url(
-        'resource.child',
-        id=child.parent_id,
-        child_id=child.id)
+        location = request.route_url(
+            'resource.child',
+            id=child.parent_id,
+            child_id=child.id)
 
-    data = OrderedDict(id=child.id)
-    data['parent'] = dict(id=child.parent_id)
+        data = OrderedDict(id=child.id)
+        data['parent'] = dict(id=child.parent_id)
 
-    return Response(json.dumps(data), status_code=201, headerlist=[
-        (b"Content-Type", b"application/json"),
-        (b"Location", bytes(location))])
+        return Response(
+            json.dumps(data), status_code=201,
+            content_type=b'application/json', headerlist=[
+                (b"Location", bytes(location)), ])
+
+    except Exception as e:
+        return exception_to_response(e)
 
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')

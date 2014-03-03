@@ -1,4 +1,4 @@
-/* globals define, require, console */
+/* globals define, require, console, alert */
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -33,6 +33,10 @@ define([
     TabContainer,
     route
 ) {
+    var E_INVALID_DATA = "INVALID_DATA",
+        E_SERIALIZE    = "SERIALIZE",
+        E_REQUEST      = "REQUEST";
+
     var CompositeWidget = declare("ngw.resource.CompositeWidget", BorderContainer, {
         style: "width: 100%; height: 100%; padding: 1px;",
         gutters: false,
@@ -189,7 +193,9 @@ define([
         // ========
 
         request: function (args) {
-            return xhr(args.url, {
+            var deferred = new Deferred();
+
+            xhr(args.url, {
                 method: args.method,
                 handleAs: "json",
                 data: json.stringify(args.data),
@@ -197,7 +203,16 @@ define([
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                 }
+            }).then(function (data) {
+                deferred.resolve(data);
+            }, function (err) {
+                deferred.reject({
+                    status: err.response.status,
+                    data: err.response.data
+                });
             });
+
+            return deferred;
         },
 
         itemUrl: function () {
@@ -214,14 +229,14 @@ define([
             });
         },
 
-        apiReq: function (args) {
+        storeRequest: function (args) {
             var widget = this,
                 deferred = new Deferred();
 
             this.validateData().then(
                 function /* callback */ (success) {
                     if (success) {
-                        console.debug("Validation completed");
+                        console.debug("Validation completed with success");
                         widget.serialize().then(
                             function /* callback */ (data) {
                                 console.debug("Serialization completed");
@@ -234,17 +249,30 @@ define([
                                         console.debug("REST API request completed");
                                         deferred.resolve(response);
                                     },
-                                    function /* errback */ (err) { console.error(err); }
+                                    function /* errback */ (err) {
+                                        console.debug("REST API request failed");
+                                        deferred.reject({
+                                            error: E_REQUEST,
+                                            status: err.status,
+                                            data: err.data
+                                        });
+                                    }
                                 );
                             },
-                            function /* errback */ (err) { console.error(err); }
+                            function /* errback */ () {
+                                console.debug("Serialization failed");
+                                deferred.reject({ error: E_SERIALIZE });
+                            }
                         );
                     } else {
-                        console.info("Validation failed");
-                        deferred.reject();
+                        console.debug("Validation completed without success");
+                        deferred.reject({ error: E_INVALID_DATA });
                     }
                 },
-                function /* errback */ (err) { console.error(err); }
+                function /* errback */ () {
+                    console.debug("Validation failed");
+                    deferred.reject({ error: E_SERIALIZE });
+                }
             ).then(null, console.error);
 
             return deferred;
@@ -262,28 +290,48 @@ define([
             });
         },
 
-        unlock: function () {
+        unlock: function (err) {
             domStyle.set(this.lockContainer.domNode, "display", "none");
             domStyle.set(this.tabContainer.domNode, "display", "block");
             array.forEach(this.buttons, function (btn) {
                 btn.set("disabled", false);
             });
             this.tabContainer.resize();
+
+            if (err !== undefined) { this.errorMessage(err); }
         },
-        
+
+        errorMessage: function (e) {
+            if (e.error == E_REQUEST && e.status == 400) {
+                alert("При проверке данных на сервере обнаружена ошибка. " +
+                    "Исправьте приведенную ниже ошибку и повторите попытку. " +
+                    "Сообщение об ошибке: \n\n" + e.data.message);
+
+            } else if (e.error == E_REQUEST && e.status == 403) {
+                alert("Недостаточно прав доступа для выполнения выбранной " +
+                    "операции. Сообщение об ошибке: \n\n" + e.data.message);
+
+            } else if (e.error == E_INVALID_DATA) {
+                alert("В ходе проверки данных обнаружены ошибки. Соответствующие " +
+                    "вкладки и поля отмечены красным цветом.");
+
+            } else {
+                alert("В ходе выполнения операции возникла неизвестная ошибка.");
+
+            }
+        },
+
         createObj: function () {
             this.lock();
 
-            this.apiReq({
+            this.storeRequest({
                 url: this.collectionUrl(),
                 method: "POST"
             }).then(
                 /* callback */ lang.hitch(this, function (data) {
                     window.location = route("resource.show", {id: data.id});
                 }),
-                /* errback  */ lang.hitch(this, function () {
-                    this.unlock();
-                })
+                /* errback  */ lang.hitch(this, this.unlock)
             );
         },
 
@@ -291,16 +339,14 @@ define([
             this.lock();
 
             // TODO: PATCH заменить на POST
-            this.apiReq({
+            this.storeRequest({
                 url: this.itemUrl(),
                 method: "PATCH"
             }).then(
                 /* callback */ lang.hitch(this, function () {
                     this.unlock();
                 }),
-                /* errback  */ lang.hitch(this, function () {
-                    this.unlock();
-                })
+                /* errback  */ lang.hitch(this, this.unlock)
             ).then(null, console.error);
         },
 
