@@ -6,6 +6,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
     // resource
+    "ngw/load-json!resource/schema",
     "dojo/text!./templates/Widget.html",
     // template
     "dojox/layout/TableContainer",
@@ -18,12 +19,19 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
+    resourceSchema,
     template
 ) {
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         identity: "resource",
         title: "Ресурс",
-        style: "margin: 1ex;"
+        style: "margin: 1ex;",
+
+        postCreate: function () {
+            this.inherited(arguments);
+            this.wCls.set("value", resourceSchema.resources[this.composite.cls].label +
+                " (" + this.composite.cls + ")");
+        }
     });
 });

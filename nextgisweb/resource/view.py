@@ -311,6 +311,7 @@ def widget(request):
         obj = Resource.query().with_polymorphic('*') \
             .filter_by(id=resid).one()
 
+        clsid = obj.cls
         parent = obj.parent
 
     else:
