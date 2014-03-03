@@ -1,25 +1,39 @@
 /*global define, require, ngwConfig*/
 define([
     "dojo/_base/declare",
-    "dijit/_WidgetBase",
     "dojo/dom-class",
+    "dojo/dom-style",
+    "dijit/layout/ContentPane",
     // CodeMirror
     ngwConfig.assetUrl + "codemirror/lib/codemirror.js",
     "xstyle/css!" + ngwConfig.assetUrl + "codemirror/lib/codemirror.css"
-], function (declare, _WidgetBase, domClass) {
+], function (
+    declare,
+    domClass,
+    domStyle,
+    ContentPane
+) {
     var CodeMirror = window.CodeMirror;
 
-    return declare(_WidgetBase, {
+    return declare(ContentPane, {
+
         postCreate: function () {
             this.inherited(arguments);
 
-            if (this.autoHeight === true) {
-                domClass.add(this.domNode, "CodeMirror-autoHeight");
-            }
+            domStyle.set(this.domNode, "padding", "0");
 
             this._cm = new CodeMirror(this.domNode, {
                 lineNumbers: this.lineNumbers || false
             });
+
+            if (this.autoHeight === true) {
+                domClass.add(this.domNode, "CodeMirror-autoHeight");
+            } else {
+                var node = this._cm.getWrapperElement();
+                domStyle.set(node, "border", "none");
+                domStyle.set(node, "width", "100%");
+                domStyle.set(node, "height", "100%");
+            }
 
             if (this.mode) { this.set("mode", this.mode); }
             if (this.value) { this.set("value", this.value); }
