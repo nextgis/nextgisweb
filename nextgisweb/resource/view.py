@@ -439,10 +439,8 @@ def setup_pyramid(comp, config):
             lambda args: args.request.route_url(
                 'resource.delete', id=args.obj.id)),
 
-        Label('security', "Права доступа"),
-
         Link(
-            'security/edit', "Редактировать",
+            'operation/security', "Права доступа",
             lambda args: args.request.route_url(
                 'resource.security', id=args.obj.id)),
 
