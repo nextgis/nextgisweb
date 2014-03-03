@@ -3,7 +3,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/DeleteWidget.html",
+    "dojo/text!./template/DeleteWidget.html",
     // template
     "dijit/form/CheckBox"
 ], function (

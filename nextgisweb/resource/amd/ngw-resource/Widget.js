@@ -7,7 +7,7 @@ define([
     "ngw-resource/serialize",
     // resource
     "ngw/load-json!resource/schema",
-    "dojo/text!./templates/Widget.html",
+    "dojo/text!./template/Widget.html",
     // template
     "dojox/layout/TableContainer",
     "ngw/form/DisplayNameTextBox",

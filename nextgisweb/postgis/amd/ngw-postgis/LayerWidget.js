@@ -8,7 +8,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
     // resource
-    "dojo/text!./templates/LayerWidget.html",
+    "dojo/text!./template/LayerWidget.html",
     // template
     "dijit/form/ValidationTextBox",
     "dijit/form/Select",

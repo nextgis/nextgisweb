@@ -6,7 +6,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
-    "dojo/text!./templates/ConnectionWidget.html",
+    "dojo/text!./template/ConnectionWidget.html",
     // template
     "dijit/form/ValidationTextBox",
     "dojox/layout/TableContainer"
