@@ -27,7 +27,7 @@ define([
             array.forEach(this.serattrmap, function (i) {
                 if (i.widget.validate !== undefined) {
                     i.widget._hasBeenBlurred = true;
-                    success = success && i.widget.validate();
+                    success = i.widget.validate() && success;
                 }
             });
 
