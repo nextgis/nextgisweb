@@ -12,11 +12,12 @@ define([
     "dojo/dom-class",
     "dijit/layout/ContentPane",
     "dijit/form/CheckBox",
-    "dijit/form/TextBox",
+    "dijit/form/ValidationTextBox",
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
+    "ngw/form/KeynameTextBox",
     "ngw-resource/serialize",
     //
     "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
@@ -34,11 +35,12 @@ define([
     domClass,
     ContentPane,
     CheckBox,
-    TextBox,
+    ValidationTextBox,
     Grid,
     Selection,
     editor,
     DijitRegistry,
+    KeynameTextBox,
     serialize
 ) {
     var fid = 1;
@@ -54,8 +56,11 @@ define([
                 label: "Ключ",
                 sortable: false,
                 autoSave: true,
-                editor: TextBox,
-                editorArgs: { style: "width: 100%; border: none"}
+                editor: KeynameTextBox,
+                editorArgs: {
+                    required: true,
+                    style: "width: 100%; border: none"
+                }
             }),
             
             { field: "datatype", label: "Тип", sortable: false },
@@ -65,9 +70,10 @@ define([
                 label: "Наименование",
                 sortable: false,
                 autoSave: true,
-                editor: TextBox,
+                editor: ValidationTextBox,
                 editorArgs: {
                     value: "value",
+                    required: true,
                     style: "width: 100%; border: none;"
                 }
             }),
@@ -100,7 +106,7 @@ define([
         style: "padding: 0",
 
         constructor: function () {
-            var store = new Observable(new Memory({idProperty: "_"}));
+            var store = new Observable(new Memory({idProperty: "fid"}));
             this.store = store;
 
             this.grid = new GridClass({ store: this.store });
@@ -117,9 +123,9 @@ define([
 
         buildRendering: function () {
             this.inherited(arguments);
-            domConstruct.place(this.grid.domNode, this.domNode);
-            domStyle.set(this.grid.domNode, "border", "none");
             domClass.add(this.domNode, "ngwFeatureLayerFieldsWidget");
+            domStyle.set(this.grid.domNode, "border", "none");
+            domConstruct.place(this.grid.domNode, this.domNode);
         },
 
         deserializeInMixin: function (data) {
