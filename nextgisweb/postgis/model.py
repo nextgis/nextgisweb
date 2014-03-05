@@ -111,6 +111,16 @@ class PostgisConnectionSerializer(Serializer):
     password = SP(read='read', write='write')
 
 
+class PostgisLayerField(Base, LayerField):
+    identity = 'postgis_layer'
+
+    __tablename__ = LayerField.__tablename__ + '_' + identity
+    __mapper_args__ = dict(polymorphic_identity=identity)
+
+    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
+    column_name = sa.Column(sa.Unicode, nullable=False)
+
+
 @Resource.registry.register
 class PostgisLayer(
     Base, DataScope, Resource,
@@ -133,6 +143,8 @@ class PostgisLayer(
     geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False),
                               nullable=False)
     geometry_srid = sa.Column(sa.Integer, nullable=False)
+
+    __field_class__ = PostgisLayerField
 
     __mapper_args__ = dict(
         polymorphic_identity=identity,
@@ -252,9 +264,10 @@ class PostgisLayer(
                     if datatype is not None:
                         fopts = dict(display_name=row['column_name'])
                         fopts.update(fdata.get(row['column_name'], dict()))
-                        self.fields.append(LayerField(
+                        self.fields.append(PostgisLayerField(
                             keyname=row['column_name'],
                             datatype=datatype,
+                            column_name=row['column_name'],
                             **fopts))
         finally:
             conn.close()
@@ -379,7 +392,7 @@ class FeatureQueryBase(object):
         for idx, fld in enumerate(self.layer.fields, start=1):
             if not self._fields or fld.keyname in self._fields:
                 clabel = 'f%d' % idx
-                addcol(sql.column(fld.keyname).label(clabel))
+                addcol(sql.column(fld.column_name).label(clabel))
                 fieldmap.append((fld.keyname, clabel))
 
         if self._filter_by:
@@ -394,7 +407,7 @@ class FeatureQueryBase(object):
             for fld in self.layer.fields:
                 if fld.datatype == FIELD_TYPE.STRING:
                     l.append(sql.cast(
-                        sql.column(fld.keyname),
+                        sql.column(fld.column_name),
                         sa.Unicode).ilike(
                         '%' + self._like + '%'))
 
