@@ -90,14 +90,13 @@ def amd_packages():
         ('feature_photo', 'nextgisweb:amd_packages/feature_photo'),
         ('webmap', 'nextgisweb:amd_packages/webmap'),
         ('vector_layer', 'nextgisweb:amd_packages/vector_layer'),
-        ('raster_layer', 'nextgisweb:amd_packages/raster_layer'),
-        ('raster_style', 'nextgisweb:amd_packages/raster_style'),
         ('wmsclient', 'nextgisweb:amd_packages/wmsclient'),
 
         # Пакеты компонентов
         ('ngw-resource', 'nextgisweb:resource/amd/ngw-resource'),
         ('ngw-postgis', 'nextgisweb:postgis/amd/ngw-postgis'),
         ('ngw-wmsclient', 'nextgisweb:wmsclient/amd/ngw-wmsclient'),
+        ('ngw-vector-layer', 'nextgisweb:vector_layer/amd/ngw-vector-layer'),
         ('ngw-raster-layer', 'nextgisweb:raster_layer/amd/ngw-raster-layer'),
         ('ngw-webmap', 'nextgisweb:webmap/amd/ngw-webmap'),
     )
