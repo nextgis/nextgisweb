@@ -2,7 +2,7 @@
 from ..component import Component, require
 
 from .feature import Feature, FeatureSet
-from .models import Base, LayerField, LayerFieldsMixin
+from .model import Base, LayerField, LayerFieldsMixin
 from .interface import (
     GEOM_TYPE,
     FIELD_TYPE,
@@ -29,8 +29,8 @@ class FeatureLayerComponent(Component):
 
     @require('resource')
     def setup_pyramid(self, config):
-        from . import views
-        views.setup_pyramid(self, config)
+        from . import view
+        view.setup_pyramid(self, config)
 
     settings_info = (
         dict(key='identify.attributes', desc=u"Показывать атрибуты в идентификации"),

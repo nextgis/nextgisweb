@@ -94,6 +94,7 @@ def amd_packages():
 
         # Пакеты компонентов
         ('ngw-resource', 'nextgisweb:resource/amd/ngw-resource'),
+        ('ngw-feature-layer', 'nextgisweb:feature_layer/amd/ngw-feature-layer'),
         ('ngw-postgis', 'nextgisweb:postgis/amd/ngw-postgis'),
         ('ngw-wmsclient', 'nextgisweb:wmsclient/amd/ngw-wmsclient'),
         ('ngw-vector-layer', 'nextgisweb:vector_layer/amd/ngw-vector-layer'),

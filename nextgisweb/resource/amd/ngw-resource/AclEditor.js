@@ -1,4 +1,4 @@
-/* globals define, console */
+/* globals ngwConfig */
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -25,6 +25,8 @@ define([
     "ngw/load-json!auth/principal/dump",
     "ngw/load-json!resource/schema",
 
+    // css
+    "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
     "xstyle/css!./resource/AclEditor.css"
 ], function (
     declare,

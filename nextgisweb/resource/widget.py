@@ -27,8 +27,12 @@ class Widget(WidgetBase):
     __abstract__ = True
 
     def is_applicable(self):
-        return (self.operation in self.__class__.operation
-                and isinstance(self.obj, self.__class__.resource))
+        operation = self.operation in self.__class__.operation
+        resclass = not hasattr(self.__class__, 'resource') \
+            or isinstance(self.obj, self.__class__.resource)
+        interface = not hasattr(self.__class__, 'interface') \
+            or self.__class__.interface.providedBy(self.obj)
+        return operation and resclass and interface
 
     def config(self):
         return OrderedDict()

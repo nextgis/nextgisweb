@@ -1,4 +1,4 @@
-/* globals define, console */
+/* globals ngwConfig */
 define([
     "dojo/_base/declare",
     "dijit/layout/BorderContainer",
@@ -20,6 +20,8 @@ define([
     // ngw
     "ngw/route",
     "./FeatureStore",
+    // css
+    "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
     // template
     "dijit/layout/ContentPane",
     "dijit/Toolbar",

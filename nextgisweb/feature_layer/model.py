@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
 from ..models import declarative_base
-from ..resource import Resource
+from ..resource import (
+    Resource,
+    MetaDataScope,
+    Serializer,
+    SerializedProperty as SP)
 
 from .interface import FIELD_TYPE
 
@@ -84,3 +90,57 @@ class LayerFieldsMixin(object):
             cascade='all',
             post_update=True
         )
+
+
+class _fields_attr(SP):
+
+    def getter(self, srlzr):
+        return map(
+            lambda f: OrderedDict((
+                ('id', f.id), ('keyname', f.keyname),
+                ('datatype', f.datatype), ('typemod', None),
+                ('display_name', f.display_name),
+                ('label_field', f == srlzr.obj.feature_label_field),
+                ('grid_visibility', f.grid_visibility))),
+            srlzr.obj.fields)
+
+    def setter(self, srlzr, value):
+        obj = srlzr.obj
+
+        fldmap = dict()
+        for idx, fld in reversed(list(enumerate(list(obj.fields)))):
+            if fld.id:
+                fldmap[fld.id] = fld
+                obj.fields.pop(idx)
+
+        obj.feature_label_field = None
+
+        for fld in value:
+            fldid = fld.get('id', None)
+
+            if fldid:
+                mfld = fldmap.get(fldid, None)
+            else:
+                mfld = obj.__field_class__(
+                    datatype=fld['datatype'])
+
+            if 'keyname' in fld:
+                mfld.keyname = fld['keyname']
+            if 'display_name' in fld:
+                mfld.display_name = fld['display_name']
+            if 'grid_visibility' in fld:
+                mfld.grid_visibility = fld['grid_visibility']
+
+            if fld.get('label_field', False):
+                obj.feature_label_field = mfld
+
+            obj.fields.append(mfld)
+
+        obj.fields.reorder()
+
+
+class FeatureLayerSerializer(Serializer):
+    identity = 'feature_layer'
+    resclass = LayerFieldsMixin
+
+    fields = _fields_attr(read='view', write='edit', scope=MetaDataScope)

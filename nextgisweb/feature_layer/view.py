@@ -5,13 +5,19 @@ from types import MethodType
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
-from ..resource import Resource, resource_factory
+from ..resource import Resource, resource_factory, Widget
 from ..geometry import geom_from_wkt
 from ..object_widget import ObjectWidget, CompositeWidget
 from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
+
+
+class FeatureLayerFieldsWidget(Widget):
+    interface = IFeatureLayer
+    operation = ('update', )
+    amdmod = 'ngw-feature-layer/FieldsWidget'
 
 
 def feature_browse(layer, request):

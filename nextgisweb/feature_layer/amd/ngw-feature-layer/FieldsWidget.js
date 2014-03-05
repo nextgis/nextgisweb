@@ -1,0 +1,153 @@
+/* globals ngwConfig */
+define([
+    "dojo/_base/declare",
+    "dojo/_base/lang",
+    "dojo/_base/array",
+    "dojo/Deferred",
+    "dojo/when",
+    "dojo/store/Memory",
+    "dojo/store/Observable",
+    "dojo/dom-construct",
+    "dojo/dom-style",
+    "dojo/dom-class",
+    "dijit/layout/ContentPane",
+    "dijit/form/CheckBox",
+    "dijit/form/TextBox",
+    "dgrid/OnDemandGrid",
+    "dgrid/Selection",
+    "dgrid/editor",
+    "dgrid/extensions/DijitRegistry",
+    "ngw-resource/serialize",
+    //
+    "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
+    "xstyle/css!./resource/FieldsWidget.css"
+], function (
+    declare,
+    lang,
+    array,
+    Deferred,
+    when,
+    Memory,
+    Observable,
+    domConstruct,
+    domStyle,
+    domClass,
+    ContentPane,
+    CheckBox,
+    TextBox,
+    Grid,
+    Selection,
+    editor,
+    DijitRegistry,
+    serialize
+) {
+    var fid = 1;
+
+    var GridClass = declare([Grid, Selection, DijitRegistry], {
+        selectionMode: "single",
+
+        columns: [
+            { field: "idx", label: "#", sortable: false },
+            
+            editor({
+                field: "keyname",
+                label: "Ключ",
+                sortable: false,
+                autoSave: true,
+                editor: TextBox,
+                editorArgs: { style: "width: 100%; border: none"}
+            }),
+            
+            { field: "datatype", label: "Тип", sortable: false },
+
+            editor({
+                field: "display_name",
+                label: "Наименование",
+                sortable: false,
+                autoSave: true,
+                editor: TextBox,
+                editorArgs: {
+                    value: "value",
+                    style: "width: 100%; border: none;"
+                }
+            }),
+
+            editor({
+                field: "grid_visibility",
+                label: "ТО",
+                sortable: false,
+                autoSave: true,
+                editor: CheckBox,
+                editorArgs: { value: true }
+            }),
+
+            editor({
+                field: "label_field",
+                label: "АН",
+                sortable: false,
+                autoSave: true,
+                editor: CheckBox,
+                editorArgs: { value: true }
+            })
+
+        ]
+    });
+
+
+    return declare([ContentPane, serialize.Mixin], {
+        title: "Атрибуты",
+        prefix: "feature_layer",
+        style: "padding: 0",
+
+        constructor: function () {
+            var store = new Observable(new Memory({idProperty: "_"}));
+            this.store = store;
+
+            this.grid = new GridClass({ store: this.store });
+
+            this.grid.on("dgrid-datachange", function(evt){
+                if (evt.cell.column.field === "label_field" && evt.value === true) {
+                    store.query({label_field: true}).forEach(function (obj) {
+                        obj.label_field = false;
+                        store.put(obj);
+                    });
+                }
+            });
+        },
+
+        buildRendering: function () {
+            this.inherited(arguments);
+            domConstruct.place(this.grid.domNode, this.domNode);
+            domStyle.set(this.grid.domNode, "border", "none");
+            domClass.add(this.domNode, "ngwFeatureLayerFieldsWidget");
+        },
+
+        deserializeInMixin: function (data) {
+            var value = data[this.prefix].fields,
+                store = this.store,
+                idx = 1;
+
+            array.forEach(value, function (f) {
+                var c = lang.clone(f);
+                c.idx = idx; idx++;
+                c.fid = fid; fid++;
+                store.put(c);
+            });
+        },
+
+        serializeInMixin: function (data) {
+            var prefix = this.prefix,
+                setObject = function (key, value) { lang.setObject(prefix + "." + key, value, data); };
+
+            // TODO: Полагаемся на синхронность MemoryStore.query,
+            // что возможно не совсем корректно
+            setObject("fields", this.store.query().map(function (src) {
+                var obj = lang.clone(src);
+                obj.fid = undefined;
+                obj.idx = undefined;
+                return obj;
+            }));
+        }
+
+    });
+});

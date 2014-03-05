@@ -5,6 +5,8 @@ define([
     "dojo/_base/array",
     "dojo/query",
     "dojo/Deferred",
+    "dojo/when",
+    "dojo/promise/all",
     "dijit/registry"
 ], function (
     declare,
@@ -12,6 +14,8 @@ define([
     array,
     query,
     Deferred,
+    when,
+    all,
     registry
 ) {
     var Mixin = declare([], {
@@ -40,7 +44,7 @@ define([
         },
 
         serialize: function (data) {
-            var deferred = new Deferred();
+            var promises = [];
 
             array.forEach(this.serattrmap, function (i) {
                 var value = i.widget.get("value");
@@ -48,10 +52,10 @@ define([
             });
 
             if (this.serializeInMixin !== undefined) {
-                this.serializeInMixin(data);
+                promises.push(when(this.serializeInMixin(data)));
             }
-            deferred.resolve();
-            return deferred;
+            
+            return all(promises);
         },
 
         deserialize: function (data) {
