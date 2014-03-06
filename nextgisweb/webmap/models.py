@@ -13,14 +13,9 @@ from ..resource import (
 Base = declarative_base()
 
 
-@Resource.registry.register
 class WebMap(Base, MetaDataScope, Resource):
     identity = 'webmap'
     cls_display_name = u"Веб-карта"
-
-    __tablename__ = 'webmap'
-
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     root_item_id = sa.Column(sa.ForeignKey('webmap_item.id'), nullable=False)
     bookmark_resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
@@ -29,11 +24,6 @@ class WebMap(Base, MetaDataScope, Resource):
     extent_right = sa.Column(sa.Float, default=+180)
     extent_bottom = sa.Column(sa.Float, default=-90)
     extent_top = sa.Column(sa.Float, default=+90)
-
-    __mapper_args__ = dict(
-        polymorphic_identity=identity,
-        inherit_condition=(resource_id == Resource.id)
-    )
 
     bookmark_resource = orm.relationship(
         Resource, foreign_keys=bookmark_resource_id)

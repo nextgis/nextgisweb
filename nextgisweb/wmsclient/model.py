@@ -31,19 +31,13 @@ Base = declarative_base()
 WMS_VERSIONS = ('1.1.1', )
 
 
-@Resource.registry.register
 class Connection(Base, MetaDataScope, Resource):
     identity = 'wmsclient_connection'
     cls_display_name = "Соединение WMS"
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-
     url = sa.Column(sa.Unicode, nullable=False)
     version = sa.Column(sa.Enum(*WMS_VERSIONS, native_enum=False),
                         nullable=False)
-
-    __tablename__ = identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
 
     @classmethod
     def check_parent(self, parent):
@@ -95,24 +89,15 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
-@Resource.registry.register
 class Layer(Base, MetaDataScope, Resource, SpatialLayerMixin):
     identity = 'wmsclient_layer'
     cls_display_name = u"Cлой WMS"
 
     implements(IRenderableStyle)
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-
     connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
     wmslayers = sa.Column(sa.Unicode, nullable=False)
     imgformat = sa.Column(sa.Unicode, nullable=False)
-
-    __tablename__ = identity
-    __mapper_args__ = dict(
-        polymorphic_identity=identity,
-        inherit_condition=(resource_id == Resource.id)
-    )
 
     connection = orm.relationship(
         Resource,

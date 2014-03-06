@@ -4,6 +4,7 @@ from collections import namedtuple
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from ..models import declarative_base
 from ..registry import registry_maker
@@ -26,19 +27,69 @@ resource_registry = registry_maker()
 PermissionSets = namedtuple('PermissionSets', ('allow', 'deny'))
 
 
-@resource_registry.register
+class ResourceMeta(DeclarativeMeta):
+
+    def __init__(cls, classname, bases, nmspc):
+
+        # По-умолчанию имя таблицы совпадает с идентификатором ресурса.
+        # Вряд ли когда-то потребуется по-другому, но на всяких случай
+        # оставим такую возможность.
+
+        if '__tablename__' not in cls.__dict__:
+            setattr(cls, '__tablename__', cls.identity)
+
+        # Дочерний класс может указать какие-то свои аргументы, оставим
+        # ему такую возможность. Если не указано, указываем свои.
+
+        if '__mapper_args__' not in cls.__dict__:
+            mapper_args = dict()
+            setattr(cls, '__mapper_args__', mapper_args)
+        else:
+            mapper_args = getattr(cls, '__mapper_args__')
+
+        if 'polymorphic_identity' not in mapper_args:
+            mapper_args['polymorphic_identity'] = cls.identity
+
+        # Для класса Resource эта переменная еще не определена.
+        Resource = globals().get('Resource', None)
+
+        if Resource and cls != Resource:
+
+            # Для дочерних классов нужна колонка с внешним ключем, указывающим
+            # на базовый класс ресурса. Возможно потребуется создать вручную,
+            # но проще для всех ее создать разом.
+
+            if 'id' not in cls.__dict__:
+                idcol = sa.Column('id', sa.ForeignKey(Resource.id),
+                                  primary_key=True)
+                idcol._creation_order = Resource.id._creation_order
+                setattr(cls, 'id', idcol)
+
+            # Автоматическое определение поля по которому происходит связь
+            # с родителем не работает в случае, если есть два поля с внешним
+            # ключем на resource.id.
+
+            if 'inherit_condition' not in mapper_args:
+                mapper_args['inherit_condition'] = (
+                    cls.id == Resource.id)
+
+        super(ResourceMeta, cls).__init__(classname, bases, nmspc)
+
+        resource_registry.register(cls)
+
+
 class Resource(Base):
+    __metaclass__ = ResourceMeta
+
     identity = 'resource'
     cls_display_name = "Ресурс"
 
     registry = resource_registry
 
-    __tablename__ = 'resource'
-
     id = sa.Column(sa.Integer, primary_key=True)
-    parent_id = sa.Column(sa.ForeignKey(id))
-
     cls = sa.Column(sa.Unicode, nullable=False)
+
+    parent_id = sa.Column(sa.ForeignKey(id))
 
     keyname = sa.Column(sa.Unicode, unique=True)
     display_name = sa.Column(sa.Unicode, nullable=False)
@@ -47,17 +98,14 @@ class Resource(Base):
 
     description = sa.Column(sa.Unicode)
 
-    __mapper_args__ = {
-        'polymorphic_identity': __tablename__,
-        'polymorphic_on': cls
-    }
+    __mapper_args__ = dict(polymorphic_on=cls)
 
     parent = orm.relationship(
         'Resource', remote_side=[id],
-        backref=orm.backref('children',
-                            order_by=display_name,
-                            cascade="delete")
-    )
+        backref=orm.backref(
+            'children',
+            order_by=display_name,
+            cascade="delete"))
 
     owner_user = orm.relationship(User)
 
@@ -280,16 +328,9 @@ register_permission(
     "Изменение данных")
 
 
-@Resource.registry.register
 class ResourceGroup(MetaDataScope, Resource):
-
     identity = 'resource_group'
     cls_display_name = "Группа ресурсов"
-
-    __tablename__ = identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
-
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     def check_child(self, child):
         # Принимаем любые дочерние ресурсы

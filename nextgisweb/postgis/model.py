@@ -39,20 +39,14 @@ Base = declarative_base()
 GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
 
 
-@Resource.registry.register
 class PostgisConnection(Base, MetaDataScope, Resource):
     identity = 'postgis_connection'
     cls_display_name = u"Соединение PostGIS"
-
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     hostname = sa.Column(sa.Unicode, nullable=False)
     database = sa.Column(sa.Unicode, nullable=False)
     username = sa.Column(sa.Unicode, nullable=False)
     password = sa.Column(sa.Unicode, nullable=False)
-
-    __tablename__ = identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
 
     @classmethod
     def check_parent(self, parent):
@@ -121,7 +115,6 @@ class PostgisLayerField(Base, LayerField):
     column_name = sa.Column(sa.Unicode, nullable=False)
 
 
-@Resource.registry.register
 class PostgisLayer(
     Base, DataScope, Resource,
     SpatialLayerMixin, LayerFieldsMixin
@@ -130,10 +123,6 @@ class PostgisLayer(
     cls_display_name = u"Слой PostGIS"
 
     implements(IFeatureLayer)
-
-    __tablename__ = identity
-
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
     schema = sa.Column(sa.Unicode, default=u'public', nullable=False)
@@ -145,11 +134,6 @@ class PostgisLayer(
     geometry_srid = sa.Column(sa.Integer, nullable=False)
 
     __field_class__ = PostgisLayerField
-
-    __mapper_args__ = dict(
-        polymorphic_identity=identity,
-        inherit_condition=(resource_id == Resource.id)
-    )
 
     connection = orm.relationship(
         Resource,

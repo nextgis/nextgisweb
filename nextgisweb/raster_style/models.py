@@ -31,17 +31,11 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
-@Resource.registry.register
 class RasterStyle(Base, DataScope, Resource):
     implements(IRenderableStyle)
 
     identity = 'raster_style'
     cls_display_name = u"Растровый стиль"
-
-    __tablename__ = identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
-
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     widget_module = 'raster_style/Widget'
 

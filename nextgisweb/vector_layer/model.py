@@ -223,17 +223,11 @@ class VectorLayerField(Base, LayerField):
     fld_uuid = sa.Column(sa.Unicode(32), nullable=False)
 
 
-@Resource.registry.register
 class VectorLayer(Base, Resource, DataScope, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = u"Векторный слой"
 
-    __tablename__ = identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
-
     implements(IFeatureLayer, IWritableFeatureLayer)
-
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     tbl_uuid = sa.Column(sa.Unicode(32), nullable=False)
     geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False),

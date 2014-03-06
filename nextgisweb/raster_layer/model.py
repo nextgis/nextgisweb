@@ -29,15 +29,9 @@ SUPPORTED_GDT_NAMES = ', '.join([
     for i in SUPPORTED_GDT])
 
 
-@Resource.registry.register
 class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
     identity = 'raster_layer'
     cls_display_name = u"Растровый слой"
-
-    __tablename__ = identity
-    __mapper_args__ = dict(polymorphic_identity=identity)
-
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 
