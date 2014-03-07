@@ -87,7 +87,9 @@ def schema(request):
 @viewargs(renderer='nextgisweb:resource/template/tree.mako')
 def tree(request):
     obj = request.context
-    return dict(obj=obj, custom_layout=True)
+    return dict(
+        obj=obj, maxwidth=True, maxheight=True,
+        subtitle="Дерево ресурсов")
 
 
 @viewargs(renderer='json', json=True)

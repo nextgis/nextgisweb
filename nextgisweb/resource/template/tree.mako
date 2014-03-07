@@ -21,7 +21,7 @@
 </script> 
 
 <div data-dojo-type="dijit/layout/BorderContainer"
-    style="width: 100%; height: 500px;">
+    style="width: 100%; height: 100%">
 
     <div data-dojo-id="tree"
         data-dojo-type="ngw-resource/Tree"
