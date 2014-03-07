@@ -17,7 +17,7 @@ class WebMapComponent(Component):
     identity = 'webmap'
     metadata = Base.metadata
 
-    @require('security')
+    @require('auth')
     def initialize(self):
         super(WebMapComponent, self).initialize()
 

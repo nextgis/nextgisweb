@@ -41,7 +41,7 @@ class ResourceComponent(Component):
     identity = 'resource'
     metadata = Base.metadata
 
-    @require('security')
+    @require('auth')
     def initialize_db(self):
         administrator = User.filter_by(keyname='administrator').one()
         everyone = User.filter_by(keyname='everyone').one()
@@ -62,10 +62,10 @@ class ResourceComponent(Component):
                 permission='delete',
                 action='deny',
                 propagate=False))
-            
+
             obj.persist()
 
-    @require('security')
+    @require('auth')
     def setup_pyramid(self, config):
         from .view import setup_pyramid
         setup_pyramid(self, config)

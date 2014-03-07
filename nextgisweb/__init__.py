@@ -23,7 +23,6 @@ def pkginfo():
         'core',
         'pyramidcomp',
         'auth',
-        'security',
         'resource',
         'spatial_ref_sys',
         'layer',
@@ -81,7 +80,6 @@ def amd_packages():
 
         # Пакеты nextgisweb
         ('ngw', 'nextgisweb:amd_packages/ngw'),
-        ('security', 'nextgisweb:amd_packages/security'),
         ('layer_group', 'nextgisweb:amd_packages/layer_group'),
         ('layer', 'nextgisweb:amd_packages/layer'),
         ('style', 'nextgisweb:amd_packages/style'),

@@ -44,6 +44,12 @@ class AuthComponent(Component):
             ), ]
         ).persist()
 
+        self.initialize_user(
+            system=True,
+            keyname='owner',
+            display_name=u"Владелец"
+        ).persist()
+
     def setup_pyramid(self, config):
 
         def user(request):
