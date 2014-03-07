@@ -70,3 +70,10 @@ body { font-size: 12px; }
         height: 100%;
         padding-top: 0px;
         padding-bottom: 0px; }
+
+.content h2 {
+    font-weight: normal;
+    text-transform: uppercase;
+    color: #555;
+    margin: 2ex 0ex 1ex;
+    padding: 0ex 0ex 4px; }
