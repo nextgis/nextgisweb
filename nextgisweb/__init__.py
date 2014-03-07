@@ -80,9 +80,6 @@ def amd_packages():
 
         # Пакеты nextgisweb
         ('ngw', 'nextgisweb:amd_packages/ngw'),
-        ('layer_group', 'nextgisweb:amd_packages/layer_group'),
-        ('layer', 'nextgisweb:amd_packages/layer'),
-        ('style', 'nextgisweb:amd_packages/style'),
         ('feature_layer', 'nextgisweb:amd_packages/feature_layer'),
         ('feature_description', 'nextgisweb:amd_packages/feature_description'),
         ('feature_photo', 'nextgisweb:amd_packages/feature_photo'),
