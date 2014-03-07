@@ -23,7 +23,8 @@ define([
             domStyle.set(this.domNode, "padding", "0");
 
             this._cm = new CodeMirror(this.domNode, {
-                lineNumbers: this.lineNumbers || false
+                lineNumbers: this.lineNumbers || false,
+                readOnly: this.readonly || false
             });
 
             if (this.autoHeight === true) {
