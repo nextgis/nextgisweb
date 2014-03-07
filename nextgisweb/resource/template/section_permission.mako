@@ -15,16 +15,16 @@
             <td>
                 <%
                 if (perm in permsets.deny):
-                    pd = u"Запрещено";
+                    pd = u"З";
                     color = '196, 0, 0'
                 elif (perm in permsets.mask):
-                    pd = u"Скрытый"
+                    pd = u"Б"
                     color = '170, 56, 30'                    
                 elif (perm in permsets.allow):
-                    pd = u"Разрешено"
+                    pd = u"Р"
                     color = '0, 196, 0'
                 else:
-                    pd = u"Отсутсвует"
+                    pd = u"О"
                     color = '64, 64, 64'
                 %>    
                 
