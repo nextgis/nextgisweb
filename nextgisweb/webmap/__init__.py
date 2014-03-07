@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import codecs
 import json
 from pkg_resources import resource_filename
@@ -8,8 +10,6 @@ from ..auth import User
 
 from .model import Base, WebMap, WebMapItem
 from .adapter import WebMapAdapter
-
-__all__ = ['WebMapComponent', 'WebMap', 'WebMapItem']
 
 
 @Component.registry.register
@@ -33,25 +33,14 @@ class WebMapComponent(Component):
         self.settings['popup_height'] = int(self.settings.get(
             'popup_height', 200))
 
-        security = self.env.security
-
-        security.add_resource('webmap', label=u"Веб-карта")
-        security.add_permission('webmap', 'read', label=u"Чтение")
-        security.add_permission('webmap', 'write', label=u"Запись")
-
-    @require('security', 'auth')
+    @require('resource', 'auth')
     def initialize_db(self):
-        if WebMap.filter_by().first() is None:
-            # Создаем веб-карту по-умолчанию только в том случае,
-            # если нет ни одиной карты.
-
-            admin = User.filter_by(keyname='administrator').one()
-
-            WebMap(
-                owner_user=admin,
-                display_name=u"Основная веб-карта",
-                root_item=WebMapItem(item_type='root')
-            ).persist()
+        # Создаем веб-карту по-умолчанию, если в корне нет ни одной.
+        # TODO: Возможность отключать такое поведение через настройки
+        if WebMap.filter_by(parent_id=0).first() is None:
+            WebMap(parent_id=0, display_name="Основная веб-карта",
+                   owner_user=User.filter_by(keyname='administrator').one(),
+                   root_item=WebMapItem(item_type='root')).persist()
 
     def setup_pyramid(self, config):
         from . import view
@@ -74,9 +63,9 @@ class WebMapComponent(Component):
         )
 
     settings_info = (
-        dict(key='basemaps', desc=u"Файл с описанием базовых слоёв"),
-        dict(key='bing_apikey', desc=u"Bing Maps API-ключ"),
-        dict(key='identify_radius', desc=u"Чувствительность инструмента идентификации (px)"),
-        dict(key='popup_width', desc=u"Ширина всплывающего окна (px)"),
-        dict(key='popup_height', desc=u"Высота всплывающего окна (px)"),
+        dict(key='basemaps', desc="Файл с описанием базовых слоёв"),
+        dict(key='bing_apikey', desc="Bing Maps API-ключ"),
+        dict(key='identify_radius', desc="Чувствительность идентификации"),
+        dict(key='popup_width', desc="Ширина всплывающего окна"),
+        dict(key='popup_height', desc="Высота всплывающего окна"),
     )
