@@ -23,8 +23,8 @@ class ResourceScope(Scope):
 
     read = P("Чтение")
     create = P("Создание").require(read)
-    update = P("Изменение").require(create)
-    delete = P("Удаление").require(update)
+    update = P("Изменение").require(read)
+    delete = P("Удаление").require(read)
 
     manage_children = P("Управление дочерними ресурсами").require(read)
     change_permissions = P("Управление правами доступа").require(read)
