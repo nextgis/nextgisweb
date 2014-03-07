@@ -9,7 +9,7 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from ..models import declarative_base
 from ..resource import (
     Resource,
-    MetaDataScope,
+    DataStructureScope,
     Serializer,
     SerializedProperty as SP)
 
@@ -60,6 +60,7 @@ class LayerField(Base):
 
 class LayerFieldsMixin(object):
     __field_class__ = LayerField
+    __scope__ = DataStructureScope
 
     @declared_attr
     def fields(cls):
@@ -139,8 +140,12 @@ class _fields_attr(SP):
         obj.fields.reorder()
 
 
+P_DSS_READ = DataStructureScope.read
+P_DSS_WRITE = DataStructureScope.write
+
+
 class FeatureLayerSerializer(Serializer):
     identity = 'feature_layer'
     resclass = LayerFieldsMixin
 
-    fields = _fields_attr(read='view', write='edit', scope=MetaDataScope)
+    fields = _fields_attr(read=P_DSS_READ, write=P_DSS_WRITE)

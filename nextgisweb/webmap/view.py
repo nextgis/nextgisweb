@@ -4,7 +4,7 @@ from collections import namedtuple
 from ..resource import Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
 
-from .models import WebMap
+from .model import WebMap
 from .plugin import WebmapPlugin
 from .adapter import WebMapAdapter
 
@@ -24,6 +24,8 @@ class ItemWidget(Widget):
 def setup_pyramid(comp, config):
 
     def display(obj, request):
+        request.resource_permission(WebMap.scope.webmap.display)
+
         MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
 
         display.mid = MID(

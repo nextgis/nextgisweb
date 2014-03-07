@@ -1,34 +1,42 @@
-<%
-
-permsets = obj.permission_sets(request.user)
-from nextgisweb.resource.scope import clscopes
-from nextgisweb.resource.permission import scope_permissions
-
-%>
+<% permsets = obj.permission_sets(request.user) %>
 
 <table class="pure-table pure-table-horizontal" style="width: 100%">
-    %for scope in reversed(list(clscopes(obj.__class__))):
+    %for k, scope in obj.scope.iteritems():
         <thead><tr>
-            <th>${scope.cls_display_name}</th>
-            <th><tt>${scope.identity}</tt></th>
-            <th>&nbsp;</th>
+            <th style="width: 70%">${scope.label}</th>
+            <th style="width: 30%"><tt>${k}</tt></th>
+            <th style="width: 0%">&nbsp;</th>
         </tr></thead>
         <tbody>
-        %for perm in scope_permissions(scope).itervalues():
+        %for perm in scope.itervalues(ordered=True):
         <tr>
             <td>${perm.label}</td>
-            <td><tt>${perm.permission}</tt></td>
+            <td><tt>${perm.name}</tt></td>
             <td>
                 <%
                 if (perm in permsets.deny):
-                    pd = u"Запрещено"
+                    pd = u"Запрещено";
+                    color = '196, 0, 0'
                 elif (perm in permsets.allow):
                     pd = u"Разрешено"
+                    color = '0, 196, 0'
                 else:
                     pd = u"Отсутсвует"
+                    color = '64, 64, 64'
                 %>    
                 
-                ${pd}
+                <div style="
+                    background-color: rgba(${color}, 1);
+                    padding: 2px 4px;
+                    border: 1px solid rgba(0, 0, 0, 0.25);
+                    border-radius: 4px;
+                    font-size: 90%;
+                    color: white;
+                    font-weight: bolder;">
+
+                    ${pd}
+
+                </div>
             </td>
         </tr>
         %endfor

@@ -223,9 +223,11 @@ class VectorLayerField(Base, LayerField):
     fld_uuid = sa.Column(sa.Unicode(32), nullable=False)
 
 
-class VectorLayer(Base, Resource, DataScope, SpatialLayerMixin, LayerFieldsMixin):
+class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = u"Векторный слой"
+
+    __scope__ = DataScope
 
     implements(IFeatureLayer, IWritableFeatureLayer)
 
@@ -433,12 +435,16 @@ class _source_attr(SP):
             srlzr.obj.load_from_ogr(ogrlayer, strdecode)
 
 
+P_DS_READ = DataScope.read
+P_DS_WRITE = DataScope.write
+
+
 class VectorLayerSerializer(Serializer):
     identity = VectorLayer.identity
     resclass = VectorLayer
 
-    srs = SR(read='view', write='edit', scope=DataScope)
-    source = _source_attr(read=None, write='edit', scope=DataScope)
+    srs = SR(read=P_DS_READ, write=P_DS_WRITE)
+    source = _source_attr(read=None, write=P_DS_WRITE)
 
 
 class FeatureQueryBase(object):

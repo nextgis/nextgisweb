@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import warnings
 import json
 from collections import OrderedDict
 
@@ -17,11 +18,16 @@ from .model import (
     Resource,
     ResourceACLRule,
     ResourceSerializer)
-from .exception import ValidationError, Forbidden
-from .scope import clscopes, scopeid
-from .permission import scope_permissions
+from .exception import ResourceError, ValidationError, Forbidden
+from .permission import Permission, Scope
+from .scope import ResourceScope
 from .serialize import CompositeSerializer
 from .widget import CompositeWidget
+
+__all__ = ['resource_factory', ]
+
+PERM_READ = ResourceScope.read
+PERM_CPERMISSIONS = ResourceScope.change_permissions
 
 
 def resource_factory(request):
@@ -42,13 +48,13 @@ def resource_factory(request):
 
 @viewargs(renderer='psection.mako')
 def show(request):
-    request.resource_permission(request.context, Resource, 'identify')
+    request.resource_permission(PERM_READ)
     return dict(obj=request.context, sections=request.context.__psection__)
 
 
 @viewargs(renderer='nextgisweb:resource/template/json.mako')
 def objjson(request):
-    request.resource_permission(request.context, Resource, 'identify')
+    request.resource_permission(PERM_READ)
     serializer = CompositeSerializer(obj=request.context, user=request.user)
     serializer.serialize()
     return dict(obj=request.context,
@@ -61,35 +67,27 @@ def schema(request):
     resources = dict()
     scopes = dict()
 
-    cscopes = set()
-
     for cls in Resource.registry:
-        clss = set(clscopes(cls))
-        cscopes.update(clss)
         resources[cls.identity] = dict(
             identity=cls.identity,
             label=cls.cls_display_name,
-            scopes=map(scopeid, clss))
+            scopes=cls.scope.keys())
 
-    for scp in cscopes:
+    for k, scp in Scope.registry.iteritems():
         spermissions = dict()
-        for _, p in scope_permissions(scp).iteritems():
-            spermissions[p.permission] = dict(
-                label=p.label, description=p.description)
+        for p in scp.itervalues():
+            spermissions[p.name] = dict(label=p.label)
 
-        scopes[scopeid(scp)] = dict(
-            identity=scopeid(scp),
-            label=scp.cls_display_name,
+        scopes[k] = dict(
+            identity=k, label=scp.label,
             permissions=spermissions)
 
-    return dict(
-        resources=resources,
-        scopes=scopes)
+    return dict(resources=resources, scopes=scopes)
 
 
 @viewargs(renderer='nextgisweb:resource/template/acl.mako')
 def security(request):
-    request.resource_permission(request.context, Resource, 'permissions')
+    request.resource_permission(PERM_CPERMISSIONS)
     return dict(
         obj=request.context,
         subtitle="Управление доступом")
@@ -97,7 +95,7 @@ def security(request):
 
 @viewargs(renderer='json', method='GET', json=True)
 def security_get(request):
-    request.resource_permission(request.context, Resource, 'permissions')
+    request.resource_permission(PERM_CPERMISSIONS)
     return [dict([
         (k, getattr(i, k))
         for k in (
@@ -108,7 +106,7 @@ def security_get(request):
 
 @viewargs(renderer='json', method='PUT', json=True)
 def security_put(request):
-    request.resource_permission(request.context, Resource, 'permissions')
+    request.resource_permission(PERM_CPERMISSIONS)
 
     for r in list(request.context.acl):
         request.context.acl.remove(r)
@@ -148,7 +146,7 @@ def store(request):
     result = []
 
     for res in query:
-        if not res.has_permission(Resource, 'identify', request.user):
+        if not res.has_permission(PERM_READ, request.user):
             continue
 
         serializer = ResourceSerializer(res, request.user)
@@ -222,7 +220,7 @@ def child_patch(request):
             json.dumps(result), status_code=200,
             content_type=b'application/json')
 
-    except Exception as e:
+    except ResourceError as e:
         return exception_to_response(e)
 
 
@@ -256,7 +254,7 @@ def child_post(request):
             content_type=b'application/json', headerlist=[
                 (b"Location", bytes(location)), ])
 
-    except Exception as e:
+    except ResourceError as e:
         return exception_to_response(e)
 
 
@@ -325,8 +323,20 @@ def widget(request):
 
 def setup_pyramid(comp, config):
 
-    def resource_permission(request, resource, cls, permission):
-        if not resource.has_permission(cls, permission, request.user):
+    def resource_permission(request, permission, resource=None):
+
+        if isinstance(resource, Permission):
+            warnings.warn(
+                'Deprecated argument order for resource_permission. ' +
+                'Use request.resource_permission(permission, resource).',
+                stacklevel=2)
+
+            permission, resource = resource, permission
+
+        if resource is None:
+            resource = request.context
+
+        if not resource.has_permission(permission, request.user):
             raise httpexceptions.HTTPForbidden()
 
     config.add_request_method(resource_permission, 'resource_permission')

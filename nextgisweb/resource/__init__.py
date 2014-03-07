@@ -9,39 +9,29 @@ from ..auth import User
 from .model import (
     Base,
     Resource,
-    ResourceACLRule,
     ResourceGroup,
-    MetaDataScope,
-    DataScope,
-)
-from .permission import register_permission
-from .interface import IResourceBase
+    ResourceACLRule)
 from .serialize import (
     Serializer,
     SerializedProperty,
     SerializedRelationship,
     SerializedResourceRelationship)
-from .exception import ResourceError, Forbidden
-from .view import resource_factory
-from .widget import Widget
 
+from .exception import *    # NOQA
+from .interface import *    # NOQA
+from .model import *        # NOQA
+from .scope import *        # NOQA
+from .permission import *   # NOQA
+from .view import *         # NOQA
+from .widget import *       # NOQA
 
 __all__ = [
-    'ResourceComponent',
     'Resource',
-    'ResourceGroup',
-    'MetaDataScope',
-    'DataScope',
-
-    'register_permission',
     'IResourceBase',
     'Serializer',
     'SerializedProperty',
     'SerializedRelationship',
     'SerializedResourceRelationship',
-    'ResourceError',
-    'Forbidden',
-    'resource_factory',
     'Widget',
 ]
 

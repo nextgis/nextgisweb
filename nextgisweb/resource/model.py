@@ -2,23 +2,23 @@
 from __future__ import unicode_literals
 from collections import namedtuple
 
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from bunch import Bunch
 
+from .. import db
 from ..models import declarative_base
 from ..registry import registry_maker
 from ..auth import Principal, User, Group
 
-from .scope import clscopes, scopeid
 from .interface import providedBy
 from .serialize import (
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR)
-from .permission import register_permission, scope_permissions
+from .scope import ResourceScope, MetadataScope
 from .exception import ResourceError, Forbidden
+
+__all__ = ['Resource', ]
 
 Base = declarative_base()
 
@@ -27,7 +27,7 @@ resource_registry = registry_maker()
 PermissionSets = namedtuple('PermissionSets', ('allow', 'deny'))
 
 
-class ResourceMeta(DeclarativeMeta):
+class ResourceMeta(db.DeclarativeMeta):
 
     def __init__(cls, classname, bases, nmspc):
 
@@ -60,7 +60,7 @@ class ResourceMeta(DeclarativeMeta):
             # но проще для всех ее создать разом.
 
             if 'id' not in cls.__dict__:
-                idcol = sa.Column('id', sa.ForeignKey(Resource.id),
+                idcol = db.Column('id', db.ForeignKey(Resource.id),
                                   primary_key=True)
                 idcol._creation_order = Resource.id._creation_order
                 setattr(cls, 'id', idcol)
@@ -73,6 +73,22 @@ class ResourceMeta(DeclarativeMeta):
                 mapper_args['inherit_condition'] = (
                     cls.id == Resource.id)
 
+        scope = Bunch()
+
+        for base in cls.__mro__:
+            bscope = base.__dict__.get('__scope__', None)
+
+            if bscope is None:
+                continue
+
+            if bscope and not hasattr(bscope, '__iter__'):
+                bscope = tuple((bscope, ))
+
+            for s in bscope:
+                scope[s.identity] = s
+
+        setattr(cls, 'scope', scope)
+
         super(ResourceMeta, cls).__init__(classname, bases, nmspc)
 
         resource_registry.register(cls)
@@ -80,37 +96,35 @@ class ResourceMeta(DeclarativeMeta):
 
 class Resource(Base):
     __metaclass__ = ResourceMeta
+    registry = resource_registry
 
     identity = 'resource'
     cls_display_name = "Ресурс"
 
-    registry = resource_registry
+    __scope__ = (ResourceScope, MetadataScope)
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    cls = sa.Column(sa.Unicode, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    cls = db.Column(db.Unicode, nullable=False)
 
-    parent_id = sa.Column(sa.ForeignKey(id))
+    parent_id = db.Column(db.ForeignKey(id))
 
-    keyname = sa.Column(sa.Unicode, unique=True)
-    display_name = sa.Column(sa.Unicode, nullable=False)
+    keyname = db.Column(db.Unicode, unique=True)
+    display_name = db.Column(db.Unicode, nullable=False)
 
-    owner_user_id = sa.Column(sa.ForeignKey(User.id), nullable=False)
+    owner_user_id = db.Column(db.ForeignKey(User.id), nullable=False)
 
-    description = sa.Column(sa.Unicode)
+    description = db.Column(db.Unicode)
 
     __mapper_args__ = dict(polymorphic_on=cls)
 
-    parent = orm.relationship(
+    parent = db.relationship(
         'Resource', remote_side=[id],
-        backref=orm.backref(
+        backref=db.backref(
             'children',
             order_by=display_name,
             cascade="delete"))
 
-    owner_user = orm.relationship(User)
-
-    def __init__(self, **kwargs):
-        super(Base, self).__init__(**kwargs)
+    owner_user = db.relationship(User)
 
     def __unicode__(self):
         return self.display_name
@@ -142,8 +156,8 @@ class Resource(Base):
         """ Права применимые к этому классу ресурсов """
 
         result = set()
-        for scope in clscopes(cls):
-            result.update(scope_permissions(scope).itervalues())
+        for scope in cls.scope.itervalues():
+            result.update(scope.itervalues())
 
         return frozenset(result)
 
@@ -162,7 +176,7 @@ class Resource(Base):
 
             for rule in rules:
                 for perm in class_permissions:
-                    if rule.cmp_permission(perm.scope, perm.permission):
+                    if rule.cmp_permission(perm):
                         if rule.action == 'allow':
                             allow.add(perm)
                         elif rule.action == 'deny':
@@ -174,36 +188,8 @@ class Resource(Base):
         sets = self.permission_sets(user)
         return sets.allow - sets.deny
 
-    def has_permission(self, cls, permission, user):
-        return (
-            scope_permissions(cls)[permission]
-            in self.permissions(user)
-        )
-
-
-register_permission(
-    Resource, 'identify',
-    "Идентификация ресурса")
-
-register_permission(
-    Resource, 'create',
-    "Создание ресурса")
-
-register_permission(
-    Resource, 'edit',
-    "Изменение ресурса")
-
-register_permission(
-    Resource, 'delete',
-    "Удаление ресурса")
-
-register_permission(
-    Resource, 'permissions',
-    "Управление правами доступа")
-
-register_permission(
-    Resource, 'children',
-    "Управление дочерними ресурсами")
+    def has_permission(self, permission, user):
+        return permission in self.permissions(user)
 
 
 class _parent_attr(SRR):
@@ -215,7 +201,7 @@ class _parent_attr(SRR):
         super(_parent_attr, self).setter(srlzr, value)
         ref = srlzr.obj.parent
 
-        if not ref.has_permission(Resource, 'children', srlzr.user):
+        if not ref.has_permission(ResourceScope.manage_children, srlzr.user):
             raise Forbidden()
 
         if not srlzr.obj.check_parent(ref):
@@ -236,55 +222,70 @@ class _interfaces_attr(SP):
 
 class _scopes_attr(SP):
     def getter(self, srlzr):
-        return map(scopeid, clscopes(srlzr.obj.__class__))
+        return srlzr.obj.scope.keys()
+
+
+def _ro(c):
+    _scp = Resource.scope.resource
+    return c(read=_scp.read, write=None, depth=2)
+
+
+def _rw(c):
+    _scp = Resource.scope.resource
+    return c(read=_scp.read, write=_scp.update, depth=2)
 
 
 class ResourceSerializer(Serializer):
     identity = Resource.identity
     resclass = Resource
 
-    id = SP(read='identify')
-    cls = SP(read='identify')
+    id = _ro(SP)
+    cls = _ro(SP)
 
-    parent = _parent_attr(read='identify', write='identify')
-    owner_user = SR(read='identify')
+    parent = _rw(_parent_attr)
+    owner_user = _ro(SR)
 
-    keyname = SP(read='identify', write='edit')
-    display_name = SP(read='identify', write='edit')
-    description = SP(read='identify', write='edit')
+    keyname = _rw(SP)
+    display_name = _rw(SP)
 
-    children = _children_attr(read='identify')
-    interfaces = _interfaces_attr(read='identify')
-    scopes = _scopes_attr(read='identify')
+    description = SP(read=MetadataScope.read, write=MetadataScope.write)
+
+    children = _ro(_children_attr)
+    interfaces = _ro(_interfaces_attr)
+    scopes = _ro(_scopes_attr)
 
 
 class ResourceACLRule(Base):
     __tablename__ = "resource_acl_rule"
 
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    principal_id = sa.Column(sa.ForeignKey(Principal.id), primary_key=True)
+    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
+    principal_id = db.Column(db.ForeignKey(Principal.id), primary_key=True)
 
-    # Тип ресурса для которого действует это правило. Пустая строка
-    # означает, что оно действует для всех типов ресурсов.
-    identity = sa.Column(sa.Unicode, primary_key=True, default='')
+    identity = db.Column(db.Unicode, primary_key=True, default='')
+    identity.__doc__ = """
+        Тип ресурса для которого действует это правило. Пустая строка
+        означает, что оно действует для всех типов ресурсов."""
 
     # Право для которого действует это правило. Пустая строка означает
     # полный набор прав для всех типов ресурсов.
-    scope = sa.Column(sa.Unicode, primary_key=True, default='')
-    permission = sa.Column(sa.Unicode, primary_key=True, default='')
+    scope = db.Column(db.Unicode, primary_key=True, default='')
+    permission = db.Column(db.Unicode, primary_key=True, default='')
 
-    # Распространять правило на дочерние ресурсы или нет
-    propagate = sa.Column(sa.Boolean, primary_key=True, default=True)
+    propagate = db.Column(db.Boolean, primary_key=True, default=True)
+    propagate.__doc__ = """
+        Следует ли распространять действие этого правила на дочерние ресурсы
+        или оно действует только на ресурс в котором указано."""
 
-    # Действие над правом: allow (разрешение) или deny (запрет).
-    # При этом правила запрета имеют приоритет над разрешениями.
-    action = sa.Column(sa.Unicode, nullable=False, default=True)
+    action = db.Column(db.Unicode, nullable=False, default=True)
+    action.__doc__ = """
+        Действие над правом: allow (разрешение) или deny (запрет). При этом
+        правила запрета имеют приоритет над разрешениями."""
 
-    resource = orm.relationship(
-        Resource, backref=orm.backref(
+    resource = db.relationship(
+        Resource, backref=db.backref(
             'acl', cascade='all, delete-orphan'))
 
-    principal = orm.relationship(Principal)
+    principal = db.relationship(Principal)
 
     def cmp_user(self, user):
         principal = self.principal
@@ -294,41 +295,16 @@ class ResourceACLRule(Base):
     def cmp_identity(self, identity):
         return (self.identity == '') or (self.identity == identity)
 
-    def cmp_permission(self, scope, permission):
-        return ((self.scope == '') and (self.permission == '')) \
-            or ((self.scope == scope) and (self.permission == '')) \
-            or ((self.scope == scope) and (self.permission == permission))
+    def cmp_permission(self, permission):
+        pname = permission.name
+        pscope = permission.scope.identity
+
+        return ((self.scope == '' and self.permission == '')
+                or (self.scope == pscope and self.permission == '')
+                or (self.scope == pscope and self.permission == pname))
 
 
-class MetaDataScope(object):
-    identity = 'metadata'
-    cls_display_name = "Метаданные"
-
-
-register_permission(
-    MetaDataScope, 'view',
-    "Просмотр метаданных")
-
-register_permission(
-    MetaDataScope, 'edit',
-    "Изменение метаданных")
-
-
-class DataScope(MetaDataScope):
-    identity = 'data'
-    cls_display_name = "Данные"
-
-
-register_permission(
-    DataScope, 'view',
-    "Просмотр данных")
-
-register_permission(
-    DataScope, 'edit',
-    "Изменение данных")
-
-
-class ResourceGroup(MetaDataScope, Resource):
+class ResourceGroup(Resource):
     identity = 'resource_group'
     cls_display_name = "Группа ресурсов"
 

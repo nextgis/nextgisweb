@@ -8,7 +8,6 @@ from zope import interface
 from ..registry import registry_maker
 from ..models import BaseClass
 
-from .permission import permission
 from .exception import Forbidden
 
 _registry = registry_maker()
@@ -39,8 +38,8 @@ class SerializerBase(object):
     def mark(self, *keys):
         self.keys.update(keys)
 
-    def has_permission(self, cls, permission):
-        return self.obj.has_permission(cls, permission, self.user)
+    def has_permission(self, permission):
+        return self.obj.has_permission(permission, self.user)
 
 
 class ISerializedAttribute(interface.Interface):
@@ -75,22 +74,11 @@ class SerializedProperty(object):
         if not self.scope:
             self.scope = self.srlzrcls.resclass
 
-        def procperm(name):
-            value = getattr(self, name)
-            if isinstance(value, basestring):
-                value = permission(self.scope, value)
-            setattr(self, name, value)
-
-        procperm('read')
-        procperm('write')
-
     def readperm(self, srlzr):
-        return self.read and srlzr.has_permission(
-            self.read.cls, self.read.permission)
+        return self.read and srlzr.has_permission(self.read)
 
     def writeperm(self, srlzr):
-        return self.write and srlzr.has_permission(
-            self.write.cls, self.write.permission)
+        return self.write and srlzr.has_permission(self.write)
 
     def getter(self, srlzr):
         return getattr(srlzr.obj, self.attrname)

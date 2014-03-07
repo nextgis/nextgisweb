@@ -59,6 +59,7 @@ def setup_pyramid(comp, config):
             )
 
         # Уже аутентифицированным пользователям показываем сообщение об ошибке
+        request.response.status = 403
         return dict(subtitle=u"Отказано в доступе")
 
     config.add_view(

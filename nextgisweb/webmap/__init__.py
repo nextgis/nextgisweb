@@ -6,7 +6,7 @@ from pkg_resources import resource_filename
 from ..component import Component, require
 from ..auth import User
 
-from .models import Base, WebMap, WebMapItem
+from .model import Base, WebMap, WebMapItem
 from .adapter import WebMapAdapter
 
 __all__ = ['WebMapComponent', 'WebMap', 'WebMapItem']
@@ -54,8 +54,8 @@ class WebMapComponent(Component):
             ).persist()
 
     def setup_pyramid(self, config):
-        from . import views
-        views.setup_pyramid(self, config)
+        from . import view
+        view.setup_pyramid(self, config)
 
     def client_settings(self, request):
         with codecs.open(self.settings['basemaps'], 'rb', 'utf-8') as fp:

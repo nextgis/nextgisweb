@@ -3,15 +3,17 @@ from StringIO import StringIO
 
 from pyramid.response import Response
 
-from ..resource import resource_factory
+from ..resource import resource_factory, DataScope
 
 from .interface import IRenderableStyle
+
+PD_READ = DataScope.read
 
 
 def setup_pyramid(comp, config):
 
     def tms(obj, request):
-        # TODO: Security
+        request.resource_permission(PD_READ)
 
         z = int(request.GET['z'])
         x = int(request.GET['x'])
@@ -32,7 +34,7 @@ def setup_pyramid(comp, config):
     ).add_view(tms, context=IRenderableStyle)
 
     def image(obj, request):
-        # TODO: Security
+        request.resource_permission(PD_READ)
 
         extent = map(float, request.GET['extent'].split(','))
         size = map(int, request.GET['size'].split(','))

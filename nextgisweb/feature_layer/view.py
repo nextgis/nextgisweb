@@ -5,7 +5,12 @@ from types import MethodType
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
-from ..resource import Resource, resource_factory, Widget
+from ..resource import (
+    Resource,
+    DataStructureScope,
+    DataScope,
+    resource_factory,
+    Widget)
 from ..geometry import geom_from_wkt
 from ..object_widget import ObjectWidget, CompositeWidget
 from .. import dynmenu as dm
@@ -20,28 +25,36 @@ class FeatureLayerFieldsWidget(Widget):
     amdmod = 'ngw-feature-layer/FieldsWidget'
 
 
-def feature_browse(layer, request):
-    # TODO: Security
-    return dict(obj=layer, subtitle=u"Объекты",
+PD_READ = DataScope.read
+PD_WRITE = DataScope.write
+
+PDS_R = DataStructureScope.read
+PDS_W = DataStructureScope.write
+
+
+def feature_browse(request):
+    request.resource_permission(PD_READ)
+    request.resource_permission(PDS_R)
+    return dict(obj=request.context, subtitle=u"Таблица объектов",
                 maxwidth=True, maxheight=True)
 
 
-def feature_show(layer, request):
-    # TODO: Security
+def feature_show(request):
+    request.resource_permission(PD_READ)
 
-    fquery = layer.feature_query()
+    fquery = request.context.feature_query()
     fquery.filter_by(id=request.matchdict['feature_id'])
 
     feature = fquery().one()
 
     return dict(
-        obj=layer,
+        obj=request.context,
         subtitle=u"Объект #%d" % feature.id,
         feature=feature)
 
 
 def feature_edit(layer, request):
-    # TODO: Security
+    request.resource_permission(PD_WRITE)
 
     query = layer.feature_query()
     query.filter_by(id=request.matchdict['feature_id'])
@@ -91,13 +104,13 @@ def feature_edit(layer, request):
     )
 
 
-def field_collection(layer, request):
-    # TODO: Security
-    return [f.to_dict() for f in layer.fields]
+def field_collection(request):
+    request.resource_permission(PDS_R)
+    return [f.to_dict() for f in request.context.fields]
 
 
 def store_collection(layer, request):
-    # TODO: Security
+    request.resource_permission(PD_READ)
 
     query = layer.feature_query()
 
@@ -145,7 +158,7 @@ def store_collection(layer, request):
 
 
 def store_item(layer, request):
-    # TODO: Security
+    request.resource_permission(PD_READ)
 
     box = request.headers.get('x-feature-box', None)
     ext = request.headers.get('x-feature-ext', None)
@@ -250,7 +263,8 @@ def setup_pyramid(comp, config):
                 query.limit(10)
 
                 features = [
-                    dict(id=f.id, layerId=layer.id, label=f.label, fields=f.fields)
+                    dict(id=f.id, layerId=layer.id,
+                         label=f.label, fields=f.fields)
                     for f in query()
                 ]
 
@@ -265,8 +279,8 @@ def setup_pyramid(comp, config):
 
         return result
 
-    config.add_route('feature_layer.identify', '/feature_layer/identify')
-    config.add_view(identify, route_name='feature_layer.identify', renderer='json')
+    config.add_route('feature_layer.identify', '/feature_layer/identify') \
+        .add_view(identify, renderer='json')
 
     config.add_route(
         'feature_layer.feature.browse',

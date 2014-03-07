@@ -9,9 +9,9 @@ from sqlalchemy import sql, func
 from ..models import declarative_base
 from ..resource import (
     Resource,
-    MetaDataScope,
+    ConnectionScope,
+    DataStructureScope,
     DataScope,
-    register_permission,
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR,
@@ -38,10 +38,16 @@ Base = declarative_base()
 
 GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
 
+PC_READ = ConnectionScope.read
+PC_WRITE = ConnectionScope.write
+PC_CONNECT = ConnectionScope.connect
 
-class PostgisConnection(Base, MetaDataScope, Resource):
+
+class PostgisConnection(Base, Resource):
     identity = 'postgis_connection'
     cls_display_name = u"Соединение PostGIS"
+
+    __scope__ = ConnectionScope
 
     hostname = sa.Column(sa.Unicode, nullable=False)
     database = sa.Column(sa.Unicode, nullable=False)
@@ -59,14 +65,14 @@ class PostgisConnection(Base, MetaDataScope, Resource):
         # их нужно проверять при каждом запросе подключения
         credhash = (self.hostname, self.database, self.username, self.password)
 
-        if self.resource_id in comp._engine:
-            engine = comp._engine[self.resource_id]
+        if self.id in comp._engine:
+            engine = comp._engine[self.id]
 
             if engine._credhash == credhash:
                 return engine
 
             else:
-                del comp._engine[self.resource_id]
+                del comp._engine[self.id]
 
         engine = sa.create_engine(make_engine_url(EngineURL(
             'postgresql+psycopg2',
@@ -75,34 +81,21 @@ class PostgisConnection(Base, MetaDataScope, Resource):
 
         engine._credhash = credhash
 
-        comp._engine[self.resource_id] = engine
+        comp._engine[self.id] = engine
         return engine
 
     def get_connection(self):
         return self.get_engine().connect()
 
 
-register_permission(
-    PostgisConnection, 'read',
-    u"Чтение параметров соединения")
-
-register_permission(
-    PostgisConnection, 'write',
-    u"Запись параметров соединения")
-
-register_permission(
-    PostgisConnection, 'connect',
-    u"Использование соединения")
-
-
 class PostgisConnectionSerializer(Serializer):
     identity = PostgisConnection.identity
     resclass = PostgisConnection
 
-    hostname = SP(read='read', write='write')
-    database = SP(read='read', write='write')
-    username = SP(read='read', write='write')
-    password = SP(read='read', write='write')
+    hostname = SP(read=PC_READ, write=PC_WRITE)
+    database = SP(read=PC_READ, write=PC_WRITE)
+    username = SP(read=PC_READ, write=PC_WRITE)
+    password = SP(read=PC_READ, write=PC_WRITE)
 
 
 class PostgisLayerField(Base, LayerField):
@@ -115,12 +108,11 @@ class PostgisLayerField(Base, LayerField):
     column_name = sa.Column(sa.Unicode, nullable=False)
 
 
-class PostgisLayer(
-    Base, DataScope, Resource,
-    SpatialLayerMixin, LayerFieldsMixin
-):
+class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'postgis_layer'
     cls_display_name = u"Слой PostGIS"
+
+    __scope__ = DataScope
 
     implements(IFeatureLayer)
 
@@ -280,9 +272,7 @@ class _fields_action(SP):
 
     def setter(self, srlzr, value):
         if value == 'update':
-            if srlzr.obj.connection.has_permission(
-                PostgisConnection, 'connect', srlzr.user
-            ):
+            if srlzr.obj.connection.has_permission(PC_CONNECT, srlzr.user):
                 srlzr.obj.setup()
             else:
                 raise Forbidden()
@@ -294,21 +284,22 @@ class PostgisLayerSerializer(Serializer):
     identity = PostgisLayer.identity
     resclass = PostgisLayer
 
-    __metadata = dict(read='view', write='edit', scope=MetaDataScope)
+    __defaults = dict(read=DataStructureScope.read,
+                      write=DataStructureScope.write)
 
-    connection = SRR(**__metadata)
+    connection = SRR(**__defaults)
 
-    schema = SP(**__metadata)
-    table = SP(**__metadata)
-    column_id = SP(**__metadata)
-    column_geom = SP(**__metadata)
+    schema = SP(**__defaults)
+    table = SP(**__defaults)
+    column_id = SP(**__defaults)
+    column_geom = SP(**__defaults)
 
-    geometry_type = SP(**__metadata)
-    geometry_srid = SP(**__metadata)
+    geometry_type = SP(**__defaults)
+    geometry_srid = SP(**__defaults)
 
-    srs = SR(**__metadata)
+    srs = SR(**__defaults)
 
-    fields = _fields_action(write="edit", scope=MetaDataScope)
+    fields = _fields_action(write=DataStructureScope.write)
 
 
 class FeatureQueryBase(object):

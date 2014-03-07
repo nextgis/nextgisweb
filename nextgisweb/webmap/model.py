@@ -5,7 +5,9 @@ import sqlalchemy.orm as orm
 from ..models import declarative_base
 from ..resource import (
     Resource,
-    MetaDataScope,
+    Scope,
+    Permission,
+    ResourceScope,
     Serializer,
     SerializedProperty as SP,
     SerializedResourceRelationship as SRR)
@@ -13,9 +15,18 @@ from ..resource import (
 Base = declarative_base()
 
 
-class WebMap(Base, MetaDataScope, Resource):
+class WebMapScope(Scope):
+    identity = 'webmap'
+    label = u"Веб-карта"
+
+    display = Permission(u"Просмотр")
+
+
+class WebMap(Base, Resource):
     identity = 'webmap'
     cls_display_name = u"Веб-карта"
+
+    __scope__ = WebMapScope
 
     root_item_id = sa.Column(sa.ForeignKey('webmap_item.id'), nullable=False)
     bookmark_resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
@@ -143,7 +154,10 @@ class WebMapItem(Base):
                 setattr(self, a, data[a])
 
 
-_mdargs = dict(read='view', write='edit', scope=MetaDataScope)
+PR_READ = ResourceScope.read
+PR_UPDATE = ResourceScope.update
+
+_mdargs = dict(read=PR_READ, write=PR_UPDATE)
 
 
 class _root_item_attr(SP):

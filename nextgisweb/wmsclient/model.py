@@ -14,7 +14,9 @@ import sqlalchemy.orm as orm
 from ..models import declarative_base
 from ..resource import (
     Resource,
-    MetaDataScope,
+    ConnectionScope,
+    DataStructureScope,
+    DataScope,
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR,
@@ -31,9 +33,11 @@ Base = declarative_base()
 WMS_VERSIONS = ('1.1.1', )
 
 
-class Connection(Base, MetaDataScope, Resource):
+class Connection(Base, Resource):
     identity = 'wmsclient_connection'
     cls_display_name = "Соединение WMS"
+
+    __scope__ = ConnectionScope
 
     url = sa.Column(sa.Unicode, nullable=False)
     version = sa.Column(sa.Enum(*WMS_VERSIONS, native_enum=False),
@@ -60,18 +64,15 @@ class Connection(Base, MetaDataScope, Resource):
         return source_meta
 
 
-_defaults = dict(read='identify', write='identify', scope=Resource)
-
-
 class ConnectionSerializer(Serializer):
     identity = Connection.identity
     resclass = Connection
 
+    _defaults = dict(read=ConnectionScope.read,
+                     write=ConnectionScope.write)
+
     url = SP(**_defaults)
     version = SP(**_defaults)
-
-    def deserialize(self, *args):
-        super(ConnectionSerializer, self).deserialize(*args)
 
 
 class RenderRequest(object):
@@ -89,9 +90,11 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
-class Layer(Base, MetaDataScope, Resource, SpatialLayerMixin):
+class Layer(Base, Resource, SpatialLayerMixin):
     identity = 'wmsclient_layer'
     cls_display_name = u"Cлой WMS"
+
+    __scope__ = (DataStructureScope, DataScope)
 
     implements(IRenderableStyle)
 
@@ -129,12 +132,12 @@ class Layer(Base, MetaDataScope, Resource, SpatialLayerMixin):
         return PIL.Image.open(BytesIO(urllib2.urlopen(url).read()))
 
 
-_defaults = dict(read='view', write='edit', scope=MetaDataScope)
-
-
 class LayerSerializer(Serializer):
     identity = Layer.identity
     resclass = Layer
+
+    _defaults = dict(read=DataStructureScope.read,
+                     write=DataStructureScope.write)
 
     connection = SRR(**_defaults)
     wmslayers = SP(**_defaults)

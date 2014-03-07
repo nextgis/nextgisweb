@@ -3,7 +3,6 @@
 <% import json %>
 
 <script>
-
     require([
         "dojo/parser",
         "dojo/ready",

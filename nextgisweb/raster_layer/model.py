@@ -10,8 +10,7 @@ from osgeo import gdal, gdalconst, osr
 from ..models import declarative_base
 from ..resource import (
     Resource,
-    MetaDataScope,
-    DataScope,
+    DataStructureScope, DataScope,
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR)
@@ -29,9 +28,11 @@ SUPPORTED_GDT_NAMES = ', '.join([
     for i in SUPPORTED_GDT])
 
 
-class RasterLayer(Base, DataScope, Resource, SpatialLayerMixin):
+class RasterLayer(Base, Resource, SpatialLayerMixin):
     identity = 'raster_layer'
     cls_display_name = u"Растровый слой"
+
+    __scope__ = (DataStructureScope, DataScope)
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 
@@ -117,14 +118,20 @@ class _source_attr(SP):
         srlzr.obj.load_file(filedata, env)
 
 
+P_DSS_READ = DataStructureScope.read
+P_DSS_WRITE = DataStructureScope.write
+P_DS_READ = DataScope.read
+P_DS_WRITE = DataScope.write
+
+
 class RasterLayerSerializer(Serializer):
     identity = RasterLayer.identity
     resclass = RasterLayer
 
-    srs = SR(read='view', write='edit', scope=DataScope)
+    srs = SR(read=P_DSS_READ, write=P_DSS_WRITE)
 
-    xsize = SP(read='view', write=None, scope=MetaDataScope)
-    ysize = SP(read='view', write=None, scope=MetaDataScope)
-    band_count = SP(read='view', write=None, scope=MetaDataScope)
+    xsize = SP(read=P_DSS_READ)
+    ysize = SP(read=P_DSS_READ)
+    band_count = SP(read=P_DSS_READ)
 
-    source = _source_attr(read=None, write='edit', scope=DataScope)
+    source = _source_attr(write=P_DS_WRITE)

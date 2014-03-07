@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import sqlalchemy as sa
 import numpy
 from osgeo import gdal_array
 import PIL
@@ -31,13 +30,13 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
-class RasterStyle(Base, DataScope, Resource):
-    implements(IRenderableStyle)
-
+class RasterStyle(Base, Resource):
     identity = 'raster_style'
     cls_display_name = u"Растровый стиль"
 
-    widget_module = 'raster_style/Widget'
+    __scope__ = DataScope
+
+    implements(IRenderableStyle)
 
     @classmethod
     def check_parent(self, parent):
