@@ -1,8 +1,37 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from UserList import UserList
 from bunch import Bunch
 
 __all__ = ['Permission', 'Scope']
+
+
+class RequirementList(UserList):
+
+    def toposort(self):
+        g = dict()
+        for a in self:
+            g[a] = set()
+            for b in self:
+                if a.src == b.dst:
+                    g[a].add(b)
+
+        self[:] = []
+
+        extra = reduce(set.union, g.values(), set()) - set(g.keys())
+        g.update({item: set() for item in extra})
+        while True:
+            ordered = set(item for item, dep in g.items() if not dep)
+            if not ordered:
+                break
+
+            self.extend(ordered)
+
+            g = {item: (dep - ordered)
+                 for item, dep in g.items()
+                 if item not in ordered}
+
+        assert not g, "A cyclic dependency exists amongst %r" % g
 
 
 class Requirement(object):
@@ -12,6 +41,10 @@ class Requirement(object):
         self.src = src
         self.attr = attr
         self.cls = cls
+
+    def __repr__(self):
+        return '<Requirement: (%s) requires (%s) on attr=%s>' % (
+            repr(self.dst), repr(self.src), self.attr)
 
 
 class Permission(object):
@@ -33,7 +66,7 @@ class Permission(object):
 
     def __repr__(self):
         return "<Permission '%s' in scope '%s'>" % (
-            self.name, self.scope.identity)
+            self.name, self.scope.identity if self.scope else 'unbound')
 
     def __unicode__(self):
         return unicode(self.label)
@@ -44,7 +77,9 @@ class Permission(object):
     def bind(self, name=None, scope=None):
         self.name = name
         self.scope = scope
+
         self.scope.requirements.extend(self._requirements)
+        self.scope.requirements.toposort()
         del self._requirements
 
     def require(self, *args, **kwargs):
@@ -53,6 +88,9 @@ class Permission(object):
             else self._requirements
 
         tgt.append(Requirement(self, *args, **kwargs))
+
+        if self.is_bound():
+            tgt.toposort()
 
         return self
 
@@ -66,14 +104,11 @@ class ScopeMeta(type):
             'Attribute identity not found in %s' % classname
 
         if Scope is not None:
-            setattr(cls, 'requirements', list())
+            setattr(cls, 'requirements', RequirementList())
 
         for name, perm in cls.__dict__.iteritems():
             if not isinstance(perm, Permission):
                 continue
-
-            assert perm.name is None
-            assert perm.scope is None
 
             perm.bind(name, cls)
 
