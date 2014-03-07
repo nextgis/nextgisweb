@@ -5,6 +5,15 @@ from bunch import Bunch
 __all__ = ['Permission', 'Scope']
 
 
+class Requirement(object):
+
+    def __init__(self, dst, src, attr=None, cls=None):
+        self.dst = dst
+        self.src = src
+        self.attr = attr
+        self.cls = cls
+
+
 class Permission(object):
 
     # Счетчик для нумерации объектов, нужно для получения элементов,
@@ -16,6 +25,9 @@ class Permission(object):
         self.name = name
         self.scope = scope
 
+        if not self.is_bound():
+            self._requirements = list()
+
         Permission.__create_order += 1
         self._create_order = Permission.__create_order
 
@@ -26,6 +38,24 @@ class Permission(object):
     def __unicode__(self):
         return unicode(self.label)
 
+    def is_bound(self):
+        return self.name is not None and self.scope is not None
+
+    def bind(self, name=None, scope=None):
+        self.name = name
+        self.scope = scope
+        self.scope.requirements.extend(self._requirements)
+        del self._requirements
+
+    def require(self, *args, **kwargs):
+        tgt = self.scope.requirements \
+            if self.is_bound() \
+            else self._requirements
+
+        tgt.append(Requirement(self, *args, **kwargs))
+
+        return self
+
 
 class ScopeMeta(type):
 
@@ -35,6 +65,9 @@ class ScopeMeta(type):
         assert Scope is None or 'identity' in cls.__dict__, \
             'Attribute identity not found in %s' % classname
 
+        if Scope is not None:
+            setattr(cls, 'requirements', list())
+
         for name, perm in cls.__dict__.iteritems():
             if not isinstance(perm, Permission):
                 continue
@@ -42,8 +75,7 @@ class ScopeMeta(type):
             assert perm.name is None
             assert perm.scope is None
 
-            perm.name = name
-            perm.scope = cls
+            perm.bind(name, cls)
 
         super(ScopeMeta, cls).__init__(classname, bases, nmspc)
 

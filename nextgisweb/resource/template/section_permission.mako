@@ -17,6 +17,9 @@
                 if (perm in permsets.deny):
                     pd = u"Запрещено";
                     color = '196, 0, 0'
+                elif (perm in permsets.mask):
+                    pd = u"Скрытый"
+                    color = '170, 56, 30'                    
                 elif (perm in permsets.allow):
                     pd = u"Разрешено"
                     color = '0, 196, 0'
@@ -32,7 +35,8 @@
                     border-radius: 4px;
                     font-size: 90%;
                     color: white;
-                    font-weight: bolder;">
+                    font-weight: bolder;
+                    text-align: center;">
 
                     ${pd}
 

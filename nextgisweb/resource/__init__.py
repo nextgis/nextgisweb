@@ -10,7 +10,7 @@ from .model import (
     Base,
     Resource,
     ResourceGroup,
-    ResourceACLRule)
+    ResourceACLRule as ACLRule)
 from .serialize import (
     Serializer,
     SerializedProperty,
@@ -44,13 +44,25 @@ class ResourceComponent(Component):
     @require('security')
     def initialize_db(self):
         administrator = User.filter_by(keyname='administrator').one()
+        everyone = User.filter_by(keyname='everyone').one()
+
         try:
             ResourceGroup.filter_by(id=0).one()
         except NoResultFound:
             obj = ResourceGroup(id=0, owner_user=administrator,
                                 display_name="Основная группа ресурсов")
-            obj.acl.append(ResourceACLRule(
-                principal=administrator, action='allow'))
+
+            obj.acl.append(ACLRule(
+                principal=administrator,
+                action='allow'))
+
+            obj.acl.append(ACLRule(
+                principal=everyone,
+                scope='resource',
+                permission='delete',
+                action='deny',
+                propagate=False))
+            
             obj.persist()
 
     @require('security')

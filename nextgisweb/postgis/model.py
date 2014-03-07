@@ -266,6 +266,11 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         raise KeyError("Field '%s' not found!" % keyname)
 
 
+DataScope.read.require(
+    ConnectionScope.connect,
+    attr='connection', cls=PostgisLayer)
+
+
 class _fields_action(SP):
     """ Специальный write-only атрибут, обеспечивающий обновление
     списка полей с сервера """

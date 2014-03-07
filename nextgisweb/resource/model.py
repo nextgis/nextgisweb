@@ -24,7 +24,7 @@ Base = declarative_base()
 
 resource_registry = registry_maker()
 
-PermissionSets = namedtuple('PermissionSets', ('allow', 'deny'))
+PermissionSets = namedtuple('PermissionSets', ('allow', 'deny', 'mask'))
 
 
 class ResourceMeta(db.DeclarativeMeta):
@@ -166,6 +166,7 @@ class Resource(Base):
 
         allow = set()
         deny = set()
+        mask = set()
 
         for res in tuple(self.parents) + (self, ):
             rules = filter(lambda (rule): (
@@ -182,11 +183,37 @@ class Resource(Base):
                         elif rule.action == 'deny':
                             deny.add(perm)
 
-        return PermissionSets(allow=allow, deny=deny)
+        for a in class_permissions:
+            passed = True
+            for scp in self.scope.itervalues():
+                if not passed:
+                    continue
+
+                for req in scp.requirements:
+                    if not passed:
+                        continue
+
+                    if req.dst == a and (
+                        req.cls is None
+                        or isinstance(self, req.cls)
+                    ):
+                        if req.attr is None:
+                            p = req.src in allow and req.src not in deny
+                        else:
+                            attrval = getattr(self, req.attr)
+                            p = attrval is not None \
+                                and attrval.has_permission(req.src, user)
+
+                        passed = passed and p
+
+            if not passed:
+                mask.add(a)
+
+        return PermissionSets(allow=allow, deny=deny, mask=mask)
 
     def permissions(self, user):
         sets = self.permission_sets(user)
-        return sets.allow - sets.deny
+        return sets.allow - sets.mask - sets.deny
 
     def has_permission(self, permission, user):
         return permission in self.permissions(user)

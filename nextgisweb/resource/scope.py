@@ -21,13 +21,13 @@ class ResourceScope(Scope):
     identity = 'resource'
     label = "Ресурс"
 
-    create = P("Создание")
     read = P("Чтение")
-    update = P("Изменение")
-    delete = P("Удаление")
+    create = P("Создание").require(read)
+    update = P("Изменение").require(read)
+    delete = P("Удаление").require(read)
 
-    manage_children = P("Управление дочерними ресурсами")
-    change_permissions = P("Управление правами доступа")
+    manage_children = P("Управление дочерними ресурсами").require(read)
+    change_permissions = P("Управление правами доступа").require(read)
 
 
 class MetadataScope(Scope):
@@ -44,7 +44,7 @@ class MetadataScope(Scope):
     label = "Метаданные"
 
     read = P("Чтение")
-    write = P("Запись")
+    write = P("Запись").require(read)
 
 
 class DataStructureScope(Scope):
@@ -57,7 +57,7 @@ class DataStructureScope(Scope):
     label = "Структура данных"
 
     read = P("Чтение")
-    write = P("Запись")
+    write = P("Запись").require(read)
 
 
 class DataScope(Scope):
@@ -67,7 +67,7 @@ class DataScope(Scope):
     label = "Данные"
 
     read = P("Чтение")
-    write = P("Запись")
+    write = P("Запись").require(read)
 
 
 class ConnectionScope(Scope):
@@ -82,5 +82,5 @@ class ConnectionScope(Scope):
     label = "Соединение"
 
     read = P("Чтение параметров соединения")
-    write = P("Запись параметров соединения")
+    write = P("Запись параметров соединения").require(read)
     connect = P("Использование соединения")

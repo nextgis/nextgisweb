@@ -132,6 +132,11 @@ class Layer(Base, Resource, SpatialLayerMixin):
         return PIL.Image.open(BytesIO(urllib2.urlopen(url).read()))
 
 
+DataScope.read.require(
+    ConnectionScope.connect,
+    attr='connection', cls=Layer)
+
+
 class LayerSerializer(Serializer):
     identity = Layer.identity
     resclass = Layer
