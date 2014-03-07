@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 from bunch import Bunch
 
@@ -238,6 +238,37 @@ class _parent_attr(SRR):
         # TODO: check_child
 
 
+class _perms_attr(SP):
+
+    def setter(self, srlzr, value):
+        for r in list(srlzr.obj.acl):
+            srlzr.obj.acl.remove(r)
+
+        for itm in value:
+            srlzr.obj.acl.append(ResourceACLRule(
+                principal_id=itm['principal']['id'],
+                identity=itm['identity'],
+                scope=itm['scope'],
+                permission=itm['permission'],
+                propagate=itm['propagate'],
+                action=itm['action']))
+
+    def getter(self, srlzr):
+        result = []
+
+        for o in srlzr.obj.acl:
+            result.append(OrderedDict((
+                ('action', o.action),
+                ('principal', dict(id=o.principal_id)),
+                ('identity', o.identity),
+                ('scope', o.scope),
+                ('permission', o.permission),
+                ('propagate', o.propagate),
+            )))
+
+        return result
+
+
 class _children_attr(SP):
     def getter(self, srlzr):
         return len(srlzr.obj.children) > 0
@@ -253,13 +284,14 @@ class _scopes_attr(SP):
         return srlzr.obj.scope.keys()
 
 
+_scp = Resource.scope.resource
+
+
 def _ro(c):
-    _scp = Resource.scope.resource
     return c(read=_scp.read, write=None, depth=2)
 
 
 def _rw(c):
-    _scp = Resource.scope.resource
     return c(read=_scp.read, write=_scp.update, depth=2)
 
 
@@ -272,6 +304,8 @@ class ResourceSerializer(Serializer):
 
     parent = _rw(_parent_attr)
     owner_user = _ro(SR)
+
+    permissions = _perms_attr(read=_scp.read, write=_scp.change_permissions)
 
     keyname = _rw(SP)
     display_name = _rw(SP)

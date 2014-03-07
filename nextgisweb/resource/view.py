@@ -16,7 +16,6 @@ from ..pyramidcomp import viewargs
 
 from .model import (
     Resource,
-    ResourceACLRule,
     ResourceSerializer)
 from .exception import ResourceError, ValidationError, Forbidden
 from .permission import Permission, Scope
@@ -83,44 +82,6 @@ def schema(request):
             permissions=spermissions)
 
     return dict(resources=resources, scopes=scopes)
-
-
-@viewargs(renderer='nextgisweb:resource/template/acl.mako')
-def security(request):
-    request.resource_permission(PERM_CPERMISSIONS)
-    return dict(
-        obj=request.context,
-        subtitle="Управление доступом")
-
-
-@viewargs(renderer='json', method='GET', json=True)
-def security_get(request):
-    request.resource_permission(PERM_CPERMISSIONS)
-    return [dict([
-        (k, getattr(i, k))
-        for k in (
-            'principal_id', 'identity', 'scope',
-            'permission', 'propagate', 'action')
-    ]) for i in request.context.acl]
-
-
-@viewargs(renderer='json', method='PUT', json=True)
-def security_put(request):
-    request.resource_permission(PERM_CPERMISSIONS)
-
-    for r in list(request.context.acl):
-        request.context.acl.remove(r)
-
-    for itm in request.json_body:
-        request.context.acl.append(ResourceACLRule(
-            principal_id=itm['principal_id'],
-            identity=itm['identity'],
-            scope=itm['scope'],
-            permission=itm['permission'],
-            propagate=itm['propagate'],
-            action=itm['action']))
-
-    return True
 
 
 @viewargs(renderer='nextgisweb:resource/template/tree.mako')
@@ -382,11 +343,6 @@ def setup_pyramid(comp, config):
 
     permalinker(Resource, 'resource.show')
 
-    # ACL
-
-    _resource_route('security', '{id:\d+}/security', client=('id', )) \
-        .add_view(security_get).add_view(security_put).add_view(security)
-
     # Секции
 
     Resource.__psection__ = PageSections()
@@ -448,11 +404,6 @@ def setup_pyramid(comp, config):
             'operation/delete', "Удалить",
             lambda args: args.request.route_url(
                 'resource.delete', id=args.obj.id)),
-
-        Link(
-            'operation/security', "Права доступа",
-            lambda args: args.request.route_url(
-                'resource.security', id=args.obj.id)),
 
         Label('extra', "Дополнительно"),
 

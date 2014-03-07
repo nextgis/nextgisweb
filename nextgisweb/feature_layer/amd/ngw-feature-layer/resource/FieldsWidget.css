@@ -1,10 +1,7 @@
-.ngwFeatureLayerFieldsWidget .field-idx { width: 3em; }
-.ngwFeatureLayerFieldsWidget .field-datatype { width: 10em; }
-.ngwFeatureLayerFieldsWidget .field-display_name { width: 50%; }
+.ngw-feature-layer-fields-widget .field-idx { width: 3em; }
+.ngw-feature-layer-fields-widget .field-datatype { width: 10em; }
+.ngw-feature-layer-fields-widget .field-display_name { width: 50%; }
 
-.ngwFeatureLayerFieldsWidget .field-grid_visibility, 
-.ngwFeatureLayerFieldsWidget .field-label_field {
-    width: 3em; text-align: center}
-
-.ngwFeatureLayerFieldsWidget .dgrid-row-table .dgrid-cell:first-child { border-left-width: 0; }
-.ngwFeatureLayerFieldsWidget .dgrid-row-table .dgrid-cell:last-child  { border-right-width: 0; }
+.ngw-feature-layer-fields-widget .field-grid_visibility, 
+.ngw-feature-layer-fields-widget .field-label_field {
+    width: 3em; text-align: center; }

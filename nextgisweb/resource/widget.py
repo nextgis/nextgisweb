@@ -63,6 +63,12 @@ class ResourceWidget(Widget):
     amdmod = 'ngw-resource/Widget'
 
 
+class ResourcePermissionWidget(Widget):
+    resource = Resource
+    operation = ('update', )
+    amdmod = 'ngw-resource/PermissionWidget'
+
+
 class ResourceDescriptionWiget(Widget):
     resource = Resource
     operation = ('create', 'update')

@@ -1,4 +1,3 @@
-/* globals ngwConfig */
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -9,6 +8,7 @@ define([
     "dojo/json",
     "dojo/dom-construct",
     "dojo/dom-class",
+    "dojo/dom-style",
     "dijit/layout/BorderContainer",
     "dijit/Toolbar",
     "dijit/ToolbarSeparator",
@@ -22,12 +22,13 @@ define([
     "dgrid/extensions/DijitRegistry",
     "ngw/route",
     "ngw/form/PrincipalSelect",
+    "ngw-resource/serialize",
+    // resource
     "ngw/load-json!auth/principal/dump",
     "ngw/load-json!resource/schema",
-
     // css
-    "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
-    "xstyle/css!./resource/AclEditor.css"
+    "xstyle/css!./resource/PermissionWidget.css",
+    "ngw/dgrid/css"
 ], function (
     declare,
     lang,
@@ -38,6 +39,7 @@ define([
     json,
     domConstruct,
     domClass,
+    domStyle,
     BorderContainer,
     Toolbar,
     ToolbarSeparator,
@@ -51,12 +53,15 @@ define([
     DijitRegistry,
     route,
     PrincipalSelect,
+    serialize,
     principalDump,
     resourceSchema
 ) {
+    var _COUNTER = 0;
 
     var GridClass = declare([Grid, Selection, DijitRegistry], {
         selectionMode: "single",
+        style: "border: none",
 
         columns: {
             action: {
@@ -72,7 +77,7 @@ define([
             principal: {
                 label: "Субъект",
                 get: function (itm) {
-                    return this.grid.principalStore.get(itm.principal_id).display_name;
+                    return this.grid.principalStore.get(itm.principal.id).display_name;
                 }},
             
             permission: {
@@ -213,7 +218,7 @@ define([
             return {
                 id: this._id,
                 action: this.action.get("value"),
-                principal_id: this.principal.get("value"),
+                principal: { id: this.principal.get("value") },
                 scope: this.permission.get("value").split(":")[0],
                 permission: this.permission.get("value").split(":")[1],
                 identity: this.identity.get("value"),
@@ -225,14 +230,18 @@ define([
             this._set("value", value);
             this._id = value.id;
             this.action.set("value", value.action);
-            this.principal.set("value", value.principal_id);
+            this.principal.set("value", value.principal.id);
             this.permission.set("value", value.scope + ":" + value.permission);
             this.identity.set("value", value.identity);
             this.propagate.set("checked", value.propagate);
         }
     });
 
-    return declare("ngw.resource.AclEditor", BorderContainer, {
+    return declare([BorderContainer, serialize.Mixin], {
+        title: "Права доступа",
+
+        style: "padding: 0px;",
+        gutters: false,
 
         constructor: function (kwArgs) {
             declare.safeMixin(this, kwArgs);
@@ -257,35 +266,22 @@ define([
             }));
 
             this.grid.on(".dgrid-row:dblclick", lang.hitch(this, this.itemEdit));
+        },
 
-            this._counter = 0; // счетчик для id в store
-
-            xhr(route("resource.security", {id: this.resourceId}), {
-                handleAs: "json",
-                headers: { "Accept": "application/json" }
-            }).then(lang.hitch(this, function (data) {
-                array.forEach(data, function (itm) {
-                    itm.id = (++this._counter);
-                    this.store.put(itm);
-                }, this);
-            })).otherwise(console.error);
+        postCreate: function () {
+            this.inherited(arguments);
+            this.serattrmap.push({key: "resource.permissions", widget: this});
         },
 
         buildRendering: function () {
             this.inherited(arguments);
 
-            domClass.add(this.domNode, "ngwResourceAclEditor");
-            
+            domClass.add(this.domNode, "ngw-resource-permission-widget");
+
+            domStyle.set(this.grid.domNode, "border", "none");
+            domClass.add(this.grid.domNode, "dgrid-border-fix");
             domConstruct.place(this.grid.domNode, this.domNode);
             
-            new Button({
-                label: "Сохранить",
-                iconClass: "dijitIconSave",
-                onClick: lang.hitch(this, this.save)
-            }).placeAt(this.toolbar);
-
-            new ToolbarSeparator().placeAt(this.toolbar);
-
             new Button({
                 label: "Добавить",
                 iconClass: "dijitIconNewTask",
@@ -312,15 +308,19 @@ define([
             this.grid.startup();
         },
 
-        save: function () {
-            var data = this.store.query();
-            xhr.put(route("resource.security", {id: this.resourceId}), {
-                data: json.stringify(data),
-                handleAs: "json",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                }
+        _setValueAttr: function (value) {
+            array.forEach(value, function (i) {
+                var c = lang.clone(i);
+                c.id = (++_COUNTER);
+                this.store.put(c);
+            }, this);
+        },
+
+        _getValueAttr: function () {
+            return this.store.query().map(function (i) {
+                var c = lang.clone(i);
+                c.id = undefined;
+                return c;
             });
         },
 

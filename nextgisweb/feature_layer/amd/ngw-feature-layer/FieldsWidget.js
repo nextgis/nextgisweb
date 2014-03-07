@@ -1,4 +1,3 @@
-/* globals ngwConfig */
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -20,8 +19,8 @@ define([
     "ngw/form/KeynameTextBox",
     "ngw-resource/serialize",
     //
-    "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
-    "xstyle/css!./resource/FieldsWidget.css"
+    "xstyle/css!./resource/FieldsWidget.css",
+    "ngw/dgrid/css"
 ], function (
     declare,
     lang,
@@ -123,8 +122,11 @@ define([
 
         buildRendering: function () {
             this.inherited(arguments);
-            domClass.add(this.domNode, "ngwFeatureLayerFieldsWidget");
+            domClass.add(this.domNode, "ngw-feature-layer-fields-widget");
+
+            domClass.add(this.domNode, "dgrid-border-fix");
             domStyle.set(this.grid.domNode, "border", "none");
+            
             domConstruct.place(this.grid.domNode, this.domNode);
         },
 
