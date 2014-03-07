@@ -196,8 +196,11 @@ class Resource(Base):
                                 and req.src not in mask
                         else:
                             attrval = getattr(self, req.attr)
-                            p = attrval is not None \
-                                and attrval.has_permission(req.src, user)
+
+                            if attrval is None:
+                                p = req.attr_empty is True
+                            else:
+                                p = attrval.has_permission(req.src, user)
 
                         if not p:
                             mask.add(a)
@@ -210,6 +213,11 @@ class Resource(Base):
 
     def has_permission(self, permission, user):
         return permission in self.permissions(user)
+
+
+ResourceScope.read.require(
+    ResourceScope.read,
+    attr='parent', attr_empty=True)
 
 
 class _parent_attr(SRR):

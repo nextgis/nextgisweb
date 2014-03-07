@@ -13,13 +13,14 @@ class RequirementList(UserList):
         for a in self:
             g[a] = set()
             for b in self:
-                if a.src == b.dst:
+                if a.src == b.dst and a != b:
                     g[a].add(b)
 
         self[:] = []
 
         extra = reduce(set.union, g.values(), set()) - set(g.keys())
         g.update({item: set() for item in extra})
+
         while True:
             ordered = set(item for item, dep in g.items() if not dep)
             if not ordered:
@@ -36,11 +37,12 @@ class RequirementList(UserList):
 
 class Requirement(object):
 
-    def __init__(self, dst, src, attr=None, cls=None):
+    def __init__(self, dst, src, attr=None, cls=None, attr_empty=False):
         self.dst = dst
         self.src = src
         self.attr = attr
         self.cls = cls
+        self.attr_empty = attr_empty
 
     def __repr__(self):
         return '<Requirement: (%s) requires (%s) on attr=%s>' % (
