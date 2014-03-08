@@ -4,8 +4,6 @@ import uuid
 
 from ..component import Component
 
-from .views import includeme
-
 
 __all__ = ["FileUploadComponent", ]
 
@@ -15,7 +13,8 @@ class FileUploadComponent(Component):
     identity = 'file_upload'
 
     def setup_pyramid(self, config):
-        includeme(config, self, self._env)
+        from . import view
+        view.setup_pyramid(self, config)
 
     def fileid(self):
         """ Возвращает новый идентификатор файла """

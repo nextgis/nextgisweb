@@ -1,4 +1,4 @@
-<%inherit file='../base.mako' />
+<%inherit file='nextgisweb:templates/base.mako' />
 
 <%def name="head()">
     <script>
