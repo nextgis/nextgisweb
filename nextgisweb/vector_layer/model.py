@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import uuid
 import types
 import zipfile
 import tempfile
+import shutil
 import ctypes
 from distutils.version import LooseVersion
 
@@ -319,13 +322,14 @@ VectorLayer.__table__.tometadata = types.MethodType(
 
 
 def _set_encoding(encoding):
+    gdal_gt_19 = LooseVersion(osgeo.__version__) >= LooseVersion('1.9')
 
     class encoding_section(object):
 
         def __init__(self, encoding):
             self.encoding = encoding
 
-            if self.encoding and LooseVersion(osgeo.__version__) >= LooseVersion('1.9'):
+            if self.encoding and gdal_gt_19:
                 # Для GDAL 1.9 и выше пытаемся установить SHAPE_ENCODING
                 # через ctypes и libgdal
 
@@ -360,7 +364,7 @@ def _set_encoding(encoding):
 
         def __enter__(self):
 
-            if self.encoding and LooseVersion(osgeo.__version__) >= LooseVersion('1.9'):
+            if self.encoding and gdal_gt_19:
                 # Для GDAL 1.9 устанавливаем значение SHAPE_ENCODING
 
                 # Оставим копию текущего значения себе
@@ -380,59 +384,83 @@ def _set_encoding(encoding):
 
         def __exit__(self, type, value, traceback):
 
-            if self.encoding and LooseVersion(osgeo.__version__) >= LooseVersion('1.9'):
+            if self.encoding and gdal_gt_19:
                 # Возвращаем на место старое значение
                 self.set_option('SHAPE_ENCODING', self.old_value)
 
     return encoding_section(encoding)
 
 
+VE = ValidationError
+
+
 class _source_attr(SP):
 
-    def setter(self, srlzr, value):
-        datafile, metafile = env.file_upload.get_filename(value['id'])
-        self._encoding = value['encoding']
-
-        if not zipfile.is_zipfile(datafile):
-            raise ValidationError(u"Загруженный файл не является ZIP-архивом.")
-
-        unzip_tmpdir = tempfile.mkdtemp()
-        zipfile.ZipFile(datafile, 'r').extractall(path=unzip_tmpdir)
-
-        with _set_encoding(self._encoding) as sdecode:
-            strdecode = sdecode
-            ogrds = ogr.Open(unzip_tmpdir)
-
-        if not ogrds:
-            raise ValidationError(u"Библиотеке GDAL/OGR не удалось открыть файл.")
+    def _ogrds(self, ogrds):
 
         if ogrds.GetLayerCount() < 1:
-            raise ValidationError(u"Набор данных не содержит слоёв.")
+            raise VE("Набор данных не содержит слоёв.")
 
         if ogrds.GetLayerCount() > 1:
-            raise ValidationError(u"Набор данных содержит более одного слоя.")
+            raise VE("Набор данных содержит более одного слоя.")
 
         ogrlayer = ogrds.GetLayer(0)
         if not ogrlayer:
-            raise ValidationError(u"Не удалось открыть слой.")
+            raise VE("Не удалось открыть слой.")
+
+        return ogrlayer
+
+    def _ogrlayer(self, obj, ogrlayer, recode=lambda (a): a):
 
         if ogrlayer.GetSpatialRef() is None:
-            raise ValidationError(u"Не указана система координат слоя.")
+            raise VE("Не указана система координат слоя.")
 
         feat = ogrlayer.GetNextFeature()
         while feat:
             geom = feat.GetGeometryRef()
             if not geom:
-                raise ValidationError(u"Объект %d не содержит геометрии." % feat.GetFID())
+                raise VE("Объект %d не содержит геометрии." % feat.GetFID())
             feat = ogrlayer.GetNextFeature()
 
         ogrlayer.ResetReading()
 
-        srlzr.obj.tbl_uuid = uuid.uuid4().hex
+        obj.tbl_uuid = uuid.uuid4().hex
 
         with DBSession.no_autoflush:
-            srlzr.obj.setup_from_ogr(ogrlayer, strdecode)
-            srlzr.obj.load_from_ogr(ogrlayer, strdecode)
+            obj.setup_from_ogr(ogrlayer, recode)
+            obj.load_from_ogr(ogrlayer, recode)
+
+    def setter(self, srlzr, value):
+        datafile, _ = env.file_upload.get_filename(value['id'])
+        self._encoding = value['encoding']
+
+        iszip = zipfile.is_zipfile(datafile)
+
+        try:
+            if iszip:
+                ogrfn = tempfile.mkdtemp()
+                zipfile.ZipFile(datafile, 'r').extractall(path=ogrfn)
+            else:
+                ogrfn = datafile
+
+            with _set_encoding(self._encoding) as sdecode:
+                ogrds = ogr.Open(ogrfn)
+                recode = sdecode
+
+            if not ogrds:
+                raise VE("Библиотеке OGR не удалось открыть файл")
+
+            drivername = ogrds.GetDriver().GetName()
+
+            if drivername not in ('ESRI Shapefile', ):
+                raise VE("Неподдерживаемый драйвер OGR: %s" % drivername)
+
+            ogrlayer = self._ogrds(ogrds)
+            self._ogrlayer(srlzr.obj, ogrlayer, recode)
+
+        finally:
+            if iszip:
+                shutil.rmtree(ogrfn)
 
 
 P_DS_READ = DataScope.read
