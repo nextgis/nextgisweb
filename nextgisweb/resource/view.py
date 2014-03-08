@@ -193,6 +193,8 @@ def child_post(request):
 
     data = request.json_body
 
+    data['resource']['parent'] = dict(id=request.context.id)
+
     cls = Resource.registry[data['resource']['cls']]
     child = cls(owner_user=request.user)
 
