@@ -338,10 +338,9 @@ define([
         updateObj: function () {
             this.lock();
 
-            // TODO: PATCH заменить на POST
             this.storeRequest({
                 url: this.itemUrl(),
-                method: "PATCH"
+                method: "PUT"
             }).then(
                 /* callback */ lang.hitch(this, function () {
                     this.unlock();

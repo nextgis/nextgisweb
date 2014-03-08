@@ -37,24 +37,23 @@ def viewargs(**kw):
 
 class RequestMethodPredicate(object):
     def __init__(self, val, config):
+        if isinstance(val, basestring):
+            val = (val, )
+
         self.val = val
 
     def text(self):
-        return 'method = %s' % (self.val,)
+        return 'method = %s' % (self.val, )
 
     phash = text
 
     def __call__(self, context, request):
-        return getattr(request, 'method', None) == self.val
+        return request.method in self.val
 
 
 class JsonPredicate(object):
     target = ('application/json', )
-    test = (
-        'text/html',
-        'application/xhtml+xml',
-        'application/xml'
-    )
+    test = ('text/html', 'application/xhtml+xml', 'application/xml')
 
     def __init__(self, val, config):
         self.val = val
@@ -81,6 +80,9 @@ class ClientRoutePredicate(object):
 
     def __call__(self, context, request):
         return True
+
+    def __repr__(self):
+        return "<client>"
 
 
 class HTTPBasicAuthenticationPolicy(BasicAuthAuthenticationPolicy):

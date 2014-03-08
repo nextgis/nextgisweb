@@ -331,9 +331,10 @@ def setup_pyramid(comp, config):
 
     _route('store', 'store/{id:\d*}', client=('id', )).add_view(store)
 
-    _resource_route('child', '{id:\d+|-}/child/{child_id:\d*}', client=('id', 'child_id')) \
+    _resource_route('child', '{id:\d+|-}/child/{child_id:\d*}',
+                    client=('id', 'child_id')) \
         .add_view(child_get, method='GET') \
-        .add_view(child_patch, method='PATCH') \
+        .add_view(child_patch, method=('PUT', 'PATCH')) \
         .add_view(child_post, method='POST')
 
     _route('widget', 'widget', client=()).add_view(widget)
