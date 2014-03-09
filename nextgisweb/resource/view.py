@@ -26,7 +26,9 @@ from .widget import CompositeWidget
 __all__ = ['resource_factory', ]
 
 PERM_READ = ResourceScope.read
+PERM_DELETE = ResourceScope.delete
 PERM_CPERMISSIONS = ResourceScope.change_permissions
+PERM_MCHILDREN = ResourceScope.manage_children
 
 
 def resource_factory(request):
@@ -223,6 +225,24 @@ def child_post(request):
         return exception_to_response(e)
 
 
+def child_delete(request):
+    child_id = request.matchdict['child_id']
+    assert child_id != ''
+
+    child = Resource.query().with_polymorphic('*') \
+        .filter_by(id=child_id).one()
+
+    request.resource_permission(PERM_MCHILDREN)
+    request.resource_permission(PERM_DELETE, child)
+
+    DBSession.delete(child)
+    DBSession.flush()
+
+    return Response(
+        json.dumps(None), status_code=200,
+        content_type=b'application/json')
+
+
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def create(request):
     return dict(obj=request.context, subtitle="Создать ресурс", maxheight=True,
@@ -335,9 +355,10 @@ def setup_pyramid(comp, config):
 
     _resource_route('child', '{id:\d+|-}/child/{child_id:\d*}',
                     client=('id', 'child_id')) \
-        .add_view(child_get, method='GET') \
-        .add_view(child_patch, method=('PUT', 'PATCH')) \
-        .add_view(child_post, method='POST')
+        .add_view(child_get, method=r'GET') \
+        .add_view(child_patch, method=(r'PUT', r'PATCH')) \
+        .add_view(child_post, method=r'POST') \
+        .add_view(child_delete, method=r'DELETE')
 
     _route('widget', 'widget', client=()).add_view(widget)
 

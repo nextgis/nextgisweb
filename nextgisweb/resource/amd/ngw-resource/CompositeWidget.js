@@ -88,6 +88,15 @@ define([
                     iconClass: "dijitIconSave",
                     onClick: lang.hitch(this, this.updateObj)
                 }).placeAt(this.btnContainer));
+
+            } else if (this.operation === "delete") {
+
+                this.buttons.push(new Button({
+                    label: "Удалить",
+                    iconClass: "dijitIconDelete",
+                    onClick: lang.hitch(this, this.deleteObj)
+                }).placeAt(this.btnContainer));
+
             }
 
             if (this.operation === "read" || this.operation === "update") {
@@ -316,6 +325,7 @@ define([
                     "вкладки и поля отмечены красным цветом.");
 
             } else {
+                console.error(e);
                 alert("В ходе выполнения операции возникла неизвестная ошибка.");
 
             }
@@ -343,6 +353,21 @@ define([
                 method: "PUT"
             }).then(
                 /* callback */ lang.hitch(this, function () {
+                    this.unlock();
+                }),
+                /* errback  */ lang.hitch(this, this.unlock)
+            ).then(null, console.error);
+        },
+
+        deleteObj: function () {
+            this.lock();
+
+            this.storeRequest({
+                url: this.itemUrl(),
+                method: "DELETE"
+            }).then(
+                /* callback */ lang.hitch(this, function () {
+                    window.location = route("resource.show", {id: this.parent});
                     this.unlock();
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)

@@ -1,6 +1,6 @@
 define([
     "dojo/_base/declare",
-    "dijit/_WidgetBase",
+    "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dojo/text!./template/DeleteWidget.html",
@@ -8,13 +8,19 @@ define([
     "dijit/form/CheckBox"
 ], function (
     declare,
-    _WidgetBase,
+    ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     template
 ) {
-    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
-        title: "Подтверждение"
+        title: "Удаление ресурса",
+
+        validateData: function () {
+            return this.wConfirm.get("checked") === true;
+        },
+
+        serialize: function () { }
     });
 });
