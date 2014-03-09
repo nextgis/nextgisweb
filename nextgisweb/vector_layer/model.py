@@ -432,7 +432,7 @@ class _source_attr(SP):
 
     def setter(self, srlzr, value):
         datafile, _ = env.file_upload.get_filename(value['id'])
-        self._encoding = value['encoding']
+        encoding = value.get('encoding', 'utf-8')
 
         iszip = zipfile.is_zipfile(datafile)
 
@@ -443,7 +443,7 @@ class _source_attr(SP):
             else:
                 ogrfn = datafile
 
-            with _set_encoding(self._encoding) as sdecode:
+            with _set_encoding(encoding) as sdecode:
                 ogrds = ogr.Open(ogrfn)
                 recode = sdecode
 
