@@ -13,7 +13,7 @@ define([
     ResourceStore
 ) {
     return declare("ngw.resource.Tree", [Tree], {
-        showRoot: false,
+        showRoot: true,
 
         constructor: function (kwArgs) {
             declare.safeMixin(this, kwArgs);
