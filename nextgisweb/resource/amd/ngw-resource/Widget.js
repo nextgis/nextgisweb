@@ -1,6 +1,7 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
+    "dojo/_base/lang",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -11,10 +12,12 @@ define([
     // template
     "dojox/layout/TableContainer",
     "ngw/form/DisplayNameTextBox",
-    "ngw/form/KeynameTextBox"
+    "ngw/form/KeynameTextBox",
+    "ngw-resource/ResourceBox"
 ], function (
     declare,
     array,
+    lang,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -30,8 +33,21 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
+
+            this.wParent.set("value", this.composite.parent !== null ? {id: this.composite.parent} : null);
             this.wCls.set("value", resourceSchema.resources[this.composite.cls].label +
                 " (" + this.composite.cls + ")");
+
+            this.wParent.set("disabled", this.composite.operation === "create");
+        },
+
+        serializeInMixin: function (data) {
+            if (!this.wParent.get("disabled")) {
+                lang.setObject(
+                    "resource.parent",
+                    this.wParent.get("value"),
+                    data);
+            }
         }
     });
 });

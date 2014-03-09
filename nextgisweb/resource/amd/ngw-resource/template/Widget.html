@@ -1,6 +1,6 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
     data-ngw-serialize-prefix="resource" title="Слой">
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
         
         <div data-dojo-type="ngw/form/DisplayNameTextBox"
             data-dojo-attach-point="wDisplayName"
@@ -11,6 +11,10 @@
             data-dojo-attach-point="wKeyname"
             data-ngw-serialize="keyname"
             title="Ключ" style="width: 100%"></div>
+
+        <div data-dojo-type="ngw-resource/ResourceBox"
+            data-dojo-attach-point="wParent"
+            title="Ресурс родитель" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/TextBox"
             data-dojo-attach-point="wCls"
