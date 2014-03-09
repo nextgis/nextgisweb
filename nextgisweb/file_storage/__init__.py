@@ -6,6 +6,7 @@ from ..component import Component
 from ..core import BackupBase
 
 from .models import Base, FileObj
+from . import command
 
 __all__ = ['FileStorageComponent', 'FileObj']
 
