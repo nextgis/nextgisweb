@@ -16,7 +16,7 @@ from .serialize import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR)
 from .scope import ResourceScope, MetadataScope
-from .exception import ResourceError, Forbidden
+from .exception import ResourceError, ValidationError, Forbidden
 
 __all__ = ['Resource', ]
 
@@ -216,6 +216,18 @@ class Resource(Base):
 
     def has_permission(self, permission, user):
         return permission in self.permissions(user)
+
+    # Валидация данных
+
+    @db.validates('parent')
+    def _validate_parent(self, key, value):
+        """ Проверка на создание замкнутых циклов в иерархии """
+
+        if value is not None:
+            if self == value or self in value.parents:
+                raise ValidationError("Resource hierarchy loop detected!")
+
+        return value
 
 
 ResourceScope.read.require(
