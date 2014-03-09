@@ -232,10 +232,17 @@ def child_delete(request):
     child = Resource.query().with_polymorphic('*') \
         .filter_by(id=child_id).one()
 
-    request.resource_permission(PERM_MCHILDREN)
-    request.resource_permission(PERM_DELETE, child)
+    def delete(obj):
+        request.resource_permission(PERM_MCHILDREN, obj)
+        for chld in obj.children:
+            delete(chld)
 
-    DBSession.delete(child)
+        request.resource_permission(PERM_DELETE, obj)
+        DBSession.delete(obj)
+
+    with DBSession.no_autoflush:
+        delete(child)
+
     DBSession.flush()
 
     return Response(

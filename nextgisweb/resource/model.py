@@ -116,13 +116,16 @@ class Resource(Base):
     description = db.Column(db.Unicode)
 
     __mapper_args__ = dict(polymorphic_on=cls)
+    __table_args__ = (
+        db.CheckConstraint('parent_id IS NOT NULL OR id = 0'),
+        db.UniqueConstraint(parent_id, display_name),
+    )
 
     parent = db.relationship(
         'Resource', remote_side=[id],
         backref=db.backref(
-            'children',
-            order_by=display_name,
-            cascade="delete"))
+            'children', cascade=None,
+            order_by=display_name))
 
     owner_user = db.relationship(User)
 
