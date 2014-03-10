@@ -435,7 +435,7 @@ define([
                                 label: f.label,
                                 onClick: function () {
                                     // Отдельно запрашиваем экстент объекта
-                                    xhr.get(route("feature_layer.store", {
+                                    xhr.get(route("feature_layer.store.item", {
                                         id: display.config.bookmarkLayerId,
                                         feature_id: f.id
                                     }), {
