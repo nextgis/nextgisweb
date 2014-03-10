@@ -44,6 +44,7 @@ def feature_show(request):
 
     fquery = request.context.feature_query()
     fquery.filter_by(id=request.matchdict['feature_id'])
+    fquery.geom()
 
     feature = fquery().one()
 
@@ -320,7 +321,7 @@ def setup_pyramid(comp, config):
     ).add_view(
         feature_show,
         context=IFeatureLayer,
-        renderer='feature_layer/feature_show.mako')
+        renderer='nextgisweb:feature_layer/template/feature_show.mako')
 
     config.add_route(
         'feature_layer.feature.edit',
