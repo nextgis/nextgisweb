@@ -388,6 +388,9 @@ define([
 
         startup: function () {
             this.inherited(arguments);
+
+            this.itemTree.startup();
+
             this._startupDeferred.resolve();
         },
 
