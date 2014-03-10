@@ -565,8 +565,9 @@ define([
 
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
-                widget.centerLonNode.innerHTML = number.format(newVal.lon, {places: 3});
-                widget.centerLatNode.innerHTML = number.format(newVal.lat, {places: 3});
+                var pt = newVal.transform(widget.displayProjection, widget.lonlatProjection);
+                widget.centerLonNode.innerHTML = number.format(pt.lon, {places: 3});
+                widget.centerLatNode.innerHTML = number.format(pt.lat, {places: 3});
             });
 
             // Обновление подписи масштаба
