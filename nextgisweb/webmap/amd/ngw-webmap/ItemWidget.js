@@ -148,12 +148,12 @@ define([
                 if (newValue) {
                     // При изменении выделенного элемента перенесем значения в виджеты
                     // и покажем нужную панель: для слоев одну, для групп другую.
-                    widget.widgetItemDisplayName.set("value", widget.getItemValue("display_name"));
-                    
                     if (newValue.item_type == "group") {
+                        widget.widgetItemDisplayNameGroup.set("value", widget.getItemValue("display_name"));
                         widget.widgetProperties.selectChild(widget.paneGroup);
                         widget.widgetItemGroupExpanded.set("checked", widget.getItemValue("group_expanded"));
                     } else if (newValue.item_type == "layer") {
+                        widget.widgetItemDisplayNameLayer.set("value", widget.getItemValue("display_name"));
                         widget.widgetProperties.selectChild(widget.paneLayer);
                         widget.wdgtItemLayerEnabled.set("checked", widget.getItemValue("layer_enabled"));
                         widget.wLayerTransparency.set("value", widget.getItemValue("layer_transparency"));
@@ -175,7 +175,11 @@ define([
             });
 
             // При изменении значений переносим их в модель
-            this.widgetItemDisplayName.watch("value", function (attr, oldValue, newValue) {
+            this.widgetItemDisplayNameGroup.watch("value", function (attr, oldValue, newValue) {
+                widget.setItemValue("display_name", newValue);
+            });
+
+            this.widgetItemDisplayNameLayer.watch("value", function (attr, oldValue, newValue) {
                 widget.setItemValue("display_name", newValue);
             });
 
