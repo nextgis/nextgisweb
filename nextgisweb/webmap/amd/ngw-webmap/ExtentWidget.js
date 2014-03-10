@@ -26,6 +26,7 @@ define([
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: "Охват и закладки",
         templateString: template,
+        serializePrefix: "webmap",
 
         serializeInMixin: function (data) {
             if (data.webmap === undefined) { data.webmap = {}; }
@@ -35,9 +36,6 @@ define([
             value.extent_right = this.wExtentRight.get("value");
             value.extent_top = this.wExtentTop.get("value");
             value.extent_bottom = this.wExtentBottom.get("value");
-
-            var brid = this.wBookmarkResource.get("value");
-            value.bookmark_resource = ( brid !== null) ? { id: brid.id } : null;
         },
 
         deserializeInMixin: function (data) {
@@ -46,10 +44,6 @@ define([
             this.wExtentRight.set("value", value.extent_right);
             this.wExtentTop.set("value", value.extent_top);
             this.wExtentBottom.set("value", value.extent_bottom);
-
-            if (value.bookmark_resource) {
-                this.wBookmarkResource.set("value", value.bookmark_resource.id);
-            }
         }
     });
 });

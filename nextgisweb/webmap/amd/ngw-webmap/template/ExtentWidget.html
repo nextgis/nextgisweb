@@ -1,4 +1,7 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" style="padding: 1ex;">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${serializePrefix}"
+    style="padding: 1ex;">
+
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2">
 
         <div data-dojo-attach-point="wExtentLeft"
@@ -25,9 +28,9 @@
             title="Верх, град."
             style="width: 100%"></div>
 
-        <div data-dojo-attach-point="wBookmarkResource"
-            data-dojo-type="ngw-resource/ResourceBox"
+        <div data-dojo-type="ngw-resource/ResourceBox"
             data-dojo-props="interface: 'IFeatureLayer', colspan: 2"
+            data-ngw-serialize="bookmark_resource"
             title="Слой закладок"
             style="width: 100%">
         </div>
