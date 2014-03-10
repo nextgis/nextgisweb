@@ -11,7 +11,8 @@ class WMSClientComponent(Component):
     metadata = Base.metadata
 
     def setup_pyramid(self, config):
-        from . import view # NOQA
+        from . import view
+        view.setup_pyramid(self, config)
 
     def client_settings(self, request):
         return dict(wms_versions=WMS_VERSIONS)

@@ -37,7 +37,7 @@ define([
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        title: "WMS",
+        title: "Слой WMS",
         templateString: template,
         serializePrefix: "wmsclient_layer",
 

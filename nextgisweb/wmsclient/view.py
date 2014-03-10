@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-from ..resource import Widget
-
+from ..resource import Widget, Resource
 from .model import Connection, Layer
 
 
@@ -15,3 +15,13 @@ class LayerWidget(Widget):
     resource = Layer
     operation = ('create', 'update')
     amdmod = 'ngw-wmsclient/LayerWidget'
+
+
+def setup_pyramid(comp, conf):
+    Resource.__psection__.register(
+        key='wmsclient_connection', priority=50,
+        title="Возможности WMS",
+        is_applicable=lambda obj: (
+            obj.cls == 'wmsclient_connection'
+            and obj.capcache()),
+        template='nextgisweb:wmsclient/template/section_connection.mako')

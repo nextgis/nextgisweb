@@ -1,5 +1,6 @@
 define([
     "dojo/_base/declare",
+    "dojo/_base/lang",
     "dojo/_base/array",
     "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
@@ -11,9 +12,11 @@ define([
     // template
     "dijit/form/ValidationTextBox",
     "dijit/form/Select",
+    "dijit/form/CheckBox",
     "dojox/layout/TableContainer"
 ], function (
     declare,
+    lang,
     array,
     ContentPane,
     _TemplatedMixin,
@@ -24,7 +27,7 @@ define([
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
-        title: "WMS-клиент",
+        title: "Соединение WMS",
         serializePrefix: "wmsclient_connection",
 
         postCreate: function () {
@@ -36,6 +39,13 @@ define([
 
             if (this.value) {
                 this.wVersion.set("value", this.value.version);
+            }
+        },
+
+        serializeInMixin: function (data) {
+            var value = this.wCapCache.get("value");
+            if (value !== "") {
+                lang.setObject(this.serializePrefix + ".capcache", value, data);
             }
         }
 
