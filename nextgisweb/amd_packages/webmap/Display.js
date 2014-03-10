@@ -44,7 +44,9 @@ define([
     "dijit/form/DropDownButton",
     "dijit/ToolbarSeparator",
     "dijit/Dialog",
-    "dijit/form/TextBox"
+    "dijit/form/TextBox",
+    // css
+    "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css"
 ], function (
     declare,
     _WidgetBase,

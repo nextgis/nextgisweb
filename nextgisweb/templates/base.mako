@@ -7,13 +7,11 @@
 <head>
 
     <title>
-
         %if hasattr(self, 'title'):
             ${self.title()} :: 
         %endif
 
         ${request.env.core.settings['system.name']}
-
     </title>
 
     <link href="//cdnjs.cloudflare.com/ajax/libs/pure/0.4.2/pure-min.css"
@@ -29,9 +27,6 @@
         rel="stylesheet" type="text/css" media="screen"/>
  
     <link href="${request.route_url('amd_package', subpath='dijit/themes/claro/claro.css')}"
-        rel="stylesheet" media="screen"/>
-
-    <link href="${request.route_url('amd_package', subpath='cbtree/themes/claro/claro.css')}"
         rel="stylesheet" media="screen"/>
 
     <script type="text/javascript">
