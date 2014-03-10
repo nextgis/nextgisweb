@@ -1,3 +1,4 @@
+/* globals ngwConfig */
 define([
     "dojo/_base/declare",
     "ngw/modelWidget/Widget",
@@ -45,18 +46,17 @@ define([
             var result = [];
 
             for (var i = 0; i < this.value.length; i++) {
-                console.log(result);
                 if (!this.deleteCheckBoxes[i].get("checked")) {
                     result.push(this.value[i]);
-                };
-            };
+                }
+            }
 
             var value = this.wFiles.get("value");
             if (value) {
                 array.forEach(value.upload_meta, function(meta) {
                     result.push({upload: meta.id});
                 });
-            };
+            }
 
             return result;
         },
@@ -70,7 +70,8 @@ define([
                 style: "display: table-cell; width: 136px; height: 136px; background-color: #ddd; vertical-align: middle; text-align: center;"
             }, mainDiv);
 
-            imgSrc = application_url + '/layer/' + this.layer + '/feature/' + this.feature + '/photo/' + photoId;
+            var imgSrc = ngwConfig.applicationUrl + "/layer/" + this.layer +
+                "/feature/" + this.feature + "/photo/" + photoId;
 
             var link = domConstruct.create("a", {
                 href: imgSrc,
@@ -84,7 +85,7 @@ define([
 
             var tableContainer = new TableContainer({
                 cols: 1,
-                labelWidth: '100%'
+                labelWidth: "100%"
             });
             tableContainer.placeAt(mainDiv);
 
