@@ -237,6 +237,9 @@ define([
             if (this._urlParams.bbox) {
                 this._extent =  new openlayers.Bounds.fromString(this._urlParams.bbox);
             } else {
+                if (this.config.extent[3] > 82) { this.config.extent[3] = 82; }
+                if (this.config.extent[1] < -82) { this.config.extent[1] = -82; }
+
                 this._extent = (new openlayers.Bounds(this.config.extent))
                     .transform(this.lonlatProjection, this.displayProjection);
             }
@@ -562,9 +565,8 @@ define([
 
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
-                var pt = newVal.transform(widget.displayProjection, widget.lonlatProjection);
-                widget.centerLonNode.innerHTML = number.format(pt.lon, {places: 3});
-                widget.centerLatNode.innerHTML = number.format(pt.lat, {places: 3});
+                widget.centerLonNode.innerHTML = number.format(newVal.lon, {places: 3});
+                widget.centerLatNode.innerHTML = number.format(newVal.lat, {places: 3});
             });
 
             // Обновление подписи масштаба
