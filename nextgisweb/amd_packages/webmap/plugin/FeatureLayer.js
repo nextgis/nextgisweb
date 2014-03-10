@@ -1,4 +1,4 @@
-/*global define, ngwConfig*/
+/* global console */
 define([
     "dojo/_base/declare",
     "./_PluginBase",
@@ -19,6 +19,7 @@ define([
     "dijit/ToolbarSeparator",
     "dijit/popup",
     "put-selector/put",
+    "ngw/route",
     "feature_layer/FeatureStore",
     "./../tool/Identify"
 ], function (
@@ -41,6 +42,7 @@ define([
     ToolbarSeparator,
     popup,
     put,
+    route,
     FeatureStore,
     Identify
 ) {
@@ -75,9 +77,9 @@ define([
         zoomToFeature: function () {
             var display = this.plugin.display;
 
-            xhr.get(ngwConfig.applicationUrl + '/layer/' + this.layerId + '/store_api/' + this.get("selectedRow").id, {
-                handleAs: 'json',
-                headers: { 'X-Feature-Box': true }
+            xhr.get(route("feature_layer.store.item", {id: this.layerId, feature_id: this.get("selectedRow").id}), {
+                handleAs: "json",
+                headers: { "X-Feature-Box": true }
             }).then(
                 function data(featuredata) {
                     display.map.olMap.zoomToExtent(featuredata.box);

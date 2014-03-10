@@ -1,4 +1,4 @@
-/*global console, define, require, OpenLayers, ngwConfig*/
+/*global console, OpenLayers*/
 define([
     "dojo/_base/declare",
     "./Base",
@@ -18,6 +18,7 @@ define([
     "dijit/form/Select",
     "dijit/form/Button",
     "put-selector/put",
+    "ngw/route",
     "ngw/openlayers",
     "ngw/openlayers/Popup",
     "feature_layer/FieldsDisplayWidget",
@@ -45,6 +46,7 @@ define([
     Select,
     Button,
     put,
+    route,
     openlayers,
     Popup,
     FieldsDisplayWidget,
@@ -79,8 +81,8 @@ define([
                 var layerResponse = this.response[layerId];
                 var idx = 0;
                 array.forEach(layerResponse.features, function (feature) {
-                    var label = put("div[style='overflow: hidden; display: inline-block; text-align: left;'] $ span[style='color: gray'] $ <", feature.label, ' (' + this.layerLabels[layerId] + ')');
-                    domStyle.set(label, 'width', (this.popupSize[0] - 32) + 'px');
+                    var label = put("div[style=\"overflow: hidden; display: inline-block; text-align: left;\"] $ span[style=\"color: gray\"] $ <", feature.label, " (" + this.layerLabels[layerId] + ")");
+                    domStyle.set(label, "width", (this.popupSize[0] - 32) + "px");
                     this.selectOptions.push({
                         label: label.outerHTML,
                         value: layerId + "/" + idx
@@ -118,8 +120,8 @@ define([
             this._extWidgets = {};
 
             if (featureLayersettings.identify.attributes) {
-                this._extWidgets['feature_layer/FieldsDisplayWidget'] = new FieldsDisplayWidget({style: "padding: 2px;"});
-                this.container.addChild(this._extWidgets['feature_layer/FieldsDisplayWidget']);
+                this._extWidgets["feature_layer/FieldsDisplayWidget"] = new FieldsDisplayWidget({style: "padding: 2px;"});
+                this.container.addChild(this._extWidgets["feature_layer/FieldsDisplayWidget"]);
             }
 
             // создаем виждеты для всех расширений IFeatureLayer
@@ -147,15 +149,15 @@ define([
                 // Если не дождаться пока все панели будут добавлены,
                 // то новая кнопка будет в случайном месте.
                 widget.editButton = new Button({
-                    iconClass: 'dijitIconEdit',
+                    iconClass: "dijitIconEdit",
                     showLabel: true,
                     onClick: function () {
                         // TODO: Пока открываем в новом окне, сделать вкладку
                         var feature = widget._featureResponse(widget.select.get("value"));
-                        window.open(
-                            ngwConfig.applicationUrl + "/layer/" + feature.layerId
-                                + "/feature/" + feature.id + "/edit"
-                        );
+                        window.open(route("feature_layer.feature.edit", {
+                            id: feature.layerId,
+                            feature_id: feature.id
+                        }));
                     }
                 }).placeAt(widget.controller, "last");
             });
@@ -180,7 +182,7 @@ define([
         _displayFeature: function (feature) {
             var widget = this;
 
-            xhr.get(ngwConfig.applicationUrl + "/layer/" + feature.layerId + "/store_api/" + feature.id, {
+            xhr.get(route("feature_layer.store.item", {id: feature.layerId, feature_id: feature.id}), {
                 handleAs: "json",
                 headers: { "X-Feature-Ext": "*" }
             }).then(function (feature) {
@@ -189,7 +191,7 @@ define([
                     array.forEach(Object.keys(widget._extWidgets), function (ident) {
                         widget._extWidgets[ident].set("feature", feature);
 
-                        if (!selected && !widget._extWidgets[ident].get('disabled')) {
+                        if (!selected && !widget._extWidgets[ident].get("disabled")) {
                             widget.container.selectChild(widget._extWidgets[ident]);
                             selected = true;
                         }
@@ -213,7 +215,7 @@ define([
         // Высота popup,
         popupHeight: webmapSettings.popup_height,
 
-        constructor: function (options) {
+        constructor: function () {
             this.map = this.display.map;
 
             this.control = new Control({tool: this});
@@ -259,7 +261,7 @@ define([
                     }, this);
 
                     // XHR-запрос к сервису
-                    xhr.post(ngwConfig.applicationUrl + '/feature_layer/identify', {
+                    xhr.post(route("feature_layer.identify"), {
                         handleAs: "json",
                         data: json.stringify(request)
                     }).then(function (response) {
@@ -287,7 +289,7 @@ define([
                 this._popup.widget.destroyRecursive();
                 this.map.olMap.removePopup(this._popup);
                 this._popup = null;
-            };
+            }
         },
 
         _responsePopup: function (response, point, layerLabels) {
@@ -316,7 +318,7 @@ define([
             widget.resize();
 
             // Обработчик закрытия
-            on(this._popup._closeSpan, 'click', lang.hitch(this, function () {
+            on(this._popup._closeSpan, "click", lang.hitch(this, function () {
                 this._removePopup();
             }));
         }

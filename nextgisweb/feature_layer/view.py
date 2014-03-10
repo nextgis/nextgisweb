@@ -248,7 +248,7 @@ def setup_pyramid(comp, config):
         feature_count = 0
 
         for layer in layer_list:
-            if not layer.has_permission(request.user, 'data-read'):
+            if request.resource_permission(DataScope.read, layer):
                 result[layer.id] = dict(error="Forbidden")
 
             elif not IFeatureLayer.providedBy(layer):
@@ -279,8 +279,10 @@ def setup_pyramid(comp, config):
 
         return result
 
-    config.add_route('feature_layer.identify', '/feature_layer/identify') \
-        .add_view(identify, renderer='json')
+    config.add_route(
+        'feature_layer.identify', '/feature_layer/identify',
+        client=(),
+    ).add_view(identify, renderer='json')
 
     config.add_route(
         'feature_layer.feature.browse',
@@ -306,7 +308,8 @@ def setup_pyramid(comp, config):
     config.add_route(
         'feature_layer.store.item',
         '/resource/{id:\d+}/store/{feature_id:\d+}',
-        factory=resource_factory
+        factory=resource_factory,
+        client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer)
 
     config.add_route(

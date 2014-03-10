@@ -1,4 +1,4 @@
-/*global define, require, console, ngwConfig*/
+/* global console, ngwConfig */
 define([
     "dojo/_base/declare",
     "dijit/_WidgetBase",
@@ -23,10 +23,10 @@ define([
     "dojo/dom-style",
     "dojo/store/JsonRest",
     "dojo/request/xhr",
-    // дерево слоев
     "dojo/data/ItemFileWriteStore",
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
+    "ngw/route",
     // tools
     "./tool/Base",
     "./tool/Zoom",
@@ -72,6 +72,7 @@ define([
     ItemFileWriteStore,
     TreeStoreModel,
     Tree,
+    route,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -225,11 +226,11 @@ define([
             this.itemModel = new TreeStoreModel({
                 store: this.itemStore,
                 checkedAttr: "checked",
-                query: { type: 'root' }
+                query: { type: "root" }
             });
 
-            this.displayProjection = new openlayers.Projection('EPSG:3857');
-            this.lonlatProjection = new openlayers.Projection('EPSG:4326');
+            this.displayProjection = new openlayers.Projection("EPSG:3857");
+            this.lonlatProjection = new openlayers.Projection("EPSG:4326");
 
             this._extent = this._urlParams.bbox ? new openlayers.Bounds.fromString(this._urlParams.bbox) : new openlayers.Bounds(this.config.extent)
                 .transform(this.lonlatProjection, this.displayProjection);
@@ -257,7 +258,7 @@ define([
             this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
                 widget.set(
                     "itemConfig",
-                    widget._itemConfigById[widget.itemStore.getValue(newVal, 'id')]
+                    widget._itemConfigById[widget.itemStore.getValue(newVal, "id")]
                 );
                 widget.set("item", newVal);
             });
@@ -331,8 +332,8 @@ define([
                         queryOptions: { deep: true },
                         onItem: function (item) {
                             var node = widget.itemTree.getNodesByItem(item)[0],
-                                config = widget._itemConfigById[widget.itemStore.getValue(item, 'id')];
-                            if (node && config.type === 'group' && !config.expanded) {
+                                config = widget._itemConfigById[widget.itemStore.getValue(item, "id")];
+                            if (node && config.type === "group" && !config.expanded) {
                                 node.collapse();
                             }
                         }
@@ -352,18 +353,18 @@ define([
             // в том случае, если их больше одного, т.е. один таб не показываем
             declare.safeMixin(this.tabContainer, {
                 updateTabVisibility: function () {
-                    var currstate = domStyle.get(this.tablist.domNode, 'display') != 'none',
+                    var currstate = domStyle.get(this.tablist.domNode, "display") != "none",
                         newstate = this.getChildren().length > 1;
 
                     if (currstate && !newstate) {
                         // Скрываем панель с табами
-                        domStyle.set(this.tablist.domNode, 'display', 'none');
+                        domStyle.set(this.tablist.domNode, "display", "none");
                         this.resize();
                     } else if (!currstate && newstate) {
                         // Показываем панель с табами
-                        domStyle.set(this.tablist.domNode, 'display', 'block');
-                        this.resize();                        
-                    };
+                        domStyle.set(this.tablist.domNode, "display", "block");
+                        this.resize();
+                    }
                 },
 
                 addChild: function () {
@@ -407,22 +408,21 @@ define([
                     array.forEach(display.tools, function (t) {
                         if (t != tool && t.toolbarBtn.get("checked")) {
                             t.toolbarBtn.set("checked", false);
-                        };
+                        }
                     });
-                    tool.activate(); 
+                    tool.activate();
                 } else {
                     // При выключении остальные инструменты не трогаем
-                    tool.deactivate()
-                };
-
+                    tool.deactivate();
+                }
             });
         },
 
         loadBookmarks: function () {
             if (this.config.bookmarkLayerId) {
-                var store = new JsonRest({
-                    target: ngwConfig.applicationUrl + '/layer/' + this.config.bookmarkLayerId + '/store_api/'
-                });
+                var store = new JsonRest({ target: route("feature_layer.store", {
+                    id: this.config.bookmarkLayerId
+                })});
 
                 var display = this;
 
@@ -432,11 +432,13 @@ define([
                             display.bookmarkMenu.addChild(new MenuItem({
                                 label: f.label,
                                 onClick: function () {
-
                                     // Отдельно запрашиваем экстент объекта
-                                    xhr.get(ngwConfig.applicationUrl + '/layer/' + display.config.bookmarkLayerId + '/store_api/' + f.id, {
-                                        handleAs: 'json',
-                                        headers: { 'X-Feature-Box': true }
+                                    xhr.get(route("feature_layer.store", {
+                                        id: display.config.bookmarkLayerId,
+                                        feature_id: f.id
+                                    }), {
+                                        handleAs: "json",
+                                        headers: { "X-Feature-Box": true }
                                     }).then(
                                         function data(featuredata) {
                                             display.map.olMap.zoomToExtent(featuredata.box);
@@ -449,7 +451,7 @@ define([
                 );
             } else {
                 // Если слой с закладками не указан, то прячем кнопку
-                domStyle.set(this.bookmarkButton.domNode, 'display', 'none');
+                domStyle.set(this.bookmarkButton.domNode, "display", "none");
             }
         },
 
@@ -465,14 +467,14 @@ define([
                     label: item.label
                 };
 
-                if (copy.type === 'layer') {
+                if (copy.type === "layer") {
                     copy.layerId = item.layerId;
                     copy.styleId = item.styleId;
 
                     copy.visibility = null;
                     copy.checked = item.visibility;
 
-                } else if (copy.type === 'group' || copy.type === 'root') {
+                } else if (copy.type === "group" || copy.type === "root") {
                     copy.children = array.map(item.children, function (c) { return prepare_item(c); });
                 }
 
@@ -501,8 +503,8 @@ define([
                 onItem: function (item) {
                     widget._itemStorePrepareItem(item);
                 },
-                onComplete: function (items) {
-                    widget.itemStore.on("Set", function (item, attr, oldVal, newVal) {
+                onComplete: function () {
+                    widget.itemStore.on("Set", function (item, attr) {
                         // При изменении атрибута checked следим за изменениями
                         // в списке видимых слоев
                         if (attr === "checked") { widget._itemStoreVisibility(item); }
@@ -510,7 +512,7 @@ define([
 
                     widget._itemStoreDeferred.resolve();
                 },
-                onError: function (error) {
+                onError: function () {
                     widget._itemStoreDeferred.reject();
                 }
             });
@@ -548,11 +550,10 @@ define([
             this.map.olMap.addControl(this.navigationControl);
 
             // Масштабная линейка
-            this.map.olMap.addControl(new OpenLayers.Control.ScaleLine({bottomOutUnits: ''}));
+            this.map.olMap.addControl(new openlayers.Control.ScaleLine({bottomOutUnits: ""}));
 
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
-                var lonlat = newVal.transform(widget.displayProjection, widget.lonlatProjection);
                 widget.centerLonNode.innerHTML = number.format(newVal.lon, {places: 3});
                 widget.centerLatNode.innerHTML = number.format(newVal.lat, {places: 3});
             });
@@ -575,7 +576,7 @@ define([
 
                 layerOptions.isBaseLayer = true;
                 if (layerOptions.keyname === undefined) {
-                    layerOptions.keyname = 'basemap_' + idx;
+                    layerOptions.keyname = "basemap_" + idx;
                 }
 
                 try {
@@ -589,7 +590,7 @@ define([
             }, this);
 
             this.zoomToInitialExtentButton.on("click", function() {
-                widget._zoomToInitialExtent()
+                widget._zoomToInitialExtent();
             });
             
             this._zoomToInitialExtent();
@@ -623,7 +624,7 @@ define([
 
             // Инициализация слоев
             store.fetch({
-                query: {type: 'layer'},
+                query: {type: "layer"},
                 queryOptions: {deep: true},
                 onItem: function (item) {
                     widget._layerSetup(item);
@@ -743,7 +744,7 @@ define([
                 map: this._mapDeferred
             }).then(
                 lang.hitch(this, function (results) {
-                    var visibleLayers, queryStr, permalink;
+                    var visibleStyles, queryStr, permalink;
 
                     visibleStyles = array.map(
                         results.visbleItems,
