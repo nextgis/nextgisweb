@@ -6,10 +6,14 @@ define([
     "dojo/Deferred",
     "dojo/when",
     "dojo/on",
+    "dojo/aspect",
+    "dojo/request/xhr",
+    "dojo/dom-construct",
     "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "put-selector/put",
+    "ngw/route",
     "ngw-resource/serialize",
     "ngw-resource/ResourceStore",
     // resource
@@ -17,6 +21,7 @@ define([
     // template
     "dijit/form/ValidationTextBox",
     "dijit/form/ComboBox",
+    "dijit/layout/BorderContainer",
     "dojox/layout/TableContainer",
     "ngw/form/SpatialRefSysSelect",
     "ngw-resource/ResourceBox",
@@ -28,10 +33,14 @@ define([
     Deferred,
     when,
     on,
+    aspect,
+    xhr,
+    domConstruct,
     ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     put,
+    route,
     serialize,
     ResourceStore,
     template
@@ -44,18 +53,42 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            var fmtstore = this.wImgFormat.get("store");
-            array.forEach(this.imgformat, function (i) {
-                fmtstore.add({id: i, name: i});
-            }, this);
+            aspect.after(this.wConnection, "set", lang.hitch(this, function (name, value) {
+                if (name == "value") { this.loadCapCache(value); }
+            }), true);
+        },
 
-            var table = put(this.wLayerSelect.containerNode,
-                "table.data[width=100%] tr th $ < th $ <<", "Имя", "Описание");
+        loadCapCache: function (connection) {
+            var widget = this,
+                fmtStore = this.wImgFormat.store;
 
-            array.forEach(this.wmslayers, function (i) {
-                var node = put(table, "tr td $ < td a.action $ ", i.id, i.title);
-                on(node, "click", lang.hitch(this, this.toggleLayer, i.id));
-            }, this);
+            var render = function (capdata) {
+                fmtStore.query().forEach(function (i) { fmtStore.remove(i.id); });
+                array.forEach(capdata.formats, function (i) {
+                    widget.wImgFormat.get("store").add({id: i, name: i});
+                });
+
+                domConstruct.empty(widget.wLayerSelect.containerNode);
+
+                var table = put(widget.wLayerSelect.containerNode,
+                    "table.pure-table.pure-table-horizontal[width=100%]");
+
+                array.forEach(capdata.layers, function (i) {
+                    var node = put(table, "tr td $ < td a.action $ ", i.id, i.title);
+                    on(node, "click", lang.hitch(widget, widget.toggleLayer, i.id));
+                }, this);
+            };
+
+            if (connection !== null) {
+                this.wConnection.store.get(connection.id).then(function (data) {
+                    xhr.get(route("resource.child", {
+                        child_id: data.id,
+                        id: data.parent.id
+                    }), { handleAs: "json" }).then(function (data) {
+                        render(data.wmsclient_connection.capcache);
+                    }).then(null, console.error);
+                });
+            }
         },
         
         toggleLayer: function (id) {
@@ -70,11 +103,6 @@ define([
                 arr.splice(idx, 1);
             }
             this.wWMSLayers.set("value", arr.join(", "));
-        },
-
-        _setValueAttr: function (value) {
-            this.wWMSLayers.set("value", value.wmslayers.split(/,\s*/).join(", "));
-            this.wImgFormat.set("value", value.imgformat);
         },
 
         serializeInMixin: function (data) {

@@ -98,6 +98,9 @@ class Connection(Base, Resource):
 
         layers.sort(key=lambda i: i['index'])
 
+        for l in layers:
+            del l['index']
+
         data = OrderedDict((
             ('formats', service.getOperationByName('GetMap').formatOptions),
             ('layers', layers)))
@@ -118,6 +121,10 @@ class Connection(Base, Resource):
 
 
 class _capcache_attr(SP):
+
+    def getter(self, srlzr):
+        return srlzr.obj.capcache_dict \
+            if srlzr.obj.capcache() else None
 
     def setter(self, srlzr, value):
         if value == 'query':
@@ -140,7 +147,9 @@ class ConnectionSerializer(Serializer):
     url = SP(**_defaults)
     version = SP(**_defaults)
 
-    capcache = _capcache_attr(write=ConnectionScope.connect)
+    capcache = _capcache_attr(
+        read=ConnectionScope.connect,
+        write=ConnectionScope.connect)
 
 
 class RenderRequest(object):

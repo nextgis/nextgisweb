@@ -39,6 +39,10 @@ define([
         },
 
         _setValueAttr: function (value) {
+            // FIXME: Тут не вызывается this.inherited, соответственно не работает
+            // watch("value"), что очень неудобно. Однако если вызывать то тоже
+            // получается полная петрушка.
+
             if (this._value === value) { return; }
 
             this._value = value;
