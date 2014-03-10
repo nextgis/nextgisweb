@@ -234,9 +234,12 @@ define([
             this.displayProjection = new openlayers.Projection("EPSG:3857");
             this.lonlatProjection = new openlayers.Projection("EPSG:4326");
 
-            this._extent = this._urlParams.bbox ? new openlayers.Bounds.fromString(this._urlParams.bbox) : new openlayers.Bounds(this.config.extent)
-                .transform(this.lonlatProjection, this.displayProjection);
-
+            if (this._urlParams.bbox) {
+                this._extent =  new openlayers.Bounds.fromString(this._urlParams.bbox);
+            } else {
+                this._extent = (new openlayers.Bounds(this.config.extent))
+                    .transform(this.lonlatProjection, this.displayProjection);
+            }
 
             // Дерево элементов слоя
             this.itemTree = new Tree({
@@ -559,8 +562,9 @@ define([
 
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
-                widget.centerLonNode.innerHTML = number.format(newVal.lon, {places: 3});
-                widget.centerLatNode.innerHTML = number.format(newVal.lat, {places: 3});
+                var pt = newVal.transform(widget.displayProjection, widget.lonlatProjection);
+                widget.centerLonNode.innerHTML = number.format(pt.lon, {places: 3});
+                widget.centerLatNode.innerHTML = number.format(pt.lat, {places: 3});
             });
 
             // Обновление подписи масштаба
