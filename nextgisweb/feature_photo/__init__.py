@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
 
-from .models import Base, FeaturePhoto
+from .model import Base, FeaturePhoto
 
 __all__ = ['FeaturePhotoComponent', 'FeaturePhoto']
 
@@ -39,5 +39,5 @@ class FeaturePhotoComponent(Component):
                 return _Widget
 
     def setup_pyramid(self, config):
-        from . import views
-        views.setup_pyramid(self, config)
+        from . import view
+        view.setup_pyramid(self, config)

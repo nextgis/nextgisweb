@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
 
-from .models import Base, FeatureDescription
+from .model import Base, FeatureDescription
 
 __all__ = ['FeatureDescriptionComponent', 'FeatureDescription']
 
@@ -23,9 +23,10 @@ class FeatureDescriptionComponent(Component):
             comp = self
 
             def feature_data(self, feature):
-                DBSession = self.comp.env.core.DBSession
-                obj = DBSession.query(FeatureDescription) \
-                    .get((self.layer.id, feature.id))
+                obj = FeatureDescription.filter_by(
+                    layer_id=self.layer.id,
+                    feature_id=feature.id,
+                ).first()
 
                 if obj:
                     return obj.value
@@ -34,9 +35,8 @@ class FeatureDescriptionComponent(Component):
             def feature_widget(self):
                 class _Widget(self.comp.FeatureDescriptionEditWidget):
                     layer = self.layer
-
                 return _Widget
 
     def setup_pyramid(self, config):
-        from . import views
-        views.setup_pyramid(self, config)
+        from . import view
+        view.setup_pyramid(self, config)
