@@ -37,7 +37,7 @@ define([
             value.extent_bottom = this.wExtentBottom.get("value");
 
             var brid = this.wBookmarkResource.get("value");
-            value.bookmark_resource = ( brid !== null) ? { id: brid } : null;
+            value.bookmark_resource = ( brid !== null) ? { id: brid.id } : null;
         },
 
         deserializeInMixin: function (data) {
