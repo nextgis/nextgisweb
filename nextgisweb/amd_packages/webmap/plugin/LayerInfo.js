@@ -1,18 +1,15 @@
-/*global define, ngwConfig*/
 define([
     "dojo/_base/declare",
     "./_PluginBase",
     "dijit/layout/ContentPane",
     "dojo/dom-construct",
-    "dijit/MenuItem",
-    "feature_layer/FeatureGrid"
+    "dijit/MenuItem"
 ], function (
     declare,
     _PluginBase,
     ContentPane,
     domConstruct,
-    MenuItem,
-    FeatureGrid
+    MenuItem
 ) {
     var Pane = declare([ContentPane], {
         closable: true,
@@ -21,7 +18,7 @@ define([
         postCreate: function () {
             if (this.data.description) {
                 domConstruct.create("div", {
-                    style: 'max-width: 60em',
+                    style: "max-width: 60em",
                     innerHTML: this.data.description
                 }, this.domNode);
             }
@@ -30,7 +27,7 @@ define([
 
     return declare([_PluginBase], {
 
-        constructor: function (params) {
+        constructor: function () {
             var plugin = this;
 
             this.menuItem = new MenuItem({
@@ -58,7 +55,7 @@ define([
 
         openLayerInfo: function () {
             var item = this.display.dumpItem(),
-                data = this.display.get('itemConfig').plugin[this.identity];
+                data = this.display.get("itemConfig").plugin[this.identity];
 
             var pane = new Pane({
                 title: item.label,
