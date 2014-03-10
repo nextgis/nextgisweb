@@ -5,7 +5,7 @@ import urllib2
 import json
 from io import BytesIO
 from datetime import datetime
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict
 
 from zope.interface import implements
 from lxml import etree
@@ -34,11 +34,7 @@ from ..style import (
 
 Base = declarative_base()
 
-
 WMS_VERSIONS = ('1.1.1', )
-
-
-WMSLayerInfo = namedtuple('WMSLayerInfo', ('key', 'title', 'index'))
 
 
 class Connection(Base, Resource):
@@ -180,8 +176,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
     imgformat = sa.Column(sa.Unicode, nullable=False)
 
     connection = orm.relationship(
-        Resource,
-        foreign_keys=connection_id,
+        Resource, foreign_keys=connection_id,
         cascade=False, cascade_backrefs=False)
 
     @classmethod
@@ -193,17 +188,14 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     def render_image(self, extent, size):
         query = dict(
-            service="WMS",
-            version="1.1.0",
-            request="GetMap",
-            layers=self.wmslayers,
-            styles="",
+            service="WMS", request="GetMap",
+            version=self.connection.version,
+            layers=self.wmslayers, styles="",
+            format=self.imgformat,
             srs="EPSG:%d" % self.srs.id,
             bbox=','.join(map(str, extent)),
             width=size[0], height=size[1],
-            format=self.imgformat,
-            transparent="true"
-        )
+            transparent="true")
 
         url = self.connection.url + "?" + urllib.urlencode(query)
         return PIL.Image.open(BytesIO(urllib2.urlopen(url).read()))
