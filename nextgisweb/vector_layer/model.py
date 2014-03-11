@@ -13,12 +13,11 @@ from zope.interface import implements
 import osgeo
 from osgeo import ogr, osr
 
-import sqlalchemy as sa
 from sqlalchemy import event
 import geoalchemy as ga
-import sqlalchemy.orm as orm
 import sqlalchemy.sql as sql
 
+from .. import db
 from ..resource import (
     Resource,
     DataScope,
@@ -50,12 +49,12 @@ GEOM_TYPE_OGR = (ogr.wkbPoint, ogr.wkbLineString, ogr.wkbPolygon)
 GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
 
 FIELD_TYPE_DB = (
-    sa.Integer,
-    sa.Float,
-    sa.Unicode,
-    sa.Date,
-    sa.Time,
-    sa.DateTime)
+    db.Integer,
+    db.Float,
+    db.Unicode,
+    db.Date,
+    db.Time,
+    db.DateTime)
 
 FIELD_TYPE_OGR = (
     ogr.OFTInteger,
@@ -147,7 +146,7 @@ class TableInfo(object):
             ))
 
     def setup_metadata(self, tablename=None):
-        metadata = sa.MetaData(schema='vector_layer' if tablename else None)
+        metadata = db.MetaData(schema='vector_layer' if tablename else None)
         geom_fldtype = _GEOM_TYPE_2_DB[self.geometry_type]
 
         class model(object):
@@ -155,18 +154,18 @@ class TableInfo(object):
                 for k, v in kwargs.iteritems():
                     setattr(self, k, v)
 
-        table = sa.Table(
+        table = db.Table(
             tablename if tablename else ('lvd_' + str(uuid.uuid4().hex)),
-            metadata, sa.Column('id', sa.Integer, primary_key=True),
+            metadata, db.Column('id', db.Integer, primary_key=True),
             ga.GeometryExtensionColumn('geom', _GEOM_TYPE_2_GA[
                 geom_fldtype](2, srid=self.srs_id)),
-            *map(lambda (fld): sa.Column(fld.key, _FIELD_TYPE_2_DB[
+            *map(lambda (fld): db.Column(fld.key, _FIELD_TYPE_2_DB[
                 fld.datatype]), self.fields)
         )
 
         ga.GeometryDDL(table)
 
-        orm.mapper(model, table)
+        db.mapper(model, table)
 
         self.metadata = metadata
         self.table = table
@@ -222,8 +221,8 @@ class VectorLayerField(Base, LayerField):
     __tablename__ = LayerField.__tablename__ + '_' + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
-    fld_uuid = sa.Column(sa.Unicode(32), nullable=False)
+    id = db.Column(db.ForeignKey(LayerField.id), primary_key=True)
+    fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
 
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
@@ -234,9 +233,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     implements(IFeatureLayer, IWritableFeatureLayer)
 
-    tbl_uuid = sa.Column(sa.Unicode(32), nullable=False)
-    geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False),
-                              nullable=False)
+    tbl_uuid = db.Column(db.Unicode(32), nullable=False)
+    geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
 
     @classmethod
     def check_parent(self, parent):
@@ -298,12 +296,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 def _vector_layer_listeners(table):
     event.listen(
         table, "after_create",
-        sa.DDL("CREATE SCHEMA vector_layer")
+        db.DDL("CREATE SCHEMA vector_layer")
     )
 
     event.listen(
         table, "after_drop",
-        sa.DDL("DROP SCHEMA IF EXISTS vector_layer CASCADE")
+        db.DDL("DROP SCHEMA IF EXISTS vector_layer CASCADE")
     )
 
 _vector_layer_listeners(VectorLayer.__table__)
@@ -313,7 +311,7 @@ _vector_layer_listeners(VectorLayer.__table__)
 # SA не копирует подписки на события в этом случае.
 
 def tometadata(self, metadata):
-    result = sa.Table.tometadata(self, metadata)
+    result = db.Table.tometadata(self, metadata)
     _vector_layer_listeners(result)
     return result
 
@@ -528,10 +526,10 @@ class FeatureQueryBase(object):
 
         if self._box:
             columns.extend((
-                sa.func.st_xmin(sa.text('geom')).label('box_left'),
-                sa.func.st_ymin(sa.text('geom')).label('box_bottom'),
-                sa.func.st_xmax(sa.text('geom')).label('box_right'),
-                sa.func.st_ymax(sa.text('geom')).label('box_top'),
+                db.func.st_xmin(db.text('geom')).label('box_left'),
+                db.func.st_ymin(db.text('geom')).label('box_bottom'),
+                db.func.st_xmax(db.text('geom')).label('box_right'),
+                db.func.st_ymax(db.text('geom')).label('box_top'),
             ))
 
         selected_fields = []
@@ -554,7 +552,7 @@ class FeatureQueryBase(object):
                     l.append(table.columns[f.key].ilike(
                         '%' + self._like + '%'))
 
-            where.append(sa.or_(*l))
+            where.append(db.or_(*l))
 
         if self._intersects:
             geom = ga.WKTSpatialElement(
@@ -574,7 +572,7 @@ class FeatureQueryBase(object):
             def __iter__(self):
                 query = sql.select(
                     columns,
-                    whereclause=sa.and_(*where),
+                    whereclause=db.and_(*where),
                     limit=self._limit,
                     offset=self._offset,
                     order_by=table.columns.id,
@@ -598,8 +596,8 @@ class FeatureQueryBase(object):
             @property
             def total_count(self):
                 query = sql.select(
-                    [sa.func.count(table.columns.id), ],
-                    whereclause=sa.and_(*where)
+                    [db.func.count(table.columns.id), ],
+                    whereclause=db.and_(*where)
                 )
                 res = DBSession.connection().execute(query)
                 for row in res:

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
+from .. import db
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -21,16 +20,15 @@ Base = declarative_base()
 class LayerField(Base):
     __tablename__ = 'layer_field'
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    layer_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
-    cls = sa.Column(sa.Unicode, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    layer_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
+    cls = db.Column(db.Unicode, nullable=False)
 
-    idx = sa.Column(sa.Integer, nullable=False)
-    keyname = sa.Column(sa.Unicode, nullable=False)
-    datatype = sa.Column(sa.Enum(*FIELD_TYPE.enum, native_enum=False),
-                         nullable=False)
-    display_name = sa.Column(sa.Unicode, nullable=False)
-    grid_visibility = sa.Column(sa.Boolean, nullable=False, default=True)
+    idx = db.Column(db.Integer, nullable=False)
+    keyname = db.Column(db.Unicode, nullable=False)
+    datatype = db.Column(db.Enum(*FIELD_TYPE.enum), nullable=False)
+    display_name = db.Column(db.Unicode, nullable=False)
+    grid_visibility = db.Column(db.Boolean, nullable=False, default=True)
 
     identity = __tablename__
 
@@ -39,7 +37,7 @@ class LayerField(Base):
         'polymorphic_on': cls
     }
 
-    layer = orm.relationship(
+    layer = db.relationship(
         Resource,
         primaryjoin='Resource.id == LayerField.layer_id',
     )
@@ -64,7 +62,7 @@ class LayerFieldsMixin(object):
 
     @declared_attr
     def fields(cls):
-        return orm.relationship(
+        return db.relationship(
             cls.__field_class__,
             foreign_keys=cls.__field_class__.layer_id,
             order_by=cls.__field_class__.idx,
@@ -75,14 +73,14 @@ class LayerFieldsMixin(object):
 
     @declared_attr
     def feature_label_field_id(cls):
-        return sa.Column(
+        return db.Column(
             "feature_label_field_id",
-            sa.ForeignKey(cls.__field_class__.id)
+            db.ForeignKey(cls.__field_class__.id)
         )
 
     @declared_attr
     def feature_label_field(cls):
-        return orm.relationship(
+        return db.relationship(
             cls.__field_class__,
             uselist=False,
             primaryjoin="%s.id == %s.feature_label_field_id" % (

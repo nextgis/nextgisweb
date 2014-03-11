@@ -12,9 +12,7 @@ from lxml import etree
 import PIL
 from owslib.wms import WebMapService, WMSCapabilitiesReader
 
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
-
+from .. import db
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -43,13 +41,12 @@ class Connection(Base, Resource):
 
     __scope__ = ConnectionScope
 
-    url = sa.Column(sa.Unicode, nullable=False)
-    version = sa.Column(sa.Enum(*WMS_VERSIONS, native_enum=False),
-                        nullable=False)
+    url = db.Column(db.Unicode, nullable=False)
+    version = db.Column(db.Enum(*WMS_VERSIONS), nullable=False)
 
-    capcache_xml = sa.Column(sa.Unicode)
-    capcache_json = sa.Column(sa.Unicode)
-    capcache_tstamp = sa.Column(sa.DateTime)
+    capcache_xml = db.Column(db.Unicode)
+    capcache_json = db.Column(db.Unicode)
+    capcache_tstamp = db.Column(db.DateTime)
 
     @classmethod
     def check_parent(self, parent):
@@ -171,11 +168,11 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     implements(IRenderableStyle)
 
-    connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
-    wmslayers = sa.Column(sa.Unicode, nullable=False)
-    imgformat = sa.Column(sa.Unicode, nullable=False)
+    connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
+    wmslayers = db.Column(db.Unicode, nullable=False)
+    imgformat = db.Column(db.Unicode, nullable=False)
 
-    connection = orm.relationship(
+    connection = db.relationship(
         Resource, foreign_keys=connection_id,
         cascade=False, cascade_backrefs=False)
 

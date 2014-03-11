@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
+from sqlalchemy.engine.url import (
+    URL as EngineURL,
+    make_url as make_engine_url)
 from zope.interface import implements
 
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
-from sqlalchemy.engine.url import URL as EngineURL, make_url as make_engine_url
-from sqlalchemy import sql, func
-
+from .. import db
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -49,10 +48,10 @@ class PostgisConnection(Base, Resource):
 
     __scope__ = ConnectionScope
 
-    hostname = sa.Column(sa.Unicode, nullable=False)
-    database = sa.Column(sa.Unicode, nullable=False)
-    username = sa.Column(sa.Unicode, nullable=False)
-    password = sa.Column(sa.Unicode, nullable=False)
+    hostname = db.Column(db.Unicode, nullable=False)
+    database = db.Column(db.Unicode, nullable=False)
+    username = db.Column(db.Unicode, nullable=False)
+    password = db.Column(db.Unicode, nullable=False)
 
     @classmethod
     def check_parent(self, parent):
@@ -74,7 +73,7 @@ class PostgisConnection(Base, Resource):
             else:
                 del comp._engine[self.id]
 
-        engine = sa.create_engine(make_engine_url(EngineURL(
+        engine = db.create_engine(make_engine_url(EngineURL(
             'postgresql+psycopg2',
             host=self.hostname, database=self.database,
             username=self.username, password=self.password)))
@@ -104,8 +103,8 @@ class PostgisLayerField(Base, LayerField):
     __tablename__ = LayerField.__tablename__ + '_' + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
-    column_name = sa.Column(sa.Unicode, nullable=False)
+    id = db.Column(db.ForeignKey(LayerField.id), primary_key=True)
+    column_name = db.Column(db.Unicode, nullable=False)
 
 
 class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
@@ -116,18 +115,17 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     implements(IFeatureLayer)
 
-    connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
-    schema = sa.Column(sa.Unicode, default=u'public', nullable=False)
-    table = sa.Column(sa.Unicode, nullable=False)
-    column_id = sa.Column(sa.Unicode, nullable=False)
-    column_geom = sa.Column(sa.Unicode, nullable=False)
-    geometry_type = sa.Column(sa.Enum(*GEOM_TYPE.enum, native_enum=False),
-                              nullable=False)
-    geometry_srid = sa.Column(sa.Integer, nullable=False)
+    connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
+    schema = db.Column(db.Unicode, default=u'public', nullable=False)
+    table = db.Column(db.Unicode, nullable=False)
+    column_id = db.Column(db.Unicode, nullable=False)
+    column_geom = db.Column(db.Unicode, nullable=False)
+    geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
+    geometry_srid = db.Column(db.Integer, nullable=False)
 
     __field_class__ = PostgisLayerField
 
-    connection = orm.relationship(
+    connection = db.relationship(
         Resource,
         foreign_keys=connection_id,
         cascade=False, cascade_backrefs=False)
@@ -348,31 +346,31 @@ class FeatureQueryBase(object):
         self._intersects = geom
 
     def __call__(self):
-        tab = sql.table(self.layer.table)
+        tab = db.sql.table(self.layer.table)
         tab.schema = self.layer.schema
 
         tab.quote = True
         tab.quote_schema = True
 
-        select = sa.select([], tab)
+        select = db.select([], tab)
 
         def addcol(col):
             select.append_column(col)
 
-        idcol = sql.column(self.layer.column_id)
+        idcol = db.sql.column(self.layer.column_id)
         addcol(idcol.label('id'))
 
-        geomcol = sql.column(self.layer.column_geom)
-        geomexpr = sa.func.st_transform(geomcol, self.layer.srs_id)
+        geomcol = db.sql.column(self.layer.column_geom)
+        geomexpr = db.func.st_transform(geomcol, self.layer.srs_id)
 
         if self._geom:
-            addcol(sa.func.st_astext(geomexpr).label('geom'))
+            addcol(db.func.st_astext(geomexpr).label('geom'))
 
         fieldmap = []
         for idx, fld in enumerate(self.layer.fields, start=1):
             if not self._fields or fld.keyname in self._fields:
                 clabel = 'f%d' % idx
-                addcol(sql.column(fld.column_name).label(clabel))
+                addcol(db.sql.column(fld.column_name).label(clabel))
                 fieldmap.append((fld.keyname, clabel))
 
         if self._filter_by:
@@ -380,34 +378,34 @@ class FeatureQueryBase(object):
                 if k == 'id':
                     select.append_whereclause(idcol == v)
                 else:
-                    select.append_whereclause(sql.column(k) == v)
+                    select.append_whereclause(db.sql.column(k) == v)
 
         if self._like:
             l = []
             for fld in self.layer.fields:
                 if fld.datatype == FIELD_TYPE.STRING:
-                    l.append(sql.cast(
-                        sql.column(fld.column_name),
-                        sa.Unicode).ilike(
+                    l.append(db.sql.cast(
+                        db.sql.column(fld.column_name),
+                        db.Unicode).ilike(
                         '%' + self._like + '%'))
 
-            select.append_whereclause(sa.or_(*l))
+            select.append_whereclause(db.or_(*l))
 
         if self._intersects:
-            intgeom = sa.func.st_setsrid(sa.func.st_geomfromtext(
+            intgeom = db.func.st_setsrid(db.func.st_geomfromtext(
                 self._intersects.wkt), self._intersects.srid)
-            select.append_whereclause(sa.func.st_intersects(
-                geomcol, sa.func.st_transform(
+            select.append_whereclause(db.func.st_intersects(
+                geomcol, db.func.st_transform(
                     intgeom, self.layer.geometry_srid)))
 
         if self._box:
-            addcol(func.st_xmin(geomexpr).label('box_left'))
-            addcol(func.st_ymin(geomexpr).label('box_bottom'))
-            addcol(func.st_xmax(geomexpr).label('box_right'))
-            addcol(func.st_ymax(geomexpr).label('box_top'))
+            addcol(db.func.st_xmin(geomexpr).label('box_left'))
+            addcol(db.func.st_ymin(geomexpr).label('box_bottom'))
+            addcol(db.func.st_xmax(geomexpr).label('box_right'))
+            addcol(db.func.st_ymax(geomexpr).label('box_top'))
 
         gt = self.layer.geometry_type
-        select.append_whereclause(sa.func.geometrytype(sql.column(
+        select.append_whereclause(db.func.geometrytype(db.sql.column(
             self.layer.column_geom)).in_((gt, 'MULTI' + gt)))
 
         select.append_order_by(idcol)
@@ -455,8 +453,8 @@ class FeatureQueryBase(object):
                 conn = self.layer.connection.get_connection()
 
                 try:
-                    result = conn.execute(sa.select(
-                        [sql.text('COUNT(id)'), ],
+                    result = conn.execute(db.select(
+                        [db.sql.text('COUNT(id)'), ],
                         from_obj=select.alias('all')))
                     for row in result:
                         return row[0]

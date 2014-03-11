@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
-
+from .. import db
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -28,18 +26,18 @@ class WebMap(Base, Resource):
 
     __scope__ = WebMapScope
 
-    root_item_id = sa.Column(sa.ForeignKey('webmap_item.id'), nullable=False)
-    bookmark_resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
+    root_item_id = db.Column(db.ForeignKey('webmap_item.id'), nullable=False)
+    bookmark_resource_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
 
-    extent_left = sa.Column(sa.Float, default=-180)
-    extent_right = sa.Column(sa.Float, default=+180)
-    extent_bottom = sa.Column(sa.Float, default=-90)
-    extent_top = sa.Column(sa.Float, default=+90)
+    extent_left = db.Column(db.Float, default=-180)
+    extent_right = db.Column(db.Float, default=+180)
+    extent_bottom = db.Column(db.Float, default=-90)
+    extent_top = db.Column(db.Float, default=+90)
 
-    bookmark_resource = orm.relationship(
+    bookmark_resource = db.relationship(
         Resource, foreign_keys=bookmark_resource_id)
 
-    root_item = orm.relationship('WebMapItem', cascade='all')
+    root_item = db.relationship('WebMapItem', cascade='all')
 
     @classmethod
     def check_parent(self, parent):
@@ -74,31 +72,30 @@ class WebMap(Base, Resource):
 class WebMapItem(Base):
     __tablename__ = 'webmap_item'
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    parent_id = sa.Column(sa.Integer, sa.ForeignKey('webmap_item.id'))
-    item_type = sa.Column(sa.Enum('root', 'group', 'layer', native_enum=False),
-                          nullable=False)
-    position = sa.Column(sa.Integer, nullable=True)
-    display_name = sa.Column(sa.Unicode, nullable=True)
-    group_expanded = sa.Column(sa.Boolean, nullable=True)
-    layer_style_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
-    layer_enabled = sa.Column(sa.Boolean, nullable=True)
-    layer_transparency = sa.Column(sa.Float, nullable=True)
-    layer_min_scale_denom = sa.Column(sa.Float, nullable=True)
-    layer_max_scale_denom = sa.Column(sa.Float, nullable=True)
-    layer_adapter = sa.Column(sa.Unicode, nullable=True)
+    id = db.Column(db.Integer, primary_key=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('webmap_item.id'))
+    item_type = db.Column(db.Enum('root', 'group', 'layer'), nullable=False)
+    position = db.Column(db.Integer, nullable=True)
+    display_name = db.Column(db.Unicode, nullable=True)
+    group_expanded = db.Column(db.Boolean, nullable=True)
+    layer_style_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
+    layer_enabled = db.Column(db.Boolean, nullable=True)
+    layer_transparency = db.Column(db.Float, nullable=True)
+    layer_min_scale_denom = db.Column(db.Float, nullable=True)
+    layer_max_scale_denom = db.Column(db.Float, nullable=True)
+    layer_adapter = db.Column(db.Unicode, nullable=True)
 
-    parent = orm.relationship(
+    parent = db.relationship(
         'WebMapItem',
         remote_side=[id],
-        backref=orm.backref('children', cascade='all')
+        backref=db.backref('children', cascade='all')
     )
 
-    style = orm.relationship(
+    style = db.relationship(
         'Resource',
         # Временное решение, позволяющее при удалении стиля автоматически
         # удалять элементы веб-карты
-        backref=orm.backref('webmap_items', cascade='all')
+        backref=db.backref('webmap_items', cascade='all')
     )
 
     def to_dict(self):
