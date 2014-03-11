@@ -15,6 +15,10 @@ define([
     return declare("ngw.resource.Tree", [Tree], {
         showRoot: true,
 
+        // Отключаем множественное выделение по-умолчанию
+        dndParams: Tree.prototype.dndParams.concat(["singular"]),
+        singular: true,
+
         constructor: function (kwArgs) {
             declare.safeMixin(this, kwArgs);
 
