@@ -14,7 +14,7 @@ class VectorLayerBackup(BackupBase):
 
     def restore(self):
         conn = self.comp.env.core.DBSession.connection()
-        layer = self.comp.VectorLayer.filter_by(layer_id=self.key).one()
+        layer = VectorLayer.filter_by(id=self.key).one()
         tableinfo = TableInfo.from_layer(layer)
         tableinfo.setup_metadata(tablename=layer._tablename)
         tableinfo.metadata.create_all(conn)
@@ -35,5 +35,5 @@ class VectorLayerComponent(Component):
             yield i
 
         for l in VectorLayer.query():
-            yield VectorLayerBackup(self, l.layer_id)
+            yield VectorLayerBackup(self, l.id)
             yield TableBackup(self, 'vector_layer.' + l._tablename)
