@@ -2,6 +2,7 @@
 import json
 from types import MethodType
 
+import geojson
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
@@ -13,6 +14,7 @@ from ..resource import (
     Widget)
 from ..geometry import geom_from_wkt
 from ..object_widget import ObjectWidget, CompositeWidget
+from ..pyramidcomp import viewargs
 from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
@@ -103,6 +105,21 @@ def feature_edit(layer, request):
         obj=layer,
         subtitle=u"Объект: %s" % unicode(feature),
     )
+
+
+@viewargs(context=IFeatureLayer)
+def feature_geojson(request):
+    request.resource_permission(PD_READ)
+    
+    query = request.context.feature_query()
+    query.geom()
+    
+    content_disposition = ('attachment; filename=%d.geojson'
+                           % request.context.id)
+    return Response(
+        geojson.dumps(query(), ensure_ascii=False),
+        content_type=b'application/json',
+        content_disposition=content_disposition)
 
 
 def field_collection(request):
@@ -333,6 +350,12 @@ def setup_pyramid(comp, config):
         context=IFeatureLayer,
         renderer='model_widget.mako')
 
+    config.add_route(
+        'feature_layer.geojson',
+        '/resource/{id:\d+}/geojson/',
+        factory=resource_factory
+    ).add_view(feature_geojson)
+
     def client_settings(self, request):
         return dict(
             extensions=dict(
@@ -359,9 +382,13 @@ def setup_pyramid(comp, config):
                     'extra/feature-browse', u"Таблица объектов",
                     lambda args: args.request.route_url(
                         "feature_layer.feature.browse",
-                        id=args.obj.id
-                    )
-                )
+                        id=args.obj.id))
+
+                yield dm.Link(
+                    'extra/geojson', u"Данные GeoJSON",
+                    lambda args: args.request.route_url(
+                        "feature_layer.geojson",
+                        id=args.obj.id))
 
     Resource.__dynmenu__.add(LayerMenuExt())
 
