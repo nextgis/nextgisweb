@@ -110,10 +110,10 @@ def feature_edit(layer, request):
 @viewargs(context=IFeatureLayer)
 def feature_geojson(request):
     request.resource_permission(PD_READ)
-    
+
     query = request.context.feature_query()
     query.geom()
-    
+
     content_disposition = ('attachment; filename=%d.geojson'
                            % request.context.id)
     return Response(
@@ -378,14 +378,16 @@ def setup_pyramid(comp, config):
 
         def build(self, args):
             if IFeatureLayer.providedBy(args.obj):
+                yield dm.Label('feature_layer', u"Векторный слой")
+
                 yield dm.Link(
-                    'extra/feature-browse', u"Таблица объектов",
+                    'feature_layer/feature-browse', u"Таблица объектов",
                     lambda args: args.request.route_url(
                         "feature_layer.feature.browse",
                         id=args.obj.id))
 
                 yield dm.Link(
-                    'extra/geojson', u"Данные GeoJSON",
+                    'feature_layer/geojson', u"Данные GeoJSON",
                     lambda args: args.request.route_url(
                         "feature_layer.geojson",
                         id=args.obj.id))
