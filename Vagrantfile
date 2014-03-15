@@ -2,6 +2,8 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    config.vm.box = "hashicorp/precise32"
+
     config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
     config.vm.provision :shell do |shell|
@@ -12,13 +14,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             [ -f /etc/apt/sources.list.d/ubuntugis-ppa-*.list ] || apt-add-repository --yes ppa:ubuntugis/ppa && apt-get update -qq
 
             mkdir -p /etc/puppet/modules
-            [ -d /etc/puppet/modules/apt ] || puppet module install puppetlabs/apt
-            [ -d /etc/puppet/modules/python ] || puppet module install stankevich-python
             [ -d /etc/puppet/modules/postgresql ] || puppet module install puppetlabs-postgresql
         "
     end
 
-    config.vm.box = "hashicorp/precise64"
 
     config.vm.provision :puppet do |puppet|
         puppet.manifests_path = "."
@@ -27,5 +26,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             'puppet',
         ]
     end
+
+    config.vm.network "forwarded_port", guest: 5000, host: 5000
 
 end
