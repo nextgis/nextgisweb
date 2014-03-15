@@ -30,7 +30,7 @@ define nextgisweb::db ($password = "") {
         unless => "SELECT * FROM pg_tables WHERE tablename = 'spatial_ref_sys'",
         require => [
             Postgresql::Server::Db[$name],
-            Package['postgresql-9.1-postgis'],
+            Package["postgresql-${pgversion}-postgis"],
         ]
     }
 }
