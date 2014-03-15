@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import sys
 import os
 import codecs
@@ -14,10 +16,13 @@ from .command import Command
 def main(argv=sys.argv):
     argparser = ArgumentParser()
 
-    argparser.add_argument('--config', default=os.environ['NEXTGISWEB_CONFIG'] if 'NEXTGISWEB_CONFIG' in os.environ else None,
-                           help=u"Конфигурационный файл nextgisweb")
-    argparser.add_argument('--logging', default=os.environ['NEXTGISWEB_LOGGING'] if 'NEXTGISWEB_LOGGING' in os.environ else None,
-                           help=u"Конфигруционный файл библиотеки logging")
+    argparser.add_argument(
+        '--config', default=os.environ.get('NEXTGISWEB_CONFIG', None),
+        help="Конфигурационный файл nextgisweb")
+
+    argparser.add_argument(
+        '--logging', default=os.environ.get('NEXTGISWEB_LOGGING', None),
+        help="Конфигруционный файл библиотеки logging")
 
     config = None
     logging = None
@@ -60,10 +65,14 @@ def main(argv=sys.argv):
 
 def config(argv=sys.argv):
     argparser = ArgumentParser()
+
     argparser.add_argument(
         '--no-comments', dest='no_comments', action='store_true',
-        help=u"Не включать описание настроек в комментарии"
-    )
+        help="Не включать описание настроек в комментарии")
+
+    argparser.add_argument(
+        '--preseed', metavar='file.ini', default=None,
+        help="Файл с предопределенными настройками")
 
     args = argparser.parse_args(argv[1:])
 
@@ -73,17 +82,42 @@ def config(argv=sys.argv):
     from .component import Component, load_all
     load_all()
 
+    preseedcfg = ConfigParser()
+
+    if args.preseed:
+        with codecs.open(args.preseed, 'r', 'utf-8') as fd:
+            preseedcfg.readfp(fd)
+
     for comp in Component.registry:
         if hasattr(comp, 'settings_info'):
             print u'[%s]' % comp.identity
+            
             if not args.no_comments:
                 print u''
+
+            preseedsect = dict(
+                preseedcfg.items(comp.identity)
+                if preseedcfg.has_section(comp.identity)
+                else ())
+
+            preseedkeys = set()
+
             for s in comp.settings_info:
                 if not args.no_comments and 'desc' in s:
                     print u'# %s ' % s['desc']
-                if 'default' in s:
+
+                if s['key'] in preseedsect:
+                    print '%s = %s' % (s['key'], preseedsect[s['key']])
+                    preseedkeys.add(s['key'])
+
+                elif 'default' in s:
                     print '%s = %s' % (s['key'], s['default'])
-                else:
+
+                elif not args.no_comments:
                     print '# %s = ' % s['key']
+
+            for k, v in preseedsect.iteritems():
+                if k not in preseedkeys:
+                    print '%s = %s' % (k, v)
 
             print ''
