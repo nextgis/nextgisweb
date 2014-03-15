@@ -21,35 +21,8 @@
 
     $ virtualenv --no-site-packages env
 
-Два пакета, необходимых для работы системы, в автоматическом режиме не
-устанавливаются, поэтому их нужно установить вручную: GDAL и mapscript.
-
-Устанавливаем GDAL. Прежде всего необходимо проверить версию GDAL, установленную
-в системе:
-
-    $ gdalinfo --version
-
-А также определить директорию с заголовочными файлами GDAL:
-
-    $ locate include | grep gdal.h
-
-Устанавливаем GDAL необходимой версии (пример установки на сервере
-NextGIS):
-
-    $ env/bin/pip install --no-install GDAL==1.8.1
-    $ cd env/build/GDAL
-    $ env/bin/python setup.py build_ext --include-dirs="/usr/local/include/"
-    $ env/bin/pip install install --no-download GDAL
-
-В дистрибутивах на базе Debian заголовочные файлы вероятнее всего будут
-в директории `/usr/include/gdal/`.
-
-В случае, если будет сообщено о том, что файл cpl_port.h не найден, следует 
-устновить переменные окружения CPLUS_INCLUDE_PATH и C_INCLUDE_PATH,
-указывающие на директорию с заголовочными файлами gdal. Например:
-
-    $ export CPLUS_INCLUDE_PATH=/usr/include/gdal
-    $ export C_INCLUDE_PATH=/usr/include/gdal
+Один пакет, необходимый для работы системы, в автоматическом режиме не
+устанавливаются, поэтому его нужно установить вручную: mapscript.
 
 Устанавливаем mapscript. mapscript должен быть установлен в системе, для
 того чтобы обеспечить его функционал в виртуальном окружении, выполняем следующие
