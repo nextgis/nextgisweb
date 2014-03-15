@@ -370,9 +370,12 @@ def setup_pyramid(comp, config):
     _route('widget', 'widget', client=()).add_view(widget)
 
     # CRUD
-    _resource_route('create', '{id:\d+}/create').add_view(create)
-    _resource_route('update', '{id:\d+}/update').add_view(update)
-    _resource_route('delete', '{id:\d+}/delete').add_view(delete)
+    _resource_route('create', '{id:\d+}/create', client=('id', )) \
+        .add_view(create)
+    _resource_route('update', '{id:\d+}/update', client=('id', )) \
+        .add_view(update)
+    _resource_route('delete', '{id:\d+}/delete', client=('id', )) \
+        .add_view(delete)
 
     permalinker(Resource, 'resource.show')
 

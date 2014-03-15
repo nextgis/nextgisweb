@@ -78,7 +78,13 @@ define([
                 this.buttons.push(new Button({
                     label: "Создать",
                     iconClass: "dijitIconNewTask",
-                    onClick: lang.hitch(this, this.createObj)
+                    onClick: lang.hitch(this, function () { this.createObj(false); })
+                }).placeAt(this.btnContainer));
+
+                this.buttons.push(new Button({
+                    label: "Создать и изменить",
+                    iconClass: "dijitIconNewTask",
+                    onClick: lang.hitch(this, function () { this.createObj(true); })
                 }).placeAt(this.btnContainer));
 
             } else if (this.operation === "update") {
@@ -331,7 +337,7 @@ define([
             }
         },
 
-        createObj: function () {
+        createObj: function (edit) {
             this.lock();
 
             this.storeRequest({
@@ -339,7 +345,11 @@ define([
                 method: "POST"
             }).then(
                 /* callback */ lang.hitch(this, function (data) {
-                    window.location = route("resource.show", {id: data.id});
+                    if (edit) {
+                        window.location = route("resource.update",  {id: data.id});
+                    } else {
+                        window.location = route("resource.show", {id: data.id});
+                    }
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
             );
