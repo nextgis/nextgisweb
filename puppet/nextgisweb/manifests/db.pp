@@ -10,6 +10,7 @@ define nextgisweb::db ($password = "") {
 
     postgresql::server::db { $name:
         user => $name,
+        encoding => "UTF-8",
         password => postgresql_password($name, $password),
     }
 
