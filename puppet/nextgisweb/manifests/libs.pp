@@ -2,6 +2,10 @@
 # можно довольно просто вычислить через apt-get build-dep python-bar
 
 class nextgisweb::libs {
+
+    # GCC и компания нужны для сборки пакетов pip
+    package { "build-essential": ensure => installed }
+
     # Заголовочные файлы python нужны для сборки других пакетов
     package { "python-dev": ensure => installed }
 
