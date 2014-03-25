@@ -16,13 +16,14 @@ define([
 
         constructor: function (name, options) {
             options = lang.clone(options);
+            options.name = name;
 
             if (options.wrapDateLine === undefined) { options.wrapDateLine = true; }
 
             if (!options.key) { options.key = clientSettings.bing_apikey; }
             if (!options.key) { throw "API key required"; }
 
-            this.olArgs = [name, options];
+            this.olArgs = [options];
             this.inherited(arguments);
         }
     });
