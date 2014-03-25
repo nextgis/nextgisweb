@@ -1,10 +1,12 @@
 /*global define*/
 define([
     "dojo/_base/declare",
+    "dojo/_base/lang",
     "./_Base",
     "ngw/settings!webmap"
 ], function (
     declare,
+    lang,
     _Base,
     clientSettings
 ) {
@@ -13,12 +15,14 @@ define([
         olClassName: "OpenLayers.Layer.Bing",
 
         constructor: function (name, options) {
-            options.name = name;
+            options = lang.clone(options);
+
+            if (options.wrapDateLine === undefined) { options.wrapDateLine = true; }
 
             if (!options.key) { options.key = clientSettings.bing_apikey; }
             if (!options.key) { throw "API key required"; }
 
-            this.olArgs = [options];
+            this.olArgs = [name, options];
             this.inherited(arguments);
         }
     });
