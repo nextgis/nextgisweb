@@ -10,26 +10,27 @@
 
 Установить pip:
 
-   $ sudo apt-get install python-pip
+    $ sudo apt-get install python-pip
 
 Установить virtualenv: 
 
-   $ sudo pip install virtualenv
+    $ sudo pip install virtualenv
 
 Установить дополнительные инструменты: 
-   $ sudo apt-get install python-mapscript
-   $ sudo apt-get install git
-   $ sudo apt-get install libgdal-dev
-   $ sudo apt-get install python-dev
-   $ sudo apt-get install g++
-   $ apt-get install libxml2-dev libxslt1-dev
+
+    $ sudo apt-get install python-mapscript
+    $ sudo apt-get install git
+    $ sudo apt-get install libgdal-dev
+    $ sudo apt-get install python-dev
+    $ sudo apt-get install g++
+    $ apt-get install libxml2-dev libxslt1-dev
 
 Генерируем ключи для работы с GitHub:
 
-   $ cd ~/.ssh
-   $ ssh-keygen -t rsa -C "sim@gis-lab.info"
-   $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys)
-   $ cd ~
+    $ cd ~/.ssh
+    $ ssh-keygen -t rsa -C "your@email.com"
+    $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys)
+    $ cd ~
 
 ### Установка NextGIS Web
 
