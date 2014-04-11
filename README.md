@@ -6,9 +6,34 @@
 * БД PostgreSQL 9.1 с установленным в ней PostGIS 2.0, пользователь БД должен быть
   владельцем БД и таблиц `geometry_columns`, `georgaphy_columns`, `spatial_ref_sys`.
 
-### Установка пакета
+### Подготовка
 
-Создаем рабочую директорию `~/ngw`:
+Установить pip:
+
+   $ sudo apt-get install python-pip
+
+Установить virtualenv: 
+
+   $ sudo pip install virtualenv
+
+Установить дополнительные инструменты: 
+   $ sudo apt-get install python-mapscript
+   $ sudo apt-get install git
+   $ sudo apt-get install libgdal-dev
+   $ sudo apt-get install python-dev
+   $ sudo apt-get install g++
+   $ apt-get install libxml2-dev libxslt1-dev
+
+Генерируем ключи для работы с GitHub:
+
+   $ cd ~/.ssh
+   $ ssh-keygen -t rsa -C "sim@gis-lab.info"
+   $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys)
+   $ cd ~
+
+### Установка NextGIS Web
+
+Создаем рабочую папку `~/ngw`:
     
     $ mkdir ~/ngw
     $ cd ~/ngw
@@ -17,16 +42,13 @@
 
     $ git clone git@github.com:nextgis/nextgisweb.git
 
-Создаем виртуальное окружение virtualenv в директории `~/ngw/env`:
+Создаем виртуальное окружение virtualenv в папке `~/ngw/env` (папка создастся сама после выполнения команды):
 
     $ virtualenv --no-site-packages env
 
-Один пакет, необходимый для работы системы, в автоматическом режиме не
-устанавливаются, поэтому его нужно установить вручную: mapscript.
+Один пакет, необходимый для работы системы, в автоматическом режиме не устанавливается, поэтому его нужно установить вручную: mapscript.
 
-Устанавливаем mapscript. mapscript должен быть установлен в системе, для
-того чтобы обеспечить его функционал в виртуальном окружении, выполняем следующие
-шаги (пример установки на сервере NextGIS):
+Для того чтобы обеспечить его функционал mapscript в виртуальном окружении, выполняем следующие шаги:
 
     $ cp -r `python -c "import mapscript, os.path; print os.path.split(mapscript.__file__)[0]"` env/lib/python2.7/site-packages/mapscript.egg
     $ echo "./mapscript.egg" > env/lib/python2.7/site-packages/mapscript.pth
@@ -67,7 +89,6 @@
     host = 0.0.0.0
     port = 6543
 
-
 ### Инициализация БД
 
 Инициализация БД выполняется следующим образом:
@@ -79,9 +100,8 @@
 
     $ env/bin/nextgisweb --config config.ini initialize_db --drop
 
-
 ### Запуск веб-сервера pserve:
 
     $ env/bin/pserve development.ini
     
-Обновлённая версия руководства - в вики    
+Обновлённая версия руководства пользователя - в вики    
