@@ -32,7 +32,7 @@
     $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys)
     $ cd ~
 
-### Установка NextGIS Web
+### Подготовка к установке NextGIS Web
 
 Создаем рабочую папку `~/ngw`:
     
@@ -47,9 +47,13 @@
 
     $ virtualenv --no-site-packages env
 
-Устанавливаем пакет nextgisweb_mapserver. Как это сделать подробно рассказано [тут](https://github.com/nextgis/nextgisweb_mapserver).
+### Установка NextGIS Web MapServer
 
-Устанавливаем пакет в режиме разработки, при этом будут установлены все необходимые пакеты:
+Установка nextgisweb_mapserver подробно описана [тут](https://github.com/nextgis/nextgisweb_mapserver).
+
+### Установка NextGIS Web
+
+Устанавливаем пакет NextGIS Web в режиме разработки, при этом будут установлены все необходимые пакеты:
 
     $ env/bin/pip install -e ./nextgisweb
 
