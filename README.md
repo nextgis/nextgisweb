@@ -47,15 +47,16 @@
 
     $ virtualenv --no-site-packages env
 
-### Установка NextGIS Web MapServer
-
-Установка nextgisweb_mapserver подробно описана [тут](https://github.com/nextgis/nextgisweb_mapserver).
-
 ### Установка NextGIS Web
 
 Устанавливаем пакет NextGIS Web в режиме разработки, при этом будут установлены все необходимые пакеты:
 
     $ env/bin/pip install -e ./nextgisweb
+
+### Установка NextGIS Web MapServer
+
+Установка nextgisweb_mapserver подробно описана [тут](https://github.com/nextgis/nextgisweb_mapserver).
+
 
 ### Конфигурационный файл
 
