@@ -32,6 +32,10 @@
     $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys)
     $ cd ~
 
+Создаем пользователя который будет упомянут в качестве database.user в config.ini (см. далее):
+    $ sudo su postgres
+    $ create zuser
+
 ### Подготовка к установке NextGIS Web
 
 Создаем рабочую папку `~/ngw`:
