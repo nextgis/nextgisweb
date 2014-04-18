@@ -66,5 +66,5 @@ class FileStorageComponent(Component):
         return os.path.join(path, str(fileobj.uuid))
 
     settings_info = (
-        dict(key='path', desc=u"Директория для хранения файлов"),
+        dict(key='path', desc=u"Директория для хранения файлов (обязательно)"),
     )
