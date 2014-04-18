@@ -348,5 +348,5 @@ class PyramidComponent(Component):
         )
 
     settings_info = (
-        dict(key='secret', desc=u"Ключ, используемый для шифрования cookies"),
+        dict(key='secret', desc=u"Ключ, используемый для шифрования cookies (обязательно)"),
     )
