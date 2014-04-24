@@ -23,7 +23,7 @@
     $ sudo apt-get install libgdal-dev
     $ sudo apt-get install python-dev
     $ sudo apt-get install g++
-    $ apt-get install libxml2-dev libxslt1-dev
+    $ sudo apt-get install libxml2-dev libxslt1-dev
 
 Генерируем ключи для работы с GitHub:
 
