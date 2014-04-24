@@ -29,7 +29,7 @@
 
     $ cd ~/.ssh
     $ ssh-keygen -t rsa -C "your@email.com"
-    $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys)
+    $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys, https://github.com/settings/ssh)
     $ cd ~
 
 Создаем пользователя, который будет упомянут в качестве database.user в config.ini (см. далее):
