@@ -43,6 +43,9 @@ define([
             if (data.postgis_layer === undefined) { data.postgis_layer = {}; }
             var value = data.postgis_layer;
             value.srs = { id: this.srs.get("value") };
+            if (value.geometry_type === "") {
+                value.geometry_type = null;
+            }
         }
     });
 });
