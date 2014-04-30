@@ -279,9 +279,19 @@ define([
             var value = data.webmap.root_item;
             if (value === undefined) { return; }
 
-            array.forEach(value.children, function (i) {
-                this.itemStore.newItem(i, {parent: this.itemModel.root, attribute: "children"});
-            }, this);
+            var widget = this;
+
+            function traverse(item, parent) {
+                array.forEach(item.children, function(i) {
+                    var element = {};
+                    for (var key in i) {
+                        if (key !== "children") { element[key] = i[key]; }
+                    }
+                    var new_item = widget.itemStore.newItem(element, {parent: parent, attribute: "children"});
+                    if (i.children) { traverse(i, new_item); }
+                }, widget);
+            }
+            traverse(value, this.itemModel.root);
         }
     });
 });
