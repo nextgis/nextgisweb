@@ -8,6 +8,12 @@
 
 ### Подготовка
 
+Подключить репозиторий ubuntugis:
+
+    $ sudo apt-add-repository ppa:ubuntugis/ppa
+    $ sudo apt-get update
+    $ sudo apt-get upgrade
+
 Установить pip:
 
     $ sudo apt-get install python-pip
