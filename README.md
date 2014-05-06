@@ -33,17 +33,19 @@
     $ cd ~
 
 Создаем пользователя, который будет упомянут в качестве database.user в config.ini (см. далее):
+
     $ sudo su postgres
     $ createuser zadmin -P
     
 Создаем базы в которую будет развернут NGW, имя базы должно быть таким же как и database.name в config.ini (см. далее):
+
     $ createdb -U zadmin zapoved_ngw
     $ createdb -U zadmin -T template_postgis zapoved_ngw
 
 ### Подготовка к установке NextGIS Web
 
 Создаем рабочую папку `~/ngw`:
-    
+
     $ mkdir ~/ngw
     $ mkdir ~/ngw/data
     $ mkdir ~/ngw/data/upload
