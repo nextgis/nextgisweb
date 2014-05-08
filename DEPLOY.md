@@ -1,6 +1,11 @@
 uWSGI
 =====
 
+```
+user@ubuntu:~/ngw$ source env/bin/activate
+(env)user@ubuntu:~/ngw$ pip install uwsgi
+```
+
 К существующему конфигурационном ini-файлу paste добавляем секцию `uwsgi`
 
 ```
