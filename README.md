@@ -126,3 +126,8 @@
     $ env/bin/pserve development.ini
     
 В промышленной эксплуатации нужно использовать не pserve, а uWSGI. Далее смотри [DEPLOY.md](https://github.com/nextgis/nextgisweb/blob/2/DEPLOY.md)
+
+### Пароль по умолчанию
+
+administrator/admin
+
