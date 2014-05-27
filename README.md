@@ -151,7 +151,7 @@ RGB - включить.
 
 Выполните gdalwarp на клиентской машине
 
-    $ C:\NextGIS_QGIS\bin\gdalwarp.exe --config GDAL_DATA "C:\NextGIS_QGIS\share\gdal" -t_srs EPSG:3857 -multi -dstalpha -dstnodata none -wo "UNIFIED_SRC_NODATA=YES" -co COMPRESS=JPEG  c:\temp\ast_20000710_023050_mul29.tif c:\temp\rgba.tif
+    $ C:\NextGIS_QGIS\bin\gdalwarp.exe --config GDAL_DATA "C:\NextGIS_QGIS\share\gdal" -t_srs EPSG:3857 -multi -dstalpha -dstnodata none -wo "UNIFIED_SRC_NODATA=YES" c:\temp\ast_20000710_023050_mul29.tif c:\temp\rgba.tif
     
 Если у вас не находится gcs.csv, то включите в комманду ключ с сылкой на каталог QGIS.
 
