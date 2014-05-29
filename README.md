@@ -125,6 +125,13 @@
 
     $ env/bin/pserve development.ini
     
+Автозапуск
+    
+    $ sudo nano /etc/rc.local
+
+    /home/zadmin/ngw/env/bin/pserve /home/zadmin/ngw/production.ini
+
+    
 В промышленной эксплуатации нужно использовать не pserve, а uWSGI. Далее смотри [DEPLOY.md](https://github.com/nextgis/nextgisweb/blob/2/DEPLOY.md)
 
 ### Пароль по умолчанию
