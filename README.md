@@ -140,6 +140,9 @@
 administrator/admin
 
 
+     ault.py:471: SAWarning: Unicode type received non-unicode bind param value.
+     processors[key](compiled_params[key]) - ошибкой не считается
+ 
 ### Подготовка растров с прозрачностью
 Откройте растр в ArcMap.
 
