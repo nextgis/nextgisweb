@@ -55,6 +55,7 @@
     $ mkdir ~/ngw/data
     $ mkdir ~/ngw/data/upload
     $ mkdir ~/ngw/backup   
+    $ mkdir ~/ngw/data_storage
     $ cd ~/ngw
 
 Клонируем репозиторий:
