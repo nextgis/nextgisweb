@@ -8,7 +8,7 @@
 
 ### Подготовка
 
-Подключить репозиторий ubuntugis:
+Подключить репозиторий ubuntugis ([поддерживаемые дистрибутивы](http://trac.osgeo.org/ubuntugis/wiki/SupportedDistributions)):
 
     $ sudo apt-add-repository ppa:ubuntugis/ppa
     $ sudo apt-get update
