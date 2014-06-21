@@ -25,7 +25,11 @@
     $ sudo su postgres -c "createdb -O ngw_admin --encoding=UTF8 db_ngw"
     $ sudo gedit /etc/postgresql/9.1/main/pg_hba.conf
 
-Отредактируем соответствующую строку и приведём её к виду: `local   all   all   md5`
+Отредактируем строку `local   all   all   peer` и приведём её к виду: `local   all   all   md5`
+
+Не забудьте перезапустить сервис базы:
+
+    $ sudo service postgresql restart
 
 Установить PostGIS:
 
@@ -41,6 +45,10 @@
     
   После этих операций будут созданы БД PostgreSQL с установленным в ней PostGIS и пользователь БД, который будет
   владельцем БД и таблиц `geometry_columns`, `georgaphy_columns`, `spatial_ref_sys`.
+
+Убедитесь, что функции PostGIS появились в базе:
+
+    $ psql -d db_ngw -U ngw_admin -c "SELECT PostGIS_Full_Version();"
 
 ### Подготовка базового ПО
 
