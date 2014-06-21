@@ -35,6 +35,9 @@
 
     $ sudo apt-get install postgresql-9.1-postgis-2.0
     $ sudo su - postgres -c "psql -d db_ngw -c 'CREATE EXTENSION postgis;'"
+    $ sudo su - postgres -c "psql -d db_ngw -c 'ALTER TABLE geometry_columns OWNER TO ngw_admin'"
+    $ sudo su - postgres -c "psql -d db_ngw -c 'ALTER TABLE spatial_ref_sys OWNER TO ngw_admin'"
+    $ sudo su - postgres -c "psql -d db_ngw -c 'ALTER TABLE geography_columns OWNER TO ngw_admin'"
     
   После этих операций будут созданы БД PostgreSQL с установленным в ней PostGIS и пользователь БД, который будет
   владельцем БД и таблиц `geometry_columns`, `georgaphy_columns`, `spatial_ref_sys`.
