@@ -1,9 +1,8 @@
 ## Установка
 
-Для установки системы необходимы:
+Для установки системы необходим Python 2.7:
 
-* Python 2.7 и пакет virtualenv
-* БД PostgreSQL 9.1 с установленным в ней PostGIS 2.0, пользователь БД должен быть
+* БД PostgreSQL 9.1 и выше с установленным в ней PostGIS 2.0, пользователь БД должен быть
   владельцем БД и таблиц `geometry_columns`, `georgaphy_columns`, `spatial_ref_sys`.
 
 ### Подготовка
@@ -13,6 +12,33 @@
     $ sudo apt-add-repository ppa:ubuntugis/ppa
     $ sudo apt-get update
     $ sudo apt-get upgrade
+
+Установить PostgreSQL:
+
+    $ sudo apt-get install postgresql
+
+Создаем пользователя, который будет упомянут в качестве database.user в config.ini (см. далее):
+
+    $ sudo su postgres -c "createuser ngw_admin -P -e"
+
+  после ввода пароля три раза говорим 'n'.
+
+Создаем базу в которую будет развернут NGW, имя базы должно быть таким же как и database.name в config.ini (см. далее):
+
+    $ sudo su postgres -c "createdb -O ngw_admin --encoding=UTF8 db_ngw"
+    $ sudo gedit /etc/postgresql/9.1/main/pg_hba.conf
+
+Отредактируем соответствующую строку и приведём её к виду: 
+    $ local   all   all   md5
+
+Установить PostGIS:
+
+    $ sudo apt-cache search postgis
+    
+В полученном списке найдите пакет подходящий для вашей версии PostgreSQL, его имя должно иметь вид postgresql-{version}-postgis-{version} и установите его: 
+
+    $ sudo apt-get install postgresql-9.1-postgis-2.0
+    $ sudo su - postgres -c "psql -d db_ngw -c 'CREATE EXTENSION postgis;'"
 
 Установить pip:
 
@@ -38,15 +64,7 @@
     $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys, https://github.com/settings/ssh)
     $ cd ~
 
-Создаем пользователя, который будет упомянут в качестве database.user в config.ini (см. далее):
-
-    $ sudo su postgres
-    $ createuser zadmin -P
     
-Создаем базу в которую будет развернут NGW, имя базы должно быть таким же как и database.name в config.ini (см. далее):
-
-    $ createdb -U zadmin -T template_postgis zapoved_ngw
-
 ### Подготовка к установке NextGIS Web
 
 Создаем рабочую папку `~/ngw`:
