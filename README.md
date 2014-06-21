@@ -2,7 +2,7 @@
 
 Для установки системы необходим Python 2.7:
 
-### Подготовка
+### Подготовка базы данных
 
 Подключить репозиторий ubuntugis ([поддерживаемые дистрибутивы](http://trac.osgeo.org/ubuntugis/wiki/SupportedDistributions)):
 
@@ -25,8 +25,7 @@
     $ sudo su postgres -c "createdb -O ngw_admin --encoding=UTF8 db_ngw"
     $ sudo gedit /etc/postgresql/9.1/main/pg_hba.conf
 
-Отредактируем соответствующую строку и приведём её к виду: 
-    $ local   all   all   md5
+Отредактируем соответствующую строку и приведём её к виду: `local   all   all   md5`
 
 Установить PostGIS:
 
@@ -39,6 +38,8 @@
     
   После этих операций будут созданы БД PostgreSQL с установленным в ней PostGIS и пользователь БД, который будет
   владельцем БД и таблиц `geometry_columns`, `georgaphy_columns`, `spatial_ref_sys`.
+
+### Подготовка базового ПО
 
 Установить pip:
 
