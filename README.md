@@ -64,11 +64,11 @@
 
     $ sudo apt-get install python-mapscript git libgdal-dev python-dev g++ libxml2-dev libxslt1-dev
 
-Генерируем ключи для работы с GitHub:
+Генерируем ключи для работы с GitHub (копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys, https://github.com/settings/ssh):
 
     $ cd ~/.ssh
     $ ssh-keygen -t rsa -C "your@email.com"
-    $ cat id_rsa.pub #(копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys, https://github.com/settings/ssh)
+    $ cat id_rsa.pub
     $ cd ~
 
     
