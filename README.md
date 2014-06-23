@@ -66,6 +66,7 @@
 
 Генерируем ключи для работы с GitHub (копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys, https://github.com/settings/ssh):
 
+    $ mkdir ~/.ssh
     $ cd ~/.ssh
     $ ssh-keygen -t rsa -C "your@email.com"
     $ cat id_rsa.pub
