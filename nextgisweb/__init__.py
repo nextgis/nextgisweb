@@ -39,6 +39,7 @@ def pkginfo():
         'raster_style',
         'wmsclient',
         'wmsserver',
+        'wfsserver',
         'file_upload',
     )
 
@@ -94,6 +95,7 @@ def amd_packages():
         ('ngw-postgis', 'nextgisweb:postgis/amd/ngw-postgis'),
         ('ngw-wmsclient', 'nextgisweb:wmsclient/amd/ngw-wmsclient'),
         ('ngw-wmsserver', 'nextgisweb:wmsserver/amd/ngw-wmsserver'),
+        ('ngw-wfsserver', 'nextgisweb:wfsserver/amd/ngw-wfsserver'),
         ('ngw-vector-layer', 'nextgisweb:vector_layer/amd/ngw-vector-layer'),
         ('ngw-raster-layer', 'nextgisweb:raster_layer/amd/ngw-raster-layer'),
         ('ngw-webmap', 'nextgisweb:webmap/amd/ngw-webmap'),
