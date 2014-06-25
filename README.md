@@ -66,6 +66,7 @@
 
 Генерируем ключи для работы с GitHub (копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys, https://github.com/settings/ssh):
 
+    $ mkdir ~/.ssh
     $ cd ~/.ssh
     $ ssh-keygen -t rsa -C "your@email.com"
     $ cat id_rsa.pub
@@ -197,7 +198,9 @@ RGB - включить.
 
     --config GDAL_DATA "C:\NextGIS_QGIS\share\gdal"    
 gdalwarp не может перезаписывать конечный файл, даже с ключом --overwrite, и сыплет странными ошибками "JPEGLib:Bogus input colorspace WriteEncodedTile/Strip() failed. ". В таком случае удалите конечный файл.
+
 На этом этапе у вас получится растр с четыремя каналами. Вы можете загрузить его в NextGIS WEB, и у него будет правильно работать прозрачность. 
+
 Если будете добавлять полученный слой в QGIS, то Свойства слоя-Прозрачность-No Data Value - выключить.
 
 ## Добавление нового компонента
