@@ -117,7 +117,11 @@
 Необходимо указывать абсолютные пути к папкам, %(here)s на данный момент не действует.
 
 Так же для работы команд pserve или pshell потребуется конфигурационный файл paster, 
-например `development.ini`. Его можно создать в любом тектовом редакторе:
+например `development.ini`. 
+
+    $ gedit development.ini
+
+Содержание:
 
     [app:main]
     use = egg:nextgisweb
@@ -163,11 +167,15 @@
     
 В промышленной эксплуатации нужно использовать не pserve, а uWSGI. Далее смотри [DEPLOY.md](https://github.com/nextgis/nextgisweb/blob/2/DEPLOY.md)
 
-### Пароль по умолчанию
+### Имя и пароль по умолчанию
 
-administrator/admin
+Имя: administrator
+Пароль: admin
 
+## Ошибки и предупреждения
+
+Несущественное предупреждение:
 
      ault.py:471: SAWarning: Unicode type received non-unicode bind param value.
-     processors[key](compiled_params[key]) - ошибкой не считается
+     processors[key](compiled_params[key])
  
