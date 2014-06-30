@@ -241,13 +241,18 @@ class _parent_attr(SRR):
         return True
 
     def setter(self, srlzr, value):
+        oldval = srlzr.obj.parent
         super(_parent_attr, self).setter(srlzr, value)
-        ref = srlzr.obj.parent
 
-        if not ref.has_permission(ResourceScope.manage_children, srlzr.user):
+        if oldval == srlzr.obj.parent:
+            return
+
+        if srlzr.obj.parent is None or not srlzr.obj.parent.has_permission(
+            ResourceScope.manage_children, srlzr.user
+        ):
             raise Forbidden()
 
-        if not srlzr.obj.check_parent(ref):
+        if not srlzr.obj.check_parent(srlzr.obj.parent):
             raise ResourceError("Parentship error")
 
         # TODO: check_child
@@ -260,13 +265,17 @@ class _perms_attr(SP):
             srlzr.obj.acl.remove(r)
 
         for itm in value:
-            srlzr.obj.acl.append(ResourceACLRule(
-                principal_id=itm['principal']['id'],
+            rule = ResourceACLRule(
                 identity=itm['identity'],
                 scope=itm['scope'],
                 permission=itm['permission'],
                 propagate=itm['propagate'],
-                action=itm['action']))
+                action=itm['action'])
+            
+            rule.principal = Principal.filter_by(
+                id=itm['principal']['id']).one()
+
+            srlzr.obj.acl.append(rule)
 
     def getter(self, srlzr):
         result = []
