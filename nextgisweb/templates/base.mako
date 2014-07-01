@@ -14,7 +14,7 @@
         ${request.env.core.settings['system.name']}
     </title>
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/pure/0.4.2/pure-min.css"
+    <link href="${request.static_url('nextgisweb:static/css/pure-0.4.2-min.css')}"
         rel="stylesheet" type="text/css"/>
 
     <link href="${request.static_url('nextgisweb:static/css/layout.css')}"
