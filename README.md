@@ -184,3 +184,6 @@
      ault.py:471: SAWarning: Unicode type received non-unicode bind param value.
      processors[key](compiled_params[key])
  
+### Фичи
+
+На данный момент при добавлении двух слоёв с одинаковым названием возникает ошибка.
