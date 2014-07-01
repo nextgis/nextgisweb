@@ -70,4 +70,4 @@ table.data {}
 table.data tr th { background-color: #eee; font-weight: bold; }
 table.data tr th, table.data tr td { padding: 0.2ex 0.5ex; }
 
-a.action {text-decoration: none; border-bottom: 1px dashed blue; }
+a.action {text-decoration: none; border-bottom: 1px dashed blue; cursor: pointer; }
