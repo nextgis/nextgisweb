@@ -50,13 +50,13 @@ class MarkerLibraryComponent(Component):
                 ).persist()
 
             for fn in resource_listdir(package, path + '/' + catname):
-                if not fn.endswith('.svg'):
+                if not fn.endswith(('.svg', '.png')):
                     continue
 
                 if resource_isdir(package, path + '/' + catname + '/' + fn):
                     continue
 
-                mkeyname = re.sub(r'\.svg$', '', fn)
+                mkeyname = re.sub(r'\.svg$|\.png$', '', fn)
 
                 try:
                     marker = Marker.filter_by(keyname=mkeyname).one()
