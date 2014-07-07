@@ -1,3 +1,5 @@
+Эта инструкция проверена и работает в Ubuntu Server 13.10, Ubuntu Server 12.04 LTS, Ubuntu Desktop 13.04
+
 ## Установка
 
 Для установки системы необходим Python 2.7:
