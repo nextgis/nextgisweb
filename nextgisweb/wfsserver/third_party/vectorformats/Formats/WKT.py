@@ -78,7 +78,7 @@ def to_wkt (geom):
 
     elif geom["type"] == "MultiPoint":
         pts = ",".join(coords_to_wkt((ring,)) for ring in coords)
-        return "MUTLIPOINT(%s)" % str(pts)
+        return "MULTIPOINT(%s)" % str(pts)
 
     elif geom["type"] == "MultiLineString":
         pts = ",".join( "(" +  coords_to_wkt(ring) + ")" for ring in coords  )
