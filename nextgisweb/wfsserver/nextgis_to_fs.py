@@ -16,20 +16,22 @@ class NextgiswebDatasource(DataSource):
     '''Class to convert nextgislayer to featureserver datasource
     '''
 
-    def __init__(self, name,  attribute_cols = '*', **args):
-        DataSource.__init__(self, name, **args)
+    def __init__(self, name,  **args):
+        DataSource.__init__(self, name, attribute_cols = '*', **args)
         self.layer          = args["layer"]
-        self.attribute_cols = attribute_cols
+        self.query = self.layer.feature_query()
+        if 'attribute_cols' in args:
+            self.attribute_cols = args['attribute_cols']
+        else:
+            self.set_attribute_cols(self.query)
         self.geom_col = u'none'
 
     # FeatureServer.DataSource
     def select (self, params):
-        print 'params=', params
-        query = self.layer.feature_query()
-        query.filter_by()
+        self.query.filter_by()
         # query.filter_by(OSM_ID=2379362827)
-        query.geom()
-        result = query()
+        self.query.geom()
+        result = self.query()
 
         features = []
         for row in result:
@@ -46,10 +48,15 @@ class NextgiswebDatasource(DataSource):
         length = ''
         try:
             type = self.layer.field_by_keyname(attribute)
+            type = type.keyname
         except KeyError: # the attribute can be=='*', that causes KeyError
             type = 'string'
 
         return (type, length)
+
+    def set_attribute_cols(self, query):
+        columns = [f.keyname for f in query.layer.fields]
+        self.attribute_cols = ','.join(columns)
 
 
 
