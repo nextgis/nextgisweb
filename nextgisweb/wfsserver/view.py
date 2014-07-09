@@ -9,6 +9,8 @@ from .model import Service
 from .third_party.FeatureServer.Server import Server
 from .third_party.FeatureServer.DataSource.PostGIS import PostGIS
 
+from nextgis_to_fs import NextgiswebDatasource
+
 
 NS_XLINK = 'http://www.w3.org/1999/xlink'
 
@@ -32,13 +34,16 @@ def handler(obj, request):
         'srsname': request.params.get('SRSNAME'),
         'version': request.params.get('VERSION')
     }
-    # None values can cause an parsing errors in featureserver. So delete 'Nones':
+    # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key:params[key] for key in params if params[key] is not None}
 
     sourcename = 'highway_line'
-    ds = PostGIS(sourcename, srid = 4326, srid_out = 4326, fid = "ogc_fid", geometry = "geom", layer='highway_line', dsn='host=localhost dbname=osm user=osm port=5432')
+    ds = NextgiswebDatasource(sourcename, layer=obj.layers[0].resource)
+
     server = Server({sourcename: ds})
-    result = server.dispatchRequest(base_path='http://0.0.0.0:6543/resources/8/wfs', path_info='/'+sourcename, params=params)
+    base_path = 'http://0.0.0.0:6543/resources/10/wfs'  # Just a stub
+    result = server.dispatchRequest(base_path=base_path,
+                                    path_info='/'+sourcename, params=params)
 
     if req.lower() in ['getcapabilities', 'describefeaturetype']:
         content_type, resxml = result
