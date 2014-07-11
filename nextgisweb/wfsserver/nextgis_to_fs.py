@@ -17,8 +17,8 @@ class NextgiswebDatasource(DataSource):
     '''
 
     def __init__(self, name,  **args):
-        DataSource.__init__(self, name, attribute_cols = '*', **args)
-        self.layer          = args["layer"]
+        DataSource.__init__(self, name, **args)
+        self.layer = args["layer"]
         self.query = self.layer.feature_query()
         if 'attribute_cols' in args:
             self.attribute_cols = args['attribute_cols']

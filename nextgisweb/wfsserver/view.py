@@ -32,7 +32,10 @@ def handler(obj, request):
         'request': req,
         'typename': request.params.get('TYPENAME'),
         'srsname': request.params.get('SRSNAME'),
-        'version': request.params.get('VERSION')
+        'version': request.params.get('VERSION'),
+        'maxfeatures': request.params.get('MAXFEATURES'),
+        'startfeature': request.params.get('STARTFEATURE'),
+        'filter': request.params.get('FILTER'),
     }
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key:params[key] for key in params if params[key] is not None}
