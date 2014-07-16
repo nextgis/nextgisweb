@@ -11,7 +11,7 @@ define([
                 url: route("style.image", {id: item.styleId}),
                 params: {},
                 singleTile: true,
-                ratio: 1.25,
+                ratio: 1,
                 isBaseLayer: false,
                 type: "png",
                 visibility: item.visibility,
@@ -21,7 +21,8 @@ define([
             });
 
             layer.olLayer.getURL = function (bounds) {
-                var size = this.getImageSize();
+                var bounds = this.getExtent(), 
+                    size = this.getImageSize();
                 return this.url + "?extent=" + bounds.toArray().join(",") +
                     "&size=" + size.w + "," + size.h;
             };
