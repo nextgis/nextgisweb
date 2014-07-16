@@ -326,7 +326,7 @@ define([
 
         itemAdd: function () {
             this.dialog.show(lang.hitch(this, function (data) {
-                data.id = ++this._counter;
+                data.id = (++_COUNTER);
                 this.store.put(data);
                 this.grid.clearSelection();
                 this.grid.select(data.id);
