@@ -3,6 +3,8 @@ from ...vectorformats.Formats.WKT import to_wkt
 import re, xml.dom.minidom as m
 from lxml import etree
 from xml.sax.saxutils import escape
+import geojson
+
 
 try:
     import osgeo.ogr as ogr
@@ -72,8 +74,7 @@ class WFS(Format):
 
         if geometry['type'].lower() in \
                 ['point', 'linestring', 'polygon', 'multipolygon', 'multilinestring', 'multipoint']:
-            wkt = to_wkt(geometry)
-            geom_wkt = ogr.CreateGeometryFromWkt(wkt)
+            geom_wkt = ogr.CreateGeometryFromJson(geojson.dumps(geometry))
 
             gml = geom_wkt.ExportToGML()
             return gml

@@ -40,11 +40,12 @@ def handler(obj, request):
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key:params[key] for key in params if params[key] is not None}
 
-    sourcename = 'highway_line'
-    ds = NextgiswebDatasource(sourcename, layer=obj.layers[0].resource)
+    layer = obj.layers[0]
+    sourcename = layer.keyname
+    ds = NextgiswebDatasource(sourcename, layer=layer.resource)
 
     server = Server({sourcename: ds})
-    base_path = 'http://0.0.0.0:6543/resources/10/wfs'  # Just a stub
+    base_path = request.path_url
     result = server.dispatchRequest(base_path=base_path,
                                     path_info='/'+sourcename, params=params)
 
