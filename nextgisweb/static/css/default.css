@@ -44,6 +44,10 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
     width: 100%;
 }
 
+/* Убираем обводку */
+*:focus {
+    outline: none;
+}
 
 /* Двигаем OL ScaleLine в центр в низ */
 .olMap .olControlScaleLine {
