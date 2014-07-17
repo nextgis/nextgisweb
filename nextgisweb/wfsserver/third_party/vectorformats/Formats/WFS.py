@@ -1,10 +1,7 @@
 from ...vectorformats.Formats.Format import Format
-from ...vectorformats.Formats.WKT import to_wkt
-import re, xml.dom.minidom as m
 from lxml import etree
-from xml.sax.saxutils import escape
 import geojson
-
+import re
 
 try:
     import osgeo.ogr as ogr
