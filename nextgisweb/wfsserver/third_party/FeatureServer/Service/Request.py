@@ -1,5 +1,4 @@
 
-#import FeatureServer
 from ...FeatureServer.Service.Action import Action
 from ...FeatureServer.WebFeatureService.WFSRequest import WFSRequest
 from ...web_request.handlers import ApplicationException

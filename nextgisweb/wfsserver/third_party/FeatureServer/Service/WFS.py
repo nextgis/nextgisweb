@@ -3,6 +3,8 @@ __copyright__ = "Copyright (c) 2006-2008 MetaCarta"
 __license__ = "Clear BSD" 
 __version__ = "$Id: WFS.py 485 2008-05-18 10:51:09Z crschmidt $"
 
+"""Most of the code is taken from featureserver project. Some simplifications of the code have done."""
+
 from ...FeatureServer.Service.Request import Request
 from ...FeatureServer.Service.Action import Action
 from ...FeatureServer.Exceptions.NoLayerException import NoLayerException

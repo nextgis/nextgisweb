@@ -4,9 +4,7 @@
 
 import sys, os, traceback
 import cgi as cgimod
-from .response import Response
 import urllib
-import StringIO
 
 
 class ApplicationException(Exception): 

@@ -3,7 +3,6 @@ Created on Oct 21, 2011
 
 @author: michel
 '''
-from ....FeatureServer.WebFeatureService.Response.TransactionSummary import TransactionSummary
 
 from ....FeatureServer.WebFeatureService.Response.InsertResult import InsertResult
 from ....FeatureServer.WebFeatureService.Response.UpdateResult import UpdateResult

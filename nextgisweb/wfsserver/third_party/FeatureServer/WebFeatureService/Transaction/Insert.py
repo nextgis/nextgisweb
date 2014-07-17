@@ -4,7 +4,7 @@ Created on Oct 16, 2011
 @author: michel
 '''
 import os, re
-from FeatureServer.WebFeatureService.Transaction.TransactionAction import TransactionAction
+from ....FeatureServer.WebFeatureService.Transaction.TransactionAction import TransactionAction
 from lxml import etree
 
 class Insert(TransactionAction):

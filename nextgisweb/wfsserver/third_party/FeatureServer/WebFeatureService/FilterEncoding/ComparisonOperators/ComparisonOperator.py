@@ -5,7 +5,7 @@ Created on Apr 5, 2011
 '''
 import os
 from lxml import etree
-from FeatureServer.WebFeatureService.FilterEncoding.Operator import Operator
+from .....FeatureServer.WebFeatureService.FilterEncoding.Operator import Operator
 
 class ComparisonOperator(Operator):
     def __init__(self, node):
