@@ -77,10 +77,6 @@ class Server (object):
             try:
                 datasource.begin()
 
-                if len(request.actions) > 0 and hasattr(request.actions[0], 'request') and request.actions[0].request is not None:
-                    if request.actions[0].request.lower() == "getfeature":
-                        ''' '''
-
                 try:
                     transactionResponse = TransactionResponse()
                     transactionResponse.setSummary(TransactionSummary())
