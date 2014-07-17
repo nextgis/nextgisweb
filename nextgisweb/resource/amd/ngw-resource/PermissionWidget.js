@@ -143,6 +143,7 @@ define([
             this.principal = new PrincipalSelect({
                 label: "Субъект",
                 style: "width: 100%",
+                required: true
             }).placeAt(this.container);
 
             var permissionOpts = [{value: ":", label: "Все ресурсы: Все права"}];
@@ -197,7 +198,7 @@ define([
             new Button({
                 label: "OK",
                 onClick: lang.hitch(this, function () {
-                    if (this._callback(this.get("value"))) {
+                    if (this.validate() && this._callback(this.get("value"))) {
                         this.hide();
                     }
                 })
