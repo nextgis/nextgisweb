@@ -7,7 +7,6 @@ from ..resource import Widget, resource_factory
 from .model import Service
 
 from .third_party.FeatureServer.Server import Server
-from .third_party.FeatureServer.DataSource.PostGIS import PostGIS
 
 from nextgis_to_fs import NextgiswebDatasource
 
