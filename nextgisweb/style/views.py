@@ -39,13 +39,6 @@ def setup_pyramid(comp, config):
         extent = map(float, request.GET['extent'].split(','))
         size = map(int, request.GET['size'].split(','))
 
-        if extent[0] < obj.srs.minx:
-            # Костыль для 180
-            extent = (
-                extent[0] + obj.srs.maxx - obj.srs.minx, extent[1],
-                extent[2] + obj.srs.maxx - obj.srs.minx, extent[3],
-            )
-
         req = obj.render_request(obj.srs)
         img = req.render_extent(extent, size)
 
