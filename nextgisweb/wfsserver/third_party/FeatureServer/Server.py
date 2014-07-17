@@ -9,15 +9,13 @@ import time
 import os
 import traceback
 import ConfigParser
-#from web_request.handlers import wsgi, mod_python, cgi # Probably the line is not used
+
 from lxml import etree
 import cgi as cgimod
 
 from ..FeatureServer.WebFeatureService.Response.TransactionResponse import TransactionResponse
 from ..FeatureServer.WebFeatureService.Response.TransactionSummary import TransactionSummary
 from ..FeatureServer.WebFeatureService.Response.ActionResult import ActionResult
-
-from ..FeatureServer.Workspace.FileHandler import FileHandler
 
 from ..FeatureServer.Exceptions.ExceptionReport import ExceptionReport
 from ..FeatureServer.Exceptions.WebFeatureService.InvalidValueException import InvalidValueException
@@ -303,146 +301,4 @@ class Server (object):
 
         return Response(data=data, content_type=mime, headers=headers, status_code=response_code, encoding=encoding)     
 
-    def dispatchWorkspaceRequest (self, base_path="", path_info="/", params={}, request_method = "GET", post_data = None,  accepts = ""):        
-        handler = FileHandler('workspace.db')
-        handler.removeExpired()
-        
-        # create workspace
-        if params.has_key("base"):
-            if params.has_key("request"):
-                
-                identifier = ''
-                if params.has_key('id'):
-                    identifier = params['id']
-                    
-                short = handler.create(params['base'], params['request'], identifier)
-                
-                output = ""
-                 
-                if params.has_key("callback"):
-                    output += params["callback"] + '('
-                
-                output += '{"key":"' + short + '"}'
-                
-                if params.has_key("callback"):
-                    output += ');'
-                     
-                return Response(data=output.decode("utf-8"), content_type="application/json; charset=utf-8", status_code="200 OK")
-            
-        
-        # handle WFS request
-        elif params.has_key('key'):
-            
-            handler.updateLastAccess(params['key'])
-            data = handler.getByKey(params['key'])
-            if len(data) > 0:                    
-                #generate workspace specific datasource
-                for layer in self.datasources:
-                    if layer == data[2]:
-                        self.datasources = {layer : self.datasources[layer]}
-                        self.datasources[layer].abstract += " :: " + str(data[0])
-                        break
-                        
-                if params.has_key('request'):
-                    if params['request'].lower() == 'getfeature':
-                        if params.has_key('filter') <> True:
-                            if post_data == None:
-                                params['filter'] = data[3]
-                    
-                    return self.dispatchRequest(base_path, path_info, params, request_method, post_data, accepts)
-        
-        # check workspace by id
-        elif params.has_key('skey'):
-            output = ""
-            if params.has_key("callback"):
-                output += params["callback"] + '('
-            output += '{"workspaces":['
-            
-            data = handler.getByKey(params['skey'])
-            if len(data) > 0:
-                date = time.strftime("%a %b %d, %Y  %I:%M:%S %p",time.localtime(float(data[4])))
-                output += '{"Workspace":"'+data[0]+'","LastAccess":"' + date  + '"},'
-                             
-            output += "]}"
-            if params.has_key("callback"):
-                output += ');'
-            
-            return Response(data=output.decode("utf-8"), content_type="application/json; charset=utf-8", status_code="200 OK")
-        
-        # check workspace by email
-        elif params.has_key('sid'):
-            output = ""
-            if params.has_key("callback"):
-                output += params["callback"] + '('
-            output += '{"workspaces":['
-            
-            workspaces = handler.getByIdentifier(params['sid'])
-            
-            for data in workspaces:
-            
-                date = time.strftime("%a %b %d, %Y  %I:%M:%S %p",time.localtime(float(data[4])))
-                output += '{"Workspace":"'+data[0]+'","LastAccess":"' + date  + '"},'
-            
-            if len(data) > 0:
-                output = output[:-1] 
-            
-            output += "]}"
-            if params.has_key("callback"):
-                output += ');'
-            
-            return Response(data=output.decode("utf-8"), content_type="application/json; charset=utf-8", status_code="200 OK")
-        
-        #TODO: not available
-        return None
 
-theServer = None
-lastRead = 0
-
-#def handler (apacheReq):
-#    global theServer
-#    if not theServer:
-#        options = apacheReq.get_options()
-#        cfgs    = cfgfiles
-#        if options.has_key("FeatureServerConfig"):
-#            cfgs = (options["FeatureServerConfig"],) + cfgs
-#        theServer = Server.load(*cfgs)
-#    return mod_python(theServer.dispatchRequest, apacheReq)
-
-def wsgi_app (environ, start_response):
-    global theServer, lastRead
-    last = 0
-    for cfg in cfgfiles:
-        try:
-            cfgTime = os.stat(cfg)[8]
-            if cfgTime > last:
-                last = cfgTime
-        except:
-            pass        
-    if not theServer or last > lastRead:
-        cfgs      = cfgfiles
-        theServer = Server.load(*cfgs)
-        lastRead = time.time()
-        
-    return wsgi(theServer.dispatchRequest, environ, start_response)
-
-def wsgi_app_workspace(environ, start_response):
-    global theServer, lastRead
-    last = 0
-    for cfg in cfgfiles:
-        try:
-            cfgTime = os.stat(cfg)[8]
-            if cfgTime > last:
-                last = cfgTime
-        except:
-            pass        
-    if not theServer or last > lastRead:
-        cfgs      = cfgfiles
-        theServer = Server.load(*cfgs)
-        lastRead = time.time()
-        
-    return wsgi(theServer.dispatchWorkspaceRequest, environ, start_response)
-
-
-if __name__ == '__main__':
-    service = Server.load(*cfgfiles)
-    cgi(service)
