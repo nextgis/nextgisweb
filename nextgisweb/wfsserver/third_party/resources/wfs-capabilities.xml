@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WFS_Capabilities
+	version="1.0.0"
+	xmlns="http://www.opengis.net/wfs"
+	xmlns:ogc="http://www.opengis.net/ogc">
+
+	<Service>
+		<Name>WFS Server</Name>
+		<Title>Web Feature Service Server</Title>
+		<Abstract>Supports WFS, GML, KML, etc.</Abstract>
+		<OnlineResource></OnlineResource>
+	</Service>
+
+	<Capability>
+		<Request>
+			<GetCapabilities>
+				<DCPType>
+					<HTTP>
+						<Get onlineResource="" />
+					</HTTP>
+				</DCPType>
+			</GetCapabilities>
+			<DescribeFeatureType>
+				<SchemaDescriptionLanguage>
+					<XMLSCHEMA />
+				</SchemaDescriptionLanguage>
+				<DCPType>
+					<HTTP>
+						<Get onlineResource="" />
+					</HTTP>
+				</DCPType>
+			</DescribeFeatureType>
+			<GetFeature>
+				<ResultFormat>
+					<GML2 />
+				</ResultFormat>
+				<DCPType>
+					<HTTP>
+						<Get onlineResource="" />
+					</HTTP>
+				</DCPType>
+			</GetFeature>
+			<Transaction>
+				<ResultFormat>
+					<GML2 />
+				</ResultFormat>
+				<DCPType>
+					<HTTP>
+						<Post onlineResource="" />
+					</HTTP>
+				</DCPType>
+			</Transaction>
+		</Request>
+	</Capability>
+
+	<FeatureTypeList>
+	</FeatureTypeList>
+
+	<SupportsGMLObjectTypeList>
+		<GMLObjectType>
+			<Name>gml:AbstractGMLFeatureType</Name>
+			<OutputFormats>
+				<Format>text/xml; subtype=gml/2.1.2</Format>
+				<Format>text/xml; subtype=gml/3.1.1</Format>
+			</OutputFormats>
+		</GMLObjectType>
+		<GMLObjectType>
+			<Name>gml:PointType</Name>
+			<OutputFormats>
+				<Format>text/xml; subtype=gml/2.1.2</Format>
+				<Format>text/xml; subtype=gml/3.1.1</Format>
+			</OutputFormats>
+		</GMLObjectType>
+		<GMLObjectType>
+			<Name>gml:LineStringType</Name>
+			<OutputFormats>
+				<Format>text/xml; subtype=gml/2.1.2</Format>
+				<Format>text/xml; subtype=gml/3.1.1</Format>
+			</OutputFormats>
+		</GMLObjectType>
+		<GMLObjectType>
+			<Name>gml:PolygonType</Name>
+			<OutputFormats>
+				<Format>text/xml; subtype=gml/2.1.2</Format>
+				<Format>text/xml; subtype=gml/3.1.1</Format>
+			</OutputFormats>
+		</GMLObjectType>
+		<GMLObjectType>
+			<Name>gml:MultiPointType</Name>
+			<OutputFormats>
+				<Format>text/xml; subtype=gml/2.1.2</Format>
+				<Format>text/xml; subtype=gml/3.1.1</Format>
+			</OutputFormats>
+		</GMLObjectType>
+		<GMLObjectType>
+			<Name>gml:MultiLineStringType</Name>
+			<OutputFormats>
+				<Format>text/xml; subtype=gml/2.1.2</Format>
+				<Format>text/xml; subtype=gml/3.1.1</Format>
+			</OutputFormats>
+		</GMLObjectType>
+		<GMLObjectType>
+			<Name>gml:MultiPolygonType</Name>
+			<OutputFormats>
+				<Format>text/xml; subtype=gml/2.1.2</Format>
+				<Format>text/xml; subtype=gml/3.1.1</Format>
+			</OutputFormats>
+		</GMLObjectType>
+	</SupportsGMLObjectTypeList>
+
+	<ogc:Filter_Capabilities>
+		<ogc:Spatial_Capabilities>
+			<ogc:GeometryOperands>
+				<ogc:GeometryOperand>gml:Envelope</ogc:GeometryOperand>
+				<ogc:GeometryOperand>gml:Point</ogc:GeometryOperand>
+				<ogc:GeometryOperand>gml:LineString</ogc:GeometryOperand>
+				<ogc:GeometryOperand>gml:Polygon</ogc:GeometryOperand>
+			</ogc:GeometryOperands>
+			<ogc:SpatialOperators>
+				<ogc:SpatialOperator name="Disjoint"/>
+				<ogc:SpatialOperator name="Equals"/>
+				<ogc:SpatialOperator name="DWithin"/>
+				<ogc:SpatialOperator name="Beyond"/>
+				<ogc:SpatialOperator name="Intersects"/>
+				<ogc:SpatialOperator name="Touches"/>
+				<ogc:SpatialOperator name="Crosses"/>
+				<ogc:SpatialOperator name="Within"/>
+				<ogc:SpatialOperator name="Contains"/>
+				<ogc:SpatialOperator name="Overlaps"/>
+				<ogc:SpatialOperator name="BBOX"/>
+			</ogc:SpatialOperators>
+		</ogc:Spatial_Capabilities>
+		<ogc:Scalar_Capabilities>
+			<ogc:Logical_Operators />
+			<ogc:Comparison_Operators>
+				<ogc:ComparisonOperator>EqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>NotEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>LessThan</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>GreaterThan</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>LessThanEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>GreaterThanEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>Between</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>Like</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>NullCheck</ogc:ComparisonOperator>
+			</ogc:Comparison_Operators>
+			<ogc:Arithmetic_Operators>
+				<ogc:Simple_Arithmetic />
+				<ogc:Functions>
+				</ogc:Functions>
+			</ogc:Arithmetic_Operators>
+		</ogc:Scalar_Capabilities>
+
+
+	</ogc:Filter_Capabilities>
+
+</WFS_Capabilities>
