@@ -107,11 +107,16 @@ define([
 
             if (this.operation === "read" || this.operation === "update") {
 
-                this.buttons.push(new Button({
-                    label: "Обновить",
-                    iconClass: "dijitIconConnector",
-                    onClick: lang.hitch(this, this.refreshObj)
-                }).placeAt(this.btnContainer));
+                // Отключаем кнопку Обновить, так как в текущем варианте
+                // данная операция не корректно работает со следующими
+                // виджетами: PermissionWidget, FieldsWidget, ItemWidget.
+                // Обновить состояние виджета (вместе со страницей) можно по F5.
+
+                // this.buttons.push(new Button({
+                //     label: "Обновить",
+                //     iconClass: "dijitIconConnector",
+                //     onClick: lang.hitch(this, this.refreshObj)
+                // }).placeAt(this.btnContainer));
 
             }
 
