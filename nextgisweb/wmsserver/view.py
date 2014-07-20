@@ -64,8 +64,8 @@ def _get_capabilities(obj, request):
 
     layer = E.Layer(
         E.LatLonBoundingBox(dict(
-            minx="-180", miny="-90",
-            maxx="180", maxy="90"))
+            minx="-180.000000", miny="-85.051129",
+            maxx="180.000000", maxy="85.051129"))
     )
 
     for l in obj.layers:
