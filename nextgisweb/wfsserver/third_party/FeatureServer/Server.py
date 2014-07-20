@@ -4,6 +4,19 @@ __copyright__ = "Copyright (c) 2006-2008 MetaCarta"
 __license__ = "Clear BSD" 
 __version__ = "$Id: Server.py 607 2009-04-27 15:53:15Z crschmidt $"
 
+"""The base of the code was taken from featureserver project.
+
+"""
+
+class FeatureServerException(Exception):
+    """Propagate exception raised by featureserver.
+    """
+    def __init__(self, mime, data, headers, encoding):
+        self.mime = mime
+        self.data = data
+        self.headers = headers
+        self.encoding = encoding
+
 from ..FeatureServer.Service.WFS import WFS
 
 from ..FeatureServer.WebFeatureService.Response.TransactionResponse import TransactionResponse
@@ -113,6 +126,7 @@ class Server (object):
 
         if len(exceptionReport) > 0:
             mime, data, headers, encoding = request.encode_exception_report(exceptionReport)
+            raise FeatureServerException(mime, data, headers, encoding)
         else:
             mime, data, headers, encoding = request.encode(response)
 

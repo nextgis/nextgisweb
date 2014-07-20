@@ -6,7 +6,7 @@ from pyramid.response import Response
 from ..resource import Widget, resource_factory
 from .model import Service
 
-from .third_party.FeatureServer.Server import Server
+from .third_party.FeatureServer.Server import Server, FeatureServerException
 
 from nextgis_to_fs import NextgiswebDatasource
 
@@ -45,8 +45,14 @@ def handler(obj, request):
 
     server = Server({sourcename: ds})
     base_path = request.path_url
-    result = server.dispatchRequest(base_path=base_path,
+
+    try:
+        result = server.dispatchRequest(base_path=base_path,
                                     path_info='/'+sourcename, params=params)
+    except FeatureServerException as e:
+        data = e.data
+        content_type = e.mime
+        return Response(data, content_type=content_type)
 
     if req.lower() in ['getcapabilities', 'describefeaturetype']:
         content_type, resxml = result
