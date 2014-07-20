@@ -62,16 +62,21 @@ def _get_capabilities(obj, request):
         E.Exception(E.Format('text/xml'))
     )
 
+    layer = E.Layer(
+        E.LatLonBoundingBox(dict(
+            minx="-180", miny="-90",
+            maxx="180", maxy="90"))
+    )
+
     for l in obj.layers:
-        capability.append(E.Layer(
+        layer.append(E.Layer(
             dict(queryable="1"),
             E.Name(l.keyname),
             E.Title(l.display_name),
-            E.SRS('EPSG:%d' % l.resource.srs.id),
-            E.LatLonBoundingBox(dict(
-                minx="-180", miny="-90",
-                maxx="180", maxy="90"))
+            E.SRS('EPSG:%d' % l.resource.srs.id)
         ))
+
+    capability.append(layer)
 
     xml = E.WMS_Capabilities(
         dict(version='1.1.1'),
