@@ -96,7 +96,7 @@ def _get_map(obj, request):
 
     lmap = dict([(l.keyname, l) for l in obj.layers])
 
-    img = Image.new('RGBA', p_size, (255, 255, 255, 255))
+    img = Image.new('RGBA', p_size, (255, 255, 255, 0))
 
     for lname in p_layers:
         lobj = lmap[lname]
