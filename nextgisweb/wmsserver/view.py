@@ -63,6 +63,7 @@ def _get_capabilities(obj, request):
     )
 
     layer = E.Layer(
+        E.Title(obj.display_name),
         E.LatLonBoundingBox(dict(
             minx="-180.000000", miny="-85.051129",
             maxx="180.000000", maxy="85.051129"))
@@ -82,7 +83,7 @@ def _get_capabilities(obj, request):
         dict(version='1.1.1'),
         service, capability)
 
-    return Response(etree.tostring(xml), content_type=b'text/xml')
+    return Response(etree.tostring(xml, encoding='utf-8'), content_type=b'text/xml')
 
 
 def _get_map(obj, request):
