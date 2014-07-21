@@ -62,22 +62,28 @@ def _get_capabilities(obj, request):
         E.Exception(E.Format('text/xml'))
     )
 
+    layer = E.Layer(
+        E.Title(obj.display_name),
+        E.LatLonBoundingBox(dict(
+            minx="-180.000000", miny="-85.051129",
+            maxx="180.000000", maxy="85.051129"))
+    )
+
     for l in obj.layers:
-        capability.append(E.Layer(
+        layer.append(E.Layer(
             dict(queryable="1"),
             E.Name(l.keyname),
             E.Title(l.display_name),
-            E.SRS('EPSG:%d' % l.resource.srs.id),
-            E.LatLonBoundingBox(dict(
-                minx="-180", miny="-90",
-                maxx="180", maxy="90"))
+            E.SRS('EPSG:%d' % l.resource.srs.id)
         ))
+
+    capability.append(layer)
 
     xml = E.WMS_Capabilities(
         dict(version='1.1.1'),
         service, capability)
 
-    return Response(etree.tostring(xml), content_type=b'text/xml')
+    return Response(etree.tostring(xml, encoding='utf-8'), content_type=b'text/xml')
 
 
 def _get_map(obj, request):
@@ -91,7 +97,7 @@ def _get_map(obj, request):
 
     lmap = dict([(l.keyname, l) for l in obj.layers])
 
-    img = Image.new('RGBA', p_size, (255, 255, 255, 255))
+    img = Image.new('RGBA', p_size, (255, 255, 255, 0))
 
     for lname in p_layers:
         lobj = lmap[lname]
