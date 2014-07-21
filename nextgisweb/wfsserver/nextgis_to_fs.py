@@ -25,7 +25,12 @@ class NextgiswebDatasource(DataSource):
             self.attribute_cols = args['attribute_cols']
         else:
             self.set_attribute_cols(self.query)
-        self.geom_col = u'none'
+
+        # Setup geometry column name. But some resources do not provide the name
+        try:
+            self.geom_col = self.layer.column_geom
+        except AttributeError:
+            self.geom_col = u'none'
 
     # FeatureServer.DataSource
     def select (self, params):
@@ -37,6 +42,7 @@ class NextgiswebDatasource(DataSource):
         features = []
         for row in result:
             feature = Feature(id=row.id, props=row.fields)
+            feature.geometry_attr = self.geom_col
             geom = geojson.dumps(row.geom)
 
             # featureserver.feature.geometry is a dict, so convert str->dict:
