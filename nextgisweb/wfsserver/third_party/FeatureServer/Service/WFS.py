@@ -31,10 +31,14 @@ class WFS(Request):
         self.host = host
         
         try:
-            self.get_layer(path_info, params)
+            self.get_layer(path_info, params)   # TODO: this line is called twice
+            # (here and on line 54: see Request.parse source).
+            # It is the cause of duplication of datasources (see my comment in Request.get_layer) and therefore
+            # it causes duplication of the sources in DescribeFeatureType response.
+            # Investigate the problem. (DK)
         except NoLayerException as e:
             a = Action()
-            
+
             if params.has_key('service') and params['service'].lower() == 'wfs':
                 for layer in self.service.datasources:
                     self.datasources.append(layer)
@@ -44,7 +48,7 @@ class WFS(Request):
                     a.request = "GetCapabilities"
             else:
                 a.method = "metadata"
-            
+
             self.actions.append(a)
             return
         

@@ -40,7 +40,7 @@ class Request (object):
             is touched), and encode_metadata is called. Otherwise, the actions
             are passed onto DataSources to create lists of Features."""
         self.host = host
-        
+
         try:
             self.get_layer(path_info, params)
         except NoLayerException as e:
@@ -160,9 +160,15 @@ class Request (object):
         
         path = path_info.split("/")
         if len(path) > 1 and path_info != '/':
-            self.datasources.append(path[1])
+            # get_layer method can be called twice, so to prevent
+            #    duplication of datasources, check it (DK)
+            if path[1] not in self.datasources:
+                self.datasources.append(path[1])
         if params.has_key("layer"):
-            self.datasources.append(params['layer'])
+            # get_layer method can be called twice, so to prevent
+            #    duplication of datasources, check it (DK)
+            if params['layer'] not in self.datasources:
+                self.datasources.append(params['layer'])
         
         if len(self.datasources) == 0:
             raise NoLayerException("Request", message="Could not obtain data source from layer parameter or path info.")
