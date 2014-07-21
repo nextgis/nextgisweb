@@ -22,12 +22,10 @@ class ServiceWidget(Widget):
 
 
 def handler(obj, request):
-    if request.params.get('SERVICE') != 'WMS':
-        return
-
     req = request.params.get('REQUEST')
+    service = request.params.get('SERVICE')   
 
-    if req == 'GetCapabilities':
+    if (req == 'GetCapabilities') and (service == 'WMS'):
         return _get_capabilities(obj, request)
     elif req == 'GetMap':
         return _get_map(obj, request)
