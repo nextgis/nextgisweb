@@ -50,7 +50,7 @@ class Server (object):
         self.metadata      = metadata
         self.processes     = processes 
     
-    def dispatchRequest (self, base_path="", path_info="/", params={}, request_method = "GET", post_data = None,  accepts = ""):
+    def dispatchRequest (self, base_path="", path_info="/", params={}, request_method="GET", post_data=None,  accepts=""):
         """Read in request data, and return a (content-type, response string) tuple. May
            raise an exception, which should be returned as a 500 error to the user."""
         response_code = "200 OK"
@@ -61,35 +61,27 @@ class Server (object):
         request = WFS(self)
         
         response = []
-        
+
         try:
             request.parse(params, path_info, host, post_data, request_method)
-            
-            # short circuit datasource where the first action is a metadata request. 
-            if len(request.actions) and request.actions[0].method == "metadata": 
-                return request.encode_metadata(request.actions[0])
 
-            # short circuit datasource where a OGC WFS request is set
-            # processing by service
             if len(request.actions) > 0 and hasattr(request.actions[0], 'request') and request.actions[0].request is not None:
                 version = '1.0.0'
                 if hasattr(request.actions[0], 'version') and len(request.actions[0].version) > 0:
                     version = request.actions[0].version
                 
                 if request.actions[0].request.lower() == "getcapabilities":
-                    return getattr(request, request.actions[0].request.lower())(version)
+                    return request.getcapabilities(version)
                 elif request.actions[0].request.lower() == "describefeaturetype":
-                    return getattr(request, request.actions[0].request.lower())(version)
+                    return request.describefeaturetype(version)
 
             datasource = self.datasources[request.datasources[0]]
 
             if request_method != "GET" and hasattr(datasource, 'processes'):
                 raise Exception("You can't post data to a processed layer.")
 
-        
             try:
                 datasource.begin()
-
                 try:
                     transactionResponse = TransactionResponse()
                     transactionResponse.setSummary(TransactionSummary())

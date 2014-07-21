@@ -8,6 +8,7 @@ __version__ = "$Id: WFS.py 485 2008-05-18 10:51:09Z crschmidt $"
 from ...FeatureServer.Service.Request import Request
 from ...FeatureServer.Service.Action import Action
 from ...FeatureServer.Exceptions.NoLayerException import NoLayerException
+from ...FeatureServer.Exceptions.WebFeatureService.InvalidValueException import WFSException
 
 from ...vectorformats.Formats import WFS as WFSFormat
 from ...FeatureServer.WebFeatureService.WFSRequest import WFSRequest
@@ -47,7 +48,7 @@ class WFS(Request):
                 else:
                     a.request = "GetCapabilities"
             else:
-                a.method = "metadata"
+                raise WFSException("Service", None, 'Requested service is not recognized')
 
             self.actions.append(a)
             return

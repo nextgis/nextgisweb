@@ -39,16 +39,24 @@ def handler(obj, request):
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key:params[key] for key in params if params[key] is not None}
 
-    layer = obj.layers[0]
-    sourcename = layer.keyname
-    ds = NextgiswebDatasource(sourcename, layer=layer.resource)
 
-    server = Server({sourcename: ds})
+    # import ipdb
+    # ipdb.set_trace()
+
+    layer = obj.layers[0]
+    sourcenames = layer.keyname
+    datasources = {layer.keyname: NextgiswebDatasource(sourcenames, layer=layer.resource)}
+
+    # datasources = {l.keyname: NextgiswebDatasource(l.keyname, layer=l.resource) for l in obj.layers}
+    # sourcenames = ','.join([sourcename for sourcename in datasources])
+
+    server = Server(datasources)
     base_path = request.path_url
+
 
     try:
         result = server.dispatchRequest(base_path=base_path,
-                                    path_info='/'+sourcename, params=params)
+                                    path_info='/'+sourcenames, params=params)
     except FeatureServerException as e:
         data = e.data
         content_type = e.mime
