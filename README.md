@@ -177,6 +177,14 @@
     
 В промышленной эксплуатации нужно использовать не pserve, а uWSGI. Далее смотри [DEPLOY.md](https://github.com/nextgis/nextgisweb/blob/2/DEPLOY.md)
 
+## Обновление
+
+    $ cd ~/ngw
+    $ git pull
+    $ env/bin/pip install -e nextgisweb
+    $ env/bin/nextgisweb --config config.ini initialize_db
+
+## Другое
 ### Авторизация
 #### Имя и пароль по умолчанию
 
