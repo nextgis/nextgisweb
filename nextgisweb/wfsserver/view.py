@@ -40,19 +40,11 @@ def handler(obj, request):
     params = {key:params[key] for key in params if params[key] is not None}
 
 
-    # import ipdb
-    # ipdb.set_trace()
-
-    layer = obj.layers[0]
-    sourcenames = layer.keyname
-    datasources = {layer.keyname: NextgiswebDatasource(sourcenames, layer=layer.resource)}
-
-    # datasources = {l.keyname: NextgiswebDatasource(l.keyname, layer=l.resource) for l in obj.layers}
-    # sourcenames = ','.join([sourcename for sourcename in datasources])
+    datasources = {l.keyname: NextgiswebDatasource(l.keyname, layer=l.resource) for l in obj.layers}
+    sourcenames = '/'.join([sourcename for sourcename in datasources])
 
     server = Server(datasources)
     base_path = request.path_url
-
 
     try:
         result = server.dispatchRequest(base_path=base_path,

@@ -162,8 +162,9 @@ class Request (object):
         if len(path) > 1 and path_info != '/':
             # get_layer method can be called twice, so to prevent
             #    duplication of datasources, check it (DK)
-            if path[1] not in self.datasources:
-                self.datasources.append(path[1])
+            for source in path[1:]:
+                if source not in self.datasources:
+                    self.datasources.append(source)
         if params.has_key("layer"):
             # get_layer method can be called twice, so to prevent
             #    duplication of datasources, check it (DK)
