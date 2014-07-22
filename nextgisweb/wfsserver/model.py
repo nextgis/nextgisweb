@@ -28,8 +28,6 @@ class Layer(Base):
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     keyname = db.Column(db.Unicode, nullable=False)
     display_name = db.Column(db.Unicode, nullable=False)
-    min_scale_denom = db.Column(db.Float, nullable=True)
-    max_scale_denom = db.Column(db.Float, nullable=True)
 
     service = db.relationship(
         Service, foreign_keys=service_id,
@@ -63,8 +61,7 @@ class _layers_attr(SP):
                 srlzr.obj.layers.append(lo)
 
             for a in (
-                'keyname', 'display_name',
-                'min_scale_denom', 'max_scale_denom'
+                'keyname', 'display_name'
             ):
                 setattr(lo, a, lv[a])
 

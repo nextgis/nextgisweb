@@ -27,7 +27,7 @@ define([
     "dijit/Toolbar",
     "ngw/form/KeynameTextBox",
     "ngw/form/DisplayNameTextBox",
-    "ngw/form/ScaleTextBox",
+    // "ngw/form/ScaleTextBox",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
@@ -102,9 +102,7 @@ define([
                             "item_type": "layer",
                             "keyname": null,
                             "display_name": itm.display_name,
-                            "resource_id": itm.id,
-                            "min_scale_denom": null,
-                            "max_scale_denom": null
+                            "resource_id": itm.id
                         }, {
                             parent: widget.getAddParent(),
                             attribute: "children"
@@ -125,8 +123,6 @@ define([
                     widget.widgetProperties.selectChild(widget.paneLayer);
                     widget.widgetItemKeyname.set("value", widget.getItemValue("keyname"));
                     widget.widgetItemDisplayName.set("value", widget.getItemValue("display_name"));
-                    widget.wLayerMinScale.set("value", widget.getItemValue("min_scale_denom"));
-                    widget.wLayerMaxScale.set("value", widget.getItemValue("max_scale_denom"));
 
                     // Изначально боковая панель со свойствами текущего элемента
                     // спрятана. Поскольку элемент уже выбран - ее нужно показать.
@@ -146,14 +142,6 @@ define([
 
             this.widgetItemDisplayName.watch("value", function (attr, oldValue, newValue) {
                 widget.setItemValue("display_name", newValue);
-            });
-
-            this.wLayerMinScale.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("min_scale_denom", newVal);
-            });
-
-            this.wLayerMaxScale.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("max_scale_denom", newVal);
             });
         },
 
@@ -206,9 +194,7 @@ define([
                 return {
                     keyname: store.getValue(itm, "keyname"),
                     display_name: store.getValue(itm, "display_name"),
-                    resource_id: store.getValue(itm, "resource_id"),
-                    min_scale_denom: store.getValue(itm, "min_scale_denom"),
-                    max_scale_denom: store.getValue(itm, "max_scale_denom")
+                    resource_id: store.getValue(itm, "resource_id")
                 };
             }
 
