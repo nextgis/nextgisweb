@@ -3,10 +3,16 @@ from lxml import etree
 import geojson
 import re
 
+import os
+
 try:
     import osgeo.ogr as ogr
 except ImportError:
     import ogr
+
+
+XMLDATADIR = os.path.join(os.path.dirname(__file__), "../../resources/")
+
 
 class WFS(Format):
     """WFS-like GML writer."""
@@ -187,8 +193,8 @@ class WFS(Format):
         return result
 
     def getcapabilities(self):
-        # FIXME: DO NOT USE hardcoded paths!!!
-        tree = etree.parse("nextgisweb/wfsserver/third_party/resources/wfs-capabilities.xml")
+        tree = etree.parse(os.path.join(XMLDATADIR,"wfs-capabilities.xml"))
+
         root = tree.getroot()
         elements = root.xpath("wfs:Capability/wfs:Request/wfs:GetCapabilities/wfs:DCPType/wfs:HTTP", namespaces = self.namespaces)
         if len(elements) > 0:
@@ -268,7 +274,7 @@ class WFS(Format):
         return featureList
         
     def describefeaturetype(self):
-        tree = etree.parse("nextgisweb/wfsserver/third_party/resources/wfs-featuretype.xsd")
+        tree = etree.parse(os.path.join(XMLDATADIR, "wfs-featuretype.xsd"))
         root = tree.getroot()
         
         if len(self.layers) == 1:
