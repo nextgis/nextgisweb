@@ -39,9 +39,7 @@ class Layer(Base):
         return dict(
             keyname=self.keyname,
             display_name=self.display_name,
-            resource_id=self.resource_id,
-            min_scale_denom=self.min_scale_denom,
-            max_scale_denom=self.max_scale_denom)
+            resource_id=self.resource_id)
 
 
 class _layers_attr(SP):
