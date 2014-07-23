@@ -30,4 +30,4 @@ class ExceptionReport():
         return self.exceptions[index]
 
     def clear(self):
-        self.exceptions = []
+        self.exceptions[:] = []
