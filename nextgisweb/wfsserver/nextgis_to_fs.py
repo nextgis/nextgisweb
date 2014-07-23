@@ -21,6 +21,7 @@ class NextgiswebDatasource(DataSource):
         self.layer = args["layer"]
         self.query = self.layer.feature_query()
         self.srid_out = self.layer.srs_id
+        self.title = self.layer.display_name
         if 'attribute_cols' in args:
             self.attribute_cols = args['attribute_cols']
         else:

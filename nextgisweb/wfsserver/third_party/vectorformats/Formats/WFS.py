@@ -228,7 +228,7 @@ class WFS(Format):
             for layer in layers:
                 featureList[0].append(layer)
         
-        return etree.tostring(tree, pretty_print=True)
+        return etree.tostring(tree, pretty_print=True, encoding='utf-8')
     
     def getlayers(self):
         ''' '''
@@ -287,7 +287,7 @@ class WFS(Format):
                 root = self.addDataSourceImport(root, self.datasources[layer])
                 #root = self.addDataSourceFeatureType(root, self.datasources[layer])
         
-        return etree.tostring(tree, pretty_print=True)
+        return etree.tostring(tree, pretty_print=True, encoding='utf-8')
     
     def addDataSourceImport(self, root, datasource):
         root.append(
