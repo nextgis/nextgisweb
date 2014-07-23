@@ -118,6 +118,7 @@ class Server (object):
 
         if len(exceptionReport) > 0:
             mime, data, headers, encoding = request.encode_exception_report(exceptionReport)
+            exceptionReport.clear()
             raise FeatureServerException(mime, data, headers, encoding)
         else:
             mime, data, headers, encoding = request.encode(response)
