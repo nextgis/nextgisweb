@@ -40,7 +40,10 @@ def handler(obj, request):
     params = {key:params[key] for key in params if params[key] is not None}
 
 
-    datasources = {l.keyname: NextgiswebDatasource(l.keyname, layer=l.resource) for l in obj.layers}
+    datasources = {l.keyname: NextgiswebDatasource(l.keyname,
+        layer=l.resource,
+        title=l.display_name) for l in obj.layers
+    }
     sourcenames = '/'.join([sourcename for sourcename in datasources])
 
     server = Server(datasources)

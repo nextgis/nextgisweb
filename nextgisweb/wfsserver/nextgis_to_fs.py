@@ -16,14 +16,14 @@ class NextgiswebDatasource(DataSource):
     '''Class to convert nextgislayer to featureserver datasource
     '''
 
-    def __init__(self, name,  **args):
-        DataSource.__init__(self, name, **args)
-        self.layer = args["layer"]
+    def __init__(self, name,  **kwargs):
+        DataSource.__init__(self, name, **kwargs)
+        self.layer = kwargs["layer"]
+        self.title = kwargs["title"]
         self.query = self.layer.feature_query()
         self.srid_out = self.layer.srs_id
-        self.title = self.layer.display_name
-        if 'attribute_cols' in args:
-            self.attribute_cols = args['attribute_cols']
+        if 'attribute_cols' in kwargs:
+            self.attribute_cols = kwargs['attribute_cols']
         else:
             self.set_attribute_cols(self.query)
 
