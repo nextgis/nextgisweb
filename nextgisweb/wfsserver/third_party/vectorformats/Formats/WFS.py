@@ -40,7 +40,8 @@ class WFS(Format):
         return "\n".join(results)        
     
     def encode_feature(self, feature):
-        layername = re.sub(r'\W', '_', self.layername)
+        # layername = re.sub(r'\W', '_', self.layername)
+        layername = self.layername
         
         attr_fields = [] 
         for key, value in feature.properties.items():           
