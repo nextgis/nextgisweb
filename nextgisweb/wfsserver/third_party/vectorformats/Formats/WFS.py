@@ -48,7 +48,10 @@ class WFS(Format):
             #key = re.sub(r'\W', '_', key)
             attr_value = value
             if hasattr(attr_value,"replace"): 
-                attr_value = attr_value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                try:
+                    attr_value = attr_value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                except:
+                    pass
             if isinstance(attr_value, str):
                 attr_value = unicode(attr_value, "utf-8")
             attr_fields.append( "<fs:%s>%s</fs:%s>" % (key, attr_value, key) )
