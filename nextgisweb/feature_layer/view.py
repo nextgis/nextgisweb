@@ -21,10 +21,10 @@ from .interface import IFeatureLayer
 from .extension import FeatureExtension
 
 
-class ComplexEncoder(json.JSONEncoder):
+class ComplexEncoder(geojson.GeoJSONEncoder):
     def default(self, obj):
         try:
-            return super(ComplexEncoder, obj).default(obj)
+            return geojson.GeoJSONEncoder.default(self, obj)
         except TypeError:
             return str(obj)
 
