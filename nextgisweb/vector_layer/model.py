@@ -7,6 +7,7 @@ import zipfile
 import tempfile
 import shutil
 import ctypes
+import operator
 from distutils.version import LooseVersion
 
 from zope.interface import implements
@@ -474,7 +475,12 @@ class VectorLayerSerializer(Serializer):
 
 
 class FeatureQueryBase(object):
-    implements(IFeatureQuery, IFeatureQueryFilterBy, IFeatureQueryLike)
+    implements(
+        IFeatureQuery,
+        IFeatureQueryFilter,
+        IFeatureQueryFilterBy,
+        IFeatureQueryLike,
+        IFeatureQueryIntersects)
 
     def __init__(self):
         self._geom = None
@@ -484,6 +490,7 @@ class FeatureQueryBase(object):
         self._limit = None
         self._offset = None
 
+        self._filter = None
         self._filter_by = None
         self._like = None
         self._intersects = None
@@ -500,6 +507,9 @@ class FeatureQueryBase(object):
     def limit(self, limit, offset=0):
         self._limit = limit
         self._offset = offset
+
+    def filter(self, *args):
+        self._filter = args
 
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
@@ -544,6 +554,17 @@ class FeatureQueryBase(object):
                     where.append(table.columns.id == v)
                 else:
                     where.append(table.columns[tableinfo[k].key] == v)
+
+        if self._filter:
+            l = []
+            for k, o, v in self._filter:
+                op = getattr(operator, o)
+                if k == 'id':
+                    l.append(op(table.columns.id, v))
+                else:
+                    l.append(op(table.columns[tableinfo[k].key], v))
+
+            where.append(db.and_(*l))
 
         if self._like:
             l = []

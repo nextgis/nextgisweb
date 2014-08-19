@@ -62,6 +62,12 @@ class IFeatureQuery(Interface):
         """ Включать охват объекта в результат запроса """
 
 
+class IFeatureQueryFilter(IFeatureQuery):
+
+    def filter(self, *args):
+        """ Установить правила отбора """
+
+
 class IFeatureQueryFilterBy(IFeatureQuery):
 
     def filter_by(self, **kwargs):
@@ -78,3 +84,9 @@ class IFeatureQueryLike(IFeatureQuery):
 
     def like(self, value):
         """ Установить отбор по подстроке """
+
+
+class IFeatureQueryIntersects(IFeatureQuery):
+
+    def intersects(self, geom):
+        """ Установить отбор по пространственному пересечению """
