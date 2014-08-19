@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import operator
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
@@ -318,6 +319,7 @@ class FeatureQueryBase(object):
         self._limit = None
         self._offset = None
 
+        self._filter = None
         self._filter_by = None
         self._like = None
         self._intersects = None
@@ -334,6 +336,9 @@ class FeatureQueryBase(object):
     def limit(self, limit, offset=0):
         self._limit = limit
         self._offset = offset
+
+    def filter(self, *args):
+        self._filter = args
 
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
@@ -381,6 +386,17 @@ class FeatureQueryBase(object):
                     select.append_whereclause(idcol == v)
                 else:
                     select.append_whereclause(db.sql.column(k) == v)
+
+        if self._filter:
+            l = []
+            for k, o, v in self._filter:
+                op = getattr(operator, o)
+                if k == 'id':
+                    l.append(op(idcol, v))
+                else:
+                    l.append(op(db.sql.column(k), v))
+
+            select.append_whereclause(db.and_(*l))
 
         if self._like:
             l = []
