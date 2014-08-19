@@ -42,7 +42,8 @@ from ..feature_layer import (
     IWritableFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilterBy,
-    IFeatureQueryLike)
+    IFeatureQueryLike,
+    IFeatureQueryIntersects)
 
 GEOM_TYPE_GA = (ga.MultiPoint, ga.MultiLineString, ga.MultiPolygon)
 GEOM_TYPE_DB = ('MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')

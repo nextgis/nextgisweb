@@ -32,7 +32,8 @@ from ..feature_layer import (
     IFeatureQuery,
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
-    IFeatureQueryLike)
+    IFeatureQueryLike,
+    IFeatureQueryIntersects)
 
 Base = declarative_base()
 
