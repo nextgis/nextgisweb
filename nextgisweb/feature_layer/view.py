@@ -21,6 +21,13 @@ from .interface import IFeatureLayer
 from .extension import FeatureExtension
 
 
+class ComplexEncoder(json.JSONEncoder):
+    def default(self, obj):
+        try:
+            return super(ComplexEncoder, obj).default(obj)
+        except TypeError:
+            return str(obj)
+
 class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
     operation = ('update', )
@@ -117,7 +124,7 @@ def feature_geojson(request):
     content_disposition = ('attachment; filename=%d.geojson'
                            % request.context.id)
     return Response(
-        geojson.dumps(query(), ensure_ascii=False),
+        geojson.dumps(query(), ensure_ascii=False, cls=ComplexEncoder),
         content_type=b'application/json',
         content_disposition=content_disposition)
 
@@ -172,7 +179,7 @@ def store_collection(layer, request):
         last = min(total - 1, last)
         headers['Content-Range'] = 'items %d-%s/%d' % (first, last, total)
 
-    return Response(json.dumps(result), headers=headers)
+    return Response(json.dumps(result, cls=ComplexEncoder), headers=headers)
 
 
 def store_item(layer, request):
@@ -205,7 +212,7 @@ def store_item(layer, request):
             result['ext'][extcls.identity] = extension.feature_data(feature)
 
     return Response(
-        json.dumps(result),
+        json.dumps(result, cls=ComplexEncoder),
         content_type='application/json')
 
 

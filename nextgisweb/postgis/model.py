@@ -234,6 +234,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                         datatype = FIELD_TYPE.STRING
                     elif row['data_type'] == 'uuid':
                         datatype = FIELD_TYPE.STRING
+                    elif row['data_type'] == 'date':
+                        datatype = FIELD_TYPE.STRING
 
                     if datatype is not None:
                         fopts = dict(display_name=row['column_name'])
