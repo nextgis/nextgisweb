@@ -41,6 +41,7 @@ from ..feature_layer import (
     IFeatureLayer,
     IWritableFeatureLayer,
     IFeatureQuery,
+    IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
     IFeatureQueryIntersects)

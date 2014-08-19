@@ -313,7 +313,7 @@ class PostgisLayerSerializer(Serializer):
 class FeatureQueryBase(object):
     implements(
         IFeatureQuery,
-        IFeatureQueryFilter
+        IFeatureQueryFilter,
         IFeatureQueryFilterBy,
         IFeatureQueryLike,
         IFeatureQueryIntersects)

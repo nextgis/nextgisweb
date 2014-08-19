@@ -9,9 +9,11 @@ from .interface import (
     IFeatureLayer,
     IWritableFeatureLayer,
     IFeatureQuery,
+    IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryOrderBy,
     IFeatureQueryLike,
+    IFeatureQueryIntersects,
 )
 
 
