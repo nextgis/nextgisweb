@@ -30,6 +30,7 @@ from ..feature_layer import (
     FIELD_TYPE,
     IFeatureLayer,
     IFeatureQuery,
+    IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryLike)
 
@@ -309,7 +310,12 @@ class PostgisLayerSerializer(Serializer):
 
 
 class FeatureQueryBase(object):
-    implements(IFeatureQuery, IFeatureQueryFilterBy, IFeatureQueryLike)
+    implements(
+        IFeatureQuery,
+        IFeatureQueryFilter
+        IFeatureQueryFilterBy,
+        IFeatureQueryLike,
+        IFeatureQueryIntersects)
 
     def __init__(self):
         self._geom = None
