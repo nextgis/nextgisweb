@@ -80,6 +80,9 @@
                         <li class="user">${request.user}</li>
                         <li><a href="${request.route_url('auth.logout')}">Выход</a></li>
                     %endif
+
+                    <li><a href="${request.route_url('pyramid.help_page')}">Справка</a></li>
+
                 </ul>
             </div>
 

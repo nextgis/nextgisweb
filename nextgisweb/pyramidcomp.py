@@ -2,6 +2,7 @@
 import sys
 from hashlib import md5
 import re
+import codecs
 from StringIO import StringIO
 
 from pyramid.config import Configurator
@@ -18,6 +19,7 @@ import pyramid_mako
 from .component import Component
 from .auth import User
 from . import dynmenu as dm
+from pkg_resources import resource_filename
 
 
 def viewargs(**kw):
@@ -233,6 +235,13 @@ class PyramidComponent(Component):
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)
 
+        if 'help_page' not in settings:
+            settings['help_page'] = resource_filename(
+                'nextgisweb', 'userdoc/help.html')
+
+        with codecs.open(settings['help_page'], 'rb', 'utf-8') as fp:
+            self.help_page = fp.read()
+
         config.add_route('home', '/') \
             .add_view('nextgisweb.views.home')
 
@@ -331,6 +340,12 @@ class PyramidComponent(Component):
 
         config.add_route('pyramid.control_panel', '/control-panel') \
             .add_view(control_panel, renderer="pyramid/control_panel.mako")
+
+        def help_page(request):
+            return dict(title=u"Справка", help_page=self.help_page)
+
+        config.add_route('pyramid.help_page', '/help-page') \
+            .add_view(help_page, renderer="pyramid/help_page.mako")
 
         def pkginfo(request):
             return dict(title=u"Версии пакетов",
