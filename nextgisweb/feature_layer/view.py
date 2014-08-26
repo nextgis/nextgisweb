@@ -302,12 +302,14 @@ def setup_pyramid(comp, config):
 
         result["featureCount"] = feature_count
 
-        return result
+        return Response(
+            json.dumps(result, cls=ComplexEncoder),
+            content_type='application/json')
 
     config.add_route(
         'feature_layer.identify', '/feature_layer/identify',
         client=(),
-    ).add_view(identify, renderer='json')
+    ).add_view(identify)
 
     config.add_route(
         'feature_layer.feature.browse',
