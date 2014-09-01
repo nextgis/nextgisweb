@@ -273,7 +273,7 @@ def setup_pyramid(comp, config):
         feature_count = 0
 
         for layer in layer_list:
-            if request.resource_permission(DataScope.read, layer):
+            if not layer.has_permission(DataScope.read, request.user):
                 result[layer.id] = dict(error="Forbidden")
 
             elif not IFeatureLayer.providedBy(layer):
