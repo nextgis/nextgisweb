@@ -9,6 +9,7 @@ from PIL import Image
 from pyramid.response import Response
 
 from ..resource import Widget, resource_factory
+from ..spatial_ref_sys import SRS
 from .model import Service
 
 
@@ -23,7 +24,7 @@ class ServiceWidget(Widget):
 
 def handler(obj, request):
     req = request.params.get('REQUEST')
-    service = request.params.get('SERVICE')   
+    service = request.params.get('SERVICE')
 
     if (req == 'GetCapabilities') and (service == 'WMS'):
         return _get_capabilities(obj, request)
@@ -68,12 +69,14 @@ def _get_capabilities(obj, request):
     )
 
     for l in obj.layers:
-        layer.append(E.Layer(
-            dict(queryable="1"),
-            E.Name(l.keyname),
-            E.Title(l.display_name),
-            E.SRS('EPSG:%d' % l.resource.srs.id)
-        ))
+        lnode = E.Layer(
+            dict(queryable="1"), E.Name(l.keyname),
+            E.Title(l.display_name))
+
+        for srs in SRS.query():
+            lnode.append(E.SRS('EPSG:%d' % srs.id))
+
+        layer.append(lnode)
 
     capability.append(layer)
 
@@ -90,6 +93,7 @@ def _get_map(obj, request):
     p_width = int(request.params.get('WIDTH'))
     p_height = int(request.params.get('HEIGHT'))
     p_format = request.params.get('FORMAT')
+    p_srs = request.params.get('SRS')
 
     p_size = (p_width, p_height)
 
@@ -97,20 +101,22 @@ def _get_map(obj, request):
 
     img = Image.new('RGBA', p_size, (255, 255, 255, 0))
 
+    srs = SRS.filter_by(id=int(p_srs.split(':')[-1])).one()
+
     for lname in p_layers:
         lobj = lmap[lname]
 
-        req = lobj.resource.render_request(lobj.resource.srs)
+        req = lobj.resource.render_request(srs)
         limg = req.render_extent(p_bbox, p_size)
         img.paste(limg, (0, 0), limg)
 
     buf = StringIO()
-    
+
     if p_format == 'image/jpeg':
         img.save(buf, 'jpeg')
     elif p_format == 'image/png':
         img.save(buf, 'png')
-    
+
     buf.seek(0)
 
     return Response(body_file=buf, content_type=b'image/png')

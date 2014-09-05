@@ -319,6 +319,7 @@ class FeatureQueryBase(object):
         IFeatureQueryIntersects)
 
     def __init__(self):
+        self._srs = None
         self._geom = None
         self._box = None
 
@@ -330,6 +331,9 @@ class FeatureQueryBase(object):
         self._filter_by = None
         self._like = None
         self._intersects = None
+
+    def srs(self, srs):
+        self._srs = srs
 
     def geom(self):
         self._geom = True
@@ -374,8 +378,10 @@ class FeatureQueryBase(object):
         idcol = db.sql.column(self.layer.column_id)
         addcol(idcol.label('id'))
 
+        srsid = self.layer.srs_id if self._srs is None else self._srs.id
+
         geomcol = db.sql.column(self.layer.column_geom)
-        geomexpr = db.func.st_transform(geomcol, self.layer.srs_id)
+        geomexpr = db.func.st_transform(geomcol, srsid)
 
         if self._geom:
             addcol(db.func.st_astext(geomexpr).label('geom'))
