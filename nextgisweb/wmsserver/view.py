@@ -24,8 +24,9 @@ class ServiceWidget(Widget):
 
 
 def handler(obj, request):
-    req = request.params.get('REQUEST')
-    service = request.params.get('SERVICE')
+    params = dict((k.upper(), v) for k,v in request.params.iteritems())
+    req = params.get('REQUEST')
+    service = params.get('SERVICE')
 
     if (req == 'GetCapabilities') and (service == 'WMS'):
         return _get_capabilities(obj, request)
