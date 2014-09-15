@@ -4,7 +4,6 @@ from StringIO import StringIO
 
 from lxml import etree
 from lxml.builder import ElementMaker
-from lxml.etree import CDATA
 from PIL import Image
 
 from pyramid.response import Response
