@@ -4,6 +4,7 @@ from StringIO import StringIO
 
 from lxml import etree
 from lxml.builder import ElementMaker
+from lxml.etree import CDATA
 from PIL import Image
 
 from pyramid.response import Response
@@ -48,7 +49,7 @@ def _get_capabilities(obj, request):
     service = E.Service(
         E.Name(obj.keyname or 'WMS'),
         E.Title(obj.display_name),
-        E.Abstract('<![CDATA[%s]]>' % (obj.description or '')),
+        E.Abstract(obj.description or ''),
         OnlineResource()
     )
 
