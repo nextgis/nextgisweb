@@ -92,12 +92,13 @@ def _get_capabilities(obj, request):
 
 
 def _get_map(obj, request):
-    p_layers = request.params.get('LAYERS').split(',')
-    p_bbox = map(float, request.params.get('BBOX').split(','))
-    p_width = int(request.params.get('WIDTH'))
-    p_height = int(request.params.get('HEIGHT'))
-    p_format = request.params.get('FORMAT')
-    p_srs = request.params.get('SRS')
+    params = dict((k.upper(), v) for k,v in request.params.iteritems())
+    p_layers = params.get('LAYERS').split(',')
+    p_bbox = map(float, params.get('BBOX').split(','))
+    p_width = int(params.get('WIDTH'))
+    p_height = int(params.get('HEIGHT'))
+    p_format = params.get('FORMAT')
+    p_srs = params.get('SRS')
 
     p_size = (p_width, p_height)
 
