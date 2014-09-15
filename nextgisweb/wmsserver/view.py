@@ -46,8 +46,11 @@ def _get_capabilities(obj, request):
     DCPType = lambda: E.DCPType(E.HTTP(E.Get(OnlineResource())))
 
     service = E.Service(
-        E.Name('WMS'), E.Title('WMS'),
-        OnlineResource())
+        E.Name(obj.keyname or 'WMS'),
+        E.Title(obj.display_name),
+        E.Abstract('CDATA<![%s]]>' % (obj.description or '')),
+        OnlineResource()
+    )
 
     capability = E.Capability(
         E.Request(
