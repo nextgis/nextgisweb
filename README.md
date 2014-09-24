@@ -205,3 +205,11 @@
 ### Фичи
 
 На данный момент при добавлении двух слоёв с одинаковым названием возникает ошибка.
+
+### В случае ошибки
+
+* sqlalchemy.exc.ProgrammingError: (ProgrammingError) permission denied for database zapoved_ore_ngw
+  Пользователю не хватает прав в базе. Он должен быть владельцем базы, и таблиц, см. в начале инструкции
+
+* KeyError: 'database.host'
+  Опечатка в конфиге
