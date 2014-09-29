@@ -213,3 +213,7 @@
 
 * KeyError: 'database.host'
   Опечатка в конфиге
+
+* OSError: [Errno 13] Permission denied: '/home/trolleway/ngw_ore/data_storage/raster_layer/79'
+  Выставите права на запись растров в data_storage используя sudo mc
+  sudo chmod 755 -R ./data_storage
