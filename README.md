@@ -1,4 +1,4 @@
-Эта инструкция проверена и работает в Ubuntu Server 13.10, Ubuntu Server 12.04 LTS, Ubuntu Desktop 13.04
+Эта инструкция проверена и работает в Ubuntu Server 13.10, Ubuntu Server 12.04 LTS, Ubuntu Desktop 13.04, Ubuntu Server 14.04 LTS
 
 ## Установка
 
@@ -66,6 +66,7 @@
 
     $ sudo apt-get install python-mapscript git libgdal-dev python-dev g++ libxml2-dev libxslt1-dev gdal-bin
 
+Для большинства случаев ключи генерировать не нужно! Это необходимо при разработке.
 
 Генерируем ключи для работы с GitHub (копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys, https://github.com/settings/ssh):
 
@@ -87,7 +88,13 @@
     $ mkdir ~/ngw/data_storage
     $ cd ~/ngw
 
+
 Клонируем репозиторий:
+
+На гитхабе рекомендуют клонировать вот так (рекомендуется):
+    $ git clone https://github.com/nextgis/nextgisweb.git
+    
+Также можно склонировать вот так:
 
     $ git clone git@github.com:nextgis/nextgisweb.git
 
