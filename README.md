@@ -64,7 +64,8 @@
 
 Установить дополнительные инструменты: 
 
-    $ sudo apt-get install python-mapscript git libgdal-dev python-dev g++ libxml2-dev libxslt1-dev
+    $ sudo apt-get install python-mapscript git libgdal-dev python-dev g++ libxml2-dev libxslt1-dev gdal-bin
+
 
 Генерируем ключи для работы с GitHub (копируем и вставляем ключ в настройки пользователя GitHub в разделе SSH keys, https://github.com/settings/ssh):
 
