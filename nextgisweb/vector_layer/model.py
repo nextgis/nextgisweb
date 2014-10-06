@@ -48,7 +48,13 @@ from ..feature_layer import (
 
 GEOM_TYPE_GA = (ga.MultiPoint, ga.MultiLineString, ga.MultiPolygon)
 GEOM_TYPE_DB = ('MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')
-GEOM_TYPE_OGR = (ogr.wkbPoint, ogr.wkbLineString, ogr.wkbPolygon)
+GEOM_TYPE_OGR = (
+    ogr.wkbPoint,
+    ogr.wkbLineString,
+    ogr.wkbPolygon,
+    ogr.wkbMultiPoint,
+    ogr.wkbMultiLineString,
+    ogr.wkbMultiPolygon)
 GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
 
 FIELD_TYPE_DB = (
@@ -67,7 +73,7 @@ FIELD_TYPE_OGR = (
     ogr.OFTTime,
     ogr.OFTDateTime)
 
-_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum))
+_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum*2))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 _GEOM_TYPE_2_GA = dict(zip(GEOM_TYPE_DB, GEOM_TYPE_GA))
 
