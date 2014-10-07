@@ -2,7 +2,7 @@
 define([
     "dojo/_base/declare",
     "./_Base",
-    "ngw/async!http://maps.google.com/maps/api/js?v=3&sensor=false"
+    "ngw/async!//maps.google.com/maps/api/js?v=3&sensor=false"
 ], function (
     declare,
     _Base
