@@ -28,6 +28,7 @@ class ComplexEncoder(geojson.GeoJSONEncoder):
         except TypeError:
             return str(obj)
 
+
 class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
     operation = ('update', )
@@ -118,13 +119,33 @@ def feature_edit(layer, request):
 def feature_geojson(request):
     request.resource_permission(PD_READ)
 
+    # Класс обертка добавляющая информацию о системе координат в геоинтерфейс
+    # результата запроса векторного слоя
+
+    class CRSProxy(object):
+        def __init__(self, query):
+            self.query = query
+
+        @property
+        def __geo_interface__(self):
+            result = self.query.__geo_interface__
+
+            # TODO: Нужен корректный способ генерации имени СК, пока по ID
+
+            result['crs'] = dict(type='name', properties=dict(
+                name='EPSG:%d' % request.context.srs_id))
+            return result
+
     query = request.context.feature_query()
     query.geom()
 
     content_disposition = ('attachment; filename=%d.geojson'
                            % request.context.id)
+
+    result = CRSProxy(query())
+
     return Response(
-        geojson.dumps(query(), ensure_ascii=False, cls=ComplexEncoder),
+        geojson.dumps(result, ensure_ascii=False, cls=ComplexEncoder),
         content_type=b'application/json',
         content_disposition=content_disposition)
 
