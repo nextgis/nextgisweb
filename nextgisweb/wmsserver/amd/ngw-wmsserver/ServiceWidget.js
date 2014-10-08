@@ -137,6 +137,9 @@ define([
 
                     // Активируем кнопку удаления слоя или группы
                     widget.btnDeleteItem.set("disabled", false);
+
+                    // Помещаем фокус на обязательное поле с ключом
+                    widget.widgetItemKeyname.focus();
                 }
             });
 
