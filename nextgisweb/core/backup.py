@@ -95,7 +95,7 @@ def backup(env, dst, nozip=False):
     assert not os.path.exists(dst), "Path already exists!"
 
     if usezip:
-        zipf = ZipFile(dst, 'w')
+        zipf = ZipFile(dst, 'w', allowZip64=True)
     else:
         os.mkdir(dst)
 
