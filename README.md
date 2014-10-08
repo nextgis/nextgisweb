@@ -8,6 +8,6 @@ NextGIS Web (NGW) is a server based application that allows to upload, manage an
 Important links:
 
 * User manual
-* ![Installation guide](https://github.com/nextgis/nextgisweb/wiki/Install-and-Update-on-Ubuntu)
+* [Installation guide](https://github.com/nextgis/nextgisweb/wiki/Install-and-Update-on-Ubuntu)
 * Test data
 * Get your NGW instance
