@@ -1,13 +1,13 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" style="padding: 1ex;">
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
         
         <div data-dojo-attach-point="wSrs"
             data-dojo-type="ngw/form/SpatialRefSysSelect"
             title="Система&nbsp;координат" style="width: 100%"></div>
 
-        <div data-dojo-attach-point="wSourceFile" 
-            data-dojo-type="ngw/form/Uploader" 
-            title="Исходный файл"></div>
+        <div data-dojo-attach-point="wSourceFile"
+            data-dojo-type="ngw/form/Uploader"
+            title="Исходный файл (*.zip)"></div>
 
         <select data-dojo-attach-point="wSourceEncoding"
             data-dojo-type="dijit/form/Select"
