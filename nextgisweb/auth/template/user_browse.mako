@@ -16,7 +16,7 @@
                 <td>${obj.display_name}</td>
                 <td>${obj.keyname}</td>
                 <td>
-                    <a href="${request.route_url('auth.user.edit', id=obj.id)}">редактировать</a>
+                    <a class="dijitIconEdit" style="width: 16px; height: 16px; display: inline-block;" href="${request.route_url('auth.user.edit', id=obj.id)}"></a>
                 </td>
             </tr>
         %endfor
