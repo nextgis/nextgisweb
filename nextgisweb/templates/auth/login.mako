@@ -30,7 +30,7 @@
         data-dojo-props="label: 'Логин'"
         style="width: 100%">
 
-        <input name="login" style="width: 99%" />
+        <input name="login" style="width: 98%" />
 
     </div>
 
@@ -38,7 +38,7 @@
         data-dojo-props="label: 'Пароль'"
         style="width: 100%">
     
-        <input name="password" type="password" style="width: 99%" />
+        <input name="password" type="password" style="width: 98%" />
     
     </div>
 
