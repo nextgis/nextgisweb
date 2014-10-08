@@ -4,7 +4,7 @@
     <thead>
         <tr>
             <th style="width: 2em;">ID</th>
-            <th style="width: 50%;">Наименование</th>
+            <th style="width: 50%;">Полное имя</th>
             <th style="width: 50%">Имя пользователя</th>
             <th style="width: 0px;">&nbsp;</th>
         </tr>
