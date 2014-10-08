@@ -9,6 +9,7 @@ define([
     "dojo/dom-construct",
     "dojo/dom-style",
     "dojo/dom-class",
+    "dijit/Tooltip",
     "dijit/layout/ContentPane",
     "dijit/form/CheckBox",
     "dijit/form/ValidationTextBox",
@@ -32,6 +33,7 @@ define([
     domConstruct,
     domStyle,
     domClass,
+    Tooltip,
     ContentPane,
     CheckBox,
     ValidationTextBox,
@@ -79,6 +81,7 @@ define([
 
             editor({
                 field: "grid_visibility",
+                id: "grid_visibility",
                 label: "ТО",
                 sortable: false,
                 autoSave: true,
@@ -88,6 +91,7 @@ define([
 
             editor({
                 field: "label_field",
+                id: "label_field",
                 label: "АН",
                 sortable: false,
                 autoSave: true,
@@ -118,6 +122,7 @@ define([
                     });
                 }
             });
+
         },
 
         buildRendering: function () {
@@ -128,6 +133,17 @@ define([
             domStyle.set(this.grid.domNode, "border", "none");
             
             domConstruct.place(this.grid.domNode, this.domNode);
+
+            new Tooltip({
+                connectId: [this.grid.column("label_field").headerNode],
+                label: "Атрибут-наименование"
+            });
+
+            new Tooltip({
+                connectId: [this.grid.column("grid_visibility").headerNode],
+                label: "Таблица объектов"
+            });
+
         },
 
         deserializeInMixin: function (data) {
