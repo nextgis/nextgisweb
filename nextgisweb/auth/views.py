@@ -271,7 +271,7 @@ def setup_pyramid(comp, config):
                 lambda kwargs: kwargs.request.route_url('auth.user.create')
             )
 
-            if 'obj' in kwargs:
+            if 'obj' in kwargs and isinstance(kwargs.obj, User):
                 yield dm.Link(
                     self.sub('edit'), u"Редактировать",
                     lambda kwargs: kwargs.request.route_url(
@@ -293,7 +293,7 @@ def setup_pyramid(comp, config):
                 lambda kwargs: kwargs.request.route_url('auth.group.create')
             )
 
-            if 'obj' in kwargs:
+            if 'obj' in kwargs and isinstance(kwargs.obj, Group):
                 yield dm.Link(
                     self.sub('edit'), u"Редактировать",
                     lambda kwargs: kwargs.request.route_url(
