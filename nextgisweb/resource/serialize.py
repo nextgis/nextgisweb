@@ -173,7 +173,16 @@ class Serializer(SerializerBase):
     def deserialize(self):
         for prop, sp in self.proptab:
             if prop in self.data and not prop in self.keys:
-                sp.deserialize(self)
+                try:
+                    sp.deserialize(self)
+                except Exception as exc:
+                    self.annotate_exception(exc, sp)
+                    raise
+
+    def annotate_exception(self, exc, sp):
+        exc.__srlzr_prprt__ = sp.attrname
+
+        # TODO: Возможно TODO из CompositeSerializer.annotate_exception тут же
 
 
 class CompositeSerializer(SerializerBase):
@@ -192,13 +201,33 @@ class CompositeSerializer(SerializerBase):
 
     def serialize(self):
         for ident, mobj in self.members.iteritems():
-            mobj.serialize()
-            self.data[ident] = mobj.data
+            try:
+                mobj.serialize()
+                self.data[ident] = mobj.data
+            except Exception as exc:
+                self.annotate_exception(exc, mobj)
+                raise
 
     def deserialize(self):
         for ident, mobj in self.members.iteritems():
-            if ident in self.data:
-                mobj.deserialize()
+            try:
+                if ident in self.data:
+                    mobj.deserialize()
+            except Exception as exc:
+                self.annotate_exception(exc, mobj)
+                raise
+
+    def annotate_exception(self, exc, mobj):
+        """ Добавляет к исключению информацию о сериализаторе, в котором
+        оно было вызвано """
+
+        exc.__srlzr_cls__ = mobj.__class__
+
+        # TODO: Здесь было бы неплохо проверять, что наше исключение является
+        # наследником ResourceError, в противном случае имеет смысл выпустить
+        # warning, которые пока не очень понятно как привязать к строке в коде.
+        # В общем суть в том, что Serializer не должен генерировать никаких
+        # исключений кроме как наследников ResourceError.
 
 
 def serval(value):

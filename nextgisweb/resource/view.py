@@ -17,7 +17,7 @@ from ..pyramidcomp import viewargs
 from .model import (
     Resource,
     ResourceSerializer)
-from .exception import ResourceError, ValidationError, Forbidden
+from .exception import ResourceError, ValidationError, ForbiddenError
 from .permission import Permission, Scope
 from .scope import ResourceScope
 from .serialize import CompositeSerializer
@@ -127,17 +127,80 @@ def store(request):
 
 
 def exception_to_response(exception):
+    data = dict(ecls=exception.__class__.__name__)
+
+    # Выбираем более подходящие HTTP-коды, впрочем зачем это нужно
+    # сейчас не очень понимаю - можно было и одним ограничиться.
+
+    scode = 500
+
     if isinstance(exception, ValidationError):
-        return Response(
-            json.dumps(dict(message=exception.message)), status_code=400,
-            content_type=b'application/json')
+        scode = 400
 
-    elif isinstance(exception, Forbidden):
-        return Response(
-            json.dumps(dict(message=exception.message)), status_code=403,
-            content_type=b'application/json')
+    if isinstance(exception, ForbiddenError):
+        scode = 403
 
-    raise exception
+    # Общие атрибуты для идентификации того где произошла ошибка,
+    # устанавливаются внутри CompositeSerializer и Serializer.
+
+    if hasattr(exception, '__srlzr_cls__'):
+        data['serializer'] = exception.__srlzr_cls__.identity
+
+    if hasattr(exception, '__srlzr_prprt__'):
+        data['attr'] = exception.__srlzr_prprt__
+
+    if isinstance(exception, ResourceError):
+
+        # Только для потомков ResourceError можно передавать сообщение
+        # пользователю как есть, в остальных случаях это может быть
+        # небезопасно, там могут быть куски SQL запросов или какие-то
+        # внутренние данные.
+
+        data['message'] = exception.message
+
+    else:
+
+        # Для всех остальных генерируем универсальное сообщение об ошибке на
+        # основании имени класса исключительной ситуации.
+
+        data['message'] = "Неизвестная исключительная ситуация %s" \
+            % exception.__class__.__name__
+
+        data['message'] += ", cериализатор %s" % data['serializer'] \
+            if 'serializer' in data else ''
+
+        data['message'] += ", атрибут %s" % data['attr'] \
+            if 'attr' in data else ''
+
+        data['message'] += "."
+
+    return Response(
+        json.dumps(data), status_code=scode,
+        content_type=b'application/json')
+
+
+def resexc_tween_factory(handler, registry):
+    """ Tween factory для перехвата исключительных ситуаций API ресурса
+
+    Исключительная ситуация может возникнуть уже как во время выполнения
+    flush так и во время commit. Если flush еще можно вызвать явно, то
+    вызов commit в любом случае происходит не явно через pyramid_tm. Для
+    того, чтобы отловить эти ситуации используется pyramid tween, которая
+    регистрируется поверх pyramid_tm (см. setup_pyramid).
+
+    После перехвата ошибки для нее генерируется представление в виде JSON
+    при помощи exception_to_response. """
+
+    def resource_exception_tween(request):
+        try:
+            response = handler(request)
+        except Exception as exc:
+            if request.matched_route.name == 'resource.child':
+                return exception_to_response(exc)
+            raise
+        return response
+
+    return resource_exception_tween
 
 
 @viewargs(renderer='json')
@@ -178,15 +241,12 @@ def child_patch(request):
 
     serializer = CompositeSerializer(child, request.user, data)
 
-    try:
-        result = serializer.deserialize()
-        DBSession.flush()
-        return Response(
-            json.dumps(result), status_code=200,
-            content_type=b'application/json')
+    result = serializer.deserialize()
+    DBSession.flush()
 
-    except ResourceError as e:
-        return exception_to_response(e)
+    return Response(
+        json.dumps(result), status_code=200,
+        content_type=b'application/json')
 
 
 def child_post(request):
@@ -200,29 +260,25 @@ def child_post(request):
     cls = Resource.registry[data['resource']['cls']]
     child = cls(owner_user=request.user)
 
-    try:
-        deserializer = CompositeSerializer(child, request.user, data)
-        deserializer.members['resource'].mark('cls')
-        deserializer.deserialize()
+    deserializer = CompositeSerializer(child, request.user, data)
+    deserializer.members['resource'].mark('cls')
+    deserializer.deserialize()
 
-        child.persist()
-        DBSession.flush()
+    child.persist()
+    DBSession.flush()
 
-        location = request.route_url(
-            'resource.child',
-            id=child.parent_id,
-            child_id=child.id)
+    location = request.route_url(
+        'resource.child',
+        id=child.parent_id,
+        child_id=child.id)
 
-        data = OrderedDict(id=child.id)
-        data['parent'] = dict(id=child.parent_id)
+    data = OrderedDict(id=child.id)
+    data['parent'] = dict(id=child.parent_id)
 
-        return Response(
-            json.dumps(data), status_code=201,
-            content_type=b'application/json', headerlist=[
-                (b"Location", bytes(location)), ])
-
-    except ResourceError as e:
-        return exception_to_response(e)
+    return Response(
+        json.dumps(data), status_code=201,
+        content_type=b'application/json', headerlist=[
+            (b"Location", bytes(location)), ])
 
 
 def child_delete(request):
@@ -366,6 +422,10 @@ def setup_pyramid(comp, config):
         .add_view(child_patch, method=(r'PUT', r'PATCH')) \
         .add_view(child_post, method=r'POST') \
         .add_view(child_delete, method=r'DELETE')
+
+    config.add_tween(
+        'nextgisweb.resource.view.resexc_tween_factory',
+        over='pyramid_tm.tm_tween_factory')
 
     _route('widget', 'widget', client=()).add_view(widget)
 
