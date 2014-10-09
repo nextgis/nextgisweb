@@ -17,7 +17,8 @@ from ..resource import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
     ResourceError,
-    Forbidden)
+    ValidationError,
+    ForbiddenError)
 from ..env import env
 from ..geometry import geom_from_wkt, box
 from ..layer import SpatialLayerMixin
@@ -176,57 +177,64 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         try:
             result = conn.execute(
+                """SELECT * FROM information_schema.tables
+                WHERE table_schema = %s AND table_name = %s""",
+                self.schema, self.table)
+
+            if result.first() is None:
+                raise ValidationError(u"Таблица '%s.%s' не обнаружена." % (self.schema, self.table))  # NOQA
+
+            result = conn.execute(
                 """SELECT type, srid FROM geometry_columns
                 WHERE f_table_schema = %s
                     AND f_table_name = %s
                     AND f_geometry_column = %s""",
-                self.schema,
-                self.table,
-                self.column_geom
-            )
+                self.schema, self.table, self.column_geom)
 
             row = result.first()
+
             if row:
                 self.geometry_srid = row['srid']
 
-                table_geometry_type = row['type'].replace('MULTI', '')
+                tab_geom_type = row['type'].replace('MULTI', '')
 
-                # Если тип геометрии не указан в базе,
-                # то он должен быть указан заранее
-                assert not (
-                    table_geometry_type == 'GEOMETRY'
-                    and self.geometry_type is None
-                )
+                if tab_geom_type == 'GEOMETRY' and self.geometry_type is None:
+                    raise ValidationError(u"Тип геометрии отсутствует в geometry_columns, необходимо указать его в явном виде.")   # NOQA
 
-                # Если тип геометрии указан в базе,
-                # то заранее не должен быть указан другой
-                assert not (
+                if (
                     self.geometry_type is not None
-                    and table_geometry_type != 'GEOMETRY'
-                    and self.geometry_type != table_geometry_type
-                )
+                    and tab_geom_type != 'GEOMETRY'
+                    and self.geometry_type != tab_geom_type
+                ):
+                    raise ValidationError(u"Тип геометрии в geometry_columns (%s) не соответствует указанному (%s)." % (tab_geom_type, self.geometry_type))  # NOQA
 
                 if self.geometry_type is None:
-                    self.geometry_type = table_geometry_type
+                    self.geometry_type = tab_geom_type
 
             result = conn.execute(
                 """SELECT column_name, data_type
                 FROM information_schema.columns
-                WHERE table_schema = %s
-                    AND table_name = %s
+                WHERE table_schema = %s AND table_name = %s
                 ORDER BY ordinal_position""",
-                self.schema,
-                self.table
-            )
+                self.schema, self.table)
+
+            colfound_id = False
+            colfound_geom = False
+
             for row in result:
                 if row['column_name'] == self.column_id:
-                    assert row['data_type'] == 'integer'
+                    if row['data_type'] != 'integer':
+                        raise ValidationError(u"Для использования поля в качестве идентификатора необходим тип integer.")  # NOQA
+                    colfound_id = True
+
                 elif row['column_name'] == self.column_geom:
-                    pass
+                    colfound_geom = True
+
                 elif row['column_name'] in ('id', 'geom'):
                     # FIXME: На данный момент наличие полей id или
                     # geom полностью ломает векторный слой
                     pass
+
                 else:
                     datatype = None
                     if row['data_type'] == 'integer':
@@ -248,6 +256,13 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                             datatype=datatype,
                             column_name=row['column_name'],
                             **fopts))
+
+            if not colfound_id:
+                raise ValidationError(u"Поле идентификатор '%s' не найдено в таблице '%s.%s'." % (self.column_id, self.schema, self.table))  # NOQA
+
+            if not colfound_geom:
+                raise ValidationError(u"Поле геометрии '%s' не найдено в таблице '%s.%s'." % (self.column_geom, self.schema, self.table))  # NOQA
+
         finally:
             conn.close()
 
@@ -283,7 +298,7 @@ class _fields_action(SP):
             if srlzr.obj.connection.has_permission(PC_CONNECT, srlzr.user):
                 srlzr.obj.setup()
             else:
-                raise Forbidden()
+                raise ForbiddenError()
         elif value != 'keep':
             raise ResourceError()
 
