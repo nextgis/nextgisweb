@@ -73,7 +73,7 @@ FIELD_TYPE_OGR = (
     ogr.OFTTime,
     ogr.OFTDateTime)
 
-_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum*2))
+_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 2))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 _GEOM_TYPE_2_GA = dict(zip(GEOM_TYPE_DB, GEOM_TYPE_GA))
 
@@ -211,7 +211,10 @@ class TableInfo(object):
                 elif fld_type == ogr.OFTReal:
                     fld_value = feature.GetFieldAsDouble(i)
                 elif fld_type == ogr.OFTString:
-                    fld_value = strdecode(feature.GetFieldAsString(i))
+                    try:
+                        fld_value = strdecode(feature.GetFieldAsString(i))
+                    except UnicodeDecodeError:
+                        raise ValidationError("Не удалось декодировать строковое значение атрибута: объект номер %d, атрибут номер %d." % (fid, i))  # NOQA
 
                 fld_values[self[feature.GetFieldDefnRef(i).GetNameRef()].key] \
                     = fld_value
