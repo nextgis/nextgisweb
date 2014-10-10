@@ -244,6 +244,16 @@ class Resource(Base):
 
         return value
 
+    @db.validates('keyname')
+    def _validate_keyname(self, key, value):
+        """ Проверка на уникальность ключа """
+
+        with DBSession.no_autoflush:
+            if Resource.filter(Resource.keyname == value, Resource.id != self.id).first():
+                raise ValidationError(u"Ключ ресурса не уникален.")
+
+        return value
+
 
 ResourceScope.read.require(
     ResourceScope.read,
