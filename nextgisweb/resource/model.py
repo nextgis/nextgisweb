@@ -235,11 +235,12 @@ class Resource(Base):
         """ Проверка на уникальность имени внутри родителя """
 
         with DBSession.no_autoflush:
-            children = self.parent.children
-            ids = (c.id for c in children)
-            display_names = (c.display_name for c in children)
-            if value in display_names and self.id not in ids:
-                raise ValidationError(u"Имя ресурса не уникально внутри родителя.")
+            if self.parent:
+                children = self.parent.children
+                ids = (c.id for c in children)
+                display_names = (c.display_name for c in children)
+                if value in display_names and self.id not in ids:
+                    raise ValidationError(u"Имя ресурса не уникально внутри родителя.")
 
         return value
 
