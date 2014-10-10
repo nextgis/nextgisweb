@@ -195,7 +195,7 @@ def resexc_tween_factory(handler, registry):
         try:
             response = handler(request)
         except Exception as exc:
-            if request.matched_route.name == 'resource.child':
+            if request.matched_route and request.matched_route.name == 'resource.child':
                 return exception_to_response(exc)
             raise
         return response
