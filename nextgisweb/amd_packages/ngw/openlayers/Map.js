@@ -24,6 +24,9 @@ define([
             this.layers = {};
             var widget = this, olMap = this.olMap;
 
+            // Z-index для попапа
+            openlayers.Map.prototype.Z_INDEX_BASE.Popup = 10000;
+
             this.olMap.events.on({
                 zoomend: function (evt) {
                     widget.set("scaleDenom", olMap.getScale());
