@@ -229,6 +229,15 @@ class Resource(Base):
 
         return value
 
+    @db.validates('display_name')
+    def _validate_display_name(self, key, value):
+        """ Проверка на уникальность имени внутри группы """
+
+        if value in (c.display_name for c in self.parent.children):
+            raise ValidationError(u"Имя ресурса не уникально внутри группы.")
+
+        return value
+
 
 ResourceScope.read.require(
     ResourceScope.read,
