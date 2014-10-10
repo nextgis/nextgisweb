@@ -231,10 +231,10 @@ class Resource(Base):
 
     @db.validates('display_name')
     def _validate_display_name(self, key, value):
-        """ Проверка на уникальность имени внутри группы """
+        """ Проверка на уникальность имени внутри родителя """
 
         if value in (c.display_name for c in self.parent.children):
-            raise ValidationError(u"Имя ресурса не уникально внутри группы.")
+            raise ValidationError(u"Имя ресурса не уникально внутри родителя.")
 
         return value
 
