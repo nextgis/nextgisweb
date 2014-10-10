@@ -230,20 +230,6 @@ class Resource(Base):
 
         return value
 
-    @db.validates('display_name')
-    def _validate_display_name(self, key, value):
-        """ Проверка на уникальность имени внутри родителя """
-
-        with DBSession.no_autoflush:
-            if self.parent:
-                children = self.parent.children
-                ids = (c.id for c in children)
-                display_names = (c.display_name for c in children)
-                if value in display_names and self.id not in ids:
-                    raise ValidationError(u"Имя ресурса не уникально внутри родителя.")
-
-        return value
-
     @db.validates('keyname')
     def _validate_keyname(self, key, value):
         """ Проверка на уникальность ключа """
