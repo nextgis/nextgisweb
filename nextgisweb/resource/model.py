@@ -249,7 +249,7 @@ class Resource(Base):
         """ Проверка на уникальность ключа """
 
         with DBSession.no_autoflush:
-            if Resource.filter(Resource.keyname == value, Resource.id != self.id).first():
+            if value is not None and Resource.filter(Resource.keyname == value, Resource.id != self.id).first():
                 raise ValidationError(u"Ключ ресурса не уникален.")
 
         return value
