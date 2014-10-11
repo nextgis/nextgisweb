@@ -7,6 +7,8 @@ from collections import OrderedDict
 from pyramid.response import Response
 from pyramid import httpexceptions
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from ..models import DBSession
 
 from ..views import permalinker
@@ -36,7 +38,10 @@ def resource_factory(request):
         return None
 
     # Вначале загружаем ресурс базового класса
-    base = Resource.filter_by(id=request.matchdict['id']).one()
+    try:
+        base = Resource.filter_by(id=request.matchdict['id']).one()
+    except NoResultFound:
+        raise httpexceptions.HTTPNotFound()
 
     # После чего загружаем ресурс того класса,
     # к которому этот ресурс и относится
