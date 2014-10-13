@@ -12,6 +12,13 @@ __all__ = ["FileUploadComponent", ]
 class FileUploadComponent(Component):
     identity = 'file_upload'
 
+    def initialize(self):
+        self.path = self.settings.get('path') or self.env.core.gtsdir(self)
+
+    def initialize_db(self):
+        if 'path' not in self.settings:
+            self.env.core.mksdir(self)
+
     def setup_pyramid(self, config):
         from . import view
         view.setup_pyramid(self, config)
@@ -27,16 +34,11 @@ class FileUploadComponent(Component):
         При makedirs == True так же создаются необходимые директории.
         Полезно в случае, когда имена файлов нужны для записи. """
 
-        assert ('path' in self.settings) and os.path.isdir(self.settings['path']), \
-            "Invalid path setting!"
-
-        base_path = self.settings['path']
-
-        # разделяем на два уровня директорий по первым символам id
+        # Разделяем на два уровня директорий по первым символам id
         levels = (fileid[0:2], fileid[2:4])
-        level_path = os.path.join(base_path, *levels)
+        level_path = os.path.join(self.path, *levels)
 
-        # создаем директории если нужно
+        # Создаем директории если нужно
         if makedirs and not os.path.isdir(level_path):
             os.makedirs(level_path)
 

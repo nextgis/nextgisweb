@@ -6,7 +6,7 @@ from ..component import Component
 from ..core import BackupBase
 
 from .models import Base, FileObj
-from . import command
+from . import command  # NOQA
 
 __all__ = ['FileStorageComponent', 'FileObj']
 
@@ -38,6 +38,13 @@ class FileStorageComponent(Component):
     identity = 'file_storage'
     metadata = Base.metadata
 
+    def initialize(self):
+        self.path = self.settings.get('path') or self.env.core.gtsdir(self)
+
+    def initialize_db(self):
+        if 'path' not in self.settings:
+            self.env.core.mksdir(self)
+
     def backup(self):
         for i in super(FileStorageComponent, self).backup():
             yield i
@@ -50,16 +57,13 @@ class FileStorageComponent(Component):
         return obj
 
     def filename(self, fileobj, makedirs=False):
-        assert ('path' in self.settings) and (os.path.isdir(self.settings['path'])), "Path not set!"
         assert fileobj.component, "Component not set!"
 
-        base_path = self.settings['path']
-
-        # разделяем на два уровня директорий по первым символам id
+        # Разделяем на два уровня директорий по первым символам id
         levels = (fileobj.uuid[0:2], fileobj.uuid[2:4])
-        path = os.path.join(base_path, fileobj.component, *levels)
+        path = os.path.join(self.path, fileobj.component, *levels)
 
-        # создаем директории если нужно
+        # Создаем директории если нужно
         if makedirs and not os.path.isdir(path):
             os.makedirs(path)
 

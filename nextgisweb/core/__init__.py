@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
+import os
+import os.path
 
 from sqlalchemy import create_engine
 
 from ..component import Component
 from ..models import DBSession, Base
 
-from .command import BackupCommand
-from .backup import BackupBase, TableBackup, SequenceBackup
+from .command import BackupCommand  # NOQA
+from .backup import BackupBase, TableBackup, SequenceBackup  # NOQA
 
 
 @Component.registry.register
@@ -66,6 +68,24 @@ class CoreComponent(Component):
         for seq in metadata._sequences.itervalues():
             yield SequenceBackup(self, seq.name)
 
+    def gtsdir(self, comp):
+        """ Получить директорию хранения файлов компонента """
+        return os.path.join(self.settings['sdir'], comp.identity)
+
+    def mksdir(self, comp):
+        """ Создание директории для хранения файлов """
+        self.bmakedirs(self.settings['sdir'], comp.identity)
+
+    def bmakedirs(self, base, path):
+        fpath = os.path.join(base, path)
+        if os.path.isdir(fpath):
+            return
+
+        if not os.path.isdir(base):
+            raise IOError("Invalid base directory path")
+
+        os.makedirs(fpath)
+
     settings_info = (
         dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),
         dict(key='system.full_name', default=u"Геоинформационная система NextGIS", desc=u"Полное название системы"),
@@ -79,4 +99,6 @@ class CoreComponent(Component):
 
         dict(key='packages.ignore', desc=u"Не загружать перечисленные пакеты"),
         dict(key='components.ignore', desc=u"Не загружать перечисленные компоненты"),
+
+        dict(key='sdir', desc=u"Директория для хранения данных")
     )
