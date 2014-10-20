@@ -284,7 +284,7 @@ class PyramidComponent(Component):
             if mpkg:
                 self.pkginfo.append(tuple(mpkg.groups()))
 
-            mgit = re.match(r'-e\sgit\+git\@.+?\@.+(.{8})\#egg=(\w+).*', l)
+            mgit = re.match(r'-e\sgit\+git\@.+?\@(.{8}).+\#egg=(\w+).*', l)
             if mgit:
                 self.pkginfo.append(tuple(reversed(mgit.groups())))
 
