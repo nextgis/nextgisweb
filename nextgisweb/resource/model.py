@@ -235,8 +235,11 @@ class Resource(Base):
         """ Проверка на уникальность ключа """
 
         with DBSession.no_autoflush:
-            if value is not None and Resource.filter(Resource.keyname == value, Resource.id != self.id).first():
-                raise ValidationError(u"Ключ ресурса не уникален.")
+            if value is not None and Resource.filter(
+                Resource.keyname == value,
+                Resource.id != self.id
+            ).first():
+                raise ValidationError("Ключ ресурса не уникален.")
 
         return value
 
@@ -282,7 +285,7 @@ class _perms_attr(SP):
                 permission=itm['permission'],
                 propagate=itm['propagate'],
                 action=itm['action'])
-            
+
             rule.principal = Principal.filter_by(
                 id=itm['principal']['id']).one()
 
@@ -350,6 +353,30 @@ class ResourceSerializer(Serializer):
     children = _ro(_children_attr)
     interfaces = _ro(_interfaces_attr)
     scopes = _ro(_scopes_attr)
+
+    def deserialize(self, *args, **kwargs):
+        # Поскольку выполнение требования на уникальное наиVaенование внутри
+        # группы зависит от двух атрибутов (parent, display_name). Корректно
+        # проверить его выполнени можно после сериализации обоих атрибутов.
+
+        # Сохраняем старые значения, чтобы отследить изменения.
+        parent, display_name = self.obj.parent, self.obj.display_name
+
+        super(ResourceSerializer, self).deserialize(*args, **kwargs)
+
+        if parent != self.parent or display_name != self.display_name:
+            with DBSession.no_autoflush:
+                conflict = Resource.filter(
+                    Resource.parent_id == self.obj.parent.id,
+                    Resource.display_name == self.obj.display_name,
+                    Resource.id != self.obj.id
+                ).first()
+
+            if conflict is not None:
+                raise ValidationError(
+                    "Наименование ресурса не уникально, одноименный дочерний "
+                    "ресурс (ID=%d) существует у родительского ресурса "
+                    "(ID=%d)." % (conflict.id, conflict.parent_id))
 
 
 class ResourceACLRule(Base):

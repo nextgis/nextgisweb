@@ -246,9 +246,10 @@ def child_patch(request):
 
     serializer = CompositeSerializer(child, request.user, data)
 
-    result = serializer.deserialize()
-    DBSession.flush()
+    with DBSession.no_autoflush:
+        result = serializer.deserialize()
 
+    DBSession.flush()
     return Response(
         json.dumps(result), status_code=200,
         content_type=b'application/json')
@@ -267,7 +268,9 @@ def child_post(request):
 
     deserializer = CompositeSerializer(child, request.user, data)
     deserializer.members['resource'].mark('cls')
-    deserializer.deserialize()
+
+    with DBSession.no_autoflush:
+        deserializer.deserialize()
 
     child.persist()
     DBSession.flush()
