@@ -24,6 +24,7 @@ def pkginfo():
         'pyramidcomp',
         'auth',
         'resource',
+        'resmeta',
         'spatial_ref_sys',
         'layer',
         'feature_layer',
