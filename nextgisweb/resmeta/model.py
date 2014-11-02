@@ -10,12 +10,14 @@ from ..resource import (
     Serializer,
     SerializedProperty)
 
+from .ident import COMP_ID
+
 
 Base = declarative_base()
 
 
 class ResourceMetadataItem(Base):
-    __tablename__ = 'resmeta_item'
+    __tablename__ = '%s_item' % COMP_ID
 
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     keyname = db.Column(db.Unicode(255), primary_key=True)
@@ -23,7 +25,7 @@ class ResourceMetadataItem(Base):
     vfloat = db.Column(db.Float)
     vtext = db.Column(db.Unicode)
 
-    resource = db.relationship(Resource, backref=db.backref('metadata'))
+    resource = db.relationship(Resource, backref=db.backref(COMP_ID))
 
     @property
     def value(self):
@@ -48,7 +50,7 @@ class _items_attr(SerializedProperty):
     def getter(self, srlzr):
         result = dict()
 
-        for itm in srlzr.obj.metadata:
+        for itm in getattr(srlzr.obj, COMP_ID):
             result[itm.keyname] = itm.value
 
         return result
@@ -58,11 +60,11 @@ class _items_attr(SerializedProperty):
             for k, val in value.iteritems():
                 itm = ResourceMetadataItem(keyname=k)
                 itm.value = val
-                srlzr.obj.metadata.append(itm)
+                getattr(srlzr.obj, COMP_ID).append(itm)
 
 
 class ResourceMetadataSerializer(Serializer):
-    identity = 'metadata'
+    identity = COMP_ID
     resclass = Resource
 
     items = _items_attr(read=MetadataScope.read, write=MetadataScope.write)
