@@ -67,4 +67,8 @@ class ResourceMetadataSerializer(Serializer):
     identity = COMP_ID
     resclass = Resource
 
+    # TODO: Возможно было бы неплохо реализовать сериализацию без
+    # промежуточного ключа items, но пока это невозможно так как сериализация
+    # в целом и сериализация атрубутов смешана в одном классе.
+
     items = _items_attr(read=MetadataScope.read, write=MetadataScope.write)
