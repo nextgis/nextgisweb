@@ -25,7 +25,8 @@ class ResourceMetadataItem(Base):
     vfloat = db.Column(db.Float)
     vtext = db.Column(db.Unicode)
 
-    resource = db.relationship(Resource, backref=db.backref(COMP_ID))
+    resource = db.relationship(Resource, backref=db.backref(
+        COMP_ID, cascade='all, delete-orphan'))
 
     @property
     def value(self):
