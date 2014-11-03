@@ -57,11 +57,29 @@ class _items_attr(SerializedProperty):
         return result
 
     def setter(self, srlzr, value):
-        if value is not None:
-            for k, val in value.iteritems():
+        odata = getattr(srlzr.obj, COMP_ID)
+
+        rml = []        # Удаляемые записи
+        imap = dict()   # Перезаписываемые записи
+
+        for i in odata:
+            if i.keyname in value:
+                imap[i.keyname] = i
+            else:
+                rml.append(i)
+
+        # Удаляем удаляемые
+        map(lambda i: odata.remove(i), rml)
+
+        for k, val in value.iteritems():
+            itm = imap.get(k)
+
+            if itm is None:
+                # Создаем новую запись если нет перезаписываемой
                 itm = ResourceMetadataItem(keyname=k)
-                itm.value = val
-                getattr(srlzr.obj, COMP_ID).append(itm)
+                odata.append(itm)
+
+            itm.value = val
 
 
 class ResourceMetadataSerializer(Serializer):
