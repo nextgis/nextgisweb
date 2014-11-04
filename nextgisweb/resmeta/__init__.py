@@ -11,3 +11,6 @@ from .model import Base
 class ResourceMetadataComponent(Component):
     identity = COMP_ID
     metadata = Base.metadata
+
+    def setup_pyramid(self, config):
+        from . import view  # NOQA
