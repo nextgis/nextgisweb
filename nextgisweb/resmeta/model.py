@@ -20,7 +20,8 @@ class ResourceMetadataItem(Base):
     __tablename__ = '%s_item' % COMP_ID
 
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    keyname = db.Column(db.Unicode(255), primary_key=True)
+    key = db.Column(db.Unicode(255), primary_key=True)
+
     vinteger = db.Column(db.Integer)
     vfloat = db.Column(db.Float)
     vtext = db.Column(db.Unicode)
@@ -52,7 +53,7 @@ class _items_attr(SerializedProperty):
         result = dict()
 
         for itm in getattr(srlzr.obj, COMP_ID):
-            result[itm.keyname] = itm.value
+            result[itm.key] = itm.value
 
         return result
 
@@ -63,8 +64,8 @@ class _items_attr(SerializedProperty):
         imap = dict()   # Перезаписываемые записи
 
         for i in odata:
-            if i.keyname in value:
-                imap[i.keyname] = i
+            if i.key in value:
+                imap[i.key] = i
             else:
                 rml.append(i)
 
@@ -76,7 +77,7 @@ class _items_attr(SerializedProperty):
 
             if itm is None:
                 # Создаем новую запись если нет перезаписываемой
-                itm = ResourceMetadataItem(keyname=k)
+                itm = ResourceMetadataItem(key=k)
                 odata.append(itm)
 
             itm.value = val
