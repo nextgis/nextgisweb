@@ -64,7 +64,7 @@ class _items_attr(SerializedProperty):
         imap = dict()   # Перезаписываемые записи
 
         for i in odata:
-            if i.key in value:
+            if i.key in value and value[i.key] is not None:
                 imap[i.key] = i
             else:
                 rml.append(i)
@@ -73,6 +73,9 @@ class _items_attr(SerializedProperty):
         map(lambda i: odata.remove(i), rml)
 
         for k, val in value.iteritems():
+            if val is None:
+                continue
+
             itm = imap.get(k)
 
             if itm is None:
