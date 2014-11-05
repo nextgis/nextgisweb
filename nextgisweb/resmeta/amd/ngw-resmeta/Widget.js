@@ -94,7 +94,7 @@ define([
         title: "Метаданные",
 
         constructor: function () {
-            this.store = new Observable(new Memory({idProperty: "idx"}));           
+            this.store = new Observable(new Memory({idProperty: "id"}));           
         },
 
         buildRendering: function () {
@@ -181,10 +181,10 @@ define([
                     value = f.value
                 } else if (f.type == "integer") {
                     value = parseInt(f.value, 10);
-                    if (value == NaN) { value = 0 }
+                    if (isNaN(value)) { value = 0 }
                 } else if (f.type == "float") {
                     value = parseFloat(f.value);
-                    if (value == NaN) { value = 0.0 }
+                    if (isNaN(value)) { value = 0.0 }
                 }
 
                 // Пустые ключи не записываем, хотя почему
