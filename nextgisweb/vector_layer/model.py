@@ -415,7 +415,7 @@ class _source_attr(SP):
             raise VE("Набор данных содержит более одного слоя.")
 
         ogrlayer = ogrds.GetLayer(0)
-        if not ogrlayer:
+        if ogrlayer is None:
             raise VE("Не удалось открыть слой.")
 
         return ogrlayer
@@ -428,7 +428,7 @@ class _source_attr(SP):
         feat = ogrlayer.GetNextFeature()
         while feat:
             geom = feat.GetGeometryRef()
-            if not geom:
+            if geom is None:
                 raise VE("Объект %d не содержит геометрии." % feat.GetFID())
             feat = ogrlayer.GetNextFeature()
 
@@ -457,7 +457,7 @@ class _source_attr(SP):
                 ogrds = ogr.Open(ogrfn)
                 recode = sdecode
 
-            if not ogrds:
+            if ogrds is None:
                 raise VE("Библиотеке OGR не удалось открыть файл")
 
             drivername = ogrds.GetDriver().GetName()
