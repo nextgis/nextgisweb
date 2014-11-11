@@ -23,7 +23,8 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
-    ValidationError)
+    ValidationError,
+    ResourceGroup)
 from ..layer import SpatialLayerMixin
 from ..style import (
     IRenderableStyle,
@@ -50,7 +51,7 @@ class Connection(Base, Resource):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
     @property
     def client(self):
@@ -178,7 +179,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
     def render_request(self, srs):
         return RenderRequest(self, srs)

@@ -24,7 +24,8 @@ from ..resource import (
     DataScope,
     Serializer,
     SerializedProperty as SP,
-    SerializedRelationship as SR)
+    SerializedRelationship as SR,
+    ResourceGroup)
 from ..resource.exception import ValidationError
 from ..env import env
 from ..geometry import geom_from_wkb, box
@@ -250,7 +251,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
     @property
     def _tablename(self):

@@ -7,7 +7,8 @@ from ..resource import (
     Resource,
     MetadataScope,
     Serializer,
-    SerializedProperty as SP)
+    SerializedProperty as SP,
+    ResourceGroup)
 
 Base = declarative_base()
 
@@ -18,7 +19,7 @@ class Service(Base, Resource):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
 
 class Layer(Base):
