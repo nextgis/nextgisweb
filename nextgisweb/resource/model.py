@@ -16,7 +16,7 @@ from .serialize import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR)
 from .scope import ResourceScope, MetadataScope
-from .exception import ResourceError, ValidationError, Forbidden
+from .exception import ValidationError, Forbidden
 
 __all__ = ['Resource', ]
 
@@ -222,7 +222,8 @@ class Resource(Base):
         with DBSession.no_autoflush:
             if value is not None:
                 if self == value or self in value.parents:
-                    raise ValidationError("Resource hierarchy loop detected!")
+                    raise ValidationError(
+                        "Невозможно переместить ресурс внутрь дочернего.")
 
         return value
 
@@ -263,7 +264,10 @@ class _parent_attr(SRR):
             raise Forbidden()
 
         if not srlzr.obj.check_parent(srlzr.obj.parent):
-            raise ResourceError("Parentship error")
+            raise ValidationError(
+                "Ресурс не может дочерним ресурсом для ID=%d. "
+                "Тип ресурса - %s, родительского ресурса - %s."
+                % (srlzr.obj.parent.id, srlzr.obj.cls, srlzr.obj.parent.cls))
 
 
 class _perms_attr(SP):
