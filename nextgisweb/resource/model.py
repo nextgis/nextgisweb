@@ -132,10 +132,6 @@ class Resource(Base):
     def __unicode__(self):
         return self.display_name
 
-    def check_child(self, child):
-        """ Может ли этот ресурс принять child в качестве дочернего """
-        return False
-
     @classmethod
     def check_parent(self, parent):
         """ Может ли этот ресурс быть дочерним для parent """
@@ -268,8 +264,6 @@ class _parent_attr(SRR):
 
         if not srlzr.obj.check_parent(srlzr.obj.parent):
             raise ResourceError("Parentship error")
-
-        # TODO: check_child
 
 
 class _perms_attr(SP):
@@ -431,10 +425,6 @@ class ResourceACLRule(Base):
 class ResourceGroup(Resource):
     identity = 'resource_group'
     cls_display_name = "Группа ресурсов"
-
-    def check_child(self, child):
-        # Принимаем любые дочерние ресурсы
-        return True
 
     @classmethod
     def check_parent(self, parent):
