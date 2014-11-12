@@ -36,7 +36,9 @@ class Layer(Base):
         Service, foreign_keys=service_id,
         backref=db.backref('layers', cascade='all'))
 
-    resource = db.relationship(Resource, foreign_keys=resource_id)
+    resource = db.relationship(
+        Resource, foreign_keys=resource_id,
+        backref=db.backref('_wmsserver_layers', cascade='all'))
 
     def to_dict(self):
         return dict(
