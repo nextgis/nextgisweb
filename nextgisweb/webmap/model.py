@@ -8,7 +8,8 @@ from ..resource import (
     ResourceScope,
     Serializer,
     SerializedProperty as SP,
-    SerializedResourceRelationship as SRR)
+    SerializedResourceRelationship as SRR,
+    ResourceGroup)
 
 Base = declarative_base()
 
@@ -41,7 +42,7 @@ class WebMap(Base, Resource):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
     def to_dict(self):
         return dict(

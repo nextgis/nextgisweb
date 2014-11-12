@@ -13,7 +13,8 @@ from ..resource import (
     DataStructureScope, DataScope,
     Serializer,
     SerializedProperty as SP,
-    SerializedRelationship as SR)
+    SerializedRelationship as SR,
+    ResourceGroup)
 from ..resource.exception import ValidationError
 from ..env import env
 from ..layer import SpatialLayerMixin
@@ -44,7 +45,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
     def load_file(self, filename, env):
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
