@@ -4,6 +4,13 @@
         <td>${obj.display_name}</td>
     </tr>
 
+    %if obj.keyname:
+    <tr>
+        <th>Ключ</th>
+        <td>${obj.keyname}</td>
+    </tr>
+    %endif
+
     <tr>
         <th>Тип ресурса</th>
         <td>${obj.cls_display_name} (${obj.cls})</td>
