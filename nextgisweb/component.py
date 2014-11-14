@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pkg_resources
+import logging
 
 from .registry import registry_maker
 
@@ -11,15 +12,14 @@ class Component(object):
     def __init__(self, env, settings):
         self._env = env
         self._settings = settings
+        self._logger = logging.getLogger('nextgisweb.comp.' + self.identity)
 
     def initialize(self):
         """ Первая стадия инициализации, вызывается перед запуском системы """
-        pass
 
     def configure(self):
         """ Вторая стадия инициализации, вызывается после того, как для всех
         компонентов выполнена первая стадия (initialize) """
-        pass
 
     def initialize_db(self):
         pass
@@ -37,6 +37,10 @@ class Component(object):
     @property
     def settings(self):
         return self._settings
+
+    @property
+    def logger(self):
+        return self._logger
 
     @classmethod
     def setup_routes(cls, dbsession):
