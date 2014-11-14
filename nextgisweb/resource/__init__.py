@@ -68,5 +68,6 @@ class ResourceComponent(Component):
 
     @require('auth')
     def setup_pyramid(self, config):
-        from .view import setup_pyramid
-        setup_pyramid(self, config)
+        from . import view, api
+        view.setup_pyramid(self, config)
+        api.setup_pyramid(self, config)
