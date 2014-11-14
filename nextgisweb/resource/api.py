@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import sys
 import json
+import traceback
 from collections import OrderedDict
 
 from pyramid.response import Response
 
+from ..env import env
 from ..models import DBSession
 from ..pyramidcomp import viewargs
 
@@ -125,37 +128,37 @@ def child_delete(request):
         content_type=b'application/json')
 
 
-def exception_to_response(exception):
-    data = dict(ecls=exception.__class__.__name__)
+def exception_to_response(exc_type, exc_value, exc_traceback):
+    data = dict(ecls=exc_value.__class__.__name__)
 
     # Выбираем более подходящие HTTP-коды, впрочем зачем это нужно
     # сейчас не очень понимаю - можно было и одним ограничиться.
 
     scode = 500
 
-    if isinstance(exception, ValidationError):
+    if isinstance(exc_value, ValidationError):
         scode = 400
 
-    if isinstance(exception, ForbiddenError):
+    if isinstance(exc_value, ForbiddenError):
         scode = 403
 
     # Общие атрибуты для идентификации того где произошла ошибка,
     # устанавливаются внутри CompositeSerializer и Serializer.
 
-    if hasattr(exception, '__srlzr_cls__'):
-        data['serializer'] = exception.__srlzr_cls__.identity
+    if hasattr(exc_value, '__srlzr_cls__'):
+        data['serializer'] = exc_value.__srlzr_cls__.identity
 
-    if hasattr(exception, '__srlzr_prprt__'):
-        data['attr'] = exception.__srlzr_prprt__
+    if hasattr(exc_value, '__srlzr_prprt__'):
+        data['attr'] = exc_value.__srlzr_prprt__
 
-    if isinstance(exception, ResourceError):
+    if isinstance(exc_value, ResourceError):
 
         # Только для потомков ResourceError можно передавать сообщение
         # пользователю как есть, в остальных случаях это может быть
         # небезопасно, там могут быть куски SQL запросов или какие-то
         # внутренние данные.
 
-        data['message'] = exception.message
+        data['message'] = exc_value.message
 
     else:
 
@@ -163,7 +166,7 @@ def exception_to_response(exception):
         # основании имени класса исключительной ситуации.
 
         data['message'] = "Неизвестная исключительная ситуация %s" \
-            % exception.__class__.__name__
+            % exc_value.__class__.__name__
 
         data['message'] += ", cериализатор %s" % data['serializer'] \
             if 'serializer' in data else ''
@@ -172,6 +175,12 @@ def exception_to_response(exception):
             if 'attr' in data else ''
 
         data['message'] += "."
+
+        # Ошибка неожиданная, имеет смысл дать возможность ее записать.
+
+        env.resource.logger.error(
+            exc_type.__name__ + ': ' + exc_value.message + "\n"
+            + ''.join(traceback.format_tb(exc_traceback)))
 
     return Response(
         json.dumps(data), status_code=scode,
@@ -193,10 +202,10 @@ def resexc_tween_factory(handler, registry):
     def resource_exception_tween(request):
         try:
             response = handler(request)
-        except Exception as exc:
+        except:
             mroute = request.matched_route
             if mroute and mroute.name == 'resource.child':
-                return exception_to_response(exc)
+                return exception_to_response(*sys.exc_info())
             raise
         return response
 
