@@ -9,7 +9,7 @@
             "ngw-resource/CompositeWidget",
             "dojo/domReady!"
         ], function (xhr, route, CompositeWidget) {
-            xhr(route("resource.widget"), {
+            xhr(route.resource.widget(), {
                 query: ${query | json.dumps, n},
                 handleAs: 'json'
             }).then(function (data) {

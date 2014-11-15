@@ -236,14 +236,14 @@ define([
         },
 
         itemUrl: function () {
-            return route("resource.child", {
+            return route.resource.child({
                 id: (this.parent !== null) ? this.parent : "-",
                 child_id: this.id
             });
         },
 
         collectionUrl: function () {
-            return route("resource.child", {
+            return route.resource.child({
                 id: (this.parent !== null) ? this.parent : "-",
                 child_id: ""
             });
@@ -351,9 +351,9 @@ define([
             }).then(
                 /* callback */ lang.hitch(this, function (data) {
                     if (edit) {
-                        window.location = route("resource.update",  {id: data.id});
+                        window.location = route.resource.update({id: data.id});
                     } else {
-                        window.location = route("resource.show", {id: data.id});
+                        window.location = route.resource.show({id: data.id});
                     }
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
@@ -382,7 +382,7 @@ define([
                 method: "DELETE"
             }).then(
                 /* callback */ lang.hitch(this, function () {
-                    window.location = route("resource.show", {id: this.parent});
+                    window.location = route.resource.show({id: this.parent});
                     this.unlock();
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
