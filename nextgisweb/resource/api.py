@@ -207,7 +207,8 @@ def resexc_tween_factory(handler, registry):
             mroute = request.matched_route
             if mroute and mroute.name in (
                 'resource.child',
-                # 'resource.item', 'resource.collection'
+                'resource.item',
+                'resource.collection'
             ):
                 return exception_to_response(*sys.exc_info())
             raise
