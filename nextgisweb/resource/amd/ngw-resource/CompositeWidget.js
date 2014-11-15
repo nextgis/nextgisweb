@@ -364,7 +364,7 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: this.itemUrl(),
+                url: route.resource.item(this.id),
                 method: "PUT"
             }).then(
                 /* callback */ lang.hitch(this, function () {
@@ -390,7 +390,7 @@ define([
         },
 
         refreshObj: function () {
-            xhr(this.itemUrl(), {
+            xhr(route.resource.item(this.id), {
                 handleAs: "json"
             }).then(
                 lang.hitch(this, this.deserialize)

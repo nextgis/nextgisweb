@@ -18,6 +18,7 @@ from .serialize import CompositeSerializer
 from .view import resource_factory
 
 
+PERM_READ = ResourceScope.read
 PERM_DELETE = ResourceScope.delete
 PERM_MCHILDREN = ResourceScope.manage_children
 
@@ -204,12 +205,38 @@ def resexc_tween_factory(handler, registry):
             response = handler(request)
         except:
             mroute = request.matched_route
-            if mroute and mroute.name == 'resource.child':
+            if mroute and mroute.name in (
+                'resource.child',
+                # 'resource.item', 'resource.collection'
+            ):
                 return exception_to_response(*sys.exc_info())
             raise
         return response
 
     return resource_exception_tween
+
+
+def item_get(context, request):
+    request.resource_permission(PERM_READ)
+
+    serializer = CompositeSerializer(context, request.user)
+    serializer.serialize()
+
+    return Response(
+        json.dumps(serializer.data), status_code=200,
+        content_type=b'application/json')
+
+
+def item_put(context, request):
+    request.resource_permission(PERM_READ)
+
+    serializer = CompositeSerializer(context, request.user, request.json_body)
+    with DBSession.no_autoflush:
+        result = serializer.deserialize()
+
+    return Response(
+        json.dumps(result), status_code=200,
+        content_type=b'application/json')
 
 
 def setup_pyramid(comp, config):
@@ -232,6 +259,12 @@ def setup_pyramid(comp, config):
         .add_view(child_put, method=(r'PUT', r'PATCH')) \
         .add_view(child_post, method=r'POST') \
         .add_view(child_delete, method=r'DELETE')
+
+    config.add_route(
+        'resource.item', '/api/resource/{id:\d+}',
+        factory=resource_factory, client=('id', )) \
+        .add_view(item_get, request_method='GET') \
+        .add_view(item_put, request_method=('PUT', 'POST'))
 
     config.add_tween(
         'nextgisweb.resource.api.resexc_tween_factory',
