@@ -112,6 +112,14 @@ def upload_put(request):
 def setup_pyramid(comp, config):
 
     config.add_route('file_upload.test', '/file_upload/test').add_view(test)
-    config.add_route('file_upload.upload', '/file_upload/upload', client=()) \
+
+    config.add_route(
+        'file_upload.upload',
+        '/api/component/file_upload/upload', client=()) \
         .add_view(upload_post, method='POST') \
         .add_view(upload_put, method='PUT')
+
+    # TODO: Обратная совместимость, со временем удалить
+    config.add_route('#file_upload.upload', '/file_upload/upload') \
+        .add_view(upload_post, request_method='POST') \
+        .add_view(upload_put, request_method='PUT')
