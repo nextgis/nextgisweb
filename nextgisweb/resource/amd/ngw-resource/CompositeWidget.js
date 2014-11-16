@@ -235,20 +235,6 @@ define([
             return deferred;
         },
 
-        itemUrl: function () {
-            return route.resource.child({
-                id: (this.parent !== null) ? this.parent : "-",
-                child_id: this.id
-            });
-        },
-
-        collectionUrl: function () {
-            return route.resource.child({
-                id: (this.parent !== null) ? this.parent : "-",
-                child_id: ""
-            });
-        },
-
         storeRequest: function (args) {
             var widget = this,
                 deferred = new Deferred();
@@ -346,7 +332,7 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: this.collectionUrl(),
+                url: route.resource.collection(),
                 method: "POST"
             }).then(
                 /* callback */ lang.hitch(this, function (data) {
@@ -378,7 +364,7 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: this.itemUrl(),
+                url: route.resource.item(this.id),
                 method: "DELETE"
             }).then(
                 /* callback */ lang.hitch(this, function () {

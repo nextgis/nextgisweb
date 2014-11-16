@@ -240,6 +240,93 @@ def item_put(context, request):
         content_type=b'application/json')
 
 
+def item_delete(context, request):
+
+    def delete(obj):
+        request.resource_permission(PERM_DELETE, obj)
+        request.resource_permission(PERM_MCHILDREN, obj)
+
+        for chld in obj.children:
+            delete(chld)
+
+        DBSession.delete(obj)
+
+    with DBSession.no_autoflush:
+        delete(context)
+
+    DBSession.flush()
+
+    return Response(
+        json.dumps(None), status_code=200,
+        content_type=b'application/json')
+
+
+def collection_get(request):
+    parent = request.params.get('parent')
+    parent = int(parent) if parent else None
+
+    query = Resource.query().with_polymorphic('*') \
+        .filter_by(parent_id=parent)
+
+    result = list()
+    for resource in query:
+        if resource.has_permission(PERM_READ, request.user):
+            serializer = CompositeSerializer(resource, request.user)
+            serializer.serialize()
+            result.append(serializer.data)
+
+    return Response(
+        json.dumps(result), status_code=200,
+        content_type=b'application/json')
+
+
+def collection_post(request):
+    data = dict(request.json_body)
+
+    if 'resource' not in data:
+        data['resource'] = dict()
+
+    qparent = request.params.get('parent')
+    if qparent is not None:
+        data['resource']['parent'] = dict(id=int(qparent))
+
+    cls = request.params.get('cls')
+    if cls is not None:
+        data['resource']['cls'] = cls
+
+    if 'parent' not in data['resource']:
+        raise ValidationError("Не указан родительский ресурс.")
+
+    if 'cls' not in data['resource']:
+        raise ValidationError("Не указан класс ресурса.")
+
+    elif data['resource']['cls'] not in Resource.registry:
+        raise ValidationError(
+            "Указанный класс ресурса (%s) не зарегистрирован."
+            % data['resource']['cls'])
+
+    cls = Resource.registry[data['resource']['cls']]
+    resource = cls(owner_user=request.user)
+
+    serializer = CompositeSerializer(resource, request.user, data)
+    serializer.members['resource'].mark('cls')
+
+    with DBSession.no_autoflush:
+        serializer.deserialize()
+
+    resource.persist()
+    DBSession.flush()
+
+    result = OrderedDict(id=resource.id)
+
+    # TODO: Родитель возвращается только в целях совместимости
+    result['parent'] = dict(id=resource.parent.id)
+
+    return Response(
+        json.dumps(result), status_code=201,
+        content_type=b'application/json')
+
+
 def setup_pyramid(comp, config):
 
     def _route(route_name, route_path, **kwargs):
@@ -265,7 +352,13 @@ def setup_pyramid(comp, config):
         'resource.item', '/api/resource/{id:\d+}',
         factory=resource_factory, client=('id', )) \
         .add_view(item_get, request_method='GET') \
-        .add_view(item_put, request_method=('PUT', 'POST'))
+        .add_view(item_put, request_method='PUT') \
+        .add_view(item_delete, request_method='DELETE')
+
+    config.add_route(
+        'resource.collection', '/api/resource/', client=()) \
+        .add_view(collection_get, request_method='GET') \
+        .add_view(collection_post, request_method='POST')
 
     config.add_tween(
         'nextgisweb.resource.api.resexc_tween_factory',
