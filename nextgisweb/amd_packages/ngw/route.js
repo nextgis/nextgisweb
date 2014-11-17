@@ -39,7 +39,7 @@ define([
             for (var k in args) { sub[keys.indexOf(k)] = args[k] }
         }
 
-        return template.replace(/\{(\w+)\}/g, function (m, a) {
+        return ngwConfig.applicationUrl + template.replace(/\{(\w+)\}/g, function (m, a) {
             var idx = parseInt(a), value = sub[idx];
 
             // TODO: Неплохо бы так же добавить имя маршрута в сообщение.
