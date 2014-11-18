@@ -223,7 +223,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
             for row in result:
                 if row['column_name'] == self.column_id:
-                    if row['data_type'] != 'integer':
+                    if row['data_type'] not in ['integer', 'bigint']:
                         raise ValidationError(u"Для использования поля в качестве идентификатора необходим тип integer.")  # NOQA
                     colfound_id = True
 
