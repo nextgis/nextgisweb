@@ -25,6 +25,8 @@ def handler(obj, request):
         return
 
     req = request.params.get('REQUEST')
+    post_data = request.body
+    request_method = request.method
 
     params = {
         'service': request.params.get('SERVICE'),
@@ -39,7 +41,6 @@ def handler(obj, request):
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key:params[key] for key in params if params[key] is not None}
 
-
     datasources = {l.keyname: NextgiswebDatasource(l.keyname,
         layer=l.resource,
         title=l.display_name) for l in obj.layers
@@ -51,7 +52,9 @@ def handler(obj, request):
 
     try:
         result = server.dispatchRequest(base_path=base_path,
-                                    path_info='/'+sourcenames, params=params)
+                                    path_info='/'+sourcenames, params=params,
+                                    post_data=post_data,
+                                    request_method=request_method)
     except FeatureServerException as e:
         data = e.data
         content_type = e.mime
