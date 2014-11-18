@@ -81,10 +81,9 @@ define([
 
             if (connection !== null) {
                 this.wConnection.store.get(connection.id).then(function (data) {
-                    xhr.get(route("resource.child", {
-                        child_id: data.id,
-                        id: data.parent.id
-                    }), { handleAs: "json" }).then(function (data) {
+                    xhr.get(route.resource.item(data.id),{
+                        handleAs: "json"
+                    }).then(function (data) {
                         render(data.wmsclient_connection.capcache);
                     }).then(null, console.error);
                 });

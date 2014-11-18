@@ -10,20 +10,24 @@ from ..resource import (
     Serializer,
     SerializedProperty)
 
+from .ident import COMP_ID
+
 
 Base = declarative_base()
 
 
 class ResourceMetadataItem(Base):
-    __tablename__ = 'resmeta_item'
+    __tablename__ = '%s_item' % COMP_ID
 
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    keyname = db.Column(db.Unicode(255), primary_key=True)
+    key = db.Column(db.Unicode(255), primary_key=True)
+
     vinteger = db.Column(db.Integer)
     vfloat = db.Column(db.Float)
     vtext = db.Column(db.Unicode)
 
-    resource = db.relationship(Resource, backref=db.backref('metadata'))
+    resource = db.relationship(Resource, backref=db.backref(
+        COMP_ID, cascade='all, delete-orphan'))
 
     @property
     def value(self):
@@ -48,21 +52,46 @@ class _items_attr(SerializedProperty):
     def getter(self, srlzr):
         result = dict()
 
-        for itm in srlzr.obj.metadata:
-            result[itm.keyname] = itm.value
+        for itm in getattr(srlzr.obj, COMP_ID):
+            result[itm.key] = itm.value
 
         return result
 
     def setter(self, srlzr, value):
-        if value is not None:
-            for k, val in value.iteritems():
-                itm = ResourceMetadataItem(keyname=k)
-                itm.value = val
-                srlzr.obj.metadata.append(itm)
+        odata = getattr(srlzr.obj, COMP_ID)
+
+        rml = []        # Удаляемые записи
+        imap = dict()   # Перезаписываемые записи
+
+        for i in odata:
+            if i.key in value and value[i.key] is not None:
+                imap[i.key] = i
+            else:
+                rml.append(i)
+
+        # Удаляем удаляемые
+        map(lambda i: odata.remove(i), rml)
+
+        for k, val in value.iteritems():
+            if val is None:
+                continue
+
+            itm = imap.get(k)
+
+            if itm is None:
+                # Создаем новую запись если нет перезаписываемой
+                itm = ResourceMetadataItem(key=k)
+                odata.append(itm)
+
+            itm.value = val
 
 
 class ResourceMetadataSerializer(Serializer):
-    identity = 'metadata'
+    identity = COMP_ID
     resclass = Resource
+
+    # TODO: Возможно было бы неплохо реализовать сериализацию без
+    # промежуточного ключа items, но пока это невозможно так как сериализация
+    # в целом и сериализация атрубутов смешана в одном классе.
 
     items = _items_attr(read=MetadataScope.read, write=MetadataScope.write)

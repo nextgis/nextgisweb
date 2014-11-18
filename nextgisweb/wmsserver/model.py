@@ -7,7 +7,8 @@ from ..resource import (
     Resource,
     MetadataScope,
     Serializer,
-    SerializedProperty as SP)
+    SerializedProperty as SP,
+    ResourceGroup)
 
 Base = declarative_base()
 
@@ -18,7 +19,7 @@ class Service(Base, Resource):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
 
 class Layer(Base):
@@ -35,7 +36,9 @@ class Layer(Base):
         Service, foreign_keys=service_id,
         backref=db.backref('layers', cascade='all'))
 
-    resource = db.relationship(Resource, foreign_keys=resource_id)
+    resource = db.relationship(
+        Resource, foreign_keys=resource_id,
+        backref=db.backref('_wmsserver_layers', cascade='all'))
 
     def to_dict(self):
         return dict(

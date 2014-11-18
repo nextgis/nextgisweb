@@ -18,7 +18,8 @@ from ..resource import (
     SerializedResourceRelationship as SRR,
     ResourceError,
     ValidationError,
-    ForbiddenError)
+    ForbiddenError,
+    ResourceGroup)
 from ..env import env
 from ..geometry import geom_from_wkt, box
 from ..layer import SpatialLayerMixin
@@ -59,7 +60,7 @@ class PostgisConnection(Base, Resource):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
     def get_engine(self):
         comp = env.postgis
@@ -136,7 +137,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
     def get_info(self):
         return super(PostgisLayer, self).get_info() + (

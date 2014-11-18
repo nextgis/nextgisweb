@@ -235,20 +235,6 @@ define([
             return deferred;
         },
 
-        itemUrl: function () {
-            return route("resource.child", {
-                id: (this.parent !== null) ? this.parent : "-",
-                child_id: this.id
-            });
-        },
-
-        collectionUrl: function () {
-            return route("resource.child", {
-                id: (this.parent !== null) ? this.parent : "-",
-                child_id: ""
-            });
-        },
-
         storeRequest: function (args) {
             var widget = this,
                 deferred = new Deferred();
@@ -346,14 +332,14 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: this.collectionUrl(),
+                url: route.resource.collection(),
                 method: "POST"
             }).then(
                 /* callback */ lang.hitch(this, function (data) {
                     if (edit) {
-                        window.location = route("resource.update",  {id: data.id});
+                        window.location = route.resource.update({id: data.id});
                     } else {
-                        window.location = route("resource.show", {id: data.id});
+                        window.location = route.resource.show({id: data.id});
                     }
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
@@ -364,7 +350,7 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: this.itemUrl(),
+                url: route.resource.item(this.id),
                 method: "PUT"
             }).then(
                 /* callback */ lang.hitch(this, function () {
@@ -378,11 +364,11 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: this.itemUrl(),
+                url: route.resource.item(this.id),
                 method: "DELETE"
             }).then(
                 /* callback */ lang.hitch(this, function () {
-                    window.location = route("resource.show", {id: this.parent});
+                    window.location = route.resource.show({id: this.parent});
                     this.unlock();
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
@@ -390,7 +376,7 @@ define([
         },
 
         refreshObj: function () {
-            xhr(this.itemUrl(), {
+            xhr(route.resource.item(this.id), {
                 handleAs: "json"
             }).then(
                 lang.hitch(this, this.deserialize)

@@ -15,12 +15,12 @@ class SpatialRefSysComponent(Component):
 
     def initialize_db(self):
         srs_list = (
-            SRS(
-                id=4326,
-                display_name=u"WGS 84 / Lon-lat (EPSG:4326)",
-                minx=-180, miny=-90,
-                maxx=180, maxy=90
-            ),
+            # SRS(
+            #     id=4326,
+            #     display_name=u"WGS 84 / Lon-lat (EPSG:4326)",
+            #     minx=-180, miny=-90,
+            #     maxx=180, maxy=90
+            # ),
             SRS(
                 id=3857,
                 display_name=u"WGS 84 / Pseudo-Mercator (EPSG:3857)",

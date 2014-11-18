@@ -24,7 +24,8 @@ from ..resource import (
     DataScope,
     Serializer,
     SerializedProperty as SP,
-    SerializedRelationship as SR)
+    SerializedRelationship as SR,
+    ResourceGroup)
 from ..resource.exception import ValidationError
 from ..env import env
 from ..geometry import geom_from_wkb, box
@@ -248,9 +249,11 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     tbl_uuid = db.Column(db.Unicode(32), nullable=False)
     geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
 
+    __field_class__ = VectorLayerField
+
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
     @property
     def _tablename(self):
@@ -415,7 +418,7 @@ class _source_attr(SP):
             raise VE("Набор данных содержит более одного слоя.")
 
         ogrlayer = ogrds.GetLayer(0)
-        if not ogrlayer:
+        if ogrlayer is None:
             raise VE("Не удалось открыть слой.")
 
         return ogrlayer
@@ -428,7 +431,7 @@ class _source_attr(SP):
         feat = ogrlayer.GetNextFeature()
         while feat:
             geom = feat.GetGeometryRef()
-            if not geom:
+            if geom is None:
                 raise VE("Объект %d не содержит геометрии." % feat.GetFID())
             feat = ogrlayer.GetNextFeature()
 
@@ -457,7 +460,7 @@ class _source_attr(SP):
                 ogrds = ogr.Open(ogrfn)
                 recode = sdecode
 
-            if not ogrds:
+            if ogrds is None:
                 raise VE("Библиотеке OGR не удалось открыть файл")
 
             drivername = ogrds.GetDriver().GetName()

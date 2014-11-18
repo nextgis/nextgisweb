@@ -43,7 +43,7 @@ define([
                 label: "Выбрать",
                 multiple: false,
                 uploadOnSelect: true,
-                url: route("file_upload.upload"),
+                url: route.file_upload.upload(),
                 name: "file"
             }).placeAt(this.fileUploader);
 

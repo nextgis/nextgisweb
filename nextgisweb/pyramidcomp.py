@@ -4,6 +4,7 @@ from hashlib import md5
 import re
 import codecs
 from StringIO import StringIO
+from urllib2 import unquote
 
 from pyramid.config import Configurator
 from pyramid.authentication import (
@@ -14,7 +15,6 @@ from pyramid.httpexceptions import HTTPForbidden
 
 import pyramid_tm
 import pyramid_mako
-
 
 from .component import Component
 from .auth import User
@@ -325,11 +325,32 @@ class PyramidComponent(Component):
                                 [(k, '__%s__' % k)
                                  for k in p.val])),
                             keys=p.val)
-
             return result
 
         config.add_route('pyramid.routes', '/pyramid/routes') \
             .add_view(routes, renderer='json', json=True)
+
+        def route(request):
+            result = dict()
+
+            route_re = re.compile(r'\{(\w+):{0,1}')
+
+            introspector = request.registry.introspector
+            for itm in introspector.get_category('routes'):
+                route = itm['introspectable']['object']
+                for p in route.predicates:
+                    if isinstance(p, ClientRoutePredicate):
+                        kys = route_re.findall(route.path)
+                        kvs = dict([
+                            (k, '{%d}' % idx)
+                            for idx, k in enumerate(kys)])
+                        tpl = unquote(route.generate(kvs))
+                        result[route.name] = [tpl, ] + kys
+
+            return result
+
+        config.add_route('pyramid.route', '/api/component/pyramid/route') \
+            .add_view(route, renderer='json')
 
         def control_panel(request):
             if not request.user.is_administrator:

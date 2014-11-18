@@ -16,7 +16,7 @@ from .serialize import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR)
 from .scope import ResourceScope, MetadataScope
-from .exception import ResourceError, ValidationError, Forbidden
+from .exception import ValidationError, Forbidden
 
 __all__ = ['Resource', ]
 
@@ -132,10 +132,6 @@ class Resource(Base):
     def __unicode__(self):
         return self.display_name
 
-    def check_child(self, child):
-        """ Может ли этот ресурс принять child в качестве дочернего """
-        return False
-
     @classmethod
     def check_parent(self, parent):
         """ Может ли этот ресурс быть дочерним для parent """
@@ -226,7 +222,8 @@ class Resource(Base):
         with DBSession.no_autoflush:
             if value is not None:
                 if self == value or self in value.parents:
-                    raise ValidationError("Resource hierarchy loop detected!")
+                    raise ValidationError(
+                        "Невозможно переместить ресурс внутрь дочернего.")
 
         return value
 
@@ -267,9 +264,10 @@ class _parent_attr(SRR):
             raise Forbidden()
 
         if not srlzr.obj.check_parent(srlzr.obj.parent):
-            raise ResourceError("Parentship error")
-
-        # TODO: check_child
+            raise ValidationError(
+                "Ресурс не может дочерним ресурсом для ID=%d. "
+                "Тип ресурса - %s, родительского ресурса - %s."
+                % (srlzr.obj.parent.id, srlzr.obj.cls, srlzr.obj.parent.cls))
 
 
 class _perms_attr(SP):
@@ -431,10 +429,6 @@ class ResourceACLRule(Base):
 class ResourceGroup(Resource):
     identity = 'resource_group'
     cls_display_name = "Группа ресурсов"
-
-    def check_child(self, child):
-        # Принимаем любые дочерние ресурсы
-        return True
 
     @classmethod
     def check_parent(self, parent):
