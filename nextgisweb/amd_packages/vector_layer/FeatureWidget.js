@@ -43,7 +43,9 @@ define([
             var result = {};
             var widget = this;
             array.forEach(Object.keys(this._widgets), function (k) {
-                result[k] = widget._widgets[k].get("value");
+                var wgtval = widget._widgets[k].get("value");
+                if (wgtval == "") { wgtval = null };
+                result[k] = wgtval;
             });
             return result;
         },
