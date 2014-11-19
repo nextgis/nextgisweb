@@ -1,8 +1,5 @@
-'''
-Created on Oct 16, 2011
+# The code is based on featureserver code.
 
-@author: michel
-'''
 import os
 from ....FeatureServer.WebFeatureService.Transaction.TransactionAction import TransactionAction
 from lxml import etree
@@ -21,22 +18,27 @@ class Update(TransactionAction):
         geomData = ''
         if len(geom) > 0:
             geomData = etree.tostring(geom[0], pretty_print=True)
-        xslt = etree.parse(os.path.dirname(os.path.abspath(__file__))+"/../../../resources/transaction/transactions.xsl")
-        transform = etree.XSLT(xslt)
-        
-        result = transform(self.node,
-                           datasource="'"+datasource.type+"'",
-                           transactionType="'"+self.type+"'",
-                           geometryAttribute="'"+datasource.geom_col+"'",
-                           geometryData="'"+geomData+"'",
-                           tableName="'"+datasource.layer+"'",
-                           tableId="'"+datasource.fid_col+"'")
 
-        elements = result.xpath("//Statement")
-        if len(elements) > 0:
-            pattern = re.compile(r'\s+')
-            self.setStatement(re.sub(pattern, ' ', str(elements[0])))
+        result = {}
+
+        properties = self.node.xpath("//*[local-name() = 'Property']")
+        result = {prop.Name: prop.Value for prop in properties}
+
+        filters = self.node.xpath("//*[local-name() = 'Filter']")
+        if len(filters) != 1:
+            raise NotImplementedError
+        flt = filters[0].xpath("//*[local-name() = 'FeatureId']")
+        if len(flt) != 1:
+            raise NotImplementedError
+
+        flt = flt[0].items()    # flt = [('fid', '1')]
+        if len(flt) == 1:
+            id = flt[0] [1]
+            result['filter'] = {'id': id}
+        else:
+            raise NotImplementedError
+
+        if result:
+            self.setStatement(result)
             return
         self.setStatement(None)
-        
-        

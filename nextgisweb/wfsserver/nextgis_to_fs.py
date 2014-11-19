@@ -10,6 +10,10 @@ import geojson
 from .third_party.FeatureServer.DataSource import DataSource
 from .third_party.vectorformats.Feature import Feature
 
+from .third_party.FeatureServer.WebFeatureService.Response.InsertResult import InsertResult
+from .third_party.FeatureServer.WebFeatureService.Response.UpdateResult import UpdateResult
+from .third_party.FeatureServer.WebFeatureService.Response.DeleteResult import DeleteResult
+
 
 
 class NextgiswebDatasource(DataSource):
@@ -51,6 +55,38 @@ class NextgiswebDatasource(DataSource):
             features.append(feature)
 
         return features
+
+    def update (self, action):
+        """ В action.wfsrequest хранится объект Transaction.Update
+        нужно его распарсить и выполнить нужные действия
+        """
+
+        # if action.feature != None:
+        #     feature = action.feature
+        #     predicates = ", ".join( self.feature_predicates(feature) )
+        #
+        #     sql = "UPDATE \"%s\" SET %s WHERE %s = %d" % ( self.table, predicates, self.fid_col, action.id )
+        #
+        #     cursor = self.db.cursor()
+        #     cursor.execute(str(sql), self.feature_values(feature))
+        #
+        #     return UpdateResult(action.id, "")
+
+        if action.wfsrequest != None:
+            data = action.wfsrequest.getStatement(self)
+            id = data['filter']['id']
+
+            # import ipdb
+            # ipdb.set_trace()
+
+            self.query.filter_by(id=id)
+            self.query.geom()
+            result = self.query()
+
+
+            return UpdateResult(action.id, "")
+
+        return None
 
     def getAttributeDescription(self, attribute):
         length = ''
