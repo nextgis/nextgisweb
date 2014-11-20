@@ -7,13 +7,14 @@ from __future__ import unicode_literals
 
 import geojson
 
+from nextgisweb.feature_layer import IWritableFeatureLayer
+
 from .third_party.FeatureServer.DataSource import DataSource
 from .third_party.vectorformats.Feature import Feature
 
 from .third_party.FeatureServer.WebFeatureService.Response.InsertResult import InsertResult
 from .third_party.FeatureServer.WebFeatureService.Response.UpdateResult import UpdateResult
 from .third_party.FeatureServer.WebFeatureService.Response.DeleteResult import DeleteResult
-
 
 
 class NextgiswebDatasource(DataSource):
@@ -61,6 +62,10 @@ class NextgiswebDatasource(DataSource):
         нужно его распарсить и выполнить нужные действия
         """
 
+        if not IWritableFeatureLayer.providedBy(self.layer):
+            # Слой не редактируемый
+            return None
+
         # if action.feature != None:
         #     feature = action.feature
         #     predicates = ", ".join( self.feature_predicates(feature) )
@@ -76,13 +81,15 @@ class NextgiswebDatasource(DataSource):
             data = action.wfsrequest.getStatement(self)
             id = data['filter']['id']
 
-            # import ipdb
-            # ipdb.set_trace()
-
             self.query.filter_by(id=id)
             self.query.geom()
             result = self.query()
 
+            feat = result.one()
+            for field_name in feat.fields:
+                if data.has_key(field_name):
+                    feat.fields[field_name] = data[field_name].text
+            self.layer.feature_put(feat)
 
             return UpdateResult(action.id, "")
 

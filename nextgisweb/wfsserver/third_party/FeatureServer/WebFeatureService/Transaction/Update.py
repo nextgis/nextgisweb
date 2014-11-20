@@ -12,8 +12,7 @@ class Update(TransactionAction):
         self.type = 'update'
         
     def createStatement(self, datasource):
-        self.removeAdditionalColumns(datasource)
-        
+
         geom = self.node.xpath("//*[local-name() = 'Name' and text()='"+datasource.geom_col+"']/following-sibling::*[1]/*")
         geomData = ''
         if len(geom) > 0:
@@ -41,4 +40,5 @@ class Update(TransactionAction):
         if result:
             self.setStatement(result)
             return
+
         self.setStatement(None)
