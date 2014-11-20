@@ -26,7 +26,7 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     ResourceGroup)
-from ..resource.exception import ValidationError
+from ..resource.exception import ValidationError, ResourceError
 from ..env import env
 from ..geometry import geom_from_wkb, box
 from ..models import declarative_base, DBSession
@@ -476,6 +476,20 @@ class _source_attr(SP):
                 shutil.rmtree(ogrfn)
 
 
+class _geometry_type_attr(SP):
+
+    def setter(self, srlzr, value):
+        if value not in GEOM_TYPE.enum:
+            raise ValidationError("Недопустимый тип геометрии.")
+
+        if srlzr.obj.id is None:
+            srlzr.obj.geometry_type = value
+
+        elif srlzr.obj.geometry_type != value:
+            raise ResourceError(
+                "Невозможно изменить тип геометрии существующего ресурса.")
+
+
 P_DS_READ = DataScope.read
 P_DS_WRITE = DataScope.write
 
@@ -485,6 +499,8 @@ class VectorLayerSerializer(Serializer):
     resclass = VectorLayer
 
     srs = SR(read=P_DS_READ, write=P_DS_WRITE)
+    geometry_type = _geometry_type_attr(read=P_DS_READ, write=P_DS_WRITE)
+
     source = _source_attr(read=None, write=P_DS_WRITE)
 
 
