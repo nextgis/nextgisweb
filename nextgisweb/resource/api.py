@@ -9,6 +9,7 @@ from pyramid.response import Response
 
 from ..env import env
 from ..models import DBSession
+from ..auth import User
 from ..pyramidcomp import viewargs
 
 from .model import Resource
@@ -21,6 +22,7 @@ from .view import resource_factory
 PERM_READ = ResourceScope.read
 PERM_DELETE = ResourceScope.delete
 PERM_MCHILDREN = ResourceScope.manage_children
+PERM_CPERM = ResourceScope.change_permissions
 
 
 @viewargs(renderer='json')
@@ -327,6 +329,40 @@ def collection_post(request):
         content_type=b'application/json')
 
 
+def permission(resource, request):
+    request.resource_permission(PERM_READ)
+
+    # В некоторых случаях может быть удобно передать пустую строку вместо
+    # идентификатора пользователя, поэтому все довольно запутано написано.
+
+    user = request.params.get('user', '')
+    user = None if user == '' else user
+
+    if user is not None:
+        # Для просмотра прав произвольного пользователя нужны доп. права
+        request.resource_permission(PERM_CPERM)
+        user = User.filter_by(id=user).one()
+
+    else:
+        # Если другого не указано, то используем текушего пользователя
+        user = request.user
+
+    effective = resource.permissions(user)
+
+    result = OrderedDict()
+    for k, scope in resource.scope.iteritems():
+        sres = OrderedDict()
+        
+        for perm in scope.itervalues(ordered=True):
+            sres[perm.name] = perm in effective
+
+        result[k] = sres
+
+    return Response(
+        json.dumps(result), status_code=200,
+        content_type=b'application/json')
+
+
 def setup_pyramid(comp, config):
 
     def _route(route_name, route_path, **kwargs):
@@ -359,6 +395,11 @@ def setup_pyramid(comp, config):
         'resource.collection', '/api/resource/', client=()) \
         .add_view(collection_get, request_method='GET') \
         .add_view(collection_post, request_method='POST')
+
+    config.add_route(
+        'resource.permission', '/api/resource/{id}/permission',
+        factory=resource_factory, client=('id', )) \
+        .add_view(permission, request_method='GET')
 
     config.add_tween(
         'nextgisweb.resource.api.resexc_tween_factory',
