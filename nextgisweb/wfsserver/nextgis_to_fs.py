@@ -5,6 +5,9 @@
 
 from __future__ import unicode_literals
 
+from osgeo import ogr
+import shapely
+
 import geojson
 
 from nextgisweb.feature_layer import IWritableFeatureLayer
@@ -38,6 +41,11 @@ class NextgiswebDatasource(DataSource):
         except AttributeError:
             self.geom_col = u'none'
 
+    @property
+    def writable(self):
+        # Можно ли редактировать слой
+        return IWritableFeatureLayer.providedBy(self.layer)
+
     # FeatureServer.DataSource
     def select (self, params):
         self.query.filter_by()
@@ -61,21 +69,8 @@ class NextgiswebDatasource(DataSource):
         """ В action.wfsrequest хранится объект Transaction.Update
         нужно его распарсить и выполнить нужные действия
         """
-
-        if not IWritableFeatureLayer.providedBy(self.layer):
-            # Слой не редактируемый
+        if not self.writable:
             return None
-
-        # if action.feature != None:
-        #     feature = action.feature
-        #     predicates = ", ".join( self.feature_predicates(feature) )
-        #
-        #     sql = "UPDATE \"%s\" SET %s WHERE %s = %d" % ( self.table, predicates, self.fid_col, action.id )
-        #
-        #     cursor = self.db.cursor()
-        #     cursor.execute(str(sql), self.feature_values(feature))
-        #
-        #     return UpdateResult(action.id, "")
 
         if action.wfsrequest != None:
             data = action.wfsrequest.getStatement(self)
@@ -85,10 +80,17 @@ class NextgiswebDatasource(DataSource):
             self.query.geom()
             result = self.query()
 
+            # Обновление атрибутов, если нужно
             feat = result.one()
             for field_name in feat.fields:
                 if data.has_key(field_name):
                     feat.fields[field_name] = data[field_name].text
+
+            # Обновление геометрии, если нужно:
+            if data.has_key('geom'):
+                geom = self._geom_from_gml(data['geom'])
+                feat.geom = geom
+
             self.layer.feature_put(feat)
 
             return UpdateResult(action.id, "")
@@ -108,6 +110,15 @@ class NextgiswebDatasource(DataSource):
     def set_attribute_cols(self, query):
         columns = [f.keyname for f in query.layer.fields]
         self.attribute_cols = ','.join(columns)
+
+
+    def _geom_from_gml(self, gml):
+        """Создание геометрии из GML.
+        Наверное есть способ лучше, но я не нашел.
+        Кто знает -- правьте
+        """
+        ogr_geo = ogr.CreateGeometryFromGML(gml)
+        return shapely.wkt.loads(ogr_geo.ExportToWkt())
 
 
 

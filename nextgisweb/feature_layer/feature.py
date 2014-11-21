@@ -42,6 +42,10 @@ class Feature(object):
     def geom(self):
         return self._geom
 
+    @geom.setter
+    def geom(self, value):
+        self._geom = value
+
     @property
     def box(self):
         return self._box

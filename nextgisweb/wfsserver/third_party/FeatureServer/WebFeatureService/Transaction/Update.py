@@ -12,14 +12,6 @@ class Update(TransactionAction):
         self.type = 'update'
         
     def createStatement(self, datasource):
-
-        geom = self.node.xpath("//*[local-name() = 'Name' and text()='"+datasource.geom_col+"']/following-sibling::*[1]/*")
-        geomData = ''
-        if len(geom) > 0:
-            geomData = etree.tostring(geom[0], pretty_print=True)
-
-        result = {}
-
         properties = self.node.xpath("//*[local-name() = 'Property']")
         result = {prop.Name: prop.Value for prop in properties}
 
@@ -36,6 +28,12 @@ class Update(TransactionAction):
             result['filter'] = {'id': id}
         else:
             raise NotImplementedError
+
+        geom = self.node.xpath("//*[local-name() = 'Name' and text()='"+datasource.geom_col+"']/following-sibling::*[1]/*")
+        geomData = ''
+        if len(geom) > 0:
+            geomData = etree.tostring(geom[0], pretty_print=True)
+            result['geom'] = geomData
 
         if result:
             self.setStatement(result)

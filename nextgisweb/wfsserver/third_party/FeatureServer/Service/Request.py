@@ -176,7 +176,7 @@ class Request (object):
 
     def handle_post(self, params, path_info, host, post_data, request_method, format_obj = None):
         """Read data from the request and turn it into an UPDATE/DELETE action."""
-        
+
         if format_obj:
             actions = []
             

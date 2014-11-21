@@ -305,6 +305,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if f.keyname in feature.fields:
                 setattr(obj, f.key, feature.fields[f.keyname])
 
+        obj.geom = ga.WKTSpatialElement(
+                str(feature.geom), self.srs_id)
+
         DBSession.merge(obj)
 
 
