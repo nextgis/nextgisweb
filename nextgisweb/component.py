@@ -7,6 +7,11 @@ from .registry import registry_maker
 
 class Component(object):
 
+    identity = None
+    """ Идентификатор компонента, который должен быть переопределен в дочернем
+    классе. Должен быть синтаксически корректным идентификатором python,
+    поскольку в ряде случаев используется как имя атрибута. """
+
     registry = registry_maker()
 
     def __init__(self, env, settings):
@@ -15,11 +20,10 @@ class Component(object):
         self._logger = logging.getLogger('nextgisweb.comp.' + self.identity)
 
     def initialize(self):
-        """ Первая стадия инициализации, вызывается перед запуском системы """
+        """ Первая стадия инициализации. """
 
     def configure(self):
-        """ Вторая стадия инициализации, вызывается после того, как для всех
-        компонентов выполнена первая стадия (initialize) """
+        """ Вторая стадия инициализации. """
 
     def initialize_db(self):
         pass

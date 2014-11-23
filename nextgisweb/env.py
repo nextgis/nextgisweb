@@ -37,21 +37,21 @@ class Env(object):
 
                 setattr(self, identity, instance)
 
-    def chain(self, mname):
+    def chain(self, meth):
         """ Построение последовательности вызова методов с учетом зависимостей.
         Зависимость от компонента ``core`` добавляется автоматически для всех
         компонентов, таким образом он всегда возвращается первым.
 
-        :param mname: Имя метода, для которого строится последовательность. """
+        :param meth: Имя метода, для которого строится последовательность. """
 
         seq = ['core', ]
 
         def traverse(components):
             for c in components:
                 if not c.identity in traverse.seq:
-                    if hasattr(getattr(c, mname), '_require'):
+                    if hasattr(getattr(c, meth), '_require'):
                         traverse([self._components[i] for i in getattr(
-                            c, mname)._require])
+                            c, meth)._require])
                     traverse.seq.append(c.identity)
 
         traverse.seq = seq
