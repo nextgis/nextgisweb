@@ -47,7 +47,7 @@ coverage.xml
 *.log
 
 # Sphinx documentation
-docs/_build/
+doc/_build/
 
 # PyBuilder
 target/
@@ -57,4 +57,3 @@ target/
 
 
 .vagrant
-.doc/_build
