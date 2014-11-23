@@ -387,7 +387,23 @@ def _set_encoding(encoding):
                 # Установим новое
                 self.set_option('SHAPE_ENCODING', '')
 
-                return lambda (x): x.decode(self.encoding)
+                def strdecode(x):
+                    if len(x) >= 254:
+
+                        # Костылек для косячка с обрезкой по 254 - 255 байтам
+                        # юникодных строк. До тех пор пока не получится
+                        # декодировать строку откусываем по байту справа.
+
+                        while True:
+                            try:
+                                x.decode(self.encoding)
+                                break
+                            except UnicodeDecodeError:
+                                x = x[:-1]
+
+                    return x.decode(self.encoding)
+
+                return strdecode
 
             elif self.encoding:
                 # Функция обертка для других версий GDAL
