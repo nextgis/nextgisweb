@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 
-extensions = [
-    'sphinx.ext.autodoc',
-]
-
-
 templates_path = ['_template']
 exclude_patterns = ['_build']
 
@@ -21,8 +16,15 @@ language = 'ru'
 
 pygments_style = 'sphinx'
 
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinxcontrib.httpdomain',
+]
+
 autodoc_member_order = 'bysource'
 autoclass_content = 'both'
+
+http_index_shortname = 'api'
 
 # -- Options for HTML output ----------------------------------------------
 

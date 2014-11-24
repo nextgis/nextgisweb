@@ -6,6 +6,7 @@ NextGISWeb
 
    component
    resource
+   file_upload
 
 
 Indices and tables
