@@ -310,6 +310,25 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         DBSession.merge(obj)
 
+    def feature_create(self, feature):
+        """Вставляет в БД новый объект, описание которого дается в feature
+
+        :param feature: описание объекта
+        :type feature:  dict
+        """
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(tablename=self._tablename)
+
+        obj = tableinfo.model()
+        for f in tableinfo.fields:
+            if f.keyname in feature.keys():
+                setattr(obj, f.key, feature[f.keyname])
+
+        obj.geom = ga.WKTSpatialElement(
+                str(feature['geom']), self.srs_id)
+
+        DBSession.add(obj)
+
 
 def _vector_layer_listeners(table):
     event.listen(

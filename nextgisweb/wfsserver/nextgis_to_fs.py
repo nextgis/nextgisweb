@@ -30,6 +30,7 @@ class NextgiswebDatasource(DataSource):
         self.title = kwargs["title"]
         self.query = self.layer.feature_query()
         self.srid_out = self.layer.srs_id
+        self.type = 'NextgisWeb'
         if 'attribute_cols' in kwargs:
             self.attribute_cols = kwargs['attribute_cols']
         else:
@@ -39,7 +40,7 @@ class NextgiswebDatasource(DataSource):
         try:
             self.geom_col = self.layer.column_geom
         except AttributeError:
-            self.geom_col = u'none'
+            self.geom_col = u'geom'
 
     @property
     def writable(self):
@@ -97,6 +98,25 @@ class NextgiswebDatasource(DataSource):
 
         return None
 
+    def insert (self, action):
+        """ В action.wfsrequest хранится объект Transaction.Insert
+        нужно его распарсить и выполнить нужные действия
+        """
+        if not self.writable:
+            return None
+
+        if action.wfsrequest != None:
+            data = action.wfsrequest.getStatement(self)
+            feature = geojson.loads(data)
+
+            # геометрия должна быть в shapely
+            feature[self.geom_col] = self._geom_from_gml(feature[self.geom_col])
+
+            self.layer.feature_create(feature)
+            return InsertResult(action.id, "")
+
+        return None
+
     def getAttributeDescription(self, attribute):
         length = ''
         try:
@@ -117,6 +137,7 @@ class NextgiswebDatasource(DataSource):
         Наверное есть способ лучше, но я не нашел.
         Кто знает -- правьте
         """
+        gml = str(gml)      # CreateGeometryFromGML не умеет работать с уникодом
         ogr_geo = ogr.CreateGeometryFromGML(gml)
         return shapely.wkt.loads(ogr_geo.ExportToWkt())
 

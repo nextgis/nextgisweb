@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 '''
 Created on Oct 16, 2011
 
@@ -8,31 +10,34 @@ from ....FeatureServer.WebFeatureService.Transaction.TransactionAction import Tr
 from lxml import etree
 
 class Insert(TransactionAction):
-    
+
     def __init__(self, node):
         super(Insert, self).__init__(node)
         self.type = 'insert'
-        
-    
+
+
     def createStatement(self, datasource):
-        self.removeAdditionalColumns(datasource)
-        
+
         geom = self.node.xpath("//*[local-name() = '"+datasource.geom_col+"']/*")
         geomData = etree.tostring(geom[0], pretty_print=True)
+
+        # Двойные кавычки нужно экранировать, иначе будут проблемы при загрузке в json
+        pattern = re.compile(r'"')
+        geomData = re.sub(pattern, '\\"', geomData)
+
         xslt = etree.parse(os.path.dirname(os.path.abspath(__file__))+"/../../../resources/transaction/transactions.xsl")
         transform = etree.XSLT(xslt)
-        
+
         result = transform(self.node,
                            datasource="'"+datasource.type+"'",
                            transactionType="'"+self.type+"'",
                            geometryAttribute="'"+datasource.geom_col+"'",
                            geometryData="'"+geomData+"'",
-                           tableName="'"+datasource.layer+"'")
+                           tableName = 'dummy')
         elements = result.xpath("//Statement")
         if len(elements) > 0:
             pattern = re.compile(r'\s+')
-            self.setStatement(re.sub(pattern, ' ', str(elements[0])))
+            result = re.sub(pattern, ' ', str(elements[0]))
+            self.setStatement(result)
             return
         self.setStatement(None)
-        
-        

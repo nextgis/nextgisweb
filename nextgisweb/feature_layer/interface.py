@@ -38,8 +38,12 @@ class IFeatureLayer(IResourceBase):
 class IWritableFeatureLayer(IFeatureLayer):
     """ Слой объектов, поддерживающий запись """
 
-    def feature_create(self):
-        """ Создать новый объект в слое """
+    def feature_create(self, feature):
+        """Вставляет в БД новый объект, описание которого дается в feature
+
+        :param feature: описание объекта
+        :type feature:  dict
+        """
 
     def feature_put(self, feature):
         """ Сохранить объект в слое """
