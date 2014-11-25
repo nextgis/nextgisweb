@@ -45,6 +45,13 @@ class IWritableFeatureLayer(IFeatureLayer):
         :type feature:  dict
         """
 
+    def feature_delete(self, feature_id):
+        """Удаляет запись с заданным id
+
+        :param feature_id: идентификатор записи
+        :type feature_id:  int or bigint
+        """
+
     def feature_put(self, feature):
         """ Сохранить объект в слое """
 

@@ -117,6 +117,20 @@ class NextgiswebDatasource(DataSource):
 
         return None
 
+
+    def delete(self, action, response=None):
+        """ В action.wfsrequest хранится объект Transaction.Delete
+        нужно его распарсить и выполнить нужные действия
+        """
+        if action.wfsrequest != None:
+            data = action.wfsrequest.getStatement(self)
+            for id in geojson.loads(data):
+                self.layer.feature_delete(id)
+
+            return DeleteResult(action.id, "")
+
+        return None
+
     def getAttributeDescription(self, attribute):
         length = ''
         try:

@@ -194,6 +194,16 @@
                 </xsl:for-each>;
                 </Statement>
             </xsl:when>
+            <xsl:when test="$datasource='NextgisWeb'">
+                <Statement>
+                    [
+                <xsl:for-each select="//*[local-name()='FeatureId']">
+                    <xsl:value-of select="./@fid" />
+                    <xsl:if test="position() &lt; $total">, </xsl:if>
+                </xsl:for-each>
+                    ]
+                </Statement>
+            </xsl:when>
         </xsl:choose>
         
     </xsl:template>

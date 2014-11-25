@@ -17,7 +17,9 @@ class Insert(TransactionAction):
 
 
     def createStatement(self, datasource):
-
+        """На выходе --- описание объекта, который нужно вставить
+        в формате json.
+        """
         geom = self.node.xpath("//*[local-name() = '"+datasource.geom_col+"']/*")
         geomData = etree.tostring(geom[0], pretty_print=True)
 
