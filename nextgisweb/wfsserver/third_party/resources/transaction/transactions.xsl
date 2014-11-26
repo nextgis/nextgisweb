@@ -134,7 +134,27 @@
         <xsl:param name="tableName"/>
         <xsl:param name="tableId" />
         <xsl:choose>
-            <xsl:when test="$datasource='PostGIS'">
+            <xsl:when test="$datasource='NextgisWeb'">
+                <Statement>
+                    {
+                    "<xsl:value-of select="$tableId"/>" : "<xsl:value-of select="//*[local-name()='FeatureId']/@fid" />",
+                    <xsl:for-each select="child::*">
+                        <xsl:variable name="total" select="count(//*[local-name()='Property'])" />
+                        <xsl:for-each select="//*[local-name()='Property']/*[local-name()='Name']">
+                            <xsl:choose>
+                                <xsl:when test=".=$geometryAttribute and string-length($geometryData) > 0">
+                                    "<xsl:value-of select="."/>" : "<xsl:value-of select="string($geometryData)" />"
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    "<xsl:value-of select="."/>" : "<xsl:value-of select="./following-sibling::*[1]"/>"
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() &lt; $total">,</xsl:if>
+                        </xsl:for-each>
+                    </xsl:for-each>
+                    }
+                </Statement>
+            </xsl:when><xsl:when test="$datasource='PostGIS'">
                 <Statement>
                     UPDATE <xsl:value-of select="$tableName"/> SET
                     <xsl:for-each select="child::*">

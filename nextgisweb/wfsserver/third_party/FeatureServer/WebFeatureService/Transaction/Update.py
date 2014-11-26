@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # The code is based on featureserver code.
 
 import os
@@ -12,31 +13,31 @@ class Update(TransactionAction):
         self.type = 'update'
         
     def createStatement(self, datasource):
-        properties = self.node.xpath("//*[local-name() = 'Property']")
-        result = {prop.Name: prop.Value for prop in properties}
-
-        filters = self.node.xpath("//*[local-name() = 'Filter']")
-        if len(filters) != 1:
-            raise NotImplementedError
-        flt = filters[0].xpath("//*[local-name() = 'FeatureId']")
-        if len(flt) != 1:
-            raise NotImplementedError
-
-        flt = flt[0].items()    # flt = [('fid', '1')]
-        if len(flt) == 1:
-            id = flt[0] [1]
-            result['filter'] = {'id': id}
-        else:
-            raise NotImplementedError
 
         geom = self.node.xpath("//*[local-name() = 'Name' and text()='"+datasource.geom_col+"']/following-sibling::*[1]/*")
         geomData = ''
         if len(geom) > 0:
             geomData = etree.tostring(geom[0], pretty_print=True)
-            result['geom'] = geomData
 
-        if result:
-            self.setStatement(result)
+            # Двойные кавычки нужно экранировать, иначе будут проблемы при загрузке в json
+            pattern = re.compile(r'"')
+            geomData = re.sub(pattern, '\\"', geomData)
+
+        xslt = etree.parse(os.path.dirname(os.path.abspath(__file__))+"/../../../resources/transaction/transactions.xsl")
+        transform = etree.XSLT(xslt)
+
+        result = transform(self.node,
+                           datasource="'"+datasource.type+"'",
+                           transactionType="'"+self.type+"'",
+                           geometryAttribute="'"+datasource.geom_col+"'",
+                           geometryData="'"+geomData+"'",
+                           tableName="dummy",
+                           tableId="'"+datasource.fid_col+"'")
+
+        elements = result.xpath("//Statement")
+        if len(elements) > 0:
+            pattern = re.compile(r'\s+')
+            self.setStatement(re.sub(pattern, ' ', str(elements[0])))
             return
-
         self.setStatement(None)
+

@@ -26,6 +26,7 @@ class NextgiswebDatasource(DataSource):
 
     def __init__(self, name,  **kwargs):
         DataSource.__init__(self, name, **kwargs)
+        self.fid_col = 'id'
         self.layer = kwargs["layer"]
         self.title = kwargs["title"]
         self.query = self.layer.feature_query()
@@ -75,7 +76,11 @@ class NextgiswebDatasource(DataSource):
 
         if action.wfsrequest != None:
             data = action.wfsrequest.getStatement(self)
-            id = data['filter']['id']
+
+            data = action.wfsrequest.getStatement(self)
+            data = geojson.loads(data)
+
+            id = data[self.fid_col]
 
             self.query.filter_by(id=id)
             self.query.geom()
@@ -85,7 +90,7 @@ class NextgiswebDatasource(DataSource):
             feat = result.one()
             for field_name in feat.fields:
                 if data.has_key(field_name):
-                    feat.fields[field_name] = data[field_name].text
+                    feat.fields[field_name] = data[field_name]
 
             # Обновление геометрии, если нужно:
             if data.has_key('geom'):
