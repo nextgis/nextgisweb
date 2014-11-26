@@ -83,6 +83,24 @@ class PostgisConnection(Base, Resource):
             host=self.hostname, database=self.database,
             username=self.username, password=self.password)))
 
+        @db.event.listens_for(engine, 'connect')
+        def _connect(dbapi, record):
+            comp.logger.debug(
+                "Resource #%d, pool 0x%x, connection 0x%x created",
+                self.id, id(dbapi), id(engine))
+
+        @db.event.listens_for(engine, 'checkout')
+        def _checkout(dbapi, record, proxy):
+            comp.logger.debug(
+                "Resource #%d, pool 0x%x, connection 0x%x retrieved",
+                self.id, id(dbapi), id(engine))
+
+        @db.event.listens_for(engine, 'checkin')
+        def _checkin(dbapi, record):
+            comp.logger.debug(
+                "Resource #%d, pool 0x%x, connection 0x%x returned",
+                self.id, id(dbapi), id(engine))
+
         engine._credhash = credhash
 
         comp._engine[self.id] = engine
