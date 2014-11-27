@@ -7,6 +7,7 @@ from ..resource import Widget, resource_factory
 from .model import Service
 
 from .third_party.FeatureServer.Server import Server, FeatureServerException
+from .third_party.web_request.response import Response as FeatureserverResponse
 
 from nextgis_to_fs import NextgiswebDatasource
 
@@ -60,15 +61,18 @@ def handler(obj, request):
         content_type = e.mime
         return Response(data, content_type=content_type)
 
-    if req.lower() in ['getcapabilities', 'describefeaturetype']:
+    # Отправляем результат обработки
+
+    if isinstance(result, tuple):
+        # ответ на запросы req.lower() in ['getcapabilities', 'describefeaturetype']
         content_type, resxml = result
         resp = Response(resxml, content_type=content_type)
         return resp
-    elif req.lower() == 'getfeature':
+    elif isinstance(result, FeatureserverResponse):
+        # ответ на запрос GetFeature, Update, Insert, Delete
         data = result.getData()
         return Response(data, content_type=result.content_type)
-    else:
-        print "UNKNOWN request!!!!!"
+
 
 def setup_pyramid(comp, config):
     config.add_route(

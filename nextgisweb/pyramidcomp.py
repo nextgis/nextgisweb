@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import sys
 from hashlib import md5
 import re
@@ -11,7 +12,8 @@ from pyramid.authentication import (
     AuthTktAuthenticationPolicy,
     BasicAuthAuthenticationPolicy)
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPNotFound
+from pyramid.response import FileResponse
 
 import pyramid_tm
 import pyramid_mako
@@ -242,6 +244,7 @@ class PyramidComponent(Component):
         with codecs.open(settings['help_page'], 'rb', 'utf-8') as fp:
             self.help_page = fp.read()
 
+
         config.add_route('home', '/') \
             .add_view('nextgisweb.views.home')
 
@@ -368,6 +371,15 @@ class PyramidComponent(Component):
         config.add_route('pyramid.help_page', '/help-page') \
             .add_view(help_page, renderer="pyramid/help_page.mako")
 
+        def logo(request):
+            settings = request.env.pyramid.settings
+            if 'logo' in settings and os.path.isfile(settings['logo']):
+                return FileResponse(settings['logo'], request=request)
+            else:
+                raise HTTPNotFound()
+
+        config.add_route('pyramid.logo', '/logo').add_view(logo)
+
         def pkginfo(request):
             return dict(title=u"Версии пакетов",
                         pkginfo=self.pkginfo,
@@ -385,5 +397,6 @@ class PyramidComponent(Component):
 
     settings_info = (
         dict(key='secret', desc=u"Ключ, используемый для шифрования cookies (обязательно)"),
-        dict(key='help_page', desc=u"HTML-справка")
+        dict(key='help_page', desc=u"HTML-справка"),
+        dict(key='logo', desc=u"Логотип системы")
     )

@@ -7,14 +7,16 @@ body { font-size: 12px; }
 
 .header { }
 
-    .header .pure-menu { background: #2D3E50; }
-    
+    .header .pure-menu {
+        background: #2D3E50;
+        overflow: auto; }
+
     .header li a:hover,
     .header li a:focus {
         background: none;
         border: none;
         color: #AECFE5; }
-    
+
     .header .pure-menu a {
         padding: 0.5ex 1ex;
         color: #6FBEF3; }
@@ -28,6 +30,8 @@ body { font-size: 12px; }
     .header .pure-menu ul { float: right; }
 
     .header .pure-menu ul li.user { color: white; }
+
+    .header img.logo { float: left; }
 
 .title {
     padding: 0.5ex 1ex;
