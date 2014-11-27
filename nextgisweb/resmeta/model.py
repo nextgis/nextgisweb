@@ -29,16 +29,23 @@ class ResourceMetadataItem(Base):
     resource = db.relationship(Resource, backref=db.backref(
         COMP_ID, cascade='all, delete-orphan'))
 
+    def tval(self):
+        if self.vinteger is not None:
+            return ('integer', self.vinteger)
+        elif self.vfloat is not None:
+            return ('float', self.vfloat)
+        elif self.vtext is not None:
+            return ('text', self.vtext)
+        else:
+            return (None, None)
+
+    @property
+    def vtype(self):
+        return self.tval()[0]
+
     @property
     def value(self):
-        if self.vinteger is not None:
-            return self.vinteger
-        elif self.vfloat is not None:
-            return self.vfloat
-        elif self.vtext is not None:
-            return self.vtext
-        else:
-            return None
+        return self.tval()[1]
 
     @value.setter
     def value(self, value):

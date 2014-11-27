@@ -365,7 +365,8 @@ class ResourceSerializer(Serializer):
         if parent != self.parent or display_name != self.display_name:
             with DBSession.no_autoflush:
                 conflict = Resource.filter(
-                    Resource.parent_id == self.obj.parent.id,
+                    Resource.parent_id == self.obj.parent.id
+                    if self.obj.parent is not None else None,
                     Resource.display_name == self.obj.display_name,
                     Resource.id != self.obj.id
                 ).first()
