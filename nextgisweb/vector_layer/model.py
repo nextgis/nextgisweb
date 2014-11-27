@@ -315,6 +315,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         :param feature_description: описание объекта
         :type feature_description:  dict
+
+        :return:    ID вставленного объекта
         """
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(tablename=self._tablename)
@@ -327,7 +329,15 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         obj.geom = ga.WKTSpatialElement(
                 str(feature_description['geom']), self.srs_id)
 
+        import ipdb
+        ipdb.set_trace()
+
         DBSession.add(obj)
+        DBSession.flush()
+        DBSession.refresh(obj)
+
+        return obj.id
+
 
     def feature_delete(self, feature_id):
         """Удаляет запись с заданным id

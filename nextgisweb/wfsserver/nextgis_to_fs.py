@@ -117,8 +117,8 @@ class NextgiswebDatasource(DataSource):
             # геометрия должна быть в shapely
             feature[self.geom_col] = self._geom_from_gml(feature[self.geom_col])
 
-            self.layer.feature_create(feature)
-            return InsertResult(action.id, "")
+            feature_id = self.layer.feature_create(feature)
+            return InsertResult(feature_id, "")
 
         return None
 

@@ -43,6 +43,8 @@ class IWritableFeatureLayer(IFeatureLayer):
 
         :param feature: описание объекта
         :type feature:  dict
+
+        :return:        ID вставленного объекта
         """
 
     def feature_delete(self, feature_id):
