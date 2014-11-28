@@ -132,7 +132,7 @@ class WFS(Format):
                     <wfs:totalDeleted>%s</wfs:totalDeleted>
                     <wfs:totalReplaced>%s</wfs:totalReplaced>
                 </wfs:TransactionSummary>
-            <wfs:TransactionResults/> """ % (str(summary.getTotalInserted()), str(summary.getTotalUpdated()), str(summary.getTotalDeleted()), str(summary.getTotalReplaced()))
+           """ % (str(summary.getTotalInserted()), str(summary.getTotalUpdated()), str(summary.getTotalDeleted()), str(summary.getTotalReplaced()))
         
         insertResult = response.getInsertResults()
         result += "<wfs:InsertResults>"
@@ -180,9 +180,9 @@ class WFS(Format):
         result += """<wfs:TransactionResult> 
                         <wfs:Status> """
         
-        if (len(insertResult) + len(updateResult) + len(replaceResult)) == failedCount:
+        if (len(insertResult) + len(updateResult) + len(replaceResult) + len(delete.getHandle())) == failedCount and failedCount > 0:
             result += "<wfs:FAILED/>"
-        elif (len(insertResult) + len(updateResult) + len(replaceResult)) > failedCount and failedCount > 0:
+        elif (len(insertResult) + len(updateResult) + len(replaceResult) + len(delete.getHandle())) > failedCount and failedCount > 0:
             result += "<wfs:PARTIAL/>"
         else:
             result += "<wfs:SUCCESS/>"

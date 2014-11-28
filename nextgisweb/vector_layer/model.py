@@ -329,9 +329,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         obj.geom = ga.WKTSpatialElement(
                 str(feature_description['geom']), self.srs_id)
 
-        import ipdb
-        ipdb.set_trace()
-
         DBSession.add(obj)
         DBSession.flush()
         DBSession.refresh(obj)
