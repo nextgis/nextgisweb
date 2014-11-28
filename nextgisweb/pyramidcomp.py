@@ -244,7 +244,6 @@ class PyramidComponent(Component):
         with codecs.open(settings['help_page'], 'rb', 'utf-8') as fp:
             self.help_page = fp.read()
 
-
         config.add_route('home', '/') \
             .add_view('nextgisweb.views.home')
 
@@ -283,13 +282,19 @@ class PyramidComponent(Component):
         for l in buf:
             l = l.strip().lower()
 
+            pkgtuple = None
             mpkg = re.match(r'(.+)==(.+)', l)
             if mpkg:
-                self.pkginfo.append(tuple(mpkg.groups()))
+                pkgtuple = tuple(mpkg.groups())
 
-            mgit = re.match(r'-e\sgit\+git\@.+?\@(.{8}).+\#egg=(\w+).*', l)
+            mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', l)
             if mgit:
-                self.pkginfo.append(tuple(reversed(mgit.groups())))
+                pkgtuple = tuple(reversed(mgit.groups()))
+
+            if pkgtuple is not None:
+                self.pkginfo.append(pkgtuple)
+            else:
+                self.logger.warn("Could not parse pip freeze line: %s", l)
 
         config.add_static_view(
             '/static%s/asset' % static_key,
