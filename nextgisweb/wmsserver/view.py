@@ -8,7 +8,7 @@ from PIL import Image
 
 from pyramid.response import Response
 
-from ..resource import Widget, resource_factory
+from ..resource import Resource, Widget, resource_factory
 from ..spatial_ref_sys import SRS
 from .model import Service
 
@@ -23,7 +23,7 @@ class ServiceWidget(Widget):
 
 
 def handler(obj, request):
-    params = dict((k.upper(), v) for k,v in request.params.iteritems())
+    params = dict((k.upper(), v) for k, v in request.params.iteritems())
     req = params.get('REQUEST')
     service = params.get('SERVICE')
 
@@ -88,11 +88,13 @@ def _get_capabilities(obj, request):
         dict(version='1.1.1'),
         service, capability)
 
-    return Response(etree.tostring(xml, encoding='utf-8'), content_type=b'text/xml')
+    return Response(
+        etree.tostring(xml, encoding='utf-8'),
+        content_type=b'text/xml')
 
 
 def _get_map(obj, request):
-    params = dict((k.upper(), v) for k,v in request.params.iteritems())
+    params = dict((k.upper(), v) for k, v in request.params.iteritems())
     p_layers = params.get('LAYERS').split(',')
     p_bbox = map(float, params.get('BBOX').split(','))
     p_width = int(params.get('WIDTH'))
@@ -129,6 +131,17 @@ def _get_map(obj, request):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'wmsclient.wms', '/resource/{id:\d+}/wms',
-        factory=resource_factory, client=('id',)
+        'wmsserver.wms', '/api/resource/{id:\d+}/wms',
+        factory=resource_factory,
     ).add_view(handler, context=Service)
+
+    config.add_route(
+        '#wmsserver.wms', '/resource/{id:\d+}/wms',
+        factory=resource_factory,
+    ).add_view(handler, context=Service)
+
+    Resource.__psection__.register(
+        key='wmsserver', priority=50,
+        title="Сервис WMS",
+        is_applicable=lambda obj: obj.cls == 'wmsserver_service',
+        template='nextgisweb:wmsserver/template/section.mako')
