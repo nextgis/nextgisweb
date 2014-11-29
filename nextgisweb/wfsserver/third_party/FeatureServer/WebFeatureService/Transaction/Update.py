@@ -37,7 +37,7 @@ class Update(TransactionAction):
         elements = result.xpath("//Statement")
         if len(elements) > 0:
             pattern = re.compile(r'\s+')
-            self.setStatement(re.sub(pattern, ' ', str(elements[0])))
+            self.setStatement(re.sub(pattern, ' ', elements[0].text))
             return
         self.setStatement(None)
 
