@@ -39,7 +39,7 @@ class Insert(TransactionAction):
         elements = result.xpath("//Statement")
         if len(elements) > 0:
             pattern = re.compile(r'\s+')
-            result = re.sub(pattern, ' ', str(elements[0]))
+            result = re.sub(pattern, ' ', elements[0].text)
             self.setStatement(result)
             return
         self.setStatement(None)
