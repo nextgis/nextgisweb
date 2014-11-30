@@ -385,6 +385,17 @@ class PyramidComponent(Component):
 
         config.add_route('pyramid.logo', '/logo').add_view(logo)
 
+        def favicon(request):
+            settings = request.env.pyramid.settings
+            if 'favicon' in settings and os.path.isfile(settings['favicon']):
+                return FileResponse(settings['favicon'],
+                                    request=request,
+                                    content_type='image/x-icon')
+            else:
+                raise HTTPNotFound()
+
+        config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
+
         def pkginfo(request):
             return dict(title=u"Версии пакетов",
                         pkginfo=self.pkginfo,
@@ -403,5 +414,6 @@ class PyramidComponent(Component):
     settings_info = (
         dict(key='secret', desc=u"Ключ, используемый для шифрования cookies (обязательно)"),
         dict(key='help_page', desc=u"HTML-справка"),
-        dict(key='logo', desc=u"Логотип системы")
+        dict(key='logo', desc=u"Логотип системы"),
+        dict(key='favicon', desc=u"Значок для избранного")
     )
