@@ -13,6 +13,7 @@ __all__ = [
     'DataStructureScope',
     'DataScope',
     'ConnectionScope',
+    'ServiceScope',
 ]
 
 P = Permission
@@ -101,3 +102,16 @@ class ConnectionScope(Scope):
     read = P("Чтение параметров соединения")
     write = P("Запись параметров соединения").require(read)
     connect = P("Использование соединения")
+
+
+class ServiceScope(Scope):
+    """ Набор прав предоставляемого сервиса, например WMS или WFS. Нужна чтобы
+    можно было разделить права на настройку сервиса и на его использование.
+    Впрочем если сервис внутри использует другие ресурсы, то права на них
+    должны проверяться отдельно. """
+
+    identity = 'service'
+    label = 'Сервис'
+
+    connect = P("Подключение")                      #: Подключение
+    configure = P("Настройка").require(connect)     #: Настройка
