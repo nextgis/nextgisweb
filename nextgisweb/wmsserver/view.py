@@ -7,8 +7,11 @@ from lxml.builder import ElementMaker
 from PIL import Image
 
 from pyramid.response import Response
+from pyramid.httpexceptions import HTTPBadRequest
 
-from ..resource import Resource, Widget, resource_factory
+from ..resource import (
+    Resource, Widget, resource_factory,
+    ServiceScope, DataScope)
 from ..spatial_ref_sys import SRS
 from .model import Service
 
@@ -23,14 +26,21 @@ class ServiceWidget(Widget):
 
 
 def handler(obj, request):
+    request.resource_permission(ServiceScope.connect)
+
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
     req = params.get('REQUEST')
     service = params.get('SERVICE')
 
-    if (req == 'GetCapabilities') and (service == 'WMS'):
+    if service != 'WMS':
+        raise HTTPBadRequest("Invalid SERVICE parameter value.")
+
+    if req == 'GetCapabilities':
         return _get_capabilities(obj, request)
     elif req == 'GetMap':
         return _get_map(obj, request)
+    else:
+        raise HTTPBadRequest("Invalid REQUEST parameter value.")
 
 
 def _maker():
@@ -112,6 +122,8 @@ def _get_map(obj, request):
 
     for lname in p_layers:
         lobj = lmap[lname]
+
+        request.resource_permission(DataScope.read, lobj.resource)
 
         req = lobj.resource.render_request(srs)
         limg = req.render_extent(p_bbox, p_size)
