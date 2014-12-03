@@ -27,7 +27,9 @@ PERM_MCHILDREN = ResourceScope.manage_children
 
 
 def resource_factory(request):
-    # TODO: Стоит использовать первый ключ вместо имени
+    # TODO: Хотелось бы использовать первый ключ, но этого не получится,
+    # поскольку matchdiсt не сохраняет порядок ключей.
+
     if request.matchdict['id'] == '-':
         return None
 
