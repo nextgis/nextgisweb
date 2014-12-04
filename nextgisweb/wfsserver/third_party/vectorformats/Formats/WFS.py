@@ -359,18 +359,18 @@ class WFS(Format):
         for property in properties:
             if property == 'Point':
                 element = etree.Element('element', attrib={'name' : datasource.geom_col,
-                                                           'type' : 'gml:PointPropertyType',
+                                                           'type' : 'gml:MultiPointPropertyType',
                                                            'minOccurs' : '0'})
                 sequence.append(element)
             elif property == 'Line':
                 element = etree.Element('element', attrib={'name' : datasource.geom_col,
-                                                           'type' : 'gml:LineStringPropertyType',
+                                                           'type' : 'gml:MultiLineStringPropertyType',
                                                            #'ref' : 'gml:curveProperty',
                                                            'minOccurs' : '0'})
                 sequence.append(element)
             elif property == 'Polygon':
                 element = etree.Element('element', attrib={'name' : datasource.geom_col,
-                                                           'type' : 'gml:PolygonPropertyType',
+                                                           'type' : 'gml:MultiPolygonPropertyType',
                                                            #'substitutionGroup' : 'gml:_Surface',
                                                            'minOccurs' : '0'})
                 sequence.append(element)
