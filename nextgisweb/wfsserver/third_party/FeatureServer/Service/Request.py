@@ -67,6 +67,8 @@ class Request (object):
 
         if request_method == "GET" or (request_method == "OPTIONS" and (post_data is None or len(post_data) <= 0)):
             action = self.get_select_action(path_info, params)
+            if u'typename' in params:
+                action.layer = params[u'typename']
 
         elif request_method == "POST" or request_method == "PUT" or (request_method == "OPTIONS" and len(post_data) > 0):
             actions = self.handle_post(params, path_info, host, post_data, request_method, format_obj = format_obj)
@@ -209,6 +211,7 @@ class Request (object):
                         for transaction in transactions:
                             action = Action()
                             action.method = transaction.__class__.__name__.lower()
+                            action.layer = transaction.getLayerName()
                             action.wfsrequest = transaction
                             actions.append(action)
             

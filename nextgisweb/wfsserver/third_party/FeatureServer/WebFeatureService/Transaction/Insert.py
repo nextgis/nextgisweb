@@ -15,6 +15,8 @@ class Insert(TransactionAction):
         super(Insert, self).__init__(node)
         self.type = 'insert'
 
+    def setLayerName(self):
+        self.layer_name = self.node.xpath('local-name()')
 
     def createStatement(self, datasource):
         """На выходе --- описание объекта, который нужно вставить
