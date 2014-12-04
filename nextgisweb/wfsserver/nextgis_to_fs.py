@@ -10,7 +10,7 @@ import shapely
 
 import geojson
 
-from nextgisweb.feature_layer import IWritableFeatureLayer
+from nextgisweb.feature_layer import IWritableFeatureLayer, GEOM_TYPE
 
 from .third_party.FeatureServer.DataSource import DataSource
 from .third_party.vectorformats.Feature import Feature
@@ -36,6 +36,15 @@ class NextgiswebDatasource(DataSource):
             self.attribute_cols = kwargs['attribute_cols']
         else:
             self.set_attribute_cols(self.query)
+
+        if self.layer.geometry_type == GEOM_TYPE.POINT:
+            self.geometry_type = 'Point'
+        elif self.layer.geometry_type == GEOM_TYPE.LINESTING:
+            self.geometry_type = 'Line'
+        elif self.layer.geometry_type == GEOM_TYPE.POLYGON:
+            self.geometry_type = 'Polygon'
+        else:
+            raise NotImplementedError
 
         # Setup geometry column name. But some resources do not provide the name
         try:
