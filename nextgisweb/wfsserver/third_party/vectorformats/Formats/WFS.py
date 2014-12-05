@@ -309,15 +309,9 @@ class WFS(Format):
         complexContent = etree.Element('complexContent')
         extension = etree.Element('extension', attrib={'base':'gml:AbstractFeatureType'})
         sequence = etree.Element('sequence')
-        
+
         for attribut_col in datasource.attribute_cols.split(','):
             type, length = datasource.getAttributeDescription(attribut_col)
-            
-            maxLength = etree.Element('maxLength', attrib={'value':str(length)})
-            restriction = etree.Element('restriction', attrib={'base' : type})
-            restriction.append(maxLength)
-            simpleType = etree.Element('simpleType')
-            simpleType.append(restriction)
 
             attrib_name = attribut_col
             if hasattr(datasource, "hstore"):
@@ -325,31 +319,32 @@ class WFS(Format):
                     attrib_name = self.getFormatedAttributName(attrib_name)
             
             element = etree.Element('element', attrib={'name' : str(attrib_name),
-                                                       'minOccurs' : '0'})
-            element.append(simpleType)
+                                                       'minOccurs' : '0',
+                                                       'type' : type
+                                                       })
             
             sequence.append(element)
             
-        if hasattr(datasource, "additional_cols"):
-            for additional_col in datasource.additional_cols.split(';'):            
-                name = additional_col
-                matches = re.search('(?<=[ ]as[ ])\s*\w+', str(additional_col))
-                if matches:
-                    name = matches.group(0)
-
-                type, length = datasource.getAttributeDescription(name)
-                
-                maxLength = etree.Element('maxLength', attrib={'value':'0'})
-                restriction = etree.Element('restriction', attrib={'base' : type})
-                restriction.append(maxLength)
-                simpleType = etree.Element('simpleType')
-                simpleType.append(restriction)
-                element = etree.Element('element', attrib={'name' : name,
-                                                           'minOccurs' : '0',
-                                                           'maxOccurs' : '0'})
-                element.append(simpleType)
-                
-                sequence.append(element)
+        # if hasattr(datasource, "additional_cols"):
+        #     for additional_col in datasource.additional_cols.split(';'):
+        #         name = additional_col
+        #         matches = re.search('(?<=[ ]as[ ])\s*\w+', str(additional_col))
+        #         if matches:
+        #             name = matches.group(0)
+        #
+        #         type, length = datasource.getAttributeDescription(name)
+        #
+        #         maxLength = etree.Element('maxLength', attrib={'value':'0'})
+        #         restriction = etree.Element('restriction', attrib={'base' : type})
+        #         restriction.append(maxLength)
+        #         simpleType = etree.Element('simpleType')
+        #         simpleType.append(restriction)
+        #         element = etree.Element('element', attrib={'name' : name,
+        #                                                    'minOccurs' : '0',
+        #                                                    'maxOccurs' : '0'})
+        #         element.append(simpleType)
+        #
+        #         sequence.append(element)
         
         
         if hasattr(datasource, 'geometry_type'):

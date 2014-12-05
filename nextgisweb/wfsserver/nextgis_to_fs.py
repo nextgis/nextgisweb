@@ -10,7 +10,7 @@ import shapely
 
 import geojson
 
-from nextgisweb.feature_layer import IWritableFeatureLayer, GEOM_TYPE
+from nextgisweb.feature_layer import IWritableFeatureLayer, GEOM_TYPE, FIELD_TYPE
 
 from .third_party.FeatureServer.DataSource import DataSource
 from .third_party.vectorformats.Feature import Feature
@@ -148,12 +148,19 @@ class NextgiswebDatasource(DataSource):
     def getAttributeDescription(self, attribute):
         length = ''
         try:
-            type = self.layer.field_by_keyname(attribute)
-            type = type.keyname
+            field = self.layer.field_by_keyname(attribute)
+            field_type = field.datatype
         except KeyError: # the attribute can be=='*', that causes KeyError
-            type = 'string'
+            field_type = FIELD_TYPE.STRING
 
-        return (type, length)
+        if field_type == FIELD_TYPE.INTEGER:
+            field_type = 'integer'
+        elif field_type == FIELD_TYPE.REAL:
+            field_type = 'double'
+        else:
+            field_type = field_type.lower()
+
+        return (field_type, length)
 
     def set_attribute_cols(self, query):
         columns = [f.keyname for f in query.layer.fields]
