@@ -52,6 +52,8 @@ class WFS(Format):
                     attr_value = attr_value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
                 except:
                     pass
+            if attr_value is None:
+                attr_value = ''
             if isinstance(attr_value, str):
                 attr_value = unicode(attr_value, "utf-8")
             attr_fields.append( "<fs:%s>%s</fs:%s>" % (key, attr_value, key) )
