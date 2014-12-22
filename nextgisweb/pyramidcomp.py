@@ -415,5 +415,6 @@ class PyramidComponent(Component):
         dict(key='secret', desc=u"Ключ, используемый для шифрования cookies (обязательно)"),
         dict(key='help_page', desc=u"HTML-справка"),
         dict(key='logo', desc=u"Логотип системы"),
-        dict(key='favicon', desc=u"Значок для избранного")
+        dict(key='favicon', desc=u"Значок для избранного"),
+        dict(key='home_url', desc=u"Ссылка для редиректа, при заходе на /")
     )
