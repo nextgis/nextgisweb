@@ -62,9 +62,7 @@ class NextgiswebDatasource(DataSource):
             self.query = self.layer.feature_query()
 
     def set_attribute_cols(self):
-        if self.query is None:
-            self._setup_query()
-        columns = [f.keyname for f in self.query.layer.fields]
+        columns = [f.keyname for f in self.layer.fields]
         self.attribute_cols = columns
 
     def get_attribute_cols(self):
@@ -79,7 +77,6 @@ class NextgiswebDatasource(DataSource):
             self._setup_query()
 
         self.query.filter_by()
-        # query.filter_by(OSM_ID=2379362827)
         self.query.geom()
         result = self.query()
 
