@@ -306,7 +306,7 @@ version="1.0.0"
         extension = etree.Element('extension', attrib={'base':'gml:AbstractFeatureType'})
         sequence = etree.Element('sequence')
 
-        for attribut_col in datasource.attribute_cols.split(','):
+        for attribut_col in datasource.get_attribute_cols():
             type, length = datasource.getAttributeDescription(attribut_col)
 
             attrib_name = attribut_col

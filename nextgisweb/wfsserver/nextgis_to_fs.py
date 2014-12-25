@@ -29,13 +29,13 @@ class NextgiswebDatasource(DataSource):
         self.fid_col = 'id'
         self.layer = kwargs["layer"]
         self.title = kwargs["title"]
-        self.query = self.layer.feature_query()
+        self.query = None
         self.srid_out = self.layer.srs_id
         self.type = 'NextgisWeb'
         if 'attribute_cols' in kwargs:
-            self.attribute_cols = kwargs['attribute_cols']
+            self.attribute_cols = kwargs['attribute_cols'].split(',')
         else:
-            self.set_attribute_cols(self.query)
+            self.attribute_cols = None      # Назначим потом (чтобы не производить лишних запросов к БД на этом этапе)
 
         if self.layer.geometry_type == GEOM_TYPE.POINT:
             self.geometry_type = 'Point'
@@ -57,8 +57,27 @@ class NextgiswebDatasource(DataSource):
         # Можно ли редактировать слой
         return IWritableFeatureLayer.providedBy(self.layer)
 
+    def _setup_query(self):
+        if self.query is None:
+            self.query = self.layer.feature_query()
+
+    def set_attribute_cols(self):
+        if self.query is None:
+            self._setup_query()
+        columns = [f.keyname for f in self.query.layer.fields]
+        self.attribute_cols = columns
+
+    def get_attribute_cols(self):
+        if self.attribute_cols is None:
+            self.set_attribute_cols()
+
+        return self.attribute_cols
+
     # FeatureServer.DataSource
     def select (self, params):
+        if self.query is None:
+            self._setup_query()
+
         self.query.filter_by()
         # query.filter_by(OSM_ID=2379362827)
         self.query.geom()
@@ -84,7 +103,8 @@ class NextgiswebDatasource(DataSource):
             return None
 
         if action.wfsrequest != None:
-            data = action.wfsrequest.getStatement(self)
+            if self.query is None:
+                self._setup_query()
 
             data = action.wfsrequest.getStatement(self)
             data = geojson.loads(data)
@@ -163,11 +183,6 @@ class NextgiswebDatasource(DataSource):
             field_type = field_type.lower()
 
         return (field_type, length)
-
-    def set_attribute_cols(self, query):
-        columns = [f.keyname for f in query.layer.fields]
-        self.attribute_cols = ','.join(columns)
-
 
     def _geom_from_gml(self, gml):
         """Создание геометрии из GML.
