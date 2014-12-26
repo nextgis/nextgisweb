@@ -29,28 +29,40 @@ class NextgiswebDatasource(DataSource):
         self.fid_col = 'id'
         self.layer = kwargs["layer"]
         self.title = kwargs["title"]
-        self.query = None
-        self.srid_out = self.layer.srs_id
+        self.query = None       # Назначим потом (чтобы не производить лишних запросов к БД на этом этапе
         self.type = 'NextgisWeb'
         if 'attribute_cols' in kwargs:
             self.attribute_cols = kwargs['attribute_cols'].split(',')
         else:
             self.attribute_cols = None      # Назначим потом (чтобы не производить лишних запросов к БД на этом этапе)
 
+    @property
+    def srid_out(self):
+        return self.layer.srs_id
+
+    @property
+    def geometry_type(self):
         if self.layer.geometry_type == GEOM_TYPE.POINT:
-            self.geometry_type = 'Point'
+            geometry_type = 'Point'
         elif self.layer.geometry_type == GEOM_TYPE.LINESTING:
-            self.geometry_type = 'Line'
+            geometry_type = 'Line'
         elif self.layer.geometry_type == GEOM_TYPE.POLYGON:
-            self.geometry_type = 'Polygon'
+            geometry_type = 'Polygon'
         else:
             raise NotImplementedError
 
+        return geometry_type
+
+    @property
+    def geom_col(self):
+
         # Setup geometry column name. But some resources do not provide the name
         try:
-            self.geom_col = self.layer.column_geom
+            geom_col = self.layer.column_geom
         except AttributeError:
-            self.geom_col = u'geom'
+            geom_col = u'geom'
+
+        return geom_col
 
     @property
     def writable(self):
