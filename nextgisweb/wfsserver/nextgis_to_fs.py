@@ -157,7 +157,7 @@ class NextgiswebDatasource(DataSource):
 
             feature_id = self.layer.feature_create(feature)
 
-            id = action.wfsrequest.getLayerName() + '.' + str(feature_id)
+            id = str(feature_id)
             return InsertResult(id, "")
 
         return None
