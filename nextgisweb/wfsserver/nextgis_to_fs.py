@@ -10,7 +10,7 @@ import shapely
 
 import geojson
 
-from nextgisweb.feature_layer import IWritableFeatureLayer
+from nextgisweb.feature_layer import IWritableFeatureLayer, GEOM_TYPE, FIELD_TYPE
 
 from .third_party.FeatureServer.DataSource import DataSource
 from .third_party.vectorformats.Feature import Feature
@@ -29,29 +29,66 @@ class NextgiswebDatasource(DataSource):
         self.fid_col = 'id'
         self.layer = kwargs["layer"]
         self.title = kwargs["title"]
-        self.query = self.layer.feature_query()
-        self.srid_out = self.layer.srs_id
+        self.query = None       # Назначим потом (чтобы не производить лишних запросов к БД на этом этапе
         self.type = 'NextgisWeb'
         if 'attribute_cols' in kwargs:
-            self.attribute_cols = kwargs['attribute_cols']
+            self.attribute_cols = kwargs['attribute_cols'].split(',')
         else:
-            self.set_attribute_cols(self.query)
+            self.attribute_cols = None      # Назначим потом (чтобы не производить лишних запросов к БД на этом этапе)
+
+    @property
+    def srid_out(self):
+        return self.layer.srs_id
+
+    @property
+    def geometry_type(self):
+        if self.layer.geometry_type == GEOM_TYPE.POINT:
+            geometry_type = 'Point'
+        elif self.layer.geometry_type == GEOM_TYPE.LINESTING:
+            geometry_type = 'Line'
+        elif self.layer.geometry_type == GEOM_TYPE.POLYGON:
+            geometry_type = 'Polygon'
+        else:
+            raise NotImplementedError
+
+        return geometry_type
+
+    @property
+    def geom_col(self):
 
         # Setup geometry column name. But some resources do not provide the name
         try:
-            self.geom_col = self.layer.column_geom
+            geom_col = self.layer.column_geom
         except AttributeError:
-            self.geom_col = u'geom'
+            geom_col = u'geom'
+
+        return geom_col
 
     @property
     def writable(self):
         # Можно ли редактировать слой
         return IWritableFeatureLayer.providedBy(self.layer)
 
+    def _setup_query(self):
+        if self.query is None:
+            self.query = self.layer.feature_query()
+
+    def set_attribute_cols(self):
+        columns = [f.keyname for f in self.layer.fields]
+        self.attribute_cols = columns
+
+    def get_attribute_cols(self):
+        if self.attribute_cols is None:
+            self.set_attribute_cols()
+
+        return self.attribute_cols
+
     # FeatureServer.DataSource
     def select (self, params):
+        if self.query is None:
+            self._setup_query()
+
         self.query.filter_by()
-        # query.filter_by(OSM_ID=2379362827)
         self.query.geom()
         result = self.query()
 
@@ -75,7 +112,8 @@ class NextgiswebDatasource(DataSource):
             return None
 
         if action.wfsrequest != None:
-            data = action.wfsrequest.getStatement(self)
+            if self.query is None:
+                self._setup_query()
 
             data = action.wfsrequest.getStatement(self)
             data = geojson.loads(data)
@@ -118,7 +156,9 @@ class NextgiswebDatasource(DataSource):
             feature[self.geom_col] = self._geom_from_gml(feature[self.geom_col])
 
             feature_id = self.layer.feature_create(feature)
-            return InsertResult(feature_id, "")
+
+            id = str(feature_id)
+            return InsertResult(id, "")
 
         return None
 
@@ -139,17 +179,19 @@ class NextgiswebDatasource(DataSource):
     def getAttributeDescription(self, attribute):
         length = ''
         try:
-            type = self.layer.field_by_keyname(attribute)
-            type = type.keyname
+            field = self.layer.field_by_keyname(attribute)
+            field_type = field.datatype
         except KeyError: # the attribute can be=='*', that causes KeyError
-            type = 'string'
+            field_type = FIELD_TYPE.STRING
 
-        return (type, length)
+        if field_type == FIELD_TYPE.INTEGER:
+            field_type = 'integer'
+        elif field_type == FIELD_TYPE.REAL:
+            field_type = 'double'
+        else:
+            field_type = field_type.lower()
 
-    def set_attribute_cols(self, query):
-        columns = [f.keyname for f in query.layer.fields]
-        self.attribute_cols = ','.join(columns)
-
+        return (field_type, length)
 
     def _geom_from_gml(self, gml):
         """Создание геометрии из GML.

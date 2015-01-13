@@ -16,6 +16,11 @@ class Delete(TransactionAction):
     def __init__(self, node):
         super(Delete, self).__init__(node)
         self.type = 'delete'
+
+    def setLayerName(self):
+        attr = self.node.attrib
+        if 'typeName' in attr:
+            self.layer_name = attr['typeName']
         
     def createStatement(self, datasource):
         """На выходе --- список идентификаторов объектов, которые нужно удалить

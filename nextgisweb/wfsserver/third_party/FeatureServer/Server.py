@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 __author__  = "MetaCarta"
 __copyright__ = "Copyright (c) 2006-2008 MetaCarta"
 __license__ = "Clear BSD" 
@@ -75,18 +77,16 @@ class Server (object):
                 elif request.actions[0].request.lower() == "describefeaturetype":
                     return request.describefeaturetype(version)
 
-            datasource = self.datasources[request.datasources[0]]
-
-            if request_method != "GET" and hasattr(datasource, 'processes'):
-                raise Exception("You can't post data to a processed layer.")
-
             try:
-                datasource.begin()
                 try:
                     transactionResponse = TransactionResponse()
                     transactionResponse.setSummary(TransactionSummary())
 
                     for action in request.actions:
+                        datasource = self.datasources[action.layer]
+
+                        datasource.begin()
+
                         method = getattr(datasource, action.method)
                         try:
                             result = method(action)

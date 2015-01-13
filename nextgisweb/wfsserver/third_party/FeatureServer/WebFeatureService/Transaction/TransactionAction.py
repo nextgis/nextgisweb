@@ -13,6 +13,7 @@ class TransactionAction(object):
         self.stmt = None
         self.type = ''
         self.node = node
+        self.layer_name = None
         
 
     def setStatement(self, stmt):
@@ -22,6 +23,13 @@ class TransactionAction(object):
         if self.stmt == None and datasource != None:
             self.createStatement(datasource)
         return self.stmt
+
+    def getLayerName(self):
+        if self.layer_name is None:
+            self.setLayerName()
+        return self.layer_name
+
+    def setLayerName(self): pass
     
     def createStatement(self, datasource): pass
     

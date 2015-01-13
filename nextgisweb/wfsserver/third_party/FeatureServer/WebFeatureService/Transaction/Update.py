@@ -11,6 +11,11 @@ class Update(TransactionAction):
     def __init__(self, node):
         super(Update, self).__init__(node)
         self.type = 'update'
+
+    def setLayerName(self):
+        attr = self.node.attrib
+        if 'typeName' in attr:
+            self.layer_name = attr['typeName']
         
     def createStatement(self, datasource):
 

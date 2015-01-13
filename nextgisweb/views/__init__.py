@@ -61,7 +61,10 @@ def permalinker(model, route_name, keys=('id', )):
 
 
 def home(request):
-    return HTTPFound(location=request.route_url('resource.show', id=0))
+    if 'home_url' in request.env.pyramid.settings:
+        return HTTPFound(request.application_url + request.env.pyramid.settings['home_url'])
+    else:
+        return HTTPFound(location=request.route_url('resource.show', id=0))
 
 
 def amd_package(request):

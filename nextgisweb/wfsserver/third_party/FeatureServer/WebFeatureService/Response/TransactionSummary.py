@@ -5,11 +5,12 @@ Created on Oct 21, 2011
 '''
 
 class TransactionSummary(object):
-    
-    totalInserted = 0
-    totalDeleted = 0
-    totalUpdated = 0
-    totalReplaced = 0
+
+    def __init__(self):
+        self.totalInserted = 0
+        self.totalDeleted = 0
+        self.totalUpdated = 0
+        self.totalReplaced = 0
     
     def increaseInserted(self, amount = 1):
         self.totalInserted += amount
