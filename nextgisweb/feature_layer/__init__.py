@@ -31,8 +31,9 @@ class FeatureLayerComponent(Component):
 
     @require('resource')
     def setup_pyramid(self, config):
-        from . import view
+        from . import view, api
         view.setup_pyramid(self, config)
+        api.setup_pyramid(self, config)
 
     settings_info = (
         dict(key='identify.attributes', desc=u"Показывать атрибуты в идентификации"),
