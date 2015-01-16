@@ -10,6 +10,7 @@ import shapely
 
 import geojson
 
+from nextgisweb.feature_layer import Feature as NgwFwature
 from nextgisweb.feature_layer import IWritableFeatureLayer, GEOM_TYPE, FIELD_TYPE
 
 from .third_party.FeatureServer.DataSource import DataSource
@@ -150,10 +151,17 @@ class NextgiswebDatasource(DataSource):
 
         if action.wfsrequest != None:
             data = action.wfsrequest.getStatement(self)
-            feature = geojson.loads(data)
 
-            # геометрия должна быть в shapely
-            feature[self.geom_col] = self._geom_from_gml(feature[self.geom_col])
+            feature_dict = geojson.loads(data)
+
+            # геометрия должна быть в shapely,
+            # т.к. ngw Feature хранит геометрию в этом виде
+            geom = self._geom_from_gml(feature_dict[self.geom_col])
+
+            # Поле геометрии в словаре аттрибутов теперь не нужно:
+            feature_dict.pop(self.geom_col)
+
+            feature = NgwFwature(fields=feature_dict, geom=geom)
 
             feature_id = self.layer.feature_create(feature)
 

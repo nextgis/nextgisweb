@@ -58,7 +58,14 @@
                                     "<xsl:value-of select="string($geometryData)" />"
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    "<xsl:value-of select="." mode="escape" />"
+                                    <xsl:variable name="newtext">
+                                        <xsl:call-template name="string-replace-all">
+                                            <xsl:with-param name="text" select="." />
+                                            <xsl:with-param name="replace" select="'&quot;'" />
+                                            <xsl:with-param name="by" select="'\&quot;'" />
+                                        </xsl:call-template>
+                                    </xsl:variable>
+                                    "<xsl:value-of select="$newtext" />"
                                 </xsl:otherwise>
                             </xsl:choose>
                         <xsl:if test="position() &lt; $total">,</xsl:if>
@@ -86,7 +93,14 @@
                                     "<xsl:value-of select="."/>" : "<xsl:value-of select="string($geometryData)" />"
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    "<xsl:value-of select="."/>" : "<xsl:value-of select="./following-sibling::*[1]"/>"
+                                    <xsl:variable name="newtext">
+                                        <xsl:call-template name="string-replace-all">
+                                            <xsl:with-param name="text" select="./following-sibling::*[1]" />
+                                            <xsl:with-param name="replace" select="'&quot;'" />
+                                            <xsl:with-param name="by" select="'\&quot;'" />
+                                        </xsl:call-template>
+                                    </xsl:variable>
+                                    "<xsl:value-of select="."/>" : "<xsl:value-of select="$newtext"/>"
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() &lt; $total">,</xsl:if>
@@ -113,5 +127,26 @@
                 </Statement>
         
     </xsl:template>
-    
+
+    <xsl:template name="string-replace-all">
+        <xsl:param name="text" />
+        <xsl:param name="replace" />
+        <xsl:param name="by" />
+        <xsl:choose>
+            <xsl:when test="contains($text, $replace)">
+                <xsl:value-of select="substring-before($text,$replace)" />
+                <xsl:value-of select="$by" />
+                <xsl:call-template name="string-replace-all">
+                    <xsl:with-param name="text"
+                                    select="substring-after($text,$replace)" />
+                    <xsl:with-param name="replace" select="$replace" />
+                    <xsl:with-param name="by" select="$by" />
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$text" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
 </xsl:stylesheet>
