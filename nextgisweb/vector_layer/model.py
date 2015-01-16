@@ -306,15 +306,15 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 setattr(obj, f.key, feature.fields[f.keyname])
 
         obj.geom = ga.WKTSpatialElement(
-                str(feature.geom), self.srs_id)
+            str(feature.geom), self.srs_id)
 
         DBSession.merge(obj)
 
-    def feature_create(self, feature_description):
-        """Вставляет в БД новый объект, описание которого дается в feature_description
+    def feature_create(self, feature):
+        """Вставляет в БД новый объект, описание которого дается в feature
 
-        :param feature_description: описание объекта
-        :type feature_description:  dict
+        :param feature: описание объекта
+        :type feature:  Feature
 
         :return:    ID вставленного объекта
         """
@@ -323,18 +323,17 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         obj = tableinfo.model()
         for f in tableinfo.fields:
-            if f.keyname in feature_description.keys():
-                setattr(obj, f.key, feature_description[f.keyname])
+            if f.keyname in feature.fields.keys():
+                setattr(obj, f.key, feature.fields[f.keyname])
 
         obj.geom = ga.WKTSpatialElement(
-                str(feature_description['geom']), self.srs_id)
+            str(feature.geom), self.srs_id)
 
         DBSession.add(obj)
         DBSession.flush()
         DBSession.refresh(obj)
 
         return obj.id
-
 
     def feature_delete(self, feature_id):
         """Удаляет запись с заданным id
@@ -348,6 +347,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         obj = DBSession.query(tableinfo.model).filter_by(id=feature_id).one()
 
         DBSession.delete(obj)
+
 
 def _vector_layer_listeners(table):
     event.listen(

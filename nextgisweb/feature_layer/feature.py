@@ -9,7 +9,7 @@ class Feature(object):
         self._geom = geom
         self._box = box
 
-        self._fields = dict(fields)
+        self._fields = dict(fields) if fields is not None else dict()
 
     @property
     def layer(self):
@@ -65,7 +65,7 @@ class FeatureSet(object):
     def one(self):
         data = list(self.__iter__())
         return data[0]
-    
+
     @property
     def __geo_interface__(self):
         return dict(
