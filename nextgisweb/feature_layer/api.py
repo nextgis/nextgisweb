@@ -104,10 +104,10 @@ def cpost(resource, request):
     if 'geom' in body:
         feature.geom = body['geom']
 
-    resource.feature_create(feature)
+    fid = resource.feature_create(feature)
 
     return Response(
-        json.dumps(dict(id=feature.id)),
+        json.dumps(dict(id=fid)),
         content_type=b'application/json')
 
 
