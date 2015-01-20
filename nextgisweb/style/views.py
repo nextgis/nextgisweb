@@ -19,7 +19,7 @@ def setup_pyramid(comp, config):
         x = int(request.GET['x'])
         y = int(request.GET['y'])
 
-        req = obj.render_request(obj.parent.srs)
+        req = obj.render_request(obj.srs)
         img = req.render_tile((z, x, y), 256)
 
         buf = StringIO()
