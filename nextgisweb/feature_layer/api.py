@@ -131,14 +131,7 @@ def iput(resource, request):
     for f in query():
         feature = f
 
-    body = request.json_body
-    if 'fields' in body:
-        for k, v in body['fields'].iteritems():
-            feature.fields[k] = v
-
-    if 'geom' in body:
-        feature.geom = body['geom']
-
+    deserialize(feature, request.json_body)
     resource.feature_put(feature)
 
     return Response(
