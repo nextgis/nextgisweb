@@ -224,7 +224,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
             width=size[0], height=size[1],
             transparent="true")
 
-        url = self.connection.url + "?" + urllib.urlencode(query)
+        sep = "&" if "?" in self.connection.url else "?"
+        url = self.connection.url + sep + urllib.urlencode(query)
         return PIL.Image.open(BytesIO(urllib2.urlopen(url).read()))
 
 
