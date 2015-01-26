@@ -50,6 +50,11 @@ define([
         addLayer: function (layer) {
             this.layers[layer.name] = layer;
             this.olMap.addLayer(layer.olLayer);
+        },
+
+        removeLayer: function (layer) {
+            this.olMap.removeLayer(layer.olLayer);
+            delete this.layers[layer.name];
         }
     });
 });
