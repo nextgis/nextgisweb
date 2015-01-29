@@ -78,41 +78,44 @@ class Server (object):
                     return request.describefeaturetype(version)
 
             try:
-                try:
-                    transactionResponse = TransactionResponse()
-                    transactionResponse.setSummary(TransactionSummary())
+                transactionResponse = TransactionResponse()
+                transactionResponse.setSummary(TransactionSummary())
 
-                    for action in request.actions:
-                        datasource = self.datasources[action.layer]
+                for action in request.actions:
+                    datasource = self.datasources[action.layer]
 
-                        datasource.begin()
+                    datasource.begin()
 
-                        method = getattr(datasource, action.method)
-                        try:
-                            result = method(action)
-                            if isinstance(result, ActionResult):
-                                transactionResponse.addResult(result)
-                            elif result is not None:
-                                response += result
-                        except InvalidValueException as e:
-                            exceptionReport.add(e)
-    
-                        datasource.commit()
-                except:
-                    datasource.rollback()
-                    raise
+                    method = getattr(datasource, action.method)
+                    try:
+                        result = method(action)
+                        if isinstance(result, ActionResult):
+                            transactionResponse.addResult(result)
+                        elif result is not None:
+                            response += result
+                    except InvalidValueException as e:
+                        exceptionReport.add(e)
 
-                if hasattr(datasource, 'processes'):
-                    for process in datasource.processes.split(","):
-                        if not self.processes.has_key(process):
-                            raise Exception("Process %s configured incorrectly. Possible processes: \n\n%s" % (process, ",".join(self.processes.keys() )))
-                        response = self.processes[process].dispatch(features=response, params=params)
-                if transactionResponse.summary.totalDeleted > 0 or transactionResponse.summary.totalInserted > 0 or transactionResponse.summary.totalUpdated > 0 or transactionResponse.summary.totalReplaced > 0:
-                    response = transactionResponse
+                    datasource.commit()
+            except:
+                datasource.rollback()
+                raise
 
-            except ConnectionException as e:
-                exceptionReport.add(e)
-    
+            # NextgiswebDatasource doesn't have processes attribute for now,
+            # so comment the lines:
+
+            # if hasattr(datasource, 'processes'):
+            #     for process in datasource.processes.split(","):
+            #         if not self.processes.has_key(process):
+            #             raise Exception("Process %s configured incorrectly. Possible processes: \n\n%s" % (process, ",".join(self.processes.keys() )))
+            #         response = self.processes[process].dispatch(features=response, params=params)
+
+
+            if transactionResponse.summary.totalDeleted > 0 or transactionResponse.summary.totalInserted > 0 or transactionResponse.summary.totalUpdated > 0 or transactionResponse.summary.totalReplaced > 0:
+                response = transactionResponse
+
+        except ConnectionException as e:
+            exceptionReport.add(e)
         except LayerNotFoundException as e:
             exceptionReport.add(e)
 
