@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from pyramid.response import Response
 
-from ..resource import Widget, resource_factory
+from ..resource import Widget, resource_factory, Resource
 from .model import Service
 
 from .third_party.FeatureServer.Server import Server, FeatureServerException
@@ -51,6 +51,7 @@ def handler(obj, request):
     server = Server(datasources)
     base_path = request.path_url
 
+    print post_data
     try:
         result = server.dispatchRequest(base_path=base_path,
                                     path_info='/'+sourcenames, params=params,
@@ -71,11 +72,20 @@ def handler(obj, request):
     elif isinstance(result, FeatureserverResponse):
         # ответ на запрос GetFeature, Update, Insert, Delete
         data = result.getData()
+        print data
         return Response(data, content_type=result.content_type)
 
 
 def setup_pyramid(comp, config):
+
     config.add_route(
-        'wfsclient.wfs', '/resource/{id:\d+}/wfs',
+        'wfsserver.wfs', '/resource/{id:\d+}/wfs',
         factory=resource_factory, client=('id',)
     ).add_view(handler, context=Service)
+
+
+    Resource.__psection__.register(
+        key='wfsserver', priority=50,
+        title="Сервис WFS",
+        is_applicable=lambda obj: obj.cls == 'wfsserver_service',
+        template='nextgisweb:wfsserver/template/section.mako')
