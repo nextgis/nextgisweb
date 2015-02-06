@@ -51,7 +51,6 @@ def handler(obj, request):
     server = Server(datasources)
     base_path = request.path_url
 
-    print post_data
     try:
         result = server.dispatchRequest(base_path=base_path,
                                     path_info='/'+sourcenames, params=params,
@@ -72,7 +71,6 @@ def handler(obj, request):
     elif isinstance(result, FeatureserverResponse):
         # ответ на запрос GetFeature, Update, Insert, Delete
         data = result.getData()
-        print data
         return Response(data, content_type=result.content_type)
 
 
