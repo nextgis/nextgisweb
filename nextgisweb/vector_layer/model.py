@@ -305,8 +305,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if f.keyname in feature.fields:
                 setattr(obj, f.key, feature.fields[f.keyname])
 
-        obj.geom = ga.WKTSpatialElement(
-            str(feature.geom), self.srs_id)
+        # FIXME: В случае отсутствия геометрии не пытаемся ее записать. Это
+        # не позволит записать пустую геометрию, но это и не нужно пока.
+
+        if feature.geom is not None:
+            obj.geom = ga.WKTSpatialElement(
+                str(feature.geom), self.srs_id)
 
         DBSession.merge(obj)
 
