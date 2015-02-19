@@ -182,7 +182,7 @@ def exception_to_response(exc_type, exc_value, exc_traceback):
         # Ошибка неожиданная, имеет смысл дать возможность ее записать.
 
         env.resource.logger.error(
-            exc_type.__name__ + ': ' + exc_value.message + "\n"
+            exc_type.__name__ + ': ' + str(exc_value.message) + "\n"
             + ''.join(traceback.format_tb(exc_traceback)))
 
     return Response(
