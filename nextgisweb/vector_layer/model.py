@@ -55,7 +55,13 @@ GEOM_TYPE_OGR = (
     ogr.wkbPolygon,
     ogr.wkbMultiPoint,
     ogr.wkbMultiLineString,
-    ogr.wkbMultiPolygon)
+    ogr.wkbMultiPolygon,
+    ogr.wkbPoint25D,
+    ogr.wkbLineString25D,
+    ogr.wkbPolygon25D,
+    ogr.wkbMultiPoint25D,
+    ogr.wkbMultiLineString25D,
+    ogr.wkbMultiPolygon25D)
 GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
 
 FIELD_TYPE_DB = (
@@ -74,7 +80,7 @@ FIELD_TYPE_OGR = (
     ogr.OFTTime,
     ogr.OFTDateTime)
 
-_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 2))
+_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 4))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 _GEOM_TYPE_2_GA = dict(zip(GEOM_TYPE_DB, GEOM_TYPE_GA))
 
@@ -193,6 +199,17 @@ class TableInfo(object):
         while feature:
             fid += 1
             geom = feature.GetGeometryRef()
+
+            # Приведение 25D геометрий к 2D
+            if geom.GetGeometryType() in (
+                ogr.wkbPoint25D,
+                ogr.wkbLineString25D,
+                ogr.wkbPolygon25D,
+                ogr.wkbMultiPoint25D,
+                ogr.wkbMultiLineString25D,
+                ogr.wkbMultiPolygon25D,
+                ):
+                geom.FlattenTo2D()
 
             if geom.GetGeometryType() == ogr.wkbPoint:
                 geom = ogr.ForceToMultiPoint(geom)
