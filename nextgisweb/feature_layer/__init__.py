@@ -13,8 +13,8 @@ from .interface import (
     IFeatureQueryFilterBy,
     IFeatureQueryOrderBy,
     IFeatureQueryLike,
-    IFeatureQueryIntersects,
-)
+    IFeatureQueryIntersects)
+from .extension import FeatureExtension
 
 
 @Component.registry.register

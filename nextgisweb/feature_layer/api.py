@@ -11,6 +11,7 @@ from ..resource import DataScope, resource_factory
 
 from .interface import IFeatureLayer, IWritableFeatureLayer, FIELD_TYPE
 from .feature import Feature
+from .extension import FeatureExtension
 
 
 PERM_READ = DataScope.read
@@ -58,6 +59,12 @@ def deserialize(feat, data):
 
                 feat.fields[fld.keyname] = fval
 
+    if 'extensions' in data:
+        for cls in FeatureExtension.registry:
+            if cls.identity in data['extensions']:
+                ext = cls(feat.layer)
+                ext.deserialize(feat, data['extensions'][cls.identity])
+
 
 def serialize(feat):
     result = OrderedDict(id=feat.id)
@@ -96,6 +103,11 @@ def serialize(feat):
             fval = val
 
         result['fields'][fld.keyname] = fval
+
+    result['extensions'] = OrderedDict()
+    for cls in FeatureExtension.registry:
+        ext = cls(feat.layer)
+        result['extensions'][cls.identity] = ext.serialize(feat)
 
     return result
 

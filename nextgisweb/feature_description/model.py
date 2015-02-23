@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
+from __future__ import unicode_literals
 
+from .. import db
 from ..models import declarative_base
 from ..resource import Resource
 
@@ -11,9 +11,9 @@ Base = declarative_base()
 class FeatureDescription(Base):
     __tablename__ = 'feature_description'
 
-    layer_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
-    feature_id = sa.Column(sa.Integer, primary_key=True)
-    value = sa.Column(sa.Unicode)
+    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
+    feature_id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.Unicode, nullable=False)
 
-    layer = orm.relationship(Resource, backref=orm.backref(
+    resource = db.relationship(Resource, backref=db.backref(
         '__feature_description', cascade='all'))

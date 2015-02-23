@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from ..component import Component, require
 
 from .model import Base, FeatureDescription
@@ -13,30 +15,32 @@ class FeatureDescriptionComponent(Component):
 
     @require('feature_layer')
     def initialize(self):
-        FeatureExtension = self.env.feature_layer.FeatureExtension
+        from . import extension # NOQA
 
-        @FeatureExtension.registry.register
-        class FeatureDescriptionExtension(FeatureExtension):
-            identity = 'feature_description'
-            display_widget = 'feature_description/DisplayWidget'
+        # FeatureExtension = self.env.feature_layer.FeatureExtension
 
-            comp = self
+        # @FeatureExtension.registry.register
+        # class FeatureDescriptionExtension(FeatureExtension):
+        #     identity = 'feature_description'
+        #     display_widget = 'feature_description/DisplayWidget'
 
-            def feature_data(self, feature):
-                obj = FeatureDescription.filter_by(
-                    layer_id=self.layer.id,
-                    feature_id=feature.id,
-                ).first()
+        #     comp = self
 
-                if obj:
-                    return obj.value
+        #     def feature_data(self, feature):
+        #         obj = FeatureDescription.filter_by(
+        #             layer_id=self.layer.id,
+        #             feature_id=feature.id,
+        #         ).first()
 
-            @property
-            def feature_widget(self):
-                class _Widget(self.comp.FeatureDescriptionEditWidget):
-                    layer = self.layer
-                return _Widget
+        #         if obj:
+        #             return obj.value
 
-    def setup_pyramid(self, config):
-        from . import view
-        view.setup_pyramid(self, config)
+        #     @property
+        #     def feature_widget(self):
+        #         class _Widget(self.comp.FeatureDescriptionEditWidget):
+        #             layer = self.layer
+        #         return _Widget
+
+    # def setup_pyramid(self, config):
+    #     from . import view
+    #     view.setup_pyramid(self, config)
