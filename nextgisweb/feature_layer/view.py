@@ -8,6 +8,7 @@ from pyramid.renderers import render_to_response
 
 from ..resource import (
     Resource,
+    ResourceScope,
     DataStructureScope,
     DataScope,
     resource_factory,
@@ -40,6 +41,8 @@ PD_WRITE = DataScope.write
 
 PDS_R = DataStructureScope.read
 PDS_W = DataStructureScope.write
+
+PR_R = ResourceScope.read
 
 
 def feature_browse(request):
@@ -313,6 +316,14 @@ def setup_pyramid(comp, config):
                          label=f.label, fields=f.fields)
                     for f in query()
                 ]
+
+                # Добавляем в результаты идентификации название
+                # родительского ресурса (можно использовать в случае,
+                # если на клиенте нет возможности извлечь имя слоя по
+                # идентификатору)
+                if layer.parent.has_permission(PR_R, request.user):
+                    for feature in features:
+                        feature['parent'] = layer.parent.display_name
 
                 result[layer.id] = dict(
                     features=features,
