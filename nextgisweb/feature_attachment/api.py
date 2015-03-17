@@ -60,6 +60,21 @@ def iget(resource, request):
         content_type=b'application/json')
 
 
+def idelete(resource, request):
+    request.resource_permission(DataScope.read)
+
+    obj = FeatureAttachment.filter_by(
+        id=request.matchdict['aid'], resource_id=resource.id,
+        feature_id=request.matchdict['fid']
+    ).one()
+
+    DBSession.delete(obj)
+
+    return Response(
+        json.dumps(None),
+        content_type=b'application/json')
+
+
 def iput(resource, request):
     request.resource_permission(DataScope.write)
 
@@ -134,7 +149,8 @@ def setup_pyramid(comp, config):
         'feature_attachment.item', itmurl,
         factory=resource_factory) \
         .add_view(iget, request_method='GET') \
-        .add_view(iput, request_method='PUT')
+        .add_view(iput, request_method='PUT') \
+        .add_view(idelete, request_method='DELETE')
 
     config.add_route(
         'feature_attachment.collection', colurl,
