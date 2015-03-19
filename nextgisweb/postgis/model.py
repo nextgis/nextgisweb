@@ -267,7 +267,11 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                     elif row['data_type'] == 'uuid':
                         datatype = FIELD_TYPE.STRING
                     elif row['data_type'] == 'date':
-                        datatype = FIELD_TYPE.STRING
+                        datatype = FIELD_TYPE.DATE
+                    elif row['data_type'] == 'time':
+                        datatype = FIELD_TYPE.TIME
+                    elif row['data_type'] == 'timestamp':
+                        datatype = FIELD_TYPE.DATETIME
 
                     if datatype is not None:
                         fopts = dict(display_name=row['column_name'])
