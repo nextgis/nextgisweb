@@ -10,6 +10,7 @@ from .model import FeatureDescription
 @FeatureExtension.registry.register
 class FeatureDescriptionExtension(FeatureExtension):
     identity = 'description'
+    editor_widget = 'ngw-feature-description/EditorWidget'
 
     def serialize(self, feature):
         obj = FeatureDescription.filter_by(

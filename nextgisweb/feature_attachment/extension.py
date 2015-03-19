@@ -8,6 +8,7 @@ from .model import FeatureAttachment
 @FeatureExtension.registry.register
 class FeatureAttachmentExtension(FeatureExtension):
     identity = 'attachment'
+    editor_widget = "ngw-feature-attachment/EditorWidget"
 
     def serialize(self, feature):
         query = FeatureAttachment.filter_by(

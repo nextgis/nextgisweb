@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from types import MethodType
+from collections import OrderedDict
 
 import geojson
 from pyramid.response import Response
@@ -70,52 +71,23 @@ def feature_show(request):
 def feature_edit(layer, request):
     request.resource_permission(PD_WRITE)
 
-    query = layer.feature_query()
-    query.filter_by(id=request.matchdict['feature_id'])
-    feature = list(query())[0]
+    feature_id = int(request.matchdict['feature_id'])
 
-    swconfig = []
+    ext_mid = OrderedDict()
+    for k, ecls in FeatureExtension.registry._dict.iteritems():
+        if hasattr(ecls, 'editor_widget'):
+            ext_mid[k] = ecls.editor_widget
 
-    if hasattr(layer, 'feature_widget'):
-        swconfig.append(('feature_layer', layer.feature_widget()))
-
-    for k, v in FeatureExtension.registry._dict.iteritems():
-        swconfig.append((k, v(layer).feature_widget))
-
-    class Widget(CompositeWidget):
-        subwidget_config = swconfig
-
-    widget = Widget(obj=feature, operation='edit')
-    widget.bind(request=request)
-
-    if request.method == 'POST':
-        widget.bind(data=request.json_body)
-
-        if widget.validate():
-            widget.populate_obj()
-
-            return render_to_response(
-                'json', dict(
-                    status_code=200,
-                    redirect=request.url
-                ),
-                request
-            )
-
-        else:
-            return render_to_response(
-                'json', dict(
-                    status_code=400,
-                    error=widget.widget_error()
-                ),
-                request
-            )
+    fields = []
+    for f in layer.fields:
+        fields.append(f.keyname)
 
     return dict(
-        widget=widget,
-        obj=layer,
-        subtitle=u"Объект: %s" % unicode(feature),
-    )
+        obj=request.context,
+        feature_id=feature_id,
+        ext_mid=ext_mid, fields=fields,
+        subtitle=u"Объект #%d" % feature_id,
+        maxheight=True)
 
 
 @viewargs(context=IFeatureLayer)
@@ -389,7 +361,7 @@ def setup_pyramid(comp, config):
     ).add_view(
         feature_edit,
         context=IFeatureLayer,
-        renderer='model_widget.mako')
+        renderer='nextgisweb:feature_layer/template/widget.mako')
 
     config.add_route(
         'feature_layer.geojson',
