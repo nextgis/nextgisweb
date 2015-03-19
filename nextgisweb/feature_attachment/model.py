@@ -42,36 +42,22 @@ class FeatureAttachment(Base):
             ('description', self.description),
             ('is_image', self.is_image)))
 
-    @classmethod
-    def deserialize(cls, feature, data):
-        if 'id' in data:
-            obj = FeatureAttachment.filter_by(
-                id=data['id'], feature_id=feature.id,
-                resource_id=feature.layer.id,
-            ).one()
-        else:
-            obj = FeatureAttachment(
-                resource_id=feature.layer.id,
-                feature_id=feature.id)
-            obj.persist()
-
+    def deserialize(self, data):
         file_upload = data.get('file_upload')
         if file_upload is not None:
-            obj.fileobj = env.file_storage.fileobj(
+            self.fileobj = env.file_storage.fileobj(
                 component='feature_attachment')
 
             srcfile, _ = env.file_upload.get_filename(file_upload['id'])
-            dstfile = env.file_storage.filename(obj.fileobj, makedirs=True)
+            dstfile = env.file_storage.filename(self.fileobj, makedirs=True)
 
             with open(srcfile, 'r') as fs, open(dstfile, 'w') as fd:
                 copyfileobj(fs, fd)
 
             for k in ('name', 'mime_type', 'size'):
                 if k in file_upload:
-                    setattr(obj, k, file_upload[k])
+                    setattr(self, k, file_upload[k])
 
         for k in ('name', 'mime_type', 'description'):
             if k in data:
-                setattr(obj, k, data[k])
-
-        return obj
+                setattr(self, k, data[k])

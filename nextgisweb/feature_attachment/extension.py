@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from ..feature_layer import FeatureExtension
+from ..models import DBSession
 from .model import FeatureAttachment
 
 
@@ -22,5 +23,25 @@ class FeatureAttachmentExtension(FeatureExtension):
         if data is None:
             data = []
 
+        rest = dict()
+        for fa in FeatureAttachment.filter_by(
+            resource_id=feature.layer.id,
+            feature_id=feature.id
+        ):
+            rest[fa.id] = fa
+
         for itm in data:
-            FeatureAttachment.deserialize(feature, itm)
+            if 'id' in itm:
+                obj = rest[itm['id']]
+                del rest[itm['id']]
+
+            else:
+                obj = FeatureAttachment(
+                    resource_id=feature.layer.id,
+                    feature_id=feature.id
+                ).persist()
+
+            obj.deserialize(itm)
+
+        for fa in rest.values():
+            DBSession.delete(fa)
