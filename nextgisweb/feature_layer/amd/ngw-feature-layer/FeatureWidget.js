@@ -136,6 +136,8 @@ define([
                 method: "PUT",
                 handleAs: "json",
                 data: json.stringify(data)
+            }).then(function () {
+                widget.load();
             });
         }
     });

@@ -174,6 +174,11 @@ define([
         },
 
         _setValueAttr: function (data) {
+            var store = this.store;
+            store.query().forEach(function (itm) {
+                store.remove(itm.lid);
+            });
+
             for (var key in data) {
                 var value = lang.clone(data[key]);
                 if (value.is_image) {
