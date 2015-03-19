@@ -95,9 +95,11 @@ define([
 
             this.watch("selectedRow", lang.hitch(this, function (attr, oldVal, newVal) {
                 this.btnOpenFeature.set("disabled", newVal == null);
+                this.btnUpdateFeature.set("disabled", newVal == null);
             }));
 
             this.btnOpenFeature.on("click", lang.hitch(this, this.openFeature));
+            this.btnUpdateFeature.on("click", lang.hitch(this, this.updateFeature));
 
             if (this.likeSearch) {
                 // Поиск нужен, настраиваем обработчики строки поиска
@@ -186,6 +188,14 @@ define([
                 feature_id: this.get("selectedRow").id
             }));
         },
+
+        updateFeature: function() {
+            window.open(route.feature_layer.feature.update({
+                id: this.layerId,
+                feature_id: this.get("selectedRow").id
+            }));
+        },
+
 
         updateSearch: function () {
             if (this._timer != undefined) { clearInterval(this._timer) };

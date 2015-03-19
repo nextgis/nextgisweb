@@ -181,7 +181,7 @@ define([
                         id: this.resource,
                         fid: this.feature,
                         aid: value.id
-                    }) + "?size=80x80";
+                    }) + "?size=80x60";
                 };
                 this.store.add(value);
             }            

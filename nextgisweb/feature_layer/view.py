@@ -68,7 +68,7 @@ def feature_show(request):
         feature=feature)
 
 
-def feature_edit(layer, request):
+def feature_update(layer, request):
     request.resource_permission(PD_WRITE)
 
     feature_id = int(request.matchdict['feature_id'])
@@ -354,12 +354,12 @@ def setup_pyramid(comp, config):
         renderer='nextgisweb:feature_layer/template/feature_show.mako')
 
     config.add_route(
-        'feature_layer.feature.edit',
-        '/resource/{id:\d+}/feature/{feature_id}/edit',
+        'feature_layer.feature.update',
+        '/resource/{id:\d+}/feature/{feature_id}/update',
         factory=resource_factory,
         client=('id', 'feature_id')
     ).add_view(
-        feature_edit,
+        feature_update,
         context=IFeatureLayer,
         renderer='nextgisweb:feature_layer/template/widget.mako')
 
