@@ -8,7 +8,9 @@ import tempfile
 import shutil
 import ctypes
 import operator
+from datetime import datetime
 from distutils.version import LooseVersion
+
 
 from zope.interface import implements
 import osgeo
@@ -224,10 +226,13 @@ class TableInfo(object):
             for i in range(feature.GetFieldCount()):
                 fld_type = feature.GetFieldDefnRef(i).GetType()
                 fld_value = None
+
                 if fld_type == ogr.OFTInteger:
                     fld_value = feature.GetFieldAsInteger(i)
                 elif fld_type == ogr.OFTReal:
                     fld_value = feature.GetFieldAsDouble(i)
+                elif fld_type in [ogr.OFTDate, ogr.OFTTime, ogr.OFTDateTime]:
+                    fld_value = datetime(*feature.GetFieldAsDateTime(i))
                 elif fld_type == ogr.OFTString:
                     try:
                         fld_value = strdecode(feature.GetFieldAsString(i))
