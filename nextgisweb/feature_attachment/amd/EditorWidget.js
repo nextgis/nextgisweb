@@ -137,7 +137,7 @@ define([
             this.toolbar = new Toolbar({});
 
             this.uploader = new Uploader({
-                label: "Загрузить файлы",
+                label: "Загрузить",
                 iconClass: "dijitIconNewTask",
                 multiple: true,
                 uploadOnSelect: true,

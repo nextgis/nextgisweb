@@ -84,9 +84,7 @@ def amd_packages():
         # Пакеты nextgisweb
         ('ngw', 'nextgisweb:amd_packages/ngw'),
         ('feature_layer', 'nextgisweb:amd_packages/feature_layer'),
-        ('feature_photo', 'nextgisweb:amd_packages/feature_photo'),
         ('webmap', 'nextgisweb:amd_packages/webmap'),
-        ('vector_layer', 'nextgisweb:amd_packages/vector_layer'),
         ('wmsclient', 'nextgisweb:amd_packages/wmsclient'),
 
         # Пакеты компонентов
