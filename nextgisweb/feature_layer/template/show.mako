@@ -5,9 +5,9 @@
 <script type="text/javascript">
     require([
         "dojo/dom",
-        "ngw-feature-layer/FeatureEditorWidget",
+        "ngw-feature-layer/FeatureDisplayWidget",
         "dojo/domReady!"
-    ], function (dom, FeatureEditorWidget) {
+    ], function (dom, FeatureDisplayWidget) {
         var ext = ${ ext_mid.keys() | json.dumps, n },
             mid = ${ ext_mid.values() | json.dumps, n };
 
@@ -15,11 +15,10 @@
             var extmid = {};
             for (var i = 0; i < arguments.length; i++) { extmid[ext[i]] = arguments[i] };
 
-            var widget = new FeatureEditorWidget({
-                resource: ${ obj.id | json.dumps, n },
-                feature: ${ feature_id | json.dumps, n },
+            var widget = new FeatureDisplayWidget({
+                resourceId: ${ obj.id | json.dumps, n },
+                featureId: ${ feature_id | json.dumps, n },
                 extmid: extmid,
-                fields: ${ fields | json.dumps, n },
                 style: "width: 100%; height: 100%; padding: 1px;"});
 
             widget.placeAt(dom.byId("widget"));

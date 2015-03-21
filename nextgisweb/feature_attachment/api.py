@@ -136,6 +136,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'feature_attachment.download',
         itmurl + '/download',
+        client=('id', 'fid', 'aid'),
         factory=resource_factory) \
         .add_view(download)
 

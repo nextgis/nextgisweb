@@ -7,7 +7,7 @@ define([
     "dojo/store/Memory",
     "dojo/store/Observable",
     "dojo/dom-construct",
-    "dojo/dom-style",
+    "dojo/dom-style",   
     "dojo/dom-class",
     "dijit/Tooltip",
     "dijit/layout/ContentPane",
@@ -94,7 +94,7 @@ define([
                 id: "label_field",
                 label: "АН",
                 sortable: false,
-                autoSave: true,
+                autoSave: true, 
                 editor: CheckBox,
                 editorArgs: { value: true }
             })

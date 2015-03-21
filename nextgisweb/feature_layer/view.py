@@ -46,6 +46,7 @@ PDS_W = DataStructureScope.write
 PR_R = ResourceScope.read
 
 
+@viewargs(renderer='nextgisweb:feature_layer/template/feature_browse.mako')
 def feature_browse(request):
     request.resource_permission(PD_READ)
     request.resource_permission(PDS_R)
@@ -53,22 +54,26 @@ def feature_browse(request):
                 maxwidth=True, maxheight=True)
 
 
+@viewargs(renderer='nextgisweb:feature_layer/template/show.mako')
 def feature_show(request):
     request.resource_permission(PD_READ)
 
-    fquery = request.context.feature_query()
-    fquery.filter_by(id=request.matchdict['feature_id'])
-    fquery.geom()
+    feature_id = int(request.matchdict['feature_id'])
 
-    feature = fquery().one()
+    ext_mid = OrderedDict()
+    for k, ecls in FeatureExtension.registry._dict.iteritems():
+        if hasattr(ecls, 'display_widget'):
+            ext_mid[k] = ecls.display_widget
 
     return dict(
         obj=request.context,
-        subtitle=u"Объект #%d" % feature.id,
-        feature=feature)
+        subtitle=u"Объект #%d" % feature_id,
+        feature_id=feature_id,
+        ext_mid=ext_mid)
 
 
-def feature_update(layer, request):
+@viewargs(renderer='nextgisweb:feature_layer/template/widget.mako')
+def feature_update(request):
     request.resource_permission(PD_WRITE)
 
     feature_id = int(request.matchdict['feature_id'])
@@ -79,7 +84,7 @@ def feature_update(layer, request):
             ext_mid[k] = ecls.editor_widget
 
     fields = []
-    for f in layer.fields:
+    for f in request.context.fields:
         fields.append(OrderedDict((
             ('keyname', f.keyname),
             ('datatype', f.datatype),
@@ -323,9 +328,21 @@ def setup_pyramid(comp, config):
         '/resource/{id:\d+}/feature/',
         factory=resource_factory,
         client=('id', )
-    ).add_view(
-        feature_browse, context=IFeatureLayer,
-        renderer='nextgisweb:feature_layer/template/feature_browse.mako')
+    ).add_view(feature_browse, context=IFeatureLayer)
+
+    config.add_route(
+        'feature_layer.feature.show',
+        '/resource/{id:\d+}/feature/{feature_id:\d+}',
+        factory=resource_factory,
+        client=('id', 'feature_id')
+    ).add_view(feature_show, context=IFeatureLayer)
+
+    config.add_route(
+        'feature_layer.feature.update',
+        '/resource/{id:\d+}/feature/{feature_id}/update',
+        factory=resource_factory,
+        client=('id', 'feature_id')
+    ).add_view(feature_update, context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.field', '/resource/{id:\d+}/field/',
@@ -345,26 +362,6 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
         client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer)
-
-    config.add_route(
-        'feature_layer.feature.show',
-        '/resource/{id:\d+}/feature/{feature_id:\d+}',
-        factory=resource_factory,
-        client=('id', 'feature_id')
-    ).add_view(
-        feature_show,
-        context=IFeatureLayer,
-        renderer='nextgisweb:feature_layer/template/feature_show.mako')
-
-    config.add_route(
-        'feature_layer.feature.update',
-        '/resource/{id:\d+}/feature/{feature_id}/update',
-        factory=resource_factory,
-        client=('id', 'feature_id')
-    ).add_view(
-        feature_update,
-        context=IFeatureLayer,
-        renderer='nextgisweb:feature_layer/template/widget.mako')
 
     config.add_route(
         'feature_layer.geojson',

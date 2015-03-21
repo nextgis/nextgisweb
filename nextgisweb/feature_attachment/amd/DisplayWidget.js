@@ -1,72 +1,100 @@
 define([
     "dojo/_base/declare",
-    "dojo/dom-construct",
+    "dojo/_base/array",
+    "dojo/dom-class",
     "dojo/on",
     "dojox/image/Lightbox",
-    "feature_layer/DisplayWidget",
+    "put-selector/put",
+    "ngw/route",   
+    "ngw-feature-layer/DisplayWidget",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "dojox/image/resources/Lightbox.css",
-    "xstyle/css!./resources/Widget.css"
+    "xstyle/css!./resource/DisplayWidget.css"
 ], function (
     declare,
-    domConstruct,
+    array,
+    domClass,
     on,
     Lightbox,
+    put,
+    route,
     DisplayWidget
 ) {
-    return declare(DisplayWidget, {
-        title: "Фотографии",
+    function fileSizeToString(size) {
+        var units = ["B", "KB", "MB", "GB"],
+            i = 0;            
+        while (size >= 1024) {
+            size /= 1024;
+            ++i;
+        }
+        return size.toFixed(1) + " " + units[i];
+    }
 
-        render: function () {
-            var widget = this,
-                feature = this._feature,
-                ext = feature ? feature.ext.feature_photo : undefined,
-                containerNode = this.containerNode;
+    return declare([DisplayWidget], {
+        title: "Прикрепленные файлы",
 
-            containerNode.innerHTML = "";
+        buildRendering: function () {
+            this.inherited(arguments);
+            domClass.add(this.domNode, "ngw-feature-attachment-display-widget");
 
-            this.set("disabled", !ext);
+            this.lbox = new dojox.image.LightboxDialog({});
+        },
 
-            // LighboxDialog не экспортируется через AMD,
-            // поэтому берем класс по полному имени
-            var dialog = new dojox.image.LightboxDialog({});
-            dialog.startup();
+        startup: function () {
+            this.inherited(arguments);
+            this.lbox.startup();
+        },
 
-            for (var idx in ext) {
-                var pid = ext[idx];
+        renderValue: function (value) {
+            var images = [], others = [];
+            array.forEach(value, function (i) {
+                if (i.is_image) { images.push(i); }
+                else { others.push(i); }
+            });
 
-                var src = ngwConfig.applicationUrl
-                    + '/layer/' + feature.layerId
-                    + '/feature/' + feature.id 
-                    + '/photo/' + pid;
+            if (images.length > 0) {
+                array.forEach(images, function (image) {
+                    var href = route.feature_attachment.download({
+                        id: this.resourceId,
+                        fid: this.featureId,
+                        aid: image.id
+                    });
 
-                var surface = domConstruct.create("div", {
-                    class: "ngwFeaturePhoto-surface ngwFeaturePhoto-inline"
-                }, containerNode);
+                    var src = route.feature_attachment.image({
+                        id: this.resourceId,
+                        fid: this.featureId,
+                        aid: image.id
+                    }) + "?size=128x128";
 
-                var align = domConstruct.create("div", {
-                    class: "ngwFeaturePhoto-align",
-                    style: "width: 64px; height: 64px;"
-                }, surface);
+                    var a = put(this.domNode, "a.image[href=$] img[src=$] <", href, src);
 
-                var a = domConstruct.create("a", {
-                    href: src,
-                    target: "_blank"
-                }, align);
+                    var lbox = this.lbox;
+                    lbox.addImage({href: href, title: image.name}, "main");
 
-                var img = domConstruct.create("img", {
-                    src: src + "?size=64x64",
-                    title: ""
-                }, a);
+                    on(a, "click", function (evt) {
+                        lbox.show({group: "main", href: href, title: image.name});
+                        evt.preventDefault();
+                    });
+                }, this);
+            }
 
-                dialog.addImage({href: src, title: ""}, "main");
+            if (others.length > 0) {
+                var tbody = put(this.domNode, "table.pure-table thead tr th.name $ < th.size $ < th.mime_type $ < th.description $ < < < tbody",
+                    "Имя", "Размер", "Тип MIME", "Описание");
 
-                on(a, "click", function (evt) {
-                    dialog.show({group: "main", href: this.href, title: ""});
-                    evt.preventDefault();
-                });
+                array.forEach(others, function (a) {
+                    var href = route.feature_attachment.download({
+                        id: this.resourceId,
+                        fid: this.featureId,
+                        aid: a.id
+                    });
 
-            };
+                    put(tbody, "tr td.name a[href=$] $ < < td.size $ < td.mime_type $ < td.description $",
+                        href, a.name, fileSizeToString(a.size), a.mime_type,
+                        a.description === null ? "" : a.description);
+
+                }, this);
+            }
         }
     });
 });

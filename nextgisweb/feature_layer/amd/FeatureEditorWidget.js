@@ -18,7 +18,7 @@ define([
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
     "ngw/route",
-    "xstyle/css!./resource/FeatureWidget.css"
+    "xstyle/css!./resource/FeatureEditorWidget.css"
 ], function (
     declare,
     lang,
@@ -97,9 +97,9 @@ define([
             this.nullbox.set("checked", value != null);
 
             if (this.datatype == 'INTEGER' || this.datatype == 'REAL') {
-                this.children[0].set("value", value);
+                this.children[0].set("value", value == null ? 0 : value);
             } else if (this.datatype == 'STRING') {
-                this.children[0].set("value", value);
+                this.children[0].set("value", value == null ? "" : value);
             } else if (this.datatype == 'DATE') {
                 var fp = function (v, p) { return number.format(v, {pattern: p})};
                 this.children[0].set("value", value == null ? null : new Date(value.year, value.month - 1, value.day));

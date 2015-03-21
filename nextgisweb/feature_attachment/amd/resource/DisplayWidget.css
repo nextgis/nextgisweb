@@ -1,0 +1,18 @@
+.ngw-feature-attachment-display-widget a.image {
+    display: block; float: left;
+    width: 128px; height: 128px;
+    margin-right: 2ex;
+    margin-bottom: 2ex;
+    text-align: center;
+}
+
+.ngw-feature-attachment-display-widget a.image img {
+    position: relative; top: 50%;
+    transform: translateY(-50%);
+}
+
+.ngw-feature-attachment-display-widget table { clear: both; width: 100%; margin-top: 1ex; }
+
+.ngw-feature-attachment-display-widget table .name { width: 20%; }
+.ngw-feature-attachment-display-widget table .size { width: 10em; text-align: right; }
+.ngw-feature-attachment-display-widget table .mime_type { width: 15em; white-space: nowrap; }
