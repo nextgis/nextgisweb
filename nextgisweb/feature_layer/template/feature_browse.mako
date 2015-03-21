@@ -5,7 +5,7 @@
 <script type="text/javascript">
     require([
         "dojo/dom",
-        "feature_layer/FeatureGrid",
+        "ngw-feature-layer/FeatureGrid",
         "dijit/form/Button",
         "dijit/form/TextBox",
         "dojo/domReady!"

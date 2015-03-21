@@ -13,7 +13,7 @@ define([
     "dojo/request/xhr",
     "dojo/request/script",
     "ngw/openlayers",
-    "feature_layer/FeatureGrid",
+    "ngw-feature-layer/FeatureGrid",
     "dijit/form/Button",
     "dijit/form/TextBox",
     "dijit/ToolbarSeparator",

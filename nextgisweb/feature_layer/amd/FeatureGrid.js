@@ -4,7 +4,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/FeatureGrid.html",
+    "dojo/text!./template/FeatureGrid.html",
     // dgrid & plugins
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
