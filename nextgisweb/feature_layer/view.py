@@ -80,7 +80,10 @@ def feature_update(layer, request):
 
     fields = []
     for f in layer.fields:
-        fields.append(f.keyname)
+        fields.append(OrderedDict((
+            ('keyname', f.keyname),
+            ('datatype', f.datatype),
+        )))
 
     return dict(
         obj=request.context,
