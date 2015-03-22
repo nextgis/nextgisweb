@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import operator
+import re
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
@@ -268,9 +269,9 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                         datatype = FIELD_TYPE.STRING
                     elif row['data_type'] == 'date':
                         datatype = FIELD_TYPE.DATE
-                    elif row['data_type'] == 'time':
+                    elif re.match('^time(?!stamp)', row['data_type']):
                         datatype = FIELD_TYPE.TIME
-                    elif row['data_type'] == 'timestamp':
+                    elif re.match('^timestamp', row['data_type']):
                         datatype = FIELD_TYPE.DATETIME
 
                     if datatype is not None:
