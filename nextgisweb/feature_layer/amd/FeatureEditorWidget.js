@@ -108,7 +108,7 @@ define([
 
         _getValueAttr: function () {
             if (this.nullbox.get("checked") == false) { return null };
-            
+
             if (this.datatype == 'INTEGER' || this.datatype == 'REAL' || this.datatype == 'STRING') {
                 return this.children[0].get("value");
             } else if (this.datatype == 'DATE') {
@@ -180,7 +180,7 @@ define([
             };
 
             this._btnPane = new ContentPane({
-                region: "bottom",
+                region: "top",
                 style: "padding-left: 0; padding-right: 0"
             });
 
@@ -192,7 +192,7 @@ define([
                 iconClass: "dijitIconSave",
                 onClick: lang.hitch(this, this.save)
             }).placeAt(this._btnPane);
-        }, 
+        },
 
         iurl: function () {
             return route.feature_layer.feature.item({

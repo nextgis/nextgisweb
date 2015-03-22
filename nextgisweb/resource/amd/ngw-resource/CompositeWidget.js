@@ -53,10 +53,10 @@ define([
                 style: "display: none; border: 1px solid silver;",
                 content: "Подождите, идет обработка запроса..."
             }).placeAt(this);
-            
+
             this.btnContainer = new ContentPane({
-                region: "bottom",
-                style: "padding: 0; margin-top: 1ex;"
+                region: "top",
+                style: "padding: 0; margin-bottom: 1ex;"
             }).placeAt(this);
 
             domClass.add(this.btnContainer.domNode, "ngwButtonStrip");
@@ -66,7 +66,7 @@ define([
             for (var k in this.config) {
                 var membercls = this.config[k].cls;
                 var member = new membercls({composite: this});
-                
+
                 member.placeAt(this.tabContainer);
                 this.members.push(member);
             }
@@ -124,7 +124,7 @@ define([
 
         startup: function () {
             this.inherited(arguments);
-            
+
             if (this.operation === "read" || this.operation === "update") {
                 this.refreshObj();
             }
@@ -209,7 +209,7 @@ define([
             }
         },
 
-        // REST API 
+        // REST API
         // ========
 
         request: function (args) {
@@ -322,7 +322,7 @@ define([
                     "вкладки и поля отмечены красным цветом.");
 
             } else {
-                alert("В ходе выполнения операции возникла неожиданная ошибка. " + 
+                alert("В ходе выполнения операции возникла неожиданная ошибка. " +
                     "Сообщение об ошибке: \n" + e.data.message);
 
             }
@@ -396,7 +396,7 @@ define([
             }
             deferred.resolve(new CompositeWidget(options));
         });
-        
+
         return deferred;
     };
 
