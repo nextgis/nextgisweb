@@ -21,7 +21,7 @@ define([
     "ngw/route",
     "ngw/openlayers",
     "ngw/openlayers/Popup",
-    "feature_layer/FieldsDisplayWidget",
+    "ngw-feature-layer/FieldsDisplayWidget",
     // settings
     "ngw/settings!feature_layer",
     "ngw/settings!webmap",
@@ -154,7 +154,7 @@ define([
                     onClick: function () {
                         // TODO: Пока открываем в новом окне, сделать вкладку
                         var feature = widget._featureResponse(widget.select.get("value"));
-                        window.open(route("feature_layer.feature.edit", {
+                        window.open(route("feature_layer.feature.update", {
                             id: feature.layerId,
                             feature_id: feature.id
                         }));

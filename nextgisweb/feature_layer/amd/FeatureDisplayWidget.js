@@ -23,7 +23,9 @@ define([
         buildRendering: function () {
             this.inherited(arguments);
 
-            this._wfields = new FieldsDisplayWidget();
+            this._wfields = new FieldsDisplayWidget({
+                fields: this.fields
+            });
             h(this._wfields.title, this.domNode);
             this._wfields.placeAt(this);
 
@@ -33,10 +35,10 @@ define([
                     resourceId: this.resourceId,
                     featureId: this.featureId
                 });
-                
+
                 h(widget.title, this.domNode);
                 widget.placeAt(this);
-                
+
                 this._ext[k] = widget;
             }
         },
@@ -46,7 +48,7 @@ define([
                 id: this.resourceId,
                 fid: this.featureId
             });
-        },        
+        },
 
         load: function () {
             xhr(this.url(), {
