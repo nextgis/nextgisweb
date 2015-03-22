@@ -21,7 +21,7 @@ define([
     "ngw/route",
     "ngw/openlayers",
     "ngw/openlayers/Popup",
-    "feature_layer/FieldsDisplayWidget",
+    "ngw-feature-layer/FieldsDisplayWidget",
     // settings
     "ngw/settings!feature_layer",
     "ngw/settings!webmap",
