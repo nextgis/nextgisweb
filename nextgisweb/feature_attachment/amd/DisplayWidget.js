@@ -5,7 +5,7 @@ define([
     "dojo/on",
     "dojox/image/Lightbox",
     "put-selector/put",
-    "ngw/route",   
+    "ngw/route",
     "ngw-feature-layer/DisplayWidget",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "dojox/image/resources/Lightbox.css",
@@ -22,7 +22,7 @@ define([
 ) {
     function fileSizeToString(size) {
         var units = ["B", "KB", "MB", "GB"],
-            i = 0;            
+            i = 0;
         while (size >= 1024) {
             size /= 1024;
             ++i;
@@ -70,10 +70,10 @@ define([
                     var a = put(this.domNode, "a.image[href=$] img[src=$] <", href, src);
 
                     var lbox = this.lbox;
-                    lbox.addImage({href: href, title: image.name}, "main");
+                    lbox.addImage({href: href, title: image.description || image.name}, "main");
 
                     on(a, "click", function (evt) {
-                        lbox.show({group: "main", href: href, title: image.name});
+                        lbox.show({group: "main", href: href, title: image.description || image.name});
                         evt.preventDefault();
                     });
                 }, this);
