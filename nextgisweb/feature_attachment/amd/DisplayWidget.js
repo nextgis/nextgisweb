@@ -35,6 +35,7 @@ define([
 
         buildRendering: function () {
             this.inherited(arguments);
+
             domClass.add(this.domNode, "ngw-feature-attachment-display-widget");
 
             this.lbox = new dojox.image.LightboxDialog({});
@@ -64,7 +65,7 @@ define([
                         id: this.resourceId,
                         fid: this.featureId,
                         aid: image.id
-                    }) + "?size=128x128";
+                    }) + (this.compact ? "?size=64x64" : "?size=128x128");
 
                     var a = put(this.domNode, "a.image[href=$] img[src=$] <", href, src);
 

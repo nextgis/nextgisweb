@@ -13,6 +13,7 @@ define([
     "dojo/request/xhr",
     "dojo/request/script",
     "ngw/openlayers",
+    "ngw-feature-layer/FeatureStore",
     "ngw-feature-layer/FeatureGrid",
     "dijit/form/Button",
     "dijit/form/TextBox",
@@ -20,7 +21,6 @@ define([
     "dijit/popup",
     "put-selector/put",
     "ngw/route",
-    "feature_layer/FeatureStore",
     "./../tool/Identify"
 ], function (
     declare,
@@ -36,6 +36,7 @@ define([
     xhr,
     script,
     openlayers,
+    FeatureStore,
     FeatureGrid,
     Button,
     TextBox,
@@ -43,7 +44,6 @@ define([
     popup,
     put,
     route,
-    FeatureStore,
     Identify
 ) {
     var MAX_SEARCH_RESULTS = 15;

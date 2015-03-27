@@ -16,6 +16,7 @@ define([
 
         renderValue: function (value) {
             var tbody = put(this.domNode, "table.pure-table.pure-table-horizontal tbody");
+
             for (var k in value) {
                 var val = value[k];
                 var field = this.fields[k];

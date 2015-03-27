@@ -378,14 +378,10 @@ def setup_pyramid(comp, config):
 
     def client_settings(self, request):
         return dict(
-            extensions=dict(
-                map(
-                    lambda ext: (ext.identity, dict(
-                        displayWidget=ext.display_widget
-                    )),
-                    FeatureExtension.registry
-                )
-            ),
+            extensions=dict(map(
+                lambda ext: (ext.identity, ext.display_widget),
+                FeatureExtension.registry
+            )),
             identify=dict(
                 attributes=self.settings['identify.attributes']
             ),

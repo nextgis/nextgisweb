@@ -92,10 +92,10 @@ define([
             }, this);
 
             this.selectPane = new ContentPane({
-                region: "top",
-                layoutPriority: 1,
+                region: "top", layoutPriority: 1,
                 style: "padding: 0px 4px;"
             });
+
             this.addChild(this.selectPane);
 
             this.select = new Select({
@@ -103,74 +103,40 @@ define([
                 options: this.selectOptions
             }).placeAt(this.selectPane);
 
-            this.container = new StackContainer({
-                region: "center"
-            });
-            this.addChild(this.container);
-
-
-            this.controller = new StackController({
-                region: "top",
-                layoutPriority: 2,
-                containerId: this.container.id
-            });
-            domClass.add(this.controller.domNode, "ngwWebmapToolIdentify-controller");
-            this.addChild(this.controller);
-
-            this._extWidgets = {};
-
-            if (featureLayersettings.identify.attributes) {
-                this._extWidgets["feature_layer/FieldsDisplayWidget"] = new FieldsDisplayWidget({style: "padding: 2px;"});
-                this.container.addChild(this._extWidgets["feature_layer/FieldsDisplayWidget"]);
-            }
+            // if (featureLayersettings.identify.attributes) {
+            //     this._fieldsDisplayWidget = new FieldsDisplayWidget({style: "padding: 2px;"});
+            //     this.container.addChild(this._fieldsDisplayWidget);
+            // }
 
             // создаем виждеты для всех расширений IFeatureLayer
-            var deferreds = [this._startupDeferred];
+            var deferreds = [];
             var widget = this;
+
+            widget.extWidgetClasses = {};
+            
             array.forEach(Object.keys(featureLayersettings.extensions), function (key) {
                 var ext = featureLayersettings.extensions[key];
 
                 var deferred = new Deferred();
                 deferreds.push(deferred);
 
-                require([ext.displayWidget], function (Cls) {
-                    var extWidget = new Cls({
-                        style: "padding: 2px;"
-                    });
-                    widget.container.addChild(extWidget);
-                    widget._extWidgets[key] = extWidget;
+                require([ext], function (cls) {
+                    widget.extWidgetClasses[key] = cls;
                     deferred.resolve(widget);
                 });
             }, this);
 
-            this._widgetsDeferred = all(deferreds);
-
-            this._widgetsDeferred.then(function () {
-                // Если не дождаться пока все панели будут добавлены,
-                // то новая кнопка будет в случайном месте.
-                widget.editButton = new Button({
-                    iconClass: "dijitIconEdit",
-                    showLabel: true,
-                    onClick: function () {
-                        // TODO: Пока открываем в новом окне, сделать вкладку
-                        var feature = widget._featureResponse(widget.select.get("value"));
-                        window.open(route("feature_layer.feature.update", {
-                            id: feature.layerId,
-                            feature_id: feature.id
-                        }));
-                    }
-                }).placeAt(widget.controller, "last");
-            });
+            this.extWidgetClassesDeferred = all(deferreds);
         },
 
         startup: function () {
             this.inherited(arguments);
 
             var widget = this;
+
             this.select.watch("value", function (attr, oldVal, newVal) {
                 widget._displayFeature(widget._featureResponse(newVal));
             });
-
             this._displayFeature(this._featureResponse(this.select.get("value")));
         },
 
@@ -180,25 +146,57 @@ define([
         },
 
         _displayFeature: function (feature) {
-            var widget = this;
+            var widget = this, lid = feature.layerId, fid = feature.id;
+            
+            var iurl = route.feature_layer.feature.item({id: lid, fid: fid});
 
-            xhr.get(route("feature_layer.store.item", {id: feature.layerId, feature_id: feature.id}), {
-                handleAs: "json",
-                headers: { "X-Feature-Ext": "*" }
+            xhr.get(iurl, {
+                method: "GET",
+                handleAs: "json"
             }).then(function (feature) {
-                widget._widgetsDeferred.then(function () {
-                    var selected = false;
-                    array.forEach(Object.keys(widget._extWidgets), function (ident) {
-                        widget._extWidgets[ident].set("feature", feature);
+                widget.extWidgetClassesDeferred.then( function () {
 
-                        if (!selected && !widget._extWidgets[ident].get("disabled")) {
-                            widget.container.selectChild(widget._extWidgets[ident]);
-                            selected = true;
+                    widget.featureContainer = new BorderContainer({region: "center", gutters: false});
+                    widget.addChild(widget.featureContainer);
+
+                    widget.extContainer = new StackContainer({
+                        region: "center"
+                    });
+
+                    widget.featureContainer.addChild(widget.extContainer);
+
+                    widget.extController = new StackController({
+                        region: "top", layoutPriority: 2,
+                        containerId: widget.extContainer.id
+                    });
+
+                    widget.featureContainer.addChild(widget.extController);
+
+                    array.forEach(Object.keys(widget.extWidgetClasses), function (key) {
+                        var cls = widget.extWidgetClasses[key],
+                            ewidget = new cls({resourceId: lid, featureId: fid, compact: true});
+
+                        ewidget.renderValue(feature.extensions[key]);
+                        ewidget.placeAt(widget.extContainer);
+                    });
+
+                    widget.editButton = new Button({
+                        iconClass: "dijitIconEdit",
+                        showLabel: true,
+                        onClick: function () {
+                            // TODO: Пока открываем в новом окне, сделать вкладку
+                            window.open(route.feature_layer.feature.update({
+                                id: lid, feature_id: fid
+                            }));
                         }
-                    }, this);
-                }).then(null, function (error) { console.error(error); });
-            });
+                    }).placeAt(widget.extController, "last");
+
+                    setTimeout(function () { widget.resize();}, 10);
+
+                });
+            }).otherwise(console.error);
         }
+
 
     });
 
@@ -261,12 +259,12 @@ define([
                     }, this);
 
                     // XHR-запрос к сервису
-                    xhr.post(route("feature_layer.identify"), {
+                    xhr.post(route.feature_layer.identify(), {
                         handleAs: "json",
                         data: json.stringify(request)
                     }).then(function (response) {
                         tool._responsePopup(response, point, layerLabels);
-                    });
+                    }).otherwise(console.error);
                 }
             });
 
