@@ -19,10 +19,10 @@ class CoreComponent(Component):
         Component.initialize(self)
 
         sa_url = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
-            user=self._settings['database.user'],
+            user=self._settings.get('database.user', 'nextgisweb'),
             password=(':' + self._settings['database.password']) if 'database.password' in self._settings else '',
-            host=self._settings['database.host'],
-            name=self._settings['database.name'],
+            host=self._settings.get('database.host', 'localhost'),
+            name=self._settings.get('database.name', 'nextgisweb'),
         )
 
         self.engine = create_engine(sa_url)
@@ -70,7 +70,8 @@ class CoreComponent(Component):
 
     def gtsdir(self, comp):
         """ Получить директорию хранения файлов компонента """
-        return os.path.join(self.settings['sdir'], comp.identity)
+        return os.path.join(self.settings['sdir'], comp.identity) \
+            if 'sdir' in self.settings else None
 
     def mksdir(self, comp):
         """ Создание директории для хранения файлов """

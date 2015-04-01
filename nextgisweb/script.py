@@ -41,7 +41,9 @@ def main(argv=sys.argv):
         setup_logging(logging)
 
     cfg = ConfigParser()
-    cfg.readfp(codecs.open(config, 'r', 'utf-8'))
+
+    if config:
+        cfg.readfp(codecs.open(config, 'r', 'utf-8'))
 
     env = Env(cfg=cfg)
     env.initialize()
@@ -91,7 +93,7 @@ def config(argv=sys.argv):
     for comp in Component.registry:
         if hasattr(comp, 'settings_info'):
             print u'[%s]' % comp.identity
-            
+
             if not args.no_comments:
                 print u''
 
