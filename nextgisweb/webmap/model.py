@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from sqlalchemy.ext.orderinglist import ordering_list
+
 from .. import db
 from ..models import declarative_base
 from ..resource import (
@@ -41,7 +43,7 @@ class WebMap(Base, Resource):
     root_item = db.relationship('WebMapItem', cascade='all')
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     def to_dict(self):
@@ -87,10 +89,9 @@ class WebMapItem(Base):
     layer_adapter = db.Column(db.Unicode, nullable=True)
 
     parent = db.relationship(
-        'WebMapItem',
-        remote_side=[id],
-        backref=db.backref('children', cascade='all')
-    )
+        'WebMapItem', remote_side=id, backref=db.backref(
+            'children', order_by=position, cascade='all, delete-orphan',
+            collection_class=ordering_list('position')))
 
     style = db.relationship(
         'Resource',
@@ -134,15 +135,10 @@ class WebMapItem(Base):
         assert data['item_type'] == self.item_type
         if data['item_type'] in ('root', 'group') and 'children' in data:
             self.children = []
-            pos = 1
             for i in data['children']:
-                child = WebMapItem(parent=self,
-                                   item_type=i['item_type'],
-                                   position=pos)
-
+                child = WebMapItem(parent=self, item_type=i['item_type'])
                 child.from_dict(i)
                 self.children.append(child)
-                pos += 1
 
         for a in ('display_name', 'group_expanded', 'layer_enabled',
                   'layer_adapter', 'layer_style_id', 'layer_transparency'
