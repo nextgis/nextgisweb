@@ -63,7 +63,7 @@ define([
             } else if (this.datatype == 'REAL') {
                 this.children = [
                     (new NumberTextBox({
-                        constraints: {pattern: "#0.####################"},
+                        constraints: {places: "0,20"},
                         style: "width: 12em;"
                     })).placeAt(this)
                 ]
