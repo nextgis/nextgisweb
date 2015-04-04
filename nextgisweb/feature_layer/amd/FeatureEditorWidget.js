@@ -56,14 +56,14 @@ define([
             if (this.datatype == 'INTEGER') {
                 this.children = [
                     (new NumberTextBox({
-                        constraints: { places:0 },
+                        constraints: {fractional: false},
                         style: "width: 12em;"
                     })).placeAt(this)
                 ];
             } else if (this.datatype == 'REAL') {
                 this.children = [
                     (new NumberTextBox({
-                        constraints: {pattern: "#0.##############################"},
+                        constraints: {pattern: "#0.####################"},
                         style: "width: 12em;"
                     })).placeAt(this)
                 ]
