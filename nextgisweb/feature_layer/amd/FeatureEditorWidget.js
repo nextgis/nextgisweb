@@ -12,6 +12,7 @@ define([
     "dijit/form/TextBox",
     "dijit/form/NumberTextBox",
     "dijit/form/DateTextBox",
+    "dijit/form/TimeTextBox",
     "dijit/form/CheckBox",
     "dijit/layout/ContentPane",
     "dijit/layout/BorderContainer",
@@ -33,6 +34,7 @@ define([
     TextBox,
     NumberTextBox,
     DateTextBox,
+    TimeTextBox,
     CheckBox,
     ContentPane,
     BorderContainer,
@@ -79,7 +81,31 @@ define([
                         style: "width: 12em;"
                     })).placeAt(this)
                 ];
-            };
+            } else if (this.datatype == 'TIME') {
+                this.children = [
+                    (new TimeTextBox({
+                        style: "width:12em;",
+                        constraints: {
+                            timePattern: "HH:mm:ss",
+                            clickableIncrement: 'T01:00:00'
+                        }
+                    })).placeAt(this)
+                ];
+            } else if (this.datatype == 'DATETIME') {
+                this.children = [
+                    (new DateTextBox({
+                        style: "width: 12em;"
+                    })).placeAt(this),
+
+                    (new TimeTextBox({
+                        style: "width:12em; margin-left: 1em;",
+                        constraints: {
+                            timePattern: "HH:mm:ss",
+                            clickableIncrement: 'T01:00:00'
+                        }
+                    })).placeAt(this)
+                ];
+            }
 
             var widget = this;
             this.nullbox.watch("checked", function (attr, oval, nval) {
@@ -103,6 +129,11 @@ define([
             } else if (this.datatype == 'DATE') {
                 var fp = function (v, p) { return number.format(v, {pattern: p})};
                 this.children[0].set("value", value == null ? null : new Date(value.year, value.month - 1, value.day));
+            } else if (this.datatype == 'TIME') {
+                this.children[0].set("value", value == null ? null : new Date(0, 0, 0, value.hour, value.minute, value.second));
+            } else if (this.datatype = 'DATETIME') {
+                this.children[0].set("value", value == null ? null : new Date(value.year, value.month - 1, value.day));
+                this.children[1].set("value", value == null ? null : new Date(0, 0, 0, value.hour, value.minute, value.second));
             }
         },
 
@@ -117,9 +148,25 @@ define([
                     year: v.getFullYear(),
                     month: v.getMonth() + 1,
                     day: v.getDate() };
+            } else if (this.datatype == 'TIME') {
+                var v = this.children[0].get("value");
+                return {
+                    hour: v.getHours(),
+                    minute: v.getMinutes(),
+                    second: v.getSeconds() }
+            } else if (this.datatype = 'DATETIME') {
+                var d = this.children[0].get("value");
+                var t = this.children[1].get("value");
+                return {
+                    year: d.getFullYear(),
+                    month: d.getMonth() + 1,
+                    day: d.getDate(),
+                    hour: t.getHours(),
+                    minute: t.getMinutes(),
+                    second: t.getSeconds() };
             }
         }
-    })
+    });
 
     var FieldsWidget = declare([TableContainer], {
         title: "Атрибуты",
