@@ -113,7 +113,7 @@ define([
             var widget = this;
 
             widget.extWidgetClasses = {};
-            
+
             array.forEach(Object.keys(featureLayersettings.extensions), function (key) {
                 var ext = featureLayersettings.extensions[key];
 
@@ -147,7 +147,7 @@ define([
 
         _displayFeature: function (feature) {
             var widget = this, lid = feature.layerId, fid = feature.id;
-            
+
             var iurl = route.feature_layer.feature.item({id: lid, fid: fid});
 
             xhr.get(iurl, {
@@ -155,6 +155,10 @@ define([
                 handleAs: "json"
             }).then(function (feature) {
                 widget.extWidgetClassesDeferred.then( function () {
+
+                    if (widget.featureContainer) {
+                        widget.featureContainer.destroyRecursive();
+                    }
 
                     widget.featureContainer = new BorderContainer({region: "center", gutters: false});
                     widget.addChild(widget.featureContainer);
