@@ -57,3 +57,6 @@ target/
 
 
 .vagrant
+
+#temp files
+*~

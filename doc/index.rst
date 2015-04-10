@@ -1,13 +1,5 @@
-NextGISWeb
-==========
 
-.. toctree::
-   :maxdepth: 3
-
-   component
-   resource
-   file_upload
-
+.. include:: toc.rst
 
 Indices and tables
 ==================
