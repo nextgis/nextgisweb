@@ -10,4 +10,9 @@ NextGIS Web
    component
    auth
    resource
+   create
    file_upload
+   change
+   misc
+   error_report
+   
