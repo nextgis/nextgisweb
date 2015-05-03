@@ -30,7 +30,7 @@
 
                         <div style="padding: 0 4px; float: right;">
 
-                            <div data-dojo-attach-point="bookmarkButton" 
+                            <div data-dojo-attach-point="bookmarkButton"
                                 data-dojo-type="dijit/form/DropDownButton"
                                 data-dojo-props="label: 'Закладки', iconClass: 'dijitIconBookmark'">
 
@@ -46,12 +46,10 @@
 
                         <div data-dojo-attach-point="zoomToInitialExtentButton"
                             data-dojo-type="dijit/form/Button"
-                            data-dojo-props="iconClass: 'iconArrowInOut', showLabel: false">
+                            data-dojo-props="iconClass: 'iconArrowInOut', label: 'Начальный охват', showLabel: false">
                         </div>
 
-                        <div data-dojo-type="dijit/ToolbarSeparator"
-                            data-dojo-props="label: 'Начальный охват'">                      
-                        </div>
+                        <div data-dojo-type="dijit/ToolbarSeparator"></div>
 
                         <div data-dojo-attach-point="infoNode"
                             style="display: inline-block; vertical-align: middle; float: right; padding: 0 4px;">
@@ -60,13 +58,13 @@
 
                             <span style="color: #999">Долгота</span>
                             <span data-dojo-attach-point="centerLonNode"></span>
-                            
+
                             <span style="color: #999">Широта</span>
                             <span data-dojo-attach-point="centerLatNode"></span>
 
                             <span style="color: #999">Масштаб</span>
                             <span data-dojo-attach-point="scaleInfoNode"></span>
-                            
+
                         </div>
 
 
@@ -100,14 +98,14 @@
                     <div data-dojo-type="dijit/layout/BorderContainer"
                         data-dojo-props="region: 'center'"
                         style="padding-bottom: 0; padding-right: 0">
-            
+
                         <!-- Тулбар над деревом слоев -->
                         <div data-dojo-type="dijit/Toolbar"
                             data-dojo-props="region: 'top'">
 
                             <div data-dojo-type="dijit/form/DropDownButton"
                                 data-dojo-props="label: 'Слой'">
-                                
+
                                 <div data-dojo-attach-point="itemMenu"
                                     data-dojo-type="dijit/Menu">
                                 </div>
@@ -132,7 +130,7 @@
                         style="padding-left: 5px; padding-right: 2px;">
 
                         <select data-dojo-attach-point="basemapSelect"
-                            data-dojo-type="dijit/form/Select" 
+                            data-dojo-type="dijit/form/Select"
                             style="width: 100%;">
                         </select>
 
