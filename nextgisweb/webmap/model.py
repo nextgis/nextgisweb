@@ -141,7 +141,7 @@ class WebMapItem(Base):
                 self.children.append(child)
 
         for a in ('display_name', 'group_expanded', 'layer_enabled',
-                  'layer_adapter', 'layer_style_id', 'layer_transparency'
+                  'layer_adapter', 'layer_style_id', 'layer_transparency',
                   'layer_min_scale_denom', 'layer_max_scale_denom'):
 
             if a in data:
