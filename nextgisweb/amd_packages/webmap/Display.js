@@ -252,7 +252,7 @@ define([
                 showRoot: false
             });
 
-            // Размещаем дерево, когда виджет будет готов           
+            // Размещаем дерево, когда виджет будет готов
             all([this._layersDeferred, this._postCreateDeferred]).then(
                 function () { widget.itemTree.placeAt(widget.layerTreePane); }
             ).then(undefined, function (err) { console.error(err); });
@@ -308,7 +308,7 @@ define([
 
             all([this._layersDeferred, this._mapSetup]).then(
                 function () {
-                    // Добавляем слои на карту 
+                    // Добавляем слои на карту
                     widget._mapAddLayers();
 
                     // Связываем изменение чекбокса с видимостью слоя
@@ -357,7 +357,7 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            // Модифицируем TabContainer так, чтобы он показывал табы только 
+            // Модифицируем TabContainer так, чтобы он показывал табы только
             // в том случае, если их больше одного, т.е. один таб не показываем
             declare.safeMixin(this.tabContainer, {
                 updateTabVisibility: function () {
@@ -557,7 +557,10 @@ define([
             });
 
             // Навигация по-умолчанию
-            this.navigationControl = new openlayers.Control.Navigation({zoomBoxEnabled: true});
+            this.navigationControl = new openlayers.Control.Navigation({
+                zoomBoxEnabled: true,
+                dragPanOptions: {enableKinetic: false}
+            });
             this.map.olMap.addControl(this.navigationControl);
 
             // Масштабная линейка
@@ -604,7 +607,7 @@ define([
             this.zoomToInitialExtentButton.on("click", function() {
                 widget._zoomToInitialExtent();
             });
-            
+
             this._zoomToInitialExtent();
 
             this._mapDeferred.resolve();
@@ -641,7 +644,7 @@ define([
                 onItem: function (item) {
                     widget._layerSetup(item);
                     widget._layer_order.unshift(store.getValue(item, "id"));
-                    
+
                     // Включаем слои, указанные в URL
                     var cond,
                         layer = widget._layers[store.getValue(item, "id")],
@@ -764,7 +767,7 @@ define([
                             return this.itemStore.dumpItem(i).styleId;
                         })
                     );
-                    
+
                     queryStr = ioQuery.objectToQuery({
                         base: this.map.olMap.baseLayer.keyname,
                         bbox: this.map.olMap.getExtent(),
