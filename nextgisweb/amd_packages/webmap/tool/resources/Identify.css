@@ -12,14 +12,27 @@
 
 .ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode {
-    font-size: 90%; 
     padding: 1px;
-    height: 18px;
+    height: 20px;
+    border-radius: 0;
 }
+
+.ngwWebmapToolIdentify-controller .dijitToggleButton:first-child .dijitButtonNode,
+.ngwWebmapToolIdentify-controller .dijitButton:first-child .dijitButtonNode {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.ngwWebmapToolIdentify-controller .dijitToggleButton:last-child .dijitButtonNode,
+.ngwWebmapToolIdentify-controller .dijitButton:last-child .dijitButtonNode {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
 
 .ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode .dijitButtonText,
 .ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode .dijitButtonText {
-    padding: 1px 1px;
+    padding: 1px 2px;
 }
 
 /* На кнопках без подписи прячем элемент подписи совсем */

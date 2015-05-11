@@ -33,6 +33,10 @@ define([
     return declare([DisplayWidget], {
         title: "Прикрепленные файлы",
 
+        constructor: function (args) {
+            if (args.compact === true) { this.title = "Файлы"; }
+        },
+
         buildRendering: function () {
             this.inherited(arguments);
 
