@@ -28,6 +28,8 @@ define([
 
         aliases: false,
 
+        grid_visibility: false,
+
         buildRendering: function () {
             this.inherited(arguments);
 
@@ -79,7 +81,9 @@ define([
                     });
                 }
 
-                put(tbody, "tr th.keyname $ < td.value $", !this.aliases ? k : fieldmap[k]["display_name"], val);
+                if (this.grid_visibility && fieldmap[k]["grid_visibility"]) {
+                    put(tbody, "tr th.keyname $ < td.value $", !this.aliases ? k : fieldmap[k]["display_name"], val);
+                }
             }
         }
     });
