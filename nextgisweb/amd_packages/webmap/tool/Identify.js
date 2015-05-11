@@ -170,12 +170,16 @@ define([
 
                     widget.featureContainer.addChild(widget.extController);
 
-                    var fwidget = new FieldsDisplayWidget({
-                        resourceId: lid, featureId: fid, compact: true,
-                        title: "Атрибуты"});
+                    // Показываем виджет с атрибутами в том случае, если
+                    // это не отключено в настройках
+                    if (featureLayersettings.identify.attributes) {
+                        var fwidget = new FieldsDisplayWidget({
+                            resourceId: lid, featureId: fid, compact: true,
+                            title: "Атрибуты"});
 
-                    fwidget.renderValue(feature.fields);
-                    fwidget.placeAt(widget.extContainer);
+                        fwidget.renderValue(feature.fields);
+                        fwidget.placeAt(widget.extContainer);
+                    }
 
                     array.forEach(Object.keys(widget.extWidgetClasses), function (key) {
                         var cls = widget.extWidgetClasses[key],
