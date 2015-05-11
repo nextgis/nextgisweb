@@ -1,8 +1,15 @@
-.ngw-feature-layer-FieldsDiplayWidget.compact table.pure-table td, 
-.ngw-feature-layer-FieldsDiplayWidget.compact table.pure-table th {
+.ngw-feature-layer-FieldsDisplayWidget table.pure-table { width: 100%; }
+
+.ngw-feature-layer-FieldsDisplayWidget table.pure-table th.display_name {
+    width: 25%;
+    text-align: left; 
+}
+
+.ngw-feature-layer-FieldsDisplayWidget.compact table.pure-table th.display_name { width: auto; }
+
+
+.ngw-feature-layer-FieldsDisplayWidget.compact table.pure-table td, 
+.ngw-feature-layer-FieldsDisplayWidget.compact table.pure-table th {
     padding: 1px 2px;
 }
 
-.ngw-feature-layer-FieldsDiplayWidget.compact table.pure-table {
-    width: 100%;
-}

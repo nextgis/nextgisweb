@@ -87,6 +87,7 @@ def feature_update(request):
     for f in request.context.fields:
         fields.append(OrderedDict((
             ('keyname', f.keyname),
+            ('display_name', f.display_name),
             ('datatype', f.datatype),
         )))
 

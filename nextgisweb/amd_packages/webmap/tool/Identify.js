@@ -174,9 +174,8 @@ define([
                     // это не отключено в настройках
                     if (featureLayersettings.identify.attributes) {
                         var fwidget = new FieldsDisplayWidget({
-                            resourceId: lid, featureId: fid, compact: true,
-                            title: "Атрибуты",
-                            aliases: true, grid_visibility: true});
+                            resourceId: lid, featureId: fid,
+                            compact: true, title: "Атрибуты"});
 
                         fwidget.renderValue(feature.fields);
                         fwidget.placeAt(widget.extContainer);

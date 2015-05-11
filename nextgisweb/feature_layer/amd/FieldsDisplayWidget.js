@@ -33,7 +33,7 @@ define([
         buildRendering: function () {
             this.inherited(arguments);
 
-            domClass.add(this.domNode, "ngw-feature-layer-FieldsDiplayWidget");
+            domClass.add(this.domNode, "ngw-feature-layer-FieldsDisplayWidget");
         },
 
         renderValue: function (value) {
@@ -65,7 +65,7 @@ define([
                 var val = value[k];
                 var field = fieldmap[k];
 
-                if (this.grid_visibility && !fieldmap[k]["grid_visibility"]) { continue; }
+                if (this.compact && !fieldmap[k].grid_visibility) { continue; }
 
                 if (field.datatype == "DATE") {
                     val = locale.format(new Date(val.year, val.month, val.day), {
@@ -83,7 +83,7 @@ define([
                     });
                 }
 
-                put(tbody, "tr th.keyname $ < td.value $", !this.aliases ? k : fieldmap[k]["display_name"], val);
+                put(tbody, "tr th.display_name $ < td.value $", fieldmap[k].display_name, val);
             }
         }
     });

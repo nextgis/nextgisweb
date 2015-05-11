@@ -180,7 +180,7 @@ define([
 
             array.forEach(this.fields, function (f) {
                 this._fmap[f.keyname] = new MultiBox({
-                    label: f.keyname,
+                    label: f.display_name,
                     datatype: f.datatype
                 });
                 this._fmap[f.keyname].placeAt(this);
