@@ -19,7 +19,6 @@
                 resourceId: ${ obj.id | json.dumps, n },
                 featureId: ${ feature_id | json.dumps, n },
                 extmid: extmid,
-                fields: ${ fields | json.dumps, n },
                 style: "width: 100%; height: 100%; padding: 1px;"});
 
             widget.placeAt(dom.byId("widget"));

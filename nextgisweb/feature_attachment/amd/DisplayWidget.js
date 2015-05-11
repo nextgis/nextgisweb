@@ -36,7 +36,7 @@ define([
         buildRendering: function () {
             this.inherited(arguments);
 
-            domClass.add(this.domNode, "ngw-feature-attachment-display-widget");
+            domClass.add(this.domNode, "ngw-feature-attachment-DisplayWidget");
 
             this.lbox = new dojox.image.LightboxDialog({});
         },

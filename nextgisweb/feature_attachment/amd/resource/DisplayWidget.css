@@ -1,4 +1,4 @@
-.ngw-feature-attachment-display-widget a.image {
+.ngw-feature-attachment-DisplayWidget a.image {
     display: block; float: left;
     width: 128px; height: 128px;
     margin-right: 2ex;
@@ -6,7 +6,7 @@
     text-align: center;
 }
 
-.ngw-feature-attachment-display-widget.compact a.image {
+.ngw-feature-attachment-DisplayWidget.compact a.image {
     display: block; float: left;
     width: 64px; height: 64px;
     margin-right: 1ex;
@@ -14,13 +14,13 @@
     text-align: center;
 }
 
-.ngw-feature-attachment-display-widget a.image img {
+.ngw-feature-attachment-DisplayWidget a.image img {
     position: relative; top: 50%;
     transform: translateY(-50%);
 }
 
-.ngw-feature-attachment-display-widget table { clear: both; width: 100%; margin-top: 1ex; }
+.ngw-feature-attachment-DisplayWidget table { clear: both; width: 100%; margin-top: 1ex; }
 
-.ngw-feature-attachment-display-widget table .name { width: 20%; }
-.ngw-feature-attachment-display-widget table .size { width: 10em; text-align: right; }
-.ngw-feature-attachment-display-widget table .mime_type { width: 15em; white-space: nowrap; }
+.ngw-feature-attachment-DisplayWidget table .name { width: 20%; }
+.ngw-feature-attachment-DisplayWidget table .size { width: 10em; text-align: right; }
+.ngw-feature-attachment-DisplayWidget table .mime_type { width: 15em; white-space: nowrap; }

@@ -1,4 +1,14 @@
 /* Делаем кнопки внутри StackController со спец классом компактней */
+.ngwWebmapToolIdentify-controller .dijitToggleButton,
+.ngwWebmapToolIdentify-controller .dijitButton {
+    margin-left: -1px;
+    margin-right: 0;
+}
+
+.ngwWebmapToolIdentify-controller .dijitToggleButton:first-child,
+.ngwWebmapToolIdentify-controller .dijitButton:first-child {
+    margin-left: 0;
+}
 
 .ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode {
@@ -11,3 +21,7 @@
 .ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode .dijitButtonText {
     padding: 1px 1px;
 }
+
+/* На кнопках без подписи прячем элемент подписи совсем */
+
+.dijitButton.no-label .dijitButtonText { display: none; }

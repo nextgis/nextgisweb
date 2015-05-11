@@ -24,6 +24,8 @@ define([
             this.inherited(arguments);
 
             this._wfields = new FieldsDisplayWidget({
+                resourceId: this.resourceId,
+                featureId: this.featureId,
                 fields: this.fields
             });
             h(this._wfields.title, this.domNode);
