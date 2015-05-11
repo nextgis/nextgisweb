@@ -9,7 +9,7 @@ define([
     "ngw/route",
     "./DisplayWidget",
     // css
-    "xstyle/css!./resource/FieldsDisplayWidget.css"   
+    "xstyle/css!./resource/FieldsDisplayWidget.css"
 ], function (
     declare,
     lang,
@@ -26,9 +26,11 @@ define([
     return declare([DisplayWidget], {
         title: "Атрибуты",
 
+        aliases: false,
+
         buildRendering: function () {
             this.inherited(arguments);
-            
+
             domClass.add(this.domNode, "ngw-feature-layer-FieldsDiplayWidget");
         },
 
@@ -77,7 +79,7 @@ define([
                     });
                 }
 
-                put(tbody, "tr th.keyname $ < td.value $", k, val);
+                put(tbody, "tr th.keyname $ < td.value $", !this.aliases ? k : fieldmap[k]["display_name"], val);
             }
         }
     });
