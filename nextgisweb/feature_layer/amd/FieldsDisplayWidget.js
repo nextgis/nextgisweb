@@ -65,6 +65,8 @@ define([
                 var val = value[k];
                 var field = fieldmap[k];
 
+                if (this.grid_visibility && !fieldmap[k]["grid_visibility"]) { continue; }
+
                 if (field.datatype == "DATE") {
                     val = locale.format(new Date(val.year, val.month, val.day), {
                         selector: "date",
@@ -81,9 +83,7 @@ define([
                     });
                 }
 
-                if (this.grid_visibility && fieldmap[k]["grid_visibility"]) {
-                    put(tbody, "tr th.keyname $ < td.value $", !this.aliases ? k : fieldmap[k]["display_name"], val);
-                }
+                put(tbody, "tr th.keyname $ < td.value $", !this.aliases ? k : fieldmap[k]["display_name"], val);
             }
         }
     });
