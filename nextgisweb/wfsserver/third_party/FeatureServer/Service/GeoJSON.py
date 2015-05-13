@@ -48,6 +48,12 @@ class GeoJSON(Request):
 
     def encode(self, result):
         g = GS()
+        if result and result[0].srs:
+            # all features have the same 'srs' property
+            crs = {"type": "name",
+                        "properties": {"name": "EPSG:%s" % (result[0].srs ,)}
+                  }
+            g.crs = crs
         result = g.encode(result)
 
         if self.datasources[0]:
