@@ -3,11 +3,10 @@
 
 __author__  = "MetaCarta"
 __copyright__ = "Copyright (c) 2006-2008 MetaCarta"
-__license__ = "Clear BSD" 
+__license__ = "Clear BSD"
 __version__ = "$Id: Server.py 607 2009-04-27 15:53:15Z crschmidt $"
 
 """The base of the code was taken from featureserver project.
-
 """
 
 class FeatureServerException(Exception):
@@ -20,6 +19,7 @@ class FeatureServerException(Exception):
         self.encoding = encoding
 
 from ..FeatureServer.Service.WFS import WFS
+from ..FeatureServer.Service.GeoJSON import GeoJSON
 
 from ..FeatureServer.WebFeatureService.Response.TransactionResponse import TransactionResponse
 from ..FeatureServer.WebFeatureService.Response.TransactionSummary import TransactionSummary
@@ -37,21 +37,21 @@ class Server (object):
     """The server manages the datasource list, and does the management of
        request input/output.  Handlers convert their specific internal
        representation to the parameters that dispatchRequest is expecting,
-       then pass off to dispatchRequest. dispatchRequest turns the input 
+       then pass off to dispatchRequest. dispatchRequest turns the input
        parameters into a (content-type, response string) tuple, which the
-       servers can then return to clients. It is possible to integrate 
+       servers can then return to clients. It is possible to integrate
        FeatureServer into another content-serving framework like Django by
-       simply creating your own datasources (passed to the init function) 
+       simply creating your own datasources (passed to the init function)
        and calling the dispatchRequest method. The Server provides a classmethod
        to load datasources from a config file, which is the typical lightweight
        configuration method, but does use some amount of time at script startup.
-       """ 
-       
+       """
+
     def __init__ (self, datasources, metadata = {}, processes = {}):
         self.datasources   = datasources
         self.metadata      = metadata
-        self.processes     = processes 
-    
+        self.processes     = processes
+
     def dispatchRequest (self, base_path="", path_info="/", params={}, request_method="GET", post_data=None,  accepts=""):
         """Read in request data, and return a (content-type, response string) tuple. May
            raise an exception, which should be returned as a 500 error to the user."""
@@ -60,8 +60,12 @@ class Server (object):
 
         exceptionReport = ExceptionReport()
 
-        request = WFS(self)
-        
+        if params.has_key("format") and params["format"] in \
+            [u'application/json', u'text/javascript', u'json', u'geojson']:
+            request = GeoJSON(self)
+        else:
+            request = WFS(self)
+
         response = []
 
         try:
@@ -71,7 +75,7 @@ class Server (object):
                 version = '1.0.0'
                 if hasattr(request.actions[0], 'version') and len(request.actions[0].version) > 0:
                     version = request.actions[0].version
-                
+
                 if request.actions[0].request.lower() == "getcapabilities":
                     return request.getcapabilities(version)
                 elif request.actions[0].request.lower() == "describefeaturetype":
@@ -126,6 +130,6 @@ class Server (object):
         else:
             mime, data, headers, encoding = request.encode(response)
 
-        return Response(data=data, content_type=mime, headers=headers, status_code=response_code, encoding=encoding)     
+        return Response(data=data, content_type=mime, headers=headers, status_code=response_code, encoding=encoding)
 
 
