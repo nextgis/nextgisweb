@@ -23,7 +23,7 @@
 .. sourcecode:: http
 
    POST /api/component/file_upload/upload HTTP/1.1
-   Host: Host: ngw_url
+   Host: ngw_url
    Accept: */*
    
    file=\tmp\test.file&name=testfile
@@ -104,3 +104,5 @@
 ---------------
 
 ..  http:put:: /api/component/file_upload/upload
+
+
