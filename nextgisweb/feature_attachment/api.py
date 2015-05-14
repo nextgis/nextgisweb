@@ -121,7 +121,10 @@ def cpost(resource, request):
     for f in query():
         feature = f
 
-    obj = FeatureAttachment.deserialize(feature, request.json_body)
+    obj = FeatureAttachment(resource_id=feature.layer.id, feature_id=feature.id)
+    obj.deserialize(request.json_body)
+
+    DBSession.add(obj)
     DBSession.flush()
 
     return Response(
