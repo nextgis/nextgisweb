@@ -25,7 +25,7 @@ Group
 .. sourcecode:: http
 
    POST /resource/0/child/ HTTP/1.1
-   Host: Host: ngw_url
+   Host: ngw_url
    Accept: */*
    
     {"resource":
@@ -63,7 +63,7 @@ PostGIS Connection
 .. sourcecode:: http
 
    POST /resource/0/child/ HTTP/1.1
-   Host: Host: ngw_url
+   Host: ngw_url
    Accept: */*
    
     {
@@ -115,7 +115,7 @@ PostGIS Layer
 .. sourcecode:: http
 
    POST /resource/0/child/ HTTP/1.1
-   Host: Host: ngw_url
+   Host: ngw_url
    Accept: */*
    
     {
@@ -188,7 +188,7 @@ Vector layer
 .. sourcecode:: http
 
    POST /resource/0/child/ HTTP/1.1
-   Host: Host: ngw_url
+   Host: ngw_url
    Accept: */*
    
     {
@@ -237,7 +237,7 @@ Raster layer
 Создание слоя
 ^^^^^^^^^^^^^
 
-.. todo:
+.. todo::
    Написать про загрузку слоя
 
 File bucket
@@ -277,7 +277,7 @@ File bucket
 .. sourcecode:: http
 
    POST /resource/0/child/ HTTP/1.1
-   Host: Host: ngw_url
+   Host: ngw_url
    Accept: */*
 
     {
@@ -329,12 +329,12 @@ File bucket
 Vector (mapserver) style
 ------------------------
 
-.. todo:
-   Написать 
+.. todo::
+   Написать про создание стиля
     
 Raster style
 ------------
 
-.. todo:
-   Написать 
+.. todo::
+   Написать про создание стиля
     

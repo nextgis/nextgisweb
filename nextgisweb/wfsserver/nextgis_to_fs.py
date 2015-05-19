@@ -95,7 +95,7 @@ class NextgiswebDatasource(DataSource):
 
         features = []
         for row in result:
-            feature = Feature(id=row.id, props=row.fields)
+            feature = Feature(id=row.id, props=row.fields, srs=self.srid_out)
             feature.geometry_attr = self.geom_col
             geom = geojson.dumps(row.geom)
 

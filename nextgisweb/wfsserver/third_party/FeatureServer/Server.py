@@ -105,7 +105,7 @@ class Server (object):
                 datasource.rollback()
                 raise
 
-            # NextgiswebDatasource doesn't have processes attribute for now,
+            # NextgiswebDatasource doesn't have 'processes',
             # so comment the lines:
 
             # if hasattr(datasource, 'processes'):

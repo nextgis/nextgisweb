@@ -78,18 +78,14 @@ def idelete(resource, request):
 def iput(resource, request):
     request.resource_permission(DataScope.write)
 
-    query = resource.feature_query()
-    query.filter_by(id=request.matchdict['fid'])
-    query.limit(1)
+    obj = FeatureAttachment.filter_by(
+        id=request.matchdict['aid'], resource_id=resource.id,
+        feature_id=request.matchdict['fid']
+    ).one()
 
-    feature = None
-    for f in query():
-        feature = f
+    obj.deserialize(request.json_body)
 
-    data = request.json_body
-    data['id'] = request.matchdict['aid']
-
-    obj = FeatureAttachment.deserialize(feature, data)
+    DBSession.flush()
 
     return Response(
         json.dumps(dict(id=obj.id)),
@@ -121,7 +117,10 @@ def cpost(resource, request):
     for f in query():
         feature = f
 
-    obj = FeatureAttachment.deserialize(feature, request.json_body)
+    obj = FeatureAttachment(resource_id=feature.layer.id, feature_id=feature.id)
+    obj.deserialize(request.json_body)
+
+    DBSession.add(obj)
     DBSession.flush()
 
     return Response(
