@@ -94,7 +94,7 @@ def feature_update(request):
     return dict(
         obj=request.context,
         feature_id=feature_id,
-        ext_mid=ext_mid, fields=fields,
+        fields=fields,
         subtitle=u"Объект #%d" % feature_id,
         maxheight=True)
 
@@ -371,7 +371,13 @@ def setup_pyramid(comp, config):
     ).add_view(feature_geojson)
 
     def client_settings(self, request):
+        editor_widget = OrderedDict()
+        for k, ecls in FeatureExtension.registry._dict.iteritems():
+            if hasattr(ecls, 'editor_widget'):
+                editor_widget[k] = ecls.editor_widget
+
         return dict(
+            editor_widget=editor_widget,
             extensions=dict(map(
                 lambda ext: (ext.identity, ext.display_widget),
                 FeatureExtension.registry

@@ -8,24 +8,15 @@
         "ngw-feature-layer/FeatureEditorWidget",
         "dojo/domReady!"
     ], function (dom, FeatureEditorWidget) {
-        var ext = ${ ext_mid.keys() | json.dumps, n },
-            mid = ${ ext_mid.values() | json.dumps, n };
+        var widget = new FeatureEditorWidget({
+            resource: ${ obj.id | json.dumps, n },
+            feature: ${ feature_id | json.dumps, n },
+            fields: ${ fields | json.dumps, n },
+            style: "width: 100%; height: 100%; padding: 1px;"});
 
-        require(mid, function () {
-            var extmid = {};
-            for (var i = 0; i < arguments.length; i++) { extmid[ext[i]] = arguments[i] };
-
-            var widget = new FeatureEditorWidget({
-                resource: ${ obj.id | json.dumps, n },
-                feature: ${ feature_id | json.dumps, n },
-                extmid: extmid,
-                fields: ${ fields | json.dumps, n },
-                style: "width: 100%; height: 100%; padding: 1px;"});
-
-            widget.placeAt(dom.byId("widget"));
-            widget.startup();
-            widget.load();
-        });
+        widget.placeAt(dom.byId("widget"));
+        widget.startup();
+        widget.load();
     });
 </script>
 

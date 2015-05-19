@@ -7,6 +7,7 @@ define([
     "dojo/dom-class",
     "dojo/dom-construct",
     "dojo/number",
+    "dojo/Deferred",
     "dijit/_WidgetBase",
     "dijit/form/Button",
     "dijit/form/TextBox",
@@ -19,6 +20,7 @@ define([
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
     "ngw/route",
+    "./loader!",
     "xstyle/css!./resource/FeatureEditorWidget.css"
 ], function (
     declare,
@@ -29,6 +31,7 @@ define([
     domClass,
     domConstruct,
     number,
+    Deferred,
     _WidgetBase,
     Button,
     TextBox,
@@ -40,7 +43,8 @@ define([
     BorderContainer,
     TabContainer,
     TableContainer,
-    route
+    route,
+    loader
 ) {
     var MultiBox = declare([_WidgetBase], {
         datatype: "STRING",
@@ -55,43 +59,43 @@ define([
                 style: "margin-right: 1ex;"
             }).placeAt(this);
 
-            if (this.datatype == 'INTEGER') {
+            if (this.datatype == "INTEGER") {
                 this.children = [
                     (new NumberTextBox({
                         constraints: {fractional: false},
                         style: "width: 12em;"
                     })).placeAt(this)
                 ];
-            } else if (this.datatype == 'REAL') {
+            } else if (this.datatype == "REAL") {
                 this.children = [
                     (new NumberTextBox({
                         constraints: {places: "0,20"},
                         style: "width: 12em;"
                     })).placeAt(this)
                 ]
-            } else if (this.datatype == 'STRING') {
+            } else if (this.datatype == "STRING") {
                 this.children = [
                     (new TextBox({
                         style: "width: calc(100% - 20px - 1ex)"
                     })).placeAt(this)
                 ];
-            } else if (this.datatype == 'DATE') {
+            } else if (this.datatype == "DATE") {
                 this.children = [
                     (new DateTextBox({
                         style: "width: 12em;"
                     })).placeAt(this)
                 ];
-            } else if (this.datatype == 'TIME') {
+            } else if (this.datatype == "TIME") {
                 this.children = [
                     (new TimeTextBox({
                         style: "width:12em;",
                         constraints: {
                             timePattern: "HH:mm:ss",
-                            clickableIncrement: 'T01:00:00'
+                            clickableIncrement: "T01:00:00"
                         }
                     })).placeAt(this)
                 ];
-            } else if (this.datatype == 'DATETIME') {
+            } else if (this.datatype == "DATETIME") {
                 this.children = [
                     (new DateTextBox({
                         style: "width: 12em;"
@@ -101,7 +105,7 @@ define([
                         style: "width:12em; margin-left: 1em;",
                         constraints: {
                             timePattern: "HH:mm:ss",
-                            clickableIncrement: 'T01:00:00'
+                            clickableIncrement: "T01:00:00"
                         }
                     })).placeAt(this)
                 ];
@@ -120,41 +124,41 @@ define([
 
         _setValueAttr: function (value) {
             this._set("value", value);
-            this.nullbox.set("checked", value != null);
+            this.nullbox.set("checked", value !== null);
 
-            if (this.datatype == 'INTEGER' || this.datatype == 'REAL') {
-                this.children[0].set("value", value == null ? 0 : value);
-            } else if (this.datatype == 'STRING') {
-                this.children[0].set("value", value == null ? "" : value);
-            } else if (this.datatype == 'DATE') {
-                var fp = function (v, p) { return number.format(v, {pattern: p})};
-                this.children[0].set("value", value == null ? null : new Date(value.year, value.month - 1, value.day));
-            } else if (this.datatype == 'TIME') {
-                this.children[0].set("value", value == null ? null : new Date(0, 0, 0, value.hour, value.minute, value.second));
-            } else if (this.datatype = 'DATETIME') {
-                this.children[0].set("value", value == null ? null : new Date(value.year, value.month - 1, value.day));
-                this.children[1].set("value", value == null ? null : new Date(0, 0, 0, value.hour, value.minute, value.second));
+            if (this.datatype == "INTEGER" || this.datatype == "REAL") {
+                this.children[0].set("value", value === null ? 0 : value);
+            } else if (this.datatype == "STRING") {
+                this.children[0].set("value", value === null ? "" : value);
+            } else if (this.datatype == "DATE") {
+                var fp = function (v, p) { return number.format(v, {pattern: p}); };
+                this.children[0].set("value", value === null ? null : new Date(value.year, value.month - 1, value.day));
+            } else if (this.datatype == "TIME") {
+                this.children[0].set("value", value === null ? null : new Date(0, 0, 0, value.hour, value.minute, value.second));
+            } else if (this.datatype == "DATETIME") {
+                this.children[0].set("value", value === null ? null : new Date(value.year, value.month - 1, value.day));
+                this.children[1].set("value", value === null ? null : new Date(0, 0, 0, value.hour, value.minute, value.second));
             }
         },
 
         _getValueAttr: function () {
-            if (this.nullbox.get("checked") == false) { return null };
+            if (this.nullbox.get("checked") === false) { return null; }
 
-            if (this.datatype == 'INTEGER' || this.datatype == 'REAL' || this.datatype == 'STRING') {
+            if (this.datatype == "INTEGER" || this.datatype == "REAL" || this.datatype == "STRING") {
                 return this.children[0].get("value");
-            } else if (this.datatype == 'DATE') {
+            } else if (this.datatype == "DATE") {
                 var v = this.children[0].get("value");
                 return {
                     year: v.getFullYear(),
                     month: v.getMonth() + 1,
                     day: v.getDate() };
-            } else if (this.datatype == 'TIME') {
+            } else if (this.datatype == "TIME") {
                 var v = this.children[0].get("value");
                 return {
                     hour: v.getHours(),
                     minute: v.getMinutes(),
-                    second: v.getSeconds() }
-            } else if (this.datatype = 'DATETIME') {
+                    second: v.getSeconds() };
+            } else if (this.datatype == "DATETIME") {
                 var d = this.children[0].get("value");
                 var t = this.children[1].get("value");
                 return {
@@ -217,14 +221,14 @@ define([
             this._fwidget = new FieldsWidget({fields: this.fields}).placeAt(this._tabContainer);
 
             this._ext = {};
-            for (var k in this.extmid) {
-                var widget = new this.extmid[k]({
+            for (var k in loader) {
+                var widget = new loader[k]({
                     resource: this.resource,
                     feature: this.feature
                 });
                 widget.placeAt(this._tabContainer);
                 this._ext[k] = widget;
-            };
+            }
 
             this._btnPane = new ContentPane({
                 region: "top",
@@ -252,13 +256,13 @@ define([
             var widget = this;
 
             xhr(this.iurl(), {
-                method: 'GET',
-                handleAs: 'json'
+                method: "GET",
+                handleAs: "json"
             }).then(function (data) {
                 widget._fwidget.set("value", data.fields);
-                for (var k in widget.extmid) {
+                for (var k in loader) {
                     widget._ext[k].set("value", data.extensions[k]);
-                };
+                }
             });
         },
 
@@ -269,9 +273,9 @@ define([
                 extensions: {}
             };
 
-            for (var k in widget.extmid) {
+            for (var k in loader) {
                 data.extensions[k] = widget._ext[k].get("value");
-            };
+            }
 
             xhr(this.iurl(), {
                 method: "PUT",

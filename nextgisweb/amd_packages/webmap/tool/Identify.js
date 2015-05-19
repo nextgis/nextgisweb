@@ -22,6 +22,7 @@ define([
     "ngw/openlayers",
     "ngw/openlayers/Popup",
     "ngw-feature-layer/FieldsDisplayWidget",
+    "ngw-feature-layer/FeatureEditorWidget",
     // settings
     "ngw/settings!feature_layer",
     "ngw/settings!webmap",
@@ -50,6 +51,7 @@ define([
     openlayers,
     Popup,
     FieldsDisplayWidget,
+    FeatureEditorWidget,
     featureLayersettings,
     webmapSettings
 ) {
@@ -195,10 +197,29 @@ define([
                         iconClass: "dijitIconEdit",
                         showLabel: true,
                         onClick: function () {
-                            // TODO: Пока открываем в новом окне, сделать вкладку
-                            window.open(route.feature_layer.feature.update({
-                                id: lid, feature_id: fid
-                            }));
+                            xhr(route.resource.item({id: lid}), {
+                                method: "GET",
+                                handleAs: "json"
+                            }).then(function (data) {
+                                var fieldmap = {};
+                                array.forEach(data.feature_layer.fields, function (itm) {
+                                    fieldmap[itm.keyname] = itm;
+                                });
+                                
+                                var pane = new FeatureEditorWidget({
+                                    resource: lid, feature: fid,
+                                    fields: data.feature_layer.fields, 
+                                    title: "Объект #" + fid,
+                                    iconClass: "iconDescription",
+                                    closable: true
+                                });
+
+                                widget.tool.display.tabContainer.addChild(pane);
+                                widget.tool.display.tabContainer.selectChild(pane);
+
+                                pane.startup();
+                                pane.load();
+                            }).otherwise(console.error);
                         }
                     }).placeAt(widget.extController, "last");
                     domClass.add(widget.editButton.domNode, "no-label");
