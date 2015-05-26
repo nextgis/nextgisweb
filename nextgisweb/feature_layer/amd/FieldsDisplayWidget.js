@@ -67,7 +67,9 @@ define([
 
                 if (this.compact && !fieldmap[k].grid_visibility) { continue; }
 
-                if (field.datatype == "DATE") {
+                if (val === null) {
+                    // pass
+                } else if (field.datatype == "DATE") {
                     val = locale.format(new Date(val.year, val.month, val.day), {
                         selector: "date",
                         formatLength: "medium"
@@ -83,7 +85,11 @@ define([
                     });
                 }
 
-                put(tbody, "tr th.display_name $ < td.value $", fieldmap[k].display_name, val);
+                if (val !== null) {
+                    put(tbody, "tr th.display_name $ < td.value $", fieldmap[k].display_name, val);
+                } else {
+                    put(tbody, "tr th.display_name $ < td.value span.null $", fieldmap[k].display_name, "Н/Д");
+                }
             }
         }
     });

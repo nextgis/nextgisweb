@@ -5,6 +5,8 @@
     text-align: left; 
 }
 
+.ngw-feature-layer-FieldsDisplayWidget span.null { color: #999; }
+
 .ngw-feature-layer-FieldsDisplayWidget.compact table.pure-table th.display_name { width: auto; }
 
 
