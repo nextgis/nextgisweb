@@ -65,7 +65,7 @@ class WebMapComponent(Component):
     settings_info = (
         dict(key='basemaps', desc="Файл с описанием базовых слоёв"),
         dict(key='bing_apikey', desc="Bing Maps API-ключ"),
-        dict(key='identify_radius', desc="Чувствительность идентификации"),
+        dict(key='identify_radius', desc="Чувствительность идентификации (3px)"),
         dict(key='popup_width', desc="Ширина всплывающего окна"),
         dict(key='popup_height', desc="Высота всплывающего окна"),
     )
