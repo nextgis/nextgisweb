@@ -218,7 +218,7 @@ def _get_feature_info(obj, request):
 
     return Response(render_template(
         'nextgisweb:wmsserver/template/get_feature_info_html.mako',
-        dict(results=results), request=request
+        dict(results=results, resource=obj), request=request
     ), content_type=b'text/html')
 
 
