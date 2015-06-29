@@ -2,7 +2,7 @@ from subprocess import check_output, CalledProcessError
 from setuptools import setup, find_packages
 
 try:
-    gdalver = '==' + check_output(['gdal-config', '--version']).strip()
+    gdalver = '>=' + check_output(['gdal-config', '--version']).strip()
 
 except CalledProcessError:
     gdalver = ''
@@ -29,6 +29,7 @@ requires = [
     'lxml',
     'passlib',
     'owslib',
+    'requests',
 ]
 
 entry_points = {
