@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import urllib
-import urllib2
+import requests
 import json
 from io import BytesIO
 from datetime import datetime
@@ -45,6 +45,8 @@ class Connection(Base, Resource):
 
     url = db.Column(db.Unicode, nullable=False)
     version = db.Column(db.Enum(*WMS_VERSIONS), nullable=False)
+    username = db.Column(db.Unicode)
+    password = db.Column(db.Unicode)
 
     capcache_xml = db.Column(db.Unicode)
     capcache_json = db.Column(db.Unicode)
@@ -57,7 +59,9 @@ class Connection(Base, Resource):
     @property
     def client(self):
         if not hasattr(self, '_client'):
-            self._client = WebMapService(self.url, version=self.version)
+            self._client = WebMapService(self.url, version=self.version,
+                                         username=self.username,
+                                         password=self.password)
 
         return self._client
 
@@ -65,6 +69,8 @@ class Connection(Base, Resource):
         if not hasattr(self, '_service'):
             self._service = WebMapService(
                 url=self.url, version=self.version,
+                username=self.username,
+                password=self.password,
                 xml=str(self.capcache_xml))
 
         return self._service
@@ -77,13 +83,14 @@ class Connection(Base, Resource):
     def capcache_query(self):
         self.capcache_tstamp = datetime.utcnow()
 
-        reader = WMSCapabilitiesReader(self.version, url=self.url)
+        reader = WMSCapabilitiesReader(self.version, url=self.url,
+                                       un=self.username,
+                                       pw=self.password)
         root = reader.read(self.url)
 
         # В версии WMS 1.3.0 для всех элементов обязателен namespace,
         # но некоторые добавляют этот namespace и в более старую версию,
         # поэтому нужно это почистить.
-
         if root.nsmap.get(None) == 'http://www.opengis.net/wms':
             del root.nsmap[None]
 
@@ -110,6 +117,8 @@ class Connection(Base, Resource):
 
         service = WebMapService(
             url=self.url, version=self.version,
+            username=self.username,
+            password=self.password,
             xml=str(self.capcache_xml))
 
         layers = []
@@ -169,6 +178,8 @@ class ConnectionSerializer(Serializer):
 
     url = SP(**_defaults)
     version = SP(**_defaults)
+    username = SP(**_defaults)
+    password = SP(**_defaults)
 
     capcache = _capcache_attr(
         read=ConnectionScope.connect,
@@ -224,9 +235,15 @@ class Layer(Base, Resource, SpatialLayerMixin):
             width=size[0], height=size[1],
             transparent="true")
 
+        auth = None
+        username = self.connection.username
+        password = self.connection.password
+        if username and password:
+            auth = (username, password)
+
         sep = "&" if "?" in self.connection.url else "?"
         url = self.connection.url + sep + urllib.urlencode(query)
-        return PIL.Image.open(BytesIO(urllib2.urlopen(url).read()))
+        return PIL.Image.open(BytesIO(requests.get(url, auth=auth).content))
 
 
 DataScope.read.require(

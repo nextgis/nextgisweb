@@ -29,6 +29,7 @@ requires = [
     'lxml',
     'passlib',
     'owslib',
+    'requests',
 ]
 
 entry_points = {
