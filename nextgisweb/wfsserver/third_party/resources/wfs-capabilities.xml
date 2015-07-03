@@ -34,6 +34,12 @@
                 <ResultFormat>
                     <GML2 />
                 </ResultFormat>
+                <ResultFormat>
+                    <GML3 />
+                </ResultFormat>
+                <ResultFormat>
+                    <JSON />
+                </ResultFormat>
                 <DCPType>
                     <HTTP>
                         <Get onlineResource="" />
