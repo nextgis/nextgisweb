@@ -41,11 +41,13 @@ def handler(obj, request):
         'format': request.params.get('OUTPUTFORMAT'),
     }
     # None values can cause parsing errors in featureserver. So delete 'Nones':
-    params = {key:params[key] for key in params if params[key] is not None}
+    params = {key: params[key] for key in params if params[key] is not None}
 
-    datasources = {l.keyname: NextgiswebDatasource(l.keyname,
-        layer=l.resource,
-        title=l.display_name) for l in obj.layers
+    datasources = {
+        l.keyname: NextgiswebDatasource(
+            l.keyname,
+            layer=l.resource,
+            title=l.display_name) for l in obj.layers
     }
     sourcenames = '/'.join([sourcename for sourcename in datasources])
 
@@ -53,10 +55,11 @@ def handler(obj, request):
     base_path = request.path_url
 
     try:
-        result = server.dispatchRequest(base_path=base_path,
-                                    path_info='/'+sourcenames, params=params,
-                                    post_data=post_data,
-                                    request_method=request_method)
+        result = server.dispatchRequest(
+            base_path=base_path,
+            path_info='/'+sourcenames, params=params,
+            post_data=post_data,
+            request_method=request_method)
     except FeatureServerException as e:
         data = e.data
         content_type = e.mime
@@ -65,7 +68,8 @@ def handler(obj, request):
     # Отправляем результат обработки
 
     if isinstance(result, tuple):
-        # ответ на запросы req.lower() in ['getcapabilities', 'describefeaturetype']
+        # ответ
+        # на запросы req.lower() in ['getcapabilities', 'describefeaturetype']
         content_type, resxml = result
         resp = Response(resxml, content_type=content_type)
         return resp
@@ -81,7 +85,6 @@ def setup_pyramid(comp, config):
         'wfsserver.wfs', '/resource/{id:\d+}/wfs',
         factory=resource_factory, client=('id',)
     ).add_view(handler, context=Service)
-
 
     Resource.__psection__.register(
         key='wfsserver', priority=50,
