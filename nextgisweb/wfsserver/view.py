@@ -22,23 +22,26 @@ class ServiceWidget(Widget):
 
 
 def handler(obj, request):
-    if request.params.get('SERVICE') != 'WFS':
+
+    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+
+    if params.get('SERVICE') != 'WFS':
         return
 
-    req = request.params.get('REQUEST')
+    req = params.get('REQUEST')
     post_data = request.body
     request_method = request.method
 
     params = {
-        'service': request.params.get('SERVICE'),
+        'service': params.get('SERVICE'),
         'request': req,
-        'typename': request.params.get('TYPENAME'),
-        'srsname': request.params.get('SRSNAME'),
-        'version': request.params.get('VERSION'),
-        'maxfeatures': request.params.get('MAXFEATURES'),
-        'startfeature': request.params.get('STARTFEATURE'),
-        'filter': request.params.get('FILTER'),
-        'format': request.params.get('OUTPUTFORMAT'),
+        'typename': params.get('TYPENAME'),
+        'srsname': params.get('SRSNAME'),
+        'version': params.get('VERSION'),
+        'maxfeatures': params.get('MAXFEATURES'),
+        'startfeature': params.get('STARTFEATURE'),
+        'filter': params.get('FILTER'),
+        'format': params.get('OUTPUTFORMAT'),
     }
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key: params[key] for key in params if params[key] is not None}
