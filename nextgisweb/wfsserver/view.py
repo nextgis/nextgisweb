@@ -32,6 +32,16 @@ def handler(obj, request):
     post_data = request.body
     request_method = request.method
 
+    # import ipdb; ipdb.set_trace()
+    # If request_method is POST and request is 'simple' method
+    # change the requset_methot to GET. It allows do not rewrite
+    # featureserver's parsing methods. (Featureserver expects GET
+    # requests and none post_data)
+    if request_method == 'POST' and req.lower() in \
+            ['getcapabilities', 'describefeaturetype', 'getfeature']:
+        request_method = 'GET'
+        post_data = None
+
     params = {
         'service': params.get('SERVICE'),
         'request': req,

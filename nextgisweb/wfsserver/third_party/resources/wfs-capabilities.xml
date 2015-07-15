@@ -18,15 +18,25 @@
                     <HTTP>
                         <Get onlineResource="" />
                     </HTTP>
+                </DCPType>                
+				<DCPType>
+                    <HTTP>
+                        <Post onlineResource="" />
+                    </HTTP>
                 </DCPType>
             </GetCapabilities>
             <DescribeFeatureType>
                 <SchemaDescriptionLanguage>
                     <XMLSCHEMA />
                 </SchemaDescriptionLanguage>
-                <DCPType>
+				<DCPType>
                     <HTTP>
                         <Get onlineResource="" />
+                    </HTTP>
+                </DCPType>
+                <DCPType>
+                    <HTTP>
+                        <Post onlineResource="" />
                     </HTTP>
                 </DCPType>
             </DescribeFeatureType>
@@ -45,11 +55,21 @@
                         <Get onlineResource="" />
                     </HTTP>
                 </DCPType>
+				<DCPType>
+                    <HTTP>
+                        <Post onlineResource="" />
+                    </HTTP>
+                </DCPType>
             </GetFeature>
             <Transaction>
                 <ResultFormat>
                     <GML2 />
                 </ResultFormat>
+                <DCPType>
+                    <HTTP>
+                        <Get onlineResource="" />
+                    </HTTP>
+                </DCPType>
                 <DCPType>
                     <HTTP>
                         <Post onlineResource="" />
@@ -58,7 +78,6 @@
             </Transaction>
         </Request>
     </Capability>
-
     <FeatureTypeList>
     </FeatureTypeList>
 
