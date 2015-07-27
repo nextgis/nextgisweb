@@ -329,12 +329,83 @@ File bucket
 Vector (mapserver) style
 ------------------------
 
-.. todo::
-   Написать про создание стиля
+Для создания векторного стиля необходимо выполнить следующий запрос.
+
+
+.. http:post:: /resource/(int:id)/child/
+
+   Запрос на создание векторного стиля
+    
+   :param id: идентификатор ресурса который необходимо изменить
+   :<json string cls: тип (для векторного стиля должен быть "mapserver_style")
+   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
+   :<json string display_name: имя стиля (**обязательно**)
+   :<json string keyname: ключ (не обязательно)
+   :<json int id: идентификатор
+   :<json string description: описание, можно использовать html (не обязательно)
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /resource/0/child/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+      "mapserver_style" : {
+        "xml" : "<map><layer><class><style><color blue=\"218\" green=\"186\" red=\"190\"/><outlinecolor blue=\"64\" green=\"64\" red=\"64\"/></style></class></layer></map>"  
+      },
+      "resource": {
+        "cls": "raster_style", 
+        "description": null, 
+        "display_name": "grunt area style", 
+        "keyname": null, 
+        "parent": {
+          "id": 0
+        }
+      }
+    }
+    
+Стили подробнее рассмотрены в подразделе ":ref:`maplayers`".
     
 Raster style
 ------------
 
-.. todo::
-   Написать про создание стиля
+Для создания растрового стиля необходимо выполнить следующий запрос.
+
+
+.. http:post:: /resource/(int:id)/child/
+
+   Запрос на создание растрового стиля
+    
+   :param id: идентификатор ресурса который необходимо изменить
+   :<json string cls: тип (для растрового стиля должен быть "raster_style")
+   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
+   :<json string display_name: имя стиля (**обязательно**)
+   :<json string keyname: ключ (не обязательно)
+   :<json int id: идентификатор
+   :<json string description: описание, можно использовать html (не обязательно)
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /resource/0/child/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+      "resource": {
+        "cls": "raster_style", 
+        "description": null, 
+        "display_name": "landsat style", 
+        "keyname": null, 
+        "parent": {
+          "id": 0
+        }
+      }
+    }
+    
+    
     
