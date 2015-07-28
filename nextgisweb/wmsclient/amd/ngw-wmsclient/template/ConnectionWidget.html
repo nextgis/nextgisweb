@@ -2,11 +2,23 @@
     data-ngw-serialize-prefix="${serializePrefix}">
 
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 1">
-        
+
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="url"
             title="URL" style="width: 100%"></div>
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: false"
+            data-dojo-attach-point="wUsername"
+            data-ngw-serialize="username"
+            title="Пользователь" style="width: 20em"></div>
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: false, type: 'password'"
+            data-dojo-attach-point="wPassword"
+            data-ngw-serialize="password"
+            title="Пароль" style="width: 20em"></div>
 
         <div data-dojo-type="dijit/form/Select"
             data-dojo-attach-point="wVersion"

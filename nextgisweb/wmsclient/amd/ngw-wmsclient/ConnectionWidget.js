@@ -43,9 +43,17 @@ define([
         },
 
         serializeInMixin: function (data) {
-            var value = this.wCapCache.get("value");
-            if (value !== "") {
-                lang.setObject(this.serializePrefix + ".capcache", value, data);
+            var capcache = this.wCapCache.get("value"),
+                username = this.wUsername.get("value"),
+                password = this.wPassword.get("value");
+            if (capcache !== "") {
+                lang.setObject(this.serializePrefix + ".capcache", capcache, data);
+            }
+            if (username == "") {
+                lang.setObject(this.serializePrefix + ".username", null, data);
+            }
+            if (password == "") {
+                lang.setObject(this.serializePrefix + ".password", null, data);
             }
         }
 

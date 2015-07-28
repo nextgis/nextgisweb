@@ -47,10 +47,10 @@ class Server (object):
        configuration method, but does use some amount of time at script startup.
        """
 
-    def __init__ (self, datasources, metadata = {}, processes = {}):
-        self.datasources   = datasources
-        self.metadata      = metadata
-        self.processes     = processes
+    def __init__ (self, datasources, metadata={}, processes={}):
+        self.datasources = datasources
+        self.metadata = metadata
+        self.processes = processes
 
     def dispatchRequest (self, base_path="", path_info="/", params={}, request_method="GET", post_data=None,  accepts=""):
         """Read in request data, and return a (content-type, response string) tuple. May
@@ -69,6 +69,7 @@ class Server (object):
         response = []
 
         try:
+            # import ipdb; ipdb.set_trace()
             request.parse(params, path_info, host, post_data, request_method)
 
             if len(request.actions) > 0 and hasattr(request.actions[0], 'request') and request.actions[0].request is not None:

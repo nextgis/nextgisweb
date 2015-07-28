@@ -113,13 +113,13 @@ define([
                 }));
             } else {
                 // Поиск не нужен, прячем строку поиска
-                domStyle.set(this.tbSearch.domNode, "display", "none");                
+                domStyle.set(this.tbSearch.domNode, "display", "none");
             };
         },
 
         initializeGrid: function () {
             var columns = [
-                selector({label: "", selectorType: "radio", width: 40}),
+                selector({label: "", selectorType: "radio", width: 40, unhidable: true}),
                 {
                     field: "id",
                     label: "#",

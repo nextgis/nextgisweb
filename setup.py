@@ -2,10 +2,9 @@ from subprocess import check_output, CalledProcessError
 from setuptools import setup, find_packages
 
 try:
-    gdalver = '==' + check_output(['gdal-config', '--version']).strip()
-
+    gv = check_output(['gdal-config', '--version']).strip()
 except CalledProcessError:
-    gdalver = ''
+    gv = None
 
 requires = [
     'pyramid',
@@ -19,8 +18,7 @@ requires = [
     'bunch',
     'flufl.enum',
     'waitress',
-
-    'pygdal' + gdalver,
+    'pygdal' + (('>=' + gv + '.0,<=' + gv + '.9999') if gv else ''),
     'psycopg2',
     'geoalchemy',
     'shapely',
@@ -29,6 +27,7 @@ requires = [
     'lxml',
     'passlib',
     'owslib',
+    'requests',
 ]
 
 entry_points = {

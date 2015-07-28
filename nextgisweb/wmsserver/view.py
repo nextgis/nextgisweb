@@ -5,18 +5,25 @@ from StringIO import StringIO
 from lxml import etree
 from lxml.builder import ElementMaker
 from PIL import Image
+from bunch import Bunch
 
 from pyramid.response import Response
+from pyramid.renderers import render as render_template
 from pyramid.httpexceptions import HTTPBadRequest
 
 from ..resource import (
     Resource, Widget, resource_factory,
     ServiceScope, DataScope)
 from ..spatial_ref_sys import SRS
+from ..geometry import geom_from_wkt
+
 from .model import Service
 
 
 NS_XLINK = 'http://www.w3.org/1999/xlink'
+
+GFI_RADIUS = 5
+GFI_FEATURE_COUNT = 10
 
 
 class ServiceWidget(Widget):
@@ -32,13 +39,14 @@ def handler(obj, request):
     req = params.get('REQUEST')
     service = params.get('SERVICE')
 
-    if service != 'WMS':
-        raise HTTPBadRequest("Invalid SERVICE parameter value.")
-
     if req == 'GetCapabilities':
+        if service != 'WMS':
+            raise HTTPBadRequest("Invalid SERVICE parameter value.")
         return _get_capabilities(obj, request)
     elif req == 'GetMap':
         return _get_map(obj, request)
+    elif req == 'GetFeatureInfo':
+        return _get_feature_info(obj, request)
     else:
         raise HTTPBadRequest("Invalid REQUEST parameter value.")
 
@@ -48,13 +56,13 @@ def _maker():
 
 
 def _get_capabilities(obj, request):
-    E = _maker()
+    E = _maker()                                                    # NOQA
 
-    OnlineResource = lambda: E.OnlineResource({
+    OnlineResource = lambda: E.OnlineResource({                     # NOQA
         '{%s}type' % NS_XLINK: 'simple',
         '{%s}href' % NS_XLINK: request.path_url})
 
-    DCPType = lambda: E.DCPType(E.HTTP(E.Get(OnlineResource())))
+    DCPType = lambda: E.DCPType(E.HTTP(E.Get(OnlineResource())))    # NOQA
 
     service = E.Service(
         E.Name(obj.keyname or 'WMS'),
@@ -69,7 +77,11 @@ def _get_capabilities(obj, request):
                 E.Format('text/xml'),
                 DCPType()),
             E.GetMap(
-                E.Format('image/png'), E.Format('image/jpeg'),
+                E.Format('image/png'),
+                E.Format('image/jpeg'),
+                DCPType()),
+            E.GetFeatureInfo(
+                E.Format('text/html'),
                 DCPType())
         ),
         E.Exception(E.Format('text/xml'))
@@ -83,8 +95,11 @@ def _get_capabilities(obj, request):
     )
 
     for l in obj.layers:
+        queryable = '1' if hasattr(l.resource, 'feature_layer') else '0'
+
         lnode = E.Layer(
-            dict(queryable="1"), E.Name(l.keyname),
+            dict(queryable=queryable),
+            E.Name(l.keyname),
             E.Title(l.display_name))
 
         for srs in SRS.query():
@@ -139,6 +154,71 @@ def _get_map(obj, request):
     buf.seek(0)
 
     return Response(body_file=buf, content_type=b'image/png')
+
+
+def _get_feature_info(obj, request):
+    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+    p_bbox = map(float, params.get('BBOX').split(','))
+    p_width = int(params.get('WIDTH'))
+    p_height = int(params.get('HEIGHT'))
+    p_srs = params.get('SRS')
+
+    p_x = float(params.get('X'))
+    p_y = float(params.get('Y'))
+    p_query_layers = params.get('QUERY_LAYERS').split(',')
+    p_info_format = params.get('INFO_FORMAT')
+    p_feature_count = int(params.get('FEATURE_COUNT', GFI_FEATURE_COUNT))
+
+    bw = p_bbox[2] - p_bbox[0]
+    bh = p_bbox[3] - p_bbox[1]
+
+    qbox = dict(
+        l=p_bbox[0] + bw * (p_x - GFI_RADIUS) / p_width,
+        b=p_bbox[3] - bh * (p_y + GFI_RADIUS) / p_height,
+        r=p_bbox[0] + bw * (p_x + GFI_RADIUS) / p_width,
+        t=p_bbox[3] - bh * (p_y - GFI_RADIUS) / p_height)
+
+    srs = SRS.filter_by(id=int(p_srs.split(':')[-1])).one()
+
+    qgeom = geom_from_wkt((
+        "POLYGON((%(l)f %(b)f, %(l)f %(t)f, " +
+        "%(r)f %(t)f, %(r)f %(b)f, %(l)f %(b)f))"
+    ) % qbox, srs.id)
+
+    lmap = dict([(l.keyname, l) for l in obj.layers])
+
+    results = list()
+    fcount = 0
+
+    for lname in p_query_layers:
+        layer = lmap[lname]
+        flayer = layer.resource.feature_layer
+
+        request.resource_permission(DataScope.read, layer.resource)
+        request.resource_permission(DataScope.read, flayer)
+
+        query = flayer.feature_query()
+        query.intersects(qgeom)
+
+        # Ограничим максимальное количество объектов из слоя, таким образом
+        # чтобы в итоге в любом случае не превысить их общее количество.
+        query.limit(p_feature_count - fcount)
+
+        features = list(query())
+        fcount += len(features)
+
+        results.append(Bunch(
+            keyname=layer.keyname, display_name=layer.display_name,
+            feature_layer=flayer, features=features))
+
+        # Необходимое количество объектов найдено, дальше не ищем
+        if fcount >= p_feature_count:
+            break
+
+    return Response(render_template(
+        'nextgisweb:wmsserver/template/get_feature_info_html.mako',
+        dict(results=results, resource=obj), request=request
+    ), content_type=b'text/html', charset=b'utf-8')
 
 
 def setup_pyramid(comp, config):
