@@ -15,4 +15,4 @@ NextGIS Web
    change
    misc
    error_report
-   
+   vector_data_types

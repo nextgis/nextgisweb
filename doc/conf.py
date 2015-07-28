@@ -19,6 +19,7 @@ pygments_style = 'sphinx'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinxcontrib.httpdomain',
+    'sphinx.ext.todo'
 ]
 
 autodoc_member_order = 'bysource'
