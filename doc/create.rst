@@ -270,7 +270,7 @@ File bucket
    :<json string keyname: ключ (не обязательно)
    :<json int id: идентификатор
    :<json string description: описание, можно использовать html (не обязательно)
-   :<json jsonobj files: перечень файлов входящих в набор (то что приходи в ответе при загрузке, files == upload_meta)
+   :<json jsonobj files: перечень файлов входящих в набор (то что приходит в ответе при загрузке, files == upload_meta)
    
 **Example request**:
 
@@ -325,16 +325,154 @@ File bucket
         }
       }
     }
+    
+Изменение набора файлов
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Для изменения набора файлов необходимо выполнить следующий запрос.
+
+
+.. http:put:: /resource/(int:id)/child/
+
+   Запрос на создание набора файлов
+    
+   :param id: идентификатор ресурса который необходимо изменить
+   :<json string cls: тип (для набора файлов должен быть "file_bucket")
+   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
+   :<json string display_name: имя слоя (**обязательно**)
+   :<json string keyname: ключ (не обязательно)
+   :<json int id: идентификатор
+   :<json string description: описание, можно использовать html (не обязательно)
+   :<json jsonobj files: перечень файлов которые должны входить в набор: текущие (те что надо удалить - не указываем), а также новых файлов (то что приходит в ответе при загрузке, files == upload_meta)
+      
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /resource/0/child/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+      "file_bucket": {
+        "files": [
+          {
+            "mime_type": "application/x-dbf", 
+            "name": "grunt_area_2_multipolygon.dbf", 
+            "size": 36607
+          }, 
+          {
+            "mime_type": "application/x-esri-shape", 
+            "name": "grunt_area_2_multipolygon.shp", 
+            "size": 65132
+          }, 
+          {
+            "mime_type": "application/x-esri-shape", 
+            "name": "grunt_area_2_multipolygon.shx", 
+            "size": 1324
+          },
+          {
+            "id": "fb439bfa-1a63-cccc-957d-ae57bb5eb67b", 
+            "mime_type": "application/octet-stream", 
+            "name": "grunt area description.txt", 
+            "size": 50
+          }
+        ]
+      }, 
+      "resource": {
+        "cls": "file_bucket", 
+        "description": null, 
+        "display_name": "grunt_area", 
+        "keyname": null, 
+        "parent": {
+          "id": 0
+        }
+      }
+    }
+    
+После выполнения запроса будет добавлен файл *grunt area description.txt* и удалены
+*grunt_area_2_multipolygon.cpg*, *grunt_area_2_multipolygon.prj*.    
 
 Vector (mapserver) style
 ------------------------
 
-.. todo::
-   Написать про создание стиля
+Для создания векторного стиля необходимо выполнить следующий запрос.
+
+
+.. http:post:: /resource/(int:id)/child/
+
+   Запрос на создание векторного стиля
+    
+   :param id: идентификатор ресурса который необходимо изменить
+   :<json string cls: тип (для векторного стиля должен быть "mapserver_style")
+   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
+   :<json string display_name: имя стиля (**обязательно**)
+   :<json string keyname: ключ (не обязательно)
+   :<json int id: идентификатор
+   :<json string description: описание, можно использовать html (не обязательно)
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /resource/0/child/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+      "mapserver_style" : {
+        "xml" : "<map><layer><class><style><color blue=\"218\" green=\"186\" red=\"190\"/><outlinecolor blue=\"64\" green=\"64\" red=\"64\"/></style></class></layer></map>"  
+      },
+      "resource": {
+        "cls": "raster_style", 
+        "description": null, 
+        "display_name": "grunt area style", 
+        "keyname": null, 
+        "parent": {
+          "id": 0
+        }
+      }
+    }
+    
+Стили подробнее рассмотрены в подразделе ":ref:`maplayers`".
     
 Raster style
 ------------
 
-.. todo::
-   Написать про создание стиля
+Для создания растрового стиля необходимо выполнить следующий запрос.
+
+
+.. http:post:: /resource/(int:id)/child/
+
+   Запрос на создание растрового стиля
+    
+   :param id: идентификатор ресурса который необходимо изменить
+   :<json string cls: тип (для растрового стиля должен быть "raster_style")
+   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
+   :<json string display_name: имя стиля (**обязательно**)
+   :<json string keyname: ключ (не обязательно)
+   :<json int id: идентификатор
+   :<json string description: описание, можно использовать html (не обязательно)
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /resource/0/child/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+      "resource": {
+        "cls": "raster_style", 
+        "description": null, 
+        "display_name": "landsat style", 
+        "keyname": null, 
+        "parent": {
+          "id": 0
+        }
+      }
+    }
+    
+    
     

@@ -20,6 +20,7 @@
 * vector_style
 * raster_style
 * file_bucket   
+* lookup_table
  
 
 HTTP API
@@ -362,10 +363,12 @@ Get feature
 Запросы к корню
 ^^^^^^^^^^^^^^^
 
+.. deprecated:: 2.2
 .. http:get:: /resource/-/child/   
 
    Корневой ресурс (список)
-    
+
+.. deprecated:: 2.2
 .. http:get:: /resource/-/child/(int:id)
     
    Корневой ресурс (объект `id`)
@@ -378,18 +381,22 @@ Get feature
    
    Ресурс `id` (объект)
 
+.. deprecated:: 2.2
 .. http:get:: /resource/store/             
 
     Плоский список всех ресурсов (список)
     
+.. deprecated:: 2.2
 .. http:get:: /resource/store/(int:id)           
 
    Ресурс `id` (объект)
 
+.. deprecated:: 2.2
 .. http:get:: /resource/store/?id=(int:id)        
 
    Ресурс `id` (объект), то же самое, что и предыдущий запрос
 
+.. deprecated:: 2.2
 .. http:get:: /resource/store/?parent_id=(int:id)
 
    Cписок дочерних объектов объекта `id` (список)

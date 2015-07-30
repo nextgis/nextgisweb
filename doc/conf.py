@@ -9,7 +9,7 @@ master_doc = 'index'
 project = u'nextgisweb'
 copyright = u'2014, NextGIS'
 
-version = '2'
+version = '2.2'
 release = '2'
 
 language = 'ru'
@@ -19,6 +19,7 @@ pygments_style = 'sphinx'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinxcontrib.httpdomain',
+    'sphinx.ext.todo'
 ]
 
 autodoc_member_order = 'bysource'
