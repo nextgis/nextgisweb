@@ -37,8 +37,8 @@ def handler(obj, request):
     # change the requset_methot to GET. It allows do not rewrite
     # featureserver's parsing methods. (Featureserver expects GET
     # requests and none post_data)
-    if request_method == 'POST' and req.lower() in \
-            ['getcapabilities', 'describefeaturetype', 'getfeature']:
+    if request_method == 'POST' and req in \
+            ['GetCapabilities', 'DescribeFeatureType', 'GetFeature']:
         request_method = 'GET'
         post_data = None
 
@@ -68,6 +68,7 @@ def handler(obj, request):
     base_path = request.path_url
 
     try:
+        # import ipdb; ipdb.set_trace()
         result = server.dispatchRequest(
             base_path=base_path,
             path_info='/'+sourcenames, params=params,

@@ -77,9 +77,9 @@ class Server (object):
                 if hasattr(request.actions[0], 'version') and len(request.actions[0].version) > 0:
                     version = request.actions[0].version
 
-                if request.actions[0].request.lower() == "getcapabilities":
+                if request.actions[0].request == "GetCapabilities":
                     return request.getcapabilities(version)
-                elif request.actions[0].request.lower() == "describefeaturetype":
+                elif request.actions[0].request == "DescribeFeatureType":
                     return request.describefeaturetype(version)
 
             try:
