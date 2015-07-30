@@ -26,7 +26,7 @@ def handler(obj, request):
     # import ipdb; ipdb.set_trace()
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
 
-    if params.get('SERVICE').upper() != 'WFS':
+    if params.get('SERVICE') != 'WFS':
         return
 
     req = params.get('REQUEST')
@@ -43,7 +43,7 @@ def handler(obj, request):
         post_data = None
 
     params = {
-        'service': params.get('SERVICE').upper(),
+        'service': params.get('SERVICE'),
         'request': req,
         'typename': params.get('TYPENAME'),
         'srsname': params.get('SRSNAME'),
