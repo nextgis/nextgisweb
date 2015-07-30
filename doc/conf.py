@@ -9,7 +9,7 @@ master_doc = 'index'
 project = u'nextgisweb'
 copyright = u'2014, NextGIS'
 
-version = '2'
+version = '2.2'
 release = '2'
 
 language = 'ru'

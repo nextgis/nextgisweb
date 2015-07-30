@@ -270,7 +270,7 @@ File bucket
    :<json string keyname: ключ (не обязательно)
    :<json int id: идентификатор
    :<json string description: описание, можно использовать html (не обязательно)
-   :<json jsonobj files: перечень файлов входящих в набор (то что приходи в ответе при загрузке, files == upload_meta)
+   :<json jsonobj files: перечень файлов входящих в набор (то что приходит в ответе при загрузке, files == upload_meta)
    
 **Example request**:
 
@@ -325,6 +325,75 @@ File bucket
         }
       }
     }
+    
+Изменение набора файлов
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Для изменения набора файлов необходимо выполнить следующий запрос.
+
+
+.. http:put:: /resource/(int:id)/child/
+
+   Запрос на создание набора файлов
+    
+   :param id: идентификатор ресурса который необходимо изменить
+   :<json string cls: тип (для набора файлов должен быть "file_bucket")
+   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
+   :<json string display_name: имя слоя (**обязательно**)
+   :<json string keyname: ключ (не обязательно)
+   :<json int id: идентификатор
+   :<json string description: описание, можно использовать html (не обязательно)
+   :<json jsonobj files: перечень файлов которые должны входить в набор: текущие 
+   (те что надо удалить - не указываем), а также новых файлов (то что приходит в 
+   ответе при загрузке, files == upload_meta)
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /resource/0/child/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+      "file_bucket": {
+        "files": [
+          {
+            "mime_type": "application/x-dbf", 
+            "name": "grunt_area_2_multipolygon.dbf", 
+            "size": 36607
+          }, 
+          {
+            "mime_type": "application/x-esri-shape", 
+            "name": "grunt_area_2_multipolygon.shp", 
+            "size": 65132
+          }, 
+          {
+            "mime_type": "application/x-esri-shape", 
+            "name": "grunt_area_2_multipolygon.shx", 
+            "size": 1324
+          },
+          {
+            "id": "fb439bfa-1a63-cccc-957d-ae57bb5eb67b", 
+            "mime_type": "application/octet-stream", 
+            "name": "grunt area description.txt", 
+            "size": 50
+          }
+        ]
+      }, 
+      "resource": {
+        "cls": "file_bucket", 
+        "description": null, 
+        "display_name": "grunt_area", 
+        "keyname": null, 
+        "parent": {
+          "id": 0
+        }
+      }
+    }
+    
+После выполнения запроса будет добавлен файл *grunt area description.txt* и удалены
+*grunt_area_2_multipolygon.cpg*, *grunt_area_2_multipolygon.prj*.    
 
 Vector (mapserver) style
 ------------------------
