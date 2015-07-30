@@ -23,16 +23,16 @@ class ServiceWidget(Widget):
 
 def handler(obj, request):
 
+    # import ipdb; ipdb.set_trace()
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
 
-    if params.get('SERVICE') != 'WFS':
+    if params.get('SERVICE').upper() != 'WFS':
         return
 
     req = params.get('REQUEST')
     post_data = request.body
     request_method = request.method
 
-    # import ipdb; ipdb.set_trace()
     # If request_method is POST and request is 'simple' method
     # change the requset_methot to GET. It allows do not rewrite
     # featureserver's parsing methods. (Featureserver expects GET
@@ -43,7 +43,7 @@ def handler(obj, request):
         post_data = None
 
     params = {
-        'service': params.get('SERVICE'),
+        'service': params.get('SERVICE').upper(),
         'request': req,
         'typename': params.get('TYPENAME'),
         'srsname': params.get('SRSNAME'),
