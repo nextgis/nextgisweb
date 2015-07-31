@@ -324,6 +324,7 @@ File bucket
 **Example response body**:
     
 .. sourcecode:: json 
+
    {"id": 22, "parent": {"id": 0}}
     
 Изменение набора файлов
@@ -438,6 +439,7 @@ Vector (mapserver) style
 **Example response body**:
     
 .. sourcecode:: json 
+
    {"id": 24, "parent": {"id": 0}}
     
 Стили подробнее рассмотрены в подразделе ":ref:`maplayers`".
@@ -482,6 +484,7 @@ Raster style
 **Example response body**:
     
 .. sourcecode:: json 
+
    {"id": 25, "parent": {"id": 0}}
     
     
