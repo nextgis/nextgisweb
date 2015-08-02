@@ -7,6 +7,7 @@ import fnmatch
 import codecs
 import logging
 import json
+import inspect
 from importlib import import_module
 from argparse import ArgumentParser
 from pkg_resources import (
@@ -25,7 +26,26 @@ from babel.messages.extract import extract_from_dir
 from babel.messages.pofile import write_po, read_po
 from babel.messages.mofile import write_mo
 
+from translationstring import TranslationString
+
 logger = logging.getLogger(__name__)
+
+
+def tcheck(arg):
+    """ Проверка на выполнение перевода в mako-шаблоне
+
+    При добавлении ее в default_filters позволяет отследить в логе экземпляры
+    TranslationString для которых не был выполнен перевод. """
+
+    if isinstance(arg, TranslationString):
+        frame = inspect.stack()[1][0]
+        template_uri = frame.f_globals.get('_template_uri', '<unknown>')
+
+        # TODO: Также добавить определение строки в самом шаблоне
+        logger.warning("Translation required at %s, msgid '%s'" % (
+            template_uri, arg))
+
+    return arg
 
 
 def load_pkginfo(args):

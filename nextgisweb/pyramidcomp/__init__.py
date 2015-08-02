@@ -218,6 +218,10 @@ class PyramidComponent(Component):
         settings = dict(self._settings, **settings)
 
         settings['mako.directories'] = 'nextgisweb:templates/'
+        if self.env.core.debug:
+            settings['mako.default_filters'] = ['tcheck', 'h']
+            settings['mako.imports'] = settings.get('mako.imports', []) \
+                + ['from nextgisweb.i18n import tcheck', ]
 
         config = ExtendedConfigurator(settings=settings)
 
