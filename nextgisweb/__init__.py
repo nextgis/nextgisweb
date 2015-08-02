@@ -80,6 +80,7 @@ def amd_packages():
         ('xstyle', 'nextgisweb:amd_packages/contrib/xstyle'),
         ('put-selector', 'nextgisweb:amd_packages/contrib/put-selector'),
         ('dgrid', 'nextgisweb:amd_packages/contrib/dgrid'),
+        ('handlebars', 'nextgisweb:amd_packages/contrib/handlebars'),
 
         # Пакеты nextgisweb
         ('ngw', 'nextgisweb:amd_packages/ngw'),

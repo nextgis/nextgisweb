@@ -36,6 +36,10 @@ entry_points = {
         'main = nextgisweb:main'
     ],
 
+    'babel.extractors': [
+        'hbs = nextgisweb.i18n.hbs:extract',
+    ],
+
     'console_scripts': [
         'nextgisweb = nextgisweb.script:main',
         'nextgisweb-config = nextgisweb.script:config',
