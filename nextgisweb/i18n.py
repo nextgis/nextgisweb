@@ -6,6 +6,7 @@ import os.path
 import fnmatch
 import codecs
 import logging
+import json
 from importlib import import_module
 from argparse import ArgumentParser
 from pkg_resources import (
@@ -14,8 +15,10 @@ from pkg_resources import (
     get_distribution)
 from email import message_from_string
 from collections import OrderedDict
-import json
+from datetime import datetime
 
+from babel import Locale
+from babel.util import LOCALTZ
 from babel.messages.catalog import Catalog
 from babel.messages.frontend import parse_mapping
 from babel.messages.extract import extract_from_dir
@@ -34,6 +37,22 @@ def load_pkginfo(args):
 def get_mappings():
     fileobj = open(resource_filename('nextgisweb', 'babel.cfg'), 'r')
     return parse_mapping(fileobj)
+
+
+def write_jed(fileobj, catalog):
+    data = OrderedDict()
+    data[''] = OrderedDict((
+        ('domain', catalog.domain),
+        ('lang', catalog.locale.language),
+        ('plural_forms', catalog.plural_forms)))
+
+    for msg in catalog:
+        if msg.id == '':
+            continue
+        data[msg.id] = (msg.string, ) if isinstance(msg.string, basestring) \
+            else msg.string
+
+    fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))
 
 
 def cmd_extract(args):
@@ -74,6 +93,60 @@ def cmd_extract(args):
                 write_po(outfd, catalog, ignore_obsolete=True)
 
 
+def cmd_init(args):
+    root = resource_filename(args.package, 'locale')
+
+    potfile = os.path.join(root, '%s.pot' % args.component)
+    if not os.path.isfile(potfile):
+        logger.error("Template file not found, extract messages first!")
+        return
+
+    with open(potfile, 'r') as infd:
+        catalog = read_po(infd, locale=args.locale)
+
+    catalog.locale = Locale.parse(args.locale)
+    catalog.revision_date = datetime.now(LOCALTZ)
+
+    pofile = os.path.join(
+        root, args.locale, 'LC_MESSAGES',
+        '%s.po' % args.component)
+
+    if os.path.isfile(pofile) and not args.force:
+        logger.error('Target file exists! Use --force to overwrite.')
+        return
+
+    with open(pofile, 'w') as outfd:
+        write_po(outfd, catalog)
+
+
+def cmd_update(args):
+    root = resource_filename(args.package, 'locale')
+    pofiles = []
+    for dirname, dirnames, filenames in os.walk(root):
+        for filename in fnmatch.filter(filenames, '*.po'):
+            relative = os.path.relpath(os.path.join(dirname, filename), root)
+            pofiles.append(relative)
+
+    for pofile in pofiles:
+        locale = pofile.split(os.sep)[0]
+        comp = os.path.split(pofile)[1].split('.', 1)[0]
+        with open(os.path.join(root, pofile), 'r') as fd:
+            catalog = read_po(fd, locale=locale, charset='utf-8')
+
+        potfile = os.path.join(root, '%s.pot' % comp)
+        if not os.path.isfile(potfile):
+            logger.warn("Template for %s:%s doesn't exists! Skipping.",
+                        locale, comp)
+
+        with codecs.open(potfile, 'r', 'utf-8') as fd:
+            template = read_po(fd)
+
+        catalog.update(template, True)
+
+        with open(os.path.join(root, pofile), 'w') as fd:
+            write_po(fd, catalog)
+
+
 def cmd_compile(args):
     locpath = resource_filename(args.package, 'locale')
     pofiles = []
@@ -99,22 +172,6 @@ def cmd_compile(args):
             write_jed(fd, catalog)
 
 
-def write_jed(fileobj, catalog):
-    data = OrderedDict()
-    data[''] = OrderedDict((
-        ('domain', catalog.domain),
-        ('lang', catalog.locale.language),
-        ('plural_forms', catalog.plural_forms)))
-
-    for msg in catalog:
-        if msg.id == '':
-            continue
-        data[msg.id] = (msg.string, ) if isinstance(msg.string, basestring) \
-            else msg.string
-
-    fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))
-
-
 def main(argv=sys.argv):
     logging.basicConfig(level=logging.INFO)
 
@@ -125,6 +182,15 @@ def main(argv=sys.argv):
 
     pextract = subparsers.add_parser('extract')
     pextract.set_defaults(func=cmd_extract)
+
+    pinit = subparsers.add_parser('init')
+    pinit.add_argument('locale')
+    pinit.add_argument('component')
+    pinit.add_argument('--force', action='store_true', default=False)
+    pinit.set_defaults(func=cmd_init)
+
+    pupdate = subparsers.add_parser('update')
+    pupdate.set_defaults(func=cmd_update)
 
     pcompile = subparsers.add_parser('compile')
     pcompile.set_defaults(func=cmd_compile)
