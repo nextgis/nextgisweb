@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-08-02 14:57+0400\n"
+"POT-Creation-Date: 2015-08-02 20:27+0400\n"
 "PO-Revision-Date: 2015-08-02 14:57+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -25,4 +25,76 @@ msgstr "Соединение PostGIS"
 #: model.py:140 amd/ngw-postgis/LayerWidget.js:31
 msgid "PostGIS layer"
 msgstr "Слой PostGIS"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:9
+msgid "Host"
+msgstr "Сервер"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:14
+msgid "Database"
+msgstr "База данных"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:19
+msgid "User"
+msgstr "Пользователь"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:24
+msgid "Password"
+msgstr "Пароль"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:9
+msgid "Connection"
+msgstr "Соединение"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:14
+msgid "Table"
+msgstr "Таблица"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:19
+msgid "Schema"
+msgstr "Схема"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:24
+msgid "ID column"
+msgstr "Поле ID"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:29
+msgid "Geometry column"
+msgstr "Поле геометрии"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:35
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:37
+msgid "Autodetect"
+msgstr "Автоматически"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:38
+msgid "Point"
+msgstr "Точка"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:39
+msgid "Line"
+msgstr "Линия"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:40
+msgid "Polygon"
+msgstr "Полигон"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:47
+msgid "Coordinate system"
+msgstr "Система координат"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:53
+msgid "Attribute definitions"
+msgstr "Описания атрибутов"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:56
+msgid "Keep"
+msgstr "Оставить"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:57
+msgid "Reload"
+msgstr "Загрузить"
 

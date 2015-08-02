@@ -9,7 +9,7 @@ define([
     "ngw-pyramid/i18n!postgis",
     "ngw-resource/serialize",
     // resource
-    "dojo/text!./template/LayerWidget.html",
+    "ngw-pyramid/i18n!postgis:template:./template/LayerWidget.hbs",
     // template
     "dijit/form/ValidationTextBox",
     "dijit/form/Select",

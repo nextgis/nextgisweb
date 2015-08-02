@@ -7,7 +7,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/i18n!postgis",
     "ngw-resource/serialize",
-    "dojo/text!./template/ConnectionWidget.html",
+    "ngw-pyramid/i18n!postgis:template:./template/ConnectionWidget.hbs",
     // template
     "dijit/form/ValidationTextBox",
     "dojox/layout/TableContainer"
