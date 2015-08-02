@@ -42,7 +42,7 @@ coverage.xml
 # Translations
 *.mo
 *.pot
-**/LC_MESSAGES/*.json
+*.jed
 
 
 # Sphinx documentation

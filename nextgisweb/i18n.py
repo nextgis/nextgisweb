@@ -167,7 +167,7 @@ def cmd_compile(args):
         with open(os.path.join(locpath, mofile), 'w') as fd:
             write_mo(fd, catalog)
 
-        jedfile = pofile[:-3] + '.json'
+        jedfile = pofile[:-3] + '.jed'
         with codecs.open(os.path.join(locpath, jedfile), 'w', 'utf-8') as fd:
             write_jed(fd, catalog)
 

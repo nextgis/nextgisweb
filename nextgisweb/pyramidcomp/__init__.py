@@ -376,7 +376,7 @@ class PyramidComponent(Component):
             for itm in introspector.get_category('translation directories'):
                 tdir = itm['introspectable']['directory']
                 jsonpath = os.path.normpath(os.path.join(
-                    tdir, locale, 'LC_MESSAGES', component) + '.json')
+                    tdir, locale, 'LC_MESSAGES', component) + '.jed')
                 if os.path.isfile(jsonpath):
                     return FileResponse(
                         jsonpath, content_type=b'application/json')
