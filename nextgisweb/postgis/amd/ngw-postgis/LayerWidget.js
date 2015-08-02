@@ -6,6 +6,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "ngw-pyramid/i18n!postgis",
     "ngw-resource/serialize",
     // resource
     "dojo/text!./template/LayerWidget.html",
@@ -22,11 +23,12 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    i18n,
     serialize,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
-        title: "Слой PostGIS",
+        title: i18n.gettext("PostGIS layer"),
         templateString: template,
         prefix: "postgis_layer",
         style: "padding: 1ex;",

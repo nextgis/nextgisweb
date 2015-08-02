@@ -5,6 +5,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "ngw-pyramid/i18n!postgis",
     "ngw-resource/serialize",
     "dojo/text!./template/ConnectionWidget.html",
     // template
@@ -16,11 +17,12 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    i18n,
     serialize,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
-        title: "Соединение PostGIS",
+        title: i18n.gettext("PostGIS connection"),
         templateString: template,
         prefix: "postgis_connection"
     });

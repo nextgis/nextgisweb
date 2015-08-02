@@ -38,6 +38,8 @@ from ..feature_layer import (
     IFeatureQueryLike,
     IFeatureQueryIntersects)
 
+from .util import _
+
 Base = declarative_base()
 
 
@@ -50,7 +52,7 @@ PC_CONNECT = ConnectionScope.connect
 
 class PostgisConnection(Base, Resource):
     identity = 'postgis_connection'
-    cls_display_name = u"Соединение PostGIS"
+    cls_display_name = _("PostGIS connection")
 
     __scope__ = ConnectionScope
 
@@ -135,7 +137,7 @@ class PostgisLayerField(Base, LayerField):
 
 class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'postgis_layer'
-    cls_display_name = u"Слой PostGIS"
+    cls_display_name = _("PostGIS layer")
 
     __scope__ = DataScope
 
@@ -159,17 +161,6 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     @classmethod
     def check_parent(self, parent):
         return isinstance(parent, ResourceGroup)
-
-    def get_info(self):
-        return super(PostgisLayer, self).get_info() + (
-            (u"Тип геометрии", dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
-                self.geometry_type]),
-            (u"Подключение", self.connection),
-            (u"Схема", self.schema),
-            (u"Таблица", self.table),
-            (u"Поле ID", self.column_id),
-            (u"Поле геометрии", self.column_geom),
-        )
 
     @property
     def source(self):
