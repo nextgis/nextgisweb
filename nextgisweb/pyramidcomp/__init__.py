@@ -6,6 +6,8 @@ import re
 import codecs
 from StringIO import StringIO
 from urllib2 import unquote
+from pkg_resources import resource_filename
+import json
 
 from pyramid.config import Configurator
 from pyramid.authentication import (
@@ -13,15 +15,15 @@ from pyramid.authentication import (
     BasicAuthAuthenticationPolicy)
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.httpexceptions import HTTPForbidden, HTTPNotFound
-from pyramid.response import FileResponse
+from pyramid.response import Response, FileResponse
+from pyramid.events import BeforeRender
 
 import pyramid_tm
 import pyramid_mako
 
-from .component import Component
-from .auth import User
-from . import dynmenu as dm
-from pkg_resources import resource_filename
+from ..component import Component
+from ..auth import User
+from .. import dynmenu as dm
 
 
 def viewargs(**kw):
@@ -219,16 +221,24 @@ class PyramidComponent(Component):
 
         config = ExtendedConfigurator(settings=settings)
 
+        config.add_translation_dirs(resource_filename('nextgisweb', 'locale'))
+
         config.add_route_predicate('client', ClientRoutePredicate)
 
         config.add_view_predicate('method', RequestMethodPredicate)
         config.add_view_predicate('json', JsonPredicate)
 
-        # возможность доступа к Env через request.env
+        # Возможность доступа к Env через request.env
         config.set_request_property(lambda (req): self._env, 'env')
 
         config.include(pyramid_tm)
         config.include(pyramid_mako)
+
+        # Фильтр для быстрого перевода строк. Определяет функцию tr, которую
+        # можно использовать вместо request.localizer.translate в шаблонах.
+        def tr_subscriber(event):
+            event['tr'] = event['request'].localizer.translate
+        config.add_subscriber(tr_subscriber, BeforeRender)
 
         assert 'secret' in settings, 'Secret not set!'
         authn_policy = AuthenticationPolicy(settings=settings)
@@ -274,8 +284,7 @@ class PyramidComponent(Component):
 
         self.pkginfo = []
 
-        # Так же из вывода pip freeze читаем список
-        # установленных пакетов
+        # Так же из вывода pip freeze читаем список установленных пакетов
 
         buf.seek(0)
 
@@ -298,7 +307,7 @@ class PyramidComponent(Component):
 
         config.add_static_view(
             '/static%s/asset' % static_key,
-            'static', cache_max_age=3600)
+            'nextgisweb:static', cache_max_age=3600)
 
         config.add_route('amd_package', '/static%s/amd/*subpath' % static_key) \
             .add_view('nextgisweb.views.amd_package')
@@ -359,6 +368,28 @@ class PyramidComponent(Component):
 
         config.add_route('pyramid.route', '/api/component/pyramid/route') \
             .add_view(route, renderer='json')
+
+        def locale_data(request):
+            locale = request.matchdict['locale']
+            component = request.matchdict['component']
+            introspector = request.registry.introspector
+            for itm in introspector.get_category('translation directories'):
+                tdir = itm['introspectable']['directory']
+                jsonpath = os.path.normpath(os.path.join(
+                    tdir, locale, 'LC_MESSAGES', component) + '.json')
+                if os.path.isfile(jsonpath):
+                    return FileResponse(
+                        jsonpath, content_type=b'application/json')
+
+            return Response(json.dumps(dict(
+                error="Locale data not found!"
+            )), status_code=404, content_type=b'application/json')
+
+        config.add_route(
+            'pyramid.locdata',
+            '/api/component/pyramid/locdata/{locale}/{component}',
+            client=('locale', 'component'),
+        ).add_view(locale_data, renderer='json')
 
         def control_panel(request):
             if not request.user.is_administrator:

@@ -7,7 +7,7 @@ except CalledProcessError:
     gv = None
 
 requires = [
-    'pyramid',
+    'pyramid>=1.5',
     'SQLAlchemy>=0.8,<0.9',
     'transaction',
     'pyramid_tm',
@@ -28,6 +28,7 @@ requires = [
     'passlib',
     'owslib',
     'requests',
+    'babel',
 ]
 
 entry_points = {
@@ -38,6 +39,7 @@ entry_points = {
     'console_scripts': [
         'nextgisweb = nextgisweb.script:main',
         'nextgisweb-config = nextgisweb.script:config',
+        'nextgisweb-i18n = nextgisweb.i18n:main',
     ],
 
     'nextgisweb.packages': ['nextgisweb = nextgisweb:pkginfo', ],
@@ -58,9 +60,9 @@ setup(
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
     ],
-    author='',
-    author_email='',
-    url='',
+    author='NextGIS',
+    author_email='info@nextgis.ru',
+    url='http://nextgis.ru/nextgis-web/',
     keywords='web wsgi bfg pylons pyramid',
     packages=find_packages(),
     include_package_data=True,

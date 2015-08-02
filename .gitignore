@@ -42,21 +42,10 @@ coverage.xml
 # Translations
 *.mo
 *.pot
+**/LC_MESSAGES/*.json
 
-# Django stuff:
-*.log
 
 # Sphinx documentation
 doc/_build/
 
-# PyBuilder
-target/
-
-# IDE
-.idea
-
-
 .vagrant
-
-#temp files
-*~

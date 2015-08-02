@@ -10,7 +10,7 @@ from ..resource import (
     Serializer,
     SerializedProperty)
 
-from .ident import COMP_ID
+from .util import COMP_ID
 
 
 Base = declarative_base()
