@@ -71,7 +71,7 @@ def handler(obj, request):
         # import ipdb; ipdb.set_trace()
         result = server.dispatchRequest(
             base_path=base_path,
-            path_info='/'+sourcenames, params=params,
+            path_info='/' + sourcenames, params=params,
             post_data=post_data,
             request_method=request_method)
     except FeatureServerException as e:

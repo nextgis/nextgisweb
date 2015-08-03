@@ -4,7 +4,7 @@ This code is based on code of MetaCarta.
 Some changes are done by NextGIS
 """
 
-__author__  = "MetaCarta"
+__author__ = "MetaCarta"
 __copyright__ = "Copyright (c) 2006-2008 MetaCarta"
 __license__ = "Clear BSD"
 
@@ -16,7 +16,9 @@ from ...vectorformats.Feature import Feature
 
 import geojson
 
+
 class GeoJSON(Request):
+
     def __init__(self, service):
         Request.__init__(self, service)
         self.callback = None
@@ -26,10 +28,10 @@ class GeoJSON(Request):
         metadata = []
         for key in layers.keys():
             metadata.append(
-              {
-                'name': key,
-                'url': "%s/%s" % (self.host, key)
-              }
+                {
+                    'name': key,
+                    'url': "%s/%s" % (self.host, key)
+                }
             )
 
         result_data = {'Layers': metadata}
@@ -44,15 +46,16 @@ class GeoJSON(Request):
         if 'callback' in params:
             self.callback = params['callback']
         g = GS()
-        Request.parse(self, params, path_info, host, post_data, request_method, format_obj=g)
+        Request.parse(self, params, path_info, host, post_data, request_method,
+                      format_obj=g)
 
     def encode(self, result):
         g = GS()
         if result and result[0].srs:
             # all features have the same 'srs' property
             crs = {"type": "name",
-                        "properties": {"name": "EPSG:%s" % (result[0].srs ,)}
-                  }
+                   "properties": {"name": "EPSG:%s" % (result[0].srs,)}
+                   }
             g.crs = crs
         result = g.encode(result)
 
@@ -67,4 +70,3 @@ class GeoJSON(Request):
     def encode_exception_report(self, exceptionReport):
         geojson = GS()
         return ("text/plain", geojson.encode_exception_report(exceptionReport), None, 'utf-8')
-

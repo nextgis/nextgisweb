@@ -6,8 +6,9 @@ from ....FeatureServer.WebFeatureService.Transaction.TransactionAction import Tr
 from lxml import etree
 import re
 
+
 class Update(TransactionAction):
-    
+
     def __init__(self, node):
         super(Update, self).__init__(node)
         self.type = 'update'
@@ -16,10 +17,11 @@ class Update(TransactionAction):
         attr = self.node.attrib
         if 'typeName' in attr:
             self.layer_name = attr['typeName']
-        
+
     def createStatement(self, datasource):
 
-        geom = self.node.xpath("//*[local-name() = 'Name' and text()='"+datasource.geom_col+"']/following-sibling::*[1]/*")
+        geom = self.node.xpath(
+            "//*[local-name() = 'Name' and text()='" + datasource.geom_col + "']/following-sibling::*[1]/*")
         geomData = ''
         if len(geom) > 0:
             geomData = etree.tostring(geom[0], pretty_print=True)
@@ -28,16 +30,17 @@ class Update(TransactionAction):
             pattern = re.compile(r'"')
             geomData = re.sub(pattern, '\\"', geomData)
 
-        xslt = etree.parse(os.path.dirname(os.path.abspath(__file__))+"/../../../resources/transaction/transactions.xsl")
+        xslt = etree.parse(os.path.dirname(os.path.abspath(__file__))
+                           + "/../../../resources/transaction/transactions.xsl")
         transform = etree.XSLT(xslt)
 
         result = transform(self.node,
-                           datasource="'"+datasource.type+"'",
-                           transactionType="'"+self.type+"'",
-                           geometryAttribute="'"+datasource.geom_col+"'",
-                           geometryData="'"+geomData+"'",
+                           datasource="'" + datasource.type + "'",
+                           transactionType="'" + self.type + "'",
+                           geometryAttribute="'" + datasource.geom_col + "'",
+                           geometryData="'" + geomData + "'",
                            tableName="dummy",
-                           tableId="'"+datasource.fid_col+"'")
+                           tableId="'" + datasource.fid_col + "'")
 
         elements = result.xpath("//Statement")
         if len(elements) > 0:
@@ -45,4 +48,3 @@ class Update(TransactionAction):
             self.setStatement(re.sub(pattern, ' ', elements[0].text))
             return
         self.setStatement(None)
-

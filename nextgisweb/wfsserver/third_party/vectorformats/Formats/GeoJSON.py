@@ -17,6 +17,7 @@ from geojson import loads as json_loads
         #~ raise Exception("simplejson is required for using the GeoJSON service. (Import failed: %s)" % E)
 
 class GeoJSON(Format):
+
     """
     The most complete Format in vectorformats library. This class is designed
     to use the fastest available JSON library to encode/decode to/from
@@ -24,7 +25,8 @@ class GeoJSON(Format):
     """
 
     crs = None
-    def _createFeature(self, feature_dict, id = None):
+
+    def _createFeature(self, feature_dict, id=None):
         """Private. Not designed to be used externally."""
         feature = Feature(id)
         if feature_dict.has_key('geometry'):
@@ -32,7 +34,6 @@ class GeoJSON(Format):
         if feature_dict.has_key('properties'):
             feature.properties = feature_dict['properties']
         return feature
-
 
     def encode(self, features, to_string=True, **kwargs):
         """
@@ -45,16 +46,16 @@ class GeoJSON(Format):
         result_data = None
         for feature in features:
             data = self.encode_feature(feature)
-            for key,value in data['properties'].items():
+            for key, value in data['properties'].items():
                 if value and isinstance(value, str):
-                    data['properties'][key] = unicode(value,"utf-8")
+                    data['properties'][key] = unicode(value, "utf-8")
             results.append(data)
 
         result_data = {
-                       'type':'FeatureCollection',
+            'type': 'FeatureCollection',
                        'features': results,
                        'crs': self.crs
-                      }
+        }
 
         if to_string:
             result = json_dumps(result_data)
@@ -63,10 +64,10 @@ class GeoJSON(Format):
         return result
 
     def encode_feature(self, feature):
-        return {'type':"Feature",
-            "id": feature.id,
-            "geometry": feature.geometry,
-            "properties": feature.properties}
+        return {'type': "Feature",
+                "id": feature.id,
+                "geometry": feature.geometry,
+                "properties": feature.properties}
 
     def encode_exception_report(self, exceptionReport):
         results = []
@@ -74,16 +75,15 @@ class GeoJSON(Format):
 
         for exception in exceptionReport:
             data = {
-                "exceptionCode" : str(exception.code),
-                "locator" : exception.locator,
-                "layer" : exception.layer,
-                "ExceptionText" : exception.message,
-                "ExceptionDump" : exception.dump
+                "exceptionCode": str(exception.code),
+                "locator": exception.locator,
+                "layer": exception.layer,
+                "ExceptionText": exception.message,
+                "ExceptionDump": exception.dump
             }
-            results.append({"Exception" : data})
+            results.append({"Exception": data})
 
-        return json_dumps({"ExceptionReport" : results})
-
+        return json_dumps({"ExceptionReport": results})
 
     def decode(self, data):
         feature_data = json_loads(data)
@@ -92,7 +92,7 @@ class GeoJSON(Format):
         elif feature_data.has_key("members"):
             feature_data = feature_data['members']
         elif feature_data.has_key("type") and feature_data['type'] in ['Point', 'LineString', 'Polygon', 'MultiPolygon', 'MultiPoint', 'MultiLineString']:
-            feature_data = [{'geometry':feature_data}]
+            feature_data = [{'geometry': feature_data}]
         else:
             feature_data = [feature_data]
 

@@ -1,24 +1,26 @@
 '''
 Created on October 15, 2012
-    
+
 @author: michel
 '''
 
+
 class ExceptionReport():
+
     def __init__(self):
         self.index = 0
         self.exceptions = []
-    
+
     def add(self, exception):
         self.exceptions.append(exception)
-    
+
     def __len__(self):
         return len(self.exceptions)
 
     def __iter__(self):
         self.index = 0
         return self
-    
+
     def next(self):
         if self.index >= len(self):
             raise StopIteration

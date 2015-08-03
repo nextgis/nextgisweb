@@ -1,6 +1,6 @@
 '''
 Created on October 15, 2012
-    
+
 @author: michel
 '''
 
@@ -17,4 +17,3 @@ class BaseException(Exception):
         self.locator = locator
         self.layer = layer
         self.dump = dump
-        

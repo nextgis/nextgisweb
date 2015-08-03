@@ -25,7 +25,8 @@ class Service(Base, Resource):
 class Layer(Base):
     __tablename__ = 'wfsserver_layer'
 
-    service_id = db.Column(db.ForeignKey('wfsserver_service.id'), primary_key=True)
+    service_id = db.Column(
+        db.ForeignKey('wfsserver_service.id'), primary_key=True)
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     keyname = db.Column(db.Unicode, nullable=False)
     display_name = db.Column(db.Unicode, nullable=False)

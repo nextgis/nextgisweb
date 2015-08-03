@@ -5,17 +5,18 @@ from ...web_request.handlers import ApplicationException
 from ...FeatureServer.Exceptions.LayerNotFoundException import LayerNotFoundException
 from ...FeatureServer.Exceptions.NoLayerException import NoLayerException
 
+
 class Request (object):
-    
+
     query_action_types = []
-    
-    def __init__ (self, service):
-        self.service     = service
-        #self.datasource  = None
+
+    def __init__(self, service):
+        self.service = service
+        # self.datasource  = None
         self.datasources = []
-        self.actions     = []
-        self.host        = None
-    
+        self.actions = []
+        self.host = None
+
     def encode_metadata(self, action):
         """Accepts an action, which is of method 'metadata' and
             may have one attribute, 'metadata', which includes
@@ -31,7 +32,7 @@ class Request (object):
                 data.append(" * %s, %s/%s" % (layer, self.host, layer))
         return ("text/plain", "\n".join(data))
 
-    def parse(self, params, path_info, host, post_data, request_method, format_obj = None):
+    def parse(self, params, path_info, host, post_data, request_method, format_obj=None):
         """Used by most of the subclasses without changes. Does general
             processing of request information using request method and
             path/parameter information, to build up a list of actions.
@@ -45,7 +46,7 @@ class Request (object):
             self.get_layer(path_info, params)
         except NoLayerException as e:
             a = Action()
-            
+
             if params.has_key('service') and params['service'].lower() == 'wfs':
                 for layer in self.service.datasources:
                     self.datasources.append(layer)
@@ -55,13 +56,14 @@ class Request (object):
                     a.request = "GetCapabilities"
             else:
                 a.method = "metadata"
-            
+
             self.actions.append(a)
             return
 
         for datasource in self.datasources:
             if not self.service.datasources.has_key(datasource):
-                raise LayerNotFoundException("Request", datasource, self.service.datasources.keys())
+                raise LayerNotFoundException(
+                    "Request", datasource, self.service.datasources.keys())
 
         action = Action()
 
@@ -71,10 +73,12 @@ class Request (object):
                 action.layer = params[u'typename']
 
         elif request_method == "POST" or request_method == "PUT" or (request_method == "OPTIONS" and len(post_data) > 0):
-            actions = self.handle_post(params, path_info, host, post_data, request_method, format_obj = format_obj)
+            actions = self.handle_post(
+                params, path_info, host, post_data, request_method,
+                                       format_obj=format_obj)
             for action in actions:
                 self.actions.append(action)
-            
+
             return
 
         elif request_method == "DELETE":
@@ -105,17 +109,17 @@ class Request (object):
             looking for the parameters in the params. """
         action = Action()
         action.method = "select"
-        
+
         id = self.get_id_from_path_info(path_info)
-        
+
         if id is not False:
             action.id = id
-        
+
         else:
             import sys
             for ds in self.datasources:
                 queryable = []
-                #ds = self.service.datasources[self.datasource]
+                # ds = self.service.datasources[self.datasource]
                 if hasattr(ds, 'queryable'):
                     queryable = ds.queryable.split(",")
                 elif params.has_key("queryable"):
@@ -144,22 +148,25 @@ class Request (object):
                     elif key in queryable or key.upper() in queryable and hasattr(self.service.datasources[ds], 'query_action_types'):
                         if qtype:
                             if qtype in self.service.datasources[ds].query_action_types:
-                                action.attributes[key+'__'+qtype] = {'column': key, 'type': qtype, 'value':value}
+                                action.attributes[key + '__' + qtype] = {
+                                    'column': key, 'type': qtype, 'value': value}
                             else:
-                                raise ApplicationException("%s, %s, %s\nYou can't use %s on this layer. Available query action types are: \n%s" % (self, self.query_action_types, qtype,
-                                                                                                                                                   qtype, ",".join(self.service.datasources[ds].query_action_types) or "None"))
+                                raise ApplicationException(
+                                    "%s, %s, %s\nYou can't use %s on this layer. Available query action types are: \n%s" % (self, self.query_action_types, qtype,
+                                                                                                                            qtype, ",".join(self.service.datasources[ds].query_action_types) or "None"))
                         else:
-                            action.attributes[key+'__eq'] = {'column': key, 'type': 'eq', 'value':value}
-                            #action.attributes[key] = value
-        
+                            action.attributes[key + '__eq'] = {
+                                'column': key, 'type': 'eq', 'value': value}
+                            # action.attributes[key] = value
+
         return action
-    
-    def get_layer(self, path_info, params = {}):
+
+    def get_layer(self, path_info, params={}):
         """Return layer based on path, or raise a NoLayerException."""
         if params.has_key("typename"):
             self.datasources = params["typename"].split(",")
             return
-        
+
         path = path_info.split("/")
         if len(path) > 1 and path_info != '/':
             # get_layer method can be called twice, so to prevent
@@ -172,49 +179,51 @@ class Request (object):
             #    duplication of datasources, check it (DK)
             if params['layer'] not in self.datasources:
                 self.datasources.append(params['layer'])
-        
-        if len(self.datasources) == 0:
-            raise NoLayerException("Request", message="Could not obtain data source from layer parameter or path info.")
 
-    def handle_post(self, params, path_info, host, post_data, request_method, format_obj = None):
+        if len(self.datasources) == 0:
+            raise NoLayerException(
+                "Request", message="Could not obtain data source from layer parameter or path info.")
+
+    def handle_post(self, params, path_info, host, post_data, request_method, format_obj=None):
         """Read data from the request and turn it into an UPDATE/DELETE action."""
 
         if format_obj:
             actions = []
-            
+
             id = self.get_id_from_path_info(path_info)
             if id is not False:
                 action = Action()
                 action.method = "update"
                 action.id = id
-                
+
                 features = format_obj.decode(post_data)
-                
+
                 action.feature = features[0]
                 actions.append(action)
-            
+
             else:
                 if hasattr(format_obj, 'decode'):
                     features = format_obj.decode(post_data)
-                    
+
                     for feature in features:
                         action = Action()
                         action.method = "insert"
                         action.feature = feature
                         actions.append(action)
-            
+
                 elif hasattr(format_obj, 'parse'):
                     format_obj.parse(post_data)
-                    
+
                     transactions = format_obj.getActions()
                     if transactions is not None:
                         for transaction in transactions:
                             action = Action()
-                            action.method = transaction.__class__.__name__.lower()
+                            action.method = transaction.__class__.__name__.lower(
+                            )
                             action.layer = transaction.getLayerName()
                             action.wfsrequest = transaction
                             actions.append(action)
-            
+
             return actions
         else:
             raise Exception("Service type does not support adding features.")
@@ -222,18 +231,18 @@ class Request (object):
     def encode(self, result):
         """Accepts a list of lists of features. Each list is generated by one datasource
             method call. Must return a (content-type, string) tuple."""
-        results = ["Service type doesn't support displaying data, using naive display."""]
+        results = [
+            "Service type doesn't support displaying data, using naive display."""]
         for action in result:
             for i in action:
                 data = i.to_dict()
-                for key,value in data['properties'].items():
+                for key, value in data['properties'].items():
                     if value and isinstance(value, str):
-                        data['properties'][key] = unicode(value,"utf-8")
+                        data['properties'][key] = unicode(value, "utf-8")
                 results.append(" * %s" % data)
-        
+
         return ("text/plain", "\n".join(results), None)
-    
+
     def getcapabilities(self, version): pass
+
     def describefeaturetype(self, version): pass
-
-
