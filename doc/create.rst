@@ -8,11 +8,10 @@ Group
 
 Для создания ресурса необходимо выполнить следующий запрос.
 
-.. http:post:: /resource/(int:id)/child/
+.. http:post:: /api/resource
 
    Запрос на создание группы ресурсов
     
-   :param id: идентификатор ресурса который необходимо изменить
    :<json string cls: тип (для группы должен быть "resource_group")
    :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
    :<json string display_name: имя группы (**обязательно**)
@@ -24,7 +23,7 @@ Group
 
 .. sourcecode:: http
 
-   POST /resource/0/child/ HTTP/1.1
+   POST /api/resource HTTP/1.1
    Host: ngw_url
    Accept: */*
    
@@ -42,11 +41,10 @@ PostGIS Connection
 
 Для создания PostGIS подключения необходимо выполнить следующий запрос.
 
-.. http:post:: /resource/(int:id)/child/
+.. http:post:: /api/resource
 
    Запрос на создание PostGIS подключения
     
-   :param id: идентификатор ресурса который необходимо изменить
    :<json string cls: тип (для группы должен быть "postgis_connection")
    :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
    :<json string display_name: имя подключения (**обязательно**)
@@ -62,7 +60,7 @@ PostGIS Connection
 
 .. sourcecode:: http
 
-   POST /resource/0/child/ HTTP/1.1
+   POST /api/resource HTTP/1.1
    Host: ngw_url
    Accept: */*
    
@@ -90,11 +88,10 @@ PostGIS Layer
 
 Для создания PostGIS слоя необходимо выполнить следующий запрос.
 
-.. http:post:: /resource/(int:id)/child/
+.. http:post:: /api/resource
 
    Запрос на создание PostGIS слоя
-    
-   :param id: идентификатор ресурса который необходимо изменить
+        
    :<json string cls: тип (для группы должен быть "postgis_layer")
    :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
    :<json string display_name: имя слоя (**обязательно**)
@@ -114,7 +111,7 @@ PostGIS Layer
 
 .. sourcecode:: http
 
-   POST /resource/0/child/ HTTP/1.1
+   POST /api/resource HTTP/1.1
    Host: ngw_url
    Accept: */*
    
@@ -169,11 +166,10 @@ Vector layer
 
 Для создания векторного слоя необходимо выполнить следующий запрос.
 
-.. http:post:: /resource/(int:id)/child/
+.. http:post:: /api/resource
 
    Запрос на создание векторного слоя
     
-   :param id: идентификатор ресурса который необходимо изменить
    :<json string cls: тип (для векторного слоя должен быть "vector_layer")
    :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
    :<json string display_name: имя слоя (**обязательно**)
@@ -187,7 +183,7 @@ Vector layer
 
 .. sourcecode:: http
 
-   POST /resource/0/child/ HTTP/1.1
+   POST /api/resource HTTP/1.1
    Host: ngw_url
    Accept: */*
    
@@ -259,11 +255,10 @@ File bucket
 Для создания набора файлов необходимо выполнить следующий запрос.
 
 
-.. http:post:: /resource/(int:id)/child/
+.. http:post:: /api/resource
 
    Запрос на создание набора файлов
     
-   :param id: идентификатор ресурса который необходимо изменить
    :<json string cls: тип (для набора файлов должен быть "file_bucket")
    :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
    :<json string display_name: имя слоя (**обязательно**)
@@ -276,7 +271,7 @@ File bucket
 
 .. sourcecode:: http
 
-   POST /resource/0/child/ HTTP/1.1
+   POST /api/resource HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -326,30 +321,36 @@ File bucket
       }
     }
     
+**Example response body**:
+    
+.. sourcecode:: json 
+
+   {"id": 22, "parent": {"id": 0}}
+    
 Изменение набора файлов
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Для изменения набора файлов необходимо выполнить следующий запрос.
 
 
-.. http:put:: /resource/(int:id)/child/
+.. http:put:: /api/resource/(int:id)
 
-   Запрос на создание набора файлов
+   Запрос на изменение набора файлов
     
    :param id: идентификатор ресурса который необходимо изменить
    :<json string cls: тип (для набора файлов должен быть "file_bucket")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя слоя (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
+   :<json jsonobj parent:  идентификатор родительского ресурса (при изменении набор файлов будет перемещен в новую группу ресурсов)
+   :<json string display_name: новое имя набора
+   :<json string keyname: новый ключ ресурса
    :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
+   :<json string description: описание, можно использовать html
    :<json jsonobj files: перечень файлов которые должны входить в набор: текущие (те что надо удалить - не указываем), а также новых файлов (то что приходит в ответе при загрузке, files == upload_meta)
       
 **Example request**:
 
 .. sourcecode:: http
 
-   POST /resource/0/child/ HTTP/1.1
+   PUT /api/resource/22 HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -381,8 +382,8 @@ File bucket
       }, 
       "resource": {
         "cls": "file_bucket", 
-        "description": null, 
-        "display_name": "grunt_area", 
+        "description": "some new text", 
+        "display_name": "new grunt_area", 
         "keyname": null, 
         "parent": {
           "id": 0
@@ -391,7 +392,8 @@ File bucket
     }
     
 После выполнения запроса будет добавлен файл *grunt area description.txt* и удалены
-*grunt_area_2_multipolygon.cpg*, *grunt_area_2_multipolygon.prj*.    
+*grunt_area_2_multipolygon.cpg*, *grunt_area_2_multipolygon.prj*, изменено название
+набора и добавлено описание.    
 
 Vector (mapserver) style
 ------------------------
@@ -399,11 +401,10 @@ Vector (mapserver) style
 Для создания векторного стиля необходимо выполнить следующий запрос.
 
 
-.. http:post:: /resource/(int:id)/child/
+.. http:post:: /api/resource
 
    Запрос на создание векторного стиля
     
-   :param id: идентификатор ресурса который необходимо изменить
    :<json string cls: тип (для векторного стиля должен быть "mapserver_style")
    :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
    :<json string display_name: имя стиля (**обязательно**)
@@ -415,7 +416,7 @@ Vector (mapserver) style
 
 .. sourcecode:: http
 
-   POST /resource/0/child/ HTTP/1.1
+   POST /api/resource HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -434,6 +435,13 @@ Vector (mapserver) style
       }
     }
     
+        
+**Example response body**:
+    
+.. sourcecode:: json 
+
+   {"id": 24, "parent": {"id": 0}}
+    
 Стили подробнее рассмотрены в подразделе ":ref:`maplayers`".
     
 Raster style
@@ -442,11 +450,10 @@ Raster style
 Для создания растрового стиля необходимо выполнить следующий запрос.
 
 
-.. http:post:: /resource/(int:id)/child/
+.. http:post:: /api/resource
 
    Запрос на создание растрового стиля
     
-   :param id: идентификатор ресурса который необходимо изменить
    :<json string cls: тип (для растрового стиля должен быть "raster_style")
    :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
    :<json string display_name: имя стиля (**обязательно**)
@@ -458,7 +465,7 @@ Raster style
 
 .. sourcecode:: http
 
-   POST /resource/0/child/ HTTP/1.1
+   POST /api/resource HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -474,5 +481,10 @@ Raster style
       }
     }
     
+**Example response body**:
+    
+.. sourcecode:: json 
+
+   {"id": 25, "parent": {"id": 0}}
     
     
