@@ -394,6 +394,16 @@ class PyramidComponent(Component):
                     return FileResponse(
                         jsonpath, content_type=b'application/json')
 
+            # Для английской локали по-умолчанию возвращаем пустой перевод,
+            # если реальный файл перевода не найден. Такое может быть нужно,
+            # если вместо строк на английском будем использовать msgid.
+            if locale == 'en':
+                return Response(json.dumps({"": {
+                    "domain": component,
+                    "lang": "en",
+                    "plural_forms": "nplurals=2; plural=(n != 1);"
+                }}), content_type=b'application/json')
+
             return Response(json.dumps(dict(
                 error="Locale data not found!"
             )), status_code=404, content_type=b'application/json')

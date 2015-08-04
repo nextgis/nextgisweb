@@ -29,7 +29,13 @@ define([
                             domain: comp,
                             locale_data: locale_data,
                             missing_key_callback: function (key) {
-                                console.warn(jed.sprintf("Missing key '%s' in domain '%s'!", [key, comp]));
+                                if (locale !== "en") {
+                                    // Все строки по-умолчанию английские - их игнорируем
+                                    console.warn(jed.sprintf(
+                                        "Missing key '%s' in domain '%s' for locale '%s'!",
+                                        [key, comp, locale]
+                                    ));
+                                }
                             }
                         });
                     } catch (e) {
