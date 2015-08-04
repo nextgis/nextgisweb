@@ -218,10 +218,19 @@ class PyramidComponent(Component):
         settings = dict(self._settings, **settings)
 
         settings['mako.directories'] = 'nextgisweb:templates/'
+
+        # Если включен режим отладки, то добавляем mako-фильтр, который
+        # проверяет была ли переведена строка перед выводом.
         if self.env.core.debug:
             settings['mako.default_filters'] = ['tcheck', 'h']
             settings['mako.imports'] = settings.get('mako.imports', []) \
                 + ['from nextgisweb.i18n import tcheck', ]
+
+        # Если в конфиге pyramid не указано иное, то используем ту локаль,
+        # которая указана в компоненте core, хотя зачем такое нужно не ясно.
+        plockey = 'pyramid.default_locale_name'
+        if plockey not in settings and self.env.core.locale is not None:
+            settings[plockey] = self.env.core.locale
 
         config = ExtendedConfigurator(settings=settings)
 
