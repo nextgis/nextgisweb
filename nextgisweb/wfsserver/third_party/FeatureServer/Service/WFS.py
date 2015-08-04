@@ -35,12 +35,12 @@ class WFS(Request):
 
         try:
             self.get_layer(path_info, params)
-                           # TODO: this line is called twice
+            # TODO: this line is called twice
             # (here and on line 58: see Request.parse source).
             # It is the cause of duplication of datasources (see my comment in Request.get_layer) and therefore
             # it causes duplication of the sources in DescribeFeatureType response.
             # Investigate the problem. (DK)
-        except NoLayerException as e:
+        except NoLayerException:
             a = Action()
 
             if params.has_key('service') and params['service'].lower() == 'wfs':
@@ -61,14 +61,14 @@ class WFS(Request):
         try:
             Request.parse(
                 self, params, path_info, host, post_data, request_method,
-                          format_obj=wfsrequest)
+                format_obj=wfsrequest)
         except:
             raise
 
     def getcapabilities(self, version):
         wfs = WFSFormat.WFS(
             layers=self.datasources, datasources=self.service.datasources, host=self.host)
-        result = wfs.getcapabilities()
+        result = wfs.getcapabilities(version)
         return ("text/xml", result)
 
     def describefeaturetype(self, version):

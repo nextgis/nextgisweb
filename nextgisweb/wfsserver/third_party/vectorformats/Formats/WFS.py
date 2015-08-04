@@ -201,10 +201,17 @@ version="1.0.0"
 
         return result
 
-    def getcapabilities(self):
-        tree = etree.parse(os.path.join(XMLDATADIR, "wfs-capabilities.xml"))
+    def getcapabilities(self, version):
+
+        try:
+          tree = etree.parse(os.path.join(XMLDATADIR, version,
+                                          "wfs-capabilities.xml"))
+        except IOError:
+            # TODO: raise exception about wrong version number
+            raise
 
         root = tree.getroot()
+
         elements = root.xpath(
             "wfs:Capability/wfs:Request/wfs:GetCapabilities/wfs:DCPType/wfs:HTTP", namespaces=self.namespaces)
         if len(elements) > 0:
