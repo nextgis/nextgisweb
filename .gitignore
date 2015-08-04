@@ -47,5 +47,6 @@ coverage.xml
 
 # Sphinx documentation
 doc/_build/
+doc/*/_build/
 
 .vagrant
