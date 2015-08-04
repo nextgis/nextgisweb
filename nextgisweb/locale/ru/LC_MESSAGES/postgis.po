@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-08-02 20:27+0400\n"
+"POT-Creation-Date: 2015-08-04 02:40+0400\n"
 "PO-Revision-Date: 2015-08-02 14:57+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -18,6 +18,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
+#: model.py:46 amd/ngw-postgis/template/LayerWidget.hbs:38
+msgid "Point"
+msgstr "Точка"
+
+#: model.py:46 amd/ngw-postgis/template/LayerWidget.hbs:39
+msgid "Line"
+msgstr "Линия"
+
+#: model.py:46 amd/ngw-postgis/template/LayerWidget.hbs:40
+msgid "Polygon"
+msgstr "Полигон"
+
 #: model.py:55 amd/ngw-postgis/ConnectionWidget.js:25
 msgid "PostGIS connection"
 msgstr "Соединение PostGIS"
@@ -25,6 +37,35 @@ msgstr "Соединение PostGIS"
 #: model.py:140 amd/ngw-postgis/LayerWidget.js:31
 msgid "PostGIS layer"
 msgstr "Слой PostGIS"
+
+#: model.py:200
+#, python-format
+msgid "Table '%s' not found!"
+msgstr "Таблица '%s' не найдена!"
+
+#: model.py:217
+msgid ""
+"Geometry type missing in geometry_columns table! You should specify it "
+"manually."
+msgstr ""
+"Тип геометрии отсутствует в таблице geometry_columns! Необходимо указать "
+"тип геометрии вручную."
+
+#: model.py:224
+msgid "Geometry type in geometry_columns table does not match specified!"
+msgstr "Тип геометрии в таблице geometry_columns не соответствует указанному!"
+
+#: model.py:242
+msgid "To use column as ID it should have integer type!"
+msgstr ""
+"Для использования поля в качестве идентификатора оно должно иметь "
+"целочисленный тип!"
+
+
+#: model.py:280 model.py:283
+#, python-format
+msgid "Column '%s' not found!"
+msgstr "Поле '%s' не найдено!"
 
 #: amd/ngw-postgis/template/ConnectionWidget.hbs:9
 msgid "Host"
@@ -69,18 +110,6 @@ msgstr "Тип геометрии"
 #: amd/ngw-postgis/template/LayerWidget.hbs:37
 msgid "Autodetect"
 msgstr "Автоматически"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:38
-msgid "Point"
-msgstr "Точка"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:39
-msgid "Line"
-msgstr "Линия"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:40
-msgid "Polygon"
-msgstr "Полигон"
 
 #: amd/ngw-postgis/template/LayerWidget.hbs:47
 msgid "Coordinate system"

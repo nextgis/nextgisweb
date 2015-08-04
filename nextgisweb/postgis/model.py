@@ -43,7 +43,7 @@ from .util import _
 Base = declarative_base()
 
 
-GEOM_TYPE_DISPLAY = (u"Точка", u"Линия", u"Полигон")
+GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"))
 
 PC_READ = ConnectionScope.read
 PC_WRITE = ConnectionScope.write
@@ -62,7 +62,7 @@ class PostgisConnection(Base, Resource):
     password = db.Column(db.Unicode, nullable=False)
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(self, parent): # NOQA
         return isinstance(parent, ResourceGroup)
 
     def get_engine(self):
@@ -159,7 +159,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         cascade=False, cascade_backrefs=False)
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(self, parent): # NOQA
         return isinstance(parent, ResourceGroup)
 
     @property
@@ -194,8 +194,10 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 WHERE table_schema = %s AND table_name = %s""",
                 self.schema, self.table)
 
+            tableref = '%s.%s' % (self.schema, self.table)
+
             if result.first() is None:
-                raise ValidationError(u"Таблица '%s.%s' не обнаружена." % (self.schema, self.table))  # NOQA
+                raise ValidationError(_("Table '%s' not found!" % tableref))
 
             result = conn.execute(
                 """SELECT type, srid FROM geometry_columns
@@ -212,14 +214,14 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 tab_geom_type = row['type'].replace('MULTI', '')
 
                 if tab_geom_type == 'GEOMETRY' and self.geometry_type is None:
-                    raise ValidationError(u"Тип геометрии отсутствует в geometry_columns, необходимо указать его в явном виде.")   # NOQA
+                    raise ValidationError(_("Geometry type missing in geometry_columns table! You should specify it manually.")) # NOQA
 
                 if (
                     self.geometry_type is not None
                     and tab_geom_type != 'GEOMETRY'
                     and self.geometry_type != tab_geom_type
                 ):
-                    raise ValidationError(u"Тип геометрии в geometry_columns (%s) не соответствует указанному (%s)." % (tab_geom_type, self.geometry_type))  # NOQA
+                    raise ValidationError(_("Geometry type in geometry_columns table does not match specified!")) # NOQA
 
                 if self.geometry_type is None:
                     self.geometry_type = tab_geom_type
@@ -237,7 +239,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             for row in result:
                 if row['column_name'] == self.column_id:
                     if row['data_type'] not in ['integer', 'bigint']:
-                        raise ValidationError(u"Для использования поля в качестве идентификатора необходим тип integer.")  # NOQA
+                        raise ValidationError(_("To use column as ID it should have integer type!"))  # NOQA
                     colfound_id = True
 
                 elif row['column_name'] == self.column_geom:
@@ -275,10 +277,10 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                             **fopts))
 
             if not colfound_id:
-                raise ValidationError(u"Поле идентификатор '%s' не найдено в таблице '%s.%s'." % (self.column_id, self.schema, self.table))  # NOQA
+                raise ValidationError(_("Column '%s' not found!" % self.column_id))  # NOQA
 
             if not colfound_geom:
-                raise ValidationError(u"Поле геометрии '%s' не найдено в таблице '%s.%s'." % (self.column_geom, self.schema, self.table))  # NOQA
+                raise ValidationError(_("Column '%s' not found!" % self.column_geom))  # NOQA
 
         finally:
             conn.close()
