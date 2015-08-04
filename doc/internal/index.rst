@@ -6,6 +6,7 @@ NextGISWeb
 
    component
    resource
+   i18n
    file_upload
 
 
