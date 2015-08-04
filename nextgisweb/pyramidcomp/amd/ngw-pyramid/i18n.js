@@ -12,10 +12,7 @@ define([
     var dummyJed = function () { return new jed({}); };
 
     return {
-        load: function (arg, parentRequire, load) {
-            var args = arg.split(":", 3);
-            var comp = args[0], mode = args[1], modarg = args[2];
-
+        load: function (comp, parentRequire, load) {
             xhr.get(route.pyramid.locdata(locale, comp), {
                 handleAs: "json",
                 headers: { "Accept": "application/json" }
@@ -44,23 +41,7 @@ define([
                         jedobj = dummyJed();
                     }
 
-                    if (mode === undefined) {
-                        load(jedobj);
-                    } else if (mode === "template") {
-                        var templateUrl = parentRequire.toUrl(modarg);
-                        require([
-                            "handlebars/handlebars",
-                            "dojo/text!" + templateUrl
-                        ], function (
-                            handlebars,
-                            templatestring
-                        ) {
-                            var hbsenv = new handlebars.create();
-                            hbsenv.registerHelper("gettext", function (arg) { return jedobj.gettext(arg); });
-                            var template = hbsenv.compile(templatestring, {}, hbsenv);
-                            load(template({}));
-                        });
-                    }
+                    load(jedobj);
                 },
                 function (error) {
                     console.error(error);
