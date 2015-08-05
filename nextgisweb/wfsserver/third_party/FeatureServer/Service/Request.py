@@ -44,7 +44,7 @@ class Request (object):
 
         try:
             self.get_layer(path_info, params)
-        except NoLayerException as e:
+        except NoLayerException:
             a = Action()
 
             if params.has_key('service') and params['service'].lower() == 'wfs':
@@ -75,7 +75,7 @@ class Request (object):
         elif request_method == "POST" or request_method == "PUT" or (request_method == "OPTIONS" and len(post_data) > 0):
             actions = self.handle_post(
                 params, path_info, host, post_data, request_method,
-                                       format_obj=format_obj)
+                format_obj=format_obj)
             for action in actions:
                 self.actions.append(action)
 
@@ -212,14 +212,15 @@ class Request (object):
                         actions.append(action)
 
                 elif hasattr(format_obj, 'parse'):
+                    # import ipdb; ipdb.set_trace()
                     format_obj.parse(post_data)
 
                     transactions = format_obj.getActions()
                     if transactions is not None:
                         for transaction in transactions:
                             action = Action()
-                            action.method = transaction.__class__.__name__.lower(
-                            )
+                            action.method = \
+                                transaction.__class__.__name__.lower()
                             action.layer = transaction.getLayerName()
                             action.wfsrequest = transaction
                             actions.append(action)

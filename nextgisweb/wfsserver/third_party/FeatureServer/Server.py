@@ -34,6 +34,8 @@ from ..FeatureServer.Exceptions.WebFeatureService.InvalidValueException import \
 from ..FeatureServer.Exceptions.ConnectionException import ConnectionException
 from ..FeatureServer.Exceptions.LayerNotFoundException import \
     LayerNotFoundException
+from ..FeatureServer.Exceptions.OperationParsingFailedException import \
+    OperationParsingFailedException
 
 from ..web_request.response import Response
 
@@ -125,6 +127,8 @@ class Server (object):
         except ConnectionException as e:
             exceptionReport.add(e)
         except LayerNotFoundException as e:
+            exceptionReport.add(e)
+        except OperationParsingFailedException as e:
             exceptionReport.add(e)
 
         if len(exceptionReport) > 0:

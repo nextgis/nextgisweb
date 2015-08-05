@@ -1,13 +1,17 @@
 '''
-Created on Dec 10, 2011
-
-@author: michel
+The code is based on featureserver's code
 '''
 from lxml import etree
 from lxml import objectify
-from ...FeatureServer.WebFeatureService.FilterEncoding.FilterEncoding import FilterEncoding
-from ...FeatureServer.WebFeatureService.Transaction.Transaction import Transaction
+
+from ...FeatureServer.WebFeatureService.FilterEncoding.FilterEncoding import \
+    FilterEncoding
+from ...FeatureServer.WebFeatureService.Transaction.Transaction import \
+    Transaction
 from ...FeatureServer.WebFeatureService.FilterEncoding.Select import Select
+from ...FeatureServer.Exceptions.OperationParsingFailedException import \
+    OperationParsingFailedException
+
 from copy import deepcopy
 
 
@@ -32,8 +36,8 @@ class WFSRequest(object):
 
         try:
             self.dom = etree.XML(self.data, parser=self.parser)
-        except Exception as e:
-            ''' '''
+        except Exception:
+            raise OperationParsingFailedException(self.data)
 
     def render(self, datasource):
         '''
