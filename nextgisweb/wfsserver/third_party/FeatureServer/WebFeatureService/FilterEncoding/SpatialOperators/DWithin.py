@@ -6,6 +6,7 @@ Created on May 9, 2011
 
 from .....FeatureServer.WebFeatureService.FilterEncoding.SpatialOperators.SpatialOperator import SpatialOperator
 
+
 class DWithin(SpatialOperator):
+
     ''' '''
-            

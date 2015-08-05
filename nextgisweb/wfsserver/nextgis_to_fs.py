@@ -22,6 +22,7 @@ from .third_party.FeatureServer.WebFeatureService.Response.DeleteResult import D
 
 
 class NextgiswebDatasource(DataSource):
+
     '''Class to convert nextgislayer to featureserver datasource
     '''
 
@@ -57,7 +58,8 @@ class NextgiswebDatasource(DataSource):
     @property
     def geom_col(self):
 
-        # Setup geometry column name. But some resources do not provide the name
+        # Setup geometry column name. But some resources do not provide the
+        # name
         try:
             geom_col = self.layer.column_geom
         except AttributeError:
@@ -85,7 +87,7 @@ class NextgiswebDatasource(DataSource):
         return self.attribute_cols
 
     # FeatureServer.DataSource
-    def select (self, params):
+    def select(self, params):
         if self.query is None:
             self._setup_query()
 
@@ -105,7 +107,7 @@ class NextgiswebDatasource(DataSource):
 
         return features
 
-    def update (self, action):
+    def update(self, action):
         """ В action.wfsrequest хранится объект Transaction.Update
         нужно его распарсить и выполнить нужные действия
         """
@@ -142,7 +144,7 @@ class NextgiswebDatasource(DataSource):
 
         return None
 
-    def insert (self, action):
+    def insert(self, action):
         """ В action.wfsrequest хранится объект Transaction.Insert
         нужно его распарсить и выполнить нужные действия
         """
@@ -170,7 +172,6 @@ class NextgiswebDatasource(DataSource):
 
         return None
 
-
     def delete(self, action, response=None):
         """ В action.wfsrequest хранится объект Transaction.Delete
         нужно его распарсить и выполнить нужные действия
@@ -189,7 +190,7 @@ class NextgiswebDatasource(DataSource):
         try:
             field = self.layer.field_by_keyname(attribute)
             field_type = field.datatype
-        except KeyError: # the attribute can be=='*', that causes KeyError
+        except KeyError:  # the attribute can be=='*', that causes KeyError
             field_type = FIELD_TYPE.STRING
 
         if field_type == FIELD_TYPE.INTEGER:
@@ -206,10 +207,7 @@ class NextgiswebDatasource(DataSource):
         Наверное есть способ лучше, но я не нашел.
         Кто знает -- правьте
         """
-        gml = str(gml)      # CreateGeometryFromGML не умеет работать с уникодом
+        gml = str(gml)
+                  # CreateGeometryFromGML не умеет работать с уникодом
         ogr_geo = ogr.CreateGeometryFromGML(gml)
         return shapely.wkt.loads(ogr_geo.ExportToWkt())
-
-
-
-

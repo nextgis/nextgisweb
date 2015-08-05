@@ -5,6 +5,7 @@ Created on Oct 16, 2011
 '''
 import re
 
+
 class TransactionAction(object):
 
     def __init__(self, node):
@@ -14,12 +15,11 @@ class TransactionAction(object):
         self.type = ''
         self.node = node
         self.layer_name = None
-        
 
     def setStatement(self, stmt):
         self.stmt = stmt
-    
-    def getStatement(self, datasource = None):
+
+    def getStatement(self, datasource=None):
         if self.stmt == None and datasource != None:
             self.createStatement(datasource)
         return self.stmt
@@ -30,9 +30,9 @@ class TransactionAction(object):
         return self.layer_name
 
     def setLayerName(self): pass
-    
+
     def createStatement(self, datasource): pass
-    
+
     def __len__(self):
         return len(self.children)
 
@@ -64,7 +64,7 @@ class TransactionAction(object):
         return str(self.node.tag)
     #
     # def removeAdditionalColumns(self, datasource):
-    #     #filter out additional cols (they can not be saved)
+    # filter out additional cols (they can not be saved)
     #     if hasattr(datasource, "additional_cols"):
     #         for additional_col in datasource.additional_cols.split(';'):
     #             name = additional_col
@@ -76,4 +76,3 @@ class TransactionAction(object):
     #             if len(nodes) > 0:
     #                 for node in nodes:
     #                     self.node.remove(node)
-
