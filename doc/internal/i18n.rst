@@ -27,19 +27,19 @@
 
 ::
 
-    (env) $ nextgisweb-i18n --package foo --component bar extract
+    (env) $ nextgisweb-i18n --package foo extract bar
 
 В результате будет создан pot-файл `foo/foo/locale/bar.pot`. Поскольку этот файл в любой момент можно сгенерировать, не нужно помещать его внутрь системы контроля версий. На основании pot-файла создаем po-файл для русского языка:
 
 ::
 
-    (env) $ nextgisweb-i18n --package foo --component bar init ru
+    (env) $ nextgisweb-i18n --package foo init bar ru
 
 В результате будет создан po-файл `foo/foo/locale/ru/LC_MESSAGES/bar.pot` (это стандартная структура для gettext, возможно мы от нее откажемся в пользу более простой). Этот файл нужно заполнить в соответствии с переводом указанных в нем строк при помощи текстового редактора или специализированного редактора po-файлов. После того как все готово, компилируем po-файлы в mo-файлы, которые так же не нужно помещать в систему контроля версий:
 
 ::
 
-    (env) $ nextgisweb-i18n --package foo --component bar compile
+    (env) $ nextgisweb-i18n --package foo compile bar
 
 Ниже приведена итоговая структура каталогов. Файлы `bar.jed` - это аналог mo-файла для javascript-библиотеки `jed <http://slexaxton.github.io/Jed/>`_, которая используется для локализации на стороне клиента. Эти файлы так же создаются на этапе компиляции и представляют из себя json-файлы.
 
@@ -61,10 +61,10 @@
 
 ::
 
-    (env) $ nextgisweb-i18n --package foo --component bar extract
-    (env) $ nextgisweb-i18n --package foo --component bar update ru
+    (env) $ nextgisweb-i18n --package foo extract bar
+    (env) $ nextgisweb-i18n --package foo update bar
     (env) $ nano foo/foo/locale/ru/LC_MESSAGES/bar.po
-    (env) $ nextgisweb-i18n --package foo --component bar compile
+    (env) $ nextgisweb-i18n --package foo compile bar
 
 
 Cервер
