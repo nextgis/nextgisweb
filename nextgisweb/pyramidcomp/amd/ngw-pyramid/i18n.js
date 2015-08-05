@@ -13,7 +13,7 @@ define([
 
     return {
         load: function (comp, parentRequire, load) {
-            xhr.get(route.pyramid.locdata(locale, comp), {
+            xhr.get(route.pyramid.locdata(comp, locale), {
                 handleAs: "json",
                 headers: { "Accept": "application/json" }
             }).then(
