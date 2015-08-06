@@ -76,6 +76,23 @@ class WFSRequest(object):
 
         return [action]
 
+    def getFeatureAction(self):
+        '''Return GetFeature action
+        '''
+        action = Action()
+        action.method = 'select'
+        action.request = u'GetFeature'
+
+        try:
+            action.layer = self.dom.Query.attrib['typeName']
+        except:
+            raise OperationParsingFailedException
+
+        if 'version' in self.dom.keys():
+            action.version = self.dom.get('version')
+
+        return [action]
+
     def get_transactions(self):
         '''Returns all WFS-T actions
         '''
@@ -109,6 +126,18 @@ class WFSRequest(object):
             return None
 
         if self.dom.xpath("//*[local-name() = 'DescribeFeatureType']"):
+            return True
+        else:
+            return False
+
+    def isGetFeature(self):
+        '''Check if request is GetFeature request
+        '''
+
+        if self.dom is None:
+            return None
+
+        if self.dom.xpath("//*[local-name() = 'GetFeature']"):
             return True
         else:
             return False

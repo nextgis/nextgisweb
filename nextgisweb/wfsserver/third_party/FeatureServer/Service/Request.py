@@ -184,8 +184,9 @@ class Request (object):
             raise NoLayerException(
                 "Request", message="Could not obtain data source from layer parameter or path info.")
 
-    def handle_post(self, params, path_info, host, post_data, request_method, format_obj=None):
-        """Read data from the request and turn it into an UPDATE/DELETE action."""
+    def handle_post(self, params, path_info, host, post_data,
+                    request_method, format_obj=None):
+        """Read data from the request and turn it into actions."""
 
         if format_obj:
             actions = []
@@ -219,7 +220,10 @@ class Request (object):
                         return format_obj.getCapabilitiesAction()
                     elif format_obj.isDescribeFeatureType():
                         return format_obj.describeFeatureTypeAction()
+                    elif format_obj.isGetFeature():
+                        return format_obj.getFeatureAction()
 
+                    # It is transaction request.
                     transactions = format_obj.getActions()
                     if transactions is not None:
                         for transaction in transactions:
