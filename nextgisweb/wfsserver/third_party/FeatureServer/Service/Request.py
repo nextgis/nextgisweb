@@ -217,6 +217,8 @@ class Request (object):
 
                     if format_obj.isGetCapabilities():
                         return format_obj.getCapabilitiesAction()
+                    elif format_obj.isDescribeFeatureType():
+                        return format_obj.describeFeatureTypeAction()
 
                     transactions = format_obj.getActions()
                     if transactions is not None:

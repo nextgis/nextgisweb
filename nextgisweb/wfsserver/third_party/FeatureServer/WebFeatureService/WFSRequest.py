@@ -58,7 +58,19 @@ class WFSRequest(object):
         '''Returns GetCapabilities action
         '''
         action = Action()
-        action.request = 'GetCapabilities'
+        action.request = u'GetCapabilities'
+        action.method = 'select'
+        if 'version' in self.dom.keys():
+            action.version = self.dom.get('version')
+
+        return [action]
+
+    def describeFeatureTypeAction(self):
+        '''Return DescribeFeatureType action
+        '''
+        action = Action()
+        action.method = 'select'
+        action.request = u'DescribeFeatureType'
         if 'version' in self.dom.keys():
             action.version = self.dom.get('version')
 
@@ -85,6 +97,18 @@ class WFSRequest(object):
             return None
 
         if self.dom.xpath("//*[local-name() = 'GetCapabilities']"):
+            return True
+        else:
+            return False
+
+    def isDescribeFeatureType(self):
+        '''Check if request is DescribeFeatureType request
+        '''
+
+        if self.dom is None:
+            return None
+
+        if self.dom.xpath("//*[local-name() = 'DescribeFeatureType']"):
             return True
         else:
             return False
