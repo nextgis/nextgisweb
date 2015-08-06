@@ -215,6 +215,9 @@ class Request (object):
                     # import ipdb; ipdb.set_trace()
                     format_obj.parse(post_data)
 
+                    if format_obj.isGetCapabilities():
+                        return format_obj.getCapabilitiesAction()
+
                     transactions = format_obj.getActions()
                     if transactions is not None:
                         for transaction in transactions:

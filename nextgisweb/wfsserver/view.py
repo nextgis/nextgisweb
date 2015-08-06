@@ -22,21 +22,22 @@ class ServiceWidget(Widget):
 
 
 def handler(obj, request):
-
     # import ipdb; ipdb.set_trace()
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
 
-    if params.get('SERVICE') != 'WFS':
-        return
+    # if params.get('SERVICE') != 'WFS':
+    #     return
 
     req = params.get('REQUEST')
     post_data = request.body
     request_method = request.method
 
-    # If request_method is POST and request is 'simple' method
-    # change the requset_methot to GET. It allows do not rewrite
+    # If request_method is POST and request is KeyValue Parameter request
+    # change the requset_method to GET. It allows do not rewrite
     # featureserver's parsing methods. (Featureserver expects GET
-    # requests and none post_data)
+    # requests and none post_data in case of KVP).
+    # (If request method is POST and post_data is XML, we'll pass the
+    # data to Service.Request method)
     if request_method == 'POST' and req in \
             ['GetCapabilities', 'DescribeFeatureType', 'GetFeature']:
         request_method = 'GET'
