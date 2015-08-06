@@ -70,7 +70,7 @@ define([
                 if (val === null) {
                     // pass
                 } else if (field.datatype == "DATE") {
-                    val = locale.format(new Date(val.year, val.month, val.day), {
+                    val = locale.format(new Date(val.year, val.month - 1, val.day), {
                         selector: "date",
                         formatLength: "medium"
                     });
@@ -80,7 +80,7 @@ define([
                         formatLength: "medium"
                     });
                 } else if (field.datatype == "DATETIME") {
-                    val = locale.format(new Date(val.year, val.month, val.day, val.hour, val.minute, val.second), {
+                    val = locale.format(new Date(val.year, val.month - 1, val.day, val.hour, val.minute, val.second), {
                         formatLength: "medium"
                     });
                 }
