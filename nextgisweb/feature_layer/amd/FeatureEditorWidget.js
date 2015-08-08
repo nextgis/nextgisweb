@@ -280,7 +280,10 @@ define([
             xhr(this.iurl(), {
                 method: "PUT",
                 handleAs: "json",
-                data: json.stringify(data)
+                data: json.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }).then(function () {
                 widget.load();
             });
