@@ -35,6 +35,7 @@ class WFSRequest(object):
         # self.data = self.data.replace('singleChar="*"', 'singleChar="\*"')
         # self.data = self.data.replace('singleChar="?"', 'singleChar="\?"')
 
+        # import ipdb; ipdb.set_trace()
         try:
             self.dom = etree.XML(self.data, parser=self.parser)
         except Exception:
@@ -83,8 +84,17 @@ class WFSRequest(object):
         action.method = 'select'
         action.request = u'GetFeature'
 
+        if 'version' in self.dom.keys():
+            action.version = self.dom.get('version')
+
+        attr = dict((k.upper(), v)
+                    for k, v in self.dom.Query.attrib.iteritems())
+
         try:
-            action.layer = self.dom.Query.attrib['typeName']
+            if action.version == '2.0.0':
+                action.layer = attr['TYPENAMES']
+            else:
+                action.layer = attr['TYPENAME']
         except:
             raise OperationParsingFailedException
 

@@ -212,7 +212,6 @@ version="1.0.0"
         # import ipdb; ipdb.set_trace()
         elements = root.xpath(
             "ows:OperationsMetadata/*/ows:DCP/ows:HTTP",
-            # "wfs:Capability/wfs:Request/wfs:GetCapabilities/wfs:DCPType/wfs:HTTP",
             namespaces=self.namespaces)
         if len(elements) > 0:
             for element in elements:
@@ -228,7 +227,6 @@ version="1.0.0"
                 featureList[0].append(layer)
 
         return tree
-
 
     def getcapabilities100(self, tree):
         '''Return GetCapabilities responce for 1.0.0 version
