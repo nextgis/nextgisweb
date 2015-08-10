@@ -1,7 +1,6 @@
 from ...vectorformats.Formats.Format import Format
 from lxml import etree
 import geojson
-import re
 
 import os
 
@@ -23,6 +22,8 @@ class WFS(Format):
                   'ogc': 'http://www.opengis.net/ogc',
                   'xsd': 'http://www.w3.org/2001/XMLSchema',
                   'gml': 'http://www.opengis.net/gml',
+                  'ows': 'http://www.opengis.net/ows/1.1',
+                  'xlink': 'http://www.w3.org/1999/xlink',
                   'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
 
     def encode(self, features, **kwargs):
@@ -198,43 +199,72 @@ version="1.0.0"
                 </wfs:TransactionResult>"""
 
         result += """</wfs:TransactionResponse>"""
-
         return result
 
-    def getcapabilities(self, version):
+    def getcapabilities200(self, tree):
+        '''Return GetCapabilities responce for 2.0.0 version
 
-        try:
-          tree = etree.parse(os.path.join(XMLDATADIR, version,
-                                          "wfs-capabilities.xml"))
-        except IOError:
-            # TODO: raise exception about wrong version number
-            raise
+        :param tree:    XML pattren of responce
+        :type tree:     lxml element
+        '''
+        root = tree.getroot()
 
+        # import ipdb; ipdb.set_trace()
+        elements = root.xpath(
+            "ows:OperationsMetadata/*/ows:DCP/ows:HTTP",
+            # "wfs:Capability/wfs:Request/wfs:GetCapabilities/wfs:DCPType/wfs:HTTP",
+            namespaces=self.namespaces)
+        if len(elements) > 0:
+            for element in elements:
+                for method in element:
+                    method.attrib['{%s}href' % (self.namespaces['xlink'])] = \
+                        self.host + '?'
+
+        # import ipdb; ipdb.set_trace()
+        layers = self.getlayers()
+        featureList = root.xpath("//*[local-name() = 'FeatureTypeList']")
+        if len(featureList) > 0 and len(layers) > 0:
+            for layer in layers:
+                featureList[0].append(layer)
+
+        return tree
+
+
+    def getcapabilities100(self, tree):
+        '''Return GetCapabilities responce for 1.0.0 version
+
+        :param tree:    XML pattren of responce
+        :type tree:     lxml element
+        '''
         root = tree.getroot()
 
         elements = root.xpath(
-            "wfs:Capability/wfs:Request/wfs:GetCapabilities/wfs:DCPType/wfs:HTTP", namespaces=self.namespaces)
+            "wfs:Capability/wfs:Request/wfs:GetCapabilities/wfs:DCPType/wfs:HTTP",
+            namespaces=self.namespaces)
         if len(elements) > 0:
             for element in elements:
                 for http in element:
                     http.set('onlineResource', self.host + '?')
 
         elements = root.xpath(
-            "wfs:Capability/wfs:Request/wfs:DescribeFeatureType/wfs:DCPType/wfs:HTTP", namespaces=self.namespaces)
+            "wfs:Capability/wfs:Request/wfs:DescribeFeatureType/wfs:DCPType/wfs:HTTP",
+            namespaces=self.namespaces)
         if len(elements) > 0:
             for element in elements:
                 for http in element:
                     http.set('onlineResource', self.host + '?')
 
         elements = root.xpath(
-            "wfs:Capability/wfs:Request/wfs:GetFeature/wfs:DCPType/wfs:HTTP", namespaces=self.namespaces)
+            "wfs:Capability/wfs:Request/wfs:GetFeature/wfs:DCPType/wfs:HTTP",
+            namespaces=self.namespaces)
         if len(elements) > 0:
             for element in elements:
                 for http in element:
                     http.set('onlineResource', self.host + '?')
 
         elements = root.xpath(
-            "wfs:Capability/wfs:Request/wfs:Transaction/wfs:DCPType/wfs:HTTP", namespaces=self.namespaces)
+            "wfs:Capability/wfs:Request/wfs:Transaction/wfs:DCPType/wfs:HTTP",
+            namespaces=self.namespaces)
         if len(elements) > 0:
             for element in elements:
                 for http in element:
@@ -246,6 +276,24 @@ version="1.0.0"
         if len(featureList) > 0 and len(layers) > 0:
             for layer in layers:
                 featureList[0].append(layer)
+
+        return tree
+
+    def getcapabilities(self, version):
+
+        try:
+            tree = etree.parse(os.path.join(XMLDATADIR, version,
+                                            "wfs-capabilities.xml"))
+        except IOError:
+            # TODO: raise exception about wrong version number
+            raise
+
+        if version == '1.0.0':
+            tree = self.getcapabilities100(tree)
+        elif version == '2.0.0':
+            tree = self.getcapabilities200(tree)
+        else:
+            raise NotImplementedError
 
         return etree.tostring(tree, pretty_print=True, encoding='utf-8')
 
@@ -382,14 +430,14 @@ version="1.0.0"
                 element = etree.Element(
                     'element', attrib={'name': datasource.geom_col,
                                        'type': 'gml:MultiLineStringPropertyType',
-                                       #'ref' : 'gml:curveProperty',
+                                       # 'ref' : 'gml:curveProperty',
                                        'minOccurs': '0'})
                 sequence.append(element)
             elif property == 'Polygon':
                 element = etree.Element(
                     'element', attrib={'name': datasource.geom_col,
                                        'type': 'gml:MultiPolygonPropertyType',
-                                       #'substitutionGroup' : 'gml:_Surface',
+                                       # 'substitutionGroup' : 'gml:_Surface',
                                        'minOccurs': '0'})
                 sequence.append(element)
 

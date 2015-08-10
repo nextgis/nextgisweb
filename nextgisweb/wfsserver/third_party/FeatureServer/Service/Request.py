@@ -223,7 +223,7 @@ class Request (object):
                     elif format_obj.isGetFeature():
                         return format_obj.getFeatureAction()
 
-                    # It is transaction request.
+                    # It is a transaction request.
                     transactions = format_obj.getActions()
                     if transactions is not None:
                         for transaction in transactions:
