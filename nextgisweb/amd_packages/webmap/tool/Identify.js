@@ -292,7 +292,10 @@ define([
                     // XHR-запрос к сервису
                     xhr.post(route.feature_layer.identify(), {
                         handleAs: "json",
-                        data: json.stringify(request)
+                        data: json.stringify(request),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
                     }).then(function (response) {
                         tool._responsePopup(response, point, layerLabels);
                     }).otherwise(console.error);
