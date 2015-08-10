@@ -30,6 +30,7 @@ def pkginfo():
         'feature_layer',
         'feature_description',
         'feature_attachment',
+        'render',
         'style',
         'marker_library',
         'webmap',
