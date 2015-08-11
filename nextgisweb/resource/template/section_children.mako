@@ -12,7 +12,7 @@
         <tr>
             <td>${idx}</td>
             <td><a style="display: block" href="${child.permalink(request)}">${child.display_name}</a></td>
-            <td>${child.cls_display_name}</td>
+            <td>${tr(child.cls_display_name)}</td>
             <td>${child.owner_user}</td>
             <td style="white-space: nowrap">
                 <a class="dijitIconEdit" style="width: 16px; height: 16px; display: inline-block;" href="${request.route_url('resource.update', id=child.id)}"></a>

@@ -15,8 +15,18 @@ from .backup import BackupBase, TableBackup, SequenceBackup  # NOQA
 class CoreComponent(Component):
     identity = 'core'
 
+    def __init__(self, env, settings):
+        super(CoreComponent, self).__init__(env, settings)
+        self.locale = None
+        self.debug = False
+
     def initialize(self):
         Component.initialize(self)
+
+        self.locale = self._settings.get('locale', 'en')
+
+        setting_debug = self._settings.get('debug', 'false').lower()
+        self.debug = setting_debug in ('true', 'yes', '1')
 
         sa_url = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
             user=self._settings.get('database.user', 'nextgisweb'),
@@ -28,7 +38,9 @@ class CoreComponent(Component):
         self.engine = create_engine(sa_url)
         self._sa_engine = self.engine
 
-        if self._settings.get('database.check_at_startup', 'no').lower() in ('yes', 'true'):
+        setting_check_at_startup = self._settings.get(
+            'database.check_at_startup', 'false').lower()
+        if setting_check_at_startup in ('true', 'yes', '1'):
             conn = self._sa_engine.connect()
             conn.close()
 
@@ -101,5 +113,7 @@ class CoreComponent(Component):
         dict(key='packages.ignore', desc=u"Не загружать перечисленные пакеты"),
         dict(key='components.ignore', desc=u"Не загружать перечисленные компоненты"),
 
-        dict(key='sdir', desc=u"Директория для хранения данных")
+        dict(key='locale', desc=u"Локаль, используемая по-умолчанию"),
+        dict(key='debug', desc=u"Дополнительный инструментарий для отладки"),
+        dict(key='sdir', desc=u"Директория для хранения данных"),
     )

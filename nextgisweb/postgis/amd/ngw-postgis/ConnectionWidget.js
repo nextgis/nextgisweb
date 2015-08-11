@@ -5,8 +5,11 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "ngw-pyramid/i18n!postgis",
+    "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
-    "dojo/text!./template/ConnectionWidget.html",
+    // resource
+    "dojo/text!./template/ConnectionWidget.hbs",
     // template
     "dijit/form/ValidationTextBox",
     "dojox/layout/TableContainer"
@@ -16,12 +19,14 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    i18n,
+    hbsI18n,
     serialize,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
-        title: "Соединение PostGIS",
-        templateString: template,
+        title: i18n.gettext("PostGIS connection"),
+        templateString: hbsI18n(template, i18n),
         prefix: "postgis_connection"
     });
 });

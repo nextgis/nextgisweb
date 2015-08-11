@@ -40,7 +40,11 @@
         var dojoConfig = {
             async: true,
             isDebug: true,
-            baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n}
+            packages: [
+                {name: "jed", main: "jed", location: ${request.static_url('nextgisweb:static/jed/') | json.dumps, n }}
+            ],
+            baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n},
+            locale: ${request.locale_name | json.dumps, n}
         };
     </script>
 
