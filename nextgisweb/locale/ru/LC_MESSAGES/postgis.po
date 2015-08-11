@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-08-04 02:40+0400\n"
+"POT-Creation-Date: 2015-08-12 00:11+0300\n"
 "PO-Revision-Date: 2015-08-02 14:57+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -30,18 +30,17 @@ msgstr "Линия"
 msgid "Polygon"
 msgstr "Полигон"
 
-#: model.py:55 amd/ngw-postgis/ConnectionWidget.js:25
+#: model.py:55 amd/ngw-postgis/ConnectionWidget.js:28
 msgid "PostGIS connection"
 msgstr "Соединение PostGIS"
 
-#: model.py:140 amd/ngw-postgis/LayerWidget.js:31
+#: model.py:140 amd/ngw-postgis/LayerWidget.js:33
 msgid "PostGIS layer"
 msgstr "Слой PostGIS"
 
 #: model.py:200
-#, python-format
-msgid "Table '%s' not found!"
-msgstr "Таблица '%s' не найдена!"
+msgid "Table '$table' not found!"
+msgstr "Таблица '$table' не найдена!"
 
 #: model.py:217
 msgid ""
@@ -61,11 +60,9 @@ msgstr ""
 "Для использования поля в качестве идентификатора оно должно иметь "
 "целочисленный тип!"
 
-
 #: model.py:280 model.py:283
-#, python-format
-msgid "Column '%s' not found!"
-msgstr "Поле '%s' не найдено!"
+msgid "Column '$column' not found!"
+msgstr "Поле '$column' не найдено!"
 
 #: amd/ngw-postgis/template/ConnectionWidget.hbs:9
 msgid "Host"
@@ -126,4 +123,3 @@ msgstr "Оставить"
 #: amd/ngw-postgis/template/LayerWidget.hbs:57
 msgid "Reload"
 msgstr "Загрузить"
-
