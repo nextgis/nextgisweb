@@ -24,7 +24,7 @@ def image(request):
         if aimg is None:
             aimg = rimg
         else:
-            aimg.paste(rimg, None)
+            aimg = Image.alpha_composite(aimg, rimg)
 
     # Если не было ресурсов для отрисовки, возвращаем пустую картинку
     if aimg is None:
