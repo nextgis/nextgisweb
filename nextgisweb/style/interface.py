@@ -10,6 +10,12 @@ class IRenderableStyle(IResourceBase):
         pass
 
 
+class ILegendableStyle(IResourceBase):
+
+    def render_legend(self):
+        pass
+
+
 class IExtentRenderRequest(Interface):
 
     def render_extent(self, extent, size):
