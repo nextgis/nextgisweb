@@ -2,8 +2,11 @@
 from ...FeatureServer.Service.Action import Action
 from ...FeatureServer.WebFeatureService.WFSRequest import WFSRequest
 from ...web_request.handlers import ApplicationException
-from ...FeatureServer.Exceptions.LayerNotFoundException import LayerNotFoundException
+from ...FeatureServer.Exceptions.LayerNotFoundException import \
+    LayerNotFoundException
 from ...FeatureServer.Exceptions.NoLayerException import NoLayerException
+from ...FeatureServer.Exceptions.InvalidValueWFSException import \
+    InvalidValueWFSException
 
 
 class Request (object):
@@ -129,11 +132,29 @@ class Request (object):
                     if "__" in key:
                         key, qtype = key.split("__")
                     if key == 'bbox':
-                        action.bbox = map(float, value.split(","))
+                        try:
+                            action.bbox = map(float, value.split(","))
+                        except ValueError:
+                            raise InvalidValueWFSException(
+                                message="Bbox values are't numeric: '%s'"
+                                % (value, )
+                            )
                     elif key == "maxfeatures":
-                        action.maxfeatures = int(value)
+                        try:
+                            action.maxfeatures = int(value)
+                        except ValueError:
+                            raise InvalidValueWFSException(
+                                message="Maxfeatures value isn't integer: '%s'"
+                                % (value, )
+                            )
                     elif key == "startfeature":
-                        action.startfeature = int(value)
+                        try:
+                            action.startfeature = int(value)
+                        except ValueError:
+                            raise InvalidValueWFSException(
+                                message="Startfeature value isn't integer: '%s'"
+                                % (value, )
+                            )
                     elif key == "request":
                         action.request = value
                     elif key == "version":

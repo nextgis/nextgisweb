@@ -84,6 +84,8 @@ class WFSRequest(object):
         action.method = 'select'
         action.request = u'GetFeature'
 
+        # import ipdb; ipdb.set_trace()
+
         if 'version' in self.dom.keys():
             action.version = self.dom.get('version')
 
@@ -97,9 +99,6 @@ class WFSRequest(object):
                 action.layer = attr['TYPENAME']
         except:
             raise OperationParsingFailedException
-
-        if 'version' in self.dom.keys():
-            action.version = self.dom.get('version')
 
         return [action]
 

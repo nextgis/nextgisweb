@@ -25,9 +25,6 @@ def handler(obj, request):
     # import ipdb; ipdb.set_trace()
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
 
-    # if params.get('SERVICE') != 'WFS':
-    #     return
-
     req = params.get('REQUEST')
     post_data = request.body
     request_method = request.method

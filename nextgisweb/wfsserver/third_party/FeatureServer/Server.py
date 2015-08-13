@@ -8,17 +8,6 @@ __license__ = "Clear BSD"
 """
 
 
-class FeatureServerException(Exception):
-
-    """Propagate exception raised by featureserver.
-    """
-
-    def __init__(self, mime, data, headers, encoding):
-        self.mime = mime
-        self.data = data
-        self.headers = headers
-        self.encoding = encoding
-
 from ..FeatureServer.Service.WFS import WFS
 from ..FeatureServer.Service.GeoJSON import GeoJSON
 
@@ -36,8 +25,21 @@ from ..FeatureServer.Exceptions.LayerNotFoundException import \
     LayerNotFoundException
 from ..FeatureServer.Exceptions.OperationParsingFailedException import \
     OperationParsingFailedException
+from Exceptions.InvalidValueWFSException import InvalidValueWFSException
+
 
 from ..web_request.response import Response
+
+class FeatureServerException(Exception):
+
+    """Propagate exception raised by featureserver.
+    """
+
+    def __init__(self, mime, data, headers, encoding):
+        self.mime = mime
+        self.data = data
+        self.headers = headers
+        self.encoding = encoding
 
 
 class Server (object):
@@ -129,6 +131,8 @@ class Server (object):
         except LayerNotFoundException as e:
             exceptionReport.add(e)
         except OperationParsingFailedException as e:
+            exceptionReport.add(e)
+        except InvalidValueWFSException as e:
             exceptionReport.add(e)
 
         if len(exceptionReport) > 0:
