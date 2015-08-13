@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from ..component import Component, require
 
-from .ident import COMP_ID
+from .util import COMP_ID
 from .model import Base
 
 

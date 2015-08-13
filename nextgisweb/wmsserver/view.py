@@ -47,6 +47,8 @@ def handler(obj, request):
         return _get_map(obj, request)
     elif req == 'GetFeatureInfo':
         return _get_feature_info(obj, request)
+    elif req == 'GetLegendGraphic':
+        return _get_legend_graphic(obj, request)
     else:
         raise HTTPBadRequest("Invalid REQUEST parameter value.")
 
@@ -82,6 +84,9 @@ def _get_capabilities(obj, request):
                 DCPType()),
             E.GetFeatureInfo(
                 E.Format('text/html'),
+                DCPType()),
+            E.GetLegendGraphic(
+                E.Format('image/png'),
                 DCPType())
         ),
         E.Exception(E.Format('text/xml'))
@@ -219,6 +224,20 @@ def _get_feature_info(obj, request):
         'nextgisweb:wmsserver/template/get_feature_info_html.mako',
         dict(results=results, resource=obj), request=request
     ), content_type=b'text/html', charset=b'utf-8')
+
+
+def _get_legend_graphic(obj, request):
+    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+    p_layer = params.get('LAYER')
+
+    lmap = dict([(l.keyname, l) for l in obj.layers])
+    layer = lmap[p_layer]
+
+    request.resource_permission(DataScope.read, layer.resource)
+
+    img = layer.resource.render_legend()
+
+    return Response(body_file=img, content_type=b'image/png')
 
 
 def setup_pyramid(comp, config):

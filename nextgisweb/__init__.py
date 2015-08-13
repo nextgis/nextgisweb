@@ -30,6 +30,7 @@ def pkginfo():
         'feature_layer',
         'feature_description',
         'feature_attachment',
+        'render',
         'style',
         'marker_library',
         'webmap',
@@ -80,6 +81,7 @@ def amd_packages():
         ('xstyle', 'nextgisweb:amd_packages/contrib/xstyle'),
         ('put-selector', 'nextgisweb:amd_packages/contrib/put-selector'),
         ('dgrid', 'nextgisweb:amd_packages/contrib/dgrid'),
+        ('handlebars', 'nextgisweb:amd_packages/contrib/handlebars'),
 
         # Пакеты nextgisweb
         ('ngw', 'nextgisweb:amd_packages/ngw'),
@@ -88,6 +90,7 @@ def amd_packages():
         ('wmsclient', 'nextgisweb:amd_packages/wmsclient'),
 
         # Пакеты компонентов
+        ('ngw-pyramid', 'nextgisweb:pyramidcomp/amd/ngw-pyramid'),
         ('ngw-resource', 'nextgisweb:resource/amd/ngw-resource'),
         ('ngw-resmeta', 'nextgisweb:resmeta/amd/ngw-resmeta'),
         ('ngw-feature-layer', 'nextgisweb:feature_layer/amd'),

@@ -5,13 +5,15 @@ from .interface import (
     IRenderableStyle,
     IExtentRenderRequest,
     ITileRenderRequest,
+    ILegendableStyle,
 )
 
 __all__ = [
     'StyleComponent',
     'IRenderableStyle',
     'IExtentRenderRequest',
-    'ITileRenderRequest'
+    'ITileRenderRequest',
+    'ILegendableStyle'
 ]
 
 

@@ -6,55 +6,55 @@
         <div data-dojo-type="ngw-resource/ResourceBox"
             data-dojo-props="cls: 'postgis_connection', colspan: 2"
             data-ngw-serialize="connection"
-            title="Подключение" style="width: 100%"></div>
+            title="{{gettext 'Connection'}}" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="table"
-            title="Таблица" style="width: 100%"></div>
+            title="{{gettext 'Table'}}" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/ValidationTextBox"            
             data-dojo-props="required: true, value: 'public'"
             data-ngw-serialize="schema"
-            title="Схема" style="width: 100%"></div>
+            title="{{gettext 'Schema'}}" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="column_id"
-            title="Поле идентификатор" style="width: 100%"></div>
+            title="{{gettext 'ID column'}}" style="width: 100%"></div>
         
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="column_geom"
-            title="Поле геометрии" style="width: 100%"></div>
+            title="{{gettext 'Geometry column'}}" style="width: 100%"></div>
         
         <select data-dojo-attach-point="geometryType" 
             data-dojo-type="dijit/form/Select"
             data-dojo-props="colspan: 2"
             data-ngw-serialize="geometry_type"
-            title="Тип геометрии" style="width: 100%">
+            title="{{gettext 'Geometry type'}}" style="width: 100%">
             
-            <option value="">Автоматически</option>
-            <option value="POINT">Точка</option>
-            <option value="LINESTRING">Линия</option>
-            <option value="POLYGON">Полигон</option>
+            <option value="">{{gettext 'Autodetect'}}</option>
+            <option value="POINT">{{gettext 'Point'}}</option>
+            <option value="LINESTRING">{{gettext 'Line'}}</option>
+            <option value="POLYGON">{{gettext 'Polygon'}}</option>
 
         </select>
         
         <div data-dojo-attach-point="srs"
             data-dojo-type="ngw/form/SpatialRefSysSelect"
             data-dojo-props="colspan: 2"
-            title="Система&nbsp;координат" style="width: 100%"></div>
+            title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>
 
         <select data-dojo-attach-point="fields"
             data-dojo-type="dijit/form/Select"
             data-dojo-props="colspan: 2"
             data-ngw-serialize="fields"
-            title="Описания&nbsp;атрибутов"
+            title="{{gettext 'Attribute definitions'}}"
             style="width: 100%">
 
-            <option value="keep">Сохранить текущие</option>
-            <option value="update">Прочитать из базы данных</option>
+            <option value="keep">{{gettext 'Keep'}}</option>
+            <option value="update">{{gettext 'Reload'}}</option>
 
         </div>
 

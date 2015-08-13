@@ -6,9 +6,11 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "ngw-pyramid/i18n!postgis",
+    "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
     // resource
-    "dojo/text!./template/LayerWidget.html",
+    "dojo/text!./template/LayerWidget.hbs",
     // template
     "dijit/form/ValidationTextBox",
     "dijit/form/Select",
@@ -22,12 +24,14 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    i18n,
+    hbsI18n,
     serialize,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
-        title: "Слой PostGIS",
-        templateString: template,
+        title: i18n.gettext("PostGIS layer"),
+        templateString: hbsI18n(template, i18n),
         prefix: "postgis_layer",
         style: "padding: 1ex;",
 

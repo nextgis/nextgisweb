@@ -6,22 +6,22 @@
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="hostname"
-            title="Сервер" style="width: 100%"></div>
+            title="{{gettext 'Host'}}" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="database"
-            title="База данных" style="width: 100%"></div>
+            title="{{gettext 'Database'}}" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="username"
-            title="Пользователь" style="width: 100%"></div>
+            title="{{gettext 'User'}}" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true, type: 'password'"
             data-ngw-serialize="password"
-            title="Пароль" style="width: 100%"></div>
+            title="{{gettext 'Password'}}" style="width: 100%"></div>
 
     </div>
 </div>
