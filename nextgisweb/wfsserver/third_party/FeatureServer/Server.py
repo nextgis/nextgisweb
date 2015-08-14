@@ -108,6 +108,7 @@ class Server (object):
                     method = getattr(datasource, action.method)
                     try:
                         result = method(action)
+                        # import ipdb; ipdb.set_trace()
                         if isinstance(result, ActionResult):
                             transactionResponse.addResult(result)
                         elif result is not None:

@@ -105,6 +105,64 @@ class Request (object):
             return False
         return False
 
+    def _set_bbox(self, action, bbox_value):
+        """Analyze bbox parameter, set bbox attribute of the action
+        """
+        try:
+            action.bbox = map(float, bbox_value.split(","))
+        except ValueError:
+            raise InvalidValueWFSException(
+                message="Bbox values are't numeric: '%s'"
+                % (value, )
+            )
+        try:
+            minX, minY, maxX, maxY = action.bbox
+        except ValueError:
+            raise InvalidValueWFSException(
+                message="Bbox values must be in format: minX,minY,maxX,maxY"
+            )
+        if minX > maxX or (minY > maxY):
+            raise InvalidValueWFSException(
+                message="Bbox values must be: minX<maxX,minY<maxY"
+            )
+        return action
+
+    def _set_maxfeatures(self, action, maxfeatures_value):
+        """Analyze maxfeatures parameter, set maxfeatures
+        attribute of the action
+        """
+        try:
+            action.maxfeatures = int(maxfeatures_value)
+        except ValueError:
+            raise InvalidValueWFSException(
+                message="Maxfeatures value isn't integer: '%s'"
+                % (value, )
+            )
+        return action
+
+    def _set_startfeature(self, action, startfeature_value):
+        """Analyze startfeature parameter, set startfeature
+        attribute of the action
+        """
+        try:
+            action.startfeature = int(startfeature_value)
+        except ValueError:
+            raise InvalidValueWFSException(
+                message="Startfeature value isn't integer: '%s'"
+                % (value, )
+            )
+        return action
+
+    def _set_filter(self, action, filter_value):
+        """Analyze filters
+        """
+        action.wfsrequest = WFSRequest()
+        try:
+            action.wfsrequest.parse(filter_value)
+        except Exception:
+            ''' '''
+        return action
+
     def get_select_action(self, path_info, params):
         """Generate a select action from a URL. Used unmodified by most
             subclasses. Handles attribute query by following the rules passed in
@@ -117,9 +175,8 @@ class Request (object):
 
         if id is not False:
             action.id = id
-
         else:
-            import sys
+            # import sys
             for ds in self.datasources:
                 # import ipdb; ipdb.set_trace()
                 queryable = []
@@ -132,57 +189,18 @@ class Request (object):
                     qtype = None
                     if "__" in key:
                         key, qtype = key.split("__")
-
                     if key == 'bbox':
-                        try:
-                            action.bbox = map(float, value.split(","))
-                        except ValueError:
-                            raise InvalidValueWFSException(
-                                message="Bbox values are't numeric: '%s'"
-                                % (value, )
-                            )
-                        try:
-                            minX, minY, maxX, maxY = action.bbox
-                        except ValueError:
-                            raise InvalidValueWFSException(
-                                message="Bbox values must be in format: minX,minY,maxX,maxY"
-                            )
-                        if minX > maxX or (minY > maxY):
-                            raise InvalidValueWFSException(
-                                message="Bbox values must be: minX<maxX,minY<maxY"
-                            )
-
+                        action = self._set_bbox(action, value)
                     elif key == "maxfeatures":
-                        try:
-                            action.maxfeatures = int(value)
-                        except ValueError:
-                            raise InvalidValueWFSException(
-                                message="Maxfeatures value isn't integer: '%s'"
-                                % (value, )
-                            )
-
+                        action = self._set_maxfeatures(action, value)
                     elif key == "startfeature":
-                        try:
-                            action.startfeature = int(value)
-                        except ValueError:
-                            raise InvalidValueWFSException(
-                                message="Startfeature value isn't integer: '%s'"
-                                % (value, )
-                            )
-
+                        action = self._set_startfeature(action, value)
                     elif key == "request":
                         action.request = value
-
                     elif key == "version":
                         action.version = value
-
                     elif key == "filter":
-                        action.wfsrequest = WFSRequest()
-                        try:
-                            action.wfsrequest.parse(value)
-                        except Exception, E:
-                            ''' '''
-
+                        action = self._set_filter(action, value)
                     elif key in queryable or key.upper() in queryable and hasattr(self.service.datasources[ds], 'query_action_types'):
                         if qtype:
                             if qtype in self.service.datasources[ds].query_action_types:
