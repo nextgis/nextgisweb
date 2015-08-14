@@ -50,6 +50,7 @@ def handler(obj, request):
         'startfeature': params.get('STARTFEATURE'),
         'filter': params.get('FILTER'),
         'format': params.get('OUTPUTFORMAT'),
+        'bbox': params.get('BBOX')
     }
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key: params[key] for key in params if params[key] is not None}

@@ -121,6 +121,7 @@ class Request (object):
         else:
             import sys
             for ds in self.datasources:
+                # import ipdb; ipdb.set_trace()
                 queryable = []
                 # ds = self.service.datasources[self.datasource]
                 if hasattr(ds, 'queryable'):
@@ -131,6 +132,7 @@ class Request (object):
                     qtype = None
                     if "__" in key:
                         key, qtype = key.split("__")
+
                     if key == 'bbox':
                         try:
                             action.bbox = map(float, value.split(","))
@@ -139,6 +141,17 @@ class Request (object):
                                 message="Bbox values are't numeric: '%s'"
                                 % (value, )
                             )
+                        try:
+                            minX, minY, maxX, maxY = action.bbox
+                        except ValueError:
+                            raise InvalidValueWFSException(
+                                message="Bbox values must be in format: minX,minY,maxX,maxY"
+                            )
+                        if minX > maxX or (minY > maxY):
+                            raise InvalidValueWFSException(
+                                message="Bbox values must be: minX<maxX,minY<maxY"
+                            )
+
                     elif key == "maxfeatures":
                         try:
                             action.maxfeatures = int(value)
@@ -147,6 +160,7 @@ class Request (object):
                                 message="Maxfeatures value isn't integer: '%s'"
                                 % (value, )
                             )
+
                     elif key == "startfeature":
                         try:
                             action.startfeature = int(value)
@@ -155,10 +169,13 @@ class Request (object):
                                 message="Startfeature value isn't integer: '%s'"
                                 % (value, )
                             )
+
                     elif key == "request":
                         action.request = value
+
                     elif key == "version":
                         action.version = value
+
                     elif key == "filter":
                         action.wfsrequest = WFSRequest()
                         try:
