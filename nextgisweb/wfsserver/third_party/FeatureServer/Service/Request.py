@@ -193,7 +193,9 @@ class Request (object):
                         action = self._set_bbox(action, value)
                     elif key == "maxfeatures":
                         action = self._set_maxfeatures(action, value)
-                    elif key == "startfeature":
+                    elif key in ["startfeature",    # WFS 1.0.0
+                                 "startindex"       # WFS 2.0.0
+                                 ]:
                         action = self._set_startfeature(action, value)
                     elif key == "request":
                         action.request = value
