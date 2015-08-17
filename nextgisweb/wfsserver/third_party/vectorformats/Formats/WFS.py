@@ -26,7 +26,7 @@ class WFS(Format):
                   'xlink': 'http://www.w3.org/1999/xlink',
                   'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
 
-    def encode(self, features, **kwargs):
+    def encodeGML2(self, features, **kwargs):
         results = ["""<?xml version="1.0" ?><wfs:FeatureCollection
    xmlns:fs="http://featureserver.org/fs"
    xmlns:wfs="http://www.opengis.net/wfs"
@@ -36,45 +36,58 @@ class WFS(Format):
    xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengeospatial.net//wfs/1.0.0/WFS-basic.xsd">
         """]
         for feature in features:
-            results.append(self.encode_feature(feature))
+            results.append(self.encode_featureGML2(feature))
         results.append("""</wfs:FeatureCollection>""")
 
         return "\n".join(results)
 
-    def encode_feature(self, feature):
+    def _encode_attr_value(self, attr_value):
+        if hasattr(attr_value, "replace"):
+            try:
+                attr_value = attr_value.replace("&", "&amp;").replace(
+                    "<", "&lt;").replace(">", "&gt;")
+            except:
+                pass
+        if attr_value is None:
+            attr_value = ''
+        if isinstance(attr_value, str):
+            attr_value = unicode(attr_value, "utf-8")
+        return attr_value
+
+    def encode(self, features, **kwargs):
+        results = self.encodeGML2(features, **kwargs)
+        return results
+
+    def encode_featureGML2(self, feature):
         # layername = re.sub(r'\W', '_', self.layername)
         layername = self.layername
+
+        gml_format = ['FORMAT=GML2']
 
         attr_fields = []
         for key, value in feature.properties.items():
             # key = re.sub(r'\W', '_', key)
-            attr_value = value
-            if hasattr(attr_value, "replace"):
-                try:
-                    attr_value = attr_value.replace("&", "&amp;").replace(
-                        "<", "&lt;").replace(">", "&gt;")
-                except:
-                    pass
-            if attr_value is None:
-                attr_value = ''
-            if isinstance(attr_value, str):
-                attr_value = unicode(attr_value, "utf-8")
+            attr_value = self._encode_attr_value(value)
             attr_fields.append("<fs:%s>%s</fs:%s>" % (key, attr_value, key))
 
         xml = "<gml:featureMember gml:id=\"%s\"><fs:%s fid=\"%s\">" % (
             str(feature.id), layername, str(feature.id))
 
         if hasattr(feature, "geometry_attr"):
-            xml += "<fs:%s>%s</fs:%s>" % (feature.geometry_attr, self.geometry_to_gml(
-                feature.geometry, feature.srs), feature.geometry_attr)
+            xml += "<fs:%s>%s</fs:%s>" % (
+                feature.geometry_attr, self.geometry_to_gml(
+                    feature.geometry, feature.srs, gml_format),
+                feature.geometry_attr)
         else:
-            xml += self.geometry_to_gml(feature.geometry, feature.srs)
+            xml += self.geometry_to_gml(feature.geometry,
+                                        feature.srs, gml_format)
 
         xml += "%s</fs:%s></gml:featureMember>" % (
             "\n".join(attr_fields), layername)
+
         return xml
 
-    def geometry_to_gml(self, geometry, srs):
+    def geometry_to_gml(self, geometry, srs, format=['FORMAT=GML2']):
         """
         >>> w = WFS()
         >>> print w.geometry_to_gml({'type':'Point', 'coordinates':[1.0,2.0]})
@@ -90,7 +103,7 @@ class WFS(Format):
                 ['point', 'linestring', 'polygon', 'multipolygon', 'multilinestring', 'multipoint']:
             geom_wkt = ogr.CreateGeometryFromJson(geojson.dumps(geometry))
 
-            gml = geom_wkt.ExportToGML()
+            gml = geom_wkt.ExportToGML(format)
             return gml
         else:
             raise Exception(
