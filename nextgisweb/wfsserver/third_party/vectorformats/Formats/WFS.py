@@ -4,6 +4,8 @@ import geojson
 
 import os
 
+import datetime
+
 try:
     import osgeo.ogr as ogr
 except ImportError:
@@ -26,7 +28,21 @@ class WFS(Format):
                   'xlink': 'http://www.w3.org/1999/xlink',
                   'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
 
-    def encodeGML2(self, features, **kwargs):
+    def encode(self, features, params):
+        # import ipdb; ipdb.set_trace()
+        if ('version' not in params):
+            results = self.encodeGML2(features, params)
+        else:
+            version = params['version']
+            if version == '2.0.0':
+                results = self.encodeGML3(features, params)
+            elif version == '1.0.0':
+                results = self.encodeGML2(features, params)
+            else:
+                raise ValueError
+        return results
+
+    def encodeGML2(self, features, params):
         results = ["""<?xml version="1.0" ?><wfs:FeatureCollection
    xmlns:fs="http://featureserver.org/fs"
    xmlns:wfs="http://www.opengis.net/wfs"
@@ -36,29 +52,36 @@ class WFS(Format):
    xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengeospatial.net//wfs/1.0.0/WFS-basic.xsd">
         """]
         for feature in features:
-            results.append(self.encode_featureGML2(feature))
+            results.append(self.encode_featureGML2(feature, params))
         results.append("""</wfs:FeatureCollection>""")
 
         return "\n".join(results)
 
-    def _encode_attr_value(self, attr_value):
-        if hasattr(attr_value, "replace"):
-            try:
-                attr_value = attr_value.replace("&", "&amp;").replace(
-                    "<", "&lt;").replace(">", "&gt;")
-            except:
-                pass
-        if attr_value is None:
-            attr_value = ''
-        if isinstance(attr_value, str):
-            attr_value = unicode(attr_value, "utf-8")
-        return attr_value
+    def encodeGML3(self, features, params):
+        current_datetime = datetime.datetime.now().isoformat()
 
-    def encode(self, features, **kwargs):
-        results = self.encodeGML2(features, **kwargs)
-        return results
+        results = ["""<?xml version="1.0" ?>
+        <wfs:FeatureCollection
+        timeStamp="%s"
+        numberMatched="unknown"
+        numberReturned="%s"
+        xmlns:fs="http://featureserver.org/fs"
+        xmlns:wfs="http://www.opengis.net/wfs/2.0"
+        xmlns:gml="http://www.opengis.net/gml/3.2"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                http://schemas.opengis.net/wfs/2.0.0/wfs.xsd
+                http://www.opengis.net/gml/3.2
+                http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+        """ % (current_datetime, len(features))]
+        for feature in features:
+            results.append(self.encode_featureGML3(feature, params))
+        results.append("""</wfs:FeatureCollection>\n""")
 
-    def encode_featureGML2(self, feature):
+        return "\n".join(results)
+
+    def encode_featureGML2(self, feature, params):
         # layername = re.sub(r'\W', '_', self.layername)
         layername = self.layername
 
@@ -86,6 +109,49 @@ class WFS(Format):
             "\n".join(attr_fields), layername)
 
         return xml
+
+    def encode_featureGML3(self, feature, params):
+        # layername = re.sub(r'\W', '_', self.layername)
+        layername = self.layername
+
+        gml_format = ['FORMAT=GML3']
+
+        attr_fields = []
+        for key, value in feature.properties.items():
+            # key = re.sub(r'\W', '_', key)
+            attr_value = self._encode_attr_value(value)
+            attr_fields.append("<fs:%s>%s</fs:%s>" % (key, attr_value, key))
+
+        xml = "<gml:featureMember gml:id=\"%s\"><fs:%s fid=\"%s\">" % (
+            str(feature.id), layername, str(feature.id))
+
+        if hasattr(feature, "geometry_attr"):
+            xml += "<fs:%s>%s</fs:%s>" % (
+                feature.geometry_attr, self.geometry_to_gml(
+                    feature.geometry, feature.srs, gml_format),
+                feature.geometry_attr)
+        else:
+            xml += self.geometry_to_gml(feature.geometry,
+                                        feature.srs, gml_format)
+
+        xml += "%s</fs:%s></gml:featureMember>" % (
+            "\n".join(attr_fields), layername)
+
+        return xml
+
+
+    def _encode_attr_value(self, attr_value):
+        if hasattr(attr_value, "replace"):
+            try:
+                attr_value = attr_value.replace("&", "&amp;").replace(
+                    "<", "&lt;").replace(">", "&gt;")
+            except:
+                pass
+        if attr_value is None:
+            attr_value = ''
+        if isinstance(attr_value, str):
+            attr_value = unicode(attr_value, "utf-8")
+        return attr_value
 
     def geometry_to_gml(self, geometry, srs, format=['FORMAT=GML2']):
         """

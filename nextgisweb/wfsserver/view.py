@@ -43,7 +43,8 @@ def handler(obj, request):
     params = {
         'service': params.get('SERVICE'),
         'request': req,
-        'typename': params.get('TYPENAME'),
+        'typename': params.get('TYPENAME'),     # WFS 1.0.0
+        'typenames': params.get('TYPENAMES'),   # WFS 2.0.0
         'srsname': params.get('SRSNAME'),
         'version': params.get('VERSION'),
         'maxfeatures': params.get('MAXFEATURES'),

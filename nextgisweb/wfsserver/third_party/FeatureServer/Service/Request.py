@@ -73,7 +73,10 @@ class Request (object):
         if request_method == "GET" or (request_method == "OPTIONS" and (post_data is None or len(post_data) <= 0)):
             action = self.get_select_action(path_info, params)
             if u'typename' in params:
-                action.layer = params[u'typename']
+                action.layer = params[u'typename']      # WFS 1.0.0
+            if u'typenames' in params:
+                action.layer = params[u'typenames']     # WFS 2.0.0
+
 
         elif request_method == "POST" or request_method == "PUT" or (request_method == "OPTIONS" and len(post_data) > 0):
             actions = self.handle_post(
@@ -223,8 +226,12 @@ class Request (object):
 
     def get_layer(self, path_info, params={}):
         """Return layer based on path, or raise a NoLayerException."""
-        if params.has_key("typename"):
+        if params.has_key("typename"):      # WFS 1.0.0
             self.datasources = params["typename"].split(",")
+            return
+
+        if params.has_key("typenames"):     # WFS 2.0.0
+            self.datasources = params["typenames"].split(",")
             return
 
         path = path_info.split("/")
