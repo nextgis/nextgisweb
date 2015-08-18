@@ -49,7 +49,7 @@ class GeoJSON(Request):
         Request.parse(self, params, path_info, host, post_data, request_method,
                       format_obj=g)
 
-    def encode(self, result):
+    def encode(self, result, params=None):
         g = GS()
         if result and result[0].srs:
             # all features have the same 'srs' property

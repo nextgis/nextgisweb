@@ -12,6 +12,7 @@ import geojson
 
 from nextgisweb.feature_layer import Feature as NgwFwature
 from nextgisweb.feature_layer import IWritableFeatureLayer, GEOM_TYPE, FIELD_TYPE
+from nextgisweb.geometry import box
 
 from .third_party.FeatureServer.DataSource import DataSource
 from .third_party.vectorformats.Feature import Feature
@@ -37,6 +38,8 @@ class NextgiswebDatasource(DataSource):
             self.attribute_cols = kwargs['attribute_cols'].split(',')
         else:
             self.attribute_cols = None      # Назначим потом (чтобы не производить лишних запросов к БД на этом этапе)
+
+        self.maxfeatures = 1000   # Default count of returned features
 
     @property
     def srid_out(self):
@@ -91,7 +94,24 @@ class NextgiswebDatasource(DataSource):
         if self.query is None:
             self._setup_query()
 
+        # import ipdb; ipdb.set_trace()
         self.query.filter_by()
+
+        # Startfeature+maxfeature
+        if params.startfeature is None:
+            params.startfeature = 0
+        if params.maxfeatures:
+            maxfeatures = params.maxfeatures
+        else:
+            maxfeatures = self.maxfeatures
+
+        self.query.limit(maxfeatures, params.startfeature)
+
+        # BBOX
+        if params.bbox:
+            geom = box(*params.bbox, srid=self.srid_out)
+            self.query.intersects(geom)
+
         self.query.geom()
         result = self.query()
 
@@ -114,7 +134,7 @@ class NextgiswebDatasource(DataSource):
         if not self.writable:
             return None
 
-        if action.wfsrequest != None:
+        if action.wfsrequest is not None:
             if self.query is None:
                 self._setup_query()
 
@@ -151,7 +171,7 @@ class NextgiswebDatasource(DataSource):
         if not self.writable:
             return None
 
-        if action.wfsrequest != None:
+        if action.wfsrequest is not None:
             data = action.wfsrequest.getStatement(self)
 
             feature_dict = geojson.loads(data)
@@ -176,7 +196,7 @@ class NextgiswebDatasource(DataSource):
         """ В action.wfsrequest хранится объект Transaction.Delete
         нужно его распарсить и выполнить нужные действия
         """
-        if action.wfsrequest != None:
+        if action.wfsrequest is not None:
             data = action.wfsrequest.getStatement(self)
             for id in geojson.loads(data):
                 self.layer.feature_delete(id)
@@ -208,6 +228,6 @@ class NextgiswebDatasource(DataSource):
         Кто знает -- правьте
         """
         gml = str(gml)
-                  # CreateGeometryFromGML не умеет работать с уникодом
+        # CreateGeometryFromGML не умеет работать с уникодом
         ogr_geo = ogr.CreateGeometryFromGML(gml)
         return shapely.wkt.loads(ogr_geo.ExportToWkt())

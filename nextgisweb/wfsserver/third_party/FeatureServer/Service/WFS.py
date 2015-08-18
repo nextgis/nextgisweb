@@ -17,13 +17,13 @@ from ...FeatureServer.WebFeatureService.Response.TransactionResponse import Tran
 
 class WFS(Request):
 
-    def encode(self, results):
+    def encode(self, results, params):
         wfs = WFSFormat.WFS(layername=self.datasources[0])
 
         if isinstance(results, TransactionResponse):
             return ("text/xml", wfs.encode_transaction(results), None, 'utf-8')
 
-        output = wfs.encode(results)
+        output = wfs.encode(results, params=params)
         return ("text/xml", output, None, 'utf-8')
 
     def encode_exception_report(self, exceptionReport):

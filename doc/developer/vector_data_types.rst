@@ -7,12 +7,6 @@
     :members:
     :undoc-members:
 
-
-
-
-
-
-
 Поддерживаемые типы геометрий:
 
 .. autoclass:: nextgisweb.feature_layer.interface.GEOM_TYPE

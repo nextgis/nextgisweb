@@ -25,9 +25,6 @@ def handler(obj, request):
     # import ipdb; ipdb.set_trace()
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
 
-    # if params.get('SERVICE') != 'WFS':
-    #     return
-
     req = params.get('REQUEST')
     post_data = request.body
     request_method = request.method
@@ -46,13 +43,16 @@ def handler(obj, request):
     params = {
         'service': params.get('SERVICE'),
         'request': req,
-        'typename': params.get('TYPENAME'),
+        'typename': params.get('TYPENAME'),     # WFS 1.0.0
+        'typenames': params.get('TYPENAMES'),   # WFS 2.0.0
         'srsname': params.get('SRSNAME'),
         'version': params.get('VERSION'),
         'maxfeatures': params.get('MAXFEATURES'),
+        'count': params.get('COUNT'),
         'startfeature': params.get('STARTFEATURE'),
         'filter': params.get('FILTER'),
         'format': params.get('OUTPUTFORMAT'),
+        'bbox': params.get('BBOX')
     }
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key: params[key] for key in params if params[key] is not None}

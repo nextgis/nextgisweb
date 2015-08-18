@@ -2,8 +2,11 @@
 from ...FeatureServer.Service.Action import Action
 from ...FeatureServer.WebFeatureService.WFSRequest import WFSRequest
 from ...web_request.handlers import ApplicationException
-from ...FeatureServer.Exceptions.LayerNotFoundException import LayerNotFoundException
+from ...FeatureServer.Exceptions.LayerNotFoundException import \
+    LayerNotFoundException
 from ...FeatureServer.Exceptions.NoLayerException import NoLayerException
+from ...FeatureServer.Exceptions.InvalidValueWFSException import \
+    InvalidValueWFSException
 
 
 class Request (object):
@@ -70,7 +73,10 @@ class Request (object):
         if request_method == "GET" or (request_method == "OPTIONS" and (post_data is None or len(post_data) <= 0)):
             action = self.get_select_action(path_info, params)
             if u'typename' in params:
-                action.layer = params[u'typename']
+                action.layer = params[u'typename']      # WFS 1.0.0
+            if u'typenames' in params:
+                action.layer = params[u'typenames']     # WFS 2.0.0
+
 
         elif request_method == "POST" or request_method == "PUT" or (request_method == "OPTIONS" and len(post_data) > 0):
             actions = self.handle_post(
@@ -102,6 +108,64 @@ class Request (object):
             return False
         return False
 
+    def _set_bbox(self, action, bbox_value):
+        """Analyze bbox parameter, set bbox attribute of the action
+        """
+        try:
+            action.bbox = map(float, bbox_value.split(","))
+        except ValueError:
+            raise InvalidValueWFSException(
+                message="Bbox values are't numeric: '%s'"
+                % (value, )
+            )
+        try:
+            minX, minY, maxX, maxY = action.bbox
+        except ValueError:
+            raise InvalidValueWFSException(
+                message="Bbox values must be in format: minX,minY,maxX,maxY"
+            )
+        if minX > maxX or (minY > maxY):
+            raise InvalidValueWFSException(
+                message="Bbox values must be: minX<maxX,minY<maxY"
+            )
+        return action
+
+    def _set_maxfeatures(self, action, maxfeatures_value):
+        """Analyze maxfeatures parameter, set maxfeatures
+        attribute of the action
+        """
+        try:
+            action.maxfeatures = int(maxfeatures_value)
+        except ValueError:
+            raise InvalidValueWFSException(
+                message="Maxfeatures value isn't integer: '%s'"
+                % (value, )
+            )
+        return action
+
+    def _set_startfeature(self, action, startfeature_value):
+        """Analyze startfeature parameter, set startfeature
+        attribute of the action
+        """
+        try:
+            action.startfeature = int(startfeature_value)
+        except ValueError:
+            raise InvalidValueWFSException(
+                message="Startfeature value isn't integer: '%s'"
+                % (value, )
+            )
+        return action
+
+    def _set_filter(self, action, filter_value):
+        """Analyze filters
+        """
+        action.wfsrequest = WFSRequest()
+        try:
+            action.wfsrequest.parse(filter_value)
+        except Exception:
+            ''' '''
+        return action
+
     def get_select_action(self, path_info, params):
         """Generate a select action from a URL. Used unmodified by most
             subclasses. Handles attribute query by following the rules passed in
@@ -114,10 +178,10 @@ class Request (object):
 
         if id is not False:
             action.id = id
-
         else:
-            import sys
+            # import sys
             for ds in self.datasources:
+                # import ipdb; ipdb.set_trace()
                 queryable = []
                 # ds = self.service.datasources[self.datasource]
                 if hasattr(ds, 'queryable'):
@@ -128,23 +192,24 @@ class Request (object):
                     qtype = None
                     if "__" in key:
                         key, qtype = key.split("__")
+                    if key == 'layer':
+                        action.layer = value
                     if key == 'bbox':
-                        action.bbox = map(float, value.split(","))
-                    elif key == "maxfeatures":
-                        action.maxfeatures = int(value)
-                    elif key == "startfeature":
-                        action.startfeature = int(value)
+                        action = self._set_bbox(action, value)
+                    elif key in ["maxfeatures",     # WFS 1.0.0
+                                 "count"            # WFS 2.0.0
+                                 ]:
+                        action = self._set_maxfeatures(action, value)
+                    elif key in ["startfeature",    # WFS 1.0.0
+                                 "startindex"       # WFS 2.0.0
+                                 ]:
+                        action = self._set_startfeature(action, value)
                     elif key == "request":
                         action.request = value
                     elif key == "version":
                         action.version = value
                     elif key == "filter":
-                        action.wfsrequest = WFSRequest()
-                        try:
-                            action.wfsrequest.parse(value)
-                        except Exception, E:
-                            ''' '''
-
+                        action = self._set_filter(action, value)
                     elif key in queryable or key.upper() in queryable and hasattr(self.service.datasources[ds], 'query_action_types'):
                         if qtype:
                             if qtype in self.service.datasources[ds].query_action_types:
@@ -163,8 +228,12 @@ class Request (object):
 
     def get_layer(self, path_info, params={}):
         """Return layer based on path, or raise a NoLayerException."""
-        if params.has_key("typename"):
+        if params.has_key("typename"):      # WFS 1.0.0
             self.datasources = params["typename"].split(",")
+            return
+
+        if params.has_key("typenames"):     # WFS 2.0.0
+            self.datasources = params["typenames"].split(",")
             return
 
         path = path_info.split("/")
@@ -221,7 +290,9 @@ class Request (object):
                     elif format_obj.isDescribeFeatureType():
                         return format_obj.describeFeatureTypeAction()
                     elif format_obj.isGetFeature():
-                        return format_obj.getFeatureAction()
+                        getFeatParams = format_obj.getFeatureParams()
+                        return [self.get_select_action(path_info,
+                                                       getFeatParams)]
 
                     # It is a transaction request.
                     transactions = format_obj.getActions()
