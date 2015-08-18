@@ -596,6 +596,7 @@ class FeatureQueryBase(object):
         IFeatureQueryIntersects)
 
     def __init__(self):
+        self._srs = None
         self._geom = None
         self._box = None
 
@@ -607,6 +608,9 @@ class FeatureQueryBase(object):
         self._filter_by = None
         self._like = None
         self._intersects = None
+
+    def srs(self, srs):
+        self._srs = srs
 
     def geom(self):
         self._geom = True
@@ -644,15 +648,20 @@ class FeatureQueryBase(object):
         columns = [table.columns.id, ]
         where = []
 
+        srsid = self.layer.srs_id if self._srs is None else self._srs.id
+
+        geomcol = table.columns.geom
+        geomexpr = ga.functions.transform(geomcol, srsid)
+
         if self._geom:
-            columns.append(table.columns.geom.label('geom'))
+            columns.append(db.func.st_asbinary(geomexpr).label('geom'))
 
         if self._box:
             columns.extend((
-                db.func.st_xmin(db.text('geom')).label('box_left'),
-                db.func.st_ymin(db.text('geom')).label('box_bottom'),
-                db.func.st_xmax(db.text('geom')).label('box_right'),
-                db.func.st_ymax(db.text('geom')).label('box_top'),
+                db.func.st_xmin(geomexpr).label('box_left'),
+                db.func.st_ymin(geomexpr).label('box_bottom'),
+                db.func.st_xmax(geomexpr).label('box_right'),
+                db.func.st_ymax(geomexpr).label('box_top'),
             ))
 
         selected_fields = []
@@ -689,10 +698,11 @@ class FeatureQueryBase(object):
             where.append(db.or_(*l))
 
         if self._intersects:
-            geom = ga.WKTSpatialElement(
-                self._intersects.wkt,
-                self._intersects.srid)
-            where.append(geom.intersects(table.columns.geom))
+            intgeom = db.func.st_setsrid(db.func.st_geomfromtext(
+                self._intersects.wkt), self._intersects.srid)
+            where.append(db.func.st_intersects(
+                geomcol, db.func.st_transform(
+                    intgeom, self.layer.srs_id)))
 
         class QueryFeatureSet(FeatureSet):
             fields = selected_fields
@@ -715,12 +725,14 @@ class FeatureQueryBase(object):
                 for row in rows:
                     fdict = dict([(f.keyname, row[f.keyname])
                                   for f in selected_fields])
+                    if self._geom:
+                        geom = geom_from_wkb(str(row['geom']))
+                    else:
+                        geom = None
+
                     yield Feature(
-                        layer=self.layer,
-                        id=row.id,
-                        fields=fdict,
-                        geom=(geom_from_wkb(str(row.geom.geom_wkb))
-                              if self._geom else None),
+                        layer=self.layer, id=row.id,
+                        fields=fdict, geom=geom,
                         box=box(
                             row.box_left, row.box_bottom,
                             row.box_right, row.box_top
