@@ -192,6 +192,8 @@ class Request (object):
                     qtype = None
                     if "__" in key:
                         key, qtype = key.split("__")
+                    if key == 'layer':
+                        action.layer = value
                     if key == 'bbox':
                         action = self._set_bbox(action, value)
                     elif key in ["maxfeatures",     # WFS 1.0.0
@@ -288,7 +290,9 @@ class Request (object):
                     elif format_obj.isDescribeFeatureType():
                         return format_obj.describeFeatureTypeAction()
                     elif format_obj.isGetFeature():
-                        return format_obj.getFeatureAction()
+                        getFeatParams = format_obj.getFeatureParams()
+                        return [self.get_select_action(path_info,
+                                                       getFeatParams)]
 
                     # It is a transaction request.
                     transactions = format_obj.getActions()

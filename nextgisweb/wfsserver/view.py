@@ -48,6 +48,7 @@ def handler(obj, request):
         'srsname': params.get('SRSNAME'),
         'version': params.get('VERSION'),
         'maxfeatures': params.get('MAXFEATURES'),
+        'count': params.get('COUNT'),
         'startfeature': params.get('STARTFEATURE'),
         'filter': params.get('FILTER'),
         'format': params.get('OUTPUTFORMAT'),

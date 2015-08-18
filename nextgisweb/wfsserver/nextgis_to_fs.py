@@ -12,7 +12,7 @@ import geojson
 
 from nextgisweb.feature_layer import Feature as NgwFwature
 from nextgisweb.feature_layer import IWritableFeatureLayer, GEOM_TYPE, FIELD_TYPE
-from nextgisweb.geometry import box, geom_from_wkb
+from nextgisweb.geometry import box
 
 from .third_party.FeatureServer.DataSource import DataSource
 from .third_party.vectorformats.Feature import Feature

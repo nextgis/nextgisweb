@@ -13,6 +13,7 @@ from ...FeatureServer.Exceptions.OperationParsingFailedException import \
     OperationParsingFailedException
 from ...FeatureServer.Service.Action import Action
 
+
 from copy import deepcopy
 
 
@@ -77,30 +78,31 @@ class WFSRequest(object):
 
         return [action]
 
-    def getFeatureAction(self):
+    def getFeatureParams(self):
         '''Return GetFeature action
         '''
-        action = Action()
-        action.method = 'select'
-        action.request = u'GetFeature'
-
         # import ipdb; ipdb.set_trace()
 
-        if 'version' in self.dom.keys():
-            action.version = self.dom.get('version')
+        params = dict(
+            (key.lower(), val) for (key, val) in self.dom.items()
+        )
+        if not ('version' in params):
+            params['version'] = '1.0.0'
 
-        attr = dict((k.upper(), v)
+        attr = dict((k.lower(), v)
                     for k, v in self.dom.Query.attrib.iteritems())
 
         try:
-            if action.version == '2.0.0':
-                action.layer = attr['TYPENAMES']
+            if params['version'] == '2.0.0':
+                params['layer'] = attr['typenames']
             else:
-                action.layer = attr['TYPENAME']
+                params['layer'] = attr['typename']
         except:
             raise OperationParsingFailedException
 
-        return [action]
+        params.update(attr)
+
+        return params
 
     def get_transactions(self):
         '''Returns all WFS-T actions
