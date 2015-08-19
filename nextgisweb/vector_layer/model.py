@@ -615,7 +615,7 @@ class FeatureQueryBase(object):
     def srs(self, srs):
         self._srs = srs
 
-    def geom(self, single_part):
+    def geom(self, single_part=False):
         self._geom = True
         self._single_part = single_part
 
