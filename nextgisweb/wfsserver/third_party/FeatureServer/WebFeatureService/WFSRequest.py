@@ -125,7 +125,7 @@ class WFSRequest(object):
             uc = uc[0].text
             uc = uc.split()
 
-        params['bbox'] = ','.join(lc + uc)
+            params['bbox'] = ','.join(lc + uc)
 
         return params
 
