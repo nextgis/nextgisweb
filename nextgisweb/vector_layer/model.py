@@ -2,25 +2,25 @@
 from __future__ import unicode_literals
 
 import uuid
-from sqlalchemy.ext.compiler import compiles
 import types
 import zipfile
 import tempfile
 import shutil
 import ctypes
 import operator
+import osgeo
+
 from datetime import datetime
 from distutils.version import LooseVersion
-
-
 from zope.interface import implements
-import osgeo
 from osgeo import ogr, osr
 
 from sqlalchemy import event
+from sqlalchemy.sql import ColumnElement
+from sqlalchemy.ext.compiler import compiles
+
 import geoalchemy as ga
 import sqlalchemy.sql as sql
-from sqlalchemy.sql import ColumnElement
 
 from .. import db
 from ..resource import (
@@ -615,11 +615,9 @@ class FeatureQueryBase(object):
     def srs(self, srs):
         self._srs = srs
 
-    def geom(self):
+    def geom(self, single_part):
         self._geom = True
-
-    def single_part_geom(self):
-        self._single_part_geom = True
+        self._single_part = single_part
 
     def box(self):
         self._box = True
@@ -660,7 +658,7 @@ class FeatureQueryBase(object):
         geomexpr = ga.functions.transform(geomcol, srsid)
 
         if self._geom:
-            if self._single_part_geom:
+            if self._single_part:
 
                 class geom(ColumnElement):
                     def __init__(self, base):
