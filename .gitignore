@@ -51,3 +51,6 @@ doc/*/_build/
 *~
 
 .vagrant
+
+#  IDE
+.idea
