@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import uuid
+from sqlalchemy.ext.compiler import compiles
 import types
 import zipfile
 import tempfile
@@ -19,6 +20,7 @@ from osgeo import ogr, osr
 from sqlalchemy import event
 import geoalchemy as ga
 import sqlalchemy.sql as sql
+from sqlalchemy.sql import ColumnElement
 
 from .. import db
 from ..resource import (
@@ -598,6 +600,7 @@ class FeatureQueryBase(object):
     def __init__(self):
         self._srs = None
         self._geom = None
+        self._single_part_geom = None
         self._box = None
 
         self._fields = None
@@ -614,6 +617,9 @@ class FeatureQueryBase(object):
 
     def geom(self):
         self._geom = True
+
+    def single_part_geom(self):
+        self._single_part_geom = True
 
     def box(self):
         self._box = True
@@ -654,7 +660,19 @@ class FeatureQueryBase(object):
         geomexpr = ga.functions.transform(geomcol, srsid)
 
         if self._geom:
-            columns.append(db.func.st_asbinary(geomexpr).label('geom'))
+            if self._single_part_geom:
+
+                class geom(ColumnElement):
+                    def __init__(self, base):
+                        self.base = base
+
+                @compiles(geom)
+                def compile(expr, compiler, **kw):
+                    return "(%s).geom" % str(compiler.process(expr.base))
+
+                columns.append(db.func.st_asbinary(geom(db.func.st_dump(geomexpr))).label('geom'))
+            else:
+                columns.append(db.func.st_asbinary(geomexpr).label('geom'))
 
         if self._box:
             columns.extend((
