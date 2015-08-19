@@ -87,7 +87,9 @@ class WFSRequest(object):
             (key.lower(), val) for (key, val) in self.dom.items()
         )
         if not ('version' in params):
-            params['version'] = '1.0.0'
+            params['version'] = u'1.0.0'
+
+        params['request'] = u'GetFeature'
 
         attr = dict((k.lower(), v)
                     for k, v in self.dom.Query.attrib.iteritems())
@@ -101,6 +103,29 @@ class WFSRequest(object):
             raise OperationParsingFailedException
 
         params.update(attr)
+
+        # Find BBOX
+        bbox = self.dom.xpath("//*[local-name() = 'BBOX']")
+        if len(bbox) > 1:
+            raise OperationParsingFailedException(
+                message="Several BBOX statements has found")
+        elif len(bbox) == 1:
+            bbox = bbox[0]
+            lc = bbox.xpath("//*[local-name() = 'lowerCorner']")
+            if len(lc) != 1:
+                raise OperationParsingFailedException(
+                    message="Can't parse 'lowerCorner' paramether of GetFeature request")
+            lc = lc[0].text
+            lc = lc.split()
+
+            uc = bbox.xpath("//*[local-name() = 'upperCorner']")
+            if len(uc) != 1:
+                raise OperationParsingFailedException(
+                    message="Can't parse 'upperCorner' paramether of GetFeature request")
+            uc = uc[0].text
+            uc = uc.split()
+
+        params['bbox'] = ','.join(lc + uc)
 
         return params
 

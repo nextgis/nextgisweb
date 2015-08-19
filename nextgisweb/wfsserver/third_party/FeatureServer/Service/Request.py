@@ -77,7 +77,6 @@ class Request (object):
             if u'typenames' in params:
                 action.layer = params[u'typenames']     # WFS 2.0.0
 
-
         elif request_method == "POST" or request_method == "PUT" or (request_method == "OPTIONS" and len(post_data) > 0):
             actions = self.handle_post(
                 params, path_info, host, post_data, request_method,
@@ -116,7 +115,7 @@ class Request (object):
         except ValueError:
             raise InvalidValueWFSException(
                 message="Bbox values are't numeric: '%s'"
-                % (value, )
+                % (bbox_value, )
             )
         try:
             minX, minY, maxX, maxY = action.bbox
@@ -139,7 +138,7 @@ class Request (object):
         except ValueError:
             raise InvalidValueWFSException(
                 message="Maxfeatures value isn't integer: '%s'"
-                % (value, )
+                % (maxfeatures_value, )
             )
         return action
 
@@ -152,7 +151,7 @@ class Request (object):
         except ValueError:
             raise InvalidValueWFSException(
                 message="Startfeature value isn't integer: '%s'"
-                % (value, )
+                % (startfeature_value, )
             )
         return action
 
@@ -223,7 +222,6 @@ class Request (object):
                             action.attributes[key + '__eq'] = {
                                 'column': key, 'type': 'eq', 'value': value}
                             # action.attributes[key] = value
-
         return action
 
     def get_layer(self, path_info, params={}):
