@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-'''
-Created on Oct 16, 2011
+# The code is based on FeatureServer code
 
-@author: michel
-'''
 import os
 import re
 from ....FeatureServer.WebFeatureService.Transaction.TransactionAction import TransactionAction
+from ...Exceptions.OperationProcessingFailedException import OperationProcessingFailedException
 from lxml import etree
 
 
@@ -20,10 +18,9 @@ class Insert(TransactionAction):
     def setLayerName(self):
         self.layer_name = self.node.xpath('local-name()')
 
-    def createStatement(self, datasource):
-        """На выходе --- описание объекта, который нужно вставить
-        в формате json.
-        """
+    def createStatement100(self, datasource):
+        '''Create statement for WFS 1.0.0
+        '''
         geom = self.node.xpath(
             "//*[local-name() = '" + datasource.geom_col + "']/*")
         geomData = etree.tostring(geom[0], pretty_print=True)
@@ -32,8 +29,9 @@ class Insert(TransactionAction):
         pattern = re.compile(r'"')
         geomData = re.sub(pattern, '\\"', geomData)
 
+        # TODO: FIX absolute path to the resource
         xslt = etree.parse(os.path.dirname(os.path.abspath(__file__))
-                           + "/../../../resources/transaction/transactions.xsl")
+                           + "/../../../resources/1.0.0/transaction/transactions.xsl")
         transform = etree.XSLT(xslt)
 
         result = transform(self.node,
@@ -49,3 +47,14 @@ class Insert(TransactionAction):
             self.setStatement(result)
             return
         self.setStatement(None)
+
+    def createStatement(self, datasource):
+        """На выходе --- описание объекта, который нужно вставить
+        в формате json.
+        """
+        if self.version == u'1.0.0':
+            self.createStatement100(datasource)
+        elif self.version == u'2.0.0':
+            raise NotImplementedError
+        else:
+            raise OperationProcessingFailedException(message='Version "%s" don\'t allowed by the server' % (self.version, ))

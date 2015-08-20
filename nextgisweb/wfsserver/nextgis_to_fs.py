@@ -172,6 +172,7 @@ class NextgiswebDatasource(DataSource):
             return None
 
         if action.wfsrequest is not None:
+            # import ipdb; ipdb.set_trace()
             data = action.wfsrequest.getStatement(self)
 
             feature_dict = geojson.loads(data)
