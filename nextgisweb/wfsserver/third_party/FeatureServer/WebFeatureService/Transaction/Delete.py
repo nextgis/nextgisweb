@@ -47,8 +47,8 @@ class Delete(TransactionAction):
         self.setStatement(None)
 
     def createStatement(self, datasource):
-        """На выходе --- описание объекта, который нужно вставить
-        в формате json.
+        """На выходе --- список идентификаторов объектов, которые нужно удалить
+        в формате json
         """
         if self.version == u'1.0.0':
             self.createStatement100(datasource)

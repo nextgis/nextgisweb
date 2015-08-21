@@ -22,7 +22,6 @@ class Update(TransactionAction):
             self.layer_name = attr['typeName']
 
     def createStatement100(self, datasource):
-
         geom = self.node.xpath(
             "//*[local-name() = 'Name' and text()='" + datasource.geom_col + "']/following-sibling::*[1]/*")
         geomData = ''
@@ -54,7 +53,7 @@ class Update(TransactionAction):
         self.setStatement(None)
 
     def createStatement(self, datasource):
-        """На выходе --- описание объекта, который нужно вставить
+        """На выходе --- описание объекта, который нужно обновить
         в формате json.
         """
         if self.version == u'1.0.0':
