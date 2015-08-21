@@ -18,9 +18,10 @@ Base = declarative_base()
 class RenderRequest(object):
     implements(IExtentRenderRequest, ITileRenderRequest)
 
-    def __init__(self, style, srs):
+    def __init__(self, style, srs, cond):
         self.style = style
         self.srs = srs
+        self.cond = cond
 
     def render_extent(self, extent, size):
         return self.style.render_image(extent, size)
@@ -46,8 +47,8 @@ class RasterStyle(Base, Resource):
     def srs(self):
         return self.parent.srs
 
-    def render_request(self, srs):
-        return RenderRequest(self, srs)
+    def render_request(self, srs, cond=None):
+        return RenderRequest(self, srs, cond)
 
     def render_image(self, extent, size):
         ds = self.parent.gdal_dataset()
