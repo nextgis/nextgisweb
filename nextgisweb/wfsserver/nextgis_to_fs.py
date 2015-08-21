@@ -10,7 +10,7 @@ import shapely
 
 import geojson
 
-from nextgisweb.feature_layer import Feature as NgwFwature
+from nextgisweb.feature_layer import Feature as NgwFeature
 from nextgisweb.feature_layer import IWritableFeatureLayer, GEOM_TYPE, FIELD_TYPE
 from nextgisweb.geometry import box
 
@@ -171,6 +171,7 @@ class NextgiswebDatasource(DataSource):
         if not self.writable:
             return None
 
+        # import ipdb; ipdb.set_trace()
         if action.wfsrequest is not None:
             # import ipdb; ipdb.set_trace()
             data = action.wfsrequest.getStatement(self)
@@ -184,7 +185,7 @@ class NextgiswebDatasource(DataSource):
             # Поле геометрии в словаре аттрибутов теперь не нужно:
             feature_dict.pop(self.geom_col)
 
-            feature = NgwFwature(fields=feature_dict, geom=geom)
+            feature = NgwFeature(fields=feature_dict, geom=geom)
 
             feature_id = self.layer.feature_create(feature)
 

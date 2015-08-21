@@ -8,15 +8,17 @@ import tempfile
 import shutil
 import ctypes
 import operator
+import osgeo
+
 from datetime import datetime
 from distutils.version import LooseVersion
-
-
 from zope.interface import implements
-import osgeo
 from osgeo import ogr, osr
 
 from sqlalchemy import event
+from sqlalchemy.sql import ColumnElement
+from sqlalchemy.ext.compiler import compiles
+
 import geoalchemy as ga
 import sqlalchemy.sql as sql
 
@@ -598,6 +600,7 @@ class FeatureQueryBase(object):
     def __init__(self):
         self._srs = None
         self._geom = None
+        self._single_part_geom = None
         self._box = None
 
         self._fields = None
@@ -612,8 +615,9 @@ class FeatureQueryBase(object):
     def srs(self, srs):
         self._srs = srs
 
-    def geom(self):
+    def geom(self, single_part=False):
         self._geom = True
+        self._single_part = single_part
 
     def box(self):
         self._box = True
@@ -654,7 +658,19 @@ class FeatureQueryBase(object):
         geomexpr = ga.functions.transform(geomcol, srsid)
 
         if self._geom:
-            columns.append(db.func.st_asbinary(geomexpr).label('geom'))
+            if self._single_part:
+
+                class geom(ColumnElement):
+                    def __init__(self, base):
+                        self.base = base
+
+                @compiles(geom)
+                def compile(expr, compiler, **kw):
+                    return "(%s).geom" % str(compiler.process(expr.base))
+
+                columns.append(db.func.st_asbinary(geom(db.func.st_dump(geomexpr))).label('geom'))
+            else:
+                columns.append(db.func.st_asbinary(geomexpr).label('geom'))
 
         if self._box:
             columns.extend((
