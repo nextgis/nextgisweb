@@ -151,7 +151,7 @@
 	border: 1px solid #ffffff;
 	border-top: none;
 	background-color: #efefef;
-	background-image: url("../../../dijit/themes/claro/form/images/formHighlight.png");
+	background-image: url("../../../dijit/themes/claro/images/standardGradient.png");
 	background-repeat: repeat-x;
 }
 .claro .dojoxCheckedMultiSelectButton .dijitArrowButton .dijitArrowButtonInner {
