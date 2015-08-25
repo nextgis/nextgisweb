@@ -84,10 +84,10 @@
         <xsl:param name="tableId" />
                 <Statement>
                     {
-                    "<xsl:value-of select="$tableId"/>" : "<xsl:value-of select="//*[local-name()='FeatureId']/@fid" />",
+                    "<xsl:value-of select="$tableId"/>" : "<xsl:value-of select="//*[local-name()='ResourceId']/@rid" />",
                     <xsl:for-each select="child::*">
                         <xsl:variable name="total" select="count(//*[local-name()='Property'])" />
-                        <xsl:for-each select="//*[local-name()='Property']/*[local-name()='Name']">
+                        <xsl:for-each select="//*[local-name()='Property']/*[local-name()='ValueReference']">
                             <xsl:choose>
                                 <xsl:when test=".=$geometryAttribute and string-length($geometryData) > 0">
                                     "<xsl:value-of select="."/>" : "<xsl:value-of select="string($geometryData)" />"

@@ -87,7 +87,6 @@ def handler(obj, request):
         # на запросы req.lower() in ['getcapabilities', 'describefeaturetype']
         content_type, resxml = result
         resp = Response(resxml, content_type=content_type)
-        print resp
         return resp
     elif isinstance(result, FeatureserverResponse):
         # ответ на запрос GetFeature, Update, Insert, Delete
