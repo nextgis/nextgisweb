@@ -47,8 +47,8 @@ def handler(obj, request):
         'typenames': params.get('TYPENAMES'),   # WFS 2.0.0
         'srsname': params.get('SRSNAME'),
         'version': params.get('VERSION'),
-        'maxfeatures': params.get('MAXFEATURES'),
-        'count': params.get('COUNT'),
+        'maxfeatures': params.get('MAXFEATURES'),   # WFS 1.0.0
+        'count': params.get('COUNT'),               # WFS 2.0.0
         'startfeature': params.get('STARTFEATURE'),
         'filter': params.get('FILTER'),
         'format': params.get('OUTPUTFORMAT'),
@@ -87,6 +87,7 @@ def handler(obj, request):
         # на запросы req.lower() in ['getcapabilities', 'describefeaturetype']
         content_type, resxml = result
         resp = Response(resxml, content_type=content_type)
+        print resp
         return resp
     elif isinstance(result, FeatureserverResponse):
         # ответ на запрос GetFeature, Update, Insert, Delete
