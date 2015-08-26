@@ -115,12 +115,12 @@
         <xsl:param name="tableName"/>
         <xsl:param name="tableId" />
         
-        <xsl:variable name="total" select="count(//*[local-name()='FeatureId'])" />
+        <xsl:variable name="total" select="count(//*[local-name()='ResourceId'])" />
         
                 <Statement>
                     [
-                <xsl:for-each select="//*[local-name()='FeatureId']">
-                    <xsl:value-of select="./@fid" />
+                <xsl:for-each select="//*[local-name()='ResourceId']">
+                    <xsl:value-of select="./@rid" />
                     <xsl:if test="position() &lt; $total">, </xsl:if>
                 </xsl:for-each>
                     ]
