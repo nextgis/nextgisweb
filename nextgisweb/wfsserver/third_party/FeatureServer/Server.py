@@ -26,7 +26,8 @@ from ..FeatureServer.Exceptions.LayerNotFoundException import \
 from ..FeatureServer.Exceptions.OperationParsingFailedException import \
     OperationParsingFailedException
 from Exceptions.InvalidValueWFSException import InvalidValueWFSException
-
+from ..FeatureServer.Exceptions.OperationProcessingFailedException import \
+    OperationProcessingFailedException
 
 from ..web_request.response import Response
 
@@ -132,6 +133,8 @@ class Server (object):
         except LayerNotFoundException as e:
             exceptionReport.add(e)
         except OperationParsingFailedException as e:
+            exceptionReport.add(e)
+        except OperationProcessingFailedException as e:
             exceptionReport.add(e)
         except InvalidValueWFSException as e:
             exceptionReport.add(e)
