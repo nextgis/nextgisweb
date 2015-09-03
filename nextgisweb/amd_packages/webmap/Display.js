@@ -564,7 +564,7 @@ define([
             this.map.olMap.addControl(this.navigationControl);
 
             // Масштабная линейка
-            this.map.olMap.addControl(new openlayers.Control.ScaleLine({bottomOutUnits: ""}));
+            this.map.olMap.addControl(new openlayers.Control.ScaleLine({bottomOutUnits: "", geodesic: true}));
 
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
