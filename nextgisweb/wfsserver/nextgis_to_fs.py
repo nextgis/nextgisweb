@@ -21,6 +21,7 @@ from .third_party.FeatureServer.WebFeatureService.Response.InsertResult import I
 from .third_party.FeatureServer.WebFeatureService.Response.UpdateResult import UpdateResult
 from .third_party.FeatureServer.WebFeatureService.Response.DeleteResult import DeleteResult
 
+from .third_party.FeatureServer.Exceptions.OperationProcessingFailedException import OperationProcessingFailedException
 
 class NextgiswebDatasource(DataSource):
 
@@ -202,7 +203,11 @@ class NextgiswebDatasource(DataSource):
         if action.wfsrequest is not None:
             data = action.wfsrequest.getStatement(self)
             for id in geojson.loads(data):
-                self.layer.feature_delete(id)
+                try:
+                    self.layer.feature_delete(id)
+                except:
+                    raise OperationProcessingFailedException(
+                        message="Can't delete feature (id=%s)" % (id, ))
 
             return DeleteResult(action.id, "")
 

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from pyramid.response import Response
 
-from ..resource import Widget, resource_factory, Resource
+from ..resource import Widget, resource_factory, Resource, ServiceScope
 from .model import Service
 
 from .third_party.FeatureServer.Server import Server, FeatureServerException
@@ -23,6 +23,8 @@ class ServiceWidget(Widget):
 
 def handler(obj, request):
     # import ipdb; ipdb.set_trace()
+    request.resource_permission(ServiceScope.connect)
+
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
 
     req = params.get('REQUEST')
@@ -98,7 +100,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'wfsserver.wfs', '/resource/{id:\d+}/wfs',
-        factory=resource_factory, client=('id',)
+        factory=resource_factory,
     ).add_view(handler, context=Service)
 
     Resource.__psection__.register(
