@@ -603,6 +603,8 @@ class FeatureQueryBase(object):
         self._single_part_geom = None
         self._box = None
 
+        self._geom_len = None
+
         self._fields = None
         self._limit = None
         self._offset = None
@@ -618,6 +620,9 @@ class FeatureQueryBase(object):
     def geom(self, single_part=False):
         self._geom = True
         self._single_part = single_part
+
+    def geom_length(self):
+        self._geom_len = True
 
     def box(self):
         self._box = True
@@ -672,6 +677,11 @@ class FeatureQueryBase(object):
             else:
                 columns.append(db.func.st_asbinary(geomexpr).label('geom'))
 
+        if self._geom_len:
+            columns.append(db.func.st_length(db.func.geography(db.func.st_transform(geomexpr, 4326))).label('geom_len'))
+            #select ST_Length(geography(ST_Transform(ST_LineFromText('LINESTRING(2000000 2000000, 10000 10000)', 3857),4326)))
+
+
         if self._box:
             columns.extend((
                 db.func.st_xmin(geomexpr).label('box_left'),
@@ -725,6 +735,7 @@ class FeatureQueryBase(object):
             layer = self.layer
 
             _geom = self._geom
+            _geom_len = self._geom_len
             _box = self._box
             _limit = self._limit
             _offset = self._offset
@@ -746,9 +757,14 @@ class FeatureQueryBase(object):
                     else:
                         geom = None
 
+                    calculated = dict()
+                    if self._geom_len:
+                        calculated['geom_len'] = row['geom_len']
+
                     yield Feature(
                         layer=self.layer, id=row.id,
                         fields=fdict, geom=geom,
+                        calculations=calculated,
                         box=box(
                             row.box_left, row.box_bottom,
                             row.box_right, row.box_top

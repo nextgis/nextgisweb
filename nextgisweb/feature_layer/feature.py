@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 class Feature(object):
 
-    def __init__(self, layer=None, id=None, fields=None, geom=None, box=None):
+    def __init__(self, layer=None, id=None, fields=None, geom=None, box=None, calculations=None):
         self._layer = layer
 
         self._id = int(id) if id else None
@@ -10,6 +10,8 @@ class Feature(object):
         self._box = box
 
         self._fields = dict(fields) if fields is not None else dict()
+
+        self._calculations = dict(calculations) if calculations else dict()
 
     @property
     def layer(self):
@@ -37,6 +39,10 @@ class Feature(object):
     @property
     def fields(self):
         return self._fields
+
+    @property
+    def calculations(self):
+        return self._calculations
 
     @property
     def geom(self):
