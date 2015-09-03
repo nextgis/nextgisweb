@@ -297,6 +297,8 @@ class Request (object):
                     if transactions is not None:
                         for transaction in transactions:
                             action = Action()
+                            action.version = transaction.version = \
+                                transactions.version
                             action.method = \
                                 transaction.__class__.__name__.lower()
                             action.layer = transaction.getLayerName()

@@ -1,9 +1,6 @@
 '''
-Created on Oct 16, 2011
-
-@author: michel
+The base of the code was taken from FeatureServer project
 '''
-import re
 
 
 class TransactionAction(object):
@@ -15,12 +12,21 @@ class TransactionAction(object):
         self.type = ''
         self.node = node
         self.layer_name = None
+        self._version = None
+
+    @property
+    def version(self):
+        return self._version
+
+    @version.setter
+    def version(self, value):
+        self._version = value
 
     def setStatement(self, stmt):
         self.stmt = stmt
 
     def getStatement(self, datasource=None):
-        if self.stmt == None and datasource != None:
+        if self.stmt is None and datasource is not None:
             self.createStatement(datasource)
         return self.stmt
 

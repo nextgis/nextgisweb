@@ -132,6 +132,7 @@ class WFSRequest(object):
     def get_transactions(self):
         '''Returns all WFS-T actions
         '''
+        # import ipdb; ipdb.set_trace()
         query = self.dom.xpath("//*[local-name() = 'Query']")
         if len(query) > 0:
             # query - return a dummy select object
@@ -140,7 +141,11 @@ class WFSRequest(object):
             # returning all transaction objects in a array
             self.transaction = Transaction()
             self.transaction.parse(self.data)
-            return self.transaction.getActions()
+            action = self.transaction.getActions()
+            if action.node is not None:
+                if 'version' in action.node.attrib:
+                    action.version = action.node.attrib['version']
+            return action
 
     def isGetCapabilities(self):
         '''Check if request is GetCapabilities request
