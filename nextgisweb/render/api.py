@@ -8,9 +8,16 @@ from pyramid.response import Response
 from ..resource import Resource, DataScope
 
 PD_READ = DataScope.read
+sett_name = 'permissions.disable_check.rendering'
 
 
 def image(request):
+    setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
+    if setting_disable_check in ('true', 'yes', '1'):
+        setting_disable_check = True
+    else:
+        setting_disable_check = False
+
     p_extent = map(float, request.GET['extent'].split(','))
     p_size = map(int, request.GET['size'].split(','))
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
@@ -18,7 +25,8 @@ def image(request):
     aimg = None
     for resid in p_resource:
         obj = Resource.filter_by(id=resid).one()
-        request.resource_permission(PD_READ, obj)
+        if not setting_disable_check:
+            request.resource_permission(PD_READ, obj)
         req = obj.render_request(obj.srs)
         rimg = req.render_extent(p_extent, p_size)
         if aimg is None:

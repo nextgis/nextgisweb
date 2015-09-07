@@ -116,4 +116,7 @@ class CoreComponent(Component):
         dict(key='locale', desc=u"Локаль, используемая по-умолчанию"),
         dict(key='debug', desc=u"Дополнительный инструментарий для отладки"),
         dict(key='sdir', desc=u"Директория для хранения данных"),
+
+        dict(key='permissions.disable_check.rendering', desc=u"Отключение проверки прав при рендеринге слоев"),
+        dict(key='permissions.disable_check.identify', desc=u"Отключение проверки прав при получении информации об объектах"),
     )
