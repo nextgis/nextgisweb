@@ -135,33 +135,37 @@ class NextgiswebDatasource(DataSource):
         if not self.writable:
             return None
 
-        if action.wfsrequest is not None:
-            if self.query is None:
-                self._setup_query()
+        try:
+            if action.wfsrequest is not None:
+                if self.query is None:
+                    self._setup_query()
 
-            data = action.wfsrequest.getStatement(self)
-            data = geojson.loads(data)
+                data = action.wfsrequest.getStatement(self)
+                data = geojson.loads(data)
 
-            id = data[self.fid_col]
+                id = data[self.fid_col]
 
-            self.query.filter_by(id=id)
-            self.query.geom()
-            result = self.query()
+                self.query.filter_by(id=id)
+                self.query.geom()
+                result = self.query()
 
-            # Обновление атрибутов, если нужно
-            feat = result.one()
-            for field_name in feat.fields:
-                if data.has_key(field_name):
-                    feat.fields[field_name] = data[field_name]
+                # Обновление атрибутов, если нужно
+                feat = result.one()
+                for field_name in feat.fields:
+                    if data.has_key(field_name):
+                        feat.fields[field_name] = data[field_name]
 
-            # Обновление геометрии, если нужно:
-            if data.has_key('geom'):
-                geom = self._geom_from_gml(data['geom'])
-                feat.geom = geom
+                # Обновление геометрии, если нужно:
+                if data.has_key('geom'):
+                    geom = self._geom_from_gml(data['geom'])
+                    feat.geom = geom
 
-            self.layer.feature_put(feat)
+                self.layer.feature_put(feat)
 
-            return UpdateResult(action.id, "")
+                return UpdateResult(action.id, "")
+        except:
+            raise OperationProcessingFailedException(
+                        message="Can't update feature (id=%s)" % (id, ))
 
         return None
 
@@ -173,26 +177,30 @@ class NextgiswebDatasource(DataSource):
             return None
 
         # import ipdb; ipdb.set_trace()
-        if action.wfsrequest is not None:
-            # import ipdb; ipdb.set_trace()
-            data = action.wfsrequest.getStatement(self)
+        try:
+            if action.wfsrequest is not None:
+                # import ipdb; ipdb.set_trace()
+                data = action.wfsrequest.getStatement(self)
 
-            feature_dict = geojson.loads(data)
+                feature_dict = geojson.loads(data)
 
-            # геометрия должна быть в shapely,
-            # т.к. ngw Feature хранит геометрию в этом виде
-            # import ipdb; ipdb.set_trace()
-            geom = self._geom_from_gml(feature_dict[self.geom_col])
+                # геометрия должна быть в shapely,
+                # т.к. ngw Feature хранит геометрию в этом виде
+                # import ipdb; ipdb.set_trace()
+                geom = self._geom_from_gml(feature_dict[self.geom_col])
 
-            # Поле геометрии в словаре аттрибутов теперь не нужно:
-            feature_dict.pop(self.geom_col)
+                # Поле геометрии в словаре аттрибутов теперь не нужно:
+                feature_dict.pop(self.geom_col)
 
-            feature = NgwFeature(fields=feature_dict, geom=geom)
+                feature = NgwFeature(fields=feature_dict, geom=geom)
 
-            feature_id = self.layer.feature_create(feature)
+                feature_id = self.layer.feature_create(feature)
 
-            id = str(feature_id)
-            return InsertResult(id, "")
+                id = str(feature_id)
+                return InsertResult(id, "")
+        except:
+            raise OperationProcessingFailedException(
+                        message="Can't insert new feature")
 
         return None
 
@@ -201,13 +209,13 @@ class NextgiswebDatasource(DataSource):
         нужно его распарсить и выполнить нужные действия
         """
         if action.wfsrequest is not None:
-            data = action.wfsrequest.getStatement(self)
-            for id in geojson.loads(data):
-                try:
+            try:
+                data = action.wfsrequest.getStatement(self)
+                for id in geojson.loads(data):
                     self.layer.feature_delete(id)
-                except:
-                    raise OperationProcessingFailedException(
-                        message="Can't delete feature (id=%s)" % (id, ))
+            except:
+                raise OperationProcessingFailedException(
+                    message="Can't delete feature (id=%s)" % (id, ))
 
             return DeleteResult(action.id, "")
 
