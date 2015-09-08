@@ -43,7 +43,7 @@ entry_points = {
     'console_scripts': [
         'nextgisweb = nextgisweb.script:main',
         'nextgisweb-config = nextgisweb.script:config',
-        'nextgisweb-i18n = nextgisweb.i18n:main',
+        'nextgisweb-i18n = nextgisweb.i18n.script:main',
     ],
 
     'nextgisweb.packages': ['nextgisweb = nextgisweb:pkginfo', ],
