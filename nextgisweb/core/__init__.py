@@ -23,7 +23,9 @@ class CoreComponent(Component):
     def initialize(self):
         Component.initialize(self)
 
-        self.locale = self._settings.get('locale', 'en')
+        self.locale_default = self._settings.get('locale.default', 'en')
+        self.locale_available = self._settings.get(
+            'locale.available', 'en ru').split(' ')
 
         setting_debug = self._settings.get('debug', 'false').lower()
         self.debug = setting_debug in ('true', 'yes', '1')
@@ -113,7 +115,8 @@ class CoreComponent(Component):
         dict(key='packages.ignore', desc=u"Не загружать перечисленные пакеты"),
         dict(key='components.ignore', desc=u"Не загружать перечисленные компоненты"),
 
-        dict(key='locale', desc=u"Локаль, используемая по-умолчанию"),
+        dict(key='locale.default', desc=u"Локаль, используемая по-умолчанию"),
+        dict(key='locale.available', desc=u"Доступные локали"),
         dict(key='debug', desc=u"Дополнительный инструментарий для отладки"),
         dict(key='sdir', desc=u"Директория для хранения данных"),
 
