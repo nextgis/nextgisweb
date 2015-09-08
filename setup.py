@@ -20,7 +20,7 @@ requires = [
     'waitress',
     'pygdal' + (('>=' + gv + '.0,<=' + gv + '.9999') if gv else ''),
     'psycopg2',
-    'geoalchemy',
+    'geoalchemy>=0.7.2',
     'shapely',
     'geojson',
     'pillow',
