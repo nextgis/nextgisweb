@@ -17,7 +17,7 @@ class CoreComponent(Component):
 
     def __init__(self, env, settings):
         super(CoreComponent, self).__init__(env, settings)
-        self.locale = None
+        self.locale_default = None
         self.debug = False
 
     def initialize(self):
