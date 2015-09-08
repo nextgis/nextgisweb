@@ -230,6 +230,7 @@ class NextgiswebDatasource(DataSource):
         Наверное есть способ лучше, но я не нашел.
         Кто знает -- правьте
         """
+        # import ipdb; ipdb.set_trace()
         gml = str(gml)
         # CreateGeometryFromGML не умеет работать с уникодом
         ogr_geo = ogr.CreateGeometryFromGML(gml)
@@ -256,6 +257,6 @@ class NextgiswebDatasource(DataSource):
         elif geo_type in [ogr.wkbLineString, ogr.wkbLinearRing]:
             return ogr.ForceToMultiLineString(ogr_geometry)
         else:
-            ogr_geometry
+            return ogr_geometry
 
 
