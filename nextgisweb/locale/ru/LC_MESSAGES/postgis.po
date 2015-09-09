@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-08-12 00:11+0300\n"
+"POT-Creation-Date: 2015-09-09 04:06+0300\n"
 "PO-Revision-Date: 2015-08-02 14:57+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -39,8 +39,9 @@ msgid "PostGIS layer"
 msgstr "Слой PostGIS"
 
 #: model.py:200
-msgid "Table '$table' not found!"
-msgstr "Таблица '$table' не найдена!"
+#, python-format
+msgid "Table '%(table)s' not found!"
+msgstr "Таблица '%(table)s' не найдена!"
 
 #: model.py:217
 msgid ""
@@ -61,8 +62,9 @@ msgstr ""
 "целочисленный тип!"
 
 #: model.py:280 model.py:283
-msgid "Column '$column' not found!"
-msgstr "Поле '$column' не найдено!"
+#, python-format
+msgid "Column '%(column)s' not found!"
+msgstr "Поле '%(column)s' не найдено!"
 
 #: amd/ngw-postgis/template/ConnectionWidget.hbs:9
 msgid "Host"

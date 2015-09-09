@@ -197,7 +197,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             tableref = '%s.%s' % (self.schema, self.table)
 
             if result.first() is None:
-                raise ValidationError(_("Table '$table' not found!", mapping=dict(table=tableref))) # NOQA
+                raise ValidationError(_("Table '%(table)s' not found!") % dict(table=tableref)) # NOQA
 
             result = conn.execute(
                 """SELECT type, srid FROM geometry_columns
@@ -277,10 +277,10 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                             **fopts))
 
             if not colfound_id:
-                raise ValidationError(_("Column '$column' not found!", mapping=dict(column=self.column_id)))  # NOQA
+                raise ValidationError(_("Column '%(column)s' not found!") % dict(column=self.column_id)) # NOQA
 
             if not colfound_geom:
-                raise ValidationError(_("Column '$column' not found!", mapping=dict(column=self.column_geom)))  # NOQA
+                raise ValidationError(_("Column '%(column)s' not found!") % dict(column=self.column_geom)) # NOQA
 
         finally:
             conn.close()
