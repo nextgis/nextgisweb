@@ -189,7 +189,7 @@ class WFS(Format):
         results.append("""</ExceptionReport>""")
         return "\n".join(results)
 
-    def encode_transaction(self, response, **kwargs):
+    def encode_transaction(self, response, **params):
         failedCount = 0
 
         summary = response.getSummary()
@@ -207,9 +207,9 @@ class WFS(Format):
                    (str(summary.getTotalReplaced()),
                     ) if summary.getTotalReplaced() > 0 else ''
 
-        result = """<?xml version="1.0" ?>
+        transact_header = """<?xml version="1.0" ?>
 <wfs:TransactionResponse
-version="1.0.0"
+version="2.0.0"
     xmlns:wfs="http://www.opengis.net/wfs"
     xmlns:ogc="http://www.opengis.net/ogc"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -222,14 +222,21 @@ version="1.0.0"
 
         insertResult = response.getInsertResults()
         if summary.getTotalInserted() > 0:
-            result += "<wfs:InsertResult>"
+            body = ''
             for insert in insertResult:
-                result += '''
-                <ogc:FeatureId fid="%s"/>
+                body += '''
+                <fes:ResourceId rid="%s"/>
                 ''' % (str(insert.getResourceId()), )
-                if len(insert.getHandle()) > 0:
-                    failedCount += 1
-            result += """</wfs:InsertResult>"""
+                # if len(insert.getHandle()) > 0:
+                #     failedCount += 1
+
+            if len(insert.getHandle()) > 0:
+                header = '<wfs:InsertResult handle="%s">' % (str(insert.getHandle()), )
+            else:
+                header = '<wfs:InsertResult>'
+            tail = """</wfs:InsertResult>"""
+
+            result = transact_header + header + body + tail
 
         updateResult = response.getUpdateResults()
         # if summary.getTotalUpdated() > 0:

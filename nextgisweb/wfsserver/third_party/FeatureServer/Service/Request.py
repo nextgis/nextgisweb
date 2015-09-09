@@ -303,6 +303,7 @@ class Request (object):
                                 transaction.__class__.__name__.lower()
                             action.layer = transaction.getLayerName()
                             action.wfsrequest = transaction
+                            action.handle = transaction.handle
                             actions.append(action)
 
             return actions

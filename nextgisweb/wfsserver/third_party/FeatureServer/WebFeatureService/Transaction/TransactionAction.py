@@ -13,6 +13,7 @@ class TransactionAction(object):
         self.node = node
         self.layer_name = None
         self._version = None
+        self.handle = ''
 
     @property
     def version(self):

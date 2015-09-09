@@ -197,7 +197,7 @@ class NextgiswebDatasource(DataSource):
                 feature_id = self.layer.feature_create(feature)
 
                 id = str(feature_id)
-                return InsertResult(id, "")
+                return InsertResult(id, action.handle, action.layer)
         except:
             raise OperationProcessingFailedException(
                         message="Can't insert new feature")
