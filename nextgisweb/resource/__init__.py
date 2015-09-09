@@ -25,6 +25,8 @@ from .permission import *   # NOQA
 from .view import *         # NOQA
 from .widget import *       # NOQA
 
+from .persmission_cache import PermissionCache, settings_info as cache_settings_info
+
 __all__ = [
     'Resource',
     'IResourceBase',
@@ -40,6 +42,17 @@ __all__ = [
 class ResourceComponent(Component):
     identity = 'resource'
     metadata = Base.metadata
+
+    def __init__(self, env, settings):
+        # setup perm cache
+        self.perm_cache_enable = False
+        self.perm_cache_instance = None
+
+        cache_enabled_sett = settings.get('perm_cache.enable', 'false').lower()
+        self.perm_cache_enable = cache_enabled_sett in ('true', 'yes', '1')
+
+        if self.perm_cache_enable:
+            self.perm_cache_instance = PermissionCache.construct(settings)
 
     @require('auth')
     def initialize_db(self):
@@ -71,3 +84,6 @@ class ResourceComponent(Component):
         from . import view, api
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
+
+    settings_info = () + cache_settings_info
+
