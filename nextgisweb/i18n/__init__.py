@@ -3,8 +3,6 @@ from __future__ import unicode_literals, print_function, absolute_import
 import logging
 import inspect
 
-from translationstring import TranslationString
-
 from .trstring import TrString, trstring_factory # API # NOQA
 from .localizer import Translations, Localizer # API # NOQA
 
@@ -17,7 +15,7 @@ def tcheck(arg):
     При добавлении ее в default_filters позволяет отследить в логе экземпляры
     TranslationString для которых не был выполнен перевод. """
 
-    if isinstance(arg, TranslationString):
+    if isinstance(arg, TrString):
         frame = inspect.stack()[1][0]
         template_uri = frame.f_globals.get('_template_uri', '<unknown>')
 
