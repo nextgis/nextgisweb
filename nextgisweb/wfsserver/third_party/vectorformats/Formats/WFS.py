@@ -207,13 +207,13 @@ class WFS(Format):
                    (str(summary.getTotalReplaced()),
                     ) if summary.getTotalReplaced() > 0 else ''
 
-        transact_header = """<?xml version="1.0" ?>
+        result = """<?xml version="1.0" ?>
 <wfs:TransactionResponse
 version="2.0.0"
     xmlns:wfs="http://www.opengis.net/wfs"
     xmlns:ogc="http://www.opengis.net/ogc"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.opengis.net/wfs ../wfs/1.0.0/WFS-transaction.xsd">
+    xsi:schemaLocation="http://www.opengis.net/wfs ../wfs/2.0.0/WFS-transaction.xsd">
 
     <wfs:TransactionSummary>
         %s %s %s %s
@@ -236,7 +236,7 @@ version="2.0.0"
                 header = '<wfs:InsertResult>'
             tail = """</wfs:InsertResult>"""
 
-            result = transact_header + header + body + tail
+            result += header + body + tail
 
         updateResult = response.getUpdateResults()
         # if summary.getTotalUpdated() > 0:
