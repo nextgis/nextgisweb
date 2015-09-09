@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import os.path
+from pkg_resources import iter_entry_points, resource_filename
 
 from sqlalchemy import create_engine
 
 from ..component import Component
 from ..models import DBSession, Base
+from ..i18n import Localizer, Translations
 
 from .command import BackupCommand  # NOQA
 from .backup import BackupBase, TableBackup, SequenceBackup  # NOQA
@@ -100,6 +102,20 @@ class CoreComponent(Component):
             raise IOError("Invalid base directory path")
 
         os.makedirs(fpath)
+
+    def localizer(self, locale):
+        if not hasattr(self, '_localizer'):
+            self._localizer = dict()
+        if locale in self._localizer:
+            return self._localizer[locale]
+
+        translations = Translations()
+        for ep in iter_entry_points(group='nextgisweb.packages'):
+            translations.scandir(resource_filename(ep.name, 'locale'), locale)
+
+        lobj = Localizer(locale, translations)
+        self._localizer[locale] = lobj
+        return lobj
 
     settings_info = (
         dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),

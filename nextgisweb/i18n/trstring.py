@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
+
+
+class TrString(unicode):
+
+    def __new__(cls, msgid, domain=None, context=None,
+                modarg=None, fmtarg=None):
+        self = unicode.__new__(cls, msgid)
+
+        if isinstance(msgid, self.__class__):
+            domain = domain or msgid.domain and msgid.domain[:]
+            context = context or msgid.context and msgid.context[:]
+            modarg = modarg or msgid.modarg and msgid.modarg[:]
+            fmtarg = fmtarg or msgid.fmtarg and msgid.fmtarg[:]
+
+        self.domain = domain
+        self.context = context
+        self.modarg = modarg
+        self.fmtarg = fmtarg
+        return self
+
+    def __mod__(self, argument):
+        return self.__class__(self, modarg=argument)
+
+
+def trstring_factory(domain):
+    def create(msgid, **kwargs):
+        return TrString(msgid, domain=domain, **kwargs)
+    return create

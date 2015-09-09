@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import sys
-from hashlib import md5
+import os.path
 import re
 import codecs
+from hashlib import md5
 from StringIO import StringIO
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename, iter_entry_points
 
 from pyramid.config import Configurator
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -94,12 +95,26 @@ class PyramidComponent(Component):
         # которая указана в компоненте core, хотя зачем такое нужно не ясно.
 
         plockey = 'pyramid.default_locale_name'
-        if plockey not in settings and self.env.core.locale is not None:
-            settings[plockey] = self.env.core.locale
+        if plockey not in settings and self.env.core.locale_default is not None:
+            settings[plockey] = self.env.core.locale_default
 
         config = ExtendedConfigurator(settings=settings)
 
-        config.add_translation_dirs(resource_filename('nextgisweb', 'locale'))
+        # Заменяем стандартный localizer от pyramid на свой, родной очень
+        # родной завязан на translationstring, который странно работает с
+        # интерполяцией строк через оператор %.
+
+        def localizer(request):
+            return request.env.core.localizer(request.locale_name)
+        config.add_request_method(localizer, 'localizer', property=True)
+
+        # TODO: Нужно отказаться от translation dirs полностью!
+        # Сейчас используются только для поиска jed-файлов.
+
+        for ep in iter_entry_points(group='nextgisweb.packages'):
+            dirname = resource_filename(ep.name, 'locale')
+            if os.path.isdir(dirname):
+                config.add_translation_dirs(dirname)
 
         config.add_route_predicate('client', ClientRoutePredicate)
 

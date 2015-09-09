@@ -5,6 +5,9 @@ import inspect
 
 from translationstring import TranslationString
 
+from .trstring import TrString, trstring_factory # API # NOQA
+from .localizer import Translations, Localizer # API # NOQA
+
 logger = logging.getLogger(__name__)
 
 
