@@ -78,11 +78,6 @@ def feature_update(request):
 
     feature_id = int(request.matchdict['feature_id'])
 
-    ext_mid = OrderedDict()
-    for k, ecls in FeatureExtension.registry._dict.iteritems():
-        if hasattr(ecls, 'editor_widget'):
-            ext_mid[k] = ecls.editor_widget
-
     fields = []
     for f in request.context.fields:
         fields.append(OrderedDict((

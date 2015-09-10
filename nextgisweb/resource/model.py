@@ -5,6 +5,7 @@ from collections import namedtuple, OrderedDict
 from bunch import Bunch
 
 from .. import db
+from ..env import env
 from ..models import declarative_base, DBSession
 from ..registry import registry_maker
 from ..auth import Principal, User, Group
@@ -211,7 +212,15 @@ class Resource(Base):
         return sets.allow - sets.mask - sets.deny
 
     def has_permission(self, permission, user):
-        return permission in self.permissions(user)
+        perm_cache = env.resource.perm_cache_instance
+        if perm_cache:
+            val = perm_cache.get_cached_perm(self, permission, user)  # get perm from cache
+            if val is None:  # cache is empty
+                val = permission in self.permissions(user)
+                perm_cache.add_to_cache(self, permission, user, val)  # add to cache
+            return val
+        else:
+            return permission in self.permissions(user)
 
     # Валидация данных
 
