@@ -46,5 +46,5 @@ def image(request):
 
 
 def setup_pyramid(comp, config):
-    config.add_route('render.image', '/api/component/render/image') \
+    config.add_route('render.image', '/api/component/render/image', client=()) \
         .add_view(image)
