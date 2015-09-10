@@ -6,7 +6,8 @@ define([
     "dijit/Dialog",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
-    "./Tree"
+    "./Tree",
+    "ngw-pyramid/i18n!resource"
 ], function (
     declare,
     lang,
@@ -15,10 +16,11 @@ define([
     Dialog,
     Button,
     BorderContainer,
-    Tree
+    Tree,
+    i18n
 ) {
     return declare([Dialog], {
-        title: "Выберите ресурс",
+        title: i18n.gettext("Select resource"),
 
         buildRendering: function () {
             this.inherited(arguments);
@@ -41,7 +43,7 @@ define([
             }, this.containerNode);
 
             this.btnOk = new Button({
-                label: "OK",
+                label: i18n.gettext("OK"),
                 disabled: true,
                 onClick: lang.hitch(this, function () {
                     this._deferred.resolve(this.tree.get("selectedItem"));
@@ -50,7 +52,7 @@ define([
             }).placeAt(this.actionBar);
             
             new Button({
-                label: "Отмена",
+                label: i18n.gettext("Cancel"),
                 onClick: lang.hitch(this, function () {
                     this._deferred.reject();
                     this.hide();

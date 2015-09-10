@@ -1,14 +1,16 @@
 define([
     "dojo/_base/declare",
     "dijit/Editor",
-    "ngw-resource/serialize"
+    "ngw-resource/serialize",
+    "ngw-pyramid/i18n!resource"
 ], function (
     declare,
     Editor,
-    serialize
+    serialize,
+    i18n
 ) {
     return declare("ngw.resource.DescriptionWidget", [Editor, serialize.Mixin], {
-        title: "Описание",
+        title: i18n.gettext("Description"),
 
         constructor: function () {
             this.value = "";

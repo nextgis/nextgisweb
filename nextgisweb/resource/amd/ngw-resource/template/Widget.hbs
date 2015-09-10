@@ -5,21 +5,21 @@
         <div data-dojo-type="ngw/form/DisplayNameTextBox"
             data-dojo-attach-point="wDisplayName"
             data-ngw-serialize="display_name"
-            title="Наименование" style="width: 100%"></div>
+            title="{{gettext 'Display name'}}" style="width: 100%"></div>
 
         <div data-dojo-type="ngw/form/KeynameTextBox"
             data-dojo-attach-point="wKeyname"
             data-ngw-serialize="keyname"
-            title="Ключ" style="width: 100%"></div>
+            title="{{gettext 'Keyname'}}" style="width: 100%"></div>
 
         <div data-dojo-type="ngw-resource/ResourceBox"
             data-dojo-attach-point="wParent"
-            title="Ресурс родитель" style="width: 100%"></div>
+            title="{{gettext 'Parent'}}" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/TextBox"
             data-dojo-attach-point="wCls"
             data-dojo-props="readonly: true"
-            title="Тип ресурса" style="width: 100%"></div>
+            title="{{gettext 'Type'}}" style="width: 100%"></div>
 
     </div>
 </div>

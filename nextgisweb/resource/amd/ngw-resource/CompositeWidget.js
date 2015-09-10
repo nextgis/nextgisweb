@@ -14,6 +14,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
+    "ngw-pyramid/i18n!resource",
     "ngw/route",
     "xstyle/css!./resource/CompositeWidget.css"
 ], function (
@@ -31,6 +32,7 @@ define([
     BorderContainer,
     ContentPane,
     TabContainer,
+    i18n,
     route
 ) {
     var E_INVALID_DATA = "INVALID_DATA",
@@ -51,7 +53,7 @@ define([
             this.lockContainer = new ContentPane({
                 region: "center",
                 style: "display: none; border: 1px solid silver;",
-                content: "Подождите, идет обработка запроса..."
+                content: i18n.gettext("Please wait. Processing request...")
             }).placeAt(this);
 
             this.btnContainer = new ContentPane({
@@ -76,13 +78,13 @@ define([
             if (this.operation === "create") {
 
                 this.buttons.push(new Button({
-                    label: "Создать",
+                    label: i18n.gettext("Create"),
                     iconClass: "dijitIconNewTask",
                     onClick: lang.hitch(this, function () { this.createObj(false); })
                 }).placeAt(this.btnContainer));
 
                 this.buttons.push(new Button({
-                    label: "Создать и изменить",
+                    label: i18n.gettext("Create and edit"),
                     iconClass: "dijitIconNewTask",
                     onClick: lang.hitch(this, function () { this.createObj(true); })
                 }).placeAt(this.btnContainer));
@@ -90,7 +92,7 @@ define([
             } else if (this.operation === "update") {
 
                 this.buttons.push(new Button({
-                    label: "Сохранить",
+                    label: i18n.gettext("Save"),
                     iconClass: "dijitIconSave",
                     onClick: lang.hitch(this, this.updateObj)
                 }).placeAt(this.btnContainer));
@@ -98,7 +100,7 @@ define([
             } else if (this.operation === "delete") {
 
                 this.buttons.push(new Button({
-                    label: "Удалить",
+                    label: i18n.gettext("Delete"),
                     iconClass: "dijitIconDelete",
                     onClick: lang.hitch(this, this.deleteObj)
                 }).placeAt(this.btnContainer));
@@ -308,23 +310,19 @@ define([
         },
 
         errorMessage: function (e) {
+            var S_ERROR_MESSAGE = i18n.gettext("Error message:")
+
             if (e.error == E_REQUEST && e.status == 400) {
-                alert("При проверке данных на сервере обнаружена ошибка. " +
-                    "Исправьте приведенную ниже ошибку и повторите попытку. " +
-                    "Сообщение об ошибке: \n" + e.data.message);
+                alert(i18n.gettext("Errors found during data validation on server. Correct error and try again.") + " " + S_ERROR_MESSAGE + "\n" + e.data.message);
 
             } else if (e.error == E_REQUEST && e.status == 403) {
-                alert("Недостаточно прав доступа для выполнения выбранной " +
-                    "операции. Сообщение об ошибке: \n" + e.data.message);
+                alert(i18n.gettext("Insufficient permissions to perform the operation.") + " " + S_ERROR_MESSAGE + "\n" + e.data.message);
 
             } else if (e.error == E_INVALID_DATA) {
-                alert("В ходе проверки данных обнаружены ошибки. Соответствующие " +
-                    "вкладки и поля отмечены красным цветом.");
+                alert(i18n.gettext("Errors found during data validation. Tabs with errors marked in red."));
 
             } else {
-                alert("В ходе выполнения операции возникла неожиданная ошибка. " +
-                    "Сообщение об ошибке: \n" + e.data.message);
-
+                alert(i18n.gettext("Unexpected error occurred during the operation.") + " " + S_ERROR_MESSAGE + "\n" + e.data.message);
             }
         },
 
