@@ -26,7 +26,7 @@ class FeatureAttachment(Base):
 
     description = db.Column(db.Unicode, nullable=True)
 
-    fileobj = db.relationship(FileObj)
+    fileobj = db.relationship(FileObj, lazy='joined')
 
     resource = db.relationship(Resource, backref=db.backref(
         '__feature_attachment', cascade='all'))
