@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from pyramid.i18n import TranslationStringFactory
+from ..i18n import trstring_factory
 
 COMP_ID = 'resmeta'
-_ = TranslationStringFactory(COMP_ID)
+_ = trstring_factory(COMP_ID)
