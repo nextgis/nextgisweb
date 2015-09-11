@@ -1,16 +1,19 @@
 define([
     "dojo/_base/declare",
     "dijit/Editor",
+    "dijit/_editor/plugins/LinkDialog",
     "ngw-resource/serialize",
     "ngw-pyramid/i18n!resource"
 ], function (
     declare,
     Editor,
+    LinkDialog,
     serialize,
     i18n
 ) {
     return declare("ngw.resource.DescriptionWidget", [Editor, serialize.Mixin], {
         title: i18n.gettext("Description"),
+        extraPlugins: ["|", "createLink", "unlink"],
 
         constructor: function () {
             this.value = "";
