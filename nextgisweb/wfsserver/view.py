@@ -95,9 +95,14 @@ def handler(obj, request):
 
 
 def setup_pyramid(comp, config):
-
     config.add_route(
-        'wfsserver.wfs', '/resource/{id:\d+}/wfs',
+        'wfsserver.wfs', '/api/resource/{id:\d+}/wfs',
+        factory=resource_factory, client=('id',)
+    ).add_view(handler, context=Service)
+
+    # TODO: Legacy route
+    config.add_route(
+        '#wfsserver.wfs', '/resource/{id:\d+}/wfs',
         factory=resource_factory, client=('id',)
     ).add_view(handler, context=Service)
 
