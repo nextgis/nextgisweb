@@ -144,7 +144,8 @@ def iput(resource, request):
         feature = f
 
     deserialize(feature, request.json_body)
-    resource.feature_put(feature)
+    if IWritableFeatureLayer.providedBy(resource):
+        resource.feature_put(feature)
 
     return Response(
         json.dumps(dict(id=feature.id)),
