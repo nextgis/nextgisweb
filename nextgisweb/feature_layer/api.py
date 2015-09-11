@@ -187,19 +187,15 @@ def cpost(resource, request):
 
 def setup_pyramid(comp, config):
 
-    # TODO: В add_view так же нужно проверять наличие интерфейсов
-    # IFeatureLayer и IWritableFeatureLayer, но похоже одновременное указание
-    # request_method и context сейчас в pyramid не работает.
-
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
         factory=resource_factory, client=('id', 'fid')) \
-        .add_view(iget, request_method='GET') \
-        .add_view(iput, request_method='PUT') \
-        .add_view(idelete, request_method='DELETE')
+        .add_view(iget, context=IFeatureLayer, request_method='GET') \
+        .add_view(iput, context=IWritableFeatureLayer, request_method='PUT') \
+        .add_view(idelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
         'feature_layer.feature.collection', '/api/resource/{id}/feature/',
         factory=resource_factory, client=('id', )) \
-        .add_view(cget, request_method='GET') \
-        .add_view(cpost, request_method='POST')
+        .add_view(cget, context=IFeatureLayer, request_method='GET') \
+        .add_view(cpost, context=IWritableFeatureLayer, request_method='POST')
