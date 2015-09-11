@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.orm.exc import NoResultFound
 
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPForbidden
 from pyramid.security import remember, forget
 
 from ..object_widget import ObjectWidget
@@ -49,14 +49,21 @@ def setup_pyramid(comp, config):
     config.add_route('auth.logout', '/logout').add_view(logout)
 
     def forbidden(request):
-        # Если это гость, то аутентификация может ему помочь
+        # Если пользователь не аутентифицирован, то можно предложить ему войти
+        # TODO: Возможно есть способ лучше проверить наличие аутентификации
+
         if request.user.keyname == 'guest':
-            return HTTPFound(
-                location=request.route_url(
-                    'auth.login',
-                    _query=dict(next=request.url)
-                )
-            )
+            # Если URL начинается с /api/ и пользователь не аутентифицирован,
+            # то скорее всего это не веб-интерфейс, а какой-то сторонний софт,
+            # который возможно умеет HTTP аутентификацию. Скажем ему что мы
+            # тоже умеем. Остальных переадресовываем на страницу логина.
+
+            if request.path.startswith('/api/'):
+                return HTTPUnauthorized(headers={
+                    b'WWW-Authenticate': b'Basic realm="NextGISWeb"'})
+            else:
+                return HTTPFound(location=request.route_url(
+                    'auth.login', _query=dict(next=request.url)))
 
         # Уже аутентифицированным пользователям показываем сообщение об ошибке
         request.response.status = 403
