@@ -58,7 +58,7 @@ def setup_pyramid(comp, config):
             # который возможно умеет HTTP аутентификацию. Скажем ему что мы
             # тоже умеем. Остальных переадресовываем на страницу логина.
 
-            if request.path.startswith('/api/'):
+            if request.path_info.startswith('/api/'):
                 return HTTPUnauthorized(headers={
                     b'WWW-Authenticate': b'Basic realm="NextGISWeb"'})
             else:
