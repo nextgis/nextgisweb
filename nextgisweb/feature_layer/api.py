@@ -191,7 +191,7 @@ def setup_pyramid(comp, config):
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
         factory=resource_factory, client=('id', 'fid')) \
         .add_view(iget, context=IFeatureLayer, request_method='GET') \
-        .add_view(iput, context=IWritableFeatureLayer, request_method='PUT') \
+        .add_view(iput, context=IFeatureLayer, request_method='PUT') \
         .add_view(idelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
