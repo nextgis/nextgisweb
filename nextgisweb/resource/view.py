@@ -17,6 +17,7 @@ from .permission import Permission, Scope
 from .scope import ResourceScope
 from .serialize import CompositeSerializer
 from .widget import CompositeWidget
+from .util import _
 
 __all__ = ['resource_factory', ]
 
@@ -60,7 +61,7 @@ def objjson(request):
     serializer = CompositeSerializer(obj=request.context, user=request.user)
     serializer.serialize()
     return dict(obj=request.context,
-                subtitle="Представление JSON",
+                subtitle=_("JSON view"),
                 objjson=serializer.data)
 
 
@@ -92,7 +93,7 @@ def tree(request):
     obj = request.context
     return dict(
         obj=obj, maxwidth=True, maxheight=True,
-        subtitle="Дерево ресурсов")
+        subtitle=_("Resource tree"))
 
 
 @viewargs(renderer='json', json=True)
@@ -129,7 +130,7 @@ def store(request):
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def create(request):
-    return dict(obj=request.context, subtitle="Создать ресурс", maxheight=True,
+    return dict(obj=request.context, subtitle=_("Create resource"), maxheight=True,
                 query=dict(operation='create', cls=request.GET.get('cls'),
                            parent=request.context.id))
 
@@ -142,7 +143,7 @@ def update(request):
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def delete(request):
-    return dict(obj=request.context, subtitle="Удалить ресурс", maxheight=True,
+    return dict(obj=request.context, subtitle=_("Delete resource"), maxheight=True,
                 query=dict(operation='delete', id=request.context.id))
 
 
@@ -259,21 +260,21 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='children', priority=20,
-        title="Дочерние ресурсы",
+        title=_("Child resources"),
         is_applicable=lambda obj: len(obj.children) > 0,
         template='nextgisweb:resource/template/section_children.mako')
 
     Resource.__psection__.register(
         key='description',
         priority=50,
-        title="Описание",
+        title=_("Description"),
         is_applicable=lambda obj: obj.description is not None,
         template='nextgisweb:resource/template/section_description.mako')
 
     Resource.__psection__.register(
         key='permission',
         priority=100,
-        title="Права пользователя",
+        title=_("User permissions"),
         template='nextgisweb:resource/template/section_permission.mako')
 
     # Действия
@@ -295,29 +296,31 @@ def setup_pyramid(comp, config):
                 _query=dict(cls=cls))
 
     Resource.__dynmenu__ = DynMenu(
-        Label('create', "Создать ресурс"),
+        Label('create', _("Create resource")),
 
         AddMenu(),
 
-        Label('operation', "Операции"),
+        Label('operation', _("Operation")),
 
         Link(
-            'operation/update', "Изменить",
+            'operation/update', _("Update"),
             lambda args: args.request.route_url(
                 'resource.update', id=args.obj.id)),
 
         Link(
-            'operation/delete', "Удалить",
+            'operation/delete', _("Delete"),
             lambda args: args.request.route_url(
                 'resource.delete', id=args.obj.id)),
 
-        Label('extra', "Дополнительно"),
+        Label('extra', _("Extra")),
 
-        Link('extra/tree', "Дерево ресурсов",
+        Link(
+            'extra/tree', _("Resource tree"),
             lambda args: args.request.route_url(
                 'resource.tree', id=args.obj.id)),
 
-        Link('extra/json', "Представление JSON",
+        Link(
+            'extra/json', _("JSON view"),
             lambda args: args.request.route_url(
                 'resource.json', id=args.obj.id)),
     )

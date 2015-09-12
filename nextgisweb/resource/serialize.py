@@ -9,6 +9,7 @@ from ..registry import registry_maker
 from ..models import BaseClass
 
 from .exception import Forbidden
+from .util import _
 
 _registry = registry_maker()
 
@@ -94,7 +95,7 @@ class SerializedProperty(object):
         if self.writeperm(srlzr):
             self.setter(srlzr, srlzr.data[self.attrname])
         else:
-            raise Forbidden("Attribute '%s' forbidden" % self.attrname)
+            raise Forbidden(_("Attribute '%s' forbidden.") % self.attrname)
 
 
 class SerializedRelationship(SerializedProperty):

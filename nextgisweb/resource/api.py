@@ -17,6 +17,7 @@ from .scope import ResourceScope
 from .exception import ResourceError, ValidationError, ForbiddenError
 from .serialize import CompositeSerializer
 from .view import resource_factory
+from .util import _
 
 
 PERM_READ = ResourceScope.read
@@ -131,8 +132,8 @@ def child_delete(request):
         content_type=b'application/json')
 
 
-def exception_to_response(exc_type, exc_value, exc_traceback):
-    data = dict(ecls=exc_value.__class__.__name__)
+def exception_to_response(request, exc_type, exc_value, exc_traceback):
+    data = dict(exception=exc_value.__class__.__name__)
 
     # Выбираем более подходящие HTTP-коды, впрочем зачем это нужно
     # сейчас не очень понимаю - можно было и одним ограничиться.
@@ -155,29 +156,25 @@ def exception_to_response(exc_type, exc_value, exc_traceback):
         data['attr'] = exc_value.__srlzr_prprt__
 
     if isinstance(exc_value, ResourceError):
-
         # Только для потомков ResourceError можно передавать сообщение
         # пользователю как есть, в остальных случаях это может быть
         # небезопасно, там могут быть куски SQL запросов или какие-то
         # внутренние данные.
 
-        data['message'] = exc_value.message
+        data['message'] = request.localizer.translate(exc_value.message)
 
     else:
-
         # Для всех остальных генерируем универсальное сообщение об ошибке на
         # основании имени класса исключительной ситуации.
 
-        data['message'] = "Неизвестная исключительная ситуация %s" \
-            % exc_value.__class__.__name__
+        if 'serializer' in data and 'attr' in data:
+            message = _("Unknown exception '%(exception)s' in serializer '%(serializer)s' attribute '%(attr)s'.")
+        elif 'attr' in data:
+            message = _("Unknown exception '%(exception)s' in serializer '%(serializer)s'.")
+        else:
+            message = _("Unknown exception '%(exception)s'.")
 
-        data['message'] += ", cериализатор %s" % data['serializer'] \
-            if 'serializer' in data else ''
-
-        data['message'] += ", атрибут %s" % data['attr'] \
-            if 'attr' in data else ''
-
-        data['message'] += "."
+        data['message'] = request.localizer.translate(message % data)
 
         # Ошибка неожиданная, имеет смысл дать возможность ее записать.
 
@@ -212,7 +209,7 @@ def resexc_tween_factory(handler, registry):
                 'resource.item',
                 'resource.collection'
             ):
-                return exception_to_response(*sys.exc_info())
+                return exception_to_response(request, *sys.exc_info())
             raise
         return response
 
@@ -297,15 +294,13 @@ def collection_post(request):
         data['resource']['cls'] = cls
 
     if 'parent' not in data['resource']:
-        raise ValidationError("Не указан родительский ресурс.")
+        raise ValidationError(_("Resource parent required."))
 
     if 'cls' not in data['resource']:
-        raise ValidationError("Не указан класс ресурса.")
+        raise ValidationError(_("Resource class required."))
 
     elif data['resource']['cls'] not in Resource.registry:
-        raise ValidationError(
-            "Указанный класс ресурса (%s) не зарегистрирован."
-            % data['resource']['cls'])
+        raise ValidationError(_("Unknown resource class '%s'.") % data['resource']['cls'])
 
     cls = Resource.registry[data['resource']['cls']]
     resource = cls(owner_user=request.user)

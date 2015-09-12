@@ -39,7 +39,7 @@ class Marker(Base):
 
     collection = orm.relationship(MarkerCollection)
     category = orm.relationship(MarkerCategory)
-    fileobj = orm.relationship(FileObj)
+    fileobj = orm.relationship(FileObj, lazy='joined')
 
     def load_file(self, fp):
         fileobj = env.file_storage.fileobj('marker_library')

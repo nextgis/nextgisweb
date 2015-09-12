@@ -17,7 +17,7 @@
 
 <%def name="title()">
     %if subtitle:
-        ${subtitle}
+        ${tr(subtitle)}
     %else:
         ${obj}
     %endif
@@ -58,7 +58,7 @@
     %endif
 
     %if subtitle:
-        <h1>${subtitle}</h1>
+        <h1>${tr(subtitle)}</h1>
     %elif obj:
         <h1>
             ${obj}

@@ -8,7 +8,7 @@ define([
     return declare(Adapter, {
         createLayer: function (item) {
             var layer = new Grid(item.id, {
-                url: route("style.image", {id: item.styleId}),
+                url: route.render.image(),
                 params: {},
                 singleTile: true,
                 ratio: 1,
@@ -22,8 +22,9 @@ define([
 
             layer.olLayer.getURL = function (bounds) {
                 var bounds = this.getExtent(), 
-                    size = this.getImageSize();
-                return this.url + "?extent=" + bounds.toArray().join(",") +
+                    size = this.getImageSize(),
+                    resource = item.styleId;
+                return this.url + "?resource=" + resource + "&extent=" + bounds.toArray().join(",") +
                     "&size=" + size.w + "," + size.h;
             };
 

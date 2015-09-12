@@ -20,7 +20,7 @@ requires = [
     'waitress',
     'pygdal' + (('>=' + gv + '.0,<=' + gv + '.9999') if gv else ''),
     'psycopg2',
-    'geoalchemy',
+    'geoalchemy>=0.7.2',
     'shapely',
     'geojson',
     'pillow',
@@ -43,7 +43,7 @@ entry_points = {
     'console_scripts': [
         'nextgisweb = nextgisweb.script:main',
         'nextgisweb-config = nextgisweb.script:config',
-        'nextgisweb-i18n = nextgisweb.i18n:main',
+        'nextgisweb-i18n = nextgisweb.i18n.script:main',
     ],
 
     'nextgisweb.packages': ['nextgisweb = nextgisweb:pkginfo', ],

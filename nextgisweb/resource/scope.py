@@ -6,6 +6,7 @@
 
 from __future__ import unicode_literals
 from .permission import Scope, Permission
+from .util import _
 
 __all__ = [
     'ResourceScope',
@@ -23,34 +24,34 @@ class ResourceScope(Scope):
     """ Базовый набор прав ресурса """
 
     identity = 'resource'
-    label = "Ресурс"
+    label = _("Resource")
 
-    read = P("Чтение")
+    read = P(_("Read"))
     """ Чтение: возможность прочитать атрибуты класс, наименование и ключ
     ресурса. Так же от этого права зависит большинство других прав ресурса,
     например изменение, таким образом нельзя изменить ресурс не имея
     возможности его прочитать. """
 
-    create = P("Создание").require(read)
+    create = P(_("Create")).require(read)
     """ Создание: довольно туманное право, сейчас не используется. Идея была
     в том, что при создании нового ресурса проверялось наличие в нем права на
     создание, но сейчас проверяется только право :py:attr:`manage_children`
     для дочернего ресурса. Возможно потом стоит к этому вернуться, без этого
     права невозможно ограничить создание новых ресурсов определенного типа. """
 
-    update = P("Изменение").require(read)
+    update = P(_("Update")).require(read)
     """ Изменение: изменение наименования и ключа ресурса, по аналогии с правом
     :py:attr:`read`. На изменение остальных атрибутов это ни как не влияет. """
 
-    delete = P("Удаление").require(read)
+    delete = P(_("Delete")).require(read)
     """ Удаление: право на удаление этого ресурса. Помимо этого для реального
     удаления ресурса необходимо наличие права :py:attr:`manage_children`
     у родительского ресурса. """
 
-    manage_children = P("Управление дочерними ресурсами").require(read)
+    manage_children = P(_("Manage children")).require(read)
     """ Управление дочерними ресурсами """
 
-    change_permissions = P("Управление правами доступа").require(read)
+    change_permissions = P(_("Change permissions")).require(read)
     """ Управление правами доступа """
 
 
@@ -62,10 +63,10 @@ class MetadataScope(Scope):
     набор прав включен для всех ресурсов на уровне класса Resource. """
 
     identity = 'metadata'
-    label = "Метаданные"
+    label = _("Metadata")
 
-    read = P("Чтение")                  #: Чтение
-    write = P("Запись").require(read)   #: Запись
+    read = P(_("Read"))                   #: Чтение
+    write = P(_("Write")).require(read)   #: Запись
 
 
 class DataStructureScope(Scope):
@@ -74,20 +75,20 @@ class DataStructureScope(Scope):
     самих данных. """
 
     identity = 'datastruct'
-    label = "Структура данных"
+    label = _("Data structure")
 
-    read = P("Чтение")                  #: Чтение
-    write = P("Запись").require(read)   #: Запись
+    read = P(_("Read"))                   #: Чтение
+    write = P(_("Write")).require(read)   #: Запись
 
 
 class DataScope(Scope):
     """ Набор прав доступа к данным """
 
     identity = 'data'
-    label = "Данные"
+    label = _("Data")
 
-    read = P("Чтение")                  #: Чтение
-    write = P("Запись").require(read)   #: Запись
+    read = P(_("Read"))                   #: Чтение
+    write = P(_("Write")).require(read)   #: Запись
 
 
 class ConnectionScope(Scope):
@@ -97,11 +98,11 @@ class ConnectionScope(Scope):
     безопасности, например логины и пароли для доступа к удаленной БД. """
 
     identity = 'connection'
-    label = "Соединение"
+    label = _("Connection")
 
-    read = P("Чтение параметров соединения")
-    write = P("Запись параметров соединения").require(read)
-    connect = P("Использование соединения")
+    read = P(_("Read"))
+    write = P(_("Write")).require(read)
+    connect = P(_("Connect"))
 
 
 class ServiceScope(Scope):
@@ -111,7 +112,7 @@ class ServiceScope(Scope):
     должны проверяться отдельно. """
 
     identity = 'service'
-    label = 'Сервис'
+    label = _('Service')
 
-    connect = P("Подключение")                      #: Подключение
-    configure = P("Настройка").require(connect)     #: Настройка
+    connect = P(_("Connect"))                       #: Подключение
+    configure = P(_("Configure")).require(connect)  #: Настройка

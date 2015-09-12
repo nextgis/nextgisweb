@@ -8,12 +8,14 @@ from ..resource import resource_factory, DataScope
 from .interface import IRenderableStyle
 
 PD_READ = DataScope.read
-
+sett_name = 'permissions.disable_check.rendering'
 
 def setup_pyramid(comp, config):
 
     def tms(obj, request):
-        request.resource_permission(PD_READ)
+        setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
+        if setting_disable_check not in ('true', 'yes', '1'):
+            request.resource_permission(PD_READ)
 
         z = int(request.GET['z'])
         x = int(request.GET['x'])
@@ -34,7 +36,9 @@ def setup_pyramid(comp, config):
     ).add_view(tms, context=IRenderableStyle)
 
     def image(obj, request):
-        request.resource_permission(PD_READ)
+        setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
+        if setting_disable_check not in ('true', 'yes', '1'):
+            request.resource_permission(PD_READ)
 
         extent = map(float, request.GET['extent'].split(','))
         size = map(int, request.GET['size'].split(','))

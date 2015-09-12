@@ -5,10 +5,12 @@ from collections import namedtuple, OrderedDict
 from bunch import Bunch
 
 from .. import db
+from ..env import env
 from ..models import declarative_base, DBSession
 from ..registry import registry_maker
 from ..auth import Principal, User, Group
 
+from .util import _
 from .interface import providedBy
 from .serialize import (
     Serializer,
@@ -99,7 +101,7 @@ class Resource(Base):
     registry = resource_registry
 
     identity = 'resource'
-    cls_display_name = "Ресурс"
+    cls_display_name = _("Resource")
 
     __scope__ = (ResourceScope, MetadataScope)
 
@@ -211,7 +213,15 @@ class Resource(Base):
         return sets.allow - sets.mask - sets.deny
 
     def has_permission(self, permission, user):
-        return permission in self.permissions(user)
+        perm_cache = env.resource.perm_cache_instance
+        if perm_cache:
+            val = perm_cache.get_cached_perm(self, permission, user)  # get perm from cache
+            if val is None:  # cache is empty
+                val = permission in self.permissions(user)
+                perm_cache.add_to_cache(self, permission, user, val)  # add to cache
+            return val
+        else:
+            return permission in self.permissions(user)
 
     # Валидация данных
 
@@ -222,8 +232,7 @@ class Resource(Base):
         with DBSession.no_autoflush:
             if value is not None:
                 if self == value or self in value.parents:
-                    raise ValidationError(
-                        "Невозможно переместить ресурс внутрь дочернего.")
+                    raise ValidationError(_("Resource can not be a parent himself."))
 
         return value
 
@@ -236,7 +245,7 @@ class Resource(Base):
                 Resource.keyname == value,
                 Resource.id != self.id
             ).first():
-                raise ValidationError("Ключ ресурса не уникален.")
+                raise ValidationError(_("Resource keyname is not unique."))
 
         return value
 
@@ -264,10 +273,7 @@ class _parent_attr(SRR):
             raise Forbidden()
 
         if not srlzr.obj.check_parent(srlzr.obj.parent):
-            raise ValidationError(
-                "Ресурс не может дочерним ресурсом для ID=%d. "
-                "Тип ресурса - %s, родительского ресурса - %s."
-                % (srlzr.obj.parent.id, srlzr.obj.cls, srlzr.obj.parent.cls))
+            raise ValidationError(_("Resource can not be a child of resource ID=%d.") % dict(id=srlzr.obj.parent.id))
 
 
 class _perms_attr(SP):
@@ -372,10 +378,7 @@ class ResourceSerializer(Serializer):
                 ).first()
 
             if conflict is not None:
-                raise ValidationError(
-                    "Наименование ресурса не уникально, одноименный дочерний "
-                    "ресурс (ID=%d) существует у родительского ресурса "
-                    "(ID=%d)." % (conflict.id, conflict.parent_id))
+                raise ValidationError(_("Resource display name is not unique. Resource with same name already exists (ID=%d).") % conflict.id)
 
 
 class ResourceACLRule(Base):
@@ -429,7 +432,7 @@ class ResourceACLRule(Base):
 
 class ResourceGroup(Resource):
     identity = 'resource_group'
-    cls_display_name = "Группа ресурсов"
+    cls_display_name = _("Resource group")
 
     @classmethod
     def check_parent(self, parent):

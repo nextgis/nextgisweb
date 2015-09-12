@@ -78,11 +78,6 @@ def feature_update(request):
 
     feature_id = int(request.matchdict['feature_id'])
 
-    ext_mid = OrderedDict()
-    for k, ecls in FeatureExtension.registry._dict.iteritems():
-        if hasattr(ecls, 'editor_widget'):
-            ext_mid[k] = ecls.editor_widget
-
     fields = []
     for f in request.context.fields:
         fields.append(OrderedDict((
@@ -266,6 +261,14 @@ def setup_pyramid(comp, config):
         """ Сервис идентификации объектов на слоях, поддерживающих интерфейс
         IFeatureLayer """
 
+        sett_name = 'permissions.disable_check.identify'
+        setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
+        if setting_disable_check in ('true', 'yes', '1'):
+            setting_disable_check = True
+        else:
+            setting_disable_check = False
+
+
         srs = int(request.json_body['srs'])
         geom = geom_from_wkt(request.json_body['geom'], srid=srs)
         layers = map(int, request.json_body['layers'])
@@ -278,7 +281,7 @@ def setup_pyramid(comp, config):
         feature_count = 0
 
         for layer in layer_list:
-            if not layer.has_permission(DataScope.read, request.user):
+            if not setting_disable_check and not layer.has_permission(DataScope.read, request.user):
                 result[layer.id] = dict(error="Forbidden")
 
             elif not IFeatureLayer.providedBy(layer):
@@ -302,7 +305,12 @@ def setup_pyramid(comp, config):
                 # родительского ресурса (можно использовать в случае,
                 # если на клиенте нет возможности извлечь имя слоя по
                 # идентификатору)
-                if layer.parent.has_permission(PR_R, request.user):
+                if not setting_disable_check:
+                    allow = layer.parent.has_permission(PR_R, request.user)
+                else:
+                    allow = True
+
+                if allow:
                     for feature in features:
                         feature['parent'] = layer.parent.display_name
 

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import os.path
+from pkg_resources import iter_entry_points, resource_filename
 
 from sqlalchemy import create_engine
 
 from ..component import Component
 from ..models import DBSession, Base
+from ..i18n import Localizer, Translations
 
 from .command import BackupCommand  # NOQA
 from .backup import BackupBase, TableBackup, SequenceBackup  # NOQA
@@ -17,13 +19,15 @@ class CoreComponent(Component):
 
     def __init__(self, env, settings):
         super(CoreComponent, self).__init__(env, settings)
-        self.locale = None
+        self.locale_default = None
         self.debug = False
 
     def initialize(self):
         Component.initialize(self)
 
-        self.locale = self._settings.get('locale', 'en')
+        self.locale_default = self._settings.get('locale.default', 'en')
+        self.locale_available = self._settings.get(
+            'locale.available', 'en ru').split(' ')
 
         setting_debug = self._settings.get('debug', 'false').lower()
         self.debug = setting_debug in ('true', 'yes', '1')
@@ -99,6 +103,20 @@ class CoreComponent(Component):
 
         os.makedirs(fpath)
 
+    def localizer(self, locale):
+        if not hasattr(self, '_localizer'):
+            self._localizer = dict()
+        if locale in self._localizer:
+            return self._localizer[locale]
+
+        translations = Translations()
+        for ep in iter_entry_points(group='nextgisweb.packages'):
+            translations.scandir(resource_filename(ep.name, 'locale'), locale)
+
+        lobj = Localizer(locale, translations)
+        self._localizer[locale] = lobj
+        return lobj
+
     settings_info = (
         dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),
         dict(key='system.full_name', default=u"Геоинформационная система NextGIS", desc=u"Полное название системы"),
@@ -113,7 +131,11 @@ class CoreComponent(Component):
         dict(key='packages.ignore', desc=u"Не загружать перечисленные пакеты"),
         dict(key='components.ignore', desc=u"Не загружать перечисленные компоненты"),
 
-        dict(key='locale', desc=u"Локаль, используемая по-умолчанию"),
+        dict(key='locale.default', desc=u"Локаль, используемая по-умолчанию"),
+        dict(key='locale.available', desc=u"Доступные локали"),
         dict(key='debug', desc=u"Дополнительный инструментарий для отладки"),
         dict(key='sdir', desc=u"Директория для хранения данных"),
+
+        dict(key='permissions.disable_check.rendering', desc=u"Отключение проверки прав при рендеринге слоев"),
+        dict(key='permissions.disable_check.identify', desc=u"Отключение проверки прав при получении информации об объектах"),
     )

@@ -26,6 +26,7 @@ define([
     // resource
     "ngw/load-json!auth/principal/dump",
     "ngw/load-json!resource/schema",
+    "ngw-pyramid/i18n!resource",
     // css
     "xstyle/css!./resource/PermissionWidget.css",
     "ngw/dgrid/css"
@@ -55,9 +56,13 @@ define([
     PrincipalSelect,
     serialize,
     principalDump,
-    resourceSchema
+    resourceSchema,
+    i18n
 ) {
     var _COUNTER = 0;
+
+    var S_ALL_RESOURCES = i18n.gettext("All resources");
+    var S_ALL_PERMISSIONS = i18n.gettext("All permissions");
 
     var GridClass = declare([Grid, Selection, DijitRegistry], {
         selectionMode: "single",
@@ -65,50 +70,50 @@ define([
 
         columns: {
             action: {
-                label: "Действие",
+                label: i18n.gettext("Action"),
                 get: function (itm) {
                     return {
-                        allow: "Разрешить",
-                        deny: "Запретить"
+                        allow: i18n.gettext("Allow"),
+                        deny: i18n.gettext("Deny")
                     }[itm.action];
                 }
             },
 
             principal: {
-                label: "Субъект",
+                label: i18n.gettext("Principal"),
                 get: function (itm) {
                     return this.grid.principalStore.get(itm.principal.id).display_name;
                 }},
             
             permission: {
-                label: "Право",
+                label: i18n.gettext("Permission"),
                 get: function (itm) {
                     if (itm.scope === "" && itm.permission === "") {
-                        return "Все ресурсы: Все права";
+                        return S_ALL_RESOURCES + ": " + S_ALL_PERMISSIONS;
                     } else if (itm.permission === "") {
-                        return resourceSchema.scopes[itm.scope].label + ": " + "Все права";
+                        return resourceSchema.scopes[itm.scope].label + ": " + S_ALL_PERMISSIONS;
                     } else {
                         return resourceSchema.scopes[itm.scope].label + ": " + resourceSchema.scopes[itm.scope].permissions[itm.permission].label;
                     }
                 }},
             
             identity: {
-                label: "Ресурс",
+                label: i18n.gettext("Resource"),
                 get: function (itm) {
                     if (itm.identity === "") {
-                        return "Все ресурсы";
+                        return S_ALL_RESOURCES;
                     } else {
                         return resourceSchema.resources[itm.identity].label;
                     }
                 }},
             
             propagate: {
-                label: "Распр.",
+                label: i18n.gettext("Propagate"),
                 get: function (itm) {
                     if (itm.propagate) {
-                        return "Да";
+                        return i18n.gettext("Yes");
                     } else {
-                        return "Нет";
+                        return i18n.gettext("No");
                     }
                 }},
         },
@@ -132,22 +137,22 @@ define([
             }).placeAt(this);
 
             this.action = new Select({
-                label: "Действие",
+                label: i18n.gettext("Action"),
                 style: "width: 100%",
                 options: [
-                    {value: "allow", label: "Разрешить"},
-                    {value: "deny", label: "Запретить"}
+                    {value: "allow", label: i18n.gettext("Allow")},
+                    {value: "deny", label: i18n.gettext("Deny")}
                 ]
             }).placeAt(this.container);
 
             this.principal = new PrincipalSelect({
-                label: "Субъект",
+                label: i18n.gettext("Principal"),
                 style: "width: 100%",
                 required: true
             }).placeAt(this.container);
 
-            var permissionOpts = [{value: ":", label: "Все ресурсы: Все права"}];
-            var identityOpts = [{value: "", label: "Все ресурсы"}];
+            var permissionOpts = [{value: ":", label: S_ALL_RESOURCES + ": " + S_ALL_PERMISSIONS}];
+            var identityOpts = [{value: "", label: S_ALL_RESOURCES}];
 
             for (var ks in resourceSchema.scopes) {
                 var scope = resourceSchema.scopes[ks];
@@ -155,7 +160,7 @@ define([
                 permissionOpts.push({type: "separator"});
                 permissionOpts.push({
                     value: ks + ":",
-                    label: scope.label + ": " + "Все права"
+                    label: scope.label + ": " + S_ALL_PERMISSIONS
                 });
                 
                 for (var kp in scope.permissions) {
@@ -176,19 +181,19 @@ define([
             }
 
             this.permission = new Select({
-                label: "Право",
+                label: i18n.gettext("Permission"),
                 style: "width: 100%",
                 options: permissionOpts
             }).placeAt(this.container);
 
             this.identity = new Select({
-                label: "Ресурс",
+                label: i18n.gettext("Resource"),
                 style: "width: 100%",
                 options: identityOpts
             }).placeAt(this.container);
 
             this.propagate = new CheckBox({
-                label: "Распространять"
+                label: i18n.gettext("Propagate")
             }).placeAt(this.container);
 
             this.actionBar = domConstruct.create("div", {
@@ -196,7 +201,7 @@ define([
             }, this.containerNode);
 
             new Button({
-                label: "OK",
+                label: i18n.gettext("OK"),
                 onClick: lang.hitch(this, function () {
                     if (this.validate() && this._callback(this.get("value"))) {
                         this.hide();
@@ -205,7 +210,7 @@ define([
             }).placeAt(this.actionBar);
             
             new Button({
-                label: "Отмена",
+                label: i18n.gettext("Cancel"),
                 onClick: lang.hitch(this, this.hide)
             }).placeAt(this.actionBar);
         },
@@ -239,7 +244,7 @@ define([
     });
 
     return declare([BorderContainer, serialize.Mixin], {
-        title: "Права доступа",
+        title: i18n.gettext("Permissions"),
 
         style: "padding: 0px;",
         gutters: false,
@@ -284,19 +289,19 @@ define([
             domConstruct.place(this.grid.domNode, this.domNode);
             
             new Button({
-                label: "Добавить",
+                label: i18n.gettext("Add"),
                 iconClass: "dijitIconNewTask",
                 onClick: lang.hitch(this, this.itemAdd)
             }).placeAt(this.toolbar);
 
             new Button({
-                label: "Изменить",
+                label: i18n.gettext("Edit"),
                 iconClass: "dijitIconEdit",
                 onClick: lang.hitch(this, this.itemEdit)
             }).placeAt(this.toolbar);
 
             new Button({
-                label: "Удалить",
+                label: i18n.gettext("Delete"),
                 iconClass: "dijitIconDelete",
                 onClick: lang.hitch(this, this.itemRemove)
             }).placeAt(this.toolbar);

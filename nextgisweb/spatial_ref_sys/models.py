@@ -42,4 +42,4 @@ class SRSMixin(object):
 
     @declared_attr
     def srs(cls):
-        return orm.relationship('SRS')
+        return orm.relationship('SRS', lazy='joined')
