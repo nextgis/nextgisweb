@@ -39,13 +39,18 @@ class Transaction(object):
 
         for trans in node.iterchildren():
             if str(trans.xpath('local-name()')) == 'Insert':
+                # import ipdb; ipdb.set_trace()
                 for child in trans.iterchildren():
                     transaction_class = self.getTransactionInstance(
                         str(trans.xpath('local-name()')), deepcopy(child))
+                    if 'handle' in trans.attrib:
+                        transaction_class.handle = trans.attrib['handle']
                     transaction.appendChild(transaction_class)
             elif str(trans.xpath('local-name()')) == 'Update' or str(trans.xpath('local-name()')) == 'Delete':
                 transaction_class = self.getTransactionInstance(
                     str(trans.xpath('local-name()')), deepcopy(trans))
+                if 'handle' in trans.attrib:
+                    transaction_class.handle = trans.attrib['handle']
                 transaction.appendChild(transaction_class)
 
         self.tree = transaction

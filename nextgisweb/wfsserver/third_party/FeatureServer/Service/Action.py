@@ -17,3 +17,4 @@ class Action (object):
         self.wfsrequest = None
         self.version = ''
         self.request = None
+        self.handle = ''

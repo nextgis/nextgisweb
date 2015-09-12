@@ -26,7 +26,8 @@ from ..FeatureServer.Exceptions.LayerNotFoundException import \
 from ..FeatureServer.Exceptions.OperationParsingFailedException import \
     OperationParsingFailedException
 from Exceptions.InvalidValueWFSException import InvalidValueWFSException
-
+from ..FeatureServer.Exceptions.OperationProcessingFailedException import \
+    OperationProcessingFailedException
 
 from ..web_request.response import Response
 
@@ -83,18 +84,16 @@ class Server (object):
             # import ipdb; ipdb.set_trace()
             request.parse(params, path_info, host, post_data, request_method)
 
-            if len(request.actions) > 0 and \
-                    hasattr(request.actions[0], 'request') and \
-                    request.actions[0].request is not None:
-                version = '1.0.0'
-                if hasattr(request.actions[0], 'version') and \
-                        len(request.actions[0].version) > 0:
+            version = '1.0.0'   # Default version
+            if len(request.actions) > 0:
+                if hasattr(request.actions[0], 'version') and len(request.actions[0].version) > 0:
                     version = request.actions[0].version
 
-                if request.actions[0].request == "GetCapabilities":
-                    return request.getcapabilities(version)
-                elif request.actions[0].request == "DescribeFeatureType":
-                    return request.describefeaturetype(version)
+                if hasattr(request.actions[0], 'request') and request.actions[0].request is not None:
+                    if request.actions[0].request == "GetCapabilities":
+                        return request.getcapabilities(version)
+                    elif request.actions[0].request == "DescribeFeatureType":
+                        return request.describefeaturetype(version)
 
             try:
                 transactionResponse = TransactionResponse()
@@ -133,6 +132,8 @@ class Server (object):
             exceptionReport.add(e)
         except OperationParsingFailedException as e:
             exceptionReport.add(e)
+        except OperationProcessingFailedException as e:
+            exceptionReport.add(e)
         except InvalidValueWFSException as e:
             exceptionReport.add(e)
 
@@ -142,6 +143,7 @@ class Server (object):
             exceptionReport.clear()
             raise FeatureServerException(mime, data, headers, encoding)
         else:
+            params['version'] = version
             mime, data, headers, encoding = request.encode(response,
                                                            params=params)
 

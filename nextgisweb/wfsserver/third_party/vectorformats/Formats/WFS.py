@@ -189,10 +189,15 @@ class WFS(Format):
         results.append("""</ExceptionReport>""")
         return "\n".join(results)
 
-    def encode_transaction(self, response, **kwargs):
+    def encode_transaction(self, response, **params):
         failedCount = 0
 
         summary = response.getSummary()
+
+        if 'version' in params:
+            wfs_version = str(params['version'])
+        else:
+            wfs_version = '1.0.0'
 
         inserted = '<wfs:totalInserted>%s</wfs:totalInserted>' % \
                    (str(summary.getTotalInserted()),
@@ -209,27 +214,38 @@ class WFS(Format):
 
         result = """<?xml version="1.0" ?>
 <wfs:TransactionResponse
-version="1.0.0"
+version="%s"
     xmlns:wfs="http://www.opengis.net/wfs"
     xmlns:ogc="http://www.opengis.net/ogc"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.opengis.net/wfs ../wfs/1.0.0/WFS-transaction.xsd">
+    xsi:schemaLocation="http://www.opengis.net/wfs ../wfs/2.0.0/WFS-transaction.xsd">
 
     <wfs:TransactionSummary>
         %s %s %s %s
     </wfs:TransactionSummary>
-           """ % (inserted, updated, deleted, replaced)
+           """ % (wfs_version, inserted, updated, deleted, replaced)
 
         insertResult = response.getInsertResults()
         if summary.getTotalInserted() > 0:
-            result += "<wfs:InsertResult>"
+            body = ''
             for insert in insertResult:
-                result += '''
-                <ogc:FeatureId fid="%s"/>
-                ''' % (str(insert.getResourceId()), )
-                if len(insert.getHandle()) > 0:
-                    failedCount += 1
-            result += """</wfs:InsertResult>"""
+                if wfs_version == '2.0.0':
+                    body += '''
+                    <fes:ResourceId rid="%s"/>
+                    ''' % (str(insert.getResourceId()), )
+                elif wfs_version == '1.0.0':
+                     body += '''
+                    <ogc:FeatureId fid="%s"/>
+                    ''' % (str(insert.getResourceId()), )
+
+
+            if len(insert.getHandle()) > 0:
+                header = '<wfs:InsertResult handle="%s">' % (str(insert.getHandle()), )
+            else:
+                header = '<wfs:InsertResult>'
+            tail = """</wfs:InsertResult>"""
+
+            result += header + body + tail
 
         updateResult = response.getUpdateResults()
         # if summary.getTotalUpdated() > 0:

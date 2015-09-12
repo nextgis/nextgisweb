@@ -21,7 +21,7 @@ class WFS(Request):
         wfs = WFSFormat.WFS(layername=self.datasources[0])
 
         if isinstance(results, TransactionResponse):
-            return ("text/xml", wfs.encode_transaction(results), None, 'utf-8')
+            return ("text/xml", wfs.encode_transaction(results, **params), None, 'utf-8')
 
         output = wfs.encode(results, params=params)
         return ("text/xml", output, None, 'utf-8')
