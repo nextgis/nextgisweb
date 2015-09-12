@@ -14,6 +14,7 @@ define([
             options = lang.clone(options);
 
             if (options.wrapDateLine === undefined) { options.wrapDateLine = true; }
+            if (options.numZoomLevels === undefined) { options.numZoomLevels = 20; }
 
             this.olArgs = [name, options];
             this.inherited(arguments);
