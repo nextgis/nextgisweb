@@ -44,6 +44,8 @@ class ResourceComponent(Component):
     metadata = Base.metadata
 
     def __init__(self, env, settings):
+        super(ResourceComponent, self).__init__(env, settings)
+
         # setup perm cache
         self.perm_cache_enable = False
         self.perm_cache_instance = None
@@ -86,4 +88,3 @@ class ResourceComponent(Component):
         api.setup_pyramid(self, config)
 
     settings_info = () + cache_settings_info
-
