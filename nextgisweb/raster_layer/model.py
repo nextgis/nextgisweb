@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function, absolute_import
 import subprocess
 
 import sqlalchemy as sa
@@ -20,6 +20,8 @@ from ..env import env
 from ..layer import SpatialLayerMixin
 from ..file_storage import FileObj
 
+from .util import _
+
 Base = declarative_base()
 
 SUPPORTED_GDT = (gdalconst.GDT_Byte, )
@@ -31,7 +33,7 @@ SUPPORTED_GDT_NAMES = ', '.join([
 
 class RasterLayer(Base, Resource, SpatialLayerMixin):
     identity = 'raster_layer'
-    cls_display_name = u"Растровый слой"
+    cls_display_name = _("Raster layer")
 
     __scope__ = (DataStructureScope, DataScope)
 
@@ -50,26 +52,23 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     def load_file(self, filename, env):
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
         if not ds:
-            raise ValidationError("Библиотеке GDAL не удалось открыть файл")
+            raise ValidationError(_("GDAL library was unable to open the file."))
 
         if ds.RasterCount not in (3, 4):
-            raise ValidationError("Поддерживаются только растры RGB и RGBA")
+            raise ValidationError(_("Only RGB and RGBA rasters are supported."))
 
         for bidx in range(1, ds.RasterCount + 1):
             band = ds.GetRasterBand(bidx)
 
-            if not band.DataType in SUPPORTED_GDT:
-                raise ValidationError(
-                    "Канал #%d имеет тип %s, однако поддерживаются " +
-                    "только каналы следующих типов: %s." % (
-                        bidx, gdal.GetDataTypeName(band.DataType),
-                        SUPPORTED_GDT_NAMES))
+            if band.DataType not in SUPPORTED_GDT:
+                raise ValidationError(_("Band #%(band)d has type '%(type)s', however only following band types are supported: %(all_types)s.") % dict(
+                    band=bidx, type=gdal.GetDataTypeName(band.DataType), all_types=SUPPORTED_GDT_NAMES))
 
         dsproj = ds.GetProjection()
         dsgtran = ds.GetGeoTransform()
 
         if not dsproj or not dsgtran:
-            raise ValidationError("Растры без проекции не поддерживаются")
+            raise ValidationError(_("Raster files without projection info are not supported."))
 
         src_osr = osr.SpatialReference()
         src_osr.ImportFromWkt(dsproj)
@@ -107,7 +106,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     def get_info(self):
         s = super(RasterLayer, self)
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
-            (u"Идентификатор файла", self.fileobj.uuid),
+            (_("File UUID"), self.fileobj.uuid),
         )
 
 
