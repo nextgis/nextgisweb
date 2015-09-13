@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
 import numpy
 from osgeo import gdal_array
 import PIL
@@ -9,8 +10,9 @@ from ..resource import Resource, DataScope
 from ..style import (
     IRenderableStyle,
     IExtentRenderRequest,
-    ITileRenderRequest,
-)
+    ITileRenderRequest)
+
+from .util import _
 
 Base = declarative_base()
 
@@ -33,7 +35,7 @@ class RenderRequest(object):
 
 class RasterStyle(Base, Resource):
     identity = 'raster_style'
-    cls_display_name = u"Растровый стиль"
+    cls_display_name = _("Raster style")
 
     __scope__ = DataScope
 
