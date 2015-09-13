@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-13 16:08+0300\n"
+"POT-Creation-Date: 2015-09-14 02:42+0300\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: view.py:38
+#: view.py:38 template/base.mako:85
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:44
+#: view.py:44 template/base.mako:95
 msgid "Help"
 msgstr "Справка"
 
@@ -33,6 +33,18 @@ msgstr "Версии пакетов"
 #: view.py:96
 msgid "System info"
 msgstr "Информация о системе"
+
+#: template/base.mako:82
+msgid "Resources"
+msgstr "Ресурсы"
+
+#: template/base.mako:89
+msgid "Sign in"
+msgstr "Войти"
+
+#: template/base.mako:92
+msgid "Sign out"
+msgstr "Выйти"
 
 #: template/pkginfo.mako:7
 msgid "Package"
