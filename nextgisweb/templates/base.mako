@@ -1,1 +1,1 @@
-/home/jean/gis/ngw/nextgisweb/nextgisweb/pyramid/template/base.mako
+../pyramid/template/base.mako
