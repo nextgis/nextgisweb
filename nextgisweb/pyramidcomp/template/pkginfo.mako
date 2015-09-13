@@ -1,10 +1,11 @@
-<%inherit file='../base.mako' />
+<%inherit file='nextgisweb:templates/base.mako' />
+<%! from nextgisweb.pyramidcomp.util import _ %>
 
 <table class="pure-table pure-table-horizontal" style="width: 100%;">
 
     <thead><tr> 
-        <th style="width: 100%">Пакет</th>
-        <th style="width: 8em;">Версия</th>
+        <th style="width: 100%">${tr(_('Package'))}</th>
+        <th style="width: 8em;">${tr(_('Version'))}</th>
     </tr></thead>
 
     <tbody>

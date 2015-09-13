@@ -7,7 +7,7 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 
 from .. import dynmenu as dm
 
-from .util import ClientRoutePredicate
+from .util import _, ClientRoutePredicate
 
 
 def settings(request):
@@ -35,13 +35,13 @@ def control_panel(request):
         raise HTTPForbidden()
 
     return dict(
-        title="Панель управления",
+        title=_("Control panel"),
         control_panel=request.env.pyramid.control_panel)
 
 
 def help_page(request):
     return dict(
-        title="Справка",
+        title=_("Help"),
         help_page=request.env.pyramid.help_page)
 
 
@@ -65,7 +65,7 @@ def favicon(request):
 
 def pkginfo(request):
     return dict(
-        title=u"Версии пакетов",
+        title=_("Package versions"),
         pkginfo=request.env.pyramid.pkginfo,
         dynmenu=request.env.pyramid.control_panel)
 
@@ -77,22 +77,24 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.routes', '/pyramid/routes') \
         .add_view(routes, renderer='json', json=True)
 
+    ctpl = lambda (n): 'nextgisweb:pyramidcomp/template/%s.mako' % n
+
     config.add_route('pyramid.control_panel', '/control-panel') \
-        .add_view(control_panel, renderer="pyramid/control_panel.mako")
+        .add_view(control_panel, renderer=ctpl('control_panel'))
 
     config.add_route('pyramid.help_page', '/help-page') \
-        .add_view(help_page, renderer="pyramid/help_page.mako")
+        .add_view(help_page, renderer=ctpl('help_page'))
 
     config.add_route('pyramid.logo', '/logo').add_view(logo)
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
 
     config.add_route('pyramid.pkginfo', '/sys/pkginfo') \
-        .add_view(pkginfo, renderer="pyramid/pkginfo.mako")
+        .add_view(pkginfo, renderer=ctpl('pkginfo'))
 
     comp.control_panel = dm.DynMenu(
-        dm.Label('sys', u"Информация о системе"),
+        dm.Label('sys', _("System info")),
 
-        dm.Link('sys/pkginfo', u"Версии пакетов", lambda args: (
+        dm.Link('sys/pkginfo', _("Package versions"), lambda args: (
             args.request.route_url('pyramid.pkginfo'))),
     )
