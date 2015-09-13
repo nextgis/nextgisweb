@@ -103,7 +103,9 @@ class CoreComponent(Component):
 
         os.makedirs(fpath)
 
-    def localizer(self, locale):
+    def localizer(self, locale=None):
+        if locale is None:
+            locale = self.locale_default
         if not hasattr(self, '_localizer'):
             self._localizer = dict()
         if locale in self._localizer:
