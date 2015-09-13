@@ -1,5 +1,5 @@
 <%inherit file='nextgisweb:templates/base.mako' />
-<%! from nextgisweb.pyramidcomp.util import _ %>
+<%! from nextgisweb.pyramid.util import _ %>
 
 <table class="pure-table pure-table-horizontal" style="width: 100%;">
 

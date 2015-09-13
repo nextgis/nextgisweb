@@ -10,7 +10,7 @@ from pyramid.response import Response
 from ..env import env
 from ..models import DBSession
 from ..auth import User
-from ..pyramidcomp import viewargs
+from ..pyramid import viewargs
 
 from .model import Resource
 from .scope import ResourceScope

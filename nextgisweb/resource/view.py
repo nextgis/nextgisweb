@@ -10,7 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from ..views import permalinker
 from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
-from ..pyramidcomp import viewargs
+from ..pyramid import viewargs
 
 from .model import Resource, ResourceSerializer
 from .permission import Permission, Scope

@@ -10,7 +10,7 @@ from subprocess import check_output
 from pyramid.response import Response
 
 from ..env import env
-from ..pyramidcomp import viewargs
+from ..pyramid import viewargs
 
 
 @viewargs(renderer='nextgisweb:file_upload/template/test.mako')

@@ -77,7 +77,7 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.routes', '/pyramid/routes') \
         .add_view(routes, renderer='json', json=True)
 
-    ctpl = lambda (n): 'nextgisweb:pyramidcomp/template/%s.mako' % n
+    ctpl = lambda (n): 'nextgisweb:pyramid/template/%s.mako' % n
 
     config.add_route('pyramid.control_panel', '/control-panel') \
         .add_view(control_panel, renderer=ctpl('control_panel'))

@@ -15,7 +15,7 @@ from ..resource import (
     Widget)
 from ..geometry import geom_from_wkt
 from ..object_widget import ObjectWidget, CompositeWidget
-from ..pyramidcomp import viewargs
+from ..pyramid import viewargs
 from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
