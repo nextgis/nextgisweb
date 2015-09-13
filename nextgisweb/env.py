@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-import sqlalchemy as sa
+from __future__ import unicode_literals, print_function, absolute_import
 import re
+
+import sqlalchemy as sa
 
 from .component import Component, load_all
 

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
+
 from sqlalchemy import *                    # NOQA
 from sqlalchemy.orm import *                # NOQA
 from sqlalchemy.ext.declarative import *    # NOQA
