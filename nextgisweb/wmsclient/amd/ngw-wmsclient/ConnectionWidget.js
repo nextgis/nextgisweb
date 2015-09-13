@@ -1,3 +1,4 @@
+/* globals define */
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -6,8 +7,10 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
+    "ngw-pyramid/i18n!wmsclient",
+    "ngw-pyramid/hbs-i18n",
     // resource
-    "dojo/text!./template/ConnectionWidget.html",
+    "dojo/text!./template/ConnectionWidget.hbs",
     "ngw/settings!wmsclient",
     // template
     "dijit/form/ValidationTextBox",
@@ -22,12 +25,14 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
+    i18n,
+    hbsI18n,
     template,
     settings
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: template,
-        title: "Соединение WMS",
+        templateString: hbsI18n(template, i18n),
+        title: i18n.gettext("WMS connection"),
         serializePrefix: "wmsclient_connection",
 
         postCreate: function () {

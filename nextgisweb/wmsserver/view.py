@@ -18,6 +18,7 @@ from ..spatial_ref_sys import SRS
 from ..geometry import geom_from_wkt
 
 from .model import Service
+from .util import _
 
 
 NS_XLINK = 'http://www.w3.org/1999/xlink'
@@ -171,7 +172,6 @@ def _get_feature_info(obj, request):
     p_x = float(params.get('X'))
     p_y = float(params.get('Y'))
     p_query_layers = params.get('QUERY_LAYERS').split(',')
-    p_info_format = params.get('INFO_FORMAT')
     p_feature_count = int(params.get('FEATURE_COUNT', GFI_FEATURE_COUNT))
 
     bw = p_bbox[2] - p_bbox[0]
@@ -253,6 +253,6 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='wmsserver', priority=50,
-        title="Сервис WMS",
+        title=_("WMS service"),
         is_applicable=lambda obj: obj.cls == 'wmsserver_service',
         template='nextgisweb:wmsserver/template/section.mako')

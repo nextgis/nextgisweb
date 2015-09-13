@@ -10,12 +10,14 @@ from ..resource import (
     SerializedProperty as SP,
     ResourceGroup)
 
+from .util import _
+
 Base = declarative_base()
 
 
 class Service(Base, Resource):
     identity = 'wmsserver_service'
-    cls_display_name = "Сервис WMS"
+    cls_display_name = _("WMS service")
 
     __scope__ = ServiceScope
 

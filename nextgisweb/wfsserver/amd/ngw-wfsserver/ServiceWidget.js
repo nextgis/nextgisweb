@@ -12,11 +12,13 @@ define([
     "dijit/Tree",
     "dijit/tree/dndSource",
     "dijit/registry",
+    "ngw-pyramid/i18n!wfsserver",
+    "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
     "ngw-resource/ResourceStore",
     "ngw-resource/ResourcePicker",
     // resource
-    "dojo/text!./template/ServiceWidget.html",
+    "dojo/text!./template/ServiceWidget.hbs",
     // template
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
@@ -46,14 +48,16 @@ define([
     Tree,
     dndSource,
     registry,
+    i18n,
+    hbsI18n,
     serialize,
     ResourceStore,
     ResourcePicker,
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        title: "Сервис WFS",
-        templateString: template,
+        title: i18n.gettext("WFS service"),
+        templateString: hbsI18n(template, i18n),
 
         constructor: function () {
             this.itemStore = new ItemFileWriteStore({data: {

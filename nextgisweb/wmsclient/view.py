@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from ..resource import Widget, Resource
 from .model import Connection, Layer
+from .util import _
 
 
 class ClientWidget(Widget):
@@ -20,7 +21,7 @@ class LayerWidget(Widget):
 def setup_pyramid(comp, conf):
     Resource.__psection__.register(
         key='wmsclient_connection', priority=50,
-        title="Возможности WMS",
+        title=_("WMS capabilities"),
         is_applicable=lambda obj: (
             obj.cls == 'wmsclient_connection'
             and obj.capcache()),

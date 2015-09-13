@@ -32,6 +32,8 @@ from ..style import (
     IExtentRenderRequest,
     ITileRenderRequest)
 
+from .util import _
+
 Base = declarative_base()
 
 WMS_VERSIONS = ('1.1.1', )
@@ -39,7 +41,7 @@ WMS_VERSIONS = ('1.1.1', )
 
 class Connection(Base, Resource):
     identity = 'wmsclient_connection'
-    cls_display_name = "Соединение WMS"
+    cls_display_name = _("WMS connection")
 
     __scope__ = ConnectionScope
 
@@ -161,10 +163,8 @@ class _capcache_attr(SP):
     def setter(self, srlzr, value):
         if value == 'query':
             srlzr.obj.capcache_query()
-
         elif value == 'clear':
             srlzr.obj.capcache_clear()
-
         else:
             raise ValidationError('Invalid capcache value!')
 
@@ -204,7 +204,7 @@ class RenderRequest(object):
 
 class Layer(Base, Resource, SpatialLayerMixin):
     identity = 'wmsclient_layer'
-    cls_display_name = u"Cлой WMS"
+    cls_display_name = _("WMS layer")
 
     __scope__ = (DataStructureScope, DataScope)
 

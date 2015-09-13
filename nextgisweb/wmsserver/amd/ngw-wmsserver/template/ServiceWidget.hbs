@@ -11,11 +11,11 @@
             <div data-dojo-type="dijit/form/Button"
                 data-dojo-attach-point="btnAddLayer"
                 data-dojo-props="iconClass: 'dijitIconNewTask'">
-                Добавить слой
+                {{gettext 'Add'}}
 
                 <div data-dojo-type="ngw-resource/ResourcePicker"
                     data-dojo-attach-point="layerPicker"
-                    data-dojo-props="interface: 'IFeatureLayer'">
+                    data-dojo-props="interface: 'IRenderableStyle'">
                 </div>
 
             </div>
@@ -24,7 +24,7 @@
                 data-dojo-attach-point="btnDeleteItem"
                 data-dojo-props="iconClass: 'dijitEditorIcon dijitEditorIconDelete'"
                 disabled="disabled">
-                Удалить
+                {{gettext 'Remove'}}
             </div>
         </div>
 
@@ -44,27 +44,31 @@
                 data-dojo-props="doLayout: false"
                 style="width: 100%;">
 
-                <div data-dojo-type="dijit/layout/ContentPane">
-                    <!-- Совсем пустота - нехорошо, добавим какую-то бредятинку -->
-                    <i>Для добавления слоев используйте панель инструментов,
-                    после чего сдесь будут отображены параметры слоя.</i>
-                </div>
+                <div data-dojo-type="dijit/layout/ContentPane"></div>
 
                 <div data-dojo-attach-point="paneLayer"
                     data-dojo-type="dijit/layout/ContentPane"
                     style="padding: 0;">
 
                     <div data-dojo-type="dojox/layout/TableContainer"
-                        data-dojo-props="labelWidth: 125">
+                        data-dojo-props="labelWidth: 150">
 
                         <div data-dojo-attach-point="widgetItemKeyname"
                             data-dojo-type="ngw/form/KeynameTextBox"
                             data-dojo-props="required: true"
-                            title="Ключ" style="width: 100%"></div>
+                            title="{{gettext 'Keyname'}}" style="width: 100%"></div>
 
                         <div data-dojo-attach-point="widgetItemDisplayName"
                             data-dojo-type="dijit/form/TextBox"
-                            title="Наименование" style="width: 100%"></div>
+                            title="{{gettext 'Display name'}}" style="width: 100%"></div>
+
+                        <div data-dojo-attach-point="wLayerMinScale" 
+                            data-dojo-type="ngw/form/ScaleTextBox"
+                            title="{{gettext 'Min scale'}}"></div>
+
+                        <div data-dojo-attach-point="wLayerMaxScale"
+                            data-dojo-type="ngw/form/ScaleTextBox"
+                            title="{{gettext 'Max scale'}}"></div>
 
                     </div>
 

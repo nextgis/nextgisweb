@@ -9,6 +9,7 @@ from .model import Service
 from .third_party.FeatureServer.Server import Server, FeatureServerException
 from .third_party.web_request.response import Response as FeatureserverResponse
 
+from .util import _
 from nextgis_to_fs import NextgiswebDatasource
 
 
@@ -104,6 +105,6 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='wfsserver', priority=50,
-        title="Сервис WFS",
+        title=_("WFS service"),
         is_applicable=lambda obj: obj.cls == 'wfsserver_service',
         template='nextgisweb:wfsserver/template/section.mako')

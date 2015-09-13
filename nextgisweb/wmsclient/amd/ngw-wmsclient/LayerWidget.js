@@ -14,10 +14,12 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "put-selector/put",
     "ngw/route",
+    "ngw-pyramid/i18n!wmsclient",
+    "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
     "ngw-resource/ResourceStore",
     // resource
-    "dojo/text!./template/LayerWidget.html",
+    "dojo/text!./template/LayerWidget.hbs",
     // template
     "dijit/form/ValidationTextBox",
     "dijit/form/ComboBox",
@@ -41,13 +43,15 @@ define([
     _WidgetsInTemplateMixin,
     put,
     route,
+    i18n,
+    i18nHbs,
     serialize,
     ResourceStore,
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        title: "Слой WMS",
-        templateString: template,
+        title: i18n.gettext("WMS layer"),
+        templateString: i18nHbs(template, i18n),
         serializePrefix: "wmsclient_layer",
 
         postCreate: function () {

@@ -10,12 +10,14 @@ from ..resource import (
     SerializedProperty as SP,
     ResourceGroup)
 
+from .util import _
+
 Base = declarative_base()
 
 
 class Service(Base, Resource):
     identity = 'wfsserver_service'
-    cls_display_name = "Сервис WFS"
+    cls_display_name = _("WFS service")
 
     __scope__ = ServiceScope
 
