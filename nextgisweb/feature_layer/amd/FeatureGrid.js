@@ -4,7 +4,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./template/FeatureGrid.html",
+    "dojo/text!./template/FeatureGrid.hbs",
     // dgrid & plugins
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
@@ -21,6 +21,8 @@ define([
     "dojo/dom-style",
     // ngw
     "ngw/route",
+    "ngw-pyramid/i18n!feature_layer",
+    "ngw-pyramid/hbs-i18n",
     "./FeatureStore",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
@@ -51,6 +53,8 @@ define([
     domStyle,
     // ngw
     route,
+    i18n,
+    hbsI18n,
     FeatureStore
 ) {
     // Базовый класс ggrid над которым затем делается обертка в dijit виджет
@@ -59,7 +63,7 @@ define([
     });
 
     return declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: template,
+        templateString: hbsI18n(template, i18n),
 
         // Текущая веделенная строка
         selectedRow: null,

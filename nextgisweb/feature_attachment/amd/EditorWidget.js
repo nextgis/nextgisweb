@@ -24,6 +24,7 @@ define([
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
     "ngw/route",
+    "ngw-pyramid/i18n!feature_attachment",
     //
     "xstyle/css!./resource/EditorWidget.css",
     "ngw/dgrid/css"
@@ -51,7 +52,8 @@ define([
     Selection,
     editor,
     DijitRegistry,
-    route
+    route,
+    i18n
 ) {
     function fileSizeToString(size) {
         var units = ["B", "KB", "MB", "GB"],
@@ -83,7 +85,7 @@ define([
                 },
                 editor({
                     field: "name",
-                    label: "Имя",
+                    label: i18n.gettext("File name"),
                     rowSpan: 1,
                     autoSave: true,
                     editor: TextBox,
@@ -91,20 +93,20 @@ define([
                 }),
                 {
                     field: "size",
-                    label: "Размер",
+                    label: i18n.gettext("Size"),
                     rowSpan: 1,
                     formatter: fileSizeToString
                 },
                 {
                     field: "mime_type",
-                    label: "Тип MIME",
+                    label: i18n.gettext("MIME type"),
                     rowSpan: 1
                 },
             ],
             [
                 editor({
                     field: "description",
-                    label: "Описание",
+                    label: i18n.gettext("Description"),
                     colSpan: 3,
                     sortable: false,
                     autoSave: true,
@@ -116,7 +118,7 @@ define([
     });
 
     return declare([LayoutContainer], {
-        title: "Прикрепленные файлы",
+        title: i18n.gettext("Attachments"),
 
         constructor: function () {
             this.store = new Observable(new Memory({idProperty: "lid"}));           
@@ -137,7 +139,7 @@ define([
             this.toolbar = new Toolbar({});
 
             this.uploader = new Uploader({
-                label: "Загрузить",
+                label: i18n.gettext("Upload"),
                 iconClass: "dijitIconNewTask",
                 multiple: true,
                 uploadOnSelect: true,
@@ -160,7 +162,7 @@ define([
             }));
 
             this.toolbar.addChild(new Button({
-                label: "Удалить",
+                label: i18n.gettext("Delete"),
                 iconClass: "dijitIconDelete",
                 onClick: lang.hitch(this, function () {
                     for (var key in this.grid.selection) {

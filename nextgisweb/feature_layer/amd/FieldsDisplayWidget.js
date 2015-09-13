@@ -7,6 +7,7 @@ define([
     "dojo/dom-class",
     "put-selector/put",
     "ngw/route",
+    "ngw-pyramid/i18n!feature_layer",
     "./DisplayWidget",
     // css
     "xstyle/css!./resource/FieldsDisplayWidget.css"
@@ -19,12 +20,13 @@ define([
     domClass,
     put,
     route,
+    i18n,
     DisplayWidget
 ) {
     var fieldsCache = {};
 
     return declare([DisplayWidget], {
-        title: "Атрибуты",
+        title: i18n.gettext("Attributes"),
 
         aliases: false,
 

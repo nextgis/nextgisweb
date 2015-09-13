@@ -6,6 +6,7 @@ define([
     "dojox/image/Lightbox",
     "put-selector/put",
     "ngw/route",
+    "ngw-pyramid/i18n!feature_attachment",
     "ngw-feature-layer/DisplayWidget",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "dojox/image/resources/Lightbox.css",
@@ -18,6 +19,7 @@ define([
     Lightbox,
     put,
     route,
+    i18n,
     DisplayWidget
 ) {
     function fileSizeToString(size) {
@@ -31,11 +33,7 @@ define([
     }
 
     return declare([DisplayWidget], {
-        title: "Прикрепленные файлы",
-
-        constructor: function (args) {
-            if (args.compact === true) { this.title = "Файлы"; }
-        },
+        title: i18n.gettext("Attachments"),
 
         buildRendering: function () {
             this.inherited(arguments);
@@ -85,7 +83,7 @@ define([
 
             if (others.length > 0) {
                 var tbody = put(this.domNode, "table.pure-table thead tr th.name $ < th.size $ < th.mime_type $ < th.description $ < < < tbody",
-                    "Имя", "Размер", "Тип MIME", "Описание");
+                    i18n.gettext("File name"), i18n.gettext("Size"), i18n.gettext("MIME type"), i18n.gettext("Description"));
 
                 array.forEach(others, function (a) {
                     var href = route.feature_attachment.download({

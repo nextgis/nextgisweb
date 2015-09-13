@@ -1,15 +1,17 @@
 define([
     "dojo/_base/declare",
     "ngw/modelWidget/Widget",
+    "ngw-pyramid/i18n!feature_description",
     "dijit/Editor",
     "dijit/_editor/plugins/LinkDialog"
 ], function (
     declare,
     Widget,
+    i18n,
     Editor
 ) {
     return declare([Widget, Editor], {
-        title: "Описание",
+        title: i18n.gettext("Description"),
         extraPlugins: ['|', 'createLink', 'unlink'],
 
         hasData: function () {

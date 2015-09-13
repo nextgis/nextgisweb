@@ -20,6 +20,7 @@ define([
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
     "ngw/route",
+    "ngw-pyramid/i18n!feature_layer",   
     "./loader!",
     "xstyle/css!./resource/FeatureEditorWidget.css"
 ], function (
@@ -44,6 +45,7 @@ define([
     TabContainer,
     TableContainer,
     route,
+    i18n,
     loader
 ) {
     var MultiBox = declare([_WidgetBase], {
@@ -173,7 +175,7 @@ define([
     });
 
     var FieldsWidget = declare([TableContainer], {
-        title: "Атрибуты",
+        title: i18n.gettext("Attributes"),
         style: "padding: 1ex; height: 100%;",
         labelWidth: "20%",
 
@@ -239,7 +241,7 @@ define([
             domClass.add(this._btnPane.domNode, "ngwButtonStrip");
 
             new Button({
-                label: "Сохранить",
+                label: i18n.gettext("Save"),
                 iconClass: "dijitIconSave",
                 onClick: lang.hitch(this, this.save)
             }).placeAt(this._btnPane);

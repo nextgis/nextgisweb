@@ -1,0 +1,81 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2015 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 0.0\n"
+"Report-Msgid-Bugs-To: info@nextgis.ru\n"
+"POT-Creation-Date: 2015-09-13 15:36+0300\n"
+"PO-Revision-Date: 2015-09-13 13:13+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+#: view.py:53 view.py:407 amd/FieldsWidget.js:146
+msgid "Feature table"
+msgstr "Таблица объектов"
+
+#: view.py:70 view.py:93
+#, python-format
+msgid "Feature #%d"
+msgstr "Объект #%d"
+
+#: view.py:404
+msgid "Vector layer"
+msgstr "Векторный слой"
+
+#: view.py:413
+msgid "Download as GeoJSON"
+msgstr "Загрузить GeoJSON"
+
+#: view.py:421 amd/FeatureEditorWidget.js:178 amd/FieldsDisplayWidget.js:29
+#: amd/FieldsWidget.js:109
+msgid "Attributes"
+msgstr "Атрибуты"
+
+#: amd/FeatureEditorWidget.js:244
+msgid "Save"
+msgstr "Сохранить"
+
+#: amd/FieldsWidget.js:59
+msgid "Keyname"
+msgstr "Ключ"
+
+#: amd/FieldsWidget.js:69
+msgid "Type"
+msgstr "Тип"
+
+#: amd/FieldsWidget.js:73
+msgid "Display name"
+msgstr "Наименование"
+
+#: amd/FieldsWidget.js:87
+msgid "FT"
+msgstr "ТО"
+
+#: amd/FieldsWidget.js:97
+msgid "LA"
+msgstr "АН"
+
+#: amd/FieldsWidget.js:141
+msgid "Label attribute"
+msgstr "Атрибут наименование"
+
+#: amd/template/FeatureGrid.hbs:12
+msgid "Open"
+msgstr "Открыть"
+
+#: amd/template/FeatureGrid.hbs:16
+msgid "Edit"
+msgstr "Редактировать"
+
+#: amd/template/FeatureGrid.hbs:21
+msgid "Search..."
+msgstr "Поиск..."

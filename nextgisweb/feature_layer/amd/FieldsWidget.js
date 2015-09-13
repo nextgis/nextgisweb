@@ -19,6 +19,7 @@ define([
     "dgrid/extensions/DijitRegistry",
     "ngw/form/KeynameTextBox",
     "ngw-resource/serialize",
+    "ngw-pyramid/i18n!feature_layer",
     //
     "xstyle/css!./resource/FieldsWidget.css",
     "ngw/dgrid/css"
@@ -42,7 +43,8 @@ define([
     editor,
     DijitRegistry,
     KeynameTextBox,
-    serialize
+    serialize,
+    i18n
 ) {
     var fid = 1;
 
@@ -54,7 +56,7 @@ define([
             
             editor({
                 field: "keyname",
-                label: "Ключ",
+                label: i18n.gettext("Keyname"),
                 sortable: false,
                 autoSave: true,
                 editor: KeynameTextBox,
@@ -64,11 +66,11 @@ define([
                 }
             }),
             
-            { field: "datatype", label: "Тип", sortable: false },
+            { field: "datatype", label: i18n.gettext("Type"), sortable: false },
 
             editor({
                 field: "display_name",
-                label: "Наименование",
+                label: i18n.gettext("Display name"),
                 sortable: false,
                 autoSave: true,
                 editor: ValidationTextBox,
@@ -82,7 +84,7 @@ define([
             editor({
                 field: "grid_visibility",
                 id: "grid_visibility",
-                label: "ТО",
+                label: i18n.gettext("FT"),
                 sortable: false,
                 autoSave: true,
                 editor: CheckBox,
@@ -92,7 +94,7 @@ define([
             editor({
                 field: "label_field",
                 id: "label_field",
-                label: "АН",
+                label: i18n.gettext("LA"),
                 sortable: false,
                 autoSave: true, 
                 editor: CheckBox,
@@ -104,7 +106,7 @@ define([
 
 
     return declare([ContentPane, serialize.Mixin], {
-        title: "Атрибуты",
+        title: i18n.gettext("Attributes"),
         prefix: "feature_layer",
         style: "padding: 0",
 
@@ -136,12 +138,12 @@ define([
 
             new Tooltip({
                 connectId: [this.grid.column("label_field").headerNode],
-                label: "Атрибут-наименование"
+                label: i18n.gettext("Label attribute")
             });
 
             new Tooltip({
                 connectId: [this.grid.column("grid_visibility").headerNode],
-                label: "Таблица объектов"
+                label: i18n.gettext("Feature table")
             });
 
         },

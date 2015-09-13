@@ -9,16 +9,16 @@
         style="margin-right: 1px;">
 
         <div data-dojo-attach-point="btnOpenFeature" data-dojo-type="dijit/form/Button"
-            data-dojo-props="iconClass: 'dijitIconApplication', disabled: true" label="Открыть">
+            data-dojo-props="iconClass: 'dijitIconApplication', disabled: true" label="{{gettext 'Open'}}">
         </div>
 
         <div data-dojo-attach-point="btnUpdateFeature" data-dojo-type="dijit/form/Button"
-            data-dojo-props="iconClass: 'dijitIconEdit', disabled: true" label="Изменить">
+            data-dojo-props="iconClass: 'dijitIconEdit', disabled: true" label="{{gettext 'Edit'}}">
         </div>
 
         <div style="float: right">
             <div data-dojo-attach-point="tbSearch" data-dojo-type="dijit/form/TextBox"
-                data-dojo-props="placeHolder: 'Поиск...'"
+                data-dojo-props="placeHolder: '{{gettext 'Search...'}}'"
                 style="margin-right: 2px; width: 20em;">
             </div>
         </div>
