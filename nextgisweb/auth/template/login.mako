@@ -1,5 +1,5 @@
 <%inherit file="nextgisweb:pyramid/template/base.mako" />
-
+<%! from nextgisweb.auth.util import _ %>
 <script>
     require([
         "dojo/parser",
@@ -20,14 +20,14 @@
 
 
 <div data-dojo-type="dijit/TitlePane"
-    title="Аутентификация"
+    title="${tr(_('Authentication'))}"
     style="width: 400px">
 
 <form data-dojo-type="dojox/layout/TableContainer"
     method="POST">
 
     <div data-dojo-type="dijit/_WidgetBase"
-        data-dojo-props="label: 'Логин'"
+        data-dojo-props="label: '${tr(_('Login'))}'"
         style="width: 100%">
 
         <input name="login" style="width: 98%" />
@@ -35,7 +35,7 @@
     </div>
 
     <div data-dojo-type="dijit/_WidgetBase"
-        data-dojo-props="label: 'Пароль'"
+        data-dojo-props="label: '${tr(_('Password'))}'"
         style="width: 100%">
     
         <input name="password" type="password" style="width: 98%" />
@@ -47,7 +47,7 @@
 
         <button data-dojo-type="dijit/form/Button" 
             type="submit" value="">
-            Войти
+            ${tr(_('Sign in'))}
 
         </button>
 

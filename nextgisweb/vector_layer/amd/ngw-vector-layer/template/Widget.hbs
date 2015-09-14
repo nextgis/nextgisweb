@@ -3,18 +3,18 @@
         
         <div data-dojo-attach-point="wSrs"
             data-dojo-type="ngw/form/SpatialRefSysSelect"
-            title="Система&nbsp;координат" style="width: 100%"></div>
+            title="{{gettext 'Spatial reference system'}}" style="width: 100%"></div>
 
         <div data-dojo-attach-point="wSourceFile"
             data-dojo-type="ngw/form/Uploader"
-            title="Исходный файл (*.zip)"></div>
+            title="{{gettext 'Source file (*.zip)'}}"></div>
 
         <select data-dojo-attach-point="wSourceEncoding"
             data-dojo-type="dijit/form/Select"
-            title="Кодировка" style="width: 100%">
+            title="{{gettext 'Encoding'}}" style="width: 100%">
 
-            <option value="utf-8">Юникод UTF-8</option>
-            <option value="windows-1251">Кириллица Windows-1251</option>
+            <option value="utf-8">{{gettext 'UTF-8'}}</option>
+            <option value="windows-1251">{{gettext 'Windows-1251'}}</option>
 
         </select>
 
