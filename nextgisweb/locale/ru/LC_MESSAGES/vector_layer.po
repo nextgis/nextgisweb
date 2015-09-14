@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 00:03+0300\n"
+"POT-Creation-Date: 2015-09-14 15:56+0600\n"
 "PO-Revision-Date: 2015-09-14 00:03+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -33,9 +33,11 @@ msgstr "Полигон"
 #: model.py:244
 #, python-format
 msgid "Unable to decode string value of feature #%(feat)d attribute #%(attr)d."
-msgstr "Ошибка декодирования строкового значения атрибута #%(attr)d объекта #%(feat)d."
+msgstr ""
+"Ошибка декодирования строкового значения атрибута #%(attr)d объекта "
+"#%(feat)d."
 
-#: model.py:270
+#: model.py:270 amd/ngw-vector-layer/Widget.js:34
 msgid "Vector layer"
 msgstr "Векторный слой"
 
@@ -80,3 +82,24 @@ msgstr "Тип геометрии не поддерживается."
 #: model.py:574
 msgid "Geometry type for existing resource can not be changed."
 msgstr "Тип геометрии существующего ресурса не может быть изменен."
+
+#: amd/ngw-vector-layer/template/Widget.hbs:6
+msgid "Spatial reference system"
+msgstr "Система координат"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:10
+msgid "Source file (*.zip)"
+msgstr "Исходный файл (*.zip)"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:14
+msgid "Encoding"
+msgstr "Кодировка"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:16
+msgid "UTF-8"
+msgstr "Юникод UTF-8"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:17
+msgid "Windows-1251"
+msgstr "Кириллица Windows-1251"
+
