@@ -101,4 +101,5 @@ def amd_packages():
         ('ngw-vector-layer', 'nextgisweb:vector_layer/amd/ngw-vector-layer'),
         ('ngw-raster-layer', 'nextgisweb:raster_layer/amd/ngw-raster-layer'),
         ('ngw-webmap', 'nextgisweb:webmap/amd/ngw-webmap'),
+        ('ngw-auth', 'nextgisweb:auth/amd/ngw-auth'),
     )
