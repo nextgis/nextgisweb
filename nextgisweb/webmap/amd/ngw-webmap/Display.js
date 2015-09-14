@@ -435,7 +435,7 @@ define([
 
         loadBookmarks: function () {
             if (this.config.bookmarkLayerId) {
-                var store = new JsonRest({ target: route("feature_layer.store", {
+                var store = new JsonRest({target: route.feature_layer.store({
                     id: this.config.bookmarkLayerId
                 })});
 
@@ -448,7 +448,7 @@ define([
                                 label: f.label,
                                 onClick: function () {
                                     // Отдельно запрашиваем экстент объекта
-                                    xhr.get(route("feature_layer.store.item", {
+                                    xhr.get(route.feature_layer.store.item({
                                         id: display.config.bookmarkLayerId,
                                         feature_id: f.id
                                     }), {

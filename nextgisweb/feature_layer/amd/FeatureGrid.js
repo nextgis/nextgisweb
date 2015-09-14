@@ -81,7 +81,7 @@ define([
 
             var widget = this;
 
-            xhr.get(route("feature_layer.field", {id: this.layerId}), {
+            xhr.get(route.feature_layer.field({id: this.layerId}), {
                 handleAs: "json"
             }).then(
                 function (data) {
@@ -187,7 +187,7 @@ define([
         },
 
         openFeature: function() {
-            window.open(route("feature_layer.feature.show", {
+            window.open(route.feature_layer.feature.show({
                 id: this.layerId,
                 feature_id: this.get("selectedRow").id
             }));

@@ -11,7 +11,7 @@ define([
 ) {
     return declare(JsonRest, {
         constructor: function (options) {
-            this.target = route("feature_layer.store", {id: options.layer});
+            this.target = route.feature_layer.store({id: options.layer});
 
             if (this.fieldList) { this.headers["X-Field-List"] = json.stringify(this.fieldList); }
             if (this.fieldPrefix) { this.headers["X-Field-Prefix"] = json.stringify(this.fieldPrefix); }

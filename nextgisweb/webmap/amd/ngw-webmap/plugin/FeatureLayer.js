@@ -79,7 +79,7 @@ define([
         zoomToFeature: function () {
             var display = this.plugin.display;
 
-            xhr.get(route("feature_layer.store.item", {id: this.layerId, feature_id: this.get("selectedRow").id}), {
+            xhr.get(route.feature_layer.store.item({id: this.layerId, feature_id: this.get("selectedRow").id}), {
                 handleAs: "json",
                 headers: { "X-Feature-Box": true }
             }).then(
