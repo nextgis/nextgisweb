@@ -1,4 +1,4 @@
-<%! from nextgisweb.resource.util import _ %>
+<%! from nextgisweb.feature_layer.util import _ %>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead><tr>
         <th>${tr(_("Keyname"))}</th>
