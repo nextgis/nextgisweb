@@ -1,7 +1,7 @@
 /* global define */
 define([
     "dojo/_base/declare",
-    "webmap/Adapter",
+    "./Adapter",
     "ngw/route",
     "ngw/openlayers/layer/Grid"
 ], function (declare, Adapter, route, Grid) {
