@@ -5,22 +5,24 @@ define([
     "dojo/number",
     "dijit/popup",
     "dijit/TooltipDialog",
-    "ngw/openlayers"
+    "ngw/openlayers",
+    "ngw-pyramid/i18n!webmap"
 ], function (
     declare,
     Base,
     number,
     popup,
     TooltipDialog,
-    openlayers
+    openlayers,
+    i18n
 ) {
     return declare(Base, {
         constructor: function (options) {
             if (this.order == 1) {
-                this.label = "Измерение расстояния";
+                this.label = i18n.gettext("Measure distance");
                 this.iconClass = "iconRuler";
             } else if (this.order == 2) {
-                this.label = "Измерение площади";
+                this.label = i18n.gettext("Measure area");
                 this.iconClass = "iconRulerSquare";
             };
 
@@ -74,12 +76,7 @@ define([
 
             this.control.activate();
 
-            // Подсказка пользователю
-            this.tooltip.set(
-                "content",
-                "Одинарный щелчёк добавляет точку для измерения,<br/>"
-                + "Двойной щелчёк завершает измерение."
-            );
+            this.tooltip.set("content", i18n.gettext("Click adds point to measure, double click completes the measurement."));
             
             popup.open({
                 popup: this.tooltip,

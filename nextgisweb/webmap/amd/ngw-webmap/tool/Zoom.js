@@ -2,21 +2,23 @@
 define([
     "dojo/_base/declare",
     "./Base",
-    "ngw/openlayers"
+    "ngw/openlayers",
+    "ngw-pyramid/i18n!webmap"
 ], function (
     declare,
     Base,
-    openlayers
+    openlayers,
+    i18n
 ) {
     return declare(Base, {
         out: false, 
 
         constructor: function (options) {
             if (!this.out) {
-                this.label = "Увеличение масштаба";
+                this.label = i18n.gettext("Zoom in");
                 this.iconClass = "iconZoomIn";
             } else {
-                this.label = "Уменьшение масштаба";
+                this.label = i18n.gettext("Zoom out");
                 this.iconClass = "iconZoomOut";
             };
 

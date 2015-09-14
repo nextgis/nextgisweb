@@ -4,7 +4,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/Display.html",
+    "dojo/text!./template/Display.hbs",
     "dojo/_base/lang",
     "dojo/_base/array",
     "dojo/Deferred",
@@ -27,6 +27,8 @@ define([
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
     "ngw/route",
+    "ngw-pyramid/i18n!webmap",
+    "ngw-pyramid/hbs-i18n",
     // tools
     "./tool/Base",
     "./tool/Zoom",
@@ -75,6 +77,8 @@ define([
     TreeStoreModel,
     Tree,
     route,
+    i18n,
+    hbsI18n,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -138,7 +142,7 @@ define([
     });
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: template,
+        templateString: hbsI18n(template, i18n),
 
         // Загрузка разных видов модулей: adapter, basemap, plugin
         _midDeferred: undefined,
@@ -683,7 +687,7 @@ define([
         _toolsSetup: function () {
             this.addTool(new ToolBase({
                 display: this,
-                label: "Перемещение",
+                label: i18n.gettext("Pan"),
                 iconClass: "iconPan"
             }));
 

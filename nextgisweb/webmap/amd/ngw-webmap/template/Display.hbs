@@ -32,7 +32,7 @@
 
                             <div data-dojo-attach-point="bookmarkButton"
                                 data-dojo-type="dijit/form/DropDownButton"
-                                data-dojo-props="label: 'Закладки', iconClass: 'dijitIconBookmark'">
+                                data-dojo-props="label: '{{gettext 'Bookmarks'}}', iconClass: 'dijitIconBookmark'">
 
                                 <div data-dojo-attach-point="bookmarkMenu"
                                     data-dojo-type="dijit/Menu">
@@ -46,7 +46,7 @@
 
                         <div data-dojo-attach-point="zoomToInitialExtentButton"
                             data-dojo-type="dijit/form/Button"
-                            data-dojo-props="iconClass: 'iconArrowInOut', label: 'Начальный охват', showLabel: false">
+                            data-dojo-props="iconClass: 'iconArrowInOut', label: '{{gettext 'Initial extent'}}', showLabel: false">
                         </div>
 
                         <div data-dojo-type="dijit/ToolbarSeparator"></div>
@@ -56,13 +56,13 @@
 
                             <div data-dojo-type="dijit/form/Button" style="width: 0;">&nbsp;</div>
 
-                            <span style="color: #999">Долгота</span>
+                            <span style="color: #999">{{gettext 'Longitude'}}</span>
                             <span data-dojo-attach-point="centerLonNode"></span>
 
-                            <span style="color: #999">Широта</span>
+                            <span style="color: #999">{{gettext 'Latitude'}}</span>
                             <span data-dojo-attach-point="centerLatNode"></span>
 
-                            <span style="color: #999">Масштаб</span>
+                            <span style="color: #999">{{gettext 'Scale'}}</span>
                             <span data-dojo-attach-point="scaleInfoNode"></span>
 
                         </div>
@@ -81,8 +81,8 @@
                             <div style="position: absolute; top: 0; right: 0; z-index: 2000; margin: 4px; background-color: rgba(255, 255, 255, 0.5)">
                                 <a href="http://nextgis.ru/nextgis-web/" target="_blank"><img src="${assetUrl}img/nextgis.png"/></a>
                             </div>
-                            <a id="permalink" data-dojo-attach-event="onclick:_getPermalink" href="#" style="position: absolute; bottom: 20px; right: 0; z-index: 2000; margin: 4px; font-size: smaller;">Ссылка</a>
-                            <div data-dojo-attach-point="permalinkDialog" data-dojo-type="dijit/Dialog" data-dojo-props="title: 'Ссылка', autofocus: false, draggable: false" style="display: none;">
+                            <a id="permalink" data-dojo-attach-event="onclick:_getPermalink" href="#" style="position: absolute; bottom: 20px; right: 0; z-index: 2000; margin: 4px; font-size: smaller;">{{gettext 'Permalink'}}</a>
+                            <div data-dojo-attach-point="permalinkDialog" data-dojo-type="dijit/Dialog" data-dojo-props="title: '{{gettext 'Permalink'}}', autofocus: false, draggable: false" style="display: none;">
                                 <div data-dojo-attach-point="permalinkContent" data-dojo-type="dijit/form/TextBox" data-dojo-props="readOnly: false, selectOnClick: true" style="width: 300px;"></div>
                             </div>
                         </div>
@@ -104,7 +104,7 @@
                             data-dojo-props="region: 'top'">
 
                             <div data-dojo-type="dijit/form/DropDownButton"
-                                data-dojo-props="label: 'Слой'">
+                                data-dojo-props="label: '{{gettext 'Layer'}}'">
 
                                 <div data-dojo-attach-point="itemMenu"
                                     data-dojo-type="dijit/Menu">

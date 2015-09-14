@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
 from sqlalchemy.ext.orderinglist import ordering_list
 
 from .. import db
@@ -13,19 +14,21 @@ from ..resource import (
     SerializedResourceRelationship as SRR,
     ResourceGroup)
 
+from .util import _
+
 Base = declarative_base()
 
 
 class WebMapScope(Scope):
     identity = 'webmap'
-    label = u"Веб-карта"
+    label = _("Web map")
 
-    display = Permission(u"Просмотр")
+    display = Permission(_("Display"))
 
 
 class WebMap(Base, Resource):
     identity = 'webmap'
-    cls_display_name = u"Веб-карта"
+    cls_display_name = _("Web map")
 
     __scope__ = WebMapScope
 

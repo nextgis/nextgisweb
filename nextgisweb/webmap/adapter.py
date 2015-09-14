@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
 from ..registry import registry_maker
+from .util import _
 
 
 class WebMapAdapter(object):
@@ -19,7 +21,7 @@ class TileAdapter(object):
 
     identity = 'tile'
     mid = 'ngw-webmap/TMSAdapter'
-    display_name = u"Тайлы"
+    display_name = _("Tiles")
 
 
 @WebMapAdapter.registry.register
@@ -29,4 +31,4 @@ class ImageAdapter(object):
 
     identity = 'image'
     mid = 'ngw-webmap/ImageAdapter'
-    display_name = u"Изображение"
+    display_name = _("Image")

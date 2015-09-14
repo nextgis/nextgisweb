@@ -2,36 +2,36 @@
     data-ngw-serialize-prefix="${serializePrefix}"
     style="padding: 1ex;">
 
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2, labelWidth: 150">
 
         <div data-dojo-attach-point="wExtentLeft"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -180, max: +180}, trim: true"
-            title="Лево, град."
+            title="{{gettext 'Left, deg.'}}"
             style="width: 100%"></div>
 
         <div data-dojo-attach-point="wExtentBottom"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
-            title="Низ, град."
+            title="{{gettext 'Bottom, deg.'}}"
             style="width: 100%"></div>
 
         <div data-dojo-attach-point="wExtentRight"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -180, max: +180}, trim: true"
-            title="Право, град."
+            title="{{gettext 'Right, deg.'}}"
             style="width: 100%"></div>
 
         <div data-dojo-attach-point="wExtentTop"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
-            title="Верх, град."
+            title="{{gettext 'Top, deg.'}}"
             style="width: 100%"></div>
 
         <div data-dojo-type="ngw-resource/ResourceBox"
             data-dojo-props="interface: 'IFeatureLayer', colspan: 2"
             data-ngw-serialize="bookmark_resource"
-            title="Слой закладок"
+            title="{{gettext 'Bookmark resource'}}"
             style="width: 100%">
         </div>
 

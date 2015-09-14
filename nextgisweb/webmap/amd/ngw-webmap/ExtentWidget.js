@@ -7,8 +7,10 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
     "ngw-resource/ResourceStore",
+    "ngw-pyramid/i18n!webmap",
+    "ngw-pyramid/hbs-i18n",
     // resource
-    "dojo/text!./template/ExtentWidget.html",
+    "dojo/text!./template/ExtentWidget.hbs",
     // template
     "dijit/form/NumberTextBox",
     "dojox/layout/TableContainer",
@@ -21,11 +23,13 @@ define([
     _WidgetsInTemplateMixin,
     serialize,
     ResourceStore,
+    i18n,
+    hbsI18n,
     template
 ) {
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        title: "Охват и закладки",
-        templateString: template,
+        title: i18n.gettext("Extent and bookmarks"),
+        templateString: hbsI18n(template, i18n),
         serializePrefix: "webmap",
 
         serializeInMixin: function (data) {

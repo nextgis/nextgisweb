@@ -15,8 +15,10 @@ define([
     "ngw-resource/serialize",
     "ngw-resource/ResourceStore",
     "ngw-resource/ResourcePicker",
+    "ngw-pyramid/i18n!webmap",
+    "ngw-pyramid/hbs-i18n",
     // resource
-    "dojo/text!./template/ItemWidget.html",
+    "dojo/text!./template/ItemWidget.hbs",
     "ngw/settings!webmap",
     // template
     "dijit/layout/TabContainer",
@@ -49,12 +51,14 @@ define([
     serialize,
     ResourceStore,
     ResourcePicker,
+    i18n,
+    hbsI18n,
     template,
     settings
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        title: "Слои",
-        templateString: template,
+        title: i18n.gettext("Layers"),
+        templateString: hbsI18n(template, i18n),
 
         constructor: function () {
             this.itemStore = new ItemFileWriteStore({data: {
@@ -107,7 +111,7 @@ define([
             this.btnAddGroup.on("click", function () {
                 widget.itemStore.newItem(
                     {
-                        display_name: "Новая группа",
+                        display_name: i18n.gettext("Add group"),
                         item_type: "group",
                         group_expanded: null
                     }, {

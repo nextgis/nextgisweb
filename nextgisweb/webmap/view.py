@@ -7,6 +7,7 @@ from ..dynmenu import DynItem, Label, Link
 from .model import WebMap
 from .plugin import WebmapPlugin
 from .adapter import WebMapAdapter
+from .util import _
 
 
 class ExtentWidget(Widget):
@@ -122,10 +123,10 @@ def setup_pyramid(comp, config):
     class DisplayMenu(DynItem):
         def build(self, args):
             if isinstance(args.obj, WebMap):
-                yield Label('webmap', u"Веб-карта")
+                yield Label('webmap', _("Web map"))
 
                 yield Link(
-                    'webmap/display', u"Просмотр",
+                    'webmap/display', _("Display"),
                     self._url())
 
         def _url(self):
