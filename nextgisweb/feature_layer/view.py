@@ -54,7 +54,7 @@ def feature_browse(request):
                 maxwidth=True, maxheight=True)
 
 
-@viewargs(renderer='nextgisweb:feature_layer/template/show.mako')
+@viewargs(renderer='nextgisweb:feature_layer/template/feature_show.mako')
 def feature_show(request):
     request.resource_permission(PD_READ)
 
