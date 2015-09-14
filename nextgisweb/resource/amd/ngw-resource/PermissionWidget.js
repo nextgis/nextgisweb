@@ -124,7 +124,7 @@ define([
     });
 
     var DialogClass = declare([Dialog], {
-        title: "Элемент правил доступа",
+        title: i18n.gettext("Permission item"),
         style: "width: 600px",
 
         buildRendering: function () {
