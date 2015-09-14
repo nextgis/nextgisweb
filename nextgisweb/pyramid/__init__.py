@@ -146,9 +146,6 @@ class PyramidComponent(Component):
         else:
             self.help_page = None
 
-        config.add_route('home', '/') \
-            .add_view('nextgisweb.views.home')
-
         # Чтобы не приходилось вручную чистить кеш статики, сделаем
         # так, чтобы у них всегда были разные URL. В качестве ключа
         # используем хеш md5 от всех установленных в окружении пакетов,

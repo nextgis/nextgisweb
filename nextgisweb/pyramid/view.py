@@ -3,11 +3,19 @@ from __future__ import unicode_literals
 import os.path
 
 from pyramid.response import FileResponse
-from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
 
 from .. import dynmenu as dm
 
 from .util import _, ClientRoutePredicate
+
+
+def home(request):
+    home_url = request.env.pyramid.settings.get('home_url')
+    if home_url is not None:
+        return HTTPFound(request.application_url + home_url)
+    else:
+        return HTTPFound(location=request.route_url('resource.show', id=0))
 
 
 def settings(request):
@@ -71,6 +79,8 @@ def pkginfo(request):
 
 
 def setup_pyramid(comp, config):
+    config.add_route('home', '/').add_view(home)
+
     config.add_route('pyramid.settings', '/settings') \
         .add_view(settings, renderer='json')
 
