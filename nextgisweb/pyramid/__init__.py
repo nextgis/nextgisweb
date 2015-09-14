@@ -140,12 +140,11 @@ class PyramidComponent(Component):
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)
 
-        if 'help_page' not in settings:
-            settings['help_page'] = resource_filename(
-                'nextgisweb', 'userdoc/help.html')
-
-        with codecs.open(settings['help_page'], 'rb', 'utf-8') as fp:
-            self.help_page = fp.read()
+        if 'help_page' in settings:
+            with codecs.open(settings['help_page'], 'rb', 'utf-8') as fp:
+                self.help_page = fp.read()
+        else:
+            self.help_page = None
 
         config.add_route('home', '/') \
             .add_view('nextgisweb.views.home')
