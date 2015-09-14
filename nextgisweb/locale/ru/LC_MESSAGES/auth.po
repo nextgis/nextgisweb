@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 19:14+0300\n"
+"POT-Creation-Date: 2015-09-14 22:45+0600\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -42,17 +42,42 @@ msgstr "Администратор"
 msgid "Owner"
 msgstr "Владелец"
 
-#: template/login.mako:23
-msgid "Authentication"
-msgstr "Аутентификация"
+#: amd/ngw-auth/GroupWidget.js:32
+msgid "Group"
+msgstr "Группа пользователей"
 
-#: template/login.mako:30
+#: amd/ngw-auth/UserWidget.js:38
+msgid "User"
+msgstr "Пользователь"
+
+#: amd/ngw-auth/UserWidget.js:47
+msgid "Enter new password here"
+msgstr "Для изменения пароля заполните это поле"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:7
+#: amd/ngw-auth/template/UserWidget.hbs:7
+msgid "Full name"
+msgstr "Полное имя"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:13
+msgid "Group name"
+msgstr "Имя группы"
+
+#: amd/ngw-auth/template/UserWidget.hbs:14 template/login.mako:30
 msgid "Login"
 msgstr "Логин"
 
-#: template/login.mako:38
+#: amd/ngw-auth/template/UserWidget.hbs:22 template/login.mako:38
 msgid "Password"
 msgstr "Пароль"
+
+#: amd/ngw-auth/template/UserWidget.hbs:29
+msgid "Groups member"
+msgstr "Член групп"
+
+#: template/login.mako:23
+msgid "Authentication"
+msgstr "Аутентификация"
 
 #: template/login.mako:50
 msgid "Sign in"

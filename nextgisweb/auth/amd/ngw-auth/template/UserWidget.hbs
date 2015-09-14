@@ -4,14 +4,14 @@
 
         <input data-dojo-attach-point="displayName"
             data-dojo-type="ngw/form/DisplayNameTextBox"
-            title="Полное имя"
+            title="{{gettext 'Full name'}}"
             style="width: 100%">
         </input>
 
         <input data-dojo-attach-point="keyname"
             data-dojo-type="ngw/form/KeynameTextBox"
             data-dojo-props="required: true"
-            title="Имя пользователя"
+            title="{{gettext 'Login'}}"
             style="width: 100%">
         </input>
 
@@ -19,14 +19,14 @@
             data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="pattern: '.{5,25}'"
             type="password"
-            title="Пароль"
+            title="{{gettext 'Password'}}"
             style="width: 100%">
         </input>
 
         <select data-dojo-attach-point="memberOf"
             data-dojo-type="dojox/form/CheckedMultiSelect"
             multiple="true"
-            title="Член групп"
+            title="{{gettext 'Groups member'}}"
             style="width: 100%">
         </select>
 
