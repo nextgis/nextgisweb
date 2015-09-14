@@ -71,6 +71,13 @@ def favicon(request):
         raise HTTPNotFound()
 
 
+def locale(request):
+    def set_cookie(reqest, response):
+        response.set_cookie('_LOCALE_', request.matchdict['locale'])
+    request.add_response_callback(set_cookie)
+    return HTTPFound(location=request.GET['next'])
+
+
 def pkginfo(request):
     return dict(
         title=_("Package versions"),
@@ -101,6 +108,8 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.pkginfo', '/sys/pkginfo') \
         .add_view(pkginfo, renderer=ctpl('pkginfo'))
+
+    config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
     comp.control_panel = dm.DynMenu(
         dm.Label('sys', _("System info")),
