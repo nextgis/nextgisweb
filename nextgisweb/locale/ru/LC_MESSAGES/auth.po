@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 17:16+0600\n"
+"POT-Creation-Date: 2015-09-14 19:14+0300\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -17,6 +17,30 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
+
+#: __init__.py:24
+msgid "Guest"
+msgstr "Гость"
+
+#: __init__.py:30
+msgid "Everyone"
+msgstr "Любой пользователь"
+
+#: __init__.py:36
+msgid "Authenticated"
+msgstr "Прошедший проверку"
+
+#: __init__.py:42
+msgid "Administrators"
+msgstr "Администраторы"
+
+#: __init__.py:45
+msgid "Administrator"
+msgstr "Администратор"
+
+#: __init__.py:53
+msgid "Owner"
+msgstr "Владелец"
 
 #: template/login.mako:23
 msgid "Authentication"
