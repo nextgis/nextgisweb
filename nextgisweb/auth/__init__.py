@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
 from pyramid.security import authenticated_userid
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -6,6 +7,7 @@ from ..component import Component
 
 from .models import Base, Principal, User, Group
 from . import command # NOQA
+from .util import _
 
 __all__ = ['Principal', 'User', 'Group']
 
@@ -19,28 +21,28 @@ class AuthComponent(Component):
         self.initialize_user(
             keyname='guest',
             system=True,
-            display_name=u"Гость"
+            display_name=_("Guest")
         )
 
         self.initialize_user(
             keyname='everyone',
             system=True,
-            display_name=u"Любой пользователь"
+            display_name=_("Everyone")
         ).persist()
 
         self.initialize_user(
             keyname='authenticated',
             system=True,
-            display_name=u"Прошедший проверку"
+            display_name=_("Authenticated")
         ).persist()
 
         self.initialize_group(
             keyname='administrators',
             system=True,
-            display_name=u"Администраторы",
+            display_name=_("Administrators"),
             members=[self.initialize_user(
                 keyname='administrator',
-                display_name=u"Администратор",
+                display_name=_("Administrator"),
                 password='admin'
             ), ]
         ).persist()
@@ -48,7 +50,7 @@ class AuthComponent(Component):
         self.initialize_user(
             system=True,
             keyname='owner',
-            display_name=u"Владелец"
+            display_name=_("Owner")
         ).persist()
 
     def setup_pyramid(self, config):
@@ -60,29 +62,39 @@ class AuthComponent(Component):
             else:
                 return User.filter_by(keyname='guest').one()
 
-        config.set_request_property(user, 'user', reify=True)
+        config.set_request_property(user, reify=True)
 
         from . import views
         views.setup_pyramid(self, config)
 
-    def initialize_user(self, keyname, **kwargs):
+    def initialize_user(self, keyname, display_name, **kwargs):
         """ Проверяет наличие в БД пользователя с keyname и в случае
         отсутствия создает его с параметрами kwargs """
 
         try:
             obj = User.filter_by(keyname=keyname).one()
         except NoResultFound:
-            obj = User(keyname=keyname, **kwargs).persist()
+            obj = User(
+                keyname=keyname,
+                display_name=translate(self, display_name),
+                **kwargs).persist()
 
         return obj
 
-    def initialize_group(self, keyname, **kwargs):
+    def initialize_group(self, keyname, display_name, **kwargs):
         """ Проверяет наличие в БД группы пользователей с keyname и в случае
         отсутствия создает ее с параметрами kwargs """
 
         try:
             obj = Group.filter_by(keyname=keyname).one()
         except NoResultFound:
-            obj = Group(keyname=keyname, **kwargs).persist()
+            obj = Group(
+                keyname=keyname,
+                display_name=translate(self, display_name),
+                **kwargs).persist()
 
         return obj
+
+
+def translate(self, trstring):
+    return self.env.core.localizer().translate(trstring)
