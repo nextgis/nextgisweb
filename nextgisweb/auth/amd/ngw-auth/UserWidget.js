@@ -6,7 +6,9 @@ define([
     "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/UserWidget.html",
+    "ngw-pyramid/i18n!auth",
+    "ngw-pyramid/hbs-i18n",
+    "dojo/text!./template/UserWidget.hbs",
     "dojo/_base/array",
     "dojo/on",
     // template
@@ -24,14 +26,16 @@ define([
     ErrorDisplayMixin,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    i18n,
+    hbsI18n,
     template,
     array,
     on
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: template,
+        templateString: hbsI18n(template, i18n),
         identity: "auth_user",
-        title: "Пользователь",
+        title: i18n.gettext("User"),
 
         postCreate: function () {
             this.inherited(arguments);
@@ -40,7 +44,7 @@ define([
             if (this.operation !== 'create') {
                 this.password.set(
                     'placeHolder',
-                    "Для изменения пароля заполните это поле"
+                    i18n.gettext("Enter new password here")
                 );
             }
 

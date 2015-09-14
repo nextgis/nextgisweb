@@ -5,7 +5,9 @@ define([
     "ngw/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/GroupWidget.html",
+    "ngw-pyramid/i18n!auth",
+    "ngw-pyramid/hbs-i18n",
+    "dojo/text!./template/GroupWidget.hbs",
     "dojo/_base/array",
     "dojo/on",
     // template
@@ -18,14 +20,16 @@ define([
     ErrorDisplayMixin,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    i18n,
+    hbsI18n,
     template,
     array,
     on
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: template,
+        templateString: hbsI18n(template, i18n),
         identity: "auth_user",
-        title: "Пользователь",
+        title: i18n.gettext("Group"),
 
         validateWidget: function () {
             var widget = this;
