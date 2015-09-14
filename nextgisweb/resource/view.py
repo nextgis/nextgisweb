@@ -65,6 +65,7 @@ def objjson(request):
                 objjson=serializer.data)
 
 
+# TODO: Перенести в API и избавиться от json=True
 @viewargs(renderer='json', json=True)
 def schema(request):
     resources = dict()
@@ -73,17 +74,18 @@ def schema(request):
     for cls in Resource.registry:
         resources[cls.identity] = dict(
             identity=cls.identity,
-            label=cls.cls_display_name,
+            label=request.localizer.translate(cls.cls_display_name),
             scopes=cls.scope.keys())
 
     for k, scp in Scope.registry.iteritems():
         spermissions = dict()
         for p in scp.itervalues():
-            spermissions[p.name] = dict(label=p.label)
+            spermissions[p.name] = dict(
+                label=request.localizer.translate(p.label))
 
         scopes[k] = dict(
-            identity=k, label=scp.label,
-            permissions=spermissions)
+            identity=k, permissions=spermissions,
+            label=request.localizer.translate(scp.label))
 
     return dict(resources=resources, scopes=scopes)
 
