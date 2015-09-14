@@ -10,6 +10,7 @@ from ..auth import User
 
 from .model import Base, WebMap, WebMapItem
 from .adapter import WebMapAdapter
+from .util import _
 
 
 @Component.registry.register
@@ -38,7 +39,8 @@ class WebMapComponent(Component):
         # Создаем веб-карту по-умолчанию, если в корне нет ни одной.
         # TODO: Возможность отключать такое поведение через настройки
         if WebMap.filter_by(parent_id=0).first() is None:
-            WebMap(parent_id=0, display_name="Основная веб-карта",
+            dispname = self.env.core.localizer().translate(_("Main web map"))
+            WebMap(parent_id=0, display_name=dispname,
                    owner_user=User.filter_by(keyname='administrator').one(),
                    root_item=WebMapItem(item_type='root')).persist()
 

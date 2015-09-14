@@ -16,6 +16,7 @@ from .serialize import (
     SerializedProperty,
     SerializedRelationship,
     SerializedResourceRelationship)
+from .util import _
 
 from .exception import *    # NOQA
 from .interface import *    # NOQA
@@ -65,8 +66,10 @@ class ResourceComponent(Component):
         try:
             ResourceGroup.filter_by(id=0).one()
         except NoResultFound:
-            obj = ResourceGroup(id=0, owner_user=adminusr,
-                                display_name="Основная группа ресурсов")
+            obj = ResourceGroup(
+                id=0, owner_user=adminusr,
+                display_name=self.env.core.localizer().translate(
+                    _("Main resource group")))
 
             obj.acl.append(ACLRule(
                 principal=admingrp,
