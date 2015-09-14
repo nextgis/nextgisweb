@@ -16,14 +16,22 @@ def route(request):
     introspector = request.registry.introspector
     for itm in introspector.get_category('routes'):
         route = itm['introspectable']['object']
+        client_predicate = False
         for p in route.predicates:
             if isinstance(p, ClientRoutePredicate):
-                kys = route_re.findall(route.path)
-                kvs = dict([
-                    (k, '{%d}' % idx)
-                    for idx, k in enumerate(kys)])
-                tpl = unquote(route.generate(kvs))
-                result[route.name] = [tpl, ] + kys
+                client_predicate = True
+        api_pattern = route.pattern.startswith('/api/')
+        if api_pattern or client_predicate:
+            if api_pattern and client_predicate:
+                request.env.pyramid.logger.warn(
+                    "API route '%s' has useless 'client' predicate!",
+                    route.name)
+            kys = route_re.findall(route.path)
+            kvs = dict([
+                (k, '{%d}' % idx)
+                for idx, k in enumerate(kys)])
+            tpl = unquote(route.generate(kvs))
+            result[route.name] = [tpl, ] + kys
 
     return result
 
@@ -63,5 +71,4 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.locdata',
         '/api/component/pyramid/locdata/{component}/{locale}',
-        client=('component', 'locale'),
     ).add_view(locdata, renderer='json')
