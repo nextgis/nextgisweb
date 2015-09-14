@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-13 15:36+0300\n"
+"POT-Creation-Date: 2015-09-14 12:50+0600\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -44,15 +44,15 @@ msgstr "Атрибуты"
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/FieldsWidget.js:59
+#: amd/FieldsWidget.js:59 template/section_fields.mako:4
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/FieldsWidget.js:69
+#: amd/FieldsWidget.js:69 template/section_fields.mako:5
 msgid "Type"
 msgstr "Тип"
 
-#: amd/FieldsWidget.js:73
+#: amd/FieldsWidget.js:73 template/section_fields.mako:6
 msgid "Display name"
 msgstr "Наименование"
 
@@ -79,3 +79,16 @@ msgstr "Редактировать"
 #: amd/template/FeatureGrid.hbs:21
 msgid "Search..."
 msgstr "Поиск..."
+
+#: template/section_fields.mako:7
+msgid "Table"
+msgstr "Таблица"
+
+#: template/section_fields.mako:14
+msgid "Yes"
+msgstr "Да"
+
+#: template/section_fields.mako:14
+msgid "No"
+msgstr "Нет"
+
