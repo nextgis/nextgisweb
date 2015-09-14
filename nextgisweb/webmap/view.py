@@ -117,7 +117,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'webmap.display', '/resource/{id:\d+}/display',
         factory=resource_factory, client=('id',)
-    ).add_view(display, context=WebMap, renderer='webmap/display.mako')
+    ).add_view(display, context=WebMap, renderer='nextgisweb:webmap/template/display.mako')
 
     class DisplayMenu(DynItem):
         def build(self, args):

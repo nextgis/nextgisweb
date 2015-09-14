@@ -1,4 +1,4 @@
-<%inherit file='../base.mako' />
+<%inherit file='nextgisweb:pyramid/template/base.mako' />
 
 <%def name="head()">
     <% import json %>

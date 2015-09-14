@@ -40,7 +40,7 @@ def setup_pyramid(comp, config):
         return dict()
 
     config.add_route('auth.login', '/login') \
-        .add_view(login, renderer='auth/login.mako')
+        .add_view(login, renderer='nextgisweb:auth/template/login.mako')
 
     def logout(request):
         headers = forget(request)
@@ -72,7 +72,7 @@ def setup_pyramid(comp, config):
     config.add_view(
         forbidden,
         context=HTTPForbidden,
-        renderer='auth/forbidden.mako'
+        renderer='nextgisweb:auth/template/forbidden.mako'
     )
 
     def principal_dump(request):

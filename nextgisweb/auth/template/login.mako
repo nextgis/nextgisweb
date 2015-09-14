@@ -1,4 +1,4 @@
-<%inherit file="../base.mako" />
+<%inherit file="nextgisweb:pyramid/template/base.mako" />
 
 <script>
     require([
