@@ -230,7 +230,7 @@ define([
                     var id = this.display.itemStore.getValue(itm, 'id'),
                         layerId = this.display.itemStore.getValue(itm, 'layerId'),
                         itmConfig = this.display._itemConfigById[id],
-                        pluginConfig = itmConfig.plugin["webmap/plugin/FeatureLayer"];
+                        pluginConfig = itmConfig.plugin["ngw-webmap/plugin/FeatureLayer"];
                     
                     if (pluginConfig != undefined && pluginConfig.likeSearch) {
                         var store = new FeatureStore({

@@ -9,7 +9,7 @@
         require([
             "dojo/parser",
             "dojo/ready",
-            "webmap/Display"
+            "ngw-webmap/Display"
         ], function (
             parser,
             ready
@@ -27,7 +27,7 @@
 </%def>
 
 <div data-dojo-id="display"
-    data-dojo-type="webmap/Display"
+    data-dojo-type="ngw-webmap/Display"
     data-dojo-props="config: displayConfig"
     style="width: 100%; height: 100%">
 </div>

@@ -18,7 +18,7 @@ class TileAdapter(object):
     однако сам сервис реализуется другим компонентом. """
 
     identity = 'tile'
-    mid = 'webmap/TMSAdapter'
+    mid = 'ngw-webmap/TMSAdapter'
     display_name = u"Тайлы"
 
 
@@ -28,5 +28,5 @@ class ImageAdapter(object):
     WMS-запросу GetImage, однако сам сервис реализуется другим компонентом. """
 
     identity = 'image'
-    mid = 'webmap/ImageAdapter'
+    mid = 'ngw-webmap/ImageAdapter'
     display_name = u"Изображение"

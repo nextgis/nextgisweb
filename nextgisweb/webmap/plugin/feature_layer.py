@@ -10,6 +10,6 @@ class FeatureLayerPlugin(WebmapPlugin):
     @classmethod
     def is_layer_supported(cls, layer, webmap):
         if IFeatureLayer.providedBy(layer):
-            return ("webmap/plugin/FeatureLayer", dict(
+            return ("ngw-webmap/plugin/FeatureLayer", dict(
                 likeSearch=IFeatureQueryLike.providedBy(layer.feature_query())
             ))

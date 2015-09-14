@@ -86,9 +86,6 @@ def amd_packages():
 
         # Пакеты nextgisweb
         ('ngw', 'nextgisweb:amd_packages/ngw'),
-        ('feature_layer', 'nextgisweb:amd_packages/feature_layer'),
-        ('webmap', 'nextgisweb:amd_packages/webmap'),
-        ('wmsclient', 'nextgisweb:amd_packages/wmsclient'),
 
         # Пакеты компонентов
         ('ngw-pyramid', 'nextgisweb:pyramid/amd/ngw-pyramid'),
