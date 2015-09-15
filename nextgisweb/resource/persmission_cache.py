@@ -59,7 +59,7 @@ class PermissionCache:
             key = '%s:%s:%s:%s' % (resource.id, user.id, permission.scope.identity, permission.name)
             res = self.redis.get(key)
             if res:
-                return bool(res)
+                return res == 'True'
             else:
                 return None
         except:
