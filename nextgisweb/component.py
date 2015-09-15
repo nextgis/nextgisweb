@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
-import pkg_resources
 import logging
 
 from .registry import registry_maker
+from .package import pkginfo
 
 
 class Component(object):
@@ -81,17 +81,13 @@ def require(*deps):
 def load_all(packages_ignore=None, components_ignore=None):
     if packages_ignore is None:
         packages_ignore = ()
-
     if components_ignore is None:
         components_ignore = ()
 
-    for ep in pkg_resources.iter_entry_points(group='nextgisweb.component'):
-        if ep.name not in components_ignore:
-            ep.load()
-
-    for ep in pkg_resources.iter_entry_points(group='nextgisweb.packages'):
-        if ep.name not in packages_ignore:
-            pkginfo = ep.load()()
-            for component, module_name in pkginfo['components'].iteritems():
-                if component not in components_ignore:
-                    __import__(module_name)
+    for pkg in pkginfo.packages:
+        if pkg in packages_ignore:
+            continue
+        for comp in pkginfo.pkg_comp(pkg):
+            if comp in components_ignore:
+                continue
+            __import__(pkginfo.comp_mod(comp))
