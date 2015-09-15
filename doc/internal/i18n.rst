@@ -209,13 +209,19 @@ Handlebars
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "ngw-pyramid/hbs-i18n",
-        "dojo/text!./templates/SomeWidget.html",
+        "dojo/text!./template/SomeWidget.hbs",
         "ngw-pyramid/i18n!comp"
     ], function(declare, _WidgetBase, _TemplatedMixin, hbsI18n, template, i18n) {
         return declare([_WidgetBase, _TemplatedMixin], {
             templateString: hbsI18n(template, i18n)
         });
     });
+
+.. note::
+
+    Согласно используемым настройкам, указанным в файле babel.cfg,
+    шаблоны виджетов должны иметь расширение .hbs и располагаться
+    внутри директории template.
 
 
 Настройки
