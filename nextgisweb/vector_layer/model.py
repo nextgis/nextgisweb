@@ -529,7 +529,7 @@ class _source_attr(SP):
             obj.load_from_ogr(ogrlayer, recode)
 
     def setter(self, srlzr, value):
-        datafile, _ = env.file_upload.get_filename(value['id'])
+        datafile, metafile = env.file_upload.get_filename(value['id'])
         encoding = value.get('encoding', 'utf-8')
 
         iszip = zipfile.is_zipfile(datafile)
