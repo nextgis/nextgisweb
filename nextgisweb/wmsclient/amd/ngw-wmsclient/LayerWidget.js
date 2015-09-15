@@ -25,7 +25,7 @@ define([
     "dijit/form/ComboBox",
     "dijit/layout/BorderContainer",
     "dojox/layout/TableContainer",
-    "ngw/form/SpatialRefSysSelect",
+    "ngw-spatial-ref-sys/SpatialRefSysSelect",
     "ngw-resource/ResourceBox",
     "ngw-resource/ResourcePicker"
 ], function (

@@ -13,7 +13,7 @@ define([
     "dojo/text!./template/Widget.hbs",
     // template
     "dojox/layout/TableContainer",
-    "ngw/form/SpatialRefSysSelect",
+    "ngw-spatial-ref-sys/SpatialRefSysSelect",
     "ngw-file-upload/Uploader",
     "dijit/form/ComboBox"
 ], function (

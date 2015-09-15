@@ -16,7 +16,7 @@ define([
     "dijit/form/Select",
     "dojox/layout/TableContainer",
     "ngw-resource/ResourceBox",
-    "ngw/form/SpatialRefSysSelect"
+    "ngw-spatial-ref-sys/SpatialRefSysSelect"
 ], function (
     declare,
     lang,
