@@ -2,18 +2,20 @@ define([
     "dojo/_base/declare",
     "dijit/_WidgetBase",
     "dojo/number",
-    "dijit/form/ValidationTextBox"
+    "dijit/form/ValidationTextBox",
+    "ngw-pyramid/i18n!pyramid",
 ], function (
     declare,
     _WidgetBase,
     number,
-    ValidationTextBox
+    ValidationTextBox,
+    i18n
 ) {
     return declare(_WidgetBase, {
         constructor: function (params) {
             this._textbox = new ValidationTextBox({
                 pattern: "1\\ *: *" + number.regexp(),
-                invalidMessage: "Введите корректное значение масштаба, например 1:" + number.format(10000),
+                invalidMessage: i18n.gettext("Enter the correct scale value, e.g. 1:") + number.format(10000),
                 required: params.required,
                 style: "width: 100%"
             });
