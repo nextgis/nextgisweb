@@ -13,8 +13,8 @@ define([
     "ngw-pyramid/i18n!resource",
     // template
     "dojox/layout/TableContainer",
-    "ngw/form/DisplayNameTextBox",
-    "ngw/form/KeynameTextBox",
+    "ngw-pyramid/form/DisplayNameTextBox",
+    "ngw-pyramid/form/KeynameTextBox",
     "ngw-resource/ResourceBox"
 ], function (
     declare,

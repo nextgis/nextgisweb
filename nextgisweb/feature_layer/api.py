@@ -190,13 +190,13 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
-        factory=resource_factory, client=('id', 'fid')) \
+        factory=resource_factory) \
         .add_view(iget, context=IFeatureLayer, request_method='GET') \
         .add_view(iput, context=IFeatureLayer, request_method='PUT') \
         .add_view(idelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
         'feature_layer.feature.collection', '/api/resource/{id}/feature/',
-        factory=resource_factory, client=('id', )) \
+        factory=resource_factory) \
         .add_view(cget, context=IFeatureLayer, request_method='GET') \
         .add_view(cpost, context=IWritableFeatureLayer, request_method='POST')

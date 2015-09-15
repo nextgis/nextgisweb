@@ -100,7 +100,7 @@ def handler(obj, request):
 def setup_pyramid(comp, config):
     config.add_route(
         'wfsserver.wfs', '/api/resource/{id:\d+}/wfs',
-        factory=resource_factory, client=('id',)
+        factory=resource_factory
     ).add_view(handler, context=Service)
 
     Resource.__psection__.register(

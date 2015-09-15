@@ -1,0 +1,123 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2015 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 0.0\n"
+"Report-Msgid-Bugs-To: info@nextgis.ru\n"
+"POT-Creation-Date: 2015-09-15 09:24+0600\n"
+"PO-Revision-Date: 2015-09-14 16:55+0600\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+#: __init__.py:24
+msgid "Guest"
+msgstr "Гость"
+
+#: __init__.py:30
+msgid "Everyone"
+msgstr "Любой пользователь"
+
+#: __init__.py:36
+msgid "Authenticated"
+msgstr "Прошедший проверку"
+
+#: __init__.py:42
+msgid "Administrators"
+msgstr "Администраторы"
+
+#: __init__.py:45
+msgid "Administrator"
+msgstr "Администратор"
+
+#: __init__.py:53
+msgid "Owner"
+msgstr "Владелец"
+
+#: views.py:72
+msgid "Access denied"
+msgstr "Отказано в доступе"
+
+#: views.py:133
+msgid "Create new group"
+msgstr "Создать новую группу"
+
+#: views.py:220
+msgid "Create new user"
+msgstr "Создать нового пользователя"
+
+#: views.py:253 views.py:318
+msgid "Users"
+msgstr "Пользователи"
+
+#: views.py:263 views.py:321
+msgid "Groups"
+msgstr "Группы пользователей"
+
+#: views.py:274 views.py:296
+msgid "List"
+msgstr "Список"
+
+#: views.py:279 views.py:301
+msgid "Create"
+msgstr "Создать"
+
+#: views.py:285 views.py:307
+msgid "Edit"
+msgstr "Изменить"
+
+#: amd/ngw-auth/GroupWidget.js:32
+msgid "Group"
+msgstr "Группа пользователей"
+
+#: amd/ngw-auth/UserWidget.js:38
+msgid "User"
+msgstr "Пользователь"
+
+#: amd/ngw-auth/UserWidget.js:47
+msgid "Enter new password here"
+msgstr "Для изменения пароля заполните это поле"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:7
+#: amd/ngw-auth/template/UserWidget.hbs:7 template/group_browse.mako:8
+#: template/user_browse.mako:8
+msgid "Full name"
+msgstr "Полное имя"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:9
+msgid "Group name"
+msgstr "Имя группы"
+
+#: amd/ngw-auth/template/UserWidget.hbs:14 template/login.mako:30
+#: template/user_browse.mako:9
+msgid "Login"
+msgstr "Логин"
+
+#: amd/ngw-auth/template/UserWidget.hbs:22 template/login.mako:38
+msgid "Password"
+msgstr "Пароль"
+
+#: amd/ngw-auth/template/UserWidget.hbs:29
+msgid "Groups member"
+msgstr "Член групп"
+
+#: template/forbidden.mako:4
+msgid "Insufficient permissions to perform this operation."
+msgstr "Недостаточно прав для выполнения этой операции."
+
+#: template/login.mako:23
+msgid "Authentication"
+msgstr "Аутентификация"
+
+#: template/login.mako:50
+msgid "Sign in"
+msgstr "Войти"
+

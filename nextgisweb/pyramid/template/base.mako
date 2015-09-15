@@ -92,8 +92,13 @@
                         <li><a href="${request.route_url('auth.logout')}">${tr(_('Sign out'))}</a></li>
                     %endif
 
-                    <li><a href="${request.route_url('pyramid.help_page')}">${tr(_('Help'))}</a></li>
+                    %if request.env.pyramid.help_page is not None:
+                        <li><a href="${request.route_url('pyramid.help_page')}">${tr(_('Help'))}</a></li>
+                    %endif
 
+                    %for locale in request.env.core.locale_available:
+                        <li><a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}">${locale.upper()}</a></li>
+                    %endfor
                 </ul>
             </div>
 

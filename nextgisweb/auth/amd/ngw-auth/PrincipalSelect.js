@@ -2,7 +2,7 @@ define([
     "dojo/_base/declare",
     "dijit/form/FilteringSelect",
     "dojo/store/Memory",
-    "../load-json!auth/principal/dump"
+    "ngw/load-json!auth/principal/dump"
 ], function (
     declare,
     FilteringSelect,

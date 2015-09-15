@@ -529,7 +529,7 @@ class _source_attr(SP):
             obj.load_from_ogr(ogrlayer, recode)
 
     def setter(self, srlzr, value):
-        datafile, _ = env.file_upload.get_filename(value['id'])
+        datafile, metafile = env.file_upload.get_filename(value['id'])
         encoding = value.get('encoding', 'utf-8')
 
         iszip = zipfile.is_zipfile(datafile)
@@ -550,10 +550,15 @@ class _source_attr(SP):
 
             drivername = ogrds.GetDriver().GetName()
 
-            if drivername not in ('ESRI Shapefile', ):
+            if drivername not in ('ESRI Shapefile', 'GeoJSON'):
                 raise VE(_("Unsupport OGR driver: %s.") % drivername)
 
             ogrlayer = self._ogrds(ogrds)
+            geomtype = ogrlayer.GetGeomType()
+            if geomtype not in _GEOM_OGR_2_TYPE:
+                raise VE(_("Unsupported geometry type: '%s'.") % (
+                    ogr.GeometryTypeToName(geomtype) if geomtype else None))
+
             self._ogrlayer(srlzr.obj, ogrlayer, recode)
 
         finally:

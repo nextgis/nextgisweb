@@ -1,15 +1,17 @@
 define([
     "dojo/_base/declare",
     "./_PluginBase",
-    "dijit/layout/ContentPane",
     "dojo/dom-construct",
-    "dijit/MenuItem"
+    "dijit/layout/ContentPane",
+    "dijit/MenuItem",
+    "ngw-pyramid/i18n!webmap",
 ], function (
     declare,
     _PluginBase,
-    ContentPane,
     domConstruct,
-    MenuItem
+    ContentPane,
+    MenuItem,
+    i18n
 ) {
     var Pane = declare([ContentPane], {
         closable: true,
@@ -31,7 +33,7 @@ define([
             var plugin = this;
 
             this.menuItem = new MenuItem({
-                label: "Описание",
+                label: i18n.gettext("Description"),
                 iconClass: "iconDescription",
                 disabled: true,
                 onClick: function () {
@@ -59,7 +61,6 @@ define([
 
             var pane = new Pane({
                 title: item.label,
-                tooltip: "Описание слоя \"" + item.label + "\"",
                 layerId: item.layerId,
                 data: data
             });

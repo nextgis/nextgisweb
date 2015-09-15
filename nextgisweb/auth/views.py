@@ -10,6 +10,8 @@ from .. import dynmenu as dm
 
 from .models import Principal, User, Group
 
+from .util import _
+
 
 def setup_pyramid(comp, config):
 
@@ -67,7 +69,7 @@ def setup_pyramid(comp, config):
 
         # Уже аутентифицированным пользователям показываем сообщение об ошибке
         request.response.status = 403
-        return dict(subtitle=u"Отказано в доступе")
+        return dict(subtitle=_("Access denied"))
 
     config.add_view(
         forbidden,
@@ -121,14 +123,14 @@ def setup_pyramid(comp, config):
             return result
 
         def widget_module(self):
-            return 'ngw/auth/GroupWidget'
+            return 'ngw-auth/GroupWidget'
 
     class GroupController(ModelController):
 
         def create_context(self, request):
             check_permission(request)
             return dict(template=dict(
-                subtitle=u"Создать группу пользователей",
+                subtitle=_("Create new group"),
                 dynmenu=Group.__dynmenu__))
 
         def edit_context(self, request):
@@ -208,14 +210,14 @@ def setup_pyramid(comp, config):
             return result
 
         def widget_module(self):
-            return 'ngw/auth/UserWidget'
+            return 'ngw-auth/UserWidget'
 
     class AuthUserModelController(ModelController):
 
         def create_context(self, request):
             check_permission(request)
             return dict(template=dict(
-                subtitle=u"Создать пользователя",
+                subtitle=_("Create new user"),
                 dynmenu=User.__dynmenu__))
 
         def edit_context(self, request):
@@ -248,7 +250,7 @@ def setup_pyramid(comp, config):
     def user_browse(request):
         check_permission(request)
         return dict(
-            title=u"Пользователи",
+            title=_("Users"),
             obj_list=User.filter_by(system=False).order_by(User.display_name),
             dynmenu=request.env.pyramid.control_panel)
 
@@ -258,7 +260,7 @@ def setup_pyramid(comp, config):
     def group_browse(request):
         check_permission(request)
         return dict(
-            title=u"Группы пользователей",
+            title=_("Groups"),
             obj_list=Group.filter_by(system=False).order_by(Group.display_name),
             dynmenu=request.env.pyramid.control_panel)
 
@@ -269,18 +271,18 @@ def setup_pyramid(comp, config):
 
         def build(self, kwargs):
             yield dm.Link(
-                self.sub('browse'), u"Список",
+                self.sub('browse'), _("List"),
                 lambda kwargs: kwargs.request.route_url('auth.user.browse')
             )
 
             yield dm.Link(
-                self.sub('create'), u"Создать",
+                self.sub('create'), _("Create"),
                 lambda kwargs: kwargs.request.route_url('auth.user.create')
             )
 
             if 'obj' in kwargs and isinstance(kwargs.obj, User):
                 yield dm.Link(
-                    self.sub('edit'), u"Редактировать",
+                    self.sub('edit'), _("Edit"),
                     lambda kwargs: kwargs.request.route_url(
                         'auth.user.edit',
                         id=kwargs.obj.id
@@ -291,18 +293,18 @@ def setup_pyramid(comp, config):
 
         def build(self, kwargs):
             yield dm.Link(
-                self.sub('browse'), u"Список",
+                self.sub('browse'), _("List"),
                 lambda kwargs: kwargs.request.route_url('auth.group.browse')
             )
 
             yield dm.Link(
-                self.sub('create'), u"Создать",
+                self.sub('create'), _("Create"),
                 lambda kwargs: kwargs.request.route_url('auth.group.create')
             )
 
             if 'obj' in kwargs and isinstance(kwargs.obj, Group):
                 yield dm.Link(
-                    self.sub('edit'), u"Редактировать",
+                    self.sub('edit'), _("Edit"),
                     lambda kwargs: kwargs.request.route_url(
                         'auth.group.edit',
                         id=kwargs.obj.id
@@ -313,9 +315,9 @@ def setup_pyramid(comp, config):
     Group.__dynmenu__ = comp.env.pyramid.control_panel
 
     comp.env.pyramid.control_panel.add(
-        dm.Label('auth-user', u"Пользователи"),
+        dm.Label('auth-user', _("Users")),
         UserMenu('auth-user'),
 
-        dm.Label('auth-group', u"Группы пользователей"),
+        dm.Label('auth-group', _("Groups")),
         GroupMenu('auth-group'),
     )

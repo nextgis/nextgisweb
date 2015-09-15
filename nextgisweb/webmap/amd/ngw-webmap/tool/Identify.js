@@ -21,6 +21,7 @@ define([
     "ngw/route",
     "ngw/openlayers",
     "ngw/openlayers/Popup",
+    "ngw-pyramid/i18n!webmap",
     "ngw-feature-layer/FieldsDisplayWidget",
     "ngw-feature-layer/FeatureEditorWidget",
     // settings
@@ -50,6 +51,7 @@ define([
     route,
     openlayers,
     Popup,
+    i18n,
     FieldsDisplayWidget,
     FeatureEditorWidget,
     featureLayersettings,
@@ -177,7 +179,7 @@ define([
                     if (featureLayersettings.identify.attributes) {
                         var fwidget = new FieldsDisplayWidget({
                             resourceId: lid, featureId: fid,
-                            compact: true, title: "Атрибуты"});
+                            compact: true, title: i18n.gettext("Attributes")});
 
                         fwidget.renderValue(feature.fields);
                         fwidget.placeAt(widget.extContainer);
@@ -209,7 +211,7 @@ define([
                                 var pane = new FeatureEditorWidget({
                                     resource: lid, feature: fid,
                                     fields: data.feature_layer.fields, 
-                                    title: "Объект #" + fid,
+                                    title: i18n.gettext("Feature") + " #" + fid,
                                     iconClass: "iconDescription",
                                     closable: true
                                 });
@@ -232,7 +234,7 @@ define([
     });
 
     return declare(Base, {
-        label: "Идентификация",
+        label: i18n.gettext("Identify"),
         iconClass: "iconIdentify",
 
         // Радиус для поиска объектов в пикселях
@@ -331,7 +333,7 @@ define([
             this._removePopup();
 
             this._popup = new Popup({
-                title: "Идентификация",
+                title: i18n.gettext("Identify"),
                 point: point,
                 size: [this.popupWidth, this.popupHeight]
             });

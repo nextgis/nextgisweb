@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-10 13:42+0300\n"
+"POT-Creation-Date: 2015-09-15 17:47+0600\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -17,6 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
+
+#: __init__.py:72
+msgid "Main resource group"
+msgstr "Основная группа ресурсов"
 
 #: api.py:171
 #, python-format
@@ -50,25 +54,25 @@ msgstr "Необходимо указать класс ресурса."
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: model.py:103 scope.py:27 amd/ngw-resource/PermissionWidget.js:101
+#: model.py:104 scope.py:27 amd/ngw-resource/PermissionWidget.js:101
 #: amd/ngw-resource/PermissionWidget.js:190 amd/ngw-resource/Widget.js:35
 msgid "Resource"
 msgstr "Ресурс"
 
-#: model.py:226
+#: model.py:235
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:239
+#: model.py:248
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:267
+#: model.py:276
 #, python-format
 msgid "Resource can not be a child of resource ID=%d."
 msgstr "Ресурс не может быть дочерним ресурсом для ID=%d."
 
-#: model.py:372
+#: model.py:381
 #, python-format
 msgid ""
 "Resource display name is not unique. Resource with same name already "
@@ -77,7 +81,7 @@ msgstr ""
 "Наименование ресурса не уникально. Ресурс с таким же именем уже "
 "существует (ID=%d)."
 
-#: model.py:426
+#: model.py:435
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -89,11 +93,11 @@ msgstr "Чтение"
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:42 view.py:306
+#: scope.py:42 view.py:308
 msgid "Update"
 msgstr "Обновление"
 
-#: scope.py:46 view.py:311 amd/ngw-resource/CompositeWidget.js:103
+#: scope.py:46 view.py:313 amd/ngw-resource/CompositeWidget.js:103
 #: amd/ngw-resource/PermissionWidget.js:304
 msgid "Delete"
 msgstr "Удаление"
@@ -143,39 +147,39 @@ msgstr "Конфигурация"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:64 view.py:323
+#: view.py:64 view.py:325
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:96 view.py:318
+#: view.py:98 view.py:320
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:133 view.py:299
+#: view.py:135 view.py:301
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:146 amd/ngw-resource/DeleteWidget.js:22
+#: view.py:148 amd/ngw-resource/DeleteWidget.js:22
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:263
+#: view.py:265
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: view.py:270 amd/ngw-resource/DescriptionWidget.js:13
+#: view.py:272 amd/ngw-resource/DescriptionWidget.js:15
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:277
+#: view.py:279
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:303
+#: view.py:305
 msgid "Operation"
 msgstr "Операция"
 
-#: view.py:315
+#: view.py:317
 msgid "Extra"
 msgstr "Дополнительно"
 
@@ -199,7 +203,9 @@ msgstr "Сообщение об ошибке"
 msgid ""
 "Errors found during data validation on server. Correct error and try "
 "again."
-msgstr "В ходе проверки данных на сервере обнаружены ошибки. Исправьте ошибки и повторите попытку."
+msgstr ""
+"В ходе проверки данных на сервере обнаружены ошибки. Исправьте ошибки и "
+"повторите попытку."
 
 #: amd/ngw-resource/CompositeWidget.js:319
 msgid "Insufficient permissions to perform the operation."
@@ -207,7 +213,9 @@ msgstr "Недостаточно прав для выполнения опера
 
 #: amd/ngw-resource/CompositeWidget.js:322
 msgid "Errors found during data validation. Tabs with errors marked in red."
-msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
+msgstr ""
+"При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены "
+"красным."
 
 #: amd/ngw-resource/CompositeWidget.js:325
 msgid "Unexpected error occurred during the operation."
@@ -258,6 +266,10 @@ msgstr "Да"
 #: amd/ngw-resource/PermissionWidget.js:116
 msgid "No"
 msgstr "Нет"
+
+#: amd/ngw-resource/PermissionWidget.js:127
+msgid "Permission item"
+msgstr "Элемент правил доступа"
 
 #: amd/ngw-resource/PermissionWidget.js:204
 #: amd/ngw-resource/ResourcePicker.js:46
@@ -314,3 +326,4 @@ msgstr "Владелец"
 #: template/section_description.mako:4
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
+

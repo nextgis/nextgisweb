@@ -6,7 +6,7 @@ define([
     return declare(null, {
         display: null,
 
-        label: "Инструмент",
+        label: "Tool",
 
         constructor: function (options) {
             declare.safeMixin(this, options);

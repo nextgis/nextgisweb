@@ -17,7 +17,7 @@ define([
     "dgrid/Selection",
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
-    "ngw/form/KeynameTextBox",
+    "ngw-pyramid/form/KeynameTextBox",
     "ngw-resource/serialize",
     "ngw-pyramid/i18n!feature_layer",
     //

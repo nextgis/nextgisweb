@@ -381,19 +381,19 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'resource.item', '/api/resource/{id:\d+}',
-        factory=resource_factory, client=('id', )) \
+        factory=resource_factory) \
         .add_view(item_get, request_method='GET') \
         .add_view(item_put, request_method='PUT') \
         .add_view(item_delete, request_method='DELETE')
 
     config.add_route(
-        'resource.collection', '/api/resource/', client=()) \
+        'resource.collection', '/api/resource/') \
         .add_view(collection_get, request_method='GET') \
         .add_view(collection_post, request_method='POST')
 
     config.add_route(
         'resource.permission', '/api/resource/{id}/permission',
-        factory=resource_factory, client=('id', )) \
+        factory=resource_factory) \
         .add_view(permission, request_method='GET')
 
     config.add_tween(

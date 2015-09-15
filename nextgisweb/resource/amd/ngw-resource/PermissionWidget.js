@@ -21,7 +21,7 @@ define([
     "dgrid/Selection",
     "dgrid/extensions/DijitRegistry",
     "ngw/route",
-    "ngw/form/PrincipalSelect",
+    "ngw-auth/PrincipalSelect",
     "ngw-resource/serialize",
     // resource
     "ngw/load-json!auth/principal/dump",
@@ -124,7 +124,7 @@ define([
     });
 
     var DialogClass = declare([Dialog], {
-        title: "Элемент правил доступа",
+        title: i18n.gettext("Permission item"),
         style: "width: 600px",
 
         buildRendering: function () {

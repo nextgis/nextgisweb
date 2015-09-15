@@ -5,7 +5,9 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./templates/Uploader.html",
+    "ngw-pyramid/i18n!file_upload",
+    "ngw-pyramid/hbs-i18n",
+    "dojo/text!./template/Uploader.html",
     "dojox/form/Uploader",
     "ngw/route"
 ], function (
@@ -14,6 +16,8 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    i18n,
+    hbsI18n,
     template,
     Uploader,
     route
@@ -40,7 +44,7 @@ define([
 
         postCreate: function () {
             this.uploaderWidget = new Uploader({
-                label: "Выбрать",
+                label: i18n.gettext("Select"),
                 multiple: false,
                 uploadOnSelect: true,
                 url: route.file_upload.upload(),
@@ -53,7 +57,7 @@ define([
             this.uploaderWidget.on("complete", function (data) { widget.uploadComplete(data); });
             this.uploaderWidget.on("error", function () { widget.uploaderError(); });
 
-            this.fileInfo.innerHTML = "Файл не выбран!";
+            this.fileInfo.innerHTML = i18n.gettext("File is not selected!");
         },
 
         startup: function () {
@@ -65,12 +69,12 @@ define([
             this.upload_promise = new Deferred();
             this.uploading = true;
             this.data = undefined;
-            this.fileInfo.innerHTML = "Идет загрузка...";
+            this.fileInfo.innerHTML = i18n.gettext("Uploading...");
         },
 
         uploadProgress: function (evt) {
             if (evt.type === "progress") {
-                this.fileInfo.innerHTML = evt.percent + " загружено...";
+                this.fileInfo.innerHTML = evt.percent + i18n.gettext(" uploaded...");
             }
         },
 
@@ -88,7 +92,7 @@ define([
             this.upload_promise.reject(error);
             this.uploading = false;
             this.data = undefined;
-            this.fileInfo.innerHTML = "Не удалось загрузить файл!";
+            this.fileInfo.innerHTML = i18n.gettext("Could not load file!");
         },
 
         _getValueAttr: function () {

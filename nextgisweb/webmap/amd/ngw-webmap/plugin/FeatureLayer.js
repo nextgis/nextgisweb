@@ -13,6 +13,7 @@ define([
     "dojo/request/xhr",
     "dojo/request/script",
     "ngw/openlayers",
+    "ngw-pyramid/i18n!webmap",
     "ngw-feature-layer/FeatureStore",
     "ngw-feature-layer/FeatureGrid",
     "dijit/form/Button",
@@ -36,6 +37,7 @@ define([
     xhr,
     script,
     openlayers,
+    i18n,
     FeatureStore,
     FeatureGrid,
     Button,
@@ -59,7 +61,7 @@ define([
             var widget = this;
 
             this.btnZoomToFeature = new Button({
-                label: "Перейти",
+                label: i18n.gettext("Go to"),
                 iconClass: "iconArrowInOut",
                 disabled: true,
                 onClick: function () {
@@ -77,7 +79,7 @@ define([
         zoomToFeature: function () {
             var display = this.plugin.display;
 
-            xhr.get(route("feature_layer.store.item", {id: this.layerId, feature_id: this.get("selectedRow").id}), {
+            xhr.get(route.feature_layer.store.item({id: this.layerId, feature_id: this.get("selectedRow").id}), {
                 handleAs: "json",
                 headers: { "X-Feature-Box": true }
             }).then(
@@ -96,7 +98,7 @@ define([
             var plugin = this;
 
             this.menuItem = new MenuItem({
-                label: "Таблица объектов",
+                label: i18n.gettext("Feature table"),
                 iconClass: "iconTable",
                 disabled: true,
                 onClick: function () {
@@ -115,7 +117,7 @@ define([
             this.tool = new Identify({display: this.display});
 
             this.tbSearch = new TextBox({
-                placeHolder: "Поиск..."
+                placeHolder: i18n.gettext("Search...")
             });
 
             var inputTimer, blurTimer;
@@ -164,7 +166,6 @@ define([
 
             var pane = new Pane({
                 title: item.label,
-                tooltip: "Таблица объектов слоя \"" + item.label + "\"",
                 layerId: item.layerId,
                 likeSearch: data.likeSearch,
                 plugin: this
@@ -220,7 +221,7 @@ define([
                 }
             };
 
-            setStatus("Идет поиск...");
+            setStatus(i18n.gettext("Searching..."));
 
             this.display.getVisibleItems().then(lang.hitch(this, function (items) {
                 var deferred = new Deferred(),
@@ -253,7 +254,7 @@ define([
                                 if (limit > 0) {
                                     ndeferred.resolve(limit);
                                 } else {
-                                    setStatus("Уточните критерий поиска");
+                                    setStatus(i18n.gettext("Refine search criterion"));
                                     ndeferred.reject();
                                 };
                             }, function (err) {
@@ -311,7 +312,7 @@ define([
                         if (limit > 0) {
                             ndeferred.resolve(limit);
                         } else {
-                            setStatus("Уточните критерий поиска");
+                            setStatus(i18n.gettext("Refine search criterion"));
                             ndeferred.reject();
                         };
                      });
@@ -325,7 +326,7 @@ define([
 
                 deferred.then(function (limit) {
                     if (limit == MAX_SEARCH_RESULTS) {
-                        setStatus("Ничего не найдено");
+                        setStatus(i18n.gettext("Not found"));
                     } else {
                         setStatus(undefined);
                     }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 15:56+0600\n"
+"POT-Creation-Date: 2015-09-15 15:24+0300\n"
 "PO-Revision-Date: 2015-09-14 00:03+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -75,11 +75,16 @@ msgstr "Библиотеке GDAL не удалось открыть файл."
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: model.py:568
+#: model.py:559
+#, python-format
+msgid "Unsupported geometry type: '%s'."
+msgstr "Тип геометрии не поддерживается: '%s'."
+
+#: model.py:573
 msgid "Unsupported geometry type."
 msgstr "Тип геометрии не поддерживается."
 
-#: model.py:574
+#: model.py:579
 msgid "Geometry type for existing resource can not be changed."
 msgstr "Тип геометрии существующего ресурса не может быть изменен."
 

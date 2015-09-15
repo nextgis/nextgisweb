@@ -115,7 +115,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'file_upload.upload',
-        '/api/component/file_upload/upload', client=()) \
+        '/api/component/file_upload/upload') \
         .add_view(upload_post, method='POST') \
         .add_view(upload_put, method='PUT')
 
