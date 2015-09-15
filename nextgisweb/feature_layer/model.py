@@ -138,16 +138,6 @@ class _fields_attr(SP):
         obj.fields.reorder()
 
 
-class _total_count_attr(SP):
-    """ Специальный read-only атрибут, содержащий информацию
-    о количестве объектов """
-
-    def getter(self, srlzr):
-        query = srlzr.obj.feature_query()
-        total_count = query().total_count
-        return total_count
-
-
 P_DSS_READ = DataStructureScope.read
 P_DSS_WRITE = DataStructureScope.write
 
@@ -157,4 +147,3 @@ class FeatureLayerSerializer(Serializer):
     resclass = LayerFieldsMixin
 
     fields = _fields_attr(read=P_DSS_READ, write=P_DSS_WRITE)
-    total_count = _total_count_attr(read=P_DSS_READ)

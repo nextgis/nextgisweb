@@ -186,6 +186,17 @@ def cpost(resource, request):
         content_type=b'application/json')
 
 
+def count(resource, request):
+    request.resource_permission(PERM_READ)
+
+    query = resource.feature_query()
+    total_count = query().total_count
+
+    return Response(
+        json.dumps(dict(total_count=total_count)),
+        content_type=b'application/json')
+
+
 def setup_pyramid(comp, config):
 
     config.add_route(
@@ -200,3 +211,8 @@ def setup_pyramid(comp, config):
         factory=resource_factory) \
         .add_view(cget, context=IFeatureLayer, request_method='GET') \
         .add_view(cpost, context=IWritableFeatureLayer, request_method='POST')
+
+    config.add_route(
+        'feature_layer.feature.count', '/api/resource/{id}/feature_count',
+        factory=resource_factory) \
+        .add_view(count, context=IFeatureLayer, request_method='GET')
