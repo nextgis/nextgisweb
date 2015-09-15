@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 16:08+0300\n"
+"POT-Creation-Date: 2015-09-15 17:47+0600\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -17,6 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
+
+#: __init__.py:72
+msgid "Main resource group"
+msgstr "Основная группа ресурсов"
 
 #: api.py:171
 #, python-format
@@ -89,11 +93,11 @@ msgstr "Чтение"
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:42 view.py:306
+#: scope.py:42 view.py:308
 msgid "Update"
 msgstr "Обновление"
 
-#: scope.py:46 view.py:311 amd/ngw-resource/CompositeWidget.js:103
+#: scope.py:46 view.py:313 amd/ngw-resource/CompositeWidget.js:103
 #: amd/ngw-resource/PermissionWidget.js:304
 msgid "Delete"
 msgstr "Удаление"
@@ -143,39 +147,39 @@ msgstr "Конфигурация"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:64 view.py:323
+#: view.py:64 view.py:325
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:96 view.py:318
+#: view.py:98 view.py:320
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:133 view.py:299
+#: view.py:135 view.py:301
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:146 amd/ngw-resource/DeleteWidget.js:22
+#: view.py:148 amd/ngw-resource/DeleteWidget.js:22
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:263
+#: view.py:265
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: view.py:270 amd/ngw-resource/DescriptionWidget.js:15
+#: view.py:272 amd/ngw-resource/DescriptionWidget.js:15
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:277
+#: view.py:279
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:303
+#: view.py:305
 msgid "Operation"
 msgstr "Операция"
 
-#: view.py:315
+#: view.py:317
 msgid "Extra"
 msgstr "Дополнительно"
 
