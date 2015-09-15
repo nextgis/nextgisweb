@@ -12,8 +12,8 @@ define([
     "dojo/on",
     // template
     "dojox/layout/TableContainer",
-    "ngw/form/KeynameTextBox",
-    "ngw/form/DisplayNameTextBox"
+    "ngw-pyramid/form/KeynameTextBox",
+    "ngw-pyramid/form/DisplayNameTextBox"
 ], function (
     declare,
     Widget,

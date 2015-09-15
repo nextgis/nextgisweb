@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 22:45+0600\n"
+"POT-Creation-Date: 2015-09-15 09:24+0600\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -42,6 +42,38 @@ msgstr "Администратор"
 msgid "Owner"
 msgstr "Владелец"
 
+#: views.py:72
+msgid "Access denied"
+msgstr "Отказано в доступе"
+
+#: views.py:133
+msgid "Create new group"
+msgstr "Создать новую группу"
+
+#: views.py:220
+msgid "Create new user"
+msgstr "Создать нового пользователя"
+
+#: views.py:253 views.py:318
+msgid "Users"
+msgstr "Пользователи"
+
+#: views.py:263 views.py:321
+msgid "Groups"
+msgstr "Группы пользователей"
+
+#: views.py:274 views.py:296
+msgid "List"
+msgstr "Список"
+
+#: views.py:279 views.py:301
+msgid "Create"
+msgstr "Создать"
+
+#: views.py:285 views.py:307
+msgid "Edit"
+msgstr "Изменить"
+
 #: amd/ngw-auth/GroupWidget.js:32
 msgid "Group"
 msgstr "Группа пользователей"
@@ -55,15 +87,17 @@ msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:7
-#: amd/ngw-auth/template/UserWidget.hbs:7
+#: amd/ngw-auth/template/UserWidget.hbs:7 template/group_browse.mako:8
+#: template/user_browse.mako:8
 msgid "Full name"
 msgstr "Полное имя"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:13
+#: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:9
 msgid "Group name"
 msgstr "Имя группы"
 
 #: amd/ngw-auth/template/UserWidget.hbs:14 template/login.mako:30
+#: template/user_browse.mako:9
 msgid "Login"
 msgstr "Логин"
 
@@ -74,6 +108,10 @@ msgstr "Пароль"
 #: amd/ngw-auth/template/UserWidget.hbs:29
 msgid "Groups member"
 msgstr "Член групп"
+
+#: template/forbidden.mako:4
+msgid "Insufficient permissions to perform this operation."
+msgstr "Недостаточно прав для выполнения этой операции."
 
 #: template/login.mako:23
 msgid "Authentication"

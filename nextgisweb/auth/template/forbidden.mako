@@ -1,3 +1,4 @@
-<%inherit file="../obj.mako" />
+<%inherit file='nextgisweb:templates/obj.mako' />
+<%! from nextgisweb.auth.util import _ %>
 
-<p>Недостаточно прав для выполнения этой операции.</p>
+<p>${tr(_("Insufficient permissions to perform this operation."))}</p>

@@ -21,7 +21,7 @@ define([
     "dgrid/Selection",
     "dgrid/extensions/DijitRegistry",
     "ngw/route",
-    "ngw/form/PrincipalSelect",
+    "ngw-auth/PrincipalSelect",
     "ngw-resource/serialize",
     // resource
     "ngw/load-json!auth/principal/dump",

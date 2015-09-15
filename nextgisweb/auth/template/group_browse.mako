@@ -1,11 +1,12 @@
 <%inherit file='nextgisweb:templates/base.mako' />
+<%! from nextgisweb.auth.util import _ %>
 
 <table class="pure-table pure-table-horizontal" style="width: 100%;">
     <thead>
         <tr>
             <th style="width: 2em;">ID</th>
-            <th style="width: 50%;">Полное имя</th>
-            <th style="width: 50%">Имя группы</th>
+            <th style="width: 50%;">${tr(_("Full name"))}</th>
+            <th style="width: 50%;">${tr(_("Group name"))}</th>
             <th style="width: 0px;">&nbsp;</th>
         </tr>
     </thead>
