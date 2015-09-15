@@ -8,5 +8,5 @@
     </script>
 </%def>
 
-<div data-dojo-type="ngw/form/Uploader"></div>
+<div data-dojo-type="ngw-file-upload/Uploader"></div>
 

@@ -14,7 +14,7 @@ define([
     // template
     "dojox/layout/TableContainer",
     "ngw/form/SpatialRefSysSelect",
-    "ngw/form/Uploader",
+    "ngw-file-upload/Uploader",
     "dijit/form/ComboBox"
 ], function (
     declare,
