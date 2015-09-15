@@ -10,6 +10,11 @@ from pyramid.response import Response, FileResponse
 from .util import ClientRoutePredicate
 
 
+def settings(request):
+    comp = request.env._components[request.GET['component']]
+    return comp.client_settings(request)
+
+
 def route(request):
     result = dict()
     route_re = re.compile(r'\{(\w+):{0,1}')
@@ -65,6 +70,9 @@ def locdata(request):
 
 
 def setup_pyramid(comp, config):
+    config.add_route('pyramid.settings', '/api/component/pyramid/settings') \
+        .add_view(settings, renderer='json')
+
     config.add_route('pyramid.route', '/api/component/pyramid/route') \
         .add_view(route, renderer='json')
 

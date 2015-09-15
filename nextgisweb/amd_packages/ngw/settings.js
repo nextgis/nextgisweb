@@ -1,12 +1,14 @@
 define([
-    "dojo/request/xhr"
+    "dojo/request/xhr",
+    "ngw/route"
 ], function (
-    xhr
+    xhr,
+    route
 ) {
     return {
         load: function (id, require, load) {
-            xhr.get(ngwConfig.applicationUrl + '/settings', {
-                handleAs: 'json',
+            xhr.get(route.pyramid.settings(), {
+                handleAs: "json",
                 query: { component: id }
             }).then(
                 function (data) {

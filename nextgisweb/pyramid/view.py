@@ -18,11 +18,6 @@ def home(request):
         return HTTPFound(location=request.route_url('resource.show', id=0))
 
 
-def settings(request):
-    comp = request.env._components[request.GET['component']]
-    return comp.client_settings(request)
-
-
 def routes(request):
     result = dict()
     introspector = request.registry.introspector
@@ -87,9 +82,6 @@ def pkginfo(request):
 
 def setup_pyramid(comp, config):
     config.add_route('home', '/').add_view(home)
-
-    config.add_route('pyramid.settings', '/settings') \
-        .add_view(settings, renderer='json')
 
     config.add_route('pyramid.routes', '/pyramid/routes') \
         .add_view(routes, renderer='json', json=True)
