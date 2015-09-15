@@ -28,7 +28,7 @@ define([
     "dijit/Dialog",
     "dijit/Toolbar",
     "ngw/form/KeynameTextBox",
-    "ngw/form/DisplayNameTextBox",
+    "ngw-pyramid/form/DisplayNameTextBox",
     // "ngw/form/ScaleTextBox",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",

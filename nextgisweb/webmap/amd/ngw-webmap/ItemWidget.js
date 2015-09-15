@@ -28,7 +28,7 @@ define([
     "dijit/layout/ContentPane",
     "dijit/Dialog",
     "dijit/Toolbar",
-    "ngw/form/DisplayNameTextBox",
+    "ngw-pyramid/form/DisplayNameTextBox",
     "ngw/form/ScaleTextBox",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
