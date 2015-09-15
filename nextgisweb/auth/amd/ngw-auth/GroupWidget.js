@@ -12,7 +12,7 @@ define([
     "dojo/on",
     // template
     "dojox/layout/TableContainer",
-    "ngw/form/KeynameTextBox",
+    "ngw-pyramid/form/KeynameTextBox",
     "ngw-pyramid/form/DisplayNameTextBox"
 ], function (
     declare,

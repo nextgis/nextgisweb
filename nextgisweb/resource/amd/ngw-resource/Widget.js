@@ -14,7 +14,7 @@ define([
     // template
     "dojox/layout/TableContainer",
     "ngw-pyramid/form/DisplayNameTextBox",
-    "ngw/form/KeynameTextBox",
+    "ngw-pyramid/form/KeynameTextBox",
     "ngw-resource/ResourceBox"
 ], function (
     declare,

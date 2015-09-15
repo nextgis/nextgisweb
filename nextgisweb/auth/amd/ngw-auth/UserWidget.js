@@ -15,7 +15,7 @@ define([
     "dijit/form/ValidationTextBox",
     "dojox/layout/TableContainer",
     "dojox/form/CheckedMultiSelect",
-    "ngw/form/KeynameTextBox",
+    "ngw-pyramid/form/KeynameTextBox",
     "ngw-pyramid/form/DisplayNameTextBox",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + 'dojox/form/resources/CheckedMultiSelect.css'

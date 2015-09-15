@@ -29,7 +29,7 @@ define([
     "dijit/Dialog",
     "dijit/Toolbar",
     "ngw-pyramid/form/DisplayNameTextBox",
-    "ngw/form/ScaleTextBox",
+    "ngw-pyramid/form/ScaleTextBox",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
