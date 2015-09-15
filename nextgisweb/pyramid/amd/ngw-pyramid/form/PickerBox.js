@@ -5,7 +5,7 @@ define([
     "dojo/when",
     "dojo/json",
     "dijit/form/MappedTextBox",
-    "dojo/text!./templates/PickerBox.html"
+    "dojo/text!./template/PickerBox.html"
 ], function (
     declare,
     lang,
@@ -14,7 +14,7 @@ define([
     MappedTextBox,
     template
 ) {
-    return declare("ngw.form.PickerBox", [MappedTextBox], {
+    return declare("ngw-pyramid.form.PickerBox", [MappedTextBox], {
 
         templateString: template,
 

@@ -2,7 +2,7 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "ngw/form/PickerBox",
+    "ngw-pyramid/form/PickerBox",
     "./ResourcePicker"
 ], function (
     declare,
