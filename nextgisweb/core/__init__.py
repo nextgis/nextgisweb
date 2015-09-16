@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
 import os.path
-from pkg_resources import iter_entry_points, resource_filename
+from pkg_resources import resource_filename
 
 from sqlalchemy import create_engine
 
+from ..package import pkginfo
 from ..component import Component
 from ..models import DBSession, Base
 from ..i18n import Localizer, Translations
@@ -112,8 +113,8 @@ class CoreComponent(Component):
             return self._localizer[locale]
 
         translations = Translations()
-        for ep in iter_entry_points(group='nextgisweb.packages'):
-            translations.scandir(resource_filename(ep.name, 'locale'), locale)
+        for pkg in pkginfo.packages:
+            translations.scandir(resource_filename(pkg, 'locale'), locale)
 
         lobj = Localizer(locale, translations)
         self._localizer[locale] = lobj

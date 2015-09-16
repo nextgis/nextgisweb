@@ -5,7 +5,7 @@ import re
 import codecs
 from hashlib import md5
 from StringIO import StringIO
-from pkg_resources import resource_filename, iter_entry_points
+from pkg_resources import resource_filename
 
 from pyramid.config import Configurator
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -14,6 +14,7 @@ from pyramid.events import BeforeRender
 import pyramid_tm
 import pyramid_mako
 
+from ..package import pkginfo
 from ..component import Component
 
 from .util import (
@@ -111,8 +112,8 @@ class PyramidComponent(Component):
         # TODO: Нужно отказаться от translation dirs полностью!
         # Сейчас используются только для поиска jed-файлов.
 
-        for ep in iter_entry_points(group='nextgisweb.packages'):
-            dirname = resource_filename(ep.name, 'locale')
+        for pkg in pkginfo.packages:
+            dirname = resource_filename(pkg, 'locale')
             if os.path.isdir(dirname):
                 config.add_translation_dirs(dirname)
 
