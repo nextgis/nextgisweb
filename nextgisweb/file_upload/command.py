@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from os import walk, stat, remove, rmdir, listdir
 from os.path import join as ptjoin
-from ..command import Command
+from datetime import timedelta, datetime
 
-from .models import FileObj
+from ..command import Command
 
 
 @Command.registry.register
 class CleanUpCommand():
-    identity = 'file_storage.cleanup'
+    identity = 'file_upload.cleanup'
 
     @classmethod
     def argparser_setup(cls, parser, env):
@@ -16,7 +16,7 @@ class CleanUpCommand():
 
     @classmethod
     def execute(cls, args, env):
-        path = env.file_storage.path
+        path = env.file_upload.path
 
         deleted_files = 0
         deleted_dirs = 0
@@ -26,22 +26,31 @@ class CleanUpCommand():
         kept_dirs = 0
         kept_bytes = 0
 
+        cutstamp = datetime.now() - timedelta(days=3)
+
         for (dirpath, dirnames, filenames) in walk(path, topdown=False):
             relist = False
 
             for fn in filenames:
-                obj = FileObj.filter_by(uuid=fn).first()
-                fullfn = ptjoin(dirpath, fn)
-                size = stat(fullfn).st_size
+                if not fn.endswith('.meta'):
+                    continue
 
-                if obj is None:
-                    remove(fullfn)
+                metaname = ptjoin(dirpath, fn)
+                dataname = metaname[:-5] + '.data'
+                metastat = stat(metaname)
+                datastat = stat(dataname)
+                metatime = datetime.fromtimestamp(metastat.st_mtime)
+                datatime = datetime.fromtimestamp(datastat.st_mtime)
+
+                if (metatime < cutstamp) and (datatime < cutstamp):
+                    remove(metaname)
+                    remove(dataname)
                     relist = True
-                    deleted_files += 1
-                    deleted_bytes += size
+                    deleted_files += 2
+                    deleted_bytes += metastat.st_size + datastat.st_size
                 else:
-                    kept_files += 1
-                    kept_bytes += size
+                    kept_files += 2
+                    kept_bytes += metastat.st_size + datastat.st_size
 
             if (
                 (not relist and len(filenames) == 0 and len(dirnames) == 0)

@@ -3,7 +3,7 @@ import os
 import uuid
 
 from ..component import Component
-
+from . import command  # NOQA
 
 __all__ = ["FileUploadComponent", ]
 
