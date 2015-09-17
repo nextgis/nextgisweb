@@ -114,7 +114,7 @@
             </div>
         %elif title:
             <div id="title" class="title">
-                <h1>${title}</h1>
+                <h1>${tr(title)}</h1>
             </div>
         %endif
 
