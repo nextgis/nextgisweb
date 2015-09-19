@@ -205,10 +205,6 @@ class PyramidComponent(Component):
         for comp in self._env.chain('setup_pyramid'):
             comp.setup_pyramid(config)
 
-        # TODO: не лезть в приватные переменные _env
-        for comp in self._env._components.itervalues():
-            comp.__class__.setup_routes(config)
-
         return config
 
     def setup_pyramid(self, config):

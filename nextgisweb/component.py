@@ -52,10 +52,6 @@ class Component(object):
     def logger(self):
         return self._logger
 
-    @classmethod
-    def setup_routes(cls, dbsession):
-        pass
-
 
 def require(*deps):
     """ Декоратор для указания зависимостей между методами компонентов.
