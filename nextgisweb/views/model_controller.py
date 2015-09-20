@@ -110,7 +110,7 @@ class ModelController(object):
         widget = widget_class(
             obj=obj,
             operation='edit',
-            options=context.get('widget_options', None)
+            options=context.get('widget_options')
         )
 
         if request.method == 'POST':
