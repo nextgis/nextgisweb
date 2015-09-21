@@ -28,7 +28,6 @@ class VectorLayerComponent(Component):
     @require('feature_layer')
     def setup_pyramid(self, config):
         from . import view
-        view.setup_pyramid(self, config)
 
     def backup(self):
         for i in super(VectorLayerComponent, self).backup():
