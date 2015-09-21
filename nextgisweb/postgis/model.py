@@ -494,7 +494,7 @@ class FeatureQueryBase(object):
 
                 try:
                     for row in conn.execute(query):
-                        fdict = dict([(k, row[l]) for k, l in fieldmap])
+                        fdict = dict((k, row[l]) for k, l in fieldmap)
 
                         if self._geom:
                             geom = geom_from_wkt(row['geom'])

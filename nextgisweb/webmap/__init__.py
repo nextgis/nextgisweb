@@ -58,10 +58,10 @@ class WebMapComponent(Component):
             identify_radius=self.settings.get('identify_radius'),
             popup_width=self.settings.get('popup_width'),
             popup_height=self.settings.get('popup_height'),
-            adapters=dict([
+            adapters=dict(
                 (i.identity, dict(display_name=i.display_name))
                 for i in WebMapAdapter.registry
-            ])
+            )
         )
 
     settings_info = (

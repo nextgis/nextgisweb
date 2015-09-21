@@ -752,8 +752,8 @@ class FeatureQueryBase(object):
                 )
                 rows = DBSession.connection().execute(query)
                 for row in rows:
-                    fdict = dict([(f.keyname, row[f.keyname])
-                                  for f in selected_fields])
+                    fdict = dict((f.keyname, row[f.keyname])
+                                  for f in selected_fields)
                     if self._geom:
                         geom = geom_from_wkb(str(row['geom']))
                     else:

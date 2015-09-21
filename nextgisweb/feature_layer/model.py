@@ -46,14 +46,14 @@ class LayerField(Base):
         return self.display_name
 
     def to_dict(self):
-        return dict([
+        return dict(
             (c, getattr(self, c))
             for c in (
                 'id', 'layer_id', 'cls',
                 'idx', 'keyname', 'datatype',
                 'display_name', 'grid_visibility',
             )
-        ])
+        )
 
 
 class LayerFieldsMixin(object):
