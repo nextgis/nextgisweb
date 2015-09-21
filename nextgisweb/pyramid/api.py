@@ -32,9 +32,9 @@ def route(request):
                     "API route '%s' has useless 'client' predicate!",
                     route.name)
             kys = route_re.findall(route.path)
-            kvs = dict([
+            kvs = dict(
                 (k, '{%d}' % idx)
-                for idx, k in enumerate(kys)])
+                for idx, k in enumerate(kys))
             tpl = unquote(route.generate(kvs))
             result[route.name] = [tpl, ] + kys
 

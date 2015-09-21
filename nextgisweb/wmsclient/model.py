@@ -55,7 +55,7 @@ class Connection(Base, Resource):
     capcache_tstamp = db.Column(db.DateTime)
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     @property
@@ -219,7 +219,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
         cascade=False, cascade_backrefs=False)
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     def render_request(self, srs, cond=None):

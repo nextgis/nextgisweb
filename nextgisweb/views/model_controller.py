@@ -65,7 +65,7 @@ class ModelController(object):
         widget_class = self.widget_class(context, 'create')
         widget = widget_class(
             operation='create',
-            options=context.get('widget_options', None)
+            options=context.get('widget_options')
         )
 
         if request.method == 'POST':
@@ -110,7 +110,7 @@ class ModelController(object):
         widget = widget_class(
             obj=obj,
             operation='edit',
-            options=context.get('widget_options', None)
+            options=context.get('widget_options')
         )
 
         if request.method == 'POST':
@@ -149,7 +149,7 @@ class ModelController(object):
         widget = widget_class(
             obj=obj,
             operation='delete',
-            options=context.get('widget_options', None)
+            options=context.get('widget_options')
         )
 
         if request.method == 'POST':

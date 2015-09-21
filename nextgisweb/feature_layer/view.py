@@ -139,7 +139,7 @@ def store_collection(layer, request):
 
     query = layer.feature_query()
 
-    http_range = request.headers.get('range', None)
+    http_range = request.headers.get('range')
     if http_range and http_range.startswith('items='):
         first, last = map(int, http_range[len('items='):].split('-', 1))
         query.limit(last - first + 1, first)
@@ -151,7 +151,7 @@ def store_collection(layer, request):
     if len(field_list) > 0:
         query.fields(*field_list)
 
-    box = request.headers.get('x-feature-box', None)
+    box = request.headers.get('x-feature-box')
     if box:
         query.box()
 
@@ -185,8 +185,8 @@ def store_collection(layer, request):
 def store_item(layer, request):
     request.resource_permission(PD_READ)
 
-    box = request.headers.get('x-feature-box', None)
-    ext = request.headers.get('x-feature-ext', None)
+    box = request.headers.get('x-feature-box')
+    ext = request.headers.get('x-feature-ext')
 
     query = layer.feature_query()
     query.filter_by(id=request.matchdict['feature_id'])
