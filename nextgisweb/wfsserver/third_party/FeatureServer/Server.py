@@ -95,30 +95,35 @@ class Server (object):
                     elif request.actions[0].request == "DescribeFeatureType":
                         return request.describefeaturetype(version)
 
-            try:
                 transactionResponse = TransactionResponse()
                 transactionResponse.setSummary(TransactionSummary())
 
                 for action in request.actions:
-                    datasource = self.datasources[action.layer]
-
-                    datasource.begin()
-
-                    method = getattr(datasource, action.method)
                     try:
-                        result = method(action)
-                        # import ipdb; ipdb.set_trace()
-                        if isinstance(result, ActionResult):
-                            transactionResponse.addResult(result)
-                        elif result is not None:
-                            response += result
-                    except InvalidValueException as e:
-                        exceptionReport.add(e)
+                        datasource = self.datasources[action.layer]
+                    except KeyError:
+                        exceptionReport.add(
+                            OperationParsingFailedException(message="Can't find layer '%s'" % (action.layer, )))
+                        continue
 
-                    datasource.commit()
-            except:
-                datasource.rollback()
-                raise
+                    try:
+                        datasource.begin()
+                        method = getattr(datasource, action.method)
+
+                        try:
+                            result = method(action)
+                            # import ipdb; ipdb.set_trace()
+                            if isinstance(result, ActionResult):
+                                transactionResponse.addResult(result)
+                            elif result is not None:
+                                response += result
+                        except InvalidValueException as e:
+                            exceptionReport.add(e)
+
+                        datasource.commit()
+                    except:
+                        datasource.rollback()
+                        raise
 
             if transactionResponse.summary.totalDeleted > 0 or \
                     transactionResponse.summary.totalInserted > 0 or \
