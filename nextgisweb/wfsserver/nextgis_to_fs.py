@@ -22,6 +22,7 @@ from .third_party.FeatureServer.WebFeatureService.Response.UpdateResult import U
 from .third_party.FeatureServer.WebFeatureService.Response.DeleteResult import DeleteResult
 
 from .third_party.FeatureServer.Exceptions.OperationProcessingFailedException import OperationProcessingFailedException
+from .third_party.FeatureServer.Exceptions.BaseException import BaseException
 
 class NextgiswebDatasource(DataSource):
 
@@ -40,11 +41,22 @@ class NextgiswebDatasource(DataSource):
         else:
             self.attribute_cols = None      # Назначим потом (чтобы не производить лишних запросов к БД на этом этапе)
 
-        self.maxfeatures = 1000   # Default count of returned features
+        if 'maxfeatures' in kwargs and kwargs['maxfeatures'] is not None:
+            try:
+                self.maxfeatures = int(kwargs['maxfeatures'])
+            except:
+                raise BaseException(
+                    message="Maxfearutes (count) paramether can't be cast to integer: %s" % (kwargs['maxfeatures']))
 
     @property
     def srid_out(self):
         return self.layer.srs_id
+
+    @property
+    def default_maxfeatures(self):
+        if hasattr(self, 'maxfeatures'):
+            return self.maxfeatures
+        return None
 
     @property
     def geometry_type(self):

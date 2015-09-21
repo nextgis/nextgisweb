@@ -64,6 +64,7 @@ def handler(obj, request):
         l.keyname: NextgiswebDatasource(
             l.keyname,
             layer=l.resource,
+            maxfeatures=l.maxfeatures,
             title=l.display_name) for l in obj.layers
     }
     sourcenames = '/'.join([sourcename for sourcename in datasources])

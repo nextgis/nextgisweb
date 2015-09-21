@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from ...vectorformats.Formats.Format import Format
 from lxml import etree
 import geojson
@@ -304,7 +306,6 @@ version="%s"
         '''
         root = tree.getroot()
 
-        # import ipdb; ipdb.set_trace()
         elements = root.xpath(
             "ows:OperationsMetadata/*/ows:DCP/ows:HTTP",
             namespaces=self.namespaces)
@@ -313,6 +314,22 @@ version="%s"
                 for method in element:
                     method.attrib['{%s}href' % (self.namespaces['xlink'])] = \
                         self.host + '?'
+
+        # Сейчас в NGW используется только один слой и datasource
+        # поэтому для того, чтобы определить параметр maxfeature нужно
+        # выбрать из datasources объект datasource (единственный там)
+        # и использовать его. Если datasource не один -- игнорируем процедуру
+        # извлечения maxfetature, чтобы не испортить работу других
+        # datasource (не из NGW)
+        if len(self.layers) == 1:
+            datasource = self.datasources[self.layers[0]]
+            maxfeatures = datasource.default_maxfeatures
+            if maxfeatures is not None:
+                count_elements = root.xpath(
+                    "ows:OperationsMetadata/ows:Constraint[@name='CountDefault']/ows:DefaultValue",
+                    namespaces=self.namespaces)
+                for e in count_elements:
+                    e.text = str(maxfeatures)
 
         # import ipdb; ipdb.set_trace()
         layers = self.getlayers()
@@ -372,7 +389,7 @@ version="%s"
 
         return tree
 
-    def getcapabilities(self, version):
+    def getcapabilities(self, version, datasource=None):
 
         try:
             tree = etree.parse(os.path.join(XMLDATADIR, version,

@@ -86,13 +86,14 @@ class Server (object):
 
             version = '1.0.0'   # Default version
             if len(request.actions) > 0:
-                if hasattr(request.actions[0], 'version') and len(request.actions[0].version) > 0:
-                    version = request.actions[0].version
+                action = request.actions[0]
+                if hasattr(action, 'version') and len(action.version) > 0:
+                    version = action.version
 
-                if hasattr(request.actions[0], 'request') and request.actions[0].request is not None:
-                    if request.actions[0].request == "GetCapabilities":
+                if hasattr(action, 'request') and action.request is not None:
+                    if action.request == "GetCapabilities":
                         return request.getcapabilities(version)
-                    elif request.actions[0].request == "DescribeFeatureType":
+                    elif action.request == "DescribeFeatureType":
                         return request.describefeaturetype(version)
 
                 transactionResponse = TransactionResponse()
@@ -102,9 +103,7 @@ class Server (object):
                     try:
                         datasource = self.datasources[action.layer]
                     except KeyError:
-                        exceptionReport.add(
-                            OperationParsingFailedException(message="Can't find layer '%s'" % (action.layer, )))
-                        continue
+                        raise OperationParsingFailedException(message="Can't find layer '%s'" % (action.layer, ))
 
                     try:
                         datasource.begin()

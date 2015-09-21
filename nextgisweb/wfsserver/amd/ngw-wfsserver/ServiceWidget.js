@@ -29,6 +29,7 @@ define([
     "dijit/Toolbar",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-pyramid/form/DisplayNameTextBox",
+    "ngw-pyramid/form/IntegerValueTextBox",
     // "ngw-pyramid/form/ScaleTextBox",
     "dijit/form/TextBox",
     "dijit/form/CheckBox",
@@ -106,6 +107,7 @@ define([
                             "item_type": "layer",
                             "keyname": null,
                             "display_name": itm.display_name,
+                            "maxfeatures": itm.maxfeatures,
                             "resource_id": itm.id
                         }, {
                             parent: widget.getAddParent(),
@@ -127,6 +129,7 @@ define([
                     widget.widgetProperties.selectChild(widget.paneLayer);
                     widget.widgetItemKeyname.set("value", widget.getItemValue("keyname"));
                     widget.widgetItemDisplayName.set("value", widget.getItemValue("display_name"));
+                    widget.widgetIntegerValue.set("value", widget.getItemValue("maxfeatures"));
 
                     // Изначально боковая панель со свойствами текущего элемента
                     // спрятана. Поскольку элемент уже выбран - ее нужно показать.
@@ -149,6 +152,10 @@ define([
 
             this.widgetItemDisplayName.watch("value", function (attr, oldValue, newValue) {
                 widget.setItemValue("display_name", newValue);
+            });
+
+            this.widgetIntegerValue.watch("value", function (attr, oldValue, newValue) {
+                widget.setItemValue("maxfeatures", parseIn(tnewValue));
             });
         },
 
@@ -201,7 +208,8 @@ define([
                 return {
                     keyname: store.getValue(itm, "keyname"),
                     display_name: store.getValue(itm, "display_name"),
-                    resource_id: store.getValue(itm, "resource_id")
+                    resource_id: store.getValue(itm, "resource_id"),
+                    maxfeatures: store.getValue(itm, "maxfeatures")
                 };
             }
 

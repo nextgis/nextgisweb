@@ -34,6 +34,7 @@ class Layer(Base):
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     keyname = db.Column(db.Unicode, nullable=False)
     display_name = db.Column(db.Unicode, nullable=False)
+    maxfeatures = db.Column(db.Integer, nullable=True)
 
     service = db.relationship(
         Service, foreign_keys=service_id,
@@ -47,6 +48,7 @@ class Layer(Base):
         return dict(
             keyname=self.keyname,
             display_name=self.display_name,
+            maxfeatures = self.maxfeatures,
             resource_id=self.resource_id)
 
 
@@ -67,7 +69,7 @@ class _layers_attr(SP):
                 srlzr.obj.layers.append(lo)
 
             for a in (
-                'keyname', 'display_name'
+                'keyname', 'display_name', 'maxfeatures'
             ):
                 setattr(lo, a, lv[a])
 

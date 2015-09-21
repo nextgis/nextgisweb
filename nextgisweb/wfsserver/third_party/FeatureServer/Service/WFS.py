@@ -67,7 +67,10 @@ class WFS(Request):
 
     def getcapabilities(self, version):
         wfs = WFSFormat.WFS(
-            layers=self.datasources, datasources=self.service.datasources, host=self.host)
+            layers=self.datasources, datasources=self.service.datasources,
+            host=self.host)
+
+        # import ipdb; ipdb.set_trace()
         result = wfs.getcapabilities(version)
         return ("text/xml", result)
 
