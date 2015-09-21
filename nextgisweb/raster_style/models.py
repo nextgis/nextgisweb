@@ -42,7 +42,7 @@ class RasterStyle(Base, Resource):
     implements(IRenderableStyle)
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return parent.cls == 'raster_layer'
 
     @property

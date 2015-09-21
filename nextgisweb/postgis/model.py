@@ -62,7 +62,7 @@ class PostgisConnection(Base, Resource):
     password = db.Column(db.Unicode, nullable=False)
 
     @classmethod
-    def check_parent(self, parent): # NOQA
+    def check_parent(cls, parent): # NOQA
         return isinstance(parent, ResourceGroup)
 
     def get_engine(self):
@@ -159,7 +159,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         cascade=False, cascade_backrefs=False)
 
     @classmethod
-    def check_parent(self, parent): # NOQA
+    def check_parent(cls, parent): # NOQA
         return isinstance(parent, ResourceGroup)
 
     @property

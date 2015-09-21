@@ -22,7 +22,7 @@ class Service(Base, Resource):
     __scope__ = ServiceScope
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
 
