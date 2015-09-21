@@ -22,7 +22,7 @@ class Service(Base, Resource):
     __scope__ = ServiceScope
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
 
@@ -59,7 +59,7 @@ class _layers_attr(SP):
         return [l.to_dict() for l in srlzr.obj.layers]
 
     def setter(self, srlzr, value):
-        m = dict([(l.resource_id, l) for l in srlzr.obj.layers])
+        m = dict((l.resource_id, l) for l in srlzr.obj.layers)
         keep = set()
         for lv in value:
             if lv['resource_id'] in m:

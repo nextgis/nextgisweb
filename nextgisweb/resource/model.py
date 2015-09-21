@@ -135,7 +135,7 @@ class Resource(Base):
         return self.display_name
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         """ Может ли этот ресурс быть дочерним для parent """
         return False
 
@@ -435,6 +435,6 @@ class ResourceGroup(Resource):
     cls_display_name = _("Resource group")
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         # Группа может быть либо корнем, либо подгруппой в другой группе
         return (parent is None) or isinstance(parent, ResourceGroup)

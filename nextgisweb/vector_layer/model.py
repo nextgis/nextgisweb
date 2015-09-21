@@ -279,7 +279,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     __field_class__ = VectorLayerField
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     @property
@@ -752,8 +752,8 @@ class FeatureQueryBase(object):
                 )
                 rows = DBSession.connection().execute(query)
                 for row in rows:
-                    fdict = dict([(f.keyname, row[f.keyname])
-                                  for f in selected_fields])
+                    fdict = dict((f.keyname, row[f.keyname])
+                                  for f in selected_fields)
                     if self._geom:
                         geom = geom_from_wkb(str(row['geom']))
                     else:

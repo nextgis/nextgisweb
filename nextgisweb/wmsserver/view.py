@@ -135,7 +135,7 @@ def _get_map(obj, request):
 
     p_size = (p_width, p_height)
 
-    lmap = dict([(l.keyname, l) for l in obj.layers])
+    lmap = dict((l.keyname, l) for l in obj.layers)
 
     img = Image.new('RGBA', p_size, (255, 255, 255, 0))
 
@@ -190,7 +190,7 @@ def _get_feature_info(obj, request):
         "%(r)f %(t)f, %(r)f %(b)f, %(l)f %(b)f))"
     ) % qbox, srs.id)
 
-    lmap = dict([(l.keyname, l) for l in obj.layers])
+    lmap = dict((l.keyname, l) for l in obj.layers)
 
     results = list()
     fcount = 0
@@ -230,7 +230,7 @@ def _get_legend_graphic(obj, request):
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
     p_layer = params.get('LAYER')
 
-    lmap = dict([(l.keyname, l) for l in obj.layers])
+    lmap = dict((l.keyname, l) for l in obj.layers)
     layer = lmap[p_layer]
 
     request.resource_permission(DataScope.read, layer.resource)

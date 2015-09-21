@@ -86,39 +86,43 @@ class Server (object):
 
             version = '1.0.0'   # Default version
             if len(request.actions) > 0:
-                if hasattr(request.actions[0], 'version') and len(request.actions[0].version) > 0:
-                    version = request.actions[0].version
+                action = request.actions[0]
+                if hasattr(action, 'version') and len(action.version) > 0:
+                    version = action.version
 
-                if hasattr(request.actions[0], 'request') and request.actions[0].request is not None:
-                    if request.actions[0].request == "GetCapabilities":
+                if hasattr(action, 'request') and action.request is not None:
+                    if action.request == "GetCapabilities":
                         return request.getcapabilities(version)
-                    elif request.actions[0].request == "DescribeFeatureType":
+                    elif action.request == "DescribeFeatureType":
                         return request.describefeaturetype(version)
 
-            try:
                 transactionResponse = TransactionResponse()
                 transactionResponse.setSummary(TransactionSummary())
 
                 for action in request.actions:
-                    datasource = self.datasources[action.layer]
-
-                    datasource.begin()
-
-                    method = getattr(datasource, action.method)
                     try:
-                        result = method(action)
-                        # import ipdb; ipdb.set_trace()
-                        if isinstance(result, ActionResult):
-                            transactionResponse.addResult(result)
-                        elif result is not None:
-                            response += result
-                    except InvalidValueException as e:
-                        exceptionReport.add(e)
+                        datasource = self.datasources[action.layer]
+                    except KeyError:
+                        raise OperationParsingFailedException(message="Can't find layer '%s'" % (action.layer, ))
 
-                    datasource.commit()
-            except:
-                datasource.rollback()
-                raise
+                    try:
+                        datasource.begin()
+                        method = getattr(datasource, action.method)
+
+                        try:
+                            result = method(action)
+                            # import ipdb; ipdb.set_trace()
+                            if isinstance(result, ActionResult):
+                                transactionResponse.addResult(result)
+                            elif result is not None:
+                                response += result
+                        except InvalidValueException as e:
+                            exceptionReport.add(e)
+
+                        datasource.commit()
+                    except:
+                        datasource.rollback()
+                        raise
 
             if transactionResponse.summary.totalDeleted > 0 or \
                     transactionResponse.summary.totalInserted > 0 or \

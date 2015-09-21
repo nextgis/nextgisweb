@@ -22,7 +22,7 @@ class Service(Base, Resource):
     __scope__ = ServiceScope
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
 
@@ -34,6 +34,7 @@ class Layer(Base):
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     keyname = db.Column(db.Unicode, nullable=False)
     display_name = db.Column(db.Unicode, nullable=False)
+    maxfeatures = db.Column(db.Integer, nullable=True)
 
     service = db.relationship(
         Service, foreign_keys=service_id,
@@ -47,6 +48,7 @@ class Layer(Base):
         return dict(
             keyname=self.keyname,
             display_name=self.display_name,
+            maxfeatures = self.maxfeatures,
             resource_id=self.resource_id)
 
 
@@ -56,7 +58,7 @@ class _layers_attr(SP):
         return [l.to_dict() for l in srlzr.obj.layers]
 
     def setter(self, srlzr, value):
-        m = dict([(l.resource_id, l) for l in srlzr.obj.layers])
+        m = dict((l.resource_id, l) for l in srlzr.obj.layers)
         keep = set()
         for lv in value:
             if lv['resource_id'] in m:
@@ -67,7 +69,7 @@ class _layers_attr(SP):
                 srlzr.obj.layers.append(lo)
 
             for a in (
-                'keyname', 'display_name'
+                'keyname', 'display_name', 'maxfeatures'
             ):
                 setattr(lo, a, lv[a])
 

@@ -46,7 +46,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     fileobj = orm.relationship(FileObj, cascade='all')
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     def load_file(self, filename, env):

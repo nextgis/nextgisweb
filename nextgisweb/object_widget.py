@@ -154,4 +154,4 @@ class CompositeWidget(ObjectWidget):
         return result
 
     def widget_error(self):
-        return dict([(k, s.widget_error()) for k, s in self.subwidgets])
+        return dict((k, s.widget_error()) for k, s in self.subwidgets)
