@@ -49,13 +49,19 @@ define([
         });
     }
 
-    var rcount = 0;
-    for (var rname in rdata) {
+    // Перед сборкой объекта нужно отсортировать ключи, так чтобы
+    // ключ foo был обработан раньше foo.bar, иначе ключ foo.bar
+    // может оказаться недоступен в итоговом объекте.
+    var rkeys = [];
+    for (var k in rdata) { rkeys.push(k); }
+    rkeys.sort();
+    
+    for (var i in rkeys) {
+        var rname = rkeys[i];
         lang.setObject(rname, lang.hitch(rdata[rname], generator), module);
-        rcount = rcount + 1;
     }
 
-    console.log('Route initialization completed, registered ' + rcount + ' routes.');
+    console.log('Route initialization completed, registered ' + rkeys.length + ' routes.');
 
     return module;
 });
