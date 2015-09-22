@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 01:40+0300\n"
+"POT-Creation-Date: 2015-09-22 11:43+0600\n"
 "PO-Revision-Date: 2015-09-14 01:40+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: model.py:20 view.py:108 amd/ngw-wfsserver/ServiceWidget.js:59
+#: model.py:20 view.py:109 amd/ngw-wfsserver/ServiceWidget.js:60
 msgid "WFS service"
 msgstr "Сервис WFS"
 
@@ -37,6 +37,10 @@ msgstr "Ключ"
 #: amd/ngw-wfsserver/template/ServiceWidget.hbs:63
 msgid "Display name"
 msgstr "Наименование"
+
+#: amd/ngw-wfsserver/template/ServiceWidget.hbs:67
+msgid "Default count of returned features"
+msgstr "Число возвращаемых объектов по умолчанию"
 
 #: template/section.mako:5
 msgid "WFS URL"
