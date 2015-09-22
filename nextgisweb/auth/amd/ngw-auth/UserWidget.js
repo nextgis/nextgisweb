@@ -87,12 +87,15 @@ define([
         },
 
         _getValueAttr: function () {
-            return {
+            var result = {
                 display_name: this.displayName.get("value"),
                 keyname: this.keyname.get("value"),
-                password: this.password.get("value"),
                 member_of: this.memberOf.get("value")
             };
+            if (this.password.get("value") !== "") {
+                result.password = this.password.get("value");
+            }
+            return result;
         }
     });
 });
