@@ -14,7 +14,6 @@ from ..resource import (
     resource_factory,
     Widget)
 from ..geometry import geom_from_wkt
-from ..object_widget import ObjectWidget, CompositeWidget
 from ..pyramid import viewargs
 from .. import dynmenu as dm
 
@@ -218,44 +217,6 @@ def store_item(layer, request):
 
 def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
-
-    class LayerFieldsWidget(ObjectWidget):
-
-        def is_applicable(self):
-            return self.operation == 'edit'
-
-        def populate_obj(self):
-            obj = self.obj
-            data = self.data
-
-            if 'feature_label_field_id' in data:
-                obj.feature_label_field_id = data['feature_label_field_id']
-
-            fields = dict(map(lambda fd: (fd['id'], fd), data['fields']))
-            for f in obj.fields:
-                if f.id in fields:
-
-                    if 'display_name' in fields[f.id]:
-                        f.display_name = fields[f.id]['display_name']
-
-                    if 'grid_visibility' in fields[f.id]:
-                        f.grid_visibility = fields[f.id]['grid_visibility']
-
-        def widget_module(self):
-            return 'feature_layer/LayerFieldsWidget'
-
-        def widget_params(self):
-            result = super(LayerFieldsWidget, self).widget_params()
-
-            if self.obj:
-                result['value'] = dict(
-                    fields=map(lambda f: f.to_dict(), self.obj.fields),
-                    feature_label_field_id=self.obj.feature_label_field_id,
-                )
-
-            return result
-
-    comp.LayerFieldsWidget = LayerFieldsWidget
 
     def identify(request):
         """ Сервис идентификации объектов на слоях, поддерживающих интерфейс

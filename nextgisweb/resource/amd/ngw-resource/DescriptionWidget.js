@@ -31,7 +31,7 @@ define([
         },
 
         _setValueAttr: function (value) {
-            if (value !== null) {
+            if (value !== null && value !== undefined) {
                 this.inherited(arguments);
             } else {
                 this.set("value", "");

@@ -129,7 +129,7 @@ define([
                     widget.widgetProperties.selectChild(widget.paneLayer);
                     widget.widgetItemKeyname.set("value", widget.getItemValue("keyname"));
                     widget.widgetItemDisplayName.set("value", widget.getItemValue("display_name"));
-                    widget.widgetIntegerValue.set("value", widget.getItemValue("maxfeatures"));
+                    widget.widgetItemMaxFeatures.set("value", widget.getItemValue("maxfeatures"));
 
                     // Изначально боковая панель со свойствами текущего элемента
                     // спрятана. Поскольку элемент уже выбран - ее нужно показать.
@@ -154,7 +154,7 @@ define([
                 widget.setItemValue("display_name", newValue);
             });
 
-            this.widgetIntegerValue.watch("value", function (attr, oldValue, newValue) {
+            this.widgetItemMaxFeatures.watch("value", function (attr, oldValue, newValue) {
                 widget.setItemValue("maxfeatures", parseInt(newValue));
             });
         },
