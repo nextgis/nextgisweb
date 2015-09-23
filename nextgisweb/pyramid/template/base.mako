@@ -16,7 +16,7 @@
         ${request.env.core.settings['system.name']}
     </title>
 
-    <link href="${request.static_url('nextgisweb:static/css/pure-0.4.2-min.css')}"
+    <link href="${request.static_url('nextgisweb:static/css/pure-0.6.0-min.css')}"
         rel="stylesheet" type="text/css"/>
 
     <link href="${request.static_url('nextgisweb:static/css/layout.css')}"
@@ -67,7 +67,7 @@
 
         <div id="header" class="header">
 
-            <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal">
+            <div class="home-menu pure-menu pure-menu-horizontal">
 
                 <% settings = request.env.pyramid.settings %>
                 %if 'logo' in settings and os.path.isfile(settings['logo']):
@@ -78,26 +78,26 @@
                     ${request.env.core.settings['system.full_name']}
                 </a>
 
-                <ul>
-                    <li><a href="${request.route_url('resource.root')}">${tr(_('Resources'))}</a></li>
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="${request.route_url('resource.root')}" class="pure-menu-link">${tr(_('Resources'))}</a></li>
 
                     %if request.user.is_administrator:
-                        <li><a href="${request.route_url('pyramid.control_panel')}">${tr(_('Control panel'))}</a></li>
+                        <li class="pure-menu-item"><a href="${request.route_url('pyramid.control_panel')}" class="pure-menu-link">${tr(_('Control panel'))}</a></li>
                     %endif
 
                     %if request.user.keyname == 'guest':
-                        <li><a href="${request.route_url('auth.login')}">${tr(_('Sign in'))}</a></li>
+                        <li class="pure-menu-item"><a href="${request.route_url('auth.login')}" class="pure-menu-link">${tr(_('Sign in'))}</a></li>
                     %else:
-                        <li class="user">${request.user}</li>
-                        <li><a href="${request.route_url('auth.logout')}">${tr(_('Sign out'))}</a></li>
+                        <li class="user pure-menu-item">${request.user}</li>
+                        <li class="pure-menu-item"><a href="${request.route_url('auth.logout')}" class="pure-menu-link">${tr(_('Sign out'))}</a></li>
                     %endif
 
                     %if request.env.pyramid.help_page is not None:
-                        <li><a href="${request.route_url('pyramid.help_page')}">${tr(_('Help'))}</a></li>
+                        <li class="pure-menu-item"><a href="${request.route_url('pyramid.help_page')}" class="pure-menu-link">${tr(_('Help'))}</a></li>
                     %endif
 
                     %for locale in request.env.core.locale_available:
-                        <li><a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}">${locale.upper()}</a></li>
+                        <li class="pure-menu-item"><a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}" class="pure-menu-link">${locale.upper()}</a></li>
                     %endfor
                 </ul>
             </div>

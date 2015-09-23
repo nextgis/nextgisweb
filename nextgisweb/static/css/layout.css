@@ -25,7 +25,9 @@ body { font-size: 12px; }
         color: white;
         font-weight: 400;
         font-size: 14px;
-        text-transform: none; }
+        text-transform: none;
+        margin-top: 0;
+        border: 0; }
 
     .header .pure-menu ul { float: right; }
 
@@ -48,9 +50,25 @@ body { font-size: 12px; }
 
 /* -- MENU STYLES -- */
 
-.pure-menu a { color: inherit; }
+.pure-menu a {
+    color: inherit;
+    border: 1px solid transparent;
+    border-left: 0;
+    border-right:0; }
 
-.pure-menu li a, .pure-menu .pure-menu-heading { padding: 0.25ex 0.25ex; }
+.pure-menu li a, .pure-menu .pure-menu-heading {
+    line-height: 1.5em;
+    padding: 0.25ex 0.25ex; }
+
+.pure-menu .pure-menu-item.pure-menu-selected { background-color: #eee; }
+
+.pure-menu .pure-menu-heading {
+    font-size: 90%;
+    margin-top: 0.5em;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #dfdfdf; }
+
 
 /* -- TABLES -- */
 
