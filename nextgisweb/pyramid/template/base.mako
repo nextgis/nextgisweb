@@ -74,7 +74,7 @@
                     <img class="logo" src="${request.route_url('pyramid.logo')}"/>
                 %endif
 
-                <a class="pure-menu-heading" href="${request.application_url}">
+                <a class="pure-menu-heading" href="${request.application_url}" style="float:left;">
                     ${request.env.core.settings['system.full_name']}
                 </a>
 
