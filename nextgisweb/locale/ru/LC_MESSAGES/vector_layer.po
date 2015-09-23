@@ -93,8 +93,8 @@ msgid "Spatial reference system"
 msgstr "Система координат"
 
 #: amd/ngw-vector-layer/template/Widget.hbs:10
-msgid "Source file (*.zip)"
-msgstr "Исходный файл (*.zip)"
+msgid "Source file"
+msgstr "Исходный файл"
 
 #: amd/ngw-vector-layer/template/Widget.hbs:14
 msgid "Encoding"
