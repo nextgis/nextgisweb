@@ -10,6 +10,7 @@ from ..component import Component
 from ..models import DBSession, Base
 from ..i18n import Localizer, Translations
 
+from .util import _
 from .command import BackupCommand  # NOQA
 from .backup import BackupBase, TableBackup, SequenceBackup  # NOQA
 
@@ -32,6 +33,13 @@ class CoreComponent(Component):
 
         setting_debug = self._settings.get('debug', 'false').lower()
         self.debug = setting_debug in ('true', 'yes', '1')
+
+        if 'system.name' not in self._settings:
+            self._settings['system.name'] = "NextGIS Web"
+
+        if 'system.full_name' not in self._settings:
+            self._settings['system.full_name'] = self.localizer().translate(
+                _("NextGIS geoinformation system"))
 
         sa_url = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
             user=self._settings.get('database.user', 'nextgisweb'),
