@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 from StringIO import StringIO
 import json
-import mimetypes
 
 from PIL import Image
 from pyramid.response import Response, FileResponse
