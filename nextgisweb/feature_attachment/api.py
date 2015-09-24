@@ -45,7 +45,7 @@ def image(resource, request):
     image.save(buf, image.format)
     buf.seek(0)
 
-    return Response(body_file=buf, content_type=b'image/%s' % image.format.lower())
+    return Response(body_file=buf, content_type=bytes(obj.mime_type))
 
 
 def iget(resource, request):
