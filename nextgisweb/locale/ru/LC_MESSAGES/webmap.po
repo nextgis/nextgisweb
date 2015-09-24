@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 15:48+0300\n"
+"POT-Creation-Date: 2015-09-24 22:28+0600\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -17,6 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
+
+#: __init__.py:42
+msgid "Main web map"
+msgstr "Основная веб-карта"
 
 #: adapter.py:24
 msgid "Tiles"
@@ -187,7 +191,9 @@ msgstr "Измерение площади"
 
 #: amd/ngw-webmap/tool/Measure.js:79
 msgid "Click adds point to measure, double click completes the measurement."
-msgstr "Двойной щелчек добавляет точку к измерению, двойной щелчек завершает измерение."
+msgstr ""
+"Двойной щелчек добавляет точку к измерению, двойной щелчек завершает "
+"измерение."
 
 #: amd/ngw-webmap/tool/Zoom.js:18
 msgid "Zoom in"
