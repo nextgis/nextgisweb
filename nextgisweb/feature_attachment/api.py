@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from StringIO import StringIO
 import json
+import mimetypes
 
 from PIL import Image
 from pyramid.response import Response, FileResponse
@@ -41,10 +42,10 @@ def image(resource, request):
             Image.ANTIALIAS)
 
     buf = StringIO()
-    image.save(buf, 'jpeg')
+    image.save(buf, image.format)
     buf.seek(0)
 
-    return Response(body_file=buf, content_type=b'image/jpeg')
+    return Response(body_file=buf, content_type=b'image/%s' % image.format.lower())
 
 
 def iget(resource, request):
