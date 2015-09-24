@@ -90,7 +90,7 @@ define([
                 if (val !== null) {
                     put(tbody, "tr th.display_name $ < td.value $", fieldmap[k].display_name, val);
                 } else {
-                    put(tbody, "tr th.display_name $ < td.value span.null $", fieldmap[k].display_name, "Н/Д");
+                    put(tbody, "tr th.display_name $ < td.value span.null $", fieldmap[k].display_name, i18n.gettext("N/A"));
                 }
             }
         }
