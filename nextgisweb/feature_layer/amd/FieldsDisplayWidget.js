@@ -34,7 +34,7 @@ define([
 
         grid_visibility: false,
 
-        urlRE: new RegExp(regexp.url({scheme: true})),
+        urlRE: new RegExp("^" + regexp.url({scheme: true}) + "$"),
 
         buildRendering: function () {
             this.inherited(arguments);
