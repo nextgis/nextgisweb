@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-15 17:47+0600\n"
+"POT-Creation-Date: 2015-09-28 17:06+0600\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -175,9 +175,10 @@ msgstr "Описание"
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:305
-msgid "Operation"
-msgstr "Операция"
+#: view.py:305 amd/ngw-resource/PermissionWidget.js:73
+#: amd/ngw-resource/PermissionWidget.js:140
+msgid "Action"
+msgstr "Действие"
 
 #: view.py:317
 msgid "Extra"
@@ -228,11 +229,6 @@ msgstr "Все ресурсы"
 #: amd/ngw-resource/PermissionWidget.js:65
 msgid "All permissions"
 msgstr "Все права"
-
-#: amd/ngw-resource/PermissionWidget.js:73
-#: amd/ngw-resource/PermissionWidget.js:140
-msgid "Action"
-msgstr "Действие"
 
 #: amd/ngw-resource/PermissionWidget.js:76
 #: amd/ngw-resource/PermissionWidget.js:143
@@ -326,4 +322,7 @@ msgstr "Владелец"
 #: template/section_description.mako:4
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
+
+#~ msgid "Operation"
+#~ msgstr "Операция"
 
