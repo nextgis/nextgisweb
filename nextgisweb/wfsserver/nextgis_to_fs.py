@@ -122,7 +122,9 @@ class NextgiswebDatasource(DataSource):
 
         # BBOX
         if params.bbox:
-            geom = box(*params.bbox, srid=self.srid_out)
+            coords = params.bbox['coords']
+            srs_id = params.bbox['srs_id'] if 'srs_id' in params.bbox else self.srid_out
+            geom = box(*coords, srid=srs_id)
             self.query.intersects(geom)
 
         self.query.geom()

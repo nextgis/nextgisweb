@@ -110,15 +110,16 @@ class Request (object):
     def _set_bbox(self, action, bbox_value):
         """Analyze bbox parameter, set bbox attribute of the action
         """
+        coords = bbox_value['coords']
         try:
-            action.bbox = map(float, bbox_value.split(","))
+            coords = map(float,coords)
         except ValueError:
             raise InvalidValueWFSException(
                 message="Bbox values are't numeric: '%s'"
-                % (bbox_value, )
+                % (coords, )
             )
         try:
-            minX, minY, maxX, maxY = action.bbox
+            minX, minY, maxX, maxY = coords
         except ValueError:
             raise InvalidValueWFSException(
                 message="Bbox values must be in format: minX,minY,maxX,maxY"
@@ -127,6 +128,18 @@ class Request (object):
             raise InvalidValueWFSException(
                 message="Bbox values must be: minX<maxX,minY<maxY"
             )
+
+        bbox = {'coords': coords}
+        if 'SRS' in bbox_value:
+            srs = bbox_value['SRS']
+            # SRS ID stored as the last 4 digits
+            try:
+                srs_id = int(srs[-4:])
+                bbox['srs_id'] = srs_id
+            except ValueError:
+                raise InvalidValueWFSException(message="Can't parse SRS: %s" % (srs, ))
+
+        action.bbox = bbox
         return action
 
     def _set_maxfeatures(self, action, maxfeatures_value):
