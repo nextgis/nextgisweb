@@ -107,7 +107,6 @@ class NextgiswebDatasource(DataSource):
         if self.query is None:
             self._setup_query()
 
-        # import ipdb; ipdb.set_trace()
         self.query.filter_by()
 
         # Startfeature+maxfeature
@@ -131,7 +130,16 @@ class NextgiswebDatasource(DataSource):
         result = self.query()
 
         features = []
+        fields_checked = False
         for row in result:
+            # Check if names contains characters that can't be used in XML tags
+            if not fields_checked:
+                for field_name in row.fields:
+                    if '<' in field_name or '>' in field_name or '&' in field_name or '@' in field_name:
+                        raise OperationProcessingFailedException(
+                            message='Field name %s contains unsupported symbol' % (field_name, ))
+                fields_checked = True
+
             feature = Feature(id=row.id, props=row.fields, srs=self.srid_out)
             feature.geometry_attr = self.geom_col
             geom = geojson.dumps(row.geom)
