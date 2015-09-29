@@ -132,9 +132,9 @@ class Request (object):
         bbox = {'coords': coords}
         if 'SRS' in bbox_value:
             srs = bbox_value['SRS']
-            # SRS ID stored as the last 4 digits
+            # SRS ID stored as the digits after the last ":" character
             try:
-                srs_id = int(srs[-4:])
+                srs_id = int(srs.split(':')[-1])
                 bbox['srs_id'] = srs_id
             except ValueError:
                 raise InvalidValueWFSException(message="Can't parse SRS: %s" % (srs, ))
