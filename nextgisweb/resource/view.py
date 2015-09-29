@@ -302,7 +302,7 @@ def setup_pyramid(comp, config):
 
         AddMenu(),
 
-        Label('operation', _("Operation")),
+        Label('operation', _("Action")),
 
         Link(
             'operation/update', _("Update"),

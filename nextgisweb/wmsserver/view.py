@@ -159,7 +159,7 @@ def _get_map(obj, request):
 
     buf.seek(0)
 
-    return Response(body_file=buf, content_type=b'image/png')
+    return Response(body_file=buf, content_type=bytes(p_format))
 
 
 def _get_feature_info(obj, request):
