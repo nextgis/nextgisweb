@@ -222,6 +222,8 @@ class Request (object):
                         action.version = value
                     elif key == "filter":
                         action = self._set_filter(action, value)
+                    elif key == 'outputformat':
+                        action.outputformat = value
                     elif key in queryable or key.upper() in queryable and hasattr(self.service.datasources[ds], 'query_action_types'):
                         if qtype:
                             if qtype in self.service.datasources[ds].query_action_types:

@@ -32,16 +32,22 @@ class WFS(Format):
 
     def encode(self, features, params):
         # import ipdb; ipdb.set_trace()
-        if ('version' not in params):
+        use_GML2 = True
+        if 'outputformat' in params:
+            use_GML2 = (params['outputformat'] == 'GML2')
+        else:
+            if 'version' in params:
+                version = params['version']
+                if version == '2.0.0':
+                    use_GML2 = False
+                elif version == '1.0.0':
+                    pass
+                else:
+                    raise ValueError
+        if use_GML2:
             results = self.encodeGML2(features, params)
         else:
-            version = params['version']
-            if version == '2.0.0':
-                results = self.encodeGML3(features, params)
-            elif version == '1.0.0':
-                results = self.encodeGML2(features, params)
-            else:
-                raise ValueError
+            results = self.encodeGML3(features, params)
         return results
 
     def encodeGML2(self, features, params):
@@ -54,7 +60,11 @@ class WFS(Format):
    xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengeospatial.net//wfs/1.0.0/WFS-basic.xsd">
         """]
         for feature in features:
-            results.append(self.encode_featureGML2(feature, params))
+            results.append(
+                self.encode_featureGML(
+                    feature, params, gml_format=['FORMAT=GML2']
+                )
+            )
         results.append("""</wfs:FeatureCollection>""")
 
         return "\n".join(results)
@@ -78,20 +88,21 @@ class WFS(Format):
                 http://schemas.opengis.net/gml/3.2.1/gml.xsd">
         """ % (current_datetime, len(features))]
         for feature in features:
-            results.append(self.encode_featureGML3(feature, params))
+            results.append(
+                self.encode_featureGML(
+                    feature, params, gml_format=['FORMAT=GML3']
+                )
+            )
+
         results.append("""</wfs:FeatureCollection>\n""")
 
         return "\n".join(results)
 
-    def encode_featureGML2(self, feature, params):
-        # layername = re.sub(r'\W', '_', self.layername)
+    def encode_featureGML(self, feature, params, gml_format=['FORMAT=GML2']):
         layername = self.layername
-
-        gml_format = ['FORMAT=GML2']
 
         attr_fields = []
         for key, value in feature.properties.items():
-            # key = re.sub(r'\W', '_', key)
             attr_value = self._encode_attr_value(value)
             attr_fields.append("<fs:%s>%s</fs:%s>" % (key, attr_value, key))
 
@@ -111,36 +122,6 @@ class WFS(Format):
             "\n".join(attr_fields), layername)
 
         return xml
-
-    def encode_featureGML3(self, feature, params):
-        # layername = re.sub(r'\W', '_', self.layername)
-        layername = self.layername
-
-        gml_format = ['FORMAT=GML3']
-
-        attr_fields = []
-        for key, value in feature.properties.items():
-            # key = re.sub(r'\W', '_', key)
-            attr_value = self._encode_attr_value(value)
-            attr_fields.append("<fs:%s>%s</fs:%s>" % (key, attr_value, key))
-
-        xml = "<gml:featureMember gml:id=\"%s\"><fs:%s fid=\"%s\">" % (
-            str(feature.id), layername, str(feature.id))
-
-        if hasattr(feature, "geometry_attr"):
-            xml += "<fs:%s>%s</fs:%s>" % (
-                feature.geometry_attr, self.geometry_to_gml(
-                    feature.geometry, feature.srs, gml_format),
-                feature.geometry_attr)
-        else:
-            xml += self.geometry_to_gml(feature.geometry,
-                                        feature.srs, gml_format)
-
-        xml += "%s</fs:%s></gml:featureMember>" % (
-            "\n".join(attr_fields), layername)
-
-        return xml
-
 
     def _encode_attr_value(self, attr_value):
         if hasattr(attr_value, "replace"):
@@ -503,27 +484,6 @@ version="%s"
                                    })
 
             sequence.append(element)
-
-        # if hasattr(datasource, "additional_cols"):
-        #     for additional_col in datasource.additional_cols.split(';'):
-        #         name = additional_col
-        #         matches = re.search('(?<=[ ]as[ ])\s*\w+', str(additional_col))
-        #         if matches:
-        #             name = matches.group(0)
-        #
-        #         type, length = datasource.getAttributeDescription(name)
-        #
-        #         maxLength = etree.Element('maxLength', attrib={'value':'0'})
-        #         restriction = etree.Element('restriction', attrib={'base' : type})
-        #         restriction.append(maxLength)
-        #         simpleType = etree.Element('simpleType')
-        #         simpleType.append(restriction)
-        #         element = etree.Element('element', attrib={'name' : name,
-        #                                                    'minOccurs' : '0',
-        #                                                    'maxOccurs' : '0'})
-        #         element.append(simpleType)
-        #
-        #         sequence.append(element)
 
         if hasattr(datasource, 'geometry_type'):
             properties = datasource.geometry_type.split(',')
