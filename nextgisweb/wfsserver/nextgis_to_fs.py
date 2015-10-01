@@ -8,6 +8,8 @@ from __future__ import unicode_literals
 from osgeo import ogr
 import shapely
 
+from bunch import Bunch
+
 import geojson
 
 from nextgisweb.feature_layer import Feature as NgwFeature
@@ -125,6 +127,9 @@ class NextgiswebDatasource(DataSource):
             srs_id = params.bbox['srs_id'] if 'srs_id' in params.bbox else self.srid_out
             geom = box(*coords, srid=srs_id)
             self.query.intersects(geom)
+
+        srid = params.srsname if params.srsname else self.srid_out
+        self.query.srs(Bunch({'id': srid}))
 
         self.query.geom()
         result = self.query()

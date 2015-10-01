@@ -132,15 +132,18 @@ class Request (object):
         bbox = {'coords': coords}
         if 'SRS' in bbox_value:
             srs = bbox_value['SRS']
-            # SRS ID stored as the digits after the last ":" character
-            try:
-                srs_id = int(srs.split(':')[-1])
-                bbox['srs_id'] = srs_id
-            except ValueError:
-                raise InvalidValueWFSException(message="Can't parse SRS: %s" % (srs, ))
-
+            bbox['srs_id'] = self._get_srid(srs)
         action.bbox = bbox
         return action
+
+    def _get_srid(self, srs_description):
+        # SRS ID stored as the digits after the last ":" character
+        try:
+            srs_id = int(srs_description.split(':')[-1])
+        except ValueError:
+            raise InvalidValueWFSException(message="Can't parse SRS: %s" % (srs, ))
+
+        return srs_id
 
     def _set_maxfeatures(self, action, maxfeatures_value):
         """Analyze maxfeatures parameter, set maxfeatures
@@ -191,7 +194,6 @@ class Request (object):
         if id is not False:
             action.id = id
         else:
-            # import sys
             for ds in self.datasources:
                 # import ipdb; ipdb.set_trace()
                 queryable = []
@@ -206,8 +208,10 @@ class Request (object):
                         key, qtype = key.split("__")
                     if key == 'layer':
                         action.layer = value
-                    if key == 'bbox':
+                    elif key == 'bbox':
                         action = self._set_bbox(action, value)
+                    elif key == 'srsname':
+                        action.srsname = self._get_srid(value)
                     elif key in ["maxfeatures",     # WFS 1.0.0
                                  "count"            # WFS 2.0.0
                                  ]:
