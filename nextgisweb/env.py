@@ -5,6 +5,7 @@ import re
 import sqlalchemy as sa
 
 from .component import Component, load_all
+from .package import pkginfo
 
 
 class Env(object):
@@ -17,27 +18,30 @@ class Env(object):
 
         load_all(
             packages_ignore=packages_ign,
-            components_ignore=components_ign
-        )
+            components_ignore=components_ign)
 
         self._components = dict()
 
         for comp_class in Component.registry:
             identity = comp_class.identity
 
-            if identity not in components_ign:
-                settings = dict(
-                    cfg.items(identity)
-                    if cfg.has_section(identity)
-                    else ())
+            if pkginfo.comp_pkg(identity) in packages_ign:
+                continue
+            if identity in components_ign:
+                continue
 
-                instance = comp_class(env=self, settings=settings)
-                self._components[comp_class.identity] = instance
+            settings = dict(
+                cfg.items(identity)
+                if cfg.has_section(identity)
+                else ())
 
-                assert not hasattr(self, identity), \
-                    "Attribute name %s already used" % identity
+            instance = comp_class(env=self, settings=settings)
+            self._components[comp_class.identity] = instance
 
-                setattr(self, identity, instance)
+            assert not hasattr(self, identity), \
+                "Attribute name %s already used" % identity
+
+            setattr(self, identity, instance)
 
     def chain(self, meth):
         """ Построение последовательности вызова методов с учетом зависимостей.
@@ -50,7 +54,7 @@ class Env(object):
 
         def traverse(components):
             for c in components:
-                if not c.identity in traverse.seq:
+                if c.identity not in traverse.seq:
                     if hasattr(getattr(c, meth), '_require'):
                         traverse([self._components[i] for i in getattr(
                             c, meth)._require])

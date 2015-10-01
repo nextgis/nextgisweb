@@ -50,12 +50,17 @@ class PkgInfo(object):
         self.scan()
         return self._pkg_comp.keys()
 
+    def comp_mod(self, comp):
+        self.scan()
+        return self._comp_mod[comp]
+
+    def comp_pkg(self, comp):
+        self.scan()
+        return self._comp_pkg[comp]
+
     def pkg_comp(self, pkg):
         self.scan()
         return self._pkg_comp[pkg]
 
-    def comp_mod(self, comp):
-        self.scan()
-        return self._comp_mod[comp]
 
 pkginfo = PkgInfo()
