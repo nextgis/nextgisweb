@@ -12,7 +12,9 @@ define([
     "dojo/_base/array",
     "dojo/on",
     // template
+    "dijit/form/CheckBox",
     "dijit/form/ValidationTextBox",
+    "dijit/form/SimpleTextarea",
     "dojox/layout/TableContainer",
     "dojox/form/CheckedMultiSelect",
     "ngw-pyramid/form/KeynameTextBox",
@@ -75,6 +77,9 @@ define([
         _setValueAttr: function (value) {
             this.displayName.set("value", value.display_name);
             this.keyname.set("value", value.keyname);
+            this.cbSuperuser.set("checked", value.superuser);
+            this.cbDisabled.set("checked", value.disabled);
+            this.description.set("value", value.description);
 
             // По простому не работает, сделаем по сложному
             var groups = lang.clone(this.groups);
@@ -90,7 +95,10 @@ define([
             var result = {
                 display_name: this.displayName.get("value"),
                 keyname: this.keyname.get("value"),
-                member_of: this.memberOf.get("value")
+                superuser: this.cbSuperuser.get("checked"),
+                disabled: this.cbDisabled.get("checked"),
+                member_of: this.memberOf.get("value"),
+                description: this.description.get("value")
             };
             if (this.password.get("value") !== "") {
                 result.password = this.password.get("value");

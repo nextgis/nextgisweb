@@ -5,7 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component
 
-from .models import Base, Principal, User, Group
+from .models import Base, Principal, User, Group, UserDisabled
 from . import command # NOQA
 from .util import _
 
@@ -58,7 +58,10 @@ class AuthComponent(Component):
         def user(request):
             user_id = authenticated_userid(request)
             if user_id:
-                return User.filter_by(id=user_id).one()
+                user = User.filter_by(id=user_id).one()
+                if user.disabled:
+                    raise UserDisabled(_("Account disabled"), user)
+                return user
             else:
                 return User.filter_by(keyname='guest').one()
 

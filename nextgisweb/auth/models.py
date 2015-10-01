@@ -30,6 +30,7 @@ class Principal(Base):
     cls = sa.Column(sa.Unicode(1), nullable=False)
     system = sa.Column(sa.Boolean, nullable=False, default=False)
     display_name = sa.Column(sa.Unicode, nullable=False)
+    description = sa.Column(sa.Unicode)
 
     __mapper_args__ = dict(
         polymorphic_on=cls,
@@ -44,6 +45,8 @@ class User(Principal):
         sa.Integer, sa.Sequence('principal_seq'),
         sa.ForeignKey(Principal.id), primary_key=True)
     keyname = sa.Column(sa.Unicode, unique=True)
+    superuser = sa.Column(sa.Boolean, nullable=False, default=False)
+    disabled = sa.Column(sa.Boolean, nullable=False, default=False)
     password_hash = sa.Column(sa.Unicode)
 
     __mapper_args__ = dict(polymorphic_identity='U')
@@ -143,3 +146,10 @@ class Group(Principal):
 
         else:
             return user in self.members
+
+
+class UserDisabled(Exception):
+    """ Запрашиваемый пользователь заблокирован """
+    def __init__(self, message, user):
+        super(Exception, self).__init__(message)
+        self.user = user

@@ -23,35 +23,32 @@
     title="${tr(_('Authentication'))}"
     style="width: 400px">
 
-<form data-dojo-type="dojox/layout/TableContainer"
-    method="POST">
+    %if error:
+        <div style="padding: 4px; color: red; text-align: center; border: 1px solid red; margin-bottom: 1ex; ">${error}</div>
+    %endif
 
-    <div data-dojo-type="dijit/_WidgetBase"
-        data-dojo-props="label: '${tr(_('Login'))}'"
-        style="width: 100%">
+    <form data-dojo-type="dojox/layout/TableContainer"
+        method="POST">
 
-        <input name="login" style="width: 98%" />
+        <div data-dojo-type="dijit/_WidgetBase"
+            data-dojo-props="label: '${tr(_('Login'))}'"
+            style="width: 100%">
+            <input name="login" style="width: 98%" />
+        </div>
 
-    </div>
-
-    <div data-dojo-type="dijit/_WidgetBase"
-        data-dojo-props="label: '${tr(_('Password'))}'"
-        style="width: 100%">
-    
-        <input name="password" type="password" style="width: 98%" />
-    
-    </div>
+        <div data-dojo-type="dijit/_WidgetBase"
+            data-dojo-props="label: '${tr(_('Password'))}'"
+            style="width: 100%">
+            <input name="password" type="password" style="width: 98%" /> 
+        </div>
 
 
-    <div data-dojo-type="dijit/_WidgetBase">
-
-        <button data-dojo-type="dijit/form/Button" 
-            type="submit" value="">
-            ${tr(_('Sign in'))}
-
-        </button>
-
-    </div>
-</form>
+        <div data-dojo-type="dijit/_WidgetBase">
+            <button data-dojo-type="dijit/form/Button" 
+                type="submit" value="">
+                ${tr(_('Sign in'))}
+            </button>
+        </div>
+    </form>
 
 </div>

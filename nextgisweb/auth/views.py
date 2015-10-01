@@ -8,7 +8,7 @@ from ..object_widget import ObjectWidget
 from ..views import ModelController, permalinker
 from .. import dynmenu as dm
 
-from .models import Principal, User, Group
+from .models import Principal, User, Group, UserDisabled
 
 from .util import _
 
@@ -32,12 +32,14 @@ def setup_pyramid(comp, config):
 
                 if user.password == request.POST['password']:
                     headers = remember(request, user.id)
+                    if user.disabled:
+                        return dict(error=_("Account disabled"))
                     return HTTPFound(location=next, headers=headers)
                 else:
                     raise NoResultFound()
 
             except NoResultFound:
-                pass
+                return dict(error=_("Invalid login or password!"))
 
         return dict()
 
@@ -68,14 +70,23 @@ def setup_pyramid(comp, config):
                     'auth.login', _query=dict(next=request.url)))
 
         # Уже аутентифицированным пользователям показываем сообщение об ошибке
+        # TODO: Отдельно можно информировать заблокированных пользователей
         request.response.status = 403
         return dict(subtitle=_("Access denied"))
 
     config.add_view(
         forbidden,
         context=HTTPForbidden,
-        renderer='nextgisweb:auth/template/forbidden.mako'
-    )
+        renderer='nextgisweb:auth/template/forbidden.mako')
+
+    def user_disabled(request):
+        request.response.status = 403
+        return dict(subtitle=request.exception.message)
+
+    config.add_view(
+        user_disabled,
+        context=UserDisabled,
+        renderer='nextgisweb:auth/template/forbidden.mako')
 
     def principal_dump(request):
         query = Principal.query().with_polymorphic('*')
@@ -85,6 +96,7 @@ def setup_pyramid(comp, config):
             result.append(dict(
                 id=p.id,
                 cls=p.cls,
+                system=p.system,
                 keyname=p.keyname,
                 display_name=p.display_name
             ))
@@ -104,6 +116,7 @@ def setup_pyramid(comp, config):
 
             self.obj.display_name = self.data['display_name']
             self.obj.keyname = self.data['keyname']
+            self.obj.description = self.data['description']
 
         def validate(self):
             result = super(AuthGroupWidget, self).validate()
@@ -118,7 +131,7 @@ def setup_pyramid(comp, config):
                 result['value'] = dict(
                     display_name=self.obj.display_name,
                     keyname=self.obj.keyname,
-                )
+                    description=self.obj.description)
 
             return result
 
@@ -167,14 +180,17 @@ def setup_pyramid(comp, config):
 
             self.obj.display_name = self.data['display_name']
             self.obj.keyname = self.data['keyname']
+            self.obj.superuser = self.data['superuser']
+            self.obj.disabled = self.data['disabled']
 
             if self.data.get('password', None) is not None:
                 self.obj.password = self.data['password']
 
             self.obj.member_of = map(
                 lambda id: Group.filter_by(id=id).one(),
-                self.data['member_of']
-            )
+                self.data['member_of'])
+
+            self.obj.description = self.data['description']
 
         def validate(self):
             result = super(AuthUserWidget, self).validate()
@@ -189,7 +205,10 @@ def setup_pyramid(comp, config):
                 result['value'] = dict(
                     display_name=self.obj.display_name,
                     keyname=self.obj.keyname,
+                    superuser=self.obj.superuser,
+                    disabled=self.obj.disabled,
                     member_of=[m.id for m in self.obj.member_of],
+                    description=self.obj.description,
                 )
                 result['groups'] = [
                     dict(

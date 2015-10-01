@@ -1,30 +1,46 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
     <div data-dojo-type="dojox/layout/TableContainer"
-        data-dojo-props="cols:1, labelWidth: 150">
+        data-dojo-props="cols:2, labelWidth: 150">
 
         <input data-dojo-attach-point="displayName"
             data-dojo-type="ngw-pyramid/form/DisplayNameTextBox"
+            data-dojo-props="colspan: 2"
             title="{{gettext 'Full name'}}"
             style="width: 100%">
         </input>
 
         <input data-dojo-attach-point="keyname"
             data-dojo-type="ngw-pyramid/form/KeynameTextBox"
-            data-dojo-props="required: true"
+            data-dojo-props="required: true, colspan: 2"
             title="{{gettext 'Login'}}"
             style="width: 100%">
         </input>
 
         <input data-dojo-attach-point="password"
             data-dojo-type="dijit/form/ValidationTextBox"
-            data-dojo-props="pattern: '.{5,25}'"
+            data-dojo-props="pattern: '.{5,25}', colspan: 2"
             type="password"
             title="{{gettext 'Password'}}"
             style="width: 100%">
         </input>
 
+        <input data-dojo-attach-point="cbDisabled"
+            data-dojo-type="dijit/form/CheckBox"
+            title="{{gettext 'Disabled'}}"/>
+
+        <input data-dojo-attach-point="cbSuperuser"
+            data-dojo-type="dijit/form/CheckBox"
+            title="{{gettext 'Superuser'}}"/>
+
+        <textarea data-dojo-attach-point="description"
+            data-dojo-type="dijit/form/SimpleTextarea"
+            data-dojo-props="rows: 4, colspan: 2"
+            title="{{gettext 'Description'}}"
+            style="width: 100%; box-sizing: border-box"></textarea>
+
         <select data-dojo-attach-point="memberOf"
             data-dojo-type="dojox/form/CheckedMultiSelect"
+            data-dojo-props="colspan: 2"
             multiple="true"
             title="{{gettext 'Groups member'}}"
             style="width: 100%">

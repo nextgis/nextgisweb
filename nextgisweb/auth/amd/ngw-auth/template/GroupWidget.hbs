@@ -5,14 +5,18 @@
         <input data-dojo-attach-point="displayName"
             data-dojo-type="ngw-pyramid/form/DisplayNameTextBox"
             title="{{gettext 'Full name'}}"
-            style="width: 100%">
-        </input>
+            style="width: 100%"></input>
 
         <input data-dojo-attach-point="keyname"
             data-dojo-type="ngw-pyramid/form/KeynameTextBox"
             title="{{gettext 'Group name'}}"
-            style="width: 100%">
-        </input>
+            style="width: 100%"></input>
+
+        <textarea data-dojo-attach-point="description"
+            data-dojo-type="dijit/form/SimpleTextarea"
+            data-dojo-props="rows: 4, colspan: 2"
+            title="{{gettext 'Description'}}"
+            style="width: 100%; box-sizing: border-box"></textarea>
 
     </div>
 </div>

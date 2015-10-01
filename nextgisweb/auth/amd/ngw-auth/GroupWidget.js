@@ -11,6 +11,7 @@ define([
     "dojo/_base/array",
     "dojo/on",
     // template
+    "dijit/form/SimpleTextarea",    
     "dojox/layout/TableContainer",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-pyramid/form/DisplayNameTextBox"
@@ -53,12 +54,14 @@ define([
         _setValueAttr: function (value) {
             this.displayName.set("value", value.display_name);
             this.keyname.set("value", value.keyname);
+            this.description.set("value", value.description);
         },
 
         _getValueAttr: function () {
             return {
                 display_name: this.displayName.get("value"),
-                keyname: this.keyname.get("value")
+                keyname: this.keyname.get("value"),
+                description: this.description.get("value"),
             };
         }
     });

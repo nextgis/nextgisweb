@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-15 09:24+0600\n"
+"POT-Creation-Date: 2015-10-02 02:34+0300\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -42,70 +42,91 @@ msgstr "Администратор"
 msgid "Owner"
 msgstr "Владелец"
 
-#: views.py:72
+#: __init__.py:63 views.py:36
+msgid "Account disabled"
+msgstr "Учетная запись отключена"
+
+#: views.py:42
+msgid "Invalid login or password!"
+msgstr "Неверный логин или пароль!"
+
+#: views.py:75
 msgid "Access denied"
 msgstr "Отказано в доступе"
 
-#: views.py:133
+#: views.py:146
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: views.py:220
+#: views.py:239
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: views.py:253 views.py:318
+#: views.py:272 views.py:337
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:263 views.py:321
+#: views.py:282 views.py:340
 msgid "Groups"
 msgstr "Группы пользователей"
 
-#: views.py:274 views.py:296
+#: views.py:293 views.py:315
 msgid "List"
 msgstr "Список"
 
-#: views.py:279 views.py:301
+#: views.py:298 views.py:320
 msgid "Create"
 msgstr "Создать"
 
-#: views.py:285 views.py:307
+#: views.py:304 views.py:326
 msgid "Edit"
 msgstr "Изменить"
 
-#: amd/ngw-auth/GroupWidget.js:32
+#: amd/ngw-auth/GroupWidget.js:33
 msgid "Group"
 msgstr "Группа пользователей"
 
-#: amd/ngw-auth/UserWidget.js:38
+#: amd/ngw-auth/UserWidget.js:40
 msgid "User"
 msgstr "Пользователь"
 
-#: amd/ngw-auth/UserWidget.js:47
+#: amd/ngw-auth/UserWidget.js:49
 msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:7
-#: amd/ngw-auth/template/UserWidget.hbs:7 template/group_browse.mako:8
+#: amd/ngw-auth/template/UserWidget.hbs:8 template/group_browse.mako:8
 #: template/user_browse.mako:8
 msgid "Full name"
 msgstr "Полное имя"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:9
+#: amd/ngw-auth/template/GroupWidget.hbs:12 template/group_browse.mako:9
 msgid "Group name"
 msgstr "Имя группы"
 
-#: amd/ngw-auth/template/UserWidget.hbs:14 template/login.mako:30
+#: amd/ngw-auth/template/GroupWidget.hbs:18
+#: amd/ngw-auth/template/UserWidget.hbs:38
+msgid "Description"
+msgstr "Описание"
+
+#: amd/ngw-auth/template/UserWidget.hbs:15 template/login.mako:34
 #: template/user_browse.mako:9
 msgid "Login"
 msgstr "Логин"
 
-#: amd/ngw-auth/template/UserWidget.hbs:22 template/login.mako:38
+#: amd/ngw-auth/template/UserWidget.hbs:23 template/login.mako:40
 msgid "Password"
 msgstr "Пароль"
 
 #: amd/ngw-auth/template/UserWidget.hbs:29
+msgid "Disabled"
+msgstr "Отключен"
+
+#: amd/ngw-auth/template/UserWidget.hbs:33
+msgid "Superuser"
+msgstr "Супер-пользователь"
+
+#: amd/ngw-auth/template/UserWidget.hbs:45
 msgid "Groups member"
 msgstr "Член групп"
 
@@ -117,7 +138,7 @@ msgstr "Недостаточно прав для выполнения этой �
 msgid "Authentication"
 msgstr "Аутентификация"
 
-#: template/login.mako:50
+#: template/login.mako:49
 msgid "Sign in"
 msgstr "Войти"
 

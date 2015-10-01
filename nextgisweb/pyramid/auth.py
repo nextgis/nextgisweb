@@ -30,7 +30,7 @@ class AuthenticationPolicy(object):
 
     def __init__(self, settings):
         def check(userid, password, request):
-            user = User.filter_by(id=userid).first()
+            user = User.filter_by(id=userid, disabled=False).first()
             if user is None or not (user.password == password):
                 return None
             else:

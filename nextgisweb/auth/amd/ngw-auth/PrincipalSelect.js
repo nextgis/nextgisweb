@@ -15,7 +15,7 @@ define([
                 data: principalDump
             });
 
-            this.searchAttr = 'display_name';
+            this.searchAttr = "display_name";
         },
 
         constructor: function (params) {
