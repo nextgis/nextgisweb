@@ -20,6 +20,13 @@ define([
 
         constructor: function (params) {
             this.required = false;
+
+            this.fetchProperties = {
+                sort: [{
+                    attribute: this.searchAttr,
+                    ascending: true
+                }]
+            };
         },
 
         _getItemAttr: function () {

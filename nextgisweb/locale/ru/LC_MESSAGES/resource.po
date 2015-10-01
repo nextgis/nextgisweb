@@ -95,12 +95,12 @@ msgstr "Создать"
 
 #: scope.py:42 view.py:308
 msgid "Update"
-msgstr "Обновление"
+msgstr "Изменить"
 
 #: scope.py:46 view.py:313 amd/ngw-resource/CompositeWidget.js:103
 #: amd/ngw-resource/PermissionWidget.js:304
 msgid "Delete"
-msgstr "Удаление"
+msgstr "Удалить"
 
 #: scope.py:51
 msgid "Manage children"
