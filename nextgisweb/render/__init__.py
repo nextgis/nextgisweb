@@ -3,6 +3,21 @@ from __future__ import unicode_literals, print_function, absolute_import
 
 from ..component import Component
 
+from .interface import (
+    IRenderableStyle,
+    IExtentRenderRequest,
+    ITileRenderRequest,
+    ILegendableStyle,
+)
+
+__all__ = [
+    'StyleComponent',
+    'IRenderableStyle',
+    'IExtentRenderRequest',
+    'ITileRenderRequest',
+    'ILegendableStyle'
+]
+
 
 @Component.registry.register
 class RenderComponent(Component):
