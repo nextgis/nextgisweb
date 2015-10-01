@@ -20,7 +20,7 @@ class TileAdapter(object):
     однако сам сервис реализуется другим компонентом. """
 
     identity = 'tile'
-    mid = 'ngw-webmap/TMSAdapter'
+    mid = 'ngw-webmap/TileAdapter'
     display_name = _("Tiles")
 
 

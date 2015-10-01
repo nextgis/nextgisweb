@@ -11,7 +11,7 @@ PD_READ = DataScope.read
 sett_name = 'permissions.disable_check.rendering'
 
 
-def tms(request):
+def tile(request):
     setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
     if setting_disable_check in ('true', 'yes', '1'):
         setting_disable_check = True
@@ -82,8 +82,8 @@ def image(request):
 
 
 def setup_pyramid(comp, config):
-    config.add_route('render.tms', '/api/component/render/tms') \
-        .add_view(tms)
+    config.add_route('render.tile', '/api/component/render/tile') \
+        .add_view(tile)
 
     config.add_route('render.image', '/api/component/render/image') \
         .add_view(image)
