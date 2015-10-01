@@ -89,7 +89,7 @@ class Server (object):
                 action = request.actions[0]
                 if hasattr(action, 'version') and len(action.version) > 0:
                     version = action.version
-                if hasattr(action, 'outputformat') and len(action.outputformat) > 0:
+                if (action.outputformat is not None) and len(action.outputformat) > 0:
                     params['outputformat'] = action.outputformat
 
                 if hasattr(action, 'request') and action.request is not None:
