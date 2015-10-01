@@ -8,7 +8,7 @@ define([
     return declare(Adapter, {
         createLayer: function (item) {
             return new XYZ(item.id, {
-                url: route.style.tms({id: item.styleId}) + "?z=${z}&x=${x}&y=${y}",
+                url: route.render.tile() + "?z=${z}&x=${x}&y=${y}" + "&resource=" + item.styleId,
                 isBaseLayer: false,
                 type: "png",
                 visibility: item.visibility,

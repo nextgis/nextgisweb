@@ -7,7 +7,7 @@ from zope.interface import implements
 
 from ..models import declarative_base
 from ..resource import Resource, DataScope
-from ..style import (
+from ..render import (
     IRenderableStyle,
     IExtentRenderRequest,
     ITileRenderRequest)

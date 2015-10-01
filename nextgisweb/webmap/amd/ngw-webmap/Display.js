@@ -178,8 +178,10 @@ define([
                 if (url.indexOf("?") !== -1) {
                     query = url.substring(url.indexOf("?") + 1, url.length);
                     queryObject = ioQuery.queryToObject(query);
-                    queryObject.styles = queryObject.styles.split(",");
-                    queryObject.styles = array.map(queryObject.styles, function(i){ return parseInt(i, 10); });
+                    if (lang.isString(queryObject.styles)) {
+                        queryObject.styles = queryObject.styles.split(",");
+                        queryObject.styles = array.map(queryObject.styles, function(i){ return parseInt(i, 10); });
+                    }
                     return queryObject;
                 }
                 return {};

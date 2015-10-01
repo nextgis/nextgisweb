@@ -27,7 +27,7 @@ from ..resource import (
     ValidationError,
     ResourceGroup)
 from ..layer import SpatialLayerMixin
-from ..style import (
+from ..render import (
     IRenderableStyle,
     IExtentRenderRequest,
     ITileRenderRequest)

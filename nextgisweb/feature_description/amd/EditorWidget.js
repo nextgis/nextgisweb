@@ -25,6 +25,14 @@ define([
             }
             if (value === '<br />') { value = ''; }
             return value;
-        }       
+        },
+
+        _setValueAttr: function (value) {
+            if (value !== null && value !== undefined) {
+                this.inherited(arguments);
+            } else {
+                this.set("value", "");
+            }
+        }
     });
 });

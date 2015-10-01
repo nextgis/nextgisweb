@@ -110,15 +110,16 @@ class Request (object):
     def _set_bbox(self, action, bbox_value):
         """Analyze bbox parameter, set bbox attribute of the action
         """
+        coords = bbox_value['coords']
         try:
-            action.bbox = map(float, bbox_value.split(","))
+            coords = map(float,coords)
         except ValueError:
             raise InvalidValueWFSException(
                 message="Bbox values are't numeric: '%s'"
-                % (bbox_value, )
+                % (coords, )
             )
         try:
-            minX, minY, maxX, maxY = action.bbox
+            minX, minY, maxX, maxY = coords
         except ValueError:
             raise InvalidValueWFSException(
                 message="Bbox values must be in format: minX,minY,maxX,maxY"
@@ -127,7 +128,22 @@ class Request (object):
             raise InvalidValueWFSException(
                 message="Bbox values must be: minX<maxX,minY<maxY"
             )
+
+        bbox = {'coords': coords}
+        if 'SRS' in bbox_value:
+            srs = bbox_value['SRS']
+            bbox['srs_id'] = self._get_srid(srs)
+        action.bbox = bbox
         return action
+
+    def _get_srid(self, srs_description):
+        # SRS ID stored as the digits after the last ":" character
+        try:
+            srs_id = int(srs_description.split(':')[-1])
+        except ValueError:
+            raise InvalidValueWFSException(message="Can't parse SRS: %s" % (srs, ))
+
+        return srs_id
 
     def _set_maxfeatures(self, action, maxfeatures_value):
         """Analyze maxfeatures parameter, set maxfeatures
@@ -178,7 +194,6 @@ class Request (object):
         if id is not False:
             action.id = id
         else:
-            # import sys
             for ds in self.datasources:
                 # import ipdb; ipdb.set_trace()
                 queryable = []
@@ -193,8 +208,10 @@ class Request (object):
                         key, qtype = key.split("__")
                     if key == 'layer':
                         action.layer = value
-                    if key == 'bbox':
+                    elif key == 'bbox':
                         action = self._set_bbox(action, value)
+                    elif key == 'srsname':
+                        action.srsname = self._get_srid(value)
                     elif key in ["maxfeatures",     # WFS 1.0.0
                                  "count"            # WFS 2.0.0
                                  ]:
@@ -209,6 +226,8 @@ class Request (object):
                         action.version = value
                     elif key == "filter":
                         action = self._set_filter(action, value)
+                    elif key == 'outputformat':
+                        action.outputformat = value
                     elif key in queryable or key.upper() in queryable and hasattr(self.service.datasources[ds], 'query_action_types'):
                         if qtype:
                             if qtype in self.service.datasources[ds].query_action_types:

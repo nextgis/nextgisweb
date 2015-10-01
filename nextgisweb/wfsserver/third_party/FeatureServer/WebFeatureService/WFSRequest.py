@@ -111,21 +111,30 @@ class WFSRequest(object):
                 message="Several BBOX statements has found")
         elif len(bbox) == 1:
             bbox = bbox[0]
+
             lc = bbox.xpath("//*[local-name() = 'lowerCorner']")
             if len(lc) != 1:
                 raise OperationParsingFailedException(
                     message="Can't parse 'lowerCorner' paramether of GetFeature request")
             lc = lc[0].text
-            lc = lc.split()
+            miny, minx = lc.split()
 
             uc = bbox.xpath("//*[local-name() = 'upperCorner']")
             if len(uc) != 1:
                 raise OperationParsingFailedException(
                     message="Can't parse 'upperCorner' paramether of GetFeature request")
             uc = uc[0].text
-            uc = uc.split()
+            maxy, maxx = uc.split()
 
-            params['bbox'] = ','.join(lc + uc)
+            bbox_param = dict(coords=[minx, miny, maxx, maxy])
+
+            envelope = bbox.xpath("//*[local-name() = 'Envelope']")
+            if len(envelope) == 1:
+                envelope = envelope[0]
+                if 'srsName' in envelope.attrib:
+                    bbox_param['SRS'] = envelope.attrib['srsName']
+
+            params['bbox'] = bbox_param
 
         return params
 

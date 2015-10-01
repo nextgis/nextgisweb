@@ -12,6 +12,8 @@ class Action (object):
         self.bbox = None
         self.maxfeatures = None
         self.startfeature = 0
+        self.outputformat = None
+        self.srsname = None
         self.attributes = {}
         self.metadata = None
         self.wfsrequest = None
