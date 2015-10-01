@@ -94,7 +94,7 @@ GeoJSON, для растровых - TMS.
 .. deprecated:: 2.2    
 .. http:get:: /resource/(int:id)/tms?z=(int:z)&x=(int:x)&y=(int:y)
 
-.. http:get:: /api/component/render/tms?z=(int:z)&x=(int:x)&y=(int:y)&resource=(int:id1),(int:id2)...
+.. http:get:: /api/component/render/tile?z=(int:z)&x=(int:x)&y=(int:y)&resource=(int:id1),(int:id2)...
     
     Запрос тайла
     
@@ -107,7 +107,7 @@ GeoJSON, для растровых - TMS.
 
 .. sourcecode:: http
 
-   GET /api/component/render/tms?z=7&x=84&y=42&resource=234 HTTP/1.1
+   GET /api/component/render/tile?z=7&x=84&y=42&resource=234 HTTP/1.1
    Host: ngw_url
    Accept: */*
 
