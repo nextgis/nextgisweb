@@ -11,7 +11,7 @@ from .interface import (
 )
 
 __all__ = [
-    'StyleComponent',
+    'RenderComponent',
     'IRenderableStyle',
     'IExtentRenderRequest',
     'ITileRenderRequest',
