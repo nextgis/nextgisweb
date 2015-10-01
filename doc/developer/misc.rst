@@ -90,12 +90,15 @@ GeoJSON, для растровых - TMS.
    Accept: */*
    
 Для получения данных в формате TMS необходимо выполнить следующий запрос:
-    
+
+.. deprecated:: 2.2    
 .. http:get:: /resource/(int:id)/tms?z=(int:z)&x=(int:x)&y=(int:y)
+
+.. http:get:: /api/component/render/tms?z=(int:z)&x=(int:x)&y=(int:y)&resource=(int:id1),(int:id2)...
     
     Запрос тайла
     
-    :param id: идентификатор ресурса растра
+    :param id1, id2: идентификаторы ресурсов стилей
     :param z: уровень зума
     :param x: номер тайла по вертикали
     :param y: номер тайла по горизонтали
@@ -104,7 +107,7 @@ GeoJSON, для растровых - TMS.
 
 .. sourcecode:: http
 
-   GET /resource/234/tms?z=7&x=84&y=42 HTTP/1.1
+   GET /api/component/render/tms?z=7&x=84&y=42&resource=234 HTTP/1.1
    Host: ngw_url
    Accept: */*
 
