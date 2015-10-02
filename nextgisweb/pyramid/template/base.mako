@@ -81,24 +81,14 @@
                 <ul class="pure-menu-list">
                     <li class="pure-menu-item"><a href="${request.route_url('resource.root')}" class="pure-menu-link">${tr(_('Resources'))}</a></li>
 
-                    <%
-                        from nextgisweb.auth import UserDisabled
-                        try:
-                            suser = request.user
-                            euser = suser
-                        except UserDisabled as e:
-                            suser = None
-                            euser = e.user
-                    %>
-
-                    %if suser and suser.is_administrator:
+                    %if request.user.is_administrator:
                         <li class="pure-menu-item"><a href="${request.route_url('pyramid.control_panel')}" class="pure-menu-link">${tr(_('Control panel'))}</a></li>
                     %endif
 
-                    %if suser and suser.keyname == 'guest':
+                    %if request.user.keyname == 'guest':
                         <li class="pure-menu-item"><a href="${request.route_url('auth.login')}" class="pure-menu-link">${tr(_('Sign in'))}</a></li>
                     %else:
-                        <li class="user pure-menu-item">${euser}</li>
+                        <li class="user pure-menu-item">${request.user}</li>
                         <li class="pure-menu-item"><a href="${request.route_url('auth.logout')}" class="pure-menu-link">${tr(_('Sign out'))}</a></li>
                     %endif
 

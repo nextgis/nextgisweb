@@ -60,7 +60,7 @@ class AuthComponent(Component):
             if user_id:
                 user = User.filter_by(id=user_id).one()
                 if user.disabled:
-                    raise UserDisabled(_("Account disabled"), user)
+                    raise UserDisabled()
                 return user
             else:
                 return User.filter_by(keyname='guest').one()

@@ -150,6 +150,3 @@ class Group(Principal):
 
 class UserDisabled(Exception):
     """ Запрашиваемый пользователь заблокирован """
-    def __init__(self, message, user):
-        super(Exception, self).__init__(message)
-        self.user = user

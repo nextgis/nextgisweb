@@ -80,13 +80,10 @@ def setup_pyramid(comp, config):
         renderer='nextgisweb:auth/template/forbidden.mako')
 
     def user_disabled(request):
-        request.response.status = 403
-        return dict(subtitle=request.exception.message)
+        headers = forget(request)
+        return HTTPFound(location=request.application_url, headers=headers)
 
-    config.add_view(
-        user_disabled,
-        context=UserDisabled,
-        renderer='nextgisweb:auth/template/forbidden.mako')
+    config.add_view(user_disabled, context=UserDisabled)
 
     def principal_dump(request):
         query = Principal.query().with_polymorphic('*')
