@@ -101,16 +101,6 @@ class User(Principal):
 
     @property
     def password(self):
-        class PasswordHashValue(object):
-            def __init__(self, value):
-                self._value = value
-
-            def __eq__(self, other):
-                if isinstance(other, basestring):
-                    return sha256_crypt.verify(other, self._value)
-                else:
-                    raise NotImplemented
-
         return PasswordHashValue(self.password_hash)
 
     @password.setter # NOQA
@@ -146,6 +136,20 @@ class Group(Principal):
 
         else:
             return user in self.members
+
+
+class PasswordHashValue(object):
+    """ Класс для автоматического сравнения паролей по хешу """
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        if self.value is None:
+            return False
+        elif isinstance(other, basestring):
+            return sha256_crypt.verify(other, self.value)
+        else:
+            raise NotImplemented
 
 
 class UserDisabled(Exception):
