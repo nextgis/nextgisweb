@@ -1,4 +1,5 @@
 `-- example of upgrade command. migration.sql have to consist below sql commands`
+
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
 #### `-- 3a274762cecaf81f4fca75d96421243303792cef` (2015-06-30)
