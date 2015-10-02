@@ -165,6 +165,11 @@ class Resource(Base):
     def permission_sets(self, user):
         class_permissions = self.class_permissions()
 
+        if user.superuser:
+            return PermissionSets(
+                allow=set(class_permissions),
+                deny=set(), mask=set())
+
         allow = set()
         deny = set()
         mask = set()
