@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
+
 from pyramid.authentication import (
     AuthTktAuthenticationPolicy,
     BasicAuthAuthenticationPolicy as
@@ -44,7 +46,7 @@ class AuthenticationPolicy(object):
                 http_only=True),
 
             BasicAuthenticationPolicy(
-                check=check, realm='NextGISWeb'),
+                check=check, realm=b'NextGISWeb'),
         )
 
     def authenticated_userid(self, request):
