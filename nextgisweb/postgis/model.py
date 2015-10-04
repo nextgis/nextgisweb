@@ -36,7 +36,8 @@ from ..feature_layer import (
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
-    IFeatureQueryIntersects)
+    IFeatureQueryIntersects,
+    IFeatureQueryOrderBy)
 
 from .util import _
 
@@ -350,7 +351,8 @@ class FeatureQueryBase(object):
         IFeatureQueryFilter,
         IFeatureQueryFilterBy,
         IFeatureQueryLike,
-        IFeatureQueryIntersects)
+        IFeatureQueryIntersects,
+        IFeatureQueryOrderBy)
 
     def __init__(self):
         self._srs = None
@@ -365,6 +367,8 @@ class FeatureQueryBase(object):
         self._filter_by = None
         self._like = None
         self._intersects = None
+
+        self._order_by = None
 
     def srs(self, srs):
         self._srs = srs
@@ -473,7 +477,12 @@ class FeatureQueryBase(object):
         select.append_whereclause(db.func.geometrytype(db.sql.column(
             self.layer.column_geom)).in_((gt, 'MULTI' + gt)))
 
-        select.append_order_by(idcol)
+        if self._order_by:
+            for order, colname in self._order_by:
+                select.append_order_by(dict(asc=db.asc, desc=db.desc)[order](
+                    db.sql.column(colname)))
+        else:
+            select.append_order_by(idcol)
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer

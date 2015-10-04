@@ -127,7 +127,8 @@ define([
                 {
                     field: "id",
                     label: "#",
-                    unhidable: true
+                    unhidable: true,
+                    sortable: false
                 }];
 
             var fields = [];

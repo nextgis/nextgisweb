@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
+import re
+import urllib
 from types import MethodType
 from collections import OrderedDict
 
@@ -157,6 +159,13 @@ def store_collection(layer, request):
     like = request.params.get('like', '')
     if like != '':
         query.like(like)
+
+    sort_re = re.compile(r'sort\(([+-])%s(\w+)\)' % (field_prefix, ))
+    sort = sort_re.search(urllib.unquote(request.query_string))
+    if sort:
+        sort_order = {'+': 'asc', '-': 'desc'}[sort.group(1)]
+        sort_colname = sort.group(2)
+        query.order_by((sort_order, sort_colname), )
 
     features = query()
 

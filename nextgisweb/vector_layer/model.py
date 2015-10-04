@@ -49,7 +49,8 @@ from ..feature_layer import (
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
-    IFeatureQueryIntersects)
+    IFeatureQueryIntersects,
+    IFeatureQueryOrderBy)
 
 from .util import _
 
@@ -599,7 +600,8 @@ class FeatureQueryBase(object):
         IFeatureQueryFilter,
         IFeatureQueryFilterBy,
         IFeatureQueryLike,
-        IFeatureQueryIntersects)
+        IFeatureQueryIntersects,
+        IFeatureQueryOrderBy)
 
     def __init__(self):
         self._srs = None
@@ -617,6 +619,8 @@ class FeatureQueryBase(object):
         self._filter_by = None
         self._like = None
         self._intersects = None
+
+        self._order_by = None
 
     def srs(self, srs):
         self._srs = srs
@@ -732,6 +736,14 @@ class FeatureQueryBase(object):
                 geomcol, db.func.st_transform(
                     intgeom, self.layer.srs_id)))
 
+        order_criterion = []
+        if self._order_by:
+            for order, colname in self._order_by:
+                order_criterion.append(dict(asc=db.asc, desc=db.desc)[order](
+                    table.columns[tableinfo[colname].key]))
+        else:
+            order_criterion.append(table.columns.id)
+
         class QueryFeatureSet(FeatureSet):
             fields = selected_fields
             layer = self.layer
@@ -748,7 +760,7 @@ class FeatureQueryBase(object):
                     whereclause=db.and_(*where),
                     limit=self._limit,
                     offset=self._offset,
-                    order_by=table.columns.id,
+                    order_by=order_criterion,
                 )
                 rows = DBSession.connection().execute(query)
                 for row in rows:
