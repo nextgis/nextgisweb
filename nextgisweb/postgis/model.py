@@ -481,8 +481,7 @@ class FeatureQueryBase(object):
             for order, colname in self._order_by:
                 select.append_order_by(dict(asc=db.asc, desc=db.desc)[order](
                     db.sql.column(colname)))
-        else:
-            select.append_order_by(idcol)
+        select.append_order_by(idcol)
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer

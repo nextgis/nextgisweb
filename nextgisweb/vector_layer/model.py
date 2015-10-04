@@ -741,8 +741,7 @@ class FeatureQueryBase(object):
             for order, colname in self._order_by:
                 order_criterion.append(dict(asc=db.asc, desc=db.desc)[order](
                     table.columns[tableinfo[colname].key]))
-        else:
-            order_criterion.append(table.columns.id)
+        order_criterion.append(table.columns.id)
 
         class QueryFeatureSet(FeatureSet):
             fields = selected_fields
