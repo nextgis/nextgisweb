@@ -9,7 +9,8 @@ body { font-size: 12px; }
 
     .header .pure-menu {
         background: #2D3E50;
-        overflow: auto; }
+        overflow: auto;
+        white-space: normal; }
 
     .header li a:hover,
     .header li a:focus {
