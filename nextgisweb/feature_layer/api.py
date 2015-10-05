@@ -188,7 +188,7 @@ def cpost(resource, request):
 
 def cdelete(resource, request):
     request.resource_permission(PERM_WRITE)
-    resource.feature_delete()
+    resource.feature_delete_all()
 
     return Response(json.dumps(None), content_type=b'application/json')
 

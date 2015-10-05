@@ -39,7 +39,7 @@ class IWritableFeatureLayer(IFeatureLayer):
     """ Слой объектов, поддерживающий запись """
 
     def feature_create(self, feature):
-        """Вставляет в БД новый объект, описание которого дается в feature
+        """ Вставить в БД новый объект, описание которого дается в feature
 
         :param feature: описание объекта
         :type feature:  dict
@@ -48,11 +48,14 @@ class IWritableFeatureLayer(IFeatureLayer):
         """
 
     def feature_delete(self, feature_id):
-        """Удаляет запись с заданным id
+        """ Удалить запись с заданным id
 
         :param feature_id: идентификатор записи
         :type feature_id:  int or bigint
         """
+
+    def feature_delete_all(self):
+        """ Удалить все записи слоя """
 
     def feature_put(self, feature):
         """ Сохранить объект в слое """

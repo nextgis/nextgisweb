@@ -367,9 +367,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         return obj.id
 
-    def feature_delete(self, feature_id=None):
-        """Удаляет запись с заданным id. В случае, если id не указан,
-        будут удалены все записи.
+    def feature_delete(self, feature_id):
+        """Удаляет запись с заданным id
 
         :param feature_id: идентификатор записи
         :type feature_id:  int or bigint
@@ -377,11 +376,16 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(tablename=self._tablename)
 
-        if feature_id is not None:
-            obj = DBSession.query(tableinfo.model).filter_by(id=feature_id).one()
-            DBSession.delete(obj)
-        else:
-            DBSession.query(tableinfo.model).delete()
+        obj = DBSession.query(tableinfo.model).filter_by(id=feature_id).one()
+
+        DBSession.delete(obj)
+
+    def feature_delete_all(self):
+        """Удаляет все записи слоя"""
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(tablename=self._tablename)
+
+        DBSession.query(tableinfo.model).delete()
 
 
 def _vector_layer_listeners(table):
