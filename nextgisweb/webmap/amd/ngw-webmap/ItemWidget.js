@@ -98,7 +98,7 @@ define([
             array.forEach(Object.keys(settings.adapters), function (key) {
                 this.wLayerAdapter.addOption({
                     value: key,
-                    label: settings.adapters[key].display_name
+                    label: i18n.gettext(settings.adapters[key].display_name)
                 });
             }, this);
 
