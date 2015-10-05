@@ -186,6 +186,13 @@ def cpost(resource, request):
         content_type=b'application/json')
 
 
+def cdelete(resource, request):
+    request.resource_permission(PERM_WRITE)
+    resource.feature_delete()
+
+    return Response(json.dumps(None), content_type=b'application/json')
+
+
 def count(resource, request):
     request.resource_permission(PERM_READ)
 
@@ -210,7 +217,8 @@ def setup_pyramid(comp, config):
         'feature_layer.feature.collection', '/api/resource/{id}/feature/',
         factory=resource_factory) \
         .add_view(cget, context=IFeatureLayer, request_method='GET') \
-        .add_view(cpost, context=IWritableFeatureLayer, request_method='POST')
+        .add_view(cpost, context=IWritableFeatureLayer, request_method='POST') \
+        .add_view(cdelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',
