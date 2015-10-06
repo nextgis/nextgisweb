@@ -68,4 +68,4 @@ class JsonPredicate(object):
     def __call__(self, context, request):
         return self.val and (
             request.accept.best_match(self.target + self.test) in self.target
-            or request.GET.get('format', None) == 'json')
+            or request.GET.get('format') == 'json')

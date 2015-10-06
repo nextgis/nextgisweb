@@ -17,11 +17,11 @@ def main(argv=sys.argv):
     argparser = ArgumentParser()
 
     argparser.add_argument(
-        '--config', default=os.environ.get('NEXTGISWEB_CONFIG', None),
+        '--config', default=os.environ.get('NEXTGISWEB_CONFIG'),
         help="Конфигурационный файл nextgisweb")
 
     argparser.add_argument(
-        '--logging', default=os.environ.get('NEXTGISWEB_LOGGING', None),
+        '--logging', default=os.environ.get('NEXTGISWEB_LOGGING'),
         help="Конфигруционный файл библиотеки logging")
 
     config = None

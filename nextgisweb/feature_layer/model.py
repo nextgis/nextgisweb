@@ -115,10 +115,10 @@ class _fields_attr(SP):
         obj.feature_label_field = None
 
         for fld in value:
-            fldid = fld.get('id', None)
+            fldid = fld.get('id')
 
             if fldid:
-                mfld = fldmap.get(fldid, None)
+                mfld = fldmap.get(fldid)
             else:
                 mfld = obj.__field_class__(
                     datatype=fld['datatype'])
