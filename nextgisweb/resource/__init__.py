@@ -75,13 +75,6 @@ class ResourceComponent(Component):
                 principal=admingrp,
                 action='allow'))
 
-            obj.acl.append(ACLRule(
-                principal=everyone,
-                scope='resource',
-                permission='delete',
-                action='deny',
-                propagate=False))
-
             obj.persist()
 
     @require('auth')

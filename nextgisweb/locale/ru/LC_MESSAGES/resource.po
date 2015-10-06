@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-28 17:06+0600\n"
+"POT-Creation-Date: 2015-10-06 12:54+0300\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -41,15 +41,19 @@ msgstr "Неизвестная ошибка '%(exception)s' в сериализ�
 msgid "Unknown exception '%(exception)s'."
 msgstr "msgstr \"Неизвестная ошибка '%(exception)s'."
 
-#: api.py:297
+#: api.py:254
+msgid "Root resource could not be deleted."
+msgstr "Корневой ресурс удалить невозможно."
+
+#: api.py:300
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:300
+#: api.py:303
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:303
+#: api.py:306
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
@@ -59,20 +63,20 @@ msgstr "Неизвестный класс ресурса '%s'."
 msgid "Resource"
 msgstr "Ресурс"
 
-#: model.py:235
+#: model.py:240
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:248
+#: model.py:253
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:276
+#: model.py:281
 #, python-format
 msgid "Resource can not be a child of resource ID=%d."
 msgstr "Ресурс не может быть дочерним ресурсом для ID=%d."
 
-#: model.py:381
+#: model.py:386
 #, python-format
 msgid ""
 "Resource display name is not unique. Resource with same name already "
@@ -81,7 +85,7 @@ msgstr ""
 "Наименование ресурса не уникально. Ресурс с таким же именем уже "
 "существует (ID=%d)."
 
-#: model.py:435
+#: model.py:440
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -322,7 +326,3 @@ msgstr "Владелец"
 #: template/section_description.mako:4
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
-
-#~ msgid "Operation"
-#~ msgstr "Операция"
-

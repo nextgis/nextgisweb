@@ -250,6 +250,9 @@ def item_delete(context, request):
 
         DBSession.delete(obj)
 
+    if context.id == 0:
+        raise ResourceError(_("Root resource could not be deleted."))
+
     with DBSession.no_autoflush:
         delete(context)
 
