@@ -169,3 +169,24 @@
    Host: ngw_url
    Accept: */*
    
+   
+Удаление всех записей
+---------------------
+
+Для удаления всех записей в векторном слое необходимо выполнить следующий запрос.
+
+.. http:delete:: /api/resource/(int:layer_id)/feature/
+
+   Запрос на удаление записей
+   
+   :param layer_id: идентификатор слоя
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   DELETE /api/resource/3/feature/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+   

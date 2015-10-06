@@ -94,6 +94,7 @@ GeoJSON, для растровых - TMS.
 .. deprecated:: 2.2    
 .. http:get:: /resource/(int:id)/tms?z=(int:z)&x=(int:x)&y=(int:y)
 
+.. versionadded:: 2.2
 .. http:get:: /api/component/render/tile?z=(int:z)&x=(int:x)&y=(int:y)&resource=(int:id1),(int:id2)...
     
     Запрос тайла
