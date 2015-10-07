@@ -26,7 +26,7 @@ requires = [
     'pillow',
     'lxml',
     'passlib',
-    'owslib',
+    'owslib>=0.9.2',
     'requests',
     'babel',
 ]
