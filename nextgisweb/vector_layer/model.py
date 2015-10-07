@@ -230,9 +230,10 @@ class TableInfo(object):
             fld_values = dict()
             for i in range(feature.GetFieldCount()):
                 fld_type = feature.GetFieldDefnRef(i).GetType()
-                fld_value = None
 
-                if fld_type == ogr.OFTInteger:
+                if not feature.IsFieldSet(i):
+                    fld_value = None
+                elif fld_type == ogr.OFTInteger:
                     fld_value = feature.GetFieldAsInteger(i)
                 elif fld_type == ogr.OFTReal:
                     fld_value = feature.GetFieldAsDouble(i)
