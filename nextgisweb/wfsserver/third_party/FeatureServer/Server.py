@@ -116,7 +116,7 @@ class Server (object):
                             datasource = self.datasources[name]
                             ds_found = True
                             break
-                        except (KeyError, IndexError):
+                        except (KeyError, IndexError, TypeError):
                             pass
 
                     if not ds_found:
