@@ -189,7 +189,7 @@ class NextgiswebDatasource(DataSource):
 
                 self.layer.feature_put(feat)
 
-                return UpdateResult(action.id, "")
+                return UpdateResult(id, "")
         except:
             raise OperationProcessingFailedException(
                         message="Can't update feature (id=%s)" % (id, ))

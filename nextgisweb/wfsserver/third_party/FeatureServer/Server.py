@@ -85,6 +85,8 @@ class Server (object):
             request.parse(params, path_info, host, post_data, request_method)
 
             version = '1.0.0'   # Default version
+            # If an action is requested (at least one), perform request processing;
+            # check exceptions otherwise
             if len(request.actions) > 0:
                 action = request.actions[0]
                 if hasattr(action, 'version') and len(action.version) > 0:
@@ -98,14 +100,30 @@ class Server (object):
                     elif action.request == "DescribeFeatureType":
                         return request.describefeaturetype(version)
 
-                transactionResponse = TransactionResponse()
-                transactionResponse.setSummary(TransactionSummary())
-
                 for action in request.actions:
+                    # Try to remove the featureserver's prefixes in name of action.layer and find the datasource name
+                    ds_found = False
                     try:
                         datasource = self.datasources[action.layer]
+                        ds_found = True
                     except KeyError:
+                        pass
+
+                    prefixes = ['fs:']
+                    for p in prefixes:
+                        try:
+                            name = action.layer[len(p):]
+                            datasource = self.datasources[name]
+                            ds_found = True
+                            break
+                        except (KeyError, IndexError):
+                            pass
+
+                    if not ds_found:
                         raise OperationParsingFailedException(message="Can't find layer '%s'" % (action.layer, ))
+
+                    transactionResponse = TransactionResponse()
+                    transactionResponse.setSummary(TransactionSummary())
 
                     try:
                         datasource.begin()
@@ -126,11 +144,11 @@ class Server (object):
                         datasource.rollback()
                         raise
 
-            if transactionResponse.summary.totalDeleted > 0 or \
-                    transactionResponse.summary.totalInserted > 0 or \
-                    transactionResponse.summary.totalUpdated > 0 or \
-                    transactionResponse.summary.totalReplaced > 0:
-                response = transactionResponse
+                if transactionResponse.summary.totalDeleted > 0 or \
+                        transactionResponse.summary.totalInserted > 0 or \
+                        transactionResponse.summary.totalUpdated > 0 or \
+                        transactionResponse.summary.totalReplaced > 0:
+                    response = transactionResponse
 
         except ConnectionException as e:
             exceptionReport.add(e)
