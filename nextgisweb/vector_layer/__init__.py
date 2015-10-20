@@ -20,7 +20,6 @@ class VectorLayerBackup(BackupBase):
         tableinfo.metadata.create_all(conn)
 
 
-@Component.registry.register
 class VectorLayerComponent(Component):
     identity = 'vector_layer'
     metadata = Base.metadata

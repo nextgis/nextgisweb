@@ -7,7 +7,6 @@ from .model import Base
 __all__ = ['FeatureAttachmentComponent', ]
 
 
-@Component.registry.register
 class FeatureAttachmentComponent(Component):
     identity = 'feature_attachment'
     metadata = Base.metadata

@@ -17,7 +17,6 @@ from .interface import (
 from .extension import FeatureExtension
 
 
-@Component.registry.register
 class FeatureLayerComponent(Component):
     identity = 'feature_layer'
     metadata = Base.metadata

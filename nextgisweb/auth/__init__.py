@@ -12,7 +12,6 @@ from .util import _
 __all__ = ['Principal', 'User', 'Group']
 
 
-@Component.registry.register
 class AuthComponent(Component):
     identity = 'auth'
     metadata = Base.metadata

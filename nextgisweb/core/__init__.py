@@ -15,7 +15,6 @@ from .command import BackupCommand  # NOQA
 from .backup import BackupBase, TableBackup, SequenceBackup  # NOQA
 
 
-@Component.registry.register
 class CoreComponent(Component):
     identity = 'core'
 

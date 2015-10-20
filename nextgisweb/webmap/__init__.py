@@ -13,7 +13,6 @@ from .adapter import WebMapAdapter
 from .util import _
 
 
-@Component.registry.register
 class WebMapComponent(Component):
     identity = 'webmap'
     metadata = Base.metadata
