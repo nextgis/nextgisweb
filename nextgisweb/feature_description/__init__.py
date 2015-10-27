@@ -8,7 +8,6 @@ from .model import Base, FeatureDescription
 __all__ = ['FeatureDescriptionComponent', 'FeatureDescription']
 
 
-@Component.registry.register
 class FeatureDescriptionComponent(Component):
     identity = 'feature_description'
     metadata = Base.metadata

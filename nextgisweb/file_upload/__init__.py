@@ -8,7 +8,6 @@ from . import command  # NOQA
 __all__ = ["FileUploadComponent", ]
 
 
-@Component.registry.register
 class FileUploadComponent(Component):
     identity = 'file_upload'
 

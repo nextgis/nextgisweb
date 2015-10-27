@@ -6,7 +6,17 @@ from .registry import registry_maker
 from .package import pkginfo
 
 
+class ComponentMeta(type):
+
+    def __init__(cls, name, bases, nmspc):
+        super(ComponentMeta, cls).__init__(name, bases, nmspc)
+        abstract = getattr(cls, '__abstract__', False)
+        if cls.identity and not abstract:
+            cls.registry.register(cls)
+
+
 class Component(object):
+    __metaclass__ = ComponentMeta
 
     identity = None
     """ Идентификатор компонента, который должен быть переопределен в дочернем

@@ -33,7 +33,6 @@ class FileObjBackup(BackupBase):
                 copyfileobj(self.binfd, fd)
 
 
-@Component.registry.register
 class FileStorageComponent(Component):
     identity = 'file_storage'
     metadata = Base.metadata

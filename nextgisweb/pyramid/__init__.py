@@ -75,7 +75,6 @@ class ExtendedConfigurator(Configurator):
         super(ExtendedConfigurator, self).add_view(view=view, **kwargs)
 
 
-@Component.registry.register
 class PyramidComponent(Component):
     identity = 'pyramid'
 

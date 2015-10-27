@@ -19,7 +19,6 @@ __all__ = [
 ]
 
 
-@Component.registry.register
 class RenderComponent(Component):
     identity = 'render'
 

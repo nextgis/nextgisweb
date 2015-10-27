@@ -5,7 +5,6 @@ from .model import Base, PostgisConnection, PostgisLayer
 __all__ = ['PostgisConnection', 'PostgisLayer']
 
 
-@Component.registry.register
 class PostgisComponent(Component):
     identity = 'postgis'
     metadata = Base.metadata

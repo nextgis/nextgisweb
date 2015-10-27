@@ -5,7 +5,6 @@ from .model import Base, Connection, Layer, WMS_VERSIONS
 __all__ = ['Connection', 'Layer']
 
 
-@Component.registry.register
 class WMSClientComponent(Component):
     identity = 'wmsclient'
     metadata = Base.metadata

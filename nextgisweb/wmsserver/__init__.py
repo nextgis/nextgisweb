@@ -5,7 +5,6 @@ from .model import Base, Service
 __all__ = ['Service', ]
 
 
-@Component.registry.register
 class WMSServerComponent(Component):
     identity = 'wmsserver'
     metadata = Base.metadata

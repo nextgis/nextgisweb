@@ -6,7 +6,6 @@ from .model import Base, RasterLayer
 __all__ = ['RasterLayerComponent', 'RasterLayer']
 
 
-@Component.registry.register
 class RasterLayerComponent(Component):
     identity = 'raster_layer'
     metadata = Base.metadata

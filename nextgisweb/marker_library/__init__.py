@@ -14,7 +14,6 @@ __all__ = [
 ]
 
 
-@Component.registry.register
 class MarkerLibraryComponent(Component):
     identity = 'marker_library'
     metadata = Base.metadata

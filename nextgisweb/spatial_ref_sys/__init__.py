@@ -8,7 +8,6 @@ from .models import Base, SRS, SRSMixin
 __all__ = ['SpatialRefSysComponent', 'SRS', 'SRSMixin']
 
 
-@Component.registry.register
 class SpatialRefSysComponent(Component):
     identity = 'spatial_ref_sys'
     metadata = Base.metadata

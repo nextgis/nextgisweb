@@ -39,7 +39,6 @@ __all__ = [
 ]
 
 
-@Component.registry.register
 class ResourceComponent(Component):
     identity = 'resource'
     metadata = Base.metadata
