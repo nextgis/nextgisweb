@@ -50,6 +50,7 @@ def handler(obj, request):
         'typenames': params.get('TYPENAMES'),   # WFS 2.0.0
         'srsname': params.get('SRSNAME'),
         'version': params.get('VERSION'),
+        'acceptversions': params.get('ACCEPTVERSIONS'),  # WFS 2.0.0 GetCapabilities
         'maxfeatures': params.get('MAXFEATURES'),   # WFS 1.0.0
         'count': params.get('COUNT'),               # WFS 2.0.0
         'startfeature': params.get('STARTFEATURE'),
@@ -59,6 +60,10 @@ def handler(obj, request):
     }
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key: params[key] for key in params if params[key] is not None}
+
+    # Change 'acceptversions' to 'version', it allows use the code without change
+    if 'acceptversions' in params:
+        params['version'] = params['acceptversions']
 
     datasources = {
         l.keyname: NextgiswebDatasource(
