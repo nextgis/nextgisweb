@@ -15,6 +15,7 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
 .dijitTableLayout tr td.tableContainer-labelCell:first-child { padding-left: 2px; }
 .dijitTableLayout tr td.tableContainer-valueCell:last-child { padding-right: 2px; }
 
+.dijitTabContainerTopChildWrapper.dijitVisible { height: 100%; }
 
 .CodeMirror { font-size: 12px; border: 1px solid #eee; }
 
