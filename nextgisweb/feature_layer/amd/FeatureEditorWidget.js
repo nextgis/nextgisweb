@@ -176,7 +176,7 @@ define([
 
     var FieldsWidget = declare([TableContainer], {
         title: i18n.gettext("Attributes"),
-        style: "padding: 1ex; height: 100%;",
+        style: "padding: 1ex; box-sizing: border-box; height: 100%; overflow: auto;",
         labelWidth: "20%",
 
         buildRendering: function () {
