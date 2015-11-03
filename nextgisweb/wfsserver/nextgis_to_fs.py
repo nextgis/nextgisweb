@@ -192,7 +192,7 @@ class NextgiswebDatasource(DataSource):
                 return UpdateResult(id, "")
         except:
             raise OperationProcessingFailedException(
-                        message="Can't update feature (id=%s)" % (id, ))
+                        message="Can't update feature (data=%s)" % (data, ))
 
         return None
 
@@ -238,11 +238,17 @@ class NextgiswebDatasource(DataSource):
         if action.wfsrequest is not None:
             try:
                 data = action.wfsrequest.getStatement(self)
-                for id in geojson.loads(data):
+                data = geojson.loads(data)
+                for id in data:
                     self.layer.feature_delete(id)
             except:
                 raise OperationProcessingFailedException(
                     message="Can't delete feature (id=%s)" % (id, ))
+
+            if len(data) == 0:
+                raise OperationProcessingFailedException(
+                    message="Empty list of Feature-id is recieved. Check format of the transaction."
+                )
 
             return DeleteResult(action.id, "")
 
