@@ -5,9 +5,10 @@ define([
 	"dojo/_base/lang",
 	"dojo/has",
 	"put-selector/put",
+	"./util/misc",
 	"dojo/_base/Deferred",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, lang, has, put, Deferred){
+], function(declare, aspect, on, lang, has, put, miscUtil, Deferred){
 
 var delegatingInputTypes = {
 		checkbox: 1,
@@ -16,21 +17,6 @@ var delegatingInputTypes = {
 	},
 	hasGridCellClass = /\bdgrid-cell\b/,
 	hasGridRowClass = /\bdgrid-row\b/;
-
-has.add("dom-contains", function(global, doc, element){
-	return !!element.contains; // not supported by FF < 9
-});
-
-function contains(parent, node){
-	// summary:
-	//		Checks to see if an element is contained by another element.
-	
-	if(has("dom-contains")){
-		return parent.contains(node);
-	}else{
-		return parent.compareDocumentPosition(node) & 8 /* DOCUMENT_POSITION_CONTAINS */;
-	}
-}
 
 var Keyboard = declare(null, {
 	// summary:
@@ -85,10 +71,25 @@ var Keyboard = declare(null, {
 					grid._focusedHeaderNode.tabIndex = -1;
 				}
 				if(grid.showHeader){
+					if(cellNavigation){
+						// Get the focused element. Ensure that the focused element
+						// is actually a grid cell, not a column-set-cell or some
+						// other cell that should not be focused
+						for(var i = 0, element, elements = grid.headerNode.getElementsByTagName("th"); (element = elements[i]); ++i){
+							if(isFocusableClass.test(element.className)){
+								grid._focusedHeaderNode = initialNode = element;
+								break;
+							}
+						}
+					}
+					else{
+						grid._focusedHeaderNode = initialNode = grid.headerNode;
+					}
+
 					// Set the tab index only if the header is visible.
-					grid._focusedHeaderNode = initialNode =
-						cellNavigation ? grid.headerNode.getElementsByTagName("th")[0] : grid.headerNode;
-					if(initialNode){ initialNode.tabIndex = grid.tabIndex; }
+					if(initialNode){
+						initialNode.tabIndex = grid.tabIndex;
+					}
 				}
 			}
 			
@@ -107,7 +108,7 @@ var Keyboard = declare(null, {
 						var focusedNode = grid._focusedNode || initialNode;
 						
 						// do not update the focused element if we already have a valid one
-						if(isFocusableClass.test(focusedNode.className) && contains(areaNode, focusedNode)){
+						if(isFocusableClass.test(focusedNode.className) && miscUtil.contains(areaNode, focusedNode)){
 							return ret;
 						}
 						
@@ -156,6 +157,8 @@ var Keyboard = declare(null, {
 			});
 		}
 		enableNavigation(this.contentNode);
+		
+		this._debouncedEnsureRowScroll = miscUtil.debounce(this._ensureRowScroll, this);
 	},
 	
 	removeRow: function(rowElement){
@@ -221,7 +224,8 @@ var Keyboard = declare(null, {
 		//		previously removed row, or to the nearest sibling otherwise.
 		
 		var focusInfo = this._removedFocus,
-			newTarget;
+			newTarget,
+			cell;
 		
 		row = row && this.row(row);
 		newTarget = row && row.element && row.id === focusInfo.rowId ? row :
@@ -235,16 +239,22 @@ var Keyboard = declare(null, {
 				focusInfo.wait = true;
 				return;
 			}
-			newTarget = typeof focusInfo.columnId !== "undefined" ?
-				this.cell(newTarget, focusInfo.columnId) : newTarget;
-			if(focusInfo.active){
-				// Row/cell was previously focused, so focus the new one immediately
-				this.focus(newTarget);
-			}else if(newTarget.element){
-				// Row/cell was not focused, but we still need to update tabIndex
-				// and the element's class to be consistent with the old one
+			// Should focus be on a cell?
+			if(typeof focusInfo.columnId !== "undefined"){
+				cell = this.cell(newTarget, focusInfo.columnId);
+				if(cell && cell.element){
+					newTarget = cell;
+				}
+			}
+			if(focusInfo.active && newTarget.element.offsetHeight !== 0){
+				// Row/cell was previously focused and is visible, so focus the new one immediately
+				this._focusOnNode(newTarget, false, null);
+			}else{
+				// Row/cell was not focused or is not visible, but we still need to
+				// update _focusedNode and the element's tabIndex/class
 				put(newTarget.element, ".dgrid-focus");
 				newTarget.element.tabIndex = this.tabIndex;
+				this._focusedNode = newTarget.element;
 			}
 		}
 		
@@ -269,6 +279,22 @@ var Keyboard = declare(null, {
 			this[isHeader ? "headerKeyMap" : "keyMap"], key, callback, true);
 	},
 	
+	_ensureRowScroll: function(rowElement){
+		// summary:
+		//		Ensures that the entire row is visible within the viewport.
+		//		Called for cell navigation in complex structures.
+
+		var scrollY = this.getScrollPosition().y;
+		if(scrollY > rowElement.offsetTop){
+			// Row starts above the viewport
+			this.scrollTo({ y: rowElement.offsetTop });
+		}
+		else if(scrollY + this.contentNode.offsetHeight < rowElement.offsetTop + rowElement.offsetHeight){
+			// Row ends below the viewport
+			this.scrollTo({ y: rowElement.offsetTop - this.contentNode.offsetHeight + rowElement.offsetHeight });
+		}
+	},
+	
 	_focusOnNode: function(element, isHeader, event){
 		var focusedNodeProperty = "_focused" + (isHeader ? "Header" : "") + "Node",
 			focusedNode = this[focusedNodeProperty],
@@ -287,7 +313,7 @@ var Keyboard = declare(null, {
 			inputs = element.getElementsByTagName("input");
 			for(i = 0, numInputs = inputs.length; i < numInputs; i++){
 				input = inputs[i];
-				if((input.tabIndex != -1 || "lastValue" in input) && !input.disabled){
+				if((input.tabIndex != -1 || "_dgridLastValue" in input) && !input.disabled){
 					// Employ workaround for focus rectangle in IE < 8
 					if(has("ie") < 8){ input.style.position = "relative"; }
 					input.focus();
@@ -298,15 +324,20 @@ var Keyboard = declare(null, {
 			}
 		}
 		
-		event = lang.mixin({ grid: this }, event);
-		if(event.type){
-			event.parentType = event.type;
+		// Set up event information for dgrid-cellfocusout/in events.
+		// Note that these events are not fired for _restoreFocus.
+		if(event !== null){
+			event = lang.mixin({ grid: this }, event);
+			if(event.type){
+				event.parentType = event.type;
+			}
+			if(!event.bubbles){
+				// IE doesn't always have a bubbles property already true.
+				// Opera throws if you try to set it to true if it is already true.
+				event.bubbles = true;
+			}
 		}
-		if(!event.bubbles){
-			// IE doesn't always have a bubbles property already true.
-			// Opera throws if you try to set it to true if it is already true.
-			event.bubbles = true;
-		}
+		
 		if(focusedNode){
 			// Clean up previously-focused element
 			// Remove the class name and the tabIndex attribute
@@ -318,18 +349,23 @@ var Keyboard = declare(null, {
 			
 			// Expose object representing focused cell or row losing focus, via
 			// event.cell or event.row; which is set depends on cellNavigation.
-			event[cellOrRowType] = this[cellOrRowType](focusedNode);
-			on.emit(element, "dgrid-cellfocusout", event);
+			if(event){
+				event[cellOrRowType] = this[cellOrRowType](focusedNode);
+				on.emit(focusedNode, "dgrid-cellfocusout", event);
+			}
 		}
 		focusedNode = this[focusedNodeProperty] = element;
 		
-		// Expose object representing focused cell or row gaining focus, via
-		// event.cell or event.row; which is set depends on cellNavigation.
-		// Note that yes, the same event object is being reused; on.emit
-		// performs a shallow copy of properties into a new event object.
-		event[cellOrRowType] = cell;
+		if(event){
+			// Expose object representing focused cell or row gaining focus, via
+			// event.cell or event.row; which is set depends on cellNavigation.
+			// Note that yes, the same event object is being reused; on.emit
+			// performs a shallow copy of properties into a new event object.
+			event[cellOrRowType] = cell;
+		}
 		
-		if(!inputFocused){
+		var isFocusableClass = this.cellNavigation ? hasGridCellClass : hasGridRowClass;
+		if(!inputFocused && isFocusableClass.test(element.className)){
 			if(has("ie") < 8){
 				// setting the position to relative magically makes the outline
 				// work properly for focusing later on with old IE.
@@ -340,7 +376,14 @@ var Keyboard = declare(null, {
 			element.focus();
 		}
 		put(element, ".dgrid-focus");
-		on.emit(focusedNode, "dgrid-cellfocusin", event);
+		
+		if(event){
+			on.emit(focusedNode, "dgrid-cellfocusin", event);
+		}
+		
+		if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
+			this._debouncedEnsureRowScroll(cell.row.element);
+		}
 	},
 	
 	focusHeader: function(element){
@@ -348,7 +391,12 @@ var Keyboard = declare(null, {
 	},
 	
 	focus: function(element){
-		this._focusOnNode(element || this._focusedNode, false);
+		var node = element || this._focusedNode;
+		if(node){
+			this._focusOnNode(node, false);
+		}else{
+			this.contentNode.focus();
+		}
 	}
 });
 
