@@ -442,7 +442,7 @@ Vector (mapserver) style
 
    {"id": 24, "parent": {"id": 0}}
     
-Стили подробнее рассмотрены в подразделе ":ref:`maplayers`".
+Стили подробнее рассмотрены в подразделе ":ref:`ngweb_style_create`".
     
 Raster style
 ------------
