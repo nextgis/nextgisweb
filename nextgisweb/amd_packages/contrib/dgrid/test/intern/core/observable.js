@@ -2,12 +2,14 @@ define([
 	"intern!tdd",
 	"intern/chai!assert",
 	"dojo/_base/declare",
+	"dojo/aspect",
+	"dojo/dom-class",
 	"dojo/query",
 	"dojo/store/Memory",
 	"dojo/store/Observable",
 	"dgrid/OnDemandList",
 	"put-selector/put"
-], function(test, assert, declare, query, Memory, Observable, OnDemandList, put){
+], function(test, assert, declare, aspect, domClass, query, Memory, Observable, OnDemandList, put){
 
 	var widget,
 		storeCounter = 0;
@@ -23,11 +25,15 @@ define([
 		return (index + 1) * 10;
 	}
 
+	function createItem(index){
+		var id = indexToId(index);
+		return {id: id, value: "Value " + id + " / Store " + storeCounter};
+	}
+
 	function createData(numStoreItems){
 		var data = [];
 		for(var i = 0; i < numStoreItems; i++){
-			var id = indexToId(i);
-			data.push({id: id, value: "Value " + id + " / Store " + storeCounter});
+			data.push(createItem(i));
 		}
 		return data;
 	}
@@ -39,7 +45,7 @@ define([
 		}));
 	}
 
-	function createList(numStoreItems, itemsPerQuery, overlap){
+	function createList(numStoreItems, itemsPerQuery, overlap, shouldObserveStore){
 		widget = new OnDemandList({
 			store: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
@@ -48,6 +54,7 @@ define([
 			renderRow: function(object){
 				return put("div", object.value);
 			},
+			shouldObserveStore: shouldObserveStore !== false,
 			sort: "id"
 		});
 		document.body.appendChild(widget.domNode);
@@ -104,7 +111,7 @@ define([
 
 			// Query the DOM to verify the structure matches the expected results.
 			msgPrefix = "DOM query: ";
-			query(widget.columns ? ".dgrid-content .field-value" : ".dgrid-row", widget.domNode).forEach(testRow);
+			query(".dgrid-row", widget.domNode).forEach(testRow);
 		});
 	}
 
@@ -159,6 +166,54 @@ define([
 			// Test with OnDemandList with varying overlap values
 			for(var overlap = 0; overlap <= config.itemOverlapMax; overlap++){
 				itemTestSuite("OnDemandList multiple queries", storeSize, config.itemsPerQuery, overlap, config);
+			}
+		});
+	}
+
+	function itemAddEmptyStoreTest(itemsToAddCount, itemsPerQuery, overlap){
+		var i;
+
+		function rowHasClass(rowNode, cssClass){
+			assert.isTrue(domClass.contains(rowNode, cssClass), rowNode.outerHTML + " should have " + cssClass);
+		}
+
+		test.test("Add " + itemsToAddCount + " items with " + overlap + " overlap", function(){
+			createList(0, itemsPerQuery, overlap);
+			var store = widget.store;
+			for(i = 0; i < itemsToAddCount; i++){
+				store.put(createItem(i));
+			}
+
+			var rows = query(".dgrid-content > div", widget.domNode);
+			rowHasClass(rows[0], "dgrid-preload");
+			for(i = 1; i <= itemsToAddCount; i++){
+				rowHasClass(rows[i], (i % 2) ? "dgrid-row-even" : "dgrid-row-odd");
+			}
+			rowHasClass(rows[i], "dgrid-preload");
+
+			for(i = 0; i < itemsToAddCount; i++){
+				store.put(createItem(i));
+			}
+
+			rows = query(".dgrid-content > div", widget.domNode);
+			rowHasClass(rows[0], "dgrid-preload");
+			for(i = 1; i <= itemsToAddCount; i++){
+				rowHasClass(rows[i], (i % 2) ? "dgrid-row-even" : "dgrid-row-odd");
+			}
+			rowHasClass(rows[i], "dgrid-preload");
+		});
+	}
+
+	function itemAddEmptyStoreTestSuite(config){
+		test.suite("Add items to empty store", function(){
+
+			test.afterEach(destroyWidget);
+
+			itemAddEmptyStoreTest(1, config.itemsPerQuery, 0);
+
+			// Test with OnDemandList with varying overlap values
+			for(var overlap = 0; overlap <= config.itemOverlapMax; overlap++){
+				itemAddEmptyStoreTest(config.itemsPerQuery + overlap + 1, config.itemsPerQuery, overlap);
 			}
 		});
 	}
@@ -232,5 +287,67 @@ define([
 		itemActionTestSuite("Remove store items", removeAction, config);
 		itemActionTestSuite("Insert store items before", addBeforeAction, config);
 		itemActionTestSuite("Insert store items after", addAfterAction, config);
+
+		itemAddEmptyStoreTestSuite(config);
+	});
+
+	test.suite("shouldObserveStore = false + store modifications", function () {
+		var numItems = 3;
+		var store;
+		var handles = [];
+
+		test.before(function () {
+			createList(numItems, 25, 0, false);
+		});
+
+		test.beforeEach(function () {
+			store = createStore(numItems);
+			widget.set("store", store);
+		});
+
+		test.afterEach(function () {
+			for (var i = handles.length; i--;) {
+				handles[i].remove();
+			}
+			handles = [];
+		});
+
+		test.after(destroyWidget);
+
+		function countRows() {
+			var count = query(".dgrid-row", widget.contentNode).length;
+			return count;
+		}
+
+		test.test("shouldObserveStore = false + add", function () {
+			var numRows = countRows();
+			store.add(createItem(3));
+			assert.strictEqual(countRows(), numRows);
+		});
+
+		test.test("shouldObserveStore = false + put", function () {
+			var numRows = countRows();
+			var calls = 0;
+
+			handles.push(aspect.before(widget, "insertRow", function () {
+				calls++;
+			}));
+			handles.push(aspect.before(widget, "removeRow", function () {
+				calls++;
+			}));
+
+			for (var i = 0; i < numItems; i++) {
+				store.put(store.get(indexToId(i)));
+			}
+			assert.strictEqual(calls, 0, "insertRow and removeRow should not be called");
+		});
+
+		test.test("shouldObserveStore = false + remove", function () {
+			var numRows = countRows();
+			for (var i = 0; i < numItems; i++) {
+				store.remove(indexToId(i));
+			}
+			assert.strictEqual(countRows(), numRows);
+		});
 	});
 });

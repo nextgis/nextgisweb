@@ -66,8 +66,8 @@ define([
 			
 			grid = new (declare([OnDemandGrid, SelectionMixin]))({
 				columns: getColumns(),
-				store: store,
-				sort: "id"
+				sort: "id",
+				store: store
 			});
 			
 			document.body.appendChild(grid.domNode);
@@ -174,6 +174,7 @@ define([
 				}));
 			
 			grid = new (declare([Grid, SelectionMixin, Pagination]))({
+				sort: "id",
 				store: store,
 				columns: getColumns()
 			});
@@ -261,8 +262,8 @@ define([
 			
 			grid = new (declare([OnDemandGrid, SelectionMixin]))({
 				columns: getColumns(),
-				store: store,
-				sort: "id"
+				sort: "id",
+				store: store
 			});
 			
 			document.body.appendChild(grid.domNode);
@@ -408,8 +409,8 @@ define([
 			
 			grid = new (declare([OnDemandGrid, SelectionMixin]))({
 				columns: getColumns(),
-				store: store,
-				sort: "id"
+				sort: "id",
+				store: store
 			});
 			
 			document.body.appendChild(grid.domNode);
@@ -467,5 +468,86 @@ define([
 		for(var name in notificationTests){
 			test.test(name, notificationTests[name]);
 		}
+	});
+	
+	test.suite("Selection events", function(){
+		var store = new Observable(new Memory({
+			data: _createTestData()
+		}));
+		var handles = [];
+		
+		test.beforeEach(function () {
+			grid = new (declare([OnDemandGrid, Selection]))({
+				columns: getColumns(),
+				sort: "id",
+				store: store
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+		
+		test.afterEach(function(){
+			grid.destroy();
+			for (var i = handles.length; i--;) {
+				handles[i].remove();
+			}
+			handles = [];
+		});
+		
+		test.test("programmatic row deselection event", function() {
+			var lastEventType,
+				expectedEventType = "dgrid-deselect",
+				eventCount = 0;
+			
+			grid.select("1");
+			
+			// Intentionally check for both select and deselect events -
+			// we should only receive a single deselect event
+			grid.on("dgrid-select, dgrid-deselect", function (event) {
+				lastEventType = event.type;
+				eventCount++;
+			});
+			
+			grid.deselect("1");
+			grid.deselect("1");
+			
+			assert.equal(eventCount, 1);
+			assert.equal(expectedEventType, lastEventType);
+		});
+
+		test.test("programmatic row selection event", function() {
+			var lastEventType,
+				expectedEventType = "dgrid-select",
+				eventCount = 0;
+			
+			grid.on("dgrid-select, dgrid-deselect", function (event) {
+				lastEventType = event.type;
+				eventCount++;
+			});
+			
+			grid.select("1");
+			grid.select("1");
+			
+			assert.equal(eventCount, 1);
+			assert.equal(expectedEventType, lastEventType);
+		});
+		
+		test.test("clearSelection() within event handler", function () {
+			var dfd = this.async();
+			var numCalls = 0;
+			handles.push(grid.on("dgrid-select", dfd.rejectOnError(function (event) {
+				numCalls++;
+				assert.isTrue(numCalls < 2, "dgrid-select handler should only fire once");
+				// clearSelection will cause selection events to be fired,
+				// but that should not include the originally-queued event
+				grid.clearSelection();
+			})));
+			
+			grid.select("1");
+			
+			// Since this test passes on 1 event firing but fails on multiple,
+			// resolve on a small timeout (since failure will occur instantaneously)
+			setTimeout(function () { dfd.resolve(); }, 100);
+		});
 	});
 });

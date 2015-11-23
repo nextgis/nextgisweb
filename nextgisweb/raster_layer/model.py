@@ -90,7 +90,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         else:
             cmd = ['gdal_translate', '-of', 'GTiff']
 
-        cmd.extend(('-co', 'TILED=YES', filename, dst_file))
+        cmd.extend(('-co', 'TILED=YES',
+                    '-co', 'BIGTIFF=YES', filename, dst_file))
         subprocess.check_call(cmd)
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)

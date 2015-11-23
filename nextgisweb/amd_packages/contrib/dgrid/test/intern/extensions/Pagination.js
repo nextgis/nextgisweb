@@ -8,11 +8,10 @@ define([
 	"put-selector/put",
 	"dgrid/Grid",
 	"dgrid/extensions/Pagination",
-	"dojo/domReady!",
-	"dgrid/test/data/base"
-], function(test, assert, declare, on, query, string, put, Grid, Pagination){
+	"dgrid/test/data/base",
+	"dojo/domReady!"
+], function(test, assert, declare, on, query, string, put, Grid, Pagination, testStore){
 	var grid,
-		handles = [],
 		PaginationGrid = declare([Grid, Pagination]);
 
 	function getColumns(){
@@ -27,6 +26,7 @@ define([
 	test.suite("Pagination", function(){
 		test.before(function(){
 			grid = new PaginationGrid({
+				sort: "id",
 				store: testStore,
 				columns: getColumns()
 			});
@@ -43,26 +43,27 @@ define([
 			var disabledLinks = query("span.dgrid-page-disabled", grid.paginationLinksNode),
 				expectedText = string.substitute(grid.i18nPagination.status,
 					{ start: 1, end: 10, total: 100 });
-			
-			assert.strictEqual(grid.paginationStatusNode.innerHTML, expectedText,
-				"should find expected status message; received '" + status + "'");
-			assert.strictEqual(disabledLinks.length, 1,
-				"should find expected number of disabled page links: found " +
-				disabledLinks.length);
-			assert.strictEqual(string.trim(disabledLinks[0].innerHTML), "1",
-				"link for active page (1) should be disabled");
-			
+
+			function testPaginationAssertions(expectedPage) {
+				assert.strictEqual(grid.paginationStatusNode.innerHTML, expectedText,
+					"should find expected status message; received '" + status + "'");
+				assert.strictEqual(disabledLinks.length, 1,
+					"should find expected number of disabled page links: found " +
+					disabledLinks.length);
+				assert.strictEqual(string.trim(disabledLinks[0].innerHTML), expectedPage,
+					"link for active page ("+expectedPage+") should be disabled");
+				for(var i = 0; i < disabledLinks.length; i++) {
+					assert.equal(disabledLinks[i].tabIndex, -1, "disabled link should have -1 tabIndex");
+				}
+			}
+
+			testPaginationAssertions("1");
+
 			grid.gotoPage(2);
 			disabledLinks = query("span.dgrid-page-disabled", grid.paginationLinksNode);
 			expectedText = string.substitute(grid.i18nPagination.status, {start: 11, end: 20, total: 100});
-			
-			assert.strictEqual(grid.paginationStatusNode.innerHTML, expectedText,
-				"should find expected status message; received '" + status + "'");
-			assert.strictEqual(disabledLinks.length, 1,
-				"should find expected number of disabled page links: found " +
-				disabledLinks.length);
-			assert.strictEqual(string.trim(disabledLinks[0].innerHTML), "2",
-				"link for active page (2) should be disabled");
+
+			testPaginationAssertions("2");
 		});
 	});
 	
@@ -74,6 +75,7 @@ define([
 		
 		test.test("pageSizeOptions + unique rowsPerPage during creation", function(){
 			grid = new PaginationGrid({
+				sort: "id",
 				store: testStore,
 				columns: getColumns(),
 				// Purposely set pageSizeOptions out of order to test setter
@@ -101,6 +103,7 @@ define([
 
 		test.test("pageSizeOptions added after creation", function(){
 			grid = new PaginationGrid({
+				sort: "id",
 				store: testStore,
 				columns: getColumns(),
 				rowsPerPage: 10
@@ -127,6 +130,7 @@ define([
 	test.suite("Pagination size selector", function(){
 		test.before(function(){
 			grid = new PaginationGrid({
+				sort: "id",
 				store: testStore,
 				columns: getColumns(),
 				pageSizeOptions: [5, 10, 15]
