@@ -26,7 +26,7 @@ class PkgInfo(object):
         epoints = pkg_resources.iter_entry_points(group='nextgisweb.packages')
         for epoint in epoints:
             pkginfo = epoint.load()()
-            components = pkginfo['components']
+            components = pkginfo.get('components', dict())
             for (comp, modname) in components.iteritems():
                 package = modname.split('.')[0]
                 self._mod_comp[modname] = comp
