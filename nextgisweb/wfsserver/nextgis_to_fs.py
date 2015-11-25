@@ -180,8 +180,10 @@ class NextgiswebDatasource(DataSource):
                 feat = result.one()
                 for field_name in feat.fields:
                     if data.has_key(field_name):
-                        feat.fields[field_name] = data[field_name]
-
+                        if data[field_name] == '':
+                            feat.fields[field_name] = None
+                        else:
+                            feat.fields[field_name] = data[field_name]
                 # Обновление геометрии, если нужно:
                 if data.has_key('geom'):
                     geom = self._geom_from_gml(data['geom'])
