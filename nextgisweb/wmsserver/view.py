@@ -115,7 +115,7 @@ def _get_capabilities(obj, request):
 
     capability.append(layer)
 
-    xml = E.WMS_Capabilities(
+    xml = E.WMT_MS_Capabilities(
         dict(version='1.1.1'),
         service, capability)
 
