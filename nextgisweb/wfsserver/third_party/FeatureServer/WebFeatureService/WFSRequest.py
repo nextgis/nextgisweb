@@ -78,6 +78,53 @@ class WFSRequest(object):
 
         return [action]
 
+    def _get_BBOX_100(self, bbox):
+        corners = bbox.xpath("//*[local-name() = 'coordinates']")
+        if len(corners) != 1:
+            raise OperationParsingFailedException(
+                message="Can't parse 'lowerCorner' paramether of GetFeature request")
+        corners = corners[0].text
+        ll, ru = corners.split()
+
+        maxy, maxx = ru.split(',')
+        miny, minx = ll.split(',')
+
+        bbox_param = dict(coords=[minx, miny, maxx, maxy])
+
+        envelope = bbox.xpath("//*[local-name() = 'Box']")
+        if len(envelope) == 1:
+            envelope = envelope[0]
+            if 'srsName' in envelope.attrib:
+                bbox_param['SRS'] = envelope.attrib['srsName']
+
+        return bbox_param
+
+
+    def _get_BBOX_200(self, bbox):
+        lc = bbox.xpath("//*[local-name() = 'lowerCorner']")
+        if len(lc) != 1:
+            raise OperationParsingFailedException(
+                message="Can't parse 'lowerCorner' paramether of GetFeature request")
+        lc = lc[0].text
+        miny, minx = lc.split()
+
+        uc = bbox.xpath("//*[local-name() = 'upperCorner']")
+        if len(uc) != 1:
+            raise OperationParsingFailedException(
+                message="Can't parse 'upperCorner' paramether of GetFeature request")
+        uc = uc[0].text
+        maxy, maxx = uc.split()
+
+        bbox_param = dict(coords=[minx, miny, maxx, maxy])
+
+        envelope = bbox.xpath("//*[local-name() = 'Envelope']")
+        if len(envelope) == 1:
+            envelope = envelope[0]
+            if 'srsName' in envelope.attrib:
+                bbox_param['SRS'] = envelope.attrib['srsName']
+
+        return bbox_param
+
     def getFeatureParams(self):
         '''Return GetFeature action
         '''
@@ -111,29 +158,10 @@ class WFSRequest(object):
                 message="Several BBOX statements has found")
         elif len(bbox) == 1:
             bbox = bbox[0]
-
-            lc = bbox.xpath("//*[local-name() = 'lowerCorner']")
-            if len(lc) != 1:
-                raise OperationParsingFailedException(
-                    message="Can't parse 'lowerCorner' paramether of GetFeature request")
-            lc = lc[0].text
-            miny, minx = lc.split()
-
-            uc = bbox.xpath("//*[local-name() = 'upperCorner']")
-            if len(uc) != 1:
-                raise OperationParsingFailedException(
-                    message="Can't parse 'upperCorner' paramether of GetFeature request")
-            uc = uc[0].text
-            maxy, maxx = uc.split()
-
-            bbox_param = dict(coords=[minx, miny, maxx, maxy])
-
-            envelope = bbox.xpath("//*[local-name() = 'Envelope']")
-            if len(envelope) == 1:
-                envelope = envelope[0]
-                if 'srsName' in envelope.attrib:
-                    bbox_param['SRS'] = envelope.attrib['srsName']
-
+            if params['version'] == u'1.0.0':
+                bbox_param = self._get_BBOX_100(bbox)
+            else:
+                bbox_param = self._get_BBOX_200(bbox)
             params['bbox'] = bbox_param
 
         return params
@@ -198,6 +226,6 @@ class WFSRequest(object):
             return None
 
         if self.isGetCapabilities():
-            return self.get_capabilities()
+            return self.getCapabilitiesAction()
         else:
             return self.get_transactions()
