@@ -86,8 +86,8 @@ class WFSRequest(object):
         corners = corners[0].text
         ll, ru = corners.split()
 
-        maxy, maxx = ru.split(',')
-        miny, minx = ll.split(',')
+        maxx, maxy = ru.split(',')
+        minx, miny = ll.split(',')
 
         bbox_param = dict(coords=[minx, miny, maxx, maxy])
 
