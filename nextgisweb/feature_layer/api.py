@@ -51,7 +51,7 @@ def view_geojson(request):
     query = request.context.feature_query()
     query.geom()
 
-    content_disposition = ('attachment; filename=%d.geojson'
+    content_disposition = (b'attachment; filename=%d.geojson'
                            % request.context.id)
 
     result = CRSProxy(query())
@@ -82,7 +82,12 @@ def view_csv(request):
         datarow.append(feature.geom.wkt)
         writer.writerow(datarow)
 
-    return Response(buf.getvalue(), content_type=b'text/plain')
+    content_disposition = (b'attachment; filename=%d.csv'
+                           % request.context.id)
+
+    return Response(
+        buf.getvalue(), content_type=b'text/csv',
+        content_disposition=content_disposition)
 
 
 def deserialize(feat, data):
