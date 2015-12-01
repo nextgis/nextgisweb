@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
-import unicodecsv
+import unicodecsv as csv
 from collections import OrderedDict
 from datetime import date, time, datetime
 from StringIO import StringIO
 
+import geojson
 from shapely import wkt
 from pyramid.response import Response
 
@@ -20,11 +21,52 @@ PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
 
 
-def csv(request):
+class ComplexEncoder(geojson.GeoJSONEncoder):
+    def default(self, obj):
+        try:
+            return geojson.GeoJSONEncoder.default(self, obj)
+        except TypeError:
+            return str(obj)
+
+
+def view_geojson(request):
+    request.resource_permission(PERM_READ)
+
+    class CRSProxy(object):
+        """ Класс обертка добавляющая информацию о системе координат в
+        геоинтерфейс результата запроса векторного слоя """
+
+        def __init__(self, query):
+            self.query = query
+
+        @property
+        def __geo_interface__(self):
+            result = self.query.__geo_interface__
+
+            # TODO: Нужен корректный способ генерации имени СК, пока по ID
+            result['crs'] = dict(type='name', properties=dict(
+                name='EPSG:%d' % request.context.srs_id))
+            return result
+
+    query = request.context.feature_query()
+    query.geom()
+
+    content_disposition = ('attachment; filename=%d.geojson'
+                           % request.context.id)
+
+    result = CRSProxy(query())
+
+    return Response(
+        geojson.dumps(result, ensure_ascii=False, cls=ComplexEncoder),
+        content_type=b'application/json',
+        content_disposition=content_disposition)
+
+
+def view_csv(request):
     request.resource_permission(PERM_READ)
 
     buf = StringIO()
-    writer = unicodecsv.writer(buf, dialect='excel')
+    writer = csv.writer(buf, dialect='excel')
 
     headrow = map(lambda fld: fld.keyname, request.context.fields)
     headrow.append('GEOM')
@@ -231,9 +273,14 @@ def count(resource, request):
 
 def setup_pyramid(comp, config):
     config.add_route(
+        'feature_layer.geojson', '/api/resource/{id}/geojson',
+        factory=resource_factory) \
+        .add_view(view_geojson, context=IFeatureLayer, request_method='GET')
+
+    config.add_route(
         'feature_layer.csv', '/api/resource/{id}/csv',
         factory=resource_factory) \
-        .add_view(csv, context=IFeatureLayer, request_method='GET')
+        .add_view(view_csv, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
@@ -255,3 +302,9 @@ def setup_pyramid(comp, config):
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',
         factory=resource_factory) \
         .add_view(count, context=IFeatureLayer, request_method='GET')
+
+    # Legacy route
+    config.add_route(
+        '#feature_layer.geojson', '/resource/{id:\d+}/geojson/',
+        factory=resource_factory) \
+        .add_view(view_geojson, context=IFeatureLayer, request_method='GET')
