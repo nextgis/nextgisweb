@@ -23,6 +23,7 @@ requires = [
     'geoalchemy>=0.7.2',
     'shapely',
     'geojson',
+    'unicodecsv',
     'pillow',
     'lxml',
     'passlib',

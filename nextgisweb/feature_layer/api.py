@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from collections import OrderedDict
 import json
+import unicodecsv
+from collections import OrderedDict
 from datetime import date, time, datetime
+from StringIO import StringIO
 
 from shapely import wkt
 from pyramid.response import Response
@@ -16,6 +18,29 @@ from .extension import FeatureExtension
 
 PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
+
+
+def csv(request):
+    request.resource_permission(PERM_READ)
+
+    buf = StringIO()
+    writer = unicodecsv.writer(buf, dialect='excel')
+
+    headrow = map(lambda fld: fld.keyname, request.context.fields)
+    headrow.append('GEOM')
+    writer.writerow(headrow)
+
+    query = request.context.feature_query()
+    query.geom()
+
+    for feature in query():
+        datarow = map(
+            lambda fld: feature.fields[fld.keyname],
+            request.context.fields)
+        datarow.append(feature.geom.wkt)
+        writer.writerow(datarow)
+
+    return Response(buf.getvalue(), content_type=b'text/plain')
 
 
 def deserialize(feat, data):
@@ -205,20 +230,26 @@ def count(resource, request):
 
 
 def setup_pyramid(comp, config):
+    config.add_route(
+        'feature_layer.csv', '/api/resource/{id}/csv',
+        factory=resource_factory) \
+        .add_view(csv, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
         factory=resource_factory) \
         .add_view(iget, context=IFeatureLayer, request_method='GET') \
         .add_view(iput, context=IFeatureLayer, request_method='PUT') \
-        .add_view(idelete, context=IWritableFeatureLayer, request_method='DELETE')
+        .add_view(idelete, context=IWritableFeatureLayer,
+                  request_method='DELETE')
 
     config.add_route(
         'feature_layer.feature.collection', '/api/resource/{id}/feature/',
         factory=resource_factory) \
         .add_view(cget, context=IFeatureLayer, request_method='GET') \
         .add_view(cpost, context=IWritableFeatureLayer, request_method='POST') \
-        .add_view(cdelete, context=IWritableFeatureLayer, request_method='DELETE')
+        .add_view(cdelete, context=IWritableFeatureLayer,
+                  request_method='DELETE')
 
     config.add_route(
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',

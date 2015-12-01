@@ -382,8 +382,12 @@ def setup_pyramid(comp, config):
                 yield dm.Link(
                     'feature_layer/geojson', _(u"Download as GeoJSON"),
                     lambda args: args.request.route_url(
-                        "feature_layer.geojson",
-                        id=args.obj.id))
+                        "feature_layer.geojson", id=args.obj.id))
+
+                yield dm.Link(
+                    'feature_layer/geojson', _(u"Download as CSV"),
+                    lambda args: args.request.route_url(
+                        "feature_layer.csv", id=args.obj.id))
 
     Resource.__dynmenu__.add(LayerMenuExt())
 
