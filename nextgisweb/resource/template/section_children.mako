@@ -2,10 +2,10 @@
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>
-            <th style="width: 5%">#</th>
-            <th style="width: 50%">${tr(_("Display name"))}</th>
-            <th style="width: 25%">${tr(_("Type"))}</th>
-            <th style="width: 20%">${tr(_("Owner"))}</th>
+            <th style="width: 5%; text-align: inherit;">#</th>
+            <th style="width: 50%; text-align: inherit;">${tr(_("Display name"))}</th>
+            <th style="width: 25%; text-align: inherit;">${tr(_("Type"))}</th>
+            <th style="width: 20%; text-align: inherit;">${tr(_("Owner"))}</th>
             <th style="width: 0%">&nbsp;</th>
         </tr>
     </thead>

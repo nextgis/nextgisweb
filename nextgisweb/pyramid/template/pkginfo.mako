@@ -10,8 +10,8 @@
 <table class="pure-table pure-table-horizontal" style="width: 100%;">
 
     <thead><tr> 
-        <th style="width: 100%">${tr(_('Package'))}</th>
-        <th style="width: 8em;">${tr(_('Version'))}</th>
+        <th style="width: 100%; text-align: inherit;">${tr(_('Package'))}</th>
+        <th style="width: 8em; text-align: inherit;">${tr(_('Version'))}</th>
     </tr></thead>
 
     <tbody>

@@ -4,9 +4,9 @@
 <table class="pure-table pure-table-horizontal" style="width: 100%;">
     <thead>
         <tr>
-            <th style="width: 2em;">ID</th>
-            <th style="width: 50%;">${tr(_("Full name"))}</th>
-            <th style="width: 50%;">${tr(_("Login"))}</th>
+            <th style="width: 2em; text-align: inherit;">ID</th>
+            <th style="width: 50%; text-align: inherit;">${tr(_("Full name"))}</th>
+            <th style="width: 50%; text-align: inherit;">${tr(_("Login"))}</th>
             <th style="width: 0px;">&nbsp;</th>
         </tr>
     </thead>

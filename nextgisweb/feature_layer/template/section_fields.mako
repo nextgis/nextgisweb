@@ -1,9 +1,9 @@
 <%! from nextgisweb.feature_layer.util import _ %>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead><tr>
-        <th>${tr(_("Keyname"))}</th>
-        <th>${tr(_("Type"))}</th>
-        <th>${tr(_("Display name"))}</th>
+        <th style="text-align: inherit;">${tr(_("Keyname"))}</th>
+        <th style="text-align: inherit;">${tr(_("Type"))}</th>
+        <th style="text-align: inherit;">${tr(_("Display name"))}</th>
         <th style="width: 0; text-align: center;">${tr(_("Table"))}</th>
     </tr></thead>
     %for field in obj.fields:

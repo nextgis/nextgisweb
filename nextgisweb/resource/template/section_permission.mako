@@ -3,8 +3,8 @@
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     %for k, scope in obj.scope.iteritems():
         <thead><tr>
-            <th style="width: 70%">${tr(scope.label)}</th>
-            <th style="width: 30%"><tt>${k}</tt></th>
+            <th style="width: 70%; text-align: inherit;">${tr(scope.label)}</th>
+            <th style="width: 30%; text-align: inherit;"><tt>${k}</tt></th>
             <th style="width: 0%">&nbsp;</th>
         </tr></thead>
         <tbody>

@@ -14,9 +14,9 @@
 
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead><tr>
-        <th style="width: 2em;">#</th>
-        <th style="width: 20em;">${tr(_('Layer'))}</th>
-        <th style="width: auto">${tr(_('Title'))}</th>
+        <th style="width: 2em; text-align: inherit;">#</th>
+        <th style="width: 20em; text-align: inherit;">${tr(_('Layer'))}</th>
+        <th style="width: auto; text-align: inherit;">${tr(_('Title'))}</th>
     </tr></thead>
 
     %for idx, l in enumerate(capcache['layers'], start=1):

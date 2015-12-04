@@ -2,9 +2,9 @@
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>
-            <th style="width: 30%;">${tr(_("Key"))}</th>
-            <th style="width: 20%;">${tr(_("Type"))}</th>
-            <th style="width: 50%; white-space: nowrap;">${tr(_("Value"))}</th>
+            <th style="width: 30%; text-align: inherit;">${tr(_("Key"))}</th>
+            <th style="width: 20%; text-align: inherit;">${tr(_("Type"))}</th>
+            <th style="width: 50%; text-align: inherit; white-space: nowrap;">${tr(_("Value"))}</th>
         </tr>
     </thead>
     %for mi in obj.resmeta:
