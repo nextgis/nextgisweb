@@ -70,11 +70,15 @@ Get resource data
 -----------------
 
 У ресурсов можно получать их данные. Для векторных ресурсов это данные в формате 
-GeoJSON, для растровых - TMS.
+GeoJSON и CSV, для растровых - TMS.
 
 Для получения данных в формате GeoJSON необходимо выполнить следующий запрос:
-    
+
+.. deprecated:: 2.2        
 .. http:get:: /resource/(int:id)/geojson/
+
+.. versionadded:: 2.2
+.. http:get:: /api/resource/(int:id)/geojson
 
     Запрос данных в GeoJson
     
@@ -85,7 +89,25 @@ GeoJSON, для растровых - TMS.
 
 .. sourcecode:: http
 
-   GET /resource/55/geojson/ HTTP/1.1
+   GET /api/resource/55/geojson HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+Для получения данных в формате CSV необходимо выполнить следующий запрос:
+
+.. versionadded:: 2.2    
+.. http:get:: /api/resource/(int:id)/csv
+
+    Запрос данных в CSV
+    
+    :param id: идентификатор ресурса  
+    
+      
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resource/55/csv HTTP/1.1
    Host: ngw_url
    Accept: */*
    

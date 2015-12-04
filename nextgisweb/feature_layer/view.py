@@ -95,41 +95,6 @@ def feature_update(request):
         maxheight=True)
 
 
-@viewargs(context=IFeatureLayer)
-def feature_geojson(request):
-    request.resource_permission(PD_READ)
-
-    # Класс обертка добавляющая информацию о системе координат в геоинтерфейс
-    # результата запроса векторного слоя
-
-    class CRSProxy(object):
-        def __init__(self, query):
-            self.query = query
-
-        @property
-        def __geo_interface__(self):
-            result = self.query.__geo_interface__
-
-            # TODO: Нужен корректный способ генерации имени СК, пока по ID
-
-            result['crs'] = dict(type='name', properties=dict(
-                name='EPSG:%d' % request.context.srs_id))
-            return result
-
-    query = request.context.feature_query()
-    query.geom()
-
-    content_disposition = ('attachment; filename=%d.geojson'
-                           % request.context.id)
-
-    result = CRSProxy(query())
-
-    return Response(
-        geojson.dumps(result, ensure_ascii=False, cls=ComplexEncoder),
-        content_type=b'application/json',
-        content_disposition=content_disposition)
-
-
 def field_collection(request):
     request.resource_permission(PDS_R)
     return [f.to_dict() for f in request.context.fields]
@@ -341,12 +306,6 @@ def setup_pyramid(comp, config):
         client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer)
 
-    config.add_route(
-        'feature_layer.geojson',
-        '/resource/{id:\d+}/geojson/',
-        factory=resource_factory
-    ).add_view(feature_geojson)
-
     def client_settings(self, request):
         editor_widget = OrderedDict()
         for k, ecls in FeatureExtension.registry._dict.iteritems():
@@ -382,8 +341,12 @@ def setup_pyramid(comp, config):
                 yield dm.Link(
                     'feature_layer/geojson', _(u"Download as GeoJSON"),
                     lambda args: args.request.route_url(
-                        "feature_layer.geojson",
-                        id=args.obj.id))
+                        "feature_layer.geojson", id=args.obj.id))
+
+                yield dm.Link(
+                    'feature_layer/geojson', _(u"Download as CSV"),
+                    lambda args: args.request.route_url(
+                        "feature_layer.csv", id=args.obj.id))
 
     Resource.__dynmenu__.add(LayerMenuExt())
 
