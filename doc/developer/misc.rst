@@ -134,3 +134,83 @@ GeoJSON и CSV, для растровых - TMS.
    Host: ngw_url
    Accept: */*
 
+Get user info
+-------------
+
+You can get user information by it id. The following request have to be executed:
+
+.. versionadded:: 2.3
+.. http:get:: /api/component/auth/user/(int:id)
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/component/auth/user/4 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+    
+.. sourcecode:: json
+
+    {
+      "description": null, 
+      "disabled": false, 
+      "display_name": "\u0410\u0434\u043c\u0438\u043d\u0438\u0441\u0442\u0440\u0430\u0442\u043e\u0440", 
+      "id": 4, 
+      "keyname": "administrator", 
+      "member_of": [
+        5
+      ], 
+      "superuser": false, 
+      "system": false
+    }   
+
+To create new user the following request have to be executed:
+    
+.. versionadded:: 2.3
+.. http:post:: /api/component/auth/user/
+
+   request to create new user
+   
+   :<json string display_name: user full name
+   :<json string keyname: user login
+   :<json string description: user description
+   :<json string password: user password
+
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /api/component/auth/user/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+   {
+     "description": null, 
+     "display_name": "another test", 
+     "keyname": "test1", 
+     "password": "test123"
+   }
+
+**Example response**:
+    
+.. sourcecode:: json
+
+    {      
+      "id": 4
+    }       
+    
+Administrator can configure to anonymous user registration to the specific group 
+(via setting checkbox in specific group in administrative interface).
+
+The special section should be present in NGW config file for this purposes:
+    
+.. sourcecode:: config
+
+   [auth]
+   register = true
+   
+       
+
