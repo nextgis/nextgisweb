@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 from passlib.hash import sha256_crypt
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -107,6 +108,30 @@ class User(Principal):
     def password(self, value):
         self.password_hash = sha256_crypt.encrypt(value)
 
+    def serialize(self):
+        return OrderedDict((
+            ('id', self.id),
+            ('system', self.system),
+            ('display_name', self.display_name),
+            ('description', self.description),
+            ('keyname', self.keyname),
+            ('superuser', self.superuser),
+            ('disabled', self.disabled),
+            ('member_of', map(lambda g: g.id, self.member_of))
+        ))
+
+    def deserialize(self, data):
+        attrs = ('display_name', 'description', 'keyname',
+                 'superuser', 'disabled', 'password')
+        for a in attrs:
+            if a in data:
+                setattr(self, a, data[a])
+
+        if 'member_of' in data:
+            self.member_of = list(map(
+                lambda gid: Group.filter_by(id=gid).one(),
+                data['member_of']))
+
 
 class Group(Principal):
     __tablename__ = 'auth_group'
@@ -136,6 +161,22 @@ class Group(Principal):
 
         else:
             return user in self.members
+
+    def serialize(self):
+        return OrderedDict((
+            ('id', self.id),
+            ('system', self.system),
+            ('display_name', self.display_name),
+            ('description', self.description),
+            ('keyname', self.keyname),
+            ('members', map(lambda u: u.id, self.members))
+        ))
+
+    def deserialize(self, data):
+        attrs = ('display_name', 'description', 'keyname')
+        for a in attrs:
+            if a in data:
+                setattr(self, a, data[a])
 
 
 class PasswordHashValue(object):

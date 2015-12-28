@@ -16,6 +16,11 @@ class AuthComponent(Component):
     identity = 'auth'
     metadata = Base.metadata
 
+    def __init__(self, env, settings):
+        super(AuthComponent, self).__init__(env, settings)
+        self.settings_register = settings.get('register', 'false').lower() \
+            in ('true', 'yes', '1')
+
     def initialize_db(self):
         self.initialize_user(
             keyname='guest',
@@ -66,8 +71,9 @@ class AuthComponent(Component):
 
         config.set_request_property(user, reify=True)
 
-        from . import views
+        from . import views, api
         views.setup_pyramid(self, config)
+        api.setup_pyramid(self, config)
 
     def initialize_user(self, keyname, display_name, **kwargs):
         """ Проверяет наличие в БД пользователя с keyname и в случае
@@ -96,6 +102,10 @@ class AuthComponent(Component):
                 **kwargs).persist()
 
         return obj
+
+    settings_info = (
+        dict(key='register', description="Allow user registration"),
+    )
 
 
 def translate(self, trstring):
