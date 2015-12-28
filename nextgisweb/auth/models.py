@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
 from collections import OrderedDict
 from passlib.hash import sha256_crypt
 import sqlalchemy as sa
@@ -140,6 +141,7 @@ class Group(Principal):
         sa.Integer, sa.Sequence('principal_seq'),
         sa.ForeignKey(Principal.id), primary_key=True)
     keyname = sa.Column(sa.Unicode, unique=True)
+    register = sa.Column(sa.Boolean, nullable=False, default=False)
 
     members = orm.relationship(
         User, secondary=tab_group_user,
@@ -169,11 +171,12 @@ class Group(Principal):
             ('display_name', self.display_name),
             ('description', self.description),
             ('keyname', self.keyname),
+            ('register', self.register),
             ('members', map(lambda u: u.id, self.members))
         ))
 
     def deserialize(self, data):
-        attrs = ('display_name', 'description', 'keyname')
+        attrs = ('display_name', 'description', 'keyname', 'register')
         for a in attrs:
             if a in data:
                 setattr(self, a, data[a])

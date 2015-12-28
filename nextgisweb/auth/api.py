@@ -30,6 +30,11 @@ def user_cpost(request):
             if k in data:
                 ndata[k] = data[k]
         data = ndata
+
+        # Добавляем группы, автоматически назначаемые при регистрации
+        data['member_of'] = map(
+            lambda group: group.id,
+            Group.filter_by(register=True))
     else:
         require_administrator(request)
 

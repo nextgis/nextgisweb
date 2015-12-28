@@ -28,3 +28,11 @@ UPDATE auth_user SET disabled = FALSE;
 ALTER TABLE auth_user ALTER COLUMN superuser SET NOT NULL;
 ALTER TABLE auth_user ALTER COLUMN disabled SET NOT NULL;
 ```
+
+#### `-- 5dee01ca98d3e19e2b1598ca54bab29c6293d02c` (2015-12-28)
+
+```sql
+ALTER TABLE auth_group ADD COLUMN register boolean;
+UPDATE auth_group SET register = FALSE;
+ALTER TABLE auth_group ALTER COLUMN register SET NOT NULL;
+```

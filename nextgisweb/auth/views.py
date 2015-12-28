@@ -114,6 +114,7 @@ def setup_pyramid(comp, config):
             self.obj.display_name = self.data['display_name']
             self.obj.keyname = self.data['keyname']
             self.obj.description = self.data['description']
+            self.obj.register = self.data['register']
 
         def validate(self):
             result = super(AuthGroupWidget, self).validate()
@@ -128,7 +129,8 @@ def setup_pyramid(comp, config):
                 result['value'] = dict(
                     display_name=self.obj.display_name,
                     keyname=self.obj.keyname,
-                    description=self.obj.description)
+                    description=self.obj.description,
+                    register=self.obj.register)
 
             return result
 

@@ -11,6 +11,7 @@ define([
     "dojo/_base/array",
     "dojo/on",
     // template
+    "dijit/form/CheckBox",
     "dijit/form/SimpleTextarea",    
     "dojox/layout/TableContainer",
     "ngw-pyramid/form/KeynameTextBox",
@@ -55,6 +56,7 @@ define([
             this.displayName.set("value", value.display_name);
             this.keyname.set("value", value.keyname);
             this.description.set("value", value.description);
+            this.register.set("checked", value.register);
         },
 
         _getValueAttr: function () {
@@ -62,6 +64,7 @@ define([
                 display_name: this.displayName.get("value"),
                 keyname: this.keyname.get("value"),
                 description: this.description.get("value"),
+                register: this.register.get("checked")
             };
         }
     });

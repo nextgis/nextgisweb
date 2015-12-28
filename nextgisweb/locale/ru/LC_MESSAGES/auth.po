@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-10-02 02:34+0300\n"
+"POT-Creation-Date: 2015-12-28 04:32+0300\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -18,31 +18,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: __init__.py:24
+#: __init__.py:28
 msgid "Guest"
 msgstr "Гость"
 
-#: __init__.py:30
+#: __init__.py:34
 msgid "Everyone"
 msgstr "Любой пользователь"
 
-#: __init__.py:36
+#: __init__.py:40
 msgid "Authenticated"
 msgstr "Прошедший проверку"
 
-#: __init__.py:42
+#: __init__.py:46
 msgid "Administrators"
 msgstr "Администраторы"
 
-#: __init__.py:45
+#: __init__.py:49
 msgid "Administrator"
 msgstr "Администратор"
 
-#: __init__.py:53
+#: __init__.py:57
 msgid "Owner"
 msgstr "Владелец"
 
-#: __init__.py:63 views.py:36
+#: views.py:36
 msgid "Account disabled"
 msgstr "Учетная запись отключена"
 
@@ -54,35 +54,35 @@ msgstr "Неверный логин или пароль!"
 msgid "Access denied"
 msgstr "Отказано в доступе"
 
-#: views.py:146
+#: views.py:145
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: views.py:239
+#: views.py:238
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: views.py:272 views.py:337
+#: views.py:271 views.py:336
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:282 views.py:340
+#: views.py:281 views.py:339
 msgid "Groups"
 msgstr "Группы пользователей"
 
-#: views.py:293 views.py:315
+#: views.py:292 views.py:314
 msgid "List"
 msgstr "Список"
 
-#: views.py:298 views.py:320
+#: views.py:297 views.py:319
 msgid "Create"
 msgstr "Создать"
 
-#: views.py:304 views.py:326
+#: views.py:303 views.py:325
 msgid "Edit"
 msgstr "Изменить"
 
-#: amd/ngw-auth/GroupWidget.js:33
+#: amd/ngw-auth/GroupWidget.js:34
 msgid "Group"
 msgstr "Группа пользователей"
 
@@ -108,6 +108,10 @@ msgstr "Имя группы"
 #: amd/ngw-auth/template/UserWidget.hbs:38
 msgid "Description"
 msgstr "Описание"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:23
+msgid "Assign at registration"
+msgstr "Назначать при регистрации"
 
 #: amd/ngw-auth/template/UserWidget.hbs:15 template/login.mako:34
 #: template/user_browse.mako:9
