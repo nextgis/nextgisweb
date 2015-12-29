@@ -18,32 +18,12 @@ def user_cget(request):
 
 
 def user_cpost(request):
-    data = request.json_body
-    comp = request.env.auth
-
-    if not request.user.is_administrator and comp.settings_register:
-        # При самостоятельной регистрации могут быть указаны только
-        # некоторые атрибуты пользователя.
-        rkeys = ('display_name', 'description', 'keyname', 'password')
-        ndata = dict()
-        for k in rkeys:
-            if k in data:
-                ndata[k] = data[k]
-        data = ndata
-
-        # Добавляем группы, автоматически назначаемые при регистрации
-        data['member_of'] = map(
-            lambda group: group.id,
-            Group.filter_by(register=True))
-    else:
-        require_administrator(request)
-
+    require_administrator(request)
     obj = User(system=False)
-    obj.deserialize(data)
+    obj.deserialize(request.json_body)
     obj.persist()
 
     DBSession.flush()
-
     return dict(id=obj.id)
 
 
@@ -72,7 +52,6 @@ def group_cpost(request):
     obj.persist()
 
     DBSession.flush()
-
     return dict(id=obj.id)
 
 
@@ -86,6 +65,32 @@ def group_iput(request):
     require_administrator(request)
     obj = Group.filter_by(id=request.matchdict['id']).one()
     obj.deserialize(request.json_body)
+    return dict(id=obj.id)
+
+
+def register(request):
+    if not request.env.auth.settings_register:
+        raise HTTPForbidden("Anonymous registration is not allowed!")
+
+    # При самостоятельной регистрации могут быть указаны только
+    # некоторые из атрибутов пользователя.
+    rkeys = ('display_name', 'description', 'keyname', 'password')
+    src = request.json_body
+    data = dict()
+    for k in rkeys:
+        if k in src:
+            data[k] = src[k]
+
+    # Добавляем группы, автоматически назначаемые при регистрации.
+    data['member_of'] = map(
+        lambda group: group.id,
+        Group.filter_by(register=True))
+
+    obj = User(system=False)
+    obj.deserialize(data)
+    obj.persist()
+
+    DBSession.flush()
     return dict(id=obj.id)
 
 
@@ -105,3 +110,6 @@ def setup_pyramid(comp, config):
     config.add_route('auth.group.item', '/api/component/auth/group/{id}') \
         .add_view(group_iget, request_method='GET', renderer='json') \
         .add_view(group_iput, request_method='PUT', renderer='json')
+
+    config.add_route('auth.register', '/api/component/auth/register') \
+        .add_view(register, request_method='POST', renderer='json')
