@@ -317,7 +317,7 @@ Get feature
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)
 
-Запрос всех обектов векторного слоя
+Запрос всех объектов векторного слоя
 
 .. http:get:: /api/resource/(int:id)/feature/
 
