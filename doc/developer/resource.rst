@@ -359,6 +359,9 @@ Get feature
     }
   }
 
+Запрос количества обектов векторного слоя
+
+.. http:get:: /api/resource/(int:id)/feature_count
     
 Запросы к корню
 ^^^^^^^^^^^^^^^
