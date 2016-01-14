@@ -200,7 +200,26 @@ To create new user the following request have to be executed:
 
     {      
       "id": 4
-    }       
+    }   
+    
+To create new group the following request have to be executed:
+    
+.. versionadded:: 2.3
+.. http:post:: /api/component/auth/group/
+
+   request to create new group
+       
+To self create user (anonymouse) the following request have to be executed:
+    
+.. versionadded:: 2.3
+.. http:post:: /api/component/auth/register/
+
+   request to create new user
+   
+   :<json string display_name: user full name
+   :<json string keyname: user login
+   :<json string description: user description
+   :<json string password: user password        
     
 Administrator can configure to anonymous user registration to the specific group 
 (via setting checkbox in specific group in administrative interface).
