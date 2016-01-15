@@ -7,7 +7,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = u'nextgisweb'
-copyright = u'2014, NextGIS'
+copyright = u'2014-2016, NextGIS'
 
 version = '2.2'
 release = '2'
