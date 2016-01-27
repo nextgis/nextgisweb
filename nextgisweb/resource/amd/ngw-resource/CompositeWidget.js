@@ -52,7 +52,7 @@ define([
 
             this.lockContainer = new ContentPane({
                 region: "center",
-                style: "display: none; border: 1px solid silver;",
+                style: "display: none; border: 1px solid silver; background-color: #fff",
                 content: i18n.gettext("Please wait. Processing request...")
             }).placeAt(this);
 

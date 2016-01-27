@@ -26,7 +26,7 @@
     <div data-dojo-id="tree"
         data-dojo-type="ngw-resource/Tree"
         data-dojo-props="resourceId: ${obj.id}, region: 'left'"
-        style="width: 300px">
+        style="width: 300px; background-color:#fff">
     </div>
 
     <div data-dojo-type="dijit/layout/ContentPane"

@@ -24,7 +24,7 @@ define([
     return declare([], {
 
         constructor: function (params) {
-            this.buttonPane = new ContentPane({style: "padding: 1px;"});
+            this.buttonPane = new ContentPane({style: "padding: 10px 0 0;"});
             this.submitUrl = params.url;
 
             widget = this;
