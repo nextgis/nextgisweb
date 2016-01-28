@@ -1,17 +1,26 @@
-.ngw-feature-layer-FieldsDisplayWidget table.pure-table { width: 100%; }
+.ngw-feature-layer-FieldsDisplayWidget .pure-table { width: 100%; }
 
-.ngw-feature-layer-FieldsDisplayWidget table.pure-table th.display_name {
-    width: 25%;
-    text-align: left; 
-}
+.ngw-feature-layer-FieldsDisplayWidget .pure-table .display_name { width: 25%;}
 
 .ngw-feature-layer-FieldsDisplayWidget span.null { color: #999; }
 
-.ngw-feature-layer-FieldsDisplayWidget.compact table.pure-table th.display_name { width: auto; }
-
-
-.ngw-feature-layer-FieldsDisplayWidget.compact table.pure-table td, 
-.ngw-feature-layer-FieldsDisplayWidget.compact table.pure-table th {
-    padding: 1px 2px;
+.ngw-feature-layer-FieldsDisplayWidget  .pure-table tr:first-child:last-child>td,
+.ngw-feature-layer-FieldsDisplayWidget  .pure-table tr:first-child:last-child>th{
+    border-bottom: 1px solid #efefef;
 }
 
+.ngw-feature-layer-FieldsDisplayWidget.compact .pure-table {
+    font-size: 12px;
+    line-height: 1.2;
+    margin-top: 7px;
+    border-top: 1px solid #efefef;
+    border-bottom: 1px solid #efefef;
+}
+
+.ngw-feature-layer-FieldsDisplayWidget.compact .pure-table .display_name { width: auto; }
+
+
+.ngw-feature-layer-FieldsDisplayWidget.compact  .pure-table td, 
+.ngw-feature-layer-FieldsDisplayWidget.compact  .pure-table th {
+    padding: 3px 5px;
+}
