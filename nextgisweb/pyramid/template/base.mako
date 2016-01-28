@@ -63,7 +63,7 @@
 <body class="claro">
 
     %if not custom_layout:
-        <div class="layout">
+        <div class="layout ${'maxwidth' if maxwidth else ''}">
             <div id="header" class="header container">
                 <% settings = request.env.pyramid.settings %>
                 
@@ -145,7 +145,7 @@
             %endif
             
             <div id="content-wrapper"
-                class="content-wrapper ${'maxwidth' if maxwidth else ''} ${'content-maxheight' if maxheight else ''}">
+                class="content-wrapper ${'content-maxheight' if maxheight else ''}">
                 <div class="content pure-g expand">
                     <div class="pure-u-${"18-24" if has_dynmenu else "1"} expand">
                         <div class="content__inner container expand">    
