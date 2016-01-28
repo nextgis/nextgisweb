@@ -1,7 +1,7 @@
 <%! from nextgisweb.resource.util import _ %>
 <ul class="meta-info list-unstyled">
     <li class="meta-info__item">
-        <div class="meta-info__key">${tr(_("Display name"))}</div>
+        <div class="meta-info__key"><span class="meta-info__key__inner">${tr(_("Display name"))}</span></div>
         <div class="meta-info__value">${obj.display_name}</div>
     </li>
      %if obj.keyname:
