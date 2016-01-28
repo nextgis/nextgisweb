@@ -453,3 +453,40 @@ table {
   z-index: 2;
   padding-right: 3px;
 }
+/*-- Breadcrumbs --*/
+.path {
+  margin-bottom: 5px;
+  margin-top: -25px;
+}
+.path__item {
+  color: #aaaaaa;
+}
+.path__item:before {
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+  width: 4px;
+  height: 4px;
+  -webkit-border-radius: 2px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 2px;
+  -moz-background-clip: padding;
+  border-radius: 2px;
+  background-clip: padding-box;
+  background-color: #ffba3f;
+  margin-left: 3px;
+  margin-right: 3px;
+}
+.path__item:first-child:before {
+  display: none;
+}
+.path__link {
+  color: #aaaaaa;
+  text-decoration: none;
+  border-bottom: 1px solid #e9e9e9;
+}
+.path__link:hover {
+  color: #176fc1;
+  border-bottom-color: #176fc1;
+  border-bottom-color: rgba(23, 111, 193, 0.4);
+}

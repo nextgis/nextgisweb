@@ -498,3 +498,38 @@ table{
                 z-index: 2;
                 padding-right: 3px;
             }
+
+/*-- Breadcrumbs --*/
+.path{
+    margin-bottom: 5px;
+    margin-top: -25px;
+}
+    .path__item{
+        color: @light-text;
+        
+        &:before{
+            content:"";
+            display: inline-block;
+            vertical-align: middle;
+            .size(4px);
+            .border-radius(2);
+            background-color: @yellow;
+            margin-left: 3px;
+            margin-right: 3px;
+        }
+        
+        &:first-child:before{
+            display: none;
+        }
+    }
+        .path__link{
+            color: @light-text;
+            text-decoration: none;
+            border-bottom: 1px solid #e9e9e9;
+            
+            &:hover{
+                color: @blue;
+                border-bottom-color: @blue;
+                border-bottom-color: fade(@blue, 40%);
+            }
+        }
