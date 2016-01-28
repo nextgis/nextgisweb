@@ -515,3 +515,7 @@ table {
 .permission-label.mask {
   background-color: #F77268;
 }
+/* Map */
+.map-logo {
+  display: block;
+}
