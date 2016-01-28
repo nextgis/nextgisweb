@@ -8,23 +8,23 @@
 
 <h2>${tr(_('Packages'))}</h2>
 <div class="content-box">
-	<table class="pure-table pure-table-horizontal" style="width: 100%;">
+    <table class="pure-table pure-table-horizontal" style="width: 100%;">
 
-		<thead><tr> 
-			<th style="width: 100%; text-align: inherit;">${tr(_('Package'))}</th>
-			<th style="width: 8em; text-align: inherit;">${tr(_('Version'))}</th>
-		</tr></thead>
+        <thead><tr> 
+            <th style="width: 100%; text-align: inherit;">${tr(_('Package'))}</th>
+            <th style="width: 8em; text-align: inherit;">${tr(_('Version'))}</th>
+        </tr></thead>
 
-		<tbody>
-		
-		%for pkg, ver in pkginfo:
-		<tr>
-			<td>${pkg}</td>
-			<td>${ver}</td>
-		</tr>
-		%endfor
+        <tbody>
+        
+        %for pkg, ver in pkginfo:
+        <tr>
+            <td>${pkg}</td>
+            <td>${ver}</td>
+        </tr>
+        %endfor
 
-		</tbody>
+        </tbody>
 
-	</table>
+    </table>
 </div>
