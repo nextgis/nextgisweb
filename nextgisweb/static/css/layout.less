@@ -452,3 +452,49 @@ table{
         }
     }
 
+/*-- Meta info --*/
+
+.meta-info{
+    max-width: 80%;
+    margin-top: 5px;
+}
+    .meta-info__item{
+        margin-bottom: .615em;
+        white-space: nowrap;
+        letter-spacing: -.31em;
+    }
+        .meta-info__key,
+        .meta-info__value{
+            position: relative;
+            display: inline-block;
+            vertical-align: bottom;
+            letter-spacing: normal;
+            white-space: normal;
+        }
+        .meta-info__value{
+            padding-left: 213px;
+        }
+        
+        .meta-info__key{
+            box-sizing: border-box;
+            width: 160px;
+            color: @light-text;
+            margin-right: -210px;            
+            padding-right: 30px;
+            
+            &:after{
+                content: "";
+                position: absolute;
+                left:0;
+                bottom:.231em;
+                width: 100%;
+                height: 1px;
+                background-color:#e1e1e1;
+            }
+        }
+            .meta-info__key__inner{
+                position: relative;
+                background-color: @bgColor;
+                z-index: 2;
+                padding-right: 3px;
+            }
