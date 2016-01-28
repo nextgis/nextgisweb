@@ -490,3 +490,28 @@ table {
   border-bottom-color: #176fc1;
   border-bottom-color: rgba(23, 111, 193, 0.4);
 }
+/* -- Permission --*/
+.permission-label {
+  background-color: #999;
+  width: 20px;
+  height: 20px;
+  -webkit-border-radius: 3px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 3px;
+  -moz-background-clip: padding;
+  border-radius: 3px;
+  background-clip: padding-box;
+  font-size: 12px;
+  color: #ffffff;
+  text-align: center;
+  line-height: 20px;
+}
+.permission-label.allow {
+  background-color: #00c775;
+}
+.permission-label.deny {
+  background-color: #F77268;
+}
+.permission-label.mask {
+  background-color: #F77268;
+}

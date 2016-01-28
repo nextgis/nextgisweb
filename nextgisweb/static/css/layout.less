@@ -533,3 +533,26 @@ table{
                 border-bottom-color: fade(@blue, 40%);
             }
         }
+        
+/* -- Permission --*/
+
+.permission-label{
+    background-color: #999;
+    .size(20px);
+    .border-radius(3);
+    font-size: 12px;
+    color: @white;
+    text-align: center;
+    line-height: 20px;
+    
+    &.allow{
+        background-color: @green;
+    }
+    
+    &.deny{
+        background-color: #F77268;
+    }
+    &.mask{
+        background-color: #F77268;
+    }
+}

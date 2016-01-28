@@ -1,5 +1,4 @@
 <% permsets = obj.permission_sets(request.user) %>
-
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     %for k, scope in obj.scope.iteritems():
         <thead><tr>
@@ -16,31 +15,19 @@
                 <%
                 if (perm in permsets.deny):
                     pd = u"D";
-                    color = '196, 0, 0'
+                    cls="deny";
                 elif (perm in permsets.mask):
-                    pd = u"M"
-                    color = '170, 56, 30'                    
+                    pd = u"M";
+                    cls="mask";
                 elif (perm in permsets.allow):
-                    pd = u"A"
-                    color = '0, 196, 0'
+                    pd = u"A";
+                    cls="allow";
                 else:
-                    pd = u"E"
-                    color = '64, 64, 64'
-                %>    
+                    pd = u"E";
+                    cls="";
+                %>
                 
-                <div style="
-                    background-color: rgba(${color}, 1);
-                    padding: 2px 4px;
-                    border: 1px solid rgba(0, 0, 0, 0.25);
-                    border-radius: 4px;
-                    font-size: 90%;
-                    color: white;
-                    font-weight: bolder;
-                    text-align: center;">
-
-                    ${pd}
-
-                </div>
+                <div class="permission-label ${cls}"> ${pd} </div>
             </td>
         </tr>
         %endfor
