@@ -9,10 +9,11 @@
             current = current.parent
         else:
             current = None
-
+            
+    parents.append(obj)
+    
     if subtitle and obj:
-        parents.append(obj)
-
+        parents.append(tr(subtitle))
 %>
 
 <%def name="title()">
@@ -34,25 +35,21 @@
         else:
             current = None
 
+    parents.append(obj)
+    
     if subtitle and obj:
-        parents.append(obj)
-
+        parents.append(tr(subtitle))
 %>
-    %if len(parents) > 0:
-        <div class="span-24 path">
-            <% first = True %>
-            %for parent in parents:
-                %if not first:
-                    &rarr;
-                %endif
-                <% first = False %>
-                <span>
-                %if hasattr(parent, 'permalink'):
-                    <a href="${parent.permalink(request)}">${parent}</a>
+    %if len(parents) > 1:
+        <div class="path">           
+            %for idx, parent in enumerate(parents):                
+                <span class="path__item">
+                %if hasattr(parent, 'permalink') and idx!=len(parents)-1:
+                    <a class="path__link" href="${parent.permalink(request)}">${parent}</a>
                 %else:
                     ${parent}
                 %endif
-                </span> 
+                </span>
             %endfor
         </div>
     %endif

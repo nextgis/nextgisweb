@@ -1,13 +1,13 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <%! from nextgisweb.pyramid.util import _ %>
-<html>
+<!--[if IE 8]>         <html class="lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
 <%
     import os
     import json
     from bunch import Bunch
 %>
 <head>
-
     <title>
         %if hasattr(self, 'title'):
             ${self.title()} ::
@@ -15,16 +15,15 @@
 
         ${request.env.core.settings['system.name']}
     </title>
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href="${request.static_url('nextgisweb:static/css/pure-0.6.0-min.css')}"
         rel="stylesheet" type="text/css"/>
-
-    <link href="${request.static_url('nextgisweb:static/css/layout.css')}"
-        rel="stylesheet" type="text/css"/>
-
     <link href="${request.static_url('nextgisweb:static/css/default.css')}"
         rel="stylesheet" type="text/css" media="screen"/>
-
+    <link href="${request.static_url('nextgisweb:static/css/layout.css')}"
+        rel="stylesheet" type="text/css"/>   
     <link href="${request.static_url('nextgisweb:static/css/icon.css')}"
         rel="stylesheet" type="text/css" media="screen"/>
 
@@ -64,101 +63,101 @@
 <body class="claro">
 
     %if not custom_layout:
-
-        <div id="header" class="header">
-
-            <div class="home-menu pure-menu pure-menu-horizontal">
-
+        <div class="layout ${'maxwidth' if maxwidth else ''}">
+            <div id="header" class="header container">
                 <% settings = request.env.pyramid.settings %>
-                %if 'logo' in settings and os.path.isfile(settings['logo']):
-                    <img class="logo" src="${request.route_url('pyramid.logo')}"/>
-                %endif
-
-                <a class="pure-menu-heading" href="${request.application_url}">
-                    ${request.env.core.settings['system.full_name']}
+                
+                <a class="header__title" href="${request.application_url}">    
+                    %if 'logo' in settings and os.path.isfile(settings['logo']):
+                        <div class="logo">
+                            <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
+                        </div>    
+                    %endif
+                    <span class="header__title__inner">
+                        ${request.env.core.settings['system.full_name']}
+                    </span>    
                 </a>
-
-                <ul class="pure-menu-list">
-                    <li class="pure-menu-item"><a href="${request.route_url('resource.root')}" class="pure-menu-link">${tr(_('Resources'))}</a></li>
-
+                <ul class="menu-list list-inline">
+                    <li class="menu-list__item"><a href="${request.route_url('resource.root')}">${tr(_('Resources'))}</a></li>
                     %if request.user.is_administrator:
-                        <li class="pure-menu-item"><a href="${request.route_url('pyramid.control_panel')}" class="pure-menu-link">${tr(_('Control panel'))}</a></li>
-                    %endif
-
-                    %if request.user.keyname == 'guest':
-                        <li class="pure-menu-item"><a href="${request.route_url('auth.login')}" class="pure-menu-link">${tr(_('Sign in'))}</a></li>
-                    %else:
-                        <li class="user pure-menu-item">${request.user}</li>
-                        <li class="pure-menu-item"><a href="${request.route_url('auth.logout')}" class="pure-menu-link">${tr(_('Sign out'))}</a></li>
-                    %endif
-
+                        <li class="menu-list__item"><a href="${request.route_url('pyramid.control_panel')}">${tr(_('Control panel'))}</a></li>
+                    %endif    
                     %if request.env.pyramid.help_page is not None:
-                        <li class="pure-menu-item"><a href="${request.route_url('pyramid.help_page')}" class="pure-menu-link">${tr(_('Help'))}</a></li>
+                        <li class="menu-list__item"><a href="${request.route_url('pyramid.help_page')}">${tr(_('Help'))}</a></li>
                     %endif
-
-                    %for locale in request.env.core.locale_available:
-                        <li class="pure-menu-item"><a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}" class="pure-menu-link">${locale.upper()}</a></li>
-                    %endfor
                 </ul>
-            </div>
-
-        </div>
-
-        %if hasattr(next, 'title_block'):
-            <div id="title" class="title">
-                ${next.title_block()}
-            </div>
-        %elif hasattr(next, 'title'):
-            <div id="title" class="title">
-                <h1>${next.title()}</h1>
-            </div>
-        %elif title:
-            <div id="title" class="title">
-                <h1>${tr(title)}</h1>
-            </div>
-        %endif
-
-        <div id="content-wrapper"
-            class="content-wrapper ${'maxwidth' if maxwidth else ''} ${'content-maxheight' if maxheight else ''}">
-
-            <div class="content expand">
-
-                <div class="pure-g expand">
-
-                    %if obj and hasattr(obj,'__dynmenu__'):
-                        <%
-                            has_dynmenu = True
-                            dynmenu = obj.__dynmenu__
-                            dynmenu_kwargs = Bunch(obj=obj, request=request)
-                        %>
-                    %elif 'dynmenu' in context.keys():
-                        <%
-                            has_dynmenu = True
-                            dynmenu = context['dynmenu']
-                            dynmenu_kwargs = context.get('dynmenu_kwargs', Bunch(request=request))
-                        %>
-                    %else:
-                        <% has_dynmenu = False %>
-                    %endif
-
-                    <div class="pure-u-${"20-24" if has_dynmenu else "1"} expand">
-                        %if hasattr(next, 'body'):
-                            ${next.body()}
+                <div class="header__right pull-right">
+                    <ul class="user-menu-list list-inline">
+                        %if request.user.keyname == 'guest':
+                            <li class="user-menu-list__item"><a href="${request.route_url('auth.login')}">${tr(_('Sign in'))}</a></li>
+                        %else:
+                            <li class="user user-menu-list__item">
+                                <i class="icon-user"></i>
+                                ${request.user}
+                            </li>
+                            <li class="sign-out user-menu-list__item"><a href="${request.route_url('auth.logout')}">
+                                <i class="icon-logout"></i>
+                            </a></li>
                         %endif
+                    </ul>
+                    <ul class="lang-list list-inline">
+                        %for locale in request.env.core.locale_available:
+                            <li class="lang-list__item"><a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}">${locale.upper()}</a></li>
+                        %endfor
+                    </ul>
+                </div>
+            </div> <!--./header -->
+            
+            %if obj and hasattr(obj,'__dynmenu__'):
+                <%
+                    has_dynmenu = True
+                    dynmenu = obj.__dynmenu__
+                    dynmenu_kwargs = Bunch(obj=obj, request=request)
+                %>
+            %elif 'dynmenu' in context.keys():
+                <%
+                    has_dynmenu = True
+                    dynmenu = context['dynmenu']
+                    dynmenu_kwargs = context.get('dynmenu_kwargs', Bunch(request=request))
+                %>
+            %else:
+                <% has_dynmenu = False %>
+            %endif
+            
+            <div id="title" class="title pure-g">
+                <div class="pure-u-${"18-24" if has_dynmenu else "1"}">
+                    <div class="content__inner container">
+                        %if hasattr(next, 'title_block'):
+                            ${next.title_block()}
+                        %elif hasattr(next, 'title'):
+                            <h1>${next.title()}</h1>
+                        %elif title:
+                            <h1>${tr(title)}</h1>
+                        %endif
+                    </div>    
+                </div>    
+            </div>
+            
+            %if has_dynmenu:
+                <div class="sidebar pure-u-6-24">
+                    <%include file="nextgisweb:pyramid/template/dynmenu.mako" args="dynmenu=dynmenu, args=dynmenu_kwargs" />
+                </div>
+            %endif
+            
+            <div id="content-wrapper"
+                class="content-wrapper ${'content-maxheight' if maxheight else ''}">
+                <div class="content pure-g expand">
+                    <div class="pure-u-${"18-24" if has_dynmenu else "1"} expand">
+                        <div class="content__inner container expand">    
+                            %if hasattr(next, 'body'):
+                                ${next.body()}
+                            %endif
+                        </div>    
                     </div>
-
-                    %if has_dynmenu:
-                        <div class="pure-u-4-24"><div style="padding-left: 1em;">
-                            <%include file="nextgisweb:pyramid/template/dynmenu.mako" args="dynmenu=dynmenu, args=dynmenu_kwargs" />
-                        </div></div>
-                    %endif
-
                 </div>
 
-            </div>
-
-        </div>
-
+            </div> <!--/.content-wrapper -->
+        </div> <!--/.layout -->
     %else:
 
         ${next.body()}

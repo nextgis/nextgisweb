@@ -16,9 +16,8 @@
             <td>${tr(child.cls_display_name)}</td>
             <td>${child.owner_user}</td>
             <td style="white-space: nowrap">
-                <a class="dijitIconEdit" style="width: 16px; height: 16px; display: inline-block;" href="${request.route_url('resource.update', id=child.id)}"></a>
-                <a class="dijitIconDelete" style="width: 16px; height: 16px; display: inline-block;" href="${request.route_url('resource.delete', id=child.id)}"></a>
-
+                <a class="dijitIconEdit" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle" href="${request.route_url('resource.update', id=child.id)}"></a>
+                <a class="dijitIconDelete" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle" href="${request.route_url('resource.delete', id=child.id)}"></a>
             </td>
         </tr>
     %endfor

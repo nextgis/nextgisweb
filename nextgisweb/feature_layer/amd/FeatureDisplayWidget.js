@@ -29,7 +29,9 @@ define([
                 fields: this.fields
             });
             h(this._wfields.title, this.domNode);
-            this._wfields.placeAt(this);
+            
+            var contentBox = domConstruct.create("div", {class:"content-box"},this.domNode);
+            this._wfields.placeAt(contentBox);
 
             this._ext = {};
             for (var k in this.extmid) {
@@ -39,6 +41,7 @@ define([
                 });
 
                 h(widget.title, this.domNode);
+            
                 widget.placeAt(this);
 
                 this._ext[k] = widget;

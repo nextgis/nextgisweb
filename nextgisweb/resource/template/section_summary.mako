@@ -1,33 +1,32 @@
 <%! from nextgisweb.resource.util import _ %>
-<table class="pure-table pure-table-vertical" style="margin-bottom: 1em; text-align: left"><tbody>
-    <tr>
-        <th>${tr(_("Display name"))}</th>
-        <td>${obj.display_name}</td>
-    </tr>
-
-    %if obj.keyname:
-    <tr>
-        <th>${tr(_("Keyname"))}</th>
-        <td>${obj.keyname}</td>
-    </tr>
+<ul class="meta-info list-unstyled">
+    <li class="meta-info__item">
+        <div class="meta-info__key"><span class="meta-info__key__inner">${tr(_("Display name"))}</span></div>
+        <div class="meta-info__value">${obj.display_name}</div>
+    </li>
+     %if obj.keyname:
+    <li class="meta-info__item">
+        <div class="meta-info__key"><span class="meta-info__key__inner">${tr(_("Keyname"))}</span></div>
+        <div class="meta-info__value">${obj.keyname}</div>
+    </li>
     %endif
-
+    
     %if hasattr(obj, 'get_info'):
         %for key, value in obj.get_info():
-        <tr>
-            <th>${tr(key)}</th>
-            <td>${tr(value)}</td>
-        </tr>
+        <li class="meta-info__item">
+            <div class="meta-info__key"><span class="meta-info__key__inner">${tr(key)}</span></div>
+            <div class="meta-info__value">${tr(value)}</div>
+        </li>
         %endfor
     %endif
-
-    <tr>
-        <th>${tr(_("Type"))}</th>
-        <td>${tr(obj.cls_display_name)} (${obj.cls})</td>
-    </tr>
-
-    <tr>
-        <th>${tr(_("Owner"))}</th>
-        <td>${obj.owner_user}</td>
-    </tr>
-</tbody></table>
+    
+    <li class="meta-info__item">
+        <div class="meta-info__key"><span class="meta-info__key__inner">${tr(_("Type"))}</span></div>
+        <div class="meta-info__value">${tr(obj.cls_display_name)} (${obj.cls})</div>
+    </li>
+    
+    <li class="meta-info__item">
+        <div class="meta-info__key"><span class="meta-info__key__inner">${tr(_("Owner"))}</span></div>
+        <div class="meta-info__value">${obj.owner_user}</div>
+    </li>
+</ul>
