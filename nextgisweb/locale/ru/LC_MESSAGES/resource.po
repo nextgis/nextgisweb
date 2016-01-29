@@ -7,18 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-10-06 12:54+0300\n"
+"POT-Creation-Date: 2016-01-30 00:56+0600\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.0\n"
+"Generated-By: Babel 2.1.1\n"
 
-#: __init__.py:72
+#: __init__.py:70
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
@@ -163,6 +164,10 @@ msgstr "Дерево ресурсов"
 msgid "Create resource"
 msgstr "Создать ресурс"
 
+#: view.py:142
+msgid "Update resource"
+msgstr "Обновить ресурс"
+
 #: view.py:148 amd/ngw-resource/DeleteWidget.js:22
 msgid "Delete resource"
 msgstr "Удалить ресурс"
@@ -306,7 +311,7 @@ msgstr "Подтвердить удаление ресурса"
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-resource/template/Widget.hbs:13 template/section_summary.mako:10
+#: amd/ngw-resource/template/Widget.hbs:13 template/section_summary.mako:9
 msgid "Keyname"
 msgstr "Ключ"
 
@@ -315,14 +320,15 @@ msgid "Parent"
 msgstr "Родитель"
 
 #: amd/ngw-resource/template/Widget.hbs:22 template/section_children.mako:7
-#: template/section_summary.mako:16
+#: template/section_summary.mako:24
 msgid "Type"
 msgstr "Тип"
 
-#: template/section_children.mako:8 template/section_summary.mako:21
+#: template/section_children.mako:8 template/section_summary.mako:29
 msgid "Owner"
 msgstr "Владелец"
 
 #: template/section_description.mako:4
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
+
