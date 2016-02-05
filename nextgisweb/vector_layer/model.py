@@ -26,6 +26,7 @@ from .. import db
 from ..resource import (
     Resource,
     DataScope,
+    DataStructureScope,
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR,
@@ -588,6 +589,8 @@ class _geometry_type_attr(SP):
             raise ResourceError(_("Geometry type for existing resource can not be changed."))
 
 
+P_DSS_READ = DataStructureScope.read
+P_DSS_WRITE = DataStructureScope.write
 P_DS_READ = DataScope.read
 P_DS_WRITE = DataScope.write
 
@@ -596,8 +599,8 @@ class VectorLayerSerializer(Serializer):
     identity = VectorLayer.identity
     resclass = VectorLayer
 
-    srs = SR(read=P_DS_READ, write=P_DS_WRITE)
-    geometry_type = _geometry_type_attr(read=P_DS_READ, write=P_DS_WRITE)
+    srs = SR(read=P_DSS_READ, write=P_DSS_WRITE)
+    geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
 
     source = _source_attr(read=None, write=P_DS_WRITE)
 
