@@ -22,6 +22,7 @@ from sqlalchemy.ext.compiler import compiles
 import geoalchemy as ga
 import sqlalchemy.sql as sql
 
+from nextgisweb.event import SafetyEvent
 from .. import db
 from ..resource import (
     Resource,
@@ -281,6 +282,20 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     __field_class__ = VectorLayerField
 
+    # events
+    before_feature_create = SafetyEvent()  # args: resource, feature
+    after_feature_create = SafetyEvent()
+
+    before_feature_update = SafetyEvent()  # args: resource, feature
+    after_feature_update = SafetyEvent()
+
+    before_feature_delete = SafetyEvent()  # args: resource, feature_id
+    after_feature_delete = SafetyEvent()
+
+    before_all_feature_delete = SafetyEvent()  # args: resource
+    after_all_feature_delete = SafetyEvent()
+
+
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
@@ -327,6 +342,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IWritableFeatureLayer
 
     def feature_put(self, feature):
+        self.before_feature_update.fire(resource=self, feature=feature)
+
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(tablename=self._tablename)
 
@@ -343,6 +360,10 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 str(feature.geom), self.srs_id)
 
         DBSession.merge(obj)
+        feature.id = obj.id
+
+        self.after_feature_update.fire(resource=self, feature=feature)
+
 
     def feature_create(self, feature):
         """Вставляет в БД новый объект, описание которого дается в feature
@@ -352,6 +373,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         :return:    ID вставленного объекта
         """
+        self.before_feature_create.fire(resource=self, feature=feature)
+
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(tablename=self._tablename)
 
@@ -367,6 +390,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         DBSession.flush()
         DBSession.refresh(obj)
 
+        self.after_feature_create.fire(resource=self, feature_id=obj.id)
+
         return obj.id
 
     def feature_delete(self, feature_id):
@@ -375,19 +400,27 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         :param feature_id: идентификатор записи
         :type feature_id:  int or bigint
         """
+        self.before_feature_delete.fire(resource=self, feature_id=feature_id)
+
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(tablename=self._tablename)
 
         obj = DBSession.query(tableinfo.model).filter_by(id=feature_id).one()
 
         DBSession.delete(obj)
+        self.after_feature_delete.fire(resource=self, feature_id=feature_id)
+
 
     def feature_delete_all(self):
         """Удаляет все записи слоя"""
+        self.before_all_feature_delete.fire(resource=self)
+
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(tablename=self._tablename)
 
         DBSession.query(tableinfo.model).delete()
+
+        self.after_all_feature_delete.fire(resource=self)
 
 
 def _vector_layer_listeners(table):
