@@ -136,13 +136,14 @@ a:hover [class*=" icon-"]:before {
 .header {
   position: relative;
   box-sizing: border-box;
-  height: 42px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 12px;
+  padding-bottom: 12px;
   background-color: #036997;
   color: #ffffff;
   z-index: 10;
   overflow: hidden;
+  line-height: 1.3;
+  max-height: 55px;
 }
 .header a {
   text-decoration: none;
@@ -176,6 +177,7 @@ a:hover [class*=" icon-"]:before {
   line-height: 30px;
   display: inline-block;
   margin-top: -4px;
+  margin-bottom: -4px;
   margin-right: 8px;
 }
 .logo__pic {
@@ -186,25 +188,21 @@ a:hover [class*=" icon-"]:before {
 .header__title__inner {
   vertical-align: middle;
 }
+.header__right {
+  float: right;
+  margin-top: -2px;
+}
 /* -- MENU STYLES -- */
 .menu-list {
   display: inline-block;
   vertical-align: middle;
-  margin-left: 30px;
+  margin-left: 20px;
 }
 .menu-list .menu-list__item {
   margin-left: 20px;
 }
 .menu-list .menu-list__item:first-child {
   margin-left: 0;
-}
-@media (min-width: 1024px) {
-  .menu-list {
-    margin-left: 6%;
-  }
-  .menu-list .menu-list__item {
-    margin-left: 40px;
-  }
 }
 .lang-list {
   display: inline-block;
@@ -229,6 +227,9 @@ a:hover [class*=" icon-"]:before {
 }
 .user-menu-list .user-menu-list__item {
   margin-left: 10px;
+}
+.user-menu-list .user-menu-list__item:first-child {
+  margin-left: 0;
 }
 .user-menu-list .user-menu-list__item.user .icon-user:before {
   color: #ffffff;
