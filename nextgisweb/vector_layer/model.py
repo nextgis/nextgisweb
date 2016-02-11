@@ -22,7 +22,7 @@ from sqlalchemy.ext.compiler import compiles
 import geoalchemy as ga
 import sqlalchemy.sql as sql
 
-from nextgisweb.event import SafetyEvent
+from ..event import SafetyEvent
 from .. import db
 from ..resource import (
     Resource,
