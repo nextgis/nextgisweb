@@ -66,27 +66,16 @@
         <div class="layout ${'maxwidth' if maxwidth else ''}">
             <div id="header" class="header container">
                 <% settings = request.env.pyramid.settings %>
-                
-                <a class="header__title" href="${request.application_url}">    
-                    %if 'logo' in settings and os.path.isfile(settings['logo']):
-                        <div class="logo">
-                            <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
-                        </div>    
-                    %endif
-                    <span class="header__title__inner">
-                        ${request.env.core.settings['system.full_name']}
-                    </span>    
-                </a>
-                <ul class="menu-list list-inline">
-                    <li class="menu-list__item"><a href="${request.route_url('resource.root')}">${tr(_('Resources'))}</a></li>
-                    %if request.user.is_administrator:
-                        <li class="menu-list__item"><a href="${request.route_url('pyramid.control_panel')}">${tr(_('Control panel'))}</a></li>
-                    %endif    
-                    %if request.env.pyramid.help_page is not None:
-                        <li class="menu-list__item"><a href="${request.route_url('pyramid.help_page')}">${tr(_('Help'))}</a></li>
-                    %endif
-                </ul>
                 <div class="header__right pull-right">
+                    <ul class="menu-list list-inline">
+                        <li class="menu-list__item"><a href="${request.route_url('resource.root')}">${tr(_('Resources'))}</a></li>
+                        %if request.user.is_administrator:
+                            <li class="menu-list__item"><a href="${request.route_url('pyramid.control_panel')}">${tr(_('Control panel'))}</a></li>
+                        %endif    
+                        %if request.env.pyramid.help_page is not None:
+                            <li class="menu-list__item"><a href="${request.route_url('pyramid.help_page')}">${tr(_('Help'))}</a></li>
+                        %endif
+                    </ul>
                     <ul class="user-menu-list list-inline">
                         %if request.user.keyname == 'guest':
                             <li class="user-menu-list__item"><a href="${request.route_url('auth.login')}">${tr(_('Sign in'))}</a></li>
@@ -106,6 +95,16 @@
                         %endfor
                     </ul>
                 </div>
+                <a class="header__title" href="${request.application_url}">    
+                    %if 'logo' in settings and os.path.isfile(settings['logo']):
+                        <div class="logo">
+                            <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
+                        </div>    
+                    %endif
+                    <span class="header__title__inner">
+                        ${request.env.core.settings['system.full_name']}
+                    </span>    
+                </a>
             </div> <!--./header -->
             
             %if obj and hasattr(obj,'__dynmenu__'):
