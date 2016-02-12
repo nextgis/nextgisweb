@@ -37,6 +37,7 @@ define([
             }
 
             if (this.mode) { this.set("mode", this.mode); }
+            if (this.lang) { this.set("lang", this.lang); }
             if (this.value) { this.set("value", this.value); }
         },
 
@@ -50,14 +51,14 @@ define([
             this._cm.refresh();
         },
 
-        _setModeAttr: function (value) {
-            this._set("mode", value);
+        _setLangAttr: function (value) {
+            this._set("lang", value);
             if (this._cm) {
                 var widget = this;
                 require([
                     ngwConfig.assetUrl + "codemirror/mode/" + value + "/" + value + ".js"
                 ], function () {
-                    widget._cm.setOption("mode", value);
+                    widget._cm.setOption("mode", (widget.get("mode") || value));
                 });
             }
         },
