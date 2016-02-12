@@ -284,13 +284,13 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     # events
     before_feature_create = SafetyEvent()  # args: resource, feature
-    after_feature_create = SafetyEvent()
+    after_feature_create = SafetyEvent()   # args: resource, feature_id
 
     before_feature_update = SafetyEvent()  # args: resource, feature
-    after_feature_update = SafetyEvent()
+    after_feature_update = SafetyEvent()   # args: resource, feature
 
     before_feature_delete = SafetyEvent()  # args: resource, feature_id
-    after_feature_delete = SafetyEvent()
+    after_feature_delete = SafetyEvent()   # args: resource, feature_id
 
     before_all_feature_delete = SafetyEvent()  # args: resource
     after_all_feature_delete = SafetyEvent()
@@ -360,7 +360,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 str(feature.geom), self.srs_id)
 
         DBSession.merge(obj)
-        feature.id = obj.id
 
         self.after_feature_update.fire(resource=self, feature=feature)
 
