@@ -21,8 +21,7 @@ define([
             });
 
             layer.olLayer.getURL = function (bounds) {
-                var bounds = this.getExtent(), 
-                    size = this.getImageSize(),
+                var size = this.getImageSize(bounds),
                     resource = item.styleId;
                 return this.url + "?resource=" + resource + "&extent=" + bounds.toArray().join(",") +
                     "&size=" + size.w + "," + size.h;
