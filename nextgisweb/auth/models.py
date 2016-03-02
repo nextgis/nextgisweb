@@ -88,11 +88,13 @@ class User(Principal):
             return a.keyname != 'guest'
 
         else:
-            return a.principal_id == b.principal_id
+            return a.principal_id == b.principal_id and a.principal_id is not None
 
     @property
     def is_administrator(self):
         """ Является ли пользователь членом группы 'administrators' """
+        if self.principal_id is None:
+            return False
 
         # Чтобы хоть как-то минимизировать кол-во обращений к БД, кешируем
         # группу 'administrators' в инстансе
