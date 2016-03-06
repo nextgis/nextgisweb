@@ -103,7 +103,7 @@
                     %endif
                     <span class="header__title__inner">
                         ${request.env.core.settings['system.full_name']}
-                    </span>    
+                    </span>
                 </a>
             </div> <!--./header -->
             
@@ -122,39 +122,36 @@
             %else:
                 <% has_dynmenu = False %>
             %endif
-            
-            <div id="title" class="title pure-g">
-                <div class="pure-u-${"18-24" if has_dynmenu else "1"}">
-                    <div class="content__inner container">
-                        %if hasattr(next, 'title_block'):
-                            ${next.title_block()}
-                        %elif hasattr(next, 'title'):
-                            <h1>${next.title()}</h1>
-                        %elif title:
-                            <h1>${tr(title)}</h1>
-                        %endif
-                    </div>    
-                </div>    
-            </div>
-            
-            %if has_dynmenu:
-                <div class="sidebar pure-u-6-24">
-                    <%include file="nextgisweb:pyramid/template/dynmenu.mako" args="dynmenu=dynmenu, args=dynmenu_kwargs" />
-                </div>
-            %endif
-            
-            <div id="content-wrapper"
-                class="content-wrapper ${'content-maxheight' if maxheight else ''}">
-                <div class="content pure-g expand">
-                    <div class="pure-u-${"18-24" if has_dynmenu else "1"} expand">
-                        <div class="content__inner container expand">    
-                            %if hasattr(next, 'body'):
-                                ${next.body()}
+
+            <div class="content pure-g">
+                <div class="content__inner pure-u-${"18-24" if has_dynmenu else "1"} expand">
+                    <div id="title" class="title">
+                        <div class="content__container container">                                
+                            %if hasattr(next, 'title_block'):
+                                ${next.title_block()}
+                            %elif hasattr(next, 'title'):
+                                <h1>${next.title()}</h1>
+                            %elif title:
+                                <h1>${tr(title)}</h1>
                             %endif
+                        </div>
+                    </div>
+                    <div id="content-wrapper" class="content-wrapper ${'content-maxheight' if maxheight else ''}">
+                        <div class="pure-u-${'18-24' if (maxheight and has_dynmenu) else '1'} expand">
+                            <div class="content__container container expand"> 
+                                %if hasattr(next, 'body'):
+                                    ${next.body()}
+                                %endif  
+                            </div>
                         </div>    
                     </div>
                 </div>
-
+                %if has_dynmenu:
+                    <div class="sidebar-helper pure-u-6-24"></div>
+                    <div class="sidebar pure-u-6-24">
+                        <%include file="nextgisweb:pyramid/template/dynmenu.mako" args="dynmenu=dynmenu, args=dynmenu_kwargs" />
+                    </div>
+                %endif   
             </div> <!--/.content-wrapper -->
         </div> <!--/.layout -->
     %else:
@@ -162,7 +159,6 @@
         ${next.body()}
 
     %endif
-
 
     %if maxheight:
 
