@@ -44,7 +44,8 @@ from .util import _
 Base = declarative_base()
 
 
-GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"))
+GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"),
+                     _("Multipoint"), _("Multiline"), _("Multipolygon"))
 
 PC_READ = ConnectionScope.read
 PC_WRITE = ConnectionScope.write
@@ -212,7 +213,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if row:
                 self.geometry_srid = row['srid']
 
-                tab_geom_type = row['type'].replace('MULTI', '')
+                tab_geom_type = row['type']
 
                 if tab_geom_type == 'GEOMETRY' and self.geometry_type is None:
                     raise ValidationError(_("Geometry type missing in geometry_columns table! You should specify it manually.")) # NOQA
@@ -475,7 +476,7 @@ class FeatureQueryBase(object):
 
         gt = self.layer.geometry_type
         select.append_whereclause(db.func.geometrytype(db.sql.column(
-            self.layer.column_geom)).in_((gt, 'MULTI' + gt)))
+            self.layer.column_geom)).in_((gt, )))
 
         if self._order_by:
             for order, colname in self._order_by:

@@ -283,28 +283,4 @@ class NextgiswebDatasource(DataSource):
         # CreateGeometryFromGML не умеет работать с уникодом
         ogr_geo = ogr.CreateGeometryFromGML(gml)
 
-        # Convert to multi-geometry. (NGW internal geometry structure
-        # is multigeometry)
-        ogr_geo = self._multigeometry(ogr_geo)
-
         return shapely.wkt.loads(ogr_geo.ExportToWkt())
-
-    def _multigeometry(self, ogr_geometry):
-        """Create multigeometry from ogr_geometry
-
-        :param ogr_geometry:    geometry
-        :return:                new multi-geometry
-        """
-
-        geo_type = ogr_geometry.GetGeometryType()
-
-        if geo_type == ogr.wkbPolygon:
-            return ogr.ForceToMultiPolygon(ogr_geometry)
-        elif geo_type == ogr.wkbPoint:
-            return ogr.ForceToMultiPoint(ogr_geometry)
-        elif geo_type in [ogr.wkbLineString, ogr.wkbLinearRing]:
-            return ogr.ForceToMultiLineString(ogr_geometry)
-        else:
-            return ogr_geometry
-
-
