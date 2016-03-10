@@ -5,6 +5,7 @@
 #### `-- ee85d1ceb4976b20e9eeb0925b614a604554aeb7` (2016-03-08)
 
 ```sql
+ALTER TABLE vector_layer ALTER COLUMN geometry_type TYPE character varying(15);
 ALTER TABLE postgis_layer ALTER COLUMN geometry_type TYPE character varying(15);
 
 ALTER TABLE vector_layer DROP CONSTRAINT vector_layer_geometry_type_check1;
