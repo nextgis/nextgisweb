@@ -157,6 +157,7 @@ a:hover [class*=" icon-"]:before{
     z-index: 10;
     overflow: hidden;
     line-height: 1.3;
+    font-size: 14px;
 
     a{
         text-decoration: none;
@@ -176,42 +177,41 @@ a:hover [class*=" icon-"]:before{
     }
     
     .header__title {
-        font-size: 14px;
-        margin-top: 0;
-        border: 0; 
-        padding:0;
-        text-transform: none;
-        letter-spacing: 0;
-        text-decoration: none;
+        display: table;
         color: @white;
+        vertical-align: top;
         
         &:hover{
             color: @white;
         }
     }
 }
-    .logo{
-        display: none;
-        height: 30px;
-        line-height: 30px;
-        display: inline-block;
-        margin-top: -4px;  
-        margin-bottom: -4px;      
-        margin-right: 8px;
-    }
-        .logo__pic{        
-            max-height: 100%;
-            width: auto;
-            vertical-align: middle;            
-        }
-    .header__title__inner{
-        vertical-align: middle;
-    }
     
     .header__right{
         float: right;
-        margin-top: -2px;
+        width: 60%;
+        text-align: right;
     }
+
+    .header__left{
+        float: left;
+        width: 40%;
+        max-width: 500px;
+    }
+        .header__title__logo{
+            display: table-cell;
+            vertical-align: top;
+        }
+            .logo__pic{
+                display: block;
+                margin: -5px 15px -5px -15px;                
+            }
+
+        .header__title__inner{
+            display: table-cell;
+            vertical-align: top;
+        }
+    
 
 /* -- MENU STYLES -- */
 
@@ -239,9 +239,9 @@ a:hover [class*=" icon-"]:before{
         &:before{
             content:"|";
             position: relative;
-            font-size: 15px;
             color: fade(@white, 20%);
             padding-right:4px;
+            top: -1px;
         }
         &:first-child:before{
             display: none;
@@ -375,14 +375,11 @@ table{
 .sidebar{
     box-sizing: border-box;
     background-color: @white;
-    //padding:30px;
-   // box-shadow: 0 0 7px rgba(57,70,78,.2);
     z-index: 5;
     overflow: auto;
     min-height: 100%;
     
     .sidebar-menu{
-       // margin: -30px;
         .box-shadow(none);
     }
 }

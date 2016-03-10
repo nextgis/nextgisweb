@@ -66,7 +66,7 @@
         <div class="layout ${'maxwidth' if maxwidth else ''}">
             <div id="header" class="header container">
                 <% settings = request.env.pyramid.settings %>
-                <div class="header__right pull-right">
+                <div class="header__right">
                     <ul class="menu-list list-inline">
                         <li class="menu-list__item"><a href="${request.route_url('resource.root')}">${tr(_('Resources'))}</a></li>
                         %if request.user.is_administrator:
@@ -95,16 +95,18 @@
                         %endfor
                     </ul>
                 </div>
-                <a class="header__title" href="${request.application_url}">    
-                    %if 'logo' in settings and os.path.isfile(settings['logo']):
-                        <div class="logo">
-                            <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
-                        </div>    
-                    %endif
-                    <span class="header__title__inner">
-                        ${request.env.core.settings['system.full_name']}
-                    </span>
-                </a>
+                <div class="header__left">
+                    <a class="header__title" href="${request.application_url}">    
+                        %if 'logo' in settings and os.path.isfile(settings['logo']):
+                            <div class="header__title__logo">
+                                <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
+                            </div>    
+                        %endif
+                        <div class="header__title__inner">
+                            ${request.env.core.settings['system.full_name']}
+                        </div>
+                    </a>
+                </div>    
             </div> <!--./header -->
             
             %if obj and hasattr(obj,'__dynmenu__'):

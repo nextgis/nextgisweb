@@ -143,6 +143,7 @@ a:hover [class*=" icon-"]:before {
   z-index: 10;
   overflow: hidden;
   line-height: 1.3;
+  font-size: 14px;
 }
 .header a {
   text-decoration: none;
@@ -158,38 +159,34 @@ a:hover [class*=" icon-"]:before {
   color: #b0d0de;
 }
 .header .header__title {
-  font-size: 14px;
-  margin-top: 0;
-  border: 0;
-  padding: 0;
-  text-transform: none;
-  letter-spacing: 0;
-  text-decoration: none;
+  display: table;
   color: #ffffff;
+  vertical-align: top;
 }
 .header .header__title:hover {
   color: #ffffff;
 }
-.logo {
-  display: none;
-  height: 30px;
-  line-height: 30px;
-  display: inline-block;
-  margin-top: -4px;
-  margin-bottom: -4px;
-  margin-right: 8px;
-}
-.logo__pic {
-  max-height: 100%;
-  width: auto;
-  vertical-align: middle;
-}
-.header__title__inner {
-  vertical-align: middle;
-}
 .header__right {
   float: right;
-  margin-top: -2px;
+  width: 60%;
+  text-align: right;
+}
+.header__left {
+  float: left;
+  width: 40%;
+  max-width: 500px;
+}
+.header__title__logo {
+  display: table-cell;
+  vertical-align: top;
+}
+.logo__pic {
+  display: block;
+  margin: -5px 15px -5px -15px;
+}
+.header__title__inner {
+  display: table-cell;
+  vertical-align: top;
 }
 /* -- MENU STYLES -- */
 .menu-list {
@@ -213,9 +210,9 @@ a:hover [class*=" icon-"]:before {
 .lang-list .lang-list__item:before {
   content: "|";
   position: relative;
-  font-size: 15px;
   color: rgba(255, 255, 255, 0.2);
   padding-right: 4px;
+  top: -1px;
 }
 .lang-list .lang-list__item:first-child:before {
   display: none;
