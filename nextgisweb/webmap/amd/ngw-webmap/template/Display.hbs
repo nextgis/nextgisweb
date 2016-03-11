@@ -49,6 +49,11 @@
                             data-dojo-props="iconClass: 'iconArrowInOut', label: '{{gettext 'Initial extent'}}', showLabel: false">
                         </div>
 
+                        <div data-dojo-attach-point="showPermalink"
+                            data-dojo-type="dijit/form/Button"
+                            data-dojo-props="iconClass: 'iconLink', label: '{{gettext 'Permalink'}}', showLabel: false">
+                        </div>
+
                         <div data-dojo-type="dijit/ToolbarSeparator"></div>
 
                         <div data-dojo-attach-point="infoNode"
@@ -80,10 +85,6 @@
 
                             <div style="position: absolute; top: 0; right: 0; z-index: 2000; margin: 4px; background-color: rgba(255, 255, 255, 0.5)">
                                 <a href="http://nextgis.ru/nextgis-web/" target="_blank"><img class="map-logo" src="${assetUrl}img/nextgis.png"/></a>
-                            </div>
-                            <a id="permalink" data-dojo-attach-event="onclick:_getPermalink" href="#" style="position: absolute; bottom: 20px; right: 0; z-index: 2000; margin: 4px; font-size: smaller;">{{gettext 'Permalink'}}</a>
-                            <div data-dojo-attach-point="permalinkDialog" data-dojo-type="dijit/Dialog" data-dojo-props="title: '{{gettext 'Permalink'}}', autofocus: false, draggable: false" style="display: none;">
-                                <div data-dojo-attach-point="permalinkContent" data-dojo-type="dijit/form/TextBox" data-dojo-props="readOnly: false, selectOnClick: true" style="width: 300px;"></div>
                             </div>
                         </div>
 

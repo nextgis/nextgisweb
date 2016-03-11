@@ -12,7 +12,7 @@ define([
     "dojo/dom-style",
     "dojo/request/xhr",
     "dojo/request/script",
-    "ngw/openlayers",
+    "openlayers/ol",
     "ngw-pyramid/i18n!webmap",
     "ngw-feature-layer/FeatureStore",
     "ngw-feature-layer/FeatureGrid",
@@ -36,7 +36,7 @@ define([
     domStyle,
     xhr,
     script,
-    openlayers,
+    ol,
     i18n,
     FeatureStore,
     FeatureGrid,
@@ -84,7 +84,9 @@ define([
                 headers: { "X-Feature-Box": true }
             }).then(
                 function data(featuredata) {
-                    display.map.olMap.zoomToExtent(featuredata.box);
+                    display.map.olMap.getView().fit(
+                        featuredata.box,
+                        display.map.olMap.getSize());
                     display.tabContainer.selectChild(display.mainPane);
                 }
             );
@@ -200,7 +202,9 @@ define([
                 var mItm = new MenuItem({
                     label: put("span $", feature.label).outerHTML,
                     onClick: lang.hitch(this, function () {
-                        display.map.olMap.zoomToExtent(feature.box);
+                        display.map.olMap.getView().fit(
+                            feature.box,
+                            display.map.olMap.getSize());
                         popup.close(this.searchResults);
                     })
                 });
@@ -289,12 +293,15 @@ define([
                                 // и покажем в списке ответов:
 
                                 // Координаты приходят в WGS84
-                                var extent = new openlayers.Bounds(
-                                    place.boundingbox[2], place.boundingbox[0],
-                                    place.boundingbox[3], place.boundingbox[1]
-                                );
+                                var extent = [
+                                    parseFloat(place.boundingbox[2]),
+                                    parseFloat(place.boundingbox[0]),
+                                    parseFloat(place.boundingbox[3]),
+                                    parseFloat(place.boundingbox[1])
+                                ];
 
-                                extent = extent.transform(
+                                extent = ol.proj.transformExtent(
+                                    extent,
                                     display.lonlatProjection,
                                     display.displayProjection
                                 );

@@ -10,6 +10,7 @@ define([
     "dojo/request/xhr",
     "dojo/dom-class",
     "dojo/dom-style",
+    "dojo/dom-construct",
     "dojo/on",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -19,7 +20,7 @@ define([
     "dijit/form/Button",
     "put-selector/put",
     "ngw/route",
-    "ngw/openlayers",
+    "openlayers/ol",
     "ngw/openlayers/Popup",
     "ngw-pyramid/i18n!webmap",
     "ngw-feature-layer/FieldsDisplayWidget",
@@ -40,6 +41,7 @@ define([
     xhr,
     domClass,
     domStyle,
+    domConstruct,
     on,
     BorderContainer,
     ContentPane,
@@ -49,7 +51,7 @@ define([
     Button,
     put,
     route,
-    openlayers,
+    ol,
     Popup,
     i18n,
     FieldsDisplayWidget,
@@ -58,19 +60,21 @@ define([
     webmapSettings
 ) {
 
-    var Control = OpenLayers.Class(OpenLayers.Control, {
-        initialize: function (options) {
-            OpenLayers.Control.prototype.initialize.apply(this, [options]);
+    var Control = function(options) {
+        this.tool = options.tool;
+        ol.interaction.Interaction.call(this, {
+            handleEvent: Control.prototype.handleClickEvent
+        });
+    };
+    ol.inherits(Control, ol.interaction.Interaction);
 
-            this.handler = new OpenLayers.Handler.Click(this, {
-                click: this.clickCallback
-            });
-        },
-
-        clickCallback: function (evt) {
-            this.tool.execute([evt.xy.x, evt.xy.y]);
+    Control.prototype.handleClickEvent = function(evt) {
+        if (evt.type == 'singleclick') {
+            this.tool.execute(evt.pixel);
+            evt.preventDefault();
         }
-    });
+        return true;
+    }
 
     var Widget = declare([BorderContainer], {
         style: "width: 100%; height: 100%",
@@ -226,7 +230,7 @@ define([
                     }).placeAt(widget.extController, "last");
                     domClass.add(widget.editButton.domNode, "no-label");
 
-                    setTimeout(function () { widget.resize();}, 10);
+                    setTimeout(function () { widget.resize();}, 50);
 
                 });
             }).otherwise(console.error);
@@ -246,30 +250,33 @@ define([
         // Высота popup,
         popupHeight: webmapSettings.popup_height,
 
+
         constructor: function () {
             this.map = this.display.map;
-
             this.control = new Control({tool: this});
-            this.display.map.olMap.addControl(this.control);
+            this.control.setActive(false);
+            this.display.map.olMap.addInteraction(this.control);
+
+            this._popup = new Popup({
+                title: i18n.gettext("Identify"),
+                size: [this.popupWidth, this.popupHeight]
+            });
+            this.display.map.olMap.addOverlay(this._popup);
         },
 
         activate: function () {
-            this.control.activate();
+            this.control.setActive(true);
         },
 
         deactivate: function () {
-            this.control.deactivate();
-
-            if (this.popup) {
-                this.display.map.olMap.removePopup(this.popup);
-                this.popup = null;
-            }
+            this.control.setActive(false);
+            this._popup.setPosition(undefined);
         },
 
         execute: function (pixel) {
             var tool = this,
                 olMap = this.display.map.olMap,
-                point = olMap.getLonLatFromPixel(new OpenLayers.Pixel(pixel[0], pixel[1]));
+                point = olMap.getCoordinateFromPixel(pixel);
 
             var request = {
                 srs: 3857,
@@ -309,34 +316,28 @@ define([
         // WKT-строка геометрии поиска объектов для точки pixel
         _requestGeomString: function (pixel) {
             var olMap = this.map.olMap,
-                bounds = new openlayers.Bounds();
+                bounds;
 
-            bounds.extend(olMap.getLonLatFromPixel({x: pixel[0] - this.pixelRadius, y: pixel[1] - this.pixelRadius}));
-            bounds.extend(olMap.getLonLatFromPixel({x: pixel[0] + this.pixelRadius, y: pixel[1] + this.pixelRadius}));
+            bounds = ol.extent.boundingExtent([
+                olMap.getCoordinateFromPixel([
+                    pixel[0] - this.pixelRadius,
+                    pixel[1] - this.pixelRadius
+                ]),
+                olMap.getCoordinateFromPixel([
+                    pixel[0] + this.pixelRadius,
+                    pixel[1] + this.pixelRadius
+                ])
+            ]);
 
-            return bounds.toGeometry().toString();
-        },
-
-        _removePopup: function () {
-            if (this._popup) {
-                this._popup.widget.select.closeDropDown(true);
-                this._popup.widget.destroyRecursive();
-                this.map.olMap.removePopup(this._popup);
-                this._popup = null;
-            }
+            return new ol.format.WKT().writeGeometry(
+                ol.geom.Polygon.fromExtent(bounds));
         },
 
         _responsePopup: function (response, point, layerLabels) {
             // TODO: Проверить, есть ли какой-нибудь результат
             // и показывать popup только если он есть.
 
-            this._removePopup();
-
-            this._popup = new Popup({
-                title: i18n.gettext("Identify"),
-                point: point,
-                size: [this.popupWidth, this.popupHeight]
-            });
+            domConstruct.empty(this._popup.contentDiv);
 
             var widget = new Widget({
                 response: response,
@@ -348,12 +349,12 @@ define([
 
             widget.placeAt(this._popup.contentDiv).startup();
 
-            this.map.olMap.addPopup(this._popup);
+            this._popup.setPosition(point);
             widget.resize();
 
             // Обработчик закрытия
             on(this._popup._closeSpan, "click", lang.hitch(this, function () {
-                this._removePopup();
+                this._popup.setPosition(undefined);
             }));
         }
 

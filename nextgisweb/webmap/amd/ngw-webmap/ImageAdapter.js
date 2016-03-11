@@ -1,31 +1,34 @@
 /* global define */
 define([
     "dojo/_base/declare",
+    "dojo/io-query",
     "./Adapter",
     "ngw/route",
-    "ngw/openlayers/layer/Grid"
-], function (declare, Adapter, route, Grid) {
+    "ngw/openlayers/layer/Image"
+], function (declare, ioQuery, Adapter, route, Image) {
     return declare(Adapter, {
         createLayer: function (item) {
-            var layer = new Grid(item.id, {
-                url: route.render.image(),
-                params: {},
-                singleTile: true,
-                ratio: 1,
-                isBaseLayer: false,
-                type: "png",
-                visibility: item.visibility,
-                minScale: item.minScaleDenom ? (1 / item.minScaleDenom) : undefined,
-                maxScale: item.maxScaleDenom ? (1 / item.maxScaleDenom) : undefined,
+            var layer = new Image(item.id, {
+                maxResolution: item.maxResolution ? item.maxResolution : undefined,
+                minResolution: item.minResolution ? item.minResolution : undefined,
+                visible: item.visibility,
                 opacity: item.transparency ? (1 - item.transparency / 100) : 1.0
+            }, {
+                url: route.render.image(),
+                params: {
+                    resource: item.styleId
+                },
+                ratio: 1,
+                imageLoadFunction: function(image, src) {
+                    var url = src.split("?")[0];
+                    var query = src.split("?")[1];
+                    var queryObject = ioQuery.queryToObject(query);
+                    image.getImage().src = url
+                        + "?resource=" + queryObject["resource"]
+                        + "&extent=" + queryObject["BBOX"]
+                        + "&size=" + queryObject["WIDTH"] + "," + queryObject["HEIGHT"];
+                }
             });
-
-            layer.olLayer.getURL = function (bounds) {
-                var size = this.getImageSize(bounds),
-                    resource = item.styleId;
-                return this.url + "?resource=" + resource + "&extent=" + bounds.toArray().join(",") +
-                    "&size=" + size.w + "," + size.h;
-            };
 
             return layer;
         }
