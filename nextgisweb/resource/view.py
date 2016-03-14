@@ -139,7 +139,7 @@ def create(request):
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def update(request):
-    return dict(obj=request.context, maxheight=True,
+    return dict(obj=request.context, subtitle=_("Update resource"), maxheight=True,
                 query=dict(operation='update', id=request.context.id))
 
 

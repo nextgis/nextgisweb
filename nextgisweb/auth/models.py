@@ -68,7 +68,7 @@ class User(Principal):
 
         # Если ни один из пользователей не особый, то обычное сравнение
         if not self.system and not other.system:
-            return self == other
+            return self.principal_id == other.principal_id
 
         elif self.system:
             a, b = self, other
@@ -88,18 +88,20 @@ class User(Principal):
             return a.keyname != 'guest'
 
         else:
-            return a == b
+            return a.principal_id == b.principal_id and a.principal_id is not None
 
     @property
     def is_administrator(self):
         """ Является ли пользователь членом группы 'administrators' """
+        if self.principal_id is None:
+            return False
 
         # Чтобы хоть как-то минимизировать кол-во обращений к БД, кешируем
         # группу 'administrators' в инстансе
         if not hasattr(self, '_admins'):
             self._admins = Group.filter_by(keyname='administrators').one()
 
-        return (self in self._admins.members)
+        return any([user for user in self._admins.members if user.principal_id == self.principal_id])
 
     @property
     def password(self):

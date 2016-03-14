@@ -286,6 +286,12 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         finally:
             conn.close()
 
+    def get_info(self):
+        return super(PostgisLayer, self).get_info() + (
+            (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
+                self.geometry_type]),
+        )
+
     # IFeatureLayer
 
     @property
