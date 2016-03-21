@@ -400,6 +400,14 @@ Get feature
     } -
 }
 
+URL к фотографиям составляется из корня URL, который нужно посмотреть в веб-интерфейсе админки, и этого имени файла. Пример:
+
+.. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/download
+
+Получение превью фотографий
+
+.. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/image?size=200x150
+
 Запрос количества обектов векторного слоя
 
 .. http:get:: /api/resource/(int:id)/feature_count
