@@ -47,23 +47,8 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
     outline: none;
 }
 
-/* Двигаем OL ScaleLine в центр в низ */
-.olMap .olControlScaleLine {
-    position: relative;
-    left: 50%; bottom: 0;
-    padding: 4px;
-}
-
-.olMap .olControlScaleLine .olControlScaleLineTop {
-    position: relative;
-    left: -50%;
-    background-color: rgba(255, 255, 255, 0.25);
-}
-
-/* Копирайты опускаем до низу */
-.olMap .olControlAttribution {
-    right: 0px; bottom: 0px;
-    padding: 4px;
+.ol-rotate {
+    top: 2.5em !important;
 }
 
 

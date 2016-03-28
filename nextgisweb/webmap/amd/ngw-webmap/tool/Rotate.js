@@ -11,20 +11,12 @@ define([
     i18n
 ) {
     return declare(Base, {
-        out: false, 
-
         constructor: function (options) {
-            if (!this.out) {
-                this.label = i18n.gettext("Zoom in");
-                this.iconClass = "iconZoomIn";
-            } else {
-                this.label = i18n.gettext("Zoom out");
-                this.iconClass = "iconZoomOut";
-            };
+            this.label = i18n.gettext("Rotate");
+            this.iconClass = "iconRotate";
 
-            this.interaction = new ol.interaction.DragZoom({
-                condition: ol.events.condition.always,
-                out: this.out
+            this.interaction = new ol.interaction.DragRotate({
+                condition: ol.events.condition.always
             });
             this.interaction.setActive(false);
             this.display.map.olMap.addInteraction(this.interaction);

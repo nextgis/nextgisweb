@@ -1,39 +1,40 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "dojo/Stateful"
+    "dojo/Stateful",
+    "openlayers/ol"
 ], function (
     declare,
     lang,
-    Stateful
+    Stateful,
+    ol
 ) {
-    // Это очень печально, что все конструкторы слоев OL имеют разные сигнатуры,
-    // поэтому какой-то универсальный класс обертку довольно трудно сделать.
-
     return declare([Stateful], {
         "-chains-": {
             constructor: "manual"
         },
 
-        olClassName: "OpenLayers.Layer",
-        olArgs: [],
+        olLayerClassName: "layer.Layer",
+        olSourceClassName: "source.Source",
 
-        constructor: function (name, options) {
+        constructor: function (name, loptions, soptions) {
             this.name = name;
-            this.title = options.title;
-            this.isBaseLayer = !!options.isBaseLayer;
+            this.title = loptions.title;
 
-            var cls = lang.getObject(this.olClassName, true);
-            this.olLayer = new cls(this.olArgs[0], this.olArgs[1], this.olArgs[2], this.olArgs[3]);
+            var lcls = lang.getObject(this.olLayerClassName, true, ol);
+            this.olLayer = new lcls(loptions);
+
+            var scls = lang.getObject(this.olSourceClassName, true, ol);
+            this.olSource = new scls(soptions);
+
+            this.olLayer.setSource(this.olSource);
 
             var layer = this;
 
-            this._visibility = this.olLayer.getVisibility();
-            this.olLayer.events.on({
-                visibilitychanged: function () {
-                    if (layer.get("visibility") != layer.olLayer.getVisibility()) {
-                        layer.set("visibility", layer.olLayer.getVisibility())
-                    };
+            this._visibility = this.olLayer.getVisible();
+            this.olLayer.on("change:visible", function () {
+                if (layer.get("visibility") != layer.olLayer.getVisible()) {
+                    layer.set("visibility", layer.olLayer.getVisible());
                 }
             });
         },
@@ -48,7 +49,7 @@ define([
 
         _visibilitySetter: function (value) {
             if (this._visibility != value) {
-                this.olLayer.setVisibility(value);
+                this.olLayer.setVisible(value);
                 this._visibility = value;
             };
         }

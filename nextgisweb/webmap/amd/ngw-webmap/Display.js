@@ -12,7 +12,8 @@ define([
     "dojo/number",
     "dojo/aspect",
     "dojo/io-query",
-    "ngw/openlayers",
+    "dojo/dom-construct",
+    "openlayers/ol",
     "ngw/openlayers/Map",
     "dijit/registry",
     "dijit/form/DropDownButton",
@@ -20,6 +21,8 @@ define([
     "dijit/MenuItem",
     "dijit/layout/ContentPane",
     "dijit/form/ToggleButton",
+    "dijit/Dialog",
+    "dijit/form/TextBox",
     "dojo/dom-style",
     "dojo/store/JsonRest",
     "dojo/request/xhr",
@@ -45,10 +48,9 @@ define([
     "dijit/form/Select",
     "dijit/form/DropDownButton",
     "dijit/ToolbarSeparator",
-    "dijit/Dialog",
-    "dijit/form/TextBox",
     // css
-    "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css"
+    "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
+    "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css"
 ], function (
     declare,
     _WidgetBase,
@@ -62,7 +64,8 @@ define([
     number,
     aspect,
     ioQuery,
-    openlayers,
+    domConstruct,
+    ol,
     Map,
     registry,
     DropDownButton,
@@ -70,6 +73,8 @@ define([
     MenuItem,
     ContentPane,
     ToggleButton,
+    Dialog,
+    TextBox,
     domStyle,
     JsonRest,
     xhr,
@@ -162,8 +167,11 @@ define([
         // Вызов после startup
         _startupDeferred: undefined,
 
-        // GET-параметры: подложка, слои, стартовый охват
+        // GET-параметры: подложка, слои, центр, разрешение
         _urlParams: undefined,
+
+        // Текущая подложка
+        _baseLayer: undefined,
 
         // Для загрузки изображения
         assetUrl: ngwConfig.assetUrl,
@@ -202,7 +210,7 @@ define([
 
             // Добавляем MID базовых карт
             array.forEach(clientSettings.basemaps, function (bm) {
-                mids.basemap.push(bm.mid);
+                mids.basemap.push(bm.base.mid);
             });
 
             array.forEach(Object.keys(mids), function (k) {
@@ -237,18 +245,17 @@ define([
                 query: { type: "root" }
             });
 
-            this.displayProjection = new openlayers.Projection("EPSG:3857");
-            this.lonlatProjection = new openlayers.Projection("EPSG:4326");
+            this.displayProjection = "EPSG:3857";
+            this.lonlatProjection = "EPSG:4326";
 
-            if (this._urlParams.bbox) {
-                this._extent =  new openlayers.Bounds.fromString(this._urlParams.bbox);
-            } else {
-                if (this.config.extent[3] > 82) { this.config.extent[3] = 82; }
-                if (this.config.extent[1] < -82) { this.config.extent[1] = -82; }
+            if (this.config.extent[3] > 82) { this.config.extent[3] = 82; }
+            if (this.config.extent[1] < -82) { this.config.extent[1] = -82; }
 
-                this._extent = (new openlayers.Bounds(this.config.extent))
-                    .transform(this.lonlatProjection, this.displayProjection);
-            }
+            this._extent = ol.proj.transformExtent(
+                this.config.extent,
+                this.lonlatProjection,
+                this.displayProjection
+            );
 
             // Дерево элементов слоя
             this.itemTree = new Tree({
@@ -299,7 +306,9 @@ define([
 
                     // И добавляем возможность переключения
                     widget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
-                        widget.map.olMap.setBaseLayer(widget.map.layers[newVal].olLayer);
+                        widget.map.layers[oldVal].olLayer.setVisible(false);
+                        widget.map.layers[newVal].olLayer.setVisible(true);
+                        widget._baseLayer = widget.map.layers[newVal];
                     });
                     if (widget._urlParams.base) { widget.basemapSelect.set("value", widget._urlParams.base); }
                 }
@@ -458,7 +467,10 @@ define([
                                         headers: { "X-Feature-Box": true }
                                     }).then(
                                         function data(featuredata) {
-                                            display.map.olMap.zoomToExtent(featuredata.box);
+                                            display.map.olMap.getView().fit(
+                                                featuredata.box,
+                                                display.map.olMap.getSize()
+                                            );
                                         }
                                     );
                                 }
@@ -555,33 +567,40 @@ define([
             var widget = this;
 
             // Инициализация карты
-            this.map = new Map(this.mapNode, {
+            this.map = new Map({
+                target: this.mapNode,
                 controls: [
-                    new openlayers.Control.Attribution(),
-                    new openlayers.Control.Zoom()
-                ]
+                    new ol.control.Rotate({
+                        tipLabel: i18n.gettext("Reset rotation")
+                    }),
+                    new ol.control.Zoom({
+                        zoomInTipLabel: i18n.gettext("Zoom in"),
+                        zoomOutTipLabel: i18n.gettext("Zoom out")
+                    }),
+                    new ol.control.Attribution({
+                        tipLabel: i18n.gettext("Attributions")
+                    }),
+                    new ol.control.ScaleLine()
+                ],
+                view: new ol.View({
+                    minZoom: 4
+                })
             });
-
-            // Навигация по-умолчанию
-            this.navigationControl = new openlayers.Control.Navigation({
-                zoomBoxEnabled: true,
-                dragPanOptions: {enableKinetic: false}
-            });
-            this.map.olMap.addControl(this.navigationControl);
-
-            // Масштабная линейка
-            this.map.olMap.addControl(new openlayers.Control.ScaleLine({bottomOutUnits: "", geodesic: true}));
 
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
-                var pt = newVal.transform(widget.displayProjection, widget.lonlatProjection);
-                widget.centerLonNode.innerHTML = number.format(pt.lon, {places: 3});
-                widget.centerLatNode.innerHTML = number.format(pt.lat, {places: 3});
+                var pt = ol.proj.transform(newVal, widget.displayProjection, widget.lonlatProjection);
+                widget.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
+                widget.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
             });
 
-            // Обновление подписи масштаба
-            this.map.watch("scaleDenom", function (attr, oldVal, newVal) {
-                widget.scaleInfoNode.innerHTML = "1 : " + number.format(newVal, {places: 0});
+            // Обновление подписи масштабного уровня
+            this.map.watch("resolution", function (attr, oldVal, newVal) {
+                widget.scaleInfoNode.innerHTML = "1 : " + number.format(
+                    widget.map.getScaleForResolution(
+                        newVal,
+                        widget.map.olMap.getView().getProjection().getMetersPerUnit()
+                    ), {places: 0});
             });
 
             // При изменении размеров контейнера пересчитываем размер карты
@@ -592,19 +611,25 @@ define([
             // Инициализация базовых слоев
             var idx = 0;
             array.forEach(clientSettings.basemaps, function (bm) {
-                var MID = this._mid.basemap[bm.mid];
-                var layerOptions = lang.clone(bm);
+                var MID = this._mid.basemap[bm.base.mid];
 
-                layerOptions.isBaseLayer = true;
-                if (layerOptions.keyname === undefined) {
-                    layerOptions.keyname = "basemap_" + idx;
+                var baseOptions = lang.clone(bm.base);
+                var layerOptions = lang.clone(bm.layer);
+                var sourceOptions = lang.clone(bm.source);
+
+                if (baseOptions.keyname === undefined) {
+                    baseOptions.keyname = "basemap_" + idx;
                 }
 
                 try {
-                    var layer = new MID(layerOptions.keyname, layerOptions);
+                    var layer = new MID(baseOptions.keyname, layerOptions, sourceOptions);
+                    if (layer.olLayer.getVisible()) {
+                        this._baseLayer = layer;
+                    }
+                    layer.isBaseLayer = true;
                     this.map.addLayer(layer);
                 } catch (err) {
-                    console.warn("Can't initialize layer [" + layerOptions.keyname + "]: " + err);
+                    console.warn("Can't initialize layer [" + baseOptions.keyname + "]: " + err);
                 }
 
                 idx = idx + 1;
@@ -612,6 +637,10 @@ define([
 
             this.zoomToInitialExtentButton.on("click", function() {
                 widget._zoomToInitialExtent();
+            });
+
+            this.showPermalink.on("click", function() {
+                widget._showPermalink();
             });
 
             this._zoomToInitialExtent();
@@ -657,7 +686,7 @@ define([
                         visibleStyles = widget._urlParams.styles;
                     if (visibleStyles) {
                         cond = array.indexOf(visibleStyles, store.getValue(item, "styleId")) !== -1;
-                        layer.olLayer.setVisibility(cond);
+                        layer.olLayer.setVisible(cond);
                         layer.visibility = cond;
                         store.setValue(item, "checked", cond);
                     }
@@ -678,6 +707,15 @@ define([
             var data = this._itemConfigById[store.getValue(item, "id")];
             var adapter = this._adapters[data.adapter];
 
+            data.minResolution = this.map.getResolutionForScale(
+                data.maxScaleDenom,
+                this.map.olMap.getView().getProjection().getMetersPerUnit()
+            );
+            data.maxResolution = this.map.getResolutionForScale(
+                data.minScaleDenom,
+                this.map.olMap.getView().getProjection().getMetersPerUnit()
+            );
+
             var layer = adapter.createLayer(data);
 
             layer.itemId = data.id;
@@ -696,8 +734,8 @@ define([
             this.addTool(new ToolZoom({display: this, out: false}));
             this.addTool(new ToolZoom({display: this, out: true}));
 
-            this.addTool(new ToolMeasure({display: this, order: 1}));
-            this.addTool(new ToolMeasure({display: this, order: 2}));
+            this.addTool(new ToolMeasure({display: this, type: "LineString"}));
+            this.addTool(new ToolMeasure({display: this, type: "Polygon"}));
         },
 
         _pluginsSetup: function () {
@@ -756,38 +794,71 @@ define([
         },
 
         _zoomToInitialExtent: function () {
-            this.map.olMap.zoomToExtent(this._extent, true);
+            if (this._urlParams.resolution && this._urlParams.center) {
+                this.map.olMap.getView().setCenter([
+                    parseFloat(this._urlParams.center[0]),
+                    parseFloat(this._urlParams.center[1])
+                ]);
+                this.map.olMap.getView().setResolution(
+                    parseFloat(this._urlParams.resolution)
+                );
+            } else {
+                this.map.olMap.getView().fit(this._extent, this.map.olMap.getSize());
+            }
         },
 
-        _getPermalink: function () {
+        _showPermalink: function () {
             all({
                 visbleItems: this.getVisibleItems(),
                 map: this._mapDeferred
             }).then(
                 lang.hitch(this, function (results) {
-                    var visibleStyles, queryStr, permalink;
-
-                    visibleStyles = array.map(
+                    var visibleStyles = array.map(
                         results.visbleItems,
                         lang.hitch(this, function (i) {
                             return this.itemStore.dumpItem(i).styleId;
                         })
                     );
 
-                    queryStr = ioQuery.objectToQuery({
-                        base: this.map.olMap.baseLayer.keyname,
-                        bbox: this.map.olMap.getExtent(),
+                    var queryStr = ioQuery.objectToQuery({
+                        base: this._baseLayer.name,
+                        center: this.map.olMap.getView().getCenter(),
+                        resolution: this.map.olMap.getView().getResolution(),
                         styles: visibleStyles.join(",")
                     });
 
-                    permalink = window.location.origin + window.location.pathname + "?" + queryStr;
+                    var permalink = window.location.origin
+                                    + window.location.pathname
+                                    + "?" + queryStr;
 
-                    this.permalinkContent.set("value", decodeURIComponent(permalink));
-                    this.permalinkDialog.show();
+                    var permalinkDialog = new Dialog({
+                        title: i18n.gettext("Permalink"),
+                        draggable: false,
+                        autofocus: false
+                    });
 
+                    var permalinkContent = new TextBox({
+                        readOnly: false,
+                        selectOnClick: true,
+                        value: decodeURIComponent(permalink),
+                        style: {
+                            width: "300px"
+                        }
+                    });
+
+                    domConstruct.place(
+                        permalinkContent.domNode,
+                        permalinkDialog.containerNode,
+                        "first"
+                    );
+                    permalinkContent.startup();
+                    permalinkDialog.show();
                 }),
-                function (error) { console.log(error); }
+                function (error) {
+                    console.log(error);
+                }
             );
         }
+
     });
 });

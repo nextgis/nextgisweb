@@ -1,12 +1,14 @@
-/* glue: 0.4 hash: 38ae865b34 */
+/* glue: 0.4 hash: 50c276c224 */
 .iconZoomOut,
 .iconZoomIn,
 .iconZoom,
 .iconTable,
 .iconRulerSquare,
 .iconRuler,
+.iconRotate,
 .iconPan,
 .iconMap,
+.iconLink,
 .iconLayers,
 .iconIdentify,
 .iconFeatureEdit,
@@ -18,10 +20,12 @@
 .iconTable{background-position:-16px -16px;width:16px;height:16px;}
 .iconRulerSquare{background-position:-32px 0px;width:16px;height:16px;}
 .iconRuler{background-position:-32px -16px;width:16px;height:16px;}
-.iconPan{background-position:0px -32px;width:16px;height:16px;}
-.iconMap{background-position:-16px -32px;width:16px;height:16px;}
-.iconLayers{background-position:-32px -32px;width:16px;height:16px;}
-.iconIdentify{background-position:-48px 0px;width:16px;height:16px;}
-.iconFeatureEdit{background-position:-48px -16px;width:16px;height:16px;}
-.iconDescription{background-position:-48px -32px;width:16px;height:16px;}
-.iconArrowInOut{background-position:0px -48px;width:16px;height:16px;}
+.iconRotate{background-position:0px -32px;width:16px;height:16px;}
+.iconPan{background-position:-16px -32px;width:16px;height:16px;}
+.iconMap{background-position:-32px -32px;width:16px;height:16px;}
+.iconLink{background-position:-48px 0px;width:16px;height:16px;}
+.iconLayers{background-position:-48px -16px;width:16px;height:16px;}
+.iconIdentify{background-position:-48px -32px;width:16px;height:16px;}
+.iconFeatureEdit{background-position:0px -48px;width:16px;height:16px;}
+.iconDescription{background-position:-16px -48px;width:16px;height:16px;}
+.iconArrowInOut{background-position:-32px -48px;width:16px;height:16px;}

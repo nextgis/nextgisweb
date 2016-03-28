@@ -6,11 +6,13 @@ define([
     _Base
 ) {
     return declare([_Base], {
-        olClassName: "OpenLayers.Layer.OSM",
+        olLayerClassName: "layer.Tile",
+        olSourceClassName: "source.OSM",
 
-        constructor: function (name, options) {
-            this.olArgs = [name, options.url, options];
+        constructor: function(name, loptions, soptions) {
+            if (soptions.wrapX === undefined) { soptions.wrapX = false; }
+
             this.inherited(arguments);
-        } 
+        }
     })
 });

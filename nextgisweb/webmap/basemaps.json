@@ -1,44 +1,56 @@
 [{
-    "keyname": "osm-mapnik",
-    "mid": "ngw/openlayers/layer/OSM",
-    "title": "OpenStreetMap"
+    "base": {
+        "keyname": "osm-mapnik",
+        "mid": "ngw/openlayers/layer/OSM"
+    },
+    "layer": {
+        "title": "OpenStreetMap"
+    },
+    "source": {}
 }, {
-    "keyname": "google-satellite",
-    "mid": "ngw/openlayers/layer/Google",
-    "title": "Google - Спутник",
-    "type": "satellite"
+    "base": {
+        "keyname": "bing-satellite",
+        "mid": "ngw/openlayers/layer/Bing"
+    },
+    "layer": {
+        "title": "Bing - Снимки",
+        "visible": false
+    },
+    "source": {
+        "imagerySet": "Aerial"
+    }
 }, {
-    "keyname": "google-roadmap",
-    "mid": "ngw/openlayers/layer/Google",
-    "title": "Google - Схема",
-    "type": "roadmap"
+    "base": {
+        "keyname": "bing-hybrid",
+        "mid": "ngw/openlayers/layer/Bing"
+    },
+    "layer": {
+        "title": "Bing - Гибрид",
+        "visible": false
+    },
+    "source": {
+        "imagerySet": "AerialWithLabels"
+    }
 }, {
-    "keyname": "google-hybrid",
-    "mid": "ngw/openlayers/layer/Google",
-    "title": "Google - Гибрид",
-    "type": "hybrid"
+    "base": {
+        "keyname": "bing-road",
+        "mid": "ngw/openlayers/layer/Bing"
+    },
+    "layer": {
+        "title": "Bing - Схема",
+        "visible": false
+    },
+    "source": {
+        "imagerySet": "Road"
+    }
 }, {
-    "keyname": "google-terrain",
-    "mid": "ngw/openlayers/layer/Google",
-    "title": "Google - Рельеф",
-    "type": "terrain"
-}, {
-    "keyname": "bing-satellite",
-    "mid": "ngw/openlayers/layer/Bing",
-    "title": "Bing - Снимки",
-    "type": "Aerial"
-}, {
-    "keyname": "bing-hybrid",
-    "mid": "ngw/openlayers/layer/Bing",
-    "title": "Bing - Гибрид",
-    "type": "AerialWithLabels"
-}, {
-    "keyname": "bing-road",
-    "mid": "ngw/openlayers/layer/Bing",
-    "title": "Bing - Схема",
-    "type": "Road"
-}, {
-    "keyname": "blank",
-    "mid": "ngw/openlayers/layer/Layer",
-    "title": "Пустой"
+    "base": {
+        "keyname": "blank",
+        "mid": "ngw/openlayers/layer/XYZ"
+    },
+    "layer": {
+        "title": "Пустой",
+        "visible": false
+    },
+    "source": {}
 }]

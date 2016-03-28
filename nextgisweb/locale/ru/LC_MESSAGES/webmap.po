@@ -7,18 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-24 22:28+0600\n"
+"POT-Creation-Date: 2016-03-16 20:05+0600\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.0\n"
+"Generated-By: Babel 2.1.1\n"
 
-#: __init__.py:42
+#: __init__.py:41
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
@@ -38,7 +39,23 @@ msgstr "Веб-карта"
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:690
+#: amd/ngw-webmap/Display.js:566
+msgid "Reset rotation"
+msgstr "Отменить поворот"
+
+#: amd/ngw-webmap/Display.js:569 amd/ngw-webmap/tool/Zoom.js:18
+msgid "Zoom in"
+msgstr "Приблизить"
+
+#: amd/ngw-webmap/Display.js:570 amd/ngw-webmap/tool/Zoom.js:21
+msgid "Zoom out"
+msgstr "Отодвинуть"
+
+#: amd/ngw-webmap/Display.js:573
+msgid "Attributions"
+msgstr "Информация о правообладателях"
+
+#: amd/ngw-webmap/Display.js:705
 msgid "Pan"
 msgstr "Перемещение"
 
@@ -189,17 +206,13 @@ msgstr "Измерение расстояния"
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:79
+#: amd/ngw-webmap/tool/Measure.js:143
 msgid "Click adds point to measure, double click completes the measurement."
 msgstr ""
 "Двойной щелчек добавляет точку к измерению, двойной щелчек завершает "
 "измерение."
 
-#: amd/ngw-webmap/tool/Zoom.js:18
-msgid "Zoom in"
-msgstr "Приблизить"
-
-#: amd/ngw-webmap/tool/Zoom.js:21
-msgid "Zoom out"
-msgstr "Отодвинуть"
+#: amd/ngw-webmap/tool/Rotate.js:15
+msgid "Rotate"
+msgstr "Поворот"
 
