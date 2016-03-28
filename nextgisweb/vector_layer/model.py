@@ -56,8 +56,10 @@ from ..feature_layer import (
 
 from .util import _
 
-GEOM_TYPE_GA = (ga.MultiPoint, ga.MultiLineString, ga.MultiPolygon)
-GEOM_TYPE_DB = ('MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')
+GEOM_TYPE_GA = (ga.Point, ga.LineString, ga.Polygon,
+                ga.MultiPoint, ga.MultiLineString, ga.MultiPolygon)
+GEOM_TYPE_DB = ('POINT', 'LINESTRING', 'POLYGON',
+                'MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')
 GEOM_TYPE_OGR = (
     ogr.wkbPoint,
     ogr.wkbLineString,
@@ -71,7 +73,8 @@ GEOM_TYPE_OGR = (
     ogr.wkbMultiPoint25D,
     ogr.wkbMultiLineString25D,
     ogr.wkbMultiPolygon25D)
-GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"))
+GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"),
+                     _("Multipoint"), _("Multiline"), _("Multipolygon"))
 
 FIELD_TYPE_DB = (
     db.Integer,
@@ -89,7 +92,7 @@ FIELD_TYPE_OGR = (
     ogr.OFTTime,
     ogr.OFTDateTime)
 
-_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 4))
+_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 2))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 _GEOM_TYPE_2_GA = dict(zip(GEOM_TYPE_DB, GEOM_TYPE_GA))
 
@@ -220,13 +223,6 @@ class TableInfo(object):
             ):
                 geom.FlattenTo2D()
 
-            if geom.GetGeometryType() == ogr.wkbPoint:
-                geom = ogr.ForceToMultiPoint(geom)
-            elif geom.GetGeometryType() == ogr.wkbLineString:
-                geom = ogr.ForceToMultiLineString(geom)
-            elif geom.GetGeometryType() == ogr.wkbPolygon:
-                geom = ogr.ForceToMultiPolygon(geom)
-
             geom.Transform(transform)
 
             fld_values = dict()
@@ -295,7 +291,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     before_all_feature_delete = SafetyEvent()  # args: resource
     after_all_feature_delete = SafetyEvent()
 
-
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
@@ -363,7 +358,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         self.after_feature_update.fire(resource=self, feature=feature)
 
-
     def feature_create(self, feature):
         """Вставляет в БД новый объект, описание которого дается в feature
 
@@ -408,7 +402,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         DBSession.delete(obj)
         self.after_feature_delete.fire(resource=self, feature_id=feature_id)
-
 
     def feature_delete_all(self):
         """Удаляет все записи слоя"""
