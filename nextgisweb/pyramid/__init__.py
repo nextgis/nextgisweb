@@ -5,7 +5,8 @@ import re
 import codecs
 from hashlib import md5
 from StringIO import StringIO
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename, get_distribution
+from collections import namedtuple
 
 from pyramid.config import Configurator
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -73,6 +74,9 @@ class ExtendedConfigurator(Configurator):
             kwargs = dict(vargs, **kwargs)
 
         super(ExtendedConfigurator, self).add_view(view=view, **kwargs)
+
+
+DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])
 
 
 class PyramidComponent(Component):
@@ -171,7 +175,7 @@ class PyramidComponent(Component):
         finally:
             sys.stdout = stdout
 
-        self.pkginfo = []
+        self.distinfo = []
 
         # Так же из вывода pip freeze читаем список установленных пакетов
 
@@ -180,17 +184,23 @@ class PyramidComponent(Component):
         for l in buf:
             l = l.strip().lower()
 
-            pkgtuple = None
+            dinfo = None
             mpkg = re.match(r'(.+)==(.+)', l)
             if mpkg:
-                pkgtuple = tuple(mpkg.groups())
+                dinfo = DistInfo(
+                    name=mpkg.group(1),
+                    version=mpkg.group(2),
+                    commit=None)
 
             mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', l)
             if mgit:
-                pkgtuple = tuple(reversed(mgit.groups()))
+                dinfo = DistInfo(
+                    name=mgit.group(2),
+                    version=get_distribution(mgit.group(2)).version,
+                    commit=mgit.group(1))
 
-            if pkgtuple is not None:
-                self.pkginfo.append(pkgtuple)
+            if dinfo is not None:
+                self.distinfo.append(dinfo)
             else:
                 self.logger.warn("Could not parse pip freeze line: %s", l)
 
