@@ -56,7 +56,7 @@ entry_points = {
 
 setup(
     name='nextgisweb',
-    version='0.0',
+    version='2.0',
     description='nextgisweb',
     long_description="",
     classifiers=[
