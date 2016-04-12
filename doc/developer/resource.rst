@@ -6,7 +6,7 @@ Resources
 ..  automodule:: nextgisweb.resource.scope
     :members:
 
-Типы ресурсов (cls) имеют следующий состав:
+Resources (cls) can be:
    
 * resource_group
 * postgis_layer
@@ -26,7 +26,7 @@ Resources
 HTTP API
 --------
 
-Запрос схемы
+Schema query
 ^^^^^^^^^^^^
 
 При запросе схемы получается состав поддерживаемых типов ресурсов и их 
@@ -279,7 +279,7 @@ HTTP API
     }
    
    
-Базовые запросы   
+Basic queries 
 ^^^^^^^^^^^^^^^    
 
 ..  http:get:: /api/resource/(int:id)
@@ -313,15 +313,15 @@ HTTP API
 Get feature
 ^^^^^^^^^^^
 
-Запрос одиного объекта
+Get single feature
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)
 
-Запрос всех объектов векторного слоя
+Get all vector layer features
 
 .. http:get:: /api/resource/(int:id)/feature/
 
-**Пример запроса**:
+**Query example**:
 
 .. sourcecode:: http
 
@@ -329,7 +329,7 @@ Get feature
    Host: ngw_url
    Accept: */*
    
-**Пример тела ответа в формате JSON**:
+**Query result in JSON**:
 
 .. sourcecode:: json
 
