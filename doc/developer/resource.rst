@@ -1,7 +1,7 @@
 .. format instructions http://pythonhosted.org/sphinxcontrib-httpdomain/#
 
-Ресурсы
-=======
+Resources
+=========
 
 ..  automodule:: nextgisweb.resource.scope
     :members:
@@ -452,4 +452,27 @@ URL к фотографиям составляется из корня URL, ко
 
    Cписок дочерних объектов объекта `id` (список)
 
+Get version
+^^^^^^^^^^^^
+.. versionadded:: 3.0
 
+To get version execute query:
+
+.. http:get:: /api/component/pyramid/pkg_version
+
+**Query example**:
+
+.. sourcecode:: http
+
+   GET /api/component/pyramid/pkg_version HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+**Query result in JSON**:
+
+.. sourcecode:: json
+
+   {
+      "nextgisweb": "2.0",
+      "nextgisweb_mapserver": "0.0dev"
+   }
