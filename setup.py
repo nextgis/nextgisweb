@@ -27,7 +27,7 @@ requires = [
     'pillow',
     'lxml',
     'passlib',
-    'owslib>=0.9.2',
+    'owslib>0.11.0',
     'requests',
     'babel',
 ]
@@ -56,7 +56,7 @@ entry_points = {
 
 setup(
     name='nextgisweb',
-    version='0.0',
+    version='2.0',
     description='nextgisweb',
     long_description="",
     classifiers=[

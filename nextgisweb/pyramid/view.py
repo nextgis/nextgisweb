@@ -76,7 +76,7 @@ def locale(request):
 def pkginfo(request):
     return dict(
         title=_("Package versions"),
-        pkginfo=request.env.pyramid.pkginfo,
+        distinfo=request.env.pyramid.distinfo,
         dynmenu=request.env.pyramid.control_panel)
 
 

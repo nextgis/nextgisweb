@@ -18,6 +18,7 @@ class PkgInfo(object):
         self._comp_mod = dict()
         self._comp_pkg = dict()
         self._pkg_comp = dict()
+        self._pkg_vers = dict()
 
     def scan(self):
         if self.scanned:
@@ -34,10 +35,13 @@ class PkgInfo(object):
                 self._comp_pkg[comp] = package
                 if package not in self._pkg_comp:
                     self._pkg_comp[package] = list()
+                    self._pkg_vers[package] = pkg_resources \
+                        .get_distribution(package).version
                 self._pkg_comp[package].append(comp)
 
         for k, v in self._pkg_comp.iteritems():
             self._pkg_comp[k] = tuple(v)
+
         self.scanned = True
 
     @property
@@ -61,6 +65,10 @@ class PkgInfo(object):
     def pkg_comp(self, pkg):
         self.scan()
         return self._pkg_comp[pkg]
+
+    def pkg_version(self, pkg):
+        self.scan()
+        return self._pkg_vers[pkg]
 
 
 pkginfo = PkgInfo()

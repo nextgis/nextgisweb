@@ -14,6 +14,7 @@ import PIL
 from owslib.wms import WebMapService, WMSCapabilitiesReader
 
 from .. import db
+from ..env import env
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -84,10 +85,10 @@ class Connection(Base, Resource):
 
     def capcache_query(self):
         self.capcache_tstamp = datetime.utcnow()
-
         reader = WMSCapabilitiesReader(self.version, url=self.url,
                                        un=self.username,
-                                       pw=self.password)
+                                       pw=self.password,
+                                       headers=env.wmsclient.headers)
         root = reader.read(self.url)
 
         # В версии WMS 1.3.0 для всех элементов обязателен namespace,
@@ -244,7 +245,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         sep = "&" if "?" in self.connection.url else "?"
         url = self.connection.url + sep + urllib.urlencode(query)
-        return PIL.Image.open(BytesIO(requests.get(url, auth=auth).content))
+        return PIL.Image.open(BytesIO(requests.get(
+            url, auth=auth, headers=env.wmsclient.headers).content))
 
 
 DataScope.read.require(

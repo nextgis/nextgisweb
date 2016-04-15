@@ -9,6 +9,13 @@ class WMSClientComponent(Component):
     identity = 'wmsclient'
     metadata = Base.metadata
 
+    def initialize(self):
+        super(WMSClientComponent, self).initialize()
+
+        self.headers = {
+            'User-Agent': self.settings.get('user_agent', 'NextGIS Web')
+        }
+
     def setup_pyramid(self, config):
         from . import view
         view.setup_pyramid(self, config)
@@ -16,4 +23,6 @@ class WMSClientComponent(Component):
     def client_settings(self, request):
         return dict(wms_versions=WMS_VERSIONS)
 
-    settings_info = ()
+    settings_info = (
+        dict(key='user_agent', desc="HTTP-заголовок User-Agent"),
+    )
