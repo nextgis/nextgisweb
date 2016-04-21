@@ -230,7 +230,7 @@ define([
                     }).placeAt(widget.extController, "last");
                     domClass.add(widget.editButton.domNode, "no-label");
 
-                    setTimeout(function () { widget.resize();}, 50);
+                    widget.resize();
 
                 });
             }).otherwise(console.error);
@@ -350,7 +350,6 @@ define([
             widget.placeAt(this._popup.contentDiv).startup();
 
             this._popup.setPosition(point);
-            widget.resize();
 
             // Обработчик закрытия
             on(this._popup._closeSpan, "click", lang.hitch(this, function () {
