@@ -18,6 +18,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="${request.route_url('pyramid.favicon')}"
+        rel="shortcut icon" type="image/x-icon"/>
     <link href="${request.static_url('nextgisweb:static/css/pure-0.6.0-min.css')}"
         rel="stylesheet" type="text/css"/>
     <link href="${request.static_url('nextgisweb:static/css/default.css')}"
