@@ -59,25 +59,6 @@ class Connection(Base, Resource):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    @property
-    def client(self):
-        if not hasattr(self, '_client'):
-            self._client = WebMapService(self.url, version=self.version,
-                                         username=self.username,
-                                         password=self.password)
-
-        return self._client
-
-    def service(self):
-        if not hasattr(self, '_service'):
-            self._service = WebMapService(
-                url=self.url, version=self.version,
-                username=self.username,
-                password=self.password,
-                xml=str(self.capcache_xml))
-
-        return self._service
-
     def capcache(self):
         return self.capcache_json is not None \
             and self.capcache_xml is not None \
