@@ -1,8 +1,9 @@
-.. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
+
 .. NextGIS Web develop TOC
 
-Описание API
-============
+API description
+===============
 
 .. toctree::
    :maxdepth: 3

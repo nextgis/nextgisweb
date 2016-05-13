@@ -1,4 +1,4 @@
-.. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
 Miscellaneous
 =============
@@ -230,6 +230,4 @@ The special section should be present in NGW config file for this purposes:
 
    [auth]
    register = true
-   
-       
 

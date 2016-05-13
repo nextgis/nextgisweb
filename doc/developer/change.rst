@@ -1,24 +1,24 @@
-.. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
-Редактирование
+Editing
 ==============
 
-Изменение ресурса
+Change resource
 -----------------
 
-Для изменения ресурса необходимо выполнить следующий запрос.
+The following POST request need to change resource.
 
 .. http:put:: /resource/(int:parent_id)/child/(int:id)
 
-   Запрос на изменение ресурса
+   Change resource request
     
-   :param parent_id: идентификатор родительского ресурса
-   :param id: идентификатор ресурса который необходимо изменить
-   :<json string display_name: название ресурса
-   :<json string keyname: уникальный ключ
-   :<json int id: идентификатор
-   :<json string description: описание
-   :jsonarray permissions: новые настройки доступа
+   :param parent_id: parent resource id
+   :param id: changing resource id
+   :<json string display_name: resource new name
+   :<json string keyname: resource new key
+   :<json int id: resource id (cannot be changed)
+   :<json string description: resource new description
+   :jsonarray permissions: resource new description
    
 **Example request**:
 
@@ -40,17 +40,16 @@
    
 
 .. note::
-   Выполняется по аналогии с изменением ресурса. Обязательно необходимо передать 
-   настройки доступа.
+   This equal to change resource. The request must be authorised.
    
-Создание записи
----------------   
+Create new feature
+------------------
 
 Для создания записи в векторном слое необходимо выполнить следующий запрос.
 
 .. http:post:: /api/resource/(int:layer_id)/feature/
 
-   Запрос на создание записи
+   Create feature request
    
    :param layer_id: идентификатор слоя
    :<json string geom: WKT представление геометрии (должно быть типа MULTI и в СК слоя)
@@ -97,14 +96,14 @@
 При формировании запроса не обязательно указывать все поля - достаточно только
 те, что необходимо изменить.
 
-Изменение записи
+Change feature
 ----------------
 
 Для изменения записи в векторном слое необходимо выполнить следующий запрос.
 
 .. http:put:: /api/resource/(int:layer_id)/feature/(int:feature_id)
 
-   Запрос на изменение записи
+   Change feature request
    
    :param layer_id: идентификатор слоя
    :param feature_id: идентификатор записи
@@ -149,17 +148,17 @@
      "id": 1
    }   
 
-Удаление записи
+Delete feature
 ---------------
 
 Для удаления записи в векторном слое необходимо выполнить следующий запрос.
 
 .. http:delete:: /api/resource/(int:layer_id)/feature/(int:feature_id)
 
-   Запрос на удаление записи
+   Delete feature request
    
-   :param layer_id: идентификатор слоя
-   :param feature_id: идентификатор записи
+   :param layer_id: resource identificator
+   :param feature_id: feature identificator
    
 **Example request**:
 
@@ -170,16 +169,16 @@
    Accept: */*
    
    
-Удаление всех записей
+Delete all features
 ---------------------
 
 Для удаления всех записей в векторном слое необходимо выполнить следующий запрос.
 
 .. http:delete:: /api/resource/(int:layer_id)/feature/
 
-   Запрос на удаление записей
+   Delete features request
    
-   :param layer_id: идентификатор слоя
+   :param layer_id: resource identificator
    
 **Example request**:
 

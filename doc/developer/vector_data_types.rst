@@ -1,13 +1,15 @@
-Типы данных для векторных слоев
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
+
+Vector layer data types
 ===============================
 
-При создании векторного слоя можно использовать следующие типы данных:
+Vector layer field types:
 
 .. autoclass:: nextgisweb.feature_layer.interface.FIELD_TYPE
     :members:
     :undoc-members:
 
-Поддерживаемые типы геометрий:
+Geometry types:
 
 .. autoclass:: nextgisweb.feature_layer.interface.GEOM_TYPE
     :members:

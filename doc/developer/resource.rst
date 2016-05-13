@@ -1,3 +1,5 @@
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
+
 .. format instructions http://pythonhosted.org/sphinxcontrib-httpdomain/#
 
 Resources
@@ -26,8 +28,8 @@ Resources (cls) can be:
 HTTP API
 --------
 
-Schema query
-^^^^^^^^^^^^
+Schema request
+^^^^^^^^^^^^^^
 
 При запросе схемы получается состав поддерживаемых типов ресурсов и их 
 характеристики и другие метаданные.  
@@ -39,7 +41,7 @@ Schema query
 .. note::    
    Для запросов REST API в заголовке HTTP запроса должны быть обязательно прописано: `Accept: */*`
     
-**Пример запроса**:
+**Example request**:
 
 .. sourcecode:: http
 
@@ -47,7 +49,7 @@ Schema query
    Host: ngw_url
    Accept: */*
    
-**Пример тела ответа в формате JSON**:
+**Example JSON response**:
     
 
 .. sourcecode:: json
@@ -279,7 +281,7 @@ Schema query
     }
    
    
-Basic queries 
+Basic requests 
 ^^^^^^^^^^^^^^^    
 
 ..  http:get:: /api/resource/(int:id)
@@ -321,7 +323,7 @@ Get all vector layer features
 
 .. http:get:: /api/resource/(int:id)/feature/
 
-**Query example**:
+**Example request**:
 
 .. sourcecode:: http
 
@@ -329,7 +331,7 @@ Get all vector layer features
    Host: ngw_url
    Accept: */*
    
-**Query result in JSON**:
+**Example JSON response**:
 
 .. sourcecode:: json
 
@@ -359,7 +361,7 @@ Get all vector layer features
     }
   }
 
-**Пример тела ответа с фотографиями и описанием**:
+**Example response with photo and description**:
 
 .. sourcecode:: json
 
@@ -417,7 +419,7 @@ URL к фотографиям составляется из корня URL, ко
 
 .. http:get:: /api/resource/(int:id)/feature_count
     
-Запросы к корню
+Root requests
 ^^^^^^^^^^^^^^^
 
 .. deprecated:: 2.2
@@ -462,11 +464,11 @@ Get version
 ^^^^^^^^^^^^
 .. versionadded:: 3.0
 
-To get version execute query:
+To get version make request:
 
 .. http:get:: /api/component/pyramid/pkg_version
 
-**Query example**:
+**Example request**:
 
 .. sourcecode:: http
 
@@ -474,7 +476,7 @@ To get version execute query:
    Host: ngw_url
    Accept: */*
    
-**Query result in JSON**:
+**Example JSON response**:
 
 .. sourcecode:: json
 
