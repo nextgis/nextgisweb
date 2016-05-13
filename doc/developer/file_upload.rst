@@ -1,4 +1,4 @@
-.. _file_upload:
+.. _ngw_file_upload:
 
 Компонент file_upload
 =====================

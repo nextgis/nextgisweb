@@ -134,8 +134,8 @@ GeoJSON и CSV, для растровых - TMS.
    Host: ngw_url
    Accept: */*
 
-Get user info
--------------
+User managment
+--------------
 
 You can get user information by it id. The following request have to be executed:
 
