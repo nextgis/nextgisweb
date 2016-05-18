@@ -29,6 +29,7 @@ def tile(request):
         obj = Resource.filter_by(id=resid).one()
         if not setting_disable_check:
             request.resource_permission(PD_READ, obj)
+            request.resource_permission(PD_READ, obj.parent)
         req = obj.render_request(obj.srs)
         rimg = req.render_tile((z, x, y), 256)
         if aimg is None:
@@ -63,6 +64,7 @@ def image(request):
         obj = Resource.filter_by(id=resid).one()
         if not setting_disable_check:
             request.resource_permission(PD_READ, obj)
+            request.resource_permission(PD_READ, obj.parent)
         req = obj.render_request(obj.srs)
         rimg = req.render_extent(p_extent, p_size)
         if aimg is None:
