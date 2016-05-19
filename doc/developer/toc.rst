@@ -2,6 +2,8 @@
 
 .. NextGIS Web develop TOC
 
+.. _ngw_api_description:
+
 API description
 ===============
 
