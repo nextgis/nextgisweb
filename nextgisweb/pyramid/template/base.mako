@@ -4,6 +4,7 @@
 <!--[if gt IE 8]><!--> <html> <!--<![endif]-->
 <%
     import os
+    import re
     import json
     from bunch import Bunch
 %>
@@ -74,8 +75,17 @@
                         %if request.user.is_administrator:
                             <li class="menu-list__item"><a href="${request.route_url('pyramid.control_panel')}">${tr(_('Control panel'))}</a></li>
                         %endif    
-                        %if request.env.pyramid.help_page is not None:
-                            <li class="menu-list__item"><a href="${request.route_url('pyramid.help_page')}">${tr(_('Help'))}</a></li>
+                        
+                        <% help_page = request.env.pyramid.help_page.get(request.locale_name) %>
+                        %if help_page:
+                            <li class="menu-list__item">
+                                %if re.match("^http[s]?", help_page):
+                                    <a href="${help_page}" target="_blank">
+                                %else:
+                                    <a href="${request.route_url('pyramid.help_page')}">
+                                %endif
+                                ${tr(_('Help'))}</a>
+                            </li>
                         %endif
                     </ul>
                     <ul class="user-menu-list list-inline">
