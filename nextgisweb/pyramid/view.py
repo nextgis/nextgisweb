@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import codecs
 import os.path
 
 from pyramid.response import FileResponse
@@ -45,9 +46,11 @@ def control_panel(request):
 
 
 def help_page(request):
-    return dict(
-        title=_("Help"),
-        help_page=request.env.pyramid.help_page)
+    with codecs.open(
+        request.env.pyramid.help_page[request.locale_name], 'rb', 'utf-8'
+        ) as fp:
+        help_page = fp.read()
+    return dict(title=_("Help"), help_page=help_page)
 
 
 def logo(request):

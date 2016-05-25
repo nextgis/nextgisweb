@@ -2,7 +2,6 @@
 import sys
 import os.path
 import re
-import codecs
 from hashlib import md5
 from StringIO import StringIO
 from pkg_resources import resource_filename, get_distribution
@@ -144,11 +143,12 @@ class PyramidComponent(Component):
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)
 
-        if 'help_page' in settings:
-            with codecs.open(settings['help_page'], 'rb', 'utf-8') as fp:
-                self.help_page = fp.read()
-        else:
-            self.help_page = None
+        # Справка
+        self.help_page = {}
+        for key in settings.keys():
+            if key.startswith('help_page'):
+                hploc = key.split('.')[-1]
+                self.help_page[hploc] = settings[key]
 
         # Чтобы не приходилось вручную чистить кеш статики, сделаем
         # так, чтобы у них всегда были разные URL. В качестве ключа
