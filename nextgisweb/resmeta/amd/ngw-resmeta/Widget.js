@@ -120,21 +120,21 @@ define([
             };
  
             this.addMenu.addChild(new MenuItem({
-                label: "Text",
+                label: i18n.gettext("Text"),
                 value: "text",
                 showLabel: true,
                 onClick: add
             }));
 
             this.addMenu.addChild(new MenuItem({
-                label: "Integer",
+                label: i18n.gettext("Integer"),
                 value: "integer",
                 showLabel: true,
                 onClick: add
             }));
 
             this.addMenu.addChild(new MenuItem({
-                label: "Float",
+                label: i18n.gettext("Float"),
                 value: "float",
                 showLabel: true,
                 onClick: add

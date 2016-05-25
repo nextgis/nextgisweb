@@ -374,6 +374,7 @@ table {
 }
 /* Sidebar */
 .sidebar {
+  position: relative;
   box-sizing: border-box;
   background-color: #ffffff;
   z-index: 5;

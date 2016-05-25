@@ -12,15 +12,24 @@
 
         <thead><tr> 
             <th style="width: 100%; text-align: inherit;">${tr(_('Package'))}</th>
-            <th style="width: 8em; text-align: inherit;">${tr(_('Version'))}</th>
+            <th style="width: 8em; text-align: inherit;" colspan="2">${tr(_('Version'))}</th>
         </tr></thead>
 
         <tbody>
         
-        %for pkg, ver in pkginfo:
+        %for dinfo in distinfo:
         <tr>
-            <td>${pkg}</td>
-            <td>${ver}</td>
+            <td>${dinfo.name}</td>
+            <td>
+                ${dinfo.version}
+            </td>
+            <td>
+                %if dinfo.commit:
+                    ${dinfo.commit}
+                %else:
+                    &nbsp;
+                %endif
+            </td>
         </tr>
         %endfor
 

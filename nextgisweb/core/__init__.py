@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import os.path
+from urllib import quote as urlquote
 from pkg_resources import resource_filename
 
 from sqlalchemy import create_engine
@@ -42,7 +43,7 @@ class CoreComponent(Component):
 
         sa_url = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
             user=self._settings.get('database.user', 'nextgisweb'),
-            password=(':' + self._settings['database.password']) if 'database.password' in self._settings else '',
+            password=(':' + urlquote(self._settings['database.password'])) if 'database.password' in self._settings else '',
             host=self._settings.get('database.host', 'localhost'),
             name=self._settings.get('database.name', 'nextgisweb'),
         )

@@ -134,6 +134,10 @@
     </FeatureTypeList>
     <fes:Filter_Capabilities>
         <fes:Conformance>
+            <fes:Constraint name="ImplementsTransactionalWFS">
+                <ows:NoValues/>
+                <ows:DefaultValue>TRUE</ows:DefaultValue>
+            </fes:Constraint>
             <fes:Constraint name="ImplementsQuery">
                 <ows:NoValues/>
                 <ows:DefaultValue>FALSE</ows:DefaultValue>

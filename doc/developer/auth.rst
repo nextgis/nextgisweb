@@ -1,20 +1,20 @@
-.. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
 Authentication
 ==============
 
-Для авторизации необходимо послать POST запрос следующего вида. 
+For the authorisation a POST request the following form sent.
 
 .. http:post:: /login
 
-   Запрос на авторизацию в NextGIS Web
+   Authentication request to NextGIS Web
 
    :form login: Login
    :form password: Password
    :status 200: Success authentication
    
    
-**Пример запроса**:
+**Example request**:
     
 .. sourcecode:: http
  
@@ -24,9 +24,10 @@ Authentication
 
    login=<login>&password=<password>
 
-При успешной аутентификации возвращается ответ с кодом 200 и Set-Cookie. Если подставлять cookie в следующие запросы, то пользователь будет считаться аутентифицированным.
+If authorisation success NextGIS Web return HTTP code 200 and Set-Cookie. 
+If set this cookie into the request header, this request will be authorised.
 
-Кроме того, в каждом запросе можно передавать аутентификационные данные (HTTP AUTH).
+Also, in each request may be send authorised data (HTTP AUTH).
 
 .. note::
     

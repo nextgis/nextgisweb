@@ -7,6 +7,8 @@ from urllib2 import unquote
 
 from pyramid.response import Response, FileResponse
 
+from ..package import pkginfo
+
 from .util import ClientRoutePredicate
 
 
@@ -69,6 +71,10 @@ def locdata(request):
     )), status_code=404, content_type=b'application/json')
 
 
+def pkg_version(request):
+    return dict([(p, pkginfo.pkg_version(p)) for p in pkginfo.packages])
+
+
 def setup_pyramid(comp, config):
     config.add_route('pyramid.settings', '/api/component/pyramid/settings') \
         .add_view(settings, renderer='json')
@@ -80,3 +86,8 @@ def setup_pyramid(comp, config):
         'pyramid.locdata',
         '/api/component/pyramid/locdata/{component}/{locale}',
     ).add_view(locdata, renderer='json')
+
+    config.add_route(
+        'pyramid.pkg_version',
+        '/api/component/pyramid/pkg_version',
+    ).add_view(pkg_version, renderer='json')

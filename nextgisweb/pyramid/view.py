@@ -5,6 +5,8 @@ import os.path
 from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
 
+from pkg_resources import resource_filename
+
 from .. import dynmenu as dm
 
 from .util import _, ClientRoutePredicate
@@ -58,7 +60,11 @@ def logo(request):
 
 def favicon(request):
     settings = request.env.pyramid.settings
-    if 'favicon' in settings and os.path.isfile(settings['favicon']):
+    if 'favicon' not in settings:
+        settings['favicon'] = resource_filename(
+            'nextgisweb', 'static/img/favicon.ico')
+
+    if os.path.isfile(settings['favicon']):
         return FileResponse(
             settings['favicon'], request=request,
             content_type=bytes('image/x-icon'))
@@ -76,7 +82,7 @@ def locale(request):
 def pkginfo(request):
     return dict(
         title=_("Package versions"),
-        pkginfo=request.env.pyramid.pkginfo,
+        distinfo=request.env.pyramid.distinfo,
         dynmenu=request.env.pyramid.control_panel)
 
 

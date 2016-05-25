@@ -1,5 +1,5 @@
 .. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
-.. NextGIS Web common TOC
+.. NextGIS Web dev common TOC
 
 NextGIS Web
 ===========

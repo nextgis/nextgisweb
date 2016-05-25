@@ -1,22 +1,24 @@
-.. _file_upload:
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
-Компонент file_upload
+.. _ngw_file_upload:
+
+file_upload component
 =====================
 
-Загрузка файла
+File upload
 --------------
 
-Для загрузки файла существует следующий запрос:
+For file upload following request exists:
 
 ..  http:post:: /api/component/file_upload/upload
 
-    Запрос на загрузку файла
+    File upload request
     
-    :form file: путь до файла
-    :form name: имя файла
+    :form file: file path
+    :form name: file name
 
-Далее следует multipart post запрос. В запросе вводятся следующие имена параметров формы:
-`name` = "имя файла"
+Next multipart POST request follow. Request includes following form parameters:
+`name` = "file name"
 
 **Example request**:
 
@@ -29,7 +31,7 @@
    file=\tmp\test.file&name=testfile
    
 
-В результате выполнения запроса должен быть получен ответ содержащий информацию о загруженном файле:
+If request succeeded the uploaded file details will be returned:
 
 **Example response body**:
     
@@ -46,20 +48,20 @@
       ]
     }
 
-Загрузка нескольких файлов
+Several files upload
 --------------------------
 
-Для загрузки файла существует следующий запрос:
+For several files upload following request exists:
 
 ..  http:post:: /api/component/file_upload/upload
 
-    Запрос на загрузку файла
+    Several files upload request
 
-    :form name: должно быть "files[]"
+    :form name: must be "files[]"
 
-В поле `name` записываются имена и пути до файлов (multipart post запрос). 
+In `name` field must be file name and path (multipart POST request). 
 
-В результате должен быть получен ответ о загрузке следующего вида:
+If request succeeded the following response will be returned:
     
 **Example response body**:
     
@@ -100,7 +102,7 @@
       ]
     }
 
-Изменение файла
+Change file
 ---------------
 
 ..  http:put:: /api/component/file_upload/upload
