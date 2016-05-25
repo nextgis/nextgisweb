@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import re
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -73,6 +74,27 @@ class ResourceComponent(Component):
                 principal=admingrp,
                 action='allow'))
 
+            everyone_permissions = self.settings.get('everyone_permissions')
+            if everyone_permissions is not None:
+                everyone = User.filter_by(keyname='everyone').one()
+                perm_list = re.split(r'\,\s*', everyone_permissions)
+                for perm in perm_list:
+                    m = re.match(r'(\w+)\:\s*(\w+)', perm)
+                    if m:
+                        scope_ident = m.group(1)
+                        permission_ident = m.group(2)
+                    else:
+                        m = re.match(r'(\w+)', perm)
+                        if m:
+                            scope_ident = m.group(1)
+                            permission_ident = None
+                        else:
+                            raise ValueError("Invalid permission: %s!" % perm)
+
+                    obj.acl.append(ACLRule(
+                        principal=everyone, action='allow',
+                        scope=scope_ident, permission=permission_ident))
+
             obj.persist()
 
     @require('auth')
@@ -81,4 +103,6 @@ class ResourceComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
-    settings_info = () + cache_settings_info
+    settings_info = (
+        dict(key="everyone_permissions", desc="Permissions for user Everyone"),
+    ) + cache_settings_info
