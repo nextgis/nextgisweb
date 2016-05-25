@@ -28,6 +28,19 @@
             title="{{gettext 'Top, deg.'}}"
             style="width: 100%"></div>
 
+
+            <div data-dojo-type="dijit/form/Button"
+                data-dojo-attach-point="btnSetExtentFromLayer"
+                data-dojo-props="iconClass: 'dijitIconNewTask', showLabel: false">
+                {{gettext 'Set extent from layer'}}
+
+                <div data-dojo-type="ngw-resource/ResourcePicker"
+                    data-dojo-attach-point="layerPicker"
+                    data-dojo-props="interface: 'IBboxLayer'">
+                </div>
+
+            </div>
+
         <div data-dojo-type="ngw-resource/ResourceBox"
             data-dojo-props="interface: 'IFeatureLayer', colspan: 2"
             data-ngw-serialize="bookmark_resource"

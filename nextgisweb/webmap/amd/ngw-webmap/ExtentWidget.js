@@ -2,6 +2,8 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
+    "dojo/request/xhr",
+    "ngw/route",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -18,6 +20,8 @@ define([
 ], function (
     declare,
     lang,
+    xhr,
+    route,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -31,6 +35,30 @@ define([
         title: i18n.gettext("Extent and bookmarks"),
         templateString: hbsI18n(template, i18n),
         serializePrefix: "webmap",
+
+       postCreate: function () {
+            this.inherited(arguments);
+
+            // Выбор слоя и получение его охвата
+            this.btnSetExtentFromLayer.on("click",
+                lang.hitch(this, function () {
+                    this.layerPicker.pick().then(lang.hitch(this,
+                        function (itm) {
+                            xhr(route.layer.extent({id: itm.id}), {
+                                method: "GET",
+                                handleAs: "json"
+                            }).then(lang.hitch(this, function (data) {
+                                var extent = data.extent;
+                                this.wExtentLeft.set("value", extent.minLon);
+                                this.wExtentRight.set("value", extent.maxLon);
+                                this.wExtentTop.set("value", extent.maxLat);
+                                this.wExtentBottom.set("value", extent.minLat);
+                            }));
+                        }
+                    ));
+                })
+            );
+        },
 
         serializeInMixin: function (data) {
             if (data.webmap === undefined) { data.webmap = {}; }
