@@ -18,6 +18,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta property="og:title" content="${'self.title() —' if hasattr(self, 'assets') else ''} ${request.env.core.settings['system.full_name']} — ${tr(_('Your Web GIS at nextgis.com'))}"/>
+    <meta property="og:image" content="http://nextgis.ru/img/webgis-for-social.png"/>
     <link href="${request.static_url('nextgisweb:static/css/pure-0.6.0-min.css')}"
         rel="stylesheet" type="text/css"/>
     <link href="${request.static_url('nextgisweb:static/css/default.css')}"
