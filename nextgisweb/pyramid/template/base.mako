@@ -10,17 +10,21 @@
 %>
 <head>
     <title>
+        <% page_title = '' %>
         %if hasattr(self, 'title'):
-            ${self.title()} ::
+            <% page_title += self.title() + ' | ' %>
         %endif
 
-        ${request.env.core.settings['system.name']}
+        <% page_title += request.env.core.settings['system.full_name'] %>
+        ${page_title}
     </title>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta property="og:title" content="${'self.title() — ' if hasattr(self, 'assets') else ''}${request.env.core.settings['system.full_name']} — ${tr(_('Your Web GIS at nextgis.com'))}"/>
     <meta property="og:image" content="http://nextgis.ru/img/webgis-for-social.png"/>
+    <meta property="og:description" content="${tr(_('Your Web GIS at nextgis.com'))}"/>
+
     <link href="${request.route_url('pyramid.favicon')}"
         rel="shortcut icon" type="image/x-icon"/>
     <link href="${request.static_url('nextgisweb:static/css/pure-0.6.0-min.css')}"
