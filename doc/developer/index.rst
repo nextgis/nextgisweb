@@ -1,3 +1,4 @@
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
 .. include:: toc.rst
 

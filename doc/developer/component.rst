@@ -1,5 +1,7 @@
-Компоненты и окружение
-======================
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
+
+Components and environment
+==========================
 
 Для обеспечения модульности в NGW используются разделение на компоненты. Один python-пакет может содержать один или несколько компонентов. Каждый компонент является наследником класса :py:class:`~nextgisweb.component.Component`, а для загрузки соответствующих модулей используются точки входа (entry points) setuptools.
 
@@ -24,8 +26,8 @@
 3. Для каждого компонента вызывается :py:meth:`~nextgisweb.component.Component.configure`
 
 
-Зависимости между компонентами
-------------------------------
+Component dependency
+--------------------
 
 Вызовы методов :py:meth:`~nextgisweb.component.Component.initialize` и :py:meth:`~nextgisweb.component.Component.configure` осуществляются с учетом зависимостей, которые могут быть указаны при помощи декоратора :py:func:`~nextgisweb.component.require`.
 
@@ -50,18 +52,18 @@
         def initialize(self):
             pass
 
-Глобальный объект окружение
+Global environment object
 ---------------------------
 
 .. autoclass:: nextgisweb.env.env
 
-Класс Component
+Component class
 ------------------------------
 
 .. autoclass:: nextgisweb.component.Component
     :members: 
 
-Класс Env
+Env class
 ------------------------
 
 .. autoclass:: nextgisweb.env.Env

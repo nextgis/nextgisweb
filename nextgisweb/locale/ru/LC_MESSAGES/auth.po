@@ -68,7 +68,7 @@ msgstr "Пользователи"
 
 #: views.py:281 views.py:339
 msgid "Groups"
-msgstr "Группы пользователей"
+msgstr "Группы"
 
 #: views.py:292 views.py:314
 msgid "List"
@@ -84,7 +84,7 @@ msgstr "Изменить"
 
 #: amd/ngw-auth/GroupWidget.js:34
 msgid "Group"
-msgstr "Группа пользователей"
+msgstr "Группа"
 
 #: amd/ngw-auth/UserWidget.js:40
 msgid "User"

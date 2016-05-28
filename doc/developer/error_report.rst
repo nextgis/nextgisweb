@@ -1,10 +1,10 @@
-.. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
 Error reporting
 ===============
 
-Если в результате запроса была получена ошибка, то код ошибки передается в HTTP 
-коде, а текст в виде JSON в теле ответа.
+If request failed, error code will be in HTTP header and error description text
+in JSON of response body.
 
 **Example response**:
     

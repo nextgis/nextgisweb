@@ -21,6 +21,7 @@ from sqlalchemy.ext.compiler import compiles
 
 import geoalchemy as ga
 import sqlalchemy.sql as sql
+from sqlalchemy import func
 
 from ..event import SafetyEvent
 from .. import db
@@ -36,7 +37,7 @@ from ..resource.exception import ValidationError, ResourceError
 from ..env import env
 from ..geometry import geom_from_wkb, box
 from ..models import declarative_base, DBSession
-from ..layer import SpatialLayerMixin
+from ..layer import SpatialLayerMixin, IBboxLayer
 
 from ..feature_layer import (
     Feature,
@@ -271,7 +272,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     __scope__ = DataScope
 
-    implements(IFeatureLayer, IWritableFeatureLayer)
+    implements(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 
     tbl_uuid = db.Column(db.Unicode(32), nullable=False)
     geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
@@ -413,6 +414,46 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         DBSession.query(tableinfo.model).delete()
 
         self.after_all_feature_delete.fire(resource=self)
+
+    # IBboxLayer implementation:
+    @property
+    def extent(self):
+        """Возвращает охват слоя
+        """
+        st_transform = func.st_transform
+        st_extent = func.st_extent
+        st_setsrid = func.st_setsrid
+        st_xmax = func.st_xmax
+        st_xmin = func.st_xmin
+        st_ymax = func.st_ymax
+        st_ymin = func.st_ymin
+
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(tablename=self._tablename)
+
+        model = tableinfo.model
+
+        fields = (
+            st_extent(st_transform(st_setsrid(model.geom, self.srs_id), 4326)),
+        )
+        bbox =  DBSession.query(*fields).label('bbox')
+
+        fields = (
+            st_xmax(bbox),
+            st_xmin(bbox),
+            st_ymax(bbox),
+            st_ymin(bbox),
+        )
+        maxLon, minLon, maxLat, minLat = DBSession.query(*fields).one()
+
+        extent = dict(
+            minLon=minLon,
+            maxLon=maxLon,
+            minLat=minLat,
+            maxLat=maxLat
+        )
+
+        return extent
 
 
 def _vector_layer_listeners(table):

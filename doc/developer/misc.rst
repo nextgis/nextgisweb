@@ -1,4 +1,4 @@
-.. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
+.. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
 Miscellaneous
 =============
@@ -134,8 +134,8 @@ GeoJSON и CSV, для растровых - TMS.
    Host: ngw_url
    Accept: */*
 
-Get user info
--------------
+User managment
+--------------
 
 You can get user information by it id. The following request have to be executed:
 
@@ -230,6 +230,4 @@ The special section should be present in NGW config file for this purposes:
 
    [auth]
    register = true
-   
-       
 

@@ -5,7 +5,9 @@ import subprocess
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
-from osgeo import gdal, gdalconst, osr
+from zope.interface import implements
+
+from osgeo import gdal, gdalconst, osr, ogr
 
 from ..models import declarative_base
 from ..resource import (
@@ -17,7 +19,7 @@ from ..resource import (
     ResourceGroup)
 from ..resource.exception import ValidationError
 from ..env import env
-from ..layer import SpatialLayerMixin
+from ..layer import SpatialLayerMixin, IBboxLayer
 from ..file_storage import FileObj
 
 from .util import _
@@ -36,6 +38,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     cls_display_name = _("Raster layer")
 
     __scope__ = (DataStructureScope, DataScope)
+
+    implements(IBboxLayer)
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 
@@ -109,6 +113,51 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
             (_("File UUID"), self.fileobj.uuid),
         )
+
+    # IBboxLayer implementation:
+    @property
+    def extent(self):
+        """Возвращает охват слоя
+        """
+
+        src_osr = osr.SpatialReference()
+        dst_osr = osr.SpatialReference()
+
+        src_osr.ImportFromEPSG(int(self.srs.id))
+        dst_osr.ImportFromEPSG(4326)
+        coordTrans = osr.CoordinateTransformation(src_osr, dst_osr)
+
+
+        ds = self.gdal_dataset()
+        geoTransform = ds.GetGeoTransform()
+
+        minx = geoTransform[0]
+        maxy = geoTransform[3]
+        maxx = minx + geoTransform[1] * ds.RasterXSize
+        miny = maxy + geoTransform[5] * ds.RasterYSize
+
+        ll_corner = ogr.Geometry(ogr.wkbPoint)
+        ll_corner.AddPoint(minx, miny)
+        ll_corner.Transform(coordTrans)
+
+        ur_corner = ogr.Geometry(ogr.wkbPoint)
+        ur_corner.AddPoint(maxx, maxy)
+        ur_corner.Transform(coordTrans)
+
+
+        minLon = ll_corner.GetX()
+        maxLat = ll_corner.GetY()
+        maxLon = ur_corner.GetX()
+        minLat = ur_corner.GetY()
+
+        extent = dict(
+            minLon=minLon,
+            maxLon=maxLon,
+            minLat=minLat,
+            maxLat=maxLat
+        )
+
+        return extent
 
 
 class _source_attr(SP):

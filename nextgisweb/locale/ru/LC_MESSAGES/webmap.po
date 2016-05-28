@@ -1,13 +1,13 @@
 # Russian translations for nextgisweb.
-# Copyright (C) 2015 NextGIS
+# Copyright (C) 2016 NextGIS
 # This file is distributed under the same license as the nextgisweb project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-03-16 20:05+0600\n"
+"POT-Creation-Date: 2016-05-25 07:37+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"Generated-By: Babel 2.2.0\n"
 
 #: __init__.py:41
 msgid "Main web map"
@@ -39,27 +39,31 @@ msgstr "Веб-карта"
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:566
+#: amd/ngw-webmap/Display.js:574
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:569 amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/Display.js:577 amd/ngw-webmap/tool/Zoom.js:18
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:570 amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/Display.js:578 amd/ngw-webmap/tool/Zoom.js:21
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:573
+#: amd/ngw-webmap/Display.js:581
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:705
+#: amd/ngw-webmap/Display.js:730
 msgid "Pan"
 msgstr "Перемещение"
 
-#: amd/ngw-webmap/ExtentWidget.js:31
+#: amd/ngw-webmap/Display.js:835 amd/ngw-webmap/template/Display.hbs:54
+msgid "Permalink"
+msgstr "Ссылка"
+
+#: amd/ngw-webmap/ExtentWidget.js:35
 msgid "Extent and bookmarks"
 msgstr "Экстент и закладки"
 
@@ -75,24 +79,24 @@ msgstr "Добавить группу"
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:101
+#: amd/ngw-webmap/plugin/FeatureLayer.js:103
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:120
+#: amd/ngw-webmap/plugin/FeatureLayer.js:122
 msgid "Search..."
 msgstr "Поиск..."
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:224
+#: amd/ngw-webmap/plugin/FeatureLayer.js:228
 msgid "Searching..."
 msgstr "Идет поиск..."
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:257
-#: amd/ngw-webmap/plugin/FeatureLayer.js:315
+#: amd/ngw-webmap/plugin/FeatureLayer.js:261
+#: amd/ngw-webmap/plugin/FeatureLayer.js:322
 msgid "Refine search criterion"
 msgstr "Уточните критерий поиска"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:329
+#: amd/ngw-webmap/plugin/FeatureLayer.js:336
 msgid "Not found"
 msgstr "Не найдено"
 
@@ -108,24 +112,23 @@ msgstr "Закладки"
 msgid "Initial extent"
 msgstr "Начальный экстент"
 
-#: amd/ngw-webmap/template/Display.hbs:59
+#: amd/ngw-webmap/template/Display.hbs:64
 msgid "Longitude"
 msgstr "Долгота"
 
-#: amd/ngw-webmap/template/Display.hbs:62
+#: amd/ngw-webmap/template/Display.hbs:67
 msgid "Latitude"
 msgstr "Широта"
 
-#: amd/ngw-webmap/template/Display.hbs:65
+#: amd/ngw-webmap/template/Display.hbs:70
 msgid "Scale"
 msgstr "Масштаб"
 
-#: amd/ngw-webmap/template/Display.hbs:84
-#: amd/ngw-webmap/template/Display.hbs:85
-msgid "Permalink"
-msgstr "Ссылка"
+#: amd/ngw-webmap/template/Display.hbs:87
+msgid "Get your own Web GIS at nextgis.com"
+msgstr "Сделайте свою Веб ГИС на nextgis.com"
 
-#: amd/ngw-webmap/template/Display.hbs:107
+#: amd/ngw-webmap/template/Display.hbs:108
 msgid "Layer"
 msgstr "Слой"
 
@@ -145,7 +148,11 @@ msgstr "Право, град."
 msgid "Top, deg."
 msgstr "Верх, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:34
+#: amd/ngw-webmap/template/ExtentWidget.hbs:35
+msgid "Set extent from layer"
+msgstr "Экстент по слою"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:47
 msgid "Bookmark resource"
 msgstr "Ресурс закладок"
 
@@ -186,15 +193,15 @@ msgstr "Адаптер"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/tool/Identify.js:182
+#: amd/ngw-webmap/tool/Identify.js:186
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:214
+#: amd/ngw-webmap/tool/Identify.js:218
 msgid "Feature"
 msgstr "Объект"
 
-#: amd/ngw-webmap/tool/Identify.js:237 amd/ngw-webmap/tool/Identify.js:336
+#: amd/ngw-webmap/tool/Identify.js:241 amd/ngw-webmap/tool/Identify.js:261
 msgid "Identify"
 msgstr "Идентификация"
 

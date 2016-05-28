@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import codecs
 import os.path
 
 from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
+
+from pkg_resources import resource_filename
 
 from .. import dynmenu as dm
 
@@ -43,9 +46,11 @@ def control_panel(request):
 
 
 def help_page(request):
-    return dict(
-        title=_("Help"),
-        help_page=request.env.pyramid.help_page)
+    with codecs.open(
+        request.env.pyramid.help_page[request.locale_name], 'rb', 'utf-8'
+        ) as fp:
+        help_page = fp.read()
+    return dict(title=_("Help"), help_page=help_page)
 
 
 def logo(request):
@@ -58,7 +63,11 @@ def logo(request):
 
 def favicon(request):
     settings = request.env.pyramid.settings
-    if 'favicon' in settings and os.path.isfile(settings['favicon']):
+    if 'favicon' not in settings:
+        settings['favicon'] = resource_filename(
+            'nextgisweb', 'static/img/favicon.ico')
+
+    if os.path.isfile(settings['favicon']):
         return FileResponse(
             settings['favicon'], request=request,
             content_type=bytes('image/x-icon'))

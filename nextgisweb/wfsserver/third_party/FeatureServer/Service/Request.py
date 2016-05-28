@@ -71,6 +71,7 @@ class Request (object):
         action = Action()
 
         if request_method == "GET" or (request_method == "OPTIONS" and (post_data is None or len(post_data) <= 0)):
+            params = self._convert_GET_params(params)
             action = self.get_select_action(path_info, params)
             if u'typename' in params:
                 action.layer = params[u'typename']      # WFS 1.0.0
@@ -106,6 +107,22 @@ class Request (object):
         except:
             return False
         return False
+
+    def _convert_GET_params(self, params):
+        """Convert parameters of GET request to more convenient  format.
+        """
+        try:
+            bbox = params['bbox']
+        except KeyError:
+            return params
+        # Convert BBox
+        bbox = bbox.split(',')
+        params['bbox'] = dict(coords=bbox)
+
+        return params
+
+
+
 
     def _set_bbox(self, action, bbox_value):
         """Analyze bbox parameter, set bbox attribute of the action
@@ -195,7 +212,6 @@ class Request (object):
             action.id = id
         else:
             for ds in self.datasources:
-                # import ipdb; ipdb.set_trace()
                 queryable = []
                 # ds = self.service.datasources[self.datasource]
                 if hasattr(ds, 'queryable'):
@@ -299,7 +315,6 @@ class Request (object):
                         actions.append(action)
 
                 elif hasattr(format_obj, 'parse'):
-                    # import ipdb; ipdb.set_trace()
                     format_obj.parse(post_data)
 
                     if format_obj.isGetCapabilities():
