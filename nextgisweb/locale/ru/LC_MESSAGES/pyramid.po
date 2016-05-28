@@ -1,13 +1,13 @@
 # Russian translations for nextgisweb.
-# Copyright (C) 2015 NextGIS
+# Copyright (C) 2016 NextGIS
 # This file is distributed under the same license as the nextgisweb project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-10-05 09:41+0600\n"
+"POT-Creation-Date: 2016-05-28 19:33+0300\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,21 +17,21 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"Generated-By: Babel 2.2.0\n"
 
-#: view.py:41 template/base.mako:85
+#: view.py:44 template/base.mako:78
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:47 template/base.mako:96
+#: view.py:53 template/base.mako:89
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:78 view.py:109
+#: view.py:87 view.py:118
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:107
+#: view.py:116
 msgid "System info"
 msgstr "Информация о системе"
 
@@ -39,17 +39,17 @@ msgstr "Информация о системе"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: template/base.mako:82
+#: template/base.mako:22
+msgid "Your Web GIS at nextgis.com"
+msgstr "Ваши карты — онлайн. Веб ГИС от nextgis.com"
+
+#: template/base.mako:76
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: template/base.mako:89
+#: template/base.mako:95
 msgid "Sign in"
 msgstr "Войти"
-
-#: template/base.mako:92
-msgid "Sign out"
-msgstr "Выйти"
 
 #: template/pkginfo.mako:6
 msgid "Platform"
@@ -59,11 +59,14 @@ msgstr "Платформа"
 msgid "Packages"
 msgstr "Пакеты"
 
-#: template/pkginfo.mako:13
+#: template/pkginfo.mako:14
 msgid "Package"
 msgstr "Пакет"
 
-#: template/pkginfo.mako:14
+#: template/pkginfo.mako:15
 msgid "Version"
 msgstr "Версия"
+
+#~ msgid "Sign out"
+#~ msgstr "Выйти"
 
