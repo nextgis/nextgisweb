@@ -16,13 +16,12 @@
         parents.append(tr(subtitle))
 %>
 
-<%def name="title()">
-    %if subtitle:
-        ${tr(subtitle)}
-    %else:
-        ${obj}
-    %endif
-</%def>
+<%def name="title()"><%
+    if subtitle:
+        return tr(subtitle)
+    else:
+        return unicode(obj)
+%></%def>
 
 <%def name="title_block()">
 <%
