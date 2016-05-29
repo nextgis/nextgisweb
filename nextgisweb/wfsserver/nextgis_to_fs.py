@@ -62,12 +62,20 @@ class NextgiswebDatasource(DataSource):
 
     @property
     def geometry_type(self):
+
         if self.layer.geometry_type == GEOM_TYPE.POINT:
             geometry_type = 'Point'
-        elif self.layer.geometry_type == GEOM_TYPE.LINESTING:
+        elif self.layer.geometry_type == GEOM_TYPE.LINESTRING:
             geometry_type = 'Line'
         elif self.layer.geometry_type == GEOM_TYPE.POLYGON:
             geometry_type = 'Polygon'
+        # MultiGeom
+        elif self.layer.geometry_type == GEOM_TYPE.MULTIPOINT:
+            geometry_type = 'MultiPoint'
+        elif self.layer.geometry_type == GEOM_TYPE.MULTILINESTRING:
+            geometry_type = 'MultiLine'
+        elif self.layer.geometry_type == GEOM_TYPE.MULTIPOLYGON:
+            geometry_type = 'MultiPolygon'
         else:
             raise NotImplementedError
 

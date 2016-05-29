@@ -488,28 +488,49 @@ version="%s"
         if hasattr(datasource, 'geometry_type'):
             properties = datasource.geometry_type.split(',')
         else:
-            properties = ['Point', 'Line', 'Polygon']
+            raise ValueError("Data source doesn't have geometry_type attribute")
         for property in properties:
-            if property == 'Point':
+            if property == 'MultiPoint':
                 element = etree.Element(
                     'element', attrib={'name': datasource.geom_col,
                                        'type': 'gml:MultiPointPropertyType',
                                        'minOccurs': '0'})
                 sequence.append(element)
-            elif property == 'Line':
+            elif property == 'MultiLine':
                 element = etree.Element(
                     'element', attrib={'name': datasource.geom_col,
                                        'type': 'gml:MultiLineStringPropertyType',
                                        # 'ref' : 'gml:curveProperty',
                                        'minOccurs': '0'})
                 sequence.append(element)
-            elif property == 'Polygon':
+            elif property == 'MultiPolygon':
                 element = etree.Element(
                     'element', attrib={'name': datasource.geom_col,
                                        'type': 'gml:MultiPolygonPropertyType',
                                        # 'substitutionGroup' : 'gml:_Surface',
                                        'minOccurs': '0'})
                 sequence.append(element)
+            if property == 'Point':
+                element = etree.Element(
+                    'element', attrib={'name': datasource.geom_col,
+                                       'type': 'gml:PointPropertyType',
+                                       'minOccurs': '0'})
+                sequence.append(element)
+            elif property == 'Line':
+                element = etree.Element(
+                    'element', attrib={'name': datasource.geom_col,
+                                       'type': 'gml:LineStringPropertyType',
+                                       # 'ref' : 'gml:curveProperty',
+                                       'minOccurs': '0'})
+                sequence.append(element)
+            elif property == 'Polygon':
+                element = etree.Element(
+                    'element', attrib={'name': datasource.geom_col,
+                                       'type': 'gml:PolygonPropertyType',
+                                       # 'substitutionGroup' : 'gml:_Surface',
+                                       'minOccurs': '0'})
+                sequence.append(element)
+
 
         extension.append(sequence)
         complexContent.append(extension)
