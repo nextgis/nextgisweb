@@ -488,7 +488,7 @@ version="%s"
         if hasattr(datasource, 'geometry_type'):
             properties = datasource.geometry_type.split(',')
         else:
-            raise ValueError("Data source doesn't have geometry_type attribute")
+            properties = ['Point', 'Line', 'Polygon', 'MultiPoint', 'MultiLine', 'MultiPolygon',]
         for property in properties:
             if property == 'MultiPoint':
                 element = etree.Element(
