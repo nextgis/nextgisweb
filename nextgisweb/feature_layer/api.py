@@ -100,7 +100,7 @@ def deserialize(feat, data):
         for fld in feat.layer.fields:
 
             if fld.keyname in fdata:
-                val = fdata[fld.keyname]
+                val = fdata.get(fld.keyname)
 
                 if val is None:
                     fval = None
@@ -145,7 +145,7 @@ def serialize(feat):
     result['fields'] = OrderedDict()
     for fld in feat.layer.fields:
 
-        val = feat.fields[fld.keyname]
+        val = feat.fields.get(fld.keyname)
 
         if val is None:
             fval = None
