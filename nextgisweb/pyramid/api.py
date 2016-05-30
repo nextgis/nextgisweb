@@ -75,6 +75,15 @@ def pkg_version(request):
     return dict([(p, pkginfo.pkg_version(p)) for p in pkginfo.packages])
 
 
+def stat(request):
+    # TODO: Security
+    result = dict()
+    for comp in request.env._components.values():
+        if hasattr(comp, 'query_stat'):
+            result[comp.identity] = comp.query_stat()
+    return result
+
+
 def setup_pyramid(comp, config):
     config.add_route('pyramid.settings', '/api/component/pyramid/settings') \
         .add_view(settings, renderer='json')
@@ -91,3 +100,8 @@ def setup_pyramid(comp, config):
         'pyramid.pkg_version',
         '/api/component/pyramid/pkg_version',
     ).add_view(pkg_version, renderer='json')
+
+    config.add_route(
+        'pyramid.stat',
+        '/api/component/pyramid/stat',
+    ).add_view(stat, renderer='json')

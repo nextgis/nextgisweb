@@ -4,8 +4,10 @@ import re
 
 from sqlalchemy.orm.exc import NoResultFound
 
+from .. import db
 from ..component import Component, require
 from ..auth import User, Group
+from ..models import DBSession
 
 from .model import (
     Base,
@@ -102,6 +104,19 @@ class ResourceComponent(Component):
         from . import view, api
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
+
+    def query_stat(self):
+        query = DBSession.query(Resource.cls, db.func.count(Resource.id)) \
+            .group_by(Resource.cls)
+
+        total = 0
+        by_cls = dict()
+        for cls, count in query.all():
+            by_cls[cls] = count
+            total += count
+
+        return dict(
+            resource_count=dict(total=total, cls=by_cls))
 
     settings_info = (
         dict(key="everyone_permissions", desc="Permissions for user Everyone"),
