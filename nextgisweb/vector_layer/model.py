@@ -15,13 +15,16 @@ from distutils.version import LooseVersion
 from zope.interface import implements
 from osgeo import ogr, osr
 
-from sqlalchemy import event
 from sqlalchemy.sql import ColumnElement
 from sqlalchemy.ext.compiler import compiles
 
 import geoalchemy as ga
 import sqlalchemy.sql as sql
-from sqlalchemy import func
+from sqlalchemy import (
+    event,
+    func,
+    cast
+)
 
 from ..event import SafetyEvent
 from .. import db
@@ -434,9 +437,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         model = tableinfo.model
 
         fields = (
-            st_extent(st_transform(st_setsrid(model.geom, self.srs_id), 4326)),
+            st_extent(st_transform(st_setsrid(cast(model.geom, ga.Geometry), self.srs_id), 4326)),
         )
-        bbox =  DBSession.query(*fields).label('bbox')
+        bbox = DBSession.query(*fields).label('bbox')
 
         fields = (
             st_xmax(bbox),
