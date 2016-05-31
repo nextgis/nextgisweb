@@ -1,7 +1,7 @@
 .. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
 .. NextGIS Web dev common TOC
 
-NextGIS Web для разработчиков
+NextGIS Web for developers
 ============================================
 
 .. toctree::
