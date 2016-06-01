@@ -110,10 +110,12 @@ def store_collection(layer, request):
         first, last = map(int, http_range[len('items='):].split('-', 1))
         query.limit(last - first + 1, first)
 
-    field_prefix = json.loads(request.headers.get('x-field-prefix', '""'))
+    field_prefix = json.loads(
+        urllib.unquote(request.headers.get('x-field-prefix', '""')))
     pref = lambda (f): field_prefix + f
 
-    field_list = json.loads(request.headers.get('x-field-list', "[]"))
+    field_list = json.loads(
+        urllib.unquote(request.headers.get('x-field-list', "[]")))
     if len(field_list) > 0:
         query.fields(*field_list)
 
