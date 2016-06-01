@@ -804,6 +804,12 @@ define([
                 this.map.olMap.getView().setZoom(
                     parseInt(this._urlParams.zoom)
                 );
+
+                if (this._urlParams.angle) {
+                    this.map.olMap.getView().setRotation(
+                        parseFloat(this._urlParams.angle)
+                    );
+                }
             } else {
                 this.map.olMap.getView().fit(this._extent, this.map.olMap.getSize());
             }
@@ -827,6 +833,7 @@ define([
                         base: this._baseLayer.name,
                         lon: center[0].toFixed(4),
                         lat: center[1].toFixed(4),
+                        angle: this.map.olMap.getView().getRotation(),
                         zoom: this.map.olMap.getView().getZoom(),
                         styles: visibleStyles.join(",")
                     });
