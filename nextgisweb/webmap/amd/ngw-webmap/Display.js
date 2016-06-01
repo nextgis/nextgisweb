@@ -794,13 +794,15 @@ define([
         },
 
         _zoomToInitialExtent: function () {
-            if (this._urlParams.resolution && this._urlParams.center) {
-                this.map.olMap.getView().setCenter([
-                    parseFloat(this._urlParams.center[0]),
-                    parseFloat(this._urlParams.center[1])
-                ]);
-                this.map.olMap.getView().setResolution(
-                    parseFloat(this._urlParams.resolution)
+            if (this._urlParams.zoom && this._urlParams.lon && this._urlParams.lat) {
+                this.map.olMap.getView().setCenter(
+                    ol.proj.fromLonLat([
+                        parseFloat(this._urlParams.lon),
+                        parseFloat(this._urlParams.lat)
+                    ])
+                );
+                this.map.olMap.getView().setZoom(
+                    parseInt(this._urlParams.zoom)
                 );
             } else {
                 this.map.olMap.getView().fit(this._extent, this.map.olMap.getSize());
@@ -820,10 +822,12 @@ define([
                         })
                     );
 
+                    var center = ol.proj.toLonLat(this.map.olMap.getView().getCenter());
                     var queryStr = ioQuery.objectToQuery({
                         base: this._baseLayer.name,
-                        center: this.map.olMap.getView().getCenter(),
-                        resolution: this.map.olMap.getView().getResolution(),
+                        lon: center[0].toFixed(4),
+                        lat: center[1].toFixed(4),
+                        zoom: this.map.olMap.getView().getZoom(),
                         styles: visibleStyles.join(",")
                     });
 
