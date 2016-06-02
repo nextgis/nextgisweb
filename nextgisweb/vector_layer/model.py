@@ -96,6 +96,8 @@ FIELD_TYPE_OGR = (
     ogr.OFTTime,
     ogr.OFTDateTime)
 
+FIELD_FORBIDDEN_NAME = ("id", "type", "source")
+
 _GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 2))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 _GEOM_TYPE_2_GA = dict(zip(GEOM_TYPE_DB, GEOM_TYPE_GA))
@@ -594,6 +596,11 @@ class _source_attr(SP):
 
         feat = ogrlayer.GetNextFeature()
         while feat:
+            for i in range(feat.GetFieldCount()):
+                fld_name = feat.GetFieldDefnRef(i).GetNameRef()
+                if fld_name.lower() in FIELD_FORBIDDEN_NAME:
+                    raise VE(_("Field name is forbidden: '%s'. Please remove or rename it and try uploading again.") % fld_name)
+
             geom = feat.GetGeometryRef()
             if geom is None:
                 raise VE(_("Feature #%d doesn't contains geometry.") % feat.GetFID())
