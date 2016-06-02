@@ -229,10 +229,12 @@ class TableInfo(object):
             ):
                 geom.FlattenTo2D()
 
-            if geom.GetGeometryType() != ogrlayer.GetGeomType():
+            gtype = geom.GetGeometryType()
+            ltype = ogrlayer.GetGeomType() & (~ogr.wkb25DBit)
+            if gtype != ltype:
                 raise ValidationError(_("Geometry type (%s) does not match column type (%s).") % (
-                    GEOM_TYPE_DISPLAY[geom.GetGeometryType()-1],
-                    GEOM_TYPE_DISPLAY[ogrlayer.GetGeomType()-1]))
+                    GEOM_TYPE_DISPLAY[gtype-1],
+                    GEOM_TYPE_DISPLAY[ltype-1]))
 
             geom.Transform(transform)
 
