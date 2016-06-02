@@ -648,7 +648,7 @@ class _source_attr(SP):
             geomtype = ogrlayer.GetGeomType()
             if geomtype not in _GEOM_OGR_2_TYPE:
                 raise VE(_("Unsupported geometry type: '%s'.") % (
-                    ogr.GeometryTypeToName(geomtype) if geomtype else None))
+                    ogr.GeometryTypeToName(geomtype) if geomtype is not None else None))
 
             self._ogrlayer(srlzr.obj, ogrlayer, recode)
 
