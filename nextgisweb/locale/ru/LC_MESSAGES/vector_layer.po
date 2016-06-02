@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-06-02 16:19+0700\n"
+"POT-Creation-Date: 2016-06-02 17:02+0700\n"
 "PO-Revision-Date: 2015-09-14 00:03+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -43,66 +43,75 @@ msgstr "Мультилиния"
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: model.py:250
+#: model.py:233
+#, python-format
+msgid "Geometry type (%s) does not match column type (%s)."
+msgstr "Тип геометрии объекта (%s) не соответствует типу геометрии слоя (%s)."
+
+#: model.py:255
 #, python-format
 msgid "Unable to decode string value of feature #%(feat)d attribute #%(attr)d."
 msgstr ""
 "Ошибка декодирования строкового значения атрибута #%(attr)d объекта "
 "#%(feat)d."
 
-#: model.py:276 amd/ngw-vector-layer/Widget.js:34
+#: model.py:281 amd/ngw-vector-layer/Widget.js:34
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: model.py:322
+#: model.py:327
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: model.py:582
+#: model.py:587
 msgid "Dataset doesn't contains layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:585
+#: model.py:590
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:589
+#: model.py:594
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:595
+#: model.py:600
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
 
-#: model.py:602
+#: model.py:607
 #, python-format
-msgid "Field name is forbidden: '%s'. Please remove or rename it and try uploading again."
-msgstr "Недопустимое имя поля: '%s'. Удалите или переименуйте поле и загрузите данные ещё раз."
+msgid ""
+"Field name is forbidden: '%s'. Please remove or rename it and try "
+"uploading again."
+msgstr ""
+"Недопустимое имя поля: '%s'. Удалите или переименуйте поле и загрузите "
+"данные ещё раз."
 
-#: model.py:606
+#: model.py:611
 #, python-format
 msgid "Feature #%d doesn't contains geometry."
 msgstr "Объект #%d не содержит геометрии."
 
-#: model.py:635
+#: model.py:640
 msgid "GDAL library failed to open file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:640
+#: model.py:645
 #, python-format
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: model.py:645
+#: model.py:650
 #, python-format
 msgid "Unsupported geometry type: '%s'."
 msgstr "Тип геометрии не поддерживается: '%s'."
 
-#: model.py:659
+#: model.py:664
 msgid "Unsupported geometry type."
 msgstr "Тип геометрии не поддерживается."
 
-#: model.py:665
+#: model.py:670
 msgid "Geometry type for existing resource can not be changed."
 msgstr "Тип геометрии существующего ресурса не может быть изменен."
 

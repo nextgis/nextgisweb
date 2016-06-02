@@ -229,6 +229,11 @@ class TableInfo(object):
             ):
                 geom.FlattenTo2D()
 
+            if geom.GetGeometryType() != ogrlayer.GetGeomType():
+                raise ValidationError(_("Geometry type (%s) does not match column type (%s).") % (
+                    GEOM_TYPE_DISPLAY[geom.GetGeometryType()-1],
+                    GEOM_TYPE_DISPLAY[ogrlayer.GetGeomType()-1]))
+
             geom.Transform(transform)
 
             fld_values = dict()
