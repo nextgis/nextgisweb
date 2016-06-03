@@ -347,7 +347,7 @@ define([
             });
             this._popup.widget = widget;
 
-            widget.placeAt(this._popup.contentDiv).startup();
+            widget.placeAt(this._popup.contentDiv);
 
             this._popup.setPosition(point);
 
