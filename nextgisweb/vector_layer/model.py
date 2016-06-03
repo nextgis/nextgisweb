@@ -606,7 +606,7 @@ class _source_attr(SP):
             for i in range(feat.GetFieldCount()):
                 fld_name = feat.GetFieldDefnRef(i).GetNameRef()
                 if fld_name.lower() in FIELD_FORBIDDEN_NAME:
-                    raise VE(_("Field name is forbidden: '%s'. Please remove or rename it and try uploading again.") % fld_name)
+                    raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)
 
             geom = feat.GetGeometryRef()
             if geom is None:
@@ -649,7 +649,7 @@ class _source_attr(SP):
             ogrlayer = self._ogrds(ogrds)
             geomtype = ogrlayer.GetGeomType()
             if geomtype not in _GEOM_OGR_2_TYPE:
-                raise VE(_("Unsupported geometry type: '%s'.") % (
+                raise VE(_("Unsupported geometry type: '%s'. Probable reason: data contain mixed geometries.") % (
                     ogr.GeometryTypeToName(geomtype) if geomtype is not None else None))
 
             self._ogrlayer(srlzr.obj, ogrlayer, recode)

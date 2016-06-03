@@ -313,16 +313,16 @@ define([
             var S_ERROR_MESSAGE = i18n.gettext("Error message:")
 
             if (e.error == E_REQUEST && e.status == 400) {
-                alert(i18n.gettext("Errors found during data validation on server. Correct error and try again.") + " " + S_ERROR_MESSAGE + "\n" + e.data.message);
+                alert(i18n.gettext("Errors found during data validation on server. Correct error and try again.") + " " + S_ERROR_MESSAGE + "\n\n" + e.data.message);
 
             } else if (e.error == E_REQUEST && e.status == 403) {
-                alert(i18n.gettext("Insufficient permissions to perform the operation.") + " " + S_ERROR_MESSAGE + "\n" + e.data.message);
+                alert(i18n.gettext("Insufficient permissions to perform the operation.") + " " + S_ERROR_MESSAGE + "\n\n" + e.data.message);
 
             } else if (e.error == E_INVALID_DATA) {
                 alert(i18n.gettext("Errors found during data validation. Tabs with errors marked in red."));
 
             } else {
-                alert(i18n.gettext("Unexpected error occurred during the operation.") + " " + S_ERROR_MESSAGE + "\n" + e.data.message);
+                alert(i18n.gettext("Unexpected error occurred during the operation.") + " " + S_ERROR_MESSAGE + "\n\n" + e.data.message);
             }
         },
 

@@ -207,7 +207,7 @@ msgstr "Сохранить"
 
 #: amd/ngw-resource/CompositeWidget.js:313
 msgid "Error message:"
-msgstr "Сообщение об ошибке"
+msgstr "Сообщение об ошибке:"
 
 #: amd/ngw-resource/CompositeWidget.js:316
 msgid ""
