@@ -41,7 +41,7 @@ msgstr "Введите корректное значение масштаба, �
 
 #: template/base.mako:22
 msgid "Your Web GIS at nextgis.com"
-msgstr "Ваши карты — онлайн. Веб ГИС от nextgis.com"
+msgstr "Ваши карты онлайн на nextgis.com"
 
 #: template/base.mako:76
 msgid "Resources"

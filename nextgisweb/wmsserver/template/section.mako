@@ -6,5 +6,5 @@
     <span class="middle-text">${url}</span>
 </p>
 <div class="content-box__info content-box__info--bottom">
-	${tr(_('Use this link in desktop client to access and edit vector data.'))}
+    ${tr(_('Use this link in desktop client (e.g. NextGIS QGIS) to access raster representation of your data layers.'))}
 </div>
