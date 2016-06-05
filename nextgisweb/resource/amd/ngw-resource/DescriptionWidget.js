@@ -17,17 +17,14 @@ define([
 
         constructor: function () {
             this.value = "";
+            this.contentPostFilters.push(function(value) {
+                return (value === "") ? null : value;
+            });
         },
 
         postCreate: function () {
             this.inherited(arguments);
             this.serattrmap.push({key: "resource.description", widget: this});
-        },
-
-        _getValueAttr: function () {
-            var value = this._get("value");
-            if (value === "") { return null; }
-            return value;
         },
 
         _setValueAttr: function (value) {
