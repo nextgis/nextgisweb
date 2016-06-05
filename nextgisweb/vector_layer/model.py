@@ -135,10 +135,14 @@ class TableInfo(object):
         defn = ogrlayer.GetLayerDefn()
         for i in range(defn.GetFieldCount()):
             fld_defn = defn.GetFieldDefn(i)
+            fld_name = fld_defn.GetNameRef()
+            if fld_name.lower() in FIELD_FORBIDDEN_NAME:
+                raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)
+
             uid = str(uuid.uuid4().hex)
             self.fields.append(FieldDef(
                 'fld_%s' % uid,
-                fld_defn.GetNameRef(),
+                fld_name,
                 _FIELD_TYPE_2_ENUM[fld_defn.GetType()],
                 uid
             ))
@@ -603,11 +607,6 @@ class _source_attr(SP):
 
         feat = ogrlayer.GetNextFeature()
         while feat:
-            for i in range(feat.GetFieldCount()):
-                fld_name = feat.GetFieldDefnRef(i).GetNameRef()
-                if fld_name.lower() in FIELD_FORBIDDEN_NAME:
-                    raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)
-
             geom = feat.GetGeometryRef()
             if geom is None:
                 raise VE(_("Feature #%d doesn't contains geometry.") % feat.GetFID())
