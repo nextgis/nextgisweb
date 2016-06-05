@@ -10,9 +10,11 @@
 
 @text-color: #212121;
 @light-text: #aaa;
+@light-text-2: #888;
 @blue: #176FC1;
 @darkBlue: #036997;
 @lightBlue: #B0D0DE;
+@lightBlue-2: #EEF4F7;
 @black: #000;
 @white: #fff;
 @bgColor: #fafafa;
@@ -22,6 +24,8 @@
 
 @base-font: "Roboto";
 @header-font:  "Roboto Condensed";
+
+@font-size-md: 16px;
 
 /* -- BASE STYLES -- */
 @font-face {
@@ -122,6 +126,15 @@ h2, .h2{
 a:hover [class^="icon-"]:before, 
 a:hover [class*=" icon-"]:before{
     color:@yellow;
+}
+
+.middle-text{
+    font-size: @font-size-md;
+    font-weight: bold;
+}
+
+.label-text{
+    margin-right: 5px;
 }
 
 /* -- LAYOUT STYLES -- */
@@ -433,11 +446,29 @@ table{
         padding: 20px;
         margin-bottom: 40px;
         .box-shadow(0 1px 3px rgba(57,70,78,.3));
+
+        p:first-child{
+            margin-top:0;
+        }
     }
     
     .lt-ie9 .content-box{
         border: 1px solid @light-border;
     }
+
+    .content-box__info{
+        background-color: @lightBlue-2;
+        padding: 10px 20px;
+        margin: 20px -20px;
+        color: @light-text-2;
+    }
+        .content-box__info:last-child{
+            margin-bottom: -20px;
+        }
+
+        .content-box__info:first-child{
+            margin-top: -20px;
+        }
     
 /* Sidebar */    
 

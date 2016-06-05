@@ -112,6 +112,13 @@ a:hover [class^="icon-"]:before,
 a:hover [class*=" icon-"]:before {
   color: #ffba3f;
 }
+.middle-text {
+  font-size: 16px;
+  font-weight: bold;
+}
+.label-text {
+  margin-right: 5px;
+}
 /* -- LAYOUT STYLES -- */
 .layout {
   position: relative;
@@ -369,8 +376,23 @@ table {
   -moz-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
   box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
 }
+.content-box p:first-child {
+  margin-top: 0;
+}
 .lt-ie9 .content-box {
   border: 1px solid #efefef;
+}
+.content-box__info {
+  background-color: #eef4f7;
+  padding: 10px 20px;
+  margin: 20px -20px;
+  color: #888888;
+}
+.content-box__info:last-child {
+  margin-bottom: -20px;
+}
+.content-box__info:first-child {
+  margin-top: -20px;
 }
 /* Sidebar */
 .sidebar {
@@ -399,6 +421,9 @@ table {
 .sidebar-menu .table-keyvalue__key__inner,
 .sidebar-menu .table-keyvalue__value__inner {
   background-color: #ffffff;
+}
+.sidebar-menu p:first-child {
+  margin-top: 0;
 }
 .sidebar-menu__heading {
   font-size: 14px;
