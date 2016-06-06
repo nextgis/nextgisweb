@@ -16,14 +16,14 @@ continue;
 var _e=_c.vmin,_f=_c.vmax;
 if(!("ymin" in _d)||!("ymax" in _d)){
 _2.forEach(_d.data,function(val,idx){
-if(val!==null){
+if(!this.isNullValue(val)){
 var x=val.x||idx+1;
 _c.hmin=Math.min(_c.hmin,x);
 _c.hmax=Math.max(_c.hmax,x);
 _c.vmin=Math.min(_c.vmin,val.open,val.close,val.high,val.low);
 _c.vmax=Math.max(_c.vmax,val.open,val.close,val.high,val.low);
 }
-});
+},this);
 }
 if("ymin" in _d){
 _c.vmin=Math.min(_e,_d.ymin);
@@ -57,7 +57,7 @@ var t=this.chart.theme,f,gap,_13,ht=this._hScaler.scaler.getTransformerFromModel
 f=dc.calculateBarSize(this._hScaler.bounds.scale,this.opt);
 gap=f.gap;
 _13=f.size;
-for(var i=this.series.length-1;i>=0;--i){
+for(var i=0;i<this.series.length;i++){
 var run=this.series[i];
 if(!this.dirty&&!run.dirty){
 t.skip();
@@ -68,7 +68,7 @@ run.cleanGroup();
 var _15=t.next("candlestick",[this.opt,run]),s=run.group,_16=new Array(run.data.length);
 for(var j=0;j<run.data.length;++j){
 var v=run.data[j];
-if(v!==null){
+if(!this.isNullValue(v)){
 var _17=t.addMixin(_15,"candlestick",v,true);
 var x=ht(v.x||(j+0.5))+_11.l+gap,y=dim.height-_11.b,_18=vt(v.open),_19=vt(v.close),_1a=vt(v.high),low=vt(v.low);
 if(low>_1a){
@@ -77,7 +77,7 @@ _1a=low;
 low=tmp;
 }
 if(_13>=1){
-var hl={x1:_13/2,x2:_13/2,y1:y-_1a,y2:y-low},op={x1:0,x2:((_13/2)+((_17.series.stroke.width||1)/2)),y1:y-_18,y2:y-_18},cl={x1:((_13/2)-((_17.series.stroke.width||1)/2)),x2:_13,y1:y-_19,y2:y-_19};
+var hl={x1:_13/2,x2:_13/2,y1:y-_1a,y2:y-low},op={x1:0,x2:((_13/2)+((_17.series.stroke?_17.series.stroke.width||1:1)/2)),y1:y-_18,y2:y-_18},cl={x1:((_13/2)-((_17.series.stroke?_17.series.stroke.width||1:1)/2)),x2:_13,y1:y-_19,y2:y-_19};
 var _1b=s.createGroup();
 _1b.setTransform({dx:x,dy:0});
 var _1c=_1b.createGroup();

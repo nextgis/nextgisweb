@@ -19,7 +19,7 @@ this._downListeners=[];
 this._moveAndUpListeners=[];
 this._cursorListeners=[];
 },_startAnimation:function(_8,_9,_a){
-if(this.animationDuration==0){
+if(this.animationDuration===0){
 return;
 }
 if(this._animation&&(this._preventAnimation||_9==_a)){
@@ -35,7 +35,7 @@ this.invalidateRendering();
 this._transitionValue=NaN;
 this.invalidateRendering();
 },refreshRendering:function(){
-if(this._gfxGroup==null||this.scale==null){
+if(this._gfxGroup===null||this.scale===null){
 return;
 }else{
 if(this._indicatorShapeFuncFlag&&_1.isFunction(this.indicatorShapeFunc)){

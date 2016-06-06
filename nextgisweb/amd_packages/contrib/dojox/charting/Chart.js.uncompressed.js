@@ -49,7 +49,8 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 		destroy = func.lambda("item.destroy()"),
 		makeClean = func.lambda("item.dirty = false"),
 		makeDirty = func.lambda("item.dirty = true"),
-		getName = func.lambda("item.name");
+		getName = func.lambda("item.name"),
+		defaultMargins = {l: 10, t: 10, r: 10, b: 10};
 
 	var Chart = declare(has("dojo-bidi")? "dojox.charting.NonBidiChart" : "dojox.charting.Chart", null, {
 		// summary:
@@ -160,7 +161,8 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 
 			// initialize parameters
 			if(!kwArgs){ kwArgs = {}; }
-			this.margins   = kwArgs.margins ? kwArgs.margins : {l: 10, t: 10, r: 10, b: 10};
+			this.margins = kwArgs.margins || defaultMargins;
+			this._customMargins = !!kwArgs.margins;
 			this.stroke    = kwArgs.stroke;
 			this.fill      = kwArgs.fill;
 			this.delayInMs = kwArgs.delayInMs || 200;
@@ -169,6 +171,8 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 			this.titlePos  = kwArgs.titlePos;
 			this.titleFont = kwArgs.titleFont;
 			this.titleFontColor = kwArgs.titleFontColor;
+			this.titleAlign = kwArgs.titleAlign; // This can be middle, left, right, or edge 
+															 // edge is left or right aligned with chart plot edge depending on bidi.
 			this.chartTitle = null;
 			this.htmlLabels = true;
 			if("htmlLabels" in kwArgs){
@@ -227,6 +231,9 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 			// returns: dojox/charting/Chart
 			//		A reference to the current chart for functional chaining.
 			this.theme = theme.clone();
+			if(!this._customMargins){
+				this.margins = this.theme.chart.margins || defaultMargins;
+			}
 			this.dirty = true;
 			return this;	//	dojox/charting/Chart
 		},
@@ -850,6 +857,7 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 				this.titlePos = this.titlePos || this.theme.chart.titlePos || "top";
 				this.titleFont = this.titleFont || this.theme.chart.titleFont;
 				this.titleFontColor = this.titleFontColor || this.theme.chart.titleFontColor || "black";
+				this.titleAlign = this.titleAlign || this.theme && this.theme.chart && this.theme.chart.titleAlign || "middle";
 				var tsize = g.normalizedLength(g.splitFontString(this.titleFont).size);
 				offsets[this.titlePos == "top" ? "t" : "b"] += (tsize + this.titleGap);
 			}
@@ -953,19 +961,7 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 
 			//create title: Whether to make chart title as a widget which extends dojox.charting.Element?
 			if(this.title){
-				var forceHtmlLabels = (g.renderer == "canvas") && this.htmlLabels,
-					labelType = forceHtmlLabels || !has("ie") && !has("opera") && this.htmlLabels ? "html" : "gfx",
-					tsize = g.normalizedLength(g.splitFontString(this.titleFont).size);
-				this.chartTitle = common.createText[labelType](
-					this,
-					this.surface,
-					dim.width/2,
-					this.titlePos=="top" ? tsize + this.margins.t : dim.height - this.margins.b,
-					"middle",
-					this.title,
-					this.titleFont,
-					this.titleFontColor
-				);
+				this._renderTitle(dim, offsets);
 			}
 
 			// go over axes
@@ -974,6 +970,51 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 			this._makeClean();
 
 			return this;	//	dojox/charting/Chart
+		},
+		_renderTitle: function(dim, offsets){
+			// summary:
+			//		Internal function to render the chart title.
+			// dim:
+			//		The dimension object of the chart
+			// tags:
+			//		private
+			var forceHtmlLabels = (g.renderer == "canvas") && this.htmlLabels,
+				labelType = forceHtmlLabels || !has("ie") && !has("opera") && this.htmlLabels ? "html" : "gfx",
+				tsize = g.normalizedLength(g.splitFontString(this.titleFont).size),
+				tBox = g._base._getTextBox(this.title,{ font: this.titleFont });
+				
+			var titleAlign = this.titleAlign;
+			var isRtl = has("dojo-bidi") && this.isRightToLeft();
+			var posX = dim.width/2; // Default is middle.
+			if(titleAlign === "edge"){
+				titleAlign = "left";
+				if(isRtl){
+					posX = dim.width - (offsets.r + tBox.w);
+				}else {
+					posX = offsets.l;
+				}
+			}else if(titleAlign != "middle"){
+				if(isRtl){
+					// We're in BIDI mode, reverse the alignment.
+					titleAlign = titleAlign === "left" ? "right" : "left";
+				}
+				if(titleAlign === "left"){
+					posX = this.margins.l;
+				}else if(titleAlign === "right"){
+					titleAlign = "left";
+					posX = dim.width - (this.margins.l + tBox.w);
+				}
+			}
+			this.chartTitle = common.createText[labelType](
+				this,
+				this.surface,
+				posX,
+				this.titlePos=="top" ? tsize + this.margins.t : dim.height - this.margins.b,
+				titleAlign,
+				this.title,
+				this.titleFont,
+				this.titleFontColor
+			);
 		},
 		_renderChartBackground: function(dim, offsets){
 			var t = this.theme, rect;

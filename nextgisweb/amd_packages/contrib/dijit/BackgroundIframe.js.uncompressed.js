@@ -6,7 +6,7 @@ define("dijit/BackgroundIframe", [
 	"dojo/dom-style", // domStyle.set
 	"dojo/_base/lang", // lang.extend lang.hitch
 	"dojo/on",
-	"dojo/sniff" // has("ie"), has("mozilla"), has("quirks")
+	"dojo/sniff" // has("ie"), has("trident"), has("quirks")
 ], function(require, dijit, config, domConstruct, domStyle, lang, on, has){
 
 	// module:
@@ -15,12 +15,14 @@ define("dijit/BackgroundIframe", [
 	// Flag for whether to create background iframe behind popups like Menus and Dialog.
 	// A background iframe is useful to prevent problems with popups appearing behind applets/pdf files,
 	// and is also useful on older versions of IE (IE6 and IE7) to prevent the "bleed through select" problem.
+	// By default, it's enabled for IE6-10, excluding Windows Phone 8,
+	// and it's also enabled for IE11 on Windows 7 and Windows 2008 Server.
 	// TODO: For 2.0, make this false by default.  Also, possibly move definition to has.js so that this module can be
 	// conditionally required via  dojo/has!bgIfame?dijit/BackgroundIframe
-	has.add("config-bgIframe", !has("touch"));
+	has.add("config-bgIframe",
+		(has("ie") && !/IEMobile\/10\.0/.test(navigator.userAgent)) || // No iframe on WP8, to match 1.9 behavior
+		(has("trident") && /Windows NT 6.[01]/.test(navigator.userAgent)));
 
-	// TODO: remove _frames, it isn't being used much, since popups never release their
-	// iframes (see [22236])
 	var _frames = new function(){
 		// summary:
 		//		cache of iframes
@@ -105,6 +107,7 @@ define("dijit/BackgroundIframe", [
 				this._conn = null;
 			}
 			if(this.iframe){
+				this.iframe.parentNode.removeChild(this.iframe);
 				_frames.push(this.iframe);
 				delete this.iframe;
 			}

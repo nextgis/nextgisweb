@@ -1,7 +1,7 @@
 define("dojox/app/controllers/Layout", ["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/window",
 		"dojo/query", "dojo/dom-geometry", "dojo/dom-attr", "dojo/dom-style", "dijit/registry",
-		"./LayoutBase", "../utils/layout", "../utils/constraints"],
-function(declare, lang, array, win, query, domGeom, domAttr, domStyle, registry, LayoutBase, layout, constraints){
+		"./LayoutBase", "../utils/layout", "../utils/constraints", "dojo/sniff"],
+function(declare, lang, array, win, query, domGeom, domAttr, domStyle, registry, LayoutBase, layout, constraints, has){
 	// module:
 	//		dojox/app/controllers/Layout
 	// summary:
@@ -57,13 +57,58 @@ function(declare, lang, array, win, query, domGeom, domAttr, domStyle, registry,
 			this.app.log("in app/controllers/Layout.initLayout event=",event);
 			this.app.log("in app/controllers/Layout.initLayout event.view.parent.name=[",event.view.parent.name,"]");
 
-			if (!event.view.domNode.parentNode) {
+			if (!event.view.domNode.parentNode || (has("ie") == 8 && !event.view.domNode.parentElement)) {
+				if(this.app.useConfigOrder){
+					event.view.parent.domNode.appendChild(event.view.domNode);
+				}else{
+					this.addViewToParentDomByConstraint(event);
+				}
+			}
+			domAttr.set(event.view.domNode, "data-app-constraint", event.view.constraint);
+			this.inherited(arguments);
+		},
+
+		addViewToParentDomByConstraint: function(event){
+			// summary:
+			//		Insert the view domNode into the parent domNode based upon the constraints.
+			//		It should layout the children in this order: top, left, center, right, bottom
+			//		Unless it is rtl then it should layout the children in this order: top, right, center, left, bottom
+			//
+			// event: Object
+			// |		{"parent":parent, "view":view, "removeView": boolean}
+			var newViewConstraint = event.view.constraint;
+			if(newViewConstraint === "bottom"){ // if new is bottom always place last
+				event.view.parent.domNode.appendChild(event.view.domNode);
+			}else if(newViewConstraint === "top"){ // if new is top always place first
+				event.view.parent.domNode.insertBefore(event.view.domNode, event.view.parent.domNode.firstChild);
+			}else{ // need to compare new constraint to the previous ones
+				if(event.view.parent.domNode.children.length > 0){ // parent node has children, check constraints
+					// in this loop if previous is top or left skip it and look for next child, otherwise process it
+					for(var childIndex in event.view.parent.domNode.children){
+						var child = event.view.parent.domNode.children[childIndex];
+						var dir = domStyle.get(event.view.parent.domNode,"direction");
+						var isltr = (dir === "ltr");
+						var LEADING_VIEW = isltr ? "left" : "right";
+						var TRAILING_VIEW = isltr ? "right" : "left";
+						if(child.getAttribute && child.getAttribute("data-app-constraint")) {
+							var previousViewConstraint = child.getAttribute("data-app-constraint");
+ 							// if previous is bottom or previous is Trailing
+ 							// or previous is not top and newView is Leading we need to insert before this child
+							if(previousViewConstraint === "bottom" ||
+								(previousViewConstraint === TRAILING_VIEW) ||
+								(previousViewConstraint !== "top" &&
+									(newViewConstraint === LEADING_VIEW))){
+								event.view.parent.domNode.insertBefore(event.view.domNode, child);
+								break;
+							}
+						}
+					}
+				}
+			}
+			// if the domNode was not added to the parent yet add it to the end now
+			if (!event.view.domNode.parentNode || (has("ie") == 8 && !event.view.domNode.parentElement)) {
 				event.view.parent.domNode.appendChild(event.view.domNode);
 			}
-
-			domAttr.set(event.view.domNode, "data-app-constraint", event.view.constraint);
-
-			this.inherited(arguments);
 		},
 
 		_doResize: function(view){

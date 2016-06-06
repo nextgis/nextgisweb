@@ -38,7 +38,7 @@ this.processSmd(_8);
 return _b;
 },errorCallback:function(_c){
 return function(_d){
-_c.errback(_d.message);
+_c.errback(_d);
 };
 },resultCallback:function(_e){
 return _5.hitch(this,function(_f){

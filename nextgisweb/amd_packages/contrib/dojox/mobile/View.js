@@ -14,7 +14,7 @@ this.domNode=this.containerNode=this.srcNodeRef||_b.create(this.tag);
 }
 this._animEndHandle=this.connect(this.domNode,_16.name("animationEnd"),"onAnimationEnd");
 this._animStartHandle=this.connect(this.domNode,_16.name("animationStart"),"onAnimationStart");
-if(!_2["mblCSS3Transition"]){
+if(!_2.mblCSS3Transition){
 this._transEndHandle=this.connect(this.domNode,_16.name("transitionEnd"),"onAnimationEnd");
 }
 if(_6("mblAndroid3Workaround")){
@@ -103,7 +103,7 @@ return _34.replace(/^#?([^&?]+).*/,"$1");
 }
 return _34;
 },_isBookmarkable:function(_35){
-return _35.moveTo&&(_2["mblForceBookmarkable"]||_35.moveTo.charAt(0)==="#")&&!_35.hashchange;
+return _35.moveTo&&(_2.mblForceBookmarkable||_35.moveTo.charAt(0)==="#")&&!_35.hashchange;
 },performTransition:function(_36,_37,_38,_39,_3a){
 if(this._inProgress){
 return;
@@ -150,7 +150,7 @@ _3d.style.display="";
 this._fixViewState(_3d);
 var _40=_e.byNode(_3d);
 if(_40){
-if(_2["mblAlwaysResizeOnTransition"]||!_40._resized){
+if(_2.mblAlwaysResizeOnTransition||!_40._resized){
 _13.resizeAll(null,_40);
 _40._resized=true;
 }
@@ -160,7 +160,7 @@ _40._addTransitionPaddingTop(_3f);
 _40.load&&_40.load();
 _40.movedFrom=_3e.id;
 }
-if(_6("mblAndroidWorkaround")&&!_2["mblCSS3Transition"]&&_3b.transition&&_3b.transition!="none"){
+if(_6("mblAndroidWorkaround")&&!_2.mblCSS3Transition&&_3b.transition&&_3b.transition!="none"){
 _d.set(_3d,_16.name("transformStyle"),"preserve-3d");
 _d.set(_3e,_16.name("transformStyle"),"preserve-3d");
 _a.add(_3d,"mblAndroidWorkaround");
@@ -175,7 +175,7 @@ var _42=(_3b.transitionDir==1)?0:(_3d._scrollTop||0);
 _3d.style.top="0px";
 if(_41>1||_42!==0){
 _3e.style.top=_42-_41+"px";
-if(!(_6("ios")>=7)&&_2["mblHideAddressBar"]!==false){
+if(!(_6("ios")>=7)&&_2.mblHideAddressBar!==false){
 this.defer(function(){
 _7.global.scrollTo(0,(_42||1));
 });
@@ -205,7 +205,7 @@ if(!_46||_46=="none"){
 this.domNode.style.display="none";
 this.invokeCallback();
 }else{
-if(_2["mblCSS3Transition"]){
+if(_2.mblCSS3Transition){
 _8.when(_14,_5.hitch(this,function(_48){
 var _49=_d.get(_45,"position");
 _d.set(_45,"position","absolute");

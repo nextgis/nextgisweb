@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/lang/oo/aop", ["dijit","dojo","dojox","dojo/require!dojox/lang/oo/Decorator,dojox/lang/oo/general"], function(dijit,dojo,dojox){
+define("dojox/lang/oo/aop", ["dojo","dijit","dojox","dojo/require!dojox/lang/oo/Decorator,dojox/lang/oo/general"], function(dojo,dijit,dojox){
 dojo.provide("dojox.lang.oo.aop");
 
 dojo.require("dojox.lang.oo.Decorator");

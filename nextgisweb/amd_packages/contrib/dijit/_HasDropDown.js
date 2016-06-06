@@ -7,13 +7,9 @@ return;
 if(e.type!="MSPointerDown"&&e.type!="pointerdown"){
 e.preventDefault();
 }
-this._docHandler=this.own(on(this.ownerDocument,_b.release,_a.hitch(this,"_onDropDownMouseUp")))[0];
+this.own(on.once(this.ownerDocument,_b.release,_a.hitch(this,"_onDropDownMouseUp")));
 this.toggleDropDown();
 },_onDropDownMouseUp:function(e){
-if(e&&this._docHandler){
-this._docHandler.remove();
-this._docHandler=null;
-}
 var _10=this.dropDown,_11=false;
 if(e&&this._opened){
 var c=_6.position(this._buttonNode,true);
@@ -69,6 +65,9 @@ this.inherited(arguments);
 var _14=this.focusNode||this.domNode;
 this.own(on(this._buttonNode,_b.press,_a.hitch(this,"_onDropDownMouseDown")),on(this._buttonNode,"click",_a.hitch(this,"_onDropDownClick")),on(_14,"keydown",_a.hitch(this,"_onKey")),on(_14,"keyup",_a.hitch(this,"_onKeyUp")));
 },destroy:function(){
+if(this._opened){
+this.closeDropDown(true);
+}
 if(this.dropDown){
 if(!this.dropDown._destroyed){
 this.dropDown.destroyRecursive();
@@ -147,11 +146,16 @@ _5.remove(_1b._popupStateNode,"dijitHasDropDownOpen");
 _1b._set("_opened",false);
 }});
 if(this.forceWidth||(this.autoWidth&&_1a.offsetWidth>_18._popupWrapper.offsetWidth)){
-var _1d={w:_1a.offsetWidth-(_18._popupWrapper.offsetWidth-_18.domNode.offsetWidth)};
+var _1d=_1a.offsetWidth-_18._popupWrapper.offsetWidth;
+var _1e={w:_18.domNode.offsetWidth+_1d};
+this._origStyle=_19.style.cssText;
 if(_a.isFunction(_18.resize)){
-_18.resize(_1d);
+_18.resize(_1e);
 }else{
-_6.setMarginBox(_19,_1d);
+_6.setMarginBox(_19,_1e);
+}
+if(_1c.corner[1]=="R"){
+_18._popupWrapper.style.left=(_18._popupWrapper.style.left.replace("px","")-_1d)+"px";
 }
 }
 _4.set(this._popupStateNode,"popupActive","true");
@@ -163,18 +167,22 @@ if(_19.getAttribute("role")!=="presentation"&&!_19.getAttribute("aria-labelledby
 _19.setAttribute("aria-labelledby",this.id);
 }
 return _1c;
-},closeDropDown:function(_1e){
+},closeDropDown:function(_1f){
 if(this._focusDropDownTimer){
 this._focusDropDownTimer.remove();
 delete this._focusDropDownTimer;
 }
 if(this._opened){
 this._popupStateNode.setAttribute("aria-expanded","false");
-if(_1e){
+if(_1f&&this.focus){
 this.focus();
 }
 _e.close(this.dropDown);
 this._opened=false;
+}
+if(this._origStyle){
+this.dropDown.domNode.style.cssText=this._origStyle;
+delete this._origStyle;
 }
 }});
 });

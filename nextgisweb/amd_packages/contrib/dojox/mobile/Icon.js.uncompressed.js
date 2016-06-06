@@ -3,13 +3,15 @@ define("dojox/mobile/Icon", [
 	"dojo/_base/lang",
 	"dojo/dom-class",
 	"dojo/dom-construct",
-	"./iconUtils"
-], function(declare, lang, domClass, domConstruct, iconUtils){
+	"./iconUtils",
+	"dojo/has",
+	"dojo/has!dojo-bidi?dojox/mobile/bidi/Icon"
+], function(declare, lang, domClass, domConstruct, iconUtils, has, BidiIcon){
 
 	// module:
 	//		dojox/mobile/Icon
 
-	return declare("dojox.mobile.Icon", null, {
+	var Icon = declare(has("dojo-bidi") ? "dojox.mobile.NonBidiIcon" : "dojox.mobile.Icon", null, {
 		// summary:
 		//		A wrapper for image icon, CSS sprite icon, or DOM Button.
 		// description:
@@ -67,6 +69,12 @@ define("dojox/mobile/Icon", [
 			}
 			this.domNode = node || domConstruct.create(this.tag);
 			iconUtils.createIcon(this.icon, this.iconPos, null, this.alt, this.domNode);
+			this._setCustomTransform();
+		},
+		_setCustomTransform: function(){
+			// summary:
+			//		To be implemented in bidi/Icon.js.
 		}
 	});
+	return has("dojo-bidi") ? declare("dojox.mobile.Icon", [Icon, BidiIcon]) : Icon;
 });

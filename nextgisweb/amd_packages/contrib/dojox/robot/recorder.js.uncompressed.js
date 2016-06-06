@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/robot/recorder", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/robot/recorder", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.robot.recorder");
 dojo.experimental("dojox.robot.recorder");
 // summary:

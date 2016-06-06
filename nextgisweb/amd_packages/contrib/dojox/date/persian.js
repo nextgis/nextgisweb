@@ -1,5 +1,5 @@
 //>>built
-define("dojox/date/persian",["..","dojo/_base/lang","dojo/date","./persian/Date"],function(_1,_2,dd,_3){
+define("dojox/date/persian",["dojox/main","dojo/_base/lang","dojo/date","./persian/Date"],function(_1,_2,dd,_3){
 var _4=_2.getObject("date.persian",true,_1);
 _4.getDaysInMonth=function(_5){
 return _5.getDaysInPersianMonth(_5.getMonth(),_5.getFullYear());

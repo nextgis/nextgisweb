@@ -590,7 +590,7 @@ _94.setDate(_94.getDate()+i);
 _97=_94.getMonth();
 _99=_94.getFullYear();
 if(_97!=_96){
-this.addMonthInPanelTime(_95,_98,_96,_99);
+this.addMonthInPanelTime(_95,_98,_96,_96!==11?_99:_99-1);
 _98=0;
 _96=_97;
 }
@@ -653,7 +653,7 @@ _a6.setDate(_a6.getDate()+i);
 _a8=_a6.getMonth();
 _aa=_a6.getFullYear();
 if(_a8!=_a7){
-this.addMonthInPanelTime(_a1[1],_a9,_a7,_aa);
+this.addMonthInPanelTime(_a1[1],_a9,_a7,_a7!==11?_aa:_aa-1);
 _a9=0;
 _a7=_a8;
 }

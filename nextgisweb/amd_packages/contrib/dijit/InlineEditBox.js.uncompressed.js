@@ -107,6 +107,9 @@ define("dijit/InlineEditBox", [
 			if(this.inlineEditBox.autoSave){
 				// Remove the save/cancel buttons since saving is done by simply tabbing away or
 				// selecting a value from the drop down list
+				this.saveButton.destroy();
+				this.cancelButton.destroy();
+				this.saveButton = this.cancelButton = null;
 				domConstruct.destroy(this.buttonContainer);
 			}
 		},
@@ -281,7 +284,7 @@ define("dijit/InlineEditBox", [
 		//		Is the node currently in edit mode?
 		editing: false,
 
-		// autoSave: Boolean
+		// autoSave: [const] Boolean
 		//		Changing the value automatically saves it; don't have to push save button
 		//		(and save button isn't even displayed)
 		autoSave: true,
@@ -515,7 +518,9 @@ define("dijit/InlineEditBox", [
 				ew.set(("displayedValue" in ew || "_setDisplayedValueAttr" in ew) ? "displayedValue" : "value", self.value);
 				this.defer(function(){ // defer needed so that the change of focus doesn't happen on mousedown which also sets focus
 					// the saveButton should start out disabled in most cases but the above set could have fired onChange
-					ww.saveButton.set("disabled", "intermediateChanges" in ew);
+					if(ww.saveButton){
+						ww.saveButton.set("disabled", "intermediateChanges" in ew);
+					}
 					this.focus(); // both nodes are showing, so we can switch focus safely
 					this._resetValue = this.getValue();
 				});

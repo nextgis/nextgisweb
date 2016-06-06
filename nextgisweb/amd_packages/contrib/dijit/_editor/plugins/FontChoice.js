@@ -204,7 +204,7 @@ _3a=_37.queryCommandValue(_38)||"";
 catch(e){
 _3a="";
 }
-var _3b=_6.isString(_3a)&&_3a.match(/'([^']*)'/);
+var _3b=_6.isString(_3a)&&(_3a.match(/'([^']*)'/)||_3a.match(/"([^"]*)"/));
 if(_3b){
 _3a=_3b[1];
 }

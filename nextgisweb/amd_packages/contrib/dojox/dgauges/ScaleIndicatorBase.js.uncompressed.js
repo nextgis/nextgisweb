@@ -11,7 +11,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 		// summary:
 		//		The value of the indicator. Default is 0.
 		value: 0,
-		
+
 		// interactionArea: String
 		//		How to interact with the indicator using mouse or touch interactions.
 		//		Can be "indicator", "gauge", "area" or "none". The default value is "gauge".
@@ -36,69 +36,69 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 		animationEaser: null,
 
 		_indicatorShapeFuncFlag: true,
-		
+
 		_interactionAreaFlag: true,
-		
+
 		_downListeners: null,
-		
+
 		_cursorListeners: null,
-		
+
 		_moveAndUpListeners: null,
-		
+
 		_transitionValue: NaN,
-		
+
 		_preventAnimation: false,
-		
+
 		_animation: null,
-		
+
 		constructor: function(){
-		
+
 			// watches changed happening on the "value" property
 			this.watch("value", lang.hitch(this, function(){
 				this.valueChanged(this);
 			}));
 			this.watch("value", lang.hitch(this, this._startAnimation));
-			
+
 			this.watch("interactionArea", lang.hitch(this, function(){
 				this._interactionAreaFlag = true;
 			}));
 			this.watch("interactionMode", lang.hitch(this, function(){
 				this._interactionAreaFlag = true;
 			}));
-			
+
 			this.watch("indicatorShapeFunc", lang.hitch(this, function(){
 				this._indicatorShapeFuncFlag = true;
 			}));
-			
+
 			this.addInvalidatingProperties(["scale", "value", "indicatorShapeFunc", "interactionArea", "interactionMode"]);
-			
+
 			this._downListeners = [];
 			this._moveAndUpListeners = [];
 			this._cursorListeners = [];
 		},
-		
+
 		_startAnimation: function(prop, oldValue, newValue){
 			// summary:
 			//		Internal method.
 			// tags:
 			//		private
-			if(this.animationDuration == 0){
+			if(this.animationDuration === 0){
 				return;
 			}
 			if(this._animation && (this._preventAnimation || oldValue == newValue)){
 				this._animation.stop();
 				return;
 			}
-			this._animation = new fx.Animation({curve: [oldValue, newValue], 
-										duration: this.animationDuration, 
+			this._animation = new fx.Animation({curve: [oldValue, newValue],
+										duration: this.animationDuration,
 										easing: this.animationEaser ? this.animationEaser : fx._defaultEasing,
 										onAnimate: lang.hitch(this, this._updateAnimation),
 										onEnd: lang.hitch(this, this._endAnimation),
 										onStop: lang.hitch(this, this._endAnimation)});
-			
+
 			this._animation.play();
 		},
-		
+
 		_updateAnimation: function(v){
 			// summary:
 			//		Internal method.
@@ -107,18 +107,18 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 			this._transitionValue = v;
 			this.invalidateRendering();
 		},
-		
+
 		_endAnimation: function(){
 			// summary:
 			//		Internal method.
 			// tags:
 			//		private
-			this._transitionValue = NaN; 
-			this.invalidateRendering();			
+			this._transitionValue = NaN;
+			this.invalidateRendering();
 		},
-		
+
 		refreshRendering: function(){
-			if(this._gfxGroup == null || this.scale == null){
+			if(this._gfxGroup === null || this.scale === null){
 				return;
 			}else{
 				if(this._indicatorShapeFuncFlag && lang.isFunction(this.indicatorShapeFunc)){
@@ -126,17 +126,17 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 					this.indicatorShapeFunc(this._gfxGroup, this);
 					this._indicatorShapeFuncFlag = false;
 				}
-				
+
 				if(this._interactionAreaFlag){
 					this._interactionAreaFlag = this._connectDownListeners();
 				}
 			}
 		},
-		
+
 		valueChanged: function(indicator){
 			// summary:
 			//		Invoked when the value of the indicator changes.
-			//		User can connect an listener on this function: 
+			//		User can connect an listener on this function:
 			// |	theIndicator.on("valueChanged", lang.hitch(this, function(){
 			// |		//do something
 			// |	}));
@@ -146,7 +146,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 				cancelable: true
 			});
 		},
-		
+
 		_disconnectDownListeners: function(){
 			// summary:
 			//		Internal method.
@@ -157,7 +157,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 			}
 			this._downListeners = [];
 		},
-		
+
 		_disconnectMoveAndUpListeners: function(){
 			// summary:
 			//		Internal method.
@@ -168,7 +168,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 			}
 			this._moveAndUpListeners = [];
 		},
-		
+
 		_disconnectListeners: function(){
 			// summary:
 			//		Internal method.
@@ -178,7 +178,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 			this._disconnectMoveAndUpListeners();
 			this._disconnectCursorListeners();
 		},
-		
+
 		_connectCursorListeners: function(target){
 			// summary:
 			//		Internal method.
@@ -194,7 +194,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 			));
 			this._cursorListeners.push(listener);
 		},
-		
+
 		_disconnectCursorListeners: function(){
 			// summary:
 			//		Internal method.
@@ -242,7 +242,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 			}
 			return false;
 		},
-		
+
 		_connectMoveAndUpListeners: function(){
 			// summary:
 			//		Internal method.
@@ -252,7 +252,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 
 			listener = on(win.doc, touch.move, lang.hitch(this, this._onMouseMove));
 			this._moveAndUpListeners.push(listener);
-			
+
 			listener = on(win.doc, touch.release, lang.hitch(this, this._onMouseUp));
 			this._moveAndUpListeners.push(listener);
 		},
@@ -300,7 +300,7 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 				});
 			}
 		},
-		
+
 		_endEditing: function(){
 			// summary:
 			//		Internal method.
@@ -314,6 +314,6 @@ define("dojox/dgauges/ScaleIndicatorBase", ["dojo/_base/lang", "dojo/_base/decla
 				});
 			}
 		}
-		
+
 	});
 });

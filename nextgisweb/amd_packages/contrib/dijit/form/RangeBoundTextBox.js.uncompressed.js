@@ -1,7 +1,8 @@
 define("dijit/form/RangeBoundTextBox", [
 	"dojo/_base/declare", // declare
 	"dojo/i18n", // i18n.getLocalization
-	"./MappedTextBox"
+	"./MappedTextBox",
+	"dojo/i18n!./nls/validate"
 ], function(declare, i18n, MappedTextBox){
 
 	// module:

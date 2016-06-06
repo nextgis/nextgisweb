@@ -106,7 +106,7 @@ var _2a=_1.isObject(_29)&&!_1.isArrayLike(_29);
 var _2b=[];
 if(_2a){
 for(var key in _29){
-_2b.push(_29[key]);
+_2b.push([key,_29[key]]);
 }
 }else{
 _2b=_29;

@@ -158,7 +158,9 @@ _d.push(g.formatNumber(n[i],true));
 if(typeof this.shape.path=="string"){
 this.shape.path+=_d.join("");
 }else{
-Array.prototype.push.apply(this.shape.path,_d);
+for(i=0,l=_d.length;i<l;++i){
+this.shape.path.push(_d[i]);
+}
 }
 },_validSegments:{m:2,l:2,h:1,v:1,c:6,s:4,q:4,t:2,a:7,z:0},_pushSegment:function(_e,_f){
 this.tbbox=null;

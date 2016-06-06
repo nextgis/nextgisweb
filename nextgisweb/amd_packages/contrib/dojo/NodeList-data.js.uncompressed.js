@@ -48,7 +48,7 @@ define("dojo/NodeList-data", [
 		if(!dataCache[pid]){ dataCache[pid] = {}; }
 
 		// API discrepency: calling with only a node returns the whole object. $.data throws
-		if(arguments.length == 1){ r = dataCache[pid]; }
+		if(arguments.length == 1){ return dataCache[pid]; }
 		if(typeof key == "string"){
 			// either getter or setter, based on `value` presence
 			if(arguments.length > 2){

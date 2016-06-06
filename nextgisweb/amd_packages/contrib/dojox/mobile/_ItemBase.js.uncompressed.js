@@ -12,8 +12,10 @@ define("dojox/mobile/_ItemBase", [
 	"./TransitionEvent",
 	"./iconUtils",
 	"./sniff",
+	"./viewRegistry",
 	"dojo/has!dojo-bidi?dojox/mobile/bidi/_ItemBase"
-], function(array, declare, lang, win, domClass, touch, registry, Contained, Container, WidgetBase, TransitionEvent, iconUtils, has, BidiItemBase){
+], function(array, declare, lang, win, domClass, touch, registry, Contained, Container, 
+	WidgetBase, TransitionEvent, iconUtils, has, viewRegistry, BidiItemBase){
 
 	// module:
 	//		dojox/mobile/_ItemBase
@@ -319,6 +321,12 @@ define("dojox/mobile/_ItemBase", [
 			// tags:
 			//		private
 			if(this.getParent().isEditing || this.onTouchStart(e) === false){ return; } // user's touchStart action
+			var enclosingScrollable = viewRegistry.getEnclosingScrollable(this.domNode);
+			if(enclosingScrollable &&
+				domClass.contains(enclosingScrollable.containerNode, "mblScrollableScrollTo2")){
+				// #17165: do not select the item during scroll animation
+				return;
+			}
 			if(!this._onTouchEndHandle && this._selStartMethod === "touch"){
 				// Connect to the entire window. Otherwise, fail to receive
 				// events if operation is performed outside this widget.

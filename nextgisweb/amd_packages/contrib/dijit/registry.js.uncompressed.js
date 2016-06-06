@@ -1,9 +1,8 @@
 define("dijit/registry", [
 	"dojo/_base/array", // array.forEach array.map
-	"dojo/sniff", // has("ie")
 	"dojo/_base/window", // win.body
 	"./main"	// dijit._scopeName
-], function(array, has, win, dijit){
+], function(array, win, dijit){
 
 	// module:
 	//		dijit/registry

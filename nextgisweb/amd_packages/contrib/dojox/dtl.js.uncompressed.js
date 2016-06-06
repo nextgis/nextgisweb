@@ -550,7 +550,7 @@ define([
 	},
 	{
 		render: function(context, buffer){
-			var str = this.contents.resolve(context);
+			var str = this.contents.resolve(context) || "";
 			if(!str.safe){
 				str = dd._base.escape("" + str);
 			}
@@ -792,533 +792,6 @@ define([
 
 
 },
-'dojox/dtl/utils/date':function(){
-define([
-	"dojo/_base/lang",
-	"dojox/date/php",
-	"../_base"
-], function(lang,ddp,dd){
-
-	var date = lang.getObject("utils.date", true, dd);
-	/*=====
-	 date = {
-	 	// TODO: summary
-	 };
-	 =====*/
-
-	date.DateFormat = ddp.DateFormat;
-	lang.extend(date.DateFormat, ddp.DateFormat.prototype, {
-		f: function(){
-			// summary:
-			//		Time, in 12-hour hours and minutes, with minutes left off if they're zero.
-			// description:
-			//		Examples: '1', '1:30', '2:05', '2'
-			//		Proprietary extension.
-			return (!this.date.getMinutes()) ? this.g() : this.g() + ":" + this.i();
-		},
-		N: function(){
-			// summary:
-			//		Month abbreviation in Associated Press style. Proprietary extension.
-			return date._months_ap[this.date.getMonth()];
-		},
-		P: function(){
-			// summary:
-			//		Time, in 12-hour hours, minutes and 'a.m.'/'p.m.', with minutes left off
-			//		if they're zero and the strings 'midnight' and 'noon' if appropriate.
-			// description:
-			//		Examples: '1 a.m.', '1:30 p.m.', 'midnight', 'noon', '12:30 p.m.'
-			//		Proprietary extension.
-			if(!this.date.getMinutes() && !this.date.getHours()){
-				return 'midnight';
-			}
-			if(!this.date.getMinutes() && this.date.getHours() == 12){
-				return 'noon';
-			}
-			return this.f() + " " + this.a();
-		}
-	});
-
-	lang.mixin(dojox.dtl.utils.date, {
-		format: function(/*Date*/ date, /*String*/ format){
-			var df = new dojox.dtl.utils.date.DateFormat(format);
-			return df.format(date);
-		},
-		timesince: function(d, now){
-			// summary:
-			//		Takes two datetime objects and returns the time between then and now
-			//		as a nicely formatted string, e.g "10 minutes"
-			// description:
-			//		Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
-			if(!(d instanceof Date)){
-				d = new Date(d.year, d.month, d.day);
-			}
-			if(!now){
-				now = new Date();
-			}
-
-			var delta = Math.abs(now.getTime() - d.getTime());
-			for(var i = 0, chunk; chunk = dojox.dtl.utils.date._chunks[i]; i++){
-				var count = Math.floor(delta / chunk[0]);
-				if(count) break;
-			}
-			return count + " " + chunk[1](count);
-		},
-		_chunks: [
-			[60 * 60 * 24 * 365 * 1000, function(n){ return (n == 1) ? 'year' : 'years'; }],
-			[60 * 60 * 24 * 30 * 1000, function(n){ return (n == 1) ? 'month' : 'months'; }],
-			[60 * 60 * 24 * 7 * 1000, function(n){ return (n == 1) ? 'week' : 'weeks'; }],
-			[60 * 60 * 24 * 1000, function(n){ return (n == 1) ? 'day' : 'days'; }],
-			[60 * 60 * 1000, function(n){ return (n == 1) ? 'hour' : 'hours'; }],
-			[60 * 1000, function(n){ return (n == 1) ? 'minute' : 'minutes'; }]
-		],
-		_months_ap: ["Jan.", "Feb.", "March", "April", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."]
-	});
-
-	return date;
-});
-
-},
-'dojox/dtl/tag/date':function(){
-define([
-	"dojo/_base/lang",
-	"../_base",
-	"../utils/date"
-], function(lang,dd,ddud){
-
-	var date = lang.getObject("tag.date", true, dd);
-	/*=====
-	 date = {
-	 	// TODO: summary
-	 };
-	 =====*/
-
-	date.NowNode = function(format, node){
-		this._format = format;
-		this.format = new ddud.DateFormat(format);
-		this.contents = node;
-	};
-	lang.extend(date.NowNode, {
-		render: function(context, buffer){
-			this.contents.set(this.format.format(new Date()));
-			return this.contents.render(context, buffer);
-		},
-		unrender: function(context, buffer){
-			return this.contents.unrender(context, buffer);
-		},
-		clone: function(buffer){
-			return new this.constructor(this._format, this.contents.clone(buffer));
-		}
-	});
-
-	date.now = function(parser, token){
-		// Split by either :" or :'
-		var parts = token.split_contents();
-		if(parts.length != 2){
-			throw new Error("'now' statement takes one argument");
-		}
-		return new date.NowNode(parts[1].slice(1, -1), parser.create_text_node());
-	};
-
-	return date;
-});
-
-},
-'dojox/dtl/tag/loader':function(){
-define([
-	"dojo/_base/lang",
-	"../_base",
-	"dojo/_base/array",
-	"dojo/_base/connect"
-], function(lang,dd,array,connect){
-
-	var ddtl = lang.getObject("tag.loader", true, dd);
-	/*=====
-	 ddtl = {
-	 	// TODO: summary
-	 };
-	 =====*/
-
-	ddtl.BlockNode = lang.extend(function(name, nodelist){
-		this.name = name;
-		this.nodelist = nodelist; // Can be overridden
-	},
-	{
-		"super": function(){
-			if(this.parent){
-				var html = this.parent.nodelist.dummyRender(this.context, null, true);
-				if(typeof html == "string"){
-					html = new String(html);
-				}
-				html.safe = true;
-				return html;
-			}
-			return '';
-		},
-		render: function(context, buffer){
-			var name = this.name;
-			var nodelist = this.nodelist;
-			var parent;
-			if(buffer.blocks){
-				var block = buffer.blocks[name];
-				if(block){
-					parent = block.parent;
-					nodelist = block.nodelist;
-					block.used = true;
-				}
-			}
-
-			this.rendered = nodelist;
-
-			context = context.push();
-			this.context = context;
-			this.parent = null;
-			if(nodelist != this.nodelist){
-				this.parent = this;
-			}
-			context.block = this;
-
-			if(buffer.getParent){
-				var bufferParent = buffer.getParent();
-				var setParent = connect.connect(buffer, "onSetParent", function(node, up, root){
-					if(up && root){
-						buffer.setParent(bufferParent);
-					}
-				});
-			}
-			buffer = nodelist.render(context, buffer, this);
-			setParent && connect.disconnect(setParent);
-			context = context.pop();
-			return buffer;
-		},
-		unrender: function(context, buffer){
-			return this.rendered.unrender(context, buffer);
-		},
-		clone: function(buffer){
-			return new this.constructor(this.name, this.nodelist.clone(buffer));
-		},
-		toString: function(){ return "dojox.dtl.tag.loader.BlockNode"; }
-	});
-
-	ddtl.ExtendsNode = lang.extend(function(getTemplate, nodelist, shared, parent, key){
-		this.getTemplate = getTemplate;
-		this.nodelist = nodelist;
-		this.shared = shared;
-		this.parent = parent;
-		this.key = key;
-	},
-	{
-		parents: {},
-		getParent: function(context){
-			var parent = this.parent;
-			if(!parent){
-				var string;
-				parent = this.parent = context.get(this.key, false);
-				if(!parent){
-					throw new Error("extends tag used a variable that did not resolve");
-				}
-				if(typeof parent == "object"){
-					var url = parent.url || parent.templatePath;
-					if(parent.shared){
-						this.shared = true;
-					}
-					if(url){
-						parent = this.parent = url.toString();
-					}else if(parent.templateString){
-						// Allow the builder's string interning to work
-						string = parent.templateString;
-						parent = this.parent = " ";
-					}else{
-						parent = this.parent = this.parent.toString();
-					}
-				}
-				if(parent && parent.indexOf("shared:") === 0){
-					this.shared = true;
-					parent = this.parent = parent.substring(7, parent.length);
-				}
-			}
-			if(!parent){
-				throw new Error("Invalid template name in 'extends' tag.");
-			}
-			if(parent.render){
-				return parent;
-			}
-			if(this.parents[parent]){
-				return this.parents[parent];
-			}
-			this.parent = this.getTemplate(string || dojox.dtl.text.getTemplateString(parent));
-			if(this.shared){
-				this.parents[parent] = this.parent;
-			}
-			return this.parent;
-		},
-		render: function(context, buffer){
-			var parent = this.getParent(context);
-
-			parent.blocks = parent.blocks || {};
-			buffer.blocks = buffer.blocks || {};
-
-			for(var i = 0, node; node = this.nodelist.contents[i]; i++){
-				if(node instanceof dojox.dtl.tag.loader.BlockNode){
-					var old = parent.blocks[node.name];
-					if(old && old.nodelist != node.nodelist){
-						// In a shared template, the individual blocks might change
-						buffer = old.nodelist.unrender(context, buffer);
-					}
-					parent.blocks[node.name] = buffer.blocks[node.name] = {
-						shared: this.shared,
-						nodelist: node.nodelist,
-						used: false
-					}
-				}
-			}
-
-			this.rendered = parent;
-			return parent.nodelist.render(context, buffer, this);
-		},
-		unrender: function(context, buffer){
-			return this.rendered.unrender(context, buffer, this);
-		},
-		toString: function(){ return "dojox.dtl.block.ExtendsNode"; }
-	});
-
-	ddtl.IncludeNode = lang.extend(function(path, constant, getTemplate, text, parsed){
-		this._path = path;
-		this.constant = constant;
-		this.path = (constant) ? path : new dd._Filter(path);
-		this.getTemplate = getTemplate;
-		this.text = text;
-		this.parsed = (arguments.length == 5) ? parsed : true;
-	},
-	{
-		_cache: [{}, {}],
-		render: function(context, buffer){
-			var location = ((this.constant) ? this.path : this.path.resolve(context)).toString();
-			var parsed = Number(this.parsed);
-			var dirty = false;
-			if(location != this.last){
-				dirty = true;
-				if(this.last){
-					buffer = this.unrender(context, buffer);
-				}
-				this.last = location;
-			}
-
-			var cache = this._cache[parsed];
-
-			if(parsed){
-				if(!cache[location]){
-					cache[location] = dd.text._resolveTemplateArg(location, true);
-				}
-				if(dirty){
-					var template = this.getTemplate(cache[location]);
-					this.rendered = template.nodelist;
-				}
-				return this.rendered.render(context, buffer, this);
-			}else{
-				if(this.text instanceof dd._TextNode){
-					if(dirty){
-						this.rendered = this.text;
-						this.rendered.set(dd.text._resolveTemplateArg(location, true));
-					}
-					return this.rendered.render(context, buffer);
-				}else{
-					if(!cache[location]){
-						var nodelist = [];
-						var div = document.createElement("div");
-						div.innerHTML = dd.text._resolveTemplateArg(location, true);
-						var children = div.childNodes;
-						while(children.length){
-							var removed = div.removeChild(children[0]);
-							nodelist.push(removed);
-						}
-						cache[location] = nodelist;
-					}
-					if(dirty){
-						this.nodelist = [];
-						var exists = true;
-						for(var i = 0, child; child = cache[location][i]; i++){
-							this.nodelist.push(child.cloneNode(true));
-						}
-					}
-					for(var i = 0, node; node = this.nodelist[i]; i++){
-						buffer = buffer.concat(node);
-					}
-				}
-			}
-			return buffer;
-		},
-		unrender: function(context, buffer){
-			if(this.rendered){
-				buffer = this.rendered.unrender(context, buffer);
-			}
-			if(this.nodelist){
-				for(var i = 0, node; node = this.nodelist[i]; i++){
-					buffer = buffer.remove(node);
-				}
-			}
-			return buffer;
-		},
-		clone: function(buffer){
-			return new this.constructor(this._path, this.constant, this.getTemplate, this.text.clone(buffer), this.parsed);
-		}
-	});
-
-	lang.mixin(ddtl, {
-		block: function(parser, token){
-			var parts = token.contents.split();
-			var name = parts[1];
-
-			parser._blocks = parser._blocks || {};
-			parser._blocks[name] = parser._blocks[name] || [];
-			parser._blocks[name].push(name);
-
-			var nodelist = parser.parse(["endblock", "endblock " + name]).rtrim();
-			parser.next_token();
-			return new dojox.dtl.tag.loader.BlockNode(name, nodelist);
-		},
-		extends_: function(parser, token){
-			var parts = token.contents.split();
-			var shared = false;
-			var parent = null;
-			var key = null;
-			if(parts[1].charAt(0) == '"' || parts[1].charAt(0) == "'"){
-				parent = parts[1].substring(1, parts[1].length - 1);
-			}else{
-				key = parts[1];
-			}
-			if(parent && parent.indexOf("shared:") == 0){
-				shared = true;
-				parent = parent.substring(7, parent.length);
-			}
-			var nodelist = parser.parse();
-			return new dojox.dtl.tag.loader.ExtendsNode(parser.getTemplate, nodelist, shared, parent, key);
-		},
-		include: function(parser, token){
-			var parts = token.contents.split();
-			if(parts.length != 2){
-				throw new Error(parts[0] + " tag takes one argument: the name of the template to be included");
-			}
-			var path = parts[1];
-			var constant = false;
-			if((path.charAt(0) == '"' || path.slice(-1) == "'") && path.charAt(0) == path.slice(-1)){
-				path = path.slice(1, -1);
-				constant = true;
-			}
-			return new ddtl.IncludeNode(path, constant, parser.getTemplate, parser.create_text_node());
-		},
-		ssi: function(parser, token){
-			// We're going to treat things a little differently here.
-			// First of all, this tag is *not* portable, so I'm not
-			// concerned about it being a "drop in" replacement.
-
-			// Instead, we'll just replicate the include tag, but with that
-			// optional "parsed" parameter.
-			var parts = token.contents.split();
-			var parsed = false;
-			if(parts.length == 3){
-				parsed = (parts.pop() == "parsed");
-				if(!parsed){
-					throw new Error("Second (optional) argument to ssi tag must be 'parsed'");
-				}
-			}
-			var node = ddtl.include(parser, new dd.Token(token.token_type, parts.join(" ")));
-			node.parsed = parsed;
-			return node;
-		}
-	});
-
-	return ddtl;
-});
-},
-'dojox/dtl/Context':function(){
-define([
-	"dojo/_base/lang",
-	"./_base"
-], function(lang,dd){
-	return dd.Context = lang.extend(function(/*Object*/dict){
-	 	// summary:
-	 	//		Represents a runtime context used by DTL templates.
-		this._this = {};
-		dd._Context.call(this, dict);	// TODO: huh?
-	}, dd._Context.prototype,		// TODO: huh?
-	{
-		getKeys: function(){
-			// summary:
-			//		Returns the set of keys exported by this context.
-			var keys = [];
-			for(var key in this){
-				if(this.hasOwnProperty(key) && key != "_this"){
-					keys.push(key);
-				}
-			}
-			return keys;
-		},
-		extend: function(/*dojox/dtl/Context|Object*/ obj){
-			// summary:
-			//		Returns a clone of this context object, with the items from the passed objecct mixed in.
-			// obj:
-			//		The object to extend.
-			return  lang.delegate(this, obj);
-		},
-		filter: function(/*dojox/dtl/Context|Object|String...*/ filter){
-			// summary:
-			//		Returns a clone of this context, only containing the items defined in the filter.
-			var context = new dd.Context();
-			var keys = [];
-			var i, arg;
-			if(filter instanceof dd.Context){
-				keys = filter.getKeys();
-			}else if(typeof filter == "object"){
-				for(var key in filter){
-					keys.push(key);
-				}
-			}else{
-				for(i = 0; arg = arguments[i]; i++){
-					if(typeof arg == "string"){
-						keys.push(arg);
-					}
-				}
-			}
-
-			for(i = 0, key; key = keys[i]; i++){
-				context[key] = this[key];
-			}
-
-			return context;
-		},
-		setThis: function(/*Object*/ scope){
-			// summary:
-			//		Sets the object on which to perform operations. 
-			// scope:
-			//		the this ref.
-			this._this = scope;
-		},
-		getThis: function(){
-			// summary:
-			//		Gets the object on which to perform operations. 
-			return this._this;
-		},
-		hasKey: function(/*String*/key){
-			// summary:
-			//		Indicates whether the specified key is defined on this context.
-			// key:
-			//		The key to look up.
-			if(this._getter){
-				var got = this._getter(key);
-				if(typeof got != "undefined"){
-					return true;
-				}
-			}
-
-			if(typeof this[key] != "undefined"){
-				return true;
-			}
-
-		return false;
-		}
-	});
-});
-},
 'dojox/string/tokenize':function(){
 define([
 	"dojo/_base/lang",
@@ -1328,7 +801,7 @@ define([
 
 	tokenize = function(/*String*/ str, /*RegExp*/ re, /*Function?*/ parseDelim, /*Object?*/ instance){
 		// summary:
-		//		Split a string by a regular expression with the ability to capture the delimeters
+		//		Split a string by a regular expression with the ability to capture the delimiters
 		// parseDelim:
 		//		Each group (excluding the 0 group) is passed as a parameter. If the function returns
 		//		a value, it's added to the list of tokens.
@@ -1365,306 +838,6 @@ define([
 	return tokenize;
 });
 
-},
-'dojox/dtl/tag/misc':function(){
-define([
-	"dojo/_base/lang",
-	"dojo/_base/array",
-	"dojo/_base/connect",
-	"../_base"
-], function(lang,array,connect,dd){
-
-	var ddtm = lang.getObject("tag.misc", true, dd);
-	/*=====
-	 ddtm = {
-	 	// TODO: summary
-	 };
-	 =====*/
-
-	ddtm.DebugNode = lang.extend(function(text){
-		this.text = text;
-	},
-	{
-		render: function(context, buffer){
-			var keys = context.getKeys();
-			var debug = [];
-			var only = {};
-			for(var i = 0, key; key = keys[i]; i++){
-				only[key] = context[key];
-				debug += "[" + key + ": " + typeof context[key] + "]\n";
-			}
-			console.debug(only);
-			return this.text.set(debug).render(context, buffer, this);
-		},
-		unrender: function(context, buffer){
-			return buffer;
-		},
-		clone: function(buffer){
-			return new this.constructor(this.text.clone(buffer));
-		},
-		toString: function(){ return "ddtm.DebugNode"; }
-	});
-
-	ddtm.FilterNode = lang.extend(function(varnode, nodelist){
-		this._varnode = varnode;
-		this._nodelist = nodelist;
-	},
-	{
-		render: function(context, buffer){
-			// Doing this in HTML requires a different buffer with a fake root node
-			var output = this._nodelist.render(context, new dojox.string.Builder());
-			context = context.update({ "var": output.toString() });
-			var filtered = this._varnode.render(context, buffer);
-			context = context.pop();
-			return buffer;
-		},
-		unrender: function(context, buffer){
-			return buffer;
-		},
-		clone: function(buffer){
-			return new this.constructor(this._expression, this._nodelist.clone(buffer));
-		}
-	});
-
-	ddtm.FirstOfNode = lang.extend(function(vars, text){
-		this._vars = vars;
-		this.vars = array.map(vars, function(item){
-			return new dojox.dtl._Filter(item);
-		});
-		this.contents = text;
-	},
-	{
-		render: function(context, buffer){
-			for(var i = 0, item; item = this.vars[i]; i++){
-				var resolved = item.resolve(context);
-				if(typeof resolved != "undefined"){
-					if(resolved === null){
-						resolved = "null";
-					}
-					this.contents.set(resolved);
-					return this.contents.render(context, buffer);
-				}
-			}
-			return this.contents.unrender(context, buffer);
-		},
-		unrender: function(context, buffer){
-			return this.contents.unrender(context, buffer);
-		},
-		clone: function(buffer){
-			return new this.constructor(this._vars, this.contents.clone(buffer));
-		}
-	});
-
-	ddtm.SpacelessNode = lang.extend(function(nodelist, text){
-		this.nodelist = nodelist;
-		this.contents = text;
-	},
-	{
-		render: function(context, buffer){
-			if(buffer.getParent){
-				// Unfortunately, we have to branch here
-				var watch = [
-					connect.connect(buffer, "onAddNodeComplete", this, "_watch"),
-					connect.connect(buffer, "onSetParent", this, "_watchParent")
-				];
-				buffer = this.nodelist.render(context, buffer);
-				connect.disconnect(watch[0]);
-				connect.disconnect(watch[1]);
-			}else{
-				var value = this.nodelist.dummyRender(context);
-				this.contents.set(value.replace(/>\s+</g, '><'));
-				buffer = this.contents.render(context, buffer);
-			}
-			return buffer;
-		},
-		unrender: function(context, buffer){
-			return this.nodelist.unrender(context, buffer);
-		},
-		clone: function(buffer){
-			return new this.constructor(this.nodelist.clone(buffer), this.contents.clone(buffer));
-		},
-		_isEmpty: function(node){
-			return (node.nodeType == 3 && !node.data.match(/[^\s\n]/));
-		},
-		_watch: function(node){
-			if(this._isEmpty(node)){
-				var remove = false;
-				if(node.parentNode.firstChild == node){
-					node.parentNode.removeChild(node);
-				}
-			}else{
-				var children = node.parentNode.childNodes;
-				if(node.nodeType == 1 && children.length > 2){
-					for(var i = 2, child; child = children[i]; i++){
-						if(children[i - 2].nodeType == 1 && this._isEmpty(children[i - 1])){
-							node.parentNode.removeChild(children[i - 1]);
-							return;
-						}
-					}
-				}
-			}
-		},
-		_watchParent: function(node){
-			var children = node.childNodes;
-			if(children.length){
-				while(node.childNodes.length){
-					var last = node.childNodes[node.childNodes.length - 1];
-					if(!this._isEmpty(last)){
-						return;
-					}
-					node.removeChild(last);
-				}
-			}
-		}
-	});
-
-	ddtm.TemplateTagNode = lang.extend(function(tag, text){
-		this.tag = tag;
-		this.contents = text;
-	},
-	{
-		mapping: {
-			openblock: "{%",
-			closeblock: "%}",
-			openvariable: "{{",
-			closevariable: "}}",
-			openbrace: "{",
-			closebrace: "}",
-			opencomment: "{#",
-			closecomment: "#}"
-		},
-		render: function(context, buffer){
-			this.contents.set(this.mapping[this.tag]);
-			return this.contents.render(context, buffer);
-		},
-		unrender: function(context, buffer){
-			return this.contents.unrender(context, buffer);
-		},
-		clone: function(buffer){
-			return new this.constructor(this.tag, this.contents.clone(buffer));
-		}
-	});
-
-	ddtm.WidthRatioNode = lang.extend(function(current, max, width, text){
-		this.current = new dd._Filter(current);
-		this.max = new dd._Filter(max);
-		this.width = width;
-		this.contents = text;
-	},
-	{
-		render: function(context, buffer){
-			var current = +this.current.resolve(context);
-			var max = +this.max.resolve(context);
-			if(typeof current != "number" || typeof max != "number" || !max){
-				this.contents.set("");
-			}else{
-				this.contents.set("" + Math.round((current / max) * this.width));
-			}
-			return this.contents.render(context, buffer);
-		},
-		unrender: function(context, buffer){
-			return this.contents.unrender(context, buffer);
-		},
-		clone: function(buffer){
-			return new this.constructor(this.current.getExpression(), this.max.getExpression(), this.width, this.contents.clone(buffer));
-		}
-	});
-
-	ddtm.WithNode = lang.extend(function(target, alias, nodelist){
-		this.target = new dd._Filter(target);
-		this.alias = alias;
-		this.nodelist = nodelist;
-	},
-	{
-		render: function(context, buffer){
-			var target = this.target.resolve(context);
-			context = context.push();
-			context[this.alias] = target;
-			buffer = this.nodelist.render(context, buffer);
-			context = context.pop();
-			return buffer;
-		},
-		unrender: function(context, buffer){
-			return buffer;
-		},
-		clone: function(buffer){
-			return new this.constructor(this.target.getExpression(), this.alias, this.nodelist.clone(buffer));
-		}
-	});
-
-	lang.mixin(ddtm, {
-		comment: function(parser, token){
-			// summary:
-			//		Ignore everything between {% comment %} and {% endcomment %}
-			parser.skip_past("endcomment");
-			return dd._noOpNode;
-		},
-		debug: function(parser, token){
-			// summary:
-			//		Output the current context, maybe add more stuff later.
-			return new ddtm.DebugNode(parser.create_text_node());
-		},
-		filter: function(parser, token){
-			// summary:
-			//		Filter the contents of the blog through variable filters.
-			var rest = token.contents.split(null, 1)[1];
-			var varnode = parser.create_variable_node("var|" + rest);
-			var nodelist = parser.parse(["endfilter"]);
-			parser.next_token();
-			return new ddtm.FilterNode(varnode, nodelist);
-		},
-		firstof: function(parser, token){
-			var parts = token.split_contents().slice(1);
-			if(!parts.length){
-				throw new Error("'firstof' statement requires at least one argument");
-			}
-			return new ddtm.FirstOfNode(parts, parser.create_text_node());
-		},
-		spaceless: function(parser, token){
-			var nodelist = parser.parse(["endspaceless"]);
-			parser.delete_first_token();
-			return new ddtm.SpacelessNode(nodelist, parser.create_text_node());
-		},
-		templatetag: function(parser, token){
-			var parts = token.contents.split();
-			if(parts.length != 2){
-				throw new Error("'templatetag' statement takes one argument");
-			}
-			var tag = parts[1];
-			var mapping = ddtm.TemplateTagNode.prototype.mapping;
-			if(!mapping[tag]){
-				var keys = [];
-				for(var key in mapping){
-					keys.push(key);
-				}
-				throw new Error("Invalid templatetag argument: '" + tag + "'. Must be one of: " + keys.join(", "));
-			}
-			return new ddtm.TemplateTagNode(tag, parser.create_text_node());
-		},
-		widthratio: function(parser, token){
-			var parts = token.contents.split();
-			if(parts.length != 4){
-				throw new Error("widthratio takes three arguments");
-			}
-			var width = +parts[3];
-			if(typeof width != "number"){
-				throw new Error("widthratio final argument must be an integer");
-			}
-			return new ddtm.WidthRatioNode(parts[1], parts[2], width, parser.create_text_node());
-		},
-		with_: function(parser, token){
-			var parts = token.split_contents();
-			if(parts.length != 4 || parts[2] != "as"){
-				throw new Error("do_width expected format as 'with value as name'");
-			}
-			var nodelist = parser.parse(["endwith"]);
-			parser.next_token();
-			return new ddtm.WithNode(parts[1], parts[3], nodelist);
-		}
-	});
-
-	return ddtm;
-});
 },
 'dojox/string/Builder':function(){
 define(["dojo/_base/lang"], 
@@ -1803,44 +976,93 @@ define(["dojo/_base/lang"],
 });
 
 },
-'dojox/dtl/ext-dojo/NodeList':function(){
+'dojox/dtl/Context':function(){
 define([
 	"dojo/_base/lang",
-	"dojo/query",
-	"../_base"
-], function(lang, query, dd){
-	var nl = lang.getObject("dojox.dtl.ext-dojo.NodeList", true);
-
-	var NodeList = query.NodeList;
-
-	lang.extend(NodeList, {
-		dtl: function(template, context){
+	"./_base"
+], function(lang,dd){
+	return dd.Context = lang.extend(function(/*Object*/dict){
+	 	// summary:
+	 	//		Represents a runtime context used by DTL templates.
+		this._this = {};
+		dd._Context.call(this, dict);	// TODO: huh?
+	}, dd._Context.prototype,		// TODO: huh?
+	{
+		getKeys: function(){
 			// summary:
-			//		Renders the specified template in each of the NodeList entries.
-			// template: dojox/dtl/__StringArgs|String
-			//		The template string or location
-			// context: dojox/dtl/__ObjectArgs|Object
-			//		The context object or location
-			var d = dd, self = this;
-			
-			var render = function(template, context){
-				var content = template.render(new d._Context(context));
-				self.forEach(function(node){
-					node.innerHTML = content;
-				});
-			};
+			//		Returns the set of keys exported by this context.
+			var keys = [];
+			for(var key in this){
+				if(this.hasOwnProperty(key) && key != "_this"){
+					keys.push(key);
+				}
+			}
+			return keys;
+		},
+		extend: function(/*dojox/dtl/Context|Object*/ obj){
+			// summary:
+			//		Returns a clone of this context object, with the items from the passed objecct mixed in.
+			// obj:
+			//		The object to extend.
+			return  lang.delegate(this, obj);
+		},
+		filter: function(/*dojox/dtl/Context|Object|String...*/ filter){
+			// summary:
+			//		Returns a clone of this context, only containing the items defined in the filter.
+			var context = new dd.Context();
+			var keys = [];
+			var i, arg;
+			if(filter instanceof dd.Context){
+				keys = filter.getKeys();
+			}else if(typeof filter == "object"){
+				for(var key in filter){
+					keys.push(key);
+				}
+			}else{
+				for(i = 0; arg = arguments[i]; i++){
+					if(typeof arg == "string"){
+						keys.push(arg);
+					}
+				}
+			}
 
-			d.text._resolveTemplateArg(template).addCallback(function(templateString){
-				template = new d.Template(templateString);
-				d.text._resolveContextArg(context).addCallback(function(context){
-					render(template, context);
-				});
-			});
+			for(i = 0, key; key = keys[i]; i++){
+				context[key] = this[key];
+			}
 
-			return this;
+			return context;
+		},
+		setThis: function(/*Object*/ scope){
+			// summary:
+			//		Sets the object on which to perform operations. 
+			// scope:
+			//		the this ref.
+			this._this = scope;
+		},
+		getThis: function(){
+			// summary:
+			//		Gets the object on which to perform operations. 
+			return this._this;
+		},
+		hasKey: function(/*String*/key){
+			// summary:
+			//		Indicates whether the specified key is defined on this context.
+			// key:
+			//		The key to look up.
+			if(this._getter){
+				var got = this._getter(key);
+				if(typeof got != "undefined"){
+					return true;
+				}
+			}
+
+			if(typeof this[key] != "undefined"){
+				return true;
+			}
+
+		return false;
 		}
 	});
-	return NodeList;
 });
 },
 'dojox/dtl/tag/logic':function(){
@@ -1980,7 +1202,7 @@ define([
 			var arred = [];
 			if(isObject){
 				for(var key in items){
-					arred.push(items[key]);
+					arred.push([key, items[key]]);
 				}
 			}else{
 				arred = items;
@@ -2128,6 +1350,342 @@ define([
 
 	return ddtl;
 });
+},
+'dojox/dtl/tag/loop':function(){
+define([
+	"dojo/_base/lang",
+	"dojo/_base/array",
+	"dojo/_base/json",
+	"../_base",
+	"dojox/string/tokenize"
+], function(lang,array,json,dd,Tokenize){
+
+	var ddtl = lang.getObject("tag.loop", true, dd);
+	/*=====
+	 ddtl = {
+	 	// TODO: summary
+	 };
+	 =====*/
+
+	ddtl.CycleNode = lang.extend(function(cyclevars, name, text, shared){
+		this.cyclevars = cyclevars;
+		this.name = name;
+		this.contents = text;
+		this.shared = shared || {counter: -1, map: {}};
+	},
+	{
+		render: function(context, buffer){
+			if(context.forloop && !context.forloop.counter0){
+				this.shared.counter = -1;
+			}
+
+			++this.shared.counter;
+			var value = this.cyclevars[this.shared.counter % this.cyclevars.length];
+
+			var map = this.shared.map;
+			if(!map[value]){
+				map[value] = new dd._Filter(value);
+			}
+			value = map[value].resolve(context, buffer);
+
+			if(this.name){
+				context[this.name] = value;
+			}
+			this.contents.set(value);
+			return this.contents.render(context, buffer);
+		},
+		unrender: function(context, buffer){
+			return this.contents.unrender(context, buffer);
+		},
+		clone: function(buffer){
+			return new this.constructor(this.cyclevars, this.name, this.contents.clone(buffer), this.shared);
+		}
+	});
+
+	ddtl.IfChangedNode = lang.extend(function(nodes, vars, shared){
+		this.nodes = nodes;
+		this._vars = vars;
+		this.shared = shared || {last: null, counter: 0};
+		this.vars = array.map(vars, function(item){
+			return new dojox.dtl._Filter(item);
+		});
+	}, {
+		render: function(context, buffer){
+			if(context.forloop){
+				if(context.forloop.counter <= this.shared.counter){
+					this.shared.last = null;
+				}
+				this.shared.counter = context.forloop.counter;
+			}
+
+			var change;
+			if(this.vars.length){
+				change = json.toJson(array.map(this.vars, function(item){
+					return item.resolve(context);
+				}));
+			}else{
+				change = this.nodes.dummyRender(context, buffer);
+			}
+
+			if(change != this.shared.last){
+				var firstloop = (this.shared.last === null);
+				this.shared.last = change;
+				context = context.push();
+				context.ifchanged = {firstloop: firstloop};
+				buffer = this.nodes.render(context, buffer);
+				context = context.pop();
+			}else{
+				buffer = this.nodes.unrender(context, buffer);
+			}
+			return buffer;
+		},
+		unrender: function(context, buffer){
+			return this.nodes.unrender(context, buffer);
+		},
+		clone: function(buffer){
+			return new this.constructor(this.nodes.clone(buffer), this._vars, this.shared);
+		}
+	});
+
+	ddtl.RegroupNode = lang.extend(function(expression, key, alias){
+		this._expression = expression;
+		this.expression = new dd._Filter(expression);
+		this.key = key;
+		this.alias = alias;
+	},
+	{
+		_push: function(container, grouper, stack){
+			if(stack.length){
+				container.push({ grouper: grouper, list: stack });
+			}
+		},
+		render: function(context, buffer){
+			context[this.alias] = [];
+			var list = this.expression.resolve(context);
+			if(list){
+				var last = null;
+				var stack = [];
+				for(var i = 0; i < list.length; i++){
+					var id = list[i][this.key];
+					if(last !== id){
+						this._push(context[this.alias], last, stack);
+						last = id;
+						stack = [list[i]];
+					}else{
+						stack.push(list[i]);
+					}
+				}
+				this._push(context[this.alias], last, stack);
+			}
+			return buffer;
+		},
+		unrender: function(context, buffer){
+			return buffer;
+		},
+		clone: function(context, buffer){
+			return this;
+		}
+	});
+
+	lang.mixin(ddtl, {
+		cycle: function(parser, token){
+			// summary:
+			//		Cycle among the given strings each time this tag is encountered
+			var args = token.split_contents();
+
+			if(args.length < 2){
+				throw new Error("'cycle' tag requires at least two arguments");
+			}
+
+			if(args[1].indexOf(",") != -1){
+				var vars = args[1].split(",");
+				args = [args[0]];
+				for(var i = 0; i < vars.length; i++){
+					args.push('"' + vars[i] + '"');
+				}
+			}
+
+			if(args.length == 2){
+				var name = args[args.length - 1];
+
+				if(!parser._namedCycleNodes){
+					throw new Error("No named cycles in template: '" + name + "' is not defined");
+				}
+				if(!parser._namedCycleNodes[name]){
+					throw new Error("Named cycle '" + name + "' does not exist");
+				}
+
+				return parser._namedCycleNodes[name];
+			}
+
+			if(args.length > 4 && args[args.length - 2] == "as"){
+				var name = args[args.length - 1];
+
+				var node = new ddtl.CycleNode(args.slice(1, args.length - 2), name, parser.create_text_node());
+
+				if(!parser._namedCycleNodes){
+					parser._namedCycleNodes = {};
+				}
+				parser._namedCycleNodes[name] = node;
+			}else{
+				node = new ddtl.CycleNode(args.slice(1), null, parser.create_text_node());
+			}
+
+			return node;
+		},
+		ifchanged: function(parser, token){
+			var parts = token.contents.split();
+			var nodes = parser.parse(["endifchanged"]);
+			parser.delete_first_token();
+			return new ddtl.IfChangedNode(nodes, parts.slice(1));
+		},
+		regroup: function(parser, token){
+			var tokens = Tokenize(token.contents, /(\s+)/g, function(spaces){
+				return spaces;
+			});
+			if(tokens.length < 11 || tokens[tokens.length - 3] != "as" || tokens[tokens.length - 7] != "by"){
+				throw new Error("Expected the format: regroup list by key as newList");
+			}
+			var expression = tokens.slice(2, -8).join("");
+			var key = tokens[tokens.length - 5];
+			var alias = tokens[tokens.length - 1];
+			return new ddtl.RegroupNode(expression, key, alias);
+		}
+	});
+
+	return ddtl;
+});
+},
+'dojox/dtl/tag/date':function(){
+define([
+	"dojo/_base/lang",
+	"../_base",
+	"../utils/date"
+], function(lang,dd,ddud){
+
+	var date = lang.getObject("tag.date", true, dd);
+	/*=====
+	 date = {
+	 	// TODO: summary
+	 };
+	 =====*/
+
+	date.NowNode = function(format, node){
+		this._format = format;
+		this.format = new ddud.DateFormat(format);
+		this.contents = node;
+	};
+	lang.extend(date.NowNode, {
+		render: function(context, buffer){
+			this.contents.set(this.format.format(new Date()));
+			return this.contents.render(context, buffer);
+		},
+		unrender: function(context, buffer){
+			return this.contents.unrender(context, buffer);
+		},
+		clone: function(buffer){
+			return new this.constructor(this._format, this.contents.clone(buffer));
+		}
+	});
+
+	date.now = function(parser, token){
+		// Split by either :" or :'
+		var parts = token.split_contents();
+		if(parts.length != 2){
+			throw new Error("'now' statement takes one argument");
+		}
+		return new date.NowNode(parts[1].slice(1, -1), parser.create_text_node());
+	};
+
+	return date;
+});
+
+},
+'dojox/dtl/utils/date':function(){
+define([
+	"dojo/_base/lang",
+	"dojox/date/php",
+	"../_base"
+], function(lang,ddp,dd){
+
+	var date = lang.getObject("utils.date", true, dd);
+	/*=====
+	 date = {
+	 	// TODO: summary
+	 };
+	 =====*/
+
+	date.DateFormat = ddp.DateFormat;
+	lang.extend(date.DateFormat, ddp.DateFormat.prototype, {
+		f: function(){
+			// summary:
+			//		Time, in 12-hour hours and minutes, with minutes left off if they're zero.
+			// description:
+			//		Examples: '1', '1:30', '2:05', '2'
+			//		Proprietary extension.
+			return (!this.date.getMinutes()) ? this.g() : this.g() + ":" + this.i();
+		},
+		N: function(){
+			// summary:
+			//		Month abbreviation in Associated Press style. Proprietary extension.
+			return date._months_ap[this.date.getMonth()];
+		},
+		P: function(){
+			// summary:
+			//		Time, in 12-hour hours, minutes and 'a.m.'/'p.m.', with minutes left off
+			//		if they're zero and the strings 'midnight' and 'noon' if appropriate.
+			// description:
+			//		Examples: '1 a.m.', '1:30 p.m.', 'midnight', 'noon', '12:30 p.m.'
+			//		Proprietary extension.
+			if(!this.date.getMinutes() && !this.date.getHours()){
+				return 'midnight';
+			}
+			if(!this.date.getMinutes() && this.date.getHours() == 12){
+				return 'noon';
+			}
+			return this.f() + " " + this.a();
+		}
+	});
+
+	lang.mixin(dojox.dtl.utils.date, {
+		format: function(/*Date*/ date, /*String*/ format){
+			var df = new dojox.dtl.utils.date.DateFormat(format);
+			return df.format(date);
+		},
+		timesince: function(d, now){
+			// summary:
+			//		Takes two datetime objects and returns the time between then and now
+			//		as a nicely formatted string, e.g "10 minutes"
+			// description:
+			//		Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
+			if(!(d instanceof Date)){
+				d = new Date(d.year, d.month, d.day);
+			}
+			if(!now){
+				now = new Date();
+			}
+
+			var delta = Math.abs(now.getTime() - d.getTime());
+			for(var i = 0, chunk; chunk = dojox.dtl.utils.date._chunks[i]; i++){
+				var count = Math.floor(delta / chunk[0]);
+				if(count) break;
+			}
+			return count + " " + chunk[1](count);
+		},
+		_chunks: [
+			[60 * 60 * 24 * 365 * 1000, function(n){ return (n == 1) ? 'year' : 'years'; }],
+			[60 * 60 * 24 * 30 * 1000, function(n){ return (n == 1) ? 'month' : 'months'; }],
+			[60 * 60 * 24 * 7 * 1000, function(n){ return (n == 1) ? 'week' : 'weeks'; }],
+			[60 * 60 * 24 * 1000, function(n){ return (n == 1) ? 'day' : 'days'; }],
+			[60 * 60 * 1000, function(n){ return (n == 1) ? 'hour' : 'hours'; }],
+			[60 * 1000, function(n){ return (n == 1) ? 'minute' : 'minutes'; }]
+		],
+		_months_ap: ["Jan.", "Feb.", "March", "April", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."]
+	});
+
+	return date;
+});
+
 },
 'dojox/date/php':function(){
 define(["dojo/_base/kernel", "dojo/_base/lang","dojo/date","dojox/string/tokenize"], function(dojo,dlang,ddate,dxst){
@@ -2609,7 +2167,7 @@ date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
 	// amount:
 	//		How much to add to the date.
 
-	var sum = new Date(+date); // convert to Number before copying to accomodate IE (#3112)
+	var sum = new Date(+date); // convert to Number before copying to accommodate IE (#3112)
 	var fixOvershoot = false;
 	var property = "Date";
 
@@ -2833,209 +2391,651 @@ return date;
 });
 
 },
-'dojox/dtl/tag/loop':function(){
+'dojox/dtl/tag/loader':function(){
 define([
 	"dojo/_base/lang",
-	"dojo/_base/array",
-	"dojo/_base/json",
 	"../_base",
-	"dojox/string/tokenize"
-], function(lang,array,json,dd,Tokenize){
+	"dojo/_base/array",
+	"dojo/_base/connect"
+], function(lang,dd,array,connect){
 
-	var ddtl = lang.getObject("tag.loop", true, dd);
+	var ddtl = lang.getObject("tag.loader", true, dd);
 	/*=====
 	 ddtl = {
 	 	// TODO: summary
 	 };
 	 =====*/
 
-	ddtl.CycleNode = lang.extend(function(cyclevars, name, text, shared){
-		this.cyclevars = cyclevars;
+	ddtl.BlockNode = lang.extend(function(name, nodelist){
 		this.name = name;
-		this.contents = text;
-		this.shared = shared || {counter: -1, map: {}};
+		this.nodelist = nodelist; // Can be overridden
+	},
+	{
+		"super": function(){
+			if(this.parent){
+				var html = this.parent.nodelist.dummyRender(this.context, null, true);
+				if(typeof html == "string"){
+					html = new String(html);
+				}
+				html.safe = true;
+				return html;
+			}
+			return '';
+		},
+		render: function(context, buffer){
+			var name = this.name;
+			var nodelist = this.nodelist;
+			var parent;
+			if(buffer.blocks){
+				var block = buffer.blocks[name];
+				if(block){
+					parent = block.parent;
+					nodelist = block.nodelist;
+					block.used = true;
+				}
+			}
+
+			this.rendered = nodelist;
+
+			context = context.push();
+			this.context = context;
+			this.parent = null;
+			if(nodelist != this.nodelist){
+				this.parent = this;
+			}
+			context.block = this;
+
+			if(buffer.getParent){
+				var bufferParent = buffer.getParent();
+				var setParent = connect.connect(buffer, "onSetParent", function(node, up, root){
+					if(up && root){
+						buffer.setParent(bufferParent);
+					}
+				});
+			}
+			buffer = nodelist.render(context, buffer, this);
+			setParent && connect.disconnect(setParent);
+			context = context.pop();
+			return buffer;
+		},
+		unrender: function(context, buffer){
+			return this.rendered.unrender(context, buffer);
+		},
+		clone: function(buffer){
+			return new this.constructor(this.name, this.nodelist.clone(buffer));
+		},
+		toString: function(){ return "dojox.dtl.tag.loader.BlockNode"; }
+	});
+
+	ddtl.ExtendsNode = lang.extend(function(getTemplate, nodelist, shared, parent, key){
+		this.getTemplate = getTemplate;
+		this.nodelist = nodelist;
+		this.shared = shared;
+		this.parent = parent;
+		this.key = key;
+	},
+	{
+		parents: {},
+		getParent: function(context){
+			var parent = this.parent;
+			if(!parent){
+				var string;
+				parent = this.parent = context.get(this.key, false);
+				if(!parent){
+					throw new Error("extends tag used a variable that did not resolve");
+				}
+				if(typeof parent == "object"){
+					var url = parent.url || parent.templatePath;
+					if(parent.shared){
+						this.shared = true;
+					}
+					if(url){
+						parent = this.parent = url.toString();
+					}else if(parent.templateString){
+						// Allow the builder's string interning to work
+						string = parent.templateString;
+						parent = this.parent = " ";
+					}else{
+						parent = this.parent = this.parent.toString();
+					}
+				}
+				if(parent && parent.indexOf("shared:") === 0){
+					this.shared = true;
+					parent = this.parent = parent.substring(7, parent.length);
+				}
+			}
+			if(!parent){
+				throw new Error("Invalid template name in 'extends' tag.");
+			}
+			if(parent.render){
+				return parent;
+			}
+			if(this.parents[parent]){
+				return this.parents[parent];
+			}
+			this.parent = this.getTemplate(string || dojox.dtl.text.getTemplateString(parent));
+			if(this.shared){
+				this.parents[parent] = this.parent;
+			}
+			return this.parent;
+		},
+		render: function(context, buffer){
+			var parent = this.getParent(context);
+
+			parent.blocks = parent.blocks || {};
+			buffer.blocks = buffer.blocks || {};
+
+			for(var i = 0, node; node = this.nodelist.contents[i]; i++){
+				if(node instanceof dojox.dtl.tag.loader.BlockNode){
+					var old = parent.blocks[node.name];
+					if(old && old.nodelist != node.nodelist){
+						// In a shared template, the individual blocks might change
+						buffer = old.nodelist.unrender(context, buffer);
+					}
+					parent.blocks[node.name] = buffer.blocks[node.name] = {
+						shared: this.shared,
+						nodelist: node.nodelist,
+						used: false
+					}
+				}
+			}
+
+			this.rendered = parent;
+			return parent.nodelist.render(context, buffer, this);
+		},
+		unrender: function(context, buffer){
+			return this.rendered.unrender(context, buffer, this);
+		},
+		toString: function(){ return "dojox.dtl.block.ExtendsNode"; }
+	});
+
+	ddtl.IncludeNode = lang.extend(function(path, constant, getTemplate, text, parsed){
+		this._path = path;
+		this.constant = constant;
+		this.path = (constant) ? path : new dd._Filter(path);
+		this.getTemplate = getTemplate;
+		this.text = text;
+		this.parsed = (arguments.length == 5) ? parsed : true;
+	},
+	{
+		_cache: [{}, {}],
+		render: function(context, buffer){
+			var location = ((this.constant) ? this.path : this.path.resolve(context)).toString();
+			var parsed = Number(this.parsed);
+			var dirty = false;
+			if(location != this.last){
+				dirty = true;
+				if(this.last){
+					buffer = this.unrender(context, buffer);
+				}
+				this.last = location;
+			}
+
+			var cache = this._cache[parsed];
+
+			if(parsed){
+				if(!cache[location]){
+					cache[location] = dd.text._resolveTemplateArg(location, true);
+				}
+				if(dirty){
+					var template = this.getTemplate(cache[location]);
+					this.rendered = template.nodelist;
+				}
+				return this.rendered.render(context, buffer, this);
+			}else{
+				if(this.text instanceof dd._TextNode){
+					if(dirty){
+						this.rendered = this.text;
+						this.rendered.set(dd.text._resolveTemplateArg(location, true));
+					}
+					return this.rendered.render(context, buffer);
+				}else{
+					if(!cache[location]){
+						var nodelist = [];
+						var div = document.createElement("div");
+						div.innerHTML = dd.text._resolveTemplateArg(location, true);
+						var children = div.childNodes;
+						while(children.length){
+							var removed = div.removeChild(children[0]);
+							nodelist.push(removed);
+						}
+						cache[location] = nodelist;
+					}
+					if(dirty){
+						this.nodelist = [];
+						var exists = true;
+						for(var i = 0, child; child = cache[location][i]; i++){
+							this.nodelist.push(child.cloneNode(true));
+						}
+					}
+					for(var i = 0, node; node = this.nodelist[i]; i++){
+						buffer = buffer.concat(node);
+					}
+				}
+			}
+			return buffer;
+		},
+		unrender: function(context, buffer){
+			if(this.rendered){
+				buffer = this.rendered.unrender(context, buffer);
+			}
+			if(this.nodelist){
+				for(var i = 0, node; node = this.nodelist[i]; i++){
+					buffer = buffer.remove(node);
+				}
+			}
+			return buffer;
+		},
+		clone: function(buffer){
+			return new this.constructor(this._path, this.constant, this.getTemplate, this.text.clone(buffer), this.parsed);
+		}
+	});
+
+	lang.mixin(ddtl, {
+		block: function(parser, token){
+			var parts = token.contents.split();
+			var name = parts[1];
+
+			parser._blocks = parser._blocks || {};
+			parser._blocks[name] = parser._blocks[name] || [];
+			parser._blocks[name].push(name);
+
+			var nodelist = parser.parse(["endblock", "endblock " + name]).rtrim();
+			parser.next_token();
+			return new dojox.dtl.tag.loader.BlockNode(name, nodelist);
+		},
+		extends_: function(parser, token){
+			var parts = token.contents.split();
+			var shared = false;
+			var parent = null;
+			var key = null;
+			if(parts[1].charAt(0) == '"' || parts[1].charAt(0) == "'"){
+				parent = parts[1].substring(1, parts[1].length - 1);
+			}else{
+				key = parts[1];
+			}
+			if(parent && parent.indexOf("shared:") == 0){
+				shared = true;
+				parent = parent.substring(7, parent.length);
+			}
+			var nodelist = parser.parse();
+			return new dojox.dtl.tag.loader.ExtendsNode(parser.getTemplate, nodelist, shared, parent, key);
+		},
+		include: function(parser, token){
+			var parts = token.contents.split();
+			if(parts.length != 2){
+				throw new Error(parts[0] + " tag takes one argument: the name of the template to be included");
+			}
+			var path = parts[1];
+			var constant = false;
+			if((path.charAt(0) == '"' || path.slice(-1) == "'") && path.charAt(0) == path.slice(-1)){
+				path = path.slice(1, -1);
+				constant = true;
+			}
+			return new ddtl.IncludeNode(path, constant, parser.getTemplate, parser.create_text_node());
+		},
+		ssi: function(parser, token){
+			// We're going to treat things a little differently here.
+			// First of all, this tag is *not* portable, so I'm not
+			// concerned about it being a "drop in" replacement.
+
+			// Instead, we'll just replicate the include tag, but with that
+			// optional "parsed" parameter.
+			var parts = token.contents.split();
+			var parsed = false;
+			if(parts.length == 3){
+				parsed = (parts.pop() == "parsed");
+				if(!parsed){
+					throw new Error("Second (optional) argument to ssi tag must be 'parsed'");
+				}
+			}
+			var node = ddtl.include(parser, new dd.Token(token.token_type, parts.join(" ")));
+			node.parsed = parsed;
+			return node;
+		}
+	});
+
+	return ddtl;
+});
+},
+'dojox/dtl/tag/misc':function(){
+define([
+	"dojo/_base/lang",
+	"dojo/_base/array",
+	"dojo/_base/connect",
+	"../_base"
+], function(lang,array,connect,dd){
+
+	var ddtm = lang.getObject("tag.misc", true, dd);
+	/*=====
+	 ddtm = {
+	 	// TODO: summary
+	 };
+	 =====*/
+
+	ddtm.DebugNode = lang.extend(function(text){
+		this.text = text;
 	},
 	{
 		render: function(context, buffer){
-			if(context.forloop && !context.forloop.counter0){
-				this.shared.counter = -1;
+			var keys = context.getKeys();
+			var debug = [];
+			var only = {};
+			for(var i = 0, key; key = keys[i]; i++){
+				only[key] = context[key];
+				debug += "[" + key + ": " + typeof context[key] + "]\n";
 			}
+			console.debug(only);
+			return this.text.set(debug).render(context, buffer, this);
+		},
+		unrender: function(context, buffer){
+			return buffer;
+		},
+		clone: function(buffer){
+			return new this.constructor(this.text.clone(buffer));
+		},
+		toString: function(){ return "ddtm.DebugNode"; }
+	});
 
-			++this.shared.counter;
-			var value = this.cyclevars[this.shared.counter % this.cyclevars.length];
+	ddtm.FilterNode = lang.extend(function(varnode, nodelist){
+		this._varnode = varnode;
+		this._nodelist = nodelist;
+	},
+	{
+		render: function(context, buffer){
+			// Doing this in HTML requires a different buffer with a fake root node
+			var output = this._nodelist.render(context, new dojox.string.Builder());
+			context = context.update({ "var": output.toString() });
+			var filtered = this._varnode.render(context, buffer);
+			context = context.pop();
+			return buffer;
+		},
+		unrender: function(context, buffer){
+			return buffer;
+		},
+		clone: function(buffer){
+			return new this.constructor(this._expression, this._nodelist.clone(buffer));
+		}
+	});
 
-			var map = this.shared.map;
-			if(!map[value]){
-				map[value] = new dd._Filter(value);
+	ddtm.FirstOfNode = lang.extend(function(vars, text){
+		this._vars = vars;
+		this.vars = array.map(vars, function(item){
+			return new dojox.dtl._Filter(item);
+		});
+		this.contents = text;
+	},
+	{
+		render: function(context, buffer){
+			for(var i = 0, item; item = this.vars[i]; i++){
+				var resolved = item.resolve(context);
+				if(typeof resolved != "undefined"){
+					if(resolved === null){
+						resolved = "null";
+					}
+					this.contents.set(resolved);
+					return this.contents.render(context, buffer);
+				}
 			}
-			value = map[value].resolve(context, buffer);
+			return this.contents.unrender(context, buffer);
+		},
+		unrender: function(context, buffer){
+			return this.contents.unrender(context, buffer);
+		},
+		clone: function(buffer){
+			return new this.constructor(this._vars, this.contents.clone(buffer));
+		}
+	});
 
-			if(this.name){
-				context[this.name] = value;
+	ddtm.SpacelessNode = lang.extend(function(nodelist, text){
+		this.nodelist = nodelist;
+		this.contents = text;
+	},
+	{
+		render: function(context, buffer){
+			if(buffer.getParent){
+				// Unfortunately, we have to branch here
+				var watch = [
+					connect.connect(buffer, "onAddNodeComplete", this, "_watch"),
+					connect.connect(buffer, "onSetParent", this, "_watchParent")
+				];
+				buffer = this.nodelist.render(context, buffer);
+				connect.disconnect(watch[0]);
+				connect.disconnect(watch[1]);
+			}else{
+				var value = this.nodelist.dummyRender(context);
+				this.contents.set(value.replace(/>\s+</g, '><'));
+				buffer = this.contents.render(context, buffer);
 			}
-			this.contents.set(value);
+			return buffer;
+		},
+		unrender: function(context, buffer){
+			return this.nodelist.unrender(context, buffer);
+		},
+		clone: function(buffer){
+			return new this.constructor(this.nodelist.clone(buffer), this.contents.clone(buffer));
+		},
+		_isEmpty: function(node){
+			return (node.nodeType == 3 && !node.data.match(/[^\s\n]/));
+		},
+		_watch: function(node){
+			if(this._isEmpty(node)){
+				var remove = false;
+				if(node.parentNode.firstChild == node){
+					node.parentNode.removeChild(node);
+				}
+			}else{
+				var children = node.parentNode.childNodes;
+				if(node.nodeType == 1 && children.length > 2){
+					for(var i = 2, child; child = children[i]; i++){
+						if(children[i - 2].nodeType == 1 && this._isEmpty(children[i - 1])){
+							node.parentNode.removeChild(children[i - 1]);
+							return;
+						}
+					}
+				}
+			}
+		},
+		_watchParent: function(node){
+			var children = node.childNodes;
+			if(children.length){
+				while(node.childNodes.length){
+					var last = node.childNodes[node.childNodes.length - 1];
+					if(!this._isEmpty(last)){
+						return;
+					}
+					node.removeChild(last);
+				}
+			}
+		}
+	});
+
+	ddtm.TemplateTagNode = lang.extend(function(tag, text){
+		this.tag = tag;
+		this.contents = text;
+	},
+	{
+		mapping: {
+			openblock: "{%",
+			closeblock: "%}",
+			openvariable: "{{",
+			closevariable: "}}",
+			openbrace: "{",
+			closebrace: "}",
+			opencomment: "{#",
+			closecomment: "#}"
+		},
+		render: function(context, buffer){
+			this.contents.set(this.mapping[this.tag]);
 			return this.contents.render(context, buffer);
 		},
 		unrender: function(context, buffer){
 			return this.contents.unrender(context, buffer);
 		},
 		clone: function(buffer){
-			return new this.constructor(this.cyclevars, this.name, this.contents.clone(buffer), this.shared);
+			return new this.constructor(this.tag, this.contents.clone(buffer));
 		}
 	});
 
-	ddtl.IfChangedNode = lang.extend(function(nodes, vars, shared){
-		this.nodes = nodes;
-		this._vars = vars;
-		this.shared = shared || {last: null, counter: 0};
-		this.vars = array.map(vars, function(item){
-			return new dojox.dtl._Filter(item);
-		});
-	}, {
-		render: function(context, buffer){
-			if(context.forloop){
-				if(context.forloop.counter <= this.shared.counter){
-					this.shared.last = null;
-				}
-				this.shared.counter = context.forloop.counter;
-			}
-
-			var change;
-			if(this.vars.length){
-				change = json.toJson(array.map(this.vars, function(item){
-					return item.resolve(context);
-				}));
-			}else{
-				change = this.nodes.dummyRender(context, buffer);
-			}
-
-			if(change != this.shared.last){
-				var firstloop = (this.shared.last === null);
-				this.shared.last = change;
-				context = context.push();
-				context.ifchanged = {firstloop: firstloop};
-				buffer = this.nodes.render(context, buffer);
-				context = context.pop();
-			}else{
-				buffer = this.nodes.unrender(context, buffer);
-			}
-			return buffer;
-		},
-		unrender: function(context, buffer){
-			return this.nodes.unrender(context, buffer);
-		},
-		clone: function(buffer){
-			return new this.constructor(this.nodes.clone(buffer), this._vars, this.shared);
-		}
-	});
-
-	ddtl.RegroupNode = lang.extend(function(expression, key, alias){
-		this._expression = expression;
-		this.expression = new dd._Filter(expression);
-		this.key = key;
-		this.alias = alias;
+	ddtm.WidthRatioNode = lang.extend(function(current, max, width, text){
+		this.current = new dd._Filter(current);
+		this.max = new dd._Filter(max);
+		this.width = width;
+		this.contents = text;
 	},
 	{
-		_push: function(container, grouper, stack){
-			if(stack.length){
-				container.push({ grouper: grouper, list: stack });
-			}
-		},
 		render: function(context, buffer){
-			context[this.alias] = [];
-			var list = this.expression.resolve(context);
-			if(list){
-				var last = null;
-				var stack = [];
-				for(var i = 0; i < list.length; i++){
-					var id = list[i][this.key];
-					if(last !== id){
-						this._push(context[this.alias], last, stack);
-						last = id;
-						stack = [list[i]];
-					}else{
-						stack.push(list[i]);
-					}
-				}
-				this._push(context[this.alias], last, stack);
+			var current = +this.current.resolve(context);
+			var max = +this.max.resolve(context);
+			if(typeof current != "number" || typeof max != "number" || !max){
+				this.contents.set("");
+			}else{
+				this.contents.set("" + Math.round((current / max) * this.width));
 			}
+			return this.contents.render(context, buffer);
+		},
+		unrender: function(context, buffer){
+			return this.contents.unrender(context, buffer);
+		},
+		clone: function(buffer){
+			return new this.constructor(this.current.getExpression(), this.max.getExpression(), this.width, this.contents.clone(buffer));
+		}
+	});
+
+	ddtm.WithNode = lang.extend(function(target, alias, nodelist){
+		this.target = new dd._Filter(target);
+		this.alias = alias;
+		this.nodelist = nodelist;
+	},
+	{
+		render: function(context, buffer){
+			var target = this.target.resolve(context);
+			context = context.push();
+			context[this.alias] = target;
+			buffer = this.nodelist.render(context, buffer);
+			context = context.pop();
 			return buffer;
 		},
 		unrender: function(context, buffer){
 			return buffer;
 		},
-		clone: function(context, buffer){
+		clone: function(buffer){
+			return new this.constructor(this.target.getExpression(), this.alias, this.nodelist.clone(buffer));
+		}
+	});
+
+	lang.mixin(ddtm, {
+		comment: function(parser, token){
+			// summary:
+			//		Ignore everything between {% comment %} and {% endcomment %}
+			parser.skip_past("endcomment");
+			return dd._noOpNode;
+		},
+		debug: function(parser, token){
+			// summary:
+			//		Output the current context, maybe add more stuff later.
+			return new ddtm.DebugNode(parser.create_text_node());
+		},
+		filter: function(parser, token){
+			// summary:
+			//		Filter the contents of the blog through variable filters.
+			var rest = token.contents.split(null, 1)[1];
+			var varnode = parser.create_variable_node("var|" + rest);
+			var nodelist = parser.parse(["endfilter"]);
+			parser.next_token();
+			return new ddtm.FilterNode(varnode, nodelist);
+		},
+		firstof: function(parser, token){
+			var parts = token.split_contents().slice(1);
+			if(!parts.length){
+				throw new Error("'firstof' statement requires at least one argument");
+			}
+			return new ddtm.FirstOfNode(parts, parser.create_text_node());
+		},
+		spaceless: function(parser, token){
+			var nodelist = parser.parse(["endspaceless"]);
+			parser.delete_first_token();
+			return new ddtm.SpacelessNode(nodelist, parser.create_text_node());
+		},
+		templatetag: function(parser, token){
+			var parts = token.contents.split();
+			if(parts.length != 2){
+				throw new Error("'templatetag' statement takes one argument");
+			}
+			var tag = parts[1];
+			var mapping = ddtm.TemplateTagNode.prototype.mapping;
+			if(!mapping[tag]){
+				var keys = [];
+				for(var key in mapping){
+					keys.push(key);
+				}
+				throw new Error("Invalid templatetag argument: '" + tag + "'. Must be one of: " + keys.join(", "));
+			}
+			return new ddtm.TemplateTagNode(tag, parser.create_text_node());
+		},
+		widthratio: function(parser, token){
+			var parts = token.contents.split();
+			if(parts.length != 4){
+				throw new Error("widthratio takes three arguments");
+			}
+			var width = +parts[3];
+			if(typeof width != "number"){
+				throw new Error("widthratio final argument must be an integer");
+			}
+			return new ddtm.WidthRatioNode(parts[1], parts[2], width, parser.create_text_node());
+		},
+		with_: function(parser, token){
+			var parts = token.split_contents();
+			if(parts.length != 4 || parts[2] != "as"){
+				throw new Error("do_width expected format as 'with value as name'");
+			}
+			var nodelist = parser.parse(["endwith"]);
+			parser.next_token();
+			return new ddtm.WithNode(parts[1], parts[3], nodelist);
+		}
+	});
+
+	return ddtm;
+});
+},
+'dojox/dtl/ext-dojo/NodeList':function(){
+define([
+	"dojo/_base/lang",
+	"dojo/query",
+	"../_base"
+], function(lang, query, dd){
+	var nl = lang.getObject("dojox.dtl.ext-dojo.NodeList", true);
+
+	var NodeList = query.NodeList;
+
+	lang.extend(NodeList, {
+		dtl: function(template, context){
+			// summary:
+			//		Renders the specified template in each of the NodeList entries.
+			// template: dojox/dtl/__StringArgs|String
+			//		The template string or location
+			// context: dojox/dtl/__ObjectArgs|Object
+			//		The context object or location
+			var d = dd, self = this;
+			
+			var render = function(template, context){
+				var content = template.render(new d._Context(context));
+				self.forEach(function(node){
+					node.innerHTML = content;
+				});
+			};
+
+			d.text._resolveTemplateArg(template).addCallback(function(templateString){
+				template = new d.Template(templateString);
+				d.text._resolveContextArg(context).addCallback(function(context){
+					render(template, context);
+				});
+			});
+
 			return this;
 		}
 	});
-
-	lang.mixin(ddtl, {
-		cycle: function(parser, token){
-			// summary:
-			//		Cycle among the given strings each time this tag is encountered
-			var args = token.split_contents();
-
-			if(args.length < 2){
-				throw new Error("'cycle' tag requires at least two arguments");
-			}
-
-			if(args[1].indexOf(",") != -1){
-				var vars = args[1].split(",");
-				args = [args[0]];
-				for(var i = 0; i < vars.length; i++){
-					args.push('"' + vars[i] + '"');
-				}
-			}
-
-			if(args.length == 2){
-				var name = args[args.length - 1];
-
-				if(!parser._namedCycleNodes){
-					throw new Error("No named cycles in template: '" + name + "' is not defined");
-				}
-				if(!parser._namedCycleNodes[name]){
-					throw new Error("Named cycle '" + name + "' does not exist");
-				}
-
-				return parser._namedCycleNodes[name];
-			}
-
-			if(args.length > 4 && args[args.length - 2] == "as"){
-				var name = args[args.length - 1];
-
-				var node = new ddtl.CycleNode(args.slice(1, args.length - 2), name, parser.create_text_node());
-
-				if(!parser._namedCycleNodes){
-					parser._namedCycleNodes = {};
-				}
-				parser._namedCycleNodes[name] = node;
-			}else{
-				node = new ddtl.CycleNode(args.slice(1), null, parser.create_text_node());
-			}
-
-			return node;
-		},
-		ifchanged: function(parser, token){
-			var parts = token.contents.split();
-			var nodes = parser.parse(["endifchanged"]);
-			parser.delete_first_token();
-			return new ddtl.IfChangedNode(nodes, parts.slice(1));
-		},
-		regroup: function(parser, token){
-			var tokens = Tokenize(token.contents, /(\s+)/g, function(spaces){
-				return spaces;
-			});
-			if(tokens.length < 11 || tokens[tokens.length - 3] != "as" || tokens[tokens.length - 7] != "by"){
-				throw new Error("Expected the format: regroup list by key as newList");
-			}
-			var expression = tokens.slice(2, -8).join("");
-			var key = tokens[tokens.length - 5];
-			var alias = tokens[tokens.length - 1];
-			return new ddtl.RegroupNode(expression, key, alias);
-		}
-	});
-
-	return ddtl;
+	return NodeList;
 });
 }}});
 define("dojox/dtl", ["./dtl/_base"], function(dxdtl){

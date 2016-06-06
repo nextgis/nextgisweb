@@ -27,7 +27,8 @@ _12.onItemUnhover(_a.byNode(this));
 }),on(this.containerNode,on.selector(_13,_9),function(evt){
 _12.onItemClick(_a.byNode(this),evt);
 evt.stopPropagation();
-evt.preventDefault();
+}),on(this.containerNode,on.selector(_13,"focusin"),function(){
+_12._onItemFocus(_a.byNode(this));
 }));
 this.inherited(arguments);
 },onKeyboardSearch:function(_14,evt,_15,_16){

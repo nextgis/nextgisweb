@@ -144,22 +144,9 @@ doc=doc||_2.doc;
 var _1e=_2.doc.parentWindow||_2.doc.defaultView;
 return "pageXOffset" in _1e?{x:_1e.pageXOffset,y:_1e.pageYOffset}:(_1e=_1("quirks")?_2.body(doc):doc.documentElement)&&{x:_5.fixIeBiDiScrollLeft(_1e.scrollLeft||0,doc),y:_1e.scrollTop||0};
 };
-if(_1("ie")){
-_5.getIeDocumentElementOffset=function getIeDocumentElementOffset(doc){
-doc=doc||_2.doc;
-var de=doc.documentElement;
-if(_1("ie")<8){
-var r=de.getBoundingClientRect(),l=r.left,t=r.top;
-if(_1("ie")<7){
-l+=de.clientLeft;
-t+=de.clientTop;
-}
-return {x:l<0?0:l,y:t<0?0:t};
-}else{
+_5.getIeDocumentElementOffset=function(doc){
 return {x:0,y:0};
-}
 };
-}
 _5.fixIeBiDiScrollLeft=function fixIeBiDiScrollLeft(_1f,doc){
 doc=doc||_2.doc;
 var ie=_1("ie");
@@ -177,35 +164,33 @@ _21=_3.byId(_21);
 var db=_2.body(_21.ownerDocument),ret=_21.getBoundingClientRect();
 ret={x:ret.left,y:ret.top,w:ret.right-ret.left,h:ret.bottom-ret.top};
 if(_1("ie")<9){
-var _23=_5.getIeDocumentElementOffset(_21.ownerDocument);
-ret.x-=_23.x+(_1("quirks")?db.clientLeft+db.offsetLeft:0);
-ret.y-=_23.y+(_1("quirks")?db.clientTop+db.offsetTop:0);
+ret.x-=(_1("quirks")?db.clientLeft+db.offsetLeft:0);
+ret.y-=(_1("quirks")?db.clientTop+db.offsetTop:0);
 }
 if(_22){
-var _24=_5.docScroll(_21.ownerDocument);
-ret.x+=_24.x;
-ret.y+=_24.y;
+var _23=_5.docScroll(_21.ownerDocument);
+ret.x+=_23.x;
+ret.y+=_23.y;
 }
 return ret;
 };
-_5.getMarginSize=function getMarginSize(_25,_26){
-_25=_3.byId(_25);
-var me=_5.getMarginExtents(_25,_26||_4.getComputedStyle(_25));
-var _27=_25.getBoundingClientRect();
-return {w:(_27.right-_27.left)+me.w,h:(_27.bottom-_27.top)+me.h};
+_5.getMarginSize=function getMarginSize(_24,_25){
+_24=_3.byId(_24);
+var me=_5.getMarginExtents(_24,_25||_4.getComputedStyle(_24));
+var _26=_24.getBoundingClientRect();
+return {w:(_26.right-_26.left)+me.w,h:(_26.bottom-_26.top)+me.h};
 };
-_5.normalizeEvent=function(_28){
-if(!("layerX" in _28)){
-_28.layerX=_28.offsetX;
-_28.layerY=_28.offsetY;
+_5.normalizeEvent=function(_27){
+if(!("layerX" in _27)){
+_27.layerX=_27.offsetX;
+_27.layerY=_27.offsetY;
 }
-if(!_1("dom-addeventlistener")){
-var se=_28.target;
+if(!("pageX" in _27)){
+var se=_27.target;
 var doc=(se&&se.ownerDocument)||document;
-var _29=_1("quirks")?doc.body:doc.documentElement;
-var _2a=_5.getIeDocumentElementOffset(doc);
-_28.pageX=_28.clientX+_5.fixIeBiDiScrollLeft(_29.scrollLeft||0,doc)-_2a.x;
-_28.pageY=_28.clientY+(_29.scrollTop||0)-_2a.y;
+var _28=_1("quirks")?doc.body:doc.documentElement;
+_27.pageX=_27.clientX+_5.fixIeBiDiScrollLeft(_28.scrollLeft||0,doc);
+_27.pageY=_27.clientY+(_28.scrollTop||0);
 }
 };
 return _5;

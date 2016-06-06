@@ -30,7 +30,7 @@ define("dojox/mobile/View", [
 
 	return declare("dojox.mobile.View", [WidgetBase, Container, Contained], {
 		// summary:
-		//		A widget that represents a view that occupies the full screen
+		//		A container widget for any HTML element and/or Dojo widgets
 		// description:
 		//		View is a container widget for any HTML element and/or Dojo widgets.
 		//		As a Dojo widget container it can itself contain View widgets
@@ -84,7 +84,7 @@ define("dojox/mobile/View", [
 
 			this._animEndHandle = this.connect(this.domNode, css3.name("animationEnd"), "onAnimationEnd");
 			this._animStartHandle = this.connect(this.domNode, css3.name("animationStart"), "onAnimationStart");
-			if(!config['mblCSS3Transition']){
+			if(!config.mblCSS3Transition){
 				this._transEndHandle = this.connect(this.domNode, css3.name("transitionEnd"), "onAnimationEnd");
 			}
 			if(has('mblAndroid3Workaround')){
@@ -244,7 +244,7 @@ define("dojox/mobile/View", [
 		},
 
 		_isBookmarkable: function(detail){
-			return detail.moveTo && (config['mblForceBookmarkable'] || detail.moveTo.charAt(0) === '#') && !detail.hashchange;
+			return detail.moveTo && (config.mblForceBookmarkable || detail.moveTo.charAt(0) === '#') && !detail.hashchange;
 		},
 
 		performTransition: function(/*String*/moveTo, /*Number*/transitionDir, /*String*/transition,
@@ -350,7 +350,7 @@ define("dojox/mobile/View", [
 			var toWidget = registry.byNode(toNode);
 			if(toWidget){
 				// Now that the target view became visible, it's time to run resize()
-				if(config["mblAlwaysResizeOnTransition"] || !toWidget._resized){
+				if(config.mblAlwaysResizeOnTransition || !toWidget._resized){
 					common.resizeAll(null, toWidget);
 					toWidget._resized = true;
 				}
@@ -364,7 +364,7 @@ define("dojox/mobile/View", [
 
 				toWidget.movedFrom = fromNode.id;
 			}
-			if(has('mblAndroidWorkaround') && !config['mblCSS3Transition']
+			if(has('mblAndroidWorkaround') && !config.mblCSS3Transition
 					&& detail.transition && detail.transition != "none"){
 				// workaround for the screen flicker issue on Android 2.2/2.3
 				// apply "-webkit-transform-style:preserve-3d" to both toNode and fromNode
@@ -387,7 +387,7 @@ define("dojox/mobile/View", [
 					if(scrollTop > 1 || toTop !== 0){
 						fromNode.style.top = toTop - scrollTop + "px";
 						// address bar hiding does not work on iOS 7+.
-						if(!(has("ios") >= 7) && config["mblHideAddressBar"] !== false){
+						if(!(has("ios") >= 7) && config.mblHideAddressBar !== false){
 							this.defer(function(){ // iPhone needs setTimeout (via defer)
 								win.global.scrollTo(0, (toTop || 1));
 							});
@@ -430,7 +430,7 @@ define("dojox/mobile/View", [
 			if(!transition || transition == "none"){
 				this.domNode.style.display = "none";
 				this.invokeCallback();
-			}else if(config['mblCSS3Transition']){
+			}else if(config.mblCSS3Transition){
 				//get dojox/css3/transit first
 				Deferred.when(transitDeferred, lang.hitch(this, function(transit){
 					//follow the style of .mblView.mblIn in View.css

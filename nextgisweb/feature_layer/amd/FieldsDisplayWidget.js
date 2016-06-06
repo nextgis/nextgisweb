@@ -60,7 +60,7 @@ define([
 
                     fieldsCache[this.resourceId] = fieldmap;
                     this._render(value, fieldmap);
-                })).otherwise(console.error);
+                }));
             }
         },
 

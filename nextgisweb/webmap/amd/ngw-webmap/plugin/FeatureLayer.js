@@ -341,7 +341,7 @@ define([
 
                 fdeferred.resolve(MAX_SEARCH_RESULTS);
 
-            })).otherwise(console.error);
+            }));
         }
     });
 });

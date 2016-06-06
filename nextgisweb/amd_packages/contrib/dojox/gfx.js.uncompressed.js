@@ -54,12 +54,14 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 			'x-small': 0, 'small': 0, 'medium': 0, 'large': 0, 'x-large': 0,
 			'xx-large': 0
 		};
-		var p;
-
+		var p, oldStyle;	
 		if(has("ie")){
-			//		we do a font-size fix if and only if one isn't applied already.
+			//	We do a font-size fix if and only if one isn't applied already.
 			// NOTE: If someone set the fontSize on the HTML Element, this will kill it.
-			win.doc.documentElement.style.fontSize="100%";
+			oldStyle = win.doc.documentElement.style.fontSize || "";
+			if(!oldStyle){
+				win.doc.documentElement.style.fontSize="100%";
+			}
 		}
 
 		//		set up the measuring node.
@@ -83,6 +85,10 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 			heights[p] = Math.round(div.offsetHeight * 12/16) * 16/12 / 1000;
 		}
 
+		if(has("ie")){
+			// Restore the font to its old style.
+			win.doc.documentElement.style.fontSize = oldStyle;
+		}
 		win.body().removeChild(div);
 		return heights; //object
 	};
@@ -103,12 +109,13 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 								/*Object*/ style,
 								/*String?*/ className){
 		var m, s, al = arguments.length;
-		var i;
+		var i, box;
 		if(!measuringNode){
 			measuringNode = domConstruct.create("div", {style: {
 				position: "absolute",
 				top: "-10000px",
-				left: "0"
+				left: "0",
+				visibility: "hidden"
 			}}, win.body());
 		}
 		m = measuringNode;
@@ -133,12 +140,14 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 		// take a measure
 		m.innerHTML = text;
 
-		if(m["getBoundingClientRect"]){
+		if(m.getBoundingClientRect){
 			var bcr = m.getBoundingClientRect();
-			return {l: bcr.left, t: bcr.top, w: bcr.width || (bcr.right - bcr.left), h: bcr.height || (bcr.bottom - bcr.top)};
+			box = {l: bcr.left, t: bcr.top, w: bcr.width || (bcr.right - bcr.left), h: bcr.height || (bcr.bottom - bcr.top)};
 		}else{
-			return domGeom.getMarginBox(m);
+			box = domGeom.getMarginBox(m);
 		}
+		m.innerHTML = "";
+		return box;
 	};
 
 	b._computeTextLocation = function(/*g.defaultTextShape*/textShape, /*Number*/width, /*Number*/height, /*Boolean*/fixHeight) {
@@ -200,11 +209,10 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 
 	// IE10
 
-	b._fixMsTouchAction = function(/*dojox/gfx/shape.Surface*/surface){
-		var r = surface.rawNode;
-		if (typeof r.style.msTouchAction != 'undefined')
-			r.style.msTouchAction = "none";
-	};
+	var touchActionProp = has("pointer-events") ? "touchAction" : has("MSPointer") ? "msTouchAction" : null;
+	b._fixMsTouchAction = touchActionProp ? function(/*dojox/gfx/shape.Surface*/surface){
+		surface.rawNode.style[touchActionProp] = "none";
+	} : function() {};
 
 	/*=====
 	g.Stroke = {
@@ -956,7 +964,7 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 		//		a constant regular expression used to split a SVG/VML path into primitive components
 		// tags:
 		//		private
-		pathSvgRegExp: /([A-Za-z])|(\d+(\.\d+)?)|(\.\d+)|(-\d+(\.\d+)?)|(-\.\d+)/g,
+		pathSvgRegExp: /([A-DF-Za-df-z])|([-+]?\d*[.]?\d+(?:[eE][-+]?\d+)?)/g,
 
 		equalSources: function(a, b){
 			// summary:

@@ -67,7 +67,7 @@ define("dojox/mobile/CarouselItem", [
 		select: function(){
 			// summary:
 			//		Highlights the item.
-			var img = this.imageNode
+			var img = this.imageNode;
 			domStyle.set(img, "opacity", 0.4);
 			this.defer(function(){
 				domStyle.set(img, "opacity", 1);

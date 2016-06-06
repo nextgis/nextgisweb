@@ -26,7 +26,7 @@ _2.create("input",{name:nm,value:_8[nm],type:"hidden"},_a);
 }
 _7.post(_c,{form:_a,handleAs:"json",content:_8}).then(function(_e){
 _2.destroy(_a);
-if(_8["ERROR"]||_8["error"]){
+if(_e["ERROR"]||_e["error"]){
 _d.onError(_e);
 }else{
 _d.onComplete(_e);

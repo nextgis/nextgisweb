@@ -86,7 +86,7 @@ this._keyboardSearch(evt," ");
 }
 }
 },_onContainerKeypress:function(evt){
-if(evt.charCode<_4.SPACE||evt.ctrlKey||evt.altKey||evt.metaKey||(evt.charCode==_4.SPACE&&this._searchTimer)){
+if(evt.charCode<=_4.SPACE||evt.ctrlKey||evt.altKey||evt.metaKey){
 return;
 }
 evt.preventDefault();
@@ -123,7 +123,7 @@ _1d=-1;
 break;
 }
 _21=this._getNextFocusableChild(_21,1);
-}while(_21!=_22);
+}while(_21&&_21!=_22);
 });
 _1e();
 this.onKeyboardSearch(_1b,evt,_1c,_1d);

@@ -17,15 +17,17 @@ define("dojox/app/utils/nls", ["require", "dojo/Deferred"],  function(require, D
 				if(index >= 0){
 					loadFile = path.substring(index+2);
 				}
-				requireSignal = require.on("error", function(error){
+				requireSignal = require.on ? require.on("error", function(error){
 					if (nlsDef.isResolved() || nlsDef.isRejected()) {
 						return;
 					}
 					if(error.info[0] && (error.info[0].indexOf(loadFile)>= 0)){
 						nlsDef.resolve(false);
-						requireSignal.remove();
+						if(requireSignal){
+							requireSignal.remove();
+						}
 					}
-				});
+				}) : null;
 
 				if(path.indexOf("./") == 0){
 					path = "app/"+path;

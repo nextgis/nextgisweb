@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/jq", ["dijit","dojo","dojox","dojo/require!dojo/NodeList-traverse,dojo/NodeList-manipulate,dojo/io/script"], function(dijit,dojo,dojox){
+define("dojox/jq", ["dojo","dijit","dojox","dojo/require!dojo/NodeList-traverse,dojo/NodeList-manipulate,dojo/io/script"], function(dojo,dijit,dojox){
 //For jQuery 1.3.2
 
 dojo.provide("dojox.jq");

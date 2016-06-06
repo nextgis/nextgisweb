@@ -16,14 +16,14 @@ continue;
 var _e=_c.vmin,_f=_c.vmax;
 if(!("ymin" in _d)||!("ymax" in _d)){
 _3.forEach(_d.data,function(val,idx){
-if(val!==null){
+if(!this.isNullValue(val)){
 var x=val.x||idx+1;
 _c.hmin=Math.min(_c.hmin,x);
 _c.hmax=Math.max(_c.hmax,x);
 _c.vmin=Math.min(_c.vmin,val.open,val.close,val.high,val.low);
 _c.vmax=Math.max(_c.vmax,val.open,val.close,val.high,val.low);
 }
-});
+},this);
 }
 if("ymin" in _d){
 _c.vmin=Math.min(_e,_d.ymin);
@@ -66,11 +66,16 @@ this._reconnectEvents(run.name);
 continue;
 }
 run.cleanGroup();
-s=run.group;
 var _15=t.next("candlestick",[this.opt,run]),_16=new Array(run.data.length);
+if(run.hidden){
+run.dyn.fill=_15.series.fill;
+run.dyn.stroke=_15.series.stroke;
+continue;
+}
+s=run.group;
 for(var j=0;j<run.data.length;++j){
 var v=run.data[j];
-if(v!==null){
+if(!this.isNullValue(v)){
 var _17=t.addMixin(_15,"candlestick",v,true);
 var x=ht(v.x||(j+0.5))+_11.l+gap,y=dim.height-_11.b,_18=vt(v.open),_19=vt(v.close),_1a=vt(v.high),low=vt(v.low);
 if("mid" in v){
@@ -90,7 +95,7 @@ var _1f=_1e.createGroup();
 _1f.createLine(_1c).setStroke(_17.series.stroke);
 _1f.createRect(_1d).setStroke(_17.series.stroke).setFill(_1b?_17.series.fill:"white");
 if("mid" in v){
-_1f.createLine({x1:(_17.series.stroke.width||1),x2:_13-(_17.series.stroke.width||1),y1:y-mid,y2:y-mid}).setStroke(_1b?"white":_17.series.stroke);
+_1f.createLine({x1:(_17.series.stroke?_17.series.stroke.width||1:1),x2:_13-(_17.series.stroke?_17.series.stroke.width||1:1),y1:y-mid,y2:y-mid}).setStroke(_1b?"white":_17.series.stroke);
 }
 run.dyn.fill=_17.series.fill;
 run.dyn.stroke=_17.series.stroke;

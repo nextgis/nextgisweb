@@ -191,6 +191,7 @@ svg=svg.replace(/<img\b([^>]*)>/gi,"<image $1 />");
 svg=svg.replace(/\bdojoGfx\w*\s*=\s*(['"])\w*\1/g,"");
 svg=svg.replace(/\b__gfxObject__\s*=\s*(['"])\w*\1/g,"");
 svg=svg.replace(/[=]([^"']+?)(\s|>)/g,"=\"$1\"$2");
+svg=svg.replace(/\bstroke-opacity\w*\s*=\s*(['"])undefined\1/g,"");
 }
 return svg;
 }});

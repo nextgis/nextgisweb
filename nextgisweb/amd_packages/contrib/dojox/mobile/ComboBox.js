@@ -17,8 +17,10 @@ if(_e("windows-theme")){
 this.domNode.blur();
 }
 },onInput:function(e){
+if(!e||e.charCode!==0){
 this._onKey(e);
 this.inherited(arguments);
+}
 },_setListAttr:function(v){
 this._set("list",v);
 },closeDropDown:function(){
@@ -48,7 +50,7 @@ _7.set(this.domNode,"aria-expanded","true");
 if(_10.id){
 _7.set(this.domNode,"aria-owns",_10.id);
 }
-if(_e("touch")){
+if(_e("touch")&&(!_e("ios")||_e("ios")<8)){
 _4.global.scrollBy(0,_5.position(_12,false).y);
 }
 if(!this._preparedNode){
@@ -115,7 +117,7 @@ this.clickHandler=this.connect(_10.domNode,"onclick",function(){
 _1b=true;
 _1c=_1a=false;
 });
-this.endHandler=this.connect(_4.doc.documentElement,"onmouseup",function(){
+this.endHandler=this.connect(_4.doc.documentElement,_9.release,function(){
 this.defer(function(){
 _1b=true;
 if(!_1a&&_1c){

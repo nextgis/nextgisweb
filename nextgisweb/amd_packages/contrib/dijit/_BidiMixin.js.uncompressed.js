@@ -22,20 +22,6 @@ define("dijit/_BidiMixin", [], function(){
 		//		In creation of widget, if it's want to activate this class,
 		//		the widget should define the "textDir".
 
-		// textDir: String
-		//		Bi-directional support,	the main variable which is responsible for the direction of the text.
-		//		The text direction can be different than the GUI direction by using this parameter in creation
-		//		of a widget.
-		//
-		//		Allowed values:
-		//
-		//		1. "ltr"
-		//		2. "rtl"
-		//		3. "auto" - contextual the direction of a text defined by first strong letter.
-		//
-		//		By default is as the page direction.
-		textDir: "",
-
 		getTextDir: function(/*String*/ text){
 			// summary:
 			//		Gets the right direction of text.

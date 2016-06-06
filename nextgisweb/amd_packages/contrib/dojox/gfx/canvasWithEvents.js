@@ -25,8 +25,6 @@ catch(e){
 return false;
 }
 });
-_3.add("MSPointer",navigator.msPointerEnabled);
-_3.add("pointer-events",navigator.pointerEnabled);
 var _10=g.canvasWithEvents={};
 _10.Shape=_2("dojox.gfx.canvasWithEvents.Shape",_a.Shape,{_testInputs:function(ctx,pos){
 if(this.clip||(!this.canvasFill&&this.strokeStyle)){
@@ -262,7 +260,7 @@ _3a="pointermove";
 if(_3("MSPointer")){
 _3a="MSPointerMove";
 }else{
-if(_3("touch")){
+if(_3("touch-events")){
 _3a="touchmove";
 }
 }

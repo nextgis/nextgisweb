@@ -1,9 +1,6 @@
 //>>built
-define("dojox/lang/functional/zip",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.functional.zip");
-(function(){
-var df=_3.lang.functional;
-_2.mixin(df,{zip:function(){
+define("dojox/lang/functional/zip",["dojo/_base/lang","./lambda"],function(_1,df){
+_1.mixin(df,{zip:function(){
 var n=arguments[0].length,m=arguments.length,i=1,t=new Array(n),j,p;
 for(;i<m;n=Math.min(n,arguments[i++].length)){
 }
@@ -17,5 +14,4 @@ return t;
 },unzip:function(a){
 return df.zip.apply(null,a);
 }});
-})();
 });

@@ -1,5 +1,5 @@
 
-.dijitPopup {
+.dijitPopup.mblComboBoxMenuPopup {
   margin: 0;
   padding: 0;
   position: absolute;
@@ -8,6 +8,17 @@
   -webkit-box-shadow: 0 0 50px #000000;
   box-shadow: 0 0 50px #000000;
   border-radius: 0;
+}
+.dijitPopup.mblComboBoxMenuPopup .dijitBackgroundIframe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  border: 0;
+  padding: 0;
+  margin: 0;
 }
 .mblReset {
   margin: 0;

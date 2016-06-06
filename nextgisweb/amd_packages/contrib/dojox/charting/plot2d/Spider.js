@@ -1,7 +1,7 @@
 //>>built
 define("dojox/charting/plot2d/Spider",["dojo/_base/lang","dojo/_base/declare","dojo/_base/connect","dojo/_base/array","dojo/dom-geometry","dojo/_base/fx","dojo/fx","dojo/sniff","./Base","./_PlotEvents","./common","../axis2d/common","dojox/gfx","dojox/gfx/matrix","dojox/gfx/fx","dojox/lang/functional","dojox/lang/utils","dojo/fx/easing"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,dc,da,g,m,_b,df,du,_c){
 var _d=0.2;
-var _e=_2("dojox.charting.plot2d.Spider",[_9,_a],{defaultParams:{labels:true,ticks:false,fixed:true,precision:1,labelOffset:-10,labelStyle:"default",htmlLabels:true,startAngle:-90,divisions:3,axisColor:"",axisWidth:0,spiderColor:"",spiderWidth:0,seriesWidth:0,seriesFillAlpha:0.2,spiderOrigin:0.16,markerSize:3,spiderType:"polygon",animationType:_c.backOut,axisTickFont:"",axisTickFontColor:"",axisFont:"",axisFontColor:""},optionalParams:{radius:0,font:"",fontColor:""},constructor:function(_f,_10){
+var _e=_2("dojox.charting.plot2d.Spider",[_9,_a],{defaultParams:{labels:true,ticks:false,fixed:true,precision:1,labelOffset:-10,labelStyle:"default",htmlLabels:true,startAngle:-90,divisions:3,axisColor:"",axisWidth:0,spiderColor:"",spiderWidth:0,seriesWidth:0,seriesFillAlpha:0.2,spiderOrigin:0.16,markerSize:3,spiderType:"polygon",animationType:_c.backOut,animate:null,axisTickFont:"",axisTickFontColor:"",axisFont:"",axisFontColor:""},optionalParams:{radius:0,font:"",fontColor:""},constructor:function(_f,_10){
 this.opt=_1.clone(this.defaultParams);
 du.updateWithObject(this.opt,_10);
 du.updateWithPattern(this.opt,_10,this.optionalParams);
@@ -9,6 +9,7 @@ this.dyn=[];
 this.datas={};
 this.labelKey=[];
 this.oldSeriePoints={};
+this.animate=this.opt.animate===null?{}:this.opt.animate;
 this.animations={};
 },clear:function(){
 this.inherited(arguments);
@@ -52,7 +53,9 @@ this.labelKey.push(key);
 }
 return this;
 },getSeriesStats:function(){
-return dc.collectSimpleStats(this.series);
+return dc.collectSimpleStats(this.series,function(v){
+return v===null;
+});
 },render:function(dim,_14){
 if(!this.dirty){
 return this;
@@ -82,7 +85,7 @@ _23=r-_29;
 }
 r/=(1+_2a);
 var _33={cx:_14.l+rx,cy:_14.t+ry,r:r};
-for(i=this.series.length-1;i>=0;i--){
+for(var i=0;i<this.series.length;i++){
 _2e=this.series[i];
 if(!this.dirty&&!_2e.dirty){
 t.skip();
@@ -168,75 +171,82 @@ for(i=this.series.length-1;i>=0;i--){
 _2e=this.series[i];
 run=_2e.data;
 if(run!==null){
-var _3c=[],_3d=[];
+var _3c=t.next("spider",[o,_2e]),f=g.normalizeColor(_3c.series.fill),sk={color:_3c.series.fill,width:_1d};
+f.a=o.seriesFillAlpha;
+_2e.dyn={fill:f,stroke:sk};
+if(_2e.hidden){
+continue;
+}
+var _3d=[],_3e=[];
 k=0;
 for(key in run){
 _2f=this.datas[key];
 min=_2f.min;
 max=_2f.max;
 _30=max-min;
-var _3e=run[key],end=_20+2*Math.PI*k/len;
-_2b=this._getCoordinate(_33,r*(ro+(1-ro)*(_3e-min)/_30),end,dim);
-_3c.push(_2b);
-_3d.push({sname:_2e.name,key:key,data:_3e});
+var _3f=run[key],end=_20+2*Math.PI*k/len;
+_2b=this._getCoordinate(_33,r*(ro+(1-ro)*(_3f-min)/_30),end,dim);
+_3d.push(_2b);
+_3e.push({sname:_2e.name,key:key,data:_3f});
 k++;
 }
-_3c[_3c.length]=_3c[0];
 _3d[_3d.length]=_3d[0];
-var _3f=this._getBoundary(_3c),_40=t.next("spider",[o,_2e]),ts=_2e.group,f=g.normalizeColor(_40.series.fill),sk={color:_40.series.fill,width:_1d};
-f.a=o.seriesFillAlpha;
-_2e.dyn={fill:f,stroke:sk};
+_3e[_3e.length]=_3e[0];
+var _40=this._getBoundary(_3d),ts=_2e.group;
 var _41=this.oldSeriePoints[_2e.name];
-var cs=this._createSeriesEntry(ts,(_41||_25),_3c,f,sk,r,ro,ms,at);
+var cs=this._createSeriesEntry(ts,(_41||_25),_3d,f,sk,r,ro,ms,at);
 this.chart.seriesShapes[_2e.name]=cs;
-this.oldSeriePoints[_2e.name]=_3c;
-var po={element:"spider_poly",index:i,id:"spider_poly_"+_2e.name,run:_2e,plot:this,shape:cs.poly,parent:ts,brect:_3f,cx:_33.cx,cy:_33.cy,cr:r,f:f,s:s};
+this.oldSeriePoints[_2e.name]=_3d;
+var po={element:"spider_poly",index:i,id:"spider_poly_"+_2e.name,run:_2e,plot:this,shape:cs.poly,parent:ts,brect:_40,cx:_33.cx,cy:_33.cy,cr:r,f:f,s:s};
 this._connectEvents(po);
 var so={element:"spider_plot",index:i,id:"spider_plot_"+_2e.name,run:_2e,plot:this,shape:_2e.group};
 this._connectEvents(so);
 _4.forEach(cs.circles,function(c,i){
-var co={element:"spider_circle",index:i,id:"spider_circle_"+_2e.name+i,run:_2e,plot:this,shape:c,parent:ts,tdata:_3d[i],cx:_3c[i].x,cy:_3c[i].y,f:f,s:s};
+var co={element:"spider_circle",index:i,id:"spider_circle_"+_2e.name+i,run:_2e,plot:this,shape:c,parent:ts,tdata:_3e[i],cx:_3d[i].x,cy:_3d[i].y,f:f,s:s};
 this._connectEvents(co);
 },this);
 }
 }
 return this;
 },_createSeriesEntry:function(ts,_42,sps,f,sk,r,ro,ms,at){
-var _43=ts.createPolyline(_42).setFill(f).setStroke(sk),_44=[];
-for(var j=0;j<_42.length;j++){
-var _45=_42[j],cr=ms;
-var _46=ts.createCircle({cx:_45.x,cy:_45.y,r:cr}).setFill(f).setStroke(sk);
-_44.push(_46);
+var _43=this.animate?_42:sps;
+var _44=ts.createPolyline(_43).setFill(f).setStroke(sk),_45=[];
+for(var j=0;j<_43.length;j++){
+var _46=_43[j],cr=ms;
+var _47=ts.createCircle({cx:_46.x,cy:_46.y,r:cr}).setFill(f).setStroke(sk);
+_45.push(_47);
 }
-var _47=_4.map(sps,function(np,j){
-var sp=_42[j],_48=new _6.Animation({duration:1000,easing:at,curve:[sp.y,np.y]});
-var spl=_43,sc=_44[j];
-_3.connect(_48,"onAnimate",function(y){
-var _49=spl.getShape();
-_49.points[j].y=y;
-spl.setShape(_49);
-var _4a=sc.getShape();
-_4a.cy=y;
-sc.setShape(_4a);
+if(this.animate){
+var _48=_4.map(sps,function(np,j){
+var sp=_42[j],_49=new _6.Animation(_1.delegate({duration:1000,easing:at,curve:[sp.y,np.y]},this.animate));
+var spl=_44,sc=_45[j];
+_3.connect(_49,"onAnimate",function(y){
+var _4a=spl.getShape();
+_4a.points[j].y=y;
+spl.setShape(_4a);
+var _4b=sc.getShape();
+_4b.cy=y;
+sc.setShape(_4b);
 });
-return _48;
+return _49;
+},this);
+var _4c=_4.map(sps,function(np,j){
+var sp=_42[j],_4d=new _6.Animation(_1.delegate({duration:1000,easing:at,curve:[sp.x,np.x]},this.animate));
+var spl=_44,sc=_45[j];
+_3.connect(_4d,"onAnimate",function(x){
+var _4e=spl.getShape();
+_4e.points[j].x=x;
+spl.setShape(_4e);
+var _4f=sc.getShape();
+_4f.cx=x;
+sc.setShape(_4f);
 });
-var _4b=_4.map(sps,function(np,j){
-var sp=_42[j],_4c=new _6.Animation({duration:1000,easing:at,curve:[sp.x,np.x]});
-var spl=_43,sc=_44[j];
-_3.connect(_4c,"onAnimate",function(x){
-var _4d=spl.getShape();
-_4d.points[j].x=x;
-spl.setShape(_4d);
-var _4e=sc.getShape();
-_4e.cx=x;
-sc.setShape(_4e);
-});
-return _4c;
-});
-var _4f=_7.combine(_47.concat(_4b));
-_4f.play();
-return {group:ts,poly:_43,circles:_44};
+return _4d;
+},this);
+var _50=_7.combine(_48.concat(_4c));
+_50.play();
+}
+return {group:ts,poly:_44,circles:_45};
 },plotEvent:function(o){
 if(o.element=="spider_plot"){
 if(o.type=="onmouseover"&&!_8("ie")){
@@ -249,43 +259,43 @@ return o.tdata.sname+"<br/>"+o.tdata.key+"<br/>"+o.tdata.data;
 }else{
 return null;
 }
-},_getBoundary:function(_50){
-var _51=_50[0].x,_52=_50[0].x,_53=_50[0].y,_54=_50[0].y;
-for(var i=0;i<_50.length;i++){
-var _55=_50[i];
-_51=Math.max(_55.x,_51);
-_53=Math.max(_55.y,_53);
-_52=Math.min(_55.x,_52);
-_54=Math.min(_55.y,_54);
+},_getBoundary:function(_51){
+var _52=_51[0].x,_53=_51[0].x,_54=_51[0].y,_55=_51[0].y;
+for(var i=0;i<_51.length;i++){
+var _56=_51[i];
+_52=Math.max(_56.x,_52);
+_54=Math.max(_56.y,_54);
+_53=Math.min(_56.x,_53);
+_55=Math.min(_56.y,_55);
 }
-return {x:_52,y:_54,width:_51-_52,height:_53-_54};
-},_drawArrow:function(s,_56,end,_57){
-var len=Math.sqrt(Math.pow(end.x-_56.x,2)+Math.pow(end.y-_56.y,2)),sin=(end.y-_56.y)/len,cos=(end.x-_56.x)/len,_58={x:end.x+(len/3)*(-sin),y:end.y+(len/3)*cos},_59={x:end.x+(len/3)*sin,y:end.y+(len/3)*(-cos)};
-s.createPolyline([_56,_58,_59]).setFill(_57.color).setStroke(_57);
-},_buildPoints:function(_5a,_5b,_5c,_5d,_5e,_5f,dim){
-for(var i=0;i<_5b;i++){
-var end=_5e+2*Math.PI*i/_5b;
-_5a.push(this._getCoordinate(_5c,_5d,end,dim));
+return {x:_53,y:_55,width:_52-_53,height:_54-_55};
+},_drawArrow:function(s,_57,end,_58){
+var len=Math.sqrt(Math.pow(end.x-_57.x,2)+Math.pow(end.y-_57.y,2)),sin=(end.y-_57.y)/len,cos=(end.x-_57.x)/len,_59={x:end.x+(len/3)*(-sin),y:end.y+(len/3)*cos},_5a={x:end.x+(len/3)*sin,y:end.y+(len/3)*(-cos)};
+s.createPolyline([_57,_59,_5a]).setFill(_58.color).setStroke(_58);
+},_buildPoints:function(_5b,_5c,_5d,_5e,_5f,_60,dim){
+for(var i=0;i<_5c;i++){
+var end=_5f+2*Math.PI*i/_5c;
+_5b.push(this._getCoordinate(_5d,_5e,end,dim));
 }
-if(_5f){
-_5a.push(this._getCoordinate(_5c,_5d,_5e+2*Math.PI,dim));
+if(_60){
+_5b.push(this._getCoordinate(_5d,_5e,_5f+2*Math.PI,dim));
 }
-},_getCoordinate:function(_60,_61,_62,dim){
-var x=_60.cx+_61*Math.cos(_62);
+},_getCoordinate:function(_61,_62,_63,dim){
+var x=_61.cx+_62*Math.cos(_63);
 if(_8("dojo-bidi")&&this.chart.isRightToLeft()&&dim){
 x=dim.width-x;
 }
-return {x:x,y:_60.cy+_61*Math.sin(_62)};
+return {x:x,y:_61.cy+_62*Math.sin(_63)};
 },_getObjectLength:function(obj){
-var _63=0;
+var _64=0;
 if(_1.isObject(obj)){
 for(var key in obj){
-_63++;
+_64++;
 }
 }
-return _63;
-},_getLabel:function(_64){
-return dc.getLabel(_64,this.opt.fixed,this.opt.precision);
+return _64;
+},_getLabel:function(_65){
+return dc.getLabel(_65,this.opt.fixed,this.opt.precision);
 }});
 return _e;
 });

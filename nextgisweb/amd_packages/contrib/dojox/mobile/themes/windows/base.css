@@ -1,17 +1,3 @@
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
-}
 html.mobile,
 .mobile body {
   width: 100%;
@@ -67,6 +53,11 @@ html.mobile,
 .mblImageIcon {
   vertical-align: top;
 }
+.unselectable {
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
 body {
   -ms-touch-action: pan-y;
 }
@@ -88,20 +79,6 @@ label {
   @-ms-viewport {
     width: device-width;
   }
-}
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
 }
 .mblHeading {
   position: relative;
@@ -281,20 +258,6 @@ h6.mblHeading {
   transition-timing-function: ease-in;
   opacity: 1;
 }
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
-}
 .mblView {
   position: relative;
   top: 0px;
@@ -314,20 +277,6 @@ h6.mblHeading {
   position: absolute !important;
   width: 100%;
   z-index: 1;
-}
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
 }
 .mblToolBarButton {
   display: inline-block;
@@ -449,20 +398,6 @@ h6.mblHeading {
 .mblToolBarButtonHasRightArrow {
   transform: rotate(180deg);
 }
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
-}
 .mblRoundRect {
   margin: 7px 9px 16px;
   padding: 8px;
@@ -478,20 +413,6 @@ h6.mblHeading {
 .mblRoundRect.mblShadow {
   -webkit-box-shadow: none;
   box-shadow: none;
-}
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
 }
 .mblEdgeToEdgeCategory {
   position: relative;
@@ -523,20 +444,6 @@ h6.mblHeading {
 .mblEdgeToEdgeCategory:first-of-type {
   margin-top: 8px;
 }
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
-}
 .mblRoundRectCategory {
   margin: 18px 0 0 20px;
   padding: 0;
@@ -547,20 +454,6 @@ h6.mblHeading {
   overflow: hidden;
   color: #ffffff;
   margin: 0px;
-}
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
 }
 .mblRoundRectList {
   margin: 7px 9px 16px;
@@ -588,20 +481,6 @@ h6.mblHeading {
 }
 .mblRoundRectList .mblListItem {
   border-radius: 0px !important;
-}
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
 }
 .mblEdgeToEdgeList {
   margin: 0;
@@ -651,20 +530,6 @@ h6.mblHeading {
   border-width: 3px 4px 0px 0px;
   border-style: solid;
   border-color: #314e84;
-}
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
 }
 .mblListItem {
   position: relative;
@@ -741,7 +606,6 @@ h6.mblHeading {
   float: right;
   line-height: normal;
   margin-right: 4px;
-  color: black;
   margin-top: 12px;
 }
 .mblListItemLabel {
@@ -809,20 +673,6 @@ h6.mblHeading {
   padding-top: 43px;
   background-color: #1f1f1f;
 }
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
-}
 .mblScrollablePane {
   position: relative;
   overflow: hidden;
@@ -840,20 +690,6 @@ h6.mblHeading {
 .mblView.mblScrollableView .mblScrollableViewContainer {
   min-width: calc(100% - 15px - 10px) !important;
   width: auto !important;
-}
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
 }
 .mblSwitch {
   margin: 0;
@@ -1128,20 +964,6 @@ h6.mblHeading {
   min-height: 27px;
   margin-top: 8px;
   margin-bottom: 8px;
-}
-.mblToolBarButtonHasArrow-styles {
-  width: 27px;
-  height: 27px;
-  border-radius: 20px;
-  border: 2px solid #ffffff;
-  padding: 0px;
-  margin: 0px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background-image: url("images/dark/back.png");
-  background-position: 50% 50%;
-  background-size: 27px 27px;
-  background-repeat: no-repeat;
 }
 .mblProgressIndicator {
   position: relative;

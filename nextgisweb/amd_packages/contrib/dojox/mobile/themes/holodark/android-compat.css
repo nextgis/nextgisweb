@@ -862,7 +862,7 @@
 .dj_ff3 .mblCheckBox {
   -moz-border-radius: 2px;
 }
-.dj_gecko .dijitPopup {
+.dj_gecko .dijitPopup.mblComboBoxMenuPopup {
   -moz-box-shadow: 0 0 50px #000000;
 }
 .dj_gecko .mblComboBoxMenuItemSelected {

@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/wire/TreeAdapter", ["dijit","dojo","dojox","dojo/require!dojox/wire/CompositeWire"], function(dijit,dojo,dojox){
+define("dojox/wire/TreeAdapter", ["dojo","dijit","dojox","dojo/require!dojox/wire/CompositeWire"], function(dojo,dijit,dojox){
 dojo.provide("dojox.wire.TreeAdapter");
 
 dojo.require("dojox.wire.CompositeWire");

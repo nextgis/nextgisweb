@@ -137,24 +137,8 @@ define("dojox/charting/bidi/Chart", ["dojox/main", "dojo/_base/declare", "dojo/_
 					
 					// recreate title
 					if(this.title){
-						var forceHtmlLabels = (g.renderer == "canvas"),
-							labelType = forceHtmlLabels || !has("ie") && !has("opera") ? "html" : "gfx",
-							tsize = g.normalizedLength(g.splitFontString(this.titleFont).size);
-						// remove the title
-						domConstruct.destroy(this.chartTitle);
-						this.chartTitle =null;
-						// create the new title
-						this.chartTitle = da.createText[labelType](
-							this,
-							this.surface,
-							this.dim.width/2,
-							this.titlePos=="top" ? tsize + this.margins.t : this.dim.height - this.margins.b,
-							"middle",
-							this.title,
-							this.titleFont,
-							this.titleFontColor
-						);
-					}				
+						this._renderTitle(this.dim, this.offsets);
+					}			
 				}else{
 					// case of pies, spiders etc.
 					arr.forEach(this.htmlElementsRegistry, function(elem, index, arr){

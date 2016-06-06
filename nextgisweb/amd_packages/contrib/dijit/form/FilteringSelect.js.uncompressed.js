@@ -139,7 +139,7 @@ define("dijit/form/FilteringSelect", [
 				});
 			}else{
 				this.valueNode.value = value;
-				this.inherited(arguments);
+				this.inherited(arguments, [value, priorityChange, displayedValue, item]);
 			}
 		},
 

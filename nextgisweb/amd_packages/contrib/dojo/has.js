@@ -9,7 +9,9 @@ define("dojo/has",["require","module"],function(_1,_2){
 var _3=_1.has||function(){
 };
 if(!1){
-var _4=typeof window!="undefined"&&typeof location!="undefined"&&typeof document!="undefined"&&window.location==location&&window.document==document,_5=this,_6=_4&&document,_7=_6&&_6.createElement("DiV"),_8=(_2.config&&_2.config())||{};
+var _4=typeof window!="undefined"&&typeof location!="undefined"&&typeof document!="undefined"&&window.location==location&&window.document==document,_5=(function(){
+return this;
+})(),_6=_4&&document,_7=_6&&_6.createElement("DiV"),_8=(_2.config&&_2.config())||{};
 _3=function(_9){
 return typeof _8[_9]=="function"?(_8[_9]=_8[_9](_5,_6,_7)):_8[_9];
 };
@@ -19,13 +21,18 @@ _3.add=function(_a,_b,_c,_d){
 return _c&&_3(_a);
 };
 1||_3.add("host-browser",_4);
+0&&_3.add("host-node",(typeof process=="object"&&process.versions&&process.versions.node&&process.versions.v8));
+0&&_3.add("host-rhino",(typeof load=="function"&&(typeof Packages=="function"||typeof Packages=="object")));
 1||_3.add("dom",_4);
 1||_3.add("dojo-dom-ready-api",1);
 1||_3.add("dojo-sniff",1);
 }
 if(1){
 _3.add("dom-addeventlistener",!!document.addEventListener);
-_3.add("touch","ontouchstart" in document||window.navigator.msMaxTouchPoints>0);
+_3.add("touch","ontouchstart" in document||("onpointerdown" in document&&navigator.maxTouchPoints>0)||window.navigator.msMaxTouchPoints);
+_3.add("touch-events","ontouchstart" in document);
+_3.add("pointer-events","pointerEnabled" in window.navigator?window.navigator.pointerEnabled:"PointerEvent" in window);
+_3.add("MSPointer",window.navigator.msPointerEnabled);
 _3.add("device-width",screen.availWidth||innerWidth);
 var _e=document.createElement("form");
 _3.add("dom-attributes-explicit",_e.attributes.length==0);

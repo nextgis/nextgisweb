@@ -116,6 +116,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 			this.axes = [];
 			this.run = null;
 			this.dyn = [];
+			this.runFilter = []; 
 		},
 		clear: function(){
 			// summary:
@@ -182,8 +183,23 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 				size,
 				startAngle = m._degToRad(this.opt.startAngle),
 				start = startAngle, filteredRun, slices, labels, shift, labelR,
-				run = this.run.data,
 				events = this.events();
+
+			var run = arr.map(this.run.data, function(item, i){
+				if(typeof item != "number" && item.hidden){ 
+					this.runFilter.push(i); 
+					item.hidden = false; 
+				} 
+				if(arr.some(this.runFilter, function(filter){return filter == i;})){ 
+					if(typeof item == "number"){ 
+						return 0; 
+					}else{ 
+						return {y: 0, text: item.text}; 
+					} 
+				}else{ 
+					return item; 
+				} 
+			}, this);
 
 			this.dyn = [];
 
@@ -192,10 +208,10 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 				labelR = r - this.opt.labelOffset;
 			}
 			var	circle = {
-					cx: offsets.l + rx,
-					cy: offsets.t + ry,
-					r:  r
-				};
+				cx: offsets.l + rx,
+				cy: offsets.t + ry,
+				r:  r
+			};
 
 			// draw shadow
 			if(this.opt.shadow || t.shadow){
@@ -274,11 +290,12 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 					// degenerated slice
 					return false;	// continue
 				}
-				if(slice == 0){
-				  this.dyn.push({fill: null, stroke: null});
-				  return false;
-				}
 				var v = run[i], theme = themes[i], specialFill, o;
+				if(slice == 0){
+					this.dyn.push({fill: theme.series.fill, stroke: theme.series.stroke});
+					return false;
+				}
+				
 				if(slice >= 1){
 					// whole pie
 					specialFill = this._plotFill(theme.series.fill, dim, offsets);

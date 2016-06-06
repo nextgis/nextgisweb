@@ -57,13 +57,15 @@ define("dojox/app/widgets/_ScrollableMixin", [
 			}
 			if(this.fixedFooter){
 				node = dom.byId(this.fixedFooter);
-				if(node.parentNode == this.domNode){ // local footer
-					this.isLocalFooter = true;
-					node.style.bottom = "0px";
+				if(node){
+					if(node.parentNode == this.domNode){ // local footer
+						this.isLocalFooter = true;
+						node.style.bottom = "0px";
+					}
+					params.fixedFooterHeight = node.offsetHeight;
 				}
-				params.fixedFooterHeight = node.offsetHeight;
 			}
-			
+
 			this.init(params);
 			this.inherited(arguments);
 			this.reparent();

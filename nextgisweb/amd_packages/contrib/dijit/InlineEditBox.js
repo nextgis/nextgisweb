@@ -32,6 +32,9 @@ _1b+="width:"+(_21+(Number(_21)==_21?"px":""))+";";
 var _22=_c.delegate(this.inlineEditBox.editorParams,{style:_1b,dir:this.dir,lang:this.lang,textDir:this.textDir});
 this.editWidget=new Cls(_22,this.editorPlaceholder);
 if(this.inlineEditBox.autoSave){
+this.saveButton.destroy();
+this.cancelButton.destroy();
+this.saveButton=this.cancelButton=null;
 _7.destroy(this.buttonContainer);
 }
 },postCreate:function(){
@@ -176,7 +179,9 @@ var _27=this;
 _e(ew.onLoadDeferred,_c.hitch(ww,function(){
 ew.set(("displayedValue" in ew||"_setDisplayedValueAttr" in ew)?"displayedValue":"value",_27.value);
 this.defer(function(){
+if(ww.saveButton){
 ww.saveButton.set("disabled","intermediateChanges" in ew);
+}
 this.focus();
 this._resetValue=this.getValue();
 });

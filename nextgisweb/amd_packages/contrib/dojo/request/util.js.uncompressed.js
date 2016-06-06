@@ -43,7 +43,7 @@ define("dojo/request/util", [
 		return freeze(response);
 	}
 	function dataHandler (response) {
-		return response.data || response.text;
+		return response.data !== undefined ? response.data : response.text;
 	}
 
 	exports.deferred = function deferred(response, cancel, isValid, isReady, handleResponse, last){

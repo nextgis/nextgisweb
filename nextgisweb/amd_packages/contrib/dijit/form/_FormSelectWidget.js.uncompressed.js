@@ -53,14 +53,29 @@ define("dijit/form/_FormSelectWidget", [
 		//		from the `<option>` html tags.   Should support getIdentity().
 		//		For back-compat store can also be a dojo/data/api/Identity.
 		store: null,
+		_setStoreAttr: function(val){
+			if(this._created){		// don't repeat work that will happen in postCreate()
+				this._deprecatedSetStore(val);
+			}
+		},
 
 		// query: object
 		//		A query to use when fetching items from our store
 		query: null,
+		_setQueryAttr: function(query){
+			if(this._created){		// don't repeat work that will happen in postCreate()
+				this._deprecatedSetStore(this.store, this.selectedValue, {query: query});
+			}
+		},
 
 		// queryOptions: object
 		//		Query options to use when fetching from the store
 		queryOptions: null,
+		_setQueryOptionsAttr: function(queryOptions){
+			if(this._created){		// don't repeat work that will happen in postCreate()
+				this._deprecatedSetStore(this.store, this.selectedValue, {queryOptions: queryOptions});
+			}
+		},
 
 		// labelAttr: String?
 		//		The entries in the drop down list come from this attribute in the dojo.store items.
@@ -128,7 +143,7 @@ define("dijit/form/_FormSelectWidget", [
 			if(valueOrIdx == null){
 				return opts; // __SelectOption[]
 			}
-			if(lang.isArray(valueOrIdx)){
+			if(lang.isArrayLike(valueOrIdx)){
 				return array.map(valueOrIdx, "return this.getOptions(item);", this); // __SelectOption[]
 			}
 			if(lang.isString(valueOrIdx)){
@@ -162,7 +177,7 @@ define("dijit/form/_FormSelectWidget", [
 			//		of the option is empty or missing, a separator is created instead.
 			//		Passing in an array of options will yield slightly better performance
 			//		since the children are only loaded once.
-			array.forEach(lang.isArray(option) ? option : [option], function(i){
+			array.forEach(lang.isArrayLike(option) ? option : [option], function(i){
 				if(i && lang.isObject(i)){
 					this.options.push(i);
 				}
@@ -179,7 +194,7 @@ define("dijit/form/_FormSelectWidget", [
 			//		You can also pass in an array of those values for a slightly
 			//		better performance since the children are only loaded once.
 			//		For numeric option values, specify {value: number} as the argument.
-			var oldOpts = this.getOptions(lang.isArray(valueOrIdx) ? valueOrIdx : [valueOrIdx]);
+			var oldOpts = this.getOptions(lang.isArrayLike(valueOrIdx) ? valueOrIdx : [valueOrIdx]);
 			array.forEach(oldOpts, function(option){
 				// We can get null back in our array - if our option was not found.  In
 				// that case, we don't want to blow up...
@@ -199,7 +214,7 @@ define("dijit/form/_FormSelectWidget", [
 			//		is matched based on the value of the entered option.  Passing
 			//		in an array of new options will yield better performance since
 			//		the children will only be loaded once.
-			array.forEach(lang.isArray(newOption) ? newOption : [newOption], function(i){
+			array.forEach(lang.isArrayLike(newOption) ? newOption : [newOption], function(i){
 				var oldOpt = this.getOptions({ value: i.value }), k;
 				if(oldOpt){
 					for(k in i){
@@ -211,6 +226,11 @@ define("dijit/form/_FormSelectWidget", [
 		},
 
 		setStore: function(store, selectedValue, fetchArgs){
+			kernel.deprecated(this.declaredClass+"::setStore(store, selectedValue, fetchArgs) is deprecated. Use set('query', fetchArgs.query), set('queryOptions', fetchArgs.queryOptions), set('store', store), or set('value', selectedValue) instead.", "", "2.0");
+			this._deprecatedSetStore(store, selectedValue, fetchArgs);
+		},
+
+		_deprecatedSetStore: function(store, selectedValue, fetchArgs){
 			// summary:
 			//		Sets the store you would like to use with this select widget.
 			//		The selected value is the value of the new store to set.  This
@@ -307,7 +327,7 @@ define("dijit/form/_FormSelectWidget", [
 			if(this._queryRes && this._queryRes.close){
 				this._queryRes.close();
 			}
-			
+
 			// Cancel listener for updates to new (dojo.store) store
 			if(this._observeHandle && this._observeHandle.remove){
 				this._observeHandle.remove();
@@ -317,11 +337,13 @@ define("dijit/form/_FormSelectWidget", [
 			// If user has specified new query and query options along with this new store, then use them.
 			if(fetchArgs.query){
 				this._set("query", fetchArgs.query);
+			}
+			if(fetchArgs.queryOptions){
 				this._set("queryOptions", fetchArgs.queryOptions);
 			}
 
 			// Add our new options
-			if(store){
+			if(store && store.query){
 				this._loadingStore = true;
 				this.onLoadDeferred = new Deferred();
 
@@ -386,16 +408,13 @@ define("dijit/form/_FormSelectWidget", [
 					}
 					this.onLoadDeferred.resolve(true);
 					this.onSetStore();
-				}), function(err){
+				}), lang.hitch(this, function(err){
 					console.error('dijit.form.Select: ' + err.toString());
 					this.onLoadDeferred.reject(err);
-				});
+				}));
 			}
 			return oStore;	// dojo/data/api/Identity
 		},
-
-		// TODO: implement set() and watch() for store and query, although not sure how to handle
-		// setting them individually rather than together (as in setStore() above)
 
 		_setValueAttr: function(/*anything*/ newValue, /*Boolean?*/ priorityChange){
 			// summary:
@@ -413,7 +432,7 @@ define("dijit/form/_FormSelectWidget", [
 			if(newValue == null){
 				return;
 			}
-			if(lang.isArray(newValue)){
+			if(lang.isArrayLike(newValue)){
 				newValue = array.map(newValue, function(value){
 					return lang.isObject(value) ? value : { value: value };
 				}); // __SelectOption[]
@@ -644,15 +663,16 @@ define("dijit/form/_FormSelectWidget", [
 			// Make our event connections for updating state
 			aspect.after(this, "onChange", lang.hitch(this, "_updateSelection"));
 
-			// moved from startup
 			//		Connects in our store, if we have one defined
 			var store = this.store;
 			if(store && (store.getIdentity || store.getFeatures()["dojo.data.api.Identity"])){
 				// Temporarily set our store to null so that it will get set
 				// and connected appropriately
 				this.store = null;
-				this.setStore(store, this._oValue);
+				this._deprecatedSetStore(store, this._oValue, {query: this.query, queryOptions: this.queryOptions});
 			}
+
+			this._storeInitialized = true;
 		},
 
 		startup: function(){

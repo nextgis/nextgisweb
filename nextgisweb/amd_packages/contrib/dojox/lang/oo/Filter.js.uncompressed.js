@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/lang/oo/Filter", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/lang/oo/Filter", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.lang.oo.Filter");
 
 (function(){

@@ -47,6 +47,7 @@ define("dojox/app/controllers/Transition", ["require", "dojo/_base/lang", "dojo/
 			// event: Object
 			//		"app-transition" event parameter. It should be like: {"viewId": viewId, "opts": opts}
 			var F = MODULE+":transition";
+			this.app.log(LOGKEY,F," ");
 			this.app.log(LOGKEY,F,"New Transition event.viewId=["+event.viewId+"]");
 			this.app.log(F,"event.viewId=["+event.viewId+"]","event.opts=",event.opts);
 
@@ -379,7 +380,8 @@ define("dojox/app/controllers/Transition", ["require", "dojo/_base/lang", "dojo/
 			var current = constraints.getSelectedChild(parent, next.constraint);
 			var currentSubViewArray = this._getCurrentSubViewArray(parent, nextSubViewArray, removeView);
 
-			var currentSubNames = this._getCurrentSubViewNamesArray(currentSubViewArray);
+			var currentSubNames = this._getNamesFromArray(currentSubViewArray, false);
+			var nextSubNames = this._getNamesFromArray(nextSubViewArray, true);
 
 			// set params on next view.
 			next.params = this._getParamsForView(next.name, params);
@@ -392,15 +394,6 @@ define("dojox/app/controllers/Transition", ["require", "dojo/_base/lang", "dojo/
 				this.app.log(LOGKEY,F,"Transition Remove current From=["+currentSubNames+"]");
 				// if next == current we will set next to null and remove the view with out a replacement
 				next = null;
-			}
-
-			// get the list of nextSubNames, this is next.name followed by the subIds
-			var nextSubNames = "";
-			if(next){
-				nextSubNames = next.name;
-				if(subIds){
-					nextSubNames = nextSubNames+","+subIds;
-				}
 			}
 
 			if(nextSubNames == currentSubNames && next == current){ // new test to see if current matches next
@@ -702,21 +695,30 @@ define("dojox/app/controllers/Transition", ["require", "dojo/_base/lang", "dojo/
 			return currentSubViewArray;
 		},
 
-		_getCurrentSubViewNamesArray: function(currentSubViewArray){
+		_getNamesFromArray: function(subViewArray, backward){
 			// summary:
-			//		Get current sub view names array, the names of the views which will be transitioned from
+			//		Get names from the sub view names array
 			//
-			// currentSubViewArray: Array
-			//		the array of views which are to be transitioned from.
+			// subViewArray: Array
+			//		the array of views to get the names from.
+			// backward: boolean
+			//		the direction to loop thru the array to get the names.
 			//
 			// returns:
-			//		Array of views which will be deactivated during this transition
-			var F = MODULE+":_getCurrentSubViewNamesArray";
-			var currentSubViewNamesArray = [];
-			for(var i = 0; i < currentSubViewArray.length; i++){
-				currentSubViewNamesArray.push(currentSubViewArray[i].name);
+			//		String of view names separated by a comma
+			//
+			var F = MODULE+":_getNamesFromArray";
+			var subViewNames = "";
+			if(backward){
+				for (var i = subViewArray.length - 1; i >= 0; i--) {
+					subViewNames = subViewNames ? subViewNames+","+subViewArray[i].name : subViewArray[i].name;
+				}
+			}else{
+				for(var i = 0; i < subViewArray.length; i++){
+					subViewNames = subViewNames ? subViewNames+","+subViewArray[i].name : subViewArray[i].name;
+				}
 			}
-			return currentSubViewNamesArray;
+			return subViewNames;
 		},
 
 		_handleTransit: function(next, parent, currentLastSubChild, opts, toId, removeView, forceTransitionNone, resizeDone){

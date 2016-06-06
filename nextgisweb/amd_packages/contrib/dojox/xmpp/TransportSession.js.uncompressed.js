@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/xmpp/TransportSession", ["dijit","dojo","dojox","dojo/require!dojox/xmpp/bosh,dojox/xmpp/util,dojox/data/dom"], function(dijit,dojo,dojox){
+define("dojox/xmpp/TransportSession", ["dojo","dijit","dojox","dojo/require!dojox/xmpp/bosh,dojox/xmpp/util,dojox/data/dom"], function(dojo,dijit,dojox){
 dojo.provide("dojox.xmpp.TransportSession");
 dojo.require("dojox.xmpp.bosh");
 dojo.require("dojox.xmpp.util");
@@ -120,7 +120,7 @@ dojo.extend(dojox.xmpp.TransportSession, {
 			if(msgDom) {
 				this.processDocument(msgDom, rid);
 			} else {
-				//console.log("Recived bad document from server",msg);
+				//console.log("Received bad document from server",msg);
 			}
 		},
 		

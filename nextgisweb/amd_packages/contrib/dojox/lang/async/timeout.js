@@ -1,8 +1,8 @@
 //>>built
-define("dojox/lang/async/timeout",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.async.timeout");
+define("dojox/lang/async/timeout",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.async.timeout");
 (function(){
-var d=_2,_4=_3.lang.async.timeout;
+var d=_1,_4=_3.lang.async.timeout;
 _4.from=function(ms){
 return function(){
 var h,_5=function(){

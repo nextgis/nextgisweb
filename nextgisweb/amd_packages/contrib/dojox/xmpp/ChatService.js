@@ -1,11 +1,11 @@
 //>>built
-define("dojox/xmpp/ChatService",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.xmpp.ChatService");
+define("dojox/xmpp/ChatService",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.xmpp.ChatService");
 _3.xmpp.chat={CHAT_STATE_NS:"http://jabber.org/protocol/chatstates",ACTIVE_STATE:"active",COMPOSING_STATE:"composing",INACTIVE_STATE:"inactive",PAUSED_STATE:"paused",GONE_STATE:"gone"};
-_2.declare("dojox.xmpp.ChatService",null,{state:"",constructor:function(){
+_1.declare("dojox.xmpp.ChatService",null,{state:"",constructor:function(){
 this.state="";
 this.chatid=Math.round(Math.random()*1000000000000000);
-},recieveMessage:function(_4,_5){
+},receiveMessage:function(_4,_5){
 if(_4&&!_5){
 this.onNewMessage(_4);
 }

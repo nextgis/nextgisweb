@@ -22,6 +22,9 @@ var _9=this.focusNode||this.domNode;
 if(this.checked){
 _9.setAttribute("checked","checked");
 }
+if(this._resetValue===undefined){
+this._lastValueReported=this._resetValue=this.checked;
+}
 },reset:function(){
 this._hasBeenBlurred=false;
 this.set("checked",this.params.checked||false);

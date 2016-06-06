@@ -1,5 +1,5 @@
 //>>built
-define("dojox/date/umalqura/locale",["../..","dojo/_base/lang","dojo/_base/array","dojo/date","dojo/i18n","dojo/regexp","dojo/string","./Date","dojo/i18n!dojo/cldr/nls/islamic"],function(_1,_2,_3,dd,_4,_5,_6,_7,_8){
+define("dojox/date/umalqura/locale",["dojox/main","dojo/_base/lang","dojo/_base/array","dojo/date","dojo/i18n","dojo/regexp","dojo/string","./Date","dojo/i18n!dojo/cldr/nls/islamic"],function(_1,_2,_3,dd,_4,_5,_6,_7,_8){
 var _9=_2.getObject("date.umalqura.locale",true,_1);
 function _a(_b,_c,_d,_e,_f){
 return _f.replace(/([a-z])\1*/ig,function(_10){
@@ -164,7 +164,7 @@ if(!_30){
 return null;
 }
 var _32,_33;
-var _34=[1389,0,1,0,0,0,0];
+var _34=[1389,9,22,0,0,0,0];
 var _35="";
 var _36=0;
 var _37=["abbr","wide","narrow"];

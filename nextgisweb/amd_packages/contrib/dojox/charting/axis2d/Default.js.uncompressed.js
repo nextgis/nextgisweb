@@ -18,7 +18,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 		// natural: Boolean?
 		//		Ensure tick marks are made on "natural" numbers. Defaults to false.
 		// leftBottom: Boolean?
-		//		The position of a vertical axis; if true, will be placed against the left-bottom corner of the chart.  Defaults to true.
+		//		Deprecated: use position instead. The position of a vertical axis; if true, will be placed against the left-bottom corner of the chart.  Defaults to true.
 		// includeZero: Boolean?
 		//		Include 0 on the axis rendering.  Default is false.
 		// fixed: Boolean?
@@ -94,6 +94,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 		// labelSizeChange: Boolean?
 		//		Indicates to the axis whether the axis labels are changing their size on zoom. If false this allows to
 		//		optimize the axis by avoiding recomputing labels maximum size on zoom actions. Default is false.
+		// position: String?
+		//		The position of the axis. Values: "leftOrBottom", "center" or "rightOrTop". Default is "leftOrBottom".
 	};
 	=====*/
 
@@ -138,7 +140,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 			fixUpper:	"none",	// align the upper on ticks: "major", "minor", "micro", "none"
 			fixLower:	"none",	// align the lower on ticks: "major", "minor", "micro", "none"
 			natural:	 false,		// all tick marks should be made on natural numbers
-			leftBottom:  true,		// position of the axis, used with "vertical"
+			leftBottom:  true,		// position of the axis, used with "vertical" - deprecated: use position instead
 			includeZero: false,		// 0 should be included
 			fixed:	   true,		// all labels are fixed numbers
 			majorLabels: true,		// draw major labels
@@ -149,7 +151,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 			htmlLabels:  true,		// use HTML to draw labels
 			enableCache: false,		// whether we cache or not
 			dropLabels: true,		// whether we automatically drop overlapping labels or not
-			labelSizeChange: false // whether the labels size change on zoom
+			labelSizeChange: false, // whether the labels size change on zoom
+			position: "leftOrBottom" // position of the axis: "leftOrBottom" (default), "center" or "rightOrTop"
 		},
 		optionalParams: {
 			min:			0,	// minimal value on this axis
@@ -202,6 +205,11 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 				this._lineUsePool = [];
 			}
 			this._invalidMaxLabelSize = true;
+			// replace deprecated leftBotton to position
+			if(!(kwArgs && ('position' in kwArgs))){
+			    this.opt.position = this.opt.leftBottom ? "leftOrBottom" : "rightOrTop";
+			}			
+			this.renderingOptions = { "shape-rendering": "crispEdges" };
 		},
 		setWindow: function(scale, offset){
 			// summary:
@@ -393,7 +401,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 				taMajorTick = this.chart.theme.getTick("major", o),
 				taMinorTick = this.chart.theme.getTick("minor", o),
 				tsize = taTitleFont ? g.normalizedLength(g.splitFontString(taTitleFont).size) : 0,
-				rotation = o.rotation % 360, leftBottom = o.leftBottom,
+				rotation = o.rotation % 360, position = o.position, 
+				leftBottom = position !== "rightOrTop",
 				cosr = Math.abs(Math.cos(rotation * Math.PI / 180)),
 				sinr = Math.abs(Math.sin(rotation * Math.PI / 180));
 			this.trailingSymbol = (o.trailingSymbol === undefined || o.trailingSymbol === null) ?
@@ -414,7 +423,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 					switch(rotation){
 						case 0:
 						case 180:
-							offsets[side] = labelWidth;
+							offsets[side] = position === "center" ? 0 : labelWidth;
 							offsets.t = offsets.b = size / 2;
 							break;
 						case 90:
@@ -440,14 +449,19 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 							}
 							break;
 					}
-					offsets[side] += labelGap + Math.max(taMajorTick.length > 0?taMajorTick.length:0,
+					if(position === "center"){
+					    offsets[side] = 0;
+					}
+					else{					
+					    offsets[side] += labelGap + Math.max(taMajorTick.length > 0?taMajorTick.length:0,
 														 taMinorTick.length > 0?taMinorTick.length:0) + (o.title ? (tsize + taTitleGap) : 0);
+					}
 				}else{
 					side = leftBottom ? "b" : "t";
 					switch(rotation){
 						case 0:
 						case 180:
-							offsets[side] = size;
+							offsets[side] = position === "center" ? 0 : size;
 							offsets.l = offsets.r = labelWidth / 2;
 							break;
 						case 90:
@@ -473,8 +487,13 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 							}
 							break;
 					}
+					if(position === "center"){
+					    offsets[side] = 0;
+					}
+					else{					
 					offsets[side] += labelGap + Math.max(taMajorTick.length > 0?taMajorTick.length:0,
 														 taMinorTick.length > 0?taMinorTick.length:0) + (o.title ? (tsize + taTitleGap) : 0);
+					}
 				}
 			}
 			return offsets;	//	Object
@@ -555,7 +574,8 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 				return this;	//	dojox/charting/axis2d/Default
 			}
 			// prepare variable
-			var o = this.opt, ta = this.chart.theme.axis, leftBottom = o.leftBottom, rotation = o.rotation % 360,
+			var o = this.opt, ta = this.chart.theme.axis, position = o.position, 
+			       leftBottom = position !== "rightOrTop", rotation = o.rotation % 360,
 				start, stop, titlePos, titleRotation=0, titleOffset, axisVector, tickVector, anchorOffset, labelOffset, labelAlign,
 				labelGap = this.chart.theme.axis.tick.labelGap,
 				// TODO: we use one font --- of major tick, we need to use major and minor fonts
@@ -634,7 +654,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 						}
 				}
 				if(leftBottom){
-					start.x = stop.x = offsets.l;
+					start.x = stop.x = position === "center" ? dim.width/2 : offsets.l;
 					titleRotation = (taTitleOrientation && taTitleOrientation == "away") ? 90 : 270;
 					titlePos.x = offsets.l - titleOffset + (titleRotation == 270 ? tsize : 0);
 					tickVector.x = -1;
@@ -704,7 +724,7 @@ define("dojox/charting/axis2d/Default", ["dojo/_base/lang", "dojo/_base/array", 
 						}
 				}
 				if(leftBottom){
-					start.y = stop.y = dim.height - offsets.b;
+					start.y = stop.y = position === "center" ? dim.height/2 : dim.height - offsets.b;
 					titleRotation = (taTitleOrientation && taTitleOrientation == "axis") ? 180 : 0;
 					titlePos.y = dim.height - offsets.b + titleOffset - (titleRotation ? tsize : 0);
 				}else{

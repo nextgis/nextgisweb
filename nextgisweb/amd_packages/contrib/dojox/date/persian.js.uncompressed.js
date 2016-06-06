@@ -1,4 +1,4 @@
-define("dojox/date/persian", ["..", "dojo/_base/lang", "dojo/date", "./persian/Date"], function(dojox, lang, dd, IDate){
+define("dojox/date/persian", ["dojox/main", "dojo/_base/lang", "dojo/date", "./persian/Date"], function(dojox, lang, dd, IDate){
 
 var dpersian = lang.getObject("date.persian", true, dojox);
 

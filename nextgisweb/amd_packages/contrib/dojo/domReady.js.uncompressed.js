@@ -1,5 +1,5 @@
 define("dojo/domReady", ['./has'], function(has){
-	var global = this,
+	var global = (function () { return this; })(),
 		doc = document,
 		readyStates = { 'loaded': 1, 'complete': 1 },
 		fixReadyState = typeof doc.readyState != "string",
@@ -39,7 +39,7 @@ define("dojo/domReady", ['./has'], function(has){
 			try{
 				(readyQ.shift())(doc);
 			}catch(err){
-				console.log("Error on domReady callback: " + err);
+				console.error(err, "in domReady callback", err.stack);
 			}
 		}
 

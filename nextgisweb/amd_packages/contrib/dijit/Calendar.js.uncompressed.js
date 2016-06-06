@@ -5,6 +5,7 @@ define("dijit/Calendar", [
 	"dojo/_base/declare", // declare
 	"dojo/dom-attr", // domAttr.get
 	"dojo/dom-class", // domClass.add domClass.contains domClass.remove domClass.toggle
+	"dojo/dom-construct",	// create
 	"dojo/_base/kernel", // kernel.deprecated
 	"dojo/keys", // keys
 	"dojo/_base/lang", // lang.hitch
@@ -15,7 +16,8 @@ define("dijit/Calendar", [
 	"./_CssStateMixin",
 	"./_TemplatedMixin",
 	"./form/DropDownButton"
-], function(array, date, local, declare, domAttr, domClass, kernel, keys, lang, on, has, CalendarLite, _Widget, _CssStateMixin, _TemplatedMixin, DropDownButton){
+], function(array, date, local, declare, domAttr, domClass, domConstruct, kernel, keys, lang, on, has,
+			CalendarLite, _Widget, _CssStateMixin, _TemplatedMixin, DropDownButton){
 
 	// module:
 	//		dijit/Calendar
@@ -32,6 +34,8 @@ define("dijit/Calendar", [
 		//		- keyboard navigation
 		//		- CSS classes for hover/mousepress on date, month, and year nodes
 		//		- support of deprecated methods (will be removed in 2.0)
+
+		baseClass: "dijitCalendar",
 
 		// Set node classes for various mouse events, see dijit._CssStateMixin for more details
 		cssStateNodes: {
@@ -280,7 +284,7 @@ define("dijit/Calendar", [
 		}
 	});
 
-	Calendar._MonthDropDown = declare("dijit.Calendar._MonthDropDown", [_Widget, _TemplatedMixin], {
+	Calendar._MonthDropDown = declare("dijit.Calendar._MonthDropDown", [_Widget, _TemplatedMixin, _CssStateMixin], {
 		// summary:
 		//		The list-of-months drop down from the MonthDropDownButton
 
@@ -289,13 +293,20 @@ define("dijit/Calendar", [
 		//		(ex: ["January", "February", undefined, "April", ...])
 		months: [],
 
-		templateString: "<div class='dijitCalendarMonthMenu dijitMenu' " +
-			"data-dojo-attach-event='onclick:_onClick,onmouseover:_onMenuHover,onmouseout:_onMenuHover'></div>",
+		baseClass: "dijitCalendarMonthMenu dijitMenu",
+
+		templateString: "<div data-dojo-attach-event='ondijitclick:_onClick'></div>",
 
 		_setMonthsAttr: function(/*String[]*/ months){
-			this.domNode.innerHTML = array.map(months,function(month, idx){
-				return month ? "<div class='dijitCalendarMonthLabel' month='" + idx + "'>" + month + "</div>" : "";
-			}).join("");
+			this.domNode.innerHTML = "";
+			array.forEach(months, function(month, idx){
+				var div = domConstruct.create("div", {
+					className: "dijitCalendarMonthLabel",
+					month: idx,
+					innerHTML: month
+				}, this.domNode);
+				div._cssState = "dijitCalendarMonthLabel";	// trigger _CSSStateMixin magic; property, not attribute.
+			}, this);
 		},
 
 		_onClick: function(/*Event*/ evt){
@@ -305,10 +316,6 @@ define("dijit/Calendar", [
 		onChange: function(/*Number*/ /*===== month =====*/){
 			// summary:
 			//		Callback when month is selected from drop down
-		},
-
-		_onMenuHover: function(evt){
-			domClass.toggle(evt.target, "dijitCalendarMonthLabelHover", evt.type == "mouseover");
 		}
 	});
 

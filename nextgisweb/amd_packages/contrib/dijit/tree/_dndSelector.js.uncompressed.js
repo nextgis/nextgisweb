@@ -1,16 +1,16 @@
 define("dijit/tree/_dndSelector", [
 	"dojo/_base/array", // array.filter array.forEach array.map
-	"dojo/_base/connect", // connect.isCopyKey
 	"dojo/_base/declare", // declare
 	"dojo/_base/kernel",	// global
 	"dojo/_base/lang", // lang.hitch
+	"dojo/dnd/common",
 	"dojo/dom", // isDescendant
 	"dojo/mouse", // mouse.isLeft
 	"dojo/on",
 	"dojo/touch",
 	"../a11yclick",
 	"./_dndContainer"
-], function(array, connect, declare, kernel, lang, dom, mouse, on, touch, a11yclick, _dndContainer){
+], function(array, declare, kernel, lang, dndCommon, dom, mouse, on, touch, a11yclick, _dndContainer){
 
 	// module:
 	//		dijit/tree/_dndSelector
@@ -158,15 +158,11 @@ define("dijit/tree/_dndSelector", [
 			//		path[s], selectedItem[s], selectedNode[s]
 
 			var selected = this.getSelectedTreeNodes();
-			var paths = [], nodes = [], selects = [];
+			var paths = [], nodes = [];
 			array.forEach(selected, function(node){
-				var ary = node.getTreePath(), model = this.tree.model;
+				var ary = node.getTreePath();
 				nodes.push(node);
 				paths.push(ary);
-				ary = array.map(ary, function(item){
-					return model.getIdentity(item);
-				}, this);
-				selects.push(ary.join("/"))
 			}, this);
 			var items = array.map(nodes,function(node){ return node.item; });
 			this.tree._set("paths", paths);
@@ -189,9 +185,14 @@ define("dijit/tree/_dndSelector", [
 			// ignore mouse or touch on expando node
 			if(this.current && this.current.isExpandable && this.tree.isExpandoNode(e.target, this.current)){ return; }
 
-			if(mouse.isLeft(e)){
+			if(e.type == "mousedown" && mouse.isLeft(e)){
 				// Prevent text selection while dragging on desktop, see #16328.   But don't call preventDefault()
-				// for mobile because it will break things completely, see #15838.
+				// for mobile because it will break things completely, see #15838.  Also, don't preventDefault() on
+				// MSPointerDown or pointerdown events, because that stops the mousedown event from being generated,
+				// see #17709.
+				// TODO: remove this completely in 2.0.  It shouldn't be needed since dojo/dnd/Manager already
+				// calls preventDefault() for the "selectstart" event.  It can also be achieved via CSS:
+				// http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting
 				e.preventDefault();
 			}
 
@@ -203,7 +204,7 @@ define("dijit/tree/_dndSelector", [
 				return;
 			}
 
-			var copy = connect.isCopyKey(e), id = treeNode.id;
+			var copy = dndCommon.getCopyKeyState(e), id = treeNode.id;
 
 			// if shift key is not pressed, and the node is already in the selection,
 			// delay deselection until onmouseup so in the case of DND, deselection
@@ -232,7 +233,7 @@ define("dijit/tree/_dndSelector", [
 			// the deselection logic here, the user can drag an already selected item.
 			if(!this._doDeselect){ return; }
 			this._doDeselect = false;
-			this.userSelect(e.type == "keyup" ? this.tree.focusedChild : this.current, connect.isCopyKey(e), e.shiftKey);
+			this.userSelect(e.type == "keyup" ? this.tree.focusedChild : this.current, dndCommon.getCopyKeyState(e), e.shiftKey);
 		},
 		onMouseMove: function(/*===== e =====*/){
 			// summary:

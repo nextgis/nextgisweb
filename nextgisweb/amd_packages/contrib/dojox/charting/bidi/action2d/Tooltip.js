@@ -22,6 +22,13 @@ _5[1]="after-centered";
 }else{
 if(_3.element=="candlestick"){
 _4.x=this.chart.dim.width+_6-_3.x;
+}else{
+if(_3.element=="slice"){
+if((_5[0]=="before-centered")||(_5[0]=="after-centered")){
+_5.reverse();
+}
+_4.x=_3.cx+(_3.cx-_4.x);
+}
 }
 }
 }

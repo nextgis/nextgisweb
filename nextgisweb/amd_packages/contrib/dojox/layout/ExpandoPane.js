@@ -39,6 +39,8 @@ this._isHorizontal=/top|bottom/.test(this.region);
 _8.set(this.domNode,{overflow:"hidden",padding:0});
 this.connect(this.domNode,"ondblclick",this.previewOnDblClick?"preview":"toggle");
 this.iconNode.setAttribute("aria-controls",this.id);
+this.iconNode.setAttribute("role","button");
+this.iconNode.setAttribute("aria-label",this.titleNode.innerHTML);
 if(this.previewOnDblClick){
 this.connect(this.getParent(),"_layoutChildren",_2.hitch(this,function(){
 this._isonlypreview=false;

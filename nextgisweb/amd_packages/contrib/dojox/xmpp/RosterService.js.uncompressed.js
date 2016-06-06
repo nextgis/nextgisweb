@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/xmpp/RosterService", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/xmpp/RosterService", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.xmpp.RosterService");
 
 dojox.xmpp.roster = {

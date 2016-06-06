@@ -51,7 +51,8 @@ define("dojox/app/ViewBase", ["require", "dojo/when", "dojo/on", "dojo/dom-attr"
 			var vcDef = this._loadViewController();
 			when(vcDef, lang.hitch(this, function(controller){
 				if(controller){
-					lang.mixin(this, controller);
+					//lang.mixin(this, controller);
+					declare.safeMixin(this, controller);
 				}
 			}));
 			return vcDef;
@@ -205,15 +206,17 @@ define("dojox/app/ViewBase", ["require", "dojo/when", "dojo/on", "dojo/dom-attr"
 				if(index >= 0){
 					loadFile = path.substring(index+2);
 				}
-				requireSignal = require.on("error", function(error){
+				requireSignal = require.on ? require.on("error", function(error){
 					if(viewControllerDef.isResolved() || viewControllerDef.isRejected()){
 						return;
 					}
 					if(error.info[0] && (error.info[0].indexOf(loadFile) >= 0)){
 						viewControllerDef.resolve(false);
-						requireSignal.remove();
+						if(requireSignal){
+							requireSignal.remove();
+						}
 					}
-				});
+				}) : null;
 
 				if(path.indexOf("./") == 0){
 					path = "app/"+path;
@@ -221,7 +224,9 @@ define("dojox/app/ViewBase", ["require", "dojo/when", "dojo/on", "dojo/dom-attr"
 
 				require([path], function(controller){
 					viewControllerDef.resolve(controller);
-					requireSignal.remove();
+					if(requireSignal){
+						requireSignal.remove();
+					}
 				});
 			}catch(e){
 				viewControllerDef.reject(e);

@@ -3,9 +3,18 @@ define("dojox/mobile/_maskUtils", [
 	"dojo/dom-style",
 	"./sniff"
 ], function(win, domStyle, has){
-	
+
+	has.add("mask-image-css", function(global, doc, elt){
+		return typeof doc.getCSSCanvasContext === "function" && typeof elt.style.webkitMaskImage !== "undefined";
+	});
+
+	// Indicates whether image mask is available (either via css mask image or svg)
+	has.add("mask-image", function(){
+		return has("mask-image-css") || has("svg");
+	});
+
 	var cache = {};
-	
+
 	return {
 		// summary:
 		//		Utility methods to clip rounded corners of various elements (Switch, ScrollablePane, scrollbars in scrollable widgets).
@@ -18,7 +27,7 @@ define("dojox/mobile/_maskUtils", [
 			var tw = x + w + r;
 			var th = y + h + b;
 			
-			if(has("webkit")){			// use -webkit-mask-image
+			if(has("mask-image-css")){			// use -webkit-mask-image
 				var id = ("DojoMobileMask" + x + y + w + h + rx + ry).replace(/\./g, "_");
 				if (!cache[id]) {
 					cache[id] = 1;

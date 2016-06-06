@@ -120,7 +120,7 @@ delete this._atWatchHandles[s];
 }
 },_setAtWatchHandle:function(_2b,_2c){
 if(_2b=="ref"){
-throw new Error(this+": 1.7 ref syntax used in conjuction with 1.8 dojox/mvc/at syntax, which is not supported.");
+throw new Error(this+": 1.7 ref syntax used in conjunction with 1.8 dojox/mvc/at syntax, which is not supported.");
 }
 var _2d=this._atWatchHandles=this._atWatchHandles||{};
 if(_2d[_2b]){

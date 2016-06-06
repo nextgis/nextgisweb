@@ -9,12 +9,13 @@ define("dojox/mobile/SimpleDialog", [
 	"dijit/registry",
 	"./Pane",
 	"./iconUtils",
-	"./sniff"
-], function(declare, win, domClass, domAttr, domConstruct, on, touch, registry, Pane, iconUtils, has){
+	"dojo/has",
+	"dojo/has!dojo-bidi?dojox/mobile/bidi/SimpleDialog"
+], function(declare, win, domClass, domAttr, domConstruct, on, touch, registry, Pane, iconUtils, has, BidiSimpleDialog){
 	// module:
 	//		dojox/mobile/SimpleDialog
 
-	return declare("dojox.mobile.SimpleDialog", Pane, {
+	var SimpleDialog = declare(has("dojo-bidi") ? "dojox.mobile.NonBidiSimpleDialog" : "dojox.mobile.SimpleDialog", Pane, {
 		// summary:
 		//		A dialog box for mobile.
 		// description:
@@ -219,4 +220,5 @@ define("dojox/mobile/SimpleDialog", [
 			}
 		}
 	});
+	return has("dojo-bidi") ? declare("dojox.mobile.SimpleDialog", [SimpleDialog, BidiSimpleDialog]) : SimpleDialog;
 });

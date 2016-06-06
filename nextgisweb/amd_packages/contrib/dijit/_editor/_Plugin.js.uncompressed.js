@@ -88,6 +88,13 @@ define("dijit/_editor/_Plugin", [
 						dropDown: this.dropDown,
 						tabIndex: "-1"
 					}, this.params || {});
+
+					// Avoid creating Button with a name like "dijit/editor/_plugins/ToggleDir", since that name becomes
+					// a global object, and then if the ToggleDir plugin is referenced again, _Plugin.js will
+					// find the <input> rather than the ToggleDir module.
+					// Not necessary in 2.0 once the getObject() call is removed from _Plugin.js.
+					delete props.name;
+
 					this.button = new this.buttonClass(props);
 				}
 			}

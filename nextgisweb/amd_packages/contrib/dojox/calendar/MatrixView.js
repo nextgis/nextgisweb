@@ -1,8 +1,8 @@
 //>>built
 require({cache:{"url:dojox/calendar/templates/MatrixView.html":"<div data-dojo-attach-events=\"keydown:_onKeyDown\">\n\t<div  class=\"dojoxCalendarYearColumnHeader\" data-dojo-attach-point=\"yearColumnHeader\">\n\t\t<table><tr><td><span data-dojo-attach-point=\"yearColumnHeaderContent\"></span></td></tr></table>\t\t\n\t</div>\t\n\t<div data-dojo-attach-point=\"columnHeader\" class=\"dojoxCalendarColumnHeader\">\n\t\t<table data-dojo-attach-point=\"columnHeaderTable\" class=\"dojoxCalendarColumnHeaderTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\t\t\n\t<div dojoAttachPoint=\"rowHeader\" class=\"dojoxCalendarRowHeader\">\n\t\t<table data-dojo-attach-point=\"rowHeaderTable\" class=\"dojoxCalendarRowHeaderTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\t\n\t<div dojoAttachPoint=\"grid\" class=\"dojoxCalendarGrid\">\n\t\t<table data-dojo-attach-point=\"gridTable\" class=\"dojoxCalendarGridTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\t\n\t<div data-dojo-attach-point=\"itemContainer\" class=\"dojoxCalendarContainer\" data-dojo-attach-event=\"mousedown:_onGridMouseDown,mouseup:_onGridMouseUp,ondblclick:_onGridDoubleClick,touchstart:_onGridTouchStart,touchmove:_onGridTouchMove,touchend:_onGridTouchEnd\">\n\t\t<table data-dojo-attach-point=\"itemContainerTable\" class=\"dojoxCalendarContainerTable\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%\"></table>\n\t</div>\t\n</div>\n"}});
 define("dojox/calendar/MatrixView",["dojo/_base/declare","dojo/_base/array","dojo/_base/event","dojo/_base/lang","dojo/_base/sniff","dojo/_base/fx","dojo/_base/html","dojo/on","dojo/dom","dojo/dom-class","dojo/dom-style","dojo/dom-geometry","dojo/dom-construct","dojo/query","dojox/html/metrics","dojo/i18n","./ViewBase","dojo/text!./templates/MatrixView.html","dijit/_TemplatedMixin"],function(_1,_2,_3,_4,_5,fx,_6,on,_7,_8,_9,_a,_b,_c,_d,_e,_f,_10,_11){
-return _1("dojox.calendar.MatrixView",[_f,_11],{templateString:_10,baseClass:"dojoxCalendarMatrixView",_setTabIndexAttr:"domNode",viewKind:"matrix",renderData:null,startDate:null,refStartTime:null,refEndTime:null,columnCount:7,rowCount:5,horizontalRenderer:null,labelRenderer:null,expandRenderer:null,percentOverlap:0,verticalGap:2,horizontalRendererHeight:17,labelRendererHeight:14,expandRendererHeight:15,cellPaddingTop:16,expandDuration:300,expandEasing:null,layoutDuringResize:false,roundToDay:true,showCellLabel:true,scrollable:false,resizeCursor:"e-resize",constructor:function(){
-this.invalidatingProperties=["columnCount","rowCount","startDate","horizontalRenderer","labelRenderer","expandRenderer","rowHeaderDatePattern","columnHeaderLabelLength","cellHeaderShortPattern","cellHeaderLongPattern","percentOverlap","verticalGap","horizontalRendererHeight","labelRendererHeight","expandRendererHeight","cellPaddingTop","roundToDay","itemToRendererKindFunc","layoutPriorityFunction","formatItemTimeFunc","textDir","items"];
+return _1("dojox.calendar.MatrixView",[_f,_11],{templateString:_10,baseClass:"dojoxCalendarMatrixView",_setTabIndexAttr:"domNode",viewKind:"matrix",renderData:null,startDate:null,refStartTime:null,refEndTime:null,columnCount:7,rowCount:5,horizontalRenderer:null,labelRenderer:null,expandRenderer:null,horizontalDecorationRenderer:null,percentOverlap:0,verticalGap:2,horizontalRendererHeight:17,labelRendererHeight:14,expandRendererHeight:15,cellPaddingTop:16,expandDuration:300,expandEasing:null,layoutDuringResize:false,roundToDay:true,showCellLabel:true,scrollable:false,resizeCursor:"e-resize",constructor:function(){
+this.invalidatingProperties=["columnCount","rowCount","startDate","horizontalRenderer","horizontalDecaorationRenderer","labelRenderer","expandRenderer","rowHeaderDatePattern","columnHeaderLabelLength","cellHeaderShortPattern","cellHeaderLongPattern","percentOverlap","verticalGap","horizontalRendererHeight","labelRendererHeight","expandRendererHeight","cellPaddingTop","roundToDay","itemToRendererKindFunc","layoutPriorityFunction","formatItemTimeFunc","textDir","items"];
 this._ddRendererList=[];
 this._ddRendererPool=[];
 this._rowHeaderHandles=[];
@@ -35,8 +35,7 @@ for(var row=0;row<rd.rowCount;row++){
 rd.dates.push([]);
 for(var col=0;col<rd.columnCount;col++){
 rd.dates[row].push(d);
-d=rd.dateModule.add(d,"day",1);
-d=this.floorToDay(d,false,rd);
+d=this.addAndFloor(d,"day",1);
 }
 }
 rd.startTime=this.newDate(rd.dates[0][0],rd);
@@ -49,6 +48,13 @@ this._computeVisibleItems(rd);
 }else{
 if(this.renderData){
 rd.items=this.renderData.items;
+}
+}
+if(this.displayedDecorationItemsInvalidated){
+rd.decorationItems=this.decorationStoreManager._computeVisibleItems(rd);
+}else{
+if(this.renderData){
+rd.decorationItems=this.renderData.decorationItems;
 }
 }
 rd.rtl=!this.isLeftToRight();
@@ -97,7 +103,7 @@ return this.getWeekNumberLabel(d);
 }
 },_formatColumnHeaderLabel:function(d){
 return this.renderData.dateLocaleModule.getNames("days",this.columnHeaderLabelLength?this.columnHeaderLabelLength:"wide","standAlone")[d.getDay()];
-},_formatGridCellLabel:function(d,row,col){
+},cellHeaderShortPattern:null,cellHeaderLongPattern:null,_formatGridCellLabel:function(d,row,col){
 var _16=row==0&&col==0||d.getDate()==1;
 var _17,rb;
 if(_16){
@@ -123,9 +129,10 @@ return;
 }
 this._validateProperties();
 var _18=this.renderData;
-this.renderData=this._createRenderData();
-this._createRendering(this.renderData,_18);
-this._layoutRenderers(this.renderData);
+var rd=this.renderData=this._createRenderData();
+this._createRendering(rd,_18);
+this._layoutDecorationRenderers(rd);
+this._layoutRenderers(rd);
 },_createRendering:function(_19,_1a){
 if(_19.rowHeight<=0){
 _19.columnCount=1;
@@ -289,7 +296,7 @@ return;
 var _34=_c("tr",_33);
 var _35=_31.rowCount-_34.length;
 var _36=_35>0;
-var _37=_31.columnCount-(_32?_32.columnCount:0);
+var _37=_31.columnCount-(_34?_c("td",_34[0]).length:0);
 if(_5("ie")==8){
 if(this._gridTableSave==null){
 this._gridTableSave=_4.clone(_33);
@@ -460,6 +467,7 @@ return;
 if(this.layoutDuringResize||_4b){
 setTimeout(_4.hitch(this,function(){
 this._layoutRenderers(this.renderData);
+this._layoutDecorationRenderers(this.renderData);
 }),20);
 }else{
 _9.set(this.itemContainer,"opacity",0);
@@ -472,6 +480,7 @@ this._resizeTimer=setTimeout(_4.hitch(this,function(){
 delete this._resizeTimer;
 this._resizeRowsImpl(this.itemContainer,"tr");
 this._layoutRenderers(this.renderData);
+this._layoutDecorationRenderers(this.renderData);
 if(this.resizeAnimationDuration==0){
 _9.set(this.itemContainer,"opacity",1);
 }else{
@@ -565,7 +574,7 @@ this.onExpandAnimationEnd(true);
 })});
 this._expandAnimation.play();
 }else{
-this._expandRowImpl(_5c);
+this._expandRowImpl(_5c,true);
 }
 }
 },_expandRowImpl:function(_5e,_5f){
@@ -741,8 +750,19 @@ res[col]=0;
 return res;
 },applyRendererZIndex:function(_7e,_7f,_80,_81,_82,_83){
 _9.set(_7f.container,{"zIndex":_82||_81?_7f.renderer.mobile?100:0:_7e.lane==undefined?1:_7e.lane+1});
-},_layoutRenderers:function(_84){
-if(_84==null||_84.items==null||_84.rowHeight<=0){
+},_layoutDecorationRenderers:function(_84){
+if(_84==null||_84.decorationItems==null||_84.rowHeight<=0){
+return;
+}
+if(!this.gridTable||this._expandAnimation!=null||this.horizontalDecorationRenderer==null){
+this.decorationRendererManager.recycleItemRenderers();
+return;
+}
+this._layoutStep=_84.columnCount;
+this.renderData.gridTablePosX=_a.position(this.gridTable).x;
+this.inherited(arguments);
+},_layoutRenderers:function(_85){
+if(_85==null||_85.items==null||_85.rowHeight<=0){
 return;
 }
 if(!this.gridTable||this._expandAnimation!=null||(this.horizontalRenderer==null&&this.labelRenderer==null)){
@@ -750,384 +770,406 @@ this._recycleItemRenderers();
 return;
 }
 this.renderData.gridTablePosX=_a.position(this.gridTable).x;
-this._layoutStep=_84.columnCount;
+this._layoutStep=_85.columnCount;
 this._recycleExpandRenderers();
 this._hiddenItems=[];
 this._offsets=[];
 this.naturalRowsHeight=[];
 this.inherited(arguments);
-},_offsets:null,_layoutInterval:function(_85,_86,_87,end,_88){
+},_offsets:null,_layoutInterval:function(_86,_87,_88,end,_89,_8a){
 if(this.renderData.cells==null){
 return;
 }
-var _89=[];
-var _8a=[];
-for(var i=0;i<_88.length;i++){
-var _8b=_88[i];
-var _8c=this._itemToRendererKind(_8b);
-if(_8c=="horizontal"){
-_89.push(_8b);
+if(_8a==="dataItems"){
+var _8b=[];
+var _8c=[];
+for(var i=0;i<_89.length;i++){
+var _8d=_89[i];
+var _8e=this._itemToRendererKind(_8d);
+if(_8e=="horizontal"){
+_8b.push(_8d);
 }else{
-if(_8c=="label"){
-_8a.push(_8b);
+if(_8e=="label"){
+_8c.push(_8d);
 }
 }
 }
-var _8d=this.getExpandedRowIndex();
-if(_8d!=-1&&_8d!=_86){
+var _8f=this.getExpandedRowIndex();
+if(_8f!=-1&&_8f!=_87){
 return;
 }
-var _8e;
-var _8f=[];
-var _90=null;
+var _90;
 var _91=[];
-if(_89.length>0&&this.horizontalRenderer){
-var _90=this._createHorizontalLayoutItems(_86,_87,end,_89);
-var _92=this._computeHorizontalOverlapLayout(_90,_91);
+var _92=null;
+var _93=[];
+if(_8b.length>0&&this.horizontalRenderer){
+var _92=this._createHorizontalLayoutItems(_87,_88,end,_8b,_8a);
+var _94=this._computeHorizontalOverlapLayout(_92,_93);
 }
-var _93;
-var _94=[];
-if(_8a.length>0&&this.labelRenderer){
-_93=this._createLabelLayoutItems(_86,_87,end,_8a);
-this._computeLabelOffsets(_93,_94);
+var _95;
+var _96=[];
+if(_8c.length>0&&this.labelRenderer){
+_95=this._createLabelLayoutItems(_87,_88,end,_8c);
+this._computeLabelOffsets(_95,_96);
 }
-var _95=this._computeColHasHiddenItems(_86,_91,_94);
-if(_90!=null){
-this._layoutHorizontalItemsImpl(_86,_90,_92,_95,_8f);
+var _97=this._computeColHasHiddenItems(_87,_93,_96);
+if(_92!=null){
+this._layoutHorizontalItemsImpl(_87,_92,_94,_97,_91,_8a);
 }
-if(_93!=null){
-this._layoutLabelItemsImpl(_86,_93,_95,_8f,_91);
+if(_95!=null){
+this._layoutLabelItemsImpl(_87,_95,_97,_91,_93,_8a);
 }
-this._layoutExpandRenderers(_86,_95,_8f);
-this._hiddenItems[_86]=_8f;
-},_createHorizontalLayoutItems:function(_96,_97,_98,_99){
-if(this.horizontalRenderer==null){
-return;
+this._layoutExpandRenderers(_87,_97,_91);
+this._hiddenItems[_87]=_91;
+}else{
+if(this.horizontalDecorationRenderer){
+var _92=this._createHorizontalLayoutItems(_87,_88,end,_89,_8a);
+if(_92!=null){
+this._layoutHorizontalItemsImpl(_87,_92,null,false,null,_8a);
 }
+}
+}
+},_createHorizontalLayoutItems:function(_98,_99,_9a,_9b,_9c){
 var rd=this.renderData;
 var cal=rd.dateModule;
-var _9a=rd.rtl?-1:1;
-var _9b=[];
-for(var i=0;i<_99.length;i++){
-var _9c=_99[i];
-var _9d=this.computeRangeOverlap(rd,_9c.startTime,_9c.endTime,_97,_98);
-var _9e=cal.difference(_97,this.floorToDay(_9d[0],false,rd),"day");
-var _9f=rd.dates[_96][_9e];
-var _a0=_a.position(this._getCellAt(_96,_9e,false));
-var _a1=_a0.x-rd.gridTablePosX;
+var _9d=rd.rtl?-1:1;
+var _9e=[];
+var _9f=_9c==="decorationItems";
+for(var i=0;i<_9b.length;i++){
+var _a0=_9b[i];
+var _a1=this.computeRangeOverlap(rd,_a0.startTime,_a0.endTime,_99,_9a);
+var _a2=cal.difference(_99,this.floorToDay(_a1[0],false,rd),"day");
+var _a3=rd.dates[_98][_a2];
+var _a4=_a.position(this._getCellAt(_98,_a2,false));
+var _a5=_a4.x-rd.gridTablePosX;
 if(rd.rtl){
-_a1+=_a0.w;
+_a5+=_a4.w;
 }
-if(!this.roundToDay&&!_9c.allDay){
-_a1+=_9a*this.computeProjectionOnDate(rd,_9f,_9d[0],_a0.w);
+if(_9f&&!_a0.isAllDay||!_9f&&!this.roundToDay&&!_a0.allDay){
+_a5+=_9d*this.computeProjectionOnDate(rd,_a3,_a1[0],_a4.w);
 }
-_a1=Math.ceil(_a1);
-var _a2=cal.difference(_97,this.floorToDay(_9d[1],false,rd),"day");
+_a5=Math.ceil(_a5);
+var _a6=cal.difference(_99,this.floorToDay(_a1[1],false,rd),"day");
 var end;
-if(_a2>rd.columnCount-1){
-_a0=_a.position(this._getCellAt(_96,rd.columnCount-1,false));
+if(_a6>rd.columnCount-1){
+_a4=_a.position(this._getCellAt(_98,rd.columnCount-1,false));
 if(rd.rtl){
-end=_a0.x-rd.gridTablePosX;
+end=_a4.x-rd.gridTablePosX;
 }else{
-end=_a0.x-rd.gridTablePosX+_a0.w;
+end=_a4.x-rd.gridTablePosX+_a4.w;
 }
 }else{
-_9f=rd.dates[_96][_a2];
-_a0=_a.position(this._getCellAt(_96,_a2,false));
-end=_a0.x-rd.gridTablePosX;
+_a3=rd.dates[_98][_a6];
+_a4=_a.position(this._getCellAt(_98,_a6,false));
+end=_a4.x-rd.gridTablePosX;
 if(rd.rtl){
-end+=_a0.w;
+end+=_a4.w;
 }
-if(this.roundToDay){
-if(!this.isStartOfDay(_9d[1])){
-end+=_9a*_a0.w;
+if(!_9f&&this.roundToDay){
+if(!this.isStartOfDay(_a1[1])){
+end+=_9d*_a4.w;
 }
 }else{
-end+=_9a*this.computeProjectionOnDate(rd,_9f,_9d[1],_a0.w);
+end+=_9d*this.computeProjectionOnDate(rd,_a3,_a1[1],_a4.w);
 }
 }
 end=Math.floor(end);
 if(rd.rtl){
 var t=end;
-end=_a1;
-_a1=t;
+end=_a5;
+_a5=t;
 }
-if(end>_a1){
-var _a3=_4.mixin({start:_a1,end:end,range:_9d,item:_9c,startOffset:_9e,endOffset:_a2},_9c);
-_9b.push(_a3);
+if(end>_a5){
+var _a7=_4.mixin({start:_a5,end:end,range:_a1,item:_a0,startOffset:_a2,endOffset:_a6},_a0);
+_9e.push(_a7);
 }
 }
-return _9b;
-},_computeHorizontalOverlapLayout:function(_a4,_a5){
+return _9e;
+},_computeHorizontalOverlapLayout:function(_a8,_a9){
 var rd=this.renderData;
-var _a6=this.horizontalRendererHeight;
-var _a7=this.computeOverlapping(_a4,this._overlapLayoutPass3);
-var _a8=this.percentOverlap/100;
+var _aa=this.horizontalRendererHeight;
+var _ab=this.computeOverlapping(_a8,this._overlapLayoutPass3);
+var _ac=this.percentOverlap/100;
 for(var i=0;i<rd.columnCount;i++){
-var _a9=_a7.addedPassRes[i];
-var _aa=rd.rtl?rd.columnCount-i-1:i;
-if(_a8==0){
-_a5[_aa]=_a9==0?0:_a9==1?_a6:_a6+(_a9-1)*(_a6+this.verticalGap);
+var _ad=_ab.addedPassRes[i];
+var _ae=rd.rtl?rd.columnCount-i-1:i;
+if(_ac==0){
+_a9[_ae]=_ad==0?0:_ad==1?_aa:_aa+(_ad-1)*(_aa+this.verticalGap);
 }else{
-_a5[_aa]=_a9==0?0:_a9*_a6-(_a9-1)*(_a8*_a6)+this.verticalGap;
+_a9[_ae]=_ad==0?0:_ad*_aa-(_ad-1)*(_ac*_aa)+this.verticalGap;
 }
-_a5[_aa]+=this.cellPaddingTop;
+_a9[_ae]+=this.cellPaddingTop;
 }
-return _a7;
-},_createLabelLayoutItems:function(_ab,_ac,_ad,_ae){
+return _ab;
+},_createLabelLayoutItems:function(_af,_b0,_b1,_b2){
 if(this.labelRenderer==null){
 return;
 }
 var d;
 var rd=this.renderData;
 var cal=rd.dateModule;
-var _af=[];
-for(var i=0;i<_ae.length;i++){
-var _b0=_ae[i];
-d=this.floorToDay(_b0.startTime,false,rd);
-var _b1=this.dateModule.compare;
-while(_b1(d,_b0.endTime)==-1&&_b1(d,_ad)==-1){
-var _b2=cal.add(d,"day",1);
-_b2=this.floorToDay(_b2,true);
-var _b3=this.computeRangeOverlap(rd,_b0.startTime,_b0.endTime,d,_b2);
-var _b4=cal.difference(_ac,this.floorToDay(_b3[0],false,rd),"day");
-if(_b4>=this.columnCount){
+var _b3=[];
+for(var i=0;i<_b2.length;i++){
+var _b4=_b2[i];
+d=this.floorToDay(_b4.startTime,false,rd);
+var _b5=this.dateModule.compare;
+while(_b5(d,_b4.endTime)==-1&&_b5(d,_b1)==-1){
+var _b6=cal.add(d,"day",1);
+_b6=this.floorToDay(_b6,true);
+var _b7=this.computeRangeOverlap(rd,_b4.startTime,_b4.endTime,d,_b6);
+var _b8=cal.difference(_b0,this.floorToDay(_b7[0],false,rd),"day");
+if(_b8>=this.columnCount){
 break;
 }
-if(_b4>=0){
-var _b5=_af[_b4];
-if(_b5==null){
-_b5=[];
-_af[_b4]=_b5;
+if(_b8>=0){
+var _b9=_b3[_b8];
+if(_b9==null){
+_b9=[];
+_b3[_b8]=_b9;
 }
-_b5.push(_4.mixin({startOffset:_b4,range:_b3,item:_b0},_b0));
+_b9.push(_4.mixin({startOffset:_b8,range:_b7,item:_b4},_b4));
 }
 d=cal.add(d,"day",1);
 this.floorToDay(d,true);
 }
 }
-return _af;
-},_computeLabelOffsets:function(_b6,_b7){
+return _b3;
+},_computeLabelOffsets:function(_ba,_bb){
 for(var i=0;i<this.renderData.columnCount;i++){
-_b7[i]=_b6[i]==null?0:_b6[i].length*(this.labelRendererHeight+this.verticalGap);
+_bb[i]=_ba[i]==null?0:_ba[i].length*(this.labelRendererHeight+this.verticalGap);
 }
-},_computeColHasHiddenItems:function(_b8,_b9,_ba){
+},_computeColHasHiddenItems:function(_bc,_bd,_be){
 var res=[];
-var _bb=this._getRowHeight(_b8);
+var _bf=this._getRowHeight(_bc);
 var h;
-var _bc=0;
+var _c0=0;
 for(var i=0;i<this.renderData.columnCount;i++){
-h=_b9==null||_b9[i]==null?this.cellPaddingTop:_b9[i];
-h+=_ba==null||_ba[i]==null?0:_ba[i];
-if(h>_bc){
-_bc=h;
+h=_bd==null||_bd[i]==null?this.cellPaddingTop:_bd[i];
+h+=_be==null||_be[i]==null?0:_be[i];
+if(h>_c0){
+_c0=h;
 }
-res[i]=h>_bb;
+res[i]=h>_bf;
 }
-this.naturalRowsHeight[_b8]=_bc;
+this.naturalRowsHeight[_bc]=_c0;
 return res;
-},_layoutHorizontalItemsImpl:function(_bd,_be,_bf,_c0,_c1){
+},_layoutHorizontalItemsImpl:function(_c1,_c2,_c3,_c4,_c5,_c6){
 var rd=this.renderData;
-var _c2=rd.cells[_bd];
-var _c3=this._getRowHeight(_bd);
-var _c4=this.horizontalRendererHeight;
-var _c5=this.percentOverlap/100;
-for(var i=0;i<_be.length;i++){
-var _c6=_be[i];
-var _c7=_c6.lane;
-var _c8=this.cellPaddingTop;
-if(_c5==0){
-_c8+=_c7*(_c4+this.verticalGap);
+var _c7=rd.cells[_c1];
+var _c8=this._getRowHeight(_c1);
+var _c9=this.horizontalRendererHeight;
+var _ca=this.percentOverlap/100;
+for(var i=0;i<_c2.length;i++){
+var _cb=_c2[i];
+var _cc=_cb.lane;
+if(_c6==="dataItems"){
+var _cd=this.cellPaddingTop;
+if(_ca==0){
+_cd+=_cc*(_c9+this.verticalGap);
 }else{
-_c8+=_c7*(_c4-_c5*_c4);
+_cd+=_cc*(_c9-_ca*_c9);
 }
 var exp=false;
-var _c9=_c3;
+var _ce=_c8;
 if(this.expandRenderer){
-for(var off=_c6.startOffset;off<=_c6.endOffset;off++){
-if(_c0[off]){
+for(var off=_cb.startOffset;off<=_cb.endOffset;off++){
+if(_c4[off]){
 exp=true;
 break;
 }
 }
-_c9=exp?_c3-this.expandRendererHeight:_c3;
+_ce=exp?_c8-this.expandRendererHeight:_c8;
 }
-if(_c8+_c4<=_c9){
-var ir=this._createRenderer(_c6,"horizontal",this.horizontalRenderer,"dojoxCalendarHorizontal");
-var _ca=this.isItemBeingEdited(_c6)&&!this.liveLayout&&this._isEditing;
-var h=_ca?_c3-this.cellPaddingTop:_c4;
-var w=_c6.end-_c6.start;
-if(_5("ie")>=9&&_c6.start+w<this.itemContainer.offsetWidth){
+if(_cd+_c9<=_ce){
+var ir=this._createRenderer(_cb,"horizontal",this.horizontalRenderer,"dojoxCalendarHorizontal");
+var _cf=this.isItemBeingEdited(_cb)&&!this.liveLayout&&this._isEditing;
+var h=_cf?_c8-this.cellPaddingTop:_c9;
+var w=_cb.end-_cb.start;
+if(_5("ie")>=9&&_cb.start+w<this.itemContainer.offsetWidth){
 w++;
 }
-_9.set(ir.container,{"top":(_ca?this.cellPaddingTop:_c8)+"px","left":_c6.start+"px","width":w+"px","height":h+"px"});
-this._applyRendererLayout(_c6,ir,_c2,w,h,"horizontal");
+_9.set(ir.container,{"top":(_cf?this.cellPaddingTop:_cd)+"px","left":_cb.start+"px","width":w+"px","height":h+"px"});
+this._applyRendererLayout(_cb,ir,_c7,w,h,"horizontal");
 }else{
-for(var d=_c6.startOffset;d<_c6.endOffset;d++){
-if(_c1[d]==null){
-_c1[d]=[_c6.item];
+for(var d=_cb.startOffset;d<_cb.endOffset;d++){
+if(_c5[d]==null){
+_c5[d]=[_cb.item];
 }else{
-_c1[d].push(_c6.item);
+_c5[d].push(_cb.item);
 }
 }
 }
+}else{
+var ir=this.decorationRendererManager.createRenderer(_cb,"horizontal",this.horizontalDecorationRenderer,"dojoxCalendarDecoration");
+var h=_c8;
+var w=_cb.end-_cb.start;
+if(_5("ie")>=9&&_cb.start+w<this.itemContainer.offsetWidth){
+w++;
 }
-},_layoutLabelItemsImpl:function(_cb,_cc,_cd,_ce,_cf){
-var _d0,_d1;
+_9.set(ir.container,{"top":"0","left":_cb.start+"px","width":w+"px","height":h+"px"});
+_b.place(ir.container,_c7);
+_9.set(ir.container,"display","block");
+}
+}
+},_layoutLabelItemsImpl:function(_d0,_d1,_d2,_d3,_d4){
+var _d5,_d6;
 var rd=this.renderData;
-var _d2=rd.cells[_cb];
-var _d3=this._getRowHeight(_cb);
-var _d4=this.labelRendererHeight;
-var _d5=_a.getMarginBox(this.itemContainer).w;
-for(var i=0;i<_cc.length;i++){
-_d0=_cc[i];
-if(_d0!=null){
-var _d6=this.expandRenderer?(_cd[i]?_d3-this.expandRendererHeight:_d3):_d3;
-_d1=_cf==null||_cf[i]==null?this.cellPaddingTop:_cf[i]+this.verticalGap;
-var _d7=_a.position(this._getCellAt(_cb,i));
-var _d8=_d7.x-rd.gridTablePosX;
-for(var j=0;j<_d0.length;j++){
-if(_d1+_d4+this.verticalGap<=_d6){
-var _d9=_d0[j];
-_4.mixin(_d9,{start:_d8,end:_d8+_d7.w});
-var ir=this._createRenderer(_d9,"label",this.labelRenderer,"dojoxCalendarLabel");
-var _da=this.isItemBeingEdited(_d9)&&!this.liveLayout&&this._isEditing;
-var h=_da?this._getRowHeight(_cb)-this.cellPaddingTop:_d4;
+var _d7=rd.cells[_d0];
+var _d8=this._getRowHeight(_d0);
+var _d9=this.labelRendererHeight;
+var _da=_a.getMarginBox(this.itemContainer).w;
+for(var i=0;i<_d1.length;i++){
+_d5=_d1[i];
+if(_d5!=null){
+_d5.sort(_4.hitch(this,function(a,b){
+return this.dateModule.compare(a.range[0],b.range[0]);
+}));
+var _db=this.expandRenderer?(_d2[i]?_d8-this.expandRendererHeight:_d8):_d8;
+_d6=_d4==null||_d4[i]==null?this.cellPaddingTop:_d4[i]+this.verticalGap;
+var _dc=_a.position(this._getCellAt(_d0,i));
+var _dd=_dc.x-rd.gridTablePosX;
+for(var j=0;j<_d5.length;j++){
+if(_d6+_d9+this.verticalGap<=_db){
+var _de=_d5[j];
+_4.mixin(_de,{start:_dd,end:_dd+_dc.w});
+var ir=this._createRenderer(_de,"label",this.labelRenderer,"dojoxCalendarLabel");
+var _df=this.isItemBeingEdited(_de)&&!this.liveLayout&&this._isEditing;
+var h=_df?this._getRowHeight(_d0)-this.cellPaddingTop:_d9;
 if(rd.rtl){
-_d9.start=_d5-_d9.end;
-_d9.end=_d9.start+_d7.w;
+_de.start=_da-_de.end;
+_de.end=_de.start+_dc.w;
 }
-_9.set(ir.container,{"top":(_da?this.cellPaddingTop:_d1)+"px","left":_d9.start+"px","width":_d7.w+"px","height":h+"px"});
-this._applyRendererLayout(_d9,ir,_d2,_d7.w,h,"label");
+_9.set(ir.container,{"top":(_df?this.cellPaddingTop:_d6)+"px","left":_de.start+"px","width":_dc.w+"px","height":h+"px"});
+this._applyRendererLayout(_de,ir,_d7,_dc.w,h,"label");
 }else{
 break;
 }
-_d1+=_d4+this.verticalGap;
+_d6+=_d9+this.verticalGap;
 }
-for(var j;j<_d0.length;j++){
-if(_ce[i]==null){
-_ce[i]=[_d0[j]];
+for(var j;j<_d5.length;j++){
+if(_d3[i]==null){
+_d3[i]=[_d5[j]];
 }else{
-_ce[i].push(_d0[j]);
+_d3[i].push(_d5[j]);
 }
 }
 }
 }
-},_applyRendererLayout:function(_db,ir,_dc,w,h,_dd){
-var _de=this.isItemBeingEdited(_db);
-var _df=this.isItemSelected(_db);
-var _e0=this.isItemHovered(_db);
-var _e1=this.isItemFocused(_db);
-var _e2=ir.renderer;
-_e2.set("hovered",_e0);
-_e2.set("selected",_df);
-_e2.set("edited",_de);
-_e2.set("focused",this.showFocus?_e1:false);
-_e2.set("moveEnabled",this.isItemMoveEnabled(_db._item,_dd));
-_e2.set("storeState",this.getItemStoreState(_db));
-if(_dd!="label"){
-_e2.set("resizeEnabled",this.isItemResizeEnabled(_db,_dd));
+},_applyRendererLayout:function(_e0,ir,_e1,w,h,_e2){
+var _e3=this.isItemBeingEdited(_e0);
+var _e4=this.isItemSelected(_e0);
+var _e5=this.isItemHovered(_e0);
+var _e6=this.isItemFocused(_e0);
+var _e7=ir.renderer;
+_e7.set("hovered",_e5);
+_e7.set("selected",_e4);
+_e7.set("edited",_e3);
+_e7.set("focused",this.showFocus?_e6:false);
+_e7.set("moveEnabled",this.isItemMoveEnabled(_e0._item,_e2));
+_e7.set("storeState",this.getItemStoreState(_e0));
+if(_e2!="label"){
+_e7.set("resizeEnabled",this.isItemResizeEnabled(_e0,_e2));
 }
-this.applyRendererZIndex(_db,ir,_e0,_df,_de,_e1);
-if(_e2.updateRendering){
-_e2.updateRendering(w,h);
+this.applyRendererZIndex(_e0,ir,_e5,_e4,_e3,_e6);
+if(_e7.updateRendering){
+_e7.updateRendering(w,h);
 }
-_b.place(ir.container,_dc);
+_b.place(ir.container,_e1);
 _9.set(ir.container,"display","block");
-},_getCellAt:function(_e3,_e4,rtl){
+},_getCellAt:function(_e8,_e9,rtl){
 if((rtl==undefined||rtl==true)&&!this.isLeftToRight()){
-_e4=this.renderData.columnCount-1-_e4;
+_e9=this.renderData.columnCount-1-_e9;
 }
-return this.gridTable.childNodes[0].childNodes[_e3].childNodes[_e4];
-},_layoutExpandRenderers:function(_e5,_e6,_e7){
+return this.gridTable.childNodes[0].childNodes[_e8].childNodes[_e9];
+},_layoutExpandRenderers:function(_ea,_eb,_ec){
 if(!this.expandRenderer){
 return;
 }
 var rd=this.renderData;
-if(rd.expandedRow==_e5){
+if(rd.expandedRow==_ea){
 if(rd.expandedRowCol!=null&&rd.expandedRowCol!=-1){
 this._layoutExpandRendererImpl(rd.expandedRow,rd.expandedRowCol,null,true);
 }
 }else{
 if(rd.expandedRow==null){
 for(var i=0;i<rd.columnCount;i++){
-if(_e6[i]){
-this._layoutExpandRendererImpl(_e5,rd.rtl?rd.columnCount-1-i:i,_e7[i],false);
+if(_eb[i]){
+this._layoutExpandRendererImpl(_ea,rd.rtl?rd.columnCount-1-i:i,_ec[i],false);
 }
 }
 }
 }
-},_layoutExpandRendererImpl:function(_e8,_e9,_ea,_eb){
+},_layoutExpandRendererImpl:function(_ed,_ee,_ef,_f0){
 var rd=this.renderData;
-var d=_4.clone(rd.dates[_e8][_e9]);
+var d=_4.clone(rd.dates[_ed][_ee]);
 var ir=null;
-var _ec=rd.cells[_e8];
-ir=this._getExpandRenderer(d,_ea,_e8,_e9,_eb);
-var dim=_a.position(this._getCellAt(_e8,_e9));
+var _f1=rd.cells[_ed];
+ir=this._getExpandRenderer(d,_ef,_ed,_ee,_f0);
+var dim=_a.position(this._getCellAt(_ed,_ee));
 dim.x-=rd.gridTablePosX;
-this.layoutExpandRenderer(ir,d,_ea,dim,this.expandRendererHeight);
-_b.place(ir.domNode,_ec);
+this.layoutExpandRenderer(ir,d,_ef,dim,this.expandRendererHeight);
+_b.place(ir.domNode,_f1);
 _9.set(ir.domNode,"display","block");
-},layoutExpandRenderer:function(_ed,_ee,_ef,_f0,_f1){
-_9.set(_ed.domNode,{"left":_f0.x+"px","width":_f0.w+"px","height":_f1+"px","top":(_f0.h-_f1-1)+"px"});
+},layoutExpandRenderer:function(_f2,_f3,_f4,_f5,_f6){
+_9.set(_f2.domNode,{"left":_f5.x+"px","width":_f5.w+"px","height":_f6+"px","top":(_f5.h-_f6-1)+"px"});
 },_onItemEditBeginGesture:function(e){
 var p=this._edProps;
-var _f2=p.editedItem;
-var _f3=e.dates;
-var _f4=this.newDate(p.editKind=="resizeEnd"?_f2.endTime:_f2.startTime);
+var _f7=p.editedItem;
+var _f8=e.dates;
+var _f9=this.newDate(p.editKind=="resizeEnd"?_f7.endTime:_f7.startTime);
 if(p.rendererKind=="label"){
 }else{
-if(e.editKind=="move"&&(_f2.allDay||this.roundToDay)){
+if(e.editKind=="move"&&(_f7.allDay||this.roundToDay)){
 var cal=this.renderData.dateModule;
-p.dayOffset=cal.difference(this.floorToDay(_f3[0],false,this.renderData),_f4,"day");
+p.dayOffset=cal.difference(this.floorToDay(_f8[0],false,this.renderData),_f9,"day");
 }
 }
 this.inherited(arguments);
-},_computeItemEditingTimes:function(_f5,_f6,_f7,_f8,_f9){
+},_computeItemEditingTimes:function(_fa,_fb,_fc,_fd,_fe){
 var cal=this.renderData.dateModule;
 var p=this._edProps;
-if(_f7=="label"){
+if(_fc=="label"){
 }else{
-if(_f5.allDay||this.roundToDay){
-var _fa=this.isStartOfDay(_f8[0]);
-switch(_f6){
+if(_fa.allDay||this.roundToDay){
+var _ff=this.isStartOfDay(_fd[0]);
+switch(_fb){
 case "resizeEnd":
-if(!_fa&&_f5.allDay){
-_f8[0]=cal.add(_f8[0],"day",1);
+if(!_ff&&_fa.allDay){
+_fd[0]=cal.add(_fd[0],"day",1);
 }
 case "resizeStart":
-if(!_fa){
-_f8[0]=this.floorToDay(_f8[0],true);
+if(!_ff){
+_fd[0]=this.floorToDay(_fd[0],true);
 }
 break;
 case "move":
-_f8[0]=cal.add(_f8[0],"day",p.dayOffset);
+_fd[0]=cal.add(_fd[0],"day",p.dayOffset);
 break;
 case "resizeBoth":
-if(!_fa){
-_f8[0]=this.floorToDay(_f8[0],true);
+if(!_ff){
+_fd[0]=this.floorToDay(_fd[0],true);
 }
-if(!this.isStartOfDay(_f8[1])){
-_f8[1]=this.floorToDay(cal.add(_f8[1],"day",1),true);
+if(!this.isStartOfDay(_fd[1])){
+_fd[1]=this.floorToDay(cal.add(_fd[1],"day",1),true);
 }
 break;
 }
 }else{
-_f8=this.inherited(arguments);
+_fd=this.inherited(arguments);
 }
 }
-return _f8;
-},getTime:function(e,x,y,_fb){
+return _fd;
+},getTime:function(e,x,y,_100){
 var rd=this.renderData;
 if(e!=null){
-var _fc=_a.position(this.itemContainer,true);
+var _101=_a.position(this.itemContainer,true);
 if(e.touches){
-_fb=_fb==undefined?0:_fb;
-x=e.touches[_fb].pageX-_fc.x;
-y=e.touches[_fb].pageY-_fc.y;
+_100=_100==undefined?0:_100;
+x=e.touches[_100].pageX-_101.x;
+y=e.touches[_100].pageY-_101.y;
 }else{
-x=e.pageX-_fc.x;
-y=e.pageY-_fc.y;
+x=e.pageX-_101.x;
+y=e.pageY-_101.y;
 }
 }
 var r=_a.getContentBox(this.itemContainer);
@@ -1146,7 +1188,7 @@ y=r.h-1;
 }
 }
 var w=_a.getMarginBox(this.itemContainer).w;
-var _fd=w/rd.columnCount;
+var colW=w/rd.columnCount;
 var row;
 if(rd.expandedRow==null){
 row=Math.floor(y/(_a.getMarginBox(this.itemContainer).h/rd.rowCount));
@@ -1157,14 +1199,14 @@ var r=_a.getContentBox(this.itemContainer);
 if(rd.rtl){
 x=r.w-x;
 }
-var col=Math.floor(x/_fd);
-var tm=Math.floor((x-(col*_fd))*1440/_fd);
-var _fe=null;
+var col=Math.floor(x/colW);
+var tm=Math.floor((x-(col*colW))*1440/colW);
+var date=null;
 if(row<rd.dates.length&&col<this.renderData.dates[row].length){
-_fe=this.newDate(this.renderData.dates[row][col]);
-_fe=this.renderData.dateModule.add(_fe,"minute",tm);
+date=this.newDate(this.renderData.dates[row][col]);
+date=this.renderData.dateModule.add(date,"minute",tm);
 }
-return _fe;
+return date;
 },_onGridMouseUp:function(e){
 this.inherited(arguments);
 if(this._gridMouseDown){
@@ -1197,11 +1239,11 @@ this._gridProps=null;
 },_onRowHeaderClick:function(e){
 this._dispatchCalendarEvt(e,"onRowHeaderClick");
 },onRowHeaderClick:function(e){
-},expandRendererClickHandler:function(e,_ff){
+},expandRendererClickHandler:function(e,_102){
 _3.stop(e);
-var ri=_ff.get("rowIndex");
-var ci=_ff.get("columnIndex");
-this._onExpandRendererClick(_4.mixin(this._createItemEditEvent(),{rowIndex:ri,columnIndex:ci,renderer:_ff,triggerEvent:e,date:this.renderData.dates[ri][ci]}));
+var ri=_102.get("rowIndex");
+var ci=_102.get("columnIndex");
+this._onExpandRendererClick(_4.mixin(this._createItemEditEvent(),{rowIndex:ri,columnIndex:ci,renderer:_102,triggerEvent:e,date:this.renderData.dates[ri][ci]}));
 },onExpandRendererClick:function(e){
 },_onExpandRendererClick:function(e){
 this._dispatchCalendarEvt(e,"onExpandRendererClick");

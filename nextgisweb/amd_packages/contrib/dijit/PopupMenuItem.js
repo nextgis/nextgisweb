@@ -1,6 +1,6 @@
 //>>built
 define("dijit/PopupMenuItem",["dojo/_base/declare","dojo/dom-style","dojo/_base/lang","dojo/query","./popup","./registry","./MenuItem","./hccss"],function(_1,_2,_3,_4,pm,_5,_6){
-return _1("dijit.PopupMenuItem",_6,{_fillContent:function(){
+return _1("dijit.PopupMenuItem",_6,{baseClass:"dijitMenuItem dijitPopupMenuItem",_fillContent:function(){
 if(this.srcNodeRef){
 var _7=_4("*",this.srcNodeRef);
 this.inherited(arguments,[_7[0]]);

@@ -16,6 +16,8 @@ define("dijit/PopupMenuItem", [
 		// summary:
 		//		An item in a Menu that spawn a drop down (usually a drop down menu)
 
+		baseClass: "dijitMenuItem dijitPopupMenuItem",
+
 		_fillContent: function(){
 			// summary:
 			//		When Menu is declared in markup, this code gets the menu label and

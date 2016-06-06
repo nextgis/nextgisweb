@@ -31,7 +31,7 @@ if(this.skip&&_9.isFormElement(e)){
 return;
 }
 if(this.delay){
-this.events.push(on(this.handle,_8.move,_3.hitch(this,"onMouseMove")),on(this.handle,_8.release,_3.hitch(this,"onMouseUp")));
+this.events.push(on(this.handle,_8.move,_3.hitch(this,"onMouseMove")),on(this.handle.ownerDocument,_8.release,_3.hitch(this,"onMouseUp")));
 this._lastX=e.pageX;
 this._lastY=e.pageY;
 }else{

@@ -123,7 +123,7 @@ if(!dfd._legacy){
 var _29=_25;
 do{
 _29=_29.parentNode;
-}while(_29!==_c.doc.documentElement);
+}while(_29&&_29!==_c.doc.documentElement);
 if(!_29){
 _25.style.position="absolute";
 _25.style.left="-1000px";
@@ -221,7 +221,7 @@ if(_3a!=="html"){
 if(_3a==="xml"){
 if(doc.documentElement.tagName.toLowerCase()==="html"){
 _8("a",doc.documentElement).orphan();
-var _3b=doc.documentElement.innerText;
+var _3b=doc.documentElement.innerText||doc.documentElement.textContent;
 _3b=_3b.replace(/>\s+</g,"><");
 _37.text=_6.trim(_3b);
 }else{

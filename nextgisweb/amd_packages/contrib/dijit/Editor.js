@@ -6,7 +6,7 @@ this.plugins=["undo","redo","|","cut","copy","paste","|","bold","italic","underl
 }
 this._plugins=[];
 this._editInterval=this.editActionInterval*1000;
-if(_c("ie")||_c("trident")){
+if(_c("ie")||_c("trident")||_c("edge")){
 this.events.push("onBeforeDeactivate");
 this.events.push("onBeforeActivate");
 }
@@ -170,14 +170,12 @@ var r;
 try{
 r=this.document.execCommand(cmd,false,null);
 if(_c("webkit")&&!r){
-throw {code:1011};
+throw {};
 }
 }
 catch(e){
-if(e.code==1011||(e.code==9&&_c("opera"))){
 var sub=_d.substitute,_27={cut:"X",copy:"C",paste:"V"};
 alert(sub(this.commands.systemShortcut,[this.commands[cmd],sub(this.commands[_c("mac")?"appleKey":"ctrlKey"],[_27[cmd]])]));
-}
 r=false;
 }
 return r;

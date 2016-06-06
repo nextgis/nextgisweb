@@ -414,52 +414,57 @@ return "("+s+")";
 }).replace(/[\xa0 ]/g,"[\\s\\xa0]");
 };
 var _52=[];
-_a.addCustomFormats=function(_53,_54){
-_52.push({pkg:_53,name:_54});
+var _53={};
+_a.addCustomFormats=function(_54,_55){
+_52.push({pkg:_54,name:_55});
+_53={};
 };
-_a._getGregorianBundle=function(_55){
-var _56={};
-_2.forEach(_52,function(_57){
-var _58=_5.getLocalization(_57.pkg,_57.name,_55);
-_56=_1.mixin(_56,_58);
+_a._getGregorianBundle=function(_56){
+if(_53[_56]){
+return _53[_56];
+}
+var _57={};
+_2.forEach(_52,function(_58){
+var _59=_5.getLocalization(_58.pkg,_58.name,_56);
+_57=_1.mixin(_57,_59);
 },this);
-return _56;
+return _53[_56]=_57;
 };
 _a.addCustomFormats(_9.id.replace(/\/date\/locale$/,".cldr"),"gregorian");
-_a.getNames=function(_59,_5a,_5b,_5c){
-var _5d,_5e=_a._getGregorianBundle(_5c),_5f=[_59,_5b,_5a];
-if(_5b=="standAlone"){
-var key=_5f.join("-");
-_5d=_5e[key];
-if(_5d[0]==1){
-_5d=undefined;
+_a.getNames=function(_5a,_5b,_5c,_5d){
+var _5e,_5f=_a._getGregorianBundle(_5d),_60=[_5a,_5c,_5b];
+if(_5c=="standAlone"){
+var key=_60.join("-");
+_5e=_5f[key];
+if(_5e[0]==1){
+_5e=undefined;
 }
 }
-_5f[1]="format";
-return (_5d||_5e[_5f.join("-")]).concat();
+_60[1]="format";
+return (_5e||_5f[_60.join("-")]).concat();
 };
-_a.isWeekend=function(_60,_61){
-var _62=_4.getWeekend(_61),day=(_60||new Date()).getDay();
-if(_62.end<_62.start){
-_62.end+=7;
-if(day<_62.start){
+_a.isWeekend=function(_61,_62){
+var _63=_4.getWeekend(_62),day=(_61||new Date()).getDay();
+if(_63.end<_63.start){
+_63.end+=7;
+if(day<_63.start){
 day+=7;
 }
 }
-return day>=_62.start&&day<=_62.end;
+return day>=_63.start&&day<=_63.end;
 };
-_a._getDayOfYear=function(_63){
-return _3.difference(new Date(_63.getFullYear(),0,1,_63.getHours()),_63)+1;
+_a._getDayOfYear=function(_64){
+return _3.difference(new Date(_64.getFullYear(),0,1,_64.getHours()),_64)+1;
 };
-_a._getWeekOfYear=function(_64,_65){
+_a._getWeekOfYear=function(_65,_66){
 if(arguments.length==1){
-_65=0;
+_66=0;
 }
-var _66=new Date(_64.getFullYear(),0,1).getDay(),adj=(_66-_65+7)%7,_67=Math.floor((_a._getDayOfYear(_64)+adj-1)/7);
-if(_66==_65){
-_67++;
+var _67=new Date(_65.getFullYear(),0,1).getDay(),adj=(_67-_66+7)%7,_68=Math.floor((_a._getDayOfYear(_65)+adj-1)/7);
+if(_67==_66){
+_68++;
 }
-return _67;
+return _68;
 };
 return _a;
 });

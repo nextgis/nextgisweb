@@ -1,13 +1,20 @@
 //>>built
-define("dojox/layout/ResizeHandle",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/connect","dojo/_base/array","dojo/_base/event","dojo/_base/fx","dojo/_base/window","dojo/fx","dojo/window","dojo/dom","dojo/dom-class","dojo/dom-geometry","dojo/dom-style","dijit/_base/manager","dijit/_Widget","dijit/_TemplatedMixin","dojo/_base/declare"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f,_10,_11){
+define("dojox/layout/ResizeHandle",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/connect","dojo/_base/array","dojo/_base/event","dojo/_base/fx","dojo/_base/window","dojo/fx","dojo/dom","dojo/dom-class","dojo/dom-geometry","dojo/dom-style","dojo/_base/declare","dojo/touch","dijit/_base/manager","dijit/_Widget","dijit/_TemplatedMixin"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f,_10,_11){
 _1.experimental("dojox.layout.ResizeHandle");
-var _12=_11("dojox.layout.ResizeHandle",[_f,_10],{targetId:"",targetContainer:null,resizeAxis:"xy",activeResize:false,activeResizeClass:"dojoxResizeHandleClone",animateSizing:true,animateMethod:"chain",animateDuration:225,minHeight:100,minWidth:100,constrainMax:false,maxHeight:0,maxWidth:0,fixedAspect:false,intermediateChanges:false,startTopic:"/dojo/resize/start",endTopic:"/dojo/resize/stop",templateString:"<div dojoAttachPoint=\"resizeHandle\" class=\"dojoxResizeHandle\"><div></div></div>",postCreate:function(){
-this.connect(this.resizeHandle,"onmousedown","_beginSizing");
+var _12=_d("dojox.layout._ResizeHelper",_10,{show:function(){
+_c.set(this.domNode,"display","");
+},hide:function(){
+_c.set(this.domNode,"display","none");
+},resize:function(dim){
+_b.setMarginBox(this.domNode,dim);
+}});
+var _13=_d("dojox.layout.ResizeHandle",[_10,_11],{targetId:"",targetContainer:null,resizeAxis:"xy",activeResize:false,activeResizeClass:"dojoxResizeHandleClone",animateSizing:true,animateMethod:"chain",animateDuration:225,minHeight:100,minWidth:100,constrainMax:false,maxHeight:0,maxWidth:0,fixedAspect:false,intermediateChanges:false,startTopic:"/dojo/resize/start",endTopic:"/dojo/resize/stop",templateString:"<div dojoAttachPoint=\"resizeHandle\" class=\"dojoxResizeHandle\"><div></div></div>",postCreate:function(){
+this.connect(this.resizeHandle,_e.press,"_beginSizing");
 if(!this.activeResize){
-this._resizeHelper=_e.byId("dojoxGlobalResizeHelper");
+this._resizeHelper=_f.byId("dojoxGlobalResizeHelper");
 if(!this._resizeHelper){
-this._resizeHelper=new _13({id:"dojoxGlobalResizeHelper"}).placeAt(_7.body());
-_b.add(this._resizeHelper.domNode,this.activeResizeClass);
+this._resizeHelper=new _12({id:"dojoxGlobalResizeHelper"}).placeAt(_7.body());
+_a.add(this._resizeHelper.domNode,this.activeResizeClass);
 }
 }else{
 this.animateSizing=false;
@@ -19,7 +26,7 @@ if(this.constrainMax){
 this.maxSize={w:this.maxWidth,h:this.maxHeight};
 }
 this._resizeX=this._resizeY=false;
-var _14=_2.partial(_b.add,this.resizeHandle);
+var _14=_2.partial(_a.add,this.resizeHandle);
 switch(this.resizeAxis.toLowerCase()){
 case "xy":
 this._resizeX=this._resizeY=true;
@@ -39,8 +46,8 @@ if(this._isSizing){
 return;
 }
 _3.publish(this.startTopic,[this]);
-this.targetWidget=_e.byId(this.targetId);
-this.targetDomNode=this.targetWidget?this.targetWidget.domNode:_a.byId(this.targetId);
+this.targetWidget=_f.byId(this.targetId);
+this.targetDomNode=this.targetWidget?this.targetWidget.domNode:_9.byId(this.targetId);
 if(this.targetContainer){
 this.targetDomNode=this.targetContainer;
 }
@@ -48,7 +55,7 @@ if(!this.targetDomNode){
 return;
 }
 if(!this.activeResize){
-var c=_c.position(this.targetDomNode,true);
+var c=_b.position(this.targetDomNode,true);
 this._resizeHelper.resize({l:c.x,t:c.y,w:c.w,h:c.h});
 this._resizeHelper.show();
 if(!this.isLeftToRight()){
@@ -57,13 +64,13 @@ this._resizeHelper.startPosition={l:c.x,t:c.y};
 }
 this._isSizing=true;
 this.startPoint={x:e.clientX,y:e.clientY};
-var _15=_d.getComputedStyle(this.targetDomNode),_16=_c.boxModel==="border-model",_17=_16?{w:0,h:0}:_c.getPadBorderExtents(this.targetDomNode,_15),_18=_c.getMarginExtents(this.targetDomNode,_15),mb;
-mb=this.startSize={w:_d.get(this.targetDomNode,"width",_15),h:_d.get(this.targetDomNode,"height",_15),pbw:_17.w,pbh:_17.h,mw:_18.w,mh:_18.h};
-if(!this.isLeftToRight()&&dojo.style(this.targetDomNode,"position")=="absolute"){
-var p=_c.position(this.targetDomNode,true);
+var _15=_c.getComputedStyle(this.targetDomNode),_16=_b.boxModel==="border-model",_17=_16?{w:0,h:0}:_b.getPadBorderExtents(this.targetDomNode,_15),_18=_b.getMarginExtents(this.targetDomNode,_15);
+this.startSize={w:_c.get(this.targetDomNode,"width",_15),h:_c.get(this.targetDomNode,"height",_15),pbw:_17.w,pbh:_17.h,mw:_18.w,mh:_18.h};
+if(!this.isLeftToRight()&&_c.get(this.targetDomNode,"position")=="absolute"){
+var p=_b.position(this.targetDomNode,true);
 this.startPosition={l:p.x,t:p.y};
 }
-this._pconnects=[_3.connect(_7.doc,"onmousemove",this,"_updateSizing"),_3.connect(_7.doc,"onmouseup",this,"_endSizing")];
+this._pconnects=[_3.connect(_7.doc,_e.move,this,"_updateSizing"),_3.connect(_7.doc,_e.release,this,"_endSizing")];
 _5.stop(e);
 },_updateSizing:function(e){
 if(this.activeResize){
@@ -82,7 +89,7 @@ if(!e.clientX||!e.clientY){
 return false;
 }
 }
-catch(e){
+catch(err){
 return false;
 }
 this._activeResizeLastEvent=e;
@@ -147,7 +154,7 @@ if(this.animateSizing){
 var _20=_8[this.animateMethod]([_6.animateProperty({node:this.targetDomNode,properties:{width:{start:this.startSize.w,end:tmp.w}},duration:this.animateDuration}),_6.animateProperty({node:this.targetDomNode,properties:{height:{start:this.startSize.h,end:tmp.h}},duration:this.animateDuration})]);
 _20.play();
 }else{
-_d.set(this.targetDomNode,{width:tmp.w+"px",height:tmp.h+"px"});
+_c.set(this.targetDomNode,{width:tmp.w+"px",height:tmp.h+"px"});
 }
 }
 if(this.intermediateChanges){
@@ -167,12 +174,5 @@ this._isSizing=false;
 this.onResize(e);
 },onResize:function(e){
 }});
-var _13=dojo.declare("dojox.layout._ResizeHelper",_f,{show:function(){
-_d.set(this.domNode,"display","");
-},hide:function(){
-_d.set(this.domNode,"display","none");
-},resize:function(dim){
-_c.setMarginBox(this.domNode,dim);
-}});
-return _12;
+return _13;
 });

@@ -13,9 +13,9 @@ define("dijit/layout/StackController", [
 	"../_TemplatedMixin",
 	"../_Container",
 	"../form/ToggleButton",
-	"dojo/touch",	// for normalized click handling, see dojoClick property setting in postCreate()
-	"dojo/i18n!../nls/common"
-], function(array, declare, domClass, domConstruct, keys, lang, on, topic, focus, registry, _Widget, _TemplatedMixin, _Container, ToggleButton){
+	"dojo/touch"	// for normalized click handling, see dojoClick property setting in postCreate()
+], function(array, declare, domClass, domConstruct, keys, lang, on, topic,
+			focus, registry, _Widget, _TemplatedMixin,_Container, ToggleButton){
 
 	// module:
 	//		dijit/layout/StackController

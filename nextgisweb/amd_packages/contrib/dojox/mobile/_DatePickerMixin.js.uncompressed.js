@@ -12,7 +12,7 @@ define("dojox/mobile/_DatePickerMixin", [
 
 	var slotMixin = {
 		format: function(/*Date*/d){
-			return datelocale.format(d, {datePattern:this.pattern, selector:"date"});
+			return datelocale.format(d, {datePattern:this.pattern, selector:"date",locale: this.picker.lang});
 		}
 	};
 
@@ -89,6 +89,7 @@ define("dojox/mobile/_DatePickerMixin", [
 			c[0] = declare(c[0], yearSlotMixin);
 			c[1] = declare(c[1], monthSlotMixin);
 			c[2] = declare(c[2], daySlotMixin);
+			p[2].picker = p[1].picker = p[0].picker = this;
 			p[0].pattern = this.yearPattern;
 			p[1].pattern = this.monthPattern;
 			p[2].pattern = this.dayPattern;
@@ -99,7 +100,7 @@ define("dojox/mobile/_DatePickerMixin", [
 			// summary:
 			//		Reorders the slots.			
 			if(this.slotOrder.length){ return; }
-			var a = datelocale._parseInfo().bundle["dateFormat-short"].toLowerCase().split(/[^ymd]+/, 3);
+			var a = datelocale._parseInfo({locale: this.lang}).bundle["dateFormat-short"].toLowerCase().split(/[^ymd]+/, 3);
 			this.slotOrder = array.map(a, function(pat){
 				return {y:0, m:1, d:2}[pat.charAt(0)];
 			});
@@ -196,7 +197,7 @@ define("dojox/mobile/_DatePickerMixin", [
 			//		private
 			var pat = this.slots[0].pattern + "/" + this.slots[1].pattern,
 				v = this.get("values"),
-				date = datelocale.parse(v[0] + "/" + v[1], {datePattern:pat, selector:"date"}),
+				date = datelocale.parse(v[0] + "/" + v[1], {datePattern:pat, selector:"date",locale: this.lang}),
 				daysInMonth = ddate.getDaysInMonth(date);
 			var changedDay = false;
 			if(daysInMonth < v[2]){
@@ -216,7 +217,7 @@ define("dojox/mobile/_DatePickerMixin", [
 			var v = this.get("values"), // [year, month, day]
 				s = this.slots,
 				pat = s[0].pattern + "/" + s[1].pattern + "/" + s[2].pattern;
-				return datelocale.parse(v[0] + "/" + v[1] + "/" + v[2], {datePattern:pat, selector:"date"});
+				return datelocale.parse(v[0] + "/" + v[1] + "/" + v[2], {datePattern:pat, selector:"date", locale: this.lang});
 		},
 
 		_setValuesAttr: function(/*Array*/values){

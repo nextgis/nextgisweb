@@ -167,6 +167,19 @@
 .mblSwDefaultShape .mblSwitchTextRightRtl {
   left: -40px;
 }
+.mblHeading .mblProgressIndicatorRtl {
+  float: right;
+}
+.mblProgContainerRtl {
+  left: 0;
+}
+.mblProgressIndicatorCenterRtl {
+  left: 0px;
+  display: inline-block;
+}
+.mblProgressIndicatorCenterRtl .mblProgContainerRtl {
+  left: 0px;
+}
 .mblCarouselItemRtl.mblCarouselSlot {
   float: right;
 }
@@ -308,4 +321,7 @@
 }
 .mblToggleButtonRtl.mblToggleButtonChecked:after {
   right: 7px;
+}
+.mblFormLayout.mblFormLayoutAuto.mblFormLayoutRightAlignRtl > * > *:last-child {
+  text-align: left;
 }

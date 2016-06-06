@@ -1,8 +1,8 @@
 //>>built
-define("dojox/lang/aspect",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.aspect");
+define("dojox/lang/aspect",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.aspect");
 (function(){
-var d=_2,_4=_3.lang.aspect,ap=Array.prototype,_5=[],_6;
+var d=_1,_4=_3.lang.aspect,ap=Array.prototype,_5=[],_6;
 var _7=function(){
 this.next_before=this.prev_before=this.next_around=this.prev_around=this.next_afterReturning=this.prev_afterReturning=this.next_afterThrowing=this.prev_afterThrowing=this;
 this.counter=0;

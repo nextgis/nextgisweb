@@ -72,7 +72,7 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 				vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler),
 				events = this.events();
 
-			for(var i = this.series.length - 1; i >= 0; --i){
+			for(var i = 0; i < this.series.length; i++){
 				var run = this.series[i];
 				if(!this.dirty && !run.dirty){
 					t.skip();
@@ -91,7 +91,6 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 					continue;
 				}
 
-				s = run.group;
 				var theme = t.next("circle", [this.opt, run]),
 					points = arr.map(run.data, function(v){
 						return v ? {
@@ -101,6 +100,13 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 						} : null;
 					}, this);
 
+				if(run.hidden){
+					run.dyn.fill = theme.series.fill;
+					run.dyn.stroke =  theme.series.stroke;
+					continue;
+				}
+				s = run.group;
+                
 				var frontCircles = null, outlineCircles = null, shadowCircles = null, styleFunc = this.opt.styleFunc;
 
 				var getFinalTheme = function(item){
@@ -113,7 +119,7 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 				// make shadows if needed
 				if(theme.series.shadow){
 					shadowCircles = arr.map(points, function(item, i){
-						if(item !== null){
+						if(!this.isNullValue(item)){
 							var finalTheme = getFinalTheme(run.data[i]),
 								shadow = finalTheme.series.shadow;
 							var shape = s.createCircle({
@@ -134,10 +140,10 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 				// make outlines if needed
 				if(theme.series.outline){
 					outlineCircles = arr.map(points, function(item, i){
-						if(item !== null){
+						if(!this.isNullValue(item)){
 							var finalTheme = getFinalTheme(run.data[i]),
 								outline = dc.makeStroke(finalTheme.series.outline);
-							outline.width = 2 * outline.width + theme.series.stroke.width;
+							outline.width = 2 * outline.width + (theme.series.stroke && theme.series.stroke.width || 0);
 							var shape = s.createCircle({
 								cx: item.x, cy: item.y, r: item.radius
 							}).setStroke(outline);
@@ -155,7 +161,7 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 
 				//	run through the data and add the circles.
 				frontCircles = arr.map(points, function(item, i){
-					if(item !== null){
+					if(!this.isNullValue(item)){
 						var finalTheme = getFinalTheme(run.data[i]),
 							rect = {
 								x: item.x - item.radius,

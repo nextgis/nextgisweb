@@ -87,6 +87,11 @@ if(!_1f){
 w=_f.getEnclosingView(evt.target);
 _1f=w&&w.domNode.parentNode||_6.body();
 }
+var src=_c.getEnclosingWidget(evt.target);
+if(src&&src.callback){
+_1d.context=src;
+_1d.method=src.callback;
+}
 this.openExternalView(_1d,_1f);
 return;
 }else{
@@ -122,7 +127,7 @@ _1d.moveTo=(_1d.moveTo.charAt(0)==="#"?"#"+_22.id:_22.id)+_23;
 if(!_21||(_1d.moveTo&&_21===_c.byId(_1d.moveTo.replace(/^#?([^&?]+).*/,"$1")))){
 return;
 }
-var src=_c.getEnclosingWidget(evt.target);
+src=_c.getEnclosingWidget(evt.target);
 if(src&&src.callback){
 _1d.context=src;
 _1d.method=src.callback;

@@ -1,6 +1,6 @@
-define("dojox/charting/plot2d/Base", ["dojo/_base/declare", "dojo/_base/array", "dojox/gfx",
+define("dojox/charting/plot2d/Base", ["dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojox/gfx",
 		"../Element", "./common", "../axis2d/common", "dojo/has"],
-	function(declare, arr, gfx, Element, common, ac, has){
+	function(declare, arr, lang, gfx, Element, common, ac, has){
 /*=====
 dojox.charting.plot2d.__PlotCtorArgs = {
 	// summary:
@@ -80,7 +80,7 @@ dojox.charting.plot2d.__PlotCtorArgs = {
 			//		Calculate the min/max on all attached series in both directions.
 			// returns: Object
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
-			return common.collectSimpleStats(this.series);
+			return common.collectSimpleStats(this.series, lang.hitch(this, "isNullValue"));
 		},
 		calculateAxes: function(dim){
 			// summary:

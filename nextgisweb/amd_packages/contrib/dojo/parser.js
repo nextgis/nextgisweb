@@ -28,23 +28,26 @@ map._extendCnt=_13;
 }
 return map;
 };
-var _18={};
-function _19(_1a,_1b){
-var ts=_1a.join();
-if(!_18[ts]){
+function _18(_19,_1a){
+if(!_1a){
+_1a=_1;
+}
+var _1b=_1a._dojoParserCtorMap||(_1a._dojoParserCtorMap={});
+var ts=_19.join();
+if(!_1b[ts]){
 var _1c=[];
-for(var i=0,l=_1a.length;i<l;i++){
-var t=_1a[i];
-_1c[_1c.length]=(_18[t]=_18[t]||(_3.getObject(t)||(~t.indexOf("/")&&(_1b?_1b(t):_1(t)))));
+for(var i=0,l=_19.length;i<l;i++){
+var t=_19[i];
+_1c[_1c.length]=(_1b[t]=_1b[t]||(_3.getObject(t)||(~t.indexOf("/")&&_1a(t))));
 }
 var _1d=_1c.shift();
-_18[ts]=_1c.length?(_1d.createSubclass?_1d.createSubclass(_1c):_1d.extend.apply(_1d,_1c)):_1d;
+_1b[ts]=_1c.length?(_1d.createSubclass?_1d.createSubclass(_1c):_1d.extend.apply(_1d,_1c)):_1d;
 }
-return _18[ts];
+return _1b[ts];
 };
 var _1e={_clearCache:function(){
 _13++;
-_18={};
+_ctorMap={};
 },_functionFromScript:function(_1f,_20){
 var _21="",_22="",_23=(_1f.getAttribute(_20+"args")||_1f.getAttribute("args")),_24=_1f.getAttribute("with");
 var _25=(_23||"").split(/\s*,\s*/);
@@ -70,7 +73,7 @@ _2e.push({node:_2f,types:_32});
 return this._instantiate(_2e,_28,_29);
 },_instantiate:function(_33,_34,_35,_36){
 var _37=_4.map(_33,function(obj){
-var _38=obj.ctor||_19(obj.types,_35.contextRequire);
+var _38=obj.ctor||_18(obj.types,_35.contextRequire);
 if(!_38){
 throw new Error("Unable to resolve constructor for: '"+obj.types.join()+"'");
 }
@@ -122,7 +125,7 @@ if(_49!=="dojo"){
 _4b[_4a+"props"]="data-dojo-props";
 _4b[_4a+"type"]="data-dojo-type";
 _4b[_4a+"mixins"]="data-dojo-mixins";
-_4b[_49+"type"]="dojoType";
+_4b[_49+"type"]="dojotype";
 _4b[_4a+"id"]="data-dojo-id";
 }
 var i=0,_4c,_4d=[],_4e,_4f;
@@ -329,7 +332,7 @@ var _7c=null;
 if(_79){
 var _7d=_6c.getAttribute(_6b),_7e=_7d?[_79].concat(_7d.split(/\s*,\s*/)):[_79];
 try{
-_7c=_19(_7e,_63.contextRequire);
+_7c=_18(_7e,_63.contextRequire);
 }
 catch(e){
 }
@@ -363,7 +366,7 @@ r(_65,function(){
 d.resolve(_4.filter(_64,function(_80){
 if(!_80.ctor){
 try{
-_80.ctor=_19(_80.types,_63.contextRequire);
+_80.ctor=_18(_80.types,_63.contextRequire);
 }
 catch(e){
 }

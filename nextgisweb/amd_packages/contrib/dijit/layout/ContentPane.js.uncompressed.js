@@ -6,7 +6,6 @@ define("dijit/layout/ContentPane", [
 	"./_ContentPaneResizeMixin",
 	"dojo/string", // string.substitute
 	"dojo/html", // html._ContentSetter
-	"dojo/i18n!../nls/loading",
 	"dojo/_base/array", // array.forEach
 	"dojo/_base/declare", // declare
 	"dojo/_base/Deferred", // Deferred
@@ -15,8 +14,9 @@ define("dijit/layout/ContentPane", [
 	"dojo/dom-construct", // empty()
 	"dojo/_base/xhr", // xhr.get
 	"dojo/i18n", // i18n.getLocalization
-	"dojo/when"
-], function(kernel, lang, _Widget, _Container, _ContentPaneResizeMixin, string, html, nlsLoading, array, declare,
+	"dojo/when",
+	"dojo/i18n!../nls/loading"
+], function(kernel, lang, _Widget, _Container, _ContentPaneResizeMixin, string, html, array, declare,
 			Deferred, dom, domAttr, domConstruct, xhr, i18n, when){
 
 	// module:
@@ -513,6 +513,7 @@ define("dijit/layout/ContentPane", [
 			// returns:
 			//		Returns a Deferred promise that is resolved when the content is parsed.
 
+			cont = this.preprocessContent(cont);
 			// first get rid of child widgets
 			this.destroyDescendants();
 
@@ -574,6 +575,17 @@ define("dijit/layout/ContentPane", [
 					self._onLoadHandler(cont);
 				}
 			});
+		},
+
+		preprocessContent: function(/*String|DocumentFragment*/ content){
+			// summary:
+			//		Hook, called after content has loaded, before being processed.
+			// description:
+			//		A subclass should preprocess the content and return the preprocessed content.
+			//		See https://bugs.dojotoolkit.org/ticket/9622
+			// returns:
+			//		Returns preprocessed content, either a String or DocumentFragment
+			return content;
 		},
 
 		_onError: function(type, err, consoleText){

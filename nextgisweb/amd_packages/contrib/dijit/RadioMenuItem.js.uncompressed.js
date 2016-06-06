@@ -1,8 +1,11 @@
 define("dijit/RadioMenuItem", [
+	"dojo/_base/array", // array.forEach
 	"dojo/_base/declare", // declare
 	"dojo/dom-class", // domClass.toggle
-	"./CheckedMenuItem"
-], function(declare, domClass, CheckedMenuItem){
+	"dojo/query!css2", // query
+	"./CheckedMenuItem",
+	"./registry"    // registry.getEnclosingWidget
+], function(array, declare, domClass, query, CheckedMenuItem, registry){
 
 	// module:
 	//		dijit/RadioButtonMenuItem
@@ -23,29 +26,20 @@ define("dijit/RadioMenuItem", [
 		// group: String
 		//		Toggling on a RadioMenuItem in a given group toggles off the other RadioMenuItems in that group.
 		group: "",
-
-		// mapping from group name to checked widget within that group (or null if no widget is checked)
-		_currentlyChecked: {},
+		_setGroupAttr: "domNode",	// needs to be set as an attribute so dojo/query can find it
 
 		_setCheckedAttr: function(/*Boolean*/ checked){
-			// summary:
-			//		Hook so attr('checked', bool) works.
-			//		Sets the class and state for the check box.
-
-			if(checked && this.group && this._currentlyChecked[this.group] && this._currentlyChecked[this.group] != this){
-				// if another RadioMenuItem in my group is checked, uncheck it
-				this._currentlyChecked[this.group].set("checked", false);
-			}
-
+			// If I am being checked then have to deselect currently checked items
 			this.inherited(arguments);
-
-			// set the currently checked widget to this, or null if we are clearing the currently checked widget
-			if(this.group){
-				if(checked){
-					this._currentlyChecked[this.group] = this;
-				}else if(this._currentlyChecked[this.group] == this){
-					this._currentlyChecked[this.group] = null;
-				}
+			if(!this._created){
+				return;
+			}
+			if(checked && this.group){
+				array.forEach(this._getRelatedWidgets(), function(widget){
+					if(widget != this && widget.checked){
+						widget.set('checked', false);
+					}
+				}, this);
 			}
 		},
 
@@ -60,6 +54,20 @@ define("dijit/RadioMenuItem", [
 				this.onChange(true);
 			}
 			this.onClick(evt);
+		},
+
+		_getRelatedWidgets: function(){
+			// Private function needed to help iterate over all radio menu items in a group.
+			var ary = [];
+			query("[group=" + this.group + "][role=" + this.role + "]").forEach(
+				function(menuItemNode){
+					var widget = registry.getEnclosingWidget(menuItemNode);
+					if(widget){
+						ary.push(widget);
+					}
+				}
+			);
+			return ary;
 		}
 	});
 });

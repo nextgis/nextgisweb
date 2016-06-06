@@ -182,6 +182,16 @@ break;
 }
 }
 }
+if(_5("dojo-bidi")){
+i=l-i;
+r=_2a[i];
+if(cd[_29]>1){
+cd[_29]=l-cd[_29]+1;
+if(cd[_29]>l){
+cd[_29]=l-0.1;
+}
+}
+}
 var x,y,px,py;
 if(typeof r=="number"){
 x=i+1;

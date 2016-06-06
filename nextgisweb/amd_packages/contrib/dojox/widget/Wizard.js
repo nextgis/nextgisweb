@@ -33,7 +33,7 @@ this.inherited(arguments);
 this._checkButtons();
 },_checkButtons:function(){
 var sw=this.selectedChildWidget;
-var _c=sw.isLastChild;
+var _c=sw.isLastChild||this.nextButton.get("disabled");
 this.nextButton.set("disabled",_c);
 this._setButtonClass(this.nextButton);
 if(sw.doneFunction){

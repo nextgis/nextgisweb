@@ -62,10 +62,6 @@ define("dijit/form/_FormWidget", [
 			// http://www.w3.org/TR/REC-html40/appendix/notes.html#h-B.3.2
 			this.nameAttrSetting = (this.name && !has("msapp")) ? ('name="' + this.name.replace(/"/g, "&quot;") + '"') : '';
 			this.inherited(arguments);
-		},
-
-		// Override automatic assigning type --> focusNode, it causes exception on IE.
-		// Instead, type must be specified as ${type} in the template, as part of the original DOM
-		_setTypeAttr: null
+		}
 	});
 });

@@ -179,7 +179,7 @@ define("dojo/request/iframe", [
 					var parentNode = formNode;
 					do{
 						parentNode = parentNode.parentNode;
-					}while(parentNode !== win.doc.documentElement);
+					}while(parentNode && parentNode !== win.doc.documentElement);
 
 					// Append the form node or some browsers won't work
 					if(!parentNode){
@@ -304,7 +304,7 @@ define("dojo/request/iframe", [
 						// IE6-8 have to parse the XML manually. See http://bugs.dojotoolkit.org/ticket/6334
 						if(doc.documentElement.tagName.toLowerCase() === 'html'){
 							query('a', doc.documentElement).orphan();
-							var xmlText = doc.documentElement.innerText;
+							var xmlText = doc.documentElement.innerText || doc.documentElement.textContent;
 							xmlText = xmlText.replace(/>\s+</g, '><');
 							response.text = lang.trim(xmlText);
 						}else{

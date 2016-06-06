@@ -70,11 +70,19 @@ define("dijit/form/_FormWidgetMixin", [
 
 		_setDisabledAttr: function(/*Boolean*/ value){
 			this._set("disabled", value);
-			domAttr.set(this.focusNode, 'disabled', value);
+
+			// Set disabled property if focusNode is an <input>, but aria-disabled attribute if focusNode is a <span>.
+			// Can't use "disabled" in this.focusNode as a test because on IE, that's true for all nodes.
+			if(/^(button|input|select|textarea|optgroup|option|fieldset)$/i.test(this.focusNode.tagName)){
+				domAttr.set(this.focusNode, 'disabled', value);
+			}else{
+				this.focusNode.setAttribute("aria-disabled", value ? "true" : "false");
+			}
+
+			// And also set disabled on the hidden <input> node
 			if(this.valueNode){
 				domAttr.set(this.valueNode, 'disabled', value);
 			}
-			this.focusNode.setAttribute("aria-disabled", value ? "true" : "false");
 
 			if(value){
 				// reset these, because after the domNode is disabled, we can no longer receive
@@ -114,7 +122,10 @@ define("dijit/form/_FormWidgetMixin", [
 				}))[0];
 				// Set a global event to handle mouseup, so it fires properly
 				// even if the cursor leaves this.domNode before the mouse up event.
-				var mouseUpHandle = this.own(on(this.ownerDocumentBody, "mouseup, touchend", lang.hitch(this, function(evt){
+				var event = has("pointer-events") ? "pointerup" : has("MSPointer") ? "MSPointerUp" :
+					has("touch-events") ? "touchend, mouseup" :		// seems like overkill but see #16622, #16725
+					"mouseup";
+				var mouseUpHandle = this.own(on(this.ownerDocumentBody, event, lang.hitch(this, function(evt){
 					mouseUpHandle.remove();
 					focusHandle.remove();
 					// if here, then the mousedown did not focus the focusNode as the default action

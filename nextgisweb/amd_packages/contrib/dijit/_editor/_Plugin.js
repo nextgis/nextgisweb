@@ -11,6 +11,7 @@ if(this.command.length){
 var _9=this.getLabel(this.command),_a=this.editor,_b=this.iconClassPrefix+" "+this.iconClassPrefix+this.command.charAt(0).toUpperCase()+this.command.substr(1);
 if(!this.button){
 var _c=_3.mixin({label:_9,ownerDocument:_a.ownerDocument,dir:_a.dir,lang:_a.lang,showLabel:false,iconClass:_b,dropDown:this.dropDown,tabIndex:"-1"},this.params||{});
+delete _c.name;
 this.button=new this.buttonClass(_c);
 }
 }

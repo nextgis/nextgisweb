@@ -125,7 +125,7 @@ return declare("dojo.Stateful", null, {
 		}
 		if(this._watchCallbacks){
 			var self = this;
-			// If setter returned a promise, wait for it to complete, otherwise call watches immediatly
+			// If setter returned a promise, wait for it to complete, otherwise call watches immediately
 			when(result, function(){
 				self._watchCallbacks(name, oldValue, value);
 			});
@@ -144,7 +144,7 @@ return declare("dojo.Stateful", null, {
 		// description:
 		//		Directly change the value of an attribute on an object, bypassing any 
 		//		accessor setter.  Also handles the calling of watch and emitting events. 
-		//		It is designed to be used by descendent class when there are two values 
+		//		It is designed to be used by descendant class when there are two values 
 		//		of attributes that are linked, but calling .set() is not appropriate.
 
 		var oldValue = this.get(name);

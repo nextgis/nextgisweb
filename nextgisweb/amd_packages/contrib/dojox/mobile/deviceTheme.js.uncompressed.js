@@ -33,7 +33,7 @@
 		//		theme={theme id} to force a specific theme through the browser
 		//		URL input. The available theme ids are Android, Holodark (theme introduced in Android 3.0), 
 		//		BlackBerry, Custom, iPhone, and iPad. The theme names are case-sensitive. If the given
-		//		id does not match, the iPhone theme is used.
+		//		id does not match, the iOS7 theme is used.
 		//
 		//	|	http://your.server.com/yourapp.html // automatic detection
 		//	|	http://your.server.com/yourapp.html?theme=Android // forces Android theme
@@ -42,6 +42,7 @@
 		//	|	http://your.server.com/yourapp.html?theme=Custom // forces Custom theme
 		//	|	http://your.server.com/yourapp.html?theme=iPhone // forces iPhone theme
 		//	|	http://your.server.com/yourapp.html?theme=iPad // forces iPad theme
+		//	|	http://your.server.com/yourapp.html?theme=ios7 // forces iOS 7 theme
 		//
 		//		To simulate a particular device from the application code, the user agent
 		//		can be forced by setting dojoConfig.mblUserAgent as follows:
@@ -49,7 +50,7 @@
 		//	|	<script src="dojox/mobile/deviceTheme.js" data-dojo-config="mblUserAgent: 'Holodark'"></script>
 		//	|	<script src="dojo/dojo.js" data-dojo-config="parseOnLoad: true"></script>
 		//
-		//		By default, an all-in-one theme file (e.g. themes/iphone/iphone.css) is
+		//		By default, an all-in-one theme file (e.g. themes/ios7/ios7.css) is
 		//		loaded. The all-in-one theme files contain style sheets for all the
 		//		dojox/mobile widgets regardless of whether they are used in your
 		//		application or not.
@@ -64,8 +65,8 @@
 		//		In the case of this example, if iphone is detected, for example, the
 		//		following files will be loaded:
 		//
-		//	|	dojox/mobile/themes/iphone/base.css
-		//	|	dojox/mobile/themes/iphone/Button.css
+		//	|	dojox/mobile/themes/ios7/base.css
+		//	|	dojox/mobile/themes/ios7/Button.css
 		//
 		//		If you want to load style sheets for your own custom widgets, you can
 		//		specify a package name along with a theme file name in an array.
@@ -74,18 +75,18 @@
 		//
 		//		In this case, the following files will be loaded.
 		//
-		//	|	dojox/mobile/themes/iphone/base.css
-		//	|	com/acme/themes/iphone/MyWidget.css
+		//	|	dojox/mobile/themes/ios7/base.css
+		//	|	com/acme/themes/ios7/MyWidget.css
 		//
 		//		If you specify '@theme' as a theme file name, it will be replaced with
-		//		the theme folder name (e.g. 'iphone'). For example,
+		//		the theme folder name (e.g. 'ios7'). For example,
 		//
 		//	|	['@theme',['com.acme','MyWidget']]
 		//
 		//		will load the following files:
 		//
-		//	|	dojox/mobile/themes/iphone/iphone.css
-		//	|	com/acme/themes/iphone/MyWidget.css
+		//	|	dojox/mobile/themes/ios7/ios7.css
+		//	|	com/acme/themes/ios7/MyWidget.css
 		
 		if(!win){
 			win = window;
@@ -136,7 +137,7 @@
 			//		Replaces the dojox/mobile object.
 			// description:
 			//		When this module is loaded from a script tag, dm is a plain
-			//		local object defined at the begining of this module.
+			//		local object defined at the beginning of this module.
 			//		common.js will replace the local dm object with the
 			//		real dojox/mobile object through this method.
 			dm = _dm;
@@ -171,6 +172,16 @@
 				[]
 			],
 			[
+				"Android 5",
+				"holodark",
+				[]
+			],
+			[
+				"Android 6",
+				"holodark",
+				[]
+			],
+			[
 				"Android",
 				"android",
 				[]
@@ -183,6 +194,41 @@
 			[
 				"BB10",
 				"blackberry",
+				[]
+			],
+			[
+				"ios7",
+				"ios7",
+				[]
+			],
+			[
+				"iPhone;.*OS 7_",
+				"ios7",
+				[]
+			],
+			[
+				"iPhone;.*OS 8_",
+				"ios7",
+				[]
+			],
+			[
+				"iPhone;.*OS 9_",
+				"ios7",
+				[]
+			],
+			[
+				"iPad;.*OS 7_",
+				"ios7",
+				[]
+			],
+			[
+				"iPad;.*OS 8_",
+				"ios7",
+				[]
+			],
+			[
+				"iPad;.*OS 9_",
+				"ios7",
 				[]
 			],
 			[
@@ -201,13 +247,13 @@
 				[]
 			],
 			[
-				"MSIE [6-9]",
-				"iphone",
+				"Windows Phone",
+				"windows",
 				[]
 			],
 			[
 				"Trident",
-				"windows",
+				"ios7",
 				[]
 			],
 			[
@@ -217,7 +263,7 @@
 			],
 			[
 				".*",
-				"iphone",
+				"ios7",
 				[]
 			]
 		];
@@ -269,7 +315,7 @@
 						// dojox.mobile mirroring support
 						var cssFilePath = files[j].toString();
 						if(config["dojo-bidi"] == true && cssFilePath.indexOf("_rtl") == -1){
-							var rtlCssList = "android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css";
+							var rtlCssList = "android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css ProgressIndicator.css Accordion.css GridLayout.css FormLayout.css";
 							var cssName = cssFilePath.substr(cssFilePath.lastIndexOf('/') + 1);
 							if(rtlCssList.indexOf(cssName) != -1){
 								this.loadCssFile(cssFilePath.replace(".css","_rtl.css"));

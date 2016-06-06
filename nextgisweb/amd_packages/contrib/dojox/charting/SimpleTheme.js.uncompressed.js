@@ -44,6 +44,7 @@ define("dojox/charting/SimpleTheme", ["dojo/_base/lang", "dojo/_base/array","doj
 	//		The default theme (and structure) looks like so:
 	//	|	// all objects are structs used directly in dojox.gfx
 	//	|	chart:{
+	//	|		margins: {l: 10, t: 10, r: 10, b: 10},
 	//	|		stroke: null,
 	//	|		fill: "white",
 	//	|		pageStyle: null // suggested page style as an object suitable for dojo.style()
@@ -494,7 +495,8 @@ lang.mixin(SimpleTheme, {
 			titleGap:		20,
 			titlePos:		"top",
 			titleFont:      "normal normal bold 14pt Tahoma",	// chart title
-			titleFontColor: "#333"
+			titleFontColor: "#333",
+			titleAlign: "middle"
 		},
 		plotarea:{
 			stroke: null,

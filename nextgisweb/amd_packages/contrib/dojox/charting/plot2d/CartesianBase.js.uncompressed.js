@@ -53,6 +53,8 @@ define("dojox/charting/plot2d/CartesianBase", ["dojo/_base/lang", "dojo/_base/de
 	});
 	=====*/
 
+	var alwaysFalse = function(){ return false; }
+
 	return declare("dojox.charting.plot2d.CartesianBase", Base, {
 		baseParams: {
 			hAxis: 			"x",
@@ -285,6 +287,17 @@ define("dojox/charting/plot2d/CartesianBase", ["dojo/_base/lang", "dojo/_base/de
 				this._vScaler = primitive.buildScaler(stats.vmin, stats.vmax, dim.height);
 			}
 			return this;	//	dojox/charting/plot2d/CartesianBase
-		}
+		},
+		isNullValue: function(value){
+			if(value === null || typeof value == "undefined"){
+				return true;
+			}
+			var h = this._hAxis ? this._hAxis.isNullValue : alwaysFalse,
+				v = this._vAxis ? this._vAxis.isNullValue : alwaysFalse;
+			if(typeof value == "number"){
+				return h(1) || v(value);
+			}
+			return h(isNaN(value.x) ? 1 : value.x) || value.y === null || v(value.y);
+		}		
 	});
 });

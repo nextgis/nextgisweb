@@ -220,7 +220,9 @@ define("dojo/router/RouterBase", [
 		},
 
 		destroy: function(){
-			this._hashchangeHandle.remove();
+			if(this._hashchangeHandle){
+				this._hashchangeHandle.remove();
+			} 			
 			this._routes = null;
 			this._routeIndex = null;
 		},

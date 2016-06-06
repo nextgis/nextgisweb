@@ -81,7 +81,7 @@ _2._KeyNavContainer.superclass.addChild.apply(this,arguments);
 },_onToolbarEvent:function(evt){
 evt.stopPropagation();
 }});
-var _1b=_1.declare("dojox.editor.plugins.FindReplace",[_f],{buttonClass:_2.form.ToggleButton,iconClassPrefix:"dijitEditorIconsFindReplace",editor:null,button:null,_frToolbar:null,_closeBox:null,_findField:null,_replaceField:null,_findButton:null,_replaceButton:null,_replaceAllButton:null,_caseSensitive:null,_backwards:null,_promDialog:null,_promDialogTimeout:null,_strings:null,_initButton:function(){
+var _1b=_1.declare("dojox.editor.plugins.FindReplace",[_f],{buttonClass:_2.form.ToggleButton,iconClassPrefix:"dijitEditorIconsFindReplace",editor:null,button:null,_frToolbar:null,_closeBox:null,_findField:null,_replaceField:null,_findButton:null,_replaceButton:null,_replaceAllButton:null,_caseSensitive:null,_backwards:null,_promDialog:null,_promDialogTimeout:null,_strings:null,_bookmark:null,_initButton:function(){
 this._strings=_1.i18n.getLocalization("dojox.editor.plugins","FindReplace");
 this.button=new _2.form.ToggleButton({label:this._strings["findReplace"],showLabel:false,iconClass:this.iconClassPrefix+" dijitEditorIconFindString",tabIndex:"-1",onChange:_1.hitch(this,"_toggleFindReplace")});
 if(_1.isOpera){
@@ -290,39 +290,60 @@ if(win.find){
 _37=win.find(txt,_35,_36,false,false,false,false);
 }else{
 var doc=ed.document;
-if(doc.selection){
+if(doc.selection||win.getSelection){
 this.editor.focus();
 var _38=doc.body.createTextRange();
-var _39=doc.selection?doc.selection.createRange():null;
-if(_39){
+var _39=_38.duplicate();
+var _3a=win.getSelection();
+var _3b=_3a.getRangeAt(0);
+var _3c=doc.selection?doc.selection.createRange():null;
+if(_3c){
 if(_36){
-_38.setEndPoint("EndToStart",_39);
+_38.setEndPoint("EndToStart",_3c);
 }else{
-_38.setEndPoint("StartToEnd",_39);
+_38.setEndPoint("StartToEnd",_3c);
 }
-}
-var _3a=_35?4:0;
+}else{
+if(this._bookmark){
+var _3d=win.getSelection().toString();
+_38.moveToBookmark(this._bookmark);
+if(_38.text!=_3d){
+_38=_39.duplicate();
+this._bookmark=null;
+}else{
 if(_36){
-_3a=_3a|1;
+_39.setEndPoint("EndToStart",_38);
+_38=_39.duplicate();
+}else{
+_39.setEndPoint("StartToEnd",_38);
+_38=_39.duplicate();
 }
-_37=_38.findText(txt,_38.text.length,_3a);
+}
+}
+}
+var _3e=_35?4:0;
+if(_36){
+_3e=_3e|1;
+}
+_37=_38.findText(txt,_38.text.length,_3e);
 if(_37){
 _38.select();
+this._bookmark=_38.getBookmark();
 }
 }
 }
 }
 return _37;
-},_filterRegexp:function(_3b,_3c){
+},_filterRegexp:function(_3f,_40){
 var rxp="";
 var c=null;
-for(var i=0;i<_3b.length;i++){
-c=_3b.charAt(i);
+for(var i=0;i<_3f.length;i++){
+c=_3f.charAt(i);
 switch(c){
 case "\\":
 rxp+=c;
 i++;
-rxp+=_3b.charAt(i);
+rxp+=_3f.charAt(i);
 break;
 case "$":
 case "^":
@@ -342,7 +363,7 @@ rxp+=c;
 }
 }
 rxp="^"+rxp+"$";
-if(_3c){
+if(_40){
 return new RegExp(rxp,"mi");
 }else{
 return new RegExp(rxp,"m");
@@ -373,8 +394,8 @@ _1.subscribe(_2._scopeName+".Editor.getPlugin",null,function(o){
 if(o.plugin){
 return;
 }
-var _3d=o.args.name.toLowerCase();
-if(_3d==="findreplace"){
+var _41=o.args.name.toLowerCase();
+if(_41==="findreplace"){
 o.plugin=new _1b({});
 }
 });

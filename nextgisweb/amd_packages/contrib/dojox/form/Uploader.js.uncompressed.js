@@ -275,7 +275,7 @@ define("dojox/form/Uploader", [
 			//
 			delete this._files;
 			this._disconnectButton();
-			array.forEach(this._inputs, domConstruct.destroy, dojo);
+			array.forEach(this._inputs, domConstruct.destroy);
 			this._inputs = [];
 			this._nameIndex = 0;
 			this._createInput();

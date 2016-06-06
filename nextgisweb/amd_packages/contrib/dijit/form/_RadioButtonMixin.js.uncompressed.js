@@ -3,7 +3,7 @@ define("dijit/form/_RadioButtonMixin", [
 	"dojo/_base/declare", // declare
 	"dojo/dom-attr", // domAttr.set
 	"dojo/_base/lang", // lang.hitch
-	"dojo/query", // query
+	"dojo/query!css2", // query
 	"../registry"    // registry.getEnclosingWidget
 ], function(array, declare, domAttr, lang, query, registry){
 
@@ -60,6 +60,7 @@ define("dijit/form/_RadioButtonMixin", [
 				e.preventDefault();
 				return false;
 			}
+
 			if(this.readOnly){ // ignored by some browsers so we have to resync the DOM elements with widget values
 				e.stopPropagation();
 				e.preventDefault();
@@ -68,7 +69,44 @@ define("dijit/form/_RadioButtonMixin", [
 				}));
 				return false;
 			}
-			return this.inherited(arguments);
+
+			// RadioButton has some unique logic since it must enforce only a single button being checked at once
+			// For this reason the "_onClick" method does not call this.inherited
+
+			var canceled = false;
+			var previouslyCheckedButton;
+
+			array.some(this._getRelatedWidgets(), function(radioButton){
+				if(radioButton.checked){
+					previouslyCheckedButton = radioButton;
+					return true;
+				}
+				return false;
+			});
+
+			// We want to set the post-click values correctly for any event handlers, but since
+			// the event handlers could revert them, we don't want to fully update the widget state
+			// yet and trigger notifications
+			this.checked = true;
+			previouslyCheckedButton && (previouslyCheckedButton.checked = false);
+
+			// Call event handlers
+			// If event handler prevents it, the clicked radio button will not be checked
+			if(this.onClick(e) === false || e.defaultPrevented){
+				canceled = true;
+			}
+
+			// Reset internal state to how it was before the click
+			this.checked = false;
+			previouslyCheckedButton && (previouslyCheckedButton.checked = true);
+
+			if(canceled){
+				e.preventDefault();
+			}else{
+				this.set('checked', true);
+			}
+
+			return !canceled;
 		}
 	});
 });

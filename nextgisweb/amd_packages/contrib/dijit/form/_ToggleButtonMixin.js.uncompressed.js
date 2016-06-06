@@ -48,6 +48,12 @@ define("dijit/form/_ToggleButtonMixin", [
 				// need this here instead of on the template so IE8 tab order works
 				node.setAttribute('checked', 'checked');
 			}
+
+			// Update our reset value if it hasn't yet been set (because this.set()
+			// is only called when there *is* a value)
+			if(this._resetValue === undefined){
+				this._lastValueReported = this._resetValue = this.checked;
+			}
 		},
 
 		reset: function(){

@@ -130,7 +130,7 @@ define("dojox/mvc/WidgetList", [
 		childType: "",
 
 		// childMixins: String|String[]|Function
-		//		The list of module IDs (separated by comma), or a functinon that takes child data as the argument and returns it, of the classes that will be mixed into child widget. childClz takes precedence over childType/this.
+		//		The list of module IDs (separated by comma), or a function that takes child data as the argument and returns it, of the classes that will be mixed into child widget. childClz takes precedence over childType/this.
 		//		Can be specified via data-mvc-child-mixins attribute of widget declaration.
 		childMixins: "",
 

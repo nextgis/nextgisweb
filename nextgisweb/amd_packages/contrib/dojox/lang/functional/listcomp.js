@@ -1,6 +1,6 @@
 //>>built
-define("dojox/lang/functional/listcomp",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.functional.listcomp");
+define("dojox/lang/functional/listcomp",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.functional.listcomp");
 (function(){
 var _4=/\bfor\b|\bif\b/gm;
 var _5=function(s){
@@ -15,7 +15,7 @@ _9.push("}");
 }
 return _8.join("")+"r.push("+_6[0]+");"+_9.join("")+"return r;";
 };
-_2.mixin(_3.lang.functional,{buildListcomp:function(s){
+_1.mixin(_3.lang.functional,{buildListcomp:function(s){
 return "function(){"+_5(s)+"}";
 },compileListcomp:function(s){
 return new Function([],_5(s));

@@ -55,6 +55,9 @@ if(_17){
 clearTimeout(_17);
 }
 _f.text=_15.join("");
+if(!_2.checkStatus(_f.status)){
+def.reject({message:"http response code "+_f.status,response:_f});
+}
 try{
 _3(_f);
 def.resolve(_f);

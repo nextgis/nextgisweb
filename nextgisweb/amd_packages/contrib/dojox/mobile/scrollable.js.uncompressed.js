@@ -9,11 +9,16 @@ define("dojox/mobile/scrollable", [
 	"dojo/dom-style",
 	"dojo/dom-geometry",
 	"dojo/touch",
+	"dijit/registry",
+	"dijit/form/_TextBoxMixin",
 	"./sniff",
 	"./_css3",
-	"./_maskUtils"
+	"./_maskUtils",
+	"./common",
+	"dojo/_base/declare",
+	"dojo/has!dojo-bidi?dojox/mobile/bidi/Scrollable"
 ], function(dojo, connect, event, lang, win, domClass, domConstruct, domStyle,
-			domGeom, touch, has, css3, maskUtils){
+			 domGeom, touch, registry, TextBoxMixin, has, css3, maskUtils, common, declare, BidiScrollable){
 
 	// module:
 	//		dojox/mobile/scrollable
@@ -148,9 +153,7 @@ define("dojox/mobile/scrollable", [
 				}
 			}
 			// prevent browser scrolling on IE10 (evt.preventDefault() is not enough)
-			if(typeof this.domNode.style.msTouchAction != "undefined"){
-				this.domNode.style.msTouchAction = "none";
-			}
+			common._setTouchAction(this.domNode, "none");
 			this.touchNode = this.touchNode || this.containerNode;
 			this._v = (this.scrollDir.indexOf("v") != -1); // vertical scrolling
 			this._h = (this.scrollDir.indexOf("h") != -1); // horizontal scrolling
@@ -171,11 +174,11 @@ define("dojox/mobile/scrollable", [
 				}
 				if(!this._useTopLeft){
 					if(this._useTransformTransition){
-						this._ch.push(connect.connect(this.domNode, css3.name("transitionEnd"), this, "onFlickAnimationEnd"));
-						this._ch.push(connect.connect(this.domNode, css3.name("transitionStart"), this, "onFlickAnimationStart"));
+						this._ch.push(connect.connect(this.containerNode, css3.name("transitionEnd"), this, "onFlickAnimationEnd"));
+						// Note that there is no transitionstart event (#17822).
 					}else{
-						this._ch.push(connect.connect(this.domNode, css3.name("animationEnd"), this, "onFlickAnimationEnd"));
-						this._ch.push(connect.connect(this.domNode, css3.name("animationStart"), this, "onFlickAnimationStart"));
+						this._ch.push(connect.connect(this.containerNode, css3.name("animationEnd"), this, "onFlickAnimationEnd"));
+						this._ch.push(connect.connect(this.containerNode, css3.name("animationStart"), this, "onFlickAnimationStart"));
 	
 						// Creation of keyframes takes a little time. If they are created
 						// in a lazy manner, a slight delay is noticeable when you start
@@ -188,8 +191,8 @@ define("dojox/mobile/scrollable", [
 						domStyle.set(this.containerNode, css3.name("transform"), "translate3d(0,0,0)");
 					}
 				}else{
-					this._ch.push(connect.connect(this.domNode, css3.name("transitionEnd"), this, "onFlickAnimationEnd"));
-					this._ch.push(connect.connect(this.domNode, css3.name("transitionStart"), this, "onFlickAnimationStart"));
+					this._ch.push(connect.connect(this.containerNode, css3.name("transitionEnd"), this, "onFlickAnimationEnd"));
+					// Note that there is no transitionstart event (#17822).
 				}
 			}
 
@@ -384,7 +387,9 @@ define("dojox/mobile/scrollable", [
 		},
 
 		onFlickAnimationStart: function(e){
-			event.stop(e);
+			if(e){
+				event.stop(e);
+			}
 		},
 
 		onFlickAnimationEnd: function(e){
@@ -474,8 +479,14 @@ define("dojox/mobile/scrollable", [
 			this._locked = false;
 			this._moved = false;
 
+			this._preventDefaultInNextTouchMove = true; // #17502
 			if(!this.isFormElement(e.target)){
+				// Call preventDefault to avoid browser scroll, except for form elements 
+				// for which doing it in touch.press would forbid the virtual keyboard 
+				// from showing up (for form elements which are text widgets, preventDefault
+				// is called in touch.move). 
 				this.propagatable ? e.preventDefault() : event.stop(e);
+				this._preventDefaultInNextTouchMove = false;
 			}
 		},
 
@@ -483,6 +494,22 @@ define("dojox/mobile/scrollable", [
 			// summary:
 			//		User-defined function to handle touchMove events.
 			if(this._locked){ return; }
+			
+			if(this._preventDefaultInNextTouchMove){ // #17502
+				this._preventDefaultInNextTouchMove = false; // only in the first touch.move
+				var enclosingWidget = registry.getEnclosingWidget(
+					// On touch-enabled devices, e.target can be different in touch.move than in
+					// touch.start. Hence:
+					((e.targetTouches && e.targetTouches.length === 1) ? e.targetTouches[0] : e).target);
+				if(enclosingWidget && enclosingWidget.isInstanceOf(TextBoxMixin)){
+					// For touches on text widgets for which e.preventDefault() has not been
+					// called in onTouchStart, call it in onTouchMove() to avoid browser scroll.
+					// Not done on other elements such that for instance a native slider
+					// can still handle touchmove events.
+					this.propagatable ? e.preventDefault() : event.stop(e);
+				}
+			}
+			
 			var x = e.touches ? e.touches[0].pageX : e.clientX;
 			var y = e.touches ? e.touches[0].pageY : e.clientY;
 			var dx = x - this.touchStartX;
@@ -752,6 +779,10 @@ define("dojox/mobile/scrollable", [
 			// summary:
 			//		Stops the currently running animation.
 			domClass.remove(this.containerNode, "mblScrollableScrollTo2");
+			this.containerNode.className = this.containerNode.className
+				.replace(/mblScrollableScrollTo2-[^ ]+/, ""); // TODO: remove supports regexp?
+				// TODO: there must be a better way than hardcoding this class name in
+				// 20 different places and 2 files
 			if(this._scrollBarV){
 				this._scrollBarV.className = "";
 			}
@@ -1215,6 +1246,7 @@ define("dojox/mobile/scrollable", [
 						if(to.y === undefined){ to.y = from.y; }
 						 // make sure we actually change the transform, otherwise no webkitTransitionEnd is fired.
 						if(to.x !== from.x || to.y !== from.y){
+							this.onFlickAnimationStart(); // needed because there is no transitionstart event.
 							domStyle.set(node, css3.add({}, {
 								transitionProperty: css3.name("transform"),
 								transitionDuration: duration + "s",
@@ -1234,11 +1266,13 @@ define("dojox/mobile/scrollable", [
 						}
 					}else{
 						// use -webkit-transform + -webkit-animation
-						this.setKeyframes(from, to, idx);
+						var entering = this.findDisp(this.domNode) === this.domNode;
+						var className = this.setKeyframes(from, to, idx, entering);
 						domStyle.set(node, css3.add({}, {
 							animationDuration: duration + "s",
 							animationTimingFunction: easing
 						}));
+						domClass.add(node, className);
 						domClass.add(node, "mblScrollableScrollTo"+idx);
 						if(idx == 2){
 							this.scrollTo(to, true, node);
@@ -1246,17 +1280,27 @@ define("dojox/mobile/scrollable", [
 							this.scrollScrollBarTo(to);
 						}
 					}
-				}else{
+				}else if(to.x !== undefined || to.y !== undefined){
+					this.onFlickAnimationStart(); // #17822: needed because there is no transitionstart event.
 					domStyle.set(node, css3.add({}, {
-						transitionProperty: "top, left",
+						// #17822 when scrolling on one direction, avoid unnecessarily animating
+						// both top and left, because this leads to two transitionend events fired 
+						// instead of one in some browsers (Safari/iOS7 at least).
+						transitionProperty: (to.x !== undefined && to.y !== undefined) ?
+							"top, left" :
+							to.y !== undefined ? "top" : "left",
 						transitionDuration: duration + "s",
 						transitionTimingFunction: easing
 					}));
 					setTimeout(function(){ // setTimeout is needed to prevent webkitTransitionEnd not fired
-						domStyle.set(node, {
-							top: (to.y || 0) + "px",
-							left: (to.x || 0) + "px"
-						});
+						var style = {};
+						if(to.x !== undefined){
+							style.left = to.x + "px";
+						}
+						if(to.y !== undefined){
+							style.top = to.y + "px";
+						}
+						domStyle.set(node, style);
 					}, 0);
 					domClass.add(node, "mblScrollableScrollTo"+idx);
 				}
@@ -1269,19 +1313,29 @@ define("dojox/mobile/scrollable", [
 				//
 				// This module itself does not make dependency on them.
 				// TODO: for 2.0 the dojo global is going away. Use require("dojo/fx") and require("dojo/fx/easing") instead.
+				
+				var self = this;
 				var s = dojo.fx.slideTo({
 					node: node,
 					duration: duration*1000,
 					left: to.x,
 					top: to.y,
-					easing: (easing == "ease-out") ? dojo.fx.easing.quadOut : dojo.fx.easing.linear
+					easing: (easing == "ease-out") ? dojo.fx.easing.quadOut : dojo.fx.easing.linear,
+					onBegin: function(){ // #17822
+						if(idx == 2){
+							self.onFlickAnimationStart();
+						}
+					},
+					onEnd: function(){
+						if(idx == 2){
+							self.onFlickAnimationEnd();
+						}
+					}
 				}).play();
-				if(idx == 2){
-					connect.connect(s, "onEnd", this, "onFlickAnimationEnd");
-				}
 			}else{
 				// directly jump to the destination without animation
 				if(idx == 2){
+					this.onFlickAnimationStart(); // #17822
 					this.scrollTo(to, false, node);
 					this.onFlickAnimationEnd();
 				}else{
@@ -1318,8 +1372,7 @@ define("dojox/mobile/scrollable", [
 			//		This function creates a mask that hides corners of one scroll
 			//		bar edge to make it round edge. The other side of the edge is
 			//		always visible and round shaped with the border-radius style.
-			if(!(has("webkit")||has("svg"))){ return; }
-			//var ctx;
+			if(!(has("mask-image"))){ return; }
 			if(this._scrollBarWrapperV){
 				var h = this._scrollBarWrapperV.offsetHeight;
 				maskUtils.createRoundMask(this._scrollBarWrapperV, 0, 0, 0, 0, 5, h, 2, 2, 0.5);
@@ -1357,7 +1410,7 @@ define("dojox/mobile/scrollable", [
 			//		unexpectedly when the user flicks the screen to scroll.
 			//		Note that only the desktop browsers need the cover.
 
-			if(!has('touch') && !this.noCover){
+			if(!has("touch") && !this.noCover){
 				if(!dm._cover){
 					dm._cover = domConstruct.create("div", null, win.doc.body);
 					dm._cover.className = "mblScrollableCover";
@@ -1384,29 +1437,32 @@ define("dojox/mobile/scrollable", [
 			// summary:
 			//		Removes the transparent DIV cover.
 
-			if(!has('touch') && dm._cover){
+			if(!has("touch") && dm._cover){
 				dm._cover.style.display = "none";
 				this.setSelectable(dm._cover, true);
 				this.setSelectable(this.domNode, true);
 			}
 		},
 
-		setKeyframes: function(/*Object*/from, /*Object*/to, /*Number*/idx){
+		setKeyframes: function(/*Object*/from, /*Object*/to, /*Number*/idx, entering){
 			// summary:
 			//		Programmatically sets key frames for the scroll animation.
 
 			if(!dm._rule){
 				dm._rule = [];
 			}
+
+			var keyframeId = idx + (entering ? "-in" : "-out");
+
 			// idx: 0:scrollbarV, 1:scrollbarH, 2:content
-			if(!dm._rule[idx]){
+			if(!(dm._rule[keyframeId])){
 				var node = domConstruct.create("style", null, win.doc.getElementsByTagName("head")[0]);
 				node.textContent =
-					".mblScrollableScrollTo"+idx+"{" + css3.name("animation-name", true) + ": scrollableViewScroll"+idx+";}"+
-					"@" + css3.name("keyframes", true) + " scrollableViewScroll"+idx+"{}";
-				dm._rule[idx] = node.sheet.cssRules[1];
+					".mblScrollableScrollTo"+keyframeId+"{" + css3.name("animation-name", true) + ": scrollableViewScroll"+keyframeId+";}"+
+					"@" + css3.name("keyframes", true) + " scrollableViewScroll"+keyframeId+"{}";
+				dm._rule[keyframeId] = node.sheet.cssRules[1];
 			}
-			var rule = dm._rule[idx];
+			var rule = dm._rule[keyframeId];
 			if(rule){
 				if(from){
 					rule.deleteRule(has("webkit")?"from":0);
@@ -1419,6 +1475,7 @@ define("dojox/mobile/scrollable", [
 					(rule.insertRule||rule.appendRule).call(rule, "to { " + css3.name("transform", true) + ": "+this.makeTranslateStr(to)+"; }");
 				}
 			}
+			return "mblScrollableScrollTo"+keyframeId;
 		},
 
 		setSelectable: function(/*DomNode*/node, /*Boolean*/selectable){
@@ -1438,7 +1495,7 @@ define("dojox/mobile/scrollable", [
 			}
 		}
 	});
-
+	Scrollable = has("dojo-bidi") ? declare("dojox.mobile.Scrollable", [Scrollable, BidiScrollable]) : Scrollable;
 	lang.setObject("dojox.mobile.scrollable", Scrollable);
 
 	return Scrollable;

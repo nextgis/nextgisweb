@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/mobile/app/_event", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/mobile/app/_event", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.mobile.app._event");
 dojo.experimental("dojox.mobile.app._event.js");
 

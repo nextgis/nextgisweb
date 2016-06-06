@@ -22,7 +22,11 @@ define("dijit/focus", [
 	// module:
 	//		dijit/focus
 
+	// Time of the last focusin event
 	var lastFocusin;
+
+	// Time of the last touch/mousedown or focusin event
+	var lastTouchOrFocusin;
 
 	var FocusManager = declare([Stateful, Evented], {
 		// summary:
@@ -97,10 +101,10 @@ define("dijit/focus", [
 				body = targetWindow.document && targetWindow.document.body;
 
 			if(body){
-				var mdh = on(targetWindow.document, 'mousedown, touchstart', function(evt){
-					_this._justMouseDowned = true;
-					setTimeout(function(){ _this._justMouseDowned = false; }, 0);
-
+				// Listen for touches or mousedowns... could also use dojo/touch.press here.
+				var event = has("pointer-events") ? "pointerdown" : has("MSPointer") ? "MSPointerDown" :
+					has("touch-events") ? "mousedown, touchstart" : "mousedown";
+				var mdh = on(targetWindow.document, event, function(evt){
 					// workaround weird IE bug where the click is on an orphaned node
 					// (first time clicking a Select/DropDownButton inside a TooltipDialog).
 					// actually, strangely this is happening on latest chrome too.
@@ -112,9 +116,6 @@ define("dijit/focus", [
 				});
 
 				var fih = on(body, 'focusin', function(evt){
-
-					lastFocusin = (new Date()).getTime();
-
 					// When you refocus the browser window, IE gives an event with an empty srcElement
 					if(!evt.target.tagName) { return; }
 
@@ -134,12 +135,6 @@ define("dijit/focus", [
 				});
 
 				var foh = on(body, 'focusout', function(evt){
-					// IE9+ has a problem where focusout events come after the corresponding focusin event.  At least
-					// when moving focus from the Editor's <iframe> to a normal DOMNode.
-					if((new Date()).getTime() < lastFocusin + 100){
-						return;
-					}
-
 					_this._onBlurNode(effectiveNode || evt.target);
 				});
 
@@ -162,6 +157,15 @@ define("dijit/focus", [
 			//		which indicates that we tabbed off the last field on the page,
 			//		in which case every widget is marked inactive
 
+			var now = (new Date()).getTime();
+
+			// IE9+ and chrome have a problem where focusout events come after the corresponding focusin event.
+			// For chrome problem see https://bugs.dojotoolkit.org/ticket/17668.
+			// IE problem happens when moving focus from the Editor's <iframe> to a normal DOMNode.
+			if(now < lastFocusin + 100){
+				return;
+			}
+
 			// If the blur event isn't followed by a focus event, it means the user clicked on something unfocusable,
 			// so clear focus.
 			if(this._clearFocusTimer){
@@ -172,16 +176,19 @@ define("dijit/focus", [
 				this.set("curNode", null);
 			}), 0);
 
-			if(this._justMouseDowned){
-				// the mouse down caused a new widget to be marked as active; this blur event
-				// is coming late, so ignore it.
-				return;
-			}
-
-			// If the blur event isn't followed by a focus or touch event then mark all widgets as inactive.
+			// Unset timer to zero-out widget stack; we'll reset it below if appropriate.
 			if(this._clearActiveWidgetsTimer){
 				clearTimeout(this._clearActiveWidgetsTimer);
 			}
+
+			if(now < lastTouchOrFocusin + 100){
+				// This blur event is coming late (after the call to _onTouchNode() rather than before.
+				// So let _onTouchNode() handle setting the widget stack.
+				// See https://bugs.dojotoolkit.org/ticket/17668
+				return;
+			}
+
+			// If the blur event isn't followed (or preceded) by a focus or touch event then mark all widgets as inactive.
 			this._clearActiveWidgetsTimer = setTimeout(lang.hitch(this, function(){
 				delete this._clearActiveWidgetsTimer;
 				this._setStack([]);
@@ -190,14 +197,18 @@ define("dijit/focus", [
 
 		_onTouchNode: function(/*DomNode*/ node, /*String*/ by){
 			// summary:
-			//		Callback when node is focused or mouse-downed
+			//		Callback when node is focused or touched.
+			//		Note that _onFocusNode() calls _onTouchNode().
 			// node:
 			//		The node that was touched.
 			// by:
 			//		"mouse" if the focus/touch was caused by a mouse down event
 
-			// ignore the recent blurNode event
+			// Keep track of time of last focusin or touch event.
+			lastTouchOrFocusin = (new Date()).getTime();
+
 			if(this._clearActiveWidgetsTimer){
+				// forget the recent blur event
 				clearTimeout(this._clearActiveWidgetsTimer);
 				delete this._clearActiveWidgetsTimer;
 			}
@@ -256,8 +267,11 @@ define("dijit/focus", [
 				return;
 			}
 
-			// There was probably a blur event right before this event, but since we have a new focus, don't
-			// do anything with the blur
+			// Keep track of time of last focusin event.
+			lastFocusin = (new Date()).getTime();
+
+			// There was probably a blur event right before this event, but since we have a new focus,
+			// forget about the blur
 			if(this._clearFocusTimer){
 				clearTimeout(this._clearFocusTimer);
 				delete this._clearFocusTimer;

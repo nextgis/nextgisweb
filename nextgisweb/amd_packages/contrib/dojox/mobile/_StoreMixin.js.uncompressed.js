@@ -83,7 +83,16 @@ define("dojox/mobile/_StoreMixin", [
 							if(newIndex != previousIndex){
 								// item removed or moved
 								_this.onDelete(object, previousIndex);
-								// TODO: support move, i.e. newIndex != -1?
+								if(newIndex != -1){
+									if (_this.onAdd) {
+										 // new widget with onAdd method defined
+										_this.onAdd(object, newIndex);
+									} else {
+										// TODO remove in 2.0
+										// compatibility with 1.8: onAdd did not exist, add was handled by onUpdate
+										_this.onUpdate(object, newIndex);
+									}
+								}
 							}else{
 								// item modified
 								// if onAdd is not defined, we are "bug compatible" with 1.8 and we do nothing.

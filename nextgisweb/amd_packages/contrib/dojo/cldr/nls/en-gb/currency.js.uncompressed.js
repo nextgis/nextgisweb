@@ -1,8 +1,8 @@
 define(
 "dojo/cldr/nls/en-gb/currency", //begin v1.x content
 {
+	"USD_symbol": "$",
 	"CAD_symbol": "CA$",
-	"EUR_displayName": "Euro",
 	"GBP_displayName": "British Pound",
 	"GBP_symbol": "£",
 	"HKD_symbol": "HK$",

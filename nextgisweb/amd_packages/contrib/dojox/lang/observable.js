@@ -1,7 +1,7 @@
 //>>built
-define("dojox/lang/observable",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.observable");
-_2.experimental("dojox.lang.observable");
+define("dojox/lang/observable",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.observable");
+_1.experimental("dojox.lang.observable");
 _3.lang.observable=function(_4,_5,_6,_7){
 return _3.lang.makeObservable(_5,_6,_7)(_4);
 };
@@ -118,7 +118,7 @@ return _23;
 }
 };
 if(!{}.__defineGetter__){
-if(_2.isIE){
+if(_1.isIE){
 var _25;
 if(document.body){
 _25=document.createElement("iframe");

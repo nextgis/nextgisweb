@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/widget/DocTester", ["dijit","dojo","dojox","dojo/require!dojo/string,dijit/_Widget,dijit/_Templated,dojox/form/BusyButton,dojox/testing/DocTest"], function(dijit,dojo,dojox){
+define("dojox/widget/DocTester", ["dojo","dijit","dojox","dojo/require!dojo/string,dijit/_Widget,dijit/_Templated,dojox/form/BusyButton,dojox/testing/DocTest"], function(dojo,dijit,dojox){
 dojo.provide("dojox.widget.DocTester");
 
 dojo.require("dojo.string");

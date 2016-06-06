@@ -1,4 +1,4 @@
-define("dojox/date/persian/locale", ["../..", "dojo/_base/lang", "dojo/_base/array", "dojo/date", "dojo/i18n", "dojo/regexp", "dojo/string", "./Date", "dojo/i18n!dojo/cldr/nls/persian"],
+define("dojox/date/persian/locale", ["dojox/main", "dojo/_base/lang", "dojo/_base/array", "dojo/date", "dojo/i18n", "dojo/regexp", "dojo/string", "./Date", "dojo/i18n!dojo/cldr/nls/persian"],
        function(dojox, lang, arr, dd, i18n, regexp, string, IDate, bundle){
 
 	var ilocale = lang.getObject("date.persian.locale", true, dojox);

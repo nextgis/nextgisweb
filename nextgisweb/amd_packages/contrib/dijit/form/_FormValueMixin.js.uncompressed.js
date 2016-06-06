@@ -4,9 +4,8 @@ define("dijit/form/_FormValueMixin", [
 	"dojo/keys", // keys.ESCAPE
 	"dojo/_base/lang",
 	"dojo/on",
-	"dojo/sniff", // has("ie"), has("quirks")
 	"./_FormWidgetMixin"
-], function(declare, domAttr, keys, lang, on, has, _FormWidgetMixin){
+], function(declare, domAttr, keys, lang, on, _FormWidgetMixin){
 
 	// module:
 	//		dijit/form/_FormValueMixin

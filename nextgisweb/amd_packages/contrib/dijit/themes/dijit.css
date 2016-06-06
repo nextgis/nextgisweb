@@ -28,12 +28,17 @@ table.dijitInline {
 }
 .dijitHidden {
 	
-	display: none !important;
+	position: absolute; 
+	visibility: hidden; 
+}
+.dijitHidden * {
+	visibility: hidden !important; 
 }
 .dijitVisible {
 	
 	display: block !important;	
 	position: relative;			
+	visibility: visible;
 }
 .dj_ie6 .dijitComboBox .dijitInputContainer,
 .dijitInputContainer {
@@ -311,6 +316,8 @@ div.dijitArrowButton {
 	top: 0;
 	left: 0;
 	#filter: ""; 
+	white-space: nowrap;
+	pointer-events: none;   
 }
 .dijitTimeTextBox {
 	width: 8em;
@@ -557,7 +564,7 @@ div.dijitArrowButton {
 }
 .dijitCheckBoxInput {
 	
-	opacity: 0.01;
+	opacity: 0;
 }
 .dj_ie .dijitCheckBoxInput {
 	filter: alpha(opacity=0);
@@ -827,18 +834,14 @@ body .dijitAlignClient { position: absolute; }
 .dijitFieldset {
 	border: 1px solid gray;
 }
-.dijitTitlePaneTitle, .dijitFieldset legend {
+.dijitTitlePaneTitle, .dijitFieldsetTitle {
 	cursor: pointer;
 	-webkit-tap-highlight-color: transparent;
 }
-.dijitFixedOpen, .dijitFixedClosed {
+.dijitTitlePaneTitleFixedOpen, .dijitTitlePaneTitleFixedClosed,
+.dijitFieldsetTitleFixedOpen, .dijitFieldsetTitleFixedClosed {
 	
 	cursor: default;
-}
-.dijitFixedOpen .dijitArrowNode, .dijitFixedOpen .dijitArrowNodeInner,
-.dijitFixedClosed .dijitArrowNode, .dijitFixedClosed .dijitArrowNodeInner{
-	
-	display: none;
 }
 .dijitTitlePaneTitle * {
 	vertical-align: middle;
@@ -849,12 +852,19 @@ body .dijitAlignClient { position: absolute; }
 }
 .dj_a11y .dijitTitlePane .dijitArrowNodeInner, .dj_a11y .dijitFieldset .dijitArrowNodeInner {
 	
-	display:inline !important;
+	display: inline;
 	font-family: monospace;		
 }
 .dj_a11y .dijitTitlePane .dijitArrowNode, .dj_a11y .dijitFieldset .dijitArrowNode {
 	
-	display:none;
+	display: none;
+}
+.dijitTitlePaneTitleFixedOpen .dijitArrowNode, .dijitTitlePaneTitleFixedOpen .dijitArrowNodeInner,
+.dijitTitlePaneTitleFixedClosed .dijitArrowNode, .dijitTitlePaneTitleFixedClosed .dijitArrowNodeInner,
+.dijitFieldsetTitleFixedOpen .dijitArrowNode, .dijitFieldsetTitleFixedOpen .dijitArrowNodeInner,
+.dijitFieldsetTitleFixedClosed .dijitArrowNode, .dijitFieldsetTitleFixedClosed .dijitArrowNodeInner {
+	
+	display: none !important;	
 }
 .dj_ie6 .dijitTitlePaneContentOuter,
 .dj_ie6 .dijitTitlePane .dijitTitlePaneTitle {
@@ -949,12 +959,22 @@ body .dijitAlignClient { position: absolute; }
 	
 	overflow: hidden;
 }
-.dijitCalendarContainer {
+.dijitCalendarContainer table {
 	width: auto;	
+	clear: both;    
 }
 .dijitCalendarContainer th, .dijitCalendarContainer td {
 	padding: 0;
 	vertical-align: middle;
+}
+.dijitCalendarMonthContainer {
+	text-align: center;
+}
+.dijitCalendarDecrementArrow {
+	float: left;
+}
+.dijitCalendarIncrementArrow {
+	float: right;
 }
 .dijitCalendarYearLabel {
     white-space: nowrap;    
@@ -1034,7 +1054,6 @@ body .dijitAlignClient { position: absolute; }
 	filter: alpha(opacity=35);
 }
 .dijitMenuItemLabel {
-	position: relative;
 	vertical-align: middle;
 }
 .dj_a11y .dijitMenuItemSelected {
@@ -1702,6 +1721,17 @@ div.dijitTabDisabled, .dj_ie div.dijitTabDisabled {
 }
 .dijitNumberTextBox .dijitInputInner {
 	text-align: inherit; 
+}
+.dijitNumberTextBox input.dijitInputInner,
+.dijitCurrencyTextBox input.dijitInputInner,
+.dijitSpinner input.dijitInputInner {
+	text-align: right;
+}
+.dj_ie8 .dijitNumberTextBox input.dijitInputInner, .dj_ie9 .dijitNumberTextBox input.dijitInputInner,
+.dj_ie8 .dijitCurrencyTextBox input.dijitInputInner, .dj_ie9 .dijitCurrencyTextBox input.dijitInputInner,
+.dj_ie8 .dijitSpinner input.dijitInputInner, .dj_ie9 .dijitSpinner input.dijitInputInner {
+	
+	padding-right: 1px !important;
 }
 .dijitToolbar .dijitSelect {
 	margin: 0;

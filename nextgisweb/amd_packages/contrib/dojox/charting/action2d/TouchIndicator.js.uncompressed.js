@@ -1,5 +1,5 @@
-define("dojox/charting/action2d/TouchIndicator", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "dojo/touch", "./ChartAction", "./_IndicatorElement", "dojox/lang/utils"],
-	function(lang, declare, eventUtil, touch, ChartAction, IndicatorElement, du){
+define("dojox/charting/action2d/TouchIndicator", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "dojo/has", "dojo/touch", "dojo/_base/connect", "./ChartAction", "./_IndicatorElement", "dojox/lang/utils"],
+	function(lang, declare, eventUtil, has, touch, dconnect, ChartAction, IndicatorElement, du){
 	
 	/*=====
 	var __TouchIndicatorCtorArgs = {
@@ -68,7 +68,7 @@ define("dojox/charting/action2d/TouchIndicator", ["dojo/_base/lang", "dojo/_base
 			//		An optional symbol string to use for indicator marker.
 		};
 	=====*/
-
+		
 	return declare("dojox.charting.action2d.TouchIndicator", ChartAction, {
 		// summary:
 		//		Create a touch indicator action. You can touch over the chart to display a data indicator.
@@ -114,12 +114,23 @@ define("dojox/charting/action2d/TouchIndicator", ["dojo/_base/lang", "dojo/_base
 			//		The chart this action applies to.
 			// kwArgs: __TouchIndicatorCtorArgs?
 			//		Optional arguments for the chart action.
-			this._listeners = [
-				{eventName: touch.press, methodName: "onTouchStart"},
-				{eventName: touch.move, methodName: "onTouchMove"},
-				{eventName: touch.release, methodName: "onTouchEnd"},
-				{eventName: touch.cancel, methodName: "onTouchEnd"}
-			];
+
+			// we should not have to do that, but dojo/touch is causing performances issue
+			// we have to workaround here for now
+			if(has("touch-events")){
+				this._listeners = [
+					{eventName: "touchstart", methodName: "onTouchStart"},
+					{eventName: "touchmove", methodName: "onTouchMove"},
+					{eventName: "touchend", methodName: "onTouchEnd"},
+					{eventName: "touchcancel", methodName: "onTouchEnd"}
+				];
+			} else {
+				this._listeners = [
+					{eventName: touch.press, methodName: "onTouchStart"},
+					{eventName: touch.move, methodName: "onTouchMove"},
+					{eventName: touch.cancel, methodName: "onTouchEnd"}
+				];
+			}
 			this.opt = lang.clone(this.defaultParams);
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
@@ -178,6 +189,10 @@ define("dojox/charting/action2d/TouchIndicator", ["dojo/_base/lang", "dojo/_base
 		},
 
 		_onTouchSingle: function(event, delayed){
+			if(!has("touch-events") && !this._onTouchEndHandler){
+				this._onTouchEndHandler =
+					dconnect.connect(this.chart.node.ownerDocument, touch.release, this, "onTouchEnd");
+			}
 			if(this.chart._delayedRenderHandle && !delayed){
 				// we have pending rendering from a previous call, let's sync
 				this.chart.render();
@@ -192,9 +207,13 @@ define("dojox/charting/action2d/TouchIndicator", ["dojo/_base/lang", "dojo/_base
 			}
 			eventUtil.stop(event);
 		},
-		
+
 		_onTouchDual: function(event){
 			// sync
+			if(!has("touch-events") && !this._onTouchEndHandler){
+				this._onTouchEndHandler =
+					dconnect.connect(this.chart.node.ownerDocument, touch.release, this, "onTouchEnd");
+			}
 			if(this.chart._delayedRenderHandle){
 				// we have pending rendering from a previous call, let's sync
 				this.chart.render();
@@ -210,6 +229,10 @@ define("dojox/charting/action2d/TouchIndicator", ["dojo/_base/lang", "dojo/_base
 		onTouchEnd: function(event){
 			// summary:
 			//		Called when touch is ended or canceled on the chart.
+			if(!has("touch-events") && this._onTouchEndHandler){
+				dconnect.disconnect(this._onTouchEndHandler);
+				this._onTouchEndHandler = null;
+			}
 			var plot = this.chart.getPlot(this._uName);
 			plot.stopTrack();
 			plot.pageCoord = null;

@@ -1109,7 +1109,7 @@ function(g, lang, arr, declare, win, domGeom, dom, gs, pathLib, ga, m, decompose
 		_render: function(force){
 			// summary:
 			//		render the all shapes
-			if(!force && this.pendingImageCount){ return; }
+			if(!this.rawNode || (!force && this.pendingImageCount)){ return; }
 			var ctx = this.rawNode.getContext("2d");
 			ctx.clearRect(0, 0, this.rawNode.width, this.rawNode.height);
 			this.render(ctx);

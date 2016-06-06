@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/secure/fromJson", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/secure/fromJson", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.secure.fromJson");
 
 // Used with permission from Mike Samuel of Google (has CCLA), from the json-sans-eval project:

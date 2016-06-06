@@ -2,8 +2,7 @@ var fs = require("fs");
 var path = require("path");
 var less = require("less");
 
-var themeFolders = ["../android", "../iphone", "../blackberry", "../holodark", "../windows", "../custom"];
-
+var themeFolders = ["../android", "../iphone", "../blackberry", "../holodark", "../windows", "../custom", "../ios7"];
 var commonFolders = ["../common/domButtons", "../common/transitions"];
 
 var batchQueue = [];

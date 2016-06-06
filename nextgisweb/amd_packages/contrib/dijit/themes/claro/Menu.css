@@ -88,9 +88,6 @@
   margin-right: 3px;
   margin-bottom: 4px;
 }
-.claro .dijitMenuItemDisabled .dijitMenuItemIconCell {
-  opacity: 1;
-}
 .claro .dijitMenuSeparatorTop {
   height: auto;
   margin-top: 1px;

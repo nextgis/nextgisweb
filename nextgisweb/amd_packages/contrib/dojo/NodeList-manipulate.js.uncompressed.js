@@ -1,4 +1,4 @@
-define("dojo/NodeList-manipulate", ["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeList-dom"], function(dquery, lang, array, construct){
+define("dojo/NodeList-manipulate", ["./query", "./_base/lang", "./_base/array", "./dom-construct", "./dom-attr", "./NodeList-dom"], function(dquery, lang, array, construct, attr){
 	// module:
 	//		dojo/NodeList-manipulate
 
@@ -14,25 +14,6 @@ define("dojo/NodeList-manipulate", ["./query", "./_base/lang", "./_base/array", 
 
 	//TODO: add a way to parse for widgets in the injected markup?
 
-	function getText(/*DOMNode*/node){
-		// summary:
-		//		recursion method for text() to use. Gets text value for a node.
-		// description:
-		//		Juse uses nodedValue so things like <br/> tags do not end up in
-		//		the text as any sort of line return.
-		var text = "", ch = node.childNodes;
-		for(var i = 0, n; n = ch[i]; i++){
-			//Skip comments.
-			if(n.nodeType != 8){
-				if(n.nodeType == 1){
-					text += getText(n);
-				}else{
-					text += n.nodeValue;
-				}
-			}
-		}
-		return text;
-	}
 
 	function getWrapInsertion(/*DOMNode*/node){
 		// summary:
@@ -168,42 +149,39 @@ define("dojo/NodeList-manipulate", ["./query", "./_base/lang", "./_base/array", 
 
 		text: function(/*String*/value){
 			// summary:
-			//		allows setting the text value of each node in the NodeList,
-			//		if there is a value passed in, otherwise, returns the text value for all the
+			//		Allows setting the text value of each node in the NodeList,
+			//		if there is a value passed in.  Otherwise, returns the text value for all the
 			//		nodes in the NodeList in one string.
 			// example:
-			//		assume a DOM created by this markup:
+			//		Assume a DOM created by this markup:
 			//	|	<div id="foo"></div>
 			//	|	<div id="bar"></div>
 			//		This code inserts "Hello World" into both divs:
-			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
-			//	|	], function(query){
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"], function(query){
 			//	|		query("div").text("Hello World");
 			//	| 	});
 			// example:
-			//		assume a DOM created by this markup:
+			//		Assume a DOM created by this markup:
 			//	|	<div id="foo"><p>Hello Mars <span>today</span></p></div>
 			//	|	<div id="bar"><p>Hello World</p></div>
-			//		This code returns "Hello Mars today":
-			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
-			//	|	], function(query){
-			//	|		var message = query("div").text();
+			//		This code writes "Hello Mars todayHello World" to the console:
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"], function(query){
+			//	|		console.log(query("div").text());
 			//	| 	});
 			// returns:
-			//		if no value is passed, the result is String, the text value of the first node.
-			//		If a value is passed, the return is this dojo/NodeList
+			//		If no value is passed, the result is String: the text value of the nodes.
+			//		If a value is passed, the return is this dojo/NodeList.
 			if(arguments.length){
 				for(var i = 0, node; node = this[i]; i++){
 					if(node.nodeType == 1){
-						construct.empty(node);
-						node.appendChild(node.ownerDocument.createTextNode(value));
+						attr.set(node, 'textContent', value);
 					}
 				}
 				return this; // dojo/NodeList
 			}else{
 				var result = "";
 				for(i = 0; node = this[i]; i++){
-					result += getText(node);
+					result += attr.get(node, 'textContent');
 				}
 				return result; //String
 			}
@@ -211,7 +189,7 @@ define("dojo/NodeList-manipulate", ["./query", "./_base/lang", "./_base/array", 
 
 		val: function(/*String||Array*/value){
 			// summary:
-			//		If a value is passed, allows seting the value property of form elements in this
+			//		If a value is passed, allows setting the value property of form elements in this
 			//		NodeList, or properly selecting/checking the right value for radio/checkbox/select
 			//		elements. If no value is passed, the value of the first node in this NodeList
 			//		is returned.

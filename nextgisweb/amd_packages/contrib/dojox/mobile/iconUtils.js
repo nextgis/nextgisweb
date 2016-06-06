@@ -69,7 +69,7 @@ _1b=this._domButtons[_1a];
 }
 }
 var _1c=null;
-if(_a("bb")&&_2["mblBBBoxShadowWorkaround"]!==false){
+if(_a("bb")&&_2.mblBBBoxShadowWorkaround!==false){
 _1c={style:"-webkit-box-shadow:none"};
 }
 for(var i=0,p=_19;i<_1b;i++){

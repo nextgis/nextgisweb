@@ -8,13 +8,14 @@ define("dojox/mobile/TabBarButton", [
 	"dojo/dom-construct",
 	"dojo/dom-style",
 	"dojo/dom-attr",
+	"./common",
 	"./View",
 	"./iconUtils",
 	"./_ItemBase",
 	"./Badge",
 	"./sniff",
 	"dojo/has!dojo-bidi?dojox/mobile/bidi/TabBarButton"
-], function(connect, declare, event, lang, dom, domClass, domConstruct, domStyle, domAttr, View, iconUtils, ItemBase, Badge, has, BidiTabBarButton){
+], function(connect, declare, event, lang, dom, domClass, domConstruct, domStyle, domAttr, common, View, iconUtils, ItemBase, Badge, has, BidiTabBarButton){
 
 	// module:
 	//		dojox/mobile/TabBarButton
@@ -69,6 +70,10 @@ define("dojox/mobile/TabBarButton", [
 		// badge: String
 		//		A string to show on a badge. (ex. "12")
 		badge: "",
+		
+		// badgeClass: [const] String
+		//		A CSS class name of a badge DOM node.
+		badgeClass: "mblDomButtonRedBadge",
 
 		/* internal properties */	
 		baseClass: "mblTabBarButton",
@@ -172,7 +177,7 @@ define("dojox/mobile/TabBarButton", [
 				// Not needed anymore (this code executes only once per life cycle):
 				delete this._pendingIcon; 
 			}
-			dom.setSelectable(this.domNode, false);
+			common.setSelectable(this.domNode, false);
 		},
 
 		onClose: function(e){
@@ -266,7 +271,10 @@ define("dojox/mobile/TabBarButton", [
 
 		_setBadgeAttr: function(/*String*/value){
 			if(!this.badgeObj){
-				this.badgeObj = new Badge({fontSize:11});
+				this.badgeObj = new Badge({
+					fontSize: 11,
+					className: this.badgeClass
+				});
 				domStyle.set(this.badgeObj.domNode, {
 					position: "absolute",
 					top: "0px",

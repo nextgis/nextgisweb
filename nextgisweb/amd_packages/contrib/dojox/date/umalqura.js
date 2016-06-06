@@ -1,5 +1,5 @@
 //>>built
-define("dojox/date/umalqura",["..","dojo/_base/lang","dojo/date","./umalqura/Date"],function(_1,_2,dd,_3){
+define("dojox/date/umalqura",["dojox/main","dojo/_base/lang","dojo/date","./umalqura/Date"],function(_1,_2,dd,_3){
 var _4=_2.getObject("date.umalqura",true,_1);
 _4.getDaysInMonth=function(_5){
 return _5.getDaysInIslamicMonth(_5.getMonth(),_5.getFullYear());

@@ -216,8 +216,12 @@ if(this.opt.offset){
 x+=this.opt.offset.x;
 y+=this.opt.offset.y;
 }
-var _3d=_7.createText.gfx(this.chart,g,x,y,"middle",_39,this.opt.font?this.opt.font:t.indicator.font,this.opt.fontColor?this.opt.fontColor:t.indicator.fontColor);
+var _3d=_7.createText.gfx(this.chart,g,x,y,this.opt.vertical?"middle":(this.opt.start?"start":"end"),_39,this.opt.font?this.opt.font:t.indicator.font,this.opt.fontColor?this.opt.fontColor:t.indicator.fontColor);
 var b=_a(_3d);
+if(this.opt.vertical&&!this.opt.start){
+b.y+=b.height/2;
+_3d.setShape({y:y+b.height/2});
+}
 b.x-=2;
 b.y-=1;
 b.width+=4;

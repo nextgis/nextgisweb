@@ -21,7 +21,7 @@ if(!_7[pid]){
 _7[pid]={};
 }
 if(arguments.length==1){
-r=_7[pid];
+return _7[pid];
 }
 if(typeof _e=="string"){
 if(arguments.length>2){

@@ -18,12 +18,18 @@ for(p in _6){
 p!="has"&&_1.add(_7+p,_6[p],0,_8);
 }
 };
-_3=1?_2.rawConfig:this.dojoConfig||this.djConfig||{};
+var _9=(function(){
+return this;
+})();
+_3=1?_2.rawConfig:_9.dojoConfig||_9.djConfig||{};
 _5(_3,"config",1);
 _5(_3.has,"",1);
 }
 if(!_3.locale&&typeof navigator!="undefined"){
-_3.locale=(navigator.language||navigator.userLanguage).toLowerCase();
+var _a=(navigator.languages&&navigator.languages.length)?navigator.languages[0]:(navigator.language||navigator.userLanguage);
+if(_a){
+_3.locale=_a.toLowerCase();
+}
 }
 return _3;
 });

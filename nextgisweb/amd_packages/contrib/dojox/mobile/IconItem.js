@@ -214,7 +214,7 @@ _22.innerHTML=_21;
 }
 },_setSelectedAttr:function(_23){
 this.inherited(arguments);
-_9.set(this.iconNode,"opacity",_23?this.getParent().pressedIconOpacity:1);
+this.iconNode&&_9.set(this.iconNode,"opacity",_23?this.getParent().pressedIconOpacity:1);
 }});
 return _4("dojo-bidi")?_1("dojox.mobile.IconItem",[_12,_11]):_12;
 });

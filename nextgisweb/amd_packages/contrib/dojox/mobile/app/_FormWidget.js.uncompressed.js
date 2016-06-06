@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/mobile/app/_FormWidget", ["dijit","dojo","dojox","dojo/require!dojo/window,dijit/_WidgetBase,dijit/focus"], function(dijit,dojo,dojox){
+define("dojox/mobile/app/_FormWidget", ["dojo","dijit","dojox","dojo/require!dojo/window,dijit/_WidgetBase,dijit/focus"], function(dojo,dijit,dojox){
 dojo.provide("dojox.mobile.app._FormWidget");
 dojo.experimental("dojox.mobile.app._FormWidget");
 

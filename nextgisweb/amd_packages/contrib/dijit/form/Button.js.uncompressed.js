@@ -1,5 +1,5 @@
 require({cache:{
-'url:dijit/form/templates/Button.html':"<span class=\"dijit dijitReset dijitInline\" role=\"presentation\"\n\t><span class=\"dijitReset dijitInline dijitButtonNode\"\n\t\tdata-dojo-attach-event=\"ondijitclick:__onClick\" role=\"presentation\"\n\t\t><span class=\"dijitReset dijitStretch dijitButtonContents\"\n\t\t\tdata-dojo-attach-point=\"titleNode,focusNode\"\n\t\t\trole=\"button\" aria-labelledby=\"${id}_label\"\n\t\t\t><span class=\"dijitReset dijitInline dijitIcon\" data-dojo-attach-point=\"iconNode\"></span\n\t\t\t><span class=\"dijitReset dijitToggleButtonIconChar\">&#x25CF;</span\n\t\t\t><span class=\"dijitReset dijitInline dijitButtonText\"\n\t\t\t\tid=\"${id}_label\"\n\t\t\t\tdata-dojo-attach-point=\"containerNode\"\n\t\t\t></span\n\t\t></span\n\t></span\n\t><input ${!nameAttrSetting} type=\"${type}\" value=\"${value}\" class=\"dijitOffScreen\"\n\t\tdata-dojo-attach-event=\"onclick:_onClick\"\n\t\ttabIndex=\"-1\" role=\"presentation\" data-dojo-attach-point=\"valueNode\"\n/></span>\n"}});
+'url:dijit/form/templates/Button.html':"<span class=\"dijit dijitReset dijitInline\" role=\"presentation\"\n\t><span class=\"dijitReset dijitInline dijitButtonNode\"\n\t\tdata-dojo-attach-event=\"ondijitclick:__onClick\" role=\"presentation\"\n\t\t><span class=\"dijitReset dijitStretch dijitButtonContents\"\n\t\t\tdata-dojo-attach-point=\"titleNode,focusNode\"\n\t\t\trole=\"button\" aria-labelledby=\"${id}_label\"\n\t\t\t><span class=\"dijitReset dijitInline dijitIcon\" data-dojo-attach-point=\"iconNode\"></span\n\t\t\t><span class=\"dijitReset dijitToggleButtonIconChar\">&#x25CF;</span\n\t\t\t><span class=\"dijitReset dijitInline dijitButtonText\"\n\t\t\t\tid=\"${id}_label\"\n\t\t\t\tdata-dojo-attach-point=\"containerNode\"\n\t\t\t></span\n\t\t></span\n\t></span\n\t><input ${!nameAttrSetting} type=\"${type}\" value=\"${value}\" class=\"dijitOffScreen\"\n\t\tdata-dojo-attach-event=\"onclick:_onClick\"\n\t\ttabIndex=\"-1\" aria-hidden=\"true\" data-dojo-attach-point=\"valueNode\"\n/></span>\n"}});
 define("dijit/form/Button", [
 	"require",
 	"dojo/_base/declare", // declare
@@ -10,7 +10,8 @@ define("dijit/form/Button", [
 	"dojo/ready",
 	"./_FormWidget",
 	"./_ButtonMixin",
-	"dojo/text!./templates/Button.html"
+	"dojo/text!./templates/Button.html",
+	"../a11yclick"	// template uses ondijitclick
 ], function(require, declare, domClass, has, kernel, lang, ready, _FormWidget, _ButtonMixin, template){
 
 	// module:
@@ -66,17 +67,19 @@ define("dijit/form/Button", [
 			}
 		},
 
-		_fillContent: function(/*DomNode*/ source){
-			// Overrides _Templated._fillContent().
-			// If button label is specified as srcNodeRef.innerHTML rather than
-			// this.params.label, handle it here.
-			// TODO: remove the method in 2.0, parser will do it all for me
-			if(source && (!this.params || !("label" in this.params))){
-				var sourceLabel = lang.trim(source.innerHTML);
-				if(sourceLabel){
-					this.label = sourceLabel; // _applyAttributes will be called after buildRendering completes to update the DOM
-				}
+		postCreate: function(){
+			this.inherited(arguments);
+			this._setLabelFromContainer();
+		},
+
+		_setLabelFromContainer: function(){
+			if(this.containerNode && !this.label){
+				// When markup was set as srcNodeRef.innerHTML, copy it to this.label, in case someone tries to
+				// reference that variable.  Alternately, could have a _getLabelAttr() method to return
+				// this.containerNode.innerHTML.
+				this.label = lang.trim(this.containerNode.innerHTML);
 			}
+			this.onLabelSet();		// set this.titleNode.title etc. according to label
 		},
 
 		_setShowLabelAttr: function(val){
@@ -93,13 +96,7 @@ define("dijit/form/Button", [
 			this.set("label", content);
 		},
 
-		_setLabelAttr: function(/*String*/ content){
-			// summary:
-			//		Hook for set('label', ...) to work.
-			// description:
-			//		Set the label (text) of the button; takes an HTML string.
-			//		If the label is hidden (showLabel=false) then and no title has
-			//		been specified, then label is also set as title attribute of icon.
+		onLabelSet: function(){
 			this.inherited(arguments);
 			if(!this.showLabel && !("title" in this.params)){
 				this.titleNode.title = lang.trim(this.containerNode.innerText || this.containerNode.textContent || '');
@@ -109,7 +106,7 @@ define("dijit/form/Button", [
 
 	if(has("dojo-bidi")){
 		Button = declare("dijit.form.Button", Button, {
-			_setLabelAttr: function(/*String*/ content){
+			onLabelSet: function(){
 				this.inherited(arguments);
 				if(this.titleNode.title){
 					this.applyTextDir(this.titleNode, this.titleNode.title);

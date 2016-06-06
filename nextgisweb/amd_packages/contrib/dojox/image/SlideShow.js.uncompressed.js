@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/image/SlideShow", ["dijit","dojo","dojox","dojo/require!dojo/string,dojo/fx,dijit/_Widget,dijit/_Templated"], function(dijit,dojo,dojox){
+define("dojox/image/SlideShow", ["dojo","dijit","dojox","dojo/require!dojo/string,dojo/fx,dijit/_Widget,dijit/_Templated"], function(dojo,dijit,dojox){
 dojo.provide("dojox.image.SlideShow");
 //
 // dojox.image.SlideShow courtesy Shane O Sullivan, licensed under a Dojo CLA

@@ -114,7 +114,7 @@ define("dijit/_HasDropDown", [
 				e.preventDefault();
 			}
 
-			this._docHandler = this.own(on(this.ownerDocument, touch.release, lang.hitch(this, "_onDropDownMouseUp")))[0];
+			this.own(on.once(this.ownerDocument, touch.release, lang.hitch(this, "_onDropDownMouseUp")));
 
 			this.toggleDropDown();
 		},
@@ -136,10 +136,6 @@ define("dijit/_HasDropDown", [
 			//		2. move mouse to a menu item while holding down the mouse button
 			//		3. mouse up.  this selects the menu item as though the user had clicked it.
 
-			if(e && this._docHandler){
-				this._docHandler.remove();
-				this._docHandler = null;
-			}
 			var dropDown = this.dropDown, overMenu = false;
 
 			if(e && this._opened){
@@ -236,6 +232,12 @@ define("dijit/_HasDropDown", [
 		},
 
 		destroy: function(){
+			// If dropdown is open, close it, to avoid leaving dijit/focus in a strange state.
+			// Put focus back on me to avoid the focused node getting destroyed, which flummoxes IE.
+			if(this._opened){
+				this.closeDropDown(true);
+			}
+
 			if(this.dropDown){
 				// Destroy the drop down, unless it's already been destroyed.  This can happen because
 				// the drop down is a direct child of <body> even though it's logically my child.
@@ -406,13 +408,21 @@ define("dijit/_HasDropDown", [
 			// Set width of drop down if necessary, so that dropdown width + width of scrollbar (from popup wrapper)
 			// matches width of aroundNode
 			if(this.forceWidth || (this.autoWidth && aroundNode.offsetWidth > dropDown._popupWrapper.offsetWidth)){
+				var widthAdjust = aroundNode.offsetWidth - dropDown._popupWrapper.offsetWidth;
 				var resizeArgs = {
-					w: aroundNode.offsetWidth - (dropDown._popupWrapper.offsetWidth - dropDown.domNode.offsetWidth)
+					w: dropDown.domNode.offsetWidth + widthAdjust
 				};
+				this._origStyle = ddNode.style.cssText;
 				if(lang.isFunction(dropDown.resize)){
 					dropDown.resize(resizeArgs);
 				}else{
 					domGeometry.setMarginBox(ddNode, resizeArgs);
+				}
+
+				// If dropdown is right-aligned then compensate for width change by changing horizontal position
+				if(retVal.corner[1] == "R"){
+					dropDown._popupWrapper.style.left =
+						(dropDown._popupWrapper.style.left.replace("px", "") - widthAdjust) + "px";
 				}
 			}
 
@@ -446,13 +456,17 @@ define("dijit/_HasDropDown", [
 
 			if(this._opened){
 				this._popupStateNode.setAttribute("aria-expanded", "false");
-				if(focus){
+				if(focus && this.focus){
 					this.focus();
 				}
 				popup.close(this.dropDown);
 				this._opened = false;
 			}
-		}
 
+			if(this._origStyle){
+				this.dropDown.domNode.style.cssText = this._origStyle;
+				delete this._origStyle;
+			}
+		}
 	});
 });

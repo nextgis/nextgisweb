@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/wire/ml/Invocation", ["dijit","dojo","dojox","dojo/require!dojox/wire/ml/Action"], function(dijit,dojo,dojox){
+define("dojox/wire/ml/Invocation", ["dojo","dijit","dojox","dojo/require!dojox/wire/ml/Action"], function(dojo,dijit,dojox){
 dojo.provide("dojox.wire.ml.Invocation");
 
 dojo.require("dojox.wire.ml.Action");

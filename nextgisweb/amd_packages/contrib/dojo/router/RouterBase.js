@@ -79,7 +79,9 @@ this.go(_19,true);
 this._handlePathChange(_1b);
 }
 },destroy:function(){
+if(this._hashchangeHandle){
 this._hashchangeHandle.remove();
+}
 this._routes=null;
 this._routeIndex=null;
 },_handlePathChange:function(_1c){

@@ -37,7 +37,7 @@ function _14(_15){
 return _13(_15);
 };
 function _16(_17){
-return _17.data||_17.text;
+return _17.data!==undefined?_17.data:_17.text;
 };
 _1.deferred=function deferred(_18,_19,_1a,_1b,_1c,_1d){
 var def=new _4(function(_1e){

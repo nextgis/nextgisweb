@@ -182,7 +182,7 @@ return;
 var dir=_20<to?1:-1;
 var _21=this.getChildren();
 var _22=[];
-var i;
+var i,j;
 for(i=_20;i!=to;i+=dir){
 _22.push({t:(_21[i+dir].domNode.offsetTop-_21[i].domNode.offsetTop)+"px",l:(_21[i+dir].domNode.offsetLeft-_21[i].domNode.offsetLeft)+"px"});
 }

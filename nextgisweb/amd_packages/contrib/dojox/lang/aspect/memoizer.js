@@ -1,6 +1,6 @@
 //>>built
-define("dojox/lang/aspect/memoizer",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.aspect.memoizer");
+define("dojox/lang/aspect/memoizer",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.aspect.memoizer");
 (function(){
 var _4=_3.lang.aspect;
 var _5={around:function(_6){

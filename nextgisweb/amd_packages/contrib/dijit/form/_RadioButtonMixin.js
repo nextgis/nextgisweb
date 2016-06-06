@@ -1,5 +1,5 @@
 //>>built
-define("dijit/form/_RadioButtonMixin",["dojo/_base/array","dojo/_base/declare","dojo/dom-attr","dojo/_base/lang","dojo/query","../registry"],function(_1,_2,_3,_4,_5,_6){
+define("dijit/form/_RadioButtonMixin",["dojo/_base/array","dojo/_base/declare","dojo/dom-attr","dojo/_base/lang","dojo/query!css2","../registry"],function(_1,_2,_3,_4,_5,_6){
 return _2("dijit.form._RadioButtonMixin",null,{type:"radio",_getRelatedWidgets:function(){
 var _7=[];
 _5("input[type=radio]",this.focusNode.form||this.ownerDocument).forEach(_4.hitch(this,function(_8){
@@ -39,6 +39,27 @@ _3.set(this.focusNode||this.domNode,"checked",_d.checked);
 }));
 return false;
 }
-return this.inherited(arguments);
+var _e=false;
+var _f;
+_1.some(this._getRelatedWidgets(),function(_10){
+if(_10.checked){
+_f=_10;
+return true;
+}
+return false;
+});
+this.checked=true;
+_f&&(_f.checked=false);
+if(this.onClick(e)===false||e.defaultPrevented){
+_e=true;
+}
+this.checked=false;
+_f&&(_f.checked=true);
+if(_e){
+e.preventDefault();
+}else{
+this.set("checked",true);
+}
+return !_e;
 }});
 });

@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/wire/ml/XmlHandler", ["dijit","dojo","dojox","dojo/require!dojox/wire/ml/RestHandler,dojox/xml/parser,dojox/wire/_base,dojox/wire/ml/util"], function(dijit,dojo,dojox){
+define("dojox/wire/ml/XmlHandler", ["dojo","dijit","dojox","dojo/require!dojox/wire/ml/RestHandler,dojox/xml/parser,dojox/wire/_base,dojox/wire/ml/util"], function(dojo,dijit,dojox){
 dojo.provide("dojox.wire.ml.XmlHandler");
 
 dojo.require("dojox.wire.ml.RestHandler");

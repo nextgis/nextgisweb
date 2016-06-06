@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/lang/observable", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/lang/observable", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.lang.observable");
 // Used to create a wrapper object with monitored reads and writes
 //

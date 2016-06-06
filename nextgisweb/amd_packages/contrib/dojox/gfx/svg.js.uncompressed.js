@@ -190,9 +190,10 @@ function(lang, has, win, dom, declare, arr, domGeom, domAttr, Color, g, gs, path
 			s.color = g.normalizeColor(s.color);
 			// generate attributes
 			if(s){
+				var w = s.width < 0 ? 0 : s.width;
 				rn.setAttribute("stroke", s.color.toCss());
 				rn.setAttribute("stroke-opacity", s.color.a);
-				rn.setAttribute("stroke-width",   s.width);
+				rn.setAttribute("stroke-width",   w);
 				rn.setAttribute("stroke-linecap", s.cap);
 				if(typeof s.join == "number"){
 					rn.setAttribute("stroke-linejoin",   "miter");
@@ -208,15 +209,15 @@ function(lang, has, win, dom, declare, arr, domGeom, domAttr, Color, g, gs, path
 					da = lang._toArray(da);
 					var i;
 					for(i = 0; i < da.length; ++i){
-						da[i] *= s.width;
+						da[i] *= w;
 					}
 					if(s.cap != "butt"){
 						for(i = 0; i < da.length; i += 2){
-							da[i] -= s.width;
+							da[i] -= w;
 							if(da[i] < 1){ da[i] = 1; }
 						}
 						for(i = 1; i < da.length; i += 2){
-							da[i] += s.width;
+							da[i] += w;
 						}
 					}
 					da = da.join(",");
@@ -263,8 +264,8 @@ function(lang, has, win, dom, declare, arr, domGeom, domAttr, Color, g, gs, path
 				var img = _createElementNS(svgns, "image");
 				img.setAttribute("x", 0);
 				img.setAttribute("y", 0);
-				img.setAttribute("width",  f.width .toFixed(8));
-				img.setAttribute("height", f.height.toFixed(8));
+				img.setAttribute("width",  (f.width < 0 ? 0 : f.width).toFixed(8));
+				img.setAttribute("height", (f.height < 0 ? 0 : f.height).toFixed(8));
 				_setAttributeNS(img, svg.xmlns.xlink, "xlink:href", f.src);
 				fill.appendChild(img);
 			}else{
@@ -334,7 +335,11 @@ function(lang, has, win, dom, declare, arr, domGeom, domAttr, Color, g, gs, path
 			this.shape = g.makeParameters(this.shape, newShape);
 			for(var i in this.shape){
 				if(i != "type"){
-					this.rawNode.setAttribute(i, this.shape[i]);
+					var v = this.shape[i];
+					if(i === "width" || i === "height"){
+						v = v < 0 ? 0 : v;
+					}
+					this.rawNode.setAttribute(i, v);
 				}
 			}
 			this.bbox = null;
@@ -393,7 +398,7 @@ function(lang, has, win, dom, declare, arr, domGeom, domAttr, Color, g, gs, path
 					clipNode = _createElementNS(svg.xmlns.svg, "clipPath");
 					clipShape = _createElementNS(svg.xmlns.svg, clipType);
 					clipNode.appendChild(clipShape);
-					this.rawNode.parentNode.appendChild(clipNode);
+					this.rawNode.parentNode.insertBefore(clipNode, this.rawNode);
 					domAttr.set(clipNode, "id", clipId);
 				}
 				domAttr.set(clipShape, clip);
@@ -459,7 +464,11 @@ function(lang, has, win, dom, declare, arr, domGeom, domAttr, Color, g, gs, path
 			this.bbox = null;
 			for(var i in this.shape){
 				if(i != "type" && i != "r"){
-					this.rawNode.setAttribute(i, this.shape[i]);
+					var v = this.shape[i];
+					if(i === "width" || i === "height"){
+						v = v < 0 ? 0 : v;
+					}
+					this.rawNode.setAttribute(i, v);
 				}
 			}
 			if(this.shape.r != null){
@@ -521,7 +530,11 @@ function(lang, has, win, dom, declare, arr, domGeom, domAttr, Color, g, gs, path
 			var rawNode = this.rawNode;
 			for(var i in this.shape){
 				if(i != "type" && i != "src"){
-					rawNode.setAttribute(i, this.shape[i]);
+					var v = this.shape[i];
+					if(i === "width" || i === "height"){
+						v = v < 0 ? 0 : v;
+					}
+					rawNode.setAttribute(i, v);
 				}
 			}
 			rawNode.setAttribute("preserveAspectRatio", "none");
@@ -740,11 +753,13 @@ else
 			// height: String
 			//		height of surface, e.g., "100px"
 			if(!this.rawNode){ return this; }
-			this.rawNode.setAttribute("width",  width);
-			this.rawNode.setAttribute("height", height);
+			var w = width < 0 ? 0 : width,
+				h = height < 0 ? 0 : height;
+			this.rawNode.setAttribute("width",  w);
+			this.rawNode.setAttribute("height", h);
 			if(hasSvgSetAttributeBug){
-				this.rawNode.style.width =  width;
-				this.rawNode.style.height =  height;
+				this.rawNode.style.width =  w;
+				this.rawNode.style.height =  h;
 			}
 			return this;	// self
 		},
@@ -774,10 +789,10 @@ else
 		s.rawNode = _createElementNS(svg.xmlns.svg, "svg");
 		s.rawNode.setAttribute("overflow", "hidden");
 		if(width){
-			s.rawNode.setAttribute("width",  width);
+			s.rawNode.setAttribute("width",  width < 0 ? 0 : width);
 		}
 		if(height){
-			s.rawNode.setAttribute("height", height);
+			s.rawNode.setAttribute("height", height < 0 ? 0 : height);
 		}
 
 		var defNode = _createElementNS(svg.xmlns.svg, "defs");
@@ -809,7 +824,8 @@ else
 		}
 	};
 
-	var C = gs.Container, Container = {
+	var C = gs.Container;
+	var Container = svg.Container = {
 		openBatch: function() {
 			// summary:
 			//		starts a new batch, subsequent new child shapes will be held in
@@ -888,7 +904,7 @@ else
 		_moveChildToBack:  C._moveChildToBack
 	};
 
-	var Creator = {
+	var Creator = svg.Creator = {
 		// summary:
 		//		SVG shape creators
 		createObject: function(shapeType, rawShape){
@@ -946,6 +962,9 @@ else
 		// override createSurface()
 		svg.createSurface = function(parentNode, width, height){
 			var s = new svg.Surface();
+			
+			width = width < 0 ? 0 : width;
+			height = height < 0 ? 0 : height;
 
 			// ensure width / height
 			if(!width || !height){

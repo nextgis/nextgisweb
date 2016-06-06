@@ -1,10 +1,11 @@
 define("dijit/form/MultiSelect", [
-	"dojo/_base/array", // array.indexOf, array.map
+	"dojo/_base/array", // indexOf, map, forEach
 	"dojo/_base/declare", // declare
 	"dojo/dom-geometry", // domGeometry.setMarginBox
-	"dojo/has",
+	"dojo/sniff",	// has("android")
 	"dojo/query", // query
-	"./_FormValueWidget"
+	"./_FormValueWidget",
+	"dojo/NodeList-dom"	// orphan()
 ], function(array, declare, domGeometry, has, query, _FormValueWidget){
 
 	// module:
@@ -12,7 +13,7 @@ define("dijit/form/MultiSelect", [
 
 	var MultiSelect = declare("dijit.form.MultiSelect" + (has("dojo-bidi") ? "_NoBidi" : ""), _FormValueWidget, {
 		// summary:
-		//		Widget version of a `<select multiple=true>` element,
+		//		Widget version of a `<select multiple=multiple>` element,
 		//		for selecting multiple options.
 
 		// size: Number
@@ -23,7 +24,7 @@ define("dijit/form/MultiSelect", [
 
 		baseClass: "dijitMultiSelect",
 
-		templateString: "<select multiple='true' ${!nameAttrSetting} data-dojo-attach-point='containerNode,focusNode' data-dojo-attach-event='onchange: _onChange'></select>",
+		templateString: "<select multiple='multiple' ${!nameAttrSetting} data-dojo-attach-point='containerNode,focusNode' data-dojo-attach-event='onchange: _onChange'></select>",
 
 		addSelected: function(/*dijit/form/MultiSelect*/ select){
 			// summary:
@@ -69,16 +70,37 @@ define("dijit/form/MultiSelect", [
 			});
 		},
 
-		multiple: true, // for Form
+		// Set multiple so parent form widget knows that I return multiple values.
+		// Also adding a no-op custom setter; otherwise the multiple property is applied to the <select> node
+		// which causes problem on Android < 4.4 with all but the first selected item being deselected.
+		multiple: true,
+		_setMultipleAttr: function(val){
+		},
 
-		_setValueAttr: function(/*Array*/ values, /*Boolean?*/ priorityChange){
+		_setValueAttr: function(/*String[]*/ values){
 			// summary:
 			//		Hook so set('value', values) works.
 			// description:
 			//		Set the value(s) of this Select based on passed values
-			query("option", this.containerNode).forEach(function(n){
-				n.selected = (array.indexOf(values, n.value) != -1);
-			});
+
+			if(has("android")){
+				// Workaround bizarre Android bug where deselecting one option selects another one.
+				// See https://code.google.com/p/android/issues/detail?id=68285.
+				// Could use this code path for all browsers but I worry about IE memory leaks.
+				query("option", this.containerNode).orphan().forEach(function(n){
+					var option = n.ownerDocument.createElement("option");
+					option.value = n.value;
+					option.selected = (array.indexOf(values, n.value) != -1);
+					option.text = n.text;
+					option.originalText = n.originalText;	// for bidi support, see has("dojo-bidi") block below
+					this.containerNode.appendChild(option);
+				}, this);
+			}else {
+				query("option", this.containerNode).forEach(function(n){
+					n.selected = (array.indexOf(values, n.value) != -1);
+				});
+			}
+
 			this.inherited(arguments);
 		},
 

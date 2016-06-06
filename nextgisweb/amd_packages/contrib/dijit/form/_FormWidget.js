@@ -18,5 +18,5 @@ return this.get("value");
 },postMixInProperties:function(){
 this.nameAttrSetting=(this.name&&!_2("msapp"))?("name=\""+this.name.replace(/"/g,"&quot;")+"\""):"";
 this.inherited(arguments);
-},_setTypeAttr:null});
+}});
 });
