@@ -88,7 +88,7 @@ define([
                     widget._fields = data;
                     widget.initializeGrid();
                 }
-            ).otherwise(console.error);
+            );
 
         },
 

@@ -89,7 +89,7 @@ define([
                         handleAs: "json"
                     }).then(function (data) {
                         render(data.wmsclient_connection.capcache);
-                    }).then(null, console.error);
+                    });
                 });
             }
         },

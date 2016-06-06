@@ -61,7 +61,7 @@ define([
                 handleAs: "json"
             }).then(lang.hitch(this, function (value) {
                 this.renderValue(value);
-            })).otherwise(console.error);
+            }));
         },
 
         renderValue: function (value) {

@@ -202,7 +202,7 @@ define([
 
             return all(promises).then(function () {
                 return data;
-            }, console.error);
+            });
         },
 
         deserialize: function (data) {
@@ -281,7 +281,7 @@ define([
                     console.debug("Validation failed");
                     deferred.reject({ error: E_SERIALIZE });
                 }
-            ).then(null, console.error);
+            );
 
             return deferred;
         },
@@ -355,7 +355,7 @@ define([
                     this.unlock();
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
-            ).then(null, console.error);
+            );
         },
 
         deleteObj: function () {
@@ -370,7 +370,7 @@ define([
                     this.unlock();
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
-            ).then(null, console.error);
+            );
         },
 
         refreshObj: function () {
@@ -378,7 +378,7 @@ define([
                 handleAs: "json"
             }).then(
                 lang.hitch(this, this.deserialize)
-            ).otherwise(console.error);
+            );
         },
     });
 

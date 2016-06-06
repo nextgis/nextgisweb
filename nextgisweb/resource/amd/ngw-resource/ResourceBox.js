@@ -28,7 +28,7 @@ define([
             this.inherited(arguments);
             this.picker.pick().then(lang.hitch(this, function (itm) {
                 this.set("value", {id: itm.id});
-            })).then(null, console.error);
+            }));
         }
     });
 });

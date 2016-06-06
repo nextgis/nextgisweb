@@ -15,7 +15,7 @@
             }).then(function (data) {
                 CompositeWidget.bootstrap(data).then(function (widget) {
                     widget.placeAt('widget').startup();
-                }).otherwise(console.error);
+                });
             });
         });
     </script>

@@ -50,7 +50,7 @@ define([
 
             when(this.getLabel(value)).then(lang.hitch(this, function (value) {
                 this.textbox.value = value;
-            })).then(null, console.error);
+            }));
         },
 
         _getValueAttr: function () {
