@@ -1,6 +1,6 @@
 define([
     "dojo/_base/declare",
-    "dojo/_base/Deferred",
+    "dojo/Deferred",
     "dojo/request/xhr",
     "dojo/json",
     "dojo/when",
