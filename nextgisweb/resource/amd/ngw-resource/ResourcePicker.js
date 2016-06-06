@@ -54,7 +54,7 @@ define([
             new Button({
                 label: i18n.gettext("Cancel"),
                 onClick: lang.hitch(this, function () {
-                    this._deferred.reject();
+                    this._deferred.reject("No resource selected");
                     this.hide();
                 })
             }).placeAt(this.actionBar);
