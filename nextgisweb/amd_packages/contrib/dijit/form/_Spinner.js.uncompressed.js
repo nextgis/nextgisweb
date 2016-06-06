@@ -103,6 +103,11 @@ define("dijit/form/_Spinner", [
 			// summary:
 			//		Mouse wheel listener where supported
 
+			if(!this.focused){
+				// If use is scrolling over page and we happen to get the mouse wheel event, just ignore it.
+				return;
+			}
+
 			evt.stopPropagation();
 			evt.preventDefault();
 			// FIXME: Safari bubbles

@@ -1,25 +1,25 @@
 //>>built
-define("dijit/layout/ContentPane",["dojo/_base/kernel","dojo/_base/lang","../_Widget","../_Container","./_ContentPaneResizeMixin","dojo/string","dojo/html","dojo/i18n!../nls/loading","dojo/_base/array","dojo/_base/declare","dojo/_base/Deferred","dojo/dom","dojo/dom-attr","dojo/dom-construct","dojo/_base/xhr","dojo/i18n","dojo/when"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f,_10,_11){
-return _a("dijit.layout.ContentPane",[_3,_4,_5],{href:"",content:"",extractContent:false,parseOnLoad:true,parserScope:_1._scopeName,preventCache:false,preload:false,refreshOnShow:false,loadingMessage:"<span class='dijitContentPaneLoading'><span class='dijitInline dijitIconLoading'></span>${loadingState}</span>",errorMessage:"<span class='dijitContentPaneError'><span class='dijitInline dijitIconError'></span>${errorState}</span>",isLoaded:false,baseClass:"dijitContentPane",ioArgs:{},onLoadDeferred:null,_setTitleAttr:null,stopParser:true,template:false,markupFactory:function(_12,_13,_14){
-var _15=new _14(_12,_13);
-return !_15.href&&_15._contentSetter&&_15._contentSetter.parseDeferred&&!_15._contentSetter.parseDeferred.isFulfilled()?_15._contentSetter.parseDeferred.then(function(){
-return _15;
-}):_15;
-},create:function(_16,_17){
-if((!_16||!_16.template)&&_17&&!("href" in _16)&&!("content" in _16)){
-_17=_c.byId(_17);
-var df=_17.ownerDocument.createDocumentFragment();
-while(_17.firstChild){
-df.appendChild(_17.firstChild);
+define("dijit/layout/ContentPane",["dojo/_base/kernel","dojo/_base/lang","../_Widget","../_Container","./_ContentPaneResizeMixin","dojo/string","dojo/html","dojo/_base/array","dojo/_base/declare","dojo/_base/Deferred","dojo/dom","dojo/dom-attr","dojo/dom-construct","dojo/_base/xhr","dojo/i18n","dojo/when","dojo/i18n!../nls/loading"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f,_10){
+return _9("dijit.layout.ContentPane",[_3,_4,_5],{href:"",content:"",extractContent:false,parseOnLoad:true,parserScope:_1._scopeName,preventCache:false,preload:false,refreshOnShow:false,loadingMessage:"<span class='dijitContentPaneLoading'><span class='dijitInline dijitIconLoading'></span>${loadingState}</span>",errorMessage:"<span class='dijitContentPaneError'><span class='dijitInline dijitIconError'></span>${errorState}</span>",isLoaded:false,baseClass:"dijitContentPane",ioArgs:{},onLoadDeferred:null,_setTitleAttr:null,stopParser:true,template:false,markupFactory:function(_11,_12,_13){
+var _14=new _13(_11,_12);
+return !_14.href&&_14._contentSetter&&_14._contentSetter.parseDeferred&&!_14._contentSetter.parseDeferred.isFulfilled()?_14._contentSetter.parseDeferred.then(function(){
+return _14;
+}):_14;
+},create:function(_15,_16){
+if((!_15||!_15.template)&&_16&&!("href" in _15)&&!("content" in _15)){
+_16=_b.byId(_16);
+var df=_16.ownerDocument.createDocumentFragment();
+while(_16.firstChild){
+df.appendChild(_16.firstChild);
 }
-_16=_2.delegate(_16,{content:df});
+_15=_2.delegate(_15,{content:df});
 }
-this.inherited(arguments,[_16,_17]);
+this.inherited(arguments,[_15,_16]);
 },postMixInProperties:function(){
 this.inherited(arguments);
-var _18=_10.getLocalization("dijit","loading",this.lang);
-this.loadingMessage=_6.substitute(this.loadingMessage,_18);
-this.errorMessage=_6.substitute(this.errorMessage,_18);
+var _17=_f.getLocalization("dijit","loading",this.lang);
+this.loadingMessage=_6.substitute(this.loadingMessage,_17);
+this.errorMessage=_6.substitute(this.errorMessage,_17);
 },buildRendering:function(){
 this.inherited(arguments);
 if(!this.containerNode){
@@ -29,7 +29,7 @@ this.domNode.removeAttribute("title");
 },startup:function(){
 this.inherited(arguments);
 if(this._contentSetter){
-_9.forEach(this._contentSetter.parseResults,function(obj){
+_8.forEach(this._contentSetter.parseResults,function(obj){
 if(!obj._started&&!obj._destroyed&&_2.isFunction(obj.startup)){
 obj.startup();
 obj._started=true;
@@ -37,45 +37,45 @@ obj._started=true;
 },this);
 }
 },_startChildren:function(){
-_9.forEach(this.getChildren(),function(obj){
+_8.forEach(this.getChildren(),function(obj){
 if(!obj._started&&!obj._destroyed&&_2.isFunction(obj.startup)){
 obj.startup();
 obj._started=true;
 }
 });
 if(this._contentSetter){
-_9.forEach(this._contentSetter.parseResults,function(obj){
+_8.forEach(this._contentSetter.parseResults,function(obj){
 if(!obj._started&&!obj._destroyed&&_2.isFunction(obj.startup)){
 obj.startup();
 obj._started=true;
 }
 },this);
 }
-},setHref:function(_19){
+},setHref:function(_18){
 _1.deprecated("dijit.layout.ContentPane.setHref() is deprecated. Use set('href', ...) instead.","","2.0");
-return this.set("href",_19);
-},_setHrefAttr:function(_1a){
+return this.set("href",_18);
+},_setHrefAttr:function(_19){
 this.cancel();
-this.onLoadDeferred=new _b(_2.hitch(this,"cancel"));
+this.onLoadDeferred=new _a(_2.hitch(this,"cancel"));
 this.onLoadDeferred.then(_2.hitch(this,"onLoad"));
-this._set("href",_1a);
+this._set("href",_19);
 if(this.preload||(this._created&&this._isShown())){
 this._load();
 }else{
 this._hrefChanged=true;
 }
 return this.onLoadDeferred;
-},setContent:function(_1b){
+},setContent:function(_1a){
 _1.deprecated("dijit.layout.ContentPane.setContent() is deprecated.  Use set('content', ...) instead.","","2.0");
-this.set("content",_1b);
-},_setContentAttr:function(_1c){
+this.set("content",_1a);
+},_setContentAttr:function(_1b){
 this._set("href","");
 this.cancel();
-this.onLoadDeferred=new _b(_2.hitch(this,"cancel"));
+this.onLoadDeferred=new _a(_2.hitch(this,"cancel"));
 if(this._created){
 this.onLoadDeferred.then(_2.hitch(this,"onLoad"));
 }
-this._setContent(_1c||"");
+this._setContent(_1b||"");
 this._isDownloaded=false;
 return this.onLoadDeferred;
 },_getContentAttr:function(){
@@ -89,7 +89,7 @@ this.onLoadDeferred=null;
 },destroy:function(){
 this.cancel();
 this.inherited(arguments);
-},destroyRecursive:function(_1d){
+},destroyRecursive:function(_1c){
 if(this._beingDestroyed){
 return;
 }
@@ -103,43 +103,43 @@ return this.refresh();
 }
 },refresh:function(){
 this.cancel();
-this.onLoadDeferred=new _b(_2.hitch(this,"cancel"));
+this.onLoadDeferred=new _a(_2.hitch(this,"cancel"));
 this.onLoadDeferred.then(_2.hitch(this,"onLoad"));
 this._load();
 return this.onLoadDeferred;
 },_load:function(){
 this._setContent(this.onDownloadStart(),true);
-var _1e=this;
-var _1f={preventCache:(this.preventCache||this.refreshOnShow),url:this.href,handleAs:"text"};
+var _1d=this;
+var _1e={preventCache:(this.preventCache||this.refreshOnShow),url:this.href,handleAs:"text"};
 if(_2.isObject(this.ioArgs)){
-_2.mixin(_1f,this.ioArgs);
+_2.mixin(_1e,this.ioArgs);
 }
-var _20=(this._xhrDfd=(this.ioMethod||_f.get)(_1f)),_21;
-_20.then(function(_22){
-_21=_22;
+var _1f=(this._xhrDfd=(this.ioMethod||_e.get)(_1e)),_20;
+_1f.then(function(_21){
+_20=_21;
 try{
-_1e._isDownloaded=true;
-return _1e._setContent(_22,false);
+_1d._isDownloaded=true;
+return _1d._setContent(_21,false);
 }
 catch(err){
-_1e._onError("Content",err);
+_1d._onError("Content",err);
 }
 },function(err){
-if(!_20.canceled){
-_1e._onError("Download",err);
+if(!_1f.canceled){
+_1d._onError("Download",err);
 }
-delete _1e._xhrDfd;
+delete _1d._xhrDfd;
 return err;
 }).then(function(){
-_1e.onDownloadEnd();
-delete _1e._xhrDfd;
-return _21;
+_1d.onDownloadEnd();
+delete _1d._xhrDfd;
+return _20;
 });
 delete this._hrefChanged;
-},_onLoadHandler:function(_23){
+},_onLoadHandler:function(_22){
 this._set("isLoaded",true);
 try{
-this.onLoadDeferred.resolve(_23);
+this.onLoadDeferred.resolve(_22);
 }
 catch(e){
 console.error("Error "+this.widgetId+" running custom onLoad code: "+e.message);
@@ -152,67 +152,70 @@ this.onUnload();
 catch(e){
 console.error("Error "+this.widgetId+" running custom onUnload code: "+e.message);
 }
-},destroyDescendants:function(_24){
+},destroyDescendants:function(_23){
 if(this.isLoaded){
 this._onUnloadHandler();
 }
-var _25=this._contentSetter;
-_9.forEach(this.getChildren(),function(_26){
+var _24=this._contentSetter;
+_8.forEach(this.getChildren(),function(_25){
+if(_25.destroyRecursive){
+_25.destroyRecursive(_23);
+}else{
+if(_25.destroy){
+_25.destroy(_23);
+}
+}
+_25._destroyed=true;
+});
+if(_24){
+_8.forEach(_24.parseResults,function(_26){
+if(!_26._destroyed){
 if(_26.destroyRecursive){
-_26.destroyRecursive(_24);
+_26.destroyRecursive(_23);
 }else{
 if(_26.destroy){
-_26.destroy(_24);
+_26.destroy(_23);
 }
 }
 _26._destroyed=true;
-});
-if(_25){
-_9.forEach(_25.parseResults,function(_27){
-if(!_27._destroyed){
-if(_27.destroyRecursive){
-_27.destroyRecursive(_24);
-}else{
-if(_27.destroy){
-_27.destroy(_24);
-}
-}
-_27._destroyed=true;
 }
 });
-delete _25.parseResults;
+delete _24.parseResults;
 }
-if(!_24){
-_e.empty(this.containerNode);
+if(!_23){
+_d.empty(this.containerNode);
 }
 delete this._singleChild;
-},_setContent:function(_28,_29){
+},_setContent:function(_27,_28){
+_27=this.preprocessContent(_27);
 this.destroyDescendants();
-var _2a=this._contentSetter;
-if(!(_2a&&_2a instanceof _7._ContentSetter)){
-_2a=this._contentSetter=new _7._ContentSetter({node:this.containerNode,_onError:_2.hitch(this,this._onError),onContentError:_2.hitch(this,function(e){
-var _2b=this.onContentError(e);
+var _29=this._contentSetter;
+if(!(_29&&_29 instanceof _7._ContentSetter)){
+_29=this._contentSetter=new _7._ContentSetter({node:this.containerNode,_onError:_2.hitch(this,this._onError),onContentError:_2.hitch(this,function(e){
+var _2a=this.onContentError(e);
 try{
-this.containerNode.innerHTML=_2b;
+this.containerNode.innerHTML=_2a;
 }
 catch(e){
 console.error("Fatal "+this.id+" could not change content due to "+e.message,e);
 }
 })});
 }
-var _2c=_2.mixin({cleanContent:this.cleanContent,extractContent:this.extractContent,parseContent:!_28.domNode&&this.parseOnLoad,parserScope:this.parserScope,startup:false,dir:this.dir,lang:this.lang,textDir:this.textDir},this._contentSetterParams||{});
-var p=_2a.set((_2.isObject(_28)&&_28.domNode)?_28.domNode:_28,_2c);
-var _2d=this;
-return _11(p&&p.then?p:_2a.parseDeferred,function(){
-delete _2d._contentSetterParams;
-if(!_29){
-if(_2d._started){
-_2d._startChildren();
-_2d._scheduleLayout();
+var _2b=_2.mixin({cleanContent:this.cleanContent,extractContent:this.extractContent,parseContent:!_27.domNode&&this.parseOnLoad,parserScope:this.parserScope,startup:false,dir:this.dir,lang:this.lang,textDir:this.textDir},this._contentSetterParams||{});
+var p=_29.set((_2.isObject(_27)&&_27.domNode)?_27.domNode:_27,_2b);
+var _2c=this;
+return _10(p&&p.then?p:_29.parseDeferred,function(){
+delete _2c._contentSetterParams;
+if(!_28){
+if(_2c._started){
+_2c._startChildren();
+_2c._scheduleLayout();
 }
-_2d._onLoadHandler(_28);
+_2c._onLoadHandler(_27);
 }
 });
+},preprocessContent:function(_2d){
+return _2d;
 },_onError:function(_2e,err,_2f){
 this.onLoadDeferred.reject(err);
 var _30=this["on"+_2e+"Error"].call(this,err);

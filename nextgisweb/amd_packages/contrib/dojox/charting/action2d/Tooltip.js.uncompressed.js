@@ -113,13 +113,10 @@ define("dojox/charting/action2d/Tooltip", ["dijit/Tooltip", "dojo/_base/lang", "
 				//case "slice":
 					if(!this.angles){
 						// calculate the running total of slice angles
-						if(typeof o.run.data[0] == "number"){
-							this.angles = df.map(df.scanl(o.run.data, "+", 0),
-								"* 2 * Math.PI / this", df.foldl(o.run.data, "+", 0));
-						}else{
-							this.angles = df.map(df.scanl(o.run.data, "a + b.y", 0),
-								"* 2 * Math.PI / this", df.foldl(o.run.data, "a + b.y", 0));
-						}
+						var filteredRun = typeof o.run.data[0] == "number" ?
+								df.map(o.run.data, "x ? Math.max(x, 0) : 0") : df.map(o.run.data, "x ? Math.max(x.y, 0) : 0");
+						this.angles = df.map(df.scanl(filteredRun, "+", 0),
+							"* 2 * Math.PI / this", df.foldl(filteredRun, "+", 0));
 					}
 					var startAngle = m._degToRad(o.plot.opt.startAngle),
 						angle = (this.angles[o.index] + this.angles[o.index + 1]) / 2 + startAngle;

@@ -19,7 +19,7 @@ this.arrowNode=_5.create("span",{className:"mblToolBarButtonArrow mblToolBarButt
 _4.add(this.domNode,"mblToolBarButtonHas"+(this.arrow==="left"?"Left":"Right")+"Arrow");
 }
 this.bodyNode=_5.create("span",{className:"mblToolBarButtonBody"},this.domNode);
-this.tableNode=_5.create("table",{cellPadding:"0",cellSpacing:"0",border:"0"},this.bodyNode);
+this.tableNode=_5.create("table",{cellPadding:"0",cellSpacing:"0",border:"0",role:"presentation"},this.bodyNode);
 if(!this.label&&this.arrow){
 this.tableNode.className="mblToolBarButtonText";
 }

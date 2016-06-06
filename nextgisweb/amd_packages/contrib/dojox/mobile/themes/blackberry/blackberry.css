@@ -53,6 +53,11 @@ html.mobile,
 .mblImageIcon {
   vertical-align: top;
 }
+.unselectable {
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
 .mblHeading {
   position: relative;
   margin: 0;
@@ -1720,7 +1725,7 @@ html.mobile,
   border: 1px inset #1b991c;
   border-radius: 7px;
   background: -webkit-gradient(radial, center center, 0, center center, 6, from(#17df25), to(#1ba51c));
-  background: radial-gradient(6 at center, #17df25 0%, #1ba51c 100%);
+  background: radial-gradient(6px at center, #17df25 0%, #1ba51c 100%);
 }
 .mblDomButtonSilverCircleGrayButton {
   position: relative;
@@ -1778,7 +1783,7 @@ html.mobile,
   border: 1px inset #ca701a;
   border-radius: 7px;
   background: -webkit-gradient(radial, center center, 0, center center, 6, from(#ff7a07), to(#e66b03));
-  background: radial-gradient(6 at center, #ff7a07 0%, #e66b03 100%);
+  background: radial-gradient(6px at center, #ff7a07 0%, #e66b03 100%);
 }
 .mblDomButtonSilverCircleGreenPlus {
   position: relative;
@@ -3690,7 +3695,7 @@ html.mobile,
 .mblCheckBox:checked.mblCheckBoxSelected::after {
   border-color: white;
 }
-.dijitPopup {
+.dijitPopup.mblComboBoxMenuPopup {
   margin: 0;
   padding: 0;
   position: absolute;
@@ -3699,6 +3704,17 @@ html.mobile,
   -webkit-box-shadow: none;
   box-shadow: none;
   border-radius: 12px;
+}
+.dijitPopup.mblComboBoxMenuPopup .dijitBackgroundIframe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  border: 0;
+  padding: 0;
+  margin: 0;
 }
 .mblReset {
   margin: 0;

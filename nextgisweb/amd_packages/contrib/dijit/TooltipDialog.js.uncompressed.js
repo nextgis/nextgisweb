@@ -1,5 +1,5 @@
 require({cache:{
-'url:dijit/templates/TooltipDialog.html':"<div role=\"alertdialog\" tabIndex=\"-1\">\n\t<div class=\"dijitTooltipContainer\" role=\"presentation\">\n\t\t<div class=\"dijitTooltipContents dijitTooltipFocusNode\" data-dojo-attach-point=\"containerNode\"></div>\n\t</div>\n\t<div class=\"dijitTooltipConnector\" role=\"presentation\" data-dojo-attach-point=\"connectorNode\"></div>\n</div>\n"}});
+'url:dijit/templates/TooltipDialog.html':"<div role=\"alertdialog\" tabIndex=\"-1\">\n\t<div class=\"dijitTooltipContainer\" role=\"presentation\">\n\t\t<div data-dojo-attach-point=\"contentsNode\" class=\"dijitTooltipContents dijitTooltipFocusNode\">\n\t\t\t<div data-dojo-attach-point=\"containerNode\"></div>\n\t\t\t${!actionBarTemplate}\n\t\t</div>\n\t</div>\n\t<div class=\"dijitTooltipConnector\" role=\"presentation\" data-dojo-attach-point=\"connectorNode\"></div>\n</div>\n"}});
 define("dijit/TooltipDialog", [
 	"dojo/_base/declare", // declare
 	"dojo/dom-class", // domClass.replace
@@ -62,7 +62,7 @@ define("dijit/TooltipDialog", [
 
 			postCreate: function(){
 				this.inherited(arguments);
-				this.own(on(this.containerNode, "keydown", lang.hitch(this, "_onKey")));
+				this.own(on(this.domNode, "keydown", lang.hitch(this, "_onKey")));
 			},
 
 			orient: function(/*DomNode*/ node, /*String*/ aroundCorner, /*String*/ tooltipCorner){
@@ -106,7 +106,7 @@ define("dijit/TooltipDialog", [
 			focus: function(){
 				// summary:
 				//		Focus on first field
-				this._getFocusItems(this.containerNode);
+				this._getFocusItems();
 				focus.focus(this._firstFocusItem);
 			},
 
@@ -157,7 +157,7 @@ define("dijit/TooltipDialog", [
 					evt.preventDefault();
 				}else if(evt.keyCode == keys.TAB){
 					var node = evt.target;
-					this._getFocusItems(this.containerNode);
+					this._getFocusItems();
 					if(this._firstFocusItem == this._lastFocusItem){
 						evt.stopPropagation();
 						evt.preventDefault();

@@ -1,8 +1,8 @@
 //>>built
 require({cache:{"url:dojox/calendar/templates/MonthColumnView.html":"<div data-dojo-attach-events=\"keydown:_onKeyDown\">\t\t\n\t<div data-dojo-attach-point=\"columnHeader\" class=\"dojoxCalendarColumnHeader\">\n\t\t<table data-dojo-attach-point=\"columnHeaderTable\" class=\"dojoxCalendarColumnHeaderTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\t\n\t<div data-dojo-attach-point=\"vScrollBar\" class=\"dojoxCalendarVScrollBar\">\n\t\t<div data-dojo-attach-point=\"vScrollBarContent\" style=\"visibility:hidden;position:relative; width:1px; height:1px;\" ></div>\n\t</div>\t\n\t<div data-dojo-attach-point=\"scrollContainer\" class=\"dojoxCalendarScrollContainer\">\n\t\t<div data-dojo-attach-point=\"sheetContainer\" style=\"position:relative;left:0;right:0;margin:0;padding:0\">\t\t\t\n\t\t\t<div data-dojo-attach-point=\"grid\" class=\"dojoxCalendarGrid\">\n\t\t\t\t<table data-dojo-attach-point=\"gridTable\" class=\"dojoxCalendarGridTable\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%\"></table>\n\t\t\t</div>\n\t\t\t<div data-dojo-attach-point=\"itemContainer\" class=\"dojoxCalendarContainer\" data-dojo-attach-event=\"mousedown:_onGridMouseDown,mouseup:_onGridMouseUp,ondblclick:_onGridDoubleClick,touchstart:_onGridTouchStart,touchmove:_onGridTouchMove,touchend:_onGridTouchEnd\">\n\t\t\t\t<table data-dojo-attach-point=\"itemContainerTable\" class=\"dojoxCalendarContainerTable\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%\"></table>\n\t\t\t</div>\n\t\t</div> \n\t</div>\t\n</div>\n"}});
-define("dojox/calendar/MonthColumnView",["./ViewBase","dijit/_TemplatedMixin","./_VerticalScrollBarBase","dojo/text!./templates/MonthColumnView.html","dojo/_base/declare","dojo/_base/event","dojo/_base/lang","dojo/_base/array","dojo/_base/sniff","dojo/_base/fx","dojo/_base/html","dojo/on","dojo/dom","dojo/dom-class","dojo/dom-style","dojo/dom-geometry","dojo/dom-construct","dojo/mouse","dojo/query","dojo/i18n","dojox/html/metrics"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,fx,_a,on,_b,_c,_d,_e,_f,_10,_11,_12,_13){
-return _5("dojox.calendar.MonthColumnView",[_1,_2],{baseClass:"dojoxCalendarMonthColumnView",templateString:_4,viewKind:"monthColumns",_setTabIndexAttr:"domNode",renderData:null,startDate:null,columnCount:6,daySize:30,showCellLabel:true,showHiddenItems:true,verticalRenderer:null,percentOverlap:0,horizontalGap:4,columnHeaderFormatLength:null,gridCellDatePattern:null,roundToDay:true,_layoutUnit:"month",_columnHeaderHandlers:null,constructor:function(){
-this.invalidatingProperties=["columnCount","startDate","daySize","percentOverlap","verticalRenderer","columnHeaderDatePattern","horizontalGap","scrollBarRTLPosition","itemToRendererKindFunc","layoutPriorityFunction","textDir","items","showCellLabel","showHiddenItems"];
+define("dojox/calendar/MonthColumnView",["./ViewBase","dijit/_TemplatedMixin","./_ScrollBarBase","dojo/text!./templates/MonthColumnView.html","dojo/_base/declare","dojo/_base/event","dojo/_base/lang","dojo/_base/array","dojo/_base/sniff","dojo/_base/fx","dojo/_base/html","dojo/on","dojo/dom","dojo/dom-class","dojo/dom-style","dojo/dom-geometry","dojo/dom-construct","dojo/mouse","dojo/query","dojo/i18n","dojox/html/metrics"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,fx,_a,on,_b,_c,_d,_e,_f,_10,_11,_12,_13){
+return _5("dojox.calendar.MonthColumnView",[_1,_2],{baseClass:"dojoxCalendarMonthColumnView",templateString:_4,viewKind:"monthColumns",_setTabIndexAttr:"domNode",renderData:null,startDate:null,columnCount:6,daySize:30,showCellLabel:true,showHiddenItems:true,verticalRenderer:null,verticalDecorationRenderer:null,percentOverlap:0,horizontalGap:4,columnHeaderFormatLength:null,gridCellDatePattern:null,roundToDay:true,_layoutUnit:"month",_columnHeaderHandlers:null,constructor:function(){
+this.invalidatingProperties=["columnCount","startDate","daySize","percentOverlap","verticalRenderer","verticalDecorationRenderer","columnHeaderDatePattern","horizontalGap","scrollBarRTLPosition","itemToRendererKindFunc","layoutPriorityFunction","textDir","items","showCellLabel","showHiddenItems"];
 this._columnHeaderHandlers=[];
 },postCreate:function(){
 this.inherited(arguments);
@@ -60,8 +60,7 @@ var _19=[];
 rd.dates.push(_19);
 while(d.getMonth()==_17){
 _19.push(d);
-d=rd.dateModule.add(d,"day",1);
-d=this.floorToDay(d,false,rd);
+d=this.addAndFloor(d,"day",1);
 }
 _17=d.getMonth();
 if(_18<_19.length){
@@ -79,6 +78,13 @@ this._computeVisibleItems(rd);
 }else{
 if(this.renderData){
 rd.items=this.renderData.items;
+}
+}
+if(this.displayedDecorationItemsInvalidated){
+rd.decorationItems=this.decorationStoreManager._computeVisibleItems(rd);
+}else{
+if(this.renderData){
+rd.decorationItems=this.renderData.decorationItems;
 }
 }
 return rd;
@@ -107,7 +113,7 @@ len=this.columnHeaderFormatLength;
 }
 var _1c=this.renderData.dateLocaleModule.getNames("months",len,"standAlone");
 return _1c[d.getMonth()];
-},_formatGridCellLabel:function(d,row,col){
+},gridCellDatePattern:null,_formatGridCellLabel:function(d,row,col){
 var _1d,rb;
 if(d==null){
 return "";
@@ -192,9 +198,9 @@ return;
 }
 this._validateProperties();
 var _2e=this.renderData;
-var rd=this._createRenderData();
-this.renderData=rd;
+var rd=this.renderData=this._createRenderData();
 this._createRendering(rd,_2e);
+this._layoutDecorationRenderers(rd);
 this._layoutRenderers(rd);
 },_createRendering:function(_2f,_30){
 _d.set(this.sheetContainer,"height",_2f.sheetHeight+"px");
@@ -265,7 +271,7 @@ for(var i=0;i<_39;i++){
 td=_f.create("td",null,tr);
 var h=[];
 h.push(on(td,"click",_7.hitch(this,this._columnHeaderClick)));
-if(_9("touch")){
+if(_9("touch-events")){
 h.push(on(td,"touchstart",function(e){
 _6.stop(e);
 _c.add(e.currentTarget,"Active");
@@ -519,29 +525,33 @@ return dur>=1440?"vertical":null;
 },_layoutRenderers:function(_61){
 this.hiddenEvents={};
 this.inherited(arguments);
-},_layoutInterval:function(_62,_63,_64,end,_65){
-var _66=[];
+},_layoutInterval:function(_62,_63,_64,end,_65,_66){
 var _67=[];
+var _68=[];
 _62.colW=this.itemContainer.offsetWidth/_62.columnCount;
+if(_66==="dataItems"){
 for(var i=0;i<_65.length;i++){
-var _68=_65[i];
-if(this._itemToRendererKind(_68)=="vertical"){
-_66.push(_68);
+var _69=_65[i];
+if(this._itemToRendererKind(_69)=="vertical"){
+_67.push(_69);
 }else{
 if(this.showHiddenItems){
-_67.push(_68);
+_68.push(_69);
 }
 }
-}
-if(_66.length>0){
-this._layoutVerticalItems(_62,_63,_64,end,_66);
 }
 if(_67.length>0){
-this._layoutBgItems(_62,_63,_64,end,_67);
+this._layoutVerticalItems(_62,_63,_64,end,_67,_66);
 }
-},_dateToYCoordinate:function(_69,d,_6a){
+if(_68.length>0){
+this._layoutBgItems(_62,_63,_64,end,_68);
+}
+}else{
+this._layoutVerticalItems(_62,_63,_64,end,_65,_66);
+}
+},_dateToYCoordinate:function(_6a,d,_6b){
 var pos=0;
-if(_6a||d.getHours()!=0||d.getMinutes()!=0){
+if(_6b||d.getHours()!=0||d.getMinutes()!=0){
 pos=(d.getDate()-1)*this.renderData.daySize;
 }else{
 var d2=this._waDojoxAddIssue(d,"day",-1);
@@ -549,93 +559,99 @@ pos=this.renderData.daySize+((d2.getDate()-1)*this.renderData.daySize);
 }
 pos+=(d.getHours()*60+d.getMinutes())*this.renderData.daySize/1440;
 return pos;
-},_layoutVerticalItems:function(_6b,_6c,_6d,_6e,_6f){
+},_layoutVerticalItems:function(_6c,_6d,_6e,_6f,_70,_71){
 if(this.verticalRenderer==null){
 return;
 }
-var _70=_6b.cells[_6c];
-var _71=[];
-for(var i=0;i<_6f.length;i++){
-var _72=_6f[i];
-var _73=this.computeRangeOverlap(_6b,_72.startTime,_72.endTime,_6d,_6e);
-var top=this._dateToYCoordinate(_6b,_73[0],true);
-var _74=this._dateToYCoordinate(_6b,_73[1],false);
-if(_74>top){
-var _75=_7.mixin({start:top,end:_74,range:_73,item:_72},_72);
-_71.push(_75);
+var _72=_6c.cells[_6d];
+var _73=[];
+for(var i=0;i<_70.length;i++){
+var _74=_70[i];
+var _75=this.computeRangeOverlap(_6c,_74.startTime,_74.endTime,_6e,_6f);
+var top=this._dateToYCoordinate(_6c,_75[0],true);
+var _76=this._dateToYCoordinate(_6c,_75[1],false);
+if(_76>top){
+var _77=_7.mixin({start:top,end:_76,range:_75,item:_74},_74);
+_73.push(_77);
 }
 }
-var _76=this.computeOverlapping(_71,this._overlapLayoutPass2).numLanes;
-var _77=this.percentOverlap/100;
-for(i=0;i<_71.length;i++){
-_72=_71[i];
-var _78=_72.lane;
-var _79=_72.extent;
+var _78=_71==="dataItems"?this.computeOverlapping(_73,this._overlapLayoutPass2).numLanes:1;
+var _79=this.percentOverlap/100;
+for(i=0;i<_73.length;i++){
+_74=_73[i];
+var _7a=_74.lane;
+var _7b=_74.extent;
+var ir=null;
+if(_71==="dataItems"){
 var w;
-var _7a;
-if(_77==0){
-w=_76==1?_6b.colW:((_6b.colW-(_76-1)*this.horizontalGap)/_76);
-_7a=_78*(w+this.horizontalGap);
-w=_79==1?w:w*_79+(_79-1)*this.horizontalGap;
-w=100*w/_6b.colW;
-_7a=100*_7a/_6b.colW;
+var _7c;
+if(_79==0){
+w=_78==1?_6c.colW:((_6c.colW-(_78-1)*this.horizontalGap)/_78);
+_7c=_7a*(w+this.horizontalGap);
+w=_7b==1?w:w*_7b+(_7b-1)*this.horizontalGap;
+w=100*w/_6c.colW;
+_7c=100*_7c/_6c.colW;
 }else{
-w=_76==1?100:(100/(_76-(_76-1)*_77));
-_7a=_78*(w-_77*w);
-w=_79==1?w:w*(_79-(_79-1)*_77);
+w=_78==1?100:(100/(_78-(_78-1)*_79));
+_7c=_7a*(w-_79*w);
+w=_7b==1?w:w*(_7b-(_7b-1)*_79);
 }
-var ir=this._createRenderer(_72,"vertical",this.verticalRenderer,"dojoxCalendarVertical");
-_d.set(ir.container,{"top":_72.start+"px","left":_7a+"%","width":w+"%","height":(_72.end-_72.start+1)+"px"});
-var _7b=this.isItemBeingEdited(_72);
-var _7c=this.isItemSelected(_72);
-var _7d=this.isItemHovered(_72);
-var _7e=this.isItemFocused(_72);
-var _7f=ir.renderer;
-_7f.set("hovered",_7d);
-_7f.set("selected",_7c);
-_7f.set("edited",_7b);
-_7f.set("focused",this.showFocus?_7e:false);
-_7f.set("storeState",this.getItemStoreState(_72));
-_7f.set("moveEnabled",this.isItemMoveEnabled(_72._item,"vertical"));
-_7f.set("resizeEnabled",this.isItemResizeEnabled(_72._item,"vertical"));
-this.applyRendererZIndex(_72,ir,_7d,_7c,_7b,_7e);
-if(_7f.updateRendering){
-_7f.updateRendering(w,_72.end-_72.start+1);
+ir=this._createRenderer(_74,"vertical",this.verticalRenderer,"dojoxCalendarVertical");
+_d.set(ir.container,{"top":_74.start+"px","left":_7c+"%","width":w+"%","height":(_74.end-_74.start+1)+"px"});
+var _7d=this.isItemBeingEdited(_74);
+var _7e=this.isItemSelected(_74);
+var _7f=this.isItemHovered(_74);
+var _80=this.isItemFocused(_74);
+var _81=ir.renderer;
+_81.set("hovered",_7f);
+_81.set("selected",_7e);
+_81.set("edited",_7d);
+_81.set("focused",this.showFocus?_80:false);
+_81.set("storeState",this.getItemStoreState(_74));
+_81.set("moveEnabled",this.isItemMoveEnabled(_74._item,"vertical"));
+_81.set("resizeEnabled",this.isItemResizeEnabled(_74._item,"vertical"));
+this.applyRendererZIndex(_74,ir,_7f,_7e,_7d,_80);
+if(_81.updateRendering){
+_81.updateRendering(w,_74.end-_74.start+1);
 }
-_f.place(ir.container,_70);
+}else{
+ir=this.decorationRendererManager.createRenderer(_74,"vertical",this.verticalDecorationRenderer,"dojoxCalendarDecoration");
+_d.set(ir.container,{"top":_74.start+"px","left":"0","width":"100%","height":(_74.end-_74.start+1)+"px"});
+}
+_f.place(ir.container,_72);
 _d.set(ir.container,"display","block");
 }
-},_getCellAt:function(_80,_81,rtl){
+},_getCellAt:function(_82,_83,rtl){
 if((rtl==undefined||rtl==true)&&!this.isLeftToRight()){
-_81=this.renderData.columnCount-1-_81;
+_83=this.renderData.columnCount-1-_83;
 }
-return this.gridTable.childNodes[0].childNodes[_80].childNodes[_81];
+return this.gridTable.childNodes[0].childNodes[_82].childNodes[_83];
 },invalidateLayout:function(){
 _11("td",this.gridTable).forEach(function(td){
 _c.remove(td,"dojoxCalendarHiddenEvents");
 });
 this.inherited(arguments);
-},_layoutBgItems:function(_82,col,_83,_84,_85){
-var _86={};
-for(var i=0;i<_85.length;i++){
-var _87=_85[i];
-var _88=this.computeRangeOverlap(_82,_87.startTime,_87.endTime,_83,_84);
-var _89=_88[0].getDate()-1;
+},_layoutBgItems:function(_84,col,_85,_86,_87){
+var _88={};
+for(var i=0;i<_87.length;i++){
+var _89=_87[i];
+var _8a=this.computeRangeOverlap(_84,_89.startTime,_89.endTime,_85,_86);
+var _8b=_8a[0].getDate()-1;
 var end;
-if(this.isStartOfDay(_88[1])){
-end=this._waDojoxAddIssue(_88[1],"day",-1);
+if(this.isStartOfDay(_8a[1])){
+end=this._waDojoxAddIssue(_8a[1],"day",-1);
 end=end.getDate()-1;
 }else{
-end=_88[1].getDate()-1;
+end=_8a[1].getDate()-1;
 }
-for(var d=_89;d<=end;d++){
-_86[d]=true;
+for(var d=_8b;d<=end;d++){
+_88[d]=true;
 }
 }
-for(var row in _86){
-if(_86[row]){
-var _8a=this._getCellAt(row,col,false);
-_c.add(_8a,"dojoxCalendarHiddenEvents");
+for(var row in _88){
+if(_88[row]){
+var _8c=this._getCellAt(row,col,false);
+_c.add(_8c,"dojoxCalendarHiddenEvents");
 }
 }
 },_sortItemsFunction:function(a,b){
@@ -644,16 +660,16 @@ if(res==0){
 res=-1*this.dateModule.compare(a.endTime,b.endTime);
 }
 return this.isLeftToRight()?res:-res;
-},getTime:function(e,x,y,_8b){
+},getTime:function(e,x,y,_8d){
 if(e!=null){
-var _8c=_e.position(this.itemContainer,true);
+var _8e=_e.position(this.itemContainer,true);
 if(e.touches){
-_8b=_8b==undefined?0:_8b;
-x=e.touches[_8b].pageX-_8c.x;
-y=e.touches[_8b].pageY-_8c.y;
+_8d=_8d==undefined?0:_8d;
+x=e.touches[_8d].pageX-_8e.x;
+y=e.touches[_8d].pageY-_8e.y;
 }else{
-x=e.pageX-_8c.x;
-y=e.pageY-_8c.y;
+x=e.pageX-_8e.x;
+y=e.pageY-_8e.y;
 }
 }
 var r=_e.getContentBox(this.itemContainer);
@@ -676,11 +692,11 @@ y=r.h-1;
 }
 var col=Math.floor(x/(r.w/this.renderData.columnCount));
 var row=Math.floor(y/(r.h/this.renderData.maxDayCount));
-var _8d=null;
+var _8f=null;
 if(col<this.renderData.dates.length&&row<this.renderData.dates[col].length){
-_8d=this.newDate(this.renderData.dates[col][row]);
+_8f=this.newDate(this.renderData.dates[col][row]);
 }
-return _8d;
+return _8f;
 },_onGridMouseUp:function(e){
 this.inherited(arguments);
 if(this._gridMouseDown){
@@ -700,24 +716,24 @@ _6.stop(e);
 return;
 }
 if(this._gridProps&&!this._isEditing){
-var _8e={x:e.touches[0].screenX,y:e.touches[0].screenY};
+var _90={x:e.touches[0].screenX,y:e.touches[0].screenY};
 var p=this._edProps;
-if(!p||p&&(Math.abs(_8e.x-p.start.x)>25||Math.abs(_8e.y-p.start.y)>25)){
+if(!p||p&&(Math.abs(_90.x-p.start.x)>25||Math.abs(_90.y-p.start.y)>25)){
 this._gridProps.moved=true;
 var d=e.touches[0].screenY-this._gridProps.start;
-var _8f=this._gridProps.scrollTop-d;
+var _91=this._gridProps.scrollTop-d;
 var max=this.itemContainer.offsetHeight-this.scrollContainer.offsetHeight;
-if(_8f<0){
+if(_91<0){
 this._gridProps.start=e.touches[0].screenY;
 this._setScrollImpl(0);
 this._gridProps.scrollTop=0;
 }else{
-if(_8f>max){
+if(_91>max){
 this._gridProps.start=e.touches[0].screenY;
 this._setScrollImpl(max);
 this._gridProps.scrollTop=max;
 }else{
-this._setScrollImpl(_8f);
+this._setScrollImpl(_91);
 }
 }
 }

@@ -12,11 +12,11 @@ define("dojo/request/xhr", [
 		return typeof XMLHttpRequest !== 'undefined';
 	});
 	has.add('dojo-force-activex-xhr', function(){
-		return has('activex') && !document.addEventListener && window.location.protocol === 'file:';
+		return has('activex') && window.location.protocol === 'file:';
 	});
 
 	has.add('native-xhr2', function(){
-		if(!has('native-xhr')){ return; }
+		if(!has('native-xhr') || has('dojo-force-activex-xhr')){ return; }
 		var x = new XMLHttpRequest();
 		return typeof x['addEventListener'] !== 'undefined' &&
 			(typeof opera === 'undefined' || typeof x['upload'] !== 'undefined');
@@ -24,13 +24,41 @@ define("dojo/request/xhr", [
 
 	has.add('native-formdata', function(){
 		// if true, the environment has a native FormData implementation
-		return typeof FormData === 'function';
+		return typeof FormData !== 'undefined';
 	});
+
+	has.add('native-response-type', function(){
+		return has('native-xhr') && typeof new XMLHttpRequest().responseType !== 'undefined';
+	});
+
+	has.add('native-xhr2-blob', function(){
+		if(!has('native-response-type')){ return; }
+		var x = new XMLHttpRequest();
+		x.open('GET', '/', true);
+		x.responseType = 'blob';
+		// will not be set if unsupported
+		var responseType = x.responseType;
+		x.abort();
+		return responseType === 'blob';
+	});
+
+	// Google Chrome doesn't support "json" response type
+	// up to version 30, so it's intentionally not included here
+	var nativeResponseTypes = {
+		'blob': has('native-xhr2-blob') ? 'blob' : 'arraybuffer',
+		'document': 'document',
+		'arraybuffer': 'arraybuffer'
+	};
 
 	function handleResponse(response, error){
 		var _xhr = response.xhr;
 		response.status = response.xhr.status;
-		response.text = _xhr.responseText;
+
+		try {
+			// Firefox throws an error when trying to access
+			// xhr.responseText if response isn't text
+			response.text = _xhr.responseText;
+		} catch (e) {}
 
 		if(response.options.handleAs === 'xml'){
 			response.data = _xhr.responseXML;
@@ -43,15 +71,31 @@ define("dojo/request/xhr", [
 				error = e;
 			}
 		}
-
+		var handleError;
 		if(error){
 			this.reject(error);
-		}else if(util.checkStatus(_xhr.status)){
-			this.resolve(response);
 		}else{
-			error = new RequestError('Unable to load ' + response.url + ' status: ' + _xhr.status, response);
-
-			this.reject(error);
+			try{
+				handlers(response);
+			}catch(e){
+				handleError = e;
+			}
+			if(util.checkStatus(_xhr.status)){
+				if(!handleError){
+					this.resolve(response);
+				}else{
+					this.reject(handleError);
+				}
+			}else{
+				if(!handleError){
+					error = new RequestError('Unable to load ' + response.url + ' status: ' + _xhr.status, response);
+					this.reject(error);
+				}else{
+					error = new RequestError('Unable to load ' + response.url + ' status: ' + _xhr.status +
+						' and an error in handleAs: transformation of response', response);
+    				this.reject(error);
+				}
+			}
 		}
 	}
 
@@ -85,6 +129,9 @@ define("dojo/request/xhr", [
 				if(evt.lengthComputable){
 					response.loaded = evt.loaded;
 					response.total = evt.total;
+					dfd.progress(response);
+				} else if(response.xhr.readyState === 3){
+					response.loaded = ('loaded' in evt) ? evt.loaded : evt.position;
 					dfd.progress(response);
 				}
 			}
@@ -130,10 +177,11 @@ define("dojo/request/xhr", [
 			method: 'GET'
 		};
 	function xhr(url, options, returnDeferred){
+		var isFormData = has('native-formdata') && options && options.data && options.data instanceof FormData;
 		var response = util.parseArgs(
 			url,
 			util.deepCreate(defaultOptions, options),
-			has('native-formdata') && options && options.data && options.data instanceof FormData
+			isFormData
 		);
 		url = response.url;
 		options = response.options;
@@ -179,8 +227,12 @@ define("dojo/request/xhr", [
 				_xhr.withCredentials = options.withCredentials;
 			}
 
+			if(has('native-response-type') && options.handleAs in nativeResponseTypes) {
+				_xhr.responseType = nativeResponseTypes[options.handleAs];
+			}
+
 			var headers = options.headers,
-				contentType = 'application/x-www-form-urlencoded';
+				contentType = isFormData ? false : 'application/x-www-form-urlencoded';
 			if(headers){
 				for(var hdr in headers){
 					if(hdr.toLowerCase() === 'content-type'){

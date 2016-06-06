@@ -187,7 +187,7 @@ var AutoUrlLink = dojo.declare("dojox.editor.plugins.AutoUrlLink", [_Plugin], {
 		// summary:
 		//		Find the occurrace of the URL strings.
 		//		FF, Chrome && Safri have a behavior that when insertHTML is executed,
-		//		the orignal referrence to the text node will be the text node next to
+		//		the original referrence to the text node will be the text node next to
 		//		the inserted anchor automatically. So we have to re-caculate the index of
 		//		the following URL occurrence.
 		// value:

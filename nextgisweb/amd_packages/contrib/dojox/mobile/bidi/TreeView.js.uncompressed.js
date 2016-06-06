@@ -14,6 +14,10 @@ define("dojox/mobile/bidi/TreeView", [
 		//		Mobile TreeView widget loads this module when user sets "has: {'dojo-bidi': true }" in data-dojo-config.
 		_customizeListItem: function(listItemArgs){
 			listItemArgs.textDir = this.textDir;
+			if(!this.isLeftToRight()){
+				listItemArgs.dir = "rtl";
+				listItemArgs.transitionDir = -1;
+			}
 		}
 
 	});

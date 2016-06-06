@@ -1,7 +1,6 @@
 
 .claro .dijitCalendar {
   border: solid 1px #b5bcc7;
-  border-collapse: separate;
   -moz-border-radius: 4px;
   border-radius: 4px;
   background-color: #cfe5fa;
@@ -26,6 +25,9 @@
   
   background-color: #abd6ff;
   border: solid 1px #759dc0;
+}
+.claro .dijitCalendar table {
+  border-collapse: separate;
 }
 .claro .dijitCalendarMonthContainer th {
   text-align: center;
@@ -152,7 +154,7 @@
   color: #000000;
 }
 .claro .dijitCalendarHoveredDate .dijitCalendarDateLabel,
-.claro .dijitCalendarEnabledDate:hover .dijitCalendarDateLabel {
+.claro .dijitCalendarLite .dijitCalendarEnabledDate:hover .dijitCalendarDateLabel {
   background-color: #abd6ff;
   border: solid 1px #759dc0;
   color: #000000;
@@ -232,7 +234,7 @@
   padding: 2px 0;
 }
 .claro .dijitCalendarMonthMenu .dijitCalendarMonthLabelHover,
-.claro .dijitCalendarMonthMenu .dijitCalendarMonthLabel:hover {
+.claro .dijitCalendarMonthMenu .dijitCalendarMonthLabelActive {
   border-color: #759dc0;
   border-width: 1px 0;
   background-color: #abd6ff;

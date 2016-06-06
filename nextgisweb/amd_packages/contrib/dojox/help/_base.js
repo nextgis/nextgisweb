@@ -1,9 +1,9 @@
 //>>built
-define("dojox/help/_base",["dijit","dojo","dojox","dojo/require!dojox/rpc/Service,dojo/io/script"],function(_1,_2,_3){
-_2.provide("dojox.help._base");
-_2.require("dojox.rpc.Service");
-_2.require("dojo.io.script");
-_2.experimental("dojox.help");
+define("dojox/help/_base",["dojo","dijit","dojox","dojo/require!dojox/rpc/Service,dojo/io/script"],function(_1,_2,_3){
+_1.provide("dojox.help._base");
+_1.require("dojox.rpc.Service");
+_1.require("dojo.io.script");
+_1.experimental("dojox.help");
 console.warn("Script causes side effects (on numbers, strings, and booleans). Call dojox.help.noConflict() if you plan on executing code.");
 _3.help={locate:function(_4,_5,_6){
 _6=_6||20;
@@ -11,18 +11,18 @@ var _7=[];
 var _8={};
 var _9;
 if(_5){
-if(!_2.isArray(_5)){
+if(!_1.isArray(_5)){
 _5=[_5];
 }
 for(var i=0,_a;_a=_5[i];i++){
 _9=_a;
-if(_2.isString(_a)){
-_a=_2.getObject(_a);
+if(_1.isString(_a)){
+_a=_1.getObject(_a);
 if(!_a){
 continue;
 }
 }else{
-if(_2.isObject(_a)){
+if(_1.isObject(_a)){
 _9=_a.__name__;
 }else{
 continue;
@@ -31,7 +31,7 @@ continue;
 _7.push(_a);
 if(_9){
 _9=_9.split(".")[0];
-if(!_8[_9]&&_2.indexOf(_3.help._namespaces,_9)==-1){
+if(!_8[_9]&&_1.indexOf(_3.help._namespaces,_9)==-1){
 _3.help.refresh(_9);
 }
 _8[_9]=true;
@@ -40,7 +40,7 @@ _8[_9]=true;
 }
 if(!_7.length){
 _7.push({__name__:"window"});
-_2.forEach(_3.help._namespaces,function(_b){
+_1.forEach(_3.help._namespaces,function(_b){
 _8[_b]=true;
 });
 }
@@ -49,7 +49,7 @@ var _d=[];
 out:
 for(var i=0,_a;_a=_7[i];i++){
 var _e=_a.__name__||"";
-var _f=_2.some(_7,function(_10){
+var _f=_1.some(_7,function(_10){
 _10=_10.__name__||"";
 return (_e.indexOf(_10+".")==0);
 });
@@ -58,7 +58,7 @@ _9=_e.split(".")[0];
 var _11=[];
 if(_e=="window"){
 for(_9 in _3.help._names){
-if(_2.isArray(_3.help._names[_9])){
+if(_1.isArray(_3.help._names[_9])){
 _11=_11.concat(_3.help._names[_9]);
 }
 }
@@ -70,7 +70,7 @@ if((_e=="window"||_12.indexOf(_e+".")==0)&&_12.toLowerCase().indexOf(_c)!=-1){
 if(_12.slice(-10)==".prototype"){
 continue;
 }
-var obj=_2.getObject(_12);
+var obj=_1.getObject(_12);
 if(obj){
 _d.push([_12,obj]);
 if(_d.length==_6){
@@ -82,7 +82,7 @@ break out;
 }
 }
 _3.help._displayLocated(_d);
-if(!_2.isMoz){
+if(!_1.isMoz){
 return "";
 }
 },refresh:function(_13,_14){
@@ -106,22 +106,22 @@ _17[key]=_3.help._noConflict(_18);
 if(_19){
 _3.help._namespaces.concat(_19);
 }
-_2.addOnLoad(function(){
-_2.require=(function(_1b){
+_1.addOnLoad(function(){
+_1.require=(function(_1b){
 return function(){
 _3.help.noConflict();
-_1b.apply(_2,arguments);
+_1b.apply(_1,arguments);
 if(_3.help._timer){
 clearTimeout(_3.help._timer);
 }
 _3.help._timer=setTimeout(function(){
-_2.addOnLoad(function(){
+_1.addOnLoad(function(){
 _3.help.refresh();
 _3.help._timer=false;
 });
 },500);
 };
-})(_2.require);
+})(_1.require);
 _3.help._recurse();
 });
 },_noConflict:function(_1c){
@@ -134,7 +134,7 @@ return +_1c;
 if(_1c instanceof Boolean){
 return (_1c==true);
 }else{
-if(_2.isObject(_1c)){
+if(_1.isObject(_1c)){
 delete _1c.__name__;
 delete _1c.help;
 }
@@ -142,7 +142,7 @@ delete _1c.help;
 }
 }
 return _1c;
-},_namespaces:["dojo","dojox","dijit","djConfig"],_rpc:new _3.rpc.Service(_2.moduleUrl("dojox.rpc.SMDLibrary","dojo-api.smd")),_attributes:["summary","type","returns","parameters"],_clean:function(_1d){
+},_namespaces:["dojo","dojox","dijit","djConfig"],_rpc:new _3.rpc.Service(_1.moduleUrl("dojox.rpc.SMDLibrary","dojo-api.smd")),_attributes:["summary","type","returns","parameters"],_clean:function(_1d){
 var obj={};
 for(var i=0,_1e;_1e=_3.help._attributes[i];i++){
 var _1f=_1d["__"+_1e+"__"];
@@ -157,7 +157,7 @@ throw new Error("_displayLocated should be overridden in one of the dojox.help p
 throw new Error("_displayHelp should be overridden in one of the dojox.help packages");
 },_addVersion:function(obj){
 if(obj.name){
-obj.version=[_2.version.major,_2.version.minor,_2.version.patch].join(".");
+obj.version=[_1.version.major,_1.version.minor,_1.version.patch].join(".");
 var _22=obj.name.split(".");
 if(_22[0]=="dojo"||_22[0]=="dijit"||_22[0]=="dojox"){
 obj.project=_22[0];
@@ -204,7 +204,7 @@ _3.help._displayHelp(false,false);
 }
 });
 }
-if(!_2.isMoz){
+if(!_1.isMoz){
 return "";
 }
 },_parse:function(_2b){
@@ -269,11 +269,11 @@ if(!_32||!this.__searching__){
 return this.__source__;
 }
 var _33="function Loading info for "+this.__name__+"... (watch console for result) {}";
-if(!_2.isMoz){
+if(!_1.isMoz){
 this.__output__=true;
 return _33;
 }
-return {toString:_2.hitch(this,function(){
+return {toString:_1.hitch(this,function(){
 this.__output__=true;
 return _33;
 })};
@@ -302,8 +302,8 @@ if(arguments.length<2){
 _39=true;
 }
 var _3a=[];
-if(_38&&_2.isString(_38)){
-_3.help.__recurse(_2.getObject(_38),_38,_38,_3a,_39);
+if(_38&&_1.isString(_38)){
+_3.help.__recurse(_1.getObject(_38),_38,_38,_3a,_39);
 }else{
 for(var i=0,ns;ns=_3.help._namespaces[i];i++){
 if(window[ns]){
@@ -328,18 +328,18 @@ if(key.match(/([^\w_.$]|__[\w_.$]+__)/)){
 continue;
 }
 var _42=_3d[key];
-if(typeof _42=="undefined"||_42===document||_42===window||_42===_3.help._toString||_42===_3.help._help||_42===null||(+_2.isIE&&_42.tagName)||_42.__seen__){
+if(typeof _42=="undefined"||_42===document||_42===window||_42===_3.help._toString||_42===_3.help._help||_42===null||(+_1.isIE&&_42.tagName)||_42.__seen__){
 continue;
 }
-var _43=_2.isFunction(_42);
-var _44=_2.isObject(_42)&&!_2.isArray(_42)&&!_42.nodeType;
+var _43=_1.isFunction(_42);
+var _44=_1.isObject(_42)&&!_1.isArray(_42)&&!_42.nodeType;
 var _45=(_3f)?(_3f+"."+key):key;
 if(_45=="dojo._blockAsync"){
 continue;
 }
 if(!_42.__name__){
 var _46=null;
-if(_2.isString(_42)){
+if(_1.isString(_42)){
 _46=String;
 }else{
 if(typeof _42=="number"){

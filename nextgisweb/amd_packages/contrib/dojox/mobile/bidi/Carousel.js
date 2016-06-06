@@ -11,7 +11,7 @@ this._prevHandle=this.connect(this.prevBtnNode,"onclick","onNextBtnClick");
 this._nextHandle=this.connect(this.nextBtnNode,"onclick","onPrevBtnClick");
 }
 if(this.pageIndicator){
-_3.set(this.piw,"float","left");
+_3.set(this.piw.domNode,"float","left");
 }
 }
 },_setTitleAttr:function(_4){

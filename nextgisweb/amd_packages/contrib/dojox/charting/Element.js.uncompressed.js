@@ -18,8 +18,9 @@ define("dojox/charting/Element", ["dojo/_base/array", "dojo/dom-construct","dojo
 		group: null,
 		htmlElements: null,
 		dirty: true,
+		renderingOptions: null,
 
-		constructor: function(chart){
+		constructor: function(chart, kwArgs){
 			// summary:
 			//		Creates a new charting element.
 			// chart: dojox/charting/Chart
@@ -30,6 +31,9 @@ define("dojox/charting/Element", ["dojo/_base/array", "dojo/dom-construct","dojo
 			this.dirty = true;
 			this.trailingSymbol = "...";
 			this._events = [];
+			if (kwArgs && kwArgs.renderingOptions) {
+				this.renderingOptions = kwArgs.renderingOptions;
+			}
 		},
 		purgeGroup: function(){
 			// summary:
@@ -105,6 +109,14 @@ define("dojox/charting/Element", ["dojo/_base/array", "dojo/dom-construct","dojo
 				}
 			}else{
 				this.group = creator.createGroup();
+				// in some cases we have a rawNode but this is not an actual DOM element (CanvasWithEvents) so check
+				// the actual rawNode type.
+				if (this.renderingOptions && this.group.rawNode &&
+					this.group.rawNode.namespaceURI == "http://www.w3.org/2000/svg") {
+					for (var key in this.renderingOptions) {
+						this.group.rawNode.setAttribute(key, this.renderingOptions[key]);
+					}
+				}
 			}
 			this.dirty = true;
 			return this;	//	dojox.charting.Element
@@ -124,6 +136,10 @@ define("dojox/charting/Element", ["dojo/_base/array", "dojo/dom-construct","dojo
 			// summary:
 			//		API addition to conform to the rest of the Dojo Toolkit's standard.
 			this.purgeGroup();
+		},
+		overrideShape: function(shape, params){
+			// summary:
+			//		Extension point for overriding the charting shape
 		},
 		//text utilities
 		getTextWidth: function(s, font){

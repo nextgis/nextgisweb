@@ -127,7 +127,7 @@ var ToolsSetup = {
 //		This object is inserted into the *function* of
 //		a tool (not a stencil). Like: function.ToolsSetup
 //		It must be attached after constructr creation, so
-//		this object is found at the botton of the file.
+//		this object is found at the bottom of the file.
 
 // name: String
 //		Fully qualified name of constructor
@@ -554,7 +554,7 @@ var Base = oo.declare(
 			}
 			
 			if(this.useSelectedStyle){
-				// using the orginal selected style copy as
+				// using the original selected style copy as
 				// a reference map of what props to copy
 				for(nm in this.style.norm){
 					if(this.selCopy[nm]===undefined){

@@ -15,6 +15,12 @@ console.error("Fatal "+this.id+" could not change content due to "+e.message,e);
 })});
 }
 this._contentSetterParams={adjustPaths:Boolean(this.adjustPaths&&(this.href||this.referencePath)),referencePath:this.href||this.referencePath,renderStyles:this.renderStyles,executeScripts:this.executeScripts,scriptHasHooks:this.scriptHasHooks,scriptHookReplacement:"dijit.byId('"+this.id+"')"};
-this.inherited("_setContent",arguments);
+return this.inherited("_setContent",arguments);
+},destroy:function(){
+var _9=this._contentSetter;
+if(_9){
+_9.tearDown();
+}
+this.inherited(arguments);
 }});
 });

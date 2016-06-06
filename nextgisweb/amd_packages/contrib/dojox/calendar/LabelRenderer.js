@@ -4,8 +4,7 @@ define("dojox/calendar/LabelRenderer",["dojo/_base/declare","dijit/_WidgetBase",
 return _1("dojox.calendar.LabelRenderer",[_2,_3,_4],{templateString:_5,_orientation:"horizontal",resizeEnabled:false,visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:45,endTimeLabel:30},_isElementVisible:function(_6,_7,_8,_9){
 switch(_6){
 case "startTimeLabel":
-var d=this.item.startTime;
-if(this.item.isAllDay||d.getHours()==0&&d.getMinutes()==0&&d.getSeconds()==0&&d.getMilliseconds()==0){
+if(this.item.allDay&&this.item.range[0].getTime()!==this.item.startTime.getTime()){
 return false;
 }
 break;

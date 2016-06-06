@@ -48,6 +48,11 @@ html.mobile,
 .mblImageIcon {
   vertical-align: top;
 }
+.unselectable {
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
 .mblHeading {
   position: relative;
   margin: 0;

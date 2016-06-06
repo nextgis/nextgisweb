@@ -291,7 +291,7 @@ define("dojox/mobile/_EditableIconMixin", [
 			var dir = from < to ? 1 : -1;
 			var children = this.getChildren();
 			var posArray = [];
-			var i;
+			var i, j;
 			for(i=from; i!=to; i+=dir){
 				posArray.push({
 					t: (children[i+dir].domNode.offsetTop - children[i].domNode.offsetTop) + "px",

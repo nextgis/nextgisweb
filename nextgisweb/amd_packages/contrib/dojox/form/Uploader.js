@@ -61,7 +61,7 @@ this.upload(_1c);
 },reset:function(){
 delete this._files;
 this._disconnectButton();
-_4.forEach(this._inputs,_b.destroy,dojo);
+_4.forEach(this._inputs,_b.destroy);
 this._inputs=[];
 this._nameIndex=0;
 this._createInput();

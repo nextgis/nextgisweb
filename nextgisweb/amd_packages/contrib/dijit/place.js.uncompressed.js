@@ -133,24 +133,21 @@ define("dijit/place", [
 		// has sized the node, due to browser quirks when the viewport is scrolled
 		// (specifically that a Tooltip will shrink to fit as though the window was
 		// scrolled to the left).
-		//
-		// In RTL mode, set style.right rather than style.left so in the common case,
-		// window resizes move the popup along with the aroundNode.
 
-		var l = domGeometry.isBodyLtr(node.ownerDocument),
-			top = best.y,
-			side = l ? best.x : view.w - best.x - best.w;
+		var top = best.y,
+			side = best.x,
+			body = win.body(node.ownerDocument);
 
-		if(/relative|absolute/.test(domStyle.get(win.body(node.ownerDocument), "position"))){
+		if(/relative|absolute/.test(domStyle.get(body, "position"))){
 			// compensate for margin on <body>, see #16148
-			top -= domStyle.get(win.body(node.ownerDocument), "marginTop");
-			side -= (l ? 1 : -1) * domStyle.get(win.body(node.ownerDocument), l ? "marginLeft" : "marginRight");
+			top -= domStyle.get(body, "marginTop");
+			side -= domStyle.get(body, "marginLeft");
 		}
 
 		var s = node.style;
 		s.top = top + "px";
-		s[l ? "left" : "right"] = side + "px";
-		s[l ? "right" : "left"] = "auto";	// needed for FF or else tooltip goes to far left
+		s.left = side + "px";
+		s.right = "auto";	// needed for FF or else tooltip goes to far left
 
 		return best;
 	}
@@ -265,7 +262,7 @@ define("dijit/place", [
 
 			// If around is a DOMNode (or DOMNode id), convert to coordinates.
 			var aroundNodePos;
-			if(typeof anchor == "string" || "offsetWidth" in anchor){
+			if(typeof anchor == "string" || "offsetWidth" in anchor || "ownerSVGElement" in anchor){
 				aroundNodePos = domGeometry.position(anchor, true);
 
 				// For above and below dropdowns, subtract width of border so that popup and aroundNode borders

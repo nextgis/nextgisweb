@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/storage/GearsStorageProvider", ["dijit","dojo","dojox","dojo/require!dojo/gears,dojox/storage/Provider,dojox/storage/manager,dojox/sql"], function(dijit,dojo,dojox){
+define("dojox/storage/GearsStorageProvider", ["dojo","dijit","dojox","dojo/require!dojo/gears,dojox/storage/Provider,dojox/storage/manager,dojox/sql"], function(dojo,dijit,dojox){
 dojo.provide("dojox.storage.GearsStorageProvider");
 dojo.require("dojo.gears");
 dojo.require("dojox.storage.Provider");

@@ -10,26 +10,28 @@ var _4=function(_5){
 if(!_5){
 return _5;
 }
-if(_5.then){
+var _6=!!_5.then;
+if(_6){
 _5=_2.delegate(_5);
 }
-function _6(_7){
-if(!_5[_7]){
-_5[_7]=function(){
-var _8=arguments;
-return _3(_5,function(_9){
-Array.prototype.unshift.call(_8,_9);
-return _4(_1[_7].apply(_1,_8));
+function _7(_8){
+_5[_8]=function(){
+var _9=arguments;
+var _a=_3(_5,function(_b){
+Array.prototype.unshift.call(_9,_b);
+return _4(_1[_8].apply(_1,_9));
 });
-};
+if(_8!=="forEach"||_6){
+return _a;
 }
 };
-_6("forEach");
-_6("filter");
-_6("map");
-if(!_5.total){
-_5.total=_3(_5,function(_a){
-return _a.length;
+};
+_7("forEach");
+_7("filter");
+_7("map");
+if(_5.total==null){
+_5.total=_3(_5,function(_c){
+return _c.length;
 });
 }
 return _5;

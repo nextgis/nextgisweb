@@ -82,18 +82,22 @@ define("dojox/app/View", ["require", "dojo/when", "dojo/on", "dojo/_base/declare
 				if(deps.length > 0){
 					var requireSignal;
 					try{
-						requireSignal = require.on("error", lang.hitch(this, function(error){
+						requireSignal = require.on ? require.on("error", lang.hitch(this, function(error){
 							if(def.isResolved() || def.isRejected()){
 								return;
 							}
 							if(error.info[0] && error.info[0].indexOf(this.template) >= 0 ){
 								def.resolve(false);
-								requireSignal.remove();
+								if(requireSignal){
+									requireSignal.remove();
+								}
 							}
-						}));
+						})) :  null;
 						require(deps, function(){
 							def.resolve.call(def, arguments);
-							requireSignal.remove();
+							if(requireSignal){
+								requireSignal.remove();
+							}
 						});
 					}catch(e){
 						def.resolve(false);

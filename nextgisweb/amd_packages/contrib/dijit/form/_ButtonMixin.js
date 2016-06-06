@@ -38,9 +38,11 @@ return true;
 this._set("label",_9);
 var _a=this.containerNode||this.focusNode;
 _a.innerHTML=_9;
+this.onLabelSet();
+},onLabelSet:function(){
 }});
 if(_3("dojo-bidi")){
-_5=_1("dijit.form._ButtonMixin",_5,{_setLabelAttr:function(){
+_5=_1("dijit.form._ButtonMixin",_5,{onLabelSet:function(){
 this.inherited(arguments);
 var _b=this.containerNode||this.focusNode;
 this.applyTextDir(_b);

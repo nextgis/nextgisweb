@@ -214,7 +214,7 @@ this.inherited(arguments);
 return this.searchAttr;
 },postMixInProperties:function(){
 this.inherited(arguments);
-if(!this.store){
+if(!this.store&&this.srcNodeRef){
 var _28=this.srcNodeRef;
 this.store=new _9({},_28);
 if(!("value" in this.params)){

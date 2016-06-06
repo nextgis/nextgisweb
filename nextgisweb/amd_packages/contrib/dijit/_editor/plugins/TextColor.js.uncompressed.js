@@ -21,28 +21,42 @@ define("dijit/_editor/plugins/TextColor", [
 
 		// Override _Plugin.buttonClass to use DropDownButton (with ColorPalette) to control this plugin
 		buttonClass: DropDownButton,
+				
+		// colorPicker: String|Constructor
+		//		The color picker dijit to use, defaults to dijit/ColorPalette
+		colorPicker: "dijit/ColorPalette",
 
 		// useDefaultCommand: Boolean
 		//		False as we do not use the default editor command/click behavior.
 		useDefaultCommand: false,
 
 		_initButton: function(){
+			this.command = this.name;
+
 			this.inherited(arguments);
 
 			// Setup to lazy load ColorPalette first time the button is clicked
 			var self = this;
 			this.button.loadDropDown = function(callback){
-				require(["../../ColorPalette"], lang.hitch(this, function(ColorPalette){
-					this.dropDown = new ColorPalette({
+				function onColorPaletteLoad(ColorPalette){
+					self.button.dropDown = new ColorPalette({
 						dir: self.editor.dir,
 						ownerDocument: self.editor.ownerDocument,
 						value: self.value,
 						onChange: function(color){
 							self.editor.execCommand(self.command, color);
+						},
+						onExecute: function(){
+							self.editor.execCommand(self.command, this.get("value"));
 						}
 					});
 					callback();
-				}));
+				}
+				if(typeof self.colorPicker == "string"){
+					require([self.colorPicker], onColorPaletteLoad);
+				}else{
+					onColorPaletteLoad(self.colorPicker);
+				}
 			};
 		},
 
@@ -97,18 +111,18 @@ define("dijit/_editor/plugins/TextColor", [
 			this.value = value;
 
 			var dropDown = this.button.dropDown;
-			if(dropDown && value !== dropDown.get('value')){
+			if(dropDown && dropDown.get && value !== dropDown.get('value')){
 				dropDown.set('value', value, false);
 			}
 		}
 	});
 
 	// Register this plugin.
-	_Plugin.registry["foreColor"] = function(){
-		return new TextColor({command: "foreColor"});
+	_Plugin.registry["foreColor"] = function(args){
+		return new TextColor(args);
 	};
-	_Plugin.registry["hiliteColor"] = function(){
-		return new TextColor({command: "hiliteColor"});
+	_Plugin.registry["hiliteColor"] = function(args){
+		return new TextColor(args);
 	};
 
 	return TextColor;

@@ -62,28 +62,25 @@ _12.h=o.height;
 break;
 default:
 if(!this.angles){
-if(typeof o.run.data[0]=="number"){
-this.angles=df.map(df.scanl(o.run.data,"+",0),"* 2 * Math.PI / this",df.foldl(o.run.data,"+",0));
-}else{
-this.angles=df.map(df.scanl(o.run.data,"a + b.y",0),"* 2 * Math.PI / this",df.foldl(o.run.data,"a + b.y",0));
+var _14=typeof o.run.data[0]=="number"?df.map(o.run.data,"x ? Math.max(x, 0) : 0"):df.map(o.run.data,"x ? Math.max(x.y, 0) : 0");
+this.angles=df.map(df.scanl(_14,"+",0),"* 2 * Math.PI / this",df.foldl(_14,"+",0));
 }
-}
-var _14=m._degToRad(o.plot.opt.startAngle),_15=(this.angles[o.index]+this.angles[o.index+1])/2+_14;
-_12.x=o.cx+o.cr*Math.cos(_15);
-_12.y=o.cy+o.cr*Math.sin(_15);
+var _15=m._degToRad(o.plot.opt.startAngle),_16=(this.angles[o.index]+this.angles[o.index+1])/2+_15;
+_12.x=o.cx+o.cr*Math.cos(_16);
+_12.y=o.cy+o.cr*Math.sin(_16);
 _12.w=_12.h=1;
-if(_14&&(_15<0||_15>2*Math.PI)){
-_15=Math.abs(2*Math.PI-Math.abs(_15));
+if(_15&&(_16<0||_16>2*Math.PI)){
+_16=Math.abs(2*Math.PI-Math.abs(_16));
 }
-if(_15<_c){
+if(_16<_c){
 }else{
-if(_15<_d+_c){
+if(_16<_d+_c){
 _13=["below-centered","above-centered"];
 }else{
-if(_15<Math.PI+_c){
+if(_16<Math.PI+_c){
 _13=["before-centered","after-centered"];
 }else{
-if(_15<2*Math.PI-_c){
+if(_16<2*Math.PI-_c){
 _13=["above-centered","below-centered"];
 }
 }
@@ -102,18 +99,18 @@ _12.y=Math.round(_12.y);
 _12.w=Math.ceil(_12.w);
 _12.h=Math.ceil(_12.h);
 this.aroundRect=_12;
-var _16=this.text(o,this.plot);
-if(_16){
-_1.show(this._format(_16),this.aroundRect,_13);
+var _17=this.text(o,this.plot);
+if(_17){
+_1.show(this._format(_17),this.aroundRect,_13);
 }
 if(!this.mouseOver){
 this._handle=_5.connect(_4.doc,"onclick",this,"onClick");
 }
 },onClick:function(){
 this.process({type:"onmouseout"});
-},_recheckPosition:function(obj,_17,_18){
-},_format:function(_19){
-return _19;
+},_recheckPosition:function(obj,_18,_19){
+},_format:function(_1a){
+return _1a;
 }});
 return _8("dojo-bidi")?_3("dojox.charting.action2d.Tooltip",[_e,_9]):_e;
 });

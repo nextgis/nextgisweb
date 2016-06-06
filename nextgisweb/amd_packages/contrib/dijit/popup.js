@@ -1,5 +1,5 @@
 //>>built
-define("dijit/popup",["dojo/_base/array","dojo/aspect","dojo/_base/declare","dojo/dom","dojo/dom-attr","dojo/dom-construct","dojo/dom-geometry","dojo/dom-style","dojo/has","dojo/keys","dojo/_base/lang","dojo/on","./place","./BackgroundIframe","./Viewport","./main"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,on,_c,_d,_e,_f){
+define("dijit/popup",["dojo/_base/array","dojo/aspect","dojo/_base/declare","dojo/dom","dojo/dom-attr","dojo/dom-construct","dojo/dom-geometry","dojo/dom-style","dojo/has","dojo/keys","dojo/_base/lang","dojo/on","./place","./BackgroundIframe","./Viewport","./main","dojo/touch"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,on,_c,_d,_e,_f){
 function _10(){
 if(this._popupWrapper){
 _6.destroy(this._popupWrapper);
@@ -13,11 +13,11 @@ if(dx||dy){
 this._firstAroundPosition=_13;
 for(var i=0;i<this._stack.length;i++){
 var _14=this._stack[i].wrapper.style;
-_14.top=(parseInt(_14.top,10)+dy)+"px";
+_14.top=(parseFloat(_14.top)+dy)+"px";
 if(_14.right=="auto"){
-_14.left=(parseInt(_14.left,10)+dx)+"px";
+_14.left=(parseFloat(_14.left)+dx)+"px";
 }else{
-_14.right=(parseInt(_14.right,10)-dx)+"px";
+_14.right=(parseFloat(_14.right)-dx)+"px";
 }
 }
 }
@@ -35,6 +35,14 @@ s.position="";
 s.top="0px";
 _15._popupWrapper=_16;
 _2.after(_15,"destroy",_10,true);
+if("ontouchend" in document){
+on(_16,"touchend",function(evt){
+if(!/^(input|button|textarea)$/i.test(evt.target.tagName)){
+evt.preventDefault();
+}
+});
+}
+_16.dojoClick=true;
 }
 return _16;
 },moveOffScreen:function(_18){
@@ -46,7 +54,7 @@ _8.set(_19,_1a);
 return _19;
 },hide:function(_1b){
 var _1c=this._createWrapper(_1b);
-_8.set(_1c,{display:"none",height:"auto",overflow:"visible",border:""});
+_8.set(_1c,{display:"none",height:"auto",overflowY:"visible",border:""});
 var _1d=_1b.domNode;
 if("_originalStyle" in _1d){
 _1d.style.cssText=_1d._originalStyle;
@@ -127,6 +135,10 @@ while((_30&&_1.some(_31,function(_32){
 return _32.widget==_30;
 }))||(!_30&&_31.length)){
 var top=_31.pop(),_33=top.widget,_34=top.onClose;
+if(_33.bgIframe){
+_33.bgIframe.destroy();
+delete _33.bgIframe;
+}
 if(_33.onClose){
 _33.onClose();
 }

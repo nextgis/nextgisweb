@@ -116,7 +116,6 @@ var _19={left:true,top:true};
 var _1a=/margin|padding|width|height|max|min|offset/;
 function _1b(_1c,_1d,_1e){
 _1d=_1d.toLowerCase();
-if(_1("ie")){
 if(_1e=="auto"){
 if(_1d=="height"){
 return _1c.offsetHeight;
@@ -132,7 +131,6 @@ return "bold";
 case 400:
 default:
 return "normal";
-}
 }
 }
 if(!(_1d in _19)){

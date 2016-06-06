@@ -29,7 +29,7 @@ _b.style.bottom="0px";
 }
 _c.fixedFooterHeight=_b.offsetHeight;
 }
-this.scrollType=this.scrollType||_2["mblScrollableScrollType"]||0;
+this.scrollType=this.scrollType||_2.mblScrollableScrollType||0;
 this.init(_c);
 if(this.allowNestedScrolls){
 for(var p=this.getParent();p;p=p.getParent()){

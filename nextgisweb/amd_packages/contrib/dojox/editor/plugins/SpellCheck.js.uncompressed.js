@@ -382,7 +382,7 @@ var SpellCheckScriptMultiPart = dojo.declare("dojox.editor.plugins._SpellCheckSc
 						r = len;
 					}else{
 						// If there is no delimiter (emplty string), leave the right boundary where it is.
-						// Else extend the right boundary to the first occurance of the delimiter if
+						// Else extend the right boundary to the first occurrence of the delimiter if
 						// it doesn't meet the end of the content.
 						while(dt && content.charAt(r) != dt && r <= len){
 							r++;
@@ -459,7 +459,7 @@ var SpellCheckScriptMultiPart = dojo.declare("dojox.editor.plugins._SpellCheckSc
 	},
 
 	onLoad: function(/*String*/ data){
-		// Stub method for a sucessful call
+		// Stub method for a successful call
 	},
 
 	setWaitingTime: function(/*Number*/ seconds){

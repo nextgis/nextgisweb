@@ -5,6 +5,11 @@
 	padding: 0;
 	background-color: #f7f7f7;
 }
+.tundra .dijitMenuTable {
+  border-collapse: separate;
+  border-spacing: 0 0;
+  padding: 0;
+}
 .tundra .dijitBorderContainer .dijitMenuBar {
 	border:1px solid #ccc;
 }

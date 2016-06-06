@@ -101,7 +101,7 @@ define("dojox/mobile/pageTurningUtils", [
 			this.page = page ? page : this.page;
 			this.dogear = typeof dogear !== 'undefined' ? dogear : this.dogear;
 			this.duration = typeof duration !== 'undefined' ? duration : this.duration;
-			this.alwaysDogeared = typeof alwaysDogeared !== 'undefined' ? alwaysDogeared : this.alwaysDogeared
+			this.alwaysDogeared = typeof alwaysDogeared !== 'undefined' ? alwaysDogeared : this.alwaysDogeared;
 			
 			if(this.turnfrom === "bottom"){ // dog-ear is not supported if using "bottom"
 				this.alwaysDogeared = true;
@@ -126,7 +126,8 @@ define("dojox/mobile/pageTurningUtils", [
 			// Calculate each div size and position based on the page turning algorithm
 			//	 fw: frontWidth, fh: frontHeight, dw: dogear, cx: posX, cy: posY,
 			//	 dx: dogearX, dy: dogearY, fy:actualPagePos
-			var Q = fold = w * tan58,
+			var fold = w * tan58,
+				Q = fold,
 				fw = Q * sin32 + Q * cos32 * tan58,
 				fh = fold + w + w/tan58,
 				dw = w * 0.11 * this.dogear,
@@ -399,7 +400,7 @@ define("dojox/mobile/pageTurningUtils", [
 				if(this._transitionEndHandle){
 					connect.disconnect(this._transitionEndHandle);
 				}
-				this._transitionEndHandle = connect.connect(catalogNode, css3.name("transitionEnd"), this, "_onPageTurned")
+				this._transitionEndHandle = connect.connect(catalogNode, css3.name("transitionEnd"), this, "_onPageTurned");
 				this._catalogNode = catalogNode;
 			}
 			

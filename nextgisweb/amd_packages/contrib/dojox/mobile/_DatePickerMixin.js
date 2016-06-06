@@ -1,7 +1,7 @@
 //>>built
 define("dojox/mobile/_DatePickerMixin",["dojo/_base/array","dojo/_base/declare","dojo/_base/lang","dojo/date","dojo/date/locale","dojo/date/stamp"],function(_1,_2,_3,_4,_5,_6){
 var _7={format:function(d){
-return _5.format(d,{datePattern:this.pattern,selector:"date"});
+return _5.format(d,{datePattern:this.pattern,selector:"date",locale:this.picker.lang});
 }};
 var _8=_3.mixin({initLabels:function(){
 this.labels=[];
@@ -35,6 +35,7 @@ var c=this.slotClasses,p=this.slotProps;
 c[0]=_2(c[0],_8);
 c[1]=_2(c[1],_a);
 c[2]=_2(c[2],_b);
+p[2].picker=p[1].picker=p[0].picker=this;
 p[0].pattern=this.yearPattern;
 p[1].pattern=this.monthPattern;
 p[2].pattern=this.dayPattern;
@@ -43,7 +44,7 @@ this.reorderSlots();
 if(this.slotOrder.length){
 return;
 }
-var a=_5._parseInfo().bundle["dateFormat-short"].toLowerCase().split(/[^ymd]+/,3);
+var a=_5._parseInfo({locale:this.lang}).bundle["dateFormat-short"].toLowerCase().split(/[^ymd]+/,3);
 this.slotOrder=_1.map(a,function(_c){
 return {y:0,m:1,d:2}[_c.charAt(0)];
 });
@@ -97,7 +98,7 @@ this.onDaySet();
 }
 },onDaySet:function(){
 },_disableEndDaysOfMonth:function(){
-var pat=this.slots[0].pattern+"/"+this.slots[1].pattern,v=this.get("values"),_14=_5.parse(v[0]+"/"+v[1],{datePattern:pat,selector:"date"}),_15=_4.getDaysInMonth(_14);
+var pat=this.slots[0].pattern+"/"+this.slots[1].pattern,v=this.get("values"),_14=_5.parse(v[0]+"/"+v[1],{datePattern:pat,selector:"date",locale:this.lang}),_15=_4.getDaysInMonth(_14);
 var _16=false;
 if(_15<v[2]){
 _16=true;
@@ -107,7 +108,7 @@ this.disableValues(_15);
 return _16;
 },_getDateAttr:function(){
 var v=this.get("values"),s=this.slots,pat=s[0].pattern+"/"+s[1].pattern+"/"+s[2].pattern;
-return _5.parse(v[0]+"/"+v[1]+"/"+v[2],{datePattern:pat,selector:"date"});
+return _5.parse(v[0]+"/"+v[1]+"/"+v[2],{datePattern:pat,selector:"date",locale:this.lang});
 },_setValuesAttr:function(_17){
 _1.forEach(this.getSlots(),function(w,i){
 var v=_17[i];

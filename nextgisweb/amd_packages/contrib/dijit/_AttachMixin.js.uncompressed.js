@@ -152,7 +152,7 @@ define("dijit/_AttachMixin", [
 			var attachEvent = getAttrFunc(baseNode, "dojoAttachEvent") || getAttrFunc(baseNode, "data-dojo-attach-event");
 			if(attachEvent){
 				// NOTE: we want to support attributes that have the form
-				// "domEvent: nativeEvent; ..."
+				// "domEvent: nativeEvent, ..."
 				var event, events = attachEvent.split(/\s*,\s*/);
 				var trim = lang.trim;
 				while((event = events.shift())){

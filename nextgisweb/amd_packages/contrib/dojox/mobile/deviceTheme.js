@@ -46,7 +46,7 @@ return _6?_6.toUrl(_10):_3.baseUrl+"../"+_10;
 this.setDm=function(_11){
 dm=_11;
 };
-this.themeMap=_3.themeMap||[["Holodark","holodark",[]],["Android 3","holodark",[]],["Android 4","holodark",[]],["Android","android",[]],["BlackBerry","blackberry",[]],["BB10","blackberry",[]],["iPhone","iphone",[]],["iPad","iphone",[this.toUrl("dojox/mobile/themes/iphone/ipad.css")]],["WindowsPhone","windows",[]],["MSIE [6-9]","iphone",[]],["Trident","windows",[]],["Custom","custom",[]],[".*","iphone",[]]];
+this.themeMap=_3.themeMap||[["Holodark","holodark",[]],["Android 3","holodark",[]],["Android 4","holodark",[]],["Android 5","holodark",[]],["Android 6","holodark",[]],["Android","android",[]],["BlackBerry","blackberry",[]],["BB10","blackberry",[]],["ios7","ios7",[]],["iPhone;.*OS 7_","ios7",[]],["iPhone;.*OS 8_","ios7",[]],["iPhone;.*OS 9_","ios7",[]],["iPad;.*OS 7_","ios7",[]],["iPad;.*OS 8_","ios7",[]],["iPad;.*OS 9_","ios7",[]],["iPhone","iphone",[]],["iPad","iphone",[this.toUrl("dojox/mobile/themes/iphone/ipad.css")]],["WindowsPhone","windows",[]],["Windows Phone","windows",[]],["Trident","ios7",[]],["Custom","custom",[]],[".*","ios7",[]]];
 dm.loadedCssFiles=[];
 this.loadDeviceTheme=function(_12){
 var t=_3.mblThemeFiles||dm.themeFiles||["@theme"];
@@ -85,7 +85,7 @@ dm.loadedCssFiles=[];
 for(j=0;j<_14.length;j++){
 var _18=_14[j].toString();
 if(_3["dojo-bidi"]==true&&_18.indexOf("_rtl")==-1){
-var _19="android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css";
+var _19="android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css ProgressIndicator.css Accordion.css GridLayout.css FormLayout.css";
 var _1a=_18.substr(_18.lastIndexOf("/")+1);
 if(_19.indexOf(_1a)!=-1){
 this.loadCssFile(_18.replace(".css","_rtl.css"));

@@ -120,6 +120,8 @@ _20._percent=1;
 _20._fire("onStop",[_20.curve.getValue(_20._getStep())]);
 _20._active=_20._paused=false;
 return _20;
+},destroy:function(){
+this.stop();
 },status:function(){
 if(this._active){
 return this._paused?"paused":"playing";

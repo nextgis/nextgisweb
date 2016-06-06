@@ -9,7 +9,7 @@ define("dojo/text",["./_base/kernel","require","./has","./request"],function(_1,
 var _5;
 if(1){
 _5=function(_6,_7,_8){
-_4(_6,{sync:!!_7}).then(_8);
+_4(_6,{sync:!!_7,headers:{"X-Requested-With":null}}).then(_8);
 };
 }else{
 if(_2.getText){

@@ -67,7 +67,7 @@ define("dojox/mobile/Audio", [
 		startup: function(){
 			if(this._started){ return; }
 			this.inherited(arguments);
-			var i;
+			var i, len, re;
 		 	if(this.domNode.canPlayType){
 				if(this.source.length > 0){
 					for(i = 0, len = this.source.length; i < len; i++){

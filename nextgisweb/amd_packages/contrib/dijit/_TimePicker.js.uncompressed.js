@@ -31,24 +31,35 @@ define("dijit/_TimePicker", [
 		//		The root className to use for the various states of this widget
 		baseClass: "dijitTimePicker",
 
+		// pickerMin: String
+		//		ISO-8601 string representing the time of the first
+		//		visible element in the time picker.
+		//		Set in local time, without a time zone.
+		pickerMin: "T00:00:00",
+
+		// pickerMax: String
+		//		ISO-8601 string representing the last (possible) time
+		//		added to the time picker.
+		//		Set in local time, without a time zone.
+		pickerMax: "T23:59:59",
+
 		// clickableIncrement: String
-		//		ISO-8601 string representing the amount by which
-		//		every clickable element in the time picker increases.
+		//		ISO-8601 string representing the interval between choices in the time picker.
 		//		Set in local time, without a time zone.
 		//		Example: `T00:15:00` creates 15 minute increments
 		//		Must divide dijit/_TimePicker.visibleIncrement evenly
 		clickableIncrement: "T00:15:00",
 
 		// visibleIncrement: String
-		//		ISO-8601 string representing the amount by which
-		//		every element with a visible time in the time picker increases.
+		//		ISO-8601 string representing the interval between "major" choices in the time picker.
+		//		Each theme will highlight the major choices with a larger font / different color / etc.
 		//		Set in local time, without a time zone.
 		//		Example: `T01:00:00` creates text in every 1 hour increment
 		visibleIncrement: "T01:00:00",
 
 		// value: String
-		//		Date to display.
-		//		Defaults to current time and date.
+		//		Time to display.
+		//		Defaults to current time.
 		//		Can be a Date object or an ISO-8601 string.
 		//		If you specify the GMT time zone (`-01:00`),
 		//		the time will be converted to the local time in the local time zone.
@@ -67,7 +78,8 @@ define("dijit/_TimePicker", [
 		_totalIncrements: 10,
 
 		// constraints: TimePicker.__Constraints
-		//		Specifies valid range of times (start time, end time)
+		//		Specifies valid range of times (start time, end time), and also used by TimeTextBox to pass other
+		//		options to the TimePicker: pickerMin, pickerMax, clickableIncrement, and visibleIncrement.
 		constraints: {},
 
 		/*=====
@@ -135,21 +147,22 @@ define("dijit/_TimePicker", [
 
 		_getFilteredNodes: function(/*number*/ start, /*number*/ maxNum, /*Boolean*/ before, /*DOMNode*/ lastNode){
 			// summary:
-			//		Returns an array of nodes with the filter applied.  At most maxNum nodes
+			//		Returns a DocumentFragment of nodes with the filter applied.  At most maxNum nodes
 			//		will be returned - but fewer may be returned as well.  If the
 			//		before parameter is set to true, then it will return the elements
 			//		before the given index
 			// tags:
 			//		private
 
-			var nodes = [];
+			var nodes = this.ownerDocument.createDocumentFragment();
 
 			for(var i = 0 ; i < this._maxIncrement; i++){
 				var n = this._createOption(i);
 				if(n){
-					nodes.push(n);
+					nodes.appendChild(n);
 				}
 			}
+
 			return nodes;
 		},
 
@@ -172,7 +185,7 @@ define("dijit/_TimePicker", [
 				// round reference date to previous visible increment
 				time = (this.value || this.currentFocus).getTime();
 
-			this._refDate = fromIso("T00:00:00");
+			this._refDate = fromIso(this.pickerMin);
 			this._refDate.setFullYear(1970, 0, 1); // match parse defaults
 
 			// assume clickable increment is the smallest unit
@@ -182,19 +195,21 @@ define("dijit/_TimePicker", [
 			// divide the visible increments by the clickable increments to get how often to display the time inline
 			// example: 01:00:00/00:15:00 -> display the time every 4 divs
 			this._visibleIncrement = visibleIncrementSeconds / clickableIncrementSeconds;
-			// divide the number of seconds in a day by the clickable increment in seconds to get the
-			// absolute max number of increments.
-			this._maxIncrement = (60 * 60 * 24) / clickableIncrementSeconds;
 
-			var nodes  = this._getFilteredNodes();
-			array.forEach(nodes, function(n){
-				this.domNode.appendChild(n);
-			}, this);
+			// get the number of increments (i.e. number of entries in the picker)
+			var endDate = fromIso(this.pickerMax);
+			endDate.setFullYear(1970, 0, 1);
+			var visibleRange = (endDate.getTime() - this._refDate.getTime()) * 0.001;
+			this._maxIncrement = Math.ceil((visibleRange + 1) / clickableIncrementSeconds);
+
+			var nodes = this._getFilteredNodes();
 
 			// never show empty due to a bad filter
-			if(!nodes.length && this.filterString){
+			if(!nodes.firstChild && this.filterString){
 				this.filterString = '';
 				this._showText();
+			}else{
+				this.domNode.appendChild(nodes);
 			}
 		},
 
@@ -216,9 +231,10 @@ define("dijit/_TimePicker", [
 			this._setConstraintsAttr(this.constraints); // this needs to happen now (and later) due to codependency on _set*Attr calls
 		},
 
+		// For historical reasons TimeTextBox sends all the options for the _TimePicker inside of a constraints{} object
 		_setConstraintsAttr: function(/* Object */ constraints){
 			// brings in increments, etc.
-			for (var key in { clickableIncrement: 1, visibleIncrement: 1 }) {
+			for (var key in { clickableIncrement: 1, visibleIncrement: 1, pickerMin: 1, pickerMax: 1 }) {
 				if (key in constraints) {
 					this[key] = constraints[key];
 				}
@@ -258,24 +274,26 @@ define("dijit/_TimePicker", [
 				innerHTML: dateString
 			}, div);
 
-			if(index % this._visibleIncrement < 1 && index % this._visibleIncrement > -1){
-				domClass.add(div, this.baseClass + "Marker");
-			}else if(!(index % this._clickableIncrement)){
-				domClass.add(div, this.baseClass + "Tick");
+			var marker = index % this._visibleIncrement < 1 && index % this._visibleIncrement > -1,
+				tick = !marker && !(index % this._clickableIncrement);
+			if(marker){
+				div.className += " " + this.baseClass + "Marker";
+			}else if(tick){
+				div.className += " " + this.baseClass + "Tick";
 			}
 
 			if(this.isDisabledDate(date)){
 				// set disabled
-				domClass.add(div, this.baseClass + "ItemDisabled");
+				div.className += " " + this.baseClass + "ItemDisabled";
 			}
 			if(this.value && !ddate.compare(this.value, date, this.constraints.selector)){
 				div.selected = true;
-				domClass.add(div, this.baseClass + "ItemSelected");
+				div.className += " " + this.baseClass + "ItemSelected";
 				this._selectedDiv = div;
-				if(domClass.contains(div, this.baseClass + "Marker")){
-					domClass.add(div, this.baseClass + "MarkerSelected");
-				}else{
-					domClass.add(div, this.baseClass + "TickSelected");
+				if(marker){
+					div.className += " " + this.baseClass + "MarkerSelected";
+				}else if(tick){
+					div.className += " " + this.baseClass + "TickSelected";
 				}
 
 				// Initially highlight the current value.   User can change highlight by up/down arrow keys
@@ -292,18 +310,26 @@ define("dijit/_TimePicker", [
 			this.set("selected", this._selectedDiv);
 		},
 
-		_onOptionSelected: function(/*Object*/ tgt){
+		_onOptionSelected: function(/*Object*/ tgt, /*Boolean*/ change){
 			// summary:
-			//		Called when user clicks an option in the drop down list
+			//		Called when user clicks or keys to an option in the drop down list
+			// tgt: Object
+			//		tgt.target specifies the node that was clicked
+			// change: Boolean
+			//		If true, fire "change" event, otherwise just fire "input" event.
 			// tags:
 			//		private
 			var tdate = tgt.target.date || tgt.target.parentNode.date;
 			if(!tdate || this.isDisabledDate(tdate)){
 				return;
 			}
-			this._highlighted_option = null;
-			this.set('value', tdate);
-			this.onChange(tdate);
+			this._set('value', tdate);
+			this.emit("input");
+			if(change) {
+				this._highlighted_option = null;
+				this.set('value', tdate);
+				this.onChange(tdate);
+			}
 		},
 
 		onChange: function(/*Date*/ /*===== time =====*/){
@@ -347,11 +373,13 @@ define("dijit/_TimePicker", [
 			//		protected
 			if(e.keyCode == keys.DOWN_ARROW){
 				this.selectNextNode();
+				this._onOptionSelected({target: this._highlighted_option}, false);
 				e.stopPropagation();
 				e.preventDefault();
 				return false;
 			}else if(e.keyCode == keys.UP_ARROW){
 				this.selectPreviousNode();
+				this._onOptionSelected({target: this._highlighted_option}, false);
 				e.stopPropagation();
 				e.preventDefault();
 				return false;
@@ -363,7 +391,7 @@ define("dijit/_TimePicker", [
 
 				// Accept the currently-highlighted option as the value
 				if(this._highlighted_option){
-					this._onOptionSelected({target: this._highlighted_option});
+					this._onOptionSelected({target: this._highlighted_option}, true);
 				}
 
 				// Call stopEvent() for ENTER key so that form doesn't submit,
@@ -391,7 +419,7 @@ define("dijit/_TimePicker", [
 		},
 
 		onClick: function(/*DomNode*/ node){
-			this._onOptionSelected({target: node});
+			this._onOptionSelected({target: node}, true);
 		}
 	});
 

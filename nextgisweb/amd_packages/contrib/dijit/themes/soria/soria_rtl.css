@@ -40,6 +40,12 @@
 div.dijitNumberTextBoxRtl {
 	text-align: right;
 }
+.dijitCalendarRtl .dijitCalendarDecrementArrow {
+	float: right;
+}
+.dijitCalendarRtl .dijitCalendarIncrementArrow {
+	float: left;
+}
 .dijitCalendarRtl .dijitCalendarNextYear {
 	margin:0 0.55em 0 0;
 }
@@ -234,6 +240,14 @@ div.dijitNumberTextBoxRtl {
 .soria  .dijitProgressBarRtl .dijitProgressBarFull {
 	border-left-width: 1px;
 	border-right: 0px;
+}
+.soria  .dijitProgressBarIndeterminateRtl .dijitProgressBarTile {
+	-moz-transform: scaleX(-1);
+	-o-transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
 }
 .dijitRtl .soria .dijitMenuItem .dijitMenuItemIcon {
 	padding-left: 3px;

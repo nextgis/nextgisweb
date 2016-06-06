@@ -31,6 +31,11 @@ define("dijit/layout/_LayoutWidget", [
 		//		children widgets, setting their size, when they become visible.
 		isLayoutContainer: true,
 
+		// Cancel _WidgetBase's _setTitleAttr because we don't want the title property (used to specify
+		// tab labels) to be set as an attribute on this.domNode... otherwise a tooltip shows up over the
+		// entire widget.
+		_setTitleAttr: null,
+
 		buildRendering: function(){
 			this.inherited(arguments);
 			domClass.add(this.domNode, "dijitContainer");

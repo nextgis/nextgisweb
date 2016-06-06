@@ -5,6 +5,7 @@ define("dojox/mobile/common", [
 	"dojo/_base/lang",
 	"dojo/_base/window",
 	"dojo/_base/kernel",
+	"dojo/dom",
 	"dojo/dom-class",
 	"dojo/dom-construct",
 	"dojo/domReady",
@@ -13,7 +14,7 @@ define("dojox/mobile/common", [
 	"dijit/registry",
 	"./sniff",
 	"./uacss" // (no direct references)
-], function(array, config, connect, lang, win, kernel, domClass, domConstruct, domReady, ready, touch, registry, has){
+], function(array, config, connect, lang, win, kernel, dom, domClass, domConstruct, domReady, ready, touch, registry, has){
 
 	// module:
 	//		dojox/mobile/common
@@ -101,8 +102,8 @@ define("dojox/mobile/common", [
 	// dojox/mobile.hideAddressBarWait: Number
 	//		The time in milliseconds to wait before the fail-safe hiding address
 	//		bar runs. The value must be larger than 800.
-	dm.hideAddressBarWait = typeof(config["mblHideAddressBarWait"]) === "number" ?
-		config["mblHideAddressBarWait"] : 1500;
+	dm.hideAddressBarWait = typeof(config.mblHideAddressBarWait) === "number" ?
+		config.mblHideAddressBarWait : 1500;
 
 	dm.hide_1 = function(){
 		// summary:
@@ -274,7 +275,7 @@ define("dojox/mobile/common", [
 		}
 	};
 
-	if(config["mblApplyPageStyles"] !== false){
+	if(config.mblApplyPageStyles !== false){
 		domClass.add(win.doc.documentElement, "mobile");
 	}
 	if(has('chrome')){
@@ -293,21 +294,55 @@ define("dojox/mobile/common", [
 
 	// flag for Android transition animation flicker workaround
 	has.add('mblAndroidWorkaround', 
-			config["mblAndroidWorkaround"] !== false && has('android') < 3, undefined, true);
+			config.mblAndroidWorkaround !== false && has('android') < 3, undefined, true);
 	has.add('mblAndroid3Workaround', 
-			config["mblAndroid3Workaround"] !== false && has('android') >= 3, undefined, true);
+			config.mblAndroid3Workaround !== false && has('android') >= 3, undefined, true);
 
 	dm._detectWindowsTheme();
-	
+
+	dm.setSelectable = function(/*Node*/node, /*Boolean*/selectable){
+		var nodes, i;
+		node = dom.byId(node);
+		if (has("ie") <= 9){
+			// (IE < 10) Fall back to setting/removing the
+			// unselectable attribute on the element and all its children
+			// except the input element (see https://bugs.dojotoolkit.org/ticket/13846)
+			nodes = node.getElementsByTagName("*");
+			i = nodes.length;
+			if(selectable){
+				node.removeAttribute("unselectable");
+				while(i--){
+					nodes[i].removeAttribute("unselectable");
+				}
+			}else{
+				node.setAttribute("unselectable", "on");
+				while(i--){
+					if (nodes[i].tagName !== "INPUT"){
+						nodes[i].setAttribute("unselectable", "on");
+					}
+				}
+			}
+		}else{
+			domClass.toggle(node, "unselectable", !selectable);
+		}
+	};
+
+	var touchActionProp = has("pointer-events") ? "touchAction" : has("MSPointer") ? "msTouchAction" : null;
+	dm._setTouchAction = touchActionProp ? function(/*Node*/node, /*Boolean*/value){
+		node.style[touchActionProp] = value;
+	} : function(){};
+
 	// Set the background style using dojo/domReady, not dojo/ready, to ensure it is already
 	// set at widget initialization time. (#17418) 
 	domReady(function(){
-		domClass.add(win.body(), "mblBackground");
+		if(config.mblApplyPageStyles !== false){
+			domClass.add(win.body(), "mblBackground");
+		}
 	});
 
 	ready(function(){
 		dm.detectScreenSize(true);
-		if(config["mblAndroidWorkaroundButtonStyle"] !== false && has('android')){
+		if(config.mblAndroidWorkaroundButtonStyle !== false && has('android')){
 			// workaround for the form button disappearing issue on Android 2.2-4.0
 			domConstruct.create("style", {innerHTML:"BUTTON,INPUT[type='button'],INPUT[type='submit'],INPUT[type='reset'],INPUT[type='file']::-webkit-file-upload-button{-webkit-appearance:none;} audio::-webkit-media-controls-play-button,video::-webkit-media-controls-play-button{-webkit-appearance:media-play-button;} video::-webkit-media-controls-fullscreen-button{-webkit-appearance:media-fullscreen-button;}"}, win.doc.head, "first");
 		}
@@ -326,10 +361,10 @@ define("dojox/mobile/common", [
 		// You can disable the hiding of the address bar with the following dojoConfig:
 		// var dojoConfig = { mblHideAddressBar: false };
 		// If unspecified, the flag defaults to true.
-		if((config["mblHideAddressBar"] !== false && isHidingPossible) ||
-			config["mblForceHideAddressBar"] === true){
+		if((config.mblHideAddressBar !== false && isHidingPossible) ||
+			config.mblForceHideAddressBar === true){
 			dm.hideAddressBar();
-			if(config["mblAlwaysHideAddressBar"] === true){
+			if(config.mblAlwaysHideAddressBar === true){
 				f = dm.hideAddressBar;
 			}
 		}
@@ -350,7 +385,7 @@ define("dojox/mobile/common", [
 						connect.disconnect(_conn);
 						_f(e);
 					});
-				}
+				};
 				curSize = dm.getScreenSize();
 			};
 			// Android: Watch for resize events when the virtual keyboard is shown/hidden.

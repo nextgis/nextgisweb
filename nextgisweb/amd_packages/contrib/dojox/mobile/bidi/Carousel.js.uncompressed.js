@@ -28,7 +28,7 @@ define("dojox/mobile/bidi/Carousel", [
 				}
 				
 				if(this.pageIndicator){
-					domStyle.set(this.piw, "float", "left"); // workaround for webkit rendering problem
+					domStyle.set(this.piw.domNode, "float", "left"); // workaround for webkit rendering problem
 				}
 			} 
 		},

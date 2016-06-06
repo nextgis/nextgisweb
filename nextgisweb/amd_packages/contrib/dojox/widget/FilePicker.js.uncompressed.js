@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/widget/FilePicker", ["dijit","dojo","dojox","dojo/i18n!dojox/widget/nls/FilePicker","dojo/require!dojox/widget/RollingList,dojo/i18n"], function(dijit,dojo,dojox){
+define("dojox/widget/FilePicker", ["dojo","dijit","dojox","dojo/i18n!dojox/widget/nls/FilePicker","dojo/require!dojox/widget/RollingList,dojo/i18n"], function(dojo,dijit,dojox){
 dojo.provide("dojox.widget.FilePicker");
 
 dojo.require("dojox.widget.RollingList");

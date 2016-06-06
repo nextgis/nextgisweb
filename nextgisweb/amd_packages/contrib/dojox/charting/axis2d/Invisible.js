@@ -21,36 +21,36 @@ return this.clear();
 return "scale" in this?this.scale:1;
 },getWindowOffset:function(){
 return "offset" in this?this.offset:0;
-},calculate:function(_9,_a,_b){
+},calculate:function(_9,_a,_b,_c){
 if(this.initialized()){
 return this;
 }
 var o=this.opt;
 this.labels=o.labels;
-this.scaler=_4.buildScaler(_9,_a,_b,o);
-var _c=this.scaler.bounds;
+this.scaler=(_c||_4).buildScaler(_9,_a,_b,o);
+var _d=this.scaler.bounds;
 if("scale" in this){
-o.from=_c.lower+this.offset;
-o.to=(_c.upper-_c.lower)/this.scale+o.from;
-if(!isFinite(o.from)||isNaN(o.from)||!isFinite(o.to)||isNaN(o.to)||o.to-o.from>=_c.upper-_c.lower){
+o.from=_d.lower+this.offset;
+o.to=(_d.upper-_d.lower)/this.scale+o.from;
+if(!isFinite(o.from)||isNaN(o.from)||!isFinite(o.to)||isNaN(o.to)||o.to-o.from>=_d.upper-_d.lower){
 delete o.from;
 delete o.to;
 delete this.scale;
 delete this.offset;
 }else{
-if(o.from<_c.lower){
-o.to+=_c.lower-o.from;
-o.from=_c.lower;
+if(o.from<_d.lower){
+o.to+=_d.lower-o.from;
+o.from=_d.lower;
 }else{
-if(o.to>_c.upper){
-o.from+=_c.upper-o.to;
-o.to=_c.upper;
+if(o.to>_d.upper){
+o.from+=_d.upper-o.to;
+o.to=_d.upper;
 }
 }
-this.offset=o.from-_c.lower;
+this.offset=o.from-_d.lower;
 }
-this.scaler=_4.buildScaler(_9,_a,_b,o);
-_c=this.scaler.bounds;
+this.scaler=(_c||_4).buildScaler(_9,_a,_b,o);
+_d=this.scaler.bounds;
 if(this.scale==1&&this.offset==0){
 delete this.scale;
 delete this.offset;

@@ -105,7 +105,7 @@ return _16;
 if(this.owner){
 var f=this.owner.get("formatItemTimeFunc");
 if(f!=null&&typeof f==="function"){
-return f(d,rd);
+return f(d,rd,this.owner,this.item);
 }
 }
 return rd.dateLocaleModule.format(d,{selector:"time"});

@@ -70,7 +70,7 @@ define("dojox/form/uploader/_IFrame", [
 				content: data
 			}).then(function(result){
 				domConstruct.destroy(sendForm);
-				if(data["ERROR"] || data["error"]){
+				if(result["ERROR"] || result["error"]){
 					self.onError(result);
 				}else{
 					self.onComplete(result);

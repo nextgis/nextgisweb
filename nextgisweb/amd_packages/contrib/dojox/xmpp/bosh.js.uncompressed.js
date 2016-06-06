@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/xmpp/bosh", ["dijit","dojo","dojox","dojo/require!dojo/io/script,dojo/io/iframe,dojox/xml/parser"], function(dijit,dojo,dojox){
+define("dojox/xmpp/bosh", ["dojo","dijit","dojox","dojo/require!dojo/io/script,dojo/io/iframe,dojox/xml/parser"], function(dojo,dijit,dojox){
 dojo.provide("dojox.xmpp.bosh");
 
 dojo.require("dojo.io.script");
@@ -89,7 +89,7 @@ dojox.xmpp.bosh = {
 		if(xmlMsg){
 			dfd.ioArgs.xmppMessage = xmlMsg;
 		}else{
-			dfd.errback(new Error("Recieved bad document from server: " + msg));
+			dfd.errback(new Error("Received bad document from server: " + msg));
 		}
 	},
 

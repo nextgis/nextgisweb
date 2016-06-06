@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/lang/typed", ["dijit","dojo","dojox","dojo/require!dojox/json/schema"], function(dijit,dojo,dojox){
+define("dojox/lang/typed", ["dojo","dijit","dojox","dojo/require!dojox/json/schema"], function(dojo,dijit,dojox){
 (function(){
 	var jsonSchema, inDojo = typeof dojo != "undefined";
 	if(inDojo){

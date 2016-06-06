@@ -13,7 +13,7 @@ _a.set(_15,"position","relative");
 tt[t]=_4.getObject(t);
 if(!tt[t]){
 _17(t,_e);
-tt[_16.transition=_e]=d.getObject(_e);
+tt[_16.transition=_e]=_4.getObject(_e);
 }
 if(!tp.duration){
 tp.duration=_f;

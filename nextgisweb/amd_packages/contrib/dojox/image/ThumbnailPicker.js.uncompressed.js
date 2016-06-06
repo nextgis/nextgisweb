@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/image/ThumbnailPicker", ["dijit","dojo","dojox","dojo/require!dojox/fx/scroll,dojo/fx/easing,dojo/fx,dijit/_Widget,dijit/_Templated"], function(dijit,dojo,dojox){
+define("dojox/image/ThumbnailPicker", ["dojo","dijit","dojox","dojo/require!dojox/fx/scroll,dojo/fx/easing,dojo/fx,dijit/_Widget,dijit/_Templated"], function(dojo,dijit,dojox){
 dojo.provide("dojox.image.ThumbnailPicker");
 dojo.experimental("dojox.image.ThumbnailPicker");
 //

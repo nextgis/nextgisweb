@@ -318,12 +318,17 @@ define("dijit/_KeyNavMixin", [
 			// tags:
 			//		private
 
-			if(evt.charCode < keys.SPACE || evt.ctrlKey || evt.altKey || evt.metaKey ||
-					(evt.charCode == keys.SPACE && this._searchTimer)){
-				// Avoid duplicate events on firefox (ex: arrow key that will be handled by keydown handler),
-				// and also control sequences like CMD-Q
+			// Ignore:
+			// 		- duplicate events on firefox (ex: arrow key that will be handled by keydown handler)
+			//		- control sequences like CMD-Q.
+			//		- the SPACE key (only occurs on FF)
+			//
+			// Note: if there's no search in progress, then SPACE should be ignored.   If there is a search
+			// in progress, then SPACE is handled in _onContainerKeyDown.
+			if(evt.charCode <= keys.SPACE || evt.ctrlKey || evt.altKey || evt.metaKey){
 				return;
 			}
+
 			evt.preventDefault();
 			evt.stopPropagation();
 
@@ -381,7 +386,7 @@ define("dijit/_KeyNavMixin", [
 							break;
 						}
 						currentItem = this._getNextFocusableChild(currentItem, 1);
-					}while(currentItem != stop);
+					}while(currentItem && currentItem != stop);
 					// commented out code block to search again if the multichar search fails after a smaller timeout
 					//if(!numMatches && (this._typingSlowly || searchLen == 1)){
 					//	this._searchString = '';

@@ -1,7 +1,7 @@
 //>>built
 define("dijit/_WidgetsInTemplateMixin",["dojo/_base/array","dojo/aspect","dojo/_base/declare","dojo/_base/lang","dojo/parser"],function(_1,_2,_3,_4,_5){
-return _3("dijit._WidgetsInTemplateMixin",null,{_earlyTemplatedStartup:false,widgetsInTemplate:true,contextRequire:null,_beforeFillContent:function(){
-if(this.widgetsInTemplate){
+return _3("dijit._WidgetsInTemplateMixin",null,{_earlyTemplatedStartup:false,contextRequire:null,_beforeFillContent:function(){
+if(/dojoType|data-dojo-type/i.test(this.domNode.innerHTML)){
 var _6=this.domNode;
 if(this.containerNode&&!this.searchContainerNode){
 this.containerNode.stopParser=true;

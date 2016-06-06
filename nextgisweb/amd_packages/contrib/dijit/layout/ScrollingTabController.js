@@ -74,65 +74,75 @@ this._setButtonClass(this._getScroll());
 this._postResize=true;
 return {h:this._contentBox.h,w:dim.w};
 },_getScroll:function(){
-return (this.isLeftToRight()||_8("ie")<8||(_8("ie")&&_8("quirks"))||_8("webkit"))?this.scrollNode.scrollLeft:_5.get(this.containerNode,"width")-_5.get(this.scrollNode,"width")+(_8("ie")>=8?-1:1)*this.scrollNode.scrollLeft;
+return (this.isLeftToRight()||_8("ie")<8||(_8("trident")&&_8("quirks"))||_8("webkit"))?this.scrollNode.scrollLeft:_5.get(this.containerNode,"width")-_5.get(this.scrollNode,"width")+(_8("trident")||_8("edge")?-1:1)*this.scrollNode.scrollLeft;
 },_convertToScrollLeft:function(val){
-if(this.isLeftToRight()||_8("ie")<8||(_8("ie")&&_8("quirks"))||_8("webkit")){
+if(this.isLeftToRight()||_8("ie")<8||(_8("trident")&&_8("quirks"))||_8("webkit")){
 return val;
 }else{
 var _1f=_5.get(this.containerNode,"width")-_5.get(this.scrollNode,"width");
-return (_8("ie")>=8?-1:1)*(val-_1f);
+return (_8("trident")||_8("edge")?-1:1)*(val-_1f);
 }
-},onSelectChild:function(_20){
+},onSelectChild:function(_20,_21){
 var tab=this.pane2button(_20.id);
 if(!tab){
 return;
 }
-var _21=tab.domNode;
-if(_21!=this._selectedTab){
-this._selectedTab=_21;
+var _22=tab.domNode;
+if(_22!=this._selectedTab){
+this._selectedTab=_22;
 if(this._postResize){
 var sl=this._getScroll();
-if(sl>_21.offsetLeft||sl+_5.get(this.scrollNode,"width")<_21.offsetLeft+_5.get(_21,"width")){
-this.createSmoothScroll().play();
+if(sl>_22.offsetLeft||sl+_5.get(this.scrollNode,"width")<_22.offsetLeft+_5.get(_22,"width")){
+var _23=this.createSmoothScroll();
+if(_21){
+_23.onEnd=function(){
+tab.focus();
+};
+}
+_23.play();
+}else{
+if(_21){
+tab.focus();
+}
 }
 }
 }
 this.inherited(arguments);
 },_getScrollBounds:function(){
-var _22=this.getChildren(),_23=_5.get(this.scrollNode,"width"),_24=_5.get(this.containerNode,"width"),_25=_24-_23,_26=this._getTabsWidth();
-if(_22.length&&_26>_23){
-return {min:this.isLeftToRight()?0:_22[_22.length-1].domNode.offsetLeft,max:this.isLeftToRight()?(_22[_22.length-1].domNode.offsetLeft+_22[_22.length-1].domNode.offsetWidth)-_23:_25};
+var _24=this.getChildren(),_25=_5.get(this.scrollNode,"width"),_26=_5.get(this.containerNode,"width"),_27=_26-_25,_28=this._getTabsWidth();
+if(_24.length&&_28>_25){
+return {min:this.isLeftToRight()?0:_24[_24.length-1].domNode.offsetLeft,max:this.isLeftToRight()?(_24[_24.length-1].domNode.offsetLeft+_24[_24.length-1].domNode.offsetWidth)-_25:_27};
 }else{
-var _27=this.isLeftToRight()?0:_25;
-return {min:_27,max:_27};
+var _29=this.isLeftToRight()?0:_27;
+return {min:_29,max:_29};
 }
 },_getScrollForSelectedTab:function(){
-var w=this.scrollNode,n=this._selectedTab,_28=_5.get(this.scrollNode,"width"),_29=this._getScrollBounds();
-var pos=(n.offsetLeft+_5.get(n,"width")/2)-_28/2;
-pos=Math.min(Math.max(pos,_29.min),_29.max);
+var w=this.scrollNode,n=this._selectedTab,_2a=_5.get(this.scrollNode,"width"),_2b=this._getScrollBounds();
+var pos=(n.offsetLeft+_5.get(n,"width")/2)-_2a/2;
+pos=Math.min(Math.max(pos,_2b.min),_2b.max);
 return pos;
 },createSmoothScroll:function(x){
 if(arguments.length>0){
-var _2a=this._getScrollBounds();
-x=Math.min(Math.max(x,_2a.min),_2a.max);
+var _2c=this._getScrollBounds();
+x=Math.min(Math.max(x,_2c.min),_2c.max);
 }else{
 x=this._getScrollForSelectedTab();
 }
 if(this._anim&&this._anim.status()=="playing"){
 this._anim.stop();
 }
-var _2b=this,w=this.scrollNode,_2c=new fx.Animation({beforeBegin:function(){
+var _2d=this,w=this.scrollNode,_2e=new fx.Animation({beforeBegin:function(){
 if(this.curve){
 delete this.curve;
 }
-var _2d=w.scrollLeft,_2e=_2b._convertToScrollLeft(x);
-_2c.curve=new fx._Line(_2d,_2e);
+var _2f=w.scrollLeft,_30=_2d._convertToScrollLeft(x);
+_2e.curve=new fx._Line(_2f,_30);
 },onAnimate:function(val){
 w.scrollLeft=val;
 }});
-this._anim=_2c;
+this._anim=_2e;
 this._setButtonClass(x);
-return _2c;
+return _2e;
 },_getBtnNode:function(e){
 var n=e.target;
 while(n&&!_3.contains(n,"tabStripButton")){
@@ -143,37 +153,37 @@ return n;
 this.doSlide(1,this._getBtnNode(e));
 },doSlideLeft:function(e){
 this.doSlide(-1,this._getBtnNode(e));
-},doSlide:function(_2f,_30){
-if(_30&&_3.contains(_30,"dijitTabDisabled")){
+},doSlide:function(_31,_32){
+if(_32&&_3.contains(_32,"dijitTabDisabled")){
 return;
 }
-var _31=_5.get(this.scrollNode,"width");
-var d=(_31*0.75)*_2f;
+var _33=_5.get(this.scrollNode,"width");
+var d=(_33*0.75)*_31;
 var to=this._getScroll()+d;
 this._setButtonClass(to);
 this.createSmoothScroll(to).play();
-},_setButtonClass:function(_32){
-var _33=this._getScrollBounds();
-this._leftBtn.set("disabled",_32<=_33.min);
-this._rightBtn.set("disabled",_32>=_33.max);
+},_setButtonClass:function(_34){
+var _35=this._getScrollBounds();
+this._leftBtn.set("disabled",_34<=_35.min);
+this._rightBtn.set("disabled",_34>=_35.max);
 }});
-var _34=_2("dijit.layout._ScrollingTabControllerButtonMixin",null,{baseClass:"dijitTab tabStripButton",templateString:_b,tabIndex:"",isFocusable:function(){
+var _36=_2("dijit.layout._ScrollingTabControllerButtonMixin",null,{baseClass:"dijitTab tabStripButton",templateString:_b,tabIndex:"",isFocusable:function(){
 return false;
 }});
-_2("dijit.layout._ScrollingTabControllerButton",[_11,_34]);
-_2("dijit.layout._ScrollingTabControllerMenuButton",[_11,_12,_34],{containerId:"",tabIndex:"-1",isLoaded:function(){
+_2("dijit.layout._ScrollingTabControllerButton",[_11,_36]);
+_2("dijit.layout._ScrollingTabControllerMenuButton",[_11,_12,_36],{containerId:"",tabIndex:"-1",isLoaded:function(){
 return false;
-},loadDropDown:function(_35){
+},loadDropDown:function(_37){
 this.dropDown=new _f({id:this.containerId+"_menu",ownerDocument:this.ownerDocument,dir:this.dir,lang:this.lang,textDir:this.textDir});
-var _36=_9.byId(this.containerId);
-_1.forEach(_36.getChildren(),function(_37){
-var _38=new _10({id:_37.id+"_stcMi",label:_37.title,iconClass:_37.iconClass,disabled:_37.disabled,ownerDocument:this.ownerDocument,dir:_37.dir,lang:_37.lang,textDir:_37.textDir||_36.textDir,onClick:function(){
-_36.selectChild(_37);
+var _38=_9.byId(this.containerId);
+_1.forEach(_38.getChildren(),function(_39){
+var _3a=new _10({id:_39.id+"_stcMi",label:_39.title,iconClass:_39.iconClass,disabled:_39.disabled,ownerDocument:this.ownerDocument,dir:_39.dir,lang:_39.lang,textDir:_39.textDir||_38.textDir,onClick:function(){
+_38.selectChild(_39);
 }});
-this.dropDown.addChild(_38);
+this.dropDown.addChild(_3a);
 },this);
-_35();
-},closeDropDown:function(_39){
+_37();
+},closeDropDown:function(_3b){
 this.inherited(arguments);
 if(this.dropDown){
 this._popupStateNode.removeAttribute("aria-owns");

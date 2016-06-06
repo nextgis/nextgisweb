@@ -48,17 +48,14 @@ _1b.render(this.dim,this.offsets);
 }
 },this);
 if(this.title){
-var _1c=(g.renderer=="canvas"),_1d=_1c||!_6("ie")&&!_6("opera")?"html":"gfx",_1e=g.normalizedLength(g.splitFontString(this.titleFont).size);
-_8.destroy(this.chartTitle);
-this.chartTitle=null;
-this.chartTitle=da.createText[_1d](this,this.surface,this.dim.width/2,this.titlePos=="top"?_1e+this.margins.t:this.dim.height-this.margins.b,"middle",this.title,this.titleFont,this.titleFontColor);
+this._renderTitle(this.dim,this.offsets);
 }
 }else{
-_5.forEach(this.htmlElementsRegistry,function(_1f,_20,arr){
-var _21=_16=="auto"?this.getTextDir(_1f[4]):_16;
-if(_1f[0].children[0]&&_1f[0].children[0].dir!=_21){
-_8.destroy(_1f[0].children[0]);
-_1f[0].children[0]=da.createText["html"](this,this.surface,_1f[1],_1f[2],_1f[3],_1f[4],_1f[5],_1f[6]).children[0];
+_5.forEach(this.htmlElementsRegistry,function(_1c,_1d,arr){
+var _1e=_16=="auto"?this.getTextDir(_1c[4]):_16;
+if(_1c[0].children[0]&&_1c[0].children[0].dir!=_1e){
+_8.destroy(_1c[0].children[0]);
+_1c[0].children[0]=da.createText["html"](this,this.surface,_1c[1],_1c[2],_1c[3],_1c[4],_1c[5],_1c[6]).children[0];
 }
 },this);
 }
@@ -75,29 +72,29 @@ this.dir=dir;
 return this;
 },isRightToLeft:function(){
 return this.dir=="rtl";
-},applyMirroring:function(_22,dim,_23){
-_c.reverseMatrix(_22,dim,_23,this.dir=="rtl");
+},applyMirroring:function(_1f,dim,_20){
+_c.reverseMatrix(_1f,dim,_20,this.dir=="rtl");
 _4.set(this.node,"direction","ltr");
 return this;
-},formatTruncatedLabel:function(_24,_25,_26){
-this.truncateBidi(_24,_25,_26);
-},truncateBidi:function(_27,_28,_29){
-if(_29=="gfx"){
-this.truncatedLabelsRegistry.push({element:_27,label:_28});
+},formatTruncatedLabel:function(_21,_22,_23){
+this.truncateBidi(_21,_22,_23);
+},truncateBidi:function(_24,_25,_26){
+if(_26=="gfx"){
+this.truncatedLabelsRegistry.push({element:_24,label:_25});
 if(this.textDir=="auto"){
-_27.setShape({textDir:this.getTextDir(_28)});
+_24.setShape({textDir:this.getTextDir(_25)});
 }
 }
-if(_29=="html"&&this.textDir=="auto"){
-_27.children[0].dir=this.getTextDir(_28);
+if(_26=="html"&&this.textDir=="auto"){
+_24.children[0].dir=this.getTextDir(_25);
 }
 },render:function(){
 this.inherited(arguments);
 this.isMirrored=false;
 return this;
-},_resetLeftBottom:function(_2a){
-if(_2a.vertical&&this.isMirrored){
-_2a.opt.leftBottom=!_2a.opt.leftBottom;
+},_resetLeftBottom:function(_27){
+if(_27.vertical&&this.isMirrored){
+_27.opt.leftBottom=!_27.opt.leftBottom;
 }
 }});
 });

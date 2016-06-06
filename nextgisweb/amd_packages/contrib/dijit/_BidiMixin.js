@@ -1,7 +1,7 @@
 //>>built
 define("dijit/_BidiMixin",[],function(){
 var _1={LRM:"‎",LRE:"‪",PDF:"‬",RLM:"‏",RLE:"‫"};
-return {textDir:"",getTextDir:function(_2){
+return {getTextDir:function(_2){
 return this.textDir=="auto"?this._checkContextual(_2):this.textDir;
 },_checkContextual:function(_3){
 var _4=/[A-Za-z\u05d0-\u065f\u066a-\u06ef\u06fa-\u07ff\ufb1d-\ufdff\ufe70-\ufefc]/.exec(_3);

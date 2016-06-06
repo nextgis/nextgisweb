@@ -1,7 +1,7 @@
 //>>built
 define("dijit/_Templated",["./_WidgetBase","./_TemplatedMixin","./_WidgetsInTemplateMixin","dojo/_base/array","dojo/_base/declare","dojo/_base/lang","dojo/_base/kernel"],function(_1,_2,_3,_4,_5,_6,_7){
 _6.extend(_1,{waiRole:"",waiState:""});
-return _5("dijit._Templated",[_2,_3],{widgetsInTemplate:false,constructor:function(){
+return _5("dijit._Templated",[_2,_3],{constructor:function(){
 _7.deprecated(this.declaredClass+": dijit._Templated deprecated, use dijit._TemplatedMixin and if necessary dijit._WidgetsInTemplateMixin","","2.0");
 },_processNode:function(_8,_9){
 var _a=this.inherited(arguments);

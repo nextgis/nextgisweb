@@ -12,9 +12,10 @@ define("dojox/mobile/Slider", [
 	"dojo/keys",
 	"dojo/touch",
 	"dijit/_WidgetBase",
-	"dijit/form/_FormValueMixin"
+	"dijit/form/_FormValueMixin",
+	"./common"
 ],
-	function(array, connect, declare, lang, win, has, domClass, domConstruct, domGeometry, domStyle, keys, touch, WidgetBase, FormValueMixin){
+	function(array, connect, declare, lang, win, has, domClass, domConstruct, domGeometry, domStyle, keys, touch, WidgetBase, FormValueMixin, common){
 
 	return declare("dojox.mobile.Slider", [WidgetBase, FormValueMixin], {
 		// summary:
@@ -67,14 +68,22 @@ define("dojox/mobile/Slider", [
 				this.progressBar = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderProgressBar" }, relativeParent, "last");
 				this.touchBox = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderTouchBox" }, relativeParent, "last");
 				this.handle = domConstruct.create("div", { style:{ position:"absolute" }, "class":"mblSliderHandle" }, relativeParent, "last");
+				this.handle.setAttribute("role", "slider");
+				this.handle.setAttribute("tabindex", 0);
 			}
 			this.inherited(arguments);
 			// prevent browser scrolling on IE10 (evt.preventDefault() is not enough)
-			if(typeof this.domNode.style.msTouchAction != "undefined"){
-				this.domNode.style.msTouchAction = "none";
-			}
+			common._setTouchAction(this.domNode, "none");
 		},
 
+		_setMinAttr: function(/*Number*/ min){
+			this.handle.setAttribute("aria-valuemin", min);
+			this._set("min",min);
+		},
+		_setMaxAttr: function(/*Number*/ max){
+			this.handle.setAttribute("aria-valuemax", max);
+			this._set("max",max);
+		},
 		_setValueAttr: function(/*Number*/ value, /*Boolean?*/ priorityChange){
 			// summary:
 			//		Hook such that set('value', value) works.
@@ -85,7 +94,6 @@ define("dojox/mobile/Slider", [
 			this.valueNode.value = value;
 			this.inherited(arguments);
 			if(!this._started){ return; } // don't move images until all the properties are set
-			this.focusNode.setAttribute("aria-valuenow", value);
 			var toPercent = (value - this.min) * 100 / (this.max - this.min);
 			// now perform visual slide
 			var horizontal = this.orientation != "V";
@@ -98,12 +106,14 @@ define("dojox/mobile/Slider", [
 			}
 			domStyle.set(this.handle, this._attrs.handleLeft, (this._reversed ? (100-toPercent) : toPercent) + "%");
 			domStyle.set(this.progressBar, this._attrs.width, toPercent + "%");
+			this.handle.setAttribute("aria-valuenow", value);
 		},
 
 		postCreate: function(){
 			this.inherited(arguments);
 
 			function beginDrag(e){
+				e.target.focus();
 				function getEventData(e){
 					point = isMouse ? e[this._attrs.pageX] : (e.touches ? e.touches[0][this._attrs.pageX] : e[this._attrs.clientX]);
 					pixelValue = point - startPixel;
@@ -129,7 +139,7 @@ define("dojox/mobile/Slider", [
 
 				e.preventDefault();
 				var isMouse = e.type == "mousedown";
-				var box = domGeometry.position(node, false); // can't use true since the added docScroll and the returned x are body-zoom incompatibile
+				var box = domGeometry.position(node, false); // can't use true since the added docScroll and the returned x are body-zoom incompatible
 				var bodyZoom = (has("ie") || has("trident") > 6) ? 1 : (domStyle.get(win.body(), "zoom") || 1);
 				if(isNaN(bodyZoom)){ bodyZoom = 1; }
 				var nodeZoom = (has("ie") || has("trident") > 6) ? 1 : (domStyle.get(node, "zoom") || 1);

@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/mobile/app/ImageThumbView", ["dijit","dojo","dojox","dojo/require!dijit/_WidgetBase,dojo/string"], function(dijit,dojo,dojox){
+define("dojox/mobile/app/ImageThumbView", ["dojo","dijit","dojox","dojo/require!dijit/_WidgetBase,dojo/string"], function(dojo,dijit,dojox){
 dojo.provide("dojox.mobile.app.ImageThumbView");
 dojo.experimental("dojox.mobile.app.ImageThumbView");
 
@@ -18,7 +18,7 @@ dojo.declare("dojox.mobile.app.ImageThumbView", dijit._WidgetBase, {
 	items: [],
 
 	// urlParam: String
-	//		The paramter name used to retrieve an image url from a JSON object
+	//		The parameter name used to retrieve an image url from a JSON object
 	urlParam: "url",
 
 	labelParam: null,

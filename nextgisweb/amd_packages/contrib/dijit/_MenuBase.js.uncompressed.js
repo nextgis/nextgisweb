@@ -100,7 +100,9 @@ define("dijit/_MenuBase", [
 				on(this.containerNode, on.selector(matches, a11yclick), function(evt){
 					self.onItemClick(registry.byNode(this), evt);
 					evt.stopPropagation();
-					evt.preventDefault();
+				}),
+				on(this.containerNode, on.selector(matches, "focusin"), function(){
+					self._onItemFocus(registry.byNode(this));
 				})
 			);
 			this.inherited(arguments);

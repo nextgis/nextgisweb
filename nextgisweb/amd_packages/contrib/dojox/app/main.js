@@ -2,7 +2,7 @@
 define("dojox/app/main",["require","dojo/_base/kernel","dojo/_base/lang","dojo/_base/declare","dojo/_base/config","dojo/_base/window","dojo/Evented","dojo/Deferred","dojo/when","dojo/has","dojo/on","dojo/ready","dojo/dom-construct","dojo/dom-attr","./utils/model","./utils/nls","./module/lifecycle","./utils/hash","./utils/constraints","./utils/config"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,on,_b,_c,_d,_e,_f,_10,_11,_12,_13){
 _a.add("app-log-api",(_5["app"]||{}).debugApp);
 var _14=_4(_7,{constructor:function(_15,_16){
-_3.mixin(this,_15);
+_4.safeMixin(this,_15);
 this.params=_15;
 this.id=_15.id;
 this.defaultView=_15.defaultView;
@@ -54,16 +54,20 @@ _1e.push(_1d[i]);
 var def=new _8();
 var _1f;
 try{
-_1f=_1.on("error",function(_20){
+_1f=_1.on?_1.on("error",function(_20){
 if(def.isResolved()||def.isRejected()){
 return;
 }
 def.reject("load controllers error.");
+if(_1f){
 _1f.remove();
-});
+}
+}):null;
 _1(_1e,function(){
 def.resolve.call(def,arguments);
+if(_1f){
 _1f.remove();
+}
 });
 }
 catch(e){
@@ -209,7 +213,7 @@ on.emit(_33,"startTransition",_36);
 app.setStatus(app.lifecycle.STARTING);
 var _37=app.id;
 if(window[_37]){
-_3.mixin(app,window[_37]);
+_4.safeMixin(app,window[_37]);
 }
 window[_37]=app;
 app.start();

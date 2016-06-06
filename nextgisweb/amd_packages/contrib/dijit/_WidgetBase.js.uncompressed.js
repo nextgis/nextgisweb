@@ -109,6 +109,10 @@ define("dijit/_WidgetBase", [
 		// |		_setMyClassAttr: { node: "domNode", type: "class" }
 		//		Maps this.myClass to this.domNode.className
 		//
+		//		- Toggle DOM node CSS class
+		// |		_setMyClassAttr: { node: "domNode", type: "toggleClass" }
+		//		Toggles myClass on this.domNode by this.myClass
+		//
 		//		If the value of _setXXXAttr is an array, then each element in the array matches one of the
 		//		formats of the above list.
 		//
@@ -149,6 +153,10 @@ define("dijit/_WidgetBase", [
 		//		HTML class attribute
 		"class": "",
 		_setClassAttr: { node: "domNode", type: "class" },
+
+		// Override automatic assigning type --> focusNode, it causes exception on IE6-8.
+		// Instead, type must be specified as ${type} in the template, as part of the original DOM.
+		_setTypeAttr: null,
 
 		// style: String||Object
 		//		HTML style attributes as cssText string or name/value hash
@@ -275,6 +283,21 @@ define("dijit/_WidgetBase", [
 		//		Used by `<img>` nodes in templates that really get their image via CSS background-image.
 		_blankGif: config.blankGif || require.toUrl("dojo/resources/blank.gif"),
 
+		// textDir: String
+		//		Bi-directional support,	the main variable which is responsible for the direction of the text.
+		//		The text direction can be different than the GUI direction by using this parameter in creation
+		//		of a widget.
+		//
+		//		This property is only effective when `has("dojo-bidi")` is defined to be true.
+		//
+		//		Allowed values:
+		//
+		//		1. "" - default value; text is same direction as widget
+		//		2. "ltr"
+		//		3. "rtl"
+		//		4. "auto" - contextual the direction of a text defined by first strong letter.
+		textDir: "",
+
 		//////////// INITIALIZATION METHODS ///////////////////////////////////////
 
 		/*=====
@@ -377,7 +400,7 @@ define("dijit/_WidgetBase", [
 			this._supportingWidgets = [];
 
 			// this is here for back-compat, remove in 2.0 (but check NodeList-instantiate.html test)
-			if(this.srcNodeRef && (typeof this.srcNodeRef.id == "string")){
+			if(this.srcNodeRef && this.srcNodeRef.id  && (typeof this.srcNodeRef.id == "string")){
 				this.id = this.srcNodeRef.id;
 			}
 
@@ -754,6 +777,9 @@ define("dijit/_WidgetBase", [
 					case "class":
 						domClass.replace(mapNode, value, this[attr]);
 						break;
+					case "toggleClass":
+						domClass.toggle(mapNode, command.className || attr, value);
+						break;
 				}
 			}, this);
 		},
@@ -1082,7 +1108,7 @@ define("dijit/_WidgetBase", [
 			//		Return this widget's explicit or implicit orientation (true for LTR, false for RTL)
 			// tags:
 			//		protected
-			return this.dir ? (this.dir == "ltr") : domGeometry.isBodyLtr(this.ownerDocument); //Boolean
+			return this.dir ? (this.dir.toLowerCase() == "ltr") : domGeometry.isBodyLtr(this.ownerDocument); //Boolean
 		},
 
 		isFocusable: function(){
@@ -1092,7 +1118,7 @@ define("dijit/_WidgetBase", [
 			return this.focus && (domStyle.get(this.domNode, "display") != "none");
 		},
 
-		placeAt: function(/* String|DomNode|_Widget */ reference, /* String|Int? */ position){
+		placeAt: function(/*String|DomNode|DocumentFragment|dijit/_WidgetBase*/ reference, /*String|Int?*/ position){
 			// summary:
 			//		Place this widget somewhere in the DOM based
 			//		on standard domConstruct.place() conventions.
@@ -1101,7 +1127,7 @@ define("dijit/_WidgetBase", [
 			//		shorthand mechanism to put an existing (or newly created) Widget
 			//		somewhere in the dom, and allow chaining.
 			// reference:
-			//		Widget, DOMNode, or id of widget or DOMNode
+			//		Widget, DOMNode, DocumentFragment, or id of widget or DOMNode
 			// position:
 			//		If reference is a widget (or id of widget), and that widget has an ".addChild" method,
 			//		it will be called passing this widget instance into that method, supplying the optional
@@ -1138,7 +1164,7 @@ define("dijit/_WidgetBase", [
 				// "reference" is a plain DOMNode, or we can't use refWidget.addChild().   Use domConstruct.place() and
 				// target refWidget.containerNode for nested placement (position==number, "first", "last", "only"), and
 				// refWidget.domNode otherwise ("after"/"before"/"replace").  (But not supported officially, see #14946.)
-				var ref = refWidget ?
+				var ref = refWidget && ("domNode" in refWidget) ?
 					(refWidget.containerNode && !/after|before|replace/.test(position || "") ?
 						refWidget.containerNode : refWidget.domNode) : dom.byId(reference, this.ownerDocument);
 				domConstruct.place(this.domNode, ref, position);

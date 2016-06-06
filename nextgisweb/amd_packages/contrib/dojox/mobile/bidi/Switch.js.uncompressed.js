@@ -27,7 +27,7 @@ define("dojox/mobile/bidi/Switch", [
 				domClass.add(this.left, "mblSwitchBgLeftRtl");
 				domClass.add(this.left.firstChild, "mblSwitchTextLeftRtl");
 				domClass.add(this.right, "mblSwitchBgRightRtl");
-				domClass.add(this.right.firstChild, "mblSwitchTextRightRtl");				
+				domClass.add(this.right.firstChild, "mblSwitchTextRightRtl");
 			}
 		},
 		_newState: function(newState){

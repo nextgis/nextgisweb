@@ -1,6 +1,6 @@
 //>>built
-define("dojox/lang/aspect/tracer",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.aspect.tracer");
+define("dojox/lang/aspect/tracer",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.aspect.tracer");
 (function(){
 var _4=_3.lang.aspect;
 var _5=function(_6){
@@ -9,7 +9,7 @@ if(_6){
 this.after=this._after;
 }
 };
-_2.extend(_5,{before:function(){
+_1.extend(_5,{before:function(){
 var _7=_4.getContext(),_8=_7.joinPoint,_9=Array.prototype.join.call(arguments,", ");
 console[this.method](_7.instance,"=>",_8.targetName+"("+_9+")");
 },afterReturning:function(_a){

@@ -43,7 +43,7 @@ return true;
 return _2(this.queryEngine(_10,_11)(this.data));
 },setData:function(_12){
 if(_12.items){
-this.idProperty=_12.identifier;
+this.idProperty=_12.identifier||this.idProperty;
 _12=this.data=_12.items;
 }else{
 this.data=_12;

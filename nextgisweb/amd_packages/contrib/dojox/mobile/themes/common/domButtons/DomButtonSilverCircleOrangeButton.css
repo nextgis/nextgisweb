@@ -26,5 +26,5 @@
   border: 1px inset #ca701a;
   border-radius: 7px;
   background: -webkit-gradient(radial, center center, 0, center center, 6, from(#ff7a07), to(#e66b03));
-  background: radial-gradient(6 at center, #ff7a07 0%, #e66b03 100%);
+  background: radial-gradient(6px at center, #ff7a07 0%, #e66b03 100%);
 }

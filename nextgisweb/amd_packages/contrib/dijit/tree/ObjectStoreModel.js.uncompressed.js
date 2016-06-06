@@ -2,14 +2,16 @@ define("dijit/tree/ObjectStoreModel", [
 	"dojo/_base/array", // array.filter array.forEach array.indexOf array.some
 	"dojo/aspect", // aspect.before, aspect.after
 	"dojo/_base/declare", // declare
+	"dojo/Deferred",
 	"dojo/_base/lang", // lang.hitch
-	"dojo/when"
-], function(array, aspect, declare, lang, when){
+	"dojo/when",
+	"../Destroyable"
+], function(array, aspect, declare, Deferred, lang, when, Destroyable){
 
 	// module:
 	//		dijit/tree/ObjectStoreModel
 
-	return declare("dijit.tree.ObjectStoreModel", null, {
+	return declare("dijit.tree.ObjectStoreModel", Destroyable, {
 		// summary:
 		//		Implements dijit/tree/model connecting dijit/Tree to a dojo/store/api/Store that implements
 		//		getChildren().
@@ -58,14 +60,8 @@ define("dijit/tree/ObjectStoreModel", [
 
 			lang.mixin(this, args);
 
-			this.childrenCache = {};	// map from id to array of children
-		},
-
-		destroy: function(){
-			// TODO: should cancel any in-progress processing of getRoot(), getChildren()
-			for(var id in this.childrenCache){
-				this.childrenCache[id].close && this.childrenCache[id].close();
-			}
+			// Map from id of each parent node to array of its children, or to Promise for that array of children.
+			this.childrenCache = {};
 		},
 
 		// =======================================================================
@@ -78,8 +74,12 @@ define("dijit/tree/ObjectStoreModel", [
 			if(this.root){
 				onItem(this.root);
 			}else{
-				var res;
-				when(res = this.store.query(this.query),
+				var res = this.store.query(this.query);
+				if(res.then){
+					this.own(res);	// in case app calls destroy() before query completes
+				}
+
+				when(res,
 					lang.hitch(this, function(items){
 						//console.log("queried root: ", res);
 						if(items.length != 1){
@@ -128,21 +128,39 @@ define("dijit/tree/ObjectStoreModel", [
 			// parentItem:
 			//		Item from the dojo/store
 
+			// TODO:
+			// For 2.0, change getChildren(), getRoot(), etc. to return a cancelable promise, rather than taking
+			// onComplete() and onError() callbacks.   Also, probably get rid of the caching.
+			//
+			// But be careful if we continue to maintain ObjectStoreModel as a separate class
+			// from Tree, because in that case ObjectStoreModel can be shared by two trees, and destroying one tree
+			// should not interfere with an in-progress getChildren() call from another tree.  Also, need to make
+			// sure that multiple calls to getChildren() for the same parentItem don't trigger duplicate calls
+			// to onChildrenChange() and onChange().
+			//
+			// I think for 2.0 though that ObjectStoreModel should be rolled into Tree itself.
+
 			var id = this.store.getIdentity(parentItem);
+
 			if(this.childrenCache[id]){
+				// If this.childrenCache[id] is defined, then it always has the latest list of children
+				// (like a live collection), so just return it.
 				when(this.childrenCache[id], onComplete, onError);
 				return;
 			}
 
+			// Query the store.
+			// Cache result so that we can close the query on destroy(), and to avoid setting up multiple observers
+			// when getChildren() is called multiple times for the same parent.
+			// The only problem is that getChildren() on non-Observable stores may return a stale value.
 			var res = this.childrenCache[id] = this.store.getChildren(parentItem);
+			if(res.then){
+				this.own(res);	// in case app calls destroy() before query completes
+			}
 
-			// User callback
-			when(res, onComplete, onError);
-
-			// Setup listener in case children list changes, or the item(s) in the children list are
-			// updated in some way.
+			// Setup observer in case children list changes, or the item(s) in the children list are updated.
 			if(res.observe){
-				res.observe(lang.hitch(this, function(obj, removedFrom, insertedInto){
+				this.own(res.observe(lang.hitch(this, function(obj, removedFrom, insertedInto){
 					//console.log("observe on children of ", id, ": ", obj, removedFrom, insertedInto);
 
 					// If removedFrom == insertedInto, this call indicates that the item has changed.
@@ -154,8 +172,11 @@ define("dijit/tree/ObjectStoreModel", [
 						// res.then(...)) has already been updated (like a live collection), so just use it.
 						when(res, lang.hitch(this, "onChildrenChange", parentItem));
 					}
-				}), true);	// true means to notify on item changes
+				}), true));	// true means to notify on item changes
 			}
+
+			// User callback
+			when(res, onComplete, onError);
 		},
 
 		// =======================================================================
@@ -193,9 +214,19 @@ define("dijit/tree/ObjectStoreModel", [
 					/*Boolean*/ bCopy, /*int?*/ insertIndex, /*Item*/ before){
 			// summary:
 			//		Move or copy an item from one parent item to another.
-			//		Used in drag & drop
+			//		Used in drag & drop.
 
-			if(!bCopy){
+			var d = new Deferred();
+
+			if(oldParentItem === newParentItem && !bCopy && !before){
+				// Avoid problem when items visually disappear when dropped onto their parent.
+				// Happens because the (no-op) store.put() call doesn't generate any notification
+				// that the childItem was added/moved.
+				d.resolve(true);
+				return d;
+			}
+
+			if(oldParentItem && !bCopy){
 				// In order for DnD moves to work correctly, childItem needs to be orphaned from oldParentItem
 				// before being adopted by newParentItem.   That way, the TreeNode is moved rather than
 				// an additional TreeNode being created, and the old TreeNode subsequently being deleted.
@@ -204,17 +235,29 @@ define("dijit/tree/ObjectStoreModel", [
 				// on when the TreeNodes in question originally appeared, and not based on the drag-from
 				// TreeNode vs. the drop-onto TreeNode.
 
-				var oldParentChildren = [].concat(this.childrenCache[this.getIdentity(oldParentItem)]), // concat to make copy
-					index = array.indexOf(oldParentChildren, childItem);
-				oldParentChildren.splice(index, 1);
-				this.onChildrenChange(oldParentItem, oldParentChildren);
+				this.getChildren(oldParentItem, lang.hitch(this, function(oldParentChildren){
+					oldParentChildren = [].concat(oldParentChildren); // concat to make copy
+					var index = array.indexOf(oldParentChildren, childItem);
+					oldParentChildren.splice(index, 1);
+					this.onChildrenChange(oldParentItem, oldParentChildren);
+
+					d.resolve(this.store.put(childItem, {
+						overwrite: true,
+						parent: newParentItem,
+						oldParent: oldParentItem,
+						before: before
+					}));
+				}));
+			}else{
+				d.resolve(this.store.put(childItem, {
+					overwrite: true,
+					parent: newParentItem,
+					oldParent: oldParentItem,
+					before: before
+				}));
 			}
 
-			return this.store.put(childItem, {
-				overwrite: true,
-				parent: newParentItem,
-				before: before
-			});
+			return d;
 		},
 
 		// =======================================================================

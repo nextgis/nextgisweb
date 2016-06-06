@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/wire/ml/Transfer", ["dijit","dojo","dojox","dojo/require!dijit/_Widget,dijit/_Container,dojox/wire/_base,dojox/wire/ml/Action"], function(dijit,dojo,dojox){
+define("dojox/wire/ml/Transfer", ["dojo","dijit","dojox","dojo/require!dijit/_Widget,dijit/_Container,dojox/wire/_base,dojox/wire/ml/Action"], function(dojo,dijit,dojox){
 dojo.provide("dojox.wire.ml.Transfer");
 
 dojo.require("dijit._Widget");

@@ -19,18 +19,22 @@ var def=new _5();
 if(_10.length>0){
 var _11;
 try{
-_11=_1.on("error",_4.hitch(this,function(_12){
+_11=_1.on?_1.on("error",_4.hitch(this,function(_12){
 if(def.isResolved()||def.isRejected()){
 return;
 }
 if(_12.info[0]&&_12.info[0].indexOf(this.template)>=0){
 def.resolve(false);
+if(_11){
 _11.remove();
 }
-}));
+}
+})):null;
 _1(_10,function(){
 def.resolve.call(def,arguments);
+if(_11){
 _11.remove();
+}
 });
 }
 catch(e){

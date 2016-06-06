@@ -21,10 +21,11 @@ define("dijit/form/Form", [
 		//	|	<form data-dojo-type="dijit/form/Form" id="myForm">
 		//	|		Name: <input type="text" name="name" />
 		//	|	</form>
+		//	|	// Example assumes you have required dijit/registry
 		//	|	myObj = {name: "John Doe"};
-		//	|	dijit.byId('myForm').set('value', myObj);
+		//	|	registry.byId('myForm').set('value', myObj);
 		//	|
-		//	|	myObj=dijit.byId('myForm').get('value');
+		//	|	myObj=registry.byId('myForm').get('value');
 
 		// HTML <FORM> attributes
 

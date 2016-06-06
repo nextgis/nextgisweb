@@ -6,7 +6,7 @@
 
 //>>built
 define("dojo/_base/window",["./kernel","./lang","../sniff"],function(_1,_2,_3){
-var _4={global:_1.global,doc:this["document"]||null,body:function(_5){
+var _4={global:_1.global,doc:_1.global["document"]||null,body:function(_5){
 _5=_5||_1.doc;
 return _5.body||_5.getElementsByTagName("body")[0];
 },setContext:function(_6,_7){

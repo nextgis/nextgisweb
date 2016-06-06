@@ -7,7 +7,8 @@ define("dojox/mobile/FixedSplitter", [
 	"dijit/_Contained",
 	"dijit/_Container",
 	"dijit/_WidgetBase",
-	"dojo/has"
+	"dojo/has",
+	"./common" // to ensure proper relayout when resizing/switching orientation (#18684)
 ], function(array, declare, win, domClass, domGeometry, Contained, Container, WidgetBase, has){
 
 	// module:

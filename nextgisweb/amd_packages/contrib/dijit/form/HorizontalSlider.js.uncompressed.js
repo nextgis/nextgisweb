@@ -210,7 +210,7 @@ define("dijit/form/HorizontalSlider", [
 			this.valueNode.value = value;
 			this.focusNode.setAttribute("aria-valuenow", value);
 			this.inherited(arguments);
-			var percent = (value - this.minimum) / (this.maximum - this.minimum);
+			var percent = this.maximum > this.minimum ? ((value - this.minimum) / (this.maximum - this.minimum)) : 0;
 			var progressBar = (this._descending === false) ? this.remainingBar : this.progressBar;
 			var remainingBar = (this._descending === false) ? this.progressBar : this.remainingBar;
 			if(this._inProgressAnim && this._inProgressAnim.status != "stopped"){
@@ -246,7 +246,7 @@ define("dijit/form/HorizontalSlider", [
 		},
 
 		_bumpValue: function(signedChange, /*Boolean?*/ priorityChange){
-			if(this.disabled || this.readOnly){
+			if(this.disabled || this.readOnly || (this.maximum <= this.minimum)){
 				return;
 			}
 			var s = domStyle.getComputedStyle(this.sliderBarContainer);
@@ -256,7 +256,8 @@ define("dijit/form/HorizontalSlider", [
 				count = c[this._pixelCount];
 			}
 			count--;
-			var value = (this.value - this.minimum) * count / (this.maximum - this.minimum) + signedChange;
+			// the division is imprecise so the expression has to be rounded to avoid long floating numbers
+			var value = Math.round((this.value - this.minimum) * count / (this.maximum - this.minimum)) + signedChange;
 			if(value < 0){
 				value = 0;
 			}
@@ -301,6 +302,12 @@ define("dijit/form/HorizontalSlider", [
 		_mouseWheeled: function(/*Event*/ evt){
 			// summary:
 			//		Event handler for mousewheel where supported
+
+			if(!this.focused){
+				// If use is scrolling over page and we happen to get the mouse wheel event, just ignore it.
+				return;
+			}
+
 			evt.stopPropagation();
 			evt.preventDefault();
 			this._bumpValue(evt.wheelDelta < 0 ? -1 : 1, true); // negative scroll acts like a decrement

@@ -3,7 +3,7 @@ define("dojox/image/FlickrBadge",["dojo","dojox/main","dojox/image/Badge","dojox
 _1.getObject("image",true,_2);
 return _1.declare("dojox.image.FlickrBadge",_2.image.Badge,{children:"a.flickrImage",userid:"",username:"",setid:"",tags:"",searchText:"",target:"",apikey:"8c6803164dbc395fb7131c9d54843627",_store:null,postCreate:function(){
 if(this.username&&!this.userid){
-var _3=_1.io.script.get({url:"http://www.flickr.com/services/rest/",preventCache:true,content:{format:"json",method:"flickr.people.findByUsername",api_key:this.apikey,username:this.username},callbackParamName:"jsoncallback"});
+var _3=_1.io.script.get({url:"https://www.flickr.com/services/rest/",preventCache:true,content:{format:"json",method:"flickr.people.findByUsername",api_key:this.apikey,username:this.username},callbackParamName:"jsoncallback"});
 _3.addCallback(this,function(_4){
 if(_4.user&&_4.user.nsid){
 this.userid=_4.user.nsid;

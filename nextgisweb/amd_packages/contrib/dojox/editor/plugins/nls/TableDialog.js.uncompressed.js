@@ -36,6 +36,9 @@ define("dojox/editor/plugins/nls/TableDialog", { root:
 })
 //end v1.x content
 ,
+"bs": true,
+"mk": true,
+"sr": true,
 "zh": true,
 "zh-tw": true,
 "uk": true,
@@ -55,6 +58,7 @@ define("dojox/editor/plugins/nls/TableDialog", { root:
 "kk": true,
 "ja": true,
 "it": true,
+"id": true,
 "hu": true,
 "hr": true,
 "he": true,
@@ -62,6 +66,7 @@ define("dojox/editor/plugins/nls/TableDialog", { root:
 "fi": true,
 "es": true,
 "el": true,
+"eu": true,
 "de": true,
 "da": true,
 "cs": true,

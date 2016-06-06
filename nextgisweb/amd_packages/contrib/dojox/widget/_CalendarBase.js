@@ -107,7 +107,7 @@ if(!this.value||_7.compare(_21,this.value)){
 _21=new Date(_21);
 this.displayMonth=new Date(_21);
 this._internalValue=_21;
-if(!this.isDisabledDate(_21,this.lang)&&this._currentChild==0){
+if(!this.isDisabledDate(_21,this.lang)&&this._currentChild===0){
 this.value=_21;
 this.onChange(_21);
 }
@@ -116,6 +116,7 @@ this._children[this._currentChild].set("value",this.value);
 }
 return true;
 }
+this.onExecute();
 return false;
 },isDisabledDate:function(_22,_23){
 var c=this.constraints;
@@ -195,5 +196,6 @@ var _41=this.displayMonth=_40.adjustDate(this.displayMonth,_3e);
 this._slideTable(_40,_3e,function(){
 _40.set("value",_41);
 });
+},onExecute:function(){
 }});
 });

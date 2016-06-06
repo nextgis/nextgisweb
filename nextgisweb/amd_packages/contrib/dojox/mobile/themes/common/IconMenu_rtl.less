@@ -77,11 +77,19 @@
     .first-column(@v);  
 }
 .mixin(holoDark, @r:6px, @l: 0px, @v:~"1px solid rgba(96, 96, 96, 0.85)"){
-   .menu-item-first-column(@v);
-   .first-row-first-column(@r, @l);
-   .first-row-last-column(@l, @r);
-   .last-row-first-column(@r, @l);
-   .last-row-last-column(@l ,@r);
-   
+  .menu-item-first-column(@v);
+  .first-row-first-column(@r, @l);
+  .first-row-last-column(@l, @r);
+  .last-row-first-column(@r, @l);
+  .last-row-last-column(@l ,@r);
+
+}
+.mixin(ios7, @r:6px, @l: 0px, @v:~"1px solid rgba(96, 96, 96, 0.85)"){
+  .menu-item-first-column(@v);
+  .first-row-first-column(@r, @l);
+  .first-row-last-column(@l, @r);
+  .last-row-first-column(@r, @l);
+  .last-row-last-column(@l ,@r);
+
 }
 .mixin(@theme-id);

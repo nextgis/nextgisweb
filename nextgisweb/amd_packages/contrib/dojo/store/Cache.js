@@ -27,13 +27,13 @@ return _d;
 });
 },add:function(_e,_f){
 return _2(_4.add(_e,_f),function(_10){
-_5.add(_e&&typeof _10=="object"?_10:_e,_f);
+_5.add(_10&&typeof _10=="object"?_10:_e,_f);
 return _10;
 });
 },put:function(_11,_12){
 _5.remove((_12&&_12.id)||this.getIdentity(_11));
 return _2(_4.put(_11,_12),function(_13){
-_5.put(_11&&typeof _13=="object"?_13:_11,_12);
+_5.put(_13&&typeof _13=="object"?_13:_11,_12);
 return _13;
 });
 },remove:function(id,_14){

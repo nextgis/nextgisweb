@@ -449,13 +449,20 @@ define("dojox/charting/plot2d/Indicator", ["dojo/_base/lang", "dojo/_base/array"
 				y += this.opt.offset.y;
 			}
 			var label = dcac.createText.gfx(
-					this.chart,
-					g,
-					x, y,
-					"middle",
-					text, this.opt.font?this.opt.font:t.indicator.font, this.opt.fontColor?this.opt.fontColor:t.indicator.fontColor);
+				this.chart,
+				g,
+				x, y,
+				this.opt.vertical? "middle" : (this.opt.start ? "start":"end"),
+				text, 
+                this.opt.font?this.opt.font:t.indicator.font, 
+                this.opt.fontColor?this.opt.fontColor:t.indicator.fontColor);
 			var b = getBoundingBox(label);
-			b.x-=2; b.y-=1; b.width+=4; b.height+=2; b.r = this.opt.radius?this.opt.radius:t.indicator.radius;
+            if(this.opt.vertical && !this.opt.start) {
+                b.y += b.height/2;
+                label.setShape({y: y+b.height/2});
+            }
+			b.x-=2; b.y-=1; b.width+=4; b.height+=2; 
+            b.r = this.opt.radius?this.opt.radius:t.indicator.radius;
 			var sh = this.opt.shadow!=undefined?this.opt.shadow:t.indicator.shadow,
 				ls = this.opt.stroke!=undefined?this.opt.stroke:t.indicator.stroke,
 				ol = this.opt.outline!=undefined?this.opt.outline:t.indicator.outline;

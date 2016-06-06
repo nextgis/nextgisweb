@@ -36,6 +36,13 @@ _c._observe_h=_d.observe(function(_f,_10,_11){
 if(_10!=-1){
 if(_11!=_10){
 _c.onDelete(_f,_10);
+if(_11!=-1){
+if(_c.onAdd){
+_c.onAdd(_f,_11);
+}else{
+_c.onUpdate(_f,_11);
+}
+}
 }else{
 if(_c.onAdd){
 _c.onUpdate(_f,_11);

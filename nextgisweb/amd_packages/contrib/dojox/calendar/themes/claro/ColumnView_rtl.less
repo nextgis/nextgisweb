@@ -1,6 +1,6 @@
 @import "ColumnViewCommon.less";
 
-.claro .dojoxCalendarColumnViewRtl {
+.claro .dojoxCalendarColumnView.dojoxCalendarColumnViewRtl {
 	.dojoxCalendarScrollContainer {	
 		border-left: none;
 		border-right: none;
@@ -9,6 +9,11 @@
 	.dojoxCalendarGrid {
 		left: 0;
 		right: @row-header-width;
+	}
+	
+	.dojoxCalendarGrid.dojoxCalendarHorizontalScroll {
+		border-right: none;
+		border-left: @outer-border;
 	}
 	
 	.dojoxCalendarGridTable td {
@@ -21,9 +26,19 @@
 		right: @row-header-width;
 	}
 	
-	.dojoxCalendarContainerColumn {
-		margin-right: 1px;
-		margin-left: 9px;
+	.dojoxCalendarContainer.dojoxCalendarHorizontalScroll {
+		border-right: none;
+		border-left: @outer-border;
+	}
+	
+	.dojoxCalendarEventContainerColumn {
+		margin-right: 2px;
+		margin-left: 7px;
+	}
+	
+	.dojoxCalendarSubColumnBorder.subColumn {
+		border-right: none;		
+		border-left: @sub-column-border;
 	}
 	
 	.dojoxCalendarYearColumnHeader{
@@ -36,11 +51,59 @@
 		right: @row-header-width;
 	}
 	
-	.dojoxCalendarColumnHeaderTable td {	
-		border-left: @outer-border;
+	.dojoxCalendarColumnHeader.dojoxCalendarHorizontalScroll {
 		border-right: none;
+		border-left: @outer-border;
 	}
 	
+	.dojoxCalendarColumnHeaderTable {
+		
+		td {	
+			border-right: none;
+			border-left: @inner-border;			
+		}
+		
+		td.last-child {
+			border-right: none;
+			border-left: @outer-border;	
+		}
+	}
+	
+	.dojoxCalendarSubColumnHeader {
+		right: @row-header-width;
+		left: 0;		
+	}
+	
+	.dojoxCalendarSubColumnHeader.dojoxCalendarHorizontalScroll {
+		border-right: none;
+		border-left: @outer-border;
+	}
+	
+	.dojoxCalendarSubRowHeader {
+		left: auto;
+		right: 0;
+	}
+	
+	.dojoxCalendarSubColumnHeaderTable {	
+		border-left: @outer-border;
+		border-right: none;
+			
+		table.subColumn td {			
+			border-left: none;			
+			border-right: none;			
+		}
+	}
+	
+	.dojoxCalendarSubColumnHeaderTable td {
+		border-left: @inner-border;
+		border-right: none;			
+	}
+	
+	.dojoxCalendarSubColumnHeaderTable td.last-child {
+		border-left: @outer-border;
+		border-right: none;			
+	}
+		
 	.dojoxCalendarRowHeaderLabel{	
 		right: auto;		
 		left: 4px;

@@ -58,7 +58,7 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 			var t = this.chart.theme, events = this.events();
-			for(var i = this.series.length - 1; i >= 0; --i){
+			for(var i = 0; i < this.series.length; i++){
 				var run = this.series[i];
 				if(!this.dirty && !run.dirty){
 					t.skip();
@@ -75,6 +75,12 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 				var theme = t.next("marker", [this.opt, run]), lpoly,
 					ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
 					vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler);
+				if(run.hidden){
+					run.dyn.marker = theme.symbol;
+					run.dyn.markerFill = theme.marker.fill;
+					run.dyn.markerStroke = theme.marker.stroke;
+					continue;
+				}
 				s = run.group;
 				if(typeof run.data[0] == "number"){
 					lpoly = arr.map(run.data, function(v, i){
@@ -118,7 +124,7 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 					}
 					if(finalTheme.marker.outline){
 						var outline = dc.makeStroke(finalTheme.marker.outline);
-						outline.width = 2 * outline.width + finalTheme.marker.stroke.width;
+						outline.width = 2 * outline.width + (finalTheme.marker.stroke && finalTheme.marker.stroke.width || 0);
 						outlineMarkers[i] = s.createPath(path).setStroke(outline);
 						if(this.animate){
 							this._animateScatter(outlineMarkers[i], dim.height - offsets.b);

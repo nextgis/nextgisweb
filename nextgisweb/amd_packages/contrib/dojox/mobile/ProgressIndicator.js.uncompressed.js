@@ -9,8 +9,9 @@ define("dojox/mobile/ProgressIndicator", [
 	"dojo/has",
 	"dijit/_Contained",
 	"dijit/_WidgetBase",
-	"./_css3"
-], function(config, declare, lang, domClass, domConstruct, domGeometry, domStyle, has, Contained, WidgetBase, css3){
+	"./_css3",
+	"dojo/has!dojo-bidi?dojox/mobile/bidi/ProgressIndicator"
+], function(config, declare, lang, domClass, domConstruct, domGeometry, domStyle, has, Contained, WidgetBase, css3, BidiProgressIndicator){
 
 	// module:
 	//		dojox/mobile/ProgressIndicator
@@ -161,7 +162,7 @@ define("dojox/mobile/ProgressIndicator", [
 			}
 		}
 	});
-
+	cls = has("dojo-bidi") ? declare("dojox.mobile.ProgressIndicator", [cls, BidiProgressIndicator]) : cls;
 	cls._instance = null;
 	cls.getInstance = function(props){
 		if(!cls._instance){

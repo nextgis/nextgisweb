@@ -6,7 +6,13 @@
 
 //>>built
 define("dojo/_base/declare",["./kernel","../has","./lang"],function(_1,_2,_3){
-var _4=_3.mixin,op=Object.prototype,_5=op.toString,_6=new Function,_7=0,_8="constructor";
+var _4=_3.mixin,op=Object.prototype,_5=op.toString,_6,_7=0,_8="constructor";
+if(!_2("csp-restrictions")){
+_6=new Function;
+}else{
+_6=function(){
+};
+}
 function _9(_a,_b){
 throw new Error("declare"+(_b?" "+_b:"")+": "+_a);
 };
@@ -206,7 +212,7 @@ t.nom=_31;
 _2f[_31]=t;
 }
 }
-if(_2("bug-for-in-skips-shadowed")){
+if(_2("bug-for-in-skips-shadowed")&&_30){
 for(var _32=_3._extraNames,i=_32.length;i;){
 _31=_32[--i];
 t=_30[_31];
@@ -225,7 +231,13 @@ _35.safeMixin(this.prototype,_34);
 return this;
 };
 function _36(_37,_38){
-return _35([this].concat(_37),_38||{});
+if(!(_37 instanceof Array||typeof _37=="function")){
+_38=_37;
+_37=undefined;
+}
+_38=_38||{};
+_37=_37||[];
+return _35([this].concat(_37),_38);
 };
 function _39(_3a,_3b){
 return function(){

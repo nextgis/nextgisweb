@@ -109,8 +109,8 @@ define("dojox/mobile/SearchBox", [
 						}
 					);
 					rect = _this.domNode.getBoundingClientRect();
-					// if touched in the right-most 20 pixels of the search box 
-					if(rect.right - (evt.touches ? evt.touches[0].pageX : evt.pageX) >= 20){
+					// if touched in the right-most 30 pixels of the search box
+					if(rect.right - (evt.touches ? evt.touches[0].pageX : evt.pageX) >= 30){
 						// cancel
 						if(handleRelease){
 							handleRelease.remove();

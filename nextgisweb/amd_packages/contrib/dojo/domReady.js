@@ -6,7 +6,9 @@
 
 //>>built
 define("dojo/domReady",["./has"],function(_1){
-var _2=this,_3=document,_4={"loaded":1,"complete":1},_5=typeof _3.readyState!="string",_6=!!_4[_3.readyState],_7=[],_8;
+var _2=(function(){
+return this;
+})(),_3=document,_4={"loaded":1,"complete":1},_5=typeof _3.readyState!="string",_6=!!_4[_3.readyState],_7=[],_8;
 function _9(_a){
 _7.push(_a);
 if(_6){
@@ -32,6 +34,7 @@ try{
 (_7.shift())(_3);
 }
 catch(err){
+console.error(err,"in domReady callback",err.stack);
 }
 }
 _8=false;

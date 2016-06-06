@@ -5,9 +5,6 @@ var _5=this;
 return _5.own(on(_5.containerNode,on.selector(function(_6,_7,_8){
 return _6.parentNode==_8;
 },_3),function(_9){
-if(!/^touch/.test(_9.type)){
-_9.preventDefault();
-}
 _5[_4](_9,this);
 }));
 },selectFirstNode:function(){
@@ -15,13 +12,13 @@ var _a=this.containerNode.firstChild;
 while(_a&&_a.style.display=="none"){
 _a=_a.nextSibling;
 }
-this._setSelectedAttr(_a);
+this._setSelectedAttr(_a,true);
 },selectLastNode:function(){
 var _b=this.containerNode.lastChild;
 while(_b&&_b.style.display=="none"){
 _b=_b.previousSibling;
 }
-this._setSelectedAttr(_b);
+this._setSelectedAttr(_b,true);
 },selectNextNode:function(){
 var _c=this.selected;
 if(!_c){
@@ -34,7 +31,7 @@ _d=_d.nextSibling;
 if(!_d){
 this.selectFirstNode();
 }else{
-this._setSelectedAttr(_d);
+this._setSelectedAttr(_d,true);
 }
 }
 },selectPreviousNode:function(){
@@ -49,17 +46,19 @@ _f=_f.previousSibling;
 if(!_f){
 this.selectLastNode();
 }else{
-this._setSelectedAttr(_f);
+this._setSelectedAttr(_f,true);
 }
 }
-},_setSelectedAttr:function(_10){
+},_setSelectedAttr:function(_10,_11){
 if(this.selected!=_10){
-var _11=this.selected;
-if(_11){
-this.onDeselect(_11);
+var _12=this.selected;
+if(_12){
+this.onDeselect(_12);
 }
 if(_10){
+if(_11){
 _2.scrollIntoView(_10);
+}
 this.onSelect(_10);
 }
 this._set("selected",_10);

@@ -124,7 +124,7 @@
 
 .background-radial-gradient-center (@r, @from, @to) {
 	background: -webkit-gradient(radial, center center, 0, center center, @r, from(@from), to(@to));
-	background: radial-gradient(@r at center, @from 0%, @to 100%);
+	background: radial-gradient(@r+0px at center, @from 0%, @to 100%);
 }
 
 .background-spinwheel () {
@@ -137,10 +137,7 @@
 	background: linear-gradient(to bottom, #edeef2 0%, #c8cadd 25%, #bbbfd4 49%, #9fa8c6 51%, #a2a9c7 81%, #a6abc9 82%, #a7adca 100%);
 }
 
-.holo-slider-background-image () {
-	background: -webkit-gradient(radial, 9 9, 3, 9 9, 9, from(@holo-color1), color-stop(0, @holo-color1), color-stop(0.01, @holo-slider-thumb-color), to(@holo-slider-thumb-color));
-	background-image: radial-gradient(circle closest-side at center, #FFFFFF 0%, #A435C5 50%, #251AE7 75%, #00A3EF 100%);
-}
+
 
 .keyframes-transform-from-to-webkit(@t1, @t2) {
 	from {

@@ -60,11 +60,9 @@ define("dojox/mobile/SpinWheelSlot", [
 		//		The steps between labelFrom and labelTo.
 		step: 1,
 
-		// tabIndex: String
-		//		Tabindex setting for this widget so users can hit the tab key to
-		//		focus on it.
-		tabIndex: "0",
-		_setTabIndexAttr: "", // sets tabIndex to domNode
+		// pageStep: Number
+		//		The number of items in a page when using pageup/pagedown keys to navigate with the keyboard.
+		pageSteps: 1,
 
 		/* internal properties */	
 		baseClass: "mblSpinWheelSlot",
@@ -108,6 +106,7 @@ define("dojox/mobile/SpinWheelSlot", [
 			this.panelNodes = [];
 			for(var k = 0; k < 3; k++){
 				this.panelNodes[k] = domConstruct.create("div", {className:"mblSpinWheelSlotPanel"});
+				this.panelNodes[k].setAttribute("aria-hidden", "true");
 				var len = this.items.length;
 				if(len > 0){ // if the slot is not empty
 					var n = Math.ceil(this.minItems / len);
@@ -127,6 +126,9 @@ define("dojox/mobile/SpinWheelSlot", [
 			this.domNode.appendChild(this.containerNode);
 			this.touchNode = domConstruct.create("div", {className:"mblSpinWheelSlotTouch"}, this.domNode);
 			this.setSelectable(this.domNode, false);
+
+			this.touchNode.setAttribute("tabindex", 0);
+			this.touchNode.setAttribute("role", "slider");
 
 			if(this.value === "" && this.items.length > 0){
 				this.value = this.items[0][1];
@@ -203,7 +205,7 @@ define("dojox/mobile/SpinWheelSlot", [
 				var items = this.panelNodes[1].childNodes;
 				this._itemHeight = items[0].offsetHeight;
 				this.adjust();
-				this.connect(this.domNode, "onkeydown", "_onKeyDown"); // for desktop browsers
+				this.connect(this.touchNode, "onkeydown", "_onKeyDown"); // for desktop browsers
 			}
 			if(has("windows-theme")){
 				this.previousCenterItem = this.getCenterItem();
@@ -225,6 +227,11 @@ define("dojox/mobile/SpinWheelSlot", [
 					a.push(this.zeroPad ? (zeros + i).slice(-this.zeroPad) : i + "");
 				}
 			}
+		},
+
+		onTouchStart: function(e) {
+			this.touchNode.focus(); // give focus to enable key navigation
+			this.inherited(arguments);
 		},
 
 		adjust: function(){
@@ -249,15 +256,34 @@ define("dojox/mobile/SpinWheelSlot", [
 			// summary:
 			//		Sets the initial value using this.value or the first item.
 			this.set("value", this._initialValue);
+			this.touchNode.setAttribute("aria-valuetext", this._initialValue);
 		},
 
 		_onKeyDown: function(e){
-			if(!e || e.type !== "keydown"){ return; }
-			if(e.keyCode === 40){ // down arrow key
-				this.spin(-1);
-			}else if(e.keyCode === 38){ // up arrow key
-				this.spin(1);
+			if(!e || e.type !== "keydown" || e.altKey || e.ctrlKey || e.shiftKey){
+				return true;
 			}
+			switch(e.keyCode){
+				case 38: // up arrow key (fallthrough)
+				case 39: // right arrow key
+					this.spin(1);
+					e.stopPropagation();
+					return false;
+				case 40: // down arrow key (fallthrough)
+				case 37: // left arrow key
+					this.spin(-1);
+					e.stopPropagation();
+					return false;
+				case 33: // pageup
+					this.spin(this.pageSteps);
+					e.stopPropagation();
+					return false;
+				case 34: // pagedown
+					this.spin(-1 * this.pageSteps);
+					e.stopPropagation();
+					return false;
+			}
+			return true;
 		},
 
 		_getCenterPanel: function(){
@@ -406,6 +432,7 @@ define("dojox/mobile/SpinWheelSlot", [
 			this._duringSlideTo = false;
 			this._onFlickAnimationStartCalled = false;
 			this.inherited(arguments);
+			this.touchNode.setAttribute("aria-valuetext", this.get("value"));
 		},
 		
 		spin: function(/*Number*/steps){
@@ -459,17 +486,22 @@ define("dojox/mobile/SpinWheelSlot", [
 
 		resize: function(e){
 			// Correct internal variables & adjust slot panels
-			var items = this.panelNodes[1].childNodes;
-			// TODO investigate - the position is calculated incorrectly for 
-			// windows theme, disable this logic for now.
-			if(items.length > 0 && !has("windows-theme")){ // empty slot?
-				this._itemHeight = items[0].offsetHeight;
-				this.centerPos = this.getParent().centerPos;
-				if(!this.panelNodes[0].style.top){
-					// #17339: to avoid messing up the layout of the panels, call adjust()
-					// only if it didn't manage yet to set the style.top (this happens 
-					// typically because the slot was initially	 hidden). 
-					this.adjust();
+			if(this.panelNodes && this.panelNodes.length > 0){
+				var items = this.panelNodes[1].childNodes;
+				// TODO investigate - the position is calculated incorrectly for
+				// windows theme, disable this logic for now.
+				if(items.length > 0 && !has("windows-theme")){ // empty slot?
+					var parent = this.getParent();
+					if(parent){ // #18012: null in same cases on IE8/9 
+						this._itemHeight = items[0].offsetHeight;
+						this.centerPos = parent.centerPos;
+						if(!this.panelNodes[0].style.top){
+							// (#17339) to avoid messing up the layout of the panels, call adjust()
+							// only if it didn't manage yet to set the style.top (this happens
+							// typically because the slot was initially	 hidden).
+							this.adjust();
+						}
+					}
 				}
 			}
 			if(this._pendingValue){
@@ -507,20 +539,26 @@ define("dojox/mobile/SpinWheelSlot", [
 			}
 			if(this.getParent()._duringStartup){
 				duration = 0; // to reduce flickers at start-up especially on android
+				// No scroll animation at startup. This avoids flickering especially on Android,
+				// and avoids the issue in #17775.
 			}else if(Math.abs(this._speed.y) < 40){
 				duration = 0.2;
 			}
-			this.inherited(arguments, [to, duration, easing]); // 2nd arg is to avoid excessive optimization by closure compiler
-			if(this.getParent()._duringStartup && !this._onFlickAnimationStartCalled){
-				// during startup, because of duration set to 0, if onFlickAnimationStart() 
-				// has not been called (depends on scrollType value), the call of 
-				// onFlickAnimationEnd is missing, hence:
-				this.onFlickAnimationEnd();
-			}else if(!this._onFlickAnimationStartCalled){
-				// if onFlickAnimationStart() wasn't called, and if slideTo() didn't call
-				// itself onFlickAnimationEnd():
-				this._duringSlideTo = false;
-				// (otherwise, wait for onFlickAnimationEnd which deletes the flag)
+			if(duration && duration > 0){
+				this.inherited(arguments, [to, duration, easing]); // 2nd arg is to avoid excessive optimization by closure compiler
+				if(!this._onFlickAnimationStartCalled){
+					// if slideTo() didn't call itself (synchronously) onFlickAnimationEnd():
+					this._duringSlideTo = false;
+					// (otherwise, wait for onFlickAnimationEnd which deletes the flag)
+				}
+			}else{
+				// #17775: at startup, no scroll animation, because it is not needed ergonomically,
+				// and because the animation would imply an asynchrouns notification of 
+				// onFlickAnimationEnd() which would forbid resetting the value right after startup.
+				// this.onFlickAnimationStart(); // not called by scrollTo()
+				this.onFlickAnimationStart(); // not called by scrollTo()
+				this.scrollTo(to, true);
+				this.onFlickAnimationEnd(); // not called by scrollTo()
 			}
 		}
 	});

@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/xmpp/util", ["dijit","dojo","dojox","dojo/require!dojox/string/Builder,dojox/encoding/base64"], function(dijit,dojo,dojox){
+define("dojox/xmpp/util", ["dojo","dijit","dojox","dojo/require!dojox/string/Builder,dojox/encoding/base64"], function(dojo,dijit,dojox){
 dojo.provide("dojox.xmpp.util");
 dojo.require("dojox.string.Builder");
 dojo.require("dojox.encoding.base64");

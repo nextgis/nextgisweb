@@ -6,6 +6,7 @@
 
 //>>built
 define("dojo/promise/instrumentation",["./tracer","../has","../_base/lang","../_base/array"],function(_1,_2,_3,_4){
+_2.add("config-useDeferredInstrumentation","report-unhandled-rejections");
 function _5(_6,_7,_8){
 var _9="";
 if(_6&&_6.stack){
@@ -28,19 +29,15 @@ var _f=[];
 var _10=false;
 var _11=1000;
 function _12(_13,_14,_15,_16){
-if(_14){
-_4.some(_f,function(obj,ix){
+if(!_4.some(_f,function(obj){
 if(obj.error===_13){
-_f.splice(ix,1);
+if(_14){
+obj.handled=true;
+}
 return true;
 }
-});
-}else{
-if(!_4.some(_f,function(obj){
-return obj.error===_13;
 })){
-_f.push({error:_13,rejection:_15,deferred:_16,timestamp:new Date().getTime()});
-}
+_f.push({error:_13,rejection:_15,handled:_14,deferred:_16,timestamp:new Date().getTime()});
 }
 if(!_10){
 _10=setTimeout(_17,_11);
@@ -51,7 +48,9 @@ var now=new Date().getTime();
 var _18=now-_11;
 _f=_4.filter(_f,function(obj){
 if(obj.timestamp<_18){
+if(!obj.handled){
 _5(obj.error,obj.rejection,obj.deferred);
+}
 return false;
 }
 return true;

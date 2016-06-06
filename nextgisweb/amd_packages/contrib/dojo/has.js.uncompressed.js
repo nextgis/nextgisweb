@@ -26,7 +26,7 @@ define("dojo/has", ["require", "module"], function(require, module){
 				window.location == location && window.document == document,
 
 			// has API variables
-			global = this,
+			global = (function () { return this; })(),
 			doc = isBrowser && document,
 			element = doc && doc.createElement("DiV"),
 			cache = (module.config && module.config()) || {};
@@ -90,6 +90,8 @@ define("dojo/has", ["require", "module"], function(require, module){
 		// has as it would have otherwise been initialized by the dojo loader; use has.add to the builder
 		// can optimize these away iff desired
 		 1 || has.add("host-browser", isBrowser);
+		 0 && has.add("host-node", (typeof process == "object" && process.versions && process.versions.node && process.versions.v8));
+		 0 && has.add("host-rhino", (typeof load == "function" && (typeof Packages == "function" || typeof Packages == "object")));
 		 1 || has.add("dom", isBrowser);
 		 1 || has.add("dojo-dom-ready-api", 1);
 		 1 || has.add("dojo-sniff", 1);
@@ -98,7 +100,23 @@ define("dojo/has", ["require", "module"], function(require, module){
 	if( 1 ){
 		// Common application level tests
 		has.add("dom-addeventlistener", !!document.addEventListener);
-		has.add("touch", "ontouchstart" in document || window.navigator.msMaxTouchPoints > 0);
+
+		// Do the device and browser have touch capability?
+		has.add("touch", "ontouchstart" in document
+			|| ("onpointerdown" in document && navigator.maxTouchPoints > 0)
+			|| window.navigator.msMaxTouchPoints);
+
+		// Touch events support
+		has.add("touch-events", "ontouchstart" in document);
+
+		// Test if pointer events are supported and enabled, with either standard names ("pointerdown" etc.) or
+		// IE specific names ("MSPointerDown" etc.).  Tests are designed to work on embedded C# WebBrowser Controls
+		// in addition to IE, Edge, and future versions of Firefox and Chrome.
+		// Note that on IE11, has("pointer-events") and has("MSPointer") are both true.
+		has.add("pointer-events", "pointerEnabled" in window.navigator ?
+				window.navigator.pointerEnabled : "PointerEvent" in window);
+		has.add("MSPointer", window.navigator.msPointerEnabled);
+
 		// I don't know if any of these tests are really correct, just a rough guess
 		has.add("device-width", screen.availWidth || innerWidth);
 

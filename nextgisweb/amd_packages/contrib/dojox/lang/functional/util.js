@@ -1,10 +1,10 @@
 //>>built
-define("dojox/lang/functional/util",["dijit","dojo","dojox","dojo/require!dojox/lang/functional/lambda"],function(_1,_2,_3){
-_2.provide("dojox.lang.functional.util");
-_2.require("dojox.lang.functional.lambda");
+define("dojox/lang/functional/util",["dojo","dijit","dojox","dojo/require!dojox/lang/functional/lambda"],function(_1,_2,_3){
+_1.provide("dojox.lang.functional.util");
+_1.require("dojox.lang.functional.lambda");
 (function(){
 var df=_3.lang.functional;
-_2.mixin(df,{inlineLambda:function(_4,_5,_6){
+_1.mixin(df,{inlineLambda:function(_4,_5,_6){
 var s=df.rawLambda(_4);
 if(_6){
 df.forEach(s.args,_6);

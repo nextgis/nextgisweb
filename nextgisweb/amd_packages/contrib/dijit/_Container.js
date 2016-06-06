@@ -39,7 +39,6 @@ _9.parentNode.removeChild(_9);
 },hasChildren:function(){
 return this.getChildren().length>0;
 },_getSiblingOfChild:function(_a,_b){
-_4.deprecated(this.declaredClass+"::_getSiblingOfChild() is deprecated. Use _KeyNavMixin::_getNext() instead.","","2.0");
 var _c=this.getChildren(),_d=_1.indexOf(_c,_a);
 return _c[_d+_b];
 },getIndexOfChild:function(_e){

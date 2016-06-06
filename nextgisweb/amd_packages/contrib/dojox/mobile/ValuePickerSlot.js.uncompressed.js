@@ -133,7 +133,7 @@ define("dojox/mobile/ValuePickerSlot", [
 			iconUtils.createIcon("mblDomButtonGrayMinus", null, this.minusIconNode);
 			
 			domAttr.set(this.plusBtnNode, "role", "button"); //a11y
-			this._setPlusBtnLabelAttr(this.plusBtnLabel)
+			this._setPlusBtnLabelAttr(this.plusBtnLabel);
 			this._setPlusBtnLabelRefAttr(this.plusBtnLabelRef);
 			
 			domAttr.set(this.inputNode, "role", "textbox");

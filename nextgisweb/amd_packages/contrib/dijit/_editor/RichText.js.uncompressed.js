@@ -9,13 +9,14 @@ define("dijit/_editor/RichText", [
 	"dojo/dom-construct", // domConstruct.create domConstruct.destroy domConstruct.place
 	"dojo/dom-geometry", // domGeometry.position
 	"dojo/dom-style", // domStyle.getComputedStyle domStyle.set
-	"dojo/_base/kernel", // kernel.deprecated
+	"dojo/_base/kernel", // kernel.deprecated, kernel.locale
 	"dojo/keys", // keys.BACKSPACE keys.TAB
 	"dojo/_base/lang", // lang.clone lang.hitch lang.isArray lang.isFunction lang.isString lang.trim
 	"dojo/on", // on()
 	"dojo/query", // query
 	"dojo/domReady",
 	"dojo/sniff", // has("ie") has("mozilla") has("opera") has("safari") has("webkit")
+	"dojo/string",
 	"dojo/topic", // topic.publish() (publish)
 	"dojo/_base/unload", // unload
 	"dojo/_base/url", // url
@@ -28,7 +29,7 @@ define("dijit/_editor/RichText", [
 	"../focus",
 	"../main"    // dijit._scopeName
 ], function(array, config, declare, Deferred, dom, domAttr, domClass, domConstruct, domGeometry, domStyle,
-			kernel, keys, lang, on, query, domReady, has, topic, unload, _Url, winUtils,
+			kernel, keys, lang, on, query, domReady, has, string, topic, unload, _Url, winUtils,
 			_Widget, _CssStateMixin, selectionapi, rangeapi, htmlapi, focus, dijit){
 
 	// module:
@@ -176,7 +177,10 @@ define("dijit/_editor/RichText", [
 
 			// Push in the builtin filters now, making them the first executed, but not over-riding anything
 			// users passed in.  See: #6062
-			this.contentPreFilters = [lang.hitch(this, "_preFixUrlAttributes")].concat(this.contentPreFilters);
+			this.contentPreFilters = [
+				lang.trim,	// avoid IE10 problem hitting ENTER on last line when there's a trailing \n.
+				lang.hitch(this, "_preFixUrlAttributes")
+			].concat(this.contentPreFilters);
 			if(has("mozilla")){
 				this.contentPreFilters = [this._normalizeFontStyle].concat(this.contentPreFilters);
 				this.contentPostFilters = [this._removeMozBogus].concat(this.contentPostFilters);
@@ -189,7 +193,7 @@ define("dijit/_editor/RichText", [
 			}
 			if(has("ie") || has("trident")){
 				// IE generates <strong> and <em> but we want to normalize to <b> and <i>
-				// Still happens in IE11!
+				// Still happens in IE11, but doesn't happen with Edge.
 				this.contentPostFilters = [this._normalizeFontStyle].concat(this.contentPostFilters);
 				this.contentDomPostFilters = [lang.hitch(this, "_stripBreakerNodes")].concat(this.contentDomPostFilters);
 			}
@@ -353,16 +357,13 @@ define("dijit/_editor/RichText", [
 
 			var dn = this.domNode;
 
-			// "html" will hold the innerHTML of the srcNodeRef and will be used to
-			// initialize the editor.
+			// Compute initial value of the editor
 			var html;
-
 			if(lang.isString(this.value)){
 				// Allow setting the editor content programmatically instead of
 				// relying on the initial content being contained within the target
 				// domNode.
 				html = this.value;
-				delete this.value;
 				dn.innerHTML = "";
 			}else if(dn.nodeName && dn.nodeName.toLowerCase() == "textarea"){
 				// if we were created from a textarea, then we need to create a
@@ -416,7 +417,6 @@ define("dijit/_editor/RichText", [
 				html = htmlapi.getChildrenHtml(dn);
 				dn.innerHTML = "";
 			}
-
 			this.value = html;
 
 			// If we're a list item we have to put in a blank line to force the
@@ -447,7 +447,7 @@ define("dijit/_editor/RichText", [
 					while((dat = datas[i++])){
 						var data = dat.split(this._NAME_CONTENT_SEP);
 						if(data[0] === this.name){
-							html = data[1];
+							this.value = data[1];
 							datas = datas.splice(i, 1);
 							saveTextarea.value = datas.join(this._SEPARATOR);
 							break;
@@ -494,6 +494,10 @@ define("dijit/_editor/RichText", [
 			}
 			ifr.frameBorder = 0;
 			ifr._loadFunc = lang.hitch(this, function(w){
+				// This method is called when the editor is first loaded and also if the Editor's
+				// dom node is repositioned. Unfortunately repositioning the Editor tends to
+				// clear the iframe's contents, so we can't just no-op in that case.
+
 				this.window = w;
 				this.document = w.document;
 
@@ -504,8 +508,10 @@ define("dijit/_editor/RichText", [
 					this._localizeEditorCommands();
 				}
 
-				// Do final setup and set initial contents of editor
-				this.onLoad(html);
+				// Do final setup and set contents of editor.
+				// Use get("value") rather than html in case _loadFunc() is being called for a second time
+				// because editor's DOMNode was repositioned.
+				this.onLoad(this.get("value"));
 			});
 
 			// Attach iframe to document, and set the initial (blank) content.
@@ -513,9 +519,12 @@ define("dijit/_editor/RichText", [
 				s;
 
 			// IE10 and earlier will throw an "Access is denied" error when attempting to access the parent frame if
-			// document.domain has been set, unless the child frame also has the same document.domain set. The child frame
-			// can only set document.domain while the document is being constructed using open/write/close; attempting to
-			// set it later results in a different "This method can't be used in this context" error. See #17529
+			// document.domain has been set, unless the child frame also has the same document.domain set. In some
+			// cases, we can only set document.domain while the document is being constructed using open/write/close;
+			// attempting to set it later results in a different "This method can't be used in this context" error.
+			// However, in at least IE9-10, sometimes the parent.window check will succeed and the access failure will
+			// only happen later when trying to access frameElement, so there is an additional check and fix there
+			// as well. See #17529
 			if (has("ie") < 11) {
 				s = 'javascript:document.open();try{parent.window;}catch(e){document.domain="' + document.domain + '";}' +
 					'document.write(\'' + src + '\');document.close()';
@@ -524,17 +533,10 @@ define("dijit/_editor/RichText", [
 				s = "javascript: '" + src + "'";
 			}
 
-			if(has("ie") == 9){
-				// On IE9, attach to document before setting the content, to avoid problem w/iframe running in
-				// wrong security context, see #16633.
-				this.editingArea.appendChild(ifr);
-				ifr.src = s;
-			}else{
-				// For other browsers, set src first, especially for IE6/7 where attaching first gives a warning on
-				// https:// about "this page contains secure and insecure items, do you want to view both?"
-				ifr.setAttribute('src', s);
-				this.editingArea.appendChild(ifr);
-			}
+			// Attach to document before setting the content, to avoid problem w/iframe running in
+			// wrong security context (IE9 and IE11), see #16633.
+			this.editingArea.appendChild(ifr);
+			ifr.src = s;
 
 			// TODO: this is a guess at the default line-height, kinda works
 			if(dn.nodeName === "LI"){
@@ -556,10 +558,23 @@ define("dijit/_editor/RichText", [
 			//		private
 			var _cs = domStyle.getComputedStyle(this.domNode);
 
+			// Find any associated label element, aria-label, or aria-labelledby and get unescaped text.
+			var title;
+			if(this["aria-label"]){
+				title = this["aria-label"];
+			}else{
+				var labelNode = query('label[for="' + this.id + '"]', this.ownerDocument)[0] ||
+						dom.byId(this["aria-labelledby"], this.ownerDocument);
+				if(labelNode){
+					title = labelNode.textContent || labelNode.innerHTML || "";
+				}
+			}
+
 			// The contents inside of <body>.  The real contents are set later via a call to setValue().
 			// In auto-expand mode, need a wrapper div for AlwaysShowToolbar plugin to correctly
 			// expand/contract the editor as the content changes.
-			var html = "<div id='dijitEditorBody'></div>";
+			var html = "<div id='dijitEditorBody' role='textbox' aria-multiline='true' " +
+					(title ? " aria-label='" + string.escape(title) + "'" : "") + "></div>";
 
 			var font = [ _cs.fontWeight, _cs.fontSize, _cs.fontFamily ].join(" ");
 
@@ -602,26 +617,18 @@ define("dijit/_editor/RichText", [
 				userStyle += match + ';';
 			});
 
-
-			// need to find any associated label element, aria-label, or aria-labelledby and update iframe document title
-			var label = query('label[for="' + this.id + '"]');
-			var title = "";
-			if(label.length){
-				title = label[0].innerHTML;
-			}else if(this["aria-label"]){
-				title = this["aria-label"];
-			}else if(this["aria-labelledby"]){
-				title = dom.byId(this["aria-labelledby"]).innerHTML;
-			}
-
 			// Now that we have the title, also set it as the title attribute on the iframe
 			this.iframe.setAttribute("title", title);
 
+			// if this.lang is unset then use default value, to avoid invalid setting of lang=""
+			var language = this.lang || kernel.locale.replace(/-.*/, "");
+
 			return [
 				"<!DOCTYPE html>",
-				this.isLeftToRight() ? "<html lang='" + this.lang + "'>\n<head>\n" : "<html dir='rtl' lang='" + this.lang + "'>\n<head>\n",
-				title ? "<title>" + title + "</title>" : "",
+				"<html lang='" + language + "'" + (this.isLeftToRight() ? "" : " dir='rtl'") + ">\n",
+				"<head>\n",
 				"<meta http-equiv='Content-Type' content='text/html'>\n",
+				title ? "<title>" + string.escape(title) + "</title>" : "",
 				"<style>\n",
 				"\tbody,html {\n",
 				"\t\tbackground:transparent;\n",
@@ -652,15 +659,21 @@ define("dijit/_editor/RichText", [
 				"\tp{ margin: 1em 0; }\n",
 
 				"\tli > ul:-moz-first-node, li > ol:-moz-first-node{ padding-top: 1.2em; }\n",
-				// Can't set min-height in IE9, it puts layout on li, which puts move/resize handles.
-				(!has("ie") ? "\tli{ min-height:1.2em; }\n" : ""),
+				// Can't set min-height in IE>=9, it puts layout on li, which puts move/resize handles.
+				// Also can't set it on Edge, as it leads to strange behavior where hitting the return key
+				// doesn't start a new list item.
+				(has("ie") || has("trident") || has("edge") ? "" : "\tli{ min-height:1.2em; }\n"),
 				"</style>\n",
 				this._applyEditingAreaStyleSheets(), "\n",
-				"</head>\n<body role='main' ",
+				"</head>\n<body role='application'",
+				title ? " aria-label='" + string.escape(title) + "'" : "",
 
 				// Onload handler fills in real editor content.
 				// On IE9, sometimes onload is called twice, and the first time frameElement is null (test_FullScreen.html)
-				"onload='frameElement && frameElement._loadFunc(window,document)' ",
+				// On IE9-10, it is also possible that accessing window.parent in the initial creation of the
+				// iframe DOM will succeed, but trying to access window.frameElement will fail, in which case we
+				// *can* set the domain without a "This method can't be used in this context" error. See #17529
+				"onload='try{frameElement && frameElement._loadFunc(window,document)}catch(e){document.domain=\"" + document.domain + "\";frameElement._loadFunc(window,document)}' ",
 				"style='" + userStyle + "'>", html, "</body>\n</html>"
 			].join(""); // String
 		},
@@ -788,8 +801,6 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 
-			// TODO: rename this to _onLoad, make empty public onLoad() method, deprecate/make protected onLoadDeferred handler?
-
 			if(!this.window.__registeredWindow){
 				this.window.__registeredWindow = true;
 				this._iframeRegHandle = focus.registerIframe(this.iframe);
@@ -812,10 +823,10 @@ define("dijit/_editor/RichText", [
 
 			var events = this.events.concat(this.captureEvents);
 			var ap = this.iframe ? this.document : this.editNode;
-			this.own(
+			this.own.apply(this,
 				array.map(events, function(item){
 					var type = item.toLowerCase().replace(/^on/, "");
-					on(ap, type, lang.hitch(this, item));
+					return on(ap, type, lang.hitch(this, item));
 				}, this)
 			);
 
@@ -832,14 +843,6 @@ define("dijit/_editor/RichText", [
 				// not contentEditable.   Removing it would also probably remove the need for creating
 				// the extra <div> in _getIframeDocTxt()
 				this.editNode.style.zoom = 1.0;
-			}else{
-				this.own(on(this.document, "mousedown", lang.hitch(this, function(){
-					// Clear the moveToStart focus, as mouse
-					// down will set cursor point.  Required to properly
-					// work with selection/position driven plugins and clicks in
-					// the window. refs: #10678
-					delete this._cursorToStart;
-				})));
 			}
 
 			if(has("webkit")){
@@ -878,9 +881,13 @@ define("dijit/_editor/RichText", [
 			// until plugins load (and do things like register filters).
 			var setContent = lang.hitch(this, function(){
 				this.setValue(html);
-				if(this.onLoadDeferred){
+
+				// Tell app that the Editor has finished loading.  isFulfilled() check avoids spurious
+				// console warning when this function is called repeatedly because Editor DOMNode was moved.
+				if(this.onLoadDeferred && !this.onLoadDeferred.isFulfilled()){
 					this.onLoadDeferred.resolve(true);
 				}
+
 				this.onDisplayChanged();
 				if(this.focusOnLoad){
 					// after the document loads, then set focus after updateInterval expires so that
@@ -903,6 +910,15 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 
+			// Modifier keys should not cause the onKeyPressed event because they do not cause any change to the
+			// display
+			if(e.keyCode === keys.SHIFT ||
+			   e.keyCode === keys.ALT ||
+			   e.keyCode === keys.META ||
+			   e.keyCode === keys.CTRL){
+				return true;
+			}
+
 			if(e.keyCode === keys.TAB && this.isTabIndent){
 				//prevent tab from moving focus out of editor
 				e.stopPropagation();
@@ -917,15 +933,19 @@ define("dijit/_editor/RichText", [
 			}
 
 			// Make tab and shift-tab skip over the <iframe>, going from the nested <div> to the toolbar
-			// or next element after the editor.   Needed on IE<9 and firefox.
-			if(e.keyCode == keys.TAB && !this.isTabIndent){
-				if(e.shiftKey && !e.ctrlKey && !e.altKey){
+			// or next element after the editor
+			if(e.keyCode == keys.TAB && !this.isTabIndent && !e.ctrlKey && !e.altKey){
+				if(e.shiftKey){
 					// focus the <iframe> so the browser will shift-tab away from it instead
 					this.beforeIframeNode.focus();
-				}else if(!e.shiftKey && !e.ctrlKey && !e.altKey){
+				}else{
 					// focus node after the <iframe> so the browser will tab away from it instead
 					this.afterIframeNode.focus();
 				}
+
+				// Prevent onKeyPressed from firing in order to avoid triggering a display change event when the
+				// editor is tabbed away; this fixes toolbar controls being inappropriately disabled in IE9+
+				return true;
 			}
 
 			if(has("ie") < 9 && e.keyCode === keys.BACKSPACE && this.document.selection.type === "Control"){
@@ -1057,9 +1077,10 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 
-			// Workaround IE9+ problems when you blur the browser windows while an editor is focused: IE hangs
+			// Workaround IE problem when you blur the browser windows while an editor is focused: IE hangs
 			// when you focus editor #1, blur the browser window, and then click editor #0.  See #16939.
-			if(has("ie") >= 9){
+			// Note: Edge doesn't seem to have this problem.
+			if(has("ie") || has("trident")){
 				this.defer(function(){
 					if(!focus.curNode){
 						this.ownerDocumentBody.focus();
@@ -1110,13 +1131,6 @@ define("dijit/_editor/RichText", [
 			if(!this.isLoaded){
 				this.focusOnLoad = true;
 				return;
-			}
-			if(this._cursorToStart){
-				delete this._cursorToStart;
-				if(this.editNode.childNodes){
-					this.placeCursorAtStart(); // this calls focus() so return
-					return;
-				}
 			}
 			if(has("ie") < 9){
 				//this.editNode.focus(); -> causes IE to scroll always (strict and quirks mode) to the top the Iframe
@@ -1211,22 +1225,6 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		private
 
-			var ie = 1;
-			var mozilla = 1 << 1;
-			var webkit = 1 << 2;
-			var opera = 1 << 3;
-
-			function isSupportedBy(browsers){
-				return {
-					ie: Boolean(browsers & ie),
-					mozilla: Boolean(browsers & mozilla),
-					webkit: Boolean(browsers & webkit),
-					opera: Boolean(browsers & opera)
-				};
-			}
-
-			var supportedBy = null;
-
 			switch(command.toLowerCase()){
 				case "bold":
 				case "italic":
@@ -1244,8 +1242,6 @@ define("dijit/_editor/RichText", [
 				case "delete":
 				case "selectall":
 				case "toggledir":
-					supportedBy = isSupportedBy(mozilla | ie | webkit | opera);
-					break;
 
 				case "createlink":
 				case "unlink":
@@ -1262,27 +1258,27 @@ define("dijit/_editor/RichText", [
 				case "redo":
 				case "strikethrough":
 				case "tabindent":
-					supportedBy = isSupportedBy(mozilla | ie | opera | webkit);
-					break;
 
+				case "cut":
+				case "copy":
+				case "paste":
+					return true;
+
+				// Note: This code path is apparently never called.  Not sure if it should return true or false
+				// for Edge.
 				case "blockdirltr":
 				case "blockdirrtl":
 				case "dirltr":
 				case "dirrtl":
 				case "inlinedirltr":
 				case "inlinedirrtl":
-					supportedBy = isSupportedBy(ie);
-					break;
-				case "cut":
-				case "copy":
-				case "paste":
-					supportedBy = isSupportedBy(ie | mozilla | webkit | opera);
-					break;
+					return has("ie") || has("trident") || has("edge");
 
+				// Note: This code path is apparently never called, not even by the dojox/editor table plugins.
+				// There's also an _inserttableEnabledImpl() method that's also never called.
+				// Previously this code returned truthy for IE and mozilla, but false for chrome/safari, so
+				// leaving it that way just in case.
 				case "inserttable":
-					supportedBy = isSupportedBy(mozilla | ie);
-					break;
-
 				case "insertcell":
 				case "insertcol":
 				case "insertrow":
@@ -1291,17 +1287,11 @@ define("dijit/_editor/RichText", [
 				case "deleterows":
 				case "mergecells":
 				case "splitcell":
-					supportedBy = isSupportedBy(ie | mozilla);
-					break;
+					return !has("webkit");
 
 				default:
 					return false;
 			}
-
-			return ((has("ie") || has("trident")) && supportedBy.ie) ||
-				(has("mozilla") && supportedBy.mozilla) ||
-				(has("webkit") && supportedBy.webkit) ||
-				(has("opera") && supportedBy.opera);	// Boolean return true if the command is supported, false otherwise
 		},
 
 		execCommand: function(/*String*/ command, argument){
@@ -1329,6 +1319,8 @@ define("dijit/_editor/RichText", [
 				if(command === "heading"){
 					throw new Error("unimplemented");
 				}else if(command === "formatblock" && (has("ie") || has("trident"))){
+					// See http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie.
+					// Not necessary on Edge though.
 					argument = '<' + argument + '>';
 				}
 			}
@@ -1405,7 +1397,9 @@ define("dijit/_editor/RichText", [
 			}
 			var r;
 			command = this._normalizeCommand(command);
-			if((has("ie") || has("trident")) && command === "formatblock"){
+			if(has("ie") && command === "formatblock"){
+				// This is to deal with IE bug when running in non-English.  See _localizeEditorCommands().
+				// Apparently not needed on IE11 or Edge.
 				r = this._native2LocalFormatNames[this.document.queryCommandValue(command)];
 			}else if(has("mozilla") && command === "hilitecolor"){
 				var oldValue;
@@ -1536,7 +1530,7 @@ define("dijit/_editor/RichText", [
 				}
 			}
 
-			return this._postFilterContent(null, nonDestructive);
+			return this.isLoaded ? this._postFilterContent(null, nonDestructive) : this.value;
 		},
 		_getValueAttr: function(){
 			// summary:
@@ -1560,17 +1554,12 @@ define("dijit/_editor/RichText", [
 				}));
 				return;
 			}
-			this._cursorToStart = true;
 			if(this.textarea && (this.isClosed || !this.isLoaded)){
 				this.textarea.value = html;
 			}else{
 				html = this._preFilterContent(html);
 				var node = this.isClosed ? this.domNode : this.editNode;
 
-				// Use &nbsp; to avoid webkit problems where editor is disabled until the user clicks it
-				if(!html && has("webkit")){
-					html = "&#160;";	// &nbsp;
-				}
 				node.innerHTML = html;
 				this._preDomFilterContent(node);
 			}
@@ -2192,7 +2181,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var applied = false;
-			if(has("ie")){
+			if(has("ie") || has("trident")){
 				this._adaptIESelection();
 				applied = this._adaptIEFormatAreaAndExec("bold");
 			}
@@ -2210,7 +2199,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var applied = false;
-			if(has("ie")){
+			if(has("ie") || has("trident")){
 				this._adaptIESelection();
 				applied = this._adaptIEFormatAreaAndExec("italic");
 			}
@@ -2228,7 +2217,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var applied = false;
-			if(has("ie")){
+			if(has("ie") || has("trident")){
 				this._adaptIESelection();
 				applied = this._adaptIEFormatAreaAndExec("underline");
 			}
@@ -2246,7 +2235,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var applied = false;
-			if(has("ie")){
+			if(has("ie") || has("trident")){
 				this._adaptIESelection();
 				applied = this._adaptIEFormatAreaAndExec("strikethrough");
 			}
@@ -2264,7 +2253,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var applied = false;
-			if(has("ie")){
+			if(has("ie") || has("trident")){
 				this._adaptIESelection();
 				applied = this._adaptIEFormatAreaAndExec("superscript");
 			}
@@ -2282,7 +2271,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var applied = false;
-			if(has("ie")){
+			if(has("ie") || has("trident")){
 				this._adaptIESelection();
 				applied = this._adaptIEFormatAreaAndExec("subscript");
 
@@ -2301,7 +2290,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var isApplied;
-			if(has("ie")){
+			if(has("ie") || has("trident")){
 				isApplied = this._handleTextColorOrProperties("fontname", argument);
 			}
 			if(!isApplied){
@@ -2318,7 +2307,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var isApplied;
-			if(has("ie")){
+			if(has("ie") || has("trident")){
 				isApplied = this._handleTextColorOrProperties("fontsize", argument);
 			}
 			if(!isApplied){
@@ -2335,7 +2324,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var applied = false;
-			if(has("ie")){
+			if(has("ie") || has("trident") || has("edge")){
 				applied = this._adaptIEList("insertorderedlist", argument);
 			}
 			if(!applied){
@@ -2352,7 +2341,7 @@ define("dijit/_editor/RichText", [
 			// tags:
 			//		protected
 			var applied = false;
-			if(has("ie")){
+			if(has("ie") || has("trident") || has("edge")){
 				applied = this._adaptIEList("insertunorderedlist", argument);
 			}
 			if(!applied){
@@ -2443,6 +2432,9 @@ define("dijit/_editor/RichText", [
 			//		then the native browser commands will fail to execute correctly.
 			//		To work around the issue,  we can remove all empty nodes from
 			//		the start of the range selection.
+			//
+			//		Note: not needed on Edge because Windows 10 won't let the user make
+			//		a selection containing leading or trailing newlines.
 			var selection = rangeapi.getSelection(this.window);
 			if(selection && selection.rangeCount && !selection.isCollapsed){
 				var range = selection.getRangeAt(0);
@@ -2775,7 +2767,7 @@ define("dijit/_editor/RichText", [
 			//		private
 			var selection = rangeapi.getSelection(this.window);
 			if(selection.isCollapsed){
-				// In the case of no selection, lets commonize the behavior and
+				// In the case of no selection, let's commonize the behavior and
 				// make sure that it indents if needed.
 				if(selection.rangeCount && !this.queryCommandValue(command)){
 					var range = selection.getRangeAt(0);
@@ -2789,6 +2781,7 @@ define("dijit/_editor/RichText", [
 							// or IE may shove too much into the list element.  It seems to
 							// grab content before the text node too if it's br split.
 							// Why can't IE work like everyone else?
+							// This problem also happens on Edge.
 
 							// Create a space, we'll select and bold it, so
 							// the whole word doesn't get bolded
@@ -2821,7 +2814,7 @@ define("dijit/_editor/RichText", [
 
 		_handleTextColorOrProperties: function(command, argument){
 			// summary:
-			//		This function handles appplying text color as best it is
+			//		This function handles applying text color as best it is
 			//		able to do so when the selection is collapsed, making the
 			//		behavior cross-browser consistent. It also handles the name
 			//		and size for IE.
@@ -2972,23 +2965,33 @@ define("dijit/_editor/RichText", [
 
 		_stripTrailingEmptyNodes: function(/*DOMNode*/ node){
 			// summary:
-			//		Function for stripping trailing <p> nodes without any text, but not stripping trailing nodes
+			//		Function for stripping trailing nodes without any text, excluding trailing nodes
 			//		like <img> or <div><img></div>, even though they don't have text either.
 
 			function isEmpty(node){
 				// If not for old IE we could check for Element children by node.firstElementChild
 				return (/^(p|div|br)$/i.test(node.nodeName) && node.children.length == 0 &&
-					lang.trim(node.textContent || node.innerText || "") == "") ||
-					(node.nodeType === 3/*text*/ && lang.trim(node.nodeValue) == "");
+					/^[\s\xA0]*$/.test(node.textContent || node.innerText || "")) ||
+					(node.nodeType === 3/*text*/ && /^[\s\xA0]*$/.test(node.nodeValue));
 			}
 			while(node.lastChild && isEmpty(node.lastChild)){
 				domConstruct.destroy(node.lastChild);
 			}
 
 			return node;
+		},
+
+		// Needed to support ToggleDir plugin.  Intentionally not inside if(has("dojo-bidi")) block
+		// so that (for backwards compatibility) ToggleDir plugin works even when has("dojo-bidi") is falsy.
+		_setTextDirAttr: function(/*String*/ value){
+			// summary:
+			//		Sets textDir attribute.  Sets direction of editNode accordingly.
+			this._set("textDir", value);
+			this.onLoadDeferred.then(lang.hitch(this, function(){
+				this.editNode.dir = value;
+			}));
 		}
 	});
 
 	return RichText;
-
 });

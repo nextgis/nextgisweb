@@ -20,11 +20,13 @@ _b.fixedHeaderHeight=_a.offsetHeight;
 }
 if(this.fixedFooter){
 _a=_7.byId(this.fixedFooter);
+if(_a){
 if(_a.parentNode==this.domNode){
 this.isLocalFooter=true;
 _a.style.bottom="0px";
 }
 _b.fixedFooterHeight=_a.offsetHeight;
+}
 }
 this.init(_b);
 this.inherited(arguments);

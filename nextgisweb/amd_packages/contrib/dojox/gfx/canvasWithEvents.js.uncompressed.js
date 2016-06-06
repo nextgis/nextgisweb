@@ -36,9 +36,6 @@ function(lang, declare, has, on, aspect, touch, Color, dom, domGeom, win, g, can
         }
     });
 
-	has.add("MSPointer", navigator.msPointerEnabled);
-	has.add("pointer-events", navigator.pointerEnabled);
-
 	var canvasWithEvents = g.canvasWithEvents = {
 		// summary:
 		//		This the graphics rendering bridge for W3C Canvas compliant browsers which extends
@@ -480,7 +477,7 @@ function(lang, declare, has, on, aspect, touch, Color, dom, domGeom, win, g, can
 				moveEvt = "pointermove";
 			}else if(has("MSPointer")){
 				moveEvt = "MSPointerMove";
-			}else if(has("touch")){
+			}else if(has("touch-events")){
 				moveEvt = "touchmove";
 			}
 			on(canvas, moveEvt, lang.hitch(this, "_checkPointer"));

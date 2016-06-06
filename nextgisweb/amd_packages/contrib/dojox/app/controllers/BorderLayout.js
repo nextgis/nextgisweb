@@ -16,10 +16,15 @@ var _a=_9.view.constraint;
 if(_9.view.parent.id==this.app.id){
 var _b=_8.byId(_9.view.parent.id+"-"+_a);
 if(_b){
-var _c=new _7({id:_9.view.id+"-cp-"+_a});
+var _c=_8.byId(_9.view.id+"-cp-"+_a);
+if(!_c){
+_c=new _7({id:_9.view.id+"-cp-"+_a});
 _c.addChild(_9.view);
 _b.addChild(_c);
 bc.addChild(_b);
+}else{
+_c.domNode.appendChild(_9.view.domNode);
+}
 }else{
 var _d=this.app.borderLayoutNoSplitter||false;
 var _e=new _6({doLayout:true,splitter:!_d,region:_a,id:_9.view.parent.id+"-"+_a});

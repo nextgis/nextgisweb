@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/widget/SortList", ["dijit","dojo","dojox","dojo/require!dijit/layout/_LayoutWidget,dijit/_Templated"], function(dijit,dojo,dojox){
+define("dojox/widget/SortList", ["dojo","dijit","dojox","dojo/require!dijit/layout/_LayoutWidget,dijit/_Templated"], function(dojo,dijit,dojox){
 dojo.provide("dojox.widget.SortList");
 dojo.experimental("dojox.widget.SortList"); // level: prototype, designed for dijit.chat.demo
 

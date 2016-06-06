@@ -188,7 +188,7 @@ define("dojox/mvc/_atBindingMixin", [
 			//		Otherwise, queue it up to this._refs so that _dbstartup() can pick it up.
 
 			if(name == "ref"){
-				throw new Error(this + ": 1.7 ref syntax used in conjuction with 1.8 dojox/mvc/at syntax, which is not supported.");
+				throw new Error(this + ": 1.7 ref syntax used in conjunction with 1.8 dojox/mvc/at syntax, which is not supported.");
 			}
 
 			// Claen up older data binding

@@ -48,7 +48,7 @@ _11._callbackSetLabel(_12?[_12]:[],undefined,undefined,_e);
 });
 }else{
 this.valueNode.value=_d;
-this.inherited(arguments);
+this.inherited(arguments,[_d,_e,_f,_10]);
 }
 },_setItemAttr:function(_13,_14,_15){
 this.inherited(arguments);

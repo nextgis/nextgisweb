@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/lang/aspect/profiler", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/lang/aspect/profiler", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.lang.aspect.profiler");
 
 (function(){

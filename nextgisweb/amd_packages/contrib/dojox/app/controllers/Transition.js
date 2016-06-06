@@ -13,6 +13,7 @@ this.onDomNodeChange({oldNode:null,newNode:this.app.domNode});
 }
 },transition:function(_f){
 var F=_b+":transition";
+this.app.log(_c,F," ");
 this.app.log(_c,F,"New Transition event.viewId=["+_f.viewId+"]");
 this.app.log(F,"event.viewId=["+_f.viewId+"]","event.opts=",_f.opts);
 var _10=_f.viewId||"";
@@ -225,7 +226,8 @@ _3c=this._getNextSubViewArray(_3a,_3b,_33);
 }
 var _3d=_9.getSelectedChild(_33,_3b.constraint);
 var _3e=this._getCurrentSubViewArray(_33,_3c,_34);
-var _3f=this._getCurrentSubViewNamesArray(_3e);
+var _3f=this._getNamesFromArray(_3e,false);
+var _40=this._getNamesFromArray(_3c,true);
 _3b.params=this._getParamsForView(_3b.name,_31);
 if(_34){
 if(_3b!==_3d){
@@ -234,13 +236,6 @@ return;
 }
 this.app.log(_c,F,"Transition Remove current From=["+_3f+"]");
 _3b=null;
-}
-var _40="";
-if(_3b){
-_40=_3b.name;
-if(_3a){
-_40=_40+","+_3a;
-}
 }
 if(_40==_3f&&_3b==_3d){
 this.app.log(_c,F,"Transition current and next DO MATCH From=["+_3f+"] TO=["+_40+"]");
@@ -443,37 +438,43 @@ var _7e=_9.getAllSelectedChildren(p);
 _7a=_7a.concat(_7e);
 }
 return _7a;
-},_getCurrentSubViewNamesArray:function(_7f){
-var F=_b+":_getCurrentSubViewNamesArray";
-var _80=[];
+},_getNamesFromArray:function(_7f,_80){
+var F=_b+":_getNamesFromArray";
+var _81="";
+if(_80){
+for(var i=_7f.length-1;i>=0;i--){
+_81=_81?_81+","+_7f[i].name:_7f[i].name;
+}
+}else{
 for(var i=0;i<_7f.length;i++){
-_80.push(_7f[i].name);
+_81=_81?_81+","+_7f[i].name:_7f[i].name;
 }
-return _80;
-},_handleTransit:function(_81,_82,_83,_84,_85,_86,_87,_88){
+}
+return _81;
+},_handleTransit:function(_82,_83,_84,_85,_86,_87,_88,_89){
 var F=_b+":_handleTransit";
-var _89=this.nextLastSubChildMatch||_81;
-var _8a=_2.mixin({},_84);
-_8a=_2.mixin({},_8a,{reverse:(_8a.reverse||_8a.transitionDir===-1)?true:false,transition:this._getTransition(_89,_82,_85,_8a,_87)});
-if(_86){
-_89=null;
+var _8a=this.nextLastSubChildMatch||_82;
+var _8b=_2.mixin({},_85);
+_8b=_2.mixin({},_8b,{reverse:(_8b.reverse||_8b.transitionDir===-1)?true:false,transition:this._getTransition(_8a,_83,_86,_8b,_88)});
+if(_87){
+_8a=null;
 }
-if(_83){
-this.app.log(_c,F,"transit FROM currentLastSubChild.id=["+_83.id+"]");
+if(_84){
+this.app.log(_c,F,"transit FROM currentLastSubChild.id=["+_84.id+"]");
 }
-if(_89){
-if(_8a.transition!=="none"){
-if(!_88&&_89._needsResize){
+if(_8a){
+if(_8b.transition!=="none"){
+if(!_89&&_8a._needsResize){
 this.app.log(_c,F,"emit doResize called from _handleTransit");
 this.app.emit("app-resize");
 }
-this.app.log(_c,F,"  calling _showSelectedChildren for w3.id=["+_89.id+"], display=["+_89.domNode.style.display+"], visibility=["+_89.domNode.style.visibility+"]");
+this.app.log(_c,F,"  calling _showSelectedChildren for w3.id=["+_8a.id+"], display=["+_8a.domNode.style.display+"], visibility=["+_8a.domNode.style.visibility+"]");
 this._showSelectedChildren(this.app);
 }
-this.app.log(_c,F,"transit TO nextLastSubChild.id=["+_89.id+"] transition=["+_8a.transition+"]");
+this.app.log(_c,F,"transit TO nextLastSubChild.id=["+_8a.id+"] transition=["+_8b.transition+"]");
 }else{
 this._showSelectedChildren(this.app);
 }
-return _a(_83&&_83.domNode,_89&&_89.domNode,_8a);
+return _a(_84&&_84.domNode,_8a&&_8a.domNode,_8b);
 }});
 });

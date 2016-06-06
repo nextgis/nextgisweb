@@ -1,8 +1,8 @@
 //>>built
-define("dojox/lang/async/topic",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.async.topic");
+define("dojox/lang/async/topic",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.async.topic");
 (function(){
-var d=_2,_4=_3.lang.async.topic;
+var d=_1,_4=_3.lang.async.topic;
 _4.from=function(_5){
 return function(){
 var h,_6=function(){

@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/layout/dnd/Avatar", ["dijit","dojo","dojox","dojo/require!dojo/dnd/Avatar,dojo/dnd/common"], function(dijit,dojo,dojox){
+define("dojox/layout/dnd/Avatar", ["dojo","dijit","dojox","dojo/require!dojo/dnd/Avatar,dojo/dnd/common"], function(dojo,dijit,dojox){
 dojo.provide("dojox.layout.dnd.Avatar");
 
 dojo.require("dojo.dnd.Avatar");
@@ -33,7 +33,7 @@ dojo.declare("dojox.layout.dnd.Avatar", dojo.dnd.Avatar, {
 		node.style.margin = "0px"
 		node.style.width = dojo.marginBox(source.node).w + "px"
 		
-		// add contructor object params to define it
+		// add constructor object params to define it
 		dojo.style(node, "opacity", this.opacity);
 		this.node = node;
 	},

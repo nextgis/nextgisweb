@@ -94,7 +94,6 @@ define("dijit/_Container", [
 			//		if -1, get the previous sibling
 			// tags:
 			//		private
-			kernel.deprecated(this.declaredClass+"::_getSiblingOfChild() is deprecated. Use _KeyNavMixin::_getNext() instead.", "", "2.0");
 			var children = this.getChildren(),
 				idx = array.indexOf(children, child);	// int
 			return children[idx + dir];

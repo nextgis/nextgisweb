@@ -36,6 +36,11 @@ define("dojox/mobile/ListItem", [
 		// |		<div layout="center">Center Node</div>
 		// |	</li>
 		//
+		//		Similarly, a child widget can have the preventTouch
+		//		attribute, whose value is a boolean (or data-mobile-prevent-touch
+		//		for children which are not widgets), such that touching such
+		//		child doesn't trigger the item action.
+		//
 		//		Note that even if you specify variableHeight="true" for the list
 		//		and place a tall object inside the layout node as in the example
 		//		below, the layout node does not expand as you may expect,
@@ -126,6 +131,12 @@ define("dojox/mobile/ListItem", [
 		//		A css class name to add to the progress indicator.
 		progStyle: "",
 
+		// layoutOnResize: Boolean
+		//		If true, a call to resize() will force computation of variable height items layout. You should not need this as in most
+		//		cases ListItem height doesn't change on container resize. Depending on number and complexity
+		//		of items in a view, setting to true may have a high impact on performance.
+		layoutOnResize: false,
+
 		/* internal properties */	
 		// The following properties are overrides of those in _ItemBase.
 		paramsToInherit: "variableHeight,transition,deleteIcon,icon,rightIcon,rightIcon2,uncheckIcon,arrowClass,checkClass,uncheckClass,deleteIconTitle,deleteIconRole",
@@ -179,11 +190,6 @@ define("dojox/mobile/ListItem", [
 				this.onTouchStart = function(e){
 					return (e.target !== this.labelNode);
 				};
-			}
-			if(opts.moveTo || opts.href || opts.url || this.clickable || (parent && parent.select)){
-				this.connect(this.domNode, "onkeydown", "_onClick"); // for desktop browsers
-			}else{
-				this._handleClick = false;
 			}
 
 			this.inherited(arguments);
@@ -269,10 +275,9 @@ define("dojox/mobile/ListItem", [
 		},
 
 		resize: function(){
-			if(this.variableHeight){
+			if(this.layoutOnResize && this.variableHeight){
 				this.layoutVariableHeight();
 			}
-
 			// labelNode may not exist only when using a template (if not created by an attach point)
 			if(!this._templated || this.labelNode){
 				// If labelNode is empty, shrink it so as not to prevent user clicks.
@@ -354,7 +359,7 @@ define("dojox/mobile/ListItem", [
 						var t = Math.round((domNode.offsetHeight - n.offsetHeight) / 2) -
 							domStyle.get(domNode, "paddingTop");
 						n.style.marginTop = t + "px";
-					}
+					};
 					if(n.offsetHeight === 0 && n.tagName === "IMG"){
 						n.onload = f;
 					}else{

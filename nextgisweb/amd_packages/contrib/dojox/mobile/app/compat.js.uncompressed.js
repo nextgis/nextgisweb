@@ -1,4 +1,49 @@
 require({cache:{
+'dijit/main':function(){
+define([
+	"dojo/_base/kernel"
+], function(dojo){
+	// module:
+	//		dijit/main
+
+/*=====
+return {
+	// summary:
+	//		The dijit package main module.
+	//		Deprecated.   Users should access individual modules (ex: dijit/registry) directly.
+};
+=====*/
+
+	return dojo.dijit;
+});
+
+},
+'dojox/main':function(){
+define(["dojo/_base/kernel"], function(dojo) {
+	// module:
+	//		dojox/main
+
+	/*=====
+	return {
+		// summary:
+		//		The dojox package main module; dojox package is somewhat unusual in that the main module currently just provides an empty object.
+		//		Apps should require modules from the dojox packages directly, rather than loading this module.
+	};
+	=====*/
+
+	return dojo.dojox;
+});
+},
+'dojo/require':function(){
+define(["./_base/loader"], function(loader){
+	return {
+		dynamic:0,
+		normalize:function(id){return id;},
+		load:loader.require
+	};
+});
+
+},
 'dojox/mobile/compat':function(){
 define([
 	"dojo/_base/lang",
@@ -58,54 +103,9 @@ define([
 	return dm;
 });
 
-},
-'dojo/require':function(){
-define(["./_base/loader"], function(loader){
-	return {
-		dynamic:0,
-		normalize:function(id){return id;},
-		load:loader.require
-	};
-});
-
-},
-'dijit/main':function(){
-define([
-	"dojo/_base/kernel"
-], function(dojo){
-	// module:
-	//		dijit/main
-
-/*=====
-return {
-	// summary:
-	//		The dijit package main module.
-	//		Deprecated.   Users should access individual modules (ex: dijit/registry) directly.
-};
-=====*/
-
-	return dojo.dijit;
-});
-
-},
-'dojox/main':function(){
-define(["dojo/_base/kernel"], function(dojo) {
-	// module:
-	//		dojox/main
-
-	/*=====
-	return {
-		// summary:
-		//		The dojox package main module; dojox package is somewhat unusual in that the main module currently just provides an empty object.
-		//		Apps should require modules from the dojox packages directly, rather than loading this module.
-	};
-	=====*/
-
-	return dojo.dojox;
-});
 }}});
 // wrapped by build app
-define("dojox/mobile/app/compat", ["dijit","dojo","dojox","dojo/require!dojox/mobile/compat"], function(dijit,dojo,dojox){
+define("dojox/mobile/app/compat", ["dojo","dijit","dojox","dojo/require!dojox/mobile/compat"], function(dojo,dijit,dojox){
 dojo.provide("dojox.mobile.app.compat");
 dojo.require("dojox.mobile.compat");
 

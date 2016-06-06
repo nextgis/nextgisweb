@@ -23,7 +23,7 @@ _e.cleanGroup(s);
 });
 }
 var t=this.chart.theme,_f=this.events();
-for(var i=this.series.length-1;i>=0;--i){
+for(var i=0;i<this.series.length;i++){
 var run=this.series[i];
 if(!this.dirty&&!run.dirty){
 t.skip();
@@ -37,6 +37,12 @@ t.skip();
 continue;
 }
 var _10=t.next("marker",[this.opt,run]),_11,ht=this._hScaler.scaler.getTransformerFromModel(this._hScaler),vt=this._vScaler.scaler.getTransformerFromModel(this._vScaler);
+if(run.hidden){
+run.dyn.marker=_10.symbol;
+run.dyn.markerFill=_10.marker.fill;
+run.dyn.markerStroke=_10.marker.stroke;
+continue;
+}
 s=run.group;
 if(typeof run.data[0]=="number"){
 _11=_2.map(run.data,function(v,i){
@@ -68,7 +74,7 @@ this._animateScatter(_12[i],_c.height-_d.b);
 }
 if(_16.marker.outline){
 var _19=dc.makeStroke(_16.marker.outline);
-_19.width=2*_19.width+_16.marker.stroke.width;
+_19.width=2*_19.width+(_16.marker.stroke&&_16.marker.stroke.width||0);
 _14[i]=s.createPath(_18).setStroke(_19);
 if(this.animate){
 this._animateScatter(_14[i],_c.height-_d.b);

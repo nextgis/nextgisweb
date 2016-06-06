@@ -25,11 +25,6 @@ define("dijit/_Templated", [
 		//		Deprecated mixin for widgets that are instantiated from a template.
 		//		Widgets should use _TemplatedMixin plus if necessary _WidgetsInTemplateMixin instead.
 
-		// widgetsInTemplate: [protected] Boolean
-		//		Should we parse the template to find widgets that might be
-		//		declared in markup inside it?  False by default.
-		widgetsInTemplate: false,
-
 		constructor: function(){
 			kernel.deprecated(this.declaredClass + ": dijit._Templated deprecated, use dijit._TemplatedMixin and if necessary dijit._WidgetsInTemplateMixin", "", "2.0");
 		},

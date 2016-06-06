@@ -100,11 +100,13 @@ define("dojox/mobile/TreeView", [
 					var heading = new Heading({
 						label: "Dynamic View",
 						back: "Back",
-						moveTo: viewRegistry.getEnclosingView(li.domNode).id
+						moveTo: viewRegistry.getEnclosingView(li.domNode).id,
+						dir: this.isLeftToRight() ? "ltr" : "rtl"
 					});
 
 					var newView = ScrollableView({
-						id: newViewId
+						id: newViewId,
+						dir: this.isLeftToRight() ? "ltr" : "rtl"
 					}, domConstruct.create("div", null, win.body()));
 					newView.addChild(heading);
 					newView.addChild(list);

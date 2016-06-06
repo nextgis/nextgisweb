@@ -207,56 +207,7 @@ return {
 					node.style.display = disp;
 				}
 			}
-		});	
-
-
-		lang.extend(Switch, {
-			_changeState: function(/*String*/state, /*Boolean*/anim){
-				// summary:
-				//		Function to toggle the switch state on the switch
-				// state:
-				//		The state to toggle, switch 'on' or 'off'
-				// anim:
-				//		Whether to use animation or not
-				// tags:
-				//		private
-				var on = (state === "on");
-
-				var pos;
-				if(!on){
-					pos = this.isLeftToRight() ? -domStyle.get(this.right,"left") : 0;
-				}else{
-					pos = this.isLeftToRight() ? 0 : -domStyle.get(this.right,"left");
-				}
-
-				this.left.style.display = "";
-				this.right.style.display = "";
-
-				var _this = this;
-				var f = function(){
-					domClass.remove(_this.domNode, on ? "mblSwitchOff" : "mblSwitchOn");
-					domClass.add(_this.domNode, on ? "mblSwitchOn" : "mblSwitchOff");
-					_this.left.style.display = on ? "" : "none";
-					_this.right.style.display = !on ? "" : "none";
-					domAttr.set(_this.domNode, "aria-checked", on ? "true" : "false"); //a11y
-				};
-
-				if(anim){
-					var a = fx.slideTo({
-						node: this.inner,
-						duration: 300,
-						left: pos,
-						onEnd: f
-					});
-					a.play();
-				}else{
-					if((this.isLeftToRight() ? on : !on) || pos){
-						this.inner.style.left = pos + "px";
-					}
-					f();
-				}
-			}
-		});	
+		});
 
 
 		lang.extend(ProgressIndicator, {
@@ -411,20 +362,6 @@ return {
 						marginBottom: "-2px",
 						fontSize: "1px"
 					});
-				}
-			});
-
-			// #13846: on IE<10, setSelectable(false) sets unselectable="on" on all children,
-			// which makes INPUT elements uneditable.
-			Heading._buildRendering = Heading.prototype.buildRendering;
-			lang.extend(Heading, {
-				buildRendering: function(){
-					Heading._buildRendering.apply(this);
-					var nodes = this.domNode.getElementsByTagName("INPUT"),
-						i = nodes.length;
-					while(i--){
-						nodes[i].removeAttribute("unselectable");
-					}
 				}
 			});
 		} // if	(has("ie"))
@@ -598,7 +535,7 @@ return {
 				for(var i = 0; i < paths.length; i++){
 					var href = paths[i];
 					if(href.indexOf("_rtl") == -1){
-						var rtlCssList = "android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css";
+						var rtlCssList = "android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css ProgressIndicator.css Accordion.css GridLayout.css FormLayout.css";
 						var cssName = href.substr(href.lastIndexOf('/') + 1);
 						if(rtlCssList.indexOf(cssName) != -1){
 							var rtlPath = href.replace(".css", "_rtl.css");
@@ -615,7 +552,7 @@ return {
 		};
 
 		ready(function(){
-			if(config["mblLoadCompatCssFiles"] !== false){
+			if(config.mblLoadCompatCssFiles !== false){
 				dm.loadCompatCssFiles();
 			}
 			if(dm.applyPngFilter){

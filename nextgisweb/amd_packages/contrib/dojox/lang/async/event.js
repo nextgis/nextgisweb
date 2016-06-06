@@ -1,8 +1,8 @@
 //>>built
-define("dojox/lang/async/event",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.async.event");
+define("dojox/lang/async/event",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.async.event");
 (function(){
-var d=_2,_4=_3.lang.async.event;
+var d=_1,_4=_3.lang.async.event;
 _4.from=function(_5,_6){
 return function(){
 var h,_7=function(){

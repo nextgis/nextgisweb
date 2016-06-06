@@ -1,5 +1,5 @@
 //>>built
-define("dijit/layout/StackContainer",["dojo/_base/array","dojo/cookie","dojo/_base/declare","dojo/dom-class","dojo/dom-construct","dojo/has","dojo/_base/lang","dojo/on","dojo/ready","dojo/topic","dojo/when","../registry","../_WidgetBase","./_LayoutWidget","dojo/i18n!../nls/common"],function(_1,_2,_3,_4,_5,_6,_7,on,_8,_9,_a,_b,_c,_d){
+define("dijit/layout/StackContainer",["dojo/_base/array","dojo/cookie","dojo/_base/declare","dojo/dom-class","dojo/dom-construct","dojo/has","dojo/_base/lang","dojo/on","dojo/ready","dojo/topic","dojo/when","../registry","../_WidgetBase","./_LayoutWidget"],function(_1,_2,_3,_4,_5,_6,_7,on,_8,_9,_a,_b,_c,_d){
 if(_6("dijit-legacy-requires")){
 _8(0,function(){
 var _e=["dijit/layout/StackController"];
@@ -55,7 +55,7 @@ this.inherited(arguments);
 if(_15.style.display=="none"){
 _15.style.display="block";
 }
-_14.domNode.title="";
+_14.domNode.removeAttribute("title");
 },addChild:function(_18,_19){
 this.inherited(arguments);
 if(this._started){
@@ -94,7 +94,7 @@ _1c=_b.byId(_1c);
 if(this.selectedChildWidget!=_1c){
 d=this._transition(_1c,this.selectedChildWidget,_1d);
 this._set("selectedChildWidget",_1c);
-_9.publish(this.id+"-selectChild",_1c);
+_9.publish(this.id+"-selectChild",_1c,this._focused);
 if(this.persist){
 _2(this.id+"_selectedChild",this.selectedChildWidget.id);
 }
@@ -149,7 +149,7 @@ _4.replace(_26._wrapper,"dijitHidden","dijitVisible");
 }
 _26.onHide&&_26.onHide();
 },closeChild:function(_27){
-var _28=_27.onClose&&_27.onClose(this,_27);
+var _28=!_27.onClose||_27.onClose(this,_27);
 if(_28){
 this.removeChild(_27);
 _27.destroyRecursive();

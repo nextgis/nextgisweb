@@ -83,16 +83,20 @@ delete this._pendingSelectedItem;
 this.selectFromEvent(e,null,null,false);
 }
 }
+if(!p.touchMoved&&(Math.abs(_f.x-p.start.x)>10||Math.abs(_f.y-p.start.y)>10)){
 p.touchMoved=true;
+}
 if(this._editingGesture){
 _7.stop(e);
 if(p.itemBeginDispatched){
 var _10=[];
 var d=p.editKind=="resizeEnd"?p.editedItem.endTime:p.editedItem.startTime;
+var _11=p.editedItem.subColumn;
 switch(p.editKind){
 case "move":
-var _11=p.moveTouchIndex==null||p.moveTouchIndex<0?0:p.moveTouchIndex;
-_10[0]=this.getTime(e,-1,-1,_11);
+var _12=p.moveTouchIndex==null||p.moveTouchIndex<0?0:p.moveTouchIndex;
+_10[0]=this.getTime(e,-1,-1,_12);
+_11=this.getSubColumn(e,-1,-1,_12);
 break;
 case "resizeStart":
 _10[0]=this.getTime(e,-1,-1,p.resizeStartTouchIndex);
@@ -105,7 +109,7 @@ _10[0]=this.getTime(e,-1,-1,p.resizeStartTouchIndex);
 _10[1]=this.getTime(e,-1,-1,p.resizeEndTouchIndex);
 break;
 }
-this._moveOrResizeItemGesture(_10,"touch",e);
+this._moveOrResizeItemGesture(_10,"touch",e,_11);
 if(p.editKind=="move"){
 if(this.renderData.dateModule.compare(p.editedItem.startTime,d)==-1){
 this.ensureVisibility(p.editedItem.startTime,p.editedItem.endTime,"start",this.autoScrollTouchMargin);
@@ -148,8 +152,8 @@ this._startTouchItemEditingGesture(e);
 }else{
 if(!p.touchMoved){
 _7.stop(e);
-_1.forEach(p.handles,function(_12){
-_12.remove();
+_1.forEach(p.handles,function(_13){
+_13.remove();
 });
 if(this._touchSelectionTimer){
 clearTimeout(this._touchSelectionTimer);
@@ -178,72 +182,72 @@ this.set("selectedItems",this._saveSelectedItems);
 delete this._saveSelectedItems;
 delete this._pendingSelectedItem;
 }
-_1.forEach(p.handles,function(_13){
-_13.remove();
+_1.forEach(p.handles,function(_14){
+_14.remove();
 });
 this._edProps=null;
 }
 }
 },_startTouchItemEditingGesture:function(e){
 var p=this._edProps;
-var _14=p.resizeStartTouchIndex!=-1;
-var _15=p.resizeEndTouchIndex!=-1;
-if(_14&&_15||this._editingGesture&&p.touchesLen==2&&(_15&&p.editKind=="resizeStart"||_14&&p.editKind=="resizeEnd")){
+var _15=p.resizeStartTouchIndex!=-1;
+var _16=p.resizeEndTouchIndex!=-1;
+if(_15&&_16||this._editingGesture&&p.touchesLen==2&&(_16&&p.editKind=="resizeStart"||_15&&p.editKind=="resizeEnd")){
 if(this._editingGesture&&p.editKind!="resizeBoth"){
 this._endItemEditingGesture("touch",e);
 }
 p.editKind="resizeBoth";
 this._startItemEditingGesture([this.getTime(e,-1,-1,p.resizeStartTouchIndex),this.getTime(e,-1,-1,p.resizeEndTouchIndex)],p.editKind,"touch",e);
 }else{
-if(_14&&p.touchesLen==1&&!this._editingGesture){
+if(_15&&p.touchesLen==1&&!this._editingGesture){
 this._startItemEditingGesture([this.getTime(e,-1,-1,p.resizeStartTouchIndex)],"resizeStart","touch",e);
 }else{
-if(_15&&p.touchesLen==1&&!this._editingGesture){
+if(_16&&p.touchesLen==1&&!this._editingGesture){
 this._startItemEditingGesture([this.getTime(e,-1,-1,p.resizeEndTouchIndex)],"resizeEnd","touch",e);
 }else{
 this._startItemEditingGesture([this.getTime(e)],"move","touch",e);
 }
 }
 }
-},_getTouchesOnRenderers:function(e,_16){
-var irs=this._getStartEndRenderers(_16);
-var _17=-1;
+},_getTouchesOnRenderers:function(e,_17){
+var irs=this._getStartEndRenderers(_17);
 var _18=-1;
 var _19=-1;
-var _1a=irs[0]!=null&&irs[0].resizeStartHandle!=null;
-var _1b=irs[1]!=null&&irs[1].resizeEndHandle!=null;
+var _1a=-1;
+var _1b=irs[0]!=null&&irs[0].resizeStartHandle!=null;
+var _1c=irs[1]!=null&&irs[1].resizeEndHandle!=null;
 var len=0;
-var _1c=false;
-var _1d=this.itemToRenderer[_16.id];
+var _1d=false;
+var _1e=this.rendererManager.itemToRenderer[_17.id];
 for(var i=0;i<e.touches.length;i++){
-if(_17==-1&&_1a){
-_1c=_4.isDescendant(e.touches[i].target,irs[0].resizeStartHandle);
-if(_1c){
-_17=i;
-len++;
-}
-}
 if(_18==-1&&_1b){
-_1c=_4.isDescendant(e.touches[i].target,irs[1].resizeEndHandle);
-if(_1c){
+_1d=_4.isDescendant(e.touches[i].target,irs[0].resizeStartHandle);
+if(_1d){
 _18=i;
 len++;
 }
 }
-if(_17==-1&&_18==-1){
-for(var j=0;j<_1d.length;j++){
-_1c=_4.isDescendant(e.touches[i].target,_1d[j].container);
-if(_1c){
+if(_19==-1&&_1c){
+_1d=_4.isDescendant(e.touches[i].target,irs[1].resizeEndHandle);
+if(_1d){
 _19=i;
+len++;
+}
+}
+if(_18==-1&&_19==-1){
+for(var j=0;j<_1e.length;j++){
+_1d=_4.isDescendant(e.touches[i].target,_1e[j].container);
+if(_1d){
+_1a=i;
 len++;
 break;
 }
 }
 }
-if(_17!=-1&&_18!=-1&&_19!=-1){
+if(_18!=-1&&_19!=-1&&_1a!=-1){
 break;
 }
 }
-return {touchesLen:len,resizeStartTouchIndex:_17,resizeEndTouchIndex:_18,moveTouchIndex:_19};
+return {touchesLen:len,resizeStartTouchIndex:_18,resizeEndTouchIndex:_19,moveTouchIndex:_1a};
 }});
 });

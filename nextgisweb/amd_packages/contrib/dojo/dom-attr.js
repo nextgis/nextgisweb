@@ -6,10 +6,10 @@
 
 //>>built
 define("dojo/dom-attr",["exports","./sniff","./_base/lang","./dom","./dom-style","./dom-prop"],function(_1,_2,_3,_4,_5,_6){
-var _7={innerHTML:1,className:1,htmlFor:_2("ie"),value:1},_8={classname:"class",htmlfor:"for",tabindex:"tabIndex",readonly:"readOnly"};
+var _7={innerHTML:1,textContent:1,className:1,htmlFor:_2("ie"),value:1},_8={classname:"class",htmlfor:"for",tabindex:"tabIndex",readonly:"readOnly"};
 function _9(_a,_b){
 var _c=_a.getAttributeNode&&_a.getAttributeNode(_b);
-return _c&&_c.specified;
+return !!_c&&_c.specified;
 };
 _1.has=function hasAttr(_d,_e){
 var lc=_e.toLowerCase();
@@ -20,6 +20,9 @@ _f=_4.byId(_f);
 var lc=_10.toLowerCase(),_11=_6.names[lc]||_10,_12=_7[_11],_13=_f[_11];
 if(_12&&typeof _13!="undefined"){
 return _13;
+}
+if(_11=="textContent"){
+return _6.get(_f,_11);
 }
 if(_11!="href"&&(typeof _13=="boolean"||_3.isFunction(_13))){
 return _13;

@@ -3,28 +3,19 @@ require({cache:{
 define("dijit/form/ValidationTextBox", [
 	"dojo/_base/declare", // declare
 	"dojo/_base/kernel", // kernel.deprecated
+	"dojo/_base/lang",
 	"dojo/i18n", // i18n.getLocalization
 	"./TextBox",
 	"../Tooltip",
 	"dojo/text!./templates/ValidationTextBox.html",
 	"dojo/i18n!./nls/validate"
-], function(declare, kernel, i18n, TextBox, Tooltip, template){
+], function(declare, kernel, lang, i18n, TextBox, Tooltip, template){
 
 	// module:
 	//		dijit/form/ValidationTextBox
 
 
-	/*=====
-	var __Constraints = {
-		// locale: String
-		//		locale used for validation, picks up value from this widget's lang attribute
-		// _flags_: anything
-		//		various flags passed to pattern function
-	};
-	=====*/
-
-	var ValidationTextBox;
-	return ValidationTextBox = declare("dijit.form.ValidationTextBox", TextBox, {
+	var ValidationTextBox = declare("dijit.form.ValidationTextBox", TextBox, {
 		// summary:
 		//		Base class for textbox widgets with the ability to validate content of various types and provide user feedback.
 
@@ -61,9 +52,10 @@ define("dijit/form/ValidationTextBox", [
 		//		displayed when the field is focused.
 		message: "",
 
-		// constraints: __Constraints
-		//		user-defined object needed to pass parameters to the validator functions
-		constraints: {},
+		// constraints: ValidationTextBox.__Constraints
+		//		Despite the name, this parameter specifies both constraints on the input as well as
+		//		formatting options.  See `dijit/form/ValidationTextBox.__Constraints` for details.
+		constraints:{},
 
 		// pattern: [extension protected] String|Function(constraints) returning a string.
 		//		This defines the regular expression used to validate the input.
@@ -175,7 +167,7 @@ define("dijit/form/ValidationTextBox", [
 			var isEmpty = this._isEmpty(this.textbox.value);
 			var isValidSubset = !isValid && isFocused && this._isValidSubset();
 			this._set("state", isValid ? "" : (((((!this._hasBeenBlurred || isFocused) && isEmpty) || isValidSubset) && (this._maskValidSubsetError || (isValidSubset && !this._hasBeenBlurred && isFocused))) ? "Incomplete" : "Error"));
-			this.focusNode.setAttribute("aria-invalid", isValid ? "false" : "true");
+			this.focusNode.setAttribute("aria-invalid", this.state == "Error" ? "true" : "false");
 
 			if(this.state == "Error"){
 				this._maskValidSubsetError = isFocused && isValidSubset; // we want the error to show up after a blur and refocus
@@ -224,7 +216,7 @@ define("dijit/form/ValidationTextBox", [
 			// srcNodeRef: DOMNode|String?
 			//		If a srcNodeRef (DOM node) is specified, replace srcNodeRef with my generated DOM tree.
 
-			this.constraints = {};
+			this.constraints = lang.clone(this.constraints);
 			this.baseClass += ' dijitValidationTextBox';
 		},
 
@@ -328,6 +320,22 @@ define("dijit/form/ValidationTextBox", [
 			this.displayMessage('');
 
 			this.inherited(arguments);
+		},
+
+		destroy: function(){
+			Tooltip.hide(this.domNode);	// in case tooltip show when ValidationTextBox (or enclosing Dialog) destroyed
+			this.inherited(arguments);
 		}
 	});
+
+	/*=====
+	 ValidationTextBox.__Constraints = {
+		 // locale: String
+		 //		locale used for validation, picks up value from this widget's lang attribute
+		 // _flags_: anything
+		 //		various flags passed to pattern function
+	 };
+	 =====*/
+
+	return ValidationTextBox;
 });

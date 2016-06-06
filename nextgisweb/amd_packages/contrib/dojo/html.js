@@ -12,6 +12,9 @@ return _a.replace(/(?:\s*<!DOCTYPE\s[^>]+>|<title[^>]*>[\s\S]*?<\/title>)/ig,"")
 },_emptyNode:_6.empty,_setNodeContent:function(_b,_c){
 _6.empty(_b);
 if(_c){
+if(typeof _c=="number"){
+_c=_c.toString();
+}
 if(typeof _c=="string"){
 _c=_6.toDom(_c,_b.ownerDocument);
 }
@@ -33,6 +36,9 @@ this.id=["Setter",(_f)?_f.id||_f.tagName:"",_8++].join("_");
 },set:function(_10,_11){
 if(undefined!==_10){
 this.content=_10;
+}
+if(typeof _10=="number"){
+_10=_10.toString();
 }
 if(_11){
 this._mixin(_11);
@@ -149,6 +155,9 @@ _9._setNodeContent(this.node,_1f,true);
 if(undefined==_21){
 console.warn("dojo.html.set: no cont argument provided, using empty string");
 _21="";
+}
+if(typeof _21=="number"){
+_21=_21.toString();
 }
 if(!_22){
 return _9._setNodeContent(_20,_21,true);

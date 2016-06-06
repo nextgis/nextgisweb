@@ -42,6 +42,10 @@ define("dijit/layout/LayoutContainer", [
 		//
 		//		- "headline" (default) where the top and bottom extend the full width of the container
 		//		- "sidebar" where the left and right sides extend from top to bottom.
+		//
+		//		However, a `layoutPriority` setting on child panes overrides the `design` attribute on the parent.
+		//		In other words, if the top and bottom sections have a lower `layoutPriority` than the left and right
+		//		panes, the top and bottom panes will extend the entire width of the box.
 		design: "headline",
 
 		baseClass: "dijitLayoutContainer",

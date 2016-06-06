@@ -7,7 +7,7 @@
 //>>built
 define("dojo/request/default",["exports","require","../has"],function(_1,_2,_3){
 var _4=_3("config-requestProvider"),_5;
-if(1){
+if(1||_3("host-webworker")){
 _5="./xhr";
 }else{
 if(0){

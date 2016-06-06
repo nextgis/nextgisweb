@@ -26,6 +26,12 @@ define("dojox/charting/bidi/action2d/Tooltip", ["dojo/_base/declare", "dojo/dom-
 			else if(obj.element == "candlestick"){
 				rect.x = this.chart.dim.width + shift - obj.x;
 			}
+			else if(obj.element == "slice"){
+				if((position[0] == "before-centered") || (position[0] == "after-centered")) {
+					position.reverse();
+				}
+				rect.x = obj.cx + (obj.cx - rect.x);
+			}
 		},
 		
 		_format: function(tooltip){

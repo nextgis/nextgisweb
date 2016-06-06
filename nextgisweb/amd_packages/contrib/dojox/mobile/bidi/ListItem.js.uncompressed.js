@@ -58,6 +58,7 @@ define("dojox/mobile/bidi/ListItem", [
 			}
 			var nEncount = 0;
 			array.forEach(this.domNode.childNodes, function(node){
+				var textNode;
 				if(nEncount === 0){
 					/* Replace content of directional text node, if found */
 					if(node.nodeType === 3 && (node.nodeValue === common.MARK.RLE || node.nodeValue === common.MARK.LRE)){

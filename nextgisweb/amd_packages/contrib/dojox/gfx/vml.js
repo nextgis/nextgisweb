@@ -707,6 +707,15 @@ return p;
 },_closePath:function(){
 this.lastControl.type="";
 return ["x"];
+},_getRealBBox:function(){
+this._confirmSegmented();
+if(this.tbbox){
+return this.tbbox;
+}
+if(typeof this.shape.path=="string"){
+this.shape.path="";
+}
+return this.inherited(arguments);
 }});
 _d.Path.nodeType="shape";
 _d.TextPath=_2("dojox.gfx.vml.TextPath",[_d.Path,_a.TextPath],{constructor:function(_7f){

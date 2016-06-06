@@ -25,7 +25,7 @@ return this._startDef;
 var _b=this._loadViewController();
 _2(_b,_6.hitch(this,function(_c){
 if(_c){
-_6.mixin(this,_c);
+_5.safeMixin(this,_c);
 }
 }));
 return _b;
@@ -123,21 +123,25 @@ var _18=_17.indexOf("./");
 if(_18>=0){
 _17=_15.substring(_18+2);
 }
-_16=_1.on("error",function(_19){
+_16=_1.on?_1.on("error",function(_19){
 if(_14.isResolved()||_14.isRejected()){
 return;
 }
 if(_19.info[0]&&(_19.info[0].indexOf(_17)>=0)){
 _14.resolve(false);
+if(_16){
 _16.remove();
 }
-});
+}
+}):null;
 if(_15.indexOf("./")==0){
 _15="app/"+_15;
 }
 _1([_15],function(_1a){
 _14.resolve(_1a);
+if(_16){
 _16.remove();
+}
 });
 }
 catch(e){

@@ -305,6 +305,9 @@ _42.grip=null;
 this._updateColumnsWidth(m);
 },_updateColumnsWidth:function(_43){
 this.inherited(arguments);
+if(_43===null){
+_43=this._dragManager;
+}
 _43._dropMode.updateAreas(_43._areaList);
 },destroy:function(){
 _4.unsubscribe(this._dropHandler);

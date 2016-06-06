@@ -1,13 +1,12 @@
-require({cache:{
-'url:dojox/layout/resources/FloatingPane.html':"<div class=\"dojoxFloatingPane\" id=\"${id}\">\n\t<div tabindex=\"0\" role=\"button\" class=\"dojoxFloatingPaneTitle\" dojoAttachPoint=\"focusNode\">\n\t\t<span dojoAttachPoint=\"closeNode\" dojoAttachEvent=\"onclick: close\" class=\"dojoxFloatingCloseIcon\"></span>\n\t\t<span dojoAttachPoint=\"maxNode\" dojoAttachEvent=\"onclick: maximize\" class=\"dojoxFloatingMaximizeIcon\">&thinsp;</span>\n\t\t<span dojoAttachPoint=\"restoreNode\" dojoAttachEvent=\"onclick: _restore\" class=\"dojoxFloatingRestoreIcon\">&thinsp;</span>\t\n\t\t<span dojoAttachPoint=\"dockNode\" dojoAttachEvent=\"onclick: minimize\" class=\"dojoxFloatingMinimizeIcon\">&thinsp;</span>\n\t\t<span dojoAttachPoint=\"titleNode\" class=\"dijitInline dijitTitleNode\"></span>\n\t</div>\n\t<div dojoAttachPoint=\"canvas\" class=\"dojoxFloatingPaneCanvas\">\n\t\t<div dojoAttachPoint=\"containerNode\" role=\"region\" tabindex=\"-1\" class=\"${contentClass}\">\n\t\t</div>\n\t\t<span dojoAttachPoint=\"resizeHandle\" class=\"dojoxFloatingResizeHandle\"></span>\n\t</div>\n</div>\n"}});
-define("dojox/layout/Dock", ["dojo/_base/lang", "dojo/_base/window", "dojo/_base/declare",
-		"dojo/_base/fx", "dojo/on", "dojo/_base/array", "dojo/_base/sniff",
-		"dojo/window", "dojo/dom", "dojo/dom-class", "dojo/dom-geometry", "dojo/dom-construct",
-		"dijit/_TemplatedMixin", "dijit/_WidgetBase", "dijit/BackgroundIframe", "dojo/dnd/Moveable",
-		"./ContentPane", "./ResizeHandle", "dojo/text!./resources/FloatingPane.html", "dojo/domReady!"], function(
+define("dojox/layout/Dock", [
+	"dojo/_base/lang", "dojo/_base/window", "dojo/_base/declare",
+	"dojo/_base/fx", "dojo/on", "dojo/_base/array", "dojo/_base/sniff",
+	"dojo/window", "dojo/dom", "dojo/dom-class", "dojo/dom-geometry", "dojo/dom-construct",
+	"dijit/_TemplatedMixin", "dijit/_WidgetBase"
+], function(
 	lang, winUtil, declare, fx, on, arrayUtil, 
-	has, windowLib, dom, domClass, domGeom, domConstruct, _TemplatedMixin, _WidgetBase, BackgroundIframe, 
-	Moveable, ContentPane, ResizeHandle, template){
+	has, windowLib, dom, domClass, domGeom, domConstruct, _TemplatedMixin, _WidgetBase
+){
 
 //TODO: don't want to rely on kernel just to make something as experimental	
 //kernel.experimental("dojox.layout.Dock");
@@ -64,7 +63,7 @@ var Dock = declare("dojox.layout.Dock",[_WidgetBase, _TemplatedMixin],{
 		if(!this._inPositioning){
 			if(this.autoPosition == "south"){
 				// Give some time for scrollbars to appear/disappear
-				setTimeout(lang.hitch(this, function() {
+				this.defer(function() {
 					this._inPositiononing = true;
 					var viewport = windowLib.getBox();
 					var s = this.domNode.style;
@@ -72,7 +71,7 @@ var Dock = declare("dojox.layout.Dock",[_WidgetBase, _TemplatedMixin],{
 					s.width = (viewport.w-2) + "px";
 					s.top = (viewport.h + viewport.t) - this.domNode.offsetHeight + "px";
 					this._inPositioning = false;
-				}), 125);
+				}, 125);
 			}
 		}
 	}

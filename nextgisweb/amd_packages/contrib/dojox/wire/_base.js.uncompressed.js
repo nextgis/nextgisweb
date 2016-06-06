@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/wire/_base", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/wire/_base", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.wire._base");
 
 dojox.wire._defaultWireClass = "dojox.wire.Wire";

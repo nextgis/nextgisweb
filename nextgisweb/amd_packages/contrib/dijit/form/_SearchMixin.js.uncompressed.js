@@ -42,6 +42,14 @@ define("dijit/form/_SearchMixin", [
 		//		ComboBox overwrites any reference to the `searchAttr` and sets it to the `queryExpr` with the user's input substituted.
 		query: {},
 
+		// list: [const] String
+		//		Alternate to specifying a store.  Id of a dijit/form/DataList widget.
+		list: "",
+		_setListAttr: function(list){
+			// Avoid having list applied to the DOM node, since it has native meaning in modern browsers
+			this._set("list", list);
+		},
+
 		// searchDelay: Integer
 		//		Delay in milliseconds between when user types something and we start
 		//		searching based on that value
@@ -122,11 +130,6 @@ define("dijit/form/_SearchMixin", [
 			//		Handles input (keyboard/paste) events
 			if(this.disabled || this.readOnly){ return; }
 			var key = evt.charOrCode;
-
-			// except for cutting/pasting case - ctrl + x/v
-			if("type" in evt && evt.type.substring(0,3) == "key" && (evt.altKey || ((evt.ctrlKey || evt.metaKey) && (key != 'x' && key != 'v')) || key == keys.SHIFT)){
-				return; // throw out weird key combinations and spurious events
-			}
 
 			var doSearch = false;
 			this._prev_key_backspace = false;

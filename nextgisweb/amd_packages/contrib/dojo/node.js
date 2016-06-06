@@ -5,36 +5,31 @@
 */
 
 //>>built
-define("dojo/node",["./has"],function(_1){
-if(!0){
-throw new Error("node plugin failed to load because environment is not Node.js");
+define("dojo/node",["./_base/kernel","./has","require"],function(_1,_2,_3){
+var _4=_1.global.require&&_1.global.require.nodeRequire;
+if(!_4){
+throw new Error("Cannot find the Node.js require");
 }
-var _2;
-if(require.nodeRequire){
-_2=require.nodeRequire("path");
-}else{
-throw new Error("node plugin failed to load because it cannot find the original Node.js require");
+var _5=_4("module");
+return {load:function(id,_6,_7){
+if(_5._findPath&&_5._nodeModulePaths){
+var _8=_5._findPath(id,_5._nodeModulePaths(_6.toUrl(".")));
+if(_8!==false){
+id=_8;
 }
-return {load:function(id,_3,_4){
-if(!_3.nodeRequire){
-throw new Error("Cannot find native require function");
 }
-_4((function(id,_5){
-var _6=define,_7;
+var _9=define,_a;
 define=undefined;
 try{
-_7=_5(id);
+_a=_4(id);
 }
 finally{
-define=_6;
+define=_9;
 }
-return _7;
-})(id,_3.nodeRequire));
-},normalize:function(id,_8){
+_7(_a);
+},normalize:function(id,_b){
 if(id.charAt(0)==="."){
-var _9=require.toUrl(_8(".")).replace("/",_2.sep),_a=id.split("/");
-_a.unshift(_9);
-id=_2.join.apply(_2,_a);
+id=_3.toUrl(_b("./"+id));
 }
 return id;
 }};

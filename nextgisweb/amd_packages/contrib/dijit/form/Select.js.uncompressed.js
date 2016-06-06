@@ -7,6 +7,7 @@ define("dijit/form/Select", [
 	"dojo/dom-class", // domClass.add domClass.remove domClass.toggle
 	"dojo/dom-geometry", // domGeometry.setMarginBox
 	"dojo/i18n", // i18n.getLocalization
+	"dojo/keys",
 	"dojo/_base/lang", // lang.hitch
 	"dojo/on",
 	"dojo/sniff", // has("ie")
@@ -20,7 +21,7 @@ define("dijit/form/Select", [
 	"../registry", // registry.byNode
 	"dojo/text!./templates/Select.html",
 	"dojo/i18n!./nls/validate"
-], function(array, declare, domAttr, domClass, domGeometry, i18n, lang, on, has,
+], function(array, declare, domAttr, domClass, domGeometry, i18n, keys, lang, on, has,
 			_FormSelectWidget, _HasDropDown, DropDownMenu, MenuItem, MenuSeparator, Tooltip, _KeyNavMixin, registry, template){
 
 	// module:
@@ -40,11 +41,9 @@ define("dijit/form/Select", [
 		},
 
 		postCreate: function(){
-			// summary:
-			//		stop mousemove from selecting text on IE to be consistent with other browsers
-
 			this.inherited(arguments);
 
+			// stop mousemove from selecting text on IE to be consistent with other browsers
 			this.own(on(this.domNode, "selectstart", function(evt){
 				evt.preventDefault();
 				evt.stopPropagation();
@@ -112,6 +111,11 @@ define("dijit/form/Select", [
 		//		Whether or not our children have been loaded
 		_childrenLoaded: false,
 
+		// labelType: String
+		//		Specifies how to interpret the labelAttr in the data store items.
+		//		Can be "html" or "text".
+		labelType: "html",
+
 		_fillContent: function(){
 			// summary:
 			//		Set the value to be the first, or the selected index
@@ -138,7 +142,9 @@ define("dijit/form/Select", [
 				var click = lang.hitch(this, "_setValueAttr", option);
 				var item = new MenuItem({
 					option: option,
-					label: option.label || this.emptyLabel,
+					label: (this.labelType === 'text' ? (option.label || '').toString()
+						.replace(/&/g, '&amp;').replace(/</g, '&lt;') :
+						option.label) || this.emptyLabel,
 					onClick: click,
 					ownerDocument: this.ownerDocument,
 					dir: this.dir,
@@ -310,8 +316,11 @@ define("dijit/form/Select", [
 		_setDisplay: function(/*String*/ newDisplay){
 			// summary:
 			//		sets the display for the given value (or values)
-			var lbl = newDisplay || this.emptyLabel;
-			this.containerNode.innerHTML = '<span role="option" class="dijitReset dijitInline ' + this.baseClass.replace(/\s+|$/g, "Label ") + '">' + lbl + '</span>';
+
+			var lbl = (this.labelType === 'text' ? (newDisplay || '')
+					.replace(/&/g, '&amp;').replace(/</g, '&lt;') :
+					newDisplay) || this.emptyLabel;
+			this.containerNode.innerHTML = '<span role="option" aria-selected="true" class="dijitReset dijitInline ' + this.baseClass.replace(/\s+|$/g, "Label ") + '">' + lbl + '</span>';
 		},
 
 		validate: function(/*Boolean*/ isFocused){
@@ -358,11 +367,9 @@ define("dijit/form/Select", [
 		},
 
 		postCreate: function(){
-			// summary:
-			//		stop mousemove from selecting text on IE to be consistent with other browsers
-
 			this.inherited(arguments);
 
+			// stop mousemove from selecting text on IE to be consistent with other browsers
 			this.own(on(this.domNode, "selectstart", function(evt){
 				evt.preventDefault();
 				evt.stopPropagation();
@@ -370,29 +377,11 @@ define("dijit/form/Select", [
 
 			this.domNode.setAttribute("aria-expanded", "false");
 
-			if(has("ie") < 9){
-				// IE INPUT tag fontFamily has to be set directly using STYLE
-				// the defer gives IE a chance to render the TextBox and to deal with font inheritance
-				this.defer(function(){
-					try{
-						var s = domStyle.getComputedStyle(this.domNode); // can throw an exception if widget is immediately destroyed
-						if(s){
-							var ff = s.fontFamily;
-							if(ff){
-								var inputs = this.domNode.getElementsByTagName("INPUT");
-								if(inputs){
-									for(var i = 0; i < inputs.length; i++){
-										inputs[i].style.fontFamily = ff;
-									}
-								}
-							}
-						}
-					}catch(e){
-						// when used in a Dialog, and this is called before the dialog is
-						// shown, s.fontFamily would trigger "Invalid Argument" error.
-					}
-				});
-			}
+			// Prevent _KeyNavMixin from calling stopPropagation() on left and right arrow keys, thus breaking
+			// navigation when Select inside Toolbar.
+			var keyNavCodes = this._keyNavCodes;
+			delete keyNavCodes[keys.LEFT_ARROW];
+			delete keyNavCodes[keys.RIGHT_ARROW];
 		},
 
 		_setStyleAttr: function(/*String||Object*/ value){
@@ -417,11 +406,13 @@ define("dijit/form/Select", [
 				this.dropDown.destroyRecursive(preserveDom);
 				delete this.dropDown;
 			}
+			Tooltip.hide(this.domNode);	// in case Select (or enclosing Dialog) destroyed while tooltip shown
 			this.inherited(arguments);
 		},
 
 		_onFocus: function(){
 			this.validate(true);	// show tooltip if second focus of required tooltip, but no selection
+			// Note: not calling superclass _onFocus() to avoid _KeyNavMixin::_onFocus() setting tabIndex --> -1
 		},
 
 		_onBlur: function(){

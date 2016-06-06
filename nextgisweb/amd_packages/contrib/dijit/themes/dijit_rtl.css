@@ -39,6 +39,12 @@
 div.dijitNumberTextBoxRtl {
 	text-align: right;
 }
+.dijitCalendarRtl .dijitCalendarDecrementArrow {
+	float: right;
+}
+.dijitCalendarRtl .dijitCalendarIncrementArrow {
+	float: left;
+}
 .dijitCalendarRtl .dijitCalendarNextYear {
 	margin:0 0.55em 0 0;
 }

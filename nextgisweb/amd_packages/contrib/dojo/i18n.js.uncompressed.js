@@ -287,10 +287,6 @@ define("dojo/i18n", ["./_base/kernel", "require", "./has", "./_base/array", "./_
 			});
 		};
 
-	if(has("dojo-unit-tests")){
-		var unitTests = thisModule.unitTests = [];
-	}
-
 	if(has("dojo-preload-i18n-Api") ||  1 ){
 		var normalizeLocale = thisModule.normalizeLocale = function(locale){
 				var result = locale ? locale.toLowerCase() : dojo.locale;
@@ -343,26 +339,112 @@ define("dojo/i18n", ["./_base/kernel", "require", "./has", "./_base/array", "./_
 					func("ROOT");
 				}
 
-				function preload(locale){
-					locale = normalizeLocale(locale);
-					forEachLocale(locale, function(loc){
-						if(array.indexOf(localesGenerated, loc)>=0){
-							var mid = bundlePrefix.replace(/\./g, "/")+"_"+loc;
-							preloading++;
-							doRequire(mid, function(rollup){
-								for(var p in rollup){
-									cache[require.toAbsMid(p) + "/" + loc] = rollup[p];
-								}
-								--preloading;
-								while(!preloading && preloadWaitQueue.length){
-									load.apply(null, preloadWaitQueue.shift());
-								}
-							});
-							return true;
+					function preloadingAddLock(){
+						preloading++;
+					}
+
+					function preloadingRelLock(){
+						--preloading;
+						while(!preloading && preloadWaitQueue.length){
+							load.apply(null, preloadWaitQueue.shift());
 						}
-						return false;
-					});
-				}
+					}
+
+					function cacheId(path, name, loc, require){
+						// path is assumed to have a trailing "/"
+						return require.toAbsMid(path + name + "/" + loc)
+					}
+
+					function preload(locale){
+						locale = normalizeLocale(locale);
+						forEachLocale(locale, function(loc){
+							if(array.indexOf(localesGenerated, loc) >= 0){
+								var mid = bundlePrefix.replace(/\./g, "/") + "_" + loc;
+								preloadingAddLock();
+								doRequire(mid, function(rollup){
+									for(var p in rollup){
+										var bundle = rollup[p],
+											match = p.match(/(.+)\/([^\/]+)$/),
+											bundleName, bundlePath;
+											
+											// If there is no match, the bundle is not a regular bundle from an AMD layer.
+											if (!match){continue;}
+
+											bundleName = match[2];
+											bundlePath = match[1] + "/";
+
+										// backcompat
+										if(!bundle._localized){continue;}
+
+										var localized;
+										if(loc === "ROOT"){
+											var root = localized = bundle._localized;
+											delete bundle._localized;
+											root.root = bundle;
+											cache[require.toAbsMid(p)] = root;
+										}else{
+											localized = bundle._localized;
+											cache[cacheId(bundlePath, bundleName, loc, require)] = bundle;
+										}
+
+										if(loc !== locale){
+											// capture some locale variables
+											function improveBundle(bundlePath, bundleName, bundle, localized){
+												// locale was not flattened and we've fallen back to a less-specific locale that was flattened
+												// for example, we had a flattened 'fr', a 'fr-ca' is available for at least this bundle, and
+												// locale==='fr-ca'; therefore, we must improve the bundle as retrieved from the rollup by
+												// manually loading the fr-ca version of the bundle and mixing this into the already-retrieved 'fr'
+												// version of the bundle.
+												//
+												// Remember, different bundles may have different sets of locales available.
+												//
+												// we are really falling back on the regular algorithm here, but--hopefully--starting with most
+												// of the required bundles already on board as given by the rollup and we need to "manually" load
+												// only one locale from a few bundles...or even better...we won't find anything better to load.
+												// This algorithm ensures there is nothing better to load even when we can only load a less-specific rollup.
+												//
+												// note: this feature is only available in async mode
+
+												// inspect the loaded bundle that came from the rollup to see if something better is available
+												// for any bundle in a rollup, more-specific available locales are given at localized.
+												var requiredBundles = [],
+													cacheIds = [];
+												forEachLocale(locale, function(loc){
+													if(localized[loc]){
+														requiredBundles.push(require.toAbsMid(bundlePath + loc + "/" + bundleName));
+														cacheIds.push(cacheId(bundlePath, bundleName, loc, require));
+													}
+												});
+
+												if(requiredBundles.length){
+													preloadingAddLock();
+													contextRequire(requiredBundles, function(){
+														// requiredBundles was constructed by forEachLocale so it contains locales from 
+														// less specific to most specific. 
+														// the loop starts with the most specific locale, the last one.
+														for(var i = requiredBundles.length - 1; i >= 0 ; i--){
+															bundle = lang.mixin(lang.clone(bundle), arguments[i]);
+															cache[cacheIds[i]] = bundle;
+														}
+														// this is the best possible (maybe a perfect match, maybe not), accept it
+														cache[cacheId(bundlePath, bundleName, locale, require)] = lang.clone(bundle);
+														preloadingRelLock();
+													});
+												}else{
+													// this is the best possible (definitely not a perfect match), accept it
+													cache[cacheId(bundlePath, bundleName, locale, require)] = bundle;
+												}
+											}
+											improveBundle(bundlePath, bundleName, bundle, localized);
+										}
+									}
+									preloadingRelLock();
+								});
+								return true;
+							}
+							return false;
+						});
+					}
 
 				preload();
 				array.forEach(dojo.config.extraLocale, preload);
@@ -449,13 +531,15 @@ define("dojo/i18n", ["./_base/kernel", "require", "./has", "./_base/array", "./_
 						results.push(cache[url]);
 					}else{
 						var bundle = require.syncLoadNls(mid);
-						// don't need to check for legacy since syncLoadNls returns a module if the module
-						// (1) was already loaded, or (2) was in the cache. In case 1, if syncRequire is called
-						// from getLocalization --> load, then load will have called checkForLegacyModules() before
-						// calling syncRequire; if syncRequire is called from preloadLocalizations, then we
-						// don't care about checkForLegacyModules() because that will be done when a particular
-						// bundle is actually demanded. In case 2, checkForLegacyModules() is never relevant
-						// because cached modules are always v1.7+ built modules.
+						// need to check for legacy module here because there might be a legacy module for a
+						// less specific locale (which was not looked up during the first checkForLegacyModules
+						// call in load()).
+						// Also need to reverse the locale and the module name in the mid because syncRequire
+						// deps parameters uses the AMD style package/nls/locale/module while legacy code uses
+						// package/nls/module/locale.
+						if(!bundle){
+							bundle = checkForLegacyModules(mid.replace(/nls\/([^\/]*)\/([^\/]*)$/, "nls/$2/$1"));
+						}
 						if(bundle){
 							results.push(bundle);
 						}else{
@@ -512,35 +596,6 @@ define("dojo/i18n", ["./_base/kernel", "require", "./has", "./_base/array", "./_
 			);
 			return result;
 		};
-
-		if(has("dojo-unit-tests")){
-			unitTests.push(function(doh){
-				doh.register("tests.i18n.unit", function(t){
-					var check;
-
-					check = evalBundle("{prop:1}", checkForLegacyModules, "nonsense", amdValue);
-					t.is({prop:1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle("({prop:1})", checkForLegacyModules, "nonsense", amdValue);
-					t.is({prop:1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle("{'prop-x':1}", checkForLegacyModules, "nonsense", amdValue);
-					t.is({'prop-x':1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle("({'prop-x':1})", checkForLegacyModules, "nonsense", amdValue);
-					t.is({'prop-x':1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle("define({'prop-x':1})", checkForLegacyModules, "nonsense", amdValue);
-					t.is(amdValue, check); t.is({'prop-x':1}, amdValue.result);
-
-					check = evalBundle("define('some/module', {'prop-x':1})", checkForLegacyModules, "nonsense", amdValue);
-					t.is(amdValue, check); t.is({'prop-x':1}, amdValue.result);
-
-					check = evalBundle("this is total nonsense and should throw an error", checkForLegacyModules, "nonsense", amdValue);
-					t.is(check instanceof Error, true);
-				});
-			});
-		}
 	}
 
 	return lang.mixin(thisModule, {

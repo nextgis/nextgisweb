@@ -6,11 +6,10 @@ define("dijit/layout/_ContentPaneResizeMixin", [
 	"dojo/dom-style",
 	"dojo/_base/lang", // lang.mixin
 	"dojo/query", // query
-	"dojo/sniff", // has("ie")
 	"../registry", // registry.byId
 	"../Viewport",
 	"./utils" // marginBox2contextBox
-], function(array, declare, domClass, domGeometry, domStyle, lang, query, has,
+], function(array, declare, domClass, domGeometry, domStyle, lang, query,
 			registry, Viewport, layoutUtils){
 
 	// module:
@@ -74,6 +73,8 @@ define("dijit/layout/_ContentPaneResizeMixin", [
 			//		and if so assume that we are a container for that widget,
 			//		and should propagate startup() and resize() calls to it.
 			//		Skips over things like data stores since they aren't visible.
+
+			if(!this.doLayout){ return; }
 
 			var candidateWidgets = [],
 				otherVisibleNodes = false;
@@ -164,9 +165,7 @@ define("dijit/layout/_ContentPaneResizeMixin", [
 		_layoutChildren: function(){
 			// Call _checkIfSingleChild() again in case app has manually mucked w/the content
 			// of the ContentPane (rather than changing it through the set("content", ...) API.
-			if(this.doLayout){
-				this._checkIfSingleChild();
-			}
+			this._checkIfSingleChild();
 
 			if(this._singleChild && this._singleChild.resize){
 				var cb = this._contentBox || domGeometry.getContentBox(this.containerNode);

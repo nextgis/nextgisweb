@@ -1,5 +1,5 @@
 //>>built
-define("dojox/mobile/FixedSplitter",["dojo/_base/array","dojo/_base/declare","dojo/_base/window","dojo/dom-class","dojo/dom-geometry","dijit/_Contained","dijit/_Container","dijit/_WidgetBase","dojo/has"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9){
+define("dojox/mobile/FixedSplitter",["dojo/_base/array","dojo/_base/declare","dojo/_base/window","dojo/dom-class","dojo/dom-geometry","dijit/_Contained","dijit/_Container","dijit/_WidgetBase","dojo/has","./common"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9){
 return _2("dojox.mobile.FixedSplitter",[_8,_7,_6],{orientation:"H",variablePane:-1,screenSizeAware:false,screenSizeAwareClass:"dojox/mobile/ScreenSizeAware",baseClass:"mblFixedSplitter",startup:function(){
 if(this._started){
 return;

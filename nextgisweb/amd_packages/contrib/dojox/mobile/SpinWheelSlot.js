@@ -1,6 +1,6 @@
 //>>built
 define("dojox/mobile/SpinWheelSlot",["dojo/_base/kernel","dojo/_base/array","dojo/_base/declare","dojo/_base/window","dojo/dom-class","dojo/dom-construct","dojo/has","dojo/has!dojo-bidi?dojox/mobile/bidi/SpinWheelSlot","dojo/touch","dojo/on","dijit/_Contained","dijit/_WidgetBase","./scrollable","./common"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,on,_a,_b,_c){
-var _d=_3(_7("dojo-bidi")?"dojox.mobile.NonBidiSpinWheelSlot":"dojox.mobile.SpinWheelSlot",[_b,_a,_c],{items:[],labels:[],labelFrom:0,labelTo:0,zeroPad:0,value:"",step:1,tabIndex:"0",_setTabIndexAttr:"",baseClass:"mblSpinWheelSlot",maxSpeed:500,minItems:15,centerPos:0,scrollBar:false,constraint:false,propagatable:false,androidWorkaroud:false,buildRendering:function(){
+var _d=_3(_7("dojo-bidi")?"dojox.mobile.NonBidiSpinWheelSlot":"dojox.mobile.SpinWheelSlot",[_b,_a,_c],{items:[],labels:[],labelFrom:0,labelTo:0,zeroPad:0,value:"",step:1,pageSteps:1,baseClass:"mblSpinWheelSlot",maxSpeed:500,minItems:15,centerPos:0,scrollBar:false,constraint:false,propagatable:false,androidWorkaroud:false,buildRendering:function(){
 this.inherited(arguments);
 this.initLabels();
 var i,j;
@@ -15,6 +15,7 @@ this.containerNode.style.height=(_4.global.innerHeight||_4.doc.documentElement.c
 this.panelNodes=[];
 for(var k=0;k<3;k++){
 this.panelNodes[k]=_6.create("div",{className:"mblSpinWheelSlotPanel"});
+this.panelNodes[k].setAttribute("aria-hidden","true");
 var _e=this.items.length;
 if(_e>0){
 var n=Math.ceil(this.minItems/_e);
@@ -29,6 +30,8 @@ this.containerNode.appendChild(this.panelNodes[k]);
 this.domNode.appendChild(this.containerNode);
 this.touchNode=_6.create("div",{className:"mblSpinWheelSlotTouch"},this.domNode);
 this.setSelectable(this.domNode,false);
+this.touchNode.setAttribute("tabindex",0);
+this.touchNode.setAttribute("role","slider");
 if(this.value===""&&this.items.length>0){
 this.value=this.items[0][1];
 }
@@ -86,7 +89,7 @@ this.centerPos=this.getParent().centerPos;
 var _19=this.panelNodes[1].childNodes;
 this._itemHeight=_19[0].offsetHeight;
 this.adjust();
-this.connect(this.domNode,"onkeydown","_onKeyDown");
+this.connect(this.touchNode,"onkeydown","_onKeyDown");
 }
 if(_7("windows-theme")){
 this.previousCenterItem=this.getCenterItem();
@@ -101,6 +104,9 @@ for(var i=this.labelFrom;i<=this.labelTo;i+=this.step){
 a.push(this.zeroPad?(_1a+i).slice(-this.zeroPad):i+"");
 }
 }
+},onTouchStart:function(e){
+this.touchNode.focus();
+this.inherited(arguments);
 },adjust:function(){
 var _1b=this.panelNodes[1].childNodes;
 var _1c;
@@ -117,17 +123,32 @@ this.panelNodes[1].style.top=_1c+"px";
 this.panelNodes[2].style.top=h+_1c+"px";
 },setInitialValue:function(){
 this.set("value",this._initialValue);
+this.touchNode.setAttribute("aria-valuetext",this._initialValue);
 },_onKeyDown:function(e){
-if(!e||e.type!=="keydown"){
-return;
+if(!e||e.type!=="keydown"||e.altKey||e.ctrlKey||e.shiftKey){
+return true;
 }
-if(e.keyCode===40){
-this.spin(-1);
-}else{
-if(e.keyCode===38){
+switch(e.keyCode){
+case 38:
+case 39:
 this.spin(1);
+e.stopPropagation();
+return false;
+case 40:
+case 37:
+this.spin(-1);
+e.stopPropagation();
+return false;
+case 33:
+this.spin(this.pageSteps);
+e.stopPropagation();
+return false;
+case 34:
+this.spin(-1*this.pageSteps);
+e.stopPropagation();
+return false;
 }
-}
+return true;
 },_getCenterPanel:function(){
 var pos=this.getPos();
 for(var i=0,len=this.panelNodes.length;i<len;i++){
@@ -231,6 +252,7 @@ this.inherited(arguments);
 this._duringSlideTo=false;
 this._onFlickAnimationStartCalled=false;
 this.inherited(arguments);
+this.touchNode.setAttribute("aria-valuetext",this.get("value"));
 },spin:function(_2d){
 if(!this._started||this._duringSlideTo){
 return;
@@ -265,26 +287,31 @@ var r=j>=0?j%h:j%h+h;
 to.y=j-r;
 return true;
 },resize:function(e){
+if(this.panelNodes&&this.panelNodes.length>0){
 var _30=this.panelNodes[1].childNodes;
 if(_30.length>0&&!_7("windows-theme")){
+var _31=this.getParent();
+if(_31){
 this._itemHeight=_30[0].offsetHeight;
-this.centerPos=this.getParent().centerPos;
+this.centerPos=_31.centerPos;
 if(!this.panelNodes[0].style.top){
 this.adjust();
+}
+}
 }
 }
 if(this._pendingValue){
 this.set("value",this._pendingValue);
 }
-},slideTo:function(to,_31,_32){
+},slideTo:function(to,_32,_33){
 this._duringSlideTo=true;
 var pos=this.getPos();
 var top=pos.y+this.panelNodes[1].offsetTop;
-var _33=top+this.panelNodes[1].offsetHeight;
+var _34=top+this.panelNodes[1].offsetHeight;
 var vh=this.domNode.parentNode.offsetHeight;
 var t;
 if(pos.y<to.y){
-if(_33>vh){
+if(_34>vh){
 t=this.panelNodes[2];
 t.style.top=this.panelNodes[0].offsetTop-this.panelNodes[0].offsetHeight+"px";
 this.panelNodes[2]=this.panelNodes[1];
@@ -303,19 +330,21 @@ this.panelNodes[2]=t;
 }
 }
 if(this.getParent()._duringStartup){
-_31=0;
+_32=0;
 }else{
 if(Math.abs(this._speed.y)<40){
-_31=0.2;
+_32=0.2;
 }
 }
-this.inherited(arguments,[to,_31,_32]);
-if(this.getParent()._duringStartup&&!this._onFlickAnimationStartCalled){
-this.onFlickAnimationEnd();
-}else{
+if(_32&&_32>0){
+this.inherited(arguments,[to,_32,_33]);
 if(!this._onFlickAnimationStartCalled){
 this._duringSlideTo=false;
 }
+}else{
+this.onFlickAnimationStart();
+this.scrollTo(to,true);
+this.onFlickAnimationEnd();
 }
 }});
 return _7("dojo-bidi")?_3("dojox.mobile.SpinWheelSlot",[_d,_8]):_d;

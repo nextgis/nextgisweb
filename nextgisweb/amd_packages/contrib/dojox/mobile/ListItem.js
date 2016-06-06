@@ -1,6 +1,6 @@
 //>>built
 define("dojox/mobile/ListItem",["dojo/_base/array","dojo/_base/declare","dojo/_base/lang","dojo/dom-class","dojo/dom-construct","dojo/dom-style","dojo/dom-attr","dijit/registry","dijit/_WidgetBase","./iconUtils","./_ItemBase","./ProgressIndicator","dojo/has","dojo/has!dojo-bidi?dojox/mobile/bidi/ListItem"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e){
-var _f=_2(_d("dojo-bidi")?"dojox.mobile.NonBidiListItem":"dojox.mobile.ListItem",_b,{rightText:"",rightIcon:"",rightIcon2:"",deleteIcon:"",anchorLabel:false,noArrow:false,checked:false,arrowClass:"",checkClass:"",uncheckClass:"",variableHeight:false,rightIconTitle:"",rightIcon2Title:"",header:false,tag:"li",busy:false,progStyle:"",paramsToInherit:"variableHeight,transition,deleteIcon,icon,rightIcon,rightIcon2,uncheckIcon,arrowClass,checkClass,uncheckClass,deleteIconTitle,deleteIconRole",baseClass:"mblListItem",_selStartMethod:"touch",_selEndMethod:"timer",_delayedSelection:true,_selClass:"mblListItemSelected",buildRendering:function(){
+var _f=_2(_d("dojo-bidi")?"dojox.mobile.NonBidiListItem":"dojox.mobile.ListItem",_b,{rightText:"",rightIcon:"",rightIcon2:"",deleteIcon:"",anchorLabel:false,noArrow:false,checked:false,arrowClass:"",checkClass:"",uncheckClass:"",variableHeight:false,rightIconTitle:"",rightIcon2Title:"",header:false,tag:"li",busy:false,progStyle:"",layoutOnResize:false,paramsToInherit:"variableHeight,transition,deleteIcon,icon,rightIcon,rightIcon2,uncheckIcon,arrowClass,checkClass,uncheckClass,deleteIconTitle,deleteIconRole",baseClass:"mblListItem",_selStartMethod:"touch",_selEndMethod:"timer",_delayedSelection:true,_selClass:"mblListItemSelected",buildRendering:function(){
 this._templated=!!this.templateString;
 if(!this._templated){
 this.domNode=this.containerNode=this.srcNodeRef||_5.create(this.tag);
@@ -34,11 +34,6 @@ this.connect(this.labelNode,"onclick","_onClick");
 this.onTouchStart=function(e){
 return (e.target!==this.labelNode);
 };
-}
-if(_11.moveTo||_11.href||_11.url||this.clickable||(_10&&_10.select)){
-this.connect(this.domNode,"onkeydown","_onClick");
-}else{
-this._handleClick=false;
 }
 this.inherited(arguments);
 if(_4.contains(this.domNode,"mblVariableHeight")){
@@ -102,7 +97,7 @@ if(_14){
 this.domNode.insertBefore(_14,this.domNode.firstChild);
 }
 },resize:function(){
-if(this.variableHeight){
+if(this.layoutOnResize&&this.variableHeight){
 this.layoutVariableHeight();
 }
 if(!this._templated||this.labelNode){

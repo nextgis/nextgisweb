@@ -93,7 +93,7 @@ this._startPoint={x:e.screenX,y:e.screenY};
 var p=this._edProps;
 if(this._editingGesture){
 if(!this._autoScroll(e.pageX,e.pageY,true)){
-this._moveOrResizeItemGesture([this.getTime(e)],"mouse",e);
+this._moveOrResizeItemGesture([this.getTime(e)],"mouse",e,this.getSubColumn(e));
 }
 }else{
 if(Math.abs(this._startPoint.x-e.screenX)>=this.triggerExtent||Math.abs(this._startPoint.y-e.screenY)>=this.triggerExtent){

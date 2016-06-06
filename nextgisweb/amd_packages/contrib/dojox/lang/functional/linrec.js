@@ -1,8 +1,8 @@
 //>>built
-define("dojox/lang/functional/linrec",["dijit","dojo","dojox","dojo/require!dojox/lang/functional/lambda,dojox/lang/functional/util"],function(_1,_2,_3){
-_2.provide("dojox.lang.functional.linrec");
-_2.require("dojox.lang.functional.lambda");
-_2.require("dojox.lang.functional.util");
+define("dojox/lang/functional/linrec",["dojo","dijit","dojox","dojo/require!dojox/lang/functional/lambda,dojox/lang/functional/util"],function(_1,_2,_3){
+_1.provide("dojox.lang.functional.linrec");
+_1.require("dojox.lang.functional.lambda");
+_1.require("dojox.lang.functional.util");
 (function(){
 var df=_3.lang.functional,_4=df.inlineLambda,_5="_x",_6=["_r","_y.a"];
 df.linrec=function(_7,_8,_9,_a){

@@ -31,31 +31,32 @@ return;
 }
 var _8=0;
 _2.forEach(this.domNode.childNodes,function(_9){
+var _a;
 if(_8===0){
 if(_9.nodeType===3&&(_9.nodeValue===_4.MARK.RLE||_9.nodeValue===_4.MARK.LRE)){
 _9.nodeValue=(_9.nodeValue===_4.MARK.RLE)?_4.MARK.LRE:_4.MARK.RLE;
 _8=2;
 return;
 }
-var _a=(_9.nodeType===1&&_9.childNodes.length===1)?_9.firstChild:_9;
-if(_a.nodeType===3&&_a.nodeValue){
-if(_a.nodeValue.search(/[.\S]/)!=-1){
+var _b=(_9.nodeType===1&&_9.childNodes.length===1)?_9.firstChild:_9;
+if(_b.nodeType===3&&_b.nodeValue){
+if(_b.nodeValue.search(/[.\S]/)!=-1){
 _8=1;
-textNode=_5.doc.createTextNode((this.getTextDir(_a.nodeValue).toLowerCase()==="rtl")?_4.MARK.RLE:_4.MARK.LRE);
-_3.place(textNode,_9,"before");
+_a=_5.doc.createTextNode((this.getTextDir(_b.nodeValue).toLowerCase()==="rtl")?_4.MARK.RLE:_4.MARK.LRE);
+_3.place(_a,_9,"before");
 }
 }
 }else{
 if(_8===1&&_9.nodeName.toLowerCase()==="div"){
 _8=2;
-textNode=_5.doc.createTextNode(_4.MARK.PDF);
-_3.place(textNode,_9,"before");
+_a=_5.doc.createTextNode(_4.MARK.PDF);
+_3.place(_a,_9,"before");
 }
 }
 },this);
-},_setTextDirAttr:function(_b){
-if(_b&&this.textDir!==_b){
-this.textDir=_b;
+},_setTextDirAttr:function(_c){
+if(_c&&this.textDir!==_c){
+this.textDir=_c;
 this._applyTextDirToTextElements();
 if(this.rightTextNode){
 this.rightTextNode.innerHTML=_4.removeUCCFromText(this.rightTextNode.innerHTML);

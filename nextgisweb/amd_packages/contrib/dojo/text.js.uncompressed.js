@@ -5,7 +5,7 @@ define("dojo/text", ["./_base/kernel", "require", "./has", "./request"], functio
 	var getText;
 	if( 1 ){
 		getText= function(url, sync, load){
-			request(url, {sync:!!sync}).then(load);
+			request(url, {sync:!!sync, headers: { 'X-Requested-With': null } }).then(load);
 		};
 	}else{
 		// Path for node.js and rhino, to load from local file system.

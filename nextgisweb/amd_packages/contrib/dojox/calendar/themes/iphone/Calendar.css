@@ -486,8 +486,22 @@
 }
 .dojoxCalendarColumnView .dojoxCalendarContainerColumn {
   position: relative;
-  margin-left: 0;
-  margin-right: 9px;
+  width: 100%;
+}
+.dojoxCalendarColumnView .dojoxCalendarSubContainerColumn {
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+  height: 100%;
+}
+.dojoxCalendarColumnView .dojoxCalendarEventContainerColumn {
+  position: relative;
+  height: 100%;
+  margin-left: 1px;
+  margin-right: 5px;
+}
+.dojoxCalendarColumnView .dojoxCalendarSubContainerColumn.subColumn {
+  border-right: 1px solid #dddddd;
 }
 .dojoxCalendarColumnView .dojoxCalendarEventContainer {
   position: absolute;
@@ -802,7 +816,6 @@
 .dojoxCalendarColumnView .dojoxCalendarMatrixView .dojoxCalendarEvent .resizeHandle {
   top: auto;
   text-align: auto;
-  vertical-align: auto;
   position: absolute;
   width: 30px;
   height: 100%;

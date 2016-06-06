@@ -9,7 +9,7 @@ define("dojo/regexp",["./_base/kernel","./_base/lang"],function(_1,_2){
 var _3={};
 _2.setObject("dojo.regexp",_3);
 _3.escapeString=function(_4,_5){
-return _4.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g,function(ch){
+return _4.replace(/([\.$?*|{}\(\)\[\]\\\/\+\-^])/g,function(ch){
 if(_5&&_5.indexOf(ch)!=-1){
 return ch;
 }

@@ -1,4 +1,4 @@
-define("dojox/date/umalqura/locale", ["../..", "dojo/_base/lang", "dojo/_base/array", "dojo/date", "dojo/i18n", "dojo/regexp", "dojo/string", "./Date", "dojo/i18n!dojo/cldr/nls/islamic"],
+define("dojox/date/umalqura/locale", ["dojox/main", "dojo/_base/lang", "dojo/_base/array", "dojo/date", "dojo/i18n", "dojo/regexp", "dojo/string", "./Date", "dojo/i18n!dojo/cldr/nls/islamic"],
        function (dojox, lang, arr, dd, i18n, regexp, string, IDate, bundle) {
 
            var ilocale = lang.getObject("date.umalqura.locale", true, dojox);
@@ -187,7 +187,7 @@ define("dojox/date/umalqura/locale", ["../..", "dojo/_base/lang", "dojo/_base/ar
 
                var date, date1;
 
-               var result = [1389, 0, 1, 0, 0, 0, 0];  //FIXME: umalqura date for [1970,0,1,0,0,0,0] used in gregorian locale
+               var result = [1389, 9, 22, 0, 0, 0, 0];  //FIXME: umalqura date for [1970,0,1,0,0,0,0] used in gregorian locale
                var amPm = "";
                var mLength = 0;
                var widthList = ["abbr", "wide", "narrow"];

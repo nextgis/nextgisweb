@@ -251,7 +251,8 @@ return true;
 }
 }
 return false;
-},this.getBookmark=function(){
+};
+this.getBookmark=function(){
 var bm,rg,tg,sel=_9.selection,cf=_6.curNode;
 if(_9.getSelection){
 sel=_8.getSelection();

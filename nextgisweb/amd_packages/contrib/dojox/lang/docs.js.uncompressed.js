@@ -1,5 +1,5 @@
 // wrapped by build app
-define("dojox/lang/docs", ["dijit","dojo","dojox"], function(dijit,dojo,dojox){
+define("dojox/lang/docs", ["dojo","dijit","dojox"], function(dojo,dijit,dojox){
 dojo.provide("dojox.lang.docs");
 
 // Extracts information from the API docs to apply a schema representation to dojo classes.

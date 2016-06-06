@@ -40,10 +40,15 @@ function(declare, domAttr, domStyle, LayoutBase, BorderContainer, StackContainer
 			if(event.view.parent.id == this.app.id){	// If the parent of this view is the app we are working with the BorderContainer
 				var reg = registry.byId(event.view.parent.id+"-"+constraint);			
 				if(reg){	// already has a stackContainer, just create the contentPane for this view and add it to the stackContainer.
-					var cp1 = new ContentPane({id:event.view.id+"-cp-"+constraint});
-					cp1.addChild(event.view); // important to add the widget to the cp before adding cp to BorderContainer for height
-					reg.addChild(cp1);
-					bc.addChild(reg);
+					var cp1 = registry.byId(event.view.id+"-cp-"+constraint);
+					if(!cp1){
+						cp1 = new ContentPane({id:event.view.id+"-cp-"+constraint});
+						cp1.addChild(event.view); // important to add the widget to the cp before adding cp to BorderContainer for height
+						reg.addChild(cp1);
+						bc.addChild(reg);
+					}else{
+						cp1.domNode.appendChild(event.view.domNode);
+					}
 				}else{ // need a contentPane
 					// this is where the region (constraint) is set for the BorderContainer's StackContainer
 					var noSplitter = this.app.borderLayoutNoSplitter || false;

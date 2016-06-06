@@ -1,13 +1,15 @@
 define("dojox/mobile/FormLayout", [
 	"dojo/_base/declare",
 	"dojo/dom-class",
-	"./Container"
-], function(declare, domClass, Container){
+	"./Container",
+	"dojo/has",
+	"dojo/has!dojo-bidi?dojox/mobile/bidi/FormLayout"
+], function(declare, domClass, Container, has, BidiFormLayout){
 
 	// module:
 	//		dojox/mobile/FormLayout
 
-	return declare("dojox.mobile.FormLayout", Container, {
+	var FormLayout = declare(has("dojo-bidi") ? "dojox.mobile.NonBidiFormLayout" : "dojox.mobile.FormLayout", Container, {
 		// summary:
 		//		A responsive container to create mobile forms.
 		// description:
@@ -78,4 +80,5 @@ define("dojox/mobile/FormLayout", [
 			}
 		}
 	});
+	return has("dojo-bidi") ? declare("dojox.mobile.FormLayout", [FormLayout, BidiFormLayout]) : FormLayout;
 });

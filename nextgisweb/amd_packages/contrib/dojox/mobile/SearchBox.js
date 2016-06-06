@@ -57,7 +57,7 @@ _e=null;
 }
 });
 _10=_b.domNode.getBoundingClientRect();
-if(_10.right-(_f.touches?_f.touches[0].pageX:_f.pageX)>=20){
+if(_10.right-(_f.touches?_f.touches[0].pageX:_f.pageX)>=30){
 if(_e){
 _e.remove();
 _e=null;

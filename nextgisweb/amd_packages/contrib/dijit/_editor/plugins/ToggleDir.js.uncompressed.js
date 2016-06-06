@@ -11,8 +11,6 @@ define("dijit/_editor/plugins/ToggleDir", [
 	// module:
 	//		dijit/_editor/plugins/ToggleDir
 
-	kernel.experimental("dijit._editor.plugins.ToggleDir");
-
 	var ToggleDir = declare("dijit._editor.plugins.ToggleDir", _Plugin, {
 		// summary:
 		//		This plugin is used to toggle direction of the edited document,
@@ -28,36 +26,31 @@ define("dijit/_editor/plugins/ToggleDir", [
 		buttonClass: ToggleButton,
 
 		_initButton: function(){
-			// Override _Plugin._initButton() to setup handler for button click events.
 			this.inherited(arguments);
-			this.editor.onLoadDeferred.then(lang.hitch(this, function(){
-				var editDoc = this.editor.editorObject.contentWindow.document.documentElement;
-				//IE direction has to toggle on the body, not document itself.
-				//If you toggle just the document, things get very strange in the
-				//view.  But, the nice thing is this works for all supported browsers.
-				editDoc = editDoc.getElementsByTagName("body")[0];
-				var isLtr = domStyle.getComputedStyle(editDoc).direction == "ltr";
-				this.button.set("checked", !isLtr);
-				this.own(this.button.on("change", lang.hitch(this, "_setRtl")));
-			}));
+
+			var button = this.button,
+				editorLtr = this.editor.isLeftToRight();
+
+			this.own(this.button.on("change", lang.hitch(this, function(checked){
+				this.editor.set("textDir", editorLtr ^ checked ? "ltr" : "rtl");
+			})));
+
+			// Button should be checked if the editor's textDir is opposite of the editor's dir.
+			// Note that the arrow in the icon points in opposite directions depending on the editor's dir.
+			var editorDir = editorLtr ? "ltr" : "rtl";
+			function setButtonChecked(textDir){
+				button.set("checked", textDir && textDir !== editorDir, false);
+			}
+			setButtonChecked(this.editor.get("textDir"));
+			this.editor.watch("textDir", function(name, oval, nval){
+				setButtonChecked(nval);
+			});
 		},
 
 		updateState: function(){
 			// summary:
 			//		Over-ride for button state control for disabled to work.
 			this.button.set("disabled", this.get("disabled"));
-		},
-
-		_setRtl: function(rtl){
-			// summary:
-			//		Handler for button click events, to switch the text direction of the editor
-			var dir = "ltr";
-			if(rtl){
-				dir = "rtl";
-			}
-			var editDoc = this.editor.editorObject.contentWindow.document.documentElement;
-			editDoc = editDoc.getElementsByTagName("body")[0];
-			editDoc.dir/*html node*/ = dir;
 		}
 	});
 

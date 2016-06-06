@@ -40,6 +40,12 @@
 div.dijitNumberTextBoxRtl {
 	text-align: right;
 }
+.dijitCalendarRtl .dijitCalendarDecrementArrow {
+	float: right;
+}
+.dijitCalendarRtl .dijitCalendarIncrementArrow {
+	float: left;
+}
 .dijitCalendarRtl .dijitCalendarNextYear {
 	margin:0 0.55em 0 0;
 }
@@ -311,6 +317,9 @@ div.dijitNumberTextBoxRtl {
 .dijitRtl .dijitDisabled .dijitIconError {
 	background-image: url("../../icons/images/commonIconsObjActDisabled_rtl.png"); 
 }
+.dijitRtl .dijitIconLoading {
+	background-image: url("../../icons/images/loadingAnimation_rtl.gif");
+}
 .claro .dijitTitlePaneRtl .dijitClosed .dijitArrowNode,
 .claro .dijitFieldsetRtl .dijitFieldsetTitleClosed .dijitArrowNode {
   background-position: -7px 0;
@@ -368,7 +377,19 @@ div.dijitNumberTextBoxRtl {
   padding-left: 1px;
   padding-right: 2px;
 }
+.claro .dijitTreeRtl .dijitTreeExpandoLoading {
+  background-image: url("../../icons/images/loadingAnimation_rtl.gif");
+  background-position: 100% 0;
+}
 .claro .dijitProgressBarRtl .dijitProgressBarFull {
   border-left-width: 1px;
   border-right-width: 0px;
+}
+.claro .dijitProgressBarIndeterminateRtl .dijitProgressBarTile {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+  filter: FlipH;
+  -ms-filter: "FlipH";
 }

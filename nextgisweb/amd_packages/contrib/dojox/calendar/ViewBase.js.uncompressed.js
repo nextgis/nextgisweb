@@ -20,7 +20,9 @@ define("dojox/calendar/ViewBase", [
 	"dojox/widget/_Invalidating",
 	"dojox/widget/Selection",
 	"dojox/calendar/time",
-	"./StoreMixin"],
+	"./StoreMixin",
+	"./StoreManager",
+	"./RendererManager"],
 
 	function(
 		declare,
@@ -44,7 +46,9 @@ define("dojox/calendar/ViewBase", [
 		_Invalidating,
 		Selection,
 		timeUtil,
-		StoreMixin){
+		StoreMixin,
+		StoreManager,
+		RendererManager){
 	
 	/*=====
 	var __GridClickEventArgs = {
@@ -113,7 +117,7 @@ define("dojox/calendar/ViewBase", [
 		//		The item that will be displayed by the renderer for the "rendererCreated" and "rendererReused" events. 
 	};
 	=====*/
-
+		
 	return declare("dojox.calendar.ViewBase", [_WidgetBase, StoreMixin, _Invalidating, Selection], {
 		
 		// summary:
@@ -143,16 +147,18 @@ define("dojox/calendar/ViewBase", [
 		
 		// formatItemTimeFunc: Function
 		//		Optional function to format the time of day of the item renderers.
-		//		The function takes the date and render data object as arguments and returns a String.
+		//		The function takes the date, the render data object, the view and the data item as arguments and returns a String.
 		formatItemTimeFunc: null,
 		
 		_cssDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
 				
-		_getFormatItemTimeFuncAttr: function(){
+		_getFormatItemTimeFuncAttr: function(){			
+			if(this.formatItemTimeFunc){
+				return this.formatItemTimeFunc;
+			}			
 			if(this.owner != null){
 				return this.owner.get("formatItemTimeFunc");
-			}
-			return this.formatItemTimeFunc;			
+			}					
 		},
 		
 		// The listeners added by the view itself.
@@ -169,26 +175,38 @@ define("dojox/calendar/ViewBase", [
 			this.dateModule = args.datePackage ? lang.getObject(args.datePackage, false) : date; 
 			this.dateClassObj = this.dateModule.Date || Date; 
 			this.dateLocaleModule = args.datePackage ? lang.getObject(args.datePackage+".locale", false) : locale; 
-			
-			this.rendererPool = [];
-			this.rendererList = [];
-			this.itemToRenderer = {};
+						
 			this._viewHandles = [];
+			
+			this.storeManager = new StoreManager({owner: this, _ownerItemsProperty: "items"});
+			this.storeManager.on("layoutInvalidated", lang.hitch(this, this._refreshItemsRendering));
+			this.storeManager.on("dataLoaded", lang.hitch(this, function(items){
+				this.set("items", items);
+			}));
+			this.storeManager.on("renderersInvalidated", lang.hitch(this, function(item){
+				this.updateRenderers(item);
+			}));
+			
+			this.rendererManager = new RendererManager({owner: this});
+			this.rendererManager.on("rendererCreated", lang.hitch(this, this._onRendererCreated));
+			this.rendererManager.on("rendererReused", lang.hitch(this, this._onRendererReused));
+			this.rendererManager.on("rendererRecycled", lang.hitch(this, this._onRendererRecycled));
+			this.rendererManager.on("rendererDestroyed", lang.hitch(this, this._onRendererDestroyed));
+			
+			this.decorationStoreManager = new StoreManager({owner: this, _ownerItemsProperty: "decorationItems"});
+			this.decorationStoreManager.on("layoutInvalidated", lang.hitch(this, this._refreshDecorationItemsRendering));
+			this.decorationStoreManager.on("dataLoaded", lang.hitch(this, function(items){
+				this.set("decorationItems", items);
+			}));
+			this.decorationRendererManager = new RendererManager({owner: this});
+			
+			this._setupDayRefresh();
 		},
 		
 		destroy: function(preserveDom){
-			// renderers
-			while(this.rendererList.length > 0){
-				this._destroyRenderer(this.rendererList.pop());
-			}			
-			for(var kind in this._rendererPool){
-				var pool = this._rendererPool[kind];
-				if(pool){
-					while(pool.length > 0){
-						this._destroyRenderer(pool.pop());
-					}
-				}
-			}
+			
+			this.rendererManager.destroy();
+			this.decorationRendererManager.destroy();
 			
 			while(this._viewHandles.length > 0){
 				this._viewHandles.pop().remove();
@@ -197,6 +215,25 @@ define("dojox/calendar/ViewBase", [
 			this.inherited(arguments);
 		},
 		
+		_setupDayRefresh: function(){
+			// Refresh the view when the current day changes.
+			var now = new Date();
+			var d = timeUtil.floor(now, "day", 1);
+			var d = this.dateModule.add(d, "day", 1);
+			// manages DST at 24h
+			if(d.getHours() == 23){
+				d = this.dateModule.add(d, "hour", 2); // go to 1am
+			}else{
+				d = timeUtil.floorToDay(d, true, this.dateClassObj);
+			}
+			setTimeout(lang.hitch(this, function(){
+				if(!this._isEditing){
+					this.refreshRendering(true); // recursive refresh
+				}
+				this._setupDayRefresh();
+			}), d.getTime()-now.getTime() + 5000);
+			// add 5 seconds to be sure to be tommorrow
+		},
 		
 		resize: function(changeSize){
 			// summary:
@@ -206,6 +243,35 @@ define("dojox/calendar/ViewBase", [
 			if(changeSize){
 				domGeometry.setMarginBox(this.domNode, changeSize);
 			}
+		},
+		
+		// view lifecycle methods
+		beforeActivate: function(){
+			// summary:
+			//		Function invoked just before the view is displayed by the calendar.
+			// tags:
+			//		protected		
+		},
+		
+		afterActivate: function(){
+			// summary:
+			//		Function invoked just after the view is displayed by the calendar.
+			// tags:
+			//		protected
+		},
+		
+		beforeDeactivate: function(){
+			// summary:
+			//		Function invoked just before the view is hidden or removed by the calendar.
+			// tags:
+			//		protected
+		},
+		
+		afterDeactivate: function(){
+			// summary:
+			//		Function invoked just after the view is the view is hidden or removed by the calendar.
+			// tags:
+			//		protected
 		},
 		
 		_getTopOwner: function(){
@@ -310,6 +376,18 @@ define("dojox/calendar/ViewBase", [
 				datePattern: "w"});
 		},
 		
+		addAndFloor: function(date, unit, steps){
+			// date must be floored!!
+			// unit >= day
+			var d = this.dateModule.add(date, unit, steps);
+			if(d.getHours() == 23){
+				d = this.dateModule.add(d, "hour", 2); // go to 1am
+			}else{
+				d = timeUtil.floorToDay(d, true, this.dateClassObj);
+			}
+			return d;
+		},
+		
 		floorToDay: function(date, reuse){
 			// summary:
 			//		Floors the specified date to the start of day.
@@ -317,8 +395,8 @@ define("dojox/calendar/ViewBase", [
 			//		The date to floor.
 			// reuse: Boolean
 			//		Whether use the specified instance or create a new one. Default is false.
-			// returns: Date
-			return timeUtil.floorToDay(date, reuse, this.dateClassObj);
+			// returns: Date			
+			return timeUtil.floorToDay(date, reuse, this.dateClassObj);			
 		},
 		
 		floorToMonth: function(date, reuse){
@@ -385,21 +463,8 @@ define("dojox/calendar/ViewBase", [
 			// includeLimits: Boolean
 			//		Whether include the end time or not.
 			// returns: Boolean
-			if(start1 == null || start2 == null || end1 == null || end2 == null){
-				return false;
-			}
-			
-			var cal = renderData.dateModule;
-			
-			if(includeLimits){
-				if(cal.compare(start1, end2) == 1 || cal.compare(start2, end1) == 1){
-					return false;
-				}					
-			}else if(cal.compare(start1, end2) != -1 || cal.compare(start2, end1) != -1){
-				return false;
-			}
-			return true; 
-		},			 
+			return timeUtil.isOverlapping(renderData, start1, end1, start2, end2, includeLimits);
+		},
 			 
 		computeRangeOverlap: function(renderData, start1, end1, start2, end2, includeLimits){
 			// summary:
@@ -475,11 +540,18 @@ define("dojox/calendar/ViewBase", [
 			//		protected
 			// returns: Number
 
+			
 			var cal = renderData.dateModule;
+			var minH = renderData.minHours;
+			var maxH = renderData.maxHours;
 			
 			if(max <= 0 || cal.compare(date, refDate) == -1){
 				return 0;
 			}
+			
+			var gt = function(d){
+				return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();			
+			};
 			
 			var referenceDate = this.floorToDay(refDate, false, renderData);
 
@@ -487,7 +559,7 @@ define("dojox/calendar/ViewBase", [
 				if(date.getMonth() == referenceDate.getMonth()){
 					if(date.getDate() < referenceDate.getDate()){
 						return 0;
-					} else if(date.getDate() > referenceDate.getDate()){
+					} else if(date.getDate() > referenceDate.getDate() && maxH < 24){
 						return max;
 					}
 				}else{
@@ -508,37 +580,49 @@ define("dojox/calendar/ViewBase", [
 			}
 
 			var res;
+			var ONE_DAY = 86400; // 24h x 60m x 60s
 
-			if(this.isSameDay(refDate, date)){
+			if(this.isSameDay(refDate, date) || maxH > 24){
 				
 				var d = lang.clone(refDate);
 				var minTime = 0;
 				
-				if(renderData.minHours != null && renderData.minHours != 0){
-					d.setHours(renderData.minHours);
-					minTime = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+				if(minH != null && minH != 0){
+					d.setHours(minH);
+					minTime = gt(d);
 				}
 				
 				d = lang.clone(refDate);
+				d.setHours(maxH);
 				
 				var maxTime;
-				if(renderData.maxHours == null || renderData.maxHours == 24){
-					maxTime = 86400; // 24h x 60m x 60s
-				}else{
-					d.setHours(renderData.maxHours);
-					maxTime = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+				if(maxH == null || maxH == 24){
+					maxTime = ONE_DAY; 
+				}else if(maxH > 24){
+					maxTime = ONE_DAY + gt(d);
+				}else{					
+					maxTime = gt(d);
 				}
 				
 				//precision is the second
 				//use this API for daylight time issues.
-				var delta = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds() - minTime;
 				
-				if(delta < 0){
+				var delta = 0;
+				
+				if(maxH > 24 && refDate.getDate() != date.getDate()){
+					delta = ONE_DAY + gt(date);
+				}else{
+					delta = gt(date);
+				}
+
+				if(delta < minTime){
 					return 0;
 				}
 				if(delta > maxTime){
 					return max;
 				}
+				
+				delta -= minTime;
 
 				res = (max * delta)/(maxTime - minTime);
 				
@@ -576,6 +660,37 @@ define("dojox/calendar/ViewBase", [
 			//		If parameter 'e' is not null and a touch event, the index of the touch to use.
 			// returns: Date
 			return null;
+		},
+		
+		getSubColumn: function(e, x, y, touchIndex){
+			// summary:
+			//		Returns the sub column at the specified point by this component.
+			// e: Event
+			//		Optional mouse event.
+			// x: Number
+			//		Position along the x-axis with respect to the sheet container used if event is not defined.
+			// y: Number
+			//		Position along the y-axis with respect to the sheet container (scroll included) used if event is not defined.
+			// touchIndex: Integer
+			//		If parameter 'e' is not null and a touch event, the index of the touch to use.
+			// returns: Object
+			
+			return null;
+		},
+		
+		getSubColumnIndex: function(value){
+			// summary:
+			//		Returns the sub column index that has the specified value, if any. -1 otherwise. 
+			// value: String
+			//		The sub column index.
+			if(this.subColumns){
+				for(var i=0; i<this.subColumns.length; i++){
+					if(this.subColumns[i] == value){
+						return i;
+					}
+				}
+			}
+			return -1;
 		},
 		
 		newDate: function(obj){
@@ -730,6 +845,7 @@ define("dojox/calendar/ViewBase", [
 		},
 		
 		_scrollPos: 0,
+		_hscrollPos: 0,
 		
 		getCSSPrefix: function(){
 			// summary:
@@ -748,15 +864,22 @@ define("dojox/calendar/ViewBase", [
 				return "-o-";
 			}
             return "";
-		},				
+		},
 		
-		_setScrollPosition: function(pos){
+		//	_hScrollNodes: DOMNodes[]
+		//		Array of nodes that will be scrolled horizontally.
+		//		Must be set by sub class on buildRendering.
+		
+		_hScrollNodes: null,
+		
+		_setScrollPositionBase: function(pos, vertical){
 			// summary:
 			//		Sets the scroll position (if the view is scrollable), using the scroll method defined.
 			// tags:
 			//		protected
 
-			if(this._scrollPos == pos){
+			if(vertical && this._scrollPos == pos || 
+			   !vertical && this._hScrollPos == pos){
 				return;
 			}
 			
@@ -771,9 +894,16 @@ define("dojox/calendar/ViewBase", [
 				}
 			}
 			
-			var containerSize = domGeometry.getMarginBox(this.scrollContainer);
-			var sheetSize = domGeometry.getMarginBox(this.sheetContainer);
-			var max = sheetSize.h - containerSize.h;
+			var max = 0;
+			if(vertical){
+				var containerSize = domGeometry.getMarginBox(this.scrollContainer);
+				var sheetSize = domGeometry.getMarginBox(this.sheetContainer);
+				max = sheetSize.h - containerSize.h;
+			}else{				
+				var gridSize = domGeometry.getMarginBox(this.grid);
+				var gridTableSize = domGeometry.getMarginBox(this.gridTable);
+				max = gridTableSize.w - gridSize.w;
+			}
 			
 			if(pos < 0){
 				pos = 0;
@@ -781,30 +911,99 @@ define("dojox/calendar/ViewBase", [
 				pos = max;
 			}
 			
-			this._scrollPos = pos;
+			if(vertical){
+				this._scrollPos = pos;
+			}else{
+				this._hScrollPos = pos;
+			}
+			
+			var rtl = !this.isLeftToRight();
 												
-			if(this._domScroll){				
-				this.scrollContainer.scrollTop = pos;				
+			if(this._domScroll){
+				if(vertical){
+					this.scrollContainer.scrollTop = pos;
+				}else{
+					arr.forEach(this._hScrollNodes, function(elt){											
+						domStyle.set(elt, "left", ((rtl?1:-1) * pos) + "px");						
+					}, this);
+				}
+								
 			}else{			
 				if(!this._cssPrefix){
 					this._cssPrefix =  this.getCSSPrefix();
 				}
-				domStyle.set(this.sheetContainer, this._cssPrefix+"transform", "translateY(-"+pos+"px)");
+								
+				var cssProp = this._cssPrefix+"transform";
+				
+				if(vertical){
+					domStyle.set(this.sheetContainer, cssProp, "translateY(-"+pos+"px)");
+				}else{					
+					var css = "translateX("+(rtl?"":"-")+pos+"px)";
+					arr.forEach(this._hScrollNodes, function(elt){						
+						domStyle.set(elt, cssProp, css);						
+					}, this);
+				}
 			}
+		},
+		
+		_setScrollPosition: function(pos){
+			// summary:
+			//		Sets the verical scroll position (if the view is scrollable), using the scroll method defined.
+			// tags:
+			//		protected			
+			this._setScrollPositionBase(pos, true);						
 		},
 		
 		_getScrollPosition: function(){
 			// summary:
-			//		Returns the scroll position (if the view is scrollable), using the scroll method defined.
+			//		Returns the vertical scroll position (if the view is scrollable), using the scroll method defined.
 			// tags:
 			//		protected
 
 			return this._scrollPos; 
 		},
+				
+		_setHScrollPosition: function(pos){
+			// summary:
+			//		Sets the horizontal scroll position (if the view is scrollable), using the scroll method defined.
+			// tags:
+			//		protected
+			
+			this._setScrollPositionBase(pos, false);			
+		},
+		
+		_setHScrollPositionImpl: function(pos, useDom, cssProperty){
+			// summary:
+			//		Sets the horizontal scroll position on sub elements (if the view is scrollable), using the scroll method defined.
+			//		Important: must be implemented by sub classes and not called directly. Use _setHScrollPosition() method instead.
+			// tags:
+			//		private
+			
+			var css = useDom ? null : "translateX(-"+pos+"px)";
+			arr.forEach(this._hScrollNodes, function(elt){
+				if(useDom){
+					elt.scrollLeft = pos;
+					domStyle.set(elt, "left", (-pos) + "px");
+				}else{
+					domStyle.set(elt, cssProp, css);
+				}
+			}, this);
+		},
+		
+		_hScrollPos: 0,
+		
+		_getHScrollPosition: function(){
+			// summary:
+			//		Returns the horizontal scroll position (if the view is scrollable), using the scroll method defined.
+			// tags:
+			//		protected
+
+			return this._hScrollPos; 
+		},
 		
 		scrollView: function(dir){
 			// summary:
-			//		If the view is scrollable, scrolls it to the specified direction.
+			//		If the view is scrollable, scrolls it vertically to the specified direction.
 			// dir: Integer
 			//		Direction of the scroll. Valid values are -1 and 1.
 			// tags:
@@ -854,10 +1053,34 @@ define("dojox/calendar/ViewBase", [
 			this._layoutRenderers(rd);
 		},
 		
+		_refreshDecorationItemsRendering: function(){
+			var rd = this.renderData;
+			this._computeVisibleItems(rd);
+			this._layoutDecorationRenderers(rd);
+		},
+		
 		invalidateLayout: function(){
 			// summary:
 			//		Triggers a re-layout of the renderers.
 			this._layoutRenderers(this.renderData);
+			this._layoutDecorationRenderers(this.renderData);
+		},
+		
+		_setDecorationItemsAttr: function(value){
+			this._set("decorationItems", value);
+			this.displayedDecorationItemsInvalidated = true;
+		},
+					
+		_getDecorationStoreAttr: function(){
+			if(this.owner){
+				return this.owner.get("decorationStore");
+			}
+			return this.decorationStore;
+		},
+		
+		_setDecorationStoreAttr: function(value){
+			this.decorationStore = value;
+			this.decorationStoreManager.set("store", value);
 		},
 		
 		////////////////////////////////////////////////////////
@@ -973,19 +1196,28 @@ define("dojox/calendar/ViewBase", [
 			return res;
 		},
 		
+		
 		_layoutRenderers: function(renderData){
+			this._layoutRenderersImpl(renderData, this.rendererManager, renderData.items, "dataItems");
+		},
+		
+		_layoutDecorationRenderers: function(renderData){
+			this._layoutRenderersImpl(renderData, this.decorationRendererManager, renderData.decorationItems, "decorationItems");
+		},
+		
+		_layoutRenderersImpl: function(renderData, rendererManager, items, itemType){
 			// summary:
 			//		Renders the data items. This method will call the _layoutInterval() method.
 			// renderData: Object
 			//		The render data.
 			// tags:
 			//		protected
-			if(!renderData.items){
+			if(!items){
 				return;
 			}
 						
 			// recycle renderers first
-			this._recycleItemRenderers();
+			rendererManager.recycleItemRenderers();
 			
 			var cal = renderData.dateModule; 
 			
@@ -997,16 +1229,16 @@ define("dojox/calendar/ViewBase", [
 			
 			var endDate;
 			
-			var items = renderData.items.concat();
+			var items = items.concat();
 
 			var itemsTemp = [], events;
+			var processing = {};
 			
 			var index = 0;
 			
 			while(cal.compare(startDate, renderData.endTime) == -1 && items.length > 0){
 			
-				endDate = cal.add(startDate, this._layoutUnit, this._layoutStep);
-				endDate = this.floorToDay(endDate, true, renderData);
+				endDate = this.addAndFloor(startDate, this._layoutUnit, this._layoutStep);											
 				
 				var endTime = lang.clone(endDate);
 				
@@ -1014,22 +1246,26 @@ define("dojox/calendar/ViewBase", [
 					startTime.setHours(renderData.minHours);
 				}
 				
-				if(renderData.maxHours && renderData.maxHours != 24){
-					endTime = cal.add(endDate, "day", -1);
+				if(renderData.maxHours != undefined && renderData.maxHours != 24){					
+					if(renderData.maxHours < 24){				
+						endTime = cal.add(endDate, "day", -1);
+					} // else > 24
 					endTime = this.floorToDay(endTime, true, renderData);
-					endTime.setHours(renderData.maxHours);
+					endTime.setHours(renderData.maxHours - (renderData.maxHours < 24 ? 0 : 24));
 				}
 				
 				// look for events that overlap the current sub interval
 				events = arr.filter(items, function(item){
 					var r = this.isOverlapping(renderData, item.startTime, item.endTime, startTime, endTime);
 					if(r){
-						// item was not fully processed as it overlaps another sub interval
-						if(cal.compare(item.endTime, endTime) == 1){
-							itemsTemp.push(item);
-						}	
+						processing[item.id] = true;						
+						itemsTemp.push(item);							
 					}else{
-						itemsTemp.push(item);
+						if(processing[item.id]){
+							delete processing[item.id];
+						}else{
+							itemsTemp.push(item);
+						}
 					}
 					return r;
 				}, this);
@@ -1041,7 +1277,7 @@ define("dojox/calendar/ViewBase", [
 				if(events.length > 0){
 					// Sort the item according a sorting function, by default start time then end time comparison are used.
 					events.sort(lang.hitch(this, this.layoutPriorityFunction ? this.layoutPriorityFunction : this._sortItemsFunction));
-					this._layoutInterval(renderData, index, startTime, endTime, events);
+					this._layoutInterval(renderData, index, startTime, endTime, events, itemType);
 				}
 
 				startDate = endDate;
@@ -1060,31 +1296,10 @@ define("dojox/calendar/ViewBase", [
 		////////////////////////////////////////////////////////////////
 		
 		_recycleItemRenderers: function(remove){
-			// summary:
-			//		Recycles all the item renderers.
-			// remove: Boolean
-			//		Whether remove the DOM node from it parent.
-			// tags:
-			//		protected
-			while(this.rendererList.length>0){
-				this._recycleRenderer(this.rendererList.pop(), remove);
-			}
-			this.itemToRenderer = {};
+			this.rendererManager.recycleItemRenderers(remove);
 		},
-				
-		// rendererPool: [protected] Array
-		//		The stack of recycled renderers available.
-		rendererPool: null,
-		
-		// rendererList: [protected] Array
-		//		The list of used renderers
-		rendererList: null,
-		
-		// itemToRenderer: [protected] Object
-		//		The associated array item to renderer list.
-		itemToRenderer: null,
-		
-		getRenderers: function(item){
+							
+		getRenderers: function(item){			
 			// summary:
 			//		Returns the renderers that are currently used to displayed the speficied item.
 			//		Returns an array of objects that contains two properties:
@@ -1094,15 +1309,10 @@ define("dojox/calendar/ViewBase", [
 			// item: Object
 			//		The data or render item.
 			// returns: Object[]
-			if(item == null || item.id == null){
-				return null;
-			}
-			var list = this.itemToRenderer[item.id];
-			return list == null ? null : list.concat();
+			
+			return this.rendererManager.getRenderers(item);			
 		},
-		
-		_rendererHandles: {},
-		
+				
 		// itemToRendererKindFunc: Function
 		//		An optional function to associate a kind of renderer ("horizontal", "label" or null) with the specified item.
 		//		By default, if an item is lasting more that 24 hours an horizontal item is used, otherwise a label is used.
@@ -1141,48 +1351,7 @@ define("dojox/calendar/ViewBase", [
 			// tags:
 			//		protected				
 						
-			if(item != null && kind != null && rendererClass != null){
-				
-				var res=null, renderer=null;
-				
-				var pool = this.rendererPool[kind];
-				
-				if(pool != null){
-					res = pool.shift();
-				}
-
-				if (res == null){
-
-					renderer = new rendererClass;
-									
-					res = {
-						renderer: renderer,
-						container: renderer.domNode,
-						kind: kind
-					};
-
-					this._onRendererCreated({renderer:res, source:this, item:item});
-					
-				} else {
-					renderer = res.renderer; 
-					
-					this._onRendererReused({renderer:renderer, source:this, item:item});
-				}
-				
-				renderer.owner = this;
-				renderer.set("rendererKind", kind);
-				renderer.set("item", item);
-				
-				var list = this.itemToRenderer[item.id];
-				if (list == null) {
-					this.itemToRenderer[item.id] = list = [];
-				}
-				list.push(res);
-				
-				this.rendererList.push(res);
-				return res;	
-			}
-			return null;
+			return this.rendererManager.createRenderer(item, kind, rendererClass, cssClass);
 		},
 		
 		_onRendererCreated: function(e){
@@ -1283,24 +1452,7 @@ define("dojox/calendar/ViewBase", [
 			// tags:
 			//		protected			
 								
-			this._onRendererRecycled({renderer:renderer, source:this});
-			
-			var pool = this.rendererPool[renderer.kind];
-			
-			if(pool == null){
-				this.rendererPool[renderer.kind] = [renderer];
-			}else{
-				pool.push(renderer);
-			}
-								
-			if(remove){
-				renderer.container.parentNode.removeChild(renderer.container);
-			}
-
-			domStyle.set(renderer.container, "display", "none");
-
-			renderer.renderer.owner = null;
-			renderer.renderer.set("item", null);
+			this.rendererManager.recycleRenderer(renderer, remove);
 		},
 							
 		_destroyRenderer: function(renderer){
@@ -1310,40 +1462,15 @@ define("dojox/calendar/ViewBase", [
 			//		The item renderer to destroy.
 			// tags:
 			//		protected
-			this._onRendererDestroyed({renderer:renderer, source:this});
 			
-			var ir = renderer.renderer;		
-			
-			if(ir["destroy"]){
-				ir.destroy();
-			}
-			
-			html.destroy(renderer.container);	
+			this.rendererManager.destroyRenderer(renderer);					
 		},
 		
 		_destroyRenderersByKind: function(kind){
 			// tags:
 			//		private
 
-			var list = [];
-			for(var i=0;i<this.rendererList.length;i++){
-				var ir = this.rendererList[i];
-				if(ir.kind == kind){
-					this._destroyRenderer(ir);
-				}else{
-					list.push(ir);
-				}
-			}
-			
-			this.rendererList = list;
-			
-			var pool = this.rendererPool[kind];
-			if(pool){
-				while(pool.length > 0){
-					this._destroyRenderer(pool.pop());
-				}
-			}
-			
+			this.rendererManager.destroyRenderersByKind(kind);			
 		},
 				
 					
@@ -1399,7 +1526,7 @@ define("dojox/calendar/ViewBase", [
 					continue;
 				}
 						
-				var list = this.itemToRenderer[item.id];
+				var list = this.rendererManager.itemToRenderer[item.id];
 				
 				if(list == null){
 					continue;
@@ -1613,7 +1740,8 @@ define("dojox/calendar/ViewBase", [
 			//		the date at the clicked location.
 			// e: MouseEvemt
 			//		the mouse event (can be used to return null for example)
-
+			// subColumn: Object
+			//		the subcolumn at clicked location (can return null)
 		},
 		=====*/
 
@@ -1643,7 +1771,8 @@ define("dojox/calendar/ViewBase", [
 		//
 		///////////////////////////////////////////////////////////////////	
 		
-		_gridMouseDown: false,		
+		_gridMouseDown: false,
+		
 		_tempIdCount: 0,
 		_tempItemsMap: null,
 				
@@ -1675,14 +1804,14 @@ define("dojox/calendar/ViewBase", [
 					return;
 				}
 				
-				var newItem = this._createdEvent = f(this, this.getTime(e), e);
+				var newItem = this._createdEvent = f(this, this.getTime(e), e, this.getSubColumn(e));
 								
 				var store = this.get("store");
 											
 				if(!newItem || store == null){
 					return;
 				}
-								
+				
 				// calendar needs an ID to work with
 				if(store.getIdentity(newItem) == undefined){
 					var id = "_tempId_" + (this._tempIdCount++);
@@ -1927,7 +2056,7 @@ define("dojox/calendar/ViewBase", [
 			//		protected
 
 
-			var list = this.itemToRenderer[item.id];
+			var list = this.rendererManager.itemToRenderer[item.id];
 
 			if(list == null){
 				return null;
@@ -2071,26 +2200,26 @@ define("dojox/calendar/ViewBase", [
 				p.editSaveStartTime = item.startTime;
 				p.editSaveEndTime = item.endTime;
 				
-				p.editItemToRenderer = this.itemToRenderer;
+				p.editItemToRenderer = this.rendererManager.itemToRenderer;
 				p.editItems = this.renderData.items;
-				p.editRendererList = this.rendererList;
+				p.editRendererList = this.rendererManager.rendererList;
 				
 				this.renderData.items = [p.editedItem];
 				var id = p.editedItem.id;
 			
-				this.itemToRenderer = {};
-				this.rendererList = [];
+				this.rendererManager.itemToRenderer = {};
+				this.rendererManager.rendererList = [];
 				var list = p.editItemToRenderer[id];
 				
 				p.editRendererIndices = [];
 				
 				arr.forEach(list, lang.hitch(this, function(ir, i){
-					if(this.itemToRenderer[id] == null){
-						this.itemToRenderer[id] = [ir];
+					if(this.rendererManager.itemToRenderer[id] == null){
+						this.rendererManager.itemToRenderer[id] = [ir];
 					}else{
-						this.itemToRenderer[id].push(ir);
+						this.rendererManager.itemToRenderer[id].push(ir);
 					}
-					this.rendererList.push(ir);
+					this.rendererManager.rendererList.push(ir);
 				}));
 				
 				// remove in old map & list the occurrence used by the edited item
@@ -2137,6 +2266,11 @@ define("dojox/calendar/ViewBase", [
 			//		"mouse", "keyboard", "touch"
 			// tags:
 			//		protected
+			
+			if(this._editingGesture){
+				// make sure to stop the current gesture if any
+				this._endItemEditingGesture(eventSource);
+			}
 
 			this._isEditing = false;
 			this._getTopOwner()._isEditing = false;
@@ -2149,8 +2283,8 @@ define("dojox/calendar/ViewBase", [
 						
 			if (!p.liveLayout){
 				this.renderData.items = p.editItems;
-				this.rendererList = p.editRendererList.concat(this.rendererList);
-				lang.mixin(this.itemToRenderer, p.editItemToRenderer);
+				this.rendererManager.rendererList = p.editRendererList.concat(this.rendererManager.rendererList);
+				lang.mixin(this.rendererManager.itemToRenderer, p.editItemToRenderer);
 			}
 
 			this._onItemEditEnd(lang.mixin(this._createItemEditEvent(), {
@@ -2214,7 +2348,7 @@ define("dojox/calendar/ViewBase", [
 					}else{ // creation canceled
 						// cleanup items list
 						
-						this.removeRenderItem(s.id);											
+						this._removeRenderItem(s.id);					
 					}									
 					
 				} else if(e.completed){
@@ -2407,17 +2541,14 @@ define("dojox/calendar/ViewBase", [
 
 			var cal = this.renderData.dateModule;
 			var p = this._edProps;
-			var diff = cal.difference(p.editingTimeFrom[0], times[0], "millisecond");
-			times[0] = this._waDojoxAddIssue(p.editingItemRefTime[0], "millisecond", diff);
-			
-			if(editKind == "resizeBoth"){
-				diff = cal.difference(p.editingTimeFrom[1], times[1], "millisecond");
-				times[1] = this._waDojoxAddIssue(p.editingItemRefTime[1], "millisecond", diff); 
-			}
+			if(editKind == "move"){
+				var diff = cal.difference(p.editingTimeFrom[0], times[0], "millisecond");
+				times[0] = this._waDojoxAddIssue(p.editingItemRefTime[0], "millisecond", diff);
+			}					
 			return times;
 		},
 		
-		_moveOrResizeItemGesture: function(dates, eventSource, e){
+		_moveOrResizeItemGesture: function(dates, eventSource, e, subColumn){
 			// summary:
 			//		Moves or resizes an item.
 			// dates: Date[]
@@ -2428,6 +2559,8 @@ define("dojox/calendar/ViewBase", [
 			//		"mouse", "keyboard", "touch"
 			// e: Event
 			//		The event at the origin of the editing gesture.
+			// subColumn: String
+			//		The sub column value, if any, or null.
 			// tags:
 			//		private
 
@@ -2455,13 +2588,22 @@ define("dojox/calendar/ViewBase", [
 			
 			var oldStart = lang.clone(item.startTime);
 			var oldEnd = lang.clone(item.endTime);
+			var oldSubColumn = item.subColumn;
 			
 			// swap cannot used using keyboard as a gesture is made of one single change (loss of start/end context).
 			var allowSwap = p.eventSource == "keyboard" ? false : this.allowStartEndSwap;
 
 			// Update the Calendar with the edited value.
 			if(editKind == "move"){
-					
+				if(subColumn != null && item.subColumn != subColumn && this.allowSubColumnMove){
+					// TODO abstract change?
+					item.subColumn = subColumn;
+					// refresh the other properties that depends on this one (especially cssClass)
+					var store = this.get("store");
+					var storeItem = this.renderItemToItem(item, store);
+					lang.mixin(item, this.itemToRenderItem(storeItem, store));
+					moveOrResizeDone = true;
+				}
 				if(cal.compare(item.startTime, newTime) != 0){
 					var duration = cal.difference(item.startTime, item.endTime, "millisecond");
 					item.startTime = this.newDate(newTime);
@@ -2574,6 +2716,7 @@ define("dojox/calendar/ViewBase", [
 			}
 			
 			moveOrResizeDone = 
+				oldSubColumn != item.subColumn ||
 				cal.compare(oldStart, item.startTime) != 0 || 
 				cal.compare(oldEnd, item.endTime) != 0;
 			
@@ -2875,7 +3018,11 @@ define("dojox/calendar/ViewBase", [
 		// allowResizeLessThan24H: Boolean
 		//		If an event has a duration greater than 24 hours, indicates if using a resize gesture, it can be resized to last less than 24 hours.
 		//		This flag is usually used when two different kind of renderers are used (MatrixView) to prevent changing the kind of renderer during an editing gesture.
-		allowResizeLessThan24H: false
+		allowResizeLessThan24H: false,
+
+		// allowSubColumnMove: Boolean
+		//		If several sub columns are displayed, indicated if the data item can be reassigned to another sub column by an editing gesture.
+		allowSubColumnMove: true
 		
 	});
 });

@@ -12,8 +12,9 @@ define("dojox/mobile/_EditableListMixin", [
 	"dojo/touch",
 	"dojo/dom-attr",
 	"dijit/registry",
-	"./ListItem"
-], function(array, connect, declare, event, win, domClass, domGeometry, domStyle, touch, domAttr, registry, ListItem){
+	"./ListItem",
+	"./common"
+], function(array, connect, declare, event, win, domClass, domGeometry, domStyle, touch, domAttr, registry, ListItem, common){
 
 	// module:
 	//		dojox/mobile/EditableRoundRectList
@@ -196,9 +197,7 @@ define("dojox/mobile/_EditableListMixin", [
 				}
 				child.rightIconNode.style.display = "";
 				child.deleteIconNode.style.display = "";
-				if(typeof child.rightIconNode.style.msTouchAction != "undefined"){
-					child.rightIconNode.style.msTouchAction = "none";
-				}
+				common._setTouchAction(child.rightIconNode, "none");
 			}, this);
 			if(!this._handles){
 				this._handles = [
@@ -218,9 +217,7 @@ define("dojox/mobile/_EditableListMixin", [
 			array.forEach(this.getChildren(), function(child){
 				child.rightIconNode.style.display = "none";
 				child.deleteIconNode.style.display = "none";
-				if(typeof child.rightIconNode.style.msTouchAction != "undefined"){
-					child.rightIconNode.style.msTouchAction = "auto";
-				}
+				common._setTouchAction(child.rightIconNode, "auto");
 			});
 			if(this._handles){
 				array.forEach(this._handles, this.disconnect, this);

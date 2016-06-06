@@ -1,6 +1,6 @@
 //>>built
-define("dojox/lang/oo/Filter",["dijit","dojo","dojox"],function(_1,_2,_3){
-_2.provide("dojox.lang.oo.Filter");
+define("dojox/lang/oo/Filter",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.oo.Filter");
 (function(){
 var oo=_3.lang.oo,F=oo.Filter=function(_4,_5){
 this.bag=_4;

@@ -1,10 +1,10 @@
 //>>built
-define("dojox/lang/oo/aop",["dijit","dojo","dojox","dojo/require!dojox/lang/oo/Decorator,dojox/lang/oo/general"],function(_1,_2,_3){
-_2.provide("dojox.lang.oo.aop");
-_2.require("dojox.lang.oo.Decorator");
-_2.require("dojox.lang.oo.general");
+define("dojox/lang/oo/aop",["dojo","dijit","dojox","dojo/require!dojox/lang/oo/Decorator,dojox/lang/oo/general"],function(_1,_2,_3){
+_1.provide("dojox.lang.oo.aop");
+_1.require("dojox.lang.oo.Decorator");
+_1.require("dojox.lang.oo.general");
 (function(){
-var oo=_3.lang.oo,md=oo.makeDecorator,_4=oo.general,_5=oo.aop,_6=_2.isFunction;
+var oo=_3.lang.oo,md=oo.makeDecorator,_4=oo.general,_5=oo.aop,_6=_1.isFunction;
 _5.before=_4.before;
 _5.around=_4.wrap;
 _5.afterReturning=md(function(_7,_8,_9){

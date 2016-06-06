@@ -15,6 +15,7 @@ return String(_e.innerHTML);
 });
 }
 if(!_d.length&&this.count>1){
+_d=[];
 var _f=this.minimum;
 var inc=(this.maximum-_f)/(this.count-1);
 for(var i=0;i<this.count;i++){

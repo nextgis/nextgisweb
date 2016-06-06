@@ -7,7 +7,7 @@ define("dojox/mobile/bidi/common", ["dojo/_base/array", "dijit/_BidiSupport"], f
 		// description:
 		//		Unicode control characters (UCC) used to control text direction.
 
-		common = {};
+		var common = {};
 		common.enforceTextDirWithUcc = function(text, textDir){
 			// summary:
 			//		Wraps by UCC (Unicode control characters) displayed text according to textDir.

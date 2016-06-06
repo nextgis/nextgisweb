@@ -38,7 +38,7 @@ define("dojo/hash", ["./_base/kernel", "require", "./_base/config", "./aspect", 
 		if(replace){
 			_replace(hash);
 		}else{
-			location.href = "#" + hash;
+			location.hash = "#" + hash;
 		}
 		return hash; // String
 	};
@@ -81,7 +81,8 @@ define("dojo/hash", ["./_base/kernel", "require", "./_base/config", "./aspect", 
 			_ieUriMonitor.iframe.location.replace(href.substring(0, index) + "?" + hash);
 			return;
 		}
-		location.replace("#"+hash);
+		var href = location.href.replace(/#.*/, "");
+		location.replace(href + "#" + hash);
 		!_connect && _pollLocation();
 	}
 

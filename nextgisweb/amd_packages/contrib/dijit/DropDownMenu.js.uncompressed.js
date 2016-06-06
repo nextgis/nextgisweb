@@ -4,14 +4,13 @@ define("dijit/DropDownMenu", [
 	"dojo/_base/declare", // declare
 	"dojo/keys", // keys
 	"dojo/text!./templates/Menu.html",
-	"./_OnDijitClickMixin",
 	"./_MenuBase"
-], function(declare, keys, template, _OnDijitClickMixin, _MenuBase){
+], function(declare, keys, template, _MenuBase){
 
 	// module:
 	//		dijit/DropDownMenu
 
-	return declare("dijit.DropDownMenu", [_MenuBase, _OnDijitClickMixin], {
+	return declare("dijit.DropDownMenu", _MenuBase, {
 		// summary:
 		//		A menu, without features for context menu (Meaning, drop down menu)
 

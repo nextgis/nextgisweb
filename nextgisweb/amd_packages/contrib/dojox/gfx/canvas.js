@@ -863,7 +863,7 @@ return this;
 },getDimensions:function(){
 return this.rawNode?{width:this.rawNode.width,height:this.rawNode.height}:null;
 },_render:function(_a6){
-if(!_a6&&this.pendingImageCount){
+if(!this.rawNode||(!_a6&&this.pendingImageCount)){
 return;
 }
 var ctx=this.rawNode.getContext("2d");

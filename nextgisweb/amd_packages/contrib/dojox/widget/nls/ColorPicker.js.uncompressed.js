@@ -14,6 +14,9 @@ saturationPickerTitle: "Saturation Selector"
 })
 //end v1.x content
 ,
+"bs": true,
+"mk": true,
+"sr": true,
 "zh": true,
 "zh-tw": true,
 "uk": true,
@@ -33,6 +36,7 @@ saturationPickerTitle: "Saturation Selector"
 "kk": true,
 "ja": true,
 "it": true,
+"id": true,
 "hu": true,
 "hr": true,
 "he": true,
@@ -40,6 +44,7 @@ saturationPickerTitle: "Saturation Selector"
 "fi": true,
 "es": true,
 "el": true,
+"eu": true,
 "de": true,
 "da": true,
 "cs": true,

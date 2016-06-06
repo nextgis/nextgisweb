@@ -5,8 +5,10 @@
 		><span data-dojo-attach-point="contentNode"
 			class="dijitTreeContent" role="presentation">
 			<span role="presentation" class="dijitInline dijitIcon dijitTreeIcon" data-dojo-attach-point="iconNode"></span
-			><span data-dojo-attach-point="labelNode,focusNode" class="dijitTreeLabel" role="treeitem" tabindex="-1" aria-selected="false"></span>
+			><span data-dojo-attach-point="labelNode,focusNode" class="dijitTreeLabel" role="treeitem"
+				   tabindex="-1" aria-selected="false" id="${id}_label"></span>
 		</span
 	></div>
-	<div data-dojo-attach-point="containerNode" class="dijitTreeNodeContainer" role="presentation" style="display: none;"></div>
+	<div data-dojo-attach-point="containerNode" class="dijitTreeNodeContainer" role="presentation"
+		 style="display: none;" aria-labelledby="${id}_label"></div>
 </div>

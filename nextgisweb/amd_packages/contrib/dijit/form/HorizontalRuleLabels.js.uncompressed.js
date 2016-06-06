@@ -82,6 +82,7 @@ define("dijit/form/HorizontalRuleLabels", [
 			}
 			// if the labels were not specified directly and not as <li> children, then calculate numeric labels
 			if(!labels.length && this.count > 1){
+				labels = [];	// avoid modifying labels[] array in the prototype
 				var start = this.minimum;
 				var inc = (this.maximum - start) / (this.count - 1);
 				for(var i = 0; i < this.count; i++){
