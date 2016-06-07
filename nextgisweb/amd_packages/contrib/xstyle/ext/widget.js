@@ -1,7 +1,11 @@
-define(['../elemental'], function(elemental){
+define(['dojo/Deferred'], function(Deferred){
 	var nextId = 0;
+	var literals = {
+		'true': true,
+		'false': false,
+		'null': null
+	};
 	function parse(value, callback, type, rule){
-		var Class, prototype;
 		if(rule){
 			var widgetCssClass = 'x-widget-' + nextId++; 
 			// create new rule for the generated elements
@@ -27,7 +31,7 @@ define(['../elemental'], function(elemental){
 				if(window[type]){
 					classLoaded(window[type]);
 				}
-				require(type.split(/\s*,\s*/), classLoaded); 
+				require(typeof type == 'string' ? type.split(/\s*,\s*/) : type, classLoaded); 
 				function classLoaded(Class, Mixin){
 					if(Mixin){
 						// more than one, mix them together
@@ -49,18 +53,22 @@ define(['../elemental'], function(elemental){
 					}
 					callback(function(element){
 						var widget = new Class(props, element);
-						widget.domNode.className += widgetCssClass;
+						if(widgetCssClass){
+							widget.domNode.className += ' ' + widgetCssClass;
+						}
 					});
 				}
-			}else{
+			}else if(callback){
 				console.error("No type defined for widget");
 			}
-		}else if(value.splice){
-			// an array
+		}else if(typeof value == 'object'){
+			// an array or object
 		}else if(value.charAt(0) == "'" || value.charAt(0) == '"'){
 			value = eval(value);
 		}else if(!isNaN(value)){
 			value = +value;
+		}else if(literals.hasOwnProperty(value)){
+			value = literals[value];
 		}
 		return value;
 	}
@@ -105,7 +113,7 @@ define(['../elemental'], function(elemental){
 	Widget.widget = def.widget;
 	Widget.role = def.role;
 	return {
-		onProperty: function(name, value, rule){
+		put: function(value, rule){
 			// used for a widget property:
 			//	widget: {
 			//		type: 'dijit/form/Button';
@@ -113,13 +121,20 @@ define(['../elemental'], function(elemental){
 			//	}
 			return {
 				then: function(callback){
-					parse(value[1].eachProperty ? value[1] : rule, function(renderer){
-						elemental.addRenderer(name, value, rule, renderer);
-						callback();
-					}, typeof value == "string" && value, rule); 
+					var deferred = new Deferred();
+					parse(value[0].eachProperty ? value[0] : rule, function(renderer){
+						deferred.resolve({
+							forElement: function(element){
+								renderer(element);
+							}
+						});
+					}, typeof value == 'string' && value, rule);
+					return deferred.then(callback);
 				}
-			}
-		}/*,
+			};
+		},
+		parse: parse
+		/*,
 		onFunction: function(name, propertyName, value){
 			// this allows us to create a CSS widget function
 			// x-property{
@@ -130,7 +145,7 @@ define(['../elemental'], function(elemental){
 			//	}
 			return function(name, propertyValue){
 				require([value], function(Class){
-					elemental.addRenderer(rule, function(element){
+					xstyle.addRenderer(rule, function(element){
 						new Class(parse(propertyValue), element);
 					});
 				});
