@@ -334,8 +334,10 @@ define([
         },
 
         _responsePopup: function (response, point, layerLabels) {
-            // TODO: Проверить, есть ли какой-нибудь результат
-            // и показывать popup только если он есть.
+            if (response.featureCount == 0) {
+                this._popup.setPosition(undefined);
+                return;
+            }
 
             domConstruct.empty(this._popup.contentDiv);
 
