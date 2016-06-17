@@ -569,3 +569,74 @@ table {
 .map-logo {
   display: block;
 }
+/* Authorization */
+.auth-form {
+  width: 350px;
+  padding: 33px 25px 36px;
+  text-align: center;
+  background: #fff;
+  position: relative;
+  box-sizing: border-box;
+  margin: 0 auto;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+.auth-form__pic {
+  position: relative;
+  color: black;
+  width: 64px;
+  margin-top: -5px;
+}
+.auth-form__title {
+  font-size: 26px;
+  margin-top: 0px;
+  margin-bottom: 25px;
+}
+.auth-form__btn {
+  margin-top: 5px;
+  font-size: 18px;
+  background-color: #036997;
+  padding: 0 2.5em;
+  height: 42px;
+  line-height: 42px;
+}
+.auth-form__error {
+  padding: 4px;
+  color: red;
+  text-align: center;
+  border: 1px solid red;
+  margin-bottom: 20px;
+}
+/* Forms */
+.pure-control-group {
+  margin-bottom: 20px;
+}
+.pure-form input[type=text],
+.pure-form input[type=password],
+.pure-form input[type=email],
+.pure-form input[type=url],
+.pure-form input[type=date],
+.pure-form input[type=month],
+.pure-form input[type=time],
+.pure-form input[type=datetime],
+.pure-form input[type=datetime-local],
+.pure-form input[type=week],
+.pure-form input[type=number],
+.pure-form input[type=search],
+.pure-form input[type=tel] {
+  line-height: 40px;
+  padding: 0 10px;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-border-radius: 0;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 0;
+  -moz-background-clip: padding;
+  border-radius: 0;
+  background-clip: padding-box;
+  font-size: 16px;
+  width: 100%;
+}
