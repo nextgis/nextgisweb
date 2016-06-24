@@ -2,11 +2,11 @@
 
 .. _ngw_file_upload:
 
-file_upload component
+File upload
 =====================
 
-File upload
---------------
+Single file upload
+-------------------
 
 For file upload following request exists:
 
@@ -48,7 +48,7 @@ If request succeeded the uploaded file details will be returned:
       ]
     }
 
-Several files upload
+Multiple files upload
 --------------------------
 
 For several files upload following request exists:
