@@ -39,7 +39,8 @@ def setup_pyramid(comp, config):
                     raise NoResultFound()
 
             except NoResultFound:
-                return dict(error=_("Invalid login or password!"))
+                return dict(error=request.localizer.translate(
+                    _("Invalid login or password!")))
 
         return dict()
 
