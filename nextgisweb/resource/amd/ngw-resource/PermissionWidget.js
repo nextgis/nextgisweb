@@ -271,6 +271,22 @@ define([
                 }
             }));
 
+            this.grid.on("dgrid-sort", lang.hitch(this, function(event) {
+                var sort = event.sort[0];
+                if (sort.attribute == "principal") {
+                    event.preventDefault();
+                    this.grid.set("sort", lang.hitch(this, function(a, b) {
+                        var aname = this.grid.principalStore.get(a.principal.id).display_name;
+                        var bname = this.grid.principalStore.get(b.principal.id).display_name;
+
+                        if (aname > bname) return sort.descending ? -1 : 1;
+                        else if (aname < bname) return sort.descending ? 1 : -1;
+                        else return 0;
+                    }));
+                    this.grid.updateSortArrow(event.sort, true);
+                }
+            }));
+
             this.grid.on(".dgrid-row:dblclick", lang.hitch(this, this.itemEdit));
         },
 
