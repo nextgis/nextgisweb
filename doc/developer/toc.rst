@@ -4,13 +4,12 @@
 
 .. _ngw_api_description:
 
-API description
-===============
+REST API description
+====================
 
 .. toctree::
    :maxdepth: 2
 
-   component
    auth
    resource
    create
