@@ -725,12 +725,6 @@ define([
         },
 
         _toolsSetup: function () {
-            this.addTool(new ToolBase({
-                display: this,
-                label: i18n.gettext("Pan"),
-                iconClass: "iconPan"
-            }));
-
             this.addTool(new ToolZoom({display: this, out: false}));
             this.addTool(new ToolZoom({display: this, out: true}));
 
