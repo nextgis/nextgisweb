@@ -8,6 +8,7 @@ Update feature fields in vector layer
 
     from nextgisweb import DBSession
     from nextgisweb.vector_layer import VectorLayer
+    import transaction
 
     def update_any_field():
         # start session and transaction
