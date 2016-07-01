@@ -7,18 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-12-02 01:22+0300\n"
+"POT-Creation-Date: 2016-07-01 23:43+0700\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.0\n"
+"Generated-By: Babel 2.1.1\n"
 
-#: view.py:54 view.py:377 amd/FieldsWidget.js:146
+#: view.py:54 view.py:338 amd/FieldsWidget.js:146
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -27,19 +28,19 @@ msgstr "Таблица объектов"
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:374
+#: view.py:335
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: view.py:383
+#: view.py:344
 msgid "Download as GeoJSON"
 msgstr "Загрузить GeoJSON"
 
-#: view.py:388
+#: view.py:349
 msgid "Download as CSV"
 msgstr "Загрузить CSV"
 
-#: view.py:395 amd/FeatureEditorWidget.js:178 amd/FieldsDisplayWidget.js:31
+#: view.py:356 amd/FeatureEditorWidget.js:178 amd/FieldsDisplayWidget.js:31
 #: amd/FieldsWidget.js:109
 msgid "Attributes"
 msgstr "Атрибуты"
@@ -47,6 +48,14 @@ msgstr "Атрибуты"
 #: amd/FeatureEditorWidget.js:244
 msgid "Save"
 msgstr "Сохранить"
+
+#: amd/FeatureGrid.js:213
+msgid "Confirmation"
+msgstr "Подтверждение"
+
+#: amd/FeatureGrid.js:214
+msgid "Delete feature?"
+msgstr "Удалить объект?"
 
 #: amd/FieldsDisplayWidget.js:101
 msgid "N/A"
@@ -84,7 +93,11 @@ msgstr "Открыть"
 msgid "Edit"
 msgstr "Редактировать"
 
-#: amd/template/FeatureGrid.hbs:21
+#: amd/template/FeatureGrid.hbs:20
+msgid "Delete"
+msgstr "Удалить"
+
+#: amd/template/FeatureGrid.hbs:25
 msgid "Search..."
 msgstr "Поиск..."
 

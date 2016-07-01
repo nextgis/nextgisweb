@@ -4,6 +4,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "dijit/ConfirmDialog",
     "dojo/text!./template/FeatureGrid.hbs",
     // dgrid & plugins
     "dgrid/OnDemandGrid",
@@ -36,6 +37,7 @@ define([
     BorderContainer,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    ConfirmDialog,
     template,
     // dgrid & plugins
     OnDemandGrid,
@@ -100,10 +102,12 @@ define([
             this.watch("selectedRow", lang.hitch(this, function (attr, oldVal, newVal) {
                 this.btnOpenFeature.set("disabled", newVal == null);
                 this.btnUpdateFeature.set("disabled", newVal == null);
+                this.btnDeleteFeature.set("disabled", newVal == null);
             }));
 
             this.btnOpenFeature.on("click", lang.hitch(this, this.openFeature));
             this.btnUpdateFeature.on("click", lang.hitch(this, this.updateFeature));
+            this.btnDeleteFeature.on("click", lang.hitch(this, this.deleteFeature));
 
             if (this.likeSearch) {
                 // Поиск нужен, настраиваем обработчики строки поиска
@@ -199,6 +203,27 @@ define([
                 id: this.layerId,
                 feature_id: this.get("selectedRow").id
             }));
+        },
+
+        deleteFeature: function() {
+            var widget = this;
+            var fid = this.get("selectedRow").id;
+
+            var confirmDlg = new ConfirmDialog({
+                title: i18n.gettext("Confirmation"),
+                content: i18n.gettext("Delete feature?"),
+                style: "width: 300px"
+            });
+
+            confirmDlg.on("execute", lang.hitch(this, function() {
+                xhr(route.feature_layer.feature.item({
+                    id: this.layerId,
+                    fid: fid}), {
+                        method: "DELETE"
+                    }
+                ).then(function () { widget._grid.refresh(); });
+            }));
+            confirmDlg.show();
         },
 
 
