@@ -11,3 +11,4 @@
    resource
    i18n
    file_upload
+   snippets
