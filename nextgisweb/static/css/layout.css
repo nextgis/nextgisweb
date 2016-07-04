@@ -738,6 +738,7 @@ table {
 .pure-form input[type=number],
 .pure-form input[type=search],
 .pure-form input[type=tel] {
+  height: 40px;
   line-height: 40px;
   padding: 0 10px;
   -webkit-box-shadow: none;
