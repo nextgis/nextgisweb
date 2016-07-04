@@ -20,11 +20,11 @@
     </tr>
 </tbody></table>
 
-<table class="pure-table pure-table-horizontal" style="width: 100%">
+<table class="pure-table pure-table-horizontal">
     <thead><tr>
         <th style="width: 2em; text-align: inherit;">#</th>
-        <th style="width: 20em; text-align: inherit;">${tr(_('Layer'))}</th>
-        <th style="width: auto; text-align: inherit;">${tr(_('Title'))}</th>
+        <th style="width: 30%; text-align: inherit;">${tr(_('Layer'))}</th>
+        <th style="width: 70%; text-align: inherit;">${tr(_('Title'))}</th>
     </tr></thead>
 
     %for idx, l in enumerate(capcache['layers'], start=1):

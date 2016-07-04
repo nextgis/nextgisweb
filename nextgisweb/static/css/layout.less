@@ -1,6 +1,3 @@
-@import "mixin.less";
-@import "fontello.css";
-
 /* -- Variables -- */
 @screen-sm-min: 768px;
 @screen-md-min: 1024px;
@@ -11,7 +8,7 @@
 @text-color: #212121;
 @light-text: #aaa;
 @light-text-2: #888;
-@blue: #176FC1;
+@blue: #1260a9;
 @darkBlue: #036997;
 @lightBlue: #B0D0DE;
 @lightBlue-2: #EEF4F7;
@@ -26,6 +23,12 @@
 @header-font:  "Roboto Condensed";
 
 @font-size-md: 16px;
+
+/* Import */
+
+@import "mixin";
+@import "material-icons";
+@import "fontello.css";
 
 /* -- BASE STYLES -- */
 @font-face {
@@ -50,7 +53,7 @@ body, html{
 }
 
 body {
-    font-size: 13px; 
+    font-size: 14px; 
     line-height: 1.54;
     color: @text-color;
     background-color: @bgColor;
@@ -59,13 +62,11 @@ body {
 
 a{
     color: @blue;
-    .transition(color .3s, border-color .3s);
 }
     a:hover{
         color: #3FB4E2;
         border-color: #3FB4E2;
         border-color: fade(#3FB4E2, 40%);
-        .transition(none);
     }
 
 h1, h2, h3,
@@ -81,12 +82,12 @@ h1, .h1{
 }
 
 h2, .h2{
-    font-size: 18px;
+    font-size: 20px;
     color: @text-color;
     border-bottom:0;
     margin-top: 35px;
     padding-bottom:0;
-    margin-bottom: 13px;
+    margin-bottom: 18px;
     
     &:first-child{
         margin-top:0;
@@ -117,15 +118,24 @@ h2, .h2{
     float: left;
 }
 /* -- Icons --*/
-[class^="icon-"]:before, 
-[class*=" icon-"]:before{
-    color: inherit;
-    margin-left:0;
-    margin-right:0;
+[class^="icon-"], 
+[class*=" icon-"]{
+    text-decoration: none;
+    &:before{
+        color: inherit;
+        margin-left:0;
+        margin-right:0;
+    }
 }
 a:hover [class^="icon-"]:before, 
-a:hover [class*=" icon-"]:before{
+a:hover [class*=" icon-"]:before,
+a[class^="icon-"]:hover:before, 
+a[class*=" icon-"]:hover:before,{
     color:@yellow;
+}
+
+.icon-viewMap:before{
+    font-family: "fontello";
 }
 
 .middle-text{
@@ -303,20 +313,20 @@ table{
     }
     
     th{
-        font-weight: normal;
+        font-weight: bold;
         color: @light-text;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-        padding-bottom: .35em;
-        padding-top: 6px;
-        padding-bottom: 5px;        
+        color: rgba(33, 33, 33, 0.86);
+        //padding-bottom: .35em;
+        //padding-top: 6px;
+        //padding-bottom: 5px;        
     }
     
     td,th{
         border-bottom: 1px solid @light-border;
         .transition(background-color .4s);
-        vertical-align: top;
+        vertical-align: middle;
         border-left:0;
+        padding: .8em 1em;
     }
     
      tbody{
@@ -330,6 +340,14 @@ table{
             &:hover td,
             &:hover th{
                 background-color: #f8f8f8;
+            }
+         }
+
+         & + thead{
+            tr{
+                th, td{
+                    padding-top: 20px;
+                }
             }
          }
     }
@@ -449,6 +467,26 @@ table{
 
         p:first-child{
             margin-top:0;
+        }
+
+        & > .pure-table-horizontal{
+            margin-left: -20px;
+            margin-right: -20px;
+            width: auto;
+
+            td, th{
+                &:first-child{
+                    padding-left: 24px;
+                }
+
+                &:last-child{
+                    padding-right: 24px;
+                }
+            }
+
+            &:last-child{
+                margin-bottom: -10px;
+            }
         }
     }
     
@@ -698,4 +736,30 @@ table{
     .border-radius(0);
     font-size: 16px;
     width: 100%;
+}
+
+/* Children table */
+
+.children-table__name__link{
+    display: block;
+    text-decoration: none;
+
+    &:hover{
+        text-decoration: none;
+        color: @black;
+    }
+}
+
+.children-table__action{
+    line-height: 1;
+    white-space: nowrap;
+    text-align: right;
+
+    .material-icons{
+        vertical-align: middle;
+
+        &:before{
+            vertical-align: top;
+        }
+    }
 }

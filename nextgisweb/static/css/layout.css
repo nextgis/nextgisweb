@@ -1,5 +1,83 @@
 @import "fontello.css";
 /* -- Variables -- */
+/* Import */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../font/MaterialIcons-Regular.eot);
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url(../font/MaterialIcons-Regular.woff2) format('woff2'), url(../font/MaterialIcons-Regular.woff) format('woff'), url(../font/MaterialIcons-Regular.ttf) format('truetype');
+  
+  /* For IE6-8 */
+}
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  color: #999;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+/* Icons in :before */
+/* Icons */
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+  display: inline-block;
+}
+.material-icons:before {
+  font-family: 'Material Icons';
+  display: inline-block;
+}
+.material-icons.icon-exitToApp:before {
+  content: "\E879";
+}
+.material-icons.icon-personOutline:before {
+  content: "\E7FF";
+}
+.material-icons.icon-close:before {
+  content: "\E5CD";
+}
+.material-icons.icon-errorOutline:before {
+  content: "\E001";
+}
+.material-icons.icon-addAPhoto:before {
+  content: "\E439";
+}
+.material-icons.icon-menu:before {
+  content: "\E5D2";
+}
+.material-icons.icon-edit:before {
+  content: "\E3C9";
+  font-size: .95em;
+  line-height: 1.05em;
+  vertical-align: top;
+}
+.material-icons.icon-caret:before {
+  content: "\E5C5";
+}
+.material-icons.icon-caretUp:before {
+  content: "\E5C7";
+}
+.material-icons.icon-loupe:before {
+  content: "\E8B6";
+}
 /* -- BASE STYLES -- */
 @font-face {
   font-family: "Roboto";
@@ -31,27 +109,19 @@ html {
   font-family: "Roboto";
 }
 body {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.54;
   color: #212121;
   background-color: #fafafa;
   min-width: 900px;
 }
 a {
-  color: #176fc1;
-  -webkit-transition: color 0.3s, border-color 0.3s;
-  -moz-transition: color 0.3s, border-color 0.3s;
-  -o-transition: color 0.3s, border-color 0.3s;
-  transition: color 0.3s, border-color 0.3s;
+  color: #1260a9;
 }
 a:hover {
   color: #3FB4E2;
   border-color: #3FB4E2;
   border-color: rgba(63, 180, 226, 0.4);
-  -webkit-transition: none;
-  -moz-transition: none;
-  -o-transition: none;
-  transition: none;
 }
 h1,
 h2,
@@ -70,12 +140,12 @@ h1,
 }
 h2,
 .h2 {
-  font-size: 18px;
+  font-size: 20px;
   color: #212121;
   border-bottom: 0;
   margin-top: 35px;
   padding-bottom: 0;
-  margin-bottom: 13px;
+  margin-bottom: 18px;
 }
 h2:first-child,
 .h2:first-child {
@@ -102,6 +172,10 @@ h2:first-child,
   float: left;
 }
 /* -- Icons --*/
+[class^="icon-"],
+[class*=" icon-"] {
+  text-decoration: none;
+}
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
   color: inherit;
@@ -109,8 +183,13 @@ h2:first-child,
   margin-right: 0;
 }
 a:hover [class^="icon-"]:before,
-a:hover [class*=" icon-"]:before {
+a:hover [class*=" icon-"]:before,
+a[class^="icon-"]:hover:before,
+a[class*=" icon-"]:hover:before {
   color: #ffba3f;
+}
+.icon-viewMap:before {
+  font-family: "fontello";
 }
 .middle-text {
   font-size: 16px;
@@ -252,13 +331,9 @@ table {
   padding-top: 0;
 }
 .pure-table th {
-  font-weight: normal;
+  font-weight: bold;
   color: #aaaaaa;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  padding-bottom: .35em;
-  padding-top: 6px;
-  padding-bottom: 5px;
+  color: rgba(33, 33, 33, 0.86);
 }
 .pure-table td,
 .pure-table th {
@@ -267,8 +342,9 @@ table {
   -moz-transition: background-color 0.4s;
   -o-transition: background-color 0.4s;
   transition: background-color 0.4s;
-  vertical-align: top;
+  vertical-align: middle;
   border-left: 0;
+  padding: .8em 1em;
 }
 .pure-table tbody th {
   text-transform: none;
@@ -279,6 +355,10 @@ table {
 .pure-table tbody tr:hover td,
 .pure-table tbody tr:hover th {
   background-color: #f8f8f8;
+}
+.pure-table tbody + thead tr th,
+.pure-table tbody + thead tr td {
+  padding-top: 20px;
 }
 .pure-table.pure-table-horizontal tbody > tr:last-child > td,
 .pure-table.pure-table-horizontal tbody > tr:last-child > th {
@@ -379,6 +459,22 @@ table {
 .content-box p:first-child {
   margin-top: 0;
 }
+.content-box > .pure-table-horizontal {
+  margin-left: -20px;
+  margin-right: -20px;
+  width: auto;
+}
+.content-box > .pure-table-horizontal td:first-child,
+.content-box > .pure-table-horizontal th:first-child {
+  padding-left: 24px;
+}
+.content-box > .pure-table-horizontal td:last-child,
+.content-box > .pure-table-horizontal th:last-child {
+  padding-right: 24px;
+}
+.content-box > .pure-table-horizontal:last-child {
+  margin-bottom: -10px;
+}
 .lt-ie9 .content-box {
   border: 1px solid #efefef;
 }
@@ -425,6 +521,22 @@ table {
 .sidebar-menu p:first-child {
   margin-top: 0;
 }
+.sidebar-menu > .pure-table-horizontal {
+  margin-left: -20px;
+  margin-right: -20px;
+  width: auto;
+}
+.sidebar-menu > .pure-table-horizontal td:first-child,
+.sidebar-menu > .pure-table-horizontal th:first-child {
+  padding-left: 24px;
+}
+.sidebar-menu > .pure-table-horizontal td:last-child,
+.sidebar-menu > .pure-table-horizontal th:last-child {
+  padding-right: 24px;
+}
+.sidebar-menu > .pure-table-horizontal:last-child {
+  margin-bottom: -10px;
+}
 .sidebar-menu__heading {
   font-size: 14px;
   line-height: 1.25;
@@ -468,9 +580,9 @@ table {
   transition: opacity 0.2s;
 }
 .sidebar-menu__link:hover {
-  color: #176fc1;
-  border-bottom-color: #176fc1;
-  border-bottom-color: rgba(23, 111, 193, 0.4);
+  color: #1260a9;
+  border-bottom-color: #1260a9;
+  border-bottom-color: rgba(18, 96, 169, 0.4);
 }
 .sidebar-menu__link:hover:after {
   zoom: 1;
@@ -480,7 +592,7 @@ table {
   opacity: 1;
 }
 .sidebar-menu__item--selected .sidebar-menu__link {
-  color: #176fc1;
+  color: #1260a9;
   font-weight: bold;
 }
 .lt-ie9 .sidebar-menu__link:after {
@@ -536,9 +648,9 @@ table {
   border-bottom: 1px solid #e9e9e9;
 }
 .path__link:hover {
-  color: #176fc1;
-  border-bottom-color: #176fc1;
-  border-bottom-color: rgba(23, 111, 193, 0.4);
+  color: #1260a9;
+  border-bottom-color: #1260a9;
+  border-bottom-color: rgba(18, 96, 169, 0.4);
 }
 /* -- Permission --*/
 .permission-label {
@@ -639,4 +751,24 @@ table {
   background-clip: padding-box;
   font-size: 16px;
   width: 100%;
+}
+/* Children table */
+.children-table__name__link {
+  display: block;
+  text-decoration: none;
+}
+.children-table__name__link:hover {
+  text-decoration: none;
+  color: #000000;
+}
+.children-table__action {
+  line-height: 1;
+  white-space: nowrap;
+  text-align: right;
+}
+.children-table__action .material-icons {
+  vertical-align: middle;
+}
+.children-table__action .material-icons:before {
+  vertical-align: top;
 }

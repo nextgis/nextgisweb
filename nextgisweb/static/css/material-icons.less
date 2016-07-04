@@ -1,0 +1,91 @@
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../font/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+       local('MaterialIcons-Regular'),
+       url(../font/MaterialIcons-Regular.woff2) format('woff2'),
+       url(../font/MaterialIcons-Regular.woff) format('woff'),
+       url(../font/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  color: #999;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+/* Icons in :before */
+
+/* Icons */
+[class^="icon-"], [class*=" icon-"]{
+    &:before{
+        display: inline-block;
+    }
+}
+.material-icons{
+    &:before{
+        font-family: 'Material Icons';
+        display: inline-block;
+    }
+    &.icon-exitToApp:before{
+        content:"\E879";
+    }
+
+    &.icon-personOutline:before{
+        content:"\E7FF";
+    }
+
+    &.icon-close:before{
+        content:"\E5CD";
+    }
+
+    &.icon-errorOutline:before{
+        content:"\E001";
+    }
+
+    &.icon-addAPhoto:before{
+        content:"\E439";
+    }
+    &.icon-menu:before{
+        content:"\E5D2";
+    }
+    &.icon-edit:before{
+        content:"\E3C9";
+        font-size: .95em;
+        line-height: 1.05em;
+        vertical-align: top; 
+    }
+    &.icon-caret:before{
+        content:"\E5C5";
+    }
+    &.icon-caretUp:before{
+        content:"\E5C7";
+    }
+    &.icon-loupe:before{
+        content:"\E8B6";
+    }
+}

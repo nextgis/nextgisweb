@@ -1,5 +1,5 @@
 <% permsets = obj.permission_sets(request.user) %>
-<table class="pure-table pure-table-horizontal" style="width: 100%">
+<table class="pure-table pure-table-horizontal">
     %for k, scope in obj.scope.iteritems():
         <thead><tr>
             <th style="width: 70%; text-align: inherit;">${tr(scope.label)}</th>
