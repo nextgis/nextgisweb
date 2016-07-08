@@ -7,6 +7,8 @@ from pkg_resources import resource_filename
 
 from ..component import Component, require
 from ..auth import User
+from ..models import DBSession
+from .. import db
 
 from .model import Base, WebMap, WebMapItem
 from .adapter import WebMapAdapter
@@ -62,6 +64,12 @@ class WebMapComponent(Component):
                 for i in WebMapAdapter.registry
             )
         )
+
+    def query_stat(self):
+        query_item_type = DBSession.query(
+            WebMapItem.item_type, db.func.count(WebMapItem.id)
+        ).group_by(WebMapItem.item_type)
+        return dict(item_type=dict(query_item_type.all()))
 
     settings_info = (
         dict(key='basemaps', desc="Файл с описанием базовых слоёв"),
