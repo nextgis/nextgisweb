@@ -6,6 +6,7 @@ import os.path
 from urllib2 import unquote
 
 from pyramid.response import Response, FileResponse
+from pyramid.httpexceptions import HTTPForbidden
 
 from ..package import pkginfo
 
@@ -75,8 +76,9 @@ def pkg_version(request):
     return dict([(p, pkginfo.pkg_version(p)) for p in pkginfo.packages])
 
 
-def stat(request):
-    # TODO: Security
+def statistics(request):
+    if not request.user.is_administrator:
+        raise HTTPForbidden("Membership in group 'administrators' required!")
     result = dict()
     for comp in request.env._components.values():
         if hasattr(comp, 'query_stat'):
@@ -102,6 +104,6 @@ def setup_pyramid(comp, config):
     ).add_view(pkg_version, renderer='json')
 
     config.add_route(
-        'pyramid.stat',
-        '/api/component/pyramid/stat',
-    ).add_view(stat, renderer='json')
+        'pyramid.statistics',
+        '/api/component/pyramid/statistics',
+    ).add_view(statistics, renderer='json')
