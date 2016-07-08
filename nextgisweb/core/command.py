@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
 from os.path import join as pthjoin
 from datetime import datetime
+import json
 import transaction
 
 from ..command import Command
@@ -85,3 +87,21 @@ class RestoreCommand(Command):
     @classmethod
     def execute(cls, args, env):
         restore(env, args.source)
+
+
+@Command.registry.register
+class StatisticsCommand(Command):
+    identity = 'statistics'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        result = dict()
+        for comp in env._components.values():
+            if hasattr(comp, 'query_stat'):
+                result[comp.identity] = comp.query_stat()
+
+        print(json.dumps(result, ensure_ascii=False, indent=2).encode('utf-8'))
