@@ -12,7 +12,7 @@
         </thead>
         <tbody>
             %for obj in obj_list:
-                <tr>
+                <tr class="${'text-muted' if obj.disabled else ''}">
                     <td>${obj.id}</td>
                     <td>${obj.display_name}</td>
                     <td>${obj.keyname}</td>
