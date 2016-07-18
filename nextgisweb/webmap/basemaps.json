@@ -49,7 +49,7 @@
         "mid": "ngw/openlayers/layer/XYZ"
     },
     "layer": {
-        "title": "Blank",
+        "title": "None",
         "visible": false
     },
     "source": {}
