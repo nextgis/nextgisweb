@@ -211,6 +211,18 @@ Create vector layer
         }
       }
     }
+    
+Same steps with curl:
+
+.. sourcecode:: bash
+   
+   $ curl -F file=@/tmp/bld.zip http://<ngw url>/api/component/file_upload/upload
+
+   {"upload_meta": [{"id": "00cc4aa9-cca7-4160-b069-58070dff9399", "name": "bld.zip", "mime_type": "application/octet-stream", "size": 62149}]}
+
+   $ curl -u administrator:admin -H "Content-Type: application/json" -X POST -d '{"resource": {"cls": "vector_layer","description": "test curl create", "display_name": "buildings","keyname": null,"parent": {"id": 0}},"vector_layer": {"source": {"encoding": "utf-8","id": "00cc4aa9-cca7-4160-b069-58070dff9399","mime_type": "application/zip","name": "bld.zip","size": 62149},"srs": {"id": 3857}}}' http://<ngw url>/api/resource/
+
+   {"id": 108, "parent": {"id": 0}}
 
 Raster layer
 ------------
