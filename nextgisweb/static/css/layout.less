@@ -362,6 +362,10 @@ table{
     &.pure-table-horizontal tbody>tr:last-child>th{
         border-bottom:0;
     }
+
+    & + &{
+        margin-top: 20px;
+    }
 }
 
 .table-keyvalue{
@@ -475,23 +479,26 @@ table{
             margin-top:0;
         }
 
-        & > .pure-table-horizontal{
+        & > .table-wrapper{        
             margin-left: -20px;
             margin-right: -20px;
-            width: auto;
 
-            td, th{
-                &:first-child{
-                    padding-left: 24px;
+            & > .pure-table-horizontal{
+                width: 100%;
+
+                td, th{
+                    &:first-child{
+                        padding-left: 24px;
+                    }
+
+                    &:last-child{
+                        padding-right: 24px;
+                    }
                 }
 
                 &:last-child{
-                    padding-right: 24px;
+                    margin-bottom: -10px;
                 }
-            }
-
-            &:last-child{
-                margin-bottom: -10px;
             }
         }
     }
@@ -770,3 +777,61 @@ table{
         }
     }
 }
+
+/* Sorted table */
+.sort-header{
+    white-space: nowrap;
+    cursor: pointer;
+    /*&:after{
+        &:extend(.material-icons);
+        position: relative;
+        font-size: 16px;
+        width: 16px;
+        height: 18px;
+        color: rgba(0,0,0,.26);
+        margin-left: 5px;
+        vertical-align: middle;
+        content:"\e804";
+        .transition(opacity .2s, transform .2s);
+        font-family: "fontello";
+    }*/
+    &:after{
+        &:extend(.material-icons);
+        position: relative;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: inherit;
+        margin-left: 5px;
+        vertical-align: middle;
+        content:"\e5D8";
+        .opacity(0);
+        .transition(opacity .2s, transform .2s);
+        //font-family: "fontello";
+    }
+    
+    &:hover{
+        &:after{
+            color: inherit;
+            .opacity(.5);
+        }
+    }
+}
+    .sort-down,
+    .sort-up,
+    .sort-down:hover,
+    .sort-up:hover{
+        &:after{
+            content:"\E5D8";
+            color: inherit;
+            font-family: "Material Icons";
+            font-size: 16px;
+            .opacity(1);
+        }
+    }
+
+    .sort-up{
+        &:after{
+            .transform(rotate(-180deg));
+        }
+    }

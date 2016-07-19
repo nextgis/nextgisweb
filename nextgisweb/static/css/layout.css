@@ -10,7 +10,8 @@
   
   /* For IE6-8 */
 }
-.material-icons {
+.material-icons,
+.sort-header:after {
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
@@ -77,6 +78,12 @@
 }
 .material-icons.icon-loupe:before {
   content: "\E8B6";
+}
+.material-icons.icon-arrowDownward:before {
+  content: "\E5DB";
+}
+.material-icons.icon-arrowUpward:before {
+  content: "\E5D8";
 }
 /* -- BASE STYLES -- */
 @font-face {
@@ -372,6 +379,9 @@ table {
 .pure-table.pure-table-horizontal tbody > tr:last-child > th {
   border-bottom: 0;
 }
+.pure-table + .pure-table {
+  margin-top: 20px;
+}
 .table-keyvalue {
   margin-bottom: 30px;
 }
@@ -467,20 +477,22 @@ table {
 .content-box p:first-child {
   margin-top: 0;
 }
-.content-box > .pure-table-horizontal {
+.content-box > .table-wrapper {
   margin-left: -20px;
   margin-right: -20px;
-  width: auto;
 }
-.content-box > .pure-table-horizontal td:first-child,
-.content-box > .pure-table-horizontal th:first-child {
+.content-box > .table-wrapper > .pure-table-horizontal {
+  width: 100%;
+}
+.content-box > .table-wrapper > .pure-table-horizontal td:first-child,
+.content-box > .table-wrapper > .pure-table-horizontal th:first-child {
   padding-left: 24px;
 }
-.content-box > .pure-table-horizontal td:last-child,
-.content-box > .pure-table-horizontal th:last-child {
+.content-box > .table-wrapper > .pure-table-horizontal td:last-child,
+.content-box > .table-wrapper > .pure-table-horizontal th:last-child {
   padding-right: 24px;
 }
-.content-box > .pure-table-horizontal:last-child {
+.content-box > .table-wrapper > .pure-table-horizontal:last-child {
   margin-bottom: -10px;
 }
 .lt-ie9 .content-box {
@@ -529,20 +541,22 @@ table {
 .sidebar-menu p:first-child {
   margin-top: 0;
 }
-.sidebar-menu > .pure-table-horizontal {
+.sidebar-menu > .table-wrapper {
   margin-left: -20px;
   margin-right: -20px;
-  width: auto;
 }
-.sidebar-menu > .pure-table-horizontal td:first-child,
-.sidebar-menu > .pure-table-horizontal th:first-child {
+.sidebar-menu > .table-wrapper > .pure-table-horizontal {
+  width: 100%;
+}
+.sidebar-menu > .table-wrapper > .pure-table-horizontal td:first-child,
+.sidebar-menu > .table-wrapper > .pure-table-horizontal th:first-child {
   padding-left: 24px;
 }
-.sidebar-menu > .pure-table-horizontal td:last-child,
-.sidebar-menu > .pure-table-horizontal th:last-child {
+.sidebar-menu > .table-wrapper > .pure-table-horizontal td:last-child,
+.sidebar-menu > .table-wrapper > .pure-table-horizontal th:last-child {
   padding-right: 24px;
 }
-.sidebar-menu > .pure-table-horizontal:last-child {
+.sidebar-menu > .table-wrapper > .pure-table-horizontal:last-child {
   margin-bottom: -10px;
 }
 .sidebar-menu__heading {
@@ -780,4 +794,70 @@ table {
 }
 .children-table__action .material-icons:before {
   vertical-align: top;
+}
+/* Sorted table */
+.sort-header {
+  white-space: nowrap;
+  cursor: pointer;
+  /*&:after{
+        &:extend(.material-icons);
+        position: relative;
+        font-size: 16px;
+        width: 16px;
+        height: 18px;
+        color: rgba(0,0,0,.26);
+        margin-left: 5px;
+        vertical-align: middle;
+        content:"\e804";
+        .transition(opacity .2s, transform .2s);
+        font-family: "fontello";
+    }*/
+}
+.sort-header:after {
+  position: relative;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: inherit;
+  margin-left: 5px;
+  vertical-align: middle;
+  content: "\e5D8";
+  zoom: 1;
+  filter: alpha(opacity=0);
+  -webkit-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+  -webkit-transition: opacity 0.2s, -webkit-transform 0.2s;
+  -moz-transition: opacity 0.2s, -moz-transform 0.2s;
+  -o-transition: opacity 0.2s, -o-transform 0.2s;
+  transition: opacity 0.2s,-webkit-transform 0.2s,-moz-transform 0.2s,-o-transform 0.2s,transform 0.2s;
+}
+.sort-header:hover:after {
+  color: inherit;
+  zoom: 1;
+  filter: alpha(opacity=50);
+  -webkit-opacity: 0.5;
+  -moz-opacity: 0.5;
+  opacity: 0.5;
+}
+.sort-down:after,
+.sort-up:after,
+.sort-down:hover:after,
+.sort-up:hover:after {
+  content: "\E5D8";
+  color: inherit;
+  font-family: "Material Icons";
+  font-size: 16px;
+  zoom: 1;
+  filter: alpha(opacity=100);
+  -webkit-opacity: 1;
+  -moz-opacity: 1;
+  opacity: 1;
+}
+.sort-up:after {
+  -webkit-transform: rotate(-180deg);
+  -moz-transform: rotate(-180deg);
+  -o-transform: rotate(-180deg);
+  -ms-transform: rotate(-180deg);
+  transform: rotate(-180deg);
 }
