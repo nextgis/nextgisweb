@@ -16,6 +16,7 @@
 @white: #fff;
 @bgColor: #fafafa;
 @light-border: #efefef;
+@light-border-2: #dedede;
 @yellow: #FFBA3F;
 @green: #00C775;
 
@@ -782,19 +783,7 @@ table{
 .sort-header{
     white-space: nowrap;
     cursor: pointer;
-    /*&:after{
-        &:extend(.material-icons);
-        position: relative;
-        font-size: 16px;
-        width: 16px;
-        height: 18px;
-        color: rgba(0,0,0,.26);
-        margin-left: 5px;
-        vertical-align: middle;
-        content:"\e804";
-        .transition(opacity .2s, transform .2s);
-        font-family: "fontello";
-    }*/
+
     &:after{
         &:extend(.material-icons);
         position: relative;
@@ -807,7 +796,6 @@ table{
         content:"\e5D8";
         .opacity(0);
         .transition(opacity .2s, transform .2s);
-        //font-family: "fontello";
     }
     
     &:hover{
@@ -822,7 +810,6 @@ table{
     .sort-down:hover,
     .sort-up:hover{
         &:after{
-            content:"\E5D8";
             color: inherit;
             font-family: "Material Icons";
             font-size: 16px;
@@ -835,3 +822,5 @@ table{
             .transform(rotate(-180deg));
         }
     }
+
+@import "override-claro";

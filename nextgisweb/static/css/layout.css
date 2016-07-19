@@ -11,7 +11,8 @@
   /* For IE6-8 */
 }
 .material-icons,
-.sort-header:after {
+.sort-header:after,
+.nextgis.claro .dgrid-sortable .dgrid-resize-header-container:after {
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
@@ -799,21 +800,9 @@ table {
 .sort-header {
   white-space: nowrap;
   cursor: pointer;
-  /*&:after{
-        &:extend(.material-icons);
-        position: relative;
-        font-size: 16px;
-        width: 16px;
-        height: 18px;
-        color: rgba(0,0,0,.26);
-        margin-left: 5px;
-        vertical-align: middle;
-        content:"\e804";
-        .transition(opacity .2s, transform .2s);
-        font-family: "fontello";
-    }*/
 }
-.sort-header:after {
+.sort-header:after,
+.nextgis.claro .dgrid-sortable .dgrid-resize-header-container:after {
   position: relative;
   font-size: 16px;
   width: 16px;
@@ -832,7 +821,8 @@ table {
   -o-transition: opacity 0.2s, -o-transform 0.2s;
   transition: opacity 0.2s,-webkit-transform 0.2s,-moz-transform 0.2s,-o-transform 0.2s,transform 0.2s;
 }
-.sort-header:hover:after {
+.sort-header:hover:after,
+.nextgis.claro .dgrid-sortable .dgrid-resize-header-container:hover:after {
   color: inherit;
   zoom: 1;
   filter: alpha(opacity=50);
@@ -843,8 +833,9 @@ table {
 .sort-down:after,
 .sort-up:after,
 .sort-down:hover:after,
-.sort-up:hover:after {
-  content: "\E5D8";
+.sort-up:hover:after,
+.nextgis.claro .dgrid-sortable .dgrid-resize-header-container.dgrid-sort-up:after,
+.nextgis.claro .dgrid-sortable .dgrid-resize-header-container.dgrid-sort-down:after {
   color: inherit;
   font-family: "Material Icons";
   font-size: 16px;
@@ -854,10 +845,36 @@ table {
   -moz-opacity: 1;
   opacity: 1;
 }
-.sort-up:after {
+.sort-up:after,
+.nextgis.claro .dgrid-sortable .dgrid-resize-header-container.dgrid-sort-down:after {
   -webkit-transform: rotate(-180deg);
   -moz-transform: rotate(-180deg);
   -o-transform: rotate(-180deg);
   -ms-transform: rotate(-180deg);
   transform: rotate(-180deg);
+}
+/* Dgrid */
+.nextgis.claro .dgrid-header,
+.nextgis.claro .dgrid-footer {
+  background: none;
+  filter: none;
+}
+.nextgis.claro .dgrid-header .dgrid-cell,
+.nextgis.claro .dgrid-footer .dgrid-cell {
+  border-color: #dedede;
+}
+.nextgis.claro .dgrid-header .dgrid-cell:hover,
+.nextgis.claro .dgrid-footer .dgrid-cell:hover {
+  background: none;
+  filter: none;
+}
+.nextgis.claro .dgrid-cell {
+  border-color: #dedede;
+}
+.nextgis.claro .dgrid-sort-arrow {
+  display: none;
+}
+.nextgis.claro .dgrid-sortable .dgrid-resize-header-container:after {
+  top: -1px;
+  margin-left: 3px;
 }
