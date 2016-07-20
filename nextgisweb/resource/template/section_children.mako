@@ -9,6 +9,8 @@
             <th style="width: 0%">&nbsp;</th>
         </tr>
     </thead>
+
+    <tbody>
     %for idx, child in enumerate(obj.children, start=1):
         <tr>
             <td>${idx}</td>
@@ -17,11 +19,15 @@
             <td>${child.owner_user}</td>
             <td class="children-table__action">
                 %if child.cls == "webmap":
-                <a class="material-icons icon-viewMap" href="${request.route_url('webmap.display', id=child.id)}" target="_blank"></a>
+                <a class="material-icons icon-viewMap" href="${request.route_url('webmap.display', id=child.id)}" target="_blank" title="${tr(_('Display map'))}"></a>
                 %endif
-                <a class="material-icons icon-edit" href="${request.route_url('resource.update', id=child.id)}"></a>
-                <a class="material-icons icon-close" href="${request.route_url('resource.delete', id=child.id)}"></a>
+                %if child.cls == "vector_layer":
+                <a class="material-icons icon-table" href="${request.route_url('feature_layer.feature.browse', id=child.id)}" title="${tr(_('Feature table'))}"></a>
+                %endif
+                <a class="material-icons icon-edit" href="${request.route_url('resource.update', id=child.id)}" title="${tr(_('Update'))}"></a>
+                <a class="material-icons icon-close" href="${request.route_url('resource.delete', id=child.id)}" title="${tr(_('Delete'))}"></a>
             </td>
         </tr>
     %endfor
+    </tbody>
 </table>
