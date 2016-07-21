@@ -127,6 +127,8 @@ def store(request):
         else:
             result.append(itm)
 
+        result.sort(key=lambda res: res['display_name'])
+
     return result
 
 
