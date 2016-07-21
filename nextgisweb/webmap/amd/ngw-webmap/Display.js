@@ -583,7 +583,7 @@ define([
                     new ol.control.ScaleLine()
                 ],
                 view: new ol.View({
-                    minZoom: 4
+                    minZoom: 3
                 })
             });
 
