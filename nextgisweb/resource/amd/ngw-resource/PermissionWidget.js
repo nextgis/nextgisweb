@@ -249,6 +249,16 @@ define([
         style: "padding: 0px;",
         gutters: false,
 
+        _principalSort: function (sort) {
+            this.grid.set("sort", lang.hitch(this, function(a, b) {
+                var aname = this.grid.principalStore.get(a.principal.id).display_name;
+                var bname = this.grid.principalStore.get(b.principal.id).display_name;
+                if (aname > bname) return sort.descending ? -1 : 1;
+                else if (aname < bname) return sort.descending ? 1 : -1;
+                else return 0;
+            }));
+        },
+
         constructor: function (kwArgs) {
             declare.safeMixin(this, kwArgs);
 
@@ -275,14 +285,7 @@ define([
                 var sort = event.sort[0];
                 if (sort.attribute == "principal") {
                     event.preventDefault();
-                    this.grid.set("sort", lang.hitch(this, function(a, b) {
-                        var aname = this.grid.principalStore.get(a.principal.id).display_name;
-                        var bname = this.grid.principalStore.get(b.principal.id).display_name;
-
-                        if (aname > bname) return sort.descending ? -1 : 1;
-                        else if (aname < bname) return sort.descending ? 1 : -1;
-                        else return 0;
-                    }));
+                    this._principalSort(sort);
                     this.grid.updateSortArrow(event.sort, true);
                 }
             }));
@@ -293,6 +296,7 @@ define([
         postCreate: function () {
             this.inherited(arguments);
             this.serattrmap.push({key: "resource.permissions", widget: this});
+            this._principalSort({attribute: "principal"});
         },
 
         buildRendering: function () {
