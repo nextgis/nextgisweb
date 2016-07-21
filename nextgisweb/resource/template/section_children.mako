@@ -21,7 +21,7 @@
                 %if child.cls == "webmap":
                 <a class="material-icons icon-viewMap" href="${request.route_url('webmap.display', id=child.id)}" target="_blank" title="${tr(_('Display map'))}"></a>
                 %endif
-                %if child.cls == "vector_layer":
+                %if child.cls == "vector_layer" or child.cls == "postgis_layer":
                 <a class="material-icons icon-table" href="${request.route_url('feature_layer.feature.browse', id=child.id)}" title="${tr(_('Feature table'))}"></a>
                 %endif
                 <a class="material-icons icon-edit" href="${request.route_url('resource.update', id=child.id)}" title="${tr(_('Update'))}"></a>
