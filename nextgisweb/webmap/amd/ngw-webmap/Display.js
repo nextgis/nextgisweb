@@ -49,6 +49,7 @@ define([
     "dijit/form/Select",
     "dijit/form/DropDownButton",
     "dijit/ToolbarSeparator",
+    "ngw-webmap/SocialButtons",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
     "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css"
