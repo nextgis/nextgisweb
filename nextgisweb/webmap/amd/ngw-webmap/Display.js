@@ -32,6 +32,7 @@ define([
     "ngw/route",
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
+    "ngw-webmap/Permalink",
     // tools
     "./tool/Base",
     "./tool/Zoom",
@@ -84,6 +85,7 @@ define([
     route,
     i18n,
     hbsI18n,
+    Permalink,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -639,8 +641,9 @@ define([
                 widget._zoomToInitialExtent();
             });
 
+            var permalink = new Permalink(this);
             this.showPermalink.on("click", function() {
-                widget._showPermalink();
+                permalink.showPermalink();
             });
 
             this._zoomToInitialExtent();
@@ -807,63 +810,6 @@ define([
             } else {
                 this.map.olMap.getView().fit(this._extent, this.map.olMap.getSize());
             }
-        },
-
-        _showPermalink: function () {
-            all({
-                visbleItems: this.getVisibleItems(),
-                map: this._mapDeferred
-            }).then(
-                lang.hitch(this, function (results) {
-                    var visibleStyles = array.map(
-                        results.visbleItems,
-                        lang.hitch(this, function (i) {
-                            return this.itemStore.dumpItem(i).styleId;
-                        })
-                    );
-
-                    var center = ol.proj.toLonLat(this.map.olMap.getView().getCenter());
-                    var queryStr = ioQuery.objectToQuery({
-                        base: this._baseLayer.name,
-                        lon: center[0].toFixed(4),
-                        lat: center[1].toFixed(4),
-                        angle: this.map.olMap.getView().getRotation(),
-                        zoom: this.map.olMap.getView().getZoom(),
-                        styles: visibleStyles.join(",")
-                    });
-
-                    var permalink = window.location.origin
-                                    + window.location.pathname
-                                    + "?" + queryStr;
-
-                    var permalinkDialog = new Dialog({
-                        title: i18n.gettext("Permalink"),
-                        draggable: false,
-                        autofocus: false
-                    });
-
-                    var permalinkContent = new TextBox({
-                        readOnly: false,
-                        selectOnClick: true,
-                        value: decodeURIComponent(permalink),
-                        style: {
-                            width: "300px"
-                        }
-                    });
-
-                    domConstruct.place(
-                        permalinkContent.domNode,
-                        permalinkDialog.containerNode,
-                        "first"
-                    );
-                    permalinkContent.startup();
-                    permalinkDialog.show();
-                }),
-                function (error) {
-                    console.log(error);
-                }
-            );
         }
-
     });
 });
