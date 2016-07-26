@@ -1,0 +1,57 @@
+div.social-buttons {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    z-index: 2000;
+    margin: 4px;
+    background-color: rgba(255, 255, 255, 0.5);
+
+}
+
+div.social-buttons i {
+
+}
+
+div.social-buttons i, div.social-buttons a {
+    font-size: 24px;
+    color: #176FC1;
+    display: block;
+    text-decoration: none;
+}
+
+div.social-buttons a {
+    opacity: 0.8;
+}
+
+/*div.social-buttons {*/
+    /*background-color: pink;*/
+    /*padding: 30px;*/
+    /*width: 300px;*/
+/*}*/
+
+div.buttons {
+    display: none;
+    /*height: 75px;*/
+    overflow: auto;
+    /*width: 200px;*/
+}
+
+div.social-buttons:hover div.buttons {
+    display: block;
+}
+
+div.social-buttons a.icon-facebook-squared {
+    color: #365899;
+}
+div.social-buttons a.icon-twitter-squared {
+    color: #1B95E0;
+}
+div.social-buttons a.icon-gplus-squared {
+    color: #D73D32;
+}
+div.social-buttons a.icon-vkontakte {
+    color: #507299;
+}
+div.social-buttons a:hover {
+    opacity: 1;
+}
