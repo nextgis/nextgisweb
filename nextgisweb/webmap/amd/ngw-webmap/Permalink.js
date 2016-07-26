@@ -66,7 +66,10 @@ define([
             permalinkDialog = new Dialog({
                 title: i18n.gettext("Permalink"),
                 draggable: false,
-                autofocus: false
+                autofocus: false,
+                onHide: function() {
+                    permalinkDialog.destroy();
+                }
             });
 
             permalinkContent = new TextBox({
