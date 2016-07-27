@@ -94,7 +94,7 @@ class ModelController(object):
                 return render_to_response('json', dict(
                     status_code=400,
                     error=widget.widget_error(),
-                ))
+                ), request)
 
         return render_to_response(
             'model_widget.mako',
@@ -133,7 +133,7 @@ class ModelController(object):
                 return render_to_response('json', dict(
                     status_code=400,
                     error=widget.widget_error(),
-                ))
+                ), request)
 
         return render_to_response(
             'model_widget.mako',
@@ -175,7 +175,7 @@ class ModelController(object):
                 return render_to_response('json', dict(
                     status_code=400,
                     error=widget.widget_error(),
-                ))
+                ), request)
 
         return render_to_response(
             'model_widget.mako',

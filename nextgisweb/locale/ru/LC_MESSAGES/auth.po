@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-06-17 16:33+0300\n"
+"POT-Creation-Date: 2016-07-28 00:43+0700\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.2.0\n"
+"Generated-By: Babel 2.3.4\n"
 
 #: __init__.py:28
 msgid "Guest"
@@ -47,51 +47,59 @@ msgstr "Владелец"
 msgid "Account disabled"
 msgstr "Учетная запись отключена"
 
-#: views.py:42
+#: views.py:43
 msgid "Invalid login or password!"
 msgstr "Неверный логин или пароль!"
 
-#: views.py:75
+#: views.py:76
 msgid "Access denied"
 msgstr "Отказано в доступе"
 
-#: views.py:145
+#: views.py:127
+msgid "Group name is not unique."
+msgstr "Имя группы не уникально."
+
+#: views.py:152
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: views.py:238
+#: views.py:208
+msgid "Login is not unique."
+msgstr "Логин не уникален."
+
+#: views.py:251
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: views.py:271 views.py:336
+#: views.py:284 views.py:349
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:281 views.py:339
+#: views.py:294 views.py:352
 msgid "Groups"
 msgstr "Группы"
 
-#: views.py:292 views.py:314
+#: views.py:305 views.py:327
 msgid "List"
 msgstr "Список"
 
-#: views.py:297 views.py:319
+#: views.py:310 views.py:332
 msgid "Create"
 msgstr "Создать"
 
-#: views.py:303 views.py:325
+#: views.py:316 views.py:338
 msgid "Edit"
 msgstr "Изменить"
 
-#: amd/ngw-auth/GroupWidget.js:35
+#: amd/ngw-auth/GroupWidget.js:34
 msgid "Group"
 msgstr "Группа"
 
-#: amd/ngw-auth/UserWidget.js:42
+#: amd/ngw-auth/UserWidget.js:40
 msgid "User"
 msgstr "Пользователь"
 
-#: amd/ngw-auth/UserWidget.js:51
+#: amd/ngw-auth/UserWidget.js:49
 msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
