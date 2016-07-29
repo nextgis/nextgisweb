@@ -1,11 +1,13 @@
 define([
     "dojo/_base/declare",
+    "dojo/_base/lang",
     "dijit/Editor",
     "dijit/_editor/plugins/LinkDialog",
     "ngw-resource/serialize",
     "ngw-pyramid/i18n!resource"
 ], function (
     declare,
+    lang,
     Editor,
     LinkDialog,
     serialize,
@@ -14,6 +16,7 @@ define([
     return declare("ngw.resource.DescriptionWidget", [Editor, serialize.Mixin], {
         title: i18n.gettext("Description"),
         extraPlugins: ["|", "createLink", "unlink"],
+        serattr: "resource.description",
 
         constructor: function () {
             this.value = "";
@@ -22,17 +25,22 @@ define([
             });
         },
 
-        postCreate: function () {
-            this.inherited(arguments);
-            this.serattrmap.push({key: "resource.description", widget: this});
-        },
-
         _setValueAttr: function (value) {
             if (value !== null && value !== undefined) {
                 this.inherited(arguments);
             } else {
                 this.set("value", "");
             }
+        },
+
+        deserializeInMixin: function (data) {
+            this.set("value", lang.getObject(this.serattr, false, data));
+        },
+
+        serializeInMixin: function (data) {
+            return this.onLoadDeferred.then(lang.hitch(this, function () {
+                lang.setObject(this.serattr, this.get("value"), data);
+            }));
         }
     });
 });
