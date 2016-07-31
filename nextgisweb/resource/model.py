@@ -278,7 +278,7 @@ class _parent_attr(SRR):
             raise Forbidden()
 
         if not srlzr.obj.check_parent(srlzr.obj.parent):
-            raise ValidationError(_("Resource can not be a child of resource ID=%d.") % dict(id=srlzr.obj.parent.id))
+            raise ValidationError(_("Resource can not be a child of resource ID=%d.") % srlzr.obj.parent.id)
 
 
 class _perms_attr(SP):
