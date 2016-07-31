@@ -293,6 +293,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         return super(PostgisLayer, self).get_info() + (
             (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
                 self.geometry_type]),
+            (_("Feature count"), self.feature_query()().total_count)
         )
 
     # IFeatureLayer

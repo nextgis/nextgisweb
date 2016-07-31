@@ -332,6 +332,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         return super(VectorLayer, self).get_info() + (
             (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
                 self.geometry_type]),
+            (_("Feature count"), self.feature_query()().total_count),
         )
 
     # IFeatureLayer
