@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-07-31 23:25+0700\n"
+"POT-Creation-Date: 2016-08-01 00:46+0700\n"
 "PO-Revision-Date: 2015-08-02 14:57+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -79,11 +79,15 @@ msgstr ""
 msgid "Column '%(column)s' not found!"
 msgstr "Поле '%(column)s' не найдено!"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:35 model.py:294
+#: model.py:296
+msgid "N/A"
+msgstr "Н/Д"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:35 model.py:299
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: model.py:296
+#: model.py:301
 msgid "Feature count"
 msgstr "Количество объектов"
 
