@@ -55,7 +55,7 @@ define([
             this.uploaderWidget.on("begin", function () { widget.uploadBegin(); });
             this.uploaderWidget.on("progress", function (evt) { widget.uploadProgress(evt); });
             this.uploaderWidget.on("complete", function (data) { widget.uploadComplete(data); });
-            this.uploaderWidget.on("error", function () { widget.uploaderError(); });
+            this.uploaderWidget.on("error", function () { widget.uploadError(); });
 
             this.fileInfo.innerHTML = i18n.gettext("File is not selected!");
         },
