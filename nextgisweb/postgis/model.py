@@ -290,15 +290,9 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             conn.close()
 
     def get_info(self):
-        try:
-            total_count = self.feature_query()().total_count
-        except:
-            total_count = _("N/A")
-
         return super(PostgisLayer, self).get_info() + (
             (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
                 self.geometry_type]),
-            (_("Feature count"), total_count),
         )
 
     # IFeatureLayer
