@@ -40,6 +40,7 @@ define([
 
         constructor: function () {
             this.upload_promise = undefined;
+            this.doc_title = document.title;
         },
 
         postCreate: function () {
@@ -75,6 +76,7 @@ define([
         uploadProgress: function (evt) {
             if (evt.type === "progress") {
                 this.fileInfo.innerHTML = evt.percent + i18n.gettext(" uploaded...");
+                document.title = evt.percent + "| " + this.doc_title;
             }
         },
 
