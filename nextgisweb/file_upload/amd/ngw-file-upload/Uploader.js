@@ -38,9 +38,11 @@ define([
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
 
+        showProgressInDocTitle: true,
+
         constructor: function () {
             this.upload_promise = undefined;
-            this.doc_title = document.title;
+            this.docTitle = document.title;
         },
 
         postCreate: function () {
@@ -76,7 +78,10 @@ define([
         uploadProgress: function (evt) {
             if (evt.type === "progress") {
                 this.fileInfo.innerHTML = evt.percent + i18n.gettext(" uploaded...");
-                document.title = evt.percent + "| " + this.doc_title;
+
+                if (this.showProgressInDocTitle) {
+                    document.title = evt.percent + " | " + this.docTitle;
+                }
             }
         },
 
