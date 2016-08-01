@@ -1,23 +1,25 @@
 define([
 	"dojo/_base/declare",
-	"dojo/query",
+	"dojo/query",  
+  "dojo/_base/array",
 	"dojo/has!ie?polyfills/classList",
 	"tablesort/tablesort.min"
 ], function(
 	declare,
 	query,
+  array,
 	classList,
 	tablesort
 ){
-  SortedTable = declare(null, {
+  return declare(null, {
   	_sortingType: ["date", "dotsep", "filesize", "monthname", "number"],
   	_sortingTypeScriptsPath: "tablesort/sorts/tablesort.",
   	_getSortingTypeScripts: function(el){
   		var sortingTypeScripts=[];
-  		for (i = 0; i < this._sortingType.length; i++){
-  			if (query('[data-sort-method='+ this._sortingType[i] +'', el).length) 
-  				sortingTypeScripts.push(this._sortingTypeScriptsPath + this._sortingType[i]);
-  		}
+      array.forEach(this._sortingType, function(item, i){
+        if (query('[data-sort-method='+ item +']', el).length) 
+          sortingTypeScripts.push(this._sortingTypeScriptsPath + this._sortingType[i]);
+      });
   		return sortingTypeScripts;
   	},
   	constructor: function(el){  	
@@ -26,6 +28,4 @@ define([
   		});
   	}
   });
-
-  return SortedTable;
 });
