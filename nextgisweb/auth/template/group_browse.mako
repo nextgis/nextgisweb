@@ -5,13 +5,13 @@
     <script>
         require([
             "dojo/ready",
-            "ngw/SortedTable"
+            "ngw/sorted-table"
         ], function(
             ready,
             sortedTable
         ){
             ready(function() {
-                new sortedTable(document.getElementById("group-table"));
+                sortedTable(document.getElementById("group-table"));
             });
         });
     </script>
