@@ -850,7 +850,11 @@ table {
   -ms-transform: rotate(-180deg);
   transform: rotate(-180deg);
 }
-/* Dgrid */
+.nextgis.claro {
+  /* Dgrid */
+  /* Forms */
+  /* Tabs */
+}
 .nextgis.claro .dgrid-header,
 .nextgis.claro .dgrid-footer {
   background: #eef4f7;
@@ -879,4 +883,7 @@ table {
 }
 .nextgis.claro .dijitTextBoxHover {
   background-color: #fff;
+}
+.nextgis.claro .dijitTabError {
+  color: #d46464;
 }

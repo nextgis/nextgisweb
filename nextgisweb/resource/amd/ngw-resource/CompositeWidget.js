@@ -155,7 +155,12 @@ define([
                         // Если валидация завершилась с ошибкой,
                         // отмечаем заголовок красным цветом
 
-                        if (!success) { domClass.add(member.controlButton.domNode, "error"); }
+                        if (!success) { 
+                            domClass.add(member.controlButton.domNode, "dijitTabError"); 
+                        } else {
+                             if(domClass.contains(member.controlButton.domNode, "dijitTabError"))
+                                domClass.remove(member.controlButton.domNode, "dijitTabError");
+                        }
                         return success;
                     }
                 ));
