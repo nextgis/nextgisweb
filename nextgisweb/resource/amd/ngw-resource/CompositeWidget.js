@@ -149,15 +149,13 @@ define([
             array.forEach(this.members, function (member) {
                 // Валидация может быть асинхронной, в этом случае
                 // member.validate вернет deferred, собираем их в массив
+                domClass.remove(member.controlButton.domNode, "error");
                 promises.push(when(member.validateData(errback)).then(
                     function /* callback */ (success) {
                         // Если валидация завершилась с ошибкой,
                         // отмечаем заголовок красным цветом
 
-                        // TODO: Наверное есть способ сделать это как-то
-                        // получше, например вешать специальный класс на
-                        // ноду таба, но непонятно как ее обнаружить.
-                        if (!success) { member.set("title", "<span style=\"color: #d00\">" + member.get("title") + "</span>"); }
+                        if (!success) { domClass.add(member.controlButton.domNode, "error"); }
                         return success;
                     }
                 ));
