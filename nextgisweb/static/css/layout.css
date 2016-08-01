@@ -11,8 +11,7 @@
   /* For IE6-8 */
 }
 .material-icons,
-.sort-header:after,
-.nextgis.claro .dgrid-sortable .dgrid-resize-header-container:after {
+.sort-header:after {
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
@@ -804,8 +803,7 @@ table {
   white-space: nowrap;
   cursor: pointer;
 }
-.sort-header:after,
-.nextgis.claro .dgrid-sortable .dgrid-resize-header-container:after {
+.sort-header:after {
   position: relative;
   font-size: 16px;
   width: 16px;
@@ -824,8 +822,7 @@ table {
   -o-transition: opacity 0.2s, -o-transform 0.2s;
   transition: opacity 0.2s,-webkit-transform 0.2s,-moz-transform 0.2s,-o-transform 0.2s,transform 0.2s;
 }
-.sort-header:hover:after,
-.nextgis.claro .dgrid-sortable .dgrid-resize-header-container:hover:after {
+.sort-header:hover:after {
   color: inherit;
   zoom: 1;
   filter: alpha(opacity=50);
@@ -836,9 +833,7 @@ table {
 .sort-down:after,
 .sort-up:after,
 .sort-down:hover:after,
-.sort-up:hover:after,
-.nextgis.claro .dgrid-sortable .dgrid-resize-header-container.dgrid-sort-up:after,
-.nextgis.claro .dgrid-sortable .dgrid-resize-header-container.dgrid-sort-down:after {
+.sort-up:hover:after {
   color: inherit;
   font-family: "Material Icons";
   font-size: 16px;
@@ -848,8 +843,7 @@ table {
   -moz-opacity: 1;
   opacity: 1;
 }
-.sort-up:after,
-.nextgis.claro .dgrid-sortable .dgrid-resize-header-container.dgrid-sort-down:after {
+.sort-up:after {
   -webkit-transform: rotate(-180deg);
   -moz-transform: rotate(-180deg);
   -o-transform: rotate(-180deg);
@@ -859,7 +853,7 @@ table {
 /* Dgrid */
 .nextgis.claro .dgrid-header,
 .nextgis.claro .dgrid-footer {
-  background: none;
+  background: #eef4f7;
   filter: none;
 }
 .nextgis.claro .dgrid-header .dgrid-cell,
@@ -874,10 +868,15 @@ table {
 .nextgis.claro .dgrid-cell {
   border-color: #dedede;
 }
-.nextgis.claro .dgrid-sort-arrow {
-  display: none;
+.nextgis.claro .dgrid-row {
+  background: #fff;
 }
-.nextgis.claro .dgrid-sortable .dgrid-resize-header-container:after {
-  top: -1px;
-  margin-left: 3px;
+.nextgis.claro .dgrid-row:hover {
+  background-color: #f8f8f8;
+}
+.nextgis.claro .dgrid-row.dgrid-selected {
+  background-color: #fdf8c3;
+}
+.nextgis.claro .dijitTextBoxHover {
+  background-color: #fff;
 }
