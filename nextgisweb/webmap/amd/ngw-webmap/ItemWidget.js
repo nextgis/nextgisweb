@@ -218,23 +218,6 @@ define([
             this.inherited(arguments);
         },
 
-        validateWidget: function () {
-            var result = { isValid: true, error: [] };
-
-            array.forEach([], function (subw) {
-                // форсируем показ значка при проверке
-                subw._hasBeenBlurred = true;
-                subw.validate();
-
-                // если есть ошибки, фиксируем их
-                if ( !subw.isValid() ) {
-                    result.isValid = false;
-                }
-            });
-
-            return result;
-        },
-
         getAddParent: function () {
             if (this.getItemValue("item_type") == "group") {
                 return this.widgetTree.selectedItem;
