@@ -19,20 +19,21 @@
         </td>
     </tr>
 </tbody></table>
+<div class="table-wrapper">
+    <table class="pure-table pure-table-horizontal">
+        <thead><tr>
+            <th style="width: 2em; text-align: inherit;">#</th>
+            <th style="width: 30%; text-align: inherit;">${tr(_('Layer'))}</th>
+            <th style="width: 70%; text-align: inherit;">${tr(_('Title'))}</th>
+        </tr></thead>
 
-<table class="pure-table pure-table-horizontal">
-    <thead><tr>
-        <th style="width: 2em; text-align: inherit;">#</th>
-        <th style="width: 30%; text-align: inherit;">${tr(_('Layer'))}</th>
-        <th style="width: 70%; text-align: inherit;">${tr(_('Title'))}</th>
-    </tr></thead>
+        %for idx, l in enumerate(capcache['layers'], start=1):
+        <tr>
+            <td>${idx}</td>
+            <td><tt>${l['id']}</tt></td>
+            <td>${l['title']}</td>
+        </tr>
+        %endfor
 
-    %for idx, l in enumerate(capcache['layers'], start=1):
-    <tr>
-        <td>${idx}</td>
-        <td><tt>${l['id']}</tt></td>
-        <td>${l['title']}</td>
-    </tr>
-    %endfor
-
-</table>
+    </table>
+</div>

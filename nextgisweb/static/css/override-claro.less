@@ -1,0 +1,45 @@
+/* Dgrid */
+
+.nextgis.claro{
+    .dgrid-header, 
+    .dgrid-footer{
+        background: none;
+        filter: none;
+
+        .dgrid-cell{
+          border-color: @light-border-2;
+
+          &:hover{
+            background: none;
+            filter: none;
+          }
+        }
+    }
+    .dgrid-cell{
+        border-color: @light-border-2;
+    }
+
+    .dgrid-sort-arrow{
+        display: none;
+    }
+
+    .dgrid-sortable .dgrid-resize-header-container{
+        &:after{
+          &:extend(.sort-header:after);
+          top: -1px;
+          margin-left: 3px;
+        }
+
+        &:hover:after{
+          &:extend(.sort-header:hover:after);
+        }
+
+        &.dgrid-sort-up:after{
+          &:extend(.sort-down:after);
+        }
+
+        &.dgrid-sort-down:after{
+          &:extend(.sort-up:after);
+        }
+    }
+}
