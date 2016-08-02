@@ -60,6 +60,8 @@ define([
             this.uploaderWidget.on("complete", function (data) { widget.uploadComplete(data); });
             this.uploaderWidget.on("error", function () { widget.uploadError(); });
 
+            this.uploaderWidget.addDropTarget(this.dropTarget);
+
             this.fileInfo.innerHTML = i18n.gettext("File is not selected!");
         },
 
