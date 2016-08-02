@@ -232,6 +232,11 @@ define([
                 this.itemStore.newItem(i, {parent: this.itemModel.root, attribute: "children"});
                 this.itemIdx++;
             }, this);
+
+            // При загрузке отмечаем самую первую ноду
+            if (this.itemIdx > 0) {
+                this.widgetTree.set("path", [this.widgetTreeRootNodeId, 1]);
+            }
         },
 
         validateDataInMixin: function (errback) {
