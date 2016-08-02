@@ -50,25 +50,30 @@
                     data-dojo-type="dijit/layout/ContentPane"
                     style="padding: 0;">
 
-                    <div data-dojo-type="dojox/layout/TableContainer"
-                        data-dojo-props="labelWidth: 150">
+                    <div data-dojo-attach-point="widgetPropertiesForm"
+                        data-dojo-type="dijit/form/Form">
 
-                        <div data-dojo-attach-point="widgetItemKeyname"
-                            data-dojo-type="ngw-pyramid/form/KeynameTextBox"
-                            data-dojo-props="required: true"
-                            title="{{gettext 'Keyname'}}" style="width: 100%"></div>
+                        <div data-dojo-type="dojox/layout/TableContainer"
+                            data-dojo-props="labelWidth: 150">
 
-                        <div data-dojo-attach-point="widgetItemDisplayName"
-                            data-dojo-type="ngw-pyramid/form/DisplayNameTextBox"
-                            title="{{gettext 'Display name'}}" style="width: 100%"></div>
+                            <div data-dojo-attach-point="widgetItemKeyname"
+                                data-dojo-type="ngw-pyramid/form/KeynameTextBox"
+                                data-dojo-props="required: true"
+                                title="{{gettext 'Keyname'}}" style="width: 100%"></div>
 
-                        <div data-dojo-attach-point="wLayerMinScale" 
-                            data-dojo-type="ngw-pyramid/form/ScaleTextBox"
-                            title="{{gettext 'Min scale'}}"></div>
+                            <div data-dojo-attach-point="widgetItemDisplayName"
+                                data-dojo-type="ngw-pyramid/form/DisplayNameTextBox"
+                                title="{{gettext 'Display name'}}" style="width: 100%"></div>
 
-                        <div data-dojo-attach-point="wLayerMaxScale"
-                            data-dojo-type="ngw-pyramid/form/ScaleTextBox"
-                            title="{{gettext 'Max scale'}}"></div>
+                            <div data-dojo-attach-point="wLayerMinScale"
+                                data-dojo-type="ngw-pyramid/form/ScaleTextBox"
+                                title="{{gettext 'Min scale'}}"></div>
+
+                            <div data-dojo-attach-point="wLayerMaxScale"
+                                data-dojo-type="ngw-pyramid/form/ScaleTextBox"
+                                title="{{gettext 'Max scale'}}"></div>
+
+                        </div>
 
                     </div>
 
