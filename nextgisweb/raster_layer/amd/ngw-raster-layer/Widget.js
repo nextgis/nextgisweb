@@ -37,6 +37,11 @@ define([
             
             value.srs = { id: this.wSrs.get("value") };
             value.source = this.wFile.data;
+        },
+
+        validateDataInMixin: function (errback) {
+            return this.wFile.upload_promise !== undefined &&
+                this.wFile.upload_promise.isResolved();
         }
     });
 });
