@@ -18,7 +18,7 @@ from osgeo import ogr, osr
 from sqlalchemy.sql import ColumnElement
 from sqlalchemy.ext.compiler import compiles
 
-import geoalchemy as ga
+import geoalchemy2 as ga
 import sqlalchemy.sql as sql
 from sqlalchemy import (
     event,
@@ -60,8 +60,6 @@ from ..feature_layer import (
 
 from .util import _
 
-GEOM_TYPE_GA = (ga.Point, ga.LineString, ga.Polygon,
-                ga.MultiPoint, ga.MultiLineString, ga.MultiPolygon)
 GEOM_TYPE_DB = ('POINT', 'LINESTRING', 'POLYGON',
                 'MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')
 GEOM_TYPE_OGR = (
@@ -100,7 +98,6 @@ FIELD_FORBIDDEN_NAME = ("id", "type", "source")
 
 _GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 2))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
-_GEOM_TYPE_2_GA = dict(zip(GEOM_TYPE_DB, GEOM_TYPE_GA))
 
 _FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
 _FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
@@ -195,13 +192,11 @@ class TableInfo(object):
         table = db.Table(
             tablename if tablename else ('lvd_' + str(uuid.uuid4().hex)),
             metadata, db.Column('id', db.Integer, primary_key=True),
-            ga.GeometryExtensionColumn('geom', _GEOM_TYPE_2_GA[
-                geom_fldtype](2, srid=self.srs_id)),
+            db.Column('geom', ga.Geometry(dimension=2,
+                geometry_type=geom_fldtype, srid=self.srs_id)),
             *map(lambda (fld): db.Column(fld.key, _FIELD_TYPE_2_DB[
                 fld.datatype]), self.fields)
         )
-
-        ga.GeometryDDL(table)
 
         db.mapper(model, table)
 
@@ -264,8 +259,8 @@ class TableInfo(object):
                 fld_values[self[feature.GetFieldDefnRef(i).GetNameRef()].key] \
                     = fld_value
 
-            obj = self.model(fid=fid, geom=ga.WKTSpatialElement(
-                str(geom), self.srs_id), **fld_values)
+            obj = self.model(fid=fid, geom=ga.elements.WKTElement(
+                str(geom), srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
 
@@ -369,8 +364,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         # не позволит записать пустую геометрию, но это и не нужно пока.
 
         if feature.geom is not None:
-            obj.geom = ga.WKTSpatialElement(
-                str(feature.geom), self.srs_id)
+            obj.geom = ga.elements.WKTElement(
+                str(feature.geom), srid=self.srs_id)
 
         DBSession.merge(obj)
 
@@ -394,8 +389,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if f.keyname in feature.fields.keys():
                 setattr(obj, f.key, feature.fields[f.keyname])
 
-        obj.geom = ga.WKTSpatialElement(
-            str(feature.geom), self.srs_id)
+        obj.geom = ga.elements.WKTElement(
+            str(feature.geom), srid=self.srs_id)
 
         DBSession.add(obj)
         DBSession.flush()
@@ -762,7 +757,7 @@ class FeatureQueryBase(object):
         srsid = self.layer.srs_id if self._srs is None else self._srs.id
 
         geomcol = table.columns.geom
-        geomexpr = ga.functions.transform(geomcol, srsid)
+        geomexpr = db.func.st_transform(geomcol, srsid)
 
         if self._geom:
             if self._single_part:
