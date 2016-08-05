@@ -21,4 +21,4 @@
     </script>
 </%def>
 
-<div id="widget" style="width: 100%; height: 100%"></div>
+<div id="widget" class="composite-widget" style="width: 100%; height: 100%;"></div>

@@ -1,46 +1,5 @@
-.nextgis.claro{
-
-    /* Dgrid */
-
-    .dgrid-header, 
-    .dgrid-footer{
-        background: @lightBlue-2;
-        filter: none;
-
-        .dgrid-cell{
-          border-color: @light-border-2;
-
-          &:hover{
-            background: none;
-            filter: none;
-          }
-        }
-    }
-    .dgrid-cell{
-        border-color: @light-border-2;
-    }
-
-    .dgrid-row{
-      background: #fff;
-
-      &:hover{
-          background-color: #f8f8f8;
-      }
-
-      &.dgrid-selected{
-        background-color: #fdf8c3;
-      }
-    }
-
-    /* Forms */
-
-    .dijitTextBoxHover{
-      background-color: #fff;
-    }
-
-    /* Tabs */
-
-    .dijitTabError{
-      color: @red;
-    }
-}
+@import "override-claro/_dgrid";
+@import "override-claro/_forms";
+@import "override-claro/_tabs";
+@import "override-claro/_editor";
+@import "override-claro/_buttons.less";

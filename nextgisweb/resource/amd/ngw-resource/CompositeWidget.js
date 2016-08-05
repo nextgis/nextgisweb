@@ -57,8 +57,7 @@ define([
             }).placeAt(this);
 
             this.btnContainer = new ContentPane({
-                region: "top",
-                style: "padding: 0; margin-bottom: 1ex;"
+                region: "bottom"
             }).placeAt(this);
 
             domClass.add(this.btnContainer.domNode, "ngwButtonStrip");
@@ -79,13 +78,11 @@ define([
 
                 this.buttons.push(new Button({
                     label: i18n.gettext("Create"),
-                    iconClass: "dijitIconNewTask",
                     onClick: lang.hitch(this, function () { this.createObj(false); })
                 }).placeAt(this.btnContainer));
 
                 this.buttons.push(new Button({
                     label: i18n.gettext("Create and edit"),
-                    iconClass: "dijitIconNewTask",
                     onClick: lang.hitch(this, function () { this.createObj(true); })
                 }).placeAt(this.btnContainer));
 
@@ -93,7 +90,6 @@ define([
 
                 this.buttons.push(new Button({
                     label: i18n.gettext("Save"),
-                    iconClass: "dijitIconSave",
                     onClick: lang.hitch(this, this.updateObj)
                 }).placeAt(this.btnContainer));
 
@@ -101,7 +97,6 @@ define([
 
                 this.buttons.push(new Button({
                     label: i18n.gettext("Delete"),
-                    iconClass: "dijitIconDelete",
                     onClick: lang.hitch(this, this.deleteObj)
                 }).placeAt(this.btnContainer));
 
@@ -121,6 +116,10 @@ define([
                 // }).placeAt(this.btnContainer));
 
             }
+
+            array.forEach(this.buttons, function (btn) {
+                domClass.add(btn.domNode, "dijitButton--primary"); 
+            });
 
         },
 

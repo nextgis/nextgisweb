@@ -33,7 +33,6 @@ define([
         title: i18n.gettext("PostGIS layer"),
         templateString: hbsI18n(template, i18n),
         prefix: "postgis_layer",
-        style: "padding: 1ex;",
 
         postCreate: function () {
             this.inherited(arguments);

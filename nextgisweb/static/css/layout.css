@@ -1,6 +1,129 @@
 @import "fontello.css";
 /* -- Variables -- */
 /* Import */
+.nextgis.claro .padding-block,
+.padding-block {
+  padding: 16px;
+}
+.uploader__dropzone {
+  position: relative;
+  background-color: #eef4f7;
+  padding: 44px 26px 48px;
+  text-align: center;
+  font-size: 16px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  -webkit-transition: background-color 0.3s;
+  -moz-transition: background-color 0.3s;
+  -o-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+}
+.uploader__dropzone:before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  border: 3px dashed #dedede;
+  -webkit-transition: left 0.3s, right 0.3s, top 0.3s, bottom 0.3s;
+  -moz-transition: left 0.3s, right 0.3s, top 0.3s, bottom 0.3s;
+  -o-transition: left 0.3s, right 0.3s, top 0.3s, bottom 0.3s;
+  transition: left 0.3s, right 0.3s, top 0.3s, bottom 0.3s;
+}
+.uploader__dropzone:first-child {
+  margin-top: 4px;
+}
+.uploader__dropzone--active {
+  background-color: #fdf8c3;
+}
+.uploader__dropzone--active:before {
+  left: 8px;
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
+}
+.uploader__inner {
+  position: relative;
+}
+.uploader__text--complete .uploader__link__text--complete {
+  display: inline;
+}
+.uploader__text--complete .uploader__link__text--start,
+.uploader__text--complete .uploader__link__text--error,
+.uploader__text--complete .uploader__linkAfter {
+  display: none;
+}
+.uploader__text--error .uploader__link__text--error {
+  display: inline;
+}
+.uploader__text--error .uploader__link__text--start,
+.uploader__text--error .uploader__link__text--complete,
+.uploader__text--error .uploader__linkAfter {
+  display: none;
+}
+.uploader__text--progress .uploader__link__text--start,
+.uploader__text--progress .uploader__link__text--complete,
+.uploader__text--progress .uploader__link__text--error,
+.uploader__text--progress .uploader__linkAfter {
+  display: none;
+}
+.uploader__link {
+  position: relative;
+  display: inline-block;
+}
+.uploader__link__text {
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.uploader__link__text--complete,
+.uploader__link__text--error {
+  display: none;
+}
+.uploader__link__btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  zoom: 1;
+  filter: alpha(opacity=0);
+  -webkit-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+.uploader__link__btn .dijitButton {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.uploader__link__btn .dijitButton input {
+  cursor: pointer;
+}
+.uploader__link__btn:hover ~ .uploader__link__text {
+  color: #2196f3;
+  border-bottom-color: #2196f3;
+  border-bottom-color: rgba(33, 150, 243, 0.4);
+}
+.uploader__help {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.54);
+  margin-top: 2px;
+}
+.uploader__icon {
+  font-size: 48px;
+  display: block;
+  margin-top: 0px;
+  color: rgba(0, 0, 0, 0.54);
+  line-height: 1;
+  margin-bottom: 4px;
+}
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
@@ -126,9 +249,9 @@ a {
   color: #1260a9;
 }
 a:hover {
-  color: #3FB4E2;
-  border-color: #3FB4E2;
-  border-color: rgba(63, 180, 226, 0.4);
+  color: #2196f3;
+  border-color: #2196f3;
+  border-color: rgba(33, 150, 243, 0.4);
 }
 h1,
 h2,
@@ -471,7 +594,7 @@ table {
 .content-box {
   position: relative;
   background: #ffffff;
-  padding: 20px;
+  padding: 16px;
   margin-bottom: 40px;
   -webkit-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
   -moz-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
@@ -481,8 +604,8 @@ table {
   margin-top: 0;
 }
 .content-box > .table-wrapper {
-  margin-left: -20px;
-  margin-right: -20px;
+  margin-left: -16px;
+  margin-right: -16px;
 }
 .content-box > .table-wrapper > .pure-table-horizontal {
   width: 100%;
@@ -496,7 +619,7 @@ table {
   padding-right: 24px;
 }
 .content-box > .table-wrapper > .pure-table-horizontal:last-child {
-  margin-bottom: -10px;
+  margin-bottom: -8px;
 }
 .lt-ie9 .content-box {
   border: 1px solid #efefef;
@@ -530,12 +653,12 @@ table {
 .sidebar-menu {
   position: relative;
   background: #ffffff;
-  padding: 20px;
+  padding: 16px;
   margin-bottom: 40px;
   -webkit-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
   -moz-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
   box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
-  padding: 30px;
+  padding: 30px 24px;
 }
 .sidebar-menu .table-keyvalue__key__inner,
 .sidebar-menu .table-keyvalue__value__inner {
@@ -545,8 +668,8 @@ table {
   margin-top: 0;
 }
 .sidebar-menu > .table-wrapper {
-  margin-left: -20px;
-  margin-right: -20px;
+  margin-left: -16px;
+  margin-right: -16px;
 }
 .sidebar-menu > .table-wrapper > .pure-table-horizontal {
   width: 100%;
@@ -560,18 +683,18 @@ table {
   padding-right: 24px;
 }
 .sidebar-menu > .table-wrapper > .pure-table-horizontal:last-child {
-  margin-bottom: -10px;
+  margin-bottom: -8px;
 }
 .sidebar-menu__heading {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.25;
   color: #212121;
   border-bottom: 1px solid rgba(39, 85, 119, 0.12);
   margin-bottom: .75em;
   margin-top: 1.875em;
-  font-family: "Roboto Condensed";
-  letter-spacing: .5px;
+  letter-spacing: .8px;
   text-transform: uppercase;
+  padding-bottom: 6px;
 }
 .sidebar-menu__heading:first-child {
   margin-top: 0;
@@ -588,10 +711,10 @@ table {
 }
 .sidebar-menu__link:after {
   content: "";
-  width: 2px;
+  width: 3px;
   height: 100%;
   position: absolute;
-  left: -30px;
+  left: -24px;
   top: 0;
   background-color: #ffba3f;
   zoom: 1;
@@ -850,11 +973,6 @@ table {
   -ms-transform: rotate(-180deg);
   transform: rotate(-180deg);
 }
-.nextgis.claro {
-  /* Dgrid */
-  /* Forms */
-  /* Tabs */
-}
 .nextgis.claro .dgrid-header,
 .nextgis.claro .dgrid-footer {
   background: #eef4f7;
@@ -884,6 +1002,103 @@ table {
 .nextgis.claro .dijitTextBoxHover {
   background-color: #fff;
 }
-.nextgis.claro .dijitTabError {
-  color: #d46464;
+.nextgis.claro .dijitTabContainer {
+  /* compensate dijitTab's 1px offset */
+  top: -1px;
+}
+.nextgis.claro .dijitTabPaneWrapper,
+.nextgis.claro .dijitTabContainerTop-tabs,
+.nextgis.claro .dijitTabContainerBottom-tabs,
+.nextgis.claro .dijitTabContainerLeft-tabs,
+.nextgis.claro .dijitTabContainerRight-tabs {
+  border-color: #dedede;
+}
+.nextgis.claro .dijitTabPaneWrapper .dijitTab,
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTab,
+.nextgis.claro .dijitTabContainerBottom-tabs .dijitTab,
+.nextgis.claro .dijitTabContainerLeft-tabs .dijitTab,
+.nextgis.claro .dijitTabContainerRight-tabs .dijitTab {
+  padding: 0px 12px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  font-size: 13px;
+  background: none;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  box-shadow: none;
+  margin-right: 0;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  transition: none;
+  color: rgba(0, 0, 0, 0.54);
+  height: 39px;
+  line-height: 38px;
+}
+.nextgis.claro .dijitTabPaneWrapper .dijitTab:hover,
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTab:hover,
+.nextgis.claro .dijitTabContainerBottom-tabs .dijitTab:hover,
+.nextgis.claro .dijitTabContainerLeft-tabs .dijitTab:hover,
+.nextgis.claro .dijitTabContainerRight-tabs .dijitTab:hover {
+  color: rgba(0, 0, 0, 0.87);
+}
+.nextgis.claro .dijitTabPaneWrapper .dijitTabChecked,
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTabChecked,
+.nextgis.claro .dijitTabContainerBottom-tabs .dijitTabChecked,
+.nextgis.claro .dijitTabContainerLeft-tabs .dijitTabChecked,
+.nextgis.claro .dijitTabContainerRight-tabs .dijitTabChecked {
+  color: rgba(0, 0, 0, 0.87);
+}
+.nextgis.claro .dijitTabPaneWrapper .dijitTabError,
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTabError,
+.nextgis.claro .dijitTabContainerBottom-tabs .dijitTabError,
+.nextgis.claro .dijitTabContainerLeft-tabs .dijitTabError,
+.nextgis.claro .dijitTabContainerRight-tabs .dijitTabError {
+  color: rgba(244, 67, 54, 0.54);
+}
+.nextgis.claro .dijitTabPaneWrapper .dijitTabError:hover,
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTabError:hover,
+.nextgis.claro .dijitTabContainerBottom-tabs .dijitTabError:hover,
+.nextgis.claro .dijitTabContainerLeft-tabs .dijitTabError:hover,
+.nextgis.claro .dijitTabContainerRight-tabs .dijitTabError:hover,
+.nextgis.claro .dijitTabPaneWrapper .dijitTabError.dijitTabChecked,
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTabError.dijitTabChecked,
+.nextgis.claro .dijitTabContainerBottom-tabs .dijitTabError.dijitTabChecked,
+.nextgis.claro .dijitTabContainerLeft-tabs .dijitTabError.dijitTabChecked,
+.nextgis.claro .dijitTabContainerRight-tabs .dijitTabError.dijitTabChecked {
+  color: rgba(244, 67, 54, 0.87);
+}
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTab {
+  border-top: 3px solid transparent;
+}
+.nextgis.claro .dijitTabContainerTop-tabs .dijitTabChecked {
+  border-top-color: #1260a9;
+  border-left-color: #dedede;
+  border-right-color: #dedede;
+  background-color: #fff;
+}
+.nextgis.claro .dijitEditorIFrameContainer {
+  padding: 16px;
+}
+.nextgis.claro .dijitButton--primary .dijitButtonNode {
+  height: 36px;
+  line-height: 34px;
+  font-size: 16px;
+  background-image: none;
+  background-color: #1260a9;
+  border: 0;
+  color: #fff;
+  border-radius: 23px;
+  letter-spacing: .5px;
+  padding: 0 16px;
+}
+.nextgis.claro .dijitButton--primary .dijitButtonNode .dijitReset {
+  line-height: inherit;
+}
+.nextgis.claro .dijitButton--primary:hover .dijitButtonNode,
+.nextgis.claro .dijitButton--primary:focus .dijitButtonNode {
+  background: #0d467b;
+}
+.nextgis.claro .dijitButton--primary + .dijitButton--primary {
+  margin-left: 8px;
 }

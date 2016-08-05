@@ -18,8 +18,10 @@
 @light-border: #efefef;
 @light-border-2: #dedede;
 @yellow: #FFBA3F;
+@yellow-light: #fdf8c3;
 @green: #00C775;
-@red: #d46464;
+@red: #F44336;
+@link-hover: #2196F3;
 
 @base-font: "Roboto";
 @header-font:  "Roboto Condensed";
@@ -28,7 +30,9 @@
 
 /* Import */
 
-@import "mixin";
+@import "helpers/_mixin";
+@import "helpers/_utilities";
+@import "blocks/_uploader";
 @import "material-icons";
 @import "fontello.css";
 
@@ -66,9 +70,9 @@ a{
     color: @blue;
 }
     a:hover{
-        color: #3FB4E2;
-        border-color: #3FB4E2;
-        border-color: fade(#3FB4E2, 40%);
+        color: @link-hover;
+        border-color: @link-hover;
+        border-color: fade(@link-hover, 40%);
     }
 
 h1, h2, h3,
@@ -326,10 +330,7 @@ table{
     th{
         font-weight: bold;
         color: @light-text;
-        color: rgba(33, 33, 33, 0.86);
-        //padding-bottom: .35em;
-        //padding-top: 6px;
-        //padding-bottom: 5px;        
+        color: rgba(33, 33, 33, 0.86);     
     }
     
     td,th{
@@ -476,7 +477,7 @@ table{
     .content-box{
         position: relative;
         background: @white;
-        padding: 20px;
+        .padding-block;
         margin-bottom: 40px;
         .box-shadow(0 1px 3px rgba(57,70,78,.3));
 
@@ -485,8 +486,8 @@ table{
         }
 
         & > .table-wrapper{        
-            margin-left: -20px;
-            margin-right: -20px;
+            margin-left: -16px;
+            margin-right: -16px;
 
             & > .pure-table-horizontal{
                 width: 100%;
@@ -502,7 +503,7 @@ table{
                 }
 
                 &:last-child{
-                    margin-bottom: -10px;
+                    margin-bottom: -8px;
                 }
             }
         }
@@ -542,18 +543,18 @@ table{
 }
     .sidebar-menu{
         .content-box;
-        padding: 30px;
+        padding: 30px 24px;
     }
         .sidebar-menu__heading{
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.25;
             color: @text-color;
             border-bottom: 1px solid rgba(39,85,119,0.12);
             margin-bottom: .75em;
             margin-top: 1.875em;
-            font-family: @header-font;
-            letter-spacing: .5px;        
+            letter-spacing: .8px;        
             text-transform: uppercase;
+            padding-bottom: 6px;
             
             &:first-child{
                 margin-top:0;
@@ -573,10 +574,10 @@ table{
             
             &:after{
                 content:"";
-                width: 2px;
+                width: 3px;
                 height: 100%;
                 position: absolute;
-                left: -30px;
+                left: -24px;
                 top:0;
                 background-color: @yellow;
                 .opacity(0);

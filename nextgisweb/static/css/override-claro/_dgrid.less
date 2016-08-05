@@ -1,0 +1,32 @@
+.nextgis.claro{
+
+    .dgrid-header, 
+    .dgrid-footer{
+        background: @lightBlue-2;
+        filter: none;
+
+        .dgrid-cell{
+          border-color: @light-border-2;
+
+          &:hover{
+            background: none;
+            filter: none;
+          }
+        }
+    }
+    .dgrid-cell{
+        border-color: @light-border-2;
+    }
+
+    .dgrid-row{
+      background: #fff;
+
+      &:hover{
+          background-color: #f8f8f8;
+      }
+
+      &.dgrid-selected{
+        background-color: #fdf8c3;
+      }
+    }
+}

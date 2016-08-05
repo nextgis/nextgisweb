@@ -176,7 +176,7 @@ define([
 
     var FieldsWidget = declare([TableContainer], {
         title: i18n.gettext("Attributes"),
-        style: "padding: 1ex; box-sizing: border-box; height: 100%; overflow: auto;",
+        style: "padding: 16px; box-sizing: border-box; height: 100%; overflow: auto;",
         labelWidth: "20%",
 
         buildRendering: function () {
@@ -233,18 +233,19 @@ define([
             }
 
             this._btnPane = new ContentPane({
-                region: "top",
+                region: "bottom",
                 style: "padding-left: 0; padding-right: 0"
             });
 
             this._btnPane.placeAt(this);
             domClass.add(this._btnPane.domNode, "ngwButtonStrip");
 
-            new Button({
+            var btn = new Button({
                 label: i18n.gettext("Save"),
-                iconClass: "dijitIconSave",
                 onClick: lang.hitch(this, this.save)
             }).placeAt(this._btnPane);
+
+            domClass.add(btn.domNode, "dijitButton--primary");
         },
 
         iurl: function () {

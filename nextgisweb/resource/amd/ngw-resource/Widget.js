@@ -33,7 +33,6 @@ define([
         templateString: hbsI18n(template, i18n),
         identity: "resource",
         title: i18n.gettext("Resource"),
-        style: "margin: 1ex;",
 
         postCreate: function () {
             this.inherited(arguments);
