@@ -1,0 +1,128 @@
+.uploader__dropzone{
+	position: relative;
+	background-color: @lightBlue-2;
+	padding: 44px 26px 48px;
+	text-align: center;
+	font-size: @font-size-md;
+	margin-top: 24px;
+	margin-bottom: 16px;
+	.transition(background-color .3s);
+
+	&:before{
+		content: "";
+		position: absolute;
+		left: 12px;
+		top: 12px;
+		right: 12px;
+		bottom: 12px;
+		border: 3px dashed @light-border-2;
+		.transition(left .3s, right .3s, top .3s, bottom .3s);
+	}
+
+	&:first-child{
+		margin-top: 4px;
+	}
+}
+	.uploader__dropzone--active{
+		background-color: @yellow-light;
+
+		&:before{
+			left: 8px;
+			top: 8px;
+			right: 8px;
+			bottom: 8px;
+		}
+	}
+
+
+.uploader__inner{
+	position: relative;
+}
+
+.uploader__text--complete{
+	.uploader__link__text--complete{
+		display: inline;
+	}
+	.uploader__link__text--start,
+	.uploader__link__text--error,
+	.uploader__linkAfter{
+		display: none;
+	}
+}
+
+.uploader__text--error{
+	.uploader__link__text--error{
+		display: inline;
+	}
+	.uploader__link__text--start,
+	.uploader__link__text--complete,
+	.uploader__linkAfter{
+		display: none;
+	}
+}
+
+.uploader__text--progress{
+	.uploader__link__text--start,
+	.uploader__link__text--complete,
+	.uploader__link__text--error,
+	.uploader__linkAfter{
+		display: none;
+	}
+}
+
+.uploader__link{
+	position: relative;
+	display: inline-block;
+}
+	.uploader__link__text{		
+		text-decoration: none;
+		border-bottom: 1px solid transparent;
+	}
+		.uploader__link__text--complete,
+		.uploader__link__text--error{
+			display: none;
+		}
+	.uploader__link__btn{
+		position: absolute;
+		left:0;
+		top:0;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		.opacity(0);
+		cursor: pointer;
+		z-index: 2;
+
+		.dijitButton{
+			position: absolute;
+			left:0;
+			top:0;
+			width: 100%;
+			height: 100%;
+			margin:0;
+
+			input{
+				cursor: pointer;
+			}
+		}
+
+		&:hover ~ .uploader__link__text{			
+			color: @link-hover;
+			border-bottom-color: @link-hover;
+        	border-bottom-color: fade(@link-hover, 40%);
+		}
+	}
+.uploader__help{
+	font-size: 14px;
+	color: rgba(0,0,0,.54);
+	margin-top: 2px;
+}
+
+.uploader__icon{
+	font-size: 48px;
+    display: block;
+    margin-top: 0px;
+    color: rgba(0,0,0,.54);
+    line-height: 1;
+    margin-bottom: 4px;
+}

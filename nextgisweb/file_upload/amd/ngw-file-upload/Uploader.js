@@ -7,8 +7,9 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/i18n!file_upload",
     "ngw-pyramid/hbs-i18n",
-    "dojo/text!./template/Uploader.html",
+    "dojo/text!./template/Uploader.hbs",
     "dojox/form/Uploader",
+    "dojo/dom-class",
     "ngw/route"
 ], function (
     declare,
@@ -20,6 +21,7 @@ define([
     hbsI18n,
     template,
     Uploader,
+    domClass,
     route
 ) {
     // Uploader AMD workaround
@@ -36,15 +38,16 @@ define([
     }
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: template,
+        templateString: hbsI18n(template, i18n),
 
         showProgressInDocTitle: true,
+        uploaderLinkText: "",
+        uploaderHelpText: "",
 
         constructor: function () {
             this.upload_promise = undefined;
-            this.docTitle = document.title;
+            this.docTitle = document.title;            
         },
-
         postCreate: function () {
             this.uploaderWidget = new Uploader({
                 label: i18n.gettext("Select"),
@@ -60,9 +63,7 @@ define([
             this.uploaderWidget.on("complete", function (data) { widget.uploadComplete(data); });
             this.uploaderWidget.on("error", function () { widget.uploadError(); });
 
-            this.uploaderWidget.addDropTarget(this.dropTarget);
-
-            this.fileInfo.innerHTML = i18n.gettext("File is not selected!");
+            widget.dndInit();
         },
 
         startup: function () {
@@ -70,11 +71,34 @@ define([
             this.uploaderWidget.startup();
         },
 
+        dndInit: function(){
+            var dropTarget = this.dropTarget;
+
+            this.uploaderWidget.addDropTarget(dropTarget);
+            if (this.uploaderLinkText.length) this.fileLink.innerHTML = this.uploaderLinkText;
+            if (this.uploaderHelpText.length) this.fileHelp.innerHTML = this.uploaderHelpText;
+
+            function dragOver(){
+                domClass.add(dropTarget, "uploader__dropzone--active");
+            }
+
+            function dragLeave(){
+                domClass.remove(dropTarget, "uploader__dropzone--active");
+            }
+
+            dropTarget.ondragover = dragOver;
+            dropTarget.ondragleave = dragLeave;
+            dropTarget.ondrop = dragLeave;
+        },
+
         uploadBegin: function () {
             this.upload_promise = new Deferred();
             this.uploading = true;
             this.data = undefined;
             this.fileInfo.innerHTML = i18n.gettext("Uploading...");
+
+            domClass.remove(this.fileText);
+            domClass.add(this.fileText, "uploader__text--progress");
         },
 
         uploadProgress: function (evt) {
@@ -95,6 +119,10 @@ define([
             // отдельных файлов, то извлекаем первый элемент из списка
             this.data = data.upload_meta[0];
             this.fileInfo.innerHTML = this.data.name + " (" + readableFileSize(this.data.size) + ")";
+
+            // Change text for choosing file
+            domClass.remove(this.fileText);
+            domClass.add(this.fileText, "uploader__text--complete");
         },
 
         uploadError: function (error) {
@@ -102,6 +130,9 @@ define([
             this.uploading = false;
             this.data = undefined;
             this.fileInfo.innerHTML = i18n.gettext("Could not load file!");
+
+            domClass.remove(this.fileText);
+            domClass.add(this.fileText, "uploader__text--error");
         },
 
         _getValueAttr: function () {

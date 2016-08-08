@@ -1,13 +1,13 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" class="padding-block">
+    <div data-dojo-attach-point="wSourceFile"
+            data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wFile" 
+            data-dojo-props="uploaderLinkText: '{{gettext 'Choose a layer file'}}',
+                             uploaderHelpText: '{{gettext 'The file should be in ESRI Shapefile (zip-archive) or GeoJSON format.'}}'
+    "></div>
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
-        
         <div data-dojo-attach-point="wSrs"
             data-dojo-type="ngw-spatial-ref-sys/SpatialRefSysSelect"
             title="{{gettext 'Spatial reference system'}}" style="width: 100%"></div>
-
-        <div data-dojo-attach-point="wSourceFile"
-            data-dojo-type="ngw-file-upload/Uploader"
-            title="{{gettext 'Source file'}}"></div>
 
         <select data-dojo-attach-point="wSourceEncoding"
             data-dojo-type="dijit/form/Select"
