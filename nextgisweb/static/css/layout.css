@@ -1080,6 +1080,9 @@ table {
 .nextgis.claro .dijitEditorIFrameContainer {
   padding: 16px;
 }
+.nextgis.claro .dijitButton--primary {
+  margin: 0;
+}
 .nextgis.claro .dijitButton--primary .dijitButtonNode {
   height: 36px;
   line-height: 34px;
