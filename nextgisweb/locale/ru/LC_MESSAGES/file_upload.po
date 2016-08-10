@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-08-08 17:47+0300\n"
+"POT-Creation-Date: 2016-08-10 15:15+0300\n"
 "PO-Revision-Date: 2015-09-15 14:53+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,36 +19,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.2.0\n"
 
-#: amd/ngw-file-upload/2016_08_06_Uploader.js:51
 #: amd/ngw-file-upload/Uploader.js:54
 msgid "Select"
 msgstr "Выбрать"
 
-#: amd/ngw-file-upload/2016_08_06_Uploader.js:66
-msgid "File is not selected!"
-msgstr "Файл не выбран!"
-
-#: amd/ngw-file-upload/2016_08_06_Uploader.js:78
 #: amd/ngw-file-upload/Uploader.js:99
 msgid "Uploading..."
 msgstr "Идёт загрузка..."
 
-#: amd/ngw-file-upload/2016_08_06_Uploader.js:83
 #: amd/ngw-file-upload/Uploader.js:107
 msgid " uploaded..."
 msgstr " загружено..."
 
-#: amd/ngw-file-upload/2016_08_06_Uploader.js:107
 #: amd/ngw-file-upload/Uploader.js:136
 msgid "Could not load file!"
 msgstr "Не удалось загрузить файл!"
 
 #: amd/ngw-file-upload/template/Uploader.hbs:9
-msgid "Choose a file"
+msgid "Select a file"
 msgstr "Выберите файл"
 
 #: amd/ngw-file-upload/template/Uploader.hbs:10
-msgid "Change?"
+msgid "Overwrite?"
 msgstr "Заменить?"
 
 #: amd/ngw-file-upload/template/Uploader.hbs:11
@@ -56,6 +48,5 @@ msgid "Try again"
 msgstr "Попробовать еще раз"
 
 #: amd/ngw-file-upload/template/Uploader.hbs:13
-msgid "or drag it here"
-msgstr "или перетащите его сюда"
-
+msgid "or use drag and drop"
+msgstr "или перетащите его в эту область"

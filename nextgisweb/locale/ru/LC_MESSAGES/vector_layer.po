@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-08-08 17:51+0300\n"
+"POT-Creation-Date: 2016-08-10 14:59+0300\n"
 "PO-Revision-Date: 2015-09-14 00:03+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -120,12 +120,12 @@ msgid "Geometry type for existing resource can not be changed."
 msgstr "Тип геометрии существующего ресурса не может быть изменен."
 
 #: amd/ngw-vector-layer/template/Widget.hbs:4
-msgid "Choose a layer file"
-msgstr "Выберите файл слоя"
+msgid "Select a dataset"
+msgstr "Выберите набор данных"
 
 #: amd/ngw-vector-layer/template/Widget.hbs:5
-msgid "The file should be in ESRI Shapefile (zip-archive) or GeoJSON format."
-msgstr "Файл должен быть в формате ESRI Shapefile (zip-архив) или GeoJSON."
+msgid "Dataset should be in ESRI Shapefile (zip) or GeoJSON format."
+msgstr "Данные должны быть в формате ESRI Shapefile (zip-архив) или GeoJSON."
 
 #: amd/ngw-vector-layer/template/Widget.hbs:10
 msgid "Spatial reference system"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-08-08 17:52+0300\n"
+"POT-Creation-Date: 2016-08-10 14:59+0300\n"
 "PO-Revision-Date: 2015-09-13 16:42+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -48,20 +48,15 @@ msgstr "Растровые файлы без информации о проек�
 msgid "File UUID"
 msgstr "UUID файла"
 
-#: amd/ngw-raster-layer/template/2016_08_04_Widget.hbs:3
+#: amd/ngw-raster-layer/template/Widget.hbs:3
+msgid "Select a dataset"
+msgstr "Выберите растровый слой"
+
+#: amd/ngw-raster-layer/template/Widget.hbs:4
+msgid "Dataset should be in GeoTIFF format with 3 or 4 bands (RGB or RGBA)."
+msgstr "Файл должен быть в формате GeoTIFF с 3 или 4 каналами (RGB or RGBA)."
+
 #: amd/ngw-raster-layer/template/Widget.hbs:7
 msgid "Coordinate system"
 msgstr "Система координат"
-
-#: amd/ngw-raster-layer/template/2016_08_04_Widget.hbs:4
-msgid "File"
-msgstr "Файл"
-
-#: amd/ngw-raster-layer/template/Widget.hbs:3
-msgid "Choose a layer file"
-msgstr "Выберите файл слоя"
-
-#: amd/ngw-raster-layer/template/Widget.hbs:4
-msgid "The file should be in GeoTIFF format with 3 or 4 bands (RGB or RGBA)."
-msgstr "Файл должен быть в формате GeoTIFF с 3 или 4 каналами (RGB or RGBA)."
 
