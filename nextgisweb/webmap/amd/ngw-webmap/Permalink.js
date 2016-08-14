@@ -7,10 +7,12 @@ define([
     'dojo/promise/all',
     'dijit/Dialog',
     'dijit/form/TextBox',
+    'ngw/utils/make-singleton',
     'openlayers/ol',
     'ngw-pyramid/i18n!webmap'
-], function (declare, array, lang, domConstruct, ioQuery, all, Dialog, TextBox, ol, i18n) {
-    return declare(null, {
+], function (declare, array, lang, domConstruct, ioQuery, all, Dialog, TextBox,
+             MakeSingleton, ol, i18n) {
+    return MakeSingleton(declare('ngw-webmap.Permalink', [], {
         constructor: function (Display) {
             this.display = Display;
         },
@@ -67,7 +69,7 @@ define([
                 title: i18n.gettext("Permalink"),
                 draggable: false,
                 autofocus: false,
-                onHide: function() {
+                onHide: function () {
                     permalinkDialog.destroy();
                 }
             });
@@ -90,5 +92,5 @@ define([
             permalinkContent.startup();
             permalinkDialog.show();
         }
-    });
+    }));
 });

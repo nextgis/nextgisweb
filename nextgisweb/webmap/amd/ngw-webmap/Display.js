@@ -49,6 +49,7 @@ define([
     "dijit/form/Select",
     "dijit/form/DropDownButton",
     "dijit/ToolbarSeparator",
+    "ngw-webmap/SocialButtons",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
     "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css"
@@ -641,7 +642,7 @@ define([
                 widget._zoomToInitialExtent();
             });
 
-            var permalink = new Permalink(this);
+            var permalink = Permalink.getInstance(this);
             this.showPermalink.on("click", function() {
                 permalink.showPermalink();
             });
