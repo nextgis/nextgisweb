@@ -642,7 +642,7 @@ define([
                 widget._zoomToInitialExtent();
             });
 
-            var permalink = new Permalink(this);
+            var permalink = Permalink.getInstance(this);
             this.showPermalink.on("click", function() {
                 permalink.showPermalink();
             });
