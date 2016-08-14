@@ -5,6 +5,7 @@ define([
     "dojo/_base/lang",
     "dojo/dom-style",
     "dojo/on",
+    "dojo/query",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/ContentPane",
@@ -12,22 +13,26 @@ define([
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/SocialButtons.hbs",
     "ngw/settings!webmap",
+    "ngw-webmap/Permalink",
     "xstyle/css!./template/resources/SocialButtons/css/fontello.css",
     "xstyle/css!./template/resources/SocialButtons/SocialButtons.css"
-], function (declare, array, lang, domStyle, on,
+], function (declare, array, lang, domStyle, on, query,
              _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
-             i18n, hbsI18n, template, settings) {
+             i18n, hbsI18n, template, settings, Permalink) {
     return declare([ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("Layers"),
         templateString: hbsI18n(template, i18n),
         url: window.location.href,
 
-        constructor: function () {
-
+        constructor: function (params) {
+            this.permalink = Permalink.getInstance(params.display);
         },
 
         postCreate: function () {
-
+            on(query("a.permalink", this.domNode), "click",
+                lang.hitch(this, function () {
+                    this.permalink.showPermalink();
+            }));
         },
 
         startup: function () {
