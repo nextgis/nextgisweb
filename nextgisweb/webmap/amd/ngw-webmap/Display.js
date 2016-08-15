@@ -32,7 +32,6 @@ define([
     "ngw/route",
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
-    "ngw-webmap/Permalink",
     // tools
     "./tool/Base",
     "./tool/Zoom",
@@ -86,7 +85,6 @@ define([
     route,
     i18n,
     hbsI18n,
-    Permalink,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -640,11 +638,6 @@ define([
 
             this.zoomToInitialExtentButton.on("click", function() {
                 widget._zoomToInitialExtent();
-            });
-
-            var permalink = Permalink.getInstance(this);
-            this.showPermalink.on("click", function() {
-                permalink.showPermalink();
             });
 
             this._zoomToInitialExtent();
