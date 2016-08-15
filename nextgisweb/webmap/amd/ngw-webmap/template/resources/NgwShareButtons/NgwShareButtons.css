@@ -1,4 +1,4 @@
-div.social-buttons {
+div.ngw-share-buttons {
     position: absolute;
     top: 30px;
     right: 0;
@@ -8,26 +8,20 @@ div.social-buttons {
 
 }
 
-div.social-buttons i {
+div.ngw-share-buttons i {
 
 }
 
-div.social-buttons i, div.social-buttons a {
+div.ngw-share-buttons i, div.ngw-share-buttons a {
     font-size: 24px;
     color: #176FC1;
     display: block;
     text-decoration: none;
 }
 
-div.social-buttons a {
+div.ngw-share-buttons a {
     opacity: 0.8;
 }
-
-/*div.social-buttons {*/
-    /*background-color: pink;*/
-    /*padding: 30px;*/
-    /*width: 300px;*/
-/*}*/
 
 div.buttons {
     display: none;
@@ -36,22 +30,22 @@ div.buttons {
     /*width: 200px;*/
 }
 
-div.social-buttons:hover div.buttons {
+div.ngw-share-buttons:hover div.buttons {
     display: block;
 }
 
-div.social-buttons a.icon-facebook-squared {
+div.ngw-share-buttons a.icon-facebook-squared {
     color: #365899;
 }
-div.social-buttons a.icon-twitter-squared {
+div.ngw-share-buttons a.icon-twitter-squared {
     color: #1B95E0;
 }
-div.social-buttons a.icon-gplus-squared {
+div.ngw-share-buttons a.icon-gplus-squared {
     color: #D73D32;
 }
-div.social-buttons a.icon-vkontakte {
+div.ngw-share-buttons a.icon-vkontakte {
     color: #507299;
 }
-div.social-buttons a:hover {
+div.ngw-share-buttons a:hover {
     opacity: 1;
 }
