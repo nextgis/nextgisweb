@@ -223,14 +223,14 @@ To create new user the following request have to be executed:
 To create new group the following request have to be executed:
     
 .. versionadded:: 2.3
-.. http:post:: /api/component/auth/group/
+.. http:post:: /api/component/auth/group
 
    request to create new group
        
 To self create user (anonymouse) the following request have to be executed:
     
 .. versionadded:: 2.3
-.. http:post:: /api/component/auth/register/
+.. http:post:: /api/component/auth/register
 
    request to create new user
    
