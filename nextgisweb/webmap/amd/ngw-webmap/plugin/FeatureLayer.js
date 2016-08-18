@@ -155,11 +155,15 @@ define([
        },
 
         postCreate: function () {
-            this.display.itemMenu.addChild(this.menuItem);
+            if (this.display.itemMenu) {
+                this.display.itemMenu.addChild(this.menuItem);
+            }
             this.display.addTool(this.tool);
 
-            new ToolbarSeparator().placeAt(this.display.infoNode, 'first');
-            this.tbSearch.placeAt(this.display.infoNode, 'first');
+            if (this.display.infoNode) {
+                new ToolbarSeparator().placeAt(this.display.infoNode, 'first');
+                this.tbSearch.placeAt(this.display.infoNode, 'first');
+            }
         },
 
         openFeatureGrid: function () {
