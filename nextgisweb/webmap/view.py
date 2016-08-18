@@ -8,6 +8,7 @@ from .model import WebMap
 from .plugin import WebmapPlugin
 from .adapter import WebMapAdapter
 from .util import _
+import urllib
 
 
 class ExtentWidget(Widget):
@@ -107,7 +108,8 @@ def setup_pyramid(comp, config):
                 plugin=tuple(display.mid.plugin)
             ),
             bookmarkLayerId=obj.bookmark_resource_id,
-            tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id)
+            tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id),
+            testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id)
         )
 
         return dict(
@@ -125,6 +127,17 @@ def setup_pyramid(comp, config):
         'webmap.display.tiny', '/resource/{id:\d+}/display/tiny',
         factory=resource_factory, client=('id',)
     ).add_view(display, context=WebMap, renderer='nextgisweb:webmap/template/tinyDisplay.mako')
+
+    def shared_map_test(request):
+        iframe = request.POST['iframe']
+        request.response.headerlist.append(("X-XSS-Protection", "0"))
+        return dict(
+            iframe=urllib.unquote(urllib.unquote(iframe))
+        )
+
+    config.add_route(
+        'webmap.display.shared.test', '/embedded/test.html'
+    ).add_view(shared_map_test, renderer='nextgisweb:webmap/template/embeddedMapTest.mako')
 
     class DisplayMenu(DynItem):
         def build(self, args):
