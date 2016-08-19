@@ -25,24 +25,20 @@ define([
             this.display = Display;
         },
 
-        showEmbeddedCode: function () {
+        _iframeSrc: null,
+        showDialog: function () {
             all({
                 visbleItems: this.display.getVisibleItems(),
                 map: this.display._mapDeferred
             }).then(
                 lang.hitch(this, function (gettingVisibleItemsResults) {
-                    this._showPermalink(gettingVisibleItemsResults.visbleItems);
+                    this._iframeSrc = this._getIframeSrc(gettingVisibleItemsResults.visbleItems);
+                    this._showDialog();
                 }),
                 function (error) {
                     console.log(error);
                 }
             );
-        },
-
-        _iframeSrc: null,
-        _showPermalink: function (visbleItems) {
-            this._iframeSrc = this._getIframeSrc(visbleItems);
-            this._showPermalinkDialog();
         },
 
         _getIframeSrc: function (visbleItems) {
@@ -81,7 +77,6 @@ define([
         _heightTextBox: null,
         _iframeTextarea: null,
 
-
         _getIframeHtml: function () {
             var iframeTemplateContext = {
                 iframeSrc: this._iframeSrc,
@@ -95,39 +90,38 @@ define([
             this._iframeTextarea.set('value', this._getIframeHtml());
         },
 
-        _showPermalinkDialog: function () {
-            var permalinkDialog, permalinkContent,
-                embedCode, copyBtn;
+        _showDialog: function () {
+            var embeddMapDialog, tableContainer, previewBtn;
 
-            permalinkDialog = new Dialog({
+            embeddMapDialog = new Dialog({
                 title: i18n.gettext('ShareEmbeddedMap'),
                 draggable: false,
                 autofocus: false,
                 onHide: function () {
-                    permalinkDialog.destroy();
+                    embeddMapDialog.destroy();
                 }
             });
 
             this._widthTextBox = new TextBox({
-                name: "width",
+                name: 'width',
                 label: 'Width',
                 intermediateChanges: true,
-                value: "500px",
+                value: '500px',
                 style: {width: '200px'}
             });
 
 
             this._heightTextBox = new TextBox({
-                name: "height",
+                name: 'height',
                 label: 'Height',
                 intermediateChanges: true,
-                value: "500px",
+                value: '500px',
                 style: {width: '200px'}
             });
 
 
             this._iframeTextarea = new SimpleTextarea({
-                label: "Output HTML",
+                label: 'Output HTML',
                 readOnly: false,
                 selectOnClick: true,
                 rows: 3,
@@ -138,22 +132,24 @@ define([
                 }
             });
 
-            var programmatic = new dojox.layout.TableContainer({
+            tableContainer = new dojox.layout.TableContainer({
                 cols: 1,
-                customClass: "labelsAndValues",
-                labelWidth: "150"
+                customClass: 'labelsAndValues',
+                labelWidth: '150'
             });
-            programmatic.addChild(this._widthTextBox);
-            programmatic.addChild(this._heightTextBox);
-            programmatic.addChild(this._iframeTextarea);
+            tableContainer.addChild(this._widthTextBox);
+            tableContainer.addChild(this._heightTextBox);
+            tableContainer.addChild(this._iframeTextarea);
 
             domConstruct.place(
-                programmatic.domNode,
-                permalinkDialog.containerNode,
+                tableContainer.domNode,
+                embeddMapDialog.containerNode,
                 'first'
             );
 
-            copyBtn = new Button({
+            tableContainer.startup();
+
+            previewBtn = new Button({
                 label: 'Preview',
                 onClick: lang.hitch(this, function () {
                     var form = domConstruct.create('form', {
@@ -161,30 +157,28 @@ define([
                         innerHTML: '<input type="hidden" name="iframe" value="' + encodeURI(this._getIframeHtml()) + '" />',
                         action: displayConfig.testEmbeddedMapUrl,
                         method: 'POST',
-                        target: "_blank"
-                    }, permalinkDialog.containerNode);
+                        target: '_blank'
+                    }, embeddMapDialog.containerNode);
                     form.submit();
                 })
             });
 
             domConstruct.place(
-                copyBtn.domNode,
-                permalinkDialog.containerNode,
+                previewBtn.domNode,
+                embeddMapDialog.containerNode,
                 'last'
             );
 
-            copyBtn.startup();
+            previewBtn.startup();
 
-            //permalinkContent.startup();
-            programmatic.startup();
-
-            on(this._widthTextBox, "change", lang.hitch(this, function () {
+            on(this._widthTextBox, 'change', lang.hitch(this, function () {
                 this._updateIframeTextarea();
             }));
-            on(this._heightTextBox, "change", lang.hitch(this, function () {
+            on(this._heightTextBox, 'change', lang.hitch(this, function () {
                 this._updateIframeTextarea();
             }));
-            permalinkDialog.show();
+
+            embeddMapDialog.show();
         }
     }));
 });

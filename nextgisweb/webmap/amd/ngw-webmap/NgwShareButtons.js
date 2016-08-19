@@ -37,7 +37,7 @@ define([
 
             on(query("a.embedded-map", this.domNode), "click",
                 lang.hitch(this, function () {
-                    this.shareEmbeddedMapDialog.showEmbeddedCode();
+                    this.shareEmbeddedMapDialog.showDialog();
             }));
         },
 
