@@ -16,53 +16,32 @@ define([
     'dojox/layout/TableContainer',
     'ngw/utils/make-singleton',
     'openlayers/ol',
+    'ngw-webmap/Permalink',
     'ngw-pyramid/i18n!webmap'
 ], function (declare, array, lang, on, domConstruct, ioQuery, all, dtl, dtlContext,
              Dialog, Button, TextBox, SimpleTextarea, NumberTextBox,
-             TableContainer, MakeSingleton, ol, i18n) {
+             TableContainer, MakeSingleton, ol, Permalink, i18n) {
     return MakeSingleton(declare('ngw-webmap.ShareEmbeddedMapDialog', [], {
         constructor: function (Display) {
             this.display = Display;
         },
 
         _iframeSrc: null,
-        showDialog: function () {
+        show: function () {
             all({
                 visbleItems: this.display.getVisibleItems(),
                 map: this.display._mapDeferred
             }).then(
                 lang.hitch(this, function (gettingVisibleItemsResults) {
-                    this._iframeSrc = this._getIframeSrc(gettingVisibleItemsResults.visbleItems);
+                    this._iframeSrc = Permalink.getPermalink(this.display, gettingVisibleItemsResults.visbleItems, {
+                        urlWithoutParams: displayConfig.tinyDisplayUrl
+                    });
                     this._showDialog();
                 }),
                 function (error) {
                     console.log(error);
                 }
             );
-        },
-
-        _getIframeSrc: function (visbleItems) {
-            var visibleStyles, center, queryStr;
-
-            visibleStyles = array.map(
-                visbleItems,
-                lang.hitch(this, function (i) {
-                    return this.display.itemStore.dumpItem(i).styleId;
-                })
-            );
-
-            center = ol.proj.toLonLat(this.display.map.olMap.getView().getCenter());
-
-            queryStr = ioQuery.objectToQuery({
-                base: this.display._baseLayer.name,
-                lon: center[0].toFixed(4),
-                lat: center[1].toFixed(4),
-                angle: this.display.map.olMap.getView().getRotation(),
-                zoom: this.display.map.olMap.getView().getZoom(),
-                styles: visibleStyles.join(',')
-            });
-
-            return displayConfig.tinyDisplayUrl + '?' + queryStr;
         },
 
         _iframeTemplate: new dtl.Template('<iframe src="{{ iframeSrc }}" frameborder="0" ' +
