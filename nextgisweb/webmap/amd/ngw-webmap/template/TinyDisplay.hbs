@@ -1,0 +1,20 @@
+<div data-dojo-type="${baseClass}"
+    data-dojo-attach-point="focusNode"
+    style="width: 100%; height: 100%">
+
+
+    <div data-dojo-attach-point="mapPane"
+                        data-dojo-type="dijit/layout/ContentPane"
+                        data-dojo-props="region: 'center'"
+                        style="width: 100%; height:100%; padding: 0;">
+
+                        <div data-dojo-attach-point="mapNode"
+                            style="position: absolute: width: 100%; height: 100%; padding: 0;">
+
+                            <div style="position: absolute; top: 0; right: 0; z-index: 2000; margin: 4px; background-color: rgba(255, 255, 255, 0.5)">
+                                <a href="http://nextgis.com" target="_blank"><img alt="{{gettext 'Get your own Web GIS at nextgis.com'}}" class="map-logo" src="${assetUrl}img/nextgis.png"/></a>
+                            </div>
+                        </div>
+
+                    </div>
+</div>

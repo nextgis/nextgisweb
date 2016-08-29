@@ -52,7 +52,9 @@ define([
         },
 
         postCreate: function () {
-            this.display.itemMenu.addChild(this.menuItem);
+            if (this.display.itemMenu) {
+                this.display.itemMenu.addChild(this.menuItem);
+            }
         },
 
         openLayerInfo: function () {

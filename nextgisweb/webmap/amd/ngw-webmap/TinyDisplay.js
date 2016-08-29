@@ -4,7 +4,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./template/Display.hbs",
+    "dojo/text!./template/TinyDisplay.hbs",
     "dojo/_base/lang",
     "dojo/_base/array",
     "dojo/Deferred",
@@ -268,12 +268,16 @@ define([
 
             // Размещаем дерево, когда виджет будет готов
             all([this._layersDeferred, this._postCreateDeferred]).then(
-                function () { widget.itemTree.placeAt(widget.layerTreePane); }
+                function () {
+                    //widget.itemTree.placeAt(widget.layerTreePane);
+                }
             ).then(undefined, function (err) { console.error(err); });
 
             // Загружаем закладки, когда кнопка будет готова
             this._postCreateDeferred.then(
-                function () { widget.loadBookmarks(); }
+                function () {
+                    //widget.loadBookmarks();
+                }
             ).then(undefined, function (err) { console.error(err); });
 
             // Выбранный элемент
@@ -292,28 +296,28 @@ define([
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            all([this._mapDeferred, this._postCreateDeferred]).then(
-                function () {
-                    // Формируем список слоев базовых карты в списке выбора
-                    array.forEach(Object.keys(widget.map.layers), function (key) {
-                        var layer = widget.map.layers[key];
-                        if (layer.isBaseLayer) {
-                            widget.basemapSelect.addOption({
-                                value: key,
-                                label: layer.title
-                            });
-                        }
-                    });
-
-                    // И добавляем возможность переключения
-                    widget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
-                        widget.map.layers[oldVal].olLayer.setVisible(false);
-                        widget.map.layers[newVal].olLayer.setVisible(true);
-                        widget._baseLayer = widget.map.layers[newVal];
-                    });
-                    if (widget._urlParams.base) { widget.basemapSelect.set("value", widget._urlParams.base); }
-                }
-            ).then(undefined, function (err) { console.error(err); });
+            //all([this._mapDeferred, this._postCreateDeferred]).then(
+            //    function () {
+            //        // Формируем список слоев базовых карты в списке выбора
+            //        array.forEach(Object.keys(widget.map.layers), function (key) {
+            //            var layer = widget.map.layers[key];
+            //            if (layer.isBaseLayer) {
+            //                widget.basemapSelect.addOption({
+            //                    value: key,
+            //                    label: layer.title
+            //                });
+            //            }
+            //        });
+            //
+            //        // И добавляем возможность переключения
+            //        widget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
+            //            widget.map.layers[oldVal].olLayer.setVisible(false);
+            //            widget.map.layers[newVal].olLayer.setVisible(true);
+            //            widget._baseLayer = widget.map.layers[newVal];
+            //        });
+            //        if (widget._urlParams.base) { widget.basemapSelect.set("value", widget._urlParams.base); }
+            //    }
+            //).then(undefined, function (err) { console.error(err); });
 
             // Слои элементов
             all([this._midDeferred.adapter, this._itemStoreDeferred]).then(
@@ -375,35 +379,35 @@ define([
 
             // Модифицируем TabContainer так, чтобы он показывал табы только
             // в том случае, если их больше одного, т.е. один таб не показываем
-            declare.safeMixin(this.tabContainer, {
-                updateTabVisibility: function () {
-                    var currstate = domStyle.get(this.tablist.domNode, "display") != "none",
-                        newstate = this.getChildren().length > 1;
-
-                    if (currstate && !newstate) {
-                        // Скрываем панель с табами
-                        domStyle.set(this.tablist.domNode, "display", "none");
-                        this.resize();
-                    } else if (!currstate && newstate) {
-                        // Показываем панель с табами
-                        domStyle.set(this.tablist.domNode, "display", "block");
-                        this.resize();
-                    }
-                },
-
-                addChild: function () {
-                    this.inherited(arguments);
-                    this.updateTabVisibility();
-                },
-                removeChild: function () {
-                    this.inherited(arguments);
-                    this.updateTabVisibility();
-                },
-                startup: function () {
-                    this.inherited(arguments);
-                    this.updateTabVisibility();
-                }
-            });
+            //declare.safeMixin(this.tabContainer, {
+            //    updateTabVisibility: function () {
+            //        var currstate = domStyle.get(this.tablist.domNode, "display") != "none",
+            //            newstate = this.getChildren().length > 1;
+            //
+            //        if (currstate && !newstate) {
+            //            // Скрываем панель с табами
+            //            domStyle.set(this.tablist.domNode, "display", "none");
+            //            this.resize();
+            //        } else if (!currstate && newstate) {
+            //            // Показываем панель с табами
+            //            domStyle.set(this.tablist.domNode, "display", "block");
+            //            this.resize();
+            //        }
+            //    },
+            //
+            //    addChild: function () {
+            //        this.inherited(arguments);
+            //        this.updateTabVisibility();
+            //    },
+            //    removeChild: function () {
+            //        this.inherited(arguments);
+            //        this.updateTabVisibility();
+            //    },
+            //    startup: function () {
+            //        this.inherited(arguments);
+            //        this.updateTabVisibility();
+            //    }
+            //});
 
             this._postCreateDeferred.resolve();
         },
@@ -417,6 +421,10 @@ define([
         },
 
         addTool: function (tool) {
+            if (!this.mapToolbar) {
+                return false;
+            }
+
             var btn = new ToggleButton({
                 label: tool.label,
                 showLabel: false,
@@ -590,18 +598,18 @@ define([
 
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
-                var pt = ol.proj.transform(newVal, widget.displayProjection, widget.lonlatProjection);
-                widget.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
-                widget.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
+                //var pt = ol.proj.transform(newVal, widget.displayProjection, widget.lonlatProjection);
+                //widget.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
+                //widget.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
             });
 
             // Обновление подписи масштабного уровня
             this.map.watch("resolution", function (attr, oldVal, newVal) {
-                widget.scaleInfoNode.innerHTML = "1 : " + number.format(
-                    widget.map.getScaleForResolution(
-                        newVal,
-                        widget.map.olMap.getView().getProjection().getMetersPerUnit()
-                    ), {places: 0});
+                //widget.scaleInfoNode.innerHTML = "1 : " + number.format(
+                //    widget.map.getScaleForResolution(
+                //        newVal,
+                //        widget.map.olMap.getView().getProjection().getMetersPerUnit()
+                //    ), {places: 0});
             });
 
             // При изменении размеров контейнера пересчитываем размер карты
@@ -635,10 +643,10 @@ define([
 
                 idx = idx + 1;
             }, this);
-
-            this.zoomToInitialExtentButton.on("click", function() {
-                widget._zoomToInitialExtent();
-            });
+            //
+            //this.zoomToInitialExtentButton.on("click", function() {
+            //    widget._zoomToInitialExtent();
+            //});
 
             this._zoomToInitialExtent();
 
@@ -722,11 +730,11 @@ define([
         },
 
         _toolsSetup: function () {
-            this.addTool(new ToolZoom({display: this, out: false}));
-            this.addTool(new ToolZoom({display: this, out: true}));
-
-            this.addTool(new ToolMeasure({display: this, type: "LineString"}));
-            this.addTool(new ToolMeasure({display: this, type: "Polygon"}));
+            //this.addTool(new ToolZoom({display: this, out: false}));
+            //this.addTool(new ToolZoom({display: this, out: true}));
+            //
+            //this.addTool(new ToolMeasure({display: this, type: "LineString"}));
+            //this.addTool(new ToolMeasure({display: this, type: "Polygon"}));
         },
 
         _pluginsSetup: function () {
