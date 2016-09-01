@@ -145,6 +145,57 @@ PostGIS Layer
 Vector layer
 ------------
 
+New method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example request**:
+
+.. sourcecode:: http
+
+POST /api/resource/ HTTP/1.1
+
+{
+    "resource":{
+        "cls":"vector_layer",
+        "parent":{
+            "id":0
+        },
+        "display_name":"Foo bar",
+        "keyname":null,
+        "description":null
+    },
+    "resmeta":{
+        "items":{
+
+        }
+    },
+    "vector_layer":{
+        "srs":{ "id":3857 },
+        "geometry_type": "POINT",
+        "fields": [
+            {
+                "keyname": "REAL_FIELD",
+                "datatype": "REAL"
+            },
+            {
+                "keyname": "INTEGER_FIELD",
+                "datatype": "INTEGER"
+            },
+            {
+                "keyname": "DATE_FIELD",
+                "datatype": "DATE"
+            },
+            {
+                "keyname": "TIME_FIELD",
+                "datatype": "TIME"
+            }
+        ]
+    }
+}
+
+Old method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Создание векторного слоя включает в себя 3 этапа:
 
 1. Подготовка векторных данных для слоя
