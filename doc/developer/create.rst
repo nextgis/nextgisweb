@@ -142,11 +142,9 @@ PostGIS Layer
     }     
 
 
-Vector layer
-------------
+Vector empty layer 
+-----------------------
 
-New method
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Example request**:
 
@@ -193,8 +191,8 @@ POST /api/resource/ HTTP/1.1
     }
     }
 
-Old method
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Vector layer with data 
+-----------------------
 
 Создание векторного слоя включает в себя 3 этапа:
 
