@@ -154,7 +154,7 @@ New method
 
 POST /api/resource/ HTTP/1.1
 
-{
+    {
     "resource":{
         "cls":"vector_layer",
         "parent":{
@@ -191,7 +191,7 @@ POST /api/resource/ HTTP/1.1
             }
         ]
     }
-}
+    }
 
 Old method
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
