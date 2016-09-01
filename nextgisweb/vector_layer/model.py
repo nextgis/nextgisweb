@@ -147,6 +147,23 @@ class TableInfo(object):
         return self
 
     @classmethod
+    def from_fields(cls, fields, srs_id, geometry_type):
+        self = cls(srs_id)
+        self.geometry_type = geometry_type
+        self.fields = []
+
+        for fld in fields:
+            uid = str(uuid.uuid4().hex)
+            self.fields.append(FieldDef(
+                'fld_%s' % uid,
+                fld['keyname'],
+                fld['datatype'],
+                uid
+            ))
+
+        return self
+
+    @classmethod
     def from_layer(cls, layer):
         self = cls(layer.srs_id)
 
@@ -313,6 +330,16 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     def setup_from_ogr(self, ogrlayer, strdecode):
         tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs.id, strdecode)
+        tableinfo.setup_layer(self)
+
+        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.metadata.create_all(bind=DBSession.connection())
+
+        self.tableinfo = tableinfo
+
+    def setup_from_fields(self, fields):
+        tableinfo = TableInfo.from_fields(
+            fields, self.srs.id, self.geometry_type)
         tableinfo.setup_layer(self)
 
         tableinfo.setup_metadata(tablename=self._tablename)
@@ -654,6 +681,15 @@ class _source_attr(SP):
                 shutil.rmtree(ogrfn)
 
 
+class _fields_attr(SP):
+
+    def setter(self, srlzr, value):
+        srlzr.obj.tbl_uuid = uuid.uuid4().hex
+
+        with DBSession.no_autoflush:
+            srlzr.obj.setup_from_fields(value)
+
+
 class _geometry_type_attr(SP):
 
     def setter(self, srlzr, value):
@@ -681,6 +717,7 @@ class VectorLayerSerializer(Serializer):
     geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
 
     source = _source_attr(read=None, write=P_DS_WRITE)
+    fields = _fields_attr(read=None, write=P_DS_WRITE)
 
 
 class FeatureQueryBase(object):
