@@ -743,6 +743,7 @@ class FeatureQueryBase(object):
 
         self._filter = None
         self._filter_by = None
+        self._filter_sql = None
         self._like = None
         self._intersects = None
 
@@ -773,6 +774,12 @@ class FeatureQueryBase(object):
 
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
+
+    def filter_sql(self, *args):
+        if len(args) > 0 and isinstance(args[0], list):
+            self._filter_sql = args[0]
+        else:
+            self._filter_sql = args
 
     def order_by(self, *args):
         self._order_by = args
@@ -843,6 +850,21 @@ class FeatureQueryBase(object):
                     l.append(op(table.columns.id, v))
                 else:
                     l.append(op(table.columns[tableinfo[k].key], v))
+
+            where.append(db.and_(*l))
+
+        if self._filter_sql:
+            l = []
+            for _filter_sql_item in self._filter_sql:
+                if len(_filter_sql_item) == 3:
+                    table_column, op, val = _filter_sql_item
+                    if table_column == 'id':
+                        l.append(op(table.columns.id, val))
+                    else:
+                        l.append(op(table.columns[tableinfo[table_column].key], val))
+                elif len(_filter_sql_item) == 4:
+                    table_column, op, val1, val2 = _filter_sql_item
+                    l.append(op(table.columns[tableinfo[table_column].key], val1, val2))
 
             where.append(db.and_(*l))
 
