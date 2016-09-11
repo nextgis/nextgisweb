@@ -33,6 +33,7 @@ define([
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
     // tools
+    "ngw-webmap/MapToolbar",
     "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
@@ -85,6 +86,7 @@ define([
     route,
     i18n,
     hbsI18n,
+    MapToolbar,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -421,7 +423,7 @@ define([
                 label: tool.label,
                 showLabel: false,
                 iconClass: tool.iconClass
-            }).placeAt(this.mapToolbar);
+            }).placeAt(this.mapToolbar.items);
 
             tool.toolbarBtn = btn;
 
@@ -456,7 +458,7 @@ define([
                 store.query().then(
                     function (data) {
                         array.forEach(data, function (f) {
-                            display.bookmarkMenu.addChild(new MenuItem({
+                            display.mapToolbar.items.bookmarkMenu.addChild(new MenuItem({
                                 label: f.label,
                                 onClick: function () {
                                     // Отдельно запрашиваем экстент объекта
@@ -591,13 +593,13 @@ define([
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
                 var pt = ol.proj.transform(newVal, widget.displayProjection, widget.lonlatProjection);
-                widget.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
-                widget.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
+                widget.mapToolbar.items.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
+                widget.mapToolbar.items.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
             });
 
             // Обновление подписи масштабного уровня
             this.map.watch("resolution", function (attr, oldVal, newVal) {
-                widget.scaleInfoNode.innerHTML = "1 : " + number.format(
+                widget.mapToolbar.items.scaleInfoNode.innerHTML = "1 : " + number.format(
                     widget.map.getScaleForResolution(
                         newVal,
                         widget.map.olMap.getView().getProjection().getMetersPerUnit()
@@ -636,7 +638,7 @@ define([
                 idx = idx + 1;
             }, this);
 
-            this.zoomToInitialExtentButton.on("click", function() {
+            this.mapToolbar.items.zoomToInitialExtentButton.on("click", function() {
                 widget._zoomToInitialExtent();
             });
 

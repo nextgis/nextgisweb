@@ -1,0 +1,36 @@
+<div>
+    <div style="padding: 0 4px; float: right;">
+        <div data-dojo-attach-point="bookmarkButton"
+             data-dojo-type="dijit/form/DropDownButton"
+             data-dojo-props="label: '{{gettext 'Bookmarks'}}', iconClass: 'dijitIconBookmark'">
+            <div data-dojo-attach-point="bookmarkMenu"
+                 data-dojo-type="dijit/Menu">
+            </div>
+        </div>
+    </div>
+
+    <!-- Распорка по высоте -->
+    <div data-dojo-type="dijit/form/Button" style="width: 0;">&nbsp;</div>
+
+    <div data-dojo-attach-point="zoomToInitialExtentButton"
+         data-dojo-type="dijit/form/Button"
+         data-dojo-props="iconClass: 'iconArrowInOut', label: '{{gettext 'Initial extent'}}', showLabel: false">
+    </div>
+
+    <div data-dojo-type="dijit/ToolbarSeparator"></div>
+
+    <div data-dojo-attach-point="infoNode"
+         style="display: inline-block; vertical-align: middle; float: right; padding: 0 4px;">
+
+        <div data-dojo-type="dijit/form/Button" style="width: 0;">&nbsp;</div>
+
+        <span style="color: #999">{{gettext 'Longitude'}}</span>
+        <span data-dojo-attach-point="centerLonNode"></span>
+
+        <span style="color: #999">{{gettext 'Latitude'}}</span>
+        <span data-dojo-attach-point="centerLatNode"></span>
+
+        <span style="color: #999">{{gettext 'Scale'}}</span>
+        <span data-dojo-attach-point="scaleInfoNode"></span>
+    </div>
+</div>
