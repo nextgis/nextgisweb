@@ -275,7 +275,9 @@ define([
 
             // Загружаем закладки, когда кнопка будет готова
             this._postCreateDeferred.then(
-                function () { widget.loadBookmarks(); }
+                function () {
+                    widget.mapToolbar.items.loadBookmarks();
+                }
             ).then(undefined, function (err) { console.error(err); });
 
             // Выбранный элемент
@@ -445,46 +447,6 @@ define([
                     tool.deactivate();
                 }
             });
-        },
-
-        loadBookmarks: function () {
-            if (this.config.bookmarkLayerId) {
-                var store = new JsonRest({target: route.feature_layer.store({
-                    id: this.config.bookmarkLayerId
-                })});
-
-                var display = this;
-
-                store.query().then(
-                    function (data) {
-                        array.forEach(data, function (f) {
-                            display.mapToolbar.items.bookmarkMenu.addChild(new MenuItem({
-                                label: f.label,
-                                onClick: function () {
-                                    // Отдельно запрашиваем экстент объекта
-                                    xhr.get(route.feature_layer.store.item({
-                                        id: display.config.bookmarkLayerId,
-                                        feature_id: f.id
-                                    }), {
-                                        handleAs: "json",
-                                        headers: { "X-Feature-Box": true }
-                                    }).then(
-                                        function data(featuredata) {
-                                            display.map.olMap.getView().fit(
-                                                featuredata.box,
-                                                display.map.olMap.getSize()
-                                            );
-                                        }
-                                    );
-                                }
-                            }));
-                        });
-                    }
-                );
-            } else {
-                // Если слой с закладками не указан, то прячем кнопку
-                domStyle.set(this.bookmarkButton.domNode, "display", "none");
-            }
         },
 
         _itemStoreSetup: function () {
