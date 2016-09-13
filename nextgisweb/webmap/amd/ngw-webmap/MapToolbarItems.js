@@ -27,45 +27,51 @@ define([
         },
 
         loadBookmarks: function () {
-            if (this.display.config.bookmarkLayerId) {
-                var store = new JsonRest({
-                    target: route.feature_layer.store({
-                        id: this.display.config.bookmarkLayerId
-                    })
-                });
+            var bookmarkId = this.display.config.bookmarkLayerId,
+                store;
 
-                var display = this.display;
-
-                store.query().then(
-                    function (data) {
-                        array.forEach(data, function (f) {
-                            display.mapToolbar.items.bookmarkMenu.addChild(new MenuItem({
-                                label: f.label,
-                                onClick: function () {
-                                    // Отдельно запрашиваем экстент объекта
-                                    xhr.get(route.feature_layer.store.item({
-                                        id: display.config.bookmarkLayerId,
-                                        feature_id: f.id
-                                    }), {
-                                        handleAs: "json",
-                                        headers: {"X-Feature-Box": true}
-                                    }).then(
-                                        function data(featuredata) {
-                                            display.map.olMap.getView().fit(
-                                                featuredata.box,
-                                                display.map.olMap.getSize()
-                                            );
-                                        }
-                                    );
-                                }
-                            }));
-                        });
-                    }
-                );
-            } else {
-                // Если слой с закладками не указан, то прячем кнопку
-                domStyle.set(this.bookmarkButton.domNode, "display", "none");
+            if (!bookmarkId) {
+                domStyle.set(this.bookmarkButton.domNode, 'display', 'none');
+                return false;
             }
+
+            store = new JsonRest({
+                target: route.feature_layer.store({
+                    id: this.display.config.bookmarkLayerId
+                })
+            });
+
+            store.query().then(lang.hitch(this, this._buildBookmarksMenuItems));
+
+        },
+
+        _buildBookmarksMenuItems: function (features) {
+            array.forEach(features, function (feature) {
+                this.bookmarkMenu.addChild(new MenuItem({
+                    label: feature.label,
+                    onClick: lang.hitch(this, function () {
+                        this._bookmarkClickMenuItemHandler(feature.id);
+                    })
+                }));
+            }, this);
+        },
+
+        _bookmarkClickMenuItemHandler: function (featureId) {
+            var feature = route.feature_layer.store.item({
+                id: this.display.config.bookmarkLayerId,
+                feature_id: featureId
+            });
+
+            xhr.get(feature, {
+                handleAs: "json",
+                headers: {"X-Feature-Box": true}
+            }).then(lang.hitch(this, function (featureData) {
+                    this.display.map.olMap.getView().fit(
+                        featureData.box,
+                        this.display.map.olMap.getSize()
+                    );
+                }
+            ));
         }
     });
 });
