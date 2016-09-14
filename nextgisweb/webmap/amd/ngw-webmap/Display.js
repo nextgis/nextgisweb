@@ -420,35 +420,6 @@ define([
             this._startupDeferred.resolve();
         },
 
-        addTool: function (tool) {
-            var btn = new ToggleButton({
-                label: tool.label,
-                showLabel: false,
-                iconClass: tool.iconClass
-            }).placeAt(this.mapToolbar.items);
-
-            tool.toolbarBtn = btn;
-
-            this.tools.push(tool);
-
-            var display = this;
-            btn.watch("checked", function (attr, oldVal, newVal) {
-                if (newVal) {
-                    // При включении инструмента все остальные инструменты
-                    // выключаем, а этот включаем
-                    array.forEach(display.tools, function (t) {
-                        if (t != tool && t.toolbarBtn.get("checked")) {
-                            t.toolbarBtn.set("checked", false);
-                        }
-                    });
-                    tool.activate();
-                } else {
-                    // При выключении остальные инструменты не трогаем
-                    tool.deactivate();
-                }
-            });
-        },
-
         _itemStoreSetup: function () {
             var itemConfigById = {};
 
@@ -686,11 +657,11 @@ define([
         },
 
         _toolsSetup: function () {
-            this.addTool(new ToolZoom({display: this, out: false}));
-            this.addTool(new ToolZoom({display: this, out: true}));
+            this.mapToolbar.items.addTool(new ToolZoom({display: this, out: false}), 'zoomingIn');
+            this.mapToolbar.items.addTool(new ToolZoom({display: this, out: true}), 'zoomingOut');
 
-            this.addTool(new ToolMeasure({display: this, type: "LineString"}));
-            this.addTool(new ToolMeasure({display: this, type: "Polygon"}));
+            this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "LineString"}), 'measuringLength');
+            this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "Polygon"}), 'measuringArea');
         },
 
         _pluginsSetup: function () {
