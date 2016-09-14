@@ -165,7 +165,7 @@ define([
             mapStates.addState('identifying', this.tool);
             mapStates.setDefaultState('identifying', true);
 
-            if (this.display.mapToolbar.items.infoNode) {
+            if (this.display.mapToolbar && this.display.mapToolbar.items.infoNode) {
                 new ToolbarSeparator().placeAt(this.display.mapToolbar.items.infoNode, 'first');
                 this.tbSearch.placeAt(this.display.mapToolbar.items.infoNode, 'first');
             }
