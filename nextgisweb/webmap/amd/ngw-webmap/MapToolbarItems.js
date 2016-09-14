@@ -9,21 +9,24 @@ define([
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
     'dijit/MenuItem',
+    'dijit/form/ToggleButton',
     'dojo/text!./template/MapToolbarItems.hbs',
     'ngw/route',
     'ngw-pyramid/i18n!webmap',
     'ngw-pyramid/hbs-i18n',
+    'ngw-webmap/MapStatesObserver',
     'dijit/form/DropDownButton',
     'dijit/form/Button',
     'dijit/ToolbarSeparator'
 ], function (declare, array, lang, JsonRest, xhr, domStyle,
              _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-             MenuItem, template, route, i18n, hbsI18n) {
+             MenuItem, ToggleButton, template, route, i18n, hbsI18n, MapStatesObserver) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
 
         constructor: function (options) {
             this.display = options.display;
+            this.mapStates = MapStatesObserver.getInstance();
         },
 
         loadBookmarks: function () {
@@ -72,6 +75,38 @@ define([
                     );
                 }
             ));
+        },
+
+        addTool: function (tool, state) {
+            var control = new ToggleButton({
+                label: tool.label,
+                showLabel: false,
+                iconClass: tool.iconClass,
+                tool: tool,
+                state: state,
+                onChange: lang.hitch(this, function(checked){
+                    if (checked) {
+                        this.mapStates.activateState(control.state);
+                    } else {
+                        this.mapStates.deactivateState(control.state);
+                    }
+
+                })
+            }).placeAt(this);
+            tool.toolbarBtn = control;
+
+            control.activate = function () {
+                this.set('checked', true);
+                this.tool.activate();
+            };
+
+            control.deactivate = function () {
+                this.set('checked', false);
+                this.tool.deactivate();
+            };
+
+            this.mapStates.addState(state, control, false);
         }
+
     });
 });
