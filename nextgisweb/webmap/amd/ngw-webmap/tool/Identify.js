@@ -74,7 +74,7 @@ define([
             evt.preventDefault();
         }
         return true;
-    }
+    };
 
     var Widget = declare([BorderContainer], {
         style: "width: 100%; height: 100%",
