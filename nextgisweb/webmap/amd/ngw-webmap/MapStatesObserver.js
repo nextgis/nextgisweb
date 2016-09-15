@@ -44,29 +44,31 @@ define([
         },
 
         activateState: function (state) {
-            if (this._states.hasOwnProperty(state)) {
-                if (this._currentState) {
-                    this._states[this._currentState].control.deactivate();
-                }
-                this._states[state].control.activate();
-                this._currentState = state;
-                return true;
-            } else {
+            if (!this._states.hasOwnProperty(state)) {
                 return false;
             }
+
+            if (this._currentState) {
+                this._states[this._currentState].control.deactivate();
+
+            }
+            this._states[state].control.activate();
+            this._currentState = state;
+            return true;
         },
 
         deactivateState: function (state) {
-            if (this._states.hasOwnProperty(state)) {
-                this._states[state].control.deactivate();
-                this._currentState = null;
-                if (this._defaultState) {
-                    this.activateState(this._defaultState);
-                }
-                return true;
-            } else {
+            if (!this._states.hasOwnProperty(state) ||
+                state !== this._currentState) {
                 return false;
             }
+
+            this._states[state].control.deactivate();
+            this._currentState = null;
+            if (this._defaultState && this._defaultState !== state) {
+                this.activateState(this._defaultState);
+            }
+            return true;
         },
 
         setDefaultState: function (state, activate) {

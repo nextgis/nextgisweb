@@ -5,6 +5,7 @@ define([
     'dojo/store/JsonRest',
     'dojo/request/xhr',
     'dojo/dom-style',
+    'dojo/on',
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
@@ -18,7 +19,7 @@ define([
     'dijit/form/DropDownButton',
     'dijit/form/Button',
     'dijit/ToolbarSeparator'
-], function (declare, array, lang, JsonRest, xhr, domStyle,
+], function (declare, array, lang, JsonRest, xhr, domStyle, on,
              _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
              MenuItem, ToggleButton, template, route, i18n, hbsI18n, MapStatesObserver) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -78,34 +79,55 @@ define([
         },
 
         addTool: function (tool, state) {
-            var control = new ToggleButton({
+            var tglButtonTool = new ToggleButton({
                 label: tool.label,
                 showLabel: false,
                 iconClass: tool.iconClass,
                 tool: tool,
                 state: state,
-                onChange: lang.hitch(this, function(checked){
-                    if (checked) {
-                        this.mapStates.activateState(control.state);
-                    } else {
-                        this.mapStates.deactivateState(control.state);
-                    }
-
-                })
+                intermediateChanges:false
             }).placeAt(this);
-            tool.toolbarBtn = control;
 
-            control.activate = function () {
-                this.set('checked', true);
-                this.tool.activate();
-            };
+            tool.toolbarBtn = tglButtonTool;
+            this._bindChangeEvent(tglButtonTool);
 
-            control.deactivate = function () {
-                this.set('checked', false);
-                this.tool.deactivate();
-            };
+            tglButtonTool.activate = lang.hitch(this, function () {
+                this._unbindChangeEvent(tglButtonTool);
+                tglButtonTool.set('checked', true);
+                this._bindChangeEvent(tglButtonTool);
+                tglButtonTool.tool.activate();
+            });
 
-            this.mapStates.addState(state, control, false);
+            tglButtonTool.deactivate = lang.hitch(this, function () {
+                this._unbindChangeEvent(tglButtonTool);
+                tglButtonTool.set('checked', false);
+                this._bindChangeEvent(tglButtonTool);
+                tglButtonTool.tool.deactivate();
+            });
+
+            this.mapStates.addState(state, tglButtonTool, false);
+        },
+
+        _bindChangeEvent: function (tglButtonTool) {
+            tglButtonTool._changeEventHandler = on(tglButtonTool, 'change', lang.hitch(this, function () {
+                this._toolChangeEventHandle(tglButtonTool);
+            }));
+        },
+
+        _unbindChangeEvent: function (tglButtonTool) {
+            if (tglButtonTool._changeEventHandler) {
+                tglButtonTool._changeEventHandler.remove();
+                delete tglButtonTool._changeEventHandler;
+            }
+        },
+
+        _toolChangeEventHandle: function (tglButtonTool) {
+            var checked = tglButtonTool.get('checked');
+            if (checked) {
+                this.mapStates.activateState(tglButtonTool.state);
+            } else {
+                this.mapStates.deactivateState(tglButtonTool.state);
+            }
         }
 
     });
