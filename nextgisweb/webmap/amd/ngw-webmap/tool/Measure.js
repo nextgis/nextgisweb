@@ -140,7 +140,7 @@ define([
 
             this.interaction.setActive(true);
 
-            this.tooltip.set("content", i18n.gettext("Click adds point to measure, double click completes the measurement."));
+            this.tooltip.set("content", i18n.gettext("Double click to finish."));
             
             popup.open({
                 popup: this.tooltip,

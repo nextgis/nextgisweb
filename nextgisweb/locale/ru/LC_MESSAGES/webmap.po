@@ -214,10 +214,8 @@ msgid "Measure area"
 msgstr "Измерение площади"
 
 #: amd/ngw-webmap/tool/Measure.js:143
-msgid "Click adds point to measure, double click completes the measurement."
-msgstr ""
-"Двойной щелчек добавляет точку к измерению, двойной щелчек завершает "
-"измерение."
+msgid "Double click to finish."
+msgstr "Щёлкните дважды, чтобы завершить."
 
 #: amd/ngw-webmap/tool/Rotate.js:15
 msgid "Rotate"
