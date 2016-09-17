@@ -33,6 +33,7 @@ define([
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
     // tools
+    "ngw-webmap/MapToolbar",
     "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
@@ -85,6 +86,7 @@ define([
     route,
     i18n,
     hbsI18n,
+    MapToolbar,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -273,7 +275,9 @@ define([
 
             // Загружаем закладки, когда кнопка будет готова
             this._postCreateDeferred.then(
-                function () { widget.loadBookmarks(); }
+                function () {
+                    widget.mapToolbar.items.loadBookmarks();
+                }
             ).then(undefined, function (err) { console.error(err); });
 
             // Выбранный элемент
@@ -416,75 +420,6 @@ define([
             this._startupDeferred.resolve();
         },
 
-        addTool: function (tool) {
-            var btn = new ToggleButton({
-                label: tool.label,
-                showLabel: false,
-                iconClass: tool.iconClass
-            }).placeAt(this.mapToolbar);
-
-            tool.toolbarBtn = btn;
-
-            this.tools.push(tool);
-
-            var display = this;
-            btn.watch("checked", function (attr, oldVal, newVal) {
-                if (newVal) {
-                    // При включении инструмента все остальные инструменты
-                    // выключаем, а этот включаем
-                    array.forEach(display.tools, function (t) {
-                        if (t != tool && t.toolbarBtn.get("checked")) {
-                            t.toolbarBtn.set("checked", false);
-                        }
-                    });
-                    tool.activate();
-                } else {
-                    // При выключении остальные инструменты не трогаем
-                    tool.deactivate();
-                }
-            });
-        },
-
-        loadBookmarks: function () {
-            if (this.config.bookmarkLayerId) {
-                var store = new JsonRest({target: route.feature_layer.store({
-                    id: this.config.bookmarkLayerId
-                })});
-
-                var display = this;
-
-                store.query().then(
-                    function (data) {
-                        array.forEach(data, function (f) {
-                            display.bookmarkMenu.addChild(new MenuItem({
-                                label: f.label,
-                                onClick: function () {
-                                    // Отдельно запрашиваем экстент объекта
-                                    xhr.get(route.feature_layer.store.item({
-                                        id: display.config.bookmarkLayerId,
-                                        feature_id: f.id
-                                    }), {
-                                        handleAs: "json",
-                                        headers: { "X-Feature-Box": true }
-                                    }).then(
-                                        function data(featuredata) {
-                                            display.map.olMap.getView().fit(
-                                                featuredata.box,
-                                                display.map.olMap.getSize()
-                                            );
-                                        }
-                                    );
-                                }
-                            }));
-                        });
-                    }
-                );
-            } else {
-                // Если слой с закладками не указан, то прячем кнопку
-                domStyle.set(this.bookmarkButton.domNode, "display", "none");
-            }
-        },
-
         _itemStoreSetup: function () {
             var itemConfigById = {};
 
@@ -591,13 +526,13 @@ define([
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
                 var pt = ol.proj.transform(newVal, widget.displayProjection, widget.lonlatProjection);
-                widget.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
-                widget.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
+                widget.mapToolbar.items.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
+                widget.mapToolbar.items.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
             });
 
             // Обновление подписи масштабного уровня
             this.map.watch("resolution", function (attr, oldVal, newVal) {
-                widget.scaleInfoNode.innerHTML = "1 : " + number.format(
+                widget.mapToolbar.items.scaleInfoNode.innerHTML = "1 : " + number.format(
                     widget.map.getScaleForResolution(
                         newVal,
                         widget.map.olMap.getView().getProjection().getMetersPerUnit()
@@ -636,7 +571,7 @@ define([
                 idx = idx + 1;
             }, this);
 
-            this.zoomToInitialExtentButton.on("click", function() {
+            this.mapToolbar.items.zoomToInitialExtentButton.on("click", function() {
                 widget._zoomToInitialExtent();
             });
 
@@ -722,11 +657,11 @@ define([
         },
 
         _toolsSetup: function () {
-            this.addTool(new ToolZoom({display: this, out: false}));
-            this.addTool(new ToolZoom({display: this, out: true}));
+            this.mapToolbar.items.addTool(new ToolZoom({display: this, out: false}), 'zoomingIn');
+            this.mapToolbar.items.addTool(new ToolZoom({display: this, out: true}), 'zoomingOut');
 
-            this.addTool(new ToolMeasure({display: this, type: "LineString"}));
-            this.addTool(new ToolMeasure({display: this, type: "Polygon"}));
+            this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "LineString"}), 'measuringLength');
+            this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "Polygon"}), 'measuringArea');
         },
 
         _pluginsSetup: function () {
