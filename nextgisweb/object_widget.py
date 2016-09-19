@@ -141,7 +141,7 @@ class CompositeWidget(ObjectWidget):
             s.populate_obj()
 
     def widget_module(self):
-        return 'ngw/modelWidget/Composite'
+        return 'ngw-pyramid/modelWidget/Composite'
 
     def widget_params(self):
         result = ObjectWidget.widget_params(self)

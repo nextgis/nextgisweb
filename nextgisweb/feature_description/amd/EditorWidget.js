@@ -1,6 +1,6 @@
 define([
     "dojo/_base/declare",
-    "ngw/modelWidget/Widget",
+    "ngw-pyramid/modelWidget/Widget",
     "ngw-pyramid/i18n!feature_description",
     "dijit/Editor",
     "dijit/_editor/plugins/LinkDialog"

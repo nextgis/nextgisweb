@@ -1,8 +1,8 @@
 /*global define, ngwConfig*/
 define([
     "dojo/_base/declare",
-    "ngw/modelWidget/Widget",
-    "ngw/modelWidget/ErrorDisplayMixin",
+    "ngw-pyramid/modelWidget/Widget",
+    "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/i18n!auth",

@@ -2,8 +2,8 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "ngw/modelWidget/Widget",
-    "ngw/modelWidget/ErrorDisplayMixin",
+    "ngw-pyramid/modelWidget/Widget",
+    "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/i18n!auth",

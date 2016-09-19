@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-05-28 19:33+0300\n"
+"POT-Creation-Date: 2016-09-19 09:10+0700\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,13 +17,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.2.0\n"
+"Generated-By: Babel 2.3.4\n"
 
-#: view.py:44 template/base.mako:78
+#: template/base.mako:85 view.py:44
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:53 template/base.mako:89
+#: template/base.mako:96 view.py:53
 msgid "Help"
 msgstr "Справка"
 
@@ -39,31 +39,43 @@ msgstr "Информация о системе"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: template/base.mako:22
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:35
+msgid "Create"
+msgstr "Создать"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
+msgid "Save"
+msgstr "Сохранить"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:39
+msgid "Delete"
+msgstr "Удалить"
+
+#: template/base.mako:27
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: template/base.mako:76
+#: template/base.mako:83
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: template/base.mako:95
+#: template/base.mako:102
 msgid "Sign in"
 msgstr "Войти"
 
-#: template/pkginfo.mako:6
+#: template/pkginfo.mako:22
 msgid "Platform"
 msgstr "Платформа"
 
-#: template/pkginfo.mako:9
+#: template/pkginfo.mako:25
 msgid "Packages"
 msgstr "Пакеты"
 
-#: template/pkginfo.mako:14
+#: template/pkginfo.mako:31
 msgid "Package"
 msgstr "Пакет"
 
-#: template/pkginfo.mako:15
+#: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
 

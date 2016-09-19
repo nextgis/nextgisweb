@@ -11,8 +11,8 @@
             "dojo/_base/declare",
             "dojo/ready",
             ${ widget.widget_module() | json.dumps, n },
-            "ngw/modelWidget/FormMixin",
-            "ngw/modelWidget/CompositeTitlePaneMixin"
+            "ngw-pyramid/modelWidget/FormMixin",
+            "ngw-pyramid/modelWidget/CompositeTitlePaneMixin"
         ], function (declare, ready, Base, FormMixin, CompositeTitlePaneMixin) {
             var FormClass = declare([Base, FormMixin, CompositeTitlePaneMixin]);
             form = new FormClass(formParams);

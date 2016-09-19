@@ -6,7 +6,8 @@ define([
     "dojo/when",
     "dojo/dom-construct",
     "dijit/layout/ContentPane",
-    "dijit/form/Button"
+    "dijit/form/Button",
+    "ngw-pyramid/i18n!pyramid"
 ], function (
     declare,
     Deferred,
@@ -15,9 +16,10 @@ define([
     when,
     domConstruct,
     ContentPane,
-    Button
+    Button,
+    i18n
 ) {
-    // Mixin превращающий ngw/modelWidget/Widget в форму редактирования
+    // Mixin превращающий ngw-pyramid/modelWidget/Widget в форму редактирования
     // модели с соответствующими кнопками и реализующий функционал сохранения
     // или добавления.
 
@@ -30,11 +32,11 @@ define([
             widget = this;
 
             if (params.operation == 'create') {
-                this.btn = new Button({label: "Создать", iconClass: "dijitIconNewTask"});
+                this.btn = new Button({label: i18n.gettext("Create"), iconClass: "dijitIconNewTask"});
             } else if (params.operation == 'edit') {
-                this.btn = new Button({label: "Сохранить", iconClass: "dijitIconSave"});
+                this.btn = new Button({label: i18n.gettext("Save"), iconClass: "dijitIconSave"});
             } else if (params.operation == 'delete') {
-                this.btn = new Button({label: "Удалить", iconClass: "dijitIconDelete"});
+                this.btn = new Button({label: i18n.gettext("Delete"), iconClass: "dijitIconDelete"});
             };
 
             this.btn.placeAt(this.buttonPane).on("click", function () { widget.submit() });
