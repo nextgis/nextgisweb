@@ -575,6 +575,10 @@ define([
                 widget._zoomToInitialExtent();
             });
 
+            this.mapToolbar.items.zoomToLayerExtentButton.on("click", function() {
+                widget._zoomToLayerExtent();
+            });
+
             this._zoomToInitialExtent();
 
             this._mapDeferred.resolve();
@@ -738,6 +742,27 @@ define([
                 }
             } else {
                 this.map.olMap.getView().fit(this._extent, this.map.olMap.getSize());
+            }
+        },
+
+        _zoomToLayerExtent: function () {
+            // TODO: Add checking of IBboxLayer interface
+            var layerId = this.item && this.itemStore.getValue(this.item, "layerId");
+            if (layerId) {
+                xhr(route.layer.extent({id: layerId}), {
+                    method: "GET",
+                    handleAs: "json"
+                }).then(lang.hitch(this, function (data) {
+                    var extent = data.extent;
+                    this.map.olMap.getView().fit(
+                        ol.proj.transformExtent([
+                            extent.minLon, extent.minLat,
+                            extent.maxLon, extent.maxLat
+                        ],
+                        this.lonlatProjection,
+                        this.displayProjection),
+                        this.map.olMap.getSize());
+                }));
             }
         }
     });

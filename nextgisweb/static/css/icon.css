@@ -1,8 +1,9 @@
-/* glue: 0.4 hash: 50c276c224 */
-.iconZoomOut,
+/* glue: 0.11.1 hash: 6d4821e8df */
+        .iconZoomOut,
 .iconZoomIn,
 .iconZoom,
 .iconTable,
+.iconShapeSquare,
 .iconRulerSquare,
 .iconRuler,
 .iconRotate,
@@ -13,19 +14,128 @@
 .iconIdentify,
 .iconFeatureEdit,
 .iconDescription,
-.iconArrowInOut{background-image:url('../img/icon.png');background-repeat:no-repeat}
-.iconZoomOut{background-position:0px 0px;width:16px;height:16px;}
-.iconZoomIn{background-position:-16px 0px;width:16px;height:16px;}
-.iconZoom{background-position:0px -16px;width:16px;height:16px;}
-.iconTable{background-position:-16px -16px;width:16px;height:16px;}
-.iconRulerSquare{background-position:-32px 0px;width:16px;height:16px;}
-.iconRuler{background-position:-32px -16px;width:16px;height:16px;}
-.iconRotate{background-position:0px -32px;width:16px;height:16px;}
-.iconPan{background-position:-16px -32px;width:16px;height:16px;}
-.iconMap{background-position:-32px -32px;width:16px;height:16px;}
-.iconLink{background-position:-48px 0px;width:16px;height:16px;}
-.iconLayers{background-position:-48px -16px;width:16px;height:16px;}
-.iconIdentify{background-position:-48px -32px;width:16px;height:16px;}
-.iconFeatureEdit{background-position:0px -48px;width:16px;height:16px;}
-.iconDescription{background-position:-16px -48px;width:16px;height:16px;}
-.iconArrowInOut{background-position:-32px -48px;width:16px;height:16px;}
+.iconArrowInOut {
+            background-image: url('../img/icon.png');
+            background-repeat: no-repeat;
+        }
+        
+        .iconZoomOut {
+            background-position: 0 0;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconZoomIn {
+            background-position: -16px 0;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconZoom {
+            background-position: 0 -16px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconTable {
+            background-position: -16px -16px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconShapeSquare {
+            background-position: -32px 0;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconRulerSquare {
+            background-position: -32px -16px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconRuler {
+            background-position: 0 -32px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconRotate {
+            background-position: -16px -32px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconPan {
+            background-position: -32px -32px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconMap {
+            background-position: -48px 0;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconLink {
+            background-position: -48px -16px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconLayers {
+            background-position: -48px -32px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconIdentify {
+            background-position: 0 -48px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconFeatureEdit {
+            background-position: -16px -48px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconDescription {
+            background-position: -32px -48px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .iconArrowInOut {
+            background-position: -48px -48px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        @media screen and (-webkit-min-device-pixel-ratio: 1.0), screen and (min--moz-device-pixel-ratio: 1.0), screen and (-o-min-device-pixel-ratio: 100/100), screen and (min-device-pixel-ratio: 1.0), screen and (min-resolution: 1.0dppx) {
+            .iconZoomOut,
+    .iconZoomIn,
+    .iconZoom,
+    .iconTable,
+    .iconShapeSquare,
+    .iconRulerSquare,
+    .iconRuler,
+    .iconRotate,
+    .iconPan,
+    .iconMap,
+    .iconLink,
+    .iconLayers,
+    .iconIdentify,
+    .iconFeatureEdit,
+    .iconDescription,
+    .iconArrowInOut {
+                background-image: url('../img/icon.png');
+                -webkit-background-size: 64px 64px;
+                -moz-background-size: 64px 64px;
+                background-size: 64px 64px;
+            }
+        }
+        
