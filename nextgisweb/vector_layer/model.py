@@ -107,11 +107,12 @@ Base = declarative_base()
 
 class FieldDef(object):
 
-    def __init__(self, key, keyname, datatype, uuid):
+    def __init__(self, key, keyname, datatype, uuid, display_name=None):
         self.key = key
         self.keyname = keyname
         self.datatype = datatype
         self.uuid = uuid
+        self.display_name = display_name
 
 
 class TableInfo(object):
@@ -156,9 +157,10 @@ class TableInfo(object):
             uid = str(uuid.uuid4().hex)
             self.fields.append(FieldDef(
                 'fld_%s' % uid,
-                fld['keyname'],
-                fld['datatype'],
-                uid
+                fld.get('keyname'),
+                fld.get('datatype'),
+                uid,
+                fld.get('display_name')
             ))
 
         return self
@@ -190,10 +192,13 @@ class TableInfo(object):
 
         layer.fields = []
         for f in self.fields:
+            if f.display_name is None:
+                f.display_name = f.keyname
+
             layer.fields.append(VectorLayerField(
                 keyname=f.keyname,
                 datatype=f.datatype,
-                display_name=f.keyname,
+                display_name=f.display_name,
                 fld_uuid=f.uuid
             ))
 
