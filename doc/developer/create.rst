@@ -185,7 +185,8 @@ POST /api/resource/ HTTP/1.1
             },
             {
                 "keyname": "TIME_FIELD",
-                "datatype": "TIME"
+                "datatype": "TIME",
+                "display_name": "TIME FIELD"
             }
         ]
     }
