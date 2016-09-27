@@ -670,7 +670,7 @@ class _source_attr(SP):
 
             drivername = ogrds.GetDriver().GetName()
 
-            if drivername not in ('ESRI Shapefile', 'GeoJSON'):
+            if drivername not in ('ESRI Shapefile', 'GeoJSON', 'KML'):
                 raise VE(_("Unsupport OGR driver: %s.") % drivername)
 
             ogrlayer = self._ogrds(ogrds)
