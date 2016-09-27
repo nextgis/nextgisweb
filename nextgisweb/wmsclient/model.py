@@ -6,7 +6,6 @@ import json
 from io import BytesIO
 from datetime import datetime
 from collections import OrderedDict
-from copy import deepcopy
 
 from zope.interface import implements
 from lxml import etree
@@ -70,34 +69,7 @@ class Connection(Base, Resource):
                                        un=self.username,
                                        pw=self.password,
                                        headers=env.wmsclient.headers)
-        root = reader.read(self.url)
-
-        # В версии WMS 1.3.0 для всех элементов обязателен namespace,
-        # но некоторые добавляют этот namespace и в более старую версию,
-        # поэтому нужно это почистить.
-        if root.nsmap.get(None) == 'http://www.opengis.net/wms':
-            del root.nsmap[None]
-
-            for elem in root.getiterator():
-                if not hasattr(elem.tag, 'find'):
-                    continue
-                i = elem.tag.find('}')
-                if i >= 0 and elem.tag[1:i] == 'http://www.opengis.net/wms':
-                    elem.tag = elem.tag[i + 1:]
-
-            new = etree.Element(root.tag, nsmap=None)
-            new[:] = root[:]
-            root = new
-
-        # WMS-сервер GeoMixer почему-то не отдает OnlineResource внутри,
-        # тега Service, подставим из Capabilities.
-
-        if root.find('Service/OnlineResource') is None:
-            gcnode = root.find('Capability/Request/GetCapabilities')
-            ornode = gcnode.find('DCPType/HTTP/Get/OnlineResource')
-            root.find('Service').append(deepcopy(ornode))
-
-        self.capcache_xml = etree.tostring(root)
+        self.capcache_xml = etree.tostring(reader.read(self.url))
 
         service = WebMapService(
             url=self.url, version=self.version,
