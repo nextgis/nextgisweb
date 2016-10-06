@@ -1,5 +1,5 @@
 /* glue: 0.11.1 hash: 6d4821e8df */
-        .iconZoomOut,
+.iconZoomOut,
 .iconZoomIn,
 .iconZoom,
 .iconTable,
@@ -14,9 +14,9 @@
 .iconIdentify,
 .iconFeatureEdit,
 .iconDescription,
-.iconArrowInOut {
-            background-image: url('../img/icon.png');
-            background-repeat: no-repeat;
+.iconArrowInOut,
+.iconHideLeftBar {
+            background: url('../img/icon.png') no-repeat;
         }
         
         .iconZoomOut {
@@ -114,6 +114,12 @@
             width: 16px;
             height: 16px;
         }
+
+        .iconHideLeftBar {
+            background-position: -0px -64px;
+            width: 16px;
+            height: 16px;
+        }
         
         @media screen and (-webkit-min-device-pixel-ratio: 1.0), screen and (min--moz-device-pixel-ratio: 1.0), screen and (-o-min-device-pixel-ratio: 100/100), screen and (min-device-pixel-ratio: 1.0), screen and (min-resolution: 1.0dppx) {
             .iconZoomOut,
@@ -131,11 +137,12 @@
     .iconIdentify,
     .iconFeatureEdit,
     .iconDescription,
-    .iconArrowInOut {
+    .iconArrowInOut,
+    .iconHideLeftBar {
                 background-image: url('../img/icon.png');
-                -webkit-background-size: 64px 64px;
-                -moz-background-size: 64px 64px;
-                background-size: 64px 64px;
+                -webkit-background-size: 64px 80px;
+                -moz-background-size: 64px 80px;
+                background-size: 64px 80px;
             }
         }
         
