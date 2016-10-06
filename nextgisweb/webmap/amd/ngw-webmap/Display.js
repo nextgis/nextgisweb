@@ -579,6 +579,13 @@ define([
                 widget._zoomToLayerExtent();
             });
 
+            this.mapToolbar.items.leftToolbarSwitch.on("change", lang.hitch(this, function (val) {
+                if (val)
+                    this.mainContainer.addChild(this.leftPanel);
+                else
+                    this.mainContainer.removeChild(this.leftPanel);
+            }));
+
             this._zoomToInitialExtent();
 
             this._mapDeferred.resolve();
