@@ -579,11 +579,15 @@ define([
                 widget._zoomToLayerExtent();
             });
 
-            this.mapToolbar.items.leftToolbarSwitch.on("change", lang.hitch(this, function (val) {
-                if (val)
+            this.mapToolbar.items.leftToolbarSwitch.on("change", lang.hitch(this, function (isLayersShow) {
+                if (isLayersShow) {
+                    this.mapToolbar.items.leftToolbarSwitch.set("title", i18n.gettext("Hide layers"));
                     this.mainContainer.addChild(this.leftPanel);
-                else
+                }
+                else {
+                    this.mapToolbar.items.leftToolbarSwitch.set("title", i18n.gettext("Show layers"));
                     this.mainContainer.removeChild(this.leftPanel);
+                }
             }));
 
             this._zoomToInitialExtent();
