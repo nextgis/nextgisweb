@@ -59,11 +59,11 @@ msgstr "Информация о правообладателях"
 
 #: amd/ngw-webmap/Display.js:584 amd/ngw-webmap/template/MapToolbarItems.hbs:27
 msgid "Hide layers"
-msgstr "Скрыть дерево слоев"
+msgstr "Скрыть дерево слоёв"
 
 #: amd/ngw-webmap/Display.js:588
 msgid "Show layers"
-msgstr "Показать дерево слоев"
+msgstr "Показать дерево слоёв"
 
 #: amd/ngw-webmap/ExtentWidget.js:35
 msgid "Extent and bookmarks"
