@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-09-20 22:07+0700\n"
+"POT-Creation-Date: 2016-10-06 16:13+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -56,6 +56,14 @@ msgstr "Отодвинуть"
 #: amd/ngw-webmap/Display.js:517 amd/ngw-webmap/TinyDisplay.js:590
 msgid "Attributions"
 msgstr "Информация о правообладателях"
+
+#: amd/ngw-webmap/Display.js:584 amd/ngw-webmap/template/MapToolbarItems.hbs:27
+msgid "Hide layers"
+msgstr "Скрыть дерево слоев"
+
+#: amd/ngw-webmap/Display.js:588
+msgid "Show layers"
+msgstr "Показать дерево слоев"
 
 #: amd/ngw-webmap/ExtentWidget.js:35
 msgid "Extent and bookmarks"
@@ -106,12 +114,12 @@ msgstr "Не найдено"
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/template/Display.hbs:41
+#: amd/ngw-webmap/template/Display.hbs:42
 #: amd/ngw-webmap/template/TinyDisplay.hbs:15
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Сделайте свою Веб ГИС на nextgis.com"
 
-#: amd/ngw-webmap/template/Display.hbs:67
+#: amd/ngw-webmap/template/Display.hbs:69
 msgid "Layer"
 msgstr "Слой"
 
@@ -188,15 +196,15 @@ msgstr "Начальный охват"
 msgid "Zoom to layer extent"
 msgstr "Увеличить до слоя"
 
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:32
+#: amd/ngw-webmap/template/MapToolbarItems.hbs:37
 msgid "Longitude"
 msgstr "Долгота"
 
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:35
+#: amd/ngw-webmap/template/MapToolbarItems.hbs:40
 msgid "Latitude"
 msgstr "Широта"
 
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:38
+#: amd/ngw-webmap/template/MapToolbarItems.hbs:43
 msgid "Scale"
 msgstr "Масштаб"
 
@@ -227,7 +235,4 @@ msgstr "Щёлкните дважды, чтобы завершить."
 #: amd/ngw-webmap/tool/Rotate.js:15
 msgid "Rotate"
 msgstr "Поворот"
-
-#~ msgid "Pan"
-#~ msgstr "Перемещение"
 

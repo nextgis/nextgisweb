@@ -14,9 +14,10 @@
             data-dojo-props="closable: false, iconClass: 'iconMap'"
             style="width: 100%; height: 100%; padding: 0">
 
-            <div data-dojo-type="dijit/layout/BorderContainer"
-                data-dojo-props="gutters: false"
-                style="width: 100%; height: 100%;">
+            <div data-dojo-attach-point="mainContainer"
+                 data-dojo-type="dijit/layout/BorderContainer"
+                 data-dojo-props="gutters: false"
+                 style="width: 100%; height: 100%;">
 
                 <!-- Панель для размещения OL карты -->
                 <div data-dojo-type="dijit/layout/BorderContainer"
@@ -51,9 +52,10 @@
 
                 </div>
 
-                <div data-dojo-type="dijit/layout/BorderContainer"
-                    data-dojo-props="region: 'left', splitter: true, gutters: false"
-                    style="width: 250px; padding: 0;">
+                <div data-dojo-attach-point="leftPanel"
+                     data-dojo-type="dijit/layout/BorderContainer"
+                     data-dojo-props="region: 'left', splitter: true, gutters: false"
+                     style="width: 250px; padding: 0;">
 
                     <div data-dojo-type="dijit/layout/BorderContainer"
                         data-dojo-props="region: 'center'"

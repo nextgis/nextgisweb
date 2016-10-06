@@ -22,6 +22,11 @@
          data-dojo-props="iconClass: 'iconShapeSquare', label: '{{gettext 'Zoom to layer extent'}}', showLabel: false">
     </div>
 
+    <div data-dojo-attach-point="leftToolbarSwitch"
+         data-dojo-type="dijit/form/ToggleButton"
+         data-dojo-props="iconClass: 'iconHideLeftBar', showLabel: false, checked: true, title: '{{gettext 'Hide layers'}}'">
+    </div>
+
     <div data-dojo-type="dijit/ToolbarSeparator"></div>
 
     <div data-dojo-attach-point="infoNode"
