@@ -63,7 +63,7 @@ msgstr "Скрыть дерево слоев"
 
 #: amd/ngw-webmap/Display.js:588
 msgid "Show layers"
-msgstr "Отобразить дерево слоев"
+msgstr "Показать дерево слоев"
 
 #: amd/ngw-webmap/ExtentWidget.js:35
 msgid "Extent and bookmarks"
