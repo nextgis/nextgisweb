@@ -29,7 +29,7 @@ class WebMapComponent(Component):
                 'nextgisweb', 'webmap/basemaps.json')
 
         self.settings['identify_radius'] = int(self.settings.get(
-            'identify_radius', 3))
+            'identify_radius', 10))
         self.settings['popup_width'] = int(self.settings.get(
             'popup_width', 300))
         self.settings['popup_height'] = int(self.settings.get(
