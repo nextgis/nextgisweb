@@ -7,10 +7,70 @@ from urllib2 import unquote
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPForbidden
+from pyramid.events import NewResponse
 
+from ..env import env
 from ..package import pkginfo
 
 from .util import ClientRoutePredicate
+
+
+def cors_response_headers(event):
+    """ Adds CORS Access-Control-Allow-Origin header for simple
+    (not preflighted) requests """
+
+    if event.request.exception is not None:
+        return
+
+    if not event.request.path_info.startswith('/api/'):
+        return
+    if 'Origin' not in event.request.headers:
+        return
+
+    try:
+        origin_list = env.core.settings_get('pyramid', 'cors_allow_origin')
+        if origin_list:
+            event.response.headers[b'Access-Control-Allow-Origin'] = \
+                str(' '.join(origin_list))
+    except KeyError:
+        pass
+
+
+def cors_tween_factory(handler, registry):
+    """ Tween adds Access-Control-* headers for CORS preflight requests """
+
+    def get_olist():
+        try:
+            return env.core.settings_get('pyramid', 'cors_allow_origin')
+        except KeyError:
+            return None
+
+    def cors_tween(request):
+        # Only request under /api/ are handled
+        is_api = request.path_info.startswith('/api/')
+
+        # Origin header required in CORS requests
+        has_origin = 'Origin' in request.headers
+
+        if is_api and has_origin and request.method == 'OPTIONS':
+            olist = get_olist()
+            if olist is not None:
+                response = Response(content_type=b'text/plain')
+
+                def hadd(n, v):
+                    response.headerlist.append((str(n), str(v)))
+
+                hadd('Access-Control-Allow-Origin', ' '.join(olist))
+                hadd('Access-Control-Allow-Methods',
+                     'GET, POST, PUT, PATCH, DELETE, HEAD')
+                hadd('Access-Control-Allow-Credentials', 'true')
+
+                return response
+
+        # Run default request handler
+        return handler(request)
+
+    return cors_tween
 
 
 def settings(request):
@@ -87,11 +147,14 @@ def statistics(request):
 
 
 def setup_pyramid(comp, config):
+    config.add_subscriber(cors_response_headers, NewResponse)
+    config.add_tween('nextgisweb.pyramid.api.cors_tween_factory')
+
     config.add_route('pyramid.settings', '/api/component/pyramid/settings') \
         .add_view(settings, renderer='json')
 
     config.add_route('pyramid.route', '/api/component/pyramid/route') \
-        .add_view(route, renderer='json')
+        .add_view(route, renderer='json', request_method='GET')
 
     config.add_route(
         'pyramid.locdata',

@@ -1,23 +1,28 @@
 # -*- coding: utf-8 -*-
 import os
 import os.path
+import json
 from urllib import quote as urlquote
 from pkg_resources import resource_filename
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm.exc import NoResultFound
 
+from .. import db
 from ..package import pkginfo
 from ..component import Component
-from ..models import DBSession, Base
+from ..models import DBSession
 from ..i18n import Localizer, Translations
 
 from .util import _
+from .model import Base, Setting
 from .command import BackupCommand  # NOQA
 from .backup import BackupBase, TableBackup, SequenceBackup  # NOQA
 
 
 class CoreComponent(Component):
     identity = 'core'
+    metadata = Base.metadata
 
     def __init__(self, env, settings):
         super(CoreComponent, self).__init__(env, settings)
@@ -58,12 +63,8 @@ class CoreComponent(Component):
             conn.close()
 
         DBSession.configure(bind=self._sa_engine)
-        Base.metadata.bind = self._sa_engine
 
         self.DBSession = DBSession
-        self.Base = Base
-
-        self.metadata = Base.metadata
 
         if 'backup.filename' not in self.settings:
             self.settings['backup.filename'] = '%y%m%d-%H%M%S'
@@ -127,6 +128,20 @@ class CoreComponent(Component):
         lobj = Localizer(locale, translations)
         self._localizer[locale] = lobj
         return lobj
+
+    def settings_get(self, component, name):
+        try:
+            obj = Setting.filter_by(component=component, name=name).one()
+            return json.loads(obj.value)
+        except NoResultFound:
+            raise KeyError("Setting %s.%s not found!" % (component, name))
+
+    def settings_set(self, component, name, value):
+        try:
+            obj = Setting.filter_by(component=component, name=name).one()
+        except NoResultFound:
+            obj = Setting(component=component, name=name).persist()
+        obj.value = json.dumps(value)
 
     settings_info = (
         dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),
