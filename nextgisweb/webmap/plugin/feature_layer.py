@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from .base import WebmapPlugin
+from .base import WebmapLayerPlugin
 
 from ...feature_layer import IFeatureLayer, IFeatureQueryLike
 
 
-@WebmapPlugin.registry.register
-class FeatureLayerPlugin(WebmapPlugin):
+@WebmapLayerPlugin.registry.register
+class FeatureLayerPlugin(WebmapLayerPlugin):
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):
