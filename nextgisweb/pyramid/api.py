@@ -6,7 +6,7 @@ import os.path
 from urllib2 import unquote
 
 from pyramid.response import Response, FileResponse
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
 
 from ..env import env
 from ..package import pkginfo
@@ -14,15 +14,16 @@ from ..package import pkginfo
 from .util import ClientRoutePredicate
 
 
+def _get_cors_olist():
+    try:
+        return env.core.settings_get('pyramid', 'cors_allow_origin')
+    except KeyError:
+        return None
+
+
 def cors_tween_factory(handler, registry):
     """ Tween adds Access-Control-* headers for simple and preflighted
     CORS requests """
-
-    def get_olist():
-        try:
-            return env.core.settings_get('pyramid', 'cors_allow_origin')
-        except KeyError:
-            return None
 
     def cors_tween(request):
         # Only request under /api/ are handled
@@ -35,7 +36,7 @@ def cors_tween_factory(handler, registry):
             # TODO: Add route matching othervise OPTIONS can return 200 OK
             # other method 404 Not found
 
-            olist = get_olist()
+            olist = _get_cors_olist()
             if olist is not None:
                 response = Response(content_type=b'text/plain')
 
@@ -55,7 +56,7 @@ def cors_tween_factory(handler, registry):
         response = handler(request)
 
         if is_api and horigin:
-            olist = get_olist()
+            olist = _get_cors_olist()
             if olist is not None:
                 response.headerlist.append((
                     str('Access-Control-Allow-Origin'),
@@ -64,6 +65,40 @@ def cors_tween_factory(handler, registry):
         return response
 
     return cors_tween
+
+
+def cors_get(request):
+    if not request.user.is_administrator:
+        raise HTTPForbidden("Membership in group 'administrators' required!")
+    return dict(allow_origin=_get_cors_olist())
+
+
+def cors_put(request):
+    if not request.user.is_administrator:
+        raise HTTPForbidden("Membership in group 'administrators' required!")
+
+    body = request.json_body
+    for k, v in body.iteritems():
+        if k == 'allow_origin':
+            if v is None:
+                v = []
+
+            if not isinstance(v, list):
+                raise HTTPBadRequest("Invalid key '%s' value!" % k)
+
+            for origin in v:
+                if (
+                    not isinstance(origin, basestring) or
+                    not re.match(r'^https?://[\w\_\-\.]{3,}$', origin)
+                ):
+                    raise HTTPBadRequest("Invalid origin '%s'" % origin)
+
+                if v.count(origin) != 1:
+                    raise HTTPBadRequest("Duplicate origin '%s'" % origin)
+
+            env.core.settings_set('pyramid', 'cors_allow_origin', v)
+        else:
+            raise HTTPBadRequest("Invalid key '%s'" % k)
 
 
 def settings(request):
@@ -141,6 +176,10 @@ def statistics(request):
 
 def setup_pyramid(comp, config):
     config.add_tween('nextgisweb.pyramid.api.cors_tween_factory')
+
+    config.add_route('pyramid.cors', '/api/component/pyramid/cors') \
+        .add_view(cors_get, request_method='GET', renderer='json') \
+        .add_view(cors_put, request_method='PUT', renderer='json')
 
     config.add_route('pyramid.settings', '/api/component/pyramid/settings') \
         .add_view(settings, renderer='json')
