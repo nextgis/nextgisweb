@@ -10,7 +10,8 @@ from collections import OrderedDict
 from zope.interface import implements
 from lxml import etree
 import PIL
-from owslib.wms import WebMapService, WMSCapabilitiesReader
+from owslib.wms import WebMapService
+from owslib.map.common import WMSCapabilitiesReader
 
 from .. import db
 from ..env import env
