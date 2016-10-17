@@ -48,7 +48,7 @@ def control_panel(request):
 def help_page(request):
     with codecs.open(
         request.env.pyramid.help_page[request.locale_name], 'rb', 'utf-8'
-        ) as fp:
+    ) as fp:
         help_page = fp.read()
     return dict(title=_("Help"), help_page=help_page)
 
@@ -89,13 +89,20 @@ def pkginfo(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def cors(request):
+    return dict(
+        title=_("Cross-origin resource sharing (CORS)"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
 def setup_pyramid(comp, config):
     config.add_route('home', '/').add_view(home)
 
     config.add_route('pyramid.routes', '/pyramid/routes') \
         .add_view(routes, renderer='json', json=True)
 
-    ctpl = lambda (n): 'nextgisweb:pyramid/template/%s.mako' % n
+    def ctpl(n):
+        return 'nextgisweb:pyramid/template/%s.mako' % n
 
     config.add_route('pyramid.control_panel', '/control-panel') \
         .add_view(control_panel, renderer=ctpl('control_panel'))
@@ -107,14 +114,24 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
 
-    config.add_route('pyramid.pkginfo', '/sys/pkginfo') \
-        .add_view(pkginfo, renderer=ctpl('pkginfo'))
+    config.add_route(
+        'pyramid.control_panel.pkginfo',
+        '/control-panel/pkginfo'
+    ).add_view(pkginfo, renderer=ctpl('pkginfo'))
+
+    config.add_route(
+        'pyramid.control_panel.cors',
+        '/control-panel/cors'
+    ).add_view(cors, renderer=ctpl('cors'))
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
     comp.control_panel = dm.DynMenu(
-        dm.Label('sys', _("System info")),
+        dm.Label('info', _("Info")),
+        dm.Link('info/pkginfo', _("Package versions"), lambda args: (
+            args.request.route_url('pyramid.control_panel.pkginfo'))),
 
-        dm.Link('sys/pkginfo', _("Package versions"), lambda args: (
-            args.request.route_url('pyramid.pkginfo'))),
+        dm.Label('settings', _("Settings")),
+        dm.Link('settings/cors', _("CORS"), lambda args: (
+            args.request.route_url('pyramid.control_panel.cors'))),
     )
