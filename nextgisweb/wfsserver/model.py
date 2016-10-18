@@ -38,7 +38,7 @@ class Layer(Base):
 
     service = db.relationship(
         Service, foreign_keys=service_id,
-        backref=db.backref('layers', cascade='all'))
+        backref=db.backref('layers', cascade='all, delete-orphan'))
 
     resource = db.relationship(
         Resource, foreign_keys=resource_id,
@@ -48,7 +48,7 @@ class Layer(Base):
         return dict(
             keyname=self.keyname,
             display_name=self.display_name,
-            maxfeatures = self.maxfeatures,
+            maxfeatures=self.maxfeatures,
             resource_id=self.resource_id)
 
 
@@ -76,7 +76,6 @@ class _layers_attr(SP):
         for lrid, lo in m.iteritems():
             if lrid not in keep:
                 srlzr.obj.layers.remove(lo)
-                DBSession.delete(lo)
 
 
 class ServiceSerializer(Serializer):
