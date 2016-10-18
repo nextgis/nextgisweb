@@ -5,7 +5,7 @@ from ..resource import Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
 
 from .model import WebMap
-from .plugin import WebmapLayerPlugin
+from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .adapter import WebMapAdapter
 from .util import _
 import urllib
@@ -35,6 +35,13 @@ def setup_pyramid(comp, config):
             set(),
             set(),
         )
+
+        # Map level plugins
+        plugin = dict()
+        for pcls in WebmapPlugin.registry:
+            p_mid_data = pcls.is_supported(obj)
+            if p_mid_data:
+                plugin.update((p_mid_data, ))
 
         def traverse(item):
             data = dict(
@@ -107,9 +114,10 @@ def setup_pyramid(comp, config):
                 basemap=tuple(display.mid.basemap),
                 plugin=tuple(display.mid.plugin)
             ),
+            webmapPlugin=plugin,
             bookmarkLayerId=obj.bookmark_resource_id,
             tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id),
-            testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id)
+            testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id),
         )
 
         return dict(
