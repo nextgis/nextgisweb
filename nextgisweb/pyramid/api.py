@@ -61,9 +61,10 @@ def cors_tween_factory(handler, registry):
                 response.headerlist.append((
                     str('Access-Control-Allow-Origin'),
                     str(' '.join(olist))))
-                response.headerlist.append((
-                    str('Access-Control-Allow-Credentials'),
-                    str('true')))
+                if '*' not in olist:
+                    response.headerlist.append((
+                        str('Access-Control-Allow-Credentials'),
+                        str('true')))
 
         return response
 
