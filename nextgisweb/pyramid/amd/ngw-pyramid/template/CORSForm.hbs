@@ -14,8 +14,8 @@
         <div data-dojo-type="dijit/layout/ContentPane"
             data-dojo-props="region: 'right'"
             style="max-width: 20em; padding-left: 1em;">
-            <p style="margin: 0;">Add allowed orgins for cross domain requests to text field beside. One origin per line.</p>
-            <p>Please note that HTTP and HTTPS are different origins. Subdomains are not included, www.domain.tld for example. Wildcards are not allowed.</p>
+            <p style="margin: 0;">{{gettext 'Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line.'}}</p>
+            <p>{{gettext 'Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are not allowed.'}}</p>
         </div>
 
         <div data-dojo-type="dijit/layout/ContentPane"
@@ -23,7 +23,7 @@
             style="padding: 1em 0;">
             <button data-dojo-type="dijit/form/Button" 
                 data-dojo-attach-point="buttonSave"
-                class="dijitButton--primary">Save</button>
+                class="dijitButton--primary">{{gettext 'Save'}}</button>
         </div>
 
     </div> 

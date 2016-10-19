@@ -132,6 +132,6 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.pkginfo'))),
 
         dm.Label('settings', _("Settings")),
-        dm.Link('settings/cors', _("CORS"), lambda args: (
+        dm.Link('settings/cors', _("Cross-origin resource sharing (CORS)"), lambda args: (
             args.request.route_url('pyramid.control_panel.cors'))),
     )
