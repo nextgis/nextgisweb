@@ -43,6 +43,7 @@ def cors_tween_factory(handler, registry):
                 def hadd(n, v):
                     response.headerlist.append((str(n), str(v)))
 
+                # TODO: Add only matched origin and method
                 hadd('Access-Control-Allow-Origin', ' '.join(olist))
                 hadd('Access-Control-Allow-Methods',
                      'GET, POST, PUT, PATCH, DELETE, HEAD')
@@ -58,6 +59,7 @@ def cors_tween_factory(handler, registry):
         if is_api and horigin:
             olist = _get_cors_olist()
             if olist is not None:
+                # TODO: Add only matched origin
                 response.headerlist.append((
                     str('Access-Control-Allow-Origin'),
                     str(' '.join(olist))))
