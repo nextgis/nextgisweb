@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from .base import WebmapPlugin
+from .base import WebmapLayerPlugin
 
 
-@WebmapPlugin.registry.register
-class LayerInfoPlugin(WebmapPlugin):
+@WebmapLayerPlugin.registry.register
+class LayerInfoPlugin(WebmapLayerPlugin):
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):

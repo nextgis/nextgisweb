@@ -2,6 +2,6 @@
 from ...registry import registry_maker
 
 
-class WebmapPlugin(object):
+class WebmapLayerPlugin(object):
 
     registry = registry_maker()

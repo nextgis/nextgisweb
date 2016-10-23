@@ -5,7 +5,7 @@ from ..resource import Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
 
 from .model import WebMap
-from .plugin import WebmapPlugin
+from .plugin import WebmapLayerPlugin
 from .adapter import WebMapAdapter
 from .util import _
 import urllib
@@ -76,7 +76,7 @@ def setup_pyramid(comp, config):
 
                 # Плагины уровня слоя
                 plugin = dict()
-                for pcls in WebmapPlugin.registry:
+                for pcls in WebmapLayerPlugin.registry:
                     p_mid_data = pcls.is_layer_supported(layer, obj)
                     if p_mid_data:
                         plugin.update((p_mid_data, ))
