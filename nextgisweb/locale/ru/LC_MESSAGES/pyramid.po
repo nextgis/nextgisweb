@@ -73,7 +73,7 @@ msgid ""
 "(example.com and www.example.com) are different origins. Wildcards are "
 "not allowed."
 msgstr ""
-"Имейте ввиду, что разные протоколы (HTTP и HTTPS) и субдомены "
+"Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены "
 "(example.com и www.example.com) считаются разными источниками. Символ "
 "подстановки (*) недопустим."
 
