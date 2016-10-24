@@ -150,7 +150,7 @@ Vector empty layer
 
 .. sourcecode:: http
 
-POST /api/resource/ HTTP/1.1
+    POST /api/resource/ HTTP/1.1
 
     {
     "resource":{
