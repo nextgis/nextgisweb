@@ -1,0 +1,64 @@
+.text-withIcon{
+	position: relative;
+	line-height: 1.285;
+	padding-left: 32px;
+
+	&_size_s{
+		padding-left: 26px;
+	}
+}
+
+
+.text-withIcon__icon{
+	position: absolute;
+	top: -5px;
+	left:0;
+	width: 24px;
+	height: 24px;
+	line-height: 24px;
+	text-align: center;
+
+	&_size_s{
+		width: 16px;
+		height: 16px;
+		line-height: 16px;
+		top: -1px;
+
+		.text-withIcon__pic_type{
+			&_raster_layer,
+			&_resource_group{
+				width: 14px;
+				height: 14px;
+			}
+
+			&_vector_layer{
+				width: 16px;
+				height: 16px;
+			}
+		}
+	}
+}
+
+.text-withIcon__pic{
+	width: 100%;
+	height: 100%;
+	position: relative;
+	vertical-align: middle;
+}
+
+.text-withIcon__pic_type{
+	&_vector_layer,
+	&_raster_layer{
+		width: 	18px;
+		height: 18px;
+	}
+
+	&_resource_group{
+		width: 	20px;
+		height: 20px;
+	}
+
+	&_postgis_layer{
+		left: -2px;
+	}
+}
