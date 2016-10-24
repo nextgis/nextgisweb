@@ -292,7 +292,8 @@ def setup_pyramid(comp, config):
                 yield Link(
                     'create/%s' % ident,
                     cls.cls_display_name,
-                    self._url(ident))
+                    self._url(ident),
+                    cls.identity)
 
         def _url(self, cls):
             return lambda (args): args.request.route_url(
