@@ -23,7 +23,7 @@
                 <td class="children-table__name">
                     <a class="children-table__name__link text-withIcon" href="${item.permalink(request)}">
                         <span class="text-withIcon__icon">
-                            <svg class="text-withIcon__pic text-withIcon__pic_type_${item.cls}"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${request.static_url('nextgisweb:static/svg/svg-symbols.svg')}#${item.cls}"></use></svg>
+                            <svg class="text-withIcon__pic svgIcon-${item.cls}"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${request.static_url('nextgisweb:static/svg/svg-symbols.svg')}#${item.cls}"></use></svg>
                         </span>
                         ${item.display_name}
                     </a>

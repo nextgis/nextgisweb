@@ -27,7 +27,7 @@
             %if item.icon:
                 <a href="${url}" class="sidebar-menu__link text-withIcon text-withIcon_size_s">
                     <span class="text-withIcon__icon text-withIcon__icon_size_s">
-                        <svg class="text-withIcon__pic text-withIcon__pic_type_${item.icon}"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${request.static_url('nextgisweb:static/svg/svg-symbols.svg')}#${item.icon}"></use></svg>
+                        <svg class="text-withIcon__pic svgIcon-${item.icon}"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${request.static_url('nextgisweb:static/svg/svg-symbols.svg')}#${item.icon}"></use></svg>
                     </span>
                     ${tr(item.label)}
                 </a>

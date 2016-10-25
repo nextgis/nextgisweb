@@ -141,37 +141,44 @@
   line-height: 24px;
   text-align: center;
 }
+.text-withIcon__icon .text-withIcon__pic {
+  width: 100%;
+  height: 100%;
+}
 .text-withIcon__icon_size_s {
   width: 16px;
   height: 16px;
   line-height: 16px;
   top: -1px;
 }
-.text-withIcon__icon_size_s .text-withIcon__pic_type_raster_layer,
-.text-withIcon__icon_size_s .text-withIcon__pic_type_resource_group {
+.text-withIcon__icon_size_s .text-withIcon__pic {
+  background-size: 16px 16px;
+}
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-raster_layer,
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-resource_group {
   width: 14px;
   height: 14px;
 }
-.text-withIcon__icon_size_s .text-withIcon__pic_type_vector_layer {
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-vector_layer {
   width: 16px;
   height: 16px;
 }
 .text-withIcon__pic {
-  width: 100%;
-  height: 100%;
   position: relative;
   vertical-align: middle;
+  background: url("../svg/default_resource.svg") center center no-repeat;
+  background-size: 24px 24px;
 }
-.text-withIcon__pic_type_vector_layer,
-.text-withIcon__pic_type_raster_layer {
+.text-withIcon__pic.svgIcon-vector_layer,
+.text-withIcon__pic.svgIcon-raster_layer {
   width: 18px;
   height: 18px;
 }
-.text-withIcon__pic_type_resource_group {
+.text-withIcon__pic.svgIcon-resource_group {
   width: 20px;
   height: 20px;
 }
-.text-withIcon__pic_type_postgis_layer {
+.text-withIcon__pic.svgIcon-postgis_layer {
   left: -2px;
 }
 @font-face {
@@ -257,6 +264,83 @@
 }
 .material-icons.icon-arrowUpward:before {
   content: "\E5D8";
+}
+.svgIcon-mapserver_style,
+.svgIcon-postgis_connection,
+.svgIcon-postgis_layer,
+.svgIcon-qgis_vector_style,
+.svgIcon-raster_layer,
+.svgIcon-raster_style,
+.svgIcon-resource_group,
+.svgIcon-vector_layer,
+.svgIcon-webmap,
+.svgIcon-wfsclient_connection,
+.svgIcon-wfsclient_layer,
+.svgIcon-wfsserver_service,
+.svgIcon-wmsclient_connection,
+.svgIcon-wmsclient_layer,
+.svgIcon-wmsserver_service {
+  background: none;
+}
+.svgIcon-mapserver_style {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-postgis_connection {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-postgis_layer {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-qgis_vector_style {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-raster_layer {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-raster_style {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-resource_group {
+  width: 20px;
+  height: 20px;
+}
+.svgIcon-vector_layer {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-webmap {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-wfsclient_connection {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-wfsclient_layer {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-wfsserver_service {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-wmsclient_connection {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-wmsclient_layer {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-wmsserver_service {
+  width: 24px;
+  height: 24px;
 }
 /* -- BASE STYLES -- */
 @font-face {
