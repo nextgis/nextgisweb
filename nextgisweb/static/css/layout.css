@@ -513,6 +513,10 @@ table {
 .pure-table + .pure-table {
   margin-top: 20px;
 }
+.pure-table-horizontal--s td,
+.pure-table-horizontal--s th {
+  padding: 8px 6px;
+}
 .table-keyvalue {
   margin-bottom: 30px;
 }

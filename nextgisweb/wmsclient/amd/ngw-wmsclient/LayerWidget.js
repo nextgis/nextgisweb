@@ -75,7 +75,7 @@ define([
                 domConstruct.empty(widget.wLayerSelect.containerNode);
 
                 var table = put(widget.wLayerSelect.containerNode,
-                    "table.pure-table.pure-table-horizontal[width=100%]");
+                    "table.pure-table.pure-table-horizontal.pure-table-horizontal--s[width=100%]");
 
                 array.forEach(capdata.layers, function (i) {
                     var node = put(table, "tr td $ < td a.action $ ", i.id, i.title);
