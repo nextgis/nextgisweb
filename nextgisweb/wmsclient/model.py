@@ -51,8 +51,8 @@ class Connection(Base, Resource):
     username = db.Column(db.Unicode)
     password = db.Column(db.Unicode)
 
-    capcache_xml = db.Column(db.Unicode)
-    capcache_json = db.Column(db.Unicode)
+    capcache_xml = db.deferred(db.Column(db.Unicode))
+    capcache_json = db.deferred(db.Column(db.Unicode))
     capcache_tstamp = db.Column(db.DateTime)
 
     @classmethod
