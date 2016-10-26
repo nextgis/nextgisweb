@@ -26,17 +26,17 @@ define([
     return declare([], {
 
         constructor: function (params) {
-            this.buttonPane = new ContentPane({style: "padding: 10px 0 0;"});
+            this.buttonPane = new ContentPane({style: "padding: 12px 0 4px;"});
             this.submitUrl = params.url;
 
             widget = this;
 
             if (params.operation == 'create') {
-                this.btn = new Button({label: i18n.gettext("Create"), iconClass: "dijitIconNewTask"});
+                this.btn = new Button({label: i18n.gettext("Create"), class: "dijitButton--primary" });
             } else if (params.operation == 'edit') {
-                this.btn = new Button({label: i18n.gettext("Save"), iconClass: "dijitIconSave"});
+                this.btn = new Button({label: i18n.gettext("Save"), class: "dijitButton--primary"});
             } else if (params.operation == 'delete') {
-                this.btn = new Button({label: i18n.gettext("Delete"), iconClass: "dijitIconDelete"});
+                this.btn = new Button({label: i18n.gettext("Delete"), class: "dijitButton--primary"});
             };
 
             this.btn.placeAt(this.buttonPane).on("click", function () { widget.submit() });
