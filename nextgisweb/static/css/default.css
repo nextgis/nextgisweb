@@ -47,11 +47,6 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
     outline: none;
 }
 
-.ol-rotate {
-    top: 2.5em !important;
-}
-
-
 table.data {}
 
 table.data tr th { background-color: #eee; font-weight: bold; }
