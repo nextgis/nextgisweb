@@ -337,6 +337,9 @@ a[class*=" icon-"]:hover:before {
 .icon-table:before {
   font-family: "fontello";
 }
+.icon-users:before {
+  margin-left: -0.3%;
+}
 .middle-text {
   font-size: 16px;
   font-weight: bold;
@@ -1116,4 +1119,19 @@ table {
 }
 .nextgis.claro .dijitButton--primary + .dijitButton--primary {
   margin-left: 8px;
+}
+.nextgis.claro .dijitComboBoxMenu {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.nextgis.claro .dijitComboBoxMenu .dijitMenuItem {
+  padding: 2px 7px;
+}
+.nextgis.claro .dijitComboBoxMenu .dijitMenuItem [class^="icon-"],
+.nextgis.claro .dijitComboBoxMenu .dijitMenuItem [class*=" icon-"] {
+  margin-right: 4px;
+}
+.nextgis.claro .dijitComboBoxMenu .dijitMenuItem [class^="icon-"]:before,
+.nextgis.claro .dijitComboBoxMenu .dijitMenuItem [class*=" icon-"]:before {
+  color: #999;
 }
