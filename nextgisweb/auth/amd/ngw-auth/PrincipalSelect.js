@@ -27,10 +27,6 @@ define([
                     ascending: true
                 }]
             };
-        },
-
-        _getItemAttr: function () {
-            return this.store.get(this.get("value"));
         }
     });
 });
