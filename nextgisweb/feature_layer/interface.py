@@ -18,13 +18,14 @@ class GEOM_TYPE(object):
 
 class FIELD_TYPE(object):
     INTEGER = 'INTEGER'
+    BIGINT = 'BIGINT'
     REAL = 'REAL'
     STRING = 'STRING'
     DATE = 'DATE'
     TIME = 'TIME'
     DATETIME = 'DATETIME'
 
-    enum = (INTEGER, REAL, STRING, DATE, TIME, DATETIME)
+    enum = (INTEGER, BIGINT, REAL, STRING, DATE, TIME, DATETIME)
 
 
 class IFeatureLayer(IResourceBase):

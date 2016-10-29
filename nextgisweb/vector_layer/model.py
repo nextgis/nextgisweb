@@ -60,6 +60,9 @@ from ..feature_layer import (
 
 from .util import _
 
+gdal_gt_19 = LooseVersion(osgeo.__version__) >= LooseVersion('1.9')
+gdal_gt_20 = LooseVersion(osgeo.__version__) >= LooseVersion('2.0')
+
 GEOM_TYPE_DB = ('POINT', 'LINESTRING', 'POLYGON',
                 'MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')
 GEOM_TYPE_OGR = (
@@ -80,6 +83,7 @@ GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"),
 
 FIELD_TYPE_DB = (
     db.Integer,
+    db.BigInteger,
     db.Float,
     db.Unicode,
     db.Date,
@@ -88,6 +92,7 @@ FIELD_TYPE_DB = (
 
 FIELD_TYPE_OGR = (
     ogr.OFTInteger,
+    ogr.OFTInteger64 if gdal_gt_20 else None,
     ogr.OFTReal,
     ogr.OFTString,
     ogr.OFTDate,
@@ -302,6 +307,8 @@ class TableInfo(object):
                     fld_value = None
                 elif fld_type == ogr.OFTInteger:
                     fld_value = feature.GetFieldAsInteger(i)
+                elif gdal_gt_20 and fld_type == ogr.OFTInteger64:
+                    fld_value = feature.GetFieldAsInteger64(i)
                 elif fld_type == ogr.OFTReal:
                     fld_value = feature.GetFieldAsDouble(i)
                 elif fld_type in [ogr.OFTDate, ogr.OFTTime, ogr.OFTDateTime]:
@@ -566,7 +573,6 @@ VectorLayer.__table__.tometadata = types.MethodType(
 
 
 def _set_encoding(encoding):
-    gdal_gt_19 = LooseVersion(osgeo.__version__) >= LooseVersion('1.9')
 
     class encoding_section(object):
 
