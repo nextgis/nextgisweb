@@ -30,21 +30,21 @@ def cors_tween_factory(handler, registry):
         is_api = request.path_info.startswith('/api/')
 
         # Origin header required in CORS requests
-        horigin = 'Origin' in request.headers
+        origin = request.headers.get('Origin', False)
 
-        if is_api and horigin and request.method == 'OPTIONS':
+        if is_api and origin and request.method == 'OPTIONS':
             # TODO: Add route matching othervise OPTIONS can return 200 OK
             # other method 404 Not found
 
             olist = _get_cors_olist()
-            if olist is not None:
+            if olist is not None and origin in olist:
                 response = Response(content_type=b'text/plain')
 
                 def hadd(n, v):
                     response.headerlist.append((str(n), str(v)))
 
-                # TODO: Add only matched origin and method
-                hadd('Access-Control-Allow-Origin', ' '.join(olist))
+                # TODO: Add only matched method
+                hadd('Access-Control-Allow-Origin', origin)
                 hadd('Access-Control-Allow-Methods',
                      'GET, POST, PUT, PATCH, DELETE, HEAD')
 
@@ -56,13 +56,12 @@ def cors_tween_factory(handler, registry):
         # Run default request handler
         response = handler(request)
 
-        if is_api and horigin:
+        if is_api and origin:
             olist = _get_cors_olist()
-            if olist is not None:
-                # TODO: Add only matched origin
+            if olist is not None and origin in olist:
                 response.headerlist.append((
                     str('Access-Control-Allow-Origin'),
-                    str(' '.join(olist))))
+                    str(origin)))
                 if '*' not in olist:
                     response.headerlist.append((
                         str('Access-Control-Allow-Credentials'),
