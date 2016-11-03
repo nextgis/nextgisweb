@@ -134,7 +134,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         minx = geoTransform[0]
         maxy = geoTransform[3]
         maxx = minx + geoTransform[1] * ds.RasterXSize
-        miny = maxy + geoTransform[5] * ds.RasterYSize
+        miny = maxy - geoTransform[5] * ds.RasterYSize
 
         ll_corner = ogr.Geometry(ogr.wkbPoint)
         ll_corner.AddPoint(minx, miny)
