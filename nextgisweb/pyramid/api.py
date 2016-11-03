@@ -30,10 +30,10 @@ def cors_tween_factory(handler, registry):
         is_api = request.path_info.startswith('/api/')
 
         # Origin header required in CORS requests
-        origin = request.headers.get('Origin', False)
+        origin = request.headers.get('Origin')
 
         # Access-Control-Request-Method header of preflight request
-        method = request.headers.get('Access-Control-Request-Method', False)
+        method = request.headers.get('Access-Control-Request-Method')
 
         # If the Origin header is not present terminate this set of
         # steps. The request is outside the scope of this specification.
@@ -44,7 +44,8 @@ def cors_tween_factory(handler, registry):
         # and terminate this set of steps. The request is outside
         # the scope of this specification.
         # http://www.w3.org/TR/cors/#resource-preflight-requests
-        if is_api and origin and method and request.method == 'OPTIONS':
+        if (is_api and origin is not None and method is not None and
+                request.method == 'OPTIONS'):
             # TODO: Add route matching othervise OPTIONS can return 200 OK
             # other method 404 Not found
 
@@ -82,7 +83,7 @@ def cors_tween_factory(handler, registry):
         # Run default request handler
         response = handler(request)
 
-        if is_api and origin:
+        if is_api and origin is not None:
             olist = _get_cors_olist()
 
             if olist is not None and origin in olist:
