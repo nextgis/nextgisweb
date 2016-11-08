@@ -33,7 +33,9 @@
 @import "helpers/_mixin";
 @import "helpers/_utilities";
 @import "blocks/_uploader";
-@import "material-icons";
+@import "blocks/_text-withIcon";
+@import "icons/_material-icons";
+@import "icons/_svg-symbols";
 @import "fontello.css";
 
 /* -- BASE STYLES -- */
@@ -343,6 +345,7 @@ table{
         vertical-align: middle;
         border-left:0;
         padding: .8em 1em;
+        line-height: 1.285;
     }
     
      tbody{
@@ -355,7 +358,7 @@ table{
          tr{
             &:hover td,
             &:hover th{
-                background-color: #f8f8f8;
+                background-color: #fbfbfb;
             }
          }
 
@@ -367,9 +370,14 @@ table{
             }
          }
     }
+
+    &.pure-table-horizontal tbody > tr:last-child>td,
+    &.pure-table-horizontal tbody > tr:last-child>th{
+        border-bottom-width:1px;
+    }
     
-    &.pure-table-horizontal tbody>tr:last-child>td,
-    &.pure-table-horizontal tbody>tr:last-child>th{
+    &.pure-table-horizontal tbody:last-child>tr:last-child>td,
+    &.pure-table-horizontal tbody:last-child>tr:last-child>th{
         border-bottom:0;
     }
 
@@ -575,19 +583,14 @@ table{
             
         .sidebar-menu__item{
             position: relative;
-            padding-top: 2px;
-            padding-bottom: 2px;
-        }
-            
-        .sidebar-menu__link{
-            color: @text-color;
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            
+            padding-top: 3px;
+            padding-bottom: 3px;
+
             &:after{
                 content:"";
                 width: 3px;
-                height: 100%;
+                top:0;
+                bottom:0;
                 position: absolute;
                 left: -24px;
                 top:0;
@@ -595,15 +598,21 @@ table{
                 .opacity(0);
                 .transition(opacity .2s);
             }
+
+            &:hover{
+                 &:after{
+                    .opacity(1);
+                }
+            }
+        }
+            
+        .sidebar-menu__link{
+            display: inline-block;
+            color: @text-color;
+            text-decoration: none;
             
             &:hover{
                 color: @blue;
-                border-bottom-color: @blue;
-                border-bottom-color: fade(@blue, 40%);
-                
-                &:after{
-                    .opacity(1);
-                }
             }
         }
             .sidebar-menu__item--selected  .sidebar-menu__link{
@@ -775,10 +784,11 @@ table{
 .children-table__name__link{
     display: block;
     text-decoration: none;
+    color: @black;
 
     &:hover{
+        color: @blue;
         text-decoration: none;
-        color: @black;
     }
 }
 
