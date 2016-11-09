@@ -5,16 +5,15 @@ define([
     "dojo/dom-style",
     "dijit/layout/ContentPane",
     // CodeMirror
-    ngwConfig.assetUrl + "codemirror/lib/codemirror.js",
-    "xstyle/css!" + ngwConfig.assetUrl + "codemirror/lib/codemirror.css"
+    "codemirror/lib/codemirror",
+    "xstyle/css!codemirror/lib/codemirror.css"
 ], function (
     declare,
     domClass,
     domStyle,
-    ContentPane
+    ContentPane,
+    CodeMirror
 ) {
-    var CodeMirror = window.CodeMirror;
-
     return declare(ContentPane, {
 
         postCreate: function () {
@@ -56,7 +55,7 @@ define([
             if (this._cm) {
                 var widget = this;
                 require([
-                    ngwConfig.assetUrl + "codemirror/mode/" + value + "/" + value + ".js"
+                    "codemirror/mode/" + value + "/" + value
                 ], function () {
                     widget._cm.setOption("mode", (widget.get("mode") || value));
                 });
