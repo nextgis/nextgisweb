@@ -44,6 +44,7 @@ class CoreComponent(Component):
         sa_url = make_engine_url(EngineURL(
             'postgresql+psycopg2',
             host=self._settings.get('database.host', 'localhost'),
+            port=self._settings.get('database.port', '5432'),
             database=self._settings.get('database.name', 'nextgisweb'),
             username=self._settings.get('database.user', 'nextgisweb'),
             password=self._settings.get('database.password', '')
