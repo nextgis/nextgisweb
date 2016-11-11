@@ -12,6 +12,7 @@ define([
     "dojo/text!./template/ConnectionWidget.hbs",
     // template
     "dijit/form/ValidationTextBox",
+    "dijit/form/NumberTextBox",
     "dojox/layout/TableContainer"
 ], function (
     declare,

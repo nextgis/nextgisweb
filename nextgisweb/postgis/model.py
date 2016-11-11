@@ -64,6 +64,7 @@ class PostgisConnection(Base, Resource):
     database = db.Column(db.Unicode, nullable=False)
     username = db.Column(db.Unicode, nullable=False)
     password = db.Column(db.Unicode, nullable=False)
+    port = db.Column(db.Integer, nullable=True)
 
     @classmethod
     def check_parent(cls, parent): # NOQA
@@ -74,7 +75,7 @@ class PostgisConnection(Base, Resource):
 
         # Need to check connection params to see if
         # they changed for each connection request
-        credhash = (self.hostname, self.database, self.username, self.password)
+        credhash = (self.hostname, self.port, self.database, self.username, self.password)
 
         if self.id in comp._engine:
             engine = comp._engine[self.id]
@@ -87,7 +88,7 @@ class PostgisConnection(Base, Resource):
 
         engine = db.create_engine(make_engine_url(EngineURL(
             'postgresql+psycopg2',
-            host=self.hostname, database=self.database,
+            host=self.hostname, port=self.port, database=self.database,
             username=self.username, password=self.password)))
 
         resid = self.id
@@ -127,6 +128,7 @@ class PostgisConnectionSerializer(Serializer):
     database = SP(read=PC_READ, write=PC_WRITE)
     username = SP(read=PC_READ, write=PC_WRITE)
     password = SP(read=PC_READ, write=PC_WRITE)
+    port = SP(read=PC_READ, write=PC_WRITE)
 
 
 class PostgisLayerField(Base, LayerField):

@@ -53,6 +53,7 @@ PostGIS Connection
    :<json string description: описание, можно использовать html (не обязательно)
    :<json string database: имя БД 
    :<json string hostname: адрес БД
+   :<json string port: порт БД
    :<json string password: пароль 
    :<json string username: логин
    

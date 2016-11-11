@@ -8,6 +8,11 @@
             data-ngw-serialize="hostname"
             title="{{gettext 'Host'}}" style="width: 100%"></div>
 
+        <div data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="required: false"
+            data-ngw-serialize="port"
+            title="{{gettext 'Port'}}" style="width: 100%"></div>
+
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="database"
