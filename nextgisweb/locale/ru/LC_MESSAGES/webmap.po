@@ -118,6 +118,10 @@ msgstr "Описание"
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
+#: amd/ngw-webmap/template/Display.hbs:12
+msgid "Map"
+msgstr "Карта"
+
 #: amd/ngw-webmap/template/Display.hbs:42
 #: amd/ngw-webmap/template/TinyDisplay.hbs:15
 msgid "Get your own Web GIS at nextgis.com"
