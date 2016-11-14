@@ -5,3 +5,11 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
     right: auto;
     top: 4.643em;
 }
+
+.ol-touch .ol-control{
+    font-size: 1.5em;
+}
+
+.ol-touch .ol-control button{
+    font-size: 1.14em;
+}
