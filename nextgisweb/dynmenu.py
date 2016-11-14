@@ -77,10 +77,11 @@ class Label(Item):
 
 class Link(Item):
 
-    def __init__(self, key, label, url):
+    def __init__(self, key, label, url, icon=None):
         super(Link, self).__init__(key)
         self._label = label
         self._url = url
+        self._icon = icon
 
     @property
     def label(self):
@@ -89,3 +90,7 @@ class Link(Item):
     @property
     def url(self):
         return self._url
+
+    @property
+    def icon(self):
+        return self._icon

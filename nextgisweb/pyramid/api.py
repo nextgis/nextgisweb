@@ -30,23 +30,50 @@ def cors_tween_factory(handler, registry):
         is_api = request.path_info.startswith('/api/')
 
         # Origin header required in CORS requests
-        horigin = 'Origin' in request.headers
+        origin = request.headers.get('Origin')
 
-        if is_api and horigin and request.method == 'OPTIONS':
+        # Access-Control-Request-Method header of preflight request
+        method = request.headers.get('Access-Control-Request-Method')
+
+        # If the Origin header is not present terminate this set of
+        # steps. The request is outside the scope of this specification.
+        # https://www.w3.org/TR/cors/#resource-preflight-requests
+
+        # If there is no Access-Control-Request-Method header
+        # or if parsing failed, do not set any additional headers
+        # and terminate this set of steps. The request is outside
+        # the scope of this specification.
+        # http://www.w3.org/TR/cors/#resource-preflight-requests
+        if (is_api and origin is not None and method is not None and
+                request.method == 'OPTIONS'):
             # TODO: Add route matching othervise OPTIONS can return 200 OK
             # other method 404 Not found
 
             olist = _get_cors_olist()
-            if olist is not None:
+
+            # If the value of the Origin header is not a
+            # case-sensitive match for any of the values
+            # in list of origins do not set any additional
+            # headers and terminate this set of steps.
+            # http://www.w3.org/TR/cors/#resource-preflight-requests
+            if olist is not None and origin in olist:
                 response = Response(content_type=b'text/plain')
 
                 def hadd(n, v):
                     response.headerlist.append((str(n), str(v)))
 
-                # TODO: Add only matched origin and method
-                hadd('Access-Control-Allow-Origin', ' '.join(olist))
-                hadd('Access-Control-Allow-Methods',
-                     'GET, POST, PUT, PATCH, DELETE, HEAD')
+                # The Origin header can only contain a single origin as
+                # the user agent will not follow redirects.
+                # http://www.w3.org/TR/cors/#resource-preflight-requests
+                hadd('Access-Control-Allow-Origin', origin)
+
+                # Add one or more Access-Control-Allow-Methods headers
+                # consisting of (a subset of) the list of methods.
+                # Since the list of methods can be unbounded,
+                # simply returning the method indicated by
+                # Access-Control-Request-Method (if supported) can be enough.
+                # http://www.w3.org/TR/cors/#resource-preflight-requests
+                hadd('Access-Control-Allow-Methods', method)
 
                 if '*' not in olist:
                     hadd('Access-Control-Allow-Credentials', 'true')
@@ -56,13 +83,13 @@ def cors_tween_factory(handler, registry):
         # Run default request handler
         response = handler(request)
 
-        if is_api and horigin:
+        if is_api and origin is not None:
             olist = _get_cors_olist()
-            if olist is not None:
-                # TODO: Add only matched origin
+
+            if olist is not None and origin in olist:
                 response.headerlist.append((
                     str('Access-Control-Allow-Origin'),
-                    str(' '.join(olist))))
+                    str(origin)))
                 if '*' not in olist:
                     response.headerlist.append((
                         str('Access-Control-Allow-Credentials'),
@@ -91,6 +118,11 @@ def cors_put(request):
 
             if not isinstance(v, list):
                 raise HTTPBadRequest("Invalid key '%s' value!" % k)
+
+            # The scheme and host are case-insensitive
+            # and normally provided in lowercase.
+            # https://tools.ietf.org/html/rfc7230
+            v = [o.lower() for o in v]
 
             for origin in v:
                 if (

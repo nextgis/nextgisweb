@@ -279,6 +279,9 @@ define([
                         this.dialog.set("value", this.store.get(k));
                     }
                 }
+
+                this.btnEdit.set("disabled", false);
+                this.btnDelete.set("disabled", false);
             }));
 
             this.grid.on("dgrid-sort", lang.hitch(this, function(event) {
@@ -308,21 +311,23 @@ define([
             domClass.add(this.grid.domNode, "dgrid-border-fix");
             domConstruct.place(this.grid.domNode, this.domNode);
             
-            new Button({
+            this.btnAdd = new Button({
                 label: i18n.gettext("Add"),
                 iconClass: "dijitIconNewTask",
                 onClick: lang.hitch(this, this.itemAdd)
             }).placeAt(this.toolbar);
 
-            new Button({
+            this.btnEdit = new Button({
                 label: i18n.gettext("Edit"),
                 iconClass: "dijitIconEdit",
+                disabled: true,
                 onClick: lang.hitch(this, this.itemEdit)
             }).placeAt(this.toolbar);
 
-            new Button({
+            this.btnDelete = new Button({
                 label: i18n.gettext("Delete"),
                 iconClass: "dijitIconDelete",
+                disabled: true,
                 onClick: lang.hitch(this, this.itemRemove)
             }).placeAt(this.toolbar);
 

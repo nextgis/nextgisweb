@@ -275,8 +275,12 @@ class TableInfo(object):
                     try:
                         fld_value = strdecode(feature.GetFieldAsString(i))
                     except UnicodeDecodeError:
-                        raise ValidationError(_("Unable to decode string value of feature #%(feat)d attribute #%(attr)d.") % dict(
-                            feat=fid, attr=i))  # NOQA
+                        raise ValidationError(_(
+                            "It seems like declared and actual attributes "
+                            "encodings do not match. Unable to decode "
+                            "attribute #%(attr)d of feature #%(feat)d. "
+                            "Try declaring different encoding.") % dict(
+                            feat=fid, attr=i))
 
                 fld_values[self[feature.GetFieldDefnRef(i).GetNameRef()].key] \
                     = fld_value

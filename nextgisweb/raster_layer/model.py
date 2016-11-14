@@ -127,34 +127,30 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         dst_osr.ImportFromEPSG(4326)
         coordTrans = osr.CoordinateTransformation(src_osr, dst_osr)
 
-
         ds = self.gdal_dataset()
         geoTransform = ds.GetGeoTransform()
 
-        minx = geoTransform[0]
-        maxy = geoTransform[3]
-        maxx = minx + geoTransform[1] * ds.RasterXSize
-        miny = maxy + geoTransform[5] * ds.RasterYSize
+        # ul | ur: upper left | upper right
+        # ll | lr: lower left | lower right
+        x_ul = geoTransform[0]
+        y_ul = geoTransform[3]
 
-        ll_corner = ogr.Geometry(ogr.wkbPoint)
-        ll_corner.AddPoint(minx, miny)
-        ll_corner.Transform(coordTrans)
+        x_lr = x_ul + ds.RasterXSize*geoTransform[1] + ds.RasterYSize*geoTransform[2];
+        y_lr = y_ul + ds.RasterXSize*geoTransform[4] + ds.RasterYSize*geoTransform[5];
 
-        ur_corner = ogr.Geometry(ogr.wkbPoint)
-        ur_corner.AddPoint(maxx, maxy)
-        ur_corner.Transform(coordTrans)
+        ll = ogr.Geometry(ogr.wkbPoint)
+        ll.AddPoint(x_ul, y_lr)
+        ll.Transform(coordTrans)
 
-
-        minLon = ll_corner.GetX()
-        maxLat = ll_corner.GetY()
-        maxLon = ur_corner.GetX()
-        minLat = ur_corner.GetY()
+        ur = ogr.Geometry(ogr.wkbPoint)
+        ur.AddPoint(x_lr, y_ul)
+        ur.Transform(coordTrans)
 
         extent = dict(
-            minLon=minLon,
-            maxLon=maxLon,
-            minLat=minLat,
-            maxLat=maxLat
+            minLon=ll.GetX(),
+            maxLon=ur.GetX(),
+            minLat=ll.GetY(),
+            maxLat=ur.GetY()
         )
 
         return extent

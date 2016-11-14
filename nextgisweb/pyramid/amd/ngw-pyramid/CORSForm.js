@@ -2,6 +2,7 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
+    "dojo/_base/lang",
     "ngw-pyramid/modelWidget/Widget",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -19,6 +20,7 @@ define([
 ], function (
     declare,
     array,
+    lang,
     Widget,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -55,7 +57,7 @@ define([
 
         save: function () {
             var olist = array.map(this.widgetOriginList.get('value').split('\n'),
-                function (i) { return i.replace(' ', '') });
+                function (i) { return lang.trim(i); });
             olist = array.filter(olist, function (i) { return i != '' });
             xhr.put(API_URL, {
                 handleAs: 'json',

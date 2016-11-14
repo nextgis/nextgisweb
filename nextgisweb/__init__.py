@@ -83,6 +83,8 @@ def amd_packages():
         ('dgrid', 'nextgisweb:amd_packages/contrib/dgrid'),
         ('handlebars', 'nextgisweb:amd_packages/contrib/handlebars'),
         ('openlayers', 'nextgisweb:amd_packages/contrib/openlayers'),
+        ('svg4everybody', 'nextgisweb:amd_packages/contrib/svg4everybody'),
+        ('codemirror', 'nextgisweb:amd_packages/contrib/codemirror'),
 
         # Пакеты nextgisweb
         ('ngw', 'nextgisweb:amd_packages/ngw'),
