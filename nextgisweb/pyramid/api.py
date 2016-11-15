@@ -127,7 +127,8 @@ def cors_put(request):
             for origin in v:
                 if (
                     not isinstance(origin, basestring) or
-                    not re.match(r'^https?://[\w\_\-\.]{3,}$', origin)
+                    not re.match(
+                        r'^https?://[\w\_\-\.]{3,}(:\d{2,5})?$', origin)
                 ):
                     raise HTTPBadRequest("Invalid origin '%s'" % origin)
 
