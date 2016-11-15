@@ -126,6 +126,8 @@ for raster layer - TMS, for QGIS styles - qml.
     :param x: tile number on x axis (horisontal)
     :param y: tile number on y axis (vertical)
     
+.. note: Styles order should be from lower to upper.     
+    
 **Example request**:
 
 .. sourcecode:: http
