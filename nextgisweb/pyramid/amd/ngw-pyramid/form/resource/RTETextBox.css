@@ -1,19 +1,33 @@
 .ngw-pyramid-form-RTETextBox {
-    padding-right: 20px;
+    padding-right: 21px;
     position: relative;
 }
 
-
-.ngw-pyramid-form-RTETextBox a.openWidget { 
-    width: 12px;
-    height: 12px;
-    display: block;
-    overflow: hidden;
-    text-indent: -5000px;
+.ngw-pyramid-form-RTETextBox__icon{
     position: absolute;
-    top: 4px; 
-    right: 5px;
-    background: url(edit.png) 0 0 no-repeat;
+    right:0;
+    top:0;
+    bottom:0;
+    height:21px;
+    width: 21px;
+    margin-top:0;
+    margin-bottom: 0;
+    font-size: 16px;
     z-index: 2000;
-    cursor: pointer; 
+    text-align: center;
+    cursor: pointer;
+}
+    .ngw-pyramid-form-RTETextBox__icon::before,
+    .ngw-pyramid-form-RTETextBox__icon.material-icons::before{
+        line-height: 21px;
+    }
+
+.dijitTextBoxDisabled .ngw-pyramid-form-RTETextBox__icon{
+    cursor: default;
+}
+
+
+.dijitTextBoxDisabled .ngw-pyramid-form-RTETextBox__icon::before,
+.dijitTextBoxDisabled .ngw-pyramid-form-RTETextBox__icon:hover::before{
+    color: #ccc;
 }

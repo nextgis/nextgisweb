@@ -57,7 +57,7 @@ define([
             domClass.add(this.domNode, "ngw-pyramid-form-RTETextBox");
 
             this.openNode = domConstruct.create("a", {
-                class: "openWidget",
+                class: "ngw-pyramid-form-RTETextBox__icon material-icons icon-edit ",
                 title: i18n.gettext("Rich Text Editor"),
                 onclick: lang.hitch(this, this.openRTEDialog)
             }, this.domNode);

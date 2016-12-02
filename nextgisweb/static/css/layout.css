@@ -1158,6 +1158,15 @@ textarea {
 .nextgis.claro .dijitTextBoxHover {
   background-color: #fff;
 }
+.nextgis.claro .dijitSelectHover,
+.nextgis.claro .dijitTextBoxHover,
+.nextgis.claro .dijitSelectFocused,
+.nextgis.claro .dijitTextBoxFocused {
+  background-image: none;
+}
+.nextgis.claro .dijitTextBoxFocused {
+  border-color: #ffce76;
+}
 .nextgis.claro .dijitTabContainer {
   /* compensate dijitTab's 1px offset */
   top: -1px;
