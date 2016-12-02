@@ -10,7 +10,6 @@ define([
     "dojo/Deferred",
     "dijit/_WidgetBase",
     "dijit/form/Button",
-    "dijit/form/TextBox",
     "dijit/form/NumberTextBox",
     "dijit/form/DateTextBox",
     "dijit/form/TimeTextBox",
@@ -20,6 +19,7 @@ define([
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
     "ngw/route",
+    "ngw-pyramid/form/RTETextBox",
     "ngw-pyramid/i18n!feature_layer",   
     "./loader!",
     "xstyle/css!./resource/FeatureEditorWidget.css"
@@ -35,7 +35,6 @@ define([
     Deferred,
     _WidgetBase,
     Button,
-    TextBox,
     NumberTextBox,
     DateTextBox,
     TimeTextBox,
@@ -45,6 +44,7 @@ define([
     TabContainer,
     TableContainer,
     route,
+    RTETextBox,
     i18n,
     loader
 ) {
@@ -77,8 +77,9 @@ define([
                 ]
             } else if (this.datatype == "STRING") {
                 this.children = [
-                    (new TextBox({
-                        style: "width: calc(100% - 20px - 1ex)"
+                    (new RTETextBox({
+                        label: i18n.gettext("Attribute: ") + this.label,
+                        style: "width: calc(100% - 40px - 1ex)"
                     })).placeAt(this)
                 ];
             } else if (this.datatype == "DATE") {

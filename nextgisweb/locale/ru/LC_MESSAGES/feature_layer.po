@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-07-01 23:43+0700\n"
+"POT-Creation-Date: 2016-12-02 19:57+0700\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,9 +17,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"Generated-By: Babel 2.3.4\n"
 
-#: view.py:54 view.py:338 amd/FieldsWidget.js:146
+#: amd/FieldsWidget.js:146 view.py:54 view.py:338
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -40,12 +40,16 @@ msgstr "Загрузить GeoJSON"
 msgid "Download as CSV"
 msgstr "Загрузить CSV"
 
-#: view.py:356 amd/FeatureEditorWidget.js:178 amd/FieldsDisplayWidget.js:31
-#: amd/FieldsWidget.js:109
+#: amd/FeatureEditorWidget.js:179 amd/FieldsDisplayWidget.js:31
+#: amd/FieldsWidget.js:109 view.py:356
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/FeatureEditorWidget.js:244
+#: amd/FeatureEditorWidget.js:81
+msgid "Attribute: "
+msgstr "Поле: "
+
+#: amd/FeatureEditorWidget.js:245
 msgid "Save"
 msgstr "Сохранить"
 
@@ -61,15 +65,15 @@ msgstr "Удалить объект?"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: amd/FieldsWidget.js:59 template/section_fields.mako:4
+#: amd/FieldsWidget.js:59 template/section_fields.mako:5
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/FieldsWidget.js:69 template/section_fields.mako:5
+#: amd/FieldsWidget.js:69 template/section_fields.mako:6
 msgid "Type"
 msgstr "Тип"
 
-#: amd/FieldsWidget.js:73 template/section_fields.mako:6
+#: amd/FieldsWidget.js:73 template/section_fields.mako:7
 msgid "Display name"
 msgstr "Наименование"
 
@@ -101,15 +105,15 @@ msgstr "Удалить"
 msgid "Search..."
 msgstr "Поиск..."
 
-#: template/section_fields.mako:7
+#: template/section_fields.mako:8
 msgid "Table"
 msgstr "Таблица"
 
-#: template/section_fields.mako:14
+#: template/section_fields.mako:15
 msgid "Yes"
 msgstr "Да"
 
-#: template/section_fields.mako:14
+#: template/section_fields.mako:15
 msgid "No"
 msgstr "Нет"
 
