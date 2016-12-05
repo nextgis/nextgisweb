@@ -73,7 +73,7 @@ define([
             var embeddMapDialog, tableContainer, previewBtn;
 
             embeddMapDialog = new Dialog({
-                title: i18n.gettext('ShareEmbeddedMap'),
+                title: i18n.gettext('Embedded map settings'),
                 draggable: false,
                 autofocus: false,
                 onHide: function () {
@@ -83,7 +83,7 @@ define([
 
             this._widthTextBox = new TextBox({
                 name: 'width',
-                label: 'Width',
+                label: i18n.gettext('Width'),
                 intermediateChanges: true,
                 value: '500px',
                 style: {width: '200px'}
@@ -92,7 +92,7 @@ define([
 
             this._heightTextBox = new TextBox({
                 name: 'height',
-                label: 'Height',
+                label: i18n.gettext('Height'),
                 intermediateChanges: true,
                 value: '500px',
                 style: {width: '200px'}
@@ -100,7 +100,7 @@ define([
 
 
             this._iframeTextarea = new SimpleTextarea({
-                label: 'Output HTML',
+                label: i18n.gettext('HTML code'),
                 readOnly: false,
                 selectOnClick: true,
                 rows: 3,
@@ -129,7 +129,7 @@ define([
             tableContainer.startup();
 
             previewBtn = new Button({
-                label: 'Preview',
+                label: i18n.gettext('Preview'),
                 onClick: lang.hitch(this, function () {
                     var form = domConstruct.create('form', {
                         id: 'testEmbeddedMapForm',

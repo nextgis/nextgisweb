@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-10-17 02:02+0700\n"
+"POT-Creation-Date: 2016-12-05 09:52+0700\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -39,29 +39,29 @@ msgstr "Веб-карта"
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:510 amd/ngw-webmap/TinyDisplay.js:583
+#: amd/ngw-webmap/Display.js:511 amd/ngw-webmap/TinyDisplay.js:583
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:513 amd/ngw-webmap/TinyDisplay.js:586
+#: amd/ngw-webmap/Display.js:514 amd/ngw-webmap/TinyDisplay.js:586
 #: amd/ngw-webmap/tool/Zoom.js:18
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:514 amd/ngw-webmap/TinyDisplay.js:587
+#: amd/ngw-webmap/Display.js:515 amd/ngw-webmap/TinyDisplay.js:587
 #: amd/ngw-webmap/tool/Zoom.js:21
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:517 amd/ngw-webmap/TinyDisplay.js:590
+#: amd/ngw-webmap/Display.js:518 amd/ngw-webmap/TinyDisplay.js:590
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:580 amd/ngw-webmap/template/MapToolbarItems.hbs:22
+#: amd/ngw-webmap/Display.js:581 amd/ngw-webmap/template/MapToolbarItems.hbs:22
 msgid "Hide layers"
 msgstr "Скрыть дерево слоёв"
 
-#: amd/ngw-webmap/Display.js:585
+#: amd/ngw-webmap/Display.js:586
 msgid "Show layers"
 msgstr "Показать дерево слоёв"
 
@@ -82,8 +82,24 @@ msgid "Permalink"
 msgstr "Ссылка"
 
 #: amd/ngw-webmap/ShareEmbeddedMapDialog.js:76
-msgid "ShareEmbeddedMap"
-msgstr ""
+msgid "Embedded map settings"
+msgstr "Настройки встраиваемой карты"
+
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:86
+msgid "Width"
+msgstr "Ширина"
+
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:95
+msgid "Height"
+msgstr "Высота"
+
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:103
+msgid "HTML code"
+msgstr "Код для встраивания"
+
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:132
+msgid "Preview"
+msgstr "Протестировать"
 
 #: amd/ngw-webmap/plugin/FeatureLayer.js:66
 msgid "Go to"
@@ -114,7 +130,7 @@ msgstr "Не найдено"
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/plugin/ZoomToLayer.js:26
+#: amd/ngw-webmap/plugin/ZoomToLayer.js:24
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
