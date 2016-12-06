@@ -48,6 +48,8 @@ If request succeeded the uploaded file details will be returned:
       ]
     }
 
+Alco create attachment allowed with PUT query, in this case you do not need set file name
+
 **Example add attachment to feature at python**:
 
 .. sourcecode:: python
