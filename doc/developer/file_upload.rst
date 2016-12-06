@@ -48,6 +48,35 @@ If request succeeded the uploaded file details will be returned:
       ]
     }
 
+**Example add attachment to feature at python**:
+
+.. sourcecode:: python
+
+
+    import requests
+    import urllib2
+    from contextlib import closing
+    import json
+
+    url_dst = 'http://trolleway.nextgis.com/api'
+    creds_dst = ('administrator', 'password')
+    feature_dst = '/resource/' + '827' + '/feature/'   #layer id
+    new_id = '/9'          #feature id
+
+    #Get file from internet, optionaly with auth
+    with closing(requests.get('http://nextgis.ru/wp-content/themes/nextgis_clean/img/ngw_icon.png', auth=('', ''), stream=True)) as f:
+
+        #upload attachment to nextgisweb
+        req = requests.put(url_dst + '/component/file_upload/upload', data=f, auth=ngw_creds)
+        json_data = req.json()
+        json_data['name'] = 'Picture001.jpg'
+
+        attach_data = {}
+        attach_data['file_upload'] = json_data
+
+        #add attachment to nextgisweb feature
+        req = requests.post(url_dst + feature_dst + str(new_id) + '/attachment/', data=json.dumps(attach_data), auth=creds_dst)
+
 Multiple files upload
 --------------------------
 
