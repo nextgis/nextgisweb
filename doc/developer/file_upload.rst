@@ -48,7 +48,7 @@ If request succeeded the uploaded file details will be returned:
       ]
     }
 
-Also create attachment allowed with PUT method, in this case you do not need set file name
+Also you can create attachment using PUT method, in this case you do not need set file name
 
 **Example add attachment to feature at python**:
 
