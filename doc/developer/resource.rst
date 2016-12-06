@@ -407,11 +407,11 @@ Get all vector layer features
     }
 
 
-URL к фотографиям составляется из корня URL, который нужно посмотреть в веб-интерфейсе админки, и этого имени файла. Пример:
+URL к атачментам составляется из корня URL, который нужно посмотреть в веб-интерфейсе админки, и этого имени файла. Пример:
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/download
 
-Получение превью фотографий
+Загружать можно файлы любых типов. Получение превью фотографий из атачмента
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/image?size=200x150
 
