@@ -77,16 +77,12 @@ define([
                 showRoot: false,
                 getLabel: function (item) { return item.display_name; },
                 getIconClass: function(item, opened){
-                    return item.item_type == "group" ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
+                    return "dijitLeaf";
                 },
                 persist: false,
                 dndController: dndSource,
                 checkItemAcceptance: function (node, source, position) {
-                    var item = registry.getEnclosingWidget(node).item,
-                        item_type = widget.itemStore.getValue(item, "item_type");
-                    // Блокируем возможность перетащить элемент внутрь слоя,
-                    // перенос внутрь допустим только для группы
-                    return item_type === "group" || (item_type === "layer" && position !== "over");
+                    return position !== "over";
                 },
                 betweenThreshold: 5
             });
@@ -107,14 +103,13 @@ define([
             this.btnAddLayer.on("click", lang.hitch(this, function () {
                 this.layerPicker.pick().then(lang.hitch(this, function (itm) {
                     this.itemStore.newItem({
-                            "item_type": "layer",
                             "keyname": null,
                             "display_name": itm.display_name,
                             "resource_id": itm.id,
                             "min_scale_denom": null,
                             "max_scale_denom": null
                         }, {
-                            parent: widget.getAddParent(),
+                            parent: widget.itemModel.root,
                             attribute: "children"
                         }
                     );
@@ -191,14 +186,6 @@ define([
 
         startup: function () {
             this.inherited(arguments);
-        },
-
-        getAddParent: function () {
-            if (this.getItemValue("item_type") == "group") {
-                return this.widgetTree.selectedItem;
-            } else {
-                return this.itemModel.root;
-            }
         },
 
         // установить значение аттрибута текущего элемента
