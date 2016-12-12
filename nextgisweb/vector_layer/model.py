@@ -127,7 +127,28 @@ class TableInfo(object):
     def from_ogrlayer(cls, ogrlayer, srs_id, strdecode):
         self = cls(srs_id)
 
-        self.geometry_type = _GEOM_OGR_2_TYPE[ogrlayer.GetGeomType()]
+        ltype = ogrlayer.GetGeomType() & (~ogr.wkb25DBit)
+        self.geometry_type = _GEOM_OGR_2_TYPE[ltype]
+        self.accepted_gtype = [ltype, ]
+
+        if ltype in (ogr.wkbPoint, ogr.wkbLineString, ogr.wkbPolygon):
+            feature = ogrlayer.GetNextFeature()
+            while feature:
+                geom = feature.GetGeometryRef()
+                gtype = geom.GetGeometryType() & (~ogr.wkb25DBit)
+                if ltype != gtype and (
+                    (ltype == ogr.wkbPoint and gtype == ogr.wkbMultiPoint) or
+                    (ltype == ogr.wkbLineString and gtype == ogr.wkbMultiLineString) or
+                    (ltype == ogr.wkbPolygon and gtype == ogr.wkbMultiPolygon)
+                ):
+                    self.geometry_type = _GEOM_OGR_2_TYPE[gtype]
+                    self.accepted_gtype.append(gtype)
+                    break
+
+                feature = ogrlayer.GetNextFeature()
+
+            ogrlayer.ResetReading()
+
         self.fields = []
 
         defn = ogrlayer.GetLayerDefn()
@@ -214,8 +235,9 @@ class TableInfo(object):
         table = db.Table(
             tablename if tablename else ('lvd_' + str(uuid.uuid4().hex)),
             metadata, db.Column('id', db.Integer, primary_key=True),
-            db.Column('geom', ga.Geometry(dimension=2,
-                geometry_type=geom_fldtype, srid=self.srs_id)),
+            db.Column('geom', ga.Geometry(
+                dimension=2, srid=self.srs_id,
+                geometry_type=geom_fldtype)),
             *map(lambda (fld): db.Column(fld.key, _FIELD_TYPE_2_DB[
                 fld.datatype]), self.fields)
         )
@@ -231,6 +253,7 @@ class TableInfo(object):
         target_osr = osr.SpatialReference()
         target_osr.ImportFromEPSG(self.srs_id)
 
+        ltype = ogrlayer.GetGeomType() & (~ogr.wkb25DBit)
         transform = osr.CoordinateTransformation(source_osr, target_osr)
 
         feature = ogrlayer.GetNextFeature()
@@ -240,24 +263,30 @@ class TableInfo(object):
             geom = feature.GetGeometryRef()
 
             # Приведение 25D геометрий к 2D
-            if geom.GetGeometryType() in (
-                ogr.wkbPoint25D,
-                ogr.wkbLineString25D,
-                ogr.wkbPolygon25D,
-                ogr.wkbMultiPoint25D,
-                ogr.wkbMultiLineString25D,
-                ogr.wkbMultiPolygon25D,
-            ):
+            if geom.GetGeometryType() & ogr.wkb25DBit:
                 geom.FlattenTo2D()
 
             gtype = geom.GetGeometryType()
-            ltype = ogrlayer.GetGeomType() & (~ogr.wkb25DBit)
-            if gtype != ltype:
-                raise ValidationError(_("Geometry type (%s) does not match column type (%s).") % (
-                    GEOM_TYPE_DISPLAY[gtype-1],
-                    GEOM_TYPE_DISPLAY[ltype-1]))
+            if gtype not in self.accepted_gtype:
+                raise ValidationError(_(
+                    "Geometry type (%s) does not match column type (%s).") % (
+                    GEOM_TYPE_DISPLAY[gtype - 1],
+                    GEOM_TYPE_DISPLAY[ltype - 1]))
 
             geom.Transform(transform)
+
+            if (
+                self.geometry_type in (
+                    GEOM_TYPE.MULTIPOINT,
+                    GEOM_TYPE.MULTILINESTRING,
+                    GEOM_TYPE.MULTIPOLYGON)
+            ):
+                if gtype == ogr.wkbPoint:
+                    geom = ogr.ForceToMultiPoint(geom)
+                elif gtype == ogr.wkbLineString:
+                    geom = ogr.ForceToMultiLineString(geom)
+                elif gtype == ogr.wkbPolygon:
+                    geom = ogr.ForceToMultiPolygon(geom)
 
             fld_values = dict()
             for i in range(feature.GetFieldCount()):
