@@ -1270,6 +1270,10 @@ textarea {
 .nextgis.claro .dijitButton--primary + .dijitButton--primary {
   margin-left: 8px;
 }
+.nextgis.claro .dijitButton--primary.dijitButtonDisabled .dijitButtonNode {
+  background: #ddd;
+  color: #999;
+}
 .nextgis.claro .dijitComboBoxMenu {
   padding-top: 5px;
   padding-bottom: 5px;
