@@ -11,8 +11,10 @@ from ..resource import (
     DataStructureScope,
     Serializer,
     SerializedProperty as SP)
+from ..resource.exception import ValidationError
 
 from .interface import FIELD_TYPE
+from .util import _
 
 Base = declarative_base()
 
@@ -119,6 +121,8 @@ class _fields_attr(SP):
 
             if fldid:
                 mfld = fldmap.get(fldid)
+                if mfld is None:
+                    raise ValidationError(_("Field not found (ID=%d)." % fldid))
             else:
                 mfld = obj.__field_class__(
                     datatype=fld['datatype'])
