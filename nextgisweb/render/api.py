@@ -4,6 +4,7 @@ from StringIO import StringIO
 
 from PIL import Image
 from pyramid.response import Response
+from pyramid.httpexceptions import HTTPBadRequest
 
 from ..resource import Resource, DataScope
 
@@ -31,6 +32,12 @@ def tile(request):
             request.resource_permission(PD_READ, obj)
         req = obj.render_request(obj.srs)
         rimg = req.render_tile((z, x, y), 256)
+
+        if (rimg.mode != 'RGBA'):
+            raise HTTPBadRequest(
+                "Image (ID=%d) must have mode RGBA, but it is %s mode." %
+                (obj.id, rimg.mode))
+
         if aimg is None:
             aimg = rimg
         else:
@@ -65,6 +72,12 @@ def image(request):
             request.resource_permission(PD_READ, obj)
         req = obj.render_request(obj.srs)
         rimg = req.render_extent(p_extent, p_size)
+
+        if (rimg.mode != 'RGBA'):
+            raise HTTPBadRequest(
+                "Image (ID=%d) must have mode RGBA, but it is %s mode." %
+                (obj.id, rimg.mode))
+
         if aimg is None:
             aimg = rimg
         else:
