@@ -39,13 +39,6 @@ class CoreComponent(Component):
         setting_debug = self._settings.get('debug', 'false').lower()
         self.debug = setting_debug in ('true', 'yes', '1')
 
-        if 'system.name' not in self._settings:
-            self._settings['system.name'] = "NextGIS Web"
-
-        if 'system.full_name' not in self._settings:
-            self._settings['system.full_name'] = self.localizer().translate(
-                _("NextGIS geoinformation system"))
-
         sa_url = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
             user=self._settings.get('database.user', 'nextgisweb'),
             password=(':' + urlquote(self._settings['database.password'])) if 'database.password' in self._settings else '',
@@ -68,6 +61,13 @@ class CoreComponent(Component):
 
         if 'backup.filename' not in self.settings:
             self.settings['backup.filename'] = '%y%m%d-%H%M%S'
+
+    def initialize_db(self):
+        for k, v in (('system.name', 'NextGIS Web'),
+                     ('system.full_name',
+                      self.localizer().translate(
+                          _('NextGIS geoinformation system')))):
+            self.init_settings(self.identity, k, self._settings.get(k, v))
 
     def backup(self):
         metadata = self.env.metadata()
@@ -142,6 +142,12 @@ class CoreComponent(Component):
         except NoResultFound:
             obj = Setting(component=component, name=name).persist()
         obj.value = json.dumps(value)
+
+    def init_settings(self, component, name, value):
+        try:
+            self.settings_get(component, name)
+        except KeyError:
+            self.settings_set(component, name, value)
 
     settings_info = (
         dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),

@@ -140,6 +140,28 @@ def cors_put(request):
             raise HTTPBadRequest("Invalid key '%s'" % k)
 
 
+def system_name_get(request):
+    if not request.user.is_administrator:
+        raise HTTPForbidden("Membership in group 'administrators' required!")
+
+    return dict(full_name=env.core.settings_get('core', 'system.full_name'))
+
+
+def system_name_put(request):
+    if not request.user.is_administrator:
+        raise HTTPForbidden("Membership in group 'administrators' required!")
+
+    body = request.json_body
+    for k, v in body.iteritems():
+        if k == 'full_name':
+            if v is None:
+                v = ''
+
+            env.core.settings_set('core', 'system.full_name', v)
+        else:
+            raise HTTPBadRequest("Invalid key '%s'" % k)
+
+
 def settings(request):
     comp = request.env._components[request.GET['component']]
     return comp.client_settings(request)
@@ -219,6 +241,11 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.cors', '/api/component/pyramid/cors') \
         .add_view(cors_get, request_method='GET', renderer='json') \
         .add_view(cors_put, request_method='PUT', renderer='json')
+
+    config.add_route('pyramid.system_name',
+                     '/api/component/pyramid/system_name') \
+        .add_view(system_name_get, request_method='GET', renderer='json') \
+        .add_view(system_name_put, request_method='PUT', renderer='json')
 
     config.add_route('pyramid.settings', '/api/component/pyramid/settings') \
         .add_view(settings, renderer='json')

@@ -15,7 +15,7 @@
             <% page_title += self.title() + ' | ' %>
         %endif
 
-        <% page_title += request.env.core.settings['system.full_name'] %>
+        <% page_title += request.env.core.settings_get('core', 'system.full_name') %>
         ${page_title}
     </title>
 
@@ -124,7 +124,7 @@
                             </div>    
                         %endif
                         <div class="header__title__inner">
-                            ${request.env.core.settings['system.full_name']}
+                            ${request.env.core.settings_get('core', 'system.full_name')}
                         </div>
                     </a>
                 </div>    

@@ -95,6 +95,12 @@ def cors(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def system_name(request):
+    return dict(
+        title=_("Web GIS name"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
 def setup_pyramid(comp, config):
     config.add_route('home', '/').add_view(home)
 
@@ -124,6 +130,11 @@ def setup_pyramid(comp, config):
         '/control-panel/cors'
     ).add_view(cors, renderer=ctpl('cors'))
 
+    config.add_route(
+        'pyramid.control_panel.system_name',
+        '/control-panel/system-name'
+    ).add_view(system_name, renderer=ctpl('system_name'))
+
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
     comp.control_panel = dm.DynMenu(
@@ -132,6 +143,8 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.pkginfo'))),
 
         dm.Label('settings', _("Settings")),
+        dm.Link('settings/core', _("Web GIS name"), lambda args: (
+            args.request.route_url('pyramid.control_panel.system_name'))),
         dm.Link('settings/cors', _("Cross-origin resource sharing (CORS)"), lambda args: (
             args.request.route_url('pyramid.control_panel.cors'))),
     )
