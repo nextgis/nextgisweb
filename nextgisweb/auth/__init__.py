@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
-from pyramid.security import authenticated_userid
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component
@@ -60,7 +59,7 @@ class AuthComponent(Component):
     def setup_pyramid(self, config):
 
         def user(request):
-            user_id = authenticated_userid(request)
+            user_id = request.authenticated_userid
             if user_id:
                 user = User.filter_by(id=user_id).one()
                 if user.disabled:
