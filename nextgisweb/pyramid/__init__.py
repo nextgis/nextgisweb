@@ -125,7 +125,8 @@ class PyramidComponent(Component):
         config.add_view_predicate('json', JsonPredicate)
 
         # Возможность доступа к Env через request.env
-        config.set_request_property(lambda (req): self._env, 'env')
+        config.add_request_method(lambda (req): self._env, 'env',
+                                  property=True)
 
         config.include(pyramid_tm)
         config.include(pyramid_mako)

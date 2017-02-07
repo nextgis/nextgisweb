@@ -68,7 +68,7 @@ class AuthComponent(Component):
             else:
                 return User.filter_by(keyname='guest').one()
 
-        config.set_request_property(user, reify=True)
+        config.add_request_method(user, reify=True)
 
         from . import views, api
         views.setup_pyramid(self, config)
