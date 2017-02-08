@@ -158,11 +158,17 @@ class TableInfo(object):
             if fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)
 
+            try:
+                fld_type = _FIELD_TYPE_2_ENUM[fld_defn.GetType()]
+            except KeyError:
+                raise VE(_("Unsupported field datatype: %r." %
+                           fld_defn.GetTypeName()))
+
             uid = str(uuid.uuid4().hex)
             self.fields.append(FieldDef(
                 'fld_%s' % uid,
                 fld_name,
-                _FIELD_TYPE_2_ENUM[fld_defn.GetType()],
+                fld_type,
                 uid
             ))
 
