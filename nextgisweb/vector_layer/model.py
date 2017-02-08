@@ -161,8 +161,8 @@ class TableInfo(object):
             try:
                 fld_type = _FIELD_TYPE_2_ENUM[fld_defn.GetType()]
             except KeyError:
-                raise VE(_("Unsupported field datatype: %r." %
-                           fld_defn.GetTypeName()))
+                raise VE(_("Unsupported field type: %r.") %
+                         fld_defn.GetTypeName())
 
             uid = str(uuid.uuid4().hex)
             self.fields.append(FieldDef(
