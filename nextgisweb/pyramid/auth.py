@@ -11,32 +11,31 @@ from ..auth import User
 
 class BasicAuthenticationPolicy(PyramidBasicAuthAuthenticationPolicy):
 
-    def _get_credentials(self, request):
+    def unauthenticated_userid(self, request):
         """ Стандартный обработчик Pyramid всегда возвращает логин в качестве
         userid, однако нам нужно именно числовое значение ID. Поэтому подменим
         одно на другое в момент извлечения из заголовков запроса. """
 
-        result = super(BasicAuthenticationPolicy, self) \
-            ._get_credentials(request)
+        username = super(BasicAuthenticationPolicy, self) \
+            .unauthenticated_userid(request)
 
-        if result is not None:
-            username, password = result
+        if username is not None:
             user = User.filter_by(keyname=username).first()
             if user is None:
-                return (None, password)
+                return None
             else:
-                return (user.id, password)
+                return user.id
 
 
 class AuthenticationPolicy(object):
 
     def __init__(self, settings):
-        def check(userid, password, request):
-            user = User.filter_by(id=userid, disabled=False).first()
+        def check(username, password, request):
+            user = User.filter_by(keyname=username, disabled=False).first()
             if user is None or not (user.password == password):
                 return None
             else:
-                return user.id
+                return user
 
         self.members = (
             AuthTktAuthenticationPolicy(
