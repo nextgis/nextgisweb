@@ -41,7 +41,8 @@ class WebMap(Base, Resource):
     extent_top = db.Column(db.Float, default=+90)
 
     bookmark_resource = db.relationship(
-        Resource, foreign_keys=bookmark_resource_id)
+        Resource, foreign_keys=bookmark_resource_id,
+        backref=db.backref('bookmarked_webmaps'))
 
     root_item = db.relationship('WebMapItem', cascade='all')
 
