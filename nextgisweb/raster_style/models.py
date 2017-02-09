@@ -85,8 +85,8 @@ class RasterStyle(Base, Resource):
         # нижняя граница
         if off_y + width_y > ds.RasterYSize:
             oversize_bottom = off_y + width_y - ds.RasterYSize
-            target_height -= round(float(oversize_bottom)
-                                   / width_y * target_height)
+            target_height -= int(float(oversize_bottom)
+                                 / width_y * target_height)
             width_y -= oversize_bottom
 
         # верхняя граница
