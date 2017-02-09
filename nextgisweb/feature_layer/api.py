@@ -57,7 +57,7 @@ def view_geojson(request):
     result = CRSProxy(query())
 
     return Response(
-        geojson.dumps(result, ensure_ascii=False, cls=ComplexEncoder),
+        text=geojson.dumps(result, ensure_ascii=False, cls=ComplexEncoder),
         content_type=b'application/json',
         content_disposition=content_disposition)
 
