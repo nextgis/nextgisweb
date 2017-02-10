@@ -9,13 +9,15 @@
     from bunch import Bunch
 %>
 <head>
+    <% system_name = request.env.core.settings_get('core', 'system.full_name') %>
+
     <title>
         <% page_title = '' %>
         %if hasattr(self, 'title'):
             <% page_title += self.title() + ' | ' %>
         %endif
 
-        <% page_title += request.env.core.settings_get('core', 'system.full_name') %>
+        <% page_title += system_name %>
         ${page_title}
     </title>
 
@@ -124,7 +126,7 @@
                             </div>    
                         %endif
                         <div class="header__title__inner">
-                            ${request.env.core.settings_get('core', 'system.full_name')}
+                            ${system_name}
                         </div>
                     </a>
                 </div>    
