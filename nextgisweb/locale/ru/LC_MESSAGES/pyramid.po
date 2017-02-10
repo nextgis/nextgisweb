@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-12-02 19:56+0700\n"
+"POT-Creation-Date: 2017-02-07 15:56+0700\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -27,19 +27,23 @@ msgstr "Панель управления"
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:87 view.py:131
+#: view.py:87 view.py:142
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:94 view.py:135
+#: view.py:94 view.py:148
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:130
+#: view.py:100 view.py:146
+msgid "Web GIS name"
+msgstr "Название Веб ГИС"
+
+#: view.py:141
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:134
+#: view.py:145
 msgid "Settings"
 msgstr "Настройки"
 
@@ -57,6 +61,7 @@ msgstr "Создать"
 
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:37
 #: amd/ngw-pyramid/template/CORSForm.hbs:26
+#: amd/ngw-pyramid/template/SystemTitleForm.hbs:10
 msgid "Save"
 msgstr "Сохранить"
 
