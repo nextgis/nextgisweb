@@ -7,7 +7,7 @@ except CalledProcessError:
     gv = None
 
 requires = [
-    'pyramid>=1.5',
+    'pyramid>=1.8',
     'SQLAlchemy>=0.8,<0.9',
     'transaction',
     'pyramid_tm',
