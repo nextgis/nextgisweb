@@ -33,15 +33,15 @@ def tile(request):
         req = obj.render_request(obj.srs)
         rimg = req.render_tile((z, x, y), 256)
 
-        if (rimg.mode != 'RGBA'):
-            raise HTTPBadRequest(
-                "Image (ID=%d) must have mode RGBA, but it is %s mode." %
-                (obj.id, rimg.mode))
-
         if aimg is None:
             aimg = rimg
         else:
-            aimg = Image.alpha_composite(aimg, rimg)
+            try:
+                aimg = Image.alpha_composite(aimg, rimg)
+            except ValueError:
+                raise HTTPBadRequest(
+                    "Image (ID=%d) must have mode %s, but it is %s mode." %
+                    (obj.id, aimg.mode, rimg.mode))
 
     # Если не было ресурсов для отрисовки, возвращаем пустую картинку
     if aimg is None:
@@ -73,15 +73,15 @@ def image(request):
         req = obj.render_request(obj.srs)
         rimg = req.render_extent(p_extent, p_size)
 
-        if (rimg.mode != 'RGBA'):
-            raise HTTPBadRequest(
-                "Image (ID=%d) must have mode RGBA, but it is %s mode." %
-                (obj.id, rimg.mode))
-
         if aimg is None:
             aimg = rimg
         else:
-            aimg = Image.alpha_composite(aimg, rimg)
+            try:
+                aimg = Image.alpha_composite(aimg, rimg)
+            except ValueError:
+                raise HTTPBadRequest(
+                    "Image (ID=%d) must have mode %s, but it is %s mode." %
+                    (obj.id, aimg.mode, rimg.mode))
 
     # Если не было ресурсов для отрисовки, возвращаем пустую картинку
     if aimg is None:
