@@ -2,7 +2,7 @@
 import os
 import os.path
 import json
-from urllib import quote as urlquote
+from urllib import quote_plus as urlquote
 from pkg_resources import resource_filename
 
 from sqlalchemy import create_engine
