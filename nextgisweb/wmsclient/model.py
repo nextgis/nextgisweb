@@ -37,7 +37,7 @@ from .util import _
 
 Base = declarative_base()
 
-WMS_VERSIONS = ('1.1.1', )
+WMS_VERSIONS = ('1.1.1', '1.3.0')
 
 
 class Connection(Base, Resource):
@@ -186,10 +186,13 @@ class Layer(Base, Resource, SpatialLayerMixin):
             version=self.connection.version,
             layers=self.wmslayers, styles="",
             format=self.imgformat,
-            srs="EPSG:%d" % self.srs.id,
             bbox=','.join(map(str, extent)),
             width=size[0], height=size[1],
             transparent="true")
+
+        # In the GetMap operation the srs parameter is called crs in 1.3.0.
+        srs = 'crs' if self.connection.version == '1.3.0' else 'srs'
+        query[srs] = "EPSG:%d" % self.srs.id
 
         auth = None
         username = self.connection.username
