@@ -149,6 +149,14 @@ class CoreComponent(Component):
         except KeyError:
             self.settings_set(component, name, value)
 
+    def query_stat(self):
+        result = dict()
+        try:
+            result['full_name'] = self.settings_get('core', 'system.full_name')
+        except KeyError:
+            pass
+        return result
+
     settings_info = (
         dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),
         dict(key='system.full_name', default=u"Геоинформационная система NextGIS", desc=u"Полное название системы"),
