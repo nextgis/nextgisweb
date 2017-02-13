@@ -8,6 +8,8 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
 
 from pkg_resources import resource_filename
 
+from ..auth.api import require_administrator
+
 from .. import dynmenu as dm
 
 from .util import _, ClientRoutePredicate
@@ -37,8 +39,7 @@ def routes(request):
 
 
 def control_panel(request):
-    if not request.user.is_administrator:
-        raise HTTPForbidden()
+    require_administrator(request)
 
     return dict(
         title=_("Control panel"),
@@ -83,6 +84,7 @@ def locale(request):
 
 
 def pkginfo(request):
+    require_administrator(request)
     return dict(
         title=_("Package versions"),
         distinfo=request.env.pyramid.distinfo,
@@ -90,12 +92,14 @@ def pkginfo(request):
 
 
 def cors(request):
+    require_administrator(request)
     return dict(
         title=_("Cross-origin resource sharing (CORS)"),
         dynmenu=request.env.pyramid.control_panel)
 
 
 def system_name(request):
+    require_administrator(request)
     return dict(
         title=_("Web GIS name"),
         dynmenu=request.env.pyramid.control_panel)

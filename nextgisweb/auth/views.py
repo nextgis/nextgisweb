@@ -11,6 +11,7 @@ from .. import dynmenu as dm
 from .models import Principal, User, Group, UserDisabled
 
 from .util import _
+from .api import require_administrator
 
 
 def setup_pyramid(comp, config):
@@ -20,8 +21,7 @@ def setup_pyramid(comp, config):
         auth и security, права доступа к редактированию пользователей
         ограничиваются по критерию членства в группе administrators """
 
-        if not request.user.is_administrator:
-            raise HTTPForbidden("Membership in group 'administrators' required!")
+        require_administrator(request)
 
     def login(request):
         next = request.params.get('next', request.application_url)
