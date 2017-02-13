@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
 import uuid
 import types
 import zipfile
@@ -163,11 +164,21 @@ class TableInfo(object):
             if fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)
 
-            try:
-                fld_type = _FIELD_TYPE_2_ENUM[fld_defn.GetType()]
-            except KeyError:
-                raise VE(_("Unsupported field type: %r.") %
-                         fld_defn.GetTypeName())
+            fld_type = None
+            fld_type_ogr = fld_defn.GetType()
+
+            if fld_type_ogr in (ogr.OFTRealList,
+                                ogr.OFTStringList,
+                                ogr.OFTIntegerList,
+                                ogr.OFTInteger64List if gdal_gt_20 else None):
+                fld_type = FIELD_TYPE.STRING
+
+            if fld_type is None:
+                try:
+                    fld_type = _FIELD_TYPE_2_ENUM[fld_type_ogr]
+                except KeyError:
+                    raise VE(_("Unsupported field type: %r.") %
+                             fld_defn.GetTypeName())
 
             uid = str(uuid.uuid4().hex)
             self.fields.append(FieldDef(
@@ -313,6 +324,15 @@ class TableInfo(object):
                     fld_value = feature.GetFieldAsDouble(i)
                 elif fld_type in [ogr.OFTDate, ogr.OFTTime, ogr.OFTDateTime]:
                     fld_value = datetime(*feature.GetFieldAsDateTime(i))
+                elif fld_type == ogr.OFTIntegerList:
+                    fld_value = json.dumps(feature.GetFieldAsIntegerList(i))
+                elif gdal_gt_20 and fld_type == ogr.OFTInteger64List:
+                    fld_value = json.dumps(feature.GetFieldAsInteger64List(i))
+                elif fld_type == ogr.OFTRealList:
+                    fld_value = json.dumps(feature.GetFieldAsDoubleList(i))
+                elif fld_type == ogr.OFTStringList:
+                    # TODO: encoding
+                    fld_value = json.dumps(feature.GetFieldAsStringList(i))
                 elif fld_type == ogr.OFTString:
                     try:
                         fld_value = strdecode(feature.GetFieldAsString(i))
