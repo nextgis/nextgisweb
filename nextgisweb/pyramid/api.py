@@ -8,8 +8,6 @@ from urllib2 import unquote
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
 
-from ..auth.api import require_administrator
-
 from ..env import env
 from ..package import pkginfo
 
@@ -103,12 +101,12 @@ def cors_tween_factory(handler, registry):
 
 
 def cors_get(request):
-    require_administrator(request)
+    request.require_administrator()
     return dict(allow_origin=_get_cors_olist())
 
 
 def cors_put(request):
-    require_administrator(request)
+    request.require_administrator()
 
     body = request.json_body
     for k, v in body.iteritems():
@@ -141,12 +139,12 @@ def cors_put(request):
 
 
 def system_name_get(request):
-    require_administrator(request)
+    request.require_administrator()
     return dict(full_name=env.core.settings_get('core', 'system.full_name'))
 
 
 def system_name_put(request):
-    require_administrator(request)
+    request.require_administrator()
 
     body = request.json_body
     for k, v in body.iteritems():
@@ -223,7 +221,7 @@ def pkg_version(request):
 
 
 def statistics(request):
-    require_administrator(request)
+    request.require_administrator()
 
     result = dict()
     for comp in request.env._components.values():

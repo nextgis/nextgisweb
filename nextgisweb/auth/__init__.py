@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 from sqlalchemy.orm.exc import NoResultFound
+from pyramid.httpexceptions import HTTPForbidden
 
 from ..component import Component
 
@@ -68,7 +69,13 @@ class AuthComponent(Component):
             else:
                 return User.filter_by(keyname='guest').one()
 
+        def require_administrator(request):
+            if not request.user.is_administrator:
+                raise HTTPForbidden(
+                    "Membership in group 'administrators' required!")
+
         config.add_request_method(user, reify=True)
+        config.add_request_method(require_administrator)
 
         from . import views, api
         views.setup_pyramid(self, config)
