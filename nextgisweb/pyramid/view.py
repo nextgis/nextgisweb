@@ -37,8 +37,7 @@ def routes(request):
 
 
 def control_panel(request):
-    if not request.user.is_administrator:
-        raise HTTPForbidden()
+    request.require_administrator()
 
     return dict(
         title=_("Control panel"),
@@ -83,6 +82,7 @@ def locale(request):
 
 
 def pkginfo(request):
+    request.require_administrator()
     return dict(
         title=_("Package versions"),
         distinfo=request.env.pyramid.distinfo,
@@ -90,12 +90,14 @@ def pkginfo(request):
 
 
 def cors(request):
+    request.require_administrator()
     return dict(
         title=_("Cross-origin resource sharing (CORS)"),
         dynmenu=request.env.pyramid.control_panel)
 
 
 def system_name(request):
+    request.require_administrator()
     return dict(
         title=_("Web GIS name"),
         dynmenu=request.env.pyramid.control_panel)

@@ -7,18 +7,13 @@ from ..models import DBSession
 from .models import User, Group
 
 
-def require_administrator(request):
-    if not request.user.is_administrator:
-        raise HTTPForbidden("Membership in group 'administrators' required!")
-
-
 def user_cget(request):
-    require_administrator(request)
+    request.require_administrator()
     return map(lambda o: o.serialize(), User.query())
 
 
 def user_cpost(request):
-    require_administrator(request)
+    request.require_administrator()
     obj = User(system=False)
     obj.deserialize(request.json_body)
     obj.persist()
@@ -28,25 +23,25 @@ def user_cpost(request):
 
 
 def user_iget(request):
-    require_administrator(request)
+    request.require_administrator()
     obj = User.filter_by(id=request.matchdict['id']).one()
     return obj.serialize()
 
 
 def user_iput(request):
-    require_administrator(request)
+    request.require_administrator()
     obj = User.filter_by(id=request.matchdict['id']).one()
     obj.deserialize(request.json_body)
     return dict(id=obj.id)
 
 
 def group_cget(request):
-    require_administrator(request)
+    request.require_administrator()
     return map(lambda o: o.serialize(), Group.query())
 
 
 def group_cpost(request):
-    require_administrator(request)
+    request.require_administrator()
     obj = Group(system=False)
     obj.deserialize(request.json_body)
     obj.persist()
@@ -56,13 +51,13 @@ def group_cpost(request):
 
 
 def group_iget(request):
-    require_administrator(request)
+    request.require_administrator()
     obj = Group.filter_by(id=request.matchdict['id']).one()
     return obj.serialize()
 
 
 def group_iput(request):
-    require_administrator(request)
+    request.require_administrator()
     obj = Group.filter_by(id=request.matchdict['id']).one()
     obj.deserialize(request.json_body)
     return dict(id=obj.id)

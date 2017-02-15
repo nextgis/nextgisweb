@@ -101,14 +101,12 @@ def cors_tween_factory(handler, registry):
 
 
 def cors_get(request):
-    if not request.user.is_administrator:
-        raise HTTPForbidden("Membership in group 'administrators' required!")
+    request.require_administrator()
     return dict(allow_origin=_get_cors_olist())
 
 
 def cors_put(request):
-    if not request.user.is_administrator:
-        raise HTTPForbidden("Membership in group 'administrators' required!")
+    request.require_administrator()
 
     body = request.json_body
     for k, v in body.iteritems():
@@ -141,15 +139,12 @@ def cors_put(request):
 
 
 def system_name_get(request):
-    if not request.user.is_administrator:
-        raise HTTPForbidden("Membership in group 'administrators' required!")
-
+    request.require_administrator()
     return dict(full_name=env.core.settings_get('core', 'system.full_name'))
 
 
 def system_name_put(request):
-    if not request.user.is_administrator:
-        raise HTTPForbidden("Membership in group 'administrators' required!")
+    request.require_administrator()
 
     body = request.json_body
     for k, v in body.iteritems():
@@ -226,8 +221,8 @@ def pkg_version(request):
 
 
 def statistics(request):
-    if not request.user.is_administrator:
-        raise HTTPForbidden("Membership in group 'administrators' required!")
+    request.require_administrator()
+
     result = dict()
     for comp in request.env._components.values():
         if hasattr(comp, 'query_stat'):

@@ -20,8 +20,7 @@ def setup_pyramid(comp, config):
         auth и security, права доступа к редактированию пользователей
         ограничиваются по критерию членства в группе administrators """
 
-        if not request.user.is_administrator:
-            raise HTTPForbidden("Membership in group 'administrators' required!")
+        request.require_administrator()
 
     def login(request):
         next = request.params.get('next', request.application_url)
