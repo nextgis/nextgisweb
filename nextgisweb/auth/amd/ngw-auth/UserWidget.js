@@ -81,14 +81,7 @@ define([
             this.cbDisabled.set("checked", value.disabled);
             this.description.set("value", value.description);
 
-            // По простому не работает, сделаем по сложному
-            var groups = lang.clone(this.groups);
-            if (this.value) {
-                array.forEach(groups, function (opt) {
-                    opt.selected = (this.value.member_of.indexOf(opt.value) !== -1);
-                }, this);
-            }
-            this.memberOf.addOption(this.groups);
+            this.memberOf.addOption(lang.clone(this.groups));
         },
 
         _getValueAttr: function () {
