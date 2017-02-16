@@ -141,6 +141,12 @@ def setup_pyramid(comp, config):
                     description=self.obj.description,
                     register=self.obj.register)
 
+                result['users'] = [
+                    dict(
+                        value=u.id,
+                        label=u.display_name
+                    ) for u in self.obj.members]
+
             return result
 
         def widget_module(self):
