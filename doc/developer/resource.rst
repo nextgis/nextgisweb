@@ -319,6 +319,10 @@ Get single feature
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)
 
+Get child resources
+
+.. http:get:: /api/resource/?parent=(int:id)
+
 Get all vector layer features
 
 .. http:get:: /api/resource/(int:id)/feature/
