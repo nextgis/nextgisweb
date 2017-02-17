@@ -35,11 +35,13 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
 }
 
 
-/* Возможность указать ширину dojox/form/CheckedMultiSelect в явном виде.*/
+/* Возможность указать ширину dojox/form/CheckedMultiSelect в явном виде,
+а также высота по умолчанию.*/
 .dojoxCheckedMultiSelect .dojoxCheckedMultiSelectWrapper {
     width: 100%;
     margin: 0 !important;
     padding-right: 0 !important;
+    height: 200px !important;
 }
 
 /* Убираем обводку */

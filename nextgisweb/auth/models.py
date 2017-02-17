@@ -183,6 +183,11 @@ class Group(Principal):
             if a in data:
                 setattr(self, a, data[a])
 
+        if 'members' in data:
+            self.members = list(map(
+                lambda uid: User.filter_by(id=uid).one(),
+                data['members']))
+
 
 class PasswordHashValue(object):
     """ Класс для автоматического сравнения паролей по хешу """

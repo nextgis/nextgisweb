@@ -1,6 +1,7 @@
 /*global define, ngwConfig*/
 define([
     "dojo/_base/declare",
+    "dojo/_base/lang",
     "ngw-pyramid/modelWidget/Widget",
     "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
@@ -12,12 +13,14 @@ define([
     "dojo/on",
     // template
     "dijit/form/CheckBox",
-    "dijit/form/SimpleTextarea",    
+    "dijit/form/SimpleTextarea",
     "dojox/layout/TableContainer",
+    "ngw-auth/PrincipalMemberSelect",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-pyramid/form/DisplayNameTextBox"
 ], function (
     declare,
+    lang,
     Widget,
     ErrorDisplayMixin,
     _TemplatedMixin,
@@ -32,6 +35,14 @@ define([
         templateString: hbsI18n(template, i18n),
         identity: "auth_user",
         title: i18n.gettext("Group"),
+
+        postCreate: function () {
+            this.inherited(arguments);
+
+            if (this.operation === 'create') {
+                this.members.addOption(lang.clone(this.users));
+            }
+        },
 
         validateWidget: function () {
             var widget = this;
@@ -57,6 +68,11 @@ define([
             this.keyname.set("value", value.keyname);
             this.description.set("value", value.description);
             this.register.set("checked", value.register);
+
+            // show group members at the top of the list
+            this.members.addOption(
+                lang.clone(this.users).sort(function (a, b) {
+                    return b.selected - a.selected; }));
         },
 
         _getValueAttr: function () {
@@ -64,7 +80,8 @@ define([
                 display_name: this.displayName.get("value"),
                 keyname: this.keyname.get("value"),
                 description: this.description.get("value"),
-                register: this.register.get("checked")
+                register: this.register.get("checked"),
+                members: this.members.get("value")
             };
         }
     });

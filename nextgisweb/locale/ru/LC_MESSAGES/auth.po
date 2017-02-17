@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-07-28 00:43+0700\n"
+"POT-Creation-Date: 2017-02-17 17:10+0700\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -43,55 +43,55 @@ msgstr "Администратор"
 msgid "Owner"
 msgstr "Владелец"
 
-#: views.py:36
+#: views.py:35
 msgid "Account disabled"
 msgstr "Учетная запись отключена"
 
-#: views.py:43
+#: views.py:42
 msgid "Invalid login or password!"
 msgstr "Неверный логин или пароль!"
 
-#: views.py:76
+#: views.py:75
 msgid "Access denied"
 msgstr "Отказано в доступе"
 
-#: views.py:127
+#: views.py:134
 msgid "Group name is not unique."
 msgstr "Имя группы не уникально."
 
-#: views.py:152
+#: views.py:172
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: views.py:208
+#: views.py:232
 msgid "Login is not unique."
 msgstr "Логин не уникален."
 
-#: views.py:251
+#: views.py:274
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: views.py:284 views.py:349
+#: views.py:307 views.py:372
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:294 views.py:352
+#: views.py:317 views.py:375
 msgid "Groups"
 msgstr "Группы"
 
-#: views.py:305 views.py:327
+#: views.py:328 views.py:350
 msgid "List"
 msgstr "Список"
 
-#: views.py:310 views.py:332
+#: views.py:333 views.py:355
 msgid "Create"
 msgstr "Создать"
 
-#: views.py:316 views.py:338
+#: views.py:339 views.py:361
 msgid "Edit"
 msgstr "Изменить"
 
-#: amd/ngw-auth/GroupWidget.js:34
+#: amd/ngw-auth/GroupWidget.js:39
 msgid "Group"
 msgstr "Группа"
 
@@ -104,26 +104,30 @@ msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:7
-#: amd/ngw-auth/template/UserWidget.hbs:8 template/group_browse.mako:8
-#: template/user_browse.mako:8
+#: amd/ngw-auth/template/UserWidget.hbs:8 template/group_browse.mako:25
+#: template/user_browse.mako:25
 msgid "Full name"
 msgstr "Полное имя"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:12 template/group_browse.mako:9
+#: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:26
 msgid "Group name"
 msgstr "Имя группы"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:18
+#: amd/ngw-auth/template/GroupWidget.hbs:19
 #: amd/ngw-auth/template/UserWidget.hbs:38
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:23
+#: amd/ngw-auth/template/GroupWidget.hbs:24
 msgid "Assign at registration"
 msgstr "Назначать при регистрации"
 
+#: amd/ngw-auth/template/GroupWidget.hbs:30
+msgid "Group members"
+msgstr "Члены группы"
+
 #: amd/ngw-auth/template/UserWidget.hbs:15 template/login.mako:12
-#: template/user_browse.mako:9
+#: template/user_browse.mako:26
 msgid "Login"
 msgstr "Логин"
 

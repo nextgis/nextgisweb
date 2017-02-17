@@ -116,6 +116,10 @@ def setup_pyramid(comp, config):
             self.obj.description = self.data['description']
             self.obj.register = self.data['register']
 
+            self.obj.members = map(
+                lambda id: User.filter_by(id=id).one(),
+                self.data['members'])
+
         def validate(self):
             result = super(AuthGroupWidget, self).validate()
             self.error = []
@@ -144,8 +148,16 @@ def setup_pyramid(comp, config):
                 result['users'] = [
                     dict(
                         value=u.id,
-                        label=u.display_name
-                    ) for u in self.obj.members]
+                        label=u.display_name,
+                        selected=u in self.obj.members
+                    ) for u in User.filter_by(system=False)]
+
+            else:
+                # Список всех пользователей для поля выбора
+                result['users'] = [
+                    dict(value=u.id, label=u.display_name)
+                    for u in User.filter_by(system=False)
+                ]
 
             return result
 

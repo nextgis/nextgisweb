@@ -16,7 +16,7 @@ define([
     "dijit/form/ValidationTextBox",
     "dijit/form/SimpleTextarea",
     "dojox/layout/TableContainer",
-    "dojox/form/CheckedMultiSelect",
+    "ngw-auth/PrincipalMemberSelect",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-pyramid/form/DisplayNameTextBox",
     // css
@@ -81,7 +81,10 @@ define([
             this.cbDisabled.set("checked", value.disabled);
             this.description.set("value", value.description);
 
-            this.memberOf.addOption(lang.clone(this.groups));
+            // show groups where user is a member at the top of the list
+            this.memberOf.addOption(
+                lang.clone(this.groups).sort(function (a, b) {
+                    return b.selected - a.selected; }));
         },
 
         _getValueAttr: function () {

@@ -39,8 +39,8 @@
             style="width: 100%; box-sizing: border-box"></textarea>
 
         <select data-dojo-attach-point="memberOf"
-            data-dojo-type="dojox/form/CheckedMultiSelect"
-            data-dojo-props="colspan: 2"
+            data-dojo-type="ngw-auth/PrincipalMemberSelect"
+            data-dojo-props="colspan: 2, route: 'auth.group.edit'"
             multiple="true"
             title="{{gettext 'Groups member'}}"
             style="width: 100%">

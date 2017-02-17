@@ -23,5 +23,13 @@
             data-dojo-type="dijit/form/CheckBox"
             title="{{gettext 'Assign at registration'}}"/>
 
+        <select data-dojo-attach-point="members"
+            data-dojo-type="ngw-auth/PrincipalMemberSelect"
+            data-dojo-props="colspan: 2, route: 'auth.user.edit'"
+            multiple="true"
+            title="{{gettext 'Group members'}}"
+            style="width: 100%;">
+        </select>
+
     </div>
 </div>
