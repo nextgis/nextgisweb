@@ -10,12 +10,10 @@ define([
     "dojo/text!./template/GroupWidget.hbs",
     "dojo/_base/array",
     "dojo/on",
-    "dojo/dom-construct",
     // template
     "dijit/form/CheckBox",
-    "dijit/form/SimpleTextarea",
+    "dijit/form/SimpleTextarea",    
     "dojox/layout/TableContainer",
-    "dijit/form/MultiSelect",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-pyramid/form/DisplayNameTextBox"
 ], function (
@@ -28,21 +26,12 @@ define([
     hbsI18n,
     template,
     array,
-    on,
-    domConstruct
+    on
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         identity: "auth_user",
         title: i18n.gettext("Group"),
-
-        postCreate: function () {
-            this.inherited(arguments);
-
-            if (this.operation === 'create') {
-                this.members.destroy();
-            }
-        },
 
         validateWidget: function () {
             var widget = this;
@@ -68,13 +57,6 @@ define([
             this.keyname.set("value", value.keyname);
             this.description.set("value", value.description);
             this.register.set("checked", value.register);
-
-            array.forEach(this.users, function (user) {
-                domConstruct.create("option", {
-                    innerHTML: user.label,
-                    value: user.value
-                }, this.members.domNode);
-            }, this);
         },
 
         _getValueAttr: function () {
