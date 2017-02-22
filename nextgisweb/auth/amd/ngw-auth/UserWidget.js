@@ -18,9 +18,7 @@ define([
     "dojox/layout/TableContainer",
     "ngw-auth/PrincipalMemberSelect",
     "ngw-pyramid/form/KeynameTextBox",
-    "ngw-pyramid/form/DisplayNameTextBox",
-    // css
-    "xstyle/css!" + ngwConfig.amdUrl + 'dojox/form/resources/CheckedMultiSelect.css'
+    "ngw-pyramid/form/DisplayNameTextBox"
 ], function (
     declare,
     lang,
