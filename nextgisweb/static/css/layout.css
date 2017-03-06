@@ -168,6 +168,9 @@
   width: 16px;
   height: 16px;
 }
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-basemap_layer {
+  shape-rendering: crispEdges;
+}
 .text-withIcon__pic {
   position: relative;
   vertical-align: middle;
@@ -284,7 +287,8 @@
 .svgIcon-wfsserver_service,
 .svgIcon-wmsclient_connection,
 .svgIcon-wmsclient_layer,
-.svgIcon-wmsserver_service {
+.svgIcon-wmsserver_service,
+.svgIcon-basemap_layer {
   background: none;
 }
 .svgIcon-mapserver_style {
@@ -344,6 +348,10 @@
   height: 24px;
 }
 .svgIcon-wmsserver_service {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-basemap_layer {
   width: 24px;
   height: 24px;
 }
