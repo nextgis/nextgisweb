@@ -138,8 +138,7 @@ class TableInfo(object):
         self.accepted_gtype = [ltype, ]
 
         if ltype in (ogr.wkbPoint, ogr.wkbLineString, ogr.wkbPolygon):
-            feature = ogrlayer.GetNextFeature()
-            while feature:
+            for feature in ogrlayer:
                 geom = feature.GetGeometryRef()
                 gtype = geom.GetGeometryType() & (~ogr.wkb25DBit)
                 if ltype != gtype and (
@@ -150,8 +149,6 @@ class TableInfo(object):
                     self.geometry_type = _GEOM_OGR_2_TYPE[gtype]
                     self.accepted_gtype.append(gtype)
                     break
-
-                feature = ogrlayer.GetNextFeature()
 
             ogrlayer.ResetReading()
 
@@ -278,10 +275,7 @@ class TableInfo(object):
         ltype = ogrlayer.GetGeomType() & (~ogr.wkb25DBit)
         transform = osr.CoordinateTransformation(source_osr, target_osr)
 
-        feature = ogrlayer.GetNextFeature()
-        fid = 0
-        while feature:
-            fid += 1
+        for fid, feature in enumerate(ogrlayer):
             geom = feature.GetGeometryRef()
 
             # Приведение 25D геометрий к 2D
@@ -351,8 +345,6 @@ class TableInfo(object):
                 str(geom), srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
-
-            feature = ogrlayer.GetNextFeature()
 
 
 class VectorLayerField(Base, LayerField):
@@ -698,12 +690,10 @@ class _source_attr(SP):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
 
-        feat = ogrlayer.GetNextFeature()
-        while feat:
+        for feat in ogrlayer:
             geom = feat.GetGeometryRef()
             if geom is None:
                 raise VE(_("Feature #%d doesn't contains geometry.") % feat.GetFID())
-            feat = ogrlayer.GetNextFeature()
 
         ogrlayer.ResetReading()
 
