@@ -33,15 +33,15 @@ class ResourceMeta(db.DeclarativeMeta):
 
     def __init__(cls, classname, bases, nmspc):
 
-        # По-умолчанию имя таблицы совпадает с идентификатором ресурса.
-        # Вряд ли когда-то потребуется по-другому, но на всяких случай
-        # оставим такую возможность.
+        # Table name is equal to resource id by default.
+        # It'll hardlybe ever needed otherwise, but let's keep this
+        # possibility.
 
         if '__tablename__' not in cls.__dict__:
             setattr(cls, '__tablename__', cls.identity)
 
-        # Дочерний класс может указать какие-то свои аргументы, оставим
-        # ему такую возможность. Если не указано, указываем свои.
+        # Child class can set it's own arguments, let's
+        # keep it possible. If not set, set our own.
 
         if '__mapper_args__' not in cls.__dict__:
             mapper_args = dict()
@@ -52,14 +52,14 @@ class ResourceMeta(db.DeclarativeMeta):
         if 'polymorphic_identity' not in mapper_args:
             mapper_args['polymorphic_identity'] = cls.identity
 
-        # Для класса Resource эта переменная еще не определена.
+        # For Resource class this variable is not set yet.
         Resource = globals().get('Resource', None)
 
         if Resource and cls != Resource:
 
-            # Для дочерних классов нужна колонка с внешним ключем, указывающим
-            # на базовый класс ресурса. Возможно потребуется создать вручную,
-            # но проще для всех ее создать разом.
+            # Field with external key is needed for child classes, pointing
+            # to base resource class. May need to be created by hand, but easier to
+            # create for all together.
 
             if 'id' not in cls.__dict__:
                 idcol = db.Column('id', db.ForeignKey(Resource.id),
@@ -67,9 +67,8 @@ class ResourceMeta(db.DeclarativeMeta):
                 idcol._creation_order = Resource.id._creation_order
                 setattr(cls, 'id', idcol)
 
-            # Автоматическое определение поля по которому происходит связь
-            # с родителем не работает в случае, если есть два поля с внешним
-            # ключем на resource.id.
+            # Automatic parent link field detection may not work
+            # if there are two fields with external key to resource.id.
 
             if 'inherit_condition' not in mapper_args:
                 mapper_args['inherit_condition'] = (
@@ -136,12 +135,12 @@ class Resource(Base):
 
     @classmethod
     def check_parent(cls, parent):
-        """ Может ли этот ресурс быть дочерним для parent """
+        """ Can this resource be child for parent? """
         return False
 
     @property
     def parents(self):
-        """ Список всех родителей от корня до непосредственного родителя """
+        """ List of all parents from root to current parent """
         result = []
         current = self
         while current.parent:
@@ -150,11 +149,11 @@ class Resource(Base):
 
         return reversed(result)
 
-    # Права доступа
+    # Permissions
 
     @classmethod
     def class_permissions(cls):
-        """ Права применимые к этому классу ресурсов """
+        """ Permissions applicable to this resource class """
 
         result = set()
         for scope in cls.scope.itervalues():
@@ -228,11 +227,11 @@ class Resource(Base):
         else:
             return permission in self.permissions(user)
 
-    # Валидация данных
+    # Data validation
 
     @db.validates('parent')
     def _validate_parent(self, key, value):
-        """ Проверка на создание замкнутых циклов в иерархии """
+        """ Test for closed loops in hierarchy """
 
         with DBSession.no_autoflush:
             if value is not None:
@@ -243,7 +242,7 @@ class Resource(Base):
 
     @db.validates('keyname')
     def _validate_keyname(self, key, value):
-        """ Проверка на уникальность ключа """
+        """ Test for key uniqueness """
 
         with DBSession.no_autoflush:
             if value is not None and Resource.filter(
@@ -364,11 +363,11 @@ class ResourceSerializer(Serializer):
     scopes = _ro(_scopes_attr)
 
     def deserialize(self, *args, **kwargs):
-        # Поскольку выполнение требования на уникальное наиVaенование внутри
-        # группы зависит от двух атрибутов (parent, display_name). Корректно
-        # проверить его выполнени можно после сериализации обоих атрибутов.
+        # As the test for uniqueness within group is dependent on two attributes
+        # (parent, display_name), it is possible to correctly check its completion
+        # after serialization of both attributes.
 
-        # Сохраняем старые значения, чтобы отследить изменения.
+        # Save old values to track changes
         parent, display_name = self.obj.parent, self.obj.display_name
 
         super(ResourceSerializer, self).deserialize(*args, **kwargs)
@@ -397,8 +396,8 @@ class ResourceACLRule(Base):
         Тип ресурса для которого действует это правило. Пустая строка
         означает, что оно действует для всех типов ресурсов."""
 
-    # Право для которого действует это правило. Пустая строка означает
-    # полный набор прав для всех типов ресурсов.
+    # Permission for which this rule is applicable. Empty line means
+    # full set of permissions for all types of resources.
     scope = db.Column(db.Unicode, primary_key=True, default='')
     permission = db.Column(db.Unicode, primary_key=True, default='')
 
@@ -441,5 +440,5 @@ class ResourceGroup(Resource):
 
     @classmethod
     def check_parent(cls, parent):
-        # Группа может быть либо корнем, либо подгруппой в другой группе
+        # Group can be either root or subgroup in other group
         return (parent is None) or isinstance(parent, ResourceGroup)

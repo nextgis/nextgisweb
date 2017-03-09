@@ -296,12 +296,12 @@ version="%s"
                     method.attrib['{%s}href' % (self.namespaces['xlink'])] = \
                         self.host + '?'
 
-        # Сейчас в NGW используется только один слой и datasource
-        # поэтому для того, чтобы определить параметр maxfeature нужно
-        # выбрать из datasources объект datasource (единственный там)
-        # и использовать его. Если datasource не один -- игнорируем процедуру
-        # извлечения maxfetature, чтобы не испортить работу других
-        # datasource (не из NGW)
+        # Currently NGW uses one layer and datasource
+        # so to set maxfeature we need to
+        # select from datasources single datasource
+        # and use it. If there are several datasources -- ignore
+        # extracting maxfeature, so we don't break work of other
+        # datasources (not from NGW)
         if len(self.layers) == 1:
             datasource = self.datasources[self.layers[0]]
             maxfeatures = datasource.default_maxfeatures

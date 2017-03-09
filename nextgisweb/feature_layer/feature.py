@@ -24,13 +24,13 @@ class Feature(object):
     @property
     def label(self):
         if self._layer and self._layer.feature_label_field:
-            # Если объект привязан к слою и услоя указано поле наименования,
-            # то используем его в качестве наименования
+            # If object is linked to a layer and naming field is set for a layer
+            # use it for naming.
             value = self._fields[self._layer.feature_label_field.keyname]
             if value is not None:
                 return unicode(value)
 
-        # В противном случае используем id объекта
+        # Otherwise use object id
         return "#%d" % self._id
 
     def __unicode__(self):

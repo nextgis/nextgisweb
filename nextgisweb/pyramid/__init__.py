@@ -44,17 +44,17 @@ class RouteHelper(object):
 class ExtendedConfigurator(Configurator):
 
     def add_route(self, name, pattern=None, **kwargs):
-        """ Расширенное добавление маршрута
+        """ Advanced route addition
 
-        Синтаксический сахар, позволяющий записать часто встречающуюся
-        конструкцию вида:
+        Syntax sugar that allows to record frequently used
+        structure like:
 
             config.add_route('foo', '/foo')
             config.add_view(foo_get, route_name='foo', request_method='GET')
             config.add_view(foo_post, route_name='foo', request_method='POST')
 
 
-        Более компактным способом:
+        In a more compact way:
 
             config.add_route('foo', '/foo') \
                 .add_view(foo_get, request_method='GET') \
@@ -86,16 +86,16 @@ class PyramidComponent(Component):
 
         settings['mako.directories'] = 'nextgisweb:templates/'
 
-        # Если включен режим отладки, то добавляем mako-фильтр, который
-        # проверяет была ли переведена строка перед выводом.
+        # If debug is on, add mako-filter that checks
+        # if the line was translated before output.
 
         if self.env.core.debug:
             settings['mako.default_filters'] = ['tcheck', 'h']
             settings['mako.imports'] = settings.get('mako.imports', []) \
                 + ['from nextgisweb.i18n import tcheck', ]
 
-        # Если в конфиге pyramid не указано иное, то используем ту локаль,
-        # которая указана в компоненте core, хотя зачем такое нужно не ясно.
+        # If pyramid config doesn't state otherwise, use locale from,
+        # core component, while this is not clear why we need that.
 
         plockey = 'pyramid.default_locale_name'
         if plockey not in settings and self.env.core.locale_default is not None:
@@ -103,16 +103,16 @@ class PyramidComponent(Component):
 
         config = ExtendedConfigurator(settings=settings)
 
-        # Заменяем стандартный localizer от pyramid на свой, родной очень
-        # родной завязан на translationstring, который странно работает с
-        # интерполяцией строк через оператор %.
+        # Substitute localizer from pyramid with our own, original is
+        # too tied to translationstring, that works strangely with string
+        # interpolation via % operator.
 
         def localizer(request):
             return request.env.core.localizer(request.locale_name)
         config.add_request_method(localizer, 'localizer', property=True)
 
-        # TODO: Нужно отказаться от translation dirs полностью!
-        # Сейчас используются только для поиска jed-файлов.
+        # TODO: Need to get rid of translation dirs!
+        # Currently used only to search for jed-files.
 
         for pkg in pkginfo.packages:
             dirname = resource_filename(pkg, 'locale')
@@ -124,15 +124,15 @@ class PyramidComponent(Component):
         config.add_view_predicate('method', RequestMethodPredicate)
         config.add_view_predicate('json', JsonPredicate)
 
-        # Возможность доступа к Env через request.env
+        # Access to Env through request.env
         config.add_request_method(lambda (req): self._env, 'env',
                                   property=True)
 
         config.include(pyramid_tm)
         config.include(pyramid_mako)
 
-        # Фильтр для быстрого перевода строк. Определяет функцию tr, которую
-        # можно использовать вместо request.localizer.translate в шаблонах.
+        # Filter for quick translation. Defines function tr, which we can use
+        # instead of request.localizer.translate in templates.
         def tr_subscriber(event):
             event['tr'] = event['request'].localizer.translate
         config.add_subscriber(tr_subscriber, BeforeRender)
@@ -144,23 +144,22 @@ class PyramidComponent(Component):
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)
 
-        # Справка
+        # Help
         self.help_page = {}
         for key in settings.keys():
             if key.startswith('help_page'):
                 hploc = key.split('.')[-1]
                 self.help_page[hploc] = settings[key]
 
-        # Чтобы не приходилось вручную чистить кеш статики, сделаем
-        # так, чтобы у них всегда были разные URL. В качестве ключа
-        # используем хеш md5 от всех установленных в окружении пакетов,
-        # который можно вытянуть через pip freeze. Так же pip freeze
-        # вместе с версиями возвращает текущий коммит, для пакетов из
-        # VCS, что тоже полезно.
+        # To not clear static cache by hand make it so that
+        # URLs are different. Use md5 hash from all installed packages
+        # which we can get with pip freeze. pip freeze
+        # also returns current commit for packages from
+        # VCS, this also helps.
 
-        # Наверное это можно как-то получше сделать, но делаем так:
-        # перенаправляем sys.stdout в StringIO, запускаем pip freeze и
-        # затем возвращаем sys.stdout на место.
+        # This could've been done better, but right now simply
+        # redirect sys.stdout to StringIO, run pip freeze and
+        # return sys.stdout to initial state.
 
         stdout = sys.stdout
         static_key = ''
@@ -178,7 +177,7 @@ class PyramidComponent(Component):
 
         self.distinfo = []
 
-        # Так же из вывода pip freeze читаем список установленных пакетов
+        # Read installed packages from pip freeze
 
         buf.seek(0)
 

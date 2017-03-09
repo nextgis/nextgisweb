@@ -25,7 +25,7 @@ class Insert(TransactionAction):
             "//*[local-name() = '" + datasource.geom_col + "']/*")
         geomData = etree.tostring(geom[0], pretty_print=True)
 
-        # Двойные кавычки нужно экранировать, иначе будут проблемы при загрузке в json
+        # Double quotes should be escaped, otherwise problems uploading to json
         pattern = re.compile(r'"')
         geomData = re.sub(pattern, '\\"', geomData)
 
@@ -58,7 +58,7 @@ class Insert(TransactionAction):
              "//*[local-name() = '" + datasource.geom_col + "']/*")
         geomData = etree.tostring(geom[0], pretty_print=True)
 
-        # Двойные кавычки нужно экранировать, иначе будут проблемы при загрузке в json
+        # Double quotes should be escaped, otherwise problems uploading to json
         pattern = re.compile(r'"')
         geomData = re.sub(pattern, '\\"', geomData)
 
@@ -84,8 +84,8 @@ class Insert(TransactionAction):
 
 
     def createStatement(self, datasource):
-        """На выходе --- описание объекта, который нужно вставить
-        в формате json.
+        """Output --- object description that should
+        be output to json.
         """
         # import ipdb; ipdb.set_trace()
         if self.version == u'1.0.0':

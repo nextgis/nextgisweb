@@ -45,7 +45,7 @@ class ObjectWidget(object):
             self.request = request
 
     def validate(self):
-        # Валидация должна выполняться один раз
+        # Validation should be run once
         assert not self.__validate_flag
         self.__validate_flag = True
 
@@ -53,7 +53,7 @@ class ObjectWidget(object):
         return True
 
     def populate_obj(self):
-        # Только после validate() и bind(data=data)
+        # Only after validate() and bind(data=data)
         assert self.__validate_flag and self.__obj_bind_flag
 
     def widget_module(self):
@@ -65,7 +65,7 @@ class ObjectWidget(object):
         )
 
     def widget_error(self):
-        # Ошибки могут быть только после валидации
+        # Errors may appear only after validation
         assert self.__validate_flag
 
         return self.error

@@ -82,8 +82,8 @@ class AuthComponent(Component):
         api.setup_pyramid(self, config)
 
     def initialize_user(self, keyname, display_name, **kwargs):
-        """ Проверяет наличие в БД пользователя с keyname и в случае
-        отсутствия создает его с параметрами kwargs """
+        """ Checks is user with keyname exists in DB and
+        if not, creates it with kwargs parameters """
 
         try:
             obj = User.filter_by(keyname=keyname).one()
@@ -96,8 +96,8 @@ class AuthComponent(Component):
         return obj
 
     def initialize_group(self, keyname, display_name, **kwargs):
-        """ Проверяет наличие в БД группы пользователей с keyname и в случае
-        отсутствия создает ее с параметрами kwargs """
+        """ Checks is usergroup with keyname exists in DB and
+        if not, creates it with kwargs parameters """
 
         try:
             obj = Group.filter_by(keyname=keyname).one()

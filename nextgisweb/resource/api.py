@@ -135,8 +135,8 @@ def child_delete(request):
 def exception_to_response(request, exc_type, exc_value, exc_traceback):
     data = dict(exception=exc_value.__class__.__name__)
 
-    # Выбираем более подходящие HTTP-коды, впрочем зачем это нужно
-    # сейчас не очень понимаю - можно было и одним ограничиться.
+    # Select more appropriate HTTP-codes, thought we don't really need it
+    # right now - we could've used just one.
 
     scode = 500
 
@@ -146,8 +146,8 @@ def exception_to_response(request, exc_type, exc_value, exc_traceback):
     if isinstance(exc_value, ForbiddenError):
         scode = 403
 
-    # Общие атрибуты для идентификации того где произошла ошибка,
-    # устанавливаются внутри CompositeSerializer и Serializer.
+    # General attributes to identify where the error has happened,
+    # installed in CompositeSerializer and Serializer.
 
     if hasattr(exc_value, '__srlzr_cls__'):
         data['serializer'] = exc_value.__srlzr_cls__.identity
@@ -156,16 +156,15 @@ def exception_to_response(request, exc_type, exc_value, exc_traceback):
         data['attr'] = exc_value.__srlzr_prprt__
 
     if isinstance(exc_value, ResourceError):
-        # Только для потомков ResourceError можно передавать сообщение
-        # пользователю как есть, в остальных случаях это может быть
-        # небезопасно, там могут быть куски SQL запросов или какие-то
-        # внутренние данные.
+        # For ResourceError children it is possible to send message to user
+        # as is, for other cases it might not be secure as it can contain
+        # SQL or some sensitive data.
 
         data['message'] = request.localizer.translate(exc_value.message)
 
     else:
-        # Для всех остальных генерируем универсальное сообщение об ошибке на
-        # основании имени класса исключительной ситуации.
+        # For all others let's generate universal error message based
+        # on class name of the exception.
 
         if 'serializer' in data and 'attr' in data:
             message = _("Unknown exception '%(exception)s' in serializer '%(serializer)s' attribute '%(attr)s'.")
@@ -176,7 +175,7 @@ def exception_to_response(request, exc_type, exc_value, exc_traceback):
 
         data['message'] = request.localizer.translate(message % data)
 
-        # Ошибка неожиданная, имеет смысл дать возможность ее записать.
+        # Unexpected error, makes sense to write it down.
 
         env.resource.logger.error(
             exc_type.__name__ + ': ' + unicode(exc_value.message) + "\n"
@@ -190,14 +189,12 @@ def exception_to_response(request, exc_type, exc_value, exc_traceback):
 def resexc_tween_factory(handler, registry):
     """ Tween factory для перехвата исключительных ситуаций API ресурса
 
-    Исключительная ситуация может возникнуть уже как во время выполнения
-    flush так и во время commit. Если flush еще можно вызвать явно, то
-    вызов commit в любом случае происходит не явно через pyramid_tm. Для
-    того, чтобы отловить эти ситуации используется pyramid tween, которая
-    регистрируется поверх pyramid_tm (см. setup_pyramid).
+    Exception can happen both during flush and commit. We can run flush explicitly,
+    but commit is ran hidden through pyramid_tm. To track those
+    situations pyramid tween is used, that is registered on top of pyramid_tm (see setup_pyramid).
 
-    После перехвата ошибки для нее генерируется представление в виде JSON
-    при помощи exception_to_response. """
+    After error intercept generate its JSON representation
+    using exception_to_response. """
 
     def resource_exception_tween(request):
         try:
@@ -319,7 +316,7 @@ def collection_post(request):
 
     result = OrderedDict(id=resource.id)
 
-    # TODO: Родитель возвращается только в целях совместимости
+    # TODO: Parent is returned only for compatibility
     result['parent'] = dict(id=resource.parent.id)
 
     return Response(
@@ -330,19 +327,19 @@ def collection_post(request):
 def permission(resource, request):
     request.resource_permission(PERM_READ)
 
-    # В некоторых случаях может быть удобно передать пустую строку вместо
-    # идентификатора пользователя, поэтому все довольно запутано написано.
+    # In some cases it is convenient to pass empty string instead of
+    # user's identifier, that's why it so tangled.
 
     user = request.params.get('user', '')
     user = None if user == '' else user
 
     if user is not None:
-        # Для просмотра прав произвольного пользователя нужны доп. права
+        # To see permissions for arbitrary user additional permissions are needed
         request.resource_permission(PERM_CPERM)
         user = User.filter_by(id=user).one()
 
     else:
-        # Если другого не указано, то используем текушего пользователя
+        # If it is not set otherwise, use current user
         user = request.user
 
     effective = resource.permissions(user)

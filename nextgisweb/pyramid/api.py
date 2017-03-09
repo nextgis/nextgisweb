@@ -200,9 +200,9 @@ def locdata(request):
             return FileResponse(
                 jsonpath, content_type=b'application/json')
 
-    # Для английской локали по-умолчанию возвращаем пустой перевод, если
-    # реальный файл перевода не найден. Такое может быть нужно, если вместо
-    # строк на английском будем использовать msgid.
+    # For english locale by default return empty translation, if
+    # real translation file was not found. This might be needed if
+    # instead of English strings we'll use msgid.
 
     if locale == 'en':
         return Response(json.dumps({"": {

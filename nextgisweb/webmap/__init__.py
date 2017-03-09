@@ -23,7 +23,7 @@ class WebMapComponent(Component):
     def initialize(self):
         super(WebMapComponent, self).initialize()
 
-        # Настройки по умолчанию
+        # Default settings
         if 'basemaps' not in self.settings:
             self.settings['basemaps'] = resource_filename(
                 'nextgisweb', 'webmap/basemaps.json')
@@ -37,8 +37,8 @@ class WebMapComponent(Component):
 
     @require('resource', 'auth')
     def initialize_db(self):
-        # Создаем веб-карту по-умолчанию, если в корне нет ни одной.
-        # TODO: Возможность отключать такое поведение через настройки
+        # Create a default web-map if there are none
+        # TODO: option to turn this off through settings
         if WebMap.filter_by(parent_id=0).first() is None:
             dispname = self.env.core.localizer().translate(_("Main web map"))
             WebMap(parent_id=0, display_name=dispname,

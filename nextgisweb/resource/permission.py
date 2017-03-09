@@ -51,8 +51,8 @@ class Requirement(object):
 
 class Permission(object):
 
-    # Счетчик для нумерации объектов, нужно для получения элементов,
-    # в том виде, в котором они были созданы внутри класса.
+    # Counter to number objects. Needed to get elements in
+    # a way they were created inside class.
     __create_order = 0
 
     def __init__(self, label=None, name=None, scope=None):

@@ -44,11 +44,11 @@ class Env(object):
             setattr(self, identity, instance)
 
     def chain(self, meth):
-        """ Построение последовательности вызова методов с учетом зависимостей.
-        Зависимость от компонента ``core`` добавляется автоматически для всех
-        компонентов, таким образом он всегда возвращается первым.
+        """ Building a sequence of method calls with dependencies.
+        ``core`` component dependency gets added automatically for all
+        components, so that it is returned first.
 
-        :param meth: Имя метода, для которого строится последовательность. """
+        :param meth: Name of the method to build sequence for. """
 
         seq = ['core', ]
 
@@ -76,8 +76,8 @@ class Env(object):
             c.configure()
 
     def metadata(self):
-        """ Возвращает объект sa.MetaData объединяющий метаданные всех
-        компонентов из этого окружения """
+        """ Returns object sa.MetaData that combines metadata
+        of all components from this environment """
 
         metadata = sa.MetaData()
 
@@ -87,8 +87,8 @@ class Env(object):
                     ctab = tab.tometadata(metadata)
                     sa.event.listen(
                         ctab, 'after_create',
-                        # После создания таблицы запишем имя компонента
-                        # в комментарий, скорее для отладки.
+                        # After table creation write component's name
+                        # in comments, for debug purposes.
                         sa.DDL(
                             "COMMENT ON TABLE %(fullname)s IS "
                             + "'" + comp.identity + "'"
@@ -114,12 +114,11 @@ class EnvMetaClass(type):
 
 
 class env(object):
-    """ Прокси-класс для доступа к глобальному окружению. Его следует
-    использовать только там, где невозможно получить доступ к текущему
-    окружению другими способами. Однако в любом случае, одновременная
-    работа с несколькими окружениями сейчас не поддерживается и вряд ли
-    это вообще когда-нибудь будет нужно. Для получение оригинального объекта,
-    к которому проксируются обращения, можно использовать конструктор
-    ``env()``. """
+    """ Proxy-class for global environment access. Use it only
+    where it is impossible to get access to current environment
+    by other means. However in any case, simultaneous work with
+    multiple environments is currently not supported an will hardly
+    ever be needed. To get original object for which messages are
+    proxied one can use constructor ``env()``. """
 
     __metaclass__ = EnvMetaClass

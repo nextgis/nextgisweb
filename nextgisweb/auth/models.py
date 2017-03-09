@@ -64,9 +64,9 @@ class User(Principal):
         return self.display_name
 
     def compare(self, other):
-        """ Сравнение двух пользователей с учетом особых пользователей """
+        """ Compare two users regarding special users """
 
-        # Если ни один из пользователей не особый, то обычное сравнение
+        # If neither user is special use regular comparison
         if not self.system and not other.system:
             return self.principal_id == other.principal_id
 
@@ -76,7 +76,7 @@ class User(Principal):
         elif other.system:
             a, b = other, self
 
-        # Теперь a - особый пользователь, b - обычный
+        # Now a - special user, b - common
 
         if a.keyname == 'everyone':
             return True
@@ -92,12 +92,12 @@ class User(Principal):
 
     @property
     def is_administrator(self):
-        """ Является ли пользователь членом группы 'administrators' """
+        """ Is user member of 'administrators' """
         if self.principal_id is None:
             return False
 
-        # Чтобы хоть как-то минимизировать кол-во обращений к БД, кешируем
-        # группу 'administrators' в инстансе
+        # To reduce number of DB requests, cache
+        # 'administrators' group in the instance
         if not hasattr(self, '_admins'):
             self._admins = Group.filter_by(keyname='administrators').one()
 
@@ -190,7 +190,7 @@ class Group(Principal):
 
 
 class PasswordHashValue(object):
-    """ Класс для автоматического сравнения паролей по хешу """
+    """ Automatic password hashes comparison class """
     def __init__(self, value):
         self.value = value
 
@@ -204,4 +204,4 @@ class PasswordHashValue(object):
 
 
 class UserDisabled(Exception):
-    """ Запрашиваемый пользователь заблокирован """
+    """ Requested user is blocked """

@@ -195,8 +195,7 @@ def setup_pyramid(comp, config):
     DBSession = comp.env.core.DBSession
 
     def identify(request):
-        """ Сервис идентификации объектов на слоях, поддерживающих интерфейс
-        IFeatureLayer """
+        """ Identification service for layers that support IFeatureLayer """
 
         sett_name = 'permissions.disable_check.identify'
         setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
@@ -213,7 +212,7 @@ def setup_pyramid(comp, config):
 
         result = dict()
 
-        # Количество объектов для всех слоев
+        # Number of features in all layers
         feature_count = 0
 
         for layer in layer_list:
@@ -227,8 +226,8 @@ def setup_pyramid(comp, config):
                 query = layer.feature_query()
                 query.intersects(geom)
 
-                # Ограничиваем кол-во идентифицируемых объектов по 10 на слой,
-                # иначе ответ может оказаться очень большим.
+                # Limit number of identifyable features by 10 per layer,
+                # otherwise the response might be too big.
                 query.limit(10)
 
                 features = [
@@ -237,10 +236,8 @@ def setup_pyramid(comp, config):
                     for f in query()
                 ]
 
-                # Добавляем в результаты идентификации название
-                # родительского ресурса (можно использовать в случае,
-                # если на клиенте нет возможности извлечь имя слоя по
-                # идентификатору)
+                # Add name of parent resource to identification results,
+                # if there is no way to get layer name by id on the client
                 if not setting_disable_check:
                     allow = layer.parent.has_permission(PR_R, request.user)
                 else:
@@ -327,7 +324,7 @@ def setup_pyramid(comp, config):
 
     comp.client_settings = MethodType(client_settings, comp, comp.__class__)
 
-    # Расширения меню слоя
+    # Layer menu extension
     class LayerMenuExt(dm.DynItem):
 
         def build(self, args):

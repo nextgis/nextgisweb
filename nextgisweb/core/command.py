@@ -35,9 +35,9 @@ class InitializeDBCmd():
             for comp in env.chain('initialize_db'):
                 comp.initialize_db()
 
-            # Не очень понятно почему так, но если в транзакции
-            # выполнялись только DDL операторы, то транзакция не
-            # записывается, форсируем костылем
+            # It's unclear why, but if transaction only
+            # ran DDL operators, then it will not be saved
+            # need to force with a cludge
 
             connection.execute("COMMIT")
 
