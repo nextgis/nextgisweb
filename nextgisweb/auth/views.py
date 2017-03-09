@@ -53,14 +53,14 @@ def setup_pyramid(comp, config):
     config.add_route('auth.logout', '/logout').add_view(logout)
 
     def forbidden(request):
-        # Если пользователь не аутентифицирован, то можно предложить ему войти
-        # TODO: Возможно есть способ лучше проверить наличие аутентификации
+        # If user is not authentificated, we can offer him to sign in
+        # TODO: there may be a better way to check if authentificated
 
         if request.user.keyname == 'guest':
-            # Если URL начинается с /api/ и пользователь не аутентифицирован,
-            # то скорее всего это не веб-интерфейс, а какой-то сторонний софт,
-            # который возможно умеет HTTP аутентификацию. Скажем ему что мы
-            # тоже умеем. Остальных переадресовываем на страницу логина.
+            # If URL starts with /api/ and user is not authentificated,
+            # then it's probably not a web-interface, but external software,
+            # that can do HTTP auth. Tell it that we can do too.
+            # Others are redirected to login page.
 
             if request.path_info.startswith('/api/'):
                 return HTTPUnauthorized(headers={
@@ -69,8 +69,8 @@ def setup_pyramid(comp, config):
                 return HTTPFound(location=request.route_url(
                     'auth.login', _query=dict(next=request.url)))
 
-        # Уже аутентифицированным пользователям показываем сообщение об ошибке
-        # TODO: Отдельно можно информировать заблокированных пользователей
+        # Show error message to already authentificated users
+        # TODO: We can separately inform blocked users
         request.response.status = 403
         return dict(subtitle=_("Access denied"))
 
@@ -153,7 +153,7 @@ def setup_pyramid(comp, config):
                     ) for u in User.filter_by(system=False)]
 
             else:
-                # Список всех пользователей для поля выбора
+                # List of all users for selector
                 result['users'] = [
                     dict(value=u.id, label=u.display_name)
                     for u in User.filter_by(system=False)
