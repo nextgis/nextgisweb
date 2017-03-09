@@ -77,8 +77,8 @@ class CoreComponent(Component):
         for tab in metadata.sorted_tables:
             yield TableBackup(self, tab.key)
 
-            # Ищем sequence созданные автоматически для PK
-            # по маске "table_field_seq" и добавляем их в архив
+            # Search sequence created automatically for PK
+            # using "table_field_seq" mask and add to archive
             for col in tab.columns:
                 if col.primary_key:
                     test_seq_name = tab.name + "_" + col.name + "_seq"
@@ -95,12 +95,12 @@ class CoreComponent(Component):
             yield SequenceBackup(self, seq.name)
 
     def gtsdir(self, comp):
-        """ Получить директорию хранения файлов компонента """
+        """ Get component's file storage folder """
         return os.path.join(self.settings['sdir'], comp.identity) \
             if 'sdir' in self.settings else None
 
     def mksdir(self, comp):
-        """ Создание директории для хранения файлов """
+        """ Create file storage folder """
         self.bmakedirs(self.settings['sdir'], comp.identity)
 
     def bmakedirs(self, base, path):
