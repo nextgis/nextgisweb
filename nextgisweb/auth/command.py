@@ -20,8 +20,8 @@ class ChangePasswordCommand():
             'password', type=str, metavar='password',
             help="Новый пароль пользователя")
 
-        # FIXME: Указание нового пароля пользователя в командной строке
-        # потенциально не безопасно, нужно читать с консоли или из файла.
+        # FIXME: Set new user password via command line
+        # is potentially not secure, need to read from console or file.
 
     @classmethod
     def execute(cls, args, env):
