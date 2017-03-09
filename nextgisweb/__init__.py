@@ -73,7 +73,7 @@ def main(global_config, **settings):
 
 def amd_packages():
     return (
-        # Сторонние пакеты
+        # External packages
         ('dojo', 'nextgisweb:amd_packages/contrib/dojo'),
         ('dijit', 'nextgisweb:amd_packages/contrib/dijit'),
         ('dojox', 'nextgisweb:amd_packages/contrib/dojox'),
@@ -86,10 +86,10 @@ def amd_packages():
         ('svg4everybody', 'nextgisweb:amd_packages/contrib/svg4everybody'),
         ('codemirror', 'nextgisweb:amd_packages/contrib/codemirror'),
 
-        # Пакеты nextgisweb
+        # nextgisweb packages
         ('ngw', 'nextgisweb:amd_packages/ngw'),
 
-        # Пакеты компонентов
+        # components packages
         ('ngw-pyramid', 'nextgisweb:pyramid/amd/ngw-pyramid'),
         ('ngw-resource', 'nextgisweb:resource/amd/ngw-resource'),
         ('ngw-resmeta', 'nextgisweb:resmeta/amd/ngw-resmeta'),
