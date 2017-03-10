@@ -8,7 +8,7 @@ except CalledProcessError:
 
 requires = [
     'pyramid>=1.8',
-    'SQLAlchemy>=0.8,<0.9',
+    'SQLAlchemy>=0.8',
     'transaction',
     'pyramid_tm',
     'pyramid_debugtoolbar',
