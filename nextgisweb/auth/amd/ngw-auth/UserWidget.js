@@ -2,6 +2,7 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
+    "dojo/store/Memory",
     "ngw-pyramid/modelWidget/Widget",
     "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
@@ -22,6 +23,7 @@ define([
 ], function (
     declare,
     lang,
+    Memory,
     Widget,
     ErrorDisplayMixin,
     _TemplatedMixin,
@@ -80,9 +82,13 @@ define([
             this.description.set("value", value.description);
 
             // show groups where user is a member at the top of the list
+            var groupStore = new Memory({data: this.groups});
             this.memberOf.addOption(
-                lang.clone(this.groups).sort(function (a, b) {
-                    return b.selected - a.selected; }));
+                groupStore.query(null, {sort: [
+                    {attribute: "selected", descending: true},
+                    {attribute: "label"}
+                ]})
+            );
         },
 
         _getValueAttr: function () {
