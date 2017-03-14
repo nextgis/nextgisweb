@@ -23,21 +23,21 @@ class FileUploadComponent(Component):
         view.setup_pyramid(self, config)
 
     def fileid(self):
-        """ Возвращает новый идентификатор файла """
+        """ Returns new file identifier """
         return str(uuid.uuid4())
 
     def get_filename(self, fileid, makedirs=False):
-        """ Возвращает имена файлов (данные и метаданные), в котором
-        хранится загружаемый файл с указанным fileid.
+        """ Returns filename (data and metadata), where
+        uploaded file is stored with set fileid.
 
-        При makedirs == True так же создаются необходимые директории.
-        Полезно в случае, когда имена файлов нужны для записи. """
+        With makedirs == True also create folders.
+        Useful when filename are needed for writing. """
 
-        # Разделяем на два уровня директорий по первым символам id
+        # Separate in two folder levels by first id characters
         levels = (fileid[0:2], fileid[2:4])
         level_path = os.path.join(self.path, *levels)
 
-        # Создаем директории если нужно
+        # Create folders if needed
         if makedirs and not os.path.isdir(level_path):
             os.makedirs(level_path)
 
