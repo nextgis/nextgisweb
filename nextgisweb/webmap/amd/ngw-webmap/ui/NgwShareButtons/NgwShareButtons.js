@@ -10,12 +10,12 @@ define([
     "dijit/layout/ContentPane",
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
-    "dojo/text!./template/NgwShareButtons.hbs",
+    "dojo/text!./NgwShareButtons.hbs",
     "ngw/settings!webmap",
     "ngw-webmap/PermalinkDialog",
     "ngw-webmap/ShareEmbeddedMapDialog",
-    "xstyle/css!./template/resources/NgwShareButtons/css/fontello.css",
-    "xstyle/css!./template/resources/NgwShareButtons/NgwShareButtons.css"
+    "xstyle/css!./css/fontello.css",
+    "xstyle/css!./NgwShareButtons.css"
 ], function (declare, array, lang, domStyle, on, query,
              _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
              i18n, hbsI18n, template, settings, PermalinkDialog, ShareEmbeddedMapDialog) {
