@@ -70,8 +70,8 @@ class PostgisConnection(Base, Resource):
     def get_engine(self):
         comp = env.postgis
 
-        # На случай, если параметры подключения изменинись
-        # их нужно проверять при каждом запросе подключения
+        # Need to check connection params to see if
+        # they changed for each connection request
         credhash = (self.hostname, self.database, self.username, self.password)
 
         if self.id in comp._engine:
@@ -319,8 +319,8 @@ DataScope.read.require(
 
 
 class _fields_action(SP):
-    """ Специальный write-only атрибут, обеспечивающий обновление
-    списка полей с сервера """
+    """ Special write-only attribute that allows updating
+    list of fields from the server """
 
     def setter(self, srlzr, value):
         if value == 'update':
