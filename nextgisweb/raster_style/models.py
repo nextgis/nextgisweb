@@ -58,23 +58,23 @@ class RasterStyle(Base, Resource):
 
         result = PIL.Image.new("RGBA", size, (0, 0, 0, 0))
 
-        # пересчитываем координаты в пикселы
+        # recalculate coords in pixels
         off_x = int((extent[0] - gt[0]) / gt[1])
         off_y = int((extent[3] - gt[3]) / gt[5])
         width_x = int(((extent[2] - gt[0]) / gt[1]) - off_x)
         width_y = int(((extent[1] - gt[3]) / gt[5]) - off_y)
 
-        # проверяем, чтобы пикселы не вылезали за пределы изображения
+        # check that pixels are not outside of image extent
         target_width, target_height = size
         offset_left = offset_top = 0
 
-        # правая граница
+        # right boundary
         if off_x + width_x > ds.RasterXSize:
             oversize_right = off_x + width_x - ds.RasterXSize
             target_width -= int(float(oversize_right) / width_x * target_width)
             width_x -= oversize_right
 
-        # левая граница
+        # left boundary
         if off_x < 0:
             oversize_left = -off_x
             offset_left = int(float(oversize_left) / width_x * target_width)
@@ -82,14 +82,14 @@ class RasterStyle(Base, Resource):
             width_x -= oversize_left
             off_x = 0
 
-        # нижняя граница
+        # bottom boundary
         if off_y + width_y > ds.RasterYSize:
             oversize_bottom = off_y + width_y - ds.RasterYSize
             target_height -= int(float(oversize_bottom)
                                  / width_y * target_height)
             width_y -= oversize_bottom
 
-        # верхняя граница
+        # top boundary
         if off_y < 0:
             oversize_top = -off_y
             offset_top = int(float(oversize_top) / width_y * target_height)
@@ -98,8 +98,8 @@ class RasterStyle(Base, Resource):
             off_y = 0
 
         if target_width <= 0 or target_height <= 0:
-            # экстент не пересекается с экстентом изображения
-            # возвращаем пустую картинку
+            # extent doesn't intersect with image extent
+            # return empty image
             return result
 
         band_count = ds.RasterCount
