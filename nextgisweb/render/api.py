@@ -43,7 +43,7 @@ def tile(request):
                     "Image (ID=%d) must have mode %s, but it is %s mode." %
                     (obj.id, aimg.mode, rimg.mode))
 
-    # Если не было ресурсов для отрисовки, возвращаем пустую картинку
+    # If there were no resources for rendering, return empty image
     if aimg is None:
         aimg = Image.new('RGBA', (256, 256))
 
@@ -83,7 +83,7 @@ def image(request):
                     "Image (ID=%d) must have mode %s, but it is %s mode." %
                     (obj.id, aimg.mode, rimg.mode))
 
-    # Если не было ресурсов для отрисовки, возвращаем пустую картинку
+    # If there were no resources for rendering, return empty image
     if aimg is None:
         aimg = Image.new('RGBA', p_size)
 
