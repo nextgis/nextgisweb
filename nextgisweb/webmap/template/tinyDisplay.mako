@@ -34,7 +34,7 @@
 </%def>
 
 <div data-dojo-id="display"
-    data-dojo-type="ngw-webmap/TinyDisplay"
+    data-dojo-type="ngw-webmap/ui/TinyDisplay/TinyDisplay"
     data-dojo-props="config: displayConfig"
     style="width: 100%; height: 100%">
 </div>

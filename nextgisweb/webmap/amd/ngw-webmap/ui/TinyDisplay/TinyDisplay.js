@@ -4,7 +4,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./template/TinyDisplay.hbs",
+    "dojo/text!./TinyDisplay.hbs",
     "dojo/_base/lang",
     "dojo/_base/array",
     "dojo/Deferred",
@@ -33,9 +33,9 @@ define([
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
     // tools
-    "./tool/Base",
-    "./tool/Zoom",
-    "./tool/Measure",
+    "../../tool/Base",
+    "../../tool/Zoom",
+    "../../tool/Measure",
     // settings
     "ngw/settings!webmap",
     // template
@@ -48,7 +48,7 @@ define([
     "dijit/form/Select",
     "dijit/form/DropDownButton",
     "dijit/ToolbarSeparator",
-    "ngw-webmap/ui/NgwShareButtons/NgwShareButtons",
+    "../NgwShareButtons/NgwShareButtons",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
     "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css"
