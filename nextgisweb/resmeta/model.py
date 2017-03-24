@@ -67,8 +67,8 @@ class _items_attr(SerializedProperty):
     def setter(self, srlzr, value):
         odata = getattr(srlzr.obj, COMP_ID)
 
-        rml = []        # Удаляемые записи
-        imap = dict()   # Перезаписываемые записи
+        rml = []        # Records to be removed
+        imap = dict()   # Records to be rewritten
 
         for i in odata:
             if i.key in value and value[i.key] is not None:
@@ -76,7 +76,7 @@ class _items_attr(SerializedProperty):
             else:
                 rml.append(i)
 
-        # Удаляем удаляемые
+        # Remove records to be removed
         map(lambda i: odata.remove(i), rml)
 
         for k, val in value.iteritems():
@@ -86,7 +86,7 @@ class _items_attr(SerializedProperty):
             itm = imap.get(k)
 
             if itm is None:
-                # Создаем новую запись если нет перезаписываемой
+                # Create new record if there is no record to rewrite
                 itm = ResourceMetadataItem(key=k)
                 odata.append(itm)
 
@@ -97,8 +97,8 @@ class ResourceMetadataSerializer(Serializer):
     identity = COMP_ID
     resclass = Resource
 
-    # TODO: Возможно было бы неплохо реализовать сериализацию без
-    # промежуточного ключа items, но пока это невозможно так как сериализация
-    # в целом и сериализация атрубутов смешана в одном классе.
+    # TODO: It would be possible nice to implement serialization
+    # without intermediate items key, but this is impossible right now
+    # as serialization as a whole and serialization of attributes are mixed in one class.
 
     items = _items_attr(read=MetadataScope.read, write=MetadataScope.write)
