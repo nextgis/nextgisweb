@@ -15,7 +15,7 @@ define([
     return {
         getPermalink: function (display, visbleItems, options) {
             var urlWithoutParams, visibleStyles, center, queryStr,
-                origin, pathname;
+                origin, pathname, queryObj;
 
             options = options ? options : {};
 
@@ -28,14 +28,20 @@ define([
 
             center = options.center ? options.center : ol.proj.toLonLat(display.map.olMap.getView().getCenter());
 
-            queryStr = ioQuery.objectToQuery({
+            queryObj = {
                 base: display._baseLayer.name,
                 lon: center[0].toFixed(4),
                 lat: center[1].toFixed(4),
                 angle: display.map.olMap.getView().getRotation(),
                 zoom: display.map.olMap.getView().getZoom(),
                 styles: visibleStyles.join(",")
-            });
+            };
+
+            if (options.additionalParams) {
+                lang.mixin(queryObj, options.additionalParams);
+            }
+
+            queryStr = ioQuery.objectToQuery(queryObj);
 
             if (options.urlWithoutParams) {
                 urlWithoutParams = options.urlWithoutParams;

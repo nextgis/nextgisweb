@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-03-24 21:09+0300\n"
+"POT-Creation-Date: 2017-03-25 20:21+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -40,22 +40,22 @@ msgid "Display"
 msgstr "Открыть"
 
 #: amd/ngw-webmap/Display.js:536
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:583
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:558
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
 #: amd/ngw-webmap/Display.js:539 amd/ngw-webmap/tool/Zoom.js:18
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:586
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:561
 msgid "Zoom in"
 msgstr "Приблизить"
 
 #: amd/ngw-webmap/Display.js:540 amd/ngw-webmap/tool/Zoom.js:21
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:587
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:562
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
 #: amd/ngw-webmap/Display.js:543
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:590
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:565
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
@@ -84,23 +84,27 @@ msgstr "Добавить группу"
 msgid "Permalink"
 msgstr "Ссылка"
 
-#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:76
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:80
 msgid "Embedded map settings"
 msgstr "Настройки встраиваемой карты"
 
-#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:86
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:90
 msgid "Width"
 msgstr "Ширина"
 
-#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:95
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:99
 msgid "Height"
 msgstr "Высота"
 
-#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:103
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:106
+msgid "Link to main map"
+msgstr "Ссылка на основную карту"
+
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:115
 msgid "HTML code"
 msgstr "Код для встраивания"
 
-#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:132
+#: amd/ngw-webmap/ShareEmbeddedMapDialog.js:145
 msgid "Preview"
 msgstr "Протестировать"
 
