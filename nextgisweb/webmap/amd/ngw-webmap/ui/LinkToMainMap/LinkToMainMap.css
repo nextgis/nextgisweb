@@ -1,0 +1,20 @@
+div.link-to-main-map {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    z-index: 2000;
+    margin: 4px;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+div.link-to-main-map a {
+    font-size: 24px;
+    color: #176FC1;
+    display: block;
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+div.link-to-main-map a:hover {
+    opacity: 1;
+}

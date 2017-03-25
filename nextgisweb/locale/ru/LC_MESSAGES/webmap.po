@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-03-25 20:21+0300\n"
+"POT-Creation-Date: 2017-03-25 22:09+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -261,6 +261,10 @@ msgstr "Щёлкните дважды, чтобы завершить."
 #: amd/ngw-webmap/tool/Rotate.js:15
 msgid "Rotate"
 msgstr "Поворот"
+
+#: amd/ngw-webmap/ui/LinkToMainMap/LinkToMainMap.js:26
+msgid "Open full map"
+msgstr "Открыть карту целиком"
 
 #~ msgid "Zoom to layer extent"
 #~ msgstr "Увеличить до слоя"
