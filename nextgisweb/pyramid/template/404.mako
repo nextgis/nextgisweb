@@ -1,6 +1,5 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
-
-<%def name="title()">${page_title}</%def>
+<%! from nextgisweb.pyramid.util import _ %>
 
 <%def name="head()">
     <% import json %>
@@ -20,4 +19,6 @@
     </script>
 </%def>
 
-${message_question} <a href="${link_contact_us}" target="_blank">${link_text}</a>.
+${tr(_('Think this page should be here?'))}
+<a href="${tr(_('http://nextgis.com/contact/'))}"
+  target="_blank">${tr(_('Contact us'))}</a>.

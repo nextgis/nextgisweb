@@ -105,10 +105,7 @@ def system_name(request):
 
 def notfound(request):
     return dict(
-        page_title=_("404: Page not found"),
-        message_question=_("Think this page should be here?"),
-        link_text=_("Contact us"),
-        link_contact_us=_("http://nextgis.com/contact/")
+        title=_("404: Page not found"),
     )
 
 
