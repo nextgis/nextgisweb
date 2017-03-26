@@ -4,7 +4,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/text!./template/TinyDisplay.hbs",
+    "dojo/text!./TinyDisplay.hbs",
     "dojo/_base/lang",
     "dojo/_base/array",
     "dojo/Deferred",
@@ -33,12 +33,12 @@ define([
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
     // tools
-    "./tool/Base",
-    "./tool/Zoom",
-    "./tool/Measure",
+    "../../tool/Base",
+    "../../tool/Zoom",
+    "../../tool/Measure",
     // settings
     "ngw/settings!webmap",
-    // template
+    "../LinkToMainMap/LinkToMainMap",
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -48,47 +48,17 @@ define([
     "dijit/form/Select",
     "dijit/form/DropDownButton",
     "dijit/ToolbarSeparator",
-    "ngw-webmap/NgwShareButtons",
+    "../NgwShareButtons/NgwShareButtons",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
     "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css"
 ], function (
-    declare,
-    _WidgetBase,
-    _TemplatedMixin,
-    _WidgetsInTemplateMixin,
-    template,
-    lang,
-    array,
-    Deferred,
-    all,
-    number,
-    aspect,
-    ioQuery,
-    domConstruct,
-    ol,
-    Map,
-    registry,
-    DropDownButton,
-    DropDownMenu,
-    MenuItem,
-    ContentPane,
-    ToggleButton,
-    Dialog,
-    TextBox,
-    domStyle,
-    JsonRest,
-    xhr,
-    ItemFileWriteStore,
-    TreeStoreModel,
-    Tree,
-    route,
-    i18n,
-    hbsI18n,
-    ToolBase,
-    ToolZoom,
-    ToolMeasure,
-    clientSettings
+    declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template,
+    lang, array, Deferred, all, number, aspect, ioQuery, domConstruct, ol,
+    Map, registry, DropDownButton, DropDownMenu, MenuItem, ContentPane,
+    ToggleButton, Dialog, TextBox, domStyle, JsonRest, xhr, ItemFileWriteStore,
+    TreeStoreModel, Tree, route, i18n, hbsI18n, ToolBase,
+    ToolZoom, ToolMeasure, clientSettings, LinkToMainMap
 ) {
 
     var CustomItemFileWriteStore = declare([ItemFileWriteStore], {
@@ -408,6 +378,11 @@ define([
             //        this.updateTabVisibility();
             //    }
             //});
+
+            if (this._urlParams.linkMainMap === 'true') {
+                var linkToMainMap = new LinkToMainMap(mainDisplayUrl);
+                domConstruct.place(linkToMainMap.domNode, this.mapNode);
+            }
 
             this._postCreateDeferred.resolve();
         },
