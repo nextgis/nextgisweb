@@ -103,6 +103,15 @@ def system_name(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def notfound(request):
+    return dict(
+        page_title=_("404: Page not found"),
+        message_question=_("Think this page should be here?"),
+        link_text=_("Contact us"),
+        link_contact_us=_("http://nextgis.com/contact/")
+    )
+
+
 def setup_pyramid(comp, config):
     config.add_route('home', '/').add_view(home)
 
@@ -117,6 +126,8 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.help_page', '/help-page') \
         .add_view(help_page, renderer=ctpl('help_page'))
+
+    config.add_notfound_view(notfound, renderer=ctpl('404'))
 
     config.add_route('pyramid.logo', '/logo').add_view(logo)
 

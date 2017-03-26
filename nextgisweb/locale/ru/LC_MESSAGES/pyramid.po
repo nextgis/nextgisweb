@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-02-07 15:56+0700\n"
+"POT-Creation-Date: 2017-03-26 21:33+0300\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,31 +19,47 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: template/base.mako:85 view.py:44
+#: template/base.mako:87 view.py:43
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: template/base.mako:96 view.py:53
+#: template/base.mako:98 view.py:52
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:87 view.py:142
+#: view.py:87 view.py:155
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:94 view.py:148
+#: view.py:95 view.py:161
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:100 view.py:146
+#: view.py:102 view.py:159
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:141
+#: view.py:108
+msgid "404: Page not found"
+msgstr "404: Страница не найдена"
+
+#: view.py:109
+msgid "Think this page should be here?"
+msgstr "Если считаете, что это ошибка,"
+
+#: view.py:110
+msgid "Contact us"
+msgstr "напишите нам"
+
+#: view.py:111
+msgid "http://nextgis.com/contact/"
+msgstr "http://nextgis.ru/contact/"
+
+#: view.py:154
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:145
+#: view.py:158
 msgid "Settings"
 msgstr "Настройки"
 
@@ -61,7 +77,7 @@ msgstr "Создать"
 
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:37
 #: amd/ngw-pyramid/template/CORSForm.hbs:26
-#: amd/ngw-pyramid/template/SystemTitleForm.hbs:10
+#: amd/ngw-pyramid/template/SystemNameForm.hbs:10
 msgid "Save"
 msgstr "Сохранить"
 
@@ -88,15 +104,15 @@ msgstr ""
 "(example.com и www.example.com) считаются разными источниками. Символ "
 "подстановки (*) недопустим."
 
-#: template/base.mako:27
+#: template/base.mako:29
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: template/base.mako:83
+#: template/base.mako:85
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: template/base.mako:102
+#: template/base.mako:104
 msgid "Sign in"
 msgstr "Войти"
 
