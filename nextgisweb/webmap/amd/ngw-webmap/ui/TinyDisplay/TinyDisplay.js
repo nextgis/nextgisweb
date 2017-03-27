@@ -266,28 +266,22 @@ define([
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            //all([this._mapDeferred, this._postCreateDeferred]).then(
-            //    function () {
-            //        // Формируем список слоев базовых карты в списке выбора
-            //        array.forEach(Object.keys(widget.map.layers), function (key) {
-            //            var layer = widget.map.layers[key];
-            //            if (layer.isBaseLayer) {
-            //                widget.basemapSelect.addOption({
-            //                    value: key,
-            //                    label: layer.title
-            //                });
-            //            }
-            //        });
-            //
-            //        // И добавляем возможность переключения
-            //        widget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
-            //            widget.map.layers[oldVal].olLayer.setVisible(false);
-            //            widget.map.layers[newVal].olLayer.setVisible(true);
-            //            widget._baseLayer = widget.map.layers[newVal];
-            //        });
-            //        if (widget._urlParams.base) { widget.basemapSelect.set("value", widget._urlParams.base); }
-            //    }
-            //).then(undefined, function (err) { console.error(err); });
+            all([this._mapDeferred, this._postCreateDeferred]).then(
+               function () {
+                   var baseLayerKey = widget._urlParams.base || 'osm-mapnik';
+
+                   array.forEach(Object.keys(widget.map.layers), function (key) {
+                       var layer = widget.map.layers[key];
+                       if (!layer.isBaseLayer) return false;
+                       if (key === baseLayerKey) {
+                           widget.map.layers[key].olLayer.setVisible(true);
+                           widget._baseLayer = widget.map.layers[key];
+                       } else {
+                           widget.map.layers[key].olLayer.setVisible(false);
+                       }
+                   });
+               }
+            ).then(undefined, function (err) { console.error(err); });
 
             // Слои элементов
             all([this._midDeferred.adapter, this._itemStoreDeferred]).then(
