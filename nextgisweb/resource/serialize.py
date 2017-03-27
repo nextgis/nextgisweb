@@ -183,7 +183,7 @@ class Serializer(SerializerBase):
     def annotate_exception(self, exc, sp):
         exc.__srlzr_prprt__ = sp.attrname
 
-        # TODO: Возможно TODO из CompositeSerializer.annotate_exception тут же
+        # TODO: Possibly TODO from CompositeSerializer.annotate_exception here as well
 
 
 class CompositeSerializer(SerializerBase):
@@ -219,16 +219,15 @@ class CompositeSerializer(SerializerBase):
                 raise
 
     def annotate_exception(self, exc, mobj):
-        """ Добавляет к исключению информацию о сериализаторе, в котором
-        оно было вызвано """
+        """ Adds information about serializer that called the exception to the exception """
 
         exc.__srlzr_cls__ = mobj.__class__
 
-        # TODO: Здесь было бы неплохо проверять, что наше исключение является
-        # наследником ResourceError, в противном случае имеет смысл выпустить
-        # warning, которые пока не очень понятно как привязать к строке в коде.
-        # В общем суть в том, что Serializer не должен генерировать никаких
-        # исключений кроме как наследников ResourceError.
+        # TODO: Here it would nice to check if our exception is a child of
+        # ResourceError, otherwise it make sense to issue a
+        # warning, that is yet unclear how to attach to a line of code.
+        # In a nutshell, Serializer shouldn't generate exceptions
+        # other than children of ResourceError.
 
 
 def serval(value):
