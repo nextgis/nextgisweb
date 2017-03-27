@@ -6,6 +6,7 @@ define([
     "dojo/_base/array",
     "dojo/Deferred",
     "dijit/layout/ContentPane",
+    "dijit/layout/TabContainer",
     "dijit/Menu",
     "dijit/MenuItem",
     "dojo/dom-construct",
@@ -31,6 +32,7 @@ define([
     array,
     Deferred,
     ContentPane,
+    TabContainer,
     Menu,
     MenuItem,
     domConstruct,
@@ -110,6 +112,12 @@ define([
                 }
             });
 
+            this.tabContainer = new TabContainer({
+                region: "bottom",
+                style: "height: 45%",
+                splitter: true
+            });
+
             var store = this.itemStore,
                 menuItem = this.menuItem;
 
@@ -128,12 +136,12 @@ define([
 
             this.tbSearch.on("blur", lang.hitch(this, function () {
                 var searchResults = this.searchResults;
-                if (searchResults && inputTimer == undefined) {
+                if (searchResults && inputTimer === undefined) {
                     blurTimer = setInterval(function() {
                         popup.close(this.searchResults);
                         clearInterval(blurTimer);
                     }, 500);
-                };
+                }
             }));
 
             this.tbSearch.on("focus", lang.hitch(this, function () {
@@ -142,12 +150,12 @@ define([
                         popup: this.searchResults,
                         around: this.tbSearch.domNode
                     });
-                };
+                }
                 clearInterval(blurTimer);
             }));
 
             this.tbSearch.on("input", lang.hitch(this, function () {
-                if (inputTimer) { clearInterval(inputTimer) };
+                if (inputTimer) { clearInterval(inputTimer); }
                 inputTimer = setInterval(lang.hitch(this, function () {
                     clearInterval(inputTimer);
                     this.search();
@@ -179,19 +187,29 @@ define([
                 title: item.label,
                 layerId: item.layerId,
                 likeSearch: data.likeSearch,
-                plugin: this
+                plugin: this,
+                onClose: lang.hitch(this, function () {
+                    if (this.tabContainer.getChildren().length == 1) {
+                        this.display.mapContainer.removeChild(this.tabContainer);
+                    }
+                    return true;
+                })
             });
 
-            this.display.tabContainer.addChild(pane);
-            this.display.tabContainer.selectChild(pane);
+            if (!this.tabContainer.getChildren().length) {
+                this.display.mapContainer.addChild(this.tabContainer);
+            }
+
+            this.tabContainer.addChild(pane);
+            this.tabContainer.selectChild(pane);
         },
 
         search: function () {
             var criteria = this.tbSearch.get('value');
 
-            if (this.searchResults) { popup.close(this.searchResults) };
+            if (this.searchResults) { popup.close(this.searchResults); }
 
-            if (criteria == "" || this._lastCriteria == criteria) { return };
+            if (criteria === "" || this._lastCriteria == criteria) { return; }
             this._lastCriteria = criteria;
 
             this.searchResults = new Menu({});
@@ -221,16 +239,16 @@ define([
             };
 
             var setStatus = function (status) {
-                if (status == undefined) {
+                if (status === undefined) {
                     domStyle.set(statusItem.domNode, 'display', 'none');
                 } else {
                     statusItem.set("label", status);
-                };
+                }
             };
 
             var breakOrError = function (value) {
-                if (value != undefined) {
-                    console.error(value)
+                if (value !== undefined) {
+                    console.error(value);
                 }
             };
 
@@ -246,7 +264,7 @@ define([
                         itmConfig = this.display._itemConfigById[id],
                         pluginConfig = itmConfig.plugin["ngw-webmap/plugin/FeatureLayer"];
                     
-                    if (pluginConfig != undefined && pluginConfig.likeSearch) {
+                    if (pluginConfig !== undefined && pluginConfig.likeSearch) {
                         var store = new FeatureStore({
                             layer: layerId,
                             featureBox: true
@@ -261,7 +279,7 @@ define([
                                 start: 0,
                                 count: limit + 1
                             }).forEach(lang.hitch(this, function(itm) {
-                                if (limit > 0) { addResult(itm); };
+                                if (limit > 0) { addResult(itm); }
                                 limit = limit - 1;
                             })).then(function () {
                                 if (limit > 0) {
@@ -269,7 +287,7 @@ define([
                                 } else {
                                     setStatus(i18n.gettext("Refine search criterion"));
                                     ndeferred.reject();
-                                };
+                                }
                             }, function (err) {
                                 // Если что-то пошло не так с конкретным слоем,
                                 // то все равно продолжаем поиск по следующему
@@ -278,7 +296,7 @@ define([
                         }).otherwise(breakOrError);
 
                         deferred = ndeferred;
-                    };
+                    }
                 }, this);
 
                 var ndeferred = new Deferred();
@@ -316,12 +334,12 @@ define([
                                 );
 
                                 var feature = {
-                                    label: place['display_name'],
+                                    label: place.display_name,
                                     box: extent
                                 };
 
                                 addResult(feature);
-                            };
+                            }
                             limit = limit - 1;
                         });
 
@@ -330,7 +348,7 @@ define([
                         } else {
                             setStatus(i18n.gettext("Refine search criterion"));
                             ndeferred.reject();
-                        };
+                        }
                      });
                 }, function (err) {
                     // Если что-то пошло не так с конкретным слоем,
