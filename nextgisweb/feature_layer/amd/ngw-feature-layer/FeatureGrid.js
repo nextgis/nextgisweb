@@ -97,12 +97,12 @@ define([
         postCreate: function () {
             if (!this.showToolbar) {
                 domStyle.set(this.toolbar.domNode, "display", "none");
-            };
+            }
 
             this.watch("selectedRow", lang.hitch(this, function (attr, oldVal, newVal) {
-                this.btnOpenFeature.set("disabled", newVal == null);
-                this.btnUpdateFeature.set("disabled", newVal == null);
-                this.btnDeleteFeature.set("disabled", newVal == null);
+                this.btnOpenFeature.set("disabled", newVal === null);
+                this.btnUpdateFeature.set("disabled", newVal === null);
+                this.btnDeleteFeature.set("disabled", newVal === null);
             }));
 
             this.btnOpenFeature.on("click", lang.hitch(this, this.openFeature));
@@ -112,7 +112,7 @@ define([
             if (this.likeSearch) {
                 // Поиск нужен, настраиваем обработчики строки поиска
                 this.tbSearch.on("input", lang.hitch(this, function () {
-                    if (this._timer != undefined) { clearInterval(this._timer) };
+                    if (this._timer !== undefined) { clearInterval(this._timer); }
                     this._timer = setInterval(lang.hitch(this, this.updateSearch), 750);
                 }));
 
@@ -122,7 +122,7 @@ define([
             } else {
                 // Поиск не нужен, прячем строку поиска
                 domStyle.set(this.tbSearch.domNode, "display", "none");
-            };
+            }
         },
 
         initializeGrid: function () {
@@ -146,13 +146,13 @@ define([
                 fields.push(f.keyname);
             });
 
-            if (this.data == undefined) {
+            if (this.data === undefined) {
                 this.store = new Observable(new FeatureStore({
                     layer: this.layerId,
                     fieldList: fields,
                     fieldPrefix: "F:"
                 }));
-            };
+            }
 
             this._grid = new GridClass({
                 store: this.store ? this.store : undefined,
@@ -228,14 +228,14 @@ define([
 
 
         updateSearch: function () {
-            if (this._timer != undefined) { clearInterval(this._timer) };
+            if (this._timer !== undefined) { clearInterval(this._timer); }
 
             var value = this.tbSearch.get("value");
             if (this._search != value) {
                 this._search = value;
                 this._grid.set("query", {like: this.tbSearch.get("value")});
-            };
+            }
         }
 
-    })
+    });
 });
