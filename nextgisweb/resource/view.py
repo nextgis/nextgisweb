@@ -28,20 +28,19 @@ PERM_MCHILDREN = ResourceScope.manage_children
 
 
 def resource_factory(request):
-    # TODO: Хотелось бы использовать первый ключ, но этого не получится,
-    # поскольку matchdiсt не сохраняет порядок ключей.
+    # TODO: We'd like to use first key, but can't
+    # as matchdiсt doesn't save keys order.
 
     if request.matchdict['id'] == '-':
         return None
 
-    # Вначале загружаем ресурс базового класса
+    # First, load base class resource
     try:
         base = Resource.filter_by(id=request.matchdict['id']).one()
     except NoResultFound:
         raise httpexceptions.HTTPNotFound()
 
-    # После чего загружаем ресурс того класса,
-    # к которому этот ресурс и относится
+    # Second, load resource of it's class
     obj = Resource.query().with_polymorphic(
         Resource.registry[base.cls]).filter_by(
         id=request.matchdict['id']).one()
@@ -65,7 +64,7 @@ def objjson(request):
                 objjson=serializer.data)
 
 
-# TODO: Перенести в API и избавиться от json=True
+# TODO: Move to API and get rid of json=True
 @viewargs(renderer='json', json=True)
 def schema(request):
     resources = dict()
@@ -254,7 +253,7 @@ def setup_pyramid(comp, config):
 
     permalinker(Resource, 'resource.show')
 
-    # Секции
+    # Sections
 
     Resource.__psection__ = PageSections()
 
@@ -281,7 +280,7 @@ def setup_pyramid(comp, config):
         title=_("User permissions"),
         template='nextgisweb:resource/template/section_permission.mako')
 
-    # Действия
+    # Actions
 
     class AddMenu(DynItem):
         def build(self, args):
