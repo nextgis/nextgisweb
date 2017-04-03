@@ -37,6 +37,7 @@ define([
     "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
+    "./ui/PrintButton/PrintButton",
     // settings
     "ngw/settings!webmap",
     // template
@@ -91,6 +92,7 @@ define([
     ToolBase,
     ToolZoom,
     ToolMeasure,
+    PrintButton,
     clientSettings
 ) {
 
@@ -701,6 +703,9 @@ define([
 
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "LineString"}), 'measuringLength');
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "Polygon"}), 'measuringArea');
+
+            this.mapToolbar.items.addSeparator();
+            this.mapToolbar.items.addButton(PrintButton);
         },
 
         _pluginsSetup: function (wmplugin) {
