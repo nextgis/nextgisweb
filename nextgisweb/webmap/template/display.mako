@@ -24,6 +24,7 @@
 </%def>
 
 <div data-dojo-id="display"
+     class="webmap-display"
     data-dojo-type="ngw-webmap/Display"
     data-dojo-props="config: displayConfig"
     style="width: 100%; height: 100%">
