@@ -60,6 +60,10 @@
             baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n},
             locale: ${request.locale_name | json.dumps, n}
         };
+
+        var printConfig = {
+            printMapCssUrl: '${request.static_url('nextgisweb:static/css/print/print-map.css')}'
+        };
     </script>
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
