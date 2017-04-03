@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-03-25 22:09+0300\n"
+"POT-Creation-Date: 2017-03-30 18:20+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -39,31 +39,33 @@ msgstr "Веб-карта"
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:536
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:558
+#: amd/ngw-webmap/Display.js:538
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:552
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:539 amd/ngw-webmap/tool/Zoom.js:18
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:561
+#: amd/ngw-webmap/Display.js:541 amd/ngw-webmap/tool/Print.js:18
+#: amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:555
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:540 amd/ngw-webmap/tool/Zoom.js:21
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:562
+#: amd/ngw-webmap/Display.js:542 amd/ngw-webmap/tool/Print.js:21
+#: amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:556
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:543
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:565
+#: amd/ngw-webmap/Display.js:545
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:559
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:606 amd/ngw-webmap/template/MapToolbarItems.hbs:22
+#: amd/ngw-webmap/Display.js:608 amd/ngw-webmap/template/MapToolbarItems.hbs:22
 msgid "Hide layers"
 msgstr "Скрыть дерево слоёв"
 
-#: amd/ngw-webmap/Display.js:611
+#: amd/ngw-webmap/Display.js:613
 msgid "Show layers"
 msgstr "Показать дерево слоёв"
 
@@ -108,28 +110,28 @@ msgstr "Код для встраивания"
 msgid "Preview"
 msgstr "Протестировать"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:66
+#: amd/ngw-webmap/plugin/FeatureLayer.js:68
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:105
+#: amd/ngw-webmap/plugin/FeatureLayer.js:107
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:124
+#: amd/ngw-webmap/plugin/FeatureLayer.js:132
 msgid "Search..."
 msgstr "Поиск..."
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:237
+#: amd/ngw-webmap/plugin/FeatureLayer.js:255
 msgid "Searching..."
 msgstr "Идет поиск..."
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:270
-#: amd/ngw-webmap/plugin/FeatureLayer.js:331
+#: amd/ngw-webmap/plugin/FeatureLayer.js:288
+#: amd/ngw-webmap/plugin/FeatureLayer.js:349
 msgid "Refine search criterion"
 msgstr "Уточните критерий поиска"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:345
+#: amd/ngw-webmap/plugin/FeatureLayer.js:363
 msgid "Not found"
 msgstr "Не найдено"
 
@@ -145,11 +147,11 @@ msgstr "Увеличить до слоя"
 msgid "Map"
 msgstr "Карта"
 
-#: amd/ngw-webmap/template/Display.hbs:42
+#: amd/ngw-webmap/template/Display.hbs:43
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Сделайте свою Веб ГИС на nextgis.com"
 
-#: amd/ngw-webmap/template/Display.hbs:69
+#: amd/ngw-webmap/template/Display.hbs:70
 msgid "Layer"
 msgstr "Слой"
 
@@ -262,9 +264,13 @@ msgstr "Щёлкните дважды, чтобы завершить."
 msgid "Rotate"
 msgstr "Поворот"
 
-#: amd/ngw-webmap/ui/LinkToMainMap/LinkToMainMap.js:26
+#: amd/ngw-webmap/ui/LinkToMainMap/LinkToMainMap.js:18
 msgid "Open full map"
 msgstr "Открыть карту целиком"
+
+#: amd/ngw-webmap/ui/PrintButton/PrintButton.js:26
+msgid "Print map"
+msgstr "Распечатать карту"
 
 #~ msgid "Zoom to layer extent"
 #~ msgstr "Увеличить до слоя"
