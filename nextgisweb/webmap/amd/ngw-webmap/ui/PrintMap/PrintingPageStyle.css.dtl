@@ -16,6 +16,13 @@ body {
     border: none;
 }
 
+#printMap img.map-logo {
+    position: absolute;
+    z-index: 9999999;
+    top: 2px;
+    right: 2px;
+}
+
 @page {
     size: {{ widthPage }}mm {{ heightPage }}mm;
     margin: 0;

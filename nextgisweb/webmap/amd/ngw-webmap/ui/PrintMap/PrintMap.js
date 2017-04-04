@@ -162,6 +162,16 @@ define([
             }, this);
 
             this._setPrintMapExtent();
+            this._buildLogo();
+        },
+
+        _buildLogo: function () {
+            var logoElement = query('img.map-logo')[0],
+                newLogoElement,
+                olViewport = query('div.ol-viewport', this.printElement)[0];
+
+            newLogoElement = lang.clone(logoElement);
+            domConstruct.place(newLogoElement, olViewport, 'last');
         },
 
         _setPrintMapExtent: function () {
