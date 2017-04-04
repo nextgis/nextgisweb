@@ -1,0 +1,71 @@
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+#printMap {
+    width: {{ widthPage }}mm;
+}
+
+#printMap div.map-container {
+    width: {{ widthMap }}mm;
+    height: {{ heightMap }}mm;
+    padding: 0;
+    margin: {{ margin }}mm;
+    border: none;
+}
+
+@page {
+    size: {{ widthPage }}mm {{ heightPage }}mm;
+    margin: 0;
+}
+
+@media print {
+    html, body {
+        width: {{ widthPage }}mm !important;
+        height: {{ heightPage }}mm !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-width: {{ widthPage }}mm !important;
+        max-width: {{ widthPage }}mm !important;
+    }
+
+    body div.webmap-display,
+        div.dijitDialog,
+        div.dijitPopup,
+        div.dijitDialogUnderlayWrapper {
+        display: none !important;
+    }
+
+    #printMap {
+        display: block!important;
+        position: relative;
+        margin: 0;
+        border: initial;
+        border-radius: initial;
+        min-height: initial;
+        box-shadow: initial;
+        background: initial;
+        page-break-after: always;
+        top: 0!important;
+        left: 0!important;
+        bottom: 0!important;
+        right: 0!important;
+        margin: 0!important;
+        max-width: 100%!important;
+        overflow: hidden;
+        width: {{ widthPage }}mm;
+        height: {{ heightPage }}mm;
+        padding: 0;
+        border: none;
+    }
+
+    #printMap div.map-container {
+        width: {{ widthMap }}mm;
+        height: {{ heightMap }}mm;
+        padding: 0;
+        margin: {{ margin }}mm;
+        border: none;
+    }
+}

@@ -15,15 +15,19 @@ define([
     'dijit/Dialog',
     'dojo/on',
     'dojox/layout/TableContainer',
+    'dojox/dtl',
+    'dojox/dtl/Context',
     'dijit/form/TextBox',
     'dijit/form/NumberTextBox',
     'ngw/openlayers/Map',
     'openlayers/ol',
     'dojo/text!./PrintMap.html',
+    'dojo/text!./PrintingPageStyle.css.dtl',
     'xstyle/css!./PrintMap.css'
 ], function (declare, query, aspect, win, domStyle, domClass, domConstruct,
              array, lang, html, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin,
-             Dialog, on, TableContainer, TextBox, NumberTextBox, Map, ol, template) {
+             Dialog, on, TableContainer, dtl, dtlContext, TextBox, NumberTextBox,
+             Map, ol, template, printingCssTemplate) {
 
     var PrintMapDialog = declare([Dialog], {
         id: 'printMapDialog',
@@ -95,7 +99,6 @@ define([
 
             this._buildPrintElement();
             this._buildMap();
-            this._buildPrintStyle();
             this.content.sizesSelect.attr('value', '210_297');
         },
 
@@ -166,40 +169,27 @@ define([
             this.printMap.olMap.getView().fit(extent, this.printMap.olMap.getSize());
         },
 
-        _buildPrintStyle: function () {
-            if (!printConfig || !printConfig.printMapCssUrl) return false;
-
-            var cssUrl = printConfig.printMapCssUrl,
-                linkElement, head;
-            linkElement = domConstruct.toDom('<link href="' + cssUrl + '" rel="stylesheet" type="text/css" media="print"/>');
-            head = document.getElementsByTagName('head')[0];
-            this.printCssElement = domConstruct.place(linkElement, head);
-        },
-
         _resizeMapContainer: function (width, height) {
-            var mapContainer = query('div.map-container', this.printElement)[0],
-                margin = this.content.marginInput.get('value');
+            var margin = this.content.marginInput.get('value');
 
-            domStyle.set(mapContainer, {
-                height: height + 'mm',
-                width: width + 'mm'
-            });
-
-            domStyle.set(this.printElement, {
-                width: width + 'mm'
-            });
-
+            this._buildPageStyle(width, height, margin);
             this.printMap.olMap.updateSize();
             this._setPrintMapExtent();
-            this._buildPageStyle(width, height, margin);
         },
 
         _buildPageStyle: function (width, height, margin) {
-            var style = this._getPageStyle();
-            if (style.sheet.cssRules.length > 0) {
-                style.sheet.deleteRule(0);
-            }
-            style.sheet.insertRule('@page {size:' + width + 'mm ' + height + 'mm; margin: ' + margin + 'mm;}', 0);
+            var style = this._getPageStyle(),
+                template, context;
+
+            template = new dtl.Template(printingCssTemplate);
+            context = new dtlContext({
+                widthPage: width,
+                heightPage: height,
+                widthMap: width - margin * 2,
+                heightMap: height - margin * 2,
+                margin: margin
+            });
+            style.innerHTML = template.render(context);
         },
 
         _pageStyle: null,
@@ -207,7 +197,9 @@ define([
             if (this._pageStyle) {
                 return this._pageStyle;
             }
+
             var style = document.createElement('style');
+            style.type = "text/css";
             style.appendChild(document.createTextNode(''));
             document.head.appendChild(style);
             this._pageStyle = style;

@@ -1,5 +1,5 @@
 body div.webmap-display,div.dijitDialog,div.dijitPopup {
-    display: none!important
+    display: none!important;
 }
 
 #printMap {
@@ -13,4 +13,5 @@ body div.webmap-display,div.dijitDialog,div.dijitPopup {
     margin: 0!important;
     max-width: none!important;
     overflow: hidden;
+    background-color: yellow;
 }
