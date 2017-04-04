@@ -150,7 +150,10 @@ define([
                     pointer: false,
                     select: false
                 }),
-                view: this.map.getView()
+                view: new ol.View({
+                    center: this.map.getView().getCenter(),
+                    zoom: this.map.getView().getZoom()
+                })
             });
 
             aspect.after(mapContainer, 'resize', lang.hitch(this, function () {
@@ -175,8 +178,8 @@ define([
         },
 
         _setPrintMapExtent: function () {
-            var extent = this.map.getView().calculateExtent(this.map.getSize());
-            this.printMap.olMap.getView().fit(extent, this.printMap.olMap.getSize());
+            this.map.getView().setCenter(this.map.getView().getCenter());
+            this.map.getView().setZoom(this.map.getView().getZoom());
         },
 
         _resizeMapContainer: function (width, height) {
