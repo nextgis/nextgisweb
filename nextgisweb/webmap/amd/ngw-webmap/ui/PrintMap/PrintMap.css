@@ -11,8 +11,12 @@
 
 #printMapDialog div.dijitLayoutContainer.dijitContainer.dijitTableLayout {
     display: inline-block;
-    width: 300px;
+    width: 500px;
     text-align: left;
+}
+
+#printMapDialog div.dijitLayoutContainer.dijitContainer.dijitTableLayout td.tableContainer-labelCell {
+    width: 135px !important;
 }
 
 #printMap {
