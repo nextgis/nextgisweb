@@ -34,7 +34,7 @@ define([
     var PrintMapDialog = declare([Dialog], {
         id: 'printMapDialog',
         contentId: 'printMapContent',
-        title: 'Печать карты',
+        title: i18n.gettext('Print map'),
         isDestroyedAfterHiding: true,
         isClosedAfterButtonClick: true,
         template: hbsI18n(template, i18n),
@@ -47,8 +47,6 @@ define([
 
         constructor: function (settings) {
             lang.mixin(this, settings);
-
-            this.set('title', i18n.gettext('Print map 222222'));
 
             var contentWidget = new (declare([_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
                 id: this.contentId,

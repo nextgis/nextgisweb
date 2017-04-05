@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-04-05 10:22+0300\n"
+"POT-Creation-Date: 2017-04-05 18:34+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -146,6 +146,7 @@ msgid "Map"
 msgstr "Карта"
 
 #: amd/ngw-webmap/template/Display.hbs:43
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.hbs:15
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Сделайте свою Веб ГИС на nextgis.com"
 
@@ -267,8 +268,53 @@ msgid "Open full map"
 msgstr "Открыть карту целиком"
 
 #: amd/ngw-webmap/ui/PrintButton/PrintButton.js:11
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.js:37
 msgid "Print map"
 msgstr "Распечатать карту"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:9
+msgid "Paper format"
+msgstr "Формат бумаги"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:11
+msgid "Select format"
+msgstr "Выберите формат"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:12
+msgid "A4 - Portrait"
+msgstr "A4 - Портретный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:13
+msgid "A4 - Landscape"
+msgstr "A4 - Альбомный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:14
+msgid "A3 - Portrait"
+msgstr "A3 - Портретный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:15
+msgid "A3 - Landscape"
+msgstr "A3 - Альбомный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:21
+msgid "Height, mm"
+msgstr "Высота, мм"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:31
+msgid "Width, mm"
+msgstr "Ширина, мм"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:41
+msgid "Margin, mm"
+msgstr "Отступ, мм"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:52
+msgid "Print"
+msgstr "Печать"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:57
+msgid "Cancel"
+msgstr "Отменить"
 
 #~ msgid "Zoom to layer extent"
 #~ msgstr "Увеличить до слоя"
