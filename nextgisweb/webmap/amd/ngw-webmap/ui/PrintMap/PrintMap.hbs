@@ -8,17 +8,17 @@
                     data-dojo-attach-point="sizesSelect"
                     title="Формат" name="sizes"
                     style="width: 180px;">
-                <option value="none" disabled="disabled" selected>Выберите формат...</option>
-                <option value="210_297">A4 - Портретный</option>
-                <option value="297_210">A4 - Альбомный</option>
-                <option value="297_420">A3 - Портретный</option>
-                <option value="420_297">A3 - Альбомный</option>
+                <option value="none" disabled="disabled" selected>{{gettext 'Select format'}}</option>
+                <option value="210_297">{{gettext 'A4 - Portrait'}}</option>
+                <option value="297_210">{{gettext 'A4 - Landscape'}}</option>
+                <option value="297_420">{{gettext 'A3 - Portrait'}}</option>
+                <option value="420_297">{{gettext 'A3 - Landscape'}}</option>
             </select>
 
             <input id="heightInput"
                    data-dojo-type="dijit/form/NumberTextBox"
                    data-dojo-attach-point="heightInput"
-                   title="Высота, мм"
+                   title="{{gettext 'Height, mm'}}"
                    type="number"
                    required="true"
                    disabled="disabled"
@@ -28,7 +28,7 @@
             <input id="widthInput"
                    data-dojo-type="dijit/form/NumberTextBox"
                    data-dojo-attach-point="widthInput"
-                   title="Ширина, мм"
+                   title="{{gettext 'Width, mm'}}"
                    type="number"
                    required="true"
                    disabled="disabled"
@@ -38,7 +38,7 @@
             <input id="marginInput"
                    data-dojo-type="dijit/form/NumberTextBox"
                    data-dojo-attach-point="marginInput"
-                   title="Отступ, мм"
+                   title="{{gettext 'Margin, mm'}}"
                    type="number"
                    required="true"
                    disabled="disabled"
@@ -49,12 +49,12 @@
         <button data-dojo-type="dijit/form/Button"
                 data-dojo-attach-point="okButton"
                 style="margin-left: 10px;">
-            Печать
+            {{gettext 'Print'}}
         </button>
         <button data-dojo-type="dijit/form/Button"
                 data-dojo-attach-point="cancelButton"
                 style="margin-left: 10px;">
-            Отменить
+            {{gettext 'Cancel'}}
         </button>
     </div>
 </div>

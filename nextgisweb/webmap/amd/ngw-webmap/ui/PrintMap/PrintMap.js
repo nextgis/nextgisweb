@@ -21,13 +21,15 @@ define([
     'dijit/form/NumberTextBox',
     'ngw/openlayers/Map',
     'openlayers/ol',
-    'dojo/text!./PrintMap.html',
+    'ngw-pyramid/i18n!webmap',
+    'ngw-pyramid/hbs-i18n',
+    'dojo/text!./PrintMap.hbs',
     'dojo/text!./PrintingPageStyle.css.dtl',
     'xstyle/css!./PrintMap.css'
 ], function (declare, query, aspect, win, domStyle, domClass, domConstruct,
              array, lang, html, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin,
              Dialog, on, TableContainer, dtl, dtlContext, TextBox, NumberTextBox,
-             Map, ol, template, printingCssTemplate) {
+             Map, ol, i18n, hbsI18n, template, printingCssTemplate) {
 
     var PrintMapDialog = declare([Dialog], {
         id: 'printMapDialog',
@@ -35,7 +37,7 @@ define([
         title: 'Печать карты',
         isDestroyedAfterHiding: true,
         isClosedAfterButtonClick: true,
-        template: template,
+        template: hbsI18n(template, i18n),
         printElementId: 'printMap',
         printElement: null,
         printElementMap: null,
@@ -46,9 +48,11 @@ define([
         constructor: function (settings) {
             lang.mixin(this, settings);
 
+            this.set('title', i18n.gettext('Print map 222222'));
+
             var contentWidget = new (declare([_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
                 id: this.contentId,
-                templateString: template,
+                templateString: hbsI18n(template, i18n),
                 message: this.message,
                 buttonOk: this.buttonOk,
                 buttonCancel: this.buttonCancel,

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-03-30 18:20+0300\n"
+"POT-Creation-Date: 2017-04-05 10:22+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -44,14 +44,12 @@ msgstr "Открыть"
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:541 amd/ngw-webmap/tool/Print.js:18
-#: amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/Display.js:541 amd/ngw-webmap/tool/Zoom.js:18
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:555
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:542 amd/ngw-webmap/tool/Print.js:21
-#: amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/Display.js:542 amd/ngw-webmap/tool/Zoom.js:21
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:556
 msgid "Zoom out"
 msgstr "Отодвинуть"
@@ -268,7 +266,7 @@ msgstr "Поворот"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: amd/ngw-webmap/ui/PrintButton/PrintButton.js:26
+#: amd/ngw-webmap/ui/PrintButton/PrintButton.js:11
 msgid "Print map"
 msgstr "Распечатать карту"
 
