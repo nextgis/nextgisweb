@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-04-05 18:34+0300\n"
+"POT-Creation-Date: 2017-04-06 11:48+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -276,43 +276,67 @@ msgstr "Распечатать карту"
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:11
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:12
 msgid "Select format"
 msgstr "Выберите формат"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:12
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:13
 msgid "A4 - Portrait"
 msgstr "A4 - Портретный"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:13
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:14
 msgid "A4 - Landscape"
 msgstr "A4 - Альбомный"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:14
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:15
 msgid "A3 - Portrait"
 msgstr "A3 - Портретный"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:15
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:16
 msgid "A3 - Landscape"
 msgstr "A3 - Альбомный"
 
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:17
+msgid "A2 - Portrait"
+msgstr "A2 - Портретный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:18
+msgid "A2 - Landscape"
+msgstr "A2 - Альбомный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:19
+msgid "A1 - Portrait"
+msgstr "A1 - Портретный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:20
+msgid "A1 - Landscape"
+msgstr "A1 - Альбомный"
+
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:21
+msgid "A0 - Portrait"
+msgstr "A0 - Портретный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:22
+msgid "A0 - Landscape"
+msgstr "A0 - Альбомный"
+
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:28
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:31
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:38
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:41
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:48
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:52
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:59
 msgid "Print"
 msgstr "Печать"
 
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:57
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:64
 msgid "Cancel"
 msgstr "Отменить"
 
