@@ -144,11 +144,11 @@ define([
                 target: mapContainer,
                 controls: [],
                 interactions: ol.interaction.defaults({
-                    doubleClickZoom: false,
-                    dragAndDrop: false,
-                    keyboardPan: false,
-                    keyboardZoom: false,
-                    mouseWheelZoom: false,
+                    doubleClickZoom: true,
+                    dragAndDrop: true,
+                    keyboardPan: true,
+                    keyboardZoom: true,
+                    mouseWheelZoom: true,
                     pointer: false,
                     select: false
                 }),
