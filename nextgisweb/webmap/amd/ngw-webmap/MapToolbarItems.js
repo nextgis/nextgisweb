@@ -16,12 +16,13 @@ define([
     'ngw-pyramid/i18n!webmap',
     'ngw-pyramid/hbs-i18n',
     'ngw-webmap/MapStatesObserver',
-    'dijit/form/DropDownButton',
-    'dijit/form/Button',
-    'dijit/ToolbarSeparator'
+    'dijit/ToolbarSeparator',
+    './ui/PrintButton/PrintButton',
+    'dijit/form/DropDownButton'
 ], function (declare, array, lang, JsonRest, xhr, domStyle, on,
              _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-             MenuItem, ToggleButton, template, route, i18n, hbsI18n, MapStatesObserver) {
+             MenuItem, ToggleButton, template, route, i18n, hbsI18n, MapStatesObserver,
+             ToolbarSeparator, PrintButton) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
 
@@ -128,7 +129,17 @@ define([
             } else {
                 this.mapStates.deactivateState(tglButtonTool.state);
             }
-        }
+        },
 
+        addSeparator: function () {
+            var toolbarSeparator = new ToolbarSeparator();
+            toolbarSeparator.placeAt(this);
+        },
+
+        addButton: function (Button, options) {
+            var button = new Button(options);
+            button.display = this.display;
+            button.placeAt(this);
+        }
     });
 });

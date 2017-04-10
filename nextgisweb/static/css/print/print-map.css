@@ -1,0 +1,17 @@
+body div.webmap-display,div.dijitDialog,div.dijitPopup {
+    display: none!important;
+}
+
+#printMap {
+    display: block!important;
+    width: auto;
+    height: auto;
+    top: 0!important;
+    left: 0!important;
+    bottom: 0!important;
+    right: 0!important;
+    margin: 0!important;
+    max-width: none!important;
+    overflow: hidden;
+    background-color: yellow;
+}

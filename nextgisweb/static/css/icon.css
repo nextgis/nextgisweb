@@ -1,5 +1,5 @@
 /* glue: 0.11.1 hash: 5960f87c44 */
-        .iconZoomOut,
+.iconZoomOut,
 .iconZoomIn,
 .iconZoom,
 .iconTable,
@@ -16,7 +16,8 @@
 .iconIdentify,
 .iconFeatureEdit,
 .iconDescription,
-.iconArrowInOut {
+.iconArrowInOut,
+.iconPrintMap {
             background-image: url('../img/icon.png');
             background-repeat: no-repeat;
         }
@@ -128,6 +129,12 @@
             width: 16px;
             height: 16px;
         }
+
+        .iconPrintMap {
+            background-position: -64px -32px;
+            width: 16px;
+            height: 16px;
+        }
         
         @media screen and (-webkit-min-device-pixel-ratio: 1.0), screen and (min--moz-device-pixel-ratio: 1.0), screen and (-o-min-device-pixel-ratio: 100/100), screen and (min-device-pixel-ratio: 1.0), screen and (min-resolution: 1.0dppx) {
             .iconZoomOut,
@@ -147,7 +154,8 @@
     .iconIdentify,
     .iconFeatureEdit,
     .iconDescription,
-    .iconArrowInOut {
+    .iconArrowInOut,
+    .iconPrintMap {
                 background-image: url('../img/icon.png');
                 -webkit-background-size: 80px 64px;
                 -moz-background-size: 80px 64px;

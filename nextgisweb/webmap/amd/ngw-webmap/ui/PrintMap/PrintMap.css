@@ -1,0 +1,47 @@
+#printMapDialog div.dijitDialogPaneContent {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0;
+    padding: 0;
+}
+
+#printMapDialog div.dijitDialogPaneContentArea {
+    text-align: center;
+}
+
+#printMapDialog div.dijitLayoutContainer.dijitContainer.dijitTableLayout {
+    display: inline-block;
+    width: 500px;
+    text-align: left;
+}
+
+#printMapDialog div.dijitLayoutContainer.dijitContainer.dijitTableLayout td.tableContainer-labelCell {
+    width: 135px !important;
+}
+
+#printMap {
+    display: block;
+    position: absolute;
+    top: 244px;
+    bottom: 17px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    max-width: 95%;
+    z-index: 999;
+    overflow: auto;
+    -webkit-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    -moz-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    background-color: white;
+}
+
+#printMap div.map-container {
+    position: relative;
+    display: block;
+    z-index: 1000;
+}
+
+#printMap.inactive {
+    display: none;
+}
