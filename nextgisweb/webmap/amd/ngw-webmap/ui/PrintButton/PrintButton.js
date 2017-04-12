@@ -10,7 +10,7 @@ define([
         postCreate: function () {
             this.set('title', i18n.gettext('Print map'));
             this.set('showLabel', false);
-            this.set('iconClass', 'iconPrintMap');
+            this.set('iconClass', 'iconPrinter');
             this.bindEvents();
         },
 

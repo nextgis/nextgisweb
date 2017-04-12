@@ -1,5 +1,5 @@
-/* glue: 0.11.1 hash: 5960f87c44 */
-.iconZoomOut,
+/* glue: 0.11.1 hash: de44a081a7 */
+        .iconZoomOut,
 .iconZoomIn,
 .iconZoom,
 .iconTable,
@@ -9,6 +9,7 @@
 .iconRulerSquare,
 .iconRuler,
 .iconRotate,
+.iconPrinter,
 .iconPan,
 .iconMap,
 .iconLink,
@@ -16,8 +17,7 @@
 .iconIdentify,
 .iconFeatureEdit,
 .iconDescription,
-.iconArrowInOut,
-.iconPrintMap {
+.iconArrowInOut {
             background-image: url('../img/icon.png');
             background-repeat: no-repeat;
         }
@@ -82,55 +82,55 @@
             height: 16px;
         }
         
-        .iconPan {
+        .iconPrinter {
             background-position: -48px -16px;
             width: 16px;
             height: 16px;
         }
         
-        .iconMap {
+        .iconPan {
             background-position: -48px -32px;
             width: 16px;
             height: 16px;
         }
         
-        .iconLink {
+        .iconMap {
             background-position: 0 -48px;
             width: 16px;
             height: 16px;
         }
         
-        .iconLayers {
+        .iconLink {
             background-position: -16px -48px;
             width: 16px;
             height: 16px;
         }
         
-        .iconIdentify {
+        .iconLayers {
             background-position: -32px -48px;
             width: 16px;
             height: 16px;
         }
         
-        .iconFeatureEdit {
+        .iconIdentify {
             background-position: -48px -48px;
             width: 16px;
             height: 16px;
         }
         
-        .iconDescription {
+        .iconFeatureEdit {
             background-position: -64px 0;
             width: 16px;
             height: 16px;
         }
         
-        .iconArrowInOut {
+        .iconDescription {
             background-position: -64px -16px;
             width: 16px;
             height: 16px;
         }
-
-        .iconPrintMap {
+        
+        .iconArrowInOut {
             background-position: -64px -32px;
             width: 16px;
             height: 16px;
@@ -147,6 +147,7 @@
     .iconRulerSquare,
     .iconRuler,
     .iconRotate,
+    .iconPrinter,
     .iconPan,
     .iconMap,
     .iconLink,
@@ -154,8 +155,7 @@
     .iconIdentify,
     .iconFeatureEdit,
     .iconDescription,
-    .iconArrowInOut,
-    .iconPrintMap {
+    .iconArrowInOut {
                 background-image: url('../img/icon.png');
                 -webkit-background-size: 80px 64px;
                 -moz-background-size: 80px 64px;
