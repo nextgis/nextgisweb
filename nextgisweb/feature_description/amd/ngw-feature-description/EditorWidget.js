@@ -15,7 +15,7 @@ define([
         extraPlugins: ['|', 'createLink', 'unlink'],
 
         hasData: function () {
-            return this.get('value') != '';
+            return this.get('value') !== '';
         },
 
         _getValueAttr: function () {

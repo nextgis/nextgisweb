@@ -10,7 +10,7 @@ define([
 
         _getValueAttr: function () {
             var val = this.inherited(arguments);
-            if (val == '') { val = null };
+            if (val === '') { val = null; }
             return val;
         }
     });

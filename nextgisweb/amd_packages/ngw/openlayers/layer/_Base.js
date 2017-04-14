@@ -51,7 +51,7 @@ define([
             if (this._visibility != value) {
                 this.olLayer.setVisible(value);
                 this._visibility = value;
-            };
+            }
         }
 
     });

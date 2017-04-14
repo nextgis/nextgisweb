@@ -8,7 +8,7 @@ define([
 
         constructor: function (params) {
             this.options = array.map(settings.srs, function (itm) {
-                return {value: itm.id, label: itm.displayName}
+                return {value: itm.id, label: itm.displayName};
             });
         }
     });

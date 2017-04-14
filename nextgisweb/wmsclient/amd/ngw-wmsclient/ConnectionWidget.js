@@ -54,10 +54,10 @@ define([
             if (capcache !== "") {
                 lang.setObject(this.serializePrefix + ".capcache", capcache, data);
             }
-            if (username == "") {
+            if (username === "") {
                 lang.setObject(this.serializePrefix + ".username", null, data);
             }
-            if (password == "") {
+            if (password === "") {
                 lang.setObject(this.serializePrefix + ".password", null, data);
             }
         }

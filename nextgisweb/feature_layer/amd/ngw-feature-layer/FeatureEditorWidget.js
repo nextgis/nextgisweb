@@ -74,7 +74,7 @@ define([
                         constraints: {places: "0,20"},
                         style: "width: 12em;"
                     })).placeAt(this)
-                ]
+                ];
             } else if (this.datatype == "STRING") {
                 this.children = [
                     (new RTETextBox({
@@ -293,4 +293,4 @@ define([
             });
         }
     });
-})
+});

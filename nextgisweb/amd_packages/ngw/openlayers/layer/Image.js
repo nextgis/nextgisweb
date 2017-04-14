@@ -12,5 +12,5 @@ define([
         constructor: function(name, options, soptions) {
             this.inherited(arguments);
         }
-    })
+    });
 });

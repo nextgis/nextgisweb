@@ -53,5 +53,5 @@ define([
 
             return urlWithoutParams + "?" + queryStr;
         }
-    }
+    };
 });

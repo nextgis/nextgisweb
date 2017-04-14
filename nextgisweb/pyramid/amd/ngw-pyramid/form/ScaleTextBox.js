@@ -28,7 +28,7 @@ define([
 
             var widget = this;
             this._textbox.watch("value", function (attr, oldVal, newVal) {
-                if (widget._textbox.isValid() && newVal != "") {
+                if (widget._textbox.isValid() && newVal !== "") {
                     var comp = newVal.split(":");
                     widget.set("value", number.parse(comp[1].replace(" ", "")));
                 } else {
@@ -45,8 +45,8 @@ define([
                 this._set("value", value);
                 if (this._textbox.isValid()) {
                     this._textbox.set("value", value ? "1 : " + number.format(value) : null);
-                };
-            };
+                }
+            }
         }
     });
 });

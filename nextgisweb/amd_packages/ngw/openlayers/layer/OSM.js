@@ -14,5 +14,5 @@ define([
 
             this.inherited(arguments);
         }
-    })
+    });
 });

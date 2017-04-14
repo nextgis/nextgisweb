@@ -6,4 +6,4 @@ define([
             declare.safeMixin(options);
         }
     });
-})
+});

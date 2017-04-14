@@ -177,7 +177,7 @@ define([
             var items = data.resmeta.items;
 
             this.store.query().forEach(function (f) {
-                var value = undefined;
+                var value;
 
                 if (f.type == "text") {
                     value = f.value;

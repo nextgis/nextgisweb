@@ -39,7 +39,7 @@ define([
         postCreate: function () {
             this.inherited(arguments);
             var self = this;
-            this.buttonSave.on("click", function () { self.save() })
+            this.buttonSave.on("click", function () { self.save(); });
         },
 
         startup: function () {
@@ -49,7 +49,7 @@ define([
                 handleAs: 'json'
             }).then(function (data) {
                 var allow_origin = data.allow_origin;
-                if (allow_origin != null) {
+                if (allow_origin !== null) {
                     self.widgetOriginList.set('value', allow_origin.join('\n'));
                 }
             });
@@ -58,12 +58,12 @@ define([
         save: function () {
             var olist = array.map(this.widgetOriginList.get('value').split('\n'),
                 function (i) { return lang.trim(i); });
-            olist = array.filter(olist, function (i) { return i != '' });
+            olist = array.filter(olist, function (i) { return i !== ''; });
             xhr.put(API_URL, {
                 handleAs: 'json',
                 headers: { "Content-Type": "application/json" },                
                 data: json.stringify({allow_origin: olist}) 
-            }).then(function () {}, function () { alert("Error!") })
+            }).then(function () {}, function () { alert("Error!"); });
         }
     });
 });

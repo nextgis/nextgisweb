@@ -13,13 +13,13 @@ define([
         _setErrorAttr: function (value) {
             if ( !this.errorNode ) {
                 this.errorNode = domConstruct.create("div", null, this.domNode, "first");
-            };
+            }
 
             if ( !this.errorListNode ) {
                 this.errorListNode = domConstruct.create("ul", {class: "ngwModelWidgetError"}, this.errorNode);
-            };
+            }
             this.errorListNode.innerHTML = "";
-            domStyle.set(this.errorListNode, "display", (value == null || value.length == 0) ? "none" : "block");
+            domStyle.set(this.errorListNode, "display", (value === null || value.length === 0) ? "none" : "block");
             
             var widget = this;
             array.forEach(value, function (error) {

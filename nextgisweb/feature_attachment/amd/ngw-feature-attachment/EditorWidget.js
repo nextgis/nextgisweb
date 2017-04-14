@@ -189,7 +189,7 @@ define([
                         fid: this.feature,
                         aid: value.id
                     }) + "?size=80x60";
-                };
+                }
                 this.store.add(value);
             }            
         },

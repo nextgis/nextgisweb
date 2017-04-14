@@ -311,7 +311,7 @@ define([
         },
 
         errorMessage: function (e) {
-            var S_ERROR_MESSAGE = i18n.gettext("Error message:")
+            var S_ERROR_MESSAGE = i18n.gettext("Error message:");
 
             if (e.error == E_REQUEST && e.status == 400) {
                 alert(i18n.gettext("Errors found during data validation on server. Correct them and try again.") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);

@@ -17,7 +17,7 @@ define([
                 function (error) {
                     load();
                 }
-            )
+            );
         }
-    }
+    };
 });

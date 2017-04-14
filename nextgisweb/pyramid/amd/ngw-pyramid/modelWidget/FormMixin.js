@@ -37,9 +37,9 @@ define([
                 this.btn = new Button({label: i18n.gettext("Save"), class: "dijitButton--primary"});
             } else if (params.operation == 'delete') {
                 this.btn = new Button({label: i18n.gettext("Delete"), class: "dijitButton--primary"});
-            };
+            }
 
-            this.btn.placeAt(this.buttonPane).on("click", function () { widget.submit() });
+            this.btn.placeAt(this.buttonPane).on("click", function () { widget.submit(); });
         },
 
         postCreate: function () { 
@@ -59,7 +59,7 @@ define([
             } else {
                 // Все остальное добавляем в спец. контейнер
                 child.placeAt(this.containerNode);
-            };
+            }
         },
 
         startup: function () {
@@ -73,16 +73,16 @@ define([
             // заблокируем форму на всякий случай
             this.set("disabled", true);
 
-            var validate = function () { return { isValid: true, error: [] } };
+            var validate = function () { return { isValid: true, error: [] }; };
             if (this.validateWidget) {
-                var validate = function () { return widget.validateWidget() };
-            };
+                validate = function () { return widget.validateWidget(); };
+            }
 
             var d = new Deferred();
 
             // при любом исходе разблокируем форму
             d.then(
-                function (success) { if (!success) { widget.set("disabled", false)} },
+                function (success) { if (!success) { widget.set("disabled", false); } },
                 function (errinfo) {
                     alert("К сожалению, во время выполнения операции произошла непредвиденная ошибка. \n" +
                           "Возможно это вызвано неполадками в работе сети. Сообщение об ошибке:\n\n" + errinfo);
