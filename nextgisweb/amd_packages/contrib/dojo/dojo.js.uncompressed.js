@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2016, The JS Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -2883,7 +2883,7 @@ define(["../has", "./config", "require", "module"], function(has, config, requir
 	dojo.isAsync = ! 1  || require.async;
 	dojo.locale = config.locale;
 
-	var rev = "$Rev: 3594395 $".match(/[0-9a-f]{7,}/);
+	var rev = "$Rev: 594ed6f $".match(/[0-9a-f]{7,}/);
 	dojo.version = {
 		// summary:
 		//		Version number of the Dojo Toolkit
@@ -2896,7 +2896,7 @@ define(["../has", "./config", "require", "module"], function(has, config, requir
 		//		- flag: String: Descriptor flag. If total version is "1.2.0beta1", will be "beta1"
 		//		- revision: Number: The Git rev from which dojo was pulled
 
-		major: 1, minor: 11, patch: 1, flag: "",
+		major: 1, minor: 12, patch: 2, flag: "",
 		revision: rev ? rev[0] : NaN,
 		toString: function(){
 			var v = dojo.version;
@@ -2960,7 +2960,10 @@ define(["../has", "./config", "require", "module"], function(has, config, requir
 
 	if( 1 ){
 		// IE 9 bug: https://bugs.dojotoolkit.org/ticket/18197
-		has.add("console-as-object", Function.prototype.bind && console && typeof console.log === "object");
+		has.add("console-as-object", function () {
+			return Function.prototype.bind && console && typeof console.log === "object";
+		});
+
 		typeof console != "undefined" || (console = {});  // intentional assignment
 		//	Be careful to leave 'log' always at the end
 		var cn = [
@@ -3231,6 +3234,10 @@ define(["require", "module"], function(require, module){
 		has.add("pointer-events", "pointerEnabled" in window.navigator ?
 				window.navigator.pointerEnabled : "PointerEvent" in window);
 		has.add("MSPointer", window.navigator.msPointerEnabled);
+		// The "pointermove"" event is only continuously emitted in a touch environment if
+		// the target node's "touch-action"" CSS property is set to "none"
+		// https://www.w3.org/TR/pointerevents/#the-touch-action-css-property
+		has.add("touch-action", has("touch") && has("pointer-events"));
 
 		// I don't know if any of these tests are really correct, just a rough guess
 		has.add("device-width", screen.availWidth || innerWidth);
@@ -5309,24 +5316,6 @@ define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config",
 			//		of these additional transactions can be done concurrently. Owing to this analysis, the entire preloading
 			//		algorithm can be discard during a build by setting the has feature dojo-preload-i18n-Api to false.
 
-			if(has("dojo-preload-i18n-Api")){
-				var split = id.split("*"),
-					preloadDemand = split[1] == "preload";
-				if(preloadDemand){
-					if(!cache[id]){
-						// use cache[id] to prevent multiple preloads of the same preload; this shouldn't happen, but
-						// who knows what over-aggressive human optimizers may attempt
-						cache[id] = 1;
-						preloadL10n(split[2], json.parse(split[3]), 1, require);
-					}
-					// don't stall the loader!
-					load(1);
-				}
-				if(preloadDemand || waitForPreloads(id, require, load)){
-					return;
-				}
-			}
-
 			var match = nlsRe.exec(id),
 				bundlePath = match[1] + "/",
 				bundleName = match[5] || match[4],
@@ -5340,7 +5329,38 @@ define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config",
 					if(!--remaining){
 						load(lang.delegate(cache[loadTarget]));
 					}
-				};
+				},
+				split = id.split("*"),
+				preloadDemand = split[1] == "preload";
+
+			if(has("dojo-preload-i18n-Api")){
+				if(preloadDemand){
+					if(!cache[id]){
+						// use cache[id] to prevent multiple preloads of the same preload; this shouldn't happen, but
+						// who knows what over-aggressive human optimizers may attempt
+						cache[id] = 1;
+						preloadL10n(split[2], json.parse(split[3]), 1, require);
+					}
+					// don't stall the loader!
+					load(1);
+				}
+				if(preloadDemand || (waitForPreloads(id, require, load) && !cache[loadTarget])){
+					return;
+				}
+			}
+			else if (preloadDemand) {
+				// If a build is created with nls resources and 'dojo-preload-i18n-Api' has not been set to false,
+				// the built file will include a preload in the cache (which looks about like so:)
+				// '*now':function(r){r(['dojo/i18n!*preload*dojo/nls/dojo*["ar","ca","cs","da","de","el","en-gb","en-us","es-es","fi-fi","fr-fr","he-il","hu","it-it","ja-jp","ko-kr","nl-nl","nb","pl","pt-br","pt-pt","ru","sk","sl","sv","th","tr","zh-tw","zh-cn","ROOT"]']);}
+				// If the consumer of the build sets 'dojo-preload-i18n-Api' to false in the Dojo config, the cached
+				// preload will not be parsed and will result in an attempt to call 'require' passing it the unparsed
+				// preload, which is not a valid module id.
+				// In this case we should skip this request.
+				load(1);
+
+				return;
+			}
+
 			array.forEach(loadList, function(locale){
 				var target = bundlePathAndName + "/" + locale;
 				if(has("dojo-preload-i18n-Api")){
@@ -5531,44 +5551,7 @@ define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config",
 	if( 1 ){
 		// this code path assumes the dojo loader and won't work with a standard AMD loader
 		var amdValue = {},
-			evalBundle =
-				// use the function ctor to keep the minifiers away (also come close to global scope, but this is secondary)
-				new Function(
-					"__bundle",				   // the bundle to evalutate
-					"__checkForLegacyModules", // a function that checks if __bundle defined __mid in the global space
-					"__mid",				   // the mid that __bundle is intended to define
-					"__amdValue",
-
-					// returns one of:
-					//		1 => the bundle was an AMD bundle
-					//		a legacy bundle object that is the value of __mid
-					//		instance of Error => could not figure out how to evaluate bundle
-
-					  // used to detect when __bundle calls define
-					  "var define = function(mid, factory){define.called = 1; __amdValue.result = factory || mid;},"
-					+ "	   require = function(){define.called = 1;};"
-
-					+ "try{"
-					+		"define.called = 0;"
-					+		"eval(__bundle);"
-					+		"if(define.called==1)"
-								// bundle called define; therefore signal it's an AMD bundle
-					+			"return __amdValue;"
-
-					+		"if((__checkForLegacyModules = __checkForLegacyModules(__mid)))"
-								// bundle was probably a v1.6- built NLS flattened NLS bundle that defined __mid in the global space
-					+			"return __checkForLegacyModules;"
-
-					+ "}catch(e){}"
-					// evaulating the bundle was *neither* an AMD *nor* a legacy flattened bundle
-					// either way, re-eval *after* surrounding with parentheses
-
-					+ "try{"
-					+		"return eval('('+__bundle+')');"
-					+ "}catch(e){"
-					+		"return e;"
-					+ "}"
-				),
+			evalBundle,
 
 			syncRequire = function(deps, callback, require){
 				var results = [];
@@ -5576,6 +5559,45 @@ define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config",
 					var url = require.toUrl(mid + ".js");
 
 					function load(text){
+						if (!evalBundle) {
+							// use the function ctor to keep the minifiers away (also come close to global scope, but this is secondary)
+							evalBundle = new Function(
+								"__bundle",				   // the bundle to evalutate
+								"__checkForLegacyModules", // a function that checks if __bundle defined __mid in the global space
+								"__mid",				   // the mid that __bundle is intended to define
+								"__amdValue",
+
+								// returns one of:
+								//		1 => the bundle was an AMD bundle
+								//		a legacy bundle object that is the value of __mid
+								//		instance of Error => could not figure out how to evaluate bundle
+
+								// used to detect when __bundle calls define
+								"var define = function(mid, factory){define.called = 1; __amdValue.result = factory || mid;},"
+								+ "	   require = function(){define.called = 1;};"
+
+								+ "try{"
+								+		"define.called = 0;"
+								+		"eval(__bundle);"
+								+		"if(define.called==1)"
+											// bundle called define; therefore signal it's an AMD bundle
+								+			"return __amdValue;"
+
+								+		"if((__checkForLegacyModules = __checkForLegacyModules(__mid)))"
+											// bundle was probably a v1.6- built NLS flattened NLS bundle that defined __mid in the global space
+								+			"return __checkForLegacyModules;"
+
+								+ "}catch(e){}"
+								// evaulating the bundle was *neither* an AMD *nor* a legacy flattened bundle
+								// either way, re-eval *after* surrounding with parentheses
+
+								+ "try{"
+								+		"return eval('('+__bundle+')');"
+								+ "}catch(e){"
+								+		"return e;"
+								+ "}"
+							);
+						}
 						var result = evalBundle(text, checkForLegacyModules, mid, amdValue);
 						if(result===amdValue){
 							// the bundle was an AMD module; re-inject it through the normal AMD path
@@ -7815,7 +7837,7 @@ define(["./create"], function(create){
 	};
 	=====*/
 
-	return create("CancelError", null, null, { dojoType: "cancel" });
+	return create("CancelError", null, null, { dojoType: "cancel", log: false });
 });
 
 },
@@ -8009,6 +8031,9 @@ define([
 	has.add("config-useDeferredInstrumentation", "report-unhandled-rejections");
 
 	function logError(error, rejection, deferred){
+		if(error && error.log === false){
+			return;
+		}
 		var stack = "";
 		if(error && error.stack){
 			stack += error.stack;
@@ -9060,11 +9085,13 @@ define(["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./sniff"], fu
 						event.rotation = 0;
 						event.scale = 1;
 					}
-					//use event.changedTouches[0].pageX|pageY|screenX|screenY|clientX|clientY|target
-					var firstChangeTouch = event.changedTouches[0];
-					for(var i in firstChangeTouch){ // use for-in, we don't need to have dependency on dojo/_base/lang here
-						delete event[i]; // delete it first to make it mutable
-						event[i] = firstChangeTouch[i];
+					if (window.TouchEvent && originalEvent instanceof TouchEvent) {
+						// use event.changedTouches[0].pageX|pageY|screenX|screenY|clientX|clientY|target
+						var firstChangeTouch = event.changedTouches[0];
+						for(var i in firstChangeTouch){ // use for-in, we don't need to have dependency on dojo/_base/lang here
+							delete event[i]; // delete it first to make it mutable
+							event[i] = firstChangeTouch[i];
+						}
 					}
 				}
 				return listener.call(this, event);
@@ -9348,8 +9375,9 @@ define([
 	'../io-query',
 	'../_base/array',
 	'../_base/lang',
-	'../promise/Promise'
-], function(exports, RequestError, CancelError, Deferred, ioQuery, array, lang, Promise){
+	'../promise/Promise',
+	'../has'
+], function(exports, RequestError, CancelError, Deferred, ioQuery, array, lang, Promise, has){
 	exports.deepCopy = function deepCopy(target, source){
 		for(var name in source){
 			var tval = target[name],
@@ -9461,9 +9489,9 @@ define([
 	exports.parseArgs = function parseArgs(url, options, skipData){
 		var data = options.data,
 			query = options.query;
-		
+
 		if(data && !skipData){
-			if(typeof data === 'object'){
+			if(typeof data === 'object' && (!(has('native-xhr2')) || !(data instanceof ArrayBuffer || data instanceof Blob ))){
 				options.data = ioQuery.objectToQuery(data);
 			}
 		}
@@ -9754,7 +9782,8 @@ define([
 			remover = addListeners(_xhr, dfd, response);
 		}
 
-		var data = options.data,
+		// IE11 treats data: undefined different than other browsers
+		var data = typeof(options.data) === 'undefined' ? null : options.data,
 			async = !options.sync,
 			method = options.method;
 
@@ -10013,17 +10042,20 @@ define(["../has", "require"],
 		function(has, require){
 
 "use strict";
-var testDiv = document.createElement("div");
-has.add("dom-qsa2.1", !!testDiv.querySelectorAll);
-has.add("dom-qsa3", function(){
-			// test to see if we have a reasonable native selector engine available
-			try{
-				testDiv.innerHTML = "<p class='TEST'></p>"; // test kind of from sizzle
-				// Safari can't handle uppercase or unicode characters when
-				// in quirks mode, IE8 can't handle pseudos like :empty
-				return testDiv.querySelectorAll(".TEST:empty").length == 1;
-			}catch(e){}
-		});
+if (typeof document !== "undefined") {
+	var testDiv = document.createElement("div");
+	has.add("dom-qsa2.1", !!testDiv.querySelectorAll);
+	has.add("dom-qsa3", function(){
+		// test to see if we have a reasonable native selector engine available
+		try{
+			testDiv.innerHTML = "<p class='TEST'></p>"; // test kind of from sizzle
+			// Safari can't handle uppercase or unicode characters when
+			// in quirks mode, IE8 can't handle pseudos like :empty
+			return testDiv.querySelectorAll(".TEST:empty").length == 1;
+		}catch(e){}
+	});
+}
+
 var fullEngine;
 var acme = "./acme", lite = "./lite";
 return {
@@ -10031,6 +10063,15 @@ return {
 	//		This module handles loading the appropriate selector engine for the given browser
 
 	load: function(id, parentRequire, loaded, config){
+		if (config && config.isBuild) {
+			//Indicate that the optimizer should not wait
+			//for this resource any more and complete optimization.
+			//This resource will be resolved dynamically during
+			//run time in the web browser.
+			loaded();
+			return;
+		}
+
 		var req = require;
 		// here we implement the default logic for choosing a selector engine
 		id = id == "default" ? has("config-selectorEngine") || "css3" : id;
@@ -10401,6 +10442,7 @@ define(["./kernel", "../has", "./lang"], function(dojo, has, lang){
 		xtor, counter = 0, cname = "constructor";
 
 	if(!has("csp-restrictions")){
+		// 'new Function()' is preferable when available since it does not create a closure
 		xtor = new Function;
 	}else{
 		xtor = function(){};
@@ -11176,7 +11218,12 @@ define(["./kernel", "../has", "./lang"], function(dojo, has, lang){
 				t = bases[i];
 				(t._meta ? mixOwn : mix)(proto, t.prototype);
 				// chain in new constructor
-				ctor = new Function;
+				if (has("csp-restrictions")) {
+					ctor = function () {};
+				}
+				else {
+					ctor = new Function;
+				}
 				ctor.superclass = superclass;
 				ctor.prototype = proto;
 				superclass = proto.constructor = ctor;
@@ -11202,6 +11249,10 @@ define(["./kernel", "../has", "./lang"], function(dojo, has, lang){
 		}
 		if(proto["-chains-"]){
 			chains = mix(chains || {}, proto["-chains-"]);
+		}
+
+		if(superclass && superclass.prototype && superclass.prototype["-chains-"]) {
+			chains = mix(chains || {}, superclass.prototype["-chains-"]);
 		}
 
 		// build ctor
@@ -12167,29 +12218,9 @@ define(["./sniff", "./_base/window","./dom", "./dom-style"],
 		node = dom.byId(node);
 		var s = computedStyle || style.getComputedStyle(node), me = geom.getMarginExtents(node, s),
 			l = node.offsetLeft - me.l, t = node.offsetTop - me.t, p = node.parentNode, px = style.toPixelValue, pcs;
-		if(has("mozilla")){
-			// Mozilla:
-			// If offsetParent has a computed overflow != visible, the offsetLeft is decreased
-			// by the parent's border.
-			// We don't want to compute the parent's style, so instead we examine node's
-			// computed left/top which is more stable.
-			var sl = parseFloat(s.left), st = parseFloat(s.top);
-			if(!isNaN(sl) && !isNaN(st)){
-				l = sl;
-				t = st;
-			}else{
-				// If child's computed left/top are not parseable as a number (e.g. "auto"), we
-				// have no choice but to examine the parent's computed style.
-				if(p && p.style){
-					pcs = style.getComputedStyle(p);
-					if(pcs.overflow != "visible"){
-						l += pcs.borderLeftStyle != none ? px(node, pcs.borderLeftWidth) : 0;
-						t += pcs.borderTopStyle != none ? px(node, pcs.borderTopWidth) : 0;
-					}
-				}
-			}
-		}else if(has("opera") || (has("ie") == 8 && !has("quirks"))){
-			// On Opera and IE 8, offsetLeft/Top includes the parent's border
+
+		if((has("ie") == 8 && !has("quirks"))){
+			// IE 8 offsetLeft/Top includes the parent's border
 			if(p){
 				pcs = style.getComputedStyle(p);
 				l -= pcs.borderLeftStyle != none ? px(node, pcs.borderLeftWidth) : 0;
@@ -12217,20 +12248,26 @@ define(["./sniff", "./_base/window","./dom", "./dom-style"],
 		// fallback to offsetWidth/Height for special cases (see #3378)
 		node = dom.byId(node);
 		var s = computedStyle || style.getComputedStyle(node), w = node.clientWidth, h,
-			pe = geom.getPadExtents(node, s), be = geom.getBorderExtents(node, s);
+			pe = geom.getPadExtents(node, s), be = geom.getBorderExtents(node, s), l = node.offsetLeft + pe.l + be.l,
+			t = node.offsetTop + pe.t + be.t;
 		if(!w){
-			w = node.offsetWidth;
-			h = node.offsetHeight;
+			w = node.offsetWidth - be.w;
+			h = node.offsetHeight - be.h;
 		}else{
 			h = node.clientHeight;
-			be.w = be.h = 0;
 		}
-		// On Opera, offsetLeft includes the parent's border
-		if(has("opera")){
-			pe.l += be.l;
-			pe.t += be.t;
+
+		if((has("ie") == 8 && !has("quirks"))){
+			// IE 8 offsetLeft/Top includes the parent's border
+			var p = node.parentNode, px = style.toPixelValue, pcs;
+			if(p){
+				pcs = style.getComputedStyle(p);
+				l -= pcs.borderLeftStyle != none ? px(node, pcs.borderLeftWidth) : 0;
+				t -= pcs.borderTopStyle != none ? px(node, pcs.borderTopWidth) : 0;
+			}
 		}
-		return {l: pe.l, t: pe.t, w: w - pe.w - be.w, h: h - pe.h - be.h};
+
+		return {l: l, t: t, w: w - pe.w, h: h - pe.h};
 	};
 
 	// Box setters depend on box context because interpretation of width/height styles
@@ -12548,7 +12585,7 @@ define(["./sniff", "./_base/window","./dom", "./dom-style"],
 
 },
 'dojo/dom-style':function(){
-define(["./sniff", "./dom"], function(has, dom){
+define(["./sniff", "./dom", "./_base/window"], function(has, dom, win){
 	// module:
 	//		dojo/dom-style
 
@@ -12595,8 +12632,12 @@ define(["./sniff", "./dom"], function(has, dom){
 		};
 	}else{
 		getComputedStyle = function(node){
-			return node.nodeType == 1 /* ELEMENT_NODE*/ ?
-				node.ownerDocument.defaultView.getComputedStyle(node, null) : {};
+			if(node.nodeType === 1 /* ELEMENT_NODE*/){
+				var dv = node.ownerDocument.defaultView,
+					w = dv.opener ? dv : win.global.window;
+				return w.getComputedStyle(node, null);
+			}
+			return {};
 		};
 	}
 	style.getComputedStyle = getComputedStyle;

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"CalendarFx.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,yBAAP,CAAkC,CACjC,mBADiC,CAEjC,oBAFiC,CAGjC,mBAHiC,CAIjC,cAJiC,CAAlC,CAKG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAkBC,CAAlB,CAAmCC,CAAnC,CAA8C,CACxDH,CAAAI,aAAA,CAAoB,yBAApB,CAEA,OAAOH,EAAA,CAAQ,yBAAR,CAAmC,CAACC,CAAD,CAAkBC,CAAlB,CAAnC,CAAkE,EAAlE,CAHiD,CALzD;",
+"sources":["CalendarFx.js.uncompressed.js"],
+"names":["define","kernel","declare","CalendarFisheye","_FisheyeFX","experimental"]
+}

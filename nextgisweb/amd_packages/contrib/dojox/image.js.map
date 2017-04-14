@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"image.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,aAAP,CAAsB,CAAC,eAAD,CAAtB,CAAyC,QAAQ,CAACC,CAAD,CAAO,CAQvD,MAAOA,EARgD,CAAxD;",
+"sources":["image.js.uncompressed.js"],
+"names":["define","image"]
+}

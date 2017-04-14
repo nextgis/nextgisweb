@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_static.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,mCAAP,CAA4C,CAAC,OAAD,CAAU,QAAV,CAAoB,UAApB,CAA5C,CAA6E,QAAQ,EAAE,EAAvF;",
+"sources":["_static.js.uncompressed.js"],
+"names":["define"]
+}

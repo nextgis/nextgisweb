@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"AutoSource.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,qBAAP,CAA8B,CAAC,kBAAD,CAAqB,UAArB,CAA9B,CAAgE,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAiB,CACxF,MAAOD,EAAA,CAAQ,qBAAR,CAA+BC,CAA/B,CAAuC,CAI7CC,YAAaA,QAAQ,EAA8B,CAGlD,IAAAC,SAAA,CAAgB,CAAA,CAHkC,CAJN,CAAvC,CADiF,CAAzF;",
+"sources":["AutoSource.js.uncompressed.js"],
+"names":["define","declare","Source","constructor","autoSync"]
+}

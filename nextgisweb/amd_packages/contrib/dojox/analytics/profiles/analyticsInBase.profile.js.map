@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"analyticsInBase.profile.js",
+"lineCount":2,
+"mappings":"A;AAAAA,YAAA,CAAe,CACPC,OAAQ,CACA,CAEbC,KAAM,SAFO,CAGQF,aAAc,kUAAA,MAAA,CAAA,GAAA,CAHtB,CADA,CADD,CAmBdG,SAAU,CACK,CAAE,OAAF,CAAW,UAAX,CADL,CAEK,CAAE,OAAF,CAAW,UAAX,CAFL,CAnBI;",
+"sources":["analyticsInBase.profile.js.uncompressed.js"],
+"names":["dependencies","layers","name","prefixes"]
+}

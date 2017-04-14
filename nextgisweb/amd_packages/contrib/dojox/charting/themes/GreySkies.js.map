@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"GreySkies.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iCAAP,CAA0C,CAAC,gBAAD,CAAmB,UAAnB,CAA1C,CAA0E,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CACtGA,CAAAC,UAAA,CAAmB,IAAIF,CACvB,OAAOC,EAAAC,UAF+F,CAAvG;",
+"sources":["GreySkies.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","GreySkies"]
+}

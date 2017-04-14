@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/sl/ShowBlockNodes",({"showBlockNodes":"Pokaži elemente blokade HTML-ja "}));
+define("dojox/editor/plugins/nls/sl/ShowBlockNodes",{showBlockNodes:"Poka\u017ei elemente blokade HTML-ja "});
+//# sourceMappingURL=ShowBlockNodes.js.map

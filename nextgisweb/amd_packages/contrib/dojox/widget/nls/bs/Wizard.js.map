@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Wizard.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,4BAAP,CAAqC,CAErCC,KAAM,eAF+B,CAGrCC,SAAU,WAH2B,CAIrCC,KAAM,eAJ+B,CAArC;",
+"sources":["Wizard.js.uncompressed.js"],
+"names":["define","next","previous","done"]
+}

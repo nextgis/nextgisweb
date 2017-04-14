@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"BarGauge.js",
+"lineCount":2,
+"mappings":"A;AACAA,MAAA,CAAO,uBAAP,CAAgC,CAAC,MAAD,CAAQ,OAAR,CAAgB,OAAhB,CAAwB,8DAAxB,CAAhC,CAAyH,QAAQ,CAACC,CAAD,CAAMC,CAAN,CAAYC,CAAZ,CAAkB,CAEnJF,CAAAG,QAAA,CAAa,uBAAb,CACAH,EAAAI,QAAA,CAAa,2BAAb,CACAJ,EAAAI,QAAA,CAAa,uBAAb,CACAF,EAAAG,OAAAC,SAAA,CAAwBJ,CAAAK,OAAAD,SACxBJ,EAAAG,OAAAG,MAAAC,iBAAA,CAAsCP,CAAAK,OAAAE,iBAN6G,CAAnJ;",
+"sources":["BarGauge.js.uncompressed.js"],
+"names":["define","dojo","dijit","dojox","provide","require","widget","BarGauge","gauges","gauge","BarLineIndicator"]
+}

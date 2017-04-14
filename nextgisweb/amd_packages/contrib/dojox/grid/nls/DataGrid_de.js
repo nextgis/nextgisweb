@@ -1,2 +1,3 @@
 //>>built
-define("dojox/grid/nls/DataGrid_de",{"dijit/nls/loading":{"loadingState":"Wird geladen...","errorState":"Es ist ein Fehler aufgetreten.","_localized":{}}});
+define("dojox/grid/nls/DataGrid_de",{"dijit/nls/loading":{loadingState:"Wird geladen...",errorState:"Es ist ein Fehler aufgetreten.",_localized:{}}});
+//# sourceMappingURL=DataGrid_de.js.map

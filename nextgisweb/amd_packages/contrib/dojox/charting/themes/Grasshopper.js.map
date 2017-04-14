@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Grasshopper.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,mCAAP,CAA4C,CAAC,iBAAD,CAAmB,gBAAnB,CAAqC,UAArC,CAA5C,CAA8F,QAAQ,CAACC,CAAD,CAAOC,CAAP,CAAoBC,CAApB,CAA2B,CAChIA,CAAAC,YAAA,CAAqB,IAAIF,CAAJ,CAAgB,CACpCG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CAD4B,CAAhB,CASrB,OAAOF,EAAAC,YAVyH,CAAjI;",
+"sources":["Grasshopper.js.uncompressed.js"],
+"names":["define","lang","SimpleTheme","themes","Grasshopper","colors"]
+}

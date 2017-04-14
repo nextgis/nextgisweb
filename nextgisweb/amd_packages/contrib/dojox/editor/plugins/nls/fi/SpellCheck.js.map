@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"SpellCheck.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,wCADA,CAC2C,CAC1CC,YAAa,kBAD6B,CAE1CC,QAAS,eAFiC,CAG1CC,KAAM,OAHoC,CAI1CC,QAAS,cAJiC,CAK1CC,MAAO,2BALmC,CAM1CC,YAAa,YAN6B,CAO1CC,QAAS,QAPiC,CAQ1CC,YAAa,UAR6B,CAS1CC,WAAY,eAT8B,CAU1CC,OAAQ,SAVkC,CAW1CC,IAAK,yCAXqC,CAY1CC,MAAO,sBAZmC,CAa1CC,SAAU,0BAbgC,CAc1CC,KAAM,8BAdoC,CAD3C;",
+"sources":["SpellCheck.js.uncompressed.js"],
+"names":["define","widgetLabel","unfound","skip","skipAll","toDic","suggestions","replace","replaceWith","replaceAll","cancel","msg","iSkip","iSkipAll","iMsg"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"browser.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAGA,OAAAC,IAAH,EACCD,OAAAC,IAAAC,IAAA,CAAgB,uBAAhB,CAAyC,MAAzC,CAEDC,OAAA,CAAO,oBAAP,CAA6B,6FAAA,MAAA,CAAA,GAAA,CAA7B,CAWU,QAAQ,CAACC,CAAD,CAAM,CAYvB,MAAOA,EAZgB,CAXxB;",
+"sources":["browser.js.uncompressed.js"],
+"names":["require","has","add","define","dojo"]
+}

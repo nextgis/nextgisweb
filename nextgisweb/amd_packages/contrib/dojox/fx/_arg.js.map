@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_arg.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,eAAP,CAAwB,CAAC,iBAAD,CAAxB,CAA4C,QAAQ,CAACC,CAAD,CAAM,CACtDC,CAAAA,CAAQD,CAAAE,UAAA,CAAe,eAAf,CAA+B,CAAA,CAA/B,CACZD,EAAAE,UAAA,CAAkBC,QAAQ,CAAYC,CAAZ,CAAiB,CAO1C,IAAAC,KAAA,CAAYD,CAAAC,KACZ,KAAAC,SAAA,CAAgBF,CAAAE,SAR0B,CAW3CN,EAAAO,iBAAA,CAAyBC,QAAQ,CAAYJ,CAAZ,CAAiB,CAOjD,IAAAK,EAAA,CAASL,CAAAK,EACT,KAAAC,EAAA,CAASN,CAAAM,EARwC,CAUlD,OAAOV,EAvBmD,CAA1D;",
+"sources":["_arg.js.uncompressed.js"],
+"names":["define","lang","fxArg","getObject","StyleArgs","fxArg.StyleArgs","args","node","cssClass","ShadowResizeArgs","fxArg.ShadowResizeArgs","x","y"]
+}

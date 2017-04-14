@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"storage.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,eAAP,CAAwB,CAAC,mBAAD,CAAxB,CAA8C,QAAQ,EAAE,EAAxD;",
+"sources":["storage.js.uncompressed.js"],
+"names":["define"]
+}

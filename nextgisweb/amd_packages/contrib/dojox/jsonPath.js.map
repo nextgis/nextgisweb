@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"jsonPath.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gBAAP,CAAyB,CAAC,mBAAD,CACxB,kBADwB,CAAzB,CAEE,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAe,CAQxBD,CAAAE,WAAA,CAAkB,wFAAlB,CAA4G,EAA5G,CAAgH,KAAhH,CACA,OAAO,CAACD,MAAOA,CAAR,CATiB,CAFzB;",
+"sources":["jsonPath.js.uncompressed.js"],
+"names":["define","kernel","query","deprecated"]
+}

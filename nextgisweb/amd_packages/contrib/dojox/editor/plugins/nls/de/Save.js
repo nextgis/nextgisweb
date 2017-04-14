@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/de/Save",({"save":"Speichern"}));
+define("dojox/editor/plugins/nls/de/Save",{save:"Speichern"});
+//# sourceMappingURL=Save.js.map

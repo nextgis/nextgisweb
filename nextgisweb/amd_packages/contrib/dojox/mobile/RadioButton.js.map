@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"RadioButton.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,0BAAP,CAAmC,CAClC,oBADkC,CAElC,8BAFkC,CAGlC,YAHkC,CAAnC,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAA4BC,CAA5B,CAAqC,CAE/C,MAAOF,EAAA,CAAQ,0BAAR,CAAoC,CAACE,CAAD,CAAWD,CAAX,CAApC,CAAkE,CAQxEE,aAAc,IAR0D,CAYxEC,UAAW,gBAZ6D,CAAlE,CAFwC,CAJhD;",
+"sources":["RadioButton.js.uncompressed.js"],
+"names":["define","declare","RadioButtonMixin","CheckBox","_setTypeAttr","baseClass"]
+}

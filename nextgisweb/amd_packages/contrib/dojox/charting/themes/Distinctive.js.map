@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Distinctive.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,mCAAP,CAA4C,CAAC,gBAAD,CAAmB,UAAnB,CAA5C,CAA4E,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CACxGA,CAAAC,YAAA,CAAqB,IAAIF,CAAJ,CAAgB,CACpCG,OAAQ,iQAAA,MAAA,CAAA,GAAA,CAD4B,CAAhB,CAqCrB,OAAOF,EAAAC,YAtCiG,CAAzG;",
+"sources":["Distinctive.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","Distinctive","colors"]
+}

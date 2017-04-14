@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"router.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,aAAP,CAAsB,CACrB,qBADqB,CAAtB,CAEG,QAAQ,CAACC,CAAD,CAAY,CAwBtB,MAAO,KAAIA,CAAJ,CAAe,EAAf,CAxBe,CAFvB;",
+"sources":["router.js.uncompressed.js"],
+"names":["define","RouterBase"]
+}

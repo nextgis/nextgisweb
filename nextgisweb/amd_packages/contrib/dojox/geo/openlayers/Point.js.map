@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Point.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,4BAAP,CAAqC,CACpC,oBADoC,CAEpC,YAFoC,CAArC,CAGG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAmB,CAE7B,MAAOD,EAAA,CAAQ,4BAAR,CAAsCC,CAAtC,CAAgD,CAItDC,SAAUA,QAAQ,CAACC,CAAD,CAAG,CAKpB,IAAAC,YAAA,CAAmBD,CALC,CAJiC,CAYtDE,SAAUA,QAAQ,EAAE,CAKnB,MAAO,KAAAD,YALY,CAZkC,CAAhD,CAFsB,CAH9B;",
+"sources":["Point.js.uncompressed.js"],
+"names":["define","declare","Geometry","setPoint","p","coordinates","getPoint"]
+}

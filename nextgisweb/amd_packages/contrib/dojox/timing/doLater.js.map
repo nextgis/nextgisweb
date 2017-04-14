@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"doLater.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,sBAAP,CAA+B,CAAC,SAAD,CAA/B,CAA4C,QAAQ,CAACC,CAAD,CAAK,CACxDC,IAAAC,aAAA,CAAkB,sBAAlB,CAEAF,EAAAG,QAAA,CAAcC,QAAQ,CAAaC,CAAb,CAAqCC,CAArC,CAA4DC,CAA5D,CAAqE,CA2B1F,GAAGF,CAAH,CAAiB,MAAO,CAAA,CA3BkE,KA4BtFG,EAAWR,CAAAG,QAAAM,OA5B2E,CA6BzFC,EAAOV,CAAAG,QAAAM,OAAAE,UAERL,EAAA,CAAUA,CAAV,EAAqBL,IAAAW,OAErBC,WAAA,CAAW,QAAQ,EAAE,CACpBL,CAAAM,MAAA,CAAeR,CAAf,CAAwBI,CAAxB,CADoB,CAArB,CAHWH,CAGX,EAHuB,GAGvB,CAGA,OAAO,CAAA,CApCmF,CAsC3F,OAAOP,EAAAG,QAzCiD,CAAzD;",
+"sources":["doLater.js.uncompressed.js"],
+"names":["define","dxt","dojo","experimental","doLater","dxt.doLater","conditional","context","interval","callback","caller","args","arguments","global","setTimeout","apply"]
+}

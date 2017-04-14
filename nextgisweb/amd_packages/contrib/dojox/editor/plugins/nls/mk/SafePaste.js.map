@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"SafePaste.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,uCAAP,CAAgD,CAE/C,aAAgB,ypDAF+B,CAAhD;",
+"sources":["SafePaste.js.uncompressed.js"],
+"names":["define"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Rating.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,0BAAP,CAAmC,CAClC,oBADkC,CAElC,gBAFkC,CAGlC,UAHkC,CAAnC,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAoBC,CAApB,CAAyB,CAKnC,MAAOF,EAAA,CAAQ,IAAR,CAAc,CAEpBG,oBAAoBA,QAAQ,CAAWC,CAAX,CAAkB,CAC7CH,CAAAI,IAAA,CAAaD,CAAb,CAAqBF,CAAAI,IAAA,CAAS,CAAC,QAAQ,OAAT,CAAT,CAA4B,CAACC,UAAU,YAAX,CAA5B,CAArB,CACA,OAAOH,EAFsC,CAF1B,CAAd,CAL4B,CAJpC;",
+"sources":["Rating.js.uncompressed.js"],
+"names":["define","declare","domStyle","css3","_setCustomTransform","parent","set","add","transform"]
+}

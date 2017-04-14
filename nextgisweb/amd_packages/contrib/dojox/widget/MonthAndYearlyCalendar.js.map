@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"MonthAndYearlyCalendar.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,qCAAP,CAA8C,CAC7C,oBAD6C,CAE7C,iBAF6C,CAG7C,sBAH6C,CAA9C,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAyBC,CAAzB,CAA4C,CACtD,MAAOF,EAAA,CAAQ,qCAAR,CAA+C,CAACC,CAAD,CAAgBC,CAAhB,CAA/C,CAAoF,EAApF,CAD+C,CAJvD;",
+"sources":["MonthAndYearlyCalendar.js.uncompressed.js"],
+"names":["define","declare","_CalendarBase","_CalendarMonthYear"]
+}

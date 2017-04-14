@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Grasslands.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,kCAAP,CAA2C,CAAC,gBAAD,CAAmB,UAAnB,CAA3C,CAA2E,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CAGvGA,CAAAC,WAAA,CAAoB,IAAIF,CAAJ,CAAgB,CACnCG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CAD2B,CAAhB,CASpB,OAAOF,EAAAC,WAZgG,CAAxG;",
+"sources":["Grasslands.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","Grasslands","colors"]
+}

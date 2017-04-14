@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"TabBarButton.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gCAAP,CAAyC,CACxC,oBADwC,CAExC,UAFwC,CAGxC,gBAHwC,CAAzC,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkBC,CAAlB,CAA2B,CAKrC,MAAOF,EAAA,CAAQ,IAAR,CAAc,CAMpBG,cAAeA,QAAQ,CAAYC,CAAZ,CAAiB,CACvC,IAAAC,UAAA,CAAeC,SAAf,CACA,KAAAC,SAAAC,WAAA,CAAyB,IAAAC,QAAzB,CAFuC,CANpB,CAUpBC,SAAUA,QAAQ,CAACC,CAAD,CAAOC,CAAP,CAAS,CAC1B,IAAAP,UAAA,CAAeC,SAAf,CAEG,KAAAO,YAAH,EAAwB,CAAA,IAAAC,cAAA,EAAxB,GACCZ,CAAAa,OAAA,CAAgB,IAAAF,YAAhB,CAAkC,yBAAlC,CACA,CAAAX,CAAAc,IAAA,CAAa,IAAAH,YAAb,CAA+B,4BAA/B,CAFD,CAH0B,CAVP,CAAd,CAL8B,CAJtC;",
+"sources":["TabBarButton.js.uncompressed.js"],
+"names":["define","declare","common","domClass","_setBadgeAttr","text","inherited","arguments","badgeObj","setTextDir","textDir","_setIcon","icon","n","iconDivNode","isLeftToRight","remove","add"]
+}

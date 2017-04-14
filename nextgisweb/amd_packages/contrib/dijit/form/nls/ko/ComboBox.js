@@ -1,2 +1,3 @@
 //>>built
-define("dijit/form/nls/ko/ComboBox",({previousMessage:"이전 선택사항",nextMessage:"기타 선택사항"}));
+define("dijit/form/nls/ko/ComboBox",{previousMessage:"\uc774\uc804 \uc120\ud0dd\uc0ac\ud56d",nextMessage:"\uae30\ud0c0 \uc120\ud0dd\uc0ac\ud56d"});
+//# sourceMappingURL=ComboBox.js.map

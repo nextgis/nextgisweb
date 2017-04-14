@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"uuid.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,YAAP,CAAqB,CAAC,kBAAD,CAArB,CAA2C,QAAQ,CAACC,CAAD,CAAM,CASxD,MAAOA,EATiD,CAAzD;",
+"sources":["uuid.js.uncompressed.js"],
+"names":["define","uuid"]
+}

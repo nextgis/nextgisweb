@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"MarkersOnly.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,mCAAP,CAA4C,CAAC,oBAAD,CAAuB,WAAvB,CAA5C,CAAiF,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkB,CAE1G,MAAOD,EAAA,CAAQ,mCAAR,CAA6CC,CAA7C,CAAsD,CAG5DC,YAAaA,QAAQ,EAAE,CAGtB,IAAAC,IAAAC,MAAA,CAAmB,CAAA,CACnB,KAAAD,IAAAE,QAAA,CAAmB,CAAA,CAJG,CAHqC,CAAtD,CAFmG,CAA3G;",
+"sources":["MarkersOnly.js.uncompressed.js"],
+"names":["define","declare","Default","constructor","opt","lines","markers"]
+}

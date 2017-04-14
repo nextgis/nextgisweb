@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_DataBindingExtension.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iCAAP,CAA0C,CACzC,kBADyC,CAEzC,aAFyC,CAGzC,iBAHyC,CAIzC,mBAJyC,CAKzC,qBALyC,CAA1C,CAMG,QAAQ,CAACC,CAAD,CAAQC,CAAR,CAAgBC,CAAhB,CAAsBC,CAAtB,CAAkCC,CAAlC,CAAmD,CAG7DF,CAAAG,OAAA,CAAYF,CAAZ,CAA8C,IAAIC,CAAlD,CAGAH,EAAAK,OAAA,CAAcH,CAAAI,UAAd,CAAoC,SAApC,CAA+C,QAAQ,EAAE,CACxD,IAAAC,WAAA,EADwD,CAAzD,CAKAP,EAAAK,OAAA,CAAcH,CAAAI,UAAd,CAAoC,SAApC,CAA+C,QAAQ,EAAE,CACrD,IAAAE,mBAAH,EACCT,CAAAU,QAAA,CAAc,IAAAD,mBAAd,CAAuC,QAAQ,CAACE,CAAD,CAAG,CAAEA,CAAAC,QAAA,EAAF,CAAlD,CAEE,KAAAC,kBAAH,EACCb,CAAAU,QAAA,CAAc,IAAAG,kBAAd,CAAsC,QAAQ,CAACF,CAAD,CAAG,CAAEA,CAAAC,QAAA,EAAF,CAAjD,CALuD,CAAzD,CAX6D,CAN9D;",
+"sources":["_DataBindingExtension.js.uncompressed.js"],
+"names":["define","array","aspect","lang","WidgetBase","DataBindingMixin","extend","before","prototype","_dbstartup","_modelWatchHandles","forEach","h","unwatch","_viewWatchHandles"]
+}

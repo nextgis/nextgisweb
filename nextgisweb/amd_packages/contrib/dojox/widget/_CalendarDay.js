@@ -1,6 +1,3 @@
 //>>built
-define("dojox/widget/_CalendarDay",["dojo/_base/declare","./_CalendarDayView"],function(_1,_2){
-return _1("dojox.widget._CalendarDay",null,{parent:null,constructor:function(){
-this._addView(_2);
-}});
-});
+define("dojox/widget/_CalendarDay",["dojo/_base/declare","./_CalendarDayView"],function(a,b){return a("dojox.widget._CalendarDay",null,{parent:null,constructor:function(){this._addView(b)}})});
+//# sourceMappingURL=_CalendarDay.js.map

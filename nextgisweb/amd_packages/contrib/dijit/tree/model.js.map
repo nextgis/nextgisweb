@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"model.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,kBAAP,CAA2B,CAAC,oBAAD,CAA3B,CAAmD,QAAQ,CAACC,CAAD,CAAS,CAEnE,MAAOA,EAAA,CAAQ,kBAAR,CAA4B,IAA5B,CAAkC,CAUxCC,QAASA,QAAQ,EAAE,EAVqB,CAoBxCC,QAASA,QAAQ,CAACC,CAAD,CAAQ,EApBe,CA4BxCC,gBAAiBA,QAAQ,CAACC,CAAD,CAAM,EA5BS,CAuCxCC,YAAaA,QAAQ,CAACC,CAAD,CAAaC,CAAb,CAAwB,EAvCL,CAoDxCC,OAAQA,QAAQ,CAACC,CAAD,CAAW,EApDa,CA6DxCC,YAAaA,QAAQ,CAACN,CAAD,CAAM,EA7Da,CAoExCO,SAAUA,QAAQ,CAACP,CAAD,CAAM,EApEgB,CA8ExCQ,QAASA,QAAQ,CAACC,CAAD,CAAOC,CAAP,CAAeC,CAAf,CAA4BC,CAA5B,CAAmC,EA9EZ,CA2FxCC,UAAWA,QAAQ,CAACC,CAAD,CAAYC,CAAZ,CAA2BC,CAA3B,CAA0CC,CAA1C,CAAiDN,CAAjD,CAA8DC,CAA9D,CAAqE,EA3FhD,CAgHxCM,SAAUA,QAAQ,CAAClB,CAAD,CAAM,EAhHgB,CA2HxCmB,iBAAkBA,QAAQ,CAACT,CAAD,CAASU,CAAT,CAAyB,EA3HX,CAAlC,CAF4D,CAApE;",
+"sources":["model.js.uncompressed.js"],
+"names":["define","declare","destroy","getRoot","onItem","mayHaveChildren","item","getChildren","parentItem","onComplete","isItem","something","getIdentity","getLabel","newItem","args","parent","insertIndex","before","pasteItem","childItem","oldParentItem","newParentItem","bCopy","onChange","onChildrenChange","newChildrenList"]
+}

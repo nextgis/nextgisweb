@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"japanese.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CACA,8BADA,CAEA,CACC,mBAAoB,eADrB,CAEC,oBAAqB,WAFtB,CAGC,kBAAmB,YAHpB,CAIC,kBAAmB,OAJpB,CAKC,kBAAmB,kBALpB,CAFA;",
+"sources":["japanese.js.uncompressed.js"],
+"names":["define"]
+}

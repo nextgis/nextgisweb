@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_base.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,qBAAP,CAA8B,CAAC,MAAD,CAAS,qBAAT,CAAgC,WAAhC,CAA9B,CACI,QAAQ,CAACC,CAAD,CAAOC,CAAP,CAAUC,CAAV,CAAkB,CAC9BF,CAAAG,aAAA,CAAkB,eAAlB,CACA,OAAOD,EAFuB,CAD9B;",
+"sources":["_base.js.uncompressed.js"],
+"names":["define","dojo","L","Drawing","experimental"]
+}

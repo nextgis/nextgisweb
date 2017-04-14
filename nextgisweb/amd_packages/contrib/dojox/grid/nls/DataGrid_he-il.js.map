@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"DataGrid_he-il.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,+BAAP,CAAuC,CACvC,oBAAoB,CAAC,aAAe,yCAAhB,CAA4B,WAAa,+DAAzC,CAAuD,WAAa,EAApE,CADmB,CAAvC;",
+"sources":["DataGrid_he-il.js.uncompressed.js"],
+"names":["define"]
+}

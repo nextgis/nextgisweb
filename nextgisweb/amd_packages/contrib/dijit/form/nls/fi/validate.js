@@ -1,2 +1,3 @@
 //>>built
-define("dijit/form/nls/fi/validate",({invalidMessage:"Annettu arvo ei kelpaa.",missingMessage:"Tämä arvo on pakollinen.",rangeMessage:"Tämä arvo on sallitun alueen ulkopuolella."}));
+define("dijit/form/nls/fi/validate",{invalidMessage:"Annettu arvo ei kelpaa.",missingMessage:"T\u00e4m\u00e4 arvo on pakollinen.",rangeMessage:"T\u00e4m\u00e4 arvo on sallitun alueen ulkopuolella."});
+//# sourceMappingURL=validate.js.map

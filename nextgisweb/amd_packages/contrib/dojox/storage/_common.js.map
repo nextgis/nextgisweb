@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_common.js",
+"lineCount":3,
+"mappings":"A;AACAA,MAAA,CAAO,uBAAP,CAAgC,CAAC,MAAD,CAAQ,OAAR,CAAgB,OAAhB,CAAwB,kRAAxB,CAAhC,CAA6U,QAAQ,CAACC,CAAD,CAAMC,CAAN,CAAYC,CAAZ,CAAkB,CACvWF,CAAAG,QAAA,CAAa,uBAAb,CACAH,EAAAI,QAAA,CAAa,wBAAb,CACAJ,EAAAI,QAAA,CAAa,uBAAb,CAOAJ,EAAAI,QAAA,CAAa,oCAAb,CACAJ;CAAAI,QAAA,CAAa,oCAAb,CACAJ,EAAAI,QAAA,CAAa,qCAAb,CACAJ,EAAAI,QAAA,CAAa,oCAAb,CACAJ,EAAAI,QAAA,CAAa,uCAAb,CACAJ,EAAAI,QAAA,CAAa,qCAAb,CAIAF,EAAAG,QAAAC,QAAAC,WAAA,EAnBuW,CAAvW;",
+"sources":["_common.js.uncompressed.js"],
+"names":["define","dojo","dijit","dojox","provide","require","storage","manager","initialize"]
+}

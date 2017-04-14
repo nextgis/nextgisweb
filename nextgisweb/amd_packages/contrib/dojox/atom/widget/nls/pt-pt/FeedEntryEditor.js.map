@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"FeedEntryEditor.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,6CADA,CACgD,CAC/CC,MAAO,QADwC,CAE/CC,KAAM,UAFyC,CAG/CC,KAAM,WAHyC,CAI/CC,OAAQ,YAJuC,CADhD;",
+"sources":["FeedEntryEditor.js.uncompressed.js"],
+"names":["define","doNew","edit","save","cancel"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"common.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,8BAAP,CAAuC,CAAC,iBAAD,CAAvC,CAA4D,QAAQ,CAACC,CAAD,CAAM,CACzE,MAAOA,EAAAC,UAAA,CAAe,uBAAf,CAAwC,CAAA,CAAxC,CADkE,CAA1E;",
+"sources":["common.js.uncompressed.js"],
+"names":["define","lang","getObject"]
+}

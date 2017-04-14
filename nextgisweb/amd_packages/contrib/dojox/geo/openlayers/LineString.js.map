@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"LineString.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iCAAP,CAA0C,CACzC,oBADyC,CAEzC,YAFyC,CAA1C,CAGG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAmB,CAE7B,MAAOD,EAAA,CAAQ,iCAAR,CAA2CC,CAA3C,CAAqD,CAK3DC,UAAWA,QAAQ,CAACC,CAAD,CAAG,CAKrB,IAAAC,YAAA,CAAmBD,CALE,CALqC,CAa3DE,UAAWA,QAAQ,EAAE,CAKpB,MAAO,KAAAD,YALa,CAbsC,CAArD,CAFsB,CAH9B;",
+"sources":["LineString.js.uncompressed.js"],
+"names":["define","declare","Geometry","setPoints","p","coordinates","getPoints"]
+}

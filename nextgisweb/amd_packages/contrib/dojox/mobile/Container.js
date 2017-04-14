@@ -1,4 +1,3 @@
 //>>built
-define("dojox/mobile/Container",["dojo/_base/declare","dijit/_Container","./Pane"],function(_1,_2,_3){
-return _1("dojox.mobile.Container",[_3,_2],{baseClass:"mblContainer"});
-});
+define("dojox/mobile/Container",["dojo/_base/declare","dijit/_Container","./Pane"],function(a,b,c){return a("dojox.mobile.Container",[c,b],{baseClass:"mblContainer"})});
+//# sourceMappingURL=Container.js.map

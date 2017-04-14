@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_Calendar.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iBAAP,CAA0B,CACzB,mBADyB,CAEzB,YAFyB,CAGzB,QAHyB,CAA1B,CAIG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAmBC,CAAnB,CAAyB,CAYnCF,CAAAG,WAAA,CAAkB,+BAAlB,CAAmD,yCAAnD,CAA8F,CAA9F,CAIAD,EAAAE,UAAA,CAAkBH,CAhBiB,CAJpC;",
+"sources":["_Calendar.js.uncompressed.js"],
+"names":["define","kernel","Calendar","dijit","deprecated","_Calendar"]
+}

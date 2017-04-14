@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"TextColor.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,uCADA,CAC0C,CACzC,cAAiB,cADwB,CAEzC,iBAAoB,gCAFqB,CAD1C;",
+"sources":["TextColor.js.uncompressed.js"],
+"names":["define"]
+}

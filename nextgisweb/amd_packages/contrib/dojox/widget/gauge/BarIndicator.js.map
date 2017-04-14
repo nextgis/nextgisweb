@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"BarIndicator.js",
+"lineCount":2,
+"mappings":"A;AACAA,MAAA,CAAO,iCAAP,CAA0C,CAAC,MAAD,CAAQ,OAAR,CAAgB,OAAhB,CAAwB,wCAAxB,CAA1C,CAA6G,QAAQ,CAACC,CAAD,CAAMC,CAAN,CAAYC,CAAZ,CAAkB,CACvIF,CAAAG,QAAA,CAAa,iCAAb,CACAH,EAAAI,QAAA,CAAa,2BAAb,CAEAF,EAAAG,OAAAC,MAAAC,aAAA,CAAkCL,CAAAM,OAAAD,aAJqG,CAAvI;",
+"sources":["BarIndicator.js.uncompressed.js"],
+"names":["define","dojo","dijit","dojox","provide","require","widget","gauge","BarIndicator","gauges"]
+}

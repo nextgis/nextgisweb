@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"RequestTimeoutError.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,iCAAP,CAA0C,CAAC,UAAD,CAAa,gBAAb,CAA1C,CAA0E,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAsB,CAWvG,MAAOD,EAAA,CAAO,qBAAP,CAA8B,IAA9B,CAAoCC,CAApC,CAAkD,CACxDC,SAAU,SAD8C,CAAlD,CAXgG,CAAxG;",
+"sources":["RequestTimeoutError.js.uncompressed.js"],
+"names":["define","create","RequestError","dojoType"]
+}

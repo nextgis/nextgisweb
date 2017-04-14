@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Manager.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oBAAP,CAA6B,yOAAA,MAAA,CAAA,GAAA,CAA7B,CAYG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAwBC,CAAxB,CAAiDC,CAAjD,CAAyDC,CAAzD,CAAqEC,CAArE,CAAiFC,CAAjF,CAA8FC,CAA9F,CAA4GC,CAA5G,CAA2HC,CAA3H,CAAwIC,CAAxI,CAAgJ,CAE3J,MAAOA,EAAA,CAAQ,oBAAR,CAA8B,CAAEV,CAAF,CAAWE,CAAX,CAAoCD,CAApC,CAAkDE,CAAlD,CAA0DC,CAA1D,CAAsEC,CAAtE,CAAkFC,CAAlF,CAA+FC,CAA/F,CAA6GC,CAA7G,CAA4HC,CAA5H,CAA9B,CAAyK,CAU/KE,oBAAqB,CAAA,CAV0J,CAY/KC,eAAgBA,QAAQ,EAAE,CACrB,IAAAC,cAAJ,GAEC,IAAAA,cAFD,CAEsB,IAAAC,WAFtB,CAIA,KAAAC,UAAA,CAAeC,SAAf,CALyB,CAZqJ,CAAzK,CAFoJ,CAZ3J;",
+"sources":["Manager.js.uncompressed.js"],
+"names":["define","_Widget","_AttachMixin","_WidgetsInTemplateMixin","_Mixin","_NodeMixin","_FormMixin","_ValueMixin","_EnableMixin","_DisplayMixin","_ClassMixin","declare","searchContainerNode","buildRendering","containerNode","srcNodeRef","inherited","arguments"]
+}

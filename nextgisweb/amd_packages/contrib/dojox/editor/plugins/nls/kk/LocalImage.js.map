@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"LocalImage.js",
+"lineCount":3,
+"mappings":"A;AAAAA,MAAA,CACA,wCADA,CAC2C,CAC1CC,iBAAkB,mGADwB,CAE1CC,IAAK,gCAFqC,CAG1CC,OAAQ,6BAHkC,CAI1CC,KAAM,wDAJoC,CAK1CC,IAAK,wDALqC,CAM1CC,eAAgB,wKAN0B;AAO1CC,eAAgB,iLAP0B,CAQ1CC,kBAAmB,+KARuB,CAD3C;",
+"sources":["LocalImage.js.uncompressed.js"],
+"names":["define","insertImageTitle","url","browse","text","set","invalidMessage","prePopuTextUrl","prePopuTextBrowse"]
+}

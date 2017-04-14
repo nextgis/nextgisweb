@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"transition.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,yBAAP,CAAkC,CACjC,qBADiC,CAEjC,mBAFiC,CAAlC,CAGG,QAAQ,CAACC,CAAD,CAAWC,CAAX,CAAkB,CAU5B,GAAGA,CAAAC,kBAAH,CAA4B,CAE3B,IAAIC,EAAkB,IAAIH,CAC1BI,QAAA,CAAQ,CAACH,CAAAC,kBAAD,CAAR,CAAoC,QAAQ,CAACG,CAAD,CAAS,CACpDF,CAAAG,QAAA,CAAwBD,CAAxB,CADoD,CAArD,CAGA,OAAOF,EANoB,CAQ5B,MAAO,KAlBqB,CAH7B;",
+"sources":["transition.js.uncompressed.js"],
+"names":["define","Deferred","config","mblCSS3Transition","transitDeferred","require","transit","resolve"]
+}

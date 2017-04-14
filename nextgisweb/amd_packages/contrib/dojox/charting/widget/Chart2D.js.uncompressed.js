@@ -6560,13 +6560,15 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	//	|		markerSymbol:  "m-3,0 c0,-4 6,-4 6,0 m-6,0 c0,4 6,4 6,0",	// marker symbol
 	//	|		markerStroke:  {width: 1.5, color: "#333"},		// marker stroke
 	//	|		markerOutline: {width: 0.1, color: "#ccc"},		// marker outline
-	//	|		markerShadow: null,								// no marker shadow
-	//	|	}
+	//	|		markerShadow: null								// no marker shadow
+	//	|	},
+	//	|	pieInnerRadius: 33
 	//
 	// example:
 	//		Defining a new theme is pretty simple:
 	//	|	var Grasslands = new SimpleTheme({
-	//	|		colors: [ "#70803a", "#dde574", "#788062", "#b1cc5d", "#eff2c2" ]
+	//	|		colors: [ "#70803a", "#dde574", "#788062", "#b1cc5d", "#eff2c2" ],
+	//	|		pieInnerRadius: 15
 	//	|	});
 	//	|
 	//	|	myChart.setTheme(Grasslands);
@@ -6632,7 +6634,8 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 			markerThemes: this.markerThemes,
 			// flags
 			noGradConv: this.noGradConv,
-			noRadialConv: this.noRadialConv
+			noRadialConv: this.noRadialConv,
+			pieInnerRadius: this.pieInnerRadius
 		});
 		// copy custom methods
 		arr.forEach(
@@ -13119,60 +13122,60 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/sniff
 
 },
 'dojox/charting/plot2d/Pie':function(){
-define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare", 
+define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare", "dojo/dom-geometry", "dojo/_base/Color",
 		"./Base", "./_PlotEvents", "./common",
 		"dojox/gfx", "dojox/gfx/matrix", "dojox/lang/functional", "dojox/lang/utils","dojo/has"],
-	function(lang, arr, declare, Base, PlotEvents, dc, g, m, df, du, has){
+	function(lang, arr, declare, domGeom, Color, Base, PlotEvents, dc, g, m, df, du, has){
 
 	/*=====
 	declare("dojox.charting.plot2d.__PieCtorArgs", dojox.charting.plot2d.__DefaultCtorArgs, {
 		// summary:
 		//		Specialized keyword arguments object for use in defining parameters on a Pie chart.
-	
+
 		// labels: Boolean?
 		//		Whether or not to draw labels for each pie slice.  Default is true.
 		labels:			true,
-	
+
 		// ticks: Boolean?
 		//		Whether or not to draw ticks to labels within each slice. Default is false.
 		ticks:			false,
-	
+
 		// fixed: Boolean?
 		//		Whether a fixed precision must be applied to data values for display. Default is true.
 		fixed:			true,
-	
+
 		// precision: Number?
 		//		The precision at which to round data values for display. Default is 0.
 		precision:		1,
-	
+
 		// labelOffset: Number?
 		//		The amount in pixels by which to offset labels.  Default is 20.
 		labelOffset:	20,
-	
+
 		// labelStyle: String?
 		//		Options as to where to draw labels.  Values include "default", and "columns".	Default is "default".
 		labelStyle:		"default",	// default/columns
-		
+
 		// omitLabels: Boolean?
 		//		Whether labels of slices small to the point of not being visible are omitted.	Default false.
 		omitLabels: false,
-		
+
 		// htmlLabels: Boolean?
 		//		Whether or not to use HTML to render slice labels. Default is true.
 		htmlLabels:		true,
-	
+
 		// radGrad: String?
 		//		The type of radial gradient to use in rendering.  Default is "native".
 		radGrad:        "native",
-	
+
 		// fanSize: Number?
 		//		The amount for a radial gradient.  Default is 5.
 		fanSize:		5,
-	
+
 		// startAngle: Number?
 		//		Where to being rendering gradients in slices, in degrees.  Default is 0.
 		startAngle:     0,
-	
+
 		// radius: Number?
 		//		The size of the radial gradient.  Default is 0.
 		radius:		0,
@@ -13192,7 +13195,17 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 
 		// styleFunc: Function?
 		//		A function that returns a styling object for the a given data item.
-		styleFunc:	null
+		styleFunc:	null,
+
+		// innerRadius: Number?
+		//		The inner radius of a ring in percent (0-100).  If value < 0
+		//		then it is assumed to be pixels, not percent.
+		innerRadius:	0,
+
+		//  minWidth: Number?
+		//      The minimum width of a pie slice at its chord. The default is 10px.
+		minWidth:   10
+
 	});
 	=====*/
 
@@ -13209,9 +13222,12 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			labelOffset:	20,
 			labelStyle:		"default",	// default/columns
 			htmlLabels:		true,		// use HTML to draw labels
-			radGrad:        "native",	// or "linear", or "fan"
-			fanSize:		5,			// maximum fan size in degrees
-			startAngle:     0			// start angle for slices in degrees
+			radGrad:       "native",	// or "linear", or "fan"
+			fanSize:		   5,			// maximum fan size in degrees
+			startAngle:    0,			// start angle for slices in degrees
+			innerRadius:	0,			// inner radius in pixels
+			minWidth:      0,			// minimal width of degenerated slices
+			zeroDataMessage: ""     // The message to display when there is no data, if provided by the user.
 		},
 		optionalParams: {
 			radius:		0,
@@ -13237,7 +13253,10 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			this.axes = [];
 			this.run = null;
 			this.dyn = [];
-			this.runFilter = []; 
+			this.runFilter = [];
+			if(kwArgs && kwArgs.hasOwnProperty("innerRadius")){
+				this._plotSetInnerRadius = true;
+			}
 		},
 		clear: function(){
 			// summary:
@@ -13276,14 +13295,15 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			//		Return the number of colors needed to draw this plot.
 			return this.run ? this.run.data.length : 0;
 		},
+
 		render: function(dim, offsets){
-			// summary:
+			//	summary:
 			//		Render the plot on the chart.
-			// dim: Object
+			//	dim: Object
 			//		An object of the form { width, height }.
-			// offsets: Object
+			//	offsets: Object
 			//		An object of the form { l, r, t, b }.
-			// returns: dojox/charting/plot2d/Pie
+			//	returns: dojox/charting/plot2d/Pie
 			//		A reference to this plot for functional chaining.
 			if(!this.dirty){ return this; }
 			this.resetEvents();
@@ -13292,96 +13312,106 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			this.cleanGroup();
 			var s = this.group, t = this.chart.theme;
 
-			if(!this.run || !this.run.data.length){
-				return this;
+			if(!this._plotSetInnerRadius && t && t.pieInnerRadius){
+				this.opt.innerRadius = t.pieInnerRadius;
 			}
 
 			// calculate the geometry
 			var rx = (dim.width  - offsets.l - offsets.r) / 2,
 				ry = (dim.height - offsets.t - offsets.b) / 2,
 				r  = Math.min(rx, ry),
-				labelFont = "font" in this.opt ? this.opt.font : t.series.font,
-				size,
+				taFont = "font" in this.opt ? this.opt.font : t.axis.tick.titleFont || "",
+				size = taFont ? g.normalizedLength(g.splitFontString(taFont).size) : 0,
+				taFontColor = this.opt.hasOwnProperty("fontColor") ? this.opt.fontColor : t.axis.tick.fontColor,
 				startAngle = m._degToRad(this.opt.startAngle),
 				start = startAngle, filteredRun, slices, labels, shift, labelR,
+				run = this.run.data,
 				events = this.events();
 
-			var run = arr.map(this.run.data, function(item, i){
-				if(typeof item != "number" && item.hidden){ 
-					this.runFilter.push(i); 
-					item.hidden = false; 
-				} 
-				if(arr.some(this.runFilter, function(filter){return filter == i;})){ 
-					if(typeof item == "number"){ 
-						return 0; 
-					}else{ 
-						return {y: 0, text: item.text}; 
-					} 
-				}else{ 
-					return item; 
-				} 
-			}, this);
+			/* Added to handle no data case */
+			var noDataFunc = lang.hitch(this, function(){
+				var ct = t.clone();
+				var themes = df.map(run, function(v){
+					var tMixin = [this.opt, this.run];
+					if(v !== null && typeof v != "number"){
+						tMixin.push(v);
+					}
+					if(this.opt.styleFunc){
+						tMixin.push(this.opt.styleFunc(v));
+					}
+					return ct.next("slice", tMixin, true);
+				}, this);
 
-			this.dyn = [];
+				// Draw initial pie, with text in it noting 0 data.
+				if("radius" in this.opt){
+					r = this.opt.radius < r ? this.opt.radius : r;
+				}
 
-			if("radius" in this.opt){
-				r = this.opt.radius;
-				labelR = r - this.opt.labelOffset;
+				var circle = {
+					cx: offsets.l + rx,
+					cy: offsets.t + ry,
+					r:  r
+				};
+				var rColor = new Color(taFontColor);
+				// If we have a radius, we'll need to fade the ring some
+				if(this.opt.innerRadius){
+					rColor.a = 0.1;
+				}
+				var ring = this._createRing(s, circle).setStroke(rColor);
+				if(this.opt.innerRadius){
+					// If we have a radius, fill it with the faded color.
+					ring.setFill(rColor);
+				}
+				if(this.opt.zeroDataMessage){
+					this.renderLabel(s, circle.cx, circle.cy + size/3, this.opt.zeroDataMessage, {
+						series: {
+							font: taFont,
+							fontColor: taFontColor 
+						}
+					},	null, "middle");
+				}
+				this.dyn = [];
+				arr.forEach(run, function(item, i){
+					this.dyn.push({
+						fill: this._plotFill(themes[i].series.fill, dim, offsets),
+						stroke: themes[i].series.stroke});
+				}, this);
+			});
+			/* END Added to handle no data case */
+
+			// Draw over circle!
+			if(!this.run && !this.run.data.ength){
+				noDataFunc();
+				return this;
 			}
-			var	circle = {
-				cx: offsets.l + rx,
-				cy: offsets.t + ry,
-				r:  r
-			};
-
-			// draw shadow
-			if(this.opt.shadow || t.shadow){
-				var shadow = this.opt.shadow || t.shadow;
-				var scircle = lang.clone(circle);
-				scircle.cx += shadow.dx;
-				scircle.cy += shadow.dy;
-				s.createCircle(scircle).setFill(shadow.color).setStroke(shadow);
-			}
-			if(s.setFilter && (this.opt.filter || t.filter)){
-				s.createCircle(circle).setFill(t.series.stroke).setFilter(this.opt.filter || t.filter);
-			}
-
 			if(typeof run[0] == "number"){
 				filteredRun = df.map(run, "x ? Math.max(x, 0) : 0");
 				if(df.every(filteredRun, "<= 0")){
-					s.createCircle(circle).setStroke(t.series.stroke);
-					this.dyn = arr.map(filteredRun, function(){
-						return {  };
-					});
+					noDataFunc();
 					return this;
-				}else{
-					slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
-				 	if(this.opt.labels){
-				 		labels = arr.map(slices, function(x){
-							return x > 0 ? this._getLabel(x * 100) + "%" : "";
-						}, this);
-					}
+				}
+				slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
+				if(this.opt.labels){
+					labels = arr.map(slices, function(x){
+						return x > 0 ? this._getLabel(x * 100) + "%" : "";
+					}, this);
 				}
 			}else{
 				filteredRun = df.map(run, "x ? Math.max(x.y, 0) : 0");
-				if(df.every(filteredRun, "<= 0")){
-					s.createCircle(circle).setStroke(t.series.stroke);
-					this.dyn = arr.map(filteredRun, function(){
-						return {  };
-					});
+				if(!filteredRun.length || df.every(filteredRun, "<= 0")){
+					noDataFunc();
 					return this;
-				}else{
-					slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
-					if(this.opt.labels){
-						labels = arr.map(slices, function(x, i){
-							if(x < 0){ return ""; }
-							var v = run[i];
-							return "text" in v ? v.text : this._getLabel(x * 100) + "%";
-						}, this);
-					}
+				}
+				slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
+				if(this.opt.labels){
+					labels = arr.map(slices, function(x, i){
+						if(x <= 0){ return ""; }
+						var v = run[i];
+						return v.hasOwnProperty("text") ? v.text : this._getLabel(x * 100) + "%";
+					}, this);
 				}
 			}
-			var themes = df.map(run, function(v, i){
+			var themes = df.map(run, function(v){
 				var tMixin = [this.opt, this.run];
 				if(v !== null && typeof v != "number"){
 					tMixin.push(v);
@@ -13392,31 +13422,123 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 				return t.next("slice", tMixin, true);
 			}, this);
 
-			if(this.opt.labels){
-				size = labelFont ? g.normalizedLength(g.splitFontString(labelFont).size) : 0;
+			if(this.opt.labels) {
 				shift = df.foldl1(df.map(labels, function(label, i){
 					var font = themes[i].series.font;
 					return g._base._getTextBox(label, {font: font}).w;
 				}, this), "Math.max(a, b)") / 2;
+
 				if(this.opt.labelOffset < 0){
 					r = Math.min(rx - 2 * shift, ry - size) + this.opt.labelOffset;
 				}
-				labelR = r - this.opt.labelOffset;
+			}
+			if(this.opt.hasOwnProperty("radius")){
+				r = this.opt.radius < r * 0.9 ? this.opt.radius : r * 0.9;
 			}
 
+			if (this.opt.labels && this.opt.labelStyle == "columns") {
+				r = r / 2;
+				if (rx > ry && rx > r * 2) {
+					r *= rx / (r * 2);
+				}
+				if (r >= ry * 0.8) {
+					r = ry * 0.8;
+				}
+			} else {
+				if (r >= ry * 0.9) {
+					r = ry * 0.9;
+				}
+			}
+
+			labelR = r - this.opt.labelOffset;
+
+			var circle = {
+					cx: offsets.l + rx,
+					cy: offsets.t + ry,
+					r:  r
+				};
+
+			this.dyn = [];
 			// draw slices
 			var eventSeries = new Array(slices.length);
+
+			// Calulate primarily size for each slice
+			var slicesSteps = [], localStart = start;
+			var minWidth = this.opt.minWidth;
+			arr.forEach(slices, function(slice, i){
+				if(slice === 0){
+					slicesSteps[i] = {
+						step: 0,
+						end: localStart,
+						start: localStart,
+						weak: false
+					};
+					return;
+				}
+				var end = localStart + slice * 2 * Math.PI;
+				if(i === slices.length - 1){
+					end = startAngle + 2 * Math.PI;
+				}
+				var step = end - localStart,
+					dist = step * r;
+				slicesSteps[i] = {
+					step:  step,
+					start: localStart,
+					end:   end,
+					weak: dist < minWidth
+				};
+				localStart = end;
+			});
+
+			if(minWidth > 0){
+				var weakCount = 0, weakCoef = minWidth / r, oldWeakCoefSum = 0, i;
+				for(i = slicesSteps.length - 1; i >= 0; i--){
+					if(slicesSteps[i].weak){
+						++weakCount;
+						oldWeakCoefSum += slicesSteps[i].step;
+						slicesSteps[i].step = weakCoef;
+					}
+				}
+				// make sure that our steps are small enough
+				var weakCoefSum = weakCount * weakCoef;
+				if(weakCoefSum > Math.PI){
+					weakCoef = Math.PI / weakCount;
+					for(i = 0; i < slicesSteps.length; ++i){
+						if(slicesSteps[i].weak){
+							slicesSteps[i].step = weakCoef;
+						}
+					}
+					weakCoefSum = Math.PI;
+				}
+				// now let's redistribute percentage
+				if(weakCount > 0){
+					weakCoef = 1 - (weakCoefSum - oldWeakCoefSum) / 2 / Math.PI;
+					for(i = 0; i < slicesSteps.length; ++i){
+						if(!slicesSteps[i].weak){
+							slicesSteps[i].step = weakCoef * slicesSteps[i].step;
+						}
+					}
+				}
+				// now let's update start and end values
+				for(i = 0; i < slicesSteps.length; ++i){
+					slicesSteps[i].start = i ? slicesSteps[i].end : localStart;
+					slicesSteps[i].end = slicesSteps[i].start + slicesSteps[i].step;
+				}
+				// let's make sure that our last end is exactly 2 * Math.PI
+				for(i = slicesSteps.length - 1; i >= 0; --i){
+					if(slicesSteps[i].step !== 0){
+						slicesSteps[i].end = localStart + 2 * Math.PI;
+						break;
+					}
+				}
+			}
+
+			localStart = start;
+			var o, specialFill;
 			arr.some(slices, function(slice, i){
-				if(slice < 0){
-					// degenerated slice
-					return false;	// continue
-				}
-				var v = run[i], theme = themes[i], specialFill, o;
-				if(slice == 0){
-					this.dyn.push({fill: theme.series.fill, stroke: theme.series.stroke});
-					return false;
-				}
-				
+				var shape;
+				var v = run[i], theme = themes[i];
+
 				if(slice >= 1){
 					// whole pie
 					specialFill = this._plotFill(theme.series.fill, dim, offsets);
@@ -13426,7 +13548,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 							width: 2 * circle.r, height: 2 * circle.r
 						});
 					specialFill = this._pseudoRadialFill(specialFill, {x: circle.cx, y: circle.cy}, circle.r);
-					var shape = s.createCircle(circle).setFill(specialFill).setStroke(theme.series.stroke);
+					shape = this._createRing(s, circle).setFill(specialFill).setStroke(theme.series.stroke);
 					this.dyn.push({fill: specialFill, stroke: theme.series.stroke});
 
 					if(events){
@@ -13445,62 +13567,78 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 						eventSeries[i] = o;
 					}
 
-					return false;	// we continue because we want to collect null data points for legend
+					var k;
+					for(k = i + 1; k < slices.length; k++){
+						theme = themes[k];
+						this.dyn.push({fill: theme.series.fill, stroke: theme.series.stroke});
+					}
+					return true;	// stop iteration
 				}
+
+				if(slicesSteps[i].step === 0){
+					// degenerated slice
+					// But we still want a fill since this will be skipped and we need the fill
+					// for the label.
+					this.dyn.push({fill: theme.series.fill, stroke: theme.series.stroke});
+					return false;	// continue
+				}
+
 				// calculate the geometry of the slice
-				var end = start + slice * 2 * Math.PI;
-				if(i + 1 == slices.length){
-					end = startAngle + 2 * Math.PI;
-				}
-				var	step = end - start,
-					x1 = circle.cx + r * Math.cos(start),
-					y1 = circle.cy + r * Math.sin(start),
-					x2 = circle.cx + r * Math.cos(end),
-					y2 = circle.cy + r * Math.sin(end);
+				var step = slicesSteps[i].step,
+					x1 = circle.cx + r * Math.cos(localStart),
+					y1 = circle.cy + r * Math.sin(localStart),
+					x2 = circle.cx + r * Math.cos(localStart + step),
+					y2 = circle.cy + r * Math.sin(localStart + step);
 				// draw the slice
-				var fanSize = m._degToRad(this.opt.fanSize);
+				var fanSize = m._degToRad(this.opt.fanSize), stroke;
 				if(theme.series.fill && theme.series.fill.type === "radial" && this.opt.radGrad === "fan" && step > fanSize){
 					var group = s.createGroup(), nfans = Math.ceil(step / fanSize), delta = step / nfans;
 					specialFill = this._shapeFill(theme.series.fill,
 						{x: circle.cx - circle.r, y: circle.cy - circle.r, width: 2 * circle.r, height: 2 * circle.r});
-					for(var j = 0; j < nfans; ++j){
-						var fansx = j == 0 ? x1 : circle.cx + r * Math.cos(start + (j - FUDGE_FACTOR) * delta),
-							fansy = j == 0 ? y1 : circle.cy + r * Math.sin(start + (j - FUDGE_FACTOR) * delta),
-							fanex = j == nfans - 1 ? x2 : circle.cx + r * Math.cos(start + (j + 1 + FUDGE_FACTOR) * delta),
-							faney = j == nfans - 1 ? y2 : circle.cy + r * Math.sin(start + (j + 1 + FUDGE_FACTOR) * delta);
-						group.createPath().
-								moveTo(circle.cx, circle.cy).
-								lineTo(fansx, fansy).
-								arcTo(r, r, 0, delta > Math.PI, true, fanex, faney).
-								lineTo(circle.cx, circle.cy).
-								closePath().
-								setFill(this._pseudoRadialFill(specialFill, {x: circle.cx, y: circle.cy}, r, start + (j + 0.5) * delta, start + (j + 0.5) * delta));
+					var j, alpha, beta, fansx, fansy, fanex, faney;
+					for(j = 0; j < nfans; ++j){
+						alpha = localStart + (j - FUDGE_FACTOR) * delta;
+						beta  = localStart + (j + 1 + FUDGE_FACTOR) * delta;
+						fansx = j == 0 ? x1 : circle.cx + r * Math.cos(alpha);
+						fansy = j == 0 ? y1 : circle.cy + r * Math.sin(alpha);
+						fanex = j == nfans - 1 ? x2 : circle.cx + r * Math.cos(beta);
+						faney = j == nfans - 1 ? y2 : circle.cy + r * Math.sin(beta);
+						this._createSlice(group, circle, r, fansx, fansy, fanex, faney, alpha, delta).
+							setFill(this._pseudoRadialFill(specialFill, {x: circle.cx, y: circle.cy}, r,
+								localStart + (j + 0.5) * delta, localStart + (j + 0.5) * delta));
 					}
-					group.createPath().
-						moveTo(circle.cx, circle.cy).
-						lineTo(x1, y1).
-						arcTo(r, r, 0, step > Math.PI, true, x2, y2).
-						lineTo(circle.cx, circle.cy).
-						closePath().
-						setStroke(theme.series.stroke);
+					stroke = theme.series.stroke;
+					this._createSlice(group, circle, r, x1, y1, x2, y2, localStart, step).setStroke(stroke);
 					shape = group;
 				}else{
-					shape = s.createPath().
-						moveTo(circle.cx, circle.cy).
-						lineTo(x1, y1).
-						arcTo(r, r, 0, step > Math.PI, true, x2, y2).
-						lineTo(circle.cx, circle.cy).
-						closePath().
-						setStroke(theme.series.stroke);
+					stroke = theme.series.stroke;
+
+					shape = this._createSlice(s, circle, r, x1, y1, x2, y2, localStart, step).setStroke(stroke);
+
 					specialFill = theme.series.fill;
 					if(specialFill && specialFill.type === "radial"){
 						specialFill = this._shapeFill(specialFill, {x: circle.cx - circle.r, y: circle.cy - circle.r, width: 2 * circle.r, height: 2 * circle.r});
 						if(this.opt.radGrad === "linear"){
-							specialFill = this._pseudoRadialFill(specialFill, {x: circle.cx, y: circle.cy}, r, start, end);
+							specialFill = this._pseudoRadialFill(specialFill, {x: circle.cx, y: circle.cy}, r, localStart, localStart + step);
 						}
 					}else if(specialFill && specialFill.type === "linear"){
+						var bbox = lang.clone(shape.getBoundingBox());
+						if(g.renderer === "svg"){
+							// Try to fix the bounding box calculations for
+							// height.  Only really works for SVG.
+							var pos = {w: 0, h: 0};
+							try{
+								pos = domGeom.position(shape.rawNode);
+							}catch(ignore){}
+							if(pos.h > bbox.height){
+								bbox.height = pos.h;
+							}
+							if(pos.w > bbox.width){
+								bbox.width = pos.w;
+							}
+						}
 						specialFill = this._plotFill(specialFill, dim, offsets);
-						specialFill = this._shapeFill(specialFill, shape.getBoundingBox());
+						specialFill = this._shapeFill(specialFill, bbox);
 					}
 					shape.setFill(specialFill);
 				}
@@ -13522,17 +13660,18 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 					eventSeries[i] = o;
 				}
 
-				start = end;
+				localStart = localStart + step;
 
 				return false;	// continue
 			}, this);
 			// draw labels
 			if(this.opt.labels){
-				var isRtl = has("dojo-bidi") && this.chart.isRightToLeft(); 
-				if(this.opt.labelStyle == "default"){ // inside or outside based on labelOffset
+				var isRtl = has("dojo-bidi") && this.chart.isRightToLeft();
+				if(this.opt.labelStyle == "default"){
 					start = startAngle;
+					localStart = start;
 					arr.some(slices, function(slice, i){
-						if(slice <= 0){
+						if(slice <= 0 && !this.opt.minWidth){
 							// degenerated slice
 							return false;	// continue
 						}
@@ -13547,58 +13686,124 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 						if(i + 1 == slices.length){
 							end = startAngle + 2 * Math.PI;
 						}
+
 						if(this.opt.omitLabels && end-start < 0.001){
 							return false;	// continue
 						}
-						var	labelAngle = (start + end) / 2,
+
+						var labelAngle = localStart + (slicesSteps[i].step / 2),//(start + end) / 2,
 							x = circle.cx + labelR * Math.cos(labelAngle),
 							y = circle.cy + labelR * Math.sin(labelAngle) + size / 2;
 						// draw the label
 						this.renderLabel(s, isRtl ? dim.width - x : x, y, labels[i], theme, this.opt.labelOffset > 0);
+						localStart += slicesSteps[i].step;
 						start = end;
 						return false;	// continue
 					}, this);
 				}else if(this.opt.labelStyle == "columns"){
-					start = startAngle;
-					var omitLabels = this.opt.omitLabels;
 					//calculate label angles
-					var labeledSlices = [];
+					var omitLabels = this.opt.omitLabels;
+					start = startAngle;
+					localStart = start;
+					var labeledSlices = [],
+						significantCount = 0, k;
+					for(k = slices.length - 1; k >= 0; --k){
+						if(slices[k]){
+							++significantCount;
+						}
+					}
 					arr.forEach(slices, function(slice, i){
 						var end = start + slice * 2 * Math.PI;
 						if(i + 1 == slices.length){
 							end = startAngle + 2 * Math.PI;
 						}
-						var labelAngle = (start + end) / 2;
-						labeledSlices.push({
-							angle: labelAngle,
-							left: Math.cos(labelAngle) < 0,
-							theme: themes[i],
-							index: i,
-							omit: omitLabels?end - start < 0.001:false
-						});
-						start = end;
-					});
-					//calculate label radius to each slice
-					var labelHeight = g._base._getTextBox("a",{ font: labelFont }).h;
-					this._getProperLabelRadius(labeledSlices, labelHeight, circle.r * 1.1);
-					//draw label and wiring
-					arr.forEach(labeledSlices, function(slice, i){
-						if(!slice.omit){
-							var leftColumn = circle.cx - circle.r * 2,
-								rightColumn = circle.cx + circle.r * 2,
-								labelWidth = g._base._getTextBox(labels[i], {font: slice.theme.series.font}).w,
-								x = circle.cx + slice.labelR * Math.cos(slice.angle),
-								y = circle.cy + slice.labelR * Math.sin(slice.angle),
-								jointX = (slice.left) ? (leftColumn + labelWidth) : (rightColumn - labelWidth),
-								labelX = (slice.left) ? leftColumn : jointX;
-							var wiring = s.createPath().moveTo(circle.cx + circle.r * Math.cos(slice.angle), circle.cy + circle.r * Math.sin(slice.angle));
-							if(Math.abs(slice.labelR * Math.cos(slice.angle)) < circle.r * 2 - labelWidth){
-								wiring.lineTo(x, y);
+						if(this.minWidth === 0 ? end - start >= 0.001 : slice !== 0){
+							// var labelAngle = (start + end) / 2;
+							var labelAngle = localStart + (slicesSteps[i].step / 2);//(start + end) / 2,
+							if(significantCount === 1 && !this.opt.minWidth){
+								labelAngle = (start + end) / 2;
 							}
-							wiring.lineTo(jointX, y).setStroke(slice.theme.series.labelWiring);
-							this.renderLabel(s, isRtl ? dim.width - labelWidth - labelX : labelX, y, labels[i], slice.theme, false, "left");
+							labeledSlices.push({
+								angle: labelAngle,
+								left:  Math.cos(labelAngle) < 0,
+								theme: themes[i],
+								index: i,
+								omit: omitLabels? end - start < 0.001:false
+							});
 						}
-					},this);
+						start = end;
+						localStart += slicesSteps[i].step;
+					}, this);
+
+					//calculate label radius to each slice
+					var labelHeight = g._base._getTextBox("a", {font:taFont, whiteSpace: "nowrap"}).h;
+					this._getProperLabelRadius(labeledSlices, labelHeight, circle.r * 1.1);
+
+					//draw label and wiring
+					var leftColumn  = circle.cx - circle.r * 2,
+						rightColumn = circle.cx + circle.r * 2;
+					arr.forEach(labeledSlices, function(slice){
+						if(slice.omit){
+							return;
+						}
+						var cTheme = themes[slice.index], lrPadding = 0;
+						if(cTheme && cTheme.axis && cTheme.axis.tick && cTheme.axis.tick.labelGap){
+							// Try to pad the lable a bit, the same as a tick gap.
+							lrPadding = cTheme.axis.tick.labelGap;
+						}
+						var labelWidth = g._base._getTextBox(labels[slice.index],
+								{font: cTheme.series.font, whiteSpace: "nowrap", paddingLeft: lrPadding + "px"}).w,
+							x = circle.cx + slice.labelR * Math.cos(slice.angle),
+							y = circle.cy + slice.labelR * Math.sin(slice.angle),
+							jointX = (slice.left) ? (leftColumn + labelWidth) : (rightColumn - labelWidth),
+							labelX = (slice.left) ? leftColumn : jointX + lrPadding,
+							newRadius = circle.r,
+							wiring = s.createPath().moveTo(circle.cx + newRadius * Math.cos(slice.angle),
+								circle.cy + newRadius * Math.sin(slice.angle));
+						if(Math.abs(slice.labelR * Math.cos(slice.angle)) < circle.r * 2 - labelWidth){
+							wiring.lineTo(x, y);
+						}
+						wiring.lineTo(jointX, y).setStroke(slice.theme.series.labelWiring);
+						// Push the wiring to the back so that highlight/magnify actions don't bleed the wire.
+						wiring.moveToBack();
+						// Try to adjust the wiring position here.  The browser always adds a bit
+						// of padding on height, so divide by 3 instead of 2.
+						var mid = labelHeight/3 + y;
+						var elem = this.renderLabel(s, labelX, mid || 0, labels[slice.index], cTheme, false, "left");
+
+						if(events && !this.opt.htmlLabels){
+							var fontWidth  = g._base._getTextBox(labels[slice.index], {font: slice.theme.series.font}).w || 0,
+								fontHeight = g.normalizedLength(g.splitFontString(slice.theme.series.font).size);
+							o = {
+								element: "labels",
+								index:   slice.index,
+								run:     this.run,
+								shape:   elem,
+								x:       labelX,
+								y:       y,
+								label:   labels[slice.index]
+							};
+
+							var shp = elem.getShape(),
+								lt = domGeom.position(this.chart.node, true),
+								aroundRect = lang.mixin({ type : 'rect' }, {
+									x: shp.x,
+									y: shp.y - 2 * fontHeight
+								});
+
+							aroundRect.x += lt.x;
+							aroundRect.y += lt.y;
+							aroundRect.x = Math.round(aroundRect.x);
+							aroundRect.y = Math.round(aroundRect.y);
+							aroundRect.width  = Math.ceil(fontWidth);
+							aroundRect.height = Math.ceil(fontHeight);
+
+							o.aroundRect = aroundRect;
+
+							this._connectEvents(o);
+							eventSeries[slices.length + slice.index] = o;
+						}
+					}, this);
 				}
 			}
 			// post-process events to restore the original indexing
@@ -13606,63 +13811,115 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			this._eventSeries[this.run.name] = df.map(run, function(v){
 				return v <= 0 ? null : eventSeries[esi++];
 			});
+
 			// chart mirroring starts
 			if(has("dojo-bidi")){
 				this._checkOrientation(this.group, dim, offsets);
 			}
-			// chart mirroring ends
+
 			return this;	//	dojox/charting/plot2d/Pie
 		},
-		_getProperLabelRadius: function(slices, labelHeight, minRidius){
-			var leftCenterSlice, rightCenterSlice,
-				leftMinSIN = 1, rightMinSIN = 1;
+
+		_getProperLabelRadius: function(slices, labelHeight, minRadius){
 			if(slices.length == 1){
-				slices[0].labelR = minRidius;
+				slices[0].labelR = minRadius;
 				return;
 			}
-			for(var i = 0; i < slices.length; i++){
-				var tempSIN = Math.abs(Math.sin(slices[i].angle));
+			var leftCenterSlice = {}, rightCenterSlice = {}, leftMinSIN = 2, rightMinSIN = 2, i;
+			var tempSIN;
+			for(i = 0; i < slices.length; ++i){
+				tempSIN = Math.abs(Math.sin(slices[i].angle));
 				if(slices[i].left){
-					if(leftMinSIN >= tempSIN){
+					if(leftMinSIN > tempSIN){
 						leftMinSIN = tempSIN;
 						leftCenterSlice = slices[i];
 					}
 				}else{
-					if(rightMinSIN >= tempSIN){
+					if(rightMinSIN > tempSIN){
 						rightMinSIN = tempSIN;
 						rightCenterSlice = slices[i];
 					}
 				}
 			}
-			leftCenterSlice.labelR = rightCenterSlice.labelR = minRidius;
-			this._calculateLabelR(leftCenterSlice, slices, labelHeight);
-			this._calculateLabelR(rightCenterSlice, slices, labelHeight);
+			leftCenterSlice.labelR = rightCenterSlice.labelR = minRadius;
+			this._caculateLabelR(leftCenterSlice,  slices, labelHeight);
+			this._caculateLabelR(rightCenterSlice, slices, labelHeight);
 		},
-		_calculateLabelR: function(firstSlice, slices, labelHeight){
-			var i = firstSlice.index,length = slices.length,
-				currentLabelR = firstSlice.labelR, nextLabelR;
-			while(!(slices[i%length].left ^ slices[(i+1)%length].left)){
-				if(!slices[(i + 1) % length].omit){
-					nextLabelR = (Math.sin(slices[i % length].angle) * currentLabelR + ((slices[i % length].left) ? (-labelHeight) : labelHeight)) /
-					Math.sin(slices[(i + 1) % length].angle);
-					currentLabelR = (nextLabelR < firstSlice.labelR) ? firstSlice.labelR : nextLabelR;
-					slices[(i + 1) % length].labelR = currentLabelR;
-				}
-				i++;
+
+		_caculateLabelR: function(firstSlice, slices, labelHeight){
+			var i, j, k, length = slices.length, currentLabelR = firstSlice.labelR, nextLabelR,
+				step = slices[firstSlice.index].left ? -labelHeight : labelHeight;
+			for(k = 0, i = firstSlice.index, j = (i + 1) % length; k < length && slices[i].left === slices[j].left; ++k){
+				nextLabelR = (Math.sin(slices[i].angle) * currentLabelR + step) / Math.sin(slices[j].angle);
+				currentLabelR = Math.max(firstSlice.labelR, nextLabelR);
+				slices[j].labelR = currentLabelR;
+				i = (i + 1) % length;
+				j = (j + 1) % length;
 			}
-			i = firstSlice.index;
-			var j = (i == 0)?length-1 : i - 1;
-			while(!(slices[i].left ^ slices[j].left)){
-				if(!slices[j].omit){
-					nextLabelR = (Math.sin(slices[i].angle) * currentLabelR + ((slices[i].left) ? labelHeight : (-labelHeight))) /
-					Math.sin(slices[j].angle);
-					currentLabelR = (nextLabelR < firstSlice.labelR) ? firstSlice.labelR : nextLabelR;
-					slices[j].labelR = currentLabelR;
-				}
-				i--;j--;
-				i = (i < 0)?i+slices.length:i;
-				j = (j < 0)?j+slices.length:j;
+			if(k >= length){
+				slices[0].labelR = firstSlice.labelR;
 			}
+			for(k = 0, i = firstSlice.index, j = (i || length) - 1; k < length && slices[i].left === slices[j].left; ++k){
+				nextLabelR = (Math.sin(slices[i].angle) * currentLabelR - step) / Math.sin(slices[j].angle);
+				currentLabelR = Math.max(firstSlice.labelR, nextLabelR);
+				slices[j].labelR = currentLabelR;
+				i = (i || length) - 1;
+				j = (j || length) - 1;
+			}
+		},
+
+		_createRing: function(group, circle){
+			var r = this.opt.innerRadius;
+			if(r > 0){
+				// Percentage, use circle.  Anything < 0 for innerRadius
+				// is assumed to be a multiple of the radius.  So 0.25 innerRadius value
+				// is computed to be 25% of the outer radius.
+				r = circle.r * (r/100);
+			}else if(r < 0){
+				r = -r; // Assume it is pixels, fixed size hole.
+			}
+			if(r){
+				return group.createPath({}).setAbsoluteMode(true).
+					moveTo(circle.cx, circle.cy - circle.r).
+					arcTo(circle.r, circle.r, 0, false, true, circle.cx + circle.r, circle.cy).
+					arcTo(circle.r, circle.r, 0,  true, true, circle.cx, circle.cy - circle.r).
+					closePath().
+					moveTo(circle.cx, circle.cy - r).
+					arcTo(r, r, 0, false, true, circle.cx + r, circle.cy).
+					arcTo(r, r, 0,  true, true, circle.cx, circle.cy - r).
+					closePath();
+			}
+			return group.createCircle(circle);
+		},
+		_createSlice: function(group, circle, R, x1, y1, x2, y2, fromAngle, stepAngle){
+			var r = this.opt.innerRadius;
+			if(r > 0){
+				// Percentage, use circle.  Anything < 0 for innerRadius
+				// is assumed to be a multiple of the radius.  So 0.25 innerRadius value
+				// is computed to be 25% of the outer radius.
+				r = circle.r * (r/100);
+			}else if(r < 0){
+				r = -r; // Assume it is pixels, fixed size hole.
+			}
+			if(r){
+				var innerX1 = circle.cx + r * Math.cos(fromAngle),
+					innerY1 = circle.cy + r * Math.sin(fromAngle),
+					innerX2 = circle.cx + r * Math.cos(fromAngle + stepAngle),
+					innerY2 = circle.cy + r * Math.sin(fromAngle + stepAngle);
+				return group.createPath({}).setAbsoluteMode(true).
+					moveTo(innerX1, innerY1).
+					lineTo(x1, y1).
+					arcTo(R, R, 0, stepAngle > Math.PI, true, x2, y2).
+					lineTo(innerX2, innerY2).
+					arcTo(r, r, 0, stepAngle > Math.PI, false, innerX1, innerY1).
+					closePath();
+			}
+			return group.createPath({}).setAbsoluteMode(true).
+				moveTo(circle.cx, circle.cy).
+				lineTo(x1, y1).
+				arcTo(R, R, 0, stepAngle > Math.PI, true, x2, y2).
+				lineTo(circle.cx, circle.cy).
+				closePath();
 		}
 	});
 });
@@ -15089,7 +15346,7 @@ define([
 		//	|		]).play();
 		//	|	});
 		//
-		return new _chain(lang.isArray(animations) ? animations : Array.prototype.slice.call(arguments, 0)); // dojo/_base/fx.Animation
+		return new _chain(lang.isArray(animations) ? animations : Array.prototype.slice.call(animations, 0)); // dojo/_base/fx.Animation
 	};
 
 	var _combine = function(animations){
@@ -15199,7 +15456,7 @@ define([
 		//	|		anim.play(); // play the animation
 		//	|	});
 		//
-		return new _combine(lang.isArray(animations) ? animations : Array.prototype.slice.call(arguments, 0)); // dojo/_base/fx.Animation
+		return new _combine(lang.isArray(animations) ? animations : Array.prototype.slice.call(animations, 0)); // dojo/_base/fx.Animation
 	};
 
 	coreFx.wipeIn = function(/*Object*/ args){
@@ -17894,7 +18151,7 @@ define([
 			//		True if widget is LTR, false if widget is RTL.   Affects the behavior of "above" and "below"
 			//		positions slightly.
 			// example:
-			//	|	placeAroundNode(node, aroundNode, {'BL':'TL', 'TR':'BR'});
+			//	|	placeAroundNode(node, aroundNode, ['below', 'above-alt']);
 			//		This will try to position node such that node's top-left corner is at the same position
 			//		as the bottom left corner of the aroundNode (ie, put node below
 			//		aroundNode, with left edges aligned).	If that fails it will try to put
@@ -17947,7 +18204,7 @@ define([
 					}
 					parent = parent.parentNode;
 				}
-			}			
+			}
 
 			var x = aroundNodePos.x,
 				y = aroundNodePos.y,
@@ -20574,7 +20831,13 @@ string.substitute = function(	/*String*/		template,
 			if(format){
 				value = lang.getObject(format, false, thisObject).call(thisObject, value, key);
 			}
-			return transform(value, key).toString();
+			var result = transform(value, key);
+
+			if (typeof result === 'undefined') {
+				throw new Error('string.substitute could not find key "' + key + '" in template');
+			}
+
+			return result.toString();
 		}); // String
 };
 
@@ -20870,13 +21133,11 @@ define([
 	// Flag for whether to create background iframe behind popups like Menus and Dialog.
 	// A background iframe is useful to prevent problems with popups appearing behind applets/pdf files,
 	// and is also useful on older versions of IE (IE6 and IE7) to prevent the "bleed through select" problem.
-	// By default, it's enabled for IE6-10, excluding Windows Phone 8,
-	// and it's also enabled for IE11 on Windows 7 and Windows 2008 Server.
+	// By default, it's enabled for IE6-11, excluding Windows Phone 8.
 	// TODO: For 2.0, make this false by default.  Also, possibly move definition to has.js so that this module can be
 	// conditionally required via  dojo/has!bgIfame?dijit/BackgroundIframe
 	has.add("config-bgIframe",
-		(has("ie") && !/IEMobile\/10\.0/.test(navigator.userAgent)) || // No iframe on WP8, to match 1.9 behavior
-		(has("trident") && /Windows NT 6.[01]/.test(navigator.userAgent)));
+    	(has("ie") || has("trident")) && !/IEMobile\/10\.0/.test(navigator.userAgent)); // No iframe on WP8, to match 1.9 behavior
 
 	var _frames = new function(){
 		// summary:

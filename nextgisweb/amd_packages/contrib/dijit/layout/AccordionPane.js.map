@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"AccordionPane.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,4BAAP,CAAqC,CACpC,oBADoC,CAEpC,mBAFoC,CAGpC,eAHoC,CAArC,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkBC,CAAlB,CAA8B,CAKxC,MAAOF,EAAA,CAAQ,4BAAR,CAAsCE,CAAtC,CAAmD,CAMzDC,YAAaA,QAAQ,EAAE,CACtBF,CAAAG,WAAA,CAAkB,gEAAlB,CAAoF,EAApF,CAAwF,KAAxF,CADsB,CANkC,CAUzDC,WAAYA,QAAQ,EAAE,EAVmC,CAAnD,CALiC,CAJzC;",
+"sources":["AccordionPane.js.uncompressed.js"],
+"names":["define","declare","kernel","ContentPane","constructor","deprecated","onSelected"]
+}

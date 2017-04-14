@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"dndSource.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,uBAAP,CAAgC,CAC/B,mBAD+B,CAE/B,iBAF+B,CAG/B,mBAH+B,CAAhC,CAIG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAeC,CAAf,CAAyB,CAYnCF,CAAAG,WAAA,CAAkB,gFAAlB,CAAoG,EAApG,CAAwG,KAAxG,CAEAF,EAAAG,UAAA,CAAe,uBAAf,CAAwCF,CAAxC,CAdmC,CAJpC;",
+"sources":["dndSource.js.uncompressed.js"],
+"names":["define","kernel","lang","dndSource","deprecated","setObject"]
+}

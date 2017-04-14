@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/ja/Blockquote",({"blockquote":"引用"}));
+define("dojox/editor/plugins/nls/ja/Blockquote",{blockquote:"\u5f15\u7528"});
+//# sourceMappingURL=Blockquote.js.map

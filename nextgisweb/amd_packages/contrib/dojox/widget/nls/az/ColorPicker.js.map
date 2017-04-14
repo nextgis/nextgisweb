@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ColorPicker.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,iCADA,CACoC,CACnC,SAAa,GADsB,CAEnC,WAAe,GAFoB,CAGnC,SAAa,qBAHsB,CAInC,SAAa,QAJsB,CAKnC,gBAAoB,GALe,CAMnC,WAAe,GANoB,CAOnC,UAAc,GAPqB,CAQnC,sBAA0B,uBARS,CASnC,eAAmB,wBATgB,CAUnC,SAAa,QAVsB,CADpC;",
+"sources":["ColorPicker.js.uncompressed.js"],
+"names":["define"]
+}

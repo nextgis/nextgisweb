@@ -1,2 +1,3 @@
 //>>built
-define("dijit/form/nls/ca/Textarea",({iframeEditTitle:"àrea d'edició",iframeFocusTitle:"Marc de l'àrea d'edició"}));
+define("dijit/form/nls/ca/Textarea",{iframeEditTitle:"\u00e0rea d'edici\u00f3",iframeFocusTitle:"Marc de l'\u00e0rea d'edici\u00f3"});
+//# sourceMappingURL=Textarea.js.map

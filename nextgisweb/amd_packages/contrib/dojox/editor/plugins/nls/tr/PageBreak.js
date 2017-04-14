@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/tr/PageBreak",({"pageBreak":"Sayfa Sonu"}));
+define("dojox/editor/plugins/nls/tr/PageBreak",{pageBreak:"Sayfa Sonu"});
+//# sourceMappingURL=PageBreak.js.map

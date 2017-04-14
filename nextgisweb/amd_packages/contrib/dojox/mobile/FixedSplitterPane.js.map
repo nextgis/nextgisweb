@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"FixedSplitterPane.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gCAAP,CAAyC,CACxC,mBADwC,CAExC,oBAFwC,CAGxC,aAHwC,CAAzC,CAIG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAkBC,CAAlB,CAA4B,CAEtCF,CAAAG,WAAA,CAAkB,gCAAlB,CAAoD,oCAApD,CAA0F,CAA1F,CAKA,OAAOF,EAAA,CAAQ,gCAAR,CAA0CC,CAA1C,CAAqD,CAI3DE,UAAW,sBAJgD,CAArD,CAP+B,CAJvC;",
+"sources":["FixedSplitterPane.js.uncompressed.js"],
+"names":["define","kernel","declare","Container","deprecated","baseClass"]
+}

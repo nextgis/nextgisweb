@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"StackedLines.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oCAAP,CAA6C,CAAC,oBAAD,CAAuB,WAAvB,CAA7C,CAAkF,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkB,CAE3G,MAAOD,EAAA,CAAQ,oCAAR,CAA8CC,CAA9C,CAAuD,CAG7DC,YAAaA,QAAQ,EAAE,CAGtB,IAAAC,IAAAC,MAAA,CAAiB,CAAA,CAHK,CAHsC,CAAvD,CAFoG,CAA5G;",
+"sources":["StackedLines.js.uncompressed.js"],
+"names":["define","declare","Stacked","constructor","opt","lines"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ExpandingTextArea.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gCAAP,CAAyC,CACxC,oBADwC,CAExC,oCAFwC,CAGxC,YAHwC,CAAzC,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkCC,CAAlC,CAA2C,CAErD,MAAOF,EAAA,CAAQ,gCAAR,CAA0C,CAACE,CAAD,CAAWD,CAAX,CAA1C,CAA8E,CAapFE,UAAW,kCAbyE,CAA9E,CAF8C,CAJtD;",
+"sources":["ExpandingTextArea.js.uncompressed.js"],
+"names":["define","declare","ExpandingTextAreaMixin","TextArea","baseClass"]
+}

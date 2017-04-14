@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"request.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,cAAP,CAAuB,CACtB,oBADsB,CAAvB,CAIG,QAAQ,CAACC,CAAD,CAA0C,CA2EpD,MAAOA,EA3E6C,CAJrD;",
+"sources":["request.js.uncompressed.js"],
+"names":["define","request"]
+}

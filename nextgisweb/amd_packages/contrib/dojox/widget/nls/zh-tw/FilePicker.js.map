@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"FilePicker.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,mCADA,CACsC,CACrCC,KAAM,cAD+B,CAErCC,KAAM,cAF+B,CAGrCC,KAAM,2DAH+B,CADtC;",
+"sources":["FilePicker.js.uncompressed.js"],
+"names":["define","name","path","size"]
+}

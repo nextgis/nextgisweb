@@ -1,4 +1,3 @@
 //>>built
-define("dojox/timing",["./timing/_base"],function(_1){
-return _1;
-});
+define("dojox/timing",["./timing/_base"],function(a){return a});
+//# sourceMappingURL=timing.js.map

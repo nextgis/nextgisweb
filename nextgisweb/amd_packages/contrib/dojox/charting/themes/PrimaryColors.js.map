@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"PrimaryColors.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,qCAAP,CAA8C,CAAC,UAAD,CAAa,qBAAb,CAAoC,UAApC,CAA9C,CAA+F,QAAQ,CAACC,CAAD,CAAQC,CAAR,CAA2BC,CAA3B,CAAkC,CAKxIA,CAAAC,cAAA,CAAuB,IAAIH,CAAJ,CAAU,CAChCI,aAAcH,CAAAI,kBAAA,CAJFC,wCAAAA,MAAAA,CAAAA,GAAAA,CAIE,CAHAC,CAACC,KAAM,QAAPD,CAAiBE,MAAO,MAAxBF,CAAgCG,GAAI,CAApCH,CAAuCI,GAAI,CAA3CJ,CAA8CK,GAAI,CAAlDL,CAAqDM,GAAI,GAAzDN,CAGA,CAAyD,EAAzD,CAA6D,EAA7D,CAAiE,EAAjE,CADkB,CAAV,CAIvB,OAAOL,EAAAC,cATiI,CAAzI;",
+"sources":["PrimaryColors.js.uncompressed.js"],
+"names":["define","Theme","gradientGenerator","themes","PrimaryColors","seriesThemes","generateMiniTheme","colors","defaultFill","type","space","x1","y1","x2","y2"]
+}

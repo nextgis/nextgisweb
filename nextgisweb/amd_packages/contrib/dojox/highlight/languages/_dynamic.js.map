@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_dynamic.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oCAAP,CAA6C,CAAC,UAAD,CAAa,UAAb,CAAyB,UAAzB,CAA7C,CAAmF,QAAQ,EAAE,EAA7F;",
+"sources":["_dynamic.js.uncompressed.js"],
+"names":["define"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Script.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,kBAAP,CAA2B,CAC1B,mBAD0B,CAE1B,oBAF0B,CAG1B,aAH0B,CAI1B,gBAJ0B,CAA3B,CAKG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkBC,CAAlB,CAA+B,CAE1CC,IAAAC,UAAA,CAAe,KAAf,CAAsB,CAAA,CAAtB,CAA4BC,KAA5B,CAEAL,EAAA,CAAQ,kBAAR,CAA4B,IAA5B,CAAkC,CACjCM,YAAaA,QAAQ,CAACC,CAAD,CAAQC,CAAR,CAAa,CACjCP,CAAAQ,YAAA,CACCP,CAAAQ,eAAA,CAA4BF,CAA5B,CADD,CADiC,CADD,CAAlC,CAQA,OAAOH,MAAAM,IAAAC,OAZmC,CAL1C;",
+"sources":["Script.js.uncompressed.js"],
+"names":["define","declare","parser","widgetParser","dojo","getObject","dojox","constructor","props","node","instantiate","_processScript","xml","Script"]
+}

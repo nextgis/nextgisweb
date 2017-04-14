@@ -6,6 +6,7 @@ define("dojo/_base/declare", ["./kernel", "../has", "./lang"], function(dojo, ha
 		xtor, counter = 0, cname = "constructor";
 
 	if(!has("csp-restrictions")){
+		// 'new Function()' is preferable when available since it does not create a closure
 		xtor = new Function;
 	}else{
 		xtor = function(){};
@@ -781,7 +782,12 @@ define("dojo/_base/declare", ["./kernel", "../has", "./lang"], function(dojo, ha
 				t = bases[i];
 				(t._meta ? mixOwn : mix)(proto, t.prototype);
 				// chain in new constructor
-				ctor = new Function;
+				if (has("csp-restrictions")) {
+					ctor = function () {};
+				}
+				else {
+					ctor = new Function;
+				}
 				ctor.superclass = superclass;
 				ctor.prototype = proto;
 				superclass = proto.constructor = ctor;
@@ -807,6 +813,10 @@ define("dojo/_base/declare", ["./kernel", "../has", "./lang"], function(dojo, ha
 		}
 		if(proto["-chains-"]){
 			chains = mix(chains || {}, proto["-chains-"]);
+		}
+
+		if(superclass && superclass.prototype && superclass.prototype["-chains-"]) {
+			chains = mix(chains || {}, superclass.prototype["-chains-"]);
 		}
 
 		// build ctor

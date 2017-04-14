@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"LabelRenderer.js",
+"lineCount":4,
+"mappings":"A;AAAAA,OAAA,CAAQ,CAACC,MAAM,CACf,kDAAkD,yhBADnC,CAAP,CAAR,CAEAC;MAAA,CAAO,8BAAP,CAAuC,CAAC,oBAAD,CAAuB,mBAAvB,CAA4C,uBAA5C,CACtC,kBADsC,CAClB,0CADkB,CAAvC,CAGC,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAuBC,CAAvB,CAAwCC,CAAxC,CAAwDC,CAAxD,CAAiE,CAEzE,MAAOJ,EAAA,CAAQ,8BAAR,CAAwC,CAACC,CAAD,CAAcC,CAAd,CAA+BC,CAA/B,CAAxC,CAAwF,CAK9FE,eAAgBD,CAL8E,CAO9FE,aAAc,YAPgF,CAS9FC,cAAe,CAAA,CAT+E,CAW9FC,iBAAkB,CACjBC,kBAAmB,EADF,CAEjBC,gBAAkB,EAFD,CAGjBC,aAAc,EAHG,CAIjBC,eAAgB,EAJC,CAKjBC,aAAc,EALG,CAX4E,CAmB9FC,kBAAmBA,QAAQ,CAACC,CAAD,CAAMC,CAAN,CAAmBC,CAAnB,CAA8BC,CAA9B,CAAmC,CAC7D,OAAOH,CAAP,EACC,KAAK,gBAAL,CAEC,GAAG,IAAAI,KAAAC,OAAH,EAAuB,IAAAD,KAAAE,MAAA,CAAgB,CAAhB,CAAAC,QAAA,EAAvB;AAAwD,IAAAH,KAAAI,UAAAD,QAAA,EAAxD,CACC,MAAO,CAAA,CAJV,CAQA,MAAO,KAAAE,UAAA,CAAeC,SAAf,CATsD,CAnBgC,CA+B9FC,cAAe,QA/B+E,CAiC9FC,WAAYA,QAAQ,EAAG,CACtB,IAAAH,UAAA,CAAeC,SAAf,CACA,KAAAG,iBAAA,EAFsB,CAjCuE,CAAxF,CAFkE,CAH1E;",
+"sources":["LabelRenderer.js.uncompressed.js"],
+"names":["require","cache","define","declare","_WidgetBase","_TemplatedMixin","_RendererMixin","template","templateString","_orientation","resizeEnabled","visibilityLimits","resizeStartHandle","resizeEndHandle","summaryLabel","startTimeLabel","endTimeLabel","_isElementVisible","elt","startHidden","endHidden","size","item","allDay","range","getTime","startTime","inherited","arguments","_displayValue","postCreate","_applyAttributes"]
+}

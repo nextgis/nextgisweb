@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Shrooms.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,+BAAP,CAAwC,CAAC,gBAAD,CAAmB,UAAnB,CAAxC,CAAwE,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CAGpGA,CAAAC,QAAA,CAAiB,IAAIF,CAAJ,CAAgB,CAChCG,OAAQ,iGAAA,MAAA,CAAA,GAAA,CADwB,CAAhB,CAgBjB,OAAOF,EAAAC,QAnB6F,CAArG;",
+"sources":["Shrooms.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","Shrooms","colors"]
+}

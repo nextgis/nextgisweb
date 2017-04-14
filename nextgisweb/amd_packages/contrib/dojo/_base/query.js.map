@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"query.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,kBAAP,CAA2B,CAAC,UAAD,CAAa,YAAb,CAA3B,CAAuD,QAAQ,CAACC,CAAD,CAAO,CAWrE,MAAOA,EAX8D,CAAtE;",
+"sources":["query.js.uncompressed.js"],
+"names":["define","query"]
+}

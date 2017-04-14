@@ -1,2 +1,3 @@
 //>>built
-define("dojox/atom/widget/nls/ko/PeopleEditor",({add:"추가",addAuthor:"작성자 추가",addContributor:"제공자 추가"}));
+define("dojox/atom/widget/nls/ko/PeopleEditor",{add:"\ucd94\uac00",addAuthor:"\uc791\uc131\uc790 \ucd94\uac00",addContributor:"\uc81c\uacf5\uc790 \ucd94\uac00"});
+//# sourceMappingURL=PeopleEditor.js.map

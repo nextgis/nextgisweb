@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ColorPicker.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,iCADA,CACoC,CACnCC,SAAU,GADyB,CAEnCC,WAAY,GAFuB,CAGnCC,UAAW,GAHwB,CAInCC,SAAU,GAJyB,CAKnCC,gBAAiB,GALkB,CAMnCC,WAAY,GANuB,CAOnCC,SAAU,QAPyB,CAQnCC,SAAU,KARyB,CASnCC,eAAgB,kDATmB,CAUnCC,sBAAuB,oEAVY,CADpC;",
+"sources":["ColorPicker.js.uncompressed.js"],
+"names":["define","redLabel","greenLabel","blueLabel","hueLabel","saturationLabel","valueLabel","degLabel","hexLabel","huePickerTitle","saturationPickerTitle"]
+}

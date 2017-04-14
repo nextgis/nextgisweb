@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Equation.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,qCAAP,CAA8C,CAAC,iBAAD,CAAoB,eAApB,CAAqC,yBAArC,CAAgE,cAAhE,CAA9C,CACA,QAAQ,CAACC,CAAD,CAAOC,CAAP,CAAWC,CAAX,CAAqBC,CAArB,CAA+B,CAEnCC,CAAAA,CAAWH,CAAAI,QAAA,CAKdF,CALc,CAMd,QAAQ,CAACG,CAAD,CAAS,EANH,CASd,CACCC,WAAW,UADZ,CATc,CAefP,EAAAQ,UAAA,CAAe,qCAAf,CAAsDJ,CAAtD,CACAA,EAAAK,MAAA,CAAiB,CAIhBC,KAAK,qCAJW,CAKhBC,QAAQ,eALQ,CAMhBC,UAAU,QANM,CAQjBV,EAAAW,SAAA,CAAkBT,CAAAK,MAAlB,CAAkC,MAAlC,CAEA,OAAOL,EA5BgC,CADvC;",
+"sources":["Equation.js.uncompressed.js"],
+"names":["define","lang","oo","registry","TextBlock","Equation","declare","options","customType","setObject","setup","name","tooltip","iconClass","register"]
+}

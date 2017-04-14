@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"purple.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,sCAAP,CAA+C,CAAC,QAAD,CAAW,aAAX,CAA/C,CAA0E,QAAQ,CAACC,CAAD,CAAKC,CAAL,CAAW,CAC5FD,CAAAE,OAAA,CAAYF,CAAAG,KAAAC,MAAA,EACZJ,EAAAE,OAAAG,MAAAC,KAAA,CAAuBN,CAAAE,OAAAK,SAAAD,KAAvB,CAAiD,SACjDN,EAAAE,OAAAM,OAAA,CAAmBP,CAAAQ,aAAA,CAAmB,CAACC,IAAK,GAAN,CAAWC,WAAY,EAAvB,CAA2BC,IAAK,EAAhC,CAAoCC,KAAM,EAA1C,CAAnB,CAEnB,OAAOb,EAAAE,OALqF,CAA7F;",
+"sources":["purple.js.uncompressed.js"],
+"names":["define","pk","Theme","purple","base","clone","chart","fill","plotarea","colors","defineColors","hue","saturation","low","high"]
+}

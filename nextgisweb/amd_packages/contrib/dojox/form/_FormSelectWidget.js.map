@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_FormSelectWidget.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,8BAAP,CAAuC,CACtC,mBADsC,CAEtC,iBAFsC,CAGtC,8BAHsC,CAAvC,CAIG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAeC,CAAf,CAAiC,CAC3CF,CAAAG,WAAA,CAAkB,8BAAlB,CAAkD,0CAAlD,CAA8F,KAA9F,CAEAF,EAAAG,UAAA,CAAe,8BAAf,CAA+CF,CAA/C,CACA,OAAOA,EAJoC,CAJ5C;",
+"sources":["_FormSelectWidget.js.uncompressed.js"],
+"names":["define","kernel","lang","_FormSelectWidget","deprecated","setObject"]
+}

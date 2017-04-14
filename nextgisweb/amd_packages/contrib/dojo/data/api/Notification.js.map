@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Notification.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,4BAAP,CAAqC,CAAC,qBAAD,CAAwB,QAAxB,CAArC,CAAwE,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAe,CAK/F,MAAOD,EAAA,CAAQ,4BAAR,CAAsCC,CAAtC,CAA4C,CAsBlDC,YAAaA,QAAQ,EAAE,CAGtB,MAAO,CACN,qBAAsB,CAAA,CADhB,CAEN,6BAA8B,CAAA,CAFxB,CAHe,CAtB2B,CA+BlDC,MAAOA,QAAQ,CAA0BC,CAA1B,CACiBC,CADjB,CAEQC,CAFR,CAGQC,CAHR,CAGiB,CAsB/B,KAAUC,MAAJ,CAAU,qDAAV,CAAN,CAtB+B,CAlCkB,CA2DlDC,MAAOA,QAAQ,CAA0BC,CAA1B,CAA+CC,CAA/C,CAA0D,CA2BxE,KAAUH,MAAJ,CAAU,qDAAV,CAAN,CA3BwE,CA3DvB,CAyFlDI,SAAUA,QAAQ,CAA0BC,CAA1B,CAAsC,CAWvD,KAAUL,MAAJ,CAAU,wDAAV,CAAN,CAXuD,CAzFN,CAA5C,CALwF,CAA/F;",
+"sources":["Notification.js.uncompressed.js"],
+"names":["define","declare","Read","getFeatures","onSet","item","attribute","oldValue","newValue","Error","onNew","newItem","parentInfo","onDelete","deletedItem"]
+}

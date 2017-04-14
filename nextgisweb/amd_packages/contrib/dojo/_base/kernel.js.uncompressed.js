@@ -80,7 +80,7 @@ define("dojo/_base/kernel", ["../has", "./config", "require", "module"], functio
 	dojo.isAsync = ! 1  || require.async;
 	dojo.locale = config.locale;
 
-	var rev = "$Rev: 3594395 $".match(/[0-9a-f]{7,}/);
+	var rev = "$Rev: 594ed6f $".match(/[0-9a-f]{7,}/);
 	dojo.version = {
 		// summary:
 		//		Version number of the Dojo Toolkit
@@ -93,7 +93,7 @@ define("dojo/_base/kernel", ["../has", "./config", "require", "module"], functio
 		//		- flag: String: Descriptor flag. If total version is "1.2.0beta1", will be "beta1"
 		//		- revision: Number: The Git rev from which dojo was pulled
 
-		major: 1, minor: 11, patch: 1, flag: "",
+		major: 1, minor: 12, patch: 2, flag: "",
 		revision: rev ? rev[0] : NaN,
 		toString: function(){
 			var v = dojo.version;
@@ -157,7 +157,10 @@ define("dojo/_base/kernel", ["../has", "./config", "require", "module"], functio
 
 	if( 1 ){
 		// IE 9 bug: https://bugs.dojotoolkit.org/ticket/18197
-		has.add("console-as-object", Function.prototype.bind && console && typeof console.log === "object");
+		has.add("console-as-object", function () {
+			return Function.prototype.bind && console && typeof console.log === "object";
+		});
+
 		typeof console != "undefined" || (console = {});  // intentional assignment
 		//	Be careful to leave 'log' always at the end
 		var cn = [

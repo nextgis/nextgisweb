@@ -7,15 +7,13 @@ define("dojox/mvc/_atBindingMixin", [
 	"./resolve",
 	"./sync"
 ], function(array, lang, declare, has, Stateful, resolve, sync){
-	if(has("mvc-bindings-log-api")){
-		function getLogContent(/*dojo/Stateful*/ target, /*String*/ targetProp){
+	var getLogContent = (has("mvc-bindings-log-api")) ? function(/*dojo/Stateful*/ target, /*String*/ targetProp){
 			return [target._setIdAttr || !target.declaredClass ? target : target.declaredClass, targetProp].join(":");
-		}
+	} : "";
 
-		function logResolveFailure(target, targetProp){
+	var logResolveFailure = (has("mvc-bindings-log-api")) ? function(target, targetProp){
 			console.warn(targetProp + " could not be resolved" + (typeof target == "string" ? (" with " + target) : "") + ".");
-		}
-	}
+	} : "";
 
 	function getParent(/*dijit/_WidgetBase*/ w){
 		// summary:
@@ -232,8 +230,8 @@ define("dojox/mvc/_atBindingMixin", [
 			// summary:
 			//		Returns list of all properties that data binding is established with.
 
-			if(this._excludes){ 
-				return this._excludes;  // String[] 
+			if(this._excludes){
+				return this._excludes;  // String[]
 			}
 			var list = [];
 			for(var s in this._atWatchHandles){

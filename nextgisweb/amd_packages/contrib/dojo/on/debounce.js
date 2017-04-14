@@ -1,14 +1,9 @@
 /*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2016, The JS Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
 
 //>>built
-define("dojo/on/debounce",["../debounce","../on","./asyncEventListener"],function(_1,on,_2){
-return function(_3,_4){
-return function(_5,_6){
-return on(_5,_3,_2(_1(_6,_4)));
-};
-};
-});
+define("dojo/on/debounce",["../debounce","../on","./asyncEventListener"],function(a,b,c){return function(d,e){return function(f,g){return b(f,d,c(a(g,e)))}}});
+//# sourceMappingURL=debounce.js.map

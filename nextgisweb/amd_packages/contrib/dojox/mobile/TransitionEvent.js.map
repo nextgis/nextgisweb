@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"TransitionEvent.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,8BAAP,CAAuC,CAAC,oBAAD,CAAuB,SAAvB,CAAvC,CAA0E,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAa,CAE9F,MAAOD,EAAA,CAAQ,8BAAR,CAAwC,IAAxC,CAA8C,CAIpDE,YAAaA,QAAQ,CAAYC,CAAZ,CAA8BC,CAA9B,CAA2DC,CAA3D,CAAwE,CAS5F,IAAAD,kBAAA,CAAyBA,CACzB,KAAAD,OAAA,CAAcA,CACd,KAAAE,aAAA,CAAoBA,CAApB,EAAkC,IAX0D,CAJzC,CAkBpDC,SAAUA,QAAQ,EAAE,CAITL,CAAAM,KAAA,CAAQ,IAAAJ,OAAR,CAAoB,iBAApB,CADCK,CAACC,QAAQ,CAAA,CAATD,CAAeE,WAAW,CAAA,CAA1BF,CAAgCG,OAAQ,IAAAP,kBAAxCI,CAAgEH,aAAc,IAAAA,aAA9EG,CACD,CAJS,CAlBgC,CAA9C,CAFuF,CAA/F;",
+"sources":["TransitionEvent.js.uncompressed.js"],
+"names":["define","declare","on","constructor","target","transitionOptions","triggerEvent","dispatch","emit","opts","bubbles","cancelable","detail"]
+}

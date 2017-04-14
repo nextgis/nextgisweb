@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Simple.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,0BAAP,CAAmC,CAAC,MAAD,CAAnC,CAA6C,QAAQ,CAACC,CAAD,CAAO,CAE3D,MAAOA,EAAAC,QAAA,CAAa,0BAAb,CAAyC,IAAzC,CAA+C,CAKrDC,QAASA,QAAQ,EAAE,EALkC,CAUrDC,UAAWA,QAAQ,CAAaC,CAAb,CAAuB,CAMzC,IANyC,IAMjCC,EAAI,CAN6B,CAM1BC,EAAIF,CAAAG,OAAnB,CAAqCF,CAArC,CAAyCC,CAAzC,CAA4C,EAAED,CAA9C,CACCD,CAAA,CAAUC,CAAV,CAAA,CAAeG,IAAAC,MAAA,CAAW,GAAX,CAAiBD,IAAAE,OAAA,EAAjB,CAPyB,CAVW,CAA/C,CAFoD,CAA5D;",
+"sources":["Simple.js.uncompressed.js"],
+"names":["define","dojo","declare","destroy","nextBytes","byteArray","i","l","length","Math","floor","random"]
+}

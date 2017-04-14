@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"InsertAnchor.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,0CADA,CAC6C,CAC5CC,aAAc,6BAD8B,CAE5CC,MAAO,4BAFqC,CAG5CC,OAAQ,WAHoC,CAI5CC,KAAM,mBAJsC,CAK5CC,IAAK,0BALuC,CAM5CC,OAAQ,YANoC,CAD7C;",
+"sources":["InsertAnchor.js.uncompressed.js"],
+"names":["define","insertAnchor","title","anchor","text","set","cancel"]
+}

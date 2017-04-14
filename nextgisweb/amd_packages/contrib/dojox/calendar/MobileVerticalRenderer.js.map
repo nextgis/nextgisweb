@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"MobileVerticalRenderer.js",
+"lineCount":4,
+"mappings":"A;AAAAA,OAAA,CAAQ,CAACC,MAAM,CACf,2DAA2D,i5BAD5C,CAAP,CAAR,CAEAC;MAAA,CAAO,uCAAP,CAAgD,CAAC,oBAAD,CAAuB,mBAAvB,CAA4C,uBAA5C,CAC/C,kBAD+C,CAC3B,mDAD2B,CAAhD,CAGC,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAuBC,CAAvB,CAAwCC,CAAxC,CAAwDC,CAAxD,CAAiE,CAEzE,MAAOJ,EAAA,CAAQ,uCAAR,CAAiD,CAACC,CAAD,CAAcC,CAAd,CAA+BC,CAA/B,CAAjD,CAAiG,CAKvGE,eAAgBD,CALuF,CAMvGE,OAAQ,CAAA,CAN+F,CAQvGC,iBAAkB,CACjBC,kBAAmB,EADF,CAEjBC,gBAAkB,EAFD,CAGjBC,aAAc,EAHG,CAIjBC,eAAgB,EAJC,CAKjBC,aAAc,EALG,CARqF,CAgBvGC,WAAYA,QAAQ,EAAG,CACtB,IAAAC,UAAA,CAAeC,SAAf,CACA,KAAAC,iBAAA,EAFsB,CAhBgF,CAqBvGC,kBAAmBA,QAAQ,CAACC,CAAD;AAAMC,CAAN,CAAmBC,CAAnB,CAA8BC,CAA9B,CAAmC,CAC7D,IAAIC,CAEJ,QAAOJ,CAAP,EACC,KAAK,gBAAL,CACCI,CAAA,CAAI,IAAAC,KAAAC,UACJ,IAAG,IAAAD,KAAAE,OAAH,EAAuB,IAAAC,MAAAC,aAAA,CAAwBL,CAAxB,CAAvB,CACC,MAAO,CAAA,CAER,MACD,MAAK,cAAL,CAEC,GADAA,CACG,CADC,IAAAC,KAAAK,QACD,CAAA,IAAAL,KAAAE,OAAA,EAAoB,IAAAC,MAAAC,aAAA,CAAwBL,CAAxB,CAAvB,CACC,MAAO,CAAA,CAVV,CAcA,MAAO,KAAAR,UAAA,CAAeC,SAAf,CAjBsD,CArByC,CAAjG,CAFkE,CAH1E;",
+"sources":["MobileVerticalRenderer.js.uncompressed.js"],
+"names":["require","cache","define","declare","_WidgetBase","_TemplatedMixin","_RendererMixin","template","templateString","mobile","visibilityLimits","resizeStartHandle","resizeEndHandle","summaryLabel","startTimeLabel","endTimeLabel","postCreate","inherited","arguments","_applyAttributes","_isElementVisible","elt","startHidden","endHidden","size","d","item","startTime","allDay","owner","isStartOfDay","endTime"]
+}

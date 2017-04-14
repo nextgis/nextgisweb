@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Flash.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,mCAAP,CAA4C,EAA5C,CAA+C,QAAQ,EAAE,CACxDC,OAAAC,KAAA,CAAa,oIAAb,CACA,OAAO,EAFiD,CAAzD;",
+"sources":["Flash.js.uncompressed.js"],
+"names":["define","console","warn"]
+}

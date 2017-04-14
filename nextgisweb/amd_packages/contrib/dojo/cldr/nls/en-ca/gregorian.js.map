@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"gregorian.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CACA,+BADA,CAEA,CACC,sBAAuB,YADxB,CAEC,qBAAsB,SAFvB,CAGC,mBAAoB,SAHrB,CAIC,qBAAsB,UAJvB,CAKC,oBAAqB,MALtB,CAMC,oBAAqB,OANtB,CAFA;",
+"sources":["gregorian.js.uncompressed.js"],
+"names":["define"]
+}

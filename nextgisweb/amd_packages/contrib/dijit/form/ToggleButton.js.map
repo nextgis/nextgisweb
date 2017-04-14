@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ToggleButton.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,yBAAP,CAAkC,CACjC,oBADiC,CAEjC,mBAFiC,CAGjC,UAHiC,CAIjC,sBAJiC,CAAlC,CAKG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkBC,CAAlB,CAA0BC,CAA1B,CAA6C,CAMvD,MAAOH,EAAA,CAAQ,yBAAR,CAAmC,CAACE,CAAD,CAASC,CAAT,CAAnC,CAAiE,CAKvEC,UAAW,mBAL4D,CAOvEC,WAAYA,QAAQ,CAAaC,CAAb,CAAqB,CAGxCL,CAAAM,WAAA,CAAkB,aAAlB,CAAgCD,CAAhC,CAAwC,qCAAxC,CAA8EA,CAA9E,CAAsF,YAAtF,CAAoG,EAApG,CAAwG,KAAxG,CACA,KAAAE,IAAA,CAAS,SAAT,CAAoBF,CAApB,CAJwC,CAP8B,CAAjE,CANgD,CALxD;",
+"sources":["ToggleButton.js.uncompressed.js"],
+"names":["define","declare","kernel","Button","_ToggleButtonMixin","baseClass","setChecked","checked","deprecated","set"]
+}

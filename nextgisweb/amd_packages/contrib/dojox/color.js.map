@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"color.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,aAAP,CAAsB,CAAC,eAAD,CAAtB,CAAyC,QAAQ,CAACC,CAAD,CAAS,CAQzD,MAAOA,EARkD,CAA1D;",
+"sources":["color.js.uncompressed.js"],
+"names":["define","dxcolor"]
+}

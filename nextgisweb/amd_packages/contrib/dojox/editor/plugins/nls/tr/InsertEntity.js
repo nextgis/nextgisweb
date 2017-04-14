@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/tr/InsertEntity",({insertEntity:"Simge Ekle"}));
+define("dojox/editor/plugins/nls/tr/InsertEntity",{insertEntity:"Simge Ekle"});
+//# sourceMappingURL=InsertEntity.js.map

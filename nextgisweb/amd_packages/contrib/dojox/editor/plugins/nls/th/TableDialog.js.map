@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"TableDialog.js",
+"lineCount":6,
+"mappings":"A;AAAAA,MAAA,CACA,yCADA,CAC4C,CAC3CC,iBAAkB,wDADyB,CAE3CC,iBAAkB,8DAFyB,CAG3CC,KAAM,qBAHqC,CAI3CC,QAAS,6CAJkC,CAK3CC,MAAO,uCALoC,CAM3CC,YAAa,6FAN8B,CAO3CC,YAAa,mGAP8B;AAQ3CC,WAAY,yGAR+B,CAS3CC,gBAAiB,+DAT0B,CAU3CC,YAAa,yDAV8B,CAW3CC,gBAAiB,4FAX0B,CAY3CC,QAAS,oEAZkC,CAa3CC,OAAQ,sCAbmC,CAc3C,UAAW,4CAdgC;AAe3CC,KAAM,0BAfqC,CAgB3CC,OAAQ,kDAhBmC,CAiB3CC,MAAO,oBAjBoC,CAkB3CC,UAAW,0BAlBgC,CAmB3CC,aAAc,0BAnB6B,CAoB3CC,aAAc,sCApB6B,CAqB3CC,iBAAkB,8DArByB,CAsB3CC,0BAA2B,0EAtBgB,CAuB3CC,yBAA0B,4FAvBiB;AAwB3CC,6BAA8B,kGAxBa,CAyB3CC,4BAA6B,oHAzBc,CA0B3CC,oBAAqB,gCA1BsB,CA2B3CC,uBAAwB,wDA3BmB,CA4B3CC,oBAAqB,0HA5BsB;AA6B3CC,sBAAuB,sFA7BoB,CAD5C;",
+"sources":["TableDialog.js.uncompressed.js"],
+"names":["define","insertTableTitle","modifyTableTitle","rows","columns","align","cellPadding","cellSpacing","tableWidth","backgroundColor","borderColor","borderThickness","percent","pixels","left","center","right","buttonSet","buttonInsert","buttonCancel","selectTableLabel","insertTableRowBeforeLabel","insertTableRowAfterLabel","insertTableColumnBeforeLabel","insertTableColumnAfterLabel","deleteTableRowLabel","deleteTableColumnLabel","colorTableCellTitle","tableContextMenuTitle"]
+}

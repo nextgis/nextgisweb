@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"CancelError.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,yBAAP,CAAkC,CAAC,UAAD,CAAlC,CAAgD,QAAQ,CAACC,CAAD,CAAQ,CAW/D,MAAOA,EAAA,CAAO,aAAP,CAAsB,IAAtB,CAA4B,IAA5B,CAAkC,CAAEC,SAAU,QAAZ,CAAsBC,IAAK,CAAA,CAA3B,CAAlC,CAXwD,CAAhE;",
+"sources":["CancelError.js.uncompressed.js"],
+"names":["define","create","dojoType","log"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"PeopleEditor.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,uCAAP,CAAgD,CAE/CC,IAAK,gCAF0C,CAG/CC,UAAW,+DAHoC,CAI/CC,eAAgB,6FAJ+B,CAAhD;",
+"sources":["PeopleEditor.js.uncompressed.js"],
+"names":["define","add","addAuthor","addContributor"]
+}

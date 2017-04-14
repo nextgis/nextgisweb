@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ToggleButton.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,2BAAP,CAAoC,CACnC,oBADmC,CAEnC,gBAFmC,CAGnC,+BAHmC,CAInC,UAJmC,CAApC,CAKG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAoBC,CAApB,CAAuCC,CAAvC,CAA8C,CAExD,MAAOH,EAAA,CAAQ,2BAAR,CAAqC,CAACG,CAAD,CAASD,CAAT,CAArC,CAAkE,CAKxEE,UAAW,iBAL6D,CAOxEC,gBAAiBA,QAAQ,EAAE,CAC1B,IAAAC,UAAA,CAAeC,SAAf,CACA,KAAIC,EAAkBC,CAAC,IAAAL,UAADK,CAAgB,GAAhBA,CAAoB,IAAA,CAAK,OAAL,CAApBA,SAAA,CAA2C,WAA3C,CAAwD,YAAxD,CAAAC,MAAA,CAA4E,GAA5E,CACtBT,EAAA,CAAS,IAAAU,QAAA,CAAe,KAAf,CAAuB,QAAhC,CAAA,CAA0C,IAAAC,UAA1C,EAA4D,IAAAC,QAA5D,CAA0EL,CAA1E,CAH0B,CAP6C,CAAlE,CAFiD,CALzD;",
+"sources":["ToggleButton.js.uncompressed.js"],
+"names":["define","declare","domClass","ToggleButtonMixin","Button","baseClass","_setCheckedAttr","inherited","arguments","newStateClasses","replace","split","checked","focusNode","domNode"]
+}

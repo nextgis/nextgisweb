@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/hu/Save",({"save":"Mentés"}));
+define("dojox/editor/plugins/nls/hu/Save",{save:"Ment\u00e9s"});
+//# sourceMappingURL=Save.js.map

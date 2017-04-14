@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"has.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oBAAP,CAA6B,CAAC,UAAD,CAAa,YAAb,CAA7B,CAAyD,QAAQ,CAACC,CAAD,CAAK,CAGrEA,CAAAC,IAAA,CAAQ,WAAR,CAAqB,CAAG,EAAAC,MAAAC,UAAA,EAAoBD,MAAAE,gBAApB,EAA8CF,MAAAG,aAA9C,CAAxB,CACA,OAAOL,EAJ8D,CAAtE;",
+"sources":["has.js.uncompressed.js"],
+"names":["define","has","add","window","indexedDB","webkitIndexedDB","mozIndexedDB"]
+}

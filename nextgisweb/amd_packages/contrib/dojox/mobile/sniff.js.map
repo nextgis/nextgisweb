@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"sniff.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oBAAP,CAA6B,CAC5B,mBAD4B,CAE5B,YAF4B,CAA7B,CAGG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAa,CAEvBD,CAAAE,WAAA,CAAkB,oBAAlB,CAAwC,wBAAxC,CAAkE,KAAlE,CAGAD,EAAAE,IAAA,CAAQ,QAAR,CAAkBF,CAAA,CAAI,KAAJ,CAAlB,CAWA,OAAOA,EAhBgB,CAHxB;",
+"sources":["sniff.js.uncompressed.js"],
+"names":["define","kernel","has","deprecated","add"]
+}

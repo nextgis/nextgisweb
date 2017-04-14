@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"RoundRectDataList.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gCAAP,CAAyC,CACxC,mBADwC,CAExC,oBAFwC,CAGxC,iBAHwC,CAIxC,kBAJwC,CAAzC,CAKG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAkBC,CAAlB,CAAiCC,CAAjC,CAA+C,CAKzDH,CAAAI,WAAA,CAAkB,gCAAlB,CACC,6CADD,CACgD,KADhD,CAGA,OAAOH,EAAA,CAAQ,gCAAR,CAA0C,CAACC,CAAD,CAAgBC,CAAhB,CAA1C,CAA0E,EAA1E,CARkD,CAL1D;",
+"sources":["RoundRectDataList.js.uncompressed.js"],
+"names":["define","kernel","declare","RoundRectList","DataListMixin","deprecated"]
+}

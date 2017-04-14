@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Adobebricks.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,mCAAP,CAA4C,CAAC,gBAAD,CAAmB,UAAnB,CAA5C,CAA4E,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CACxGA,CAAAC,YAAA,CAAqB,IAAIF,CAAJ,CAAgB,CACpCG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CAD4B,CAAhB,CASrB,OAAOF,EAAAC,YAViG,CAAzG;",
+"sources":["Adobebricks.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","Adobebricks","colors"]
+}

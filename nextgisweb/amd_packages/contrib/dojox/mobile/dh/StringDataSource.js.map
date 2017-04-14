@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"StringDataSource.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,kCAAP,CAA2C,CAC1C,oBAD0C,CAA3C,CAEG,QAAQ,CAACC,CAAD,CAAS,CAKnB,MAAOA,EAAA,CAAQ,kCAAR,CAA4C,IAA5C,CAAkD,CAIxDC,KAAM,EAJkD,CAMxDC,YAAaA,QAAQ,CAAYD,CAAZ,CAAiB,CAGrC,IAAAA,KAAA,CAAYA,CAHyB,CANkB,CAYxDE,QAASA,QAAQ,EAAE,CAGlB,MAAO,KAAAF,KAHW,CAZqC,CAAlD,CALY,CAFpB;",
+"sources":["StringDataSource.js.uncompressed.js"],
+"names":["define","declare","text","constructor","getData"]
+}

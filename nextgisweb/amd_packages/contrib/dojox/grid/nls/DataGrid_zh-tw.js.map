@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"DataGrid_zh-tw.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,+BAAP,CAAuC,CACvC,oBAAoB,CAAC,aAAe,uBAAhB,CAAyB,WAAa,4CAAtC,CAAgD,WAAa,EAA7D,CADmB,CAAvC;",
+"sources":["DataGrid_zh-tw.js.uncompressed.js"],
+"names":["define"]
+}

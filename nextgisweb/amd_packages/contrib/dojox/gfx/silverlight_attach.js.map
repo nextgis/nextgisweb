@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"silverlight_attach.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,8BAAP,CAAuC,CAAC,mBAAD,CAAsB,iBAAtB,CAAyC,SAAzC,CAAoD,eAApD,CAAvC,CACE,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAeC,CAAf,CAAkBC,CAAlB,CAAqB,CAC9BF,CAAAG,UAAA,CAAe,8BAAf,CAA+C,CAAA,CAA/C,CACAJ,EAAAK,aAAA,CAAoB,8BAApB,CAEAF,EAAAG,WAAA,CAAgBC,QAAQ,CAACC,CAAD,CAAM,CAK7B,MAAO,KALsB,CAQ9BL,EAAAM,cAAA,CAAmBC,QAAQ,CAACF,CAAD,CAAM,CAKhC,MAAO,KALyB,CAQjC,OAAOL,EApBuB,CAD/B;",
+"sources":["silverlight_attach.js.uncompressed.js"],
+"names":["define","kernel","lang","g","sl","getObject","experimental","attachNode","sl.attachNode","node","attachSurface","sl.attachSurface"]
+}

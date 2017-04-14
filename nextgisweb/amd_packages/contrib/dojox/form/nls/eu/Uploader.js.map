@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Uploader.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,4BAAP,CAAqC,CAEpCC,MAAO,wBAF6B,CAArC;",
+"sources":["Uploader.js.uncompressed.js"],
+"names":["define","label"]
+}

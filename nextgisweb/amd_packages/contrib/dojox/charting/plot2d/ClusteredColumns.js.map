@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ClusteredColumns.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,wCAAP,CAAiD,CAAC,oBAAD,CAAuB,kBAAvB,CAA2C,WAA3C,CAAwD,UAAxD,CAAjD,CACC,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAiBC,CAAjB,CAA0BC,CAA1B,CAA6B,CAErC,MAAOH,EAAA,CAAQ,wCAAR,CAAkDE,CAAlD,CAA2D,CAGjEE,iBAAkBA,QAAQ,EAAE,CAC3B,IAAIC,EAAS,IAAAC,OAAAD,OACbJ,EAAAM,QAAA,CAAc,IAAAD,OAAd,CAA2B,QAAQ,CAACE,CAAD,CAAO,CAAIA,CAAAC,OAAH,EAAiBJ,CAAA,EAAlB,CAA1C,CACA,KAAIK,EAAIP,CAAAQ,iBAAA,CAAoB,IAAAC,SAAAC,OAAAC,MAApB,CAAgD,IAAAC,IAAhD,CAA0DV,CAA1D,CACR,OAAO,CAACW,IAAKN,CAAAM,IAAN,CAAaC,MAAOP,CAAAQ,KAApB,CAA4BC,UAAWT,CAAAQ,KAAvC,CAA+CE,YAAaf,CAA5D,CAJoB,CAHqC,CAA3D,CAF8B,CADtC;",
+"sources":["ClusteredColumns.js.uncompressed.js"],
+"names":["define","declare","array","Columns","dc","getBarProperties","length","series","forEach","serie","hidden","f","calculateBarSize","_hScaler","bounds","scale","opt","gap","width","size","thickness","clusterSize"]
+}

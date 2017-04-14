@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"CubanShirts.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,mCAAP,CAA4C,CAAC,gBAAD,CAAmB,UAAnB,CAA5C,CAA4E,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CAGxGA,CAAAC,YAAA,CAAqB,IAAIF,CAAJ,CAAgB,CACpCG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CAD4B,CAAhB,CASrB,OAAOF,EAAAC,YAZiG,CAAzG;",
+"sources":["CubanShirts.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","CubanShirts","colors"]
+}

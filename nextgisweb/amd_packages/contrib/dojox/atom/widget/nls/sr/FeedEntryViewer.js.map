@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"FeedEntryViewer.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,0CAAP,CAAmD,CAElDC,eAAgB,uBAFkC,CAGlDC,MAAO,QAH2C,CAIlDC,QAAS,QAJyC,CAKlDC,aAAc,WALoC,CAMlDC,GAAI,IAN8C,CAOlDC,MAAO,WAP2C,CAQlDC,QAAS,gBARyC,CASlDC,QAAS,QATyC,CAUlDC,QAAS,cAVyC,CAAnD;",
+"sources":["FeedEntryViewer.js.uncompressed.js"],
+"names":["define","displayOptions","title","authors","contributors","id","close","updated","summary","content"]
+}

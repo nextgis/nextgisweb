@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Collection.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iCAAP,CAA0C,CACzC,oBADyC,CAEzC,YAFyC,CAA1C,CAGG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAmB,CAE7B,MAAOD,EAAA,CAAQ,iCAAR,CAA2CC,CAA3C,CAAqD,CAM3DC,YAAY,IAN+C,CAQ3DC,cAAeA,QAAQ,CAACC,CAAD,CAAG,CAKzB,IAAAF,YAAA,CAAmBE,CALM,CARiC,CAgB3DC,cAAeA,QAAQ,EAAE,CAKxB,MAAO,KAAAH,YALiB,CAhBkC,CAArD,CAFsB,CAH9B;",
+"sources":["Collection.js.uncompressed.js"],
+"names":["define","declare","Geometry","coordinates","setGeometries","g","getGeometries"]
+}

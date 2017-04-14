@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"DataCarousel.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,2BAAP,CAAoC,CACnC,mBADmC,CAEnC,oBAFmC,CAGnC,YAHmC,CAInC,cAJmC,CAApC,CAKG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAkBC,CAAlB,CAA4BC,CAA5B,CAAsC,CAKhDH,CAAAI,WAAA,CAAkB,2BAAlB,CAA+C,wCAA/C,CAAyF,CAAzF,CACA,OAAOH,EAAA,CAAQ,2BAAR,CAAqC,CAACC,CAAD,CAAWC,CAAX,CAArC,CAA4D,EAA5D,CANyC,CALjD;",
+"sources":["DataCarousel.js.uncompressed.js"],
+"names":["define","kernel","declare","Carousel","DataMixin","deprecated"]
+}

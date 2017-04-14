@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Algae.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,6BAAP,CAAsC,CAAC,gBAAD,CAAmB,UAAnB,CAAtC,CAAsE,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CAClGA,CAAAC,MAAA,CAAe,IAAIF,CAAJ,CAAgB,CAC9BG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CADsB,CAAhB,CASf,OAAOF,EAAAC,MAV2F,CAAnG;",
+"sources":["Algae.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","Algae","colors"]
+}

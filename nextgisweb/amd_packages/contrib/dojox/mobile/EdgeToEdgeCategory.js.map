@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"EdgeToEdgeCategory.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iCAAP,CAA0C,CACzC,oBADyC,CAEzC,qBAFyC,CAA1C,CAGG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAA4B,CAKtC,MAAOD,EAAA,CAAQ,iCAAR,CAA2CC,CAA3C,CAA8D,CAGpEC,eAAgBA,QAAQ,EAAE,CACzB,IAAAC,UAAA,CAAeC,SAAf,CACA,KAAAC,QAAAC,UAAA,CAAyB,uBAEtB,KAAAC,KAAH,EAA6B,MAA7B,EAAgB,IAAAA,KAAhB,GACC,IAAAF,QAAAC,UADD,EAC2B,4BAD3B,CAJyB,CAH0C,CAA9D,CAL+B,CAHvC;",
+"sources":["EdgeToEdgeCategory.js.uncompressed.js"],
+"names":["define","declare","RoundRectCategory","buildRendering","inherited","arguments","domNode","className","type"]
+}

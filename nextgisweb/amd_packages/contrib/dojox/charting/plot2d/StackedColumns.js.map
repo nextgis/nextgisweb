@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"StackedColumns.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,sCAAP,CAA+C,CAAC,oBAAD,CAAuB,iBAAvB,CAA0C,WAA1C,CAAuD,iBAAvD,CAA/C,CACC,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAgBC,CAAhB,CAAyBC,CAAzB,CAAuC,CAE/C,MAAOH,EAAA,CAAQ,sCAAR,CAAgDE,CAAhD,CAAyD,CAG/DE,eAAgBA,QAAQ,EAAE,CAKzB,IAAIC,EAAQF,CAAAG,aAAA,CAA2B,IAAAC,OAA3B,CAAwCN,CAAAO,MAAA,CAAW,IAAX,CAAiB,aAAjB,CAAxC,CACZH,EAAAI,KAAA,EAAc,EACdJ,EAAAK,KAAA,EAAc,EACd,OAAOL,EARkB,CAHqC,CAc/DM,gBAAiBA,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAoBC,CAApB,CAA6B,CACrD,MAAOX,EAAAQ,gBAAAI,KAAA,CAAmC,IAAnC,CAAyCH,CAAzC,CAAiDC,CAAjD,CAA4DC,CAA5D,CAD8C,CAdS,CAAzD,CAFwC,CADhD;",
+"sources":["StackedColumns.js.uncompressed.js"],
+"names":["define","declare","lang","Columns","commonStacked","getSeriesStats","stats","collectStats","series","hitch","hmin","hmax","rearrangeValues","values","transform","baseline","call"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ZoomAndPan.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,yCAAP,CAAkD,CAAC,oBAAD,CAAlD,CACC,QAAQ,CAACC,CAAD,CAAS,CAGjB,MAAOA,EAAA,CAAQ,IAAR,CAAc,CACpBC,UAAWA,QAAQ,CAACC,CAAD,CAAO,CAEzB,MADY,KAAAC,UAAAC,CAAeC,SAAfD,CACZ,EAAgB,IAAAE,MAAAC,cAAA,EAAA,CAA6B,EAA7B,CAAiC,CAAjD,CAFyB,CADN,CAAd,CAHU,CADlB;",
+"sources":["ZoomAndPan.js.uncompressed.js"],
+"names":["define","declare","_getDelta","event","inherited","delta","arguments","chart","isRightToLeft"]
+}

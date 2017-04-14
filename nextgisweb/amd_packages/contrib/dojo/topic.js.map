@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"topic.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,YAAP,CAAqB,CAAC,WAAD,CAArB,CAAoC,QAAQ,CAACC,CAAD,CAAS,CAKpD,IAAIC,EAAM,IAAID,CACd,OAAO,CASNE,QAASA,QAAQ,CAACC,CAAD,CAAQC,CAAR,CAAc,CAS9B,MAAOH,EAAAI,KAAAC,MAAA,CAAeL,CAAf,CAAoBM,SAApB,CATuB,CATzB,CAqBNC,UAAWA,QAAQ,CAACL,CAAD,CAAQM,CAAR,CAAiB,CAOnC,MAAOR,EAAAS,GAAAJ,MAAA,CAAaL,CAAb,CAAkBM,SAAlB,CAP4B,CArB9B,CAN6C,CAArD;",
+"sources":["topic.js.uncompressed.js"],
+"names":["define","Evented","hub","publish","topic","event","emit","apply","arguments","subscribe","listener","on"]
+}

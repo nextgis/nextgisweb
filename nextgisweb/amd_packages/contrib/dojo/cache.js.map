@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"cache.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,YAAP,CAAqB,CAAC,gBAAD,CAAmB,QAAnB,CAArB,CAAmD,QAAQ,CAACC,CAAD,CAAM,CAKhE,MAAOA,EAAAC,MALyD,CAAjE;",
+"sources":["cache.js.uncompressed.js"],
+"names":["define","dojo","cache"]
+}

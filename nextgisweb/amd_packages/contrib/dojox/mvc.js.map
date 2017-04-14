@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"mvc.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,WAAP,CAAoB,CAAC,aAAD,CAApB,CAAqC,QAAQ,CAACC,CAAD,CAAO,CAYnD,MAAOA,EAZ4C,CAApD;",
+"sources":["mvc.js.uncompressed.js"],
+"names":["define","dxmvc"]
+}

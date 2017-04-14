@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Fieldset.js",
+"lineCount":3,
+"mappings":"A;AAAAA,OAAA,CAAQ,CAACC,MAAM,CACf,oCAAoC,gpCADrB,CAAP,CAAR,CAEAC;MAAA,CAAO,gBAAP,CAAyB,CACxB,oBADwB,CAExB,iBAFwB,CAGxB,iBAHwB,CAIxB,qCAJwB,CAKxB,aALwB,CAAzB,CAMG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAiBC,CAAjB,CAA4BC,CAA5B,CAAqC,CAG/C,MAAOH,EAAA,CAAQ,gBAAR,CAA0BE,CAA1B,CAAqC,CAO3CE,UAAW,eAPgC,CAW3CC,MAAO,EAXoC,CAe3CC,KAAM,CAAA,CAfqC,CAiB3CC,eAAgBJ,CAjB2B,CAmB3CK,WAAYA,QAAQ,EAAG,CACtB,GAAIH,CAAA,IAAAA,MAAJ,CAAe,CACd,IAAII,EAAUR,CAAA,CAAM,QAAN,CAAgB,IAAAS,cAAhB,CACXD,EAAAE,OAAH,GACC,IAAAC,IAAA,CAAS,OAAT,CAAkBH,CAAA,CAAQ,CAAR,CAAAI,UAAlB,CACA,CAAAJ,CAAA,CAAQ,CAAR,CAAAK,WAAAC,YAAA,CAAkCN,CAAA,CAAQ,CAAR,CAAlC,CAFD,CAFc,CAQf,IAAAO,UAAA,CAAeC,SAAf,CATsB,CAnBoB,CAArC,CAHwC,CANhD;",
+"sources":["Fieldset.js.uncompressed.js"],
+"names":["require","cache","define","declare","query","TitlePane","template","baseClass","title","open","templateString","postCreate","legends","containerNode","length","set","innerHTML","parentNode","removeChild","inherited","arguments"]
+}

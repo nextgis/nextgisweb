@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ProgressIndicator.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,qCAAP,CAA8C,CAC7C,oBAD6C,CAE7C,gBAF6C,CAA9C,CAGG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAmB,CAK7B,MAAOD,EAAA,CAAQ,IAAR,CAAc,CAEpBE,eAAeA,QAAQ,EAAE,CACxB,IAAAC,UAAA,CAAeC,SAAf,CACI,KAAAC,cAAA,EAAJ,GACI,IAAAC,YAOH,GALC,IAAAC,gBAAAC,MAAAC,KAKD,CALmC,CAD1BC,IAAAC,MAAAC,CAAW,IAAAL,gBAAAM,aAAXD,CAA+C,CAA/CA,CAMT,CALwC,IAKxC,EAHG,IAAAE,OAGH,EAFCb,CAAAc,IAAA,CAAa,IAAAC,QAAb,CAA2B,+BAA3B,CAED,CAAAf,CAAAc,IAAA,CAAa,IAAAE,cAAb,CAAiC,qBAAjC,CARD,CAFwB,CAFL,CAAd,CALsB,CAH9B;",
+"sources":["ProgressIndicator.js.uncompressed.js"],
+"names":["define","declare","domClass","buildRendering","inherited","arguments","isLeftToRight","closeButton","closeButtonNode","style","left","Math","round","s","offsetHeight","center","add","domNode","containerNode"]
+}

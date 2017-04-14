@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"easing.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iBAAP,CAA0B,CAAC,iBAAD,CAAoB,mBAApB,CAAyC,gBAAzC,CAA1B,CACE,QAAQ,CAACC,CAAD,CAAMC,CAAN,CAAaC,CAAb,CAAoB,CAC7BD,CAAAE,WAAA,CAAkB,iBAAlB,CAAoC,8CAApC,CAAmF,KAAnF,CASA,OARYH,EAAAI,UAAAC,CAAe,UAAfA,CAA0B,CAAA,CAA1BA,CACZH,OAOA,CAPeA,CAHc,CAD9B;",
+"sources":["easing.js.uncompressed.js"],
+"names":["define","lang","kernel","easing","deprecated","getObject","fxExt"]
+}

@@ -2658,7 +2658,7 @@ define([
 			//		True if widget is LTR, false if widget is RTL.   Affects the behavior of "above" and "below"
 			//		positions slightly.
 			// example:
-			//	|	placeAroundNode(node, aroundNode, {'BL':'TL', 'TR':'BR'});
+			//	|	placeAroundNode(node, aroundNode, ['below', 'above-alt']);
 			//		This will try to position node such that node's top-left corner is at the same position
 			//		as the bottom left corner of the aroundNode (ie, put node below
 			//		aroundNode, with left edges aligned).	If that fails it will try to put
@@ -2711,7 +2711,7 @@ define([
 					}
 					parent = parent.parentNode;
 				}
-			}			
+			}
 
 			var x = aroundNodePos.x,
 				y = aroundNodePos.y,
@@ -3426,13 +3426,11 @@ define([
 	// Flag for whether to create background iframe behind popups like Menus and Dialog.
 	// A background iframe is useful to prevent problems with popups appearing behind applets/pdf files,
 	// and is also useful on older versions of IE (IE6 and IE7) to prevent the "bleed through select" problem.
-	// By default, it's enabled for IE6-10, excluding Windows Phone 8,
-	// and it's also enabled for IE11 on Windows 7 and Windows 2008 Server.
+	// By default, it's enabled for IE6-11, excluding Windows Phone 8.
 	// TODO: For 2.0, make this false by default.  Also, possibly move definition to has.js so that this module can be
 	// conditionally required via  dojo/has!bgIfame?dijit/BackgroundIframe
 	has.add("config-bgIframe",
-		(has("ie") && !/IEMobile\/10\.0/.test(navigator.userAgent)) || // No iframe on WP8, to match 1.9 behavior
-		(has("trident") && /Windows NT 6.[01]/.test(navigator.userAgent)));
+    	(has("ie") || has("trident")) && !/IEMobile\/10\.0/.test(navigator.userAgent)); // No iframe on WP8, to match 1.9 behavior
 
 	var _frames = new function(){
 		// summary:
@@ -5455,17 +5453,12 @@ define([
 			//	|		parser.parse({ noStart:true, rootNode: someNode });
 
 			// determine the root node and options based on the passed arguments.
-			var root;
-			if(!options && rootNode && rootNode.rootNode){
+			if(rootNode && typeof rootNode != "string" && !("nodeType" in rootNode)){
+				// If called as parse(options) rather than parse(), parse(rootNode), or parse(rootNode, options)...
 				options = rootNode;
-				root = options.rootNode;
-			}else if(rootNode && dlang.isObject(rootNode) && !("nodeType" in rootNode)){
-				options = rootNode;
-			}else{
-				root = rootNode;
+				rootNode = options.rootNode;
 			}
-			root = root ? dom.byId(root) : dwindow.body();
-
+			var root = rootNode ? dom.byId(rootNode) : dwindow.body();
 			options = options || {};
 
 			var mixin = options.template ? { template: true } : {},
@@ -8130,7 +8123,13 @@ string.substitute = function(	/*String*/		template,
 			if(format){
 				value = lang.getObject(format, false, thisObject).call(thisObject, value, key);
 			}
-			return transform(value, key).toString();
+			var result = transform(value, key);
+
+			if (typeof result === 'undefined') {
+				throw new Error('string.substitute could not find key "' + key + '" in template');
+			}
+
+			return result.toString();
 		}); // String
 };
 

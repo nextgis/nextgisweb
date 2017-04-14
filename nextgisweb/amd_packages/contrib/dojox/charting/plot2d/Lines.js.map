@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Lines.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,6BAAP,CAAsC,CAAC,oBAAD,CAAuB,WAAvB,CAAtC,CAA2E,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkB,CAEpG,MAAOD,EAAA,CAAQ,6BAAR,CAAuCC,CAAvC,CAAgD,CAGtDC,YAAaA,QAAQ,EAAE,CAGtB,IAAAC,IAAAC,MAAA,CAAiB,CAAA,CAHK,CAH+B,CAAhD,CAF6F,CAArG;",
+"sources":["Lines.js.uncompressed.js"],
+"names":["define","declare","Default","constructor","opt","lines"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ClusteredBars.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,qCAAP,CAA8C,CAAC,oBAAD,CAAuB,kBAAvB,CAA2C,QAA3C,CAAqD,UAArD,CAA9C,CACC,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAiBC,CAAjB,CAAuBC,CAAvB,CAA0B,CAElC,MAAOH,EAAA,CAAQ,qCAAR,CAA+CE,CAA/C,CAAqD,CAG3DE,iBAAkBA,QAAQ,EAAE,CAC3B,IAAIC,EAAS,IAAAC,OAAAD,OACbJ,EAAAM,QAAA,CAAc,IAAAD,OAAd,CAA2B,QAAQ,CAACE,CAAD,CAAO,CAAIA,CAAAC,OAAH,EAAiBJ,CAAA,EAAlB,CAA1C,CACA,KAAIK,EAAIP,CAAAQ,iBAAA,CAAoB,IAAAC,SAAAC,OAAAC,MAApB,CAAgD,IAAAC,IAAhD,CAA0DV,CAA1D,CACR,OAAO,CAACW,IAAKN,CAAAM,IAAN,CAAaC,OAAQP,CAAAQ,KAArB,CAA6BC,UAAWT,CAAAQ,KAAxC,CAJoB,CAH+B,CAArD,CAF2B,CADnC;",
+"sources":["ClusteredBars.js.uncompressed.js"],
+"names":["define","declare","array","Bars","dc","getBarProperties","length","series","forEach","serie","hidden","f","calculateBarSize","_vScaler","bounds","scale","opt","gap","height","size","thickness"]
+}

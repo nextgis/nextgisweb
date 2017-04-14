@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"collections.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,mBAAP,CAA4B,CAAC,qBAAD,CAA5B,CAAqD,QAAQ,CAACC,CAAD,CAAa,CAOhE,MAAOA,EAPyD,CAA1E;",
+"sources":["collections.js.uncompressed.js"],
+"names":["define","collections"]
+}

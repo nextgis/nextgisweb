@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"LinkPane.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,uBAAP,CAAgC,CAC/B,eAD+B,CAE/B,oBAF+B,CAG/B,oBAH+B,CAAhC,CAIG,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAA+BC,CAA/B,CAAuC,CAMjD,MAAOA,EAAA,CAAQ,uBAAR,CAAiC,CAACF,CAAD,CAAcC,CAAd,CAAjC,CAAiE,CAcvEE,eAAgB,4FAduD,CAgBvEC,oBAAqBA,QAAQ,EAAE,CAG3B,IAAAC,WAAH,GACC,IAAAC,MADD,EACe,IAAAD,WAAAE,UADf,CAGA,KAAAC,UAAA,CAAeC,SAAf,CAN8B,CAhBwC,CAyBvEC,aAAcA,QAAQ,EAAE,EAzB+C,CAAjE,CAN0C,CAJlD;",
+"sources":["LinkPane.js.uncompressed.js"],
+"names":["define","ContentPane","_TemplatedMixin","declare","templateString","postMixInProperties","srcNodeRef","title","innerHTML","inherited","arguments","_fillContent"]
+}

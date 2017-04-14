@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/nb/BidiSupport",{"ltr":"Tekstretning venstre mot høyre","rtl":"Tekstretning høyre mot venstre"});
+define("dojox/editor/plugins/nls/nb/BidiSupport",{ltr:"Tekstretning venstre mot h\u00f8yre",rtl:"Tekstretning h\u00f8yre mot venstre"});
+//# sourceMappingURL=BidiSupport.js.map

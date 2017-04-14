@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"EdgeToEdgeDataList.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iCAAP,CAA0C,CACzC,mBADyC,CAEzC,oBAFyC,CAGzC,kBAHyC,CAIzC,kBAJyC,CAA1C,CAKG,QAAQ,CAACC,CAAD,CAASC,CAAT,CAAkBC,CAAlB,CAAkCC,CAAlC,CAAgD,CAK1DH,CAAAI,WAAA,CAAkB,iCAAlB,CACC,8CADD,CACiD,KADjD,CAGA,OAAOH,EAAA,CAAQ,iCAAR,CAA2C,CAACC,CAAD,CAAiBC,CAAjB,CAA3C,CAA2E,EAA3E,CARmD,CAL3D;",
+"sources":["EdgeToEdgeDataList.js.uncompressed.js"],
+"names":["define","kernel","declare","EdgeToEdgeList","DataListMixin","deprecated"]
+}

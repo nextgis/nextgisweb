@@ -1,2 +1,3 @@
 //>>built
-define("dojox/widget/nls/sr/FilePicker",{name:"Ime",path:"Putanja",size:"Veličina (u bajtima)"});
+define("dojox/widget/nls/sr/FilePicker",{name:"Ime",path:"Putanja",size:"Veli\u010dina (u bajtima)"});
+//# sourceMappingURL=FilePicker.js.map

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Areas.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,6BAAP,CAAsC,CAAC,oBAAD,CAAuB,WAAvB,CAAtC,CACE,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAkB,CAE3B,MAAOD,EAAA,CAAQ,6BAAR,CAAuCC,CAAvC,CAAgD,CAGtDC,YAAaA,QAAQ,EAAE,CAGtB,IAAAC,IAAAC,MAAA,CAAiB,CAAA,CACjB,KAAAD,IAAAE,MAAA,CAAiB,CAAA,CAJK,CAH+B,CAAhD,CAFoB,CAD5B;",
+"sources":["Areas.js.uncompressed.js"],
+"names":["define","declare","Default","constructor","opt","lines","areas"]
+}

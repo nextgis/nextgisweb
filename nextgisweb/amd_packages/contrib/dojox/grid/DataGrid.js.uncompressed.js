@@ -2775,7 +2775,7 @@ return declare("dojox.grid._Layout", null, {
 				}
 			}
 		}
-		
+
 		//Fix #9481 - reset idx in cell markup
 		array.forEach(this.cells, function(c){
 			var marks = c.markup[2].split(" ");
@@ -2785,7 +2785,7 @@ return declare("dojox.grid._Layout", null, {
 				c.markup[2] = marks.join(" ");
 			}
 		});
-		
+
 		this.grid.setupHeaderMenu();
 		//this.grid.renderOnIdle();
 	},
@@ -2804,7 +2804,7 @@ return declare("dojox.grid._Layout", null, {
 			return false;
 		}
 	},
-	
+
 	addCellDef: function(inRowIndex, inCellIndex, inDef){
 		var self = this;
 		var getCellWidth = function(inDef){
@@ -2843,7 +2843,7 @@ return declare("dojox.grid._Layout", null, {
 		props.unitWidth = getCellWidth(inDef);
 		return new cell_type(lang.mixin({}, this._defaultCellProps, inDef, props));
 	},
-	
+
 	addRowDef: function(inRowIndex, inDef){
 		var result = [];
 		var relSum = 0, pctSum = 0, doRel = true;
@@ -2875,13 +2875,16 @@ return declare("dojox.grid._Layout", null, {
 			});
 		}
 		return result;
-	
+
 	},
 
 	addRowsDef: function(inDef){
 		var result = [];
 		if(lang.isArray(inDef)){
-			if(lang.isArray(inDef[0])){
+            // inDef[0] could be a NodeList if the Grid is defined in a declarative way.
+            // lang.isArray() does not recognize a NodeList as an array, now so the wrong path will be chosen.
+            // lang.isArrayLike() does the right match against a NodeList, instead.
+			if(lang.isArrayLike(inDef[0])){
 				for(var i=0, row; inDef && (row=inDef[i]); i++){
 					result.push(this.addRowDef(i, row));
 				}
@@ -2891,7 +2894,7 @@ return declare("dojox.grid._Layout", null, {
 		}
 		return result;
 	},
-	
+
 	addViewDef: function(inDef){
 		this._defaultCellProps = inDef.defaultCell || {};
 		if(inDef.width && inDef.width == "auto"){
@@ -2899,7 +2902,7 @@ return declare("dojox.grid._Layout", null, {
 		}
 		return lang.mixin({}, inDef, {cells: this.addRowsDef(inDef.rows || inDef.cells)});
 	},
-	
+
 	setStructure: function(inStructure){
 		this.fieldIndex = 0;
 		this.cells = [];
@@ -2945,7 +2948,7 @@ return declare("dojox.grid._Layout", null, {
 					("cells" in def || "rows" in def || ("type" in def && !isCell(def))));
 		};
 
-		if(lang.isArray(inStructure)){
+		if(lang.isArrayLike(inStructure)){
 			var hasViews = false;
 			for(var i=0, st; (st=inStructure[i]); i++){
 				if(isView(st)){
@@ -9356,8 +9359,8 @@ var Manager = declare("dojo.dnd.Manager", [Evented], {
 	},
 
 	// avatar's offset from the mouse
-	OFFSET_X: has("touch") ? 0 : 16,
-	OFFSET_Y: has("touch") ? -64 : 16,
+	OFFSET_X: has("touch") ? 4 : 16,
+	OFFSET_Y: has("touch") ? 4 : 16,
 
 	// methods
 	overSource: function(source){
@@ -9652,15 +9655,14 @@ exports.autoScrollNodes = function(e){
 	for(var n = e.target; n;){
 		if(n.nodeType == 1 && (n.tagName.toLowerCase() in exports._validNodes)){
 			var s = domStyle.getComputedStyle(n),
-				overflow = (s.overflow.toLowerCase() in exports._validOverflow),
 				overflowX = (s.overflowX.toLowerCase() in exports._validOverflow),
 				overflowY = (s.overflowY.toLowerCase() in exports._validOverflow);
-			if(overflow || overflowX || overflowY){
+			if(overflowX || overflowY){
 				b = domGeom.getContentBox(n, s);
 				t = domGeom.position(n, true);
 			}
 			// overflow-x
-			if(overflow || overflowX){
+			if(overflowX){
 				w = Math.min(exports.H_TRIGGER_AUTOSCROLL, b.w / 2);
 				rx = e.pageX - t.x;
 				if(has("webkit") || has("opera")){
@@ -9681,7 +9683,7 @@ exports.autoScrollNodes = function(e){
 				}
 			}
 			// overflow-y
-			if(overflow || overflowY){
+			if(overflowY){
 				//console.log(b.l, b.t, t.x, t.y, n.scrollLeft, n.scrollTop);
 				h = Math.min(exports.V_TRIGGER_AUTOSCROLL, b.h / 2);
 				ry = e.pageY - t.y;
@@ -10212,7 +10214,13 @@ string.substitute = function(	/*String*/		template,
 			if(format){
 				value = lang.getObject(format, false, thisObject).call(thisObject, value, key);
 			}
-			return transform(value, key).toString();
+			var result = transform(value, key);
+
+			if (typeof result === 'undefined') {
+				throw new Error('string.substitute could not find key "' + key + '" in template');
+			}
+
+			return result.toString();
 		}); // String
 };
 
@@ -11447,13 +11455,33 @@ define([
 },
 'dojo/dnd/Moveable':function(){
 define([
-	"../_base/array", "../_base/declare", "../_base/lang",
-	"../dom", "../dom-class", "../Evented", "../on", "../topic", "../touch", "./common", "./Mover", "../_base/window"
-], function(array, declare, lang, dom, domClass, Evented, on, topic, touch, dnd, Mover, win){
+	"../_base/array", "../_base/declare", "../_base/lang", "../dom", "../dom-class", "../Evented",
+	"../has", "../on", "../topic", "../touch", "./common", "./Mover", "../_base/window"
+], function(array, declare, lang, dom, domClass, Evented, has, on, topic, touch, dnd, Mover, win){
 
 // module:
 //		dojo/dnd/Moveable
 
+var touchActionPropertyName;
+var setTouchAction = function () {};
+
+function setTouchActionPropertyName() {
+	if ("touchAction" in document.body.style) {
+		touchActionPropertyName = "touchAction";
+	}
+	else if ("msTouchAction" in document.body.style) {
+		touchActionPropertyName = "msTouchAction";
+	}
+	setTouchAction = function setTouchAction(/* Node */ node, /* string */ action) {
+		node.style[touchActionPropertyName] = action;
+	}
+	setTouchAction(arguments[0], arguments[1]);
+}
+
+if (has("touch-action")) {
+	// Ensure that the logic to determine "touchActionPropertyName" runs
+	setTouchAction = setTouchActionPropertyName;
+}
 
 var Moveable = declare("dojo.dnd.Moveable", [Evented], {
 	// summary:
@@ -11470,6 +11498,7 @@ var Moveable = declare("dojo.dnd.Moveable", [Evented], {
 		// params: Moveable.__MoveableArgs?
 		//		optional parameters
 		this.node = dom.byId(node);
+		setTouchAction(this.node, "none");
 		if(!params){ params = {}; }
 		this.handle = params.handle ? dom.byId(params.handle) : null;
 		if(!this.handle){ this.handle = this.node; }
@@ -11494,6 +11523,7 @@ var Moveable = declare("dojo.dnd.Moveable", [Evented], {
 		// summary:
 		//		stops watching for possible move, deletes all references, so the object can be garbage-collected
 		array.forEach(this.events, function(handle){ handle.remove(); });
+		setTouchAction(this.node, "");
 		this.events = this.node = this.handle = null;
 	},
 

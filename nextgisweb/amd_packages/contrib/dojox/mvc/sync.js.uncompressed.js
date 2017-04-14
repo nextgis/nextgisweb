@@ -8,7 +8,7 @@ define("dojox/mvc/sync", [
 	/*=====
 	mvc = {};
 	=====*/
-	
+
 	/*=====
 	dojox.mvc.sync.converter = {
 		// summary:
@@ -56,14 +56,12 @@ define("dojox/mvc/sync", [
 
 	var sync;
 
-	if(has("mvc-bindings-log-api")){
-		function getLogContent(/*dojo/Stateful*/ source, /*String*/ sourceProp, /*dojo/Stateful*/ target, /*String*/ targetProp){
-			return [
-				[target.canConvertToLoggable || !target.declaredClass ? target : target.declaredClass, targetProp].join(":"),
-				[source.canConvertToLoggable || !source.declaredClass ? source : source.declaredClass, sourceProp].join(":")
-			];
-		}
-	}
+	var getLogContent = (has("mvc-bindings-log-api")) ? function(/*dojo/Stateful*/ source, /*String*/ sourceProp, /*dojo/Stateful*/ target, /*String*/ targetProp){
+		return [
+			[target.canConvertToLoggable || !target.declaredClass ? target : target.declaredClass, targetProp].join(":"),
+			[source.canConvertToLoggable || !source.declaredClass ? source : source.declaredClass, sourceProp].join(":")
+		];
+	} : "";
 
 	function equals(/*Anything*/ dst, /*Anything*/ src){
 		// summary:

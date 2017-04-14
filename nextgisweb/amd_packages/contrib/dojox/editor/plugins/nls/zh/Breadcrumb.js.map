@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Breadcrumb.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,wCADA,CAC2C,CAC1C,YAAe,0BAD2B,CAE1C,eAAkB,0BAFwB,CAG1C,cAAiB,0BAHyB,CAI1C,cAAiB,0BAJyB,CAK1C,eAAkB,0BALwB,CAM1C,UAAa,4CAN6B,CAO1C,QAAW,4CAP+B,CAD3C;",
+"sources":["Breadcrumb.js.uncompressed.js"],
+"names":["define"]
+}

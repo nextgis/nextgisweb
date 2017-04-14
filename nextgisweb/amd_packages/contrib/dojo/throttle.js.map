@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"throttle.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,eAAP,CAAwB,EAAxB,CAA4B,QAAQ,EAAE,CAMrC,MAAO,SAAQ,CAACC,CAAD,CAAKC,CAAL,CAAU,CAYxB,IAAIC,EAAS,CAAA,CACb,OAAO,SAAQ,EAAE,CACZA,CAAJ,GAGAA,CAEA,CAFS,CAAA,CAET,CADAF,CAAAG,MAAA,CAAS,IAAT,CAAeC,SAAf,CACA,CAAAC,UAAA,CAAW,QAAQ,EAAE,CACpBH,CAAA,CAAS,CAAA,CADW,CAArB,CAEGD,CAFH,CALA,CADgB,CAbO,CANY,CAAtC;",
+"sources":["throttle.js.uncompressed.js"],
+"names":["define","cb","wait","canrun","apply","arguments","setTimeout"]
+}

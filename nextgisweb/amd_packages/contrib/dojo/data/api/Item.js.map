@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Item.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,oBAAP,CAA6B,CAAC,qBAAD,CAA7B,CAAsD,QAAQ,CAACC,CAAD,CAAS,CAKtE,MAAOA,EAAA,CAAQ,IAAR,CAAc,EAAd,CAL+D,CAAvE;",
+"sources":["Item.js.uncompressed.js"],
+"names":["define","declare"]
+}

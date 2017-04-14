@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/fr/ShowBlockNodes",({"showBlockNodes":"Affichage des éléments de bloc HTML"}));
+define("dojox/editor/plugins/nls/fr/ShowBlockNodes",{showBlockNodes:"Affichage des \u00e9l\u00e9ments de bloc HTML"});
+//# sourceMappingURL=ShowBlockNodes.js.map

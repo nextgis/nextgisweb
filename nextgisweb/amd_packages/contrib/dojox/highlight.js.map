@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"highlight.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iBAAP,CAA0B,CAAC,mBAAD,CAA1B,CAAiD,QAAQ,CAACC,CAAD,CAAW,CAQnE,MAAOA,EAR4D,CAApE;",
+"sources":["highlight.js.uncompressed.js"],
+"names":["define","highlight"]
+}

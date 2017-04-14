@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"SageToLime.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,kCAAP,CAA2C,CAAC,gBAAD,CAAmB,UAAnB,CAA3C,CAA2E,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CACvGA,CAAAC,WAAA,CAAoB,IAAIF,CAAJ,CAAgB,CACnCG,OAAQ,iFAAA,MAAA,CAAA,GAAA,CAD2B,CAAhB,CAcpB,OAAOF,EAAAC,WAfgG,CAAxG;",
+"sources":["SageToLime.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","SageToLime","colors"]
+}

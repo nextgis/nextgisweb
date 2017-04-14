@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ContentTypeMap.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gCAAP,CAAyC,CACxC,iBADwC,CAAzC,CAEG,QAAQ,CAACC,CAAD,CAAM,CAKhB,IAAIC,EAAI,EAKRD,EAAAE,UAAA,CAAe,gCAAf,CAAiDD,CAAjD,CAEAA,EAAAE,IAAA,CAAQ,CACP,KAAQ,oCADD,CAEP,KAAQ,oCAFD,CAKRF,EAAAG,IAAA,CAAQC,QAAQ,CAAYC,CAAZ,CAAoCC,CAApC,CAAiD,CAGhE,IAAAJ,IAAA,CAASG,CAAT,CAAA,CAAwBC,CAHwC,CAMjEN,EAAAO,gBAAA,CAAoBC,QAAQ,CAAYH,CAAZ,CAAwB,CAGnD,MAAO,KAAAH,IAAA,CAASG,CAAT,CAH4C,CAMpD,OAAOL,EA7BS,CAFjB;",
+"sources":["ContentTypeMap.js.uncompressed.js"],
+"names":["define","lang","o","setObject","map","add","o.add","contentType","handlerClass","getHandlerClass","o.getHandlerClass"]
+}

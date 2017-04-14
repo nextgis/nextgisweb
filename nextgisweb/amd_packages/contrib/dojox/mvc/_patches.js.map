@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_patches.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oBAAP,CAA6B,CAC5B,uBAD4B,CAE5B,yBAF4B,CAG5B,sBAH4B,CAA7B,CAIG,QAAQ,EAAE,EAJb;",
+"sources":["_patches.js.uncompressed.js"],
+"names":["define"]
+}

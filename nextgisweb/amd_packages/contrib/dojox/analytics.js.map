@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"analytics.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iBAAP,CAA0B,CAAC,mBAAD,CAA1B,CAAiD,QAAQ,CAACC,CAAD,CAAY,CAQpE,MAAOA,EAR6D,CAArE;",
+"sources":["analytics.js.uncompressed.js"],
+"names":["define","analytics"]
+}

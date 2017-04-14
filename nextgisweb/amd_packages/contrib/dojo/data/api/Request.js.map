@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Request.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,uBAAP,CAAgC,CAAC,qBAAD,CAAhC,CAAyD,QAAQ,CAACC,CAAD,CAAS,CAK1E,MAAOA,EAAA,CAAQ,uBAAR,CAAiC,IAAjC,CAAuC,CAe7CC,MAAOA,QAAQ,EAAE,CAQhB,KAAUC,MAAJ,CAAU,gDAAV,CAAN,CARgB,CAf4B,CAAvC,CALmE,CAA1E;",
+"sources":["Request.js.uncompressed.js"],
+"names":["define","declare","abort","Error"]
+}

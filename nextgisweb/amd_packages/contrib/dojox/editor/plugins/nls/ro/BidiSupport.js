@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/ro/BidiSupport",{"ltr":"Direcţie text de la stânga la dreapta","rtl":"Direcţie text de la dreapta la stânga"});
+define("dojox/editor/plugins/nls/ro/BidiSupport",{ltr:"Direc\u0163ie text de la st\u00e2nga la dreapta",rtl:"Direc\u0163ie text de la dreapta la st\u00e2nga"});
+//# sourceMappingURL=BidiSupport.js.map

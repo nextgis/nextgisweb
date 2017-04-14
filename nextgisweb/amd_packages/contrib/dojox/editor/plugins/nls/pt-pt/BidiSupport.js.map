@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"BidiSupport.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,4CAAP,CAAqD,CAEpD,IAAO,wDAF6C,CAGpD,IAAO,wDAH6C,CAArD;",
+"sources":["BidiSupport.js.uncompressed.js"],
+"names":["define"]
+}

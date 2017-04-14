@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"SimpleDialog.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gCAAP,CAAyC,CACxC,oBADwC,CAAzC,CAEG,QAAQ,CAACC,CAAD,CAAS,CAKnB,MAAOA,EAAA,CAAQ,IAAR,CAAc,CAEpBC,QAAQA,QAAQ,EAAE,CACjB,IAAAC,UAAA,CAAeC,SAAf,CACI,EAAA,IAAAC,cAAA,EAAJ,EAA4B,IAAAC,YAA5B,GAEC,IAAAC,gBAAAC,MAAAC,KAFD,CAEmC,CAD1BC,IAAAC,MAAAC,CAAW,IAAAL,gBAAAM,aAAXD,CAA+C,CAA/CA,CADT,CAEwC,IAFxC,CAFiB,CAFE,CAAd,CALY,CAFpB;",
+"sources":["SimpleDialog.js.uncompressed.js"],
+"names":["define","declare","refresh","inherited","arguments","isLeftToRight","closeButton","closeButtonNode","style","left","Math","round","s","offsetHeight"]
+}

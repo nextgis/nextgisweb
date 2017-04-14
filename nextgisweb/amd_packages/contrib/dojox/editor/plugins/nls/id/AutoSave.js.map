@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"AutoSave.js",
+"lineCount":3,
+"mappings":"A;AAAAA,MAAA,CACA,sCADA,CACyC,CACxC,UAAa,QAD2B,CAExC,mBAAsB,uCAFkB,CAGxC,oBAAuB,oCAHiB,CAIxC,uBAA0B,sBAJc,CAKxC,6BAAgC,wCALQ,CAMxC,2BAA8B,+BANU,CAOxC,4BAA+B,KAPS,CAQxC,0BAA6B,eARW,CASxC,8BAAiC,OATO,CAUxC,mBAAsB,kBAVkB;AAWxC,gBAAmB,+BAXqB,CADzC;",
+"sources":["AutoSave.js.uncompressed.js"],
+"names":["define"]
+}

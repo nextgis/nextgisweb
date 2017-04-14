@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"typematic.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,uBAAP,CAAgC,CAAC,cAAD,CAAhC,CAAkD,QAAQ,EAAE,EAA5D;",
+"sources":["typematic.js.uncompressed.js"],
+"names":["define"]
+}

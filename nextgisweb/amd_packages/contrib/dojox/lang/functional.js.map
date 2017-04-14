@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"functional.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,uBAAP,CAAgC,CAAC,qBAAD,CAAwB,oBAAxB,CAA8C,qBAA9C,CAAhC,CAAsG,QAAQ,CAACC,CAAD,CAAI,CACjH,MAAOA,EAD0G,CAAlH;",
+"sources":["functional.js.uncompressed.js"],
+"names":["define","df"]
+}

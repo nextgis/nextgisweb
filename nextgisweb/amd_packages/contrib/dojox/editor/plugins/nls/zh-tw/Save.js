@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/zh-tw/Save",({"save":"儲存"}));
+define("dojox/editor/plugins/nls/zh-tw/Save",{save:"\u5132\u5b58"});
+//# sourceMappingURL=Save.js.map

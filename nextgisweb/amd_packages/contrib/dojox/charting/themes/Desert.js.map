@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Desert.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,8BAAP,CAAuC,CAAC,gBAAD,CAAmB,UAAnB,CAAvC,CAAuE,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CAGnGA,CAAAC,OAAA,CAAgB,IAAIF,CAAJ,CAAgB,CAC/BG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CADuB,CAAhB,CAShB,OAAOF,EAAAC,OAZ4F,CAApG;",
+"sources":["Desert.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","Desert","colors"]
+}

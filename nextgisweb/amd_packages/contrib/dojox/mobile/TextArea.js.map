@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"TextArea.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,uBAAP,CAAgC,CAC/B,oBAD+B,CAE/B,oBAF+B,CAG/B,WAH+B,CAAhC,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAwBC,CAAxB,CAAgC,CAE1C,MAAOF,EAAA,CAAQ,uBAAR,CAAgCE,CAAhC,CAAyC,CAS/CC,UAAW,aAToC,CAW/CC,oBAAqBA,QAAQ,EAAE,CAG1BC,CAAA,IAAAA,MAAJ,EAAkB,IAAAC,WAAlB,GACC,IAAAD,MADD,CACc,IAAAC,WAAAD,MADd,CAGA,KAAAE,UAAA,CAAeC,SAAf,CAN8B,CAXgB,CAoB/CC,eAAgBA,QAAQ,EAAE,CACrB,IAAAH,WAAJ,GACC,IAAAA,WADD,CACmBL,CAAAS,OAAA,CAAoB,UAApB,CAAgC,EAAhC,CADnB,CAGA,KAAAH,UAAA,CAAeC,SAAf,CAJyB,CApBqB,CAAzC,CAFmC,CAJ3C;",
+"sources":["TextArea.js.uncompressed.js"],
+"names":["define","declare","domConstruct","TextBox","baseClass","postMixInProperties","value","srcNodeRef","inherited","arguments","buildRendering","create"]
+}

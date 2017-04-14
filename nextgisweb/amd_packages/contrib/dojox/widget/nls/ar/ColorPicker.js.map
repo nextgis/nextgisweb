@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"ColorPicker.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,iCADA,CACoC,CACpCC,eAAgB,kFADoB,CAEpCC,sBAAuB,wFAFa,CADpC;",
+"sources":["ColorPicker.js.uncompressed.js"],
+"names":["define","huePickerTitle","saturationPickerTitle"]
+}

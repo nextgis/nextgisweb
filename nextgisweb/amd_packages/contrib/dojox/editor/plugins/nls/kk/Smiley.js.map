@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Smiley.js",
+"lineCount":4,
+"mappings":"A;AAAAA,MAAA,CACA,oCADA,CACuC,CACtCC,OAAQ,6FAD8B,CAEtCC,cAAe,8DAFuB,CAGtCC,iBAAkB,0BAHoB,CAItCC,aAAc,+DAJwB,CAKtCC,aAAc,sCALwB,CAMtCC,aAAc,kDANwB,CAOtCC,cAAe,gCAPuB;AAQtCC,aAAc,gCARwB,CAStCC,gBAAiB,oBATqB,CAUtCC,cAAe,2EAVuB,CAWtCC,YAAa,sCAXyB,CAYtCC,cAAe,gCAZuB,CAatCC,aAAc,cAbwB,CActCC,eAAgB,oBAdsB,CAetCC,aAAc,gCAfwB,CAgBtCC,YAAa,cAhByB,CAiBtCC,WAAY,oBAjB0B,CAkBtCC,cAAe,4CAlBuB,CAmBtCC,eAAgB,gCAnBsB;AAoBtCC,cAAe,gCApBuB,CADvC;",
+"sources":["Smiley.js.uncompressed.js"],
+"names":["define","smiley","emoticonSmile","emoticonLaughing","emoticonWink","emoticonGrin","emoticonCool","emoticonAngry","emoticonHalf","emoticonEyebrow","emoticonFrown","emoticonShy","emoticonGoofy","emoticonOops","emoticonTongue","emoticonIdea","emoticonYes","emoticonNo","emoticonAngel","emoticonCrying","emoticonHappy"]
+}

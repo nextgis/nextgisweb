@@ -1,5 +1,3 @@
 //>>built
-define("dojox/app/module/env",["dojo/_base/declare"],function(_1){
-return _1(null,{mode:"",init:function(){
-}});
-});
+define("dojox/app/module/env",["dojo/_base/declare"],function(a){return a(null,{mode:"",init:function(){}})});
+//# sourceMappingURL=env.js.map

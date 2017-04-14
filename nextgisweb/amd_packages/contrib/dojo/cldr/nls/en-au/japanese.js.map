@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"japanese.js",
+"lineCount":9,
+"mappings":"A;;;;;;;AAAAA,MAAA,CACA,8BADA,CAEA,CACC,yBAA0B,YAD3B,CAEC,wBAAyB,WAF1B,CAGC,yBAA0B,YAH3B,CAIC,yBAA0B,WAJ3B,CAKC,wBAAyB,WAL1B,CAMC,wBAAyB,WAN1B,CAOC,wBAAyB,WAP1B,CAQC,oBAAqB,WARtB,CASC,wBAAyB,WAT1B,CAUC,0BAA2B,YAV5B,CAWC,kBAAmB,kBAXpB,CAYC,uBAAwB,OAZzB,CAaC,uBAAwB,UAbzB;AAcC,mBAAoB,eAdrB,CAeC,yBAA0B,WAf3B,CAgBC,kBAAmB,YAhBpB,CAFA;",
+"sources":["japanese.js.uncompressed.js"],
+"names":["define"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"gfx3d.js",
+"lineCount":2,
+"mappings":"A;AACAA,MAAA,CAAO,aAAP,CAAsB,CAAC,mBAAD,CAAqB,OAArB,CAA6B,gBAA7B,CAA8C,eAA9C,CAA8D,gBAA9D,CAAtB,CAAuG,QAAQ,CAACC,CAAD,CAAMC,CAAN,CAAa,CAC3HD,CAAAE,UAAA,CAAe,OAAf,CAAwB,CAAA,CAAxB,CAA8BD,CAA9B,CAUA,OAAOA,EAAAE,MAXoH,CAA5H;",
+"sources":["gfx3d.js.uncompressed.js"],
+"names":["define","dojo","dojox","getObject","gfx3d"]
+}

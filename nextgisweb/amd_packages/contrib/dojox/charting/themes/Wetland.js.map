@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Wetland.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,+BAAP,CAAwC,CAAC,gBAAD,CAAmB,UAAnB,CAAxC,CAAwE,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CACpGA,CAAAC,QAAA,CAAiB,IAAIF,CAAJ,CAAgB,CAChCG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CADwB,CAAhB,CASjB,OAAOF,EAAAC,QAV6F,CAArG;",
+"sources":["Wetland.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","Wetland","colors"]
+}

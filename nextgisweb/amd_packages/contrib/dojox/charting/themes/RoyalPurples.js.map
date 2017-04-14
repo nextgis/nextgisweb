@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"RoyalPurples.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oCAAP,CAA6C,CAAC,gBAAD,CAAmB,UAAnB,CAA7C,CAA6E,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CACzGA,CAAAC,aAAA,CAAsB,IAAIF,CAAJ,CAAgB,CACrCG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CAD6B,CAAhB,CAStB,OAAOF,EAAAC,aAVkG,CAA1G;",
+"sources":["RoyalPurples.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","RoyalPurples","colors"]
+}

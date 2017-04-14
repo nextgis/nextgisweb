@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"FeedViewerEntry.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,0CAAP,CAAmD,CAElDC,aAAc,8CAFoC,CAAnD;",
+"sources":["FeedViewerEntry.js.uncompressed.js"],
+"names":["define","deleteButton"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Video.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oBAAP,CAA6B,CAC5B,oBAD4B,CAE5B,YAF4B,CAG5B,SAH4B,CAA7B,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAeC,CAAf,CAAqB,CAI/B,MAAOF,EAAA,CAAQ,oBAAR,CAA8BE,CAA9B,CAAqC,CAa3CC,MAAO,OAboC,CAmB3CC,OAAQ,OAnBmC,CAuB3CC,KAAM,OAvBqC,CAyB3CC,gBAAiBA,QAAQ,EAAE,CAC1B,MAAOL,EAAA,CAAI,IAAJ,CAAA,CAAY,aAAZ,CACU,CAAb,EAAAA,CAAA,CAAI,IAAJ,CAAA,CAAiB,cAAjB,CAEA,IAJsB,CAzBgB,CAArC,CAJwB,CAJhC;",
+"sources":["Video.js.uncompressed.js"],
+"names":["define","declare","has","Audio","width","height","_tag","_getEmbedRegExp"]
+}

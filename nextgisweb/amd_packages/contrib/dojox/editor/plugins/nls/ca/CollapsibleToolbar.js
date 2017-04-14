@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/ca/CollapsibleToolbar",({"collapse":"Redueix la barra d'eines de l'editor","expand":"Expandeix la barra d'eines de l'editor"}));
+define("dojox/editor/plugins/nls/ca/CollapsibleToolbar",{collapse:"Redueix la barra d'eines de l'editor",expand:"Expandeix la barra d'eines de l'editor"});
+//# sourceMappingURL=CollapsibleToolbar.js.map

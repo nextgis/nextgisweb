@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"RoundRectStoreList.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,iCAAP,CAA0C,CACzC,oBADyC,CAEzC,iBAFyC,CAGzC,mBAHyC,CAA1C,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAyBC,CAAzB,CAAwC,CAKlD,MAAOF,EAAA,CAAQ,iCAAR,CAA2C,CAACC,CAAD,CAAgBC,CAAhB,CAA3C,CAA4E,EAA5E,CAL2C,CAJnD;",
+"sources":["RoundRectStoreList.js.uncompressed.js"],
+"names":["define","declare","RoundRectList","StoreListMixin"]
+}

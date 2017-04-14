@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_www.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,yCAAP,CAAkD,wDAAA,MAAA,CAAA,GAAA,CAAlD,CAA6H,QAAQ,EAAE,EAAvI;",
+"sources":["_www.js.uncompressed.js"],
+"names":["define"]
+}

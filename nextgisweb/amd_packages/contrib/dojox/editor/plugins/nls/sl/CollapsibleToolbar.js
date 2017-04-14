@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/sl/CollapsibleToolbar",({"collapse":"Strni orodno vrstico urejevalnika ","expand":"Razširi orodno vrstico urejevalnika "}));
+define("dojox/editor/plugins/nls/sl/CollapsibleToolbar",{collapse:"Strni orodno vrstico urejevalnika ",expand:"Raz\u0161iri orodno vrstico urejevalnika "});
+//# sourceMappingURL=CollapsibleToolbar.js.map

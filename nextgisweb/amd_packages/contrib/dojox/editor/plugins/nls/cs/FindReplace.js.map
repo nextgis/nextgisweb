@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"FindReplace.js",
+"lineCount":3,
+"mappings":"A;AAAAA,MAAA,CACA,yCADA,CAC4C,CAC3C,UAAa,aAD8B,CAE3C,YAAe,4BAF4B,CAG3C,aAAgB,0CAH2B,CAI3C,eAAkB,kCAJyB,CAK3C,YAAe,uBAL4B,CAM3C,UAAa,+DAN8B,CAO3C,iBAAoB,+DAPuB,CAQ3C,UAAa,gCAR8B,CAS3C,iBAAoB,4CATuB;AAU3C,iBAAoB,mBAVuB,CAW3C,wBAA2B,4BAXgB,CAY3C,WAAc,YAZ6B,CAa3C,kBAAqB,iBAbsB,CAc3C,cAAiB,UAd0B,CAe3C,qBAAwB,eAfmB,CAgB3C,kBAAqB,sDAhBsB,CAiB3C,cAAiB,gCAjB0B,CAkB3C,kBAAqB,aAlBsB,CAmB3C,qBAAwB,cAnBmB,CAD5C;",
+"sources":["FindReplace.js.uncompressed.js"],
+"names":["define"]
+}

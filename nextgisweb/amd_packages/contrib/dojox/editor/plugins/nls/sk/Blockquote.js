@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/sk/Blockquote",({"blockquote":"Blok citátu"}));
+define("dojox/editor/plugins/nls/sk/Blockquote",{blockquote:"Blok cit\u00e1tu"});
+//# sourceMappingURL=Blockquote.js.map

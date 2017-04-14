@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"TabBar.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,0BAAP,CAAmC,CAClC,oBADkC,CAElC,UAFkC,CAAnC,CAGG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAiB,CAK3B,MAAOD,EAAA,CAAQ,IAAR,CAAc,CAOpBE,gBAAiBA,QAAQ,CAAYC,CAAZ,CAAoB,CACxC,IAAAC,SAAJ,EAAqB,IAAAD,QAArB,GAAsCA,CAAtC,GACC,IAAAE,KAAA,CAAU,SAAV,CAAqBF,CAArB,CACA,CAAAF,CAAAK,qBAAA,CAA4B,IAA5B,CAFD,CAD4C,CAPzB,CAAd,CALoB,CAH5B;",
+"sources":["TabBar.js.uncompressed.js"],
+"names":["define","declare","common","_setTextDirAttr","textDir","_created","_set","setTextDirForButtons"]
+}

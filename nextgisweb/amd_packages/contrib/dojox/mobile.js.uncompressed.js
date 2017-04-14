@@ -6588,8 +6588,9 @@ define([
 		},
 
 		startup: function(){
+			var started = this._started;
 			this.inherited(arguments);
-			if(!this._started){
+			if(!started){
 				this.resize();
 			}
 		},

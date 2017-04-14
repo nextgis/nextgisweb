@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"BlueDusk.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gCAAP,CAAyC,CAAC,gBAAD,CAAmB,UAAnB,CAAzC,CAAyE,QAAQ,CAACC,CAAD,CAAcC,CAAd,CAAqB,CACrGA,CAAAC,SAAA,CAAkB,IAAIF,CAAJ,CAAgB,CACjCG,OAAQ,CACP,SADO,CAEP,SAFO,CAGP,SAHO,CAIP,SAJO,CAKP,SALO,CADyB,CAAhB,CAUlB,OAAOF,EAAAC,SAX8F,CAAtG;",
+"sources":["BlueDusk.js.uncompressed.js"],
+"names":["define","SimpleTheme","themes","BlueDusk","colors"]
+}

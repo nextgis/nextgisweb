@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_CheckBoxSelector.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,8BAAP,CAAuC,CAAC,SAAD,CAAY,aAAZ,CAAvC,CAAmE,QAAQ,CAACC,CAAD,CAAO,CACjF,MAAOA,EAAAC,KAAAC,kBAD0E,CAAlF;",
+"sources":["_CheckBoxSelector.js.uncompressed.js"],
+"names":["define","dojox","grid","_CheckBoxSelector"]
+}

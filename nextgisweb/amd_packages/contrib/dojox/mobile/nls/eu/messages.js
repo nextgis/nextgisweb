@@ -1,2 +1,3 @@
 //>>built
-define("dojox/mobile/nls/eu/messages",{"CarouselPrevious":"Aurrekoa","CarouselNext":"Hurrengoa","PageIndicatorLabel":"$0/$1 orria"});
+define("dojox/mobile/nls/eu/messages",{CarouselPrevious:"Aurrekoa",CarouselNext:"Hurrengoa",PageIndicatorLabel:"$0/$1 orria"});
+//# sourceMappingURL=messages.js.map

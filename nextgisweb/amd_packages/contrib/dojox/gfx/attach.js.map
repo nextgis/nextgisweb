@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"attach.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,kBAAP,CAA2B,CAAC,WAAD,CAA3B,CAA0C,QAAQ,EAAE,EAApD;",
+"sources":["attach.js.uncompressed.js"],
+"names":["define"]
+}

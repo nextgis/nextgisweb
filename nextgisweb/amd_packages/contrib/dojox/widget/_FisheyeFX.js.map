@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"_FisheyeFX.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,yBAAP,CAAkC,CACjC,oBADiC,CAEjC,YAFiC,CAIjC,eAJiC,CAAlC,CAKG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAiBC,CAAjB,CAA8B,CAExC,MAAOF,EAAA,CAAQ,yBAAR,CAAmC,IAAnC,CAAyC,CAG/CG,MAAOA,QAAQ,CAACC,CAAD,CAAWC,CAAX,CAAqB,CAGnCJ,CAAA,CAAMG,CAAN,CAAgBC,CAAhB,CAAAC,QAAA,CAAkC,QAAQ,CAACC,CAAD,CAAM,CAC/C,IAAIL,CAAJ,CAAgB,CACfM,WAAY,CACXC,SAAU,GADC,CADG,CAAhB,CAIGF,CAJH,CAD+C,CAAhD,CAHmC,CAHW,CAAzC,CAFiC,CALzC;",
+"sources":["_FisheyeFX.js.uncompressed.js"],
+"names":["define","declare","query","FisheyeLite","addFx","theQuery","fromNode","forEach","node","properties","fontSize"]
+}

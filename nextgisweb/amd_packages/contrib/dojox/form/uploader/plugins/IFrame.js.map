@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"IFrame.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,oCAAP,CAA6C,EAA7C,CAAgD,QAAQ,EAAE,CACzDC,OAAAC,KAAA,CAAa,qIAAb,CACA,OAAO,EAFkD,CAA1D;",
+"sources":["IFrame.js.uncompressed.js"],
+"names":["define","console","warn"]
+}

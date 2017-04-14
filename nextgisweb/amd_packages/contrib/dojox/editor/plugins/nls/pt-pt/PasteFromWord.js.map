@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"PasteFromWord.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,8CADA,CACiD,CAChD,cAAiB,eAD+B,CAEhD,aAAgB,kOAFgC,CADjD;",
+"sources":["PasteFromWord.js.uncompressed.js"],
+"names":["define"]
+}

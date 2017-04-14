@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"IndicatorBase.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,6BAAP,CAAsC,CAAC,oBAAD,CAAuB,4BAAvB,CAAtC,CAA4F,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAwB,CAC3H,MAAOD,EAAA,CAAQ,6BAAR,CAAuCC,CAAvC,CAAsD,CAM5DC,MAAO,IANqD,CAAtD,CADoH,CAA5H;",
+"sources":["IndicatorBase.js.uncompressed.js"],
+"names":["define","declare","_Invalidating","value"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"messages.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,8BAAP,CAAuC,CAGtC,iBAAoB,0BAHkB,CAKtC,aAAgB,kBALsB,CAStC,mBAAsB,sBATgB,CAAvC;",
+"sources":["messages.js.uncompressed.js"],
+"names":["define"]
+}

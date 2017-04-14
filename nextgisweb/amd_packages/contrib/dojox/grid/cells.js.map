@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"cells.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,kBAAP,CAA2B,CAAC,SAAD,CAAY,eAAZ,CAA3B,CAAyD,QAAQ,CAACC,CAAD,CAAO,CACvE,MAAOA,EAAAC,KAAAC,MADgE,CAAxE;",
+"sources":["cells.js.uncompressed.js"],
+"names":["define","dojox","grid","cells"]
+}

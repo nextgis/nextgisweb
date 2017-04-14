@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Pagination.js",
+"lineCount":4,
+"mappings":"A;AAAAA,MAAA,CACA,uCADA,CAC0C,CACzC,aAAgB,gDADyB,CAEzC,SAAY,yDAF6B,CAGzC,QAAW,yDAH8B,CAIzC,QAAW,mDAJ8B,CAKzC,QAAW,+DAL8B,CAMzC,UAAa,sCAN4B,CAOzC,kBAAqB,0BAPoB,CAQzC,sBAAyB,+BARgB;AASzC,sBAAyB,0EATgB,CAUzC,sBAAyB,yDAVgB,CAWzC,gBAAmB,8FAXsB,CAYzC,YAAe,yDAZ0B,CAazC,iBAAoB,kFAbqB,CAczC,oBAAuB,8CAdkB;AAezC,cAAiB,gCAfwB,CAgBzC,aAAgB,gCAhByB,CAiBzC,IAAO,oBAjBkC,CAD1C;",
+"sources":["Pagination.js.uncompressed.js"],
+"names":["define"]
+}

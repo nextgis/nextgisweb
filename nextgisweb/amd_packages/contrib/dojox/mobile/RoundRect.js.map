@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"RoundRect.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,wBAAP,CAAiC,CAChC,oBADgC,CAEhC,gBAFgC,CAGhC,aAHgC,CAAjC,CAIG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAoBC,CAApB,CAA8B,CAKxC,MAAOF,EAAA,CAAQ,wBAAR,CAAkCE,CAAlC,CAA6C,CAenDC,OAAQ,CAAA,CAf2C,CAqBnDC,UAAW,cArBwC,CAuBnDC,eAAgBA,QAAQ,EAAE,CACzB,IAAAC,UAAA,CAAeC,SAAf,CACG,KAAAJ,OAAH,EACCF,CAAAO,IAAA,CAAa,IAAAC,QAAb,CAA2B,WAA3B,CAHwB,CAvByB,CAA7C,CALiC,CAJzC;",
+"sources":["RoundRect.js.uncompressed.js"],
+"names":["define","declare","domClass","Container","shadow","baseClass","buildRendering","inherited","arguments","add","domNode"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"generic.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CACA,6BADA,CAEA,CACC,kBAAmB,kBADpB,CAEC,mBAAoB,gBAFrB,CAFA;",
+"sources":["generic.js.uncompressed.js"],
+"names":["define"]
+}

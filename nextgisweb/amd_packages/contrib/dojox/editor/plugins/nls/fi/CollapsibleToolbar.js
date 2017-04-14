@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/fi/CollapsibleToolbar",({"collapse":"Pienennä muokkausohjelman työkalurivi","expand":"Laajenna muokkausohjelman työkalurivi"}));
+define("dojox/editor/plugins/nls/fi/CollapsibleToolbar",{collapse:"Pienenn\u00e4 muokkausohjelman ty\u00f6kalurivi",expand:"Laajenna muokkausohjelman ty\u00f6kalurivi"});
+//# sourceMappingURL=CollapsibleToolbar.js.map

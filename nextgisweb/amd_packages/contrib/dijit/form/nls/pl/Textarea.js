@@ -1,2 +1,3 @@
 //>>built
-define("dijit/form/nls/pl/Textarea",({iframeEditTitle:"edycja obszaru",iframeFocusTitle:"edycja ramki obszaru"}));
+define("dijit/form/nls/pl/Textarea",{iframeEditTitle:"edycja obszaru",iframeFocusTitle:"edycja ramki obszaru"});
+//# sourceMappingURL=Textarea.js.map

@@ -550,7 +550,10 @@ define([
 	},
 	{
 		render: function(context, buffer){
-			var str = this.contents.resolve(context) || "";
+			var str = this.contents.resolve(context);
+			if (str === undefined || str === null) {
+				str = '';
+			}
 			if(!str.safe){
 				str = dd._base.escape("" + str);
 			}
@@ -1229,18 +1232,24 @@ define([
 				forloop.first = !j;
 				forloop.last = (j == arred.length - 1);
 
-				if(assign.length > 1 && lang.isArrayLike(item)){
-					if(!dirty){
-						dirty = true;
-						context = context.push();
+				if (lang.isArrayLike(item)) {
+					if(assign.length > 1){
+						if(!dirty){
+							dirty = true;
+							context = context.push();
+						}
+						var zipped = {};
+						for(k = 0; k < item.length && k < assign.length; k++){
+							zipped[assign[k]] = item[k];
+						}
+						lang.mixin(context, zipped);
+					}else{
+						// in single assignment scenarios, pick only the value
+						context[assign[0]] = item[1];
 					}
-					var zipped = {};
-					for(k = 0; k < item.length && k < assign.length; k++){
-						zipped[assign[k]] = item[k];
-					}
-					lang.mixin(context, zipped);
 				}else{
-					context[assign[0]] = item;
+				    // in single assignment scenarios, pick only the value
+				    context[assign[0]] = item;
 				}
 
 				if(j + 1 > this.pool.length){
@@ -1350,6 +1359,7 @@ define([
 
 	return ddtl;
 });
+
 },
 'dojox/dtl/tag/loop':function(){
 define([

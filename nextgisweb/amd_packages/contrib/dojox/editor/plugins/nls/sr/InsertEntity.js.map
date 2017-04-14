@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"InsertEntity.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,0CAAP,CAAmD,CAElDC,aAAc,eAFoC,CAAnD;",
+"sources":["InsertEntity.js.uncompressed.js"],
+"names":["define","insertEntity"]
+}

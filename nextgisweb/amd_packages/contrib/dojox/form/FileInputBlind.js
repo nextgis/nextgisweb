@@ -1,5 +1,3 @@
 //>>built
-define("dojox/form/FileInputBlind",["dojo/_base/lang","dojox/form/FileInputAuto"],function(_1,_2){
-_1.setObject("dojox.form.FileInputBlind",_2);
-return _2;
-});
+define("dojox/form/FileInputBlind",["dojo/_base/lang","dojox/form/FileInputAuto"],function(b,a){b.setObject("dojox.form.FileInputBlind",a);return a});
+//# sourceMappingURL=FileInputBlind.js.map

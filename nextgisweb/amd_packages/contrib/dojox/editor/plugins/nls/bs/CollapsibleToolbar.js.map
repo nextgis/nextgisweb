@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"CollapsibleToolbar.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,gDAAP,CAAyD,CAExD,SAAY,+BAF4C,CAGxD,OAAU,sCAH8C,CAAzD;",
+"sources":["CollapsibleToolbar.js.uncompressed.js"],
+"names":["define"]
+}

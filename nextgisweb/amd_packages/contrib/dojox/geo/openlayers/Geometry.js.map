@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Geometry.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,+BAAP,CAAwC,CACvC,oBADuC,CAAxC,CAEG,QAAQ,CAACC,CAAD,CAAS,CAEnB,MAAOA,EAAA,CAAQ,+BAAR,CAAyC,IAAzC,CAA+C,CAcrDC,YAAc,IAduC,CAkBrDC,MAAO,IAlB8C,CAoBrDC,YAAaA,QAAQ,CAACC,CAAD,CAAQ,CAM5B,IAAAH,YAAA,CAAmBG,CANS,CApBwB,CAA/C,CAFY,CAFpB;",
+"sources":["Geometry.js.uncompressed.js"],
+"names":["define","declare","coordinates","shape","constructor","coords"]
+}

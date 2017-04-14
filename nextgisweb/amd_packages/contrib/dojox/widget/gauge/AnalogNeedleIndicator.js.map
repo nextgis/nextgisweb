@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"AnalogNeedleIndicator.js",
+"lineCount":2,
+"mappings":"A;AACAA,MAAA,CAAO,0CAAP,CAAmD,CAAC,MAAD,CAAQ,OAAR,CAAgB,OAAhB,CAAwB,iDAAxB,CAAnD,CAA+H,QAAQ,CAACC,CAAD,CAAMC,CAAN,CAAYC,CAAZ,CAAkB,CACzJF,CAAAG,QAAA,CAAa,0CAAb,CACAH,EAAAI,QAAA,CAAa,oCAAb,CAEAF,EAAAG,OAAAC,MAAAC,sBAAA,CAA2CL,CAAAM,OAAAD,sBAJ8G,CAAzJ;",
+"sources":["AnalogNeedleIndicator.js.uncompressed.js"],
+"names":["define","dojo","dijit","dojox","provide","require","widget","gauge","AnalogNeedleIndicator","gauges"]
+}

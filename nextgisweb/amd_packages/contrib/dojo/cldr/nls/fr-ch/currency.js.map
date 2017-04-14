@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"currency.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CACA,8BADA,CAEA,CACC,WAAc,KADf,CAFA;",
+"sources":["currency.js.uncompressed.js"],
+"names":["define"]
+}

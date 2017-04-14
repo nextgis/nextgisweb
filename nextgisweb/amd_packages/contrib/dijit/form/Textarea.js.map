@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"Textarea.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,qBAAP,CAA8B,CAC7B,oBAD6B,CAE7B,gBAF6B,CAG7B,2BAH6B,CAI7B,kBAJ6B,CAA9B,CAKG,QAAQ,CAACC,CAAD,CAAUC,CAAV,CAAoBC,CAApB,CAA6CC,CAA7C,CAA4D,CAKtE,MAAOH,EAAA,CAAQ,qBAAR,CAA+B,CAACG,CAAD,CAAiBD,CAAjB,CAA/B,CAA0E,CAchFE,UAAW,mDAdqE,CAiBhFC,KAAM,EAjB0E,CAmBhFC,eAAgBA,QAAQ,EAAE,CACzB,IAAAC,UAAA,CAAeC,SAAf,CAGAP,EAAAQ,IAAA,CAAa,IAAAC,QAAb,CAA2B,CAAEC,UAAW,QAAb,CAAuBC,UAAW,MAAlC,CAA0CC,UAAW,YAArD,CAAmEC,YAAa,YAAhF,CAA8FC,gBAAiB,YAA/G,CAA6HC,aAAc,YAA3I,CAA3B,CAJyB,CAnBsD,CAA1E,CAL+D,CALvE;",
+"sources":["Textarea.js.uncompressed.js"],
+"names":["define","declare","domStyle","_ExpandingTextAreaMixin","SimpleTextarea","baseClass","cols","buildRendering","inherited","arguments","set","textbox","overflowY","overflowX","boxSizing","MsBoxSizing","WebkitBoxSizing","MozBoxSizing"]
+}

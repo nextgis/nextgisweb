@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"FontChoice.js",
+"lineCount":4,
+"mappings":"A;AAAAA,MAAA,CACA,iCADA,CACoC,CACnCC,SAAU,4CADyB,CAEnCC,SAAU,gFAFyB,CAGnCC,YAAa,gCAHsB,CAInCC,MAAO,uEAJ4B,CAKnC,aAAc,8FALqB,CAMnCC,UAAW,6FANwB;AAOnCC,QAAS,4CAP0B,CAQnCC,QAAS,wDAR0B,CASnCC,SAAU,gCATyB,CAUnCC,EAAG,8DAVgC,CAWnCC,GAAI,oEAX+B,CAYnCC,GAAI,6IAZ+B,CAanCC,GAAI,mOAb+B;AAcnCC,IAAK,mGAd8B,CAenC,EAAG,mCAfgC,CAgBnC,EAAG,kCAhBgC,CAiBnC,EAAG,gCAjBgC,CAkBnC,EAAG,sCAlBgC,CAmBnC,EAAG,sCAnBgC,CAoBnC,EAAG,wCApBgC,CAqBnC,EAAG,yCArBgC,CADpC;",
+"sources":["FontChoice.js.uncompressed.js"],
+"names":["define","fontSize","fontName","formatBlock","serif","monospace","cursive","fantasy","noFormat","p","h1","h2","h3","pre"]
+}

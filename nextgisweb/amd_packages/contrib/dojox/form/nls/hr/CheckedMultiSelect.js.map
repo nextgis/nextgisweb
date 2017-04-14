@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"CheckedMultiSelect.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CACA,sCADA,CACyC,CACxCC,eAAgB,2CADwB,CAExCC,qBAAsB,0BAFkB,CADzC;",
+"sources":["CheckedMultiSelect.js.uncompressed.js"],
+"names":["define","invalidMessage","multiSelectLabelText"]
+}

@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"loadInit.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAAAA,MAAA,CAAO,eAAP,CAAwB,CAAC,gBAAD,CAAxB,CAA4C,QAAQ,CAACC,CAAD,CAAQ,CAC3D,MAAO,CACNC,QAAQ,CADF,CAENC,UAAUA,QAAQ,CAACC,CAAD,CAAI,CAAC,MAAOA,EAAR,CAFhB,CAGNC,KAAKJ,CAAAK,SAHC,CADoD,CAA5D;",
+"sources":["loadInit.js.uncompressed.js"],
+"names":["define","loader","dynamic","normalize","id","load","loadInit"]
+}

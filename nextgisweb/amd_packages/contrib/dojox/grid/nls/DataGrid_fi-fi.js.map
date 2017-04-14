@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"DataGrid_fi-fi.js",
+"lineCount":2,
+"mappings":"A;AAAAA,MAAA,CAAO,+BAAP,CAAuC,CACvC,oBAAoB,CAAC,aAAe,mCAAhB,CAA0C,WAAa,oBAAvD,CAA4E,WAAa,EAAzF,CADmB,CAAvC;",
+"sources":["DataGrid_fi-fi.js.uncompressed.js"],
+"names":["define"]
+}

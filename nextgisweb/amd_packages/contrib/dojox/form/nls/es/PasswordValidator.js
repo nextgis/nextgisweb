@@ -1,2 +1,3 @@
 //>>built
-define("dojox/form/nls/es/PasswordValidator",({nomatchMessage:"Las contraseñas no coinciden.",badPasswordMessage:"Contraseña no válida."}));
+define("dojox/form/nls/es/PasswordValidator",{nomatchMessage:"Las contrase\u00f1as no coinciden.",badPasswordMessage:"Contrase\u00f1a no v\u00e1lida."});
+//# sourceMappingURL=PasswordValidator.js.map

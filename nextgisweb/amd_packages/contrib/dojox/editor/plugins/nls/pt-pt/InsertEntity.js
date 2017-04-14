@@ -1,2 +1,3 @@
 //>>built
-define("dojox/editor/plugins/nls/pt-pt/InsertEntity",({insertEntity:"Inserir símbolo"}));
+define("dojox/editor/plugins/nls/pt-pt/InsertEntity",{insertEntity:"Inserir s\u00edmbolo"});
+//# sourceMappingURL=InsertEntity.js.map

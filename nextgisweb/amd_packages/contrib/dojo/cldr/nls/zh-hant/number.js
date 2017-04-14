@@ -1,8 +1,9 @@
 /*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2016, The JS Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
 
 //>>built
-define("dojo/cldr/nls/zh-hant/number",{"group":",","percentSign":"%","exponential":"E","scientificFormat":"#E0","percentFormat":"#,##0%","list":";","infinity":"∞","minusSign":"-","decimal":".","superscriptingExponent":"×","nan":"非數值","perMille":"‰","decimalFormat":"#,##0.###","currencyFormat":"¤#,##0.00;(¤#,##0.00)","plusSign":"+","decimalFormat-long":"000兆","decimalFormat-short":"000T"});
+define("dojo/cldr/nls/zh-hant/number",{group:",",percentSign:"%",exponential:"E",scientificFormat:"#E0",percentFormat:"#,##0%",list:";",infinity:"\u221e",minusSign:"-",decimal:".",superscriptingExponent:"\u00d7",nan:"\u975e\u6578\u503c",perMille:"\u2030",decimalFormat:"#,##0.###",currencyFormat:"\u00a4#,##0.00;(\u00a4#,##0.00)",plusSign:"+","decimalFormat-long":"000\u5146","decimalFormat-short":"000T"});
+//# sourceMappingURL=number.js.map
