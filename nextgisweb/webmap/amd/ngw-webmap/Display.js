@@ -784,7 +784,7 @@ define([
                     );
                 }
             } else {
-                this.map.olMap.getView().fit(this._extent, this.map.olMap.getSize());
+                this.map.olMap.getView().fit(this._extent);
             }
         }
     });

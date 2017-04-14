@@ -17,7 +17,8 @@ define([
             class: "dijitTooltipContainer",
             style: {
                 "background-color": "white",
-                "padding": 0
+                "padding": 0,
+                "user-select": "auto"
             }
         }, this.container);
 

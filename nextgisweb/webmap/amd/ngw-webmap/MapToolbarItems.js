@@ -71,10 +71,7 @@ define([
                 handleAs: "json",
                 headers: {"X-Feature-Box": true}
             }).then(lang.hitch(this, function (featureData) {
-                    this.display.map.olMap.getView().fit(
-                        featureData.box,
-                        this.display.map.olMap.getSize()
-                    );
+                    this.display.map.olMap.getView().fit(featureData.box);
                 }
             ));
         },

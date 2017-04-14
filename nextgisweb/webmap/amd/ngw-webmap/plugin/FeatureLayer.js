@@ -88,9 +88,7 @@ define([
                 headers: { "X-Feature-Box": true }
             }).then(
                 function data(featuredata) {
-                    display.map.olMap.getView().fit(
-                        featuredata.box,
-                        display.map.olMap.getSize());
+                    display.map.olMap.getView().fit(featuredata.box);
                     display.tabContainer.selectChild(display.mainPane);
                 }
             );
@@ -229,9 +227,7 @@ define([
                 var mItm = new MenuItem({
                     label: put("span $", feature.label).outerHTML,
                     onClick: lang.hitch(this, function () {
-                        display.map.olMap.getView().fit(
-                            feature.box,
-                            display.map.olMap.getSize());
+                        display.map.olMap.getView().fit(feature.box);
                         popup.close(this.searchResults);
                     })
                 });

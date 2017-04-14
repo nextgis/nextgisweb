@@ -56,8 +56,7 @@ define([
                         extent.maxLon, extent.maxLat
                     ],
                     plugin.display.lonlatProjection,
-                    plugin.display.displayProjection),
-                    plugin.display.map.olMap.getSize());
+                    plugin.display.displayProjection));
             });
         }
     });

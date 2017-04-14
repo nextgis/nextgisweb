@@ -445,10 +445,7 @@ define([
                                         headers: { "X-Feature-Box": true }
                                     }).then(
                                         function data(featuredata) {
-                                            display.map.olMap.getView().fit(
-                                                featuredata.box,
-                                                display.map.olMap.getSize()
-                                            );
+                                            display.map.olMap.getView().fit(featuredata.box);
                                         }
                                     );
                                 }
@@ -779,7 +776,7 @@ define([
                     );
                 }
             } else {
-                this.map.olMap.getView().fit(this._extent, this.map.olMap.getSize());
+                this.map.olMap.getView().fit(this._extent);
             }
         }
     });
