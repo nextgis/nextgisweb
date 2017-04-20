@@ -13,6 +13,7 @@ define([
     "dojo/dom-style",
     "dojo/request/xhr",
     "dojo/request/script",
+    "dojo/topic",
     "openlayers/ol",
     "ngw-pyramid/i18n!webmap",
     "ngw-feature-layer/FeatureStore",
@@ -39,6 +40,7 @@ define([
     domStyle,
     xhr,
     script,
+    topic,
     ol,
     i18n,
     FeatureStore,
@@ -77,6 +79,18 @@ define([
             // При изменении выделенной строки изменяем доступность кнопок
             this.watch("selectedRow", function (attr, oldVal, newVal) {
                 widget.btnZoomToFeature.set("disabled", newVal === null);
+                if (newVal) {
+                    xhr.get(route.feature_layer.feature.item({
+                        id: widget.layerId,
+                        fid: newVal.id
+                    }), {
+                        handleAs: "json"
+                    }).then(
+                        function (feature) {
+                            topic.publish("feature.highlight", {geom: feature.geom});
+                        }
+                    );
+                }
             });
         },
 

@@ -12,6 +12,7 @@ define([
     "dojo/dom-style",
     "dojo/dom-construct",
     "dojo/on",
+    "dojo/topic",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/StackContainer",
@@ -43,6 +44,7 @@ define([
     domStyle,
     domConstruct,
     on,
+    topic,
     BorderContainer,
     ContentPane,
     StackContainer,
@@ -233,6 +235,8 @@ define([
                     widget.resize();
 
                 });
+
+                topic.publish("feature.highlight", {geom: feature.geom});
             });
         }
     });
@@ -336,6 +340,7 @@ define([
         _responsePopup: function (response, point, layerLabels) {
             if (response.featureCount === 0) {
                 this._popup.setPosition(undefined);
+                topic.publish("feature.unhighlight");
                 return;
             }
 
@@ -357,6 +362,7 @@ define([
             // Обработчик закрытия
             on(this._popup._closeSpan, "click", lang.hitch(this, function () {
                 this._popup.setPosition(undefined);
+                topic.publish("feature.unhighlight");
             }));
         }
 

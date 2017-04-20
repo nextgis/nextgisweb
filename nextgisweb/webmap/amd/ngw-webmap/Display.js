@@ -15,6 +15,7 @@ define([
     "dojo/dom-construct",
     "openlayers/ol",
     "ngw/openlayers/Map",
+    "ngw/openlayers/layer/Vector",
     "dijit/registry",
     "dijit/form/DropDownButton",
     "dijit/DropDownMenu",
@@ -27,6 +28,7 @@ define([
     "dojo/store/JsonRest",
     "dojo/request/xhr",
     "dojo/data/ItemFileWriteStore",
+    "dojo/topic",
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
     "ngw/route",
@@ -71,6 +73,7 @@ define([
     domConstruct,
     ol,
     Map,
+    Vector,
     registry,
     DropDownButton,
     DropDownMenu,
@@ -83,6 +86,7 @@ define([
     JsonRest,
     xhr,
     ItemFileWriteStore,
+    topic,
     TreeStoreModel,
     Tree,
     route,
@@ -359,6 +363,8 @@ define([
                     // Добавляем слои на карту
                     widget._mapAddLayers();
 
+                    widget._mapAddHighlightOverlay();
+
                     // Связываем изменение чекбокса с видимостью слоя
                     var store = widget.itemStore;
                     store.on("Set", function (item, attr, oldVal, newVal) {
@@ -625,6 +631,39 @@ define([
             array.forEach(this._layer_order, function (id) {
                 this.map.addLayer(this._layers[id]);
             }, this);
+        },
+
+        _mapAddHighlightOverlay: function () {
+            var wkt = new ol.format.WKT(),
+                overlay, source;
+
+            topic.subscribe("feature.highlight", function (e) {
+                source.clear();
+                source.addFeature(new ol.Feature({
+                    geometry: wkt.readGeometry(e.geom)
+                }));
+            });
+
+            topic.subscribe("feature.unhighlight", function () {
+                source.clear();
+            });
+
+            var stroke = new ol.style.Stroke({
+                width: 3,
+                color: "rgba(255,255,0,1)"
+            });
+            overlay = new Vector("highlight", {
+                title: "Highlight Overlay",
+                style: new ol.style.Style({
+                    stroke: stroke,
+                    image: new ol.style.Circle({
+                        stroke: stroke,
+                        radius: 5
+                    })
+                })
+            });
+            source = overlay.olLayer.getSource();
+            this.map.addLayer(overlay);
         },
 
         _adaptersSetup: function () {
