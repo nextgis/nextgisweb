@@ -247,6 +247,10 @@ msgstr "Объект"
 msgid "Identify"
 msgstr "Идентификация"
 
+#: amd/ngw-webmap/tool/Identify.js:354
+msgid "Features"
+msgstr "Объектов"
+
 #: amd/ngw-webmap/tool/Measure.js:22
 msgid "Measure distance"
 msgstr "Измерение расстояния"

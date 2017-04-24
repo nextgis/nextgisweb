@@ -31,16 +31,19 @@ define([
         }, this.subcontainer, "last");
 
         // Заголовок
-        this.titleDiv = domConstruct.create("div", {
-            innerHTML: this.title ? this.title : "&nbsp;",
+        this.titleBar = domConstruct.create("div", {
             style: "background-color: #eee; margin: 1px 1px 2px 1px;"
         }, this.subcontainer, "first");
+
+        this.titleSpan = domConstruct.create("span", {
+            innerHTML: this.title ? this.title : "&nbsp;",
+        }, this.titleBar, "last");
 
         // Кнопка закрытия в заголовке
         this._closeSpan = domConstruct.create("span", {
             class: "dijitDialogCloseIcon",
             style: "margin-top: 2px"
-        }, this.titleDiv, "last");
+        }, this.titleBar, "last");
 
         // Соединительная стрелка
         this._connectorDiv = domConstruct.create("div", {
@@ -58,6 +61,10 @@ define([
     };
 
     ol.inherits(Popup, ol.Overlay);
+
+    Popup.prototype.setTitle = function (title) {
+        this.titleSpan.innerHTML = title;
+    };
 
     return Popup;
 

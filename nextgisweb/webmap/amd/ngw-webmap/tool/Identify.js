@@ -334,7 +334,7 @@ define([
         },
 
         _responsePopup: function (response, point, layerLabels) {
-            if (response.featureCount == 0) {
+            if (response.featureCount === 0) {
                 this._popup.setPosition(undefined);
                 return;
             }
@@ -351,6 +351,7 @@ define([
 
             widget.placeAt(this._popup.contentDiv);
 
+            this._popup.setTitle(i18n.gettext("Features") + ": " + response.featureCount);
             this._popup.setPosition(point);
 
             // Обработчик закрытия
