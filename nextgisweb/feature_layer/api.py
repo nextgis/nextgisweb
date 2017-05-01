@@ -258,6 +258,36 @@ def cpost(resource, request):
         content_type=b'application/json')
 
 
+def cpatch(resource, request):
+    request.resource_permission(PERM_WRITE)
+    result = list()
+
+    for fdata in request.json_body:
+        if 'id' not in fdata:
+            # Create new feature
+            feature = Feature(layer=resource)
+            deserialize(feature, fdata)
+            fid = resource.feature_create(feature)
+        else:
+            # Update existing feature
+            fid = fdata['id']
+            query = resource.feature_query()
+            query.geom()
+            query.filter_by(id=fid)
+            query.limit(1)
+
+            feature = None
+            for f in query():
+                feature = f
+
+            deserialize(feature, request.json_body)
+            resource.feature_put(feature)
+
+        result.append(dict(id=fid))
+
+    return Response(json.dumps(result), content_type=b'application/json')
+
+
 def cdelete(resource, request):
     request.resource_permission(PERM_WRITE)
     resource.feature_delete_all()
@@ -300,8 +330,8 @@ def setup_pyramid(comp, config):
         factory=resource_factory) \
         .add_view(cget, context=IFeatureLayer, request_method='GET') \
         .add_view(cpost, context=IWritableFeatureLayer, request_method='POST') \
-        .add_view(cdelete, context=IWritableFeatureLayer,
-                  request_method='DELETE')
+        .add_view(cpatch, context=IWritableFeatureLayer, request_method='PATCH') \
+        .add_view(cdelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',
