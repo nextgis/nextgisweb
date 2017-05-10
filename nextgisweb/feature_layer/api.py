@@ -280,7 +280,7 @@ def cpatch(resource, request):
             for f in query():
                 feature = f
 
-            deserialize(feature, request.json_body)
+            deserialize(feature, fdata)
             resource.feature_put(feature)
 
         result.append(dict(id=fid))
