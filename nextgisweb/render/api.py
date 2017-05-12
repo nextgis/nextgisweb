@@ -99,4 +99,4 @@ def setup_pyramid(comp, config):
         .add_view(tile)
 
     config.add_route('render.image', '/api/component/render/image') \
-        .add_view(image)
+        .add_view(image, http_cache=0)
