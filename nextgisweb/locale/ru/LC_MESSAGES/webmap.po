@@ -116,6 +116,18 @@ msgstr "Перейти"
 msgid "Feature table"
 msgstr "Таблица объектов"
 
+#: amd/ngw-webmap/plugin/LayerEditor.js:26
+msgid "Confirmation"
+msgstr "Подтверждение"
+
+#: amd/ngw-webmap/plugin/LayerEditor.js:27
+msgid "Finish editing?"
+msgstr "Закончить редактирование?"
+
+#: amd/ngw-webmap/plugin/LayerEditor.js:41
+msgid "Editing"
+msgstr "Редактирование"
+
 #: amd/ngw-webmap/plugin/ZoomToLayer.js:24
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
