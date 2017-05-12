@@ -26,7 +26,8 @@ define([
                     image.getImage().src = url
                         + "?resource=" + queryObject["resource"]
                         + "&extent=" + queryObject["BBOX"]
-                        + "&size=" + queryObject["WIDTH"] + "," + queryObject["HEIGHT"];
+                        + "&size=" + queryObject["WIDTH"] + "," + queryObject["HEIGHT"]
+                        + "#" + Date.now(); // in-memory cache busting
                 }
             });
 
