@@ -39,6 +39,10 @@ define([
             });
         },
 
+        reload: function () {
+            this.olSource.changed();
+        },
+
         postscript: function () {
             // НЕ вызываем Stateful.postscript!
         },
