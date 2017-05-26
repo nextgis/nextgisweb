@@ -2,11 +2,13 @@
 import os
 import os.path
 import json
-from urllib import quote_plus as urlquote
 from pkg_resources import resource_filename
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.engine.url import (
+    URL as EngineURL,
+    make_url as make_engine_url)
 
 from .. import db
 from ..package import pkginfo
@@ -39,12 +41,13 @@ class CoreComponent(Component):
         setting_debug = self._settings.get('debug', 'false').lower()
         self.debug = setting_debug in ('true', 'yes', '1')
 
-        sa_url = 'postgresql+psycopg2://%(user)s%(password)s@%(host)s/%(name)s' % dict(
-            user=self._settings.get('database.user', 'nextgisweb'),
-            password=(':' + urlquote(self._settings['database.password'])) if 'database.password' in self._settings else '',
+        sa_url = make_engine_url(EngineURL(
+            'postgresql+psycopg2',
             host=self._settings.get('database.host', 'localhost'),
-            name=self._settings.get('database.name', 'nextgisweb'),
-        )
+            database=self._settings.get('database.name', 'nextgisweb'),
+            username=self._settings.get('database.user', 'nextgisweb'),
+            password=self._settings.get('database.password', '')
+        ))
 
         self.engine = create_engine(sa_url)
         self._sa_engine = self.engine
