@@ -261,11 +261,23 @@ define([
             this.control.setActive(false);
             this.display.map.olMap.addInteraction(this.control);
 
+            this._bindEvents();
+
             this._popup = new Popup({
                 title: i18n.gettext("Identify"),
                 size: [this.popupWidth, this.popupHeight]
             });
             this.display.map.olMap.addOverlay(this._popup);
+        },
+
+        _bindEvents: function () {
+            topic.subscribe('webmap/tool/identify/on', lang.hitch(this, function () {
+                this.activate();
+            }));
+
+            topic.subscribe('webmap/tool/identify/off', lang.hitch(this, function () {
+                this.deactivate();
+            }));
         },
 
         activate: function () {
