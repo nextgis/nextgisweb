@@ -77,7 +77,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         src_osr = osr.SpatialReference()
         src_osr.ImportFromWkt(dsproj)
         dst_osr = osr.SpatialReference()
-        src_osr.ImportFromEPSG(int(self.srs.id))
+        dst_osr.ImportFromEPSG(int(self.srs.id))
 
         reproject = not src_osr.IsSame(dst_osr)
 
