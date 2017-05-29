@@ -2,6 +2,9 @@
 from __future__ import unicode_literals, print_function, absolute_import
 import subprocess
 
+from tempfile import NamedTemporaryFile
+from shutil import copy
+
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
@@ -58,15 +61,22 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         if not ds:
             raise ValidationError(_("GDAL library was unable to open the file."))
 
-        if ds.RasterCount not in (3, 4):
-            raise ValidationError(_("Only RGB and RGBA rasters are supported."))
+        if ds.RasterCount not in (1, 3, 4):
+            raise ValidationError(_("Only RGB, RGBA and single-band rasters are supported."))
 
-        for bidx in range(1, ds.RasterCount + 1):
-            band = ds.GetRasterBand(bidx)
+        paletted = None
+        if ds.RasterCount == 1:
+            band = ds.GetRasterBand(1)
+            paletted = band.GetRasterColorTable()
+            if paletted is None:
+                raise ValidationError(_("Only paletted single-band rasters are supported."))
+        else:
+            for bidx in range(1, ds.RasterCount + 1):
+                band = ds.GetRasterBand(bidx)
 
-            if band.DataType not in SUPPORTED_GDT:
-                raise ValidationError(_("Band #%(band)d has type '%(type)s', however only following band types are supported: %(all_types)s.") % dict(
-                    band=bidx, type=gdal.GetDataTypeName(band.DataType), all_types=SUPPORTED_GDT_NAMES))
+                if band.DataType not in SUPPORTED_GDT:
+                    raise ValidationError(_("Band #%(band)d has type '%(type)s', however only following band types are supported: %(all_types)s.") % dict(
+                        band=bidx, type=gdal.GetDataTypeName(band.DataType), all_types=SUPPORTED_GDT_NAMES))
 
         dsproj = ds.GetProjection()
         dsgtran = ds.GetGeoTransform()
@@ -97,6 +107,21 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         cmd.extend(('-co', 'TILED=YES',
                     '-co', 'BIGTIFF=YES', filename, dst_file))
         subprocess.check_call(cmd)
+
+        if paletted:
+            # Convert paletted single-band image into RGBA image.
+            # For a paletted TIFF with nodata, set the alpha component
+            # of the color entry that matches the nodata value to 0.
+            # https://trac.osgeo.org/gdal/changeset/28000 (GDAL 2.X)
+            try:
+                tf = NamedTemporaryFile()
+                copy(dst_file, tf.name)
+
+                cmd = ['gdal_translate', '-expand', 'rgba',
+                       tf.name, dst_file]
+                subprocess.check_call(cmd)
+            finally:
+                tf.close()
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
