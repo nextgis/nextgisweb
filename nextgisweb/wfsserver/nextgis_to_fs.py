@@ -36,7 +36,7 @@ class NextgiswebDatasource(DataSource):
         self.fid_col = 'id'
         self.layer = kwargs["layer"]
         self.title = kwargs["title"]
-        self.query = None       # Назначим потом (чтобы не производить лишних запросов к БД на этом этапе
+        self.query = None       # To define later (to reduce number of requests to DB at this stage)
         self.type = 'NextgisWeb'
         if 'attribute_cols' in kwargs:
             self.attribute_cols = kwargs['attribute_cols'].split(',')
@@ -95,7 +95,7 @@ class NextgiswebDatasource(DataSource):
 
     @property
     def writable(self):
-        # Можно ли редактировать слой
+        # Can we edit this layer
         return IWritableFeatureLayer.providedBy(self.layer)
 
     def _setup_query(self):
@@ -164,8 +164,8 @@ class NextgiswebDatasource(DataSource):
         return features
 
     def update(self, action):
-        """ В action.wfsrequest хранится объект Transaction.Update
-        нужно его распарсить и выполнить нужные действия
+        """ action.wfsrequest stores object Transaction.Update
+        need to parse it and work on it
         """
         if not self.writable:
             return None
@@ -184,7 +184,7 @@ class NextgiswebDatasource(DataSource):
                 self.query.geom()
                 result = self.query()
 
-                # Обновление атрибутов, если нужно
+                # Update attributes if needed
                 feat = result.one()
                 for field_name in feat.fields:
                     if data.has_key(field_name):
@@ -192,7 +192,7 @@ class NextgiswebDatasource(DataSource):
                             feat.fields[field_name] = None
                         else:
                             feat.fields[field_name] = data[field_name]
-                # Обновление геометрии, если нужно:
+                # Update geometries if needed:
                 if data.has_key('geom'):
                     geom = self._geom_from_gml(data['geom'])
                     feat.geom = geom
@@ -207,8 +207,8 @@ class NextgiswebDatasource(DataSource):
         return None
 
     def insert(self, action):
-        """ В action.wfsrequest хранится объект Transaction.Insert
-        нужно его распарсить и выполнить нужные действия
+        """ action.wfsrequest stores Transaction.Insert object
+        need to parse it and work on it
         """
         if not self.writable:
             return None
@@ -221,12 +221,12 @@ class NextgiswebDatasource(DataSource):
 
                 feature_dict = geojson.loads(data)
 
-                # геометрия должна быть в shapely,
-                # т.к. ngw Feature хранит геометрию в этом виде
+                # geometry should be in shapely,
+                # as ngw Feature stores geometries like that
                 # import ipdb; ipdb.set_trace()
                 geom = self._geom_from_gml(feature_dict[self.geom_col])
 
-                # Поле геометрии в словаре аттрибутов теперь не нужно:
+                # Geometry field in attributes is not needed anymore
                 feature_dict.pop(self.geom_col)
 
                 feature = NgwFeature(fields=feature_dict, geom=geom)
@@ -242,8 +242,8 @@ class NextgiswebDatasource(DataSource):
         return None
 
     def delete(self, action, response=None):
-        """ В action.wfsrequest хранится объект Transaction.Delete
-        нужно его распарсить и выполнить нужные действия
+        """ action.wfsrequest stores Transaction.Delete object
+        need to parse it and work on it
         """
         if action.wfsrequest is not None:
             try:
@@ -282,13 +282,13 @@ class NextgiswebDatasource(DataSource):
         return (field_type, length)
 
     def _geom_from_gml(self, gml):
-        """Создание геометрии из GML.
-        Наверное есть способ лучше, но я не нашел.
-        Кто знает -- правьте
+        """Create geometry from GML.
+        May be there is a better way, but I didn't find it.
+        Fix it if you know how.
         """
         # import ipdb; ipdb.set_trace()
         gml = str(gml)
-        # CreateGeometryFromGML не умеет работать с уникодом
+        # CreateGeometryFromGML can't do unicode
         ogr_geo = ogr.CreateGeometryFromGML(gml)
 
         return shapely.wkt.loads(ogr_geo.ExportToWkt())
