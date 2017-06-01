@@ -16,9 +16,9 @@ from .util import _
 def setup_pyramid(comp, config):
 
     def check_permission(request):
-        """ Чтобы избежать перекрестной зависимости двух компонентов -
-        auth и security, права доступа к редактированию пользователей
-        ограничиваются по критерию членства в группе administrators """
+        """ To avoid interdependency of two components: 
+        auth and security, permissions to edit users 
+        are limited by administrators group membership criterion"""
 
         request.require_administrator()
 
@@ -255,7 +255,7 @@ def setup_pyramid(comp, config):
                 ]
 
             else:
-                # Список всех групп для поля выбора
+                # List of all groups to selection field
                 result['groups'] = [
                     dict(value=g.id, label=g.display_name)
                     for g in Group.query()
