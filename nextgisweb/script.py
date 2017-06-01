@@ -78,7 +78,7 @@ def config(argv=sys.argv):
 
     args = argparser.parse_args(argv[1:])
 
-    # немного чиним utf-8
+    # trying to fix utf-8
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
     from .component import Component, load_all
