@@ -205,8 +205,8 @@ def _get_feature_info(obj, request):
         query = flayer.feature_query()
         query.intersects(qgeom)
 
-        # Ограничим максимальное количество объектов из слоя, таким образом
-        # чтобы в итоге в любом случае не превысить их общее количество.
+        # Limit number of layer features so that we
+        # don't overshoot its total number
         query.limit(p_feature_count - fcount)
 
         features = list(query())
@@ -216,7 +216,7 @@ def _get_feature_info(obj, request):
             keyname=layer.keyname, display_name=layer.display_name,
             feature_layer=flayer, features=features))
 
-        # Необходимое количество объектов найдено, дальше не ищем
+        # Needed number of features found, stop search
         if fcount >= p_feature_count:
             break
 
