@@ -6,11 +6,11 @@ Miscellaneous
 Identification by polygon
 -------------------------
 
-Полигон - потому что в настройках задается допуск в пикселях.
+This is a polygon, because there is a tolerance parameters set in pixels.
 
 .. http:put:: /feature_layer/identify
 
-   Запрос на идентификацию
+   Identification request
    
    :<json int srs: Spatial reference id
    :<json string geom: Polygon in WKT
