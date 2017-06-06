@@ -615,6 +615,7 @@ define([
             //});
 
             this._zoomToInitialExtent();
+            this._setBasemap();
 
             this._mapDeferred.resolve();
         },
@@ -777,6 +778,22 @@ define([
                 }
             } else {
                 this.map.olMap.getView().fit(this._extent);
+            }
+        },
+
+        _setBasemap: function () {
+            var newBasemapKey = this._urlParams.base,
+                newBasemapLayer,
+                currentBasemapLayer;
+
+            if (newBasemapKey) {
+                if (this._baseLayer) {
+                    currentBasemapLayer = this.map.layers[this._baseLayer.name];
+                    currentBasemapLayer.olLayer.setVisible(false);
+                }
+                newBasemapLayer = this.map.layers[newBasemapKey];
+                newBasemapLayer.olLayer.setVisible(true);
+                this._baseLayer = newBasemapLayer;
             }
         }
     });
