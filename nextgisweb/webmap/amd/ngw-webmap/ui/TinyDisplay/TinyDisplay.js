@@ -620,6 +620,44 @@ define([
             this._mapDeferred.resolve();
         },
 
+        _zoomToInitialExtent: function () {
+            if (this._urlParams.zoom && this._urlParams.lon && this._urlParams.lat) {
+                this.map.olMap.getView().setCenter(
+                    ol.proj.fromLonLat([
+                        parseFloat(this._urlParams.lon),
+                        parseFloat(this._urlParams.lat)
+                    ])
+                );
+                this.map.olMap.getView().setZoom(
+                    parseInt(this._urlParams.zoom)
+                );
+
+                if (this._urlParams.angle) {
+                    this.map.olMap.getView().setRotation(
+                        parseFloat(this._urlParams.angle)
+                    );
+                }
+            } else {
+                this.map.olMap.getView().fit(this._extent);
+            }
+        },
+
+        _setBasemap: function () {
+            var newBasemapKey = this._urlParams.base,
+                newBasemapLayer,
+                currentBasemapLayer;
+
+            if (newBasemapKey) {
+                if (this._baseLayer) {
+                    currentBasemapLayer = this.map.layers[this._baseLayer.name];
+                    currentBasemapLayer.olLayer.setVisible(false);
+                }
+                newBasemapLayer = this.map.layers[newBasemapKey];
+                newBasemapLayer.olLayer.setVisible(true);
+                this._baseLayer = newBasemapLayer;
+            }
+        },
+
         _mapAddLayers: function () {
             array.forEach(this._layer_order, function (id) {
                 this.map.addLayer(this._layers[id]);
@@ -757,44 +795,6 @@ define([
         dumpItem: function () {
             // Выгружает значение выбранного слоя из itemStore в виде Object
             return this.itemStore.dumpItem(this.item);
-        },
-
-        _zoomToInitialExtent: function () {
-            if (this._urlParams.zoom && this._urlParams.lon && this._urlParams.lat) {
-                this.map.olMap.getView().setCenter(
-                    ol.proj.fromLonLat([
-                        parseFloat(this._urlParams.lon),
-                        parseFloat(this._urlParams.lat)
-                    ])
-                );
-                this.map.olMap.getView().setZoom(
-                    parseInt(this._urlParams.zoom)
-                );
-
-                if (this._urlParams.angle) {
-                    this.map.olMap.getView().setRotation(
-                        parseFloat(this._urlParams.angle)
-                    );
-                }
-            } else {
-                this.map.olMap.getView().fit(this._extent);
-            }
-        },
-
-        _setBasemap: function () {
-            var newBasemapKey = this._urlParams.base,
-                newBasemapLayer,
-                currentBasemapLayer;
-
-            if (newBasemapKey) {
-                if (this._baseLayer) {
-                    currentBasemapLayer = this.map.layers[this._baseLayer.name];
-                    currentBasemapLayer.olLayer.setVisible(false);
-                }
-                newBasemapLayer = this.map.layers[newBasemapKey];
-                newBasemapLayer.olLayer.setVisible(true);
-                this._baseLayer = newBasemapLayer;
-            }
         }
     });
 });
