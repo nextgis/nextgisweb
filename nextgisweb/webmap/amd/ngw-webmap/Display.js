@@ -539,6 +539,7 @@ define([
             // Инициализация карты
             this.map = new Map({
                 target: this.mapNode,
+                logo: false,
                 controls: [
                     new ol.control.Rotate({
                         tipLabel: i18n.gettext("Reset rotation")
