@@ -87,19 +87,32 @@ define([
 
             this.selectOptions = [];
 
-            array.forEach(Object.keys(this.response), function (layerId) {
-                var layerResponse = this.response[layerId];
-                var idx = 0;
-                array.forEach(layerResponse.features, function (feature) {
-                    var label = put("div[style=\"overflow: hidden; display: inline-block; text-align: left;\"] $ span[style=\"color: gray\"] $ <", feature.label, " (" + this.layerLabels[layerId] + ")");
-                    domStyle.set(label, "width", (this.popupSize[0] - 35) + "px");
-                    this.selectOptions.push({
-                        label: label.outerHTML,
-                        value: layerId + "/" + idx
-                    });
-                    idx++;
-                }, this);
-            }, this);
+            var layersResponse = Object.keys(this.response);
+            this.tool.display.itemStore.fetch({
+                scope: this,
+                queryOptions: {deep: true},
+                query: {type: "layer"},
+                onItem: function (item) {
+                    var itemObj = this.tool.display.itemStore.dumpItem(item),
+                        layerId = itemObj.layerId.toString(),
+                        layerIdx = layersResponse.indexOf(layerId);
+
+                    if (layerIdx > -1) {
+                        var layerResponse = this.response[layerId];
+                        var idx = 0;
+                        array.forEach(layerResponse.features, function (feature) {
+                            var label = put("div[style=\"overflow: hidden; display: inline-block; text-align: left;\"] $ span[style=\"color: gray\"] $ <", feature.label, " (" + this.layerLabels[layerId] + ")");
+                            domStyle.set(label, "width", (this.popupSize[0] - 35) + "px");
+                            this.selectOptions.push({
+                                label: label.outerHTML,
+                                value: layerId + "/" + idx
+                            });
+                            idx++;
+                        }, this);
+                        layersResponse.splice(layerIdx, 1);
+                    }
+                }
+            });
 
             this.selectPane = new ContentPane({
                 region: "top", layoutPriority: 1,
