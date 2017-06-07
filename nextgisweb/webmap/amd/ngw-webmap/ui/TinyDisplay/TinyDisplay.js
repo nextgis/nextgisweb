@@ -179,6 +179,8 @@ define([
             this._mid = {};
             var mids = this.config.mid;
 
+            this.clientSettings = clientSettings;
+
             // Добавляем MID базовых карт
             array.forEach(clientSettings.basemaps, function (bm) {
                 mids.basemap.push(bm.base.mid);
@@ -201,6 +203,22 @@ define([
                     deferred.resolve(obj);
                 });
             }, this);
+
+            // Плагины уровня карты
+            var wmpmids = Object.keys(this.config.webmapPlugin);
+            var deferred = new LoggedDeferred("_midDeferred.webmapPlugin");
+
+            this._midDeferred.webmapPlugin = deferred;
+            require(wmpmids, function () {
+                var obj = {};
+                for (var i = 0; i < arguments.length; i++) {
+                    obj[wmpmids[i]] = arguments[i];
+                }
+
+                widget._mid.wmplugin = obj;
+
+                deferred.resolve(obj);
+            });
 
             // Хранилище
             this._itemStoreSetup();
@@ -260,11 +278,14 @@ define([
             });
 
             // Карта
-            all([this._midDeferred.basemap, this._startupDeferred]).then(
+            all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
                 function () {
+                    widget._pluginsSetup(true);
                     widget._mapSetup();
                 }
-            ).then(undefined, function (err) { console.error(err); });
+            ).then(undefined, function (err) {
+                console.error(err);
+            });
 
             all([this._mapDeferred, this._postCreateDeferred]).then(
                function () {
@@ -742,17 +763,20 @@ define([
             //this.addTool(new ToolMeasure({display: this, type: "Polygon"}));
         },
 
-        _pluginsSetup: function () {
+        _pluginsSetup: function (wmplugin) {
             this._plugins = {};
 
-            var widget = this;
-            array.forEach(Object.keys(this._mid.plugin), function (key) {
+            var widget = this,
+                plugins = wmplugin ? this._mid.wmplugin
+                                   : this._mid.plugin;
+
+            array.forEach(Object.keys(plugins), function (key) {
                 console.log("Plugin [%s]::constructor...", key);
 
-                var plugin =  new this._mid.plugin[key]({
+                var plugin =  new plugins[key]({
                     identity: key,
                     display: this,
-                    itemStore: this.itemStore
+                    itemStore: wmplugin ? false : this.itemStore
                 });
 
                 widget._postCreateDeferred.then(
