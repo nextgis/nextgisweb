@@ -296,7 +296,8 @@ define([
 
             var request = {
                 srs: 3857,
-                geom: this._requestGeomString(pixel)
+                geom: this._requestGeomString(pixel),
+                layers: []
             };
 
             this.display.getVisibleItems().then(function (items) {
@@ -304,10 +305,18 @@ define([
                     // Никаких видимых элементов сейчас нет
                     console.log("Visible items not found!");
                 } else {
-                    // Добавляем список видимых элементов в запрос
-                    request.layers = array.map(items, function (i) {
-                        return this.display.itemStore.getValue(i, "layerId");
-                    });
+                    // Добавляем список видимых элементов в запрос,
+                    // учитывая видимость в пределах масштаба
+                    var mapResolution = this.display.map.get("resolution");
+                    array.forEach(items, function (i) {
+                        var item = this.display._itemConfigById[
+                            this.display.itemStore.getValue(i, "id")];
+                        if (mapResolution >= item.maxResolution ||
+                            mapResolution < item.minResolution) {
+                            return;
+                        }
+                        request.layers.push(item.layerId);
+                    }, this);
 
                     var layerLabels = {};
                     array.forEach(items, function (i) {
