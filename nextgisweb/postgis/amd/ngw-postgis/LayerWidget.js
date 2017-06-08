@@ -16,6 +16,7 @@ define([
     "dijit/form/Select",
     "dojox/layout/TableContainer",
     "ngw-resource/ResourceBox",
+    "ngw-pyramid/form/IntegerValueTextBox",
     "ngw-spatial-ref-sys/SpatialRefSysSelect"
 ], function (
     declare,
@@ -37,6 +38,7 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
+            this.geometrySRID.set("disabled", this.composite.operation !== "create");
             this.geometryType.set("disabled", this.composite.operation !== "create");
             this.srs.set("disabled", this.composite.operation !== "create");
             this.fields.set("value", this.composite.operation == "create" ? "update" : "keep");
@@ -48,6 +50,9 @@ define([
             value.srs = { id: this.srs.get("value") };
             if (value.geometry_type === "") {
                 value.geometry_type = null;
+            }
+            if (value.geometry_srid !== null) {
+                value.geometry_srid = parseInt(value.geometry_srid);
             }
         }
     });

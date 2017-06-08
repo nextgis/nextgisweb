@@ -211,7 +211,23 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             row = result.first()
 
             if row:
-                self.geometry_srid = row['srid']
+                geometry_srid = row['srid']
+
+                if geometry_srid == 0 and self.geometry_srid is None:
+                    raise ValidationError(_("SRID missing in geometry_columns table! You should specify it manually."))  # NOQA
+
+                if (self.geometry_srid == 0):
+                    raise ValidationError(_("0 is an invalid SRID."))
+
+                if (
+                    self.geometry_srid is not None
+                    and geometry_srid != 0
+                    and self.geometry_srid != geometry_srid
+                ):
+                    raise ValidationError(_("SRID in geometry_columns table does not match specified!"))  # NOQA
+
+                if self.geometry_srid is None:
+                    self.geometry_srid = geometry_srid
 
                 tab_geom_type = row['type']
 

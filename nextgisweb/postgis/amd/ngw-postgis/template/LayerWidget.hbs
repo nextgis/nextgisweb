@@ -22,15 +22,14 @@
             data-dojo-props="required: true"
             data-ngw-serialize="column_id"
             title="{{gettext 'ID column'}}" style="width: 100%"></div>
-        
+
         <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="column_geom"
             title="{{gettext 'Geometry column'}}" style="width: 100%"></div>
-        
+
         <select data-dojo-attach-point="geometryType" 
             data-dojo-type="dijit/form/Select"
-            data-dojo-props="colspan: 2"
             data-ngw-serialize="geometry_type"
             title="{{gettext 'Geometry type'}}" style="width: 100%">
             
@@ -43,7 +42,13 @@
             <option value="MULTIPOLYGON">{{gettext 'Multipolygon'}}</option>
 
         </select>
-        
+
+        <div data-dojo-attach-point="geometrySRID"
+            data-dojo-type="ngw-pyramid/form/IntegerValueTextBox"
+            data-dojo-props="placeholder: '{{gettext 'Autodetect'}}'"
+            data-ngw-serialize="geometry_srid"
+            title="SRID" style="width: 100%"></div>
+
         <div data-dojo-attach-point="srs"
             data-dojo-type="ngw-spatial-ref-sys/SpatialRefSysSelect"
             data-dojo-props="colspan: 2"
