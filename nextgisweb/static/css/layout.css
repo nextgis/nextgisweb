@@ -1297,3 +1297,30 @@ textarea {
 .nextgis.claro .dijitComboBoxMenu .dijitMenuItem [class*=" icon-"]:before {
   color: #999;
 }
+.dijitTreeNode .text-withIcon_size_s {
+  padding-left: 20px;
+  margin-left: 8px;
+}
+.dijitTreeNode .text-withIcon__icon_size_s {
+  top: 0;
+}
+.nextgis.claro .dijitTreeRow,
+.nextgis.claro .dijitTreeNode .dojoDndItemBefore,
+.nextgis.claro .dijitTreeNode .dojoDndItemAfter {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.nextgis.claro .dijitTreeRowSelected,
+.nextgis.claro .dijitTreeRowHover,
+.nextgis.claro .dijitTreeRowActive {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  background-image: none;
+  border: 0;
+}
+.nextgis.claro .dijitTreeRowHover {
+  background-color: #f8f8f8;
+}
+.nextgis.claro .dijitTreeRowSelected {
+  background-color: #fdf8c3;
+}
