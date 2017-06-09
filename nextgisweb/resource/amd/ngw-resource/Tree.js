@@ -4,13 +4,15 @@ define([
     "dijit/Tree",
     "dijit/tree/ObjectStoreModel",
     "ngw/route",
-    "./ResourceStore"
+    "./ResourceStore",
+    "./TreeNode"
 ], function (
     declare,
     Tree,
     ObjectStoreModel,
     route,
-    ResourceStore
+    ResourceStore,
+    TreeNode
 ) {
     return declare("ngw.resource.Tree", [Tree], {
         showRoot: true,
@@ -34,6 +36,14 @@ define([
                     return item.children;
                 }
             });
+        },
+
+        getIconClass: function (item, opened) {
+            return;
+        },
+
+        _createTreeNode: function (args) {
+            return new TreeNode(args);
         }
     });
 });
