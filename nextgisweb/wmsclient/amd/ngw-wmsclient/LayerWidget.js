@@ -17,7 +17,6 @@ define([
     "ngw-pyramid/i18n!wmsclient",
     "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
-    "ngw-resource/ResourceStore",
     // resource
     "dojo/text!./template/LayerWidget.hbs",
     // template
@@ -46,7 +45,6 @@ define([
     i18n,
     i18nHbs,
     serialize,
-    ResourceStore,
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {

@@ -8,7 +8,6 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
-    "ngw-resource/ResourceStore",
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
     // resource
@@ -26,7 +25,6 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
-    ResourceStore,
     i18n,
     hbsI18n,
     template

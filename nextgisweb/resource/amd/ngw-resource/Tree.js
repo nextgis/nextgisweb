@@ -4,6 +4,7 @@ define([
     "dijit/Tree",
     "dijit/tree/ObjectStoreModel",
     "ngw/route",
+    "ngw/utils/make-singleton",
     "./ResourceStore",
     "./TreeNode"
 ], function (
@@ -11,9 +12,19 @@ define([
     Tree,
     ObjectStoreModel,
     route,
+    makeSingleton,
     ResourceStore,
     TreeNode
 ) {
+
+    var ResourceObjectStoreModel = makeSingleton(declare([ObjectStoreModel], {
+        store: new ResourceStore(),
+        labelAttr: "display_name",
+        mayHaveChildren: function (item) {
+            return item.children;
+        }
+    }));
+
     return declare("ngw.resource.Tree", [Tree], {
         showRoot: true,
 
@@ -26,16 +37,10 @@ define([
 
             if (this.resourceId === undefined) { this.resourceId = 0; }
 
-            this.store = new ResourceStore();
-
-            this.model = new ObjectStoreModel({
-                store: this.store,
-                labelAttr: "display_name",
-                query: {id: this.resourceId},
-                mayHaveChildren: function (item) {
-                    return item.children;
-                }
+            this.model = ResourceObjectStoreModel.getInstance({
+                query: {id: this.resourceId}
             });
+            this.store = this.model.store;
         },
 
         getIconClass: function (item, opened) {

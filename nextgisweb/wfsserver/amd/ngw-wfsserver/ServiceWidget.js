@@ -15,7 +15,6 @@ define([
     "ngw-pyramid/i18n!wfsserver",
     "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
-    "ngw-resource/ResourceStore",
     "ngw-resource/ResourcePicker",
     // resource
     "dojo/text!./template/ServiceWidget.hbs",
@@ -52,7 +51,6 @@ define([
     i18n,
     hbsI18n,
     serialize,
-    ResourceStore,
     ResourcePicker,
     template
 ) {
