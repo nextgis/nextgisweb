@@ -1,6 +1,8 @@
 /* globals define */
 define([
     "dojo/_base/declare",
+    "dojo/_base/lang",
+    "dojo/Deferred",
     "dijit/Tree",
     "dijit/tree/ObjectStoreModel",
     "ngw/route",
@@ -9,6 +11,8 @@ define([
     "./TreeNode"
 ], function (
     declare,
+    lang,
+    Deferred,
     Tree,
     ObjectStoreModel,
     route,
@@ -19,7 +23,26 @@ define([
 
     var ResourceObjectStoreModel = makeSingleton(declare([ObjectStoreModel], {
         store: new ResourceStore(),
+
         labelAttr: "display_name",
+
+        // Признак того, что загружена корневая нода. Используется вместо
+        // оригинального свойства root, которое теперь всегда null. Это сделано
+        // для того, чтобы избежать дублирования загрузки корневой ноды в
+        // случае, если на странице используется несколько ResourcePicker-ов.
+        _root: undefined,
+
+        constructor: function () {
+            this._root = new Deferred();
+            this.store.query(this.query).then(
+                lang.hitch(this, function (items) { this._root.resolve(items[0]); })
+            );
+        },
+
+        getRoot: function (onItem, onError) {
+            this._root.promise.then(onItem, onError);
+        },
+
         mayHaveChildren: function (item) {
             return item.children;
         }
