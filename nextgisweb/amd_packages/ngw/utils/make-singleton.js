@@ -16,7 +16,7 @@ define([
                     instance.constructor = null; // remove instance's constructor method
                 }                              //  so you cannot use new operator on it!!
                 return instance;               // this is our singleton instance.
-            }
+            };
         };
 
         // Since we are working with Dojo, when declaring a class object, if you

@@ -8,7 +8,6 @@ define([
     'dojo/dom-construct',
     'dojo/_base/array',
     'dojo/_base/lang',
-    'dojo/_base/html',
     'dijit/_Widget',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
@@ -27,7 +26,7 @@ define([
     'dojo/text!./PrintingPageStyle.css.dtl',
     'xstyle/css!./PrintMap.css'
 ], function (declare, query, aspect, win, domStyle, domClass, domConstruct,
-             array, lang, html, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin,
+             array, lang, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin,
              Dialog, on, TableContainer, dtl, dtlContext, TextBox, NumberTextBox,
              Map, ol, i18n, hbsI18n, template, printingCssTemplate) {
 
@@ -235,5 +234,5 @@ define([
             });
             printMapDialog.show();
         }
-    }
+    };
 });

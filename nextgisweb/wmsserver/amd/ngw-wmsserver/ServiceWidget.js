@@ -11,14 +11,13 @@ define([
     "dijit/tree/TreeStoreModel",
     "dijit/Tree",
     "dijit/tree/dndSource",
-    "dijit/registry",
     "ngw-pyramid/i18n!wmsserver",
     "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
-    "ngw-resource/ResourcePicker",
     // resource
     "dojo/text!./template/ServiceWidget.hbs",
     // template
+    "ngw-resource/ResourcePicker",
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
     "dijit/layout/BorderContainer",
@@ -47,11 +46,9 @@ define([
     TreeStoreModel,
     Tree,
     dndSource,
-    registry,
     i18n,
     hbsI18n,
     serialize,
-    ResourcePicker,
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {

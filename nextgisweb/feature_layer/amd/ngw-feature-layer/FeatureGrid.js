@@ -17,7 +17,6 @@ define([
     "dojo/_base/array",
     "dojo/request/xhr",
     "dojo/Deferred",
-    "dojo/promise/all",
     "dojo/store/Observable",
     "dojo/dom-style",
     // ngw
@@ -50,7 +49,6 @@ define([
     array,
     xhr,
     Deferred,
-    all,
     Observable,
     domStyle,
     // ngw

@@ -15,10 +15,10 @@ define([
     "ngw-pyramid/i18n!wfsserver",
     "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
-    "ngw-resource/ResourcePicker",
     // resource
     "dojo/text!./template/ServiceWidget.hbs",
     // template
+    "ngw-resource/ResourcePicker",
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
     "dijit/layout/BorderContainer",
@@ -51,7 +51,6 @@ define([
     i18n,
     hbsI18n,
     serialize,
-    ResourcePicker,
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {

@@ -1,8 +1,6 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "dojo/Deferred",
-    "dojo/when",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/ContentPane",
@@ -19,8 +17,6 @@ define([
 ], function (
     declare,
     lang,
-    Deferred,
-    when,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     ContentPane,

@@ -1,7 +1,6 @@
 /* globals define */
 define([
     "dojo/_base/declare",
-    "dojo/_base/lang",
     "dojo/_base/array",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
@@ -20,7 +19,6 @@ define([
     "ngw-spatial-ref-sys/SpatialRefSysSelect"
 ], function (
     declare,
-    lang,
     array,
     _WidgetBase,
     _TemplatedMixin,

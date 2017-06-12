@@ -24,7 +24,7 @@ define([
             } else if (this.type == "Polygon") {
                 this.label = i18n.gettext("Measure area");
                 this.iconClass = "iconRulerSquare";
-            };
+            }
 
             var wgs84Sphere = new ol.Sphere(6378137);
 
@@ -43,12 +43,12 @@ define([
                     output = {
                         measure: Math.round(length / 1000 * 100) / 100,
                         units: "km"
-                    }
+                    };
                 } else {
                     output = {
                         measure: Math.round(length * 100) / 100,
                         units: "m"
-                    }
+                    };
                 }
                 output.label = "L = ";
                 return output;
@@ -65,12 +65,12 @@ define([
                     output = {
                         measure: Math.round(area / 1000000 * 100) / 100,
                         units: "km<sup>2</sup>"
-                    }
+                    };
                 } else {
                     output = {
                         measure: Math.round(area * 100) / 100,
                         units: "m<sup>2</sup>"
-                    }
+                    };
                 }
                 output.label = "S = ";
                 return output;
@@ -135,7 +135,7 @@ define([
         },
 
         activate: function () {
-            if (this.active) { return };
+            if (this.active) { return; }
             this.active = true;
 
             this.interaction.setActive(true);
@@ -149,7 +149,7 @@ define([
         },
 
         deactivate: function () {
-            if (!this.active) { return };
+            if (!this.active) { return; }
             this.active = false;
 
             this.vector.getSource().clear();

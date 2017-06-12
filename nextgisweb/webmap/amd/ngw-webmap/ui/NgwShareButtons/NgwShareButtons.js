@@ -1,8 +1,6 @@
 define([
     "dojo/_base/declare",
-    "dojo/_base/array",
     "dojo/_base/lang",
-    "dojo/dom-style",
     "dojo/on",
     "dojo/query",
     "dijit/_TemplatedMixin",
@@ -11,14 +9,13 @@ define([
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./NgwShareButtons.hbs",
-    "ngw/settings!webmap",
     "ngw-webmap/PermalinkDialog",
     "ngw-webmap/ShareEmbeddedMapDialog",
     "xstyle/css!./css/fontello.css",
     "xstyle/css!./NgwShareButtons.css"
-], function (declare, array, lang, domStyle, on, query,
+], function (declare, lang, on, query,
              _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
-             i18n, hbsI18n, template, settings, PermalinkDialog, ShareEmbeddedMapDialog) {
+             i18n, hbsI18n, template, PermalinkDialog, ShareEmbeddedMapDialog) {
     return declare([ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("Layers"),
         templateString: hbsI18n(template, i18n),

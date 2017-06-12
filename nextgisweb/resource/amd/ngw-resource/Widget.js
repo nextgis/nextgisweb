@@ -1,6 +1,5 @@
 define([
     "dojo/_base/declare",
-    "dojo/_base/array",
     "dojo/_base/lang",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
@@ -18,7 +17,6 @@ define([
     "ngw-resource/ResourceBox"
 ], function (
     declare,
-    array,
     lang,
     _WidgetBase,
     _TemplatedMixin,

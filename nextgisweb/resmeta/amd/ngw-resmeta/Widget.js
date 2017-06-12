@@ -2,9 +2,6 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "dojo/_base/array",
-    "dojo/Deferred",
-    "dojo/when",
     "dojo/dom-style",
     "dojo/dom-class",
     "dojo/store/Memory",
@@ -28,9 +25,6 @@ define([
 ], function (
     declare,
     lang,
-    array,
-    Deferred,
-    when,
     domStyle,
     domClass,
     Memory,

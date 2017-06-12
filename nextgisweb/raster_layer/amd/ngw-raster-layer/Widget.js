@@ -1,8 +1,6 @@
 /* globals define */
 define([
     "dojo/_base/declare",
-    "dojo/Deferred",
-    "dojo/when",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -17,8 +15,6 @@ define([
     "ngw-file-upload/Uploader"
 ], function (
     declare,
-    Deferred,
-    when,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,

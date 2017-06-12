@@ -113,16 +113,16 @@ define([
                                         } else {
                                             // что-то странное с ответом
                                             d.reject();
-                                        };
+                                        }
                                     }, 
                                     d.reject
                                 );
                             }, d.reject
-                        )
+                        );
                     } else {
                         widget.set("error", result.error);
                         d.resolve(false);
-                    };
+                    }
                 }, d.reject
             );
 

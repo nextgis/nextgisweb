@@ -5,7 +5,6 @@ define([
     "dojo/Deferred",
     "dijit/Tree",
     "dijit/tree/ObjectStoreModel",
-    "ngw/route",
     "ngw/utils/make-singleton",
     "./ResourceStore",
     "./TreeNode"
@@ -15,7 +14,6 @@ define([
     Deferred,
     Tree,
     ObjectStoreModel,
-    route,
     makeSingleton,
     ResourceStore,
     TreeNode

@@ -11,7 +11,6 @@ define([
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/UserWidget.hbs",
     "dojo/_base/array",
-    "dojo/on",
     // template
     "dijit/form/CheckBox",
     "dijit/form/ValidationTextBox",
@@ -31,8 +30,7 @@ define([
     i18n,
     hbsI18n,
     template,
-    array,
-    on
+    array
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
