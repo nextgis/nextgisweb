@@ -54,9 +54,9 @@ def setup_pyramid(comp, config):
                 style = item.style
                 layer = style.parent
 
-                # При отсутствии необходимых прав пропускаем элемент веб-карты,
-                # таким образом он просто не будет показан при отображении и
-                # в дереве слоев
+                # If there are no necessary permissions skip web-map element
+                # so it won't be shown in the tree
+                # 
 
                 # TODO: Security
 
@@ -67,7 +67,7 @@ def setup_pyramid(comp, config):
                 # ):
                 #     return None
 
-                # Основные параметры элемента
+                # Main element parameters
                 data.update(
                     layerId=style.parent_id,
                     styleId=style.id,
@@ -81,7 +81,7 @@ def setup_pyramid(comp, config):
                     item.layer_adapter, 'image').mid
                 display.mid.adapter.add(data['adapter'])
 
-                # Плагины уровня слоя
+                # Layer level plugins
                 plugin = dict()
                 for pcls in WebmapLayerPlugin.registry:
                     p_mid_data = pcls.is_layer_supported(layer, obj)
@@ -92,8 +92,8 @@ def setup_pyramid(comp, config):
                 display.mid.plugin.update(plugin.keys())
 
             elif item.item_type in ('root', 'group'):
-                # Рекурсивно пробегаем по всем элементам, исключая те,
-                # на которые нет необходимых прав доступа
+                # Recursively run all elements excluding those
+                # with no permissions
                 data.update(
                     expanded=item.group_expanded,
                     children=filter(

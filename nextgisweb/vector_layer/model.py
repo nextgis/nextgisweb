@@ -278,7 +278,7 @@ class TableInfo(object):
         for fid, feature in enumerate(ogrlayer):
             geom = feature.GetGeometryRef()
 
-            # Приведение 25D геометрий к 2D
+            # Bring 25D geometries to 2D
             if geom.GetGeometryType() & ogr.wkb25DBit:
                 geom.FlattenTo2D()
 
@@ -450,8 +450,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if f.keyname in feature.fields:
                 setattr(obj, f.key, feature.fields[f.keyname])
 
-        # FIXME: В случае отсутствия геометрии не пытаемся ее записать. Это
-        # не позволит записать пустую геометрию, но это и не нужно пока.
+        # FIXME: Don't try to write geometry if it exists. 
+        # This will not let to write empty geometry, but it is not needed yet.
 
         if feature.geom is not None:
             obj.geom = ga.elements.WKTElement(
@@ -462,12 +462,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.after_feature_update.fire(resource=self, feature=feature)
 
     def feature_create(self, feature):
-        """Вставляет в БД новый объект, описание которого дается в feature
+        """Insert new object to DB which is described in feature
 
-        :param feature: описание объекта
+        :param feature: object description
         :type feature:  Feature
 
-        :return:    ID вставленного объекта
+        :return:    inserted object ID
         """
         self.before_feature_create.fire(resource=self, feature=feature)
 
@@ -491,9 +491,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         return obj.id
 
     def feature_delete(self, feature_id):
-        """Удаляет запись с заданным id
+        """Remove record with id
 
-        :param feature_id: идентификатор записи
+        :param feature_id: record id
         :type feature_id:  int or bigint
         """
         self.before_feature_delete.fire(resource=self, feature_id=feature_id)
@@ -507,7 +507,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.after_feature_delete.fire(resource=self, feature_id=feature_id)
 
     def feature_delete_all(self):
-        """Удаляет все записи слоя"""
+        """Remove all records from a layer"""
         self.before_all_feature_delete.fire(resource=self)
 
         tableinfo = TableInfo.from_layer(self)
@@ -520,7 +520,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IBboxLayer implementation:
     @property
     def extent(self):
-        """Возвращает охват слоя
+        """Return layer's extent
         """
         st_transform = func.st_transform
         st_extent = func.st_extent
@@ -572,8 +572,8 @@ def _vector_layer_listeners(table):
 _vector_layer_listeners(VectorLayer.__table__)
 
 
-# Инициализация БД использует table.tometadata(), однако
-# SA не копирует подписки на события в этом случае.
+# DB initialization uses table.tometadata(), however
+# SA doesn't copy event subscriptions in this case.
 
 def tometadata(self, metadata):
     result = db.Table.tometadata(self, metadata)
@@ -592,15 +592,15 @@ def _set_encoding(encoding):
             self.encoding = encoding
 
             if self.encoding and gdal_gt_19:
-                # Для GDAL 1.9 и выше пытаемся установить SHAPE_ENCODING
-                # через ctypes и libgdal
+                # For GDAL 1.9 and higher try to set SHAPE_ENCODING
+                # through ctypes and libgdal
 
-                # Загружаем библиотеку только в том случае,
-                # если нам нужно перекодировать
+                # Load library only if we need
+                # to recode
                 self.lib = ctypes.CDLL('libgdal.so')
 
-                # Обертки для функций cpl_conv.h
-                # см. http://www.gdal.org/cpl__conv_8h.html
+                # cpl_conv.h functions wrappers
+                # see http://www.gdal.org/cpl__conv_8h.html
 
                 # CPLGetConfigOption
                 self.get_option = self.lib.CPLGetConfigOption
@@ -613,24 +613,24 @@ def _set_encoding(encoding):
                 self.strdup.restype = ctypes.c_char_p
 
                 # CPLSetThreadLocalConfigOption
-                # Используем именно thread local вариант функции, чтобы
-                # минимизировать побочные эффекты.
+                # Use thread local function
+                # to minimize side effects.
                 self.set_option = self.lib.CPLSetThreadLocalConfigOption
                 self.set_option.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
                 self.set_option.restype = None
 
             elif encoding:
-                # Для други версий GDAL вернем функцию обертку, которая
-                # умеет декодировать строки в unicode, см. __enter__
+                # For other version of GDAL return function wrapper
+                # that can decode string to unicode, see __enter__
                 pass
 
         def __enter__(self):
 
             def strdecode(x):
                 if len(x) >= 254:
-                    # Костылек для косячка с обрезкой по 254 - 255 байтам
-                    # юникодных строк. До тех пор пока не получится
-                    # декодировать строку откусываем по байту справа.
+                    # Cludge to fix 254 - 255 byte unicode string cut off
+                    # Until we can decode
+                    # cut a byte on the right
 
                     while True:
                         try:
@@ -642,19 +642,19 @@ def _set_encoding(encoding):
                 return x.decode(self.encoding)
 
             if self.encoding and gdal_gt_19:
-                # Для GDAL 1.9 устанавливаем значение SHAPE_ENCODING
+                # For GDAL 1.9 set SHAPE_ENCODING value
 
-                # Оставим копию текущего значения себе
+                # Keep copy of the current value
                 tmp = self.get_option('SHAPE_ENCODING', None)
                 self.old_value = self.strdup(tmp)
 
-                # Установим новое
+                # Set new value
                 self.set_option('SHAPE_ENCODING', '')
 
                 return strdecode
 
             elif self.encoding:
-                # Функция обертка для других версий GDAL
+                # Wrapper for other GDAL versions
                 return strdecode
 
             return lambda (x): x
@@ -662,7 +662,7 @@ def _set_encoding(encoding):
         def __exit__(self, type, value, traceback):
 
             if self.encoding and gdal_gt_19:
-                # Возвращаем на место старое значение
+                # Return old value
                 self.set_option('SHAPE_ENCODING', self.old_value)
 
     return encoding_section(encoding)

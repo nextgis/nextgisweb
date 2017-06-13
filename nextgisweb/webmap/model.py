@@ -99,8 +99,8 @@ class WebMapItem(Base):
 
     style = db.relationship(
         'Resource',
-        # Временное решение, позволяющее при удалении стиля автоматически
-        # удалять элементы веб-карты
+        # Temporary solution that allows to automatically 
+        # remove web-map elements when style is removed
         backref=db.backref('webmap_items', cascade='all')
     )
 

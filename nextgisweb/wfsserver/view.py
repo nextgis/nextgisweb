@@ -89,16 +89,16 @@ def handler(obj, request):
         content_type = e.mime
         return Response(data, content_type=content_type)
 
-    # Отправляем результат обработки
+    # Send results
 
     if isinstance(result, tuple):
-        # ответ
-        # на запросы req.lower() in ['getcapabilities', 'describefeaturetype']
+        # respond
+        # for req.lower() in ['getcapabilities', 'describefeaturetype'] requests
         content_type, resxml = result
         resp = Response(resxml, content_type=content_type)
         return resp
     elif isinstance(result, FeatureserverResponse):
-        # ответ на запрос GetFeature, Update, Insert, Delete
+        # respond to GetFeature, Update, Insert, Delete requests
         data = result.getData()
         return Response(data, content_type=result.content_type)
 

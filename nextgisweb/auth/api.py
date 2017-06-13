@@ -67,8 +67,7 @@ def register(request):
     if not request.env.auth.settings_register:
         raise HTTPForbidden("Anonymous registration is not allowed!")
 
-    # При самостоятельной регистрации могут быть указаны только
-    # некоторые из атрибутов пользователя.
+    # For self-registration only certain attributes of the user are required
     rkeys = ('display_name', 'description', 'keyname', 'password')
     src = request.json_body
     data = dict()
@@ -76,7 +75,7 @@ def register(request):
         if k in src:
             data[k] = src[k]
 
-    # Добавляем группы, автоматически назначаемые при регистрации.
+    # Add groups automatically assigned on registration
     data['member_of'] = map(
         lambda group: group.id,
         Group.filter_by(register=True))

@@ -58,11 +58,11 @@ class FileStorageComponent(Component):
     def filename(self, fileobj, makedirs=False):
         assert fileobj.component, "Component not set!"
 
-        # Разделяем на два уровня директорий по первым символам id
+        # Separate in two folder levels by first id characters
         levels = (fileobj.uuid[0:2], fileobj.uuid[2:4])
         path = os.path.join(self.path, fileobj.component, *levels)
 
-        # Создаем директории если нужно
+        # Create folders if needed
         if makedirs and not os.path.isdir(path):
             os.makedirs(path)
 
