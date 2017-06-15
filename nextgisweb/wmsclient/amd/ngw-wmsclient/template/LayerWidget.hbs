@@ -1,4 +1,5 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" style="height: 100%;" class="padding-block">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${serializePrefix}" style="height: 100%;" class="padding-block">
 
     <div data-dojo-type="dijit/layout/BorderContainer"
         data-dojo-props="gutters: false"
@@ -10,19 +11,23 @@
 
             <div data-dojo-attach-point="wConnection"
                 data-dojo-type="ngw-resource/ResourceBox"
+                data-ngw-serialize="connection"
                 data-dojo-props="cls: 'wmsclient_connection'"
                 title="{{gettext 'WMS connection'}}" style="width: 100%"></div>
 
             <div data-dojo-attach-point="wSRS"
+                data-ngw-serialize="srs"
                 data-dojo-type="ngw-spatial-ref-sys/SpatialRefSysSelect"
                 title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>
 
             <div data-dojo-attach-point="wImgFormat"
+                data-ngw-serialize="imgformat"
                 data-dojo-type="dijit/form/ComboBox"
                 data-dojo-props="required: true"
                 title="{{gettext 'Image format'}}" style="width: 100%"></div>
 
             <div  data-dojo-attach-point="wWMSLayers"
+                data-ngw-serialize="wmslayers"
                 data-dojo-type="dijit/form/ValidationTextBox"
                 data-dojo-props="required: true"
                 title="{{gettext 'WMS layers'}}" style="width: 100%"></div>
