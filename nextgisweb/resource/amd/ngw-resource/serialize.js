@@ -61,14 +61,14 @@ define([
         deserialize: function (data) {
             var deferred = new Deferred();
 
-            if (this.deserializeInMixin !== undefined) {
-                this.deserializeInMixin(data);
-            }
-
             array.forEach(this.serattrmap, function (i) {
                 var value = lang.getObject(i.key, false, data);
                 i.widget.set("value", value);
             });
+
+            if (this.deserializeInMixin !== undefined) {
+                this.deserializeInMixin(data);
+            }
 
             deferred.resolve();
 
