@@ -201,7 +201,13 @@ class Layer(Base, Resource, SpatialLayerMixin):
             auth = (username, password)
 
         sep = "&" if "?" in self.connection.url else "?"
-        url = self.connection.url + sep + urllib.urlencode(query)
+
+        # ArcGIS server requires that space is url-encoded as "%20"
+        # but it does not accept space encoded as "+".
+        # It is always safe to replace spaces with "%20".
+        url = self.connection.url + sep + \
+            urllib.urlencode(query).replace("+", "%20")
+
         return PIL.Image.open(BytesIO(requests.get(
             url, auth=auth, headers=env.wmsclient.headers).content))
 
