@@ -1,39 +1,41 @@
 # Russian translations for nextgisweb.
 # Copyright (C) 2016 NextGIS
 # This file is distributed under the same license as the nextgisweb project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
 #
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# iraqez <v.gumenyuk@agro-corp.com.ua>, 2017.
 msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
 "POT-Creation-Date: 2017-05-29 16:30+0700\n"
-"PO-Revision-Date: 2015-09-13 16:42+0300\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: ru\n"
-"Language-Team: ru <LL@li.org>\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"PO-Revision-Date: 2017-06-18 01:11+0200\n"
+"Last-Translator: iraqez <v.gumenyuk@agro-corp.com.ua>\n"
+"Language: uk\n"
+"Language-Team: Ukrainian <kde-russian@lists.kde.ru>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<"
+"=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
+"X-Generator: Lokalize 2.0\n"
 
 #: amd/ngw-raster-layer/Widget.js:32 model.py:41
 msgid "Raster layer"
-msgstr "Растровый слой"
+msgstr "Растровий шар"
 
 #: model.py:62
 msgid "GDAL library was unable to open the file."
-msgstr "Библиотеке GDAL не удалось открыть файл."
+msgstr "Бібліотеці GDAL не вдалося відкрити файл."
 
 #: model.py:65
 msgid "Only RGB, RGBA and single-band rasters are supported."
-msgstr "Поддерживаются только RGB, RGBA и одноканальные растры."
+msgstr "Підтримуються тільки RGB, RGBA и одноканальні растри."
 
 #: model.py:72
 msgid "Only paletted single-band rasters are supported."
-msgstr "Одноканальный растр должен иметь палитру."
+msgstr "Одноканальний растр повинен мати палітру."
 
 #: model.py:77
 #, python-format
@@ -41,12 +43,12 @@ msgid ""
 "Band #%(band)d has type '%(type)s', however only following band types are"
 " supported: %(all_types)s."
 msgstr ""
-"Канал #%(band)d имеет тип '%(type)s', однако поддерживаются только "
-"следующие типы каналов: %(all_types)s."
+"Канал #%(band)d має тип '%(type)s', але підтримуються тільки"
+"наступні типи каналів: %(all_types)s."
 
 #: model.py:84
 msgid "Raster files without projection info are not supported."
-msgstr "Растровые файлы без информации о проекции не поддерживаются."
+msgstr "Растрові файли без інформації про проекцію не підтримуються."
 
 #: model.py:134
 msgid "File UUID"
@@ -54,11 +56,11 @@ msgstr "UUID файла"
 
 #: amd/ngw-raster-layer/template/Widget.hbs:3
 msgid "Select a dataset"
-msgstr "Выберите растровый слой"
+msgstr "Виберіть растровий шар"
 
 #: amd/ngw-raster-layer/template/Widget.hbs:4
 msgid "Dataset should be in GeoTIFF format with 3 or 4 bands (RGB or RGBA)."
-msgstr "Файл должен быть в формате GeoTIFF с 3 или 4 каналами (RGB or RGBA)."
+msgstr "Файл повинний бути в форматі GeoTIFF з 3 або 4 каналами (RGB or RGBA)."
 
 #: amd/ngw-raster-layer/template/Widget.hbs:7
 msgid "Coordinate system"

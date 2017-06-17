@@ -9,9 +9,9 @@ msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
 "POT-Creation-Date: 2017-02-17 17:10+0700\n"
-"PO-Revision-Date: 2017-06-18 00:29+0200\n"
+"PO-Revision-Date: 2017-06-18 00:45+0200\n"
 "Last-Translator: iraqez <v.gumenyuk@agro-corp.com.ua>\n"
-"Language: ru\n"
+"Language: uk\n"
 "Language-Team: Ukrainian <kde-russian@lists.kde.ru>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<"
 "=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
@@ -22,119 +22,96 @@ msgstr ""
 "X-Generator: Lokalize 2.0\n"
 
 #: __init__.py:28
-#, fuzzy
 msgid "Guest"
 msgstr "Гість"
 
 #: __init__.py:34
-#, fuzzy
 msgid "Everyone"
 msgstr "Любий користувач"
 
 #: __init__.py:40
-#, fuzzy
 msgid "Authenticated"
 msgstr "Перевірений користувач"
 
 #: __init__.py:46
-#, fuzzy
 msgid "Administrators"
 msgstr "Адміністратори"
 
 #: __init__.py:49
-#, fuzzy
 msgid "Administrator"
 msgstr "Адміністратор"
 
 #: __init__.py:57
-#, fuzzy
 msgid "Owner"
 msgstr "Власник"
 
 #: views.py:35
-#, fuzzy
 msgid "Account disabled"
 msgstr "Обліковий запис відключено"
 
 #: views.py:42
-#, fuzzy
 msgid "Invalid login or password!"
 msgstr "Невірний логін або пароль!"
 
 #: views.py:75
-#, fuzzy
 msgid "Access denied"
 msgstr "Відмовлено в доступі"
 
 #: views.py:134
-#, fuzzy
 msgid "Group name is not unique."
 msgstr "Ім'я групи не унікальне"
 
 #: views.py:172
-#, fuzzy
 msgid "Create new group"
 msgstr "Створити нову групу"
 
 #: views.py:232
-#, fuzzy
 msgid "Login is not unique."
 msgstr "Логін не унікальний"
 
 #: views.py:274
-#, fuzzy
 msgid "Create new user"
 msgstr "Створити нового користувача"
 
 #: views.py:307 views.py:372
-#, fuzzy
 msgid "Users"
 msgstr "Користувачі"
 
 #: views.py:317 views.py:375
-#, fuzzy
 msgid "Groups"
 msgstr "Групи"
 
 #: views.py:328 views.py:350
-#, fuzzy
 msgid "List"
 msgstr "Список"
 
 #: views.py:333 views.py:355
-#, fuzzy
 msgid "Create"
 msgstr "Створити"
 
 #: views.py:339 views.py:361
-#, fuzzy
 msgid "Edit"
 msgstr "Змінити"
 
 #: amd/ngw-auth/GroupWidget.js:39
-#, fuzzy
 msgid "Group"
 msgstr "Група"
 
 #: amd/ngw-auth/UserWidget.js:40
-#, fuzzy
 msgid "User"
 msgstr "Користувач"
 
 #: amd/ngw-auth/UserWidget.js:49
-#, fuzzy
 msgid "Enter new password here"
 msgstr "Для зміни паролю заповніть це поле"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:7
-#, fuzzy
 #: amd/ngw-auth/template/UserWidget.hbs:8 template/group_browse.mako:25
 #: template/user_browse.mako:25
 msgid "Full name"
 msgstr "Повне ім'я"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:26
-#, fuzzy
 msgid "Group name"
 msgstr "Ім'я групи"
 
