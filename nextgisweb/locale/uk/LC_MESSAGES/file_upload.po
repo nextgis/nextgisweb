@@ -1,0 +1,52 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2016 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 0.0\n"
+"Report-Msgid-Bugs-To: info@nextgis.ru\n"
+"POT-Creation-Date: 2016-08-10 15:15+0300\n"
+"PO-Revision-Date: 2015-09-15 14:53+0600\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.2.0\n"
+
+#: amd/ngw-file-upload/Uploader.js:54
+msgid "Select"
+msgstr "Выбрать"
+
+#: amd/ngw-file-upload/Uploader.js:99
+msgid "Uploading..."
+msgstr "Идёт загрузка..."
+
+#: amd/ngw-file-upload/Uploader.js:107
+msgid " uploaded..."
+msgstr " загружено..."
+
+#: amd/ngw-file-upload/Uploader.js:136
+msgid "Could not load file!"
+msgstr "Не удалось загрузить файл!"
+
+#: amd/ngw-file-upload/template/Uploader.hbs:9
+msgid "Select a file"
+msgstr "Выберите файл"
+
+#: amd/ngw-file-upload/template/Uploader.hbs:10
+msgid "Overwrite?"
+msgstr "Заменить?"
+
+#: amd/ngw-file-upload/template/Uploader.hbs:11
+msgid "Try again"
+msgstr "Попробовать еще раз"
+
+#: amd/ngw-file-upload/template/Uploader.hbs:13
+msgid "or use drag and drop"
+msgstr "или перетащите его в эту область"

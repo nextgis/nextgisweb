@@ -1,0 +1,124 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2015 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 0.0\n"
+"Report-Msgid-Bugs-To: info@nextgis.ru\n"
+"POT-Creation-Date: 2017-01-13 19:20+0700\n"
+"PO-Revision-Date: 2015-09-13 13:13+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: model.py:125
+#, python-format
+msgid "Field not found (ID=%d)."
+msgstr "Поле не найдено (ID=%d)."
+
+#: amd/FieldsWidget.js:146 view.py:54 view.py:338
+msgid "Feature table"
+msgstr "Таблица объектов"
+
+#: view.py:71 view.py:94
+#, python-format
+msgid "Feature #%d"
+msgstr "Объект #%d"
+
+#: view.py:335
+msgid "Vector layer"
+msgstr "Векторный слой"
+
+#: view.py:344
+msgid "Download as GeoJSON"
+msgstr "Загрузить GeoJSON"
+
+#: view.py:349
+msgid "Download as CSV"
+msgstr "Загрузить CSV"
+
+#: amd/FeatureEditorWidget.js:179 amd/FieldsDisplayWidget.js:31
+#: amd/FieldsWidget.js:109 view.py:356
+msgid "Attributes"
+msgstr "Атрибуты"
+
+#: amd/FeatureEditorWidget.js:81
+msgid "Attribute: "
+msgstr "Поле: "
+
+#: amd/FeatureEditorWidget.js:245
+msgid "Save"
+msgstr "Сохранить"
+
+#: amd/FeatureGrid.js:213
+msgid "Confirmation"
+msgstr "Подтверждение"
+
+#: amd/FeatureGrid.js:214
+msgid "Delete feature?"
+msgstr "Удалить объект?"
+
+#: amd/FieldsDisplayWidget.js:101
+msgid "N/A"
+msgstr "Н/Д"
+
+#: amd/FieldsWidget.js:59 template/section_fields.mako:5
+msgid "Keyname"
+msgstr "Ключ"
+
+#: amd/FieldsWidget.js:69 template/section_fields.mako:6
+msgid "Type"
+msgstr "Тип"
+
+#: amd/FieldsWidget.js:73 template/section_fields.mako:7
+msgid "Display name"
+msgstr "Наименование"
+
+#: amd/FieldsWidget.js:87
+msgid "FT"
+msgstr "ТО"
+
+#: amd/FieldsWidget.js:97
+msgid "LA"
+msgstr "АН"
+
+#: amd/FieldsWidget.js:141
+msgid "Label attribute"
+msgstr "Атрибут наименование"
+
+#: amd/template/FeatureGrid.hbs:12
+msgid "Open"
+msgstr "Открыть"
+
+#: amd/template/FeatureGrid.hbs:16
+msgid "Edit"
+msgstr "Редактировать"
+
+#: amd/template/FeatureGrid.hbs:20
+msgid "Delete"
+msgstr "Удалить"
+
+#: amd/template/FeatureGrid.hbs:25
+msgid "Search..."
+msgstr "Поиск..."
+
+#: template/section_fields.mako:8
+msgid "Table"
+msgstr "Таблица"
+
+#: template/section_fields.mako:15
+msgid "Yes"
+msgstr "Да"
+
+#: template/section_fields.mako:15
+msgid "No"
+msgstr "Нет"
+

@@ -1,0 +1,59 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2015 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+#
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# iraqez <v.gumenyuk@agro-corp.com.ua>, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 0.0\n"
+"Report-Msgid-Bugs-To: info@nextgis.ru\n"
+"POT-Creation-Date: 2015-09-13 02:37+0300\n"
+"PO-Revision-Date: 2017-06-18 00:31+0200\n"
+"Last-Translator: iraqez <v.gumenyuk@agro-corp.com.ua>\n"
+"Language-Team: Ukrainian <kde-russian@lists.kde.ru>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<"
+"=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+"Language: uk\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: amd/DisplayWidget.js:36 amd/EditorWidget.js:121
+#, fuzzy
+msgid "Attachments"
+msgstr "Вкладення"
+
+#: amd/DisplayWidget.js:86 amd/EditorWidget.js:88
+#, fuzzy
+msgid "File name"
+msgstr "Ім'я файлу"
+
+#: amd/DisplayWidget.js:86 amd/EditorWidget.js:96
+#, fuzzy
+msgid "Size"
+msgstr "Розмір"
+
+#: amd/DisplayWidget.js:86 amd/EditorWidget.js:102
+#, fuzzy
+msgid "MIME type"
+msgstr "Тип MIME"
+
+#: amd/DisplayWidget.js:86 amd/EditorWidget.js:109
+#, fuzzy
+msgid "Description"
+msgstr "Опис"
+
+#: amd/EditorWidget.js:142
+#, fuzzy
+msgid "Upload"
+msgstr "Завантажити"
+
+#: amd/EditorWidget.js:165
+#, fuzzy
+msgid "Delete"
+msgstr "Видалити"
+
+

@@ -1,0 +1,134 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2016 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 0.0\n"
+"Report-Msgid-Bugs-To: info@nextgis.ru\n"
+"POT-Creation-Date: 2017-03-26 21:33+0300\n"
+"PO-Revision-Date: 2015-09-13 16:08+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: template/base.mako:87 view.py:43
+msgid "Control panel"
+msgstr "Панель управления"
+
+#: template/base.mako:98 view.py:52
+msgid "Help"
+msgstr "Справка"
+
+#: view.py:87 view.py:155
+msgid "Package versions"
+msgstr "Версии пакетов"
+
+#: view.py:95 view.py:161
+msgid "Cross-origin resource sharing (CORS)"
+msgstr "Cross-origin resource sharing (CORS)"
+
+#: view.py:102 view.py:159
+msgid "Web GIS name"
+msgstr "Название Веб ГИС"
+
+#: view.py:108
+msgid "404: Page not found"
+msgstr "404: Страница не найдена"
+
+#: view.py:109
+msgid "Think this page should be here?"
+msgstr "Если считаете, что это ошибка,"
+
+#: view.py:110
+msgid "Contact us"
+msgstr "напишите нам"
+
+#: view.py:111
+msgid "http://nextgis.com/contact/"
+msgstr "http://nextgis.ru/contact/"
+
+#: view.py:154
+msgid "Info"
+msgstr "Информация"
+
+#: view.py:158
+msgid "Settings"
+msgstr "Настройки"
+
+#: amd/ngw-pyramid/form/RTETextBox.js:61
+msgid "Rich Text Editor"
+msgstr "Визуальный редактор"
+
+#: amd/ngw-pyramid/form/ScaleTextBox.js:18
+msgid "Enter the correct scale value, e.g. 1:"
+msgstr "Введите корректное значение масштаба, например 1:"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:35
+msgid "Create"
+msgstr "Создать"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
+#: amd/ngw-pyramid/template/CORSForm.hbs:26
+#: amd/ngw-pyramid/template/SystemNameForm.hbs:10
+msgid "Save"
+msgstr "Сохранить"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:39
+msgid "Delete"
+msgstr "Удалить"
+
+#: amd/ngw-pyramid/template/CORSForm.hbs:17
+msgid ""
+"Enter allowed origins for cross domain requests to use HTTP API of this "
+"Web GIS on other websites. One origin per line."
+msgstr ""
+"Введите перечень допустимых источников для кросс-доменных запросов для "
+"использования HTTP API этой Веб ГИС на других веб-сайтах. По одному "
+"источнику в строке."
+
+#: amd/ngw-pyramid/template/CORSForm.hbs:18
+msgid ""
+"Please note that different protocols (HTTP and HTTPS) and subdomains "
+"(example.com and www.example.com) are different origins. Wildcards are "
+"not allowed."
+msgstr ""
+"Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены "
+"(example.com и www.example.com) считаются разными источниками. Символ "
+"подстановки (*) недопустим."
+
+#: template/base.mako:29
+msgid "Your Web GIS at nextgis.com"
+msgstr "Ваши карты онлайн на nextgis.com"
+
+#: template/base.mako:85
+msgid "Resources"
+msgstr "Ресурсы"
+
+#: template/base.mako:104
+msgid "Sign in"
+msgstr "Войти"
+
+#: template/pkginfo.mako:22
+msgid "Platform"
+msgstr "Платформа"
+
+#: template/pkginfo.mako:25
+msgid "Packages"
+msgstr "Пакеты"
+
+#: template/pkginfo.mako:31
+msgid "Package"
+msgstr "Пакет"
+
+#: template/pkginfo.mako:32
+msgid "Version"
+msgstr "Версия"
+

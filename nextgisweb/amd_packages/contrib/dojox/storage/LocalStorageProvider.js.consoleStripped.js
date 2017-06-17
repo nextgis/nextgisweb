@@ -41,7 +41,7 @@ define("dojox/storage/LocalStorageProvider", [
 			// toJson() always.
 			value = JSON.stringify(value);
 
-			try { // ua may raise an QUOTA_EXCEEDED_ERR exception
+			try { // uk may raise an QUOTA_EXCEEDED_ERR exception
 				this.store.setItem(fullKey,value);
 
 				if(resultsHandler){

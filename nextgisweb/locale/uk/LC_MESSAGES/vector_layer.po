@@ -1,0 +1,154 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2016 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 0.0\n"
+"Report-Msgid-Bugs-To: info@nextgis.ru\n"
+"POT-Creation-Date: 2017-02-08 12:29+0700\n"
+"PO-Revision-Date: 2015-09-14 00:03+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: model.py:78
+msgid "Point"
+msgstr "Точка"
+
+#: model.py:78
+msgid "Line"
+msgstr "Линия"
+
+#: model.py:78
+msgid "Polygon"
+msgstr "Полигон"
+
+#: model.py:79
+msgid "Multipoint"
+msgstr "Мультиточка"
+
+#: model.py:79
+msgid "Multiline"
+msgstr "Мультилиния"
+
+#: model.py:79
+msgid "Multipolygon"
+msgstr "Мультиполигон"
+
+#: model.py:159
+#, python-format
+msgid "Field name is forbidden: '%s'. Please remove or rename it."
+msgstr "Недопустимое имя поля: '%s'. Удалите или переименуйте его."
+
+#: model.py:164
+#, python-format
+msgid "Unsupported field type: %r."
+msgstr "Тип поля %r не поддерживается."
+
+#: model.py:277
+#, python-format
+msgid "Geometry type (%s) does not match column type (%s)."
+msgstr "Тип геометрии объекта (%s) не соответствует типу геометрии слоя (%s)."
+
+#: model.py:313
+#, python-format
+msgid ""
+"It seems like declared and actual attributes encodings do not match. "
+"Unable to decode attribute #%(attr)d of feature #%(feat)d. Try declaring "
+"different encoding."
+msgstr ""
+"Похоже, заданная кодировка отличается от фактической. Невозможно "
+"декодировать атрибут #%(attr)d записи #%(feat)d. Попробуйте выбрать "
+"другую кодировку."
+
+#: amd/ngw-vector-layer/Widget.js:34 model.py:343
+msgid "Vector layer"
+msgstr "Векторный слой"
+
+#: model.py:399
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
+#: model.py:401
+msgid "Feature count"
+msgstr "Количество объектов"
+
+#: model.py:660
+msgid "Dataset doesn't contains layers."
+msgstr "Набор данных не содержит ни одного слоя."
+
+#: model.py:663
+msgid "Dataset contains more than one layer."
+msgstr "Набор данных содержит более одного слоя."
+
+#: model.py:667
+msgid "Unable to open layer."
+msgstr "Не удалось открыть слой."
+
+#: model.py:673
+msgid "Layer doesn't contain coordinate system information."
+msgstr "Слой не содержит информации о системе координат."
+
+#: model.py:679
+#, python-format
+msgid "Feature #%d doesn't contains geometry."
+msgstr "Объект #%d не содержит геометрии."
+
+#: model.py:708
+msgid "GDAL library failed to open file."
+msgstr "Библиотеке GDAL не удалось открыть файл."
+
+#: model.py:713
+#, python-format
+msgid "Unsupport OGR driver: %s."
+msgstr "Драйвер OGR '%s' не поддерживается."
+
+#: model.py:718
+#, python-format
+msgid ""
+"Unsupported geometry type: '%s'. Probable reason: data contain mixed "
+"geometries."
+msgstr ""
+"Тип геометрии не поддерживается: '%s'. Возможная причина: смешанные типы "
+"геометрий."
+
+#: model.py:741
+msgid "Unsupported geometry type."
+msgstr "Тип геометрии не поддерживается."
+
+#: model.py:747
+msgid "Geometry type for existing resource can not be changed."
+msgstr "Тип геометрии существующего ресурса не может быть изменен."
+
+#: amd/ngw-vector-layer/template/Widget.hbs:4
+msgid "Select a dataset"
+msgstr "Выберите набор данных"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:5
+msgid "Dataset should be in ESRI Shapefile (zip) or GeoJSON format."
+msgstr "Данные должны быть в формате ESRI Shapefile (zip-архив) или GeoJSON."
+
+#: amd/ngw-vector-layer/template/Widget.hbs:10
+msgid "Spatial reference system"
+msgstr "Система координат"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:14
+msgid "Encoding"
+msgstr "Кодировка"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:16
+msgid "UTF-8"
+msgstr "Юникод UTF-8"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:17
+msgid "Windows-1251"
+msgstr "Кириллица Windows-1251"
+
