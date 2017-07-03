@@ -13,7 +13,7 @@ from sqlalchemy import Enum as _Enum
 
 
 class Enum(_Enum):
-    """ Обертка sqlalchemy.Enum с предустановленным native_enum=False """
+    """ sqlalchemy.Enum wrapped with native_enum=False pre-installed"""
 
     def __init__(self, *args, **kwargs):
         if 'native_enum' in kwargs:
