@@ -33,8 +33,8 @@ def view_geojson(request):
     request.resource_permission(PERM_READ)
 
     class CRSProxy(object):
-        """ Класс обертка добавляющая информацию о системе координат в
-        геоинтерфейс результата запроса векторного слоя """
+        """ Wrapper class that adds CRS information
+        in geointerface of vector layer query result"""
 
         def __init__(self, query):
             self.query = query
@@ -43,7 +43,7 @@ def view_geojson(request):
         def __geo_interface__(self):
             result = self.query.__geo_interface__
 
-            # TODO: Нужен корректный способ генерации имени СК, пока по ID
+            # TODO: Need correct way to generate CRS name, currently by ID
             result['crs'] = dict(type='name', properties=dict(
                 name='EPSG:%d' % request.context.srs_id))
             return result
