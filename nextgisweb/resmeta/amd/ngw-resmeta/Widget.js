@@ -183,7 +183,7 @@ define([
                     if (isNaN(value)) { value = 0.0; }
                 }
 
-                // Пустые ключи не записываем, хотя почему
+                // Empty keys are not stored, but why?
                 if (f.key !== "") { items[f.key] = value; }
             });
 

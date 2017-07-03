@@ -10,16 +10,16 @@ logger = logging.getLogger(__name__)
 
 
 def tcheck(arg):
-    """ Проверка на выполнение перевода в mako-шаблоне
+    """ Check translation in mako-template
 
-    При добавлении ее в default_filters позволяет отследить в логе экземпляры
-    TranslationString для которых не был выполнен перевод. """
+    If added to default_filters allows to see examplars of
+    TranslationString in logs for which translation was not completed. """
 
     if isinstance(arg, TrString):
         frame = inspect.stack()[1][0]
         template_uri = frame.f_globals.get('_template_uri', '<unknown>')
 
-        # TODO: Также добавить определение строки в самом шаблоне
+        # TODO: Add string definition in the template itself
         logger.warning("Translation required at %s, msgid '%s'" % (
             template_uri, arg))
 

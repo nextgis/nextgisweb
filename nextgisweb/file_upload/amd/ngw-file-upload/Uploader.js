@@ -115,8 +115,8 @@ define([
             this.upload_promise.resolve(data);
             this.uploading = false;
 
-            // Поскольку данный виджет используется для загрузки
-            // отдельных файлов, то извлекаем первый элемент из списка
+            // As this widget is used to upload individual
+            // files, extract first element from the list
             this.data = data.upload_meta[0];
             this.fileInfo.innerHTML = this.data.name + " (" + readableFileSize(this.data.size) + ")";
 

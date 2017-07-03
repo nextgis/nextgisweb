@@ -46,8 +46,8 @@ define([
             if (this.resourceId in fieldsCache) {
                 this._render(value, fieldsCache[this.resourceId]);
             } else {
-                // TODO: Тут неплохо бы было бы иметь возможность получать не весь ресурс,
-                // а только нужную его часть через API. Прочем вряд ли это сейчас критично.
+                // TODO: Here it would be nice to get not all the resource
+                // but only needed part through API. Though not critical at the moment.
 
                 xhr(route.resource.item({id: this.resourceId}), {
                     method: "GET",

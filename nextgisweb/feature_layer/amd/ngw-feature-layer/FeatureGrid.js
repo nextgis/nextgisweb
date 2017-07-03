@@ -57,7 +57,7 @@ define([
     hbsI18n,
     FeatureStore
 ) {
-    // Базовый класс ggrid над которым затем делается обертка в dijit виджет
+    // Base class ggrid which is them wrapped in dijit widget
     var GridClass = declare([OnDemandGrid, Selection, ColumnHider, ColumnResizer, selector], {
         selectionMode: "none"
     });
@@ -65,13 +65,13 @@ define([
     return declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
 
-        // Текущая веделенная строка
+        // Currently selected row
         selectedRow: null,
 
-        // Показывать ли тулбар
+        // Show toolbar?
         showToolbar: true,
 
-        // Показывать ли строку поиска
+        // Show search string?
         likeSearch: true,
 
         constructor: function (params) {
@@ -108,7 +108,7 @@ define([
             this.btnDeleteFeature.on("click", lang.hitch(this, this.deleteFeature));
 
             if (this.likeSearch) {
-                // Поиск нужен, настраиваем обработчики строки поиска
+                // Search is needed, set search string processors
                 this.tbSearch.on("input", lang.hitch(this, function () {
                     if (this._timer !== undefined) { clearInterval(this._timer); }
                     this._timer = setInterval(lang.hitch(this, this.updateSearch), 750);
@@ -118,7 +118,7 @@ define([
                     this.updateSearch();
                 }));
             } else {
-                // Поиск не нужен, прячем строку поиска
+                // Search is not needed, hide it
                 domStyle.set(this.tbSearch.domNode, "display", "none");
             }
         },

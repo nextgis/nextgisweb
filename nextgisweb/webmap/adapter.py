@@ -5,19 +5,19 @@ from .util import _
 
 
 class WebMapAdapter(object):
-    """ Адаптер веб-карты отвечает за то, каким образом стиль слоя будет
-    отображаться на веб-карте.
+    """ Web map adapter is responsible for how layer style
+    will be displayed on web map.
 
-    Состоит из двух частей. Первая работает на сервере и реализуется в виде
-    python-класса, вторая работает не клиенте и реализуется AMD модуля. """
+    It consists of two parts. First works on the server and implemented as 
+    a python-class, second works on fronend and implemented as an AMD module. """
 
     registry = registry_maker()
 
 
 @WebMapAdapter.registry.register
 class TileAdapter(object):
-    """ Адаптер, реализующий отображение стиля слоя через тайловый сервис,
-    однако сам сервис реализуется другим компонентом. """
+    """ An adapter that implements visulation of layer style through 
+    tile service, but the service itself is implemented by other component. """
 
     identity = 'tile'
     mid = 'ngw-webmap/TileAdapter'
@@ -26,8 +26,8 @@ class TileAdapter(object):
 
 @WebMapAdapter.registry.register
 class ImageAdapter(object):
-    """ Адаптер, реализующий отображение стиля слоя через сервис подобный
-    WMS-запросу GetImage, однако сам сервис реализуется другим компонентом. """
+    """ An adapter that implements visulation of layer style through 
+    WMS-like GetImage request, but the service itself is implemented by other component. """
 
     identity = 'image'
     mid = 'ngw-webmap/ImageAdapter'

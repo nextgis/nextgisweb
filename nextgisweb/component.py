@@ -19,9 +19,9 @@ class Component(object):
     __metaclass__ = ComponentMeta
 
     identity = None
-    """ Идентификатор компонента, который должен быть переопределен в дочернем
-    классе. Должен быть синтаксически корректным идентификатором python,
-    поскольку в ряде случаев используется как имя атрибута. """
+    """ Component identifier that should be redefined in a
+    child class. Must be syntactically correct python id
+    as it is used as attribute name in some cases. """
 
     registry = registry_maker()
 
@@ -31,10 +31,10 @@ class Component(object):
         self._logger = logging.getLogger('nextgisweb.comp.' + self.identity)
 
     def initialize(self):
-        """ Первая стадия инициализации. """
+        """ First initialization stage. """
 
     def configure(self):
-        """ Вторая стадия инициализации. """
+        """ Second initialization stage. """
 
     def initialize_db(self):
         pass
@@ -47,9 +47,9 @@ class Component(object):
 
     @property
     def env(self):
-        """ Окружение к которому относится этот компонент. Устанавливается при
-        создании экземпляра класса компонента и в дальнейшем не меняется. По
-        этот атрбут следует использовать вместо глобального окружения
+        """ Environment this component belongs too. Set 
+        on class exemplar creation and not changed afterwards.
+        This attribute should be used instead of global environment
         :py:class:`~nextgisweb.env.env`. """
 
         return self._env
@@ -73,13 +73,13 @@ class Component(object):
 
 
 def require(*deps):
-    """ Декоратор для указания зависимостей между методами компонентов.
-    В результате приминения зависимости записываюстся в приватные атрибуты
-    декорируемого метода. Эти приватные методы используются в
+    """ Decorator for dependencies between components methods.
+    When applied dependencies are written to private attributes of decorated
+    method. These private methods are used in
     :py:meth:`~nextgisweb.env.Env.chain`.
 
-    :param deps: Один или несколько идентификаторов компонентов, от
-        которых зависит выполнение декорируемого метода. """
+    :param deps: One or many component identifiers which decorated method
+        execution depends on. """
 
     def subdecorator(defn):
 

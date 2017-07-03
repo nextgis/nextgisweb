@@ -27,7 +27,7 @@ define([
                             locale_data: locale_data,
                             missing_key_callback: function (key) {
                                 if (locale !== "en") {
-                                    // Все строки по-умолчанию английские - их игнорируем
+                                    // All strings are English by default - ignore them
                                     console.warn(jed.sprintf(
                                         "Missing key '%s' in domain '%s' for locale '%s'!",
                                         [key, comp, locale]

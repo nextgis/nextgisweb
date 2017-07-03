@@ -271,8 +271,8 @@ define([
                 checkItemAcceptance: function (node, source, position) {
                     var item = registry.getEnclosingWidget(node).item,
                         item_type = widget.itemStore.getValue(item, "item_type");
-                    // Блокируем возможность перетащить элемент внутрь слоя,
-                    // перенос внутрь допустим только для группы
+                    // Block possibility to drag an element inside the layer
+                    // drag-n-drop can be done only for groups
                     return item_type === "group" || (item_type === "layer" && position !== "over");
                 },
                 betweenThreshold: 5
@@ -301,12 +301,12 @@ define([
             // Список адаптеров
             this.wLayerAdapter.set("store", this.adaptersStore);
 
-            // Создать дерево без model не получается, поэтому создаем его вручную
+            // Create tree without model is not possible, so create it manually
             this.widgetTree.placeAt(this.containerTree).startup();
 
             var widget = this;
 
-            // Добавление новой группы
+            // Add new group
             this.btnAddGroup.on("click", function () {
                 widget.itemStore.newItem(
                     {
@@ -320,7 +320,7 @@ define([
                 );
             });
 
-            // Добавление нового слоя
+            // Add new layer
             this.btnAddLayer.on("click", lang.hitch(this, function () {
                 this.layerPicker.pick().then(lang.hitch(this, function (itm) {
                     this.itemStore.newItem({
@@ -341,7 +341,7 @@ define([
                 }));
             }));
 
-            // Удаление слоя или группы
+            // Remove a group or a layer
             this.btnDeleteItem.on("click", function() {
                 widget.itemStore.deleteItem(widget.widgetTree.selectedItem);
                 widget.treeLayoutContainer.removeChild(widget.itemPane);
@@ -355,8 +355,8 @@ define([
 
             this.widgetTree.watch("selectedItem", function (attr, oldValue, newValue) {
                 if (newValue) {
-                    // При изменении выделенного элемента перенесем значения в виджеты
-                    // и покажем нужную панель: для слоев одну, для групп другую.
+                    // On change of selected element move values to widgets
+                    // and show needed panel: one for layers, another for groups.
                     if (newValue.item_type == "group") {
                         widget.widgetItemDisplayNameGroup.set("value", widget.getItemValue("display_name"));
                         widget.widgetProperties.selectChild(widget.paneGroup);
@@ -372,19 +372,19 @@ define([
                         widget.wLayerStyle.set("value", widget.getItemValue("layer_style_url"));
                     }
 
-                    // Изначально боковая панель со свойствами текущего элемента
-                    // спрятана. Поскольку элемент уже выбран - ее нужно показать.
+                    // Initially the side panel with current element properties is 
+                    // hidden. As the element is selected - open it up.
                     if (!oldValue) {
                         domStyle.set(widget.itemPane.domNode, "display", "block");
                         widget.treeLayoutContainer.addChild(widget.itemPane);
                     }
 
-                    // Активируем кнопку удаления слоя или группы
+                    // Activate layer/group deletion button
                     widget.btnDeleteItem.set("disabled", false);
                 }
             });
 
-            // При изменении значений переносим их в модель
+            // When values are changed - move them to the model
             this.widgetItemDisplayNameGroup.watch("value", function (attr, oldValue, newValue) {
                 widget.setItemValue("display_name", newValue);
             });
@@ -393,12 +393,12 @@ define([
                 widget.setItemValue("display_name", newValue);
             });
 
-            // NB: Именно "checked", "value" не работает
+            // NB: "checked", "value" doesn't work
             this.widgetItemGroupExpanded.watch("checked", function (attr, oldValue, newValue) {
                 widget.setItemValue("group_expanded", newValue);
             });
 
-            // NB: Именно "checked", "value" не работает
+            // NB: "checked", "value" doesn't work
             this.wdgtItemLayerEnabled.watch("checked", function (attr, oldValue, newValue) {
                 widget.setItemValue("layer_enabled", newValue);
             });
@@ -432,12 +432,12 @@ define([
             }
         },
 
-        // установить значение аттрибута текущего элемента
+        // set current element attribute value
         setItemValue: function (attr, value) {
             this.itemStore.setValue(this.widgetTree.selectedItem, attr, value);
         },
 
-        // значение аттрибута текущего элемента
+        // current element attribute value
         getItemValue: function (attr) {
             if (this.widgetTree.selectedItem) {
                 return this.itemStore.getValue(this.widgetTree.selectedItem, attr);
@@ -448,8 +448,8 @@ define([
             if (data.webmap === undefined) { data.webmap = {}; }
             var store = this.itemStore;
 
-            // Простого способа сделать дамп данных из itemStore
-            // почему-то нет, поэтому обходим рекурсивно.
+            // There is no simple way to make data dump from itemStore for some rease
+            // so walk through recursively.
             function traverse(itm) {
                 return {
                     item_type: store.getValue(itm, "item_type"),

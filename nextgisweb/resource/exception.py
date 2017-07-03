@@ -11,7 +11,7 @@ __all__ = [
 
 
 class ResourceError(Exception):
-    """ Базовый класс для исключительных ситуаций ресурса """
+    """ Base class for resource exceptions """
 
 
 class ForbiddenError(ResourceError):
@@ -19,13 +19,13 @@ class ForbiddenError(ResourceError):
 
 
 class ValidationError(ResourceError):
-    """ Исключительная ситуация вызванная некорректными данными со стороны
-    пользователя или внешнего сервиса """
+    """ Exception raised by incorrect data 
+    from user or external service """
 
 
 class OperationalError(ResourceError):
-    """ Исключительная ситуация вызванная неправильным функционированием
-    системы, что-то пошло не так в общем """
+    """ Exception raised by incorrect system
+    behavior, 'something went wrong' """
 
 
 Forbidden = ForbiddenError  # TODO: Depricate

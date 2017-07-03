@@ -33,7 +33,7 @@ define([
             }
         }, this.subcontainer, "last");
 
-        // Заголовок
+        // Header
         this.titleBar = domConstruct.create("div", {
             class: "ngwPopup__title",
         }, this.subcontainer, "first");
@@ -42,13 +42,13 @@ define([
             innerHTML: this.title ? this.title : "&nbsp;",
         }, this.titleBar, "last");
 
-        // Кнопка закрытия в заголовке
+        // Close button in the header
         this._closeSpan = domConstruct.create("span", {
             class: "dijitDialogCloseIcon",
             style: "margin-top: 2px"
         }, this.titleBar, "last");
 
-        // Соединительная стрелка
+        // Connecting arrow
         this._connectorDiv = domConstruct.create("div", {
             class: "dijitTooltipConnector"
         }, this.container, 'first');

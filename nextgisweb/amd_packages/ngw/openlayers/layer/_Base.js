@@ -44,7 +44,7 @@ define([
         },
 
         postscript: function () {
-            // НЕ вызываем Stateful.postscript!
+            // Don't call Stateful.postscript!
         },
 
         _visibilityGetter: function () {
