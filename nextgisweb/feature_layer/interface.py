@@ -30,88 +30,88 @@ class FIELD_TYPE(object):
 
 class IFeatureLayer(IResourceBase):
 
-    geometry_type = Attribute(""" Тип геометрии слоя GEOM_TYPE """)
-    fields = Attribute(""" Список полей """)
+    geometry_type = Attribute(""" Layer geometry type GEOM_TYPE """)
+    fields = Attribute(""" List of fields """)
 
-    feature_query = Attribute(""" Класс запроса объектов """)
+    feature_query = Attribute(""" Feature query class """)
 
     def field_by_keyname(self, keyname):
-        """ Получить поле по ключу. Если поле не найдено, то должно
-        вызываться исключение KeyError. """
+        """ Get field by key. If field is not found, 
+        KeyError exception should be raised. """
 
 
 class IWritableFeatureLayer(IFeatureLayer):
-    """ Слой объектов, поддерживающий запись """
+    """ Feature layer that supports writing """
 
     def feature_create(self, feature):
-        """ Вставить в БД новый объект, описание которого дается в feature
+        """ Create new feature with description from feature
 
-        :param feature: описание объекта
+        :param feature: feature description
         :type feature:  dict
 
-        :return:        ID вставленного объекта
+        :return:        ID of new feature
         """
 
     def feature_delete(self, feature_id):
-        """ Удалить запись с заданным id
+        """ Remove feature with id
 
-        :param feature_id: идентификатор записи
+        :param feature_id: feature id
         :type feature_id:  int or bigint
         """
 
     def feature_delete_all(self):
-        """ Удалить все записи слоя """
+        """ Remove all features """
 
     def feature_put(self, feature):
-        """ Сохранить объект в слое """
+        """ Save feature in a layer """
 
 
 class IFeatureQuery(Interface):
 
     def fields(self, *args):
-        """ Установить список полей запроса. Если список полей
-        не установлен, то запрос должен возращать все поля элемента. """
+        """ Set a list of request fields. If list of fields not set
+        return all fields. """
 
     def limit(self, limit, offset=0):
-        """ Установить лимит запроса наподобие SQL инструкции
+        """ Set request limit similarly to SQL
         LIMIT limit OFFSET offset """
 
     def geom(self):
-        """ Включать геометрию объекта в результат запроса """
+        """ Include geometry in request result """
 
     def srs(self, srs):
-        """ Установить систему координат геометрии в случае,
-        если она включена в запрос """
+        """ Include CRS if
+        it was included in request """
 
     def box(self):
-        """ Включать охват объекта в результат запроса """
+        """ Include extent in request result """
 
 
 class IFeatureQueryFilter(IFeatureQuery):
 
     def filter(self, *args):
-        """ Установить правила отбора """
+        """ Set query rules """
 
 
 class IFeatureQueryFilterBy(IFeatureQuery):
 
     def filter_by(self, **kwargs):
-        """ Установить отбор по значениям аттрибутов """
+        """ Set query by attributes """
 
 
 class IFeatureQueryOrderBy(IFeatureQuery):
 
     def order_by(self, *args):
-        """ Установить порядок сортировки """
+        """ Set sort order """
 
 
 class IFeatureQueryLike(IFeatureQuery):
 
     def like(self, value):
-        """ Установить отбор по подстроке """
+        """ Set query by substring """
 
 
 class IFeatureQueryIntersects(IFeatureQuery):
 
     def intersects(self, geom):
-        """ Установить отбор по пространственному пересечению """
+        """ Set query by spatial intersection """
