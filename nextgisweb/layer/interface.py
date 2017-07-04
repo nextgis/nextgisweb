@@ -5,4 +5,4 @@ from ..resource import IResourceBase
 
 
 class IBboxLayer(IResourceBase):
-    extent = Attribute(""" Ограничивающий прямоугольник (охват) слоя """)
+    extent = Attribute(""" Bounding box (extent) of a layer """)
