@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-""" Универсальные наборы прав доступа
-=====================================
+""" Universal sets of permissions
+=================================
 
 """
 
@@ -21,81 +21,81 @@ P = Permission
 
 
 class ResourceScope(Scope):
-    """ Базовый набор прав ресурса """
+    """ Base set of resource permissions """
 
     identity = 'resource'
     label = _("Resource")
 
     read = P(_("Read"))
-    """ Чтение: возможность прочитать атрибуты класс, наименование и ключ
-    ресурса. Так же от этого права зависит большинство других прав ресурса,
-    например изменение, таким образом нельзя изменить ресурс не имея
-    возможности его прочитать. """
+    """ Read: ability to read class, name and key of the
+    resource. Most of the other permissions depend on Read, for
+    example Update, so you can't change a resource
+    if you can't read it. """
 
     create = P(_("Create")).require(read)
-    """ Создание: довольно туманное право, сейчас не используется. Идея была
-    в том, что при создании нового ресурса проверялось наличие в нем права на
-    создание, но сейчас проверяется только право :py:attr:`manage_children`
-    для дочернего ресурса. Возможно потом стоит к этому вернуться, без этого
-    права невозможно ограничить создание новых ресурсов определенного типа. """
+    """ Create: a little bit fuzzy rule that is not used currently. The idea was
+    to check Create permission while creating a new resource, 
+    but currenty only :py:attr:`manage_children` permission is checked
+    for child resource. Possibly will have to return to this one
+    as it is impossible to restrict creation of resources with certain types without this rule. """
 
     update = P(_("Update")).require(read)
-    """ Изменение: изменение наименования и ключа ресурса, по аналогии с правом
-    :py:attr:`read`. На изменение остальных атрибутов это ни как не влияет. """
+    """ Update: change name and key of the resource
+    analogous to :py:attr:`read`. Doesn't affect changes to any other attributes. """
 
     delete = P(_("Delete")).require(read)
-    """ Удаление: право на удаление этого ресурса. Помимо этого для реального
-    удаления ресурса необходимо наличие права :py:attr:`manage_children`
-    у родительского ресурса. """
+    """ Delete: permission to remove this resource. Besides that to really remove a resource
+    one will also need :py:attr:`manage_children` permission 
+    for parent resource. """
 
     manage_children = P(_("Manage children")).require(read)
-    """ Управление дочерними ресурсами """
+    """ Manage children resources """
 
     change_permissions = P(_("Change permissions")).require(read)
-    """ Управление правами доступа """
+    """ Manage permissions """
 
 
 class MetadataScope(Scope):
-    """ Набор прав метаданных ресурса. Типичный пример метаданных ресурса -
-    его описание в свободной форме. Это описание фактически ни на что не
-    влияет, его изменение не приводит к изменению структуры данных или
-    чего-либо еще. Поскольку у каждого типа ресурсов есть описание, то этот
-    набор прав включен для всех ресурсов на уровне класса Resource. """
+    """ Set of permissions for resource metadata. Typical example of resource metadata -
+    is its description in free form. This description doesn't affect anything
+    it's change doesn't change data structure or anything else.
+    As every resource has description this set of permissions is 
+    included for all resources at Resource class level. """
 
     identity = 'metadata'
     label = _("Metadata")
 
-    read = P(_("Read"))                   #: Чтение
-    write = P(_("Write")).require(read)   #: Запись
+    read = P(_("Read"))                   #: Read
+    write = P(_("Write")).require(read)   #: Write
 
 
 class DataStructureScope(Scope):
-    """ Набор прав структуры данных ресурса, например стурктура полей
-    векторного слоя, ее изменение может приводить к изменению содержимого
-    самих данных. """
+    """ Set of permissions for data structure, for example fields structure
+    of vector layer, its change might lead to change 
+    in data itself. """
 
     identity = 'datastruct'
     label = _("Data structure")
 
-    read = P(_("Read"))                   #: Чтение
-    write = P(_("Write")).require(read)   #: Запись
+    read = P(_("Read"))                   #: Read
+    write = P(_("Write")).require(read)   #: Write
 
 
 class DataScope(Scope):
-    """ Набор прав доступа к данным """
+    """ Set of permissions for data access """
 
     identity = 'data'
     label = _("Data")
 
-    read = P(_("Read"))                   #: Чтение
-    write = P(_("Write")).require(read)   #: Запись
+    read = P(_("Read"))                   #: Read
+    write = P(_("Write")).require(read)   #: Write
 
 
 class ConnectionScope(Scope):
-    """ Набор прав параметров внешнего соединения. В некоторых случаях
-    требуется хранить в ресурсе параметры доступа к внешним ресурсам. Эти
-    параметры могут содержать чувствительные данные с точки зрения
-    безопасности, например логины и пароли для доступа к удаленной БД. """
+    """ Set of permissions for external connection parameters. In some cases
+    we need to store access parameters to external resources. These 
+    parameters may be sensitive, logins and passwords 
+    to access remote DB for example. """
 
     identity = 'connection'
     label = _("Connection")
@@ -106,13 +106,13 @@ class ConnectionScope(Scope):
 
 
 class ServiceScope(Scope):
-    """ Набор прав предоставляемого сервиса, например WMS или WFS. Нужна чтобы
-    можно было разделить права на настройку сервиса и на его использование.
-    Впрочем если сервис внутри использует другие ресурсы, то права на них
-    должны проверяться отдельно. """
+    """ Set of permissions for services such as WMS or WFS. This is 
+    needed to separate permissions for service parameters and its actual usage.
+    Though if service is using other resources inside, we need to 
+    their permissions separately. """
 
     identity = 'service'
     label = _('Service')
 
-    connect = P(_("Connect"))                       #: Подключение
-    configure = P(_("Configure")).require(connect)  #: Настройка
+    connect = P(_("Connect"))                       #: Connection
+    configure = P(_("Configure")).require(connect)  #: Configuration
