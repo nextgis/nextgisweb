@@ -317,7 +317,9 @@ class TableInfo(object):
                 elif fld_type == ogr.OFTReal:
                     fld_value = feature.GetFieldAsDouble(i)
                 elif fld_type in [ogr.OFTDate, ogr.OFTTime, ogr.OFTDateTime]:
-                    fld_value = datetime(*feature.GetFieldAsDateTime(i))
+                    # OGR_F_GetFieldAsDateTimeEx returns
+                    # seconds with millisecond accuracy
+                    fld_value = datetime(*map(int, feature.GetFieldAsDateTime(i)))
                 elif fld_type == ogr.OFTIntegerList:
                     fld_value = json.dumps(feature.GetFieldAsIntegerList(i))
                 elif gdal_gt_20 and fld_type == ogr.OFTInteger64List:
