@@ -59,11 +59,11 @@ define([
             var result = { isValid: true, error: [] };
 
             array.forEach([this.displayName, this.keyname, this.password], function (subw) {
-                // форсируем показ значка при проверке
+                // force icon display when checking
                 subw._hasBeenBlurred = true;
                 subw.validate();
 
-                // если есть ошибки, фиксируем их
+                // if there're errors, mark them
                 if (!subw.isValid()) {
                     result.isValid = false;
                 }
