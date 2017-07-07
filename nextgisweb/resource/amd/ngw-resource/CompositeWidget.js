@@ -104,10 +104,10 @@ define([
 
             if (this.operation === "read" || this.operation === "update") {
 
-                // Отключаем кнопку Обновить, так как в текущем варианте
-                // данная операция не корректно работает со следующими
-                // виджетами: PermissionWidget, FieldsWidget, ItemWidget.
-                // Обновить состояние виджета (вместе со страницей) можно по F5.
+                // Turn off Refresh button, as currently this will not work
+                // correctly with the following widgets:
+                // PermissionWidget, FieldsWidget, ItemWidget.
+                // Update widget state (with the page) with F5.
 
                 // this.buttons.push(new Button({
                 //     label: "Обновить",
@@ -131,27 +131,27 @@ define([
             }
         },
 
-        // Сериализация и валидация
-        // ========================
+        // Serialization and validation
+        // ============================
 
         validateData: function () {
             var deferred = new Deferred(),
                 promises = [],
                 errors = [];
 
-            // Регистрация ошибки, эта функция передается дочерним
-            // виджетам в качестве параметра
+            // Register error, this function is given to
+            // children widgets as a parameter
             function errback(err) {
                 errors.push(err);
             }
 
             array.forEach(this.members, function (member) {
-                // Валидация может быть асинхронной, в этом случае
-                // member.validate вернет deferred, собираем их в массив
+                // Validation can be asynchronous,
+                // member.validate will return deferred in this case, collect them into an array
                 promises.push(when(member.validateData(errback)).then(
                     function /* callback */ (success) {
-                        // Если валидация завершилась с ошибкой,
-                        // отмечаем заголовок красным цветом
+                        // If validation returned an error
+                        // mark a heading red\
 
                         if (!success) { 
                             domClass.add(member.controlButton.domNode, "dijitTabError"); 
@@ -168,14 +168,14 @@ define([
                 function /* callback */ (results) {
                     var success = true;
 
-                    // Проверяем результаты всех членов, все должны
-                    // вернуть истинное выражение
+                    // Check results of all members,
+                    // all must return True
                     array.forEach(results, function (res) {
                         success = success && res;
                     });
 
-                    // Так же как и дочерние виждеты составной виджет
-                    // возвращает истину или ложь, и reject в случае ошибки.
+                    // As children widgets, composit widget
+                    // returns True or False and reject if there is an error.
                     deferred.resolve(success);
                 },
 
@@ -288,8 +288,8 @@ define([
         },
 
 
-        // Всякие действия и кнопки
-        // ========================
+        // Different actions and buttons
+        // =============================
 
         lock: function () {
             domStyle.set(this.tabContainer.domNode, "display", "none");
