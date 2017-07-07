@@ -19,9 +19,9 @@ define([
     Button,
     i18n
 ) {
-    // Mixin превращающий ngw-pyramid/modelWidget/Widget в форму редактирования
-    // модели с соответствующими кнопками и реализующий функционал сохранения
-    // или добавления.
+    // Mixin that turns ngw-pyramid/modelWidget/Widget in model editing form
+    // wth buttons and functionality to save 
+    // or add.
 
     return declare([], {
 
@@ -43,21 +43,21 @@ define([
         },
 
         postCreate: function () { 
-            // Создаем дополнительный div, в который будут
-            // попадать дочерние виджеты
+            // Create additional div, where children
+            // widgets will be stored
             this.containerNode = domConstruct.create('div', null, this.domNode);
 
-            // Вызываем базовый класс после, мало ли кто там
-            // тоже захочит разместить дочерний виджет
+            // Call base class after, in case someone want to 
+            // add a child widget as well
             this.inherited(arguments);
         },
 
         addChild: function (child) {
             if (child == this.buttonPane) {
-                // Панель с кнопками добавляем в корень
+                // Add toolbar with buttons to root
                 child.placeAt(this.domNode);
             } else {
-                // Все остальное добавляем в спец. контейнер
+                // Add other stuff to special container
                 child.placeAt(this.containerNode);
             }
         },
@@ -70,7 +70,7 @@ define([
         submit: function () {
             var widget = this;
 
-            // заблокируем форму на всякий случай
+            // block form just in case
             this.set("disabled", true);
 
             var validate = function () { return { isValid: true, error: [] }; };
@@ -80,22 +80,22 @@ define([
 
             var d = new Deferred();
 
-            // при любом исходе разблокируем форму
+            // unblock form in any case
             d.then(
                 function (success) { if (!success) { widget.set("disabled", false); } },
                 function (errinfo) {
-                    alert("К сожалению, во время выполнения операции произошла непредвиденная ошибка. \n" +
-                          "Возможно это вызвано неполадками в работе сети. Сообщение об ошибке:\n\n" + errinfo);
+                    alert("There was an error executing your command. \n" +
+                          "It might be related to network problems. Error message:\n\n" + errinfo);
 
                     widget.set("disabled", false);
                 }
             );
 
-            // валидация формы может быть асинхронной
+            // form validation can be asynchronous
             when(validate(),
                 function (result) {
                     if (result.isValid) {
-                        // получение значения может быть асинхронным
+                        // getting value can be asynchronous
                         when(widget.get("value"),
                             function (value) {
                                 xhr.post(widget.submitUrl, {
@@ -111,7 +111,7 @@ define([
                                             d.resolve(false);
                                             widget.set("error", response.error);
                                         } else {
-                                            // что-то странное с ответом
+                                            // something wrong with the response
                                             d.reject();
                                         }
                                     }, 
