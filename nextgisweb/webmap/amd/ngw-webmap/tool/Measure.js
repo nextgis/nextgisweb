@@ -128,7 +128,7 @@ define([
                 ol.Observable.unByKey(listener);
             });
 
-            // Тултип для вывода результатов
+            // Tooltip for results
             this.tooltip = new TooltipDialog();
 
             this.active = false;
