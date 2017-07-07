@@ -161,8 +161,8 @@ define([
             var prefix = this.prefix,
                 setObject = function (key, value) { lang.setObject(prefix + "." + key, value, data); };
 
-            // TODO: Полагаемся на синхронность MemoryStore.query,
-            // что возможно не совсем корректно
+            // TODO: We rely on MemoryStore.query being synchronous,
+            // this might be not wise
             setObject("fields", this.store.query().map(function (src) {
                 var obj = lang.clone(src);
                 obj.fid = undefined;
