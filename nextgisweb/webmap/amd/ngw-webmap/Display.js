@@ -374,7 +374,7 @@ define([
             ).then(undefined, function (err) { console.error(err); });
 
 
-            // Tools by default and plugins
+            // Default tools and plugins
             all([this._midDeferred.plugin, this._layersDeferred]).then(
                 function () {
                     widget._toolsSetup();
@@ -473,7 +473,7 @@ define([
                     copy.children = array.map(item.children, function (c) { return prepare_item(c); });
                 }
 
-                // For others build an index
+                // Build an index for everything else
                 itemConfigById[item.id] = item;
 
                 return copy;
@@ -501,7 +501,7 @@ define([
                 onComplete: function () {
                     widget.itemStore.on("Set", function (item, attr) {
                         // While attribute checked is changed
-                        // watch в списке видимых слоев
+                        // watch changes in the list of visible layers
                         if (attr === "checked") { widget._itemStoreVisibility(item); }
                     });
 
@@ -664,7 +664,7 @@ define([
         },
 
         _adaptersSetup: function () {
-            // Create exemplars for all adapter classes
+            // Create instances for all adapter classes
             this._adapters = {};
             array.forEach(Object.keys(this._mid.adapter), function (k) {
                 this._adapters[k] = new this._mid.adapter[k]({
