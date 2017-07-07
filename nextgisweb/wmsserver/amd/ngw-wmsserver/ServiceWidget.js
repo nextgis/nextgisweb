@@ -89,12 +89,12 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            // Создать дерево без model не получается, поэтому создаем его вручную
+            // It is impossible to create a tree without a model, so creating it manually
             this.widgetTree.placeAt(this.containerTree).startup();
 
             var widget = this;
 
-            // Добавление нового слоя
+            // Add new layer
             this.btnAddLayer.on("click", lang.hitch(this, function () {
                 this.layerPicker.pick().then(lang.hitch(this, function (itm) {
                     this.itemStore.newItem({
@@ -116,7 +116,7 @@ define([
                 }));
             }));
 
-            // Удаление слоя или группы
+            // Remove a layer or group
             this.btnDeleteItem.on("click", function() {
                 var item = widget.widgetTree.selectedItem,
                     identity = widget.itemModel.getIdentity(item),
@@ -124,7 +124,7 @@ define([
                     prevSibling = node.getPreviousSibling(),
                     nextSibling = node.getNextSibling();
 
-                // Переключаемся на соседнюю ноду
+                // Switch to next node
                 var sibling = prevSibling ? prevSibling : nextSibling;
                 if (sibling) {
                     widget.widgetTree.set("path", [
@@ -147,17 +147,17 @@ define([
                     widget.wLayerMinScale.set("value", widget.getItemValue("min_scale_denom"));
                     widget.wLayerMaxScale.set("value", widget.getItemValue("max_scale_denom"));
 
-                    // Изначально боковая панель со свойствами текущего элемента
-                    // спрятана. Поскольку элемент уже выбран - ее нужно показать.
+                    // Initially the side panel with current element properties is 
+                    // hidden. As the element is selected - open it up.
                     if (!oldValue) {
                         domStyle.set(widget.itemPane.domNode, "display", "block");
                         widget.treeLayoutContainer.addChild(widget.itemPane);
                     }
 
-                    // Активируем кнопку удаления слоя или группы
+                    // Activate layer/group deletion button
                     widget.btnDeleteItem.set("disabled", false);
 
-                    // Помещаем фокус на обязательное поле с ключом
+                    // Move focus to required field with a key
                     widget.widgetItemKeyname.focus();
                 }
             });
@@ -183,12 +183,12 @@ define([
             this.inherited(arguments);
         },
 
-        // установить значение аттрибута текущего элемента
+        // set current element attribute value
         setItemValue: function (attr, value) {
             this.itemStore.setValue(this.widgetTree.selectedItem, attr, value);
         },
 
-        // значение аттрибута текущего элемента
+        // current element attribute value
         getItemValue: function (attr) {
             if (this.widgetTree.selectedItem) {
                 return this.itemStore.getValue(this.widgetTree.selectedItem, attr);
@@ -222,7 +222,7 @@ define([
                 this.itemIdx++;
             }, this);
 
-            // При загрузке отмечаем самую первую ноду
+            // On load mark the very first node
             if (this.itemIdx > 0) {
                 this.widgetTree.set("path", [this.widgetTreeRootNodeId, 1]);
             }
