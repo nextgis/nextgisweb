@@ -20,7 +20,7 @@ define([
     i18n
 ) {
     // Mixin that turns ngw-pyramid/modelWidget/Widget in model editing form
-    // wth buttons and functionality to save 
+    // with buttons and functionality to save 
     // or add.
 
     return declare([], {
