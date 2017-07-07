@@ -37,7 +37,7 @@ define([
        postCreate: function () {
             this.inherited(arguments);
 
-            // Выбор слоя и получение его охвата
+            // Layer selection and get its extent
             this.btnSetExtentFromLayer.on("click",
                 lang.hitch(this, function () {
                     this.layerPicker.pick().then(lang.hitch(this,
