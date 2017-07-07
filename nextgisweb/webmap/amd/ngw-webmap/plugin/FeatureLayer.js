@@ -72,7 +72,7 @@ define([
             });
             this.toolbar.addChild(this.btnZoomToFeature);
 
-            // При изменении выделенной строки изменяем доступность кнопок
+            // When selected row is changed, change active buttons
             this.watch("selectedRow", function (attr, oldVal, newVal) {
                 widget.btnZoomToFeature.set("disabled", newVal === null);
                 if (newVal) {
@@ -295,8 +295,8 @@ define([
                                     ndeferred.reject();
                                 }
                             }, function (err) {
-                                // Если что-то пошло не так с конкретным слоем,
-                                // то все равно продолжаем поиск по следующему
+                                // If something went wrong with current layer
+                                // still continue search with the next one
                                 ndeferred.resolve(limit);
                             }).otherwise(breakOrError);
                         }).otherwise(breakOrError);
@@ -307,7 +307,7 @@ define([
 
                 var ndeferred = new Deferred();
 
-                // Посылаем запрос на геокодирование
+                // Send geocoding request
                 deferred.then(function (limit) {
 
                     var NOMINATIM_SEARCH_URL = "http://nominatim.openstreetmap.org/search/";
@@ -322,10 +322,10 @@ define([
                     script.get(url, jsonpArgs).then(function (data) {
                         array.forEach(data, function (place) {
                             if (limit > 0) {
-                                // Отформатируем ответ в виде удобном для отображения
-                                // и покажем в списке ответов:
+                                // Format the response for better output
+                                // and show in the results:
 
-                                // Координаты приходят в WGS84
+                                // Coordinates are in WGS84
                                 var extent = [
                                     parseFloat(place.boundingbox[2]),
                                     parseFloat(place.boundingbox[0]),
@@ -357,8 +357,8 @@ define([
                         }
                      });
                 }, function (err) {
-                    // Если что-то пошло не так с конкретным слоем,
-                    // то все равно продолжаем поиск по следующему
+                    // If something went wrong with current layer
+                    // still continue search with the next one
                     ndeferred.resolve(limit);
                 }).otherwise(breakOrError);
 
