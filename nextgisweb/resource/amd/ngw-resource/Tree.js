@@ -24,10 +24,10 @@ define([
 
         labelAttr: "display_name",
 
-        // Признак того, что загружена корневая нода. Используется вместо
-        // оригинального свойства root, которое теперь всегда null. Это сделано
-        // для того, чтобы избежать дублирования загрузки корневой ноды в
-        // случае, если на странице используется несколько ResourcePicker-ов.
+        // Indication that root node is loaded. Used instead of 
+        // original root property, which is always null now. This is done
+        // to avoid double root node loading
+        // when a page uses several ResourcePicker
         _root: undefined,
 
         constructor: function () {
@@ -49,7 +49,7 @@ define([
     return declare("ngw.resource.Tree", [Tree], {
         showRoot: true,
 
-        // Отключаем множественное выделение по-умолчанию
+        // Turn off multiple selection by defaul
         dndParams: Tree.prototype.dndParams.concat(["singular"]),
         singular: true,
 
@@ -58,10 +58,10 @@ define([
 
             if (this.resourceId === undefined) { this.resourceId = 0; }
 
-            // Все деревья, являющиеся экземплярами данного класса, используют
-            // общую модель. Вследствие чего уменьшается количество запросов
-            // к серверу, но при этом экземпляры не могут иметь разные
-            // корневые ноды. Возможно, это когда-то может понадобиться.
+            // All trees that are exemplars of this class use
+            // the same model. As a result there are less requests
+            // to server, but exemplars can't have different 
+            // root nodes. This might become useful sometimes.
             this.model = ResourceObjectStoreModel.getInstance({
                 query: {id: this.resourceId}
             });
