@@ -155,37 +155,37 @@ define([
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
 
-        // Загрузка разных видов модулей: adapter, basemap, plugin
+        // Load modules: adapter, basemap, plugin
         _midDeferred: undefined,
 
-        // Инициализация хранилища элементов веб-карты
+        // Initialize webmap's elements storage
         _itemStoreDeferred: undefined,
 
-        // Виджет карты с базовыми слоями создан
+        // Map widget with base layers is created
         _mapDeferred: undefined,
 
-        // Слои элементов карты созданы
+        // Layers for map elements are created
         _layersDeferred: undefined,
 
-        // Вызов после postCreate
+        // Call after postCreate
         _postCreateDeferred: undefined,
 
-        // Вызов после startup
+        // Call after startup
         _startupDeferred: undefined,
 
-        // GET-параметры: подложка, слои, центр, разрешение
+        // GET-parameters: basemap, layers, center, resolution
         _urlParams: undefined,
 
-        // Текущая подложка
+        // Current basemap
         _baseLayer: undefined,
 
-        // Для загрузки изображения
+        // To load an image
         assetUrl: ngwConfig.assetUrl,
 
         constructor: function (options) {
             declare.safeMixin(this, options);
 
-            // Извлекаем GET-параметры из URL
+            // Extract GET-parameters from URL
             this._urlParams = (function(){
                 var url, query, queryObject;
                 url = window.location.toString();
@@ -209,15 +209,15 @@ define([
 
             var widget = this;
 
-            // Асинхронная загрузка необходимых модулей
+            // Asynchronous loading of necessary modules
             this._midDeferred = {};
             this._mid = {};
             var mids = this.config.mid;
 
-            // Доступ к настройкам
+            // Access to settings
             this.clientSettings = clientSettings;
 
-            // Добавляем MID базовых карт
+            // Add base maps MID
             array.forEach(clientSettings.basemaps, function (bm) {
                 mids.basemap.push(bm.base.mid);
             });
@@ -240,7 +240,7 @@ define([
                 });
             }, this);
 
-            // Плагины уровня карты
+            // Webmap level plugins
             var wmpmids = Object.keys(this.config.webmapPlugin);
             var deferred = new LoggedDeferred("_midDeferred.webmapPlugin");
 
@@ -256,14 +256,14 @@ define([
                 deferred.resolve(obj);
             });
 
-            // Хранилище
+            // Storage
             this._itemStoreSetup();
 
             this._mapDeferred.then(
                 function () { widget._itemStorePrepare(); }
             );
 
-            // Модель
+            // Model
             this.itemModel = new TreeStoreModel({
                 store: this.itemStore,
                 checkedAttr: "checked",
@@ -282,7 +282,7 @@ define([
                 this.displayProjection
             );
 
-            // Дерево элементов слоя
+            // Layer elements tree
             this.itemTree = new Tree({
                 style: "height: 100%",
                 model: this.itemModel,
@@ -290,19 +290,19 @@ define([
                 showRoot: false
             });
 
-            // Размещаем дерево, когда виджет будет готов
+            // Place a tree when widget is ready
             all([this._layersDeferred, this._postCreateDeferred]).then(
                 function () { widget.itemTree.placeAt(widget.layerTreePane); }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Загружаем закладки, когда кнопка будет готова
+            // Load bookmarks when button is ready
             this._postCreateDeferred.then(
                 function () {
                     widget.mapToolbar.items.loadBookmarks();
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Выбранный элемент
+            // Chosen element
             this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
                 widget.set(
                     "itemConfig",
@@ -311,14 +311,14 @@ define([
                 widget.set("item", newVal);
             });
 
-            // Карта
+            // Map
             all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
                 function () {
-                    // Если в дальнейшем будет необходимо, то для плагинов
-                    // уровня карты можно будет ввести какой-то признак
-                    // того, когда следует исполнять код плагина:
-                    // до настройки карты или после. Сейчас плагины
-                    // уровня карты исполняются перед настройкой карты.
+                    // If needed in the future, webmap level plugins
+                    // can have a property for
+                    // when the plugin code should be executed
+                    // before map setting or after. Currently webmap level
+                    // plugins are executed before map setting.
                     widget._pluginsSetup(true);
                     widget._mapSetup();
                 }
@@ -326,7 +326,7 @@ define([
 
             all([this._mapDeferred, this._postCreateDeferred]).then(
                 function () {
-                    // Формируем список слоев базовых карты в списке выбора
+                    // Create a list of base layers in a list
                     array.forEach(Object.keys(widget.map.layers), function (key) {
                         var layer = widget.map.layers[key];
                         if (layer.isBaseLayer) {
@@ -337,7 +337,7 @@ define([
                         }
                     });
 
-                    // И добавляем возможность переключения
+                    // and add switching
                     widget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
                         widget.map.layers[oldVal].olLayer.setVisible(false);
                         widget.map.layers[newVal].olLayer.setVisible(true);
@@ -347,7 +347,7 @@ define([
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Слои элементов
+            // Element layers
             all([this._midDeferred.adapter, this._itemStoreDeferred]).then(
                 function () {
                     widget._layersSetup();
@@ -356,12 +356,12 @@ define([
 
             all([this._layersDeferred, this._mapSetup]).then(
                 function () {
-                    // Добавляем слои на карту
+                    // Add layers to map
                     widget._mapAddLayers();
 
                     widget._mapAddHighlightOverlay();
 
-                    // Связываем изменение чекбокса с видимостью слоя
+                    // Link checkbox with layer visibility
                     var store = widget.itemStore;
                     store.on("Set", function (item, attr, oldVal, newVal) {
                         if (attr === "checked" && store.getValue(item, "type") === "layer") {
@@ -374,7 +374,7 @@ define([
             ).then(undefined, function (err) { console.error(err); });
 
 
-            // Иструменты по-умолчанию и плагины
+            // Tools by default and plugins
             all([this._midDeferred.plugin, this._layersDeferred]).then(
                 function () {
                     widget._toolsSetup();
@@ -382,8 +382,8 @@ define([
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Свернем те элементы дерева, которые не отмечены как развернутые.
-            // По-умолчанию все элементы развернуты за счет autoExpand у itemTree
+            // Fold tree elements that are not marked as unfolded.
+            // By default all elements are unfolded with autoExpand у itemTree
             all([this._itemStoreDeferred, widget.itemTree.onLoadDeferred]).then(
                 function () {
                     widget.itemStore.fetch({
@@ -400,26 +400,26 @@ define([
             ).then(undefined, function (err) { console.error(err); });
 
 
-            // Инструменты
+            // Tools
             this.tools = [];
         },
 
         postCreate: function () {
             this.inherited(arguments);
 
-            // Модифицируем TabContainer так, чтобы он показывал табы только
-            // в том случае, если их больше одного, т.е. один таб не показываем
+            // Modify TabContainer so that it shows tabs only if
+            // there are more then 1, so don't show tabs if there is just one of them
             declare.safeMixin(this.tabContainer, {
                 updateTabVisibility: function () {
                     var currstate = domStyle.get(this.tablist.domNode, "display") != "none",
                         newstate = this.getChildren().length > 1;
 
                     if (currstate && !newstate) {
-                        // Скрываем панель с табами
+                        // Hide tabs panel
                         domStyle.set(this.tablist.domNode, "display", "none");
                         this.resize();
                     } else if (!currstate && newstate) {
-                        // Показываем панель с табами
+                        // Show tabs panel
                         domStyle.set(this.tablist.domNode, "display", "block");
                         this.resize();
                     }
@@ -454,8 +454,8 @@ define([
             var itemConfigById = {};
 
             function prepare_item(item) {
-                // В хранилище переносим только самое необходимое и то, что
-                // может меняться в процессе работы с картой.
+                // Move to store only necessary stuff and stuff that
+                // can change while working with the map.
                 var copy = {
                     id: item.id,
                     type: item.type,
@@ -473,7 +473,7 @@ define([
                     copy.children = array.map(item.children, function (c) { return prepare_item(c); });
                 }
 
-                // Для всего остального строим индекс
+                // For others build an index
                 itemConfigById[item.id] = item;
 
                 return copy;
@@ -500,8 +500,8 @@ define([
                 },
                 onComplete: function () {
                     widget.itemStore.on("Set", function (item, attr) {
-                        // При изменении атрибута checked следим за изменениями
-                        // в списке видимых слоев
+                        // While attribute checked is changed
+                        // watch в списке видимых слоев
                         if (attr === "checked") { widget._itemStoreVisibility(item); }
                     });
 
@@ -532,7 +532,7 @@ define([
         _mapSetup: function () {
             var widget = this;
 
-            // Инициализация карты
+            // Initialize webmap
             this.map = new Map({
                 target: this.mapNode,
                 logo: false,
@@ -554,14 +554,14 @@ define([
                 })
             });
 
-            // Обновление подписи центра карты
+            // Update map center text
             this.map.watch("center", function (attr, oldVal, newVal) {
                 var pt = ol.proj.transform(newVal, widget.displayProjection, widget.lonlatProjection);
                 widget.mapToolbar.items.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
                 widget.mapToolbar.items.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
             });
 
-            // Обновление подписи масштабного уровня
+            // Update scale text
             this.map.watch("resolution", function (attr, oldVal, newVal) {
                 widget.mapToolbar.items.scaleInfoNode.innerHTML = "1 : " + number.format(
                     widget.map.getScaleForResolution(
@@ -570,12 +570,12 @@ define([
                     ), {places: 0});
             });
 
-            // При изменении размеров контейнера пересчитываем размер карты
+            // If container size is changed recalculate map size
             aspect.after(this.mapPane, "resize", function() {
                 widget.map.olMap.updateSize();
             });
 
-            // Инициализация базовых слоев
+            // Initialize basemaps
             var idx = 0;
             array.forEach(clientSettings.basemaps, function (bm) {
                 var MID = this._mid.basemap[bm.base.mid];
@@ -664,7 +664,7 @@ define([
         },
 
         _adaptersSetup: function () {
-            // Создаем экземпляры всех классов адаптеров
+            // Create exemplars for all adapter classes
             this._adapters = {};
             array.forEach(Object.keys(this._mid.adapter), function (k) {
                 this._adapters[k] = new this._mid.adapter[k]({
@@ -678,10 +678,10 @@ define([
 
             this._adaptersSetup();
 
-            this._layers = {};              // Список всех слоев по id
-            this._layer_order = [];         // Порядок слоев от нижнего к верхнему
+            this._layers = {};              // List all layers by id
+            this._layer_order = [];         // Layers order from bottom to top
 
-            // Инициализация слоев
+            // Initialize layers
             store.fetch({
                 query: {type: "layer"},
                 queryOptions: {deep: true},
@@ -689,7 +689,7 @@ define([
                     widget._layerSetup(item);
                     widget._layer_order.unshift(store.getValue(item, "id"));
 
-                    // Включаем слои, указанные в URL
+                    // Turn on layers from URL
                     var cond,
                         layer = widget._layers[store.getValue(item, "id")],
                         visibleStyles = widget._urlParams.styles;
@@ -798,7 +798,7 @@ define([
         },
 
         dumpItem: function () {
-            // Выгружает значение выбранного слоя из itemStore в виде Object
+            // Unload the value of selected layer from itemStore as an Object
             return this.itemStore.dumpItem(this.item);
         },
 
