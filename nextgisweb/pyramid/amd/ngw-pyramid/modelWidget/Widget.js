@@ -5,11 +5,11 @@ define([
     declare,
     _WidgetBase
 ) {
-	// Базовый класс для виджета привязанного к модели
+	// Base class for widget attached to a model
     return declare([_WidgetBase], {
 
-        // Виджет содержит значимую информацию, которую
-        // по возможности стоит показать пользователю
+        // Widget contains meaningful information
+        // that should be shown to a user
         hasData: function() {
             return true;
         }
