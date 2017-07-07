@@ -126,7 +126,7 @@ define([
                 options: this.selectOptions
             }).placeAt(this.selectPane);
 
-            // создаем виждеты для всех расширений IFeatureLayer
+            // create widgets for all extensions of IFeatureLayer
             var deferreds = [];
             var widget = this;
 
@@ -193,8 +193,8 @@ define([
 
                     widget.featureContainer.addChild(widget.extController);
 
-                    // Показываем виджет с атрибутами в том случае, если
-                    // это не отключено в настройках
+                    // Show attributes widget only if it is not turned off
+                    // in settings
                     if (featureLayersettings.identify.attributes) {
                         var fwidget = new FieldsDisplayWidget({
                             resourceId: lid, featureId: fid,
@@ -258,13 +258,13 @@ define([
         label: i18n.gettext("Identify"),
         iconClass: "iconIdentify",
 
-        // Радиус для поиска объектов в пикселях
+        // Seach features radius in pixels
         pixelRadius: webmapSettings.identify_radius,
 
-        // Ширина popup
+        // popup width
         popupWidth: webmapSettings.popup_width,
 
-        // Высота popup,
+        // popup height
         popupHeight: webmapSettings.popup_height,
 
 
@@ -315,11 +315,11 @@ define([
 
             this.display.getVisibleItems().then(function (items) {
                 if (items.length === 0) {
-                    // Никаких видимых элементов сейчас нет
+                    // No visible items currently
                     console.log("Visible items not found!");
                 } else {
-                    // Добавляем список видимых элементов в запрос,
-                    // учитывая видимость в пределах масштаба
+                    // Add list of visible items to a request,
+                    // taking scale visibility into cosideration
                     var mapResolution = this.display.map.get("resolution");
                     array.forEach(items, function (i) {
                         var item = this.display._itemConfigById[
@@ -336,7 +336,7 @@ define([
                         layerLabels[this.display.itemStore.getValue(i, "layerId")] = this.display.itemStore.getValue(i, "label");
                     }, this);
 
-                    // XHR-запрос к сервису
+                    // XHR-request to service
                     xhr.post(route.feature_layer.identify(), {
                         handleAs: "json",
                         data: json.stringify(request),
@@ -351,7 +351,7 @@ define([
 
         },
 
-        // WKT-строка геометрии поиска объектов для точки pixel
+        // WKT-string for search features geometry for point pixel
         _requestGeomString: function (pixel) {
             var olMap = this.map.olMap,
                 bounds;
@@ -393,7 +393,7 @@ define([
             this._popup.setTitle(i18n.gettext("Features") + ": " + response.featureCount);
             this._popup.setPosition(point);
 
-            // Обработчик закрытия
+            // Closing function
             on(this._popup._closeSpan, "click", lang.hitch(this, function () {
                 this._popup.setPosition(undefined);
                 topic.publish("feature.unhighlight");
