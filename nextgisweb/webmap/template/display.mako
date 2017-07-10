@@ -23,7 +23,7 @@
     </script>
 </%def>
 
-<div data-dojo-id="display"
+<div id="display"
      class="webmap-display"
     data-dojo-type="ngw-webmap/Display"
     data-dojo-props="config: displayConfig"

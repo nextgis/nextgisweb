@@ -37,6 +37,7 @@ define([
     "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
+    "./tool/Swipe",
     "./ui/PrintButton/PrintButton",
     // settings
     "ngw/settings!webmap",
@@ -92,6 +93,7 @@ define([
     ToolBase,
     ToolZoom,
     ToolMeasure,
+    ToolSwipe,
     PrintButton,
     clientSettings
 ) {
@@ -739,6 +741,8 @@ define([
 
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "LineString"}), 'measuringLength');
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "Polygon"}), 'measuringArea');
+
+            this.mapToolbar.items.addTool(new ToolSwipe({display: this, orientation: "vertical"}), 'swipeVertical');
 
             this.mapToolbar.items.addSeparator();
             this.mapToolbar.items.addButton(PrintButton);
