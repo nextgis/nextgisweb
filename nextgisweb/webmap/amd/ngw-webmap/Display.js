@@ -742,6 +742,8 @@ define([
 
             this.mapToolbar.items.addSeparator();
             this.mapToolbar.items.addButton(PrintButton);
+
+            topic.publish('/webmap/tools/initialized');
         },
 
         _pluginsSetup: function (wmplugin) {
