@@ -101,13 +101,13 @@
                     </ul>
                     <ul class="user-menu-list list-inline">
                         %if request.user.keyname == 'guest':
-                            <li class="user-menu-list__item"><a href="${request.route_url('auth.login')}">${tr(_('Sign in'))}</a></li>
+                            <li class="user-menu-list__item"><a href="${request.route_url(login_route_name)}">${tr(_('Sign in'))}</a></li>
                         %else:
                             <li class="user user-menu-list__item">
                                 <i class="icon-user"></i>
                                 ${request.user}
                             </li>
-                            <li class="sign-out user-menu-list__item"><a href="${request.route_url('auth.logout')}">
+                            <li class="sign-out user-menu-list__item"><a href="${request.route_url(logout_route_name)}">
                                 <i class="icon-logout"></i>
                             </a></li>
                         %endif
