@@ -233,16 +233,16 @@ define([
             var statusItem = new MenuItem({label: "", disabled: true});
             statusItem.placeAt(searchResults);
 
-            var addResult = function (feature) {
+            var addResult = lang.hitch(this, function (feature) {
                 var mItm = new MenuItem({
                     label: put("span $", feature.label).outerHTML,
                     onClick: lang.hitch(this, function () {
-                        display.map.olMap.getView().fit(feature.box);
+                        this.display.map.olMap.getView().fit(feature.box);
                         popup.close(this.searchResults);
                     })
                 });
                 mItm.placeAt(statusItem, 'before');
-            };
+            });
 
             var setStatus = function (status) {
                 if (status === undefined) {
@@ -308,7 +308,7 @@ define([
                 var ndeferred = new Deferred();
 
                 // Посылаем запрос на геокодирование
-                deferred.then(function (limit) {
+                deferred.then(lang.hitch(this, function (limit) {
 
                     var NOMINATIM_SEARCH_URL = "http://nominatim.openstreetmap.org/search/";
                     var CALLBACK = "json_callback";
@@ -319,7 +319,7 @@ define([
                         query: {format: "json"}
                     };
 
-                    script.get(url, jsonpArgs).then(function (data) {
+                    script.get(url, jsonpArgs).then(lang.hitch(this, function (data) {
                         array.forEach(data, function (place) {
                             if (limit > 0) {
                                 // Отформатируем ответ в виде удобном для отображения
@@ -335,8 +335,8 @@ define([
 
                                 extent = ol.proj.transformExtent(
                                     extent,
-                                    display.lonlatProjection,
-                                    display.displayProjection
+                                    this.display.lonlatProjection,
+                                    this.display.displayProjection
                                 );
 
                                 var feature = {
@@ -347,7 +347,7 @@ define([
                                 addResult(feature);
                             }
                             limit = limit - 1;
-                        });
+                        }, this);
 
                         if (limit > 0) {
                             ndeferred.resolve(limit);
@@ -355,8 +355,8 @@ define([
                             setStatus(i18n.gettext("Refine search criterion"));
                             ndeferred.reject();
                         }
-                     });
-                }, function (err) {
+                     }));
+                }), function (err) {
                     // Если что-то пошло не так с конкретным слоем,
                     // то все равно продолжаем поиск по следующему
                     ndeferred.resolve(limit);
