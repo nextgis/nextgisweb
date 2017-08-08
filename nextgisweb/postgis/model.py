@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import geoalchemy2 as ga
 import operator
 import re
 from sqlalchemy.engine.url import (
@@ -32,6 +33,7 @@ from ..feature_layer import (
     GEOM_TYPE,
     FIELD_TYPE,
     IFeatureLayer,
+    IWritableFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
@@ -143,7 +145,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     __scope__ = DataScope
 
-    implements(IFeatureLayer)
+    implements(IFeatureLayer, IWritableFeatureLayer)
 
     connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
     schema = db.Column(db.Unicode, default=u'public', nullable=False)
@@ -328,6 +330,120 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         raise KeyError("Field '%s' not found!" % keyname)
 
+    # IWritableFeatureLayer
+
+    def makevals(self, feature):
+        values = dict()
+
+        for f in self.fields:
+            if f.keyname in feature.fields.keys():
+                values[f.keyname] = feature.fields[f.keyname]
+
+        if feature.geom is not None:
+            values[self.column_geom] = db.func.st_transform(
+                ga.elements.WKTElement(str(feature.geom), srid=self.srs_id),
+                self.geometry_srid)
+
+        return values
+
+    def feature_put(self, feature):
+        """Update existing object
+
+        :param feature: object description
+        :type feature:  Feature
+        """
+        conn = self.connection.get_connection()
+
+        idcol = db.sql.column(self.column_id)
+        geomcol = db.sql.column(self.column_geom)
+
+        cols = map(db.sql.column, (f.keyname for f in self.fields))
+        cols.append(idcol)
+        cols.append(geomcol)
+
+        tab = db.sql.table(self.table, *cols)
+        tab.schema = self.schema
+
+        tab.quote = True
+        tab.quote_schema = True
+
+        stmt = db.update(tab).values(
+            self.makevals(feature)).where(idcol == feature.id)
+
+        try:
+            conn.execute(stmt)
+        finally:
+            conn.close()
+
+    def feature_create(self, feature):
+        """Insert new object to DB which is described in feature
+
+        :param feature: object description
+        :type feature:  Feature
+
+        :return:    inserted object ID
+        """
+        conn = self.connection.get_connection()
+
+        idcol = db.sql.column(self.column_id)
+        geomcol = db.sql.column(self.column_geom)
+
+        cols = map(db.sql.column, (f.keyname for f in self.fields))
+        cols.append(idcol)
+        cols.append(geomcol)
+
+        tab = db.sql.table(self.table, *cols)
+        tab.schema = self.schema
+
+        tab.quote = True
+        tab.quote_schema = True
+
+        stmt = db.insert(tab).values(
+            self.makevals(feature)).returning(idcol)
+
+        try:
+            return conn.execute(stmt).scalar()
+        finally:
+            conn.close()
+
+    def feature_delete(self, feature_id):
+        """Remove record with id
+
+        :param feature_id: record id
+        :type feature_id:  int or bigint
+        """
+        conn = self.connection.get_connection()
+
+        tab = db.sql.table(self.table)
+        tab.schema = self.schema
+
+        tab.quote = True
+        tab.quote_schema = True
+
+        stmt = db.delete(tab).where(
+            db.sql.column(self.column_id) == feature_id)
+
+        try:
+            conn.execute(stmt)
+        finally:
+            conn.close()
+
+    def feature_delete_all(self):
+        """Remove all records from a layer"""
+        conn = self.connection.get_connection()
+
+        tab = db.sql.table(self.table)
+        tab.schema = self.schema
+
+        tab.quote = True
+        tab.quote_schema = True
+
+        stmt = db.delete(tab)
+
+        try:
+            conn.execute(stmt)
+        finally:
+            conn.close()
 
 DataScope.read.require(
     ConnectionScope.connect,
