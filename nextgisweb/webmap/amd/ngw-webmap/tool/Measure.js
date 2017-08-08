@@ -18,6 +18,8 @@ define([
 ) {
     return declare(Base, {
         constructor: function (options) {
+            var tool = this;
+
             if (this.type == "LineString") {
                 this.label = i18n.gettext("Measure distance");
                 this.iconClass = "iconRuler";
@@ -32,7 +34,7 @@ define([
                 var output;
                 var length = 0;
                 var coordinates = line.getCoordinates();
-                var sourceProj = this.display.map.olMap.getView().getProjection();
+                var sourceProj = tool.display.map.olMap.getView().getProjection();
                 for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
                     var c1 = ol.proj.transform(coordinates[i], sourceProj, "EPSG:4326");
                     var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, "EPSG:4326");
@@ -56,7 +58,7 @@ define([
 
             var formatArea = function(polygon) {
                 var output;
-                var sourceProj = this.display.map.olMap.getView().getProjection();
+                var sourceProj = tool.display.map.olMap.getView().getProjection();
                 var geom = polygon.clone().transform(sourceProj, "EPSG:4326");
                 var coordinates = geom.getLinearRing(0).getCoordinates();
                 var area = Math.abs(wgs84Sphere.geodesicArea(coordinates));
