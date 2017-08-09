@@ -259,7 +259,8 @@ define([
 
             xhr(this.iurl(), {
                 method: "GET",
-                handleAs: "json"
+                handleAs: "json",
+                preventCache: true,
             }).then(function (data) {
                 widget._fwidget.set("value", data.fields);
                 for (var k in loader) {
