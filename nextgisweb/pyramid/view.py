@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import codecs
 import os.path
 import base64
+from datetime import timedelta
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
@@ -61,7 +62,9 @@ def logo(request):
         try:
             logodata = request.env.core.settings_get('pyramid', 'logo')
             bindata = base64.b64decode(logodata)
-            return Response(bindata, content_type=b'image/png')
+            return Response(
+                bindata, content_type=b'image/png',
+                expires=timedelta(days=1))
 
         except KeyError:
             raise HTTPNotFound()
