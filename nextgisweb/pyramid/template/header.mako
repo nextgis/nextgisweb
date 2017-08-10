@@ -1,13 +1,13 @@
 <%! from nextgisweb.pyramid.util import _ %>
 
 <%
+    settings = request.env.pyramid.settings
     system_name = request.env.core.settings_get('core', 'system.full_name')
     has_logo = request.env.core.settings_exists('pyramid', 'logo') or \
         ('logo' in settings and os.path.isfile(settings['logo']))
 %>
 
 <div id="header" class="header container">
-    <% settings = request.env.pyramid.settings %>
     <div class="header__right">
         <ul class="menu-list list-inline">
             <li class="menu-list__item"><a href="${request.route_url('resource.root')}">${tr(_('Resources'))}</a></li>
