@@ -1,4 +1,7 @@
-<%! from nextgisweb.pyramid.util import _ %>
+<%! 
+    import re
+    from nextgisweb.pyramid.util import _
+%>
 
 <%
     settings = request.env.pyramid.settings
