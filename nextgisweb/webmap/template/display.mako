@@ -23,9 +23,18 @@
     </script>
 </%def>
 
-<div id="display"
-     class="webmap-display"
-    data-dojo-type="ngw-webmap/Display"
-    data-dojo-props="config: displayConfig"
-    style="width: 100%; height: 100%">
+
+<%include file="nextgisweb:pyramid/template/header.mako" />
+
+## TODO: Remove inline styles and pixel offset
+
+<div style="position: fixed; top: 42px; bottom: 0px; width: 100%;">
+
+    <div id="display"
+         class="webmap-display"
+        data-dojo-type="ngw-webmap/Display"
+        data-dojo-props="config: displayConfig"
+        style="width: 100%; height: 100%">
+    </div>
+
 </div>

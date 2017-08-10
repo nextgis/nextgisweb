@@ -132,6 +132,11 @@ class CoreComponent(Component):
         self._localizer[locale] = lobj
         return lobj
 
+    def settings_exists(self, component, name):
+        return DBSession.query(db.exists().where(db.and_(
+            Setting.component == component, Setting.name == name
+        ))).scalar()
+
     def settings_get(self, component, name):
         try:
             obj = Setting.filter_by(component=component, name=name).one()

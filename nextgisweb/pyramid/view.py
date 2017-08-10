@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 import codecs
 import os.path
+import base64
 
-from pyramid.response import FileResponse
+from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
 
 from pkg_resources import resource_filename
@@ -57,7 +58,13 @@ def logo(request):
     if 'logo' in settings and os.path.isfile(settings['logo']):
         return FileResponse(settings['logo'], request=request)
     else:
-        raise HTTPNotFound()
+        try:
+            logodata = request.env.core.settings_get('pyramid', 'logo')
+            bindata = base64.b64decode(logodata)
+            return Response(bindata, content_type=b'image/png')
+
+        except KeyError:
+            raise HTTPNotFound()
 
 
 def favicon(request):
