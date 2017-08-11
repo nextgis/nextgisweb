@@ -38,6 +38,8 @@ define([
     "./tool/Zoom",
     "./tool/Measure",
     "./ui/PrintButton/PrintButton",
+    //left panel
+    "ngw/components/navigated-menu/NavigatedMenu",
     // settings
     "ngw/settings!webmap",
     // template
@@ -93,6 +95,7 @@ define([
     ToolZoom,
     ToolMeasure,
     PrintButton,
+    NavigatedMenu,
     clientSettings
 ) {
 
