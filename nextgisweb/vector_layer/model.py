@@ -100,7 +100,7 @@ FIELD_TYPE_OGR = (
     ogr.OFTTime,
     ogr.OFTDateTime)
 
-FIELD_FORBIDDEN_NAME = ("id", "type", "source")
+FIELD_FORBIDDEN_NAME = ("id",)
 
 _GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 2))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
