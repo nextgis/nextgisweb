@@ -62,7 +62,8 @@ def upload_post(request):
         metas.append(meta)
 
     # TODO: Add IFrame support for IE and Flash uploader
-    return Response("%s" % json.dumps(dict(upload_meta=metas)))
+    return Response(json.dumps(dict(upload_meta=metas)),
+                    content_type=b'application/json')
 
 
 def upload_put(request):
