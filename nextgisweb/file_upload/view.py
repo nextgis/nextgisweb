@@ -118,8 +118,3 @@ def setup_pyramid(comp, config):
         '/api/component/file_upload/upload') \
         .add_view(upload_post, method='POST') \
         .add_view(upload_put, method='PUT')
-
-    # TODO: backward compatibility, to be removed later
-    config.add_route('#file_upload.upload', '/file_upload/upload') \
-        .add_view(upload_post, request_method='POST') \
-        .add_view(upload_put, request_method='PUT')
