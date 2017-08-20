@@ -44,6 +44,8 @@
     <link href="${request.route_url('amd_package', subpath='dijit/themes/claro/claro.css')}"
         rel="stylesheet" media="screen"/>
 
+    <link href="${request.route_url('pyramid.custom_css')}" rel="stylesheet" type="text/css"/>
+
     <script type="text/javascript">
         var ngwConfig = {
             applicationUrl: ${request.application_url | json.dumps, n},
