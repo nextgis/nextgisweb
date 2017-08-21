@@ -711,3 +711,51 @@ To get version make request:
       "nextgisweb": "2.0",
       "nextgisweb_mapserver": "0.0dev"
    }
+
+Get route
+^^^^^^^^^^^^
+.. versionadded:: 3.0
+
+To get posible routes make request:
+
+.. http:get:: /api/component/pyramid/route
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/component/pyramid/route HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+**Example JSON response**:
+
+.. sourcecode:: json
+
+    {
+        "pyramid.settings": [
+            "/api/component/pyramid/settings"
+        ],
+        "feature_layer.store.item": [
+            "/resource/{0}/store/{1}",
+            "id",
+            "feature_id"
+        ],
+        "feature_layer.feature.update": [
+            "/resource/{0}/feature/{1}/update",
+            "id",
+            "feature_id"
+        ],
+	...
+        "pyramid.statistics": [
+            "/api/component/pyramid/statistics"
+        ],
+        "feature_layer.feature.item": [
+            "/api/resource/{0}/feature/{1}",
+            "id",
+            "fid"
+        ],
+        "pyramid.pkg_version": [
+            "/api/component/pyramid/pkg_version"
+        ]
+    }
