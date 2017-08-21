@@ -1,21 +1,12 @@
 /* globals define, ngwConfig */
 define([
     "dojo/_base/lang",
-    "./load-json!pyramid/routes", 
     "./load-json!api/component/pyramid/route"
 ], function (
     lang,
-    routes,
     rdata
 ) {
-    var module = function (route, args) {
-        console.warn("DEPRECATED: Use route.cname.rname(args) instead of route('cname.rname', args).");
-
-        return ngwConfig.applicationUrl +
-            routes[route].pattern.replace(/__(\w+)__/g, function (match, a) {
-                return args[a];
-            });
-    };
+    var module = {};
 
     var generator = function (args) {
         var sub,

@@ -23,21 +23,6 @@ def home(request):
         return HTTPFound(location=request.route_url('resource.show', id=0))
 
 
-def routes(request):
-    result = dict()
-    introspector = request.registry.introspector
-    for itm in introspector.get_category('routes'):
-        route = itm['introspectable']['object']
-        for p in route.predicates:
-            if isinstance(p, ClientRoutePredicate):
-                result[route.name] = dict(
-                    pattern=route.generate(dict(
-                        [(k, '__%s__' % k)
-                         for k in p.val])),
-                    keys=p.val)
-    return result
-
-
 def control_panel(request):
     request.require_administrator()
 
@@ -121,9 +106,6 @@ def notfound(request):
 
 def setup_pyramid(comp, config):
     config.add_route('home', '/').add_view(home)
-
-    config.add_route('pyramid.routes', '/pyramid/routes') \
-        .add_view(routes, renderer='json', json=True)
 
     def ctpl(n):
         return 'nextgisweb:pyramid/template/%s.mako' % n
