@@ -246,11 +246,6 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
     ).add_view(handler, context=Service)
 
-    config.add_route(
-        '#wmsserver.wms', '/resource/{id:\d+}/wms',
-        factory=resource_factory,
-    ).add_view(handler, context=Service)
-
     Resource.__psection__.register(
         key='wmsserver', priority=50,
         title=_("WMS service"),

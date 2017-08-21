@@ -337,9 +337,3 @@ def setup_pyramid(comp, config):
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',
         factory=resource_factory) \
         .add_view(count, context=IFeatureLayer, request_method='GET')
-
-    # Legacy route
-    config.add_route(
-        '#feature_layer.geojson', '/resource/{id:\d+}/geojson/',
-        factory=resource_factory) \
-        .add_view(view_geojson, context=IFeatureLayer, request_method='GET')
