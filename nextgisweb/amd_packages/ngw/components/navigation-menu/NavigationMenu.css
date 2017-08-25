@@ -1,0 +1,20 @@
+.navigation-menu{
+    width: 56px;
+    padding: 8px 0 !important;
+    background-color: #076dbf
+}
+    .navigation-menu__item{
+        text-align:center;
+        cursor: pointer;
+        height: 40px;
+    }
+
+    .navigation-menu__icon{
+        color: rgba(255,255,255,.54);
+        line-height: 40px;
+    }
+
+        .navigation-menu__item:hover .navigation-menu__icon,
+        .active .navigation-menu__icon{
+            color: #fff;
+        }

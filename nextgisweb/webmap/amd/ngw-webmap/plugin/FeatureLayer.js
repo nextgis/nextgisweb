@@ -173,8 +173,8 @@ define([
        },
 
         postCreate: function () {
-            if (this.display.itemMenu) {
-                this.display.itemMenu.addChild(this.menuItem);
+            if (this.display.layersPanel.component.itemMenu) {
+                this.display.layersPanel.component.itemMenu.addChild(this.menuItem);
             }
 
             var mapStates = MapStatesObserver.getInstance();

@@ -39,7 +39,9 @@ define([
     "./tool/Measure",
     "./ui/PrintButton/PrintButton",
     //left panel
-    "ngw/components/navigated-menu/NavigatedMenu",
+    "ngw/components/navigation-menu/NavigationMenu",
+    "ngw/components/dynamic-panel/DynamicPanel",
+    "ngw-webmap/ui/LayersPanel/LayersPanel",
     // settings
     "ngw/settings!webmap",
     // template
@@ -95,7 +97,9 @@ define([
     ToolZoom,
     ToolMeasure,
     PrintButton,
-    NavigatedMenu,
+    NavigationMenu,
+    DynamicPanel,
+    LayersPanel,
     clientSettings
 ) {
 
@@ -184,6 +188,9 @@ define([
 
         // Для загрузки изображения
         assetUrl: ngwConfig.assetUrl,
+
+        // Активная левая панель
+        activeLeftPanel: 'layersPanel',
 
         constructor: function (options) {
             declare.safeMixin(this, options);
@@ -285,18 +292,8 @@ define([
                 this.displayProjection
             );
 
-            // Дерево элементов слоя
-            this.itemTree = new Tree({
-                style: "height: 100%",
-                model: this.itemModel,
-                autoExpand: true,
-                showRoot: false
-            });
-
-            // Размещаем дерево, когда виджет будет готов
-            all([this._layersDeferred, this._postCreateDeferred]).then(
-                function () { widget.itemTree.placeAt(widget.layerTreePane); }
-            ).then(undefined, function (err) { console.error(err); });
+            // Панель слоев
+            widget._layersPanelSetup();
 
             // Загружаем закладки, когда кнопка будет готова
             this._postCreateDeferred.then(
@@ -304,15 +301,6 @@ define([
                     widget.mapToolbar.items.loadBookmarks();
                 }
             ).then(undefined, function (err) { console.error(err); });
-
-            // Выбранный элемент
-            this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
-                widget.set(
-                    "itemConfig",
-                    widget._itemConfigById[widget.itemStore.getValue(newVal, "id")]
-                );
-                widget.set("item", newVal);
-            });
 
             // Карта
             all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
@@ -324,29 +312,6 @@ define([
                     // уровня карты исполняются перед настройкой карты.
                     widget._pluginsSetup(true);
                     widget._mapSetup();
-                }
-            ).then(undefined, function (err) { console.error(err); });
-
-            all([this._mapDeferred, this._postCreateDeferred]).then(
-                function () {
-                    // Формируем список слоев базовых карты в списке выбора
-                    array.forEach(Object.keys(widget.map.layers), function (key) {
-                        var layer = widget.map.layers[key];
-                        if (layer.isBaseLayer) {
-                            widget.basemapSelect.addOption({
-                                value: key,
-                                label: layer.title
-                            });
-                        }
-                    });
-
-                    // И добавляем возможность переключения
-                    widget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
-                        widget.map.layers[oldVal].olLayer.setVisible(false);
-                        widget.map.layers[newVal].olLayer.setVisible(true);
-                        widget._baseLayer = widget.map.layers[newVal];
-                    });
-                    if (widget._urlParams.base) { widget.basemapSelect.set("value", widget._urlParams.base); }
                 }
             ).then(undefined, function (err) { console.error(err); });
 
@@ -385,30 +350,13 @@ define([
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Свернем те элементы дерева, которые не отмечены как развернутые.
-            // По-умолчанию все элементы развернуты за счет autoExpand у itemTree
-            all([this._itemStoreDeferred, widget.itemTree.onLoadDeferred]).then(
-                function () {
-                    widget.itemStore.fetch({
-                        queryOptions: { deep: true },
-                        onItem: function (item) {
-                            var node = widget.itemTree.getNodesByItem(item)[0],
-                                config = widget._itemConfigById[widget.itemStore.getValue(item, "id")];
-                            if (node && config.type === "group" && !config.expanded) {
-                                node.collapse();
-                            }
-                        }
-                    });
-                }
-            ).then(undefined, function (err) { console.error(err); });
-
-
             // Инструменты
             this.tools = [];
         },
 
         postCreate: function () {
             this.inherited(arguments);
+            var widget = this;
 
             // Модифицируем TabContainer так, чтобы он показывал табы только
             // в том случае, если их больше одного, т.е. один таб не показываем
@@ -441,6 +389,9 @@ define([
                     this.updateTabVisibility();
                 }
             });
+
+            // Левое меню
+            this._navigationMenuSetup()
 
             this._postCreateDeferred.resolve();
         },
@@ -784,6 +735,116 @@ define([
             }, this);
         },
 
+        _navigationMenuSetup(){
+            var widget = this;
+
+            this.navigationMenu = new NavigationMenu({
+                value: this.activeLeftPanel,
+                items: [
+                    {
+                        name: 'layers',
+                        icon: 'layers',
+                        value: 'layersPanel'
+                    }
+                ],
+                region: 'left'
+            }).placeAt(this.navigationMenuPane);
+
+            this.navigationMenu.watch("value", function(name, oldValue, value){
+                if (oldValue && widget[oldValue])
+                    widget.deactivatePanel(widget[oldValue]);
+
+                if (widget[value])
+                    widget.activatePanel(widget[value]);
+
+                widget.activeLeftPanel = value;
+            });
+        },
+
+        _layersPanelSetup: function(){
+            var widget = this;
+
+            // Дерево элементов слоя
+            widget.itemTree = new Tree({
+                style: "height: 100%",
+                model: widget.itemModel,
+                autoExpand: true,
+                showRoot: false
+            });
+
+            // Выбранный элемент
+            widget.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
+                widget.set(
+                    "itemConfig",
+                    widget._itemConfigById[widget.itemStore.getValue(newVal, "id")]
+                );
+                widget.set("item", newVal);
+            });
+
+            // Размещаем дерево, когда виджет будет готов
+            all([widget._layersDeferred, widget._postCreateDeferred]).then(
+                function () {
+                    var layersPanel = new LayersPanel({region: 'top'});
+                    widget.itemTree.placeAt(layersPanel.layerTreePane);
+
+                    widget.layersPanel = new DynamicPanel({
+                        region: 'left',
+                        splitter: true,
+                        title: "Слои",
+                        component: layersPanel,
+                        isOpen: widget.activeLeftPanel == "layersPanel"
+                    });
+
+                    if (widget.activeLeftPanel == "layersPanel")
+                        widget.activatePanel(widget.layersPanel);
+
+                    widget.layersPanel.on("closed", function(){
+                        widget.navigationMenu.reset();
+                    });
+                }
+            ).then(undefined, function (err) { console.error(err); });
+
+            // Свернем те элементы дерева, которые не отмечены как развернутые.
+            // По-умолчанию все элементы развернуты за счет autoExpand у itemTree
+            all([widget._itemStoreDeferred, widget.itemTree.onLoadDeferred]).then(
+                function () {
+                    widget.itemStore.fetch({
+                        queryOptions: { deep: true },
+                        onItem: function (item) {
+                            var node = widget.itemTree.getNodesByItem(item)[0],
+                                config = widget._itemConfigById[widget.itemStore.getValue(item, "id")];
+                            if (node && config.type === "group" && !config.expanded) {
+                                node.collapse();
+                            }
+                        }
+                    });
+                }
+            ).then(undefined, function (err) { console.error(err); });
+
+            all([this._layersDeferred, this._mapDeferred, this._postCreateDeferred]).then(
+                function () {
+                    // Формируем список слоев базовых карты в списке выбора
+                    array.forEach(Object.keys(widget.map.layers), function (key) {
+                        var layer = widget.map.layers[key];
+                        if (layer.isBaseLayer) {
+                            widget.layersPanel.component.basemapSelect.addOption({
+                                value: key,
+                                label: layer.title
+                            });
+                        }
+                    });
+
+                    // И добавляем возможность переключения
+                    widget.layersPanel.component.basemapSelect.watch("value", function (attr, oldVal, newVal) {
+                        widget.map.layers[oldVal].olLayer.setVisible(false);
+                        widget.map.layers[newVal].olLayer.setVisible(true);
+                        widget._baseLayer = widget.map.layers[newVal];
+                    });
+                    if (widget._urlParams.base) { widget.layersPanel.component.basemapSelect.set("value", widget._urlParams.base); }
+                }
+            ).then(undefined, function (err) { console.error(err); });
+        },
+
         getVisibleItems: function () {
             var store = this.itemStore,
                 deferred = new Deferred();
@@ -827,6 +888,14 @@ define([
             } else {
                 this.map.olMap.getView().fit(this._extent);
             }
+        },
+        activatePanel(panel){
+            panel.show();
+            this.mainContainer.addChild(panel);
+        },
+        deactivatePanel(panel){
+            this.mainContainer.removeChild(panel);
+            if (panel.isOpen) panel.hide();
         }
     });
 });
