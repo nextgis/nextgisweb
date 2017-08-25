@@ -163,6 +163,10 @@ class CoreComponent(Component):
             result['full_name'] = self.settings_get('core', 'system.full_name')
         except KeyError:
             pass
+
+        result['database_size'] = DBSession.query(db.func.pg_database_size(
+            db.func.current_database(),)).scalar()
+
         return result
 
     settings_info = (
