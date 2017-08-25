@@ -52,8 +52,8 @@ define([
         },
 
         postCreate: function () {
-            if (this.display.layersPanel.component.itemMenu) {
-                this.display.layersPanel.component.itemMenu.addChild(this.menuItem);
+            if (this.display.layersPanel.contentWidget.itemMenu) {
+                this.display.layersPanel.contentWidget.itemMenu.addChild(this.menuItem);
             }
         },
 

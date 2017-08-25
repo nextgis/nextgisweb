@@ -1,15 +1,10 @@
 define([
-    "dojo/Stateful",
     'dojo/_base/declare',
     'ngw-pyramid/i18n!webmap',
     'ngw-pyramid/hbs-i18n',
-    //"dojo/_base/array",
-    //"dojo/query",
-    //"dojo/dom",
-    //"dojo/dom-construct",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dijit/layout/ContentPane",
+    "ngw/components/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
     "dijit/form/DropDownButton",
     "dijit/DropDownMenu",
@@ -22,29 +17,26 @@ define([
     "dijit/form/Select",
     "xstyle/css!./LayersPanel.css"
 ], function (
-    Stateful,
     declare,
     i18n,
     hbsI18n,
-    //array,
-    //query,
-    //dom,
-    //domConstruct,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    ContentPane,
+    DynamicPanel,
     BorderContainer,
     DropdownButton,
     DropDownMenu,
     MenuItem,
     Toolbar,
     template) {
-    return declare([Stateful, BorderContainer,_TemplatedMixin, _WidgetsInTemplateMixin],{
-        templateString: hbsI18n(template, i18n),
+    return declare([DynamicPanel, BorderContainer,_TemplatedMixin, _WidgetsInTemplateMixin],{
         constructor: function (options) {
             declare.safeMixin(this,options);
-        },
-        postCreate: function(){
+
+            this.contentWidget = new (declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
+                templateString: hbsI18n(template, i18n),
+                region: 'top'
+            }));
         }
     });
 });

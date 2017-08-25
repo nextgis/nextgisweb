@@ -34,13 +34,13 @@ define([
     return declare([ContentPane,_TemplatedMixin, _WidgetsInTemplateMixin],{
         templateString: hbsI18n(template, i18n),
         title: "",
-        component: [],
+        contentWidget: undefined,
         isOpen: false,
         constructor: function (options) {
             declare.safeMixin(this,options);
         },
         postCreate(){
-            this.component.placeAt(this.contentNode);
+            this.contentWidget.placeAt(this.contentNode);
             if (this.isOpen) this.show();
 
             query(this.closer).on("click", lang.hitch(this, function() {

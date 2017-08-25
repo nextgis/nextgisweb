@@ -40,7 +40,7 @@ define([
     "./ui/PrintButton/PrintButton",
     //left panel
     "ngw/components/navigation-menu/NavigationMenu",
-    "ngw/components/dynamic-panel/DynamicPanel",
+    //"ngw/components/dynamic-panel/DynamicPanel",
     "ngw-webmap/ui/LayersPanel/LayersPanel",
     // settings
     "ngw/settings!webmap",
@@ -98,7 +98,7 @@ define([
     ToolMeasure,
     PrintButton,
     NavigationMenu,
-    DynamicPanel,
+   // DynamicPanel,
     LayersPanel,
     clientSettings
 ) {
@@ -771,16 +771,19 @@ define([
             // Размещаем дерево, когда виджет будет готов
             all([widget._layersDeferred, widget._postCreateDeferred]).then(
                 function () {
-                    var layersPanel = new LayersPanel({region: 'top'});
-                    widget.itemTree.placeAt(layersPanel.layerTreePane);
+                    //var layersPanel = new LayersPanel({
+                    //    region: 'top',
+                    //});
 
-                    widget.layersPanel = new DynamicPanel({
+
+                    widget.layersPanel = new LayersPanel({
                         region: 'left',
                         splitter: true,
-                        title: "Слои",
-                        component: layersPanel,
+                        title: i18n.gettext("Layers"),
                         isOpen: widget.activeLeftPanel == "layersPanel"
                     });
+
+                    widget.itemTree.placeAt(widget.layersPanel.contentWidget.layerTreePane);
 
                     if (widget.activeLeftPanel == "layersPanel")
                         widget.activatePanel(widget.layersPanel);
@@ -814,7 +817,7 @@ define([
                     array.forEach(Object.keys(widget.map.layers), function (key) {
                         var layer = widget.map.layers[key];
                         if (layer.isBaseLayer) {
-                            widget.layersPanel.component.basemapSelect.addOption({
+                            widget.layersPanel.contentWidget.basemapSelect.addOption({
                                 value: key,
                                 label: layer.title
                             });
@@ -822,12 +825,12 @@ define([
                     });
 
                     // И добавляем возможность переключения
-                    widget.layersPanel.component.basemapSelect.watch("value", function (attr, oldVal, newVal) {
+                    widget.layersPanel.contentWidget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
                         widget.map.layers[oldVal].olLayer.setVisible(false);
                         widget.map.layers[newVal].olLayer.setVisible(true);
                         widget._baseLayer = widget.map.layers[newVal];
                     });
-                    if (widget._urlParams.base) { widget.layersPanel.component.basemapSelect.set("value", widget._urlParams.base); }
+                    if (widget._urlParams.base) { widget.layersPanel.contentWidget.basemapSelect.set("value", widget._urlParams.base); }
                 }
             ).then(undefined, function (err) { console.error(err); });
         },
