@@ -560,19 +560,6 @@ define([
                 widget._zoomToInitialExtent();
             });
 
-            this.mapToolbar.items.leftToolbarSwitch.on("change", lang.hitch(this, function (isLayersShow) {
-                if (isLayersShow) {
-                    this.mapToolbar.items.leftToolbarSwitch.set("title", i18n.gettext("Hide layers"));
-                    this.mapToolbar.items.leftToolbarSwitch.set("iconClass", "iconSideHide");
-                    this.mainContainer.addChild(this.leftPanel);
-                }
-                else {
-                    this.mapToolbar.items.leftToolbarSwitch.set("title", i18n.gettext("Show layers"));
-                    this.mapToolbar.items.leftToolbarSwitch.set("iconClass", "iconSideExpand");
-                    this.mainContainer.removeChild(this.leftPanel);
-                }
-            }));
-
             this._zoomToInitialExtent();
 
             this._mapDeferred.resolve();
