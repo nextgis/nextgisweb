@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from shutil import copyfileobj
+from collections import OrderedDict, defaultdict
 
 from ..component import Component
 from ..core import BackupBase
@@ -67,6 +68,20 @@ class FileStorageComponent(Component):
             os.makedirs(path)
 
         return os.path.join(path, str(fileobj.uuid))
+
+    def query_stat(self):
+        # Traverse all objects in file storage and calculate total
+        # and per component size in filesystem
+
+        size = OrderedDict(total=0)
+        per_component = defaultdict(lambda: 0)
+        size['component'] = per_component
+        for fileobj in FileObj.query():
+            statres = os.stat(self.filename(fileobj))
+            size['total'] += statres.st_size
+            per_component[fileobj.component] += statres.st_size
+
+        return dict(size=size)
 
     settings_info = (
         dict(key='path', desc=u"Директория для хранения файлов (обязательно)"),
