@@ -30,6 +30,7 @@ requires = [
     'owslib>=0.13.0',
     'requests',
     'babel',
+    'minio',
 ]
 
 entry_points = {
