@@ -17,12 +17,9 @@ def main(argv=sys.argv):
     argparser = ArgumentParser()
 
     argparser.add_argument(
-        '--config', default=os.environ.get('NEXTGISWEB_CONFIG'),
-        help="Конфигурационный файл nextgisweb")
-
+        '--config', help="Конфигурационный файл nextgisweb")
     argparser.add_argument(
-        '--logging', default=os.environ.get('NEXTGISWEB_LOGGING'),
-        help="Конфигруционный файл библиотеки logging")
+        '--logging', help="Конфигруционный файл библиотеки logging")
 
     config = None
     logging = None
@@ -36,6 +33,12 @@ def main(argv=sys.argv):
             logging = argv[i + 1]
 
         i += 2 if argv[i].startswith('--') else 1
+
+    if config is None:
+        config = os.environ.get('NEXTGISWEB_CONFIG')
+
+    if logging is None:
+        logging = os.environ.get('NEXTGISWEB_LOGGING')
 
     if logging:
         setup_logging(logging)
