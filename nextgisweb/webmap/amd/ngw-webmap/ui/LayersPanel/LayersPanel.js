@@ -35,7 +35,8 @@ define([
 
             this.contentWidget = new (declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
                 templateString: hbsI18n(template, i18n),
-                region: 'top'
+                region: 'top',
+                gutters: false
             }));
         }
     });

@@ -4,7 +4,7 @@ define([
     'dojo/on',
     'dijit/form/Button',
     'ngw-pyramid/i18n!webmap',
-    '../PrintMap/PrintMap'
+    //'../PrintMap/PrintMap'
 ], function (declare, lang, on, Button, i18n, PrintMap) {
     return declare([Button], {
         postCreate: function () {

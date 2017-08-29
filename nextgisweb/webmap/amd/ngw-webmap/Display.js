@@ -37,11 +37,10 @@ define([
     "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
-    "./ui/PrintButton/PrintButton",
     //left panel
     "ngw/components/navigation-menu/NavigationMenu",
-    //"ngw/components/dynamic-panel/DynamicPanel",
     "ngw-webmap/ui/LayersPanel/LayersPanel",
+    "ngw-webmap/ui/PrintMapPanel/PrintMapPanel",
     // settings
     "ngw/settings!webmap",
     // template
@@ -96,10 +95,9 @@ define([
     ToolBase,
     ToolZoom,
     ToolMeasure,
-    PrintButton,
     NavigationMenu,
-   // DynamicPanel,
     LayersPanel,
+    PrintMapPanel,
     clientSettings
 ) {
 
@@ -294,6 +292,28 @@ define([
 
             // Панель слоев
             widget._layersPanelSetup();
+
+            // Панель печати
+            all([widget._layersDeferred, widget._postCreateDeferred]).then(
+                function () {
+                    widget.printMapPanel = new PrintMapPanel({
+                        region: 'left',
+                        splitter: true,
+                        title: i18n.gettext("Print map"),
+                        isOpen: widget.activeLeftPanel == "printMapPanel",
+                        class: "dynamic-panel--fullwidth",
+                        gutters: false,
+                        map: widget.map.olMap
+                    });
+
+                    if (widget.activeLeftPanel == "printMapPanel")
+                        widget.activatePanel(widget.printMapPanel);
+
+                    widget.printMapPanel.on("closed", function(){
+                        widget.navigationMenu.reset();
+                    });
+                }
+            ).then(undefined, function (err) { console.error(err); });
 
             // Загружаем закладки, когда кнопка будет готова
             this._postCreateDeferred.then(
@@ -681,9 +701,6 @@ define([
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "LineString"}), 'measuringLength');
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "Polygon"}), 'measuringArea');
 
-            this.mapToolbar.items.addSeparator();
-            this.mapToolbar.items.addButton(PrintButton);
-
             topic.publish('/webmap/tools/initialized');
         },
 
@@ -732,6 +749,11 @@ define([
                         name: 'layers',
                         icon: 'layers',
                         value: 'layersPanel'
+                    },
+                    {
+                        name: 'print',
+                        icon: 'print',
+                        value: 'printMapPanel'
                     }
                 ],
                 region: 'left'
@@ -771,16 +793,12 @@ define([
             // Размещаем дерево, когда виджет будет готов
             all([widget._layersDeferred, widget._postCreateDeferred]).then(
                 function () {
-                    //var layersPanel = new LayersPanel({
-                    //    region: 'top',
-                    //});
-
-
                     widget.layersPanel = new LayersPanel({
                         region: 'left',
                         splitter: true,
                         title: i18n.gettext("Layers"),
-                        isOpen: widget.activeLeftPanel == "layersPanel"
+                        isOpen: widget.activeLeftPanel == "layersPanel",
+                        gutters: false
                     });
 
                     widget.itemTree.placeAt(widget.layersPanel.contentWidget.layerTreePane);

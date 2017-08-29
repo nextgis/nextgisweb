@@ -17,12 +17,11 @@ define([
     'ngw-pyramid/hbs-i18n',
     'ngw-webmap/MapStatesObserver',
     'dijit/ToolbarSeparator',
-    './ui/PrintButton/PrintButton',
     'dijit/form/DropDownButton'
 ], function (declare, array, lang, JsonRest, xhr, domStyle, on,
              _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
              MenuItem, ToggleButton, template, route, i18n, hbsI18n, MapStatesObserver,
-             ToolbarSeparator, PrintButton) {
+             ToolbarSeparator) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
 

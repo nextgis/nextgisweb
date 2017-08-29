@@ -4,6 +4,11 @@
     width: 250px;
     padding: 0;
 }
+    .dynamic-panel--fullwidth,
+    .claro .dynamic-panel--fullwidth{
+        width: calc(100% - 56px);
+    }
+
     .dynamic-panel__title{
         position: absolute;
         top:0;
