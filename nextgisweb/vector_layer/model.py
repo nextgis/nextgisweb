@@ -63,6 +63,7 @@ from .util import _
 
 gdal_gt_19 = LooseVersion(osgeo.__version__) >= LooseVersion('1.9')
 gdal_gt_20 = LooseVersion(osgeo.__version__) >= LooseVersion('2.0')
+gdal_gt_22 = LooseVersion(osgeo.__version__) >= LooseVersion('2.2')
 
 GEOM_TYPE_DB = ('POINT', 'LINESTRING', 'POLYGON',
                 'MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')
@@ -309,7 +310,7 @@ class TableInfo(object):
                 fld_type = feature.GetFieldDefnRef(i).GetType()
 
                 if (not feature.IsFieldSet(i) or
-                        feature.IsFieldNull(i)):
+                        (gdal_gt_22 and feature.IsFieldNull(i))):
                     fld_value = None
                 elif fld_type == ogr.OFTInteger:
                     fld_value = feature.GetFieldAsInteger(i)
