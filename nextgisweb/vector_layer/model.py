@@ -11,7 +11,7 @@ import ctypes
 import operator
 import osgeo
 
-from datetime import datetime
+from datetime import datetime, time, date
 from distutils.version import LooseVersion
 from zope.interface import implements
 from osgeo import ogr, osr
@@ -308,7 +308,8 @@ class TableInfo(object):
             for i in range(feature.GetFieldCount()):
                 fld_type = feature.GetFieldDefnRef(i).GetType()
 
-                if not feature.IsFieldSet(i):
+                if (not feature.IsFieldSet(i) or
+                        feature.IsFieldNull(i)):
                     fld_value = None
                 elif fld_type == ogr.OFTInteger:
                     fld_value = feature.GetFieldAsInteger(i)
@@ -316,10 +317,17 @@ class TableInfo(object):
                     fld_value = feature.GetFieldAsInteger64(i)
                 elif fld_type == ogr.OFTReal:
                     fld_value = feature.GetFieldAsDouble(i)
-                elif fld_type in [ogr.OFTDate, ogr.OFTTime, ogr.OFTDateTime]:
-                    # OGR_F_GetFieldAsDateTimeEx returns
-                    # seconds with millisecond accuracy
-                    fld_value = datetime(*map(int, feature.GetFieldAsDateTime(i)))
+                elif fld_type == ogr.OFTDate:
+                    year, month, day = feature.GetFieldAsDateTime(i)[0:3]
+                    fld_value = date(year, month, day)
+                elif fld_type == ogr.OFTTime:
+                    hour, minute, second = feature.GetFieldAsDateTime(i)[3:6]
+                    fld_value = time(hour, minute, int(second))
+                elif fld_type == ogr.OFTDateTime:
+                    year, month, day, hour, minute, second, tz = \
+                        feature.GetFieldAsDateTime(i)
+                    fld_value = datetime(year, month, day,
+                                         hour, minute, int(second))
                 elif fld_type == ogr.OFTIntegerList:
                     fld_value = json.dumps(feature.GetFieldAsIntegerList(i))
                 elif gdal_gt_20 and fld_type == ogr.OFTInteger64List:
