@@ -7,11 +7,9 @@ define([
     'dojo/dom-style',
     'dojo/on',
     'dijit/_WidgetBase',
-    'dijit/_TemplatedMixin',
-    'dijit/_WidgetsInTemplateMixin',
     'dijit/MenuItem',
     'dijit/form/ToggleButton',
-    'dojo/text!./template/MapToolbarItems.hbs',
+    './controls/ToggleControl',
     'ngw/route',
     'ngw-pyramid/i18n!webmap',
     'ngw-pyramid/hbs-i18n',
@@ -19,11 +17,9 @@ define([
     'dijit/ToolbarSeparator',
     'dijit/form/DropDownButton'
 ], function (declare, array, lang, JsonRest, xhr, domStyle, on,
-             _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-             MenuItem, ToggleButton, template, route, i18n, hbsI18n, MapStatesObserver,
+             _WidgetBase, MenuItem, ToggleButton, ToggleControl,route, i18n, hbsI18n, MapStatesObserver,
              ToolbarSeparator) {
-    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+    return declare([_WidgetBase], {
 
         constructor: function (options) {
             this.display = options.display;
@@ -76,13 +72,15 @@ define([
         },
 
         addTool: function (tool, state) {
-            var tglButtonTool = new ToggleButton({
+            var tglButtonTool = new ToggleControl({
                 label: tool.label,
                 showLabel: false,
                 iconClass: tool.iconClass,
                 tool: tool,
                 state: state,
-                intermediateChanges:false
+                intermediateChanges:false,
+                customIcon: tool.customIcon,
+                class: "ol-control ol-unselectable"
             }).placeAt(this);
 
             tool.toolbarBtn = tglButtonTool;

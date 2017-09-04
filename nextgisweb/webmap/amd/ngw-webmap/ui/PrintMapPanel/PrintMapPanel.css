@@ -40,3 +40,7 @@
 #printMap.inactive {
     display: none;
 }
+
+#printMap .map-logo{
+    bottom: 12px;
+}

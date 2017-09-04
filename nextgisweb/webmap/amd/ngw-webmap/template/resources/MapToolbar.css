@@ -1,0 +1,68 @@
+.claro .map-toolbar .dijitButton,
+.claro .map-toolbar .dijitToggleButton,
+.claro .map-toolbar .dijitDropDownButton,
+.claro .map-toolbar .dijitComboButton{
+    margin: 0;
+}
+
+
+.claro .control-pane--bottom .map-toolbar .ol-control{
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+    .claro .control-pane--bottom .map-toolbar .ol-control:first-child{
+        margin-left: 0;
+    }
+
+.claro .control-pane--top .map-toolbar .ol-control{
+    margin-top: 8px;
+}
+    .claro .control-pane--top .map-toolbar .ol-control:first-child{
+        margin-top: 0px;
+    }
+
+    .claro .map-toolbar .ol-control .dijitButtonNode{
+        padding: 0;
+        border: 0;
+        width: 30px;
+        height: 30px;
+        line-height: 29px;
+        background: #fff;
+        color: #076dbf;
+        box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+        transition: none;
+        text-shadow: none;
+    }
+
+    .claro .map-toolbar .ol-control .dijitButtonNode .ol-control__icon {
+        color: #076dbf;
+        fill: #076dbf;
+    }
+
+    .claro .map-toolbar .ol-control .dijitButtonNode .dijitButtonContents{
+        display: inline-block;
+    }
+
+    .claro .map-toolbar .ol-control .dijitButtonNode:hover{
+        background: #f9fafb;
+    }
+
+    .claro .map-toolbar .ol-control .dijitButtonNode:hover .ol-control__icon{
+        color: #00b77e;
+        fill: #00b77e;
+    }
+
+    .claro .map-toolbar  .ol-control.dijitToggleButtonChecked .dijitButtonNode{
+        background: #00b77e;
+    }
+
+    .claro .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode .ol-control__icon{
+        color: #fff;
+        fill: #fff;
+    }
+
+
+
+
+

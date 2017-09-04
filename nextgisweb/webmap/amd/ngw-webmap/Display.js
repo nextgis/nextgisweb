@@ -12,6 +12,7 @@ define([
     "dojo/number",
     "dojo/aspect",
     "dojo/io-query",
+    "dojo/dom-construct",
     "openlayers/ol",
     "ngw/openlayers/Map",
     "ngw/openlayers/layer/Vector",
@@ -34,6 +35,8 @@ define([
     "ngw-pyramid/hbs-i18n",
     // tools
     "ngw-webmap/MapToolbar",
+    "ngw-webmap/controls/InitialExtent",
+    "ngw-webmap/controls/InfoScale",
     "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
@@ -71,6 +74,7 @@ define([
     number,
     aspect,
     ioQuery,
+    domConstruct,
     ol,
     Map,
     Vector,
@@ -92,6 +96,8 @@ define([
     i18n,
     hbsI18n,
     MapToolbar,
+    InitialExtent,
+    InfoScale,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -316,11 +322,15 @@ define([
             ).then(undefined, function (err) { console.error(err); });
 
             // Загружаем закладки, когда кнопка будет готова
-            this._postCreateDeferred.then(
+            /*this._postCreateDeferred.then(
                 function () {
-                    widget.mapToolbar.items.loadBookmarks();
+                    tool widget.mapToolbar.items.loadBookmarks();
+                    widget.mapToolbar = new MapToolbar({
+                        region:'top',
+                        display: widget
+                    });
                 }
-            ).then(undefined, function (err) { console.error(err); });
+            ).then(undefined, function (err) { console.error(err); });*/
 
             // Карта
             all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
@@ -506,43 +516,63 @@ define([
         _mapSetup: function () {
             var widget = this;
 
+            widget.mapToolbar = new MapToolbar({
+                display: widget,
+                target: widget.leftBottomControlPane
+            });
+
             // Инициализация карты
             this.map = new Map({
                 target: this.mapNode,
                 logo: false,
-                controls: [
-                    new ol.control.Rotate({
-                        tipLabel: i18n.gettext("Reset rotation")
-                    }),
-                    new ol.control.Zoom({
-                        zoomInTipLabel: i18n.gettext("Zoom in"),
-                        zoomOutTipLabel: i18n.gettext("Zoom out")
-                    }),
-                    new ol.control.Attribution({
-                        tipLabel: i18n.gettext("Attributions")
-                    }),
-                    new ol.control.ScaleLine()
-                ],
+                controls: [],
                 view: new ol.View({
                     minZoom: 3
                 })
             });
 
-            // Обновление подписи центра карты
-            this.map.watch("center", function (attr, oldVal, newVal) {
-                var pt = ol.proj.transform(newVal, widget.displayProjection, widget.lonlatProjection);
-                widget.mapToolbar.items.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
-                widget.mapToolbar.items.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
-            });
-
-            // Обновление подписи масштабного уровня
-            this.map.watch("resolution", function (attr, oldVal, newVal) {
-                widget.mapToolbar.items.scaleInfoNode.innerHTML = "1 : " + number.format(
-                    widget.map.getScaleForResolution(
-                        newVal,
-                        widget.map.olMap.getView().getProjection().getMetersPerUnit()
-                    ), {places: 0});
-            });
+            this._mapAddControls([
+                new ol.control.Zoom({
+                    zoomInLabel: domConstruct.create("span", {
+                        class: "ol-control__icon material-icons",
+                        innerHTML: "add"
+                    }),
+                    zoomOutLabel: domConstruct.create("span", {
+                        class: "ol-control__icon material-icons",
+                        innerHTML: "remove"
+                    }),
+                    zoomInTipLabel: i18n.gettext("Zoom in"),
+                    zoomOutTipLabel: i18n.gettext("Zoom out"),
+                    target: widget.leftTopControlPane,
+                }),
+                new ol.control.Attribution({
+                    tipLabel: i18n.gettext("Attributions"),
+                    target: widget.rightBottomControlPane,
+                    collapsible: false
+                }),
+                new ol.control.ScaleLine({
+                    target: widget.rightBottomControlPane,
+                    minWidth: 48
+                }),
+                new InfoScale({
+                    display: widget,
+                    target: widget.rightBottomControlPane
+                }),
+                new InitialExtent({
+                    display: widget,
+                    target: widget.leftTopControlPane,
+                    tipLabel: i18n.gettext("Initial extent")
+                }),
+                new ol.control.Rotate({
+                    tipLabel: i18n.gettext("Reset rotation"),
+                    target: widget.leftTopControlPane,
+                    label: domConstruct.create("span", {
+                        class: "ol-control__icon material-icons",
+                        innerHTML: "arrow_upward"
+                    })
+                }),
+                widget.mapToolbar
+            ]);
 
             // При изменении размеров контейнера пересчитываем размер карты
             aspect.after(this.mapPane, "resize", function() {
@@ -576,15 +606,16 @@ define([
                 idx = idx + 1;
             }, this);
 
-            this.mapToolbar.items.zoomToInitialExtentButton.on("click", function() {
-                widget._zoomToInitialExtent();
-            });
-
             this._zoomToInitialExtent();
 
             this._mapDeferred.resolve();
         },
 
+        _mapAddControls(controls){
+            array.forEach(controls, function(control){
+                this.map.olMap.addControl(control);
+            }, this);
+        },
         _mapAddLayers: function () {
             array.forEach(this._layer_order, function (id) {
                 this.map.addLayer(this._layers[id]);

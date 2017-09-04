@@ -182,7 +182,7 @@ define([
         },
 
         _buildLogo: function () {
-            var logoElement = query('img.map-logo')[0],
+            var logoElement = query('.map-logo')[0],
                 newLogoElement,
                 olViewport = query('div.ol-viewport', this.printElement)[0];
 

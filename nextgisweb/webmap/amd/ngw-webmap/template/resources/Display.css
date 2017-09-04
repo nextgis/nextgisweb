@@ -13,3 +13,175 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
 .ol-touch .ol-control button{
     font-size: 1.14em;
 }
+
+/* Control panes */
+
+.control-pane{
+    position: absolute;
+    z-index: 10;
+}
+
+.control-pane--left{
+    left: 16px;
+}
+.control-pane--top{
+    top: 16px;
+}
+.control-pane--right{
+    right: 16px;
+}
+.control-pane--bottom{
+    bottom: 17px;
+}
+
+.control-pane--bottom.control-pane--right{
+    bottom: 1px;
+    right: 12px;
+}
+
+.control-pane .ol-control,
+.control-pane .ol-scale-line{
+    position: static;
+    left: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    line-height: 1;
+    top: -1px;
+}
+
+.control-pane--bottom .ol-control,
+.control-pane--bottom .ol-scale-line{
+    display: inline-block;
+    vertical-align: bottom;
+    margin-left: 8px;
+    color: rgba(0,0,0,.46);
+    font-size: 10px;
+    text-shadow: -1px -1px 0 rgba(255,255,255,.48), 1px -1px 0 rgba(255,255,255,.48), -1px 1px 0 rgba(255,255,255,.48), 1px 1px 0 rgba(255,255,255,.48);
+}
+    .control-pane--bottom .ol-control:first-child,
+    .control-pane--bottom .ol-scale-line:first-child{
+        margin-left: 0;
+    }
+
+.control-pane--top .ol-control,
+.control-pane--top .ol-scale-line{
+    margin-top: 8px;
+}
+    .control-pane--top .ol-control:first-child,
+    .control-pane--top .ol-scale-line:first-child{
+        margin-top: 0px;
+    }
+
+/* Map buttons */
+
+.ol-control {
+    background: none;
+    padding: 0;
+}
+    .ol-control button,
+    .ol-control button:active,
+    .ol-control button:focus{
+        width: 30px;
+        height: 30px;
+        background-color: #fff;
+        color: #076dbf;
+        margin: 1px 0 0;
+        box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+    }
+
+    .ol-control:first-child button{
+        margin-top:1px;
+    }
+
+    .control-pane--bottom .ol-control button{
+        text-shadow: none;
+    }
+
+    .ol-control button .material-icons,
+    .ol-control button:active .material-icons,
+    .ol-control button:focus .material-icons{
+       color: #076dbf;
+    }
+
+    .ol-control__icon{
+        fill: #076dbf;
+    }
+
+    .ol-control:hover{
+        background-color: transparent;
+    }
+
+    .ol-control button:hover{
+        background-color: #f9fafb;
+        color: #00b77e;
+    }
+
+    .ol-control button:hover .ol-control__icon,
+    .ol-control button:hover .material-icons {
+        color: #00b77e;
+        fill: #00b77e;
+    }
+
+/* Rotate control */
+
+.ol-compass{
+    font-size: 24px;
+    font-weight: normal;
+    display: inline-block;
+}
+
+/* Scale line */
+
+.ol-scale-line,
+.control-pane .ol-scale-line{
+    position: relative;
+    padding: 0;
+    background-color: transparent;
+}
+
+    .ol-scale-line::after{
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: -1px;
+        border: 1px solid rgba(255, 255, 255, 0.68);
+        top: 0;
+        border-top: 0;
+    }
+
+    .ol-scale-line-inner{
+        margin: 0;
+        border-color: rgba(0,0,0,.46);
+        color: rgba(0,0,0,.46);
+        float: right;
+    }
+
+/* Attribution */
+
+.ol-attribution:not(.ol-collapsed){
+    background: transparent;
+    height: auto;
+    line-height: inherit;
+}
+    .ol-attribution ul{
+        padding: 0;
+        text-shadow: inherit;
+        color: inherit;
+    }
+
+    .ol-attribution a{
+        text-decoration: none;
+    }
+
+/* Logo */
+
+.map-logo{
+    position: absolute;
+    right: 12px;
+    bottom: 24px;
+    text-decoration: none;
+    line-height: 1;
+    z-index: 1000;
+}

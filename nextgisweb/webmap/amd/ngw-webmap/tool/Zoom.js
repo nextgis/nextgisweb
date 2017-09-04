@@ -16,10 +16,10 @@ define([
         constructor: function (options) {
             if (!this.out) {
                 this.label = i18n.gettext("Zoom in");
-                this.iconClass = "iconZoomIn";
+                this.customIcon = "<span class='ol-control__icon material-icons'>zoom_in</span>";
             } else {
                 this.label = i18n.gettext("Zoom out");
-                this.iconClass = "iconZoomOut";
+                this.customIcon = "<span class='ol-control__icon material-icons'>zoom_out</span>";
             };
 
             this.interaction = new ol.interaction.DragZoom({
