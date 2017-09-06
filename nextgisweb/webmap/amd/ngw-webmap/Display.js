@@ -41,7 +41,7 @@ define([
     "./tool/Zoom",
     "./tool/Measure",
     //left panel
-    "ngw/components/navigation-menu/NavigationMenu",
+    "ngw-pyramid/navigation-menu/NavigationMenu",
     "ngw-webmap/ui/LayersPanel/LayersPanel",
     "ngw-webmap/ui/PrintMapPanel/PrintMapPanel",
     // settings

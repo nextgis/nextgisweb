@@ -13,7 +13,7 @@ define([
     'dojo/dom-style',
     'dojo/dom-class',
     'dojo/dom-construct',
-    "ngw/components/dynamic-panel/DynamicPanel",
+    "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
     'dojox/layout/TableContainer',
     'dojox/dtl',
@@ -108,7 +108,7 @@ define([
             }));
         },
 
-        show(){
+        show: function(){
             this.inherited(arguments);
 
             this._buildPrintElement();

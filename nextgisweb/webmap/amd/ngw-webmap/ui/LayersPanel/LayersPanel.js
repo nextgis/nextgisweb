@@ -4,7 +4,7 @@ define([
     'ngw-pyramid/hbs-i18n',
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "ngw/components/dynamic-panel/DynamicPanel",
+    "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
     "dijit/form/DropDownButton",
     "dijit/DropDownMenu",
