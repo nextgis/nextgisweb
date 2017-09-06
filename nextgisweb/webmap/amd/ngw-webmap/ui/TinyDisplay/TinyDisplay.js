@@ -51,7 +51,8 @@ define([
     "../NgwShareButtons/NgwShareButtons",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
-    "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css"
+    "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css",
+    "xstyle/css!./TinyDisplay.css"
 ], function (
     declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template,
     lang, array, Deferred, all, number, aspect, ioQuery, domConstruct, ol,
@@ -566,17 +567,36 @@ define([
             this.map = new Map({
                 target: this.mapNode,
                 controls: [
-                    new ol.control.Rotate({
-                        tipLabel: i18n.gettext("Reset rotation")
-                    }),
                     new ol.control.Zoom({
+                        zoomInLabel: domConstruct.create("span", {
+                            class: "ol-control__icon material-icons",
+                            innerHTML: "add"
+                        }),
+                        zoomOutLabel: domConstruct.create("span", {
+                            class: "ol-control__icon material-icons",
+                            innerHTML: "remove"
+                        }),
                         zoomInTipLabel: i18n.gettext("Zoom in"),
-                        zoomOutTipLabel: i18n.gettext("Zoom out")
+                        zoomOutTipLabel: i18n.gettext("Zoom out"),
+                        target: widget.leftTopControlPane,
                     }),
                     new ol.control.Attribution({
-                        tipLabel: i18n.gettext("Attributions")
+                        tipLabel: i18n.gettext("Attributions"),
+                        target: widget.rightBottomControlPane,
+                        collapsible: false
                     }),
-                    new ol.control.ScaleLine()
+                    new ol.control.ScaleLine({
+                        target: widget.rightBottomControlPane,
+                        minWidth: 48
+                    }),
+                    new ol.control.Rotate({
+                        tipLabel: i18n.gettext("Reset rotation"),
+                        target: widget.leftTopControlPane,
+                        label: domConstruct.create("span", {
+                            class: "ol-control__icon material-icons",
+                            innerHTML: "arrow_upward"
+                        })
+                    }),
                 ],
                 view: new ol.View({
                     minZoom: 3

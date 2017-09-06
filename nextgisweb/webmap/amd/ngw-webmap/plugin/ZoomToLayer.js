@@ -37,7 +37,7 @@ define([
         },
 
         postCreate: function () {
-            if (this.display.layersPanel.contentWidget.itemMenu) {
+            if (this.display.layersPanel && this.display.layersPanel.contentWidget.itemMenu) {
                 this.display.layersPanel.contentWidget.itemMenu.addChild(this.menuItem);
             }
         },
