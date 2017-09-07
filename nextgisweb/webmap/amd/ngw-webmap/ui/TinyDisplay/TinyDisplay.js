@@ -38,7 +38,7 @@ define([
     "../../tool/Measure",
     // settings
     "ngw/settings!webmap",
-    "../LinkToMainMap/LinkToMainMap",
+    "ngw-webmap/controls/LinkToMainMap",
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -395,11 +395,6 @@ define([
             //    }
             //});
 
-            if (this._urlParams.linkMainMap === 'true') {
-                var linkToMainMap = new LinkToMainMap(mainDisplayUrl);
-                domConstruct.place(linkToMainMap.domNode, this.mapNode);
-            }
-
             this._postCreateDeferred.resolve();
         },
 
@@ -602,6 +597,14 @@ define([
                     minZoom: 3
                 })
             });
+
+            if (this._urlParams.linkMainMap === 'true') {
+                this.map.olMap.addControl(new LinkToMainMap({
+                    url: mainDisplayUrl,
+                    target: widget.leftBottomControlPane,
+                    tipLabel: i18n.gettext('Open full map')
+                }));
+            }
 
             // Обновление подписи центра карты
             this.map.watch("center", function (attr, oldVal, newVal) {
