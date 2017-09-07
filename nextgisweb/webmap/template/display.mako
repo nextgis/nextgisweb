@@ -23,9 +23,33 @@
     </script>
 </%def>
 
-<div data-dojo-id="display"
-     class="webmap-display"
-    data-dojo-type="ngw-webmap/Display"
-    data-dojo-props="config: displayConfig"
-    style="width: 100%; height: 100%">
+
+<%include file="nextgisweb:pyramid/template/header.mako" />
+
+<div id="webmap-wrapper" class="webmap-wrapper">
+
+    <div id="display"
+         class="webmap-display"
+        data-dojo-type="ngw-webmap/Display"
+        data-dojo-props="config: displayConfig"
+        style="width: 100%; height: 100%">
+    </div>
+
 </div>
+
+<script type="text/javascript">
+    require(["dojo/dom", "dojo/dom-style", "dojo/dom-geometry", "dojo/on", "dojo/domReady!"],
+    function (dom, domStyle, domGeom, on) {
+        var webmapWrapper = dom.byId("webmap-wrapper"),
+            header = dom.byId("header");
+
+        function resize() {
+            var height = domGeom.getMarginBox(header, domStyle.getComputedStyle(header)).h;
+            domStyle.set(webmapWrapper, "top", height + "px");
+        }
+
+        setTimeout(resize, 500) // timeout for a font rendering
+        on(window, 'resize', resize);
+    });
+
+</script>

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from pyramid.events import BeforeRender, subscriber
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPForbidden
@@ -67,7 +68,7 @@ def setup_pyramid(comp, config):
                     b'WWW-Authenticate': b'Basic realm="NextGISWeb"'})
             else:
                 return HTTPFound(location=request.route_url(
-                    'auth.login', _query=dict(next=request.url)))
+                    get_login_route_name(), _query=dict(next=request.url)))
 
         # Show error message to already authentificated users
         # TODO: We can separately inform blocked users
@@ -375,3 +376,16 @@ def setup_pyramid(comp, config):
         dm.Label('auth-group', _("Groups")),
         GroupMenu('auth-group'),
     )
+
+    # Login and logout routes names
+    def get_login_route_name():
+        return comp.settings.get('login_route_name', 'auth.login')
+
+    def get_logout_route_name():
+        return comp.settings.get('logout_route_name', 'auth.logout')
+
+    def add_globals(event):
+        event['login_route_name'] = get_login_route_name()
+        event['logout_route_name'] = get_logout_route_name()
+
+    config.add_subscriber(add_globals, BeforeRender)

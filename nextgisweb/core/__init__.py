@@ -62,8 +62,17 @@ class CoreComponent(Component):
 
         self.DBSession = DBSession
 
-        if 'backup.filename' not in self.settings:
-            self.settings['backup.filename'] = '%y%m%d-%H%M%S'
+        self._backup_path = self.settings.get('backup.filename')
+        self._backup_filename = self.settings.get(
+            'backup.filename', '%Y%m%d-%H%M%S')
+
+        self._backup_upload_bucket = self.settings.get(
+            'backup_upload.bucket', 'ngwbackup')
+        self._backup_upload_server = self.settings.get('backup_upload.server')
+        self._backup_upload_access_key = self.settings.get(
+            'backup_upload.access_key')
+        self._backup_upload_secret_key = self.settings.get(
+            'backup_upload.secret_key')
 
     def initialize_db(self):
         for k, v in (('system.name', 'NextGIS Web'),
@@ -132,6 +141,11 @@ class CoreComponent(Component):
         self._localizer[locale] = lobj
         return lobj
 
+    def settings_exists(self, component, name):
+        return DBSession.query(db.exists().where(db.and_(
+            Setting.component == component, Setting.name == name
+        ))).scalar()
+
     def settings_get(self, component, name):
         try:
             obj = Setting.filter_by(component=component, name=name).one()
@@ -158,6 +172,10 @@ class CoreComponent(Component):
             result['full_name'] = self.settings_get('core', 'system.full_name')
         except KeyError:
             pass
+
+        result['database_size'] = DBSession.query(db.func.pg_database_size(
+            db.func.current_database(),)).scalar()
+
         return result
 
     settings_info = (

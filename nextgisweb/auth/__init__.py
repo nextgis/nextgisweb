@@ -111,6 +111,8 @@ class AuthComponent(Component):
 
     settings_info = (
         dict(key='register', description="Allow user registration"),
+        dict(key='login_route_name', description="Name of route for login page (default: 'auth.login')"),
+        dict(key='logout_route_name', description="Name of route for logout page (default: 'auth.logout')"),
     )
 
 

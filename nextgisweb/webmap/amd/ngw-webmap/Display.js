@@ -44,6 +44,7 @@ define([
     "ngw-pyramid/navigation-menu/NavigationMenu",
     "ngw-webmap/ui/LayersPanel/LayersPanel",
     "ngw-webmap/ui/PrintMapPanel/PrintMapPanel",
+    "./tool/Swipe",
     // settings
     "ngw/settings!webmap",
     // template
@@ -104,6 +105,7 @@ define([
     NavigationMenu,
     LayersPanel,
     PrintMapPanel,
+    ToolSwipe,
     clientSettings
 ) {
 
@@ -731,6 +733,8 @@ define([
 
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "LineString"}), 'measuringLength');
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "Polygon"}), 'measuringArea');
+
+            this.mapToolbar.items.addTool(new ToolSwipe({display: this, orientation: "vertical"}), 'swipeVertical');
 
             topic.publish('/webmap/tools/initialized');
         },

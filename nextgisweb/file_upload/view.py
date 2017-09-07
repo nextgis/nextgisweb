@@ -62,7 +62,8 @@ def upload_post(request):
         metas.append(meta)
 
     # TODO: Add IFrame support for IE and Flash uploader
-    return Response("%s" % json.dumps(dict(upload_meta=metas)))
+    return Response(json.dumps(dict(upload_meta=metas)),
+                    content_type=b'application/json')
 
 
 def upload_put(request):
@@ -118,8 +119,3 @@ def setup_pyramid(comp, config):
         '/api/component/file_upload/upload') \
         .add_view(upload_post, method='POST') \
         .add_view(upload_put, method='PUT')
-
-    # TODO: backward compatibility, to be removed later
-    config.add_route('#file_upload.upload', '/file_upload/upload') \
-        .add_view(upload_post, request_method='POST') \
-        .add_view(upload_put, request_method='PUT')

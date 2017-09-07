@@ -559,7 +559,7 @@ a[class*=" icon-"]:hover:before {
 }
 .logo__pic {
   display: block;
-  margin: -5px 15px -5px -15px;
+  margin: -11px 15px -11px -25px;
 }
 .header__title__inner {
   display: table-cell;

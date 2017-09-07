@@ -313,7 +313,7 @@ define([
                 layers: []
             };
 
-            this.display.getVisibleItems().then(function (items) {
+            this.display.getVisibleItems().then(lang.hitch(this, function (items) {
                 if (items.length === 0) {
                     // Никаких видимых элементов сейчас нет
                     console.log("Visible items not found!");
@@ -347,7 +347,7 @@ define([
                         tool._responsePopup(response, point, layerLabels);
                     });
                 }
-            });
+            }));
 
         },
 

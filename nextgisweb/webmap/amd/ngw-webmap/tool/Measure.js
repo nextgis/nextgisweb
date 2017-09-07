@@ -18,6 +18,8 @@ define([
 ) {
     return declare(Base, {
         constructor: function (options) {
+            var tool = this;
+
             if (this.type == "LineString") {
                 this.label = i18n.gettext("Measure distance");
                 this.customIcon = '<svg class="ol-control__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 612" style="width: 20px; height: 20px" xml:space="preserve"><g><path d="M606.924,144.053L467.944,5.074c-6.765-6.765-17.728-6.765-24.489,0l-38.001,38.001l69.49,69.494c6.763,6.761,6.769,17.726,0,24.489l-24.489,24.489c-6.765,6.769-17.728,6.769-24.493,0L356.47,92.059l-61.228,61.23l69.494,69.49c6.761,6.761,6.761,17.728,0,24.493l-24.493,24.489c-6.765,6.769-17.728,6.765-24.489,0.004l-69.495-69.492L185.031,263.5\
@@ -43,7 +45,7 @@ define([
                 var output;
                 var length = 0;
                 var coordinates = line.getCoordinates();
-                var sourceProj = this.display.map.olMap.getView().getProjection();
+                var sourceProj = tool.display.map.olMap.getView().getProjection();
                 for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
                     var c1 = ol.proj.transform(coordinates[i], sourceProj, "EPSG:4326");
                     var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, "EPSG:4326");
@@ -67,7 +69,7 @@ define([
 
             var formatArea = function(polygon) {
                 var output;
-                var sourceProj = this.display.map.olMap.getView().getProjection();
+                var sourceProj = tool.display.map.olMap.getView().getProjection();
                 var geom = polygon.clone().transform(sourceProj, "EPSG:4326");
                 var coordinates = geom.getLinearRing(0).getCoordinates();
                 var area = Math.abs(wgs84Sphere.geodesicArea(coordinates));

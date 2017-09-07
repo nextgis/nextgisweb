@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 import codecs
 import os.path
+import base64
+from datetime import timedelta
 
-from pyramid.response import FileResponse
+from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
 
 from pkg_resources import resource_filename
@@ -19,21 +21,6 @@ def home(request):
         return HTTPFound(request.application_url + home_url)
     else:
         return HTTPFound(location=request.route_url('resource.show', id=0))
-
-
-def routes(request):
-    result = dict()
-    introspector = request.registry.introspector
-    for itm in introspector.get_category('routes'):
-        route = itm['introspectable']['object']
-        for p in route.predicates:
-            if isinstance(p, ClientRoutePredicate):
-                result[route.name] = dict(
-                    pattern=route.generate(dict(
-                        [(k, '__%s__' % k)
-                         for k in p.val])),
-                    keys=p.val)
-    return result
 
 
 def control_panel(request):
@@ -57,7 +44,15 @@ def logo(request):
     if 'logo' in settings and os.path.isfile(settings['logo']):
         return FileResponse(settings['logo'], request=request)
     else:
-        raise HTTPNotFound()
+        try:
+            logodata = request.env.core.settings_get('pyramid', 'logo')
+            bindata = base64.b64decode(logodata)
+            return Response(
+                bindata, content_type=b'image/png',
+                expires=timedelta(days=1))
+
+        except KeyError:
+            raise HTTPNotFound()
 
 
 def favicon(request):
@@ -111,9 +106,6 @@ def notfound(request):
 
 def setup_pyramid(comp, config):
     config.add_route('home', '/').add_view(home)
-
-    config.add_route('pyramid.routes', '/pyramid/routes') \
-        .add_view(routes, renderer='json', json=True)
 
     def ctpl(n):
         return 'nextgisweb:pyramid/template/%s.mako' % n

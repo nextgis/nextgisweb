@@ -4,9 +4,10 @@ import re
 import json
 import os.path
 from urllib2 import unquote
+from datetime import timedelta
 
 from pyramid.response import Response, FileResponse
-from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
+from pyramid.httpexceptions import HTTPBadRequest
 
 from ..env import env
 from ..package import pkginfo
@@ -230,6 +231,15 @@ def statistics(request):
     return result
 
 
+def custom_css(request):
+    try:
+        body = request.env.core.settings_get('pyramid', 'custom_css')
+    except KeyError:
+        body = ""
+
+    return Response(body, content_type=b'text/css', expires=timedelta(days=1))
+
+
 def setup_pyramid(comp, config):
     config.add_tween('nextgisweb.pyramid.api.cors_tween_factory')
 
@@ -262,3 +272,10 @@ def setup_pyramid(comp, config):
         'pyramid.statistics',
         '/api/component/pyramid/statistics',
     ).add_view(statistics, renderer='json')
+
+    config.add_route(
+        'pyramid.custom_css',
+        '/api/component/pyramid/custom_css'
+    ).add_view(custom_css)
+
+    # TODO: Add PUT method for changing custom_css setting and GUI
