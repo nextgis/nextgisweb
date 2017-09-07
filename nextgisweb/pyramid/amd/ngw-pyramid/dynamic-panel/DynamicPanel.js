@@ -36,6 +36,7 @@ define([
         title: "",
         contentWidget: undefined,
         isOpen: false,
+        withCloser: true,
         constructor: function (options) {
             declare.safeMixin(this,options);
         },
@@ -43,9 +44,8 @@ define([
             this.contentWidget.placeAt(this.contentNode);
             if (this.isOpen) this.show();
 
-            query(this.closer).on("click", lang.hitch(this, function() {
-               this.hide();
-            }));
+            if (this.withCloser)
+                this._createCLoser();
         },
         show(){
             this.isOpen = true;
@@ -58,6 +58,17 @@ define([
             this.containerNode.style.display = "none";
             if (this.getParent()) this.getParent().resize();
             this.emit("closed");
+        },
+        _createCLoser(){
+            this.closer = domConstruct.create("span", {
+                class: "dynamic-panel__closer material-icons material-icons--link",
+                innerHTML: "close"
+            });
+            domConstruct.place(this.closer, this.domNode);
+
+            query(this.closer).on("click", lang.hitch(this, function() {
+               this.hide();
+            }));
         }
     });
 });

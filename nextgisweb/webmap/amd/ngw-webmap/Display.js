@@ -829,7 +829,8 @@ define([
                         splitter: true,
                         title: i18n.gettext("Layers"),
                         isOpen: widget.activeLeftPanel == "layersPanel",
-                        gutters: false
+                        gutters: false,
+                        withCloser: false
                     });
 
                     widget.itemTree.placeAt(widget.layersPanel.contentWidget.layerTreePane);
