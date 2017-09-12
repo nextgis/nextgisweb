@@ -1,1 +1,8 @@
 glue icon --css=css/ --img=img/
+
+
+To compile .less files:
+
+`npm install` - will install all requirments. do it once
+`npm run watch:css` - will watch for changes in the LESS files and build them when they change
+`npm run build:css` - will build all CSS from the LESS files

@@ -1,0 +1,28 @@
+{
+  "name": "nextgisweb",
+  "version": "3.0.0",
+  "description": "NextGIS Web ==============",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "lessc nextgisweb/static/css/layout.less > nextgisweb/static/css/layout.css",
+    "watch:css": "onchange 'nextgisweb/static/css/*.less' -- npm run build:css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nextgis/nextgisweb.git"
+  },
+  "author": "",
+  "license": "GNU",
+  "bugs": {
+    "url": "https://github.com/nextgis/nextgisweb/issues"
+  },
+  "homepage": "https://github.com/nextgis/nextgisweb#readme",
+  "devDependencies": {
+    "less": "^2.7.2",
+    "onchange": "^3.2.1"
+  }
+}
