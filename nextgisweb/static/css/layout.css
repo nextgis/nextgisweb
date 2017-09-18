@@ -1,6 +1,6 @@
-@import "fontello.css";
 /* -- Variables -- */
 /* Import */
+@import "fontello.css";
 .nextgis.claro .padding-block,
 .padding-block {
   padding: 16px;
@@ -10,9 +10,14 @@
   margin-left: -16px;
   margin-right: -16px;
 }
+.clearfix::after {
+  display: block;
+  content: "";
+  clear: both;
+}
 .uploader__dropzone {
   position: relative;
-  background-color: #eef4f7;
+  background-color: #EEF4F7;
   padding: 44px 26px 48px;
   text-align: center;
   font-size: 16px;
@@ -112,8 +117,8 @@
   cursor: pointer;
 }
 .uploader__link__btn:hover ~ .uploader__link__text {
-  color: #2196f3;
-  border-bottom-color: #2196f3;
+  color: #2196F3;
+  border-bottom-color: #2196F3;
   border-bottom-color: rgba(33, 150, 243, 0.4);
 }
 .uploader__help {
@@ -189,14 +194,46 @@
 .text-withIcon__pic.svgIcon-postgis_layer {
   left: -2px;
 }
+.list {
+  padding: 8px 0;
+  list-style-type: none;
+  background-color: #fff;
+  font-size: 16px;
+}
+.list .list__item {
+  display: block;
+  padding: 0 16px;
+  height: 48px;
+  line-height: 48px;
+  white-space: nowrap;
+  color: #212121;
+  text-decoration: none;
+}
+.list .list__item a {
+  color: #212121;
+  text-decoration: none;
+}
+.list .list__item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: #212121;
+  text-decoration: none;
+}
+.list--s {
+  font-size: 14px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.list--s .list__item {
+  height: 32px;
+  line-height: 32px;
+}
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
   src: url(../font/MaterialIcons-Regular.eot);
-  src: local('Material Icons'), local('MaterialIcons-Regular'), url(../font/MaterialIcons-Regular.woff2) format('woff2'), url(../font/MaterialIcons-Regular.woff) format('woff'), url(../font/MaterialIcons-Regular.ttf) format('truetype');
-  
   /* For IE6-8 */
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url(../font/MaterialIcons-Regular.woff2) format('woff2'), url(../font/MaterialIcons-Regular.woff) format('woff'), url(../font/MaterialIcons-Regular.ttf) format('truetype');
 }
 .material-icons,
 .sort-header:after {
@@ -387,17 +424,17 @@ html {
 }
 body {
   font-size: 14px;
-  line-height: 1.54;
+  line-height: 1.55;
   color: #212121;
   background-color: #fafafa;
   min-width: 900px;
 }
 a {
-  color: #1260a9;
+  color: #0070c5;
 }
 a:hover {
-  color: #2196f3;
-  border-color: #2196f3;
+  color: #2196F3;
+  border-color: #2196F3;
   border-color: rgba(33, 150, 243, 0.4);
 }
 h1,
@@ -413,7 +450,7 @@ h3,
 h1,
 .h1 {
   font-size: 28px;
-  color: #000000;
+  color: #000;
 }
 h2,
 .h2 {
@@ -471,7 +508,7 @@ a:hover [class^="icon-"]:before,
 a:hover [class*=" icon-"]:before,
 a[class^="icon-"]:hover:before,
 a[class*=" icon-"]:hover:before {
-  color: #ffba3f;
+  color: #FFBA3F;
 }
 .icon-viewMap:before {
   font-family: "fontello";
@@ -488,6 +525,14 @@ a[class*=" icon-"]:hover:before {
 }
 .label-text {
   margin-right: 5px;
+}
+.icon--link {
+  cursor: pointer;
+  text-decoration: none;
+}
+.icon--link:hover {
+  color: #2196F3;
+  text-decoration: none;
 }
 /* -- LAYOUT STYLES -- */
 .layout {
@@ -513,57 +558,90 @@ a[class*=" icon-"]:hover:before {
 .header {
   position: relative;
   box-sizing: border-box;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  background-color: #036997;
-  color: #ffffff;
+  padding: 16px 16px 18px 0;
+  background-color: #e5eef7;
   z-index: 10;
-  overflow: hidden;
-  line-height: 1.3;
-  font-size: 14px;
+  line-height: 1.5;
+  font-size: 15px;
+  font-family: 'lato', 'Roboto', Arial, sans-serif;
+  border-bottom: 1px solid #d3e3f2;
 }
 .header a {
   text-decoration: none;
-  color: #b0d0de;
+  color: #0070c5;
 }
 .header a:hover {
-  color: #ffffff;
+  color: #000;
 }
 .header a:hover .icon-logout:before {
-  color: #ffba3f;
+  color: #000;
 }
 .header .icon-logout:before {
-  color: #b0d0de;
+  color: #0070c5;
 }
 .header .header__title {
   display: table;
-  color: #ffffff;
+  color: #0070c5;
   vertical-align: top;
+  font-weight: bold;
+  min-height: 36px;
+  margin-top: -8px;
+  margin-bottom: -8px;
 }
 .header .header__title:hover {
-  color: #ffffff;
+  color: #0070c5;
 }
-.header__right {
-  float: right;
-  width: 60%;
-  text-align: right;
+.header-nav {
+  margin: 0;
+  list-style-type: none;
+  padding: 0;
+  position: absolute;
+  right: 16px;
+  top: 0;
+  bottom: 0;
+  font-weight: bold;
+  margin-top: auto;
+  margin-bottom: auto;
+  height: 36px;
+}
+.header-nav__item {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 14px;
+  margin-top: auto;
+  height: 36px;
+  line-height: 34px;
+  margin-bottom: auto;
+}
+.header-nav__item > .material-icons {
+  display: inline;
+  color: #0070c5;
+  line-height: inherit;
+}
+.header-nav__item > .material-icons:hover {
+  color: #000;
 }
 .header__left {
-  float: left;
-  width: 40%;
-  max-width: 500px;
+  padding-right: 250px;
 }
 .header__title__logo {
   display: table-cell;
-  vertical-align: top;
+  vertical-align: middle;
+  border-right: 1px solid #b4d0ea;
+  min-width: 55px;
+  padding: 6px 16px;
+  box-sizing: border-box;
 }
 .logo__pic {
   display: block;
-  margin: -11px 15px -11px -25px;
+  margin: auto;
 }
 .header__title__inner {
   display: table-cell;
-  vertical-align: top;
+  vertical-align: middle;
+  padding-left: 16px;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 /* -- MENU STYLES -- */
 .menu-list {
@@ -605,7 +683,7 @@ a[class*=" icon-"]:hover:before {
   margin-left: 0;
 }
 .user-menu-list .user-menu-list__item.user .icon-user:before {
-  color: #ffffff;
+  color: #0070c5;
 }
 /* -- TABLES -- */
 table {
@@ -623,7 +701,7 @@ table {
 }
 .pure-table th {
   font-weight: bold;
-  color: #aaaaaa;
+  color: #aaa;
   color: rgba(33, 33, 33, 0.86);
 }
 .pure-table td,
@@ -689,7 +767,7 @@ table {
 .table-keyvalue th.table-keyvalue__key {
   border-bottom-color: #e1e1e1;
   font-weight: normal;
-  color: #aaaaaa;
+  color: #aaa;
   letter-spacing: 0;
 }
 .table-keyvalue td.table-keyvalue__value,
@@ -716,7 +794,7 @@ table {
 }
 .content-box .table-keyvalue__key__inner,
 .content-box .table-keyvalue__value__inner {
-  background-color: #ffffff;
+  background-color: #fff;
 }
 .table-keyvalue__key__inner {
   padding-right: 3px;
@@ -752,7 +830,7 @@ table {
 }
 .content-box {
   position: relative;
-  background: #ffffff;
+  background: #fff;
   padding: 16px;
   margin-bottom: 40px;
   -webkit-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
@@ -784,11 +862,11 @@ table {
   border: 1px solid #efefef;
 }
 .content-box__info {
-  background-color: #eef4f7;
+  background-color: #EEF4F7;
   padding: 10px 16px;
   margin-top: 16px;
   margin-bottom: -16px;
-  color: #888888;
+  color: #888;
   margin-left: -16px;
   margin-right: -16px;
 }
@@ -802,7 +880,7 @@ table {
 .sidebar {
   position: relative;
   box-sizing: border-box;
-  background-color: #ffffff;
+  background-color: #fff;
   z-index: 5;
   overflow: auto;
   min-height: 100%;
@@ -814,7 +892,7 @@ table {
 }
 .sidebar-menu {
   position: relative;
-  background: #ffffff;
+  background: #fff;
   padding: 16px;
   margin-bottom: 40px;
   -webkit-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
@@ -824,7 +902,7 @@ table {
 }
 .sidebar-menu .table-keyvalue__key__inner,
 .sidebar-menu .table-keyvalue__value__inner {
-  background-color: #ffffff;
+  background-color: #fff;
 }
 .sidebar-menu p:first-child {
   margin-top: 0;
@@ -873,7 +951,7 @@ table {
   position: absolute;
   left: -24px;
   top: 0;
-  background-color: #ffba3f;
+  background-color: #FFBA3F;
   zoom: 1;
   filter: alpha(opacity=0);
   -webkit-opacity: 0;
@@ -897,10 +975,10 @@ table {
   text-decoration: none;
 }
 .sidebar-menu__link:hover {
-  color: #1260a9;
+  color: #0070c5;
 }
 .sidebar-menu__item--selected .sidebar-menu__link {
-  color: #1260a9;
+  color: #0070c5;
   font-weight: bold;
 }
 .lt-ie9 .sidebar-menu__link:after {
@@ -915,7 +993,7 @@ table {
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: #ffffff;
+  background-color: #fff;
   box-shadow: 0 0 7px rgba(57, 70, 78, 0.2);
 }
 /*-- Meta info --*/
@@ -929,7 +1007,7 @@ table {
   margin-top: -25px;
 }
 .path__item {
-  color: #aaaaaa;
+  color: #aaa;
 }
 .path__item:before {
   content: "";
@@ -943,7 +1021,7 @@ table {
   -moz-background-clip: padding;
   border-radius: 2px;
   background-clip: padding-box;
-  background-color: #ffba3f;
+  background-color: #FFBA3F;
   margin-left: 3px;
   margin-right: 3px;
 }
@@ -951,14 +1029,14 @@ table {
   display: none;
 }
 .path__link {
-  color: #aaaaaa;
+  color: #aaa;
   text-decoration: none;
   border-bottom: 1px solid #e9e9e9;
 }
 .path__link:hover {
-  color: #1260a9;
-  border-bottom-color: #1260a9;
-  border-bottom-color: rgba(18, 96, 169, 0.4);
+  color: #0070c5;
+  border-bottom-color: #0070c5;
+  border-bottom-color: rgba(0, 112, 197, 0.4);
 }
 /* -- Permission --*/
 .permission-label {
@@ -972,12 +1050,12 @@ table {
   border-radius: 3px;
   background-clip: padding-box;
   font-size: 12px;
-  color: #ffffff;
+  color: #fff;
   text-align: center;
   line-height: 20px;
 }
 .permission-label.allow {
-  background-color: #00c775;
+  background-color: #00C775;
 }
 .permission-label.deny {
   background-color: #F77268;
@@ -1068,10 +1146,10 @@ textarea {
 .children-table__name__link {
   display: block;
   text-decoration: none;
-  color: #000000;
+  color: #000;
 }
 .children-table__name__link:hover {
-  color: #1260a9;
+  color: #0070c5;
   text-decoration: none;
 }
 .children-table__action {
@@ -1137,9 +1215,19 @@ textarea {
   -ms-transform: rotate(-180deg);
   transform: rotate(-180deg);
 }
+.overlay {
+  display: none;
+  position: fixed;
+  z-index: 500;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
 .nextgis.claro .dgrid-header,
 .nextgis.claro .dgrid-footer {
-  background: #eef4f7;
+  background: #EEF4F7;
   filter: none;
 }
 .nextgis.claro .dgrid-header .dgrid-cell,
@@ -1245,7 +1333,7 @@ textarea {
   border-top: 3px solid transparent;
 }
 .nextgis.claro .dijitTabContainerTop-tabs .dijitTabChecked {
-  border-top-color: #1260a9;
+  border-top-color: #0070c5;
   border-left-color: #dedede;
   border-right-color: #dedede;
   background-color: #fff;
@@ -1261,7 +1349,7 @@ textarea {
   line-height: 34px;
   font-size: 16px;
   background-image: none;
-  background-color: #1260a9;
+  background-color: #0070c5;
   border: 0;
   color: #fff;
   border-radius: 23px;
@@ -1273,7 +1361,7 @@ textarea {
 }
 .nextgis.claro .dijitButton--primary:hover .dijitButtonNode,
 .nextgis.claro .dijitButton--primary:focus .dijitButtonNode {
-  background: #0d467b;
+  background: #005392;
 }
 .nextgis.claro .dijitButton--primary + .dijitButton--primary {
   margin-left: 8px;

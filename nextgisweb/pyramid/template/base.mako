@@ -56,6 +56,7 @@
         var dojoConfig = {
             async: true,
             isDebug: true,
+            parseOnLoad: true,
             packages: [
                 {name: "jed", main: "jed", location: ${request.static_url('nextgisweb:static/jed/') | json.dumps, n }}
             ],
@@ -65,6 +66,9 @@
     </script>
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
+    <script> require(["dojo/parser"]); </script>
+
+    <script src="//use.edgefonts.net/lato:n4,i4,n7,i7:all.js"></script>
 
     %if hasattr(self, 'assets'):
         ${self.assets()}
@@ -162,12 +166,12 @@
                 resize();
 
                 on(window, 'resize', resize);
+
             });
 
         </script>
 
     %endif
-
 </body>
 
 </html>

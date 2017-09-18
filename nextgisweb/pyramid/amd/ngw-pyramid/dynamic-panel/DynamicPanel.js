@@ -8,8 +8,10 @@ define([
     "dojo/_base/array",
     "dojo/dom",
     "dojo/dom-construct",
+    "dojo/dom-class",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "dijit/_WidgetBase",
     "dijit/layout/ContentPane",
     "dijit/layout/BorderContainer",
     "dojo/text!./DynamicPanel.hbs",
@@ -26,47 +28,71 @@ define([
     array,
     dom,
     domConstruct,
+    domClass,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    _WidgetBase,
     ContentPane,
     BorderContainer,
     template) {
-    return declare([ContentPane,_TemplatedMixin, _WidgetsInTemplateMixin],{
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
         templateString: hbsI18n(template, i18n),
         title: "",
         contentWidget: undefined,
         isOpen: false,
         withCloser: true,
+        withOverlay: false,
+        withTitle: true,
         constructor: function (options) {
             declare.safeMixin(this,options);
         },
-        postCreate(){
-            this.contentWidget.placeAt(this.contentNode);
+        postCreate: function(){
+            if (this.contentWidget)
+                this.contentWidget.placeAt(this.contentNode);
+
             if (this.isOpen) this.show();
 
             if (this.withCloser)
                 this._createCLoser();
+
+            if (this.withOverlay)
+                this._createOverlay();
+
+            if (!this.withTitle){
+                domClass.add(this.domNode, "dynamic-panel--notitle");
+            }
         },
-        show(){
+        show: function(){
             this.isOpen = true;
-            this.containerNode.style.display = "block";
+            this.domNode.style.display = "block";
+            if (this.overlay) this.overlay.style.display = "block";
             if (this.getParent()) this.getParent().resize();
             this.emit("shown");
         },
-        hide(){
+        hide: function(){
             this.isOpen = false;
-            this.containerNode.style.display = "none";
+            this.domNode.style.display = "none";
             if (this.getParent()) this.getParent().resize();
+            if (this.overlay) this.overlay.style.display = "none";
             this.emit("closed");
         },
-        _createCLoser(){
+        _createCLoser: function(){
             this.closer = domConstruct.create("span", {
-                class: "dynamic-panel__closer material-icons material-icons--link",
+                class: "dynamic-panel__closer material-icons material-icons--link icon--link",
                 innerHTML: "close"
             });
             domConstruct.place(this.closer, this.domNode);
 
             query(this.closer).on("click", lang.hitch(this, function() {
+               this.hide();
+            }));
+        },
+        _createOverlay: function(){
+            this.overlay = domConstruct.create("div", {
+                class: "overlay"
+            });
+            domConstruct.place(this.overlay, document.body);
+            query(this.overlay).on("click", lang.hitch(this, function() {
                this.hide();
             }));
         }

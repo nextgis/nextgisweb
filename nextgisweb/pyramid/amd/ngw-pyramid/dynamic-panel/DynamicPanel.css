@@ -1,8 +1,9 @@
 .dynamic-panel,
 .claro .dynamic-panel{
     display: none;
-    width: 250px;
+    width: 350px;
     padding: 0;
+    background-color: #fff;
 }
     .dynamic-panel--fullwidth,
     .claro .dynamic-panel--fullwidth{
@@ -19,6 +20,9 @@
         line-height: 40px;
         border-bottom: 1px solid rgba(0,0,0,.12);
         box-sizing: border-box;
+        font-family: 'lato', 'Roboto', sans-serif;
+        font-size: 15px;
+        font-weight: bold;
     }
 
     .dynamic-panel__content{
@@ -37,3 +41,11 @@
         z-index: 10;
         cursor: pointer;
     }
+
+.dynamic-panel--notitle .dynamic-panel__title{
+    display: none;
+}
+
+.dynamic-panel--notitle .dynamic-panel__content{
+    top:0;
+}

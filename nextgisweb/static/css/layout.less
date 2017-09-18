@@ -8,9 +8,9 @@
 @text-color: #212121;
 @light-text: #aaa;
 @light-text-2: #888;
-@blue: #1260a9;
+@blue: #0070c5;
 @darkBlue: #036997;
-@lightBlue: #B0D0DE;
+@lightBlue: #e5eef7;
 @lightBlue-2: #EEF4F7;
 @black: #000;
 @white: #fff;
@@ -34,6 +34,7 @@
 @import "helpers/_utilities";
 @import "blocks/_uploader";
 @import "blocks/_text-withIcon";
+@import "blocks/_list";
 @import "icons/_material-icons";
 @import "icons/_svg-symbols";
 @import "fontello.css";
@@ -62,7 +63,7 @@ body, html{
 
 body {
     font-size: 14px; 
-    line-height: 1.54;
+    line-height: 1.55;
     color: @text-color;
     background-color: @bgColor;
     min-width: @min-width;
@@ -168,6 +169,16 @@ a[class*=" icon-"]:hover:before,{
     margin-right: 5px;
 }
 
+.icon--link{
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover{
+        color: @link-hover;
+        text-decoration: none;
+    }
+}
+
 /* -- LAYOUT STYLES -- */
 .layout{
     position: relative;
@@ -194,66 +205,102 @@ a[class*=" icon-"]:hover:before,{
 .header{
     position: relative;
     box-sizing: border-box;
-    padding-top: 12px;
-    padding-bottom: 12px;    
-    background-color: @darkBlue;
-    color: @white;
+    padding: 16px 16px 18px 0;
+    background-color: @lightBlue;
     z-index: 10;
-    overflow: hidden;
-    line-height: 1.3;
-    font-size: 14px;
+    line-height: 1.5;
+    font-size: 15px;
+    font-family: 'lato', 'Roboto', Arial, sans-serif;
+    border-bottom: 1px solid #d3e3f2;
 
     a{
         text-decoration: none;
-        color: @lightBlue;
+        color: @blue;
         
         &:hover{
-            color: @white;
+            color: #000;
             
             .icon-logout:before{
-                color: @yellow;
+                color: #000;
             }
         }
     }
     
     .icon-logout:before{
-        color: @lightBlue;
+        color: @blue;
     }
     
     .header__title {
         display: table;
-        color: @white;
+        color: @blue;
         vertical-align: top;
+        font-weight: bold;
+        min-height: 36px;
+        margin-top: -8px;
+        margin-bottom: -8px;
         
         &:hover{
-            color: @white;
+            color: @blue;
         }
     }
 }
     
-    .header__right{
-        float: right;
-        width: 60%;
-        text-align: right;
+    .header-nav{
+        margin: 0;
+        list-style-type: none;
+        padding: 0;
+        position: absolute;
+        right: 16px;
+        top: 0;
+        bottom: 0;
+        font-weight: bold;
+        margin-top: auto;
+        margin-bottom: auto;
+        height: 36px;
+
+        &__item{
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 14px;
+            margin-top: auto;
+            height: 36px;
+            line-height: 34px;
+            margin-bottom: auto;
+
+            & > .material-icons{
+                display: inline;
+                color: @blue;
+                line-height:inherit;
+
+                &:hover{
+                    color: #000;
+                }
+            }
+        }
     }
 
     .header__left{
-        float: left;
-        width: 40%;
-        max-width: 500px;
+        padding-right: 250px;
     }
         .header__title__logo{
             display: table-cell;
-            vertical-align: top;
+            vertical-align: middle;
+            border-right: 1px solid #b4d0ea;
+            min-width: 55px;
+            padding: 6px 16px;
+            box-sizing: border-box;
         }
             .logo__pic{
                 display: block;
-                margin: -5px 15px -5px -15px;                
+                margin: auto;
             }
 
         .header__title__inner{
             display: table-cell;
-            vertical-align: top;
+            vertical-align: middle;
+            padding-left: 16px;
+            padding-top: 4px;
+            padding-bottom: 4px;
         }
     
 
@@ -308,7 +355,7 @@ a[class*=" icon-"]:hover:before,{
         
         &.user{
             .icon-user:before{
-                color: @white;
+                color: @blue;
             }
         }
     }    
@@ -853,5 +900,16 @@ textarea {
             .transform(rotate(-180deg));
         }
     }
+
+.overlay{
+    display: none;
+    position: fixed;
+    z-index: 500;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,.6);
+}
 
 @import "override-claro";
