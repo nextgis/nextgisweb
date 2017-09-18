@@ -306,7 +306,7 @@ define([
                 function () {
                     widget.printMapPanel = new PrintMapPanel({
                         region: 'left',
-                        splitter: true,
+                        splitter: false,
                         title: i18n.gettext("Print map"),
                         isOpen: widget.activeLeftPanel == "printMapPanel",
                         class: "dynamic-panel--fullwidth",

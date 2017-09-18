@@ -141,6 +141,12 @@ define([
                 var node = domConstruct.toDom('<div id="' + this.printElementId + '"><div class="map-container map"></div></div>');
                 this.printElement = domConstruct.place(node, document.body, 'last');
                 this.printElementMap = query('div.map-container', this.printElement)[0];
+                this.printElement.style.top = 244 + document.getElementById("header").offsetHeight + 'px';
+
+                on(window, "resize", lang.hitch(this, function(){
+                    console.log("resize");
+                    this.printElement.style.top = 244 + document.getElementById("header").offsetHeight + 'px';
+                }));
             } else {
                 domConstruct.empty(query('div.map-container', this.printElement)[0]);
                 domClass.remove(printElement, 'inactive');

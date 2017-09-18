@@ -23,7 +23,7 @@
     right: 20px;
     margin: 0 auto;
     max-width: calc(100% - 96px);
-    z-index: 999;
+    z-index: 400;
     overflow: auto;
     -webkit-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
     -moz-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
