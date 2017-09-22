@@ -4,12 +4,10 @@ define([
     "dojo/_base/lang",
     "ngw-pyramid/form/PickerBox",
     "./ResourcePicker"
-], function (
-    declare,
-    lang,
-    PickerBox,
-    ResourcePicker
-) {
+], function (declare,
+             lang,
+             PickerBox,
+             ResourcePicker) {
     return declare([PickerBox], {
         buildRendering: function () {
             this.inherited(arguments);
@@ -18,7 +16,8 @@ define([
         },
 
         getLabel: function (value) {
-            if (value === null) { return ""; }
+            if (value === null) return "";
+
             return this.store.get(value.id).then(function (data) {
                 return data.display_name;
             });
@@ -28,6 +27,9 @@ define([
             this.inherited(arguments);
             this.picker.pick().then(lang.hitch(this, function (itm) {
                 this.set("value", {id: itm.id});
+                this.emit("picked", {
+                    resource: itm
+                });
             }));
         }
     });
