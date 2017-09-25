@@ -6,6 +6,7 @@ define([
     "dijit/Dialog",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
+    "dojox/collections/Set",
     "./Tree",
     "ngw-pyramid/i18n!resource"
 ], function (
@@ -16,6 +17,7 @@ define([
     Dialog,
     Button,
     BorderContainer,
+    set,
     Tree,
     i18n
 ) {
@@ -63,6 +65,8 @@ define([
         checkItemAcceptance: function (itm) {
             if (itm === undefined || itm === null) { return false; }
             if (this.interface !== undefined && itm.interfaces.indexOf(this.interface) == -1) { return false; }
+            if (this.interfaces !== undefined &&
+                (set.intersection(itm.interfaces, this.interfaces).count == 0)) { return false; }
             if (this.cls !== undefined && itm.cls != this.cls) { return false; }
 
             return true;
