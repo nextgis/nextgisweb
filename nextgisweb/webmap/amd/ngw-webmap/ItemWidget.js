@@ -8,6 +8,8 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dojo/data/ItemFileWriteStore",
+    "dojo/data/ObjectStore",
+    "dojo/store/Memory",
     "dijit/tree/TreeStoreModel",
     "dijit/Tree",
     "dijit/tree/dndSource",
@@ -43,6 +45,8 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     ItemFileWriteStore,
+    ObjectStore,
+    Memory,
     TreeStoreModel,
     Tree,
     dndSource,
@@ -88,17 +92,24 @@ define([
                 },
                 betweenThreshold: 5
             });
+
+            this.adaptersStore = new ObjectStore({
+                objectStore: new Memory({
+                    data: array.map(Object.keys(settings.adapters), function (key) {
+                        return {
+                            id: key,
+                            label: i18n.gettext(settings.adapters[key].display_name)
+                        };
+                    })
+                })
+            });
         },
 
         postCreate: function () {
             this.inherited(arguments);
 
-            array.forEach(Object.keys(settings.adapters), function (key) {
-                this.wLayerAdapter.addOption({
-                    value: key,
-                    label: i18n.gettext(settings.adapters[key].display_name)
-                });
-            }, this);
+            // Список адаптеров
+            this.wLayerAdapter.set("store", this.adaptersStore);
 
             // Создать дерево без model не получается, поэтому создаем его вручную
             this.widgetTree.placeAt(this.containerTree).startup();
