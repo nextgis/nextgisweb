@@ -274,6 +274,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                     datatype = None
                     if row['data_type'] == 'integer':
                         datatype = FIELD_TYPE.INTEGER
+                    elif row['data_type'] == 'bigint':
+                        datatype = FIELD_TYPE.BIGINT
                     elif row['data_type'] == 'double precision':
                         datatype = FIELD_TYPE.REAL
                     elif row['data_type'] == 'character varying':
