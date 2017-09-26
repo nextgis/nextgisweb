@@ -59,7 +59,8 @@ define([
                 style: "margin-right: 1ex;"
             }).placeAt(this);
 
-            if (this.datatype == "INTEGER") {
+            if ((this.datatype == "INTEGER") ||
+                (this.datatype == "BIGINT")) {
                 this.children = [
                     (new NumberTextBox({
                         constraints: {fractional: false},
