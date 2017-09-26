@@ -11,8 +11,9 @@ class TrString(unicode):
         if isinstance(msgid, self.__class__):
             domain = domain or msgid.domain and msgid.domain[:]
             context = context or msgid.context and msgid.context[:]
-            modarg = modarg or msgid.modarg and msgid.modarg[:]
             fmtarg = fmtarg or msgid.fmtarg and msgid.fmtarg[:]
+            modarg = (modarg if modarg is not None else msgid.modarg
+                      and msgid.modarg[:])
 
         self.domain = domain
         self.context = context
