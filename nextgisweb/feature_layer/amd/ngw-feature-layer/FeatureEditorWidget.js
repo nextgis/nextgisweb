@@ -128,7 +128,8 @@ define([
             this._set("value", value);
             this.nullbox.set("checked", value !== null);
 
-            if (this.datatype == "INTEGER" || this.datatype == "REAL") {
+            if (this.datatype == "INTEGER" || this.datatype == "BIGINT" ||
+                this.datatype == "REAL") {
                 this.children[0].set("value", value === null ? 0 : value);
             } else if (this.datatype == "STRING") {
                 this.children[0].set("value", value === null ? "" : value);
@@ -146,9 +147,7 @@ define([
         _getValueAttr: function () {
             if (this.nullbox.get("checked") === false) { return null; }
 
-            if (this.datatype == "INTEGER" || this.datatype == "REAL" || this.datatype == "STRING") {
-                return this.children[0].get("value");
-            } else if (this.datatype == "DATE") {
+            if (this.datatype == "DATE") {
                 var v = this.children[0].get("value");
                 return {
                     year: v.getFullYear(),
@@ -170,6 +169,8 @@ define([
                     hour: t.getHours(),
                     minute: t.getMinutes(),
                     second: t.getSeconds() };
+            } else {
+                return this.children[0].get("value");
             }
         }
     });
