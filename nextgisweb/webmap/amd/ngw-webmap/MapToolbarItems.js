@@ -1,13 +1,9 @@
 define([
     'dojo/_base/declare',
-    'dojo/_base/array',
     'dojo/_base/lang',
-    'dojo/store/JsonRest',
-    'dojo/request/xhr',
     'dojo/dom-style',
     'dojo/on',
     'dijit/_WidgetBase',
-    'dijit/MenuItem',
     'dijit/form/ToggleButton',
     './controls/ToggleControl',
     'ngw/route',
@@ -16,59 +12,14 @@ define([
     'ngw-webmap/MapStatesObserver',
     'dijit/ToolbarSeparator',
     'dijit/form/DropDownButton'
-], function (declare, array, lang, JsonRest, xhr, domStyle, on,
-             _WidgetBase, MenuItem, ToggleButton, ToggleControl,route, i18n, hbsI18n, MapStatesObserver,
+], function (declare, lang, domStyle, on,
+             _WidgetBase, ToggleButton, ToggleControl,route, i18n, hbsI18n, MapStatesObserver,
              ToolbarSeparator) {
     return declare([_WidgetBase], {
 
         constructor: function (options) {
             this.display = options.display;
             this.mapStates = MapStatesObserver.getInstance();
-        },
-
-        loadBookmarks: function () {
-            var bookmarkId = this.display.config.bookmarkLayerId,
-                store;
-
-            if (!bookmarkId) {
-                domStyle.set(this.bookmarkButton.domNode, 'display', 'none');
-                return false;
-            }
-
-            store = new JsonRest({
-                target: route.feature_layer.store({
-                    id: this.display.config.bookmarkLayerId
-                })
-            });
-
-            store.query().then(lang.hitch(this, this._buildBookmarksMenuItems));
-
-        },
-
-        _buildBookmarksMenuItems: function (features) {
-            array.forEach(features, function (feature) {
-                this.bookmarkMenu.addChild(new MenuItem({
-                    label: feature.label,
-                    onClick: lang.hitch(this, function () {
-                        this._bookmarkClickMenuItemHandler(feature.id);
-                    })
-                }));
-            }, this);
-        },
-
-        _bookmarkClickMenuItemHandler: function (featureId) {
-            var feature = route.feature_layer.store.item({
-                id: this.display.config.bookmarkLayerId,
-                feature_id: featureId
-            });
-
-            xhr.get(feature, {
-                handleAs: "json",
-                headers: {"X-Feature-Box": true}
-            }).then(lang.hitch(this, function (featureData) {
-                    this.display.map.olMap.getView().fit(featureData.box);
-                }
-            ));
         },
 
         addTool: function (tool, state) {

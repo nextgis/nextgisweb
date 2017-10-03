@@ -46,6 +46,7 @@ define([
     "ngw-webmap/ui/LayersPanel/LayersPanel",
     "ngw-webmap/ui/PrintMapPanel/PrintMapPanel",
     "ngw-webmap/ui/SearchPanel/SearchPanel",
+    "ngw-webmap/ui/BookmarkPanel/BookmarkPanel",
     "./tool/Swipe",
     // settings
     "ngw/settings!webmap",
@@ -102,7 +103,7 @@ define([
     MapToolbar,
     InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure,
     NavigationMenu,
-    LayersPanel, PrintMapPanel, SearchPanel,
+    LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel,
     ToolSwipe,
     clientSettings,
     //template
@@ -197,7 +198,23 @@ define([
 
         // Активная левая панель
         activeLeftPanel: 'layersPanel',
-
+        navigationMenuItems: [
+            {
+                name: 'layers',
+                icon: 'layers',
+                value: 'layersPanel'
+            },
+            {
+                name: 'search',
+                icon: 'search',
+                value: 'searchPanel'
+            },
+            {
+                name: 'print',
+                icon: 'print',
+                value: 'printMapPanel'
+            }
+        ],
         constructor: function (options) {
             declare.safeMixin(this, options);
 
@@ -344,16 +361,34 @@ define([
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Загружаем закладки, когда кнопка будет готова
-            /*this._postCreateDeferred.then(
-                function () {
-                    tool widget.mapToolbar.items.loadBookmarks();
-                    widget.mapToolbar = new MapToolbar({
-                        region:'top',
-                        display: widget
-                    });
-                }
-            ).then(undefined, function (err) { console.error(err); });*/
+            // Панель закладок
+            if (this.config.bookmarkLayerId) {
+                this.navigationMenuItems.splice(2,0, { name: 'bookmark', icon: 'bookmark', value: 'bookmarkPanel'});
+
+                all([widget._layersDeferred, widget._postCreateDeferred]).then(
+                    function () {
+                        widget.bookmarkPanel = new BookmarkPanel({
+                            region: 'left',
+                            class: "dynamic-panel--fullwidth",
+                            title: i18n.gettext("Bookmarks"),
+                            isOpen: widget.activeLeftPanel == "bookmarkPanel",
+                            gutters: false,
+                            withCloser: false,
+                            display: widget,
+                            bookmarkLayerId: widget.config.bookmarkLayerId
+                        });
+
+                        if (widget.activeLeftPanel == "bookmarkPanel")
+                            widget.activatePanel(widget.bookmarkPanel);
+
+                        widget.bookmarkPanel.on("closed", function () {
+                            widget.navigationMenu.reset();
+                        });
+                    }
+                ).then(undefined, function (err) {
+                    console.error(err);
+                });
+            }
 
             // Карта
             all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
@@ -808,23 +843,7 @@ define([
 
             this.navigationMenu = new NavigationMenu({
                 value: this.activeLeftPanel,
-                items: [
-                    {
-                        name: 'layers',
-                        icon: 'layers',
-                        value: 'layersPanel'
-                    },
-                    {
-                        name: 'search',
-                        icon: 'search',
-                        value: 'searchPanel'
-                    },
-                    {
-                        name: 'print',
-                        icon: 'print',
-                        value: 'printMapPanel'
-                    }
-                ],
+                items: this.navigationMenuItems,
                 region: 'left'
             }).placeAt(this.navigationMenuPane);
 
