@@ -208,3 +208,13 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
     line-height: 1;
     z-index: 1000;
 }
+
+/* leftPanelPane */
+
+.leftPanelPane{
+    width: 350px;
+}
+
+.leftPanelPane--fullwidth {
+    width: calc(100% - 56px) !important;
+}

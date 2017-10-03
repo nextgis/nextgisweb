@@ -73,6 +73,7 @@ define([
         printElementMap: null,
         printMap: null,
         printCssElement: null,
+        isFullWidth: true,
         constructor: function (options) {
             declare.safeMixin(this,options);
 

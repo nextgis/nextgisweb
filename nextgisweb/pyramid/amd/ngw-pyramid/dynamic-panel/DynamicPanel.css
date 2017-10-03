@@ -7,7 +7,7 @@
 }
     .dynamic-panel--fullwidth,
     .claro .dynamic-panel--fullwidth{
-        width: calc(100% - 56px);
+        width: 100%;
     }
 
     .dynamic-panel__title{
@@ -32,6 +32,7 @@
         left:0;
         width: 100%;
         box-sizing: border-box;
+        overflow: auto;
     }
 
     .dynamic-panel__closer{
@@ -42,7 +43,27 @@
         cursor: pointer;
     }
 
-.dynamic-panel--notitle .dynamic-panel__title{
+    .dynamic-panel__loader{
+        display: none;
+        position: absolute;
+        top: 40px;
+        bottom:0;
+        width: 100%;
+        background-color: rgba(255,255,255,.68);
+    }
+
+    .dynamic-panel__loader svg{
+        width: 48px;
+        height: 48px;
+        position: absolute;
+        top:0;
+        bottom:0;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+
+.dynamic-panel--notitle > .dynamic-panel__title{
     display: none;
 }
 

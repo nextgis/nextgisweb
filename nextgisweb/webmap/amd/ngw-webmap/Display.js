@@ -13,6 +13,7 @@ define([
     "dojo/aspect",
     "dojo/io-query",
     "dojo/dom-construct",
+    "dojo/dom-class",
     "openlayers/ol",
     "ngw/openlayers/Map",
     "ngw/openlayers/layer/Vector",
@@ -44,6 +45,7 @@ define([
     "ngw-pyramid/navigation-menu/NavigationMenu",
     "ngw-webmap/ui/LayersPanel/LayersPanel",
     "ngw-webmap/ui/PrintMapPanel/PrintMapPanel",
+    "ngw-webmap/ui/SearchPanel/SearchPanel",
     "./tool/Swipe",
     // settings
     "ngw/settings!webmap",
@@ -76,6 +78,7 @@ define([
     aspect,
     ioQuery,
     domConstruct,
+    domClass,
     ol,
     Map,
     Vector,
@@ -97,16 +100,13 @@ define([
     i18n,
     hbsI18n,
     MapToolbar,
-    InitialExtent,
-    InfoScale,
-    ToolBase,
-    ToolZoom,
-    ToolMeasure,
+    InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure,
     NavigationMenu,
-    LayersPanel,
-    PrintMapPanel,
+    LayersPanel, PrintMapPanel, SearchPanel,
     ToolSwipe,
-    clientSettings
+    clientSettings,
+    //template
+    TabContainer, BorderContainer
 ) {
 
     var CustomItemFileWriteStore = declare([ItemFileWriteStore], {
@@ -323,6 +323,27 @@ define([
                 }
             ).then(undefined, function (err) { console.error(err); });
 
+            // Панель поиска
+            all([widget._layersDeferred, widget._postCreateDeferred]).then(
+                function () {
+                    widget.searchPanel = new SearchPanel({
+                        region: 'left',
+                        class: "dynamic-panel--fullwidth",
+                        isOpen: widget.activeLeftPanel == "searchPanel",
+                        gutters: false,
+                        withCloser: false,
+                        display: widget
+                    });
+
+                    if (widget.activeLeftPanel == "searchPanel")
+                        widget.activatePanel(widget.searchPanel);
+
+                    widget.searchPanel.on("closed", function(){
+                        widget.navigationMenu.reset();
+                    });
+                }
+            ).then(undefined, function (err) { console.error(err); });
+
             // Загружаем закладки, когда кнопка будет готова
             /*this._postCreateDeferred.then(
                 function () {
@@ -423,7 +444,15 @@ define([
             });
 
             // Левое меню
-            this._navigationMenuSetup()
+            this._navigationMenuSetup();
+
+            // Контейнер для левой панели
+            this.leftPanelPane = new BorderContainer({
+                class: "leftPanelPane",
+                region: "left",
+                gutters: false,
+                splitter: true
+            });
 
             this._postCreateDeferred.resolve();
         },
@@ -786,6 +815,11 @@ define([
                         value: 'layersPanel'
                     },
                     {
+                        name: 'search',
+                        icon: 'search',
+                        value: 'searchPanel'
+                    },
+                    {
                         name: 'print',
                         icon: 'print',
                         value: 'printMapPanel'
@@ -830,7 +864,7 @@ define([
                 function () {
                     widget.layersPanel = new LayersPanel({
                         region: 'left',
-                        splitter: true,
+                        class: "dynamic-panel--fullwidth",
                         title: i18n.gettext("Layers"),
                         isOpen: widget.activeLeftPanel == "layersPanel",
                         gutters: false,
@@ -935,11 +969,25 @@ define([
         },
         activatePanel(panel){
             panel.show();
-            this.mainContainer.addChild(panel);
+
+            if (panel.isFullWidth){
+                domClass.add(this.leftPanelPane.domNode,  "leftPanelPane--fullwidth");
+                this.leftPanelPane.set("splitter", false);
+            }
+
+            this.leftPanelPane.addChild(panel);
+            this.mainContainer.addChild(this.leftPanelPane);
         },
         deactivatePanel(panel){
-            this.mainContainer.removeChild(panel);
-            if (panel.isOpen) panel.hide();
+            this.mainContainer.removeChild(this.leftPanelPane);
+            this.leftPanelPane.removeChild(panel);
+            if (panel.isFullWidth){
+                domClass.remove(this.leftPanelPane.domNode,  "leftPanelPane--fullwidth");
+                this.leftPanelPane.set("splitter", true);
+            }
+            if (panel.isOpen) {
+                panel.hide();
+            }
         }
     });
 });

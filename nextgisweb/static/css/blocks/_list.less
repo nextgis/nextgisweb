@@ -12,16 +12,23 @@
     white-space: nowrap;
     color: @text-color;
     text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     a{
       color: @text-color;
       text-decoration: none;
     }
 
-    &:hover{
+    &:hover,
+    &:focus{
       background-color: rgba(0,0,0,.04);
       color: @text-color;
       text-decoration: none;
+    }
+
+    &--link{
+      cursor: pointer;
     }
   }
 
@@ -33,6 +40,16 @@
     .list__item{
       height: 32px;
       line-height:32px;
+    }
+  }
+
+  &--multirow{
+    .list__item{
+      height: auto;
+      line-height: inherit;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      white-space: normal;
     }
   }
 }
