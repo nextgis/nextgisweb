@@ -2,7 +2,7 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
 
 .webmap-wrapper{
     position: fixed;
-    top: 43px;
+    top: 55px;
     bottom: 0px;
     width: 100%;
 }
