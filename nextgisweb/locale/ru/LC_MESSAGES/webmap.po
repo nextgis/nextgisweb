@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-07-10 15:55+0700\n"
+"POT-Creation-Date: 2017-10-03 16:32+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.4.0\n"
 
 #: __init__.py:43
 msgid "Main web map"
@@ -39,42 +39,48 @@ msgstr "Веб-карта"
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:543
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:570
-msgid "Reset rotation"
-msgstr "Отменить поворот"
+#: amd/ngw-webmap/Display.js:327
+#: amd/ngw-webmap/ui/PrintButton/PrintButton.js:11
+#: amd/ngw-webmap/ui/PrintMap/PrintMap.js:36
+msgid "Print map"
+msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:546 amd/ngw-webmap/tool/Zoom.js:18
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:573
+#: amd/ngw-webmap/Display.js:373
+msgid "Bookmarks"
+msgstr "Закладки"
+
+#: amd/ngw-webmap/Display.js:610 amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:574
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:547 amd/ngw-webmap/tool/Zoom.js:21
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:574
+#: amd/ngw-webmap/Display.js:611 amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:575
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:550
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:577
+#: amd/ngw-webmap/Display.js:615
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:579
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:613 amd/ngw-webmap/template/MapToolbarItems.hbs:22
-msgid "Hide layers"
-msgstr "Скрыть дерево слоёв"
+#: amd/ngw-webmap/Display.js:630
+msgid "Initial extent"
+msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:618
-msgid "Show layers"
-msgstr "Показать дерево слоёв"
+#: amd/ngw-webmap/Display.js:633
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:588
+msgid "Reset rotation"
+msgstr "Отменить поворот"
+
+#: amd/ngw-webmap/Display.js:887 amd/ngw-webmap/ItemWidget.js:58
+#: amd/ngw-webmap/ui/NgwShareButtons/NgwShareButtons.js:20
+msgid "Layers"
+msgstr "Слои"
 
 #: amd/ngw-webmap/ExtentWidget.js:33
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
-
-#: amd/ngw-webmap/ItemWidget.js:58
-#: amd/ngw-webmap/ui/NgwShareButtons/NgwShareButtons.js:20
-msgid "Layers"
-msgstr "Слои"
 
 #: amd/ngw-webmap/ItemWidget.js:112 amd/ngw-webmap/template/ItemWidget.hbs:26
 msgid "Add group"
@@ -108,30 +114,13 @@ msgstr "Код для встраивания"
 msgid "Preview"
 msgstr "Протестировать"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:66
+#: amd/ngw-webmap/plugin/FeatureLayer.js:65
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:115
+#: amd/ngw-webmap/plugin/FeatureLayer.js:114
 msgid "Feature table"
 msgstr "Таблица объектов"
-
-#: amd/ngw-webmap/plugin/FeatureLayer.js:140
-msgid "Search..."
-msgstr "Поиск..."
-
-#: amd/ngw-webmap/plugin/FeatureLayer.js:261
-msgid "Searching..."
-msgstr "Идет поиск..."
-
-#: amd/ngw-webmap/plugin/FeatureLayer.js:294
-#: amd/ngw-webmap/plugin/FeatureLayer.js:355
-msgid "Refine search criterion"
-msgstr "Уточните критерий поиска"
-
-#: amd/ngw-webmap/plugin/FeatureLayer.js:369
-msgid "Not found"
-msgstr "Не найдено"
 
 #: amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
@@ -145,14 +134,10 @@ msgstr "Увеличить до слоя"
 msgid "Map"
 msgstr "Карта"
 
-#: amd/ngw-webmap/template/Display.hbs:43
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.hbs:15
+#: amd/ngw-webmap/template/Display.hbs:45
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.hbs:24
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Сделайте свою Веб ГИС на nextgis.com"
-
-#: amd/ngw-webmap/template/Display.hbs:70
-msgid "Layer"
-msgstr "Слой"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:10
 msgid "Left, deg."
@@ -215,26 +200,6 @@ msgstr "Адаптер"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:5
-msgid "Bookmarks"
-msgstr "Закладки"
-
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:17
-msgid "Initial extent"
-msgstr "Начальный охват"
-
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:32
-msgid "Longitude"
-msgstr "Долгота"
-
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:35
-msgid "Latitude"
-msgstr "Широта"
-
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:38
-msgid "Scale"
-msgstr "Масштаб"
-
 #: amd/ngw-webmap/tool/Identify.js:201
 msgid "Attributes"
 msgstr "Атрибуты"
@@ -251,15 +216,15 @@ msgstr "Идентификация"
 msgid "Features"
 msgstr "Объектов"
 
-#: amd/ngw-webmap/tool/Measure.js:22
+#: amd/ngw-webmap/tool/Measure.js:24
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
-#: amd/ngw-webmap/tool/Measure.js:25
+#: amd/ngw-webmap/tool/Measure.js:29
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:143
+#: amd/ngw-webmap/tool/Measure.js:156
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
@@ -275,83 +240,133 @@ msgstr "Вертикальная шторка"
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
-#: amd/ngw-webmap/ui/LinkToMainMap/LinkToMainMap.js:18
-msgid "Open full map"
-msgstr "Открыть карту целиком"
-
-#: amd/ngw-webmap/ui/PrintButton/PrintButton.js:11
-#: amd/ngw-webmap/ui/PrintMap/PrintMap.js:36
-msgid "Print map"
-msgstr "Распечатать карту"
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Слой"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:9
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:9
 msgid "Paper format"
 msgstr "Формат бумаги"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:12
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:12
 msgid "Select format"
 msgstr "Выберите формат"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:13
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:13
 msgid "A4 - Portrait"
 msgstr "A4 - Портретный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:14
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:14
 msgid "A4 - Landscape"
 msgstr "A4 - Альбомный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:15
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:15
 msgid "A3 - Portrait"
 msgstr "A3 - Портретный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:16
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:16
 msgid "A3 - Landscape"
 msgstr "A3 - Альбомный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:17
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:17
 msgid "A2 - Portrait"
 msgstr "A2 - Портретный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:18
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:18
 msgid "A2 - Landscape"
 msgstr "A2 - Альбомный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:19
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:19
 msgid "A1 - Portrait"
 msgstr "A1 - Портретный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:20
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:20
 msgid "A1 - Landscape"
 msgstr "A1 - Альбомный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:21
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:21
 msgid "A0 - Portrait"
 msgstr "A0 - Портретный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:22
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:22
 msgid "A0 - Landscape"
 msgstr "A0 - Альбомный"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:28
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:28
 msgid "Height, mm"
 msgstr "Высота, мм"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:38
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:38
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:48
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:48
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:59
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:60
 msgid "Print"
 msgstr "Печать"
 
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.hbs:64
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:66
 msgid "Cancel"
 msgstr "Отменить"
 
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.hbs:7
+msgid "Search on the map"
+msgstr "Поиск по карте"
+
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:146
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:204
+msgid "Refine search criterion"
+msgstr "Уточните критерий поиска"
+
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:219
+msgid "Not found"
+msgstr "Не найдено"
+
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:605
+msgid "Open full map"
+msgstr "Открыть карту целиком"
+
 #~ msgid "Zoom to layer extent"
 #~ msgstr "Увеличить до слоя"
+
+#~ msgid "Hide layers"
+#~ msgstr "Скрыть дерево слоёв"
+
+#~ msgid "Show layers"
+#~ msgstr "Показать дерево слоёв"
+
+#~ msgid "Search..."
+#~ msgstr "Поиск..."
+
+#~ msgid "Searching..."
+#~ msgstr "Идет поиск..."
+
+#~ msgid "Longitude"
+#~ msgstr "Долгота"
+
+#~ msgid "Latitude"
+#~ msgstr "Широта"
+
+#~ msgid "Scale"
+#~ msgstr "Масштаб"
 
