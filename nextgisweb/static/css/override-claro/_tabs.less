@@ -1,9 +1,4 @@
 .nextgis.claro{
-	.dijitTabContainer{
-		/* compensate dijitTab's 1px offset */
-		top: -1px; 
-	}
-
 	.dijitTabPaneWrapper,
 	.dijitTabContainerTop-tabs, 
 	.dijitTabContainerBottom-tabs, 
@@ -49,6 +44,8 @@
 	.dijitTabContainerTop-tabs{
 		.dijitTab{
 			border-top: 3px solid transparent;
+			top: 0;
+			margin-bottom: -1px;
 		}
 
 		.dijitTabChecked{

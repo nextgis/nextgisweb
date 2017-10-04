@@ -1323,10 +1323,6 @@ textarea {
 .nextgis.claro .dijitTextBoxFocused {
   border-color: #ffce76;
 }
-.nextgis.claro .dijitTabContainer {
-  /* compensate dijitTab's 1px offset */
-  top: -1px;
-}
 .nextgis.claro .dijitTabPaneWrapper,
 .nextgis.claro .dijitTabContainerTop-tabs,
 .nextgis.claro .dijitTabContainerBottom-tabs,
@@ -1391,6 +1387,8 @@ textarea {
 }
 .nextgis.claro .dijitTabContainerTop-tabs .dijitTab {
   border-top: 3px solid transparent;
+  top: 0;
+  margin-bottom: -1px;
 }
 .nextgis.claro .dijitTabContainerTop-tabs .dijitTabChecked {
   border-top-color: #0070c5;
