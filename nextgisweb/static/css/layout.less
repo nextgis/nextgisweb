@@ -24,7 +24,7 @@
 @link-hover: #2196F3;
 
 @base-font: "Roboto";
-@header-font:  "Roboto Condensed";
+@header-font:  "lato";
 
 @font-size-md: 16px;
 
@@ -32,6 +32,7 @@
 
 @import "helpers/_mixin";
 @import "helpers/_utilities";
+@import "blocks/_typography";
 @import "blocks/_uploader";
 @import "blocks/_text-withIcon";
 @import "blocks/_list";
@@ -78,36 +79,6 @@ a{
         border-color: @link-hover;
         border-color: fade(@link-hover, 40%);
     }
-
-h1, h2, h3,
-.h1, .h2, .h3{
-    font-family: @header-font;
-    font-weight: normal;
-    line-height: 1.1;
-}
-
-h1, .h1{
-    font-size: 28px;
-    color: @black;
-}
-
-h2, .h2{
-    font-size: 20px;
-    color: @text-color;
-    border-bottom:0;
-    margin-top: 35px;
-    padding-bottom:0;
-    margin-bottom: 18px;
-    
-    &:first-child{
-        margin-top:0;
-    }
-}
-
-.text-muted{
-    color: #bbb;
-    color: rgba(0,0,0,.4);
-}
 
 .list-unstyled{
     margin:0;
@@ -187,11 +158,10 @@ a[class*=" icon-"]:hover:before,{
     min-width: 900px;
 }
     .title{
-        padding: 45px 0 25px;
+        padding: 40px 0 16px;
         
          h1, h2, h3 {
             margin: 0;
-            font-weight: normal;
             vertical-align: middle; 
         }
     }
@@ -614,14 +584,9 @@ table{
         padding: 30px 24px;
     }
         .sidebar-menu__heading{
-            font-size: 13px;
             line-height: 1.25;
-            color: @text-color;
             border-bottom: 1px solid rgba(39,85,119,0.12);
-            margin-bottom: .75em;
-            margin-top: 1.875em;
-            letter-spacing: .8px;        
-            text-transform: uppercase;
+            margin-bottom: 8px;
             padding-bottom: 6px;
             
             &:first-child{
