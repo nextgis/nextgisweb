@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-10-03 16:32+0300\n"
+"POT-Creation-Date: 2017-10-06 17:12+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -39,41 +39,45 @@ msgstr "Веб-карта"
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:327
+#: amd/ngw-webmap/Display.js:333
 #: amd/ngw-webmap/ui/PrintButton/PrintButton.js:11
 #: amd/ngw-webmap/ui/PrintMap/PrintMap.js:36
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:373
+#: amd/ngw-webmap/Display.js:379
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:610 amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/Display.js:406
+msgid "Share"
+msgstr "Поделиться"
+
+#: amd/ngw-webmap/Display.js:654 amd/ngw-webmap/tool/Zoom.js:18
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:574
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:611 amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/Display.js:655 amd/ngw-webmap/tool/Zoom.js:21
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:575
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:615
+#: amd/ngw-webmap/Display.js:659
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:579
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:630
+#: amd/ngw-webmap/Display.js:674
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:633
+#: amd/ngw-webmap/Display.js:677
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:588
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:887 amd/ngw-webmap/ItemWidget.js:58
+#: amd/ngw-webmap/Display.js:931 amd/ngw-webmap/ItemWidget.js:58
 #: amd/ngw-webmap/ui/NgwShareButtons/NgwShareButtons.js:20
 msgid "Layers"
 msgstr "Слои"
@@ -103,6 +107,7 @@ msgid "Height"
 msgstr "Высота"
 
 #: amd/ngw-webmap/ShareEmbeddedMapDialog.js:106
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:42
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
@@ -111,8 +116,9 @@ msgid "HTML code"
 msgstr "Код для встраивания"
 
 #: amd/ngw-webmap/ShareEmbeddedMapDialog.js:145
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:60
 msgid "Preview"
-msgstr "Протестировать"
+msgstr "Прeдпросмотр"
 
 #: amd/ngw-webmap/plugin/FeatureLayer.js:65
 msgid "Go to"
@@ -341,6 +347,18 @@ msgstr "Уточните критерий поиска"
 #: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:219
 msgid "Not found"
 msgstr "Не найдено"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:2
+msgid "Map link"
+msgstr "Ссылка на карту"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:9
+msgid "Social networks"
+msgstr "Соцсети"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:17
+msgid "Embed code for your site"
+msgstr "Вставить карту на сайт"
 
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:605
 msgid "Open full map"

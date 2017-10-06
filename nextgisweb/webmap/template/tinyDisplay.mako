@@ -9,18 +9,7 @@
         var displayConfig = ${json.dumps(display_config, indent=4).replace('\n', '\n' + (8 * ' ')) | n};
         var mainDisplayUrl = "${request.route_url('webmap.display', id=obj.id)}?${request.query_string | n}";
 
-        require([
-            "dojo/parser",
-            "dojo/ready",
-            "ngw-webmap/Display"
-        ], function (
-            parser,
-            ready
-        ) {
-            ready(function() {
-                parser.parse();
-            });
-        });
+        require(["ngw-webmap/Display"]);
     </script>
 
     <style type="text/css">

@@ -47,6 +47,7 @@ define([
     "ngw-webmap/ui/PrintMapPanel/PrintMapPanel",
     "ngw-webmap/ui/SearchPanel/SearchPanel",
     "ngw-webmap/ui/BookmarkPanel/BookmarkPanel",
+    "ngw-webmap/ui/SharePanel/SharePanel",
     "./tool/Swipe",
     // settings
     "ngw/settings!webmap",
@@ -60,7 +61,6 @@ define([
     "dijit/form/Select",
     "dijit/form/DropDownButton",
     "dijit/ToolbarSeparator",
-    "ngw-webmap/ui/NgwShareButtons/NgwShareButtons",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
     "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css",
@@ -103,7 +103,7 @@ define([
     MapToolbar,
     InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure,
     NavigationMenu,
-    LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel,
+    LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel,
     ToolSwipe,
     clientSettings,
     //template
@@ -208,6 +208,11 @@ define([
                 name: 'search',
                 icon: 'search',
                 value: 'searchPanel'
+            },
+            {
+                name: 'share',
+                icon: 'share',
+                value: 'sharePanel'
             },
             {
                 name: 'print',
@@ -389,6 +394,44 @@ define([
                     console.error(err);
                 });
             }
+
+            // Панель "Поделиться"
+            all([widget._layersDeferred, widget._postCreateDeferred]).then(
+                function () {
+                    var itemStoreListener;
+                    widget.sharePanel = new SharePanel({
+                        region: 'left',
+                        class: "dynamic-panel--fullwidth",
+                        title: i18n.gettext("Share"),
+                        isOpen: widget.activeLeftPanel == "sharePanel",
+                        gutters: false,
+                        withCloser: false,
+                        display: widget
+                    });
+
+                    if (widget.activeLeftPanel == "sharePanel")
+                        widget.activatePanel(widget.sharePanel);
+
+                    widget.sharePanel.on("shown", function () {
+                        widget.map.olMap.getView().on("change", widget.sharePanel.setPermalinkUrl, widget.sharePanel);
+                        widget.map.olMap.getView().on("change", widget.sharePanel.setEmbedCode, widget.sharePanel);
+                        itemStoreListener = widget.itemStore.on("Set", function (item, attr) {
+                            widget.sharePanel.setPermalinkUrl();
+                            widget.sharePanel.setEmbedCode();
+                        });
+                    });
+
+                    widget.sharePanel.on("closed", function () {
+                        widget.navigationMenu.reset();
+                        widget.map.olMap.getView().un("change", widget.sharePanel.setPermalinkUrl, widget.sharePanel);
+                        widget.map.olMap.getView().un("change", widget.sharePanel.setEmbedCode, widget.sharePanel);
+                        itemStoreListener.remove();
+                    });
+
+                }
+            ).then(undefined, function (err) {
+               console.error(err);
+            });
 
             // Карта
             all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
@@ -987,8 +1030,6 @@ define([
             }
         },
         activatePanel(panel){
-            panel.show();
-
             if (panel.isFullWidth){
                 domClass.add(this.leftPanelPane.domNode,  "leftPanelPane--fullwidth");
                 this.leftPanelPane.set("splitter", false);
@@ -996,6 +1037,7 @@ define([
 
             this.leftPanelPane.addChild(panel);
             this.mainContainer.addChild(this.leftPanelPane);
+            panel.show();
         },
         deactivatePanel(panel){
             this.mainContainer.removeChild(this.leftPanelPane);
