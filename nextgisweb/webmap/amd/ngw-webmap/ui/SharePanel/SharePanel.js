@@ -43,6 +43,7 @@ define([
                 gutters: false,
                 previewMapUrl: displayConfig.testEmbeddedMapUrl,
                 url: window.location.href,
+                assetUrl: ngwConfig.assetUrl
             }));
         },
         postCreate: function(){
