@@ -117,6 +117,8 @@ def setup_pyramid(comp, config):
             bookmarkLayerId=obj.bookmark_resource_id,
             tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id),
             testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id),
+            webmapDescription=obj.description,
+            webmapTitle=obj.display_name
         )
 
         return dict(

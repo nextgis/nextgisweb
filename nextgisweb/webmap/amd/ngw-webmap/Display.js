@@ -48,6 +48,7 @@ define([
     "ngw-webmap/ui/SearchPanel/SearchPanel",
     "ngw-webmap/ui/BookmarkPanel/BookmarkPanel",
     "ngw-webmap/ui/SharePanel/SharePanel",
+    "ngw-webmap/ui/InfoPanel/InfoPanel",
     "./tool/Swipe",
     // settings
     "ngw/settings!webmap",
@@ -103,7 +104,7 @@ define([
     MapToolbar,
     InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure,
     NavigationMenu,
-    LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel,
+    LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel, InfoPanel,
     ToolSwipe,
     clientSettings,
     //template
@@ -246,7 +247,7 @@ define([
             this._startupDeferred = new LoggedDeferred("_startupDeferred");
 
             var widget = this;
-
+            
             // Асинхронная загрузка необходимых модулей
             this._midDeferred = {};
             this._mid = {};
@@ -392,6 +393,28 @@ define([
                     }
                 ).then(undefined, function (err) {
                     console.error(err);
+                });
+            }
+
+            // Панель с описанием
+            if (this.config.webmapDescription) {
+                this.navigationMenuItems.splice(2,0, { name: 'info', icon: 'info_outline', value: 'infoPanel'});
+
+                widget.infoPanel = new InfoPanel({
+                    region: 'left',
+                    class: "info-panel dynamic-panel--fullwidth",
+                    withTitle: false,
+                    isOpen: widget.activeLeftPanel == "infoPanel",
+                    gutters: false,
+                    withCloser: false,
+                    description: this.config.webmapDescription
+                });
+
+                if (widget.activeLeftPanel == "infoPanel")
+                    widget.activatePanel(widget.infoPanel);
+
+                widget.infoPanel.on("closed", function () {
+                    widget.navigationMenu.reset();
                 });
             }
 

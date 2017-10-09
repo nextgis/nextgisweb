@@ -1,4 +1,6 @@
-<%! 
+<%page args="title"/>
+
+<%!
     import os
     import re
     from nextgisweb.pyramid.util import _
@@ -6,7 +8,6 @@
 
 <%
     settings = request.env.pyramid.settings
-    system_name = request.env.core.settings_get('core', 'system.full_name')
     has_logo = request.env.core.settings_exists('pyramid', 'logo') or \
         ('logo' in settings and os.path.isfile(settings['logo']))
 %>
@@ -43,7 +44,7 @@
             %endif
             </div>
             <div class="header__title__inner">
-                ${system_name}
+                ${title}
             </div>
         </a>
     </div>
@@ -77,4 +78,3 @@
                           logoutLink: '${request.route_url(logout_route_name)}'
                       %endif
                     "></div>
-
