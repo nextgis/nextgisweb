@@ -1349,6 +1349,34 @@ textarea {
 .nextgis.claro .dgrid-row.dgrid-selected {
   background-color: #fdf8c3;
 }
+.nextgis.claro .dijitSplitterV {
+  margin-left: -5px;
+  background-image: none;
+}
+.nextgis.claro .dijitSplitterH {
+  margin-top: -5px;
+  background-image: none;
+}
+.nextgis.claro .dijitSplitterHHover,
+.nextgis.claro .dijitSplitterVHover,
+.nextgis.claro .dijitSplitterHActive,
+.nextgis.claro .dijitSplitterVActive {
+  background-color: rgba(229, 238, 247, 0.48);
+}
+.nextgis.claro .dijitSplitterHHover .dijitSplitterThumb,
+.nextgis.claro .dijitSplitterVHover .dijitSplitterThumb,
+.nextgis.claro .dijitSplitterHActive .dijitSplitterThumb,
+.nextgis.claro .dijitSplitterVActive .dijitSplitterThumb {
+  background-color: transparent;
+}
+.dj_ios .nextgis.claro .dijitSplitterV,
+.dj_android .nextgis.claro .dijitSplitterV {
+  margin-left: -11px;
+}
+.dj_ios .nextgis.claro .dijitSplitterH,
+.dj_android .nextgis.claro .dijitSplitterH {
+  margin-top: -11px;
+}
 .nextgis.claro .dijitTextBoxHover {
   background-color: #fff;
 }
@@ -1516,8 +1544,8 @@ textarea {
   border: 0;
 }
 .nextgis.claro .dijitTreeRowHover {
-  background-color: #f8f8f8;
+  background-color: rgba(0, 0, 0, 0.04);
 }
 .nextgis.claro .dijitTreeRowSelected {
-  background-color: #fdf8c3;
+  background-color: rgba(0, 0, 0, 0.04);
 }
