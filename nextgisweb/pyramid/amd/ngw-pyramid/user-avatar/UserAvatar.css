@@ -8,9 +8,9 @@
     .user-avatar__label{
         display: inline-block;
         vertical-align: middle;
-        width: 36px;
-        height: 36px;
-        line-height: 36px;
+        width: 34px;
+        height: 34px;
+        line-height: 34px;
         border-radius: 2px;
         color: rgba(255, 255, 255, 0.93);
         background: #076dbf;

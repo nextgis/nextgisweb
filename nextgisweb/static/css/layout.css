@@ -654,7 +654,7 @@ a[class*=" icon-"]:hover:before {
 .header {
   position: relative;
   box-sizing: border-box;
-  padding: 16px 16px 18px 0;
+  padding: 15px 15px 15px 0;
   background-color: #e5eef7;
   z-index: 10;
   line-height: 1.5;
@@ -680,9 +680,9 @@ a[class*=" icon-"]:hover:before {
   color: #076dbf;
   vertical-align: top;
   font-weight: bold;
-  min-height: 36px;
-  margin-top: -8px;
-  margin-bottom: -8px;
+  min-height: 34px;
+  margin-top: -7px;
+  margin-bottom: -7px;
 }
 .header .header__title:hover {
   color: #076dbf;
@@ -698,15 +698,15 @@ a[class*=" icon-"]:hover:before {
   font-weight: bold;
   margin-top: auto;
   margin-bottom: auto;
-  height: 36px;
+  height: 34px;
 }
 .header-nav__item {
   display: inline-block;
   vertical-align: middle;
-  margin-left: 14px;
+  margin-left: 12px;
   margin-top: auto;
-  height: 36px;
-  line-height: 34px;
+  height: 34px;
+  line-height: 32px;
   margin-bottom: auto;
 }
 .header-nav__item > .material-icons {
@@ -724,13 +724,13 @@ a[class*=" icon-"]:hover:before {
   display: table-cell;
   vertical-align: middle;
   border-right: 1px solid #b4d0ea;
-  min-width: 55px;
-  padding: 6px 16px;
+  min-width: 50px;
+  padding: 6px 12px;
   box-sizing: border-box;
 }
 .logo__pic {
   display: block;
-  margin: auto;
+  margin: -6px auto;
 }
 .header__title__inner {
   display: table-cell;
