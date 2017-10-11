@@ -91,10 +91,10 @@ define([
 
             var style = new ol.style.Style({
                 fill: new ol.style.Fill({
-                    color: 'rgba(221, 0, 0, 0.25)'
+                    color: 'rgba(7, 109, 191, .2)'
                 }),
                 stroke: new ol.style.Stroke({
-                    color: '#d00',
+                    color: '#076dbf',
                     width: 2
                 }),
                 image: new ol.style.Circle({
