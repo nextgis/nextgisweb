@@ -1192,11 +1192,13 @@ table {
 }
 .auth-form__btn {
   margin-top: 5px;
-  font-size: 18px;
-  background-color: #036997;
+  font-size: 16px;
+  background-color: #076dbf;
   padding: 0 2.5em;
-  height: 42px;
-  line-height: 42px;
+  height: 43px;
+  line-height: 43px;
+  font-family: "lato_local";
+  border-radius: 21px;
 }
 .auth-form__error {
   padding: 4px;
