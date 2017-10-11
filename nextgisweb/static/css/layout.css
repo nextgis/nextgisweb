@@ -1509,6 +1509,24 @@ textarea {
   background: #ddd;
   color: #999;
 }
+.nextgis.claro .dijitButton--default {
+  margin: 0;
+}
+.nextgis.claro .dijitButton--default .dijitButtonNode {
+  height: 36px;
+  line-height: 30px;
+  font-size: 16px;
+  background-image: none;
+  background-color: #e5eef7;
+  border: 0;
+  color: #076dbf;
+  border-radius: 23px;
+  padding: 0 16px;
+  font-family: "lato_local";
+}
+.nextgis.claro .dijitButton--default .dijitButtonNode .dijitReset {
+  line-height: inherit;
+}
 .nextgis.claro .dijitButton--s .dijitButtonNode {
   height: 32px;
   padding-left: 12px;

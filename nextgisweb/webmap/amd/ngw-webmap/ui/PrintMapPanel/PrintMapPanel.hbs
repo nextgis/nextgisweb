@@ -53,17 +53,20 @@
                    data-dojo-props="constraints:{min:0,max:20000,places:0}"/>
         </div>
         <br/>
-        <button data-dojo-type="dijit/form/Button"
-                data-dojo-attach-point="okButton"
-                data-dojo-props="region: 'top'"
-                style="margin-left: 10px;">
-            {{gettext 'Print'}}
-        </button>
+
         <button data-dojo-type="dijit/form/Button"
                 data-dojo-attach-point="cancelButton"
                 data-dojo-props="region: 'top'"
+                class="dijitButton--default dijitButton--s"
                 style="margin-left: 10px;">
             {{gettext 'Cancel'}}
+        </button>
+        <button data-dojo-type="dijit/form/Button"
+                data-dojo-attach-point="okButton"
+                data-dojo-props="region: 'top'"
+                class="dijitButton--primary dijitButton--s"
+                style="margin-left: 10px;">
+            {{gettext 'Print'}}
         </button>
     </div>
 </div>
