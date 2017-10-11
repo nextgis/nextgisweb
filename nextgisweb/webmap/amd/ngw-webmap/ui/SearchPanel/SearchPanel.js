@@ -245,7 +245,7 @@ define([
             });
             domConstruct.place(resultNode, this.searchResultsList);
         },
-        clearAll(){
+        clearAll: function(){
             this.searchField.value = "";
             this._lastCriteria = "";
             this.clearSearchResults();

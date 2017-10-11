@@ -743,7 +743,7 @@ define([
             this._mapDeferred.resolve();
         },
 
-        _mapAddControls(controls){
+        _mapAddControls: function(controls){
             array.forEach(controls, function(control){
                 this.map.olMap.addControl(control);
             }, this);
@@ -904,7 +904,7 @@ define([
             }, this);
         },
 
-        _navigationMenuSetup(){
+        _navigationMenuSetup: function(){
             var widget = this;
 
             this.navigationMenu = new NavigationMenu({
@@ -1052,7 +1052,7 @@ define([
                 this.map.olMap.getView().fit(this._extent);
             }
         },
-        activatePanel(panel){
+        activatePanel: function(panel){
             if (panel.isFullWidth){
                 domClass.add(this.leftPanelPane.domNode,  "leftPanelPane--fullwidth");
                 this.leftPanelPane.set("splitter", false);
@@ -1062,7 +1062,7 @@ define([
             this.mainContainer.addChild(this.leftPanelPane);
             panel.show();
         },
-        deactivatePanel(panel){
+        deactivatePanel: function(panel){
             this.mainContainer.removeChild(this.leftPanelPane);
             this.leftPanelPane.removeChild(panel);
             if (panel.isFullWidth){
