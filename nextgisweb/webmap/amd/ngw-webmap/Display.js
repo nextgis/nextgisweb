@@ -201,22 +201,22 @@ define([
         activeLeftPanel: 'layersPanel',
         navigationMenuItems: [
             {
-                name: 'layers',
+                title: i18n.gettext('Layers'),
                 icon: 'layers',
                 value: 'layersPanel'
             },
             {
-                name: 'search',
+                title: i18n.gettext('Search on the map'),
                 icon: 'search',
                 value: 'searchPanel'
             },
             {
-                name: 'share',
+                title: i18n.gettext('Share'),
                 icon: 'share',
                 value: 'sharePanel'
             },
             {
-                name: 'print',
+                title: i18n.gettext('Print map'),
                 icon: 'print',
                 value: 'printMapPanel'
             }
@@ -369,7 +369,7 @@ define([
 
             // Панель закладок
             if (this.config.bookmarkLayerId) {
-                this.navigationMenuItems.splice(2,0, { name: 'bookmark', icon: 'bookmark', value: 'bookmarkPanel'});
+                this.navigationMenuItems.splice(2,0, { title: i18n.gettext('Bookmarks'), icon: 'bookmark', value: 'bookmarkPanel'});
 
                 all([widget._layersDeferred, widget._postCreateDeferred]).then(
                     function () {
@@ -398,7 +398,7 @@ define([
 
             // Панель с описанием
             if (this.config.webmapDescription) {
-                this.navigationMenuItems.splice(2,0, { name: 'info', icon: 'info_outline', value: 'infoPanel'});
+                this.navigationMenuItems.splice(2,0, { title: i18n.gettext('Description'), icon: 'info_outline', value: 'infoPanel'});
 
                 widget.infoPanel = new InfoPanel({
                     region: 'left',

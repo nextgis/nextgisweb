@@ -43,6 +43,7 @@ define([
                  itemEl = domConstruct.create("div", {
                      innerHTML: '<span class="navigation-menu__icon material-icons">' + item.icon + '</span>',
                      className: "navigation-menu__item " + itemActiveClass,
+                     title: item.title,
                      onclick: function(e){
                          if (widget.value === item.value)
                              widget.reset()
