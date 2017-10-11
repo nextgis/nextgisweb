@@ -68,8 +68,6 @@
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
     <script> require(["dojo/parser"]); </script>
 
-    <script src="//use.edgefonts.net/lato:n4,i4,n7,i7:all.js"></script>
-
     %if hasattr(self, 'assets'):
         ${self.assets()}
     %endif

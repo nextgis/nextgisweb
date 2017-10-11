@@ -24,7 +24,7 @@
 @link-hover: #2196F3;
 
 @base-font: "Roboto";
-@header-font:  "lato";
+@header-font:  "lato_local";
 
 @font-size-md: 16px;
 
@@ -50,7 +50,10 @@
 }
 
 @font-face {
-    .font-face(@header-font, ~'../font/roboto-condensed-regular', normal, normal);
+    .font-face(@header-font, ~'../font/lato/lato-regular', normal, normal);
+}
+@font-face {
+    .font-face(@header-font, ~'../font/lato/lato-bold', bold, normal);
 }
 
 
@@ -181,7 +184,7 @@ a[class*=" icon-"]:hover:before,{
     z-index: 10;
     line-height: 1.5;
     font-size: 15px;
-    font-family: 'lato', 'Roboto', Arial, sans-serif;
+    font-family: @header-font, 'Roboto', Arial, sans-serif;
     border-bottom: 1px solid #d3e3f2;
 
     a{
@@ -235,7 +238,7 @@ a[class*=" icon-"]:hover:before,{
             margin-left: 12px;
             margin-top: auto;
             height: 34px;
-            line-height: 32px;
+            line-height: 34px;
             margin-bottom: auto;
 
             & > .material-icons{
