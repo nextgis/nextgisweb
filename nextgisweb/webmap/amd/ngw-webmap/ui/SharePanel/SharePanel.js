@@ -12,6 +12,7 @@ define([
     'ngw-webmap/Permalink',
     'dojox/dtl/_base', 'dojox/dtl/Context',
     "dojo/text!./SharePanel.hbs",
+    "svg4everybody/svg4everybody",
 
     //templates
     "xstyle/css!./SharePanel.css"
@@ -28,7 +29,8 @@ define([
     lang, all,
     Permalink,
     dtl, dtlContext,
-    template) {
+    template,
+    svg4everybody) {
     return declare([DynamicPanel, BorderContainer,_TemplatedMixin, _WidgetsInTemplateMixin], {
         _iframeTemplate: new dtl.Template('<iframe src="{{ iframeSrc }}" frameborder="0" ' +
             'style="overflow:hidden;height:{{ height }}px;width:{{ width }}px" height="{{ height }}" width="{{ width }}"></iframe>'),
@@ -48,6 +50,7 @@ define([
         },
         postCreate: function(){
             this.inherited(arguments);
+            svg4everybody();
             this.contentWidget.mapWidthControl.on("change", lang.hitch(this, function(){
                 this.setEmbedCode();
             }));
