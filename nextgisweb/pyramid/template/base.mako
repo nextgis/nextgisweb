@@ -66,7 +66,7 @@
     </script>
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
-    <script> require(["dojo/parser"]); </script>
+    <script> require(["ngw-pyramid/right-menu/RightMenu", "ngw-pyramid/user-avatar/UserAvatar", "dojo/parser"]); </script>
 
     %if hasattr(self, 'assets'):
         ${self.assets()}
