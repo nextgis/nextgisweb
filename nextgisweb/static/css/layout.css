@@ -735,6 +735,10 @@ a[class*=" icon-"]:hover:before {
   padding: 6px 12px;
   box-sizing: border-box;
 }
+.header__title__logo:hover {
+  border-bottom: 0;
+  text-decoration: none;
+}
 .logo__pic {
   display: block;
   margin: -6px auto;

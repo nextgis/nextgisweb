@@ -35,18 +35,18 @@
         </li>
     </ul>
     <div class="header__left">
-        <a class="header__title" href="${request.application_url}">
-            <div class="header__title__logo">
+        <div class="header__title">
+            <a class="header__title__logo" href="${request.application_url}">
             %if has_logo:
                 <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
             %else:
                 <img class="logo__pic" src="${request.static_url('nextgisweb:static/img/nextgis_logo_s.svg')}"/>
             %endif
-            </div>
+            </a>
             <div class="header__title__inner">
                 ${title}
             </div>
-        </a>
+        </div>
     </div>
 </div>
 
