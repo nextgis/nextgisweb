@@ -1,5 +1,8 @@
 .share-panel{
-    padding: 0px 16px !important;
+    padding: 0px 16px 24px !important;
+    position: relative !important;
+    width: auto !important;
+
 }
 
 .share-panel .divider{
