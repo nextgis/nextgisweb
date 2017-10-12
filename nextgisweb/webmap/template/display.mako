@@ -7,6 +7,7 @@
 
     <script type="text/javascript">
         var displayConfig = ${json.dumps(display_config, indent=4).replace('\n', '\n' + (8 * ' ')) | n};
+        require(["ngw-webmap/Display"]);
     </script>
 </%def>
 
