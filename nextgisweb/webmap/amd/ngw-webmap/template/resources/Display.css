@@ -50,8 +50,10 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
     right: 0px;
     background-color: rgba(255,255,255,.48);
     line-height:1;
-    padding: 1px 2px;
+    padding: 1px 2px 3px;
     overflow: hidden;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
 }
 
 .control-pane .ol-control,
@@ -198,12 +200,18 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
         text-decoration: none;
     }
 
+    .ol-attribution.ol-uncollapsible img {
+        height: 14px;
+        margin-top: -3px;
+        margin-bottom: -1px;
+    }
+
 /* Logo */
 
 .map-logo{
     position: absolute;
     right: 10px;
-    bottom: 26px;
+    bottom: 28px;
     text-decoration: none;
     line-height: 1;
     z-index: 1000;
