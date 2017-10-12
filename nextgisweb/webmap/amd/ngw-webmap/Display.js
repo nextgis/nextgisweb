@@ -206,7 +206,7 @@ define([
                 value: 'layersPanel'
             },
             {
-                title: i18n.gettext('Search on the map'),
+                title: i18n.gettext('Search'),
                 icon: 'search',
                 value: 'searchPanel'
             },
