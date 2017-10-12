@@ -150,8 +150,8 @@ define([
                                 // Если что-то пошло не так с конкретным слоем,
                                 // то все равно продолжаем поиск по следующему
                                 ndeferred.resolve();
-                            }).otherwise(widget._breakOrError);
-                        }).otherwise(widget._breakOrError);
+                            }).otherwise(lang.hitch(widget, widget._breakOrError));
+                        }).otherwise(lang.hitch(widget, widget._breakOrError));
 
                         deferred = ndeferred;
                     }
@@ -209,7 +209,7 @@ define([
                     // Если что-то пошло не так с конкретным слоем,
                     // то все равно продолжаем поиск по следующему
                     ndeferred.resolve();
-                }).otherwise(widget._breakOrError);
+                }).otherwise(lang.hitch(widget, widget._breakOrError));
 
                 deferred = ndeferred;
 
@@ -218,7 +218,7 @@ define([
                     if (limit == widget.MAX_SEARCH_RESULTS) {
                         widget.setStatus(i18n.gettext("Not found"));
                     }
-                }).otherwise(widget._breakOrError);
+                }).otherwise(lang.hitch(widget, widget._breakOrError));
 
                 fdeferred.resolve(widget.MAX_SEARCH_RESULTS);
             }));
@@ -257,6 +257,9 @@ define([
             this.loader.style.display = "none";
         },
         _breakOrError: function (value) {
+            if (this.loader)
+                this.loader.style.display = "none";
+
             if (value !== undefined) {
                 console.error(value);
             }
