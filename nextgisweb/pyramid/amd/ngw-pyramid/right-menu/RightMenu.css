@@ -1,0 +1,53 @@
+.right-menu{
+    position: fixed;
+    z-index: 2000;
+    right: 0;
+    top:0;
+    bottom: 0;
+    overflow: auto;
+    left: auto;
+    box-shadow: 0 15px 30px rgba(0,0,0,.24);
+}
+
+.right-menu__user-name{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: inline-block;
+    max-width: 236px;
+}
+
+.right-menu__user-logout{
+    vertical-align: top;
+    margin-top: 14px;
+    margin-left: 8px;
+}
+
+.right-menu__user-login{
+    text-decoration: none;
+}
+
+.right-menu .dynamic-panel__title{
+    height: 51px;
+    line-height:49px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.right-menu .dynamic-panel__closer{
+    top: 14px;
+    right: 8px;
+}
+
+.right-menu .dynamic-panel__content{
+    top: 51px;
+}
+
+.right-menu .list{
+    font-size: inherit;
+}
+
+.right-menu .list__item{
+    padding-left: 20px;
+    padding-right: 20px;
+}

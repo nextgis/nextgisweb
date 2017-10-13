@@ -1,0 +1,46 @@
+.printMap-panel{
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.printMap-panel div.dijitLayoutContainer.dijitContainer.dijitTableLayout {
+    display: inline-block;
+    width: 500px;
+    text-align: left;
+}
+
+.printMap-panel div.dijitLayoutContainer.dijitContainer.dijitTableLayout td.tableContainer-labelCell {
+    width: 135px !important;
+}
+
+#printMap {
+    display: block;
+    position: absolute;
+    top: 244px;
+    bottom: 17px;
+    left: 76px;
+    right: 20px;
+    margin: 0 auto;
+    max-width: calc(100% - 96px);
+    z-index: 400;
+    overflow: auto;
+    -webkit-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    -moz-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    background-color: white;
+}
+
+#printMap div.map-container {
+    position: relative;
+    display: block;
+    z-index: 1000;
+}
+
+#printMap.inactive {
+    display: none;
+}
+
+#printMap .map-logo{
+    bottom: 12px;
+}

@@ -16,7 +16,7 @@ define([
 
             if (this.orientation === "vertical") {
                 this.label = i18n.gettext("Vertical swipe");
-                this.iconClass = "iconSwipeVertical";
+                this.customIcon = "<span class='ol-control__icon material-icons'>compare</span>";
             } else {
                 this.orientation = "horizontal";
                 this.label = i18n.gettext("Horizontal swipe");

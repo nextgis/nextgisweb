@@ -1,0 +1,20 @@
+<div class="dynamic-panel search-panel">
+    <div data-dojo-attach-point="titleNode"
+         class="dynamic-panel__title search-panel__header">
+        <input data-dojo-attach-point="searchField"
+               class="search-panel__field"
+               type="search"
+               placeholder="{{ gettext 'Search on the map' }}">
+        <span data-dojo-attach-point="searchIcon"
+              class="material-icons search-panel__field-icon">search</span>
+    </div>
+    <div data-dojo-attach-point="contentNode"
+         class="dynamic-panel__content search-panel__content">
+    </div>
+    <div data-dojo-attach-point="loader"
+         class="dynamic-panel__loader">
+        <svg class="progress-circular progress-circular--indeterminate" xmlns="http://www.w3.org/2000/svg" viewBox="25 25 50 50" style="transform: rotate(0deg);">
+            <circle class="progress-circular__overlay" fill="transparent" cx="50" cy="50" r="20" stroke-width="4" stroke-dasharray="125.664" stroke-dashoffset="125.66370614359172px"></circle>
+        </svg>
+    </div>
+</div>

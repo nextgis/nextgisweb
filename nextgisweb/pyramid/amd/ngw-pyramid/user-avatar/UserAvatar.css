@@ -1,0 +1,48 @@
+.user-avatar{
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    line-height:1;
+}
+
+    .user-avatar__label{
+        display: inline-block;
+        vertical-align: middle;
+        width: 34px;
+        height: 34px;
+        line-height: 34px;
+        border-radius: 2px;
+        color: rgba(255, 255, 255, 0.93);
+        background: #076dbf;
+        text-align: center;
+    }
+
+    .user-avatar:hover .user-avatar__label{
+        color: #fff;
+    }
+
+    .user-avatar .user-avatar__icon{
+        vertical-align: middle;
+        font-size: 18px;
+        margin-left: -2px;
+        color: rgba(7, 109, 191, 0.51);
+        margin-right: -2px;
+        transition: transform .2s;
+    }
+    
+    .user-avatar__menu{
+        display: none;
+        position: absolute;
+        left:0;
+        top: 100%;
+        margin-top: 6px;
+        z-index: 1000;
+        border-radius: 2px;
+        box-shadow: 0 3px 5px rgba(0,0,0,.16);
+        font-weight: normal;
+        font-family: 'Roboto', sans-serif;
+    }
+
+.user-avatar--active .user-avatar__icon{
+    transform: rotate(180deg);
+}

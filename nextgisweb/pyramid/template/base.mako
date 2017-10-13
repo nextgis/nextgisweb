@@ -56,6 +56,7 @@
         var dojoConfig = {
             async: true,
             isDebug: true,
+            parseOnLoad: true,
             packages: [
                 {name: "jed", main: "jed", location: ${request.static_url('nextgisweb:static/jed/') | json.dumps, n }}
             ],
@@ -65,6 +66,7 @@
     </script>
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
+    <script> require(["ngw-pyramid/right-menu/RightMenu", "ngw-pyramid/user-avatar/UserAvatar", "dojo/parser"]); </script>
 
     %if hasattr(self, 'assets'):
         ${self.assets()}
@@ -81,7 +83,7 @@
     %if not custom_layout:
         <div class="layout ${'maxwidth' if maxwidth else ''}">
         
-            <%include file="nextgisweb:pyramid/template/header.mako" />
+            <%include file="nextgisweb:pyramid/template/header.mako" args="title=system_name"/>
             
             %if obj and hasattr(obj,'__dynmenu__'):
                 <%
@@ -162,12 +164,12 @@
                 resize();
 
                 on(window, 'resize', resize);
+
             });
 
         </script>
 
     %endif
-
 </body>
 
 </html>

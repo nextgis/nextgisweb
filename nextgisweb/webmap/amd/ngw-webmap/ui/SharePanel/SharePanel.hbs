@@ -1,0 +1,61 @@
+<div class="share-panel">
+    <h5 class="heading">{{ gettext 'Map link' }}</h5>
+    <input type="text"
+           data-dojo-attach-point="permalinkControl"
+           data-dojo-type="dijit/form/TextBox"
+           data-dojo-props="readOnly: false, selectOnClick: true"
+           style="width: 100%"/>
+    <div class="divider"></div>
+    <h5 class="heading">{{ gettext 'Social networks' }}</h5>
+    <div class="social-links">
+        <a href="http://www.facebook.com/sharer.php?u=${url}&amp;display=popup&amp;caption=An%20example%20caption" class="social-link" target="_blank"><svg class="svgIcon-fb"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${assetUrl}/svg/svg-symbols.svg#fb"></use></svg></a>
+        <a href="https://twitter.com/intent/tweet?url=${url}&amp;via=nextgis&amp;hashtags=nextgis" class="social-link" target="_blank"><svg class="svgIcon-twitter"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${assetUrl}/svg/svg-symbols.svg#twitter"></use></svg></a>
+        <a href="https://plus.google.com/share?url=${url}" class="social-link" target="_blank"><svg class="svgIcon-gplus"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${assetUrl}/svg/svg-symbols.svg#gplus"></use></svg></a>
+        <a href="http://vk.com/share.php?url=${url}" class="social-link" target="_blank"><svg class="svgIcon-vk"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${assetUrl}/svg/svg-symbols.svg#vk"></use></svg></a>
+    </div>
+    <div class="divider"></div>
+    <h5 class="heading">{{ gettext 'Embed code for your site' }}</h5>
+    <div class="input-group input-group--inline">
+        <span class="input-group__label">Размер карты:</span>
+        <span class="nowrap">
+            <input type="number"
+                   data-dojo-attach-point="mapWidthControl"
+                   data-dojo-type="dijit/form/TextBox"
+                   data-dojo-props="readOnly: false, name: 'width', intermediateChanges: true"
+                   value="600"
+                   style="width: 60px"/>
+            x
+            <input type="number"
+                   data-dojo-attach-point="mapHeightControl"
+                   data-dojo-type="dijit/form/TextBox"
+                   data-dojo-props="readOnly: false, name: 'height', intermediateChanges: true"
+                   value="400"
+                   style="width: 60px"/>
+            px
+        </span>
+    </div>
+    <div class="input-group">
+        <label class="checkbox">
+            <input data-dojo-attach-point="linkCheckbox"
+                   data-dojo-type="dijit/form/CheckBox"
+                   checked />
+            <span class="checkbox__label">{{ gettext 'Link to main map' }}</span>
+        </label>
+    </div>
+    <div class="input-group">
+        <textarea data-dojo-attach-point="codeControl"
+                  data-dojo-type="dijit/form/SimpleTextarea"
+                  data-dojo-props="readOnly: false, selectOnClick: true"
+                  rows="8"
+                  style="width:100%;"></textarea>
+    </div>
+    <form data-dojo-attach-point="previewMapForm"
+          class="hidden"
+          action="${previewMapUrl}" method="POST" target="_blank">
+        <input type="hidden" name="iframe" data-dojo-attach-point="previewMapCodeControl" value="">
+    </form>
+    <button data-dojo-type="dijit/form/Button"
+            data-dojo-attach-point="previewMapButton"
+            class="previewMap-button dijitButton--primary dijitButton--s"
+            type="button">{{ gettext "Preview" }}</button>
+</div>

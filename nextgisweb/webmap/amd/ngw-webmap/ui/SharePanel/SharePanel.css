@@ -1,0 +1,35 @@
+.share-panel{
+    padding: 0px 16px 24px !important;
+    position: relative !important;
+    width: auto !important;
+
+}
+
+.share-panel .divider{
+    margin-left: -16px;
+    margin-right: -16px;
+}
+
+.previewMap-button,
+.nextgis.claro  .share-panel .previewMap-button{
+    margin-top: 8px;
+}
+
+.social-links{
+    line-height: 1;
+}
+
+.social-link{
+    border: none;
+    text-decoration: none;
+    height: 32px;
+    display: inline-block;
+}
+
+.social-link:hover{
+    opacity: .8;
+}
+
+.social-link + .social-link{
+    margin-left: 2px;
+}

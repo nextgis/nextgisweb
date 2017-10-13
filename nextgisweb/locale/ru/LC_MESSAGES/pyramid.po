@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-03-26 21:33+0300\n"
+"POT-Creation-Date: 2017-09-18 12:31+0300\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,49 +17,37 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.4.0\n"
 
-#: template/base.mako:87 view.py:43
+#: view.py:30
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: template/base.mako:98 view.py:52
+#: view.py:39
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:87 view.py:155
+#: view.py:82 view.py:144
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:95 view.py:161
+#: view.py:90 view.py:150
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:102 view.py:159
+#: view.py:97 view.py:148
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:108
+#: view.py:103
 msgid "404: Page not found"
 msgstr "404: Страница не найдена"
 
-#: view.py:109
-msgid "Think this page should be here?"
-msgstr "Если считаете, что это ошибка,"
-
-#: view.py:110
-msgid "Contact us"
-msgstr "напишите нам"
-
-#: view.py:111
-msgid "http://nextgis.com/contact/"
-msgstr "http://nextgis.ru/contact/"
-
-#: view.py:154
+#: view.py:143
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:158
+#: view.py:147
 msgid "Settings"
 msgstr "Настройки"
 
@@ -85,6 +73,15 @@ msgstr "Сохранить"
 msgid "Delete"
 msgstr "Удалить"
 
+#: amd/ngw-pyramid/right-menu/RightMenu.js:71
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5
+msgid "Sign out"
+msgstr "Выйти"
+
+#: amd/ngw-pyramid/right-menu/RightMenu.js:76 template/header.mako:18
+msgid "Sign in"
+msgstr "Войти"
+
 #: amd/ngw-pyramid/template/CORSForm.hbs:17
 msgid ""
 "Enter allowed origins for cross domain requests to use HTTP API of this "
@@ -104,17 +101,21 @@ msgstr ""
 "(example.com и www.example.com) считаются разными источниками. Символ "
 "подстановки (*) недопустим."
 
+#: template/404.mako:22
+msgid "Think this page should be here?"
+msgstr "Если считаете, что это ошибка,"
+
+#: template/404.mako:23
+msgid "http://nextgis.com/contact/"
+msgstr "http://nextgis.ru/contact/"
+
+#: template/404.mako:24
+msgid "Contact us"
+msgstr "напишите нам"
+
 #: template/base.mako:29
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
-
-#: template/base.mako:85
-msgid "Resources"
-msgstr "Ресурсы"
-
-#: template/base.mako:104
-msgid "Sign in"
-msgstr "Войти"
 
 #: template/pkginfo.mako:22
 msgid "Platform"
@@ -131,4 +132,7 @@ msgstr "Пакет"
 #: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
+
+msgid "Resources"
+msgstr "Ресурсы"
 

@@ -1,0 +1,34 @@
+<div class="layers-panel">
+
+    <!-- Тулбар над деревом слоев -->
+    <div data-dojo-type="dijit/Toolbar"
+         data-dojo-props="region: 'top'">
+
+        <div data-dojo-type="dijit/form/DropDownButton"
+             data-dojo-props="label: '{{gettext 'Layer'}}'">
+
+            <div data-dojo-attach-point="itemMenu"
+                 data-dojo-type="dijit/Menu">
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Панель для размещения дерева слоев -->
+    <div data-dojo-attach-point="layerTreePane"
+         data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="region: 'center'"
+         style="padding: 0">
+    </div>
+
+    <!-- Панель для размещения переключателя подложки -->
+    <div data-dojo-attach-point="basemapPane"
+         data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="region: 'bottom', border: false">
+        <select data-dojo-attach-point="basemapSelect"
+                data-dojo-type="dijit/form/Select"
+                style="width: 100%;">
+        </select>
+    </div>
+</div>

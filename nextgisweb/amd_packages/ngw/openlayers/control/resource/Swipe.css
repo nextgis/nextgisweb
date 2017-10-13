@@ -31,6 +31,17 @@
 .ol-swipe button
 {   cursor: ew-resize;
 }
+
+.ol-swipe button{
+    background-color: #00b77e;
+}
+
+.ol-swipe button:hover,
+.ol-swipe button:focus,
+.ol-swipe button:active{
+    background-color: #00d18f;
+}
+
 .ol-swipe.horizontal,
 .ol-swipe.horizontal button
 {   cursor: ns-resize;

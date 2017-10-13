@@ -2,9 +2,13 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
 
 .webmap-wrapper{
     position: fixed;
-    top: 43px;
+    top: 51px;
     bottom: 0px;
     width: 100%;
+}
+
+.webmap-display > .dijitTabContainer > .dijitTabPaneWrapper{
+    border: 0;
 }
 
 .ol-rotate{
@@ -19,4 +23,207 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
 
 .ol-touch .ol-control button{
     font-size: 1.14em;
+}
+
+/* Control panes */
+
+.control-pane{
+    position: absolute;
+    z-index: 10;
+}
+
+.control-pane--left{
+    left: 16px;
+}
+.control-pane--top{
+    top: 16px;
+}
+.control-pane--right{
+    right: 16px;
+}
+.control-pane--bottom{
+    bottom: 17px;
+}
+
+.control-pane--bottom.control-pane--right{
+    bottom: 0px;
+    right: 0px;
+    background-color: rgba(255,255,255,.48);
+    line-height:1;
+    padding: 1px 2px 3px;
+    overflow: hidden;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
+
+.control-pane .ol-control,
+.control-pane .ol-scale-line{
+    position: static;
+    left: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    line-height: 1;
+    top: -1px;
+}
+
+.control-pane--bottom .ol-control,
+.control-pane--bottom .ol-scale-line{
+    display: inline-block;
+    vertical-align: bottom;
+    margin-left: 8px;
+    color: rgba(0,0,0,.46);
+    font-size: 10px;
+}
+    .control-pane--bottom .ol-control:first-child,
+    .control-pane--bottom .ol-scale-line:first-child{
+        margin-left: 0;
+    }
+
+.control-pane--top .ol-control,
+.control-pane--top .ol-scale-line{
+    margin-top: 8px;
+}
+    .control-pane--top .ol-control:first-child,
+    .control-pane--top .ol-scale-line:first-child{
+        margin-top: 0px;
+    }
+
+/* Map buttons */
+
+.ol-control {
+    background: none;
+    padding: 0;
+}
+    .ol-control button,
+    .ol-control button:active,
+    .ol-control button:focus,
+    .ol-control__btn,
+    .ol-control__btn:active,
+    .ol-control__btn:focus{
+        display: block;
+        width: 30px;
+        height: 30px;
+        background-color: #fff;
+        color: #076dbf;
+        margin: 1px 0 0;
+        box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+        text-decoration: none;
+        line-height:30px;
+        border-radius: 2px;
+        padding: 0;
+        text-align: center;
+    }
+
+    .ol-control:first-child button{
+        margin-top:1px;
+    }
+
+    .control-pane--bottom .ol-control button{
+        text-shadow: none;
+    }
+
+    .ol-control button .material-icons,
+    .ol-control button:active .material-icons,
+    .ol-control button:focus .material-icons,
+    .ol-control__btn .material-icons,
+    .ol-control__btn:active .material-icons,
+    .ol-control__btn:focus .material-icons{
+       color: #076dbf;
+    }
+
+    .ol-control__icon{
+        fill: #076dbf;
+        line-height: 30px;
+        width: 30px;
+        height: 30px;
+    }
+
+    .ol-control:hover{
+        background-color: transparent;
+    }
+
+    .ol-control button:hover,
+    .ol-control .ol-control__button:hover{
+        background-color: #f9fafb;
+        color: #00b77e;
+    }
+
+    .ol-control button:hover .ol-control__icon,
+    .ol-control button:hover .material-icons,
+    .ol-control__btn:hover .ol-control__icon,
+    .ol-control__btn:hover .material-icons {
+        color: #00b77e;
+        fill: #00b77e;
+    }
+
+/* Rotate control */
+
+.ol-compass{
+    font-size: 24px;
+    font-weight: normal;
+    display: inline-block;
+}
+
+/* Scale line */
+
+.ol-scale-line,
+.control-pane .ol-scale-line{
+    position: relative;
+    padding: 0;
+    background-color: transparent;
+    top: 1px;
+}
+
+    .ol-scale-line-inner{
+        margin: 0;
+        border-color: rgba(0,0,0,.46);
+        color: rgba(0,0,0,.46);
+        float: right;
+    }
+
+/* Attribution */
+
+.ol-attribution:not(.ol-collapsed){
+    background: transparent;
+    height: auto;
+    line-height: inherit;
+}
+    .ol-attribution ul{
+        padding: 0;
+        text-shadow: inherit;
+        color: inherit;
+        line-height:1;
+    }
+
+    .ol-attribution a{
+        text-decoration: none;
+    }
+
+    .ol-attribution.ol-uncollapsible img {
+        height: 14px;
+        margin-top: -3px;
+        margin-bottom: -1px;
+    }
+
+/* Logo */
+
+.map-logo{
+    position: absolute;
+    right: 10px;
+    bottom: 28px;
+    text-decoration: none;
+    line-height: 1;
+    z-index: 1000;
+}
+
+/* leftPanelPane */
+
+.leftPanelPane{
+    width: 350px;
+    border-right: 1px solid rgba(0,0,0,.12);
+}
+
+.leftPanelPane--fullwidth {
+    width: calc(100% - 50px) !important;
 }

@@ -7,24 +7,11 @@
 
     <script type="text/javascript">
         var displayConfig = ${json.dumps(display_config, indent=4).replace('\n', '\n' + (8 * ' ')) | n};
-
-        require([
-            "dojo/parser",
-            "dojo/ready",
-            "ngw-webmap/Display"
-        ], function (
-            parser,
-            ready
-        ) {
-            ready(function() {
-                parser.parse();
-            });
-        });
+        require(["ngw-webmap/Display"]);
     </script>
 </%def>
 
-
-<%include file="nextgisweb:pyramid/template/header.mako" />
+<%include file="nextgisweb:pyramid/template/header.mako" args="title=display_config['webmapTitle']"/>
 
 <div id="webmap-wrapper" class="webmap-wrapper">
 
@@ -47,8 +34,7 @@
             var height = domGeom.getMarginBox(header, domStyle.getComputedStyle(header)).h;
             domStyle.set(webmapWrapper, "top", height + "px");
         }
-
-        setTimeout(resize, 500) // timeout for a font rendering
+        resize();
         on(window, 'resize', resize);
     });
 
