@@ -79,6 +79,10 @@ def cors_tween_factory(handler, registry):
                 if '*' not in olist:
                     hadd('Access-Control-Allow-Credentials', 'true')
 
+                # Add allowed Authorization header for HTTP authentication
+                # from JavaScript. It is a good idea?
+                hadd('Access-Control-Allow-Headers', 'Authorization')
+
                 return response
 
         # Run default request handler
