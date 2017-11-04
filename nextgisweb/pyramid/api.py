@@ -235,13 +235,25 @@ def statistics(request):
     return result
 
 
-def custom_css(request):
+def custom_css_get(request):
     try:
         body = request.env.core.settings_get('pyramid', 'custom_css')
     except KeyError:
         body = ""
 
     return Response(body, content_type=b'text/css', expires=timedelta(days=1))
+
+
+def custom_css_put(request):
+    request.require_administrator()
+
+    body = request.body
+    if re.match(r'^\s*$', body, re.MULTILINE):
+        request.env.core.settings_delete('pyramid', 'custom_css')
+    else:
+        request.env.core.settings_set('pyramid', 'custom_css', body)
+
+    return Response()
 
 
 def setup_pyramid(comp, config):
@@ -278,8 +290,8 @@ def setup_pyramid(comp, config):
     ).add_view(statistics, renderer='json')
 
     config.add_route(
-        'pyramid.custom_css',
-        '/api/component/pyramid/custom_css'
-    ).add_view(custom_css)
+        'pyramid.custom_css', '/api/component/pyramid/custom_css') \
+        .add_view(custom_css_get, request_method='GET') \
+        .add_view(custom_css_put, request_method='PUT')
 
     # TODO: Add PUT method for changing custom_css setting and GUI

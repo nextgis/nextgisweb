@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-09-18 12:31+0300\n"
+"POT-Creation-Date: 2017-11-04 14:09+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -27,27 +27,31 @@ msgstr "Панель управления"
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:82 view.py:144
+#: view.py:82 view.py:156
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:90 view.py:150
+#: view.py:90 view.py:162
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:97 view.py:148
+#: view.py:97 view.py:164
+msgid "Custom CSS"
+msgstr "Пользовательские стили CSS"
+
+#: view.py:104 view.py:160
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:103
+#: view.py:110
 msgid "404: Page not found"
 msgstr "404: Страница не найдена"
 
-#: view.py:143
+#: view.py:155
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:147
+#: view.py:159
 msgid "Settings"
 msgstr "Настройки"
 
@@ -65,6 +69,7 @@ msgstr "Создать"
 
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:37
 #: amd/ngw-pyramid/template/CORSForm.hbs:26
+#: amd/ngw-pyramid/template/CustomCSSForm.hbs:25
 #: amd/ngw-pyramid/template/SystemNameForm.hbs:10
 msgid "Save"
 msgstr "Сохранить"
@@ -73,12 +78,12 @@ msgstr "Сохранить"
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-pyramid/right-menu/RightMenu.js:71
+#: amd/ngw-pyramid/right-menu/RightMenu.js:68
 #: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5
 msgid "Sign out"
 msgstr "Выйти"
 
-#: amd/ngw-pyramid/right-menu/RightMenu.js:76 template/header.mako:18
+#: amd/ngw-pyramid/right-menu/RightMenu.js:73 template/header.mako:19
 msgid "Sign in"
 msgstr "Войти"
 
@@ -100,6 +105,14 @@ msgstr ""
 "Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены "
 "(example.com и www.example.com) считаются разными источниками. Символ "
 "подстановки (*) недопустим."
+
+#: amd/ngw-pyramid/template/CustomCSSForm.hbs:17
+msgid ""
+"Enter custom CSS here. They will be used to redefine styles, design for "
+"all pages of your Web GIS."
+msgstr ""
+"Здесь можно задать стили CSS. Они будут использованы для оформления "
+"всех страниц вашей Веб ГИС."
 
 #: template/404.mako:22
 msgid "Think this page should be here?"
@@ -132,7 +145,3 @@ msgstr "Пакет"
 #: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
-
-msgid "Resources"
-msgstr "Ресурсы"
-
