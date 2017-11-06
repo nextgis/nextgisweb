@@ -1,5 +1,4 @@
 define([
-    "dojo/Evented",
     'dojo/_base/declare',
     'ngw-pyramid/i18n!webmap',
     'ngw-pyramid/hbs-i18n',
@@ -12,14 +11,10 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/_WidgetBase",
-    "dijit/layout/ContentPane",
-    "dijit/layout/BorderContainer",
     "dojo/text!./DynamicPanel.hbs",
-    "dijit/layout/BorderContainer",
     "dijit/form/Select",
     "xstyle/css!./DynamicPanel.css"
 ], function (
-    Evented,
     declare,
     i18n,
     hbsI18n,
@@ -32,9 +27,8 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     _WidgetBase,
-    ContentPane,
-    BorderContainer,
-    template) {
+    template
+) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
         templateString: hbsI18n(template, i18n),
         title: "",

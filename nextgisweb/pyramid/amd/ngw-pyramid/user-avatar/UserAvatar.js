@@ -5,11 +5,7 @@ define([
     "dojo/query",
     "dojo/_base/lang",
     "dojo/_base/array",
-    "dojo/dom",
-    "dojo/dom-construct",
-    "dojo/on",
     "dojo/dom-class",
-    "dojo/query",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dojo/text!./UserAvatar.hbs",
@@ -21,14 +17,11 @@ define([
     query,
     lang,
     array,
-    dom,
-    domConstruct,
-    on,
     domClass,
-    query,
     _WidgetBase,
     _TemplatedMixin,
-    template) {
+    template
+) {
     return declare([_WidgetBase, _TemplatedMixin],{
         templateString: hbsI18n(template, i18n),
         userName: undefined,

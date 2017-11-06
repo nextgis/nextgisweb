@@ -1,28 +1,21 @@
 define([
     'dojo/_base/declare',
     'ngw-pyramid/i18n!pyramid',
-    'ngw-pyramid/hbs-i18n',
     "dijit/_TemplatedMixin",
     "dijit/_WidgetBase",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
-    "dijit/layout/BorderContainer",
-    "dojo/query",
     "dojo/dom-construct",
     "dojo/_base/array",
     "dojo/on",
-
     "xstyle/css!./RightMenu.css"
 ], function (
     declare,
     i18n,
-    hbsI18n,
     _TemplatedMixin,
     _WidgetBase,
     _WidgetsInTemplateMixin,
     DynamicPanel,
-    BorderContainer,
-    query,
     domConstruct,
     array,
     on
@@ -30,7 +23,6 @@ define([
     return declare([DynamicPanel],{
         user: undefined,
         items: [],
-        user: undefined,
         logoutLink: undefined,
         loginLink: undefined,
         constructor: function (options) {
