@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-11-05 07:43+0000\n"
+"POT-Creation-Date: 2017-11-07 13:05+0300\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.4.0\n"
 
-#: view.py:30
+#: template/header.mako:73 view.py:30
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:39
+#: template/header.mako:79 view.py:39
 msgid "Help"
 msgstr "Справка"
 
@@ -78,12 +78,12 @@ msgstr "Сохранить"
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-pyramid/right-menu/RightMenu.js:68
+#: amd/ngw-pyramid/right-menu/RightMenu.js:60
 #: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5
 msgid "Sign out"
 msgstr "Выйти"
 
-#: amd/ngw-pyramid/right-menu/RightMenu.js:73 template/header.mako:19
+#: amd/ngw-pyramid/right-menu/RightMenu.js:65 template/header.mako:19
 msgid "Sign in"
 msgstr "Войти"
 
@@ -130,6 +130,10 @@ msgstr "напишите нам"
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
+#: template/header.mako:68
+msgid "Resources"
+msgstr "Ресурсы"
+
 #: template/pkginfo.mako:22
 msgid "Platform"
 msgstr "Платформа"
@@ -145,3 +149,4 @@ msgstr "Пакет"
 #: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
+

@@ -39,7 +39,7 @@ define([
                          array.forEach(widget.items, function(item){
                              domConstruct.create('a', {
                                  class: "list__item",
-                                 innerHTML: i18n.gettext(item.text),
+                                 innerHTML: item.text,
                                  href: item.link
                              }, this.domNode);
                          }, this);

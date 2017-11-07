@@ -65,18 +65,18 @@
         (new RightMenu({
             items: [
                 {
-                    "text": "Resources",
+                    "text": '${tr(_("Resources"))}',
                     "link": '${request.route_url("resource.root")}'
                 }
             %if request.user.is_administrator:
                 ,{
-                    "text": "Control panel",
+                    "text": '${tr(_("Control panel"))}',
                     "link": '${request.route_url("pyramid.control_panel")}'
                 }
             %endif
             %if request.env.pyramid.help_page.get(request.locale_name):
                 ,{
-                    "text": "Help",
+                    "text": '${tr(_("Help"))}',
                     "link": '${request.route_url("pyramid.help_page")}'
                 }
             %endif
