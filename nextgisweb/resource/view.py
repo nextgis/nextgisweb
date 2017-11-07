@@ -285,6 +285,9 @@ def setup_pyramid(comp, config):
     class AddMenu(DynItem):
         def build(self, args):
             for ident, cls in Resource.registry._dict.iteritems():
+                if ident in comp.disabled_cls:
+                    continue
+
                 if not cls.check_parent(args.obj):
                     continue
 

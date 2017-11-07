@@ -59,6 +59,15 @@ class ResourceComponent(Component):
         if self.perm_cache_enable:
             self.perm_cache_instance = PermissionCache.construct(settings)
 
+        svalue = settings.get('disabled_cls', None)
+        self.disabled_cls = re.split(',\s*', svalue) if svalue is not None \
+            else list()
+
+    def initialize(self):
+        super(ResourceComponent, self).initialize()
+        for item in self.disabled_cls:
+            Resource.registry[item]
+
     @require('auth')
     def initialize_db(self):
         adminusr = User.filter_by(keyname='administrator').one()
@@ -119,5 +128,6 @@ class ResourceComponent(Component):
             resource_count=dict(total=total, cls=by_cls))
 
     settings_info = (
+        dict(key="disabled_cls", desc="Resource classes disabled for creation"),
         dict(key="everyone_permissions", desc="Permissions for user Everyone"),
     ) + cache_settings_info
