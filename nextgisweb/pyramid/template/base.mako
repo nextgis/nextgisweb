@@ -56,7 +56,6 @@
         var dojoConfig = {
             async: true,
             isDebug: true,
-            parseOnLoad: true,
             packages: [
                 {name: "jed", main: "jed", location: ${request.static_url('nextgisweb:static/jed/') | json.dumps, n }}
             ],
@@ -66,7 +65,6 @@
     </script>
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
-    <script> require(["ngw-pyramid/right-menu/RightMenu", "ngw-pyramid/user-avatar/UserAvatar", "dojo/parser"]); </script>
 
     %if hasattr(self, 'assets'):
         ${self.assets()}
