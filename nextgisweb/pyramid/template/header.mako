@@ -34,7 +34,7 @@
     </ul>
     <div class="header__left">
         <div class="header__title">
-            <a class="header__title__logo" href="${request.application_url}">
+            <a class="header__title-logo" href="${request.application_url}">
             %if has_logo:
                 <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
             %else:
