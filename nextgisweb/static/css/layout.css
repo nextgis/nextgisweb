@@ -674,10 +674,6 @@ a[class*=" icon-"]:hover:before {
   text-decoration: none;
   color: inherit;
 }
-.header a:hover {
-  color: inherit;
-  opacity: .76;
-}
 .header .header__title {
   display: table;
   color: inherit;
