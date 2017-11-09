@@ -14,5 +14,12 @@
         <div class="pure-control-group">
             <input name="password" type="password" required placeholder="${tr(_('Password'))}">
         </div>
-        <button class="pure-button pure-button-primary auth-form__btn" type="submit" value="" class="pure-button pure-button-primary">${tr(_('Sign in'))}</button>
+        <button class="auth-form__btn dijit dijitReset dijitInline dijitButton--primary dijitButton"
+                type="submit" value="" class="pure-button pure-button-primary">
+            <span class="dijitReset dijitInline dijitButtonNode" >
+                <span>
+                    ${tr(_('Sign in'))}
+                </span>
+            </span>
+        </button>
     </form>
