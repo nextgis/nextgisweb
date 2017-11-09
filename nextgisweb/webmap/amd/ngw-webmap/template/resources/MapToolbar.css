@@ -30,38 +30,38 @@
         line-height: 29px;
         background: #fff;
         color: #076dbf;
+        fill: #076dbf;
         box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
         transition: none;
         text-shadow: none;
     }
 
-    .claro .map-toolbar .ol-control .dijitButtonNode .ol-control__icon {
-        color: #076dbf;
-        fill: #076dbf;
+    .claro .map-toolbar .ol-control .dijitButtonNode:hover{
+        background: #f9fafb;
+        color: #00b77e;
+        fill: #00b77e;
+    }
+
+    .claro .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode{
+        background: #00b77e;
+        color: #fff;
+        fill: #fff;
     }
 
     .claro .map-toolbar .ol-control .dijitButtonNode .dijitButtonContents{
         display: inline-block;
     }
 
-    .claro .map-toolbar .ol-control .dijitButtonNode:hover{
-        background: #f9fafb;
+    .custom-css .map-toolbar .ol-control .dijitButtonNode,
+    .custom-css .map-toolbar .ol-control .dijitButtonNode:hover{
+        color: rgba(0,0,0,.48);
+        fill: rgba(0,0,0,.48);
     }
-
-    .claro .map-toolbar .ol-control .dijitButtonNode:hover .ol-control__icon{
-        color: #00b77e;
-        fill: #00b77e;
-    }
-
-    .claro .map-toolbar  .ol-control.dijitToggleButtonChecked .dijitButtonNode{
-        background: #00b77e;
-    }
-
-    .claro .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode .ol-control__icon{
+    .custom-css .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode{
+        background: #858585;
         color: #fff;
         fill: #fff;
     }
-
 
 
 
