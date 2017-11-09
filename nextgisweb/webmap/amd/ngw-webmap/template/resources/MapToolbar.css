@@ -52,17 +52,6 @@
         display: inline-block;
     }
 
-    .custom-css .map-toolbar .ol-control .dijitButtonNode,
-    .custom-css .map-toolbar .ol-control .dijitButtonNode:hover{
-        color: rgba(0,0,0,.48);
-        fill: rgba(0,0,0,.48);
-    }
-    .custom-css .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode{
-        background: #858585;
-        color: #fff;
-        fill: #fff;
-    }
-
 
 
 

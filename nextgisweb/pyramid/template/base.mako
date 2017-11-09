@@ -9,13 +9,7 @@
     from bunch import Bunch
 %>
 <head>
-    <%
-        system_name = request.env.core.settings_get('core', 'system.full_name')
-        try:
-            custom_css = request.env.core.settings_get('pyramid', 'custom_css')
-        except KeyError:
-            custom_css = ""
-    %>
+    <% system_name = request.env.core.settings_get('core', 'system.full_name') %>
 
     <title>
         <% page_title = '' %>
@@ -82,7 +76,7 @@
 
 </head>
 
-<body class="claro nextgis ${'custom-css' if custom_css else ''}">
+<body class="claro nextgis">
     %if not custom_layout:
         <div class="layout ${'maxwidth' if maxwidth else ''}">
         

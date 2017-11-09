@@ -147,14 +147,6 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
         fill: #00b77e;
     }
 
-    .custom-css .ol-control button,
-    .custom-css .ol-control__btn,
-    .custom-css .ol-control button:hover,
-    .custom-css .ol-control__btn:hover{
-        color: rgba(0,0,0,.48);
-        fill: rgba(0,0,0,.48);
-    }
-
 /* Rotate control */
 
 .ol-compass{
