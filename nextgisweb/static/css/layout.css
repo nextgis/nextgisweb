@@ -226,7 +226,8 @@ h2:first-child,
   width: 16px;
   height: 16px;
 }
-.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-basemap_layer {
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-basemap_layer,
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-lookup_table {
   shape-rendering: crispEdges;
 }
 .text-withIcon__pic {
@@ -438,7 +439,8 @@ h2:first-child,
 .svgIcon-wmsclient_connection,
 .svgIcon-wmsclient_layer,
 .svgIcon-wmsserver_service,
-.svgIcon-basemap_layer {
+.svgIcon-basemap_layer,
+.svgIcon-lookup_table {
   background: none;
 }
 .svgIcon-mapserver_style {
