@@ -48,6 +48,7 @@
     </div>
 </div>
 <div id="rightMenu"></div>
+
 <script>
     require([
         "ngw-pyramid/right-menu/RightMenu",
@@ -74,10 +75,16 @@
                     "link": '${request.route_url("pyramid.control_panel")}'
                 }
             %endif
-            %if request.env.pyramid.help_page.get(request.locale_name):
+
+            <% help_page = request.env.pyramid.help_page.get(request.locale_name) %>
+            %if help_page:
                 ,{
                     "text": '${tr(_("Help"))}',
-                    "link": '${request.route_url("pyramid.help_page")}'
+                    %if re.match("^http[s]?", help_page):
+                        "link": '${help_page}'
+                    %else:
+                        "link": '${request.route_url("pyramid.help_page")}'
+                    %endif
                 }
             %endif
             ],
