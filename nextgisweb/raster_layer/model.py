@@ -105,6 +105,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             cmd = ['gdal_translate', '-of', 'GTiff']
 
         cmd.extend(('-co', 'TILED=YES',
+                    '-co', 'COMPRESS=DEFLATE',
                     '-co', 'BIGTIFF=YES', filename, dst_file))
         subprocess.check_call(cmd)
 
