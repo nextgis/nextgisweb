@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..component import Component, require
 
+from .api import ComplexEncoder
 from .feature import Feature, FeatureSet
 from .model import Base, LayerField, LayerFieldsMixin
 from .interface import (
