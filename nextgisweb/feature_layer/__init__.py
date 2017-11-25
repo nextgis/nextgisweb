@@ -26,6 +26,9 @@ class FeatureLayerComponent(Component):
         self.settings['identify.attributes'] = \
             self.settings.get('identify.attributes', 'true').lower() == 'true'
 
+        self.settings['search.nominatim'] = \
+            self.settings.get('search.nominatim', 'true').lower() == 'true'
+
         from .extension import FeatureExtension
         self.FeatureExtension = FeatureExtension
 
@@ -37,4 +40,5 @@ class FeatureLayerComponent(Component):
 
     settings_info = (
         dict(key='identify.attributes', desc=u"Показывать атрибуты в идентификации"),
+        dict(key='search.nominatim', desc=u"Использовать Nominatim при поиске")
     )

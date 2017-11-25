@@ -320,6 +320,9 @@ def setup_pyramid(comp, config):
             identify=dict(
                 attributes=self.settings['identify.attributes']
             ),
+            search=dict(
+                nominatim=self.settings['search.nominatim']
+            )
         )
 
     comp.client_settings = MethodType(client_settings, comp, comp.__class__)

@@ -5,13 +5,20 @@ define([
     "dijit/_WidgetBase",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
-    "dojo/Deferred", "dojo/request/script",
+    "dojo/Deferred",
+    "dojo/request/script",
     "openlayers/ol",
-    "dojo/on", "dojo/dom-class", "dojo/dom-construct", "dojo/_base/lang", "dojo/_base/array",
+    "dojo/on",
+    "dojo/dom-class",
+    "dojo/dom-construct",
+    "dojo/_base/lang",
+    "dojo/_base/array",
     "ngw-feature-layer/FeatureStore",
+    // settings
+    "ngw/settings!feature_layer",
+    // templates
     "dojo/text!./SearchPanel.hbs",
-
-    //templates
+    // css
     "xstyle/css!./SearchPanel.css"
 ], function (
     declare,
@@ -20,11 +27,18 @@ define([
     _WidgetBase,
     DynamicPanel,
     BorderContainer,
-    Deferred, script,
+    Deferred,
+    script,
     ol,
-    on, domClass, domConstruct, lang, array,
+    on,
+    domClass,
+    domConstruct,
+    lang,
+    array,
     FeatureStore,
-    template) {
+    featureLayersettings,
+    template
+) {
     return declare([DynamicPanel, BorderContainer],{
         inputTimer: undefined,
         statusPane: undefined,
@@ -157,61 +171,63 @@ define([
                     }
                 }, this);
 
-                var ndeferred = new Deferred();
+                if (featureLayersettings.search.nominatim) {
+                    var ndeferred = new Deferred();
 
-                // Посылаем запрос на геокодирование
-                deferred.then(lang.hitch(this, function (limit) {
-                    var NOMINATIM_SEARCH_URL = "http://nominatim.openstreetmap.org/search/";
-                    var CALLBACK = "json_callback";
-                    var url = NOMINATIM_SEARCH_URL + encodeURIComponent(criteria);
+                    // Посылаем запрос на геокодирование
+                    deferred.then(lang.hitch(this, function (limit) {
+                        var NOMINATIM_SEARCH_URL = "http://nominatim.openstreetmap.org/search/";
+                        var CALLBACK = "json_callback";
+                        var url = NOMINATIM_SEARCH_URL + encodeURIComponent(criteria);
 
-                    jsonpArgs = {
-                        jsonp: CALLBACK,
-                        query: {format: "json", limit: "30"}
-                    };
+                        jsonpArgs = {
+                            jsonp: CALLBACK,
+                            query: {format: "json", limit: "30"}
+                        };
 
-                    script.get(url, jsonpArgs).then(lang.hitch(this, function (data) {
-                        array.forEach(data, function (place) {
+                        script.get(url, jsonpArgs).then(lang.hitch(this, function (data) {
+                            array.forEach(data, function (place) {
+                                if (limit > 0) {
+                                    // Отформатируем ответ в виде удобном для отображения
+                                    // и покажем в списке ответов:
+
+                                    // Координаты приходят в WGS84
+                                    var extent = [
+                                        parseFloat(place.boundingbox[2]),
+                                        parseFloat(place.boundingbox[0]),
+                                        parseFloat(place.boundingbox[3]),
+                                        parseFloat(place.boundingbox[1])
+                                    ];
+
+                                    extent = ol.proj.transformExtent(
+                                        extent,
+                                        this.display.lonlatProjection,
+                                        this.display.displayProjection
+                                    );
+
+                                    var feature = {
+                                        label: place.display_name,
+                                        box: extent
+                                    };
+                                    widget.addSearchResult(feature);
+                                }
+                                limit = limit - 1;
+                            }, this);
                             if (limit > 0) {
-                                // Отформатируем ответ в виде удобном для отображения
-                                // и покажем в списке ответов:
-
-                                // Координаты приходят в WGS84
-                                var extent = [
-                                    parseFloat(place.boundingbox[2]),
-                                    parseFloat(place.boundingbox[0]),
-                                    parseFloat(place.boundingbox[3]),
-                                    parseFloat(place.boundingbox[1])
-                                ];
-
-                                extent = ol.proj.transformExtent(
-                                    extent,
-                                    this.display.lonlatProjection,
-                                    this.display.displayProjection
-                                );
-
-                                var feature = {
-                                    label: place.display_name,
-                                    box: extent
-                                };
-                                widget.addSearchResult(feature);
+                                ndeferred.resolve(limit);
+                            } else {
+                                widget.setStatus(i18n.gettext("Refine search criterion"));
+                                ndeferred.reject();
                             }
-                            limit = limit - 1;
-                        }, this);
-                        if (limit > 0) {
-                            ndeferred.resolve(limit);
-                        } else {
-                            widget.setStatus(i18n.gettext("Refine search criterion"));
-                            ndeferred.reject();
-                        }
-                     }));
-                }), function (err) {
-                    // Если что-то пошло не так с конкретным слоем,
-                    // то все равно продолжаем поиск по следующему
-                    ndeferred.resolve();
-                }).otherwise(lang.hitch(widget, widget._breakOrError));
+                         }));
+                    }), function (err) {
+                        // Если что-то пошло не так с конкретным слоем,
+                        // то все равно продолжаем поиск по следующему
+                        ndeferred.resolve();
+                    }).otherwise(lang.hitch(widget, widget._breakOrError));
 
-                deferred = ndeferred;
+                    deferred = ndeferred;
+                }
 
                 deferred.then(function (limit) {
                     widget.loader.style.display = "none";
