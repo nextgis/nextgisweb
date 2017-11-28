@@ -226,7 +226,8 @@ h2:first-child,
   width: 16px;
   height: 16px;
 }
-.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-basemap_layer {
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-basemap_layer,
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-lookup_table {
   shape-rendering: crispEdges;
 }
 .text-withIcon__pic {
@@ -438,7 +439,8 @@ h2:first-child,
 .svgIcon-wmsclient_connection,
 .svgIcon-wmsclient_layer,
 .svgIcon-wmsserver_service,
-.svgIcon-basemap_layer {
+.svgIcon-basemap_layer,
+.svgIcon-lookup_table {
   background: none;
 }
 .svgIcon-mapserver_style {
@@ -667,32 +669,21 @@ a[class*=" icon-"]:hover:before {
   line-height: 1.5;
   font-size: 15px;
   font-family: "lato_local", 'Roboto', Arial, sans-serif;
-  border-bottom: 1px solid #d3e3f2;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  color: #076dbf;
 }
 .header a {
   text-decoration: none;
-  color: #076dbf;
-}
-.header a:hover {
-  color: #000;
-}
-.header a:hover .icon-logout:before {
-  color: #000;
-}
-.header .icon-logout:before {
-  color: #076dbf;
+  color: inherit;
 }
 .header .header__title {
   display: table;
-  color: #076dbf;
+  color: inherit;
   vertical-align: top;
   font-weight: bold;
   min-height: 34px;
   margin-top: -7px;
   margin-bottom: -7px;
-}
-.header .header__title:hover {
-  color: #076dbf;
 }
 .header-nav {
   margin: 0;
@@ -716,18 +707,26 @@ a[class*=" icon-"]:hover:before {
   line-height: 34px;
   margin-bottom: auto;
 }
+.header-nav__item > a {
+  color: inherit;
+}
+.header-nav__item > a:hover {
+  color: inherit;
+  opacity: .76;
+}
 .header-nav__item > .material-icons {
   display: inline;
-  color: #076dbf;
+  color: inherit;
   line-height: inherit;
 }
 .header-nav__item > .material-icons:hover {
-  color: #000;
+  color: inherit;
+  opacity: .76;
 }
 .header__left {
   padding-right: 250px;
 }
-.header__title__logo {
+.header__title-logo {
   display: table-cell;
   vertical-align: middle;
   border-right: 1px solid #b4d0ea;
@@ -735,7 +734,7 @@ a[class*=" icon-"]:hover:before {
   padding: 6px 12px;
   box-sizing: border-box;
 }
-.header__title__logo:hover {
+.header__title-logo:hover {
   border-bottom: 0;
   text-decoration: none;
 }
@@ -1486,57 +1485,72 @@ textarea {
 }
 .nextgis.claro .dijitButton--primary {
   margin: 0;
+  background-color: #076dbf;
+  color: #fff;
+  border-radius: 23px;
+  font-size: 16px;
 }
 .nextgis.claro .dijitButton--primary .dijitButtonNode {
   height: 36px;
   line-height: 30px;
-  font-size: 16px;
+  font-size: inherit;
   background-image: none;
-  background-color: #076dbf;
+  background-color: inherit;
   border: 0;
-  color: #fff;
+  color: inherit;
   border-radius: 23px;
   padding: 0 16px;
   font-family: "lato_local";
+  transition: none;
 }
 .nextgis.claro .dijitButton--primary .dijitButtonNode .dijitReset {
   line-height: inherit;
 }
-.nextgis.claro .dijitButton--primary:hover .dijitButtonNode,
-.nextgis.claro .dijitButton--primary:focus .dijitButtonNode {
+.nextgis.claro .dijitButton--primary.dijitButtonDisabled {
+  background: #ddd;
+  color: #999;
+}
+.nextgis.claro .dijitButton--primary:hover {
   background: #05518e;
 }
 .nextgis.claro .dijitButton--primary + .dijitButton--primary {
   margin-left: 8px;
 }
-.nextgis.claro .dijitButton--primary.dijitButtonDisabled .dijitButtonNode {
-  background: #ddd;
-  color: #999;
-}
 .nextgis.claro .dijitButton--default {
   margin: 0;
+  background-color: #e5eef7;
+  color: #076dbf;
+  border-radius: 23px;
+  font-size: 16px;
 }
 .nextgis.claro .dijitButton--default .dijitButtonNode {
   height: 36px;
   line-height: 30px;
-  font-size: 16px;
+  font-size: inherit;
   background-image: none;
-  background-color: #e5eef7;
+  background-color: inherit;
   border: 0;
-  color: #076dbf;
+  color: inherit;
   border-radius: 23px;
   padding: 0 16px;
   font-family: "lato_local";
+  transition: none;
 }
 .nextgis.claro .dijitButton--default .dijitButtonNode .dijitReset {
   line-height: inherit;
+}
+.nextgis.claro .dijitButton--default.dijitButtonDisabled {
+  background: #ddd;
+  color: #999;
+}
+.nextgis.claro .dijitButton--s {
+  font-size: 14px;
 }
 .nextgis.claro .dijitButton--s .dijitButtonNode {
   height: 32px;
   padding-left: 12px;
   padding-right: 12px;
   line-height: 27px;
-  font-size: 14px;
 }
 .nextgis.claro .dijitComboBoxMenu {
   padding-top: 5px;

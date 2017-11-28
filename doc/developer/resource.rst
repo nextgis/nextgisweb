@@ -759,3 +759,20 @@ To get posible routes make request:
             "/api/component/pyramid/pkg_version"
         ]
     }
+
+Get map
+^^^^^^^^^^^^
+.. versionadded:: 3.0
+
+To get map web interface (not map json representation) make one of the following requests:
+
+.. http:get:: resource/{0}/display
+.. http:get:: resource/{0}/display/tiny
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET esource/42/display HTTP/1.1
+   Host: ngw_url
+   Accept: */*

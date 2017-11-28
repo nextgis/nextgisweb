@@ -185,37 +185,22 @@ a[class*=" icon-"]:hover:before,{
     line-height: 1.5;
     font-size: 15px;
     font-family: @header-font, 'Roboto', Arial, sans-serif;
-    border-bottom: 1px solid #d3e3f2;
+    border-bottom: 1px solid rgba(0,0,0,.04);
+    color: @blue;
 
     a{
         text-decoration: none;
-        color: @blue;
-        
-        &:hover{
-            color: #000;
-            
-            .icon-logout:before{
-                color: #000;
-            }
-        }
-    }
-    
-    .icon-logout:before{
-        color: @blue;
+        color: inherit;
     }
     
     .header__title {
         display: table;
-        color: @blue;
+        color: inherit;
         vertical-align: top;
         font-weight: bold;
         min-height: 34px;
         margin-top: -7px;
         margin-bottom: -7px;
-        
-        &:hover{
-            color: @blue;
-        }
     }
 }
     
@@ -241,13 +226,23 @@ a[class*=" icon-"]:hover:before,{
             line-height: 34px;
             margin-bottom: auto;
 
+            & > a{
+                color: inherit;
+
+                &:hover{
+                    color: inherit;
+                    opacity: .76;
+                }
+            }
+
             & > .material-icons{
                 display: inline;
-                color: @blue;
+                color: inherit;
                 line-height:inherit;
 
                 &:hover{
-                    color: #000;
+                    color: inherit;
+                    opacity: .76;
                 }
             }
         }
@@ -256,7 +251,7 @@ a[class*=" icon-"]:hover:before,{
     .header__left{
         padding-right: 250px;
     }
-        .header__title__logo{
+        .header__title-logo{
             display: table-cell;
             vertical-align: middle;
             border-right: 1px solid #b4d0ea;

@@ -1,69 +1,83 @@
 .nextgis.claro{
+
 	.dijitButton--primary{
 		margin:0;
-		
+		background-color: @blue;
+		color: #fff;
+		border-radius: 23px;
+		font-size: @font-size-md;
+
 		.dijitButtonNode{
 			height: 36px;
 			line-height: 30px;
-			font-size: @font-size-md;
-			background-image: none;			
-			background-color: @blue;
+			font-size: inherit;
+			background-image: none;
+			background-color: inherit;
 			border:0;
-			color: #fff;
+			color: inherit;
 			border-radius: 23px;
 			padding: 0 16px;
 			font-family: @header-font;
+			transition: none;
 
 			.dijitReset{
 				line-height: inherit;
 			}
 		}
 
-		&:hover,
-		&:focus{
-			.dijitButtonNode{
-				background: darken(@blue, 10%);
-			}
+		&.dijitButtonDisabled{
+			background: #ddd;
+			color: #999;
+		}
+
+		&:hover{
+			background: darken(@blue, 10%);
 		}
 
 		& + .dijitButton--primary{
 			margin-left: 8px;
 		}
-
-		&.dijitButtonDisabled{
-			.dijitButtonNode{
-				background: #ddd;
-				color: #999;
-			}
-		}
 	}
 
 	.dijitButton--default{
 		margin: 0;
+		background-color: @lightBlue;
+		color: @blue;
+		border-radius: 23px;
+		font-size: @font-size-md;
 
 		.dijitButtonNode{
 			height: 36px;
 			line-height: 30px;
-			font-size: @font-size-md;
+			font-size: inherit;
 			background-image: none;
-			background-color: @lightBlue;
+			background-color: inherit;
 			border:0;
-			color: @blue;
+			color: inherit;
 			border-radius: 23px;
 			padding: 0 16px;
 			font-family: @header-font;
+			transition: none;
 
 			.dijitReset{
 				line-height: inherit;
 			}
 		}
+
+		&.dijitButtonDisabled{
+			background: #ddd;
+			color: #999;
+		}
 	}
 
-	.dijitButton--s .dijitButtonNode{
-		height: 32px;
-		padding-left:12px;
-		padding-right: 12px;
-		line-height: 27px;
+	.dijitButton--s {
 		font-size: 14px;
+
+		.dijitButtonNode {
+			height: 32px;
+			padding-left: 12px;
+			padding-right: 12px;
+			line-height: 27px;
+		}
 	}
 }

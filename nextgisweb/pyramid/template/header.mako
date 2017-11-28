@@ -18,9 +18,7 @@
             %if request.user.keyname == 'guest':
                 <a href="${request.route_url(login_route_name)}">${tr(_('Sign in'))}</a>
             %else:
-                <div class="user-avatar" data-dojo-type="ngw-pyramid/user-avatar/UserAvatar"
-                 data-dojo-props="userName: '${request.user}',
-                                  logoutLink: '${request.route_url(logout_route_name)}'"></div>
+                <div class="user-avatar" id="userAvatar"></div>
             %endif
         </li>
         <li class="header-nav__item">
@@ -36,7 +34,7 @@
     </ul>
     <div class="header__left">
         <div class="header__title">
-            <a class="header__title__logo" href="${request.application_url}">
+            <a class="header__title-logo" href="${request.application_url}">
             %if has_logo:
                 <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
             %else:
@@ -49,32 +47,54 @@
         </div>
     </div>
 </div>
+<div id="rightMenu"></div>
 
-<%
-    items = []
-    items.append({
-        'text': 'Resources',
-        'link': request.route_url('resource.root')
-    })
-    if request.user.is_administrator:
-        items.append({
-            'text': 'Control panel',
-            'link': request.route_url('pyramid.control_panel')
-        })
-    if request.env.pyramid.help_page.get(request.locale_name):
-        items.append({
-            'text': 'Help',
-            'link': request.route_url('pyramid.help_page')
-        })
-%>
-<div id="rightMenu"
-     data-dojo-type="ngw-pyramid/right-menu/RightMenu"
-     data-dojo-props="items: ${items},
-                      class: 'right-menu',
-                      withOverlay: true,
-                      loginLink: '${request.route_url(login_route_name)}',
-                      %if (request.user.keyname != 'guest'):
-                          user: '${request.user}',
-                          logoutLink: '${request.route_url(logout_route_name)}'
-                      %endif
-                    "></div>
+<script>
+    require([
+        "ngw-pyramid/right-menu/RightMenu",
+        "ngw-pyramid/user-avatar/UserAvatar"
+    ], function (
+        RightMenu, UserAvatar
+    ) {
+        %if request.user.keyname != 'guest':
+            (new UserAvatar({
+                userName: '${request.user}',
+                logoutLink: '${request.route_url(logout_route_name)}'
+            })).placeAt('userAvatar');
+        %endif
+
+        (new RightMenu({
+            items: [
+                {
+                    "text": '${tr(_("Resources"))}',
+                    "link": '${request.route_url("resource.root")}'
+                }
+            %if request.user.is_administrator:
+                ,{
+                    "text": '${tr(_("Control panel"))}',
+                    "link": '${request.route_url("pyramid.control_panel")}'
+                }
+            %endif
+
+            <% help_page = request.env.pyramid.help_page.get(request.locale_name) %>
+            %if help_page:
+                ,{
+                    "text": '${tr(_("Help"))}',
+                    %if re.match("^http[s]?", help_page):
+                        "link": '${help_page}'
+                    %else:
+                        "link": '${request.route_url("pyramid.help_page")}'
+                    %endif
+                }
+            %endif
+            ],
+            class: 'right-menu',
+            withOverlay: true,
+            loginLink: '${request.route_url(login_route_name)}',
+            %if (request.user.keyname != 'guest'):
+              user: '${request.user}',
+              logoutLink: '${request.route_url(logout_route_name)}'
+            %endif
+        })).placeAt('rightMenu');
+    });
+</script>

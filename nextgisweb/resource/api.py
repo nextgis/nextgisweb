@@ -299,8 +299,11 @@ def collection_post(request):
     if 'cls' not in data['resource']:
         raise ValidationError(_("Resource class required."))
 
-    elif data['resource']['cls'] not in Resource.registry:
+    if data['resource']['cls'] not in Resource.registry:
         raise ValidationError(_("Unknown resource class '%s'.") % data['resource']['cls'])
+
+    elif data['resource']['cls'] in request.env.resource.disabled_cls:
+        raise ValidationError(_("Resource class '%s' disabled.") % data['resource']['cls'])
 
     cls = Resource.registry[data['resource']['cls']]
     resource = cls(owner_user=request.user)

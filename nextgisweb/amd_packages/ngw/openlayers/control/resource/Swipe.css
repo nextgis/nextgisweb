@@ -42,6 +42,10 @@
     background-color: #00d18f;
 }
 
+.custom-css .ol-swipe button{
+    background-color: #858585;
+}
+
 .ol-swipe.horizontal,
 .ol-swipe.horizontal button
 {   cursor: ns-resize;

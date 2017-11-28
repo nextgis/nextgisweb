@@ -1,7 +1,8 @@
 .navigation-menu{
     width: 50px;
     padding: 8px 0 !important;
-    background-color: #076dbf
+    background-color: #076dbf;
+    color: #fff;
 }
     .navigation-menu__item{
         text-align:center;
@@ -11,11 +12,13 @@
     }
 
     .navigation-menu__icon{
-        color: rgba(255,255,255,.54);
         line-height: 40px;
+        color: inherit;
+        opacity: .48;
+        color: inherit;
     }
 
         .navigation-menu__item:hover .navigation-menu__icon,
         .active .navigation-menu__icon{
-            color: #fff;
+            opacity: 1;
         }

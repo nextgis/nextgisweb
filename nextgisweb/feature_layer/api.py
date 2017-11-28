@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import decimal
 import json
 import unicodecsv as csv
 from collections import OrderedDict
-from datetime import date, time, datetime
+from datetime import datetime, date, time
+from decimal import Decimal
 from StringIO import StringIO
 
 import geojson
+from geojson import GeoJSONEncoder
 from shapely import wkt
 from pyramid.response import Response
 
@@ -21,12 +24,17 @@ PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
 
 
-class ComplexEncoder(geojson.GeoJSONEncoder):
+class ComplexEncoder(GeoJSONEncoder):
+    # SQLAlchemy uses decimal.Decimal for numeric columns
+    # and datetime.date for dates. geojson does
+    # not know how to deal with objects of those types.
+    # This class provides a simple encoder that can deal
+    # with these kinds of objects.
+
     def default(self, obj):
-        try:
-            return geojson.GeoJSONEncoder.default(self, obj)
-        except TypeError:
+        if isinstance(obj, (Decimal, date, datetime)):
             return str(obj)
+        return GeoJSONEncoder.default(self, obj)
 
 
 def view_geojson(request):

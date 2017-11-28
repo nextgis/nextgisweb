@@ -160,6 +160,13 @@ class CoreComponent(Component):
             obj = Setting(component=component, name=name).persist()
         obj.value = json.dumps(value)
 
+    def settings_delete(self, component, name):
+        try:
+            DBSession.delete(Setting.filter_by(
+                component=component, name=name).one())
+        except NoResultFound:
+            pass
+
     def init_settings(self, component, name, value):
         try:
             self.settings_get(component, name)

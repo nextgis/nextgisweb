@@ -5,7 +5,6 @@ define([
     'ngw-pyramid/hbs-i18n',
     "dojo/_base/array",
     "dojo/query",
-    "dojo/dom",
     "dojo/dom-construct",
     "dijit/_TemplatedMixin",
     "dijit/layout/ContentPane",
@@ -19,11 +18,11 @@ define([
     hbsI18n,
     array,
     query,
-    dom,
     domConstruct,
     _TemplatedMixin,
     ContentPane,
-    template) {
+    template
+) {
     return declare([Stateful, ContentPane,_TemplatedMixin],{
         templateString: hbsI18n(template, i18n),
         items: [], // array of menu item. {name: "name", icon: "icon", value: "value"}
@@ -46,13 +45,13 @@ define([
                      title: item.title,
                      onclick: function(e){
                          if (widget.value === item.value)
-                             widget.reset()
+                             widget.reset();
                          else
                             widget.activateItem(item.value, this);
                      }
                  }, this.domNode);
 
-                 itemEl.setAttribute("data-item-value", item.value)
+                 itemEl.setAttribute("data-item-value", item.value);
 
             }, this);
         },
@@ -63,7 +62,7 @@ define([
         },
         reset: function(){
             this.set("value", undefined);
-            query(".active", this.domNode).removeClass("active")
+            query(".active", this.domNode).removeClass("active");
         }
     });
 });

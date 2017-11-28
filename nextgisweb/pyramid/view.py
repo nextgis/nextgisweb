@@ -91,6 +91,13 @@ def cors(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def custom_css(request):
+    request.require_administrator()
+    return dict(
+        title=_("Custom CSS"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
 def system_name(request):
     request.require_administrator()
     return dict(
@@ -133,6 +140,11 @@ def setup_pyramid(comp, config):
     ).add_view(cors, renderer=ctpl('cors'))
 
     config.add_route(
+        'pyramid.control_panel.custom_css',
+        '/control-panel/custom-css'
+    ).add_view(custom_css, renderer=ctpl('custom_css'))
+
+    config.add_route(
         'pyramid.control_panel.system_name',
         '/control-panel/system-name'
     ).add_view(system_name, renderer=ctpl('system_name'))
@@ -149,4 +161,6 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.system_name'))),
         dm.Link('settings/cors', _("Cross-origin resource sharing (CORS)"), lambda args: (
             args.request.route_url('pyramid.control_panel.cors'))),
+        dm.Link('settings/custom_css', _("Custom CSS"), lambda args: (
+            args.request.route_url('pyramid.control_panel.custom_css'))),
     )

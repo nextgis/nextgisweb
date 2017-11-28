@@ -63,6 +63,12 @@ def group_iput(request):
     return dict(id=obj.id)
 
 
+def current_user(request):
+    return dict(
+        id=request.user.id, keyname=request.user.keyname,
+        display_name=request.user.display_name)
+
+
 def register(request):
     if not request.env.auth.settings_register:
         raise HTTPForbidden("Anonymous registration is not allowed!")
@@ -104,6 +110,9 @@ def setup_pyramid(comp, config):
     config.add_route('auth.group.item', '/api/component/auth/group/{id}') \
         .add_view(group_iget, request_method='GET', renderer='json') \
         .add_view(group_iput, request_method='PUT', renderer='json')
+
+    config.add_route('auth.current_user', '/api/component/auth/current_user') \
+        .add_view(current_user, request_method='GET', renderer='json')
 
     config.add_route('auth.register', '/api/component/auth/register') \
         .add_view(register, request_method='POST', renderer='json')
