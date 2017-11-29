@@ -72,6 +72,9 @@ class Server (object):
 
         exceptionReport = ExceptionReport()
 
+        if "acceptversions" in params:
+            params["version"] = max(params["acceptversions"].split(","))
+
         if params.has_key("format") and params["format"] in \
                 [u'application/json', u'text/javascript', u'json', u'geojson']:
             request = GeoJSON(self)

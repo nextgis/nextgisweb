@@ -61,10 +61,6 @@ def handler(obj, request):
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key: params[key] for key in params if params[key] is not None}
 
-    # Change 'acceptversions' to 'version', it allows use the code without change
-    if 'acceptversions' in params:
-        params['version'] = params['acceptversions']
-
     datasources = {
         l.keyname: NextgiswebDatasource(
             l.keyname,
