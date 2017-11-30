@@ -176,7 +176,7 @@ define([
 
                     // Посылаем запрос на геокодирование
                     deferred.then(lang.hitch(this, function (limit) {
-                        var NOMINATIM_SEARCH_URL = "http://nominatim.openstreetmap.org/search/";
+                        var NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search/";
                         var CALLBACK = "json_callback";
                         var url = NOMINATIM_SEARCH_URL + encodeURIComponent(criteria);
 
