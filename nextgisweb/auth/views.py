@@ -28,7 +28,8 @@ def setup_pyramid(comp, config):
 
         if request.method == 'POST':
             try:
-                user = User.filter_by(keyname=request.POST['login']).one()
+                user = User.filter_by(
+                    keyname=request.POST['login'].strip()).one()
 
                 if user.password == request.POST['password']:
                     headers = remember(request, user.id)
