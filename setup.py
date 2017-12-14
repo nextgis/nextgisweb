@@ -33,6 +33,10 @@ requires = [
     'minio',
 ]
 
+extras_require = {
+    'dev': ['pdbpp', 'ipython']
+}
+
 entry_points = {
     'paste.app_factory': [
         'main = nextgisweb:main'
@@ -75,6 +79,7 @@ setup(
     zip_safe=False,
     test_suite='nextgisweb',
     install_requires=requires,
+    extras_require=extras_require,
     tests_require=['nose', ],
     entry_points=entry_points,
 )
