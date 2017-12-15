@@ -32,7 +32,7 @@ class ComplexEncoder(GeoJSONEncoder):
     # with these kinds of objects.
 
     def default(self, obj):
-        if isinstance(obj, (Decimal, date, datetime)):
+        if isinstance(obj, (Decimal, date, datetime, time)):
             return str(obj)
         return GeoJSONEncoder.default(self, obj)
 
