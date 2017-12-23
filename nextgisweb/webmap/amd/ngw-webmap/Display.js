@@ -41,6 +41,7 @@ define([
     "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
+    "./tool/Identify",
     //left panel
     "ngw-pyramid/navigation-menu/NavigationMenu",
     "ngw-webmap/ui/LayersPanel/LayersPanel",
@@ -50,6 +51,7 @@ define([
     "ngw-webmap/ui/SharePanel/SharePanel",
     "ngw-webmap/ui/InfoPanel/InfoPanel",
     "./tool/Swipe",
+    "ngw-webmap/MapStatesObserver",
     // settings
     "ngw/settings!webmap",
     // template
@@ -102,10 +104,11 @@ define([
     i18n,
     hbsI18n,
     MapToolbar,
-    InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure,
+    InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure, Identify,
     NavigationMenu,
     LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel, InfoPanel,
     ToolSwipe,
+    MapStatesObserver,
     clientSettings,
     //template
     TabContainer, BorderContainer
@@ -866,7 +869,12 @@ define([
 
             this.mapToolbar.items.addTool(new ToolSwipe({display: this, orientation: "vertical"}), 'swipeVertical');
 
-            topic.publish('/webmap/tools/initialized');
+            this.identify = new Identify({display: this});
+            var mapStates = MapStatesObserver.getInstance();
+            mapStates.addState('identifying', this.identify);
+            mapStates.setDefaultState('identifying', true);
+
+            topic.publish('/webmap/tools/initialized')
         },
 
         _pluginsSetup: function (wmplugin) {

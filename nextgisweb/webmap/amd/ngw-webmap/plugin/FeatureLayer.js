@@ -21,9 +21,7 @@ define([
     "dijit/ToolbarSeparator",
     "dijit/popup",
     "put-selector/put",
-    "ngw/route",
-    "ngw-webmap/MapStatesObserver",
-    "ngw-webmap/tool/Identify"
+    "ngw/route"
 ], function (
     declare,
     _PluginBase,
@@ -46,9 +44,7 @@ define([
     ToolbarSeparator,
     popup,
     put,
-    route,
-    MapStatesObserver,
-    Identify
+    route
 ) {
 
     var Pane = declare([FeatureGrid], {
@@ -133,7 +129,7 @@ define([
                 menuItem.set("disabled", !(itemConfig.type == "layer" && itemConfig.plugin[plugin.identity]));
             });
 
-            this.tool = new Identify({display: this.display});
+           // this.tool = new Identify({display: this.display});
        },
 
         postCreate: function () {
@@ -141,9 +137,9 @@ define([
                 this.display.layersPanel.contentWidget.itemMenu.addChild(this.menuItem);
             }
 
-            var mapStates = MapStatesObserver.getInstance();
-            mapStates.addState('identifying', this.tool);
-            mapStates.setDefaultState('identifying', true);
+            // var mapStates = MapStatesObserver.getInstance();
+            // mapStates.addState('identifying', this.tool);
+            // mapStates.setDefaultState('identifying', true);
         },
 
         openFeatureGrid: function () {

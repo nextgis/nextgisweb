@@ -1,0 +1,50 @@
+.coordinate-switcher,
+.claro .coordinate-switcher{
+    font-size: 12px;
+    border-color:transparent !important;
+    color: #555;
+}
+
+.coordinate-switcher__dropdown,
+.claro .coordinate-switcher__dropdown{
+    font-size: 12px;
+    border:0;
+}
+
+.nextgis.claro .coordinate-switcher__dropdown .dijitMenuItem td{
+    color: #555;
+}
+
+.coordinate-switcher .dijitArrowButton,
+.claro .coordinate-switcher .dijitArrowButton{
+    background-color: transparent;
+    background-image: none;
+}
+
+
+.coordinate-switcher .dijitArrowButtonInner,
+.claro .coordinate-switcher .dijitArrowButtonInner{
+    display: none;
+}
+
+.claro .coordinate-switcher .dijitArrowButton::after{
+    content: "arrow_drop_down";
+    font-family: "Material Icons";
+    font-size: 17px;
+    font-feature-settings: 'liga';
+    vertical-align: middle;
+    color: #999;
+    margin-left: -5px;
+    margin-right: -5px;
+}
+
+.claro .coordinate-switcher.dijitSelectOpenedFocused .dijitArrowButton{
+    position: relative;
+    top: -1px;
+    transform: rotate(180deg);
+}
+
+.claro .coordinate-switcher .dijitButtonContents,
+.coordinate-switcher .dijitButtonContents{
+    border-right: 0
+}

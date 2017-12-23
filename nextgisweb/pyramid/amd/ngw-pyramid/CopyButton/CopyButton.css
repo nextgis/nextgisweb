@@ -1,0 +1,24 @@
+.copy-button__icon{
+    cursor:pointer;
+    user-select: none;
+}
+
+.copy-button__icon:hover{
+    color: #00b77e;
+}
+
+.copy-button__input{
+    position: fixed;
+    left:0;
+    top:0;
+    z-index: -1000;
+}
+
+.copy-button.activated .copy-button__icon{
+    animation: copyButton-highlight .4s ease-in-out;
+}
+
+@keyframes copyButton-highlight {
+    from,
+    to { color: #00b77e; }
+}

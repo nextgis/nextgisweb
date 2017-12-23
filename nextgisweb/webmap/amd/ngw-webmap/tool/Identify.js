@@ -26,6 +26,8 @@ define([
     "ngw-pyramid/i18n!webmap",
     "ngw-feature-layer/FieldsDisplayWidget",
     "ngw-feature-layer/FeatureEditorWidget",
+    "ngw-webmap/ui/CoordinateSwitcher/CoordinateSwitcher",
+    "ngw-pyramid/CopyButton/CopyButton",
     // settings
     "ngw/settings!feature_layer",
     "ngw/settings!webmap",
@@ -58,6 +60,8 @@ define([
     i18n,
     FieldsDisplayWidget,
     FeatureEditorWidget,
+    CoordinateSwitcher,
+    CopyButton,
     featureLayersettings,
     webmapSettings
 ) {
@@ -81,7 +85,8 @@ define([
     var Widget = declare([BorderContainer], {
         style: "width: 100%; height: 100%",
         gutters: false,
-
+        features: [],
+        coordinates: undefined,
         postCreate: function () {
             this.inherited(arguments);
 
@@ -100,6 +105,7 @@ define([
                     if (layerIdx > -1) {
                         var layerResponse = this.response[layerId];
                         var idx = 0;
+
                         array.forEach(layerResponse.features, function (feature) {
                             var label = put("div[style=\"overflow: hidden; display: inline-block; text-align: left;\"] $ span[style=\"color: gray\"] $ <", feature.label, " (" + this.layerLabels[layerId] + ")");
                             domStyle.set(label, "width", (this.popupSize[0] - 35) + "px");
@@ -114,6 +120,43 @@ define([
                 }
             });
 
+            if (this.response.featureCount) {
+                // render layer select
+                this._displaySelectPane();
+
+                // render feature container
+                this.featureContainer = new BorderContainer({
+                    region: "center",
+                    gutters: false,
+                    class: "ngwPopup__features"
+                }).placeAt(this.domNode);
+                setTimeout(lang.hitch(this, this.resize), 50);
+                this._displayFeature(this._featureResponse(this.select.get("value")));
+            }
+
+            // Coordinates
+            this._displayCoordinates();
+
+            // создаем виждеты для всех расширений IFeatureLayer
+            var deferreds = [];
+
+            this.extWidgetClasses = {};
+
+            array.forEach(Object.keys(featureLayersettings.extensions), function (key) {
+                var ext = featureLayersettings.extensions[key];
+
+                var deferred = new Deferred();
+                deferreds.push(deferred);
+
+                require([ext], lang.hitch(this, function (cls) {
+                    this.extWidgetClasses[key] = cls;
+                    deferred.resolve(this);
+                }));
+            }, this);
+
+            this.extWidgetClassesDeferred = all(deferreds);
+        },
+        _displaySelectPane: function() {
             this.selectPane = new ContentPane({
                 region: "top", layoutPriority: 1,
                 style: "padding: 0 2px 0 1px"
@@ -126,62 +169,30 @@ define([
                 options: this.selectOptions
             }).placeAt(this.selectPane);
 
-            // создаем виждеты для всех расширений IFeatureLayer
-            var deferreds = [];
-            var widget = this;
-
-            widget.extWidgetClasses = {};
-
-            array.forEach(Object.keys(featureLayersettings.extensions), function (key) {
-                var ext = featureLayersettings.extensions[key];
-
-                var deferred = new Deferred();
-                deferreds.push(deferred);
-
-                require([ext], function (cls) {
-                    widget.extWidgetClasses[key] = cls;
-                    deferred.resolve(widget);
-                });
-            }, this);
-
-            this.extWidgetClassesDeferred = all(deferreds);
+            this.select.watch("value", lang.hitch(this, function (attr, oldVal, newVal) {
+                this._displayFeature(this._featureResponse(newVal));
+            }));
         },
-
-        startup: function () {
-            this.inherited(arguments);
-
-            var widget = this;
-
-            this.select.watch("value", function (attr, oldVal, newVal) {
-                widget._displayFeature(widget._featureResponse(newVal));
-            });
-            this._displayFeature(this._featureResponse(this.select.get("value")));
-        },
-
         _featureResponse: function (selectValue) {
             var keys = selectValue.split("/");
             return this.response[keys[0]].features[keys[1]];
         },
-
         _displayFeature: function (feature) {
-            var widget = this, lid = feature.layerId, fid = feature.id;
+            var widget = this, lid = feature.layerId, fid = feature.id,
+                iurl = route.feature_layer.feature.item({id: lid, fid: fid});
 
-            var iurl = route.feature_layer.feature.item({id: lid, fid: fid});
+            domConstruct.empty(widget.featureContainer.domNode);
+
 
             xhr.get(iurl, {
                 method: "GET",
                 handleAs: "json"
             }).then(function (feature) {
                 widget.extWidgetClassesDeferred.then(function () {
-                    if (widget.featureContainer) {
-                        widget.featureContainer.destroyRecursive();
-                    }
-
-                    widget.featureContainer = new BorderContainer({region: "center", gutters: false});
-                    widget.addChild(widget.featureContainer);
 
                     widget.extContainer = new StackContainer({
-                        region: "center", style: "overflow-y: scroll"});
+                        region: "center", style: "overflow-y: scroll"
+                    });
 
                     widget.featureContainer.addChild(widget.extContainer);
 
@@ -198,7 +209,8 @@ define([
                     if (featureLayersettings.identify.attributes) {
                         var fwidget = new FieldsDisplayWidget({
                             resourceId: lid, featureId: fid,
-                            compact: true, title: i18n.gettext("Attributes")});
+                            compact: true, title: i18n.gettext("Attributes")
+                        });
 
                         fwidget.renderValue(feature.fields);
                         fwidget.placeAt(widget.extContainer);
@@ -208,7 +220,8 @@ define([
                         var cls = widget.extWidgetClasses[key],
                             ewidget = new cls({
                                 resourceId: lid, featureId: fid,
-                                compact: true});
+                                compact: true
+                            });
 
                         ewidget.renderValue(feature.extensions[key]);
                         ewidget.placeAt(widget.extContainer);
@@ -226,10 +239,10 @@ define([
                                 array.forEach(data.feature_layer.fields, function (itm) {
                                     fieldmap[itm.keyname] = itm;
                                 });
-                                
+
                                 var pane = new FeatureEditorWidget({
                                     resource: lid, feature: fid,
-                                    fields: data.feature_layer.fields, 
+                                    fields: data.feature_layer.fields,
                                     title: i18n.gettext("Feature") + " #" + fid,
                                     iconClass: "iconDescription",
                                     closable: true
@@ -251,6 +264,39 @@ define([
 
                 topic.publish("feature.highlight", {geom: feature.geom});
             });
+        },
+        _displayCoordinates: function(){
+            this.coordinatePane = new ContentPane({
+                region: "bottom",
+                class:"ngwPopup__coordinates",
+            });
+            this.addChild(this.coordinatePane);
+            this.coordinateSwitcher = new CoordinateSwitcher({
+                point: this.coordinates,
+                selectedFormat: localStorage.getItem('coordinatesFormat'),
+                projections: {
+                    initial: this.displayProjection,
+                    lonlat: this.lonlatProjection
+                }
+            });
+            this.coordinateSwitcher.placeAt(this.coordinatePane);
+            this.coordinateSwitcher.startup();
+
+            on(this.coordinateSwitcher.dropDown.containerNode, "click",  lang.hitch(this, function(value){
+                var selectedFormat = this.coordinateSwitcher.options.filter(function(item){
+                    return item.selected;
+                })[0].format;
+
+                this.coordinateCopyBtn.copy();
+                localStorage.setItem('coordinatesFormat', selectedFormat);
+            }));
+
+            this.coordinateCopyBtn = new CopyButton({
+                target: this.coordinateSwitcher,
+                targetAttribute: "value",
+                class: "ngwPopup__coordinates-copy"
+            });
+            this.coordinateCopyBtn.placeAt(this.coordinatePane, "first");
         }
     });
 
@@ -314,39 +360,32 @@ define([
             };
 
             this.display.getVisibleItems().then(lang.hitch(this, function (items) {
-                if (items.length === 0) {
-                    // Никаких видимых элементов сейчас нет
-                    console.log("Visible items not found!");
-                } else {
-                    // Добавляем список видимых элементов в запрос,
-                    // учитывая видимость в пределах масштаба
-                    var mapResolution = this.display.map.get("resolution");
-                    array.forEach(items, function (i) {
-                        var item = this.display._itemConfigById[
-                            this.display.itemStore.getValue(i, "id")];
-                        if (mapResolution >= item.maxResolution ||
-                            mapResolution < item.minResolution) {
-                            return;
-                        }
-                        request.layers.push(item.layerId);
-                    }, this);
+                var mapResolution = this.display.map.get("resolution");
+                array.forEach(items, function (i) {
+                    var item = this.display._itemConfigById[
+                        this.display.itemStore.getValue(i, "id")];
+                    if (mapResolution >= item.maxResolution ||
+                        mapResolution < item.minResolution) {
+                        return;
+                    }
+                    request.layers.push(item.layerId);
+                }, this);
 
-                    var layerLabels = {};
-                    array.forEach(items, function (i) {
-                        layerLabels[this.display.itemStore.getValue(i, "layerId")] = this.display.itemStore.getValue(i, "label");
-                    }, this);
+                var layerLabels = {};
+                array.forEach(items, function (i) {
+                    layerLabels[this.display.itemStore.getValue(i, "layerId")] = this.display.itemStore.getValue(i, "label");
+                }, this);
 
-                    // XHR-запрос к сервису
-                    xhr.post(route.feature_layer.identify(), {
-                        handleAs: "json",
-                        data: json.stringify(request),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    }).then(function (response) {
-                        tool._responsePopup(response, point, layerLabels);
-                    });
-                }
+                // XHR-запрос к сервису
+                xhr.post(route.feature_layer.identify(), {
+                    handleAs: "json",
+                    data: json.stringify(request),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function (response) {
+                    tool._responsePopup(response, point, layerLabels);
+                });
             }));
 
         },
@@ -372,10 +411,12 @@ define([
         },
 
         _responsePopup: function (response, point, layerLabels) {
+
             if (response.featureCount === 0) {
-                this._popup.setPosition(undefined);
                 topic.publish("feature.unhighlight");
-                return;
+                domClass.add(this._popup.contentDiv, "ngwPopup__content--nofeature");
+            } else {
+                domClass.remove(this._popup.contentDiv, "ngwPopup__content--nofeature");
             }
 
             domConstruct.empty(this._popup.contentDiv);
@@ -384,7 +425,10 @@ define([
                 response: response,
                 tool: this,
                 layerLabels: layerLabels,
-                popupSize: [this.popupWidth, this.popupHeight]
+                popupSize: [this.popupWidth, this.popupHeight],
+                coordinates: point,
+                displayProjection: this.display.displayProjection,
+                lonlatProjection: this.display.lonlatProjection
             });
             this._popup.widget = widget;
 

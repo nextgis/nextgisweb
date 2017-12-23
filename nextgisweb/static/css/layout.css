@@ -1389,17 +1389,27 @@ textarea {
 .dj_android .nextgis.claro .dijitSplitterH {
   margin-top: -11px;
 }
-.nextgis.claro .dijitTextBoxHover {
-  background-color: #fff;
+.nextgis.claro .dijitSelect,
+.nextgis.claro .dijitTextBox {
+  border-radius: 2px;
+}
+.nextgis.claro .dijitSelect .dijitInputField,
+.nextgis.claro .dijitTextBox .dijitInputField {
+  padding: 2px 4px;
 }
 .nextgis.claro .dijitSelectHover,
 .nextgis.claro .dijitTextBoxHover,
 .nextgis.claro .dijitSelectFocused,
 .nextgis.claro .dijitTextBoxFocused {
   background-image: none;
+  background-color: #fff;
 }
 .nextgis.claro .dijitTextBoxFocused {
   border-color: #00e69f;
+}
+.nextgis.claro .dijitTextArea {
+  padding: 4px;
+  box-sizing: border-box;
 }
 .checkbox {
   cursor: pointer;
@@ -1552,6 +1562,26 @@ textarea {
   padding-right: 12px;
   line-height: 27px;
 }
+.nextgis.claro .dijitMenuTable {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-radius: 2px;
+}
+.nextgis.claro .dijitMenu {
+  border: 0;
+}
+.nextgis.claro .dijitMenu .dijitMenuItem td {
+  padding: 4px 6px;
+  border: 0;
+}
+.nextgis.claro .dijitMenu .dijitMenuItemHover td,
+.nextgis.claro .dijitMenu .dijitMenuItemSelected td,
+.nextgis.claro .dijitMenuItemHover,
+.nextgis.claro .dijitComboBoxMenu .dijitMenuItemHover,
+.nextgis.claro .dijitMenuItemSelected {
+  background-color: rgba(0, 0, 0, 0.04);
+  background-image: none;
+}
 .nextgis.claro .dijitComboBoxMenu {
   padding-top: 5px;
   padding-bottom: 5px;
@@ -1593,4 +1623,10 @@ textarea {
 }
 .nextgis.claro .dijitTreeRowSelected {
   background-color: rgba(0, 0, 0, 0.04);
+}
+.nextgis.claro .dijitPopup {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+.nextgis.claro .dijitTooltipDialogPopup {
+  box-shadow: none;
 }

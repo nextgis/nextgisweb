@@ -1,6 +1,9 @@
 define([
     "dojo/dom-construct",
-    "openlayers/ol"
+    "openlayers/ol",
+
+    //templates
+    "xstyle/css!./resource/Popup.css"
 ], function (
     domConstruct,
     ol
@@ -17,12 +20,12 @@ define([
             class: "dijitTooltipContainer",
             style: {
                 "background-color": "white",
-                "padding": 0,
-                "user-select": "auto"
+                "padding": 0
             }
         }, this.container);
 
         this.contentDiv = domConstruct.create("div", {
+            class: "ngwPopup__content",
             style: {
                 "width": options.size[0] + "px",
                 "height": options.size[1] + "px",
@@ -32,7 +35,7 @@ define([
 
         // Заголовок
         this.titleBar = domConstruct.create("div", {
-            style: "background-color: #eee; margin: 1px 1px 2px 1px;"
+            class: "ngwPopup__title",
         }, this.subcontainer, "first");
 
         this.titleSpan = domConstruct.create("span", {

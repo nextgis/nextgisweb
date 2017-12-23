@@ -17,6 +17,10 @@
     border-bottom: 1px solid #efefef;
 }
 
+.ngw-feature-layer-FieldsDisplayWidget.compact .pure-table:last-child{
+    border-bottom: 0;
+}
+
 .ngw-feature-layer-FieldsDisplayWidget.compact .pure-table .display_name { width: auto; }
 
 

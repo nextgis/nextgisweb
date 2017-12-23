@@ -38,3 +38,28 @@
 /* На кнопках без подписи прячем элемент подписи совсем */
 
 .dijitButton.no-label .dijitButtonText { display: none; }
+
+.ngwPopup__coordinates,
+.claro .ngwPopup__coordinates{
+    box-sizing: border-box;
+    width: 100% !important;
+    padding: 3px 3px 2px 2px;
+}
+
+.ngwPopup__coordinates-copy{
+    float: right;
+    margin-top: 3px;
+    line-height: 1;
+}
+
+.ngwPopup__coordinates-copy .copy-button__icon{
+    font-size: 16px;
+}
+
+.ngwPopup__coordinates .coordinate-switcher{
+    margin-left: -2px;
+}
+
+.ngwPopup__features{
+    border-bottom: 1px solid #efefef;
+}
