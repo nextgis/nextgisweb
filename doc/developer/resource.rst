@@ -8,11 +8,11 @@ Resources
 ..  automodule:: nextgisweb.resource.scope
     :members:
 
-.. _resource_classes:
+.. _ngwdev_resource_classes:
 Resource classes
 --------------------
 
-Resources (cls) can be:
+Now there are followin resource classes:
    
 * resource_group
 * postgis_layer
@@ -310,7 +310,7 @@ Basic requests
     Create resource by JSON data payload.
 
     :param integer parent: Parent resource identificator, may be in JSON payload.
-    :param string cls: Resource type. See :ref:`resource_classes`.
+    :param string cls: Resource class (type). For a list of supported resource classes see :ref:`ngwdev_resource_classes`.
     
  
 Get feature
