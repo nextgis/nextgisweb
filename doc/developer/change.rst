@@ -40,7 +40,9 @@ The following PUT request need to change resource.
    
 
 .. note::
-   This equal to create resource. The request must be authorised.
+   This equal to create resource. The request must be authorized.
+   
+.. todo:: Add lookup table update example   
    
 Create new feature
 ------------------
