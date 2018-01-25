@@ -11,12 +11,17 @@ To create new group execute following request.
 .. http:post:: /api/resource
 
    Create resource group request.
-    
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``resource_group``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<json jsonobj parent: parent resource identificator
+   :<json jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identificator
    :<json string display_name: group name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
+   :statuscode 201: no error
    
 **Example request**:
 
@@ -36,6 +41,7 @@ To create new group execute following request.
     }   
 
 .. _ngwdev_create_pg_conn:
+
 PostGIS Connection
 -------------------
 
@@ -44,16 +50,22 @@ To create PostGIS connection execute following request.
 .. http:post:: /api/resource
 
    PostGIS connection create request.
-    
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``postgis_connection``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<json jsonobj parent: parent resource identificator
+   :<json jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj postgis_connection: postgis connection JSON object
    :<json string database: Database name 
    :<json string hostname: Database host
    :<json string password: password
    :<json string username: login
+   :statuscode 201: no error
    
 **Example request**:
 
@@ -90,20 +102,27 @@ To create PostGIS layer execute following request.
 .. http:post:: /api/resource
 
    Create PostGIS layer request.
-        
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate   
+   :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``postgis_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<json jsonobj parent: parent resource identificator
+   :<json jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj postgis_layer: postgis layer JSON object
    :<json string column_geom: geometry column name (usually ``wkb_geometry``)
    :<json string column_id: primary key column (usually ``ogc_fid``)
    :<json jsonobj connection: PostGIS connection identificator (to create PostGIS connection see :ref:`ngwdev_create_pg_conn`) 
    :<json string fields: check to reread fields from database (must be ``update`` or not set)
    :<json string geometry_type: geometry type (if null, will read from database table). See :ref:`ngwdev_geom_types`
    :<json string schema: table schema
-   :<json jsonobj srs: spatial reference
+   :<json jsonobj srs: spatial reference JSON object
+   :<jsonobj int id: EPSG code
    :<json string table: table name
+   :statuscode 201: no error
    
 **Example request**:
 
@@ -148,19 +167,25 @@ To create empty vector layer execute following request:
 .. http:post:: /api/resource
 
    Create PostGIS layer request.
-        
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``vector_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<json jsonobj parent: parent resource identificator
+   :<json jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj vector_layer: vector layer JSON object
    :<json jsonarr fields: array of json objects:
    :<jsonarr string keyname: field name
    :<jsonarr string datatype: field type. See :ref:`ngwdev_field_types`
    :<jsonarr string display_name: field alias
    :<json string geometry_type: geometry type. See :ref:`ngwdev_geom_types`   
    :<json jsonobj srs: spatial reference json object
-   :<jsonobj int id: EPSG code
+   :<jsonobj int id: :term:`EPSG` code
+   :statuscode 201: no error
    
 
 **Example request**:
@@ -207,9 +232,7 @@ To create empty vector layer execute following request:
             }
         ]
     }
-    }
-    
-   Create empty vector layer request.    
+    }   
 
 Vector layer with data 
 -----------------------
@@ -223,31 +246,37 @@ Vector layer creation from geodata source (:term:`Shapefile`, :term:`GeoJSON`) c
 Vector geodata preparing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-При подготовке векторных данных необходимо преобразовать их к формату ESRI Shape, при этом поле с именем ID является запрещенным. Кроме того, файл должен иметь валидную систему координат и кодировку UTF-8 или CP1251. Также геометрии должны быть валидными и иметься у всех записей, атрибуты не должны содержать непечатных символов.
+To prepare your geodata export it to ESRI Shapefile or GeoJSON format (if needed). The field name ``id`` is forbidden. 
+Also, geodata must have spatial reference and ``UTF-8`` or ``CP1251`` encoding. Geometry must be valid and exist in all features, field names and values cannot include non-printing characters. 
 
-Loading vector geodata
+Uploading vector geodata
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Подготовленный шейп-файл необходимо заархивировать в zip и загрузить (подробнее 
-по загрузке файлов см. :ref:`ngw_file_upload`).
+If geodata is in ESRI Shapefile format, all files must be packed into the one ZIP archive. GeoJSON file can be uploaded without archiving. Geodata uploading detailes see in :ref:`ngw_file_upload`.
 
 Create vector layer
 ^^^^^^^^^^^^^^^^^^^
 
-Для создания векторного слоя необходимо выполнить следующий запрос.
+To create vector layer execute following request:
 
 .. http:post:: /api/resource
 
-   Запрос на создание векторного слоя
-    
-   :<json string cls: тип (для векторного слоя должен быть "vector_layer")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя слоя (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
-   :<json jsonobj source: информация полученная в результате загрузки файла
-   :<json jsonobj srs: система координат в которую необходимо перепроецировать входной файл. Должна соответсвоваться СК веб карты
+   Create vector layer from uploaded file request.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
+   :<json string cls: type (must be ``vector_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj vector_layer: vector layer JSON object
+   :<json jsonobj source: JSON object with file upload response
+   :<json jsonobj srs: spatial reference of creating vector layer. Should be the same as web map
+   :<jsonobj int id: EPSG code
+   :statuscode 201: no error
    
 **Example request**:
 
@@ -287,48 +316,114 @@ Same steps with curl:
    
    $ curl -F file=@/tmp/bld.zip http://<ngw url>/api/component/file_upload/upload
 
-   {"upload_meta": [{"id": "00cc4aa9-cca7-4160-b069-58070dff9399", "name": "bld.zip", "mime_type": "application/octet-stream", "size": 62149}]}
+   {"upload_meta": [{"id": "00cc4aa9-cca7-4160-b069-58070dff9399", "name": "bld.zip", 
+   "mime_type": "application/octet-stream", "size": 62149}]}
 
-   $ curl -u administrator:admin -H "Content-Type: application/json" -X POST -d '{"resource": {"cls": "vector_layer","description": "test curl create", "display_name": "buildings","keyname": null,"parent": {"id": 0}},"vector_layer": {"source": {"encoding": "utf-8","id": "00cc4aa9-cca7-4160-b069-58070dff9399","mime_type": "application/zip","name": "bld.zip","size": 62149},"srs": {"id": 3857}}}' http://<ngw url>/api/resource/
+   $ curl --user "user:password" -H "Accept: */*" -X POST -d '{"resource": 
+   {"cls": "vector_layer","description": "test curl create", "display_name": "buildings",
+   "keyname": null,"parent": {"id": 0}},"vector_layer": {"source": {"encoding": "utf-8",
+   "id": "00cc4aa9-cca7-4160-b069-58070dff9399","mime_type": "application/zip","name": "bld.zip",
+   "size": 62149},"srs": {"id": 3857}}}' http://<ngw url>/api/resource/
 
    {"id": 108, "parent": {"id": 0}}
+   
+   
+Create new feature in vector layer
+-----------------------------------
+
+To create new feature in vector layer execute following request:
+
+.. http:post:: /api/resource/(int:layer_id)/feature/
+
+   Create feature request
+   
+   :param layer_id: layer resource identificator
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate 
+   :<json string geom: geometry in WKT format (geometry type ans spatial reference must be corespondent to layer geometry type and spatial reference)
+   :<jsonarr fields: attributes array in form of JSON field name - value object 
+   :statuscode 201: no error
+   
+**Example request**:
+
+.. sourcecode:: http   
+
+   POST /api/resource/3/feature/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+   {
+     "extensions": {
+       "attachment": null, 
+       "description": null
+     }, 
+     "fields": {
+       "Age": 1, 
+       "DateTr": {
+         "day": 7, 
+         "month": 2, 
+         "year": 2015
+       }, 
+       "Davnost": 4, 
+       "Foto": 26, 
+       "Nomerp": 1, 
+       "Nomers": 1, 
+       "Samka": 0, 
+       "Sex": 3, 
+       "Sizeb": 0.0, 
+       "Sizef": 0.0, 
+       "Sizes": 9.19999980926514, 
+       "Snowdepth": 31, 
+       "Wher": "\u043b\u044b\u0436\u043d\u044f", 
+       "id01": 0
+     }, 
+     "geom": "MULTIPOINT (15112317.9207317382097244 6059092.3103669174015522)"
+   }
+
+For timestamp field input value must be divided on parts: *day*, *month*,
+*day*, *hour*, *minute*, *second*. 
+In request payload add only set fields. Other fields will set to default values.
 
 Raster layer
 ------------
 
-Создание растрового слоя включает в себя 3 этапа:
+Raster layer creation consists of following steps:
 
-1. Подготовка растра для слоя
-2. Загрузка растра
-3. Создание слоя
+1. Raster file prepare
+2. Upload raster
+3. Create raster layer
 
 Raster preparing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-В качестве растра должен выступать файл в формате GeoTIFF с 3-мя (RGB) или 4-мя (RGBA) каналами. Растр должен содержать географическую привязку, из которой возможно перепроецировать в СК веб-карты. Для каналов должны быть корректно заданы значения color interpretation. Рекомендуется использовать сжатие без искажения (LZW, DEFLATE) для снижения трафика при загрузки на сервер. Значение пиксела должно быть 1 байт (яркость от от 0 до 255).
+You can upload raster file in GeoTIFF format with 3 (RGB) or 4 (RGBA) bands. GeoTIFF file must have spatial reference, which can project to web map spatial reference (usually EPSG:3857). Value of ``color interpretation`` muast be set for bands. Compression (LZW, DEFLATE) can be used for decrease traffic. Pixel values must be between 0 to 255 (1 byte).
 
 Loading raster
 ^^^^^^^^^^^^^^^
 
-Подготовленный растр необходимо загрузить (подробнее по загрузке файлов см. :ref:`ngw_file_upload`).
+Prepared raster can be upload. See :ref:`ngw_file_upload`.
 
 Create raster layer
 ^^^^^^^^^^^^^^^^^^^
 
-Для создания растрового слоя необходимо выполнить следующий запрос.
+To create raster layer execute following request:
 
 .. http:post:: /api/resource
 
-   Запрос на создание растрового слоя
-    
-   :<json string cls: тип (для растрового слоя должен быть "raster_layer")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя слоя (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
-   :<json jsonobj source: информация полученная в результате загрузки файла
-   :<json jsonobj srs: система координат в которую необходимо перепроецировать входной файл. Должна соответсвоваться СК веб карты
+   Create raster layer request.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json string cls: type (must be ``raster_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj source: JSON object with file upload response
+   :<json jsonobj srs: spatial reference of creating vector layer. Should be the same as web map
+   :<jsonobj int id: EPSG code
+   :statuscode 201: no error
    
 **Example request**:
 
@@ -355,16 +450,18 @@ Create raster layer
     }
 
     
-Some steps with curl:
+Same steps with curl:
 
 .. sourcecode:: bash
    
    $ curl --user "user:password" --upload-file 'tmp/myfile.tif' http://<ngw url>/api/component/file_upload/upload
 
-
    {"id": "a2f381f9-8467-477c-87fa-3f71ecb749a5", "mime_type": "image/tiff", "size": 17549598}
 
-   $ curl -u administrator:admin -H "Content-Type: application/json" -X POST -d '{ "resource": { "cls": "raster_layer", "display_name": "20150820_211250_1_0b0e", "parent": { "id": 101 } }, "raster_layer": { "source": {"id": "a2f381f9-8467-477c-87fa-3f71ecb749a5", "mime_type": "image/tiff", "size": 17549598}, "srs": {"id": 3857} } }' http://<ngw url>/api/resource/
+   $ curl --user "user:password" -H "Accept: */*" -X POST -d '{ "resource": {
+   "cls": "raster_layer", "display_name": "20150820_211250_1_0b0e", "parent": { "id": 101 } }, 
+   "raster_layer": { "source": {"id": "a2f381f9-8467-477c-87fa-3f71ecb749a5", "mime_type": "image/tiff",
+   "size": 17549598}, "srs": {"id": 3857} } }' http://<ngw url>/api/resource/
 
    {"id": 102, "parent": {"id": 101}}
 
@@ -372,33 +469,36 @@ Some steps with curl:
 File bucket
 -----------
 
-Создание набора файлов включает в себя 2 этапа:
+File bucket creation includes 2 steps:
 
-1. Загрузка файлов
-2. Вызов POST запроса создание набора файлов
+1. Upload files
+2. Execute POST request to create file bucket
 
 File upload
 ^^^^^^^^^^^^^^^
 
-Файлы необходимо загрузить (подробнее по загрузке файлов см. :ref:`ngw_file_upload`).
+Upload files to server. See :ref:`ngw_file_upload`. Any file types are supported.
 
 Create file bucket
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Для создания набора файлов необходимо выполнить следующий запрос.
-
+To create file bucket execute following request:
 
 .. http:post:: /api/resource
 
-   Запрос на создание набора файлов
-    
-   :<json string cls: тип (для набора файлов должен быть "file_bucket")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя слоя (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
-   :<json jsonobj files: перечень файлов входящих в набор (то что приходит в ответе при загрузке, files == upload_meta)
+   Create file bucket request.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
+   :<json string cls: type (must be ``file_bucket``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj files: Part of upload JSON response (files == upload_meta)
+   :statuscode 201: no error
    
 **Example request**:
 
@@ -459,91 +559,28 @@ Create file bucket
 .. sourcecode:: json 
 
    {"id": 22, "parent": {"id": 0}}
-    
-Download file bucket
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Для изменения набора файлов необходимо выполнить следующий запрос.
-
-
-.. http:put:: /api/resource/(int:id)
-
-   Запрос на изменение набора файлов
-    
-   :param id: идентификатор ресурса который необходимо изменить
-   :<json string cls: тип (для набора файлов должен быть "file_bucket")
-   :<json jsonobj parent:  идентификатор родительского ресурса (при изменении набор файлов будет перемещен в новую группу ресурсов)
-   :<json string display_name: новое имя набора
-   :<json string keyname: новый ключ ресурса
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html
-   :<json jsonobj files: перечень файлов которые должны входить в набор: текущие (те что надо удалить - не указываем), а также новых файлов (то что приходит в ответе при загрузке, files == upload_meta)
-      
-**Example request**:
-
-.. sourcecode:: http
-
-   PUT /api/resource/22 HTTP/1.1
-   Host: ngw_url
-   Accept: */*
-
-    {
-      "file_bucket": {
-        "files": [
-          {
-            "mime_type": "application/x-dbf", 
-            "name": "grunt_area_2_multipolygon.dbf", 
-            "size": 36607
-          }, 
-          {
-            "mime_type": "application/x-esri-shape", 
-            "name": "grunt_area_2_multipolygon.shp", 
-            "size": 65132
-          }, 
-          {
-            "mime_type": "application/x-esri-shape", 
-            "name": "grunt_area_2_multipolygon.shx", 
-            "size": 1324
-          },
-          {
-            "id": "fb439bfa-1a63-cccc-957d-ae57bb5eb67b", 
-            "mime_type": "application/octet-stream", 
-            "name": "grunt area description.txt", 
-            "size": 50
-          }
-        ]
-      }, 
-      "resource": {
-        "cls": "file_bucket", 
-        "description": "some new text", 
-        "display_name": "new grunt_area", 
-        "keyname": null, 
-        "parent": {
-          "id": 0
-        }
-      }
-    }
-    
-После выполнения запроса будет добавлен файл *grunt area description.txt* и удалены
-*grunt_area_2_multipolygon.cpg*, *grunt_area_2_multipolygon.prj*, изменено название
-набора и добавлено описание.    
 
 Vector (mapserver) style
 ------------------------
 
-Для создания векторного стиля необходимо выполнить следующий запрос.
-
+To create vector style execute following request:
 
 .. http:post:: /api/resource
 
-   Запрос на создание векторного стиля
-    
-   :<json string cls: тип (для векторного стиля должен быть "mapserver_style")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя стиля (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
+   Create vector layer request.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj mapserver_style: Style json object.
+   :<jsonobj string xml: MapServer xml style. Supported tags described in :ref:`ngw_mapstyles`.
+   :<json jsonobj resource: Resource json object. 
+   :<jsonobj string cls: type (must be ``mapserver_style``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<jsonobj jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identificator
+   :<jsonobj string display_name: name
+   :<jsonobj string keyname: key (optional)
+   :<jsonobj string description: decription text, HTML supported (optional)
+   :statuscode 201: no error
    
 **Example request**:
 
@@ -555,7 +592,8 @@ Vector (mapserver) style
 
     {
       "mapserver_style" : {
-        "xml" : "<map><layer><class><style><color blue=\"218\" green=\"186\" red=\"190\"/><outlinecolor blue=\"64\" green=\"64\" red=\"64\"/></style></class></layer></map>"  
+        "xml" : "<map><layer><class><style><color blue=\"218\" green=\"186\" red=\"190\"/>
+        <outlinecolor blue=\"64\" green=\"64\" red=\"64\"/></style></class></layer></map>"  
       },
       "resource": {
         "cls": "raster_style", 
@@ -567,7 +605,6 @@ Vector (mapserver) style
         }
       }
     }
-    
         
 **Example response body**:
     
@@ -575,24 +612,24 @@ Vector (mapserver) style
 
    {"id": 24, "parent": {"id": 0}}
     
-Стили подробнее рассмотрены в подразделе ":ref:`ngw_style_create`".
-    
 Raster style
 ------------
 
-Для создания растрового стиля необходимо выполнить следующий запрос.
-
+To create raster style execute following request:
 
 .. http:post:: /api/resource
 
-   Запрос на создание растрового стиля
-    
-   :<json string cls: тип (для растрового стиля должен быть "raster_style")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя стиля (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
+   Create raster layer request.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
+   :<json string cls: type (must be ``raster_style``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<jsonobj int id: parent resource identificator
+   :<jsonobj string display_name: name
+   :<jsonobj string keyname: key (optional)
+   :<jsonobj string description: decription text, HTML supported (optional)
+   :statuscode 201: no error
    
 **Example request**:
 
@@ -626,5 +663,63 @@ Lookup table
 
 To create lookup table execute following request.
 
-.. todo:: Add details
+.. http:post:: /api/resource
+
+   Create lookup table request.
    
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
+   :<json string cls: type (must be ``lookup_table``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<jsonobj int id: parent resource identificator
+   :<jsonobj string display_name: name
+   :<jsonobj string keyname: key (optional)
+   :<jsonobj string description: decription text, HTML supported (optional)
+   :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
+   :<json jsonobj lookup_table: lookup table values JSON object. Key - value JSON object struct.
+   :statuscode 201: no error
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /api/resource HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+        "resource": {
+            "cls": "lookup_table",
+            "parent": {
+                "id": 381
+            },
+            "display_name": "test_2",
+            "keyname": null,
+            "description": null
+        },
+        "resmeta": {
+            "items": {}
+        },
+        "lookup_table": {
+            "items": {
+                "cat": "Машина"
+            }
+        }
+    }
+    
+**Example response body**:
+    
+.. sourcecode:: json 
+
+   {"id": 25, "parent": {"id": 0}}
+   
+Same steps with curl:
+
+.. sourcecode:: bash
+   
+   $ curl --user "user:password" -H 'Accept: */*' -X POST -d '{"resource":{"cls":"lookup_table",
+   "parent":{"id":381},"display_name":"test_3","keyname":null,"description":null},"resmeta":
+   {"items":{}},"lookup_table":{"items":{"cat":"\u041c\u0430\u0448\u0438\u043d\u0430"}}}' 
+   http://<ngw url>/api/resource/
+
+   {"id": 385, "parent": {"id": 381}}
