@@ -21,7 +21,7 @@ Execute following PUT request to change resource.
    :<json string keyname: resource new key
    :<json int id: resource id (cannot be changed)
    :<json string description: resource new description
-   :<jsonarray permissions: resource permissions array
+   :<jsonarr permissions: resource permissions array
    :statuscode 200: no error
    
 **Example request**:
@@ -57,14 +57,14 @@ To change file bucket execute following PUT request:
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate 
    :param id: resource identificator
-   :<jsonobj resource: resource JSON object
+   :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``file_bucket``, for a list of supported types see :ref:`ngwdev_resource_classes`)
    :<json jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
+   :<json int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
-   :<jsonobj file_bucket: file bucket JSON object
+   :<json jsonobj file_bucket: file bucket JSON object
    :<jsonarr files: array of files should present in bucket: present (which need to delete don't include in array), also new files (upload response JSON object, files == upload_meta)
    :statuscode 200: no error
       
@@ -131,12 +131,12 @@ To change flookup table execute following PUT request:
    :param id: resource identificator
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``lookup_table``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<jsonobj int id: parent resource identificator
-   :<jsonobj string display_name: name
-   :<jsonobj string keyname: key (optional)
-   :<jsonobj string description: decription text, HTML supported (optional)
+   :<json int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
    :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
-   :<jsonobj file_bucket: file bucket JSON object
+   :<json file_bucket: file bucket JSON object
    :<json jsonobj lookup_table: lookup table values JSON object. Key - value JSON object struct.
    :statuscode 200: no error
       
