@@ -9,10 +9,11 @@ Resources
     :members:
 
 .. _ngwdev_resource_classes:
+
 Resource classes
 --------------------
 
-Now there are followin resource classes:
+Now there are following resource classes:
    
 * resource_group
 * postgis_layer
