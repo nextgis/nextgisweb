@@ -1,17 +1,17 @@
 .. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
-Authentication
+Authorization
 ==============
 
-For the authorisation a POST request the following form sent.
+Sent the following POST request to get authorization cookie.
 
 .. http:post:: /login
 
-   Authentication request to NextGIS Web
+   Authorization request to NextGIS Web
 
    :form login: Login
    :form password: Password
-   :status 200: Success authentication
+   :status 200: Success authorization
    
    
 **Example request**:
@@ -24,10 +24,10 @@ For the authorisation a POST request the following form sent.
 
    login=<login>&password=<password>
 
-If authorisation success NextGIS Web return HTTP code 200 and Set-Cookie. 
-If set this cookie into the request header, this request will be authorised.
+If authorization succeeds, NextGIS Web will return HTTP code 200 and Set-Cookie. 
+Requests with this cookie into the header will be considered authorized.
 
-Also, in each request may be send authorised data (HTTP AUTH).
+In each request authozised data (HTTP AUTH) may be send.
 
 .. note::
     
@@ -43,5 +43,5 @@ Also, in each request may be send authorised data (HTTP AUTH).
     For example, if the user agent uses 'Aladdin' as the username and 'open 
     sesame' as the password then the header is formed as follows:
 
-    Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+    ``Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==``
 
