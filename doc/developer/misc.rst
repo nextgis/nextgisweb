@@ -6,7 +6,7 @@ Miscellaneous
 Identification by polygon
 -------------------------
 
-This is a polygon, because there is a tolerance parameters set in pixels.
+To get features intersect a polygon execute following request.
 
 .. http:put:: /feature_layer/identify
 
@@ -69,20 +69,21 @@ This is a polygon, because there is a tolerance parameters set in pixels.
 Get resource data
 -----------------
 
-You can get resource data. For vector or postgis layer this is data in GeoJSON and CSV formats, 
-for raster layer - TMS, for QGIS styles - qml.
+Geodatata can be fetched for vector and raster layers. For vector layers (PostGIS and Vector) geodata 
+returns in :term:`GeoJSON` or :term:`CSV` formats. For raster layers (Raster, :term:`WMS`) - tiles 
+(:term`TMS`:) or image. For QGIS styles - qml file.
 
-**The following request returns GeoJSON from vector layer**:
+**The following request returns GeoJSON file from vector layer**:
 
 .. deprecated:: 2.2        
 .. http:get:: /resource/(int:id)/geojson/
 
-.. versionadded:: 2.2
+.. versionadded:: 3.0
 .. http:get:: /api/resource/(int:id)/geojson
 
-    GeoJson data request
+    GeoJSON file request
     
-    :param id: resource id  
+    :param id: resource identificator  
     
       
 **Example request**:
@@ -93,14 +94,14 @@ for raster layer - TMS, for QGIS styles - qml.
    Host: ngw_url
    Accept: */*
 
-**The following request returns CSV from vector layer**:
+**The following request returns CSV file from vector layer**:
 
-.. versionadded:: 2.2    
+.. versionadded:: 3.0    
 .. http:get:: /api/resource/(int:id)/csv
 
-   CSV data request
+   CSV file request
     
-   :param id: resiurce id  
+   :param id: resiurce identificator  
     
     
 **Example request**:
@@ -116,7 +117,7 @@ for raster layer - TMS, for QGIS styles - qml.
 .. deprecated:: 2.2    
 .. http:get:: /resource/(int:id)/tms?z=(int:z)&x=(int:x)&y=(int:y)
 
-.. versionadded:: 2.2
+.. versionadded:: 3.0
 .. http:get:: /api/component/render/tile?z=(int:z)&x=(int:x)&y=(int:y)&resource=(int:id1),(int:id2)...
     
     Tile request
@@ -126,7 +127,7 @@ for raster layer - TMS, for QGIS styles - qml.
     :param x: tile number on x axis (horisontal)
     :param y: tile number on y axis (vertical)
     
-.. note: Styles order should be from lower to upper.     
+.. note:: Styles order should be from lower to upper.     
     
 **Example request**:
 
@@ -141,9 +142,9 @@ for raster layer - TMS, for QGIS styles - qml.
 .. versionadded:: 3.0.1    
 .. http:get:: /api/resource/(int:id)/qml
 
-   QML data request
+   QML file request
     
-   :param id: resiurce id  
+   :param id: resiurce identificator  
     
     
 **Example request**:
@@ -157,7 +158,7 @@ for raster layer - TMS, for QGIS styles - qml.
 User managment
 --------------
 
-You can get user information by it id. The following request have to be executed:
+To get user desctription by it identificator execute following request:
 
 .. versionadded:: 2.3
 .. http:get:: /api/component/auth/user/(int:id)
@@ -187,12 +188,12 @@ You can get user information by it id. The following request have to be executed
       "system": false
     }   
 
-To create new user the following request have to be executed:
+To create new user execute following request:
     
 .. versionadded:: 2.3
 .. http:post:: /api/component/auth/user/
 
-   request to create new user
+   Request to create new user.
    
    :<json string display_name: user full name
    :<json string keyname: user login
@@ -222,29 +223,29 @@ To create new user the following request have to be executed:
       "id": 4
     }   
     
-To create new group the following request have to be executed:
+To create new group execute following request:
     
 .. versionadded:: 2.3
 .. http:post:: /api/component/auth/group
 
-   request to create new group
+   Request to create new group
        
-To self create user (anonymouse) the following request have to be executed:
+To self create user (anonymouse) execute following request:
     
 .. versionadded:: 2.3
 .. http:post:: /api/component/auth/register
 
-   request to create new user
+   Request to create new user
    
    :<json string display_name: user full name
    :<json string keyname: user login
    :<json string description: user description
    :<json string password: user password        
     
-Administrator can configure to anonymous user registration to the specific group 
-(via setting checkbox in specific group in administrative interface).
+Administrator can configure anonymous user registration to the specific group 
+(via setting checkbox on group in administrative user interface).
 
-The special section should be present in NGW config file for this purposes:
+The special section must be in NGW config file:
     
 .. sourcecode:: config
 
