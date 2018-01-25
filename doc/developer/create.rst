@@ -1,23 +1,22 @@
 .. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
 Create resource
-===============
+=================
 
-Group
------
+Resource group
+---------------
 
-Для создания ресурса необходимо выполнить следующий запрос.
+To create new group execute following request.
 
 .. http:post:: /api/resource
 
-   Запрос на создание группы ресурсов
+   Create resource group request.
     
-   :<json string cls: тип (для группы должен быть "resource_group")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя группы (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
+   :<json string cls: type (must be ``resource_group``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent: parent resource identificator
+   :<json string display_name: group name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
    
 **Example request**:
 
@@ -36,25 +35,25 @@ Group
       }
     }   
 
+.. _ngwdev_create_pg_conn:
 PostGIS Connection
-------------------
+-------------------
 
-Для создания PostGIS подключения необходимо выполнить следующий запрос.
+To create PostGIS connection execute following request.
 
 .. http:post:: /api/resource
 
-   Запрос на создание PostGIS подключения
+   PostGIS connection create request.
     
-   :<json string cls: тип (для группы должен быть "postgis_connection")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя подключения (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
-   :<json string database: имя БД 
-   :<json string hostname: адрес БД
-   :<json string password: пароль 
-   :<json string username: логин
+   :<json string cls: type (must be ``postgis_connection``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json string database: Database name 
+   :<json string hostname: Database host
+   :<json string password: password
+   :<json string username: login
    
 **Example request**:
 
@@ -86,26 +85,25 @@ PostGIS Connection
 PostGIS Layer
 -------------
 
-Для создания PostGIS слоя необходимо выполнить следующий запрос.
+To create PostGIS layer execute following request.
 
 .. http:post:: /api/resource
 
-   Запрос на создание PostGIS слоя
+   Create PostGIS layer request.
         
-   :<json string cls: тип (для группы должен быть "postgis_layer")
-   :<json jsonobj parent:  идентификатор родительского ресурса (должен совпадать с идентификатором в адресе запроса: resource/0 - {"id":0})
-   :<json string display_name: имя слоя (**обязательно**)
-   :<json string keyname: ключ (не обязательно)
-   :<json int id: идентификатор
-   :<json string description: описание, можно использовать html (не обязательно)
-   :<json string column_geom: имя колонки с геометрией (обычно wkb_geometry)
-   :<json string column_id: имя колонки уникального ключа (обычно ogc_fid)
-   :<json jsonobj connection: идентификатор PostGIS подключения 
-   :<json string fields: отметка необходимости чтения полей из базы данных ("update")
-   :<json string geometry_type: тип геометрии (если равен null, то читается из базы данных)
-   :<json string schema: схема базы данных, где размещается таблица
-   :<json jsonobj srs: описание системы координат
-   :<json string table: название таблицы
+   :<json string cls: type (must be ``postgis_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json string column_geom: geometry column name (usually ``wkb_geometry``)
+   :<json string column_id: primary key column (usually ``ogc_fid``)
+   :<json jsonobj connection: PostGIS connection identificator (to create PostGIS connection see :ref:`ngwdev_create_pg_conn`) 
+   :<json string fields: check to reread fields from database (must be ``update`` or not set)
+   :<json string geometry_type: geometry type (if null, will read from database table). See :ref:`ngwdev_geom_types`
+   :<json string schema: table schema
+   :<json jsonobj srs: spatial reference
+   :<json string table: table name
    
 **Example request**:
 
@@ -142,9 +140,28 @@ PostGIS Layer
     }     
 
 
-Vector empty layer 
+Empty vector layer 
 -----------------------
 
+To create empty vector layer execute following request:
+
+.. http:post:: /api/resource
+
+   Create PostGIS layer request.
+        
+   :<json string cls: type (must be ``vector_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json jsonarr fields: array of json objects:
+   :<jsonarr string keyname: field name
+   :<jsonarr string datatype: field type. See :ref:`ngwdev_field_types`
+   :<jsonarr string display_name: field alias
+   :<json string geometry_type: geometry type. See :ref:`ngwdev_geom_types`   
+   :<json jsonobj srs: spatial reference json object
+   :<jsonobj int id: EPSG code
+   
 
 **Example request**:
 
@@ -191,15 +208,17 @@ Vector empty layer
         ]
     }
     }
+    
+   Create empty vector layer request.    
 
 Vector layer with data 
 -----------------------
 
-Создание векторного слоя включает в себя 3 этапа:
+Vector layer creation from geodata source (:term:`Shapefile`, :term:`GeoJSON`) consists of following steps:
 
-1. Подготовка векторных данных для слоя
-2. Загрузка векторных данных
-3. Создание слоя
+1. Prepare vector geodata for layer
+2. Upload vector geodata
+3. Create vector layer
 
 Vector geodata preparing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -601,4 +620,11 @@ Raster style
 
    {"id": 25, "parent": {"id": 0}}
     
-    
+
+Lookup table
+--------------
+
+To create lookup table execute following request.
+
+.. todo:: Add details
+   
