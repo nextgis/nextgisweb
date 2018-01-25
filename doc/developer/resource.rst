@@ -8,6 +8,10 @@ Resources
 ..  automodule:: nextgisweb.resource.scope
     :members:
 
+.. _resource_classes:
+Resource classes
+--------------------
+
 Resources (cls) can be:
    
 * resource_group
@@ -26,20 +30,19 @@ Resources (cls) can be:
  
 
 HTTP API
---------
+---------
 
 Schema request
 ^^^^^^^^^^^^^^
 
-При запросе схемы получается состав поддерживаемых типов ресурсов и их 
-характеристики и другие метаданные.  
+Schema request returns list of supported NextGIS Web resources, resource properties and metadata.  
 
 .. http:get:: /resource/schema
 
-   Проверка состава ресурсов.
+   Schema request.
  
 .. note::    
-   Для запросов REST API в заголовке HTTP запроса должны быть обязательно прописано: `Accept: */*`
+   REST API requests require accept field in header with following text: `Accept: */*`
     
 **Example request**:
 
@@ -286,30 +289,28 @@ Basic requests
 
 ..  http:get:: /api/resource/(int:id)
 
-    Получить JSON представление ресурса. Для вызова этого метода необходимо как 
-    минимум право чтения ресурса.
+    Get JSON resource representation. Need resource read permission.
 
 ..  http:put:: /api/resource/(int:id)
 
-    Изменить ресурс в соответствии с переданным JSON. Так же необходимо право 
-    чтения ресурса.
+    Change resource by JSON payload data. Need read and write permiossions.
 
 ..  http:delete:: /api/resource/(int:id)
 
-    Удалить ресурс.
+    Delete resource.
 
 ..  http:get:: /api/resource/
 
-    Выбрать ресурсы и получить JSON.
+    Get resource description in JSON.
 
-    :param integer parent: Идентификатор ресурса-родителя.
+    :param integer parent: Parent resource identificator.
 
 ..  http:post:: /api/resource/
 
-    Создать ресурс в соответствии с JSON.
+    Create resource by JSON data payload.
 
-    :param integer parent: Идентификатор ресурса-родителя, так же может быть передан в JSON.
-    :param string cls: Идентификатор класса создаваемого ресурса.
+    :param integer parent: Parent resource identificator, may be in JSON payload.
+    :param string cls: Resource type. See :ref:`resource_classes`.
     
  
 Get feature
@@ -633,65 +634,65 @@ Get all vector layer features
         }
     }
 
-
-URL к атачментам составляется из корня URL, который нужно посмотреть в веб-интерфейсе админки, и этого имени файла. Пример:
+Attachment URL forms from feature URL addind ``attachment/`` and attachment identificator. For example:
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/download
 
-Загружать можно файлы любых типов. Получение превью фотографий из атачмента
+Attachment support loading any file types. For images a preview generates.
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/image?size=200x150
 
-Запрос количества обектов векторного слоя
+Feature count request.
 
 .. http:get:: /api/resource/(int:id)/feature_count
     
-Root requests
-^^^^^^^^^^^^^^^
+Requests to root
+^^^^^^^^^^^^^^^^^^
 
 .. deprecated:: 2.2
 .. http:get:: /resource/-/child/   
 
-   Корневой ресурс (список)
+   Root resource (list).
 
 .. deprecated:: 2.2
 .. http:get:: /resource/-/child/(int:id)
     
-   Корневой ресурс (объект `id`)
+   Get resource by identificator ``id``.
     
 .. http:get:: /resource/(int:id)/child/
     
-   Список дочерних ресурсов ресурса `id` (список)
+   Child resources of resource with identificator ``id`` (list).
     
 .. http:get:: /resource/(int:parent_id)/child/(int:id)
    
-   Ресурс `id` (объект)
+   Resource with identificator ``id`` (object).
 
 .. deprecated:: 2.2
 .. http:get:: /resource/store/             
 
-    Плоский список всех ресурсов (список)
+   Plain all resource list.
     
 .. deprecated:: 2.2
 .. http:get:: /resource/store/(int:id)           
 
-   Ресурс `id` (объект)
+   Resource with identificator ``id`` (object).
 
 .. deprecated:: 2.2
 .. http:get:: /resource/store/?id=(int:id)        
 
-   Ресурс `id` (объект), то же самое, что и предыдущий запрос
-
+   Resource with identificator ``id`` (object).
+   
 .. deprecated:: 2.2
 .. http:get:: /resource/store/?parent_id=(int:id)
 
-   Cписок дочерних объектов объекта `id` (список)
+   Child resources of resource with identificator ``id`` (list).
 
 Get version
 ^^^^^^^^^^^^
+
 .. versionadded:: 3.0
 
-To get version make request:
+To get version execute request:
 
 .. http:get:: /api/component/pyramid/pkg_version
 
@@ -714,9 +715,10 @@ To get version make request:
 
 Get route
 ^^^^^^^^^^^^
+
 .. versionadded:: 3.0
 
-To get posible routes make request:
+To get posible routes execute request:
 
 .. http:get:: /api/component/pyramid/route
 
@@ -762,9 +764,10 @@ To get posible routes make request:
 
 Get map
 ^^^^^^^^^^^^
+
 .. versionadded:: 3.0
 
-To get map web interface (not map json representation) make one of the following requests:
+To get map web interface (not map json representation) execute one of the following requests:
 
 .. http:get:: resource/{0}/display
 .. http:get:: resource/{0}/display/tiny
@@ -773,6 +776,6 @@ To get map web interface (not map json representation) make one of the following
 
 .. sourcecode:: http
 
-   GET esource/42/display HTTP/1.1
+   GET resource/42/display HTTP/1.1
    Host: ngw_url
    Accept: */*
