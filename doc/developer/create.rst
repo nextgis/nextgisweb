@@ -17,7 +17,7 @@ To create new group execute following request.
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``resource_group``, for a list of supported types see :ref:`ngwdev_resource_classes`)
    :<json jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
+   :<json int id: parent resource identificator
    :<json string display_name: group name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
@@ -56,7 +56,7 @@ To create PostGIS connection execute following request.
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``postgis_connection``, for a list of supported types see :ref:`ngwdev_resource_classes`)
    :<json jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
+   :<json int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
@@ -108,7 +108,7 @@ To create PostGIS layer execute following request.
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``postgis_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
    :<json jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
+   :<json int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
@@ -120,7 +120,7 @@ To create PostGIS layer execute following request.
    :<json string geometry_type: geometry type (if null, will read from database table). See :ref:`ngwdev_geom_types`
    :<json string schema: table schema
    :<json jsonobj srs: spatial reference JSON object
-   :<jsonobj int id: EPSG code
+   :<json int id: EPSG code
    :<json string table: table name
    :statuscode 201: no error
    
@@ -173,7 +173,7 @@ To create empty vector layer execute following request:
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``vector_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
    :<json jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
+   :<json int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
@@ -184,7 +184,7 @@ To create empty vector layer execute following request:
    :<jsonarr string display_name: field alias
    :<json string geometry_type: geometry type. See :ref:`ngwdev_geom_types`   
    :<json jsonobj srs: spatial reference json object
-   :<jsonobj int id: :term:`EPSG` code
+   :<json int id: :term:`EPSG` code
    :statuscode 201: no error
    
 
@@ -268,14 +268,14 @@ To create vector layer execute following request:
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``vector_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
    :<json jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
+   :<json int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
    :<json jsonobj vector_layer: vector layer JSON object
    :<json jsonobj source: JSON object with file upload response
    :<json jsonobj srs: spatial reference of creating vector layer. Should be the same as web map
-   :<jsonobj int id: EPSG code
+   :<json int id: EPSG code
    :statuscode 201: no error
    
 **Example request**:
@@ -416,13 +416,13 @@ To create raster layer execute following request:
    :reqheader Authorization: optional Basic auth string to authenticate
    :<json string cls: type (must be ``raster_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
    :<json jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
+   :<json int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
    :<json jsonobj source: JSON object with file upload response
    :<json jsonobj srs: spatial reference of creating vector layer. Should be the same as web map
-   :<jsonobj int id: EPSG code
+   :<json int id: EPSG code
    :statuscode 201: no error
    
 **Example request**:
@@ -493,7 +493,7 @@ To create file bucket execute following request:
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``file_bucket``, for a list of supported types see :ref:`ngwdev_resource_classes`)
    :<json jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
+   :<json int id: parent resource identificator
    :<json string display_name: name
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
@@ -572,14 +572,14 @@ To create vector style execute following request:
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :<json jsonobj mapserver_style: Style json object.
-   :<jsonobj string xml: MapServer xml style. Supported tags described in :ref:`ngw_mapstyles`.
+   :<json string xml: MapServer xml style. Supported tags described in :ref:`ngw_mapstyles`.
    :<json jsonobj resource: Resource json object. 
-   :<jsonobj string cls: type (must be ``mapserver_style``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<jsonobj jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identificator
-   :<jsonobj string display_name: name
-   :<jsonobj string keyname: key (optional)
-   :<jsonobj string description: decription text, HTML supported (optional)
+   :<json string cls: type (must be ``mapserver_style``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent:  parent resource json object
+   :<json int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
    :statuscode 201: no error
    
 **Example request**:
@@ -625,10 +625,10 @@ To create raster style execute following request:
    :reqheader Authorization: optional Basic auth string to authenticate
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``raster_style``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<jsonobj int id: parent resource identificator
-   :<jsonobj string display_name: name
-   :<jsonobj string keyname: key (optional)
-   :<jsonobj string description: decription text, HTML supported (optional)
+   :<json int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
    :statuscode 201: no error
    
 **Example request**:
@@ -671,10 +671,10 @@ To create lookup table execute following request.
    :reqheader Authorization: optional Basic auth string to authenticate
    :<json jsonobj resource: resource JSON object
    :<json string cls: type (must be ``lookup_table``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<jsonobj int id: parent resource identificator
-   :<jsonobj string display_name: name
-   :<jsonobj string keyname: key (optional)
-   :<jsonobj string description: decription text, HTML supported (optional)
+   :<json int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
    :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
    :<json jsonobj lookup_table: lookup table values JSON object. Key - value JSON object struct.
    :statuscode 201: no error
