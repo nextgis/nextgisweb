@@ -8,11 +8,11 @@ File upload
 Single file upload
 -------------------
 
-For file upload following request exists:
+Execute foolowing request for file upload:
 
 ..  http:post:: /api/component/file_upload/upload
 
-    File upload request
+    File upload request.
     
     :form file: file path
     :form name: file name
@@ -30,8 +30,7 @@ Next multipart POST request follow. Request includes following form parameters:
    
    file=\tmp\test.file&name=testfile
    
-
-If request succeeded the uploaded file details will be returned:
+Response in JSON format with file details returnes on succeed:
 
 **Example response body**:
     
@@ -50,7 +49,7 @@ If request succeeded the uploaded file details will be returned:
 
 Also you can create attachment using PUT method, in this case you do not need set file name
 
-**Example add attachment to feature at python**:
+**Example add attachment to feature on Python**:
 
 .. sourcecode:: python
 
@@ -82,7 +81,7 @@ Also you can create attachment using PUT method, in this case you do not need se
 Multiple files upload
 --------------------------
 
-For several files upload following request exists:
+For multiple files upload execute following request:
 
 ..  http:post:: /api/component/file_upload/upload
 
@@ -90,9 +89,9 @@ For several files upload following request exists:
 
     :form name: must be "files[]"
 
-In `name` field must be file name and path (multipart POST request). 
+In ``name`` field must be file name and path (multipart POST request). 
 
-If request succeeded the following response will be returned:
+Responce in JSON formate returnes on succeed:
     
 **Example response body**:
     
@@ -136,6 +135,12 @@ If request succeeded the following response will be returned:
 Change file
 ---------------
 
+To change file detailes execute following request:
+
 ..  http:put:: /api/component/file_upload/upload
+
+    File change request.
+    
+.. todo:: What is put payload?
 
 
