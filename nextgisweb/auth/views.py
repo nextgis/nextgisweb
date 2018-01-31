@@ -206,10 +206,10 @@ def setup_pyramid(comp, config):
         def populate_obj(self):
             super(AuthUserWidget, self).populate_obj()
 
-            self.obj.display_name = self.data['display_name']
-            self.obj.keyname = self.data['keyname']
-            self.obj.superuser = self.data['superuser']
-            self.obj.disabled = self.data['disabled']
+            self.obj.display_name = self.data.get('display_name')
+            self.obj.keyname = self.data.get('keyname')
+            self.obj.superuser = self.data.get('superuser', False)
+            self.obj.disabled = self.data.get('disabled', False)
 
             if self.data.get('password', None) is not None:
                 self.obj.password = self.data['password']
