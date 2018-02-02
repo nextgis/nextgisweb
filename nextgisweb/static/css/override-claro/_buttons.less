@@ -80,4 +80,31 @@
 			line-height: 27px;
 		}
 	}
+
+	.dijitButton--signal{
+
+
+		.dijitButtonContents{
+			position: relative;
+		}
+
+		.dijitButtonContents::after{
+			content: "";
+			position: absolute;
+			left: -1px;
+			top: -1px;
+			width: 5px;
+			height: 5px;
+			border-radius: 50%;
+			background-color: #00b77e;
+			border: 2px solid #fff;
+			display: none;
+		}
+
+		&-active{
+			.dijitButtonContents::after{
+				display: block;
+			}
+		}
+	}
 }
