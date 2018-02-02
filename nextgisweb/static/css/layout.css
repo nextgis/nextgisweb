@@ -1562,6 +1562,24 @@ textarea {
   padding-right: 12px;
   line-height: 27px;
 }
+.nextgis.claro .dijitButton--signal .dijitButtonContents {
+  position: relative;
+}
+.nextgis.claro .dijitButton--signal .dijitButtonContents::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #00b77e;
+  border: 2px solid #fff;
+  display: none;
+}
+.nextgis.claro .dijitButton--signal-active .dijitButtonContents::after {
+  display: block;
+}
 .nextgis.claro .dijitMenuTable {
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1629,4 +1647,9 @@ textarea {
 }
 .nextgis.claro .dijitTooltipDialogPopup {
   box-shadow: none;
+}
+.nextgis.claro .dijitToolbar {
+  background-image: none;
+  background-color: #f1f1f1;
+  padding: 4px;
 }

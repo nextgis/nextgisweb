@@ -5,6 +5,7 @@ define([
     "dojo/_base/lang",
     "dojo/dom-style",
     "dojo/dom-construct",
+    "dojo/dom-class",
     "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -28,6 +29,7 @@ define([
     "ngw-pyramid/hbs-i18n",
     // resource
     "dojo/text!./template/ItemWidget.hbs",
+    //"xstyle/css!./template/resource/ItemWidget.css",
     "ngw/settings!webmap",
     // template
     "dijit/layout/TabContainer",
@@ -39,13 +41,17 @@ define([
     "dijit/form/TextBox",
     "dijit/form/NumberTextBox",
     "dijit/form/Select",
-    "ngw-resource/Tree"
+    "ngw-resource/Tree",
+
+    //css
+    "xstyle/css!./template/resources/ItemWidget.css"
 ], function (
     declare,
     array,
     lang,
     domStyle,
     domConstruct,
+    domClass,
     ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -87,6 +93,7 @@ define([
                 showRoot: false,
                 betweenThreshold: 5,
                 dndController: dndSource,
+                class: "layer-order__tree",
                 getLabel: function (item) {
                     return item.display_name;
                 },
@@ -100,20 +107,33 @@ define([
             this.inherited(arguments);
 
             this.container = new BorderContainer({
-                style: "width: 400px; height: 300px"
+                style: "width: 400px; height: 300px",
+                class: "layer-order"
             }).placeAt(this);
 
             this.tree.set("region", "center");
+            domClass.add(this.tree.domNode, "layer-order__tree--faded");
             this.tree.placeAt(this.container);
 
             this.actionBar = domConstruct.create("div", {
                 class: "dijitDialogPaneActionBar"
             }, this.containerNode);
 
-            this.state = new ToggleButton({
-                label: i18n.gettext("Enabled"),
-                checked: false
-            }).placeAt(this.actionBar);
+            this.checkboxContainer = domConstruct.create("div", {
+                style: "float: left; margin-top: 3px"
+            }, this.actionBar);
+
+            this.state =  new CheckBox({
+                id: "layerOrderEnabled",
+                name: "layerOrderEnabled"
+            }).placeAt(this.checkboxContainer);
+            this.state.startup();
+
+            this.checkboxContainer.appendChild(domConstruct.create("label", {
+                for : "layerOrderEnabled",
+                style: "vertical-align: middle; padding-left: 4px;",
+                innerHTML: i18n.gettext("Enabled")
+            }));
 
             this.btnOk = new Button({
                 label: i18n.gettext("OK"),
@@ -230,7 +250,6 @@ define([
             this.btnLayerOrder.on("click", lang.hitch(this, function () {
                 this.layerOrder.show();
             }));
-
             this.widgetTree.watch("selectedItem", function (attr, oldValue, newValue) {
                 if (newValue) {
                     // При изменении выделенного элемента перенесем значения в виджеты
