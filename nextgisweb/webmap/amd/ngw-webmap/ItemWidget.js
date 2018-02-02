@@ -4,6 +4,7 @@ define([
     "dojo/_base/array",
     "dojo/_base/lang",
     "dojo/dom-style",
+    "dojo/dom-construct",
     "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -14,6 +15,12 @@ define([
     "dijit/Tree",
     "dijit/tree/dndSource",
     "dijit/registry",
+    "dijit/Dialog",
+    "dijit/form/Button",
+    "dijit/form/ToggleButton",
+    "dijit/form/CheckBox",
+    "dijit/layout/BorderContainer",
+    "dojox/layout/TableContainer",
     "ngw/route",
     "ngw-resource/serialize",
     "ngw-resource/ResourcePicker",
@@ -24,16 +31,12 @@ define([
     "ngw/settings!webmap",
     // template
     "dijit/layout/TabContainer",
-    "dojox/layout/TableContainer",
-    "dijit/layout/BorderContainer",
     "dijit/layout/StackContainer",
     "dijit/layout/ContentPane",
-    "dijit/Dialog",
     "dijit/Toolbar",
     "ngw-pyramid/form/DisplayNameTextBox",
     "ngw-pyramid/form/ScaleTextBox",
     "dijit/form/TextBox",
-    "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
     "dijit/form/Select",
     "ngw-resource/Tree"
@@ -42,6 +45,7 @@ define([
     array,
     lang,
     domStyle,
+    domConstruct,
     ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -52,6 +56,12 @@ define([
     Tree,
     dndSource,
     registry,
+    Dialog,
+    Button,
+    ToggleButton,
+    CheckBox,
+    BorderContainer,
+    TableContainer,
     route,
     serialize,
     ResourcePicker,
@@ -60,6 +70,58 @@ define([
     template,
     settings
 ) {
+    var LayerOrder = declare([Dialog], {
+        title: i18n.gettext("Layer order"),
+
+        constructor: function (kwargs) {
+            declare.safeMixin(this, kwargs);
+
+            this.itemModel = new TreeStoreModel({
+                store: this.store,
+                query: {}
+            });
+
+            this.tree = new Tree({
+                model: this.itemModel,
+                persist: false,
+                showRoot: false,
+                betweenThreshold: 5,
+                dndController: dndSource,
+                getLabel: function (item) {
+                    return item.display_name;
+                },
+                checkItemAcceptance: function (node, source, position) {
+                    return position !== "over";
+                }
+            });
+        },
+
+        buildRendering: function () {
+            this.inherited(arguments);
+
+            this.container = new BorderContainer({
+                style: "width: 400px; height: 300px"
+            }).placeAt(this);
+
+            this.tree.set("region", "center");
+            this.tree.placeAt(this.container);
+
+            this.actionBar = domConstruct.create("div", {
+                class: "dijitDialogPaneActionBar"
+            }, this.containerNode);
+
+            this.state = new ToggleButton({
+                label: i18n.gettext("Enabled"),
+                checked: false
+            }).placeAt(this.actionBar);
+
+            this.btnOk = new Button({
+                label: i18n.gettext("OK"),
+                onClick: lang.hitch(this, this.hide)
+            }).placeAt(this.actionBar);
+        }
+    });
+
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("Layers"),
         templateString: hbsI18n(template, i18n),
@@ -104,6 +166,10 @@ define([
                         };
                     })
                 })
+            });
+
+            this.layerOrder = new LayerOrder({
+                store: this.itemStore
             });
         },
 
@@ -159,6 +225,11 @@ define([
                 widget.treeLayoutContainer.removeChild(widget.itemPane);
                 widget.btnDeleteItem.set("disabled", true);
             });
+
+            // Настраиваемый порядок слоёв
+            this.btnLayerOrder.on("click", lang.hitch(this, function () {
+                this.layerOrder.show();
+            }));
 
             this.widgetTree.watch("selectedItem", function (attr, oldValue, newValue) {
                 if (newValue) {
@@ -273,6 +344,7 @@ define([
             }
 
             data.webmap.root_item = traverse(this.itemModel.root);
+            data.webmap.layer_order_enabled = this.layerOrder.state.set("checked");
         },
 
         deserializeInMixin: function (data) {
@@ -295,6 +367,7 @@ define([
                 }, widget);
             }
             traverse(value, this.itemModel.root);
+            this.layerOrder.state.set("checked", data.webmap.layer_order_enabled);
         },
 
         iurl: function (id) {
