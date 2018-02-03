@@ -27,6 +27,7 @@ define([
     "dojo/store/JsonRest",
     "dojo/request/xhr",
     "dojo/data/ItemFileWriteStore",
+    "dojo/topic",
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
     "ngw/route",
@@ -36,6 +37,8 @@ define([
     "../../tool/Base",
     "../../tool/Zoom",
     "../../tool/Measure",
+    "../../tool/Identify",
+    "ngw-webmap/MapStatesObserver",
     // settings
     "ngw/settings!webmap",
     "ngw-webmap/controls/LinkToMainMap",
@@ -57,9 +60,9 @@ define([
     declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template,
     lang, array, Deferred, all, number, aspect, ioQuery, domConstruct, ol,
     Map, registry, DropDownButton, DropDownMenu, MenuItem, ContentPane,
-    ToggleButton, Dialog, TextBox, domStyle, JsonRest, xhr, ItemFileWriteStore,
+    ToggleButton, Dialog, TextBox, domStyle, JsonRest, xhr, ItemFileWriteStore, topic,
     TreeStoreModel, Tree, route, i18n, hbsI18n, ToolBase,
-    ToolZoom, ToolMeasure, clientSettings, LinkToMainMap
+    ToolZoom, ToolMeasure, Identify, MapStatesObserver, clientSettings, LinkToMainMap
 ) {
 
     var CustomItemFileWriteStore = declare([ItemFileWriteStore], {
@@ -784,6 +787,13 @@ define([
             //
             //this.addTool(new ToolMeasure({display: this, type: "LineString"}));
             //this.addTool(new ToolMeasure({display: this, type: "Polygon"}));
+
+            this.identify = new Identify({display: this});
+            var mapStates = MapStatesObserver.getInstance();
+            mapStates.addState('identifying', this.identify);
+            mapStates.setDefaultState('identifying', true);
+
+            topic.publish('/webmap/tools/initialized')
         },
 
         _pluginsSetup: function (wmplugin) {
