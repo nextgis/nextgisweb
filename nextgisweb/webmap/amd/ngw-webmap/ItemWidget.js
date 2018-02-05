@@ -99,6 +99,7 @@ define([
         ordinal: "position",
         layerOrdinal: "draw_order_position",
         labelField: "label",
+        enabled: false,
 
         constructor: function (kwargs) {
             declare.safeMixin(this, kwargs);
@@ -136,7 +137,7 @@ define([
                 style: "float: left; margin-top: 3px"
             }, this.actionBar);
 
-            this.enabled =  new CheckBox({
+            this.chckbxEnabled =  new CheckBox({
                 id: "layerOrderEnabled",
                 name: "layerOrderEnabled"
             }).placeAt(this.checkboxContainer);
@@ -156,7 +157,11 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            this.enabled.watch("checked", lang.hitch(this, function (attr, oval, nval) {
+            this.watch("enabled", lang.hitch(this, function (attr, oval, nval) {
+                this.chckbxEnabled.set("checked", nval);
+            }));
+
+            this.chckbxEnabled.watch("checked", lang.hitch(this, function (attr, oval, nval) {
                 if (nval) {
                     domClass.add(this.widget.btnLayerOrder.domNode, "dijitButton--signal-active");
                     domClass.remove(this.ordinalWidget.domNode, "layer-order__grid--faded");
@@ -169,6 +174,7 @@ define([
 
         onHide: function () {
             this.setOrdinalWidgetStore();
+            this.chckbxEnabled.set("checked", this.get("enabled"));
         },
 
         createOrderedStore: function (store) {
@@ -232,6 +238,8 @@ define([
                     this.hide();
                 }
             });
+
+            this.set("enabled", this.chckbxEnabled.get("checked"));
         }
     });
 
@@ -459,7 +467,7 @@ define([
             }
 
             data.webmap.root_item = traverse(this.itemModel.root);
-            data.webmap.draw_order_enabled = this.layerOrder.enabled.get("checked");
+            data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
         },
 
         deserializeInMixin: function (data) {
@@ -482,7 +490,7 @@ define([
                 }, widget);
             }
             traverse(value, this.itemModel.root);
-            this.layerOrder.enabled.set("checked", data.webmap.draw_order_enabled);
+            this.layerOrder.set("enabled", data.webmap.draw_order_enabled);
         },
 
         iurl: function (id) {
