@@ -34,6 +34,7 @@ class WebMap(Base, Resource):
 
     root_item_id = db.Column(db.ForeignKey('webmap_item.id'), nullable=False)
     bookmark_resource_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
+    draw_order_enabled = db.Column(db.Boolean, nullable=True)
 
     extent_left = db.Column(db.Float, default=-180)
     extent_right = db.Column(db.Float, default=+180)
@@ -91,6 +92,7 @@ class WebMapItem(Base):
     layer_min_scale_denom = db.Column(db.Float, nullable=True)
     layer_max_scale_denom = db.Column(db.Float, nullable=True)
     layer_adapter = db.Column(db.Unicode, nullable=True)
+    draw_order_position = db.Column(db.Integer, nullable=True)
 
     parent = db.relationship(
         'WebMapItem', remote_side=id, backref=db.backref(
@@ -133,6 +135,7 @@ class WebMapItem(Base):
                 layer_min_scale_denom=self.layer_min_scale_denom,
                 layer_max_scale_denom=self.layer_max_scale_denom,
                 layer_adapter=self.layer_adapter,
+                draw_order_position=self.draw_order_position,
             )
 
     def from_dict(self, data):
@@ -146,7 +149,8 @@ class WebMapItem(Base):
 
         for a in ('display_name', 'group_expanded', 'layer_enabled',
                   'layer_adapter', 'layer_style_id', 'layer_transparency',
-                  'layer_min_scale_denom', 'layer_max_scale_denom'):
+                  'layer_min_scale_denom', 'layer_max_scale_denom',
+                  'draw_order_position'):
 
             if a in data:
                 setattr(self, a, data[a])
@@ -178,6 +182,8 @@ class WebMapSerializer(Serializer):
     extent_right = SP(**_mdargs)
     extent_bottom = SP(**_mdargs)
     extent_top = SP(**_mdargs)
+
+    draw_order_enabled = SP(**_mdargs)
 
     bookmark_resource = SRR(**_mdargs)
 

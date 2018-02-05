@@ -74,6 +74,7 @@ def setup_pyramid(comp, config):
                     transparency=item.layer_transparency,
                     minScaleDenom=item.layer_min_scale_denom,
                     maxScaleDenom=item.layer_max_scale_denom,
+                    drawOrderPosition=item.draw_order_position,
                 )
 
                 data['adapter'] = WebMapAdapter.registry.get(
@@ -118,7 +119,8 @@ def setup_pyramid(comp, config):
             tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id),
             testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id),
             webmapDescription=obj.description,
-            webmapTitle=obj.display_name
+            webmapTitle=obj.display_name,
+            drawOrderEnabled=obj.draw_order_enabled,
         )
 
         return dict(

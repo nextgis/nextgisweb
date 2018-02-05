@@ -2,6 +2,13 @@
 
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
+#### `-- 229fd7b8d0866f712ebd0e171764700352c25303` (2018-02-02)
+
+```sql
+ALTER TABLE public.webmap ADD COLUMN draw_order_enabled boolean;
+ALTER TABLE public.webmap_item ADD COLUMN draw_order_position integer;
+```
+
 #### `-- 229fd7b8d0866f712ebd0e171764700352c25303` (2017-02-13)
 
 ```sql

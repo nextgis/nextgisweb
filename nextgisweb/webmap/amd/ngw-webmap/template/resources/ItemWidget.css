@@ -1,4 +1,5 @@
-.layer-order__tree--faded:after{
+
+.layer-order__grid--faded:after{
     content: "";
     position: absolute;
     top:0;
@@ -6,4 +7,31 @@
     width: 100%;
     height: 100%;
     background-color: rgba(255,255,255,.82);
+}
+
+.layer-order__grid .dgrid-content {
+    counter-reset: row;
+}
+
+.layer-order__grid .dgrid-content .dgrid-row-table{
+    counter-increment: row;
+}
+
+.layer-order__grid .dgrid-content .dgrid-row-table .dgrid-cell::before{
+    content: counter(row) ".";
+    color: #777;
+    margin-right: 8px;
+}
+
+.layer-order__grid .dgrid-cell {
+    border: none !important;
+}
+
+.layer-order__grid .dgrid-scroller{
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.layer-order__grid .dgrid-cell-padding{
+    padding: 3px 8px;
 }

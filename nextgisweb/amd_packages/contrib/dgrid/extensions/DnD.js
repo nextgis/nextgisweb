@@ -13,8 +13,8 @@ define([
 	"put-selector/put",
 	"../Selection",
 	"dojo/has!touch?../util/touch",
-	"dojo/has!touch?./_DnD-touch-autoscroll",
-	"xstyle/css!dojo/resources/dnd.css"
+	"dojo/has!touch?./_DnD-touch-autoscroll"
+	// "xstyle/css!dojo/resources/dnd.css"
 ], function(declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, put, Selection, touchUtil){
 	// Requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)

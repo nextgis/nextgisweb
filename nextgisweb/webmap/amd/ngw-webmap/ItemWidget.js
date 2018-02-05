@@ -3,6 +3,7 @@ define([
     "dojo/_base/declare",
     "dojo/_base/array",
     "dojo/_base/lang",
+    "dojo/Deferred",
     "dojo/dom-style",
     "dojo/dom-construct",
     "dojo/dom-class",
@@ -12,16 +13,22 @@ define([
     "dojo/data/ItemFileWriteStore",
     "dojo/data/ObjectStore",
     "dojo/store/Memory",
+    "dojo/store/Observable",
+    "dojo/aspect",
+    "./OrderedStoreMixin",
     "dijit/tree/TreeStoreModel",
     "dijit/Tree",
     "dijit/tree/dndSource",
     "dijit/registry",
     "dijit/Dialog",
     "dijit/form/Button",
-    "dijit/form/ToggleButton",
     "dijit/form/CheckBox",
     "dijit/layout/BorderContainer",
     "dojox/layout/TableContainer",
+    "dgrid/OnDemandGrid",
+    "dgrid/Keyboard",
+    "dgrid/extensions/DnD",
+    "dgrid/extensions/DijitRegistry",
     "ngw/route",
     "ngw-resource/serialize",
     "ngw-resource/ResourcePicker",
@@ -49,6 +56,7 @@ define([
     declare,
     array,
     lang,
+    Deferred,
     domStyle,
     domConstruct,
     domClass,
@@ -58,16 +66,22 @@ define([
     ItemFileWriteStore,
     ObjectStore,
     Memory,
+    Observable,
+    aspect,
+    OrderedStoreMixin,
     TreeStoreModel,
     Tree,
     dndSource,
     registry,
     Dialog,
     Button,
-    ToggleButton,
     CheckBox,
     BorderContainer,
     TableContainer,
+    Grid,
+    Keyboard,
+    DnD,
+    DijitRegistry,
     route,
     serialize,
     ResourcePicker,
@@ -76,31 +90,32 @@ define([
     template,
     settings
 ) {
+    var OrderedStore = declare([Memory, OrderedStoreMixin]);
+
+    var OrdinalWidget = declare([Grid, DnD, Keyboard, DijitRegistry]);
+
     var LayerOrder = declare([Dialog], {
         title: i18n.gettext("Layer order"),
+        ordinal: "position",
+        layerOrdinal: "draw_order_position",
+        labelField: "label",
 
         constructor: function (kwargs) {
             declare.safeMixin(this, kwargs);
 
-            this.itemModel = new TreeStoreModel({
-                store: this.store,
-                query: {}
+            this.ordinalWidget = new OrdinalWidget({
+                region: "center",
+                columns: [{
+                    field: this.labelField,
+                    sortable: false
+                }],
+                showHeader: false,
+                class: "layer-order__grid layer-order__grid--faded"
             });
 
-            this.tree = new Tree({
-                model: this.itemModel,
-                persist: false,
-                showRoot: false,
-                betweenThreshold: 5,
-                dndController: dndSource,
-                class: "layer-order__tree",
-                getLabel: function (item) {
-                    return item.display_name;
-                },
-                checkItemAcceptance: function (node, source, position) {
-                    return position !== "over";
-                }
-            });
+            aspect.after(this.store, "onNew", lang.hitch(this, this.setOrdinalWidgetStore));
+            aspect.after(this.store, "onDelete", lang.hitch(this, this.setOrdinalWidgetStore));
+            aspect.after(this.store, "onSet", lang.hitch(this, this.setOrdinalWidgetStore));
         },
 
         buildRendering: function () {
@@ -111,9 +126,7 @@ define([
                 class: "layer-order"
             }).placeAt(this);
 
-            this.tree.set("region", "center");
-            domClass.add(this.tree.domNode, "layer-order__tree--faded");
-            this.tree.placeAt(this.container);
+            domConstruct.place(this.ordinalWidget.domNode, this.container.domNode);
 
             this.actionBar = domConstruct.create("div", {
                 class: "dijitDialogPaneActionBar"
@@ -123,22 +136,102 @@ define([
                 style: "float: left; margin-top: 3px"
             }, this.actionBar);
 
-            this.state =  new CheckBox({
+            this.enabled =  new CheckBox({
                 id: "layerOrderEnabled",
                 name: "layerOrderEnabled"
             }).placeAt(this.checkboxContainer);
-            this.state.startup();
 
             this.checkboxContainer.appendChild(domConstruct.create("label", {
                 for : "layerOrderEnabled",
                 style: "vertical-align: middle; padding-left: 4px;",
-                innerHTML: i18n.gettext("Enabled")
+                innerHTML: i18n.gettext("Use on the map")
             }));
 
             this.btnOk = new Button({
-                label: i18n.gettext("OK"),
-                onClick: lang.hitch(this, this.hide)
+                label: i18n.gettext("Save"),
+                onClick: lang.hitch(this, this.save)
             }).placeAt(this.actionBar);
+        },
+
+        postCreate: function () {
+            this.inherited(arguments);
+
+            this.enabled.watch("checked", lang.hitch(this, function (attr, oval, nval) {
+                if (nval) {
+                    domClass.add(this.widget.btnLayerOrder.domNode, "dijitButton--signal-active");
+                    domClass.remove(this.ordinalWidget.domNode, "layer-order__grid--faded");
+                } else {
+                    domClass.remove(this.widget.btnLayerOrder.domNode, "dijitButton--signal-active");
+                    domClass.add(this.ordinalWidget.domNode, "layer-order__grid--faded");
+                }
+            }));
+        },
+
+        onHide: function () {
+            this.setOrdinalWidgetStore();
+        },
+
+        createOrderedStore: function (store) {
+            return new Observable(new OrderedStore({
+                data: store.data,
+                idProperty: store.idProperty,
+                ordinal: this.ordinal
+            }));
+        },
+
+        setOrdinalWidgetStore: function () {
+            var data = [],
+                deferred = new Deferred();
+
+            this.store.fetch({
+                scope: this,
+                query: { item_type: "layer" },
+                queryOptions: { deep: true },
+                onItem: function (item) {
+                    var element = {
+                        "id": this.store.getIdentity(item),
+                        "label": this.store.getValue(item, "display_name")
+                    };
+                    element[this.ordinal] = this.store.getValue(item, this.layerOrdinal) ||
+                                            this.store.getIdentity(item);
+                    data.push(element);
+                },
+                onComplete: function () {
+                    deferred.resolve(data);
+                }
+            });
+
+            deferred.promise.then(lang.hitch(this, function (data) {
+                var store = new Memory({ data: data });
+                this.ordinalWidget.set("store", this.createOrderedStore(store));
+            }));
+        },
+
+        save: function () {
+            var i = 1;
+
+            this.ordinalWidget.store.query({}, {}).forEach(function(item) {
+                item[this.ordinal] = i;
+                i += 1;
+            }, this);
+
+            this.store.fetch({
+                scope: this,
+                query: { item_type: "layer" },
+                queryOptions: { deep: true },
+                onItem: function (item) {
+                    this.store._setValueOrValues(
+                        item,
+                        this.layerOrdinal,
+                        this.ordinalWidget.store.get(
+                            this.store.getIdentity(item))[this.ordinal],
+                        false // callOnSet
+                    );
+                },
+                onComplete: function () {
+                    this.hide();
+                }
+            });
         }
     });
 
@@ -189,7 +282,8 @@ define([
             });
 
             this.layerOrder = new LayerOrder({
-                store: this.itemStore
+                store: this.itemStore,
+                widget: this
             });
         },
 
@@ -250,6 +344,7 @@ define([
             this.btnLayerOrder.on("click", lang.hitch(this, function () {
                 this.layerOrder.show();
             }));
+
             this.widgetTree.watch("selectedItem", function (attr, oldValue, newValue) {
                 if (newValue) {
                     // При изменении выделенного элемента перенесем значения в виджеты
@@ -358,12 +453,13 @@ define([
                     layer_min_scale_denom: store.getValue(itm, "layer_min_scale_denom"),
                     layer_max_scale_denom: store.getValue(itm, "layer_max_scale_denom"),
                     layer_adapter: store.getValue(itm, "layer_adapter"),
+                    draw_order_position: store.getValue(itm, "draw_order_position"),
                     children: array.map(store.getValues(itm, "children"), function (i) { return traverse(i); })
                 };
             }
 
             data.webmap.root_item = traverse(this.itemModel.root);
-            data.webmap.layer_order_enabled = this.layerOrder.state.set("checked");
+            data.webmap.draw_order_enabled = this.layerOrder.enabled.get("checked");
         },
 
         deserializeInMixin: function (data) {
@@ -386,7 +482,7 @@ define([
                 }, widget);
             }
             traverse(value, this.itemModel.root);
-            this.layerOrder.state.set("checked", data.webmap.layer_order_enabled);
+            this.layerOrder.enabled.set("checked", data.webmap.draw_order_enabled);
         },
 
         iurl: function (id) {
