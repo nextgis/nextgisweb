@@ -98,6 +98,13 @@ define([
                         // получение значения может быть асинхронным
                         when(widget.get("value"),
                             function (value) {
+                                // IE checking
+                                if (document.documentMode) {
+                                    // #612 IE will raise 'Syntax error' if url empty
+                                    if (!widget.submitUrl || 0 === widget.submitUrl.length) {
+                                        widget.submitUrl = window.location.href;
+                                    }
+                                }
                                 xhr.post(widget.submitUrl, {
                                     handleAs: "json",
                                     data: json.stringify(value),
@@ -114,7 +121,7 @@ define([
                                             // что-то странное с ответом
                                             d.reject();
                                         }
-                                    }, 
+                                    },
                                     d.reject
                                 );
                             }, d.reject
