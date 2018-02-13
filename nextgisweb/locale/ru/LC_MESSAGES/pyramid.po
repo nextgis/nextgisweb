@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-12-23 20:01+0300\n"
+"POT-Creation-Date: 2018-02-13 11:17+0300\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.4.0\n"
+"Generated-By: Babel 2.3.4\n"
 
 #: template/header.mako:74 view.py:30
 msgid "Control panel"
@@ -90,6 +90,10 @@ msgstr "Сохранить"
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:39
 msgid "Delete"
 msgstr "Удалить"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:88
+msgid "Unexpected error occurred during the operation."
+msgstr "В ходе выполнении операции произошла неожиданная ошибка."
 
 #: amd/ngw-pyramid/right-menu/RightMenu.js:60
 #: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5

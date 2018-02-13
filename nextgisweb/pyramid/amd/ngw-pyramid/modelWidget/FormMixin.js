@@ -84,9 +84,8 @@ define([
             d.then(
                 function (success) { if (!success) { widget.set("disabled", false); } },
                 function (errinfo) {
-                    alert("К сожалению, во время выполнения операции произошла непредвиденная ошибка. \n" +
-                          "Возможно это вызвано неполадками в работе сети. Сообщение об ошибке:\n\n" + errinfo);
-
+                    console.log(errinfo);
+                    alert(i18n.gettext("Unexpected error occurred during the operation."));
                     widget.set("disabled", false);
                 }
             );
