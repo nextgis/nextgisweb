@@ -85,6 +85,7 @@ def amd_packages():
         ('openlayers', 'nextgisweb:amd_packages/contrib/openlayers'),
         ('svg4everybody', 'nextgisweb:amd_packages/contrib/svg4everybody'),
         ('codemirror', 'nextgisweb:amd_packages/contrib/codemirror'),
+        ('jquery', 'nextgisweb:amd_packages/contrib/jquery'),
 
         # nextgisweb packages
         ('ngw', 'nextgisweb:amd_packages/ngw'),
