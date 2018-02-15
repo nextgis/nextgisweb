@@ -42,6 +42,7 @@ define([
     "./tool/Zoom",
     "./tool/Measure",
     "./tool/Identify",
+    "ngw-webmap/FeatureHighlighter",
     //left panel
     "ngw-pyramid/navigation-menu/NavigationMenu",
     "ngw-webmap/ui/LayersPanel/LayersPanel",
@@ -104,7 +105,7 @@ define([
     i18n,
     hbsI18n,
     MapToolbar,
-    InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure, Identify,
+    InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure, Identify, FeatureHighlighter,
     NavigationMenu,
     LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel, InfoPanel,
     ToolSwipe,
@@ -480,11 +481,11 @@ define([
             ).then(undefined, function (err) { console.error(err); });
 
             all([this._layersDeferred, this._mapSetup]).then(
-                function () {
+                lang.hitch(this, function () {
                     // Добавляем слои на карту
                     widget._mapAddLayers();
 
-                    widget._mapAddHighlightOverlay();
+                    new FeatureHighlighter(this.map);
 
                     // Связываем изменение чекбокса с видимостью слоя
                     var store = widget.itemStore;
@@ -495,7 +496,7 @@ define([
                             layer.set("visibility", newVal);
                         }
                     });
-                }
+                })
             ).then(undefined, function (err) { console.error(err); });
 
 
@@ -756,39 +757,6 @@ define([
             array.forEach(this._layer_order, function (id) {
                 this.map.addLayer(this._layers[id]);
             }, this);
-        },
-
-        _mapAddHighlightOverlay: function () {
-            var wkt = new ol.format.WKT(),
-                overlay, source;
-
-            topic.subscribe("feature.highlight", function (e) {
-                source.clear();
-                source.addFeature(new ol.Feature({
-                    geometry: wkt.readGeometry(e.geom)
-                }));
-            });
-
-            topic.subscribe("feature.unhighlight", function () {
-                source.clear();
-            });
-
-            var stroke = new ol.style.Stroke({
-                width: 3,
-                color: "rgba(255,255,0,1)"
-            });
-            overlay = new Vector("highlight", {
-                title: "Highlight Overlay",
-                style: new ol.style.Style({
-                    stroke: stroke,
-                    image: new ol.style.Circle({
-                        stroke: stroke,
-                        radius: 5
-                    })
-                })
-            });
-            source = overlay.olLayer.getSource();
-            this.map.addLayer(overlay);
         },
 
         _adaptersSetup: function () {
