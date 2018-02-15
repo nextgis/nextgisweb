@@ -39,6 +39,7 @@ define([
     "../../tool/Measure",
     "../../tool/Identify",
     "ngw-webmap/MapStatesObserver",
+    "ngw-webmap/FeatureHighlighter",
     // settings
     "ngw/settings!webmap",
     "ngw-webmap/controls/LinkToMainMap",
@@ -62,7 +63,7 @@ define([
     Map, registry, DropDownButton, DropDownMenu, MenuItem, ContentPane,
     ToggleButton, Dialog, TextBox, domStyle, JsonRest, xhr, ItemFileWriteStore, topic,
     TreeStoreModel, Tree, route, i18n, hbsI18n, ToolBase,
-    ToolZoom, ToolMeasure, Identify, MapStatesObserver, clientSettings, LinkToMainMap
+    ToolZoom, ToolMeasure, Identify, MapStatesObserver, FeatureHighlighter, clientSettings, LinkToMainMap
 ) {
 
     var CustomItemFileWriteStore = declare([ItemFileWriteStore], {
@@ -260,9 +261,9 @@ define([
 
             // Размещаем дерево, когда виджет будет готов
             all([this._layersDeferred, this._postCreateDeferred]).then(
-                function () {
-                    //widget.itemTree.placeAt(widget.layerTreePane);
-                }
+                lang.hitch(this, function () {
+                    new FeatureHighlighter(this.map);
+                })
             ).then(undefined, function (err) { console.error(err); });
 
             // Загружаем закладки, когда кнопка будет готова
