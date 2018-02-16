@@ -366,39 +366,6 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
-
-            // Модифицируем TabContainer так, чтобы он показывал табы только
-            // в том случае, если их больше одного, т.е. один таб не показываем
-            //declare.safeMixin(this.tabContainer, {
-            //    updateTabVisibility: function () {
-            //        var currstate = domStyle.get(this.tablist.domNode, "display") != "none",
-            //            newstate = this.getChildren().length > 1;
-            //
-            //        if (currstate && !newstate) {
-            //            // Скрываем панель с табами
-            //            domStyle.set(this.tablist.domNode, "display", "none");
-            //            this.resize();
-            //        } else if (!currstate && newstate) {
-            //            // Показываем панель с табами
-            //            domStyle.set(this.tablist.domNode, "display", "block");
-            //            this.resize();
-            //        }
-            //    },
-            //
-            //    addChild: function () {
-            //        this.inherited(arguments);
-            //        this.updateTabVisibility();
-            //    },
-            //    removeChild: function () {
-            //        this.inherited(arguments);
-            //        this.updateTabVisibility();
-            //    },
-            //    startup: function () {
-            //        this.inherited(arguments);
-            //        this.updateTabVisibility();
-            //    }
-            //});
-
             this._postCreateDeferred.resolve();
         },
 
@@ -610,22 +577,6 @@ define([
                 }));
             }
 
-            // Обновление подписи центра карты
-            this.map.watch("center", function (attr, oldVal, newVal) {
-                //var pt = ol.proj.transform(newVal, widget.displayProjection, widget.lonlatProjection);
-                //widget.centerLonNode.innerHTML = number.format(pt[0], {places: 3});
-                //widget.centerLatNode.innerHTML = number.format(pt[1], {places: 3});
-            });
-
-            // Обновление подписи масштабного уровня
-            this.map.watch("resolution", function (attr, oldVal, newVal) {
-                //widget.scaleInfoNode.innerHTML = "1 : " + number.format(
-                //    widget.map.getScaleForResolution(
-                //        newVal,
-                //        widget.map.olMap.getView().getProjection().getMetersPerUnit()
-                //    ), {places: 0});
-            });
-
             // При изменении размеров контейнера пересчитываем размер карты
             aspect.after(this.mapPane, "resize", function() {
                 widget.map.olMap.updateSize();
@@ -657,10 +608,6 @@ define([
 
                 idx = idx + 1;
             }, this);
-            //
-            //this.zoomToInitialExtentButton.on("click", function() {
-            //    widget._zoomToInitialExtent();
-            //});
 
             this._zoomToInitialExtent();
             this._setBasemap();
@@ -783,14 +730,10 @@ define([
         },
 
         _toolsSetup: function () {
-            //this.addTool(new ToolZoom({display: this, out: false}));
-            //this.addTool(new ToolZoom({display: this, out: true}));
-            //
-            //this.addTool(new ToolMeasure({display: this, type: "LineString"}));
-            //this.addTool(new ToolMeasure({display: this, type: "Polygon"}));
+            var mapStates;
 
             this.identify = new Identify({display: this});
-            var mapStates = MapStatesObserver.getInstance();
+            mapStates = MapStatesObserver.getInstance();
             mapStates.addState('identifying', this.identify);
             mapStates.setDefaultState('identifying', true);
 
