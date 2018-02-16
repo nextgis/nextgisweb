@@ -262,7 +262,15 @@ define([
             // Размещаем дерево, когда виджет будет готов
             all([this._layersDeferred, this._postCreateDeferred]).then(
                 lang.hitch(this, function () {
-                    new FeatureHighlighter(this.map);
+                    var featureHighlighter = new FeatureHighlighter(this.map);
+
+                    if (this._urlParams.feature_id && this._urlParams.layer_id) {
+                        featureHighlighter.highlightFeatureById(
+                            this._urlParams.feature_id,
+                            this._urlParams.layer_id
+                        );
+                    }
+
                 })
             ).then(undefined, function (err) { console.error(err); });
 
