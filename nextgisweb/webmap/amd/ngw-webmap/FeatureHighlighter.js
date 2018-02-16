@@ -1,10 +1,12 @@
 define([
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/request/xhr',
     'dojo/topic',
+    'ngw/route',
     'ngw/openlayers/layer/Vector',
     'openlayers/ol'
-], function (declare, lang, topic, Vector, ol) {
+], function (declare, lang, xhr, topic, route, Vector, ol) {
     return declare('ngw-webmap.FeatureHighlighter', [], {
         _map: null,
         _source: null,
@@ -55,6 +57,17 @@ define([
 
         _unhighlightFeature: function () {
             this._source.clear();
+        },
+
+        highlightFeatureById: function (featureId, layerId) {
+            var get_feature_item_url = route.feature_layer.feature.item({id: layerId, fid: featureId});
+
+            xhr.get(get_feature_item_url, {
+                method: 'GET',
+                handleAs: 'json'
+            }).then(lang.hitch(this, function (feature) {
+                this._highlightFeature({geom: feature.geom});
+            }));
         }
     });
 });
