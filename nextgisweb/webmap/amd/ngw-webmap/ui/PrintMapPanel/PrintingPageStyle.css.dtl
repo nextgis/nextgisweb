@@ -39,6 +39,7 @@ body {
     }
 
     body div.webmap-display,
+        #header,
         div.dijitDialog,
         div.dijitPopup,
         div.dijitDialogUnderlayWrapper {
