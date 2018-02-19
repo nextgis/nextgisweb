@@ -16,20 +16,14 @@ define([
     "openlayers/ol",
     "ngw/openlayers/Map",
     "dijit/registry",
-    "dijit/form/DropDownButton",
-    "dijit/DropDownMenu",
-    "dijit/MenuItem",
     "dijit/layout/ContentPane",
     "dijit/form/ToggleButton",
     "dijit/Dialog",
-    "dijit/form/TextBox",
     "dojo/dom-style",
     "dojo/store/JsonRest",
     "dojo/request/xhr",
     "dojo/data/ItemFileWriteStore",
     "dojo/topic",
-    "cbtree/models/TreeStoreModel",
-    "cbtree/Tree",
     "ngw/route",
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
@@ -47,11 +41,6 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dojox/layout/TableContainer",
-    "dijit/Toolbar",
-    "dijit/form/Button",
-    "dijit/form/Select",
-    "dijit/form/DropDownButton",
-    "dijit/ToolbarSeparator",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
     "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css",
@@ -60,10 +49,9 @@ define([
 ], function (
     declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template,
     lang, array, Deferred, all, number, aspect, ioQuery, domConstruct, ol,
-    Map, registry, DropDownButton, DropDownMenu, MenuItem, ContentPane,
-    ToggleButton, Dialog, TextBox, domStyle, JsonRest, xhr, ItemFileWriteStore, topic,
-    TreeStoreModel, Tree, route, i18n, hbsI18n, ToolBase,
-    ToolZoom, ToolMeasure, Identify, MapStatesObserver, FeatureHighlighter, clientSettings, LinkToMainMap
+    Map, registry, ContentPane, ToggleButton, Dialog, domStyle, JsonRest, xhr, ItemFileWriteStore, topic,
+    route, i18n, hbsI18n, ToolBase, ToolZoom, ToolMeasure, Identify, MapStatesObserver,
+    FeatureHighlighter, clientSettings, LinkToMainMap
 ) {
 
     var CustomItemFileWriteStore = declare([ItemFileWriteStore], {
@@ -232,13 +220,6 @@ define([
                 function () { widget._itemStorePrepare(); }
             );
 
-            // Модель
-            this.itemModel = new TreeStoreModel({
-                store: this.itemStore,
-                checkedAttr: "checked",
-                query: { type: "root" }
-            });
-
             this.displayProjection = "EPSG:3857";
             this.lonlatProjection = "EPSG:4326";
 
@@ -250,14 +231,6 @@ define([
                 this.lonlatProjection,
                 this.displayProjection
             );
-
-            // Дерево элементов слоя
-            this.itemTree = new Tree({
-                style: "height: 100%",
-                model: this.itemModel,
-                autoExpand: true,
-                showRoot: false
-            });
 
             // Размещаем дерево, когда виджет будет готов
             all([this._layersDeferred, this._postCreateDeferred]).then(
@@ -280,15 +253,6 @@ define([
                     //widget.loadBookmarks();
                 }
             ).then(undefined, function (err) { console.error(err); });
-
-            // Выбранный элемент
-            this.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
-                widget.set(
-                    "itemConfig",
-                    widget._itemConfigById[widget.itemStore.getValue(newVal, "id")]
-                );
-                widget.set("item", newVal);
-            });
 
             // Карта
             all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
@@ -350,24 +314,6 @@ define([
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Свернем те элементы дерева, которые не отмечены как развернутые.
-            // По-умолчанию все элементы развернуты за счет autoExpand у itemTree
-            all([this._itemStoreDeferred, widget.itemTree.onLoadDeferred]).then(
-                function () {
-                    widget.itemStore.fetch({
-                        queryOptions: { deep: true },
-                        onItem: function (item) {
-                            var node = widget.itemTree.getNodesByItem(item)[0],
-                                config = widget._itemConfigById[widget.itemStore.getValue(item, "id")];
-                            if (node && config.type === "group" && !config.expanded) {
-                                node.collapse();
-                            }
-                        }
-                    });
-                }
-            ).then(undefined, function (err) { console.error(err); });
-
-
             // Инструменты
             this.tools = [];
         },
@@ -379,43 +325,7 @@ define([
 
         startup: function () {
             this.inherited(arguments);
-
-            this.itemTree.startup();
-
             this._startupDeferred.resolve();
-        },
-
-        addTool: function (tool) {
-            if (!this.mapToolbar) {
-                return false;
-            }
-
-            var btn = new ToggleButton({
-                label: tool.label,
-                showLabel: false,
-                iconClass: tool.iconClass
-            }).placeAt(this.mapToolbar);
-
-            tool.toolbarBtn = btn;
-
-            this.tools.push(tool);
-
-            var display = this;
-            btn.watch("checked", function (attr, oldVal, newVal) {
-                if (newVal) {
-                    // При включении инструмента все остальные инструменты
-                    // выключаем, а этот включаем
-                    array.forEach(display.tools, function (t) {
-                        if (t != tool && t.toolbarBtn.get("checked")) {
-                            t.toolbarBtn.set("checked", false);
-                        }
-                    });
-                    tool.activate();
-                } else {
-                    // При выключении остальные инструменты не трогаем
-                    tool.deactivate();
-                }
-            });
         },
 
         loadBookmarks: function () {
