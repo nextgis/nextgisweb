@@ -3,10 +3,11 @@ define([
     'dojo/_base/lang',
     'dojo/request/xhr',
     'dojo/topic',
+    'dojo/Deferred',
     'ngw/route',
     'ngw/openlayers/layer/Vector',
     'openlayers/ol'
-], function (declare, lang, xhr, topic, route, Vector, ol) {
+], function (declare, lang, xhr, topic, Deferred, route, Vector, ol) {
     return declare('ngw-webmap.FeatureHighlighter', [], {
         _map: null,
         _source: null,
@@ -49,10 +50,16 @@ define([
         },
 
         _highlightFeature: function (e) {
+            var feature;
+
             this._source.clear();
-            this._source.addFeature(new ol.Feature({
+
+            feature = new ol.Feature({
                 geometry: this._wkt.readGeometry(e.geom)
-            }));
+            });
+            this._source.addFeature(feature);
+
+            return feature;
         },
 
         _unhighlightFeature: function () {
@@ -60,14 +67,19 @@ define([
         },
 
         highlightFeatureById: function (featureId, layerId) {
-            var get_feature_item_url = route.feature_layer.feature.item({id: layerId, fid: featureId});
+            var get_feature_item_url = route.feature_layer.feature.item({id: layerId, fid: featureId}),
+                highlightedDeferred = new Deferred(),
+                feature;
 
             xhr.get(get_feature_item_url, {
                 method: 'GET',
                 handleAs: 'json'
             }).then(lang.hitch(this, function (feature) {
-                this._highlightFeature({geom: feature.geom});
+                feature = this._highlightFeature({geom: feature.geom});
+                highlightedDeferred.resolve(feature);
             }));
+
+            return highlightedDeferred.promise;
         }
     });
 });
