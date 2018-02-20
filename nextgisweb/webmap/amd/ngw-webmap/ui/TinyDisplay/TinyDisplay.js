@@ -232,16 +232,24 @@ define([
                 this.displayProjection
             );
 
-            // Размещаем дерево, когда виджет будет готов
             all([this._layersDeferred, this._postCreateDeferred]).then(
                 lang.hitch(this, function () {
-                    var featureHighlighter = new FeatureHighlighter(this.map);
+                    var featureHighlighter = new FeatureHighlighter(this.map),
+                        featureHighlighterPromise,
+                        extent;
 
                     if (this._urlParams.feature_id && this._urlParams.layer_id) {
-                        featureHighlighter.highlightFeatureById(
+                        featureHighlighterPromise = featureHighlighter.highlightFeatureById(
                             this._urlParams.feature_id,
                             this._urlParams.layer_id
                         );
+
+                        if (this._urlParams.zoom_to === 'true') {
+                            featureHighlighterPromise.then(lang.hitch(this, function (feature) {
+                                extent = feature.getGeometry().getExtent();
+                                this.map.olMap.getView().fit(extent);
+                            }));
+                        }
                     }
 
                 })
