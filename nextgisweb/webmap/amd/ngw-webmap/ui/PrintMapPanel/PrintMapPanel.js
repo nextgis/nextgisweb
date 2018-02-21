@@ -74,6 +74,8 @@ define([
         printMap: null,
         printCssElement: null,
         isFullWidth: true,
+        mode: 'format', // 'format', 'custom'
+
         constructor: function (options) {
             declare.safeMixin(this,options);
 
@@ -83,8 +85,10 @@ define([
                 gutters: false
             }));
         },
+
         postCreate: function(){
             this.inherited(arguments);
+
             on(this.contentWidget.okButton, 'click', lang.hitch(this, function () {
                 window.print();
             }));
@@ -96,9 +100,11 @@ define([
             on(this.contentWidget.sizesSelect, 'change', lang.hitch(this, function () {
                 var sizeValues = this.contentWidget.sizesSelect.get('value'),
                     parsedSizeValues, height, width;
-                if (sizeValues === 'custom') {
 
-                } else if (sizeValues && sizeValues!="none") {
+                if (sizeValues === 'custom') {
+                    this._setMode('custom');
+                } else if (sizeValues && sizeValues != 'none') {
+                    this._setMode('format');
                     parsedSizeValues = sizeValues.split('_');
                     width = parsedSizeValues[0];
                     height = parsedSizeValues[1];
@@ -109,6 +115,52 @@ define([
             }));
         },
 
+        _setMode: function (newMode) {
+            if (this.mode === newMode) {
+                return false;
+            }
+
+            if (newMode === 'format') {
+                this._setFormatMode();
+            }
+
+            if (newMode === 'custom') {
+                this._setCustomMode();
+            }
+        },
+
+        _setFormatMode: function () {
+            this._disableInput(this.contentWidget.heightInput, true);
+            this._disableInput(this.contentWidget.widthInput, true);
+            this._disableInput(this.contentWidget.marginInput, true);
+            this.contentWidget.marginInput.set('value', 10);
+            this.mode = 'format';
+        },
+
+        _setCustomMode: function () {
+            this._disableInput(this.contentWidget.heightInput, false);
+            this._disableInput(this.contentWidget.widthInput, false);
+            this._disableInput(this.contentWidget.marginInput, false);
+
+            on(this.contentWidget.heightInput, 'change', lang.hitch(this, function (newHeight) {
+                this._resizeMapContainer(null, newHeight);
+            }));
+
+            on(this.contentWidget.widthInput, 'change', lang.hitch(this, function (newWidth) {
+                this._resizeMapContainer(newWidth);
+            }));
+
+            on(this.contentWidget.marginInput, 'change', lang.hitch(this, function (newMargin) {
+                this._resizeMapContainer(null, null, newMargin);
+            }));
+
+            this.mode = 'custom';
+        },
+
+        _disableInput: function (input, isDisabled) {
+            input.set('disabled', isDisabled);
+        },
+
         show: function(){
             this.inherited(arguments);
 
@@ -116,8 +168,11 @@ define([
             this._buildMap();
             this.contentWidget.sizesSelect.attr('value', '210_297');
         },
-        _resizeMapContainer: function (width, height) {
-            var margin = this.contentWidget.marginInput.get('value');
+
+        _resizeMapContainer: function (width, height, margin) {
+            width = width || this.contentWidget.widthInput.get('value');
+            height = height || this.contentWidget.heightInput.get('value');
+            margin = margin || this.contentWidget.marginInput.get('value');
 
             this._buildPageStyle(width, height, margin);
             this.printMap.olMap.updateSize();
@@ -216,6 +271,7 @@ define([
             });
             style.innerHTML = template.render(context);
         },
+
         _pageStyle: null,
         _getPageStyle: function () {
             if (this._pageStyle) {
@@ -229,6 +285,7 @@ define([
             this._pageStyle = style;
             return style;
         },
+
         _removePageStyle: function () {
             if (this._pageStyle) {
                 domConstruct.destroy(this._pageStyle);
