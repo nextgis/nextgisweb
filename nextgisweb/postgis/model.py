@@ -2,6 +2,7 @@
 import geoalchemy2 as ga
 import operator
 import re
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
@@ -116,7 +117,11 @@ class PostgisConnection(Base, Resource):
         return engine
 
     def get_connection(self):
-        return self.get_engine().connect()
+        try:
+            conn = self.get_engine().connect()
+        except OperationalError:
+            raise ValidationError(_("Cannot connect to the database!"))
+        return conn
 
 
 class PostgisConnectionSerializer(Serializer):
