@@ -158,7 +158,9 @@ class TableInfo(object):
         defn = ogrlayer.GetLayerDefn()
         for i in range(defn.GetFieldCount()):
             fld_defn = defn.GetFieldDefn(i)
-            fld_name = fld_defn.GetNameRef()
+
+            # TODO: Fix invalid field names as done for attributes.
+            fld_name = strdecode(fld_defn.GetNameRef())
             if fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)
 
@@ -349,8 +351,8 @@ class TableInfo(object):
                             "Try declaring different encoding.") % dict(
                             feat=fid, attr=i))
 
-                fld_values[self[feature.GetFieldDefnRef(i).GetNameRef()].key] \
-                    = fld_value
+                fld_name = strdecode(feature.GetFieldDefnRef(i).GetNameRef())
+                fld_values[self[fld_name].key] = fld_value
 
             obj = self.model(fid=fid, geom=ga.elements.WKTElement(
                 str(geom), srid=self.srs_id), **fld_values)
