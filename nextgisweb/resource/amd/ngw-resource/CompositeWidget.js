@@ -317,7 +317,7 @@ define([
                 alert(i18n.gettext("Errors found during data validation on server. Correct them and try again.") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
 
             } else if (e.error == E_REQUEST && e.status == 403) {
-                alert(i18n.gettext("Insufficient permissions to perform the operation.") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
+                alert(i18n.gettext("Insufficient permissions to perform the operation. Forgot to log in?") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
 
             } else if (e.error == E_INVALID_DATA) {
                 alert(i18n.gettext("Errors found during data validation. Tabs with errors marked in red."));
