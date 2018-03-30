@@ -39,11 +39,11 @@ msgstr "Векторный слой"
 
 #: view.py:344
 msgid "Download as GeoJSON"
-msgstr "Загрузить GeoJSON"
+msgstr "Скачать GeoJSON"
 
 #: view.py:349
 msgid "Download as CSV"
-msgstr "Загрузить CSV"
+msgstr "Скачать CSV"
 
 #: amd/FeatureEditorWidget.js:179 amd/FieldsDisplayWidget.js:31
 #: amd/FieldsWidget.js:109 view.py:356
