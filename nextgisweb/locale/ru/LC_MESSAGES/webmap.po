@@ -168,7 +168,7 @@ msgstr "Наименование"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:77
 msgid "Enabled"
-msgstr "Разрешено"
+msgstr "Включен"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:84
 msgid "Transparency"
