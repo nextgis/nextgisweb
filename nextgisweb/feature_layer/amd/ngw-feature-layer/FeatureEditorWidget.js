@@ -49,6 +49,8 @@ define([
 
         isNull: false,
 
+        style: "display: flex; align-items: center",
+
         buildRendering: function () {
             this.domNode = domConstruct.create("div");
             this.buildWidget();
@@ -74,7 +76,7 @@ define([
                 this.children = [
                     (new RTETextBox({
                         label: i18n.gettext("Attribute: ") + this.label,
-                        style: "width: calc(100% - 160px - 1ex)"
+                        style: "flex-grow: 1"
                     })).placeAt(this)
                 ];
             } else if (this.datatype == "DATE") {
