@@ -2,8 +2,8 @@
 import sys
 import os.path
 import re
+import subprocess
 from hashlib import md5
-from StringIO import StringIO
 from pkg_resources import resource_filename, get_distribution
 from collections import namedtuple
 
@@ -157,31 +157,18 @@ class PyramidComponent(Component):
         # also returns current commit for packages from
         # VCS, this also helps.
 
-        # This could've been done better, but right now simply
-        # redirect sys.stdout to StringIO, run pip freeze and
-        # return sys.stdout to initial state.
-
-        stdout = sys.stdout
         static_key = ''
 
-        try:
-            import pip
-            buf = StringIO()
-            sys.stdout = buf
-            pip.main(['freeze', ])
-            h = md5()
-            h.update(buf.getvalue())
-            static_key = '/' + h.hexdigest()
-        finally:
-            sys.stdout = stdout
+        reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
+        h = md5()
+        h.update(reqs)
+        static_key = '/' + h.hexdigest()
 
         self.distinfo = []
 
         # Read installed packages from pip freeze
 
-        buf.seek(0)
-
-        for l in buf:
+        for l in reqs.splitlines():
             l = l.strip().lower()
 
             dinfo = None
