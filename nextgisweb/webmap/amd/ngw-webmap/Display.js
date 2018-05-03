@@ -689,6 +689,7 @@ define([
                 }),
                 new ol.control.ScaleLine({
                     target: widget.rightBottomControlPane,
+                    units: widget.config.measurementSystem,
                     minWidth: 48
                 }),
                 new InfoScale({

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-02-21 21:58+0300\n"
+"POT-Creation-Date: 2018-05-04 02:13+0700\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.5.1\n"
 
 #: __init__.py:43
 msgid "Main web map"
@@ -31,15 +31,15 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:24 model.py:31 view.py:156
+#: model.py:24 model.py:31 view.py:158
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:26 view.py:159
+#: model.py:26 view.py:161
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:208 amd/ngw-webmap/Display.js:933
+#: amd/ngw-webmap/Display.js:208 amd/ngw-webmap/Display.js:934
 #: amd/ngw-webmap/ItemWidget.js:247
 msgid "Layers"
 msgstr "Слои"
@@ -79,11 +79,11 @@ msgstr "Отодвинуть"
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:701
+#: amd/ngw-webmap/Display.js:702
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:704
+#: amd/ngw-webmap/Display.js:705
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:485
 msgid "Reset rotation"
 msgstr "Отменить поворот"
@@ -218,7 +218,7 @@ msgstr "Измерение расстояния"
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:156
+#: amd/ngw-webmap/tool/Measure.js:173
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 

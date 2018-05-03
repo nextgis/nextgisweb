@@ -78,7 +78,8 @@ class CoreComponent(Component):
         for k, v in (('system.name', 'NextGIS Web'),
                      ('system.full_name',
                       self.localizer().translate(
-                          _('NextGIS geoinformation system')))):
+                          _('NextGIS geoinformation system'))),
+                     ('units', 'metric')):
             self.init_settings(self.identity, k, self._settings.get(k, v))
 
     def backup(self):

@@ -162,6 +162,22 @@ def system_name_put(request):
             raise HTTPBadRequest("Invalid key '%s'" % k)
 
 
+def miscellaneous_get(request):
+    units = env.core.settings_get('core', 'units')
+    return dict(units=units)
+
+
+def miscellaneous_put(request):
+    request.require_administrator()
+
+    body = request.json_body
+    for k, v in body.iteritems():
+        if k in ('units',):
+            env.core.settings_set('core', k, v)
+        else:
+            raise HTTPBadRequest("Invalid key '%s'" % k)
+
+
 def settings(request):
     comp = request.env._components[request.GET['component']]
     return comp.client_settings(request)
@@ -295,3 +311,8 @@ def setup_pyramid(comp, config):
         .add_view(custom_css_put, request_method='PUT')
 
     # TODO: Add PUT method for changing custom_css setting and GUI
+
+    config.add_route('pyramid.miscellaneous',
+                     '/api/component/pyramid/miscellaneous') \
+        .add_view(miscellaneous_get, request_method='GET', renderer='json') \
+        .add_view(miscellaneous_put, request_method='PUT', renderer='json')

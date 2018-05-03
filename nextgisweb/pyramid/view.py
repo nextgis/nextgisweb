@@ -105,6 +105,13 @@ def system_name(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def miscellaneous(request):
+    request.require_administrator()
+    return dict(
+        title=_("Miscellaneous"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
 def notfound(request):
     return dict(
         title=_("404: Page not found"),
@@ -149,6 +156,11 @@ def setup_pyramid(comp, config):
         '/control-panel/system-name'
     ).add_view(system_name, renderer=ctpl('system_name'))
 
+    config.add_route(
+        'pyramid.control_panel.miscellaneous',
+        '/control-panel/miscellaneous'
+    ).add_view(miscellaneous, renderer=ctpl('miscellaneous'))
+
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
     comp.control_panel = dm.DynMenu(
@@ -163,4 +175,6 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.cors'))),
         dm.Link('settings/custom_css', _("Custom CSS"), lambda args: (
             args.request.route_url('pyramid.control_panel.custom_css'))),
+        dm.Link('settings/miscellaneous', _("Miscellaneous"), lambda args: (
+            args.request.route_url('pyramid.control_panel.miscellaneous'))),
     )

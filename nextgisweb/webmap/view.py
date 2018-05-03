@@ -121,6 +121,7 @@ def setup_pyramid(comp, config):
             webmapDescription=obj.description,
             webmapTitle=obj.display_name,
             drawOrderEnabled=obj.draw_order_enabled,
+            measurementSystem=request.env.core.settings_get('core', 'units'),
         )
 
         return dict(
