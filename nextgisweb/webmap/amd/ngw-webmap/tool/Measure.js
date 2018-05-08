@@ -91,13 +91,13 @@ define([
                         suffix: "m<sup>2</sup>"
                     };
                 } else if (units === "imperial") {
-                    area = area * Math.pow(1 / 0.3048, 2);
-                    output = (area > (5280 * 5280)) ? {
-                        measure: Math.round(area / (5280 * 5280) * 100) / 100,
+                    area = area * (1 / 4046.86);
+                    output = (area > (640 * 100)) ? {
+                        measure: Math.round(area / 640 * 100) / 100,
                         suffix: "mi<sup>2</sup>"
                     } : {
                         measure: Math.round(area * 100) / 100,
-                        suffix: "ft<sup>2</sup>"
+                        suffix: "ac"
                     };
                 }
 
