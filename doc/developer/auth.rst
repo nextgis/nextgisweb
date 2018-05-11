@@ -27,7 +27,7 @@ Sent the following POST request to get authorization cookie.
 If authorization succeeds, NextGIS Web will return HTTP code 200 and Set-Cookie. 
 Requests with this cookie into the header will be considered authorized.
 
-In each request authozised data (HTTP AUTH) may be send.
+Authorized data (HTTP AUTH) can be sent with each request.
 
 .. note::
     
