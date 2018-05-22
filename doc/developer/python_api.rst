@@ -5,9 +5,6 @@
 Python api
 =====================
 
-Single file upload
--------------------
-
 We have a Python library, witch can operated NextGIS Web api from client machine
 
 https://github.com/nextgis/ngw_external_api_python
