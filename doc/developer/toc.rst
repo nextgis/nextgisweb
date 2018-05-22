@@ -18,3 +18,4 @@ REST API description
    misc
    error_report
    vector_data_types
+   python_api
