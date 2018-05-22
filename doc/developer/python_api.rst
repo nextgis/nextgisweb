@@ -2,10 +2,10 @@
 
 .. _ngw_python_api:
 
-Python api
-=====================
+Python API library
+==================
 
-We have a Python library, witch can operate NextGIS Web api from client machine
+Various NextGIS Web tasks can be performed through ngw_external_api_python library from the client (script, plugin, software package). 
 
 https://github.com/nextgis/ngw_external_api_python
 
