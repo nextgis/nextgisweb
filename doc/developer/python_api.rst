@@ -5,7 +5,7 @@
 Python api
 =====================
 
-We have a Python library, witch can operated NextGIS Web api from client machine
+We have a Python library, witch can operate NextGIS Web api from client machine
 
 https://github.com/nextgis/ngw_external_api_python
 
