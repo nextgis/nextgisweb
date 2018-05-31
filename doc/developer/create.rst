@@ -771,4 +771,4 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   curl --user "administrator:qwop200" -H "Accept: */*" -X POST -d '{"resource": {"display_name": "cwm Вебкарта", "parent": {"id": 2317}, "cls": "webmap"}, "webmap": {"root_item": {"item_type": "root", "children": [{"layer_enabled": false, "layer_adapter": "tile", "display_name": "LT05_L1TP_124025_20010603_20161211_01", "layer_style_id": 2284, "item_type": "layer"}]}}}' http://trolleway.nextgis.com/api/resource/
+   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource": {"display_name": "cwm Вебкарта", "parent": {"id": 2317}, "cls": "webmap"}, "webmap": {"root_item": {"item_type": "root", "children": [{"layer_enabled": false, "layer_adapter": "tile", "display_name": "LT05_L1TP_124025_20010603_20161211_01", "layer_style_id": 2284, "item_type": "layer"}]}}}' http://trolleway.nextgis.com/api/resource/
