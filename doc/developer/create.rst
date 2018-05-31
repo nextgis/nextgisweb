@@ -723,3 +723,45 @@ Same steps with curl:
    http://<ngw url>/api/resource/
 
    {"id": 385, "parent": {"id": 381}}
+   
+   
+Web map
+---------------
+
+To create new web map execute following request.
+
+.. http:post:: /api/resource
+
+
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /api/resource HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+{
+   "resource":{
+      "display_name":"Test webmap",
+      "parent":{
+         "id":2317
+      },
+      "cls":"webmap"
+   },
+   "webmap":{
+      "root_item":{
+         "item_type":"root",
+         "children":[
+            {
+               "layer_enabled":false,
+               "layer_adapter":"tile",
+               "display_name":"LT05_L1TP_124025_20010603_20161211_01",
+               "layer_style_id":2284,
+               "item_type":"layer"
+            }
+         ]
+      }
+   }
+}
