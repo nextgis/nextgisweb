@@ -76,6 +76,7 @@ define([
             this.displayName.set("value", value.display_name);
             this.keyname.set("value", value.keyname);
             this.cbDisabled.set("checked", value.disabled);
+            this.cbSuperuser.set("checked", value.superuser);
             this.description.set("value", value.description);
 
             // show groups where user is a member at the top of the list
@@ -92,6 +93,7 @@ define([
             var result = {
                 display_name: this.displayName.get("value"),
                 keyname: this.keyname.get("value"),
+                superuser: this.cbSuperuser.get("checked"),
                 disabled: this.cbDisabled.get("checked"),
                 member_of: this.memberOf.get("value"),
                 description: this.description.get("value")
