@@ -1,6 +1,6 @@
 .. sectionauthor:: Dmitry Baryshnikov <dmitry.baryshnikov@nextgis.ru>
 
-.. _ngw_file_upload:
+.. _ngwdev_file_upload:
 
 File upload
 =====================

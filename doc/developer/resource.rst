@@ -13,7 +13,7 @@ Resources
 Resource classes
 --------------------
 
-Now there are following resource classes:
+There are following resource classes now:
    
 * resource_group
 * postgis_layer
@@ -33,10 +33,89 @@ Now there are following resource classes:
 HTTP API
 ---------
 
-Schema request
-^^^^^^^^^^^^^^
+Version
+^^^^^^^
 
-Schema request returns list of supported NextGIS Web resources, resource properties and metadata.  
+.. versionadded:: 3.0
+
+To get NextGIS Web API version execute the following request:
+
+.. http:get:: /api/component/pyramid/pkg_version
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/component/pyramid/pkg_version HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+**Example JSON response**:
+
+.. sourcecode:: json
+
+   {
+      "nextgisweb": "2.0",
+      "nextgisweb_mapserver": "0.0dev"
+   }
+
+
+Routes
+^^^^^^^
+
+.. versionadded:: 3.0
+
+Routes are the REST API URLs which are supported by current instance of NextGIS 
+Web. To get possible routes execute the following request:
+
+.. http:get:: /api/component/pyramid/route
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/component/pyramid/route HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+**Example JSON response**:
+
+.. sourcecode:: json
+
+    {
+        "pyramid.settings": [
+            "/api/component/pyramid/settings"
+        ],
+        "feature_layer.store.item": [
+            "/resource/{0}/store/{1}",
+            "id",
+            "feature_id"
+        ],
+        "feature_layer.feature.update": [
+            "/resource/{0}/feature/{1}/update",
+            "id",
+            "feature_id"
+        ],
+	...
+        "pyramid.statistics": [
+            "/api/component/pyramid/statistics"
+        ],
+        "feature_layer.feature.item": [
+            "/api/resource/{0}/feature/{1}",
+            "id",
+            "fid"
+        ],
+        "pyramid.pkg_version": [
+            "/api/component/pyramid/pkg_version"
+        ]
+    }
+
+
+Schema
+^^^^^^^
+
+Schema request returns list of supported NextGIS Web resources, each resource type
+properties and metadata.  
 
 .. http:get:: /resource/schema
 
@@ -54,236 +133,299 @@ Schema request returns list of supported NextGIS Web resources, resource propert
    Accept: */*
    
 **Example JSON response**:
-    
 
 .. sourcecode:: json
 
     {
-      "resources": {
-        "mapserver_style": {
-          "identity": "mapserver_style", 
-          "label": "\u0421\u0442\u0438\u043b\u044c MapServer", 
-          "scopes": [
-            "resource", 
-            "data", 
-            "metadata"
-          ]
-        }, 
-        "postgis_connection": {
-          "identity": "postgis_connection", 
-          "label": "\u0421\u043e\u0435\u0434\u0438\u043d\u0435\u043d\u0438\u0435 
-                   PostGIS", 
-          "scopes": [
-            "connection", 
-            "resource", 
-            "metadata"
-          ]
-        }, 
-        "postgis_layer": {
-          "identity": "postgis_layer", 
-          "label": "\u0421\u043b\u043e\u0439 PostGIS", 
-          "scopes": [
-            "resource", 
-            "datastruct", 
-            "data", 
-            "metadata"
-          ]
-        }, 
-        "raster_layer": {
-          "identity": "raster_layer", 
-          "label": "\u0420\u0430\u0441\u0442\u0440\u043e\u0432\u044b\u0439 
-                    \u0441\u043b\u043e\u0439", 
-          "scopes": [
-            "resource", 
-            "datastruct", 
-            "data", 
-            "metadata"
-          ]
-        }, 
-        "raster_style": {
-          "identity": "raster_style", 
-          "label": "\u0420\u0430\u0441\u0442\u0440\u043e\u0432\u044b\u0439 
-                    \u0441\u0442\u0438\u043b\u044c", 
-          "scopes": [
-            "resource", 
-            "data", 
-            "metadata"
-          ]
-        }, 
-        "resource": {
-          "identity": "resource", 
-          "label": "\u0420\u0435\u0441\u0443\u0440\u0441", 
-          "scopes": [
-            "resource", 
-            "metadata"
-          ]
-        }, 
-        "resource_group": {
-          "identity": "resource_group", 
-          "label": "\u0413\u0440\u0443\u043f\u043f\u0430 \u0440\u0435\u0441
-                    \u0443\u0440\u0441\u043e\u0432", 
-          "scopes": [
-            "resource", 
-            "metadata"
-          ]
-        }, 
-        "vector_layer": {
-          "identity": "vector_layer", 
-          "label": "\u0412\u0435\u043a\u0442\u043e\u0440\u043d\u044b\u0439 
-                    \u0441\u043b\u043e\u0439", 
-          "scopes": [
-            "resource", 
-            "datastruct", 
-            "data", 
-            "metadata"
-          ]
-        }, 
-        "webmap": {
-          "identity": "webmap", 
-          "label": "\u0412\u0435\u0431-\u043a\u0430\u0440\u0442\u0430", 
-          "scopes": [
-            "resource", 
-            "webmap", 
-            "metadata"
-          ]
-        }, 
-        "wfsserver_service": {
-          "identity": "wfsserver_service", 
-          "label": "\u0421\u0435\u0440\u0432\u0438\u0441 WFS", 
-          "scopes": [
-            "resource", 
-            "metadata"
-          ]
-        }, 
-        "wmsclient_connection": {
-          "identity": "wmsclient_connection", 
-          "label": "\u0421\u043e\u0435\u0434\u0438\u043d\u0435\u043d\u0438\u0435 
-                    WMS", 
-          "scopes": [
-            "connection", 
-            "resource", 
-            "metadata"
-          ]
-        }, 
-        "wmsclient_layer": {
-          "identity": "wmsclient_layer", 
-          "label": "C\u043b\u043e\u0439 WMS", 
-          "scopes": [
-            "resource", 
-            "datastruct", 
-            "data", 
-            "metadata"
-          ]
-        }, 
-        "wmsserver_service": {
-          "identity": "wmsserver_service", 
-          "label": "\u0421\u0435\u0440\u0432\u0438\u0441 WMS", 
-          "scopes": [
-            "resource", 
-            "metadata"
-          ]
+        "scopes": {
+            "resource": {
+                "label": "Ресурс",
+                "identity": "resource",
+                "permissions": {
+                    "manage_children": {
+                        "label": "Manage child resources"
+                    },
+                    "change_permissions": {
+                        "label": "Change permissions"
+                    },
+                    "read": {
+                        "label": "Read"
+                    },
+                    "create": {
+                        "label": "Create"
+                    },
+                    "update": {
+                        "label": "Modify"
+                    },
+                    "delete": {
+                        "label": "Delete"
+                    }
+                }
+            },
+            "service": {
+                "label": "Сервис",
+                "identity": "service",
+                "permissions": {
+                    "connect": {
+                        "label": "Connection"
+                    },
+                    "configure": {
+                        "label": "Configure"
+                    }
+                }
+            },
+            "datastruct": {
+                "label": "Data structure",
+                "identity": "datastruct",
+                "permissions": {
+                    "write": {
+                        "label": "White"
+                    },
+                    "read": {
+                        "label": "Read"
+                    }
+                }
+            },
+            "connection": {
+                "label": "Connection",
+                "identity": "connection",
+                "permissions": {
+                    "write": {
+                        "label": "Write"
+                    },
+                    "read": {
+                        "label": "Read"
+                    },
+                    "connect": {
+                        "label": "Connect"
+                    }
+                }
+            },
+            "webmap": {
+                "label": "Web-map",
+                "identity": "webmap",
+                "permissions": {
+                    "display": {
+                        "label": "Open"
+                    }
+                }
+            },
+            "data": {
+                "label": "Data",
+                "identity": "data",
+                "permissions": {
+                    "write": {
+                        "label": "Write"
+                    },
+                    "read": {
+                        "label": "Read"
+                    }
+                }
+            },
+            "metadata": {
+                "label": "Metadata",
+                "identity": "metadata",
+                "permissions": {
+                    "write": {
+                        "label": "Write"
+                    },
+                    "read": {
+                        "label": "Read"
+                    }
+                }
+            }
+        },
+        "resources": {
+            "raster_style": {
+                "scopes": [
+                    "resource",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "raster_style",
+                "label": "Raster style"
+            },
+            "resource": {
+                "scopes": [
+                    "resource",
+                    "metadata"
+                ],
+                "identity": "resource",
+                "label": "Resource"
+            },
+            "postgis_connection": {
+                "scopes": [
+                    "connection",
+                    "resource",
+                    "metadata"
+                ],
+                "identity": "postgis_connection",
+                "label": "PostGIS connection"
+            },
+            "resource_group": {
+                "scopes": [
+                    "resource",
+                    "metadata"
+                ],
+                "identity": "resource_group",
+                "label": "Resource group"
+            },
+            "wmsclient_connection": {
+                "scopes": [
+                    "connection",
+                    "resource",
+                    "metadata"
+                ],
+                "identity": "wmsclient_connection",
+                "label": "WMS connection"
+            },
+            "mapserver_style": {
+                "scopes": [
+                    "resource",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "mapserver_style",
+                "label": "MapServer style"
+            },
+            "vector_layer": {
+                "scopes": [
+                    "resource",
+                    "datastruct",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "vector_layer",
+                "label": "Vector layer"
+            },
+            "qgis_vector_style": {
+                "scopes": [
+                    "resource",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "qgis_vector_style",
+                "label": "QGIS style"
+            },
+            "wmsclient_layer": {
+                "scopes": [
+                    "resource",
+                    "datastruct",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "wmsclient_layer",
+                "label": "WMS layer"
+            },
+            "basemap_layer": {
+                "scopes": [
+                    "resource",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "basemap_layer",
+                "label": "Basemap"
+            },
+            "wfsserver_service": {
+                "scopes": [
+                    "resource",
+                    "service",
+                    "metadata"
+                ],
+                "identity": "wfsserver_service",
+                "label": "WFS service"
+            },
+            "lookup_table": {
+                "scopes": [
+                    "resource",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "lookup_table",
+                "label": "Reference"
+            },
+            "postgis_layer": {
+                "scopes": [
+                    "resource",
+                    "datastruct",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "postgis_layer",
+                "label": "PostGIS layer"
+            },
+            "webmap": {
+                "scopes": [
+                    "resource",
+                    "webmap",
+                    "metadata"
+                ],
+                "identity": "webmap",
+                "label": "Web map"
+            },
+            "wmsserver_service": {
+                "scopes": [
+                    "resource",
+                    "service",
+                    "metadata"
+                ],
+                "identity": "wmsserver_service",
+                "label": "WMS service"
+            },
+            "raster_layer": {
+                "scopes": [
+                    "resource",
+                    "datastruct",
+                    "data",
+                    "metadata"
+                ],
+                "identity": "raster_layer",
+                "label": "Raster layer"
+            }
         }
-      }, 
-      "scopes": {
-        "connection": {
-          "identity": "connection", 
-          "label": "\u0421\u043e\u0435\u0434\u0438\u043d\u0435\u043d\u0438\u0435", 
-          "permissions": {
-            "connect": {
-              "label": "\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432
-                        \u0430\u043d\u0438\u0435 \u0441\u043e\u0435\u0434\u0438
-                        \u043d\u0435\u043d\u0438\u044f"
-            }, 
-            "read": {
-              "label": "\u0427\u0442\u0435\u043d\u0438\u0435 \u043f\u0430\u0440
-                        \u0430\u043c\u0435\u0442\u0440\u043e\u0432 \u0441\u043e
-                        \u0435\u0434\u0438\u043d\u0435\u043d\u0438\u044f"
-            }, 
-            "write": {
-              "label": "\u0417\u0430\u043f\u0438\u0441\u044c \u043f\u0430\u0440
-                        \u0430\u043c\u0435\u0442\u0440\u043e\u0432 \u0441\u043e
-                        \u0435\u0434\u0438\u043d\u0435\u043d\u0438\u044f"
-            }
-          }
-        }, 
-        "data": {
-          "identity": "data", 
-          "label": "\u0414\u0430\u043d\u043d\u044b\u0435", 
-          "permissions": {
-            "read": {
-              "label": "\u0427\u0442\u0435\u043d\u0438\u0435"
-            }, 
-            "write": {
-              "label": "\u0417\u0430\u043f\u0438\u0441\u044c"
-            }
-          }
-        }, 
-        "datastruct": {
-          "identity": "datastruct", 
-          "label": "\u0421\u0442\u0440\u0443\u043a\u0442\u0443\u0440\u0430 
-                    \u0434\u0430\u043d\u043d\u044b\u0445", 
-          "permissions": {
-            "read": {
-              "label": "\u0427\u0442\u0435\u043d\u0438\u0435"
-            }, 
-            "write": {
-              "label": "\u0417\u0430\u043f\u0438\u0441\u044c"
-            }
-          }
-        }, 
-        "metadata": {
-          "identity": "metadata", 
-          "label": "\u041c\u0435\u0442\u0430\u0434\u0430\u043d\u043d\u044b\u0435", 
-          "permissions": {
-            "read": {
-              "label": "\u0427\u0442\u0435\u043d\u0438\u0435"
-            }, 
-            "write": {
-              "label": "\u0417\u0430\u043f\u0438\u0441\u044c"
-            }
-          }
-        }, 
-        "resource": {
-          "identity": "resource", 
-          "label": "\u0420\u0435\u0441\u0443\u0440\u0441", 
-          "permissions": {
-            "change_permissions": {
-              "label": "\u0423\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438
-                        \u0435 \u043f\u0440\u0430\u0432\u0430\u043c\u0438 \u0434
-                        \u043e\u0441\u0442\u0443\u043f\u0430"
-            }, 
-            "create": {
-              "label": "\u0421\u043e\u0437\u0434\u0430\u043d\u0438\u0435"
-            }, 
-            "delete": {
-              "label": "\u0423\u0434\u0430\u043b\u0435\u043d\u0438\u0435"
-            }, 
-            "manage_children": {
-              "label": "\u0423\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438
-                        \u0435 \u0434\u043e\u0447\u0435\u0440\u043d\u0438\u043c
-                        \u0438 \u0440\u0435\u0441\u0443\u0440\u0441\u0430\u043c
-                        \u0438"
-            }, 
-            "read": {
-              "label": "\u0427\u0442\u0435\u043d\u0438\u0435"
-            }, 
-            "update": {
-              "label": "\u0418\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0435"
-            }
-          }
-        }, 
-        "webmap": {
-          "identity": "webmap", 
-          "label": "\u0412\u0435\u0431-\u043a\u0430\u0440\u0442\u0430", 
-          "permissions": {
-            "display": {
-              "label": "\u041f\u0440\u043e\u0441\u043c\u043e\u0442\u0440"
-            }
-          }
-        }
-      }
     }
    
+Requests to root
+^^^^^^^^^^^^^^^^^^
+
+.. deprecated:: 2.2
+.. http:get:: /resource/-/child/   
+
+   Root resource (list).
+
+.. deprecated:: 2.2
+.. http:get:: /resource/-/child/(int:id)
+    
+   Get resource by identificator ``id``.
+    
+.. http:get:: /resource/(int:id)/child/
+    
+   Child resources of resource with identificator ``id`` (list).
+    
+.. http:get:: /resource/(int:parent_id)/child/(int:id)
+   
+   Resource with identificator ``id`` (object).
+
+.. deprecated:: 2.2
+.. http:get:: /resource/store/             
+
+   All resource list.
+    
+.. deprecated:: 2.2
+.. http:get:: /resource/store/(int:id)           
+
+   Resource with identificator ``id`` (object).
+
+.. deprecated:: 2.2
+.. http:get:: /resource/store/?id=(int:id)        
+
+   Resource with identificator ``id`` (object).
+   
+.. deprecated:: 2.2
+.. http:get:: /resource/store/?parent_id=(int:id)
+
+   Child resources of resource with identificator ``id`` (list).
+
    
 Basic requests 
 ^^^^^^^^^^^^^^^    
@@ -294,7 +436,7 @@ Basic requests
 
 ..  http:put:: /api/resource/(int:id)
 
-    Change resource by JSON payload data. Need read and write permiossions.
+    Change resource by JSON payload data. Need read and write permissions.
 
 ..  http:delete:: /api/resource/(int:id)
 
@@ -312,16 +454,12 @@ Basic requests
 
     :param integer parent: Parent resource identificator, may be in JSON payload.
     :param string cls: Resource class (type). For a list of supported resource classes see :ref:`ngwdev_resource_classes`.
-    
- 
-Get feature
-^^^^^^^^^^^
 
-Get single feature
+Child resource
+^^^^^^^^^^^^^^^
 
-.. http:get:: /api/resource/(int:id)/feature/(int:feature_id)
-
-Get child resources
+To get child resources of parent resource with identificator ``id`` execute the
+following request:
 
 .. http:get:: /api/resource/?parent=(int:id)
 
@@ -547,8 +685,201 @@ Get child resources
 		}
 	}
 
-  
-Get all vector layer features
+.. _ngwdev_resource_properties
+
+Resource properties
+^^^^^^^^^^^^^^^^^^^^
+
+To get resource properties execute the following request:
+
+.. http:get:: /api/resource/(int:id)
+
+   Resource properties.
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resource/1 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example JSON response**:
+
+.. sourcecode:: json
+
+   {
+    "resource": {
+        "id": 2,
+        "cls": "resource_group",
+        "parent": {
+            "id": 0,
+            "parent": {
+                "id": null
+            }
+        },
+        "owner_user": {
+            "id": 4
+        },
+        "permissions": [],
+        "keyname": null,
+        "display_name": "test",
+        "description": "",
+        "children": true,
+        "interfaces": [],
+        "scopes": [
+            "resource",
+            "metadata"
+        ]
+    },
+    "resmeta": {
+        "items": {}
+    }
+   }
+
+Where:
+
+* **resource** - resource description
+
+   * id - resource identificator
+   * cls - resource type (see. :ref:`ngwdev_resource_classes`)
+   * parent - parent resource
+   * owner_user - resource owner identificator
+   * permissions - resource permissions array
+   * keyname - unique identificator (allowed only ASCII characters). Must be unique in whole NextGIS Web instance
+   * display_name - name showing in web user interface
+   * description - resource description showing in web user interface
+   * children - boolean value. True if resource has children resources
+   * interfaces - API interfaces supported by resource
+   * scope - which scope the resource is belongs   
+
+* **resmeta** - resource metadata
+
+The map resource properties has the following json description:
+
+.. sourcecode:: json
+
+   {
+    "resource": {
+        "id": 1,
+        "cls": "webmap",
+        "parent": {
+            "id": 2,
+            "parent": {
+                "id": 0
+            }
+        },
+        "owner_user": {
+            "id": 4
+        },
+        "permissions": [],
+        "keyname": null,
+        "display_name": "Main web map",
+        "description": null,
+        "children": false,
+        "interfaces": [],
+        "scopes": [
+            "resource",
+            "webmap",
+            "metadata"
+        ]
+    },
+    "webmap": {
+        "extent_left": -180,
+        "extent_right": 180,
+        "extent_bottom": -90,
+        "extent_top": 90,
+        "draw_order_enabled": null,
+        "bookmark_resource": null,
+        "root_item": {
+            "item_type": "root",
+            "children": [
+                {
+                    "layer_adapter": "image",
+                    "layer_enabled": true,
+                    "draw_order_position": null,
+                    "layer_max_scale_denom": null,
+                    "item_type": "layer",
+                    "layer_min_scale_denom": null,
+                    "display_name": "Cities",
+                    "layer_style_id": 91,
+                    "layer_transparency": null
+                },
+                {
+                    "group_expanded": false, 
+                    "display_name": "Points of interest", 
+                    "children": [
+                     ], 
+                    "item_type": "group"
+                } 
+            ]
+        }
+    },
+    "basemap_webmap": {
+        "basemaps": [
+           {
+                "opacity": null, 
+                "enabled": true, 
+                "position": 0, 
+                "display_name": "OpenStreetMap Standard", 
+                "resource_id": 665
+            },
+        ]
+    },
+    "resmeta": {
+        "items": {}
+    }
+   }
+ 
+Where:
+
+* **resource** - resource description (see upper for details)
+* **webmap** - web map description
+
+   * extent_left, extent_right, extent_bottom, extent_top - 
+   * draw_order_enabled - use specific draw order or same as layers order
+   * bookmark_resource - vector layer resource identificator
+   * root_item - layers description group
+      
+      * item_type - always root
+      * children - map layers and groups
+         
+         * layer_adapter - ``image`` or ``tile`` (also see :ref:`ngw_map_create`)
+         * layer_enabled - is layer checked be default
+         * draw_order_position - if drawing order is enabled this is position in order. May be ``null``.
+         * layer_max_scale_denom, layer_min_scale_denom - a scale range in format ``1 : 10 000``
+         * item_type - may be ``group`` or ``layer``
+         * display_name - layer or group name
+         * layer_style_id - vector or raster layer style resource identificator
+         * layer_transparency - transparency
+         * group_expanded - is group checked by default or not
+
+* **basemap_webmap** - array of web map basemaps
+
+   * opacity - basemap opacity
+   * enabled - is basemap should be present in web map basemaps combobox
+   * position - position in web map basemaps combobox
+   * display_name - name showing in web map basemaps combobox
+   * resource_id - basemap resource identificator
+
+* **resmeta** - resource metadata
+
+Feature count
+^^^^^^^^^^^^^
+
+To get feature count in vector layer execute the following request:
+
+.. http:get:: /api/resource/(int:id)/feature_count
+        
+ 
+Feature
+^^^^^^^^^^^
+
+To get a single feature of vector layer execute the following request:
+
+.. http:get:: /api/resource/(int:id)/feature/(int:feature_id)
+ 
+To get all vector layer features execute the following request:
 
 .. http:get:: /api/resource/(int:id)/feature/
 
@@ -635,143 +966,31 @@ Get all vector layer features
         }
     }
 
-Attachment URL forms from feature URL addind ``attachment/`` and attachment identificator. For example:
+
+Attachment
+^^^^^^^^^^^
+
+Attachment URL forms from feature URL adding ``attachment/`` and attachment 
+identificator. For example:
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/download
 
-Attachment support loading any file types. For images a preview generates.
+Attachment support loading any file types. For image files a preview generates 
+during upload.
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/image?size=200x150
 
-Feature count request.
-
-.. http:get:: /api/resource/(int:id)/feature_count
-    
-Requests to root
+Map web interface
 ^^^^^^^^^^^^^^^^^^
 
-.. deprecated:: 2.2
-.. http:get:: /resource/-/child/   
-
-   Root resource (list).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/-/child/(int:id)
-    
-   Get resource by identificator ``id``.
-    
-.. http:get:: /resource/(int:id)/child/
-    
-   Child resources of resource with identificator ``id`` (list).
-    
-.. http:get:: /resource/(int:parent_id)/child/(int:id)
-   
-   Resource with identificator ``id`` (object).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/store/             
-
-   Plain all resource list.
-    
-.. deprecated:: 2.2
-.. http:get:: /resource/store/(int:id)           
-
-   Resource with identificator ``id`` (object).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/store/?id=(int:id)        
-
-   Resource with identificator ``id`` (object).
-   
-.. deprecated:: 2.2
-.. http:get:: /resource/store/?parent_id=(int:id)
-
-   Child resources of resource with identificator ``id`` (list).
-
-Get version
-^^^^^^^^^^^^
-
 .. versionadded:: 3.0
 
-To get version execute request:
-
-.. http:get:: /api/component/pyramid/pkg_version
-
-**Example request**:
-
-.. sourcecode:: http
-
-   GET /api/component/pyramid/pkg_version HTTP/1.1
-   Host: ngw_url
-   Accept: */*
-   
-**Example JSON response**:
-
-.. sourcecode:: json
-
-   {
-      "nextgisweb": "2.0",
-      "nextgisweb_mapserver": "0.0dev"
-   }
-
-Get route
-^^^^^^^^^^^^
-
-.. versionadded:: 3.0
-
-To get posible routes execute request:
-
-.. http:get:: /api/component/pyramid/route
-
-**Example request**:
-
-.. sourcecode:: http
-
-   GET /api/component/pyramid/route HTTP/1.1
-   Host: ngw_url
-   Accept: */*
-   
-**Example JSON response**:
-
-.. sourcecode:: json
-
-    {
-        "pyramid.settings": [
-            "/api/component/pyramid/settings"
-        ],
-        "feature_layer.store.item": [
-            "/resource/{0}/store/{1}",
-            "id",
-            "feature_id"
-        ],
-        "feature_layer.feature.update": [
-            "/resource/{0}/feature/{1}/update",
-            "id",
-            "feature_id"
-        ],
-	...
-        "pyramid.statistics": [
-            "/api/component/pyramid/statistics"
-        ],
-        "feature_layer.feature.item": [
-            "/api/resource/{0}/feature/{1}",
-            "id",
-            "fid"
-        ],
-        "pyramid.pkg_version": [
-            "/api/component/pyramid/pkg_version"
-        ]
-    }
-
-Get map
-^^^^^^^^^^^^
-
-.. versionadded:: 3.0
-
-To get map web interface (not map json representation) execute one of the following requests:
+To get map web interface (not a map json representation) execute one of the 
+following request:
 
 .. http:get:: resource/{0}/display
-.. http:get:: resource/{0}/display/tiny
+
+   Web map user interface.
 
 **Example request**:
 
@@ -780,3 +999,10 @@ To get map web interface (not map json representation) execute one of the follow
    GET resource/42/display HTTP/1.1
    Host: ngw_url
    Accept: */*
+
+To get web interface without layer control and toolbars execute the following 
+request:
+
+.. http:get:: resource/{0}/display/tiny
+
+   Web map ``light`` user interface.

@@ -1,6 +1,6 @@
 .. sectionauthor:: Artem Svetlov <artem.svetlov@nextgis.ru>
 
-.. _ngw_python_api:
+.. _ngwdev_python_api:
 
 Python API library
 ==================
