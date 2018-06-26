@@ -74,14 +74,17 @@ body {
     min-width: @min-width;
 }
 
-a{
+a, .link{
     color: @blue;
-}
-    a:hover{
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover{
         color: @link-hover;
         border-color: @link-hover;
         border-color: fade(@link-hover, 40%);
     }
+}
 
 .list-unstyled{
     margin:0;

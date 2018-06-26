@@ -567,10 +567,14 @@ body {
   background-color: #fafafa;
   min-width: 900px;
 }
-a {
+a,
+.link {
   color: #076dbf;
+  text-decoration: underline;
+  cursor: pointer;
 }
-a:hover {
+a:hover,
+.link:hover {
   color: #2196F3;
   border-color: #2196F3;
   border-color: rgba(33, 150, 243, 0.4);
