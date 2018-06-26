@@ -411,7 +411,8 @@ define([
                     isOpen: widget.activeLeftPanel == "infoPanel",
                     gutters: false,
                     withCloser: false,
-                    description: this.config.webmapDescription
+                    description: this.config.webmapDescription,
+                    display: widget
                 });
 
                 if (widget.activeLeftPanel == "infoPanel")
@@ -485,7 +486,7 @@ define([
                     // Добавляем слои на карту
                     widget._mapAddLayers();
 
-                    new FeatureHighlighter(this.map);
+                    widget.featureHighlighter = new FeatureHighlighter(this.map);
 
                     // Связываем изменение чекбокса с видимостью слоя
                     var store = widget.itemStore;
@@ -1056,3 +1057,4 @@ define([
         }
     });
 });
+
