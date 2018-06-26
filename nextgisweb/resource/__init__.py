@@ -68,6 +68,13 @@ class ResourceComponent(Component):
         for item in self.disabled_cls:
             Resource.registry[item]
 
+        self.quota_limit = int(self.settings['quota.limit']) if \
+            'quota.limit' in self.settings else None
+
+        self.quota_resource_cls = re.split(
+            r'[,\s]+', self.settings['quota.resource_cls']) if \
+            'quota.resource_cls' in self.settings else None
+
     @require('auth')
     def initialize_db(self):
         adminusr = User.filter_by(keyname='administrator').one()
@@ -130,4 +137,6 @@ class ResourceComponent(Component):
     settings_info = (
         dict(key="disabled_cls", desc="Resource classes disabled for creation"),
         dict(key="everyone_permissions", desc="Permissions for user Everyone"),
+        dict(key="quota.resource_cls", desc="Countable resources"),
+        dict(key="quota.limit", desc="Quota limit"),
     ) + cache_settings_info
