@@ -145,12 +145,13 @@ class WFS(Format):
         '<gml:LineString><gml:coordinates>1.0,2.0 2.0,1.0</gml:coordinates></gml:LineString>'
         """
 
-        if "EPSG" not in str(srs):
-            srs = "EPSG:" + str(srs)
-
         if geometry['type'].lower() in \
                 ['point', 'linestring', 'polygon', 'multipolygon', 'multilinestring', 'multipoint']:
             geom_wkt = ogr.CreateGeometryFromJson(geojson.dumps(geometry))
+
+            osrs = ogr.osr.SpatialReference()
+            osrs.ImportFromEPSG(srs)
+            geom_wkt.AssignSpatialReference(osrs)
 
             gml = geom_wkt.ExportToGML(format)
             return gml
@@ -312,7 +313,6 @@ version="%s"
                 for e in count_elements:
                     e.text = str(maxfeatures)
 
-        # import ipdb; ipdb.set_trace()
         layers = self.getlayers()
         featureList = root.xpath("//*[local-name() = 'FeatureTypeList']")
         if len(featureList) > 0 and len(layers) > 0:
