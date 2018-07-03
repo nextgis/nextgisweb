@@ -53,6 +53,7 @@ define([
 
         zoomToFeature: function (resid, fid) {
             var display = this.display;
+            var minZoom = 12;
 
             display
             .featureHighlighter
@@ -60,9 +61,14 @@ define([
             .then(function (feature) {
                 var geometry = feature.getGeometry();
                 var view = display.map.olMap.getView();
-                view.fit(geometry.getExtent());
+                var extent = geometry.getExtent();
                 if (geometry.getType() === 'Point') {
-                    view.setZoom(15);
+                    view.setCenter(geometry.getCoordinates());
+                    if (view.getZoom() < minZoom) {
+                        view.setZoom(minZoom);
+                    }
+                } else {
+                    view.fit(extent);
                 }
             });
         }
