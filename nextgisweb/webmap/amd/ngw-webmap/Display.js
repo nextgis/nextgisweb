@@ -53,6 +53,8 @@ define([
     "ngw-webmap/ui/InfoPanel/InfoPanel",
     "./tool/Swipe",
     "ngw-webmap/MapStatesObserver",
+    // utils
+    "./utils/URL",
     // settings
     "ngw/settings!webmap",
     // template
@@ -110,6 +112,7 @@ define([
     LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel, InfoPanel,
     ToolSwipe,
     MapStatesObserver,
+    URL,
     clientSettings,
     //template
     TabContainer, BorderContainer
@@ -201,27 +204,35 @@ define([
         // Для загрузки изображения
         assetUrl: ngwConfig.assetUrl,
 
+        // Параметр адресной строки для установки имени активной панели
+        modeURLParam: 'panel',
+        emptyModeURLValue: 'none',
+
         // Активная левая панель
         activeLeftPanel: 'layersPanel',
         navigationMenuItems: [
             {
                 title: i18n.gettext('Layers'),
                 icon: 'layers',
+                name: 'layers',
                 value: 'layersPanel'
             },
             {
                 title: i18n.gettext('Search'),
                 icon: 'search',
+                name: 'search',
                 value: 'searchPanel'
             },
             {
                 title: i18n.gettext('Share'),
                 icon: 'share',
+                name: 'share',
                 value: 'sharePanel'
             },
             {
                 title: i18n.gettext('Print map'),
                 icon: 'print',
+                name: 'print',
                 value: 'printMapPanel'
             }
         ],
@@ -229,20 +240,7 @@ define([
             declare.safeMixin(this, options);
 
             // Извлекаем GET-параметры из URL
-            this._urlParams = (function(){
-                var url, query, queryObject;
-                url = window.location.toString();
-                if (url.indexOf("?") !== -1) {
-                    query = url.substring(url.indexOf("?") + 1, url.length);
-                    queryObject = ioQuery.queryToObject(query);
-                    if (lang.isString(queryObject.styles)) {
-                        queryObject.styles = queryObject.styles.split(",");
-                        queryObject.styles = array.map(queryObject.styles, function(i){ return parseInt(i, 10); });
-                    }
-                    return queryObject;
-                }
-                return {};
-            })();
+            this._urlParams = URL.getURLParams();
 
             this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
             this._mapDeferred = new LoggedDeferred("_mapDeferred");
@@ -373,7 +371,7 @@ define([
 
             // Панель закладок
             if (this.config.bookmarkLayerId) {
-                this.navigationMenuItems.splice(2,0, { title: i18n.gettext('Bookmarks'), icon: 'bookmark', value: 'bookmarkPanel'});
+                this.navigationMenuItems.splice(2, 0, { title: i18n.gettext('Bookmarks'), name: 'bookmark', icon: 'bookmark', value: 'bookmarkPanel'});
 
                 all([widget._layersDeferred, widget._postCreateDeferred]).then(
                     function () {
@@ -402,25 +400,32 @@ define([
 
             // Панель с описанием
             if (this.config.webmapDescription) {
-                this.navigationMenuItems.splice(2,0, { title: i18n.gettext('Description'), icon: 'info_outline', value: 'infoPanel'});
-
-                widget.infoPanel = new InfoPanel({
-                    region: 'left',
-                    class: "info-panel dynamic-panel--fullwidth",
-                    withTitle: false,
-                    isOpen: widget.activeLeftPanel == "infoPanel",
-                    gutters: false,
-                    withCloser: false,
-                    description: this.config.webmapDescription,
-                    display: widget
+                this.navigationMenuItems.splice(2,0, { 
+                    title: i18n.gettext('Description'), 
+                    name: 'info', 
+                    icon: 'info_outline', 
+                    value: 'infoPanel'
                 });
+                // Асинхронный запуск чтобы применялись УРЛ параметры назначения стартового режима
+                setTimeout(function () {
+                    widget.infoPanel = new InfoPanel({
+                        region: 'left',
+                        class: "info-panel dynamic-panel--fullwidth",
+                        withTitle: false,
+                        isOpen: widget.activeLeftPanel == "infoPanel",
+                        gutters: false,
+                        withCloser: false,
+                        description: widget.config.webmapDescription,
+                        display: widget
+                    });
 
-                if (widget.activeLeftPanel == "infoPanel")
-                    widget.activatePanel(widget.infoPanel);
+                    if (widget.activeLeftPanel == "infoPanel")
+                        widget.activatePanel(widget.infoPanel);
 
-                widget.infoPanel.on("closed", function () {
-                    widget.navigationMenu.reset();
-                });
+                    widget.infoPanel.on("closed", function () {
+                        widget.navigationMenu.reset();
+                    });
+                }, 0);
             }
 
             // Панель "Поделиться"
@@ -508,6 +513,19 @@ define([
                     widget._pluginsSetup();
                 }
             ).then(undefined, function (err) { console.error(err); });
+
+            // Установка открытой панели из параметров URL
+            var panelNameFromURL = this._urlParams[this.modeURLParam];
+            if (panelNameFromURL) {
+                if (panelNameFromURL === this.emptyModeURLValue) {
+                    this.activeLeftPanel = '';
+                } else {
+                    var menuItem = this._findNavigationMenuItem(panelNameFromURL);
+                    if (menuItem) {
+                        this.activeLeftPanel = menuItem.value;
+                    }
+                }
+            }
 
             // Инструменты
             this.tools = [];
@@ -886,6 +904,27 @@ define([
             }, this);
         },
 
+        _findNavigationMenuItem: function (itemValue) {
+            for (var fry = 0; fry < this.navigationMenuItems.length; fry++) {
+                var menuItem = this.navigationMenuItems[fry];
+                if ([menuItem.icon, menuItem.value, menuItem.name].indexOf(itemValue) !== -1) {
+                    return menuItem;
+                }
+            }
+            return false;
+        },
+
+        _setActivePanelURL: function () {
+            if (this.activeLeftPanel) {
+                var menuItem = this._findNavigationMenuItem(this.activeLeftPanel);
+                if (menuItem) {
+                    URL.setURLParam(this.modeURLParam, menuItem.name);
+                }
+            } else {
+                URL.setURLParam(this.modeURLParam, this.emptyModeURLValue)
+            }
+        },
+
         _navigationMenuSetup: function(){
             var widget = this;
 
@@ -903,7 +942,9 @@ define([
                     widget.activatePanel(widget[value]);
 
                 widget.activeLeftPanel = value;
+                widget._setActivePanelURL();
             });
+            this._setActivePanelURL();
         },
 
         _layersPanelSetup: function(){
