@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 from pyramid.response import Response
 
+from .. import db
 from ..env import env
 from ..models import DBSession
 from ..auth import User
@@ -361,6 +362,27 @@ def permission(resource, request):
         content_type=b'application/json')
 
 
+def quota(request):
+    quota_limit = request.env.resource.quota_limit
+    quota_resource_cls = request.env.resource.quota_resource_cls
+
+    count = None
+    if quota_limit is not None:
+        query = DBSession.query(db.func.count(Resource.id))
+        if quota_resource_cls is not None:
+            query = query.filter(Resource.cls.in_(quota_resource_cls))
+
+        with DBSession.no_autoflush:
+            count = query.scalar()
+
+    result = dict(limit=quota_limit, resource_cls=quota_resource_cls,
+                  count=count)
+
+    return Response(
+        json.dumps(result), status_code=200,
+        content_type=b'application/json')
+
+
 def setup_pyramid(comp, config):
 
     def _route(route_name, route_path, **kwargs):
@@ -398,6 +420,10 @@ def setup_pyramid(comp, config):
         'resource.permission', '/api/resource/{id}/permission',
         factory=resource_factory) \
         .add_view(permission, request_method='GET')
+
+    config.add_route(
+        'resource.quota', '/api/resource/quota') \
+        .add_view(quota, request_method='GET')
 
     config.add_tween(
         'nextgisweb.resource.api.resexc_tween_factory',
