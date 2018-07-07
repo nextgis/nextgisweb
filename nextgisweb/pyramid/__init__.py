@@ -218,6 +218,14 @@ class PyramidComponent(Component):
         for comp in self._env.chain('setup_pyramid'):
             comp.setup_pyramid(config)
 
+        def amd_base(request):
+            amds = []
+            for comp in self._env.chain('amd_base'):
+                amds.extend(comp.amd_base)
+            return amds
+
+        config.add_request_method(amd_base, 'amd_base', property=True, reify=True)
+
         return config
 
     def setup_pyramid(self, config):

@@ -74,6 +74,10 @@
         ${self.head()}
     %endif
 
+    %for a in request.amd_base:
+        <script src="${request.route_url('amd_package', subpath='%s.js' % a)}"></script>
+    %endfor
+
 </head>
 
 <body class="claro nextgis">
