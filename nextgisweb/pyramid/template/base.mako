@@ -62,6 +62,10 @@
             baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n},
             locale: ${request.locale_name | json.dumps, n}
         };
+
+        %if (hasattr(request, 'context') and hasattr(request.context, 'id')):
+        var ngwResourceId = ${request.context.id};
+        %endif
     </script>
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
