@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-06-26 23:43+0300\n"
+"POT-Creation-Date: 2018-07-18 01:11+0700\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,13 +17,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.4.0\n"
+"Generated-By: Babel 2.5.1\n"
 
 #: __init__.py:89
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
-#: api.py:170
+#: api.py:171
 #, python-format
 msgid ""
 "Unknown exception '%(exception)s' in serializer '%(serializer)s' "
@@ -32,34 +32,34 @@ msgstr ""
 "Неизвестная ошибка '%(exception)s' в сериализаторе '%(serializer)s', "
 "атрибут '%(attr)s'."
 
-#: api.py:172
+#: api.py:173
 #, python-format
 msgid "Unknown exception '%(exception)s' in serializer '%(serializer)s'."
 msgstr "Неизвестная ошибка '%(exception)s' в сериализаторе '%(serializer)s'."
 
-#: api.py:174
+#: api.py:175
 #, python-format
 msgid "Unknown exception '%(exception)s'."
 msgstr "msgstr \"Неизвестная ошибка '%(exception)s'."
 
-#: api.py:251
+#: api.py:252
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:297
+#: api.py:298
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:300
+#: api.py:301
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:303
+#: api.py:304
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:306
+#: api.py:307
 #, python-format
 msgid "Resource class '%s' disabled."
 msgstr ""
@@ -92,12 +92,12 @@ msgstr ""
 "Наименование ресурса не уникально. Ресурс с таким же именем уже "
 "существует (ID=%d)."
 
-#: model.py:405
+#: model.py:404
 #, python-format
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: model.py:459
+#: model.py:458
 msgid "Resource group"
 msgstr "Группа ресурсов"
 

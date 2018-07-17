@@ -400,9 +400,7 @@ class ResourceSerializer(Serializer):
                 count = query.scalar()
 
             if count >= quota_limit:
-                raise ValidationError(_(
-                    "Maximum number of resources exceeded. "
-                    "The limit is %s." % (quota_limit,)))
+                raise ValidationError(_("Maximum number of resources exceeded. The limit is %s.") % (quota_limit,))
 
 
 class ResourceACLRule(Base):
