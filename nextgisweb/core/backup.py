@@ -10,7 +10,10 @@ from shutil import copyfileobj
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import pip
+try:
+    from pip._internal import main as pip_main
+except ImportError:
+    from pip import main as pip_main
 
 from ..registry import registry_maker
 
@@ -122,7 +125,7 @@ def backup(env, dst, nozip=False):
         buf = openfile('requirements')
         stdout = sys.stdout
         sys.stdout = buf
-        pip.main(['freeze', ])
+        pip_main(['freeze', ])
         putfile(buf)
     finally:
         sys.stdout = stdout
