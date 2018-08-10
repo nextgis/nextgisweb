@@ -49,7 +49,7 @@ msgstr "Разное"
 
 #: view.py:122 view.py:196
 msgid "Home path"
-msgstr "Относительный путь стартовой страницы"
+msgstr "Стартовая страница"
 
 #: view.py:128
 msgid "404: Page not found"
