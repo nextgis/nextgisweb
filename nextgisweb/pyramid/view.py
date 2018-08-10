@@ -16,9 +16,13 @@ from .util import _, ClientRoutePredicate
 
 
 def home(request):
-    home_url = request.env.pyramid.settings.get('home_url')
-    if home_url is not None:
-        return HTTPFound(request.application_url + home_url)
+    try:
+        home_path = request.env.core.settings_get('pyramid', 'home_path')
+    except KeyError:
+        home_path = None
+
+    if home_path is not None:
+        return HTTPFound(request.application_url + home_path)
     else:
         return HTTPFound(location=request.route_url('resource.show', id=0))
 
@@ -112,6 +116,13 @@ def miscellaneous(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def home_path(request):
+    request.require_administrator()
+    return dict(
+        title=_("Home path"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
 def notfound(request):
     return dict(
         title=_("404: Page not found"),
@@ -161,6 +172,11 @@ def setup_pyramid(comp, config):
         '/control-panel/miscellaneous'
     ).add_view(miscellaneous, renderer=ctpl('miscellaneous'))
 
+    config.add_route(
+        'pyramid.control_panel.home_path',
+        '/control-panel/home_path'
+    ).add_view(home_path, renderer=ctpl('home_path'))
+
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
     comp.control_panel = dm.DynMenu(
@@ -177,4 +193,7 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.custom_css'))),
         dm.Link('settings/miscellaneous', _("Miscellaneous"), lambda args: (
             args.request.route_url('pyramid.control_panel.miscellaneous'))),
+        dm.Link('settings/home_path', _("Home path"), lambda args: (
+            args.request.route_url('pyramid.control_panel.home_path'))),
     )
+

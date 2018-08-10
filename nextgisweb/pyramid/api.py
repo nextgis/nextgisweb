@@ -178,6 +178,29 @@ def miscellaneous_put(request):
             raise HTTPBadRequest("Invalid key '%s'" % k)
 
 
+def home_path_get(request):
+    request.require_administrator()
+    try:
+        home_path = env.core.settings_get('pyramid', 'home_path')
+    except KeyError:
+        home_path = None
+    return dict(home_path=home_path)
+
+
+def home_path_put(request):
+    request.require_administrator()
+
+    body = request.json_body
+    for k, v in body.iteritems():
+        if k == 'home_path':
+            if v:
+                env.core.settings_set('pyramid', 'home_path', v)
+            else:
+                env.core.settings_delete('pyramid', 'home_path')
+        else:
+            raise HTTPBadRequest("Invalid key '%s'" % k)
+
+
 def settings(request):
     comp = request.env._components[request.GET['component']]
     return comp.client_settings(request)
@@ -316,3 +339,9 @@ def setup_pyramid(comp, config):
                      '/api/component/pyramid/miscellaneous') \
         .add_view(miscellaneous_get, request_method='GET', renderer='json') \
         .add_view(miscellaneous_put, request_method='PUT', renderer='json')
+
+    config.add_route('pyramid.home_path',
+                     '/api/component/pyramid/home_path') \
+        .add_view(home_path_get, request_method='GET', renderer='json') \
+        .add_view(home_path_put, request_method='PUT', renderer='json')
+
