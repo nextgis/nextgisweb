@@ -790,12 +790,21 @@ define([
         },
 
         _layersSetup: function () {
-            var widget = this, store = this.itemStore;
+            var widget = this,
+                store = this.itemStore,
+                visibleStyles = null;
 
             this._adaptersSetup();
 
             this._layers = {};              // Список всех слоев по id
             this._layer_order = [];         // Порядок слоев от нижнего к верхнему
+
+            if (lang.isString(widget._urlParams.styles)) {
+                visibleStyles = widget._urlParams.styles.split(',');
+                visibleStyles = array.map(visibleStyles, function (i) {
+                    return parseInt(i, 10);
+                });
+            }
 
             // Инициализация слоев
             store.fetch({
@@ -810,8 +819,7 @@ define([
 
                     // Включаем слои, указанные в URL
                     var cond,
-                        layer = widget._layers[store.getValue(item, "id")],
-                        visibleStyles = widget._urlParams.styles;
+                        layer = widget._layers[store.getValue(item, "id")];
                     if (visibleStyles) {
                         cond = array.indexOf(visibleStyles, store.getValue(item, "styleId")) !== -1;
                         layer.olLayer.setVisible(cond);
