@@ -8,7 +8,7 @@ File upload
 Single file upload
 -------------------
 
-Execute foolowing request for file upload:
+Execute folowing request for file upload:
 
 ..  http:post:: /api/component/file_upload/upload
 
@@ -30,7 +30,7 @@ Next multipart POST request follow. Request includes following form parameters:
    
    file=\tmp\test.file&name=testfile
    
-Response in JSON format with file details returnes on succeed:
+Response in JSON format with file details returned on success:
 
 **Example response body**:
     
@@ -47,7 +47,7 @@ Response in JSON format with file details returnes on succeed:
       ]
     }
 
-Also you can create attachment using PUT method, in this case you do not need set file name
+Also you can create attachment using PUT method, in this case you do not need to set file name
 
 **Example add attachment to feature on Python**:
 
@@ -78,20 +78,20 @@ Also you can create attachment using PUT method, in this case you do not need se
         #add attachment to nextgisweb feature
         req = requests.post(url_dst + feature_dst + str(new_id) + '/attachment/', data=json.dumps(attach_data), auth=creds_dst)
 
-Multiple files upload
---------------------------
+Multiple file upload
+--------------------
 
-For multiple files upload execute following request:
+For multiple files execute the following request:
 
 ..  http:post:: /api/component/file_upload/upload
 
-    Several files upload request
+    Multiple files upload request
 
     :form name: must be "files[]"
 
 In ``name`` field must be file name and path (multipart POST request). 
 
-Responce in JSON formate returnes on succeed:
+Responce in JSON formate returned on success:
     
 **Example response body**:
     
