@@ -458,7 +458,7 @@ define([
                         widget.navigationMenu.reset();
                         widget.map.olMap.getView().un("change", widget.sharePanel.setPermalinkUrl, widget.sharePanel);
                         widget.map.olMap.getView().un("change", widget.sharePanel.setEmbedCode, widget.sharePanel);
-                        itemStoreListener.remove();
+                        if (itemStoreListener) itemStoreListener.remove();
                     });
 
                 }
