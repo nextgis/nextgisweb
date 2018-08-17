@@ -345,3 +345,8 @@ def setup_pyramid(comp, config):
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',
         factory=resource_factory) \
         .add_view(count, context=IFeatureLayer, request_method='GET')
+
+    from .identify import identify
+    config.add_route(
+        'feature_layer.identify', '/api/feature_layer/identify') \
+        .add_view(identify, request_method='POST')
