@@ -503,6 +503,40 @@ define([
                 }));
             }
 
+            if (this._urlParams.events === 'true') {
+                this.map.olMap.on('moveend', lang.hitch(this, function (ev) {
+                    var view = this.map.olMap.getView(),
+                        center = ol.proj.toLonLat(view.getCenter(), view.getProjection().getCode());
+
+                    parent.postMessage({
+                        event: 'ngMapExtentChanged',
+                        detail: 'move',
+                        data: {
+                            zoom: view.getZoom(),
+                            lat: center[1],
+                            lon: center[0]
+                        }
+                    }, '*');
+                }));
+
+
+                this.map.olMap.getView().on('change', lang.hitch(this, function (e) {
+                    var view = this.map.olMap.getView(),
+                        center = ol.proj.toLonLat(view.getCenter(), view.getProjection().getCode());
+
+                    parent.postMessage({
+                        event: 'ngMapExtentChanged',
+                        detail: 'zoom',
+                        data: {
+                            zoom: view.getZoom(),
+                            lat: center[1],
+                            lon: center[0]
+                        }
+                    }, '*');
+                }));
+            }
+
+
             // При изменении размеров контейнера пересчитываем размер карты
             aspect.after(this.mapPane, "resize", function() {
                 widget.map.olMap.updateSize();
