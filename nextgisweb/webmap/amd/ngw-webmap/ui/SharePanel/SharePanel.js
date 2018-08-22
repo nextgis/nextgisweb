@@ -60,6 +60,9 @@ define([
             this.contentWidget.linkCheckbox.on("change", lang.hitch(this, function(){
                 this.setEmbedCode();
             }));
+            this.contentWidget.eventsCheckbox.on("change", lang.hitch(this, function(){
+                this.setEmbedCode();
+            }));
             this.contentWidget.previewMapButton.on("click", lang.hitch(this, function(){
                 this.contentWidget.previewMapForm.submit();
             }));
@@ -78,7 +81,8 @@ define([
                     var iframeSrc = Permalink.getPermalink(this.display, visibleItemsResults.visibleItems, {
                         urlWithoutParams: displayConfig.tinyDisplayUrl,
                         additionalParams: {
-                            linkMainMap: this.contentWidget.linkCheckbox.get('checked')
+                            linkMainMap: this.contentWidget.linkCheckbox.get('checked'),
+                            events: this.contentWidget.eventsCheckbox.get('checked'),
                         }
                     });
 

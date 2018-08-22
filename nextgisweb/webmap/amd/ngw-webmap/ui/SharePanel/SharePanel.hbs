@@ -43,6 +43,13 @@
         </label>
     </div>
     <div class="input-group">
+        <label class="checkbox">
+            <input data-dojo-attach-point="eventsCheckbox"
+                   data-dojo-type="dijit/form/CheckBox"/>
+            <span class="checkbox__label">{{ gettext 'Generate events' }}</span>
+        </label>
+    </div>
+    <div class="input-group">
         <textarea data-dojo-attach-point="codeControl"
                   data-dojo-type="dijit/form/SimpleTextarea"
                   data-dojo-props="readOnly: false, selectOnClick: true"
