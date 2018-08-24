@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-05-04 02:13+0700\n"
+"POT-Creation-Date: 2018-08-24 12:10+0800\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.5.1\n"
+"Generated-By: Babel 2.6.0\n"
 
 #: __init__.py:43
 msgid "Main web map"
@@ -31,59 +31,59 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:24 model.py:31 view.py:158
+#: model.py:24 model.py:31 view.py:157
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:26 view.py:161
+#: model.py:26 view.py:160
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:208 amd/ngw-webmap/Display.js:934
+#: amd/ngw-webmap/Display.js:215 amd/ngw-webmap/Display.js:984
 #: amd/ngw-webmap/ItemWidget.js:247
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:213
+#: amd/ngw-webmap/Display.js:221
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:218 amd/ngw-webmap/Display.js:432
+#: amd/ngw-webmap/Display.js:227 amd/ngw-webmap/Display.js:438
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:223 amd/ngw-webmap/Display.js:337
+#: amd/ngw-webmap/Display.js:233 amd/ngw-webmap/Display.js:335
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:376 amd/ngw-webmap/Display.js:383
+#: amd/ngw-webmap/Display.js:374 amd/ngw-webmap/Display.js:381
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:405 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:404 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:681 amd/ngw-webmap/tool/Zoom.js:19
+#: amd/ngw-webmap/Display.js:700 amd/ngw-webmap/tool/Zoom.js:19
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:471
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:682 amd/ngw-webmap/tool/Zoom.js:22
+#: amd/ngw-webmap/Display.js:701 amd/ngw-webmap/tool/Zoom.js:22
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:472
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:686
+#: amd/ngw-webmap/Display.js:705
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:476
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:702
+#: amd/ngw-webmap/Display.js:721
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:705
+#: amd/ngw-webmap/Display.js:724
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:485
 msgid "Reset rotation"
 msgstr "Отменить поворот"
@@ -339,7 +339,11 @@ msgstr "Вставить карту на сайт"
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:60
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:49
+msgid "Generate events"
+msgstr "Генерация событий"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:67
 msgid "Preview"
 msgstr "Прeдпросмотр"
 

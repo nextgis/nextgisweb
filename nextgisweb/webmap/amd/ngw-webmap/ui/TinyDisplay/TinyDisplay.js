@@ -137,6 +137,9 @@ define([
         // Текущая подложка
         _baseLayer: undefined,
 
+        // current zoom level and center
+        _position: {},
+
         // Для загрузки изображения
         assetUrl: ngwConfig.assetUrl,
 
@@ -503,40 +506,6 @@ define([
                 }));
             }
 
-            if (this._urlParams.events === 'true') {
-                this.map.olMap.on('moveend', lang.hitch(this, function (ev) {
-                    var view = this.map.olMap.getView(),
-                        center = ol.proj.toLonLat(view.getCenter(), view.getProjection().getCode());
-
-                    parent.postMessage({
-                        event: 'ngMapExtentChanged',
-                        detail: 'move',
-                        data: {
-                            zoom: view.getZoom(),
-                            lat: center[1],
-                            lon: center[0]
-                        }
-                    }, '*');
-                }));
-
-
-                this.map.olMap.getView().on('change', lang.hitch(this, function (e) {
-                    var view = this.map.olMap.getView(),
-                        center = ol.proj.toLonLat(view.getCenter(), view.getProjection().getCode());
-
-                    parent.postMessage({
-                        event: 'ngMapExtentChanged',
-                        detail: 'zoom',
-                        data: {
-                            zoom: view.getZoom(),
-                            lat: center[1],
-                            lon: center[0]
-                        }
-                    }, '*');
-                }));
-            }
-
-
             // При изменении размеров контейнера пересчитываем размер карты
             aspect.after(this.mapPane, "resize", function() {
                 widget.map.olMap.updateSize();
@@ -572,7 +541,86 @@ define([
             this._zoomToInitialExtent();
             this._setBasemap();
 
+            this._handlePostMessage();
+
             this._mapDeferred.resolve();
+        },
+
+        /**
+         * Generate window `message` events to listen from iframe
+         * @example
+         * window.addEventListener('message', function(evt) {
+         *    var data = evt.data;
+         *    if (data.event === 'ngMapExtentChanged') {
+         *        if (data.detail === 'zoom') {
+         *        } else if (data.detail === 'move') {
+         *        }
+         *    }
+         * }, false);
+         */
+        _handlePostMessage: function () {
+            var widget = this;
+            if (this._urlParams.events === 'true') {
+                var getPosition = function () {
+                    var view = widget.map.olMap.getView();
+                    var center = ol.proj.toLonLat(
+                        view.getCenter(),
+                        view.getProjection().getCode()
+                    );
+                    return {
+                        zoom: view.getZoom(),
+                        lat: center[1],
+                        lon: center[0]
+                    };
+                };
+
+                var postMessage = function () {
+                    var position = getPosition();
+                    var memPosition = widget._position || {};
+                    var options = {
+                        event: 'ngMapExtentChanged',
+                        data: {
+                            zoom: position.zoom,
+                            lat: position.lat,
+                            lon: position.lon
+                        }
+                    };
+                    var events = [
+                        {
+                            detail: 'move',
+                            isChange: function () {
+                                return position.lat !== memPosition.lat ||
+                                    position.lon !== memPosition.lon;
+                            }
+                        },
+                        {
+                            detail: 'zoom',
+                            isChange: function () {
+                                return position.zoom !== memPosition.zoom;
+                            }
+                        }
+                    ]
+                    for (var fry = 0; fry < events.length; fry++) {
+                        var event = events[fry];
+                        if (event.isChange()) {
+                            options.detail = event.detail;
+                            parent.postMessage(options, '*');
+                        }
+                    }
+                };
+
+                // save position before it change
+                this.map.olMap.on('movestart', lang.hitch(this, function (ev) {
+                    widget._position = getPosition();
+                }));
+
+                this.map.olMap.on('moveend', lang.hitch(this, function (ev) {
+                    postMessage();
+                    widget._position = position;
+                }));
+                // send init event
+                postMessage();
+            }
         },
 
         _zoomToInitialExtent: function () {
