@@ -599,14 +599,14 @@ define([
                                 return position.zoom !== memPosition.zoom;
                             }
                         }
-                    ]
-                    for (var fry = 0; fry < events.length; fry++) {
-                        var event = events[fry];
+                    ];
+                    array.forEach(events, function (event) {
                         if (event.isChange()) {
                             options.detail = event.detail;
-                            parent.postMessage(options, '*');
+                            window.parent.postMessage(options, '*');
                         }
-                    }
+                    });
+                    widget._position = position;
                 };
 
                 // save position before it change
@@ -616,7 +616,6 @@ define([
 
                 this.map.olMap.on('moveend', lang.hitch(this, function (ev) {
                     postMessage();
-                    widget._position = position;
                 }));
                 // send init event
                 postMessage();
