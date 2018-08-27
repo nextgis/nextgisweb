@@ -137,9 +137,6 @@ define([
         // Текущая подложка
         _baseLayer: undefined,
 
-        // current zoom level and center
-        _position: {},
-
         // Для загрузки изображения
         assetUrl: ngwConfig.assetUrl,
 
@@ -561,64 +558,19 @@ define([
         _handlePostMessage: function () {
             var widget = this;
             if (this._urlParams.events === 'true') {
-                var getPosition = function () {
-                    var view = widget.map.olMap.getView();
-                    var center = ol.proj.toLonLat(
-                        view.getCenter(),
-                        view.getProjection().getCode()
-                    );
-                    return {
-                        zoom: view.getZoom(),
-                        lat: center[1],
-                        lon: center[0]
-                    };
-                };
-
-                var postMessage = function () {
-                    var position = getPosition();
-                    var memPosition = widget._position || {};
-                    var options = {
-                        event: 'ngMapExtentChanged',
-                        data: {
-                            zoom: position.zoom,
-                            lat: position.lat,
-                            lon: position.lon
+                array.forEach(['move', 'zoom'], lang.hitch(this, function (ev) {
+                    widget.map.on(ev, function (data) {
+                        var parent = window.parent;
+                        if (parent && parent.postMessage) {
+                            parent.postMessage({
+                                event: 'ngMapExtentChanged',
+                                detail: ev,
+                                data: data
+                            }, '*');
                         }
-                    };
-                    var events = [
-                        {
-                            detail: 'move',
-                            isChange: function () {
-                                return position.lat !== memPosition.lat ||
-                                    position.lon !== memPosition.lon;
-                            }
-                        },
-                        {
-                            detail: 'zoom',
-                            isChange: function () {
-                                return position.zoom !== memPosition.zoom;
-                            }
-                        }
-                    ];
-                    array.forEach(events, function (event) {
-                        if (event.isChange()) {
-                            options.detail = event.detail;
-                            window.parent.postMessage(options, '*');
-                        }
-                    });
-                    widget._position = position;
-                };
-
-                // save position before it change
-                this.map.olMap.on('movestart', lang.hitch(this, function (ev) {
-                    widget._position = getPosition();
+                    })
                 }));
-
-                this.map.olMap.on('moveend', lang.hitch(this, function (ev) {
-                    postMessage();
-                }));
-                // send init event
-                postMessage();
+                this.map.startChangePositionListening();
             }
         },
 
