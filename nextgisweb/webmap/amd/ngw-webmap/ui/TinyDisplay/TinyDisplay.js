@@ -552,20 +552,22 @@ define([
          *        if (data.detail === 'zoom') {
          *        } else if (data.detail === 'move') {
          *        }
+         *        // OR
+         *        if (data.detail === 'position') {}
          *    }
          * }, false);
          */
         _handlePostMessage: function () {
             var widget = this;
             if (this._urlParams.events === 'true') {
-                array.forEach(['move', 'zoom'], lang.hitch(this, function (ev) {
-                    widget.map.on(ev, function (data) {
+                array.forEach(['move', 'zoom', 'position'], lang.hitch(this, function (ev) {
+                    widget.map.watch(ev, function (name, oldPosition, newPosition) {
                         var parent = window.parent;
                         if (parent && parent.postMessage) {
                             parent.postMessage({
                                 event: 'ngMapExtentChanged',
-                                detail: ev,
-                                data: data
+                                detail: name,
+                                data: newPosition
                             }, '*');
                         }
                     })
