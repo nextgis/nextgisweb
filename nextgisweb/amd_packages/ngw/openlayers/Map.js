@@ -1,14 +1,10 @@
 /*global define*/
 define([
     "dojo/_base/declare",
-    "dojo/_base/lang",
-    "dojo/_base/array",
     "dojo/Stateful",
     "openlayers/ol"
 ], function (
     declare,
-    lang,
-    array,
     Stateful,
     ol
 ) {
@@ -16,9 +12,6 @@ define([
         DPI: 1000 / 39.37 / 0.28,
 
         IPM: 39.37,
-
-        // zoom lat and lon, used to compare between movestart and moveend positions
-        _position: {},
 
         constructor: function (options) {
             this.olMap = new ol.Map(options);
@@ -34,6 +27,10 @@ define([
 
             olView.on("change:center", function (evt) {
                 widget.set("center", olView.getCenter());
+            });
+
+            olMap.on("moveend", function (evt) {
+                widget.set("position", widget.getPosition(), this);
             });
         },
 
@@ -55,59 +52,16 @@ define([
             return parseFloat(scale) / (mpu * this.IPM * this.DPI);
         },
 
-        startChangePositionListening: function () {
-            var widget = this;
-            // save position before it change
-            this.olMap.on(
-                'movestart', 
-                lang.hitch(this, function () {
-                    widget._position = widget._getPosition();
-                })
-            );
-
-            this.olMap.on(
-                'moveend', 
-                lang.hitch(this, function () {
-                    widget._sendPositionChangeEvents();
-                })
-            );
-            // emit initial event
-            widget._sendPositionChangeEvents();
-        },
-
-        _sendPositionChangeEvents: function () {
-            var widget = this;
-            var memPosition = widget._position;
-            var position = widget._getPosition();
-            var events = [
-                {params: ['lat', 'lon'], name: 'move'},
-                {params: ['zoom'], name: 'zoom'},
-            ];
-            array.forEach(events, function (event) {
-                var isTimeToEmit = array.some(event.params, function (p) {
-                    var changed = memPosition[p] !== position[p];
-                    if (changed) {
-                        widget._position[p] = position[p];
-                    }
-                    return changed;
-                })
-                if (isTimeToEmit) {
-                    widget.set(event.name, position);
-                }
-            });
-            widget.set('position', position);
-        },
-
-        _getPosition: function () {
+        getPosition: function (crs) {
             var view = this.olMap.getView();
-            var center = ol.proj.toLonLat(
-                view.getCenter(),
-                view.getProjection().getCode()
-            );
+            var center = view.getCenter();
+            var mapCrs = view.getProjection().getCode();
+            if (crs && (crs !== mapCrs)) {
+                center = ol.proj.transform(center, mapCrs, crs);
+            }
             return {
                 zoom: view.getZoom(),
-                lat: center[1],
-                lon: center[0]
+                center: center
             };
         },
     });

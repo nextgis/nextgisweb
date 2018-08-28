@@ -559,20 +559,42 @@ define([
          */
         _handlePostMessage: function () {
             var widget = this;
-            if (this._urlParams.events === 'true') {
-                array.forEach(['move', 'zoom', 'position'], lang.hitch(this, function (ev) {
-                    widget.map.watch(ev, function (name, oldPosition, newPosition) {
-                        var parent = window.parent;
-                        if (parent && parent.postMessage) {
-                            parent.postMessage({
-                                event: 'ngMapExtentChanged',
-                                detail: name,
-                                data: newPosition
-                            }, '*');
+            var parent = window.parent;
+            if (this._urlParams.events === 'true' && parent && parent.postMessage) {
+                var commonOptions = {
+                    event: 'ngMapExtentChanged'
+                };
+                var parsePosition = function(pos) {
+                    return {
+                        zoom: pos.zoom,
+                        lat: pos.center[1],
+                        lon: pos.center[0]
+                    }
+                };
+                widget.map.watch('position', function (name, oldPosition, newPosition) {
+                    oldPosition = oldPosition ? parsePosition(oldPosition) : {};
+                    newPosition = parsePosition(newPosition);
+                    // set array of position part to compare between old and new state
+                    var events = [
+                        { params: ['lat', 'lon'], name: 'move' },
+                        { params: ['zoom'], name: 'zoom' },
+                    ];
+                    var transformPosition = widget.map.getPosition(widget.lonlatProjection);
+                    // prepare to send transform position
+                    commonOptions.data = parsePosition(transformPosition);
+                    array.forEach(events, function (event) {
+                        var isChange = array.some(event.params, function (p) {
+                            return oldPosition[p] !== newPosition[p];
+                        })
+                        if (isChange) {
+                            commonOptions.detail = event.name;
+                            parent.postMessage(commonOptions, '*');
                         }
-                    })
-                }));
-                this.map.startChangePositionListening();
+                    });
+                    // on any position change
+                    commonOptions.detail = name
+                    parent.postMessage(commonOptions, '*');
+                })
             }
         },
 
