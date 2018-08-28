@@ -8,7 +8,7 @@ define([
     Stateful,
     ol
 ) {
-    return declare(Stateful, {
+    return declare([Stateful], {
         DPI: 1000 / 39.37 / 0.28,
 
         IPM: 39.37,
@@ -28,6 +28,10 @@ define([
             olView.on("change:center", function (evt) {
                 widget.set("center", olView.getCenter());
             });
+
+            olMap.on("moveend", function (evt) {
+                widget.set("position", widget.getPosition(), this);
+            });
         },
 
         addLayer: function (layer) {
@@ -46,6 +50,19 @@ define([
 
         getResolutionForScale: function(scale, mpu) {
             return parseFloat(scale) / (mpu * this.IPM * this.DPI);
-        }
+        },
+
+        getPosition: function (crs) {
+            var view = this.olMap.getView();
+            var center = view.getCenter();
+            var mapCrs = view.getProjection().getCode();
+            if (crs && (crs !== mapCrs)) {
+                center = ol.proj.transform(center, mapCrs, crs);
+            }
+            return {
+                zoom: view.getZoom(),
+                center: center
+            };
+        },
     });
 });

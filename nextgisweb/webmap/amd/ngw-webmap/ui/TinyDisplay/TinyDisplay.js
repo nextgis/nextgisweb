@@ -503,40 +503,6 @@ define([
                 }));
             }
 
-            if (this._urlParams.events === 'true') {
-                this.map.olMap.on('moveend', lang.hitch(this, function (ev) {
-                    var view = this.map.olMap.getView(),
-                        center = ol.proj.toLonLat(view.getCenter(), view.getProjection().getCode());
-
-                    parent.postMessage({
-                        event: 'ngMapExtentChanged',
-                        detail: 'move',
-                        data: {
-                            zoom: view.getZoom(),
-                            lat: center[1],
-                            lon: center[0]
-                        }
-                    }, '*');
-                }));
-
-
-                this.map.olMap.getView().on('change', lang.hitch(this, function (e) {
-                    var view = this.map.olMap.getView(),
-                        center = ol.proj.toLonLat(view.getCenter(), view.getProjection().getCode());
-
-                    parent.postMessage({
-                        event: 'ngMapExtentChanged',
-                        detail: 'zoom',
-                        data: {
-                            zoom: view.getZoom(),
-                            lat: center[1],
-                            lon: center[0]
-                        }
-                    }, '*');
-                }));
-            }
-
-
             // При изменении размеров контейнера пересчитываем размер карты
             aspect.after(this.mapPane, "resize", function() {
                 widget.map.olMap.updateSize();
@@ -572,7 +538,64 @@ define([
             this._zoomToInitialExtent();
             this._setBasemap();
 
+            this._handlePostMessage();
+
             this._mapDeferred.resolve();
+        },
+
+        /**
+         * Generate window `message` events to listen from iframe
+         * @example
+         * window.addEventListener('message', function(evt) {
+         *    var data = evt.data;
+         *    if (data.event === 'ngMapExtentChanged') {
+         *        if (data.detail === 'zoom') {
+         *        } else if (data.detail === 'move') {
+         *        }
+         *        // OR
+         *        if (data.detail === 'position') {}
+         *    }
+         * }, false);
+         */
+        _handlePostMessage: function () {
+            var widget = this;
+            var parent = window.parent;
+            if (this._urlParams.events === 'true' && parent && parent.postMessage) {
+                var commonOptions = {
+                    event: 'ngMapExtentChanged'
+                };
+                var parsePosition = function(pos) {
+                    return {
+                        zoom: pos.zoom,
+                        lat: pos.center[1],
+                        lon: pos.center[0]
+                    }
+                };
+                widget.map.watch('position', function (name, oldPosition, newPosition) {
+                    oldPosition = oldPosition ? parsePosition(oldPosition) : {};
+                    newPosition = parsePosition(newPosition);
+                    // set array of position part to compare between old and new state
+                    var events = [
+                        { params: ['lat', 'lon'], name: 'move' },
+                        { params: ['zoom'], name: 'zoom' },
+                    ];
+                    var transformPosition = widget.map.getPosition(widget.lonlatProjection);
+                    // prepare to send transform position
+                    commonOptions.data = parsePosition(transformPosition);
+                    array.forEach(events, function (event) {
+                        var isChange = array.some(event.params, function (p) {
+                            return oldPosition[p] !== newPosition[p];
+                        })
+                        if (isChange) {
+                            commonOptions.detail = event.name;
+                            parent.postMessage(commonOptions, '*');
+                        }
+                    });
+                    // on any position change
+                    commonOptions.detail = name
+                    parent.postMessage(commonOptions, '*');
+                })
+            }
         },
 
         _zoomToInitialExtent: function () {
