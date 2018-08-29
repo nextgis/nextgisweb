@@ -181,7 +181,9 @@ define([
 
         hide: function () {
             this.inherited(arguments);
-
+            array.forEach(this.printMap.olMap.getLayers().getArray(), function (layer) {
+                this.printMap.olMap.removeLayer(layer);
+            }, this);
             this.printMap.olMap.setTarget(null);
             this.printMap.olMap = null;
             domClass.add(this.printElement, 'inactive');
@@ -236,7 +238,9 @@ define([
             }));
 
             array.forEach(this.map.getLayers().getArray(), function (layer) {
-                this.printMap.olMap.addLayer(layer);
+                if (layer.getVisible()) {
+                    this.printMap.olMap.addLayer(layer);
+                }
             }, this);
 
             this._setPrintMapExtent();
