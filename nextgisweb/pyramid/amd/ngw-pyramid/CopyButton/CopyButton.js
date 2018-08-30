@@ -56,6 +56,7 @@ define([
             var widget = this;
 
             this.targetInput.value = this.target["" + this.targetAttribute];
+            this.targetInput.style.display = 'block';
             this.targetInput.select();
 
             try {
@@ -63,7 +64,10 @@ define([
                 widget.updateTooltip(widget.hintText.variants.success);
             } catch (err) {
                 widget.updateTooltip(widget.hintText.variants.error);
+            } finally {
+                this.targetInput.style.display = 'none';
             }
+            
         },
         updateTooltip: function(message){
             var widget = this;
