@@ -478,7 +478,7 @@ version="%s"
                     attrib_name = self.getFormatedAttributName(attrib_name)
 
             element = etree.Element(
-                'element', attrib={'name': str(attrib_name),
+                'element', attrib={'name': attrib_name,
                                    'minOccurs': '0',
                                    'type': type
                                    })
