@@ -27,6 +27,27 @@
         <ows:Fees>NONE</ows:Fees>
         <ows:AccessConstraints>NONE</ows:AccessConstraints>
     </ows:ServiceIdentification>
+    <ows:ServiceProvider>
+        <ows:ProviderName>The ancient geographes INC</ows:ProviderName>
+        <ows:ServiceContact>
+            <ows:IndividualName>Claudius Ptolomaeus</ows:IndividualName>
+            <ows:PositionName>Chief geographer</ows:PositionName>
+            <ows:ContactInfo>
+                <ows:Phone>
+                    <ows:Voice/>
+                    <ows:Facsimile/>
+                </ows:Phone>
+                <ows:Address>
+                    <ows:DeliveryPoint/>
+                    <ows:City>Alexandria</ows:City>
+                    <ows:AdministrativeArea/>
+                    <ows:PostalCode/>
+                    <ows:Country>Egypt</ows:Country>
+                    <ows:ElectronicMailAddress>claudius.ptolomaeus@gmail.com</ows:ElectronicMailAddress>
+                </ows:Address>
+            </ows:ContactInfo>
+        </ows:ServiceContact>
+    </ows:ServiceProvider>
     <ows:OperationsMetadata>
         <ows:Operation name="GetCapabilities">
             <ows:DCP>
