@@ -399,9 +399,8 @@ class ResourceSerializer(Serializer):
             with DBSession.no_autoflush:
                 count = query.scalar()
 
-            # TODO: Uncomment after September 3, 2018
-            # if count >= quota_limit:
-            #     raise ValidationError(_("Maximum number of resources exceeded. The limit is %s.") % (quota_limit,))
+            if count >= quota_limit:
+                raise ValidationError(_("Maximum number of resources exceeded. The limit is %s.") % (quota_limit,))
 
 
 class ResourceACLRule(Base):
