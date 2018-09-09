@@ -43,6 +43,11 @@ def handler(obj, request):
         request_method = 'GET'
         post_data = None
 
+    # WFS 1.0.0 bbox: 'BBOX=minX,minY,maxX,maxY'
+    # WFS 2.0.0 bbox: 'BBOX=minX,minY,maxX,maxY,EPSG:3857'
+    bbox = params.get('BBOX')
+    bbox = ','.join(bbox.split(',')[:4]) if bbox else None
+
     params = {
         'service': params.get('SERVICE'),
         'request': req,
@@ -56,7 +61,7 @@ def handler(obj, request):
         'startfeature': params.get('STARTFEATURE'),
         'filter': params.get('FILTER'),
         'format': params.get('OUTPUTFORMAT'),
-        'bbox': params.get('BBOX')
+        'bbox': bbox
     }
     # None values can cause parsing errors in featureserver. So delete 'Nones':
     params = {key: params[key] for key in params if params[key] is not None}
