@@ -2,6 +2,14 @@
 
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
+#### `-- e1ad5e94cef9ab9b605948f53331927b52c8f3c5` (2018-09-11)
+
+```sql
+ALTER TABLE public.resource ADD COLUMN creation_date timestamp without time zone;;
+UPDATE public.resource SET creation_date = '1970-01-01';
+ALTER TABLE public.resource ALTER COLUMN creation_date SET NOT NULL;
+```
+
 #### `-- 229fd7b8d0866f712ebd0e171764700352c25303` (2018-02-02)
 
 ```sql
