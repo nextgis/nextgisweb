@@ -3,8 +3,8 @@ import json
 
 from pyramid.response import Response
 
-from view import ComplexEncoder
 from .interface import IFeatureLayer
+from .. import geojson
 from ..geometry import geom_from_wkt
 from ..models import DBSession
 from ..resource import (
@@ -109,5 +109,5 @@ def identify(request):
     result['featureCount'] = feature_count
 
     return Response(
-        json.dumps(result, cls=ComplexEncoder),
+        geojson.dumps(result),
         content_type='application/json')

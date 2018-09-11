@@ -5,9 +5,9 @@ import urllib
 from types import MethodType
 from collections import OrderedDict
 
-import geojson
 from pyramid.response import Response
 
+from .. import geojson
 from ..resource import (
     Resource,
     ResourceScope,
@@ -22,14 +22,6 @@ from .. import dynmenu as dm
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
 from .util import _
-
-
-class ComplexEncoder(geojson.GeoJSONEncoder):
-    def default(self, obj):
-        try:
-            return geojson.GeoJSONEncoder.default(self, obj)
-        except TypeError:
-            return str(obj)
 
 
 class FeatureLayerFieldsWidget(Widget):
@@ -154,7 +146,7 @@ def store_collection(layer, request):
         last = min(total - 1, last)
         headers['Content-Range'] = 'items %d-%s/%d' % (first, last, total)
 
-    return Response(json.dumps(result, cls=ComplexEncoder), headers=headers)
+    return Response(json.dumps(result, cls=geojson.Encoder), headers=headers)
 
 
 def store_item(layer, request):
@@ -187,7 +179,7 @@ def store_item(layer, request):
             result['ext'][extcls.identity] = extension.feature_data(feature)
 
     return Response(
-        json.dumps(result, cls=ComplexEncoder),
+        json.dumps(result, cls=geojson.Encoder),
         content_type='application/json')
 
 

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import sys
-import json
 import traceback
 from collections import OrderedDict
 
 from pyramid.response import Response
 
 from .. import db
+from .. import geojson as json
 from ..env import env
 from ..models import DBSession
 from ..auth import User
