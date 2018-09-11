@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from collections import namedtuple, OrderedDict
+from datetime import datetime
 
 from bunch import Bunch
 
@@ -111,6 +112,8 @@ class Resource(Base):
 
     keyname = db.Column(db.Unicode, unique=True)
     display_name = db.Column(db.Unicode, nullable=False)
+    creation_date = db.Column(db.TIMESTAMP, nullable=False,
+                              default=datetime.utcnow)
 
     owner_user_id = db.Column(db.ForeignKey(User.id), nullable=False)
 
@@ -347,6 +350,7 @@ class ResourceSerializer(Serializer):
 
     id = _ro(SP)
     cls = _ro(SP)
+    creation_date = _ro(SP)
 
     parent = _rw(_parent_attr)
     owner_user = _ro(SR)
