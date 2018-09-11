@@ -19,7 +19,7 @@ define([
             if (value === null) return "";
 
             return this.store.get(value.id).then(function (data) {
-                return data.display_name;
+                return data.resource.display_name;
             });
         },
 

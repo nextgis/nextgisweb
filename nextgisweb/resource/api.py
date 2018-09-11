@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import sys
+import json
 import traceback
 from collections import OrderedDict
 
 from pyramid.response import Response
 
 from .. import db
-from .. import geojson as json
+from .. import geojson
 from ..env import env
 from ..models import DBSession
 from ..auth import User
@@ -27,7 +28,6 @@ PERM_MCHILDREN = ResourceScope.manage_children
 PERM_CPERM = ResourceScope.change_permissions
 
 
-@viewargs(renderer='json')
 def child_get(request):
     # TODO: Security
 
@@ -47,11 +47,14 @@ def child_get(request):
         serializer.serialize()
 
         if child_id is not None:
-            return serializer.data
+            result = serializer.data
+            break
         else:
             result.append(serializer.data)
 
-    return result
+    return Response(
+        json.dumps(result, cls=geojson.Encoder), status_code=200,
+        content_type=b'application/json')
 
 
 def child_put(request):
@@ -221,7 +224,7 @@ def item_get(context, request):
     serializer.serialize()
 
     return Response(
-        json.dumps(serializer.data), status_code=200,
+        geojson.dumps(serializer.data), status_code=200,
         content_type=b'application/json')
 
 
@@ -266,7 +269,8 @@ def collection_get(request):
     parent = int(parent) if parent else None
 
     query = Resource.query().with_polymorphic('*') \
-        .filter_by(parent_id=parent)
+        .filter_by(parent_id=parent) \
+        .order_by(Resource.display_name)
 
     result = list()
     for resource in query:
@@ -276,7 +280,7 @@ def collection_get(request):
             result.append(serializer.data)
 
     return Response(
-        json.dumps(result), status_code=200,
+        json.dumps(result, cls=geojson.Encoder), status_code=200,
         content_type=b'application/json')
 
 

@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-import geojson
+import datetime
+import decimal
 import functools
 
-from datetime import datetime, date, time
-from decimal import Decimal
-from geojson import GeoJSONEncoder
+from geojson import dumps as _dumps, loads as _loads
+from geojson.codec import GeoJSONEncoder
 
 
 class Encoder(GeoJSONEncoder):
-    # SQLAlchemy uses decimal.Decimal for numeric columns
-    # and datetime.date for dates. geojson does
-    # not know how to deal with objects of those types.
-    # This class provides a simple encoder that can deal
-    # with these kinds of objects.
+    # SQLAlchemy's Reflecting Tables mechanism uses decimal.Decimal
+    # for numeric columns and datetime.date for dates. Python json
+    # doesn't deal with these types. This class provides a simple
+    # encoder to deal with objects of these types.
 
     def default(self, obj):
-        if isinstance(obj, (Decimal, date, datetime, time)):
-            return str(obj)
+        if isinstance(obj, (datetime.date, datetime.datetime, datetime.time)):
+            return obj.isoformat()
+        if isinstance(obj, decimal.Decimal):
+            # The decimal is converted to a lossy float
+            return float(obj)
         return GeoJSONEncoder.default(self, obj)
 
 
-dumps = functools.partial(geojson.dumps, cls=Encoder)
-loads = functools.partial(geojson.loads, cls=Encoder)
+dumps = functools.partial(_dumps, cls=Encoder)
+loads = functools.partial(_loads, cls=Encoder)

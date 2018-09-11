@@ -97,40 +97,6 @@ def tree(request):
         subtitle=_("Resource tree"))
 
 
-@viewargs(renderer='json', json=True)
-def store(request):
-    oid = request.matchdict['id']
-    if oid == '':
-        oid = None
-
-    query = Resource.query().with_polymorphic('*')
-    if oid is not None:
-        query = query.filter_by(id=oid)
-
-    for k in ('id', 'parent_id'):
-        if request.GET.get(k):
-            query = query.filter(getattr(Resource, k) == request.GET.get(k))
-
-    result = []
-
-    for res in query:
-        if not res.has_permission(PERM_READ, request.user):
-            continue
-
-        serializer = ResourceSerializer(res, request.user)
-        serializer.serialize()
-        itm = serializer.data
-
-        if oid is not None:
-            return itm
-        else:
-            result.append(itm)
-
-        result.sort(key=lambda res: res['display_name'])
-
-    return result
-
-
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def create(request):
     return dict(obj=request.context, subtitle=_("Create resource"), maxheight=True,
@@ -238,8 +204,6 @@ def setup_pyramid(comp, config):
         .add_view(objjson)
 
     _resource_route('tree', '{id:\d+}/tree', client=('id', )).add_view(tree)
-
-    _route('store', 'store/{id:\d*}', client=('id', )).add_view(store)
 
     _route('widget', 'widget', client=()).add_view(widget)
 

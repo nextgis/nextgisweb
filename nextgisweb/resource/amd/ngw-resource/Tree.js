@@ -33,7 +33,7 @@ define([
         constructor: function () {
             this._root = new Deferred();
             this.store.query(this.query).then(
-                lang.hitch(this, function (items) { this._root.resolve(items[0]); })
+                lang.hitch(this, function (items) { this._root.resolve(items[0].resource); })
             );
         },
 
@@ -62,9 +62,7 @@ define([
             // общую модель. Вследствие чего уменьшается количество запросов
             // к серверу, но при этом экземпляры не могут иметь разные
             // корневые ноды. Возможно, это когда-то может понадобиться.
-            this.model = ResourceObjectStoreModel.getInstance({
-                query: {id: this.resourceId}
-            });
+            this.model = ResourceObjectStoreModel.getInstance();
             this.store = this.model.store;
         },
 

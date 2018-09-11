@@ -5,7 +5,7 @@
 #### `-- e1ad5e94cef9ab9b605948f53331927b52c8f3c5` (2018-09-11)
 
 ```sql
-ALTER TABLE public.resource ADD COLUMN creation_date timestamp without time zone;;
+ALTER TABLE public.resource ADD COLUMN creation_date timestamp without time zone;
 UPDATE public.resource SET creation_date = '1970-01-01';
 ALTER TABLE public.resource ALTER COLUMN creation_date SET NOT NULL;
 ```
