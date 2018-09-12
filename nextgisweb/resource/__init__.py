@@ -131,8 +131,12 @@ class ResourceComponent(Component):
             by_cls[cls] = count
             total += count
 
+        query = DBSession.query(db.func.max(Resource.creation_date))
+        cdate = query.scalar()
+
         return dict(
-            resource_count=dict(total=total, cls=by_cls))
+            resource_count=dict(total=total, cls=by_cls),
+            last_creation_date=cdate)
 
     settings_info = (
         dict(key="disabled_cls", desc="Resource classes disabled for creation"),

@@ -17,6 +17,7 @@ import pyramid_mako
 from ..package import pkginfo
 from ..component import Component
 
+from .renderer import json_renderer
 from .util import (
     viewargs,
     ClientRoutePredicate,
@@ -225,6 +226,8 @@ class PyramidComponent(Component):
             return amds
 
         config.add_request_method(amd_base, 'amd_base', property=True, reify=True)
+
+        config.add_renderer('json', json_renderer)
 
         return config
 
