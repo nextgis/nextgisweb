@@ -3,13 +3,13 @@ from __future__ import unicode_literals, print_function, absolute_import
 import os
 from os.path import join as pthjoin
 from datetime import datetime
-import json
 from tempfile import NamedTemporaryFile
 
 
 import transaction
 from minio import Minio
 
+from .. import geojson
 from ..command import Command
 from ..models import DBSession
 
@@ -167,4 +167,4 @@ class StatisticsCommand(Command):
             if hasattr(comp, 'query_stat'):
                 result[comp.identity] = comp.query_stat()
 
-        print(json.dumps(result, ensure_ascii=False, indent=2).encode('utf-8'))
+        print(geojson.dumps(result, ensure_ascii=False, indent=2).encode('utf-8'))
