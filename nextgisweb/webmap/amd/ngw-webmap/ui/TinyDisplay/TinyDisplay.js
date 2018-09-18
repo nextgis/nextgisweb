@@ -588,12 +588,13 @@ define([
                         })
                         if (isChange) {
                             commonOptions.detail = event.name;
-                            parent.postMessage(commonOptions, '*');
+                            // message should be a string to work correctly with all browsers and systems
+                            parent.postMessage(JSON.stringify(commonOptions), '*');
                         }
                     });
                     // on any position change
                     commonOptions.detail = name
-                    parent.postMessage(commonOptions, '*');
+                    parent.postMessage(JSON.stringify(commonOptions), '*');
                 })
             }
         },
