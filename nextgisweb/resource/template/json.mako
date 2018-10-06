@@ -1,6 +1,6 @@
 <%inherit file='nextgisweb:templates/obj.mako' />
 
-<% from json import dumps %>
+<% from nextgisweb.geojson import dumps %>
 
 <script type="text/javascript">
     require(["ngw-pyramid/form/CodeMirror", "dojo/domReady!"], function (CodeMirror) {
