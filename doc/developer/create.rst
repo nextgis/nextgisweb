@@ -383,6 +383,12 @@ To create new feature in vector layer execute following request:
 For timestamp field input value must be divided on parts: *day*, *month*,
 *day*, *hour*, *minute*, *second*. 
 In request payload add only set fields. Other fields will set to default values.
+    
+**Example response body**:
+    
+.. sourcecode:: json 
+
+   {"id": 25}
 
 Raster layer
 ------------
