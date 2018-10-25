@@ -838,8 +838,16 @@ To create new WMS service execute following request.
     }
    }
    
+**Example response body**:
+    
+.. sourcecode:: json 
+   
+   {"id": 131, "parent": {"id": 0}}
+   
 Same steps with curl:
 
 .. sourcecode:: bash
 
    curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource":{"cls":"wmsserver_service","parent":{"id":0},"display_name":"test1wms","keyname":null,"description":null},"resmeta":{"items":{}},"wmsserver_service":{"layers":[{"keyname":"test1","display_name":"test wms layer","resource_id":127,"min_scale_denom":null,"max_scale_denom":null}]}}' http://demo.nextgis.com/api/resource/
+   
+   {"id": 131, "parent": {"id": 0}}
