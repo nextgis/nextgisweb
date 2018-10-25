@@ -314,7 +314,7 @@ Same steps with curl:
 
 .. sourcecode:: bash
    
-   $ curl -F file=@/tmp/bld.zip http://<ngw url>/api/component/file_upload/upload
+   $ curl -F file=@/tmp/bld.zip http://demo.nextgis.com/api/component/file_upload/upload
 
    {"upload_meta": [{"id": "00cc4aa9-cca7-4160-b069-58070dff9399", "name": "bld.zip", 
    "mime_type": "application/octet-stream", "size": 62149}]}
@@ -323,7 +323,7 @@ Same steps with curl:
    {"cls": "vector_layer","description": "test curl create", "display_name": "buildings",
    "keyname": null,"parent": {"id": 0}},"vector_layer": {"source": {"encoding": "utf-8",
    "id": "00cc4aa9-cca7-4160-b069-58070dff9399","mime_type": "application/zip","name": "bld.zip",
-   "size": 62149},"srs": {"id": 3857}}}' http://<ngw url>/api/resource/
+   "size": 62149},"srs": {"id": 3857}}}' http://demo.nextgis.com/api/resource/
 
    {"id": 108, "parent": {"id": 0}}
    
@@ -460,14 +460,14 @@ Same steps with curl:
 
 .. sourcecode:: bash
    
-   $ curl --user "user:password" --upload-file 'tmp/myfile.tif' http://<ngw url>/api/component/file_upload/upload
+   $ curl --user "user:password" --upload-file 'tmp/myfile.tif' http://demo.nextgis.com/api/component/file_upload/upload
 
    {"id": "a2f381f9-8467-477c-87fa-3f71ecb749a5", "mime_type": "image/tiff", "size": 17549598}
 
    $ curl --user "user:password" -H "Accept: */*" -X POST -d '{ "resource": {
    "cls": "raster_layer", "display_name": "20150820_211250_1_0b0e", "parent": { "id": 101 } }, 
    "raster_layer": { "source": {"id": "a2f381f9-8467-477c-87fa-3f71ecb749a5", "mime_type": "image/tiff",
-   "size": 17549598}, "srs": {"id": 3857} } }' http://<ngw url>/api/resource/
+   "size": 17549598}, "srs": {"id": 3857} } }' http://demo.nextgis.com/api/resource/
 
    {"id": 102, "parent": {"id": 101}}
 
@@ -726,7 +726,7 @@ Same steps with curl:
    $ curl --user "user:password" -H 'Accept: */*' -X POST -d '{"resource":{"cls":"lookup_table",
    "parent":{"id":381},"display_name":"test_3","keyname":null,"description":null},"resmeta":
    {"items":{}},"lookup_table":{"items":{"cat":"\u041c\u0430\u0448\u0438\u043d\u0430"}}}' 
-   http://<ngw url>/api/resource/
+   http://demo.nextgis.com/api/resource/
 
    {"id": 385, "parent": {"id": 381}}
    
@@ -737,8 +737,6 @@ Web map
 To create new web map execute following request.
 
 .. http:post:: /api/resource
-
-
    
 **Example request**:
 
@@ -777,4 +775,71 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource": {"display_name": "cwm Вебкарта", "parent": {"id": 2317}, "cls": "webmap"}, "webmap": {"root_item": {"item_type": "root", "children": [{"layer_enabled": false, "layer_adapter": "tile", "display_name": "LT05_L1TP_124025_20010603_20161211_01", "layer_style_id": 2284, "item_type": "layer"}]}}}' http://trolleway.nextgis.com/api/resource/
+   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource": {"display_name": "cwm Вебкарта", "parent": {"id": 2317}, "cls": "webmap"}, "webmap": {"root_item": {"item_type": "root", "children": [{"layer_enabled": false, "layer_adapter": "tile", "display_name": "LT05_L1TP_124025_20010603_20161211_01", "layer_style_id": 2284, "item_type": "layer"}]}}}' http://demo.nextgis.com/api/resource/
+   
+WMS Service
+-----------
+
+To create new WMS service execute following request.
+
+.. http:post:: /api/resource
+
+Create WMS service request.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
+   :<json string cls: type (must be ``wmsserver_service``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
+   :<json jsonobj wmsserver_service: JSON object with layest array (required).
+   :<jsonarr layers: array or WMS service layers. `keyname`, `display_name` and `resource_id` are mandatory.
+   :<json jsonobj keyname: Key name for WMS service item. Name may be only ASCII symbols without spaces.
+   :<json jsonobj display_name: Service item name.
+   :<json jsonobj resource_id: Resource identifier wich will be WMS layer datasource. Supported types are: `vector layer style`, `raster style`, `WMS layer`. 
+   :<json jsonobj min_scale_denom: Minimum scale to show WMS layer. String in form of "1 : 100000".
+   :<json jsonobj max_scale_denom: Maximum scale to show WMS layer. String in form of "1 : 100000".
+   :statuscode 201: no error
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /api/resource HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+   {
+    "resource": {
+        "cls": "wmsserver_service",
+        "parent": {
+            "id": 0
+        },
+        "display_name": "Test WMS Service",
+        "keyname": null,
+        "description": null
+    },
+    "resmeta": {
+        "items": {}
+    },
+    "wmsserver_service": {
+        "layers": [
+            {
+                "keyname": "image1",
+                "display_name": "Image #1",
+                "resource_id": 127,
+                "min_scale_denom": null,
+                "max_scale_denom": null
+            }
+        ]
+    }
+   }
+   
+   Same steps with curl:
+
+.. sourcecode:: bash
+
+   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource":{"cls":"wmsserver_service","parent":{"id":0},"display_name":"test1wms","keyname":null,"description":null},"resmeta":{"items":{}},"wmsserver_service":{"layers":[{"keyname":"test1","display_name":"test wms layer","resource_id":127,"min_scale_denom":null,"max_scale_denom":null}]}}' http://demo.nextgis.com/api/resource/
