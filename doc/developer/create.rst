@@ -784,7 +784,7 @@ To create new WMS service execute following request.
 
 .. http:post:: /api/resource
 
-Create WMS service request.
+   Create WMS service request.
    
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
@@ -838,7 +838,7 @@ Create WMS service request.
     }
    }
    
-   Same steps with curl:
+Same steps with curl:
 
 .. sourcecode:: bash
 
