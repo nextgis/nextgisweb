@@ -796,12 +796,12 @@ To create new WMS service execute following request.
    :<json string description: decription text, HTML supported (optional)
    :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
    :<json jsonobj wmsserver_service: JSON object with layest array (required).
-   :<jsonarr layers: array or WMS service layers. `keyname`, `display_name` and `resource_id` are mandatory.
-   :<json jsonobj keyname: Key name for WMS service item. Name may be only ASCII symbols without spaces.
-   :<json jsonobj display_name: Service item name.
-   :<json jsonobj resource_id: Resource identifier wich will be WMS layer datasource. Supported types are: `vector layer style`, `raster style`, `WMS layer`. 
-   :<json jsonobj min_scale_denom: Minimum scale to show WMS layer. String in form of "1 : 100000".
-   :<json jsonobj max_scale_denom: Maximum scale to show WMS layer. String in form of "1 : 100000".
+   :<jsonarr jsonobj layers: array or WMS service layers. `keyname`, `display_name` and `resource_id` are mandatory.
+   :<jsonarr string keyname: Key name for WMS service item. Name may be only ASCII symbols without spaces.
+   :<jsonarr string display_name: Service item name.
+   :<jsonarr integer resource_id: Resource identifier wich will be WMS layer datasource. Supported types are: `vector layer style`, `raster style`, `WMS layer`. 
+   :<jsonarr string min_scale_denom: Minimum scale to show WMS layer. String in form of "1 : 100000".
+   :<jsonarr string max_scale_denom: Maximum scale to show WMS layer. String in form of "1 : 100000".
    :statuscode 201: no error
    
 **Example request**:
