@@ -160,7 +160,7 @@ To create PostGIS layer execute following request.
 
 
 Empty vector layer 
------------------------
+------------------
 
 To create empty vector layer execute following request:
 
@@ -243,11 +243,11 @@ Vector layer creation from geodata source (:term:`Shapefile`, :term:`GeoJSON`) c
 2. Upload vector geodata
 3. Create vector layer
 
-Vector geodata preparing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Preparing vector data
+^^^^^^^^^^^^^^^^^^^^^
 
-To prepare your geodata export it to ESRI Shapefile or GeoJSON format (if needed). The field name ``id`` is forbidden. 
-Also, geodata must have spatial reference and ``UTF-8`` or ``CP1251`` encoding. Geometry must be valid and exist in all features, field names and values cannot include non-printing characters. 
+To prepare your data export it to ESRI Shapefile or GeoJSON format. Make sure there are no ``id`` field names. 
+Layer must have spatial reference and ``UTF-8`` or ``CP1251`` encoding. Geometry must be valid and exist in all features, field names and values cannot include non-printable characters. 
 
 Uploading vector geodata
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -399,20 +399,20 @@ Raster layer creation consists of following steps:
 2. Upload raster
 3. Create raster layer
 
-Raster preparing
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Preparing raster data
+^^^^^^^^^^^^^^^^^^^^^
 
-You can upload raster file in GeoTIFF format with 3 (RGB) or 4 (RGBA) bands. GeoTIFF file must have spatial reference, which can project to web map spatial reference (usually EPSG:3857). Value of ``color interpretation`` muast be set for bands. Compression (LZW, DEFLATE) can be used for decrease traffic. Pixel values must be between 0 to 255 (1 byte).
+You can upload rasters in GeoTIFF format with 3 (RGB) or 4 (RGBA) bands. GeoTIFF file must have spatial reference, which can project to web map spatial reference (usually EPSG:3857). Value of bands ``color interpretation`` must be set. Compression (LZW, DEFLATE) can be used to decrease traffic. Pixel values must be between 0 to 255 (8 bit).
 
 Loading raster
 ^^^^^^^^^^^^^^^
 
-Prepared raster can be upload. See :ref:`ngw_file_upload`.
+Prepared raster can be uploaded. See :ref:`ngw_file_upload`.
 
 Create raster layer
 ^^^^^^^^^^^^^^^^^^^
 
-To create raster layer execute following request:
+To create raster layer execute the following request:
 
 .. http:post:: /api/resource
 
