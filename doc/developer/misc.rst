@@ -231,7 +231,7 @@ This feature requires the special section in NGW config file:
 Get layer extent
 ----------------
 
-To get layer extent execute following request. You can request layer extent for vaector and raster layers. 
+To get layer extent execute following request. You can request layer extent for vector and raster layers. 
 
 .. http:get:: /api/resource/(int:id)/extent
 
