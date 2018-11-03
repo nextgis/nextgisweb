@@ -227,6 +227,35 @@ This feature requires the special section in NGW config file:
 
    [auth]
    register = true
+   
+Get layer extent
+----------------
+
+To get layer extent execute following request. You can request layer extent for vaector and raster layers. 
+
+.. http:get:: /api/resource/(int:id)/extent
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resoure/10/extent HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+    
+.. sourcecode:: json
+
+    {
+      "extent": 
+      {
+        "minLat": 54.760400119987466, 
+        "maxLon": 35.08562149737197, 
+        "minLon": 35.06675807847286, 
+        "maxLat": 54.768358305249386
+      }
+    }   
 
 Identification by polygon
 -------------------------
