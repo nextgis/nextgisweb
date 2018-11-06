@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import re
-import urllib
 from types import MethodType
 from collections import OrderedDict
 
@@ -92,63 +90,6 @@ def field_collection(request):
     return [f.to_dict() for f in request.context.fields]
 
 
-def store_collection(layer, request):
-    request.resource_permission(PD_READ)
-
-    query = layer.feature_query()
-
-    http_range = request.headers.get('range')
-    if http_range and http_range.startswith('items='):
-        first, last = map(int, http_range[len('items='):].split('-', 1))
-        query.limit(last - first + 1, first)
-
-    field_prefix = json.loads(
-        urllib.unquote(request.headers.get('x-field-prefix', '""')))
-    pref = lambda (f): field_prefix + f
-
-    field_list = json.loads(
-        urllib.unquote(request.headers.get('x-field-list', "[]")))
-    if len(field_list) > 0:
-        query.fields(*field_list)
-
-    box = request.headers.get('x-feature-box')
-    if box:
-        query.box()
-
-    like = request.params.get('like', '')
-    if like != '':
-        query.like(like)
-
-    sort_re = re.compile(r'sort\(([+-])%s(\w+)\)' % (field_prefix, ))
-    sort = sort_re.search(urllib.unquote(request.query_string))
-    if sort:
-        sort_order = {'+': 'asc', '-': 'desc'}[sort.group(1)]
-        sort_colname = sort.group(2)
-        query.order_by((sort_order, sort_colname), )
-
-    features = query()
-
-    result = []
-    for fobj in features:
-        fdata = dict(
-            [(pref(k), v) for k, v in fobj.fields.iteritems()],
-            id=fobj.id, label=fobj.label)
-        if box:
-            fdata['box'] = fobj.box.bounds
-
-        result.append(fdata)
-
-    headers = dict()
-    headers["Content-Type"] = 'application/json'
-
-    if http_range:
-        total = features.total_count
-        last = min(total - 1, last)
-        headers['Content-Range'] = 'items %d-%s/%d' % (first, last, total)
-
-    return Response(json.dumps(result, cls=geojson.Encoder), headers=headers)
-
-
 def store_item(layer, request):
     request.resource_permission(PD_READ)
 
@@ -210,12 +151,6 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
         client=('id', )
     ).add_view(field_collection, context=IFeatureLayer, renderer='json')
-
-    config.add_route(
-        'feature_layer.store',
-        '/resource/{id:\d+}/store/',
-        factory=resource_factory, client=('id', )
-    ).add_view(store_collection, context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.store.item',
