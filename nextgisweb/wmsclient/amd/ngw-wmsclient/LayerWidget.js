@@ -79,7 +79,7 @@ define([
 
             if (connection !== null) {
                 this.wConnection.store.get(connection.id).then(function (data) {
-                    xhr.get(route.resource.item(data.id),{
+                    xhr.get(route.resource.item(data.resource.id),{
                         handleAs: "json"
                     }).then(function (data) {
                         render(data.wmsclient_connection.capcache);
@@ -87,7 +87,7 @@ define([
                 });
             }
         },
-        
+
         toggleLayer: function (id) {
             var arr = this.wWMSLayers.get("value").split(/,\s*/);
             if (arr.length === 1 && arr[0] === "") {
