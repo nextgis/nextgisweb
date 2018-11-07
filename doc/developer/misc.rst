@@ -22,10 +22,12 @@ GeoJSON
 .. versionadded:: 3.0
 .. http:get:: /api/resource/(int:id)/geojson
 
-    GeoJSON file request
+   GeoJSON file request
     
-    :param id: resource identificator  
-    
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate    
+   :param id: resource identificator  
+   :statuscode 200: no error
       
 **Example request**:
 
@@ -44,9 +46,11 @@ CSV
 .. http:get:: /api/resource/(int:id)/csv
 
    CSV file request
-    
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
    :param id: resource identificator  
-    
+   :statuscode 200: no error 
     
 **Example request**:
 
@@ -69,10 +73,13 @@ TMS
     
     Tile request
     
+    :reqheader Accept: must be ``*/*``
+    :reqheader Authorization: optional Basic auth string to authenticate
     :param id1, id2: style resources id's
     :param z: zoom level
     :param x: tile number on x axis (horisontal)
     :param y: tile number on y axis (vertical)
+    :statuscode 200: no error
     
 .. note:: Styles order should be from lower to upper.     
     
@@ -93,9 +100,11 @@ QML Style (QGIS Layer style)
 .. http:get:: /api/resource/(int:id)/qml
 
    QML file request
-    
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
    :param id: resource identificator  
-    
+   :statuscode 200: no error 
     
 **Example request**:
 
@@ -116,12 +125,14 @@ MVT data can be fetched only for NextGIS Web vector layer.
 .. http:get:: /api/resource/(int:id)/(int:z)/(int:x)/(int:y).mvt
 
    MVT request
-    
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
    :param id: resource identificator  
    :param z:  zoom level
    :param x:  x tile column
    :param y:  y tile row 
-    
+   :statuscode 200: no error 
     
 **Example request**:
 
@@ -130,6 +141,58 @@ MVT data can be fetched only for NextGIS Web vector layer.
    GET /api/resource/56/11/1234/543.mvt HTTP/1.1
    Host: ngw_url
    Accept: */*   
+   
+Get resource permissions
+------------------------
+
+To get resource permissions execute following request. Returned json may vary depends on resource type. 
+
+**The following request returns resource permissions**:
+
+.. http:get:: /api/resource/(int:id)/permission
+
+   Permissions request
+    
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate 
+   :param id: resource identificator
+   :statuscode 200: no error
+    
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resource/56/permission HTTP/1.1
+   Host: ngw_url
+   Accept: */*   
+
+**Example response**:
+    
+.. sourcecode:: json
+
+    {
+        "resource": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "delete": true,
+            "manage_children": true,
+            "change_permissions": true
+        },
+        "datastruct": {
+            "read": true,
+            "write": true
+        },
+        "data": {
+            "read": true,
+            "write": true
+        },
+        "metadata": {
+            "read": true,
+            "write": true
+        }
+    }
+   
 
 User managment
 --------------
@@ -171,10 +234,14 @@ To create new user execute following request:
 
    Request to create new user.
    
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
    :<json string display_name: user full name
    :<json string keyname: user login
    :<json string description: user description
    :<json string password: user password
+   :>json id: new user identifier 
+   :statuscode 201: no error
 
 **Example request**:
 
@@ -213,10 +280,13 @@ To self create user (anonymouse user) execute following request:
 
    Request to create new user
    
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
    :<json string display_name: user full name
    :<json string keyname: user login
    :<json string description: user description
-   :<json string password: user password        
+   :<json string password: user password     
+   :statuscode 201: no error
     
 Administrator can configure anonymous user registration to the specific group 
 (via setting checkbox on group in administrative user interface).
@@ -228,6 +298,29 @@ This feature requires the special section in NGW config file:
    [auth]
    register = true
    
+To get current user details execute following request:
+
+.. http:post:: /api/component/auth/current_user
+
+   Request to get current user details
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :>json string keyname: user login
+   :>json string display_name: user name
+   :>json int id: user identifier
+   :statuscode 200: no error
+   
+**Example response**:
+    
+.. sourcecode:: json
+
+    {
+        "keyname": "administrator",
+        "display_name": "Администратор",
+        "id": 4
+    }   
+   
 Get layer extent
 ----------------
 
@@ -235,6 +328,17 @@ To get layer extent execute following request. You can request layer extent for 
 Returned coordinates are in WGS84 (EPSG:4326) spatial reference.
 
 .. http:get:: /api/resource/(int:id)/extent
+
+   Get layer extent
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :>json jsonobj extent: extent json object
+   :>jsonobj double minLat: Minimum latitude  
+   :>jsonobj double minLon: Minimum longtitude
+   :>jsonobj double maxLat: Maximun latitude
+   :>jsonobj double maxLon: Maximum longtitude
+   :statuscode 200: no error
 
 **Example request**:
 
@@ -249,7 +353,7 @@ Returned coordinates are in WGS84 (EPSG:4326) spatial reference.
 .. sourcecode:: json
 
     {
-      "extent": 
+      "jsonobj": 
       {
         "minLat": 54.760400119987466, 
         "maxLon": 35.08562149737197, 
@@ -267,10 +371,12 @@ To get features intersected by a polygon execute following request.
 
    Identification request
    
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
    :<json int srs: Spatial reference id
    :<json string geom: Polygon in WKT
    :<jsonarr int layers: layes id array
-
+   :statuscode 200: no error 
 
 **Example request**:
 
