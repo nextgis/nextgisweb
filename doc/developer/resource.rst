@@ -28,6 +28,8 @@ There are following resource classes now:
 * raster_style
 * file_bucket   
 * lookup_table
+* wmsclient_layer
+* wmsclient_connection
  
 
 HTTP API
