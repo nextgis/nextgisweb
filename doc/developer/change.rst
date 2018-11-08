@@ -8,27 +8,26 @@ Change resource
 
 Execute following PUT request to change resource.
 
-.. http:put:: /resource/(int:parent_id)/child/(int:id)
+.. http:put:: /api/resource/(int:id)
 
    Change resource request
     
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate    
-   :param parent_id: parent resource id
-   :param id: changing resource id
+   :param id: resource identifier
    :<json jsonobj resource: resource JSON object
-   :<json string display_name: resource new name
-   :<json string keyname: resource new key
-   :<json int id: resource id (cannot be changed)
-   :<json string description: resource new description
-   :<jsonarr permissions: resource permissions array
+   :<jsonobj string display_name: resource new name
+   :<jsonobj string keyname: resource new key
+   :<jsonobj int id: resource new parent identifier (resource will move to new parent)
+   :<jsonobj string description: resource new description
+   :<jsonobj jsonarr permissions: resource permissions array
    :statuscode 200: no error
    
 **Example request**:
 
 .. sourcecode:: http
 
-   PUT /resource/7/child/8 HTTP/1.1
+   PUT /api/resource/8 HTTP/1.1
    Host: ngw_url
    Accept: */*
    
@@ -43,7 +42,8 @@ Execute following PUT request to change resource.
    }
 
 .. note::
-   Payload of change resource request is equal to create resource request payload. The request must be authorized.
+   Payload of this request may be equal to create new resource request payload, but some fields can be omitted. 
+   Request must be authorized.
    
 Change file bucket resource
 -----------------------------
@@ -56,16 +56,16 @@ To change file bucket execute following PUT request:
     
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate 
-   :param id: resource identificator
+   :param id: resource identifier
    :<json jsonobj resource: resource JSON object
-   :<json string cls: type (must be ``file_bucket``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<json jsonobj parent:  parent resource json object
-   :<json int id: parent resource identificator
-   :<json string display_name: name
-   :<json string keyname: key (optional)
-   :<json string description: decription text, HTML supported (optional)
+   :<jsonobj string cls: type (must be ``file_bucket``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<jsonobj jsonobj parent:  parent resource json object
+   :<jsonobj int id: parent resource identifier
+   :<jsonobj string display_name: name
+   :<jsonobj string keyname: key (optional)
+   :<jsonobj string description: decription text, HTML supported (optional)
    :<json jsonobj file_bucket: file bucket JSON object
-   :<jsonarr files: array of files should present in bucket: present (which need to delete don't include in array), also new files (upload response JSON object, files == upload_meta)
+   :<jsonobj jsonarr files: array of files should present in bucket: present (which need to delete don't include in array), also new files (upload response JSON object, files == upload_meta)
    :statuscode 200: no error
       
 **Example request**:
@@ -113,9 +113,9 @@ To change file bucket execute following PUT request:
       }
     }
     
-In this example, file *grunt area description.txt* will be added, files
+In this example, file *grunt area description.txt* will added, files
 *grunt_area_2_multipolygon.cpg*, *grunt_area_2_multipolygon.prj* - deleted, 
-and bucket name and description will be changed.
+and bucket name and description will changed.
 
 Change lookup table resource
 -----------------------------
@@ -128,15 +128,14 @@ To change flookup table execute following PUT request:
     
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate 
-   :param id: resource identificator
+   :param id: resource identifier
    :<json jsonobj resource: resource JSON object
-   :<json string cls: type (must be ``lookup_table``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<json int id: parent resource identificator
-   :<json string display_name: name
-   :<json string keyname: key (optional)
-   :<json string description: decription text, HTML supported (optional)
-   :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
-   :<json file_bucket: file bucket JSON object
+   :<jsonobj string cls: type (must be ``lookup_table``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<jsonobj int id: parent resource identifier
+   :<jsonobj string display_name: name
+   :<jsonobj string keyname: key (optional)
+   :<jsonobj string description: decription text, HTML supported (optional)
+   :<jsonobj jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
    :<json jsonobj lookup_table: lookup table values JSON object. Key - value JSON object struct.
    :statuscode 200: no error
       
@@ -174,13 +173,13 @@ To change feature in vector layer execute following request:
 
    Change feature request
    
-   :param layer_id: layer resource identificator
-   :param feature_id: feature identificator
+   :param layer_id: layer resource identifier
+   :param feature_id: feature identifier
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate 
    :<json string geom: geometry in WKT format (geometry type ans spatial reference must be corespondent to layer geometry type and spatial reference)
    :<jsonarr fields: attributes array in form of JSON field name - value object 
-   :<json int id: feture identificator
+   :<json int id: feture identifier
    :statuscode 200: no error
    
 **Example request**:
@@ -220,7 +219,7 @@ To change feature in vector layer execute following request:
      "id": 1
    }   
    
-In request payload add only change fields. Other fields will stay unchanged. Also geom field may be skipped.
+In request payload add only changed fields. Other fields will stay unchanged. Also geom field may be skipped.
 
 To change features in batch mode use patch request.
 
@@ -228,16 +227,17 @@ To change features in batch mode use patch request.
 
    Change features request
    
-   :param layer_id: layer resource identificator
+   :param layer_id: layer resource identifier
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate 
    :<jsonarr string geom: geometry in WKT format (geometry type ans spatial reference must be corespondent to layer geometry type and spatial reference)
    :<jsonarr jsonarr fields: attributes array in form of JSON field name - value object 
-   :<jsonarr int id: feture identificator
+   :<jsonarr int id: feture identifier
    :statuscode 200: no error
    
-Request accept array of JSON objects. If feature identificator is not present in vector layer - 
+Request accept array of JSON objects. If feature identifier is not present in vector layer - 
 feature will be created, else - changed.
+
 .. Метод принимает на вход список объектов, если у объекта передан id - то обновляется этот объект, а у которых не передан - те создаёт
    
 Delete feature
@@ -251,8 +251,8 @@ To delete feature from vector layer execute following request:
    
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
-   :param layer_id: resource identificator
-   :param feature_id: feature identificator
+   :param layer_id: resource identifier
+   :param feature_id: feature identifier
    :statuscode 200: no error
    
 **Example request**:
@@ -275,7 +275,7 @@ To delete all feature in vector layer execute following request:
    
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
-   :param layer_id: resource identificator
+   :param layer_id: resource identifier
    :statuscode 200: no error
    
 **Example request**:
