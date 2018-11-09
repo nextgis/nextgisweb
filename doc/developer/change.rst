@@ -66,7 +66,7 @@ This query create metadata fields, or updating it if they exists.
       }
    }
 }
-   
+    
    Same steps with curl:
 
 .. sourcecode:: bash
