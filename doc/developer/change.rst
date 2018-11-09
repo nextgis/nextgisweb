@@ -45,6 +45,35 @@ Execute following PUT request to change resource.
    Payload of this request may be equal to create new resource request payload, but some fields can be omitted. 
    Request must be authorized.
    
+   
+Change metadata
+-----------------------------   
+This query create metadata fields, or updating it if they exists.
+
+**Example request**:
+
+.. sourcecode:: http
+
+   PUT /api/resource/8 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+{  
+   "resmeta":{  
+      "items":{  
+         "UPDATED_AT":"2018-11-07 14:00",
+         "CHECKED_AT":"2018-11-07 12:00"
+      }
+   }
+}
+   
+   Same steps with curl:
+
+.. sourcecode:: bash
+   
+curl --user "user:password" -H 'Accept: */*' -X PUT -d '{"resmeta": {"items":{"UPDATED_AT":"2018-11-07 14:00", "CHECKED_AT":"2018-11-07 12:00"}}}' http://<ngw url>/api/resource/(int:id)
+
+
 Change file bucket resource
 -----------------------------
 
