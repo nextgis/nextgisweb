@@ -328,7 +328,7 @@ Same steps with curl:
    {"id": 108, "parent": {"id": 0}}
    
    
-Create new feature in vector layer
+Feature in vector or PostGIS layer
 -----------------------------------
 
 To create new feature in vector layer execute following request:
@@ -795,7 +795,7 @@ To create new WMS service execute following request.
    :<json string keyname: key (optional)
    :<json string description: decription text, HTML supported (optional)
    :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
-   :<json jsonobj wmsserver_service: JSON object with layest array (required).
+   :<json jsonobj wmsserver_service: JSON object with layers array (required).
    :<json jsonarr layers: array or WMS service layers. `keyname`, `display_name` and `resource_id` are mandatory.
    :<jsonarr string keyname: Key name for WMS service item. Name may be only ASCII symbols without spaces.
    :<jsonarr string display_name: Service item name.
@@ -849,5 +849,134 @@ Same steps with curl:
 .. sourcecode:: bash
 
    curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource":{"cls":"wmsserver_service","parent":{"id":0},"display_name":"test1wms","keyname":null,"description":null},"resmeta":{"items":{}},"wmsserver_service":{"layers":[{"keyname":"test1","display_name":"test wms layer","resource_id":127,"min_scale_denom":null,"max_scale_denom":null}]}}' http://demo.nextgis.com/api/resource/
+   
+   {"id": 131, "parent": {"id": 0}}
+
+WMS Connection
+---------------
+
+To create new WMS connection execute following request.
+
+.. http:post:: /api/resource
+
+   Create WMS connection request.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
+   :<json string cls: type (must be ``wmsclient_connection``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
+   :<json jsonobj wmsclient_connection: JSON object with connection properties (required).
+   :<json string url: WMS service url.
+   :<json string username: User name to connect to service.
+   :<json string password: Password to connect to service.
+   :<json string version: WMS version.
+   :<json string capcache: If equal `query` - query capabilities from service. 
+   :statuscode 201: no error
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /api/resource HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+    {
+        "resource": {
+            "cls": "wmsclient_connection",
+            "parent": {
+                "id": 0
+            },
+            "display_name": "test connection",
+            "keyname": null,
+            "description": null
+        },
+        "resmeta": {
+            "items": {}
+        },
+        "wmsclient_connection": {
+            "url": "http://pkk5.rosreestr.ru/arcgis/services/Cadastre/CadastreWMS/MapServer/WMSServer",
+            "username": null,
+            "password": null,
+            "version": "1.1.1",
+            "capcache": "query"
+        }
+    }
+   
+Same steps with curl:
+
+.. sourcecode:: bash
+   
+   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource":{"cls":"wmsclient_connection","parent":{"id":0},"display_name":"test connection","keyname":null,"description":null},"resmeta":{"items":{}},"wmsclient_connection":{"url":"http://pkk5.rosreestr.ru/arcgis/services/Cadastre/CadastreWMS/MapServer/WMSServer","username":null,"password":null,"version":"1.1.1","capcache":"query"}}' http://demo.nextgis.com/api/resource/
+   
+   {"id": 131, "parent": {"id": 0}}
+
+WMS Layer
+---------------
+
+To create WMS layer from WMS connection execute following request.
+
+.. http:post:: /api/resource
+
+   Create WMS layer request.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json jsonobj resource: resource JSON object
+   :<json string cls: type (must be ``wmsclient_layer``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json int id: parent resource identificator
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: decription text, HTML supported (optional)
+   :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
+   :<json jsonobj wmsclient_layer: JSON object with layer properties (required).
+   :<json jsonobj connection: WMS connection.
+   :<json string imgformat: Image format. Available values can fetched from WMS connection.
+   :<json string wmslayers: String with layer identifiers separated with comma. Available layers can fetched from WMS connection.
+   :statuscode 201: no error
+   
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /api/resource HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+        "resource": {
+            "cls": "wmsclient_layer",
+            "parent": {
+                "id": 0
+            },
+            "display_name": "layer1",
+            "keyname": null,
+            "description": null
+        },
+        "resmeta": {
+            "items": {}
+        },
+        "wmsclient_layer": {
+            "connection": {
+                "id": 18
+            },
+            "srs": {
+                "id": 3857
+            },
+            "imgformat": "image/png",
+            "wmslayers": "1,2"
+        }
+    }
+    
+Same steps with curl:
+
+.. sourcecode:: bash
+   
+   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource":{"cls":"wmsclient_layer","parent":{"id":0},"display_name":"layer1","keyname":null,"description":null},"resmeta":{"items":{}},"wmsclient_layer":{"connection":{"id":18},"srs":{"id":3857},"imgformat":"image/png","wmslayers":"1,2"}}' http://demo.nextgis.com/api/resource/
    
    {"id": 131, "parent": {"id": 0}}

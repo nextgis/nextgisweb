@@ -872,7 +872,70 @@ Feature count
 To get feature count in vector layer execute the following request:
 
 .. http:get:: /api/resource/(int:id)/feature_count
+
+   Get feature count
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :>jsonobj long total_count: Feature count
+   :statuscode 200: no error   
+   
+**Example request**:   
+
+.. sourcecode:: http
+
+   GET /api/resoure/10/feature_count HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+    
+.. sourcecode:: json
+
+   {
+     "total_count": 0
+   }
         
+Get layer extent
+^^^^^^^^^^^^^^^^^
+
+To get layer extent execute following request. You can request extent for vector and raster layers. 
+Returned coordinates are in WGS84 (EPSG:4326) spatial reference.
+
+.. http:get:: /api/resource/(int:id)/extent
+
+   Get layer extent
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :>json jsonobj extent: extent json object
+   :>jsonobj double minLat: Minimum latitude  
+   :>jsonobj double minLon: Minimum longtitude
+   :>jsonobj double maxLat: Maximun latitude
+   :>jsonobj double maxLon: Maximum longtitude
+   :statuscode 200: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resoure/10/extent HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+    
+.. sourcecode:: json
+
+    {
+      "extent": 
+      {
+        "minLat": 54.760400119987466, 
+        "maxLon": 35.08562149737197, 
+        "minLon": 35.06675807847286, 
+        "maxLat": 54.768358305249386
+      }
+    }   
  
 Feature
 ^^^^^^^^^^^
