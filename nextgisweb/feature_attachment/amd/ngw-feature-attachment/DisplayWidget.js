@@ -67,16 +67,18 @@ define([
                         id: this.resourceId,
                         fid: this.featureId,
                         aid: image.id
-                    }) + (this.compact ? "?size=64x64" : "?size=128x128");
-                    
+                    });
+
+                    var preview = src + (this.compact ? "?size=64x64" : "?size=128x128");
+
                     var contentClass = !this.compact ? ".content-box" : "";
-                    var a = put(this.domNode, "a.image" + contentClass + "[href=$] img[src=$] <", href, src);
+                    var a = put(this.domNode, "a.image" + contentClass + "[href=$] img[src=$] <", href, preview);
 
                     var lbox = this.lbox;
-                    lbox.addImage({href: href, title: image.description || image.name}, "main");
+                    lbox.addImage({href: src, title: image.description || image.name}, "main");
 
                     on(a, "click", function (evt) {
-                        lbox.show({group: "main", href: href, title: image.description || image.name});
+                        lbox.show({group: "main", href: src, title: image.description || image.name});
                         evt.preventDefault();
                     });
                 }, this);

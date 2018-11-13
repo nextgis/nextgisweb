@@ -44,7 +44,7 @@ def image(resource, request):
         pass
 
     if exif is not None:
-        otag = exif[EXIF_ORIENTATION_TAG]
+        otag = exif.get(EXIF_ORIENTATION_TAG)
         if otag in (3, 6, 8):
             orientation = ORIENTATIONS.get(otag)
             image = image.transpose(orientation.degrees)
