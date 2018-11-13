@@ -10,6 +10,7 @@ from ..resource import DataScope, resource_factory
 from ..env import env
 from ..models import DBSession
 
+from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
 
 
@@ -34,6 +35,19 @@ def image(resource, request):
     ).one()
 
     image = Image.open(env.file_storage.filename(obj.fileobj))
+    ext = image.format
+
+    exif = None
+    try:
+        exif = image._getexif()
+    except:
+        pass
+
+    if exif is not None:
+        otag = exif[EXIF_ORIENTATION_TAG]
+        if otag in (3, 6, 8):
+            orientation = ORIENTATIONS.get(otag)
+            image = image.transpose(orientation.degrees)
 
     if 'size' in request.GET:
         image.thumbnail(
@@ -41,7 +55,7 @@ def image(resource, request):
             Image.ANTIALIAS)
 
     buf = StringIO()
-    image.save(buf, image.format)
+    image.save(buf, ext)
     buf.seek(0)
 
     return Response(body_file=buf, content_type=bytes(obj.mime_type))
