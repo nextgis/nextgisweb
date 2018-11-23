@@ -16,3 +16,5 @@ class PostgisComponent(Component):
     @require('feature_layer')
     def setup_pyramid(self, config):
         from . import view # NOQA
+        from . import api
+        api.setup_pyramid(self, config)
