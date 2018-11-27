@@ -48,6 +48,7 @@ Execute following PUT request to change resource.
    
 Change metadata
 -----------------------------   
+
 This query create metadata fields, or updating it if they exists.
 
 **Example request**:
@@ -58,20 +59,20 @@ This query create metadata fields, or updating it if they exists.
    Host: ngw_url
    Accept: */*
    
-{  
-   "resmeta":{  
-      "items":{  
-         "UPDATED_AT":"2018-11-07 14:00",
-         "CHECKED_AT":"2018-11-07 12:00"
+   {  
+      "resmeta":{  
+         "items":{  
+            "UPDATED_AT":"2018-11-07 14:00",
+            "CHECKED_AT":"2018-11-07 12:00"
+         }
       }
    }
-}
     
    Same steps with curl:
 
 .. sourcecode:: bash
    
-curl --user "user:password" -H 'Accept: */*' -X PUT -d '{"resmeta": {"items":{"UPDATED_AT":"2018-11-07 14:00", "CHECKED_AT":"2018-11-07 12:00"}}}' http://<ngw url>/api/resource/(int:id)
+   curl --user "user:password" -H 'Accept: */*' -X PUT -d '{"resmeta": {"items":{"UPDATED_AT":"2018-11-07 14:00", "CHECKED_AT":"2018-11-07 12:00"}}}' http://<ngw url>/api/resource/(int:id)
 
 
 Change file bucket resource
