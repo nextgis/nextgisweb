@@ -91,6 +91,7 @@ Also you can create attachment using PUT method, in this case you do not need to
     part.setHeader(QNetworkRequest::ContentTypeHeader,
                    QVariant("application/octet-stream"));
     part.setBody(file_contents); // pass QByteArray reference
+    
     multipart->append(part);
     
 
