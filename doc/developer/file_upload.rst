@@ -78,7 +78,7 @@ Also you can create attachment using PUT method, in this case you do not need to
         #add attachment to nextgisweb feature
         req = requests.post(url_dst + feature_dst + str(new_id) + '/attachment/', data=json.dumps(attach_data), auth=creds_dst)
 
-**Example of forming multipart POST body in C++**:
+**Example of forming multipart POST body in Qt**:
 
 .. sourcecode:: c++
     
