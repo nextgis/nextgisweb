@@ -440,7 +440,8 @@ h2:first-child,
 .svgIcon-wmsclient_layer,
 .svgIcon-wmsserver_service,
 .svgIcon-basemap_layer,
-.svgIcon-lookup_table {
+.svgIcon-lookup_table,
+.svgIcon-formbuilder_form {
   background: none;
 }
 .svgIcon-mapserver_style {
