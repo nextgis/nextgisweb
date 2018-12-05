@@ -75,6 +75,22 @@ class ResourceComponent(Component):
             r'[,\s]+', self.settings['quota.resource_cls']) if \
             'quota.resource_cls' in self.settings else None
 
+        self.quota_resource_by_cls = self.parse_quota_resource_by_cls()
+
+    def parse_quota_resource_by_cls(self):
+        quota_resource_by_cls = dict()
+
+        if 'quota.resource_by_cls' not in self.settings:
+            return quota_resource_by_cls
+
+        quota_resources_pairs = re.split(r'[,\s]+', self.settings['quota.resource_by_cls'])
+        if quota_resources_pairs:
+            for pair in quota_resources_pairs:
+                resource_quota = re.split(r'[:\s]+', pair)
+                quota_resource_by_cls[resource_quota[0]] = int(resource_quota[1])
+
+        return quota_resource_by_cls
+
     @require('auth')
     def initialize_db(self):
         adminusr = User.filter_by(keyname='administrator').one()
