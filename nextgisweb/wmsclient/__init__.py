@@ -24,5 +24,5 @@ class WMSClientComponent(Component):
         return dict(wms_versions=WMS_VERSIONS)
 
     settings_info = (
-        dict(key='user_agent', desc=u"HTTP-заголовок User-Agent"),
+        dict(key='user_agent', desc=u"HTTP-header User-Agent"),
     )
