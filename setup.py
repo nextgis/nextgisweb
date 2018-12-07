@@ -27,7 +27,7 @@ requires = [
     'pillow==5.3.0',
     'lxml==4.2.5',
     'passlib==1.7.1',
-    'owslib==0.17.0',
+    'owslib@https://github.com/geopython/OWSLib/archive/master.zip',
     'requests==2.20.1',
     'babel==2.6.0',
     'minio==4.0.6',
