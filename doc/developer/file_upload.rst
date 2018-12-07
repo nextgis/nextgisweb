@@ -8,14 +8,15 @@ File upload
 Single file upload
 -------------------
 
-Execute folowing request for file upload:
+Execute folowing request to upload a file:
 
 ..  http:post:: /api/component/file_upload/upload
 
     File upload request.
     
-    :form file: file path
+    :form file: file data
     :form name: file name
+    :statuscode 200: no error
 
 Next multipart POST request follow. Request includes following form parameters:
 `name` = "file name"
@@ -53,7 +54,6 @@ Also you can create attachment using PUT method, in this case you do not need to
 
 .. sourcecode:: python
 
-
     import requests
     import urllib2
     from contextlib import closing
@@ -82,7 +82,6 @@ Also you can create attachment using PUT method, in this case you do not need to
 
 .. sourcecode:: c++
     
-    
     QHttpMultiPart *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
     QHttpPart part;
@@ -98,7 +97,7 @@ Also you can create attachment using PUT method, in this case you do not need to
 Multiple file upload
 --------------------
 
-For multiple files execute the following request:
+For multiple file upload execute the following request:
 
 ..  http:post:: /api/component/file_upload/upload
 
@@ -108,7 +107,7 @@ For multiple files execute the following request:
 
 In ``name`` field must be file name and path (multipart POST request). 
 
-Responce in JSON formate returned on success:
+Response in JSON format with files details returned on success:
     
 **Example response body**:
     
@@ -148,16 +147,4 @@ Responce in JSON formate returned on success:
         }
       ]
     }
-
-Change file
----------------
-
-To change file detailes execute following request:
-
-..  http:put:: /api/component/file_upload/upload
-
-    File change request.
-    
-.. todo:: What is put payload?
-
 

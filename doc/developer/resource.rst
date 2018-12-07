@@ -30,6 +30,7 @@ There are following resource classes now:
 * lookup_table
 * wmsclient_layer
 * wmsclient_connection
+* formbuilder_form
  
 
 HTTP API

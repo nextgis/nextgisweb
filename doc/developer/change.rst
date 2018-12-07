@@ -42,8 +42,8 @@ Execute following PUT request to change resource.
    }
 
 .. note::
-   Payload of this request may be equal to create new resource request payload, but some fields can be omitted. 
-   Request must be authorized.
+   Payload of this request may be equal to create new resource request payload,
+   but some fields can be omitted. Request must be authorized.
    
    
 Change metadata
