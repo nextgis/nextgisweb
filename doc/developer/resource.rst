@@ -22,10 +22,10 @@ There are following resource classes now:
 * postgis_connection
 * webmap
 * wfsserver_service
+* vector_layer
+* raster_layer
 * mapserver_style
 * qgis_vector_style
-* raster_layer
-* vector_style
 * raster_style
 * file_bucket   
 * lookup_table
