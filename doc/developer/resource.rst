@@ -388,49 +388,7 @@ properties and metadata.
             }
         }
     }
-   
-Requests to root
-^^^^^^^^^^^^^^^^^^
-
-.. deprecated:: 2.2
-.. http:get:: /resource/-/child/   
-
-   Root resource (list).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/-/child/(int:id)
-    
-   Get resource by identificator ``id``.
-    
-.. http:get:: /resource/(int:id)/child/
-    
-   Child resources of resource with identificator ``id`` (list).
-    
-.. http:get:: /resource/(int:parent_id)/child/(int:id)
-   
-   Resource with identificator ``id`` (object).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/store/             
-
-   All resource list.
-    
-.. deprecated:: 2.2
-.. http:get:: /resource/store/(int:id)           
-
-   Resource with identificator ``id`` (object).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/store/?id=(int:id)        
-
-   Resource with identificator ``id`` (object).
-   
-.. deprecated:: 2.2
-.. http:get:: /resource/store/?parent_id=(int:id)
-
-   Child resources of resource with identificator ``id`` (list).
-
-   
+         
 Basic requests 
 ^^^^^^^^^^^^^^^    
 
@@ -458,6 +416,73 @@ Basic requests
 
     :param integer parent: Parent resource identificator, may be in JSON payload.
     :param string cls: Resource class (type). For a list of supported resource classes see :ref:`ngwdev_resource_classes`.
+    
+Search resources
+^^^^^^^^^^^^^^^^^
+
+To search resources execute the following request:
+
+.. http:get:: /api/resource/search/?(string:key1)=(string:value1)&(string:key2)=(string:value2)...
+
+   Search resources.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :param key1, key2...: resource properties (for example, cls, creation_date, keyname). If resource property has children they divided by double underscore (``__``).  
+   :param value1,value2...: key value to search. All ``key=value`` pairs form following search string ``key1=value1 AND key2=value2 AND ...``.
+   :statuscode 200: no error
+   :>jsonarr resource: Array of resource json representation.    
+
+.. warning:: 
+   Now supported anly ``owner_user__id`` key with child.
+
+.. note::
+   Without any parameters request returns all resources available by current user.
+
+    
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resource/search/?keyname=satellite HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+    
+.. sourcecode:: json
+
+    [
+        {
+            "resource": {
+                "id": 856,
+                "cls": "resource_group",
+                "creation_date": "1970-01-01T00:00:00",
+                "parent": {
+                    "id": 0,
+                    "parent": {
+                        "id": null
+                    }
+                },
+                "owner_user": {
+                    "id": 4
+                },
+                "permissions": [],
+                "keyname": "satellite",
+                "display_name": "111222",
+                "children": false,
+                "interfaces": [],
+                "scopes": [
+                    "resource",
+                    "metadata"
+                ]
+            },
+            "resmeta": {}
+        }
+    ]
+    
+Found only one resource because keyname is unique in whole NextGIS Web instance.    
+
 
 Child resource
 ^^^^^^^^^^^^^^^
