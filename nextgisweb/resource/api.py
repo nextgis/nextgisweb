@@ -28,114 +28,6 @@ PERM_MCHILDREN = ResourceScope.manage_children
 PERM_CPERM = ResourceScope.change_permissions
 
 
-def child_get(request):
-    # TODO: Security
-
-    child_id = request.matchdict['child_id']
-    child_id = None if child_id == '' else child_id
-
-    query = Resource.query().with_polymorphic('*').filter_by(
-        parent_id=request.context.id if request.context else None)
-
-    if child_id is not None:
-        query = query.filter_by(id=child_id)
-
-    result = []
-
-    for child in query:
-        serializer = CompositeSerializer(child, request.user)
-        serializer.serialize()
-
-        if child_id is not None:
-            result = serializer.data
-            break
-        else:
-            result.append(serializer.data)
-
-    return Response(
-        json.dumps(result, cls=geojson.Encoder), status_code=200,
-        content_type=b'application/json')
-
-
-def child_put(request):
-    child_id = request.matchdict['child_id']
-    assert child_id != ''
-
-    data = request.json_body
-
-    child = Resource.query().with_polymorphic('*') \
-        .filter_by(id=child_id).one()
-
-    serializer = CompositeSerializer(child, request.user, data)
-
-    with DBSession.no_autoflush:
-        result = serializer.deserialize()
-
-    DBSession.flush()
-    return Response(
-        json.dumps(result), status_code=200,
-        content_type=b'application/json')
-
-
-def child_post(request):
-    child_id = request.matchdict['child_id']
-    assert child_id == ''
-
-    data = request.json_body
-
-    data['resource']['parent'] = dict(id=request.context.id)
-
-    cls = Resource.registry[data['resource']['cls']]
-    child = cls(owner_user=request.user)
-
-    deserializer = CompositeSerializer(child, request.user, data)
-    deserializer.members['resource'].mark('cls')
-
-    with DBSession.no_autoflush:
-        deserializer.deserialize()
-
-    child.persist()
-    DBSession.flush()
-
-    location = request.route_url(
-        'resource.child',
-        id=child.parent_id,
-        child_id=child.id)
-
-    data = OrderedDict(id=child.id)
-    data['parent'] = dict(id=child.parent_id)
-
-    return Response(
-        json.dumps(data), status_code=201,
-        content_type=b'application/json', headerlist=[
-            (b"Location", bytes(location)), ])
-
-
-def child_delete(request):
-    child_id = request.matchdict['child_id']
-    assert child_id != ''
-
-    child = Resource.query().with_polymorphic('*') \
-        .filter_by(id=child_id).one()
-
-    def delete(obj):
-        request.resource_permission(PERM_MCHILDREN, obj)
-        for chld in obj.children:
-            delete(chld)
-
-        request.resource_permission(PERM_DELETE, obj)
-        DBSession.delete(obj)
-
-    with DBSession.no_autoflush:
-        delete(child)
-
-    DBSession.flush()
-
-    return Response(
-        json.dumps(None), status_code=200,
-        content_type=b'application/json')
-
-
 def exception_to_response(request, exc_type, exc_value, exc_traceback):
     data = dict(exception=exc_value.__class__.__name__)
 
@@ -206,9 +98,8 @@ def resexc_tween_factory(handler, registry):
         except:
             mroute = request.matched_route
             if mroute and mroute.name in (
-                'resource.child',
                 'resource.item',
-                'resource.collection'
+                'resource.collection',
             ):
                 return exception_to_response(request, *sys.exc_info())
             raise
@@ -388,25 +279,6 @@ def quota(request):
 
 
 def setup_pyramid(comp, config):
-
-    def _route(route_name, route_path, **kwargs):
-        return config.add_route(
-            'resource.' + route_name,
-            '/resource/' + route_path,
-            **kwargs)
-
-    def _resource_route(route_name, route_path, **kwargs):
-        return _route(
-            route_name, route_path,
-            factory=resource_factory,
-            **kwargs)
-
-    _resource_route('child', '{id:\d+|-}/child/{child_id:\d*}',
-                    client=('id', 'child_id')) \
-        .add_view(child_get, method=r'GET') \
-        .add_view(child_put, method=(r'PUT', r'PATCH')) \
-        .add_view(child_post, method=r'POST') \
-        .add_view(child_delete, method=r'DELETE')
 
     config.add_route(
         'resource.item', '/api/resource/{id:\d+}',
