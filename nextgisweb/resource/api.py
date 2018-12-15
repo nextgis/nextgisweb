@@ -102,6 +102,7 @@ def resexc_tween_factory(handler, registry):
                 'resource.collection',
                 'resource.permission',
                 'resource.quota',
+                'resource.search',
             ):
                 return exception_to_response(request, *sys.exc_info())
             raise
@@ -280,6 +281,29 @@ def quota(request):
         content_type=b'application/json')
 
 
+def search(request):
+    query = Resource.query().with_polymorphic('*') \
+        .order_by(Resource.display_name)
+
+    principal_id = request.GET.pop('owner_user__id', None)
+    if principal_id is not None:
+        owner = User.filter_by(principal_id=int(principal_id)).one()
+        query = query.filter_by(owner_user=owner)
+
+    query = query.filter_by(**request.GET)
+
+    result = list()
+    for resource in query:
+        if resource.has_permission(PERM_READ, request.user):
+            serializer = CompositeSerializer(resource, request.user)
+            serializer.serialize()
+            result.append(serializer.data)
+
+    return Response(
+        json.dumps(result, cls=geojson.Encoder), status_code=200,
+        content_type=b'application/json')
+
+
 def setup_pyramid(comp, config):
 
     config.add_route(
@@ -302,6 +326,10 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.quota', '/api/resource/quota') \
         .add_view(quota, request_method='GET')
+
+    config.add_route(
+        'resource.search', '/api/resource/search/') \
+        .add_view(search, request_method='GET')
 
     config.add_tween(
         'nextgisweb.resource.api.resexc_tween_factory',
