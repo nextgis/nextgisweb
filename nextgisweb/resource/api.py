@@ -100,6 +100,8 @@ def resexc_tween_factory(handler, registry):
             if mroute and mroute.name in (
                 'resource.item',
                 'resource.collection',
+                'resource.permission',
+                'resource.quota',
             ):
                 return exception_to_response(request, *sys.exc_info())
             raise
