@@ -123,12 +123,6 @@ def widget(request):
     clsid = request.GET.get('cls', None)
     parent_id = request.GET.get('parent', None)
 
-    def url(parent_id, child_id=''):
-        return request.route_url(
-            'resource.child',
-            id=parent_id,
-            child_id=child_id)
-
     if operation == 'create':
         if resid is not None or clsid is None or parent_id is None:
             raise httpexceptions.HTTPBadRequest()
