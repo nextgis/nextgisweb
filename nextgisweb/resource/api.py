@@ -282,24 +282,28 @@ def quota(request):
 
 
 def search(request):
-    mode = request.matchdict.get('mode', 'plain')
-    scls = ResourceSerializer if mode == 'plain' else CompositeSerializer
+    smap = dict(resource=ResourceSerializer, full=CompositeSerializer)
 
+    smode = request.GET.pop('serialization', None)
+    smode = smode if smode in smap else 'resource'
+    principal_id = request.GET.pop('owner_user__id', None)
+
+    scls = smap.get(smode)
     def serialize(resource, user):
         serializer = scls(resource, user)
         serializer.serialize()
         data = serializer.data
-        return {Resource.identity: data} if mode == 'plain' else data
+        return {Resource.identity: data} if smode == 'resource' else data
 
     query = Resource.query().with_polymorphic('*') \
+        .filter_by(**dict(map(
+            lambda k: (k, request.GET.get(k)),
+            (attr for attr in request.GET if hasattr(Resource, attr))))) \
         .order_by(Resource.display_name)
 
-    principal_id = request.GET.pop('owner_user__id', None)
     if principal_id is not None:
         owner = User.filter_by(principal_id=int(principal_id)).one()
         query = query.filter_by(owner_user=owner)
-
-    query = query.filter_by(**request.GET)
 
     result = list()
     for resource in query:
@@ -336,10 +340,6 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'resource.search', '/api/resource/search/') \
-        .add_view(search, request_method='GET')
-
-    config.add_route(
-        'resource.search:composite', '/api/resource/search/{mode:composite}/') \
         .add_view(search, request_method='GET')
 
     config.add_tween(
