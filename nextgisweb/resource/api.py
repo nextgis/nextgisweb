@@ -282,6 +282,15 @@ def quota(request):
 
 
 def search(request):
+    mode = request.matchdict.get('mode', 'plain')
+    scls = ResourceSerializer if mode == 'plain' else CompositeSerializer
+
+    def serialize(resource, user):
+        serializer = scls(resource, user)
+        serializer.serialize()
+        data = serializer.data
+        return {Resource.identity: data} if mode == 'plain' else data
+
     query = Resource.query().with_polymorphic('*') \
         .order_by(Resource.display_name)
 
@@ -295,9 +304,7 @@ def search(request):
     result = list()
     for resource in query:
         if resource.has_permission(PERM_READ, request.user):
-            serializer = ResourceSerializer(resource, request.user)
-            serializer.serialize()
-            result.append({Resource.identity: serializer.data})
+            result.append(serialize(resource, request.user))
 
     return Response(
         json.dumps(result, cls=geojson.Encoder), status_code=200,
@@ -329,6 +336,10 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'resource.search', '/api/resource/search/') \
+        .add_view(search, request_method='GET')
+
+    config.add_route(
+        'resource.search:composite', '/api/resource/search/{mode:composite}/') \
         .add_view(search, request_method='GET')
 
     config.add_tween(
