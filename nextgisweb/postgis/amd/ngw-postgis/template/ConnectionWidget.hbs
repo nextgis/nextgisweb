@@ -9,6 +9,11 @@
             title="{{gettext 'Host'}}" style="width: 100%"></div>
 
         <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: false, regExp:'\\d+'"
+            data-ngw-serialize="port"
+            title="{{gettext 'Port'}}" style="width: 100%"></div>
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
             data-dojo-props="required: true"
             data-ngw-serialize="database"
             title="{{gettext 'Database'}}" style="width: 100%"></div>
