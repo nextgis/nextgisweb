@@ -14,7 +14,7 @@ from ..models import DBSession
 from ..auth import User
 from ..pyramid import viewargs
 
-from .model import Resource
+from .model import Resource, ResourceSerializer
 from .scope import ResourceScope
 from .exception import ResourceError, ValidationError, ForbiddenError
 from .serialize import CompositeSerializer
@@ -295,9 +295,9 @@ def search(request):
     result = list()
     for resource in query:
         if resource.has_permission(PERM_READ, request.user):
-            serializer = CompositeSerializer(resource, request.user)
+            serializer = ResourceSerializer(resource, request.user)
             serializer.serialize()
-            result.append(serializer.data)
+            result.append({Resource.identity: serializer.data})
 
     return Response(
         json.dumps(result, cls=geojson.Encoder), status_code=200,
