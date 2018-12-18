@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-03-21 18:03+0500\n"
+"POT-Creation-Date: 2018-12-16 19:54+0300\n"
 "PO-Revision-Date: 2015-08-02 14:57+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.4.0\n"
+"Generated-By: Babel 2.6.0\n"
 
 #: amd/ngw-postgis/template/LayerWidget.hbs:37 model.py:50
 msgid "Point"
@@ -47,34 +47,34 @@ msgstr "Мультиполигон"
 msgid "PostGIS connection"
 msgstr "Соединение PostGIS"
 
-#: model.py:123
+#: model.py:124
 msgid "Cannot connect to the database!"
 msgstr "Невозможно подключиться к базе данных!"
 
-#: amd/ngw-postgis/LayerWidget.js:32 model.py:149
+#: amd/ngw-postgis/LayerWidget.js:32 model.py:151
 msgid "PostGIS layer"
 msgstr "Слой PostGIS"
 
-#: model.py:209
+#: model.py:211
 #, python-format
 msgid "Table '%(table)s' not found!"
 msgstr "Таблица '%(table)s' не найдена!"
 
-#: model.py:224
+#: model.py:226
 msgid "SRID missing in geometry_columns table! You should specify it manually."
 msgstr ""
 "SRID отсутствует в таблице geometry_columns! Необходимо указать SRID "
 "вручную."
 
-#: model.py:227
+#: model.py:229
 msgid "0 is an invalid SRID."
 msgstr "SRID не может быть равен 0."
 
-#: model.py:234
+#: model.py:236
 msgid "SRID in geometry_columns table does not match specified!"
 msgstr "SRID в таблице geometry_columns не соответствует указанному!"
 
-#: model.py:242
+#: model.py:244
 msgid ""
 "Geometry type missing in geometry_columns table! You should specify it "
 "manually."
@@ -82,22 +82,22 @@ msgstr ""
 "Тип геометрии отсутствует в таблице geometry_columns! Необходимо указать "
 "тип геометрии вручную."
 
-#: model.py:249
+#: model.py:251
 msgid "Geometry type in geometry_columns table does not match specified!"
 msgstr "Тип геометрии в таблице geometry_columns не соответствует указанному!"
 
-#: model.py:267
+#: model.py:269
 msgid "To use column as ID it should have integer type!"
 msgstr ""
 "Для использования поля в качестве идентификатора оно должно иметь "
 "целочисленный тип!"
 
-#: model.py:309 model.py:312
+#: model.py:311 model.py:314
 #, python-format
 msgid "Column '%(column)s' not found!"
 msgstr "Поле '%(column)s' не найдено!"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:34 model.py:319
+#: amd/ngw-postgis/template/LayerWidget.hbs:34 model.py:321
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
@@ -106,14 +106,18 @@ msgid "Host"
 msgstr "Сервер"
 
 #: amd/ngw-postgis/template/ConnectionWidget.hbs:14
+msgid "Port"
+msgstr "Порт"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:19
 msgid "Database"
 msgstr "База данных"
 
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:19
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:24
 msgid "User"
 msgstr "Пользователь"
 
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:24
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:29
 msgid "Password"
 msgstr "Пароль"
 

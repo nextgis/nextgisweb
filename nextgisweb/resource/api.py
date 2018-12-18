@@ -14,7 +14,7 @@ from ..models import DBSession
 from ..auth import User
 from ..pyramid import viewargs
 
-from .model import Resource
+from .model import Resource, ResourceSerializer
 from .scope import ResourceScope
 from .exception import ResourceError, ValidationError, ForbiddenError
 from .serialize import CompositeSerializer
@@ -282,22 +282,33 @@ def quota(request):
 
 
 def search(request):
+    smap = dict(resource=ResourceSerializer, full=CompositeSerializer)
+
+    smode = request.GET.pop('serialization', None)
+    smode = smode if smode in smap else 'resource'
+    principal_id = request.GET.pop('owner_user__id', None)
+
+    scls = smap.get(smode)
+    def serialize(resource, user):
+        serializer = scls(resource, user)
+        serializer.serialize()
+        data = serializer.data
+        return {Resource.identity: data} if smode == 'resource' else data
+
     query = Resource.query().with_polymorphic('*') \
+        .filter_by(**dict(map(
+            lambda k: (k, request.GET.get(k)),
+            (attr for attr in request.GET if hasattr(Resource, attr))))) \
         .order_by(Resource.display_name)
 
-    principal_id = request.GET.pop('owner_user__id', None)
     if principal_id is not None:
         owner = User.filter_by(principal_id=int(principal_id)).one()
         query = query.filter_by(owner_user=owner)
 
-    query = query.filter_by(**request.GET)
-
     result = list()
     for resource in query:
         if resource.has_permission(PERM_READ, request.user):
-            serializer = CompositeSerializer(resource, request.user)
-            serializer.serialize()
-            result.append(serializer.data)
+            result.append(serialize(resource, request.user))
 
     return Response(
         json.dumps(result, cls=geojson.Encoder), status_code=200,

@@ -63,6 +63,7 @@ To create PostGIS connection execute following request.
    :<json jsonobj postgis_connection: postgis connection JSON object
    :<json string database: Database name 
    :<json string hostname: Database host
+   :<json string port: Database port
    :<json string password: password
    :<json string username: login
    :statuscode 201: no error

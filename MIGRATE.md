@@ -2,6 +2,12 @@
 
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
+#### (2018-12-16)
+
+```sql
+ALTER TABLE postgis_connection ADD COLUMN port integer;
+```
+
 #### `-- e1ad5e94cef9ab9b605948f53331927b52c8f3c5` (2018-09-11)
 
 ```sql
