@@ -428,7 +428,7 @@ To search resources execute the following request:
    
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
-   :param key1, key2...: resource properties (for example, cls, creation_date, keyname). If resource property has children they divided by double underscore (``__``).  
+   :param key1, key2...: resource properties (for example, cls, creation_date, keyname). If resource property has children they divided by double underscore (``__``). The ``serialization=full`` parameter make return list of resources with full description, otherwise only ``resource`` key will returned.   
    :param value1,value2...: key value to search. All ``key=value`` pairs form following search string ``key1=value1 AND key2=value2 AND ...``.
    :statuscode 200: no error
    :>jsonarr resource: Array of resource json representation.    
