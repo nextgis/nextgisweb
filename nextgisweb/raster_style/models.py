@@ -67,6 +67,8 @@ class RasterStyle(Base, Resource):
         off_y = int((extent[3] - gt[3]) / gt[5])
         width_x = int(((extent[2] - gt[0]) / gt[1]) - off_x)
         width_y = int(((extent[1] - gt[3]) / gt[5]) - off_y)
+        width_x = max(width_x, 1)
+        width_y = max(width_y, 1)
 
         # check that pixels are not outside of image extent
         target_width, target_height = size
