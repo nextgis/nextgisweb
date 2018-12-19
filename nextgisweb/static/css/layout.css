@@ -441,7 +441,10 @@ h2:first-child,
 .svgIcon-wmsserver_service,
 .svgIcon-basemap_layer,
 .svgIcon-lookup_table,
-.svgIcon-formbuilder_form {
+.svgIcon-formbuilder_form,
+.svgIcon-qgis_raster_style,
+.svgIcon-trackers_group,
+.svgIcon-tracker {
   background: none;
 }
 .svgIcon-mapserver_style {
