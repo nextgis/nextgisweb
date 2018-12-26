@@ -231,7 +231,15 @@ def idelete(resource, request):
 def cget(resource, request):
     request.resource_permission(PERM_READ)
 
+    limit = request.GET.get('limit')
+    offset = request.GET.get('offset', 0)
+
     query = resource.feature_query()
+
+    # Paging
+    if limit is not None:
+        query.limit(int(limit), int(offset))
+
     query.geom()
 
     result = map(serialize, query())
