@@ -964,8 +964,8 @@ Returned coordinates are in WGS84 (EPSG:4326) spatial reference.
       }
     }   
  
-Feature
-^^^^^^^^^^^
+Features and single feature
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To get a single feature of vector layer execute the following request:
 
@@ -974,6 +974,31 @@ To get a single feature of vector layer execute the following request:
 To get all vector layer features execute the following request:
 
 .. http:get:: /api/resource/(int:id)/feature/
+
+   Get features
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :>jsonarray features: features array
+   :statuscode 200: no error 
+   
+To get features using filters execute the following request:
+
+.. versionadded:: 3.1
+
+.. http:get:: /api/resource/(int:id)/feature/?limit=(int:limit)&offset=(int:offset)&intersects=(string:wkt_string)&fields=(string:field_name_1,string:field_name_2,...)&fld_{field_name_1}=(string:value)&fld_{field_name_2}=(string:value)
+
+   Get features with parameters
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :param limit: limit feature count adding to return array
+   :param offset: skip some features before create features array
+   :param intersects: geometry as WKT string. Features intersect with this geometry will added to array
+   :param fields: comma separated list of fields in return feature
+   :param fld_{field_name_1}...fld_{field_name_N}: field name and value to filter return features. Parameter name froms as ``fld_`` + real field name (keyname). All pairs of field name = value form ``AND`` SQL query.  
+   :>jsonarray features: features array
+   :statuscode 200: no error   
 
 **Example request**:
 
@@ -1058,6 +1083,26 @@ To get all vector layer features execute the following request:
         }
     }
 
+
+**Example request with parameters**:
+
+.. sourcecode:: http
+
+   GET api/resource/442/feature/?fld_ondatr_set=3.0 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+.. sourcecode:: http
+
+   GET api/resource/442/feature/?intersects=POLYGON((4692730.0186502402648329%206500222.2378559196367859,4692731.0186502402648330%206500222.2378559196367859,4692730.0186502402648331%206500222.2378559196367861,4692730.0186502402648329%206500222.2378559196367861,4692730.0186502402648329%206500222.2378559196367859)) HTTP/1.1
+   Host: ngw_url
+   Accept: */*   
+
+.. sourcecode:: http
+
+   GET api/resource/442/feature/?fld_dataunreal=2018-04-15&fields=Desman_ID,Year_1 HTTP/1.1
+   Host: ngw_url
+   Accept: */*  
 
 Attachment
 ^^^^^^^^^^^
