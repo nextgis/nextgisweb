@@ -979,7 +979,7 @@ To get all vector layer features execute the following request:
    
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
-   :>jsonarray features: features array
+   :>jsonarr features: features array
    :statuscode 200: no error 
    
 To get features using filters execute the following request:
