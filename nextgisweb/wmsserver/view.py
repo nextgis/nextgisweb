@@ -37,18 +37,18 @@ def handler(obj, request):
     request.resource_permission(ServiceScope.connect)
 
     params = dict((k.upper(), v) for k, v in request.params.iteritems())
-    req = params.get('REQUEST')
-    service = params.get('SERVICE')
+    req = params.get('REQUEST', '').upper()
+    service = params.get('SERVICE', '').upper()
 
-    if req == 'GetCapabilities':
+    if req == 'GETCAPABILITIES':
         if service != 'WMS':
             raise HTTPBadRequest("Invalid SERVICE parameter value.")
         return _get_capabilities(obj, request)
-    elif req == 'GetMap':
+    elif req == 'GETMAP':
         return _get_map(obj, request)
-    elif req == 'GetFeatureInfo':
+    elif req == 'GETFEATUREINFO':
         return _get_feature_info(obj, request)
-    elif req == 'GetLegendGraphic':
+    elif req == 'GETLEGENDGRAPHIC':
         return _get_legend_graphic(obj, request)
     else:
         raise HTTPBadRequest("Invalid REQUEST parameter value.")
