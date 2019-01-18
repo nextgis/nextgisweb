@@ -187,24 +187,24 @@ class CoreComponent(Component):
         return result
 
     settings_info = (
-        dict(key='system.name', default=u"NextGIS Web", desc=u"Название системы"),
-        dict(key='system.full_name', default=u"Геоинформационная система NextGIS", desc=u"Полное название системы"),
+        dict(key='system.name', default=u"NextGIS Web", desc=u"GIS name"),
+        dict(key='system.full_name', default=u"NextGIS Web", desc=u"Full GIS nane"),
 
-        dict(key='database.host', default='localhost', desc=u"Имя сервера БД"),
-        dict(key='database.name', default='nextgisweb', desc=u"Имя БД на сервере"),
-        dict(key='database.user', default='nextgisweb', desc=u"Имя пользователя БД"),
-        dict(key='database.password', desc=u"Пароль пользователя БД"),
+        dict(key='database.host', default='localhost', desc=u"DB server name"),
+        dict(key='database.name', default='nextgisweb', desc=u"DB name on the server"),
+        dict(key='database.user', default='nextgisweb', desc=u"DB user name"),
+        dict(key='database.password', desc=u"DB user password"),
 
-        dict(key='database.check_at_startup', desc=u"Проверять подключение при запуске"),
+        dict(key='database.check_at_startup', desc=u"Check connection of startup"),
 
-        dict(key='packages.ignore', desc=u"Не загружать перечисленные пакеты"),
-        dict(key='components.ignore', desc=u"Не загружать перечисленные компоненты"),
+        dict(key='packages.ignore', desc=u"Ignore listed packages"),
+        dict(key='components.ignore', desc=u"Ignore listed components"),
 
-        dict(key='locale.default', desc=u"Локаль, используемая по-умолчанию"),
-        dict(key='locale.available', desc=u"Доступные локали"),
-        dict(key='debug', desc=u"Дополнительный инструментарий для отладки"),
-        dict(key='sdir', desc=u"Директория для хранения данных"),
+        dict(key='locale.default', desc=u"Default locale"),
+        dict(key='locale.available', desc=u"Available locale"),
+        dict(key='debug', desc=u"Additional debug tools"),
+        dict(key='sdir', desc=u"Data storage folder"),
 
-        dict(key='permissions.disable_check.rendering', desc=u"Отключение проверки прав при рендеринге слоев"),
-        dict(key='permissions.disable_check.identify', desc=u"Отключение проверки прав при получении информации об объектах"),
+        dict(key='permissions.disable_check.rendering', desc=u"Turn off permission checking for rendering"),
+        dict(key='permissions.disable_check.identify', desc=u"Turn off permission checking for identification"),
     )
