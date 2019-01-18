@@ -84,5 +84,5 @@ class FileStorageComponent(Component):
         return dict(size=size)
 
     settings_info = (
-        dict(key='path', desc=u"Директория для хранения файлов (обязательно)"),
+        dict(key='path', desc=u"Files storage folder (required)"),
     )
