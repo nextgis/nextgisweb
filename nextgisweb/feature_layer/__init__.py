@@ -38,6 +38,6 @@ class FeatureLayerComponent(Component):
         api.setup_pyramid(self, config)
 
     settings_info = (
-        dict(key='identify.attributes', desc=u"Показывать атрибуты в идентификации"),
-        dict(key='search.nominatim', desc=u"Использовать Nominatim при поиске")
+        dict(key='identify.attributes', desc=u"Show attributes in identification"),
+        dict(key='search.nominatim', desc=u"Use Nominatim while searching")
     )
