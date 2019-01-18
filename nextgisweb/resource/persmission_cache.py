@@ -4,11 +4,11 @@ from ..auth.models import User, Group
 from .model import ResourceACLRule
 
 settings_info = (
-        dict(key='perm_cache.enable',       desc=u"Включить кэширование прав (default = False)"),
-        dict(key='perm_cache.redis_path',   desc=u"Путь к сокету Redis (default = None)"),
-        dict(key='perm_cache.redis_url',    desc=u"URL сервера Redis (default = localhost"),
-        dict(key='perm_cache.redis_port',   desc=u"Port сервера Redis (default = 6379)"),
-        dict(key='perm_cache.redis_db',     desc=u"БД Redis (default = 0)"),
+        dict(key='perm_cache.enable',       desc=u"Turn on permissions caching (default = False)"),
+        dict(key='perm_cache.redis_path',   desc=u"Redis socket path (default = None)"),
+        dict(key='perm_cache.redis_url',    desc=u"Redis server URL (default = localhost"),
+        dict(key='perm_cache.redis_port',   desc=u"Redis server port (default = 6379)"),
+        dict(key='perm_cache.redis_db',     desc=u"Redis DB (default = 0)"),
 )
 
 
