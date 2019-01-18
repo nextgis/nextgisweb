@@ -237,8 +237,8 @@ class PyramidComponent(Component):
         api.setup_pyramid(self, config)
 
     settings_info = (
-        dict(key='secret', desc=u"Ключ, используемый для шифрования cookies (обязательно)"),
-        dict(key='help_page', desc=u"HTML-справка"),
-        dict(key='logo', desc=u"Логотип системы"),
-        dict(key='favicon', desc=u"Значок для избранного"),
+        dict(key='secret', desc=u"Cookies encryption key (required)"),
+        dict(key='help_page', desc=u"HTML help"),
+        dict(key='logo', desc=u"System logo"),
+        dict(key='favicon', desc=u"Favicon"),
     )
