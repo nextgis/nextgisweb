@@ -43,7 +43,7 @@ def main(argv=sys.argv):
     if logging:
         setup_logging(logging)
 
-    cfg = ConfigParser()
+    cfg = ConfigParser(os.environ)
 
     if config:
         cfg.readfp(codecs.open(config, 'r', 'utf-8'))
