@@ -20,8 +20,7 @@ Pillow==4.2.1
 pkg-resources==0.0.0
 plaster==0.5
 plaster-pastedeploy==0.4.1
-psycopg2==2.7.3
-pygdal==1.11.3.3
+psycopg2-binary
 Pygments==2.2.0
 pyproj==1.9.5.1
 pyramid==1.9.1
