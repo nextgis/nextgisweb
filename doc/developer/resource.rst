@@ -32,7 +32,8 @@ There are following resource classes now:
 * wmsclient_layer
 * wmsclient_connection
 * formbuilder_form
- 
+* trackers_group
+* tracker
 
 HTTP API
 ---------
