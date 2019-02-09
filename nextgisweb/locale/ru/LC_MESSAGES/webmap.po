@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-08-24 12:10+0800\n"
+"POT-Creation-Date: 2019-02-08 14:46+0100\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -334,6 +334,10 @@ msgstr "Соцсети"
 #: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:17
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:19
+msgid "Map size:"
+msgstr "Размер карты:"
 
 #: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:42
 msgid "Link to main map"
