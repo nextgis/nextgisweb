@@ -54,9 +54,6 @@ define([
          * @param {Object} item - Menu item {name: "", title: "", icon: "", value: ""}.
          */
         addItem: function (item) {
-            if (!relItemName) {
-
-            }
             this._addItem(item);
             this._renderItem(item);
         },
