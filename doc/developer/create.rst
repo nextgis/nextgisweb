@@ -63,6 +63,7 @@ To create PostGIS connection execute following request.
    :<json jsonobj postgis_connection: postgis connection JSON object
    :<json string database: Database name 
    :<json string hostname: Database host
+   :<json string port: Database port
    :<json string password: password
    :<json string username: login
    :statuscode 201: no error
@@ -252,7 +253,7 @@ Layer must have spatial reference and ``UTF-8`` or ``CP1251`` encoding. Geometry
 Uploading vector geodata
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If geodata is in ESRI Shapefile format, all files must be packed into the one ZIP archive. GeoJSON file can be uploaded without archiving. Geodata uploading detailes see in :ref:`ngw_file_upload`.
+If geodata is in ESRI Shapefile format, all files must be packed into the one ZIP archive. GeoJSON file can be uploaded without archiving. Geodata uploading detailes see in :ref:`ngwdev_file_upload`.
 
 Create vector layer
 ^^^^^^^^^^^^^^^^^^^
@@ -407,7 +408,7 @@ You can upload rasters in GeoTIFF format with 3 (RGB) or 4 (RGBA) bands. GeoTIFF
 Loading raster
 ^^^^^^^^^^^^^^^
 
-Prepared raster can be uploaded. See :ref:`ngw_file_upload`.
+Prepared raster can be uploaded. See :ref:`ngwdev_file_upload`.
 
 Create raster layer
 ^^^^^^^^^^^^^^^^^^^
@@ -483,7 +484,7 @@ File bucket creation includes 2 steps:
 File upload
 ^^^^^^^^^^^^^^^
 
-Upload files to server. See :ref:`ngw_file_upload`. Any file types are supported.
+Upload files to server. See :ref:`ngwdev_file_upload`. Any file types are supported.
 
 Create file bucket
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -938,6 +939,7 @@ To create WMS layer from WMS connection execute following request.
    :<json jsonobj connection: WMS connection.
    :<json string imgformat: Image format. Available values can fetched from WMS connection.
    :<json string wmslayers: String with layer identifiers separated with comma. Available layers can fetched from WMS connection.
+   :<json jsonobj vendor_params: Additional parameters added to each request. This is key and value list.
    :statuscode 201: no error
    
 **Example request**:
@@ -969,7 +971,10 @@ To create WMS layer from WMS connection execute following request.
                 "id": 3857
             },
             "imgformat": "image/png",
-            "wmslayers": "1,2"
+            "wmslayers": "1,2",
+            "vendor_params": {
+               "key1": "value1"
+            }
         }
     }
     

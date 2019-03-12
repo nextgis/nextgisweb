@@ -24,13 +24,16 @@ There are following resource classes now:
 * wfsserver_service
 * vector_layer
 * raster_layer
-* vector_style
+* mapserver_style
+* qgis_vector_style
 * raster_style
 * file_bucket   
 * lookup_table
 * wmsclient_layer
 * wmsclient_connection
- 
+* formbuilder_form
+* trackers_group
+* tracker
 
 HTTP API
 ---------
@@ -386,49 +389,7 @@ properties and metadata.
             }
         }
     }
-   
-Requests to root
-^^^^^^^^^^^^^^^^^^
-
-.. deprecated:: 2.2
-.. http:get:: /resource/-/child/   
-
-   Root resource (list).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/-/child/(int:id)
-    
-   Get resource by identificator ``id``.
-    
-.. http:get:: /resource/(int:id)/child/
-    
-   Child resources of resource with identificator ``id`` (list).
-    
-.. http:get:: /resource/(int:parent_id)/child/(int:id)
-   
-   Resource with identificator ``id`` (object).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/store/             
-
-   All resource list.
-    
-.. deprecated:: 2.2
-.. http:get:: /resource/store/(int:id)           
-
-   Resource with identificator ``id`` (object).
-
-.. deprecated:: 2.2
-.. http:get:: /resource/store/?id=(int:id)        
-
-   Resource with identificator ``id`` (object).
-   
-.. deprecated:: 2.2
-.. http:get:: /resource/store/?parent_id=(int:id)
-
-   Child resources of resource with identificator ``id`` (list).
-
-   
+         
 Basic requests 
 ^^^^^^^^^^^^^^^    
 
@@ -456,6 +417,73 @@ Basic requests
 
     :param integer parent: Parent resource identificator, may be in JSON payload.
     :param string cls: Resource class (type). For a list of supported resource classes see :ref:`ngwdev_resource_classes`.
+    
+Search resources
+^^^^^^^^^^^^^^^^^
+
+To search resources execute the following request:
+
+.. http:get:: /api/resource/search/?(string:key1)=(string:value1)&(string:key2)=(string:value2)...
+
+   Search resources.
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :param key1, key2...: resource properties (for example, cls, creation_date, keyname). If resource property has children they divided by double underscore (``__``). The ``serialization=full`` parameter make return list of resources with full description, otherwise only ``resource`` key will returned.   
+   :param value1,value2...: key value to search. All ``key=value`` pairs form following search string ``key1=value1 AND key2=value2 AND ...``.
+   :statuscode 200: no error
+   :>jsonarr resource: Array of resource json representation.    
+
+.. warning:: 
+   Now supported anly ``owner_user__id`` key with child.
+
+.. note::
+   Without any parameters request returns all resources available by current user.
+
+    
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resource/search/?keyname=satellite HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+    
+.. sourcecode:: json
+
+    [
+        {
+            "resource": {
+                "id": 856,
+                "cls": "resource_group",
+                "creation_date": "1970-01-01T00:00:00",
+                "parent": {
+                    "id": 0,
+                    "parent": {
+                        "id": null
+                    }
+                },
+                "owner_user": {
+                    "id": 4
+                },
+                "permissions": [],
+                "keyname": "satellite",
+                "display_name": "111222",
+                "children": false,
+                "interfaces": [],
+                "scopes": [
+                    "resource",
+                    "metadata"
+                ]
+            },
+            "resmeta": {}
+        }
+    ]
+    
+Found only one resource because keyname is unique in whole NextGIS Web instance.    
+
 
 Child resource
 ^^^^^^^^^^^^^^^
@@ -937,8 +965,8 @@ Returned coordinates are in WGS84 (EPSG:4326) spatial reference.
       }
     }   
  
-Feature
-^^^^^^^^^^^
+Features and single feature
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To get a single feature of vector layer execute the following request:
 
@@ -947,6 +975,31 @@ To get a single feature of vector layer execute the following request:
 To get all vector layer features execute the following request:
 
 .. http:get:: /api/resource/(int:id)/feature/
+
+   Get features
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :>jsonarr features: features array
+   :statuscode 200: no error 
+   
+To get features using filters execute the following request:
+
+.. versionadded:: 3.1
+
+.. http:get:: /api/resource/(int:id)/feature/?limit=(int:limit)&offset=(int:offset)&intersects=(string:wkt_string)&fields=(string:field_name_1,string:field_name_2,...)&fld_{field_name_1}=(string:value)&fld_{field_name_2}=(string:value)
+
+   Get features with parameters
+   
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :param limit: limit feature count adding to return array
+   :param offset: skip some features before create features array
+   :param intersects: geometry as WKT string. Features intersect with this geometry will added to array
+   :param fields: comma separated list of fields in return feature
+   :param fld_{field_name_1}...fld_{field_name_N}: field name and value to filter return features. Parameter name froms as ``fld_`` + real field name (keyname). All pairs of field name = value form ``AND`` SQL query.  
+   :>jsonarray features: features array
+   :statuscode 200: no error   
 
 **Example request**:
 
@@ -1031,6 +1084,26 @@ To get all vector layer features execute the following request:
         }
     }
 
+
+**Example request with parameters**:
+
+.. sourcecode:: http
+
+   GET api/resource/442/feature/?fld_ondatr_set=3.0 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+.. sourcecode:: http
+
+   GET api/resource/442/feature/?intersects=POLYGON((4692730.0186502402648329%206500222.2378559196367859,4692731.0186502402648330%206500222.2378559196367859,4692730.0186502402648331%206500222.2378559196367861,4692730.0186502402648329%206500222.2378559196367861,4692730.0186502402648329%206500222.2378559196367859)) HTTP/1.1
+   Host: ngw_url
+   Accept: */*   
+
+.. sourcecode:: http
+
+   GET api/resource/442/feature/?fld_dataunreal=2018-04-15&fields=Desman_ID,Year_1 HTTP/1.1
+   Host: ngw_url
+   Accept: */*  
 
 Attachment
 ^^^^^^^^^^^

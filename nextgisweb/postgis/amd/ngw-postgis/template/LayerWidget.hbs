@@ -3,28 +3,33 @@
 
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, labelWidth: 150">
 
-        <div data-dojo-type="ngw-resource/ResourceBox"
+        <div data-dojo-attach-point="wConnection"
+            data-dojo-type="ngw-resource/ResourceBox"
             data-dojo-props="cls: 'postgis_connection', colspan: 2"
             data-ngw-serialize="connection"
             title="{{gettext 'Connection'}}" style="width: 100%"></div>
 
-        <div data-dojo-type="dijit/form/ValidationTextBox"
-            data-dojo-props="required: true"
-            data-ngw-serialize="table"
-            title="{{gettext 'Table'}}" style="width: 100%"></div>
-
-        <div data-dojo-type="dijit/form/ValidationTextBox"            
-            data-dojo-props="required: true, value: 'public'"
+        <div data-dojo-attach-point="wSchema"
+            data-dojo-type="dijit/form/ComboBox"
+            data-dojo-props="required: true, searchAttr: 'id', maxHeight: -1"
             data-ngw-serialize="schema"
             title="{{gettext 'Schema'}}" style="width: 100%"></div>
 
-        <div data-dojo-type="dijit/form/ValidationTextBox"
-            data-dojo-props="required: true"
+        <div data-dojo-attach-point="wTable"
+            data-dojo-type="dijit/form/ComboBox"
+            data-dojo-props="required: true, searchAttr: 'id', maxHeight: -1"
+            data-ngw-serialize="table"
+            title="{{gettext 'Table'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wColumnID"
+            data-dojo-type="dijit/form/ComboBox"
+            data-dojo-props="required: true, searchAttr: 'id', maxHeight: -1"
             data-ngw-serialize="column_id"
             title="{{gettext 'ID column'}}" style="width: 100%"></div>
 
-        <div data-dojo-type="dijit/form/ValidationTextBox"
-            data-dojo-props="required: true"
+        <div data-dojo-attach-point="wColumnGeometry"
+            data-dojo-type="dijit/form/ComboBox"
+            data-dojo-props="required: true, searchAttr: 'id', maxHeight: -1"
             data-ngw-serialize="column_geom"
             title="{{gettext 'Geometry column'}}" style="width: 100%"></div>
 

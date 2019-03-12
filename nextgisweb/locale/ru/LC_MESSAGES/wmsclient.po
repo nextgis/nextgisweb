@@ -7,29 +7,56 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2015-09-14 00:46+0300\n"
+"POT-Creation-Date: 2018-12-07 16:44+0300\n"
 "PO-Revision-Date: 2015-09-14 00:47+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.0\n"
+"Generated-By: Babel 2.6.0\n"
 
-#: model.py:44 amd/ngw-wmsclient/ConnectionWidget.js:35
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:14
+#: amd/ngw-wmsclient/ConnectionWidget.js:35
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:45
 msgid "WMS connection"
 msgstr "Соединение WMS"
 
-#: model.py:207 amd/ngw-wmsclient/LayerWidget.js:53
+#: amd/ngw-wmsclient/LayerWidget.js:47 model.py:162
 msgid "WMS layer"
 msgstr "Слой WMS"
 
-#: view.py:24
+#: view.py:30
 msgid "WMS capabilities"
 msgstr "Возможности WMS"
+
+#: view.py:38
+msgid "WMS vendor parameters"
+msgstr "WMS вендор параметры"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:46
+#: template/section_vendor_params.mako:6
+msgid "Key"
+msgstr "Ключ"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:55
+#: template/section_vendor_params.mako:7
+msgid "Value"
+msgstr "Значение"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:66
+msgid "Vendor parameters"
+msgstr "Вендор параметры"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:92
+msgid "Add"
+msgstr "Добавить"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:98
+msgid "Delete"
+msgstr "Удалить"
 
 #: amd/ngw-wmsclient/template/ConnectionWidget.hbs:9
 msgid "URL"
@@ -63,28 +90,28 @@ msgstr "Запросить"
 msgid "Clear"
 msgstr "Очистить"
 
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:18
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:21
 msgid "Coordinate system"
 msgstr "Система координат"
 
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:23
-#: template/section_connection.mako:10
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:27
+#: template/section_connection.mako:15
 msgid "Image format"
 msgstr "Формат изображения"
 
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:28
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:33
 msgid "WMS layers"
 msgstr "Слои WMS"
 
-#: template/section_connection.mako:6
+#: template/section_connection.mako:7
 msgid "Timestamp"
 msgstr "Метка времени"
 
-#: template/section_connection.mako:18
+#: template/section_connection.mako:26
 msgid "Layer"
 msgstr "Слой"
 
-#: template/section_connection.mako:19
+#: template/section_connection.mako:27
 msgid "Title"
 msgstr "Наименование"
 

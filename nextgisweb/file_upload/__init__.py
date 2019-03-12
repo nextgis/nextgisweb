@@ -45,5 +45,5 @@ class FileUploadComponent(Component):
         return (base_filename + '.data', base_filename + '.meta')
 
     settings_info = (
-        dict(key='path', desc=u"Директория для временного хранения загруженных файлов (обязательно)"),
+        dict(key='path', desc=u"Uploads storage folder (required)"),
     )

@@ -190,6 +190,10 @@ class Layer(Base, Resource, SpatialLayerMixin):
             width=size[0], height=size[1],
             transparent="true")
 
+        # Vendor-specific parameters
+        for p in self.vendor_params:
+            query[p.key] = p.value
+
         # In the GetMap operation the srs parameter is called crs in 1.3.0.
         srs = 'crs' if self.connection.version == '1.3.0' else 'srs'
         query[srs] = "EPSG:%d" % self.srs.id
@@ -212,6 +216,56 @@ class Layer(Base, Resource, SpatialLayerMixin):
             url, auth=auth, headers=env.wmsclient.headers).content))
 
 
+class LayerVendorParam(Base):
+    __tablename__ = 'wmsclient_layer_vendor_param'
+
+    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
+    key = db.Column(db.Unicode(255), primary_key=True)
+    value = db.Column(db.Unicode)
+
+    resource = db.relationship(Resource, backref=db.backref(
+        'vendor_params', cascade='all, delete-orphan'))
+
+
+class _vendor_params_attr(SP):
+
+    def getter(self, srlzr):
+        result = {}
+
+        for itm in getattr(srlzr.obj, 'vendor_params'):
+            result[itm.key] = itm.value
+
+        return result
+
+    def setter(self, srlzr, value):
+        odata = getattr(srlzr.obj, 'vendor_params')
+
+        rml = []     # Records to be removed
+        imap = {}    # Records to be rewritten
+
+        for i in odata:
+            if i.key in value and value[i.key] is not None:
+                imap[i.key] = i
+            else:
+                rml.append(i)
+
+        # Remove records to be removed
+        map(lambda i: odata.remove(i), rml)
+
+        for k, val in value.iteritems():
+            if val is None:
+                continue
+
+            itm = imap.get(k)
+
+            if itm is None:
+                # Create new record if there is no record to rewrite
+                itm = LayerVendorParam(key=k)
+                odata.append(itm)
+
+            itm.value = val
+
+
 DataScope.read.require(
     ConnectionScope.connect,
     attr='connection', cls=Layer)
@@ -228,3 +282,5 @@ class LayerSerializer(Serializer):
     wmslayers = SP(**_defaults)
     imgformat = SP(**_defaults)
     srs = SR(**_defaults)
+
+    vendor_params = _vendor_params_attr(**_defaults)

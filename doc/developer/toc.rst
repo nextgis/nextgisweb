@@ -4,7 +4,7 @@
 
 .. _ngwdev_description:
 
-REST API description
+NextGIS Web REST API 
 ====================
 
 .. toctree::

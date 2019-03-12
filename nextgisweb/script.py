@@ -17,9 +17,9 @@ def main(argv=sys.argv):
     argparser = ArgumentParser()
 
     argparser.add_argument(
-        '--config', help="Конфигурационный файл nextgisweb")
+        '--config', help="nextgisweb configuration file")
     argparser.add_argument(
-        '--logging', help="Конфигруционный файл библиотеки logging")
+        '--logging', help="logging library configuration file")
 
     config = None
     logging = None
@@ -43,7 +43,7 @@ def main(argv=sys.argv):
     if logging:
         setup_logging(logging)
 
-    cfg = ConfigParser()
+    cfg = ConfigParser(os.environ)
 
     if config:
         cfg.readfp(codecs.open(config, 'r', 'utf-8'))
@@ -73,11 +73,11 @@ def config(argv=sys.argv):
 
     argparser.add_argument(
         '--no-comments', dest='no_comments', action='store_true',
-        help="Не включать описание настроек в комментарии")
+        help="Don't include settings description in comments")
 
     argparser.add_argument(
         '--preseed', metavar='file.ini', default=None,
-        help="Файл с предопределенными настройками")
+        help="Presets file")
 
     args = argparser.parse_args(argv[1:])
 

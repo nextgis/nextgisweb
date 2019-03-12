@@ -18,4 +18,7 @@ in JSON of response body.
    Connection: keep-alive
 
    {"message": "Attribute 'keyname' forbidden"}
+   
+In some cases the html text or empty body may returned. For example, if 
+internal server error occured, HTTP status code set to 500 and html text returns.
 

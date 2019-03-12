@@ -8,29 +8,29 @@ except CalledProcessError:
 
 requires = [
     'pyramid==1.10.1',
-    'SQLAlchemy==1.2.14',
+    'SQLAlchemy==1.2.16',
     'transaction==2.4.0',
     'pyramid_tm==2.2.1',
     'pyramid_debugtoolbar==4.5',
     'pyramid_mako==1.0.2',
-    'zope.sqlalchemy==1.0',
+    'zope.sqlalchemy==1.1',
     'zope.interface==4.6.0',
     'bunch==1.0.1',
     'flufl.enum==4.1.1',
-    'waitress==1.1.0',
+    'waitress==1.2.0',
     'pygdal' + (('>=' + gv + '.0,<=' + gv + '.9999') if gv else ''),
-    'psycopg2==2.7.6.1',
+    'psycopg2-binary==2.7.7',
     'geoalchemy2==0.5.0',
     'shapely==1.6.4.post2',
     'geojson==2.4.1',
     'unicodecsv==0.14.1',
-    'pillow==5.3.0',
-    'lxml==4.2.5',
+    'pillow==5.4.1',
+    'lxml==4.3.0',
     'passlib==1.7.1',
-    'owslib==0.17.0',
-    'requests==2.20.1',
+    'OWSLib>=0.17.1',
+    'requests==2.21.0',
     'babel==2.6.0',
-    'minio==4.0.6',
+    'minio==4.0.10',
 ]
 
 extras_require = {
@@ -61,7 +61,7 @@ entry_points = {
 
 setup(
     name='nextgisweb',
-    version='3.0',
+    version='3.1',
     description='nextgisweb',
     long_description="",
     classifiers=[

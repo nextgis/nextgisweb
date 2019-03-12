@@ -8,7 +8,7 @@ Get resource data
 
 Geodatata can be fetched for vector and raster layers. For vector layers 
 (PostGIS and Vector) geodata returns in :term:`GeoJSON` or :term:`CSV` formats. 
-For raster layers (Raster, :term:`WMS`) - tiles (:term`TMS`:) or image. 
+For raster layers (Raster, :term:`WMS`) - tiles (:term:`TMS`:) or image. 
 For QGIS styles - qml file.
 
 GeoJSON
@@ -321,7 +321,7 @@ To get current user details execute following request:
         "id": 4
     }   
    
-Identification by polygon
+Identify by polygon
 -------------------------
 
 To get features intersected by a polygon execute following request.

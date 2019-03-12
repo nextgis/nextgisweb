@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
+import os
 import codecs
 from ConfigParser import ConfigParser
 
@@ -59,7 +60,7 @@ def main(global_config, **settings):
     if 'logging' in settings:
         setup_logging(settings['logging'])
 
-    cfg = ConfigParser()
+    cfg = ConfigParser(os.environ)
     cfg.readfp(codecs.open(settings['config'], 'r', 'utf-8'))
 
     env = Env(cfg)

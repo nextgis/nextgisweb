@@ -43,10 +43,11 @@ define([
             // watch("value") doesn't work, which very inconvenient. But if we call it
             // - it's a mess.
 
-            if (this._value === value) { return; }
+            if (json.stringify(this._value) === json.stringify(value)) { return; }
 
             this._value = value;
             this.valueNode.value = json.stringify(value);
+            this.emit("update", {"value": value});
 
             when(this.getLabel(value)).then(lang.hitch(this, function (value) {
                 this.textbox.value = value;

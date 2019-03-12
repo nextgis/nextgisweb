@@ -217,12 +217,12 @@ h2:first-child,
 .text-withIcon__icon_size_s .text-withIcon__pic {
   background-size: 16px 16px;
 }
-.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-raster_layer,
-.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-resource_group {
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-raster_layer {
   width: 14px;
   height: 14px;
 }
-.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-vector_layer {
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-vector_layer,
+.text-withIcon__icon_size_s .text-withIcon__pic.svgIcon-resource_group {
   width: 16px;
   height: 16px;
 }
@@ -242,8 +242,8 @@ h2:first-child,
   height: 18px;
 }
 .text-withIcon__pic.svgIcon-resource_group {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 }
 .text-withIcon__pic.svgIcon-postgis_layer {
   left: -2px;
@@ -441,7 +441,10 @@ h2:first-child,
 .svgIcon-wmsserver_service,
 .svgIcon-basemap_layer,
 .svgIcon-lookup_table,
-.svgIcon-formbuilder_form {
+.svgIcon-formbuilder_form,
+.svgIcon-qgis_raster_style,
+.svgIcon-trackers_group,
+.svgIcon-tracker {
   background: none;
 }
 .svgIcon-mapserver_style {
@@ -469,8 +472,8 @@ h2:first-child,
   height: 24px;
 }
 .svgIcon-resource_group {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 }
 .svgIcon-vector_layer {
   width: 24px;

@@ -42,8 +42,8 @@ Execute following PUT request to change resource.
    }
 
 .. note::
-   Payload of this request may be equal to create new resource request payload, but some fields can be omitted. 
-   Request must be authorized.
+   Payload of this request may be equal to create new resource request payload,
+   but some fields can be omitted. Request must be authorized.
    
    
 Change metadata
@@ -265,10 +265,34 @@ To change features in batch mode use patch request.
    :<jsonarr int id: feture identifier
    :statuscode 200: no error
    
-Request accept array of JSON objects. If feature identifier is not present in vector layer - 
-feature will be created, else - changed.
+Request accepts array of JSON objects. If feature identifier is not present in PATCH 
+body a feature will be created, else - changed.
 
 .. Метод принимает на вход список объектов, если у объекта передан id - то обновляется этот объект, а у которых не передан - те создаёт
+
+**Example request**:
+
+.. sourcecode:: http
+
+   PATCH /api/resource/3/feature/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+   [
+     {"geom": "POINT(30.20 10.15)", "fields": {"externalObjectId": "i1"}},
+     {"id": 24, "geom": "POINT(30.20 10.15)", "fields": {"externalObjectId": "i2"}},
+     {"geom": "POINT(30.20 10.15)", "fields": {"externalObjectId": "i3"}}
+   ]
+
+**Example response body**:
+    
+.. sourcecode:: json 
+
+   [
+     {"id": 25}, 
+     {"id": 24}, 
+     {"id": 26}
+   ]
    
 Delete feature
 ---------------

@@ -124,6 +124,7 @@ def home_path(request):
 
 
 def notfound(request):
+    request.response.status = 404
     return dict(
         title=_("404: Page not found"),
     )

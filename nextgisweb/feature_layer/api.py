@@ -12,6 +12,7 @@ from StringIO import StringIO
 from shapely import wkt
 from pyramid.response import Response
 
+from ..geometry import geom_from_wkt
 from ..resource import DataScope, resource_factory
 from .. import geojson
 
@@ -133,12 +134,14 @@ def deserialize(feat, data):
                 ext.deserialize(feat, data['extensions'][cls.identity])
 
 
-def serialize(feat):
+def serialize(feat, keys=None):
     result = OrderedDict(id=feat.id)
     result['geom'] = wkt.dumps(feat.geom)
 
     result['fields'] = OrderedDict()
     for fld in feat.layer.fields:
+        if keys is not None and fld.keyname not in keys:
+            continue
 
         val = feat.fields.get(fld.keyname)
 
@@ -232,9 +235,42 @@ def cget(resource, request):
     request.resource_permission(PERM_READ)
 
     query = resource.feature_query()
+
+    # Paging
+    limit = request.GET.get('limit')
+    offset = request.GET.get('offset', 0)
+    if limit is not None:
+        query.limit(int(limit), int(offset))
+
+    # Filtering by attributes
+    filter_by = {}
+    keys = [fld.keyname for fld in resource.fields]
+    for key in keys:
+        fld_key = 'fld_%s' % key
+        if fld_key in request.GET:
+            filter_by.update({key: request.GET[fld_key]})
+
+    if filter_by:
+        query.filter_by(**filter_by)
+
+    # Filtering by extent
+    wkt = request.GET.get('intersects')
+    if wkt is not None:
+        geom = geom_from_wkt(wkt, srid=resource.srs.id)
+        query.intersects(geom)
+
+    # Selected fields
+    fields = request.GET.get('fields')
+    if fields is not None:
+        field_list = fields.split(',')
+        fields = [key for key in keys if key in field_list]
+
+    if fields:
+        query.fields(*fields)
+
     query.geom()
 
-    result = map(serialize, query())
+    result = [serialize(feature, fields) for feature in query()]
 
     return Response(
         json.dumps(result),

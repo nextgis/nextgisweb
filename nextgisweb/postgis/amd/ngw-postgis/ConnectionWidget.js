@@ -27,6 +27,13 @@ define([
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
         title: i18n.gettext("PostGIS connection"),
         templateString: hbsI18n(template, i18n),
-        prefix: "postgis_connection"
+        prefix: "postgis_connection",
+
+        serializeInMixin: function (data) {
+            var value = data.postgis_connection;
+            if (value.port === "") {
+                value.port = null;
+            }
+        }
     });
 });

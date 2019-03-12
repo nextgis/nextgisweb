@@ -3,7 +3,7 @@
 Authorization
 ==============
 
-Sent the following POST request to get authorization cookie.
+Send the following POST request to get authorization cookie.
 
 .. http:post:: /login
 
@@ -29,8 +29,7 @@ Requests with this cookie into the header will be considered authorized.
 
 Authorized data (HTTP AUTH) can be sent with each request.
 
-.. note::
-    
+.. note::   
     When the user agent wants to send the server authentication credentials it 
     may use the Authorization header.
 
