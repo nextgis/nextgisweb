@@ -435,7 +435,7 @@ To search resources execute the following request:
    :>jsonarr resource: Array of resource json representation.    
 
 .. warning:: 
-   Now supported anly ``owner_user__id`` key with child.
+   Now supported only ``owner_user__id`` key with child.
 
 .. note::
    Without any parameters request returns all resources available by current user.
