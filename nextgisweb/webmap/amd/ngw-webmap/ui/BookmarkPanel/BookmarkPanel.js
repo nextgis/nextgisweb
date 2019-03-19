@@ -5,6 +5,7 @@ define([
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
     'dojo/store/JsonRest',
+    'dojo/store/Memory',
     'ngw/route',
     "dojo/on", "dojo/dom-construct", "dojo/_base/lang", "dojo/_base/array", 'dojo/request/xhr'
 ], function (
@@ -14,6 +15,7 @@ define([
     DynamicPanel,
     BorderContainer,
     JsonRest,
+    Memory,
     route,
     on, domConstruct, lang, array, xhr
     ){
@@ -33,12 +35,14 @@ define([
             store.query().then(lang.hitch(this, this._buildBookmarks));
         },
         _buildBookmarks: function(features){
+            var store = new Memory({data: features});
+
             this.bookmarksList = domConstruct.create("ul", {
                 id: "bookmarks-list",
                 class: "list list--s list--multirow bookmarks"
             });
 
-            array.forEach(features, function (feature) {
+            array.forEach(store.query(null, {sort: [{ attribute: "label"}]}), function (feature) {
                 var bookmarksItem = domConstruct.create("li", {
                     class: "list__item list__item--link",
                     innerHTML: feature.label,
