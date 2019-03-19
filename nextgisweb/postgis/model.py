@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import geoalchemy2 as ga
-import operator
 import re
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.engine.url import (
@@ -591,7 +590,19 @@ class FeatureQueryBase(object):
         if self._filter:
             l = []
             for k, o, v in self._filter:
-                op = getattr(operator, o)
+                supported_operators = ('gt', 'lt', 'ge', 'le', 'eq', 'ne', 'like', 'ilike')
+                if o not in supported_operators:
+                    raise ValueError(
+                        "Invalid operator '%s'. Only %r are supported." % (
+                            o, supported_operators))
+
+                if o == 'like':
+                    o = 'like_op'
+
+                if o == 'ilike':
+                    o = 'ilike_op'
+
+                op = getattr(db.sql.operators, o)
                 if k == 'id':
                     l.append(op(idcol, v))
                 else:

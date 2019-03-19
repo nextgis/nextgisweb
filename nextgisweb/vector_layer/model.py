@@ -8,7 +8,6 @@ import zipfile
 import tempfile
 import shutil
 import ctypes
-import operator
 import osgeo
 
 from datetime import datetime, time, date
@@ -918,7 +917,19 @@ class FeatureQueryBase(object):
         if self._filter:
             l = []
             for k, o, v in self._filter:
-                op = getattr(operator, o)
+                supported_operators = ('gt', 'lt', 'ge', 'le', 'eq', 'ne', 'like', 'ilike')
+                if o not in supported_operators:
+                    raise ValueError(
+                        "Invalid operator '%s'. Only %r are supported." % (
+                            o, supported_operators))
+
+                if o == 'like':
+                    o = 'like_op'
+
+                if o == 'ilike':
+                    o = 'ilike_op'
+
+                op = getattr(db.sql.operators, o)
                 if k == 'id':
                     l.append(op(table.columns.id, v))
                 else:
