@@ -987,7 +987,7 @@ To get features using filters execute the following request:
 
 .. versionadded:: 3.1
 
-.. http:get:: /api/resource/(int:id)/feature/?limit=(int:limit)&offset=(int:offset)&intersects=(string:wkt_string)&fields=(string:field_name_1,string:field_name_2,...)&fld_{field_name_1}=(string:value)&fld_{field_name_2}=(string:value)
+.. http:get:: /api/resource/(int:id)/feature/?limit=(int:limit)&offset=(int:offset)&intersects=(string:wkt_string)&fields=(string:field_name_1,string:field_name_2,...)&fld_{field_name_1}=(string:value)&fld_{field_name_2}=(string:value)&fld_{field_name_3}__ilike=(string:value)&fld_{field_name_4}__like=(string:value)
 
    Get features with parameters
    
@@ -997,7 +997,9 @@ To get features using filters execute the following request:
    :param offset: skip some features before create features array
    :param intersects: geometry as WKT string. Features intersect with this geometry will added to array
    :param fields: comma separated list of fields in return feature
-   :param fld_{field_name_1}...fld_{field_name_N}: field name and value to filter return features. Parameter name froms as ``fld_`` + real field name (keyname). All pairs of field name = value form ``AND`` SQL query.  
+   :param fld_{field_name_1}...fld_{field_name_N}: field name and value to filter return features. Parameter name forms as ``fld_`` + real field name (keyname). All pairs of field name = value form final ``AND`` SQL query.
+   :param fld_{field_name_1}__ilike...fld_{field_name_N}__ilike: field name and value to filter return features using ``ILIKE`` statement. Parameter name forms as ``fld_`` + real field name (keyname) + ``__ilike``. All pairs of field name ILILE value form final ``AND`` SQL query. To filter part of field use percent sign (may be at the start of a string, at the end or both).  
+   :param fld_{field_name_1}__like...fld_{field_name_N}__like: field name and value to filter return features using ``LIKE`` statement. Parameter name forms as ``fld_`` + real field name (keyname) + ``__ilike``. All pairs of field name ILILE value form final ``AND`` SQL query. To filter part of field use percent sign (may be at the start of a string, at the end or both).
    :>jsonarray features: features array
    :statuscode 200: no error   
 
