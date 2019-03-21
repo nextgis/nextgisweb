@@ -13,6 +13,9 @@ from pyramid.events import BeforeRender
 
 import pyramid_tm
 import pyramid_mako
+import sentry_sdk
+
+from sentry_sdk.integrations.pyramid import PyramidIntegration
 
 from ..package import pkginfo
 from ..component import Component
@@ -101,6 +104,13 @@ class PyramidComponent(Component):
         plockey = 'pyramid.default_locale_name'
         if plockey not in settings and self.env.core.locale_default is not None:
             settings[plockey] = self.env.core.locale_default
+
+        sentry_dsn = 'sentry_dsn'
+        if sentry_dsn in settings:
+            sentry_sdk.init(
+                settings[sentry_dsn],
+                integrations=[PyramidIntegration()],
+            )
 
         config = ExtendedConfigurator(settings=settings)
 
@@ -241,4 +251,5 @@ class PyramidComponent(Component):
         dict(key='help_page', desc=u"HTML help"),
         dict(key='logo', desc=u"System logo"),
         dict(key='favicon', desc=u"Favicon"),
+        dict(key='sentry_dsn', desc=u"Sentry DSN"),
     )
