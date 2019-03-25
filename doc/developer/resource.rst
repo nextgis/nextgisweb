@@ -14,7 +14,7 @@ Resource classes
 --------------------
 
 There are following resource classes now:
-   
+
 * resource_group
 * postgis_layer
 * wmsserver_service
@@ -27,7 +27,7 @@ There are following resource classes now:
 * mapserver_style
 * qgis_vector_style
 * raster_style
-* file_bucket   
+* file_bucket
 * lookup_table
 * wmsclient_layer
 * wmsclient_connection
@@ -54,7 +54,7 @@ To get NextGIS Web API version execute the following request:
    GET /api/component/pyramid/pkg_version HTTP/1.1
    Host: ngw_url
    Accept: */*
-   
+
 **Example JSON response**:
 
 .. sourcecode:: json
@@ -70,7 +70,7 @@ Routes
 
 .. versionadded:: 3.0
 
-Routes are the REST API URLs which are supported by current instance of NextGIS 
+Routes are the REST API URLs which are supported by current instance of NextGIS
 Web. To get possible routes execute the following request:
 
 .. http:get:: /api/component/pyramid/route
@@ -82,7 +82,7 @@ Web. To get possible routes execute the following request:
    GET /api/component/pyramid/route HTTP/1.1
    Host: ngw_url
    Accept: */*
-   
+
 **Example JSON response**:
 
 .. sourcecode:: json
@@ -120,15 +120,15 @@ Schema
 ^^^^^^^
 
 Schema request returns list of supported NextGIS Web resources, each resource type
-properties and metadata.  
+properties and metadata.
 
 .. http:get:: /resource/schema
 
    Schema request.
- 
-.. note::    
+
+.. note::
    REST API requests require accept field in header with following text: `Accept: */*`
-    
+
 **Example request**:
 
 .. sourcecode:: http
@@ -136,7 +136,7 @@ properties and metadata.
    GET /resource/schema HTTP/1.1
    Host: ngw_url
    Accept: */*
-   
+
 **Example JSON response**:
 
 .. sourcecode:: json
@@ -389,9 +389,9 @@ properties and metadata.
             }
         }
     }
-         
-Basic requests 
-^^^^^^^^^^^^^^^    
+
+Basic requests
+^^^^^^^^^^^^^^^
 
 ..  http:get:: /api/resource/(int:id)
 
@@ -409,15 +409,15 @@ Basic requests
 
     Get resource description in JSON.
 
-    :param integer parent: Parent resource identificator.
+    :param integer parent: Parent resource identifier.
 
 ..  http:post:: /api/resource/
 
     Create resource by JSON data payload.
 
-    :param integer parent: Parent resource identificator, may be in JSON payload.
+    :param integer parent: Parent resource identifier, may be in JSON payload.
     :param string cls: Resource class (type). For a list of supported resource classes see :ref:`ngwdev_resource_classes`.
-    
+
 Search resources
 ^^^^^^^^^^^^^^^^^
 
@@ -426,21 +426,21 @@ To search resources execute the following request:
 .. http:get:: /api/resource/search/?(string:key1)=(string:value1)&(string:key2)=(string:value2)...
 
    Search resources.
-   
+
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
-   :param key1, key2...: resource properties (for example, cls, creation_date, keyname). If resource property has children they divided by double underscore (``__``). The ``serialization=full`` parameter make return list of resources with full description, otherwise only ``resource`` key will returned.   
+   :param key1, key2...: resource properties (for example, cls, creation_date, keyname). If resource property has children they divided by double underscore (``__``). The ``serialization=full`` parameter make return list of resources with full description, otherwise only ``resource`` key will returned.
    :param value1,value2...: key value to search. All ``key=value`` pairs form following search string ``key1=value1 AND key2=value2 AND ...``.
    :statuscode 200: no error
-   :>jsonarr resource: Array of resource json representation.    
+   :>jsonarr resource: Array of resource json representation.
 
-.. warning:: 
+.. warning::
    Now supported only ``owner_user__id`` key with child.
 
 .. note::
    Without any parameters request returns all resources available by current user.
 
-    
+
 **Example request**:
 
 .. sourcecode:: http
@@ -450,7 +450,7 @@ To search resources execute the following request:
    Accept: */*
 
 **Example response**:
-    
+
 .. sourcecode:: json
 
     [
@@ -481,14 +481,14 @@ To search resources execute the following request:
             "resmeta": {}
         }
     ]
-    
-Found only one resource because keyname is unique in whole NextGIS Web instance.    
+
+Found only one resource because keyname is unique in whole NextGIS Web instance.
 
 
 Child resource
 ^^^^^^^^^^^^^^^
 
-To get child resources of parent resource with identificator ``id`` execute the
+To get child resources of parent resource with identifier ``id`` execute the
 following request:
 
 .. http:get:: /api/resource/?parent=(int:id)
@@ -497,7 +497,7 @@ following request:
 
 .. sourcecode:: json
 
-  
+
 	{
 		"resource": {
 			"id": 730,
@@ -771,17 +771,17 @@ Where:
 
 * **resource** - resource description
 
-   * id - resource identificator
+   * id - resource identifier
    * cls - resource type (see. :ref:`ngwdev_resource_classes`)
    * parent - parent resource
-   * owner_user - resource owner identificator
+   * owner_user - resource owner identifier
    * permissions - resource permissions array
-   * keyname - unique identificator (allowed only ASCII characters). Must be unique in whole NextGIS Web instance
+   * keyname - unique identifier (allowed only ASCII characters). Must be unique in whole NextGIS Web instance
    * display_name - name showing in web user interface
    * description - resource description showing in web user interface
    * children - boolean value. True if resource has children resources
    * interfaces - API interfaces supported by resource
-   * scope - which scope the resource is belongs   
+   * scope - which scope the resource is belongs
 
 * **resmeta** - resource metadata
 
@@ -836,22 +836,22 @@ The map resource properties has the following json description:
                     "layer_transparency": null
                 },
                 {
-                    "group_expanded": false, 
-                    "display_name": "Points of interest", 
+                    "group_expanded": false,
+                    "display_name": "Points of interest",
                     "children": [
-                     ], 
+                     ],
                     "item_type": "group"
-                } 
+                }
             ]
         }
     },
     "basemap_webmap": {
         "basemaps": [
            {
-                "opacity": null, 
-                "enabled": true, 
-                "position": 0, 
-                "display_name": "OpenStreetMap Standard", 
+                "opacity": null,
+                "enabled": true,
+                "position": 0,
+                "display_name": "OpenStreetMap Standard",
                 "resource_id": 665
             },
         ]
@@ -860,27 +860,27 @@ The map resource properties has the following json description:
         "items": {}
     }
    }
- 
+
 Where:
 
 * **resource** - resource description (see upper for details)
 * **webmap** - web map description
 
-   * extent_left, extent_right, extent_bottom, extent_top - 
+   * extent_left, extent_right, extent_bottom, extent_top -
    * draw_order_enabled - use specific draw order or same as layers order
-   * bookmark_resource - vector layer resource identificator
+   * bookmark_resource - vector layer resource identifier
    * root_item - layers description group
-      
+
       * item_type - always root
       * children - map layers and groups
-         
+
          * layer_adapter - ``image`` or ``tile`` (also see :ref:`ngw_map_create`)
          * layer_enabled - is layer checked be default
          * draw_order_position - if drawing order is enabled this is position in order. May be ``null``.
          * layer_max_scale_denom, layer_min_scale_denom - a scale range in format ``1 : 10 000``
          * item_type - may be ``group`` or ``layer``
          * display_name - layer or group name
-         * layer_style_id - vector or raster layer style resource identificator
+         * layer_style_id - vector or raster layer style resource identifier
          * layer_transparency - transparency
          * group_expanded - is group checked by default or not
 
@@ -890,7 +890,7 @@ Where:
    * enabled - is basemap should be present in web map basemaps combobox
    * position - position in web map basemaps combobox
    * display_name - name showing in web map basemaps combobox
-   * resource_id - basemap resource identificator
+   * resource_id - basemap resource identifier
 
 * **resmeta** - resource metadata
 
@@ -902,13 +902,13 @@ To get feature count in vector layer execute the following request:
 .. http:get:: /api/resource/(int:id)/feature_count
 
    Get feature count
-   
+
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :>jsonobj long total_count: Feature count
-   :statuscode 200: no error   
-   
-**Example request**:   
+   :statuscode 200: no error
+
+**Example request**:
 
 .. sourcecode:: http
 
@@ -917,27 +917,27 @@ To get feature count in vector layer execute the following request:
    Accept: */*
 
 **Example response**:
-    
+
 .. sourcecode:: json
 
    {
      "total_count": 0
    }
-        
+
 Get layer extent
 ^^^^^^^^^^^^^^^^^
 
-To get layer extent execute following request. You can request extent for vector and raster layers. 
+To get layer extent execute following request. You can request extent for vector and raster layers.
 Returned coordinates are in WGS84 (EPSG:4326) spatial reference.
 
 .. http:get:: /api/resource/(int:id)/extent
 
    Get layer extent
-   
+
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :>json jsonobj extent: extent json object
-   :>jsonobj double minLat: Minimum latitude  
+   :>jsonobj double minLat: Minimum latitude
    :>jsonobj double minLon: Minimum longtitude
    :>jsonobj double maxLat: Maximun latitude
    :>jsonobj double maxLon: Maximum longtitude
@@ -952,37 +952,37 @@ Returned coordinates are in WGS84 (EPSG:4326) spatial reference.
    Accept: */*
 
 **Example response**:
-    
+
 .. sourcecode:: json
 
     {
-      "extent": 
+      "extent":
       {
-        "minLat": 54.760400119987466, 
-        "maxLon": 35.08562149737197, 
-        "minLon": 35.06675807847286, 
+        "minLat": 54.760400119987466,
+        "maxLon": 35.08562149737197,
+        "minLon": 35.06675807847286,
         "maxLat": 54.768358305249386
       }
-    }   
- 
+    }
+
 Features and single feature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To get a single feature of vector layer execute the following request:
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)
- 
+
 To get all vector layer features execute the following request:
 
 .. http:get:: /api/resource/(int:id)/feature/
 
    Get features
-   
+
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :>jsonarr features: features array
-   :statuscode 200: no error 
-   
+   :statuscode 200: no error
+
 To get features using filters execute the following request:
 
 .. versionadded:: 3.1
@@ -990,7 +990,7 @@ To get features using filters execute the following request:
 .. http:get:: /api/resource/(int:id)/feature/?limit=(int:limit)&offset=(int:offset)&intersects=(string:wkt_string)&fields=(string:field_name_1,string:field_name_2,...)&fld_{field_name_1}=(string:value)&fld_{field_name_2}=(string:value)&fld_{field_name_3}__ilike=(string:value)&fld_{field_name_4}__like=(string:value)
 
    Get features with parameters
-   
+
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :param limit: limit feature count adding to return array
@@ -998,10 +998,23 @@ To get features using filters execute the following request:
    :param intersects: geometry as WKT string. Features intersect with this geometry will added to array
    :param fields: comma separated list of fields in return feature
    :param fld_{field_name_1}...fld_{field_name_N}: field name and value to filter return features. Parameter name forms as ``fld_`` + real field name (keyname). All pairs of field name = value form final ``AND`` SQL query.
-   :param fld_{field_name_1}__ilike...fld_{field_name_N}__ilike: field name and value to filter return features using ``ILIKE`` statement. Parameter name forms as ``fld_`` + real field name (keyname) + ``__ilike``. All pairs of field name ILILE value form final ``AND`` SQL query. To filter part of field use percent sign (may be at the start of a string, at the end or both).  
-   :param fld_{field_name_1}__like...fld_{field_name_N}__like: field name and value to filter return features using ``LIKE`` statement. Parameter name forms as ``fld_`` + real field name (keyname) + ``__ilike``. All pairs of field name ILILE value form final ``AND`` SQL query. To filter part of field use percent sign (may be at the start of a string, at the end or both).
+   :param fld_{field_name_1}__{operation}...fld_{field_name_N}__{operation}: field name and value to filter return features using operation statement. Supported operations are: ``gt``, ``lt``, ``ge``, ``le``, ``eq``, ``ne``, ``like``, ``ilike``. All pairs of field name - operation - value form final ``AND`` SQL query.
    :>jsonarray features: features array
-   :statuscode 200: no error   
+   :statuscode 200: no error
+
+Filter operations:
+
+* gt - greater (>)
+* lt - lower (<)
+* ge - greater or equal (>=)
+* le - lower or equal (<=)
+* eq - equal (=)
+* ne - not equal (!=)
+* like - LIKE SQL statement (for strings compare)
+* ilike - ILIKE SQL statement (for strings compare)
+
+To filter part of field use percent sign. May be at the start of a string, at the
+end or both. Works only for ``like`` and ``ilike`` operations.
 
 **Example request**:
 
@@ -1010,25 +1023,25 @@ To get features using filters execute the following request:
    GET api/resource/1878/feature/8 HTTP/1.1
    Host: ngw_url
    Accept: */*
-   
+
 **Example JSON response**:
 
 .. sourcecode:: json
 
   {
     "id": 8,
-    "geom": "MULTIPOLYGON (((4071007.5456240694038570 7385427.4912760490551591, 
-                             4071010.5846461649052799 7385440.8649944914504886, 
-                             4071018.6441773008555174 7385439.0351102603599429, 
-                             4071019.4902054299600422 7385442.7727465946227312, 
+    "geom": "MULTIPOLYGON (((4071007.5456240694038570 7385427.4912760490551591,
+                             4071010.5846461649052799 7385440.8649944914504886,
+                             4071018.6441773008555174 7385439.0351102603599429,
+                             4071019.4902054299600422 7385442.7727465946227312,
                              4071057.3388322992250323 7385434.1683989763259888,
-                             4071056.4928041673265398 7385430.4307667789980769, 
-                             4071065.5208148718811572 7385428.1726148622110486, 
-                             4071062.6153761623427272 7385414.7794514624401927, 
-                             4071058.2961799190379679 7385415.5581231201067567, 
-                             4071055.1347063803113997 7385401.6588457319885492, 
-                             4071007.8795825401321054 7385412.3850365970283747, 
-                             4071011.1301116724498570 7385426.6931363716721535, 
+                             4071056.4928041673265398 7385430.4307667789980769,
+                             4071065.5208148718811572 7385428.1726148622110486,
+                             4071062.6153761623427272 7385414.7794514624401927,
+                             4071058.2961799190379679 7385415.5581231201067567,
+                             4071055.1347063803113997 7385401.6588457319885492,
+                             4071007.8795825401321054 7385412.3850365970283747,
+                             4071011.1301116724498570 7385426.6931363716721535,
                              4071007.5456240694038570 7385427.4912760490551591)))",
     "fields": {
         "OSM_ID": 128383475,
@@ -1069,15 +1082,15 @@ To get features using filters execute the following request:
                 {
                     "id": 1,
                     "name": "fyADeqvXtXo.jpg",
-                    "size": 107458, 
+                    "size": 107458,
                     "mime_type": "image/jpeg",
-                    "description": null, 
+                    "description": null,
                     "is_image": true
                 },
                 {
-                    "id": 2, 
+                    "id": 2,
                     "name": "0_12cb49_b02b5fb0_orig.jpg",
-                    "size": 65121, 
+                    "size": 65121,
                     "mime_type": "image/jpeg",
                     "description": "Текст подписи к фото",
                     "is_image": true
@@ -1094,28 +1107,28 @@ To get features using filters execute the following request:
    GET api/resource/442/feature/?fld_ondatr_set=3.0 HTTP/1.1
    Host: ngw_url
    Accept: */*
-   
+
 .. sourcecode:: http
 
    GET api/resource/442/feature/?intersects=POLYGON((4692730.0186502402648329%206500222.2378559196367859,4692731.0186502402648330%206500222.2378559196367859,4692730.0186502402648331%206500222.2378559196367861,4692730.0186502402648329%206500222.2378559196367861,4692730.0186502402648329%206500222.2378559196367859)) HTTP/1.1
    Host: ngw_url
-   Accept: */*   
+   Accept: */*
 
 .. sourcecode:: http
 
    GET api/resource/442/feature/?fld_dataunreal=2018-04-15&fields=Desman_ID,Year_1 HTTP/1.1
    Host: ngw_url
-   Accept: */*  
+   Accept: */*
 
 Attachment
 ^^^^^^^^^^^
 
-Attachment URL forms from feature URL adding ``attachment/`` and attachment 
-identificator. For example:
+Attachment URL forms from feature URL adding ``attachment/`` and attachment
+identifier. For example:
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/download
 
-Attachment support loading any file types. For image files a preview generates 
+Attachment support loading any file types. For image files a preview generates
 during upload.
 
 .. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/attachment/(int:attachment_id)/image?size=200x150
@@ -1125,7 +1138,7 @@ Map web interface
 
 .. versionadded:: 3.0
 
-To get map web interface (not a map json representation) execute one of the 
+To get map web interface (not a map json representation) execute one of the
 following request:
 
 .. http:get:: resource/{0}/display
@@ -1140,7 +1153,7 @@ following request:
    Host: ngw_url
    Accept: */*
 
-To get web interface without layer control and toolbars execute the following 
+To get web interface without layer control and toolbars execute the following
 request:
 
 .. http:get:: resource/{0}/display/tiny

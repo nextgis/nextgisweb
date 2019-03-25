@@ -13,7 +13,7 @@ Execute folowing request to upload a file:
 ..  http:post:: /api/component/file_upload/upload
 
     File upload request.
-    
+
     :form file: file data
     :form name: file name
     :statuscode 200: no error
@@ -28,21 +28,21 @@ Next multipart POST request follow. Request includes following form parameters:
    POST /api/component/file_upload/upload HTTP/1.1
    Host: ngw_url
    Accept: */*
-   
+
    file=\tmp\test.file&name=testfile
-   
+
 Response in JSON format with file details returned on success:
 
 **Example response body**:
-    
-.. sourcecode:: json 
+
+.. sourcecode:: json
 
     {
       "upload_meta": [
         {
-          "id": "0eddf759-86d3-4fe0-b0f1-869fe783d2ed", 
-          "mime_type": "application/octet-stream", 
-          "name": "ngw1_1.zip", 
+          "id": "0eddf759-86d3-4fe0-b0f1-869fe783d2ed",
+          "mime_type": "application/octet-stream",
+          "name": "ngw1_1.zip",
           "size": 2299
         }
       ]
@@ -64,7 +64,7 @@ Also you can create attachment using PUT method, in this case you do not need to
     feature_dst = '/resource/' + '827' + '/feature/'   #layer id
     new_id = '/9'          #feature id
 
-    #Get file from internet, optionaly with auth
+    #Get file from internet, optionally with auth
     with closing(requests.get('http://nextgis.ru/wp-content/themes/nextgis_clean/img/ngw_icon.png', auth=('', ''), stream=True)) as f:
 
         #upload attachment to nextgisweb
@@ -81,7 +81,7 @@ Also you can create attachment using PUT method, in this case you do not need to
 **Example of forming multipart POST body in Qt**:
 
 .. sourcecode:: c++
-    
+
     QHttpMultiPart *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
     QHttpPart part;
@@ -90,9 +90,9 @@ Also you can create attachment using PUT method, in this case you do not need to
     part.setHeader(QNetworkRequest::ContentTypeHeader,
                    QVariant("application/octet-stream"));
     part.setBody(file_contents); // pass QByteArray reference
-    
+
     multipart->append(part);
-    
+
 
 Multiple file upload
 --------------------
@@ -105,46 +105,45 @@ For multiple file upload execute the following request:
 
     :form name: must be "files[]"
 
-In ``name`` field must be file name and path (multipart POST request). 
+In ``name`` field must be file name and path (multipart POST request).
 
 Response in JSON format with files details returned on success:
-    
+
 **Example response body**:
-    
-.. sourcecode:: json 
+
+.. sourcecode:: json
 
     {
       "upload_meta": [
         {
-          "id": "b5c02d94-e1d7-40cf-b9c7-79bc9cca429d", 
-          "mime_type": "application/octet-stream", 
-          "name": "grunt_area_2_multipolygon.cpg", 
+          "id": "b5c02d94-e1d7-40cf-b9c7-79bc9cca429d",
+          "mime_type": "application/octet-stream",
+          "name": "grunt_area_2_multipolygon.cpg",
           "size": 5
-        }, 
+        },
         {
-          "id": "d8457f14-39cb-4f9d-bb00-452a381fa62e", 
-          "mime_type": "application/x-dbf", 
-          "name": "grunt_area_2_multipolygon.dbf", 
+          "id": "d8457f14-39cb-4f9d-bb00-452a381fa62e",
+          "mime_type": "application/x-dbf",
+          "name": "grunt_area_2_multipolygon.dbf",
           "size": 36607
-        }, 
+        },
         {
-          "id": "1b0754f8-079d-4675-9367-36531da247e1", 
-          "mime_type": "application/octet-stream", 
-          "name": "grunt_area_2_multipolygon.prj", 
+          "id": "1b0754f8-079d-4675-9367-36531da247e1",
+          "mime_type": "application/octet-stream",
+          "name": "grunt_area_2_multipolygon.prj",
           "size": 138
-        }, 
+        },
         {
-          "id": "a34b5ab3-f3a5-4a60-835d-318e601d34df", 
-          "mime_type": "application/x-esri-shape", 
-          "name": "grunt_area_2_multipolygon.shp", 
+          "id": "a34b5ab3-f3a5-4a60-835d-318e601d34df",
+          "mime_type": "application/x-esri-shape",
+          "name": "grunt_area_2_multipolygon.shp",
           "size": 65132
-        }, 
+        },
         {
-          "id": "fb439bfa-1a63-4384-957d-ae57bb5eb67b", 
-          "mime_type": "application/x-esri-shape", 
-          "name": "grunt_area_2_multipolygon.shx", 
+          "id": "fb439bfa-1a63-4384-957d-ae57bb5eb67b",
+          "mime_type": "application/x-esri-shape",
+          "name": "grunt_area_2_multipolygon.shx",
           "size": 1324
         }
       ]
     }
-

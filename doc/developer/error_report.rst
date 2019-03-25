@@ -7,7 +7,7 @@ If request failed, error code will be in HTTP header and error description text
 in JSON of response body.
 
 **Example response**:
-    
+
 .. sourcecode:: http
 
    HTTP/1.1 403 Forbidden
@@ -18,7 +18,6 @@ in JSON of response body.
    Connection: keep-alive
 
    {"message": "Attribute 'keyname' forbidden"}
-   
-In some cases the html text or empty body may returned. For example, if 
-internal server error occured, HTTP status code set to 500 and html text returns.
 
+In some cases the html text or empty body may returned. For example, if
+internal server error occurred, HTTP status code set to 500 and html text returns.
