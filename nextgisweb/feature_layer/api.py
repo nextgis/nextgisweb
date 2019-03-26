@@ -243,15 +243,19 @@ def cget(resource, request):
         query.limit(int(limit), int(offset))
 
     # Filtering by attributes
-    filter_by = {}
+    filter_ = []
     keys = [fld.keyname for fld in resource.fields]
-    for key in keys:
-        fld_key = 'fld_%s' % key
-        if fld_key in request.GET:
-            filter_by.update({key: request.GET[fld_key]})
+    for key in filter(lambda k: k.startswith('fld_'), request.GET.keys()):
+        try:
+            fld_key, operator = key.rsplit('__', 1)
+        except ValueError:
+            fld_key, operator = (key, 'eq')
 
-    if filter_by:
-        query.filter_by(**filter_by)
+        if fld_key in ['fld_%s' % k for k in keys]:
+            filter_.append((fld_key.lstrip('fld_'), operator, request.GET[key]))
+
+    if filter_:
+        query.filter(*filter_)
 
     # Filtering by extent
     wkt = request.GET.get('intersects')

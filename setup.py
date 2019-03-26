@@ -31,6 +31,7 @@ requires = [
     'requests==2.21.0',
     'babel==2.6.0',
     'minio==4.0.10',
+    'sentry-sdk==0.7.7',
 ]
 
 extras_require = {
