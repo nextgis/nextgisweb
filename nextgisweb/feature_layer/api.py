@@ -325,9 +325,19 @@ def cpatch(resource, request):
 
 def cdelete(resource, request):
     request.resource_permission(PERM_WRITE)
-    resource.feature_delete_all()
 
-    return Response(json.dumps(None), content_type=b'application/json')
+    if request.body and request.json_body:
+        result = []
+        for fdata in request.json_body:
+            if 'id' in fdata:
+                fid = fdata['id']
+                resource.feature_delete(fid)
+                result.append(fid)
+    else:
+        resource.feature_delete_all()
+        result = True
+
+    return Response(json.dumps(result), content_type=b'application/json')
 
 
 def count(resource, request):
