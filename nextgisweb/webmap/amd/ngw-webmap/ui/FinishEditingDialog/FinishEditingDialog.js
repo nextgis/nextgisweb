@@ -15,14 +15,14 @@ define([
             declare.safeMixin(this, options);
 
             this.title = i18n.gettext('Stopping editing');
-            this.style = 'width: 300px';
+            this.style = 'width: 400px';
         },
 
         postCreate: function () {
             this.inherited(arguments);
 
             this.contentPane = new ContentPane({
-                content: "<p>Do you want to save changes?</p>"
+                content: "<p>" + i18n.gettext("Do you want to save changes?") + "</p>"
             }).placeAt(this.containerNode);
 
             this.actionBar = domConstruct.create("div", {

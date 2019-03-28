@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-02-08 14:46+0100\n"
+"POT-Creation-Date: 2019-03-28 12:05+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -101,6 +101,7 @@ msgid "Use on the map"
 msgstr "Учитывать на карте"
 
 #: amd/ngw-webmap/ItemWidget.js:152
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
 msgid "Save"
 msgstr "Сохранить"
 
@@ -116,15 +117,7 @@ msgstr "Перейти"
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: amd/ngw-webmap/plugin/LayerEditor.js:26
-msgid "Confirmation"
-msgstr "Подтверждение"
-
-#: amd/ngw-webmap/plugin/LayerEditor.js:27
-msgid "Finish editing?"
-msgstr "Закончить редактирование?"
-
-#: amd/ngw-webmap/plugin/LayerEditor.js:41
+#: amd/ngw-webmap/plugin/LayerEditor.js:70
 msgid "Editing"
 msgstr "Редактирование"
 
@@ -246,6 +239,35 @@ msgstr "Вертикальная шторка"
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
+#: amd/ngw-webmap/tool/editing/CreateFeature.js:16
+msgid "Create features"
+msgstr "Создать объекты"
+
+#: amd/ngw-webmap/tool/editing/DeleteFeature.js:16
+msgid "Delete features"
+msgstr "Удалить объекты"
+
+#: amd/ngw-webmap/tool/editing/ModifyFeature.js:16
+msgid "Modify features"
+msgstr "Изменить объекты"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:17
+msgid "Stopping editing"
+msgstr "Закончить редактирование?"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:25
+msgid "Do you want to save changes?"
+msgstr "Вы хотите сохранить изменения?"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:38
+msgid "Don't save"
+msgstr "Не сохранять"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:63
+msgid "Cancel"
+msgstr "Отменить"
+
 #: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
 msgid "Layer"
 msgstr "Слой"
@@ -313,10 +335,6 @@ msgstr "Ширина, мм"
 #: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:49
 msgid "Margin, mm"
 msgstr "Отступ, мм"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:63
-msgid "Cancel"
-msgstr "Отменить"
 
 #: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:70
 msgid "Print"
@@ -408,4 +426,10 @@ msgstr "Открыть карту целиком"
 
 #~ msgid "OK"
 #~ msgstr "OK"
+
+#~ msgid "Confirmation"
+#~ msgstr "Подтверждение"
+
+#~ msgid "Finish editing?"
+#~ msgstr "Закончить редактирование?"
 
