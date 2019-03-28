@@ -22,7 +22,9 @@ define([
             this.mapStates = MapStatesObserver.getInstance();
         },
 
-        addTool: function (tool, state) {
+        addTool: function (tool, state, place) {
+            place = place || this;
+
             var tglButtonTool = new ToggleControl({
                 label: tool.label,
                 showLabel: false,
@@ -32,7 +34,7 @@ define([
                 intermediateChanges:false,
                 customIcon: tool.customIcon,
                 class: "ol-control ol-unselectable"
-            }).placeAt(this);
+            }).placeAt(place);
 
             tool.toolbarBtn = tglButtonTool;
             this._bindChangeEvent(tglButtonTool);
