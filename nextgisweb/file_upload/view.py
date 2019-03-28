@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import pickle
 import json
 import re
+import magic
+
 from shutil import copyfileobj
 from subprocess import check_output
 
@@ -98,8 +100,7 @@ def upload_put(request):
     # but we don't always know filename.
 
     if not mime:
-        mime, _ = check_output(['file', '--mime', '--brief', datafn]) \
-            .split('; ')
+        mime = magic.from_file(datafn, mime=True)
 
     meta['mime_type'] = mime
 

@@ -16,4 +16,5 @@ class Package(PackageBase):
             'libjpeg-turbo8-dev',
             'nodejs',
             'postgresql-client',
+            'libmagic-dev',
         )

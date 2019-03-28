@@ -28,6 +28,7 @@ pyramid-debugtoolbar==4.5
 pyramid-mako==1.0.2
 pyramid-tm==2.2.1
 python-dateutil==2.7.5
+python-magic==0.4.15
 pytz==2018.9
 repoze.lru==0.7
 requests==2.21.0
