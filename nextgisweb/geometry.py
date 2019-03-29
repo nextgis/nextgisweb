@@ -14,9 +14,7 @@ for t in dir(shapely.geometry):
             _base_class = original
 
             def __init__(self, *args, **kwargs):
-                if 'srid' in kwargs:
-                    srid = kwargs['srid']
-                    del kwargs['srid']
+                self._srid = kwargs.pop('srid')
 
                 self._base_class.__init__(self, *args, **kwargs)
 
