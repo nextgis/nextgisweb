@@ -14,7 +14,7 @@ define([
             declare.safeMixin(this, options);
 
             this.label = i18n.gettext("Create features");
-            this.customIcon = "<span class='ol-control__icon material-icons'>add</span>";
+            this.customIcon = "<span class='ol-control__icon material-icons'>add_box</span>";
         },
 
         activate: function () {
