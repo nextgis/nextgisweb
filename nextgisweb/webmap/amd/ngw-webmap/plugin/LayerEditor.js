@@ -318,12 +318,12 @@ define([
         },
 
         _buildEditingControls: function () {
-            this.display.mapToolbar.items.addTool(new CreateFeature({
-                layerEditor: this
-            }), CREATING_STATE_KEY, this.elEditToolbar);
             this.display.mapToolbar.items.addTool(new ModifyFeature({
                 layerEditor: this
             }), MODIFYING_STATE_KEY, this.elEditToolbar);
+            this.display.mapToolbar.items.addTool(new CreateFeature({
+                layerEditor: this
+            }), CREATING_STATE_KEY, this.elEditToolbar);
             this.display.mapToolbar.items.addTool(new DeleteFeature({
                 layerEditor: this
             }), DELETING_STATE_KEY, this.elEditToolbar);
