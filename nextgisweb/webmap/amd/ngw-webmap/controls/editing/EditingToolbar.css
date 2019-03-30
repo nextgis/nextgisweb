@@ -1,0 +1,67 @@
+.claro .control-pane.control-pane--top.control-pane--left .ol-hidden {
+  display: none;
+}
+
+.claro .edit-toolbar .dijitButton,
+.claro .edit-toolbar .dijitToggleButton,
+.claro .edit-toolbar .dijitDropDownButton,
+.claro .edit-toolbar .dijitComboButton {
+  margin: 0;
+}
+
+.claro .control-pane--left .edit-toolbar .ol-control {
+  display: block;
+  vertical-align: middle;
+  margin-top: 10px;
+}
+
+.claro .control-pane--left .edit-toolbar {
+  margin-top: 8px;
+  box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+}
+
+.claro .control-pane--left .edit-toolbar .ol-control:first-child {
+  margin-top: 0px;
+}
+
+.claro .control-pane--left .edit-toolbar .ol-control {
+  margin-top: 1px;
+  border-radius: 0;
+}
+
+.claro .control-pane--left .edit-toolbar .dijitButtonNode {
+  border-radius: 0;
+}
+
+.claro .edit-toolbar .ol-control .dijitButtonNode {
+  padding: 0;
+  border: 0;
+  width: 30px;
+  height: 30px;
+  line-height: 29px;
+  background: #fff;
+  color: #076dbf;
+  fill: #076dbf;
+  transition: none;
+  text-shadow: none;
+}
+
+.claro .edit-toolbar .ol-control .dijitButtonNode:hover {
+  background: #f9fafb;
+  color: #00b77e;
+  fill: #00b77e;
+}
+
+.claro .edit-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode {
+  background: #00b77e;
+  color: #fff;
+  fill: #fff;
+}
+
+.claro .edit-toolbar .ol-control .dijitButtonNode .dijitButtonContents {
+  display: inline-block;
+}
+
+
+
+

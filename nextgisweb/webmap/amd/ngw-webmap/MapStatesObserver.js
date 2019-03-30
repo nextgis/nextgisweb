@@ -48,6 +48,8 @@ define([
                 return false;
             }
 
+            if (this._currentState && this._currentState === state) return true;
+
             if (this._currentState) {
                 this._states[this._currentState].control.deactivate();
 
@@ -76,6 +78,15 @@ define([
             if (activate) {
                 this.activateState(state);
             }
+        },
+
+        activateDefaultState: function () {
+            this.activateState(this._defaultState);
+        },
+
+        getActiveState: function () {
+            if (!this._currentState) return false;
+            return this._currentState;
         }
     }));
 });
