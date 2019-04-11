@@ -152,7 +152,12 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             cursize /= 2
             multiplier *= 2
 
-        cmd = ['gdaladdo', '-q', '-ro', '-clean', '-r', 'cubic',
+        cmd = ['gdaladdo', '-q', '-clean', fn]
+
+        env.raster_layer.logger.debug('Removing existing overviews with command: ' + ' '.join(cmd))
+        subprocess.check_call(cmd)
+
+        cmd = ['gdaladdo', '-q', '-ro', '-r', 'cubic',
             '--config', 'COMPRESS_OVERVIEW', 'JPEG',
             '--config', 'INTERLEAVE_OVERVIEW', 'PIXEL',
             '--config', 'BIGTIFF_OVERVIEW', 'YES',
