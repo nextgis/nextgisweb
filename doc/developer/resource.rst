@@ -5,9 +5,6 @@
 Resources
 =========
 
-..  automodule:: nextgisweb.resource.scope
-    :members:
-
 .. _ngwdev_resource_classes:
 
 Resource classes
