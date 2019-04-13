@@ -241,7 +241,8 @@ h2:first-child,
   width: 18px;
   height: 18px;
 }
-.text-withIcon__pic.svgIcon-resource_group {
+.text-withIcon__pic.svgIcon-resource_group,
+.text-withIcon__pic.collector_project {
   width: 24px;
   height: 24px;
 }
@@ -444,7 +445,8 @@ h2:first-child,
 .svgIcon-formbuilder_form,
 .svgIcon-qgis_raster_style,
 .svgIcon-trackers_group,
-.svgIcon-tracker {
+.svgIcon-tracker,
+.svgIcon-collector_project {
   background: none;
 }
 .svgIcon-mapserver_style {
@@ -508,6 +510,10 @@ h2:first-child,
   height: 24px;
 }
 .svgIcon-basemap_layer {
+  width: 24px;
+  height: 24px;
+}
+.svgIcon-collector_project {
   width: 24px;
   height: 24px;
 }
