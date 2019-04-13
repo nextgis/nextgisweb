@@ -493,224 +493,223 @@ following request:
 **Example JSON response**:
 
 .. sourcecode:: json
-
-
-	{
-		"resource": {
-			"id": 730,
-			"cls": "webmap",
-			"parent": {
-				"id": 640,
-				"parent": {
-					"id": 639
-				}
-			},
-			"owner_user": {
-				"id": 4
-			},
-			"permissions": [],
-			"keyname": null,
-			"display_name": "OpenDroneMap sample",
-			"description": null,
-			"children": false,
-			"interfaces": [],
-			"scopes": [
-				"resource",
-				"webmap",
-				"metadata"
-			]
-		},
-		"webmap": {
-			"extent_left": -83.31,
-			"extent_right": -83.3,
-			"extent_bottom": 41.042,
-			"extent_top": 41.034,
-			"bookmark_resource": null,
-			"root_item": {
-				"item_type": "root",
-				"children": [
-					{
-						"layer_adapter": "image",
-						"layer_enabled": true,
-						"layer_max_scale_denom": null,
-						"item_type": "layer",
-						"layer_min_scale_denom": null,
-						"display_name": "Seneca country",
-						"layer_style_id": 642,
-						"layer_transparency": null
-					}
-				]
-			}
-		},
-		"basemap_webmap": {
-			"basemaps": [
-				{
-					"opacity": null,
-					"enabled": true,
-					"position": 0,
-					"display_name": "HikeBikeMap",
-					"resource_id": 1039
-				},
-				{
-					"opacity": null,
-					"enabled": true,
-					"position": 1,
-					"display_name": "Спутник",
-					"resource_id": 1038
-				}
-			]
-		},
-		"resmeta": {
-			"items": {}
-		}
-	},
-	{
-		"resource": {
-			"id": 641,
-			"cls": "raster_layer",
-			"parent": {
-				"id": 640,
-				"parent": {
-					"id": 639
-				}
-			},
-			"owner_user": {
-				"id": 4
-			},
-			"permissions": [],
-			"keyname": null,
-			"display_name": "odm_orthophoto_low",
-			"description": null,
-			"children": true,
-			"interfaces": [
-				"IBboxLayer"
-			],
-			"scopes": [
-				"resource",
-				"datastruct",
-				"data",
-				"metadata"
-			]
-		},
-		"resmeta": {
-			"items": {}
-		},
-		"raster_layer": {
-			"srs": {
-				"id": 3857
-			},
-			"xsize": 16996,
-			"ysize": 17054,
-			"band_count": 4
-		}
-	},
-	{
-		"resource": {
-			"id": 1041,
-			"cls": "wfsserver_service",
-			"parent": {
-				"id": 640,
-				"parent": {
-					"id": 639
-				}
-			},
-			"owner_user": {
-				"id": 4
-			},
-			"permissions": [],
-			"keyname": null,
-			"display_name": "WFS service for demo",
-			"description": null,
-			"children": false,
-			"interfaces": [],
-			"scopes": [
-				"resource",
-				"service",
-				"metadata"
-			]
-		},
-		"resmeta": {
-			"items": {}
-		},
-		"wfsserver_service": {
-			"layers": [
-				{
-					"maxfeatures": 2222,
-					"keyname": "lines",
-					"display_name": "Просеки",
-					"resource_id": 534
-				}
-			]
-		}
-	},
-	{
-		"resource": {
-			"id": 1036,
-			"cls": "resource_group",
-			"parent": {
-				"id": 640,
-				"parent": {
-					"id": 639
-				}
-			},
-			"owner_user": {
-				"id": 4
-			},
-			"permissions": [],
-			"keyname": null,
-			"display_name": "Sample folder",
-			"description": null,
-			"children": true,
-			"interfaces": [],
-			"scopes": [
-				"resource",
-				"metadata"
-			]
-		},
-		"resmeta": {
-			"items": {}
-		}
-	},
-	{
-		"resource": {
-			"id": 1037,
-			"cls": "wmsserver_service",
-			"parent": {
-				"id": 640,
-				"parent": {
-					"id": 639
-				}
-			},
-			"owner_user": {
-				"id": 4
-			},
-			"permissions": [],
-			"keyname": null,
-			"display_name": "OpenDroneMap at NextGIS.com",
-			"description": null,
-			"children": false,
-			"interfaces": [],
-			"scopes": [
-				"resource",
-				"service",
-				"metadata"
-			]
-		},
-		"resmeta": {
-			"items": {}
-		},
-		"wmsserver_service": {
-			"layers": [
-				{
-					"min_scale_denom": null,
-					"keyname": "seneca_country",
-					"display_name": "Seneca country",
-					"max_scale_denom": null,
-					"resource_id": 642
-				}
-			]
-		}
-	}
+   
+   {
+      "resource": {
+         "id": 730,
+         "cls": "webmap",
+         "parent": {
+            "id": 640,
+            "parent": {
+               "id": 639
+            }
+         },
+         "owner_user": {
+            "id": 4
+         },
+         "permissions": [],
+         "keyname": null,
+         "display_name": "OpenDroneMap sample",
+         "description": null,
+         "children": false,
+         "interfaces": [],
+         "scopes": [
+            "resource",
+            "webmap",
+            "metadata"
+         ]
+      },
+      "webmap": {
+         "extent_left": -83.31,
+         "extent_right": -83.3,
+         "extent_bottom": 41.042,
+         "extent_top": 41.034,
+         "bookmark_resource": null,
+         "root_item": {
+            "item_type": "root",
+            "children": [
+               {
+                  "layer_adapter": "image",
+                  "layer_enabled": true,
+                  "layer_max_scale_denom": null,
+                  "item_type": "layer",
+                  "layer_min_scale_denom": null,
+                  "display_name": "Seneca country",
+                  "layer_style_id": 642,
+                  "layer_transparency": null
+               }
+            ]
+         }
+      },
+      "basemap_webmap": {
+         "basemaps": [
+            {
+               "opacity": null,
+               "enabled": true,
+               "position": 0,
+               "display_name": "HikeBikeMap",
+               "resource_id": 1039
+            },
+            {
+               "opacity": null,
+               "enabled": true,
+               "position": 1,
+               "display_name": "Спутник",
+               "resource_id": 1038
+            }
+         ]
+      },
+      "resmeta": {
+         "items": {}
+      }
+   },
+   {
+      "resource": {
+         "id": 641,
+         "cls": "raster_layer",
+         "parent": {
+            "id": 640,
+            "parent": {
+               "id": 639
+            }
+         },
+         "owner_user": {
+            "id": 4
+         },
+         "permissions": [],
+         "keyname": null,
+         "display_name": "odm_orthophoto_low",
+         "description": null,
+         "children": true,
+         "interfaces": [
+            "IBboxLayer"
+         ],
+         "scopes": [
+            "resource",
+            "datastruct",
+            "data",
+            "metadata"
+         ]
+      },
+      "resmeta": {
+         "items": {}
+      },
+      "raster_layer": {
+         "srs": {
+            "id": 3857
+         },
+         "xsize": 16996,
+         "ysize": 17054,
+         "band_count": 4
+      }
+   },
+   {
+      "resource": {
+         "id": 1041,
+         "cls": "wfsserver_service",
+         "parent": {
+            "id": 640,
+            "parent": {
+               "id": 639
+            }
+         },
+         "owner_user": {
+            "id": 4
+         },
+         "permissions": [],
+         "keyname": null,
+         "display_name": "WFS service for demo",
+         "description": null,
+         "children": false,
+         "interfaces": [],
+         "scopes": [
+            "resource",
+            "service",
+            "metadata"
+         ]
+      },
+      "resmeta": {
+         "items": {}
+      },
+      "wfsserver_service": {
+         "layers": [
+            {
+               "maxfeatures": 2222,
+               "keyname": "lines",
+               "display_name": "Просеки",
+               "resource_id": 534
+            }
+         ]
+      }
+   },
+   {
+      "resource": {
+         "id": 1036,
+         "cls": "resource_group",
+         "parent": {
+            "id": 640,
+            "parent": {
+               "id": 639
+            }
+         },
+         "owner_user": {
+            "id": 4
+         },
+         "permissions": [],
+         "keyname": null,
+         "display_name": "Sample folder",
+         "description": null,
+         "children": true,
+         "interfaces": [],
+         "scopes": [
+            "resource",
+            "metadata"
+         ]
+      },
+      "resmeta": {
+         "items": {}
+      }
+   },
+   {
+      "resource": {
+         "id": 1037,
+         "cls": "wmsserver_service",
+         "parent": {
+            "id": 640,
+            "parent": {
+               "id": 639
+            }
+         },
+         "owner_user": {
+            "id": 4
+         },
+         "permissions": [],
+         "keyname": null,
+         "display_name": "OpenDroneMap at NextGIS.com",
+         "description": null,
+         "children": false,
+         "interfaces": [],
+         "scopes": [
+            "resource",
+            "service",
+            "metadata"
+         ]
+      },
+      "resmeta": {
+         "items": {}
+      },
+      "wmsserver_service": {
+         "layers": [
+            {
+               "min_scale_denom": null,
+               "keyname": "seneca_country",
+               "display_name": "Seneca country",
+               "max_scale_denom": null,
+               "resource_id": 642
+            }
+         ]
+      }
+   }
 
 .. _ngwdev_resource_properties
 
