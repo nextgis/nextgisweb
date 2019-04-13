@@ -144,7 +144,6 @@ def cors_put(request):
 
 
 def system_name_get(request):
-    request.require_administrator()
     return dict(full_name=env.core.settings_get('core', 'system.full_name'))
 
 
