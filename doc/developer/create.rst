@@ -233,7 +233,7 @@ To create empty vector layer execute following request:
             }
         ]
     }
-    }
+  }
 
 Vector layer with data
 -----------------------
@@ -338,7 +338,7 @@ To create new feature in vector layer execute following request:
 
    Create feature request
 
-   :param layer_id: layer resource identificator
+   :param layer_id: layer resource identifier
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :<json string geom: geometry in WKT format (geometry type and spatial reference must be corespondent to layer geometry type and spatial reference)
