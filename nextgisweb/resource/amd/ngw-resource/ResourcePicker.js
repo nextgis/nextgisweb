@@ -68,6 +68,8 @@ define([
             if (this.interfaces !== undefined &&
                 (set.intersection(itm.interfaces, this.interfaces).count == 0)) { return false; }
             if (this.cls !== undefined && itm.cls != this.cls) { return false; }
+            if (this.clases !== undefined &&
+                (set.intersection([itm.cls], this.clases).count == 0)) { return false; }
 
             return true;
         },
