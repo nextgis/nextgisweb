@@ -8,7 +8,7 @@ Resource group
 
 To create new group execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create resource group request.
 
@@ -27,7 +27,7 @@ To create new group execute following request.
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -47,7 +47,7 @@ PostGIS Connection
 
 To create PostGIS connection execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    PostGIS connection create request.
 
@@ -72,7 +72,7 @@ To create PostGIS connection execute following request.
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -100,7 +100,7 @@ PostGIS Layer
 
 To create PostGIS layer execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create PostGIS layer request.
 
@@ -129,7 +129,7 @@ To create PostGIS layer execute following request.
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -165,7 +165,7 @@ Empty vector layer
 
 To create empty vector layer execute following request:
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create PostGIS layer request.
 
@@ -260,7 +260,7 @@ Create vector layer
 
 To create vector layer execute following request:
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create vector layer from uploaded file request.
 
@@ -283,7 +283,7 @@ To create vector layer execute following request:
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -415,7 +415,7 @@ Create raster layer
 
 To create raster layer execute the following request:
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create raster layer request.
 
@@ -436,7 +436,7 @@ To create raster layer execute the following request:
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -491,7 +491,7 @@ Create file bucket
 
 To create file bucket execute following request:
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create file bucket request.
 
@@ -511,7 +511,7 @@ To create file bucket execute following request:
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -572,7 +572,7 @@ Vector (mapserver) style
 
 To create vector style execute following request:
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create vector layer request.
 
@@ -593,7 +593,7 @@ To create vector style execute following request:
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -624,7 +624,7 @@ Raster style
 
 To create raster style execute following request:
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create raster layer request.
 
@@ -642,7 +642,7 @@ To create raster style execute following request:
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -670,7 +670,7 @@ Lookup table
 
 To create lookup table execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create lookup table request.
 
@@ -690,7 +690,7 @@ To create lookup table execute following request.
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -737,7 +737,7 @@ Web map
 
 To create new web map execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
 **Example request**:
 
@@ -783,7 +783,7 @@ WMS Service
 
 To create new WMS service execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create WMS service request.
 
@@ -809,7 +809,7 @@ To create new WMS service execute following request.
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -858,7 +858,7 @@ WMS Connection
 
 To create new WMS connection execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create WMS connection request.
 
@@ -883,7 +883,7 @@ To create new WMS connection execute following request.
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -922,7 +922,7 @@ WMS Layer
 
 To create WMS layer from WMS connection execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
    Create WMS layer request.
 
@@ -946,7 +946,7 @@ To create WMS layer from WMS connection execute following request.
 
 .. sourcecode:: http
 
-   POST /api/resource HTTP/1.1
+   POST /api/resource/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -991,7 +991,7 @@ Tracker
 
 To create tracker execute following request.
 
-.. http:post:: /api/resource
+.. http:post:: /api/resource/
 
   Create tracker request.
 
@@ -1015,7 +1015,7 @@ To create tracker execute following request.
 
 .. sourcecode:: http
 
-  POST /api/resource HTTP/1.1
+  POST /api/resource/ HTTP/1.1
   Host: ngw_url
   Accept: */*
 
