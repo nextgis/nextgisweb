@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, absolute_import
 import os
 import codecs
-from ConfigParser import ConfigParser
+from ConfigParser import RawConfigParser
 
 from pyramid.config import Configurator
 from pyramid.paster import setup_logging
@@ -60,8 +60,12 @@ def main(global_config, **settings):
     if 'logging' in settings:
         setup_logging(settings['logging'])
 
-    cfg = ConfigParser(os.environ)
+    cfg = RawConfigParser()
     cfg.readfp(codecs.open(settings['config'], 'r', 'utf-8'))
+
+    for section in cfg.sections():
+        for item, value in cfg.items(section):
+            cfg.set(section, item, value % os.environ)
 
     env = Env(cfg)
     env.initialize()

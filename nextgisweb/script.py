@@ -5,7 +5,7 @@ import sys
 import os
 import codecs
 from argparse import ArgumentParser
-from ConfigParser import ConfigParser
+from ConfigParser import RawConfigParser
 
 from pyramid.paster import setup_logging
 
@@ -43,10 +43,14 @@ def main(argv=sys.argv):
     if logging:
         setup_logging(logging)
 
-    cfg = ConfigParser(os.environ)
+    cfg = RawConfigParser()
 
     if config:
         cfg.readfp(codecs.open(config, 'r', 'utf-8'))
+
+    for section in cfg.sections():
+        for item, value in cfg.items(section):
+            cfg.set(section, item, value % os.environ)
 
     env = Env(cfg=cfg)
     env.initialize()
