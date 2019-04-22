@@ -15,6 +15,7 @@ requires = [
     'pyramid_mako==1.0.2',
     'zope.sqlalchemy==1.1',
     'zope.interface==4.6.0',
+    'zope.event',
     'bunch==1.0.1',
     'flufl.enum==4.1.1',
     'waitress==1.2.0',

@@ -4,6 +4,7 @@ import sys
 import json
 import traceback
 from collections import OrderedDict
+import zope.event
 
 from pyramid.response import Response
 
@@ -20,6 +21,7 @@ from .exception import ResourceError, ValidationError, ForbiddenError
 from .serialize import CompositeSerializer
 from .view import resource_factory
 from .util import _
+from .events import AfterResourcePut, AfterResourceCollectionPost
 
 
 PERM_READ = ResourceScope.read
@@ -129,6 +131,8 @@ def item_put(context, request):
     with DBSession.no_autoflush:
         result = serializer.deserialize()
 
+    zope.event.notify(AfterResourcePut(context, request))
+
     return Response(
         json.dumps(result), status_code=200,
         content_type=b'application/json')
@@ -220,6 +224,8 @@ def collection_post(request):
 
     # TODO: Parent is returned only for compatibility
     result['parent'] = dict(id=resource.parent.id)
+
+    zope.event.notify(AfterResourceCollectionPost(resource, request))
 
     return Response(
         json.dumps(result), status_code=201,
