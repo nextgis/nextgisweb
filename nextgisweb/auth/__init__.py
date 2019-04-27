@@ -4,6 +4,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
 
 from ..component import Component
+from ..models import DBSession
+from .. import db
 
 from .models import Base, Principal, User, Group, UserDisabled
 from . import command # NOQA
@@ -80,6 +82,10 @@ class AuthComponent(Component):
         from . import views, api
         views.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
+
+    def query_stat(self):
+        query_user = DBSession.query(db.func.count(User.id))
+        return dict(user_count=query_user.scalar())
 
     def initialize_user(self, keyname, display_name, **kwargs):
         """ Checks is user with keyname exists in DB and
