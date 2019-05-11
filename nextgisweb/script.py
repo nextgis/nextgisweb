@@ -91,7 +91,7 @@ def config(argv=sys.argv):
     from .component import Component, load_all
     load_all()
 
-    preseedcfg = ConfigParser()
+    preseedcfg = RawConfigParser()
 
     if args.preseed:
         with codecs.open(args.preseed, 'r', 'utf-8') as fd:
