@@ -27,6 +27,7 @@ from .interface import IRenderableStyle
 
 Base = declarative_base()
 
+
 class ResourceTileCache(Base):
     __tablename__ = 'resource_tile_cache'
 
@@ -46,7 +47,7 @@ class ResourceTileCache(Base):
         
 
     def init_metadata(self):
-        self._sameta = MetaData()
+        self._sameta = MetaData(schema='tile_cache')
         self._tiletab = Table(
             self.uuid.hex, self._sameta,
             db.Column('z', db.SmallInteger, primary_key=True),
@@ -84,7 +85,10 @@ class ResourceTileCache(Base):
                 self._tilestor = sqlite3.connect(p, isolation_level=None)
             
             self._tilestor.text_factory = bytes
-            cur = self._tilestor.cursor()                    
+            cur = self._tilestor.cursor()
+            
+            # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
+            cur.execute("PRAGMA page_size = 8192")
             cur.execute("CREATE TABLE IF NOT EXISTS tile (sid BLOB PRIMARY KEY, data BLOB)")
 
         return self._tilestor
@@ -101,14 +105,14 @@ class ResourceTileCache(Base):
         return os.path.join(d, suuid)
 
     def get_tile(self, tile):
-        # TODO: Replace with raw SQL query
-        tc = self.tiletab.c
-        q = db.sql.select([tc.digest, tc.expires]) \
-            .where(tc.z == db.sql.bindparam('z')) \
-            .where(tc.x == db.sql.bindparam('x')) \
-            .where(tc.y == db.sql.bindparam('y')) 
-
-        row = DBSession.connection().execute(q, z=tile[0], x=tile[1], y=tile[2]).fetchone()
+        z, x, y = tile
+       
+        conn = DBSession.connection()
+        row = conn.execute(db.sql.text(
+            'SELECT digest, expires '
+            'FROM tile_cache."{}" '
+            'WHERE z = :z AND x = :x AND y = :y'.format(self.uuid.hex)
+        ), z=z, x=x, y=y).fetchone()
 
         if row is None:
             return None
@@ -126,6 +130,8 @@ class ResourceTileCache(Base):
         return Image.open(StringIO(data))
 
     def put_tile(self, tile, img):
+        z, x, y = tile
+
         # Calculate image MD5 digest as UUID
         buf = StringIO()
         img.save(buf, format='PNG')
@@ -139,22 +145,25 @@ class ResourceTileCache(Base):
             # TODO: ON CONFLICT DO NOTHING in SQLite >= 3.24.0
             pass
 
-        # TODO: Replace with raw SQL query
-        q = self.tiletab.insert().values(
-            z=db.sql.bindparam('z'),
-            x=db.sql.bindparam('x'),
-            y=db.sql.bindparam('y'),
-            digest=db.sql.bindparam('digest'),
-            expires=db.sql.bindparam('expires')
-        )
-
-        DBSession().execute(q, dict(
-            z=tile[0], x=tile[1], y=tile[2],
-            digest=digest, expires=self.EXPRIRES_MAX))
+        conn = DBSession.connection()
+        conn.execute(db.sql.text(
+            'INSERT INTO tile_cache."{}" (z, x, y, digest, expires) '
+            'VALUES (:z, :x, :y, :digest, :expires)'.format(self.uuid.hex)
+        ), z=z, x=x, y=y, digest=digest, expires=self.EXPRIRES_MAX)
 
         # Force zope session management to commit changes
         mark_changed(DBSession())
- 
+
+db.event.listen(
+    ResourceTileCache.__table__, 'after_create',
+    db.DDL('CREATE SCHEMA IF NOT EXISTS tile_cache'),
+    propagate=True)
+
+db.event.listen(
+    ResourceTileCache.__table__, 'after_drop',
+    db.DDL('DROP SCHEMA IF EXISTS tile_cache'),
+    propagate=True)
+
 
 class ResourceTileCacheSeializedProperty(SerializedProperty):
 
