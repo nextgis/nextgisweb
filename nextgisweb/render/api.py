@@ -30,8 +30,19 @@ def tile(request):
         obj = Resource.filter_by(id=resid).one()
         if not setting_disable_check:
             request.resource_permission(PD_READ, obj)
-        req = obj.render_request(obj.srs)
-        rimg = req.render_tile((z, x, y), 256)
+        
+        rimg = None
+        tc = obj.tile_cache
+        
+        if tc is not None and tc.enabled:
+            rimg = tc.get_tile((z, x, y))
+
+        if not rimg:
+            req = obj.render_request(obj.srs)
+            rimg = req.render_tile((z, x, y), 256)
+
+            if tc is not None and tc.enabled:
+                tc.put_tile((z, x, y), rimg)
 
         if aimg is None:
             aimg = rimg

@@ -34,6 +34,7 @@ requires = [
     'minio==4.0.10',
     'sentry-sdk==0.7.7',
     'python-magic==0.4.15',
+    'plyvel',
 ]
 
 extras_require = {

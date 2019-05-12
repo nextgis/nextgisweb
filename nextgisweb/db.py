@@ -10,6 +10,7 @@ from sqlalchemy import sql                  # NOQA
 from sqlalchemy import func                 # NOQA
 
 from sqlalchemy import Enum as _Enum
+from sqlalchemy.dialects.postgresql import UUID as _UUID
 
 
 class Enum(_Enum):
@@ -21,3 +22,12 @@ class Enum(_Enum):
         else:
             kwargs['native_enum'] = False
         super(Enum, self).__init__(*args, **kwargs)
+
+
+class UUID(_UUID):
+    """ SQLAclhemy-s PostgreSQL UUID wrapper with as_uuid=True by default """
+
+    def __init__(self, *args, **kwargs):
+        if 'as_uuid' not in kwargs:
+            kwargs['as_uuid'] = True
+        super(UUID, self).__init__(*args, **kwargs)
