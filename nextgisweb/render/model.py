@@ -4,6 +4,9 @@ from uuid import uuid4, UUID
 from collections import namedtuple
 from StringIO import StringIO
 from hashlib import md5
+from os import makedirs
+import os.path
+import sqlite3
 
 from PIL import Image
 from sqlalchemy import MetaData, Table
@@ -72,8 +75,30 @@ class ResourceTileCache(Base):
     @property
     def tilestor(self):
         if not hasattr(self, '_tilestor'):
-            self._tilestor = env.render.tile_cache_storage.prefixed_db(self.uuid.bytes)
+            try:
+                p = self.tilestor_path(create=False)
+                self._tilestor = sqlite3.connect(p, isolation_level=None)
+            except sqlite3.OperationalError as e:
+                # SQLite db not found, create it
+                p = self.tilestor_path(create=True)
+                self._tilestor = sqlite3.connect(p, isolation_level=None)
+            
+            self._tilestor.text_factory = bytes
+            cur = self._tilestor.cursor()                    
+            cur.execute("CREATE TABLE IF NOT EXISTS tile (sid BLOB PRIMARY KEY, data BLOB)")
+
         return self._tilestor
+
+    def tilestor_path(self, create=False):
+        tcpath = env.render.tile_cache_path
+        suuid = self.uuid.hex
+        d = os.path.join(tcpath, suuid[0:2], suuid[2:4])
+        if create:
+            if not os.path.isdir(d):
+                if not os.path.isdir(tcpath):
+                    raise RuntimeError("Path '{}' doen't exists!".format(tcpath))
+                makedirs(d) # TODO: Add exist_ok=True for Python 3
+        return os.path.join(d, suuid)
 
     def get_tile(self, tile):
         # TODO: Replace with raw SQL query
@@ -90,7 +115,14 @@ class ResourceTileCache(Base):
 
         digest, expires = row
         
-        data = self.tilestor.get(digest.bytes)
+        cur = self.tilestor.cursor()
+        cur.execute('SELECT data FROM tile WHERE sid = ?', (digest.bytes, ))
+        
+        row = cur.fetchone()
+        if row is None:
+            return None
+        
+        data = row[0]       
         return Image.open(StringIO(data))
 
     def put_tile(self, tile, img):
@@ -99,8 +131,13 @@ class ResourceTileCache(Base):
         img.save(buf, format='PNG')
         digest = UUID(bytes=md5(buf.getvalue()).digest())
 
-        # Save tile to LevelDB tile storage
-        self.tilestor.put(digest.bytes, buf.getvalue())
+        cur = self.tilestor.cursor()
+        try:
+            cur.execute("INSERT INTO tile VALUES (?, ?)", (digest.bytes, buf.getvalue()))
+        except sqlite3.IntegrityError as exc:
+            # Ignore if tile already exists: other process can add it
+            # TODO: ON CONFLICT DO NOTHING in SQLite >= 3.24.0
+            pass
 
         # TODO: Replace with raw SQL query
         q = self.tiletab.insert().values(

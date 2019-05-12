@@ -36,10 +36,3 @@ class RenderComponent(Component):
     def setup_pyramid(self, config):
         from . import api
         api.setup_pyramid(self, config)
-
-    @property
-    def tile_cache_storage(self):
-        if not hasattr(self, '_tile_cache_storage'):
-            self._tile_cache_storage = plyvel.DB(
-                self.tile_cache_path, create_if_missing=True)
-        return self._tile_cache_storage
