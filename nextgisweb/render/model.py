@@ -5,6 +5,7 @@ from collections import namedtuple
 from StringIO import StringIO
 from hashlib import md5
 from os import makedirs
+from errno import EEXIST
 import os.path
 import sqlite3
 
@@ -101,7 +102,14 @@ class ResourceTileCache(Base):
             if not os.path.isdir(d):
                 if not os.path.isdir(tcpath):
                     raise RuntimeError("Path '{}' doen't exists!".format(tcpath))
-                makedirs(d) # TODO: Add exist_ok=True for Python 3
+                try:
+                    makedirs(d) 
+                except OSError as exc:
+                    # Ignore 'File exists' error in concurency conditions
+                    # TODO: Add exist_ok=True for Python3 instead of exception
+                    if exc.errno != EEXIST:
+                        raise
+
         return os.path.join(d, suuid)
 
     def get_tile(self, tile):
