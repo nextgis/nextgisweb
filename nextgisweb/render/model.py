@@ -24,6 +24,7 @@ from ..resource import (
 )
 
 from .interface import IRenderableStyle
+from .util import imghash
 
 
 Base = declarative_base()
@@ -116,38 +117,35 @@ class ResourceTileCache(Base):
         z, x, y = tile
        
         conn = DBSession.connection()
-        row = conn.execute(db.sql.text(
+        trow = conn.execute(db.sql.text(
             'SELECT digest, expires '
             'FROM tile_cache."{}" '
             'WHERE z = :z AND x = :x AND y = :y'.format(self.uuid.hex)
         ), z=z, x=x, y=y).fetchone()
 
-        if row is None:
+        if trow is None:
             return None
 
-        digest, expires = row
+        digest, expires = trow
         
         cur = self.tilestor.cursor()
-        cur.execute('SELECT data FROM tile WHERE sid = ?', (digest.bytes, ))
-        
-        row = cur.fetchone()
-        if row is None:
+        srow = cur.execute('SELECT data FROM tile WHERE sid = ?', (digest.bytes, )).fetchone()    
+        if srow is None:
             return None
         
-        data = row[0]       
-        return Image.open(StringIO(data))
+        return Image.open(StringIO(srow[0]))
 
     def put_tile(self, tile, img):
         z, x, y = tile
 
-        # Calculate image MD5 digest as UUID
+        digest = UUID(bytes=imghash(img).digest())
+
         buf = StringIO()
         img.save(buf, format='PNG')
-        digest = UUID(bytes=md5(buf.getvalue()).digest())
 
-        cur = self.tilestor.cursor()
         try:
-            cur.execute("INSERT INTO tile VALUES (?, ?)", (digest.bytes, buf.getvalue()))
+            self.tilestor.execute("INSERT INTO tile VALUES (?, ?)", (
+                digest.bytes, buf.getvalue()))
         except sqlite3.IntegrityError as exc:
             # Ignore if tile already exists: other process can add it
             # TODO: ON CONFLICT DO NOTHING in SQLite >= 3.24.0
