@@ -45,8 +45,14 @@ class ResourceTileCache(Base):
     def __init__(self, *args, **kwagrs):
         if 'uuid' not in kwagrs:
             kwagrs['uuid'] = uuid4()
+        self.reconstructor()
         super(ResourceTileCache, self).__init__(*args, **kwagrs)
-        
+
+    @db.reconstructor
+    def reconstructor(self):
+        self._sameta = None
+        self._tiletab = None
+        self._tilestor = None
 
     def init_metadata(self):
         self._sameta = MetaData(schema='tile_cache')
@@ -65,19 +71,19 @@ class ResourceTileCache(Base):
 
     @property
     def sameta(self):
-        if not hasattr(self, '_sameta'):
+        if self._sameta is None:
             self.init_metadata()
         return self._sameta
     
     @property
     def tiletab(self):
-        if not hasattr(self, '_tiletab'):
+        if self._tiletab is None:
             self.init_metadata()
         return self._tiletab
 
     @property
     def tilestor(self):
-        if not hasattr(self, '_tilestor'):
+        if self._tilestor is None:
             try:
                 p = self.tilestor_path(create=False)
                 self._tilestor = sqlite3.connect(p, isolation_level=None)
