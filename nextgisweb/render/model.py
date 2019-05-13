@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from datetime import datetime, timedelta
 from uuid import uuid4, UUID
 from collections import namedtuple
 from StringIO import StringIO
@@ -27,6 +28,7 @@ from .interface import IRenderableStyle
 from .util import imghash
 
 
+TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 Base = declarative_base()
 
 
@@ -38,6 +40,8 @@ class ResourceTileCache(Base):
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     uuid = db.Column(db.UUID, nullable=False)
     enabled = db.Column(db.Boolean, nullable=False, default=False)
+    max_z = db.Column(db.SmallInteger)
+    ttl = db.Column(db.Integer)
 
     resource = db.relationship(Resource, backref=db.backref(
         'tile_cache', cascade='all, delete-orphan', uselist=False))
@@ -133,6 +137,9 @@ class ResourceTileCache(Base):
             return None
 
         digest, expires = trow
+        expdt = TIMESTAMP_EPOCH + timedelta(seconds=expires)
+        if expdt <= datetime.utcnow():
+            return None
         
         cur = self.tilestor.cursor()
         srow = cur.execute('SELECT data FROM tile WHERE sid = ?', (digest.bytes, )).fetchone()    
@@ -157,11 +164,16 @@ class ResourceTileCache(Base):
             # TODO: ON CONFLICT DO NOTHING in SQLite >= 3.24.0
             pass
 
+        exp = min(int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds() + self.ttl), self.EXPRIRES_MAX) \
+            if self.ttl is not None else self.EXPRIRES_MAX
+
         conn = DBSession.connection()
+        
         conn.execute(db.sql.text(
-            'INSERT INTO tile_cache."{}" (z, x, y, digest, expires) '
+            'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
+            'INSERT INTO tile_cache."{0}" (z, x, y, digest, expires) '
             'VALUES (:z, :x, :y, :digest, :expires)'.format(self.uuid.hex)
-        ), z=z, x=x, y=y, digest=digest, expires=self.EXPRIRES_MAX)
+        ), z=z, x=x, y=y, digest=digest, expires=exp)
 
         # Force zope session management to commit changes
         mark_changed(DBSession())

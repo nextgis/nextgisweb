@@ -31,18 +31,23 @@ def tile(request):
         if not setting_disable_check:
             request.resource_permission(PD_READ, obj)
         
-        rimg = None
-        tc = obj.tile_cache
+        rimg = None  # Resulting resource image
+
+        tcache = obj.tile_cache
+
+        # Is requested tile may be cached?
+        cached = tcache is not None and tcache.enabled \
+            and (tcache.max_z is None or z <= tcache.max_z)
         
-        if tc is not None and tc.enabled:
-            rimg = tc.get_tile((z, x, y))
+        if cached:
+            rimg = tcache.get_tile((z, x, y))
 
         if not rimg:
             req = obj.render_request(obj.srs)
             rimg = req.render_tile((z, x, y), 256)
 
-            if tc is not None and tc.enabled:
-                tc.put_tile((z, x, y), rimg)
+            if cached:
+                tcache.put_tile((z, x, y), rimg)
 
         if aimg is None:
             aimg = rimg
