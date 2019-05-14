@@ -1,4 +1,7 @@
-<%! from nextgisweb.resource.util import _ %>
+<%!
+from nextgisweb.resource.util import _
+from nextgisweb.resource.scope import ResourceScope
+%>
 <script>
     require([
         "dojo/ready",
@@ -18,7 +21,7 @@
 
 <%def name="child_group(children)">
     <tbody>
-        %for item in children:
+        %for item in filter(lambda i: i.has_permission(ResourceScope.read, request.user), children):
             <tr>
                 <td class="children-table__name">
                     <a class="children-table__name__link text-withIcon" href="${item.permalink(request)}">
