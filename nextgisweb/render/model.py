@@ -190,16 +190,21 @@ db.event.listen(
 
 
 class ResourceTileCacheSeializedProperty(SerializedProperty):
+    
+    def default(self):
+        column = getattr(ResourceTileCache, self.attrname)
+        return column.default.arg if column.default is not None else None
 
     def getter(self, srlzr):
         if srlzr.obj.tile_cache is None:
-            srlzr.obj.tile_cache = ResourceTileCache()
+            return self.default()
         return getattr(srlzr.obj.tile_cache, self.attrname)
 
     def setter(self, srlzr, value):
-        if srlzr.obj.tile_cache is None:
-            srlzr.obj.tile_cache = ResourceTileCache()
-        setattr(srlzr.obj.tile_cache, self.attrname, value)
+        if value != self.default() or srlzr.obj.tile_cache is not None:
+            if srlzr.obj.tile_cache is None:
+                srlzr.obj.tile_cache = ResourceTileCache()
+            setattr(srlzr.obj.tile_cache, self.attrname, value)
 
 
 class ResourceTileCacheSerializer(Serializer):
@@ -207,6 +212,8 @@ class ResourceTileCacheSerializer(Serializer):
     resclass = Resource
 
     enabled = ResourceTileCacheSeializedProperty(read=ResourceScope.read, write=ResourceScope.update)
+    max_z = ResourceTileCacheSeializedProperty(read=ResourceScope.read, write=ResourceScope.update)
+    ttl = ResourceTileCacheSeializedProperty(read=ResourceScope.read, write=ResourceScope.update)
 
     def is_applicable(self):
         return IRenderableStyle.providedBy(self.obj)
@@ -214,5 +221,6 @@ class ResourceTileCacheSerializer(Serializer):
     def serialize(self):
         super(ResourceTileCacheSerializer, self).serialize()
         
-        self.obj.tile_cache.sameta.create_all(bind=DBSession.connection())
-        self.obj.tile_cache.enabled = True
+        if self.obj.tile_cache is not None:
+            self.obj.tile_cache.sameta.create_all(bind=DBSession.connection())
+
