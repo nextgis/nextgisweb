@@ -218,8 +218,8 @@ class ResourceTileCacheSerializer(Serializer):
     def is_applicable(self):
         return IRenderableStyle.providedBy(self.obj)
 
-    def serialize(self):
-        super(ResourceTileCacheSerializer, self).serialize()
+    def deserialize(self):
+        super(ResourceTileCacheSerializer, self).deserialize()
         
         if self.obj.tile_cache is not None:
             self.obj.tile_cache.sameta.create_all(bind=DBSession.connection())
