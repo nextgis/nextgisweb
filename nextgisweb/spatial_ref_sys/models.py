@@ -66,9 +66,12 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
     END
     $BODY$;
 
+    TRUNCATE TABLE spatial_ref_sys;
+
     DROP TRIGGER IF EXISTS spatial_ref_sys ON srs;
     CREATE TRIGGER spatial_ref_sys AFTER INSERT OR UPDATE OR DELETE ON srs
         FOR EACH ROW EXECUTE PROCEDURE srs_spatial_ref_sys_sync();
+
 """), propagate=True)
 
 
