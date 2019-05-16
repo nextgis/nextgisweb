@@ -39,6 +39,7 @@ class SpatialRefSysComponent(Component):
                 srs.persist()
 
     def setup_pyramid(self, config):
-        from . import views
+        from . import api, views
+        api.setup_pyramid(self, config)
         views.setup_pyramid(self, config)
 
