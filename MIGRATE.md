@@ -2,6 +2,12 @@
 
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
+#### (2019-05-16)
+
+```sql
+ALTER TABLE public.webmap ADD COLUMN editable boolean DEFAULT FALSE;
+```
+
 #### (2018-12-16)
 
 ```sql

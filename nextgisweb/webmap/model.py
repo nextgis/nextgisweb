@@ -35,6 +35,7 @@ class WebMap(Base, Resource):
     root_item_id = db.Column(db.ForeignKey('webmap_item.id'), nullable=False)
     bookmark_resource_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
     draw_order_enabled = db.Column(db.Boolean, nullable=True)
+    editable = db.Column(db.Boolean, nullable=False, default=False)
 
     extent_left = db.Column(db.Float, default=-180)
     extent_right = db.Column(db.Float, default=+180)
@@ -55,6 +56,7 @@ class WebMap(Base, Resource):
         return dict(
             id=self.id,
             display_name=self.display_name,
+            editable=self.editable,
             root_item=self.root_item.to_dict(),
             bookmark_resource_id=self.bookmark_resource_id,
             extent=(self.extent_left, self.extent_bottom,
@@ -74,7 +76,10 @@ class WebMap(Base, Resource):
 
         if 'extent' in data:
             self.extent_left, self.extent_bottom, \
-                self.extent_right, self.extent_top = data['extent']
+            self.extent_right, self.extent_top = data['extent']
+
+        if 'editable' in data:
+            self.editable = data['editable']
 
 
 class WebMapItem(Base):
@@ -184,6 +189,7 @@ class WebMapSerializer(Serializer):
     extent_top = SP(**_mdargs)
 
     draw_order_enabled = SP(**_mdargs)
+    editable = SP(**_mdargs)
 
     bookmark_resource = SRR(**_mdargs)
 
