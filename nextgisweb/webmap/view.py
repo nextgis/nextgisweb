@@ -23,8 +23,13 @@ class ItemWidget(Widget):
     amdmod = 'ngw-webmap/ItemWidget'
 
 
-def setup_pyramid(comp, config):
+class SettingsWidget(Widget):
+    resource = WebMap
+    operation = ('create', 'update')
+    amdmod = 'ngw-webmap/resource/OtherSettings/OtherSettings'
 
+
+def setup_pyramid(comp, config):
     def display(obj, request):
         request.resource_permission(WebMap.scope.webmap.display)
 
@@ -41,7 +46,7 @@ def setup_pyramid(comp, config):
         for pcls in WebmapPlugin.registry:
             p_mid_data = pcls.is_supported(obj)
             if p_mid_data:
-                plugin.update((p_mid_data, ))
+                plugin.update((p_mid_data,))
 
         def traverse(item):
             data = dict(
@@ -86,7 +91,7 @@ def setup_pyramid(comp, config):
                 for pcls in WebmapLayerPlugin.registry:
                     p_mid_data = pcls.is_layer_supported(layer, obj)
                     if p_mid_data:
-                        plugin.update((p_mid_data, ))
+                        plugin.update((p_mid_data,))
 
                 data.update(plugin=plugin)
                 display.mid.plugin.update(plugin.keys())
@@ -120,6 +125,7 @@ def setup_pyramid(comp, config):
             testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id),
             webmapDescription=obj.description,
             webmapTitle=obj.display_name,
+            webmapEditable=obj.editable,
             drawOrderEnabled=obj.draw_order_enabled,
             measurementSystem=request.env.core.settings_get('core', 'units'),
         )
