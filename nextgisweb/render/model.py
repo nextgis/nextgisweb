@@ -7,6 +7,7 @@ from StringIO import StringIO
 from hashlib import md5
 from os import makedirs
 from errno import EEXIST
+import struct
 import os.path
 import sqlite3
 
@@ -25,7 +26,7 @@ from ..resource import (
 )
 
 from .interface import IRenderableStyle
-from .util import imghash
+from .util import imghash, imgcolor
 
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
@@ -65,9 +66,10 @@ class ResourceTileCache(Base):
             db.Column('z', db.SmallInteger, primary_key=True),
             db.Column('x', db.Integer, primary_key=True),
             db.Column('y', db.Integer, primary_key=True),
+            db.Column('color', db.Integer),
             # Use PostgreSQL UUID-type as MD5-hash storage. There is no other
             # easy way for store fixed size binary value in PostgreSQL database.
-            db.Column('digest', db.UUID, nullable=False),
+            db.Column('digest', db.UUID),
             # We don't need subsecond resolution which TIMESTAMP provides, so 
             # use 4-byte INTEGER type. Say hello to 2038-year problem!
             db.Column('expires', db.Integer, nullable=False),
@@ -128,7 +130,7 @@ class ResourceTileCache(Base):
        
         conn = DBSession.connection()
         trow = conn.execute(db.sql.text(
-            'SELECT digest, expires '
+            'SELECT color, digest, expires '
             'FROM tile_cache."{}" '
             'WHERE z = :z AND x = :x AND y = :y'.format(self.uuid.hex)
         ), z=z, x=x, y=y).fetchone()
@@ -136,34 +138,45 @@ class ResourceTileCache(Base):
         if trow is None:
             return None
 
-        digest, expires = trow
+        color, digest, expires = trow
         expdt = TIMESTAMP_EPOCH + timedelta(seconds=expires)
         if expdt <= datetime.utcnow():
             return None
         
-        cur = self.tilestor.cursor()
-        srow = cur.execute('SELECT data FROM tile WHERE sid = ?', (digest.bytes, )).fetchone()    
-        if srow is None:
-            return None
-        
-        return Image.open(StringIO(srow[0]))
+        if color is not None:
+            colort = tuple(map(ord, struct.pack('!i', color)))
+            return Image.new('RGBA', (256, 256), colort)
+        else:
+            cur = self.tilestor.cursor()
+            srow = cur.execute('SELECT data FROM tile WHERE sid = ?', (digest.bytes, )).fetchone()    
+            if srow is None:
+                return None           
+            return Image.open(StringIO(srow[0]))
 
     def put_tile(self, tile, img):
         z, x, y = tile
 
-        digest = UUID(bytes=imghash(img).digest())
+        colortuple = imgcolor(img)
 
-        buf = StringIO()
-        img.save(buf, format='PNG')
+        color = None
+        if colortuple is not None:
+            color = struct.unpack('!i', bytearray(colortuple))[0]
 
-        try:
-            self.tilestor.execute("INSERT INTO tile VALUES (?, ?)", (
-                digest.bytes, buf.getvalue()))
-        except sqlite3.IntegrityError as exc:
-            # Ignore if tile already exists: other process can add it
-            # TODO: ON CONFLICT DO NOTHING in SQLite >= 3.24.0
-            pass
+        digest = None
+        if color is None:
+            digest = UUID(bytes=imghash(img).digest())
 
+            buf = StringIO()
+            img.save(buf, format='PNG')
+
+            try:
+                self.tilestor.execute("INSERT INTO tile VALUES (?, ?)", (
+                    digest.bytes, buf.getvalue()))
+            except sqlite3.IntegrityError as exc:
+                # Ignore if tile already exists: other process can add it
+                # TODO: ON CONFLICT DO NOTHING in SQLite >= 3.24.0
+                pass
+ 
         exp = min(int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds() + self.ttl), self.EXPRIRES_MAX) \
             if self.ttl is not None else self.EXPRIRES_MAX
 
@@ -171,9 +184,9 @@ class ResourceTileCache(Base):
         
         conn.execute(db.sql.text(
             'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
-            'INSERT INTO tile_cache."{0}" (z, x, y, digest, expires) '
-            'VALUES (:z, :x, :y, :digest, :expires)'.format(self.uuid.hex)
-        ), z=z, x=x, y=y, digest=digest, expires=exp)
+            'INSERT INTO tile_cache."{0}" (z, x, y, color, digest, expires) '
+            'VALUES (:z, :x, :y, :color, :digest, :expires)'.format(self.uuid.hex)
+        ), z=z, x=x, y=y, color=color, digest=digest, expires=exp)
 
         # Force zope session management to commit changes
         mark_changed(DBSession())
@@ -185,7 +198,7 @@ db.event.listen(
 
 db.event.listen(
     ResourceTileCache.__table__, 'after_drop',
-    db.DDL('DROP SCHEMA IF EXISTS tile_cache'),
+    db.DDL('DROP SCHEMA IF EXISTS tile_cache CASCADE'),
     propagate=True)
 
 
