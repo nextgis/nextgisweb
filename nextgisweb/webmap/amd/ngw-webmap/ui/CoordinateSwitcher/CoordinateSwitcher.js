@@ -1,25 +1,40 @@
 define([
-    'dojo/_base/declare',
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
+    "dojo/_base/declare",
+    "dojo/_base/array",
+    "dojo/request/xhr",
+    "dojo/Deferred",
+    "ngw-pyramid/i18n!webmap",
+    "ngw-pyramid/hbs-i18n",
     "dojo/on",
     "dojo/dom-class",
-    'dijit/form/Select',
+    "dijit/form/Select",
     "openlayers/ol",
     "ngw-pyramid/utils/coordinateConverter",
-
+    "ngw/route",
     //templates
     "xstyle/css!./CoordinateSwitcher.css"
 ], function (
     declare,
+    array,
+    xhr,
+    Deferred,
     i18n,
     hbsI18n,
     on,
     domClass,
     Select,
     ol,
-    CoordinateConverter
+    CoordinateConverter,
+    route
     ) {
+
+    var proj4;
+    var customCoordinateSystems;
+    var getProjCode = function (prj) {
+        var auth_name = prj.auth_name ? prj.auth_name + ":" : "";
+        return auth_name + prj.auth_srid;
+    };
+
     return declare([Select], {
         point: undefined,
         coordinates: {},
@@ -31,15 +46,113 @@ define([
         name: "coordinate-switcher",
         class: "coordinate-switcher",
         constructor: function(options){
-          declare.safeMixin(this,options);
-          this._convertCoordinates();
-          this._setOptions();
+            var that = this;
+            declare.safeMixin(this,options);
+            this._getCustomCoordinateSystems().then(function () {
+                that._convertCoordinates();
+                that._setOptions();
+            }, function () {
+                // for backward compatibility
+                that._convertDefaultCoordinates();
+                that._setDefaultOptions();
+            });
         },
         buildRendering: function(){
             this.inherited(arguments);
             domClass.add(this.dropDown.domNode, "coordinate-switcher__dropdown");
         },
+        _getCustomCoordinateSystems: function() {
+            var coordSystemDefer = new Deferred();
+            if (customCoordinateSystems) {
+                coordSystemDefer.resolve();
+            }
+            var API_URL = route.spatial_ref_sys.collection();
+            xhr.get(API_URL, {
+                handleAs: "json"
+            }).then(function (data) {
+                customCoordinateSystems = data || [];
+                if (customCoordinateSystems.length) {
+                    require(["openlayers/proj4"], function (_proj4) {
+                        proj4 = _proj4;
+                        array.forEach(customCoordinateSystems, function(c, i) {
+                            c.projCode = getProjCode(c);
+                            proj4.defs(c.projCode, c.proj4text);
+                        });
+                        return coordSystemDefer.resolve();
+                    });
+                }
+            }, coordSystemDefer.reject);
+            return coordSystemDefer;
+        },
         _convertCoordinates: function(){
+            var that = this;
+            array.forEach(customCoordinateSystems, function(c) {
+                var custom = proj4(that.projections.initial, c.proj4text, that.point);
+                that.coordinates[c.projCode] = [custom[0], custom[1]];
+            })
+        },
+        _setOptions: function() {
+            var that = this;
+            that.options = [];
+            array.forEach(customCoordinateSystems, function (c) {
+                var code = c.projCode;
+                var pr = proj4(c.projCode);
+                var coord = that.coordinates[code];
+                var x = coord[1];
+                var y = coord[0];
+                var pushOption = function (opt) {
+                    that.options.push({
+                        label: opt.value + " " + c.projCode, // " - " + c.display_name,
+                        value: opt.value,
+                        format: opt.format,
+                        selected: that.selectedFormat === opt.format
+                    });
+                }
+                if (!pr.oProj.units) {
+                    array.forEach([
+                        ["DD", [x.toFixed(6), y.toFixed(6)]],
+                        ["DMS", [
+                            CoordinateConverter.DDtoDMS(x, { lon: false, needString: true }),
+                            CoordinateConverter.DDtoDMS(y, { lon: true, needString: true })] 
+                        ],
+                        ["DM", [
+                            CoordinateConverter.DDtoDM(x, { lon: false, needString: true }),
+                            CoordinateConverter.DDtoDM(y, { lon: true, needString: true })
+                        ]]
+                    ], function (args) {
+                            var formatCoord = args[1];
+                            var formatCode = code + "-" + args[0];
+                            var fx = formatCoord[0];
+                            var fy = formatCoord[1];
+                            pushOption({
+                                value: fx + ", " + fy,
+                                format: formatCode,
+                            });
+                    });
+                } else {
+                    pushOption({     
+                        value: Math.round(x) + ", " + Math.round(y),
+                        format: code,
+                    });
+                }
+            });
+            // options are filled asynchronously so need to set the value manually
+            if (!that._isSelectedFormat) {
+                var format;
+                if (that.selectedFormat) {
+                    var filtered = array.filter(that.options, function (opt) {
+                        return opt.format === that.selectedFormat;
+                    });
+                    format = filtered[0];
+                } else {
+                    format = that.options[0];
+                }
+                that.set(format);
+                that._isSelectedFormat = true;
+            }
+        },
+        // for backward compatibility
+        _convertDefaultCoordinates: function(){
             var pointLonLat = ol.proj.transform(this.point, this.projections.initial, this.projections.lonlat),
                 pointLatLon=[pointLonLat[1], pointLonLat[0]];
 
@@ -50,11 +163,11 @@ define([
                 ],
                 DMS: [
                     CoordinateConverter.DDtoDMS(pointLatLon[0], {lon: false, needString: true}),
-                    CoordinateConverter.DDtoDMS(pointLatLon[1],{lon: true, needString: true})
+                    CoordinateConverter.DDtoDMS(pointLatLon[1], {lon: true, needString: true})
                 ],
                 DM: [
                     CoordinateConverter.DDtoDM(pointLatLon[0], {lon: false, needString: true}),
-                    CoordinateConverter.DDtoDM(pointLatLon[1],{lon: true, needString: true})
+                    CoordinateConverter.DDtoDM(pointLatLon[1], {lon: true, needString: true})
                 ],
                 degrees: [
                     Math.round(pointLatLon[0]*1000000)/1000000 + "°",
@@ -66,7 +179,8 @@ define([
                 ]
             };
         },
-        _setOptions: function(){
+        // for backward compatibility
+        _setDefaultOptions: function(){
             this.options = [
                 {
                     label: this.coordinates.DD[0] + ", " + this.coordinates.DD[1],

@@ -8,6 +8,7 @@ def collection(request):
     return list(map(lambda o: dict(
         id=o.id, display_name=o.display_name,
         auth_name=o.auth_name, auth_srid=o.auth_srid,
+        proj4text=o.proj4text
     ), SRS.query()))
 
 
