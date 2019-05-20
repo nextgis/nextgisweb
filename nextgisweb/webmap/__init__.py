@@ -46,7 +46,8 @@ class WebMapComponent(Component):
                    root_item=WebMapItem(item_type='root')).persist()
 
     def setup_pyramid(self, config):
-        from . import view
+        from . import api, view
+        api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
     def client_settings(self, request):
