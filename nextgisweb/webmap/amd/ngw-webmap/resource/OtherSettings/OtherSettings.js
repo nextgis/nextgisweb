@@ -42,11 +42,15 @@ define([
             if (data.webmap === undefined) { data.webmap = {}; }
             var value = data.webmap;
             value.editable = this.chbEditable.get("checked");
+            value.annotation_enabled = this.chbAnnotationEnabled.get("checked");
+            value.annotation_default = this.chbAnnotationDefault.get("checked");
         },
 
         deserializeInMixin: function (data) {
             var value = data.webmap;
             this.chbEditable.set("checked", value.editable);
+            this.chbAnnotationEnabled.set("checked", value.annotation_enabled);
+            this.chbAnnotationDefault.set("checked", value.annotation_default);
         }
     });
 });

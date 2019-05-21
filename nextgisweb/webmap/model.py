@@ -229,6 +229,9 @@ class WebMapSerializer(Serializer):
     draw_order_enabled = SP(**_mdargs)
     editable = SP(**_mdargs)
 
+    annotation_enabled = SP(**_mdargs)
+    annotation_default = SP(**_mdargs)
+
     bookmark_resource = SRR(**_mdargs)
 
     root_item = _root_item_attr(**_mdargs)
