@@ -18,6 +18,14 @@
                         <option value="imperial">{{gettext 'Feet/Miles'}}</option>
                     </select>
 
+                    <select data-dojo-type="dijit/form/Select"
+                        data-dojo-attach-point="wDegreeFormat"
+                        title="{{gettext 'Degree format'}}" style="width: 100%">
+                        <option value="dd" selected="selected">{{gettext 'Decimal degrees'}}</option>
+                        <option value="ddm">{{gettext 'Degrees, decimal minutes'}}</option>
+                        <option value="dms">{{gettext 'Degrees, minutes, seconds'}}</option>
+                    </select>
+
                 </div>
         </div>
 

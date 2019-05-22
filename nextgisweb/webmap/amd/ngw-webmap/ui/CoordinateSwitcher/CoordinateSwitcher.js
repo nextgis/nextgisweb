@@ -11,6 +11,7 @@ define([
     "openlayers/ol",
     "ngw-pyramid/utils/coordinateConverter",
     "ngw/route",
+    "ngw/settings!pyramid",
     //templates
     "xstyle/css!./CoordinateSwitcher.css"
 ], function (
@@ -25,8 +26,10 @@ define([
     Select,
     ol,
     CoordinateConverter,
-    route
-    ) {
+    route,
+    settingsPyramid
+) {
+    var degreeFormat = settingsPyramid.degree_format;
 
     var proj4;
     var customCoordinateSystems;
@@ -109,25 +112,20 @@ define([
                     });
                 }
                 if (!pr.oProj.units) {
-                    array.forEach([
-                        ["DD", [x.toFixed(6), y.toFixed(6)]],
-                        ["DMS", [
-                            CoordinateConverter.DDtoDMS(x, { lon: false, needString: true }),
-                            CoordinateConverter.DDtoDMS(y, { lon: true, needString: true })] 
-                        ],
-                        ["DM", [
-                            CoordinateConverter.DDtoDM(x, { lon: false, needString: true }),
-                            CoordinateConverter.DDtoDM(y, { lon: true, needString: true })
-                        ]]
-                    ], function (args) {
-                            var formatCoord = args[1];
-                            var formatCode = code + "-" + args[0];
-                            var fx = formatCoord[0];
-                            var fy = formatCoord[1];
-                            pushOption({
-                                value: fx + ", " + fy,
-                                format: formatCode,
-                            });
+                    var fx, fy;
+                    if (degreeFormat == 'dd') {
+                        fx = x.toFixed(6);
+                        fy = x.toFixed(6);
+                    } else if (degreeFormat == 'ddm') {
+                        fx = CoordinateConverter.DDtoDM(x, { lon: false, needString: true });
+                        fy = CoordinateConverter.DDtoDM(y, { lon: true, needString: true });
+                    } else if (degreeFormat == 'dms') {
+                        fx = CoordinateConverter.DDtoDMS(x, { lon: false, needString: true });
+                        fy = CoordinateConverter.DDtoDMS(y, { lon: true, needString: true });
+                    };
+                    pushOption({
+                        value: fx + ", " + fy,
+                        format: code,
                     });
                 } else {
                     pushOption({     

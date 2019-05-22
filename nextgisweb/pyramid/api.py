@@ -162,8 +162,14 @@ def system_name_put(request):
 
 
 def miscellaneous_get(request):
-    units = env.core.settings_get('core', 'units')
-    return dict(units=units)
+    result = dict()
+    for k in ('units', 'degree_format'):
+        try:
+            result[k] = env.core.settings_get('core', k)
+        except KeyError:
+            pass
+    
+    return result
 
 
 def miscellaneous_put(request):
@@ -171,7 +177,7 @@ def miscellaneous_put(request):
 
     body = request.json_body
     for k, v in body.iteritems():
-        if k in ('units',):
+        if k in ('units', 'degree_format'):
             env.core.settings_set('core', k, v)
         else:
             raise HTTPBadRequest("Invalid key '%s'" % k)
