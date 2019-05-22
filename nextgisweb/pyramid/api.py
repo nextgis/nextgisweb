@@ -367,7 +367,7 @@ def setup_pyramid(comp, config):
         .add_view(custom_css_get, request_method='GET') \
         .add_view(custom_css_put, request_method='PUT')
 
-    config.add_route('pyramid.logo', '/api/component/pyramid/logo', client=()) \
+    config.add_route('pyramid.logo', '/api/component/pyramid/logo') \
         .add_view(logo_get, request_method='GET') \
         .add_view(logo_put, request_method='PUT')
 
