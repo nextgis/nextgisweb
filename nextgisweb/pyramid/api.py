@@ -296,19 +296,15 @@ def custom_css_put(request):
 
 
 def logo_get(request):
-    settings = request.env.pyramid.settings
-    if 'logo' in settings and os.path.isfile(settings['logo']):
-        return FileResponse(settings['logo'], request=request)
-    else:
-        try:
-            logodata = request.env.core.settings_get('pyramid', 'logo')
-            bindata = base64.b64decode(logodata)
-            return Response(
-                bindata, content_type=b'image/png',
-                expires=timedelta(days=1))
+    try:
+        logodata = request.env.core.settings_get('pyramid', 'logo')
+        bindata = base64.b64decode(logodata)
+        return Response(
+            bindata, content_type=b'image/png',
+            expires=timedelta(days=1))
 
-        except KeyError:
-            raise HTTPNotFound()
+    except KeyError:
+        raise HTTPNotFound()
 
 
 def logo_put(request):
