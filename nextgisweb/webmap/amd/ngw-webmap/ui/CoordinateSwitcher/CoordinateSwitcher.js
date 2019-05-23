@@ -84,7 +84,7 @@ define([
                 var y = coord[0];
                 var pushOption = function (opt) {
                     that.options.push({
-                        label: opt.value + " " + c.projCode, // " - " + c.display_name,
+                        label: opt.value + " " + c.display_name,
                         value: opt.value,
                         format: opt.format,
                         selected: c.projCode === that.selectedFormat
