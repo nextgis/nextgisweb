@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-05-22 13:12+0000\n"
+"POT-Creation-Date: 2019-05-23 18:36+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -147,16 +147,16 @@ msgstr ""
 "страниц вашей Веб ГИС."
 
 #: amd/ngw-pyramid/template/LogoForm.hbs:12
-msgid "Select a new logo"
-msgstr "Выберите новый Логотип"
+msgid "Upload a PNG logo"
+msgstr "Выберите логотип в формате PNG"
 
 #: amd/ngw-pyramid/template/LogoForm.hbs:13
 msgid ""
-"Logo should be in PNG format, 22 pixels in height and 22 to 200 pixels in"
-" width."
+"We recommend height of 45 px and width of up to 200 px. Refresh the page "
+"after upload."
 msgstr ""
-"Логотип должен быть в формате PNG, 22 пикселей в высоту и до 200 пикселей"
-" в ширину. "
+"Рекомендуемая высота 45 пикселей, ширина до 200 пикселей. Обновите "
+"страницу после загрузки."
 
 #: amd/ngw-pyramid/template/LogoForm.hbs:25
 msgid "Restore default"
@@ -209,13 +209,4 @@ msgstr "Пакет"
 #: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
-
-#~ msgid "Metric"
-#~ msgstr "Метрические"
-
-#~ msgid "Imperial"
-#~ msgstr "Имперские"
-
-#~ msgid "Map logo link"
-#~ msgstr "Ссылка логотипа на карте"
 
