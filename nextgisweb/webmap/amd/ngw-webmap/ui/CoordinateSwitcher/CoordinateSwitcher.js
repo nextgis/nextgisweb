@@ -9,8 +9,10 @@ define([
     "dojo/dom-class",
     "dijit/form/Select",
     "openlayers/ol",
+    "openlayers/proj4",
     "ngw-pyramid/utils/coordinateConverter",
     "ngw/route",
+    "ngw/load-json!api/component/spatial_ref_sys/",
     "ngw/settings!pyramid",
     //templates
     "xstyle/css!./CoordinateSwitcher.css"
@@ -25,18 +27,19 @@ define([
     domClass,
     Select,
     ol,
+    proj4,
     CoordinateConverter,
     route,
+    customCoordinateSystems,
     settingsPyramid
 ) {
     var degreeFormat = settingsPyramid.degree_format;
-
-    var proj4;
-    var customCoordinateSystems;
-    var getProjCode = function (prj) {
-        var auth_name = prj.auth_name ? prj.auth_name + ":" : "";
-        return auth_name + prj.auth_srid;
-    };
+    if (customCoordinateSystems) {
+        array.forEach(customCoordinateSystems, function (c) {
+            c.projCode = (c.auth_name ? c.auth_name + ":" : "") + c.auth_srid;
+            proj4.defs(c.projCode, c.proj4text);
+        });
+    }
 
     return declare([Select], {
         point: undefined,
@@ -49,43 +52,19 @@ define([
         name: "coordinate-switcher",
         class: "coordinate-switcher",
         constructor: function(options){
-            var that = this;
             declare.safeMixin(this,options);
-            this._getCustomCoordinateSystems().then(function () {
-                that._convertCoordinates();
-                that._setOptions();
-            }, function () {
+            if (customCoordinateSystems) {
+                this._convertCoordinates();
+                this._setOptions();
+            } else {
                 // for backward compatibility
-                that._convertDefaultCoordinates();
-                that._setDefaultOptions();
-            });
+                this._convertDefaultCoordinates();
+                this._setDefaultOptions();
+            }
         },
         buildRendering: function(){
             this.inherited(arguments);
             domClass.add(this.dropDown.domNode, "coordinate-switcher__dropdown");
-        },
-        _getCustomCoordinateSystems: function() {
-            var coordSystemDefer = new Deferred();
-            if (customCoordinateSystems) {
-                coordSystemDefer.resolve();
-            }
-            var API_URL = route.spatial_ref_sys.collection();
-            xhr.get(API_URL, {
-                handleAs: "json"
-            }).then(function (data) {
-                customCoordinateSystems = data || [];
-                if (customCoordinateSystems.length) {
-                    require(["openlayers/proj4"], function (_proj4) {
-                        proj4 = _proj4;
-                        array.forEach(customCoordinateSystems, function(c, i) {
-                            c.projCode = getProjCode(c);
-                            proj4.defs(c.projCode, c.proj4text);
-                        });
-                        return coordSystemDefer.resolve();
-                    });
-                }
-            }, coordSystemDefer.reject);
-            return coordSystemDefer;
         },
         _convertCoordinates: function(){
             var that = this;
@@ -108,7 +87,7 @@ define([
                         label: opt.value + " " + c.projCode, // " - " + c.display_name,
                         value: opt.value,
                         format: opt.format,
-                        selected: that.selectedFormat === opt.format
+                        selected: c.projCode === that.selectedFormat
                     });
                 }
                 if (!pr.oProj.units) {
@@ -134,20 +113,6 @@ define([
                     });
                 }
             });
-            // options are filled asynchronously so need to set the value manually
-            if (!that._isSelectedFormat) {
-                var format;
-                if (that.selectedFormat) {
-                    var filtered = array.filter(that.options, function (opt) {
-                        return opt.format === that.selectedFormat;
-                    });
-                    format = filtered[0];
-                } else {
-                    format = that.options[0];
-                }
-                that.set(format);
-                that._isSelectedFormat = true;
-            }
         },
         // for backward compatibility
         _convertDefaultCoordinates: function(){
