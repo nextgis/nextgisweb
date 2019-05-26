@@ -1,0 +1,21 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${prefix}" class="padding-block">
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+
+        <div data-dojo-type="dijit/form/CheckBox"
+            data-ngw-serialize="enabled"
+            title="{{gettext 'Enabled'}}"></div>
+
+        <div data-dojo-type="ngw-pyramid/form/IntegerValueTextBox"
+            data-ngw-serialize="max_z"
+            data-dojo-props="required: false, value: 5"
+            title="{{gettext 'Max Z level'}}" style="width: 50%"></div>
+       
+        <div data-dojo-type="ngw-pyramid/form/IntegerValueTextBox"
+            data-ngw-serialize="ttl"
+            data-dojo-props="required: false, value: 2630000"
+            title="{{gettext 'TTL, sec.'}}" style="width: 50%"></div>
+
+    </div>
+</div>

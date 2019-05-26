@@ -32,5 +32,5 @@ class RenderComponent(Component):
             os.makedirs(self.tile_cache_path)
 
     def setup_pyramid(self, config):
-        from . import api
+        from . import api, view
         api.setup_pyramid(self, config)
