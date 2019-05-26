@@ -145,7 +145,7 @@ class ResourceTileCache(Base):
         color, tstamp = trow
 
         if self.ttl is not None:
-            expdt = TIMESTAMP_EPOCH + timedelta(seconds=tstamp) + self.ttl
+            expdt = TIMESTAMP_EPOCH + timedelta(seconds=tstamp + self.ttl)
             if expdt <= datetime.utcnow():
                 return None
         
