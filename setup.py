@@ -23,6 +23,7 @@ requires = [
     'psycopg2-binary==2.7.7',
     'geoalchemy2==0.5.0',
     'shapely==1.6.4.post2',
+    'affine=2.2.2',
     'geojson==2.4.1',
     'unicodecsv==0.14.1',
     'pillow==5.4.1',

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
+from math import log
 from StringIO import StringIO
 
 from PIL import Image
+from affine import Affine
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 
@@ -10,6 +12,13 @@ from ..resource import Resource, DataScope
 
 PD_READ = DataScope.read
 sett_name = 'permissions.disable_check.rendering'
+
+
+def af_transform(a, b):
+    """ Crate affine transform from coordinate system A to B """
+    return ~(Affine.translation(a[0], a[3])
+        * Affine.scale((a[2] - a[0]) / b[2], (a[1] - a[3]) / b[3])
+        * Affine.translation(b[0], b[1]))
 
 
 def tile(request):
@@ -81,13 +90,69 @@ def image(request):
     p_size = map(int, request.GET['size'].split(','))
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
 
+    resolution = (
+        (p_extent[2] - p_extent[0]) / p_size[0],
+        (p_extent[3] - p_extent[1]) / p_size[1],
+    )
+
     aimg = None
+    zexact = None
     for resid in p_resource:
         obj = Resource.filter_by(id=resid).one()
         if not setting_disable_check:
             request.resource_permission(PD_READ, obj)
-        req = obj.render_request(obj.srs)
-        rimg = req.render_extent(p_extent, p_size)
+
+        rimg = None
+
+        if zexact is None:
+            if abs(resolution[0] - resolution[1]) < 1e-9:
+                ztile = log((obj.srs.maxx - obj.srs.minx) / (256 * resolution[0]), 2)
+                zexact = abs(round(ztile) - ztile) < 1e-9
+                if zexact:
+                    ztile = int(round(ztile))
+            else:
+                zexact = False
+
+        # Is requested image may be cached via tiles?
+        cached = zexact and obj.tile_cache is not None and obj.tile_cache.enabled \
+            and (obj.tile_cache.max_z is None or ztile <= obj.tile_cache.max_z)
+
+        if cached:
+            # Affine transform from layer to tile
+            at_l2t = af_transform(
+                (obj.srs.minx, obj.srs.miny, obj.srs.maxx, obj.srs.maxy),
+                (0, 0, 2 ** ztile, 2 ** ztile))
+
+            # Affine transform from layer to image
+            at_l2i = af_transform(p_extent, (0, 0) + tuple(p_size))
+
+            # Affine transform from tile to image
+            at_t2i = at_l2i * ~at_l2t
+
+            # Tile coordinates of render extent
+            t_lb = map(int, at_l2t * p_extent[0:2])
+            t_rt = map(int, at_l2t * p_extent[2:4])
+
+            for tx in range(min(t_lb[0], t_rt[0]), max(t_lb[0], t_rt[0]) + 1):
+                for ty in range(min(t_lb[1], t_rt[1]), max(t_lb[1], t_rt[1]) + 1):
+                    tile = (ztile, tx, ty)
+                    timg = obj.tile_cache.get_tile(tile)
+                    if timg is None:
+                        rimg = None
+                        break
+                    else:
+                        if rimg is None:
+                            rimg = Image.new('RGBA', p_size)
+                        toffset = map(lambda x: int(round(x)), at_t2i * (tx, ty))
+                        rimg.paste(timg, toffset)
+   
+        if rimg is None:
+            req = obj.render_request(obj.srs)
+            rimg = req.render_extent(p_extent, p_size)
+
+            if cached:
+                # TODO: Slice image to tiles and put it to cache
+                pass
 
         if aimg is None:
             aimg = rimg
