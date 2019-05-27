@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
-from math import log
+from math import log, ceil, floor
+from itertools import product
 from StringIO import StringIO
 
 from PIL import Image
@@ -19,6 +20,10 @@ def af_transform(a, b):
     return ~(Affine.translation(a[0], a[3])
         * Affine.scale((a[2] - a[0]) / b[2], (a[1] - a[3]) / b[3])
         * Affine.translation(b[0], b[1]))
+
+
+def rtoint(arg):
+    return tuple(map(lambda c: int(round(c)), arg))
 
 
 def tile(request):
@@ -117,11 +122,16 @@ def image(request):
         cached = zexact and obj.tile_cache is not None and obj.tile_cache.enabled \
             and (obj.tile_cache.max_z is None or ztile <= obj.tile_cache.max_z)
 
+        ext_extent = p_extent
+        ext_size = p_size
+        ext_offset = (0, 0)
+
         if cached:
             # Affine transform from layer to tile
             at_l2t = af_transform(
                 (obj.srs.minx, obj.srs.miny, obj.srs.maxx, obj.srs.maxy),
                 (0, 0, 2 ** ztile, 2 ** ztile))
+            at_t2l = ~at_l2t
 
             # Affine transform from layer to image
             at_l2i = af_transform(p_extent, (0, 0) + tuple(p_size))
@@ -130,29 +140,51 @@ def image(request):
             at_t2i = at_l2i * ~at_l2t
 
             # Tile coordinates of render extent
-            t_lb = map(int, at_l2t * p_extent[0:2])
-            t_rt = map(int, at_l2t * p_extent[2:4])
+            t_lb = tuple(at_l2t * p_extent[0:2])
+            t_rt = tuple(at_l2t * p_extent[2:4])
 
-            for tx in range(min(t_lb[0], t_rt[0]), max(t_lb[0], t_rt[0]) + 1):
-                for ty in range(min(t_lb[1], t_rt[1]), max(t_lb[1], t_rt[1]) + 1):
-                    tile = (ztile, tx, ty)
-                    timg = obj.tile_cache.get_tile(tile)
-                    if timg is None:
-                        rimg = None
-                        break
-                    else:
-                        if rimg is None:
-                            rimg = Image.new('RGBA', p_size)
-                        toffset = map(lambda x: int(round(x)), at_t2i * (tx, ty))
-                        rimg.paste(timg, toffset)
+            tb = (
+                int(floor(t_lb[0]) if t_lb[0] == min(t_lb[0], t_rt[0]) else ceil(t_lb[0])),
+                int(floor(t_lb[1]) if t_lb[1] == min(t_lb[1], t_rt[1]) else ceil(t_lb[1])),
+                int(floor(t_rt[0]) if t_rt[0] == min(t_lb[0], t_rt[0]) else ceil(t_rt[0])),
+                int(floor(t_rt[1]) if t_rt[1] == min(t_lb[1], t_rt[1]) else ceil(t_rt[1])),
+            )
+
+            ext_extent = at_t2l * tb[0:2] + at_t2l * tb[2:4]
+            ext_im = rtoint(at_t2i * tb[0:2] + at_t2i * tb[2:4])
+            ext_size = (ext_im[2] - ext_im[0], ext_im[1] - ext_im[3])
+            ext_offset = (-ext_im[0], -ext_im[3])
+
+            tx_range = tuple(range(min(tb[0], tb[2]), max(tb[0], tb[2]) + 1))
+            ty_range = tuple(range(min(tb[1], tb[3]), max(tb[1], tb[3]) + 1))
+
+            for tx, ty in product(tx_range, ty_range):
+                timg = obj.tile_cache.get_tile((ztile, tx, ty))
+                if timg is None:
+                    rimg = None
+                    break
+                else:
+                    if rimg is None:
+                        rimg = Image.new('RGBA', p_size)
+                    toffset = rtoint(at_t2i * (tx, ty))
+                    rimg.paste(timg, toffset)
    
         if rimg is None:
             req = obj.render_request(obj.srs)
-            rimg = req.render_extent(p_extent, p_size)
+            rimg = req.render_extent(ext_extent, ext_size)
 
             if cached:
-                # TODO: Slice image to tiles and put it to cache
-                pass
+                for tx, ty in product(tx_range, ty_range):
+                    t_offset = at_t2i * (tx, ty)
+                    t_offset = rtoint((t_offset[0] + ext_offset[0], t_offset[1] + ext_offset[1]))
+                    timg = rimg.crop(t_offset + (t_offset[0] + 256, t_offset[1] + 256))
+                    obj.tile_cache.put_tile((ztile, tx, ty), timg)
+        
+            rimg = rimg.crop((
+                ext_offset[0], ext_offset[1],
+                ext_offset[0] + p_size[0],
+                ext_offset[1] + p_size[1]
+            ))
 
         if aimg is None:
             aimg = rimg
