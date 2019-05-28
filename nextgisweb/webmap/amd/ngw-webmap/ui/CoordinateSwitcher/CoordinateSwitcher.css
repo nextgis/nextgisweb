@@ -69,3 +69,8 @@
 .ngwPopup.dijitTooltipBelow .coordinate-switcher.dijitSelect .dijitReset.dijitInputField.dijitButtonText {
     width: 1px;
 }
+
+.ngwPopup__coordinates-srs-name {
+    font-style: italic;
+    font-size: 0.7rem;
+}

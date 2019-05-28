@@ -84,7 +84,7 @@ define([
                 var y = coord[0];
                 var pushOption = function (opt) {
                     that.options.push({
-                        label: opt.value + " " + c.display_name,
+                        label: opt.value + " <span class='ngwPopup__coordinates-srs-name'>" + c.display_name + "</span>",
                         value: opt.value,
                         format: opt.format,
                         selected: c.projCode === that.selectedFormat
