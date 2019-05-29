@@ -4,7 +4,7 @@ from math import log, ceil, floor
 from itertools import product
 from StringIO import StringIO
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from affine import Affine
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
@@ -24,6 +24,24 @@ def af_transform(a, b):
 
 def rtoint(arg):
     return tuple(map(lambda c: int(round(c)), arg))
+
+
+def tile_debug_info(img, offset=(0, 0), color='black',
+                    zxy=None, extent=None, msg=None):
+    """ Print tile debug info on image at given tile offset """
+    drw = ImageDraw.Draw(img)
+    drw.rectangle(offset + tuple(map(lambda c: c + 255, offset)), outline=color)
+    fnt = ImageFont.load_default()
+    text = []
+    if zxy:
+        text.append(unicode(zxy))
+    if extent:
+        text.append(unicode(extent[0:2]))
+        text.append(unicode(extent[2:4]))
+    if msg:
+        text.append(msg)
+    drw.text((8 + offset[0], 8 + offset[1]), '\n'.join(text), fill=color)
+    return img
 
 
 def tile(request):
@@ -94,6 +112,9 @@ def image(request):
     p_extent = map(float, request.GET['extent'].split(','))
     p_size = map(int, request.GET['size'].split(','))
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
+
+    # Print tile debug info on resulting image
+    tdi = request.GET.get('tdi', '').lower() in ('yes', 'true')
 
     resolution = (
         (p_extent[2] - p_extent[0]) / p_size[0],
@@ -166,6 +187,13 @@ def image(request):
                 else:
                     if rimg is None:
                         rimg = Image.new('RGBA', p_size)
+
+                    if tdi:
+                        timg = tile_debug_info(
+                            timg.convert('RGBA'), color='blue', zxy=(ztile, tx, ty),
+                            extent=at_t2l * (tx, ty) + at_t2l * (tx + 1, ty + 1),
+                            msg='CACHED')
+
                     toffset = rtoint(at_t2i * (tx, ty))
                     rimg.paste(timg, toffset)
    
@@ -179,6 +207,13 @@ def image(request):
                     t_offset = rtoint((t_offset[0] + ext_offset[0], t_offset[1] + ext_offset[1]))
                     timg = rimg.crop(t_offset + (t_offset[0] + 256, t_offset[1] + 256))
                     obj.tile_cache.put_tile((ztile, tx, ty), timg)
+                    
+                    if tdi:
+                        rimg = tile_debug_info(
+                            rimg, offset=t_offset, color='red', zxy=(ztile, tx, ty),
+                            extent=at_t2l * (tx, ty) + at_t2l * (tx + 1, ty + 1),
+                            msg='NEW')
+
         
             rimg = rimg.crop((
                 ext_offset[0], ext_offset[1],
