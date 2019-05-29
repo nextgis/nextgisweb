@@ -645,7 +645,7 @@ To create QGIS vector style for the layer do the following:
       "res_meta": {
          "items": {
          }
-      }
+      },
       "resource": {
         "cls": "qgis_vector_style",
         "description": null,
