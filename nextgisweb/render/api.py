@@ -176,8 +176,8 @@ def image(request):
             ext_size = (ext_im[2] - ext_im[0], ext_im[1] - ext_im[3])
             ext_offset = (-ext_im[0], -ext_im[3])
 
-            tx_range = tuple(range(min(tb[0], tb[2]), max(tb[0], tb[2]) + 1))
-            ty_range = tuple(range(min(tb[1], tb[3]), max(tb[1], tb[3]) + 1))
+            tx_range = tuple(range(min(tb[0], tb[2]), max(tb[0], tb[2])))
+            ty_range = tuple(range(min(tb[1], tb[3]), max(tb[1], tb[3])))
 
             for tx, ty in product(tx_range, ty_range):
                 timg = obj.tile_cache.get_tile((ztile, tx, ty))
