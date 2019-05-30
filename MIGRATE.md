@@ -2,7 +2,7 @@
 
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
-#### (2019-06-30)
+#### (2019-05-30)
 
 ```sql
 
