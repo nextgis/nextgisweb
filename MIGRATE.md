@@ -2,6 +2,55 @@
 
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
+#### (2019-06-30)
+
+```sql
+
+ALTER TABLE srs ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE srs_id_seq;
+ALTER TABLE srs ADD COLUMN auth_name character varying;
+ALTER TABLE srs ADD COLUMN auth_srid integer;
+ALTER TABLE srs ADD COLUMN proj4text character varying NOT NULL DEFAULT ''; 
+
+CREATE OR REPLACE FUNCTION srs_spatial_ref_sys_sync() RETURNS TRIGGER
+LANGUAGE 'plpgsql' AS $BODY$
+BEGIN
+    IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+        -- Update existing spatial_ref_sys row
+        UPDATE spatial_ref_sys SET
+        auth_name = NEW.auth_name, auth_srid = NEW.auth_srid,
+        proj4text = NEW.proj4text, srtext = NULL
+        WHERE srid = NEW.id;
+        
+        -- Insert if missing
+        INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text)
+        SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NULL, NEW.proj4text
+        WHERE NOT EXISTS(SELECT * FROM spatial_ref_sys WHERE srid = NEW.id);
+
+        RETURN NEW;
+    END IF;
+    
+    IF TG_OP = 'DELETE' THEN
+        -- Delete existing row
+        DELETE FROM spatial_ref_sys WHERE srid = OLD.id;
+        RETURN OLD;
+    END IF;
+
+END
+$BODY$;
+
+TRUNCATE TABLE spatial_ref_sys;
+
+DROP TRIGGER IF EXISTS spatial_ref_sys ON srs;
+CREATE TRIGGER spatial_ref_sys AFTER INSERT OR UPDATE OR DELETE ON srs
+    FOR EACH ROW EXECUTE PROCEDURE srs_spatial_ref_sys_sync();
+
+UPDATE srs SET auth_name = 'EPSG', auth_srid = 3857, proj4text = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs' WHERE id = 3857;
+UPDATE srs SET auth_name = 'EPSG', auth_srid = 4326,  proj4text = '+proj=longlat +datum=WGS84 +no_defs' WHERE id = 4326;
+
+ALTER TABLE srs ALTER COLUMN proj4text DROP DEFAULT;
+```
+
 #### (2018-12-16)
 
 ```sql
