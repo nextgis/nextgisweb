@@ -71,6 +71,7 @@
 }
 
 .ngwPopup__coordinates-srs-name {
+    padding-left: 3px; 
     font-style: italic;
     font-size: 0.7rem;
 }

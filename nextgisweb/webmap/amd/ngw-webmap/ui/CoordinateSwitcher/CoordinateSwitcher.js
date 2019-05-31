@@ -1,12 +1,12 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
-    "dojo/request/xhr",
-    "dojo/Deferred",
+    "dojo/dom-construct",
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
     "dojo/on",
     "dojo/dom-class",
+    "put-selector/put",
     "dijit/form/Select",
     "openlayers/ol",
     "openlayers/proj4",
@@ -19,12 +19,12 @@ define([
 ], function (
     declare,
     array,
-    xhr,
-    Deferred,
+    domConstruct,
     i18n,
     hbsI18n,
     on,
     domClass,
+    put,
     Select,
     ol,
     proj4,
@@ -83,8 +83,11 @@ define([
                 var x = coord[1];
                 var y = coord[0];
                 var pushOption = function (opt) {
+                    var el = put(
+                        "span span $ + span.ngwPopup__coordinates-srs-name $ <", 
+                        opt.value, c.display_name);
                     that.options.push({
-                        label: opt.value + " <span class='ngwPopup__coordinates-srs-name'>" + c.display_name + "</span>",
+                        label: el.innerHTML,
                         value: opt.value,
                         format: opt.format,
                         selected: c.projCode === that.selectedFormat
