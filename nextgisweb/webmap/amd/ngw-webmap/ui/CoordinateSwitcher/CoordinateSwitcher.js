@@ -97,7 +97,7 @@ define([
                     var fx, fy;
                     if (degreeFormat == 'dd') {
                         fx = x.toFixed(6);
-                        fy = x.toFixed(6);
+                        fy = y.toFixed(6);
                     } else if (degreeFormat == 'ddm') {
                         fx = CoordinateConverter.DDtoDM(x, { lon: false, needString: true });
                         fy = CoordinateConverter.DDtoDM(y, { lon: true, needString: true });
