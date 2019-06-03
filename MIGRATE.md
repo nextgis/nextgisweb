@@ -45,8 +45,22 @@ DROP TRIGGER IF EXISTS spatial_ref_sys ON srs;
 CREATE TRIGGER spatial_ref_sys AFTER INSERT OR UPDATE OR DELETE ON srs
     FOR EACH ROW EXECUTE PROCEDURE srs_spatial_ref_sys_sync();
 
-UPDATE srs SET auth_name = 'EPSG', auth_srid = 3857, proj4text = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs' WHERE id = 3857;
-UPDATE srs SET auth_name = 'EPSG', auth_srid = 4326,  proj4text = '+proj=longlat +datum=WGS84 +no_defs' WHERE id = 4326;
+UPDATE srs SET
+  auth_name = 'EPSG', auth_srid = 3857,
+  proj4text = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs'
+WHERE id = 3857;
+
+UPDATE srs SET
+  auth_name = 'EPSG', auth_srid = 4326, 
+  proj4text = '+proj=longlat +datum=WGS84 +no_defs'
+WHERE id = 4326;
+
+INSERT INTO srs (id, auth_name, auth_srid, display_name, proj4text, minx, miny, maxx, maxy)
+SELECT
+  4326, 'EPGSG', 4326, 'WGS 84 / Lon-lat (EPSG:4326)',
+  '+proj=longlat +datum=WGS84 +no_defs',
+  -180, -90, 180, 90
+WHERE NOT EXISTS(SELECT * FROM srs WHERE id = 4326);
 
 ALTER TABLE srs ALTER COLUMN proj4text DROP DEFAULT;
 ```
