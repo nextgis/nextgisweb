@@ -5,11 +5,12 @@ from .models import SRS
 
 
 def collection(request):
-    return list(map(lambda o: dict(
+    srs_collection = list(map(lambda o: dict(
         id=o.id, display_name=o.display_name,
         auth_name=o.auth_name, auth_srid=o.auth_srid,
         proj4text=o.proj4text
     ), SRS.query()))
+    return sorted(srs_collection, key=lambda srs: srs['id'] != 4326)
 
 
 def get(request):
