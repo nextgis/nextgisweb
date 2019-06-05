@@ -440,6 +440,7 @@ To search resources execute the following request:
 
 **Example request**:
 
+Search by keyname
 .. sourcecode:: http
 
    GET /api/resource/search/?keyname=satellite HTTP/1.1
@@ -480,6 +481,18 @@ To search resources execute the following request:
     ]
 
 Found only one resource because keyname is unique in whole NextGIS Web instance.
+
+
+**Example request**:
+
+Search by name
+
+.. sourcecode:: http
+
+   GET /api/resource/search/?display_name=photos HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
 
 
 Child resource
