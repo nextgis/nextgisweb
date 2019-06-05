@@ -624,7 +624,7 @@ QGIS style
 
 To create QGIS vector style for the layer do the following:
 
-1. Upload file with QGIS style to NGW. See :ref:`ngwdev_file_upload`. Get *id*, *mime_type*, *name* and *size* from the reply. 
+1. Upload file with QGIS style to NGW. See :ref:`ngwdev_file_upload`. Get *id*, *mime_type* and *size* from the reply. 
 2. Create NGW resource via */api/resource/* as shown below:
 
 .. sourcecode:: http
@@ -638,7 +638,6 @@ To create QGIS vector style for the layer do the following:
          "file_upload": {
             "id": <id>, 
             "mime_type": <mime type>,
-            "name": <name>,
             "size": <size>
          }
       },
