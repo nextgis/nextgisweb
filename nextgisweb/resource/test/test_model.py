@@ -4,7 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from nextgisweb.fixture import env, tx_abort
+from nextgisweb.pytest import tx_abort
 from nextgisweb.models import DBSession
 from nextgisweb.resource import ResourceGroup
 from nextgisweb.auth import User
