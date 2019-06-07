@@ -2,13 +2,10 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import pytest
-from transaction import manager as transaction_manager
-
-import nextgisweb.env
-from nextgisweb.models import DBSession
 
 
 def _env_initialize():
+    import nextgisweb.env
     result = nextgisweb.env.env()
     if result:
         return result
@@ -25,8 +22,10 @@ def env():
 
 @pytest.fixture
 def tx_abort():
+    from nextgisweb.models import DBSession
+    from transaction import manager
     _env_initialize()
-    with transaction_manager as tx:
+    with manager as tx:
         yield
         try:
             DBSession.flush()
@@ -34,3 +33,10 @@ def tx_abort():
         finally:
             DBSession.expunge_all()
             DBSession.expire_all()
+
+
+@pytest.fixture(scope='session')
+def webapp(env):
+    from webtest import TestApp
+    app = env.pyramid.make_app({}).make_wsgi_app()
+    yield TestApp(app)

@@ -34,7 +34,10 @@ requires = [
     'minio==4.0.10',
     'sentry-sdk==0.7.7',
     'python-magic==0.4.15',
+    
+    # TODO: Move to dev or test dependencies
     'pytest',
+    'webtest',
 ]
 
 extras_require = {
