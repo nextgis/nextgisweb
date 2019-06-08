@@ -53,6 +53,10 @@ entry_points = {
         'hbs = nextgisweb.i18n.hbs:extract',
     ],
 
+    'pytest11': [
+        'nextgisweb = nextgisweb.pytest',
+    ],
+
     'console_scripts': [
         'nextgisweb = nextgisweb.script:main',
         'nextgisweb-config = nextgisweb.script:config',
@@ -76,6 +80,7 @@ setup(
         "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        "Framework :: Pytest",
     ],
     author='NextGIS',
     author_email='info@nextgis.com',

@@ -12,7 +12,7 @@ from nextgisweb.feature_layer import FIELD_TYPE
 from nextgisweb.vector_layer import VectorLayer
 
 
-def test_from_fields(tx_abort):
+def test_from_fields(txn):
     res = VectorLayer(
         parent_id=0, display_name='from_fields',
         owner_user=User.by_keyname('administrator'),

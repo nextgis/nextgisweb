@@ -9,7 +9,7 @@ from nextgisweb.resource import ResourceGroup
 from nextgisweb.auth import User
 
 
-def test_same_display_name(tx_abort):
+def test_same_display_name(txn):
     margs=dict(
         parent_id=0, display_name='display name',
         owner_user=User.by_keyname('administrator'))

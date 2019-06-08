@@ -21,15 +21,15 @@ def env():
 
 
 @pytest.fixture
-def tx_abort():
+def txn():
     from nextgisweb.models import DBSession
     from transaction import manager
     _env_initialize()
-    with manager as tx:
-        yield
+    with manager as t:
+        yield t
         try:
             DBSession.flush()
-            tx.abort()
+            t.abort()
         finally:
             DBSession.expunge_all()
             DBSession.expire_all()
