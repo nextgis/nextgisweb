@@ -29,8 +29,6 @@ Unit tests designed to test functionality of a specific module and usually do no
 .. code-block:: python
 
     # package/component/test/test_unit.py
-    import pytest
-
     from package.component import some_function
 
     def test_some_function():
@@ -40,14 +38,46 @@ Unit tests designed to test functionality of a specific module and usually do no
 Functional tests
 ----------------
 
-Functional tests operate on data and NextGIS Web must be configured and  initialized database (``nextgisweb initialize_db``). Some tests can modify data so don't use functional tests on production instances.
+Functional tests operate on data and NextGIS Web must be configured and  initialized database (``nextgisweb initialize_db``). Some tests can modify data so don't run functional tests on production instances.
 
 
-Server mode
+Server side
 ^^^^^^^^^^^
+
+Server side tests executed in same context as others NextGIS Web console scripts. Enviroment can be loaded with ``env`` fixture wich initializes components.
+
+.. code-block:: python
+
+    # package/component/test/test_env.py
+
+    def test_component(env):
+        env.component.some_component_method()
+
+
+If the test needs to be performed as part of transaction that needs to be aborted, you can use transaction fixture ``txn``.
+
+.. code-block:: python
+
+    # package/component/test/test_txn.py
+    from package.component.model import SomeModel
+
+    def test_transaction(txn):
+        SomeModel(field='value').persist()  # Dummy record insert
+        DBSession.flush()
+
 
 Web application
 ^^^^^^^^^^^^^^^
+
+For testing via HTTP requests fixture ``webapp`` can be used. It's represents `WebTest's <https://docs.pylonsproject.org/projects/webtest/en/latest/index.html>`_ `TestApp <https://docs.pylonsproject.org/projects/webtest/en/latest/api.html>`_ instance wich can be used for doing requests.
+
+.. code-block:: python
+
+    # package/component/test/test_webapp.py
+
+    def test_api_method(webapp):
+        webapp.get('/api/component/component/method')
+
 
 Writing tests
 -------------
@@ -60,7 +90,6 @@ Pytest doesn't support well relative imports in test modules. So don't use relat
 .. code-block:: python
 
     # package/component/test/test_import.py
-    import pytest
 
     from ..model import SomeModel                   # Wrong way!
     from package.component.model import SomeModel   # It's OK!
@@ -68,3 +97,8 @@ Pytest doesn't support well relative imports in test modules. So don't use relat
 
 Running tests
 -------------
+
+.. code-block:: shell
+
+    $ export NEXTGISWEB_CONFIG=path/to/config.ini
+    $ python -m pytest -v path/to/package
