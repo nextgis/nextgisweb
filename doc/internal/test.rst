@@ -40,6 +40,9 @@ Unit tests designed to test functionality of a specific module and usually do no
 Functional tests
 ----------------
 
+Functional tests operate on data and NextGIS Web must be configured and  initialized database (``nextgisweb initialize_db``). Some tests can modify data so don't use functional tests on production instances.
+
+
 Server mode
 ^^^^^^^^^^^
 
@@ -52,7 +55,7 @@ Writing tests
 Relative imports
 ^^^^^^^^^^^^^^^^
 
-For design reasons pytest doesn't support well relative imports in test modules. So don't use relative imports and use absolute imports instead. For example:
+Pytest doesn't support well relative imports in test modules. So don't use relative imports and use absolute imports instead. For example:
 
 .. code-block:: python
 
