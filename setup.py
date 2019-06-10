@@ -34,6 +34,10 @@ requires = [
     'minio==4.0.10',
     'sentry-sdk==0.7.7',
     'python-magic==0.4.15',
+    
+    # TODO: Move to dev or test dependencies
+    'pytest',
+    'webtest',
 ]
 
 extras_require = {
@@ -47,6 +51,10 @@ entry_points = {
 
     'babel.extractors': [
         'hbs = nextgisweb.i18n.hbs:extract',
+    ],
+
+    'pytest11': [
+        'nextgisweb = nextgisweb.pytest',
     ],
 
     'console_scripts': [
@@ -72,6 +80,7 @@ setup(
         "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        "Framework :: Pytest",
     ],
     author='NextGIS',
     author_email='info@nextgis.com',

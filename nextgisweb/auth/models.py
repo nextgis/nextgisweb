@@ -135,6 +135,10 @@ class User(Principal):
                 lambda gid: Group.filter_by(id=gid).one(),
                 data['member_of']))
 
+    @classmethod
+    def by_keyname(cls, keyname):
+        return cls.filter_by(keyname=keyname).one()
+
 
 class Group(Principal):
     __tablename__ = 'auth_group'
