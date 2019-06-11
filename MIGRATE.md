@@ -2,6 +2,14 @@
 
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
+#### (2019-06-02)
+
+```sql
+ALTER TABLE public.webmap ADD COLUMN annotation_enabled boolean DEFAULT FALSE;
+ALTER TABLE public.webmap ADD COLUMN annotation_default boolean DEFAULT FALSE;
+
+```
+
 #### (2019-05-16)
 
 ```sql
