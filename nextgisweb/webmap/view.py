@@ -4,7 +4,7 @@ from collections import namedtuple
 from ..resource import Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
 
-from .model import WebMap
+from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .adapter import WebMapAdapter
 from .util import _
@@ -133,8 +133,8 @@ def setup_pyramid(comp, config):
                 enabled=obj.annotation_enabled,
                 default=obj.annotation_default,
                 scope=dict(
-                    read=True,
-                    write=True
+                    read=obj.has_permission(WebMapScope.annotation_read, request.user),
+                    write=obj.has_permission(WebMapScope.annotation_write, request.user),
                 )
             )
         )
