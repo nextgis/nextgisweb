@@ -34,7 +34,13 @@ define([
                 intermediateChanges:false,
                 customIcon: tool.customIcon,
                 class: "ol-control ol-unselectable"
-            }).placeAt(place);
+            });
+            
+            if (typeof place === "function") {
+                place(tglButtonTool);
+            } else {
+                tglButtonTool.placeAt(place);
+            }
 
             tool.toolbarBtn = tglButtonTool;
             this._bindChangeEvent(tglButtonTool);
