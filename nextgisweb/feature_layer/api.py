@@ -1,24 +1,29 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
+import os
 import re
 import urllib
+import zipfile
 
-import unicodecsv as csv
+import backports.tempfile
 from collections import OrderedDict
 from datetime import datetime, date, time
-from StringIO import StringIO
+from io import BytesIO
 
+from osgeo import ogr, gdal
 from shapely import wkt
 from pyramid.response import Response
 
 from ..geometry import geom_from_wkt
-from ..resource import DataScope, resource_factory
+from ..resource import DataScope, ValidationError, resource_factory
 from .. import geojson
 
 from .interface import IFeatureLayer, IWritableFeatureLayer, FIELD_TYPE
 from .feature import Feature
 from .extension import FeatureExtension
+from .ogrdriver import EXPORT_FORMAT_OGR
+from .util import _
 
 
 PERM_READ = DataScope.read
@@ -26,64 +31,107 @@ PERM_WRITE = DataScope.write
 
 
 def view_geojson(request):
+    request.GET["format"] = EXPORT_FORMAT_OGR["GEOJSON"].extension
+    request.GET["zipped"] = "false"
+
+    return export(request)
+
+
+def export(request):
     request.resource_permission(PERM_READ)
 
-    class CRSProxy(object):
-        """ Wrapper class that adds CRS information
-        in geointerface of vector layer query result"""
+    srs = int(
+        request.GET.get("srs", request.context.srs.id)
+    )
+    format = request.GET.get("format")
+    extent = request.GET.get("extent")
+    zipped = request.GET.get("zipped", "true")
+    zipped = zipped.lower() == "true"
 
-        def __init__(self, query):
-            self.query = query
+    if format is None:
+        raise ValidationError(
+            _("Output format is not provided.")
+        )
+    else:
+        format = format.upper()
 
-        @property
-        def __geo_interface__(self):
-            result = self.query.__geo_interface__
+    if not format in EXPORT_FORMAT_OGR:
+        raise ValidationError(
+            _("Format '%s' is not supported.") % (format,)
+        )
 
-            # TODO: Need correct way to generate CRS name, currently by ID
-            result['crs'] = dict(type='name', properties=dict(
-                name='EPSG:%d' % request.context.srs_id))
-            return result
+    driver = EXPORT_FORMAT_OGR[format]
 
     query = request.context.feature_query()
     query.geom()
 
-    content_disposition = (b'attachment; filename=%d.geojson'
-                           % request.context.id)
-
-    result = CRSProxy(query())
-
-    return Response(
-        text=geojson.dumps(result, ensure_ascii=False),
-        content_type=b'application/json',
-        content_disposition=content_disposition)
-
-
-def view_csv(request):
-    request.resource_permission(PERM_READ)
-
-    buf = StringIO()
-    writer = csv.writer(buf, dialect='excel')
-
-    headrow = map(lambda fld: fld.keyname, request.context.fields)
-    headrow.append('GEOM')
-    writer.writerow(headrow)
-
-    query = request.context.feature_query()
-    query.geom()
-
+    ogr_ds, ogr_layer = request.context.ogr_layer()
     for feature in query():
-        datarow = map(
-            lambda fld: feature.fields[fld.keyname],
-            request.context.fields)
-        datarow.append(feature.geom.wkt)
-        writer.writerow(datarow)
+        ogr_feature = ogr.Feature(ogr_layer.GetLayerDefn())
+        ogr_feature.SetFID(feature.id)
+        ogr_feature.SetGeometry(
+            ogr.CreateGeometryFromWkb(feature.geom.wkb)
+        )
 
-    content_disposition = (b'attachment; filename=%d.csv'
-                           % request.context.id)
+        for field in request.context.fields:
+            ogr_feature[
+                field.keyname.encode("utf8")
+            ] = feature.fields[field.keyname]
+
+        ogr_layer.CreateFeature(ogr_feature)
+
+    buf = BytesIO()
+
+    with backports.tempfile.TemporaryDirectory() as temp_dir:
+        options = [
+            '-f "%s"' % driver.name,
+            "-t_srs EPSG:%d" % srs,
+        ]
+        options.extend(["-preserve_fid"])
+        options.extend(list(driver.options or []))
+
+        filename = "%d.%s" % (
+            request.context.id,
+            driver.extension,
+        )
+        gdal.VectorTranslate(
+            os.path.join(temp_dir, filename),
+            ogr_ds,
+            options=" ".join(options),
+        )
+
+        if zipped or not driver.single_file:
+            with zipfile.ZipFile(
+                buf, "w", zipfile.ZIP_DEFLATED
+            ) as zipf:
+                for root, dirs, files in os.walk(temp_dir):
+                    for file in files:
+                        path = os.path.join(root, file)
+                        zipf.write(
+                            path, os.path.basename(path)
+                        )
+
+            content_type = "application/zip"
+            filename = "%s.zip" % (filename,)
+
+        else:
+            content_type = (
+                driver.mime or "application/octet-stream"
+            )
+            with open(
+                os.path.join(temp_dir, filename)
+            ) as f:
+                buf.write(f.read())
+
+    content_disposition = (
+        b"attachment; filename=%s" % filename
+    )
 
     return Response(
-        buf.getvalue(), content_type=b'text/csv',
-        content_disposition=content_disposition)
+        buf.getvalue(),
+        content_type=b"%s" % str(content_type),
+        content_disposition=content_disposition,
+    )
 
 
 def deserialize(feat, data):
@@ -415,9 +463,9 @@ def setup_pyramid(comp, config):
         .add_view(view_geojson, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
-        'feature_layer.csv', '/api/resource/{id}/csv',
+        'feature_layer.export', '/api/resource/{id}/export',
         factory=resource_factory) \
-        .add_view(view_csv, context=IFeatureLayer, request_method='GET')
+        .add_view(export, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',

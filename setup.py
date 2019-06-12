@@ -24,7 +24,6 @@ requires = [
     'geoalchemy2==0.5.0',
     'shapely==1.6.4.post2',
     'geojson==2.4.1',
-    'unicodecsv==0.14.1',
     'pillow==5.4.1',
     'lxml==4.3.0',
     'passlib==1.7.1',
@@ -34,6 +33,7 @@ requires = [
     'minio==4.0.10',
     'sentry-sdk==0.9.0',
     'python-magic==0.4.15',
+    'backports.tempfile==1.0',
     
     # TODO: Move to dev or test dependencies
     'pytest',

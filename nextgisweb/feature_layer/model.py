@@ -108,11 +108,11 @@ class LayerFieldsMixin(object):
         for field in self.fields:
             ogr_layer.CreateField(
                 ogr.FieldDefn(
-                    str(field.keyname),
+                    field.keyname.encode('utf8'),
                     _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
                 )
             )
-        return ogr_layer
+        return ds, ogr_layer
 
 
 class _fields_attr(SP):
