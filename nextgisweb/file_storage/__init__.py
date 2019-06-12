@@ -72,16 +72,21 @@ class FileStorageComponent(Component):
     def query_stat(self):
         # Traverse all objects in file storage and calculate total
         # and per component size in filesystem
+        
+        itm = lambda: OrderedDict(size=0, count=0)
+        result = OrderedDict(
+            total=itm(), component=defaultdict(itm))
+        
+        def add_item(itm, size):
+            itm['size'] += size
+            itm['count'] += 1
 
-        size = OrderedDict(total=0)
-        per_component = defaultdict(lambda: 0)
-        size['component'] = per_component
         for fileobj in FileObj.query():
             statres = os.stat(self.filename(fileobj))
-            size['total'] += statres.st_size
-            per_component[fileobj.component] += statres.st_size
+            add_item(result['total'], statres.st_size)
+            add_item(result['component'][fileobj.component], statres.st_size)
 
-        return dict(size=size)
+        return result
 
     settings_info = (
         dict(key='path', desc=u"Files storage folder (required)"),
