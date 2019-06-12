@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 
+from osgeo import gdal, ogr, osr
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
@@ -13,10 +14,15 @@ from ..resource import (
     SerializedProperty as SP)
 from ..resource.exception import ValidationError
 
-from .interface import FIELD_TYPE
+from .interface import (
+    FIELD_TYPE,
+    FIELD_TYPE_OGR)
+
 from .util import _
 
 Base = declarative_base()
+
+_FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 
 
 class LayerField(Base):
@@ -91,6 +97,22 @@ class LayerFieldsMixin(object):
             cascade='all',
             post_update=True
         )
+
+    def ogr_layer(self):
+        ds = gdal.GetDriverByName("Memory").Create(
+            r"", 0, 0, 0, gdal.GDT_Unknown
+        )
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(self.srs.id)
+        ogr_layer = ds.CreateLayer(r"", srs=srs)
+        for field in self.fields:
+            ogr_layer.CreateField(
+                ogr.FieldDefn(
+                    str(field.keyname),
+                    _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
+                )
+            )
+        return ogr_layer
 
 
 class _fields_attr(SP):
