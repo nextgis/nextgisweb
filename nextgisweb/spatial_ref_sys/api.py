@@ -8,7 +8,7 @@ def collection(request):
     srs_collection = list(map(lambda o: dict(
         id=o.id, display_name=o.display_name,
         auth_name=o.auth_name, auth_srid=o.auth_srid,
-        proj4text=o.proj4text
+        wkt=o.wkt
     ), SRS.query()))
     return sorted(srs_collection, key=lambda srs: srs['id'] != 4326)
 
@@ -18,7 +18,7 @@ def get(request):
     return dict(
         id=obj.id, display_name=obj.display_name,
         auth_name=obj.auth_name, auth_srid=obj.auth_srid,
-        proj4text=obj.proj4text
+        wkt=obj.wkt
     )
 
 

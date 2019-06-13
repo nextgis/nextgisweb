@@ -18,7 +18,7 @@ class SRS(Base):
     display_name = sa.Column(sa.Unicode, nullable=False)
     auth_name = sa.Column(sa.Unicode) # NULL auth_* used for
     auth_srid = sa.Column(sa.Integer) # custom local projection
-    proj4text = sa.Column(sa.Unicode, nullable=False)
+    wkt = sa.Column(sa.Unicode, nullable=False)
     minx = sa.Column(sa.Float)
     miny = sa.Column(sa.Float)
     maxx = sa.Column(sa.Float)
@@ -46,12 +46,12 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
             -- Update existing spatial_ref_sys row
             UPDATE spatial_ref_sys SET
             auth_name = NEW.auth_name, auth_srid = NEW.auth_srid,
-            proj4text = NEW.proj4text, srtext = NULL
+            srtext = NEW.wkt, proj4text = NULL
             WHERE srid = NEW.id;
             
             -- Insert if missing
             INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text)
-            SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NULL, NEW.proj4text
+            SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt, NULL
             WHERE NOT EXISTS(SELECT * FROM spatial_ref_sys WHERE srid = NEW.id);
 
             RETURN NEW;

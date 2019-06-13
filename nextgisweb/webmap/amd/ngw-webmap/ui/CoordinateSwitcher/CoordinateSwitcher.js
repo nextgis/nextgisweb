@@ -37,7 +37,7 @@ define([
     if (customCoordinateSystems) {
         array.forEach(customCoordinateSystems, function (c) {
             c.projCode = (c.auth_name ? c.auth_name + ":" : "") + c.auth_srid;
-            proj4.defs(c.projCode, c.proj4text);
+            proj4.defs(c.projCode, c.wkt);
         });
     }
 
@@ -69,7 +69,7 @@ define([
         _convertCoordinates: function(){
             var that = this;
             array.forEach(customCoordinateSystems, function(c) {
-                var custom = proj4(that.projections.initial, c.proj4text, that.point);
+                var custom = proj4(that.projections.initial, c.wkt, that.point);
                 that.coordinates[c.projCode] = [custom[0], custom[1]];
             })
         },
@@ -93,7 +93,7 @@ define([
                         selected: c.projCode === that.selectedFormat
                     });
                 }
-                if (!pr.oProj.units) {
+                if (pr.oProj.units == 'degree') {
                     var fx, fy;
                     if (degreeFormat == 'dd') {
                         fx = x.toFixed(6);
