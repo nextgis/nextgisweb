@@ -8,10 +8,8 @@ import zipfile
 import tempfile
 import shutil
 import ctypes
-import osgeo
 
 from datetime import datetime, time, date
-from distutils.version import LooseVersion
 from zope.interface import implements
 from osgeo import ogr, osr
 
@@ -43,12 +41,17 @@ from ..models import declarative_base, DBSession
 from ..layer import SpatialLayerMixin, IBboxLayer
 
 from ..feature_layer import (
+    gdal_gt_19,
+    gdal_gt_20,
+    gdal_gt_22,
     Feature,
     FeatureSet,
     LayerField,
     LayerFieldsMixin,
     GEOM_TYPE,
+    GEOM_TYPE_OGR,
     FIELD_TYPE,
+    FIELD_TYPE_OGR,
     IFeatureLayer,
     IWritableFeatureLayer,
     IFeatureQuery,
@@ -60,25 +63,8 @@ from ..feature_layer import (
 
 from .util import _
 
-gdal_gt_19 = LooseVersion(osgeo.__version__) >= LooseVersion('1.9')
-gdal_gt_20 = LooseVersion(osgeo.__version__) >= LooseVersion('2.0')
-gdal_gt_22 = LooseVersion(osgeo.__version__) >= LooseVersion('2.2')
-
 GEOM_TYPE_DB = ('POINT', 'LINESTRING', 'POLYGON',
                 'MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')
-GEOM_TYPE_OGR = (
-    ogr.wkbPoint,
-    ogr.wkbLineString,
-    ogr.wkbPolygon,
-    ogr.wkbMultiPoint,
-    ogr.wkbMultiLineString,
-    ogr.wkbMultiPolygon,
-    ogr.wkbPoint25D,
-    ogr.wkbLineString25D,
-    ogr.wkbPolygon25D,
-    ogr.wkbMultiPoint25D,
-    ogr.wkbMultiLineString25D,
-    ogr.wkbMultiPolygon25D)
 GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"),
                      _("Multipoint"), _("Multiline"), _("Multipolygon"))
 
@@ -90,15 +76,6 @@ FIELD_TYPE_DB = (
     db.Date,
     db.Time,
     db.DateTime)
-
-FIELD_TYPE_OGR = (
-    ogr.OFTInteger,
-    ogr.OFTInteger64 if gdal_gt_20 else None,
-    ogr.OFTReal,
-    ogr.OFTString,
-    ogr.OFTDate,
-    ogr.OFTTime,
-    ogr.OFTDateTime)
 
 FIELD_FORBIDDEN_NAME = ("id", "geom")
 

@@ -48,3 +48,30 @@
 .coordinate-switcher .dijitButtonContents{
     border-right: 0
 }
+
+
+/* fixes to display coordinate selector and copy button in one line */
+
+.ngwPopup.dijitTooltipBelow .coordinate-switcher.dijitSelect {
+    user-select: none;
+    width: calc(100% - 20px);
+    table-layout: auto;
+}
+
+.ngwPopup.dijitTooltipBelow .coordinate-switcher.dijitSelect .dijitReset.dijitStretch.dijitButtonContents {
+    overflow: hidden;
+}
+
+.ngwPopup.dijitTooltipBelow .coordinate-switcher.dijitSelect .dijitReset.dijitRight.dijitArrowButtonContainer {
+    width: 5px;
+}
+
+.ngwPopup.dijitTooltipBelow .coordinate-switcher.dijitSelect .dijitReset.dijitInputField.dijitButtonText {
+    width: 1px;
+}
+
+.ngwPopup__coordinates-srs-name {
+    padding-left: 3px; 
+    font-style: italic;
+    font-size: 0.7rem;
+}

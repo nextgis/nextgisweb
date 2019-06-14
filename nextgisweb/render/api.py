@@ -6,7 +6,9 @@ from PIL import Image
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 
-from ..resource import Resource, DataScope
+from ..resource import Resource, DataScope, resource_factory
+
+from .interface import ILegendableStyle
 
 PD_READ = DataScope.read
 sett_name = 'permissions.disable_check.rendering'
@@ -94,9 +96,22 @@ def image(request):
     return Response(body_file=buf, content_type=b'image/png')
 
 
-def setup_pyramid(comp, config):
-    config.add_route('render.tile', '/api/component/render/tile') \
-        .add_view(tile)
+def legend(request):
+    request.resource_permission(PD_READ)
+    result = request.context.render_legend()
+    return Response(body_file=result, content_type=b'image/png')
 
-    config.add_route('render.image', '/api/component/render/image') \
-        .add_view(image, http_cache=0)
+
+def setup_pyramid(comp, config):
+    config.add_route(
+        'render.tile', '/api/component/render/tile'
+    ).add_view(tile)
+
+    config.add_route(
+        'render.image', '/api/component/render/image'
+    ).add_view(image, http_cache=0)
+
+    config.add_route(
+        'render.legend', '/api/resource/{id:\d+}/legend',
+        factory=resource_factory
+    ).add_view(legend, context=ILegendableStyle, request_method='GET')

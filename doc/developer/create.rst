@@ -567,10 +567,10 @@ To create file bucket execute following request:
 
    {"id": 22, "parent": {"id": 0}}
 
-Vector (mapserver) style
-------------------------
+Mapserver style
+---------------
 
-To create vector style execute following request:
+To create mapserver vector style execute following request:
 
 .. http:post:: /api/resource/
 
@@ -618,6 +618,43 @@ To create vector style execute following request:
 .. sourcecode:: json
 
    {"id": 24, "parent": {"id": 0}}
+   
+QGIS style
+----------
+
+To create QGIS vector style for the layer do the following:
+
+1. Upload file with QGIS style to NGW. See :ref:`ngwdev_file_upload`. Get *id*, *mime_type* and *size* from the reply. 
+2. Create NGW resource via */api/resource/* as shown below:
+
+.. sourcecode:: http
+
+   POST /api/resource/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+    {
+      "qgis_vector_style": {
+         "file_upload": {
+            "id": <id>, 
+            "mime_type": <mime type>,
+            "size": <size>
+         }
+      },
+      "res_meta": {
+         "items": {
+         }
+      },
+      "resource": {
+        "cls": "qgis_vector_style",
+        "description": null,
+        "display_name": "My QGIS style",
+        "keyname": null,
+        "parent": {
+          "id": <layer id>
+        }
+      }
+    }
 
 Raster style
 ------------

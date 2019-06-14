@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-08-10 10:16+0700\n"
+"POT-Creation-Date: 2019-05-23 18:36+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.5.1\n"
+"Generated-By: Babel 2.6.0\n"
 
 #: template/header.mako:74 view.py:34
 msgid "Control panel"
@@ -27,39 +27,43 @@ msgstr "Панель управления"
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:86 view.py:184
+#: view.py:70 view.py:179
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:94 view.py:190
+#: view.py:78 view.py:185
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:101 view.py:192
+#: view.py:85 view.py:187
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:108 view.py:188
+#: view.py:92 view.py:189
+msgid "Custom logo"
+msgstr "Логотип"
+
+#: view.py:99 view.py:183
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:115 view.py:194
+#: view.py:106 view.py:191
 msgid "Miscellaneous"
 msgstr "Разное"
 
-#: view.py:122 view.py:196
+#: view.py:113 view.py:193
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:128
+#: view.py:120
 msgid "404: Page not found"
 msgstr "404: Страница не найдена"
 
-#: view.py:183
+#: view.py:178
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:187
+#: view.py:182
 msgid "Settings"
 msgstr "Настройки"
 
@@ -91,7 +95,8 @@ msgstr "Создать"
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:37
 #: amd/ngw-pyramid/template/CORSForm.hbs:26
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:25
-#: amd/ngw-pyramid/template/HomePathForm.hbs:10
+#: amd/ngw-pyramid/template/HomePathForm.hbs:11
+#: amd/ngw-pyramid/template/LogoForm.hbs:22
 #: amd/ngw-pyramid/template/MiscellaneousForm.hbs:29
 #: amd/ngw-pyramid/template/SystemNameForm.hbs:10
 msgid "Save"
@@ -141,6 +146,22 @@ msgstr ""
 "Здесь можно задать стили CSS. Они будут использованы для оформления всех "
 "страниц вашей Веб ГИС."
 
+#: amd/ngw-pyramid/template/LogoForm.hbs:12
+msgid "Upload a PNG logo"
+msgstr "Выберите логотип в формате PNG"
+
+#: amd/ngw-pyramid/template/LogoForm.hbs:13
+msgid ""
+"We recommend height of 45 px and width of up to 200 px. Refresh the page "
+"after upload."
+msgstr ""
+"Рекомендуемая высота 45 пикселей, ширина до 200 пикселей. Обновите "
+"страницу после загрузки."
+
+#: amd/ngw-pyramid/template/LogoForm.hbs:25
+msgid "Restore default"
+msgstr "Восстановить по-умолчанию"
+
 #: amd/ngw-pyramid/template/MiscellaneousForm.hbs:16
 msgid "Measurement units"
 msgstr "Единицы измерения"
@@ -188,14 +209,4 @@ msgstr "Пакет"
 #: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
-
-#~ msgid "Metric"
-#~ msgstr "Метрические"
-
-#~ msgid "Imperial"
-#~ msgstr "Имперские"
-
-#~ msgid "Map logo link"
-#~ msgstr "Ссылка логотипа на карте"
-
 
