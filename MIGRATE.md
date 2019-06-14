@@ -2,7 +2,6 @@
 
 `-- psql -d <database_name> -h 192.168.250.1 -U ngw_admin -a -f migration.sql`
 
-<<<<<<< HEAD
 #### (2019-06-02)
 
 ```sql
@@ -11,8 +10,6 @@ ALTER TABLE public.webmap ADD COLUMN annotation_default boolean DEFAULT FALSE;
 
 ```
 
-||||||| merged common ancestors
-=======
 #### (2019-05-30)
 
 ```sql
@@ -84,7 +81,6 @@ ALTER TABLE srs ADD CONSTRAINT srs_id_check_local CHECK (auth_name IS NULL AND a
 
 ```
 
->>>>>>> 3
 #### (2019-05-16)
 
 ```sql
