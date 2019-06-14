@@ -48,6 +48,12 @@ def annotation_cpost(resource, request):
     return dict(id=obj.id)
 
 
+def annotation_iget(resource, request):
+    request.resource_permission(WebMapScope.annotation_read)
+    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(request.matchdict['annotation_id'])).one()
+    return annotation_to_dict(obj)
+
+
 def annotation_iput(resource, request):
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(request.matchdict['annotation_id'])).one()
@@ -74,5 +80,6 @@ def setup_pyramid(comp, config):
         'webmap.annotation.item', '/api/resource/{id:\d+}/annotation/{annotation_id:\d+}',
         factory=resource_factory, client=('id', 'annotation_id')
     ) \
+        .add_view(annotation_iget, context=WebMap, request_method='GET', renderer='json') \
         .add_view(annotation_iput, context=WebMap, request_method='PUT', renderer='json') \
         .add_view(annotation_idelete, context=WebMap, request_method='DELETE', renderer='json')
