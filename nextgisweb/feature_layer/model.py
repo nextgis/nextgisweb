@@ -100,7 +100,7 @@ class LayerFieldsMixin(object):
 
     def ogr_layer(self):
         ds = gdal.GetDriverByName("Memory").Create(
-            r"", 0, 0, 0, gdal.GDT_Unknown
+            "", 0, 0, 0, gdal.GDT_Unknown
         )
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(self.srs.id)

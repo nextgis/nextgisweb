@@ -14,9 +14,11 @@ from io import BytesIO
 from osgeo import ogr, gdal
 from shapely import wkt
 from pyramid.response import Response
+from pyramid.httpexceptions import HTTPNotFound
 
-from ..geometry import geom_from_wkt
-from ..resource import DataScope, ValidationError, resource_factory
+from ..geometry import geom_from_wkt, box
+from ..resource import DataScope, ValidationError, Resource, resource_factory
+from ..spatial_ref_sys import SRS
 from .. import geojson
 
 from .interface import IFeatureLayer, IWritableFeatureLayer, FIELD_TYPE
@@ -44,7 +46,6 @@ def export(request):
         request.GET.get("srs", request.context.srs.id)
     )
     format = request.GET.get("format")
-    extent = request.GET.get("extent")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
 
@@ -67,18 +68,7 @@ def export(request):
 
     ogr_ds, ogr_layer = request.context.ogr_layer()
     for feature in query():
-        ogr_feature = ogr.Feature(ogr_layer.GetLayerDefn())
-        ogr_feature.SetFID(feature.id)
-        ogr_feature.SetGeometry(
-            ogr.CreateGeometryFromWkb(feature.geom.wkb)
-        )
-
-        for field in request.context.fields:
-            ogr_feature[
-                field.keyname.encode("utf8")
-            ] = feature.fields[field.keyname]
-
-        ogr_layer.CreateFeature(ogr_feature)
+        ogr_layer.CreateFeature(feature.ogr)
 
     buf = BytesIO()
 
@@ -132,6 +122,95 @@ def export(request):
         content_type=b"%s" % str(content_type),
         content_disposition=content_disposition,
     )
+
+
+def mvt(request):
+    x = int(request.matchdict["x"])
+    y = int(request.matchdict["y"])
+    z = int(request.matchdict["z"])
+
+    simplification = float(
+        request.GET.get("simplification", 0)
+    )
+
+    resids = map(
+        int,
+        filter(None, request.GET["resource"].split(",")),
+    )
+
+    # web mercator
+    merc = SRS.filter_by(id=3857).one()
+    minx, miny, maxx, maxy = merc.tile_extent((z, x, y))
+
+    # 5% padding by default
+    padding = float(request.GET.get("padding", 0.05))
+
+    bbox = (
+        minx - (maxx - minx) * padding,
+        miny - (maxy - miny) * padding,
+        maxx + (maxx - minx) * padding,
+        maxy + (maxy - miny) * padding,
+    )
+
+    ds = gdal.GetDriverByName(b"Memory").Create(
+        b"", 0, 0, 0, gdal.GDT_Unknown
+    )
+
+    for resid in resids:
+        obj = Resource.filter_by(id=resid).one()
+        request.resource_permission(PERM_READ, obj)
+
+        ogr_ds, ogr_layer = obj.ogr_layer()
+
+        query = obj.feature_query()
+        query.intersects(box(*bbox, srid=merc.id))
+        query.geom()
+
+        for feature in query():
+            ogr_layer.CreateFeature(feature.ogr)
+
+        ds.CopyLayer(ogr_layer, b"ngw:%d" % obj.id)
+
+    with backports.tempfile.TemporaryDirectory() as temp_dir:
+        mvt_dir = os.path.join(temp_dir, "mvt")
+
+        options = [
+            "-preserve_fid",
+            "-f MVT",
+            "-t_srs EPSG:%d" % merc.id,
+            "-clipdst %f %f %f %f" % bbox,
+            "-dsco FORMAT=DIRECTORY",
+            "-dsco TILE_EXTENSION=pbf",
+            "-dsco MINZOOM=%d" % z,
+            "-dsco MAXZOOM=%d" % z,
+            "-dsco SIMPLIFICATION=%f" % simplification,
+            "-dsco COMPRESS=YES",
+        ]
+
+        gdal.VectorTranslate(
+            mvt_dir, ds, options=" ".join(options)
+        )
+
+        filepath = os.path.join(
+            "%s" % mvt_dir,
+            "%d" % z,
+            "%d" % x,
+            "%d.pbf" % y,
+        )
+
+        if os.path.exists(filepath):
+            with open(filepath) as f:
+                buf = BytesIO()
+                buf.write(f.read())
+
+            return Response(
+                buf.getvalue(),
+                content_type=b"application/vnd.mapbox-vector-tile",
+            )
+        else:
+            raise HTTPNotFound(
+                "Tile (%d, %d, %d) not found." % (z, x, y)
+            )
 
 
 def deserialize(feat, data):
@@ -466,6 +545,10 @@ def setup_pyramid(comp, config):
         'feature_layer.export', '/api/resource/{id}/export',
         factory=resource_factory) \
         .add_view(export, context=IFeatureLayer, request_method='GET')
+
+    config.add_route(
+        'feature_layer.mvt', '/api/component/feature_layr/mvt/{z:\d+}/{x:\d+}/{y:\d+}.pbf') \
+        .add_view(mvt, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
