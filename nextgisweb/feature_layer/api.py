@@ -32,6 +32,22 @@ PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
 
 
+def _ogr_memory_ds():
+    return gdal.GetDriverByName(b'Memory').Create(
+        b'', 0, 0, 0, gdal.GDT_Unknown)
+
+
+def _ogr_layer_from_features(layer, features, ds=None):
+    ogr_layer = layer.to_ogr(ds)
+    layer_defn = ogr_layer.GetLayerDefn()
+
+    for f in features:
+        ogr_layer.CreateFeature(
+            f.to_ogr(layer_defn))
+    
+    return ogr_layer
+
+
 def view_geojson(request):
     request.GET["format"] = EXPORT_FORMAT_OGR["GEOJSON"].extension
     request.GET["zipped"] = "false"
@@ -66,9 +82,9 @@ def export(request):
     query = request.context.feature_query()
     query.geom()
 
-    ogr_ds, ogr_layer = request.context.ogr_layer()
-    for feature in query():
-        ogr_layer.CreateFeature(feature.ogr)
+    ogr_ds = _ogr_memory_ds()
+    ogr_layer = _ogr_layer_from_features(
+        request.context, query(), ds=ogr_ds)
 
     buf = BytesIO()
 
@@ -152,24 +168,21 @@ def mvt(request):
         maxy + (maxy - miny) * padding,
     )
 
-    ds = gdal.GetDriverByName(b"Memory").Create(
-        b"", 0, 0, 0, gdal.GDT_Unknown
-    )
+    ds_src = _ogr_memory_ds()
+    ds_dst = _ogr_memory_ds()
 
     for resid in resids:
         obj = Resource.filter_by(id=resid).one()
         request.resource_permission(PERM_READ, obj)
 
-        ogr_ds, ogr_layer = obj.ogr_layer()
-
         query = obj.feature_query()
         query.intersects(box(*bbox, srid=merc.id))
         query.geom()
 
-        for feature in query():
-            ogr_layer.CreateFeature(feature.ogr)
+        ogr_layer = _ogr_layer_from_features(
+            obj, query(), ds=ds_src)
 
-        ds.CopyLayer(ogr_layer, b"ngw:%d" % obj.id)
+        ds_dst.CopyLayer(ogr_layer, b"ngw:%d" % obj.id)
 
     options = [
         "-preserve_fid",
@@ -188,7 +201,7 @@ def mvt(request):
     vsibuf = "/vsimem/mvt"
 
     gdal.VectorTranslate(
-        vsibuf, ds, options=" ".join(options)
+        vsibuf, ds_dst, options=" ".join(options)
     )
 
     filepath = os.path.join(
