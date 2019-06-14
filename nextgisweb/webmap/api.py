@@ -19,7 +19,7 @@ def annotation_to_dict(obj):
     for k in ('id', 'description', 'style', 'geom'):
         v = getattr(obj, k)
         if k == 'geom':
-            v = to_shape(v).to_wkt()
+            v = to_shape(v).wkt
         if v is not None:
             result[k] = v
     return result
