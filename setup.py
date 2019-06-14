@@ -32,7 +32,7 @@ requires = [
     'requests[security]==2.21.0',
     'babel==2.6.0',
     'minio==4.0.10',
-    'sentry-sdk==0.7.7',
+    'sentry-sdk==0.9.0',
     'python-magic==0.4.15',
     
     # TODO: Move to dev or test dependencies
