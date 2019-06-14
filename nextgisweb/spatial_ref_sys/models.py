@@ -10,11 +10,20 @@ from ..models import declarative_base
 
 Base = declarative_base()
 
+SRID_MAX = 998999     # PostGIS maximum srid (srs.id)
+SRID_LOCAL = 990001   # First local srid (srs.id)
+
 
 class SRS(Base):
     __tablename__ = 'srs'
 
-    id = sa.Column(sa.Integer, primary_key=True, autoincrement=False)
+    id_seq = db.Sequence(
+        'srs_id_seq', metadata=Base.metadata,
+        minvalue=SRID_LOCAL, maxvalue=SRID_MAX)
+
+    id = sa.Column(
+        sa.Integer, primary_key=True, autoincrement=False,
+        server_default=id_seq.next_value())
     display_name = sa.Column(sa.Unicode, nullable=False)
     auth_name = sa.Column(sa.Unicode) # NULL auth_* used for
     auth_srid = sa.Column(sa.Integer) # custom local projection
@@ -23,6 +32,20 @@ class SRS(Base):
     miny = sa.Column(sa.Float)
     maxx = sa.Column(sa.Float)
     maxy = sa.Column(sa.Float)
+
+    __table_args__ = (
+        db.CheckConstraint(
+            'id > 0 AND id <= %d' % SRID_MAX,
+            name='srs_id_check'),
+        db.CheckConstraint(
+            '(auth_name IS NULL AND auth_srid IS NULL) '
+            'OR (auth_name IS NOT NULL AND auth_srid IS NOT NULL)',
+            name='srs_auth_check'),
+        db.CheckConstraint(
+            '(auth_name IS NULL AND auth_srid IS NULL) '
+            'OR id < %d' % SRID_LOCAL,
+            name='srs_id_auth_check'),
+    )
 
     def as_osr(self):
         return osr.ImportFromEPSG(self.id)
