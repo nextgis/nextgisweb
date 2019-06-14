@@ -125,9 +125,9 @@ def export(request):
 
 
 def mvt(request):
-    x = int(request.matchdict["x"])
-    y = int(request.matchdict["y"])
-    z = int(request.matchdict["z"])
+    z = int(request.GET["z"])
+    x = int(request.GET["x"])
+    y = int(request.GET["y"])
 
     simplification = float(
         request.GET.get("simplification", 0)
@@ -547,7 +547,7 @@ def setup_pyramid(comp, config):
         .add_view(export, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
-        'feature_layer.mvt', '/api/component/feature_layr/mvt/{z:\d+}/{x:\d+}/{y:\d+}.pbf') \
+        'feature_layer.mvt', '/api/component/feature_layer/mvt') \
         .add_view(mvt, request_method='GET')
 
     config.add_route(
