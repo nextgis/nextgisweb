@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import pytest
 
 from nextgisweb import db
@@ -27,6 +28,16 @@ def test_postgis_sync(txn):
     DBSession.flush()
 
     assert DBSession.connection().execute(qpg, id=obj.id).fetchone() == None
+
+
+@pytest.mark.parametrize('x, y, src, dst', (
+    (0, 0, 4326, 3857),
+    (0, 0, 3857, 4326),
+))
+def test_postgis_translate(txn, x, y, src, dst):
+    px, py = DBSession.connection().execute(db.text(
+        'SELECT ST_X(pt), ST_Y(pt) FROM ST_Transform(ST_Transform(ST_SetSRID(ST_MakePoint(:x, :y), :src) ,:dst), :src) AS pt'
+    ), x=x, y=y, src=src, dst=dst).fetchone()
 
 
 def test_wkt_valid():

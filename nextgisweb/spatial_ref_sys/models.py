@@ -31,6 +31,7 @@ class SRS(Base):
     auth_name = sa.Column(sa.Unicode) # NULL auth_* used for
     auth_srid = sa.Column(sa.Integer) # custom local projection
     wkt = sa.Column(sa.Unicode, nullable=False)
+    proj4 = sa.Column(sa.Unicode, nullable=False)
     minx = sa.Column(sa.Float)
     miny = sa.Column(sa.Float)
     maxx = sa.Column(sa.Float)
@@ -55,6 +56,7 @@ class SRS(Base):
         sr = osr.SpatialReference()
         if sr.ImportFromWkt(value) != 0:
             raise ValueError('Invalid SRS WKT definition!')
+        self.proj4 = sr.ExportToProj4()
         return value
 
     def tile_extent(self, tile):
@@ -76,12 +78,12 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
             -- Update existing spatial_ref_sys row
             UPDATE spatial_ref_sys SET
             auth_name = NEW.auth_name, auth_srid = NEW.auth_srid,
-            srtext = NEW.wkt, proj4text = NULL
+            srtext = NEW.wkt, proj4text = NEW.proj4
             WHERE srid = NEW.id;
             
             -- Insert if missing
             INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text)
-            SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt, NULL
+            SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt, NEW.proj4
             WHERE NOT EXISTS(SELECT * FROM spatial_ref_sys WHERE srid = NEW.id);
 
             RETURN NEW;
