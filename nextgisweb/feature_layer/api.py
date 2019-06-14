@@ -171,46 +171,54 @@ def mvt(request):
 
         ds.CopyLayer(ogr_layer, b"ngw:%d" % obj.id)
 
-    with backports.tempfile.TemporaryDirectory() as temp_dir:
-        mvt_dir = os.path.join(temp_dir, "mvt")
+    options = [
+        "-preserve_fid",
+        "-f MVT",
+        "-t_srs EPSG:%d" % merc.id,
+        "-clipdst %f %f %f %f" % bbox,
+        "-dsco FORMAT=DIRECTORY",
+        "-dsco TILE_EXTENSION=pbf",
+        "-dsco MINZOOM=%d" % z,
+        "-dsco MAXZOOM=%d" % z,
+        "-dsco SIMPLIFICATION=%f" % simplification,
+        "-dsco COMPRESS=YES",
+    ]
 
-        options = [
-            "-preserve_fid",
-            "-f MVT",
-            "-t_srs EPSG:%d" % merc.id,
-            "-clipdst %f %f %f %f" % bbox,
-            "-dsco FORMAT=DIRECTORY",
-            "-dsco TILE_EXTENSION=pbf",
-            "-dsco MINZOOM=%d" % z,
-            "-dsco MAXZOOM=%d" % z,
-            "-dsco SIMPLIFICATION=%f" % simplification,
-            "-dsco COMPRESS=YES",
-        ]
+    # not thread safe?
+    vsibuf = "/vsimem/mvt"
 
-        gdal.VectorTranslate(
-            mvt_dir, ds, options=" ".join(options)
-        )
+    gdal.VectorTranslate(
+        vsibuf, ds, options=" ".join(options)
+    )
 
-        filepath = os.path.join(
-            "%s" % mvt_dir,
-            "%d" % z,
-            "%d" % x,
-            "%d.pbf" % y,
-        )
+    filepath = os.path.join(
+        "%s" % vsibuf, "%d" % z, "%d" % x, "%d.pbf" % y
+    )
 
-        if os.path.exists(filepath):
-            with open(filepath) as f:
-                buf = BytesIO()
-                buf.write(f.read())
+    try:
+        f = gdal.VSIFOpenL(b"%s" % (filepath,), b"rb")
+
+        if f is not None:
+            # SEEK_END = 2
+            gdal.VSIFSeekL(f, 0, 2)
+            size = gdal.VSIFTellL(f)
+
+            # SEEK_SET = 0
+            gdal.VSIFSeekL(f, 0, 0)
+            content = gdal.VSIFReadL(1, size, f)
+            gdal.VSIFCloseL(f)
 
             return Response(
-                buf.getvalue(),
+                content,
                 content_type=b"application/vnd.mapbox-vector-tile",
             )
         else:
             raise HTTPNotFound(
                 "Tile (%d, %d, %d) not found." % (z, x, y)
             )
+
+    finally:
+        gdal.Unlink(b"%s" % (vsibuf,))
 
 
 def deserialize(feat, data):
