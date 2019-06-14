@@ -246,6 +246,21 @@ class PyramidComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
+    def client_settings(self, request):
+        result = dict()
+
+        try:
+            result['units'] = self.env.core.settings_get('core', 'units')
+        except KeyError:
+            result['units'] = 'metric'
+
+        try:
+            result['degree_format'] = self.env.core.settings_get('core', 'degree_format')
+        except KeyError:
+            result['degree_format'] = 'dd'
+
+        return result
+
     settings_info = (
         dict(key='secret', desc=u"Cookies encryption key (required)"),
         dict(key='help_page', desc=u"HTML help"),
