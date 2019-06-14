@@ -22,7 +22,7 @@ class SRS(Base):
         minvalue=SRID_LOCAL, maxvalue=SRID_MAX)
 
     id = sa.Column(
-        sa.Integer, primary_key=True, autoincrement=False,
+        sa.Integer, id_seq, primary_key=True, autoincrement=False,
         server_default=id_seq.next_value())
     display_name = sa.Column(sa.Unicode, nullable=False)
     auth_name = sa.Column(sa.Unicode) # NULL auth_* used for
