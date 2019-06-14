@@ -47,6 +47,13 @@ class SRS(Base):
             name='srs_id_auth_check'),
     )
 
+    @db.validates('wkt')
+    def _validate_wkt(self, key, value):
+        sr = osr.SpatialReference()
+        if sr.ImportFromWkt(value) != 0:
+            raise ValueError('Invalid SRS WKT definition!')
+        return value
+
     def as_osr(self):
         return osr.ImportFromEPSG(self.id)
 
