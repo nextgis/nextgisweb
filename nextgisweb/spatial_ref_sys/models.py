@@ -54,9 +54,6 @@ class SRS(Base):
             raise ValueError('Invalid SRS WKT definition!')
         return value
 
-    def as_osr(self):
-        return osr.ImportFromEPSG(self.id)
-
     def tile_extent(self, tile):
         z, x, y = tile
         step = (self.maxx - self.minx) / (2 ** z)
