@@ -73,7 +73,7 @@ ALTER TABLE srs ALTER COLUMN id SET DEFAULT nextval('srs_id_seq'::regclass);
 
 ALTER TABLE srs ADD CONSTRAINT srs_auth_check CHECK (auth_name IS NULL AND auth_srid IS NULL OR auth_name IS NOT NULL AND auth_srid IS NOT NULL);
 ALTER TABLE srs ADD CONSTRAINT srs_id_check CHECK (id > 0 AND id <= 998999);
-ALTER TABLE srs ADD CONSTRAINT srs_id_check_local CHECK (auth_name IS NULL AND auth_srid IS NULL OR id < 990001);
+ALTER TABLE srs ADD CONSTRAINT srs_id_auth_check CHECK (auth_name IS NULL AND auth_srid IS NULL OR id < 990001);
 
 ```
 
