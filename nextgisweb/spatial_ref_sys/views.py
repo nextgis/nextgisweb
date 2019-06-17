@@ -100,9 +100,9 @@ def setup_pyramid(comp, config):
         def template_context(self, context):
             return context['template']
 
-    SRSModelController('srs.list', '/srs/list').includeme(config)
+    SRSModelController('srs', '/srs').includeme(config)
 
-    permalinker(SRS, 'srs.list.edit')
+    permalinker(SRS, 'srs.edit')
 
     def srs_browse(request):
         check_permission(request)
@@ -111,7 +111,7 @@ def setup_pyramid(comp, config):
             obj_list=SRS.filter_by(),
             dynmenu=request.env.pyramid.control_panel)
 
-    config.add_route('srs.list.browse', '/srs/list/') \
+    config.add_route('srs.browse', '/srs/') \
         .add_view(srs_browse, renderer='nextgisweb:spatial_ref_sys/template/srs_browse.mako')
 
     class SRSMenu(dm.DynItem):
@@ -119,19 +119,19 @@ def setup_pyramid(comp, config):
         def build(self, kwargs):
             yield dm.Link(
                 self.sub('browse'), _("List"),
-                lambda kwargs: kwargs.request.route_url('srs.list.browse')
+                lambda kwargs: kwargs.request.route_url('srs.browse')
             )
 
             yield dm.Link(
                 self.sub('create'), _("Create"),
-                lambda kwargs: kwargs.request.route_url('srs.list.create')
+                lambda kwargs: kwargs.request.route_url('srs.create')
             )
 
             if 'obj' in kwargs and isinstance(kwargs.obj, SRS):
                 yield dm.Link(
                     self.sub('edit'), _("Edit"),
                     lambda kwargs: kwargs.request.route_url(
-                        'srs.list.edit',
+                        'srs.edit',
                         id=kwargs.obj.id
                     )
                 )

@@ -22,8 +22,8 @@
         <table id="srs-table" class="pure-table pure-table-horizontal">
             <thead>
                 <tr>
-                    <th class="sort-default" style="width: 50%; text-align: inherit;">${tr(_("Full name"))}</th>
-                    <th style="width: 50%; text-align: inherit;">${tr(_("Login"))}</th>
+                    <th class="sort-default" style="width: 50%; text-align: inherit;">${tr(_("SRS name"))}</th>
+                    <th style="width: 50%; text-align: inherit;">${tr(_("WKT"))}</th>
                     <th class="no-sort" style="width: 0px;">&nbsp;</th>
                 </tr>
             </thead>
@@ -33,7 +33,7 @@
                         <td>${obj.display_name}</td>
                         <td>${obj.auth_srid}</td>
                         <td>
-                            <a class="material-icons icon-edit" href="${request.route_url('srs.list.edit', id=obj.id)}"></a>
+                            <a class="material-icons icon-edit" href="${request.route_url('srs.edit', id=obj.id)}"></a>
                         </td>
                     </tr>
                 %endfor
