@@ -4,7 +4,7 @@ from collections import namedtuple
 from ..resource import Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
 
-from .model import WebMap
+from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .adapter import WebMapAdapter
 from .util import _
@@ -159,9 +159,12 @@ def setup_pyramid(comp, config):
 
     class DisplayMenu(DynItem):
         def build(self, args):
-            if isinstance(args.obj, WebMap):
-                yield Label('webmap', _("Web map"))
+            yield Label('webmap', _("Web map"))
 
+            if (
+                isinstance(args.obj, WebMap)
+                and args.obj.has_permission(WebMapScope.display, args.request.user)
+            ):
                 yield Link(
                     'webmap/display', _("Display"),
                     self._url())
