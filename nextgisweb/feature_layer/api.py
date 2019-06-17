@@ -4,6 +4,7 @@ import json
 import os
 import re
 import urllib
+import uuid
 import zipfile
 
 import backports.tempfile
@@ -197,8 +198,7 @@ def mvt(request):
         "-dsco COMPRESS=YES",
     ]
 
-    # not thread safe?
-    vsibuf = "/vsimem/mvt"
+    vsibuf = "/vsimem/mvt-%s" % uuid.uuid4()
 
     gdal.VectorTranslate(
         vsibuf, ds_dst, options=" ".join(options)
