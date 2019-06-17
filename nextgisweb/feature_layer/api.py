@@ -14,9 +14,11 @@ from io import BytesIO
 from osgeo import ogr, gdal
 from shapely import wkt
 from pyramid.response import Response
+from pyramid.httpexceptions import HTTPNotFound
 
-from ..geometry import geom_from_wkt
-from ..resource import DataScope, ValidationError, resource_factory
+from ..geometry import geom_from_wkt, box
+from ..resource import DataScope, ValidationError, Resource, resource_factory
+from ..spatial_ref_sys import SRS
 from .. import geojson
 
 from .interface import IFeatureLayer, IWritableFeatureLayer, FIELD_TYPE
@@ -28,6 +30,22 @@ from .util import _
 
 PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
+
+
+def _ogr_memory_ds():
+    return gdal.GetDriverByName(b'Memory').Create(
+        b'', 0, 0, 0, gdal.GDT_Unknown)
+
+
+def _ogr_layer_from_features(layer, features, ds=None):
+    ogr_layer = layer.to_ogr(ds)
+    layer_defn = ogr_layer.GetLayerDefn()
+
+    for f in features:
+        ogr_layer.CreateFeature(
+            f.to_ogr(layer_defn))
+    
+    return ogr_layer
 
 
 def view_geojson(request):
@@ -44,7 +62,6 @@ def export(request):
         request.GET.get("srs", request.context.srs.id)
     )
     format = request.GET.get("format")
-    extent = request.GET.get("extent")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
 
@@ -65,20 +82,9 @@ def export(request):
     query = request.context.feature_query()
     query.geom()
 
-    ogr_ds, ogr_layer = request.context.ogr_layer()
-    for feature in query():
-        ogr_feature = ogr.Feature(ogr_layer.GetLayerDefn())
-        ogr_feature.SetFID(feature.id)
-        ogr_feature.SetGeometry(
-            ogr.CreateGeometryFromWkb(feature.geom.wkb)
-        )
-
-        for field in request.context.fields:
-            ogr_feature[
-                field.keyname.encode("utf8")
-            ] = feature.fields[field.keyname]
-
-        ogr_layer.CreateFeature(ogr_feature)
+    ogr_ds = _ogr_memory_ds()
+    ogr_layer = _ogr_layer_from_features(
+        request.context, query(), ds=ogr_ds)
 
     buf = BytesIO()
 
@@ -132,6 +138,100 @@ def export(request):
         content_type=b"%s" % str(content_type),
         content_disposition=content_disposition,
     )
+
+
+def mvt(request):
+    z = int(request.GET["z"])
+    x = int(request.GET["x"])
+    y = int(request.GET["y"])
+
+    simplification = float(
+        request.GET.get("simplification", 0)
+    )
+
+    resids = map(
+        int,
+        filter(None, request.GET["resource"].split(",")),
+    )
+
+    # web mercator
+    merc = SRS.filter_by(id=3857).one()
+    minx, miny, maxx, maxy = merc.tile_extent((z, x, y))
+
+    # 5% padding by default
+    padding = float(request.GET.get("padding", 0.05))
+
+    bbox = (
+        minx - (maxx - minx) * padding,
+        miny - (maxy - miny) * padding,
+        maxx + (maxx - minx) * padding,
+        maxy + (maxy - miny) * padding,
+    )
+
+    ds_src = _ogr_memory_ds()
+    ds_dst = _ogr_memory_ds()
+
+    for resid in resids:
+        obj = Resource.filter_by(id=resid).one()
+        request.resource_permission(PERM_READ, obj)
+
+        query = obj.feature_query()
+        query.intersects(box(*bbox, srid=merc.id))
+        query.geom()
+
+        ogr_layer = _ogr_layer_from_features(
+            obj, query(), ds=ds_src)
+
+        ds_dst.CopyLayer(ogr_layer, b"ngw:%d" % obj.id)
+
+    options = [
+        "-preserve_fid",
+        "-f MVT",
+        "-t_srs EPSG:%d" % merc.id,
+        "-clipdst %f %f %f %f" % bbox,
+        "-dsco FORMAT=DIRECTORY",
+        "-dsco TILE_EXTENSION=pbf",
+        "-dsco MINZOOM=%d" % z,
+        "-dsco MAXZOOM=%d" % z,
+        "-dsco SIMPLIFICATION=%f" % simplification,
+        "-dsco COMPRESS=YES",
+    ]
+
+    # not thread safe?
+    vsibuf = "/vsimem/mvt"
+
+    gdal.VectorTranslate(
+        vsibuf, ds_dst, options=" ".join(options)
+    )
+
+    filepath = os.path.join(
+        "%s" % vsibuf, "%d" % z, "%d" % x, "%d.pbf" % y
+    )
+
+    try:
+        f = gdal.VSIFOpenL(b"%s" % (filepath,), b"rb")
+
+        if f is not None:
+            # SEEK_END = 2
+            gdal.VSIFSeekL(f, 0, 2)
+            size = gdal.VSIFTellL(f)
+
+            # SEEK_SET = 0
+            gdal.VSIFSeekL(f, 0, 0)
+            content = gdal.VSIFReadL(1, size, f)
+            gdal.VSIFCloseL(f)
+
+            return Response(
+                content,
+                content_type=b"application/vnd.mapbox-vector-tile",
+            )
+        else:
+            raise HTTPNotFound(
+                "Tile (%d, %d, %d) not found." % (z, x, y)
+            )
+
+    finally:
+        gdal.Unlink(b"%s" % (vsibuf,))
 
 
 def deserialize(feat, data):
@@ -466,6 +566,10 @@ def setup_pyramid(comp, config):
         'feature_layer.export', '/api/resource/{id}/export',
         factory=resource_factory) \
         .add_view(export, context=IFeatureLayer, request_method='GET')
+
+    config.add_route(
+        'feature_layer.mvt', '/api/component/feature_layer/mvt') \
+        .add_view(mvt, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',

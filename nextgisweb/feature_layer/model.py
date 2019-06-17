@@ -98,13 +98,10 @@ class LayerFieldsMixin(object):
             post_update=True
         )
 
-    def ogr_layer(self):
-        ds = gdal.GetDriverByName("Memory").Create(
-            r"", 0, 0, 0, gdal.GDT_Unknown
-        )
+    def to_ogr(self, ogr_ds):
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(self.srs.id)
-        ogr_layer = ds.CreateLayer(r"", srs=srs)
+        ogr_layer = ogr_ds.CreateLayer(r"", srs=srs)
         for field in self.fields:
             ogr_layer.CreateField(
                 ogr.FieldDefn(
@@ -112,7 +109,7 @@ class LayerFieldsMixin(object):
                     _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
                 )
             )
-        return ds, ogr_layer
+        return ogr_layer
 
 
 class _fields_attr(SP):
