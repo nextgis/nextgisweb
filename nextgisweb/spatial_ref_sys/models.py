@@ -13,6 +13,7 @@ Base = declarative_base()
 SRID_MAX = 998999     # PostGIS maximum srid (srs.id)
 SRID_LOCAL = 990001   # First local srid (srs.id)
 
+DISABLED_SRS = [4326, 3857]
 
 class SRS(Base):
     __tablename__ = 'srs'
@@ -59,6 +60,13 @@ class SRS(Base):
             self.minx + (x + 1) * step,
             self.maxy - y * step,
         )
+
+    def __unicode__(self):
+        return  self.display_name if self.display_name else self.auth_srid
+
+    @property
+    def disabled(self):
+        return self.auth_srid in DISABLED_SRS
 
 
 db.event.listen(SRS.__table__, 'after_create', db.DDL("""

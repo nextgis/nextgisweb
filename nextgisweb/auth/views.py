@@ -266,7 +266,7 @@ def setup_pyramid(comp, config):
             return result
 
         def widget_module(self):
-            return 'ngw-auth/UserWidget'
+            return 'ngw-spatial-ref-sys/UserWidget'
 
     class AuthUserModelController(ModelController):
 
