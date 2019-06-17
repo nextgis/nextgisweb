@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
+import os
 import re
+import codecs
+from ConfigParser import RawConfigParser
 
 import sqlalchemy as sa
 
@@ -10,7 +13,15 @@ from .package import pkginfo
 
 class Env(object):
 
-    def __init__(self, cfg):
+    def __init__(self, cfg=None):
+        if cfg is None:
+            cfg = RawConfigParser()
+            cfg.readfp(codecs.open(os.environ.get('NEXTGISWEB_CONFIG'), 'r', 'utf-8'))
+
+            for section in cfg.sections():
+                for item, value in cfg.items(section):
+                    cfg.set(section, item, value % os.environ)
+
         cs = dict(cfg.items('core') if cfg.has_section('core') else ())
 
         packages_ign = re.split(r'[,\s]+', cs.get('packages.ignore', ''))

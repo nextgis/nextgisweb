@@ -1,8 +1,39 @@
 # -*- coding: utf-8 -*-
+import osgeo
+
+from osgeo import ogr
+from distutils.version import LooseVersion
 from zope.interface import Interface, Attribute
 
 from ..resource import IResourceBase
 
+
+gdal_gt_19 = LooseVersion(osgeo.__version__) >= LooseVersion('1.9')
+gdal_gt_20 = LooseVersion(osgeo.__version__) >= LooseVersion('2.0')
+gdal_gt_22 = LooseVersion(osgeo.__version__) >= LooseVersion('2.2')
+
+GEOM_TYPE_OGR = (
+    ogr.wkbPoint,
+    ogr.wkbLineString,
+    ogr.wkbPolygon,
+    ogr.wkbMultiPoint,
+    ogr.wkbMultiLineString,
+    ogr.wkbMultiPolygon,
+    ogr.wkbPoint25D,
+    ogr.wkbLineString25D,
+    ogr.wkbPolygon25D,
+    ogr.wkbMultiPoint25D,
+    ogr.wkbMultiLineString25D,
+    ogr.wkbMultiPolygon25D)
+
+FIELD_TYPE_OGR = (
+    ogr.OFTInteger,
+    ogr.OFTInteger64 if gdal_gt_20 else None,
+    ogr.OFTReal,
+    ogr.OFTString,
+    ogr.OFTDate,
+    ogr.OFTTime,
+    ogr.OFTDateTime)
 
 class GEOM_TYPE(object):
     POINT = 'POINT'

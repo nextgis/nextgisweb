@@ -48,6 +48,7 @@ define([
                 handleAs: 'json'
             }).then(function (data) {
                 widget.wMeasurementUnits.set('value', data.units);
+                widget.wDegreeFormat.set('value', data.degree_format);
             });
         },
 
@@ -58,7 +59,8 @@ define([
                     "Content-Type": "application/json"
                 },
                 data: json.stringify({
-                    units: this.wMeasurementUnits.get('value')
+                    units: this.wMeasurementUnits.get('value'),
+                    degree_format: this.wDegreeFormat.get('value')
                 })
             }).then(
                 function () {

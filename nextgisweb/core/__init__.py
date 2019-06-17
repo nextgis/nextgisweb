@@ -75,11 +75,13 @@ class CoreComponent(Component):
             'backup_upload.secret_key')
 
     def initialize_db(self):
-        for k, v in (('system.name', 'NextGIS Web'),
-                     ('system.full_name',
-                      self.localizer().translate(
-                          _('NextGIS geoinformation system'))),
-                     ('units', 'metric')):
+        for k, v in (
+            ('system.name', 'NextGIS Web'),
+            ('system.full_name', self.localizer().translate(
+                _('NextGIS geoinformation system'))),
+            ('units', 'metric'),
+            ('degree_format', 'dd')
+        ):
             self.init_settings(self.identity, k, self._settings.get(k, v))
 
     def backup(self):

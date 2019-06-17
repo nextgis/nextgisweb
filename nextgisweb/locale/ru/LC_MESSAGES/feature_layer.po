@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-04-13 23:34+0700\n"
+"POT-Creation-Date: 2019-06-13 01:32+0300\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,57 +17,66 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.5.1\n"
+"Generated-By: Babel 2.6.0\n"
 
-#: model.py:125
+#: api.py:117
+msgid "Output format is not provided."
+msgstr "Выходной формат не указан."
+
+#: api.py:124
+#, python-format
+msgid "Format '%s' is not supported."
+msgstr "Формат '%s' не поддерживается."
+
+#: model.py:147
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:142 view.py:54 view.py:338
+#: amd/ngw-feature-layer/FieldsWidget.js:142 view.py:44 view.py:192
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:71 view.py:94
+#: view.py:61 view.py:84
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:335
+#: view.py:189
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: view.py:344
+#: view.py:198
 msgid "Download as GeoJSON"
 msgstr "Скачать GeoJSON"
 
-#: view.py:349
+#: view.py:203
 msgid "Download as CSV"
 msgstr "Скачать CSV"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:190
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:192
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:31
-#: amd/ngw-feature-layer/FieldsWidget.js:105 view.py:356
+#: amd/ngw-feature-layer/FieldsWidget.js:105 view.py:210
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:76
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:78
 msgid "Attribute: "
 msgstr "Поле: "
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:121
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:123
 msgid "Set NULL"
 msgstr "Установить NULL"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:122
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:124
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:133
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:135
 msgid "NULL"
 msgstr "NULL"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:256
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:258
 msgid "Save"
 msgstr "Сохранить"
 

@@ -19,6 +19,7 @@ from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
+from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMAT
 from .util import _
 
 
@@ -176,7 +177,8 @@ def setup_pyramid(comp, config):
             ),
             search=dict(
                 nominatim=self.settings['search.nominatim']
-            )
+            ),
+            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMAT,
         )
 
     comp.client_settings = MethodType(client_settings, comp, comp.__class__)
@@ -195,14 +197,16 @@ def setup_pyramid(comp, config):
                         id=args.obj.id))
 
                 yield dm.Link(
-                    'feature_layer/geojson', _(u"Download as GeoJSON"),
+                    'feature_layer/export-geojson', _(u"Download as GeoJSON"),
                     lambda args: args.request.route_url(
-                        "feature_layer.geojson", id=args.obj.id))
+                        "feature_layer.export", id=args.obj.id,
+                        _query={"format": "geojson", "zipped": "false"}))
 
                 yield dm.Link(
-                    'feature_layer/geojson', _(u"Download as CSV"),
+                    'feature_layer/export-csv', _(u"Download as CSV"),
                     lambda args: args.request.route_url(
-                        "feature_layer.csv", id=args.obj.id))
+                        "feature_layer.export", id=args.obj.id,
+                        _query={"format": "csv", "zipped": "false"}))
 
     Resource.__dynmenu__.add(LayerMenuExt())
 

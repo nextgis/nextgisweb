@@ -25,7 +25,6 @@ requires = [
     'shapely==1.6.4.post2',
     'affine==2.2.2',
     'geojson==2.4.1',
-    'unicodecsv==0.14.1',
     'pillow==5.4.1',
     'lxml==4.3.0',
     'passlib==1.7.1',
@@ -33,8 +32,13 @@ requires = [
     'requests[security]==2.21.0',
     'babel==2.6.0',
     'minio==4.0.10',
-    'sentry-sdk==0.7.7',
+    'sentry-sdk==0.9.0',
     'python-magic==0.4.15',
+    'backports.tempfile==1.0',
+    
+    # TODO: Move to dev or test dependencies
+    'pytest',
+    'webtest',
 ]
 
 extras_require = {
@@ -48,6 +52,10 @@ entry_points = {
 
     'babel.extractors': [
         'hbs = nextgisweb.i18n.hbs:extract',
+    ],
+
+    'pytest11': [
+        'nextgisweb = nextgisweb.pytest',
     ],
 
     'console_scripts': [
@@ -73,6 +81,7 @@ setup(
         "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        "Framework :: Pytest",
     ],
     author='NextGIS',
     author_email='info@nextgis.com',

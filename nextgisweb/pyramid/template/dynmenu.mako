@@ -17,10 +17,15 @@
 </script>
 
 <ul class="sidebar-menu list-unstyled">
+<% label = None %>
 %for item in dynmenu.build(args):
     %if isinstance(item, dm.Label):
-        <li class="sidebar-menu__heading heading">${tr(item.label)}</li>
+        <% label = item %>
     %elif isinstance(item, dm.Link):
+        %if label is not None:
+            <li class="sidebar-menu__heading heading">${tr(label.label)}</li>
+            <% label = None %>
+        %endif
         <% url = item.url(args) %>
         <li class="sidebar-menu__item${' sidebar-menu__item--selected' if url == request.url else ''}">
 

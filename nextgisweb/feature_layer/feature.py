@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from osgeo import ogr
+
 class Feature(object):
 
     def __init__(self, layer=None, id=None, fields=None, geom=None, box=None, calculations=None):
@@ -64,6 +66,20 @@ class Feature(object):
             properties=self.fields,
             geometry=self.geom,
         )
+
+    def to_ogr(self, layer_defn):
+        ogr_feature = ogr.Feature(layer_defn)
+        ogr_feature.SetFID(self.id)
+        ogr_feature.SetGeometry(
+            ogr.CreateGeometryFromWkb(self.geom.wkb)
+        )
+
+        for field in self.fields:
+            ogr_feature[field.encode("utf8")] = self.fields[
+                field
+            ]
+
+        return ogr_feature
 
 
 class FeatureSet(object):
