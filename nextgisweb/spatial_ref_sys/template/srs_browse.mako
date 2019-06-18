@@ -5,38 +5,13 @@
     <script>
         require([
             "dojo/ready",
-            "ngw/sorted-table",
-            "dojo/request/xhr"
+            "ngw/sorted-table"
         ], function(
             ready,
             sortedTable,
-            xhr
         ){
             ready(function() {
-                var widget = this;
-                sortedTable(document.getElementById("srs-table"));
-                var deleteBtn = document.getElementsByClassName("icon-delete")[0];
-                deleteBtn.onclick = (function(e) {
-                    e.preventDefault();
-                    var isForDelete = confirm('${tr(_("Confirm remove of SRS"))}');
-                    if (isForDelete) {
-                        xhr.del(e.target.href, {
-                                    handleAs: "json",
-                                    headers: { "Content-Type": "application/json" }
-                                }).then(
-                                    function (response) {
-                                        if (response.status_code == 200) {
-                                            window.location = response.redirect;
-                                        } else if (response.status_code == 400) {
-                                            widget.set("error", response.error);
-                                        } else {
-                                            // something wrong with the response
-                                        }
-                                    },
-                                );
-                    }
-                });
-                
+                sortedTable(document.getElementById("srs-table"));             
             });
         });
     </script>
@@ -59,7 +34,7 @@
                         <td>
                             %if not obj.disabled:
                                 <a class="material-icons icon-edit" href="${request.route_url('srs.edit', id=obj.id)}"></a>
-                                <a class="material-icons icon-delete" href="${request.route_url('srs.browse', id=obj.id)}"></a>
+                                <a class="material-icons icon-delete" href="${request.route_url('srs.delete', id=obj.id)}"></a>
                             %endif
                         </td>
                     </tr>

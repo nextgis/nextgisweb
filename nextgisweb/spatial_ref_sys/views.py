@@ -6,7 +6,7 @@ from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPForbidden
 from pyramid.security import remember, forget
 
 from ..object_widget import ObjectWidget
-from ..views import ModelController, permalinker
+from ..views import ModelController, DeleteWidget, permalinker
 from .. import dynmenu as dm
 
 from .models import SRS
@@ -100,7 +100,10 @@ def setup_pyramid(comp, config):
             return context['obj']
 
         def widget_class(self, context, operation):
-            return SRSWidget
+            if operation == 'delete':
+                return DeleteWidget
+            else:
+                return SRSWidget
 
         def template_context(self, context):
             return context['template']
@@ -108,7 +111,6 @@ def setup_pyramid(comp, config):
     SRSModelController('srs', '/srs').includeme(config)
 
     permalinker(SRS, 'srs.edit')
-    permalinker(SRS, 'srs.delete')
 
     def srs_browse(request):
         check_permission(request)
@@ -117,16 +119,8 @@ def setup_pyramid(comp, config):
             obj_list=SRS.filter_by(),
             dynmenu=request.env.pyramid.control_panel)
     
-    def srs_delete(request):
-        check_permission(request)
-        obj = SRS.filter_by(**request.matchdict).one()
-
-        DBSession.delete(obj)
-        return None
-
     config.add_route('srs.browse', '/srs/') \
-        .add_view(srs_browse, renderer='nextgisweb:spatial_ref_sys/template/srs_browse.mako') \
-        # .add_view(srs_delete, context=SRS, request_method='DELETE', renderer='json')
+        .add_view(srs_browse, renderer='nextgisweb:spatial_ref_sys/template/srs_browse.mako')
 
     class SRSMenu(dm.DynItem):
 
