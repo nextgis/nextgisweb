@@ -10,6 +10,7 @@ from ..views import ModelController, permalinker
 from .. import dynmenu as dm
 
 from .models import SRS
+from ..models import DBSession
 
 from .util import _
 
@@ -18,7 +19,7 @@ def setup_pyramid(comp, config):
 
     def check_permission(request):
         """ To avoid interdependency of two components:
-        auth and security, permissions to edit users
+        auth and security, permissions to edit SRS
         are limited by administrators group membership criterion"""
 
         request.require_administrator()
@@ -32,12 +33,7 @@ def setup_pyramid(comp, config):
             super(SRSWidget, self).populate_obj()
 
             self.obj.display_name = self.data.get('display_name')
-            self.obj.auth_name = self.data.get('auth_name')
-            self.obj.auth_srid = self.data.get('auth_srid', False)
             self.obj.wkt = self.data.get('wkt', False)
-
-            self.obj.disabled = self.data.get('disabled', False)
-
 
         def validate(self):
             result = super(SRSWidget, self).validate()
@@ -88,6 +84,15 @@ def setup_pyramid(comp, config):
                 template=dict(obj=obj)
             )
 
+        def delete_context(self, request):
+            check_permission(request)
+            obj = SRS.filter_by(**request.matchdict).one()
+
+            return dict(
+                obj=obj,
+                template=dict(obj=obj)
+            )
+
         def create_object(self, context):
             return SRS()
 
@@ -103,6 +108,7 @@ def setup_pyramid(comp, config):
     SRSModelController('srs', '/srs').includeme(config)
 
     permalinker(SRS, 'srs.edit')
+    permalinker(SRS, 'srs.delete')
 
     def srs_browse(request):
         check_permission(request)
@@ -110,9 +116,17 @@ def setup_pyramid(comp, config):
             title=('SRS'),
             obj_list=SRS.filter_by(),
             dynmenu=request.env.pyramid.control_panel)
+    
+    def srs_delete(request):
+        check_permission(request)
+        obj = SRS.filter_by(**request.matchdict).one()
+
+        DBSession.delete(obj)
+        return None
 
     config.add_route('srs.browse', '/srs/') \
-        .add_view(srs_browse, renderer='nextgisweb:spatial_ref_sys/template/srs_browse.mako')
+        .add_view(srs_browse, renderer='nextgisweb:spatial_ref_sys/template/srs_browse.mako') \
+        # .add_view(srs_delete, context=SRS, request_method='DELETE', renderer='json')
 
     class SRSMenu(dm.DynItem):
 
@@ -132,6 +146,13 @@ def setup_pyramid(comp, config):
                     self.sub('edit'), _("Edit"),
                     lambda kwargs: kwargs.request.route_url(
                         'srs.edit',
+                        id=kwargs.obj.id
+                    )
+                )
+                yield dm.Link(
+                    self.sub('delete'), _("Delete"),
+                    lambda kwargs: kwargs.request.route_url(
+                        'srs.delete',
                         id=kwargs.obj.id
                     )
                 )

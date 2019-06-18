@@ -71,7 +71,7 @@ class SRS(Base):
         )
 
     def __unicode__(self):
-        return  self.display_name if self.display_name else self.auth_srid
+        return  self.display_name
 
     @property
     def disabled(self):
