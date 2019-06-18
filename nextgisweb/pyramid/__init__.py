@@ -2,6 +2,7 @@
 import sys
 import os.path
 import re
+import warnings
 from hashlib import md5
 from StringIO import StringIO
 from pkg_resources import resource_filename, get_distribution
@@ -183,7 +184,9 @@ class PyramidComponent(Component):
         try:
             buf = StringIO()
             sys.stdout = buf
-            pip_main(['freeze', ])
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', r'DEPRECATION: Python 2\.7 will reach')
+                pip_main(['freeze', ])
             h = md5()
             h.update(buf.getvalue())
             static_key = '/' + h.hexdigest()
