@@ -10,5 +10,6 @@
    component
    resource
    i18n
+   test
    file_upload
    snippets

@@ -14,6 +14,9 @@ SRID_MAX = 998999     # PostGIS maximum srid (srs.id)
 SRID_LOCAL = 990001   # First local srid (srs.id)
 
 DISABLED_SRS = [4326, 3857]
+WKT_ESPG_4326 = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]'
+WKT_ESPG_3857 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]'
+
 
 class SRS(Base):
     __tablename__ = 'srs'
@@ -23,12 +26,13 @@ class SRS(Base):
         minvalue=SRID_LOCAL, maxvalue=SRID_MAX)
 
     id = sa.Column(
-        sa.Integer, primary_key=True, autoincrement=False,
+        sa.Integer, id_seq, primary_key=True, autoincrement=False,
         server_default=id_seq.next_value())
     display_name = sa.Column(sa.Unicode, nullable=False)
     auth_name = sa.Column(sa.Unicode) # NULL auth_* used for
     auth_srid = sa.Column(sa.Integer) # custom local projection
     wkt = sa.Column(sa.Unicode, nullable=False)
+    proj4 = sa.Column(sa.Unicode, nullable=False)
     minx = sa.Column(sa.Float)
     miny = sa.Column(sa.Float)
     maxx = sa.Column(sa.Float)
@@ -48,8 +52,13 @@ class SRS(Base):
             name='srs_id_auth_check'),
     )
 
-    def as_osr(self):
-        return osr.ImportFromEPSG(self.id)
+    @db.validates('wkt')
+    def _validate_wkt(self, key, value):
+        sr = osr.SpatialReference()
+        if sr.ImportFromWkt(value) != 0:
+            raise ValueError('Invalid SRS WKT definition!')
+        self.proj4 = sr.ExportToProj4()
+        return value
 
     def tile_extent(self, tile):
         z, x, y = tile
@@ -77,12 +86,12 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
             -- Update existing spatial_ref_sys row
             UPDATE spatial_ref_sys SET
             auth_name = NEW.auth_name, auth_srid = NEW.auth_srid,
-            srtext = NEW.wkt, proj4text = NULL
+            srtext = NEW.wkt, proj4text = NEW.proj4
             WHERE srid = NEW.id;
             
             -- Insert if missing
             INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text)
-            SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt, NULL
+            SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt, NEW.proj4
             WHERE NOT EXISTS(SELECT * FROM spatial_ref_sys WHERE srid = NEW.id);
 
             RETURN NEW;

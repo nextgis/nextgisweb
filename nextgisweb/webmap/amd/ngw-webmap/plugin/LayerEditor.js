@@ -44,8 +44,17 @@ define([
     return declare([_PluginBase], {
         _lastEditingState: null,
         _selectedResourceId: null,
+        _disabled: true,
 
         constructor: function () {
+            var webmapEditable = this.display.config.webmapEditable;
+            
+            if (webmapEditable) {
+                this._disabled = false;
+            } else {
+                return;
+            }
+            
             this.mapStates = MapStatesObserver.getInstance();
             this.store = new Memory();
             this.source = new ol.source.Vector();
@@ -143,6 +152,8 @@ define([
         },
 
         postCreate: function () {
+            if (this._disabled) return;
+
             finishConfirmDialog.on("save", lang.hitch(this, this._saveChanges));
             finishConfirmDialog.on("undo", lang.hitch(this, this._undoChanges));
             finishConfirmDialog.on("continue", lang.hitch(this, this._continueEditing));

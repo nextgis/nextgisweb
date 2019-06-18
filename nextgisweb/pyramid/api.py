@@ -5,6 +5,7 @@ import json
 import os.path
 from urllib2 import unquote
 from datetime import timedelta
+import base64
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPBadRequest
@@ -300,6 +301,36 @@ def custom_css_put(request):
     return Response()
 
 
+def logo_get(request):
+    try:
+        logodata = request.env.core.settings_get('pyramid', 'logo')
+        bindata = base64.b64decode(logodata)
+        return Response(
+            bindata, content_type=b'image/png',
+            expires=timedelta(days=1))
+
+    except KeyError:
+        raise HTTPNotFound()
+
+
+def logo_put(request):
+    request.require_administrator()
+    
+    value = request.json_body
+
+    if value is None:
+        request.env.core.settings_delete('pyramid', 'logo')
+    
+    else:
+        fn, fnmeta = request.env.file_upload.get_filename(value['id'])
+        with open(fn, 'r') as fd:
+            request.env.core.settings_set(
+                'pyramid', 'logo',
+                base64.b64encode(fd.read())) 
+
+    return Response()
+
+
 def setup_pyramid(comp, config):
     config.add_tween('nextgisweb.pyramid.api.cors_tween_factory')
 
@@ -337,6 +368,10 @@ def setup_pyramid(comp, config):
         'pyramid.custom_css', '/api/component/pyramid/custom_css') \
         .add_view(custom_css_get, request_method='GET') \
         .add_view(custom_css_put, request_method='PUT')
+
+    config.add_route('pyramid.logo', '/api/component/pyramid/logo') \
+        .add_view(logo_get, request_method='GET') \
+        .add_view(logo_put, request_method='PUT')
 
     # TODO: Add PUT method for changing custom_css setting and GUI
 

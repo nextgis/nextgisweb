@@ -264,7 +264,6 @@ class PyramidComponent(Component):
     settings_info = (
         dict(key='secret', desc=u"Cookies encryption key (required)"),
         dict(key='help_page', desc=u"HTML help"),
-        dict(key='logo', desc=u"System logo"),
         dict(key='favicon', desc=u"Favicon"),
         dict(key='sentry_dsn', desc=u"Sentry DSN"),
     )

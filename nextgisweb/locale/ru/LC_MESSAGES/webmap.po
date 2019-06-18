@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-03-28 12:05+0300\n"
+"POT-Creation-Date: 2019-05-16 17:05+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -31,11 +31,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:24 model.py:31 view.py:157
+#: model.py:24 model.py:31 view.py:163
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:26 view.py:160
+#: model.py:26 view.py:166
 msgid "Display"
 msgstr "Открыть"
 
@@ -117,13 +117,21 @@ msgstr "Перейти"
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: amd/ngw-webmap/plugin/LayerEditor.js:70
+#: amd/ngw-webmap/plugin/LayerEditor.js:79
 msgid "Editing"
 msgstr "Редактирование"
 
 #: amd/ngw-webmap/plugin/ZoomToLayer.js:24
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.hbs:8
+msgid "Enable layers editing"
+msgstr "Разрешить редактирование слоев"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:33
+msgid "Settings"
+msgstr "Настройки"
 
 #: amd/ngw-webmap/template/Display.hbs:12
 msgid "Map"

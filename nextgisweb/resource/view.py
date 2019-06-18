@@ -21,7 +21,9 @@ from .util import _
 
 __all__ = ['resource_factory', ]
 
+PERM_CREATE = ResourceScope.create
 PERM_READ = ResourceScope.read
+PERM_UPDATE = ResourceScope.update
 PERM_DELETE = ResourceScope.delete
 PERM_CPERMISSIONS = ResourceScope.change_permissions
 PERM_MCHILDREN = ResourceScope.manage_children
@@ -89,6 +91,7 @@ def schema(request):
     return dict(resources=resources, scopes=scopes)
 
 
+# TODO: Remove deprecated useless page
 @viewargs(renderer='nextgisweb:resource/template/tree.mako')
 def tree(request):
     obj = request.context
@@ -99,6 +102,7 @@ def tree(request):
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def create(request):
+    request.resource_permission(PERM_MCHILDREN)
     return dict(obj=request.context, subtitle=_("Create resource"), maxheight=True,
                 query=dict(operation='create', cls=request.GET.get('cls'),
                            parent=request.context.id))
@@ -106,12 +110,14 @@ def create(request):
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def update(request):
+    request.resource_permission(PERM_UPDATE)
     return dict(obj=request.context, subtitle=_("Update resource"), maxheight=True,
                 query=dict(operation='update', id=request.context.id))
 
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def delete(request):
+    request.resource_permission(PERM_DELETE)
     return dict(obj=request.context, subtitle=_("Delete resource"), maxheight=True,
                 query=dict(operation='delete', id=request.context.id))
 
@@ -240,13 +246,25 @@ def setup_pyramid(comp, config):
 
     # Actions
 
-    class AddMenu(DynItem):
+    class ResourceMenu(DynItem):
         def build(self, args):
+            permissions = args.obj.permissions(args.request.user)
             for ident, cls in Resource.registry._dict.iteritems():
                 if ident in comp.disabled_cls:
                     continue
 
                 if not cls.check_parent(args.obj):
+                    continue
+
+                # Is current user has permission to manage resource children?
+                if PERM_MCHILDREN not in permissions:
+                    continue
+
+                # Is current user has permission to create child resource?
+                # TODO: Fix SAWarning: Object of type ... not in session,
+                # add operation along 'Resource.children' will not proceed
+                child = cls(parent=args.obj, owner_user=args.request.user)
+                if not child.has_permission(PERM_CREATE, args.request.user):
                     continue
 
                 yield Link(
@@ -255,6 +273,24 @@ def setup_pyramid(comp, config):
                     self._url(ident),
                     cls.identity)
 
+            if PERM_UPDATE in permissions:
+                yield Link(
+                    'operation/update', _("Update"),
+                    lambda args: args.request.route_url(
+                        'resource.update', id=args.obj.id))
+
+            if PERM_DELETE in permissions:
+                yield Link(
+                    'operation/delete', _("Delete"),
+                    lambda args: args.request.route_url(
+                        'resource.delete', id=args.obj.id))
+
+            if PERM_READ in permissions:
+                yield Link(
+                    'extra/json', _("JSON view"),
+                    lambda args: args.request.route_url(
+                        'resource.json', id=args.obj.id))
+
         def _url(self, cls):
             return lambda (args): args.request.route_url(
                 'resource.create', id=args.obj.id,
@@ -262,30 +298,8 @@ def setup_pyramid(comp, config):
 
     Resource.__dynmenu__ = DynMenu(
         Label('create', _("Create resource")),
-
-        AddMenu(),
-
         Label('operation', _("Action")),
-
-        Link(
-            'operation/update', _("Update"),
-            lambda args: args.request.route_url(
-                'resource.update', id=args.obj.id)),
-
-        Link(
-            'operation/delete', _("Delete"),
-            lambda args: args.request.route_url(
-                'resource.delete', id=args.obj.id)),
-
         Label('extra', _("Extra")),
 
-        Link(
-            'extra/tree', _("Resource tree"),
-            lambda args: args.request.route_url(
-                'resource.tree', id=args.obj.id)),
-
-        Link(
-            'extra/json', _("JSON view"),
-            lambda args: args.request.route_url(
-                'resource.json', id=args.obj.id)),
+        ResourceMenu(),
     )
