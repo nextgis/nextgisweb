@@ -3,6 +3,7 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/store/Memory",
+    "dojo/dom-style",
     "ngw-pyramid/modelWidget/Widget",
     "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
@@ -23,6 +24,7 @@ define([
     declare,
     lang,
     Memory,
+    domStyle,
     Widget,
     ErrorDisplayMixin,
     _TemplatedMixin,
@@ -37,11 +39,11 @@ define([
         identity: "srs_list",
         title: i18n.gettext("SRS"),
 
-        constructor: function (obj) {
-            this.wktEditDisabled = obj.value && obj.value.disabled;
-            // this.fromWkt = obj.value && obj.value.wkt;
+        postCreate: function () {
+            if (this.value.disabled && this.wkt) {
+                this.wkt.set("readOnly", true);
+            }
         },
-
 
         validateWidget: function () {
 
@@ -57,9 +59,6 @@ define([
                     result.isValid = false;
                 }
             });
-            // if (this.wktEditDisabled && this.fromWkt !== this.wkt.get("value")) {
-            //     result.isValid = false;
-            // }
 
             return result;
         },
