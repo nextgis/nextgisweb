@@ -32,9 +32,9 @@
                         <td>${obj.display_name}</td>
                         
                         <td>
-                            <a class="material-icons icon-edit" href="${request.route_url('srs.edit', id=obj.id)}"></a>
+                            <a class="material-icons icon-edit" href="${request.route_url('srs.edit', id=obj.id)}"  title="${tr(_('Edit'))}"></a>
                             %if not obj.disabled:
-                                <a class="material-icons icon-delete" href="${request.route_url('srs.delete', id=obj.id)}"></a>
+                                <a class="material-icons icon-close" href="${request.route_url('srs.delete', id=obj.id)}" title="${tr(_('Delete'))}"></a>
                             %endif
                         </td>
                     </tr>
