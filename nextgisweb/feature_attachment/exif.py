@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 # Borrowed from https://github.com/kylefox/python-image-orientation-patch
+from __future__ import division, absolute_import, print_function
 
 from collections import namedtuple
 from PIL import Image

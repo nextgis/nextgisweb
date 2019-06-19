@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from subprocess import check_output, CalledProcessError
 from setuptools import setup, find_packages
 
