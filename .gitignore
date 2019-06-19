@@ -56,3 +56,5 @@ doc/*/_build/
 #  IDE
 .idea
 .vscode
+
+XDG_CACHE_HOME

@@ -37,18 +37,13 @@ define([
         identity: "srs_list",
         title: i18n.gettext("SRS"),
 
-        postCreate: function () {
-            this.inherited(arguments);
-          
-            if (this.operation !== 'create') {
-            }
-
-            if (this.operation === 'create') {
-            }
+        constructor: function (obj) {
+            this.wktEditDisabled = obj.value && obj.value.disabled;
+            // this.fromWkt = obj.value && obj.value.wkt;
         },
 
+
         validateWidget: function () {
-            var widget = this;
 
             var result = { isValid: true, error: [] };
 
@@ -62,19 +57,24 @@ define([
                     result.isValid = false;
                 }
             });
+            // if (this.wktEditDisabled && this.fromWkt !== this.wkt.get("value")) {
+            //     result.isValid = false;
+            // }
 
             return result;
         },
 
         _setValueAttr: function (value) {
             this.displayName.set("value", value.display_name);
-            this.wkt.set("value", value.wkt);
+            if (this.wkt) {
+                this.wkt.set("value", value.wkt);            
+            }
         },
 
         _getValueAttr: function () {
             var result = {
                 display_name: this.displayName.get("value"),
-                wkt: this.wkt.get("value"),
+                wkt: this.wkt.get("value")
             };
             return result;
         }

@@ -10,7 +10,6 @@ from ..views import ModelController, DeleteWidget, permalinker
 from .. import dynmenu as dm
 
 from .models import SRS
-from ..models import DBSession
 
 from .util import _
 
@@ -24,10 +23,26 @@ def setup_pyramid(comp, config):
 
         request.require_administrator()
 
+    class SRSDeleteWidget(DeleteWidget):
+
+
+        def validate(self):
+            result = super(SRSDeleteWidget, self).validate()
+            self.error = []
+            if self.operation == 'delete':
+                disabled = self.obj.disabled
+                if disabled:
+                    result = False
+                    self.error.append(dict(
+                        message=self.request.localizer.translate(
+                            _("Unable to delete standard coordinate system."))))
+            return result
+
+
     class SRSWidget(ObjectWidget):
 
         def is_applicable(self):
-            return self.operation in ('create', 'edit')
+            return self.operation in ('create', 'edit', 'delete',)
 
         def populate_obj(self):
             super(SRSWidget, self).populate_obj()
@@ -41,12 +56,19 @@ def setup_pyramid(comp, config):
 
             if self.operation == 'create':
                 conflict = SRS.filter_by(
-                    auth_srid=self.data.get("auth_srid")).first()
+                    display_name=self.data.get("display_name")).first()
                 if conflict:
                     result = False
                     self.error.append(dict(
                         message=self.request.localizer.translate(
-                            _("SRS is not unique."))))
+                            _("Coordinate system name is not unique."))))
+            elif self.operation == 'edit':
+                disallowed_wkt_change = self.obj.disabled and self.obj.wkt != self.data.get("wkt")
+                if disallowed_wkt_change:
+                    result = False
+                    self.error.append(dict(
+                        message=self.request.localizer.translate(
+                            _("Cannot change wkt of standard coordinate system."))))
 
             return result
 
@@ -88,6 +110,11 @@ def setup_pyramid(comp, config):
             check_permission(request)
             obj = SRS.filter_by(**request.matchdict).one()
 
+            # disabled = obj.disabled
+            # if disabled:
+            #     raise Exception(_("Unable to delete standard coordinate system."))
+
+            
             return dict(
                 obj=obj,
                 template=dict(obj=obj)
@@ -101,7 +128,7 @@ def setup_pyramid(comp, config):
 
         def widget_class(self, context, operation):
             if operation == 'delete':
-                return DeleteWidget
+                return SRSDeleteWidget
             else:
                 return SRSWidget
 
@@ -143,13 +170,14 @@ def setup_pyramid(comp, config):
                         id=kwargs.obj.id
                     )
                 )
-                yield dm.Link(
-                    self.sub('delete'), _("Delete"),
-                    lambda kwargs: kwargs.request.route_url(
-                        'srs.delete',
-                        id=kwargs.obj.id
+                if not kwargs.obj.disabled:
+                    yield dm.Link(
+                        self.sub('delete'), _("Delete"),
+                        lambda kwargs: kwargs.request.route_url(
+                            'srs.delete',
+                            id=kwargs.obj.id
+                        )
                     )
-                )
 
   
     SRS.__dynmenu__ = comp.env.pyramid.control_panel
