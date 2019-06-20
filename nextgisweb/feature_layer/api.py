@@ -195,7 +195,7 @@ def mvt(request):
         "-dsco MINZOOM=%d" % z,
         "-dsco MAXZOOM=%d" % z,
         "-dsco SIMPLIFICATION=%f" % simplification,
-        "-dsco COMPRESS=YES",
+        "-dsco COMPRESS=NO",
     ]
 
     vsibuf = "/vsimem/mvt-%s" % uuid.uuid4()
