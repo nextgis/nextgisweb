@@ -125,6 +125,11 @@ def store_item(layer, request):
         content_type='application/json')
 
 
+@viewargs(renderer='nextgisweb:feature_layer/template/test_mvt.mako')
+def test_mvt(request):
+    return dict()
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         'feature_layer.feature.browse',
@@ -159,6 +164,11 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
         client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer)
+
+    config.add_route(
+        'feature_layer.test_mvt',
+        '/feature_layer/test_mvt'
+    ).add_view(test_mvt)
 
     def client_settings(self, request):
         editor_widget = OrderedDict()
