@@ -1,0 +1,41 @@
+.annotations-settings table {
+  width: 100%;
+  margin-top: 3px;
+}
+
+.annotations-settings table .row {
+  width: 100%;
+}
+
+.annotations-settings table .row .title {
+  width: 40%;
+  padding: 3px;
+}
+
+.annotations-settings table .row .controls {
+  width: 60%;
+}
+
+.annotations-settings table .row .controls.stroke div.dijitNumberTextBox {
+  width: 75%;
+}
+
+.annotations-settings table .row .controls .color-selector {
+  height: 21px;
+}
+
+.annotations-settings table .row .controls.stroke input,
+.annotations-settings table .row .controls.fill input {
+  float: right;
+}
+
+.annotations-settings table .row .controls.circle-size .dijitTextBox  {
+  width: 100%;
+}
+
+div.dijitPopup.Popup {
+  padding: 2px;
+  margin-top: 1px;
+  background-color: #ededed;
+}
+

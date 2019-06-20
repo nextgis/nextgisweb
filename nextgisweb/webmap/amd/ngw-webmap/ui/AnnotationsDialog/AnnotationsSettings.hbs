@@ -1,0 +1,50 @@
+<div class="annotations-settings">
+  <table>
+    <tr class="row">
+      <td class="title">
+        {{gettext 'Stroke: width / color'}}
+      </td>
+      <td class="controls stroke">
+        <div data-dojo-type="dijit/form/NumberTextBox"
+             data-dojo-attach-point="widthStroke"
+             title="{{gettext 'Stroke width, px'}}"
+             data-dojo-props="constraints:{min:1,max:20,places:0},
+                 invalidMessage:'{{gettext 'Please enter a numeric value'}}',
+                 rangeMessage:'{{gettext 'Invalid width: should be from 1 to 20 px'}}'"
+             value="1"></div>
+        <input
+          type="color" value="#ff0000" title="{{gettext 'Stroke color'}}"
+          class="color-selector"
+          data-dojo-attach-point="colorStroke"
+        >
+      </td>
+    </tr>
+    <tr class="row">
+      <td class="title">
+        {{gettext 'Fill color'}}
+      </td>
+      <td class="controls fill">
+        <input
+          type="color" value="#630808" title="{{gettext 'Fill color'}}"
+          class="color-selector"
+          data-dojo-attach-point="fillStroke"
+        >
+      </td>
+    </tr>
+    <tr class="row">
+      <td class="title">
+        {{gettext 'Circle size, px'}}
+      </td>
+      <td class="controls circle-size">
+        <div data-dojo-type="dijit/form/NumberTextBox"
+             data-dojo-attach-point="circleSize"
+             title="{{gettext 'Circle size, px'}}"
+             width="100%"
+             data-dojo-props="constraints:{min:1,max:100,places:0},
+                 invalidMessage:'{{gettext 'Please enter a numeric value'}}',
+                 rangeMessage:'{{gettext 'Invalid width: should be from 1 to 100 px'}}'"
+             value="5"></div>
+      </td>
+    </tr>
+  </table>
+</div>

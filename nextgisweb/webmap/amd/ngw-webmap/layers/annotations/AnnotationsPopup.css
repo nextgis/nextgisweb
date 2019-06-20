@@ -1,0 +1,33 @@
+body .ol-popup.annotation .edit-controls {
+  display: none;
+}
+
+body.annotations-edit .ol-popup.annotation .edit-controls {
+  display: block;
+}
+
+.ol-popup.annotation {
+  padding: 3px;
+}
+
+.ol-popup.annotation .ol-popup-closer {
+  display: none;
+}
+
+.ol-popup.annotation .edit-controls {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+}
+
+.ol-popup.annotation .edit-controls span {
+  cursor: pointer;
+  display: block;
+  color: #076dbf;
+  background-color: white;
+}
+
+.ol-popup.annotation .edit-controls span:hover {
+  color: #20c08e;
+}

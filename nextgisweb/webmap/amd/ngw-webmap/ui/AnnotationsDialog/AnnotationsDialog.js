@@ -1,48 +1,19 @@
 define([
-    'dojo/_base/declare', 'dojo/_base/lang', 'dojo/dom-construct',
+    'dojo/_base/declare', 'dojo/_base/lang', 'dojo/dom-construct', 'dojo/dom-style',
     'dojo/Deferred', 'dojo/on', 'dojo/Evented', 'dojo/store/Memory', 'dijit/Dialog', 'dijit/form/Button',
-    'dijit/layout/ContentPane', 'dijit/layout/BorderContainer',
+    'dijit/layout/ContentPane', 'dijit/layout/BorderContainer', 'dojox/html/entities',
     'dijit/Editor', 'dijit/_editor/plugins/FontChoice', 'dijit/_editor/plugins/TextColor',
     'dojox/layout/TableContainer', 'dijit/form/Textarea', 'dijit/form/TextBox',
     'dijit/form/NumberTextBox', 'dijit/form/Select', 'dijit/form/DropDownButton',
-    'ngw-pyramid/i18n!webmap', 'xstyle/css!./AnnotationsDialog.css'
-], function (declare, lang, domConstruct, Deferred, on, Evented, Memory, Dialog,
-             Button, ContentPane, BorderContainer, Editor, FontChoice, TextColor, TableContainer, Textarea,
-             TextBox, NumberTextBox, Select, DropDownButton, i18n) {
-    
-    var buildColor = function (id, labelKey, className) {
-        var translatedName = i18n.gettext(labelKey);
-        
-        return {
-            id: id,
-            name: translatedName,
-            label: '<i class="select-color ' + className + '"></i><span>' + translatedName + '</span>'
-        };
-    };
-    
-    var colors = [
-        buildColor('#FF0000', 'Red', 'red'),
-        buildColor('#008000', 'Green', 'green'),
-        buildColor('#0000FF', 'Blue', 'blue'),
-        buildColor('#FFFF00', 'Yellow', 'yellow'),
-        buildColor('#FFA500', 'Orange', 'orange'),
-        buildColor('#000000', 'Black', 'black'),
-        buildColor('#ffffff', 'White', 'white')
-    ];
-    
-    colors.sort(function (a, b) {
-        if (a.name < b.name) return -1;
-        if (a.name > b.name) return 1;
-        return 0;
-    });
-    
-    var colorsStore = new Memory({
-        data: colors
-    });
+    'ngw-pyramid/i18n!webmap', 'ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings',
+    'xstyle/css!./AnnotationsDialog.css'
+], function (declare, lang, domConstruct, domStyle, Deferred, on, Evented, Memory, Dialog,
+             Button, ContentPane, BorderContainer, htmlEntities, Editor, FontChoice, TextColor, TableContainer, Textarea,
+             TextBox, NumberTextBox, Select, DropDownButton, i18n, AnnotationsSettings) {
     
     return declare([Dialog, Evented], {
         _deferred: null,
-        _feature: null,
+        _annFeature: null,
         
         constructor: function (options) {
             declare.safeMixin(this, options);
@@ -62,30 +33,8 @@ define([
                 height: '300'
             }).placeAt(this.containerNode);
             
-            var tableContainer = new TableContainer({
-                customClass: 'adt',
-                labelWidth: '150'
-            }).placeAt(this.containerNode);
-            
-            this.circleSize = new NumberTextBox({
-                label: i18n.gettext('Circle size, px'),
-                width: '100%'
-            });
-            
-            this.circleColor = new Select({
-                store: colorsStore,
-                width: '100%',
-                label: i18n.gettext('Circle color'),
-                labelAttr: 'label',
-                labelType: 'html'
-            });
-            
-            this.circleColor.on('change', function (evt) {
-                console.log(evt);
-            });
-            
-            tableContainer.addChild(this.circleSize);
-            tableContainer.addChild(this.circleColor);
+            this.annotationsSettings = new AnnotationsSettings()
+                .placeAt(this.containerNode);
             
             this.actionBar = domConstruct.create('div', {
                 class: 'dijitDialogPaneActionBar'
@@ -111,11 +60,12 @@ define([
         
         onSave: function () {
             this.emit('save');
-            this._makeFeatureFromDialog();
+            var newData = this._updateFeatureFromDialog();
             if (this._deferred) this._deferred.resolve({
                 action: 'save',
-                feature: this._feature
-            });
+                annFeature: this._annFeature,
+                newData: newData
+            }, this);
             this.hide();
         },
         
@@ -123,8 +73,8 @@ define([
             this.emit('undo');
             if (this._deferred) this._deferred.resolve({
                 action: 'undo',
-                feature: this._feature
-            });
+                annFeature: this._annFeature
+            }, this);
             this.hide();
         },
         
@@ -132,44 +82,48 @@ define([
             this.emit('delete');
             if (this._deferred) this._deferred.resolve({
                 action: 'delete',
-                feature: this._feature
-            });
+                annFeature: this._annFeature
+            }, this);
             this.hide();
         },
         
-        _makeFeatureFromDialog: function () {
-            var style = {
-                circle: {
-                    radius: 5,
-                    stroke: {color: 'red', width: 1},
-                    fill: {color: 'red'}
-                }
-            };
-            
-            this._feature.setProperties({
-                style: style,
-                description: this.editor.get('value')
-            });
+        _updateFeatureFromDialog: function () {
+            return {
+                style: {
+                    circle: {
+                        radius: this.annotationsSettings.circleSize.get('value'),
+                        stroke: {
+                            color: this.annotationsSettings.colorStroke.value,
+                            width: this.annotationsSettings.widthStroke.get('value')
+                        },
+                        fill: {
+                            color: this.annotationsSettings.fillStroke.value
+                        }
+                    }
+                },
+                description: htmlEntities.encode(this.editor.get('value'))
+            }
         },
         
-        showForCreate: function (feature) {
-            this.set('title', i18n.gettext('Create new annotation'));
-            this.editor.set('value', i18n.gettext('Your annotation text'));
-            this.circleSize.set('value', 5);
-            this.circleColor.set('value', '#FF0000');
+        showForEdit: function (annFeature) {
+            var annotationInfo = annFeature.getAnnotationInfo();
             
-            this._feature = feature;
+            this.title = i18n.gettext('Edit annotation');
+            this.editor.set('value', htmlEntities.decode(annotationInfo.description));
+            this.annotationsSettings.circleSize.set('value', annotationInfo.style.circle.radius);
+            this.annotationsSettings.widthStroke.set('value', annotationInfo.style.circle.stroke.width);
+            this.annotationsSettings.colorStroke.value = annotationInfo.style.circle.stroke.color;
+            this.annotationsSettings.fillStroke.value = annotationInfo.style.circle.fill.color;
+            domStyle.set(this.btnDelete.domNode, 'display', 'block');
             
             this.show();
+            
+            this._annFeature = annFeature;
             this._deferred = new Deferred();
             return this._deferred;
         },
         
-        showForEdit: function (feature) {
-            this.title = i18n.gettext('Edit annotation');
-            this.editor.set('value', i18n.gettext('Your annotation text'));
-            this.circleSize.set('value', 5);
-            this.circleColor.set('value', '#FF0000');
+        showLastData: function () {
             this.show();
         }
     });

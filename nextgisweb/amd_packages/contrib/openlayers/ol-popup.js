@@ -90,6 +90,10 @@ define([
             _this.container = element;
             _this.container.className = 'ol-popup';
             
+            if (options.customCssClass) {
+                _this.container.className = _this.container.className + ' ' + options.customCssClass;
+            }
+            
             _this.closer = document.createElement('a');
             _this.closer.className = 'ol-popup-closer';
             _this.closer.href = '#';
