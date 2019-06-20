@@ -30,7 +30,7 @@ def annotation_from_dict(obj, data):
         if k in data:
             v = data[k]
             if k == 'geom':
-                v = 'SRID=4326;' + v
+                v = 'SRID=3857;' + v
             setattr(obj, k, v)
 
 

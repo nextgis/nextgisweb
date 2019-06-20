@@ -194,7 +194,7 @@ class WebMapAnnotation(Base):
     webmap_id = db.Column(db.ForeignKey(WebMap.id), nullable=False)
     description = db.Column(db.Unicode)
     style = db.Column(JSONTextType)
-    geom = db.Column(ga.Geometry(dimension=2, srid=4326), nullable=False)
+    geom = db.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
 
     webmap = db.relationship(WebMap)
 
