@@ -146,9 +146,8 @@ def mvt(request):
     x = int(request.GET["x"])
     y = int(request.GET["y"])
 
-    simplification = float(
-        request.GET.get("simplification", 0)
-    )
+    extent = int(request.GET.get('extent', 4096))
+    simplification = float(request.GET.get("simplification", extent / 512))
 
     resids = map(
         int,
@@ -195,6 +194,7 @@ def mvt(request):
         "-dsco TILE_EXTENSION=pbf",
         "-dsco MINZOOM=%d" % z,
         "-dsco MAXZOOM=%d" % z,
+        "-dsco EXTENT=%d" % extent,
         "-dsco SIMPLIFICATION=%f" % simplification,
         "-dsco COMPRESS=NO",
     ]
