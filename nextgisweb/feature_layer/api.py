@@ -177,8 +177,10 @@ def mvt(request):
         request.resource_permission(PERM_READ, obj)
 
         query = obj.feature_query()
-        query.intersects(box(*bbox, srid=merc.id))
-        query.geom()
+
+        bbox = box(*bbox, srid=merc.id)
+        query.intersects(bbox)
+        query.clipbybox2d(bbox)
 
         ogr_layer = _ogr_layer_from_features(
             obj, query(), ds=ds_src)
@@ -189,7 +191,6 @@ def mvt(request):
         "-preserve_fid",
         "-f MVT",
         "-t_srs EPSG:%d" % merc.id,
-        "-clipdst %f %f %f %f" % bbox,
         "-dsco FORMAT=DIRECTORY",
         "-dsco TILE_EXTENSION=pbf",
         "-dsco MINZOOM=%d" % z,
