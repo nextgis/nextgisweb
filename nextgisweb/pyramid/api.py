@@ -8,7 +8,7 @@ from datetime import timedelta
 import base64
 
 from pyramid.response import Response, FileResponse
-from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
 from ..env import env
 from ..package import pkginfo
