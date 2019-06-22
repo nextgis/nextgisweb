@@ -1,4 +1,6 @@
-from __future__ import absolute_import
+# -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function
+
 import pytest
 
 from nextgisweb import db
@@ -27,7 +29,7 @@ def test_postgis_sync(txn):
     DBSession.delete(obj)
     DBSession.flush()
 
-    assert DBSession.connection().execute(qpg, id=obj.id).fetchone() == None
+    assert DBSession.connection().execute(qpg, id=obj.id).fetchone() is None
 
 
 @pytest.mark.parametrize('x, y, src, dst', (
@@ -36,7 +38,9 @@ def test_postgis_sync(txn):
 ))
 def test_postgis_transform(txn, x, y, src, dst):
     px, py = DBSession.connection().execute(db.text(
-        'SELECT ST_X(pt), ST_Y(pt) FROM ST_Transform(ST_Transform(ST_SetSRID(ST_MakePoint(:x, :y), :src) ,:dst), :src) AS pt'
+        'SELECT ST_X(pt), ST_Y(pt) '
+        'FROM ST_Transform(ST_Transform('
+        '   ST_SetSRID(ST_MakePoint(:x, :y), :src) ,:dst), :src) AS pt'
     ), x=x, y=y, src=src, dst=dst).fetchone()
     assert abs(px - x) < 1e-6
     assert abs(py - y) < 1e-6
