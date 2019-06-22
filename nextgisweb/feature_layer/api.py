@@ -38,14 +38,14 @@ def _ogr_memory_ds():
         b'', 0, 0, 0, gdal.GDT_Unknown)
 
 
-def _ogr_layer_from_features(layer, features, ds=None):
-    ogr_layer = layer.to_ogr(ds)
+def _ogr_layer_from_features(layer, features, name=r'', ds=None):
+    ogr_layer = layer.to_ogr(ds, name=name)
     layer_defn = ogr_layer.GetLayerDefn()
 
     for f in features:
         ogr_layer.CreateFeature(
             f.to_ogr(layer_defn))
-    
+
     return ogr_layer
 
 
@@ -168,8 +168,7 @@ def mvt(request):
         maxy + (maxy - miny) * padding,
     )
 
-    ds_src = _ogr_memory_ds()
-    ds_dst = _ogr_memory_ds()
+    ds = _ogr_memory_ds()
 
     for resid in resids:
         obj = Resource.filter_by(id=resid).one()
@@ -181,10 +180,8 @@ def mvt(request):
         query.intersects(bbox)
         query.clipbybox2d(bbox)
 
-        ogr_layer = _ogr_layer_from_features(
-            obj, query(), ds=ds_src)
-
-        ds_dst.CopyLayer(ogr_layer, b"ngw:%d" % obj.id)
+        _ogr_layer_from_features(
+            obj, query(), name=b"ngw:%d" % obj.id, ds=ds)
 
     options = [
         "-preserve_fid",
@@ -202,7 +199,7 @@ def mvt(request):
     vsibuf = "/vsimem/mvt-%s" % uuid.uuid4()
 
     gdal.VectorTranslate(
-        vsibuf, ds_dst, options=" ".join(options)
+        vsibuf, ds, options=" ".join(options)
     )
 
     filepath = os.path.join(
