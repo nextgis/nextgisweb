@@ -771,6 +771,15 @@ class VectorLayerSerializer(Serializer):
     fields = _fields_attr(read=None, write=P_DS_WRITE)
 
 
+@lru_cache()
+def _clipbybox2d_exists():
+    return (
+        DBSession.connection()
+        .execute("SELECT 1 FROM pg_proc WHERE proname='st_clipbybox2d'")
+        .fetchone()
+    )
+
+
 class FeatureQueryBase(object):
     implements(
         IFeatureQuery,
@@ -858,16 +867,6 @@ class FeatureQueryBase(object):
 
         geomcol = table.columns.geom
         geomexpr = db.func.st_transform(geomcol, srsid)
-
-        @lru_cache()
-        def _clipbybox2d_exists():
-            return (
-                DBSession.connection()
-                .execute(
-                    "select 1 from pg_proc where proname='st_clipbybox2d'"
-                )
-                .fetchone()
-            )
 
         if self._clip_by_box is not None:
             if _clipbybox2d_exists():
