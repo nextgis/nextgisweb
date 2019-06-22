@@ -58,6 +58,7 @@ def tile(request):
     y = int(request.GET['y'])
 
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
+    p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1')
 
     aimg = None
     for resid in p_resource:
@@ -70,7 +71,7 @@ def tile(request):
         tcache = obj.tile_cache
 
         # Is requested tile may be cached?
-        cached = tcache is not None and tcache.enabled \
+        cached = p_cache and tcache is not None and tcache.enabled \
             and (tcache.max_z is None or z <= tcache.max_z)
         
         if cached:
@@ -114,6 +115,7 @@ def image(request):
     p_extent = map(float, request.GET['extent'].split(','))
     p_size = map(int, request.GET['size'].split(','))
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
+    p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1')
 
     # Print tile debug info on resulting image
     tdi = request.GET.get('tdi', '').lower() in ('yes', 'true')
@@ -142,7 +144,7 @@ def image(request):
                 zexact = False
 
         # Is requested image may be cached via tiles?
-        cached = zexact and obj.tile_cache is not None and obj.tile_cache.enabled \
+        cached = p_cache and zexact and obj.tile_cache is not None and obj.tile_cache.enabled \
             and (obj.tile_cache.max_z is None or ztile <= obj.tile_cache.max_z)
 
         ext_extent = p_extent
