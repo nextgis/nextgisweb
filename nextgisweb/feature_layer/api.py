@@ -38,7 +38,13 @@ def _ogr_memory_ds():
         b'', 0, 0, 0, gdal.GDT_Unknown)
 
 
-def _ogr_layer_from_features(layer, features, name=r'', ds=None):
+def _ogr_ds(driver, options):
+    return ogr.GetDriverByName(driver).CreateDataSource(
+        "/vsimem/%s" % uuid.uuid4(), options=options
+    )
+
+
+def _ogr_layer_from_features(layer, features, name=b'', ds=None):
     ogr_layer = layer.to_ogr(ds, name=name)
     layer_defn = ogr_layer.GetLayerDefn()
 
@@ -168,7 +174,19 @@ def mvt(request):
         maxy + (maxy - miny) * padding,
     )
 
-    ds = _ogr_memory_ds()
+    options = [
+        "FORMAT=DIRECTORY",
+        "TILE_EXTENSION=pbf",
+        "MINZOOM=%d" % z,
+        "MAXZOOM=%d" % z,
+        "EXTENT=%d" % extent,
+        "SIMPLIFICATION=%f" % simplification,
+        "COMPRESS=NO",
+    ]
+
+    ds = _ogr_ds(b"MVT", options)
+
+    vsibuf = ds.GetName()
 
     for resid in resids:
         obj = Resource.filter_by(id=resid).one()
@@ -186,24 +204,8 @@ def mvt(request):
         _ogr_layer_from_features(
             obj, query(), name=b"ngw:%d" % obj.id, ds=ds)
 
-    options = [
-        "-preserve_fid",
-        "-f MVT",
-        "-t_srs EPSG:%d" % merc.id,
-        "-dsco FORMAT=DIRECTORY",
-        "-dsco TILE_EXTENSION=pbf",
-        "-dsco MINZOOM=%d" % z,
-        "-dsco MAXZOOM=%d" % z,
-        "-dsco EXTENT=%d" % extent,
-        "-dsco SIMPLIFICATION=%f" % simplification,
-        "-dsco COMPRESS=NO",
-    ]
-
-    vsibuf = "/vsimem/mvt-%s" % uuid.uuid4()
-
-    gdal.VectorTranslate(
-        vsibuf, ds, options=" ".join(options)
-    )
+    # flush changes
+    ds = None
 
     filepath = os.path.join(
         "%s" % vsibuf, "%d" % z, "%d" % x, "%d.pbf" % y
