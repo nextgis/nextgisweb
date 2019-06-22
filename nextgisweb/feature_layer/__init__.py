@@ -19,7 +19,8 @@ from .interface import (
     IFeatureQueryOrderBy,
     IFeatureQueryLike,
     IFeatureQueryIntersects,
-    IFeatureQueryClipByBox)
+    IFeatureQueryClipByBox,
+    IFeatureQuerySimplify)
 from .extension import FeatureExtension
 
 

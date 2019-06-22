@@ -61,7 +61,8 @@ from ..feature_layer import (
     IFeatureQueryLike,
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
-    IFeatureQueryClipByBox)
+    IFeatureQueryClipByBox,
+    IFeatureQuerySimplify)
 
 from .util import _
 
@@ -788,12 +789,14 @@ class FeatureQueryBase(object):
         IFeatureQueryLike,
         IFeatureQueryIntersects,
         IFeatureQueryOrderBy,
-        IFeatureQueryClipByBox)
+        IFeatureQueryClipByBox,
+        IFeatureQuerySimplify)
 
     def __init__(self):
         self._srs = None
         self._geom = None
         self._clip_by_box = None
+        self._simplify = None
         self._single_part_geom = None
         self._box = None
 
@@ -820,6 +823,9 @@ class FeatureQueryBase(object):
 
     def clip_by_box(self, box):
         self._clip_by_box = box
+
+    def simplify(self, tolerance):
+        self._simplify = tolerance
 
     def geom_length(self):
         self._geom_len = True
@@ -879,6 +885,11 @@ class FeatureQueryBase(object):
                     db.func.st_geomfromtext(self._clip_by_box.wkt),
                     self._clip_by_box.srid)
                 geomexpr = db.func.st_intersection(geomexpr, clip)
+
+        if self._simplify is not None:
+            geomexpr = db.func.st_simplifypreservetopology(
+                geomexpr, self._simplify
+            )
 
         if self._geom:
             if self._single_part:

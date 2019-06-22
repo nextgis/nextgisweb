@@ -22,7 +22,12 @@ from ..resource import DataScope, ValidationError, Resource, resource_factory
 from ..spatial_ref_sys import SRS
 from .. import geojson
 
-from .interface import IFeatureLayer, IWritableFeatureLayer, IFeatureQueryClipByBox, FIELD_TYPE
+from .interface import (
+    IFeatureLayer,
+    IWritableFeatureLayer,
+    IFeatureQueryClipByBox,
+    IFeatureQuerySimplify,
+    FIELD_TYPE)
 from .feature import Feature
 from .extension import FeatureExtension
 from .ogrdriver import EXPORT_FORMAT_OGR
@@ -180,7 +185,6 @@ def mvt(request):
         "MINZOOM=%d" % z,
         "MAXZOOM=%d" % z,
         "EXTENT=%d" % extent,
-        "SIMPLIFICATION=%f" % simplification,
         "COMPRESS=NO",
     ]
 
@@ -200,6 +204,10 @@ def mvt(request):
 
         if IFeatureQueryClipByBox.providedBy(query):
             query.clip_by_box(bbox)
+
+        if IFeatureQuerySimplify.providedBy(query):
+            tolerance = ((merc.maxx - merc.minx) / (1 << z)) / extent
+            query.simplify(tolerance * simplification)
 
         _ogr_layer_from_features(
             obj, query(), name=b"ngw:%d" % obj.id, ds=ds)
