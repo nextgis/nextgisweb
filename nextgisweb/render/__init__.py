@@ -32,5 +32,5 @@ class RenderComponent(Component):
             os.makedirs(self.tile_cache_path)
 
     def setup_pyramid(self, config):
-        from . import api, view
+        from . import api,  # NOQA
         api.setup_pyramid(self, config)

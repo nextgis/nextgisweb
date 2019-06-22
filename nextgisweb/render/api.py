@@ -19,7 +19,8 @@ sett_name = 'permissions.disable_check.rendering'
 
 def af_transform(a, b):
     """ Crate affine transform from coordinate system A to B """
-    return ~(Affine.translation(a[0], a[3])
+    return ~(
+        Affine.translation(a[0], a[3])
         * Affine.scale((a[2] - a[0]) / b[2], (a[1] - a[3]) / b[3])
         * Affine.translation(b[0], b[1]))
 
@@ -33,7 +34,7 @@ def tile_debug_info(img, offset=(0, 0), color='black',
     """ Print tile debug info on image at given tile offset """
     drw = ImageDraw.Draw(img)
     drw.rectangle(offset + tuple(map(lambda c: c + 255, offset)), outline=color)
-    fnt = ImageFont.load_default()
+    ImageFont.load_default()
     text = []
     if zxy:
         text.append(unicode(zxy))
@@ -65,7 +66,7 @@ def tile(request):
         obj = Resource.filter_by(id=resid).one()
         if not setting_disable_check:
             request.resource_permission(PD_READ, obj)
-        
+
         rimg = None  # Resulting resource image
 
         tcache = obj.tile_cache
@@ -73,7 +74,7 @@ def tile(request):
         # Is requested tile may be cached?
         cached = p_cache and tcache is not None and tcache.enabled \
             and (tcache.max_z is None or z <= tcache.max_z)
-        
+
         if cached:
             rimg = tcache.get_tile((z, x, y))
 
@@ -200,7 +201,7 @@ def image(request):
 
                     toffset = rtoint(at_t2i * (tx, ty))
                     rimg.paste(timg, toffset)
-   
+
         if rimg is None:
             req = obj.render_request(obj.srs)
             rimg = req.render_extent(ext_extent, ext_size)
@@ -211,14 +212,13 @@ def image(request):
                     t_offset = rtoint((t_offset[0] + ext_offset[0], t_offset[1] + ext_offset[1]))
                     timg = rimg.crop(t_offset + (t_offset[0] + 256, t_offset[1] + 256))
                     obj.tile_cache.put_tile((ztile, tx, ty), timg)
-                    
+
                     if tdi:
                         rimg = tile_debug_info(
                             rimg, offset=t_offset, color='red', zxy=(ztile, tx, ty),
                             extent=at_t2l * (tx, ty) + at_t2l * (tx + 1, ty + 1),
                             msg='NEW')
 
-        
             rimg = rimg.crop((
                 ext_offset[0], ext_offset[1],
                 ext_offset[0] + p_size[0],
@@ -254,14 +254,14 @@ def legend(request):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'render.tile', '/api/component/render/tile'
+        'render.tile', r'/api/component/render/tile'
     ).add_view(tile)
 
     config.add_route(
-        'render.image', '/api/component/render/image'
+        'render.image', r'/api/component/render/image'
     ).add_view(image, http_cache=0)
 
     config.add_route(
-        'render.legend', '/api/resource/{id:\d+}/legend',
+        'render.legend', r'/api/resource/{id:\d+}/legend',
         factory=resource_factory
     ).add_view(legend, context=ILegendableStyle, request_method='GET')

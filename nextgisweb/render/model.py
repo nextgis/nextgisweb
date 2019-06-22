@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from datetime import datetime, timedelta
-from uuid import uuid4, UUID
-from collections import namedtuple
+from uuid import uuid4
 from StringIO import StringIO
-from hashlib import md5
 from os import makedirs
 from errno import EEXIST
 import struct
@@ -19,10 +17,10 @@ from ..env import env
 from .. import db
 from ..models import declarative_base, DBSession
 from ..resource import (
-    Resource, 
+    Resource,
     Serializer,
     SerializedProperty,
-    ResourceScope, 
+    ResourceScope,
 )
 
 from .interface import IRenderableStyle
@@ -67,7 +65,7 @@ class ResourceTileCache(Base):
             db.Column('x', db.Integer, primary_key=True),
             db.Column('y', db.Integer, primary_key=True),
             db.Column('color', db.Integer),
-            # We don't need subsecond resolution which TIMESTAMP provides, so 
+            # We don't need subsecond resolution which TIMESTAMP provides, so
             # use 4-byte INTEGER type. Say hello to 2038-year problem!
             db.Column('tstamp', db.Integer, nullable=False),
         )
@@ -77,7 +75,7 @@ class ResourceTileCache(Base):
         if self._sameta is None:
             self.init_metadata()
         return self._sameta
-    
+
     @property
     def tiletab(self):
         if self._tiletab is None:
@@ -90,14 +88,14 @@ class ResourceTileCache(Base):
             try:
                 p = self.tilestor_path(create=False)
                 self._tilestor = sqlite3.connect(p, isolation_level=None)
-            except sqlite3.OperationalError as e:
+            except sqlite3.OperationalError:
                 # SQLite db not found, create it
                 p = self.tilestor_path(create=True)
                 self._tilestor = sqlite3.connect(p, isolation_level=None)
-            
+
             self._tilestor.text_factory = bytes
             cur = self._tilestor.cursor()
-            
+
             # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
             cur.execute("PRAGMA page_size = 8192")
             cur.execute("""
@@ -120,7 +118,7 @@ class ResourceTileCache(Base):
                 if not os.path.isdir(tcpath):
                     raise RuntimeError("Path '{}' doen't exists!".format(tcpath))
                 try:
-                    makedirs(d) 
+                    makedirs(d)
                 except OSError as exc:
                     # Ignore 'File exists' error in concurency conditions
                     # TODO: Add exist_ok=True for Python3 instead of exception
@@ -131,7 +129,7 @@ class ResourceTileCache(Base):
 
     def get_tile(self, tile):
         z, x, y = tile
-       
+
         conn = DBSession.connection()
         trow = conn.execute(db.sql.text(
             'SELECT color, tstamp '
@@ -148,16 +146,19 @@ class ResourceTileCache(Base):
             expdt = TIMESTAMP_EPOCH + timedelta(seconds=tstamp + self.ttl)
             if expdt <= datetime.utcnow():
                 return None
-        
+
         if color is not None:
             colort = tuple(map(ord, struct.pack('!i', color)))
             return Image.new('RGBA', (256, 256), colort)
 
         else:
             cur = self.tilestor.cursor()
-            srow = cur.execute('SELECT data FROM tile WHERE z = ? AND x = ? AND y = ?', (z, x, y)).fetchone()    
+            srow = cur.execute(
+                'SELECT data FROM tile WHERE z = ? AND x = ? AND y = ?',
+                (z, x, y)).fetchone()
+
             if srow is None:
-                return None           
+                return None
             return Image.open(StringIO(srow[0]))
 
     def put_tile(self, tile, img):
@@ -177,13 +178,13 @@ class ResourceTileCache(Base):
             try:
                 self.tilestor.execute("INSERT INTO tile VALUES (?, ?, ?, ?, ?)", (
                     z, x, y, tstamp, buf.getvalue()))
-            except sqlite3.IntegrityError as exc:
+            except sqlite3.IntegrityError:
                 # Ignore if tile already exists: other process can add it
                 # TODO: ON CONFLICT DO NOTHING in SQLite >= 3.24.0
                 pass
- 
+
         conn = DBSession.connection()
-        
+
         conn.execute(db.sql.text(
             'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
             'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
@@ -192,6 +193,7 @@ class ResourceTileCache(Base):
 
         # Force zope session management to commit changes
         mark_changed(DBSession())
+
 
 db.event.listen(
     ResourceTileCache.__table__, 'after_create',
@@ -205,7 +207,7 @@ db.event.listen(
 
 
 class ResourceTileCacheSeializedProperty(SerializedProperty):
-    
+
     def default(self):
         column = getattr(ResourceTileCache, self.attrname)
         return column.default.arg if column.default is not None else None
@@ -226,16 +228,17 @@ class ResourceTileCacheSerializer(Serializer):
     identity = 'tile_cache'
     resclass = Resource
 
-    enabled = ResourceTileCacheSeializedProperty(read=ResourceScope.read, write=ResourceScope.update)
-    max_z = ResourceTileCacheSeializedProperty(read=ResourceScope.read, write=ResourceScope.update)
-    ttl = ResourceTileCacheSeializedProperty(read=ResourceScope.read, write=ResourceScope.update)
+    __permissions = dict(read=ResourceScope.read, write=ResourceScope.update)
+
+    enabled = ResourceTileCacheSeializedProperty(**__permissions)
+    max_z = ResourceTileCacheSeializedProperty(**__permissions)
+    ttl = ResourceTileCacheSeializedProperty(**__permissions)
 
     def is_applicable(self):
         return IRenderableStyle.providedBy(self.obj)
 
     def deserialize(self):
         super(ResourceTileCacheSerializer, self).deserialize()
-        
+
         if self.obj.tile_cache is not None:
             self.obj.tile_cache.sameta.create_all(bind=DBSession.connection())
-

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from ..i18n import trstring_factory
-from hashlib import md5
 
 import PIL.ImageStat
+
+from ..i18n import trstring_factory
 
 
 COMP_ID = 'render'
@@ -12,7 +12,7 @@ _ = trstring_factory(COMP_ID)
 
 def imgcolor(img):
     """ Check image color and return color tuple if all pixels have same color """
-    
+
     # Min and max values for each channel
     extrema = PIL.ImageStat.Stat(img).extrema
 
@@ -25,5 +25,5 @@ def imgcolor(img):
     for comp in extrema:
         if comp[0] != comp[1]:
             return None
-    
+
     return map(lambda c: c[0], extrema)
