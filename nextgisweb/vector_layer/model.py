@@ -60,7 +60,8 @@ from ..feature_layer import (
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
     IFeatureQueryIntersects,
-    IFeatureQueryOrderBy)
+    IFeatureQueryOrderBy,
+    IFeatureQueryClipByBox)
 
 from .util import _
 
@@ -777,12 +778,13 @@ class FeatureQueryBase(object):
         IFeatureQueryFilterBy,
         IFeatureQueryLike,
         IFeatureQueryIntersects,
-        IFeatureQueryOrderBy)
+        IFeatureQueryOrderBy,
+        IFeatureQueryClipByBox)
 
     def __init__(self):
         self._srs = None
         self._geom = None
-        self._clipbybox2d = None
+        self._clip_by_box = None
         self._single_part_geom = None
         self._box = None
 
@@ -807,8 +809,8 @@ class FeatureQueryBase(object):
         self._geom = True
         self._single_part = single_part
 
-    def clipbybox2d(self, geom):
-        self._clipbybox2d = geom
+    def clip_by_box(self, box):
+        self._clip_by_box = box
 
     def geom_length(self):
         self._geom_len = True
@@ -867,8 +869,17 @@ class FeatureQueryBase(object):
                 .fetchone()
             )
 
-        if self._geom and self._clipbybox2d:
-            raise ValueError("geom and clipbybox2d are mutually exclusive.")
+        if self._clip_by_box is not None:
+            if _clipbybox2d_exists():
+                clip = db.func.st_setsrid(
+                    db.func.st_makeenvelope(*self._clip_by_box.bounds),
+                    self._clip_by_box.srid)
+                geomexpr = db.func.st_clipbybox2d(geomexpr, clip)
+            else:
+                clip = db.func.st_setsrid(
+                    db.func.st_geomfromtext(self._clip_by_box.wkt),
+                    self._clip_by_box.srid)
+                geomexpr = db.func.st_intersection(geomexpr, clip)
 
         if self._geom:
             if self._single_part:
@@ -895,26 +906,6 @@ class FeatureQueryBase(object):
                 db.func.st_xmax(geomexpr).label('box_right'),
                 db.func.st_ymax(geomexpr).label('box_top'),
             ))
-
-        if self._clipbybox2d:
-            if _clipbybox2d_exists():
-                xmin, ymin, xmax, ymax = self._clipbybox2d.bounds
-                clip = db.func.st_setsrid(
-                    db.func.st_makeenvelope(
-                        xmin, ymin, xmax, ymax
-                    ),
-                    self._clipbybox2d.srid,
-                )
-                clipexpr = db.func.st_clipbybox2d(geomexpr, clip)
-            else:
-                clip = db.func.st_setsrid(
-                    db.func.st_geomfromtext(
-                        self._clipbybox2d.wkt
-                    ),
-                    self._clipbybox2d.srid,
-                )
-                clipexpr = db.func.st_intersection(geomexpr, clip)
-            columns.append(db.func.st_asbinary(clipexpr).label("geom"))
 
         selected_fields = []
         for f in tableinfo.fields:
@@ -995,7 +986,6 @@ class FeatureQueryBase(object):
             layer = self.layer
 
             _geom = self._geom
-            _clipbybox2d = self._clipbybox2d
             _geom_len = self._geom_len
             _box = self._box
             _limit = self._limit
@@ -1013,10 +1003,7 @@ class FeatureQueryBase(object):
                 for row in rows:
                     fdict = dict((f.keyname, row[f.keyname])
                                   for f in selected_fields)
-                    if (
-                        self._geom or
-                        self._clipbybox2d
-                    ):
+                    if self._geom:
                         geom = geom_from_wkb(str(row['geom']))
                     else:
                         geom = None

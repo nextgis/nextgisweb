@@ -18,7 +18,8 @@ from .interface import (
     IFeatureQueryFilterBy,
     IFeatureQueryOrderBy,
     IFeatureQueryLike,
-    IFeatureQueryIntersects)
+    IFeatureQueryIntersects,
+    IFeatureQueryClipByBox)
 from .extension import FeatureExtension
 
 

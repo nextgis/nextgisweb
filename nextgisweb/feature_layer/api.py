@@ -22,7 +22,7 @@ from ..resource import DataScope, ValidationError, Resource, resource_factory
 from ..spatial_ref_sys import SRS
 from .. import geojson
 
-from .interface import IFeatureLayer, IWritableFeatureLayer, FIELD_TYPE
+from .interface import IFeatureLayer, IWritableFeatureLayer, IFeatureQueryClipByBox, FIELD_TYPE
 from .feature import Feature
 from .extension import FeatureExtension
 from .ogrdriver import EXPORT_FORMAT_OGR
@@ -178,7 +178,10 @@ def mvt(request):
 
         bbox = box(*bbox, srid=merc.id)
         query.intersects(bbox)
-        query.clipbybox2d(bbox)
+        query.geom()
+
+        if IFeatureQueryClipByBox.providedBy(query):
+            query.clip_by_box(bbox)
 
         _ogr_layer_from_features(
             obj, query(), name=b"ngw:%d" % obj.id, ds=ds)
