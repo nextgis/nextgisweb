@@ -206,7 +206,7 @@ def mvt(request):
             query.clip_by_box(bbox)
 
         if IFeatureQuerySimplify.providedBy(query):
-            tolerance = ((merc.maxx - merc.minx) / (1 << z)) / extent
+            tolerance = ((obj.srs.maxx - obj.srs.minx) / (1 << z)) / extent
             query.simplify(tolerance * simplification)
 
         _ogr_layer_from_features(
