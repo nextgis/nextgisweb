@@ -33,13 +33,18 @@ PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
 
 
+def _ogr_memory_ds():
+    return gdal.GetDriverByName(b'Memory').Create(
+        b'', 0, 0, 0, gdal.GDT_Unknown)
+
+
 def _ogr_ds(driver, options):
     return ogr.GetDriverByName(driver).CreateDataSource(
         "/vsimem/%s" % uuid.uuid4(), options=options
     )
 
 
-def _ogr_layer_from_features(layer, features, name=r'', ds=None):
+def _ogr_layer_from_features(layer, features, name=b'', ds=None):
     ogr_layer = layer.to_ogr(ds, name=name)
     layer_defn = ogr_layer.GetLayerDefn()
 
