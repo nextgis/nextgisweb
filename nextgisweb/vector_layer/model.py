@@ -9,6 +9,7 @@ import tempfile
 import shutil
 import ctypes
 
+from backports.functools_lru_cache import lru_cache
 from datetime import datetime, time, date
 from zope.interface import implements
 from osgeo import ogr, osr
@@ -59,7 +60,8 @@ from ..feature_layer import (
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
     IFeatureQueryIntersects,
-    IFeatureQueryOrderBy)
+    IFeatureQueryOrderBy,
+    IFeatureQueryClipByBox)
 
 from .util import _
 
@@ -776,11 +778,13 @@ class FeatureQueryBase(object):
         IFeatureQueryFilterBy,
         IFeatureQueryLike,
         IFeatureQueryIntersects,
-        IFeatureQueryOrderBy)
+        IFeatureQueryOrderBy,
+        IFeatureQueryClipByBox)
 
     def __init__(self):
         self._srs = None
         self._geom = None
+        self._clip_by_box = None
         self._single_part_geom = None
         self._box = None
 
@@ -804,6 +808,9 @@ class FeatureQueryBase(object):
     def geom(self, single_part=False):
         self._geom = True
         self._single_part = single_part
+
+    def clip_by_box(self, box):
+        self._clip_by_box = box
 
     def geom_length(self):
         self._geom_len = True
@@ -851,6 +858,28 @@ class FeatureQueryBase(object):
 
         geomcol = table.columns.geom
         geomexpr = db.func.st_transform(geomcol, srsid)
+
+        @lru_cache()
+        def _clipbybox2d_exists():
+            return (
+                DBSession.connection()
+                .execute(
+                    "select 1 from pg_proc where proname='st_clipbybox2d'"
+                )
+                .fetchone()
+            )
+
+        if self._clip_by_box is not None:
+            if _clipbybox2d_exists():
+                clip = db.func.st_setsrid(
+                    db.func.st_makeenvelope(*self._clip_by_box.bounds),
+                    self._clip_by_box.srid)
+                geomexpr = db.func.st_clipbybox2d(geomexpr, clip)
+            else:
+                clip = db.func.st_setsrid(
+                    db.func.st_geomfromtext(self._clip_by_box.wkt),
+                    self._clip_by_box.srid)
+                geomexpr = db.func.st_intersection(geomexpr, clip)
 
         if self._geom:
             if self._single_part:

@@ -98,10 +98,10 @@ class LayerFieldsMixin(object):
             post_update=True
         )
 
-    def to_ogr(self, ogr_ds):
+    def to_ogr(self, ogr_ds, name=r''):
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(self.srs.id)
-        ogr_layer = ogr_ds.CreateLayer(r"", srs=srs)
+        ogr_layer = ogr_ds.CreateLayer(name, srs=srs)
         for field in self.fields:
             ogr_layer.CreateField(
                 ogr.FieldDefn(

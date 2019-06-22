@@ -146,3 +146,9 @@ class IFeatureQueryIntersects(IFeatureQuery):
 
     def intersects(self, geom):
         """ Set query by spatial intersection """
+
+
+class IFeatureQueryClipByBox(IFeatureQuery):
+
+    def clip_by_box(self, box):
+        """ Clip geometry by bbox """
