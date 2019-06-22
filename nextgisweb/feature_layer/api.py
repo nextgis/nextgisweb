@@ -15,7 +15,7 @@ from io import BytesIO
 from osgeo import ogr, gdal
 from shapely import wkt
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPNoContent
 
 from ..geometry import geom_from_wkt, box
 from ..resource import DataScope, ValidationError, Resource, resource_factory
@@ -224,9 +224,7 @@ def mvt(request):
                 content_type=b"application/vnd.mapbox-vector-tile",
             )
         else:
-            raise HTTPNotFound(
-                "Tile (%d, %d, %d) not found." % (z, x, y)
-            )
+            return HTTPNoContent()
 
     finally:
         gdal.Unlink(b"%s" % (vsibuf,))
