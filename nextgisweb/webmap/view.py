@@ -136,7 +136,7 @@ def setup_pyramid(comp, config):
                     read=obj.has_permission(WebMapScope.annotation_read, request.user),
                     write=obj.has_permission(WebMapScope.annotation_write, request.user),
                 )
-            )
+            ) if comp.settings['annotation'] else None
         )
 
         return dict(

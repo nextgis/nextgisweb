@@ -35,6 +35,10 @@ class WebMapComponent(Component):
         self.settings['popup_height'] = int(self.settings.get(
             'popup_height', 200))
 
+        self.settings['annotation'] = self.settings.get(
+            'annotation', 'true'
+        ).lower() in ('true', 'yes')
+
     @require('resource', 'auth')
     def initialize_db(self):
         # Create a default web-map if there are none
@@ -78,4 +82,5 @@ class WebMapComponent(Component):
         dict(key='identify_radius', desc="Identification sensitivity (3px)"),
         dict(key='popup_width', desc="Popup width"),
         dict(key='popup_height', desc="Popup height"),
+        dict(key='annotation', desc="Turn on / off annotations"),
     )
