@@ -178,6 +178,7 @@ def mvt(request):
         maxx + (maxx - minx) * padding,
         maxy + (maxy - miny) * padding,
     )
+    bbox = box(*bbox, srid=merc.id)
 
     options = [
         "FORMAT=DIRECTORY",
@@ -197,8 +198,6 @@ def mvt(request):
         request.resource_permission(PERM_READ, obj)
 
         query = obj.feature_query()
-
-        bbox = box(*bbox, srid=merc.id)
         query.intersects(bbox)
         query.geom()
 
