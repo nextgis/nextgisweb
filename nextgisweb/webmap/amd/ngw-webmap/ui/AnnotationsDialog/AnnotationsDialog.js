@@ -106,7 +106,8 @@ define([
         },
         
         showForEdit: function (annFeature) {
-            var annotationInfo = annFeature.getAnnotationInfo();
+            var annotationInfo = annFeature.getAnnotationInfo(),
+                id = annFeature.getId();
             
             this.title = i18n.gettext('Edit annotation');
             this.editor.set('value', htmlEntities.decode(annotationInfo.description));
@@ -114,7 +115,12 @@ define([
             this.annotationsSettings.widthStroke.set('value', annotationInfo.style.circle.stroke.width);
             this.annotationsSettings.colorStroke.value = annotationInfo.style.circle.stroke.color;
             this.annotationsSettings.fillStroke.value = annotationInfo.style.circle.fill.color;
-            domStyle.set(this.btnDelete.domNode, 'display', 'block');
+            
+            if (id) {
+                domStyle.set(this.btnDelete.domNode, 'display', 'block');
+            } else {
+                domStyle.set(this.btnDelete.domNode, 'display', 'none');
+            }
             
             this.show();
             
