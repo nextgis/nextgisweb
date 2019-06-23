@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 from datetime import datetime, timedelta
 from uuid import uuid4
 from StringIO import StringIO
@@ -195,6 +195,17 @@ class ResourceTileCache(Base):
         # Force zope session management to commit changes
         mark_changed(DBSession())
 
+    def initialize(self):
+        self.sameta.create_all(bind=DBSession.connection())
+
+    def clear(self):
+        """ Clear tile cache and remove all tiles """
+        self._sameta = None
+        self._tiletab = None
+        self._tilestor = None
+        self.uuid = uuid4()
+        self.initialize()
+
 
 db.event.listen(
     ResourceTileCache.__table__, 'after_create',
@@ -243,4 +254,4 @@ class ResourceTileCacheSerializer(Serializer):
         super(ResourceTileCacheSerializer, self).deserialize()
 
         if self.obj.tile_cache is not None:
-            self.obj.tile_cache.sameta.create_all(bind=DBSession.connection())
+            self.obj.tile_cache.initialize()
