@@ -128,16 +128,18 @@ def setup_pyramid(comp, config):
             webmapTitle=obj.display_name,
             webmapEditable=obj.editable,
             drawOrderEnabled=obj.draw_order_enabled,
-            measurementSystem=request.env.core.settings_get('core', 'units'),
-            annotations=dict(
+            measurementSystem=request.env.core.settings_get('core', 'units')
+        )
+
+        if comp.settings['annotation']:
+            config['annotations'] = dict(
                 enabled=obj.annotation_enabled,
                 default=obj.annotation_default,
                 scope=dict(
                     read=obj.has_permission(WebMapScope.annotation_read, request.user),
                     write=obj.has_permission(WebMapScope.annotation_write, request.user),
                 )
-            ) if comp.settings['annotation'] else None
-        )
+            )
 
         return dict(
             obj=obj,
