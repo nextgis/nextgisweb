@@ -41,6 +41,7 @@ class ResourceTileCache(Base):
     enabled = db.Column(db.Boolean, nullable=False, default=False)
     max_z = db.Column(db.SmallInteger)
     ttl = db.Column(db.Integer)
+    image_compose = db.Column(db.Boolean, nullable=False, default=False)
 
     resource = db.relationship(Resource, backref=db.backref(
         'tile_cache', cascade='all, delete-orphan', uselist=False))
@@ -233,6 +234,7 @@ class ResourceTileCacheSerializer(Serializer):
     enabled = ResourceTileCacheSeializedProperty(**__permissions)
     max_z = ResourceTileCacheSeializedProperty(**__permissions)
     ttl = ResourceTileCacheSeializedProperty(**__permissions)
+    image_compose = ResourceTileCacheSeializedProperty(**__permissions)
 
     def is_applicable(self):
         return IRenderableStyle.providedBy(self.obj)

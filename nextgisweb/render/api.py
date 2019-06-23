@@ -135,7 +135,7 @@ def image(request):
 
         rimg = None
 
-        if zexact is None:
+        if p_cache and zexact is None:
             if abs(resolution[0] - resolution[1]) < 1e-9:
                 ztile = log((obj.srs.maxx - obj.srs.minx) / (256 * resolution[0]), 2)
                 zexact = abs(round(ztile) - ztile) < 1e-9
@@ -145,8 +145,10 @@ def image(request):
                 zexact = False
 
         # Is requested image may be cached via tiles?
-        cached = p_cache and zexact and obj.tile_cache is not None and obj.tile_cache.enabled \
-            and (obj.tile_cache.max_z is None or ztile <= obj.tile_cache.max_z)
+        cached = (
+            p_cache and zexact and obj.tile_cache is not None
+            and obj.tile_cache.enabled and obj.tile_cache.image_compose
+            and (obj.tile_cache.max_z is None or ztile <= obj.tile_cache.max_z))
 
         ext_extent = p_extent
         ext_size = p_size

@@ -28,6 +28,7 @@ define([
         serializeInMixin: function (data) {
             var value = data.tile_cache;
             value.enabled = (value.enabled === "on") ? true : false;
+            value.image_compose = (value.image_compose === "on") ? true : false;
         }
     });
 });
