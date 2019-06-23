@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import PIL.ImageStat
+from affine import Affine
 
 from ..i18n import trstring_factory
 
@@ -27,3 +28,29 @@ def imgcolor(img):
             return None
 
     return map(lambda c: c[0], extrema)
+
+
+def af_transform(a, b):
+    """ Crate affine transform from coordinate system A to B """
+    return ~(
+        Affine.translation(a[0], a[3]) * Affine.scale(
+            (a[2] - a[0]) / b[2], (a[1] - a[3]) / b[3]
+        ) * Affine.translation(b[0], b[1]))
+
+
+def affine_from_bounds(a, b):
+    # Force arguments to float
+    a = map(float, a)
+    b = map(float, b)
+
+    return ~(
+        Affine.translation(a[0], a[1]) * Affine.scale(
+            (a[2] - a[0]) / (b[2] - b[0]),
+            (a[3] - a[1]) / (b[3] - b[1])
+        ) * Affine.translation(- b[0], - b[1]))
+
+
+def affine_bounds_to_tile(bounds, zoom):
+    tilemax = 2 ** zoom
+    return affine_from_bounds(
+        bounds, (0, tilemax, tilemax, 0))

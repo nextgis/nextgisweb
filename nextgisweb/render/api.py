@@ -5,24 +5,17 @@ from itertools import product
 from StringIO import StringIO
 
 from PIL import Image, ImageDraw, ImageFont
-from affine import Affine
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 
 from ..resource import Resource, DataScope, resource_factory
 
 from .interface import ILegendableStyle
+from .util import af_transform
+
 
 PD_READ = DataScope.read
 sett_name = 'permissions.disable_check.rendering'
-
-
-def af_transform(a, b):
-    """ Crate affine transform from coordinate system A to B """
-    return ~(
-        Affine.translation(a[0], a[3])
-        * Affine.scale((a[2] - a[0]) / b[2], (a[1] - a[3]) / b[3])
-        * Affine.translation(b[0], b[1]))
 
 
 def rtoint(arg):

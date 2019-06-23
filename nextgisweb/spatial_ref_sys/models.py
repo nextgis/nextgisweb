@@ -69,6 +69,13 @@ class SRS(Base):
             self.maxy - y * step,
         )
 
+    def tile_center(self, tile):
+        extent = self.tile_extent(tile)
+        return (
+            (extent[0] + extent[2]) / 2,
+            (extent[1] + extent[3]) / 2,
+        )
+
 
 db.event.listen(SRS.__table__, 'after_create', db.DDL("""
     CREATE OR REPLACE FUNCTION srs_spatial_ref_sys_sync() RETURNS TRIGGER

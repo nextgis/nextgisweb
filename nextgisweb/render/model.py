@@ -24,7 +24,7 @@ from ..resource import (
 )
 
 from .interface import IRenderableStyle
-from .util import imgcolor
+from .util import imgcolor, affine_bounds_to_tile
 
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
@@ -185,7 +185,6 @@ class ResourceTileCache(Base):
                 pass
 
         conn = DBSession.connection()
-
         conn.execute(db.sql.text(
             'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
             'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
@@ -205,6 +204,45 @@ class ResourceTileCache(Base):
         self._tilestor = None
         self.uuid = uuid4()
         self.initialize()
+
+    def invalidate(self, geom):
+        srs = self.resource.srs
+        conn = DBSession.connection()
+
+        # TODO: This query uses sequnce scan and should be rewritten
+        query_z = db.sql.text(
+            'SELECT DISTINCT z FROM tile_cache."{}"'
+            .format(self.uuid.hex))
+
+        query_delete = db.sql.text(
+            'DELETE FROM tile_cache."{0}" '
+            'WHERE z = :z '
+            '   AND x BETWEEN :xmin AND :xmax '
+            '   AND y BETWEEN :ymin AND :ymax '
+            .format(self.uuid.hex))
+
+        zlist = map(lambda a: a[0], conn.execute(query_z).fetchall())
+        for z in zlist:
+            aft = affine_bounds_to_tile((srs.minx, srs.miny, srs.maxx, srs.maxy), z)
+
+            xmin, ymax = map(lambda a: int(a), aft * geom.bounds[0:2])
+            xmax, ymin = map(lambda a: int(a), aft * geom.bounds[2:4])
+
+            xmin -= 1
+            ymin -= 1
+            xmax += 1
+            ymax += 1
+
+            env.render.logger.debug(
+                'Removing tiles for z=%d x=%d..%d y=%d..%d',
+                z, xmin, xmax, ymin, ymax)
+
+            conn.execute(
+                query_delete, z=z,
+                xmin=xmin, ymin=ymin,
+                xmax=xmax, ymax=ymax)
+
+        mark_changed(DBSession())
 
 
 db.event.listen(
