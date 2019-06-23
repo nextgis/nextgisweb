@@ -19,22 +19,29 @@ define([
         _annotationsLayer: null,
         _editableLayer: null,
         _annotationsDialog: null,
+        _annotationPanel: null,
         
-        _popupsVisible: null,
         _annotationsVisible: null,
+        _popupsVisible: null,
         
         _editable: null,
         
-        constructor: function (display) {
-            if (!display) throw Exception('AnnotationsManager: display is required parameter for first call!');
-            this._display = display;
+        constructor: function (options) {
+            if (!options.display || !options.panel) {
+                throw Exception('AnnotationsManager: "display" and "panel" are required parameter for first call!');
+            }
+            this._display = options.display;
+            this._annotationPanel = options.panel;
+
+            this._annotationsVisible = this._display.config.annotations.default;
+            this._popupsVisible = this._annotationsVisible;
             
-            this._display._layersDeferred.then(lang.hitch(this, this._init));
             this._annotationsDialog = new AnnotationsDialog({
                 annotationsManager: this
             });
-            
             this._editable = this._display.config.annotations.scope.write;
+            
+            this._display._layersDeferred.then(lang.hitch(this, this._init));
         },
         
         _init: function () {
@@ -63,12 +70,15 @@ define([
         _loadAnnotations: function () {
             this._getAnnotationsCollection().then(lang.hitch(this, function (annotations) {
                 this._annotationsLayer.fillAnnotations(annotations);
+                this._onAnnotationsVisibleChange(this._annotationsVisible);
+                this._onMessagesVisibleChange(this._popupsVisible);
             }));
         },
         
         _bindEvents: function () {
             topic.subscribe('webmap/annotations/add/activate', lang.hitch(this, this._onAddModeActivated));
             topic.subscribe('webmap/annotations/add/deactivate', lang.hitch(this, this._onAddModeDeactivated));
+
             topic.subscribe('webmap/annotations/layer/feature/created', lang.hitch(this, this._onCreateOlFeature));
             topic.subscribe('webmap/annotations/change/', lang.hitch(this, this._onChangeAnnotation));
             topic.subscribe('webmap/annotations/geometry/changed', lang.hitch(this, this._onChangeGeometry));
@@ -104,6 +114,8 @@ define([
         _onAddModeActivated: function () {
             if (this._editable) domClass.add(document.body, 'annotations-edit');
             this._editableLayer.activate(this._annotationsLayer);
+            this._annotationPanel.setAnnotationsShow(true);
+            this._annotationPanel.setMessagesShow(true);
         },
         
         _onAddModeDeactivated: function () {

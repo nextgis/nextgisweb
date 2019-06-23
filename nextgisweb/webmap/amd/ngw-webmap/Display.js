@@ -535,7 +535,8 @@ define([
         },
     
         _buildAnnotationsPanel() {
-            if (!this.config.annotations.enabled ||
+            if (!this.config.annotations ||
+                !this.config.annotations.enabled ||
                 !this.config.annotations.scope.read) {
                 return false;
             }

@@ -36,17 +36,28 @@ define([
             this.inherited(arguments);
             
             this._setDefaultValues();
-            this._bindEvents();
+            setTimeout(lang.hitch(this, this._bindEvents), 500);
             this._buildAnnotationTool();
             
-            AnnotationsManager.getInstance(this.display);
+            AnnotationsManager.getInstance({
+                display: this.display,
+                panel: this
+            });
             this._mapStates = MapStatesObserver.getInstance();
         },
         
         _setDefaultValues: function () {
-            this.contentWidget.chbAnnotationsShow.set('value',
-                this._display.config.annotations.default);
-            this.contentWidget.chbAnnotationsShowMessages.set('value', true);
+            var toShowAnnotationLayer = this._display.config.annotations.default;
+            this.contentWidget.chbAnnotationsShow.set('value', toShowAnnotationLayer);
+            this.contentWidget.chbAnnotationsShowMessages.set('value', toShowAnnotationLayer);
+        },
+        
+        setAnnotationsShow: function (value) {
+            this.contentWidget.chbAnnotationsShow.set('value', value);
+        },
+        
+        setMessagesShow: function (value) {
+            this.contentWidget.chbAnnotationsShowMessages.set('value', value);
         },
         
         _bindEvents: function () {

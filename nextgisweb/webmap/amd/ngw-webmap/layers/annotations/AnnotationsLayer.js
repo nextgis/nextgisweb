@@ -15,7 +15,10 @@ define([
         constructor: function (editable) {
             this._editable = editable;
             this._source = new ol.source.Vector();
-            this._layer = new Vector('', {title: 'annotations'});
+            this._layer = new Vector('', {
+                title: 'annotations'
+            });
+            this._layer.set('visibility', false);
             this._layer.olLayer.setSource(this._source);
         },
         
@@ -29,14 +32,16 @@ define([
         },
         
         fillAnnotations: function (annotationsInfo) {
-            var editable = this._editable;
-
-            var annotationFeatures = array.map(annotationsInfo, function (annotationInfo) {
+            var editable = this._editable,
+                annotationFeatures;
+            
+            annotationFeatures = array.map(annotationsInfo, function (annotationInfo) {
                 return new AnnotationFeature({
                     annotationInfo: annotationInfo,
                     editable: editable
                 });
             }, this);
+            
             array.forEach(annotationFeatures, function (annotationFeature) {
                 this._source.addFeature(annotationFeature.getFeature());
             }, this);
@@ -50,7 +55,7 @@ define([
             var olFeatures = this._source.getFeatures(),
                 map = this._map,
                 popup;
-
+            
             array.forEach(olFeatures, function (olFeature) {
                 popup = olFeature.get('popup');
                 popup.addToMap(map).show();
@@ -60,7 +65,7 @@ define([
         hidePopups: function () {
             var olFeatures = this._source.getFeatures(),
                 popup;
-
+            
             array.forEach(olFeatures, function (olFeature) {
                 popup = olFeature.get('popup').remove();
             }, this);
