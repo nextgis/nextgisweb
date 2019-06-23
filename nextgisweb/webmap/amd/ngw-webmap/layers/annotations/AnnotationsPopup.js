@@ -1,12 +1,12 @@
 define([
-    'dojo/_base/declare', 'dojo/_base/array', 'dojo/on', 'dojo/topic', 'dojo/html', 'dojo/dom-construct',
+    'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/array', 'dojo/on', 'dojo/topic', 'dojo/html', 'dojo/dom-construct',
     'dijit/_WidgetBase', 'dijit/_TemplatedMixin', 'dijit/_WidgetsInTemplateMixin',
     'openlayers/ol', 'openlayers/ol-popup', 'ngw-webmap/layers/annotations/AnnotationFeature',
     'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n',
     'ngw/openlayers/layer/Vector', 'dojo/text!./AnnotationsPopup.hbs',
     'xstyle/css!./AnnotationsPopup.css'
 ], function (
-    declare, array, on, topic, html, domConstruct, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
+    declare, lang, array, on, topic, html, domConstruct, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
     ol, olPopup, AnnotationFeature, i18n, hbsI18n, Vector, template
 ) {
     var contentTemplate = hbsI18n(template, i18n);
@@ -28,6 +28,8 @@ define([
         },
         
         addToMap: function (map) {
+            if (this._map) return this;
+
             this._map = map;
             this._map.olMap.addOverlay(this._popup);
             return this;
@@ -35,6 +37,7 @@ define([
         
         remove: function () {
             if (!this._map) return false;
+
             this._map.olMap.removeOverlay(this._popup);
             this._map = null;
             this._contentWidget = null;
@@ -55,11 +58,7 @@ define([
         },
         
         _setEditableState: function () {
-            if (this._editable) {
-                on(this._contentWidget.spanEditAnnotation, 'click', lang.hitch(this, this._onEditAnnotation));
-            } else {
-                domConstruct.destroy(this._contentWidget.spanEditAnnotation);
-            }
+            on(this._contentWidget.spanEditAnnotation, 'click', lang.hitch(this, this._onEditAnnotation));
         },
         
         _onEditAnnotation: function () {

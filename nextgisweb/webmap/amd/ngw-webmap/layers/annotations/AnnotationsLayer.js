@@ -62,6 +62,11 @@ define([
             }, this);
         },
         
+        showPopup: function (annotationFeature) {
+            var popup = annotationFeature.getPopup();
+            popup.addToMap(this._map).show();
+        },
+        
         hidePopups: function () {
             var olFeatures = this._source.getFeatures(),
                 popup;
@@ -73,6 +78,7 @@ define([
         
         removeAnnFeature: function (annFeature) {
             var olFeature = annFeature.getFeature();
+            olFeature.get('popup').remove();
             this._source.removeFeature(olFeature);
             annFeature.clearOlFeature();
         }

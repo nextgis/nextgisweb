@@ -171,6 +171,7 @@ define([
                     var annId = resultSaved.id;
                     annFeature.setId(annId);
                     annFeature.updateAnnotationInfo(newAnnotationInfo);
+                    if (this._popupsVisible) this._annotationsLayer.showPopup(annFeature);
                     this._standby.hide();
                 }),
                 lang.hitch(this, function (err) {
@@ -186,6 +187,7 @@ define([
             this._updateAnnotation(annFeature, newAnnotationInfo).then(
                 lang.hitch(this, function () {
                     annFeature.updateAnnotationInfo(newAnnotationInfo);
+                    annFeature.updatePopup();
                     this._standby.hide();
                 }),
                 lang.hitch(this, function (err) {
@@ -201,7 +203,7 @@ define([
             this._deleteAnnotation(annFeature).then(
                 lang.hitch(this, function () {
                     this._annotationsLayer.removeAnnFeature(annFeature);
-                    this.this._standby.hide();
+                    this._standby.hide();
                 }),
                 lang.hitch(this, function (err) {
                     this._standby.hide();

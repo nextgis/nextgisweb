@@ -342,12 +342,12 @@ msgid "Invalid width: should be from 1 to 100 px"
 msgstr "Значение должно быть от 1 до 100 пикс."
 
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:14
-msgid "Show annotations"
-msgstr ""
+msgid "Show annotations layer"
+msgstr "Показать слой аннотаций"
 
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
-msgid "Show annotations messages"
-msgstr "Показать аннотации"
+msgid "Show messages"
+msgstr "Показать сообщения"
 
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:17
 msgid "Stopping editing"

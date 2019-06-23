@@ -81,6 +81,10 @@ define([
             return this._feature.get('info');
         },
         
+        getPopup: function () {
+            return this._feature.get('popup');
+        },
+        
         getDescriptionAsHtml: function () {
             var description = this._feature.get('info')['description'];
             if (!description) return '';
@@ -104,6 +108,11 @@ define([
             this._feature.setProperties({
                 info: annotationInfo
             });
+        },
+        
+        updatePopup: function () {
+            var popup = this._feature.get('popup');
+            popup.update();
         },
         
         _buildStyle: function (annotationInfo) {
