@@ -4,6 +4,7 @@ define([
     "./Base",
     "dojo/number",
     "dijit/popup",
+    "dojo/_base/lang",
     "dijit/TooltipDialog",
     "openlayers/ol",
     "ngw-pyramid/i18n!webmap"
@@ -12,6 +13,7 @@ define([
     Base,
     number,
     popup,
+    lang,
     TooltipDialog,
     ol,
     i18n
@@ -78,9 +80,7 @@ define([
             var formatArea = function(polygon, units) {
                 var output;
                 var sourceProj = tool.display.map.olMap.getView().getProjection();
-                var geom = polygon.clone().transform(sourceProj, "EPSG:4326");
-                var coordinates = geom.getLinearRing(0).getCoordinates();
-                var area = Math.abs(wgs84Sphere.geodesicArea(coordinates));
+                var area = Math.abs(ol.Sphere.getArea(polygon, {projection: sourceProj}));
 
                 if ((units === "metric") || (units === null)) {
                     output = (area > 10000) ? {
@@ -133,9 +133,8 @@ define([
             this.interaction.setActive(false);
 
             var listener;
-            var widget = this;
             var units = this.display.config.measurementSystem;
-            this.interaction.on("drawstart", function(evt) {
+            this.interaction.on("drawstart", lang.hitch(this, function(evt) {
                 this.vector.getSource().clear();
                 listener = evt.feature.getGeometry().on("change", function(evt) {
                     var geom = evt.target;
@@ -146,13 +145,13 @@ define([
                         output = formatLength(geom, units);
                     }
 
-                    widget.tooltip.set("content",
+                    tool.tooltip.set("content",
                         output.label
                         + number.format(output.measure) + " "
                         + output.suffix
                     );
                 });
-            }, this);
+            }));
 
             this.interaction.on("drawend", function(evt) {
                 ol.Observable.unByKey(listener);
