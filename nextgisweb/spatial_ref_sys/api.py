@@ -21,6 +21,11 @@ def get(request):
         wkt=obj.wkt
     )
 
+def srs_convert(request):
+    projStr = request.matchdict['projStr']
+
+    return dict(wkt=projStr)
+
 
 def setup_pyramid(comp, config):
     config.add_route(
@@ -30,3 +35,6 @@ def setup_pyramid(comp, config):
     config.add_route(
         'spatial_ref_sys.get', '/api/component/spatial_ref_sys/{id}',
     ).add_view(get, request_method='GET', renderer='json')
+
+    config.add_route('spatial_ref_sys.convert', '/api/component/spatial_ref_sys/convert/') \
+        .add_view(srs_convert, request_method='POST', renderer='json')

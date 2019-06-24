@@ -145,9 +145,11 @@ def setup_pyramid(comp, config):
             title=('SRS'),
             obj_list=SRS.filter_by(),
             dynmenu=request.env.pyramid.control_panel)
+
     
     config.add_route('srs.browse', '/srs/') \
         .add_view(srs_browse, renderer='nextgisweb:spatial_ref_sys/template/srs_browse.mako')
+
 
     class SRSMenu(dm.DynItem):
 

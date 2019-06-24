@@ -10,8 +10,11 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/i18n!auth",
     "ngw-pyramid/hbs-i18n",
+    "ngw/route",
     "dojo/text!./template/SRSWidget.hbs",
     "dojo/_base/array",
+    "dojo/request/xhr",
+    "./ProjStringDialog",
     // template
     "dijit/form/CheckBox",
     "dijit/form/ValidationTextBox",
@@ -31,17 +34,29 @@ define([
     _WidgetsInTemplateMixin,
     i18n,
     hbsI18n,
+    route,
     template,
-    array
+    array,
+    xhr,
+    ProjStringDialog
 ) {
+
+    var projStringDialog = new ProjStringDialog();
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         identity: "srs_list",
         title: i18n.gettext("SRS"),
 
         postCreate: function () {
-            if (this.value.disabled && this.wkt) {
+            if (this.value && this.value.disabled && this.wkt) {
                 this.wkt.set("readOnly", true);
+            }
+            if (this.btnImportProjectionString) {
+                projStringDialog.on("save", lang.hitch(this, this._insertProjectionString));
+
+                this.btnImportProjectionString.on('click', function () {
+                    projStringDialog.show();
+                });
             }
         },
 
@@ -76,6 +91,24 @@ define([
                 wkt: this.wkt.get("value")
             };
             return result;
+        },
+
+        _insertProjectionString: function (data) {
+            var projString = data && data.projStr;
+            if (projString) {
+                xhr.post(route.spatial_ref_sys.convert(), {
+                    handleAs: "json",
+                    headers: { "Accept": "application/json" },
+                    data: data
+                }).then(
+                    function (data) {
+                        console.log(data);
+                    },
+                    function (error) {
+
+                    }
+                );
+            }
         }
     });
 });
