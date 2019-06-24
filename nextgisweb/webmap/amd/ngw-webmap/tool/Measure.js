@@ -41,8 +41,6 @@ define([
         l118.779-118.78L249.789,249.79z"/></g></svg>';
             }
 
-            var wgs84Sphere = new ol.Sphere(6378137);
-
             var formatLength = function(line, units) {
                 var output;
                 var length = 0;
@@ -51,7 +49,7 @@ define([
                 for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
                     var c1 = ol.proj.transform(coordinates[i], sourceProj, "EPSG:4326");
                     var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, "EPSG:4326");
-                    length += wgs84Sphere.haversineDistance(c1, c2);
+                    length += ol.sphere.getDistance(c1, c2);
                 }
 
                 if ((units === "metric") || (units === null)) {
@@ -80,7 +78,7 @@ define([
             var formatArea = function(polygon, units) {
                 var output;
                 var sourceProj = tool.display.map.olMap.getView().getProjection();
-                var area = Math.abs(ol.Sphere.getArea(polygon, {projection: sourceProj}));
+                var area = Math.abs(ol.sphere.getArea(polygon, {projection: sourceProj}));
 
                 if ((units === "metric") || (units === null)) {
                     output = (area > 10000) ? {
