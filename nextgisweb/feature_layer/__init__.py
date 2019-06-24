@@ -20,7 +20,9 @@ from .interface import (
     IFeatureQueryLike,
     IFeatureQueryIntersects,
     IFeatureQueryClipByBox,
-    IFeatureQuerySimplify)
+    IFeatureQuerySimplify,
+)
+from .event import on_data_change
 from .extension import FeatureExtension
 
 
@@ -35,7 +37,6 @@ class FeatureLayerComponent(Component):
         self.settings['search.nominatim'] = \
             self.settings.get('search.nominatim', 'true').lower() == 'true'
 
-        from .extension import FeatureExtension
         self.FeatureExtension = FeatureExtension
 
     @require('resource')

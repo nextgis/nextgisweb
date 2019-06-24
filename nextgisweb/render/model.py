@@ -24,10 +24,12 @@ from ..resource import (
 )
 
 from .interface import IRenderableStyle
+from .event import on_style_change, on_data_change
 from .util import imgcolor, affine_bounds_to_tile
 
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
+
 Base = declarative_base()
 
 
@@ -254,6 +256,19 @@ db.event.listen(
     ResourceTileCache.__table__, 'after_drop',
     db.DDL('DROP SCHEMA IF EXISTS tile_cache CASCADE'),
     propagate=True)
+
+
+@on_style_change.connect
+def on_style_change_handler(resource):
+    if resource.tile_cache is not None:
+        resource.tile_cache.clear()
+        resource.tile_cache.initialize()
+
+
+@on_data_change.connect
+def on_data_change_handler(resource, geom):
+    if resource.tile_cache is not None:
+        resource.tile_cache.invalidate(geom)
 
 
 class ResourceTileCacheSeializedProperty(SerializedProperty):

@@ -12,13 +12,20 @@ from .interface import (
     ILegendableStyle,
 )
 from .model import Base
+from .event import (
+    on_style_change,
+    on_data_change,
+)
+
 
 __all__ = [
     'RenderComponent',
     'IRenderableStyle',
     'IExtentRenderRequest',
     'ITileRenderRequest',
-    'ILegendableStyle'
+    'ILegendableStyle',
+    'on_style_change',
+    'on_data_change',
 ]
 
 
