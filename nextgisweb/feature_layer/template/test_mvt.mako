@@ -34,7 +34,7 @@
             source: new ol.source.VectorTile({
               format: new ol.format.MVT(),
               tileGrid: ol.tilegrid.createXYZ({maxZoom: 22}),
-              tilePixelRatio: 16,
+              tilePixelRatio: parseInt(${request.GET.get('extent', 4096)} / 256),
               wrapX: false,
               url: "${request.route_url('feature_layer.mvt', _query=request.GET)}" + "&x={x}&y={y}&z={z}"
             })

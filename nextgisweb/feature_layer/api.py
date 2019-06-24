@@ -15,14 +15,19 @@ from io import BytesIO
 from osgeo import ogr, gdal
 from shapely import wkt
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPNoContent
 
 from ..geometry import geom_from_wkt, box
 from ..resource import DataScope, ValidationError, Resource, resource_factory
 from ..spatial_ref_sys import SRS
 from .. import geojson
 
-from .interface import IFeatureLayer, IWritableFeatureLayer, FIELD_TYPE
+from .interface import (
+    IFeatureLayer,
+    IWritableFeatureLayer,
+    IFeatureQueryClipByBox,
+    IFeatureQuerySimplify,
+    FIELD_TYPE)
 from .feature import Feature
 from .extension import FeatureExtension
 from .ogrdriver import EXPORT_FORMAT_OGR
@@ -38,14 +43,20 @@ def _ogr_memory_ds():
         b'', 0, 0, 0, gdal.GDT_Unknown)
 
 
-def _ogr_layer_from_features(layer, features, ds=None):
-    ogr_layer = layer.to_ogr(ds)
+def _ogr_ds(driver, options):
+    return ogr.GetDriverByName(driver).CreateDataSource(
+        "/vsimem/%s" % uuid.uuid4(), options=options
+    )
+
+
+def _ogr_layer_from_features(layer, features, name=b'', ds=None):
+    ogr_layer = layer.to_ogr(ds, name=name)
     layer_defn = ogr_layer.GetLayerDefn()
 
     for f in features:
         ogr_layer.CreateFeature(
             f.to_ogr(layer_defn))
-    
+
     return ogr_layer
 
 
@@ -146,9 +157,8 @@ def mvt(request):
     x = int(request.GET["x"])
     y = int(request.GET["y"])
 
-    simplification = float(
-        request.GET.get("simplification", 0)
-    )
+    extent = int(request.GET.get('extent', 4096))
+    simplification = float(request.GET.get("simplification", extent / 512))
 
     resids = map(
         int,
@@ -168,41 +178,41 @@ def mvt(request):
         maxx + (maxx - minx) * padding,
         maxy + (maxy - miny) * padding,
     )
+    bbox = box(*bbox, srid=merc.id)
 
-    ds_src = _ogr_memory_ds()
-    ds_dst = _ogr_memory_ds()
+    options = [
+        "FORMAT=DIRECTORY",
+        "TILE_EXTENSION=pbf",
+        "MINZOOM=%d" % z,
+        "MAXZOOM=%d" % z,
+        "EXTENT=%d" % extent,
+        "COMPRESS=NO",
+    ]
+
+    ds = _ogr_ds(b"MVT", options)
+
+    vsibuf = ds.GetName()
 
     for resid in resids:
         obj = Resource.filter_by(id=resid).one()
         request.resource_permission(PERM_READ, obj)
 
         query = obj.feature_query()
-        query.intersects(box(*bbox, srid=merc.id))
+        query.intersects(bbox)
         query.geom()
 
-        ogr_layer = _ogr_layer_from_features(
-            obj, query(), ds=ds_src)
+        if IFeatureQueryClipByBox.providedBy(query):
+            query.clip_by_box(bbox)
 
-        ds_dst.CopyLayer(ogr_layer, b"ngw:%d" % obj.id)
+        if IFeatureQuerySimplify.providedBy(query):
+            tolerance = ((obj.srs.maxx - obj.srs.minx) / (1 << z)) / extent
+            query.simplify(tolerance * simplification)
 
-    options = [
-        "-preserve_fid",
-        "-f MVT",
-        "-t_srs EPSG:%d" % merc.id,
-        "-clipdst %f %f %f %f" % bbox,
-        "-dsco FORMAT=DIRECTORY",
-        "-dsco TILE_EXTENSION=pbf",
-        "-dsco MINZOOM=%d" % z,
-        "-dsco MAXZOOM=%d" % z,
-        "-dsco SIMPLIFICATION=%f" % simplification,
-        "-dsco COMPRESS=NO",
-    ]
+        _ogr_layer_from_features(
+            obj, query(), name=b"ngw:%d" % obj.id, ds=ds)
 
-    vsibuf = "/vsimem/mvt-%s" % uuid.uuid4()
-
-    gdal.VectorTranslate(
-        vsibuf, ds_dst, options=" ".join(options)
-    )
+    # flush changes
+    ds = None
 
     filepath = os.path.join(
         "%s" % vsibuf, "%d" % z, "%d" % x, "%d.pbf" % y
@@ -226,9 +236,7 @@ def mvt(request):
                 content_type=b"application/vnd.mapbox-vector-tile",
             )
         else:
-            raise HTTPNotFound(
-                "Tile (%d, %d, %d) not found." % (z, x, y)
-            )
+            return HTTPNoContent()
 
     finally:
         gdal.Unlink(b"%s" % (vsibuf,))
