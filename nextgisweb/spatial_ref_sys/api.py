@@ -28,14 +28,26 @@ def srs_convert(request):
     wkt = False
     message = ''
     sr = osr.SpatialReference()
-    # imports = ['ImportFromProj4', 'ImportFromESRI']
-    imports = ['ImportFromProj4']
+    imports = [
+        'ImportFromProj4', 
+        lambda x: sr.ImportFromEPSG(int(x)), 
+        'ImportFromMICoordSys',
+        'ImportFromESRI'
+    ]
 
     for i in imports:
-        method_to_call = getattr(sr, i)
-        if method_to_call and method_to_call(projStr) == 0:
-            wkt = sr.ExportToWkt()
-            break
+
+        if hasattr(i, '__call__'):
+            method_to_call = i
+        else:
+            method_to_call = getattr(sr, i)
+
+        try:
+            if method_to_call and method_to_call(projStr) == 0:
+                wkt = sr.ExportToWkt()
+                break
+        except:
+            pass
             
     if not wkt:
         message = 'Invalid SRS definition!'
