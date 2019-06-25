@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 
+import json
+from osgeo import osr
 from .models import SRS
 
 
@@ -22,9 +24,23 @@ def get(request):
     )
 
 def srs_convert(request):
-    projStr = request.matchdict['projStr']
+    projStr = request.POST.get('projStr').encode('utf-8')
+    wkt = False
+    message = ''
+    sr = osr.SpatialReference()
+    # imports = ['ImportFromProj4', 'ImportFromESRI']
+    imports = ['ImportFromProj4']
 
-    return dict(wkt=projStr)
+    for i in imports:
+        method_to_call = getattr(sr, i)
+        if method_to_call and method_to_call(projStr) == 0:
+            wkt = sr.ExportToWkt()
+            break
+            
+    if not wkt:
+        message = 'Invalid SRS definition!'
+
+    return dict(success=bool(wkt), wkt=wkt, message=message)
 
 
 def setup_pyramid(comp, config):

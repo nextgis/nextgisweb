@@ -50,6 +50,7 @@ define([
         postCreate: function () {
             if (this.value && this.value.disabled && this.wkt) {
                 this.wkt.set("readOnly", true);
+                this.btnImportProjectionString.set("disabled", true);
             }
             if (this.btnImportProjectionString) {
                 projStringDialog.on("save", lang.hitch(this, this._insertProjectionString));
@@ -94,6 +95,7 @@ define([
         },
 
         _insertProjectionString: function (data) {
+            var widget = this;
             var projString = data && data.projStr;
             if (projString) {
                 xhr.post(route.spatial_ref_sys.convert(), {
@@ -102,10 +104,18 @@ define([
                     data: data
                 }).then(
                     function (data) {
-                        console.log(data);
+                        var wkt = data && data.wkt;
+                        if (data.success && wkt && widget.wkt) {
+                            widget.wkt.set("value", wkt);
+                        } else {
+                            var message = data.message;
+                            if (message) {
+                                console.warn(message);
+                            }
+                        }
                     },
                     function (error) {
-
+                        // handle error
                     }
                 );
             }
