@@ -130,6 +130,11 @@ def test_mvt(request):
     return dict()
 
 
+@viewargs(renderer='nextgisweb:feature_layer/template/export.mako')
+def export(request):
+    return dict(obj=request.context, subtitle=_("Save as"), maxheight=True)
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         'feature_layer.feature.browse',
@@ -164,6 +169,11 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
         client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer)
+
+    config.add_route(
+        'feature_layer.export.page', '/resource/{id:\d+}/export',
+        factory=resource_factory,
+    ).add_view(export, context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.test_mvt',
@@ -207,16 +217,10 @@ def setup_pyramid(comp, config):
                         id=args.obj.id))
 
                 yield dm.Link(
-                    'feature_layer/export-geojson', _(u"Download as GeoJSON"),
+                    'feature_layer/export', _(u"Save as"),
                     lambda args: args.request.route_url(
-                        "feature_layer.export", id=args.obj.id,
-                        _query={"format": "geojson", "zipped": "false"}))
-
-                yield dm.Link(
-                    'feature_layer/export-csv', _(u"Download as CSV"),
-                    lambda args: args.request.route_url(
-                        "feature_layer.export", id=args.obj.id,
-                        _query={"format": "csv", "zipped": "false"}))
+                        "feature_layer.export.page",
+                        id=args.obj.id))
 
     Resource.__dynmenu__.add(LayerMenuExt())
 
