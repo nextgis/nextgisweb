@@ -19,7 +19,7 @@ from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
-from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMAT
+from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 from .util import _
 
 
@@ -198,7 +198,7 @@ def setup_pyramid(comp, config):
             search=dict(
                 nominatim=self.settings['search.nominatim']
             ),
-            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMAT,
+            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
         )
 
     comp.client_settings = MethodType(client_settings, comp, comp.__class__)

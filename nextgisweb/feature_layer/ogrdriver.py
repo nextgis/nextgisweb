@@ -63,6 +63,11 @@ EXPORT_FORMAT_OGR["SHP"] = OGRDriver(
     mime=None,
 )
 
-OGR_DRIVER_NAME_2_EXPORT_FORMAT = {
-    v.name: k for k, v in EXPORT_FORMAT_OGR.iteritems()
-}
+OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
+    {
+        "name": format.name,
+        "extension": format.extension,
+        "single_file": format.single_file,
+    }
+    for _, format in EXPORT_FORMAT_OGR.iteritems()
+]

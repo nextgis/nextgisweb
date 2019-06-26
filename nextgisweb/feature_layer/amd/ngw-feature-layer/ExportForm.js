@@ -50,6 +50,10 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
+            this.wFormat.watch('value', lang.hitch(this, function (attr, oldVal, newVal) {
+                var format = this.formatStore.get(newVal);
+                this.wZipped.set('disabled', !format.single_file);
+            }));
             this.buttonSave.on('click', lang.hitch(this, function () {
                 var query = {
                     format: this.wFormat.get('value'),
@@ -65,15 +69,16 @@ define([
         startup: function () {
             this.inherited(arguments);
 
-            var formatMap = settings.export_formats;
-            this.wFormat.set('store', new ObjectStore(new Memory({
-                data: array.map(Object.keys(formatMap), function (key) {
+            this.formatStore = new ObjectStore(new Memory({
+                data: array.map(settings.export_formats, function (format) {
                     return {
-                        id: formatMap[key],
-                        label: key
+                        id: format.extension,
+                        label: format.name,
+                        single_file: format.single_file
                     }
                 })
-            })));
+            }));
+            this.wFormat.set('store', this.formatStore);
 
             xhr.get(SRS_URL, {
                 handleAs: 'json'
