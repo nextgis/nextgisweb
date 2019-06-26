@@ -110,12 +110,14 @@ define([
                         } else {
                             var message = data.message;
                             if (message) {
+                                widget.wkt.set("value", "");
                                 console.warn(message);
                             }
                         }
                     },
                     function (error) {
                         // handle error
+                        widget.wkt.set("value", "");
                     }
                 );
             }
