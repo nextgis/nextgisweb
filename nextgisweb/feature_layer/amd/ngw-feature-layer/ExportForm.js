@@ -12,7 +12,7 @@ define([
     "dojo/io-query",
     "ngw/settings!feature_layer",
     "ngw/route",
-    "ngw-pyramid/i18n!pyramid",
+    "ngw-pyramid/i18n!feature_layer",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/ExportForm.hbs",
     // template

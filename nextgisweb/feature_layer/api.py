@@ -73,6 +73,7 @@ def export(request):
     srs = int(
         request.GET.get("srs", request.context.srs.id)
     )
+    srs = SRS.filter_by(id=srs).one()
     format = request.GET.get("format")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
@@ -103,7 +104,7 @@ def export(request):
     with backports.tempfile.TemporaryDirectory() as temp_dir:
         options = [
             '-f "%s"' % driver.name,
-            "-t_srs EPSG:%d" % srs,
+            "-t_srs EPSG:%d" % srs.id,
         ]
         options.extend(["-preserve_fid"])
         options.extend(list(driver.options or []))
