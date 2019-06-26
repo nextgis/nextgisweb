@@ -20,9 +20,7 @@ EXPORT_FORMAT_OGR["GEOJSON"] = OGRDriver(
     "GeoJSON",
     "geojson",
     single_file=True,
-    options=(
-        "-preserve_fid",
-    ),
+    options=None,
     mime="application/json",
 )
 
@@ -30,10 +28,10 @@ EXPORT_FORMAT_OGR["CSV"] = OGRDriver(
     "CSV",
     "csv",
     options=(
-        "-lco GEOMETRY=AS_WKT",
-        "-lco CREATE_CSVT=YES",
-        "-lco GEOMETRY_NAME=GEOM",
-        "-lco WRITE_BOM=YES",
+        "GEOMETRY=AS_WKT",
+        "CREATE_CSVT=YES",
+        "GEOMETRY_NAME=GEOM",
+        "WRITE_BOM=YES",
     ),
     single_file=True,
     mime="text/csv",
@@ -60,7 +58,7 @@ EXPORT_FORMAT_OGR["SHP"] = OGRDriver(
     "shp",
     single_file=False,
     options=(
-        "-lco ENCODING=UTF-8",
+        "ENCODING=UTF-8",
     ),
     mime=None,
 )

@@ -102,12 +102,6 @@ def export(request):
     buf = BytesIO()
 
     with backports.tempfile.TemporaryDirectory() as temp_dir:
-        options = [
-            '-f "%s"' % driver.name,
-            "-t_srs EPSG:%d" % srs.id,
-        ]
-        options.extend(list(driver.options or []))
-
         filename = "%d.%s" % (
             request.context.id,
             driver.extension,
@@ -115,7 +109,9 @@ def export(request):
         gdal.VectorTranslate(
             os.path.join(temp_dir, filename),
             ogr_ds,
-            options=" ".join(options),
+            format="%s" % driver.name,
+            dstSRS="%s" % srs.wkt,
+            layerCreationOptions=(driver.options or []),
         )
 
         if zipped or not driver.single_file:
