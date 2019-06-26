@@ -106,7 +106,6 @@ def export(request):
             '-f "%s"' % driver.name,
             "-t_srs EPSG:%d" % srs.id,
         ]
-        options.extend(["-preserve_fid"])
         options.extend(list(driver.options or []))
 
         filename = "%d.%s" % (

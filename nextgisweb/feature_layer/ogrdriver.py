@@ -20,7 +20,9 @@ EXPORT_FORMAT_OGR["GEOJSON"] = OGRDriver(
     "GeoJSON",
     "geojson",
     single_file=True,
-    options=None,
+    options=(
+        "-preserve_fid",
+    ),
     mime="application/json",
 )
 
