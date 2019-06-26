@@ -86,7 +86,7 @@ define([
                 this.wSRS.set('store', new ObjectStore(new Memory({
                     data: array.map(data, function (item) {
                         return {
-                            id: item.auth_srid,
+                            id: item.id,
                             label: item.display_name
                         }
                     })
