@@ -49,13 +49,13 @@ def _ogr_ds(driver, options):
     )
 
 
-def _ogr_layer_from_features(layer, features, name=b'', ds=None):
-    ogr_layer = layer.to_ogr(ds, name=name)
+def _ogr_layer_from_features(layer, features, name=b'', ds=None, fid=None):
+    ogr_layer = layer.to_ogr(ds, name=name, fid=fid)
     layer_defn = ogr_layer.GetLayerDefn()
 
     for f in features:
         ogr_layer.CreateFeature(
-            f.to_ogr(layer_defn))
+            f.to_ogr(layer_defn, fid=fid))
 
     return ogr_layer
 
@@ -74,6 +74,7 @@ def export(request):
         request.GET.get("srs", request.context.srs.id)
     )
     srs = SRS.filter_by(id=srs).one()
+    fid = request.GET.get("fid")
     format = request.GET.get("format")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
@@ -97,7 +98,7 @@ def export(request):
 
     ogr_ds = _ogr_memory_ds()
     ogr_layer = _ogr_layer_from_features(
-        request.context, query(), ds=ogr_ds)
+        request.context, query(), ds=ogr_ds, fid=fid)
 
     buf = BytesIO()
 

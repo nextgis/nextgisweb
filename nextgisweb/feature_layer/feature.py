@@ -67,7 +67,7 @@ class Feature(object):
             geometry=self.geom,
         )
 
-    def to_ogr(self, layer_defn):
+    def to_ogr(self, layer_defn, fid=None):
         ogr_feature = ogr.Feature(layer_defn)
         ogr_feature.SetFID(self.id)
         ogr_feature.SetGeometry(
@@ -78,6 +78,9 @@ class Feature(object):
             ogr_feature[field.encode("utf8")] = self.fields[
                 field
             ]
+
+        if fid is not None:
+            ogr_feature[fid.encode("utf8")] = self.id
 
         return ogr_feature
 

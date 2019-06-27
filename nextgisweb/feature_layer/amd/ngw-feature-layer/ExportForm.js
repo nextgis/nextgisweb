@@ -21,7 +21,8 @@ define([
     "dojox/layout/TableContainer",
     "dijit/form/Select",
     "dijit/form/CheckBox",
-    "dijit/form/Button"
+    "dijit/form/Button",
+    "dijit/form/TextBox"
 ], function (
     declare,
     array,
@@ -58,7 +59,8 @@ define([
                 var query = {
                     format: this.wFormat.get('value'),
                     srs: this.wSRS.get('value'),
-                    zipped: this.wZipped.checked ? 'true' : 'false'
+                    zipped: this.wZipped.checked ? 'true' : 'false',
+                    fid: this.wFID.get('value')
                 };
                 window.open(route.feature_layer.export({
                     id: this.resid

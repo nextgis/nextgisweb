@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-06-25 21:44+0300\n"
+"POT-Creation-Date: 2019-06-27 19:30+0300\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,16 +19,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: api.py:82
+#: api.py:84
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:89
+#: api.py:91
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: model.py:144
+#: model.py:151
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
@@ -73,7 +73,7 @@ msgid "NULL"
 msgstr "NULL"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:258
-#: amd/ngw-feature-layer/template/ExportForm.hbs:28
+#: amd/ngw-feature-layer/template/ExportForm.hbs:32
 msgid "Save"
 msgstr "Сохранить"
 
@@ -122,6 +122,10 @@ msgid "SRS"
 msgstr "Система координат"
 
 #: amd/ngw-feature-layer/template/ExportForm.hbs:20
+msgid "FID field"
+msgstr "Поле FID"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:24
 msgid "Zip archive"
 msgstr "Zip архив"
 

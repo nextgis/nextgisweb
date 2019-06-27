@@ -98,7 +98,7 @@ class LayerFieldsMixin(object):
             post_update=True
         )
 
-    def to_ogr(self, ogr_ds, name=r''):
+    def to_ogr(self, ogr_ds, name=r'', fid=None):
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(self.srs.id)
         ogr_layer = ogr_ds.CreateLayer(name, srs=srs)
@@ -107,6 +107,13 @@ class LayerFieldsMixin(object):
                 ogr.FieldDefn(
                     field.keyname.encode('utf8'),
                     _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
+                )
+            )
+        if fid is not None:
+            ogr_layer.CreateField(
+                ogr.FieldDefn(
+                    fid.encode('utf8'),
+                    ogr.OFTInteger
                 )
             )
         return ogr_layer
