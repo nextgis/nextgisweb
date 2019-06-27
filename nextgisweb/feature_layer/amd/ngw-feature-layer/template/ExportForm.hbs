@@ -15,6 +15,13 @@
                     data-dojo-attach-point="wSRS"
                     title="{{gettext 'SRS'}}" style="width: 100%">
                 </select>
+                <select data-dojo-type="dijit/form/Select"
+                    data-dojo-attach-point="wEncoding"
+                    title="{{gettext 'Encoding'}}" style="width: 100%">
+                    <option value="UTF-8" selected="selected">UTF-8</option>
+                    <option value="CP1251">Windows-1251</option>
+                    <option value="CP1252">Windows-1252</option>
+                </select>
                 <input data-dojo-type="dijit/form/TextBox"
                     data-dojo-attach-point="wFID"
                     title="{{gettext 'FID field'}}"

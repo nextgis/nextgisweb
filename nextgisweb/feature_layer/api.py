@@ -76,6 +76,7 @@ def export(request):
     srs = SRS.filter_by(id=srs).one()
     fid = request.GET.get("fid")
     format = request.GET.get("format")
+    encoding = request.GET.get("encoding")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
 
@@ -92,6 +93,12 @@ def export(request):
         )
 
     driver = EXPORT_FORMAT_OGR[format]
+
+    # layer creation options
+    lco = driver.options or []
+
+    if encoding is not None:
+        lco.append("ENCODING=%s" % encoding)
 
     query = request.context.feature_query()
     query.geom()
@@ -112,7 +119,7 @@ def export(request):
             ogr_ds,
             format="%s" % driver.name,
             dstSRS="%s" % srs.wkt,
-            layerCreationOptions=(driver.options or []),
+            layerCreationOptions=lco,
         )
 
         if zipped or not driver.single_file:
