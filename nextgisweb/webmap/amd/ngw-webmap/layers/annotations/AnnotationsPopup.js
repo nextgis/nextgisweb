@@ -25,19 +25,40 @@ define([
                 autoPan: false,
                 customCssClass: 'annotation'
             });
+            this._popup.annFeature = annotationFeature;
+            this._popup.cloneOlPopup = this.cloneOlPopup;
         },
         
         addToMap: function (map) {
             if (this._map) return this;
-
+            
             this._map = map;
             this._map.olMap.addOverlay(this._popup);
             return this;
         },
         
+        cloneOlPopup: function (annFeature) {
+            var popup = new olPopup({
+                insertFirst: false,
+                autoPan: false,
+                customCssClass: 'annotation no-edit'
+            });
+            
+            var coordinates = annFeature.getFeature().getGeometry().getCoordinates();
+            
+            var contentWidget = new (declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+                templateString: contentTemplate
+            }));
+            
+            popup.show(coordinates, '');
+            contentWidget.placeAt(popup.content);
+            html.set(contentWidget.descriptionDiv, annFeature.getDescriptionAsHtml());
+            return popup;
+        },
+        
         remove: function () {
             if (!this._map) return false;
-
+            
             this._map.olMap.removeOverlay(this._popup);
             this._map = null;
             this._contentWidget = null;

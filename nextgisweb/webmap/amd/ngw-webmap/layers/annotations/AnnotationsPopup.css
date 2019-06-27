@@ -2,6 +2,10 @@ body .ol-popup.annotation .edit-controls {
   display: none;
 }
 
+body.annotations-edit .ol-popup.annotation.no-edit .edit-controls {
+  display: none;
+}
+
 body.annotations-edit .ol-popup.annotation .edit-controls {
   display: block;
 }
