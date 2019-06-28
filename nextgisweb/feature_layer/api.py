@@ -95,7 +95,7 @@ def export(request):
     driver = EXPORT_FORMAT_OGR[format]
 
     # layer creation options
-    lco = driver.options or []
+    lco = list(driver.options or [])
 
     if encoding is not None:
         lco.append("ENCODING=%s" % encoding)
