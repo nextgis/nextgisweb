@@ -28,7 +28,7 @@ define([
         constructor: function (options) {
             declare.safeMixin(this, options);
 
-            this.title = i18n.gettext("Insert projection string");
+            this.title = i18n.gettext("Insert srs string");
             this.style = "width: 400px";
         },
 

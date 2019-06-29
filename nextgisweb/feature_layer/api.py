@@ -209,7 +209,7 @@ def mvt(request):
             query.simplify(tolerance * simplification)
 
         _ogr_layer_from_features(
-            obj, query(), name=b"%d" % obj.id, ds=ds)
+            obj, query(), name=b"ngw:%d" % obj.id, ds=ds)
 
     # flush changes
     ds = None

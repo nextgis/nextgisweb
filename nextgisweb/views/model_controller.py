@@ -163,8 +163,8 @@ class ModelController(object):
             widget.bind(data=request.json_body, request=request)
 
             if widget.validate():
-                # DBSession.delete(obj)
-                # DBSession.flush()
+                DBSession.delete(obj)
+                DBSession.flush()
 
                 return render_to_response(
                     'json',

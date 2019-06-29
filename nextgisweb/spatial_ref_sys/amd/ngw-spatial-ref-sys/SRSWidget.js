@@ -50,12 +50,12 @@ define([
         postCreate: function () {
             if (this.value && this.value.disabled && this.wkt) {
                 this.wkt.set("readOnly", true);
-                this.btnImportProjectionString.set("disabled", true);
+                this.btnImportSRSString.set("disabled", true);
             }
-            if (this.btnImportProjectionString) {
-                projStringDialog.on("save", lang.hitch(this, this._insertProjectionString));
+            if (this.btnImportSRSString) {
+                projStringDialog.on("save", lang.hitch(this, this._insertSRSString));
 
-                this.btnImportProjectionString.on('click', function () {
+                this.btnImportSRSString.on('click', function () {
                     projStringDialog.show();
                 });
             }
@@ -99,7 +99,7 @@ define([
             alert(message);
         },
 
-        _insertProjectionString: function (data) {
+        _insertSRSString: function (data) {
             var widget = this;
             var projString = data && data.projStr;
             if (projString) {

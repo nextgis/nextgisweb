@@ -41,7 +41,7 @@ msgstr "Создать"
 
 #: template/srs_browse.mako:35 views.py:169
 msgid "Edit"
-msgstr "Резактировать"
+msgstr "Редактировать"
 
 #: template/srs_browse.mako:37 views.py:177
 msgid "Delete"
@@ -52,7 +52,7 @@ msgid "SRS"
 msgstr ""
 
 #: amd/ngw-spatial-ref-sys/ProjStringDialog.js:31
-msgid "Insert projection string"
+msgid "Insert SRS definition string"
 msgstr "Вставить строку определения SRS"
 
 #: amd/ngw-spatial-ref-sys/ProjStringDialog.js:45
@@ -92,7 +92,7 @@ msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
 
 #: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:21
-msgid "Import projection string"
+msgid "Import SRS string"
 msgstr "Импортировать SRS"
 
 #: template/srs_browse.mako:25
