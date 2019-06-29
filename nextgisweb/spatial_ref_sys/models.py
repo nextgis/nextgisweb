@@ -7,6 +7,7 @@ from osgeo import osr
 
 from .. import db
 from ..models import declarative_base
+from ..error import ValidationError
 
 Base = declarative_base()
 
@@ -55,7 +56,8 @@ class SRS(Base):
     def _validate_wkt(self, key, value):
         sr = osr.SpatialReference()
         if sr.ImportFromWkt(value) != 0:
-            raise ValueError('Invalid SRS WKT definition!')
+            raise ValidationError(
+                'Invalid SRS WKT definition!', data=value)
         self.proj4 = sr.ExportToProj4()
         return value
 

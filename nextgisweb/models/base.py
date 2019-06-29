@@ -2,14 +2,36 @@
 import warnings
 import sqlalchemy.exc
 from sqlalchemy.ext.declarative import declarative_base as sa_declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import Query as SAQuery, scoped_session, sessionmaker
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from zope.sqlalchemy import ZopeTransactionExtension
+
+from ..error import provide_error_info
 
 # Ignore SQLAlchemy unicode warnings
 warnings.filterwarnings('ignore', '^Unicode type received non-unicode bind param value', sqlalchemy.exc.SAWarning)  # NOQA
 
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+
+class Query(SAQuery):
+
+    def one_or_error(self, message=None, data=None, http_status_code=404):
+        try:
+            return self.one()
+        except NoResultFound as exc:
+            provide_error_info(
+                exc, http_status_code=http_status_code,
+                message=message if message else "No result found")
+            raise
+        except MultipleResultsFound as exc:
+            provide_error_info(
+                exc, http_status_code=http_status_code,
+                message=message if message else "Multiple results found")
+            raise
+
+
+DBSession = scoped_session(
+    sessionmaker(query_cls=Query, extension=ZopeTransactionExtension()))
 
 
 class BaseClass(object):
@@ -57,5 +79,6 @@ def declarative_base():
         constructor=None,
         class_registry=_CLASS_REGISTRY,
     )
+
 
 Base = declarative_base()

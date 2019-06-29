@@ -8,7 +8,6 @@ from StringIO import StringIO
 from pkg_resources import resource_filename, get_distribution
 from collections import namedtuple
 
-from pyramid.config import Configurator
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
 
@@ -21,6 +20,7 @@ from sentry_sdk.integrations.pyramid import PyramidIntegration
 from ..package import pkginfo
 from ..component import Component
 
+from .config import Configurator
 from .renderer import json_renderer
 from .util import (
     viewargs,
@@ -30,54 +30,6 @@ from .util import (
 from .auth import AuthenticationPolicy
 
 __all__ = ['viewargs', ]
-
-
-class RouteHelper(object):
-
-    def __init__(self, name, config):
-        self.config = config
-        self.name = name
-
-    def add_view(self, view=None, **kwargs):
-        if 'route_name' not in kwargs:
-            kwargs['route_name'] = self.name
-
-        self.config.add_view(view=view, **kwargs)
-        return self
-
-
-class ExtendedConfigurator(Configurator):
-
-    def add_route(self, name, pattern=None, **kwargs):
-        """ Advanced route addition
-
-        Syntax sugar that allows to record frequently used
-        structure like:
-
-            config.add_route('foo', '/foo')
-            config.add_view(foo_get, route_name='foo', request_method='GET')
-            config.add_view(foo_post, route_name='foo', request_method='POST')
-
-
-        In a more compact way:
-
-            config.add_route('foo', '/foo') \
-                .add_view(foo_get, request_method='GET') \
-                .add_view(foo_post, request_method='POST')
-
-        """
-
-        super(ExtendedConfigurator, self).add_route(
-            name, pattern=pattern, **kwargs)
-
-        return RouteHelper(name, self)
-
-    def add_view(self, view=None, **kwargs):
-        vargs = getattr(view, '__viewargs__', None)
-        if vargs:
-            kwargs = dict(vargs, **kwargs)
-
-        super(ExtendedConfigurator, self).add_view(view=view, **kwargs)
 
 
 DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])
@@ -113,7 +65,7 @@ class PyramidComponent(Component):
                 integrations=[PyramidIntegration()],
             )
 
-        config = ExtendedConfigurator(settings=settings)
+        config = Configurator(settings=settings)
 
         # Substitute localizer from pyramid with our own, original is
         # too tied to translationstring, that works strangely with string
@@ -136,9 +88,21 @@ class PyramidComponent(Component):
         config.add_view_predicate('method', RequestMethodPredicate)
         config.add_view_predicate('json', JsonPredicate)
 
+        config.add_request_method(
+            lambda request: request.path_info.lower().startswith('/api/'),
+            'is_api', property=True, reify=True)
+
+        config.registry.settings['error_info.request_filter'] = lambda request: (
+            request.is_api or request.is_xhr)
+
+        config.add_tween(
+            'nextgisweb.pyramid.error_info.tween_factory',
+            over='pyramid_tm.tm_tween_factory')
+
         # Access to Env through request.env
-        config.add_request_method(lambda (req): self._env, 'env',
-                                  property=True)
+        config.add_request_method(
+            lambda (req): self._env, 'env',
+            property=True)
 
         config.include(pyramid_tm)
         config.include(pyramid_mako)

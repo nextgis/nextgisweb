@@ -14,7 +14,8 @@ def collection(request):
 
 
 def get(request):
-    obj = SRS.filter_by(id=request.matchdict['id']).one()
+    obj = SRS.filter_by(id=request.matchdict['id']).one_or_error()
+
     return dict(
         id=obj.id, display_name=obj.display_name,
         auth_name=obj.auth_name, auth_srid=obj.auth_srid,

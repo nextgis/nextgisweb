@@ -7,10 +7,12 @@ from datetime import timedelta
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
+import zope.interface
 
 from pkg_resources import resource_filename
 
 from .. import dynmenu as dm
+from ..error import IErrorInfo
 
 from .util import _, ClientRoutePredicate
 
@@ -121,6 +123,14 @@ def notfound(request):
     )
 
 
+def test_error_info(request):
+    class TestException(Exception):
+        zope.interface.implements(IErrorInfo)
+        http_status_code = 418
+
+    raise TestException()
+
+
 def setup_pyramid(comp, config):
     config.add_route('home', '/').add_view(home)
 
@@ -173,6 +183,9 @@ def setup_pyramid(comp, config):
     ).add_view(home_path, renderer=ctpl('home_path'))
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
+
+    config.add_route('pyramid.test_error_info', '/test/error_info') \
+        .add_view(test_error_info)
 
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
