@@ -24,10 +24,11 @@ def get(request):
 
 def srs_convert(request):
     proj_str = request.POST.get("projStr")
+    format = request.POST.get("format")
     message = ""
-    wkt = convert_projstr_to_wkt(proj_str)
+    wkt = convert_projstr_to_wkt(proj_str, format)
 
-    message = "Invalid SRS definition!" if wkt else ""
+    message = "Invalid SRS definition!" if not wkt else ""
 
     return dict(success=bool(wkt), wkt=wkt, message=message)
 

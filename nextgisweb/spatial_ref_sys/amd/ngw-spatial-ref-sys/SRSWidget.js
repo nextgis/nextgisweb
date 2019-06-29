@@ -94,6 +94,11 @@ define([
             return result;
         },
 
+        _handleDialogError: function (message) {
+            widget.wkt.set("value", "");
+            alert(message);
+        },
+
         _insertProjectionString: function (data) {
             var widget = this;
             var projString = data && data.projStr;
@@ -108,16 +113,11 @@ define([
                         if (data.success && wkt && widget.wkt) {
                             widget.wkt.set("value", wkt);
                         } else {
-                            var message = data.message;
-                            if (message) {
-                                widget.wkt.set("value", "");
-                                console.warn(message);
-                            }
+                            widget._handleDialogError(data.message);
                         }
                     },
                     function (error) {
-                        // handle error
-                        widget.wkt.set("value", "");
+                        widget._handleDialogError(error);
                     }
                 );
             }
