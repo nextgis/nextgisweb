@@ -68,7 +68,7 @@ def setup_pyramid(comp, config):
                     result = False
                     self.error.append(dict(
                         message=self.request.localizer.translate(
-                            _("Cannot change wkt of standard coordinate system."))))
+                            _("Cannot change wkt definition of standard coordinate system."))))
 
             return result
 

@@ -1,0 +1,101 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2019 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.1\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2019-06-29 02:15+0000\n"
+"PO-Revision-Date: 2019-06-29 02:18+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: views.py:38
+msgid "Unable to delete standard coordinate system."
+msgstr "Невозможно удалить стандартную систему координат"
+
+#: views.py:64
+msgid "Coordinate system name is not unique."
+msgstr "Название системы координат не уникально"
+
+#: views.py:71
+msgid "Cannot change wkt definition of standard coordinate system."
+msgstr "Невозможно изменить определение wkt стандартной системы координат."
+
+#: views.py:158
+msgid "List"
+msgstr "Список"
+
+#: views.py:163
+msgid "Create"
+msgstr "Создать"
+
+#: template/srs_browse.mako:35 views.py:169
+msgid "Edit"
+msgstr "Резактировать"
+
+#: template/srs_browse.mako:37 views.py:177
+msgid "Delete"
+msgstr "Удалить"
+
+#: amd/ngw-spatial-ref-sys/SRSWidget.js:48 views.py:188
+msgid "SRS"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:31
+msgid "Insert projection string"
+msgstr "Вставить строку определения SRS"
+
+#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:45
+msgid "Format"
+msgstr "Формат"
+
+#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:48
+msgid "Proj4"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:49
+msgid "Mapinfo"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:50
+msgid "EPSG"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:55
+msgid "Definition"
+msgstr "Определение"
+
+#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:63
+msgid "Insert"
+msgstr "Вставить"
+
+#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:68
+msgid "Cancel"
+msgstr "Отменить"
+
+#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:9
+msgid "Display name"
+msgstr "Наименование"
+
+#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:16
+msgid "OGC WKT definition"
+msgstr "OGC WKT определение"
+
+#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:21
+msgid "Import projection string"
+msgstr "Импортировать SRS"
+
+#: template/srs_browse.mako:25
+msgid "SRS name"
+msgstr "Наименование SRS"
+
