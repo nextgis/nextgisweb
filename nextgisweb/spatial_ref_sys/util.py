@@ -41,24 +41,29 @@ def update_MI_coord_sys_string(str):
     return "Earth Projection " + ", ".join(items)
 
 
-def convert_any_projstr_to_wkt(proj_str):
+def convert_projstr_to_wkt(proj_str, format=None):
     proj_str = proj_str.encode("utf-8")
     sr = osr.SpatialReference()
     wkt = ""
     imports = [
-        "ImportFromProj4", 
-        lambda x: sr.ImportFromEPSG(int(x)), 
-        lambda x: sr.ImportFromMICoordSys(
-            update_MI_coord_sys_string(x).encode("utf-8")),
-        "ImportFromESRI",
-        "ImportFromWkt"
+        ["proj4", "ImportFromProj4"], 
+        ["epsg", lambda x: sr.ImportFromEPSG(int(x))],
+        ["mapinfo", lambda x: sr.ImportFromMICoordSys(
+            update_MI_coord_sys_string(x).encode("utf-8"))],
+        ["esri", "ImportFromESRI"],
+        ["wkt", "ImportFromWkt"]
     ]
 
-    for i in imports:
-        if hasattr(i, "__call__"):
-            method_to_call = i
+    for imp in imports:
+        _format, method = imp
+
+        if format and not _format == format:
+            continue
+
+        if hasattr(method, "__call__"):
+            method_to_call = method
         else:
-            method_to_call = getattr(sr, i)
+            method_to_call = getattr(sr, method)
         try:
             if method_to_call and method_to_call(proj_str) == 0:
                 wkt = sr.ExportToWkt()

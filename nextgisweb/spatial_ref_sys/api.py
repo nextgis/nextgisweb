@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 
 import json
 from .models import SRS
-from .util import convert_any_projstr_to_wkt
+from .util import convert_projstr_to_wkt
 
 def collection(request):
     srs_collection = list(map(lambda o: dict(
@@ -25,7 +25,7 @@ def get(request):
 def srs_convert(request):
     proj_str = request.POST.get("projStr")
     message = ""
-    wkt = convert_any_projstr_to_wkt(proj_str)
+    wkt = convert_projstr_to_wkt(proj_str)
 
     message = "Invalid SRS definition!" if wkt else ""
 
