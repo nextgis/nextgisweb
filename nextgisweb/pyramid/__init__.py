@@ -44,10 +44,12 @@ class PyramidComponent(Component):
 
         settings['mako.directories'] = 'nextgisweb:templates/'
 
+        is_debug = self.env.core.debug
+
         # If debug is on, add mako-filter that checks
         # if the line was translated before output.
 
-        if self.env.core.debug:
+        if is_debug:
             settings['mako.default_filters'] = ['tcheck', 'h']
             settings['mako.imports'] = settings.get('mako.imports', []) \
                 + ['from nextgisweb.i18n import tcheck', ]
@@ -96,14 +98,14 @@ class PyramidComponent(Component):
         self.error_handlers = list()
 
         @self.error_handlers.append
-        def api_error_handler(request, err_info, exc, exc_info, **kwargs):
+        def api_error_handler(request, err_info, exc, exc_info):
             if request.is_api or request.is_xhr:
                 return error.json_error_response(
-                    request, err_info, exc, exc_info, **kwargs)
+                    request, err_info, exc, exc_info, debug=is_debug)
 
         def error_handler(request, err_info, exc, exc_info, **kwargs):
             for handler in self.error_handlers:
-                result = handler(request, err_info, exc, exc_info, **kwargs)
+                result = handler(request, err_info, exc, exc_info)
                 if result is not None:
                     return result
 
@@ -208,8 +210,8 @@ class PyramidComponent(Component):
         for comp in self._env.chain('setup_pyramid'):
             comp.setup_pyramid(config)
 
-        def html_error_handler(request, err_info, exc, exc_info, **kwargs):
-            return error.html_error_response(request, err_info, exc, exc_info, **kwargs)
+        def html_error_handler(request, err_info, exc, exc_info):
+            return error.html_error_response(request, err_info, exc, exc_info, debug=is_debug)
 
         self.error_handlers.append(html_error_handler)
 
