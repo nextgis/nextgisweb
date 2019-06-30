@@ -107,11 +107,9 @@ class PyramidComponent(Component):
                 if result is not None:
                     return result
 
-        config.registry.settings['error.handler'] = error_handler
-
-        config.add_tween(
-            'nextgisweb.pyramid.error.tween_factory',
-            over='pyramid_tm.tm_tween_factory')
+        config.registry.settings['error.err_response'] = error_handler
+        config.registry.settings['error.exc_response'] = error_handler
+        config.include(error)
 
         # Access to Env through request.env
         config.add_request_method(
@@ -177,18 +175,18 @@ class PyramidComponent(Component):
 
         buf.seek(0)
 
-        for l in buf:
-            l = l.strip().lower()
+        for line in buf:
+            line = line.strip().lower()
 
             dinfo = None
-            mpkg = re.match(r'(.+)==(.+)', l)
+            mpkg = re.match(r'(.+)==(.+)', line)
             if mpkg:
                 dinfo = DistInfo(
                     name=mpkg.group(1),
                     version=mpkg.group(2),
                     commit=None)
 
-            mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', l)
+            mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', line)
             if mgit:
                 dinfo = DistInfo(
                     name=mgit.group(2),
@@ -198,7 +196,7 @@ class PyramidComponent(Component):
             if dinfo is not None:
                 self.distinfo.append(dinfo)
             else:
-                self.logger.warn("Could not parse pip freeze line: %s", l)
+                self.logger.warn("Could not parse pip freeze line: %s", line)
 
         config.add_static_view(
             '/static%s/asset' % static_key,
@@ -211,7 +209,6 @@ class PyramidComponent(Component):
             comp.setup_pyramid(config)
 
         def html_error_handler(request, err_info, exc, exc_info, **kwargs):
-            # if not request.registry.settings.get('debugtoolbar.intercept_exc', False):
             return error.html_error_response(request, err_info, exc, exc_info, **kwargs)
 
         self.error_handlers.append(html_error_handler)

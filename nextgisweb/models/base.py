@@ -30,8 +30,9 @@ class Query(SAQuery):
             raise
 
 
-DBSession = scoped_session(
-    sessionmaker(query_cls=Query, extension=ZopeTransactionExtension()))
+DBSession = scoped_session(sessionmaker(
+    query_cls=Query, expire_on_commit=False,
+    extension=ZopeTransactionExtension()))
 
 
 class BaseClass(object):

@@ -141,7 +141,7 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.help_page', '/help-page') \
         .add_view(help_page, renderer=ctpl('help_page'))
 
-    config.add_notfound_view(notfound, renderer=ctpl('404'))
+    # config.add_notfound_view(notfound, renderer=ctpl('404'))
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
 
@@ -204,4 +204,3 @@ def setup_pyramid(comp, config):
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
     )
-
