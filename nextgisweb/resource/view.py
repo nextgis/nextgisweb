@@ -5,6 +5,7 @@ import warnings
 from pyramid import httpexceptions
 from sqlalchemy import bindparam
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 import sqlalchemy.ext.baked
 
 from ..views import permalinker
@@ -12,6 +13,7 @@ from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
 from ..pyramid import viewargs
 from ..models import DBSession
+from .. import error
 
 from .exception import ForbiddenError
 from .model import Resource
@@ -48,7 +50,14 @@ def resource_factory(request):
 
     # First, load base class resource
     res_id = int(request.matchdict['id'])
-    res_cls, = bq_res_cls(DBSession()).params(id=res_id).one()
+
+    try:
+        res_cls, = bq_res_cls(DBSession()).params(id=res_id).one()
+    except NoResultFound as exc:
+        error.provide_error_info(
+            exc, _("Resource not found"),
+            http_status_code=404)
+        raise
 
     # Second, load resource of it's class
     bq_obj = _rf_bakery(
