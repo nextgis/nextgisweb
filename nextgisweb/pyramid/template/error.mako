@@ -6,32 +6,31 @@ from nextgisweb.pyramid.error import json_error
 %>
 
 <%def name="head()">
-    <% import json %>
-
     <script type="text/javascript">
         require([
-            "dojo/parser",
-            "dojo/ready"
+            "dojo/dom",
+            "dojo/on",
+            "dojo/dom-style",
+            "dojo/domReady!"
         ], function (
-            parser,
-            ready
+            dom,
+            on,
+            domStyle
         ) {
-            ready(function() {
-                parser.parse();
+            var link = dom.byId('tInfoLink');
+            var data = dom.byId('tInfoData');
+            
+            on(link, 'click', function () {
+                domStyle.set(link, 'display', 'none');
+                domStyle.set(data, 'display', 'block');
             });
         });
     </script>
 </%def>
 
-<h1>${err_info.http_status_code}: ${tr(err_info.message)}</h1>
+<%def name="title_block()">
+    <h1>${tr(err_info.message)}</h1>
+</%def>
 
-
-<script type="text/javascript">
-    require(["ngw-pyramid/form/CodeMirror", "dojo/domReady!"], function (CodeMirror) {
-        var cm = new CodeMirror({autoHeight: true, lang: "javascript", mode: "javascript", lineNumbers: true, readonly: true}).placeAt('content');
-        cm.set("value", ${json.dumps(json.dumps(json_error(request, err_info, exc, exc_info, debug=debug), indent=2)) | n});
-    });
-</script>
-
-
-<div id="content"></div>
+<a id="tInfoLink" style="text-decoration: none;">Technical info</a>
+<pre id='tInfoData' style="display: none;">${json.dumps(json_error(request, err_info, exc, exc_info, debug=debug), indent=2)}</pre>
