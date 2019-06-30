@@ -3,6 +3,9 @@ from __future__ import unicode_literals
 import warnings
 
 from pyramid import httpexceptions
+from sqlalchemy import bindparam
+from sqlalchemy.orm import joinedload
+import sqlalchemy.ext.baked
 
 from ..views import permalinker
 from ..dynmenu import DynMenu, Label, Link, DynItem
@@ -28,6 +31,9 @@ PERM_CPERMISSIONS = ResourceScope.change_permissions
 PERM_MCHILDREN = ResourceScope.manage_children
 
 
+_rf_bakery = sqlalchemy.ext.baked.bakery()
+
+
 def resource_factory(request):
     # TODO: We'd like to use first key, but can't
     # as matchdiсt doesn't save keys order.
@@ -35,17 +41,25 @@ def resource_factory(request):
     if request.matchdict['id'] == '-':
         return None
 
-    # TODO: Add bakery query caching
+    bq_res_cls = _rf_bakery(
+        lambda session: session.query(
+            Resource.cls).filter_by(
+                id=bindparam('id')))
 
     # First, load base class resource
     res_id = int(request.matchdict['id'])
-    res_cls, = DBSession.query(Resource.cls).filter_by(id=res_id) \
-        .one_or_error(_("Resource not found"), data=dict(id=res_id))
+    res_cls, = bq_res_cls(DBSession()).params(id=res_id).one()
 
     # Second, load resource of it's class
-    obj = Resource.query().with_polymorphic(
-        Resource.registry[res_cls]).filter_by(id=res_id).one()
+    bq_obj = _rf_bakery(
+        lambda session: session.query(Resource).with_polymorphic(
+            Resource.registry[res_cls]
+        ).options(
+            joinedload(Resource.owner_user),
+            joinedload(Resource.parent),
+        ).filter_by(id=bindparam('id')), res_cls)
 
+    obj = bq_obj(DBSession()).params(id=res_id).one()
     return obj
 
 
