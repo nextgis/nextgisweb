@@ -2,11 +2,9 @@
 from __future__ import unicode_literals
 import codecs
 import os.path
-import base64
-from datetime import timedelta
 
-from pyramid.response import Response, FileResponse
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
+from pyramid.response import FileResponse
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 import zope.interface
 
 from pkg_resources import resource_filename
@@ -14,7 +12,7 @@ from pkg_resources import resource_filename
 from .. import dynmenu as dm
 from ..error import IErrorInfo
 
-from .util import _, ClientRoutePredicate
+from .util import _
 
 
 def home(request):

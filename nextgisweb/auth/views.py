@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
-from pyramid.events import BeforeRender, subscriber
+import sys
+
 from sqlalchemy.orm.exc import NoResultFound
 
+from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPForbidden
 from pyramid.security import remember, forget
+from pyramid.compat import reraise
+from pyramid.renderers import render_to_response
 
 from ..object_widget import ObjectWidget
 from ..views import ModelController, permalinker
+from ..error import IErrorInfo
 from .. import dynmenu as dm
 
 from .models import Principal, User, Group, UserDisabled
@@ -14,7 +19,73 @@ from .models import Principal, User, Group, UserDisabled
 from .util import _
 
 
+def login(request):
+    next_url = request.params.get('next', request.application_url)
+
+    if request.method == 'POST':
+        try:
+            user = User.filter_by(
+                keyname=request.POST['login'].strip()).one()
+
+            if user.password == request.POST['password']:
+                headers = remember(request, user.id)
+                if user.disabled:
+                    return dict(
+                        error=_("Account disabled"),
+                        next_url=next_url)
+                return HTTPFound(location=next_url, headers=headers)
+            else:
+                raise NoResultFound()
+
+        except NoResultFound:
+            return dict(
+                error=_("Invalid login or password!"),
+                next_url=next_url)
+
+    return dict(next_url=next_url)
+
+
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(location=request.application_url, headers=headers)
+
+
+def forbidden_error_response(request, err_info, exc, exc_info, **kwargs):
+    # If user is not authentificated, we can offer him to sign in
+    # TODO: there may be a better way to check if authentificated
+
+    if request.user.keyname == 'guest':
+        # If URL starts with /api/ and user is not authentificated,
+        # then it's probably not a web-interface, but external software,
+        # that can do HTTP auth. Tell it that we can do too.
+        if request.is_api:
+            return HTTPUnauthorized(headers={
+                b'WWW-Authenticate': b'Basic realm="NextGISWeb"'})
+
+        # Others are redirected to login page.
+        elif request.method == 'GET':
+            response = render_to_response(
+                'nextgisweb:auth/template/login.mako',
+                dict(next_url=request.url), request=request)
+            response.status = 403
+            return response
+
+    # Show error message to already authentificated users
+    # TODO: We can separately inform blocked users
+
+    response = render_to_response(
+        'nextgisweb:auth/template/forbidden.mako',
+        dict(subtitle=_("Access denied")), request=request)
+    response.status = 403
+    return response
+
+
 def setup_pyramid(comp, config):
+    def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
+        if err_info.http_status_code == 403:
+            return forbidden_error_response(request, err_info, exc, exc_info, **kwargs)
+
+    comp.env.pyramid.error_handlers.append(forbidden_error_handler)
 
     def check_permission(request):
         """ To avoid interdependency of two components:
@@ -23,63 +94,10 @@ def setup_pyramid(comp, config):
 
         request.require_administrator()
 
-    def login(request):
-        next = request.params.get('next', request.application_url)
-
-        if request.method == 'POST':
-            try:
-                user = User.filter_by(
-                    keyname=request.POST['login'].strip()).one()
-
-                if user.password == request.POST['password']:
-                    headers = remember(request, user.id)
-                    if user.disabled:
-                        return dict(error=_("Account disabled"))
-                    return HTTPFound(location=next, headers=headers)
-                else:
-                    raise NoResultFound()
-
-            except NoResultFound:
-                return dict(error=request.localizer.translate(
-                    _("Invalid login or password!")))
-
-        return dict()
-
     config.add_route('auth.login', '/login') \
         .add_view(login, renderer='nextgisweb:auth/template/login.mako')
 
-    def logout(request):
-        headers = forget(request)
-        return HTTPFound(location=request.application_url, headers=headers)
-
     config.add_route('auth.logout', '/logout').add_view(logout)
-
-    def forbidden(request):
-        # If user is not authentificated, we can offer him to sign in
-        # TODO: there may be a better way to check if authentificated
-
-        if request.user.keyname == 'guest':
-            # If URL starts with /api/ and user is not authentificated,
-            # then it's probably not a web-interface, but external software,
-            # that can do HTTP auth. Tell it that we can do too.
-            # Others are redirected to login page.
-
-            if request.path_info.startswith('/api/'):
-                return HTTPUnauthorized(headers={
-                    b'WWW-Authenticate': b'Basic realm="NextGISWeb"'})
-            else:
-                return HTTPFound(location=request.route_url(
-                    get_login_route_name(), _query=dict(next=request.url)))
-
-        # Show error message to already authentificated users
-        # TODO: We can separately inform blocked users
-        request.response.status = 403
-        return dict(subtitle=_("Access denied"))
-
-    config.add_view(
-        forbidden,
-        context=HTTPForbidden,
-        renderer='nextgisweb:auth/template/forbidden.mako')
 
     def user_disabled(request):
         headers = forget(request)

@@ -4,15 +4,14 @@ import warnings
 
 from pyramid import httpexceptions
 
-from sqlalchemy.orm.exc import NoResultFound
-
-
 from ..views import permalinker
 from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
 from ..pyramid import viewargs
+from ..models import DBSession
 
-from .model import Resource, ResourceSerializer
+from .exception import ForbiddenError
+from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
 from .serialize import CompositeSerializer
@@ -36,16 +35,16 @@ def resource_factory(request):
     if request.matchdict['id'] == '-':
         return None
 
+    # TODO: Add bakery query caching
+
     # First, load base class resource
-    try:
-        base = Resource.filter_by(id=request.matchdict['id']).one()
-    except NoResultFound:
-        raise httpexceptions.HTTPNotFound()
+    res_id = int(request.matchdict['id'])
+    res_cls, = DBSession.query(Resource.cls).filter_by(id=res_id) \
+        .one_or_error(_("Resource not found"), data=dict(id=res_id))
 
     # Second, load resource of it's class
     obj = Resource.query().with_polymorphic(
-        Resource.registry[base.cls]).filter_by(
-        id=request.matchdict['id']).one()
+        Resource.registry[res_cls]).filter_by(id=res_id).one()
 
     return obj
 
@@ -166,7 +165,7 @@ def setup_pyramid(comp, config):
 
         if isinstance(resource, Permission):
             warnings.warn(
-                'Deprecated argument order for resource_permission. ' +
+                'Deprecated argument order for resource_permission. '
                 'Use request.resource_permission(permission, resource).',
                 stacklevel=2)
 
@@ -176,7 +175,12 @@ def setup_pyramid(comp, config):
             resource = request.context
 
         if not resource.has_permission(permission, request.user):
-            raise httpexceptions.HTTPForbidden()
+            raise ForbiddenError(
+                _(""), data=dict(
+                    resource=dict(id=resource.id),
+                    permission=permission.name,
+                    scope=permission.scope.identity
+                ))
 
     config.add_request_method(resource_permission, 'resource_permission')
 
@@ -198,21 +202,21 @@ def setup_pyramid(comp, config):
         lambda (r): httpexceptions.HTTPFound(
             r.route_url('resource.show', id=0)))
 
-    _resource_route('show', '{id:\d+}', client=('id', )).add_view(show)
+    _resource_route('show', r'{id:\d+}', client=('id', )).add_view(show)
 
-    _resource_route('json', '{id:\d+}/json', client=('id', )) \
+    _resource_route('json', r'{id:\d+}/json', client=('id', )) \
         .add_view(objjson)
 
-    _resource_route('tree', '{id:\d+}/tree', client=('id', )).add_view(tree)
+    _resource_route('tree', r'{id:\d+}/tree', client=('id', )).add_view(tree)
 
     _route('widget', 'widget', client=()).add_view(widget)
 
     # CRUD
-    _resource_route('create', '{id:\d+}/create', client=('id', )) \
+    _resource_route('create', r'{id:\d+}/create', client=('id', )) \
         .add_view(create)
-    _resource_route('update', '{id:\d+}/update', client=('id', )) \
+    _resource_route('update', r'{id:\d+}/update', client=('id', )) \
         .add_view(update)
-    _resource_route('delete', '{id:\d+}/delete', client=('id', )) \
+    _resource_route('delete', r'{id:\d+}/delete', client=('id', )) \
         .add_view(delete)
 
     permalinker(Resource, 'resource.show')

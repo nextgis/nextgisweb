@@ -28,6 +28,7 @@ from .util import (
     RequestMethodPredicate,
     JsonPredicate)
 from .auth import AuthenticationPolicy
+from . import error
 
 __all__ = ['viewargs', ]
 
@@ -92,11 +93,24 @@ class PyramidComponent(Component):
             lambda request: request.path_info.lower().startswith('/api/'),
             'is_api', property=True, reify=True)
 
-        config.registry.settings['error_info.request_filter'] = lambda request: (
-            request.is_api or request.is_xhr)
+        self.error_handlers = list()
+
+        @self.error_handlers.append
+        def api_error_handler(request, err_info, exc, exc_info, **kwargs):
+            if request.is_api or request.is_xhr:
+                return error.json_error_response(
+                    request, err_info, exc, exc_info, **kwargs)
+
+        def error_handler(request, err_info, exc, exc_info, **kwargs):
+            for handler in self.error_handlers:
+                result = handler(request, err_info, exc, exc_info, **kwargs)
+                if result is not None:
+                    return result
+
+        config.registry.settings['error.handler'] = error_handler
 
         config.add_tween(
-            'nextgisweb.pyramid.error_info.tween_factory',
+            'nextgisweb.pyramid.error.tween_factory',
             over='pyramid_tm.tm_tween_factory')
 
         # Access to Env through request.env
@@ -195,6 +209,12 @@ class PyramidComponent(Component):
 
         for comp in self._env.chain('setup_pyramid'):
             comp.setup_pyramid(config)
+
+        def html_error_handler(request, err_info, exc, exc_info, **kwargs):
+            # if not request.registry.settings.get('debugtoolbar.intercept_exc', False):
+            return error.html_error_response(request, err_info, exc, exc_info, **kwargs)
+
+        self.error_handlers.append(html_error_handler)
 
         def amd_base(request):
             amds = []
