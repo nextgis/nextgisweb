@@ -45,9 +45,9 @@ define([
                 label: i18n.gettext("Format"),
                 style: "width: 100%",
                 options: [
-                    { value: "proj4", label: i18n.gettext("Proj4") },
-                    { value: "mapinfo", label: i18n.gettext("Mapinfo") },
-                    { value: "epsg", label: i18n.gettext("EPSG") }
+                    { value: "proj4", label: "Proj4" },
+                    { value: "mapinfo", label: "Mapinfo" },
+                    { value: "epsg", label: "EPSG" }
                 ]
             }).placeAt(this.container);
 

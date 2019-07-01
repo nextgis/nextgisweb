@@ -14,7 +14,7 @@ define([
     "dojo/text!./template/SRSWidget.hbs",
     "dojo/_base/array",
     "dojo/request/xhr",
-    "./ProjStringDialog",
+    "./SRSStringDialog",
     // template
     "dijit/form/CheckBox",
     "dijit/form/ValidationTextBox",
@@ -38,10 +38,10 @@ define([
     template,
     array,
     xhr,
-    ProjStringDialog
+    SRSStringDialog
 ) {
 
-    var projStringDialog = new ProjStringDialog();
+    var srsStringDialog = new SRSStringDialog();
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         identity: "srs_list",
@@ -53,10 +53,10 @@ define([
                 this.btnImportSRSString.set("disabled", true);
             }
             if (this.btnImportSRSString) {
-                projStringDialog.on("save", lang.hitch(this, this._insertSRSString));
+                srsStringDialog.on("save", lang.hitch(this, this._insertSRSString));
 
                 this.btnImportSRSString.on('click', function () {
-                    projStringDialog.show();
+                    srsStringDialog.show();
                 });
             }
         },

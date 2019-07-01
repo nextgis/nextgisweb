@@ -20,6 +20,7 @@ requires = [
     'bunch==1.0.1',
     'flufl.enum==4.1.1',
     'waitress==1.2.0',
+    'numpy<1.17',
     'pygdal' + (('>=' + gv + '.0,<=' + gv + '.9999') if gv else ''),
     'psycopg2-binary==2.7.7',
     'geoalchemy2==0.5.0',

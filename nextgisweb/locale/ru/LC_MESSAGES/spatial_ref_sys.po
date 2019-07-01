@@ -47,39 +47,23 @@ msgstr "Редактировать"
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-spatial-ref-sys/SRSWidget.js:48 views.py:188
-msgid "SRS"
-msgstr ""
-
-#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:31
+#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:31
 msgid "Insert SRS definition string"
 msgstr "Вставить строку определения SRS"
 
-#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:45
+#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:45
 msgid "Format"
 msgstr "Формат"
 
-#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:48
-msgid "Proj4"
-msgstr ""
-
-#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:49
-msgid "Mapinfo"
-msgstr ""
-
-#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:50
-msgid "EPSG"
-msgstr ""
-
-#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:55
+#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:55
 msgid "Definition"
 msgstr "Определение"
 
-#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:63
+#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:63
 msgid "Insert"
 msgstr "Вставить"
 
-#: amd/ngw-spatial-ref-sys/ProjStringDialog.js:68
+#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:68
 msgid "Cancel"
 msgstr "Отменить"
 
