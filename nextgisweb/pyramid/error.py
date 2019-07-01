@@ -15,6 +15,7 @@ from zope.interface import implements
 from zope.interface.interface import adapter_hooks
 
 from ..error import IErrorInfo, provide_error_info
+from .util import _
 
 
 _logger = logging.getLogger(__name__)
@@ -166,3 +167,16 @@ def adapt_httpexception(iface, obj):
     ):
         provide_error_info(obj, message=obj.title, http_status_code=obj.code)
         return IErrorInfo(obj)
+
+
+# Patch useful pyramid HTTP exceptions with translatable strings
+for exc, title in (
+    (httpexceptions.HTTPBadRequest, _("Bad request")),
+    (httpexceptions.HTTPForbidden, _("Forbidden")),
+    (httpexceptions.HTTPNotFound, _("Not found")),
+    (httpexceptions.HTTPUnprocessableEntity, _("Unprocessable entity")),
+    (httpexceptions.HTTPInternalServerError, _("Internal server error")),
+    (httpexceptions.HTTPNotImplemented, _("Not implemented")),
+    (httpexceptions.HTTPServiceUnavailable, _("Service unavailable")),
+):
+    exc.title = title
