@@ -30,14 +30,10 @@ from nextgisweb.pyramid.error import json_error
 </%def>
 
 <%def name="title_block()">
-    <h1>${tr(err_info.message)}</h1>
+    <h1>${err_info.http_status_code} ${tr(err_info.title)}</h1>
 </%def>
 
-%if err_info.http_status_code == 404:
-    ${tr(_('Think this page should be here?'))}
-    <a href="${tr(_('http://nextgis.com/contact/'))}"
-    target="_blank">${tr(_('Contact us'))}</a>.
-%endif
+${tr(err_info.message)}
 
 <div style="margin-top: 2ex;">
     <a id="tInfoLink" style="text-decoration: none;">${tr(_("Show technical info"))}</a>

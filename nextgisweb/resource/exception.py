@@ -5,13 +5,14 @@ import zope.interface
 
 from ..error import IErrorInfo
 
+from .util import _
+
 
 __all__ = [
     'ResourceError',
     'ForbiddenError',
     'ValidationError',
     'OperationalError',
-    'Forbidden',
 ]
 
 
@@ -26,7 +27,7 @@ class ResourceError(Exception):
 
 
 class ForbiddenError(ResourceError):
-
+    title = _("Forbidden")
     http_status_code = 403
 
 
@@ -34,13 +35,19 @@ class ValidationError(ResourceError):
     """ Exception raised by incorrect data
     from user or external service """
 
+    title = _("Validation error")
     http_status_code = 422
+
+
+class HierarchyError(ValidationError):
+    title = _("Hierarchy error")
 
 
 class OperationalError(ResourceError):
     """ Exception raised by incorrect system
     behavior, 'something went wrong' """
 
+    title = _("Operational error")
     http_status_code = 503
 
 

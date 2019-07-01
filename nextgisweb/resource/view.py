@@ -55,7 +55,8 @@ def resource_factory(request):
         res_cls, = bq_res_cls(DBSession()).params(id=res_id).one()
     except NoResultFound as exc:
         error.provide_error_info(
-            exc, _("Resource not found"),
+            exc, ("Resource not found"),
+            _("Resource with id = %d was not found, perhaps it was deleted.") % res_id,
             http_status_code=404)
         raise
 

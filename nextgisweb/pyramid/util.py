@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 from ..i18n import trstring_factory
 
 COMP_ID = 'pyramid'
@@ -68,4 +68,4 @@ class JsonPredicate(object):
     def __call__(self, context, request):
         return self.val and (
             request.accept.best_match(self.target + self.test) in self.target
-            or request.GET.get('format') == 'json')
+            or request.GET.get('format') == 'json')  # NOQA: W503

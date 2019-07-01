@@ -108,17 +108,21 @@ def json_error(request, err_info, exc, exc_info, debug=True):
         return exc.__class__.__name__
     exc_full_name = exc_module + '.' + exc.__class__.__name__
 
-    message = err_info_attr(err_info, exc, 'message')
-    status_code = err_info_attr(err_info, exc, 'http_status_code', 500)
+    result = OrderedDict()
 
-    result = OrderedDict((
-        ('message', request.localizer.translate(message) if message else None),
-        ('exception', exc_full_name),
-        ('status_code', status_code),
-    ))
+    title = err_info_attr(err_info, exc, 'title')
+    if title is not None:
+        result['title'] = request.localizer.translate(title)
+
+    message = err_info_attr(err_info, exc, 'message')
+    if message is not None:
+        result['message'] = request.localizer.translate(message)
+
+    result['status_code'] = err_info_attr(err_info, exc, 'http_status_code', 500)
+    result['exception'] = exc_full_name
 
     data = err_info_attr(err_info, exc, 'data')
-    if data is not None:
+    if data is not None and len(data) > 0:
         result['data'] = data
 
     if debug and exc_info is not None:
@@ -165,7 +169,10 @@ def adapt_httpexception(iface, obj):
         issubclass(iface, IErrorInfo)
         and isinstance(obj, httpexceptions.HTTPError)  # NOQA: W503
     ):
-        provide_error_info(obj, message=obj.title, http_status_code=obj.code)
+        provide_error_info(
+            obj, message=obj.detail, title=obj.title,
+            http_status_code=obj.code)
+
         return IErrorInfo(obj)
 
 

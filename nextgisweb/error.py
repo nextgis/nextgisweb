@@ -8,24 +8,22 @@ from zope.interface.interface import adapter_hooks
 
 class IErrorInfo(Interface):
 
-    message = Attribute(
-        """ User friendly and secure error message """)
+    title = Attribute("General error description")
+    message = Attribute("User friendly and secure message describing error")
+    http_status_code = Attribute("Corresponding HTTP 4xx or 5xx status code")
 
-    data = Attribute(
-        """ Extended error specific JSON-serializable data """)
-
-    http_status_code = Attribute(
-        """ Corresponding HTTP 4xx or 5xx status code """)
+    data = Attribute("Error specific JSON-serializable dictionary")
 
 
-ErrorInfo = namedtuple('ErrorInfo', ['message', 'http_status_code', 'data'])
+ErrorInfo = namedtuple('ErrorInfo', ['title', 'message', 'http_status_code', 'data'])
 classImplements(ErrorInfo, IErrorInfo)
 
 
-def provide_error_info(exc, message=None, http_status_code=None, data=None):
+def provide_error_info(exc, title=None, message=None, http_status_code=None, data=None):
     exc.__error_info__ = ErrorInfo(
-        message=message, data=data,
-        http_status_code=http_status_code)
+        title=title, message=message,
+        http_status_code=http_status_code,
+        data=data if data else dict())
     return exc
 
 
@@ -38,8 +36,15 @@ def adapt_exception_to_error_info(iface, obj):
 
 class ValidationError(Exception):
     implements(IErrorInfo)
+
+    title = "Validation error"
     http_status_code = 422
 
-    def __init__(self, message, data=None):
+    def __init__(self, message, title=None, http_status_code=None, data=None):
         self.message = message
-        self.data = data
+        self.data = data if data else dict()
+
+        if title is not None:
+            self.title = title
+        if http_status_code is not None:
+            self.http_status_code = 422
