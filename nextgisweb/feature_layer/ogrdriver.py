@@ -28,10 +28,10 @@ EXPORT_FORMAT_OGR["CSV"] = OGRDriver(
     "CSV",
     "csv",
     options=(
-        "-lco GEOMETRY=AS_WKT",
-        "-lco CREATE_CSVT=YES",
-        "-lco GEOMETRY_NAME=GEOM",
-        "-lco WRITE_BOM=YES",
+        "GEOMETRY=AS_WKT",
+        "CREATE_CSVT=YES",
+        "GEOMETRY_NAME=GEOM",
+        "WRITE_BOM=YES",
     ),
     single_file=True,
     mime="text/csv",
@@ -57,12 +57,15 @@ EXPORT_FORMAT_OGR["SHP"] = OGRDriver(
     "ESRI Shapefile",
     "shp",
     single_file=False,
-    options=(
-        "-lco ENCODING=UTF-8",
-    ),
+    options=None,
     mime=None,
 )
 
-OGR_DRIVER_NAME_2_EXPORT_FORMAT = {
-    v.name: k for k, v in EXPORT_FORMAT_OGR.iteritems()
-}
+OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
+    {
+        "name": format.name,
+        "extension": format.extension,
+        "single_file": format.single_file,
+    }
+    for _, format in EXPORT_FORMAT_OGR.iteritems()
+]

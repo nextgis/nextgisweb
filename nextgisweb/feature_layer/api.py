@@ -49,13 +49,13 @@ def _ogr_ds(driver, options):
     )
 
 
-def _ogr_layer_from_features(layer, features, name=b'', ds=None):
-    ogr_layer = layer.to_ogr(ds, name=name)
+def _ogr_layer_from_features(layer, features, name=b'', ds=None, fid=None):
+    ogr_layer = layer.to_ogr(ds, name=name, fid=fid)
     layer_defn = ogr_layer.GetLayerDefn()
 
     for f in features:
         ogr_layer.CreateFeature(
-            f.to_ogr(layer_defn))
+            f.to_ogr(layer_defn, fid=fid))
 
     return ogr_layer
 
@@ -73,7 +73,10 @@ def export(request):
     srs = int(
         request.GET.get("srs", request.context.srs.id)
     )
+    srs = SRS.filter_by(id=srs).one()
+    fid = request.GET.get("fid")
     format = request.GET.get("format")
+    encoding = request.GET.get("encoding")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
 
@@ -91,23 +94,22 @@ def export(request):
 
     driver = EXPORT_FORMAT_OGR[format]
 
+    # layer creation options
+    lco = list(driver.options or [])
+
+    if encoding is not None:
+        lco.append("ENCODING=%s" % encoding)
+
     query = request.context.feature_query()
     query.geom()
 
     ogr_ds = _ogr_memory_ds()
     ogr_layer = _ogr_layer_from_features(
-        request.context, query(), ds=ogr_ds)
+        request.context, query(), ds=ogr_ds, fid=fid)
 
     buf = BytesIO()
 
     with backports.tempfile.TemporaryDirectory() as temp_dir:
-        options = [
-            '-f "%s"' % driver.name,
-            "-t_srs EPSG:%d" % srs,
-        ]
-        options.extend(["-preserve_fid"])
-        options.extend(list(driver.options or []))
-
         filename = "%d.%s" % (
             request.context.id,
             driver.extension,
@@ -115,7 +117,9 @@ def export(request):
         gdal.VectorTranslate(
             os.path.join(temp_dir, filename),
             ogr_ds,
-            options=" ".join(options),
+            format="%s" % driver.name,
+            dstSRS="%s" % srs.wkt,
+            layerCreationOptions=lco,
         )
 
         if zipped or not driver.single_file:

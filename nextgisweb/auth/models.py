@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 from collections import OrderedDict
+
 from passlib.hash import sha256_crypt
+from backports.functools_lru_cache import lru_cache
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
@@ -193,8 +195,18 @@ class Group(Principal):
                 data['members']))
 
 
+@lru_cache(maxsize=256)
+def _password_hash_cache(a, b):
+    result = sha256_crypt.verify(a, b)
+    if not result:
+        # Prevent caching with ValueError
+        raise ValueError()
+    return result
+
+
 class PasswordHashValue(object):
     """ Automatic password hashes comparison class """
+
     def __init__(self, value):
         self.value = value
 
@@ -202,9 +214,13 @@ class PasswordHashValue(object):
         if self.value is None:
             return False
         elif isinstance(other, basestring):
-            return sha256_crypt.verify(other, self.value)
+            try:
+                return _password_hash_cache(other, self.value)
+            except ValueError:
+                # Cache prevention with ValueError
+                return False
         else:
-            raise NotImplemented
+            raise NotImplementedError()
 
 
 class UserDisabled(Exception):
