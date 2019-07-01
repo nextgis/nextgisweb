@@ -1,6 +1,7 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <%!
 import json
+from pyramid.httpexceptions import HTTPNotFound
 from nextgisweb.pyramid.util import _
 from nextgisweb.pyramid.error import json_error
 %>
@@ -32,5 +33,13 @@ from nextgisweb.pyramid.error import json_error
     <h1>${tr(err_info.message)}</h1>
 </%def>
 
-<a id="tInfoLink" style="text-decoration: none;">Technical info</a>
-<pre id='tInfoData' style="display: none;">${json.dumps(json_error(request, err_info, exc, exc_info, debug=debug), indent=2)}</pre>
+%if err_info.http_status_code == 404:
+    ${tr(_('Think this page should be here?'))}
+    <a href="${tr(_('http://nextgis.com/contact/'))}"
+    target="_blank">${tr(_('Contact us'))}</a>.
+%endif
+
+<div style="margin-top: 2ex;">
+    <a id="tInfoLink" style="text-decoration: none;">${tr(_("Show technical info"))}</a>
+    <pre id='tInfoData' style="display: none;">${json.dumps(json_error(request, err_info, exc, exc_info, debug=debug), indent=2)}</pre>
+</div>

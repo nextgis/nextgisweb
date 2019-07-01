@@ -114,13 +114,6 @@ def home_path(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
-def notfound(request):
-    request.response.status = 404
-    return dict(
-        title=_("404: Page not found"),
-    )
-
-
 def test_error_info(request):
     class TestException(Exception):
         zope.interface.implements(IErrorInfo)
@@ -140,8 +133,6 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.help_page', '/help-page') \
         .add_view(help_page, renderer=ctpl('help_page'))
-
-    # config.add_notfound_view(notfound, renderer=ctpl('404'))
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
 
