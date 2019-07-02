@@ -62,7 +62,7 @@ EXPORT_FORMAT_OGR["SHP"] = OGRDriver(
     "ESRI Shapefile",
     "shp",
     single_file=False,
-    fid_support=True,
+    fid_support=False,
     options=None,
     mime=None,
 )
