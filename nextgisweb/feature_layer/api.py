@@ -6,6 +6,7 @@ import re
 import urllib
 import uuid
 import zipfile
+import itertools
 
 import backports.tempfile
 from collections import OrderedDict
@@ -115,12 +116,18 @@ def export(request):
             request.context.id,
             driver.extension,
         )
+
+        vtopts = [
+            '-f', driver.name,
+            '-t_srs', srs.wkt,
+        ] + list(itertools.chain(*[('-lco', o) for o in lco]))
+
+        if driver.fid_support and fid is None:
+            vtopts.append('-preserve_fid')
+
         gdal.VectorTranslate(
-            os.path.join(temp_dir, filename),
-            ogr_ds,
-            format="%s" % driver.name,
-            dstSRS="%s" % srs.wkt,
-            layerCreationOptions=lco,
+            os.path.join(temp_dir, filename), ogr_ds,
+            options=gdal.VectorTranslateOptions(options=vtopts)
         )
 
         if zipped or not driver.single_file:
