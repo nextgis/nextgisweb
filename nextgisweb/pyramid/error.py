@@ -191,7 +191,7 @@ def adapt_httpexception(iface, obj):
         and isinstance(obj, httpexceptions.HTTPError)  # NOQA: W503
     ):
         provide_error_info(
-            obj, message=obj.detail, title=obj.title,
+            obj, message=obj.explanation, title=obj.title,
             http_status_code=obj.code)
 
         return IErrorInfo(obj)
