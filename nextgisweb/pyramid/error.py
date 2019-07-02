@@ -177,11 +177,17 @@ def html_error_response(request, err_info, exc, exc_info, debug=True):
 
 class InternalServerError(Exception):
     implements(IErrorInfo)
+
+    title = _("Internal server error")
+    message = _(
+        "The server encountered an internal error or misconfiguration "
+        "and was unable to complete your request.")
+
     http_status_code = 500
-    message = "Internal server error"
 
     def __init__(self, exc_info):
         self.exc_info = exc_info
+        self.data = dict()
 
 
 @adapter_hooks.append
