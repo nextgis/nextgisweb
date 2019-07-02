@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 import sys
+import os.path
 import warnings
 import traceback
 import json
 import logging
 from collections import OrderedDict
+from hashlib import md5
 
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
@@ -102,6 +104,21 @@ def err_info_attr(err_info, exc, attr, default=None):
         return default
 
 
+def guru_meditation(tb):
+    """ Calculate md5-hash from traceback """
+
+    tbhash = md5()
+    for fn, line, func, text in tb:
+        tbhash.update(''.join((
+            # Only file name (without path) taken, so hash
+            # should not depend on package location.
+            os.path.split(fn)[-1],
+            unicode(line), func, text
+        )))
+
+    return tbhash.hexdigest()
+
+
 def json_error(request, err_info, exc, exc_info, debug=True):
     exc_module = exc.__class__.__module__
     if exc_module is None or exc_module == str.__class__.__module__:
@@ -118,17 +135,21 @@ def json_error(request, err_info, exc, exc_info, debug=True):
     if message is not None:
         result['message'] = request.localizer.translate(message)
 
-    result['status_code'] = err_info_attr(err_info, exc, 'http_status_code', 500)
     result['exception'] = exc_full_name
+    result['status_code'] = err_info_attr(err_info, exc, 'http_status_code', 500)
 
     data = err_info_attr(err_info, exc, 'data')
     if data is not None and len(data) > 0:
         result['data'] = data
 
-    if debug and exc_info is not None:
-        result['traceback'] = map(
-            lambda itm: OrderedDict(zip(('file', 'line', 'func', 'text'), itm)),
-            traceback.extract_tb(exc_info[2]))
+    if exc_info is not None:
+        tb = traceback.extract_tb(exc_info[2])
+        result['guru_meditation'] = guru_meditation(tb)
+        if debug:
+            result['traceback'] = map(
+                lambda itm: OrderedDict(zip(
+                    ('file', 'line', 'func', 'text'),
+                    itm)), tb)
 
     return result
 
