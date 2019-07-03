@@ -28,8 +28,8 @@ define([
         constructor: function (options) {
             declare.safeMixin(this, options);
 
-            this.title = i18n.gettext("Insert srs string");
-            this.style = "width: 400px";
+            this.title = i18n.gettext("Insert SRS definition string");
+            this.style = "width: 600px";
         },
 
         postCreate: function () {
@@ -37,7 +37,7 @@ define([
 
             this.container = new TableContainer({
                 cols: 1,
-                labelWidth: "150",
+                labelWidth: "70",
                 customClass: "dijitDialogPaneContentArea",
             }).placeAt(this.containerNode);
 
@@ -45,14 +45,15 @@ define([
                 label: i18n.gettext("Format"),
                 style: "width: 100%",
                 options: [
-                    { value: "proj4", label: "Proj4" },
-                    { value: "mapinfo", label: "Mapinfo" },
+                    { value: "proj4", label: "PROJ" },
+                    { value: "mapinfo", label: "MapInfo" },
                     { value: "epsg", label: "EPSG" }
                 ]
             }).placeAt(this.container);
 
             this.textArea = new SimpleTextarea({
                 label: i18n.gettext("Definition"),
+                rows: 4
             }).placeAt(this.container);
 
             this.actionBar = domConstruct.create("div", {

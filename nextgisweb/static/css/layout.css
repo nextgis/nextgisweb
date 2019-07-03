@@ -836,6 +836,11 @@ table {
   padding: .8em 1em;
   line-height: 1.285;
 }
+.pure-table td.fit-content,
+.pure-table th.fit-content {
+  width: 1%;
+  white-space: nowrap;
+}
 .pure-table tbody th {
   text-transform: none;
   color: #212121;

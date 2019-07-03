@@ -110,10 +110,9 @@ def setup_pyramid(comp, config):
             check_permission(request)
             obj = SRS.filter_by(**request.matchdict).one()
 
-            # disabled = obj.disabled
-            # if disabled:
-            #     raise Exception(_("Unable to delete standard coordinate system."))
-
+            disabled = obj.disabled
+            if disabled:
+                raise ValueError(_("Unable to delete standard coordinate system."))
             
             return dict(
                 obj=obj,
