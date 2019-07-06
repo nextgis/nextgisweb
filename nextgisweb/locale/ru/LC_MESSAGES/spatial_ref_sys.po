@@ -55,10 +55,6 @@ msgstr "Формат"
 msgid "Definition"
 msgstr "Определение"
 
-#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:63
-msgid "OK"
-msgstr "Хорошо"
-
 #: amd/ngw-spatial-ref-sys/SRSStringDialog.js:68
 msgid "Cancel"
 msgstr "Отменить"
