@@ -360,9 +360,13 @@ def iget(resource, request):
     request.resource_permission(PERM_READ)
 
     geom_format = request.GET.get("geom_format")
+    srs = request.GET.get("srs")
 
     query = resource.feature_query()
     query.geom()
+
+    if srs is not None:
+        query.srs(SRS.filter_by(id=int(srs)).one())
 
     query.filter_by(id=request.matchdict['fid'])
     query.limit(1)
@@ -411,8 +415,12 @@ def cget(resource, request):
     request.resource_permission(PERM_READ)
 
     geom_format = request.GET.get("geom_format")
+    srs = request.GET.get("srs")
 
     query = resource.feature_query()
+
+    if srs is not None:
+        query.srs(SRS.filter_by(id=int(srs)).one())
 
     # Paging
     limit = request.GET.get('limit')
