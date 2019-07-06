@@ -16,9 +16,15 @@
             title="{{gettext 'OGC WKT definition'}}"
             style="width: 100%; box-sizing: border-box"></textarea>
 
-        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnImportSRSString"
-            data-dojo-props="iconClass: 'dijitIconNewTask', showLabel: false">
-            {{gettext 'Import srs string'}}
+
+        <div data-dojo-type="dijit/layout/ContentPane" style="padding: 0;"> 
+            <button data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnImportSRSString"
+                style="margin:0;"
+                data-dojo-props="iconClass: 'dijitIconNewTask', showLabel: true" title="">    
+                {{gettext 'Import SRS definition'}}   
+            </button>
         </div>
+
     </div>
+
 </div>

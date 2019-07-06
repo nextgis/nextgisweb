@@ -31,7 +31,7 @@
                     <tr class="${'text-muted' if obj.disabled else ''}">
                         <td>${obj.display_name}</td>
                         
-                        <td>
+                        <td class="fit-content">
                             <a class="material-icons icon-edit" href="${request.route_url('srs.edit', id=obj.id)}"  title="${tr(_('Edit'))}"></a>
                             %if not obj.disabled:
                                 <a class="material-icons icon-close" href="${request.route_url('srs.delete', id=obj.id)}" title="${tr(_('Delete'))}"></a>

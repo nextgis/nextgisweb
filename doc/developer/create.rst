@@ -391,6 +391,26 @@ In request payload add only set fields. Other fields will set to default values.
 
    {"id": 25}
 
+Batch create features in vector layer
+----------------------------------------
+
+To create multiple features in vector layer execute following request:
+
+.. http:patch:: /api/resource/(int:layer_id)/feature/
+
+    Payload is an array of feature definitions, like in POST request
+
+.. sourcecode:: bash
+
+#Create empty vector layer
+curl --user "administrator:demodemo" -H "Accept: */*" -X POST -d '{ "resource":{ "cls":"vector_layer", "parent":{ "id":0 }, "display_name":"Foo bar", "keyname":null, "description":null }, "resmeta":{ "items":{ } }, "vector_layer":{ "srs":{ "id":3857 }, "geometry_type": "POINT", "fields": [ { "keyname": "INTEGER_FIELD", "datatype": "INTEGER" } ] } } ' http://dev.nextgis.com/sandbox/api/resource/
+
+#returning id of new layer: {"id": 994, "parent": {"id": 0}}
+
+#upload 2 features in new vector layer
+curl --user "administrator:demodemo" -H "Accept: */*" -X PATCH -d '[{   "fields": { "INTEGER_FIELD": 26 }, "geom": "POINT (15112666.6 6059666.6)" },{   "fields": { "INTEGER_FIELD": 27 }, "geom": "POINT (15112666.6 6059666.6)" }]   ' http://dev.nextgis.com/sandbox/api/resource/994/feature/
+
+
 Raster layer
 ------------
 
