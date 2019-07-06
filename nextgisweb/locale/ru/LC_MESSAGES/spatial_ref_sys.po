@@ -47,10 +47,6 @@ msgstr "Редактировать"
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:31
-msgid "Insert SRS definition string"
-msgstr "Вставить строку определения SRS"
-
 #: amd/ngw-spatial-ref-sys/SRSStringDialog.js:45
 msgid "Format"
 msgstr "Формат"
@@ -60,8 +56,8 @@ msgid "Definition"
 msgstr "Определение"
 
 #: amd/ngw-spatial-ref-sys/SRSStringDialog.js:63
-msgid "Insert"
-msgstr "Вставить"
+msgid "OK"
+msgstr "Хорошо"
 
 #: amd/ngw-spatial-ref-sys/SRSStringDialog.js:68
 msgid "Cancel"
@@ -76,8 +72,8 @@ msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
 
 #: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:21
-msgid "Enter SRS definition"
-msgstr "Определение SRS"
+msgid "Import SRS definition"
+msgstr "Импортировать определение SRS"
 
 #: template/srs_browse.mako:25
 msgid "SRS name"

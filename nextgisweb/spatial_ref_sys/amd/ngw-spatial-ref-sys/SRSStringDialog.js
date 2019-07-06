@@ -28,7 +28,7 @@ define([
         constructor: function (options) {
             declare.safeMixin(this, options);
 
-            this.title = i18n.gettext("Insert SRS definition string");
+            this.title = i18n.gettext("Import SRS definition");
             this.style = "width: 600px";
         },
 
@@ -61,7 +61,7 @@ define([
             }, this.containerNode);
 
             this.btnOk = new Button({
-                label: i18n.gettext("Insert"),
+                label: i18n.gettext("OK"),
                 onClick: lang.hitch(this, this.onSave)
             }).placeAt(this.actionBar);
 
