@@ -3,6 +3,7 @@ This code is based on code of MetaCarta.
 
 Some changes are done by NextGIS
 """
+from __future__ import absolute_import
 
 __author__ = "MetaCarta"
 __copyright__ = "Copyright (c) 2006-2008 MetaCarta"
