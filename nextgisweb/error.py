@@ -10,18 +10,22 @@ class IErrorInfo(Interface):
 
     title = Attribute("General error description")
     message = Attribute("User friendly and secure message describing error")
+    detail = Attribute("Information about fixing problem in Web GIS context")
     http_status_code = Attribute("Corresponding HTTP 4xx or 5xx status code")
 
     data = Attribute("Error specific JSON-serializable dictionary")
 
 
-ErrorInfo = namedtuple('ErrorInfo', ['title', 'message', 'http_status_code', 'data'])
+ErrorInfo = namedtuple('ErrorInfo', ['title', 'message', 'detail', 'http_status_code', 'data'])
 classImplements(ErrorInfo, IErrorInfo)
 
 
-def provide_error_info(exc, title=None, message=None, http_status_code=None, data=None):
+def provide_error_info(
+    exc, title=None, message=None, detail=None,
+    http_status_code=None, data=None
+):
     exc.__error_info__ = ErrorInfo(
-        title=title, message=message,
+        title=title, message=message, detail=None,
         http_status_code=http_status_code,
         data=data if data else dict())
     return exc

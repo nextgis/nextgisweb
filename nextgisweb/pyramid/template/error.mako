@@ -30,10 +30,16 @@ from nextgisweb.pyramid.error import json_error
 </%def>
 
 <%def name="title_block()">
-    <h1>${err_info.http_status_code} ${tr(err_info.title)}</h1>
+    <h1>${tr(err_info.title)}</h1>
 </%def>
 
-${tr(err_info.message)}
+%if err_info.message:
+    <p>${tr(err_info.message)}</p>
+%endif
+
+%if err_info.detail:
+    <p>${tr(err_info.detail)}</p>
+%endif
 
 <div style="margin-top: 2ex;">
     <a id="tInfoLink" style="text-decoration: none;">${tr(_("Show technical info"))}</a>

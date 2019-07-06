@@ -13,9 +13,8 @@ from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
 from ..pyramid import viewargs
 from ..models import DBSession
-from .. import error
 
-from .exception import ForbiddenError
+from .error import ForbiddenError, ResourceNotFoundError
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
@@ -53,12 +52,8 @@ def resource_factory(request):
 
     try:
         res_cls, = bq_res_cls(DBSession()).params(id=res_id).one()
-    except NoResultFound as exc:
-        error.provide_error_info(
-            exc, ("Resource not found"),
-            _("Resource with id = %d was not found, perhaps it was deleted.") % res_id,
-            http_status_code=404)
-        raise
+    except NoResultFound:
+        raise ResourceNotFoundError(res_id)
 
     # Second, load resource of it's class
     bq_obj = _rf_bakery(

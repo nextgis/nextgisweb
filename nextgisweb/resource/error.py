@@ -10,6 +10,7 @@ from .util import _
 
 __all__ = [
     'ResourceError',
+    'ResourceNotFoundError',
     'ForbiddenError',
     'ValidationError',
     'HierarchyError',
@@ -25,6 +26,22 @@ class ResourceError(Exception):
     def __init__(self, message, data=None):
         self.message = message
         self.data = data if data is not None else dict()
+
+
+class ResourceNotFoundError(Exception):
+    zope.interface.implements(IErrorInfo)
+
+    title = _("Resource not found")
+    message = _("Resource with id = %d was not found.")
+    detail = _(
+        "The resource may have been deleted or an error in the URL. Correct "
+        "the URL or go to the home page and try to find the desired resource.")
+    http_status_code = 404
+
+    def __init__(self, resource_id):
+        self.message = self.__class__.message % resource_id
+        self.data = dict(resource_id=resource_id)
+        super(ResourceNotFoundError, self).__init__(self.message)
 
 
 class ForbiddenError(ResourceError):

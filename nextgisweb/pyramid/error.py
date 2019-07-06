@@ -135,6 +135,10 @@ def json_error(request, err_info, exc, exc_info, debug=True):
     if message is not None:
         result['message'] = request.localizer.translate(message)
 
+    detail = err_info_attr(err_info, exc, 'detail')
+    if detail is not None:
+        result['detail'] = request.localizer.translate(detail)
+
     result['exception'] = exc_full_name
     result['status_code'] = err_info_attr(err_info, exc, 'http_status_code', 500)
 
@@ -197,7 +201,7 @@ def adapt_httpexception(iface, obj):
         and isinstance(obj, httpexceptions.HTTPError)  # NOQA: W503
     ):
         provide_error_info(
-            obj, message=obj.explanation, title=obj.title,
+            obj, title=obj.title, message=obj.explanation, detail=obj.detail,
             http_status_code=obj.code)
 
         return IErrorInfo(obj)
