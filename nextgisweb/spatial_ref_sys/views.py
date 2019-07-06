@@ -141,7 +141,7 @@ def setup_pyramid(comp, config):
     def srs_browse(request):
         check_permission(request)
         return dict(
-            title=('SRS'),
+            title=('Spatial Reference Systems'),
             obj_list=SRS.filter_by(),
             dynmenu=request.env.pyramid.control_panel)
 
@@ -184,7 +184,7 @@ def setup_pyramid(comp, config):
     SRS.__dynmenu__ = comp.env.pyramid.control_panel
 
     comp.env.pyramid.control_panel.add(
-        dm.Label('srs-list', _("SRS")),
+        dm.Label('srs-list', _("Spatial Reference Systems")),
         SRSMenu('srs-list'),
     )
 
