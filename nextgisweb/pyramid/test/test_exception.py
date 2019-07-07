@@ -5,7 +5,7 @@ import pytest
 from pyramid.config import Configurator
 import zope.interface
 
-from nextgisweb.exception import IUserException
+from nextgisweb.core.exception import IUserException
 from nextgisweb.pyramid import exception
 
 

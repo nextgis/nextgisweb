@@ -16,7 +16,7 @@ from pyramid import httpexceptions
 from zope.interface import implements
 from zope.interface.interface import adapter_hooks
 
-from ..exception import IUserException, user_exception
+from ..core.exception import IUserException, user_exception
 from .util import _
 
 

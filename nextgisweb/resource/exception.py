@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import zope.interface
 
-from ..exception import IUserException
+from ..core.exception import IUserException
 
 from .util import _
 

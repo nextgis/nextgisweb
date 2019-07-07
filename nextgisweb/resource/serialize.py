@@ -7,7 +7,7 @@ from zope import interface
 
 from ..registry import registry_maker
 from ..models import BaseClass
-from ..exception import IUserException
+from ..core.exception import IUserException
 
 from .exception import ForbiddenError
 from .util import _

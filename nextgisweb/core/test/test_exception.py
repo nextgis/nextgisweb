@@ -4,7 +4,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import pytest
 import zope.interface
 
-from nextgisweb.exception import IUserException, user_exception
+from nextgisweb.core.exception import IUserException, user_exception
 
 
 def test_interface():

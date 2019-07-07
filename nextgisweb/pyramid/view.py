@@ -10,7 +10,7 @@ import zope.interface
 from pkg_resources import resource_filename
 
 from .. import dynmenu as dm
-from ..exception import IUserException
+from ..core.exception import IUserException
 
 from .util import _
 
