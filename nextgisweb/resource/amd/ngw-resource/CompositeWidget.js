@@ -14,6 +14,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
+    "ngw-pyramid/ErrorDialog",
     "ngw-pyramid/i18n!resource",
     "ngw/route",
     "xstyle/css!./resource/CompositeWidget.css"
@@ -32,6 +33,7 @@ define([
     BorderContainer,
     ContentPane,
     TabContainer,
+    ErrorDialog,
     i18n,
     route
 ) {
@@ -311,17 +313,10 @@ define([
         },
 
         errorMessage: function (e) {
-            var S_ERROR_MESSAGE = i18n.gettext("Error message:");
-
-            if (e.error == E_REQUEST && e.status == 400) {
-                alert(i18n.gettext("Errors found during data validation on server. Correct them and try again.") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
-
-            } else if (e.error == E_REQUEST && e.status == 403) {
-                alert(i18n.gettext("Insufficient permissions to perform the operation. Forgot to log in?") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
-
+            if (e.status >= 400 && e.status <= 599) {
+                new ErrorDialog({error: e.data}).show()
             } else if (e.error == E_INVALID_DATA) {
                 alert(i18n.gettext("Errors found during data validation. Tabs with errors marked in red."));
-
             } else {
                 alert(i18n.gettext("Unexpected error occurred during the operation.") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
             }
