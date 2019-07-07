@@ -9,7 +9,7 @@ define([
     "dojox/layout/TableContainer",
     "dijit/form/Select",
     "dijit/form/SimpleTextarea",
-    "ngw-pyramid/i18n!webmap"
+    "ngw-pyramid/i18n!spatial_ref_sys"
 ], function (
     declare, 
     lang, 

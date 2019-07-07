@@ -8,7 +8,7 @@ define([
     "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "ngw-pyramid/i18n!auth",
+    "ngw-pyramid/i18n!spatial_ref_sys",
     "ngw-pyramid/hbs-i18n",
     "ngw/route",
     "dojo/text!./template/SRSWidget.hbs",
