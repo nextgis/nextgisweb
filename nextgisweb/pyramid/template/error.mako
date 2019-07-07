@@ -15,14 +15,14 @@ from nextgisweb.pyramid.exception import json_error
 
 <div class="dijitDialog">
     <div class="dijitDialogTitleBar">
-        <span class="dijitDialogTitle">${tr(err_info.title)}</span>
+        <span class="dijitDialogTitle">${tr(err_info.title) if hasattr(err_info, 'title') and err_info.title else ""}</span>
     </div>
     <div id="containerNode" class="dijitDialogPaneContent ngwPyramidErrorDialog">
         <div id="contentArea" class="dijitDialogPaneContentArea">
-            %if err_info.message:
+            %if hasattr(err_info, 'message') and err_info.message:
                 <p>${tr(err_info.message)}</p>
             %endif
-            %if err_info.detail:
+            %if hasattr(err_info, 'detail') and err_info.detail:
                 <p>${tr(err_info.detail)}</p>
             %endif
         </div>
