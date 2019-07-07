@@ -19,7 +19,7 @@ from .serialize import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR)
 from .scope import ResourceScope, MetadataScope
-from .exception import ValidationError, HierarchyError, ForbiddenError
+from .exception import ValidationError, HierarchyError, ForbiddenError, DisplayNameNotUnique
 
 __all__ = ['Resource', ]
 
@@ -390,10 +390,7 @@ class ResourceSerializer(Serializer):
                 ).first()
 
             if conflict is not None:
-                raise ValidationError(_(
-                    "Resource display name is not unique. "
-                    "Resource with same name already exists (id = %d)."
-                ) % conflict.id)
+                raise DisplayNameNotUnique(conflict.id)
 
         # Total quota checking
         quota_resource_cls = env.resource.quota_resource_cls

@@ -14,7 +14,7 @@ from ..psection import PageSections
 from ..pyramid import viewargs
 from ..models import DBSession
 
-from .error import ForbiddenError, ResourceNotFoundError
+from .error import ForbiddenError, ResourceNotFound
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
@@ -53,7 +53,7 @@ def resource_factory(request):
     try:
         res_cls, = bq_res_cls(DBSession()).params(id=res_id).one()
     except NoResultFound:
-        raise ResourceNotFoundError(res_id)
+        raise ResourceNotFound(res_id)
 
     # Second, load resource of it's class
     bq_obj = _rf_bakery(
