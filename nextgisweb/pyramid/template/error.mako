@@ -7,41 +7,80 @@ from nextgisweb.pyramid.exception import json_error
 %>
 
 <%def name="head()">
-    <script type="text/javascript">
-        require([
-            "dojo/dom",
-            "dojo/on",
-            "dojo/dom-style",
-            "dojo/domReady!"
-        ], function (
-            dom,
-            on,
-            domStyle
-        ) {
-            var link = dom.byId('tInfoLink');
-            var data = dom.byId('tInfoData');
-            
-            on(link, 'click', function () {
-                domStyle.set(link, 'display', 'none');
-                domStyle.set(data, 'display', 'block');
-            });
-        });
-    </script>
+    <link href="${request.route_url('amd_package', subpath='ngw-pyramid/ErrorDialog.css')}" rel="stylesheet" type="text/css"/>
 </%def>
 
-<%def name="title_block()">
-    <h1>${tr(err_info.title)}</h1>
-</%def>
 
-%if err_info.message:
-    <p>${tr(err_info.message)}</p>
-%endif
+<!-- Use dijit same layout as ngw-pyrami/ErrorDialog -->
 
-%if err_info.detail:
-    <p>${tr(err_info.detail)}</p>
-%endif
+<div class="dijitDialog">
+    <div class="dijitDialogTitleBar">
+        <span class="dijitDialogTitle">${tr(err_info.title)}</span>
+    </div>
+    <div id="containerNode" class="dijitDialogPaneContent ngwPyramidErrorDialog">
+        <div id="contentArea" class="dijitDialogPaneContentArea">
+            %if err_info.message:
+                <p>${tr(err_info.message)}</p>
+            %endif
+            %if err_info.detail:
+                <p>${tr(err_info.detail)}</p>
+            %endif
+        </div>
+        <div id="actionBar" class="dijitDialogPaneActionBar">
 
-<div style="margin-top: 2ex;">
-    <a id="tInfoLink" style="text-decoration: none;">${tr(_("Show technical info"))}</a>
-    <pre id='tInfoData' style="display: none;">${json.dumps(json_error(request, err_info, exc, exc_info, debug=debug), indent=2)}</pre>
+        </div>
+    </div>
 </div>
+
+<script type="text/javascript">
+    require([
+        "dojo/dom-style",
+        "dojo/json",
+        "dijit/form/Button",
+        "ngw-pyramid/form/CodeMirror",
+        "ngw-pyramid/i18n!resource",
+        "dojo/domReady!"
+    ], function (
+        domStyle,
+        json,
+        Button,
+        CodeMirror,
+        i18n
+    ) {
+        var error = ${json.dumps(json_error(request, err_info, exc, exc_info, debug=debug)) | n};
+
+        var technicalInfo = new CodeMirror({
+            readonly: true,
+            lineNumbers: true,
+            autoHeight: true,
+            lang: 'javascript',
+            style: "display: none;",
+            value: json.stringify(error, undefined, 2)
+        }).placeAt("contentArea");
+        technicalInfo.startup();
+
+        new Button({
+            label: i18n.gettext("Back"),
+            class: "dijitButton--primary",
+            onClick: function () {
+                window.history.back();
+            }
+        }).placeAt("actionBar")
+
+        new Button({
+            label: i18n.gettext("Request support"),
+            class: "dijitButton--default",
+            style: "float: right; margin-left: 1ex;"
+        }).placeAt("actionBar");
+
+        new Button({
+            label: i18n.gettext("Technical info"),
+            class: "dijitButton--default",
+            style: "float: right;",
+            onClick: function () {
+                domStyle.set(technicalInfo.domNode, "display", "block");
+                technicalInfo.resize();
+            }
+        }).placeAt("actionBar");
+    });
+</script>

@@ -58,7 +58,7 @@ define([
             }).placeAt(this.actionBar);
 
             new Button({
-                label: i18n.gettext("Report a bug"),
+                label: i18n.gettext("Request support"),
                 class: "dijitButton--default",
                 style: "float: right;"
             }).placeAt(this.actionBar);
