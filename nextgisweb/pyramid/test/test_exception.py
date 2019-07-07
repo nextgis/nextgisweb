@@ -5,12 +5,12 @@ import pytest
 from pyramid.config import Configurator
 import zope.interface
 
-from nextgisweb.error import IErrorInfo
-from nextgisweb.pyramid import error
+from nextgisweb.exception import IUserException
+from nextgisweb.pyramid import exception
 
 
 class ErrorTest(Exception):
-    zope.interface.implements(IErrorInfo)
+    zope.interface.implements(IUserException)
 
     title = "Test title"
     message = "Test message"
@@ -27,11 +27,11 @@ def webapp():
     from webtest import TestApp
 
     settings = dict()
-    settings['error.err_response'] = error.json_error_response
-    settings['error.exc_response'] = error.json_error_response
+    settings['error.err_response'] = exception.json_error_response
+    settings['error.exc_response'] = exception.json_error_response
 
     config = Configurator(settings=settings)
-    config.include(error)
+    config.include(exception)
 
     def view_error(request):
         raise ErrorTest()
@@ -57,7 +57,7 @@ def test_error(webapp):
 
     assert rjson == dict(
         title="Test title", message="Test message",
-        exception='nextgisweb.pyramid.test.test_error.ErrorTest',
+        exception='nextgisweb.pyramid.test.test_exception.ErrorTest',
         status_code=418)
 
 
@@ -73,4 +73,4 @@ def test_exception(webapp):
 
     assert rjson == dict(
         title="Internal server error", status_code=500,
-        exception='nextgisweb.pyramid.error.InternalServerError')
+        exception='nextgisweb.pyramid.exception.InternalServerError')

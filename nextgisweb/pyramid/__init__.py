@@ -28,7 +28,7 @@ from .util import (
     RequestMethodPredicate,
     JsonPredicate)
 from .auth import AuthenticationPolicy
-from . import error
+from . import exception
 
 __all__ = ['viewargs', ]
 
@@ -100,7 +100,7 @@ class PyramidComponent(Component):
         @self.error_handlers.append
         def api_error_handler(request, err_info, exc, exc_info):
             if request.is_api or request.is_xhr:
-                return error.json_error_response(
+                return exception.json_error_response(
                     request, err_info, exc, exc_info, debug=is_debug)
 
         def error_handler(request, err_info, exc, exc_info, **kwargs):
@@ -111,7 +111,7 @@ class PyramidComponent(Component):
 
         config.registry.settings['error.err_response'] = error_handler
         config.registry.settings['error.exc_response'] = error_handler
-        config.include(error)
+        config.include(exception)
 
         # Access to Env through request.env
         config.add_request_method(
@@ -211,7 +211,7 @@ class PyramidComponent(Component):
             comp.setup_pyramid(config)
 
         def html_error_handler(request, err_info, exc, exc_info):
-            return error.html_error_response(request, err_info, exc, exc_info, debug=is_debug)
+            return exception.html_error_response(request, err_info, exc, exc_info, debug=is_debug)
 
         self.error_handlers.append(html_error_handler)
 

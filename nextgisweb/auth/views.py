@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
-import sys
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound
 from pyramid.security import remember, forget
-from pyramid.compat import reraise
 from pyramid.renderers import render_to_response
 
 from ..object_widget import ObjectWidget
 from ..views import ModelController, permalinker
-from ..error import IErrorInfo
 from .. import dynmenu as dm
 
 from .models import Principal, User, Group, UserDisabled

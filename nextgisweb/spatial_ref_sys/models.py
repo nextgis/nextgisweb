@@ -7,7 +7,6 @@ from osgeo import osr
 
 from .. import db
 from ..models import declarative_base
-from ..error import ValidationError
 
 Base = declarative_base()
 

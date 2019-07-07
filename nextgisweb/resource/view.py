@@ -14,7 +14,7 @@ from ..psection import PageSections
 from ..pyramid import viewargs
 from ..models import DBSession
 
-from .error import ForbiddenError, ResourceNotFound
+from .exception import ForbiddenError, ResourceNotFound
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope

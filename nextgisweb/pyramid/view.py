@@ -10,7 +10,7 @@ import zope.interface
 from pkg_resources import resource_filename
 
 from .. import dynmenu as dm
-from ..error import IErrorInfo
+from ..exception import IUserException
 
 from .util import _
 
@@ -116,7 +116,7 @@ def home_path(request):
 
 def test_error_info(request):
     class TestException(Exception):
-        zope.interface.implements(IErrorInfo)
+        zope.interfacexceptionlements(IUserException)
         http_status_code = 418
 
     raise TestException()

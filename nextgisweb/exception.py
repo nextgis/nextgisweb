@@ -6,7 +6,7 @@ from zope.interface import Interface, Attribute, implements, classImplements
 from zope.interface.interface import adapter_hooks
 
 
-class IErrorInfo(Interface):
+class IUserException(Interface):
 
     title = Attribute("General error description")
     message = Attribute("User friendly and secure message describing error")
@@ -16,30 +16,32 @@ class IErrorInfo(Interface):
     data = Attribute("Error specific JSON-serializable dictionary")
 
 
-ErrorInfo = namedtuple('ErrorInfo', ['title', 'message', 'detail', 'http_status_code', 'data'])
-classImplements(ErrorInfo, IErrorInfo)
+UserException = namedtuple('UserException', [
+    'title', 'message', 'detail', 'http_status_code', 'data'])
+
+classImplements(UserException, IUserException)
 
 
-def provide_error_info(
+def user_exception(
     exc, title=None, message=None, detail=None,
     http_status_code=None, data=None
 ):
-    exc.__error_info__ = ErrorInfo(
-        title=title, message=message, detail=None,
+    exc.__user_exception__ = UserException(
+        title=title, message=message, detail=detail,
         http_status_code=http_status_code,
         data=data if data else dict())
     return exc
 
 
 @adapter_hooks.append
-def adapt_exception_to_error_info(iface, obj):
-    if isinstance(obj, Exception) and issubclass(iface, IErrorInfo):
-        if hasattr(obj, '__error_info__'):
-            return obj.__error_info__
+def adapt_exception_to_user_exception(iface, obj):
+    if isinstance(obj, Exception) and issubclass(iface, IUserException):
+        if hasattr(obj, '__user_exception__'):
+            return obj.__user_exception__
 
 
 class ValidationError(Exception):
-    implements(IErrorInfo)
+    implements(IUserException)
 
     title = "Validation error"
     http_status_code = 422

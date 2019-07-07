@@ -7,7 +7,7 @@ from zope import interface
 
 from ..registry import registry_maker
 from ..models import BaseClass
-from ..error import IErrorInfo
+from ..exception import IUserException
 
 from .exception import ForbiddenError
 from .util import _
@@ -186,7 +186,7 @@ class Serializer(SerializerBase):
         exc.__srlzr_prprt__ = sp.attrname
 
         try:
-            error_info = IErrorInfo(exc)
+            error_info = IUserException(exc)
             error_info.data['attribute'] = sp.attrname
         except TypeError:
             pass
@@ -232,7 +232,7 @@ class CompositeSerializer(SerializerBase):
         exc.__srlzr_cls__ = mobj.__class__
 
         try:
-            error_info = IErrorInfo(exc)
+            error_info = IUserException(exc)
             error_info.data['serializer'] = mobj.__class__.identity
         except TypeError:
             pass

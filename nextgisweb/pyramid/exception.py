@@ -16,7 +16,7 @@ from pyramid import httpexceptions
 from zope.interface import implements
 from zope.interface.interface import adapter_hooks
 
-from ..error import IErrorInfo, provide_error_info
+from ..exception import IUserException, user_exception
 from .util import _
 
 
@@ -27,23 +27,23 @@ def includeme(config):
     TM_TFACTORY = 'pyramid_tm.tm_tween_factory'
     DT_TFACTORY = 'pyramid_debugtoolbar.toolbar_tween_factory'
 
-    ERR_TFACTORY = 'nextgisweb.pyramid.error.error_tween_factory'
-    EXC_TFACTORY = 'nextgisweb.pyramid.error.exception_tween_factory'
+    ERR_TFACTORY = 'nextgisweb.pyramid.exception.handled_exception_tween_factory'
+    EXC_TFACTORY = 'nextgisweb.pyramid.exception.unhandled_exception_tween_factory'
 
     config.add_tween(ERR_TFACTORY, over=(TM_TFACTORY, 'MAIN'), under=(DT_TFACTORY, 'INGRESS'))
     config.add_tween(EXC_TFACTORY, over=(DT_TFACTORY, ERR_TFACTORY))
 
 
-def error_tween_factory(handler, registry):
+def handled_exception_tween_factory(handler, registry):
     err_response = registry.settings['error.err_response']
 
-    def error_tween(request):
+    def handled_exception_tween(request):
         try:
             response = handler(request)
 
             if isinstance(response, httpexceptions.HTTPError):
                 eresp = err_response(
-                    request, IErrorInfo(response), response, None)
+                    request, IUserException(response), response, None)
                 if eresp is not None:
                     return eresp
 
@@ -53,7 +53,7 @@ def error_tween_factory(handler, registry):
             exc_info = sys.exc_info()
 
             try:
-                err_info = IErrorInfo(exc)
+                err_info = IUserException(exc)
             except TypeError:
                 err_info = None
 
@@ -65,13 +65,13 @@ def error_tween_factory(handler, registry):
 
             reraise(*exc_info)
 
-    return error_tween
+    return handled_exception_tween
 
 
-def exception_tween_factory(handler, registry):
+def unhandled_exception_tween_factory(handler, registry):
     exc_response = registry.settings['error.exc_response']
 
-    def exception_tween(request):
+    def unhandled_exception_tween(request):
         try:
             return handler(request)
         except Exception as exc:
@@ -81,7 +81,7 @@ def exception_tween_factory(handler, registry):
             iexc = InternalServerError(sys.exc_info())
             return exc_response(request, iexc, iexc, iexc.exc_info)
 
-    return exception_tween
+    return unhandled_exception_tween
 
 
 def exc_name(exc):
@@ -180,7 +180,7 @@ def html_error_response(request, err_info, exc, exc_info, debug=True):
 
 
 class InternalServerError(Exception):
-    implements(IErrorInfo)
+    implements(IUserException)
 
     title = _("Internal server error")
     message = _(
@@ -197,14 +197,14 @@ class InternalServerError(Exception):
 @adapter_hooks.append
 def adapt_httpexception(iface, obj):
     if (
-        issubclass(iface, IErrorInfo)
+        issubclass(iface, IUserException)
         and isinstance(obj, httpexceptions.HTTPError)  # NOQA: W503
     ):
-        provide_error_info(
+        user_exception(
             obj, title=obj.title, message=obj.explanation, detail=obj.detail,
             http_status_code=obj.code)
 
-        return IErrorInfo(obj)
+        return IUserException(obj)
 
 
 # Patch useful pyramid HTTP exceptions with translatable strings

@@ -3,7 +3,7 @@
 import json
 from pyramid.httpexceptions import HTTPNotFound
 from nextgisweb.pyramid.util import _
-from nextgisweb.pyramid.error import json_error
+from nextgisweb.pyramid.exception import json_error
 %>
 
 <%def name="head()">
