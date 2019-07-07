@@ -309,14 +309,19 @@ define([
             });
             this.tabContainer.resize();
 
-            if (err !== undefined) { this.errorMessage(err); }
+            if (err !== undefined) {
+                this.errorMessage(err);
+            }
         },
 
         errorMessage: function (e) {
             if (e.status >= 400 && e.status <= 599) {
                 new ErrorDialog({error: e.data}).show()
             } else if (e.error == E_INVALID_DATA) {
-                alert(i18n.gettext("Errors found during data validation. Tabs with errors marked in red."));
+                new ErrorDialog({
+                    title: i18n.gettext("Validation error"),
+                    message: i18n.gettext("Errors found during data validation. Tabs with errors marked in red.")
+                }).show()
             } else {
                 alert(i18n.gettext("Unexpected error occurred during the operation.") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
             }

@@ -27,20 +27,23 @@ define([
 
         constructor: function (options) {
             this.inherited(arguments);
-            this.error = options.error;
+            
+            this.error = options.error || {};
+            
+            this.title = options.title || this.error.title || null;
+            this.message = options.message || this.error.message || null;
+            this.detail = options.detail || this.error.detail || null;
         },
 
         buildRendering: function () {
             this.inherited(arguments);
-            this.set('title', this.error.title);
-
             domClass.add(this.containerNode, "ngwPyramidErrorDialog");
 
             this.contentArea = put(this.containerNode, 'div.dijitDialogPaneContentArea');
             this.actionBar = put(this.containerNode, 'div.dijitDialogPaneActionBar');
 
-            if (this.error.message) { put(this.contentArea, "p", this.error.message) };
-            if (this.error.detail) { put(this.contentArea, "p", this.error.detail) };
+            if (this.message) { put(this.contentArea, "p", this.message) };
+            if (this.detail) { put(this.contentArea, "p", this.detail) };
             
             this.technicalInfo = new CodeMirror({
                 readonly: true,
