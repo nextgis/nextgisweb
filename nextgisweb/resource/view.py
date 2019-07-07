@@ -284,11 +284,13 @@ def setup_pyramid(comp, config):
                     continue
 
                 # Is current user has permission to create child resource?
-                # TODO: Fix SAWarning: Object of type ... not in session,
-                # add operation along 'Resource.children' will not proceed
                 child = cls(parent=args.obj, owner_user=args.request.user)
                 if not child.has_permission(PERM_CREATE, args.request.user):
                     continue
+
+                # Workaround SAWarning: Object of type ... not in session,
+                # add operation along 'Resource.children' will not proceed
+                child.parent = None
 
                 yield Link(
                     'create/%s' % ident,

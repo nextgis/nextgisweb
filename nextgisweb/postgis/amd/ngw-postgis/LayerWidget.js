@@ -21,7 +21,7 @@ define([
     "dojox/layout/TableContainer",
     "ngw-resource/ResourceBox",
     "ngw-pyramid/form/IntegerValueTextBox",
-    "ngw-spatial-ref-sys/SpatialRefSysSelect"
+    "ngw-spatial-ref-sys/SRSSelect"
 ], function (
     declare,
     array,

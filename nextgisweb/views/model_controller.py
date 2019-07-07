@@ -2,6 +2,13 @@
 from pyramid.renderers import render_to_response
 
 from ..models import DBSession
+from ..object_widget import ObjectWidget
+
+
+class DeleteWidget(ObjectWidget):
+
+    def widget_module(self):
+        return 'ngw-pyramid/modelWidget/Widget'
 
 
 class ModelController(object):
@@ -156,8 +163,8 @@ class ModelController(object):
             widget.bind(data=request.json_body, request=request)
 
             if widget.validate():
-                widget.populate_obj()
-                request.env.core.DBSession.flush()
+                DBSession.delete(obj)
+                DBSession.flush()
 
                 return render_to_response(
                     'json',
@@ -165,7 +172,7 @@ class ModelController(object):
                         status_code=200,
                         redirect=context.get(
                             'redirect',
-                            request.application_url
+                            request.route_url(self.route_prefix + '.browse')
                         ),
                     ),
                     request

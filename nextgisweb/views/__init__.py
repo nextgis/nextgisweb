@@ -5,7 +5,7 @@ from pyramid.response import FileResponse
 
 from ..package import amd_packages
 
-from .model_controller import ModelController
+from .model_controller import ModelController, DeleteWidget
 
 
 def permalinker(model, route_name, keys=('id', )):
