@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from ..i18n import trstring_factory
 from osgeo import osr
 
-COMP_ID = "srs"
+COMP_ID = "spatial_ref_sys"
 _ = trstring_factory(COMP_ID)
 
 MI_UNIT_ALIASES =  {
@@ -55,9 +55,9 @@ def convert_projstr_to_wkt(proj_str, format=None):
     ]
 
     for imp in imports:
-        _format, method = imp
+        format_, method = imp
 
-        if format and not _format == format:
+        if format and not format_ == format:
             continue
 
         if hasattr(method, "__call__"):
