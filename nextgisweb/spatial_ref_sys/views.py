@@ -94,7 +94,7 @@ def setup_pyramid(comp, config):
         def create_context(self, request):
             check_permission(request)
             return dict(template=dict(
-                subtitle=("Create new Spatial Reference System"),
+                subtitle=_("Create new Spatial Reference System"),
                 dynmenu=SRS.__dynmenu__))
 
         def edit_context(self, request):
@@ -141,7 +141,7 @@ def setup_pyramid(comp, config):
     def srs_browse(request):
         check_permission(request)
         return dict(
-            title=('Spatial Reference Systems'),
+            title=_('Spatial Reference Systems'),
             obj_list=SRS.filter_by(),
             dynmenu=request.env.pyramid.control_panel)
 

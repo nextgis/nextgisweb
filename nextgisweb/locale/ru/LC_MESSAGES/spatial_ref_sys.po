@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.1\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2019-07-06 16:57+0000\n"
+"POT-Creation-Date: 2019-07-08 14:32+0000\n"
 "PO-Revision-Date: 2019-07-06 17:02+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -31,6 +31,14 @@ msgstr "Название системы координат не уникальн
 msgid "Cannot change wkt definition of standard coordinate system."
 msgstr "Невозможно изменить определение wkt стандартной системы координат."
 
+#: views.py:97
+msgid "Create new Spatial Reference System"
+msgstr "Создать новую Систему Координат"
+
+#: views.py:144 views.py:187
+msgid "Spatial Reference Systems"
+msgstr "Системы координат"
+
 #: views.py:157
 msgid "List"
 msgstr "Список"
@@ -46,10 +54,6 @@ msgstr "Редактировать"
 #: template/srs_browse.mako:37 views.py:176
 msgid "Delete"
 msgstr "Удалить"
-
-#: views.py:187
-msgid "Spatial Reference Systems"
-msgstr "Системы координат"
 
 #: amd/ngw-spatial-ref-sys/SRSStringDialog.js:37
 #: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:24
@@ -70,7 +74,7 @@ msgstr "Отменить"
 
 #: amd/ngw-spatial-ref-sys/SRSWidget.js:48
 msgid "Spatial Reference System"
-msgstr "Систему Координат"
+msgstr "Система Координат"
 
 #: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:9
 msgid "Display name"
