@@ -27,17 +27,38 @@ define([
 
         constructor: function (options) {
             this.inherited(arguments);
-            
-            this.error = options.error || {};
-            
-            this.title = options.title || this.error.title || null;
-            this.message = options.message || this.error.message || null;
-            this.detail = options.detail || this.error.detail || null;
+
+            if (options.response) {
+                var response = options.response;
+                if (response.status == undefined || response.status == 0) {
+                    this.title = i18n.gettext("Network error");
+                    this.message = i18n.gettext("There is no response from the server or problem connecting to server.");
+                    this.detail = i18n.gettext("Check network connectivity and try again later.");
+                } else if (response.status >= 400 && response.status <= 599) {
+                    var data = response.data;
+                    this.title = data.title;
+                    this.message = data.message;
+                    this.detail = data.detail;
+                    this.error = data;
+                } else {
+                    this.title = i18n.gettext("Unexpected server response");
+                    this.message = i18n.gettext("Something went wrong.");
+                };
+            };
+
+            if (options.title) { this.title = options.title };
+            if (options.message) { this.title = options.message };
+            if (options.detail) { this.title = options.detail };
+                  
+            this.title = this.title || i18n.gettext("Unexpected error");
+            this.message = this.message || i18n.gettext("Something went wrong.");
+            this.detail = this.detail || null;
+            this.error = this.error || {};           
         },
 
         buildRendering: function () {
             this.inherited(arguments);
-            domClass.add(this.containerNode, "ngwPyramidErrorDialog");
+            domClass.add(this.domNode, "ngwPyramidErrorDialog");
 
             this.contentArea = put(this.containerNode, 'div.dijitDialogPaneContentArea');
             this.actionBar = put(this.containerNode, 'div.dijitDialogPaneActionBar');

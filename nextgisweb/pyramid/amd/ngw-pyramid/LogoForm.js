@@ -9,6 +9,7 @@ define([
     "dojo/request/xhr",
     "dojo/json",
     "ngw/route",
+    "ngw-pyramid/ErrorDialog",
     "ngw-pyramid/i18n!pyramid",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/LogoForm.hbs",
@@ -27,6 +28,7 @@ define([
     xhr,
     json,
     route,
+    ErrorDialog,
     i18n,
     hbsI18n,
     template
@@ -52,7 +54,7 @@ define([
                 data: json.stringify(data) 
             }).then(function () {
                 window.location = route.pyramid.control_panel();
-            }, function () { alert("Error!"); });
+            }, function (err) { new ErrorDialog({response: err}).show() });
         }
     });
 });
