@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import warnings
 
 import zope.interface
 
-from ..core.exception import IUserException
+from ..core.exception import (
+    IUserException,
+    UserException,
+    ValidationException)
 
 from .util import _
 
@@ -19,19 +23,7 @@ __all__ = [
 ]
 
 
-class ResourceError(Exception):
-    """ Base class for resource exceptions """
-
-    zope.interface.implements(IUserException)
-
-    def __init__(self, message, data=None):
-        self.message = message
-        self.data = data if data is not None else dict()
-
-
-class ResourceNotFound(Exception):
-    zope.interface.implements(IUserException)
-
+class ResourceNotFound(UserException):
     title = _("Resource not found")
     message = _("Resource with id = %d was not found.")
     detail = _(
@@ -40,25 +32,35 @@ class ResourceNotFound(Exception):
     http_status_code = 404
 
     def __init__(self, resource_id):
-        self.message = self.__class__.message % resource_id
-        self.data = dict(resource_id=resource_id)
-        super(ResourceNotFound, self).__init__(self.message)
+        super(ResourceNotFound, self).__init__(
+            message=self.__class__.message % resource_id,
+            data=dict(resource_id=resource_id))
 
 
-class DisplayNameNotUnique(Exception):
-    zope.interface.implements(IUserException)
-
+class DisplayNameNotUnique(ValidationException):
     title = _("Resource display name is not unique")
     message = _("Resource with same display name already exists (id = %d).")
     detail = _(
         "Within a single parent resource, each resource must have unique display "
         "name. Give the resource a different display name or rename existing.")
-    http_status_code = 422
 
     def __init__(self, resource_id):
-        self.message = self.__class__.message % resource_id
-        self.data = dict(resource_id=resource_id)
-        super(DisplayNameNotUnique, self).__init__(self.message)
+        super(DisplayNameNotUnique, self).__init__(
+            message=self.__class__.message % resource_id,
+            data=dict(resource_id=resource_id))
+
+
+# TODO: Rewrite old-style resource exception classes
+
+class ResourceError(Exception):
+    """ Base class for resource exceptions """
+
+    zope.interface.implements(IUserException)
+
+    def __init__(self, message, data=None):
+        warnings.warn("{} is deprecated!".format(self.__class__.__name__), DeprecationWarning)
+        self.message = message
+        self.data = data if data is not None else dict()
 
 
 class ForbiddenError(ResourceError):
