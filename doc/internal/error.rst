@@ -27,9 +27,21 @@ Exception can provide following attributes:
 :attr:`~nextgisweb.core.exception.data`
     Error specific JSON-serializable dictionary.
 
-**TODO:** Add base exception classes
+New exception classes can be inherited from:
 
-**TODO:** Add examples
+:class:`~nextgisweb.core.exception.UserException`
+    Base class for any other exception below and custom exceptions.
+
+:class:`~nextgisweb.core.exception.ValidationError`
+    For validation errors (HTTP status code is 422).
+
+:class:`~nextgisweb.core.exception.InsufficientPermissions`
+    For authorizations errors (HTTP status code is 403).
+
+:class:`~nextgisweb.core.exception.OperationalError`
+    For operational errors (default HTTP status code is 503).
+
+**TODO:** Add examples for :meth:`~nextgisweb.core.exception.user_exception`.
 
 Webserver and API
 -----------------

@@ -11,7 +11,6 @@ from .util import _
 
 
 class IUserException(Interface):
-
     title = Attribute("General error description")
     message = Attribute("User friendly and secure message describing error")
     detail = Attribute("Information about fixing problem in Web GIS context")
@@ -94,11 +93,11 @@ class ValidationError(UserException):
     http_status_code = 422
 
 
-class OperationalError(UserException):
-    title = _("Operational error")
-    http_status_code = 503
-
-
 class InsufficientPermissions(UserException):
     title = _("Insufficient permissions")
     http_status_code = 403
+
+
+class OperationalError(UserException):
+    title = _("Operational error")
+    http_status_code = 503
