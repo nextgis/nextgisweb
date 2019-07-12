@@ -2,8 +2,6 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "dojo/store/Memory",
-    "dojo/dom-style",
     "ngw-pyramid/modelWidget/Widget",
     "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
@@ -26,8 +24,6 @@ define([
 ], function (
     declare,
     lang,
-    Memory,
-    domStyle,
     Widget,
     ErrorDisplayMixin,
     _TemplatedMixin,
