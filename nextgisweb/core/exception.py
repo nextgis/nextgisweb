@@ -89,16 +89,16 @@ class UserException(Exception):
             else self.message)
 
 
-class ValidationException(UserException):
+class ValidationError(UserException):
     title = _("Validation error")
     http_status_code = 422
 
 
-class OperationalException(UserException):
+class OperationalError(UserException):
     title = _("Operational error")
     http_status_code = 503
 
 
-class InsufficientPermissionsException(UserException):
+class InsufficientPermissions(UserException):
     title = _("Insufficient permissions")
     http_status_code = 403

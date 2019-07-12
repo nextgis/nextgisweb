@@ -7,7 +7,7 @@ import zope.interface
 from ..core.exception import (
     IUserException,
     UserException,
-    ValidationException)
+    ValidationError)
 
 from .util import _
 
@@ -37,7 +37,7 @@ class ResourceNotFound(UserException):
             data=dict(resource_id=resource_id))
 
 
-class DisplayNameNotUnique(ValidationException):
+class DisplayNameNotUnique(ValidationError):
     title = _("Resource display name is not unique")
     message = _("Resource with same display name already exists (id = %d).")
     detail = _(
