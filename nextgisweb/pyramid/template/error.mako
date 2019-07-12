@@ -37,6 +37,7 @@ from nextgisweb.pyramid.exception import json_error
         "dojo/dom-style",
         "dojo/json",
         "dijit/form/Button",
+        "ngw/settings!pyramid",
         "ngw-pyramid/form/CodeMirror",
         "ngw-pyramid/i18n!resource",
         "dojo/domReady!"
@@ -44,6 +45,7 @@ from nextgisweb.pyramid.exception import json_error
         domStyle,
         json,
         Button,
+        settings,
         CodeMirror,
         i18n
     ) {
@@ -67,11 +69,17 @@ from nextgisweb.pyramid.exception import json_error
             }
         }).placeAt("actionBar")
 
-        new Button({
-            label: i18n.gettext("Request support"),
-            class: "dijitButton--default",
-            style: "float: right; margin-left: 1ex;"
-        }).placeAt("actionBar");
+        if (settings['support_url']) {
+            new Button({
+                label: i18n.gettext("Request support"),
+                class: "dijitButton--default",
+                style: "float: right; margin-left: 1ex;",
+                onClick: function() {
+                    var win = window.open(settings['support_url'], '_blank');
+                    win.focus();
+                }
+            }).placeAt("actionBar");
+        };
 
         new Button({
             label: i18n.gettext("Technical info"),

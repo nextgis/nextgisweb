@@ -235,6 +235,8 @@ class PyramidComponent(Component):
     def client_settings(self, request):
         result = dict()
 
+        result['support_url'] = self.env.core.settings.get('support_url')
+
         try:
             result['units'] = self.env.core.settings_get('core', 'units')
         except KeyError:

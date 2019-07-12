@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-05-23 18:36+0000\n"
+"POT-Creation-Date: 2019-07-12 22:46+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,6 +19,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
+#: exception.py:185 exception.py:216
+msgid "Internal server error"
+msgstr "Внутренняя ошибка сервера"
+
+#: exception.py:186
+msgid ""
+"The server encountered an internal error or misconfiguration and was "
+"unable to complete your request."
+msgstr ""
+"При обработке запроса возникла внутренняя ошибка или сервер настроен "
+"некорректно и не может обработать запрос."
+
+#: exception.py:212
+msgid "Bad request"
+msgstr "Некорректный запрос"
+
+#: exception.py:213
+msgid "Forbidden"
+msgstr "Запрещено"
+
+#: exception.py:214
+msgid "Not found"
+msgstr "Не найдено"
+
+#: exception.py:215
+msgid "Unprocessable entity"
+msgstr "Необрабатываемая сущность"
+
+#: exception.py:217
+msgid "Not implemented"
+msgstr "Не реализовано"
+
+#: exception.py:218
+msgid "Service unavailable"
+msgstr "Сервис недоступен"
+
 #: template/header.mako:74 view.py:34
 msgid "Control panel"
 msgstr "Панель управления"
@@ -27,45 +63,79 @@ msgstr "Панель управления"
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:70 view.py:179
+#: view.py:70 view.py:181
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:78 view.py:185
+#: view.py:78 view.py:187
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:85 view.py:187
+#: view.py:85 view.py:189
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:92 view.py:189
+#: view.py:92 view.py:191
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:99 view.py:183
+#: view.py:99 view.py:185
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:106 view.py:191
+#: view.py:106 view.py:193
 msgid "Miscellaneous"
 msgstr "Разное"
 
-#: view.py:113 view.py:193
+#: view.py:113 view.py:195
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:120
-msgid "404: Page not found"
-msgstr "404: Страница не найдена"
-
-#: view.py:178
+#: view.py:180
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:182
+#: view.py:184
 msgid "Settings"
 msgstr "Настройки"
+
+#: amd/ngw-pyramid/ErrorDialog.js:34
+msgid "Network error"
+msgstr "Сетевая ошибка"
+
+#: amd/ngw-pyramid/ErrorDialog.js:35
+msgid "There is no response from the server or problem connecting to server."
+msgstr ""
+"Не удалось получить ответ от сервера либо в процессе соединения возникла "
+"ошибка."
+
+#: amd/ngw-pyramid/ErrorDialog.js:36
+msgid "Check network connectivity and try again later."
+msgstr "Проверьте сетевое соединение и попробуйте повторить позже."
+
+#: amd/ngw-pyramid/ErrorDialog.js:44
+msgid "Unexpected server response"
+msgstr "Неожидаемый ответ сервера"
+
+#: amd/ngw-pyramid/ErrorDialog.js:45 amd/ngw-pyramid/ErrorDialog.js:54
+msgid "Something went wrong."
+msgstr "Что-то пошло не так."
+
+#: amd/ngw-pyramid/ErrorDialog.js:53
+msgid "Unexpected error"
+msgstr "Неожиданная ошибка"
+
+#: amd/ngw-pyramid/ErrorDialog.js:79
+msgid "OK"
+msgstr "OK"
+
+#: amd/ngw-pyramid/ErrorDialog.js:85
+msgid "Request support"
+msgstr "Запросить поддержку"
+
+#: amd/ngw-pyramid/ErrorDialog.js:91
+msgid "Technical information"
+msgstr "Техническая информация"
 
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:30
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:32
@@ -97,7 +167,7 @@ msgstr "Создать"
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:25
 #: amd/ngw-pyramid/template/HomePathForm.hbs:11
 #: amd/ngw-pyramid/template/LogoForm.hbs:22
-#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:29
+#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:37
 #: amd/ngw-pyramid/template/SystemNameForm.hbs:10
 msgid "Save"
 msgstr "Сохранить"
@@ -174,17 +244,21 @@ msgstr "Метры/Километры"
 msgid "Feet/Miles"
 msgstr "Футы/Мили"
 
-#: template/404.mako:22
-msgid "Think this page should be here?"
-msgstr "Если считаете, что это ошибка,"
+#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:23
+msgid "Degree format"
+msgstr "Формат градусов"
 
-#: template/404.mako:23
-msgid "http://nextgis.com/contact/"
-msgstr "http://nextgis.ru/contact/"
+#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:24
+msgid "Decimal degrees"
+msgstr "Десятичные градусы"
 
-#: template/404.mako:24
-msgid "Contact us"
-msgstr "напишите нам"
+#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:25
+msgid "Degrees, decimal minutes"
+msgstr "Градусы и десятичные минуты"
+
+#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:26
+msgid "Degrees, minutes, seconds"
+msgstr "Градусы, минуты, секунды"
 
 #: template/base.mako:29
 msgid "Your Web GIS at nextgis.com"

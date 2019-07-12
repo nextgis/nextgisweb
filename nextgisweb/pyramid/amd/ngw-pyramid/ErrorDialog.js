@@ -7,6 +7,7 @@ define([
     "dijit/Dialog",
     "dijit/form/Button",
     "put-selector/put",
+    "ngw/settings!pyramid",
     "ngw-pyramid/form/CodeMirror",
     "ngw-pyramid/i18n!resource",
     "xstyle/css!./ErrorDialog.css"
@@ -19,6 +20,7 @@ define([
     Dialog,
     Button,
     put,
+    settings,
     CodeMirror,
     i18n
 ) {
@@ -81,11 +83,17 @@ define([
                 onClick: lang.hitch(this, this.hide)
             }).placeAt(this.actionBar);
 
-            new Button({
-                label: i18n.gettext("Request support"),
-                class: "dijitButton--default",
-                style: "float: right;"
-            }).placeAt(this.actionBar);
+            if (settings['support_url']) {
+                new Button({
+                    label: i18n.gettext("Request support"),
+                    class: "dijitButton--default",
+                    style: "float: right;", 
+                    onClick: function() {
+                        var win = window.open(settings['support_url'], '_blank');
+                        win.focus();
+                    }
+                }).placeAt(this.actionBar);
+            };
 
             new Button({
                 label: i18n.gettext("Technical information"),
