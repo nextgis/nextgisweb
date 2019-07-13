@@ -5,6 +5,7 @@ import pytest
 
 from nextgisweb import db
 from nextgisweb.models import DBSession
+from nextgisweb.core.exception import ValidationError
 from nextgisweb.spatial_ref_sys.models import SRS, SRID_LOCAL, WKT_ESPG_4326, WKT_ESPG_3857
 
 
@@ -51,5 +52,5 @@ def test_wkt_valid():
 
 
 def test_wkt_invalid():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         SRS(wkt='INVALID')
