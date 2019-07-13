@@ -169,7 +169,7 @@ def miscellaneous_get(request):
             result[k] = env.core.settings_get('core', k)
         except KeyError:
             pass
-    
+
     return result
 
 
@@ -332,7 +332,9 @@ def logo_put(request):
 
 
 def setup_pyramid(comp, config):
-    config.add_tween('nextgisweb.pyramid.api.cors_tween_factory')
+    config.add_tween(
+        'nextgisweb.pyramid.api.cors_tween_factory',
+        under=('pyramid_debugtoolbar.toolbar_tween_factory', 'INGRESS'))
 
     config.add_route('pyramid.cors', '/api/component/pyramid/cors') \
         .add_view(cors_get, request_method='GET', renderer='json') \

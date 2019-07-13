@@ -1,0 +1,3 @@
+.ngwPyramidErrorDialog .dijitDialogPaneContentArea { width: 40em;}
+.ngwPyramidErrorDialog .dijitDialogPaneActionBar { text-align: left; padding: 1ex; }
+.ngwPyramidErrorDialog .dijitDialogPaneContentArea .CodeMirror-scroll { max-height: 25em; }

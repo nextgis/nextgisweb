@@ -7,8 +7,9 @@ from zope import interface
 
 from ..registry import registry_maker
 from ..models import BaseClass
+from ..core.exception import IUserException
 
-from .exception import Forbidden
+from .exception import ForbiddenError
 from .util import _
 
 _registry = registry_maker()
@@ -95,7 +96,7 @@ class SerializedProperty(object):
         if self.writeperm(srlzr):
             self.setter(srlzr, srlzr.data[self.attrname])
         else:
-            raise Forbidden(_("Attribute '%s' forbidden.") % self.attrname)
+            raise ForbiddenError(_("Attribute '%s' forbidden.") % self.attrname)
 
 
 class SerializedRelationship(SerializedProperty):
@@ -173,17 +174,22 @@ class Serializer(SerializerBase):
 
     def deserialize(self):
         for prop, sp in self.proptab:
-            if prop in self.data and not prop in self.keys:
+            if prop in self.data and prop not in self.keys:
                 try:
                     sp.deserialize(self)
                 except Exception as exc:
+                    exc_info = sys.exc_info()
                     self.annotate_exception(exc, sp)
-                    raise
+                    raise exc_info[0], exc_info[1], exc_info[2]
 
     def annotate_exception(self, exc, sp):
         exc.__srlzr_prprt__ = sp.attrname
 
-        # TODO: Possibly TODO from CompositeSerializer.annotate_exception here as well
+        try:
+            error_info = IUserException(exc)
+            error_info.data['attribute'] = sp.attrname
+        except TypeError:
+            pass
 
 
 class CompositeSerializer(SerializerBase):
@@ -206,8 +212,9 @@ class CompositeSerializer(SerializerBase):
                 mobj.serialize()
                 self.data[ident] = mobj.data
             except Exception as exc:
+                exc_info = sys.exc_info()
                 self.annotate_exception(exc, mobj)
-                raise
+                raise exc_info[0], exc_info[1], exc_info[2]
 
     def deserialize(self):
         for ident, mobj in self.members.iteritems():
@@ -215,27 +222,28 @@ class CompositeSerializer(SerializerBase):
                 if ident in self.data:
                     mobj.deserialize()
             except Exception as exc:
+                exc_info = sys.exc_info()
                 self.annotate_exception(exc, mobj)
-                raise
+                raise exc_info[0], exc_info[1], exc_info[2]
 
     def annotate_exception(self, exc, mobj):
         """ Adds information about serializer that called the exception to the exception """
 
         exc.__srlzr_cls__ = mobj.__class__
 
-        # TODO: Here it would nice to check if our exception is a child of
-        # ResourceError, otherwise it make sense to issue a
-        # warning, that is yet unclear how to attach to a line of code.
-        # In a nutshell, Serializer shouldn't generate exceptions
-        # other than children of ResourceError.
+        try:
+            error_info = IUserException(exc)
+            error_info.data['serializer'] = mobj.__class__.identity
+        except TypeError:
+            pass
 
 
 def serval(value):
     if (
         value is None
-        or isinstance(value, int)
-        or isinstance(value, float)
-        or isinstance(value, basestring)
+        or isinstance(value, int)  # NOQA: W503
+        or isinstance(value, float)  # NOQA: W503
+        or isinstance(value, basestring)  # NOQA: W503
     ):
         return value
 

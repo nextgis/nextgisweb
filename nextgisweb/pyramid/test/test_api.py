@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import pytest
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 
 def test_route(webapp):

@@ -4,7 +4,7 @@ import logging
 import inspect
 
 from .trstring import TrString, trstring_factory # API # NOQA
-from .localizer import Translations, Localizer # API # NOQA
+from .localizer import Translations, Localizer, translator # API # NOQA
 
 logger = logging.getLogger(__name__)
 

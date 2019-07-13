@@ -14,6 +14,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
+    "ngw-pyramid/ErrorDialog",
     "ngw-pyramid/i18n!resource",
     "ngw/route",
     "xstyle/css!./resource/CompositeWidget.css"
@@ -32,13 +33,10 @@ define([
     BorderContainer,
     ContentPane,
     TabContainer,
+    ErrorDialog,
     i18n,
     route
 ) {
-    var E_INVALID_DATA = "INVALID_DATA",
-        E_SERIALIZE    = "SERIALIZE",
-        E_REQUEST      = "REQUEST";
-
     var CompositeWidget = declare("ngw.resource.CompositeWidget", BorderContainer, {
         style: "width: 100%; height: 100%; padding: 1px;",
         gutters: false,
@@ -216,9 +214,7 @@ define([
         // ========
 
         request: function (args) {
-            var deferred = new Deferred();
-
-            xhr(args.url, {
+            return xhr(args.url, {
                 method: args.method,
                 handleAs: "json",
                 data: json.stringify(args.data),
@@ -226,16 +222,7 @@ define([
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                 }
-            }).then(function (data) {
-                deferred.resolve(data);
-            }, function (err) {
-                deferred.reject({
-                    status: err.response.status,
-                    data: err.response.data
-                });
             });
-
-            return deferred;
         },
 
         storeRequest: function (args) {
@@ -259,28 +246,33 @@ define([
                                         deferred.resolve(response);
                                     },
                                     function /* errback */ (err) {
-                                        console.debug("REST API request failed");
-                                        deferred.reject({
-                                            error: E_REQUEST,
-                                            status: err.status,
-                                            data: err.data
-                                        });
+                                        console.error("REST API request failed");
+                                        deferred.reject({ response: err.response });
                                     }
                                 );
                             },
                             function /* errback */ () {
-                                console.debug("Serialization failed");
-                                deferred.reject({ error: E_SERIALIZE });
+                                console.error("Serialization failed");
+                                deferred.reject({
+                                    title: i18n.gettext("Unexpected error"),
+                                    message: i18n.gettext("Serialization failed")
+                                });
                             }
                         );
                     } else {
                         console.debug("Validation completed without success");
-                        deferred.reject({ error: E_INVALID_DATA });
+                        deferred.reject({
+                            title: i18n.gettext("Validation error"),
+                            message: i18n.gettext("Errors found during data validation. Tabs with errors marked in red.")
+                        });
                     }
                 },
                 function /* errback */ () {
-                    console.debug("Validation failed");
-                    deferred.reject({ error: E_SERIALIZE });
+                    console.error("Validation failed");
+                    deferred.reject({
+                        title: i18n.gettext("Unexpected error"),
+                        message: i18n.gettext("Validation failed")
+                    });
                 }
             );
 
@@ -294,36 +286,18 @@ define([
         lock: function () {
             domStyle.set(this.tabContainer.domNode, "display", "none");
             domStyle.set(this.lockContainer.domNode, "display", "block");
-            array.forEach(this.buttons, function (btn) {
-                btn.set("disabled", true);
-            });
+            array.forEach(this.buttons, function (btn) { btn.set("disabled", true) });
         },
 
         unlock: function (err) {
             domStyle.set(this.lockContainer.domNode, "display", "none");
             domStyle.set(this.tabContainer.domNode, "display", "block");
-            array.forEach(this.buttons, function (btn) {
-                btn.set("disabled", false);
-            });
+            array.forEach(this.buttons, function (btn) { btn.set("disabled", false) });
+
             this.tabContainer.resize();
 
-            if (err !== undefined) { this.errorMessage(err); }
-        },
-
-        errorMessage: function (e) {
-            var S_ERROR_MESSAGE = i18n.gettext("Error message:");
-
-            if (e.error == E_REQUEST && e.status == 400) {
-                alert(i18n.gettext("Errors found during data validation on server. Correct them and try again.") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
-
-            } else if (e.error == E_REQUEST && e.status == 403) {
-                alert(i18n.gettext("Insufficient permissions to perform the operation. Forgot to log in?") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
-
-            } else if (e.error == E_INVALID_DATA) {
-                alert(i18n.gettext("Errors found during data validation. Tabs with errors marked in red."));
-
-            } else {
-                alert(i18n.gettext("Unexpected error occurred during the operation.") + "\n\n" + S_ERROR_MESSAGE + " " + e.data.message);
+            if (err !== undefined) {
+                new ErrorDialog(err).show();
             }
         },
 

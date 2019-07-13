@@ -42,6 +42,9 @@ class CoreComponent(Component):
         setting_debug = self._settings.get('debug', 'false').lower()
         self.debug = setting_debug in ('true', 'yes', '1')
 
+        if 'support_url' not in self._settings:
+            self._settings['support_url'] = "http://nextgis.com/contact/"
+
         sa_url = make_engine_url(EngineURL(
             'postgresql+psycopg2',
             host=self._settings.get('database.host', 'localhost'),
@@ -207,6 +210,8 @@ class CoreComponent(Component):
         dict(key='locale.available', desc="Available locale"),
         dict(key='debug', desc="Additional debug tools"),
         dict(key='sdir', desc="Data storage folder"),
+
+        dict(key='support_url', desc="Support URL"),
 
         dict(
             key='permissions.disable_check.rendering',
