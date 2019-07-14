@@ -5,12 +5,11 @@ import os.path
 
 from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
-import zope.interface
 
 from pkg_resources import resource_filename
 
 from .. import dynmenu as dm
-from ..core.exception import IUserException
+from ..core.exception import UserException
 
 from .util import _
 
@@ -114,12 +113,21 @@ def home_path(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
-def test_error_info(request):
-    class TestException(Exception):
-        zope.interfacexceptionlements(IUserException)
+def test_exception_handled(request):
+    class HandledTestException(UserException):
+        title = "Title"
+        message = "Message"
+        detail = "Detail"
         http_status_code = 418
 
-    raise TestException()
+    raise HandledTestException()
+
+
+def test_exception_unhandled(request):
+    class UnhandledTestException(Exception):
+        pass
+
+    raise UnhandledTestException()
 
 
 def setup_pyramid(comp, config):
@@ -173,8 +181,10 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
-    config.add_route('pyramid.test_error_info', '/test/error_info') \
-        .add_view(test_error_info)
+    config.add_route('pyramid.test_exception_handled', '/test/exception/handled') \
+        .add_view(test_exception_handled)
+    config.add_route('pyramid.test_exception_unhandled', '/test/exception/unhandled') \
+        .add_view(test_exception_unhandled)
 
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
