@@ -186,6 +186,7 @@ class InternalServerError(Exception):
     message = _(
         "The server encountered an internal error or misconfiguration "
         "and was unable to complete your request.")
+    detail = None
 
     http_status_code = 500
 
