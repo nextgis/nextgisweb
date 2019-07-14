@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, absolute_import, print_function, unicode_literals
 
-import json
 from .models import SRS
 from .util import convert_projstr_to_wkt
+
 
 def collection(request):
     srs_collection = list(map(lambda o: dict(
@@ -21,6 +21,7 @@ def get(request):
         auth_name=obj.auth_name, auth_srid=obj.auth_srid,
         wkt=obj.wkt
     )
+
 
 def srs_convert(request):
     proj_str = request.POST.get("projStr")

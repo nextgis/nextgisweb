@@ -7,6 +7,11 @@ from ..package import amd_packages
 
 from .model_controller import ModelController, DeleteWidget
 
+__all__ = [
+    'ModelController',
+    'DeleteWidget',
+]
+
 
 def permalinker(model, route_name, keys=('id', )):
     def _permalink(model, request):

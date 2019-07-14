@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
-from pyramid.events import BeforeRender, subscriber
-from sqlalchemy.orm.exc import NoResultFound
-
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPForbidden
-from pyramid.security import remember, forget
+from __future__ import division, unicode_literals, print_function, absolute_import
 
 from ..object_widget import ObjectWidget
 from ..views import ModelController, DeleteWidget, permalinker
 from .. import dynmenu as dm
 
 from .models import SRS
-
 from .util import _
 
 
@@ -24,8 +19,6 @@ def setup_pyramid(comp, config):
         request.require_administrator()
 
     class SRSDeleteWidget(DeleteWidget):
-
-
         def validate(self):
             result = super(SRSDeleteWidget, self).validate()
             self.error = []
@@ -37,7 +30,6 @@ def setup_pyramid(comp, config):
                         message=self.request.localizer.translate(
                             _("Unable to delete standard coordinate system."))))
             return result
-
 
     class SRSWidget(ObjectWidget):
 
@@ -113,7 +105,7 @@ def setup_pyramid(comp, config):
             disabled = obj.disabled
             if disabled:
                 raise ValueError(_("Unable to delete standard coordinate system."))
-            
+
             return dict(
                 obj=obj,
                 template=dict(obj=obj)
@@ -145,10 +137,8 @@ def setup_pyramid(comp, config):
             obj_list=SRS.filter_by(),
             dynmenu=request.env.pyramid.control_panel)
 
-    
     config.add_route('srs.browse', '/srs/') \
         .add_view(srs_browse, renderer='nextgisweb:spatial_ref_sys/template/srs_browse.mako')
-
 
     class SRSMenu(dm.DynItem):
 
@@ -180,11 +170,9 @@ def setup_pyramid(comp, config):
                         )
                     )
 
-  
     SRS.__dynmenu__ = comp.env.pyramid.control_panel
 
     comp.env.pyramid.control_panel.add(
         dm.Label('srs-list', _("Spatial Reference Systems")),
         SRSMenu('srs-list'),
     )
-

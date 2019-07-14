@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 import subprocess
-
-import os
-import os.path
 from tempfile import NamedTemporaryFile
 from shutil import copy
 
@@ -79,8 +76,10 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 band = ds.GetRasterBand(bidx)
 
                 if band.DataType not in SUPPORTED_GDT:
-                    raise ValidationError(_("Band #%(band)d has type '%(type)s', however only following band types are supported: %(all_types)s.") % dict(
-                        band=bidx, type=gdal.GetDataTypeName(band.DataType), all_types=SUPPORTED_GDT_NAMES))
+                    raise ValidationError(
+                        _("Band #%(band)d has type '%(type)s', however only following band types are supported: %(all_types)s.") % dict(  # NOQA: E501
+                            band=bidx, type=gdal.GetDataTypeName(band.DataType),
+                            all_types=SUPPORTED_GDT_NAMES))
 
         dsproj = ds.GetProjection()
         dsgtran = ds.GetGeoTransform()
@@ -157,7 +156,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         env.raster_layer.logger.debug('Removing existing overviews with command: ' + ' '.join(cmd))
         subprocess.check_call(cmd)
 
-        cmd = ['gdaladdo', '-q', '-ro', '-r', 'cubic',
+        cmd = [
+            'gdaladdo', '-q', '-ro', '-r', 'cubic',
             '--config', 'COMPRESS_OVERVIEW', 'JPEG',
             '--config', 'INTERLEAVE_OVERVIEW', 'PIXEL',
             '--config', 'BIGTIFF_OVERVIEW', 'YES',
@@ -194,8 +194,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         x_ul = geoTransform[0]
         y_ul = geoTransform[3]
 
-        x_lr = x_ul + ds.RasterXSize*geoTransform[1] + ds.RasterYSize*geoTransform[2];
-        y_lr = y_ul + ds.RasterXSize*geoTransform[4] + ds.RasterYSize*geoTransform[5];
+        x_lr = x_ul + ds.RasterXSize * geoTransform[1] + ds.RasterYSize * geoTransform[2]
+        y_lr = y_ul + ds.RasterXSize * geoTransform[4] + ds.RasterYSize * geoTransform[5]
 
         ll = ogr.Geometry(ogr.wkbPoint)
         ll.AddPoint(x_ul, y_lr)
