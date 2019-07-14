@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-07-12 22:46+0000\n"
+"POT-Creation-Date: 2019-07-13 23:31+0000\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -77,12 +77,12 @@ msgid ""
 "name. Give the resource a different display name or rename existing."
 msgstr ""
 "В рамках одного дочернего ресурса каждый ресурс должен иметь уникальное "
-"наименование. Дайти ресурсу другое наименование или переименуйте "
+"наименование. Присвойте ресурсу другое наименование или переименуйте "
 "существующий."
 
 #: exception.py:67
 msgid "Forbidden"
-msgstr "Запрещено"
+msgstr "Доступ запрещен"
 
 #: amd/ngw-resource/CompositeWidget.js:265 exception.py:75
 msgid "Validation error"
@@ -142,13 +142,13 @@ msgstr "Чтение"
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:42 template/section_children.mako:49 view.py:301
+#: scope.py:42 template/section_children.mako:49 view.py:306
 msgid "Update"
 msgstr "Изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:97
 #: amd/ngw-resource/PermissionWidget.js:322 scope.py:46
-#: template/section_children.mako:52 view.py:307
+#: template/section_children.mako:52 view.py:312
 msgid "Delete"
 msgstr "Удалить"
 
@@ -197,44 +197,49 @@ msgstr "Конфигурация"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:83 view.py:313
+#: view.py:85 view.py:318
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:118
+#: view.py:120
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:124 view.py:323
+#: view.py:126 view.py:328
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:132
+#: view.py:134
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: amd/ngw-resource/DeleteWidget.js:22 view.py:139
+#: amd/ngw-resource/DeleteWidget.js:22 view.py:141
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:251
+#: view.py:200
+#, python-format
+msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
+msgstr ""
+
+#: view.py:256
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:258
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:263
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:265
+#: view.py:270
 msgid "User permissions"
 msgstr "Права пользователя"
 
 #: amd/ngw-resource/PermissionWidget.js:67
-#: amd/ngw-resource/PermissionWidget.js:134 view.py:324
+#: amd/ngw-resource/PermissionWidget.js:134 view.py:329
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:325
+#: view.py:330
 msgid "Extra"
 msgstr "Дополнительно"
 

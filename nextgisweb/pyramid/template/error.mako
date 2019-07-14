@@ -39,7 +39,7 @@ from nextgisweb.pyramid.exception import json_error
         "dijit/form/Button",
         "ngw/settings!pyramid",
         "ngw-pyramid/form/CodeMirror",
-        "ngw-pyramid/i18n!resource",
+        "ngw-pyramid/i18n!pyramid",
         "dojo/domReady!"
     ], function (
         domStyle,
@@ -62,7 +62,7 @@ from nextgisweb.pyramid.exception import json_error
         technicalInfo.startup();
 
         new Button({
-            label: i18n.gettext("Back"),
+            label: ${tr(_("Back")) | json.dumps, n},
             class: "dijitButton--primary",
             onClick: function () {
                 window.history.back();
@@ -82,7 +82,7 @@ from nextgisweb.pyramid.exception import json_error
         };
 
         new Button({
-            label: i18n.gettext("Technical info"),
+            label: i18n.gettext("Technical information"),
             class: "dijitButton--default",
             style: "float: right;",
             onClick: function () {
