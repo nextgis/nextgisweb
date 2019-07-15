@@ -54,7 +54,7 @@ class CleanUpCommand():
 
             if (
                 (not relist and len(filenames) == 0 and len(dirnames) == 0)
-                or listdir(dirpath) == 0
+                or listdir(dirpath) == 0  # NOQA: W503
             ):
                 rmdir(dirpath)
                 deleted_dirs += 1

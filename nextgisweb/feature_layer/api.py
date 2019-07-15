@@ -6,6 +6,7 @@ import re
 import urllib
 import uuid
 import zipfile
+import itertools
 
 import backports.tempfile
 from collections import OrderedDict
@@ -14,6 +15,7 @@ from io import BytesIO
 
 from osgeo import ogr, gdal
 from shapely import wkt
+from shapely.geometry import mapping
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNoContent
 
@@ -49,13 +51,13 @@ def _ogr_ds(driver, options):
     )
 
 
-def _ogr_layer_from_features(layer, features, name=b'', ds=None):
-    ogr_layer = layer.to_ogr(ds, name=name)
+def _ogr_layer_from_features(layer, features, name=b'', ds=None, fid=None):
+    ogr_layer = layer.to_ogr(ds, name=name, fid=fid)
     layer_defn = ogr_layer.GetLayerDefn()
 
     for f in features:
         ogr_layer.CreateFeature(
-            f.to_ogr(layer_defn))
+            f.to_ogr(layer_defn, fid=fid))
 
     return ogr_layer
 
@@ -73,7 +75,10 @@ def export(request):
     srs = int(
         request.GET.get("srs", request.context.srs.id)
     )
+    srs = SRS.filter_by(id=srs).one()
+    fid = request.GET.get("fid")
     format = request.GET.get("format")
+    encoding = request.GET.get("encoding")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
 
@@ -91,31 +96,38 @@ def export(request):
 
     driver = EXPORT_FORMAT_OGR[format]
 
+    # layer creation options
+    lco = list(driver.options or [])
+
+    if encoding is not None:
+        lco.append("ENCODING=%s" % encoding)
+
     query = request.context.feature_query()
     query.geom()
 
     ogr_ds = _ogr_memory_ds()
     ogr_layer = _ogr_layer_from_features(
-        request.context, query(), ds=ogr_ds)
+        request.context, query(), ds=ogr_ds, fid=fid)
 
     buf = BytesIO()
 
     with backports.tempfile.TemporaryDirectory() as temp_dir:
-        options = [
-            '-f "%s"' % driver.name,
-            "-t_srs EPSG:%d" % srs,
-        ]
-        options.extend(["-preserve_fid"])
-        options.extend(list(driver.options or []))
-
         filename = "%d.%s" % (
             request.context.id,
             driver.extension,
         )
+
+        vtopts = [
+            '-f', driver.name,
+            '-t_srs', srs.wkt,
+        ] + list(itertools.chain(*[('-lco', o) for o in lco]))
+
+        if driver.fid_support and fid is None:
+            vtopts.append('-preserve_fid')
+
         gdal.VectorTranslate(
-            os.path.join(temp_dir, filename),
-            ogr_ds,
-            options=" ".join(options),
+            os.path.join(temp_dir, filename), ogr_ds,
+            options=gdal.VectorTranslateOptions(options=vtopts)
         )
 
         if zipped or not driver.single_file:
@@ -178,6 +190,7 @@ def mvt(request):
         maxx + (maxx - minx) * padding,
         maxy + (maxy - miny) * padding,
     )
+    bbox = box(*bbox, srid=merc.id)
 
     options = [
         "FORMAT=DIRECTORY",
@@ -197,8 +210,6 @@ def mvt(request):
         request.resource_permission(PERM_READ, obj)
 
         query = obj.feature_query()
-
-        bbox = box(*bbox, srid=merc.id)
         query.intersects(bbox)
         query.geom()
 
@@ -291,9 +302,15 @@ def deserialize(feat, data):
                 ext.deserialize(feat, data['extensions'][cls.identity])
 
 
-def serialize(feat, keys=None):
+def serialize(feat, keys=None, geom_format=None):
     result = OrderedDict(id=feat.id)
-    result['geom'] = wkt.dumps(feat.geom)
+
+    if geom_format is not None and geom_format.lower() == "geojson":
+        geom = mapping(feat.geom)
+    else:
+        geom = wkt.dumps(feat.geom)
+
+    result['geom'] = geom
 
     result['fields'] = OrderedDict()
     for fld in feat.layer.fields:
@@ -342,8 +359,14 @@ def serialize(feat, keys=None):
 def iget(resource, request):
     request.resource_permission(PERM_READ)
 
+    geom_format = request.GET.get("geom_format")
+    srs = request.GET.get("srs")
+
     query = resource.feature_query()
     query.geom()
+
+    if srs is not None:
+        query.srs(SRS.filter_by(id=int(srs)).one())
 
     query.filter_by(id=request.matchdict['fid'])
     query.limit(1)
@@ -353,7 +376,7 @@ def iget(resource, request):
         result = f
 
     return Response(
-        json.dumps(serialize(result)),
+        json.dumps(serialize(result, geom_format=geom_format)),
         content_type=b'application/json')
 
 
@@ -391,7 +414,13 @@ def idelete(resource, request):
 def cget(resource, request):
     request.resource_permission(PERM_READ)
 
+    geom_format = request.GET.get("geom_format")
+    srs = request.GET.get("srs")
+
     query = resource.feature_query()
+
+    if srs is not None:
+        query.srs(SRS.filter_by(id=int(srs)).one())
 
     # Paging
     limit = request.GET.get('limit')
@@ -431,7 +460,10 @@ def cget(resource, request):
 
     query.geom()
 
-    result = [serialize(feature, fields) for feature in query()]
+    result = [
+        serialize(feature, fields, geom_format=geom_format)
+        for feature in query()
+    ]
 
     return Response(
         json.dumps(result),

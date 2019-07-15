@@ -7,7 +7,6 @@ import re
 import magic
 
 from shutil import copyfileobj
-from subprocess import check_output
 
 from pyramid.response import Response
 

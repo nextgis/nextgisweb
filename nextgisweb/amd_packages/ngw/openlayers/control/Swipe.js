@@ -42,8 +42,8 @@ define([
         ol.control.Control.call(this, {
             element: element
         });
-        
-        this.on('propertychange', function () {
+
+        this.on('propertychange', lang.hitch(this, function () {
             var orientation = this.get('orientation');
             var position = this.get('position');
 
@@ -58,7 +58,7 @@ define([
             }
             domClass.remove(this.element, "vertical horizontal");
             domClass.add(this.element, this.get('orientation'));
-        }, this);
+        }));
         
         this.set('position', options.position || 0.5);
         this.set('orientation', options.orientation || 'vertical');
@@ -88,14 +88,16 @@ define([
                 })
             })
         });
+        this._precompose = lang.hitch(this, this.precompose);
+        this._postcompose = lang.hitch(this, this.postcompose);
     };
     ol.inherits(Swipe, ol.control.Control);
 
     Swipe.prototype.setMap = function (map) {
         if (this.getMap()) {
             array.forEach(this.layers, function (layer) {
-                layer.un('precompose', this.precompose, this);
-                layer.un('postcompose', this.postcompose, this);
+                layer.un('precompose', this._precompose);
+                layer.un('postcompose', this._postcompose);
             }, this);
             this.getMap().render();
         }
@@ -104,8 +106,8 @@ define([
 
         if (map) {
             array.forEach(this.layers, function (layer) {
-                layer.on('precompose', this.precompose, this);
-                layer.on('postcompose', this.postcompose, this);
+                layer.on('precompose', this._precompose);
+                layer.on('postcompose', this._postcompose);
             }, this);
             map.render();
         }
@@ -116,8 +118,8 @@ define([
             if (this.layers.indexOf(layer) === -1) {
                 this.layers.push(layer);
                 if (this.getMap()) {
-                    layer.on('precompose', this.precompose, this);
-                    layer.on('postcompose', this.postcompose, this);
+                    layer.on('precompose', this._precompose);
+                    layer.on('postcompose', this._postcompose);
                     this.getMap().render();
                 }
             }
@@ -128,8 +130,8 @@ define([
         array.forEach(layers, function (layer, idx) {
             if (this.layers.indexOf(layer) !== -1) {
                 if (this.getMap()) {
-                    layer.un('precompose', this.precompose, this);
-                    layer.un('postcompose', this.postcompose, this);
+                    layer.un('precompose', this._precompose);
+                    layer.un('postcompose', this._postcompose);
                     this.layers.splice(idx, 1);
                     this.getMap().render();
                 }

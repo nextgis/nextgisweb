@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-06-13 01:32+0300\n"
+"POT-Creation-Date: 2019-06-28 01:48+0300\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,44 +19,40 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: api.py:117
+#: api.py:85
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:124
+#: api.py:92
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: model.py:147
+#: model.py:151
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:142 view.py:44 view.py:192
+#: amd/ngw-feature-layer/FieldsWidget.js:142 view.py:45 view.py:214
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:61 view.py:84
+#: view.py:62 view.py:85
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:189
+#: view.py:135 view.py:220
+msgid "Save as"
+msgstr "Сохранить как"
+
+#: view.py:211
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: view.py:198
-msgid "Download as GeoJSON"
-msgstr "Скачать GeoJSON"
-
-#: view.py:203
-msgid "Download as CSV"
-msgstr "Скачать CSV"
-
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:192
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:31
-#: amd/ngw-feature-layer/FieldsWidget.js:105 view.py:210
+#: amd/ngw-feature-layer/FieldsWidget.js:105 view.py:228
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -77,6 +73,7 @@ msgid "NULL"
 msgstr "NULL"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:258
+#: amd/ngw-feature-layer/template/ExportForm.hbs:39
 msgid "Save"
 msgstr "Сохранить"
 
@@ -116,6 +113,26 @@ msgstr "АН"
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
+#: amd/ngw-feature-layer/template/ExportForm.hbs:12
+msgid "Format"
+msgstr "Формат"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:16
+msgid "SRS"
+msgstr "Система координат"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:20
+msgid "Encoding"
+msgstr "Кодировка"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:27
+msgid "FID field"
+msgstr "Поле FID"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:31
+msgid "Zip archive"
+msgstr "Zip архив"
+
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:12
 msgid "Open"
 msgstr "Открыть"
@@ -143,4 +160,10 @@ msgstr "Да"
 #: template/section_fields.mako:15
 msgid "No"
 msgstr "Нет"
+
+#~ msgid "Download as GeoJSON"
+#~ msgstr "Скачать GeoJSON"
+
+#~ msgid "Download as CSV"
+#~ msgstr "Скачать CSV"
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 from os.path import join as pthjoin
 from datetime import datetime
@@ -24,7 +24,7 @@ class InitializeDBCmd():
     def argparser_setup(cls, parser, env):
         parser.add_argument(
             '--drop', action="store_true", default=False,
-            help=u"Удалить существующие объекты из БД")
+            help="Удалить существующие объекты из БД")
 
     @classmethod
     def execute(cls, args, env):
@@ -85,8 +85,8 @@ class BackupCommand(Command):
         if 'backup.path' in settings:
             default_target = pthjoin(
                 settings['backup.path'],
-                datetime.today().strftime(settings['backup.filename']) +
-                '.ngwbackup')
+                datetime.today().strftime(settings['backup.filename'])
+                + '.ngwbackup')  # NOQA: W503
         else:
             default_target = None
 
@@ -144,8 +144,8 @@ class RestoreCommand(Command):
     def argparser_setup(cls, parser, env):
         parser.add_argument(
             'source', type=str, metavar='path',
-            help=u"Исходный файл или директория с резервной копией для"
-            + u" восстановления")
+            help="Исходный файл или директория с резервной копией для"
+            + " восстановления")  # NOQA: W503
 
     @classmethod
     def execute(cls, args, env):

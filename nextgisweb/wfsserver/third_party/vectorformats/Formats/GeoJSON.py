@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from ...vectorformats.Feature import Feature
 from ...vectorformats.Formats.Format import Format
 

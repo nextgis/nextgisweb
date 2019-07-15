@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 import codecs
 import os.path
-import base64
-from datetime import timedelta
 
-from pyramid.response import Response, FileResponse
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPForbidden
+from pyramid.response import FileResponse
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from pkg_resources import resource_filename
 
 from .. import dynmenu as dm
+from ..core.exception import UserException
 
-from .util import _, ClientRoutePredicate
+from .util import _
 
 
 def home(request):
@@ -114,11 +113,21 @@ def home_path(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
-def notfound(request):
-    request.response.status = 404
-    return dict(
-        title=_("404: Page not found"),
-    )
+def test_exception_handled(request):
+    class HandledTestException(UserException):
+        title = "Title"
+        message = "Message"
+        detail = "Detail"
+        http_status_code = 418
+
+    raise HandledTestException()
+
+
+def test_exception_unhandled(request):
+    class UnhandledTestException(Exception):
+        pass
+
+    raise UnhandledTestException()
 
 
 def setup_pyramid(comp, config):
@@ -132,8 +141,6 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.help_page', '/help-page') \
         .add_view(help_page, renderer=ctpl('help_page'))
-
-    config.add_notfound_view(notfound, renderer=ctpl('404'))
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
 
@@ -174,6 +181,11 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
+    config.add_route('pyramid.test_exception_handled', '/test/exception/handled') \
+        .add_view(test_exception_handled)
+    config.add_route('pyramid.test_exception_unhandled', '/test/exception/unhandled') \
+        .add_view(test_exception_unhandled)
+
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
         dm.Link('info/pkginfo', _("Package versions"), lambda args: (
@@ -193,4 +205,3 @@ def setup_pyramid(comp, config):
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
     )
-

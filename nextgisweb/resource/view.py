@@ -3,16 +3,21 @@ from __future__ import unicode_literals
 import warnings
 
 from pyramid import httpexceptions
-
+from sqlalchemy import bindparam
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
-
+import sqlalchemy.ext.baked
 
 from ..views import permalinker
 from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
 from ..pyramid import viewargs
+from ..models import DBSession
 
-from .model import Resource, ResourceSerializer
+from ..core.exception import InsufficientPermissions
+
+from .exception import ResourceNotFound
+from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
 from .serialize import CompositeSerializer
@@ -29,6 +34,9 @@ PERM_CPERMISSIONS = ResourceScope.change_permissions
 PERM_MCHILDREN = ResourceScope.manage_children
 
 
+_rf_bakery = sqlalchemy.ext.baked.bakery()
+
+
 def resource_factory(request):
     # TODO: We'd like to use first key, but can't
     # as matchdiсt doesn't save keys order.
@@ -36,17 +44,29 @@ def resource_factory(request):
     if request.matchdict['id'] == '-':
         return None
 
+    bq_res_cls = _rf_bakery(
+        lambda session: session.query(
+            Resource.cls).filter_by(
+                id=bindparam('id')))
+
     # First, load base class resource
+    res_id = int(request.matchdict['id'])
+
     try:
-        base = Resource.filter_by(id=request.matchdict['id']).one()
+        res_cls, = bq_res_cls(DBSession()).params(id=res_id).one()
     except NoResultFound:
-        raise httpexceptions.HTTPNotFound()
+        raise ResourceNotFound(res_id)
 
     # Second, load resource of it's class
-    obj = Resource.query().with_polymorphic(
-        Resource.registry[base.cls]).filter_by(
-        id=request.matchdict['id']).one()
+    bq_obj = _rf_bakery(
+        lambda session: session.query(Resource).with_polymorphic(
+            Resource.registry[res_cls]
+        ).options(
+            joinedload(Resource.owner_user),
+            joinedload(Resource.parent),
+        ).filter_by(id=bindparam('id')), res_cls)
 
+    obj = bq_obj(DBSession()).params(id=res_id).one()
     return obj
 
 
@@ -166,7 +186,7 @@ def setup_pyramid(comp, config):
 
         if isinstance(resource, Permission):
             warnings.warn(
-                'Deprecated argument order for resource_permission. ' +
+                'Deprecated argument order for resource_permission. '
                 'Use request.resource_permission(permission, resource).',
                 stacklevel=2)
 
@@ -176,7 +196,13 @@ def setup_pyramid(comp, config):
             resource = request.context
 
         if not resource.has_permission(permission, request.user):
-            raise httpexceptions.HTTPForbidden()
+            raise InsufficientPermissions(
+                _("Insufficient '%s' permission in scope '%s' on resource id = %d.") % (
+                    permission.name, permission.scope.identity, resource.id
+                ), data=dict(
+                    resource=dict(id=resource.id),
+                    permission=permission.name,
+                    scope=permission.scope.identity))
 
     config.add_request_method(resource_permission, 'resource_permission')
 
@@ -198,21 +224,21 @@ def setup_pyramid(comp, config):
         lambda (r): httpexceptions.HTTPFound(
             r.route_url('resource.show', id=0)))
 
-    _resource_route('show', '{id:\d+}', client=('id', )).add_view(show)
+    _resource_route('show', r'{id:\d+}', client=('id', )).add_view(show)
 
-    _resource_route('json', '{id:\d+}/json', client=('id', )) \
+    _resource_route('json', r'{id:\d+}/json', client=('id', )) \
         .add_view(objjson)
 
-    _resource_route('tree', '{id:\d+}/tree', client=('id', )).add_view(tree)
+    _resource_route('tree', r'{id:\d+}/tree', client=('id', )).add_view(tree)
 
     _route('widget', 'widget', client=()).add_view(widget)
 
     # CRUD
-    _resource_route('create', '{id:\d+}/create', client=('id', )) \
+    _resource_route('create', r'{id:\d+}/create', client=('id', )) \
         .add_view(create)
-    _resource_route('update', '{id:\d+}/update', client=('id', )) \
+    _resource_route('update', r'{id:\d+}/update', client=('id', )) \
         .add_view(update)
-    _resource_route('delete', '{id:\d+}/delete', client=('id', )) \
+    _resource_route('delete', r'{id:\d+}/delete', client=('id', )) \
         .add_view(delete)
 
     permalinker(Resource, 'resource.show')
@@ -261,11 +287,13 @@ def setup_pyramid(comp, config):
                     continue
 
                 # Is current user has permission to create child resource?
-                # TODO: Fix SAWarning: Object of type ... not in session,
-                # add operation along 'Resource.children' will not proceed
                 child = cls(parent=args.obj, owner_user=args.request.user)
                 if not child.has_permission(PERM_CREATE, args.request.user):
                     continue
+
+                # Workaround SAWarning: Object of type ... not in session,
+                # add operation along 'Resource.children' will not proceed
+                child.parent = None
 
                 yield Link(
                     'create/%s' % ident,

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-12-07 11:52+0300\n"
+"POT-Creation-Date: 2019-07-13 23:31+0000\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,52 +17,84 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.6.0\n"
 
 #: __init__.py:105
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
-#: api.py:174
-#, python-format
-msgid ""
-"Unknown exception '%(exception)s' in serializer '%(serializer)s' "
-"attribute '%(attr)s'."
-msgstr ""
-"Неизвестная ошибка '%(exception)s' в сериализаторе '%(serializer)s', "
-"атрибут '%(attr)s'."
-
-#: api.py:176
-#, python-format
-msgid "Unknown exception '%(exception)s' in serializer '%(serializer)s'."
-msgstr "Неизвестная ошибка '%(exception)s' в сериализаторе '%(serializer)s'."
-
-#: api.py:178
-#, python-format
-msgid "Unknown exception '%(exception)s'."
-msgstr "msgstr \"Неизвестная ошибка '%(exception)s'."
-
-#: api.py:255
+#: api.py:66
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:302
+#: api.py:113
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:305
+#: api.py:116
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:308
+#: api.py:119
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:311
+#: api.py:122
 #, python-format
 msgid "Resource class '%s' disabled."
+msgstr "Класс ресурса '%s' отключен."
+
+#: exception.py:27
+msgid "Resource not found"
+msgstr "Ресурс не найден"
+
+#: exception.py:28
+#, python-format
+msgid "Resource with id = %d was not found."
+msgstr "Ресурс с id = %d не найден."
+
+#: exception.py:29
+msgid ""
+"The resource may have been deleted or an error in the URL. Correct the "
+"URL or go to the home page and try to find the desired resource."
 msgstr ""
+"Возможно ресурс был удален либо в URL содержит ошибку. Исправьте URL или "
+"перейдите на домашнюю страницу и попробуйте найти начиная с нее."
+
+#: exception.py:41
+msgid "Resource display name is not unique"
+msgstr "Наименование ресурса не уникально"
+
+#: exception.py:42
+#, python-format
+msgid "Resource with same display name already exists (id = %d)."
+msgstr "Ресурс с таким наименованием уже существует (id = %d)."
+
+#: exception.py:43
+msgid ""
+"Within a single parent resource, each resource must have unique display "
+"name. Give the resource a different display name or rename existing."
+msgstr ""
+"В рамках одного дочернего ресурса каждый ресурс должен иметь уникальное "
+"наименование. Присвойте ресурсу другое наименование или переименуйте "
+"существующий."
+
+#: exception.py:67
+msgid "Forbidden"
+msgstr "Доступ запрещен"
+
+#: amd/ngw-resource/CompositeWidget.js:265 exception.py:75
+msgid "Validation error"
+msgstr "Ошибка валидации"
+
+#: exception.py:80
+msgid "Hierarchy error"
+msgstr "Ошибка иерархии"
+
+#: exception.py:87
+msgid "Operational error"
+msgstr "Операционная ошибка"
 
 #: amd/ngw-resource/PermissionWidget.js:95
 #: amd/ngw-resource/PermissionWidget.js:184 amd/ngw-resource/Widget.js:33
@@ -78,31 +110,27 @@ msgstr "Ресурс не может быть родителем сам себе
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:283
+#: model.py:281
 #, python-format
-msgid "Resource can not be a child of resource ID=%d."
-msgstr "Ресурс не может быть дочерним ресурсом для ID=%d."
+msgid "You are not allowed to manage children of resource with id = %d."
+msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:389
+#: model.py:286
 #, python-format
-msgid ""
-"Resource display name is not unique. Resource with same name already "
-"exists (ID=%d)."
-msgstr ""
-"Наименование ресурса не уникально. Ресурс с таким же именем уже "
-"существует (ID=%d)."
+msgid "Resource can not be a child of resource id = %d."
+msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:407
+#: model.py:411
 #, python-format
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: model.py:422
+#: model.py:428
 #, python-format
 msgid "Maximum number of resources '%s' exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов '%s'. Лимит %s."
 
-#: model.py:477
+#: model.py:484
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -110,17 +138,17 @@ msgstr "Группа ресурсов"
 msgid "Read"
 msgstr "Чтение"
 
-#: amd/ngw-resource/CompositeWidget.js:80 scope.py:35
+#: amd/ngw-resource/CompositeWidget.js:78 scope.py:35
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:42 template/section_children.mako:40 view.py:277
+#: scope.py:42 template/section_children.mako:49 view.py:306
 msgid "Update"
 msgstr "Изменить"
 
-#: amd/ngw-resource/CompositeWidget.js:99
+#: amd/ngw-resource/CompositeWidget.js:97
 #: amd/ngw-resource/PermissionWidget.js:322 scope.py:46
-#: template/section_children.mako:41 view.py:282
+#: template/section_children.mako:52 view.py:312
 msgid "Delete"
 msgstr "Удалить"
 
@@ -164,87 +192,87 @@ msgstr "Сервис"
 msgid "Configure"
 msgstr "Конфигурация"
 
-#: serialize.py:98
+#: serialize.py:99
 #, python-format
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:63 view.py:294
+#: view.py:85 view.py:318
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:97 view.py:289
+#: view.py:120
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:102 view.py:270
+#: view.py:126 view.py:328
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:109
+#: view.py:134
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: amd/ngw-resource/DeleteWidget.js:22 view.py:115
+#: amd/ngw-resource/DeleteWidget.js:22 view.py:141
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:230
+#: view.py:200
+#, python-format
+msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
+msgstr ""
+
+#: view.py:256
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:237
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:263
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:244
+#: view.py:270
 msgid "User permissions"
 msgstr "Права пользователя"
 
 #: amd/ngw-resource/PermissionWidget.js:67
-#: amd/ngw-resource/PermissionWidget.js:134 view.py:274
+#: amd/ngw-resource/PermissionWidget.js:134 view.py:329
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:286
+#: view.py:330
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: amd/ngw-resource/CompositeWidget.js:56
+#: amd/ngw-resource/CompositeWidget.js:54
 msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
-#: amd/ngw-resource/CompositeWidget.js:85
+#: amd/ngw-resource/CompositeWidget.js:83
 msgid "Create and edit"
 msgstr "Создать и изменить"
 
-#: amd/ngw-resource/CompositeWidget.js:92
+#: amd/ngw-resource/CompositeWidget.js:90
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-resource/CompositeWidget.js:314
-msgid "Error message:"
-msgstr "Сообщение об ошибке:"
+#: amd/ngw-resource/CompositeWidget.js:257
+#: amd/ngw-resource/CompositeWidget.js:273
+msgid "Unexpected error"
+msgstr "Внезапная ошибка"
 
-#: amd/ngw-resource/CompositeWidget.js:317
-msgid "Errors found during data validation on server. Correct them and try again."
-msgstr ""
-"В ходе проверки данных на сервере обнаружены ошибки. Исправьте их и "
-"повторите попытку."
+#: amd/ngw-resource/CompositeWidget.js:258
+msgid "Serialization failed"
+msgstr "Сериализация не удалась"
 
-#: amd/ngw-resource/CompositeWidget.js:320
-msgid "Insufficient permissions to perform the operation. Forgot to log in?"
-msgstr "Недостаточно прав для выполнения операции. Забыли войти?"
-
-#: amd/ngw-resource/CompositeWidget.js:323
+#: amd/ngw-resource/CompositeWidget.js:266
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr ""
 "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены "
 "красным."
 
-#: amd/ngw-resource/CompositeWidget.js:326
-msgid "Unexpected error occurred during the operation."
-msgstr "В ходе выполнении операции произошла неожиданная ошибка."
+#: amd/ngw-resource/CompositeWidget.js:274
+msgid "Validation failed"
+msgstr "Валидация провалилась"
 
 #: amd/ngw-resource/PermissionWidget.js:58
 msgid "All resources"
@@ -321,7 +349,7 @@ msgstr "Выберите ресурс"
 msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
 
-#: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:52
+#: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:64
 #: template/section_summary.mako:6
 msgid "Display name"
 msgstr "Наименование"
@@ -334,27 +362,24 @@ msgstr "Ключ"
 msgid "Parent"
 msgstr "Родитель"
 
-#: amd/ngw-resource/template/Widget.hbs:22 template/section_children.mako:53
+#: amd/ngw-resource/template/Widget.hbs:22 template/section_children.mako:65
 #: template/section_summary.mako:36
 msgid "Type"
 msgstr "Тип"
 
-#: template/section_children.mako:35
+#: template/section_children.mako:43
 msgid "Display map"
 msgstr "Открыть карту"
 
-#: template/section_children.mako:38
+#: template/section_children.mako:46
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: template/section_children.mako:54 template/section_summary.mako:44
+#: template/section_children.mako:66 template/section_summary.mako:44
 msgid "Owner"
 msgstr "Владелец"
 
 #: template/section_description.mako:4
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
-
-#~ msgid "Insufficient permissions to perform the operation."
-#~ msgstr "Недостаточно прав для выполнения операции."
 
