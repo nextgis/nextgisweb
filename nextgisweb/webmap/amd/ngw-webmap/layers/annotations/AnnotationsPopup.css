@@ -15,6 +15,11 @@ body.annotations-edit .ol-popup.annotation:hover .edit-controls {
   padding: 6px 8px 8px;
   border-radius: 2px;
   box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+  border: none;
+}
+
+.ol-popup.annotation:before {
+  border: none;
 }
 
 .ol-popup.annotation .ol-popup-closer {

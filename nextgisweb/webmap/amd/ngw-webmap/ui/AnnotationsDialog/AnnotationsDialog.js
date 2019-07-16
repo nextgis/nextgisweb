@@ -31,7 +31,7 @@ define([
                 }],
                 height: '300',
                 plugins: ['cut', 'copy', 'paste', '|', 'bold', 'italic', 'underline', 'removeFormat', '|', 'createLink'],
-                style: "font-family: 'Arial, Helvetica, sans-serif"
+                style: 'font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 14px;'
             }).placeAt(this.containerNode);
             
             this.annotationsSettings = new AnnotationsSettings()
