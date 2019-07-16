@@ -2,7 +2,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 from .models import SRS
-from .util import convert_projstr_to_wkt
+from .util import convert_projstr_to_wkt, _
+from nextgisweb.core.exception import ValidationError
 
 
 def collection(request):
@@ -26,12 +27,11 @@ def get(request):
 def srs_convert(request):
     proj_str = request.POST.get("projStr")
     format = request.POST.get("format")
-    message = ""
-    wkt = convert_projstr_to_wkt(proj_str, format)
+    wkt = convert_projstr_to_wkt(proj_str, format, pretty=True)
+    if not wkt:
+        raise ValidationError(_("Invalid SRS definition!"))
 
-    message = "Invalid SRS definition!" if not wkt else ""
-
-    return dict(success=bool(wkt), wkt=wkt, message=message)
+    return dict(wkt=wkt)
 
 
 def setup_pyramid(comp, config):

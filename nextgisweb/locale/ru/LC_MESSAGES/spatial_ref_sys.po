@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.1\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2019-07-08 14:32+0000\n"
+"POT-Creation-Date: 2019-07-16 14:14+0000\n"
 "PO-Revision-Date: 2019-07-06 17:02+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,15 +19,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: views.py:38 views.py:115
+#: api.py:32
+msgid "Invalid SRS definition!"
+msgstr "Неверное определение SRS!"
+
+#: models.py:65
+msgid "Invalid OGC WKT definition!"
+msgstr "Неверное определение OGC WKT!"
+
+#: views.py:31 views.py:107
 msgid "Unable to delete standard coordinate system."
 msgstr "Невозможно удалить стандартную систему координат."
 
-#: views.py:64
+#: views.py:56
 msgid "Coordinate system name is not unique."
 msgstr "Название системы координат не уникально."
 
-#: views.py:71
+#: views.py:63
 msgid "Cannot change wkt definition of standard coordinate system."
 msgstr "Невозможно изменить определение wkt стандартной системы координат."
 
@@ -39,36 +47,36 @@ msgstr "Создать новую Систему координат"
 msgid "Spatial reference systems"
 msgstr "Системы координат"
 
-#: views.py:157
+#: views.py:147
 msgid "List"
 msgstr "Список"
 
-#: views.py:162
+#: views.py:152
 msgid "Create"
 msgstr "Создать"
 
-#: template/srs_browse.mako:35 views.py:168
+#: template/srs_browse.mako:35 views.py:158
 msgid "Edit"
 msgstr "Редактировать"
 
-#: template/srs_browse.mako:37 views.py:176
+#: template/srs_browse.mako:37 views.py:166
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:37
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:37
 #: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:24
 msgid "Import definition"
 msgstr "Импортировать определение"
 
-#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:52
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:52
 msgid "Format"
 msgstr "Формат"
 
-#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:66
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:66
 msgid "Definition"
 msgstr "Определение"
 
-#: amd/ngw-spatial-ref-sys/SRSStringDialog.js:80
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:84
 msgid "Cancel"
 msgstr "Отменить"
 
