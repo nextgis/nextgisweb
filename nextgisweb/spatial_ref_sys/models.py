@@ -2,7 +2,6 @@
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
-
 from osgeo import osr
 
 from .. import db
@@ -56,6 +55,7 @@ class SRS(Base):
 
     def delete(selef):
         raise Exception()
+
 
     @db.validates('wkt')
     def _validate_wkt(self, key, value):
