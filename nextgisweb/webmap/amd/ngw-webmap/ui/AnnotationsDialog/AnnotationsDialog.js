@@ -24,13 +24,14 @@ define([
             this.inherited(arguments);
             
             this.editor = new Editor({
-                plugins: ['cut', 'copy', 'paste', '|', 'bold', 'italic', 'underline', 'removeFormat', '|', 'createLink'],
                 extraPlugins: ['foreColor', 'hiliteColor', {
                     name: 'dijit/_editor/plugins/FontChoice',
                     command: 'fontSize',
                     generic: true
                 }],
-                height: '300'
+                height: '300',
+                plugins: ['cut', 'copy', 'paste', '|', 'bold', 'italic', 'underline', 'removeFormat', '|', 'createLink'],
+                style: "font-family: 'Arial, Helvetica, sans-serif"
             }).placeAt(this.containerNode);
             
             this.annotationsSettings = new AnnotationsSettings()

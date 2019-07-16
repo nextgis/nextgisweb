@@ -5,18 +5,19 @@
         {{gettext 'Stroke: width / color'}}
       </td>
       <td class="controls stroke">
-        <div data-dojo-type="dijit/form/NumberTextBox"
-             data-dojo-attach-point="widthStroke"
-             title="{{gettext 'Stroke width, px'}}"
-             data-dojo-props="constraints:{min:1,max:20,places:0},
+        <div data-dojo-attach-point="widthStroke"
+             data-dojo-props="constraints:{min:0,max:20,places:0},
                  invalidMessage:'{{gettext 'Please enter a numeric value'}}',
-                 rangeMessage:'{{gettext 'Invalid width: should be from 1 to 20 px'}}'"
+                 rangeMessage:'{{gettext 'Invalid width: should be from 0 to 20 px'}}'"
+             data-dojo-type="dijit/form/NumberTextBox"
+             title="{{gettext 'Stroke width, px'}}"
              value="1"></div>
         <input
-          type="color" value="#ff0000" title="{{gettext 'Stroke color'}}"
           class="color-selector"
           data-dojo-attach-point="colorStroke"
-        >
+          title="{{gettext 'Stroke color'}}"
+          type="color"
+          value="#cc9900"/>
       </td>
     </tr>
     <tr class="row">
@@ -25,10 +26,11 @@
       </td>
       <td class="controls fill">
         <input
-          type="color" value="#630808" title="{{gettext 'Fill color'}}"
           class="color-selector"
           data-dojo-attach-point="fillStroke"
-        >
+          title="{{gettext 'Fill color'}}"
+          type="color"
+          value="#ff9900"/>
       </td>
     </tr>
     <tr class="row">

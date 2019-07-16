@@ -5,8 +5,6 @@ define([
 ], function (
     declare, lang, array, topic, i18n, ol, Vector
 ) {
-    var wkt = new ol.format.WKT();
-    
     return declare(null, {
         _map: null,
         _editableLayer: null,
@@ -45,22 +43,14 @@ define([
                 topic.publish('webmap/annotations/layer/feature/created', e.feature);
             }));
             
-            // this._modify = new ol.interaction.Modify({
-            //     source: this._source
-            // });
-            
-            // this._bindModifyEvents();
-            
             this._snap = new ol.interaction.Snap({
                 source: this._source
             });
             
             this._map.olMap.addInteraction(this._draw);
-            // this._map.olMap.addInteraction(this._modify);
             this._map.olMap.addInteraction(this._snap);
             
             this._draw.setActive(true);
-            // this._modify.setActive(true);
             this._snap.setActive(true);
         },
         
@@ -81,11 +71,9 @@ define([
         
         _offInteractions: function () {
             this._map.olMap.removeInteraction(this._draw);
-            // this._map.olMap.removeInteraction(this._modify);
             this._map.olMap.removeInteraction(this._snap);
             
             this._draw = null;
-            // this._modify = null;
             this._snap = null;
         }
     });
