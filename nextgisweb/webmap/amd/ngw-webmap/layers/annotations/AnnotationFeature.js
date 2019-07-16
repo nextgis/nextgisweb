@@ -9,8 +9,8 @@ define([
         defaultStyle = {
             circle: {
                 radius: 5,
-                stroke: {color: '#FF0000', width: 1},
-                fill: {color: '#AC3434'}
+                stroke: {color: '#d27a00', width: 1},
+                fill: {color: '#FF9800'}
             }
         };
     
