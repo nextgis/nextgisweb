@@ -158,6 +158,12 @@ define([
                 }
             }
             
+            if (result.action === 'undo') {
+                if (annFeature.isNew()) {
+                    this._annotationsLayer.removeAnnFeature(annFeature);
+                }
+            }
+            
             if (result.action === 'delete') {
                 this.deleteAnnotation(annFeature, dialog);
             }
