@@ -12,7 +12,9 @@ body.annotations-edit .ol-popup.annotation:hover .edit-controls {
 
 .ol-popup.annotation {
   min-height: 30px;
-  padding: 3px;
+  padding: 6px 8px 8px;
+  border-radius: 2px;
+  box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
 }
 
 .ol-popup.annotation .ol-popup-closer {
@@ -21,23 +23,21 @@ body.annotations-edit .ol-popup.annotation:hover .edit-controls {
 
 .ol-popup.annotation .edit-controls {
   position: absolute;
-  top: -15px;
-  right: -15px;
-  box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
-  padding: 5px;
-  border-radius: 50%;
-  border: 1px solid #cccccc;
-  background-color: white;
+  top: -8px;
+  right: -8px;
+  box-shadow: 0 2px 3px rgba(2, 34, 60, 0.24);
+  padding: 3px;
+  border-radius: 2px;
+  background-color: #f1f1f1;
 }
 
 .ol-popup.annotation .edit-controls span {
   cursor: pointer;
   display: block;
-  color: #076dbf;
-  background-color: white;
-  font-size: 20px;
+  font-size: 16px;
+  color: #777;
 }
 
 .ol-popup.annotation .edit-controls span:hover {
-  color: #20c08e;
+  color: #076dbf;
 }
