@@ -1,5 +1,5 @@
-/* -- Variables -- */
 /* Import */
+/* -- Variables -- */
 @import "fontello.css";
 .nextgis.claro .padding-block,
 .padding-block {
@@ -294,6 +294,36 @@ h2:first-child,
   padding-bottom: 8px;
   white-space: normal;
 }
+a,
+.link {
+  color: #076dbf;
+  text-decoration: underline;
+  cursor: pointer;
+}
+a:hover,
+.link:hover {
+  color: #2196F3;
+  border-color: #2196F3;
+  border-color: rgba(33, 150, 243, 0.4);
+}
+.link--action {
+  font-family: "lato_local";
+  font-size: 16px;
+  text-decoration: none;
+}
+.link--muted {
+  color: #888;
+}
+.link--muted:hover {
+  color: #555555;
+}
+.link__icon {
+  vertical-align: middle;
+  transition: transform .3s;
+}
+.link--dropdown.active .link__icon {
+  transform: rotate(-180deg);
+}
 .progress-circular--indeterminate {
   -webkit-animation: progress-circular-rotate 1.4s linear infinite;
   animation: progress-circular-rotate 1.4s linear infinite;
@@ -576,18 +606,6 @@ body {
   color: #212121;
   background-color: #fafafa;
   min-width: 900px;
-}
-a,
-.link {
-  color: #076dbf;
-  text-decoration: underline;
-  cursor: pointer;
-}
-a:hover,
-.link:hover {
-  color: #2196F3;
-  border-color: #2196F3;
-  border-color: rgba(33, 150, 243, 0.4);
 }
 .list-unstyled {
   margin: 0;
@@ -1661,4 +1679,8 @@ textarea {
   background-image: none;
   background-color: #f1f1f1;
   padding: 4px;
+}
+.nextgis.claro .dijitDialogUnderlay {
+  background: #010910;
+  opacity: .75;
 }

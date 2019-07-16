@@ -1,41 +1,13 @@
-/* -- Variables -- */
-@screen-sm-min: 768px;
-@screen-md-min: 1024px;
-
-@min-width: 900px;
-@headerHeight: 42px;
-
-@text-color: #212121;
-@light-text: #aaa;
-@light-text-2: #888;
-@blue: #076dbf;
-@darkBlue: #036997;
-@lightBlue: #e5eef7;
-@lightBlue-2: #EEF4F7;
-@black: #000;
-@white: #fff;
-@bgColor: #fafafa;
-@light-border: #efefef;
-@light-border-2: #dedede;
-@yellow: #FFBA3F;
-@yellow-light: #fdf8c3;
-@green: #00C775;
-@red: #F44336;
-@link-hover: #2196F3;
-
-@base-font: "Roboto";
-@header-font:  "lato_local";
-
-@font-size-md: 16px;
-
 /* Import */
 
+@import "settings/_variables";
 @import "helpers/_mixin";
 @import "helpers/_utilities";
 @import "blocks/_typography";
 @import "blocks/_uploader";
 @import "blocks/_text-withIcon";
 @import "blocks/_list";
+@import "blocks/_links";
 @import "blocks/_loaders";
 @import "icons/_material-icons";
 @import "icons/_svg-symbols";
@@ -72,18 +44,6 @@ body {
     color: @text-color;
     background-color: @bgColor;
     min-width: @min-width;
-}
-
-a, .link{
-    color: @blue;
-    text-decoration: underline;
-    cursor: pointer;
-
-    &:hover{
-        color: @link-hover;
-        border-color: @link-hover;
-        border-color: fade(@link-hover, 40%);
-    }
 }
 
 .list-unstyled{
