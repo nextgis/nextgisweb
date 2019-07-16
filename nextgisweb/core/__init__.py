@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 import os.path
 import json
@@ -40,6 +41,9 @@ class CoreComponent(Component):
 
         setting_debug = self._settings.get('debug', 'false').lower()
         self.debug = setting_debug in ('true', 'yes', '1')
+
+        if 'support_url' not in self._settings:
+            self._settings['support_url'] = "http://nextgis.com/contact/"
 
         sa_url = make_engine_url(EngineURL(
             'postgresql+psycopg2',
@@ -189,24 +193,30 @@ class CoreComponent(Component):
         return result
 
     settings_info = (
-        dict(key='system.name', default=u"NextGIS Web", desc=u"GIS name"),
-        dict(key='system.full_name', default=u"NextGIS Web", desc=u"Full GIS nane"),
+        dict(key='system.name', default="NextGIS Web", desc="GIS name"),
+        dict(key='system.full_name', default="NextGIS Web", desc="Full GIS nane"),
 
-        dict(key='database.host', default='localhost', desc=u"DB server name"),
-        dict(key='database.name', default='nextgisweb', desc=u"DB name on the server"),
-        dict(key='database.user', default='nextgisweb', desc=u"DB user name"),
-        dict(key='database.password', desc=u"DB user password"),
+        dict(key='database.host', default='localhost', desc="DB server name"),
+        dict(key='database.name', default='nextgisweb', desc="DB name on the server"),
+        dict(key='database.user', default='nextgisweb', desc="DB user name"),
+        dict(key='database.password', desc="DB user password"),
 
-        dict(key='database.check_at_startup', desc=u"Check connection of startup"),
+        dict(key='database.check_at_startup', desc="Check connection of startup"),
 
-        dict(key='packages.ignore', desc=u"Ignore listed packages"),
-        dict(key='components.ignore', desc=u"Ignore listed components"),
+        dict(key='packages.ignore', desc="Ignore listed packages"),
+        dict(key='components.ignore', desc="Ignore listed components"),
 
-        dict(key='locale.default', desc=u"Default locale"),
-        dict(key='locale.available', desc=u"Available locale"),
-        dict(key='debug', desc=u"Additional debug tools"),
-        dict(key='sdir', desc=u"Data storage folder"),
+        dict(key='locale.default', desc="Default locale"),
+        dict(key='locale.available', desc="Available locale"),
+        dict(key='debug', desc="Additional debug tools"),
+        dict(key='sdir', desc="Data storage folder"),
 
-        dict(key='permissions.disable_check.rendering', desc=u"Turn off permission checking for rendering"),
-        dict(key='permissions.disable_check.identify', desc=u"Turn off permission checking for identification"),
+        dict(key='support_url', desc="Support URL"),
+
+        dict(
+            key='permissions.disable_check.rendering',
+            desc="Turn off permission checking for rendering"),
+        dict(
+            key='permissions.disable_check.identify',
+            desc="Turn off permission checking for identification"),
     )

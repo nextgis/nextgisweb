@@ -4,7 +4,11 @@ from ..component import Component
 from .models import SpatialLayerMixin
 from .interface import IBboxLayer
 
-__all__ = ['LayerComponent', 'SpatialLayerMixin']
+__all__ = [
+    'LayerComponent',
+    'SpatialLayerMixin',
+    'IBboxLayer',
+]
 
 
 class LayerComponent(Component):

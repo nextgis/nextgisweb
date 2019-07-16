@@ -8,7 +8,6 @@ from StringIO import StringIO
 from pkg_resources import resource_filename, get_distribution
 from collections import namedtuple
 
-from pyramid.config import Configurator
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
 
@@ -21,6 +20,7 @@ from sentry_sdk.integrations.pyramid import PyramidIntegration
 from ..package import pkginfo
 from ..component import Component
 
+from .config import Configurator
 from .renderer import json_renderer
 from .util import (
     viewargs,
@@ -28,56 +28,9 @@ from .util import (
     RequestMethodPredicate,
     JsonPredicate)
 from .auth import AuthenticationPolicy
+from . import exception
 
 __all__ = ['viewargs', ]
-
-
-class RouteHelper(object):
-
-    def __init__(self, name, config):
-        self.config = config
-        self.name = name
-
-    def add_view(self, view=None, **kwargs):
-        if 'route_name' not in kwargs:
-            kwargs['route_name'] = self.name
-
-        self.config.add_view(view=view, **kwargs)
-        return self
-
-
-class ExtendedConfigurator(Configurator):
-
-    def add_route(self, name, pattern=None, **kwargs):
-        """ Advanced route addition
-
-        Syntax sugar that allows to record frequently used
-        structure like:
-
-            config.add_route('foo', '/foo')
-            config.add_view(foo_get, route_name='foo', request_method='GET')
-            config.add_view(foo_post, route_name='foo', request_method='POST')
-
-
-        In a more compact way:
-
-            config.add_route('foo', '/foo') \
-                .add_view(foo_get, request_method='GET') \
-                .add_view(foo_post, request_method='POST')
-
-        """
-
-        super(ExtendedConfigurator, self).add_route(
-            name, pattern=pattern, **kwargs)
-
-        return RouteHelper(name, self)
-
-    def add_view(self, view=None, **kwargs):
-        vargs = getattr(view, '__viewargs__', None)
-        if vargs:
-            kwargs = dict(vargs, **kwargs)
-
-        super(ExtendedConfigurator, self).add_view(view=view, **kwargs)
 
 
 DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])
@@ -91,10 +44,12 @@ class PyramidComponent(Component):
 
         settings['mako.directories'] = 'nextgisweb:templates/'
 
+        is_debug = self.env.core.debug
+
         # If debug is on, add mako-filter that checks
         # if the line was translated before output.
 
-        if self.env.core.debug:
+        if is_debug:
             settings['mako.default_filters'] = ['tcheck', 'h']
             settings['mako.imports'] = settings.get('mako.imports', []) \
                 + ['from nextgisweb.i18n import tcheck', ]
@@ -113,7 +68,7 @@ class PyramidComponent(Component):
                 integrations=[PyramidIntegration()],
             )
 
-        config = ExtendedConfigurator(settings=settings)
+        config = Configurator(settings=settings)
 
         # Substitute localizer from pyramid with our own, original is
         # too tied to translationstring, that works strangely with string
@@ -136,9 +91,32 @@ class PyramidComponent(Component):
         config.add_view_predicate('method', RequestMethodPredicate)
         config.add_view_predicate('json', JsonPredicate)
 
+        config.add_request_method(
+            lambda request: request.path_info.lower().startswith('/api/'),
+            'is_api', property=True, reify=True)
+
+        self.error_handlers = list()
+
+        @self.error_handlers.append
+        def api_error_handler(request, err_info, exc, exc_info):
+            if request.is_api or request.is_xhr:
+                return exception.json_error_response(
+                    request, err_info, exc, exc_info, debug=is_debug)
+
+        def error_handler(request, err_info, exc, exc_info, **kwargs):
+            for handler in self.error_handlers:
+                result = handler(request, err_info, exc, exc_info)
+                if result is not None:
+                    return result
+
+        config.registry.settings['error.err_response'] = error_handler
+        config.registry.settings['error.exc_response'] = error_handler
+        config.include(exception)
+
         # Access to Env through request.env
-        config.add_request_method(lambda (req): self._env, 'env',
-                                  property=True)
+        config.add_request_method(
+            lambda (req): self._env, 'env',
+            property=True)
 
         config.include(pyramid_tm)
         config.include(pyramid_mako)
@@ -199,18 +177,18 @@ class PyramidComponent(Component):
 
         buf.seek(0)
 
-        for l in buf:
-            l = l.strip().lower()
+        for line in buf:
+            line = line.strip().lower()
 
             dinfo = None
-            mpkg = re.match(r'(.+)==(.+)', l)
+            mpkg = re.match(r'(.+)==(.+)', line)
             if mpkg:
                 dinfo = DistInfo(
                     name=mpkg.group(1),
                     version=mpkg.group(2),
                     commit=None)
 
-            mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', l)
+            mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', line)
             if mgit:
                 dinfo = DistInfo(
                     name=mgit.group(2),
@@ -220,7 +198,7 @@ class PyramidComponent(Component):
             if dinfo is not None:
                 self.distinfo.append(dinfo)
             else:
-                self.logger.warn("Could not parse pip freeze line: %s", l)
+                self.logger.warn("Could not parse pip freeze line: %s", line)
 
         config.add_static_view(
             '/static%s/asset' % static_key,
@@ -231,6 +209,11 @@ class PyramidComponent(Component):
 
         for comp in self._env.chain('setup_pyramid'):
             comp.setup_pyramid(config)
+
+        def html_error_handler(request, err_info, exc, exc_info):
+            return exception.html_error_response(request, err_info, exc, exc_info, debug=is_debug)
+
+        self.error_handlers.append(html_error_handler)
 
         def amd_base(request):
             amds = []
@@ -251,6 +234,8 @@ class PyramidComponent(Component):
 
     def client_settings(self, request):
         result = dict()
+
+        result['support_url'] = self.env.core.settings.get('support_url')
 
         try:
             result['units'] = self.env.core.settings_get('core', 'units')

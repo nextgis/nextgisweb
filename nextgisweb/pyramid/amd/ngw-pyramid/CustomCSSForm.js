@@ -9,6 +9,7 @@ define([
     "dojo/request/xhr",
     "dojo/json",
     "ngw/route",
+    "ngw-pyramid/ErrorDialog",
     "ngw-pyramid/i18n!pyramid",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/CustomCSSForm.hbs",
@@ -27,6 +28,7 @@ define([
     xhr,
     json,
     route,
+    ErrorDialog,
     i18n,
     hbsI18n,
     template
@@ -57,7 +59,9 @@ define([
             xhr.put(API_URL, {
                 headers: { "Content-Type": "text/css" },
                 data: self.widgetBody.get('value')
-            }).then(function () {}, function () { alert("Error!"); });
+            }).then(function () {}, function (err) {
+                new ErrorDialog({response: err}).show();
+            });
         }
     });
 });

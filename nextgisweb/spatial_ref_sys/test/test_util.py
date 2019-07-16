@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
-import pytest
-
 from nextgisweb.spatial_ref_sys.util import convert_projstr_to_wkt, update_MI_coord_sys_string
 from osgeo import osr
 
+
 def test_update_MI_coord_sys_string():
     errors = []
-    sr = osr.SpatialReference()
     tests = [
         {
             "standard": 'Earth Projection 8, 1001, "m", 37.98333333333, 0, 1, 1300000, -4511057.628, 0',
@@ -35,7 +33,7 @@ def test_update_MI_coord_sys_string():
             check = update_MI_coord_sys_string(v)
             if standard != check:
                 errors.append("%s != %s" % (standard, check))
-    
+
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
 
 
