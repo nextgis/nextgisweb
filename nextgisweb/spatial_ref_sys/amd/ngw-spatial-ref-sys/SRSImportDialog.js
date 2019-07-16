@@ -34,7 +34,7 @@ define([
         constructor: function (options) {
             declare.safeMixin(this, options);
 
-            this.title = i18n.gettext("Import SRS definition");
+            this.title = i18n.gettext("Import definition");
             this.style = "width: 600px";
         },
 

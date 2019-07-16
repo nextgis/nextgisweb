@@ -39,12 +39,12 @@ msgstr "Название системы координат не уникальн
 msgid "Cannot change wkt definition of standard coordinate system."
 msgstr "Невозможно изменить определение wkt стандартной системы координат."
 
-#: views.py:89
-msgid "Create new Spatial Reference System"
-msgstr "Создать новую Систему Координат"
+#: views.py:97
+msgid "Create new Spatial reference system"
+msgstr "Создать новую Систему координат"
 
-#: views.py:136 views.py:176
-msgid "Spatial Reference Systems"
+#: views.py:144 views.py:187
+msgid "Spatial reference systems"
 msgstr "Системы координат"
 
 #: views.py:147
@@ -65,8 +65,8 @@ msgstr "Удалить"
 
 #: amd/ngw-spatial-ref-sys/SRSImportDialog.js:37
 #: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:24
-msgid "Import SRS definition"
-msgstr "Импортировать определение SRS"
+msgid "Import definition"
+msgstr "Импортировать определение"
 
 #: amd/ngw-spatial-ref-sys/SRSImportDialog.js:52
 msgid "Format"
@@ -80,9 +80,9 @@ msgstr "Определение"
 msgid "Cancel"
 msgstr "Отменить"
 
-#: amd/ngw-spatial-ref-sys/SRSWidget.js:46
-msgid "Spatial Reference System"
-msgstr "Система Координат"
+#: amd/ngw-spatial-ref-sys/SRSWidget.js:48
+msgid "Spatial reference system"
+msgstr "Система координат"
 
 #: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:9
 msgid "Display name"
