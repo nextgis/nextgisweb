@@ -6,7 +6,7 @@ body.annotations-edit .ol-popup.annotation.no-edit .edit-controls {
   display: none;
 }
 
-body.annotations-edit .ol-popup.annotation .edit-controls {
+body.annotations-edit .ol-popup.annotation:hover .edit-controls {
   display: block;
 }
 
@@ -21,9 +21,13 @@ body.annotations-edit .ol-popup.annotation .edit-controls {
 
 .ol-popup.annotation .edit-controls {
   position: absolute;
-  top: 1px;
-  right: 1px;
+  top: -15px;
+  right: -15px;
   box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+  padding: 5px;
+  border-radius: 50%;
+  border: 1px solid #cccccc;
+  background-color: white;
 }
 
 .ol-popup.annotation .edit-controls span {
@@ -31,6 +35,7 @@ body.annotations-edit .ol-popup.annotation .edit-controls {
   display: block;
   color: #076dbf;
   background-color: white;
+  font-size: 20px;
 }
 
 .ol-popup.annotation .edit-controls span:hover {
