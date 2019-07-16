@@ -2,15 +2,15 @@ define([
     'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/array',
     'dojo/on', 'dojo/dom-construct', 'dojo/topic',
     'dijit/_TemplatedMixin', 'dijit/_WidgetsInTemplateMixin', 'dijit/layout/BorderContainer',
-    'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n', 'ngw-pyramid/dynamic-panel/DynamicPanel',
-    'ngw-webmap/ui/AnnotationsManager/AnnotationsManager', 'ngw-webmap/tool/annotations/AddAnnotation',
+    'dijit/form/CheckBox', 'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n', 'ngw-pyramid/dynamic-panel/DynamicPanel',
+    'ngw-webmap/ui/AnnotationsManager/AnnotationsManager',
     'ngw-webmap/MapStatesObserver', 'dojo/text!./AnnotationsPanel.hbs',
     // dependencies
     'xstyle/css!./AnnotationsPanel.css', 'dijit/form/ToggleButton', 'dojox/layout/TableContainer',
     'dijit/layout/ContentPane', 'ngw-webmap/controls/ToggleControl'
 ], function (
     declare, lang, array, on, domConstruct, topic, _TemplatedMixin, _WidgetsInTemplateMixin,
-    BorderContainer, i18n, hbsI18n, DynamicPanel, AnnotationsManager, AddAnnotationTool,
+    BorderContainer, CheckBox, i18n, hbsI18n, DynamicPanel, AnnotationsManager,
     MapStatesObserver, template
 ) {
     var ADD_ANNOTATION_STATE_KEY = 'addAnnotation';
@@ -19,11 +19,11 @@ define([
         _display: null,
         _mapStates: null,
         _enableEdit: false,
+        _chbAddAnnotations: null,
         
         constructor: function (options) {
             declare.safeMixin(this, options);
             this._display = options.display;
-            
             
             this.contentWidget = new (declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
                 templateString: hbsI18n(template, i18n),
@@ -35,6 +35,8 @@ define([
         postCreate: function () {
             this.inherited(arguments);
             
+            this._mapStates = MapStatesObserver.getInstance();
+            
             this._setDefaultValues();
             setTimeout(lang.hitch(this, this._bindEvents), 500);
             this._buildAnnotationTool();
@@ -43,7 +45,6 @@ define([
                 display: this.display,
                 panel: this
             });
-            this._mapStates = MapStatesObserver.getInstance();
         },
         
         _setDefaultValues: function () {
@@ -73,21 +74,31 @@ define([
             this.contentWidget.chbAnnotationsShowMessages.on('change', function (value) {
                 topic.publish('/annotations/messages/visible', value);
             });
+            
+            if (this._chbAddAnnotations && this._enableEdit) {
+                this._chbAddAnnotations.on('change', lang.hitch(this, function (value) {
+                    if (value) {
+                        this._mapStates.activateState(ADD_ANNOTATION_STATE_KEY);
+                        topic.publish('webmap/annotations/add/activate');
+                    } else {
+                        this._mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
+                        topic.publish('webmap/annotations/add/deactivate');
+                    }
+                }));
+            }
         },
         
         _buildAnnotationTool: function () {
             if (!this._display.config.annotations.scope.write) return false;
             
-            var setPlace = lang.hitch(this, function (tglButtonTool) {
-                this.contentWidget.tcAnnotations.addChild(tglButtonTool);
+            this._chbAddAnnotations = new CheckBox({
+                name: 'chbAddAnnotations',
+                title: i18n.gettext('Edit annotations'),
+                checked: false
             });
+            this.contentWidget.tcAnnotations.addChild(this._chbAddAnnotations);
             
-            this._display.mapToolbar.items.addTool(
-                new AddAnnotationTool({}),
-                ADD_ANNOTATION_STATE_KEY,
-                setPlace
-            );
-            
+            this._mapStates.addState(ADD_ANNOTATION_STATE_KEY);
             this._enableEdit = true;
         }
     });
