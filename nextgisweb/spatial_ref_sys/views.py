@@ -173,6 +173,6 @@ def setup_pyramid(comp, config):
     SRS.__dynmenu__ = comp.env.pyramid.control_panel
 
     comp.env.pyramid.control_panel.add(
-        dm.Label('srs-list', _("Spatial Reference Systems")),
-        SRSMenu('srs-list'),
+        dm.Label('spatial_ref_sys', _("Spatial reference systems")),
+        SRSMenu('spatial_ref_sys'),
     )
