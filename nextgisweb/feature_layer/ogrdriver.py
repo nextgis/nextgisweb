@@ -13,6 +13,7 @@ OGRDriver = collections.namedtuple(
         "options",
         "mime",
         "single_file",
+        "fid_support",
     ],
 )
 
@@ -20,6 +21,7 @@ EXPORT_FORMAT_OGR["GEOJSON"] = OGRDriver(
     "GeoJSON",
     "geojson",
     single_file=True,
+    fid_support=True,
     options=None,
     mime="application/json",
 )
@@ -28,12 +30,13 @@ EXPORT_FORMAT_OGR["CSV"] = OGRDriver(
     "CSV",
     "csv",
     options=(
-        "-lco GEOMETRY=AS_WKT",
-        "-lco CREATE_CSVT=YES",
-        "-lco GEOMETRY_NAME=GEOM",
-        "-lco WRITE_BOM=YES",
+        "GEOMETRY=AS_WKT",
+        "CREATE_CSVT=YES",
+        "GEOMETRY_NAME=GEOM",
+        "WRITE_BOM=YES",
     ),
     single_file=True,
+    fid_support=False,
     mime="text/csv",
 )
 
@@ -41,6 +44,7 @@ EXPORT_FORMAT_OGR["DXF"] = OGRDriver(
     "DXF",
     "dxf",
     single_file=True,
+    fid_support=False,
     options=None,
     mime="application/dxf",
 )
@@ -49,6 +53,7 @@ EXPORT_FORMAT_OGR["TAB"] = OGRDriver(
     "MapInfo File",
     "tab",
     single_file=False,
+    fid_support=False,
     options=None,
     mime=None,
 )
@@ -57,12 +62,16 @@ EXPORT_FORMAT_OGR["SHP"] = OGRDriver(
     "ESRI Shapefile",
     "shp",
     single_file=False,
-    options=(
-        "-lco ENCODING=UTF-8",
-    ),
+    fid_support=False,
+    options=None,
     mime=None,
 )
 
-OGR_DRIVER_NAME_2_EXPORT_FORMAT = {
-    v.name: k for k, v in EXPORT_FORMAT_OGR.iteritems()
-}
+OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
+    {
+        "name": format.name,
+        "extension": format.extension,
+        "single_file": format.single_file,
+    }
+    for _, format in EXPORT_FORMAT_OGR.iteritems()
+]

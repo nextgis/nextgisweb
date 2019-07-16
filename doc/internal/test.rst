@@ -10,15 +10,16 @@ Each NextGIS Web component have own set of tests located inside ``test`` directo
 
 ::
 
-    .                           # Repository root directory
-    ├── package                 # Package source root
-    │   ├── component           # Component root directory
-    │   │   ├── test            # Test root directory
-    │   │   │   ├── data        # Test data directory
-    │   │   │   └── test_*.py   # Test module files
-    │   │   └── __init__.py     # And other component files
-    │   └── __init__.py         # Package files and other components
-    └── setup.py                # Setuptools configuration file
+    .                               # Repository root directory
+    ├── package                     # Package source root
+    │   ├── component               # Component root directory
+    │   │   ├── test                # Test root directory
+    │   │   │   ├── data            # Test data directory
+    │   │   │   ├── __init__.py     # Dummy __init__ module
+    │   │   │   └── test_*.py       # Test module files
+    │   │   └── __init__.py         # And other component files
+    │   └── __init__.py             # Package files and other components
+    └── setup.py                    # Setuptools configuration file
 
 Unit tests
 ----------
@@ -81,6 +82,15 @@ For testing via HTTP requests fixture ``webapp`` can be used. It's represents `W
 
 Writing tests
 -------------
+
+Naming conventions
+^^^^^^^^^^^^^^^^^^
+
+Follow pytest default naming conventions - test modules and function should be prefixed with ``test_``.
+
+.. note::
+
+    Do not forget to add an dummy ``__init__.py`` file to test directory. Otherwise pytest will not be able to handle names of the modules.
 
 Relative imports
 ^^^^^^^^^^^^^^^^

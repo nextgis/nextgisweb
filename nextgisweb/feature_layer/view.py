@@ -19,7 +19,7 @@ from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
-from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMAT
+from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 from .util import _
 
 
@@ -125,6 +125,16 @@ def store_item(layer, request):
         content_type='application/json')
 
 
+@viewargs(renderer='nextgisweb:feature_layer/template/test_mvt.mako')
+def test_mvt(request):
+    return dict()
+
+
+@viewargs(renderer='nextgisweb:feature_layer/template/export.mako')
+def export(request):
+    return dict(obj=request.context, subtitle=_("Save as"), maxheight=True)
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         'feature_layer.feature.browse',
@@ -160,6 +170,16 @@ def setup_pyramid(comp, config):
         client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer)
 
+    config.add_route(
+        'feature_layer.export.page', '/resource/{id:\d+}/export',
+        factory=resource_factory,
+    ).add_view(export, context=IFeatureLayer)
+
+    config.add_route(
+        'feature_layer.test_mvt',
+        '/feature_layer/test_mvt'
+    ).add_view(test_mvt)
+
     def client_settings(self, request):
         editor_widget = OrderedDict()
         for k, ecls in FeatureExtension.registry._dict.iteritems():
@@ -178,7 +198,7 @@ def setup_pyramid(comp, config):
             search=dict(
                 nominatim=self.settings['search.nominatim']
             ),
-            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMAT,
+            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
         )
 
     comp.client_settings = MethodType(client_settings, comp, comp.__class__)
@@ -197,16 +217,10 @@ def setup_pyramid(comp, config):
                         id=args.obj.id))
 
                 yield dm.Link(
-                    'feature_layer/export-geojson', _(u"Download as GeoJSON"),
+                    'feature_layer/export', _(u"Save as"),
                     lambda args: args.request.route_url(
-                        "feature_layer.export", id=args.obj.id,
-                        _query={"format": "geojson", "zipped": "false"}))
-
-                yield dm.Link(
-                    'feature_layer/export-csv', _(u"Download as CSV"),
-                    lambda args: args.request.route_url(
-                        "feature_layer.export", id=args.obj.id,
-                        _query={"format": "csv", "zipped": "false"}))
+                        "feature_layer.export.page",
+                        id=args.obj.id))
 
     Resource.__dynmenu__.add(LayerMenuExt())
 

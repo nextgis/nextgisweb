@@ -22,7 +22,7 @@ define([
     "dijit/form/ComboBox",
     "dijit/layout/BorderContainer",
     "dojox/layout/TableContainer",
-    "ngw-spatial-ref-sys/SpatialRefSysSelect",
+    "ngw-spatial-ref-sys/SRSSelect",
     "ngw-resource/ResourceBox",
     "ngw-resource/ResourcePicker"
 ], function (

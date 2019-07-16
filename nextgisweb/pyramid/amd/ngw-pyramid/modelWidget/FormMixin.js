@@ -97,6 +97,7 @@ define([
                         // getting value can be asynchronous
                         when(widget.get("value"),
                             function (value) {
+                                if (value === undefined) { value = null };
                                 // IE checking
                                 if (document.documentMode) {
                                     // #612 IE will raise 'Syntax error' if url empty

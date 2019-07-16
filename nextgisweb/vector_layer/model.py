@@ -9,6 +9,7 @@ import tempfile
 import shutil
 import ctypes
 
+from backports.functools_lru_cache import lru_cache
 from datetime import datetime, time, date
 from zope.interface import implements
 from osgeo import ogr, osr
@@ -59,7 +60,9 @@ from ..feature_layer import (
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
     IFeatureQueryIntersects,
-    IFeatureQueryOrderBy)
+    IFeatureQueryOrderBy,
+    IFeatureQueryClipByBox,
+    IFeatureQuerySimplify)
 
 from .util import _
 
@@ -769,6 +772,15 @@ class VectorLayerSerializer(Serializer):
     fields = _fields_attr(read=None, write=P_DS_WRITE)
 
 
+@lru_cache()
+def _clipbybox2d_exists():
+    return (
+        DBSession.connection()
+        .execute("SELECT 1 FROM pg_proc WHERE proname='st_clipbybox2d'")
+        .fetchone()
+    )
+
+
 class FeatureQueryBase(object):
     implements(
         IFeatureQuery,
@@ -776,11 +788,15 @@ class FeatureQueryBase(object):
         IFeatureQueryFilterBy,
         IFeatureQueryLike,
         IFeatureQueryIntersects,
-        IFeatureQueryOrderBy)
+        IFeatureQueryOrderBy,
+        IFeatureQueryClipByBox,
+        IFeatureQuerySimplify)
 
     def __init__(self):
         self._srs = None
         self._geom = None
+        self._clip_by_box = None
+        self._simplify = None
         self._single_part_geom = None
         self._box = None
 
@@ -804,6 +820,12 @@ class FeatureQueryBase(object):
     def geom(self, single_part=False):
         self._geom = True
         self._single_part = single_part
+
+    def clip_by_box(self, box):
+        self._clip_by_box = box
+
+    def simplify(self, tolerance):
+        self._simplify = tolerance
 
     def geom_length(self):
         self._geom_len = True
@@ -851,6 +873,23 @@ class FeatureQueryBase(object):
 
         geomcol = table.columns.geom
         geomexpr = db.func.st_transform(geomcol, srsid)
+
+        if self._clip_by_box is not None:
+            if _clipbybox2d_exists():
+                clip = db.func.st_setsrid(
+                    db.func.st_makeenvelope(*self._clip_by_box.bounds),
+                    self._clip_by_box.srid)
+                geomexpr = db.func.st_clipbybox2d(geomexpr, clip)
+            else:
+                clip = db.func.st_setsrid(
+                    db.func.st_geomfromtext(self._clip_by_box.wkt),
+                    self._clip_by_box.srid)
+                geomexpr = db.func.st_intersection(geomexpr, clip)
+
+        if self._simplify is not None:
+            geomexpr = db.func.st_simplifypreservetopology(
+                geomexpr, self._simplify
+            )
 
         if self._geom:
             if self._single_part:

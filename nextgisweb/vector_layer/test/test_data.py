@@ -4,7 +4,6 @@ import os.path
 from uuid import uuid4
 
 import pytest
-from sqlalchemy.exc import IntegrityError
 from osgeo import ogr
 
 from nextgisweb.models import DBSession

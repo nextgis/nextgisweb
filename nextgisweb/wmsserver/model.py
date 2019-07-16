@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from .. import db
-from ..models import declarative_base, DBSession
+from ..models import declarative_base
 from ..resource import (
     Resource,
     ServiceScope,

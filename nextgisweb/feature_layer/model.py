@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 
-from osgeo import gdal, ogr, osr
+from osgeo import ogr, osr
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
@@ -98,13 +98,10 @@ class LayerFieldsMixin(object):
             post_update=True
         )
 
-    def ogr_layer(self):
-        ds = gdal.GetDriverByName("Memory").Create(
-            r"", 0, 0, 0, gdal.GDT_Unknown
-        )
+    def to_ogr(self, ogr_ds, name=r'', fid=None):
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(self.srs.id)
-        ogr_layer = ds.CreateLayer(r"", srs=srs)
+        ogr_layer = ogr_ds.CreateLayer(name, srs=srs)
         for field in self.fields:
             ogr_layer.CreateField(
                 ogr.FieldDefn(
@@ -112,7 +109,14 @@ class LayerFieldsMixin(object):
                     _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
                 )
             )
-        return ds, ogr_layer
+        if fid is not None:
+            ogr_layer.CreateField(
+                ogr.FieldDefn(
+                    fid.encode('utf8'),
+                    ogr.OFTInteger
+                )
+            )
+        return ogr_layer
 
 
 class _fields_attr(SP):

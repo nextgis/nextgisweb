@@ -1,0 +1,30 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" class="content-box">
+
+    <div data-dojo-type="dojox/layout/TableContainer"
+        data-dojo-props="cols:2, labelWidth: 150">
+
+        <input data-dojo-attach-point="displayName"
+            data-dojo-type="ngw-pyramid/form/DisplayNameTextBox"
+            data-dojo-props="colspan: 2"
+            title="{{gettext 'Display name'}}"
+            style="width: 100%">
+        </input>
+
+        <textarea data-dojo-attach-point="wkt"
+            data-dojo-type="dijit/form/SimpleTextarea"
+            data-dojo-props="rows: 4, colspan: 2, required: true"
+            title="{{gettext 'OGC WKT definition'}}"
+            style="width: 100%; box-sizing: border-box"></textarea>
+
+
+        <div data-dojo-type="dijit/layout/ContentPane" style="padding: 0;"> 
+            <button data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnImportSRSString"
+                style="margin:0;"
+                data-dojo-props="iconClass: 'dijitIconNewTask', showLabel: true" title="">    
+                {{gettext 'Import SRS definition'}}   
+            </button>
+        </div>
+
+    </div>
+
+</div>

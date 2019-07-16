@@ -7,6 +7,9 @@ from osgeo import osr
 
 from .. import db
 from ..models import declarative_base
+from ..core.exception import ValidationError
+
+from .util import _
 
 Base = declarative_base()
 
@@ -51,11 +54,16 @@ class SRS(Base):
             name='srs_id_auth_check'),
     )
 
+    def delete(selef):
+        raise Exception()
+
     @db.validates('wkt')
     def _validate_wkt(self, key, value):
         sr = osr.SpatialReference()
         if sr.ImportFromWkt(value) != 0:
-            raise ValueError('Invalid SRS WKT definition!')
+            raise ValidationError(
+                message=_("Invalid OGC WKT definition!"))
+
         self.proj4 = sr.ExportToProj4()
         return value
 
@@ -68,6 +76,13 @@ class SRS(Base):
             self.minx + (x + 1) * step,
             self.maxy - y * step,
         )
+
+    def __unicode__(self):
+        return  self.display_name
+
+    @property
+    def disabled(self):
+        return bool(self.auth_srid or self.auth_name)
 
 
 db.event.listen(SRS.__table__, 'after_create', db.DDL("""

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
-import inspect
+from __future__ import division, unicode_literals, print_function, absolute_import
 
 
 class ValidationError(Exception):

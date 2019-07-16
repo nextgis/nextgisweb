@@ -170,9 +170,12 @@ def setup_pyramid(comp, config):
 
     class DisplayMenu(DynItem):
         def build(self, args):
-            if isinstance(args.obj, WebMap):
-                yield Label('webmap', _("Web map"))
+            yield Label('webmap', _("Web map"))
 
+            if (
+                isinstance(args.obj, WebMap)
+                and args.obj.has_permission(WebMapScope.display, args.request.user)
+            ):
                 yield Link(
                     'webmap/display', _("Display"),
                     self._url())

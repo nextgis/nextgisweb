@@ -4,9 +4,14 @@ import pkg_resources
 
 
 def amd_packages():
+    if hasattr(amd_packages, 'cached_result'):
+        return list(amd_packages.cached_result)
+
     result = []
     for ep in pkg_resources.iter_entry_points(group='nextgisweb.amd_packages'):
         result.extend(ep.load()())
+
+    amd_packages.cached_result = tuple(result)
     return result
 
 
