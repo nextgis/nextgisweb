@@ -62,17 +62,21 @@ define([
         },
         
         _bindEvents: function () {
+            var deactivateAnnotationState = lang.hitch(this, function (value) {
+                if (!value && this._enableEdit && this._mapStates.getActiveState() === ADD_ANNOTATION_STATE_KEY) {
+                    if (this._chbAddAnnotations.get('checked')) this._chbAddAnnotations.set('checked', false);
+                }
+            });
+            
             this.contentWidget.chbAnnotationsShow.on('change', lang.hitch(this, function (value) {
                 topic.publish('/annotations/visible', value);
                 this.contentWidget.chbAnnotationsShowMessages.set('disabled', !value);
-                
-                if (!value && this._enableEdit && this._mapStates.getActiveState() === ADD_ANNOTATION_STATE_KEY) {
-                    this._mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
-                }
+                deactivateAnnotationState(value);
             }));
             
             this.contentWidget.chbAnnotationsShowMessages.on('change', function (value) {
                 topic.publish('/annotations/messages/visible', value);
+                deactivateAnnotationState(value);
             });
             
             if (this._chbAddAnnotations && this._enableEdit) {
