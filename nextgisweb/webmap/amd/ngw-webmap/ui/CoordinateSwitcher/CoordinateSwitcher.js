@@ -1,17 +1,12 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
-    "dojo/dom-construct",
-    "ngw-pyramid/i18n!webmap",
-    "ngw-pyramid/hbs-i18n",
-    "dojo/on",
     "dojo/dom-class",
     "put-selector/put",
     "dijit/form/Select",
     "openlayers/ol",
     "openlayers/proj4",
     "ngw-pyramid/utils/coordinateConverter",
-    "ngw/route",
     "ngw/load-json!api/component/spatial_ref_sys/",
     "ngw/settings!pyramid",
     //templates
@@ -19,25 +14,19 @@ define([
 ], function (
     declare,
     array,
-    domConstruct,
-    i18n,
-    hbsI18n,
-    on,
     domClass,
     put,
     Select,
     ol,
     proj4,
     CoordinateConverter,
-    route,
     customCoordinateSystems,
     settingsPyramid
 ) {
     var degreeFormat = settingsPyramid.degree_format;
     if (customCoordinateSystems) {
         array.forEach(customCoordinateSystems, function (c) {
-            c.projCode = (c.auth_name ? c.auth_name + ":" : "") + c.auth_srid;
-            proj4.defs(c.projCode, c.wkt);
+            c.projCode = (c.auth_name ? c.auth_name + ":" : "") + c.id;
         });
     }
 
@@ -78,7 +67,7 @@ define([
             that.options = [];
             array.forEach(customCoordinateSystems, function (c) {
                 var code = c.projCode;
-                var pr = proj4(c.projCode);
+                var pr = proj4(c.wkt);
                 var coord = that.coordinates[code];
                 var x = coord[1];
                 var y = coord[0];
