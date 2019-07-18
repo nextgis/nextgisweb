@@ -24,11 +24,6 @@ define([
     settingsPyramid
 ) {
     var degreeFormat = settingsPyramid.degree_format;
-    if (customCoordinateSystems) {
-        array.forEach(customCoordinateSystems, function (c) {
-            c.projCode = (c.auth_name ? c.auth_name + ":" : "") + c.id;
-        });
-    }
 
     return declare([Select], {
         point: undefined,
@@ -59,14 +54,14 @@ define([
             var that = this;
             array.forEach(customCoordinateSystems, function(c) {
                 var custom = proj4(that.projections.initial, c.wkt, that.point);
-                that.coordinates[c.projCode] = [custom[0], custom[1]];
+                that.coordinates[c.id] = [custom[0], custom[1]];
             })
         },
         _setOptions: function() {
             var that = this;
             that.options = [];
             array.forEach(customCoordinateSystems, function (c) {
-                var code = c.projCode;
+                var code = c.id;
                 var pr = proj4(c.wkt);
                 var coord = that.coordinates[code];
                 var x = coord[1];
@@ -79,7 +74,7 @@ define([
                         label: el.innerHTML,
                         value: opt.value,
                         format: opt.format,
-                        selected: c.projCode === that.selectedFormat
+                        selected: c.id === that.selectedFormat
                     });
                 }
                 if (pr.oProj.units == 'degree') {
