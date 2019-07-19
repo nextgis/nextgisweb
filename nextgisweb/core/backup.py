@@ -1,227 +1,242 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 import os
-import sys
 import re
-from os.path import join as ptjoin
-from tempfile import NamedTemporaryFile
-from zipfile import ZipFile
-from shutil import copyfileobj
+import logging
+from contextlib import contextmanager
+from collections import namedtuple, OrderedDict
+from subprocess import check_call, check_output
+import io
+import json
+from backports.functools_lru_cache import lru_cache
 
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-try:
-    from pip._internal import main as pip_main
-except ImportError:
-    from pip import main as pip_main
 
 from ..registry import registry_maker
+from ..models import DBSession
 
-Base = declarative_base()
+
+logger = logging.getLogger(__name__)
 
 
-class BackupObject(Base):
-    __tablename__ = 'object'
+IR_FIELDS = ('id', 'identity', 'data')
+IndexRecord = namedtuple('IndexRecord', IR_FIELDS)
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    comp = sa.Column(sa.Text, nullable=False)
-    identity = sa.Column(sa.Text, nullable=False)
-    objkey = sa.Column(sa.Text)
-    value = sa.Column(sa.Text)
-    is_binary = sa.Column(sa.Boolean, nullable=False, default=False)
-    binfn = sa.Column(sa.Text)
+
+class IndexFile(object):
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    @contextmanager
+    def writer(self):
+        def write(record):
+            if write.fp is None:
+                write.fp = io.open(
+                    self.filename, 'w',
+                    newline='\n', encoding='utf-8')
+
+            fp = write.fp
+            fp.write(json.dumps(
+                OrderedDict(zip(IR_FIELDS, record)),
+                ensure_ascii=False))
+            fp.write('\n')
+
+        write.fp = None
+
+        yield write
+
+        if write.fp is not None:
+            write.fp.close()
+
+    @contextmanager
+    def reader(self):
+        with io.open(self.filename, 'r', newline='\n', encoding='utf-8') as fp:
+            def read():
+                for line in fp:
+                    data = json.loads(line)
+                    yield IndexRecord(**data)
+            yield read()
 
 
 class BackupBase(object):
     registry = registry_maker()
 
-    def __init__(self, comp, key, value=None, binfd=None):
-        self.comp = comp
-        self.key = key
-        self.value = value
-        self.binfd = binfd
+    def __init__(self, data):
+        self.data = data
+        self.component = None
 
-    def is_binary(self):
+    def bind(self, component):
+        self.component = component
+
+    @property
+    def blob(self):
         return False
 
-    def backup(self):
-        raise NotImplementedError("Backup for '%s' not implemented!" % self.identity)
+    def backup(self, dst):
+        raise NotImplementedError()
 
-    def restore(self):
-        raise NotImplementedError("Restore for '%s' not implemented!" % self.identity)
-
-
-@BackupBase.registry.register
-class TableBackup(BackupBase):
-    identity = 'table'
-
-    def is_binary(self):
-        return True
-
-    def backup(self):
-        conn = self.comp.env.core.DBSession.connection()
-        cursor = conn.connection.cursor()
-
-        cursor.copy_expert(
-            "COPY %s TO STDOUT WITH CSV HEADER" % self.key,
-            self.binfd
-        )
-
-    def restore(self):
-        conn = self.comp.env.core.DBSession.connection()
-        cursor = conn.connection.cursor()
-
-        cursor.copy_expert(
-            "COPY %s FROM STDIN WITH CSV HEADER" % self.key,
-            self.binfd
-        )
+    def restore(self, src):
+        raise NotImplementedError()
 
 
-@BackupBase.registry.register
-class SequenceBackup(BackupBase):
-    identity = 'sequence'
-
-    def backup(self):
-        conn = self.comp.env.core.DBSession.connection()
-        res = conn.execute("SELECT last_value FROM %s" % self.key)
-        self.value = res.fetchone()[0]
-
-    def restore(self):
-        conn = self.comp.env.core.DBSession.connection()
-        conn.execute("ALTER SEQUENCE %s RESTART WITH %s" % (
-            self.key, int(self.value) + 1))
+def pg_connection_options(env):
+    return [
+        '--host', env.core.settings['database.host'],
+        '--username', env.core.settings['database.user'],
+        '--dbname', env.core.settings['database.name'],
+    ], env.core.settings['database.password']
 
 
-def backup(env, dst, nozip=False):
-    if os.path.exists(dst):
-        raise RuntimeError("Destination path already exists!")
+def backup(env, dst):
+    # TRANSACTION AND CONNECTION
 
-    if nozip:
-        os.mkdir(dst)
-    else:
-        zipf = ZipFile(dst, 'w', allowZip64=True)
+    con = DBSession.connection()
+    con.execute(
+        "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE "
+        "   READ ONLY DEFERRABLE")
 
-    def openfile(fn):
-        if nozip:
-            return open(ptjoin(dst, fn), 'wb')
+    snapshot, = con.execute("SELECT pg_export_snapshot()").fetchone()
+    logger.debug("Using postgres snapshot: %s", snapshot)
+
+    # POSTGES DUMP
+    logger.info("Dumping PostgreSQL database...")
+
+    pg_dir = os.path.join(dst, 'postgres')
+    os.mkdir(pg_dir)
+
+    pg_copt, pg_pass = pg_connection_options(env)
+    check_call([
+        '/usr/bin/pg_dump',
+        '--format', 'directory',
+        '--compress', '0',
+        '--snapshot', snapshot,
+        '--file', pg_dir,
+    ] + pg_copt, env=dict(PGPASSWORD=pg_pass))
+
+    pg_listing = check_output([
+        '/usr/bin/pg_restore',
+        '--list', pg_dir
+    ])
+
+    @lru_cache(maxsize=None)
+    def get_cls_relname(oid):
+        relname, = con.execute(
+            sa.text("SELECT relname FROM pg_catalog.pg_class WHERE oid = :oid"),
+            oid=oid).fetchone()
+        return relname
+
+    def get_namespace(oid):
+        nspname, = con.execute(sa.text(
+            "SELECT nspname FROM pg_catalog.pg_namespace WHERE oid = :oid"
+        ), oid=oid).fetchone()
+        return nspname
+
+    pg_toc_regexp = re.compile(r'(\d+)\;\s+(\d+)\s+(\d+)\s+(.*)')
+
+    restore_list = []
+    skip_prev = False
+    for line in pg_listing.split('\n'):
+        if line == '' or line.startswith(';'):
+            restore_list.append(line)
+            continue
+
+        skip = False
+        m = pg_toc_regexp.match(line)
+        if m:
+            did, cls_oid, obj_oid, rest = m.groups()
+            cls_oid = int(cls_oid)
+            obj_oid = int(obj_oid)
+
+            cls_relname = get_cls_relname(cls_oid) if cls_oid != 0 else None
+
+            # Skip restoration: database, extensions, public schema
+            # and comments for skipped comments
+            skip = cls_relname in ('pg_database', 'pg_extension') or (
+                cls_relname == 'pg_namespace' and get_namespace(obj_oid) == 'public'
+            ) or (skip_prev and rest.startswith('COMMENT '))
+
+            restore_list.append((';' if skip else '') + line)
         else:
-            tmpf = NamedTemporaryFile(delete=False)
-            tmpf._target = fn
-            return tmpf
+            logger.warn('Unexpected line in TOC: %s', line)
 
-    def putfile(fd):
-        if nozip:
-            pass
-        else:
-            fd.flush()
-            fd.close()
-            zipf.write(fd.name, fd._target)
-            os.remove(fd.name)
+        skip_prev = skip
 
-    sqlitefile = openfile('db.sqlite')
-    engine = sa.create_engine('sqlite:///' + sqlitefile.name)
+    pg_restore_list = os.path.join(pg_dir, 'restore')
+    with io.open(pg_restore_list, 'w') as fd:
+        fd.write('\n'.join(restore_list))
 
-    try:
-        buf = openfile('requirements')
-        stdout = sys.stdout
-        sys.stdout = buf
-        pip_main(['freeze', ])
-        putfile(buf)
-    finally:
-        sys.stdout = stdout
+    # CUSTOM COMPONENT DATA
+    logger.info("Dumping components data...")
 
-    Base.metadata.bind = engine
-    Base.metadata.create_all(engine)
-    session = sessionmaker(bind=engine)()
+    comp_root = os.path.join(dst, 'component')
+    os.mkdir(comp_root)
 
-    seq = 0
     for comp in env.chain('initialize'):
-        compdir = None
+        comp_dir = os.path.join(comp_root, comp.identity)
+        os.mkdir(comp_dir)
 
-        for itm in comp.backup():
-            seq += 1
+        idx_file = IndexFile(os.path.join(comp_dir, '0'))
+        with idx_file.writer() as idx_write:
+            for seq, itm in enumerate(comp.backup(), start=1):
+                itm.bind(comp)
+                record = IndexRecord(id=seq, identity=itm.identity, data=itm.data)
+                if itm.blob:
+                    binfn = os.path.join(comp_dir, unicode(seq))
+                    with io.open(binfn, 'wb') as fd:
+                        itm.backup(fd)
 
-            obj = BackupObject(
-                id=seq, comp=comp.identity, identity=itm.identity,
-                objkey=itm.key, is_binary=itm.is_binary()
-            )
-
-            if obj.is_binary:
-                if compdir is None:
-                    compdir = '%s.bin' % comp.identity
-                    if nozip:
-                        os.mkdir(ptjoin(dst, compdir))
-
-                cleankey = re.sub('[^A-Za-z0-9]', '_', itm.key)[:64]
-
-                obj.binfn = ptjoin(compdir, '%06d-%s' % (
-                    obj.id, cleankey))
-
-                itm.binfd = openfile(obj.binfn)
-
-            itm.backup()
-            obj.value = itm.value
-
-            if obj.is_binary:
-                putfile(itm.binfd)
-
-            session.add(obj)
-
-    session.commit()
-
-    putfile(sqlitefile)
+                idx_write(record)
 
 
 def restore(env, src):
-    assert os.path.exists(src), "Path already exists!"
+    con = DBSession.connection()
 
-    usezip = not os.path.isdir(src)
+    con.execute('BEGIN')
+    try:
+        metadata = env.metadata()
+        metadata.drop_all(con)
+        con.execute('COMMIT')
+    except Exception:
+        con.execute('ROLLBACK')
+        raise
 
-    if usezip:
-        zipf = ZipFile(src)
-        sqlitefile = NamedTemporaryFile(delete=False)
-        sqlitesrc = zipf.open('db.sqlite', 'r')
-        copyfileobj(sqlitesrc, sqlitefile)
-        sqlitefile.close()
-        engine = sa.create_engine('sqlite:///' + sqlitefile.name)
-    else:
-        engine = sa.create_engine('sqlite:///' + ptjoin(src, 'db.sqlite'))
+    # POSTGRES RESTORE
+    logger.info("Restoring PostgreSQL dump...")
 
-    Base.metadata.bind = engine
-    session = sessionmaker(bind=engine)()
+    pg_dir = os.path.join(src, 'postgres')
+    pg_restore_list = os.path.join(pg_dir, 'restore')
 
-    conn = env.core.DBSession.connection()
-    conn.execute("BEGIN")
+    pg_copt, pg_pass = pg_connection_options(env)
+    check_call([
+        '/usr/bin/pg_restore',
+        '--clean', '--if-exists',
+        '--no-owner', '--no-privileges',
+        '--exit-on-error',
+        '--use-list', pg_restore_list,
+    ] + pg_copt + [pg_dir, ], env=dict(PGPASSWORD=pg_pass))
 
-    metadata = env.metadata()
+    # CUSTOM COMPONENT DATA
+    logger.info("Restoring component data...")
 
-    metadata.drop_all(conn)
-    metadata.create_all(conn)
-
-    for objrec in session.query(BackupObject):
-        cls = BackupBase.registry[objrec.identity]
-
-        if objrec.is_binary and usezip:
-            binfd = zipf.open(objrec.binfn)
-        elif objrec.is_binary and not usezip:
-            binfd = open(ptjoin(src, objrec.binfn))
-        else:
-            binfd = None
-
-        obj = cls(
-            comp=env._components[objrec.comp],
-            key=objrec.objkey,
-            value=objrec.value,
-            binfd=binfd
-        )
-
-        obj.restore()
-
-        if binfd:
-            binfd.close()
-
-    if usezip:
-        os.remove(sqlitefile.name)
-
-    conn.execute("COMMIT")
+    comp_root = os.path.join(src, 'component')
+    con.execute('BEGIN')
+    try:
+        for comp_identity in os.listdir(comp_root):
+            comp = env._components[comp_identity]
+            comp_dir = os.path.join(comp_root, comp_identity)
+            idx_fn = os.path.join(comp_dir, '0')
+            if os.path.exists(idx_fn):
+                idx_file = IndexFile(os.path.join(comp_dir, '0'))
+                with idx_file.reader() as read:
+                    for record in read:
+                        itm = BackupBase.registry[record.identity](record.data)
+                        itm.bind(comp)
+                        if itm.blob:
+                            binfn = os.path.join(comp_dir, unicode(record.id))
+                            with io.open(binfn, 'rb') as fd:
+                                itm.restore(fd)
+        con.execute('COMMIT')
+    except Exception:
+        con.execute('ROLLBACK')
+        raise
