@@ -69,6 +69,11 @@ def annotation_idelete(resource, request):
 
 
 def setup_pyramid(comp, config):
+    if comp.settings.get('annotation'):
+        setup_annotations(config)
+
+
+def setup_annotations(config):
     config.add_route(
         'webmap.annotation.collection', '/api/resource/{id:\d+}/annotation/',
         factory=resource_factory, client=('id',)

@@ -2,18 +2,12 @@
      data-ngw-serialize-prefix="${serializePrefix}"
      class="padding-block">
 
-  <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 1, labelWidth: 300">
+  <div data-dojo-attach-point="tcControls"
+       data-dojo-type="dojox/layout/TableContainer"
+       data-dojo-props="cols: 1, labelWidth: 300">
     <div data-dojo-attach-point="chbEditable"
          data-dojo-type="dijit/form/CheckBox"
          title="{{gettext 'Enable layers editing'}}">
-    </div>
-    <div data-dojo-attach-point="chbAnnotationEnabled"
-         data-dojo-type="dijit/form/CheckBox"
-         title="{{gettext 'Enable annotations'}}">
-    </div>
-    <div data-dojo-attach-point="chbAnnotationDefault"
-         data-dojo-type="dijit/form/CheckBox"
-         title="{{gettext 'Show annotations by default'}}">
     </div>
   </div>
 </div>
