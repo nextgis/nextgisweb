@@ -1,17 +1,12 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
-    "dojo/dom-construct",
-    "ngw-pyramid/i18n!webmap",
-    "ngw-pyramid/hbs-i18n",
-    "dojo/on",
     "dojo/dom-class",
     "put-selector/put",
     "dijit/form/Select",
     "openlayers/ol",
     "openlayers/proj4",
     "ngw-pyramid/utils/coordinateConverter",
-    "ngw/route",
     "ngw/load-json!api/component/spatial_ref_sys/",
     "ngw/settings!pyramid",
     //templates
@@ -19,27 +14,16 @@ define([
 ], function (
     declare,
     array,
-    domConstruct,
-    i18n,
-    hbsI18n,
-    on,
     domClass,
     put,
     Select,
     ol,
     proj4,
     CoordinateConverter,
-    route,
     customCoordinateSystems,
     settingsPyramid
 ) {
     var degreeFormat = settingsPyramid.degree_format;
-    if (customCoordinateSystems) {
-        array.forEach(customCoordinateSystems, function (c) {
-            c.projCode = (c.auth_name ? c.auth_name + ":" : "") + c.auth_srid;
-            proj4.defs(c.projCode, c.wkt);
-        });
-    }
 
     return declare([Select], {
         point: undefined,
@@ -70,15 +54,15 @@ define([
             var that = this;
             array.forEach(customCoordinateSystems, function(c) {
                 var custom = proj4(that.projections.initial, c.wkt, that.point);
-                that.coordinates[c.projCode] = [custom[0], custom[1]];
+                that.coordinates[c.id] = [custom[0], custom[1]];
             })
         },
         _setOptions: function() {
             var that = this;
             that.options = [];
             array.forEach(customCoordinateSystems, function (c) {
-                var code = c.projCode;
-                var pr = proj4(c.projCode);
+                var code = c.id;
+                var pr = proj4(c.wkt);
                 var coord = that.coordinates[code];
                 var x = coord[1];
                 var y = coord[0];
@@ -90,7 +74,7 @@ define([
                         label: el.innerHTML,
                         value: opt.value,
                         format: opt.format,
-                        selected: c.projCode === that.selectedFormat
+                        selected: c.id === that.selectedFormat
                     });
                 }
                 if (pr.oProj.units == 'degree') {

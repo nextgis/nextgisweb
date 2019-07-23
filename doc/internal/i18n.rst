@@ -1,17 +1,31 @@
-Интернационализация и локализация
-=================================
+Internationalization and localization
+=====================================
 
-Интернационализация NextGIS Web работает на базе библиотек `gettext <http://www.gnu.org/software/gettext/>`_ и `babel <http://babel.pocoo.org/>`_. Порядок работы со строками стандартный для проектов на базе `gettext`:
+Internationalization and localization of NextGIS Web is powered by `gettext`_
+and `babel`_ libraries. The procedure for working with strings is standard
+for projects based on gettext:
 
-1. Извлечение строк для перевода из исходных текстов в pot-файл (`extract`)
-2. Создание или обновление po-файлов локализации на базе pot-файлов (`init` и `update`)
-3. Компияция po-файлов в mo-файлы (`compile`)
+.. _gettext: http://www.gnu.org/software/gettext
+.. _babel: http://babel.pocoo.org/
 
-Все строки, которые так или иначе показываются пользователю, должны быть указаны в коде на английском языке и только потом переведены на русский.
+1. Extracting strings to translate from sources to pot-file (``extract``)
+2. Creating or updating po-files based on pot-files (``init`` and ``update``)
+3. Compiling po-files into mo-files (``compile``)
 
-Интернационализация выполняется для каждого компонента NextGIS Web отдельно. Как следствие, на данный момент нет способа интернационализации строк не относящихся ни к одному компоненту. Локализация каджого компонента существует в рамках своего, одноименного с компонентом, домена (domain) в терминах библиотеки gettext. То есть в одном компоненте одна строка может быть переведена одним образом, а в другом - другим, даже без использования контекстов.
+All lines that are shown to the user must be written in sources in English
+and only then translated into other languages.
 
-Все действия со строками выполняются при помощи утилиты командной строки `nextgisweb-i18n` из пакета `nextgisweb`. Эта утилита является надстройкой над утилитой `pybabel` из пакета `babel` с предустановленными по-умолчанию настройками.
+Translation is performed for each component of NextGIS Web separately. As
+a result, there is no way to internationalize strings that are not belongs
+to any component.
+
+Translations of each component exists within its own ``domain`` in terms
+of the gettext library. In one component one line can be translated in
+one way, and in another - in another, even without the use of contexts.
+
+All actions on translations are performed using ``nextgisweb-i18n`` command
+line utility from the ``nextgisweb`` package. This utility is an add-on
+to the ``pybabel`` utility from `babel` package with default settings preset.
 
 Рассмотрим локализацию на русский язык на примере несуществующего компонента `bar` из несуществующего пакета `foo`. В этом случае структура каталогов будет выглядеть следующим образом:
 

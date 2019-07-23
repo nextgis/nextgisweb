@@ -29,10 +29,12 @@ define([
             proj4: "+proj=tmerc +lat_0=0 +lon_0=40.98333333333 +k=1 +x_0=1300000 +y_0=-4511057.63 +ellps=krass +towgs84=23.57,-140.95,-79.8,0,0.35,0.79,-0.22 +units=m +no_defs"
         },
 
+        _valuesMem: {},
+
         constructor: function (options) {
             declare.safeMixin(this, options);
 
-            this.title = i18n.gettext("Import SRS definition");
+            this.title = i18n.gettext("Import definition");
             this.style = "width: 600px";
         },
 
@@ -57,13 +59,17 @@ define([
             }).placeAt(this.container);
 
             this.format.on("change", function () {
-                widget._updatePlaceholder();
+                widget._onFormatChange();
             });
 
             this.textArea = new SimpleTextarea({
                 label: i18n.gettext("Definition"),
                 rows: 4
             }).placeAt(this.container);
+
+            this.textArea.on("change", function () {
+                widget._setValueMem()
+            })
 
             this.actionBar = domConstruct.create("div", {
                 class: "dijitDialogPaneActionBar"
@@ -79,7 +85,7 @@ define([
                 onClick: lang.hitch(this, this.onContinue)
             }).placeAt(this.actionBar);
 
-            this._updatePlaceholder();
+            this._updatePlaceholder(this.format.get("value"));
         },
 
         onSave: function () {
@@ -95,13 +101,26 @@ define([
             this.hide();
         },
 
-        _updatePlaceholder: function () {
+        _onFormatChange: function () {
             var format = this.format.get("value");
+            var valueMem = this._valuesMem[format] || '';
+            this.textArea.set("value", valueMem);
+
+            this._updatePlaceholder(format);
+        },
+
+        _updatePlaceholder: function (format) {
             var placeholder = this._placeholders[format] || '';
             // Not work correct
             // this.textArea.set("placeHolder", placeholder);
 
             this.textArea.domNode.placeholder = placeholder;
+        },
+
+        _setValueMem: function () {
+            var format = this.format.get("value");
+            var value = this.textArea.get("value");
+            this._valuesMem[format] = value;
         }
     });
 });

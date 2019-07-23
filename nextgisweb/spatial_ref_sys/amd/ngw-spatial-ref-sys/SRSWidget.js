@@ -9,10 +9,11 @@ define([
     "ngw-pyramid/i18n!spatial_ref_sys",
     "ngw-pyramid/hbs-i18n",
     "ngw/route",
+    "ngw-pyramid/ErrorDialog",
     "dojo/text!./template/SRSWidget.hbs",
     "dojo/_base/array",
     "dojo/request/xhr",
-    "./SRSStringDialog",
+    "./SRSImportDialog",
     // template
     "dijit/form/CheckBox",
     "dijit/form/ValidationTextBox",
@@ -31,13 +32,14 @@ define([
     i18n,
     hbsI18n,
     route,
+    ErrorDialog,
     template,
     array,
     xhr,
-    SRSStringDialog
+    SRSImportDialog
 ) {
 
-    var srsStringDialog = new SRSStringDialog();
+    var srsImportDialog = new SRSImportDialog();
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         identity: "srs_list",
@@ -49,10 +51,10 @@ define([
                 this.btnImportSRSString.set("disabled", true);
             }
             if (this.btnImportSRSString) {
-                srsStringDialog.on("save", lang.hitch(this, this._insertSRSString));
+                srsImportDialog.on("save", lang.hitch(this, this._insertSRSString));
 
                 this.btnImportSRSString.on('click', function () {
-                    srsStringDialog.show();
+                    srsImportDialog.show();
                 });
             }
         },
@@ -90,11 +92,6 @@ define([
             return result;
         },
 
-        _handleDialogError: function (message) {
-            widget.wkt.set("value", "");
-            alert(message);
-        },
-
         _insertSRSString: function (data) {
             var widget = this;
             var projString = data && data.projStr;
@@ -106,14 +103,12 @@ define([
                 }).then(
                     function (data) {
                         var wkt = data && data.wkt;
-                        if (data.success && wkt && widget.wkt) {
+                        if (wkt && widget.wkt) {
                             widget.wkt.set("value", wkt);
-                        } else {
-                            widget._handleDialogError(data.message);
                         }
                     },
                     function (error) {
-                        widget._handleDialogError(error);
+                        new ErrorDialog({response: error.response}).show();
                     }
                 );
             }
