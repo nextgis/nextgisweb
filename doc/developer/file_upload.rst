@@ -54,29 +54,29 @@ Also you can create attachment using PUT method, in this case you do not need to
 
 .. sourcecode:: python
 
-import requests
-import urllib2
-from contextlib import closing
-import json
+      import requests
+      import urllib2
+      from contextlib import closing
+      import json
 
-url_dst = 'http://dev.nextgis.com/sandbox/api'
-ngw_creds = ('administrator', 'demodemo')
-feature_dst = '/resource/' + '1501' + '/feature/'   #layer id
-new_id = '/33'          #feature id
+      url_dst = 'http://dev.nextgis.com/sandbox/api'
+      ngw_creds = ('administrator', 'demodemo')
+      feature_dst = '/resource/' + '1501' + '/feature/'   #layer id
+      new_id = '/33'          #feature id
 
-#Get file from internet, optionally with auth
-with closing(requests.get('http://nextgis.ru/wp-content/themes/nextgis_clean/img/ngw_icon.png', auth=ngw_creds, stream=True)) as f:
+      #Get file from internet, optionally with auth
+      with closing(requests.get('http://nextgis.ru/wp-content/themes/nextgis_clean/img/ngw_icon.png', auth=ngw_creds, stream=True)) as f:
 
-    #upload attachment to nextgisweb
-    req = requests.put(url_dst + '/component/file_upload/upload', data=f, auth=ngw_creds)
-    json_data = req.json()
-    json_data['name'] = 'Picture001.jpg'
+          #upload attachment to nextgisweb
+          req = requests.put(url_dst + '/component/file_upload/upload', data=f, auth=ngw_creds)
+          json_data = req.json()
+          json_data['name'] = 'Picture001.jpg'
 
-    attach_data = {}
-    attach_data['file_upload'] = json_data
+          attach_data = {}
+          attach_data['file_upload'] = json_data
 
-    #add attachment to nextgisweb feature
-    req = requests.post(url_dst + feature_dst + str(new_id) + '/attachment/', data=json.dumps(attach_data), auth=ngw_creds)
+          #add attachment to nextgisweb feature
+          req = requests.post(url_dst + feature_dst + str(new_id) + '/attachment/', data=json.dumps(attach_data), auth=ngw_creds)
 
 
 
