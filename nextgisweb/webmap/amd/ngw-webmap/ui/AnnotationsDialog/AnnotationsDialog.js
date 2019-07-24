@@ -57,6 +57,8 @@ define([
                 'class': 'delete-annotation',
                 style: 'float: left'
             }).placeAt(this.actionBar);
+            
+            this.onCancel = lang.hitch(this, this.onUndo);
         },
         
         onSave: function () {
