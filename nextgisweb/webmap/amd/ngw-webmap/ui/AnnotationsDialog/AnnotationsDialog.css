@@ -1,0 +1,34 @@
+.adt-table-horiz .dijitButtonNode.dijitArrowButton {
+  width: 10px;
+}
+
+i.select-color {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+}
+
+i.select-color.red {
+  background-color: #FF0000;
+}
+
+i.select-color.green {
+  background-color: #008000;
+}
+
+i.select-color.blue {
+  background-color: #0000FF;
+}
+
+i.select-color.yellow {
+  background-color: #FFFF00;
+}
+
+i.select-color.orange {
+  background-color: #FFA500;
+}
+
+i.select-color.black {
+  background-color: #000000;
+}
