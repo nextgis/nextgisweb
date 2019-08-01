@@ -43,3 +43,5 @@ class SpatialRefSysComponent(Component):
         views.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
+    def query_stat(self):
+        return dict(count=SRS.query().count())

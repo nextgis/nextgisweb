@@ -1,0 +1,51 @@
+.annotations-panel {
+  width: 100%;
+  height: 100%;
+}
+
+.annotations-panel .annotations-table-container {
+  padding: 2px;
+}
+
+.annotations-panel .annotations-table-container .ol-control {
+  position: inherit;
+  box-shadow: 0 2px 7px rgba(2, 34, 60, 0.16);
+  border: #e2e4e8 1px solid;
+  margin-left: 0;
+}
+
+.annotations-panel .annotations-table-container .ol-control .dijitButtonNode {
+  padding: 0;
+  border: 0;
+  width: 23px;
+  height: 23px;
+  line-height: 21px;
+  background: #fff;
+  color: #076dbf;
+  fill: #076dbf;
+  transition: none;
+  text-shadow: none;
+}
+
+.annotations-panel .annotations-table-container .ol-control .dijitButtonNode:hover {
+  background: #f9fafb;
+  color: #00b77e;
+  fill: #00b77e;
+}
+
+.annotations-panel .annotations-table-container .ol-control.dijitToggleButtonChecked .dijitButtonNode {
+  background: #00b77e;
+  color: #fff;
+  fill: #fff;
+}
+
+.annotations-panel .annotations-table-container .ol-control .dijitButtonNode .dijitButtonContents {
+  display: inline-block;
+}
+
+.annotations-panel .annotations-table-container .ol-control .dijitButtonNode .ol-control__icon {
+  line-height: 20px;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}

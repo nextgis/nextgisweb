@@ -41,7 +41,7 @@ def update_MI_coord_sys_string(str):
     return "Earth Projection " + ", ".join(items)
 
 
-def convert_projstr_to_wkt(proj_str, format=None):
+def convert_projstr_to_wkt(proj_str, format=None, pretty=False):
     proj_str = proj_str.encode("utf-8")
     sr = osr.SpatialReference()
     wkt = ""
@@ -66,7 +66,7 @@ def convert_projstr_to_wkt(proj_str, format=None):
             method_to_call = getattr(sr, method)
         try:
             if method_to_call and method_to_call(proj_str) == 0:
-                wkt = sr.ExportToWkt()
+                wkt = sr.ExportToPrettyWkt() if pretty else sr.ExportToWkt()
                 break
         except:
             pass

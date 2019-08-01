@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
+import json
+
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.types import TypeDecorator
+import geoalchemy2 as ga
 
 from .. import db
 from ..models import declarative_base
@@ -24,6 +28,8 @@ class WebMapScope(Scope):
     label = _("Web map")
 
     display = Permission(_("Display"))
+    annotation_read = Permission(_("View annotations"))
+    annotation_write = Permission(_("Edit annotations"))
 
 
 class WebMap(Base, Resource):
@@ -42,11 +48,16 @@ class WebMap(Base, Resource):
     extent_bottom = db.Column(db.Float, default=-90)
     extent_top = db.Column(db.Float, default=+90)
 
+    annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
+    annotation_default = db.Column(db.Boolean, nullable=False, default=False)
+
+    root_item = db.relationship('WebMapItem', cascade='all')
+
     bookmark_resource = db.relationship(
         Resource, foreign_keys=bookmark_resource_id,
         backref=db.backref('bookmarked_webmaps'))
 
-    root_item = db.relationship('WebMapItem', cascade='all')
+    annotations = db.relationship('WebMapAnnotation', cascade='all,delete-orphan')
 
     @classmethod
     def check_parent(cls, parent):
@@ -160,6 +171,33 @@ class WebMapItem(Base):
             if a in data:
                 setattr(self, a, data[a])
 
+class JSONTextType(TypeDecorator):
+    """ SA type decorator for JSON stored as text """
+
+    impl = db.Unicode
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        return json.dumps(value)
+
+    def process_result_value(self, value, dialect):
+        if not value:
+            return None
+        return json.loads(value)    
+
+
+class WebMapAnnotation(Base):
+    __tablename__ = 'webmap_annotation'
+
+    id = db.Column(db.Integer, primary_key=True)
+    webmap_id = db.Column(db.ForeignKey(WebMap.id), nullable=False)
+    description = db.Column(db.Unicode)
+    style = db.Column(JSONTextType)
+    geom = db.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
+
+    webmap = db.relationship(WebMap)
+
 
 PR_READ = ResourceScope.read
 PR_UPDATE = ResourceScope.update
@@ -190,6 +228,9 @@ class WebMapSerializer(Serializer):
 
     draw_order_enabled = SP(**_mdargs)
     editable = SP(**_mdargs)
+
+    annotation_enabled = SP(**_mdargs)
+    annotation_default = SP(**_mdargs)
 
     bookmark_resource = SRR(**_mdargs)
 
