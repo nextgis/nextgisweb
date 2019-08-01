@@ -59,8 +59,7 @@ msgid ""
 "The resource may have been deleted or an error in the URL. Correct the "
 "URL or go to the home page and try to find the desired resource."
 msgstr ""
-"Возможно ресурс был удален либо в URL содержит ошибку. Исправьте URL или "
-"перейдите на домашнюю страницу и попробуйте найти начиная с нее."
+"Возможно ресурс удален, либо в адресе допущена ошибка. Исправьте адрес или вернитесь на главную страницу и попробуйте найти нужный ресурс с помощью навигации."
 
 #: exception.py:41
 msgid "Resource display name is not unique"
