@@ -59,17 +59,7 @@ define([
             .featureHighlighter
             .highlightFeatureById(fid, resid)
             .then(function (feature) {
-                var geometry = feature.getGeometry();
-                var view = display.map.olMap.getView();
-                var extent = geometry.getExtent();
-                if (geometry.getType() === 'Point') {
-                    view.setCenter(geometry.getCoordinates());
-                    if (view.getZoom() < minZoom) {
-                        view.setZoom(minZoom);
-                    }
-                } else {
-                    view.fit(extent);
-                }
+                display.map.zoomToFeature(feature);
             });
         }
     });

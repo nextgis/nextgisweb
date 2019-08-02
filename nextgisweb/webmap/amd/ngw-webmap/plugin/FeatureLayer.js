@@ -87,13 +87,14 @@ define([
 
         zoomToFeature: function () {
             var display = this.plugin.display;
+            var wkt = new ol.format.WKT();
 
-            xhr.get(route.feature_layer.store.item({id: this.layerId, feature_id: this.get("selectedRow").id}), {
-                handleAs: "json",
-                headers: { "X-Feature-Box": true }
+            xhr.get(route.feature_layer.feature.item({id: this.layerId, fid: this.get("selectedRow").id}), {
+                handleAs: "json"
             }).then(
-                function data(featuredata) {
-                    display.map.olMap.getView().fit(featuredata.box);
+                function (feature) {
+                    var geometry = wkt.readGeometry(feature.geom);
+                    display.map.zoomToFeature(new ol.Feature({geometry: geometry}));
                     display.tabContainer.selectChild(display.mainPane);
                 }
             );
