@@ -13,7 +13,6 @@ define([
     MenuItem, domStyle, xhr, script, topic, ol, i18n, FeatureStore,
     FeatureGrid, Button, TextBox, ToolbarSeparator, popup, put, route
 ) {
-    
     var Pane = declare([FeatureGrid], {
         closable: true,
         gutters: false,
@@ -66,7 +65,6 @@ define([
                 }
             );
         }
-        
     });
     
     return declare([_PluginBase], {
@@ -98,6 +96,16 @@ define([
             if (this.display.layersPanel && this.display.layersPanel.contentWidget.itemMenu) {
                 this.display.layersPanel.contentWidget.itemMenu.addChild(this.menuItem);
             }
+            
+            this._bindEvents();
+        },
+        
+        _bindEvents: function () {
+            topic.subscribe('/webmap/feature-table/refresh', lang.hitch(this, function (layerId) {
+                if (!this._openedLayersById.hasOwnProperty(layerId)) return;
+                var pane = this._openedLayersById[layerId];
+                pane.updateSearch();
+            }));
         },
         
         _openedLayersById: {},
