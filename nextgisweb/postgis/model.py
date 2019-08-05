@@ -613,11 +613,10 @@ class FeatureQueryBase(object):
         if self._like:
             l = []
             for fld in self.layer.fields:
-                if fld.datatype == FIELD_TYPE.STRING:
-                    l.append(db.sql.cast(
-                        db.sql.column(fld.column_name),
-                        db.Unicode).ilike(
-                        '%' + self._like + '%'))
+                l.append(db.sql.cast(
+                    db.sql.column(fld.column_name),
+                    db.Unicode).ilike(
+                    '%' + self._like + '%'))
 
             select.append_whereclause(db.or_(*l))
 
