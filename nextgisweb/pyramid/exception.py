@@ -226,7 +226,10 @@ for exc, title, explanation in (
     (
         httpexceptions.HTTPNotFound,
         _("Page not found"),
-        _("The page may have been deleted or an error in the address. Correct the address or go to the home page and try to find the desired page."),
+        _(
+            "The page may have been deleted or an error in the address. "
+            "Correct the address or go to the home page and try to find the desired page."
+        ),
     ),
     (
         httpexceptions.HTTPUnprocessableEntity,
