@@ -209,13 +209,51 @@ def adapt_httpexception(iface, obj):
 
 
 # Patch useful pyramid HTTP exceptions with translatable strings
-for exc, title in (
-    (httpexceptions.HTTPBadRequest, _("Bad request")),
-    (httpexceptions.HTTPForbidden, _("Forbidden")),
-    (httpexceptions.HTTPNotFound, _("Not found")),
-    (httpexceptions.HTTPUnprocessableEntity, _("Unprocessable entity")),
-    (httpexceptions.HTTPInternalServerError, _("Internal server error")),
-    (httpexceptions.HTTPNotImplemented, _("Not implemented")),
-    (httpexceptions.HTTPServiceUnavailable, _("Service unavailable")),
+for exc, title, explanation in (
+    (
+        httpexceptions.HTTPBadRequest,
+        _("Bad request"),
+        _(
+            "The server could not comply with the request since "
+            "it is either malformed or otherwise incorrect."
+        ),
+    ),
+    (
+        httpexceptions.HTTPForbidden,
+        _("Forbidden"),
+        _("Access was denied to this resource."),
+    ),
+    (
+        httpexceptions.HTTPNotFound,
+        _("Not found"),
+        _("The resource could not be found."),
+    ),
+    (
+        httpexceptions.HTTPUnprocessableEntity,
+        _("Unprocessable entity"),
+        _("Unable to process the contained instructions."),
+    ),
+    (
+        httpexceptions.HTTPInternalServerError,
+        _("Internal server error"),
+        _(
+            "The server has either erred or is incapable of performing "
+            "the requested operation."
+        ),
+    ),
+    (
+        httpexceptions.HTTPNotImplemented,
+        _("Not implemented"),
+        _("Not implemented"),
+    ),
+    (
+        httpexceptions.HTTPServiceUnavailable,
+        _("Service unavailable"),
+        _(
+            "The server is currently unavailable. "
+            "Please try again at a later time."
+        ),
+    ),
 ):
     exc.title = title
+    exc.explanation = explanation
