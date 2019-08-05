@@ -57,7 +57,9 @@ msgstr "Страница не найдена"
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
-msgstr "Возможно, страница удалена либо в адресе допущена ошибка. Исправьте адрес или вернитесь на главную страницу и попробуйте найти нужную страницу с помощью навигации."
+msgstr "Возможно, страница удалена либо в адресе допущена ошибка. Исправьте "
+"адрес или вернитесь на главную страницу и попробуйте найти нужную страницу "
+"с помощью навигации."
 
 #: exception.py:233
 msgid "Unprocessable entity"
@@ -84,7 +86,8 @@ msgstr "Сервис недоступен"
 
 #: exception.py:252
 msgid "The server is currently unavailable. Please try again at a later time."
-msgstr "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить действие еще раз через некоторое время."
+msgstr "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
+"действие еще раз через некоторое время."
 
 #: template/header.mako:74 view.py:33
 msgid "Control panel"
