@@ -202,7 +202,7 @@ def adapt_httpexception(iface, obj):
         and isinstance(obj, httpexceptions.HTTPError)  # NOQA: W503
     ):
         user_exception(
-            obj, title=obj.title, message=obj.explanation, detail=obj.detail,
+            obj, title=obj.title, message=obj.explanation, detail=None,
             http_status_code=obj.code)
 
         return IUserException(obj)
@@ -225,8 +225,8 @@ for exc, title, explanation in (
     ),
     (
         httpexceptions.HTTPNotFound,
-        _("Not found"),
-        _("The resource could not be found."),
+        _("Page not found"),
+        _("The page may have been deleted or an error in the address. Correct the address or go to the home page and try to find the desired page."),
     ),
     (
         httpexceptions.HTTPUnprocessableEntity,
