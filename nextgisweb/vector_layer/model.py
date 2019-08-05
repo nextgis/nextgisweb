@@ -971,9 +971,11 @@ class FeatureQueryBase(object):
         if self._like:
             l = []
             for f in tableinfo.fields:
-                if f.datatype == FIELD_TYPE.STRING:
-                    l.append(table.columns[f.key].ilike(
-                        '%' + self._like + '%'))
+                l.append(
+                    cast(table.columns[f.key], db.Unicode).ilike(
+                        "%" + self._like + "%"
+                    )
+                )
 
             where.append(db.or_(*l))
 
