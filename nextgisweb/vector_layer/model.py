@@ -933,18 +933,36 @@ class FeatureQueryBase(object):
         if self._filter:
             l = []
             for k, o, v in self._filter:
-                supported_operators = ('gt', 'lt', 'ge', 'le', 'eq', 'ne', 'in', 'notin', 'startswith', 'like', 'ilike')
+                supported_operators = (
+                    "eq",
+                    "ge",
+                    "gt",
+                    "ilike",
+                    "in",
+                    "le",
+                    "like",
+                    "lt",
+                    "ne",
+                    "notin",
+                    "startswith",
+                )
                 if o not in supported_operators:
                     raise ValueError(
-                        "Invalid operator '%s'. Only %r are supported." % (
-                            o, supported_operators))
-                
-                add_op_list = ['like', 'ilike', 'in', 'notin', 'startswith']
-                if o in add_op_list:
-                    o += '_op'
+                        "Invalid operator '%s'. Only %r are supported."
+                        % (o, supported_operators)
+                    )
+
+                if o in [
+                    "ilike",
+                    "in",
+                    "like",
+                    "notin",
+                    "startswith",
+                ]:
+                    o += "_op"
 
                 op = getattr(db.sql.operators, o)
-                if k == 'id':
+                if k == "id":
                     l.append(op(table.columns.id, v))
                 else:
                     l.append(op(table.columns[tableinfo[k].key], v))
