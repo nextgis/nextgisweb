@@ -69,6 +69,8 @@ Also you can create attachment using PUT method, in this case you do not need to
 
           #upload attachment to nextgisweb
           req = requests.put(url_dst + '/component/file_upload/upload', data=f, auth=ngw_creds)
+          #on some servers needed data=f.content instead
+          
           json_data = req.json()
           json_data['name'] = 'Picture001.jpg'
 
