@@ -328,6 +328,14 @@ Same steps with curl:
 
    {"id": 108, "parent": {"id": 0}}
 
+Create vector layer in ogr2ogr:
+
+.. sourcecode:: bash
+
+   
+   ogr2ogr -f NGW -overwrite -t_srs EPSG:3857 -lco "KEY=data" -lco "OVERWRITE=YES"  "NGW:https://sandbox.nextgis.com/resource/464/data" PG:"dbname=gis" "data"
+   #create vector layer with data group 464, layer will have name "data", keyname "data". Layer will take from local PostGIS database, table name is "data"
+   
 
 Feature in vector or PostGIS layer
 -----------------------------------
