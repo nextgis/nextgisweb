@@ -1,0 +1,23 @@
+.nextgis .ngwPyramidErrorDialog,
+.ngwPyramidErrorDialog{
+    border: 0;
+}
+
+.ngwPyramidErrorDialog .dijitDialogTitleBar{
+  display: none;
+}
+
+
+.ngwPyramidErrorDialog .dijitDialogPaneContent {
+  padding: 0;
+  border-top: 0;
+}
+
+.ngwPyramidErrorDialog .error-card{
+  box-shadow: none;
+  width: 580px;
+}
+
+.ngwPyramidErrorDialog .error-card__title{
+  font-size: 20px;
+}

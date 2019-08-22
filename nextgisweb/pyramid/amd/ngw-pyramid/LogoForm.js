@@ -9,7 +9,7 @@ define([
     "dojo/request/xhr",
     "dojo/json",
     "ngw/route",
-    "ngw-pyramid/ErrorDialog",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "ngw-pyramid/i18n!pyramid",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/LogoForm.hbs",
@@ -50,8 +50,8 @@ define([
             };
             xhr.put(route.pyramid.logo(), {
                 handleAs: 'json',
-                headers: { "Content-Type": "application/json" },                
-                data: json.stringify(data) 
+                headers: { "Content-Type": "application/json" },
+                data: json.stringify(data)
             }).then(function () {
                 window.location = route.pyramid.control_panel();
             }, function (err) { new ErrorDialog({response: err}).show() });

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-07-13 23:31+0000\n"
+"POT-Creation-Date: 2019-08-05 13:35+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: exception.py:185 exception.py:216
+#: exception.py:185 exception.py:238
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
@@ -31,111 +31,107 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:212
+#: exception.py:215
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:213
+#: exception.py:216
+msgid ""
+"The server could not comply with the request since it is either malformed"
+" or otherwise incorrect."
+msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
+
+#: exception.py:223
 msgid "Forbidden"
-msgstr "Запрещено"
+msgstr "Доступ запрещен"
 
-#: exception.py:214
-msgid "Not found"
-msgstr "Не найдено"
+#: exception.py:224
+msgid "Access was denied to this resource."
+msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:215
+#: exception.py:228
+msgid "Page not found"
+msgstr "Страница не найдена"
+
+#: exception.py:229
+msgid ""
+"The page may have been deleted or an error in the address. Correct the "
+"address or go to the home page and try to find the desired page."
+msgstr "Возможно, страница удалена либо в адресе допущена ошибка. Исправьте "
+"адрес или вернитесь на главную страницу и попробуйте найти нужную страницу "
+"с помощью навигации."
+
+#: exception.py:233
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:217
+#: exception.py:234
+msgid "Unable to process the contained instructions."
+msgstr "Невозможно выполнить запрошенную операцию."
+
+#: exception.py:239
+msgid ""
+"The server has either erred or is incapable of performing the requested "
+"operation."
+msgstr "При обработке запроса возникла внутренняя ошибка или сервер настроен "
+"некорректно и не может обработать запрос."
+
+#: exception.py:246 exception.py:247
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:218
+#: exception.py:251
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: template/header.mako:74 view.py:34
+#: exception.py:252
+msgid "The server is currently unavailable. Please try again at a later time."
+msgstr "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
+"действие еще раз через некоторое время."
+
+#: template/header.mako:74 view.py:33
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: template/header.mako:82 view.py:43
+#: template/header.mako:82 view.py:42
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:70 view.py:181
+#: view.py:69 view.py:191
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:78 view.py:187
+#: view.py:77 view.py:197
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:85 view.py:189
+#: view.py:84 view.py:199
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:92 view.py:191
+#: view.py:91 view.py:201
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:99 view.py:185
+#: view.py:98 view.py:195
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:106 view.py:193
+#: view.py:105 view.py:203
 msgid "Miscellaneous"
 msgstr "Разное"
 
-#: view.py:113 view.py:195
+#: view.py:112 view.py:205
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:180
+#: view.py:190
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:184
+#: view.py:194
 msgid "Settings"
 msgstr "Настройки"
-
-#: amd/ngw-pyramid/ErrorDialog.js:36
-msgid "Network error"
-msgstr "Сетевая ошибка"
-
-#: amd/ngw-pyramid/ErrorDialog.js:37
-msgid "There is no response from the server or problem connecting to server."
-msgstr ""
-"Не удалось получить ответ от сервера либо в процессе соединения возникла "
-"ошибка."
-
-#: amd/ngw-pyramid/ErrorDialog.js:38
-msgid "Check network connectivity and try again later."
-msgstr "Проверьте сетевое соединение и попробуйте повторить позже."
-
-#: amd/ngw-pyramid/ErrorDialog.js:46
-msgid "Unexpected server response"
-msgstr "Неожидаемый ответ сервера"
-
-#: amd/ngw-pyramid/ErrorDialog.js:47 amd/ngw-pyramid/ErrorDialog.js:56
-msgid "Something went wrong."
-msgstr "Что-то пошло не так."
-
-#: amd/ngw-pyramid/ErrorDialog.js:55
-msgid "Unexpected error"
-msgstr "Неожиданная ошибка"
-
-#: amd/ngw-pyramid/ErrorDialog.js:81
-msgid "OK"
-msgstr "OK"
-
-#: amd/ngw-pyramid/ErrorDialog.js:88
-msgid "Request support"
-msgstr "Запросить поддержку"
-
-#: amd/ngw-pyramid/ErrorDialog.js:99
-msgid "Technical information"
-msgstr "Техническая информация"
 
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:30
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:32
@@ -149,6 +145,40 @@ msgstr "Скопировано"
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:34
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
+
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:37
+msgid "Technical information"
+msgstr "Техническая информация"
+
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
+msgid "Contact support"
+msgstr "Написать в поддержку"
+
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
+msgid "Back to home"
+msgstr "На главную"
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:26
+msgid "Network error"
+msgstr "Сетевая ошибка"
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:27
+msgid "There is no response from the server or problem connecting to server."
+msgstr ""
+"Не удалось получить ответ от сервера либо в процессе соединения возникла "
+"ошибка."
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:28
+msgid "Check network connectivity and try again later."
+msgstr "Проверьте сетевое соединение и попробуйте повторить позже."
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:36
+msgid "Unexpected server response"
+msgstr "Неожидаемый ответ сервера"
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:37
+msgid "Something went wrong."
+msgstr "Что-то пошло не так."
 
 #: amd/ngw-pyramid/form/RTETextBox.js:61
 msgid "Rich Text Editor"
@@ -264,10 +294,6 @@ msgstr "Градусы, минуты, секунды"
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: template/error.mako:65
-msgid "Back"
-msgstr "Назад"
-
 #: template/header.mako:69
 msgid "Resources"
 msgstr "Ресурсы"
@@ -287,4 +313,27 @@ msgstr "Пакет"
 #: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
+
+#~ msgid "Back"
+#~ msgstr "Назад"
+
+#~ msgid "Not found"
+#~ msgstr "Не найдено"
+
+#~ msgid "Unexpected error"
+#~ msgstr "Неожиданная ошибка"
+
+#~ msgid "OK"
+#~ msgstr "OK"
+
+#~ msgid "Request support"
+#~ msgstr "Запросить поддержку"
+
+#~ msgid ""
+#~ "The resource may have been deleted "
+#~ "or an error in the address. "
+#~ "Correct the address or go to the"
+#~ " home page and try to find the"
+#~ " desired resource."
+#~ msgstr ""
 

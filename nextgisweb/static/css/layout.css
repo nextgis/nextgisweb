@@ -1,5 +1,5 @@
-/* -- Variables -- */
 /* Import */
+/* -- Variables -- */
 @import "fontello.css";
 .nextgis.claro .padding-block,
 .padding-block {
@@ -294,6 +294,36 @@ h2:first-child,
   padding-bottom: 8px;
   white-space: normal;
 }
+a,
+.link {
+  color: #076dbf;
+  text-decoration: underline;
+  cursor: pointer;
+}
+a:hover,
+.link:hover {
+  color: #2196F3;
+  border-color: #2196F3;
+  border-color: rgba(33, 150, 243, 0.4);
+}
+.link--action {
+  font-family: "lato_local";
+  font-size: 16px;
+  text-decoration: none;
+}
+.link--muted {
+  color: #888;
+}
+.link--muted:hover {
+  color: #555555;
+}
+.link__icon {
+  vertical-align: middle;
+  transition: transform .3s;
+}
+.link--dropdown.active .link__icon {
+  transform: rotate(-180deg);
+}
 .progress-circular--indeterminate {
   -webkit-animation: progress-circular-rotate 1.4s linear infinite;
   animation: progress-circular-rotate 1.4s linear infinite;
@@ -576,18 +606,6 @@ body {
   color: #212121;
   background-color: #fafafa;
   min-width: 900px;
-}
-a,
-.link {
-  color: #076dbf;
-  text-decoration: underline;
-  cursor: pointer;
-}
-a:hover,
-.link:hover {
-  color: #2196F3;
-  border-color: #2196F3;
-  border-color: rgba(33, 150, 243, 0.4);
 }
 .list-unstyled {
   margin: 0;
@@ -1512,16 +1530,27 @@ textarea {
 .nextgis.claro .dijitEditorIFrameContainer {
   padding: 16px;
 }
-.nextgis.claro .dijitButton--primary {
+.nextgis.claro .dijitButton--primary,
+.nextgis.claro .dijitButton--default {
   margin: 0;
-  background-color: #076dbf;
-  color: #fff;
   border-radius: 23px;
   font-size: 16px;
 }
-.nextgis.claro .dijitButton--primary .dijitButtonNode {
+.nextgis.claro .dijitButton--primary + .dijitButton--primary,
+.nextgis.claro .dijitButton--default + .dijitButton--primary,
+.nextgis.claro .dijitButton--primary + .dijitButton--default,
+.nextgis.claro .dijitButton--default + .dijitButton--default {
+  margin-left: 8px;
+}
+.nextgis.claro .dijitButton--primary.dijitButtonDisabled,
+.nextgis.claro .dijitButton--default.dijitButtonDisabled {
+  background: #ddd;
+  color: #999;
+}
+.nextgis.claro .dijitButton--primary .dijitButtonNode,
+.nextgis.claro .dijitButton--default .dijitButtonNode {
   height: 36px;
-  line-height: 30px;
+  line-height: 35px;
   font-size: inherit;
   background-image: none;
   background-color: inherit;
@@ -1532,45 +1561,24 @@ textarea {
   font-family: "lato_local";
   transition: none;
 }
-.nextgis.claro .dijitButton--primary .dijitButtonNode .dijitReset {
+.nextgis.claro .dijitButton--primary .dijitButtonNode .dijitReset,
+.nextgis.claro .dijitButton--default .dijitButtonNode .dijitReset {
   line-height: inherit;
 }
-.nextgis.claro .dijitButton--primary.dijitButtonDisabled {
-  background: #ddd;
-  color: #999;
+.nextgis.claro .dijitButton--primary .dijitButtonNode *,
+.nextgis.claro .dijitButton--default .dijitButtonNode * {
+  vertical-align: baseline;
+}
+.nextgis.claro .dijitButton--primary {
+  background-color: #076dbf;
+  color: #fff;
 }
 .nextgis.claro .dijitButton--primary:hover {
   background: #05518e;
 }
-.nextgis.claro .dijitButton--primary + .dijitButton--primary {
-  margin-left: 8px;
-}
 .nextgis.claro .dijitButton--default {
-  margin: 0;
   background-color: #e5eef7;
   color: #076dbf;
-  border-radius: 23px;
-  font-size: 16px;
-}
-.nextgis.claro .dijitButton--default .dijitButtonNode {
-  height: 36px;
-  line-height: 30px;
-  font-size: inherit;
-  background-image: none;
-  background-color: inherit;
-  border: 0;
-  color: inherit;
-  border-radius: 23px;
-  padding: 0 16px;
-  font-family: "lato_local";
-  transition: none;
-}
-.nextgis.claro .dijitButton--default .dijitButtonNode .dijitReset {
-  line-height: inherit;
-}
-.nextgis.claro .dijitButton--default.dijitButtonDisabled {
-  background: #ddd;
-  color: #999;
 }
 .nextgis.claro .dijitButton--s {
   font-size: 14px;
@@ -1671,4 +1679,8 @@ textarea {
   background-image: none;
   background-color: #f1f1f1;
   padding: 4px;
+}
+.nextgis.claro .dijitDialogUnderlay {
+  background: #010910;
+  opacity: .75;
 }

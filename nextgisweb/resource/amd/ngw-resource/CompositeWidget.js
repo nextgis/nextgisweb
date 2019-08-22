@@ -14,7 +14,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
-    "ngw-pyramid/ErrorDialog",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "ngw-pyramid/i18n!resource",
     "ngw/route",
     "xstyle/css!./resource/CompositeWidget.css"
@@ -116,7 +116,7 @@ define([
             }
 
             array.forEach(this.buttons, function (btn) {
-                domClass.add(btn.domNode, "dijitButton--primary"); 
+                domClass.add(btn.domNode, "dijitButton--primary");
             });
 
         },
@@ -151,8 +151,8 @@ define([
                         // If validation returned an error
                         // mark a heading red\
 
-                        if (!success) { 
-                            domClass.add(member.controlButton.domNode, "dijitTabError"); 
+                        if (!success) {
+                            domClass.add(member.controlButton.domNode, "dijitTabError");
                         } else {
                              if(domClass.contains(member.controlButton.domNode, "dijitTabError"))
                                 domClass.remove(member.controlButton.domNode, "dijitTabError");

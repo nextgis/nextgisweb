@@ -109,12 +109,18 @@ def guru_meditation(tb):
 
     tbhash = md5()
     for fn, line, func, text in tb:
-        tbhash.update(''.join((
-            # Only file name (without path) taken, so hash
-            # should not depend on package location.
-            os.path.split(fn)[-1],
-            unicode(line), func, text
-        )))
+        tbhash.update(
+            "".join(
+                (
+                    # Only file name (without path) taken, so hash
+                    # should not depend on package location.
+                    os.path.split(fn)[-1],
+                    unicode(line),
+                    func,
+                    text if text is not None else "",
+                )
+            )
+        )
 
     return tbhash.hexdigest()
 
@@ -202,20 +208,61 @@ def adapt_httpexception(iface, obj):
         and isinstance(obj, httpexceptions.HTTPError)  # NOQA: W503
     ):
         user_exception(
-            obj, title=obj.title, message=obj.explanation, detail=obj.detail,
+            obj, title=obj.title, message=obj.explanation, detail=None,
             http_status_code=obj.code)
 
         return IUserException(obj)
 
 
 # Patch useful pyramid HTTP exceptions with translatable strings
-for exc, title in (
-    (httpexceptions.HTTPBadRequest, _("Bad request")),
-    (httpexceptions.HTTPForbidden, _("Forbidden")),
-    (httpexceptions.HTTPNotFound, _("Not found")),
-    (httpexceptions.HTTPUnprocessableEntity, _("Unprocessable entity")),
-    (httpexceptions.HTTPInternalServerError, _("Internal server error")),
-    (httpexceptions.HTTPNotImplemented, _("Not implemented")),
-    (httpexceptions.HTTPServiceUnavailable, _("Service unavailable")),
+for exc, title, explanation in (
+    (
+        httpexceptions.HTTPBadRequest,
+        _("Bad request"),
+        _(
+            "The server could not comply with the request since "
+            "it is either malformed or otherwise incorrect."
+        ),
+    ),
+    (
+        httpexceptions.HTTPForbidden,
+        _("Forbidden"),
+        _("Access was denied to this resource."),
+    ),
+    (
+        httpexceptions.HTTPNotFound,
+        _("Page not found"),
+        _(
+            "The page may have been deleted or an error in the address. "
+            "Correct the address or go to the home page and try to find the desired page."
+        ),
+    ),
+    (
+        httpexceptions.HTTPUnprocessableEntity,
+        _("Unprocessable entity"),
+        _("Unable to process the contained instructions."),
+    ),
+    (
+        httpexceptions.HTTPInternalServerError,
+        _("Internal server error"),
+        _(
+            "The server has either erred or is incapable of performing "
+            "the requested operation."
+        ),
+    ),
+    (
+        httpexceptions.HTTPNotImplemented,
+        _("Not implemented"),
+        _("Not implemented"),
+    ),
+    (
+        httpexceptions.HTTPServiceUnavailable,
+        _("Service unavailable"),
+        _(
+            "The server is currently unavailable. "
+            "Please try again at a later time."
+        ),
+    ),
 ):
     exc.title = title
+    exc.explanation = explanation

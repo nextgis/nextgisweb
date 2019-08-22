@@ -438,7 +438,7 @@ def cget(resource, request):
             fld_key, operator = (key, 'eq')
 
         if fld_key in ['fld_%s' % k for k in keys]:
-            filter_.append((fld_key.lstrip('fld_'), operator, request.GET[key]))
+            filter_.append((re.sub('^fld_', '', fld_key), operator, request.GET[key]))
 
     if filter_:
         query.filter(*filter_)

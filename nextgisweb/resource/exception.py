@@ -27,8 +27,8 @@ class ResourceNotFound(UserException):
     title = _("Resource not found")
     message = _("Resource with id = %d was not found.")
     detail = _(
-        "The resource may have been deleted or an error in the URL. Correct "
-        "the URL or go to the home page and try to find the desired resource.")
+        "The resource may have been deleted or an error in the address. Correct "
+        "the address or go to the home page and try to find the desired resource.")
     http_status_code = 404
 
     def __init__(self, resource_id):

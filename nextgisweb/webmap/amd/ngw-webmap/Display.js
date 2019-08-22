@@ -51,6 +51,7 @@ define([
     "ngw-webmap/ui/BookmarkPanel/BookmarkPanel",
     "ngw-webmap/ui/SharePanel/SharePanel",
     "ngw-webmap/ui/InfoPanel/InfoPanel",
+    "ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel",
     "./tool/Swipe",
     "ngw-webmap/MapStatesObserver",
     // utils
@@ -109,7 +110,7 @@ define([
     MapToolbar,
     InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure, Identify, FeatureHighlighter,
     NavigationMenu,
-    LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel, InfoPanel,
+    LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel, InfoPanel, AnnotationsPanel,
     ToolSwipe,
     MapStatesObserver,
     URL,
@@ -400,10 +401,10 @@ define([
 
             // Панель с описанием
             if (this.config.webmapDescription) {
-                this.navigationMenuItems.splice(2,0, { 
-                    title: i18n.gettext('Description'), 
-                    name: 'info', 
-                    icon: 'info_outline', 
+                this.navigationMenuItems.splice(2,0, {
+                    title: i18n.gettext('Description'),
+                    name: 'info',
+                    icon: 'info_outline',
                     value: 'infoPanel'
                 });
                 // Асинхронный запуск чтобы применялись УРЛ параметры назначения стартового режима
@@ -427,6 +428,8 @@ define([
                     });
                 }, 0);
             }
+    
+            this._buildAnnotationsPanel();
 
             // Панель "Поделиться"
             all([widget._layersDeferred, widget._postCreateDeferred]).then(
@@ -529,6 +532,49 @@ define([
 
             // Инструменты
             this.tools = [];
+        },
+    
+        _buildAnnotationsPanel() {
+            if (!this.config.annotations ||
+                !this.config.annotations.enabled ||
+                !this.config.annotations.scope.read) {
+                return false;
+            }
+        
+            this.navigationMenuItems.splice(2, 0, {
+                title: i18n.gettext('Annotations'),
+                name: 'annotation',
+                icon: 'message',
+                value: 'annotationPanel'
+            });
+        
+            var buildAnnotationsPanel = function (widget) {
+                widget.annotationPanel = new AnnotationsPanel({
+                    region: 'left',
+                    class: 'dynamic-panel--fullwidth',
+                    title: i18n.gettext('Annotations'),
+                    isOpen: widget.activeLeftPanel == 'annotationPanel',
+                    gutters: false,
+                    withCloser: false,
+                    display: widget
+                });
+            
+                if (widget.activeLeftPanel == 'annotationPanel')
+                    widget.activatePanel(widget.annotationPanel);
+            
+                widget.annotationPanel.on('closed', function () {
+                    widget.navigationMenu.reset();
+                });
+            };
+        
+            all([this._layersDeferred, this._postCreateDeferred])
+                .then(lang.hitch(this, function () {
+                    buildAnnotationsPanel(this)
+                }))
+                .then(undefined, function (err) {
+                    console.error(err);
+                });
+        
         },
 
         postCreate: function () {

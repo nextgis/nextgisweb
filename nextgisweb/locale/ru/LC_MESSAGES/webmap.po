@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-05-16 17:05+0300\n"
+"POT-Creation-Date: 2019-07-31 16:20+0300\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: __init__.py:43
+#: __init__.py:47
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
@@ -31,59 +31,71 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:24 model.py:31 view.py:163
+#: model.py:28 model.py:37 view.py:173
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:26 view.py:166
+#: model.py:30 view.py:180
 msgid "Display"
 msgstr "Открыть"
 
-#: amd/ngw-webmap/Display.js:215 amd/ngw-webmap/Display.js:984
+#: model.py:31
+msgid "View annotations"
+msgstr "Просмотр аннотаций"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:100 model.py:32
+msgid "Edit annotations"
+msgstr "Редактировать аннотации"
+
+#: amd/ngw-webmap/Display.js:216 amd/ngw-webmap/Display.js:1030
 #: amd/ngw-webmap/ItemWidget.js:247
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:221
+#: amd/ngw-webmap/Display.js:222
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:227 amd/ngw-webmap/Display.js:438
+#: amd/ngw-webmap/Display.js:228 amd/ngw-webmap/Display.js:441
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:233 amd/ngw-webmap/Display.js:335
+#: amd/ngw-webmap/Display.js:234 amd/ngw-webmap/Display.js:336
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:374 amd/ngw-webmap/Display.js:381
+#: amd/ngw-webmap/Display.js:375 amd/ngw-webmap/Display.js:382
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:404 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:405 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:700 amd/ngw-webmap/tool/Zoom.js:19
+#: amd/ngw-webmap/Display.js:545 amd/ngw-webmap/Display.js:555
+msgid "Annotations"
+msgstr "Аннотации"
+
+#: amd/ngw-webmap/Display.js:746 amd/ngw-webmap/tool/Zoom.js:19
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:471
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:701 amd/ngw-webmap/tool/Zoom.js:22
+#: amd/ngw-webmap/Display.js:747 amd/ngw-webmap/tool/Zoom.js:22
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:472
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:705
+#: amd/ngw-webmap/Display.js:751
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:476
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:721
+#: amd/ngw-webmap/Display.js:767
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:724
+#: amd/ngw-webmap/Display.js:770
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:485
 msgid "Reset rotation"
 msgstr "Отменить поворот"
@@ -101,6 +113,7 @@ msgid "Use on the map"
 msgstr "Учитывать на карте"
 
 #: amd/ngw-webmap/ItemWidget.js:152
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
 msgid "Save"
 msgstr "Сохранить"
@@ -108,6 +121,15 @@ msgstr "Сохранить"
 #: amd/ngw-webmap/ItemWidget.js:313 amd/ngw-webmap/template/ItemWidget.hbs:26
 msgid "Add group"
 msgstr "Добавить группу"
+
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:8
+msgid "Your annotation text"
+msgstr "Ваш текст аннотации"
+
+#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.hbs:7
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:122
+msgid "Edit annotation"
+msgstr "Редактировать аннотацию"
 
 #: amd/ngw-webmap/plugin/FeatureLayer.js:61
 msgid "Go to"
@@ -125,13 +147,21 @@ msgstr "Редактирование"
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.hbs:8
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.hbs:10
 msgid "Enable layers editing"
 msgstr "Разрешить редактирование слоев"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:33
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:18
 msgid "Settings"
 msgstr "Настройки"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:30
+msgid "Enable annotations"
+msgstr "Разрешить аннотирование"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:33
+msgid "Show annotations by default"
+msgstr "Показывать аннотации по умолчанию"
 
 #: amd/ngw-webmap/template/Display.hbs:12
 msgid "Map"
@@ -223,15 +253,15 @@ msgstr "Идентификация"
 msgid "Features"
 msgstr "Объектов"
 
-#: amd/ngw-webmap/tool/Measure.js:24
+#: amd/ngw-webmap/tool/Measure.js:26
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
-#: amd/ngw-webmap/tool/Measure.js:29
+#: amd/ngw-webmap/tool/Measure.js:31
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:173
+#: amd/ngw-webmap/tool/Measure.js:170
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
@@ -259,6 +289,68 @@ msgstr "Удалить объекты"
 msgid "Modify features"
 msgstr "Изменить объекты"
 
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:50
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:38
+msgid "Don't save"
+msgstr "Не сохранять"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:55
+msgid "Delete"
+msgstr "Удалить"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:125
+msgid "Create annotation"
+msgstr "Создать аннотацию"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:5
+msgid "Stroke: width / color"
+msgstr "Обводка: ширина / цвет"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:10
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:46
+msgid "Please enter a numeric value"
+msgstr "Введите числовое значение"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:11
+msgid "Invalid width: should be from 0 to 20 px"
+msgstr "Значение должно быть от 0 до 20 пикс."
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:13
+msgid "Stroke width, px"
+msgstr "Ширина обводки, пикс."
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:18
+msgid "Stroke color"
+msgstr "Цвет обводки"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:25
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:31
+msgid "Fill color"
+msgstr "Цвет заливки"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:38
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:43
+msgid "Circle size, px"
+msgstr "Размер пунсона, пикс"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:47
+msgid "Invalid width: should be from 1 to 100 px"
+msgstr "Значение должно быть от 1 до 100 пикс."
+
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:185
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:201
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:216
+msgid "Error on the server:"
+msgstr "Ошибка на сервере:"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:14
+msgid "Show annotations layer"
+msgstr "Показывать слой аннотаций"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
+msgid "Show messages"
+msgstr "Показывать сообщения"
+
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:17
 msgid "Stopping editing"
 msgstr "Закончить редактирование?"
@@ -266,10 +358,6 @@ msgstr "Закончить редактирование?"
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:25
 msgid "Do you want to save changes?"
 msgstr "Вы хотите сохранить изменения?"
-
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:38
-msgid "Don't save"
-msgstr "Не сохранять"
 
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
 #: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:63

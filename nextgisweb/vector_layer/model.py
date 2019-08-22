@@ -944,20 +944,36 @@ class FeatureQueryBase(object):
         if self._filter:
             l = []
             for k, o, v in self._filter:
-                supported_operators = ('gt', 'lt', 'ge', 'le', 'eq', 'ne', 'like', 'ilike')
+                supported_operators = (
+                    "eq",
+                    "ge",
+                    "gt",
+                    "ilike",
+                    "in",
+                    "le",
+                    "like",
+                    "lt",
+                    "ne",
+                    "notin",
+                    "startswith",
+                )
                 if o not in supported_operators:
                     raise ValueError(
-                        "Invalid operator '%s'. Only %r are supported." % (
-                            o, supported_operators))
+                        "Invalid operator '%s'. Only %r are supported."
+                        % (o, supported_operators)
+                    )
 
-                if o == 'like':
-                    o = 'like_op'
-
-                if o == 'ilike':
-                    o = 'ilike_op'
+                if o in [
+                    "ilike",
+                    "in",
+                    "like",
+                    "notin",
+                    "startswith",
+                ]:
+                    o += "_op"
 
                 op = getattr(db.sql.operators, o)
-                if k == 'id':
+                if k == "id":
                     l.append(op(table.columns.id, v))
                 else:
                     l.append(op(table.columns[tableinfo[k].key], v))
@@ -982,9 +998,11 @@ class FeatureQueryBase(object):
         if self._like:
             l = []
             for f in tableinfo.fields:
-                if f.datatype == FIELD_TYPE.STRING:
-                    l.append(table.columns[f.key].ilike(
-                        '%' + self._like + '%'))
+                l.append(
+                    cast(table.columns[f.key], db.Unicode).ilike(
+                        "%" + self._like + "%"
+                    )
+                )
 
             where.append(db.or_(*l))
 

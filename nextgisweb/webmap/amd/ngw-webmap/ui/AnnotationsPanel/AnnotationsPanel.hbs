@@ -1,0 +1,23 @@
+<div class="annotations-panel">
+  <div data-dojo-attach-point="annotationPane"
+       data-dojo-type="dijit/layout/ContentPane"
+       data-dojo-props="region: 'center'"
+       style="padding: 0">
+
+    <div class="annotations-table-container"
+         data-dojo-attach-point="tcAnnotations"
+         data-dojo-type="dojox/layout/TableContainer"
+         data-dojo-props="cols: 1, labelWidth: 200">
+
+      <div data-dojo-attach-point="chbAnnotationsShow"
+           data-dojo-type="dijit/form/CheckBox"
+           title="{{gettext 'Show annotations layer'}}">
+      </div>
+
+      <div data-dojo-attach-point="chbAnnotationsShowMessages"
+           data-dojo-type="dijit/form/CheckBox"
+           title="{{gettext 'Show messages'}}">
+      </div>
+    </div>
+  </div>
+</div>

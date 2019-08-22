@@ -7,7 +7,7 @@ define([
     "dojo/request/xhr",
     "dojo/json",
     "ngw/route",
-    "ngw-pyramid/ErrorDialog",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "ngw-pyramid/i18n!pyramid",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/SystemNameForm.hbs",
@@ -65,7 +65,7 @@ define([
                 function () {
                     window.location.reload(true);
                 },
-                function (err) { new ErrorDialog({response: err}).show() })
+                function (err) { new ErrorDialog({response: err}).show() }
             );
         }
     });
