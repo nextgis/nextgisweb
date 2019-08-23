@@ -32,6 +32,8 @@ TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 
 Base = declarative_base()
 
+SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
+
 
 class ResourceTileCache(Base):
     __tablename__ = 'resource_tile_cache'
@@ -44,6 +46,11 @@ class ResourceTileCache(Base):
     max_z = db.Column(db.SmallInteger)
     ttl = db.Column(db.Integer)
     image_compose = db.Column(db.Boolean, nullable=False, default=False)
+    seed_z = db.Column(db.SmallInteger)
+    seed_tstamp = db.Column(db.TIMESTAMP)
+    seed_status = db.Column(db.Enum(*SEED_STATUS_ENUM))
+    seed_progress = db.Column(db.Integer)
+    seed_total = db.Column(db.Integer)
 
     resource = db.relationship(Resource, backref=db.backref(
         'tile_cache', cascade='all, delete-orphan', uselist=False))
@@ -246,6 +253,12 @@ class ResourceTileCache(Base):
 
         mark_changed(DBSession())
 
+    def update_seed_status(self, value, progress=None, total=None):
+        self.seed_status = value
+        self.seed_progress = progress
+        self.seed_total = total
+        self.seed_tstamp = datetime.utcnow()
+
 
 db.event.listen(
     ResourceTileCache.__table__, 'after_create',
@@ -299,6 +312,7 @@ class ResourceTileCacheSerializer(Serializer):
     max_z = ResourceTileCacheSeializedProperty(**__permissions)
     ttl = ResourceTileCacheSeializedProperty(**__permissions)
     image_compose = ResourceTileCacheSeializedProperty(**__permissions)
+    seed_z = ResourceTileCacheSeializedProperty(**__permissions)
 
     def is_applicable(self):
         return IRenderableStyle.providedBy(self.obj)

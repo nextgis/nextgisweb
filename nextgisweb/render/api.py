@@ -10,7 +10,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 
 from ..resource import Resource, DataScope, resource_factory
 
-from .interface import ILegendableStyle
+from .interface import ILegendableStyle, IRenderableStyle
 from .util import af_transform
 
 
@@ -241,6 +241,20 @@ def image(request):
     return Response(body_file=buf, content_type=b'image/png')
 
 
+def tile_cache_seed_status(request):
+    request.resource_permission(PD_READ)
+    tc = request.context.tile_cache
+    if tc is None:
+        return dict()
+
+    return dict(
+        tstamp=tc.seed_tstamp,
+        status=tc.seed_status,
+        progress=tc.seed_progress,
+        total=tc.seed_total,
+    )
+
+
 def legend(request):
     request.resource_permission(PD_READ)
     result = request.context.render_legend()
@@ -255,6 +269,14 @@ def setup_pyramid(comp, config):
     config.add_route(
         'render.image', r'/api/component/render/image'
     ).add_view(image, http_cache=0)
+
+    config.add_route(
+        'render.tile_cache.seed_status', r'/api/resource/{id:\d+}/tile_cache/seed_status',
+        factory=resource_factory
+    ).add_view(
+        tile_cache_seed_status, context=IRenderableStyle,
+        request_method='GET', renderer='json'
+    )
 
     config.add_route(
         'render.legend', r'/api/resource/{id:\d+}/legend',

@@ -5,6 +5,7 @@ import os.path
 
 from ..component import Component
 
+from . import command  # NOQA
 from .interface import (
     IRenderableStyle,
     IExtentRenderRequest,
