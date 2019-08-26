@@ -534,7 +534,7 @@ define([
             this.tools = [];
         },
     
-        _buildAnnotationsPanel() {
+        _buildAnnotationsPanel: function () {
             if (!this.config.annotations ||
                 !this.config.annotations.enabled ||
                 !this.config.annotations.scope.read) {
