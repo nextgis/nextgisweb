@@ -109,12 +109,18 @@ def guru_meditation(tb):
 
     tbhash = md5()
     for fn, line, func, text in tb:
-        tbhash.update(''.join((
-            # Only file name (without path) taken, so hash
-            # should not depend on package location.
-            os.path.split(fn)[-1],
-            unicode(line), func, text
-        )))
+        tbhash.update(
+            "".join(
+                (
+                    # Only file name (without path) taken, so hash
+                    # should not depend on package location.
+                    os.path.split(fn)[-1],
+                    unicode(line),
+                    func,
+                    text if text is not None else "",
+                )
+            )
+        )
 
     return tbhash.hexdigest()
 

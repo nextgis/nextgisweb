@@ -78,7 +78,7 @@ error message:
 
 .. code-block:: javascript
 
-    require(["ngw-pyramid/ErrorDialog"], function (ErrorDialog) {
+    require(["ngw-pyramid/ErrorDialog/ErrorDialog"], function (ErrorDialog) {
         // ...
         if (somethingWentWrong) {
             new ErrorDialog({

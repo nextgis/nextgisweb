@@ -9,7 +9,7 @@ define([
     "ngw-pyramid/i18n!spatial_ref_sys",
     "ngw-pyramid/hbs-i18n",
     "ngw/route",
-    "ngw-pyramid/ErrorDialog",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "dojo/text!./template/SRSWidget.hbs",
     "dojo/_base/array",
     "dojo/request/xhr",
