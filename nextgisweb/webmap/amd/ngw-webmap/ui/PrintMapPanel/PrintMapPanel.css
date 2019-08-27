@@ -27,6 +27,10 @@
   height: 7px;
 }
 
+.printMap-panel div.print-controls-pane .tableContainer-labelCell {
+  line-height: 1em;
+}
+
 .dijitButton.export-option .dijitButtonNode {
   background-color: #e5eef7;
   border-color: #c8e5f7;
