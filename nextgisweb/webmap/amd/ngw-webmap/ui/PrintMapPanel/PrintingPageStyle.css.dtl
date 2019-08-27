@@ -8,12 +8,16 @@ body {
     width: {{ widthPage }}mm;
 }
 
-#printMap div.map-container {
+#printMap {
     width: {{ widthMap }}mm;
     height: {{ heightMap }}mm;
     padding: 0;
-    margin: {{ margin }}mm;
     border: none;
+}
+
+#printMap div.ol-viewport {
+    width: {{ widthMap }}mm !important;
+    height: {{ heightMap }}mm !important;
 }
 
 #printMap img.map-logo {
@@ -38,12 +42,19 @@ body {
         max-width: {{ widthPage }}mm !important;
     }
 
-    body div.webmap-display,
-        #header,
-        div.dijitDialog,
-        div.dijitPopup,
-        div.dijitDialogUnderlayWrapper {
+    body #header,
+    div.print-controls-pane,
+    div.navigation-menu,
+    div.webmap-wrapper {
         display: none !important;
+    }
+
+    #printMapCanvas {
+        display: block;
+        width: {{ widthPage }}mm !important;
+        height: {{ heightPage }}mm !important;
+        margin: 0;
+        padding: 0;
     }
 
     #printMap {
@@ -66,14 +77,6 @@ body {
         width: {{ widthPage }}mm;
         height: {{ heightPage }}mm;
         padding: 0;
-        border: none;
-    }
-
-    #printMap div.map-container {
-        width: {{ widthMap }}mm;
-        height: {{ heightMap }}mm;
-        padding: 0;
-        margin: {{ margin }}mm;
         border: none;
     }
 }

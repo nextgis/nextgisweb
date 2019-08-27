@@ -1,68 +1,30 @@
 define([
-    'dojo/_base/declare',
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
-    'dijit/_TemplatedMixin',
-    'dijit/_WidgetsInTemplateMixin',
-    'dojo/_base/array',
-    'dojo/_base/lang',
-    'dojo/on',
-    'dojo/query',
-    'dojo/aspect',
-    'dojo/_base/window',
-    'dojo/dom-style',
-    'dojo/dom-class',
-    'dojo/dom-construct',
-    'ngw-pyramid/dynamic-panel/DynamicPanel',
-    'dijit/layout/BorderContainer',
-    'dojox/layout/TableContainer',
-    'dojox/dtl',
-    'dojox/dtl/Context',
-    'dijit/form/TextBox',
-    'dijit/form/NumberTextBox',
-    'dijit/form/DropDownButton',
-    'dijit/DropDownMenu',
-    'dijit/MenuItem',
-    'dijit/Toolbar',
-    'ngw/openlayers/Map',
-    'openlayers/ol',
-    'dojo/text!./PrintMapPanel.hbs',
-    'dojo/text!./PrintingPageStyle.css.dtl',
-    
-    //templates
-    
-    'dijit/form/Select',
-    'xstyle/css!./PrintMapPanel.css'
+    'dojo/_base/declare', 'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n',
+    'dijit/_TemplatedMixin', 'dijit/_WidgetsInTemplateMixin',
+    'dojo/_base/array', 'dojo/_base/lang', 'dojo/on',
+    'dojo/query', 'dojo/aspect', 'dojo/_base/window', 'dojo/dom-style',
+    'dojo/dom', 'dojo/dom-class', 'dojo/dom-construct', 'dojo/Deferred',
+    'ngw-pyramid/dynamic-panel/DynamicPanel', 'dijit/layout/BorderContainer',
+    'dojox/layout/TableContainer', 'dojox/dtl', 'dojox/dtl/Context',
+    'dijit/form/TextBox', 'dijit/form/NumberTextBox', 'dijit/form/DropDownButton',
+    'dijit/DropDownMenu', 'dijit/MenuItem', 'dijit/Toolbar',
+    'ngw/openlayers/Map', 'openlayers/ol', 'openlayers/ol-mapscale',
+    'dojo/text!./PrintMapPanel.hbs', 'dojo/text!./PrintingPageStyle.css.dtl',
+    'dijit/form/Select', 'dijit/TooltipDialog',
+    'xstyle/css!./PrintMapPanel.css',
+    'dom-to-image/dom-to-image'
 ], function (
-    declare,
-    i18n,
-    hbsI18n,
-    _TemplatedMixin,
-    _WidgetsInTemplateMixin,
-    array,
-    lang,
-    on,
-    query,
-    aspect,
-    win,
-    domStyle,
-    domClass,
-    domConstruct,
-    DynamicPanel,
-    BorderContainer,
-    TableContainer,
-    dtl,
-    dtlContext,
-    TextBox,
-    NumberTextBox,
-    DropdownButton,
-    DropDownMenu,
-    MenuItem,
-    Toolbar,
-    Map,
-    ol,
-    template,
-    printingCssTemplate) {
+    declare, i18n, hbsI18n,
+    _TemplatedMixin, _WidgetsInTemplateMixin,
+    array, lang, on,
+    query, aspect, win, domStyle,
+    dom, domClass, domConstruct, Deferred,
+    DynamicPanel, BorderContainer,
+    TableContainer, dtl, dtlContext,
+    TextBox, NumberTextBox, DropdownButton,
+    DropDownMenu, MenuItem, Toolbar,
+    Map, ol, olMapScale,
+    template, printingCssTemplate) {
     return declare([DynamicPanel, BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
         
         map: 'undefined',
@@ -75,9 +37,13 @@ define([
         printCssElement: null,
         isFullWidth: true,
         mode: 'format', // 'format', 'custom'
+        _mapScale: null,
         
         constructor: function (options) {
             declare.safeMixin(this, options);
+            
+            this.withTitle = false;
+            this.withCloser = false;
             
             this.contentWidget = new (declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
                 templateString: hbsI18n(template, i18n),
@@ -89,12 +55,24 @@ define([
         postCreate: function () {
             this.inherited(arguments);
             
-            on(this.contentWidget.okButton, 'click', lang.hitch(this, function () {
-                window.print();
+            on(this.contentWidget.printButton, 'click', lang.hitch(this, function () {
+                this._buildPrintCanvas('png').then(lang.hitch(this, function (hrefCanvasEl) {
+                    setTimeout(function () {
+                        window.print();
+                    }, 100);
+                }));
             }));
             
-            on(this.contentWidget.cancelButton, 'click', lang.hitch(this, function () {
-                this.hide();
+            on(this.contentWidget.exportJpegButton, 'click', lang.hitch(this, function () {
+                this._buildPrintCanvas('jpeg').then(lang.hitch(this, function (hrefCanvasEl) {
+                    hrefCanvasEl.click();
+                }));
+            }));
+            
+            on(this.contentWidget.exportPngButton, 'click', lang.hitch(this, function () {
+                this._buildPrintCanvas('png').then(lang.hitch(this, function (hrefCanvasEl) {
+                    hrefCanvasEl.click();
+                }));
             }));
             
             on(this.contentWidget.sizesSelect, 'change', lang.hitch(this, function () {
@@ -113,6 +91,85 @@ define([
                     this._resizeMapContainer(width, height);
                 }
             }));
+            
+            on(this.contentWidget.scalesSelect, 'change', lang.hitch(this, function () {
+                var scale = this.contentWidget.scalesSelect.get('value');
+                
+                var view = this.printMap.olMap.getView();
+                var projection = view.getProjection();
+                var center = view.getCenter();
+                var pointResolution3857 = Math.cosh(center[1] / 6378137);
+                var resolution = pointResolution3857 * (parseInt(scale, 10) / (96 * 39.3701));
+                this.printMap.olMap.getView().setResolution(resolution);
+            }));
+            
+            on(this.contentWidget.scaleDisplay, 'change', lang.hitch(this, function (value) {
+                this._onScaleCheckboxChange(value, 'value');
+            }));
+            
+            on(this.contentWidget.scaleBar, 'change', lang.hitch(this, function (value) {
+                this._onScaleCheckboxChange(value, 'line');
+            }));
+        },
+        
+        _onScaleCheckboxChange: function (value, cssClass) {
+            if (!this._mapScale) return;
+            var element = this._mapScale.element;
+            if (value) {
+                domClass.add(element, cssClass);
+            } else {
+                domClass.remove(element, cssClass);
+            }
+        },
+        
+        /**
+         * Build canvas for printing image.
+         *
+         * @param {string} imageType - "png" or "jpeg"
+         * @return {Deferred} A good string
+         */
+        _buildPrintCanvas: function (imageType) {
+            var deferred = new Deferred(),
+                domToImagePromise;
+            
+            switch (imageType) {
+                case 'png':
+                    domToImagePromise = domtoimage.toPng(this.printMap.olMap.getViewport());
+                    break;
+                case 'jpeg':
+                    domToImagePromise = domtoimage.toJpeg(this.printMap.olMap.getViewport());
+                    break;
+                default:
+                    console.error('Image type "' + imageType + '" is unknown.');
+            }
+            
+            domToImagePromise.then(lang.hitch(this, function (dataUrl) {
+                var hrefCanvasEl = this._buildHrefCanvasElement(dataUrl);
+                deferred.resolve(hrefCanvasEl);
+            })).catch(function (error) {
+                console.error(error);
+                deferred.reject(error);
+            });
+            
+            return deferred.promise;
+        },
+        
+        _buildHrefCanvasElement: function (dataUrl) {
+            var img, a;
+            
+            domConstruct.destroy('printMapCanvas');
+            
+            img = new Image();
+            img.src = dataUrl;
+            img.title = 'NextGIS web map';
+            a = document.createElement('a');
+            a.id = 'printMapCanvas';
+            a.href = dataUrl;
+            a.download = 'NextGIS web map';
+            a.appendChild(img);
+            document.body.appendChild(a);
+            
+            return a;
         },
         
         _setMode: function (newMode) {
@@ -167,6 +224,8 @@ define([
             this._buildPrintElement();
             this._buildMap();
             this.contentWidget.sizesSelect.attr('value', '210_297');
+            this.contentWidget.scaleDisplay.attr('checked', false);
+            this.contentWidget.scaleBar.attr('checked', false);
         },
         
         _resizeMapContainer: function (width, height, margin) {
@@ -194,26 +253,14 @@ define([
         },
         
         _buildPrintElement: function () {
-            var printElement = document.getElementById(this.printElementId);
-            if (printElement === null) {
-                var node = domConstruct.toDom('<div id="' + this.printElementId + '"><div class="map-container map"></div></div>');
-                this.printElement = domConstruct.place(node, document.body, 'last');
-                this.printElementMap = query('div.map-container', this.printElement)[0];
-                this.printElement.style.top = 244 + document.getElementById('header').offsetHeight + 'px';
-                
-                on(window, 'resize', lang.hitch(this, function () {
-                    console.log('resize');
-                    this.printElement.style.top = 244 + document.getElementById('header').offsetHeight + 'px';
-                }));
-            } else {
-                domConstruct.empty(query('div.map-container', this.printElement)[0]);
-                domClass.remove(printElement, 'inactive');
-                this.printElement = printElement;
-            }
+            var printElement = this.contentWidget.mapContainer;
+            domConstruct.empty(printElement);
+            domClass.remove(printElement, 'inactive');
+            this.printElement = printElement;
         },
         
         _buildMap: function () {
-            var mapContainer = query('div.map-container', this.printElement)[0];
+            var mapContainer = this.contentWidget.mapContainer;
             
             this.printMap = new Map({
                 target: mapContainer,
@@ -233,6 +280,13 @@ define([
                 })
             });
             
+            this._mapScale = new olMapScale({
+                formatNumber: function (scale) {
+                    return Math.round(scale / 1000) * 1000;
+                }
+            });
+            this.printMap.olMap.addControl(this._mapScale);
+            
             aspect.after(mapContainer, 'resize', lang.hitch(this, function () {
                 this.printMap.olMap.updateSize();
             }));
@@ -240,6 +294,7 @@ define([
             array.forEach(this.map.getLayers().getArray(), function (layer) {
                 if (layer.getVisible()) {
                     this.printMap.olMap.addLayer(layer);
+                    console.log(layer);
                 }
             }, this);
             

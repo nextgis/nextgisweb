@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-07-31 16:20+0300\n"
+"POT-Creation-Date: 2019-08-27 08:21+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -131,11 +131,11 @@ msgstr "Ваш текст аннотации"
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:61
+#: amd/ngw-webmap/plugin/FeatureLayer.js:27
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:110
+#: amd/ngw-webmap/plugin/FeatureLayer.js:75
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -360,7 +360,6 @@ msgid "Do you want to save changes?"
 msgstr "Вы хотите сохранить изменения?"
 
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:63
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -368,73 +367,101 @@ msgstr "Отменить"
 msgid "Layer"
 msgstr "Слой"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:9
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:14
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:12
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:17
 msgid "Select format"
 msgstr "Выберите формат"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:13
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:18
 msgid "A4 - Portrait"
 msgstr "A4 - Портретный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:14
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:19
 msgid "A4 - Landscape"
 msgstr "A4 - Альбомный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:15
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:20
 msgid "A3 - Portrait"
 msgstr "A3 - Портретный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:16
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:21
 msgid "A3 - Landscape"
 msgstr "A3 - Альбомный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:17
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:22
 msgid "A2 - Portrait"
 msgstr "A2 - Портретный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:18
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:23
 msgid "A2 - Landscape"
 msgstr "A2 - Альбомный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:19
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:24
 msgid "A1 - Portrait"
 msgstr "A1 - Портретный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:20
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:25
 msgid "A1 - Landscape"
 msgstr "A1 - Альбомный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:21
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:26
 msgid "A0 - Portrait"
 msgstr "A0 - Портретный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:22
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:27
 msgid "A0 - Landscape"
 msgstr "A0 - Альбомный"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:23
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:28
 msgid "Custom size"
 msgstr "Настраиваемый"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:29
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:34
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:39
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:45
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:49
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:56
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:70
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:67
+msgid "Scale value"
+msgstr "Значение масштаба"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:72
+msgid "Scale bar"
+msgstr "Масштабная линейка"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:77
+msgid "Scale"
+msgstr "Масштаб"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:80
+msgid "Select scale"
+msgstr "Выберите масштаб"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:102
 msgid "Print"
 msgstr "Печать"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:107
+msgid "Save as"
+msgstr "Сохранить как"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:114
+msgid "JPEG"
+msgstr "JPEG"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:121
+msgid "PNG"
+msgstr "PNG"
 
 #: amd/ngw-webmap/ui/SearchPanel/SearchPanel.hbs:7
 msgid "Search on the map"
