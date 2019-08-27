@@ -4,9 +4,6 @@ body {
     margin: 0;
     padding: 0;
 }
-#printMap {
-    width: {{ widthPage }}mm;
-}
 
 #printMap {
     width: {{ widthMap }}mm;
@@ -29,17 +26,17 @@ body {
 
 @page {
     size: {{ widthPage }}mm {{ heightPage }}mm;
-    margin: 0;
+    margin: {{ margin }}mm;
 }
 
 @media print {
     html, body {
-        width: {{ widthPage }}mm !important;
-        height: {{ heightPage }}mm !important;
+        width: {{ widthMap }}mm !important;
+        height: {{ heightMap }}mm !important;
         padding: 0 !important;
         margin: 0 !important;
-        min-width: {{ widthPage }}mm !important;
-        max-width: {{ widthPage }}mm !important;
+        min-width: {{ widthMap }}mm !important;
+        max-width: {{ widthMap }}mm !important;
     }
 
     body #header,
@@ -51,8 +48,8 @@ body {
 
     #printMapCanvas {
         display: block;
-        width: {{ widthPage }}mm !important;
-        height: {{ heightPage }}mm !important;
+        width: {{ widthMap }}mm !important;
+        height: {{ heightMap }}mm !important;
         margin: 0;
         padding: 0;
     }
