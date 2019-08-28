@@ -10,12 +10,14 @@
            data-dojo-props="cols:1, region: 'top'"
            style="width: 100%;">
         <select id="sizesSelect"
-                data-dojo-type="dijit.form.Select"
+                data-dojo-type="dijit/form/Select"
                 data-dojo-attach-point="sizesSelect"
                 title="{{gettext 'Paper format'}}"
                 name="sizes"
                 style="width: 180px;">
-          <option value="none" disabled="disabled" selected>{{gettext 'Select format'}}</option>
+          <option value="none" disabled="disabled" selected>
+            {{gettext 'Select format'}}
+          </option>
           <option value="210_297">{{gettext 'A4 - Portrait'}}</option>
           <option value="280_200">{{gettext 'A4 - Landscape'}}</option>
           <option value="297_420">{{gettext 'A3 - Portrait'}}</option>

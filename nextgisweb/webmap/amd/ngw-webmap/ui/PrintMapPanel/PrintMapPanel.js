@@ -1,5 +1,5 @@
 define([
-    'dojo/_base/declare', 'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n',
+    'dojo/_base/declare', 'dojo/topic',
     'dijit/_TemplatedMixin', 'dijit/_WidgetsInTemplateMixin',
     'dojo/_base/array', 'dojo/_base/lang', 'dojo/on',
     'dojo/query', 'dojo/aspect', 'dojo/_base/window', 'dojo/dom-style',
@@ -8,13 +8,14 @@ define([
     'dojox/layout/TableContainer', 'dojox/dtl', 'dojox/dtl/Context',
     'dijit/form/TextBox', 'dijit/form/NumberTextBox', 'dijit/form/DropDownButton',
     'dijit/DropDownMenu', 'dijit/MenuItem', 'dijit/Toolbar',
+    'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n',
     'ngw/openlayers/Map', 'openlayers/ol', 'openlayers/ol-mapscale',
     'dojo/text!./PrintMapPanel.hbs', 'dojo/text!./PrintingPageStyle.css.dtl',
     'dijit/form/Select', 'dijit/TooltipDialog',
     'xstyle/css!./PrintMapPanel.css',
     'dom-to-image/dom-to-image'
 ], function (
-    declare, i18n, hbsI18n,
+    declare, topic,
     _TemplatedMixin, _WidgetsInTemplateMixin,
     array, lang, on,
     query, aspect, win, domStyle,
@@ -23,6 +24,7 @@ define([
     TableContainer, dtl, dtlContext,
     TextBox, NumberTextBox, DropdownButton,
     DropDownMenu, MenuItem, Toolbar,
+    i18n, hbsI18n,
     Map, ol, olMapScale,
     template, printingCssTemplate) {
     return declare([DynamicPanel, BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -92,6 +94,10 @@ define([
                 }
             }));
             
+            topic.subscribe('ol/mapscale/changed', lang.hitch(this, function (scaleValue) {
+                this._setCurrentScale(scaleValue);
+            }));
+            
             on(this.contentWidget.scalesSelect, 'change', lang.hitch(this, function () {
                 var scale = this.contentWidget.scalesSelect.get('value');
                 
@@ -120,6 +126,10 @@ define([
             } else {
                 domClass.remove(element, cssClass);
             }
+        },
+        
+        _setCurrentScale: function (scaleValue) {
+            this.contentWidget.scalesSelect.updateOption({value: 'none', label: '1 : ' + scaleValue, selected: true});
         },
         
         /**
@@ -294,7 +304,6 @@ define([
             array.forEach(this.map.getLayers().getArray(), function (layer) {
                 if (layer.getVisible()) {
                     this.printMap.olMap.addLayer(layer);
-                    console.log(layer);
                 }
             }, this);
             

@@ -1,7 +1,9 @@
 define([
         'dojo/_base/declare',
+        'dojo/topic',
         'openlayers/ol'
-    ], function (declare, ol) {
+    
+    ], function (declare, topic, ol) {
         
         /**
          * This file is part of ol-mapscale package.
@@ -198,6 +200,12 @@ define([
                 element.appendChild(_this.scaleValueElement_);
                 
                 /**
+                 * @type {String}
+                 * @private
+                 */
+                _this.previousScaleValue_ = null;
+                
+                /**
                  * @private
                  * @type {olx.ViewState}
                  */
@@ -255,28 +263,33 @@ define([
                  * @private
                  */
                 
-            }, {
-                key: 'updateElement_',
-                value: function updateElement_() {
-                    var viewState = this.viewState_;
-                    
-                    if (viewState) {
-                        var resolution = viewState.resolution;
-                        var projection = viewState.projection;
-                        var center = viewState.center;
-                        var pointResolution = ol.proj.getPointResolution(projection, resolution, center, ol.proj.Units.METERS);
-                        var scale = Math.round(pointResolution * INCHES_PER_METER * DOTS_PER_INCH);
-                        var formatNumber_ = this.formatNumber_ || formatNumber;
-                        var scaleValue;
-                        if (this.formatNumber_) {
-                            scaleValue = this.formatNumber_(scale);
-                        } else {
-                            scaleValue = formatNumber_(scale, this.digits_, this.units_);
+            },
+                {
+                    key: 'updateElement_',
+                    value: function updateElement_() {
+                        var viewState = this.viewState_;
+                        
+                        if (viewState) {
+                            var resolution = viewState.resolution;
+                            var projection = viewState.projection;
+                            var center = viewState.center;
+                            var pointResolution = ol.proj.getPointResolution(projection, resolution, center, ol.proj.Units.METERS);
+                            var scale = Math.round(pointResolution * INCHES_PER_METER * DOTS_PER_INCH);
+                            var formatNumber_ = this.formatNumber_ || formatNumber;
+                            var scaleValue;
+                            if (this.formatNumber_) {
+                                scaleValue = this.formatNumber_(scale);
+                            } else {
+                                scaleValue = formatNumber_(scale, this.digits_, this.units_);
+                            }
+                            if (this.previousScaleValue_ !== scaleValue) {
+                                this.previousScaleValue_ = scaleValue;
+                                topic.publish('ol/mapscale/changed', scaleValue);
+                            }
+                            this.scaleValueElement_.innerHTML = '1 : ' + scaleValue;
                         }
-                        this.scaleValueElement_.innerHTML = '1 : ' + scaleValue;
                     }
-                }
-            }], [{
+                }], [{
                 key: 'render',
                 value: function render(mapEvent) {
                     var frameState = mapEvent.frameState;
