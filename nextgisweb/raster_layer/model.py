@@ -30,11 +30,7 @@ PYRAMID_TARGET_SIZE = 512
 
 Base = declarative_base()
 
-SUPPORTED_GDT = (gdalconst.GDT_Byte, )
-
-SUPPORTED_GDT_NAMES = ', '.join([
-    gdal.GetDataTypeName(i)
-    for i in SUPPORTED_GDT])
+SUPPORTED_DRIVERS = ('GTiff', )
 
 
 class RasterLayer(Base, Resource, SpatialLayerMixin):
@@ -49,6 +45,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
     xsize = sa.Column(sa.Integer, nullable=False)
     ysize = sa.Column(sa.Integer, nullable=False)
+    dtype = sa.Column(sa.Unicode, nullable=False)
     band_count = sa.Column(sa.Integer, nullable=False)
 
     fileobj = orm.relationship(FileObj, cascade='all')
@@ -62,30 +59,34 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         if not ds:
             raise ValidationError(_("GDAL library was unable to open the file."))
 
-        if ds.RasterCount not in (1, 3, 4):
-            raise ValidationError(_("Only RGB, RGBA and single-band rasters are supported."))
-
-        paletted = None
-        if ds.RasterCount == 1:
-            band = ds.GetRasterBand(1)
-            paletted = band.GetRasterColorTable()
-            if paletted is None:
-                raise ValidationError(_("Only paletted single-band rasters are supported."))
-        else:
-            for bidx in range(1, ds.RasterCount + 1):
-                band = ds.GetRasterBand(bidx)
-
-                if band.DataType not in SUPPORTED_GDT:
-                    raise ValidationError(
-                        _("Band #%(band)d has type '%(type)s', however only following band types are supported: %(all_types)s.") % dict(  # NOQA: E501
-                            band=bidx, type=gdal.GetDataTypeName(band.DataType),
-                            all_types=SUPPORTED_GDT_NAMES))
-
+        dsdriver = ds.GetDriver()
         dsproj = ds.GetProjection()
         dsgtran = ds.GetGeoTransform()
 
+        if dsdriver.ShortName not in SUPPORTED_DRIVERS:
+            raise ValidationError(
+                _(
+                    "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
+                )
+                % dict(
+                    format=dsdriver.ShortName,
+                    all_formats=", ".join(SUPPORTED_DRIVERS),
+                )
+            )
+
         if not dsproj or not dsgtran:
             raise ValidationError(_("Raster files without projection info are not supported."))
+
+        band_types = set(
+            gdal.GetDataTypeName(band.DataType)
+            for band in (
+                ds.GetRasterBand(bidx)
+                for bidx in range(1, ds.RasterCount + 1)
+            )
+        )
+
+        if len(band_types) != 1:
+            raise ValidationError(_("Complex data types are not supported."))
 
         src_osr = osr.SpatialReference()
         src_osr.ImportFromWkt(dsproj)
@@ -107,27 +108,14 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         else:
             cmd = ['gdal_translate', '-of', 'GTiff']
 
-        cmd.extend(('-co', 'TILED=YES',
+        cmd.extend(('-co', 'COMPRESS=DEFLATE',
+                    '-co', 'TILED=YES',
                     '-co', 'BIGTIFF=YES', filename, dst_file))
         subprocess.check_call(cmd)
 
-        if paletted:
-            # Convert paletted single-band image into RGBA image.
-            # For a paletted TIFF with nodata, set the alpha component
-            # of the color entry that matches the nodata value to 0.
-            # https://trac.osgeo.org/gdal/changeset/28000 (GDAL 2.X)
-            try:
-                tf = NamedTemporaryFile()
-                copy(dst_file, tf.name)
-
-                cmd = ['gdal_translate', '-expand', 'rgba',
-                       tf.name, dst_file]
-                subprocess.check_call(cmd)
-            finally:
-                tf.close()
-
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
+        self.dtype = band_types.pop()
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
         self.band_count = ds.RasterCount
@@ -158,7 +146,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         cmd = [
             'gdaladdo', '-q', '-ro', '-r', 'cubic',
-            '--config', 'COMPRESS_OVERVIEW', 'JPEG',
+            '--config', 'COMPRESS_OVERVIEW', 'DEFLATE',
             '--config', 'INTERLEAVE_OVERVIEW', 'PIXEL',
             '--config', 'BIGTIFF_OVERVIEW', 'YES',
             fn
@@ -170,7 +158,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     def get_info(self):
         s = super(RasterLayer, self)
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
-            (_("File UUID"), self.fileobj.uuid),
+            (_("Data type"), self.dtype),
         )
 
     # IBboxLayer implementation:
