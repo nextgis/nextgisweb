@@ -32,7 +32,6 @@ define([
         map: 'undefined',
         id: 'printMapDialog',
         contentId: 'printMapContent',
-        printElementId: 'printMap',
         printElement: null,
         printElementMap: null,
         printMap: null,
@@ -58,11 +57,7 @@ define([
             this.inherited(arguments);
             
             on(this.contentWidget.printButton, 'click', lang.hitch(this, function () {
-                this._buildPrintCanvas('png').then(lang.hitch(this, function (hrefCanvasEl) {
-                    setTimeout(function () {
-                        window.print();
-                    }, 100);
-                }));
+                window.print();
             }));
             
             on(this.contentWidget.exportJpegButton, 'click', lang.hitch(this, function () {
@@ -102,7 +97,6 @@ define([
                 var scale = this.contentWidget.scalesSelect.get('value');
                 
                 var view = this.printMap.olMap.getView();
-                var projection = view.getProjection();
                 var center = view.getCenter();
                 var pointResolution3857 = Math.cosh(center[1] / 6378137);
                 var resolution = pointResolution3857 * (parseInt(scale, 10) / (96 * 39.3701));

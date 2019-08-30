@@ -5,19 +5,28 @@ body {
     padding: 0;
 }
 
-#printMap {
+#printMapPage {
+  width: {{ widthPage }}mm;
+  height: {{ heightPage }}mm;
+  padding: 0;
+}
+
+#printMapPage .print-map {
+    display: block;
+    position: absolute;
     width: {{ widthMap }}mm;
     height: {{ heightMap }}mm;
     padding: 0;
+    margin: {{ margin }}mm;
     border: none;
 }
 
-#printMap div.ol-viewport {
+#printMapPage .print-map div.ol-viewport {
     width: {{ widthMap }}mm !important;
     height: {{ heightMap }}mm !important;
 }
 
-#printMap img.map-logo {
+#printMapPage .print-map img.map-logo {
     position: absolute;
     z-index: 9999999;
     top: 2px;
@@ -42,19 +51,40 @@ body {
     body #header,
     div.print-controls-pane,
     div.navigation-menu,
-    div.webmap-wrapper {
+    div.main-pane .main-container .map-container,
+    #printMapCanvas {
         display: none !important;
     }
 
-    #printMapCanvas {
-        display: block;
-        width: {{ widthMap }}mm !important;
-        height: {{ heightMap }}mm !important;
-        margin: 0;
-        padding: 0;
+    #webmap-wrapper,
+    #printMapDialog,
+    div.print-map-pane,
+    div.dijitTabPaneWrapper.dijitTabContainerTop-container.dijitAlignCenter,
+    div.main-pane,
+    div.main-container,
+    #webmap-wrapper div.leftPanelPane,
+    div.printMap-panel,
+    div.printMap-panel .dijitBorderContainer,
+    #printMapPage,
+    #printMapPage .print-map {
+      width: {{ widthMap }}mm !important;
+      height: {{ heightMap }}mm !important;
+      margin: 0;
+      padding: 0;
     }
 
-    #printMap {
+    #webmap-wrapper div.leftPanelPane,
+    div.print-map-pane {
+      left: 0 !important;
+      top: 0 !important;
+      position: absolute;
+    }
+
+    #webmap-wrapper {
+      top: 0 !important;
+    }
+
+    #printMapPage .print-map {
         display: block!important;
         position: relative;
         margin: 0;
@@ -71,8 +101,6 @@ body {
         margin: 0!important;
         max-width: 100%!important;
         overflow: hidden;
-        width: {{ widthPage }}mm;
-        height: {{ heightPage }}mm;
         padding: 0;
         border: none;
     }

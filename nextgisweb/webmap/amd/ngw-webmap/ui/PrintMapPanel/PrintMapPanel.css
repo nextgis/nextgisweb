@@ -41,9 +41,9 @@
   background-color: #c8e5f7;
 }
 
-#printMap {
+#printMapPage {
   display: block;
-  margin: 0 auto;
+  margin: 10px auto;
   z-index: 400;
   -webkit-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
   -moz-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
@@ -51,26 +51,26 @@
   background-color: white;
 }
 
-#printMap div.map-container {
+#printMapPage .print-map div.map-container {
   position: relative;
   display: block;
   z-index: 1000;
 }
 
-#printMap.inactive {
+#printMapPage .print-map.inactive {
   display: none;
 }
 
-#printMap .map-logo {
+#printMapPage .print-map .map-logo {
   bottom: 12px;
 }
 
-#printMap .ol-scale-line-inner {
+#printMapPage .print-map .ol-scale-line-inner {
   top: -26px;
   left: unset;
 }
 
-#printMap .ol-mapscale {
+#printMapPage .print-map .ol-mapscale {
   position: absolute;
   bottom: 8px;
   left: 8px;
@@ -80,32 +80,32 @@
   overflow: hidden;
 }
 
-#printMap .ol-mapscale * {
+#printMapPage .print-map .ol-mapscale * {
   color: black;
   font-size: 10px;
   margin: 2px;
 }
 
-#printMap .ol-mapscale .ol-scale-value,
-#printMap .ol-mapscale .ol-scale-line-target {
+#printMapPage .print-map .ol-mapscale .ol-scale-value,
+#printMapPage .print-map .ol-mapscale .ol-scale-line-target {
   display: none;
 }
 
-#printMap .ol-mapscale.value .ol-scale-value {
+#printMapPage .print-map .ol-mapscale.value .ol-scale-value {
   display: block;
 }
 
-#printMap .ol-mapscale.line .ol-scale-line-target {
+#printMapPage .print-map .ol-mapscale.line .ol-scale-line-target {
   display: block;
 }
 
-#printMap .ol-mapscale .ol-scale-line {
+#printMapPage .print-map .ol-mapscale .ol-scale-line {
   position: static;
   background: none;
   padding: 0;
 }
 
-#printMap .ol-mapscale .ol-scale-line-inner {
+#printMapPage .print-map .ol-mapscale .ol-scale-line-inner {
   border: 1px solid black;
   border-top: none;
   text-align: center;
