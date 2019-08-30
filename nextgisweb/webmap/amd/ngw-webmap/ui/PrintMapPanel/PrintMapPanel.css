@@ -4,19 +4,30 @@
   text-align: center;
 }
 
-.printMap-panel div.dijitLayoutContainer.dijitContainer.dijitTableLayout {
-  display: inline-block;
-  text-align: left;
-}
-
 .printMap-panel div.print-controls-pane {
   width: 350px;
   margin: 0;
-  padding: 5px 0 0 0;
+  padding: 0;
   border-right: 1px #b5bcc7 solid;
   border-left: none;
   border-top: none;
   border-bottom: none;
+}
+
+.printMap-panel .dynamic-panel__title {
+  text-align: left;
+}
+
+.printMap-panel .print-panel-content {
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  width: 100%;
+}
+
+.printMap-panel div.dijitLayoutContainer.dijitContainer.dijitTableLayout {
+  display: inline-block;
+  text-align: left;
 }
 
 .printMap-panel div.print-controls-pane .buttons-section {
