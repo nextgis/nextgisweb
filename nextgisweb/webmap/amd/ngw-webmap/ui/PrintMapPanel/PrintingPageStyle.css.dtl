@@ -71,6 +71,7 @@ body {
       height: {{ heightMap }}mm !important;
       margin: 0;
       padding: 0;
+      overflow: hidden;
     }
 
     #webmap-wrapper div.leftPanelPane,
