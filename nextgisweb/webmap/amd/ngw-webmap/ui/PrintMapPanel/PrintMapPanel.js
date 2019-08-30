@@ -2,7 +2,7 @@ define([
     'dojo/_base/declare', 'dojo/topic',
     'dijit/_TemplatedMixin', 'dijit/_WidgetsInTemplateMixin',
     'dojo/_base/array', 'dojo/_base/lang', 'dojo/on',
-    'dojo/query', 'dojo/aspect', 'dojo/_base/window', 'dojo/dom-style',
+    'dojo/query', 'dojo/has', 'dojo/sniff', 'dojo/aspect', 'dojo/_base/window', 'dojo/dom-style',
     'dojo/dom', 'dojo/dom-class', 'dojo/dom-construct', 'dojo/Deferred',
     'ngw-pyramid/dynamic-panel/DynamicPanel', 'dijit/layout/BorderContainer',
     'dojox/layout/TableContainer', 'dojox/dtl', 'dojox/dtl/Context',
@@ -18,7 +18,7 @@ define([
     declare, topic,
     _TemplatedMixin, _WidgetsInTemplateMixin,
     array, lang, on,
-    query, aspect, win, domStyle,
+    query, has, sniff, aspect, win, domStyle,
     dom, domClass, domConstruct, Deferred,
     DynamicPanel, BorderContainer,
     TableContainer, dtl, dtlContext,
@@ -60,17 +60,7 @@ define([
                 window.print();
             }));
             
-            on(this.contentWidget.exportJpegButton, 'click', lang.hitch(this, function () {
-                this._buildPrintCanvas('jpeg').then(lang.hitch(this, function (hrefCanvasEl) {
-                    hrefCanvasEl.click();
-                }));
-            }));
-            
-            on(this.contentWidget.exportPngButton, 'click', lang.hitch(this, function () {
-                this._buildPrintCanvas('png').then(lang.hitch(this, function (hrefCanvasEl) {
-                    hrefCanvasEl.click();
-                }));
-            }));
+            this._processExportButtons();
             
             on(this.contentWidget.sizesSelect, 'change', lang.hitch(this, function () {
                 var sizeValues = this.contentWidget.sizesSelect.get('value'),
@@ -112,6 +102,25 @@ define([
             
             on(this.contentWidget.scaleBar, 'change', lang.hitch(this, function (value) {
                 this._onScaleCheckboxChange(value, 'line');
+            }));
+        },
+        
+        _processExportButtons: function () {
+            if (has('ie') || sniff('trident') || has('safari')) {
+                domStyle.set(this.contentWidget.exportButton.domNode, 'display', 'none');
+                return;
+            }
+            
+            on(this.contentWidget.exportJpegButton, 'click', lang.hitch(this, function () {
+                this._buildPrintCanvas('jpeg').then(lang.hitch(this, function (hrefCanvasEl) {
+                    hrefCanvasEl.click();
+                }));
+            }));
+            
+            on(this.contentWidget.exportPngButton, 'click', lang.hitch(this, function () {
+                this._buildPrintCanvas('png').then(lang.hitch(this, function (hrefCanvasEl) {
+                    hrefCanvasEl.click();
+                }));
             }));
         },
         
