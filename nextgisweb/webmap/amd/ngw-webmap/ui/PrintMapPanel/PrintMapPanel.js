@@ -98,7 +98,10 @@ define([
                 
                 var view = this.printMap.olMap.getView();
                 var center = view.getCenter();
-                var pointResolution3857 = Math.cosh(center[1] / 6378137);
+                var cosh = function (value) {
+                    return (Math.exp(value) + Math.exp(-value)) / 2;
+                };
+                var pointResolution3857 = cosh(center[1] / 6378137);
                 var resolution = pointResolution3857 * (parseInt(scale, 10) / (96 * 39.3701));
                 this.printMap.olMap.getView().setResolution(resolution);
             }));
