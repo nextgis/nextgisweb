@@ -19,6 +19,7 @@ define([
                     resource: item.styleId
                 },
                 ratio: 1,
+                crossOrigin: 'anonymous',
                 imageLoadFunction: function(image, src) {
                     var url = src.split("?")[0];
                     var query = src.split("?")[1];
