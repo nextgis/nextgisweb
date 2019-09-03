@@ -171,21 +171,31 @@ define([
         },
         
         _buildHrefCanvasElement: function (dataUrl) {
-            var img, a;
+            var webMapTitle = this._getWebMapTitle(),
+                img, a;
             
             domConstruct.destroy('printMapCanvas');
             
             img = new Image();
             img.src = dataUrl;
-            img.title = 'NextGIS web map';
+            img.title = webMapTitle;
             a = document.createElement('a');
             a.id = 'printMapCanvas';
             a.href = dataUrl;
-            a.download = 'NextGIS web map';
+            a.download = webMapTitle;
             a.appendChild(img);
             document.body.appendChild(a);
             
             return a;
+        },
+        
+        _getWebMapTitle: function () {
+            var titleElement = query('.header__title__inner')[0];
+            if (titleElement && titleElement.textContent) {
+                return titleElement.textContent.trim();
+            } else {
+                return 'NextGIS web map';
+            }
         },
         
         _setMode: function (newMode) {
