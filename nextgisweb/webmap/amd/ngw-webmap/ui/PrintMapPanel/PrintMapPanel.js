@@ -172,7 +172,7 @@ define([
             }
             
             domToImagePromise.then(lang.hitch(this, function (dataUrl) {
-                var hrefCanvasEl = this._buildHrefCanvasElement(dataUrl);
+                var hrefCanvasEl = this._buildHrefCanvasElement(dataUrl, imageType);
                 deferred.resolve(hrefCanvasEl);
             })).catch(function (error) {
                 console.error(error);
@@ -182,7 +182,7 @@ define([
             return deferred.promise;
         },
         
-        _buildHrefCanvasElement: function (dataUrl) {
+        _buildHrefCanvasElement: function (dataUrl, extension) {
             var webMapTitle = this._getWebMapTitle(),
                 img, a;
             
@@ -190,11 +190,10 @@ define([
             
             img = new Image();
             img.src = dataUrl;
-            img.title = webMapTitle;
             a = document.createElement('a');
             a.id = 'printMapCanvas';
             a.href = dataUrl;
-            a.download = webMapTitle;
+            a.download = webMapTitle + '.' + extension;
             a.appendChild(img);
             document.body.appendChild(a);
             
