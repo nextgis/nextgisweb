@@ -103,6 +103,18 @@ define([
             on(this.contentWidget.scaleBar, 'change', lang.hitch(this, function (value) {
                 this._onScaleCheckboxChange(value, 'line');
             }));
+            
+            on(this.contentWidget.heightInput, 'change', lang.hitch(this, function (newHeight) {
+                this._resizeMapContainer(null, newHeight);
+            }));
+            
+            on(this.contentWidget.widthInput, 'change', lang.hitch(this, function (newWidth) {
+                this._resizeMapContainer(newWidth);
+            }));
+            
+            on(this.contentWidget.marginInput, 'change', lang.hitch(this, function (newMargin) {
+                this._resizeMapContainer(null, null, newMargin);
+            }));
         },
         
         _processExportButtons: function () {
@@ -215,28 +227,12 @@ define([
         _setFormatMode: function () {
             this._disableInput(this.contentWidget.heightInput, true);
             this._disableInput(this.contentWidget.widthInput, true);
-            this._disableInput(this.contentWidget.marginInput, true);
-            this.contentWidget.marginInput.set('value', 10);
             this.mode = 'format';
         },
         
         _setCustomMode: function () {
             this._disableInput(this.contentWidget.heightInput, false);
             this._disableInput(this.contentWidget.widthInput, false);
-            this._disableInput(this.contentWidget.marginInput, false);
-            
-            on(this.contentWidget.heightInput, 'change', lang.hitch(this, function (newHeight) {
-                this._resizeMapContainer(null, newHeight);
-            }));
-            
-            on(this.contentWidget.widthInput, 'change', lang.hitch(this, function (newWidth) {
-                this._resizeMapContainer(newWidth);
-            }));
-            
-            on(this.contentWidget.marginInput, 'change', lang.hitch(this, function (newMargin) {
-                this._resizeMapContainer(null, null, newMargin);
-            }));
-            
             this.mode = 'custom';
         },
         
