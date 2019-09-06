@@ -6,5 +6,5 @@ from .model import RasterLayer
 
 class RasterLayerWidget(Widget):
     resource = RasterLayer
-    operation = ('create', )
+    operation = ('create', 'update')
     amdmod = 'ngw-raster-layer/Widget'
