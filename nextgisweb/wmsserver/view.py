@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import json
+
 from StringIO import StringIO
 
 from lxml import etree
@@ -16,6 +18,7 @@ from ..resource import (
     ServiceScope, DataScope)
 from ..spatial_ref_sys import SRS
 from ..geometry import geom_from_wkt
+from .. import geojson
 
 from .model import Service
 from .util import _
@@ -168,6 +171,7 @@ def _get_feature_info(obj, request):
     p_width = int(params.get('WIDTH'))
     p_height = int(params.get('HEIGHT'))
     p_srs = params.get('SRS')
+    p_info_format = params.get('INFO_FORMAT', b'text/html')
 
     p_x = float(params.get('X'))
     p_y = float(params.get('Y'))
@@ -219,6 +223,25 @@ def _get_feature_info(obj, request):
         # Needed number of features found, stop search
         if fcount >= p_feature_count:
             break
+
+    if p_info_format == 'application/json':
+        result = [
+            dict(
+                keyname=result.keyname,
+                display_name=result.display_name,
+                features=[
+                    {
+                        fld.display_name: feature.fields[fld.keyname]
+                        for fld in result.feature_layer.fields
+                    }
+                    for feature in result.features
+                ],
+            )
+            for result in results
+        ]
+        return Response(
+            json.dumps(result, cls=geojson.Encoder),
+            content_type=b'application/json')
 
     return Response(render_template(
         'nextgisweb:wmsserver/template/get_feature_info_html.mako',
