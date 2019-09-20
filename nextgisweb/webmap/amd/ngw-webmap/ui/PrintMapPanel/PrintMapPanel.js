@@ -162,10 +162,10 @@ define([
             
             switch (imageType) {
                 case 'png':
-                    domToImagePromise = domtoimage.toPng(this.printMap.olMap.getViewport());
+                    domToImagePromise = domtoimage.toPng(this.contentWidget.mapPageContainer);
                     break;
                 case 'jpeg':
-                    domToImagePromise = domtoimage.toJpeg(this.printMap.olMap.getViewport());
+                    domToImagePromise = domtoimage.toJpeg(this.contentWidget.mapPageContainer);
                     break;
                 default:
                     console.error('Image type "' + imageType + '" is unknown.');
