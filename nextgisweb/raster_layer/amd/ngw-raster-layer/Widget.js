@@ -36,8 +36,9 @@ define([
         },
 
         validateDataInMixin: function (errback) {
-            return this.wFile.upload_promise !== undefined &&
-                this.wFile.upload_promise.isResolved();
+            return this.composite.operation == "create" ?
+                this.wFile.upload_promise !== undefined &&
+                    this.wFile.upload_promise.isResolved() : true;
         }
     });
 });
