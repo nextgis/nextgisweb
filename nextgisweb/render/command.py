@@ -9,6 +9,7 @@ from pyproj import Transformer
 import transaction
 
 from ..command import Command
+from ..models import DBSession
 
 from .model import ResourceTileCache
 from .util import affine_bounds_to_tile
@@ -31,14 +32,17 @@ class TileCacheSeedCommand():
 
     @classmethod
     def execute(cls, args, env):
-        q = ResourceTileCache.query().filter(
+        tc_ids = DBSession.query(ResourceTileCache.resource_id).filter(
             ResourceTileCache.enabled,
-            ResourceTileCache.seed_z != None)  # NOQA: E711
+            ResourceTileCache.seed_z != None  # NOQA: E711
+        ).all()
 
         # TODO: Add arbitrary SRS support
         srs_tr = Transformer.from_crs(4326, 3857, always_xy=True)
 
-        for tc in q:
+        for tc_id in tc_ids:
+            tc = ResourceTileCache.filter_by(resource_id=tc_id).one()
+
             rend_res = tc.resource
             data_res = rend_res.parent
             srs = data_res.srs
