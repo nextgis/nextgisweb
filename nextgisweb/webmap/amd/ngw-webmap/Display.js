@@ -439,28 +439,30 @@ define([
                         region: 'left',
                         class: "dynamic-panel--fullwidth",
                         title: i18n.gettext("Share"),
-                        isOpen: widget.activeLeftPanel == "sharePanel",
+                        isOpen: widget.activeLeftPanel === "sharePanel",
                         gutters: false,
                         withCloser: false,
                         display: widget
                     });
-
-                    if (widget.activeLeftPanel == "sharePanel")
-                        widget.activatePanel(widget.sharePanel);
-
+    
+                    if (widget.activeLeftPanel === "sharePanel") widget.activatePanel(widget.sharePanel);
+    
+                    var setPermalinkUrl = lang.hitch(widget.sharePanel, widget.sharePanel.setPermalinkUrl),
+                        setEmbedCode = lang.hitch(widget.sharePanel, widget.sharePanel.setEmbedCode);
+    
                     widget.sharePanel.on("shown", function () {
-                        widget.map.olMap.getView().on("change", widget.sharePanel.setPermalinkUrl, widget.sharePanel);
-                        widget.map.olMap.getView().on("change", widget.sharePanel.setEmbedCode, widget.sharePanel);
+                        widget.map.olMap.getView().on("change", setPermalinkUrl);
+                        widget.map.olMap.getView().on("change", setEmbedCode);
                         itemStoreListener = widget.itemStore.on("Set", function (item, attr) {
                             widget.sharePanel.setPermalinkUrl();
                             widget.sharePanel.setEmbedCode();
                         });
                     });
-
+    
                     widget.sharePanel.on("closed", function () {
                         widget.navigationMenu.reset();
-                        widget.map.olMap.getView().un("change", widget.sharePanel.setPermalinkUrl, widget.sharePanel);
-                        widget.map.olMap.getView().un("change", widget.sharePanel.setEmbedCode, widget.sharePanel);
+                        widget.map.olMap.getView().un("change", setPermalinkUrl);
+                        widget.map.olMap.getView().un("change", setEmbedCode);
                         if (itemStoreListener) itemStoreListener.remove();
                     });
 
