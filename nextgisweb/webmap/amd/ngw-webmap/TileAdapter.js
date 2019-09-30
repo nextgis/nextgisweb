@@ -13,7 +13,8 @@ define([
                 minResolution: item.minResolution ? item.minResolution : undefined,
                 opacity: item.transparency ? (1 - item.transparency / 100) : 1.0
             }, {
-                url: route.render.tile() + "?z={z}&x={x}&y={y}" + "&resource=" + item.styleId
+                url: route.render.tile() + "?z={z}&x={x}&y={y}" + "&resource=" + item.styleId,
+                crossOrigin: 'anonymous'
             });
         }
     });

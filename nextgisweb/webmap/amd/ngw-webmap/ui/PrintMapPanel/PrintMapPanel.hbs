@@ -1,73 +1,145 @@
 <div class="printMap-panel">
-    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'">
+  <div data-dojo-type="dijit/layout/BorderContainer"
+       data-dojo-props="gutters:true, liveSplitters:true, region: 'top'"
+       style="width: 100%; height: 100%; padding: 0;">
+    <div data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="splitter:true, region:'left'"
+         style="height: 100%; margin: 0;"
+         class="print-controls-pane">
+      <div class="dynamic-panel__title">{{gettext 'Print'}}</div>
+      <div class="print-panel-content">
         <div data-dojo-type="dojox/layout/TableContainer"
              data-dojo-attach-point="tableContainer"
-             data-dojo-props="cols:1, region: 'top'">
-            <select id="sizesSelect"
-                    data-dojo-type="dijit.form.Select"
-                    data-dojo-attach-point="sizesSelect"
-                    title="{{gettext 'Paper format'}}"
-                    name="sizes"
-                    style="width: 180px;">
-                <option value="none" disabled="disabled" selected>{{gettext 'Select format'}}</option>
-                <option value="210_297">{{gettext 'A4 - Portrait'}}</option>
-                <option value="297_210">{{gettext 'A4 - Landscape'}}</option>
-                <option value="297_420">{{gettext 'A3 - Portrait'}}</option>
-                <option value="420_297">{{gettext 'A3 - Landscape'}}</option>
-                <option value="420_594">{{gettext 'A2 - Portrait'}}</option>
-                <option value="594_420">{{gettext 'A2 - Landscape'}}</option>
-                <option value="594_841">{{gettext 'A1 - Portrait'}}</option>
-                <option value="841_594">{{gettext 'A1 - Landscape'}}</option>
-                <option value="841_1189">{{gettext 'A0 - Portrait'}}</option>
-                <option value="1189_841">{{gettext 'A0 - Landscape'}}</option>
-                <option value="custom">{{gettext 'Custom size'}}</option>
-            </select>
+             data-dojo-props="cols:1, region:'top', labelWidth: '50%'"
+             style="width: 95%; margin: 0 auto;">
+          <select id="sizesSelect"
+                  data-dojo-type="dijit/form/Select"
+                  data-dojo-attach-point="sizesSelect"
+                  title="{{gettext 'Paper format'}}"
+                  name="sizes"
+                  style="width: 100%;">
+            <option value="none" disabled="disabled" selected>
+              {{gettext 'Select format'}}
+            </option>
+            <option value="210_297">{{gettext 'A4 - Portrait'}}</option>
+            <option value="280_200">{{gettext 'A4 - Landscape'}}</option>
+            <option value="297_420">{{gettext 'A3 - Portrait'}}</option>
+            <option value="420_297">{{gettext 'A3 - Landscape'}}</option>
+            <option value="420_594">{{gettext 'A2 - Portrait'}}</option>
+            <option value="594_420">{{gettext 'A2 - Landscape'}}</option>
+            <option value="594_841">{{gettext 'A1 - Portrait'}}</option>
+            <option value="841_594">{{gettext 'A1 - Landscape'}}</option>
+            <option value="841_1189">{{gettext 'A0 - Portrait'}}</option>
+            <option value="1189_841">{{gettext 'A0 - Landscape'}}</option>
+            <option value="custom">{{gettext 'Custom size'}}</option>
+          </select>
 
-            <input id="heightInput"
-                   data-dojo-type="dijit/form/NumberTextBox"
-                   data-dojo-attach-point="heightInput"
-                   title="{{gettext 'Height, mm'}}"
-                   type="number"
-                   required="true"
-                   disabled="disabled"
-                   value="297"
-                   data-dojo-props="constraints:{min:0,max:20000,places:0}"/>
+          <input id="heightInput"
+                 data-dojo-type="dijit/form/NumberTextBox"
+                 data-dojo-attach-point="heightInput"
+                 title="{{gettext 'Height, mm'}}"
+                 type="number"
+                 required="true"
+                 disabled="disabled"
+                 value="297"
+                 style="width: 100%;"
+                 data-dojo-props="constraints:{min:0,max:20000,places:0}"/>
 
-            <input id="widthInput"
-                   data-dojo-type="dijit/form/NumberTextBox"
-                   data-dojo-attach-point="widthInput"
-                   title="{{gettext 'Width, mm'}}"
-                   type="number"
-                   required="true"
-                   disabled="disabled"
-                   value="210"
-                   data-dojo-props="constraints:{min:0,max:20000,places:0}"/>
+          <input id="widthInput"
+                 data-dojo-type="dijit/form/NumberTextBox"
+                 data-dojo-attach-point="widthInput"
+                 title="{{gettext 'Width, mm'}}"
+                 type="number"
+                 required="true"
+                 disabled="disabled"
+                 value="210"
+                 style="width: 100%;"
+                 data-dojo-props="constraints:{min:0,max:20000,places:0}"/>
 
-            <input id="marginInput"
-                   data-dojo-type="dijit/form/NumberTextBox"
-                   data-dojo-attach-point="marginInput"
-                   title="{{gettext 'Margin, mm'}}"
-                   type="number"
-                   required="true"
-                   disabled="disabled"
-                   value="10"
-                   data-dojo-props="constraints:{min:0,max:20000,places:0}"/>
+          <input id="marginInput"
+                 data-dojo-type="dijit/form/NumberTextBox"
+                 data-dojo-attach-point="marginInput"
+                 title="{{gettext 'Margin, mm'}}"
+                 type="number"
+                 required="true"
+                 value="10"
+                 style="width: 100%;"
+                 data-dojo-props="constraints:{min:0,max:20000,places:0}"/>
+
+          <input data-dojo-type="dijit/form/CheckBox"
+                 data-dojo-attach-point="scaleDisplay"
+                 checked
+                 title="{{gettext 'Scale value'}}"/>
+
+          <input data-dojo-type="dijit/form/CheckBox"
+                 data-dojo-attach-point="scaleBar"
+                 checked
+                 title="{{gettext 'Scale bar'}}"/>
+
+          <select id="scalesSelect"
+                  data-dojo-type="dijit.form.Select"
+                  data-dojo-attach-point="scalesSelect"
+                  title="{{gettext 'Scale'}}"
+                  name="scale"
+                  style="width: 100%;">
+            <option value="none" disabled="disabled" selected>{{gettext 'Select scale'}}</option>
+            <option value="5000">1 : 5 000</option>
+            <option value="10000">1 : 10 000</option>
+            <option value="20000">1 : 20 000</option>
+            <option value="25000">1 : 25 000</option>
+            <option value="50000">1 : 50 000</option>
+            <option value="100000">1 : 100 000</option>
+            <option value="200000">1 : 200 000</option>
+            <option value="500000">1 : 500 000</option>
+            <option value="1000000">1 : 1 000 000</option>
+            <option value="5000000">1 : 5 000 000</option>
+            <option value="5000000">1 : 5 000 000</option>
+            <option value="10000000">1 : 10 000 000</option>
+          </select>
         </div>
-        <br/>
 
-        <button data-dojo-type="dijit/form/Button"
-                data-dojo-attach-point="cancelButton"
-                data-dojo-props="region: 'top'"
-                class="dijitButton--default dijitButton--s"
-                style="margin-left: 10px;">
-            {{gettext 'Cancel'}}
-        </button>
-        <button data-dojo-type="dijit/form/Button"
-                data-dojo-attach-point="okButton"
-                data-dojo-props="region: 'top'"
-                class="dijitButton--primary dijitButton--s"
-                style="margin-left: 10px;">
+        <div class="buttons-section">
+          <button data-dojo-type="dijit/form/Button"
+                  data-dojo-attach-point="printButton"
+                  data-dojo-props="region: 'top'"
+                  class="dijitButton--primary dijitButton--s"
+                  style="margin-left: 10px;">
             {{gettext 'Print'}}
-        </button>
+          </button>
+
+          <div data-dojo-type="dijit/form/DropDownButton"
+               data-dojo-attach-point="exportButton"
+               class="dijitButton--default dijitButton--s scale">
+            <span>{{gettext 'Save as'}}</span>
+            <div data-dojo-type="dijit/TooltipDialog">
+              <button data-dojo-type="dijit/form/Button"
+                      data-dojo-attach-point="exportJpegButton"
+                      data-dojo-props="region: 'top'"
+                      class="export-option"
+                      style="margin-left: 5px;">
+                {{gettext 'JPEG'}}
+              </button>
+              <button data-dojo-type="dijit/form/Button"
+                      data-dojo-attach-point="exportPngButton"
+                      data-dojo-props="region: 'top'"
+                      class="export-option"
+                      style="margin-left: 5px;">
+                {{gettext 'PNG'}}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="splitter:true, region:'center'"
+         class="print-map-pane"
+         style="overflow: auto; margin: 0; border: none;">
+      <div id="printMapPage">
+        <div class="print-map" data-dojo-attach-point="mapContainer"></div>
+      </div>
+
+    </div>
+  </div>
 </div>

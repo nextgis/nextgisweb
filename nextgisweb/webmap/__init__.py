@@ -35,6 +35,10 @@ class WebMapComponent(Component):
         self.settings['popup_height'] = int(self.settings.get(
             'popup_height', 200))
 
+        self.settings['annotation'] = self.settings.get(
+            'annotation', 'false'
+        ).lower() in ('true', 'yes')
+
     @require('resource', 'auth')
     def initialize_db(self):
         # Create a default web-map if there are none
@@ -46,7 +50,8 @@ class WebMapComponent(Component):
                    root_item=WebMapItem(item_type='root')).persist()
 
     def setup_pyramid(self, config):
-        from . import view
+        from . import api, view
+        api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
     def client_settings(self, request):
@@ -59,6 +64,7 @@ class WebMapComponent(Component):
             identify_radius=self.settings.get('identify_radius'),
             popup_width=self.settings.get('popup_width'),
             popup_height=self.settings.get('popup_height'),
+            annotation=self.settings.get('annotation'),
             adapters=dict(
                 (i.identity, dict(display_name=i.display_name))
                 for i in WebMapAdapter.registry
@@ -77,4 +83,5 @@ class WebMapComponent(Component):
         dict(key='identify_radius', desc="Identification sensitivity (3px)"),
         dict(key='popup_width', desc="Popup width"),
         dict(key='popup_height', desc="Popup height"),
+        dict(key='annotation', desc="Turn on / off annotations"),
     )

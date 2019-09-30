@@ -88,6 +88,7 @@ def amd_packages():
         ('dgrid', 'nextgisweb:amd_packages/contrib/dgrid'),
         ('handlebars', 'nextgisweb:amd_packages/contrib/handlebars'),
         ('openlayers', 'nextgisweb:amd_packages/contrib/openlayers'),
+        ('dom-to-image', 'nextgisweb:amd_packages/contrib/dom-to-image'),
         ('svg4everybody', 'nextgisweb:amd_packages/contrib/svg4everybody'),
         ('codemirror', 'nextgisweb:amd_packages/contrib/codemirror'),
         ('jquery', 'nextgisweb:amd_packages/contrib/jquery'),

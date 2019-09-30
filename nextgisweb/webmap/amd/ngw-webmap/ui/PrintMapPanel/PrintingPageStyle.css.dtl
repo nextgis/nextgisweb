@@ -4,11 +4,16 @@ body {
     margin: 0;
     padding: 0;
 }
-#printMap {
-    width: {{ widthPage }}mm;
+
+#printMapPage {
+  width: {{ widthPage }}mm;
+  height: {{ heightPage }}mm;
+  padding: 0;
 }
 
-#printMap div.map-container {
+#printMapPage .print-map {
+    display: block;
+    position: absolute;
     width: {{ widthMap }}mm;
     height: {{ heightMap }}mm;
     padding: 0;
@@ -16,7 +21,12 @@ body {
     border: none;
 }
 
-#printMap img.map-logo {
+#printMapPage .print-map div.ol-viewport {
+    width: {{ widthMap }}mm !important;
+    height: {{ heightMap }}mm !important;
+}
+
+#printMapPage .print-map img.map-logo {
     position: absolute;
     z-index: 9999999;
     top: 2px;
@@ -25,28 +35,57 @@ body {
 
 @page {
     size: {{ widthPage }}mm {{ heightPage }}mm;
-    margin: 0;
+    margin: {{ margin }}mm;
 }
 
 @media print {
     html, body {
-        width: {{ widthPage }}mm !important;
-        height: {{ heightPage }}mm !important;
+        width: {{ widthMap }}mm !important;
+        height: {{ heightMap }}mm !important;
         padding: 0 !important;
         margin: 0 !important;
-        min-width: {{ widthPage }}mm !important;
-        max-width: {{ widthPage }}mm !important;
+        min-width: {{ widthMap }}mm !important;
+        max-width: {{ widthMap }}mm !important;
     }
 
-    body div.webmap-display,
-        #header,
-        div.dijitDialog,
-        div.dijitPopup,
-        div.dijitDialogUnderlayWrapper {
+    body #header,
+    div.print-controls-pane,
+    div.navigation-menu,
+    div.main-pane .main-container .map-container,
+    #printMapCanvas {
         display: none !important;
     }
 
-    #printMap {
+    #webmap-wrapper,
+    #printMapDialog,
+    div.print-map-pane,
+    div.dijitTabPaneWrapper.dijitTabContainerTop-container.dijitAlignCenter,
+    div.main-pane,
+    div.main-container,
+    #webmap-wrapper div.leftPanelPane,
+    div.printMap-panel,
+    div.printMap-panel .dijitBorderContainer,
+    #printMapPage,
+    #printMapPage .print-map {
+      width: {{ widthMap }}mm !important;
+      height: {{ heightMap }}mm !important;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #webmap-wrapper div.leftPanelPane,
+    div.print-map-pane {
+      left: 0 !important;
+      top: 0 !important;
+      position: absolute;
+    }
+
+    #webmap-wrapper {
+      top: 0 !important;
+    }
+
+    #printMapPage .print-map {
         display: block!important;
         position: relative;
         margin: 0;
@@ -63,17 +102,7 @@ body {
         margin: 0!important;
         max-width: 100%!important;
         overflow: hidden;
-        width: {{ widthPage }}mm;
-        height: {{ heightPage }}mm;
         padding: 0;
-        border: none;
-    }
-
-    #printMap div.map-container {
-        width: {{ widthMap }}mm;
-        height: {{ heightMap }}mm;
-        padding: 0;
-        margin: {{ margin }}mm;
         border: none;
     }
 }

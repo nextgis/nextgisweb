@@ -64,5 +64,20 @@ define([
                 center: center
             };
         },
+
+        zoomToFeature: function (feature) {
+            var minPointZoom = 12;
+            var view = this.olMap.getView();
+            var geometry = feature.getGeometry();
+            var extent = geometry.getExtent();
+            if (geometry.getType() == 'Point') {
+                view.setCenter(geometry.getCoordinates());
+                if (view.getZoom() < minPointZoom) {
+                    view.setZoom(minPointZoom);
+                }
+            } else {
+                view.fit(extent);
+            }
+        }
     });
 });

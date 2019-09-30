@@ -453,6 +453,7 @@ define([
                 this._deactivateEditingControls();
                 this._removeCurrentEditingItem();
                 this.display._layers[this.display.item.id].reload();
+                topic.publish('/webmap/feature-table/refresh', this._selectedResourceId);
                 this._standby.hide();
             }));
         },

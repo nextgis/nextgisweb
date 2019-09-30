@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import urllib
 import requests
 import json
 from io import BytesIO
@@ -12,6 +11,7 @@ from lxml import etree
 import PIL
 from owslib.wms import WebMapService
 from owslib.map.common import WMSCapabilitiesReader
+from pyramid.url import urlencode
 
 from .. import db
 from ..env import env
@@ -182,13 +182,17 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     def render_image(self, extent, size):
         query = dict(
-            service="WMS", request="GetMap",
+            service="WMS",
+            request="GetMap",
             version=self.connection.version,
-            layers=self.wmslayers, styles="",
+            layers=self.wmslayers,
+            styles="",
             format=self.imgformat,
-            bbox=','.join(map(str, extent)),
-            width=size[0], height=size[1],
-            transparent="true")
+            bbox=",".join(map(str, extent)),
+            width=size[0],
+            height=size[1],
+            transparent="true",
+        )
 
         # Vendor-specific parameters
         for p in self.vendor_params:
@@ -209,8 +213,11 @@ class Layer(Base, Resource, SpatialLayerMixin):
         # ArcGIS server requires that space is url-encoded as "%20"
         # but it does not accept space encoded as "+".
         # It is always safe to replace spaces with "%20".
-        url = self.connection.url + sep + \
-            urllib.urlencode(query).replace("+", "%20")
+        url = (
+            self.connection.url
+            + sep
+            + urlencode(query).replace("+", "%20")
+        )
 
         return PIL.Image.open(BytesIO(requests.get(
             url, auth=auth, headers=env.wmsclient.headers).content))

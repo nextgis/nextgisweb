@@ -123,12 +123,23 @@ def setup_pyramid(comp, config):
             bookmarkLayerId=obj.bookmark_resource_id,
             tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id),
             testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id),
+            webmapId=obj.id,
             webmapDescription=obj.description,
             webmapTitle=obj.display_name,
             webmapEditable=obj.editable,
             drawOrderEnabled=obj.draw_order_enabled,
-            measurementSystem=request.env.core.settings_get('core', 'units'),
+            measurementSystem=request.env.core.settings_get('core', 'units')
         )
+
+        if comp.settings['annotation']:
+            config['annotations'] = dict(
+                enabled=obj.annotation_enabled,
+                default=obj.annotation_default,
+                scope=dict(
+                    read=obj.has_permission(WebMapScope.annotation_read, request.user),
+                    write=obj.has_permission(WebMapScope.annotation_write, request.user),
+                )
+            )
 
         return dict(
             obj=obj,
