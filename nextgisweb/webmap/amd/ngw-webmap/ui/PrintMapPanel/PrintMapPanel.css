@@ -1,7 +1,6 @@
 .printMap-panel {
   width: 100%;
   height: 100%;
-  text-align: center;
 }
 
 .printMap-panel div.print-controls-pane {
@@ -23,6 +22,7 @@
   top: 40px;
   bottom: 0;
   width: 100%;
+  text-align: center;
 }
 
 .printMap-panel div.dijitLayoutContainer.dijitContainer.dijitTableLayout {
