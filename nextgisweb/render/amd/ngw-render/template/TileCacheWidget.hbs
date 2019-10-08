@@ -1,11 +1,16 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
     data-ngw-serialize-prefix="${prefix}" class="padding-block">
 
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1"
+        data-dojo-attach-point="wTableContainer">
 
         <div data-dojo-type="dijit/form/CheckBox"
             data-ngw-serialize="enabled"
             title="{{gettext 'Enabled'}}"></div>
+
+        <div data-dojo-type="dijit/form/CheckBox"
+            data-ngw-serialize="image_compose"
+            title="{{gettext 'Image compose'}}"></div>
 
         <div data-dojo-type="ngw-pyramid/form/IntegerValueTextBox"
             data-ngw-serialize="max_z"
@@ -18,10 +23,12 @@
             title="{{gettext 'TTL, sec.'}}" style="width: 50%"></div>
 
         <div data-dojo-type="dijit/form/CheckBox"
-            data-ngw-serialize="image_compose"
-            title="{{gettext 'Image compose'}}"></div>
+            data-dojo-attach-point="wTrackChanges"
+            data-ngw-serialize="track_changes"
+            title="{{gettext 'Track changes'}}"></div>
 
         <div data-dojo-type="ngw-pyramid/form/IntegerValueTextBox"
+            data-dojo-attach-point="wSeedZ"
             data-ngw-serialize="seed_z"
             data-dojo-props="required: false"
             title="{{gettext 'Seed zoom level'}}" style="width: 50%"></div>

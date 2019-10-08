@@ -43,9 +43,10 @@ class ResourceTileCache(Base):
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     uuid = db.Column(db.UUID, nullable=False)
     enabled = db.Column(db.Boolean, nullable=False, default=False)
+    image_compose = db.Column(db.Boolean, nullable=False, default=False)
     max_z = db.Column(db.SmallInteger)
     ttl = db.Column(db.Integer)
-    image_compose = db.Column(db.Boolean, nullable=False, default=False)
+    track_changes = db.Column(db.Boolean, nullable=False, default=False)
     seed_z = db.Column(db.SmallInteger)
     seed_tstamp = db.Column(db.TIMESTAMP)
     seed_status = db.Column(db.Enum(*SEED_STATUS_ENUM))
@@ -273,14 +274,14 @@ db.event.listen(
 
 @on_style_change.connect
 def on_style_change_handler(resource):
-    if resource.tile_cache is not None:
+    if env.render.tile_cache_track_changes and resource.tile_cache is not None:
         resource.tile_cache.clear()
         resource.tile_cache.initialize()
 
 
 @on_data_change.connect
 def on_data_change_handler(resource, geom):
-    if resource.tile_cache is not None:
+    if env.render.tile_cache_track_changes and resource.tile_cache is not None:
         resource.tile_cache.invalidate(geom)
 
 
@@ -309,9 +310,10 @@ class ResourceTileCacheSerializer(Serializer):
     __permissions = dict(read=ResourceScope.read, write=ResourceScope.update)
 
     enabled = ResourceTileCacheSeializedProperty(**__permissions)
+    image_compose = ResourceTileCacheSeializedProperty(**__permissions)
     max_z = ResourceTileCacheSeializedProperty(**__permissions)
     ttl = ResourceTileCacheSeializedProperty(**__permissions)
-    image_compose = ResourceTileCacheSeializedProperty(**__permissions)
+    track_changes = ResourceTileCacheSeializedProperty(**__permissions)
     seed_z = ResourceTileCacheSeializedProperty(**__permissions)
 
     def is_applicable(self):
