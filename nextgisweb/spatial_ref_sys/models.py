@@ -60,6 +60,7 @@ class SRS(Base):
     @db.validates('wkt')
     def _validate_wkt(self, key, value):
         sr = osr.SpatialReference()
+        value = value.encode('utf-8')
         if sr.ImportFromWkt(value) != 0:
             raise ValidationError(
                 message=_("Invalid OGC WKT definition!"))

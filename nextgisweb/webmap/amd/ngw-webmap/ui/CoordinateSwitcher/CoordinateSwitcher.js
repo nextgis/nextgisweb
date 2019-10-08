@@ -53,8 +53,12 @@ define([
         _convertCoordinates: function(){
             var that = this;
             array.forEach(customCoordinateSystems, function(c) {
-                var custom = proj4(that.projections.initial, c.wkt, that.point);
-                that.coordinates[c.id] = [custom[0], custom[1]];
+                try {
+                    var custom = proj4(that.projections.initial, c.wkt, that.point);
+                    that.coordinates[c.id] = [custom[0], custom[1]];
+                } catch (er) {
+                    // console.warn(er);
+                }
             })
         },
         _setOptions: function() {
@@ -62,42 +66,44 @@ define([
             that.options = [];
             array.forEach(customCoordinateSystems, function (c) {
                 var code = c.id;
-                var pr = proj4(c.wkt);
                 var coord = that.coordinates[code];
-                var x = coord[1];
-                var y = coord[0];
-                var pushOption = function (opt) {
-                    var el = put(
-                        "span span $ + span.ngwPopup__coordinates-srs-name $ <", 
-                        opt.value, c.display_name);
-                    that.options.push({
-                        label: el.innerHTML,
-                        value: opt.value,
-                        format: opt.format,
-                        selected: c.id === that.selectedFormat
-                    });
-                }
-                if (pr.oProj.units == 'degree') {
-                    var fx, fy;
-                    if (degreeFormat == 'dd') {
-                        fx = x.toFixed(6);
-                        fy = y.toFixed(6);
-                    } else if (degreeFormat == 'ddm') {
-                        fx = CoordinateConverter.DDtoDM(x, { lon: false, needString: true });
-                        fy = CoordinateConverter.DDtoDM(y, { lon: true, needString: true });
-                    } else if (degreeFormat == 'dms') {
-                        fx = CoordinateConverter.DDtoDMS(x, { lon: false, needString: true });
-                        fy = CoordinateConverter.DDtoDMS(y, { lon: true, needString: true });
-                    };
-                    pushOption({
-                        value: fx + ", " + fy,
-                        format: code,
-                    });
-                } else {
-                    pushOption({     
-                        value: Math.round(x) + ", " + Math.round(y),
-                        format: code,
-                    });
+                if (coord) {
+                    var pr = proj4(c.wkt);
+                    var x = coord[1];
+                    var y = coord[0];
+                    var pushOption = function (opt) {
+                        var el = put(
+                            "span span $ + span.ngwPopup__coordinates-srs-name $ <", 
+                            opt.value, c.display_name);
+                        that.options.push({
+                            label: el.innerHTML,
+                            value: opt.value,
+                            format: opt.format,
+                            selected: c.id === that.selectedFormat
+                        });
+                    }
+                    if (pr.oProj.units == 'degree') {
+                        var fx, fy;
+                        if (degreeFormat == 'dd') {
+                            fx = x.toFixed(6);
+                            fy = y.toFixed(6);
+                        } else if (degreeFormat == 'ddm') {
+                            fx = CoordinateConverter.DDtoDM(x, { lon: false, needString: true });
+                            fy = CoordinateConverter.DDtoDM(y, { lon: true, needString: true });
+                        } else if (degreeFormat == 'dms') {
+                            fx = CoordinateConverter.DDtoDMS(x, { lon: false, needString: true });
+                            fy = CoordinateConverter.DDtoDMS(y, { lon: true, needString: true });
+                        };
+                        pushOption({
+                            value: fx + ", " + fy,
+                            format: code,
+                        });
+                    } else {
+                        pushOption({     
+                            value: Math.round(x) + ", " + Math.round(y),
+                            format: code,
+                        });
+                    }
                 }
             });
         },
