@@ -50,7 +50,7 @@ def convert_projstr_to_wkt(proj_str, format=None, pretty=False):
         ["epsg", lambda x: sr.ImportFromEPSG(int(x))],
         ["mapinfo", lambda x: sr.ImportFromMICoordSys(
             update_MI_coord_sys_string(x).encode("utf-8"))],
-        ["esri", "ImportFromESRI"],
+        ["esri", lambda x: sr.ImportFromESRI([proj_str.decode("utf-8")])],
         ["wkt", "ImportFromWkt"]
     ]
 
