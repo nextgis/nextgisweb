@@ -35,6 +35,7 @@ FIELD_TYPE_OGR = (
     ogr.OFTTime,
     ogr.OFTDateTime)
 
+
 class GEOM_TYPE(object):
     POINT = 'POINT'
     LINESTRING = 'LINESTRING'
@@ -42,9 +43,27 @@ class GEOM_TYPE(object):
     MULTIPOINT = 'MULTIPOINT'
     MULTILINESTRING = 'MULTILINESTRING'
     MULTIPOLYGON = 'MULTIPOLYGON'
+    POINTZ = 'POINTZ'
+    LINESTRINGZ = 'LINESTRINGZ'
+    POLYGONZ = 'POLYGONZ'
+    MULTIPOINTZ = 'MULTIPOINTZ'
+    MULTILINESTRINGZ = 'MULTILINESTRINGZ'
+    MULTIPOLYGONZ = 'MULTIPOLYGONZ'
 
-    enum = (POINT, LINESTRING, POLYGON, MULTIPOINT,
-            MULTILINESTRING, MULTIPOLYGON)
+    enum = (
+        POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON,
+        POINTZ, LINESTRINGZ, POLYGONZ, MULTIPOINTZ, MULTILINESTRINGZ, MULTIPOLYGONZ,
+    )
+
+    is_multi = (
+        MULTIPOINT, MULTILINESTRING, MULTIPOLYGON,
+        MULTIPOINTZ, MULTILINESTRINGZ, MULTIPOLYGONZ,
+    )
+
+    has_z = (
+        POINTZ, LINESTRINGZ, POLYGONZ,
+        MULTIPOINTZ, MULTILINESTRINGZ, MULTIPOLYGONZ,
+    )
 
 
 class FIELD_TYPE(object):
@@ -67,7 +86,7 @@ class IFeatureLayer(IResourceBase):
     feature_query = Attribute(""" Feature query class """)
 
     def field_by_keyname(self, keyname):
-        """ Get field by key. If field is not found, 
+        """ Get field by key. If field is not found,
         KeyError exception should be raised. """
 
 

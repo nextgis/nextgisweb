@@ -66,10 +66,20 @@ from ..feature_layer import (
 
 from .util import _
 
-GEOM_TYPE_DB = ('POINT', 'LINESTRING', 'POLYGON',
-                'MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON')
-GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"),
-                     _("Multipoint"), _("Multiline"), _("Multipolygon"))
+
+GEOM_TYPE_DB = (
+    'POINT', 'LINESTRING', 'POLYGON',
+    'MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON',
+    'POINTZ', 'LINESTRINGZ', 'POLYGONZ',
+    'MULTIPOINTZ', 'MULTILINESTRINGZ', 'MULTIPOLYGONZ',
+)
+
+GEOM_TYPE_DISPLAY = (
+    _("Point"), _("Line"), _("Polygon"),
+    _("Multipoint"), _("Multiline"), _("Multipolygon"),
+    _("Point Z"), _("Line Z"), _("Polygon Z"),
+    _("Multipoint Z"), _("Multiline Z"), _("Multipolygon Z"),
+)
 
 FIELD_TYPE_DB = (
     db.Integer,
@@ -82,7 +92,7 @@ FIELD_TYPE_DB = (
 
 FIELD_FORBIDDEN_NAME = ("id", "geom")
 
-_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum * 2))
+_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 
 _FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
@@ -113,21 +123,36 @@ class TableInfo(object):
     def from_ogrlayer(cls, ogrlayer, srs_id, strdecode):
         self = cls(srs_id)
 
-        ltype = ogrlayer.GetGeomType() & (~ogr.wkb25DBit)
+        ltype = ogrlayer.GetGeomType()
         self.geometry_type = _GEOM_OGR_2_TYPE[ltype]
-        self.accepted_gtype = [ltype, ]
 
-        if ltype in (ogr.wkbPoint, ogr.wkbLineString, ogr.wkbPolygon):
+        is_multi = self.geometry_type in GEOM_TYPE.is_multi
+        has_z = self.geometry_type in GEOM_TYPE.has_z
+
+        if not is_multi or not has_z:
             for feature in ogrlayer:
                 geom = feature.GetGeometryRef()
-                gtype = geom.GetGeometryType() & (~ogr.wkb25DBit)
-                if ltype != gtype and (
-                    (ltype == ogr.wkbPoint and gtype == ogr.wkbMultiPoint) or
-                    (ltype == ogr.wkbLineString and gtype == ogr.wkbMultiLineString) or
-                    (ltype == ogr.wkbPolygon and gtype == ogr.wkbMultiPolygon)
-                ):
-                    self.geometry_type = _GEOM_OGR_2_TYPE[gtype]
-                    self.accepted_gtype.append(gtype)
+                gtype = geom.GetGeometryType()
+                if ltype != gtype:
+                    if not is_multi and (
+                        ltype in (ogr.wkbPoint, ogr.wkbPoint25D) and gtype in (ogr.wkbMultiPoint, ogr.wkbMultiPoint25D)  # NOQA: E501
+                        or ltype in (ogr.wkbLineString, ogr.wkbLineString25D) and gtype in (ogr.wkbMultiLineString, ogr.wkbMultiLineString25D)  # NOQA: E501, W503
+                        or ltype in (ogr.wkbPolygon, ogr.wkbPolygon25D) and gtype in (ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D)  # NOQA: E501, W503
+                    ):
+                        self.geometry_type = _GEOM_OGR_2_TYPE[gtype]
+                        ltype = gtype
+                        is_multi = True
+
+                    if not has_z and (
+                        ltype in (ogr.wkbPoint, ogr.wkbMultiPoint) and gtype in (ogr.wkbPoint25D, ogr.wkbMultiPoint25D)  # NOQA: E501
+                        or ltype in (ogr.wkbLineString, ogr.wkbMultiLineString) and gtype in (ogr.wkbLineString25D, ogr.wkbMultiLineString25D)  # NOQA: E501, W503
+                        or ltype in (ogr.wkbPolygon, ogr.wkbMultiPolygon) and gtype in (ogr.wkbPolygon25D, ogr.wkbMultiPolygon25D)  # NOQA: E501, W503
+                    ):
+                        self.geometry_type = _GEOM_OGR_2_TYPE[gtype]
+                        ltype = gtype
+                        has_z = True
+
+                if is_multi and has_z:
                     break
 
             ogrlayer.ResetReading()
@@ -141,7 +166,7 @@ class TableInfo(object):
             # TODO: Fix invalid field names as done for attributes.
             fld_name = strdecode(fld_defn.GetNameRef())
             if fld_name.lower() in FIELD_FORBIDDEN_NAME:
-                raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)
+                raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)  # NOQA: E501
 
             fld_type = None
             fld_type_ogr = fld_defn.GetType()
@@ -254,37 +279,41 @@ class TableInfo(object):
         target_osr = osr.SpatialReference()
         target_osr.ImportFromEPSG(self.srs_id)
 
-        ltype = ogrlayer.GetGeomType() & (~ogr.wkb25DBit)
         transform = osr.CoordinateTransformation(source_osr, target_osr)
+
+        is_multi = self.geometry_type in GEOM_TYPE.is_multi
+        has_z = self.geometry_type in GEOM_TYPE.has_z
 
         for fid, feature in enumerate(ogrlayer):
             geom = feature.GetGeometryRef()
 
-            # Bring 25D geometries to 2D
-            if geom.GetGeometryType() & ogr.wkb25DBit:
-                geom.FlattenTo2D()
-
             gtype = geom.GetGeometryType()
-            if gtype not in self.accepted_gtype:
+            if gtype not in GEOM_TYPE_OGR:
                 raise ValidationError(_(
-                    "Geometry type (%s) does not match column type (%s).") % (
-                    GEOM_TYPE_DISPLAY[gtype - 1],
-                    GEOM_TYPE_DISPLAY[ltype - 1]))
+                    "Unknown geometry type: %d (%s).") % (
+                    gtype, ogr.GeometryTypeToName(gtype)))
 
             geom.Transform(transform)
 
-            if (
-                self.geometry_type in (
-                    GEOM_TYPE.MULTIPOINT,
-                    GEOM_TYPE.MULTILINESTRING,
-                    GEOM_TYPE.MULTIPOLYGON)
-            ):
-                if gtype == ogr.wkbPoint:
+            # Force single geometries to multi
+            if is_multi:
+                if gtype in (ogr.wkbPoint, ogr.wkbPoint25D):
                     geom = ogr.ForceToMultiPoint(geom)
-                elif gtype == ogr.wkbLineString:
+                elif gtype in (ogr.wkbLineString, ogr.wkbLineString25D):
                     geom = ogr.ForceToMultiLineString(geom)
-                elif gtype == ogr.wkbPolygon:
+                elif gtype in (ogr.wkbPolygon, ogr.wkbPolygon25D):
                     geom = ogr.ForceToMultiPolygon(geom)
+
+            # Force Z
+            if has_z and not geom.Is3D():
+                geom.Set3D(True)
+
+            # Check geometry type again
+            gtype = geom.GetGeometryType()
+            if gtype not in GEOM_TYPE_OGR or _GEOM_OGR_2_TYPE[gtype] != self.geometry_type:
+                raise ValidationError(_(
+                    "Unknown geometry type: %d (%s).") % (
+                    gtype, ogr.GeometryTypeToName(gtype)))
 
             fld_values = dict()
             for i in range(feature.GetFieldCount()):
@@ -514,6 +543,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def extent(self):
         """Return layer's extent
         """
+        st_force2d = func.st_force2d
         st_transform = func.st_transform
         st_extent = func.st_extent
         st_setsrid = func.st_setsrid
@@ -528,7 +558,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         model = tableinfo.model
 
         fields = (
-            st_extent(st_transform(st_setsrid(cast(model.geom, ga.Geometry), self.srs_id), 4326)),
+            st_extent(st_transform(st_setsrid(cast(
+                st_force2d(model.geom), ga.Geometry), self.srs_id), 4326)),
         )
         bbox = DBSession.query(*fields).label('bbox')
 
@@ -561,6 +592,7 @@ def _vector_layer_listeners(table):
         db.DDL("DROP SCHEMA IF EXISTS vector_layer CASCADE")
     )
 
+
 _vector_layer_listeners(VectorLayer.__table__)
 
 
@@ -571,6 +603,7 @@ def tometadata(self, metadata):
     result = db.Table.tometadata(self, metadata)
     _vector_layer_listeners(result)
     return result
+
 
 VectorLayer.__table__.tometadata = types.MethodType(
     tometadata, VectorLayer.__table__)
@@ -723,7 +756,7 @@ class _source_attr(SP):
             ogrlayer = self._ogrds(ogrds)
             geomtype = ogrlayer.GetGeomType()
             if geomtype not in _GEOM_OGR_2_TYPE:
-                raise VE(_("Unsupported geometry type: '%s'. Probable reason: data contain mixed geometries.") % (
+                raise VE(_("Unsupported geometry type: '%s'. Probable reason: data contain mixed geometries.") % (  # NOQA: E501
                     ogr.GeometryTypeToName(geomtype) if geomtype is not None else None))
 
             self._ogrlayer(srlzr.obj, ogrlayer, recode)
@@ -902,12 +935,13 @@ class FeatureQueryBase(object):
                 def compile(expr, compiler, **kw):
                     return "(%s).geom" % str(compiler.process(expr.base))
 
-                columns.append(db.func.st_asbinary(geom(db.func.st_dump(geomexpr))).label('geom'))
+                columns.append(db.func.st_asewkb(geom(db.func.st_dump(geomexpr))).label('geom'))
             else:
-                columns.append(db.func.st_asbinary(geomexpr).label('geom'))
+                columns.append(db.func.st_asewkb(geomexpr).label('geom'))
 
         if self._geom_len:
-            columns.append(db.func.st_length(db.func.geography(db.func.st_transform(geomexpr, 4326))).label('geom_len'))
+            columns.append(db.func.st_length(db.func.geography(
+                db.func.st_transform(geomexpr, 4326))).label('geom_len'))
 
         if self._box:
             columns.extend((
@@ -931,7 +965,7 @@ class FeatureQueryBase(object):
                     where.append(table.columns[tableinfo[k].key] == v)
 
         if self._filter:
-            l = []
+            token = []
             for k, o, v in self._filter:
                 supported_operators = (
                     "eq",
@@ -963,37 +997,37 @@ class FeatureQueryBase(object):
 
                 op = getattr(db.sql.operators, o)
                 if k == "id":
-                    l.append(op(table.columns.id, v))
+                    token.append(op(table.columns.id, v))
                 else:
-                    l.append(op(table.columns[tableinfo[k].key], v))
+                    token.append(op(table.columns[tableinfo[k].key], v))
 
-            where.append(db.and_(*l))
+            where.append(db.and_(*token))
 
         if self._filter_sql:
-            l = []
+            token = []
             for _filter_sql_item in self._filter_sql:
                 if len(_filter_sql_item) == 3:
                     table_column, op, val = _filter_sql_item
                     if table_column == 'id':
-                        l.append(op(table.columns.id, val))
+                        token.append(op(table.columns.id, val))
                     else:
-                        l.append(op(table.columns[tableinfo[table_column].key], val))
+                        token.append(op(table.columns[tableinfo[table_column].key], val))
                 elif len(_filter_sql_item) == 4:
                     table_column, op, val1, val2 = _filter_sql_item
-                    l.append(op(table.columns[tableinfo[table_column].key], val1, val2))
+                    token.append(op(table.columns[tableinfo[table_column].key], val1, val2))
 
-            where.append(db.and_(*l))
+            where.append(db.and_(*token))
 
         if self._like:
-            l = []
+            token = []
             for f in tableinfo.fields:
-                l.append(
+                token.append(
                     cast(table.columns[f.key], db.Unicode).ilike(
                         "%" + self._like + "%"
                     )
                 )
 
-            where.append(db.or_(*l))
+            where.append(db.or_(*token))
 
         if self._intersects:
             intgeom = db.func.st_setsrid(db.func.st_geomfromtext(
@@ -1030,7 +1064,7 @@ class FeatureQueryBase(object):
                 rows = DBSession.connection().execute(query)
                 for row in rows:
                     fdict = dict((f.keyname, row[f.keyname])
-                                  for f in selected_fields)
+                                 for f in selected_fields)
                     if self._geom:
                         geom = geom_from_wkb(str(row['geom']))
                     else:
