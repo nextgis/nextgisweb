@@ -8,10 +8,6 @@ from zope.interface import Interface, Attribute
 from ..resource import IResourceBase
 
 
-gdal_gt_19 = LooseVersion(osgeo.__version__) >= LooseVersion('1.9')
-gdal_gt_20 = LooseVersion(osgeo.__version__) >= LooseVersion('2.0')
-gdal_gt_22 = LooseVersion(osgeo.__version__) >= LooseVersion('2.2')
-
 GEOM_TYPE_OGR = (
     ogr.wkbPoint,
     ogr.wkbLineString,
@@ -28,7 +24,7 @@ GEOM_TYPE_OGR = (
 
 FIELD_TYPE_OGR = (
     ogr.OFTInteger,
-    ogr.OFTInteger64 if gdal_gt_20 else None,
+    ogr.OFTInteger64,
     ogr.OFTReal,
     ogr.OFTString,
     ogr.OFTDate,

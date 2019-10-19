@@ -42,9 +42,6 @@ from ..models import declarative_base, DBSession
 from ..layer import SpatialLayerMixin, IBboxLayer
 
 from ..feature_layer import (
-    gdal_gt_19,
-    gdal_gt_20,
-    gdal_gt_22,
     Feature,
     FeatureSet,
     LayerField,
@@ -174,7 +171,7 @@ class TableInfo(object):
             if fld_type_ogr in (ogr.OFTRealList,
                                 ogr.OFTStringList,
                                 ogr.OFTIntegerList,
-                                ogr.OFTInteger64List if gdal_gt_20 else None):
+                                ogr.OFTInteger64List):
                 fld_type = FIELD_TYPE.STRING
 
             if fld_type is None:
@@ -319,12 +316,11 @@ class TableInfo(object):
             for i in range(feature.GetFieldCount()):
                 fld_type = feature.GetFieldDefnRef(i).GetType()
 
-                if (not feature.IsFieldSet(i) or
-                        (gdal_gt_22 and feature.IsFieldNull(i))):
+                if (not feature.IsFieldSet(i) or feature.IsFieldNull(i)):
                     fld_value = None
                 elif fld_type == ogr.OFTInteger:
                     fld_value = feature.GetFieldAsInteger(i)
-                elif gdal_gt_20 and fld_type == ogr.OFTInteger64:
+                elif fld_type == ogr.OFTInteger64:
                     fld_value = feature.GetFieldAsInteger64(i)
                 elif fld_type == ogr.OFTReal:
                     fld_value = feature.GetFieldAsDouble(i)
@@ -341,7 +337,7 @@ class TableInfo(object):
                                          hour, minute, int(second))
                 elif fld_type == ogr.OFTIntegerList:
                     fld_value = json.dumps(feature.GetFieldAsIntegerList(i))
-                elif gdal_gt_20 and fld_type == ogr.OFTInteger64List:
+                elif fld_type == ogr.OFTInteger64List:
                     fld_value = json.dumps(feature.GetFieldAsInteger64List(i))
                 elif fld_type == ogr.OFTRealList:
                     fld_value = json.dumps(feature.GetFieldAsDoubleList(i))
@@ -616,7 +612,7 @@ def _set_encoding(encoding):
         def __init__(self, encoding):
             self.encoding = encoding
 
-            if self.encoding and gdal_gt_19:
+            if self.encoding:
                 # For GDAL 1.9 and higher try to set SHAPE_ENCODING
                 # through ctypes and libgdal
 
@@ -644,13 +640,7 @@ def _set_encoding(encoding):
                 self.set_option.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
                 self.set_option.restype = None
 
-            elif encoding:
-                # For other version of GDAL return function wrapper
-                # that can decode string to unicode, see __enter__
-                pass
-
         def __enter__(self):
-
             def strdecode(x):
                 if len(x) >= 254:
                     # Cludge to fix 254 - 255 byte unicode string cut off
@@ -666,8 +656,8 @@ def _set_encoding(encoding):
 
                 return x.decode(self.encoding)
 
-            if self.encoding and gdal_gt_19:
-                # For GDAL 1.9 set SHAPE_ENCODING value
+            if self.encoding:
+                # Set SHAPE_ENCODING value
 
                 # Keep copy of the current value
                 tmp = self.get_option('SHAPE_ENCODING', None)
@@ -678,15 +668,10 @@ def _set_encoding(encoding):
 
                 return strdecode
 
-            elif self.encoding:
-                # Wrapper for other GDAL versions
-                return strdecode
-
             return lambda (x): x
 
         def __exit__(self, type, value, traceback):
-
-            if self.encoding and gdal_gt_19:
+            if self.encoding:
                 # Return old value
                 self.set_option('SHAPE_ENCODING', self.old_value)
 
