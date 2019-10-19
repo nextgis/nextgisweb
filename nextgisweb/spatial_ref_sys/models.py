@@ -78,6 +78,13 @@ class SRS(Base):
             self.maxy - y * step,
         )
 
+    def tile_center(self, tile):
+        extent = self.tile_extent(tile)
+        return (
+            (extent[0] + extent[2]) / 2,
+            (extent[1] + extent[3]) / 2,
+        )
+
     def __unicode__(self):
         return  self.display_name
 

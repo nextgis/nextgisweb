@@ -62,7 +62,8 @@ from ..feature_layer import (
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
     IFeatureQueryClipByBox,
-    IFeatureQuerySimplify)
+    IFeatureQuerySimplify,
+    on_data_change)
 
 from .util import _
 
@@ -453,6 +454,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         self.after_feature_update.fire(resource=self, feature=feature)
 
+        on_data_change.fire(self, feature.geom)
+        # TODO: Old geom version
+
     def feature_create(self, feature):
         """Insert new object to DB which is described in feature
 
@@ -480,6 +484,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         self.after_feature_create.fire(resource=self, feature_id=obj.id)
 
+        on_data_change.fire(self, feature.geom)
+
         return obj.id
 
     def feature_delete(self, feature_id):
@@ -496,7 +502,10 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         obj = DBSession.query(tableinfo.model).filter_by(id=feature_id).one()
 
         DBSession.delete(obj)
+
         self.after_feature_delete.fire(resource=self, feature_id=feature_id)
+
+        # TODO: Implement on_data_change
 
     def feature_delete_all(self):
         """Remove all records from a layer"""
@@ -508,6 +517,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         DBSession.query(tableinfo.model).delete()
 
         self.after_all_feature_delete.fire(resource=self)
+
+        # TODO: Implement on_data_change
 
     # IBboxLayer implementation:
     @property
