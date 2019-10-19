@@ -292,7 +292,7 @@ class ResourceTileCacheSeializedProperty(SerializedProperty):
         return column.default.arg if column.default is not None else None
 
     def getter(self, srlzr):
-        if srlzr.obj.tile_cache is None:
+        if not env.render.tile_cache_enabled or srlzr.obj.tile_cache is None:
             return self.default()
         return getattr(srlzr.obj.tile_cache, self.attrname)
 
