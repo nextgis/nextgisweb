@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 import numpy
 import PIL
 
-from osgeo import gdal_array
+from osgeo import gdal, gdalconst, gdal_array
 from pkg_resources import resource_filename
 from zope.interface import implements
 from StringIO import StringIO
@@ -45,9 +45,15 @@ class RasterStyle(Base, Resource):
 
     implements(IRenderableStyle, ILegendableStyle)
 
+    # Only RGB, RGBA rasters are supported.
     @classmethod
     def check_parent(cls, parent):
-        return parent.cls == 'raster_layer'
+        return (
+            parent.cls == "raster_layer"
+            and parent.band_count in (3, 4)
+            and parent.dtype
+            in (gdal.GetDataTypeName(gdalconst.GDT_Byte),)
+        )
 
     @property
     def srs(self):
