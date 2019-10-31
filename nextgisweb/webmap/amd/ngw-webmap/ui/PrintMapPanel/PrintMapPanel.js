@@ -9,7 +9,7 @@ define([
     'dijit/form/TextBox', 'dijit/form/NumberTextBox', 'dijit/form/DropDownButton',
     'dijit/DropDownMenu', 'dijit/MenuItem', 'dijit/Toolbar',
     'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n',
-    'ngw/openlayers/Map', 'openlayers/ol', 'openlayers/ol-mapscale',
+    'ngw/openlayers/Map', 'openlayers/ol', 'openlayers/ol-mapscale', 'openlayers/interactions/DragZoomUnConstrained',
     'dojo/text!./PrintMapPanel.hbs', 'dojo/text!./PrintingPageStyle.css.dtl',
     'dijit/form/Select', 'dijit/TooltipDialog',
     'xstyle/css!./PrintMapPanel.css',
@@ -25,7 +25,7 @@ define([
     TextBox, NumberTextBox, DropdownButton,
     DropDownMenu, MenuItem, Toolbar,
     i18n, hbsI18n,
-    Map, ol, olMapScale,
+    Map, ol, olMapScale, DragZoomUnConstrained,
     template, printingCssTemplate) {
     return declare([DynamicPanel, BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
         
@@ -281,20 +281,24 @@ define([
         },
         
         _buildMap: function () {
-            var mapContainer = this.contentWidget.mapContainer;
-            
+            var mapContainer = this.contentWidget.mapContainer,
+                interactions;
+
+            interactions = ol.interaction.defaults({
+                doubleClickZoom: true,
+                dragAndDrop: true,
+                keyboardPan: true,
+                keyboardZoom: true,
+                mouseWheelZoom: true,
+                pointer: false,
+                select: false,
+                shiftDragZoom: false
+            });
+
             this.printMap = new Map({
                 target: mapContainer,
                 controls: [],
-                interactions: ol.interaction.defaults({
-                    doubleClickZoom: true,
-                    dragAndDrop: true,
-                    keyboardPan: true,
-                    keyboardZoom: true,
-                    mouseWheelZoom: true,
-                    pointer: false,
-                    select: false
-                }),
+                interactions: interactions.extend([new DragZoomUnConstrained()]),
                 view: new ol.View({
                     center: this.map.getView().getCenter(),
                     zoom: this.map.getView().getZoom()
