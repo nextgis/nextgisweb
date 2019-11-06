@@ -143,7 +143,7 @@ class WebMapItem(Base):
 
         elif self.item_type == 'layer':
             style_parent_id = None
-            if self.style and self.style.parent and self.style.parent.id:
+            if self.style and self.style.parent:
                 style_parent_id = self.style.parent.id
 
             return dict(
