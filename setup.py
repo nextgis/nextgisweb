@@ -29,7 +29,7 @@ requires = [
     'pillow==5.4.1',
     'lxml==4.3.0',
     'passlib==1.7.1',
-    'OWSLib>=0.17.1',
+    'OWSLib==0.17.1',
     'requests[security]==2.21.0',
     'babel==2.6.0',
     'minio==4.0.10',
