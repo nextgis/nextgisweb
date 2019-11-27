@@ -8,10 +8,6 @@ from zope.interface import Interface, Attribute
 from ..resource import IResourceBase
 
 
-gdal_gt_19 = LooseVersion(osgeo.__version__) >= LooseVersion('1.9')
-gdal_gt_20 = LooseVersion(osgeo.__version__) >= LooseVersion('2.0')
-gdal_gt_22 = LooseVersion(osgeo.__version__) >= LooseVersion('2.2')
-
 GEOM_TYPE_OGR = (
     ogr.wkbPoint,
     ogr.wkbLineString,
@@ -28,12 +24,13 @@ GEOM_TYPE_OGR = (
 
 FIELD_TYPE_OGR = (
     ogr.OFTInteger,
-    ogr.OFTInteger64 if gdal_gt_20 else None,
+    ogr.OFTInteger64,
     ogr.OFTReal,
     ogr.OFTString,
     ogr.OFTDate,
     ogr.OFTTime,
     ogr.OFTDateTime)
+
 
 class GEOM_TYPE(object):
     POINT = 'POINT'
@@ -42,9 +39,27 @@ class GEOM_TYPE(object):
     MULTIPOINT = 'MULTIPOINT'
     MULTILINESTRING = 'MULTILINESTRING'
     MULTIPOLYGON = 'MULTIPOLYGON'
+    POINTZ = 'POINTZ'
+    LINESTRINGZ = 'LINESTRINGZ'
+    POLYGONZ = 'POLYGONZ'
+    MULTIPOINTZ = 'MULTIPOINTZ'
+    MULTILINESTRINGZ = 'MULTILINESTRINGZ'
+    MULTIPOLYGONZ = 'MULTIPOLYGONZ'
 
-    enum = (POINT, LINESTRING, POLYGON, MULTIPOINT,
-            MULTILINESTRING, MULTIPOLYGON)
+    enum = (
+        POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON,
+        POINTZ, LINESTRINGZ, POLYGONZ, MULTIPOINTZ, MULTILINESTRINGZ, MULTIPOLYGONZ,
+    )
+
+    is_multi = (
+        MULTIPOINT, MULTILINESTRING, MULTIPOLYGON,
+        MULTIPOINTZ, MULTILINESTRINGZ, MULTIPOLYGONZ,
+    )
+
+    has_z = (
+        POINTZ, LINESTRINGZ, POLYGONZ,
+        MULTIPOINTZ, MULTILINESTRINGZ, MULTIPOLYGONZ,
+    )
 
 
 class FIELD_TYPE(object):
@@ -67,7 +82,7 @@ class IFeatureLayer(IResourceBase):
     feature_query = Attribute(""" Feature query class """)
 
     def field_by_keyname(self, keyname):
-        """ Get field by key. If field is not found, 
+        """ Get field by key. If field is not found,
         KeyError exception should be raised. """
 
 

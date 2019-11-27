@@ -4,9 +4,6 @@ from ..component import Component, require
 from .feature import Feature, FeatureSet
 from .model import Base, LayerField, LayerFieldsMixin
 from .interface import (
-    gdal_gt_19,
-    gdal_gt_20,
-    gdal_gt_22,
     GEOM_TYPE,
     GEOM_TYPE_OGR,
     FIELD_TYPE,
