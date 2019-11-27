@@ -177,7 +177,7 @@ class Resource(Base):
         mask = set()
 
         for res in tuple(self.parents) + (self, ):
-            rules = filter(lambda (rule): (
+            rules = filter(lambda rule: (
                 (rule.propagate or res == self)
                 and rule.cmp_identity(self.identity)  # NOQA: W503
                 and rule.cmp_user(user)),  # NOQA: W503

@@ -227,4 +227,4 @@ def setup_pyramid(comp, config):
     Resource.__psection__.register(
         key='fields', title=_(u"Attributes"),
         template="nextgisweb:feature_layer/template/section_fields.mako",
-        is_applicable=lambda (obj): IFeatureLayer.providedBy(obj))
+        is_applicable=lambda obj: IFeatureLayer.providedBy(obj))
