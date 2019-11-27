@@ -552,7 +552,7 @@ def store_collection(layer, request):
 
     field_prefix = json.loads(
         urllib.unquote(request.headers.get('x-field-prefix', '""')))
-    pref = lambda (f): field_prefix + f
+    pref = lambda f: field_prefix + f
 
     field_list = json.loads(
         urllib.unquote(request.headers.get('x-field-list', "[]")))

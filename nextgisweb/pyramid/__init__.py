@@ -115,7 +115,7 @@ class PyramidComponent(Component):
 
         # Access to Env through request.env
         config.add_request_method(
-            lambda (req): self._env, 'env',
+            lambda req: self._env, 'env',
             property=True)
 
         config.include(pyramid_tm)

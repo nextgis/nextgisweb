@@ -25,7 +25,7 @@ class PageSections(object):
 
     def __iter__(self):
         items = list(self._items)
-        items.sort(key=lambda (itm): itm.priority)
+        items.sort(key=lambda itm: itm.priority)
         return items.__iter__()
 
     def register(self, **kwargs):

@@ -48,7 +48,7 @@ def pkginfo():
 
     return dict(
         components=dict(map(
-            lambda (i): (i, "nextgisweb.%s" % i),
+            lambda i: (i, "nextgisweb.%s" % i),
             components)
         )
     )

@@ -26,7 +26,7 @@ class ModelController(object):
         self.client = client
 
     def includeme(self, config):
-        route = lambda (s): self.route_prefix + '.' + s
+        route = lambda s: self.route_prefix + '.' + s
 
         config.add_route(route('create'), self.url_base + '/create',
                          client=self.client_base)

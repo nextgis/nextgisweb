@@ -240,7 +240,7 @@ class TableInfo(object):
             db.Column('geom', ga.Geometry(
                 dimension=2, srid=self.srs_id,
                 geometry_type=geom_fldtype)),
-            *map(lambda (fld): db.Column(fld.key, _FIELD_TYPE_2_DB[
+            *map(lambda fld: db.Column(fld.key, _FIELD_TYPE_2_DB[
                 fld.datatype]), self.fields)
         )
 
@@ -660,7 +660,7 @@ def _set_encoding(encoding):
                 # Wrapper for other GDAL versions
                 return strdecode
 
-            return lambda (x): x
+            return lambda x: x
 
         def __exit__(self, type, value, traceback):
 
@@ -689,7 +689,7 @@ class _source_attr(SP):
 
         return ogrlayer
 
-    def _ogrlayer(self, obj, ogrlayer, recode=lambda (a): a):
+    def _ogrlayer(self, obj, ogrlayer, recode=lambda a: a):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
 
