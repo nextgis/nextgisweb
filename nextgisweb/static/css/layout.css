@@ -605,7 +605,7 @@ body {
   line-height: 1.55;
   color: #212121;
   background-color: #fafafa;
-  min-width: 900px;
+  min-width: 680px;
 }
 .list-unstyled {
   margin: 0;
@@ -676,7 +676,7 @@ a[class*=" icon-"]:hover:before {
 .layout {
   position: relative;
   min-height: 100%;
-  min-width: 900px;
+  min-width: 680px;
 }
 .title {
   padding: 40px 0 24px;
