@@ -3,7 +3,7 @@ from subprocess import check_output, CalledProcessError
 from setuptools import setup, find_packages
 
 try:
-    gv = check_output(['gdal-config', '--version']).strip()
+    gv = check_output(['gdal-config', '--version'], universal_newlines=True).strip()
 except CalledProcessError:
     gv = None
 
