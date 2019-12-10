@@ -64,14 +64,15 @@ def geom_transform(request):
 
 def geom_calc(request, prop):
     proj4_from = get_proj4(int(request.json_body["srs_id_from"]))
-    proj4_to = get_proj4(int(request.json_body["srs_id_to"]))
+    srs_id_to = int(request.json_body["srs_id_to"])
+    proj4_to = get_proj4(srs_id_to)
     geom = geom_from_wkt(request.json_body["geom"])
 
     crs_from = CRS.from_proj4(proj4_from)
     crs_to = CRS.from_proj4(proj4_to)
     geom_transformed = shp_geom_transform(geom, crs_from, crs_to)
 
-    result = shp_geom_calc(geom_transformed, crs_to, prop)
+    result = shp_geom_calc(geom_transformed, crs_to, prop, srs_id_to)
     return result
 
 

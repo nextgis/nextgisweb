@@ -8,6 +8,8 @@ from shapely.ops import transform as map_coords
 from shapely import wkt, wkb
 from pyproj import Transformer
 
+from .models import DBSession
+
 for t in dir(shapely.geometry):
     original = getattr(shapely.geometry, t)
     if isclass(original) and issubclass(original, base.BaseGeometry):
@@ -59,11 +61,24 @@ def geom_transform(g, crs_from, crs_to):
     return g
 
 
-def geom_calc(g, crs, prop):
+def geom_calc(g, crs, prop, srid):
+    # pyproj < 2.3
+    def geodesic_calc_with_postgis():
+        params = {"wkt": geom_to_wkt(g), "srid": srid}
+        fun = dict(length="ST_Length", area="ST_Area")[prop]
+        query_text = "SELECT " + fun + "(geography(ST_GeomFromText(:wkt, :srid))) as value"
+        return DBSession.execute(query_text, params).scalar()
+
     calcs = dict(
-        length=lambda: crs.get_geod().geometry_length(g) if crs.is_geographic else g.length,
-        area=lambda: crs.get_geod().geometry_area_perimeter(g)[0] if crs.is_geographic else g.area
+        length=lambda: geodesic_calc_with_postgis() if crs.is_geographic else g.length,
+        area=lambda: geodesic_calc_with_postgis() if crs.is_geographic else g.area
     )
+
+    # pyproj >= 2.3
+    # calcs = dict(
+    #     length=lambda: crs.get_geod().geometry_length(g) if crs.is_geographic else g.length,
+    #     area=lambda: crs.get_geod().geometry_area_perimeter(g)[0] if crs.is_geographic else g.area
+    # )
 
     if prop not in calcs.keys():
         return None
