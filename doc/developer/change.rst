@@ -41,9 +41,21 @@ Execute following PUT request to change resource.
        }
    }
 
+
 .. note::
    Payload of this request may be equal to create new resource request payload,
    but some fields can be omitted. Request must be authorized.
+   
+**Move resource in terminal**:
+
+.. sourcecode:: bash
+
+   url='https://sandbox.nextgis.com'
+   login='administrator'
+   password='demodemo'
+   
+   curl -d '{"resource":{"parent":{"id":373}}}' -u $login:$password -X PUT $url/api/resource/381
+
 
 
 Change metadata
