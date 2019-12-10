@@ -81,10 +81,6 @@ def setup_pyramid(comp, config):
         "spatial_ref_sys.collection", "/api/component/spatial_ref_sys/",
     ).add_view(collection, request_method="GET", renderer="json")
 
-    config.add_route(
-        "spatial_ref_sys.get", "/api/component/spatial_ref_sys/{id}",
-    ).add_view(get, request_method="GET", renderer="json")
-
     config.add_route("spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert") \
         .add_view(srs_convert, request_method="POST", renderer="json")
 
@@ -99,3 +95,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         "spatial_ref_sys.geom_area", "/api/component/spatial_ref_sys/geom_area") \
         .add_view(lambda r: geom_calc(r, "area"), request_method="POST", renderer="json")
+
+    config.add_route(
+        "spatial_ref_sys.get", "/api/component/spatial_ref_sys/{id}",
+    ).add_view(get, request_method="GET", renderer="json")
