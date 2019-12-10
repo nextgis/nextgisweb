@@ -85,17 +85,17 @@ def setup_pyramid(comp, config):
         "spatial_ref_sys.get", "/api/component/spatial_ref_sys/{id}",
     ).add_view(get, request_method="GET", renderer="json")
 
-    config.add_route("spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert/") \
+    config.add_route("spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert") \
         .add_view(srs_convert, request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.geom_transform", "/api/component/spatial_ref_sys/geom_transform/") \
+        "spatial_ref_sys.geom_transform", "/api/component/spatial_ref_sys/geom_transform") \
         .add_view(geom_transform, request_method="POST")
 
     config.add_route(
-        "spatial_ref_sys.geom_length", "/api/component/spatial_ref_sys/geom_length/") \
+        "spatial_ref_sys.geom_length", "/api/component/spatial_ref_sys/geom_length") \
         .add_view(lambda r: geom_calc(r, "length"), request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.geom_area", "/api/component/spatial_ref_sys/geom_area/") \
+        "spatial_ref_sys.geom_area", "/api/component/spatial_ref_sys/geom_area") \
         .add_view(lambda r: geom_calc(r, "area"), request_method="POST", renderer="json")
