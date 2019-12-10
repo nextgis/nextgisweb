@@ -59,7 +59,7 @@ def geom_transform(request):
     crs_to = CRS.from_proj4(proj4_to)
     geom_transformed = shp_geom_transform(geom, crs_from, crs_to)
 
-    return Response(geom_to_wkt(geom_transformed))
+    return dict(geom=geom_to_wkt(geom_transformed))
 
 
 def geom_calc(request, prop):
@@ -86,7 +86,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "spatial_ref_sys.geom_transform", "/api/component/spatial_ref_sys/geom_transform") \
-        .add_view(geom_transform, request_method="POST")
+        .add_view(geom_transform, request_method="POST", renderer="json")
 
     config.add_route(
         "spatial_ref_sys.geom_length", "/api/component/spatial_ref_sys/geom_length") \
