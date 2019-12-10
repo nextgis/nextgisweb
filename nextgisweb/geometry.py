@@ -7,6 +7,7 @@ from shapely.geometry import base
 from shapely.ops import transform as map_coords
 from shapely import wkt, wkb
 from pyproj import Transformer
+from sqlalchemy import func
 
 from .models import DBSession
 
@@ -64,10 +65,9 @@ def geom_transform(g, crs_from, crs_to):
 def geom_calc(g, crs, prop, srid):
     # pyproj < 2.3
     def geodesic_calc_with_postgis():
-        params = {"wkt": geom_to_wkt(g), "srid": srid}
-        fun = dict(length="ST_Length", area="ST_Area")[prop]
-        query_text = "SELECT " + fun + "(geography(ST_GeomFromText(:wkt, :srid))) as value"
-        return DBSession.execute(query_text, params).scalar()
+        fun = dict(length=func.ST_Length, area=func.ST_Area)[prop]
+        query = fun(func.geography(func.ST_GeomFromText(geom_to_wkt(g), srid)))
+        return DBSession.query(query).scalar()
 
     calcs = dict(
         length=lambda: geodesic_calc_with_postgis() if crs.is_geographic else g.length,
