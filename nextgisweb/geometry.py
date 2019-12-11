@@ -19,7 +19,7 @@ for t in dir(shapely.geometry):
             _base_class = original
 
             def __init__(self, *args, **kwargs):
-                self._srid = kwargs.pop('srid')
+                self._srid = kwargs.pop('srid') if 'srid' in kwargs else None
 
                 self._base_class.__init__(self, *args, **kwargs)
 
