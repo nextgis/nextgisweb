@@ -69,22 +69,19 @@ def geom_calc(g, crs, prop, srid):
         query = fun(func.geography(func.ST_GeomFromText(geom_to_wkt(g), srid)))
         return DBSession.query(query).scalar()
 
+    factor = crs.axis_info[0].unit_conversion_factor
     calcs = dict(
-        length=lambda: geodesic_calc_with_postgis() if crs.is_geographic else g.length,
-        area=lambda: geodesic_calc_with_postgis() if crs.is_geographic else g.area
+        length=lambda: geodesic_calc_with_postgis() if crs.is_geographic else g.length * factor,
+        area=lambda: geodesic_calc_with_postgis() if crs.is_geographic else g.area * factor**2
     )
 
     # pyproj >= 2.3
     # calcs = dict(
-    #     length=lambda: crs.get_geod().geometry_length(g) if crs.is_geographic else g.length,
-    #     area=lambda: crs.get_geod().geometry_area_perimeter(g)[0] if crs.is_geographic else g.area
+    #     length=lambda: crs.get_geod().geometry_length(g) if crs.is_geographic else g.length * factor,
+    #     area=lambda: crs.get_geod().geometry_area_perimeter(g)[0] if crs.is_geographic else g.area * factor**2
     # )
 
-    if prop not in calcs.keys():
+    if prop not in calcs:
         return None
 
-    result = dict(
-        units="metre" if crs.is_geographic else crs.axis_info[0].unit_name,
-        value=calcs[prop]()
-    )
-    return result
+    return calcs[prop]()

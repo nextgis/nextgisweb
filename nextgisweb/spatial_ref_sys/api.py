@@ -65,8 +65,8 @@ def geom_calc(request, prop):
     crs_to = CRS.from_proj4(srs_to.proj4)
     geom_transformed = shp_geom_transform(geom, crs_from, crs_to)
 
-    result = shp_geom_calc(geom_transformed, crs_to, prop, srs_to.id)
-    return result
+    value = shp_geom_calc(geom_transformed, crs_to, prop, srs_to.id)
+    return dict(value=value)
 
 
 def setup_pyramid(comp, config):
