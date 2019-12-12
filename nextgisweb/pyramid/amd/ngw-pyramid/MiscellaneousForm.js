@@ -33,7 +33,7 @@ define([
     template
 ) {
     var API_URL = route.pyramid.miscellaneous();
-    var SRS_URL = '/api/component/spatial_ref_sys/';
+    var SRS_URL = route.spatial_ref_sys.collection();
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
