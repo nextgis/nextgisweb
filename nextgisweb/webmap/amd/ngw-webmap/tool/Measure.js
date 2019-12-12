@@ -43,19 +43,19 @@ define([
 
                 if ((units === "metric") || (units === null)) {
                     output = (length > 100) ? {
-                        measure: Math.round(length / 1000 * 100) / 100,
+                        measure: length / 1000,
                         suffix: "km"
                     } : {
-                        measure: Math.round(length * 100) / 100,
+                        measure: length,
                         suffix: "m"
                     };
                 } else if (units === "imperial") {
                     length = length * (1 / 0.3048); // feets
                     output = (length > 5280) ? {
-                        measure: Math.round(length / 5280 * 100) / 100,
+                        measure: length / 5280,
                         suffix: "mi"
                     } : {
-                        measure: Math.round(length * 100) / 100,
+                        measure: length,
                         suffix: "ft"
                     };
                 }
@@ -71,19 +71,19 @@ define([
 
                 if ((units === "metric") || (units === null)) {
                     output = (area > 10000) ? {
-                        measure: Math.round(area / 1000000 * 100) / 100,
+                        measure: area / 1000000,
                         suffix: "km<sup>2</sup>"
                     } : {
-                        measure: Math.round(area * 100) / 100,
+                        measure: area,
                         suffix: "m<sup>2</sup>"
                     };
                 } else if (units === "imperial") {
                     area = area * (1 / 4046.86);
                     output = (area > (640 * 100)) ? {
-                        measure: Math.round(area / 640 * 100) / 100,
+                        measure: area / 640,
                         suffix: "mi<sup>2</sup>"
                     } : {
-                        measure: Math.round(area * 100) / 100,
+                        measure: area,
                         suffix: "ac"
                     };
                 }
@@ -134,7 +134,7 @@ define([
 
                     tool.tooltip.set("content",
                         output.label
-                        + number.format(output.measure) + " "
+                        + number.format(output.measure, {places:2}) + " "
                         + output.suffix
                     );
                 });
