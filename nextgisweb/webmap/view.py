@@ -128,7 +128,8 @@ def setup_pyramid(comp, config):
             webmapTitle=obj.display_name,
             webmapEditable=obj.editable,
             drawOrderEnabled=obj.draw_order_enabled,
-            measurementSystem=request.env.core.settings_get('core', 'units')
+            measurementSystem=request.env.core.settings_get('core', 'units'),
+            measurementSRID=request.env.core.settings_get('core', 'measurement_srid')
         )
 
         if comp.settings['annotation']:

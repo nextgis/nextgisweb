@@ -2,22 +2,28 @@
 define([
     "dojo/_base/declare",
     "./Base",
+    "dojo/request/xhr",
     "dojo/number",
     "dijit/popup",
     "dojo/_base/lang",
     "dijit/TooltipDialog",
     "openlayers/ol",
+    "ngw/route",
     "ngw-pyramid/i18n!webmap"
 ], function (
     declare,
     Base,
+    xhr,
     number,
     popup,
     lang,
     TooltipDialog,
     ol,
+    route,
     i18n
 ) {
+    var GEOM_LENGTH_URL = route.spatial_ref_sys.geom_length();
+    var GEOM_AREA_URL = route.spatial_ref_sys.geom_area();
     return declare(Base, {
         constructor: function (options) {
             var tool = this;
@@ -30,67 +36,50 @@ define([
                 this.customIcon = '<svg class="ol-control__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 326.534 326.535" style="width:18px;height:18px"><path d="M326.533 38.375a38.369 38.369 0 00-23.688-35.451 38.37 38.37 0 00-41.816 8.317l-20.065 20.066 14.577 14.577a8.25 8.25 0 01-11.667 11.667l-14.577-14.577-37.83 37.831 14.576 14.577a8.248 8.248 0 010 11.667 8.25 8.25 0 01-11.667 0L179.8 92.473l-37.831 37.83 14.577 14.576a8.25 8.25 0 01-11.667 11.667l-14.577-14.577-37.83 37.83 14.576 14.577a8.25 8.25 0 010 11.667 8.25 8.25 0 01-11.667 0l-14.577-14.577-37.83 37.831 14.576 14.576a8.25 8.25 0 01-11.667 11.667l-14.576-14.576-20.066 20.066a38.372 38.372 0 0027.133 65.503l249.788-.001a38.377 38.377 0 0027.134-11.238 38.377 38.377 0 0011.239-27.133l-.002-249.786zM249.789 249.79l-118.778.002 118.779-118.78-.001 118.778z"/></svg>';
             }
 
-            var formatLength = function(line, units) {
+            function formatUnits (value, units, is_area) {
                 var output;
-                var length = 0;
-                var coordinates = line.getCoordinates();
-                var sourceProj = tool.display.map.olMap.getView().getProjection();
-                for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
-                    var c1 = ol.proj.transform(coordinates[i], sourceProj, "EPSG:4326");
-                    var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, "EPSG:4326");
-                    length += ol.sphere.getDistance(c1, c2);
+                if (is_area) {
+                    if ((units === "metric") || (units === null)) {
+                        output = (value > 10000) ? {
+                            measure: value / 1000000,
+                            suffix: "km<sup>2</sup>"
+                        } : {
+                            measure: value,
+                            suffix: "m<sup>2</sup>"
+                        };
+                    } else if (units === "imperial") {
+                        value = value * (1 / 4046.86);
+                        output = (value > (640 * 100)) ? {
+                            measure: value / 640,
+                            suffix: "mi<sup>2</sup>"
+                        } : {
+                            measure: value,
+                            suffix: "ac"
+                        };
+                    }
+                } else {
+                    if ((units === "metric") || (units === null)) {
+                        output = (value > 100) ? {
+                            measure: value / 1000,
+                            suffix: "km"
+                        } : {
+                            measure: value,
+                            suffix: "m"
+                        };
+                    } else if (units === "imperial") {
+                        value = value * (1 / 0.3048); // feets
+                        output = (value > 5280) ? {
+                            measure: value / 5280,
+                            suffix: "mi"
+                        } : {
+                            measure: value,
+                            suffix: "ft"
+                        };
+                    }
                 }
-
-                if ((units === "metric") || (units === null)) {
-                    output = (length > 100) ? {
-                        measure: length / 1000,
-                        suffix: "km"
-                    } : {
-                        measure: length,
-                        suffix: "m"
-                    };
-                } else if (units === "imperial") {
-                    length = length * (1 / 0.3048); // feets
-                    output = (length > 5280) ? {
-                        measure: length / 5280,
-                        suffix: "mi"
-                    } : {
-                        measure: length,
-                        suffix: "ft"
-                    };
-                }
-
-                output.label = "L = ";
+                output.label = is_area ? "S = " : "L = ";
                 return output;
-            };
-
-            var formatArea = function(polygon, units) {
-                var output;
-                var sourceProj = tool.display.map.olMap.getView().getProjection();
-                var area = Math.abs(ol.sphere.getArea(polygon, {projection: sourceProj}));
-
-                if ((units === "metric") || (units === null)) {
-                    output = (area > 10000) ? {
-                        measure: area / 1000000,
-                        suffix: "km<sup>2</sup>"
-                    } : {
-                        measure: area,
-                        suffix: "m<sup>2</sup>"
-                    };
-                } else if (units === "imperial") {
-                    area = area * (1 / 4046.86);
-                    output = (area > (640 * 100)) ? {
-                        measure: area / 640,
-                        suffix: "mi<sup>2</sup>"
-                    } : {
-                        measure: area,
-                        suffix: "ac"
-                    };
-                }
-
-                output.label = "S = ";
-                return output;
-            };
+            }
 
             var style = new ol.style.Style({
                 fill: new ol.style.Fill({
@@ -119,24 +108,76 @@ define([
             this.display.map.olMap.addInteraction(this.interaction);
             this.interaction.setActive(false);
 
-            var listener;
+            function isValid (geom) {
+                if (geom instanceof ol.geom.Polygon) {
+                    return geom.getLinearRing(0).getCoordinates().length > 3;
+                } else if (geom instanceof ol.geom.LineString) {
+                    return geom.getCoordinates().length > 1;
+                }
+                return true;
+            }
+
             var units = this.display.config.measurementSystem;
+            var mapProj = tool.display.map.olMap.getView().getProjection();
+            var mapSRID = mapProj.getCode().match(/EPSG\:(\d+)/)[1];
+            var measurementSRID = this.display.config.measurementSRID;
+
+            var listener;
+            var DELAY = 200; // milliseconds
+            var id_actuality = 0;
             this.interaction.on("drawstart", lang.hitch(this, function(evt) {
                 this.vector.getSource().clear();
+                var prev = -Infinity;
+                var prev_last_coord = null;
+                var timeoutID;
                 listener = evt.feature.getGeometry().on("change", function(evt) {
+                    tool.tooltip.set("content", "...");
+
                     var geom = evt.target;
-                    var output;
-                    if (geom instanceof ol.geom.Polygon) {
-                        output = formatArea(geom, units);
-                    } else if (geom instanceof ol.geom.LineString) {
-                        output = formatLength(geom, units);
+                    if (!isValid(geom)) {
+                        return;
                     }
 
-                    tool.tooltip.set("content",
-                        output.label
-                        + number.format(output.measure, {places:2}) + " "
-                        + output.suffix
-                    );
+                    var is_area = geom instanceof ol.geom.Polygon;
+                    var MEASURE_URL = is_area ? GEOM_AREA_URL : GEOM_LENGTH_URL;
+
+                    function requestMeasure () {
+                        var id = id_actuality;
+                        xhr(MEASURE_URL, {
+                            method: "POST",
+                            data: JSON.stringify({
+                                geom: new ol.format.WKT().writeGeometry(geom),
+                                srs_id_from: mapSRID,
+                                srs_id_to: measurementSRID
+                            }),
+                            headers: {'Content-Type': 'application/json'},
+                            handleAs: "json"
+                        }).then(function (data) {
+                            if (id === id_actuality) {
+                                var output = formatUnits(data.value, units, is_area);
+                                tool.tooltip.set("content",
+                                    output.label
+                                    + number.format(output.measure, {places:2}) + " "
+                                    + output.suffix
+                                );
+                            }
+                        });
+                    }
+
+                    if (timeoutID) {
+                        window.clearTimeout(timeoutID);
+                        timeoutID = null;
+                    }
+
+                    var now = Date.now();
+                    var diff = now - prev;
+                    prev = now;
+                    id_actuality++;
+                    if (diff > DELAY) {
+                        requestMeasure();
+                    } else {
+                        timeoutID = window.setTimeout(requestMeasure, DELAY-diff);
+                    }
                 });
             }));
 
