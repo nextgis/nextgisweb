@@ -37,48 +37,48 @@ define([
             }
 
             function formatUnits (value, units, is_area) {
-                var output;
+                var label, measure, suffix;
+                label = is_area ? "S" : "L";
                 if (is_area) {
                     if ((units === "metric") || (units === null)) {
-                        output = (value > 10000) ? {
-                            measure: value / 1000000,
-                            suffix: "km<sup>2</sup>"
-                        } : {
-                            measure: value,
-                            suffix: "m<sup>2</sup>"
+                        if (value > 10000) {
+                            measure = value / 1000000,
+                            suffix = "km<sup>2</sup>"
+                        } else {
+                            measure = value,
+                            suffix = "m<sup>2</sup>"
                         };
                     } else if (units === "imperial") {
                         value = value * (1 / 4046.86);
-                        output = (value > (640 * 100)) ? {
-                            measure: value / 640,
-                            suffix: "mi<sup>2</sup>"
-                        } : {
-                            measure: value,
-                            suffix: "ac"
+                        if (value > (640 * 100)) {
+                            measure = value / 640,
+                            suffix = "mi<sup>2</sup>"
+                        } else {
+                            measure = value,
+                            suffix = "ac"
                         };
                     }
                 } else {
                     if ((units === "metric") || (units === null)) {
-                        output = (value > 100) ? {
-                            measure: value / 1000,
-                            suffix: "km"
-                        } : {
-                            measure: value,
-                            suffix: "m"
+                        if (value > 100) {
+                            measure = value / 1000,
+                            suffix = "km"
+                        } else {
+                            measure = value,
+                            suffix = "m"
                         };
                     } else if (units === "imperial") {
                         value = value * (1 / 0.3048); // feets
-                        output = (value > 5280) ? {
-                            measure: value / 5280,
-                            suffix: "mi"
-                        } : {
-                            measure: value,
-                            suffix: "ft"
+                        if (value > 5280) {
+                            measure = value / 5280,
+                            suffix = "mi"
+                        } else {
+                            measure = value,
+                            suffix = "ft"
                         };
                     }
                 }
-                output.label = is_area ? "S = " : "L = ";
-                return output;
+                return label + " = " + number.format(measure, {places:2}) + " " + suffix;
             }
 
             var style = new ol.style.Style({
@@ -155,11 +155,7 @@ define([
                         }).then(function (data) {
                             if (id === id_actuality) {
                                 var output = formatUnits(data.value, units, is_area);
-                                tool.tooltip.set("content",
-                                    output.label
-                                    + number.format(output.measure, {places:2}) + " "
-                                    + output.suffix
-                                );
+                                tool.tooltip.set("content", output);
                             }
                         });
                     }
