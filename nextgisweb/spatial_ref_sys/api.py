@@ -49,8 +49,8 @@ def geom_transform(request):
     srs_to = SRS.filter_by(id=int(request.json_body["srs_id_to"])).one()
     geom = geom_from_wkt(request.json_body["geom"])
 
-    crs_from = CRS.from_proj4(srs_from.proj4)
-    crs_to = CRS.from_proj4(srs_to.proj4)
+    crs_from = CRS.from_wkt(srs_from.wkt)
+    crs_to = CRS.from_wkt(srs_to.wkt)
     geom_transformed = shp_geom_transform(geom, crs_from, crs_to)
 
     return dict(geom=geom_to_wkt(geom_transformed))
@@ -61,8 +61,8 @@ def geom_calc(request, prop):
     srs_to = SRS.filter_by(id=int(request.json_body["srs_id_to"])).one()
     geom = geom_from_wkt(request.json_body["geom"])
 
-    crs_from = CRS.from_proj4(srs_from.proj4)
-    crs_to = CRS.from_proj4(srs_to.proj4)
+    crs_from = CRS.from_wkt(srs_from.wkt)
+    crs_to = CRS.from_wkt(srs_to.wkt)
     geom_transformed = shp_geom_transform(geom, crs_from, crs_to)
 
     value = shp_geom_calc(geom_transformed, crs_to, prop, srs_to.id)
