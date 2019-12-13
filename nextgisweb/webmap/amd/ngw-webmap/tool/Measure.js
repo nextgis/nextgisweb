@@ -60,7 +60,7 @@ define([
                     }
                 } else {
                     if ((units === "metric") || (units === null)) {
-                        if (value > 100) {
+                        if (value > 1000) {
                             measure = value / 1000,
                             suffix = "km"
                         } else {
