@@ -78,7 +78,12 @@ define([
                         };
                     }
                 }
-                return label + " = " + number.format(measure, {places:2}) + " " + suffix;
+                return [
+                    label,
+                    "=",
+                    number.format(measure, {places: 2,locale: dojoConfig.locale}),
+                    suffix
+                ].join(' ');
             }
 
             var style = new ol.style.Style({
