@@ -13,6 +13,12 @@
     %if error:
         <div class="auth-form__error">${error}</div>
     %endif
+
+    %if request.env.auth.oauth is not None:
+        <% oauth_url = request.route_url('auth.oauth', _query=dict(next=next_url) if next_url else None) %>
+        <a href="${oauth_url}">${tr(_('Continue with NextGIS ID'))}</a>
+    %endif
+
     <div class="pure-control-group">
         <input name="login" type="text" required placeholder="${tr(_('Login'))}">
     </div>
