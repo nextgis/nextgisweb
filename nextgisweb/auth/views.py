@@ -7,7 +7,7 @@ import secrets
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound
+from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPBadRequest
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
 
@@ -61,8 +61,11 @@ def oauth(request):
 
     elif 'code' in request.params and 'state' in request.params:
         # Extract next_url from state named cookie
-        state = request.params['state']
-        next_url = request.cookies[cookie_name(state)]
+        try:
+            state = request.params['state']
+            next_url = request.cookies[cookie_name(state)]
+        except KeyError:
+            raise HTTPBadRequest()
 
         access_token = oaserver.get_access_token(
             request.params['code'], oauth_url)
