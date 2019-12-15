@@ -139,6 +139,7 @@ class AuthComponent(Component):
 
         Option('oauth.auth_endpoint'),
         Option('oauth.token_endpoint'),
+        Option('oauth.introspection_endpoint', default=None),
         Option('oauth.userinfo_endpoint'),
 
         Option('oauth.userinfo.scope', default=None),

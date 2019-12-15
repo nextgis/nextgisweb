@@ -27,6 +27,7 @@ class OAuthServer(object):
 
         self.auth_endpoint = options['auth_endpoint']
         self.token_endpoint = options['token_endpoint']
+        self.introspection_endpoint = options['introspection_endpoint']
         self.userinfo_endpoint = options['userinfo_endpoint']
 
         self.userinfo_scope = options['userinfo.scope']
@@ -61,18 +62,35 @@ class OAuthServer(object):
         data = response.json()
         return data['access_token']
 
-    def get_user_info(self, access_token):
+    def query_userinfo(self, access_token):
         response = requests.get(self.userinfo_endpoint, headers={
             'Authorization': 'Bearer ' + access_token
         })
         response.raise_for_status()
         return response.json()
 
-    def get_user(self, access_token):
-        userinfo = self.get_user_info(access_token)
-        userinfo_subject = unicode(userinfo[self.userinfo_subject])
+    def query_introspection(self, access_token):
+        response = requests.post(self.introspection_endpoint, dict(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            token=access_token,
+        ))
+        response.raise_for_status()
+        return response.json()
+
+    def get_user(self, access_token, as_resource_server=False):
+        # Use userinfo instead of introspection when introspection not available
+        # TODO: This behaivor should be enabled in settings and disabled by default!
+        if as_resource_server and self.introspection_endpoint is None:
+            as_resource_server = False
+
+        if as_resource_server:
+            userinfo = self.query_introspection(access_token)
+        else:
+            userinfo = self.query_userinfo(access_token)
 
         with DBSession.no_autoflush:
+            userinfo_subject = unicode(userinfo[self.userinfo_subject])
             user = User.filter_by(oauth_subject=userinfo_subject).first()
 
             if user is None:
