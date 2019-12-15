@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from pyramid.response import Response
 from pyproj import CRS
-from backports.functools_lru_cache import lru_cache
 
 from .models import SRS
 from .util import convert_projstr_to_wkt, _
