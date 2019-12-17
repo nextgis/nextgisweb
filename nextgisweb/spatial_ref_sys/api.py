@@ -43,8 +43,8 @@ def srs_convert(request):
 
 
 def geom_transform(request):
-    srs_from = SRS.filter_by(id=int(request.json_body["srs_id_from"])).one()
-    srs_to = SRS.filter_by(id=int(request.json_body["srs_id_to"])).one()
+    srs_from = SRS.filter_by(id=int(request.json_body["srs"])).one()
+    srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
     geom = geom_from_wkt(request.json_body["geom"])
 
     crs_from = CRS.from_wkt(srs_from.wkt)
@@ -55,15 +55,17 @@ def geom_transform(request):
 
 
 def geom_calc(request, prop):
-    srs_from = SRS.filter_by(id=int(request.json_body["srs_id_from"])).one()
-    srs_to = SRS.filter_by(id=int(request.json_body["srs_id_to"])).one()
+    srs_from_id = request.json_body["srs"] if "srs" in request.json_body else None
+    srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
     geom = geom_from_wkt(request.json_body["geom"])
 
-    crs_from = CRS.from_wkt(srs_from.wkt)
-    crs_to = CRS.from_wkt(srs_to.wkt)
-    geom_transformed = shp_geom_transform(geom, crs_from, crs_to)
+    if srs_from_id and srs_from_id != srs_to.id:
+        srs_from = SRS.filter_by(id=int(srs_from_id)).one()
+        crs_from = CRS.from_wkt(srs_from.wkt)
+        crs_to = CRS.from_wkt(srs_to.wkt)
+        geom = shp_geom_transform(geom, crs_from, crs_to)
 
-    value = shp_geom_calc(geom_transformed, crs_to, prop, srs_to.id)
+    value = shp_geom_calc(geom, crs_to, prop, srs_to.id)
     return dict(value=value)
 
 
@@ -76,17 +78,17 @@ def setup_pyramid(comp, config):
         .add_view(srs_convert, request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.geom_transform", "/api/component/spatial_ref_sys/geom_transform") \
+        "spatial_ref_sys.geom_transform", r"/api/component/spatial_ref_sys/{id:\d+}/geom_transform") \
         .add_view(geom_transform, request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.geom_length", "/api/component/spatial_ref_sys/geom_length") \
+        "spatial_ref_sys.geom_length", r"/api/component/spatial_ref_sys/{id:\d+}/geom_length") \
         .add_view(lambda r: geom_calc(r, "length"), request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.geom_area", "/api/component/spatial_ref_sys/geom_area") \
+        "spatial_ref_sys.geom_area", r"/api/component/spatial_ref_sys/{id:\d+}/geom_area") \
         .add_view(lambda r: geom_calc(r, "area"), request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.get", "/api/component/spatial_ref_sys/{id}",
+        "spatial_ref_sys.get", r"/api/component/spatial_ref_sys/{id:\d+}",
     ).add_view(get, request_method="GET", renderer="json")

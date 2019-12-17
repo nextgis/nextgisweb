@@ -22,8 +22,8 @@ define([
     route,
     i18n
 ) {
-    var GEOM_LENGTH_URL = route.spatial_ref_sys.geom_length();
-    var GEOM_AREA_URL = route.spatial_ref_sys.geom_area();
+    var GEOM_LENGTH_URL = route.spatial_ref_sys.geom_length;
+    var GEOM_AREA_URL = route.spatial_ref_sys.geom_area;
     return declare(Base, {
         constructor: function (options) {
             var tool = this;
@@ -129,11 +129,10 @@ define([
 
             var listener;
             var DELAY = 200; // milliseconds
-            var id_actuality = 0;
+            var id_request, id_actuality = 0;
             this.interaction.on("drawstart", lang.hitch(this, function(evt) {
                 this.vector.getSource().clear();
-                var prev = -Infinity;
-                var prev_last_coord = null;
+                var now, diff, prev = -Infinity;
                 var timeoutID;
                 listener = evt.feature.getGeometry().on("change", function(evt) {
                     tool.tooltip.set("content", "...");
@@ -144,21 +143,20 @@ define([
                     }
 
                     var is_area = geom instanceof ol.geom.Polygon;
-                    var MEASURE_URL = is_area ? GEOM_AREA_URL : GEOM_LENGTH_URL;
+                    var measure_url = is_area ? GEOM_AREA_URL : GEOM_LENGTH_URL;
 
                     function requestMeasure () {
-                        var id = id_actuality;
-                        xhr(MEASURE_URL, {
+                        id_request = id_actuality;
+                        xhr(measure_url({id: measurementSRID}), {
                             method: "POST",
                             data: JSON.stringify({
                                 geom: new ol.format.WKT().writeGeometry(geom),
-                                srs_id_from: mapSRID,
-                                srs_id_to: measurementSRID
+                                srs: mapSRID
                             }),
                             headers: {'Content-Type': 'application/json'},
                             handleAs: "json"
                         }).then(function (data) {
-                            if (id === id_actuality) {
+                            if (id_request === id_actuality) {
                                 var output = formatUnits(data.value, units, is_area);
                                 tool.tooltip.set("content", output);
                             }
@@ -170,8 +168,8 @@ define([
                         timeoutID = null;
                     }
 
-                    var now = Date.now();
-                    var diff = now - prev;
+                    now = Date.now();
+                    diff = now - prev;
                     prev = now;
                     id_actuality++;
                     if (diff > DELAY) {
