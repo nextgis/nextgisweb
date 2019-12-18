@@ -37,11 +37,20 @@ def frtc(txn):
 
 
 @pytest.fixture
-def img_cross():
+def img_cross_red():
     result = Image.new('RGBA', (256, 256))
     draw = ImageDraw.Draw(result)
     draw.line((0, 0, 256, 256), fill='red')
     draw.line((0, 256, 256, 0), fill='red')
+    return result
+
+
+@pytest.fixture
+def img_cross_green():
+    result = Image.new('RGBA', (256, 256))
+    draw = ImageDraw.Draw(result)
+    draw.line((0, 0, 256, 256), fill='green')
+    draw.line((0, 256, 256, 0), fill='green')
     return result
 
 
@@ -51,11 +60,11 @@ def img_fill():
     return result
 
 
-def test_put_get_cross(frtc, img_cross, txn):
+def test_put_get_cross(frtc, img_cross_red, txn):
     tile = (0, 0, 0)
-    frtc.put_tile(tile, img_cross)
+    frtc.put_tile(tile, img_cross_red)
     cimg = frtc.get_tile(tile)
-    assert cimg.getextrema() == img_cross.getextrema()
+    assert cimg.getextrema() == img_cross_red.getextrema()
 
 
 def test_put_get_fill(frtc, img_fill, txn):
@@ -70,32 +79,36 @@ def test_get_missing(frtc, txn):
     assert frtc.get_tile(tile) is None
 
 
-def test_ttl(frtc, img_cross, txn):
+def test_ttl(frtc, img_cross_red, txn):
     tile = (0, 0, 0)
     frtc.ttl = 1
-    frtc.put_tile(tile, img_cross)
+    frtc.put_tile(tile, img_cross_red)
     sleep(1)
     assert frtc.get_tile(tile) is None
 
 
-def test_clear(frtc, img_cross, txn):
+def test_clear(frtc, img_cross_red, txn):
     tile = (0, 0, 0)
-    frtc.put_tile(tile, img_cross)
+    frtc.put_tile(tile, img_cross_red)
     frtc.clear()
     assert frtc.get_tile(tile) is None
 
 
-def test_invalidate(frtc, img_cross, txn, caplog):
+def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, txn, caplog):
     caplog.set_level(logging.DEBUG)
     tile_invalid = (4, 0, 0)
     tile_valid = (4, 15, 15)
 
-    frtc.put_tile(tile_invalid, img_cross)
-    frtc.put_tile(tile_valid, img_cross)
+    frtc.put_tile(tile_invalid, img_cross_red)
+    frtc.put_tile(tile_valid, img_cross_red)
 
     frtc.invalidate(Point(
         *frtc.resource.srs.tile_center(tile_invalid),
         srid=None))
 
     assert frtc.get_tile(tile_invalid) is None
-    assert frtc.get_tile(tile_valid).getextrema() == img_cross.getextrema()
+    assert frtc.get_tile(tile_valid).getextrema() == img_cross_red.getextrema()
+
+    # Update previously invalidated tile
+    frtc.put_tile(tile_invalid, img_cross_green)
+    assert frtc.get_tile(tile_invalid).getextrema() == img_cross_green.getextrema()

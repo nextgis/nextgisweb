@@ -186,12 +186,18 @@ class ResourceTileCache(Base):
             buf = StringIO()
             img.save(buf, format='PNG')
 
+            self.tilestor.execute(
+                "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
+                (z, x, y))
+
             try:
-                self.tilestor.execute("INSERT INTO tile VALUES (?, ?, ?, ?, ?)", (
-                    z, x, y, tstamp, buf.getvalue()))
+                self.tilestor.execute(
+                    "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
+                    (z, x, y, tstamp, buf.getvalue()))
+
             except sqlite3.IntegrityError:
-                # Ignore if tile already exists: other process can add it
-                # TODO: ON CONFLICT DO NOTHING in SQLite >= 3.24.0
+                # NOTE: Race condition with other proccess may occurs here.
+                # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
                 pass
 
         conn = DBSession.connection()
