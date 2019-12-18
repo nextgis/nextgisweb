@@ -257,7 +257,7 @@ def mvt(request):
 
 def deserialize(feat, data):
     if 'geom' in data:
-        feat.geom = data['geom']
+        feat.geom = geom_from_wkt(data['geom'])
 
     if 'fields' in data:
         fdata = data['fields']
