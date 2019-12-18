@@ -274,14 +274,22 @@ db.event.listen(
 
 @on_style_change.connect
 def on_style_change_handler(resource):
-    if env.render.tile_cache_track_changes and resource.tile_cache is not None:
+    if (
+        env.render.tile_cache_track_changes
+        and resource.tile_cache is not None  # NOQA: W503
+        and resource.tile_cache.track_changes  # NOQA: W503
+    ):
         resource.tile_cache.clear()
         resource.tile_cache.initialize()
 
 
 @on_data_change.connect
 def on_data_change_handler(resource, geom):
-    if env.render.tile_cache_track_changes and resource.tile_cache is not None:
+    if (
+        env.render.tile_cache_track_changes
+        and resource.tile_cache is not None  # NOQA: W503
+        and resource.tile_cache.track_changes  # NOQA: W503
+    ):
         resource.tile_cache.invalidate(geom)
 
 
