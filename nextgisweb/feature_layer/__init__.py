@@ -21,6 +21,7 @@ from .interface import (
 )
 from .event import on_data_change
 from .extension import FeatureExtension
+from .api import query_feature_or_not_found
 
 
 class FeatureLayerComponent(Component):

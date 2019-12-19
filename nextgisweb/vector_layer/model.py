@@ -60,7 +60,8 @@ from ..feature_layer import (
     IFeatureQueryOrderBy,
     IFeatureQueryClipByBox,
     IFeatureQuerySimplify,
-    on_data_change)
+    on_data_change,
+    query_feature_or_not_found)
 
 from .util import _
 
@@ -524,13 +525,15 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(tablename=self._tablename)
 
-        obj = DBSession.query(tableinfo.model).filter_by(id=feature_id).one()
-
+        query = self.feature_query()
+        query.geom()
+        feature = query_feature_or_not_found(query, self.id, feature_id)
+        obj = DBSession.query(tableinfo.model).filter_by(id=feature.id).one()
         DBSession.delete(obj)
 
         self.after_feature_delete.fire(resource=self, feature_id=feature_id)
 
-        # TODO: Implement on_data_change
+        on_data_change.fire(self, feature.geom)
 
     def feature_delete_all(self):
         """Remove all records from a layer"""
