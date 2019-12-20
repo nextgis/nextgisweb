@@ -59,10 +59,11 @@ def geom_calc(request, prop):
     srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
     geom = geom_from_wkt(request.json_body["geom"])
 
+    crs_to = CRS.from_wkt(srs_to.wkt)
+
     if srs_from_id and srs_from_id != srs_to.id:
         srs_from = SRS.filter_by(id=int(srs_from_id)).one()
         crs_from = CRS.from_wkt(srs_from.wkt)
-        crs_to = CRS.from_wkt(srs_to.wkt)
         geom = shp_geom_transform(geom, crs_from, crs_to)
 
     value = shp_geom_calc(geom, crs_to, prop, srs_to.id)
