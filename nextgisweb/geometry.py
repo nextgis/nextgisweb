@@ -66,7 +66,9 @@ def geom_calc(g, crs, prop, srid):
     # pyproj < 2.3
     def geodesic_calc_with_postgis():
         fun = dict(length=func.ST_Length, area=func.ST_Area)[prop]
-        query = fun(func.geography(func.ST_GeomFromText(geom_to_wkt(g), srid)))
+        query = fun( func.geography( func.ST_FlipCoordinates(
+            func.ST_GeomFromText(geom_to_wkt(g), srid)
+        ) ) )
         return DBSession.query(query).scalar()
 
     factor = crs.axis_info[0].unit_conversion_factor
