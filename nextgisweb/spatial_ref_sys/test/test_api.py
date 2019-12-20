@@ -26,7 +26,7 @@ def msk23_id():
 def test_measure(msk23_id, webapp):
     MOSCOW_VLADIVOSTOK = 'LINESTRING(55.75 37.62,43.12 131.9)'
     LENGTH_SPHERE = 6434561.600305
-    LENGTH_FLAT = 10718924.8168
+    LENGTH_FLAT = 10718924.816779
 
     result = webapp.post_json(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 3857,
@@ -54,7 +54,7 @@ def test_measure(msk23_id, webapp):
         "/api/component/spatial_ref_sys/%d/geom_length" % 3857,
         dict(geom=MOSCOW_VLADIVOSTOK, srs=4326)
     )
-    assert abs(result.json["value"] - LENGTH_FLAT) < 1e-4
+    assert abs(result.json["value"] - LENGTH_FLAT) < 1e-6
 
     POLY = 'POLYGON((484000 1400000,484000 1400100,484100 1400100,484100 1400000,484000 1400000))'
     result = webapp.post_json(
