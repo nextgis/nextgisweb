@@ -247,6 +247,11 @@ class PyramidComponent(Component):
         except KeyError:
             result['degree_format'] = 'dd'
 
+        try:
+            result['measurement_srid'] = self.env.core.settings_get('core', 'measurement_srid')
+        except KeyError:
+            result['measurement_srid'] = 4326
+
         return result
 
     settings_info = (
