@@ -9,6 +9,7 @@ define([
     "dijit/TooltipDialog",
     "openlayers/ol",
     "ngw/route",
+    "ngw/settings!pyramid",
     "ngw-pyramid/i18n!webmap"
 ], function (
     declare,
@@ -20,6 +21,7 @@ define([
     TooltipDialog,
     ol,
     route,
+    clientSettings,
     i18n
 ) {
     var GEOM_LENGTH_URL = route.spatial_ref_sys.geom_length;
@@ -122,10 +124,9 @@ define([
                 return true;
             }
 
-            var units = this.display.config.measurementSystem;
+            var units = clientSettings.units;
             var mapProj = tool.display.map.olMap.getView().getProjection();
             var mapSRID = mapProj.getCode().match(/EPSG\:(\d+)/)[1];
-            var measurementSRID = this.display.config.measurementSRID;
 
             var listener;
             var DELAY = 200; // milliseconds
@@ -147,7 +148,7 @@ define([
 
                     function requestMeasure () {
                         id_request = id_actuality;
-                        xhr(measure_url({id: measurementSRID}), {
+                        xhr(measure_url({id: clientSettings.measurement_srid}), {
                             method: "POST",
                             data: JSON.stringify({
                                 geom: new ol.format.WKT().writeGeometry(geom),
