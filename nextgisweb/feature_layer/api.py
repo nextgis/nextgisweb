@@ -33,6 +33,7 @@ from .interface import (
 from .feature import Feature
 from .extension import FeatureExtension
 from .ogrdriver import EXPORT_FORMAT_OGR
+from .exception import FeatureNotFound
 from .util import _
 
 
@@ -256,7 +257,7 @@ def mvt(request):
 
 def deserialize(feat, data):
     if 'geom' in data:
-        feat.geom = data['geom']
+        feat.geom = geom_from_wkt(data['geom'])
 
     if 'fields' in data:
         fdata = data['fields']
@@ -356,6 +357,18 @@ def serialize(feat, keys=None, geom_format=None):
     return result
 
 
+def query_feature_or_not_found(query, resource_id, feature_id):
+    """ Query one feature by id or return FeatureNotFound exception. """
+
+    query.filter_by(id=feature_id)
+    query.limit(1)
+
+    for feat in query():
+        return feat
+
+    raise FeatureNotFound(resource_id, feature_id)
+
+
 def iget(resource, request):
     request.resource_permission(PERM_READ)
 
@@ -368,15 +381,10 @@ def iget(resource, request):
     if srs is not None:
         query.srs(SRS.filter_by(id=int(srs)).one())
 
-    query.filter_by(id=request.matchdict['fid'])
-    query.limit(1)
-
-    result = None
-    for f in query():
-        result = f
+    result = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
     return Response(
-        json.dumps(serialize(result, geom_format=geom_format)),
+        json.dumps(serialize(result, geom_format=geom_format), cls=geojson.Encoder),
         content_type=b'application/json')
 
 
@@ -386,12 +394,7 @@ def iput(resource, request):
     query = resource.feature_query()
     query.geom()
 
-    query.filter_by(id=request.matchdict['fid'])
-    query.limit(1)
-
-    feature = None
-    for f in query():
-        feature = f
+    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
     deserialize(feature, request.json_body)
     if IWritableFeatureLayer.providedBy(resource):
@@ -466,7 +469,7 @@ def cget(resource, request):
     ]
 
     return Response(
-        json.dumps(result),
+        json.dumps(result, cls=geojson.Encoder),
         content_type=b'application/json')
 
 
@@ -552,7 +555,7 @@ def store_collection(layer, request):
 
     field_prefix = json.loads(
         urllib.unquote(request.headers.get('x-field-prefix', '""')))
-    pref = lambda (f): field_prefix + f
+    pref = lambda f: field_prefix + f
 
     field_list = json.loads(
         urllib.unquote(request.headers.get('x-field-list', "[]")))

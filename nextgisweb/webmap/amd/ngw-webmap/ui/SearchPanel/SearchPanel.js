@@ -178,14 +178,13 @@ define([
                     deferred.then(lang.hitch(this, function (limit) {
                         var NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search/";
                         var CALLBACK = "json_callback";
-                        var url = NOMINATIM_SEARCH_URL + encodeURIComponent(criteria);
 
                         jsonpArgs = {
                             jsonp: CALLBACK,
-                            query: {format: "json", limit: "30"}
+                            query: {format: "json", limit: "30", q: criteria}
                         };
 
-                        script.get(url, jsonpArgs).then(lang.hitch(this, function (data) {
+                        script.get(NOMINATIM_SEARCH_URL, jsonpArgs).then(lang.hitch(this, function (data) {
                             array.forEach(data, function (place) {
                                 if (limit > 0) {
                                     // Отформатируем ответ в виде удобном для отображения

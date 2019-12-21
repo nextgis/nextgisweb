@@ -197,7 +197,7 @@ msgstr "Создать"
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:25
 #: amd/ngw-pyramid/template/HomePathForm.hbs:11
 #: amd/ngw-pyramid/template/LogoForm.hbs:22
-#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:37
+#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:42
 #: amd/ngw-pyramid/template/SystemNameForm.hbs:10
 msgid "Save"
 msgstr "Сохранить"
@@ -289,6 +289,10 @@ msgstr "Градусы и десятичные минуты"
 #: amd/ngw-pyramid/template/MiscellaneousForm.hbs:26
 msgid "Degrees, minutes, seconds"
 msgstr "Градусы, минуты, секунды"
+
+#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:31
+msgid "Measurement SRID"
+msgstr "Система координат для расчётов"
 
 #: template/base.mako:29
 msgid "Your Web GIS at nextgis.com"

@@ -58,6 +58,7 @@ define([
     "./utils/URL",
     // settings
     "ngw/settings!webmap",
+    "ngw/settings!pyramid",
     // template
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",
@@ -114,7 +115,8 @@ define([
     ToolSwipe,
     MapStatesObserver,
     URL,
-    clientSettings,
+    webmapClientSettings,
+    pyramidClientSettings,
     //template
     TabContainer, BorderContainer
 ) {
@@ -257,10 +259,10 @@ define([
             var mids = this.config.mid;
 
             // Доступ к настройкам
-            this.clientSettings = clientSettings;
+            this.clientSettings = webmapClientSettings;
 
             // Добавляем MID базовых карт
-            array.forEach(clientSettings.basemaps, function (bm) {
+            array.forEach(webmapClientSettings.basemaps, function (bm) {
                 mids.basemap.push(bm.base.mid);
             });
 
@@ -439,28 +441,30 @@ define([
                         region: 'left',
                         class: "dynamic-panel--fullwidth",
                         title: i18n.gettext("Share"),
-                        isOpen: widget.activeLeftPanel == "sharePanel",
+                        isOpen: widget.activeLeftPanel === "sharePanel",
                         gutters: false,
                         withCloser: false,
                         display: widget
                     });
-
-                    if (widget.activeLeftPanel == "sharePanel")
-                        widget.activatePanel(widget.sharePanel);
-
+    
+                    if (widget.activeLeftPanel === "sharePanel") widget.activatePanel(widget.sharePanel);
+    
+                    var setPermalinkUrl = lang.hitch(widget.sharePanel, widget.sharePanel.setPermalinkUrl),
+                        setEmbedCode = lang.hitch(widget.sharePanel, widget.sharePanel.setEmbedCode);
+    
                     widget.sharePanel.on("shown", function () {
-                        widget.map.olMap.getView().on("change", widget.sharePanel.setPermalinkUrl, widget.sharePanel);
-                        widget.map.olMap.getView().on("change", widget.sharePanel.setEmbedCode, widget.sharePanel);
+                        widget.map.olMap.getView().on("change", setPermalinkUrl);
+                        widget.map.olMap.getView().on("change", setEmbedCode);
                         itemStoreListener = widget.itemStore.on("Set", function (item, attr) {
                             widget.sharePanel.setPermalinkUrl();
                             widget.sharePanel.setEmbedCode();
                         });
                     });
-
+    
                     widget.sharePanel.on("closed", function () {
                         widget.navigationMenu.reset();
-                        widget.map.olMap.getView().un("change", widget.sharePanel.setPermalinkUrl, widget.sharePanel);
-                        widget.map.olMap.getView().un("change", widget.sharePanel.setEmbedCode, widget.sharePanel);
+                        widget.map.olMap.getView().un("change", setPermalinkUrl);
+                        widget.map.olMap.getView().un("change", setEmbedCode);
                         if (itemStoreListener) itemStoreListener.remove();
                     });
 
@@ -754,7 +758,7 @@ define([
                 }),
                 new ol.control.ScaleLine({
                     target: widget.rightBottomControlPane,
-                    units: widget.config.measurementSystem,
+                    units: pyramidClientSettings.units,
                     minWidth: 48
                 }),
                 new InfoScale({
@@ -784,7 +788,7 @@ define([
 
             // Инициализация базовых слоев
             var idx = 0;
-            array.forEach(clientSettings.basemaps, function (bm) {
+            array.forEach(webmapClientSettings.basemaps, function (bm) {
                 var MID = this._mid.basemap[bm.base.mid];
 
                 var baseOptions = lang.clone(bm.base);

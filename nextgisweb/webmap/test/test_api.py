@@ -12,7 +12,8 @@ ANNOTATION_SAMPLE = dict(
     style=dict(string='string', int=0, bool=True, none=None)
 )
 
-@pytest.fixture()
+
+@pytest.fixture(scope='module')
 def webmap(env):
     with transaction.manager:
         obj = WebMap(
@@ -29,12 +30,20 @@ def webmap(env):
         DBSession.delete(WebMap.filter_by(id=obj.id).one())
 
 
-def test_annotation_post_get(webmap, webapp):
-    webapp.authorization = ('Basic', ('administrator', 'admin')) # FIXME:
+@pytest.fixture(scope='module')
+def enable_annotation(env):
+    remember = env.webmap.settings['annotation']
+    env.webmap.settings['annotation'] = True
+    yield None
+    env.webmap.settings['annotation'] = remember
+
+
+def test_annotation_post_get(webapp, webmap, enable_annotation):
+    webapp.authorization = ('Basic', ('administrator', 'admin'))  # FIXME:
     wmid = webmap.id
     result = webapp.post_json('/api/resource/%d/annotation/' % wmid, ANNOTATION_SAMPLE)
     aid = result.json['id']
-    
+
     assert aid > 0
 
     adata = webapp.get('/api/resource/%d/annotation/%d' % (wmid, aid)).json

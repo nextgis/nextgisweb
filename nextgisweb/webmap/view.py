@@ -128,7 +128,6 @@ def setup_pyramid(comp, config):
             webmapTitle=obj.display_name,
             webmapEditable=obj.editable,
             drawOrderEnabled=obj.draw_order_enabled,
-            measurementSystem=request.env.core.settings_get('core', 'units')
         )
 
         if comp.settings['annotation']:
@@ -181,7 +180,7 @@ def setup_pyramid(comp, config):
                     self._url())
 
         def _url(self):
-            return lambda (args): args.request.route_url(
+            return lambda args: args.request.route_url(
                 'webmap.display', id=args.obj.id)
 
     WebMap.__dynmenu__.add(DisplayMenu())

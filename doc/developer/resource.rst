@@ -493,6 +493,13 @@ Search by name
    Host: ngw_url
    Accept: */*
    
+Search for raster layers
+
+.. sourcecode:: http
+
+   GET /api/resource/search/?cls=raster_layer HTTP/1.1
+   Host: ngw_url
+   Accept: */*
 
 
 Child resource

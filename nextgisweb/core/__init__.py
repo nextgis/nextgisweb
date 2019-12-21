@@ -84,7 +84,8 @@ class CoreComponent(Component):
             ('system.full_name', self.localizer().translate(
                 _('NextGIS geoinformation system'))),
             ('units', 'metric'),
-            ('degree_format', 'dd')
+            ('degree_format', 'dd'),
+            ('measurement_srid', 4326)
         ):
             self.init_settings(self.identity, k, self._settings.get(k, v))
 

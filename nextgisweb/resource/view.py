@@ -221,7 +221,7 @@ def setup_pyramid(comp, config):
     _route('schema', 'schema', client=()).add_view(schema)
 
     _route('root', '').add_view(
-        lambda (r): httpexceptions.HTTPFound(
+        lambda r: httpexceptions.HTTPFound(
             r.route_url('resource.show', id=0)))
 
     _resource_route('show', r'{id:\d+}', client=('id', )).add_view(show)
@@ -320,7 +320,7 @@ def setup_pyramid(comp, config):
                         'resource.json', id=args.obj.id))
 
         def _url(self, cls):
-            return lambda (args): args.request.route_url(
+            return lambda args: args.request.route_url(
                 'resource.create', id=args.obj.id,
                 _query=dict(cls=cls))
 

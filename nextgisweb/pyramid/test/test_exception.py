@@ -14,6 +14,7 @@ class ErrorTest(Exception):
 
     title = "Test title"
     message = "Test message"
+    detail = "Test detail"
     data = dict()
     http_status_code = 418
 
@@ -56,7 +57,7 @@ def test_error(webapp):
     del rjson['traceback']
 
     assert rjson == dict(
-        title="Test title", message="Test message",
+        title="Test title", message="Test message", detail="Test detail",
         exception='nextgisweb.pyramid.test.test_exception.ErrorTest',
         status_code=418)
 

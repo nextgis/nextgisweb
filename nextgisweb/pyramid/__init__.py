@@ -115,7 +115,7 @@ class PyramidComponent(Component):
 
         # Access to Env through request.env
         config.add_request_method(
-            lambda (req): self._env, 'env',
+            lambda req: self._env, 'env',
             property=True)
 
         config.include(pyramid_tm)
@@ -246,6 +246,11 @@ class PyramidComponent(Component):
             result['degree_format'] = self.env.core.settings_get('core', 'degree_format')
         except KeyError:
             result['degree_format'] = 'dd'
+
+        try:
+            result['measurement_srid'] = self.env.core.settings_get('core', 'measurement_srid')
+        except KeyError:
+            result['measurement_srid'] = 4326
 
         return result
 

@@ -142,12 +142,17 @@ class WebMapItem(Base):
                 )
 
         elif self.item_type == 'layer':
+            style_parent_id = None
+            if self.style and self.style.parent:
+                style_parent_id = self.style.parent.id
+
             return dict(
                 item_type=self.item_type,
                 display_name=self.display_name,
                 layer_enabled=self.layer_enabled,
                 layer_transparency=self.layer_transparency,
                 layer_style_id=self.layer_style_id,
+                style_parent_id=style_parent_id,
                 layer_min_scale_denom=self.layer_min_scale_denom,
                 layer_max_scale_denom=self.layer_max_scale_denom,
                 layer_adapter=self.layer_adapter,

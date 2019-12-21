@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function, absolute_import
 
 
 class Event:
@@ -9,10 +10,13 @@ class Event:
         self._handlers.add(handler)
         return self
 
+    def connect(self, handler):
+        self.handle(handler)
+
     def unhandle(self, handler):
         try:
             self._handlers.remove(handler)
-        except:
+        except Exception:
             raise ValueError("Handler is not handling this event, so cannot unhandle it.")
         return self
 
@@ -26,7 +30,7 @@ class Event:
     __iadd__ = handle
     __isub__ = unhandle
     __call__ = fire
-    __len__  = get_handlers_count
+    __len__ = get_handlers_count
 
 
 class SafetyEvent(Event):
@@ -35,6 +39,5 @@ class SafetyEvent(Event):
         for handler in self._handlers:
             try:
                 handler(*args, **kargs)
-            except:
+            except Exception:
                 pass
-
