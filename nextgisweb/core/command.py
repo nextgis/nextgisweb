@@ -10,9 +10,7 @@ from contextlib import contextmanager
 from backports.tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
 
-
 import transaction
-from minio import Minio
 
 from .. import geojson
 from ..command import Command
@@ -63,29 +61,6 @@ class BackupCommand(Command):
     @classmethod
     def argparser_setup(cls, parser, env):
         parser.add_argument(
-            '--upload', dest='upload', action='store_true',
-            help="upload backup to remote storage using S3 protocol")
-
-        parser.add_argument(
-            '--upload-object', dest='upload_object', metavar='name')
-
-        parser.add_argument(
-            '--upload-bucket', dest='upload_bucket', metavar='name',
-            default=env.core._backup_upload_bucket)
-
-        parser.add_argument(
-            '--upload-server', dest='upload_server', metavar='host:port',
-            default=env.core._backup_upload_server)
-
-        parser.add_argument(
-            '--upload-access-key', dest='upload_access_key', metavar='key',
-            default=env.core._backup_upload_access_key)
-
-        parser.add_argument(
-            '--upload-secret-key', dest='upload_secret_key', metavar='secret',
-            default=env.core._backup_upload_secret_key)
-
-        parser.add_argument(
             '--no-zip', dest='nozip', action='store_true',
             help='use directory instead of zip-file as backup format')
 
@@ -114,16 +89,6 @@ class BackupCommand(Command):
                 target = NamedTemporaryFile(delete=False).name
                 os.unlink(target)
 
-        upload_object = args.upload_object
-        if upload_object is None:
-            upload_object = autoname
-
-        if args.nozip and args.upload:
-            raise RuntimeError("Incompatible options: no-zip and upload")
-
-        if args.upload and upload_object is None:
-            raise RuntimeError("Upload object name required")
-
         if os.path.exists(target):
             raise RuntimeError("Target already exists!")
 
@@ -141,22 +106,6 @@ class BackupCommand(Command):
 
         with tgt_context() as tgt:
             backup(env, tgt)
-
-        if args.upload:
-            env.core.logger.info(
-                "Uploading backup to server=%s, bucket=%s, object=%s",
-                args.upload_server, args.upload_bucket, upload_object)
-            client = Minio(
-                args.upload_server, secure=False,
-                access_key=args.upload_access_key,
-                secret_key=args.upload_secret_key)
-
-            if args.upload_secret_key:
-                if not client.bucket_exists(args.upload_bucket):
-                    env.core.logger.info("Bucket not exist so creating new")
-                    client.make_bucket(args.upload_bucket)
-
-            client.fput_object(args.upload_bucket, upload_object, target)
 
     @classmethod
     def compress(cls, src, dst):
