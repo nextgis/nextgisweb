@@ -699,7 +699,7 @@ class _source_attr(SP):
 
     def _ogrds(self, ogrds):
         if ogrds.GetLayerCount() < 1:
-            raise VE(_("Dataset doesn't contains layers."))
+            raise VE(_("Dataset doesn't contain layers."))
 
         if ogrds.GetLayerCount() > 1:
             raise VE(_("Dataset contains more than one layer."))
@@ -717,7 +717,7 @@ class _source_attr(SP):
         for feat in ogrlayer:
             geom = feat.GetGeometryRef()
             if geom is None:
-                raise VE(_("Feature #%d doesn't contains geometry.") % feat.GetFID())
+                raise VE(_("Feature #%d doesn't have geometry.") % feat.GetFID())
 
         ogrlayer.ResetReading()
 
@@ -784,7 +784,7 @@ class _geometry_type_attr(SP):
             srlzr.obj.geometry_type = value
 
         elif srlzr.obj.geometry_type != value:
-            raise ResourceError(_("Geometry type for existing resource can not be changed."))
+            raise ResourceError(_("Geometry type for existing resource can't be changed."))
 
 
 P_DSS_READ = DataStructureScope.read
