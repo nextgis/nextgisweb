@@ -39,6 +39,9 @@ class Component(object):
     def initialize_db(self):
         pass
 
+    def backup_configure(self, config):
+        pass
+
     def backup(self):
         return ()
 

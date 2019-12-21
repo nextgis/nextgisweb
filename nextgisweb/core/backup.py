@@ -80,6 +80,19 @@ class BackupBase(object):
         raise NotImplementedError()
 
 
+class BackupConfiguration(object):
+
+    def __init__(self):
+        self._exclude_table = list()
+        self._exclude_table_data = list()
+
+    def exclude_table(self, schema, table):
+        self._exclude_table.append('{}.{}'.format(schema, table))
+
+    def exclude_table_data(self, schema, table):
+        self._exclude_table_data.append('{}.{}'.format(schema, table))
+
+
 def pg_connection_options(env):
     return [
         '--host', env.core.settings['database.host'],
@@ -99,20 +112,36 @@ def backup(env, dst):
     snapshot, = con.execute("SELECT pg_export_snapshot()").fetchone()
     logger.debug("Using postgres snapshot: %s", snapshot)
 
+    # CONFIGURATION
+
+    config = BackupConfiguration()
+    for comp in env.chain('backup_configure'):
+        comp.backup_configure(config)
+
     # POSTGES DUMP
+
     logger.info("Dumping PostgreSQL database...")
 
     pg_dir = os.path.join(dst, 'postgres')
     os.mkdir(pg_dir)
 
+    exc_opt = list()
+    if len(config._exclude_table) > 0:
+        logger.debug("Excluding table: %s", ', '.join(config._exclude_table))
+        exc_opt += ['--exclude-table={}'.format(i) for i in config._exclude_table]
+
+    if len(config._exclude_table_data) > 0:
+        logger.debug("Excluding table data: %s", ', '.join(config._exclude_table_data))
+        exc_opt += ['--exclude-table-data={}'.format(i) for i in config._exclude_table_data]
+
     pg_copt, pg_pass = pg_connection_options(env)
     check_call([
         '/usr/bin/pg_dump',
-        '--format', 'directory',
-        '--compress', '0',
-        '--snapshot', snapshot,
-        '--file', pg_dir,
-    ] + pg_copt, env=dict(PGPASSWORD=pg_pass))
+        '--format=directory',
+        '--compress=0',
+        '--snapshot={}'.format(snapshot),
+        '--file={}'.format(pg_dir),
+    ] + exc_opt + pg_copt, env=dict(PGPASSWORD=pg_pass))
 
     pg_listing = check_output([
         '/usr/bin/pg_restore',
