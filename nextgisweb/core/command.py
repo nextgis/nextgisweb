@@ -88,6 +88,7 @@ class BackupCommand(Command):
             else:
                 target = NamedTemporaryFile(delete=False).name
                 os.unlink(target)
+                logger.warn("Backup path not set. Writing backup to temporary file %s!", target)
 
         if os.path.exists(target):
             raise RuntimeError("Target already exists!")
@@ -102,7 +103,7 @@ class BackupCommand(Command):
             def tgt_context():
                 with TemporaryDirectory() as tmpdir:
                     yield tmpdir
-                    cls.compress(tmpdir, args.target)
+                    cls.compress(tmpdir, target)
 
         with tgt_context() as tgt:
             backup(env, tgt)
