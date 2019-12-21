@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from collections import OrderedDict
 
+from pyramid.httpexceptions import HTTPNotFound
 from geoalchemy2.shape import to_shape
 
 from ..models import DBSession
@@ -34,12 +35,19 @@ def annotation_from_dict(obj, data):
             setattr(obj, k, v)
 
 
+def check_annotation_enabled(request):
+    if not request.env.webmap.settings['annotation']:
+        raise HTTPNotFound()
+
+
 def annotation_cget(resource, request):
+    check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
     return map(annotation_to_dict, resource.annotations)
 
 
 def annotation_cpost(resource, request):
+    check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation()
     annotation_from_dict(obj, request.json_body)
@@ -49,12 +57,14 @@ def annotation_cpost(resource, request):
 
 
 def annotation_iget(resource, request):
+    check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(request.matchdict['annotation_id'])).one()
     return annotation_to_dict(obj)
 
 
 def annotation_iput(resource, request):
+    check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(request.matchdict['annotation_id'])).one()
     annotation_from_dict(obj, request.json_body)
@@ -62,6 +72,7 @@ def annotation_iput(resource, request):
 
 
 def annotation_idelete(resource, request):
+    check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(request.matchdict['annotation_id'])).one()
     DBSession.delete(obj)
@@ -69,8 +80,7 @@ def annotation_idelete(resource, request):
 
 
 def setup_pyramid(comp, config):
-    if comp.settings.get('annotation'):
-        setup_annotations(config)
+    setup_annotations(config)
 
 
 def setup_annotations(config):
