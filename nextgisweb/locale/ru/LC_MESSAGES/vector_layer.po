@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2017-02-08 12:29+0700\n"
+"POT-Creation-Date: 2019-12-21 19:12+0000\n"
 "PO-Revision-Date: 2015-09-14 00:03+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,48 +17,72 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.6.0\n"
 
-#: model.py:78
+#: model.py:77
 msgid "Point"
 msgstr "Точка"
 
-#: model.py:78
+#: model.py:77
 msgid "Line"
 msgstr "Линия"
 
-#: model.py:78
+#: model.py:77
 msgid "Polygon"
 msgstr "Полигон"
 
-#: model.py:79
+#: model.py:78
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: model.py:79
+#: model.py:78
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: model.py:79
+#: model.py:78
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: model.py:159
+#: model.py:79
+msgid "Point Z"
+msgstr "Точка Z"
+
+#: model.py:79
+msgid "Line Z"
+msgstr "Линия Z"
+
+#: model.py:79
+msgid "Polygon Z"
+msgstr "Полигон Z"
+
+#: model.py:80
+msgid "Multipoint Z"
+msgstr "Мультиточка Z"
+
+#: model.py:80
+msgid "Multiline Z"
+msgstr "Мультилиния Z"
+
+#: model.py:80
+msgid "Multipolygon Z"
+msgstr "Мультиполигон Z"
+
+#: model.py:168
 #, python-format
 msgid "Field name is forbidden: '%s'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '%s'. Удалите или переименуйте его."
 
-#: model.py:164
+#: model.py:183
 #, python-format
 msgid "Unsupported field type: %r."
 msgstr "Тип поля %r не поддерживается."
 
-#: model.py:277
+#: model.py:291 model.py:313
 #, python-format
-msgid "Geometry type (%s) does not match column type (%s)."
-msgstr "Тип геометрии объекта (%s) не соответствует типу геометрии слоя (%s)."
+msgid "Unknown geometry type: %d (%s)."
+msgstr "Неизвестный тип геометрии: %d (%s)."
 
-#: model.py:313
+#: model.py:353
 #, python-format
 msgid ""
 "It seems like declared and actual attributes encodings do not match. "
@@ -69,49 +93,49 @@ msgstr ""
 "декодировать атрибут #%(attr)d записи #%(feat)d. Попробуйте выбрать "
 "другую кодировку."
 
-#: amd/ngw-vector-layer/Widget.js:34 model.py:343
+#: amd/ngw-vector-layer/Widget.js:30 model.py:381
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: model.py:399
+#: model.py:437
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: model.py:401
+#: model.py:439
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: model.py:660
-msgid "Dataset doesn't contains layers."
+#: model.py:702
+msgid "Dataset doesn't contain layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:663
+#: model.py:705
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:667
+#: model.py:709
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:673
+#: model.py:715
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
 
-#: model.py:679
+#: model.py:720
 #, python-format
-msgid "Feature #%d doesn't contains geometry."
+msgid "Feature #%d doesn't have geometry."
 msgstr "Объект #%d не содержит геометрии."
 
-#: model.py:708
+#: model.py:748
 msgid "GDAL library failed to open file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:713
+#: model.py:753
 #, python-format
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: model.py:718
+#: model.py:758
 #, python-format
 msgid ""
 "Unsupported geometry type: '%s'. Probable reason: data contain mixed "
@@ -120,12 +144,12 @@ msgstr ""
 "Тип геометрии не поддерживается: '%s'. Возможная причина: смешанные типы "
 "геометрий."
 
-#: model.py:741
+#: model.py:781
 msgid "Unsupported geometry type."
 msgstr "Тип геометрии не поддерживается."
 
-#: model.py:747
-msgid "Geometry type for existing resource can not be changed."
+#: model.py:787
+msgid "Geometry type for existing resource can't be changed."
 msgstr "Тип геометрии существующего ресурса не может быть изменен."
 
 #: amd/ngw-vector-layer/template/Widget.hbs:4
