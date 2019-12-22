@@ -48,7 +48,7 @@ class FileStorageComponent(Component):
         if 'path' not in self.settings:
             self.env.core.mksdir(self)
 
-    def backup(self):
+    def backup_objects(self):
         for fileobj in FileObj.query():
             yield FileObjBackup(dict(uuid=fileobj.uuid))
 

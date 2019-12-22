@@ -42,7 +42,7 @@ class Component(object):
     def backup_configure(self, config):
         pass
 
-    def backup(self):
+    def backup_objects(self):
         return ()
 
     def setup_pyramid(self, config):

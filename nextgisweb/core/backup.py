@@ -202,13 +202,13 @@ def backup(env, dst):
     comp_root = os.path.join(dst, 'component')
     os.mkdir(comp_root)
 
-    for comp in env.chain('initialize'):
+    for comp in env.chain('backup_objects'):
         comp_dir = os.path.join(comp_root, comp.identity)
         os.mkdir(comp_dir)
 
         idx_file = IndexFile(os.path.join(comp_dir, '$index'))
         with idx_file.writer() as idx_write:
-            for seq, itm in enumerate(comp.backup(), start=1):
+            for seq, itm in enumerate(comp.backup_objects(), start=1):
                 itm.bind(comp)
                 record = IndexRecord(id=seq, identity=itm.identity, data=itm.data)
                 if itm.blob:
