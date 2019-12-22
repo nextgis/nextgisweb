@@ -1,4 +1,31 @@
 //>>built
-define("dojox/gauges/TextIndicator",["dojo/_base/declare","./_Indicator"],function(c,d){return c("dojox.gauges.TextIndicator",[d],{x:0,y:0,align:"middle",fixedPrecision:!0,precision:0,draw:function(c,d){var a=this.value;a<this._gauge.min&&(a=this._gauge.min);a>this._gauge.max&&(a=this._gauge.max);var b=this._gauge?this._gauge._getNumberModule():null,a=b?this.fixedPrecision?b.format(a,{places:this.precision}):b.format(a):this.fixedPrecision?a.toFixed(this.precision):a.toString(),b=this.x?this.x:0,
-e=this.y?this.y:0,f=this.align?this.align:"middle";this.shape?this.shape.setShape({x:b,y:e,text:a,align:f}):this.shape=c.createText({x:b,y:e,text:a,align:f});this.shape.setFill(this.color);this.font&&this.shape.setFont(this.font)}})});
-//# sourceMappingURL=TextIndicator.js.map
+define("dojox/gauges/TextIndicator",["dojo/_base/declare","./_Indicator"],function(_1,_2){
+return _1("dojox.gauges.TextIndicator",[_2],{x:0,y:0,align:"middle",fixedPrecision:true,precision:0,draw:function(_3,_4){
+var v=this.value;
+if(v<this._gauge.min){
+v=this._gauge.min;
+}
+if(v>this._gauge.max){
+v=this._gauge.max;
+}
+var _5;
+var _6=this._gauge?this._gauge._getNumberModule():null;
+if(_6){
+_5=this.fixedPrecision?_6.format(v,{places:this.precision}):_6.format(v);
+}else{
+_5=this.fixedPrecision?v.toFixed(this.precision):v.toString();
+}
+var x=this.x?this.x:0;
+var y=this.y?this.y:0;
+var _7=this.align?this.align:"middle";
+if(!this.shape){
+this.shape=_3.createText({x:x,y:y,text:_5,align:_7});
+}else{
+this.shape.setShape({x:x,y:y,text:_5,align:_7});
+}
+this.shape.setFill(this.color);
+if(this.font){
+this.shape.setFont(this.font);
+}
+}});
+});

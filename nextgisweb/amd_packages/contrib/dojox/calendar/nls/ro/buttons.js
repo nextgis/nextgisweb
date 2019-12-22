@@ -1,3 +1,2 @@
 //>>built
-define("dojox/calendar/nls/ro/buttons",{previousButton:"\u25c4",nextButton:"\u25ba",todayButton:"Ast\u0103zi",dayButton:"Zi",weekButton:"S\u0103pt\u0103m\u00e2n\u0103",fourDaysButton:"4 zile",monthButton:"Lun\u0103"});
-//# sourceMappingURL=buttons.js.map
+define("dojox/calendar/nls/ro/buttons",{previousButton:"◄",nextButton:"►",todayButton:"Astăzi",dayButton:"Zi",weekButton:"Săptămână",fourDaysButton:"4 zile",monthButton:"Lună"});

@@ -1,3 +1,4 @@
 //>>built
-define("dojox/validate",["./validate/_base"],function(a){return a});
-//# sourceMappingURL=validate.js.map
+define("dojox/validate",["./validate/_base"],function(_1){
+return _1;
+});

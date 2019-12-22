@@ -1,20 +1,253 @@
 //>>built
-require({cache:{"url:dijit/templates/InlineEditBox.html":'\x3cspan data-dojo-attach-point\x3d"editNode" role\x3d"presentation" class\x3d"dijitReset dijitInline dijitOffScreen"\n\t\x3e\x3cspan data-dojo-attach-point\x3d"editorPlaceholder"\x3e\x3c/span\n\t\x3e\x3cspan data-dojo-attach-point\x3d"buttonContainer"\n\t\t\x3e\x3cbutton data-dojo-type\x3d"./form/Button" data-dojo-props\x3d"label: \'${buttonSave}\', \'class\': \'saveButton\'"\n\t\t\tdata-dojo-attach-point\x3d"saveButton" data-dojo-attach-event\x3d"onClick:save"\x3e\x3c/button\n\t\t\x3e\x3cbutton data-dojo-type\x3d"./form/Button"  data-dojo-props\x3d"label: \'${buttonCancel}\', \'class\': \'cancelButton\'"\n\t\t\tdata-dojo-attach-point\x3d"cancelButton" data-dojo-attach-event\x3d"onClick:cancel"\x3e\x3c/button\n\t\x3e\x3c/span\n\x3e\x3c/span\x3e\n'}});
-define("dijit/InlineEditBox","require dojo/_base/array dojo/aspect dojo/_base/declare dojo/dom-attr dojo/dom-class dojo/dom-construct dojo/dom-style dojo/i18n dojo/_base/kernel dojo/keys dojo/_base/lang dojo/on dojo/sniff dojo/when ./a11yclick ./focus ./_Widget ./_TemplatedMixin ./_WidgetsInTemplateMixin ./_Container ./form/Button ./form/_TextBoxMixin ./form/TextBox dojo/text!./templates/InlineEditBox.html dojo/i18n!./nls/common".split(" "),function(t,l,u,m,n,e,v,g,x,p,w,c,f,q,y,z,r,b,h,A,E,F,B,C,
-D){h=m("dijit._InlineEditor",[b,h,A],{templateString:D,contextRequire:t,postMixInProperties:function(){this.inherited(arguments);this.messages=x.getLocalization("dijit","common",this.lang);l.forEach(["buttonSave","buttonCancel"],function(a){this[a]||(this[a]=this.messages[a])},this)},buildRendering:function(){this.inherited(arguments);var a="string"==typeof this.editor?c.getObject(this.editor)||t(this.editor):this.editor,d=this.sourceStyle,k="line-height:"+d.lineHeight+";",e=g.getComputedStyle(this.domNode);
-l.forEach(["Weight","Family","Size","Style"],function(a){e["font"+a]!=d["font"+a]&&(k+="font-"+a+":"+d["font"+a]+";")},this);l.forEach("marginTop marginBottom marginLeft marginRight position left top right bottom float clear display".split(" "),function(a){this.domNode.style[a]=d[a]},this);var b=this.inlineEditBox.width;"100%"==b?(k+="width:100%;",this.domNode.style.display="block"):k+="width:"+(b+(Number(b)==b?"px":""))+";";b=c.delegate(this.inlineEditBox.editorParams,{style:k,dir:this.dir,lang:this.lang,
-textDir:this.textDir});this.editWidget=new a(b,this.editorPlaceholder);this.inlineEditBox.autoSave&&(this.saveButton.destroy(),this.cancelButton.destroy(),this.saveButton=this.cancelButton=null,v.destroy(this.buttonContainer))},postCreate:function(){this.inherited(arguments);var a=this.editWidget;this.inlineEditBox.autoSave?this.own(u.after(a,"onChange",c.hitch(this,"_onChange"),!0),f(a,"keydown",c.hitch(this,"_onKeyDown"))):"intermediateChanges"in a&&(a.set("intermediateChanges",!0),this.own(u.after(a,
-"onChange",c.hitch(this,"_onIntermediateChange"),!0)),this.saveButton.set("disabled",!0))},startup:function(){this.editWidget.startup();this.inherited(arguments)},_onIntermediateChange:function(){this.saveButton.set("disabled",this.getValue()==this._resetValue||!this.enableSave())},destroy:function(){this.editWidget.destroy(!0);this.inherited(arguments)},getValue:function(){var a=this.editWidget;return String(a.get("displayedValue"in a||"_getDisplayedValueAttr"in a?"displayedValue":"value"))},_onKeyDown:function(a){this.inlineEditBox.autoSave&&
-this.inlineEditBox.editing&&!a.altKey&&!a.ctrlKey&&(a.keyCode==w.ESCAPE?(a.stopPropagation(),a.preventDefault(),this.cancel(!0)):a.keyCode==w.ENTER&&"INPUT"==a.target.tagName&&(a.stopPropagation(),a.preventDefault(),this._onChange()))},_onBlur:function(){this.inherited(arguments);this.inlineEditBox.autoSave&&this.inlineEditBox.editing&&(this.getValue()==this._resetValue?this.cancel(!1):this.enableSave()&&this.save(!1))},_onChange:function(){this.inlineEditBox.autoSave&&this.inlineEditBox.editing&&
-this.enableSave()&&r.focus(this.inlineEditBox.displayNode)},enableSave:function(){return this.editWidget.isValid?this.editWidget.isValid():!0},focus:function(){this.editWidget.focus();this.editWidget.focusNode&&(r._onFocusNode(this.editWidget.focusNode),"INPUT"==this.editWidget.focusNode.tagName&&this.defer(function(){B.selectInputText(this.editWidget.focusNode)}))}});b=m("dijit.InlineEditBox"+(q("dojo-bidi")?"_NoBidi":""),b,{editing:!1,autoSave:!0,buttonSave:"",buttonCancel:"",renderAsHtml:!1,editor:C,
-editorWrapper:h,editorParams:{},disabled:!1,onChange:function(){},onCancel:function(){},width:"100%",value:"",noValueIndicator:6>=q("ie")?"\x3cspan style\x3d'font-family: wingdings; text-decoration: underline;'\x3e\x26#160;\x26#160;\x26#160;\x26#160;\x26#x270d;\x26#160;\x26#160;\x26#160;\x26#160;\x3c/span\x3e":"\x3cspan style\x3d'text-decoration: underline;'\x3e\x26#160;\x26#160;\x26#160;\x26#160;\x26#x270d;\x26#160;\x26#160;\x26#160;\x26#160;\x3c/span\x3e",constructor:function(){this.editorParams=
-{}},postMixInProperties:function(){this.inherited(arguments);this.displayNode=this.srcNodeRef;this.own(f(this.displayNode,z,c.hitch(this,"_onClick")),f(this.displayNode,"mouseover, focus",c.hitch(this,"_onMouseOver")),f(this.displayNode,"mouseout, blur",c.hitch(this,"_onMouseOut")));this.displayNode.setAttribute("role","button");this.displayNode.getAttribute("tabIndex")||this.displayNode.setAttribute("tabIndex",0);this.value||"value"in this.params||(this.value=c.trim(this.renderAsHtml?this.displayNode.innerHTML:
-this.displayNode.innerText||this.displayNode.textContent||""));this.value||(this.displayNode.innerHTML=this.noValueIndicator);e.add(this.displayNode,"dijitInlineEditBoxDisplayMode")},setDisabled:function(a){p.deprecated("dijit.InlineEditBox.setDisabled() is deprecated.  Use set('disabled', bool) instead.","","2.0");this.set("disabled",a)},_setDisabledAttr:function(a){this.domNode.setAttribute("aria-disabled",a?"true":"false");a?this.displayNode.removeAttribute("tabIndex"):this.displayNode.setAttribute("tabIndex",
-0);e.toggle(this.displayNode,"dijitInlineEditBoxDisplayModeDisabled",a);this._set("disabled",a)},_onMouseOver:function(){this.disabled||e.add(this.displayNode,"dijitInlineEditBoxDisplayModeHover")},_onMouseOut:function(){e.remove(this.displayNode,"dijitInlineEditBoxDisplayModeHover")},_onClick:function(a){this.disabled||(a&&(a.stopPropagation(),a.preventDefault()),this._onMouseOut(),this.defer("edit"))},edit:function(){if(!this.disabled&&!this.editing){this._set("editing",!0);this._savedTabIndex=
-n.get(this.displayNode,"tabIndex")||"0";if(!this.wrapperWidget){var a=v.create("span",null,this.domNode,"before");this.wrapperWidget=new ("string"==typeof this.editorWrapper?c.getObject(this.editorWrapper):this.editorWrapper)({value:this.value,buttonSave:this.buttonSave,buttonCancel:this.buttonCancel,dir:this.dir,lang:this.lang,tabIndex:this._savedTabIndex,editor:this.editor,inlineEditBox:this,sourceStyle:g.getComputedStyle(this.displayNode),save:c.hitch(this,"save"),cancel:c.hitch(this,"cancel"),
-textDir:this.textDir},a);this.wrapperWidget._started||this.wrapperWidget.startup();this._started||this.startup()}var d=this.wrapperWidget;e.add(this.displayNode,"dijitOffScreen");e.remove(d.domNode,"dijitOffScreen");g.set(d.domNode,{visibility:"visible"});n.set(this.displayNode,"tabIndex","-1");var b=d.editWidget,f=this;y(b.onLoadDeferred,c.hitch(d,function(){b.set("displayedValue"in b||"_setDisplayedValueAttr"in b?"displayedValue":"value",f.value);this.defer(function(){d.saveButton&&d.saveButton.set("disabled",
-"intermediateChanges"in b);this.focus();this._resetValue=this.getValue()})}))}},_onBlur:function(){this.inherited(arguments)},destroy:function(){this.wrapperWidget&&!this.wrapperWidget._destroyed&&(this.wrapperWidget.destroy(),delete this.wrapperWidget);this.inherited(arguments)},_showText:function(a){var b=this.wrapperWidget;g.set(b.domNode,{visibility:"hidden"});e.add(b.domNode,"dijitOffScreen");e.remove(this.displayNode,"dijitOffScreen");n.set(this.displayNode,"tabIndex",this._savedTabIndex);a&&
-r.focus(this.displayNode)},save:function(a){if(!this.disabled&&this.editing){this._set("editing",!1);var b=this.wrapperWidget.getValue();this.set("value",b);this._showText(a)}},setValue:function(a){p.deprecated("dijit.InlineEditBox.setValue() is deprecated.  Use set('value', ...) instead.","","2.0");return this.set("value",a)},_setValueAttr:function(a){a=c.trim(a);var b=this.renderAsHtml?a:a.replace(/&/gm,"\x26amp;").replace(/</gm,"\x26lt;").replace(/>/gm,"\x26gt;").replace(/"/gm,"\x26quot;").replace(/\n/g,
-"\x3cbr\x3e");this.displayNode.innerHTML=this.editorParams&&"password"===this.editorParams.type?"********":b||this.noValueIndicator;this._set("value",a);this._started&&this.defer(function(){this.onChange(a)})},getValue:function(){p.deprecated("dijit.InlineEditBox.getValue() is deprecated.  Use get('value') instead.","","2.0");return this.get("value")},cancel:function(a){!this.disabled&&this.editing&&(this._set("editing",!1),this.defer("onCancel"),this._showText(a))}});q("dojo-bidi")&&(b=m("dijit.InlineEditBox",
-b,{_setValueAttr:function(){this.inherited(arguments);this.applyTextDir(this.displayNode)}}));b._InlineEditor=h;return b});
-//# sourceMappingURL=InlineEditBox.js.map
+require({cache:{"url:dijit/templates/InlineEditBox.html":"<span data-dojo-attach-point=\"editNode\" role=\"presentation\" class=\"dijitReset dijitInline dijitOffScreen\"\n\t><span data-dojo-attach-point=\"editorPlaceholder\"></span\n\t><span data-dojo-attach-point=\"buttonContainer\"\n\t\t><button data-dojo-type=\"./form/Button\" data-dojo-props=\"label: '${buttonSave}', 'class': 'saveButton'\"\n\t\t\tdata-dojo-attach-point=\"saveButton\" data-dojo-attach-event=\"onClick:save\"></button\n\t\t><button data-dojo-type=\"./form/Button\"  data-dojo-props=\"label: '${buttonCancel}', 'class': 'cancelButton'\"\n\t\t\tdata-dojo-attach-point=\"cancelButton\" data-dojo-attach-event=\"onClick:cancel\"></button\n\t></span\n></span>\n"}});
+define("dijit/InlineEditBox",["require","dojo/_base/array","dojo/aspect","dojo/_base/declare","dojo/dom-attr","dojo/dom-class","dojo/dom-construct","dojo/dom-style","dojo/i18n","dojo/_base/kernel","dojo/keys","dojo/_base/lang","dojo/on","dojo/sniff","dojo/when","./a11yclick","./focus","./_Widget","./_TemplatedMixin","./_WidgetsInTemplateMixin","./_Container","./form/Button","./form/_TextBoxMixin","./form/TextBox","dojo/text!./templates/InlineEditBox.html","dojo/i18n!./nls/common"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,on,_d,_e,_f,fm,_10,_11,_12,_13,_14,_15,_16,_17){
+var _18=_4("dijit._InlineEditor",[_10,_11,_12],{templateString:_17,contextRequire:_1,postMixInProperties:function(){
+this.inherited(arguments);
+this.messages=_9.getLocalization("dijit","common",this.lang);
+_2.forEach(["buttonSave","buttonCancel"],function(_19){
+if(!this[_19]){
+this[_19]=this.messages[_19];
+}
+},this);
+},buildRendering:function(){
+this.inherited(arguments);
+var Cls=typeof this.editor=="string"?(_c.getObject(this.editor)||_1(this.editor)):this.editor;
+var _1a=this.sourceStyle,_1b="line-height:"+_1a.lineHeight+";",_1c=_8.getComputedStyle(this.domNode);
+_2.forEach(["Weight","Family","Size","Style"],function(_1d){
+var _1e=_1a["font"+_1d],_1f=_1c["font"+_1d];
+if(_1f!=_1e){
+_1b+="font-"+_1d+":"+_1a["font"+_1d]+";";
+}
+},this);
+_2.forEach(["marginTop","marginBottom","marginLeft","marginRight","position","left","top","right","bottom","float","clear","display"],function(_20){
+this.domNode.style[_20]=_1a[_20];
+},this);
+var _21=this.inlineEditBox.width;
+if(_21=="100%"){
+_1b+="width:100%;";
+this.domNode.style.display="block";
+}else{
+_1b+="width:"+(_21+(Number(_21)==_21?"px":""))+";";
+}
+var _22=_c.delegate(this.inlineEditBox.editorParams,{style:_1b,dir:this.dir,lang:this.lang,textDir:this.textDir});
+this.editWidget=new Cls(_22,this.editorPlaceholder);
+if(this.inlineEditBox.autoSave){
+this.saveButton.destroy();
+this.cancelButton.destroy();
+this.saveButton=this.cancelButton=null;
+_7.destroy(this.buttonContainer);
+}
+},postCreate:function(){
+this.inherited(arguments);
+var ew=this.editWidget;
+if(this.inlineEditBox.autoSave){
+this.own(_3.after(ew,"onChange",_c.hitch(this,"_onChange"),true),on(ew,"keydown",_c.hitch(this,"_onKeyDown")));
+}else{
+if("intermediateChanges" in ew){
+ew.set("intermediateChanges",true);
+this.own(_3.after(ew,"onChange",_c.hitch(this,"_onIntermediateChange"),true));
+this.saveButton.set("disabled",true);
+}
+}
+},startup:function(){
+this.editWidget.startup();
+this.inherited(arguments);
+},_onIntermediateChange:function(){
+this.saveButton.set("disabled",(this.getValue()==this._resetValue)||!this.enableSave());
+},destroy:function(){
+this.editWidget.destroy(true);
+this.inherited(arguments);
+},getValue:function(){
+var ew=this.editWidget;
+return String(ew.get(("displayedValue" in ew||"_getDisplayedValueAttr" in ew)?"displayedValue":"value"));
+},_onKeyDown:function(e){
+if(this.inlineEditBox.autoSave&&this.inlineEditBox.editing){
+if(e.altKey||e.ctrlKey){
+return;
+}
+if(e.keyCode==_b.ESCAPE){
+e.stopPropagation();
+e.preventDefault();
+this.cancel(true);
+}else{
+if(e.keyCode==_b.ENTER&&e.target.tagName=="INPUT"){
+e.stopPropagation();
+e.preventDefault();
+this._onChange();
+}
+}
+}
+},_onBlur:function(){
+this.inherited(arguments);
+if(this.inlineEditBox.autoSave&&this.inlineEditBox.editing){
+if(this.getValue()==this._resetValue){
+this.cancel(false);
+}else{
+if(this.enableSave()){
+this.save(false);
+}
+}
+}
+},_onChange:function(){
+if(this.inlineEditBox.autoSave&&this.inlineEditBox.editing&&this.enableSave()){
+fm.focus(this.inlineEditBox.displayNode);
+}
+},enableSave:function(){
+return this.editWidget.isValid?this.editWidget.isValid():true;
+},focus:function(){
+this.editWidget.focus();
+if(this.editWidget.focusNode){
+fm._onFocusNode(this.editWidget.focusNode);
+if(this.editWidget.focusNode.tagName=="INPUT"){
+this.defer(function(){
+_15.selectInputText(this.editWidget.focusNode);
+});
+}
+}
+}});
+var _23=_4("dijit.InlineEditBox"+(_d("dojo-bidi")?"_NoBidi":""),_10,{editing:false,autoSave:true,buttonSave:"",buttonCancel:"",renderAsHtml:false,editor:_16,editorWrapper:_18,editorParams:{},disabled:false,onChange:function(){
+},onCancel:function(){
+},width:"100%",value:"",noValueIndicator:_d("ie")<=6?"<span style='font-family: wingdings; text-decoration: underline;'>&#160;&#160;&#160;&#160;&#x270d;&#160;&#160;&#160;&#160;</span>":"<span style='text-decoration: underline;'>&#160;&#160;&#160;&#160;&#x270d;&#160;&#160;&#160;&#160;</span>",constructor:function(){
+this.editorParams={};
+},postMixInProperties:function(){
+this.inherited(arguments);
+this.displayNode=this.srcNodeRef;
+this.own(on(this.displayNode,_f,_c.hitch(this,"_onClick")),on(this.displayNode,"mouseover, focus",_c.hitch(this,"_onMouseOver")),on(this.displayNode,"mouseout, blur",_c.hitch(this,"_onMouseOut")));
+this.displayNode.setAttribute("role","button");
+if(!this.displayNode.getAttribute("tabIndex")){
+this.displayNode.setAttribute("tabIndex",0);
+}
+if(!this.value&&!("value" in this.params)){
+this.value=_c.trim(this.renderAsHtml?this.displayNode.innerHTML:(this.displayNode.innerText||this.displayNode.textContent||""));
+}
+if(!this.value){
+this.displayNode.innerHTML=this.noValueIndicator;
+}
+_6.add(this.displayNode,"dijitInlineEditBoxDisplayMode");
+},setDisabled:function(_24){
+_a.deprecated("dijit.InlineEditBox.setDisabled() is deprecated.  Use set('disabled', bool) instead.","","2.0");
+this.set("disabled",_24);
+},_setDisabledAttr:function(_25){
+this.domNode.setAttribute("aria-disabled",_25?"true":"false");
+if(_25){
+this.displayNode.removeAttribute("tabIndex");
+}else{
+this.displayNode.setAttribute("tabIndex",0);
+}
+_6.toggle(this.displayNode,"dijitInlineEditBoxDisplayModeDisabled",_25);
+this._set("disabled",_25);
+},_onMouseOver:function(){
+if(!this.disabled){
+_6.add(this.displayNode,"dijitInlineEditBoxDisplayModeHover");
+}
+},_onMouseOut:function(){
+_6.remove(this.displayNode,"dijitInlineEditBoxDisplayModeHover");
+},_onClick:function(e){
+if(this.disabled){
+return;
+}
+if(e){
+e.stopPropagation();
+e.preventDefault();
+}
+this._onMouseOut();
+this.defer("edit");
+},edit:function(){
+if(this.disabled||this.editing){
+return;
+}
+this._set("editing",true);
+this._savedTabIndex=_5.get(this.displayNode,"tabIndex")||"0";
+if(!this.wrapperWidget){
+var _26=_7.create("span",null,this.domNode,"before");
+var Ewc=typeof this.editorWrapper=="string"?_c.getObject(this.editorWrapper):this.editorWrapper;
+this.wrapperWidget=new Ewc({value:this.value,buttonSave:this.buttonSave,buttonCancel:this.buttonCancel,dir:this.dir,lang:this.lang,tabIndex:this._savedTabIndex,editor:this.editor,inlineEditBox:this,sourceStyle:_8.getComputedStyle(this.displayNode),save:_c.hitch(this,"save"),cancel:_c.hitch(this,"cancel"),textDir:this.textDir},_26);
+if(!this.wrapperWidget._started){
+this.wrapperWidget.startup();
+}
+if(!this._started){
+this.startup();
+}
+}
+var ww=this.wrapperWidget;
+_6.add(this.displayNode,"dijitOffScreen");
+_6.remove(ww.domNode,"dijitOffScreen");
+_8.set(ww.domNode,{visibility:"visible"});
+_5.set(this.displayNode,"tabIndex","-1");
+var ew=ww.editWidget;
+var _27=this;
+_e(ew.onLoadDeferred,_c.hitch(ww,function(){
+ew.set(("displayedValue" in ew||"_setDisplayedValueAttr" in ew)?"displayedValue":"value",_27.value);
+this.defer(function(){
+if(ww.saveButton){
+ww.saveButton.set("disabled","intermediateChanges" in ew);
+}
+this.focus();
+this._resetValue=this.getValue();
+});
+}));
+},_onBlur:function(){
+this.inherited(arguments);
+if(!this.editing){
+}
+},destroy:function(){
+if(this.wrapperWidget&&!this.wrapperWidget._destroyed){
+this.wrapperWidget.destroy();
+delete this.wrapperWidget;
+}
+this.inherited(arguments);
+},_showText:function(_28){
+var ww=this.wrapperWidget;
+_8.set(ww.domNode,{visibility:"hidden"});
+_6.add(ww.domNode,"dijitOffScreen");
+_6.remove(this.displayNode,"dijitOffScreen");
+_5.set(this.displayNode,"tabIndex",this._savedTabIndex);
+if(_28){
+fm.focus(this.displayNode);
+}
+},save:function(_29){
+if(this.disabled||!this.editing){
+return;
+}
+this._set("editing",false);
+var ww=this.wrapperWidget;
+var _2a=ww.getValue();
+this.set("value",_2a);
+this._showText(_29);
+},setValue:function(val){
+_a.deprecated("dijit.InlineEditBox.setValue() is deprecated.  Use set('value', ...) instead.","","2.0");
+return this.set("value",val);
+},_setValueAttr:function(val){
+val=_c.trim(val);
+var _2b=this.renderAsHtml?val:val.replace(/&/gm,"&amp;").replace(/</gm,"&lt;").replace(/>/gm,"&gt;").replace(/"/gm,"&quot;").replace(/\n/g,"<br>");
+if(this.editorParams&&this.editorParams.type==="password"){
+this.displayNode.innerHTML="********";
+}else{
+this.displayNode.innerHTML=_2b||this.noValueIndicator;
+}
+this._set("value",val);
+if(this._started){
+this.defer(function(){
+this.onChange(val);
+});
+}
+},getValue:function(){
+_a.deprecated("dijit.InlineEditBox.getValue() is deprecated.  Use get('value') instead.","","2.0");
+return this.get("value");
+},cancel:function(_2c){
+if(this.disabled||!this.editing){
+return;
+}
+this._set("editing",false);
+this.defer("onCancel");
+this._showText(_2c);
+}});
+if(_d("dojo-bidi")){
+_23=_4("dijit.InlineEditBox",_23,{_setValueAttr:function(){
+this.inherited(arguments);
+this.applyTextDir(this.displayNode);
+}});
+}
+_23._InlineEditor=_18;
+return _23;
+});

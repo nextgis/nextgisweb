@@ -1,5 +1,76 @@
 //>>built
-define("dojox/gfx/renderer",["./_base","dojo/_base/lang","dojo/_base/sniff","dojo/_base/window","dojo/_base/config"],function(m,n,f,k,d){var g=null;f.add("vml",function(b,d,c){c.innerHTML='\x3cv:shape adj\x3d"1"/\x3e';b="adj"in c.firstChild;c.innerHTML="";return b});return{load:function(b,p,c){function l(){p(["dojox/gfx/"+a],function(b){m.renderer=a;g=b;c(b)})}if(g&&"force"!=b)c(g);else{var a=d.forceGfxRenderer;b=!a&&(n.isString(d.gfxRenderer)?d.gfxRenderer:"svg,vml,canvas,silverlight").split(",");
-for(var h,e;!a&&b.length;)switch(b.shift()){case "svg":"SVGAngle"in k.global&&(a="svg");break;case "vml":f("vml")&&(a="vml");break;case "silverlight":try{f("ie")?(h=new ActiveXObject("AgControl.AgControl"),h.IsVersionSupported("1.0"))&&(e=!0):navigator.plugins["Silverlight Plug-In"]&&(e=!0)}catch(q){e=!1}finally{h=null}e&&(a="silverlight");break;case "canvas":k.global.CanvasRenderingContext2D&&(a="canvas")}"canvas"===a&&!1!==d.canvasEvents&&(a="canvasWithEvents");"svg"==a&&"undefined"!=typeof window.svgweb?
-window.svgweb.addOnLoad(l):l()}}}});
-//# sourceMappingURL=renderer.js.map
+define("dojox/gfx/renderer",["./_base","dojo/_base/lang","dojo/_base/sniff","dojo/_base/window","dojo/_base/config"],function(g,_1,_2,_3,_4){
+var _5=null;
+_2.add("vml",function(_6,_7,_8){
+_8.innerHTML="<v:shape adj=\"1\"/>";
+var _9=("adj" in _8.firstChild);
+_8.innerHTML="";
+return _9;
+});
+return {load:function(id,_a,_b){
+if(_5&&id!="force"){
+_b(_5);
+return;
+}
+var _c=_4.forceGfxRenderer,_d=!_c&&(_1.isString(_4.gfxRenderer)?_4.gfxRenderer:"svg,vml,canvas,silverlight").split(","),_e,_f;
+while(!_c&&_d.length){
+switch(_d.shift()){
+case "svg":
+if("SVGAngle" in _3.global){
+_c="svg";
+}
+break;
+case "vml":
+if(_2("vml")){
+_c="vml";
+}
+break;
+case "silverlight":
+try{
+if(_2("ie")){
+_e=new ActiveXObject("AgControl.AgControl");
+if(_e&&_e.IsVersionSupported("1.0")){
+_f=true;
+}
+}else{
+if(navigator.plugins["Silverlight Plug-In"]){
+_f=true;
+}
+}
+}
+catch(e){
+_f=false;
+}
+finally{
+_e=null;
+}
+if(_f){
+_c="silverlight";
+}
+break;
+case "canvas":
+if(_3.global.CanvasRenderingContext2D){
+_c="canvas";
+}
+break;
+}
+}
+if(_c==="canvas"&&_4.canvasEvents!==false){
+_c="canvasWithEvents";
+}
+if(_4.isDebug){
+}
+function _10(){
+_a(["dojox/gfx/"+_c],function(_11){
+g.renderer=_c;
+_5=_11;
+_b(_11);
+});
+};
+if(_c=="svg"&&typeof window.svgweb!="undefined"){
+window.svgweb.addOnLoad(_10);
+}else{
+_10();
+}
+}};
+});

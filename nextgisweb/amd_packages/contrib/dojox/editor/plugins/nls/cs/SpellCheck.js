@@ -1,4 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/cs/SpellCheck",{widgetLabel:"D\u00e1vkov\u00e1 kontrola pravopisu",unfound:"Nenalezeno",skip:"P\u0159esko\u010dit",skipAll:"P\u0159esko\u010dit v\u0161e",toDic:"P\u0159idat do slovn\u00edku",suggestions:"N\u00e1vrhy",replace:"Nahradit",replaceWith:"Text pro nahrazen\u00ed",replaceAll:"Nahradit v\u0161e",cancel:"Storno",msg:"Nebyly nalezeny \u017e\u00e1dn\u00e9 chyby pravopisu.",iSkip:"P\u0159esko\u010dit tento v\u00fdskyt",iSkipAll:"P\u0159esko\u010dit v\u0161echny podobn\u00e9 v\u00fdskyty",
-iMsg:"\u017d\u00e1dn\u00e9 n\u00e1vrhy pravopisu"});
-//# sourceMappingURL=SpellCheck.js.map
+define("dojox/editor/plugins/nls/cs/SpellCheck",({widgetLabel:"Dávková kontrola pravopisu",unfound:"Nenalezeno",skip:"Přeskočit",skipAll:"Přeskočit vše",toDic:"Přidat do slovníku",suggestions:"Návrhy",replace:"Nahradit",replaceWith:"Text pro nahrazení",replaceAll:"Nahradit vše",cancel:"Storno",msg:"Nebyly nalezeny žádné chyby pravopisu.",iSkip:"Přeskočit tento výskyt",iSkipAll:"Přeskočit všechny podobné výskyty",iMsg:"Žádné návrhy pravopisu"}));

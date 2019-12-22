@@ -1,6 +1,75 @@
 //>>built
-define("dojox/gauges/AnalogArcIndicator",["dojo/_base/declare","dojo/_base/lang","dojo/_base/connect","dojo/_base/fx","./AnalogIndicatorBase"],function(k,l,m,n,p){return k("dojox.gauges.AnalogArcIndicator",[p],{_createArc:function(g){if(this.shape){var d=this._gauge._mod360(this._gauge.startAngle),a=this._gauge._getRadians(this._gauge._getAngle(g)),b=this._gauge._getRadians(d);"cclockwise"==this._gauge.orientation&&(d=a,a=b,b=d);d=0;(b<=a?a-b:2*Math.PI+a-b)>Math.PI&&(d=1);var f=Math.cos(a),a=Math.sin(a),
-h=Math.cos(b),b=Math.sin(b),e=this.offset+this.width,c=["M"];c.push(this._gauge.cx+this.offset*b);c.push(this._gauge.cy-this.offset*h);c.push("A",this.offset,this.offset,0,d,1);c.push(this._gauge.cx+this.offset*a);c.push(this._gauge.cy-this.offset*f);c.push("L");c.push(this._gauge.cx+e*a);c.push(this._gauge.cy-e*f);c.push("A",e,e,0,d,0);c.push(this._gauge.cx+e*b);c.push(this._gauge.cy-e*h);c.push("z");this.shape.setShape(c.join(" "));this.currentValue=g}},draw:function(g,d){var a=this.value;a<this._gauge.min&&
-(a=this._gauge.min);a>this._gauge.max&&(a=this._gauge.max);if(this.shape)d?this._createArc(a):(a=new n.Animation({curve:[this.currentValue,a],duration:this.duration,easing:this.easing}),m.connect(a,"onAnimate",l.hitch(this,this._createArc)),a.play());else{var b=this.color?this.color:"black",f={color:this.strokeColor?this.strokeColor:b,width:1};this.color.type&&!this.strokeColor&&(f.color=this.color.colors[0].color);this.shape=g.createPath().setStroke(f).setFill(b);this._createArc(a);this.shape.connect("onmouseover",
-this,this.handleMouseOver);this.shape.connect("onmouseout",this,this.handleMouseOut);this.shape.connect("onmousedown",this,this.handleMouseDown);this.shape.connect("touchstart",this,this.handleTouchStart)}}})});
-//# sourceMappingURL=AnalogArcIndicator.js.map
+define("dojox/gauges/AnalogArcIndicator",["dojo/_base/declare","dojo/_base/lang","dojo/_base/connect","dojo/_base/fx","./AnalogIndicatorBase"],function(_1,_2,_3,fx,_4){
+return _1("dojox.gauges.AnalogArcIndicator",[_4],{_createArc:function(_5){
+if(this.shape){
+var _6=this._gauge._mod360(this._gauge.startAngle);
+var a=this._gauge._getRadians(this._gauge._getAngle(_5));
+var sa=this._gauge._getRadians(_6);
+if(this._gauge.orientation=="cclockwise"){
+var _7=a;
+a=sa;
+sa=_7;
+}
+var _8;
+var _9=0;
+if(sa<=a){
+_8=a-sa;
+}else{
+_8=2*Math.PI+a-sa;
+}
+if(_8>Math.PI){
+_9=1;
+}
+var _a=Math.cos(a);
+var _b=Math.sin(a);
+var _c=Math.cos(sa);
+var _d=Math.sin(sa);
+var _e=this.offset+this.width;
+var p=["M"];
+p.push(this._gauge.cx+this.offset*_d);
+p.push(this._gauge.cy-this.offset*_c);
+p.push("A",this.offset,this.offset,0,_9,1);
+p.push(this._gauge.cx+this.offset*_b);
+p.push(this._gauge.cy-this.offset*_a);
+p.push("L");
+p.push(this._gauge.cx+_e*_b);
+p.push(this._gauge.cy-_e*_a);
+p.push("A",_e,_e,0,_9,0);
+p.push(this._gauge.cx+_e*_d);
+p.push(this._gauge.cy-_e*_c);
+p.push("z");
+this.shape.setShape(p.join(" "));
+this.currentValue=_5;
+}
+},draw:function(_f,_10){
+var v=this.value;
+if(v<this._gauge.min){
+v=this._gauge.min;
+}
+if(v>this._gauge.max){
+v=this._gauge.max;
+}
+if(this.shape){
+if(_10){
+this._createArc(v);
+}else{
+var _11=new fx.Animation({curve:[this.currentValue,v],duration:this.duration,easing:this.easing});
+_3.connect(_11,"onAnimate",_2.hitch(this,this._createArc));
+_11.play();
+}
+}else{
+var _12=this.color?this.color:"black";
+var _13=this.strokeColor?this.strokeColor:_12;
+var _14={color:_13,width:1};
+if(this.color.type&&!this.strokeColor){
+_14.color=this.color.colors[0].color;
+}
+this.shape=_f.createPath().setStroke(_14).setFill(_12);
+this._createArc(v);
+this.shape.connect("onmouseover",this,this.handleMouseOver);
+this.shape.connect("onmouseout",this,this.handleMouseOut);
+this.shape.connect("onmousedown",this,this.handleMouseDown);
+this.shape.connect("touchstart",this,this.handleTouchStart);
+}
+}});
+});

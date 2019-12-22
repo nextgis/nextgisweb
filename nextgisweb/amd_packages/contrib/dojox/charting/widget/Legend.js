@@ -1,8 +1,102 @@
 //>>built
-define("dojox/charting/widget/Legend","dojo/_base/declare dijit/_WidgetBase dojox/gfx dojo/_base/array dojo/has dojo/has!dojo-bidi?../bidi/widget/Legend dojox/lang/functional dojo/dom dojo/dom-construct dojo/dom-class dijit/registry".split(" "),function(m,g,q,f,h,r,k,t,d,l,n){g=m(h("dojo-bidi")?"dojox.charting.widget.NonBidiLegend":"dojox.charting.widget.Legend",g,{chartRef:"",horizontal:!0,swatchSize:18,legendBody:null,postCreate:function(){!this.chart&&this.chartRef&&(this.chart=n.byId(this.chartRef)||
-n.byNode(t.byId(this.chartRef)));this.chart=this.chart.chart||this.chart;this.refresh()},buildRendering:function(){this.domNode=d.create("table",{role:"group","aria-label":"chart legend","class":"dojoxLegendNode"});this.legendBody=d.create("tbody",null,this.domNode);this.inherited(arguments)},destroy:function(){this._surfaces&&f.forEach(this._surfaces,function(c){c.destroy()});this.inherited(arguments)},refresh:function(){this._surfaces&&f.forEach(this._surfaces,function(a){a.destroy()});for(this._surfaces=
-[];this.legendBody.lastChild;)d.destroy(this.legendBody.lastChild);this.horizontal&&(l.add(this.domNode,"dojoxLegendHorizontal"),this._tr=d.create("tr",null,this.legendBody),this._inrow=0);var c=this.series||this.chart.series;if(0!=c.length)if("dojox.charting.plot2d.Pie"==c[0].chart.stack[0].declaredClass){var b=c[0].chart.stack[0];"number"==typeof b.run.data[0]?(c=k.map(b.run.data,"Math.max(x, 0)"),c=k.map(c,"/this",k.foldl(c,"+",0)),f.forEach(c,function(a,c){this._addLabel(b.dyn[c],b._getLabel(100*
-a)+"%")},this)):f.forEach(b.run.data,function(a,c){this._addLabel(b.dyn[c],a.legend||a.text||a.y)},this)}else f.forEach(c,function(a){this._addLabel(a.dyn,a.legend||a.name)},this)},_addLabel:function(c,b){var a=d.create("td"),p=d.create("div",null,a),e=d.create("label",null,a),f=d.create("div",{style:{width:this.swatchSize+"px",height:this.swatchSize+"px","float":"left"}},p);l.add(p,"dojoxLegendIcon dijitInline");l.add(e,"dojoxLegendText");this._tr?(this._tr.appendChild(a),++this._inrow===this.horizontal&&
-(this._tr=d.create("tr",null,this.legendBody),this._inrow=0)):d.create("tr",null,this.legendBody).appendChild(a);this._makeIcon(f,c);e.innerHTML=String(b);h("dojo-bidi")&&(e.dir=this.getTextDir(b,e.dir))},_makeIcon:function(c,b){var a=this.swatchSize,d=this.swatchSize,e=q.createSurface(c,d,a);this._surfaces.push(e);if(b.fill)e.createRect({x:2,y:2,width:d-4,height:a-4}).setFill(b.fill).setStroke(b.stroke);else if(b.stroke||b.marker){var f={x1:0,y1:a/2,x2:d,y2:a/2};b.stroke&&e.createLine(f).setStroke(b.stroke);
-b.marker&&e.createPath({path:"M"+d/2+" "+a/2+" "+b.marker}).setFill(b.markerFill).setStroke(b.markerStroke)}else e.createRect({x:2,y:2,width:d-4,height:a-4}).setStroke("black"),e.createLine({x1:2,y1:2,x2:d-2,y2:a-2}).setStroke("black"),e.createLine({x1:2,y1:a-2,x2:d-2,y2:2}).setStroke("black")}});return h("dojo-bidi")?m("dojox.charting.widget.Legend",[g,r]):g});
-//# sourceMappingURL=Legend.js.map
+define("dojox/charting/widget/Legend",["dojo/_base/declare","dijit/_WidgetBase","dojox/gfx","dojo/_base/array","dojo/has","dojo/has!dojo-bidi?../bidi/widget/Legend","dojox/lang/functional","dojo/dom","dojo/dom-construct","dojo/dom-class","dijit/registry"],function(_1,_2,_3,_4,_5,_6,df,_7,_8,_9,_a){
+var _b=_1(_5("dojo-bidi")?"dojox.charting.widget.NonBidiLegend":"dojox.charting.widget.Legend",_2,{chartRef:"",horizontal:true,swatchSize:18,legendBody:null,postCreate:function(){
+if(!this.chart&&this.chartRef){
+this.chart=_a.byId(this.chartRef)||_a.byNode(_7.byId(this.chartRef));
+if(!this.chart){
+}
+}
+this.chart=this.chart.chart||this.chart;
+this.refresh();
+},buildRendering:function(){
+this.domNode=_8.create("table",{role:"group","aria-label":"chart legend","class":"dojoxLegendNode"});
+this.legendBody=_8.create("tbody",null,this.domNode);
+this.inherited(arguments);
+},destroy:function(){
+if(this._surfaces){
+_4.forEach(this._surfaces,function(_c){
+_c.destroy();
+});
+}
+this.inherited(arguments);
+},refresh:function(){
+if(this._surfaces){
+_4.forEach(this._surfaces,function(_d){
+_d.destroy();
+});
+}
+this._surfaces=[];
+while(this.legendBody.lastChild){
+_8.destroy(this.legendBody.lastChild);
+}
+if(this.horizontal){
+_9.add(this.domNode,"dojoxLegendHorizontal");
+this._tr=_8.create("tr",null,this.legendBody);
+this._inrow=0;
+}
+var s=this.series||this.chart.series;
+if(s.length==0){
+return;
+}
+if(s[0].chart.stack[0].declaredClass=="dojox.charting.plot2d.Pie"){
+var t=s[0].chart.stack[0];
+if(typeof t.run.data[0]=="number"){
+var _e=df.map(t.run.data,"Math.max(x, 0)");
+var _f=df.map(_e,"/this",df.foldl(_e,"+",0));
+_4.forEach(_f,function(x,i){
+this._addLabel(t.dyn[i],t._getLabel(x*100)+"%");
+},this);
+}else{
+_4.forEach(t.run.data,function(x,i){
+this._addLabel(t.dyn[i],x.legend||x.text||x.y);
+},this);
+}
+}else{
+_4.forEach(s,function(x){
+this._addLabel(x.dyn,x.legend||x.name);
+},this);
+}
+},_addLabel:function(dyn,_10){
+var _11=_8.create("td"),_12=_8.create("div",null,_11),_13=_8.create("label",null,_11),div=_8.create("div",{style:{"width":this.swatchSize+"px","height":this.swatchSize+"px","float":"left"}},_12);
+_9.add(_12,"dojoxLegendIcon dijitInline");
+_9.add(_13,"dojoxLegendText");
+if(this._tr){
+this._tr.appendChild(_11);
+if(++this._inrow===this.horizontal){
+this._tr=_8.create("tr",null,this.legendBody);
+this._inrow=0;
+}
+}else{
+var tr=_8.create("tr",null,this.legendBody);
+tr.appendChild(_11);
+}
+this._makeIcon(div,dyn);
+_13.innerHTML=String(_10);
+if(_5("dojo-bidi")){
+_13.dir=this.getTextDir(_10,_13.dir);
+}
+},_makeIcon:function(div,dyn){
+var mb={h:this.swatchSize,w:this.swatchSize};
+var _14=_3.createSurface(div,mb.w,mb.h);
+this._surfaces.push(_14);
+if(dyn.fill){
+_14.createRect({x:2,y:2,width:mb.w-4,height:mb.h-4}).setFill(dyn.fill).setStroke(dyn.stroke);
+}else{
+if(dyn.stroke||dyn.marker){
+var _15={x1:0,y1:mb.h/2,x2:mb.w,y2:mb.h/2};
+if(dyn.stroke){
+_14.createLine(_15).setStroke(dyn.stroke);
+}
+if(dyn.marker){
+var c={x:mb.w/2,y:mb.h/2};
+_14.createPath({path:"M"+c.x+" "+c.y+" "+dyn.marker}).setFill(dyn.markerFill).setStroke(dyn.markerStroke);
+}
+}else{
+_14.createRect({x:2,y:2,width:mb.w-4,height:mb.h-4}).setStroke("black");
+_14.createLine({x1:2,y1:2,x2:mb.w-2,y2:mb.h-2}).setStroke("black");
+_14.createLine({x1:2,y1:mb.h-2,x2:mb.w-2,y2:2}).setStroke("black");
+}
+}
+}});
+return _5("dojo-bidi")?_1("dojox.charting.widget.Legend",[_b,_6]):_b;
+});

@@ -1,5 +1,77 @@
 //>>built
-define("dojox/encoding/digests/_base",["dojo/_base/lang"],function(e){e=e.getObject("dojox.encoding.digests",!0);e.outputTypes={Base64:0,Hex:1,String:2,Raw:3};e.addWords=function(c,d){var a=(c&65535)+(d&65535);return(c>>16)+(d>>16)+(a>>16)<<16|a&65535};e.stringToWord=function(c){for(var d=[],a=0,b=8*c.length;a<b;a+=8)d[a>>5]|=(c.charCodeAt(a/8)&255)<<a%32;return d};e.wordToString=function(c){for(var d=[],a=0,b=32*c.length;a<b;a+=8)d.push(String.fromCharCode(c[a>>5]>>>a%32&255));return d.join("")};
-e.wordToHex=function(c){for(var d=[],a=0,b=4*c.length;a<b;a++)d.push("0123456789abcdef".charAt(c[a>>2]>>a%4*8+4&15)+"0123456789abcdef".charAt(c[a>>2]>>a%4*8&15));return d.join("")};e.wordToBase64=function(c){for(var d=[],a=0,b=4*c.length;a<b;a+=3)for(var e=(c[a>>2]>>a%4*8&255)<<16|(c[a+1>>2]>>(a+1)%4*8&255)<<8|c[a+2>>2]>>(a+2)%4*8&255,f=0;4>f;f++)8*a+6*f>32*c.length?d.push("\x3d"):d.push("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".charAt(e>>6*(3-f)&63));return d.join("")};e.stringToUtf8=
-function(c){for(var d="",a=-1,b,e;++a<c.length;)b=c.charCodeAt(a),e=a+1<c.length?c.charCodeAt(a+1):0,55296<=b&&56319>=b&&56320<=e&&57343>=e&&(b=65536+((b&1023)<<10)+(e&1023),a++),127>=b?d+=String.fromCharCode(b):2047>=b?d+=String.fromCharCode(192|b>>>6&31,128|b&63):65535>=b?d+=String.fromCharCode(224|b>>>12&15,128|b>>>6&63,128|b&63):2097151>=b&&(d+=String.fromCharCode(240|b>>>18&7,128|b>>>12&63,128|b>>>6&63,128|b&63));return d};return e});
-//# sourceMappingURL=_base.js.map
+define("dojox/encoding/digests/_base",["dojo/_base/lang"],function(_1){
+var _2=_1.getObject("dojox.encoding.digests",true);
+_2.outputTypes={Base64:0,Hex:1,String:2,Raw:3};
+_2.addWords=function(a,b){
+var l=(a&65535)+(b&65535);
+var m=(a>>16)+(b>>16)+(l>>16);
+return (m<<16)|(l&65535);
+};
+var _3=8;
+var _4=(1<<_3)-1;
+_2.stringToWord=function(s){
+var wa=[];
+for(var i=0,l=s.length*_3;i<l;i+=_3){
+wa[i>>5]|=(s.charCodeAt(i/_3)&_4)<<(i%32);
+}
+return wa;
+};
+_2.wordToString=function(wa){
+var s=[];
+for(var i=0,l=wa.length*32;i<l;i+=_3){
+s.push(String.fromCharCode((wa[i>>5]>>>(i%32))&_4));
+}
+return s.join("");
+};
+_2.wordToHex=function(wa){
+var h="0123456789abcdef",s=[];
+for(var i=0,l=wa.length*4;i<l;i++){
+s.push(h.charAt((wa[i>>2]>>((i%4)*8+4))&15)+h.charAt((wa[i>>2]>>((i%4)*8))&15));
+}
+return s.join("");
+};
+_2.wordToBase64=function(wa){
+var p="=",_5="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",s=[];
+for(var i=0,l=wa.length*4;i<l;i+=3){
+var t=(((wa[i>>2]>>8*(i%4))&255)<<16)|(((wa[i+1>>2]>>8*((i+1)%4))&255)<<8)|((wa[i+2>>2]>>8*((i+2)%4))&255);
+for(var j=0;j<4;j++){
+if(i*8+j*6>wa.length*32){
+s.push(p);
+}else{
+s.push(_5.charAt((t>>6*(3-j))&63));
+}
+}
+}
+return s.join("");
+};
+_2.stringToUtf8=function(_6){
+var _7="";
+var i=-1;
+var x,y;
+while(++i<_6.length){
+x=_6.charCodeAt(i);
+y=i+1<_6.length?_6.charCodeAt(i+1):0;
+if(55296<=x&&x<=56319&&56320<=y&&y<=57343){
+x=65536+((x&1023)<<10)+(y&1023);
+i++;
+}
+if(x<=127){
+_7+=String.fromCharCode(x);
+}else{
+if(x<=2047){
+_7+=String.fromCharCode(192|((x>>>6)&31),128|(x&63));
+}else{
+if(x<=65535){
+_7+=String.fromCharCode(224|((x>>>12)&15),128|((x>>>6)&63),128|(x&63));
+}else{
+if(x<=2097151){
+_7+=String.fromCharCode(240|((x>>>18)&7),128|((x>>>12)&63),128|((x>>>6)&63),128|(x&63));
+}
+}
+}
+}
+}
+return _7;
+};
+return _2;
+});

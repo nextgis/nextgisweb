@@ -1,3 +1,2 @@
 //>>built
-define("dijit/_editor/nls/fr/LinkDialog",{createLinkTitle:"Propri\u00e9t\u00e9s du lien",insertImageTitle:"Propri\u00e9t\u00e9s de l'image",url:"URL :",text:"Description :",target:"Cible :",set:"D\u00e9finir",currentWindow:"Fen\u00eatre actuelle",parentWindow:"Fen\u00eatre parent",topWindow:"Fen\u00eatre sup\u00e9rieure",newWindow:"Nouvelle fen\u00eatre"});
-//# sourceMappingURL=LinkDialog.js.map
+define("dijit/_editor/nls/fr/LinkDialog",({createLinkTitle:"Propriétés du lien",insertImageTitle:"Propriétés de l'image",url:"URL :",text:"Description :",target:"Cible :",set:"Définir",currentWindow:"Fenêtre actuelle",parentWindow:"Fenêtre parent",topWindow:"Fenêtre supérieure",newWindow:"Nouvelle fenêtre"}));

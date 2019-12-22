@@ -1,5 +1,77 @@
 //>>built
-define("dojox/charting/action2d/Highlight","dojo/_base/lang dojo/_base/declare dojo/_base/Color dojo/_base/connect dojox/color/_base ./PlotAction dojo/fx/easing dojox/gfx/fx".split(" "),function(k,l,m,n,e,p,q,r){var t=function(a){return function(){return a}},f=function(a){a=new e.Color(a);var b=a.toHsl();0==b.s?b.l=50>b.l?100:0:(b.s=100,b.l=50>b.l?75:75<b.l?50:b.l-50>75-b.l?50:75);b=e.fromHsl(b);b.a=a.a;return b},u=function(a){a=f(a);a.a=.7;return a};return l("dojox.charting.action2d.Highlight",p,
-{defaultParams:{duration:400,easing:q.backOut},optionalParams:{highlight:"red"},constructor:function(a,b,d){this.colorFunc=(a=d&&d.highlight)?k.isFunction(a)?a:t(a):f;this.connect()},process:function(a){if(a.shape&&a.type in this.overOutEvents&&"spider_circle"!=a.element&&"spider_plot"!=a.element){"spider_poly"==a.element&&this.colorFunc==f&&(this.colorFunc=u);var b=a.run.name,d=a.index,c;b in this.anim?c=this.anim[b][d]:this.anim[b]={};if(c)c.action.stop(!0);else{c=a.shape.getFill();if(!(c&&c instanceof
-m))return;this.anim[b][d]=c={start:c,end:this.colorFunc(c)}}var g=c.start,h=c.end;if("onmouseout"==a.type)var e=g,g=h,h=e;c.action=r.animateFill({shape:a.shape,duration:this.duration,easing:this.easing,color:{start:g,end:h}});"onmouseout"==a.type&&n.connect(c.action,"onEnd",this,function(){this.anim[b]&&delete this.anim[b][d]});c.action.play()}}})});
-//# sourceMappingURL=Highlight.js.map
+define("dojox/charting/action2d/Highlight",["dojo/_base/lang","dojo/_base/declare","dojo/_base/Color","dojo/_base/connect","dojox/color/_base","./PlotAction","dojo/fx/easing","dojox/gfx/fx"],function(_1,_2,_3,_4,c,_5,_6,_7){
+var _8=100,_9=75,_a=50,cc=function(_b){
+return function(){
+return _b;
+};
+},hl=function(_c){
+var a=new c.Color(_c),x=a.toHsl();
+if(x.s==0){
+x.l=x.l<50?100:0;
+}else{
+x.s=_8;
+if(x.l<_a){
+x.l=_9;
+}else{
+if(x.l>_9){
+x.l=_a;
+}else{
+x.l=x.l-_a>_9-x.l?_a:_9;
+}
+}
+}
+var _d=c.fromHsl(x);
+_d.a=a.a;
+return _d;
+},_e=function(_f){
+var r=hl(_f);
+r.a=0.7;
+return r;
+};
+return _2("dojox.charting.action2d.Highlight",_5,{defaultParams:{duration:400,easing:_6.backOut},optionalParams:{highlight:"red"},constructor:function(_10,_11,_12){
+var a=_12&&_12.highlight;
+this.colorFunc=a?(_1.isFunction(a)?a:cc(a)):hl;
+this.connect();
+},process:function(o){
+if(!o.shape||!(o.type in this.overOutEvents)){
+return;
+}
+if(o.element=="spider_circle"||o.element=="spider_plot"){
+return;
+}else{
+if(o.element=="spider_poly"&&this.colorFunc==hl){
+this.colorFunc=_e;
+}
+}
+var _13=o.run.name,_14=o.index,_15;
+if(_13 in this.anim){
+_15=this.anim[_13][_14];
+}else{
+this.anim[_13]={};
+}
+if(_15){
+_15.action.stop(true);
+}else{
+var _16=o.shape.getFill();
+if(!_16||!(_16 instanceof _3)){
+return;
+}
+this.anim[_13][_14]=_15={start:_16,end:this.colorFunc(_16)};
+}
+var _17=_15.start,end=_15.end;
+if(o.type=="onmouseout"){
+var t=_17;
+_17=end;
+end=t;
+}
+_15.action=_7.animateFill({shape:o.shape,duration:this.duration,easing:this.easing,color:{start:_17,end:end}});
+if(o.type=="onmouseout"){
+_4.connect(_15.action,"onEnd",this,function(){
+if(this.anim[_13]){
+delete this.anim[_13][_14];
+}
+});
+}
+_15.action.play();
+}});
+});

@@ -5,5 +5,4 @@
 */
 
 //>>built
-define("dojo/cldr/nls/currency",{root:{USD_symbol:"US$",CAD_symbol:"CA$",GBP_symbol:"\u00a3",HKD_symbol:"HK$",JPY_symbol:"JP\u00a5",AUD_symbol:"A$",CNY_symbol:"CN\u00a5",EUR_symbol:"\u20ac"},ar:!0,bs:!0,ca:!0,cs:!0,da:!0,de:!0,el:!0,en:!0,"en-au":!0,"en-ca":!0,"en-gb":!0,es:!0,fi:!0,fr:!0,"fr-ch":!0,he:!0,hr:!0,hu:!0,id:!0,it:!0,ja:!0,ko:!0,mk:!0,nb:!0,nl:!0,pl:!0,pt:!0,"pt-pt":!0,ro:!0,ru:!0,sk:!0,sl:!0,sr:!0,sv:!0,th:!0,tr:!0,zh:!0,"zh-hant":!0,"zh-hk":!0,"zh-tw":!0});
-//# sourceMappingURL=currency.js.map
+define("dojo/cldr/nls/currency",{root:{"USD_symbol":"US$","CAD_symbol":"CA$","GBP_symbol":"£","HKD_symbol":"HK$","JPY_symbol":"JP¥","AUD_symbol":"A$","CNY_symbol":"CN¥","EUR_symbol":"€"},"ar":true,"bs":true,"ca":true,"cs":true,"da":true,"de":true,"el":true,"en":true,"en-au":true,"en-ca":true,"en-gb":true,"es":true,"fi":true,"fr":true,"fr-ch":true,"he":true,"hr":true,"hu":true,"id":true,"it":true,"ja":true,"ko":true,"mk":true,"nb":true,"nl":true,"pl":true,"pt":true,"pt-pt":true,"ro":true,"ru":true,"sk":true,"sl":true,"sr":true,"sv":true,"th":true,"tr":true,"zh":true,"zh-hant":true,"zh-hk":true,"zh-tw":true});

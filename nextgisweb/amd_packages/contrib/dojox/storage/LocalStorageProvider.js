@@ -1,7 +1,110 @@
 //>>built
-define("dojox/storage/LocalStorageProvider","dojo/_base/declare dojox/storage/Provider dojox/storage/manager dojo/_base/array dojo/_base/lang dojo/json".split(" "),function(f,k,g,l,m,h){f=f("dojox.storage.LocalStorageProvider",[k],{store:null,initialize:function(){this.store=localStorage;this.initialized=!0;g.loaded()},isAvailable:function(){return"undefined"!=typeof localStorage},put:function(a,b,c,d){this._assertIsValidKey(a);d=d||this.DEFAULT_NAMESPACE;this._assertIsValidNamespace(d);var e=this.getFullKey(a,
-d);b=h.stringify(b);try{this.store.setItem(e,b),c&&c(this.SUCCESS,a,null,d)}catch(n){c&&c(this.FAILED,a,n.toString(),d)}},get:function(a,b){this._assertIsValidKey(a);b=b||this.DEFAULT_NAMESPACE;this._assertIsValidNamespace(b);a=this.getFullKey(a,b);return h.parse(this.store.getItem(a))},getKeys:function(a){a=a||this.DEFAULT_NAMESPACE;this._assertIsValidNamespace(a);a="__"+a+"_";for(var b=[],c=0;c<this.store.length;c++){var d=this.store.key(c);this._beginsWith(d,a)&&(d=d.substring(a.length),b.push(d))}return b},
-clear:function(a){a=a||this.DEFAULT_NAMESPACE;this._assertIsValidNamespace(a);a="__"+a+"_";for(var b=[],c=0;c<this.store.length;c++)this._beginsWith(this.store.key(c),a)&&b.push(this.store.key(c));l.forEach(b,m.hitch(this.store,"removeItem"))},remove:function(a,b){b=b||this.DEFAULT_NAMESPACE;this._assertIsValidNamespace(b);this.store.removeItem(this.getFullKey(a,b))},getNamespaces:function(){var a=[this.DEFAULT_NAMESPACE],b={};b[this.DEFAULT_NAMESPACE]=!0;for(var c=/^__([^_]*)_/,d=0;d<this.store.length;d++){var e=
-this.store.key(d);1==c.test(e)&&(e=e.match(c)[1],"undefined"==typeof b[e]&&(b[e]=!0,a.push(e)))}return a},isPermanent:function(){return!0},getMaximumSize:function(){return dojox.storage.SIZE_NO_LIMIT},hasSettingsUI:function(){return!1},isValidKey:function(a){return null===a||void 0===a?!1:/^[0-9A-Za-z_-]*$/.test(a)},isValidNamespace:function(a){return null===a||void 0===a?!1:/^[0-9A-Za-z-]*$/.test(a)},getFullKey:function(a,b){return"__"+b+"_"+a},_beginsWith:function(a,b){return b.length>a.length?
-!1:a.substring(0,b.length)===b},_assertIsValidNamespace:function(a){if(!1===this.isValidNamespace(a))throw Error("Invalid namespace given: "+a);},_assertIsValidKey:function(a){if(!1===this.isValidKey(a))throw Error("Invalid key given: "+a);}});g.register("dojox.storage.LocalStorageProvider",new f);return f});
-//# sourceMappingURL=LocalStorageProvider.js.map
+define("dojox/storage/LocalStorageProvider",["dojo/_base/declare","dojox/storage/Provider","dojox/storage/manager","dojo/_base/array","dojo/_base/lang","dojo/json"],function(_1,_2,_3,_4,_5,_6){
+var _7=_1("dojox.storage.LocalStorageProvider",[_2],{store:null,initialize:function(){
+this.store=localStorage;
+this.initialized=true;
+_3.loaded();
+},isAvailable:function(){
+return typeof localStorage!="undefined";
+},put:function(_8,_9,_a,_b){
+this._assertIsValidKey(_8);
+_b=_b||this.DEFAULT_NAMESPACE;
+this._assertIsValidNamespace(_b);
+var _c=this.getFullKey(_8,_b);
+_9=_6.stringify(_9);
+try{
+this.store.setItem(_c,_9);
+if(_a){
+_a(this.SUCCESS,_8,null,_b);
+}
+}
+catch(e){
+if(_a){
+_a(this.FAILED,_8,e.toString(),_b);
+}
+}
+},get:function(_d,_e){
+this._assertIsValidKey(_d);
+_e=_e||this.DEFAULT_NAMESPACE;
+this._assertIsValidNamespace(_e);
+_d=this.getFullKey(_d,_e);
+return _6.parse(this.store.getItem(_d));
+},getKeys:function(_f){
+_f=_f||this.DEFAULT_NAMESPACE;
+this._assertIsValidNamespace(_f);
+_f="__"+_f+"_";
+var _10=[];
+for(var i=0;i<this.store.length;i++){
+var _11=this.store.key(i);
+if(this._beginsWith(_11,_f)){
+_11=_11.substring(_f.length);
+_10.push(_11);
+}
+}
+return _10;
+},clear:function(_12){
+_12=_12||this.DEFAULT_NAMESPACE;
+this._assertIsValidNamespace(_12);
+_12="__"+_12+"_";
+var _13=[];
+for(var i=0;i<this.store.length;i++){
+if(this._beginsWith(this.store.key(i),_12)){
+_13.push(this.store.key(i));
+}
+}
+_4.forEach(_13,_5.hitch(this.store,"removeItem"));
+},remove:function(key,_14){
+_14=_14||this.DEFAULT_NAMESPACE;
+this._assertIsValidNamespace(_14);
+this.store.removeItem(this.getFullKey(key,_14));
+},getNamespaces:function(){
+var _15=[this.DEFAULT_NAMESPACE];
+var _16={};
+_16[this.DEFAULT_NAMESPACE]=true;
+var _17=/^__([^_]*)_/;
+for(var i=0;i<this.store.length;i++){
+var _18=this.store.key(i);
+if(_17.test(_18)==true){
+var _19=_18.match(_17)[1];
+if(typeof _16[_19]=="undefined"){
+_16[_19]=true;
+_15.push(_19);
+}
+}
+}
+return _15;
+},isPermanent:function(){
+return true;
+},getMaximumSize:function(){
+return dojox.storage.SIZE_NO_LIMIT;
+},hasSettingsUI:function(){
+return false;
+},isValidKey:function(_1a){
+if(_1a===null||_1a===undefined){
+return false;
+}
+return /^[0-9A-Za-z_-]*$/.test(_1a);
+},isValidNamespace:function(_1b){
+if(_1b===null||_1b===undefined){
+return false;
+}
+return /^[0-9A-Za-z-]*$/.test(_1b);
+},getFullKey:function(key,_1c){
+return "__"+_1c+"_"+key;
+},_beginsWith:function(_1d,_1e){
+if(_1e.length>_1d.length){
+return false;
+}
+return _1d.substring(0,_1e.length)===_1e;
+},_assertIsValidNamespace:function(_1f){
+if(this.isValidNamespace(_1f)===false){
+throw new Error("Invalid namespace given: "+_1f);
+}
+},_assertIsValidKey:function(key){
+if(this.isValidKey(key)===false){
+throw new Error("Invalid key given: "+key);
+}
+}});
+_3.register("dojox.storage.LocalStorageProvider",new _7());
+return _7;
+});

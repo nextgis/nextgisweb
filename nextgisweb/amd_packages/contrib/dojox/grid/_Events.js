@@ -1,13 +1,227 @@
 //>>built
-define("dojox/grid/_Events",["dojo/keys","dojo/dom-class","dojo/_base/declare","dojo/_base/event","dojo/_base/sniff"],function(c,e,f,d,g){return f("dojox.grid._Events",null,{cellOverClass:"dojoxGridCellOver",onKeyEvent:function(a){this.dispatchKeyEvent(a)},onContentEvent:function(a){this.dispatchContentEvent(a)},onHeaderEvent:function(a){this.dispatchHeaderEvent(a)},onStyleRow:function(a){a.customClasses+=(a.odd?" dojoxGridRowOdd":"")+(a.selected?" dojoxGridRowSelected":"")+(a.over?" dojoxGridRowOver":
-"");this.focus.styleRow(a);this.edit.styleRow(a)},onKeyDown:function(a){if(!a.altKey&&!a.metaKey){var b;switch(a.keyCode){case c.ESCAPE:this.edit.cancel();break;case c.ENTER:if(!this.edit.isEditing()){b=this.focus.getHeaderIndex();if(0<=b){this.setSortIndex(b);break}else this.selection.clickSelect(this.focus.rowIndex,dojo.isCopyKey(a),a.shiftKey);d.stop(a)}a.shiftKey||(b=this.edit.isEditing(),this.edit.apply(),b||this.edit.setEditCell(this.focus.cell,this.focus.rowIndex));this.edit.isEditing()||((this.focus.focusView||
-this.views.views[0]).content.decorateEvent(a),this.onRowClick(a),d.stop(a));break;case c.SPACE:this.edit.isEditing()||(b=this.focus.getHeaderIndex(),0<=b?this.setSortIndex(b):(this.selection.clickSelect(this.focus.rowIndex,dojo.isCopyKey(a),a.shiftKey),this.focus._focusifyCellNode(!0),this.focus.setFocusCell(this.focus.cell,this.focus.rowIndex),d.stop(a)));break;case c.TAB:this.focus[a.shiftKey?"previousKey":"nextKey"](a);break;case c.LEFT_ARROW:case c.RIGHT_ARROW:if(!this.edit.isEditing()){var e=
-a.keyCode;d.stop(a);b=this.focus.getHeaderIndex();0<=b&&a.shiftKey&&a.ctrlKey?this.focus.colSizeAdjust(a,b,5*(e==c.LEFT_ARROW?-1:1)):(a=e==c.LEFT_ARROW?1:-1,this.isLeftToRight()&&(a*=-1),this.focus.move(0,a))}break;case c.UP_ARROW:this.edit.isEditing()||0===this.focus.rowIndex||(d.stop(a),this.focus.move(-1,0));break;case c.DOWN_ARROW:this.edit.isEditing()||this.focus.rowIndex+1==this.rowCount||(d.stop(a),this.focus.move(1,0));break;case c.PAGE_UP:this.edit.isEditing()||0===this.focus.rowIndex||(d.stop(a),
-this.focus.rowIndex!=this.scroller.firstVisibleRow+1?this.focus.move(this.scroller.firstVisibleRow-this.focus.rowIndex,0):(this.setScrollTop(this.scroller.findScrollTop(this.focus.rowIndex-1)),this.focus.move(this.scroller.firstVisibleRow-this.scroller.lastVisibleRow+1,0)));break;case c.PAGE_DOWN:this.edit.isEditing()||this.focus.rowIndex+1==this.rowCount||(d.stop(a),this.focus.rowIndex!=this.scroller.lastVisibleRow-1?this.focus.move(this.scroller.lastVisibleRow-this.focus.rowIndex-1,0):(this.setScrollTop(this.scroller.findScrollTop(this.focus.rowIndex+
-1)),this.focus.move(this.scroller.lastVisibleRow-this.scroller.firstVisibleRow-1,0)))}}},onMouseOver:function(a){-1==a.rowIndex?this.onHeaderCellMouseOver(a):this.onCellMouseOver(a)},onMouseOut:function(a){-1==a.rowIndex?this.onHeaderCellMouseOut(a):this.onCellMouseOut(a)},onMouseDown:function(a){-1==a.rowIndex?this.onHeaderCellMouseDown(a):this.onCellMouseDown(a)},onMouseOverRow:function(a){this.rows.isOver(a.rowIndex)||(this.rows.setOverRow(a.rowIndex),-1==a.rowIndex?this.onHeaderMouseOver(a):this.onRowMouseOver(a))},
-onMouseOutRow:function(a){if(this.rows.isOver(-1))this.onHeaderMouseOut(a);else this.rows.isOver(-2)||(this.rows.setOverRow(-2),this.onRowMouseOut(a))},onMouseDownRow:function(a){if(-1!=a.rowIndex)this.onRowMouseDown(a)},onCellMouseOver:function(a){a.cellNode&&e.add(a.cellNode,this.cellOverClass)},onCellMouseOut:function(a){a.cellNode&&e.remove(a.cellNode,this.cellOverClass)},onCellMouseDown:function(a){},onCellClick:function(a){this._click[0]=this._click[1];this._click[1]=a;this.edit.isEditCell(a.rowIndex,
-a.cellIndex)||this.focus.setFocusCell(a.cell,a.rowIndex);1<this._click.length&&null==this._click[0]&&this._click.shift();this.onRowClick(a)},onCellDblClick:function(a){var b;b=1<this._click.length&&g("ie")?this._click[1]:1<this._click.length&&this._click[0].rowIndex!=this._click[1].rowIndex?this._click[0]:a;this.focus.setFocusCell(b.cell,b.rowIndex);this.edit.setEditCell(b.cell,b.rowIndex);this.onRowDblClick(a)},onCellContextMenu:function(a){this.onRowContextMenu(a)},onCellFocus:function(a,b){this.edit.cellFocus(a,
-b)},onRowClick:function(a){this.edit.rowClick(a);this.selection.clickSelectEvent(a)},onRowDblClick:function(a){},onRowMouseOver:function(a){},onRowMouseOut:function(a){},onRowMouseDown:function(a){},onRowContextMenu:function(a){d.stop(a)},onHeaderMouseOver:function(a){},onHeaderMouseOut:function(a){},onHeaderCellMouseOver:function(a){a.cellNode&&e.add(a.cellNode,this.cellOverClass)},onHeaderCellMouseOut:function(a){a.cellNode&&e.remove(a.cellNode,this.cellOverClass)},onHeaderCellMouseDown:function(a){},
-onHeaderClick:function(a){},onHeaderCellClick:function(a){this.setSortIndex(a.cell.index);this.onHeaderClick(a)},onHeaderDblClick:function(a){},onHeaderCellDblClick:function(a){this.onHeaderDblClick(a)},onHeaderCellContextMenu:function(a){this.onHeaderContextMenu(a)},onHeaderContextMenu:function(a){this.headerMenu||d.stop(a)},onStartEdit:function(a,b){},onApplyCellEdit:function(a,b,c){},onCancelEdit:function(a){},onApplyEdit:function(a){},onCanSelect:function(a){return!0},onCanDeselect:function(a){return!0},
-onSelected:function(a){this.updateRowStyles(a)},onDeselected:function(a){this.updateRowStyles(a)},onSelectionChanged:function(){}})});
-//# sourceMappingURL=_Events.js.map
+define("dojox/grid/_Events",["dojo/keys","dojo/dom-class","dojo/_base/declare","dojo/_base/event","dojo/_base/sniff"],function(_1,_2,_3,_4,_5){
+return _3("dojox.grid._Events",null,{cellOverClass:"dojoxGridCellOver",onKeyEvent:function(e){
+this.dispatchKeyEvent(e);
+},onContentEvent:function(e){
+this.dispatchContentEvent(e);
+},onHeaderEvent:function(e){
+this.dispatchHeaderEvent(e);
+},onStyleRow:function(_6){
+var i=_6;
+i.customClasses+=(i.odd?" dojoxGridRowOdd":"")+(i.selected?" dojoxGridRowSelected":"")+(i.over?" dojoxGridRowOver":"");
+this.focus.styleRow(_6);
+this.edit.styleRow(_6);
+},onKeyDown:function(e){
+if(e.altKey||e.metaKey){
+return;
+}
+var _7;
+switch(e.keyCode){
+case _1.ESCAPE:
+this.edit.cancel();
+break;
+case _1.ENTER:
+if(!this.edit.isEditing()){
+_7=this.focus.getHeaderIndex();
+if(_7>=0){
+this.setSortIndex(_7);
+break;
+}else{
+this.selection.clickSelect(this.focus.rowIndex,dojo.isCopyKey(e),e.shiftKey);
+}
+_4.stop(e);
+}
+if(!e.shiftKey){
+var _8=this.edit.isEditing();
+this.edit.apply();
+if(!_8){
+this.edit.setEditCell(this.focus.cell,this.focus.rowIndex);
+}
+}
+if(!this.edit.isEditing()){
+var _9=this.focus.focusView||this.views.views[0];
+_9.content.decorateEvent(e);
+this.onRowClick(e);
+_4.stop(e);
+}
+break;
+case _1.SPACE:
+if(!this.edit.isEditing()){
+_7=this.focus.getHeaderIndex();
+if(_7>=0){
+this.setSortIndex(_7);
+break;
+}else{
+this.selection.clickSelect(this.focus.rowIndex,dojo.isCopyKey(e),e.shiftKey);
+this.focus._focusifyCellNode(true);
+this.focus.setFocusCell(this.focus.cell,this.focus.rowIndex);
+}
+_4.stop(e);
+}
+break;
+case _1.TAB:
+this.focus[e.shiftKey?"previousKey":"nextKey"](e);
+break;
+case _1.LEFT_ARROW:
+case _1.RIGHT_ARROW:
+if(!this.edit.isEditing()){
+var _a=e.keyCode;
+_4.stop(e);
+_7=this.focus.getHeaderIndex();
+if(_7>=0&&(e.shiftKey&&e.ctrlKey)){
+this.focus.colSizeAdjust(e,_7,(_a==_1.LEFT_ARROW?-1:1)*5);
+}else{
+var _b=(_a==_1.LEFT_ARROW)?1:-1;
+if(this.isLeftToRight()){
+_b*=-1;
+}
+this.focus.move(0,_b);
+}
+}
+break;
+case _1.UP_ARROW:
+if(!this.edit.isEditing()&&this.focus.rowIndex!==0){
+_4.stop(e);
+this.focus.move(-1,0);
+}
+break;
+case _1.DOWN_ARROW:
+if(!this.edit.isEditing()&&this.focus.rowIndex+1!=this.rowCount){
+_4.stop(e);
+this.focus.move(1,0);
+}
+break;
+case _1.PAGE_UP:
+if(!this.edit.isEditing()&&this.focus.rowIndex!==0){
+_4.stop(e);
+if(this.focus.rowIndex!=this.scroller.firstVisibleRow+1){
+this.focus.move(this.scroller.firstVisibleRow-this.focus.rowIndex,0);
+}else{
+this.setScrollTop(this.scroller.findScrollTop(this.focus.rowIndex-1));
+this.focus.move(this.scroller.firstVisibleRow-this.scroller.lastVisibleRow+1,0);
+}
+}
+break;
+case _1.PAGE_DOWN:
+if(!this.edit.isEditing()&&this.focus.rowIndex+1!=this.rowCount){
+_4.stop(e);
+if(this.focus.rowIndex!=this.scroller.lastVisibleRow-1){
+this.focus.move(this.scroller.lastVisibleRow-this.focus.rowIndex-1,0);
+}else{
+this.setScrollTop(this.scroller.findScrollTop(this.focus.rowIndex+1));
+this.focus.move(this.scroller.lastVisibleRow-this.scroller.firstVisibleRow-1,0);
+}
+}
+break;
+default:
+break;
+}
+},onMouseOver:function(e){
+e.rowIndex==-1?this.onHeaderCellMouseOver(e):this.onCellMouseOver(e);
+},onMouseOut:function(e){
+e.rowIndex==-1?this.onHeaderCellMouseOut(e):this.onCellMouseOut(e);
+},onMouseDown:function(e){
+e.rowIndex==-1?this.onHeaderCellMouseDown(e):this.onCellMouseDown(e);
+},onMouseOverRow:function(e){
+if(!this.rows.isOver(e.rowIndex)){
+this.rows.setOverRow(e.rowIndex);
+e.rowIndex==-1?this.onHeaderMouseOver(e):this.onRowMouseOver(e);
+}
+},onMouseOutRow:function(e){
+if(this.rows.isOver(-1)){
+this.onHeaderMouseOut(e);
+}else{
+if(!this.rows.isOver(-2)){
+this.rows.setOverRow(-2);
+this.onRowMouseOut(e);
+}
+}
+},onMouseDownRow:function(e){
+if(e.rowIndex!=-1){
+this.onRowMouseDown(e);
+}
+},onCellMouseOver:function(e){
+if(e.cellNode){
+_2.add(e.cellNode,this.cellOverClass);
+}
+},onCellMouseOut:function(e){
+if(e.cellNode){
+_2.remove(e.cellNode,this.cellOverClass);
+}
+},onCellMouseDown:function(e){
+},onCellClick:function(e){
+this._click[0]=this._click[1];
+this._click[1]=e;
+if(!this.edit.isEditCell(e.rowIndex,e.cellIndex)){
+this.focus.setFocusCell(e.cell,e.rowIndex);
+}
+if(this._click.length>1&&this._click[0]==null){
+this._click.shift();
+}
+this.onRowClick(e);
+},onCellDblClick:function(e){
+var _c;
+if(this._click.length>1&&_5("ie")){
+_c=this._click[1];
+}else{
+if(this._click.length>1&&this._click[0].rowIndex!=this._click[1].rowIndex){
+_c=this._click[0];
+}else{
+_c=e;
+}
+}
+this.focus.setFocusCell(_c.cell,_c.rowIndex);
+this.edit.setEditCell(_c.cell,_c.rowIndex);
+this.onRowDblClick(e);
+},onCellContextMenu:function(e){
+this.onRowContextMenu(e);
+},onCellFocus:function(_d,_e){
+this.edit.cellFocus(_d,_e);
+},onRowClick:function(e){
+this.edit.rowClick(e);
+this.selection.clickSelectEvent(e);
+},onRowDblClick:function(e){
+},onRowMouseOver:function(e){
+},onRowMouseOut:function(e){
+},onRowMouseDown:function(e){
+},onRowContextMenu:function(e){
+_4.stop(e);
+},onHeaderMouseOver:function(e){
+},onHeaderMouseOut:function(e){
+},onHeaderCellMouseOver:function(e){
+if(e.cellNode){
+_2.add(e.cellNode,this.cellOverClass);
+}
+},onHeaderCellMouseOut:function(e){
+if(e.cellNode){
+_2.remove(e.cellNode,this.cellOverClass);
+}
+},onHeaderCellMouseDown:function(e){
+},onHeaderClick:function(e){
+},onHeaderCellClick:function(e){
+this.setSortIndex(e.cell.index);
+this.onHeaderClick(e);
+},onHeaderDblClick:function(e){
+},onHeaderCellDblClick:function(e){
+this.onHeaderDblClick(e);
+},onHeaderCellContextMenu:function(e){
+this.onHeaderContextMenu(e);
+},onHeaderContextMenu:function(e){
+if(!this.headerMenu){
+_4.stop(e);
+}
+},onStartEdit:function(_f,_10){
+},onApplyCellEdit:function(_11,_12,_13){
+},onCancelEdit:function(_14){
+},onApplyEdit:function(_15){
+},onCanSelect:function(_16){
+return true;
+},onCanDeselect:function(_17){
+return true;
+},onSelected:function(_18){
+this.updateRowStyles(_18);
+},onDeselected:function(_19){
+this.updateRowStyles(_19);
+},onSelectionChanged:function(){
+}});
+});

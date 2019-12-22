@@ -1,10 +1,163 @@
 //>>built
-define("dojox/mobile/ComboBox","dojo/_base/kernel dojo/_base/declare dojo/_base/lang dojo/_base/window dojo/dom-geometry dojo/dom-style dojo/dom-attr dojo/window dojo/touch dijit/form/_AutoCompleterMixin dijit/popup ./_ComboBoxMenu ./TextBox ./sniff".split(" "),function(A,B,C,q,e,r,f,D,t,E,u,G,F,g){A.experimental("dojox.mobile.ComboBox");return B("dojox.mobile.ComboBox",[F,E],{dropDownClass:"dojox.mobile._ComboBoxMenu",selectOnClick:!1,autoComplete:!1,dropDown:null,maxHeight:-1,dropDownPosition:["below",
-"above"],_throttleOpenClose:function(){this._throttleHandler&&this._throttleHandler.remove();this._throttleHandler=this.defer(function(){this._throttleHandler=null},500)},_onFocus:function(){this.inherited(arguments);this._opened||this._throttleHandler||this._startSearchAll();g("windows-theme")&&this.domNode.blur()},onInput:function(b){b&&0===b.charCode||(this._onKey(b),this.inherited(arguments))},_setListAttr:function(b){this._set("list",b)},closeDropDown:function(){this._throttleOpenClose();this.endHandler&&
-(this.disconnect(this.startHandler),this.disconnect(this.endHandler),this.disconnect(this.moveHandler),clearInterval(this.repositionTimer),this.repositionTimer=this.endHandler=null);this.inherited(arguments);f.remove(this.domNode,"aria-owns");f.set(this.domNode,"aria-expanded","false");u.close(this.dropDown);this._opened=!1;g("windows-theme")&&this.domNode.disabled&&this.defer(function(){this.domNode.removeAttribute("disabled")},300)},openDropDown:function(){var b=!this._opened,c=this.dropDown,h=
-c.domNode,k=this.domNode,v=this;f.set(c.domNode,"role","listbox");f.set(this.domNode,"aria-expanded","true");c.id&&f.set(this.domNode,"aria-owns",c.id);g("touch")&&(!g("ios")||8>g("ios"))&&q.global.scrollBy(0,e.position(k,!1).y);this._preparedNode||(this._preparedNode=!0,h.style.width&&(this._explicitDDWidth=!0),h.style.height&&(this._explicitDDHeight=!0));var a={display:"",overflow:"hidden",visibility:"hidden"};this._explicitDDWidth||(a.width="");this._explicitDDHeight||(a.height="");r.set(h,a);
-a=this.maxHeight;if(-1==a)var a=D.getBox(),d=e.position(k,!1),a=Math.floor(Math.max(d.y,a.h-(d.y+d.h)));u.moveOffScreen(c);c.startup&&!c._started&&c.startup();d=e.position(this.dropDown.containerNode,!1);a&&d.h>a&&(d.h=a);d.w=Math.max(d.w,k.offsetWidth);e.setMarginBox(h,d);h=u.open({parent:this,popup:c,around:k,orient:g("windows-theme")?["above"]:this.dropDownPosition,onExecute:function(){v.closeDropDown()},onCancel:function(){v.closeDropDown()},onClose:function(){v._opened=!1}});this._opened=!0;
-if(b){var n=!1,l=!1,m=!1,p=c.domNode.parentNode,b=e.position(k,!1),a=e.position(p,!1),w=a.x-b.x,x=a.y-b.y,y=-1,z=-1;this.startHandler=this.connect(q.doc.documentElement,t.press,function(a){m=l=!0;n=!1;y=a.clientX;z=a.clientY});this.moveHandler=this.connect(q.doc.documentElement,t.move,function(a){l=!0;a.touches?m=n=!0:!m||a.clientX==y&&a.clientY==z||(n=!0)});this.clickHandler=this.connect(c.domNode,"onclick",function(){l=!0;m=n=!1});this.endHandler=this.connect(q.doc.documentElement,t.release,function(){this.defer(function(){l=
-!0;!n&&m&&this.closeDropDown();m=!1})});this.repositionTimer=setInterval(C.hitch(this,function(){if(l)l=!1;else{var a=e.position(k,!1),b=e.position(p,!1),c=b.x-a.x,a=b.y-a.y;(1<=Math.abs(c-w)||1<=Math.abs(a-x))&&r.set(p,{left:parseInt(r.get(p,"left"))+w-c+"px",top:parseInt(r.get(p,"top"))+x-a+"px"})}}),50)}g("windows-theme")&&this.domNode.setAttribute("disabled",!0);return h},postCreate:function(){this.inherited(arguments);this.connect(this.domNode,"onclick","_onClick");f.set(this.domNode,"role",
-"combobox");f.set(this.domNode,"aria-expanded","false")},destroy:function(){this.repositionTimer&&clearInterval(this.repositionTimer);this.inherited(arguments)},_onClick:function(b){this._throttleHandler||(this.opened?this.closeDropDown():this._startSearchAll())}})});
-//# sourceMappingURL=ComboBox.js.map
+define("dojox/mobile/ComboBox",["dojo/_base/kernel","dojo/_base/declare","dojo/_base/lang","dojo/_base/window","dojo/dom-geometry","dojo/dom-style","dojo/dom-attr","dojo/window","dojo/touch","dijit/form/_AutoCompleterMixin","dijit/popup","./_ComboBoxMenu","./TextBox","./sniff"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e){
+_1.experimental("dojox.mobile.ComboBox");
+return _2("dojox.mobile.ComboBox",[_d,_a],{dropDownClass:"dojox.mobile._ComboBoxMenu",selectOnClick:false,autoComplete:false,dropDown:null,maxHeight:-1,dropDownPosition:["below","above"],_throttleOpenClose:function(){
+if(this._throttleHandler){
+this._throttleHandler.remove();
+}
+this._throttleHandler=this.defer(function(){
+this._throttleHandler=null;
+},500);
+},_onFocus:function(){
+this.inherited(arguments);
+if(!this._opened&&!this._throttleHandler){
+this._startSearchAll();
+}
+if(_e("windows-theme")){
+this.domNode.blur();
+}
+},onInput:function(e){
+if(!e||e.charCode!==0){
+this._onKey(e);
+this.inherited(arguments);
+}
+},_setListAttr:function(v){
+this._set("list",v);
+},closeDropDown:function(){
+this._throttleOpenClose();
+if(this.endHandler){
+this.disconnect(this.startHandler);
+this.disconnect(this.endHandler);
+this.disconnect(this.moveHandler);
+clearInterval(this.repositionTimer);
+this.repositionTimer=this.endHandler=null;
+}
+this.inherited(arguments);
+_7.remove(this.domNode,"aria-owns");
+_7.set(this.domNode,"aria-expanded","false");
+_b.close(this.dropDown);
+this._opened=false;
+if(_e("windows-theme")&&this.domNode.disabled){
+this.defer(function(){
+this.domNode.removeAttribute("disabled");
+},300);
+}
+},openDropDown:function(){
+var _f=!this._opened;
+var _10=this.dropDown,_11=_10.domNode,_12=this.domNode,_13=this;
+_7.set(_10.domNode,"role","listbox");
+_7.set(this.domNode,"aria-expanded","true");
+if(_10.id){
+_7.set(this.domNode,"aria-owns",_10.id);
+}
+if(_e("touch")&&(!_e("ios")||_e("ios")<8)){
+_4.global.scrollBy(0,_5.position(_12,false).y);
+}
+if(!this._preparedNode){
+this._preparedNode=true;
+if(_11.style.width){
+this._explicitDDWidth=true;
+}
+if(_11.style.height){
+this._explicitDDHeight=true;
+}
+}
+var _14={display:"",overflow:"hidden",visibility:"hidden"};
+if(!this._explicitDDWidth){
+_14.width="";
+}
+if(!this._explicitDDHeight){
+_14.height="";
+}
+_6.set(_11,_14);
+var _15=this.maxHeight;
+if(_15==-1){
+var _16=_8.getBox(),_17=_5.position(_12,false);
+_15=Math.floor(Math.max(_17.y,_16.h-(_17.y+_17.h)));
+}
+_b.moveOffScreen(_10);
+if(_10.startup&&!_10._started){
+_10.startup();
+}
+var mb=_5.position(this.dropDown.containerNode,false);
+var _18=(_15&&mb.h>_15);
+if(_18){
+mb.h=_15;
+}
+mb.w=Math.max(mb.w,_12.offsetWidth);
+_5.setMarginBox(_11,mb);
+var _19=_b.open({parent:this,popup:_10,around:_12,orient:_e("windows-theme")?["above"]:this.dropDownPosition,onExecute:function(){
+_13.closeDropDown();
+},onCancel:function(){
+_13.closeDropDown();
+},onClose:function(){
+_13._opened=false;
+}});
+this._opened=true;
+if(_f){
+var _1a=false,_1b=false,_1c=false,_1d=_10.domNode.parentNode,_1e=_5.position(_12,false),_1f=_5.position(_1d,false),_20=_1f.x-_1e.x,_21=_1f.y-_1e.y,_22=-1,_23=-1;
+this.startHandler=this.connect(_4.doc.documentElement,_9.press,function(e){
+_1b=true;
+_1c=true;
+_1a=false;
+_22=e.clientX;
+_23=e.clientY;
+});
+this.moveHandler=this.connect(_4.doc.documentElement,_9.move,function(e){
+_1b=true;
+if(e.touches){
+_1c=_1a=true;
+}else{
+if(_1c&&(e.clientX!=_22||e.clientY!=_23)){
+_1a=true;
+}
+}
+});
+this.clickHandler=this.connect(_10.domNode,"onclick",function(){
+_1b=true;
+_1c=_1a=false;
+});
+this.endHandler=this.connect(_4.doc.documentElement,_9.release,function(){
+this.defer(function(){
+_1b=true;
+if(!_1a&&_1c){
+this.closeDropDown();
+}
+_1c=false;
+});
+});
+this.repositionTimer=setInterval(_3.hitch(this,function(){
+if(_1b){
+_1b=false;
+return;
+}
+var _24=_5.position(_12,false),_25=_5.position(_1d,false),_26=_25.x-_24.x,_27=_25.y-_24.y;
+if(Math.abs(_26-_20)>=1||Math.abs(_27-_21)>=1){
+_6.set(_1d,{left:parseInt(_6.get(_1d,"left"))+_20-_26+"px",top:parseInt(_6.get(_1d,"top"))+_21-_27+"px"});
+}
+}),50);
+}
+if(_e("windows-theme")){
+this.domNode.setAttribute("disabled",true);
+}
+return _19;
+},postCreate:function(){
+this.inherited(arguments);
+this.connect(this.domNode,"onclick","_onClick");
+_7.set(this.domNode,"role","combobox");
+_7.set(this.domNode,"aria-expanded","false");
+},destroy:function(){
+if(this.repositionTimer){
+clearInterval(this.repositionTimer);
+}
+this.inherited(arguments);
+},_onClick:function(e){
+if(!this._throttleHandler){
+if(this.opened){
+this.closeDropDown();
+}else{
+this._startSearchAll();
+}
+}
+}});
+});

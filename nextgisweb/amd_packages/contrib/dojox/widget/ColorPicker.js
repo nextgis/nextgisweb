@@ -1,19 +1,268 @@
 //>>built
-require({cache:{"url:dojox/widget/ColorPicker/ColorPicker.html":'\x3ctable class\x3d"dojoxColorPicker" dojoAttachEvent\x3d"onkeypress: _handleKey" cellpadding\x3d"0" cellspacing\x3d"0" role\x3d"presentation"\x3e\n\t\x3ctr\x3e\n\t\t\x3ctd valign\x3d"top" class\x3d"dojoxColorPickerRightPad"\x3e\n\t\t\t\x3cdiv class\x3d"dojoxColorPickerBox"\x3e\n\t\t\t\t\x3c!-- Forcing ABS in style attr due to dojo DND issue with not picking it up form the class. --\x3e\n\t\t\t\t\x3cimg title\x3d"${saturationPickerTitle}" alt\x3d"${saturationPickerTitle}" class\x3d"dojoxColorPickerPoint" src\x3d"${_pickerPointer}" tabIndex\x3d"0" dojoAttachPoint\x3d"cursorNode" style\x3d"position: absolute; top: 0px; left: 0px;"\x3e\n\t\t\t\t\x3cimg role\x3d"presentation" alt\x3d"" dojoAttachPoint\x3d"colorUnderlay" dojoAttachEvent\x3d"onclick: _setPoint, onmousedown: _stopDrag" class\x3d"dojoxColorPickerUnderlay" src\x3d"${_underlay}" ondragstart\x3d"return false"\x3e\n\t\t\t\x3c/div\x3e\n\t\t\x3c/td\x3e\n\t\t\x3ctd valign\x3d"top" class\x3d"dojoxColorPickerRightPad"\x3e\n\t\t\t\x3cdiv class\x3d"dojoxHuePicker"\x3e\n\t\t\t\t\x3c!-- Forcing ABS in style attr due to dojo DND issue with not picking it up form the class. --\x3e\n\t\t\t\t\x3cimg dojoAttachPoint\x3d"hueCursorNode" tabIndex\x3d"0" class\x3d"dojoxHuePickerPoint" title\x3d"${huePickerTitle}" alt\x3d"${huePickerTitle}" src\x3d"${_huePickerPointer}" style\x3d"position: absolute; top: 0px; left: 0px;"\x3e\n\t\t\t\t\x3cdiv class\x3d"dojoxHuePickerUnderlay" dojoAttachPoint\x3d"hueNode"\x3e\n\t\t\t\t    \x3cimg role\x3d"presentation" alt\x3d"" dojoAttachEvent\x3d"onclick: _setHuePoint, onmousedown: _stopDrag" src\x3d"${_hueUnderlay}"\x3e\n\t\t\t\t\x3c/div\x3e\n\t\t\t\x3c/div\x3e\n\t\t\x3c/td\x3e\n\t\t\x3ctd valign\x3d"top"\x3e\n\t\t\t\x3ctable cellpadding\x3d"0" cellspacing\x3d"0" role\x3d"presentation"\x3e\n\t\t\t\t\x3ctr\x3e\n\t\t\t\t\t\x3ctd valign\x3d"top" class\x3d"dojoxColorPickerPreviewContainer"\x3e\n\t\t\t\t\t\t\x3ctable cellpadding\x3d"0" cellspacing\x3d"0" role\x3d"presentation"\x3e\n\t\t\t\t\t\t\t\x3ctr\x3e\n\t\t\t\t\t\t\t\t\x3ctd valign\x3d"top" class\x3d"dojoxColorPickerRightPad"\x3e\n\t\t\t\t\t\t\t\t\t\x3cdiv dojoAttachPoint\x3d"previewNode" class\x3d"dojoxColorPickerPreview"\x3e\x3c/div\x3e\n\t\t\t\t\t\t\t\t\x3c/td\x3e\n\t\t\t\t\t\t\t\t\x3ctd valign\x3d"top"\x3e\n\t\t\t\t\t\t\t\t\t\x3cdiv dojoAttachPoint\x3d"safePreviewNode" class\x3d"dojoxColorPickerWebSafePreview"\x3e\x3c/div\x3e\n\t\t\t\t\t\t\t\t\x3c/td\x3e\n\t\t\t\t\t\t\t\x3c/tr\x3e\n\t\t\t\t\t\t\x3c/table\x3e\n\t\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3c/tr\x3e\n\t\t\t\t\x3ctr\x3e\n\t\t\t\t\t\x3ctd valign\x3d"bottom"\x3e\n\t\t\t\t\t\t\x3ctable class\x3d"dojoxColorPickerOptional" cellpadding\x3d"0" cellspacing\x3d"0" role\x3d"presentation"\x3e\n\t\t\t\t\t\t\t\x3ctr\x3e\n\t\t\t\t\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\t\t\t\t\x3cdiv class\x3d"dijitInline dojoxColorPickerRgb" dojoAttachPoint\x3d"rgbNode"\x3e\n\t\t\t\t\t\t\t\t\t\t\x3ctable cellpadding\x3d"1" cellspacing\x3d"1" role\x3d"presentation"\x3e\n\t\t\t\t\t\t\t\t\t\t\x3ctr\x3e\x3ctd\x3e\x3clabel for\x3d"${_uId}_r"\x3e${redLabel}\x3c/label\x3e\x3c/td\x3e\x3ctd\x3e\x3cinput id\x3d"${_uId}_r" dojoAttachPoint\x3d"Rval" size\x3d"1" dojoAttachEvent\x3d"onchange: _colorInputChange"\x3e\x3c/td\x3e\x3c/tr\x3e\n\t\t\t\t\t\t\t\t\t\t\x3ctr\x3e\x3ctd\x3e\x3clabel for\x3d"${_uId}_g"\x3e${greenLabel}\x3c/label\x3e\x3c/td\x3e\x3ctd\x3e\x3cinput id\x3d"${_uId}_g" dojoAttachPoint\x3d"Gval" size\x3d"1" dojoAttachEvent\x3d"onchange: _colorInputChange"\x3e\x3c/td\x3e\x3c/tr\x3e\n\t\t\t\t\t\t\t\t\t\t\x3ctr\x3e\x3ctd\x3e\x3clabel for\x3d"${_uId}_b"\x3e${blueLabel}\x3c/label\x3e\x3c/td\x3e\x3ctd\x3e\x3cinput id\x3d"${_uId}_b" dojoAttachPoint\x3d"Bval" size\x3d"1" dojoAttachEvent\x3d"onchange: _colorInputChange"\x3e\x3c/td\x3e\x3c/tr\x3e\n\t\t\t\t\t\t\t\t\t\t\x3c/table\x3e\n\t\t\t\t\t\t\t\t\t\x3c/div\x3e\n\t\t\t\t\t\t\t\t\x3c/td\x3e\n\t\t\t\t\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\t\t\t\t\x3cdiv class\x3d"dijitInline dojoxColorPickerHsv" dojoAttachPoint\x3d"hsvNode"\x3e\n\t\t\t\t\t\t\t\t\t\t\x3ctable cellpadding\x3d"1" cellspacing\x3d"1" role\x3d"presentation"\x3e\n\t\t\t\t\t\t\t\t\t\t\x3ctr\x3e\x3ctd\x3e\x3clabel for\x3d"${_uId}_h"\x3e${hueLabel}\x3c/label\x3e\x3c/td\x3e\x3ctd\x3e\x3cinput id\x3d"${_uId}_h" dojoAttachPoint\x3d"Hval"size\x3d"1" dojoAttachEvent\x3d"onchange: _colorInputChange"\x3e ${degLabel}\x3c/td\x3e\x3c/tr\x3e\n\t\t\t\t\t\t\t\t\t\t\x3ctr\x3e\x3ctd\x3e\x3clabel for\x3d"${_uId}_s"\x3e${saturationLabel}\x3c/label\x3e\x3c/td\x3e\x3ctd\x3e\x3cinput id\x3d"${_uId}_s" dojoAttachPoint\x3d"Sval" size\x3d"1" dojoAttachEvent\x3d"onchange: _colorInputChange"\x3e ${percentSign}\x3c/td\x3e\x3c/tr\x3e\n\t\t\t\t\t\t\t\t\t\t\x3ctr\x3e\x3ctd\x3e\x3clabel for\x3d"${_uId}_v"\x3e${valueLabel}\x3c/label\x3e\x3c/td\x3e\x3ctd\x3e\x3cinput id\x3d"${_uId}_v" dojoAttachPoint\x3d"Vval" size\x3d"1" dojoAttachEvent\x3d"onchange: _colorInputChange"\x3e ${percentSign}\x3c/td\x3e\x3c/tr\x3e\n\t\t\t\t\t\t\t\t\t\t\x3c/table\x3e\n\t\t\t\t\t\t\t\t\t\x3c/div\x3e\n\t\t\t\t\t\t\t\t\x3c/td\x3e\n\t\t\t\t\t\t\t\x3c/tr\x3e\n\t\t\t\t\t\t\t\x3ctr\x3e\n\t\t\t\t\t\t\t\t\x3ctd colspan\x3d"2"\x3e\n\t\t\t\t\t\t\t\t\t\x3cdiv class\x3d"dojoxColorPickerHex" dojoAttachPoint\x3d"hexNode" aria-live\x3d"polite"\x3e\t\n\t\t\t\t\t\t\t\t\t\t\x3clabel for\x3d"${_uId}_hex"\x3e\x26nbsp;${hexLabel}\x26nbsp;\x3c/label\x3e\x3cinput id\x3d"${_uId}_hex" dojoAttachPoint\x3d"hexCode, focusNode, valueNode" size\x3d"6" class\x3d"dojoxColorPickerHexCode" dojoAttachEvent\x3d"onchange: _colorInputChange"\x3e\n\t\t\t\t\t\t\t\t\t\x3c/div\x3e\n\t\t\t\t\t\t\t\t\x3c/td\x3e\n\t\t\t\t\t\t\t\x3c/tr\x3e\n\t\t\t\t\t\t\x3c/table\x3e\n\t\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3c/tr\x3e\n\t\t\t\x3c/table\x3e\n\t\t\x3c/td\x3e\n\t\x3c/tr\x3e\n\x3c/table\x3e\n\n'}});
-define("dojox/widget/ColorPicker","dojo/_base/kernel dojo/_base/declare dojo/_base/lang dojo/_base/array dojo/_base/html dojo/_base/connect dojo/_base/sniff dojo/_base/window dojo/_base/event dojo/dom dojo/dom-class dojo/keys dojo/fx dojo/dnd/move dijit/registry dijit/_base/focus dijit/form/_FormWidget dijit/typematic dojox/color dojo/i18n dojo/i18n!./nls/ColorPicker dojo/i18n!dojo/cldr/nls/number dojo/text!./ColorPicker/ColorPicker.html".split(" "),function(t,u,e,v,f,n,w,x,y,p,z,g,m,q,A,l,B,h,k,
-r,D,E,C){t.experimental("dojox.widget.ColorPicker");return u("dojox.widget.ColorPicker",B,{showRgb:!0,showHsv:!0,showHex:!0,webSafe:!0,animatePoint:!0,slideDuration:250,liveUpdate:!1,PICKER_HUE_H:150,PICKER_SAT_VAL_H:150,PICKER_SAT_VAL_W:150,PICKER_HUE_SELECTOR_H:8,PICKER_SAT_SELECTOR_H:10,PICKER_SAT_SELECTOR_W:10,value:"#ffffff",_underlay:require.toUrl("dojox/widget/ColorPicker/images/underlay.png"),_hueUnderlay:require.toUrl("dojox/widget/ColorPicker/images/hue.png"),_pickerPointer:require.toUrl("dojox/widget/ColorPicker/images/pickerPointer.png"),
-_huePickerPointer:require.toUrl("dojox/widget/ColorPicker/images/hueHandle.png"),_huePickerPointerAlly:require.toUrl("dojox/widget/ColorPicker/images/hueHandleA11y.png"),templateString:C,postMixInProperties:function(){z.contains(x.body(),"dijit_a11y")&&(this._huePickerPointer=this._huePickerPointerAlly);this._uId=A.getUniqueId(this.id);e.mixin(this,r.getLocalization("dojox.widget","ColorPicker"));e.mixin(this,r.getLocalization("dojo.cldr","number"));this.inherited(arguments)},postCreate:function(){this.inherited(arguments);
-7>w("ie")&&(this.colorUnderlay.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(src\x3d'"+this._underlay+"', sizingMethod\x3d'scale')",this.colorUnderlay.src=this._blankGif.toString());this.showRgb||(this.rgbNode.style.visibility="hidden");this.showHsv||(this.hsvNode.style.visibility="hidden");this.showHex||(this.hexNode.style.visibility="hidden");this.webSafe||(this.safePreviewNode.style.visibility="hidden")},startup:function(){this._started||(this._started=!0,this.set("value",this.value),
-this._mover=new q.boxConstrainedMoveable(this.cursorNode,{box:{t:-(this.PICKER_SAT_SELECTOR_H/2),l:-(this.PICKER_SAT_SELECTOR_W/2),w:this.PICKER_SAT_VAL_W,h:this.PICKER_SAT_VAL_H}}),this._hueMover=new q.boxConstrainedMoveable(this.hueCursorNode,{box:{t:-(this.PICKER_HUE_SELECTOR_H/2),l:0,w:0,h:this.PICKER_HUE_H}}),this._subs=[],this._subs.push(n.subscribe("/dnd/move/stop",e.hitch(this,"_clearTimer"))),this._subs.push(n.subscribe("/dnd/move/start",e.hitch(this,"_setTimer"))),this._keyListeners=[],
-this._connects.push(h.addKeyListener(this.hueCursorNode,{charOrCode:g.UP_ARROW,shiftKey:!1,metaKey:!1,ctrlKey:!1,altKey:!1},this,e.hitch(this,this._updateHueCursorNode),25,25)),this._connects.push(h.addKeyListener(this.hueCursorNode,{charOrCode:g.DOWN_ARROW,shiftKey:!1,metaKey:!1,ctrlKey:!1,altKey:!1},this,e.hitch(this,this._updateHueCursorNode),25,25)),this._connects.push(h.addKeyListener(this.cursorNode,{charOrCode:g.UP_ARROW,shiftKey:!1,metaKey:!1,ctrlKey:!1,altKey:!1},this,e.hitch(this,this._updateCursorNode),
-25,25)),this._connects.push(h.addKeyListener(this.cursorNode,{charOrCode:g.DOWN_ARROW,shiftKey:!1,metaKey:!1,ctrlKey:!1,altKey:!1},this,e.hitch(this,this._updateCursorNode),25,25)),this._connects.push(h.addKeyListener(this.cursorNode,{charOrCode:g.LEFT_ARROW,shiftKey:!1,metaKey:!1,ctrlKey:!1,altKey:!1},this,e.hitch(this,this._updateCursorNode),25,25)),this._connects.push(h.addKeyListener(this.cursorNode,{charOrCode:g.RIGHT_ARROW,shiftKey:!1,metaKey:!1,ctrlKey:!1,altKey:!1},this,e.hitch(this,this._updateCursorNode),
-25,25)))},_setValueAttr:function(a,b){this._started&&this.setColor(a,b)},setColor:function(a,b){a=k.fromString(a);this._updatePickerLocations(a);this._updateColorInputs(a);this._updateValue(a,b)},_setTimer:function(a){if(a.node==this.cursorNode||a.node==this.hueCursorNode)l.focus(a.node),p.setSelectable(this.domNode,!1),this._timer=setInterval(e.hitch(this,"_updateColor"),45)},_clearTimer:function(a){this._timer&&(clearInterval(this._timer),this._timer=null,this.onChange(this.value),p.setSelectable(this.domNode,
-!0))},_setHue:function(a){f.style(this.colorUnderlay,"backgroundColor",k.fromHsv(a,100,100).toHex())},_updateHueCursorNode:function(a,b,c){if(-1!==a){a=f.style(this.hueCursorNode,"top");b=this.PICKER_HUE_SELECTOR_H/2;a+=b;var d=!1;c.charOrCode==g.UP_ARROW?0<a&&(--a,d=!0):c.charOrCode==g.DOWN_ARROW&&a<this.PICKER_HUE_H&&(a+=1,d=!0);d&&f.style(this.hueCursorNode,"top",a-b+"px")}else this._updateColor(!0)},_updateCursorNode:function(a,b,c){b=this.PICKER_SAT_SELECTOR_H/2;var d=this.PICKER_SAT_SELECTOR_W/
-2;if(-1!==a){a=f.style(this.cursorNode,"top");var e=f.style(this.cursorNode,"left");a+=b;var e=e+d,h=!1;c.charOrCode==g.UP_ARROW?0<a&&(--a,h=!0):c.charOrCode==g.DOWN_ARROW?a<this.PICKER_SAT_VAL_H&&(a+=1,h=!0):c.charOrCode==g.LEFT_ARROW?0<e&&(--e,h=!0):c.charOrCode==g.RIGHT_ARROW&&e<this.PICKER_SAT_VAL_W&&(e+=1,h=!0);h&&(e-=d,f.style(this.cursorNode,"top",a-b+"px"),f.style(this.cursorNode,"left",e+"px"))}else this._updateColor(!0)},_updateColor:function(a){var b=this.PICKER_HUE_SELECTOR_H/2,c=this.PICKER_SAT_SELECTOR_H/
-2,d=this.PICKER_SAT_SELECTOR_W/2,b=f.style(this.hueCursorNode,"top")+b,c=f.style(this.cursorNode,"top")+c,d=f.style(this.cursorNode,"left")+d,b=Math.round(360-b/this.PICKER_HUE_H*360),d=k.fromHsv(b,d/this.PICKER_SAT_VAL_W*100,100-c/this.PICKER_SAT_VAL_H*100);this._updateColorInputs(d);this._updateValue(d,a);b!=this._hue&&this._setHue(b)},_colorInputChange:function(a){var b,c=!1;switch(a.target){case this.hexCode:b=k.fromString(a.target.value);c=!0;break;case this.Rval:case this.Gval:case this.Bval:b=
-k.fromArray([this.Rval.value,this.Gval.value,this.Bval.value]);c=!0;break;case this.Hval:case this.Sval:case this.Vval:b=k.fromHsv(this.Hval.value,this.Sval.value,this.Vval.value),c=!0}c&&(this._updatePickerLocations(b),this._updateColorInputs(b),this._updateValue(b,!0))},_updateValue:function(a,b){var c=a.toHex();this.value=this.valueNode.value=c;if(b&&(!this._timer||this.liveUpdate))this.onChange(c)},_updatePickerLocations:function(a){var b=this.PICKER_HUE_SELECTOR_H/2,c=this.PICKER_SAT_SELECTOR_H/
-2,d=this.PICKER_SAT_SELECTOR_W/2;a=a.toHsv();b=Math.round(this.PICKER_HUE_H-a.h/360*this.PICKER_HUE_H)-b;d=Math.round(a.s/100*this.PICKER_SAT_VAL_W)-d;c=Math.round(this.PICKER_SAT_VAL_H-a.v/100*this.PICKER_SAT_VAL_H)-c;this.animatePoint?(m.slideTo({node:this.hueCursorNode,duration:this.slideDuration,top:b,left:0}).play(),m.slideTo({node:this.cursorNode,duration:this.slideDuration,top:c,left:d}).play()):(f.style(this.hueCursorNode,"top",b+"px"),f.style(this.cursorNode,{left:d+"px",top:c+"px"}));a.h!=
-this._hue&&this._setHue(a.h)},_updateColorInputs:function(a){var b=a.toHex();this.showRgb&&(this.Rval.value=a.r,this.Gval.value=a.g,this.Bval.value=a.b);this.showHsv&&(a=a.toHsv(),this.Hval.value=Math.round(a.h),this.Sval.value=Math.round(a.s),this.Vval.value=Math.round(a.v));this.showHex&&(this.hexCode.value=b);this.previewNode.style.backgroundColor=b;this.webSafe&&(this.safePreviewNode.style.backgroundColor=b)},_setHuePoint:function(a){var b=this.PICKER_HUE_SELECTOR_H/2;a=a.layerY||a.y-a.target.getBoundingClientRect().top;
-a-=b;this.animatePoint?m.slideTo({node:this.hueCursorNode,duration:this.slideDuration,top:a,left:0,onEnd:e.hitch(this,function(){this._updateColor(!0);l.focus(this.hueCursorNode)})}).play():(f.style(this.hueCursorNode,"top",a+"px"),this._updateColor(!0))},_setPoint:function(a){var b=this.PICKER_SAT_SELECTOR_H/2,c=this.PICKER_SAT_SELECTOR_W/2,d=a.layerY||a.y-a.target.getBoundingClientRect().top,d=d-b,b=a.layerX||a.x-a.target.getBoundingClientRect().left,b=b-c;a&&l.focus(a.target);this.animatePoint?
-m.slideTo({node:this.cursorNode,duration:this.slideDuration,top:d,left:b,onEnd:e.hitch(this,function(){this._updateColor(!0);l.focus(this.cursorNode)})}).play():(f.style(this.cursorNode,{left:b+"px",top:d+"px"}),this._updateColor(!0))},_handleKey:function(a){},focus:function(){this.focused||l.focus(this.focusNode)},_stopDrag:function(a){y.stop(a)},destroy:function(){this.inherited(arguments);v.forEach(this._subs,function(a){n.unsubscribe(a)});delete this._subs}})});
-//# sourceMappingURL=ColorPicker.js.map
+require({cache:{"url:dojox/widget/ColorPicker/ColorPicker.html":"<table class=\"dojoxColorPicker\" dojoAttachEvent=\"onkeypress: _handleKey\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\">\n\t<tr>\n\t\t<td valign=\"top\" class=\"dojoxColorPickerRightPad\">\n\t\t\t<div class=\"dojoxColorPickerBox\">\n\t\t\t\t<!-- Forcing ABS in style attr due to dojo DND issue with not picking it up form the class. -->\n\t\t\t\t<img title=\"${saturationPickerTitle}\" alt=\"${saturationPickerTitle}\" class=\"dojoxColorPickerPoint\" src=\"${_pickerPointer}\" tabIndex=\"0\" dojoAttachPoint=\"cursorNode\" style=\"position: absolute; top: 0px; left: 0px;\">\n\t\t\t\t<img role=\"presentation\" alt=\"\" dojoAttachPoint=\"colorUnderlay\" dojoAttachEvent=\"onclick: _setPoint, onmousedown: _stopDrag\" class=\"dojoxColorPickerUnderlay\" src=\"${_underlay}\" ondragstart=\"return false\">\n\t\t\t</div>\n\t\t</td>\n\t\t<td valign=\"top\" class=\"dojoxColorPickerRightPad\">\n\t\t\t<div class=\"dojoxHuePicker\">\n\t\t\t\t<!-- Forcing ABS in style attr due to dojo DND issue with not picking it up form the class. -->\n\t\t\t\t<img dojoAttachPoint=\"hueCursorNode\" tabIndex=\"0\" class=\"dojoxHuePickerPoint\" title=\"${huePickerTitle}\" alt=\"${huePickerTitle}\" src=\"${_huePickerPointer}\" style=\"position: absolute; top: 0px; left: 0px;\">\n\t\t\t\t<div class=\"dojoxHuePickerUnderlay\" dojoAttachPoint=\"hueNode\">\n\t\t\t\t    <img role=\"presentation\" alt=\"\" dojoAttachEvent=\"onclick: _setHuePoint, onmousedown: _stopDrag\" src=\"${_hueUnderlay}\">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</td>\n\t\t<td valign=\"top\">\n\t\t\t<table cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td valign=\"top\" class=\"dojoxColorPickerPreviewContainer\">\n\t\t\t\t\t\t<table cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\">\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<td valign=\"top\" class=\"dojoxColorPickerRightPad\">\n\t\t\t\t\t\t\t\t\t<div dojoAttachPoint=\"previewNode\" class=\"dojoxColorPickerPreview\"></div>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t<td valign=\"top\">\n\t\t\t\t\t\t\t\t\t<div dojoAttachPoint=\"safePreviewNode\" class=\"dojoxColorPickerWebSafePreview\"></div>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</table>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td valign=\"bottom\">\n\t\t\t\t\t\t<table class=\"dojoxColorPickerOptional\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\">\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t\t<div class=\"dijitInline dojoxColorPickerRgb\" dojoAttachPoint=\"rgbNode\">\n\t\t\t\t\t\t\t\t\t\t<table cellpadding=\"1\" cellspacing=\"1\" role=\"presentation\">\n\t\t\t\t\t\t\t\t\t\t<tr><td><label for=\"${_uId}_r\">${redLabel}</label></td><td><input id=\"${_uId}_r\" dojoAttachPoint=\"Rval\" size=\"1\" dojoAttachEvent=\"onchange: _colorInputChange\"></td></tr>\n\t\t\t\t\t\t\t\t\t\t<tr><td><label for=\"${_uId}_g\">${greenLabel}</label></td><td><input id=\"${_uId}_g\" dojoAttachPoint=\"Gval\" size=\"1\" dojoAttachEvent=\"onchange: _colorInputChange\"></td></tr>\n\t\t\t\t\t\t\t\t\t\t<tr><td><label for=\"${_uId}_b\">${blueLabel}</label></td><td><input id=\"${_uId}_b\" dojoAttachPoint=\"Bval\" size=\"1\" dojoAttachEvent=\"onchange: _colorInputChange\"></td></tr>\n\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t\t<div class=\"dijitInline dojoxColorPickerHsv\" dojoAttachPoint=\"hsvNode\">\n\t\t\t\t\t\t\t\t\t\t<table cellpadding=\"1\" cellspacing=\"1\" role=\"presentation\">\n\t\t\t\t\t\t\t\t\t\t<tr><td><label for=\"${_uId}_h\">${hueLabel}</label></td><td><input id=\"${_uId}_h\" dojoAttachPoint=\"Hval\"size=\"1\" dojoAttachEvent=\"onchange: _colorInputChange\"> ${degLabel}</td></tr>\n\t\t\t\t\t\t\t\t\t\t<tr><td><label for=\"${_uId}_s\">${saturationLabel}</label></td><td><input id=\"${_uId}_s\" dojoAttachPoint=\"Sval\" size=\"1\" dojoAttachEvent=\"onchange: _colorInputChange\"> ${percentSign}</td></tr>\n\t\t\t\t\t\t\t\t\t\t<tr><td><label for=\"${_uId}_v\">${valueLabel}</label></td><td><input id=\"${_uId}_v\" dojoAttachPoint=\"Vval\" size=\"1\" dojoAttachEvent=\"onchange: _colorInputChange\"> ${percentSign}</td></tr>\n\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<td colspan=\"2\">\n\t\t\t\t\t\t\t\t\t<div class=\"dojoxColorPickerHex\" dojoAttachPoint=\"hexNode\" aria-live=\"polite\">\t\n\t\t\t\t\t\t\t\t\t\t<label for=\"${_uId}_hex\">&nbsp;${hexLabel}&nbsp;</label><input id=\"${_uId}_hex\" dojoAttachPoint=\"hexCode, focusNode, valueNode\" size=\"6\" class=\"dojoxColorPickerHexCode\" dojoAttachEvent=\"onchange: _colorInputChange\">\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</table>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</table>\n\t\t</td>\n\t</tr>\n</table>\n\n"}});
+define("dojox/widget/ColorPicker",["dojo/_base/kernel","dojo/_base/declare","dojo/_base/lang","dojo/_base/array","dojo/_base/html","dojo/_base/connect","dojo/_base/sniff","dojo/_base/window","dojo/_base/event","dojo/dom","dojo/dom-class","dojo/keys","dojo/fx","dojo/dnd/move","dijit/registry","dijit/_base/focus","dijit/form/_FormWidget","dijit/typematic","dojox/color","dojo/i18n","dojo/i18n!./nls/ColorPicker","dojo/i18n!dojo/cldr/nls/number","dojo/text!./ColorPicker/ColorPicker.html"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,fx,_d,_e,_f,_10,_11,_12,_13,_14,_15,_16){
+_1.experimental("dojox.widget.ColorPicker");
+var _17=function(hex){
+return hex;
+};
+return _2("dojox.widget.ColorPicker",_10,{showRgb:true,showHsv:true,showHex:true,webSafe:true,animatePoint:true,slideDuration:250,liveUpdate:false,PICKER_HUE_H:150,PICKER_SAT_VAL_H:150,PICKER_SAT_VAL_W:150,PICKER_HUE_SELECTOR_H:8,PICKER_SAT_SELECTOR_H:10,PICKER_SAT_SELECTOR_W:10,value:"#ffffff",_underlay:require.toUrl("dojox/widget/ColorPicker/images/underlay.png"),_hueUnderlay:require.toUrl("dojox/widget/ColorPicker/images/hue.png"),_pickerPointer:require.toUrl("dojox/widget/ColorPicker/images/pickerPointer.png"),_huePickerPointer:require.toUrl("dojox/widget/ColorPicker/images/hueHandle.png"),_huePickerPointerAlly:require.toUrl("dojox/widget/ColorPicker/images/hueHandleA11y.png"),templateString:_16,postMixInProperties:function(){
+if(_b.contains(_8.body(),"dijit_a11y")){
+this._huePickerPointer=this._huePickerPointerAlly;
+}
+this._uId=_e.getUniqueId(this.id);
+_3.mixin(this,_13.getLocalization("dojox.widget","ColorPicker"));
+_3.mixin(this,_13.getLocalization("dojo.cldr","number"));
+this.inherited(arguments);
+},postCreate:function(){
+this.inherited(arguments);
+if(_7("ie")<7){
+this.colorUnderlay.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+this._underlay+"', sizingMethod='scale')";
+this.colorUnderlay.src=this._blankGif.toString();
+}
+if(!this.showRgb){
+this.rgbNode.style.visibility="hidden";
+}
+if(!this.showHsv){
+this.hsvNode.style.visibility="hidden";
+}
+if(!this.showHex){
+this.hexNode.style.visibility="hidden";
+}
+if(!this.webSafe){
+this.safePreviewNode.style.visibility="hidden";
+}
+},startup:function(){
+if(this._started){
+return;
+}
+this._started=true;
+this.set("value",this.value);
+this._mover=new _d.boxConstrainedMoveable(this.cursorNode,{box:{t:-(this.PICKER_SAT_SELECTOR_H/2),l:-(this.PICKER_SAT_SELECTOR_W/2),w:this.PICKER_SAT_VAL_W,h:this.PICKER_SAT_VAL_H}});
+this._hueMover=new _d.boxConstrainedMoveable(this.hueCursorNode,{box:{t:-(this.PICKER_HUE_SELECTOR_H/2),l:0,w:0,h:this.PICKER_HUE_H}});
+this._subs=[];
+this._subs.push(_6.subscribe("/dnd/move/stop",_3.hitch(this,"_clearTimer")));
+this._subs.push(_6.subscribe("/dnd/move/start",_3.hitch(this,"_setTimer")));
+this._keyListeners=[];
+this._connects.push(_11.addKeyListener(this.hueCursorNode,{charOrCode:_c.UP_ARROW,shiftKey:false,metaKey:false,ctrlKey:false,altKey:false},this,_3.hitch(this,this._updateHueCursorNode),25,25));
+this._connects.push(_11.addKeyListener(this.hueCursorNode,{charOrCode:_c.DOWN_ARROW,shiftKey:false,metaKey:false,ctrlKey:false,altKey:false},this,_3.hitch(this,this._updateHueCursorNode),25,25));
+this._connects.push(_11.addKeyListener(this.cursorNode,{charOrCode:_c.UP_ARROW,shiftKey:false,metaKey:false,ctrlKey:false,altKey:false},this,_3.hitch(this,this._updateCursorNode),25,25));
+this._connects.push(_11.addKeyListener(this.cursorNode,{charOrCode:_c.DOWN_ARROW,shiftKey:false,metaKey:false,ctrlKey:false,altKey:false},this,_3.hitch(this,this._updateCursorNode),25,25));
+this._connects.push(_11.addKeyListener(this.cursorNode,{charOrCode:_c.LEFT_ARROW,shiftKey:false,metaKey:false,ctrlKey:false,altKey:false},this,_3.hitch(this,this._updateCursorNode),25,25));
+this._connects.push(_11.addKeyListener(this.cursorNode,{charOrCode:_c.RIGHT_ARROW,shiftKey:false,metaKey:false,ctrlKey:false,altKey:false},this,_3.hitch(this,this._updateCursorNode),25,25));
+},_setValueAttr:function(_18,_19){
+if(!this._started){
+return;
+}
+this.setColor(_18,_19);
+},setColor:function(col,_1a){
+col=_12.fromString(col);
+this._updatePickerLocations(col);
+this._updateColorInputs(col);
+this._updateValue(col,_1a);
+},_setTimer:function(_1b){
+if(_1b.node!=this.cursorNode&&_1b.node!=this.hueCursorNode){
+return;
+}
+_f.focus(_1b.node);
+_a.setSelectable(this.domNode,false);
+this._timer=setInterval(_3.hitch(this,"_updateColor"),45);
+},_clearTimer:function(_1c){
+if(!this._timer){
+return;
+}
+clearInterval(this._timer);
+this._timer=null;
+this.onChange(this.value);
+_a.setSelectable(this.domNode,true);
+},_setHue:function(h){
+_5.style(this.colorUnderlay,"backgroundColor",_12.fromHsv(h,100,100).toHex());
+},_updateHueCursorNode:function(_1d,_1e,e){
+if(_1d!==-1){
+var y=_5.style(this.hueCursorNode,"top");
+var _1f=this.PICKER_HUE_SELECTOR_H/2;
+y+=_1f;
+var _20=false;
+if(e.charOrCode==_c.UP_ARROW){
+if(y>0){
+y-=1;
+_20=true;
+}
+}else{
+if(e.charOrCode==_c.DOWN_ARROW){
+if(y<this.PICKER_HUE_H){
+y+=1;
+_20=true;
+}
+}
+}
+y-=_1f;
+if(_20){
+_5.style(this.hueCursorNode,"top",y+"px");
+}
+}else{
+this._updateColor(true);
+}
+},_updateCursorNode:function(_21,_22,e){
+var _23=this.PICKER_SAT_SELECTOR_H/2;
+var _24=this.PICKER_SAT_SELECTOR_W/2;
+if(_21!==-1){
+var y=_5.style(this.cursorNode,"top");
+var x=_5.style(this.cursorNode,"left");
+y+=_23;
+x+=_24;
+var _25=false;
+if(e.charOrCode==_c.UP_ARROW){
+if(y>0){
+y-=1;
+_25=true;
+}
+}else{
+if(e.charOrCode==_c.DOWN_ARROW){
+if(y<this.PICKER_SAT_VAL_H){
+y+=1;
+_25=true;
+}
+}else{
+if(e.charOrCode==_c.LEFT_ARROW){
+if(x>0){
+x-=1;
+_25=true;
+}
+}else{
+if(e.charOrCode==_c.RIGHT_ARROW){
+if(x<this.PICKER_SAT_VAL_W){
+x+=1;
+_25=true;
+}
+}
+}
+}
+}
+if(_25){
+y-=_23;
+x-=_24;
+_5.style(this.cursorNode,"top",y+"px");
+_5.style(this.cursorNode,"left",x+"px");
+}
+}else{
+this._updateColor(true);
+}
+},_updateColor:function(_26){
+var _27=this.PICKER_HUE_SELECTOR_H/2,_28=this.PICKER_SAT_SELECTOR_H/2,_29=this.PICKER_SAT_SELECTOR_W/2;
+var _2a=_5.style(this.hueCursorNode,"top")+_27,_2b=_5.style(this.cursorNode,"top")+_28,_2c=_5.style(this.cursorNode,"left")+_29,h=Math.round(360-(_2a/this.PICKER_HUE_H*360)),col=_12.fromHsv(h,_2c/this.PICKER_SAT_VAL_W*100,100-(_2b/this.PICKER_SAT_VAL_H*100));
+this._updateColorInputs(col);
+this._updateValue(col,_26);
+if(h!=this._hue){
+this._setHue(h);
+}
+},_colorInputChange:function(e){
+var col,_2d=false;
+switch(e.target){
+case this.hexCode:
+col=_12.fromString(e.target.value);
+_2d=true;
+break;
+case this.Rval:
+case this.Gval:
+case this.Bval:
+col=_12.fromArray([this.Rval.value,this.Gval.value,this.Bval.value]);
+_2d=true;
+break;
+case this.Hval:
+case this.Sval:
+case this.Vval:
+col=_12.fromHsv(this.Hval.value,this.Sval.value,this.Vval.value);
+_2d=true;
+break;
+}
+if(_2d){
+this._updatePickerLocations(col);
+this._updateColorInputs(col);
+this._updateValue(col,true);
+}
+},_updateValue:function(col,_2e){
+var hex=col.toHex();
+this.value=this.valueNode.value=hex;
+if(_2e&&(!this._timer||this.liveUpdate)){
+this.onChange(hex);
+}
+},_updatePickerLocations:function(col){
+var _2f=this.PICKER_HUE_SELECTOR_H/2,_30=this.PICKER_SAT_SELECTOR_H/2,_31=this.PICKER_SAT_SELECTOR_W/2;
+var hsv=col.toHsv(),_32=Math.round(this.PICKER_HUE_H-hsv.h/360*this.PICKER_HUE_H)-_2f,_33=Math.round(hsv.s/100*this.PICKER_SAT_VAL_W)-_31,_34=Math.round(this.PICKER_SAT_VAL_H-hsv.v/100*this.PICKER_SAT_VAL_H)-_30;
+if(this.animatePoint){
+fx.slideTo({node:this.hueCursorNode,duration:this.slideDuration,top:_32,left:0}).play();
+fx.slideTo({node:this.cursorNode,duration:this.slideDuration,top:_34,left:_33}).play();
+}else{
+_5.style(this.hueCursorNode,"top",_32+"px");
+_5.style(this.cursorNode,{left:_33+"px",top:_34+"px"});
+}
+if(hsv.h!=this._hue){
+this._setHue(hsv.h);
+}
+},_updateColorInputs:function(col){
+var hex=col.toHex();
+if(this.showRgb){
+this.Rval.value=col.r;
+this.Gval.value=col.g;
+this.Bval.value=col.b;
+}
+if(this.showHsv){
+var hsv=col.toHsv();
+this.Hval.value=Math.round((hsv.h));
+this.Sval.value=Math.round(hsv.s);
+this.Vval.value=Math.round(hsv.v);
+}
+if(this.showHex){
+this.hexCode.value=hex;
+}
+this.previewNode.style.backgroundColor=hex;
+if(this.webSafe){
+this.safePreviewNode.style.backgroundColor=_17(hex);
+}
+},_setHuePoint:function(evt){
+var _35=this.PICKER_HUE_SELECTOR_H/2;
+var _36=evt.layerY||(evt.y-evt.target.getBoundingClientRect().top);
+_36-=_35;
+if(this.animatePoint){
+fx.slideTo({node:this.hueCursorNode,duration:this.slideDuration,top:_36,left:0,onEnd:_3.hitch(this,function(){
+this._updateColor(true);
+_f.focus(this.hueCursorNode);
+})}).play();
+}else{
+_5.style(this.hueCursorNode,"top",_36+"px");
+this._updateColor(true);
+}
+},_setPoint:function(evt){
+var _37=this.PICKER_SAT_SELECTOR_H/2;
+var _38=this.PICKER_SAT_SELECTOR_W/2;
+var _39=evt.layerY||(evt.y-evt.target.getBoundingClientRect().top);
+_39-=_37;
+var _3a=evt.layerX||(evt.x-evt.target.getBoundingClientRect().left);
+_3a-=_38;
+if(evt){
+_f.focus(evt.target);
+}
+if(this.animatePoint){
+fx.slideTo({node:this.cursorNode,duration:this.slideDuration,top:_39,left:_3a,onEnd:_3.hitch(this,function(){
+this._updateColor(true);
+_f.focus(this.cursorNode);
+})}).play();
+}else{
+_5.style(this.cursorNode,{left:_3a+"px",top:_39+"px"});
+this._updateColor(true);
+}
+},_handleKey:function(e){
+},focus:function(){
+if(!this.focused){
+_f.focus(this.focusNode);
+}
+},_stopDrag:function(e){
+_9.stop(e);
+},destroy:function(){
+this.inherited(arguments);
+_4.forEach(this._subs,function(sub){
+_6.unsubscribe(sub);
+});
+delete this._subs;
+}});
+});

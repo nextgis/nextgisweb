@@ -5,5 +5,11 @@
 */
 
 //>>built
-define("dojo/_base/sniff",["./kernel","./lang","../sniff"],function(b,c,a){b._name="browser";c.mixin(b,{isBrowser:!0,isFF:a("ff"),isIE:a("ie"),isKhtml:a("khtml"),isWebKit:a("webkit"),isMozilla:a("mozilla"),isMoz:a("mozilla"),isOpera:a("opera"),isSafari:a("safari"),isChrome:a("chrome"),isMac:a("mac"),isIos:a("ios"),isAndroid:a("android"),isWii:a("wii"),isQuirks:a("quirks"),isAir:a("air")});return a});
-//# sourceMappingURL=sniff.js.map
+define("dojo/_base/sniff",["./kernel","./lang","../sniff"],function(_1,_2,_3){
+if(!1){
+return _3;
+}
+_1._name="browser";
+_2.mixin(_1,{isBrowser:true,isFF:_3("ff"),isIE:_3("ie"),isKhtml:_3("khtml"),isWebKit:_3("webkit"),isMozilla:_3("mozilla"),isMoz:_3("mozilla"),isOpera:_3("opera"),isSafari:_3("safari"),isChrome:_3("chrome"),isMac:_3("mac"),isIos:_3("ios"),isAndroid:_3("android"),isWii:_3("wii"),isQuirks:_3("quirks"),isAir:_3("air")});
+return _3;
+});

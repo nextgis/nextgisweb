@@ -1,3 +1,2 @@
 //>>built
-define("dojox/grid/nls/DataGrid_ja-jp",{"dijit/nls/loading":{loadingState:"\u30ed\u30fc\u30c9\u4e2d...",errorState:"\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002",_localized:{}}});
-//# sourceMappingURL=DataGrid_ja-jp.js.map
+define("dojox/grid/nls/DataGrid_ja-jp",{"dijit/nls/loading":{"loadingState":"ロード中...","errorState":"エラーが発生しました。","_localized":{}}});

@@ -1,8 +1,151 @@
 //>>built
-define("dojox/io/windowName","dojo/_base/kernel dojo/_base/window dojo/_base/xhr dojo/_base/sniff dojo/_base/url dojo/domReady!".split(" "),function(c){c.getObject("io.windowName",!0,dojox);dojox.io.windowName={send:function(p,a){a.url+=(a.url.match(/\?/)?"\x26":"?")+"windowname\x3d"+(a.authElement?"auth":!0);var k=a.authElement,n=function(a){try{var h=g.ioArgs.frame.contentWindow.document;h.write(" ");h.close()}catch(t){}(k||c.body()).removeChild(g.ioArgs.outerFrame);return a},g=c._ioSetArgs(a,n,
-n,n);a.timeout&&setTimeout(function(){-1==g.fired&&g.callback(Error("Timeout"))},a.timeout);dojox.io.windowName._send(g,p,k,a.onAuthLoad);return g},_send:function(p,a,k,n){function g(a){a.style.width="100%";a.style.height="100%";a.style.border="0px"}var l=p.ioArgs,h=dojox.io.windowName._frameNum++,t=(c.config.dojoBlankHtmlUrl||c.config.dojoCallbackUrl||c.moduleUrl("dojo","resources/blank.html"))+"#"+h,q=new c._Url(window.location,t),e=c.doc,f=k||c.body();if(c.isMoz&&![].reduce){var d=e.createElement("iframe");
-g(d);k||(d.style.display="none");f.appendChild(d);f=d.contentWindow;e=f.document;e.write("\x3chtml\x3e\x3cbody margin\x3d'0px'\x3e\x3ciframe style\x3d'width:100%;height:100%;border:0px' name\x3d'protectedFrame'\x3e\x3c/iframe\x3e\x3c/body\x3e\x3c/html\x3e");e.close();e=f[0];f.__defineGetter__(0,function(){});f.__defineGetter__("protectedFrame",function(){});e=e.document;e.write("\x3chtml\x3e\x3cbody margin\x3d'0px'\x3e\x3c/body\x3e\x3c/html\x3e");e.close();f=e.body}var b;if(c.isIE){var m=e.createElement("div");
-m.innerHTML='\x3ciframe name\x3d"'+q+'" onload\x3d"dojox.io.windowName['+h+']()"\x3e';b=m.firstChild}else b=e.createElement("iframe");l.frame=b;g(b);l.outerFrame=d=d||b;k||(d.style.display="none");var r=0;dojox.io.windowName[h]=b.onload=function(){try{if(!c.isMoz&&"about:blank"==b.contentWindow.location)return}catch(v){}r||(r=1,k?n&&n():b.contentWindow.location=t);try{if(2>r){var a=b.contentWindow.name;"string"==typeof a&&a!=q&&(r=2,p.ioArgs.hash=b.contentWindow.location.hash,p.callback(a))}}catch(v){}};
-b.name=q;if(a.match(/GET/i))c._ioAddQueryToUrl(l),b.src=l.url,f.appendChild(b),b.contentWindow&&b.contentWindow.location.replace(l.url);else if(a.match(/POST/i)){f.appendChild(b);a=c.doc.createElement("form");c.body().appendChild(a);var h=c.queryToObject(l.query),u;for(u in h)for(d=h[u],d=d instanceof Array?d:[d],f=0;f<d.length;f++)m=e.createElement("input"),m.type="hidden",m.name=u,m.value=d[f],a.appendChild(m);a.method="POST";a.action=l.url;a.target=q;a.submit();a.parentNode.removeChild(a)}else throw Error("Method "+
-a+" not supported with the windowName transport");b.contentWindow&&(b.contentWindow.name=q)},_frameNum:0};return dojox.io.windowName});
-//# sourceMappingURL=windowName.js.map
+define("dojox/io/windowName",["dojo/_base/kernel","dojo/_base/window","dojo/_base/xhr","dojo/_base/sniff","dojo/_base/url","dojo/domReady!"],function(_1){
+_1.getObject("io.windowName",true,dojox);
+dojox.io.windowName={send:function(_2,_3){
+_3.url+=(_3.url.match(/\?/)?"&":"?")+"windowname="+(_3.authElement?"auth":true);
+var _4=_3.authElement;
+var _5=function(_6){
+try{
+var _7=_8.ioArgs.frame.contentWindow.document;
+_7.write(" ");
+_7.close();
+}
+catch(e){
+}
+(_4||_1.body()).removeChild(_8.ioArgs.outerFrame);
+return _6;
+};
+var _8=_1._ioSetArgs(_3,_5,_5,_5);
+if(_3.timeout){
+setTimeout(function(){
+if(_8.fired==-1){
+_8.callback(new Error("Timeout"));
+}
+},_3.timeout);
+}
+dojox.io.windowName._send(_8,_2,_4,_3.onAuthLoad);
+return _8;
+},_send:function(_9,_a,_b,_c){
+var _d=_9.ioArgs;
+var _e=dojox.io.windowName._frameNum++;
+var _f=(_1.config.dojoBlankHtmlUrl||_1.config.dojoCallbackUrl||_1.moduleUrl("dojo","resources/blank.html"))+"#"+_e;
+var _10=new _1._Url(window.location,_f);
+var doc=_1.doc;
+var _11=_b||_1.body();
+function _12(_13){
+_13.style.width="100%";
+_13.style.height="100%";
+_13.style.border="0px";
+};
+if(_1.isMoz&&![].reduce){
+var _14=doc.createElement("iframe");
+_12(_14);
+if(!_b){
+_14.style.display="none";
+}
+_11.appendChild(_14);
+var _15=_14.contentWindow;
+doc=_15.document;
+doc.write("<html><body margin='0px'><iframe style='width:100%;height:100%;border:0px' name='protectedFrame'></iframe></body></html>");
+doc.close();
+var _16=_15[0];
+_15.__defineGetter__(0,function(){
+});
+_15.__defineGetter__("protectedFrame",function(){
+});
+doc=_16.document;
+doc.write("<html><body margin='0px'></body></html>");
+doc.close();
+_11=doc.body;
+}
+var _17;
+if(_1.isIE){
+var div=doc.createElement("div");
+div.innerHTML="<iframe name=\""+_10+"\" onload=\"dojox.io.windowName["+_e+"]()\">";
+_17=div.firstChild;
+}else{
+_17=doc.createElement("iframe");
+}
+_d.frame=_17;
+_12(_17);
+_d.outerFrame=_14=_14||_17;
+if(!_b){
+_14.style.display="none";
+}
+var _18=0;
+function _19(){
+var _1a=_17.contentWindow.name;
+if(typeof _1a=="string"){
+if(_1a!=_10){
+_18=2;
+_9.ioArgs.hash=_17.contentWindow.location.hash;
+_9.callback(_1a);
+}
+}
+};
+dojox.io.windowName[_e]=_17.onload=function(){
+try{
+if(!_1.isMoz&&_17.contentWindow.location=="about:blank"){
+return;
+}
+}
+catch(e){
+}
+if(!_18){
+_18=1;
+if(_b){
+if(_c){
+_c();
+}
+}else{
+_17.contentWindow.location=_f;
+}
+}
+try{
+if(_18<2){
+_19();
+}
+}
+catch(e){
+}
+};
+_17.name=_10;
+if(_a.match(/GET/i)){
+_1._ioAddQueryToUrl(_d);
+_17.src=_d.url;
+_11.appendChild(_17);
+if(_17.contentWindow){
+_17.contentWindow.location.replace(_d.url);
+}
+}else{
+if(_a.match(/POST/i)){
+_11.appendChild(_17);
+var _1b=_1.doc.createElement("form");
+_1.body().appendChild(_1b);
+var _1c=_1.queryToObject(_d.query);
+for(var i in _1c){
+var _1d=_1c[i];
+_1d=_1d instanceof Array?_1d:[_1d];
+for(var j=0;j<_1d.length;j++){
+var _1e=doc.createElement("input");
+_1e.type="hidden";
+_1e.name=i;
+_1e.value=_1d[j];
+_1b.appendChild(_1e);
+}
+}
+_1b.method="POST";
+_1b.action=_d.url;
+_1b.target=_10;
+_1b.submit();
+_1b.parentNode.removeChild(_1b);
+}else{
+throw new Error("Method "+_a+" not supported with the windowName transport");
+}
+}
+if(_17.contentWindow){
+_17.contentWindow.name=_10;
+}
+},_frameNum:0};
+return dojox.io.windowName;
+});

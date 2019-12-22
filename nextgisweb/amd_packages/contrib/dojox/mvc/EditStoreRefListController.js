@@ -1,3 +1,13 @@
 //>>built
-define("dojox/mvc/EditStoreRefListController",["dojo/_base/declare","dojo/_base/lang","./getPlainValue","./EditStoreRefController","./ListController"],function(b,e,f,c,d){return b("dojox.mvc.EditStoreRefListController",[c,d],{commitCurrent:function(){for(var b=this.cursor[this.idProperty],a=0;a<this.originalModel.length;a++)if(this.originalModel[a][this.idProperty]==b){this.originalModel.set(a,this.cloneModel(this.cursor));break}this.store.put(this.cursor)}})});
-//# sourceMappingURL=EditStoreRefListController.js.map
+define("dojox/mvc/EditStoreRefListController",["dojo/_base/declare","dojo/_base/lang","./getPlainValue","./EditStoreRefController","./ListController"],function(_1,_2,_3,_4,_5){
+return _1("dojox.mvc.EditStoreRefListController",[_4,_5],{commitCurrent:function(){
+var id=this.cursor[this.idProperty];
+for(var i=0;i<this.originalModel.length;i++){
+if(this.originalModel[i][this.idProperty]==id){
+this.originalModel.set(i,this.cloneModel(this.cursor));
+break;
+}
+}
+this.store.put(this.cursor);
+}});
+});

@@ -1,3 +1,27 @@
 //>>built
-define("dojox/math/round",["dojo","dojox"],function(f,a){f.getObject("math.round",!0,a);f.experimental("dojox.math.round");a.math.round=function(c,a,d){d=10/(d||10);var b=Math.pow(10,-15+Math.log(Math.abs(c))/Math.log(10));return(d*(+c+(0<c?b:-b))).toFixed(a)/d};if(0==(.9).toFixed()){var g=a.math.round;a.math.round=function(c,a,d){var b=Math.pow(10,-a||0),e=Math.abs(c);if(!c||e>=b)b=0;else if(e/=b,.5>e||.95<=e)b=0;return g(c,a,d)+(0<c?b:-b)}}return a.math.round});
-//# sourceMappingURL=round.js.map
+define("dojox/math/round",["dojo","dojox"],function(_1,_2){
+_1.getObject("math.round",true,_2);
+_1.experimental("dojox.math.round");
+_2.math.round=function(_3,_4,_5){
+var _6=Math.log(Math.abs(_3))/Math.log(10);
+var _7=10/(_5||10);
+var _8=Math.pow(10,-15+_6);
+return (_7*(+_3+(_3>0?_8:-_8))).toFixed(_4)/_7;
+};
+if((0.9).toFixed()==0){
+var _9=_2.math.round;
+_2.math.round=function(v,p,m){
+var d=Math.pow(10,-p||0),a=Math.abs(v);
+if(!v||a>=d){
+d=0;
+}else{
+a/=d;
+if(a<0.5||a>=0.95){
+d=0;
+}
+}
+return _9(v,p,m)+(v>0?d:-d);
+};
+}
+return _2.math.round;
+});

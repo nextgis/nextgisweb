@@ -5,5 +5,19 @@
 */
 
 //>>built
-define("dojo/Evented",["./aspect","./on"],function(e,c){function a(){}var f=e.after;a.prototype={on:function(a,d){return c.parse(this,a,d,function(b,a){return f(b,"on"+a,d,!0)})},emit:function(a,d){var b=[this];b.push.apply(b,arguments);return c.emit.apply(c,b)}};return a});
-//# sourceMappingURL=Evented.js.map
+define("dojo/Evented",["./aspect","./on"],function(_1,on){
+"use strict";
+var _2=_1.after;
+function _3(){
+};
+_3.prototype={on:function(_4,_5){
+return on.parse(this,_4,_5,function(_6,_7){
+return _2(_6,"on"+_7,_5,true);
+});
+},emit:function(_8,_9){
+var _a=[this];
+_a.push.apply(_a,arguments);
+return on.emit.apply(on,_a);
+}};
+return _3;
+});

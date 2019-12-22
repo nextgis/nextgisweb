@@ -242,7 +242,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 					this.renderLabel(s, circle.cx, circle.cy + size/3, this.opt.zeroDataMessage, {
 						series: {
 							font: taFont,
-							fontColor: taFontColor 
+							fontColor: taFontColor
 						}
 					},	null, "middle");
 				}
@@ -281,7 +281,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 				slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
 				if(this.opt.labels){
 					labels = arr.map(slices, function(x, i){
-						if(x <= 0){ return ""; }
+						if(x < 0){ return ""; }
 						var v = run[i];
 						return v.hasOwnProperty("text") ? v.text : this._getLabel(x * 100) + "%";
 					}, this);
@@ -312,7 +312,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 				r = this.opt.radius < r * 0.9 ? this.opt.radius : r * 0.9;
 			}
 
-			if (this.opt.labels && this.opt.labelStyle == "columns") {
+			if (!this.opt.radius && this.opt.labels && this.opt.labelStyle == "columns") {
 				r = r / 2;
 				if (rx > ry && rx > r * 2) {
 					r *= rx / (r * 2);
@@ -593,7 +593,7 @@ define("dojox/charting/plot2d/Pie", ["dojo/_base/lang", "dojo/_base/array" ,"doj
 						if(i + 1 == slices.length){
 							end = startAngle + 2 * Math.PI;
 						}
-						if(this.minWidth === 0 ? end - start >= 0.001 : slice !== 0){
+						if(this.minWidth !== 0 || end - start >= 0.001){
 							// var labelAngle = (start + end) / 2;
 							var labelAngle = localStart + (slicesSteps[i].step / 2);//(start + end) / 2,
 							if(significantCount === 1 && !this.opt.minWidth){

@@ -1,6 +1,102 @@
 //>>built
-define("dojox/wire/ml/Invocation",["dojo","dijit","dojox","dojo/require!dojox/wire/ml/Action"],function(c,n,e){c.provide("dojox.wire.ml.Invocation");c.require("dojox.wire.ml.Action");c.declare("dojox.wire.ml.Invocation",e.wire.ml.Action,{object:"",method:"",topic:"",parameters:"",result:"",error:"",_run:function(){if(this.topic){var a=this._getParameters(arguments);try{c.publish(this.topic,a),this.onComplete()}catch(k){this.onError(k)}}else if(this.method){var b=this.object?e.wire.ml._getValue(this.object):
-c.global;if(b){var a=this._getParameters(arguments),d=b[this.method];if(!d){d=b.callMethod;if(!d)return;a=[this.method,a]}try{var g=!1;if(b.getFeatures){var l=b.getFeatures();if("fetch"==this.method&&l["dojo.data.api.Read"]||"save"==this.method&&l["dojo.data.api.Write"]){var f=a[0];f.onComplete||(f.onComplete=function(){});this.connect(f,"onComplete","onComplete");f.onError||(f.onError=function(){});this.connect(f,"onError","onError");g=!0}}var h=d.apply(b,a);if(!g)if(h&&h instanceof c.Deferred){var m=
-this;h.addCallbacks(function(a){m.onComplete(a)},function(a){m.onError(a)})}else this.onComplete(h)}catch(k){this.onError(k)}}}},onComplete:function(a){this.result&&e.wire.ml._setValue(this.result,a);this.error&&e.wire.ml._setValue(this.error,"")},onError:function(a){this.error&&(a&&a.message&&(a=a.message),e.wire.ml._setValue(this.error,a))},_getParameters:function(a){if(!this.parameters)return a;var b=[],d=this.parameters.split(",");if(1==d.length)a=e.wire.ml._getValue(c.trim(d[0]),a),c.isArray(a)?
-b=a:b.push(a);else for(var g in d)b.push(e.wire.ml._getValue(c.trim(d[g]),a));return b}})});
-//# sourceMappingURL=Invocation.js.map
+define("dojox/wire/ml/Invocation",["dojo","dijit","dojox","dojo/require!dojox/wire/ml/Action"],function(_1,_2,_3){
+_1.provide("dojox.wire.ml.Invocation");
+_1.require("dojox.wire.ml.Action");
+_1.declare("dojox.wire.ml.Invocation",_3.wire.ml.Action,{object:"",method:"",topic:"",parameters:"",result:"",error:"",_run:function(){
+if(this.topic){
+var _4=this._getParameters(arguments);
+try{
+_1.publish(this.topic,_4);
+this.onComplete();
+}
+catch(e){
+this.onError(e);
+}
+}else{
+if(this.method){
+var _5=(this.object?_3.wire.ml._getValue(this.object):_1.global);
+if(!_5){
+return;
+}
+var _4=this._getParameters(arguments);
+var _6=_5[this.method];
+if(!_6){
+_6=_5.callMethod;
+if(!_6){
+return;
+}
+_4=[this.method,_4];
+}
+try{
+var _7=false;
+if(_5.getFeatures){
+var _8=_5.getFeatures();
+if((this.method=="fetch"&&_8["dojo.data.api.Read"])||(this.method=="save"&&_8["dojo.data.api.Write"])){
+var _9=_4[0];
+if(!_9.onComplete){
+_9.onComplete=function(){
+};
+}
+this.connect(_9,"onComplete","onComplete");
+if(!_9.onError){
+_9.onError=function(){
+};
+}
+this.connect(_9,"onError","onError");
+_7=true;
+}
+}
+var r=_6.apply(_5,_4);
+if(!_7){
+if(r&&(r instanceof _1.Deferred)){
+var _a=this;
+r.addCallbacks(function(_b){
+_a.onComplete(_b);
+},function(_c){
+_a.onError(_c);
+});
+}else{
+this.onComplete(r);
+}
+}
+}
+catch(e){
+this.onError(e);
+}
+}
+}
+},onComplete:function(_d){
+if(this.result){
+_3.wire.ml._setValue(this.result,_d);
+}
+if(this.error){
+_3.wire.ml._setValue(this.error,"");
+}
+},onError:function(_e){
+if(this.error){
+if(_e&&_e.message){
+_e=_e.message;
+}
+_3.wire.ml._setValue(this.error,_e);
+}
+},_getParameters:function(_f){
+if(!this.parameters){
+return _f;
+}
+var _10=[];
+var _11=this.parameters.split(",");
+if(_11.length==1){
+var _12=_3.wire.ml._getValue(_1.trim(_11[0]),_f);
+if(_1.isArray(_12)){
+_10=_12;
+}else{
+_10.push(_12);
+}
+}else{
+for(var i in _11){
+_10.push(_3.wire.ml._getValue(_1.trim(_11[i]),_f));
+}
+}
+return _10;
+}});
+});

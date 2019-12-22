@@ -1,7 +1,99 @@
 //>>built
-define("dojox/geo/charting/KeyboardInteractionSupport","dojo/_base/lang dojo/_base/declare dojo/_base/event dojo/_base/connect dojo/_base/html dojo/dom dojox/lang/functional dojo/keys".split(" "),function(w,r,t,b,u,v,n,c){return r("dojox.geo.charting.KeyboardInteractionSupport",null,{_map:null,_zoomEnabled:!1,constructor:function(a,d){this._map=a;d&&(this._zoomEnabled=d.enableZoom)},connect:function(){var a=v.byId(this._map.container);u.attr(a,{tabindex:0,role:"presentation","aria-label":"map"});
-this._keydownListener=b.connect(a,"keydown",this,"keydownHandler");this._onFocusListener=b.connect(a,"focus",this,"onFocus");this._onBlurListener=b.connect(a,"blur",this,"onBlur")},disconnect:function(){b.disconnect(this._keydownListener);this._keydownListener=null;b.disconnect(this._onFocusListener);this._onFocusListener=null;b.disconnect(this._onBlurListener);this._onBlurListener=null},keydownHandler:function(a){switch(a.keyCode){case c.LEFT_ARROW:this._directTo(-1,-1,1,-1);break;case c.RIGHT_ARROW:this._directTo(-1,
--1,-1,1);break;case c.UP_ARROW:this._directTo(1,-1,-1,-1);break;case c.DOWN_ARROW:this._directTo(-1,1,-1,-1);break;case c.SPACE:this._map.selectedFeature&&!this._map.selectedFeature._isZoomIn&&this._zoomEnabled&&this._map.selectedFeature._zoomIn();break;case c.ESCAPE:this._map.selectedFeature&&this._map.selectedFeature._isZoomIn&&this._zoomEnabled&&this._map.selectedFeature._zoomOut();break;default:return}t.stop(a)},onFocus:function(a){if(!this._map.selectedFeature&&!this._map.focused){this._map.focused=
-!0;var d;a=!1;if(this._map.lastSelectedFeature)d=this._map.lastSelectedFeature;else{var b=this._map.getMapCenter(),c=Infinity;n.forIn(this._map.mapObj.features,function(a){var f=Math.sqrt(Math.pow(a._center[0]-b.x,2)+Math.pow(a._center[1]-b.y,2));f<c&&(c=f,d=a)});a=!0}d&&(a&&d._onclickHandler(null),this._map.mapObj.marker.show(d.id))}},onBlur:function(){this._map.lastSelectedFeature=this._map.selectedFeature},_directTo:function(a,d,b,c){var p=this._map.selectedFeature,f=p._center[0],q=p._center[1],
-h=Infinity,g=null;n.forIn(this._map.mapObj.features,function(e){var l=Math.abs(f-e._center[0]),m=Math.abs(q-e._center[1]),k=l+m;0<(a-d)*(q-e._center[1])&&l<m&&h>k&&(h=k,g=e);0<(b-c)*(f-e._center[0])&&l>m&&h>k&&(h=k,g=e)});g&&(this._map.mapObj.marker.hide(),g._onclickHandler(null),this._map.mapObj.marker.show(g.id))}})});
-//# sourceMappingURL=KeyboardInteractionSupport.js.map
+define("dojox/geo/charting/KeyboardInteractionSupport",["dojo/_base/lang","dojo/_base/declare","dojo/_base/event","dojo/_base/connect","dojo/_base/html","dojo/dom","dojox/lang/functional","dojo/keys"],function(_1,_2,_3,_4,_5,_6,_7,_8){
+return _2("dojox.geo.charting.KeyboardInteractionSupport",null,{_map:null,_zoomEnabled:false,constructor:function(_9,_a){
+this._map=_9;
+if(_a){
+this._zoomEnabled=_a.enableZoom;
+}
+},connect:function(){
+var _b=_6.byId(this._map.container);
+_5.attr(_b,{tabindex:0,role:"presentation","aria-label":"map"});
+this._keydownListener=_4.connect(_b,"keydown",this,"keydownHandler");
+this._onFocusListener=_4.connect(_b,"focus",this,"onFocus");
+this._onBlurListener=_4.connect(_b,"blur",this,"onBlur");
+},disconnect:function(){
+_4.disconnect(this._keydownListener);
+this._keydownListener=null;
+_4.disconnect(this._onFocusListener);
+this._onFocusListener=null;
+_4.disconnect(this._onBlurListener);
+this._onBlurListener=null;
+},keydownHandler:function(e){
+switch(e.keyCode){
+case _8.LEFT_ARROW:
+this._directTo(-1,-1,1,-1);
+break;
+case _8.RIGHT_ARROW:
+this._directTo(-1,-1,-1,1);
+break;
+case _8.UP_ARROW:
+this._directTo(1,-1,-1,-1);
+break;
+case _8.DOWN_ARROW:
+this._directTo(-1,1,-1,-1);
+break;
+case _8.SPACE:
+if(this._map.selectedFeature&&!this._map.selectedFeature._isZoomIn&&this._zoomEnabled){
+this._map.selectedFeature._zoomIn();
+}
+break;
+case _8.ESCAPE:
+if(this._map.selectedFeature&&this._map.selectedFeature._isZoomIn&&this._zoomEnabled){
+this._map.selectedFeature._zoomOut();
+}
+break;
+default:
+return;
+}
+_3.stop(e);
+},onFocus:function(e){
+if(this._map.selectedFeature||this._map.focused){
+return;
+}
+this._map.focused=true;
+var _c,_d=false;
+if(this._map.lastSelectedFeature){
+_c=this._map.lastSelectedFeature;
+}else{
+var _e=this._map.getMapCenter(),_f=Infinity;
+_7.forIn(this._map.mapObj.features,function(_10){
+var _11=Math.sqrt(Math.pow(_10._center[0]-_e.x,2)+Math.pow(_10._center[1]-_e.y,2));
+if(_11<_f){
+_f=_11;
+_c=_10;
+}
+});
+_d=true;
+}
+if(_c){
+if(_d){
+_c._onclickHandler(null);
+}
+this._map.mapObj.marker.show(_c.id);
+}
+},onBlur:function(){
+this._map.lastSelectedFeature=this._map.selectedFeature;
+},_directTo:function(up,_12,_13,_14){
+var _15=this._map.selectedFeature,_16=_15._center[0],_17=_15._center[1],_18=Infinity,_19=null;
+_7.forIn(this._map.mapObj.features,function(_1a){
+var _1b=Math.abs(_16-_1a._center[0]),_1c=Math.abs(_17-_1a._center[1]),_1d=_1b+_1c;
+if((up-_12)*(_17-_1a._center[1])>0){
+if(_1b<_1c&&_18>_1d){
+_18=_1d;
+_19=_1a;
+}
+}
+if((_13-_14)*(_16-_1a._center[0])>0){
+if(_1b>_1c&&_18>_1d){
+_18=_1d;
+_19=_1a;
+}
+}
+});
+if(_19){
+this._map.mapObj.marker.hide();
+_19._onclickHandler(null);
+this._map.mapObj.marker.show(_19.id);
+}
+}});
+});

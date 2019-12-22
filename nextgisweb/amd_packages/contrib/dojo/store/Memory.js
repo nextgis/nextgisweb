@@ -5,7 +5,52 @@
 */
 
 //>>built
-define("dojo/store/Memory",["../_base/declare","./util/QueryResults","./util/SimpleQueryEngine"],function(f,g,h){return f("dojo.store.Memory",null,{constructor:function(a){for(var b in a)this[b]=a[b];this.setData(this.data||[])},data:null,idProperty:"id",index:null,queryEngine:h,get:function(a){return this.data[this.index[a]]},getIdentity:function(a){return a[this.idProperty]},put:function(a,b){var d=this.data,e=this.index,c=this.idProperty,c=a[c]=b&&"id"in b?b.id:c in a?a[c]:Math.random();if(c in
-e){if(b&&!1===b.overwrite)throw Error("Object already exists");d[e[c]]=a}else e[c]=d.push(a)-1;return c},add:function(a,b){(b=b||{}).overwrite=!1;return this.put(a,b)},remove:function(a){var b=this.index,d=this.data;if(a in b)return d.splice(b[a],1),this.setData(d),!0},query:function(a,b){return g(this.queryEngine(a,b)(this.data))},setData:function(a){a.items?(this.idProperty=a.identifier||this.idProperty,a=this.data=a.items):this.data=a;this.index={};for(var b=0,d=a.length;b<d;b++)this.index[a[b][this.idProperty]]=
-b}})});
-//# sourceMappingURL=Memory.js.map
+define("dojo/store/Memory",["../_base/declare","./util/QueryResults","./util/SimpleQueryEngine"],function(_1,_2,_3){
+var _4=null;
+return _1("dojo.store.Memory",_4,{constructor:function(_5){
+for(var i in _5){
+this[i]=_5[i];
+}
+this.setData(this.data||[]);
+},data:null,idProperty:"id",index:null,queryEngine:_3,get:function(id){
+return this.data[this.index[id]];
+},getIdentity:function(_6){
+return _6[this.idProperty];
+},put:function(_7,_8){
+var _9=this.data,_a=this.index,_b=this.idProperty;
+var id=_7[_b]=(_8&&"id" in _8)?_8.id:_b in _7?_7[_b]:Math.random();
+if(id in _a){
+if(_8&&_8.overwrite===false){
+throw new Error("Object already exists");
+}
+_9[_a[id]]=_7;
+}else{
+_a[id]=_9.push(_7)-1;
+}
+return id;
+},add:function(_c,_d){
+(_d=_d||{}).overwrite=false;
+return this.put(_c,_d);
+},remove:function(id){
+var _e=this.index;
+var _f=this.data;
+if(id in _e){
+_f.splice(_e[id],1);
+this.setData(_f);
+return true;
+}
+},query:function(_10,_11){
+return _2(this.queryEngine(_10,_11)(this.data));
+},setData:function(_12){
+if(_12.items){
+this.idProperty=_12.identifier||this.idProperty;
+_12=this.data=_12.items;
+}else{
+this.data=_12;
+}
+this.index={};
+for(var i=0,l=_12.length;i<l;i++){
+this.index[_12[i][this.idProperty]]=i;
+}
+}});
+});

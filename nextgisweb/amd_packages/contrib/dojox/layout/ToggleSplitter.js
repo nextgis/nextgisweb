@@ -1,11 +1,163 @@
 //>>built
-define("dojox/layout/ToggleSplitter",["dojo","dijit","dijit/layout/BorderContainer"],function(b,h){b.experimental("dojox.layout.ToggleSplitter");var k=b.declare("dojox.layout.ToggleSplitter",h.layout._Splitter,{container:null,child:null,region:null,state:"full",_closedSize:"0",baseClass:"dojoxToggleSplitter",templateString:'\x3cdiv class\x3d"dijitSplitter dojoxToggleSplitter" dojoAttachEvent\x3d"onkeypress:_onKeyPress,onmousedown:_startDrag,onmouseenter:_onMouse,onmouseleave:_onMouse"\x3e\x3cdiv dojoAttachPoint\x3d"toggleNode" class\x3d"dijitSplitterThumb dojoxToggleSplitterIcon" tabIndex\x3d"0" role\x3d"separator" dojoAttachEvent\x3d"onmousedown:_onToggleNodeMouseDown,onclick:_toggle,onmouseenter:_onToggleNodeMouseMove,onmouseleave:_onToggleNodeMouseMove,onfocus:_onToggleNodeMouseMove,onblur:_onToggleNodeMouseMove"\x3e\x3cspan class\x3d"dojoxToggleSplitterA11y" dojoAttachPoint\x3d"a11yText"\x3e\x3c/span\x3e\x3c/div\x3e\x3c/div\x3e',
-postCreate:function(){this.inherited(arguments);var a=this.region;b.addClass(this.domNode,this.baseClass+a.charAt(0).toUpperCase()+a.substring(1))},startup:function(){this.inherited(arguments);var a=this.child.domNode,d=b.style(a,this.horizontal?"height":"width");this.domNode.setAttribute("aria-controls",a.id);b.forEach(["toggleSplitterState","toggleSplitterFullSize","toggleSplitterCollapsedSize"],function(a){var b=a.substring(14),b=b.charAt(0).toLowerCase()+b.substring(1);a in this.child&&(this[b]=
-this.child[a])},this);this.fullSize||(this.fullSize="full"==this.state?d+"px":"75px");this._openStyleProps=this._getStyleProps(a,"full");this._started=!0;this.set("state",this.state);return this},_onKeyPress:function(a){"full"==this.state&&this.inherited(arguments);if(a.charCode==b.keys.SPACE||a.keyCode==b.keys.ENTER)this._toggle(a),b.stopEvent(a)},_onToggleNodeMouseDown:function(a){b.stopEvent(a);this.toggleNode.focus()},_startDrag:function(a){"full"==this.state&&this.inherited(arguments)},_stopDrag:function(a){this.inherited(arguments);
-this.toggleNode.blur()},_toggle:function(a){switch(this.state){case "full":a=this.collapsedSize?"collapsed":"closed";break;case "collapsed":a="closed";break;default:a="full"}this.set("state",a)},_onToggleNodeMouseMove:function(a){var d=this.baseClass,c=this.toggleNode,f="full"==this.state||"collapsed"==this.state;a="mouseout"==a.type||"blur"==a.type;b.toggleClass(c,d+"IconOpen",a&&f);b.toggleClass(c,d+"IconOpenHover",!a&&f);b.toggleClass(c,d+"IconClosed",a&&!f);b.toggleClass(c,d+"IconClosedHover",
-!a&&!f)},_handleOnChange:function(a){a=this.child.domNode;var d,c,f=this.horizontal?"height":"width";"full"==this.state?(c=b.mixin({display:"block",overflow:"auto",visibility:"visible"},this._openStyleProps),c[f]=this._openStyleProps&&this._openStyleProps[f]?this._openStyleProps[f]:this.fullSize,b.style(this.domNode,"cursor",""),b.style(a,c)):"collapsed"==this.state?(c=b.getComputedStyle(a),this._openStyleProps=d=this._getStyleProps(a,"full",c),b.style(this.domNode,"cursor","auto"),b.style(a,f,this.collapsedSize)):
-(this.collapsedSize||(c=b.getComputedStyle(a),this._openStyleProps=d=this._getStyleProps(a,"full",c)),c=this._getStyleProps(a,"closed",c),b.style(this.domNode,"cursor","auto"),b.style(a,c));this._setStateClass();this.container._started&&this.container._layoutChildren(this.region)},_getStyleProps:function(a,d,c){c||(c=b.getComputedStyle(a));var f={},e=this.horizontal?"height":"width";f.overflow="closed"!=d?c.overflow:"hidden";f.visibility="closed"!=d?c.visibility:"hidden";f[e]="closed"!=d?a.style[e]||
-c[e]:this._closedSize;var g=["Top","Right","Bottom","Left"];b.forEach(["padding","margin","border"],function(a){for(var b=0;b<g.length;b++){var e=a+g[b];"border"==a&&(e+="Width");void 0!==c[e]&&(f[e]="closed"!=d?c[e]:0)}});return f},_setStateClass:function(){var a="\x26#9652",d=this.region.toLowerCase(),c=this.baseClass,f=this.toggleNode,e="full"==this.state||"collapsed"==this.state,g=this.focused;b.toggleClass(f,c+"IconOpen",e&&!g);b.toggleClass(f,c+"IconClosed",!e&&!g);b.toggleClass(f,c+"IconOpenHover",
-e&&g);b.toggleClass(f,c+"IconClosedHover",!e&&g);if("top"==d&&e||"bottom"==d&&!e)a="\x26#9650";else if("top"==d&&!e||"bottom"==d&&e)a="\x26#9660";else if("right"==d&&e||"left"==d&&!e)a="\x26#9654";else if("right"==d&&!e||"left"==d&&e)a="\x26#9664";this.a11yText.innerHTML=a},_setStateAttr:function(a){if(this._started){var b=this.state;this.state=a;this._handleOnChange(b);switch(a){case "full":this.domNode.setAttribute("aria-expanded",!0);a="onOpen";break;case "collapsed":this.domNode.setAttribute("aria-expanded",
-!0);a="onCollapsed";break;default:this.domNode.setAttribute("aria-expanded",!1),a="onClosed"}this[a](this.child)}},onOpen:function(a){},onCollapsed:function(a){},onClosed:function(a){}});b.extend(h._Widget,{toggleSplitterState:"full",toggleSplitterFullSize:"",toggleSplitterCollapsedSize:""});return k});
-//# sourceMappingURL=ToggleSplitter.js.map
+define("dojox/layout/ToggleSplitter",["dojo","dijit","dijit/layout/BorderContainer"],function(_1,_2){
+_1.experimental("dojox.layout.ToggleSplitter");
+var _3=_1.declare("dojox.layout.ToggleSplitter",_2.layout._Splitter,{container:null,child:null,region:null,state:"full",_closedSize:"0",baseClass:"dojoxToggleSplitter",templateString:"<div class=\"dijitSplitter dojoxToggleSplitter\" dojoAttachEvent=\"onkeypress:_onKeyPress,onmousedown:_startDrag,onmouseenter:_onMouse,onmouseleave:_onMouse\">"+"<div dojoAttachPoint=\"toggleNode\" class=\"dijitSplitterThumb dojoxToggleSplitterIcon\" tabIndex=\"0\" role=\"separator\" "+"dojoAttachEvent=\"onmousedown:_onToggleNodeMouseDown,onclick:_toggle,onmouseenter:_onToggleNodeMouseMove,onmouseleave:_onToggleNodeMouseMove,onfocus:_onToggleNodeMouseMove,onblur:_onToggleNodeMouseMove\">"+"<span class=\"dojoxToggleSplitterA11y\" dojoAttachPoint=\"a11yText\"></span></div>"+"</div>",postCreate:function(){
+this.inherited(arguments);
+var _4=this.region;
+_1.addClass(this.domNode,this.baseClass+_4.charAt(0).toUpperCase()+_4.substring(1));
+},startup:function(){
+this.inherited(arguments);
+var _5=this.child,_6=this.child.domNode,_7=_1.style(_6,(this.horizontal?"height":"width"));
+this.domNode.setAttribute("aria-controls",_6.id);
+_1.forEach(["toggleSplitterState","toggleSplitterFullSize","toggleSplitterCollapsedSize"],function(_8){
+var _9=_8.substring("toggleSplitter".length);
+_9=_9.charAt(0).toLowerCase()+_9.substring(1);
+if(_8 in this.child){
+this[_9]=this.child[_8];
+}
+},this);
+if(!this.fullSize){
+this.fullSize=this.state=="full"?_7+"px":"75px";
+}
+this._openStyleProps=this._getStyleProps(_6,"full");
+this._started=true;
+this.set("state",this.state);
+return this;
+},_onKeyPress:function(_a){
+if(this.state=="full"){
+this.inherited(arguments);
+}
+if(_a.charCode==_1.keys.SPACE||_a.keyCode==_1.keys.ENTER){
+this._toggle(_a);
+_1.stopEvent(_a);
+}
+},_onToggleNodeMouseDown:function(_b){
+_1.stopEvent(_b);
+this.toggleNode.focus();
+},_startDrag:function(e){
+if(this.state=="full"){
+this.inherited(arguments);
+}
+},_stopDrag:function(e){
+this.inherited(arguments);
+this.toggleNode.blur();
+},_toggle:function(_c){
+var _d;
+switch(this.state){
+case "full":
+_d=this.collapsedSize?"collapsed":"closed";
+break;
+case "collapsed":
+_d="closed";
+break;
+default:
+_d="full";
+}
+this.set("state",_d);
+},_onToggleNodeMouseMove:function(_e){
+var _f=this.baseClass,_10=this.toggleNode,on=this.state=="full"||this.state=="collapsed",_11=_e.type=="mouseout"||_e.type=="blur";
+_1.toggleClass(_10,_f+"IconOpen",_11&&on);
+_1.toggleClass(_10,_f+"IconOpenHover",!_11&&on);
+_1.toggleClass(_10,_f+"IconClosed",_11&&!on);
+_1.toggleClass(_10,_f+"IconClosedHover",!_11&&!on);
+},_handleOnChange:function(_12){
+var _13=this.child.domNode,_14,_15,dim=this.horizontal?"height":"width";
+if(this.state=="full"){
+var _16=_1.mixin({display:"block",overflow:"auto",visibility:"visible"},this._openStyleProps);
+_16[dim]=(this._openStyleProps&&this._openStyleProps[dim])?this._openStyleProps[dim]:this.fullSize;
+_1.style(this.domNode,"cursor","");
+_1.style(_13,_16);
+}else{
+if(this.state=="collapsed"){
+_15=_1.getComputedStyle(_13);
+_14=this._getStyleProps(_13,"full",_15);
+this._openStyleProps=_14;
+_1.style(this.domNode,"cursor","auto");
+_1.style(_13,dim,this.collapsedSize);
+}else{
+if(!this.collapsedSize){
+_15=_1.getComputedStyle(_13);
+_14=this._getStyleProps(_13,"full",_15);
+this._openStyleProps=_14;
+}
+var _17=this._getStyleProps(_13,"closed",_15);
+_1.style(this.domNode,"cursor","auto");
+_1.style(_13,_17);
+}
+}
+this._setStateClass();
+if(this.container._started){
+this.container._layoutChildren(this.region);
+}
+},_getStyleProps:function(_18,_19,_1a){
+if(!_1a){
+_1a=_1.getComputedStyle(_18);
+}
+var _1b={},dim=this.horizontal?"height":"width";
+_1b["overflow"]=(_19!="closed")?_1a["overflow"]:"hidden";
+_1b["visibility"]=(_19!="closed")?_1a["visibility"]:"hidden";
+_1b[dim]=(_19!="closed")?_18.style[dim]||_1a[dim]:this._closedSize;
+var _1c=["Top","Right","Bottom","Left"];
+_1.forEach(["padding","margin","border"],function(_1d){
+for(var i=0;i<_1c.length;i++){
+var _1e=_1d+_1c[i];
+if(_1d=="border"){
+_1e+="Width";
+}
+if(undefined!==_1a[_1e]){
+_1b[_1e]=(_19!="closed")?_1a[_1e]:0;
+}
+}
+});
+return _1b;
+},_setStateClass:function(){
+var _1f="&#9652",_20=this.region.toLowerCase(),_21=this.baseClass,_22=this.toggleNode,on=this.state=="full"||this.state=="collapsed",_23=this.focused;
+_1.toggleClass(_22,_21+"IconOpen",on&&!_23);
+_1.toggleClass(_22,_21+"IconClosed",!on&&!_23);
+_1.toggleClass(_22,_21+"IconOpenHover",on&&_23);
+_1.toggleClass(_22,_21+"IconClosedHover",!on&&_23);
+if(_20=="top"&&on||_20=="bottom"&&!on){
+_1f="&#9650";
+}else{
+if(_20=="top"&&!on||_20=="bottom"&&on){
+_1f="&#9660";
+}else{
+if(_20=="right"&&on||_20=="left"&&!on){
+_1f="&#9654";
+}else{
+if(_20=="right"&&!on||_20=="left"&&on){
+_1f="&#9664";
+}
+}
+}
+}
+this.a11yText.innerHTML=_1f;
+},_setStateAttr:function(_24){
+if(!this._started){
+return;
+}
+var _25=this.state;
+this.state=_24;
+this._handleOnChange(_25);
+var _26;
+switch(_24){
+case "full":
+this.domNode.setAttribute("aria-expanded",true);
+_26="onOpen";
+break;
+case "collapsed":
+this.domNode.setAttribute("aria-expanded",true);
+_26="onCollapsed";
+break;
+default:
+this.domNode.setAttribute("aria-expanded",false);
+_26="onClosed";
+}
+this[_26](this.child);
+},onOpen:function(_27){
+},onCollapsed:function(_28){
+},onClosed:function(_29){
+}});
+_1.extend(_2._Widget,{toggleSplitterState:"full",toggleSplitterFullSize:"",toggleSplitterCollapsedSize:""});
+return _3;
+});

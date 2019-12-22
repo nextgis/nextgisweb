@@ -1,7 +1,65 @@
 //>>built
-require({cache:{"url:dojox/calendar/templates/ColumnViewSecondarySheet.html":'\x3cdiv data-dojo-attach-events\x3d"keydown:_onKeyDown"\x3e\n\t\x3cdiv  data-dojo-attach-point\x3d"rowHeader" class\x3d"dojoxCalendarRowHeader"\x3e\n\t\t\x3ctable data-dojo-attach-point\x3d"rowHeaderTable" class\x3d"dojoxCalendarRowHeaderTable" cellpadding\x3d"0" cellspacing\x3d"0"\x3e\x3c/table\x3e\n\t\x3c/div\x3e\t\n\t\x3cdiv data-dojo-attach-point\x3d"grid" class\x3d"dojoxCalendarGrid"\x3e\n\t\t\x3ctable data-dojo-attach-point\x3d"gridTable" class\x3d"dojoxCalendarGridTable" cellpadding\x3d"0" cellspacing\x3d"0"\x3e\x3c/table\x3e\n\t\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"itemContainer" class\x3d"dojoxCalendarContainer" data-dojo-attach-event\x3d"mousedown:_onGridMouseDown,mouseup:_onGridMouseUp,ondblclick:_onGridDoubleClick,touchstart:_onGridTouchStart,touchmove:_onGridTouchMove,touchend:_onGridTouchEnd"\x3e\n\t\t\x3ctable data-dojo-attach-point\x3d"itemContainerTable" class\x3d"dojoxCalendarContainerTable" cellpadding\x3d"0" cellspacing\x3d"0" style\x3d"width:100%"\x3e\x3c/table\x3e\n\t\x3c/div\x3e\n\x3c/div\x3e\n'}});
-define("dojox/calendar/ColumnViewSecondarySheet","dojo/_base/array dojo/_base/declare dojo/_base/event dojo/_base/lang dojo/dom-geometry dojo/dom-style ./MatrixView dojo/text!./templates/ColumnViewSecondarySheet.html".split(" "),function(f,g,h,n,e,k,l,m){return g("dojox.calendar.ColumnViewSecondarySheet",l,{templateString:m,rowCount:1,cellPaddingTop:4,roundToDay:!1,_defaultHeight:-1,layoutDuringResize:!0,buildRendering:function(){this.inherited(arguments);this._hScrollNodes=[this.gridTable,this.itemContainerTable]},
-_configureHScrollDomNodes:function(a){f.forEach(this._hScrollNodes,function(c){k.set(c,"width",a)},this)},_defaultItemToRendererKindFunc:function(a){return a.allDay?"horizontal":null},_formatGridCellLabel:function(){return null},_formatRowHeaderLabel:function(){return null},__fixEvt:function(a){a.sheet="secondary";a.source=this;return a},_dispatchCalendarEvt:function(a,c){a=this.inherited(arguments);if(this.owner.owner)this.owner.owner[c](a)},_layoutExpandRenderers:function(a,c,d){if(this.expandRenderer&&
--1!=this._expandedRowCol){var b=e.getMarginBox(this.domNode).h;if(-1==this._defaultHeight||0===this._defaultHeight)this._defaultHeight=b;this._defaultHeight!=b&&b>=this._getExpandedHeight()||void 0!==this._expandedRowCol&&-1!==this._expandedRowCol?(b=this._expandedRowCol,b>=this.renderData.columnCount&&(b=0),this._layoutExpandRendererImpl(0,b,null,!0)):this.inherited(arguments)}},expandRendererClickHandler:function(a,c){h.stop(a);var d=e.getMarginBox(this.domNode).h,b=this._getExpandedHeight();this._defaultHeight==
-d||d<b?(this._expandedRowCol=c.columnIndex,this.owner.resizeSecondarySheet(b)):(delete this._expandedRowCol,this.owner.resizeSecondarySheet(this._defaultHeight))},_getExpandedHeight:function(){return(this.naturalRowsHeight&&0<this.naturalRowsHeight.length?this.naturalRowsHeight[0]:0)+this.expandRendererHeight+this.verticalGap+this.verticalGap},_layoutRenderers:function(a){this._domReady&&(this.inherited(arguments),a.items&&0!==a.items.length||this._layoutExpandRenderers(0,!1,null))}})});
-//# sourceMappingURL=ColumnViewSecondarySheet.js.map
+require({cache:{"url:dojox/calendar/templates/ColumnViewSecondarySheet.html":"<div data-dojo-attach-events=\"keydown:_onKeyDown\">\n\t<div  data-dojo-attach-point=\"rowHeader\" class=\"dojoxCalendarRowHeader\">\n\t\t<table data-dojo-attach-point=\"rowHeaderTable\" class=\"dojoxCalendarRowHeaderTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\t\n\t<div data-dojo-attach-point=\"grid\" class=\"dojoxCalendarGrid\">\n\t\t<table data-dojo-attach-point=\"gridTable\" class=\"dojoxCalendarGridTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\n\t<div data-dojo-attach-point=\"itemContainer\" class=\"dojoxCalendarContainer\" data-dojo-attach-event=\"mousedown:_onGridMouseDown,mouseup:_onGridMouseUp,ondblclick:_onGridDoubleClick,touchstart:_onGridTouchStart,touchmove:_onGridTouchMove,touchend:_onGridTouchEnd\">\n\t\t<table data-dojo-attach-point=\"itemContainerTable\" class=\"dojoxCalendarContainerTable\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%\"></table>\n\t</div>\n</div>\n"}});
+define("dojox/calendar/ColumnViewSecondarySheet",["dojo/_base/array","dojo/_base/declare","dojo/_base/event","dojo/_base/lang","dojo/dom-geometry","dojo/dom-style","./MatrixView","dojo/text!./templates/ColumnViewSecondarySheet.html"],function(_1,_2,_3,_4,_5,_6,_7,_8){
+return _2("dojox.calendar.ColumnViewSecondarySheet",_7,{templateString:_8,rowCount:1,cellPaddingTop:4,roundToDay:false,_defaultHeight:-1,layoutDuringResize:true,buildRendering:function(){
+this.inherited(arguments);
+this._hScrollNodes=[this.gridTable,this.itemContainerTable];
+},_configureHScrollDomNodes:function(_9){
+_1.forEach(this._hScrollNodes,function(_a){
+_6.set(_a,"width",_9);
+},this);
+},_defaultItemToRendererKindFunc:function(_b){
+return _b.allDay?"horizontal":null;
+},_formatGridCellLabel:function(){
+return null;
+},_formatRowHeaderLabel:function(){
+return null;
+},__fixEvt:function(e){
+e.sheet="secondary";
+e.source=this;
+return e;
+},_dispatchCalendarEvt:function(e,_c){
+e=this.inherited(arguments);
+if(this.owner.owner){
+this.owner.owner[_c](e);
+}
+},_layoutExpandRenderers:function(_d,_e,_f){
+if(!this.expandRenderer||this._expandedRowCol==-1){
+return;
+}
+var h=_5.getMarginBox(this.domNode).h;
+if(this._defaultHeight==-1||this._defaultHeight===0){
+this._defaultHeight=h;
+}
+if(this._defaultHeight!=h&&h>=this._getExpandedHeight()||this._expandedRowCol!==undefined&&this._expandedRowCol!==-1){
+var col=this._expandedRowCol;
+if(col>=this.renderData.columnCount){
+col=0;
+}
+this._layoutExpandRendererImpl(0,col,null,true);
+}else{
+this.inherited(arguments);
+}
+},expandRendererClickHandler:function(e,_10){
+_3.stop(e);
+var h=_5.getMarginBox(this.domNode).h;
+var _11=this._getExpandedHeight();
+if(this._defaultHeight==h||h<_11){
+this._expandedRowCol=_10.columnIndex;
+this.owner.resizeSecondarySheet(_11);
+}else{
+delete this._expandedRowCol;
+this.owner.resizeSecondarySheet(this._defaultHeight);
+}
+},_getExpandedHeight:function(){
+return (this.naturalRowsHeight&&this.naturalRowsHeight.length>0?this.naturalRowsHeight[0]:0)+this.expandRendererHeight+this.verticalGap+this.verticalGap;
+},_layoutRenderers:function(_12){
+if(!this._domReady){
+return;
+}
+this.inherited(arguments);
+if(!_12.items||_12.items.length===0){
+this._layoutExpandRenderers(0,false,null);
+}
+}});
+});

@@ -6,6 +6,10 @@ dramatically different paths.  Some of the code is very mature, some of the code
 essentially abandoned.  All of the packages require the Dojo Toolkit [core][] and some require the widget library
 [dijit][].
 
+While still being maintained, new development is primarily focused on modern Dojo.
+
+Checkout the [Dojo framework website](https://dojo.io/) or if you want a more detailed technical status and overview, checkout the [`Dojo roadmap`](https://dojo.io/community/).
+
 You should read the ``README`` file contained in each sub-package to understand the status of the code contained
 within.
 
@@ -28,7 +32,7 @@ If you are starting out with Dojo, the following resources are available to you:
 ## License and Copyright
 
 The Dojo Toolkit (including this package) is dual licensed under BSD 3-Clause and AFL.  For more information on the
-license please see the [License Information][].  The Dojo Toolkit is Copyright (c) 2005-2016, The JS Foundation.  All
+license please see the [License Information][].  The Dojo Toolkit is Copyright (c) 2005-2018, The JS Foundation.  All
 rights reserved.
 
 [core]: https://github.com/dojo/dojo/

@@ -1,11 +1,169 @@
 //>>built
-define("dojox/calendar/_RendererMixin",["dojo/_base/declare","dojo/_base/lang","dojo/dom-style","dojo/dom-class","dojo/Stateful"],function(l,m,h,k,n){return l("dojox.calendar._RendererMixin",n,{item:null,owner:null,edited:!1,focused:!1,hovered:!1,selected:!1,storeState:!1,moveEnabled:!0,resizeEnabled:!0,_orientation:"vertical",_displayValue:"block",_displayValueMap:{},visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:45,endTimeLabel:50},_setSelectedAttr:function(a){this._setState("selected",
-a,"Selected")},_setFocusedAttr:function(a){this._setState("focused",a,"Focused")},_setEditedAttr:function(a){this._setState("edited",a,"Edited")},_setHoveredAttr:function(a){this._setState("hovered",a,"Hovered")},_setStoreStateAttr:function(a){var c=null;switch(a){case "storing":c="Storing";break;case "unstored":c="Unstored";break;default:c=null}var d=this.stateNode||this.domNode;k.remove(d,"Storing");k.remove(d,"Unstored");this._set("storeState",a);null!=c&&k.add(d,c)},_setState:function(a,c,d){this[a]!=
-c&&(k[c?"add":"remove"](this.stateNode||this.domNode,d),this._set(a,c))},_setItemAttr:function(a){null==a?(this.item&&this.item.cssClass&&k.remove(this.domNode,this.item.cssClass),this.item=null):(null!=this.item?(this.item.cssClass!=a.cssClass&&this.item.cssClass&&k.remove(this.domNode,this.item.cssClass),this.item=m.mixin(this.item,a)):this.item=a,a.cssClass&&k.add(this.domNode,a.cssClass))},_setText:function(a,c,d){this.owner&&this.owner._setText(a,c,d)},_isElementVisible:function(a,c,d,g){var f,
-b=this.visibilityLimits[a];switch(a){case "moveHandle":f=this.moveEnabled;break;case "resizeStartHandle":f=this.mobile?this.resizeEnabled&&!c&&this.edited&&(-1==b||g>b):this.resizeEnabled&&!c&&(-1==b||g>b);break;case "resizeEndHandle":f=this.mobile?this.resizeEnabled&&!d&&this.edited&&(-1==b||g>b):this.resizeEnabled&&!d&&(-1==b||g>b);break;case "startTimeLabel":f=this.mobile?!c&&(!this.edited||this.edited&&(-1==b||g>b)):!c&&(-1==b||g>b);break;case "endTimeLabel":f=this.edited&&!d&&(-1==b||g>b);break;
-case "summaryLabel":f=this.mobile?!this.edited||this.edited&&(-1==b||g>b):-1==b||g>b}return f},_formatTime:function(a,c){if(this.owner){var d=this.owner.get("formatItemTimeFunc");if(null!=d&&"function"===typeof d)return d(c,a,this.owner,this.item)}return a.dateLocaleModule.format(c,{selector:"time"})},getDisplayValue:function(a){return this._displayValue},updateRendering:function(a,c){c=c||this.item.h;a=a||this.item.w;if(c||a){this.item.h=c;this.item.w=a;var d="vertical"==this._orientation?c:a,g=
-this.owner.renderData,f=0!=g.dateModule.compare(this.item.range[0],this.item.startTime),b=0!=g.dateModule.compare(this.item.range[1],this.item.endTime),e;null!=this.beforeIcon&&(e="horizontal"!=this._orientation||this.isLeftToRight()?f:b,h.set(this.beforeIcon,"display",e?this.getDisplayValue("beforeIcon"):"none"));null!=this.afterIcon&&(e="horizontal"!=this._orientation||this.isLeftToRight()?b:f,h.set(this.afterIcon,"display",e?this.getDisplayValue("afterIcon"):"none"));this.moveHandle&&(e=this._isElementVisible("moveHandle",
-f,b,d),h.set(this.moveHandle,"display",e?this.getDisplayValue("moveHandle"):"none"));this.resizeStartHandle&&(e=this._isElementVisible("resizeStartHandle",f,b,d),h.set(this.resizeStartHandle,"display",e?this.getDisplayValue("resizeStartHandle"):"none"));this.resizeEndHandle&&(e=this._isElementVisible("resizeEndHandle",f,b,d),h.set(this.resizeEndHandle,"display",e?this.getDisplayValue("resizeEndHandle"):"none"));this.startTimeLabel&&(e=this._isElementVisible("startTimeLabel",f,b,d),h.set(this.startTimeLabel,
-"display",e?this.getDisplayValue("startTimeLabel"):"none"),e&&this._setText(this.startTimeLabel,this._formatTime(g,this.item.startTime)));this.endTimeLabel&&(e=this._isElementVisible("endTimeLabel",f,b,d),h.set(this.endTimeLabel,"display",e?this.getDisplayValue("endTimeLabel"):"none"),e&&this._setText(this.endTimeLabel,this._formatTime(g,this.item.endTime)));this.summaryLabel&&(e=this._isElementVisible("summaryLabel",f,b,d),h.set(this.summaryLabel,"display",e?this.getDisplayValue("summaryLabel"):
-"none"),e&&this._setText(this.summaryLabel,this.item.summary,!0))}}})});
-//# sourceMappingURL=_RendererMixin.js.map
+define("dojox/calendar/_RendererMixin",["dojo/_base/declare","dojo/_base/lang","dojo/dom-style","dojo/dom-class","dojo/Stateful"],function(_1,_2,_3,_4,_5){
+return _1("dojox.calendar._RendererMixin",_5,{item:null,owner:null,edited:false,focused:false,hovered:false,selected:false,storeState:false,moveEnabled:true,resizeEnabled:true,_orientation:"vertical",_displayValue:"block",_displayValueMap:{},visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:45,endTimeLabel:50},_setSelectedAttr:function(_6){
+this._setState("selected",_6,"Selected");
+},_setFocusedAttr:function(_7){
+this._setState("focused",_7,"Focused");
+},_setEditedAttr:function(_8){
+this._setState("edited",_8,"Edited");
+},_setHoveredAttr:function(_9){
+this._setState("hovered",_9,"Hovered");
+},_setStoreStateAttr:function(_a){
+var _b=null;
+switch(_a){
+case "storing":
+_b="Storing";
+break;
+case "unstored":
+_b="Unstored";
+break;
+default:
+_b=null;
+}
+var tn=this.stateNode||this.domNode;
+_4.remove(tn,"Storing");
+_4.remove(tn,"Unstored");
+this._set("storeState",_a);
+if(_b!=null){
+_4.add(tn,_b);
+}
+},_setState:function(_c,_d,_e){
+if(this[_c]!=_d){
+var tn=this.stateNode||this.domNode;
+_4[_d?"add":"remove"](tn,_e);
+this._set(_c,_d);
+}
+},_setItemAttr:function(_f){
+if(_f==null){
+if(this.item&&this.item.cssClass){
+_4.remove(this.domNode,this.item.cssClass);
+}
+this.item=null;
+}else{
+if(this.item!=null){
+if(this.item.cssClass!=_f.cssClass){
+if(this.item.cssClass){
+_4.remove(this.domNode,this.item.cssClass);
+}
+}
+this.item=_2.mixin(this.item,_f);
+if(_f.cssClass){
+_4.add(this.domNode,_f.cssClass);
+}
+}else{
+this.item=_f;
+if(_f.cssClass){
+_4.add(this.domNode,_f.cssClass);
+}
+}
+}
+},_setText:function(_10,_11,_12){
+if(this.owner){
+this.owner._setText(_10,_11,_12);
+}
+},_isElementVisible:function(elt,_13,_14,_15){
+var _16;
+var _17=this.visibilityLimits[elt];
+switch(elt){
+case "moveHandle":
+_16=this.moveEnabled;
+break;
+case "resizeStartHandle":
+if(this.mobile){
+_16=this.resizeEnabled&&!_13&&this.edited&&(_17==-1||_15>_17);
+}else{
+_16=this.resizeEnabled&&!_13&&(_17==-1||_15>_17);
+}
+break;
+case "resizeEndHandle":
+if(this.mobile){
+_16=this.resizeEnabled&&!_14&&this.edited&&(_17==-1||_15>_17);
+}else{
+_16=this.resizeEnabled&&!_14&&(_17==-1||_15>_17);
+}
+break;
+case "startTimeLabel":
+if(this.mobile){
+_16=!_13&&(!this.edited||this.edited&&(_17==-1||_15>_17));
+}else{
+_16=!_13&&(_17==-1||_15>_17);
+}
+break;
+case "endTimeLabel":
+_16=this.edited&&!_14&&(_17==-1||_15>_17);
+break;
+case "summaryLabel":
+if(this.mobile){
+_16=!this.edited||this.edited&&(_17==-1||_15>_17);
+}else{
+_16=_17==-1||_15>_17;
+}
+break;
+}
+return _16;
+},_formatTime:function(rd,d){
+if(this.owner){
+var f=this.owner.get("formatItemTimeFunc");
+if(f!=null&&typeof f==="function"){
+return f(d,rd,this.owner,this.item);
+}
+}
+return rd.dateLocaleModule.format(d,{selector:"time"});
+},getDisplayValue:function(_18){
+return this._displayValue;
+},updateRendering:function(w,h){
+h=h||this.item.h;
+w=w||this.item.w;
+if(!h&&!w){
+return;
+}
+this.item.h=h;
+this.item.w=w;
+var _19=this._orientation=="vertical"?h:w;
+var rd=this.owner.renderData;
+var _1a=rd.dateModule.compare(this.item.range[0],this.item.startTime)!=0;
+var _1b=rd.dateModule.compare(this.item.range[1],this.item.endTime)!=0;
+var _1c;
+if(this.beforeIcon!=null){
+_1c=this._orientation!="horizontal"||this.isLeftToRight()?_1a:_1b;
+_3.set(this.beforeIcon,"display",_1c?this.getDisplayValue("beforeIcon"):"none");
+}
+if(this.afterIcon!=null){
+_1c=this._orientation!="horizontal"||this.isLeftToRight()?_1b:_1a;
+_3.set(this.afterIcon,"display",_1c?this.getDisplayValue("afterIcon"):"none");
+}
+if(this.moveHandle){
+_1c=this._isElementVisible("moveHandle",_1a,_1b,_19);
+_3.set(this.moveHandle,"display",_1c?this.getDisplayValue("moveHandle"):"none");
+}
+if(this.resizeStartHandle){
+_1c=this._isElementVisible("resizeStartHandle",_1a,_1b,_19);
+_3.set(this.resizeStartHandle,"display",_1c?this.getDisplayValue("resizeStartHandle"):"none");
+}
+if(this.resizeEndHandle){
+_1c=this._isElementVisible("resizeEndHandle",_1a,_1b,_19);
+_3.set(this.resizeEndHandle,"display",_1c?this.getDisplayValue("resizeEndHandle"):"none");
+}
+if(this.startTimeLabel){
+_1c=this._isElementVisible("startTimeLabel",_1a,_1b,_19);
+_3.set(this.startTimeLabel,"display",_1c?this.getDisplayValue("startTimeLabel"):"none");
+if(_1c){
+this._setText(this.startTimeLabel,this._formatTime(rd,this.item.startTime));
+}
+}
+if(this.endTimeLabel){
+_1c=this._isElementVisible("endTimeLabel",_1a,_1b,_19);
+_3.set(this.endTimeLabel,"display",_1c?this.getDisplayValue("endTimeLabel"):"none");
+if(_1c){
+this._setText(this.endTimeLabel,this._formatTime(rd,this.item.endTime));
+}
+}
+if(this.summaryLabel){
+_1c=this._isElementVisible("summaryLabel",_1a,_1b,_19);
+_3.set(this.summaryLabel,"display",_1c?this.getDisplayValue("summaryLabel"):"none");
+if(_1c){
+this._setText(this.summaryLabel,this.item.summary,true);
+}
+}
+}});
+});

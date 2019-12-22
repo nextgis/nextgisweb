@@ -1,3 +1,5 @@
 //>>built
-define("dojox/charting/themes/GreySkies",["../SimpleTheme","./common"],function(b,a){a.GreySkies=new b;return a.GreySkies});
-//# sourceMappingURL=GreySkies.js.map
+define("dojox/charting/themes/GreySkies",["../SimpleTheme","./common"],function(_1,_2){
+_2.GreySkies=new _1();
+return _2.GreySkies;
+});

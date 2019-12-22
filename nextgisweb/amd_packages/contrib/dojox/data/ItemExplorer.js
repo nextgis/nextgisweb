@@ -1,22 +1,454 @@
 //>>built
-define("dojox/data/ItemExplorer",["dojo","dijit","dojox","dojo/require!dijit/Tree,dijit/Dialog,dijit/Menu,dijit/form/ValidationTextBox,dijit/form/Textarea,dijit/form/Button,dijit/form/RadioButton,dijit/form/FilteringSelect"],function(c,e,v){c.provide("dojox.data.ItemExplorer");c.require("dijit.Tree");c.require("dijit.Dialog");c.require("dijit.Menu");c.require("dijit.form.ValidationTextBox");c.require("dijit.form.Textarea");c.require("dijit.form.Button");c.require("dijit.form.RadioButton");c.require("dijit.form.FilteringSelect");
-(function(){var p=function(b,a,c){var d=b.getValues(a,c);2>d.length&&(d=b.getValue(a,c));return d};c.declare("dojox.data.ItemExplorer",e.Tree,{useSelect:!1,refSelectSearchAttr:null,constructor:function(b){c.mixin(this,b);var a=this,g={},d=this.rootModelNode={value:g,id:"root"};this._modelNodeIdMap={};this._modelNodePropMap={};var f=1;this.model={getRoot:function(a){a(d)},mayHaveChildren:function(a){return a.value&&"object"==typeof a.value&&!(a.value instanceof Date)},getChildren:function(b,c,d){function l(){if(n)f=
-a.store.getAttributes(h),e=h;else if(h&&"object"==typeof h){e=b.value;f=[];for(var d in h)h.hasOwnProperty(d)&&"__id"!=d&&"__clientId"!=d&&f.push(d)}if(f){for(var g=0;d=f[g++];)q.push({property:d,value:n?p(a.store,h,d):h[d],parent:e});q.push({addNew:!0,parent:e,parentNode:b})}c(q)}var f,e,h=b.value,q=[];if(h==g)c([]);else{var n=a.store&&a.store.isItem(h,!0);n&&!a.store.isItemLoaded(h)?a.store.loadItem({item:h,onItem:function(a){h=a;l()}}):l()}},getIdentity:function(b){if(!b.id&&(b.addNew&&(b.property=
-"--addNew"),b.id=f++,a.store)){if(a.store.isItem(b.value)){var c=a.store.getIdentity(b.value);(a._modelNodeIdMap[c]=a._modelNodeIdMap[c]||[]).push(b)}b.parent&&(c=a.store.getIdentity(b.parent)+"."+b.property,(a._modelNodePropMap[c]=a._modelNodePropMap[c]||[]).push(b))}return b.id},getLabel:function(a){return a===d?"Object Properties":a.addNew?a.parent instanceof Array?"Add new value":"Add new property":a.property+": "+(a.value instanceof Array?"("+a.value.length+" elements)":a.value)},onChildrenChange:function(a){},
-onChange:function(a){}}},postCreate:function(){this.inherited(arguments);c.connect(this,"onClick",function(a,b){this.lastFocused=b;a.addNew?this._addProperty():this._editProperty()});var b=new e.Menu({targetNodeIds:[this.rootNode.domNode],id:"contextMenu"});c.connect(b,"_openMyself",this,function(a){if(a=e.getEnclosingWidget(a.target)){var g=a.item;this.store.isItem(g.value,!0)&&!g.parent?(c.forEach(b.getChildren(),function(a){a.attr("disabled","Add"!=a.label)}),this.lastFocused=a):!g.value||"object"!=
-typeof g.value||g.value instanceof Date?g.property&&0<=c.indexOf(this.store.getIdentityAttributes(),g.property)?(this.focusNode(a),alert("Cannot modify an Identifier node.")):g.addNew?this.focusNode(a):(c.forEach(b.getChildren(),function(a){a.attr("disabled","Edit"!=a.label&&"Delete"!=a.label)}),this.lastFocused=a):(c.forEach(b.getChildren(),function(a){a.attr("disabled","Add"!=a.label&&"Delete"!=a.label)}),this.lastFocused=a)}});b.addChild(new e.MenuItem({label:"Add",onClick:c.hitch(this,"_addProperty")}));
-b.addChild(new e.MenuItem({label:"Edit",onClick:c.hitch(this,"_editProperty")}));b.addChild(new e.MenuItem({label:"Delete",onClick:c.hitch(this,"_destroyProperty")}));b.startup()},store:null,setStore:function(b){this.store=b;var a=this;this._editDialog&&(this._editDialog.destroyRecursive(),delete this._editDialog);c.connect(b,"onSet",function(b,c,f,e){var d=a.store.getIdentity(b);if((b=a._modelNodeIdMap[d])&&(void 0===f||void 0===e||f instanceof Array||e instanceof Array||"object"==typeof f||"object"==
-typeof e))for(f=0;f<b.length;f++)(function(b){a.model.getChildren(b,function(c){a.model.onChildrenChange(b,c)})})(b[f]);if(b=a._modelNodePropMap[d+"."+c])for(f=0;f<b.length;f++)b[f].value=e,a.model.onChange(b[f])});this.rootNode.setChildItems([])},setItem:function(b){(this._modelNodeIdMap={})[this.store.getIdentity(b)]=[this.rootModelNode];this._modelNodePropMap={};this.rootModelNode.value=b;var a=this;this.model.getChildren(this.rootModelNode,function(b){a.rootNode.setChildItems(b)})},refreshItem:function(){this.setItem(this.rootModelNode.value)},
-_createEditDialog:function(){this._editDialog=new e.Dialog({title:"Edit Property",execute:c.hitch(this,"_updateItem"),preload:!0});this._editDialog.placeAt(c.body());this._editDialog.startup();var b=c.doc.createElement("div"),a=c.doc.createElement("label");c.attr(a,"for","property");c.style(a,"fontWeight","bold");c.attr(a,"innerHTML","Property:");b.appendChild(a);(new e.form.ValidationTextBox({name:"property",value:"",required:!0,disabled:!0})).placeAt(b);b.appendChild(c.doc.createElement("br"));
-b.appendChild(c.doc.createElement("br"));(new e.form.RadioButton({name:"itemType",value:"value",onClick:c.hitch(this,function(){this._enableFields("value")})})).placeAt(b);a=c.doc.createElement("label");c.attr(a,"for","value");c.attr(a,"innerHTML","Value (JSON):");b.appendChild(a);a=c.doc.createElement("div");c.addClass(a,"value");(new e.form.Textarea({name:"jsonVal"})).placeAt(a);b.appendChild(a);(new e.form.RadioButton({name:"itemType",value:"reference",onClick:c.hitch(this,function(){this._enableFields("reference")})})).placeAt(b);
-a=c.doc.createElement("label");c.attr(a,"for","_reference");c.attr(a,"innerHTML","Reference (ID):");b.appendChild(a);b.appendChild(c.doc.createElement("br"));a=c.doc.createElement("div");c.addClass(a,"reference");this.useSelect?(new e.form.FilteringSelect({name:"_reference",store:this.store,searchAttr:this.refSelectSearchAttr||this.store.getIdentityAttributes()[0],required:!1,value:null,pageSize:10})).placeAt(a):(new e.form.ValidationTextBox({name:"_reference",value:"",promptMessage:"Enter the ID of the item to reference",
-isValid:c.hitch(this,function(a){return!0})})).placeAt(a);b.appendChild(a);b.appendChild(c.doc.createElement("br"));b.appendChild(c.doc.createElement("br"));a=document.createElement("div");a.setAttribute("dir","rtl");(new e.form.Button({type:"reset",label:"Cancel"})).placeAt(a).onClick=c.hitch(this._editDialog,"onCancel");(new e.form.Button({type:"submit",label:"OK"})).placeAt(a);b.appendChild(a);this._editDialog.attr("content",b)},_enableFields:function(b){switch(b){case "reference":c.query(".value [widgetId]",
-this._editDialog.containerNode).forEach(function(a){e.getEnclosingWidget(a).attr("disabled",!0)});c.query(".reference [widgetId]",this._editDialog.containerNode).forEach(function(a){e.getEnclosingWidget(a).attr("disabled",!1)});break;case "value":c.query(".value [widgetId]",this._editDialog.containerNode).forEach(function(a){e.getEnclosingWidget(a).attr("disabled",!1)}),c.query(".reference [widgetId]",this._editDialog.containerNode).forEach(function(a){e.getEnclosingWidget(a).attr("disabled",!0)})}},
-_updateItem:function(b){function a(){try{var a,c=[],l=b.property;if(n){for(;!k.isItem(d.parent,!0);)g=g.getParent(),c.push(d.property),d=g.item;if(0==c.length)k.setValue(d.parent,d.property,f);else{e=p(k,d.parent,d.property);e instanceof Array&&(e=e.concat());for(a=e;1<c.length;)a=a[c.pop()];a[c]=f;k.setValue(d.parent,d.property,e)}}else if(k.isItem(m,!0))k.isItemLoaded(m)?(m instanceof Array&&(l=m.length),k.setValue(m,l,f)):k.loadItem({item:m,onItem:function(a){a instanceof Array&&(l=a.length);k.setValue(a,
-l,f)}});else{for(d.value instanceof Array?c.push(d.value.length):c.push(b.property);!k.isItem(d.parent,!0);)g=g.getParent(),c.push(d.property),d=g.item;for(a=e=p(k,d.parent,d.property);1<c.length;)a=a[c.pop()];a[c]=f;k.setValue(d.parent,d.property,e)}}catch(u){alert(u)}}var g,d,f,e,n="Edit Property"==this._editDialog.attr("title"),r=this._editDialog,k=this.store;if(r.validate()){g=this.lastFocused;d=g.item;var m=d.value;d.addNew&&(m=g.item.parent,g=g.getParent(),d=g.item);f=null;switch(b.itemType){case "reference":this.store.fetchItemByIdentity({identity:b._reference,
-onItem:function(b){f=b;a()},onError:function(){alert("The id could not be found")}});break;case "value":var t=b.jsonVal;f=c.fromJson(t);"function"==typeof f&&(f.toString=function(){return t});a()}}else r.show()},_editProperty:function(){var b=c.mixin({},this.lastFocused.item);this._editDialog?this._editDialog.reset():this._createEditDialog();if(0<=c.indexOf(this.store.getIdentityAttributes(),b.property))alert("Cannot Edit an Identifier!");else if(this._editDialog.attr("title","Edit Property"),e.getEnclosingWidget(c.query("input",
-this._editDialog.containerNode)[0]).attr("disabled",!0),this.store.isItem(b.value,!0))b.parent&&(b.itemType="reference",this._enableFields(b.itemType),b._reference=this.store.getIdentity(b.value),this._editDialog.attr("value",b),this._editDialog.show());else if(!b.value||"object"!=typeof b.value||b.value instanceof Date)b.itemType="value",this._enableFields(b.itemType),b.jsonVal="function"==typeof b.value?b.value.toString():b.value instanceof Date?'new Date("'+b.value+'")':c.toJson(b.value),this._editDialog.attr("value",
-b),this._editDialog.show()},_destroyProperty:function(){for(var b=this.lastFocused,a=b.item,e=[];!this.store.isItem(a.parent,!0)||a.parent instanceof Array;)b=b.getParent(),e.push(a.property),a=b.item;if(0<=c.indexOf(this.store.getIdentityAttributes(),a.property))alert("Cannot Delete an Identifier!");else try{if(0<e.length){var d,f=p(this.store,a.parent,a.property);for(d=f;1<e.length;)d=d[e.pop()];c.isArray(d)?d.splice(e,1):delete d[e];this.store.setValue(a.parent,a.property,f)}else this.store.unsetAttribute(a.parent,
-a.property)}catch(l){alert(l)}},_addProperty:function(){var b=this.lastFocused.item,a=b.value,g=c.hitch(this,function(){var b=null;this._editDialog?this._editDialog.reset():this._createEditDialog();a instanceof Array?(b=a.length,e.getEnclosingWidget(c.query("input",this._editDialog.containerNode)[0]).attr("disabled",!0)):e.getEnclosingWidget(c.query("input",this._editDialog.containerNode)[0]).attr("disabled",!1);this._editDialog.attr("title","Add Property");this._enableFields("value");this._editDialog.attr("value",
-{itemType:"value",property:b});this._editDialog.show()});b.addNew&&(b=this.lastFocused.getParent().item,a=this.lastFocused.item.parent);b.property&&0<=c.indexOf(this.store.getIdentityAttributes(),b.property)?alert("Cannot add properties to an ID node!"):this.store.isItem(a,!0)&&!this.store.isItemLoaded(a)?this.store.loadItem({item:a,onItem:function(b){a=b;g()}}):g()}})})()});
-//# sourceMappingURL=ItemExplorer.js.map
+define("dojox/data/ItemExplorer",["dojo","dijit","dojox","dojo/require!dijit/Tree,dijit/Dialog,dijit/Menu,dijit/form/ValidationTextBox,dijit/form/Textarea,dijit/form/Button,dijit/form/RadioButton,dijit/form/FilteringSelect"],function(_1,_2,_3){
+_1.provide("dojox.data.ItemExplorer");
+_1.require("dijit.Tree");
+_1.require("dijit.Dialog");
+_1.require("dijit.Menu");
+_1.require("dijit.form.ValidationTextBox");
+_1.require("dijit.form.Textarea");
+_1.require("dijit.form.Button");
+_1.require("dijit.form.RadioButton");
+_1.require("dijit.form.FilteringSelect");
+(function(){
+var _4=function(_5,_6,_7){
+var _8=_5.getValues(_6,_7);
+if(_8.length<2){
+_8=_5.getValue(_6,_7);
+}
+return _8;
+};
+_1.declare("dojox.data.ItemExplorer",_2.Tree,{useSelect:false,refSelectSearchAttr:null,constructor:function(_9){
+_1.mixin(this,_9);
+var _a=this;
+var _b={};
+var _c=(this.rootModelNode={value:_b,id:"root"});
+this._modelNodeIdMap={};
+this._modelNodePropMap={};
+var _d=1;
+this.model={getRoot:function(_e){
+_e(_c);
+},mayHaveChildren:function(_f){
+return _f.value&&typeof _f.value=="object"&&!(_f.value instanceof Date);
+},getChildren:function(_10,_11,_12){
+var _13,_14,_15=_10.value;
+var _16=[];
+if(_15==_b){
+_11([]);
+return;
+}
+var _17=_a.store&&_a.store.isItem(_15,true);
+if(_17&&!_a.store.isItemLoaded(_15)){
+_a.store.loadItem({item:_15,onItem:function(_18){
+_15=_18;
+_19();
+}});
+}else{
+_19();
+}
+function _19(){
+if(_17){
+_13=_a.store.getAttributes(_15);
+_14=_15;
+}else{
+if(_15&&typeof _15=="object"){
+_14=_10.value;
+_13=[];
+for(var i in _15){
+if(_15.hasOwnProperty(i)&&i!="__id"&&i!="__clientId"){
+_13.push(i);
+}
+}
+}
+}
+if(_13){
+for(var key,k=0;key=_13[k++];){
+_16.push({property:key,value:_17?_4(_a.store,_15,key):_15[key],parent:_14});
+}
+_16.push({addNew:true,parent:_14,parentNode:_10});
+}
+_11(_16);
+};
+},getIdentity:function(_1a){
+if(!_1a.id){
+if(_1a.addNew){
+_1a.property="--addNew";
+}
+_1a.id=_d++;
+if(_a.store){
+if(_a.store.isItem(_1a.value)){
+var _1b=_a.store.getIdentity(_1a.value);
+(_a._modelNodeIdMap[_1b]=_a._modelNodeIdMap[_1b]||[]).push(_1a);
+}
+if(_1a.parent){
+_1b=_a.store.getIdentity(_1a.parent)+"."+_1a.property;
+(_a._modelNodePropMap[_1b]=_a._modelNodePropMap[_1b]||[]).push(_1a);
+}
+}
+}
+return _1a.id;
+},getLabel:function(_1c){
+return _1c===_c?"Object Properties":_1c.addNew?(_1c.parent instanceof Array?"Add new value":"Add new property"):_1c.property+": "+(_1c.value instanceof Array?"("+_1c.value.length+" elements)":_1c.value);
+},onChildrenChange:function(_1d){
+},onChange:function(_1e){
+}};
+},postCreate:function(){
+this.inherited(arguments);
+_1.connect(this,"onClick",function(_1f,_20){
+this.lastFocused=_20;
+if(_1f.addNew){
+this._addProperty();
+}else{
+this._editProperty();
+}
+});
+var _21=new _2.Menu({targetNodeIds:[this.rootNode.domNode],id:"contextMenu"});
+_1.connect(_21,"_openMyself",this,function(e){
+var _22=_2.getEnclosingWidget(e.target);
+if(_22){
+var _23=_22.item;
+if(this.store.isItem(_23.value,true)&&!_23.parent){
+_1.forEach(_21.getChildren(),function(_24){
+_24.attr("disabled",(_24.label!="Add"));
+});
+this.lastFocused=_22;
+}else{
+if(_23.value&&typeof _23.value=="object"&&!(_23.value instanceof Date)){
+_1.forEach(_21.getChildren(),function(_25){
+_25.attr("disabled",(_25.label!="Add")&&(_25.label!="Delete"));
+});
+this.lastFocused=_22;
+}else{
+if(_23.property&&_1.indexOf(this.store.getIdentityAttributes(),_23.property)>=0){
+this.focusNode(_22);
+alert("Cannot modify an Identifier node.");
+}else{
+if(_23.addNew){
+this.focusNode(_22);
+}else{
+_1.forEach(_21.getChildren(),function(_26){
+_26.attr("disabled",(_26.label!="Edit")&&(_26.label!="Delete"));
+});
+this.lastFocused=_22;
+}
+}
+}
+}
+}
+});
+_21.addChild(new _2.MenuItem({label:"Add",onClick:_1.hitch(this,"_addProperty")}));
+_21.addChild(new _2.MenuItem({label:"Edit",onClick:_1.hitch(this,"_editProperty")}));
+_21.addChild(new _2.MenuItem({label:"Delete",onClick:_1.hitch(this,"_destroyProperty")}));
+_21.startup();
+},store:null,setStore:function(_27){
+this.store=_27;
+var _28=this;
+if(this._editDialog){
+this._editDialog.destroyRecursive();
+delete this._editDialog;
+}
+_1.connect(_27,"onSet",function(_29,_2a,_2b,_2c){
+var _2d,i,_2e=_28.store.getIdentity(_29);
+_2d=_28._modelNodeIdMap[_2e];
+if(_2d&&(_2b===undefined||_2c===undefined||_2b instanceof Array||_2c instanceof Array||typeof _2b=="object"||typeof _2c=="object")){
+for(i=0;i<_2d.length;i++){
+(function(_2f){
+_28.model.getChildren(_2f,function(_30){
+_28.model.onChildrenChange(_2f,_30);
+});
+})(_2d[i]);
+}
+}
+_2d=_28._modelNodePropMap[_2e+"."+_2a];
+if(_2d){
+for(i=0;i<_2d.length;i++){
+_2d[i].value=_2c;
+_28.model.onChange(_2d[i]);
+}
+}
+});
+this.rootNode.setChildItems([]);
+},setItem:function(_31){
+(this._modelNodeIdMap={})[this.store.getIdentity(_31)]=[this.rootModelNode];
+this._modelNodePropMap={};
+this.rootModelNode.value=_31;
+var _32=this;
+this.model.getChildren(this.rootModelNode,function(_33){
+_32.rootNode.setChildItems(_33);
+});
+},refreshItem:function(){
+this.setItem(this.rootModelNode.value);
+},_createEditDialog:function(){
+this._editDialog=new _2.Dialog({title:"Edit Property",execute:_1.hitch(this,"_updateItem"),preload:true});
+this._editDialog.placeAt(_1.body());
+this._editDialog.startup();
+var _34=_1.doc.createElement("div");
+var _35=_1.doc.createElement("label");
+_1.attr(_35,"for","property");
+_1.style(_35,"fontWeight","bold");
+_1.attr(_35,"innerHTML","Property:");
+_34.appendChild(_35);
+var _36=new _2.form.ValidationTextBox({name:"property",value:"",required:true,disabled:true}).placeAt(_34);
+_34.appendChild(_1.doc.createElement("br"));
+_34.appendChild(_1.doc.createElement("br"));
+var _37=new _2.form.RadioButton({name:"itemType",value:"value",onClick:_1.hitch(this,function(){
+this._enableFields("value");
+})}).placeAt(_34);
+var _38=_1.doc.createElement("label");
+_1.attr(_38,"for","value");
+_1.attr(_38,"innerHTML","Value (JSON):");
+_34.appendChild(_38);
+var _39=_1.doc.createElement("div");
+_1.addClass(_39,"value");
+var _3a=new _2.form.Textarea({name:"jsonVal"}).placeAt(_39);
+_34.appendChild(_39);
+var _3b=new _2.form.RadioButton({name:"itemType",value:"reference",onClick:_1.hitch(this,function(){
+this._enableFields("reference");
+})}).placeAt(_34);
+var _3c=_1.doc.createElement("label");
+_1.attr(_3c,"for","_reference");
+_1.attr(_3c,"innerHTML","Reference (ID):");
+_34.appendChild(_3c);
+_34.appendChild(_1.doc.createElement("br"));
+var _3d=_1.doc.createElement("div");
+_1.addClass(_3d,"reference");
+if(this.useSelect){
+var _3e=new _2.form.FilteringSelect({name:"_reference",store:this.store,searchAttr:this.refSelectSearchAttr||this.store.getIdentityAttributes()[0],required:false,value:null,pageSize:10}).placeAt(_3d);
+}else{
+var _3f=new _2.form.ValidationTextBox({name:"_reference",value:"",promptMessage:"Enter the ID of the item to reference",isValid:_1.hitch(this,function(_40){
+return true;
+})}).placeAt(_3d);
+}
+_34.appendChild(_3d);
+_34.appendChild(_1.doc.createElement("br"));
+_34.appendChild(_1.doc.createElement("br"));
+var _41=document.createElement("div");
+_41.setAttribute("dir","rtl");
+var _42=new _2.form.Button({type:"reset",label:"Cancel"}).placeAt(_41);
+_42.onClick=_1.hitch(this._editDialog,"onCancel");
+var _43=new _2.form.Button({type:"submit",label:"OK"}).placeAt(_41);
+_34.appendChild(_41);
+this._editDialog.attr("content",_34);
+},_enableFields:function(_44){
+switch(_44){
+case "reference":
+_1.query(".value [widgetId]",this._editDialog.containerNode).forEach(function(_45){
+_2.getEnclosingWidget(_45).attr("disabled",true);
+});
+_1.query(".reference [widgetId]",this._editDialog.containerNode).forEach(function(_46){
+_2.getEnclosingWidget(_46).attr("disabled",false);
+});
+break;
+case "value":
+_1.query(".value [widgetId]",this._editDialog.containerNode).forEach(function(_47){
+_2.getEnclosingWidget(_47).attr("disabled",false);
+});
+_1.query(".reference [widgetId]",this._editDialog.containerNode).forEach(function(_48){
+_2.getEnclosingWidget(_48).attr("disabled",true);
+});
+break;
+}
+},_updateItem:function(_49){
+var _4a,_4b,val,_4c,_4d=this._editDialog.attr("title")=="Edit Property";
+var _4e=this._editDialog;
+var _4f=this.store;
+function _50(){
+try{
+var _51,_52=[];
+var _53=_49.property;
+if(_4d){
+while(!_4f.isItem(_4b.parent,true)){
+_4a=_4a.getParent();
+_52.push(_4b.property);
+_4b=_4a.item;
+}
+if(_52.length==0){
+_4f.setValue(_4b.parent,_4b.property,val);
+}else{
+_4c=_4(_4f,_4b.parent,_4b.property);
+if(_4c instanceof Array){
+_4c=_4c.concat();
+}
+_51=_4c;
+while(_52.length>1){
+_51=_51[_52.pop()];
+}
+_51[_52]=val;
+_4f.setValue(_4b.parent,_4b.property,_4c);
+}
+}else{
+if(_4f.isItem(_54,true)){
+if(!_4f.isItemLoaded(_54)){
+_4f.loadItem({item:_54,onItem:function(_55){
+if(_55 instanceof Array){
+_53=_55.length;
+}
+_4f.setValue(_55,_53,val);
+}});
+}else{
+if(_54 instanceof Array){
+_53=_54.length;
+}
+_4f.setValue(_54,_53,val);
+}
+}else{
+if(_4b.value instanceof Array){
+_52.push(_4b.value.length);
+}else{
+_52.push(_49.property);
+}
+while(!_4f.isItem(_4b.parent,true)){
+_4a=_4a.getParent();
+_52.push(_4b.property);
+_4b=_4a.item;
+}
+_4c=_4(_4f,_4b.parent,_4b.property);
+_51=_4c;
+while(_52.length>1){
+_51=_51[_52.pop()];
+}
+_51[_52]=val;
+_4f.setValue(_4b.parent,_4b.property,_4c);
+}
+}
+}
+catch(e){
+alert(e);
+}
+};
+if(_4e.validate()){
+_4a=this.lastFocused;
+_4b=_4a.item;
+var _54=_4b.value;
+if(_4b.addNew){
+_54=_4a.item.parent;
+_4a=_4a.getParent();
+_4b=_4a.item;
+}
+val=null;
+switch(_49.itemType){
+case "reference":
+this.store.fetchItemByIdentity({identity:_49._reference,onItem:function(_56){
+val=_56;
+_50();
+},onError:function(){
+alert("The id could not be found");
+}});
+break;
+case "value":
+var _57=_49.jsonVal;
+val=_1.fromJson(_57);
+if(typeof val=="function"){
+val.toString=function(){
+return _57;
+};
+}
+_50();
+break;
+}
+}else{
+_4e.show();
+}
+},_editProperty:function(){
+var _58=_1.mixin({},this.lastFocused.item);
+if(!this._editDialog){
+this._createEditDialog();
+}else{
+this._editDialog.reset();
+}
+if(_1.indexOf(this.store.getIdentityAttributes(),_58.property)>=0){
+alert("Cannot Edit an Identifier!");
+}else{
+this._editDialog.attr("title","Edit Property");
+_2.getEnclosingWidget(_1.query("input",this._editDialog.containerNode)[0]).attr("disabled",true);
+if(this.store.isItem(_58.value,true)){
+if(_58.parent){
+_58.itemType="reference";
+this._enableFields(_58.itemType);
+_58._reference=this.store.getIdentity(_58.value);
+this._editDialog.attr("value",_58);
+this._editDialog.show();
+}
+}else{
+if(_58.value&&typeof _58.value=="object"&&!(_58.value instanceof Date)){
+}else{
+_58.itemType="value";
+this._enableFields(_58.itemType);
+_58.jsonVal=typeof _58.value=="function"?_58.value.toString():_58.value instanceof Date?"new Date(\""+_58.value+"\")":_1.toJson(_58.value);
+this._editDialog.attr("value",_58);
+this._editDialog.show();
+}
+}
+}
+},_destroyProperty:function(){
+var _59=this.lastFocused;
+var _5a=_59.item;
+var _5b=[];
+while(!this.store.isItem(_5a.parent,true)||_5a.parent instanceof Array){
+_59=_59.getParent();
+_5b.push(_5a.property);
+_5a=_59.item;
+}
+if(_1.indexOf(this.store.getIdentityAttributes(),_5a.property)>=0){
+alert("Cannot Delete an Identifier!");
+}else{
+try{
+if(_5b.length>0){
+var _5c,_5d=_4(this.store,_5a.parent,_5a.property);
+_5c=_5d;
+while(_5b.length>1){
+_5c=_5c[_5b.pop()];
+}
+if(_1.isArray(_5c)){
+_5c.splice(_5b,1);
+}else{
+delete _5c[_5b];
+}
+this.store.setValue(_5a.parent,_5a.property,_5d);
+}else{
+this.store.unsetAttribute(_5a.parent,_5a.property);
+}
+}
+catch(e){
+alert(e);
+}
+}
+},_addProperty:function(){
+var _5e=this.lastFocused.item;
+var _5f=_5e.value;
+var _60=_1.hitch(this,function(){
+var _61=null;
+if(!this._editDialog){
+this._createEditDialog();
+}else{
+this._editDialog.reset();
+}
+if(_5f instanceof Array){
+_61=_5f.length;
+_2.getEnclosingWidget(_1.query("input",this._editDialog.containerNode)[0]).attr("disabled",true);
+}else{
+_2.getEnclosingWidget(_1.query("input",this._editDialog.containerNode)[0]).attr("disabled",false);
+}
+this._editDialog.attr("title","Add Property");
+this._enableFields("value");
+this._editDialog.attr("value",{itemType:"value",property:_61});
+this._editDialog.show();
+});
+if(_5e.addNew){
+_5e=this.lastFocused.getParent().item;
+_5f=this.lastFocused.item.parent;
+}
+if(_5e.property&&_1.indexOf(this.store.getIdentityAttributes(),_5e.property)>=0){
+alert("Cannot add properties to an ID node!");
+}else{
+if(this.store.isItem(_5f,true)&&!this.store.isItemLoaded(_5f)){
+this.store.loadItem({item:_5f,onItem:function(_62){
+_5f=_62;
+_60();
+}});
+}else{
+_60();
+}
+}
+}});
+})();
+});

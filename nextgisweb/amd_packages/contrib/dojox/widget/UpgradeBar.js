@@ -1,9 +1,90 @@
 //>>built
-require({cache:{"url:dojox/widget/UpgradeBar/UpgradeBar.html":'\x3cdiv class\x3d"dojoxUpgradeBar"\x3e\n\t\x3cdiv class\x3d"dojoxUpgradeBarMessage" dojoAttachPoint\x3d"messageNode"\x3emessage\x3c/div\x3e\n\t\x3cdiv class\x3d"dojoxUpgradeBarReminderButton" dojoAttachPoint\x3d"dontRemindButtonNode" dojoAttachEvent\x3d"onclick:_onDontRemindClick"\x3e${noRemindButton}\x3c/div\x3e\n\t\x3cspan dojoAttachPoint\x3d"closeButtonNode" class\x3d"dojoxUpgradeBarCloseIcon" dojoAttachEvent\x3d"onclick: hide, onmouseenter: _onCloseEnter, onmouseleave: _onCloseLeave" title\x3d"${buttonCancel}"\x3e\x3c/span\x3e\n\x3c/div\x3e'}});
-define("dojox/widget/UpgradeBar","dojo/_base/kernel dojo/_base/array dojo/_base/connect dojo/_base/declare dojo/_base/fx dojo/_base/lang dojo/_base/sniff dojo/_base/window dojo/dom-attr dojo/dom-class dojo/dom-construct dojo/dom-geometry dojo/dom-style dojo/cookie dojo/domReady dojo/fx dojo/window dijit/_WidgetBase dijit/_TemplatedMixin dojo/text!./UpgradeBar/UpgradeBar.html".split(" "),function(e,l,m,n,c,f,p,d,q,g,r,t,b,h,u,k,v,w,x,y){e.experimental("dojox.widget.UpgradeBar");return n("dojox.widget.UpgradeBar",
-[w,x],{notifications:[],buttonCancel:"Close for now",noRemindButton:"Don't Remind Me Again",templateString:y,constructor:function(a,b){!a.notifications&&b&&l.forEach(b.childNodes,function(a){if(1==a.nodeType){var b=q.get(a,"validate");this.notifications.push({message:a.innerHTML,validate:function(){var a=!0;try{a=e.eval(b)}catch(z){}return a}})}},this)},checkNotifications:function(){if(this.notifications.length)for(var a=0;a<this.notifications.length;a++)if(this.notifications[a].validate()){this.notify(this.notifications[a].message);
-break}},postCreate:function(){this.inherited(arguments);this.domNode.parentNode&&b.set(this.domNode,"display","none");f.mixin(this.attributeMap,{message:{node:"messageNode",type:"innerHTML"}});this.noRemindButton||r.destroy(this.dontRemindButtonNode);if(6==p("ie")){var a=this,c=function(){var c=v.getBox();b.set(a.domNode,"width",c.w+"px")};this.connect(window,"resize",function(){c()});c()}u(f.hitch(this,"checkNotifications"))},notify:function(a){h("disableUpgradeReminders")||(this.domNode.parentNode&&
-this.domNode.parentNode.innerHTML||document.body.appendChild(this.domNode),b.set(this.domNode,"display",""),a&&this.set("message",a))},show:function(){this._bodyMarginTop=b.get(d.body(),"marginTop");this._size=t.getContentBox(this.domNode).h;b.set(this.domNode,{display:"block",height:0,opacity:0});this._showAnim||(this._showAnim=k.combine([c.animateProperty({node:d.body(),duration:500,properties:{marginTop:this._bodyMarginTop+this._size}}),c.animateProperty({node:this.domNode,duration:500,properties:{height:this._size,
-opacity:1}})]));this._showAnim.play()},hide:function(){this._hideAnim||(this._hideAnim=k.combine([c.animateProperty({node:d.body(),duration:500,properties:{marginTop:this._bodyMarginTop}}),c.animateProperty({node:this.domNode,duration:500,properties:{height:0,opacity:0}})]),m.connect(this._hideAnim,"onEnd",this,function(){b.set(this.domNode,{display:"none",opacity:1})}));this._hideAnim.play()},_onDontRemindClick:function(){h("disableUpgradeReminders",!0,{expires:3650});this.hide()},_onCloseEnter:function(){g.add(this.closeButtonNode,
-"dojoxUpgradeBarCloseIcon-hover")},_onCloseLeave:function(){g.remove(this.closeButtonNode,"dojoxUpgradeBarCloseIcon-hover")}})});
-//# sourceMappingURL=UpgradeBar.js.map
+require({cache:{"url:dojox/widget/UpgradeBar/UpgradeBar.html":"<div class=\"dojoxUpgradeBar\">\n\t<div class=\"dojoxUpgradeBarMessage\" dojoAttachPoint=\"messageNode\">message</div>\n\t<div class=\"dojoxUpgradeBarReminderButton\" dojoAttachPoint=\"dontRemindButtonNode\" dojoAttachEvent=\"onclick:_onDontRemindClick\">${noRemindButton}</div>\n\t<span dojoAttachPoint=\"closeButtonNode\" class=\"dojoxUpgradeBarCloseIcon\" dojoAttachEvent=\"onclick: hide, onmouseenter: _onCloseEnter, onmouseleave: _onCloseLeave\" title=\"${buttonCancel}\"></span>\n</div>"}});
+define("dojox/widget/UpgradeBar",["dojo/_base/kernel","dojo/_base/array","dojo/_base/connect","dojo/_base/declare","dojo/_base/fx","dojo/_base/lang","dojo/_base/sniff","dojo/_base/window","dojo/dom-attr","dojo/dom-class","dojo/dom-construct","dojo/dom-geometry","dojo/dom-style","dojo/cookie","dojo/domReady","dojo/fx","dojo/window","dijit/_WidgetBase","dijit/_TemplatedMixin","dojo/text!./UpgradeBar/UpgradeBar.html"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f,fx,win,_10,_11,_12){
+_1.experimental("dojox.widget.UpgradeBar");
+var _13=_4("dojox.widget.UpgradeBar",[_10,_11],{notifications:[],buttonCancel:"Close for now",noRemindButton:"Don't Remind Me Again",templateString:_12,constructor:function(_14,_15){
+if(!_14.notifications&&_15){
+_2.forEach(_15.childNodes,function(n){
+if(n.nodeType==1){
+var val=_9.get(n,"validate");
+this.notifications.push({message:n.innerHTML,validate:function(){
+var _16=true;
+try{
+_16=_1.eval(val);
+}
+catch(e){
+}
+return _16;
+}});
+}
+},this);
+}
+},checkNotifications:function(){
+if(!this.notifications.length){
+return;
+}
+for(var i=0;i<this.notifications.length;i++){
+var _17=this.notifications[i].validate();
+if(_17){
+this.notify(this.notifications[i].message);
+break;
+}
+}
+},postCreate:function(){
+this.inherited(arguments);
+if(this.domNode.parentNode){
+_d.set(this.domNode,"display","none");
+}
+_6.mixin(this.attributeMap,{message:{node:"messageNode",type:"innerHTML"}});
+if(!this.noRemindButton){
+_b.destroy(this.dontRemindButtonNode);
+}
+if(_7("ie")==6){
+var _18=this;
+var _19=function(){
+var v=win.getBox();
+_d.set(_18.domNode,"width",v.w+"px");
+};
+this.connect(window,"resize",function(){
+_19();
+});
+_19();
+}
+_f(_6.hitch(this,"checkNotifications"));
+},notify:function(msg){
+if(_e("disableUpgradeReminders")){
+return;
+}
+if(!this.domNode.parentNode||!this.domNode.parentNode.innerHTML){
+document.body.appendChild(this.domNode);
+}
+_d.set(this.domNode,"display","");
+if(msg){
+this.set("message",msg);
+}
+},show:function(){
+this._bodyMarginTop=_d.get(_8.body(),"marginTop");
+this._size=_c.getContentBox(this.domNode).h;
+_d.set(this.domNode,{display:"block",height:0,opacity:0});
+if(!this._showAnim){
+this._showAnim=fx.combine([_5.animateProperty({node:_8.body(),duration:500,properties:{marginTop:this._bodyMarginTop+this._size}}),_5.animateProperty({node:this.domNode,duration:500,properties:{height:this._size,opacity:1}})]);
+}
+this._showAnim.play();
+},hide:function(){
+if(!this._hideAnim){
+this._hideAnim=fx.combine([_5.animateProperty({node:_8.body(),duration:500,properties:{marginTop:this._bodyMarginTop}}),_5.animateProperty({node:this.domNode,duration:500,properties:{height:0,opacity:0}})]);
+_3.connect(this._hideAnim,"onEnd",this,function(){
+_d.set(this.domNode,{display:"none",opacity:1});
+});
+}
+this._hideAnim.play();
+},_onDontRemindClick:function(){
+_e("disableUpgradeReminders",true,{expires:3650});
+this.hide();
+},_onCloseEnter:function(){
+_a.add(this.closeButtonNode,"dojoxUpgradeBarCloseIcon-hover");
+},_onCloseLeave:function(){
+_a.remove(this.closeButtonNode,"dojoxUpgradeBarCloseIcon-hover");
+}});
+return _13;
+});

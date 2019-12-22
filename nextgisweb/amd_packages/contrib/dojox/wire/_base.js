@@ -1,5 +1,95 @@
 //>>built
-define("dojox/wire/_base",["dojo","dijit","dojox"],function(d,g,b){d.provide("dojox.wire._base");b.wire._defaultWireClass="dojox.wire.Wire";b.wire._wireClasses={attribute:"dojox.wire.DataWire",path:"dojox.wire.XmlWire",children:"dojox.wire.CompositeWire",columns:"dojox.wire.TableAdapter",nodes:"dojox.wire.TreeAdapter",segments:"dojox.wire.TextAdapter"};b.wire.register=function(a,c){a&&c&&(b.wire._wireClasses[c]||(b.wire._wireClasses[c]=a))};b.wire._getClass=function(a){d.require(a);return d.getObject(a)};
-b.wire.create=function(a){a||(a={});var c=a.wireClass;if(c)d.isString(c)&&(c=b.wire._getClass(c));else for(var e in a)if(a[e]&&(c=b.wire._wireClasses[e])){d.isString(c)&&(c=b.wire._getClass(c),b.wire._wireClasses[e]=c);break}c||(d.isString(b.wire._defaultWireClass)&&(b.wire._defaultWireClass=b.wire._getClass(b.wire._defaultWireClass)),c=b.wire._defaultWireClass);return new c(a)};b.wire.isWire=function(a){return a&&a._wireClass};b.wire.transfer=function(a,c,d,f){a&&c&&(b.wire.isWire(a)||(a=b.wire.create(a)),
-b.wire.isWire(c)||(c=b.wire.create(c)),a=a.getValue(d),c.setValue(a,f||d))};b.wire.connect=function(a,c,e){if(a&&c&&e){var f={topic:a.topic};a.topic?f.handle=d.subscribe(a.topic,function(){b.wire.transfer(c,e,arguments)}):a.event&&(f.handle=d.connect(a.scope,a.event,function(){b.wire.transfer(c,e,arguments)}));return f}};b.wire.disconnect=function(a){a&&a.handle&&(a.topic?d.unsubscribe(a.handle):d.disconnect(a.handle))}});
-//# sourceMappingURL=_base.js.map
+define("dojox/wire/_base",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.wire._base");
+_3.wire._defaultWireClass="dojox.wire.Wire";
+_3.wire._wireClasses={"attribute":"dojox.wire.DataWire","path":"dojox.wire.XmlWire","children":"dojox.wire.CompositeWire","columns":"dojox.wire.TableAdapter","nodes":"dojox.wire.TreeAdapter","segments":"dojox.wire.TextAdapter"};
+_3.wire.register=function(_4,_5){
+if(!_4||!_5){
+return;
+}
+if(_3.wire._wireClasses[_5]){
+return;
+}
+_3.wire._wireClasses[_5]=_4;
+};
+_3.wire._getClass=function(_6){
+_1["require"](_6);
+return _1.getObject(_6);
+};
+_3.wire.create=function(_7){
+if(!_7){
+_7={};
+}
+var _8=_7.wireClass;
+if(_8){
+if(_1.isString(_8)){
+_8=_3.wire._getClass(_8);
+}
+}else{
+for(var _9 in _7){
+if(!_7[_9]){
+continue;
+}
+_8=_3.wire._wireClasses[_9];
+if(_8){
+if(_1.isString(_8)){
+_8=_3.wire._getClass(_8);
+_3.wire._wireClasses[_9]=_8;
+}
+break;
+}
+}
+}
+if(!_8){
+if(_1.isString(_3.wire._defaultWireClass)){
+_3.wire._defaultWireClass=_3.wire._getClass(_3.wire._defaultWireClass);
+}
+_8=_3.wire._defaultWireClass;
+}
+return new _8(_7);
+};
+_3.wire.isWire=function(_a){
+return (_a&&_a._wireClass);
+};
+_3.wire.transfer=function(_b,_c,_d,_e){
+if(!_b||!_c){
+return;
+}
+if(!_3.wire.isWire(_b)){
+_b=_3.wire.create(_b);
+}
+if(!_3.wire.isWire(_c)){
+_c=_3.wire.create(_c);
+}
+var _f=_b.getValue(_d);
+_c.setValue(_f,(_e||_d));
+};
+_3.wire.connect=function(_10,_11,_12){
+if(!_10||!_11||!_12){
+return;
+}
+var _13={topic:_10.topic};
+if(_10.topic){
+_13.handle=_1.subscribe(_10.topic,function(){
+_3.wire.transfer(_11,_12,arguments);
+});
+}else{
+if(_10.event){
+_13.handle=_1.connect(_10.scope,_10.event,function(){
+_3.wire.transfer(_11,_12,arguments);
+});
+}
+}
+return _13;
+};
+_3.wire.disconnect=function(_14){
+if(!_14||!_14.handle){
+return;
+}
+if(_14.topic){
+_1.unsubscribe(_14.handle);
+}else{
+_1.disconnect(_14.handle);
+}
+};
+});

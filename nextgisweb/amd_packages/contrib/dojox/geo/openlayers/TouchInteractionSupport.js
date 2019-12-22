@@ -1,8 +1,110 @@
 //>>built
-define("dojox/geo/openlayers/TouchInteractionSupport","dojo/_base/declare dojo/_base/connect dojo/_base/html dojo/_base/lang dojo/_base/event dojo/_base/window".split(" "),function(h,c,f,k,e,g){return h("dojox.geo.openlayers.TouchInteractionSupport",null,{_map:null,_centerTouchLocation:null,_touchMoveListener:null,_touchEndListener:null,_initialFingerSpacing:null,_initialScale:null,_tapCount:null,_tapThreshold:null,_lastTap:null,constructor:function(a){this._map=a;this._centerTouchLocation=new OpenLayers.LonLat(0,
-0);a=this._map.div;c.connect(a,"touchstart",this,this._touchStartHandler);c.connect(a,"touchmove",this,this._touchMoveHandler);c.connect(a,"touchend",this,this._touchEndHandler);this._tapCount=0;this._lastTap={x:0,y:0};this._tapThreshold=100},_getTouchBarycenter:function(a){var b=a.touches;a=b[0];var d=null,d=1<b.length?b[1]:b[0],b=f.marginBox(this._map.div);return{x:(a.pageX+d.pageX)/2-b.l,y:(a.pageY+d.pageY)/2-b.t}},_getFingerSpacing:function(a){a=a.touches;var b=-1;2<=a.length&&(b=a[1].pageX-a[0].pageX,
-a=a[1].pageY-a[0].pageY,b=Math.sqrt(b*b+a*a));return b},_isDoubleTap:function(a){var b=!1;a=a.touches;if(0<this._tapCount&&1==a.length){var d=a[0].pageX-this._lastTap.x,c=a[0].pageY-this._lastTap.y;d*d+c*c<this._tapThreshold?b=!0:this._tapCount=0}this._tapCount++;this._lastTap.x=a[0].pageX;this._lastTap.y=a[0].pageY;setTimeout(k.hitch(this,function(){this._tapCount=0}),300);return b},_doubleTapHandler:function(a){a=a.touches;var b=f.marginBox(this._map.div);a=this._map.getLonLatFromPixel(new OpenLayers.Pixel(a[0].pageX-
-b.l,a[0].pageY-b.t));this._map.setCenter(new OpenLayers.LonLat(a.lon,a.lat),this._map.getZoom()+1)},_touchStartHandler:function(a){e.stop(a);if(this._isDoubleTap(a))this._doubleTapHandler(a);else{var b=this._getTouchBarycenter(a);this._centerTouchLocation=this._map.getLonLatFromPixel(new OpenLayers.Pixel(b.x,b.y));this._initialFingerSpacing=this._getFingerSpacing(a);this._initialScale=this._map.getScale();this._touchMoveListener||(this._touchMoveListener=c.connect(g.global,"touchmove",this,this._touchMoveHandler));
-this._touchEndListener||(this._touchEndListener=c.connect(g.global,"touchend",this,this._touchEndHandler))}},_touchEndHandler:function(a){e.stop(a);0==a.touches.length?(this._touchMoveListener&&(c.disconnect(this._touchMoveListener),this._touchMoveListener=null),this._touchEndListener&&(c.disconnect(this._touchEndListener),this._touchEndListener=null)):(a=this._getTouchBarycenter(a),this._centerTouchLocation=this._map.getLonLatFromPixel(new OpenLayers.Pixel(a.x,a.y)))},_touchMoveHandler:function(a){e.stop(a);
-var b=this._getTouchBarycenter(a),d=this._map.getLonLatFromPixel(new OpenLayers.Pixel(b.x,b.y)),b=d.lon-this._centerTouchLocation.lon,d=d.lat-this._centerTouchLocation.lat,c=1;2<=a.touches.length&&(c=this._getFingerSpacing(a)/this._initialFingerSpacing,this._map.zoomToScale(this._initialScale/c));a=this._map.getCenter();this._map.setCenter(new OpenLayers.LonLat(a.lon-b,a.lat-d))}})});
-//# sourceMappingURL=TouchInteractionSupport.js.map
+define("dojox/geo/openlayers/TouchInteractionSupport",["dojo/_base/declare","dojo/_base/connect","dojo/_base/html","dojo/_base/lang","dojo/_base/event","dojo/_base/window"],function(_1,_2,_3,_4,_5,_6){
+return _1("dojox.geo.openlayers.TouchInteractionSupport",null,{_map:null,_centerTouchLocation:null,_touchMoveListener:null,_touchEndListener:null,_initialFingerSpacing:null,_initialScale:null,_tapCount:null,_tapThreshold:null,_lastTap:null,constructor:function(_7){
+this._map=_7;
+this._centerTouchLocation=new OpenLayers.LonLat(0,0);
+var _8=this._map.div;
+_2.connect(_8,"touchstart",this,this._touchStartHandler);
+_2.connect(_8,"touchmove",this,this._touchMoveHandler);
+_2.connect(_8,"touchend",this,this._touchEndHandler);
+this._tapCount=0;
+this._lastTap={x:0,y:0};
+this._tapThreshold=100;
+},_getTouchBarycenter:function(_9){
+var _a=_9.touches;
+var _b=_a[0];
+var _c=null;
+if(_a.length>1){
+_c=_a[1];
+}else{
+_c=_a[0];
+}
+var _d=_3.marginBox(this._map.div);
+var _e=(_b.pageX+_c.pageX)/2-_d.l;
+var _f=(_b.pageY+_c.pageY)/2-_d.t;
+return {x:_e,y:_f};
+},_getFingerSpacing:function(_10){
+var _11=_10.touches;
+var _12=-1;
+if(_11.length>=2){
+var dx=(_11[1].pageX-_11[0].pageX);
+var dy=(_11[1].pageY-_11[0].pageY);
+_12=Math.sqrt(dx*dx+dy*dy);
+}
+return _12;
+},_isDoubleTap:function(_13){
+var _14=false;
+var _15=_13.touches;
+if((this._tapCount>0)&&_15.length==1){
+var dx=(_15[0].pageX-this._lastTap.x);
+var dy=(_15[0].pageY-this._lastTap.y);
+var _16=dx*dx+dy*dy;
+if(_16<this._tapThreshold){
+_14=true;
+}else{
+this._tapCount=0;
+}
+}
+this._tapCount++;
+this._lastTap.x=_15[0].pageX;
+this._lastTap.y=_15[0].pageY;
+setTimeout(_4.hitch(this,function(){
+this._tapCount=0;
+}),300);
+return _14;
+},_doubleTapHandler:function(_17){
+var _18=_17.touches;
+var _19=_3.marginBox(this._map.div);
+var _1a=_18[0].pageX-_19.l;
+var _1b=_18[0].pageY-_19.t;
+var _1c=this._map.getLonLatFromPixel(new OpenLayers.Pixel(_1a,_1b));
+this._map.setCenter(new OpenLayers.LonLat(_1c.lon,_1c.lat),this._map.getZoom()+1);
+},_touchStartHandler:function(_1d){
+_5.stop(_1d);
+if(this._isDoubleTap(_1d)){
+this._doubleTapHandler(_1d);
+return;
+}
+var _1e=this._getTouchBarycenter(_1d);
+this._centerTouchLocation=this._map.getLonLatFromPixel(new OpenLayers.Pixel(_1e.x,_1e.y));
+this._initialFingerSpacing=this._getFingerSpacing(_1d);
+this._initialScale=this._map.getScale();
+if(!this._touchMoveListener){
+this._touchMoveListener=_2.connect(_6.global,"touchmove",this,this._touchMoveHandler);
+}
+if(!this._touchEndListener){
+this._touchEndListener=_2.connect(_6.global,"touchend",this,this._touchEndHandler);
+}
+},_touchEndHandler:function(_1f){
+_5.stop(_1f);
+var _20=_1f.touches;
+if(_20.length==0){
+if(this._touchMoveListener){
+_2.disconnect(this._touchMoveListener);
+this._touchMoveListener=null;
+}
+if(this._touchEndListener){
+_2.disconnect(this._touchEndListener);
+this._touchEndListener=null;
+}
+}else{
+var _21=this._getTouchBarycenter(_1f);
+this._centerTouchLocation=this._map.getLonLatFromPixel(new OpenLayers.Pixel(_21.x,_21.y));
+}
+},_touchMoveHandler:function(_22){
+_5.stop(_22);
+var _23=this._getTouchBarycenter(_22);
+var _24=this._map.getLonLatFromPixel(new OpenLayers.Pixel(_23.x,_23.y));
+var _25=_24.lon-this._centerTouchLocation.lon;
+var _26=_24.lat-this._centerTouchLocation.lat;
+var _27=1;
+var _28=_22.touches;
+if(_28.length>=2){
+var _29=this._getFingerSpacing(_22);
+_27=_29/this._initialFingerSpacing;
+this._map.zoomToScale(this._initialScale/_27);
+}
+var _2a=this._map.getCenter();
+this._map.setCenter(new OpenLayers.LonLat(_2a.lon-_25,_2a.lat-_26));
+}});
+});

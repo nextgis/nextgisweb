@@ -1,3 +1,13 @@
 //>>built
-define("dojox/charting/plot2d/ClusteredBars",["dojo/_base/declare","dojo/_base/array","./Bars","./common"],function(c,d,e,f){return c("dojox.charting.plot2d.ClusteredBars",e,{getBarProperties:function(){var b=this.series.length;d.forEach(this.series,function(a){a.hidden&&b--});var a=f.calculateBarSize(this._vScaler.bounds.scale,this.opt,b);return{gap:a.gap,height:a.size,thickness:a.size}}})});
-//# sourceMappingURL=ClusteredBars.js.map
+define("dojox/charting/plot2d/ClusteredBars",["dojo/_base/declare","dojo/_base/array","./Bars","./common"],function(_1,_2,_3,dc){
+return _1("dojox.charting.plot2d.ClusteredBars",_3,{getBarProperties:function(){
+var _4=this.series.length;
+_2.forEach(this.series,function(_5){
+if(_5.hidden){
+_4--;
+}
+});
+var f=dc.calculateBarSize(this._vScaler.bounds.scale,this.opt,_4);
+return {gap:f.gap,height:f.size,thickness:f.size};
+}});
+});

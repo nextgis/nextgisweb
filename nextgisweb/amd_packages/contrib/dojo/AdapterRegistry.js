@@ -5,6 +5,34 @@
 */
 
 //>>built
-define("dojo/AdapterRegistry",["./_base/kernel","./_base/lang"],function(d,e){var c=d.AdapterRegistry=function(b){this.pairs=[];this.returnWrappers=b||!1};e.extend(c,{register:function(b,a,c,d,e){this.pairs[e?"unshift":"push"]([b,a,c,d])},match:function(){for(var b=0;b<this.pairs.length;b++){var a=this.pairs[b];if(a[1].apply(this,arguments))return a[3]||this.returnWrappers?a[2]:a[2].apply(this,arguments)}throw Error("No match found");},unregister:function(b){for(var a=0;a<this.pairs.length;a++)if(this.pairs[a][0]==
-b)return this.pairs.splice(a,1),!0;return!1}});return c});
-//# sourceMappingURL=AdapterRegistry.js.map
+define("dojo/AdapterRegistry",["./_base/kernel","./_base/lang"],function(_1,_2){
+var _3=_1.AdapterRegistry=function(_4){
+this.pairs=[];
+this.returnWrappers=_4||false;
+};
+_2.extend(_3,{register:function(_5,_6,_7,_8,_9){
+this.pairs[((_9)?"unshift":"push")]([_5,_6,_7,_8]);
+},match:function(){
+for(var i=0;i<this.pairs.length;i++){
+var _a=this.pairs[i];
+if(_a[1].apply(this,arguments)){
+if((_a[3])||(this.returnWrappers)){
+return _a[2];
+}else{
+return _a[2].apply(this,arguments);
+}
+}
+}
+throw new Error("No match found");
+},unregister:function(_b){
+for(var i=0;i<this.pairs.length;i++){
+var _c=this.pairs[i];
+if(_c[0]==_b){
+this.pairs.splice(i,1);
+return true;
+}
+}
+return false;
+}});
+return _3;
+});

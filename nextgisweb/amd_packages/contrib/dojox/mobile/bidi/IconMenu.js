@@ -1,3 +1,9 @@
 //>>built
-define("dojox/mobile/bidi/IconMenu",["dojo/_base/declare","./common"],function(b,c){return b(null,{_setTextDirAttr:function(a){this._created&&this.textDir===a||(this._set("textDir",a),c.setTextDirForButtons(this))}})});
-//# sourceMappingURL=IconMenu.js.map
+define("dojox/mobile/bidi/IconMenu",["dojo/_base/declare","./common"],function(_1,_2){
+return _1(null,{_setTextDirAttr:function(_3){
+if(!this._created||this.textDir!==_3){
+this._set("textDir",_3);
+_2.setTextDirForButtons(this);
+}
+}});
+});

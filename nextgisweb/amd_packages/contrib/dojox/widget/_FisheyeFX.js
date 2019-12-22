@@ -1,3 +1,8 @@
 //>>built
-define("dojox/widget/_FisheyeFX",["dojo/_base/declare","dojo/query","./FisheyeLite"],function(a,b,c){return a("dojox.widget._FisheyeFX",null,{addFx:function(a,d){b(a,d).forEach(function(a){new c({properties:{fontSize:1.1}},a)})}})});
-//# sourceMappingURL=_FisheyeFX.js.map
+define("dojox/widget/_FisheyeFX",["dojo/_base/declare","dojo/query","./FisheyeLite"],function(_1,_2,_3){
+return _1("dojox.widget._FisheyeFX",null,{addFx:function(_4,_5){
+_2(_4,_5).forEach(function(_6){
+new _3({properties:{fontSize:1.1}},_6);
+});
+}});
+});

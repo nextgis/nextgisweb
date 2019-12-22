@@ -11,6 +11,9 @@ html.mobile,
   font-size: 17px;
   color: #ffffff;
 }
+.mobile body a {
+  color: #f0f0f0;
+}
 .mblBackground {
   background-color: #000000;
 }

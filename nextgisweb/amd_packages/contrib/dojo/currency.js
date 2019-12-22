@@ -5,6 +5,29 @@
 */
 
 //>>built
-define("dojo/currency","./_base/array ./_base/lang ./number ./i18n ./i18n!./cldr/nls/currency ./cldr/monetary".split(" "),function(g,f,c,h,l,k){var b={};f.setObject("dojo.currency",b);b._mixInDefaults=function(a){a=a||{};a.type="currency";var b=h.getLocalization("dojo.cldr","currency",a.locale)||{},c=a.currency,e=k.getData(c);g.forEach(["displayName","symbol","group","decimal"],function(a){e[a]=b[c+"_"+a]});e.fractional=[!0,!1];return f.mixin(e,a)};b.format=function(a,d){return c.format(a,b._mixInDefaults(d))};
-b.regexp=function(a){return c.regexp(b._mixInDefaults(a))};b.parse=function(a,d){return c.parse(a,b._mixInDefaults(d))};return b});
-//# sourceMappingURL=currency.js.map
+define("dojo/currency",["./_base/array","./_base/lang","./number","./i18n","./i18n!./cldr/nls/currency","./cldr/monetary"],function(_1,_2,_3,_4,_5,_6){
+var _7={};
+_2.setObject("dojo.currency",_7);
+_7._mixInDefaults=function(_8){
+_8=_8||{};
+_8.type="currency";
+var _9=_4.getLocalization("dojo.cldr","currency",_8.locale)||{};
+var _a=_8.currency;
+var _b=_6.getData(_a);
+_1.forEach(["displayName","symbol","group","decimal"],function(_c){
+_b[_c]=_9[_a+"_"+_c];
+});
+_b.fractional=[true,false];
+return _2.mixin(_b,_8);
+};
+_7.format=function(_d,_e){
+return _3.format(_d,_7._mixInDefaults(_e));
+};
+_7.regexp=function(_f){
+return _3.regexp(_7._mixInDefaults(_f));
+};
+_7.parse=function(_10,_11){
+return _3.parse(_10,_7._mixInDefaults(_11));
+};
+return _7;
+});

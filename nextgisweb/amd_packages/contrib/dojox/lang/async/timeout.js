@@ -1,3 +1,37 @@
 //>>built
-define("dojox/lang/async/timeout",["dojo","dijit","dojox"],function(e,h,g){e.provide("dojox.lang.async.timeout");(function(){var f=g.lang.async.timeout;f.from=function(b){return function(){var a,c=function(){a&&(clearTimeout(a),a=null)},d=new e.Deferred(c);a=setTimeout(function(){c();d.callback(b)},b);return d}};f.failOn=function(b){return function(){var a,c=function(){a&&(clearTimeout(a),a=null)},d=new e.Deferred(c);a=setTimeout(function(){c();d.errback(b)},b);return d}}})()});
-//# sourceMappingURL=timeout.js.map
+define("dojox/lang/async/timeout",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.async.timeout");
+(function(){
+var d=_1,_4=_3.lang.async.timeout;
+_4.from=function(ms){
+return function(){
+var h,_5=function(){
+if(h){
+clearTimeout(h);
+h=null;
+}
+},x=new d.Deferred(_5);
+h=setTimeout(function(){
+_5();
+x.callback(ms);
+},ms);
+return x;
+};
+};
+_4.failOn=function(ms){
+return function(){
+var h,_6=function(){
+if(h){
+clearTimeout(h);
+h=null;
+}
+},x=new d.Deferred(_6);
+h=setTimeout(function(){
+_6();
+x.errback(ms);
+},ms);
+return x;
+};
+};
+})();
+});

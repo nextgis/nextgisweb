@@ -1,7 +1,110 @@
 //>>built
-define("dojox/dtl/contrib/data",["dojo/_base/kernel","dojo/_base/lang","../_base","dojo/_base/array"],function(l,e,f,m){var d=e.getObject("contrib.data",!0,f),g=!0;d._BoundItem=e.extend(function(a,c){this.item=a;this.store=c},{get:function(a){var c=this.store,b=this.item;if("getLabel"==a)return c.getLabel(b);if("getAttributes"==a)return c.getAttributes(b);if("getIdentity"==a)return c.getIdentity?c.getIdentity(b):"Store has no identity API";if(!c.hasAttribute(b,a)&&("s"==a.slice(-1)&&(g&&(g=!1,l.deprecated("You no longer need an extra s to call getValues, it can be figured out automatically")),
-a=a.slice(0,-1)),!c.hasAttribute(b,a)))return;if(a=c.getValues(b,a)){if(!e.isArray(a))return new d._BoundItem(a,c);a=m.map(a,function(a){return e.isObject(a)&&c.isItem(a)?new d._BoundItem(a,c):a});a.get=d._get;return a}}});d._BoundItem.prototype.get.safe=!0;d.BindDataNode=e.extend(function(a,c,b,d){this.items=a&&new f._Filter(a);this.query=c&&new f._Filter(c);this.store=new f._Filter(b);this.alias=d},{render:function(a,c){var b=this.items&&this.items.resolve(a),e=this.query&&this.query.resolve(a),
-f=this.store.resolve(a);if(!f||!f.getFeatures)throw Error("data_bind didn't receive a store");if(e){var g=!1;f.fetch({query:e,sync:!0,scope:this,onComplete:function(a){g=!0;b=a}});if(!g)throw Error("The bind_data tag only works with a query if the store executed synchronously");}e=[];if(b)for(var h=0,k;k=b[h];h++)e.push(new d._BoundItem(k,f));a[this.alias]=e;return c},unrender:function(a,c){return c},clone:function(){return this}});e.mixin(d,{_get:function(a){if(this.length)return this[0]instanceof
-d._BoundItem?this[0].get(a):this[0][a]},bind_data:function(a,c){var b=c.contents.split();if("to"!=b[2]||"as"!=b[4]||!b[5])throw Error("data_bind expects the format: 'data_bind items to store as varName'");return new d.BindDataNode(b[1],null,b[3],b[5])},bind_query:function(a,c){var b=c.contents.split();if("to"!=b[2]||"as"!=b[4]||!b[5])throw Error("data_bind expects the format: 'bind_query query to store as varName'");return new d.BindDataNode(null,b[1],b[3],b[5])}});d._get.safe=!0;f.register.tags("dojox.dtl.contrib",
-{data:["bind_data","bind_query"]});return d});
-//# sourceMappingURL=data.js.map
+define("dojox/dtl/contrib/data",["dojo/_base/kernel","dojo/_base/lang","../_base","dojo/_base/array"],function(_1,_2,dd,_3){
+var _4=_2.getObject("contrib.data",true,dd);
+var _5=true;
+_4._BoundItem=_2.extend(function(_6,_7){
+this.item=_6;
+this.store=_7;
+},{get:function(_8){
+var _9=this.store;
+var _a=this.item;
+if(_8=="getLabel"){
+return _9.getLabel(_a);
+}else{
+if(_8=="getAttributes"){
+return _9.getAttributes(_a);
+}else{
+if(_8=="getIdentity"){
+if(_9.getIdentity){
+return _9.getIdentity(_a);
+}
+return "Store has no identity API";
+}else{
+if(!_9.hasAttribute(_a,_8)){
+if(_8.slice(-1)=="s"){
+if(_5){
+_5=false;
+_1.deprecated("You no longer need an extra s to call getValues, it can be figured out automatically");
+}
+_8=_8.slice(0,-1);
+}
+if(!_9.hasAttribute(_a,_8)){
+return;
+}
+}
+var _b=_9.getValues(_a,_8);
+if(!_b){
+return;
+}
+if(!_2.isArray(_b)){
+return new _4._BoundItem(_b,_9);
+}
+_b=_3.map(_b,function(_c){
+if(_2.isObject(_c)&&_9.isItem(_c)){
+return new _4._BoundItem(_c,_9);
+}
+return _c;
+});
+_b.get=_4._get;
+return _b;
+}
+}
+}
+}});
+_4._BoundItem.prototype.get.safe=true;
+_4.BindDataNode=_2.extend(function(_d,_e,_f,_10){
+this.items=_d&&new dd._Filter(_d);
+this.query=_e&&new dd._Filter(_e);
+this.store=new dd._Filter(_f);
+this.alias=_10;
+},{render:function(_11,_12){
+var _13=this.items&&this.items.resolve(_11);
+var _14=this.query&&this.query.resolve(_11);
+var _15=this.store.resolve(_11);
+if(!_15||!_15.getFeatures){
+throw new Error("data_bind didn't receive a store");
+}
+if(_14){
+var _16=false;
+_15.fetch({query:_14,sync:true,scope:this,onComplete:function(it){
+_16=true;
+_13=it;
+}});
+if(!_16){
+throw new Error("The bind_data tag only works with a query if the store executed synchronously");
+}
+}
+var _17=[];
+if(_13){
+for(var i=0,_18;_18=_13[i];i++){
+_17.push(new _4._BoundItem(_18,_15));
+}
+}
+_11[this.alias]=_17;
+return _12;
+},unrender:function(_19,_1a){
+return _1a;
+},clone:function(){
+return this;
+}});
+_2.mixin(_4,{_get:function(key){
+if(this.length){
+return (this[0] instanceof _4._BoundItem)?this[0].get(key):this[0][key];
+}
+},bind_data:function(_1b,_1c){
+var _1d=_1c.contents.split();
+if(_1d[2]!="to"||_1d[4]!="as"||!_1d[5]){
+throw new Error("data_bind expects the format: 'data_bind items to store as varName'");
+}
+return new _4.BindDataNode(_1d[1],null,_1d[3],_1d[5]);
+},bind_query:function(_1e,_1f){
+var _20=_1f.contents.split();
+if(_20[2]!="to"||_20[4]!="as"||!_20[5]){
+throw new Error("data_bind expects the format: 'bind_query query to store as varName'");
+}
+return new _4.BindDataNode(null,_20[1],_20[3],_20[5]);
+}});
+_4._get.safe=true;
+dd.register.tags("dojox.dtl.contrib",{"data":["bind_data","bind_query"]});
+return _4;
+});

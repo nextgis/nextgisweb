@@ -5,5 +5,4 @@
 */
 
 //>>built
-define("dojo/cldr/nls/bs/currency",{HKD_displayName:"Honkon\u0161ki dolar",CHF_displayName:"\u0160vajcarski franak",CAD_displayName:"Kanadski dolar",CNY_displayName:"Kineski Juan Renminbi",AUD_displayName:"Australijski dolar",JPY_displayName:"Japanski jen",USD_displayName:"Ameri\u010dki dolar",GBP_displayName:"Britanska funta sterlinga",EUR_displayName:"Evro"});
-//# sourceMappingURL=currency.js.map
+define("dojo/cldr/nls/bs/currency",{"HKD_displayName":"Honkonški dolar","CHF_displayName":"Švicarski franak","CAD_displayName":"Kanadski dolar","CNY_displayName":"Kineski juan","AUD_displayName":"Australijski dolar","JPY_displayName":"Japanski jen","USD_displayName":"Američki dolar","GBP_displayName":"Britanska funta","EUR_displayName":"Euro"});

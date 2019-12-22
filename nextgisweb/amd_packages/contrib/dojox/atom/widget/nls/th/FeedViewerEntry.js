@@ -1,3 +1,2 @@
 //>>built
-define("dojox/atom/widget/nls/th/FeedViewerEntry",{deleteButton:"[\u0e25\u0e1a]"});
-//# sourceMappingURL=FeedViewerEntry.js.map
+define("dojox/atom/widget/nls/th/FeedViewerEntry",({deleteButton:"[ลบ]"}));

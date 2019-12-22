@@ -5,5 +5,8 @@
 */
 
 //>>built
-define("dojo/errors/RequestError",["./create"],function(a){return a("RequestError",function(a,b){this.response=b})});
-//# sourceMappingURL=RequestError.js.map
+define("dojo/errors/RequestError",["./create"],function(_1){
+return _1("RequestError",function(_2,_3){
+this.response=_3;
+});
+});

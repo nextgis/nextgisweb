@@ -5,5 +5,8 @@
 */
 
 //>>built
-define("dojo/data/api/Request",["../../_base/declare"],function(a){return a("dojo.data.api.Request",null,{abort:function(){throw Error("Unimplemented API: dojo.data.api.Request.abort");}})});
-//# sourceMappingURL=Request.js.map
+define("dojo/data/api/Request",["../../_base/declare"],function(_1){
+return _1("dojo.data.api.Request",null,{abort:function(){
+throw new Error("Unimplemented API: dojo.data.api.Request.abort");
+}});
+});

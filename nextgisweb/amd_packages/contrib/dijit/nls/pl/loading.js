@@ -1,3 +1,2 @@
 //>>built
-define("dijit/nls/pl/loading",{loadingState:"\u0141adowanie...",errorState:"Niestety, wyst\u0105pi\u0142 b\u0142\u0105d"});
-//# sourceMappingURL=loading.js.map
+define("dijit/nls/pl/loading",({loadingState:"Ładowanie...",errorState:"Niestety, wystąpił błąd"}));

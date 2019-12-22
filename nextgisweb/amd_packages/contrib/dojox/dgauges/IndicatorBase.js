@@ -1,3 +1,4 @@
 //>>built
-define("dojox/dgauges/IndicatorBase",["dojo/_base/declare","dojox/widget/_Invalidating"],function(a,b){return a("dojox.dgauges.IndicatorBase",b,{value:null})});
-//# sourceMappingURL=IndicatorBase.js.map
+define("dojox/dgauges/IndicatorBase",["dojo/_base/declare","dojox/widget/_Invalidating"],function(_1,_2){
+return _1("dojox.dgauges.IndicatorBase",_2,{value:null});
+});

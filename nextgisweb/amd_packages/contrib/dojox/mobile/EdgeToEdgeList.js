@@ -1,3 +1,7 @@
 //>>built
-define("dojox/mobile/EdgeToEdgeList",["dojo/_base/declare","./RoundRectList"],function(a,b){return a("dojox.mobile.EdgeToEdgeList",b,{filterBoxClass:"mblFilteredEdgeToEdgeListSearchBox",buildRendering:function(){this.inherited(arguments);this.domNode.className="mblEdgeToEdgeList"}})});
-//# sourceMappingURL=EdgeToEdgeList.js.map
+define("dojox/mobile/EdgeToEdgeList",["dojo/_base/declare","./RoundRectList"],function(_1,_2){
+return _1("dojox.mobile.EdgeToEdgeList",_2,{filterBoxClass:"mblFilteredEdgeToEdgeListSearchBox",buildRendering:function(){
+this.inherited(arguments);
+this.domNode.className="mblEdgeToEdgeList";
+}});
+});

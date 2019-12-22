@@ -1,5 +1,17 @@
 //>>built
-require({cache:{"url:dojox/calendar/templates/LabelRenderer.html":'\x3cdiv class\x3d"dojoxCalendarEvent dojoxCalendarLabel" onselectstart\x3d"return false;"\x3e\t\n\t\x3cdiv class\x3d"labels"\x3e\n\t\t\x3cspan data-dojo-attach-point\x3d"startTimeLabel" class\x3d"startTime"\x3e\x3c/span\x3e\n\t\t\x3cspan data-dojo-attach-point\x3d"summaryLabel" class\x3d"summary"\x3e\x3c/span\x3e\n\t\t\x3cspan data-dojo-attach-point\x3d"endTimeLabel" class\x3d"endTime"\x3e\x3c/span\x3e\n\t\x3c/div\x3e\t\n\t\x3cdiv data-dojo-attach-point\x3d"moveHandle" class\x3d"handle moveHandle" \x3e\x3c/div\x3e\n\x3c/div\x3e\n'}});
-define("dojox/calendar/LabelRenderer",["dojo/_base/declare","dijit/_WidgetBase","dijit/_TemplatedMixin","./_RendererMixin","dojo/text!./templates/LabelRenderer.html"],function(a,b,c,d,e){return a("dojox.calendar.LabelRenderer",[b,c,d],{templateString:e,_orientation:"horizontal",resizeEnabled:!1,visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:45,endTimeLabel:30},_isElementVisible:function(a,b,c,d){switch(a){case "startTimeLabel":if(this.item.allDay&&this.item.range[0].getTime()!==
-this.item.startTime.getTime())return!1}return this.inherited(arguments)},_displayValue:"inline",postCreate:function(){this.inherited(arguments);this._applyAttributes()}})});
-//# sourceMappingURL=LabelRenderer.js.map
+require({cache:{"url:dojox/calendar/templates/LabelRenderer.html":"<div class=\"dojoxCalendarEvent dojoxCalendarLabel\" onselectstart=\"return false;\">\t\n\t<div class=\"labels\">\n\t\t<span data-dojo-attach-point=\"startTimeLabel\" class=\"startTime\"></span>\n\t\t<span data-dojo-attach-point=\"summaryLabel\" class=\"summary\"></span>\n\t\t<span data-dojo-attach-point=\"endTimeLabel\" class=\"endTime\"></span>\n\t</div>\t\n\t<div data-dojo-attach-point=\"moveHandle\" class=\"handle moveHandle\" ></div>\n</div>\n"}});
+define("dojox/calendar/LabelRenderer",["dojo/_base/declare","dijit/_WidgetBase","dijit/_TemplatedMixin","./_RendererMixin","dojo/text!./templates/LabelRenderer.html"],function(_1,_2,_3,_4,_5){
+return _1("dojox.calendar.LabelRenderer",[_2,_3,_4],{templateString:_5,_orientation:"horizontal",resizeEnabled:false,visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:45,endTimeLabel:30},_isElementVisible:function(_6,_7,_8,_9){
+switch(_6){
+case "startTimeLabel":
+if(this.item.allDay&&this.item.range[0].getTime()!==this.item.startTime.getTime()){
+return false;
+}
+break;
+}
+return this.inherited(arguments);
+},_displayValue:"inline",postCreate:function(){
+this.inherited(arguments);
+this._applyAttributes();
+}});
+});

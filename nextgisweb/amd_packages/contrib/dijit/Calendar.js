@@ -1,11 +1,115 @@
 //>>built
-define("dijit/Calendar","dojo/_base/array dojo/date dojo/date/locale dojo/_base/declare dojo/dom-attr dojo/dom-class dojo/dom-construct dojo/_base/kernel dojo/keys dojo/_base/lang dojo/on dojo/sniff ./CalendarLite ./_Widget ./_CssStateMixin ./_TemplatedMixin ./form/DropDownButton".split(" "),function(n,x,y,k,p,b,q,r,d,f,g,t,u,l,m,v,w){var h=k("dijit.Calendar",[u,l,m],{baseClass:"dijitCalendar",cssStateNodes:{decrementMonth:"dijitCalendarArrow",incrementMonth:"dijitCalendarArrow",previousYearLabelNode:"dijitCalendarPreviousYear",
-nextYearLabelNode:"dijitCalendarNextYear"},setValue:function(a){r.deprecated("dijit.Calendar:setValue() is deprecated.  Use set('value', ...) instead.","","2.0");this.set("value",a)},_createMonthWidget:function(){return new h._MonthDropDownButton({id:this.id+"_mddb",tabIndex:-1,onMonthSelect:f.hitch(this,"_onMonthSelect"),lang:this.lang,dateLocaleModule:this.dateLocaleModule},this.monthNode)},postCreate:function(){this.inherited(arguments);this.own(g(this.domNode,"keydown",f.hitch(this,"_onKeyDown")),
-g(this.dateRowsNode,"mouseover",f.hitch(this,"_onDayMouseOver")),g(this.dateRowsNode,"mouseout",f.hitch(this,"_onDayMouseOut")),g(this.dateRowsNode,"mousedown",f.hitch(this,"_onDayMouseDown")),g(this.dateRowsNode,"mouseup",f.hitch(this,"_onDayMouseUp")))},_onMonthSelect:function(a){var c=new this.dateClassObj(this.currentFocus);c.setDate(1);c.setMonth(a);a=this.dateModule.getDaysInMonth(c);var e=this.currentFocus.getDate();c.setDate(Math.min(e,a));this._setCurrentFocusAttr(c)},_onDayMouseOver:function(a){(a=
-b.contains(a.target,"dijitCalendarDateLabel")?a.target.parentNode:a.target)&&(a.dijitDateValue&&!b.contains(a,"dijitCalendarDisabledDate")||a==this.previousYearLabelNode||a==this.nextYearLabelNode)&&(b.add(a,"dijitCalendarHoveredDate"),this._currentNode=a)},_onDayMouseOut:function(a){!this._currentNode||a.relatedTarget&&a.relatedTarget.parentNode==this._currentNode||(a="dijitCalendarHoveredDate",b.contains(this._currentNode,"dijitCalendarActiveDate")&&(a+=" dijitCalendarActiveDate"),b.remove(this._currentNode,
-a),this._currentNode=null)},_onDayMouseDown:function(a){(a=a.target.parentNode)&&a.dijitDateValue&&!b.contains(a,"dijitCalendarDisabledDate")&&(b.add(a,"dijitCalendarActiveDate"),this._currentNode=a)},_onDayMouseUp:function(a){(a=a.target.parentNode)&&a.dijitDateValue&&b.remove(a,"dijitCalendarActiveDate")},handleKey:function(a){var c=-1,e,b=this.currentFocus;switch(a.keyCode){case d.RIGHT_ARROW:c=1;case d.LEFT_ARROW:e="day";this.isLeftToRight()||(c*=-1);break;case d.DOWN_ARROW:c=1;case d.UP_ARROW:e=
-"week";break;case d.PAGE_DOWN:c=1;case d.PAGE_UP:e=a.ctrlKey||a.altKey?"year":"month";break;case d.END:b=this.dateModule.add(b,"month",1),e="day";case d.HOME:b=new this.dateClassObj(b);b.setDate(1);break;default:return!0}e&&(b=this.dateModule.add(b,e,c));this._setCurrentFocusAttr(b);return!1},_onKeyDown:function(a){this.handleKey(a)||(a.stopPropagation(),a.preventDefault())},onValueSelected:function(){},onChange:function(a){this.onValueSelected(a)},getClassForDate:function(){}});h._MonthDropDownButton=
-k("dijit.Calendar._MonthDropDownButton",w,{onMonthSelect:function(){},postCreate:function(){this.inherited(arguments);this.dropDown=new h._MonthDropDown({id:this.id+"_mdd",onChange:this.onMonthSelect})},_setMonthAttr:function(a){var b=this.dateLocaleModule.getNames("months","wide","standAlone",this.lang,a);this.dropDown.set("months",b);this.containerNode.innerHTML=(6==t("ie")?"":"\x3cdiv class\x3d'dijitSpacer'\x3e"+this.dropDown.domNode.innerHTML+"\x3c/div\x3e")+"\x3cdiv class\x3d'dijitCalendarMonthLabel dijitCalendarCurrentMonthLabel'\x3e"+
-b[a.getMonth()]+"\x3c/div\x3e"}});h._MonthDropDown=k("dijit.Calendar._MonthDropDown",[l,v,m],{months:[],baseClass:"dijitCalendarMonthMenu dijitMenu",templateString:"\x3cdiv data-dojo-attach-event\x3d'ondijitclick:_onClick'\x3e\x3c/div\x3e",_setMonthsAttr:function(a){this.domNode.innerHTML="";n.forEach(a,function(a,b){q.create("div",{className:"dijitCalendarMonthLabel",month:b,innerHTML:a},this.domNode)._cssState="dijitCalendarMonthLabel"},this)},_onClick:function(a){this.onChange(p.get(a.target,"month"))},
-onChange:function(){}});return h});
-//# sourceMappingURL=Calendar.js.map
+define("dijit/Calendar",["dojo/_base/array","dojo/date","dojo/date/locale","dojo/_base/declare","dojo/dom-attr","dojo/dom-class","dojo/dom-construct","dojo/_base/kernel","dojo/keys","dojo/_base/lang","dojo/on","dojo/sniff","./CalendarLite","./_Widget","./_CssStateMixin","./_TemplatedMixin","./form/DropDownButton"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,on,_b,_c,_d,_e,_f,_10){
+var _11=_4("dijit.Calendar",[_c,_d,_e],{baseClass:"dijitCalendar",cssStateNodes:{"decrementMonth":"dijitCalendarArrow","incrementMonth":"dijitCalendarArrow","previousYearLabelNode":"dijitCalendarPreviousYear","nextYearLabelNode":"dijitCalendarNextYear"},setValue:function(_12){
+_8.deprecated("dijit.Calendar:setValue() is deprecated.  Use set('value', ...) instead.","","2.0");
+this.set("value",_12);
+},_createMonthWidget:function(){
+return new _11._MonthDropDownButton({id:this.id+"_mddb",tabIndex:-1,onMonthSelect:_a.hitch(this,"_onMonthSelect"),lang:this.lang,dateLocaleModule:this.dateLocaleModule},this.monthNode);
+},postCreate:function(){
+this.inherited(arguments);
+this.own(on(this.domNode,"keydown",_a.hitch(this,"_onKeyDown")),on(this.dateRowsNode,"mouseover",_a.hitch(this,"_onDayMouseOver")),on(this.dateRowsNode,"mouseout",_a.hitch(this,"_onDayMouseOut")),on(this.dateRowsNode,"mousedown",_a.hitch(this,"_onDayMouseDown")),on(this.dateRowsNode,"mouseup",_a.hitch(this,"_onDayMouseUp")));
+},_onMonthSelect:function(_13){
+var _14=new this.dateClassObj(this.currentFocus);
+_14.setDate(1);
+_14.setMonth(_13);
+var _15=this.dateModule.getDaysInMonth(_14);
+var _16=this.currentFocus.getDate();
+_14.setDate(Math.min(_16,_15));
+this._setCurrentFocusAttr(_14);
+},_onDayMouseOver:function(evt){
+var _17=_6.contains(evt.target,"dijitCalendarDateLabel")?evt.target.parentNode:evt.target;
+if(_17&&((_17.dijitDateValue&&!_6.contains(_17,"dijitCalendarDisabledDate"))||_17==this.previousYearLabelNode||_17==this.nextYearLabelNode)){
+_6.add(_17,"dijitCalendarHoveredDate");
+this._currentNode=_17;
+}
+},_onDayMouseOut:function(evt){
+if(!this._currentNode){
+return;
+}
+if(evt.relatedTarget&&evt.relatedTarget.parentNode==this._currentNode){
+return;
+}
+var cls="dijitCalendarHoveredDate";
+if(_6.contains(this._currentNode,"dijitCalendarActiveDate")){
+cls+=" dijitCalendarActiveDate";
+}
+_6.remove(this._currentNode,cls);
+this._currentNode=null;
+},_onDayMouseDown:function(evt){
+var _18=evt.target.parentNode;
+if(_18&&_18.dijitDateValue&&!_6.contains(_18,"dijitCalendarDisabledDate")){
+_6.add(_18,"dijitCalendarActiveDate");
+this._currentNode=_18;
+}
+},_onDayMouseUp:function(evt){
+var _19=evt.target.parentNode;
+if(_19&&_19.dijitDateValue){
+_6.remove(_19,"dijitCalendarActiveDate");
+}
+},handleKey:function(evt){
+var _1a=-1,_1b,_1c=this.currentFocus;
+switch(evt.keyCode){
+case _9.RIGHT_ARROW:
+_1a=1;
+case _9.LEFT_ARROW:
+_1b="day";
+if(!this.isLeftToRight()){
+_1a*=-1;
+}
+break;
+case _9.DOWN_ARROW:
+_1a=1;
+case _9.UP_ARROW:
+_1b="week";
+break;
+case _9.PAGE_DOWN:
+_1a=1;
+case _9.PAGE_UP:
+_1b=evt.ctrlKey||evt.altKey?"year":"month";
+break;
+case _9.END:
+_1c=this.dateModule.add(_1c,"month",1);
+_1b="day";
+case _9.HOME:
+_1c=new this.dateClassObj(_1c);
+_1c.setDate(1);
+break;
+default:
+return true;
+}
+if(_1b){
+_1c=this.dateModule.add(_1c,_1b,_1a);
+}
+this._setCurrentFocusAttr(_1c);
+return false;
+},_onKeyDown:function(evt){
+if(!this.handleKey(evt)){
+evt.stopPropagation();
+evt.preventDefault();
+}
+},onValueSelected:function(){
+},onChange:function(_1d){
+this.onValueSelected(_1d);
+},getClassForDate:function(){
+}});
+_11._MonthDropDownButton=_4("dijit.Calendar._MonthDropDownButton",_10,{onMonthSelect:function(){
+},postCreate:function(){
+this.inherited(arguments);
+this.dropDown=new _11._MonthDropDown({id:this.id+"_mdd",onChange:this.onMonthSelect});
+},_setMonthAttr:function(_1e){
+var _1f=this.dateLocaleModule.getNames("months","wide","standAlone",this.lang,_1e);
+this.dropDown.set("months",_1f);
+this.containerNode.innerHTML=(_b("ie")==6?"":"<div class='dijitSpacer'>"+this.dropDown.domNode.innerHTML+"</div>")+"<div class='dijitCalendarMonthLabel dijitCalendarCurrentMonthLabel'>"+_1f[_1e.getMonth()]+"</div>";
+}});
+_11._MonthDropDown=_4("dijit.Calendar._MonthDropDown",[_d,_f,_e],{months:[],baseClass:"dijitCalendarMonthMenu dijitMenu",templateString:"<div data-dojo-attach-event='ondijitclick:_onClick'></div>",_setMonthsAttr:function(_20){
+this.domNode.innerHTML="";
+_1.forEach(_20,function(_21,idx){
+var div=_7.create("div",{className:"dijitCalendarMonthLabel",month:idx,innerHTML:_21},this.domNode);
+div._cssState="dijitCalendarMonthLabel";
+},this);
+},_onClick:function(evt){
+this.onChange(_5.get(evt.target,"month"));
+},onChange:function(){
+}});
+return _11;
+});

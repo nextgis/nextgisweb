@@ -1,5 +1,52 @@
 //>>built
-define("dijit/form/_ButtonMixin",["dojo/_base/declare","dojo/dom","dojo/has","../registry"],function(e,g,f,h){var b=e("dijit.form._ButtonMixin"+(f("dojo-bidi")?"_NoBidi":""),null,{label:"",type:"button",__onClick:function(a){a.stopPropagation();a.preventDefault();this.disabled||this.valueNode.click(a);return!1},_onClick:function(a){if(this.disabled)return a.stopPropagation(),a.preventDefault(),!1;!1===this.onClick(a)&&a.preventDefault();var b=a.defaultPrevented;if(!b&&"submit"==this.type&&!(this.valueNode||
-this.focusNode).form)for(var c=this.domNode;c.parentNode;c=c.parentNode){var d=h.byNode(c);if(d&&"function"==typeof d._onSubmit){d._onSubmit(a);a.preventDefault();b=!0;break}}return!b},postCreate:function(){this.inherited(arguments);g.setSelectable(this.focusNode,!1)},onClick:function(){return!0},_setLabelAttr:function(a){this._set("label",a);(this.containerNode||this.focusNode).innerHTML=a;this.onLabelSet()},onLabelSet:function(){}});f("dojo-bidi")&&(b=e("dijit.form._ButtonMixin",b,{onLabelSet:function(){this.inherited(arguments);
-this.applyTextDir(this.containerNode||this.focusNode)}}));return b});
-//# sourceMappingURL=_ButtonMixin.js.map
+define("dijit/form/_ButtonMixin",["dojo/_base/declare","dojo/dom","dojo/has","../registry"],function(_1,_2,_3,_4){
+var _5=_1("dijit.form._ButtonMixin"+(_3("dojo-bidi")?"_NoBidi":""),null,{label:"",type:"button",__onClick:function(e){
+e.stopPropagation();
+e.preventDefault();
+if(!this.disabled){
+this.valueNode.click(e);
+}
+return false;
+},_onClick:function(e){
+if(this.disabled){
+e.stopPropagation();
+e.preventDefault();
+return false;
+}
+if(this.onClick(e)===false){
+e.preventDefault();
+}
+var _6=e.defaultPrevented;
+if(!_6&&this.type=="submit"&&!(this.valueNode||this.focusNode).form){
+for(var _7=this.domNode;_7.parentNode;_7=_7.parentNode){
+var _8=_4.byNode(_7);
+if(_8&&typeof _8._onSubmit=="function"){
+_8._onSubmit(e);
+e.preventDefault();
+_6=true;
+break;
+}
+}
+}
+return !_6;
+},postCreate:function(){
+this.inherited(arguments);
+_2.setSelectable(this.focusNode,false);
+},onClick:function(){
+return true;
+},_setLabelAttr:function(_9){
+this._set("label",_9);
+var _a=this.containerNode||this.focusNode;
+_a.innerHTML=_9;
+this.onLabelSet();
+},onLabelSet:function(){
+}});
+if(_3("dojo-bidi")){
+_5=_1("dijit.form._ButtonMixin",_5,{onLabelSet:function(){
+this.inherited(arguments);
+var _b=this.containerNode||this.focusNode;
+this.applyTextDir(_b);
+}});
+}
+return _5;
+});

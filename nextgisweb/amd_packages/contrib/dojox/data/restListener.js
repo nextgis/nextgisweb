@@ -1,4 +1,29 @@
 //>>built
-define("dojox/data/restListener",["dojo","dijit","dojox"],function(f,g,e){f.provide("dojox.data.restListener");e.data.restListener=function(a){var b=a.channel,d=e.rpc.JsonRest,c=d.getServiceAndId(b).service,d=e.json.ref.resolveJson(a.result,{defaultId:"put"==a.event&&b,index:e.rpc.Rest._index,idPrefix:c.servicePath.replace(/[^\/]*$/,""),idAttribute:d.getIdAttribute(c),schemas:d.schemas,loader:d._loader,assignAbsoluteIds:!0}),b=e.rpc.Rest._index&&e.rpc.Rest._index[b];a="on"+a.event.toLowerCase();c=
-c&&c._store;if(b&&b[a])b[a](d);else if(c)switch(a){case "onpost":c.onNew(d);break;case "ondelete":c.onDelete(b)}}});
-//# sourceMappingURL=restListener.js.map
+define("dojox/data/restListener",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.data.restListener");
+_3.data.restListener=function(_4){
+var _5=_4.channel;
+var jr=_3.rpc.JsonRest;
+var _6=jr.getServiceAndId(_5).service;
+var _7=_3.json.ref.resolveJson(_4.result,{defaultId:_4.event=="put"&&_5,index:_3.rpc.Rest._index,idPrefix:_6.servicePath.replace(/[^\/]*$/,""),idAttribute:jr.getIdAttribute(_6),schemas:jr.schemas,loader:jr._loader,assignAbsoluteIds:true});
+var _8=_3.rpc.Rest._index&&_3.rpc.Rest._index[_5];
+var _9="on"+_4.event.toLowerCase();
+var _a=_6&&_6._store;
+if(_8){
+if(_8[_9]){
+_8[_9](_7);
+return;
+}
+}
+if(_a){
+switch(_9){
+case "onpost":
+_a.onNew(_7);
+break;
+case "ondelete":
+_a.onDelete(_8);
+break;
+}
+}
+};
+});

@@ -1064,8 +1064,12 @@ define([
 						}
 						break;
 					case "innerText":
+						// Deprecated, use "textContent" instead.
 						mapNode.innerHTML = "";
 						mapNode.appendChild(this.ownerDocument.createTextNode(value));
+						break;
+					case "textContent":
+						mapNode.textContent = value;
 						break;
 					case "innerHTML":
 						mapNode.innerHTML = value;
@@ -4838,6 +4842,14 @@ define(["./_base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/kernel",
 	"dojo/on", "dojo/_base/array", "dojo/dom-construct", "dojo/_base/Color", "./matrix" ],
 	function(g, lang, declare, kernel, has, on, arr, domConstruct, Color, matrixLib){
 
+	function removeItemAt(a, index) {
+		var len = (a.length - 1);
+		while (index < len) {
+			a[index] = a[++index];
+		}
+		a.length = len;
+	}
+
 	var shape = g.shape = {
 		// summary:
 		//		This module contains the core graphics Shape API.
@@ -5391,7 +5403,7 @@ define(["./_base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/kernel",
 						shape.parent = null;
 						shape.parentMatrix = null;
 					}
-					this.children.splice(i, 1);
+					removeItemAt(this.children, i);
 					break;
 				}
 			}
@@ -5461,7 +5473,7 @@ define(["./_base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/kernel",
 			//		one of the child shapes to move to the front
 			for(var i = 0; i < this.children.length; ++i){
 				if(this.children[i] == shape){
-					this.children.splice(i, 1);
+					removeItemAt(this.children, i);
 					this.children.push(shape);
 					break;
 				}
@@ -5475,7 +5487,7 @@ define(["./_base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/kernel",
 			//		one of the child shapes to move to the front
 			for(var i = 0; i < this.children.length; ++i){
 				if(this.children[i] == shape){
-					this.children.splice(i, 1);
+					removeItemAt(this.children, i);
 					this.children.unshift(shape);
 					break;
 				}
@@ -11885,42 +11897,6 @@ define([
 
 			return values;
 		},
-
-		getIndexValue: function(series, i, index, isNullValue){
-			var value = 0, v, j;
-			for(j = 0; j <= i; ++j){
-				v = series[j].data[index];
-				if(!isNullValue(v)){
-					if(isNaN(v)){ v = v.y || 0; }
-					value += v;
-				}
-			}
-			return value;
-		},
-
-		getValue: function(series, i, x, isNullValue){
-			var value = null, j, z;
-			for(j = 0; j <= i; ++j){
-				for(z = 0; z < series[j].data.length; z++){
-					v = series[j].data[z];
-					if(!isNullValue(v)){
-						if(v.x == x){
-							if(!value){
-								value = {x: x};
-							}
-							if(v.y != null){
-								if(value.y == null){
-									value.y = 0;
-								}
-								value.y += v.y;
-							}
-							break;
-						}else if(v.x > x){break;}
-					}
-				}
-			}
-			return value;
-		},
 		
 		getIndexValue: function(series, i, index, isNullValue){
 			var value = 0, v, j, pvalue;
@@ -12104,8 +12080,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 				events = this.events(),
 				bar = this.getBarProperties();
 
-			var z = this.series.length;
-			arr.forEach(this.series, function(serie){if(serie.hidden){z--;}});
+			var z = 0; // the non-hidden series index
 
 			// Collect and calculate  all values
 			var extractedValues = this.extractValues(this._hScaler);
@@ -12130,7 +12105,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 					run.dyn.fill = theme.series.fill;
 					continue;
 				}
-				z--;
 
 				s = run.group;
 				var indexed = arr.some(run.data, function(item){
@@ -12214,6 +12188,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 				}
 				this._eventSeries[run.name] = eventSeries;
 				run.dirty = false;
+				z++;
 			}
 			this.dirty = false;
 			// chart mirroring starts
@@ -13366,7 +13341,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare", "dojo/dom-g
 					this.renderLabel(s, circle.cx, circle.cy + size/3, this.opt.zeroDataMessage, {
 						series: {
 							font: taFont,
-							fontColor: taFontColor 
+							fontColor: taFontColor
 						}
 					},	null, "middle");
 				}
@@ -13405,7 +13380,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare", "dojo/dom-g
 				slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
 				if(this.opt.labels){
 					labels = arr.map(slices, function(x, i){
-						if(x <= 0){ return ""; }
+						if(x < 0){ return ""; }
 						var v = run[i];
 						return v.hasOwnProperty("text") ? v.text : this._getLabel(x * 100) + "%";
 					}, this);
@@ -13436,7 +13411,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare", "dojo/dom-g
 				r = this.opt.radius < r * 0.9 ? this.opt.radius : r * 0.9;
 			}
 
-			if (this.opt.labels && this.opt.labelStyle == "columns") {
+			if (!this.opt.radius && this.opt.labels && this.opt.labelStyle == "columns") {
 				r = r / 2;
 				if (rx > ry && rx > r * 2) {
 					r *= rx / (r * 2);
@@ -13717,7 +13692,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare", "dojo/dom-g
 						if(i + 1 == slices.length){
 							end = startAngle + 2 * Math.PI;
 						}
-						if(this.minWidth === 0 ? end - start >= 0.001 : slice !== 0){
+						if(this.minWidth !== 0 || end - start >= 0.001){
 							// var labelAngle = (start + end) / 2;
 							var labelAngle = localStart + (slicesSteps[i].step / 2);//(start + end) / 2,
 							if(significantCount === 1 && !this.opt.minWidth){
@@ -17108,7 +17083,8 @@ define(["dijit/Tooltip", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/wi
 		// the data description block for the widget parser
 		defaultParams: {
 			text: DEFAULT_TEXT,	// the function to produce a tooltip from the object
-            mouseOver: true
+            mouseOver: true,
+			defaultPosition: ["after-centered", "before-centered"]
 		},
 		optionalParams: {},	// no optional parameters
 
@@ -17123,6 +17099,7 @@ define(["dijit/Tooltip", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/wi
 			//		Optional keyword arguments object for setting parameters.
 			this.text = kwArgs && kwArgs.text ? kwArgs.text : DEFAULT_TEXT;
 			this.mouseOver = kwArgs && kwArgs.mouseOver != undefined ? kwArgs.mouseOver : true;
+			this.defaultPosition = kwArgs && kwArgs.defaultPosition != undefined ? kwArgs.defaultPosition : ["after-centered", "before-centered"];
 			this.connect();
 		},
 		
@@ -17143,7 +17120,7 @@ define(["dijit/Tooltip", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/wi
 			if(!o.shape || (this.mouseOver && o.type !== "onmouseover") || (!this.mouseOver && o.type !== "onclick")){ return; }
 			
 			// calculate relative coordinates and the position
-			var aroundRect = {type: "rect"}, position = ["after-centered", "before-centered"];
+			var aroundRect = {type: "rect"}, position = this.defaultPosition;
 			switch(o.element){
 				case "marker":
 					aroundRect.x = o.cx;

@@ -1,6 +1,151 @@
 //>>built
-define("dojox/lang/functional/array",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/array","./lambda"],function(k,h,n,g){var l={};h.mixin(g,{filter:function(a,d,c){"string"==typeof a&&(a=a.split(""));c=c||k.global;d=g.lambda(d);var b=[],f,e,m;if(h.isArray(a))for(e=0,m=a.length;e<m;++e)f=a[e],d.call(c,f,e,a)&&b.push(f);else if("function"==typeof a.hasNext&&"function"==typeof a.next)for(e=0;a.hasNext();)f=a.next(),d.call(c,f,e++,a)&&b.push(f);else for(e in a)e in l||(f=a[e],d.call(c,f,e,a)&&b.push(f));
-return b},forEach:function(a,d,c){"string"==typeof a&&(a=a.split(""));c=c||k.global;d=g.lambda(d);var b,f;if(h.isArray(a))for(b=0,f=a.length;b<f;d.call(c,a[b],b,a),++b);else if("function"==typeof a.hasNext&&"function"==typeof a.next)for(b=0;a.hasNext();d.call(c,a.next(),b++,a));else for(b in a)b in l||d.call(c,a[b],b,a);return c},map:function(a,d,c){"string"==typeof a&&(a=a.split(""));c=c||k.global;d=g.lambda(d);var b,f,e;if(h.isArray(a))for(b=Array(f=a.length),e=0;e<f;b[e]=d.call(c,a[e],e,a),++e);
-else if("function"==typeof a.hasNext&&"function"==typeof a.next)for(b=[],e=0;a.hasNext();b.push(d.call(c,a.next(),e++,a)));else for(e in b=[],a)e in l||b.push(d.call(c,a[e],e,a));return b},every:function(a,d,c){"string"==typeof a&&(a=a.split(""));c=c||k.global;d=g.lambda(d);var b,f;if(h.isArray(a))for(b=0,f=a.length;b<f;++b){if(!d.call(c,a[b],b,a))return!1}else if("function"==typeof a.hasNext&&"function"==typeof a.next)for(b=0;a.hasNext();){if(!d.call(c,a.next(),b++,a))return!1}else for(b in a)if(!(b in
-l||d.call(c,a[b],b,a)))return!1;return!0},some:function(a,d,c){"string"==typeof a&&(a=a.split(""));c=c||k.global;d=g.lambda(d);var b,f;if(h.isArray(a))for(b=0,f=a.length;b<f;++b){if(d.call(c,a[b],b,a))return!0}else if("function"==typeof a.hasNext&&"function"==typeof a.next)for(b=0;a.hasNext();){if(d.call(c,a.next(),b++,a))return!0}else for(b in a)if(!(b in l)&&d.call(c,a[b],b,a))return!0;return!1}});return g});
-//# sourceMappingURL=array.js.map
+define("dojox/lang/functional/array",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/array","./lambda"],function(_1,_2,_3,df){
+var _4={};
+_2.mixin(df,{filter:function(a,f,o){
+if(typeof a=="string"){
+a=a.split("");
+}
+o=o||_1.global;
+f=df.lambda(f);
+var t=[],v,i,n;
+if(_2.isArray(a)){
+for(i=0,n=a.length;i<n;++i){
+v=a[i];
+if(f.call(o,v,i,a)){
+t.push(v);
+}
+}
+}else{
+if(typeof a.hasNext=="function"&&typeof a.next=="function"){
+for(i=0;a.hasNext();){
+v=a.next();
+if(f.call(o,v,i++,a)){
+t.push(v);
+}
+}
+}else{
+for(i in a){
+if(!(i in _4)){
+v=a[i];
+if(f.call(o,v,i,a)){
+t.push(v);
+}
+}
+}
+}
+}
+return t;
+},forEach:function(a,f,o){
+if(typeof a=="string"){
+a=a.split("");
+}
+o=o||_1.global;
+f=df.lambda(f);
+var i,n;
+if(_2.isArray(a)){
+for(i=0,n=a.length;i<n;f.call(o,a[i],i,a),++i){
+}
+}else{
+if(typeof a.hasNext=="function"&&typeof a.next=="function"){
+for(i=0;a.hasNext();f.call(o,a.next(),i++,a)){
+}
+}else{
+for(i in a){
+if(!(i in _4)){
+f.call(o,a[i],i,a);
+}
+}
+}
+}
+return o;
+},map:function(a,f,o){
+if(typeof a=="string"){
+a=a.split("");
+}
+o=o||_1.global;
+f=df.lambda(f);
+var t,n,i;
+if(_2.isArray(a)){
+t=new Array(n=a.length);
+for(i=0;i<n;t[i]=f.call(o,a[i],i,a),++i){
+}
+}else{
+if(typeof a.hasNext=="function"&&typeof a.next=="function"){
+t=[];
+for(i=0;a.hasNext();t.push(f.call(o,a.next(),i++,a))){
+}
+}else{
+t=[];
+for(i in a){
+if(!(i in _4)){
+t.push(f.call(o,a[i],i,a));
+}
+}
+}
+}
+return t;
+},every:function(a,f,o){
+if(typeof a=="string"){
+a=a.split("");
+}
+o=o||_1.global;
+f=df.lambda(f);
+var i,n;
+if(_2.isArray(a)){
+for(i=0,n=a.length;i<n;++i){
+if(!f.call(o,a[i],i,a)){
+return false;
+}
+}
+}else{
+if(typeof a.hasNext=="function"&&typeof a.next=="function"){
+for(i=0;a.hasNext();){
+if(!f.call(o,a.next(),i++,a)){
+return false;
+}
+}
+}else{
+for(i in a){
+if(!(i in _4)){
+if(!f.call(o,a[i],i,a)){
+return false;
+}
+}
+}
+}
+}
+return true;
+},some:function(a,f,o){
+if(typeof a=="string"){
+a=a.split("");
+}
+o=o||_1.global;
+f=df.lambda(f);
+var i,n;
+if(_2.isArray(a)){
+for(i=0,n=a.length;i<n;++i){
+if(f.call(o,a[i],i,a)){
+return true;
+}
+}
+}else{
+if(typeof a.hasNext=="function"&&typeof a.next=="function"){
+for(i=0;a.hasNext();){
+if(f.call(o,a.next(),i++,a)){
+return true;
+}
+}
+}else{
+for(i in a){
+if(!(i in _4)){
+if(f.call(o,a[i],i,a)){
+return true;
+}
+}
+}
+}
+}
+return false;
+}});
+return df;
+});

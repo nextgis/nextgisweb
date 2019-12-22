@@ -1,3 +1,2 @@
 //>>built
-define("dijit/form/nls/pt/Textarea",{iframeEditTitle:"editar \u00e1rea",iframeFocusTitle:"editar quadro da \u00e1rea"});
-//# sourceMappingURL=Textarea.js.map
+define("dijit/form/nls/pt/Textarea",({iframeEditTitle:"editar área",iframeFocusTitle:"editar quadro da área"}));

@@ -1,4 +1,30 @@
 //>>built
-define("dojox/widget/_CalendarView","dojo/_base/declare dijit/_WidgetBase dojo/dom-construct dojo/query dojo/date dojo/_base/window".split(" "),function(g,h,e,f,k,l){return g("dojox.widget._CalendarView",h,{headerClass:"",useHeader:!0,cloneClass:function(a,b,d){var c=f(a,this.domNode)[0];if(d)for(d=f(a,this.domNode)[0],a=0;a<b;a++)c.parentNode.insertBefore(c.cloneNode(!0),d);else for(a=0;a<b;a++)c.parentNode.appendChild(c.cloneNode(!0))},_setText:function(a,b){a.innerHTML!=b&&(e.empty(a),a.appendChild(l.doc.createTextNode(b)))},
-getHeader:function(){return this.header||(this.header=e.create("span",{"class":this.headerClass}))},onValueSelected:function(a){},adjustDate:function(a,b){return k.add(a,this.datePart,b)},onDisplay:function(){},onBeforeDisplay:function(){},onBeforeUnDisplay:function(){}})});
-//# sourceMappingURL=_CalendarView.js.map
+define("dojox/widget/_CalendarView",["dojo/_base/declare","dijit/_WidgetBase","dojo/dom-construct","dojo/query","dojo/date","dojo/_base/window"],function(_1,_2,_3,_4,_5,_6){
+return _1("dojox.widget._CalendarView",_2,{headerClass:"",useHeader:true,cloneClass:function(_7,n,_8){
+var _9=_4(_7,this.domNode)[0];
+var i;
+if(!_8){
+for(i=0;i<n;i++){
+_9.parentNode.appendChild(_9.cloneNode(true));
+}
+}else{
+var _a=_4(_7,this.domNode)[0];
+for(i=0;i<n;i++){
+_9.parentNode.insertBefore(_9.cloneNode(true),_a);
+}
+}
+},_setText:function(_b,_c){
+if(_b.innerHTML!=_c){
+_3.empty(_b);
+_b.appendChild(_6.doc.createTextNode(_c));
+}
+},getHeader:function(){
+return this.header||(this.header=_3.create("span",{"class":this.headerClass}));
+},onValueSelected:function(_d){
+},adjustDate:function(_e,_f){
+return _5.add(_e,this.datePart,_f);
+},onDisplay:function(){
+},onBeforeDisplay:function(){
+},onBeforeUnDisplay:function(){
+}});
+});

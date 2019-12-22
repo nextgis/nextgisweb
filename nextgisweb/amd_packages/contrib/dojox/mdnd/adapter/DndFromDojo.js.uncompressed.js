@@ -16,10 +16,6 @@ define("dojox/mdnd/adapter/DndFromDojo", ["dojo/_base/kernel",
 	
 		// dropIndicatorSize: Object
 		//		size by default of dropIndicator (display only into a D&D Area)
-		dropIndicatorSize : {'w':0,'h':50},
-	
-		// dropIndicatorSize: Object
-		//		size by default of dropIndicator (display only into a D&D Area)
 		dropIndicatorSize: {'w':0,'h':50},
 	
 		// _areaManager: Object

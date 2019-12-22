@@ -1,7 +1,109 @@
 //>>built
-define("dojox/fx/Shadow","dojo/_base/kernel dojo/_base/query dojo/_base/lang dojo/_base/declare dojo/_base/sniff dojo/dom-construct dojo/dom-class dojo/dom-geometry dojo/_base/fx dojo/fx dijit/_Widget dojo/NodeList-fx".split(" "),function(f,n,p,q,g,h,t,u,v,w,x,z){f.experimental("dojox.fx.Shadow");return q("dojox.fx.Shadow",x,{shadowPng:f.moduleUrl("dojox.fx","resources/shadow"),shadowThickness:7,shadowOffset:3,opacity:.75,animate:!1,node:null,startup:function(){this.inherited(arguments);this.node.style.position=
-"relative";this.pieces={};var a=-1*this.shadowThickness,c=this.shadowOffset,d=this.shadowOffset+this.shadowThickness;this._makePiece("tl","top",c,"left",a);this._makePiece("l","top",d,"left",a,"scale");this._makePiece("tr","top",c,"left",0);this._makePiece("r","top",d,"left",0,"scale");this._makePiece("bl","top",0,"left",a);this._makePiece("b","top",0,"left",0,"crop");this._makePiece("br","top",0,"left",0);this.nodeList=n(".shadowPiece",this.node);this.setOpacity(this.opacity);this.resize()},_makePiece:function(a,
-c,d,y,f,k){var e,m=this.shadowPng+a.toUpperCase()+".png";7>g("ie")?(e=h.create("div"),e.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(src\x3d'"+m+"'"+(k?", sizingMethod\x3d'"+k+"'":"")+")"):e=h.create("img",{src:m});e.style.position="absolute";e.style[c]=d+"px";e.style[y]=f+"px";e.style.width=this.shadowThickness+"px";e.style.height=this.shadowThickness+"px";t.add(e,"shadowPiece");this.pieces[a]=e;this.node.appendChild(e)},setOpacity:function(a,c){if(!g("ie"))if(c||(c={}),this.animate){var d=
-[];this.nodeList.forEach(function(f){d.push(v._fade(p.mixin(c,{node:f,end:a})))});w.combine(d).play()}else this.nodeList.style("opacity",a)},setDisabled:function(a){a?this.disabled||(this.animate?this.nodeList.fadeOut().play():this.nodeList.style("visibility","hidden"),this.disabled=!0):this.disabled&&(this.animate?this.nodeList.fadeIn().play():this.nodeList.style("visibility","visible"),this.disabled=!1)},resize:function(a){var c;a?(c=a.x,a=a.y):(a=u.position(this.node),c=a.w,a=a.h);var d=a-(this.shadowOffset+
-this.shadowThickness);0>d&&(d=0);1>a&&(a=1);1>c&&(c=1);with(this.pieces)l.style.height=d+"px",r.style.height=d+"px",b.style.width=c+"px",bl.style.top=a+"px",b.style.top=a+"px",br.style.top=a+"px",tr.style.left=c+"px",r.style.left=c+"px",br.style.left=c+"px"}})});
-//# sourceMappingURL=Shadow.js.map
+define("dojox/fx/Shadow",["dojo/_base/kernel","dojo/_base/query","dojo/_base/lang","dojo/_base/declare","dojo/_base/sniff","dojo/dom-construct","dojo/dom-class","dojo/dom-geometry","dojo/_base/fx","dojo/fx","dijit/_Widget","dojo/NodeList-fx"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c){
+_1.experimental("dojox.fx.Shadow");
+return _4("dojox.fx.Shadow",_b,{shadowPng:_1.moduleUrl("dojox.fx","resources/shadow"),shadowThickness:7,shadowOffset:3,opacity:0.75,animate:false,node:null,startup:function(){
+this.inherited(arguments);
+this.node.style.position="relative";
+this.pieces={};
+var x1=-1*this.shadowThickness;
+var y0=this.shadowOffset;
+var y1=this.shadowOffset+this.shadowThickness;
+this._makePiece("tl","top",y0,"left",x1);
+this._makePiece("l","top",y1,"left",x1,"scale");
+this._makePiece("tr","top",y0,"left",0);
+this._makePiece("r","top",y1,"left",0,"scale");
+this._makePiece("bl","top",0,"left",x1);
+this._makePiece("b","top",0,"left",0,"crop");
+this._makePiece("br","top",0,"left",0);
+this.nodeList=_2(".shadowPiece",this.node);
+this.setOpacity(this.opacity);
+this.resize();
+},_makePiece:function(_d,_e,_f,_10,_11,_12){
+var img;
+var url=this.shadowPng+_d.toUpperCase()+".png";
+if(_5("ie")<7){
+img=_6.create("div");
+img.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+url+"'"+(_12?", sizingMethod='"+_12+"'":"")+")";
+}else{
+img=_6.create("img",{src:url});
+}
+img.style.position="absolute";
+img.style[_e]=_f+"px";
+img.style[_10]=_11+"px";
+img.style.width=this.shadowThickness+"px";
+img.style.height=this.shadowThickness+"px";
+_7.add(img,"shadowPiece");
+this.pieces[_d]=img;
+this.node.appendChild(img);
+},setOpacity:function(n,_13){
+if(_5("ie")){
+return;
+}
+if(!_13){
+_13={};
+}
+if(this.animate){
+var _14=[];
+this.nodeList.forEach(function(_15){
+_14.push(_9._fade(_3.mixin(_13,{node:_15,end:n})));
+});
+_a.combine(_14).play();
+}else{
+this.nodeList.style("opacity",n);
+}
+},setDisabled:function(_16){
+if(_16){
+if(this.disabled){
+return;
+}
+if(this.animate){
+this.nodeList.fadeOut().play();
+}else{
+this.nodeList.style("visibility","hidden");
+}
+this.disabled=true;
+}else{
+if(!this.disabled){
+return;
+}
+if(this.animate){
+this.nodeList.fadeIn().play();
+}else{
+this.nodeList.style("visibility","visible");
+}
+this.disabled=false;
+}
+},resize:function(_17){
+var x;
+var y;
+if(_17){
+x=_17.x;
+y=_17.y;
+}else{
+var co=_8.position(this.node);
+x=co.w;
+y=co.h;
+}
+var _18=y-(this.shadowOffset+this.shadowThickness);
+if(_18<0){
+_18=0;
+}
+if(y<1){
+y=1;
+}
+if(x<1){
+x=1;
+}
+with(this.pieces){
+l.style.height=_18+"px";
+r.style.height=_18+"px";
+b.style.width=x+"px";
+bl.style.top=y+"px";
+b.style.top=y+"px";
+br.style.top=y+"px";
+tr.style.left=x+"px";
+r.style.left=x+"px";
+br.style.left=x+"px";
+}
+}});
+});

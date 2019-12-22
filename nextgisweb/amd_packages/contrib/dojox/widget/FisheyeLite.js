@@ -1,5 +1,33 @@
 //>>built
-define("dojox/widget/FisheyeLite","dojo/_base/kernel dojo/_base/declare dojo/_base/lang dojo/on dojo/query dojo/dom-style dojo/_base/fx dijit/_WidgetBase dojo/fx/easing".split(" "),function(e,n,d,p,f,l,h,m,b){d.getObject("widget",!0,dojox);e.experimental("dojox/widget/FisheyeLite");return dojo.declare("dojox.widget.FisheyeLite",[m],{durationIn:350,easeIn:b.backOut,durationOut:1420,easeOut:b.elasticOut,properties:null,units:"px",constructor:function(a,d){this.properties=a.properties||{fontSize:2.75}},
-postCreate:function(){this.inherited(arguments);this._target=f(".fisheyeTarget",this.domNode)[0]||this.domNode;this._makeAnims();this.connect(this.domNode,"onmouseover","show");this.connect(this.domNode,"onmouseout","hide");this.connect(this._target,"onclick","onClick")},show:function(){this._runningOut.stop();this._runningIn.play()},hide:function(){this._runningIn.stop();this._runningOut.play()},_makeAnims:function(){var a={},b={},e=l.getComputedStyle(this._target),c;for(c in this.properties){var g=
-this.properties[c],f=d.isObject(g),k=parseFloat(e[c]);b[c]={end:k,units:this.units};a[c]=f?g:{end:g*k,units:this.units}}this._runningIn=h.animateProperty({node:this._target,easing:this.easeIn,duration:this.durationIn,properties:a});this._runningOut=h.animateProperty({node:this._target,duration:this.durationOut,easing:this.easeOut,properties:b});this.connect(this._runningIn,"onEnd",d.hitch(this,"onSelected",this))},onClick:function(a){},onSelected:function(a){}})});
-//# sourceMappingURL=FisheyeLite.js.map
+define("dojox/widget/FisheyeLite",["dojo/_base/kernel","dojo/_base/declare","dojo/_base/lang","dojo/on","dojo/query","dojo/dom-style","dojo/_base/fx","dijit/_WidgetBase","dojo/fx/easing"],function(_1,_2,_3,on,_4,_5,fx,_6,_7){
+_3.getObject("widget",true,dojox);
+_1.experimental("dojox/widget/FisheyeLite");
+return dojo.declare("dojox.widget.FisheyeLite",[_6],{durationIn:350,easeIn:_7.backOut,durationOut:1420,easeOut:_7.elasticOut,properties:null,units:"px",constructor:function(_8,_9){
+this.properties=_8.properties||{fontSize:2.75};
+},postCreate:function(){
+this.inherited(arguments);
+this._target=_4(".fisheyeTarget",this.domNode)[0]||this.domNode;
+this._makeAnims();
+this.connect(this.domNode,"onmouseover","show");
+this.connect(this.domNode,"onmouseout","hide");
+this.connect(this._target,"onclick","onClick");
+},show:function(){
+this._runningOut.stop();
+this._runningIn.play();
+},hide:function(){
+this._runningIn.stop();
+this._runningOut.play();
+},_makeAnims:function(){
+var _a={},_b={},cs=_5.getComputedStyle(this._target);
+for(var p in this.properties){
+var _c=this.properties[p],_d=_3.isObject(_c),v=parseFloat(cs[p]);
+_b[p]={end:v,units:this.units};
+_a[p]=_d?_c:{end:_c*v,units:this.units};
+}
+this._runningIn=fx.animateProperty({node:this._target,easing:this.easeIn,duration:this.durationIn,properties:_a});
+this._runningOut=fx.animateProperty({node:this._target,duration:this.durationOut,easing:this.easeOut,properties:_b});
+this.connect(this._runningIn,"onEnd",_3.hitch(this,"onSelected",this));
+},onClick:function(e){
+},onSelected:function(e){
+}});
+});

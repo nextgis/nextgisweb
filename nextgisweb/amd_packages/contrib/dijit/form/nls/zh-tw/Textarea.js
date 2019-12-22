@@ -1,3 +1,2 @@
 //>>built
-define("dijit/form/nls/zh-tw/Textarea",{iframeEditTitle:"\u7de8\u8f2f\u5340",iframeFocusTitle:"\u7de8\u8f2f\u5340\u6846"});
-//# sourceMappingURL=Textarea.js.map
+define("dijit/form/nls/zh-tw/Textarea",({iframeEditTitle:"編輯區",iframeFocusTitle:"編輯區框"}));

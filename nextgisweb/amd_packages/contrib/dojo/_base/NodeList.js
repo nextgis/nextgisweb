@@ -5,6 +5,19 @@
 */
 
 //>>built
-define("dojo/_base/NodeList",["./kernel","../query","./array","./html","../NodeList-dom"],function(b,a,d){a=a.NodeList;var c=a.prototype;c.connect=a._adaptAsForEach(function(){return b.connect.apply(this,arguments)});c.coords=a._adaptAsMap(b.coords);a.events="blur focus change click error keydown keypress keyup load mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup submit".split(" ");d.forEach(a.events,function(a){var b="on"+a;c[b]=function(a,c){return this.connect(b,a,c)}});return b.NodeList=
-a});
-//# sourceMappingURL=NodeList.js.map
+define("dojo/_base/NodeList",["./kernel","../query","./array","./html","../NodeList-dom"],function(_1,_2,_3){
+var _4=_2.NodeList,_5=_4.prototype;
+_5.connect=_4._adaptAsForEach(function(){
+return _1.connect.apply(this,arguments);
+});
+_5.coords=_4._adaptAsMap(_1.coords);
+_4.events=["blur","focus","change","click","error","keydown","keypress","keyup","load","mousedown","mouseenter","mouseleave","mousemove","mouseout","mouseover","mouseup","submit"];
+_3.forEach(_4.events,function(_6){
+var _7="on"+_6;
+_5[_7]=function(a,b){
+return this.connect(_7,a,b);
+};
+});
+_1.NodeList=_4;
+return _4;
+});

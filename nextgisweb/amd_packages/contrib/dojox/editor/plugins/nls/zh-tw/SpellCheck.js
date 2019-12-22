@@ -1,4 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/zh-tw/SpellCheck",{widgetLabel:"\u6279\u6b21\u62fc\u5b57\u6aa2\u67e5",unfound:"\u627e\u4e0d\u5230",skip:"\u8df3\u904e",skipAll:"\u5168\u90e8\u8df3\u904e",toDic:"\u65b0\u589e\u81f3\u5b57\u5178",suggestions:"\u5efa\u8b70",replace:"\u53d6\u4ee3",replaceWith:"\u53d6\u4ee3\u70ba",replaceAll:"\u5168\u90e8\u53d6\u4ee3",cancel:"\u53d6\u6d88",msg:"\u627e\u4e0d\u5230\u62fc\u932f",iSkip:"\u8df3\u904e\u6b64\u9805",iSkipAll:"\u8df3\u904e\u6240\u6709\u5982\u6b64\u9805\u7684\u9805\u76ee",
-iMsg:"\u6c92\u6709\u62fc\u5b57\u5efa\u8b70"});
-//# sourceMappingURL=SpellCheck.js.map
+define("dojox/editor/plugins/nls/zh-tw/SpellCheck",({widgetLabel:"批次拼字檢查",unfound:"找不到",skip:"跳過",skipAll:"全部跳過",toDic:"新增至字典",suggestions:"建議",replace:"取代",replaceWith:"取代為",replaceAll:"全部取代",cancel:"取消",msg:"找不到拼錯",iSkip:"跳過此項",iSkipAll:"跳過所有如此項的項目",iMsg:"沒有拼字建議"}));

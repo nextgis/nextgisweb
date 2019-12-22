@@ -1,9 +1,68 @@
 //>>built
-require({cache:{"url:dijit/form/templates/Spinner.html":'\x3cdiv class\x3d"dijit dijitReset dijitInline dijitLeft"\n\tid\x3d"widget_${id}" role\x3d"presentation"\n\t\x3e\x3cdiv class\x3d"dijitReset dijitButtonNode dijitSpinnerButtonContainer"\n\t\t\x3e\x3cinput class\x3d"dijitReset dijitInputField dijitSpinnerButtonInner" type\x3d"text" tabIndex\x3d"-1" readonly\x3d"readonly" role\x3d"presentation"\n\t\t/\x3e\x3cdiv class\x3d"dijitReset dijitLeft dijitButtonNode dijitArrowButton dijitUpArrowButton"\n\t\t\tdata-dojo-attach-point\x3d"upArrowNode"\n\t\t\t\x3e\x3cdiv class\x3d"dijitArrowButtonInner"\n\t\t\t\t\x3e\x3cinput class\x3d"dijitReset dijitInputField" value\x3d"\x26#9650; " type\x3d"text" tabIndex\x3d"-1" readonly\x3d"readonly" role\x3d"presentation"\n\t\t\t\t\t${_buttonInputDisabled}\n\t\t\t/\x3e\x3c/div\n\t\t\x3e\x3c/div\n\t\t\x3e\x3cdiv class\x3d"dijitReset dijitLeft dijitButtonNode dijitArrowButton dijitDownArrowButton"\n\t\t\tdata-dojo-attach-point\x3d"downArrowNode"\n\t\t\t\x3e\x3cdiv class\x3d"dijitArrowButtonInner"\n\t\t\t\t\x3e\x3cinput class\x3d"dijitReset dijitInputField" value\x3d"\x26#9660; " type\x3d"text" tabIndex\x3d"-1" readonly\x3d"readonly" role\x3d"presentation"\n\t\t\t\t\t${_buttonInputDisabled}\n\t\t\t/\x3e\x3c/div\n\t\t\x3e\x3c/div\n\t\x3e\x3c/div\n\t\x3e\x3cdiv class\x3d\'dijitReset dijitValidationContainer\'\n\t\t\x3e\x3cinput class\x3d"dijitReset dijitInputField dijitValidationIcon dijitValidationInner" value\x3d"\x26#935; " type\x3d"text" tabIndex\x3d"-1" readonly\x3d"readonly" role\x3d"presentation"\n\t/\x3e\x3c/div\n\t\x3e\x3cdiv class\x3d"dijitReset dijitInputField dijitInputContainer"\n\t\t\x3e\x3cinput class\x3d\'dijitReset dijitInputInner\' data-dojo-attach-point\x3d"textbox,focusNode" type\x3d"${type}" data-dojo-attach-event\x3d"onkeydown:_onKeyDown"\n\t\t\trole\x3d"spinbutton" autocomplete\x3d"off" ${!nameAttrSetting}\n\t/\x3e\x3c/div\n\x3e\x3c/div\x3e\n'}});
-define("dijit/form/_Spinner","dojo/_base/declare dojo/keys dojo/_base/lang dojo/sniff dojo/mouse dojo/on ../typematic ./RangeBoundTextBox dojo/text!./templates/Spinner.html ./_TextBoxMixin".split(" "),function(f,c,g,p,h,k,d,l,m,n){return f("dijit.form._Spinner",l,{defaultTimeout:500,minimumTimeout:10,timeoutChangeRate:.9,smallDelta:1,largeDelta:10,templateString:m,baseClass:"dijitTextBox dijitSpinner",cssStateNodes:{upArrowNode:"dijitUpArrowButton",downArrowNode:"dijitDownArrowButton"},adjust:function(a){return a},
-_arrowPressed:function(a,b,c){this.disabled||this.readOnly||(this._setValueAttr(this.adjust(this.get("value"),b*c),!1),n.selectInputText(this.textbox,this.textbox.value.length))},_arrowReleased:function(){this._wheelTimer=null},_typematicCallback:function(a,b,d){var e=this.smallDelta;b==this.textbox&&(b=d.keyCode,e=b==c.PAGE_UP||b==c.PAGE_DOWN?this.largeDelta:this.smallDelta,b=b==c.UP_ARROW||b==c.PAGE_UP?this.upArrowNode:this.downArrowNode);-1==a?this._arrowReleased(b):this._arrowPressed(b,b==this.upArrowNode?
-1:-1,e)},_wheelTimer:null,_mouseWheeled:function(a){if(this.focused){a.stopPropagation();a.preventDefault();var b=a.wheelDelta/120;Math.floor(b)!=b&&(b=0<a.wheelDelta?1:-1);a=a.detail?-1*a.detail:b;if(0!==a){var c=this[0<a?"upArrowNode":"downArrowNode"];this._arrowPressed(c,a,this.smallDelta);this._wheelTimer&&this._wheelTimer.remove();this._wheelTimer=this.defer(function(){this._arrowReleased(c)},50)}}},_setConstraintsAttr:function(a){this.inherited(arguments);this.focusNode&&(void 0!==this.constraints.min?
-this.focusNode.setAttribute("aria-valuemin",this.constraints.min):this.focusNode.removeAttribute("aria-valuemin"),void 0!==this.constraints.max?this.focusNode.setAttribute("aria-valuemax",this.constraints.max):this.focusNode.removeAttribute("aria-valuemax"))},_setValueAttr:function(a,b){this.focusNode.setAttribute("aria-valuenow",a);this.inherited(arguments)},postCreate:function(){this.inherited(arguments);this.own(k(this.domNode,h.wheel,g.hitch(this,"_mouseWheeled")),d.addListener(this.upArrowNode,
-this.textbox,{keyCode:c.UP_ARROW,ctrlKey:!1,altKey:!1,shiftKey:!1,metaKey:!1},this,"_typematicCallback",this.timeoutChangeRate,this.defaultTimeout,this.minimumTimeout),d.addListener(this.downArrowNode,this.textbox,{keyCode:c.DOWN_ARROW,ctrlKey:!1,altKey:!1,shiftKey:!1,metaKey:!1},this,"_typematicCallback",this.timeoutChangeRate,this.defaultTimeout,this.minimumTimeout),d.addListener(this.upArrowNode,this.textbox,{keyCode:c.PAGE_UP,ctrlKey:!1,altKey:!1,shiftKey:!1,metaKey:!1},this,"_typematicCallback",
-this.timeoutChangeRate,this.defaultTimeout,this.minimumTimeout),d.addListener(this.downArrowNode,this.textbox,{keyCode:c.PAGE_DOWN,ctrlKey:!1,altKey:!1,shiftKey:!1,metaKey:!1},this,"_typematicCallback",this.timeoutChangeRate,this.defaultTimeout,this.minimumTimeout))}})});
-//# sourceMappingURL=_Spinner.js.map
+require({cache:{"url:dijit/form/templates/Spinner.html":"<div class=\"dijit dijitReset dijitInline dijitLeft\"\n\tid=\"widget_${id}\" role=\"presentation\"\n\t><div class=\"dijitReset dijitButtonNode dijitSpinnerButtonContainer\"\n\t\t><input class=\"dijitReset dijitInputField dijitSpinnerButtonInner\" type=\"text\" tabIndex=\"-1\" readonly=\"readonly\" role=\"presentation\"\n\t\t/><div class=\"dijitReset dijitLeft dijitButtonNode dijitArrowButton dijitUpArrowButton\"\n\t\t\tdata-dojo-attach-point=\"upArrowNode\"\n\t\t\t><div class=\"dijitArrowButtonInner\"\n\t\t\t\t><input class=\"dijitReset dijitInputField\" value=\"&#9650; \" type=\"text\" tabIndex=\"-1\" readonly=\"readonly\" role=\"presentation\"\n\t\t\t\t\t${_buttonInputDisabled}\n\t\t\t/></div\n\t\t></div\n\t\t><div class=\"dijitReset dijitLeft dijitButtonNode dijitArrowButton dijitDownArrowButton\"\n\t\t\tdata-dojo-attach-point=\"downArrowNode\"\n\t\t\t><div class=\"dijitArrowButtonInner\"\n\t\t\t\t><input class=\"dijitReset dijitInputField\" value=\"&#9660; \" type=\"text\" tabIndex=\"-1\" readonly=\"readonly\" role=\"presentation\"\n\t\t\t\t\t${_buttonInputDisabled}\n\t\t\t/></div\n\t\t></div\n\t></div\n\t><div class='dijitReset dijitValidationContainer'\n\t\t><input class=\"dijitReset dijitInputField dijitValidationIcon dijitValidationInner\" value=\"&#935; \" type=\"text\" tabIndex=\"-1\" readonly=\"readonly\" role=\"presentation\"\n\t/></div\n\t><div class=\"dijitReset dijitInputField dijitInputContainer\"\n\t\t><input class='dijitReset dijitInputInner' data-dojo-attach-point=\"textbox,focusNode\" type=\"${type}\" data-dojo-attach-event=\"onkeydown:_onKeyDown\"\n\t\t\trole=\"spinbutton\" autocomplete=\"off\" ${!nameAttrSetting}\n\t/></div\n></div>\n"}});
+define("dijit/form/_Spinner",["dojo/_base/declare","dojo/keys","dojo/_base/lang","dojo/sniff","dojo/mouse","dojo/on","../typematic","./RangeBoundTextBox","dojo/text!./templates/Spinner.html","./_TextBoxMixin"],function(_1,_2,_3,_4,_5,on,_6,_7,_8,_9){
+return _1("dijit.form._Spinner",_7,{defaultTimeout:500,minimumTimeout:10,timeoutChangeRate:0.9,smallDelta:1,largeDelta:10,templateString:_8,baseClass:"dijitTextBox dijitSpinner",cssStateNodes:{"upArrowNode":"dijitUpArrowButton","downArrowNode":"dijitDownArrowButton"},adjust:function(_a){
+return _a;
+},_arrowPressed:function(_b,_c,_d){
+if(this.disabled||this.readOnly){
+return;
+}
+this._setValueAttr(this.adjust(this.get("value"),_c*_d),false);
+_9.selectInputText(this.textbox,this.textbox.value.length);
+},_arrowReleased:function(){
+this._wheelTimer=null;
+},_typematicCallback:function(_e,_f,evt){
+var inc=this.smallDelta;
+if(_f==this.textbox){
+var key=evt.keyCode;
+inc=(key==_2.PAGE_UP||key==_2.PAGE_DOWN)?this.largeDelta:this.smallDelta;
+_f=(key==_2.UP_ARROW||key==_2.PAGE_UP)?this.upArrowNode:this.downArrowNode;
+}
+if(_e==-1){
+this._arrowReleased(_f);
+}else{
+this._arrowPressed(_f,(_f==this.upArrowNode)?1:-1,inc);
+}
+},_wheelTimer:null,_mouseWheeled:function(evt){
+if(!this.focused){
+return;
+}
+evt.stopPropagation();
+evt.preventDefault();
+var _10=evt.wheelDelta/120;
+if(Math.floor(_10)!=_10){
+_10=evt.wheelDelta>0?1:-1;
+}
+var _11=evt.detail?(evt.detail*-1):_10;
+if(_11!==0){
+var _12=this[(_11>0?"upArrowNode":"downArrowNode")];
+this._arrowPressed(_12,_11,this.smallDelta);
+if(this._wheelTimer){
+this._wheelTimer.remove();
+}
+this._wheelTimer=this.defer(function(){
+this._arrowReleased(_12);
+},50);
+}
+},_setConstraintsAttr:function(_13){
+this.inherited(arguments);
+if(this.focusNode){
+if(this.constraints.min!==undefined){
+this.focusNode.setAttribute("aria-valuemin",this.constraints.min);
+}else{
+this.focusNode.removeAttribute("aria-valuemin");
+}
+if(this.constraints.max!==undefined){
+this.focusNode.setAttribute("aria-valuemax",this.constraints.max);
+}else{
+this.focusNode.removeAttribute("aria-valuemax");
+}
+}
+},_setValueAttr:function(_14,_15){
+this.focusNode.setAttribute("aria-valuenow",_14);
+this.inherited(arguments);
+},postCreate:function(){
+this.inherited(arguments);
+this.own(on(this.domNode,_5.wheel,_3.hitch(this,"_mouseWheeled")),_6.addListener(this.upArrowNode,this.textbox,{keyCode:_2.UP_ARROW,ctrlKey:false,altKey:false,shiftKey:false,metaKey:false},this,"_typematicCallback",this.timeoutChangeRate,this.defaultTimeout,this.minimumTimeout),_6.addListener(this.downArrowNode,this.textbox,{keyCode:_2.DOWN_ARROW,ctrlKey:false,altKey:false,shiftKey:false,metaKey:false},this,"_typematicCallback",this.timeoutChangeRate,this.defaultTimeout,this.minimumTimeout),_6.addListener(this.upArrowNode,this.textbox,{keyCode:_2.PAGE_UP,ctrlKey:false,altKey:false,shiftKey:false,metaKey:false},this,"_typematicCallback",this.timeoutChangeRate,this.defaultTimeout,this.minimumTimeout),_6.addListener(this.downArrowNode,this.textbox,{keyCode:_2.PAGE_DOWN,ctrlKey:false,altKey:false,shiftKey:false,metaKey:false},this,"_typematicCallback",this.timeoutChangeRate,this.defaultTimeout,this.minimumTimeout));
+}});
+});

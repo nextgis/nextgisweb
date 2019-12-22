@@ -5,11 +5,167 @@
 */
 
 //>>built
-define("dojo/html","./_base/kernel ./_base/lang ./_base/array ./_base/declare ./dom ./dom-construct ./parser".split(" "),function(k,g,h,l,m,f,n){var p=0,e={_secureForInnerHtml:function(a){return a.replace(/(?:\s*<!DOCTYPE\s[^>]+>|<title[^>]*>[\s\S]*?<\/title>)/ig,"")},_emptyNode:f.empty,_setNodeContent:function(a,b){f.empty(a);if(b)if("number"==typeof b&&(b=b.toString()),"string"==typeof b&&(b=f.toDom(b,a.ownerDocument)),!b.nodeType&&g.isArrayLike(b))for(var c=b.length,d=0;d<b.length;d=c==b.length?
-d+1:0)f.place(b[d],a,"last");else f.place(b,a,"last");return a},_ContentSetter:l("dojo.html._ContentSetter",null,{node:"",content:"",id:"",cleanContent:!1,extractContent:!1,parseContent:!1,parserScope:k._scopeName,startup:!0,constructor:function(a,b){g.mixin(this,a||{});b=this.node=m.byId(this.node||b);this.id||(this.id=["Setter",b?b.id||b.tagName:"",p++].join("_"))},set:function(a,b){void 0!==a&&(this.content=a);"number"==typeof a&&(a=a.toString());b&&this._mixin(b);this.onBegin();this.setContent();
-var c=this.onEnd();return c&&c.then?c:this.node},setContent:function(){var a=this.node;if(!a)throw Error(this.declaredClass+": setContent given no node");try{a=e._setNodeContent(a,this.content)}catch(c){var b=this.onContentError(c);try{a.innerHTML=b}catch(d){console.error("Fatal "+this.declaredClass+".setContent could not change content due to "+d.message,d)}}this.node=a},empty:function(){this.parseDeferred&&(this.parseDeferred.isResolved()||this.parseDeferred.cancel(),delete this.parseDeferred);
-this.parseResults&&this.parseResults.length&&(h.forEach(this.parseResults,function(a){a.destroy&&a.destroy()}),delete this.parseResults);f.empty(this.node)},onBegin:function(){var a=this.content;if(g.isString(a)&&(this.cleanContent&&(a=e._secureForInnerHtml(a)),this.extractContent)){var b=a.match(/<body[^>]*>\s*([\s\S]+)\s*<\/body>/im);b&&(a=b[1])}this.empty();this.content=a;return this.node},onEnd:function(){this.parseContent&&this._parse();return this.node},tearDown:function(){delete this.parseResults;
-delete this.parseDeferred;delete this.node;delete this.content},onContentError:function(a){return"Error occurred setting content: "+a},onExecError:function(a){return"Error occurred executing scripts: "+a},_mixin:function(a){var b={},c;for(c in a)c in b||(this[c]=a[c])},_parse:function(){var a=this.node;try{var b={};h.forEach(["dir","lang","textDir"],function(a){this[a]&&(b[a]=this[a])},this);var c=this;this.parseDeferred=n.parse({rootNode:a,noStart:!this.startup,inherited:b,scope:this.parserScope}).then(function(a){return c.parseResults=
-a},function(a){c._onError("Content",a,"Error parsing in _ContentSetter#"+this.id)})}catch(d){this._onError("Content",d,"Error parsing in _ContentSetter#"+this.id)}},_onError:function(a,b,c){a=this["on"+a+"Error"].call(this,b);c?console.error(c,b):a&&e._setNodeContent(this.node,a,!0)}}),set:function(a,b,c){void 0==b&&(console.warn("dojo.html.set: no cont argument provided, using empty string"),b="");"number"==typeof b&&(b=b.toString());return c?(new e._ContentSetter(g.mixin(c,{content:b,node:a}))).set():
-e._setNodeContent(a,b,!0)}};g.setObject("dojo.html",e);return e});
-//# sourceMappingURL=html.js.map
+define("dojo/html",["./_base/kernel","./_base/lang","./_base/array","./_base/declare","./dom","./dom-construct","./parser"],function(_1,_2,_3,_4,_5,_6,_7){
+var _8=0;
+var _9={_secureForInnerHtml:function(_a){
+return _a.replace(/(?:\s*<!DOCTYPE\s[^>]+>|<title[^>]*>[\s\S]*?<\/title>)/ig,"");
+},_emptyNode:_6.empty,_setNodeContent:function(_b,_c){
+_6.empty(_b);
+if(_c){
+if(typeof _c=="number"){
+_c=_c.toString();
+}
+if(typeof _c=="string"){
+_c=_6.toDom(_c,_b.ownerDocument);
+}
+if(!_c.nodeType&&_2.isArrayLike(_c)){
+for(var _d=_c.length,i=0;i<_c.length;i=_d==_c.length?i+1:0){
+_6.place(_c[i],_b,"last");
+}
+}else{
+_6.place(_c,_b,"last");
+}
+}
+return _b;
+},_ContentSetter:_4("dojo.html._ContentSetter",null,{node:"",content:"",id:"",cleanContent:false,extractContent:false,parseContent:false,parserScope:_1._scopeName,startup:true,constructor:function(_e,_f){
+_2.mixin(this,_e||{});
+_f=this.node=_5.byId(this.node||_f);
+if(!this.id){
+this.id=["Setter",(_f)?_f.id||_f.tagName:"",_8++].join("_");
+}
+},set:function(_10,_11){
+if(undefined!==_10){
+this.content=_10;
+}
+if(typeof _10=="number"){
+_10=_10.toString();
+}
+if(_11){
+this._mixin(_11);
+}
+this.onBegin();
+this.setContent();
+var ret=this.onEnd();
+if(ret&&ret.then){
+return ret;
+}else{
+return this.node;
+}
+},setContent:function(){
+var _12=this.node;
+if(!_12){
+throw new Error(this.declaredClass+": setContent given no node");
+}
+try{
+_12=_9._setNodeContent(_12,this.content);
+}
+catch(e){
+var _13=this.onContentError(e);
+try{
+_12.innerHTML=_13;
+}
+catch(e){
+console.error("Fatal "+this.declaredClass+".setContent could not change content due to "+e.message,e);
+}
+}
+this.node=_12;
+},empty:function(){
+if(this.parseDeferred){
+if(!this.parseDeferred.isResolved()){
+this.parseDeferred.cancel();
+}
+delete this.parseDeferred;
+}
+if(this.parseResults&&this.parseResults.length){
+_3.forEach(this.parseResults,function(w){
+if(w.destroy){
+w.destroy();
+}
+});
+delete this.parseResults;
+}
+_6.empty(this.node);
+},onBegin:function(){
+var _14=this.content;
+if(_2.isString(_14)){
+if(this.cleanContent){
+_14=_9._secureForInnerHtml(_14);
+}
+if(this.extractContent){
+var _15=_14.match(/<body[^>]*>\s*([\s\S]+)\s*<\/body>/im);
+if(_15){
+_14=_15[1];
+}
+}
+}
+this.empty();
+this.content=_14;
+return this.node;
+},onEnd:function(){
+if(this.parseContent){
+this._parse();
+}
+return this.node;
+},tearDown:function(){
+delete this.parseResults;
+delete this.parseDeferred;
+delete this.node;
+delete this.content;
+},onContentError:function(err){
+return "Error occurred setting content: "+err;
+},onExecError:function(err){
+return "Error occurred executing scripts: "+err;
+},_mixin:function(_16){
+var _17={},key;
+for(key in _16){
+if(key in _17){
+continue;
+}
+this[key]=_16[key];
+}
+},_parse:function(){
+var _18=this.node;
+try{
+var _19={};
+_3.forEach(["dir","lang","textDir"],function(_1a){
+if(this[_1a]){
+_19[_1a]=this[_1a];
+}
+},this);
+var _1b=this;
+this.parseDeferred=_7.parse({rootNode:_18,noStart:!this.startup,inherited:_19,scope:this.parserScope}).then(function(_1c){
+return _1b.parseResults=_1c;
+},function(e){
+_1b._onError("Content",e,"Error parsing in _ContentSetter#"+_1b.id);
+});
+}
+catch(e){
+this._onError("Content",e,"Error parsing in _ContentSetter#"+this.id);
+}
+},_onError:function(_1d,err,_1e){
+var _1f=this["on"+_1d+"Error"].call(this,err);
+if(_1e){
+console.error(_1e,err);
+}else{
+if(_1f){
+_9._setNodeContent(this.node,_1f,true);
+}
+}
+}}),set:function(_20,_21,_22){
+if(undefined==_21){
+console.warn("dojo.html.set: no cont argument provided, using empty string");
+_21="";
+}
+if(typeof _21=="number"){
+_21=_21.toString();
+}
+if(!_22){
+return _9._setNodeContent(_20,_21,true);
+}else{
+var op=new _9._ContentSetter(_2.mixin(_22,{content:_21,node:_20}));
+return op.set();
+}
+}};
+_2.setObject("dojo.html",_9);
+return _9;
+});

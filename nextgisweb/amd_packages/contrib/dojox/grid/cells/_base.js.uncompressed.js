@@ -102,11 +102,14 @@ define("dojox/grid/cells/_base", [
 			//		grid row index
 			// returns:
 			//		html for a given grid cell
-			var f, i=this.grid.edit.info, d=this.get ? this.get(inRowIndex, inItem) : (this.value || this.defaultValue);
-			d = (d && d.replace && this.grid.escapeHTMLInData) ? d.replace(/&/g, '&amp;').replace(/</g, '&lt;') : d;
-			if(this.editable && (this.alwaysEditing || (i.rowIndex==inRowIndex && i.cell==this))){
+			var i = this.grid.edit.info;
+			var d = this.get ? this.get(inRowIndex, inItem) : (this.value || this.defaultValue);
+			if (d && d.replace && this.grid.escapeHTMLInData) {
+				d = d.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+			}
+			if (this.editable && (this.alwaysEditing || (i.rowIndex==inRowIndex && i.cell==this))){
 				return this.formatEditing(i.value ? i.value : d, inRowIndex);
-			}else{
+			} else {
 				return this._defaultFormat(d, [d, inRowIndex, this]);
 			}
 		},
@@ -329,6 +332,10 @@ define("dojox/grid/cells/_base", [
 		keyFilter: null,
 		formatEditing: function(inDatum, inRowIndex){
 			this.needFormatNode(inDatum, inRowIndex);
+			if (inDatum && inDatum.replace) {
+				// escape quotes to avoid XSS
+				inDatum = inDatum.replace(/"/g, '&quot;')
+			}
 			return '<input class="dojoxGridInput" type="text" value="' + inDatum + '">';
 		},
 		formatNode: function(inNode, inDatum, inRowIndex){

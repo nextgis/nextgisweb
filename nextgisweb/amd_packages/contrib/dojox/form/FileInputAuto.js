@@ -1,9 +1,90 @@
 //>>built
-require({cache:{"url:dojox/form/resources/FileInputAuto.html":'\x3cdiv class\x3d"dijitFileInput"\x3e\n\t\x3cinput id\x3d"${id}" name\x3d"${name}" class\x3d"dijitFileInputReal" type\x3d"file" dojoAttachPoint\x3d"fileInput" /\x3e\n\t\x3cdiv class\x3d"dijitFakeInput" dojoAttachPoint\x3d"fakeNodeHolder"\x3e\n\t\t\x3cinput class\x3d"dijitFileInputVisible" type\x3d"text" dojoAttachPoint\x3d"focusNode, inputNode" /\x3e\n\t\t\x3cdiv class\x3d"dijitInline dijitFileInputText" dojoAttachPoint\x3d"titleNode"\x3e${label}\x3c/div\x3e\n\t\t\x3cdiv class\x3d"dijitInline dijitFileInputButton" dojoAttachPoint\x3d"cancelNode" dojoAttachEvent\x3d"onclick:reset"\x3e${cancelText}\x3c/div\x3e\n\t\x3c/div\x3e\n\t\x3cdiv class\x3d"dijitProgressOverlay" dojoAttachPoint\x3d"overlay"\x3e\x26nbsp;\x3c/div\x3e\n\x3c/div\x3e\n'}});
-define("dojox/form/FileInputAuto","dojo/_base/declare dojo/_base/lang dojo/_base/fx dojo/_base/window dojo/dom-style dojo/_base/sniff dojo/text!./resources/FileInputAuto.html dojox/form/FileInput dojo/io/iframe".split(" "),function(e,f,g,h,c,b,d,k,l){d=e("dojox.form.FileInputAuto",k,{url:"",blurDelay:2E3,duration:500,uploadMessage:"Uploading ...",triggerEvent:"onblur",_sent:!1,templateString:d,onBeforeSend:function(){return{}},startup:function(){this._blurListener=this.connect(this.fileInput,this.triggerEvent,
-"_onBlur");this._focusListener=this.connect(this.fileInput,"onfocus","_onFocus");this.inherited(arguments)},_onFocus:function(){this._blurTimer&&clearTimeout(this._blurTimer)},_onBlur:function(){this._blurTimer&&clearTimeout(this._blurTimer);this._sent||(this._blurTimer=setTimeout(f.hitch(this,"_sendFile"),this.blurDelay))},setMessage:function(a){this.overlay.removeChild(this.overlay.firstChild);this.overlay.appendChild(document.createTextNode(a))},_sendFile:function(a){this._sent||this._sending||
-!this.fileInput.value||(this._sending=!0,c.set(this.fakeNodeHolder,"display","none"),c.set(this.overlay,{opacity:0,display:"block"}),this.setMessage(this.uploadMessage),g.fadeIn({node:this.overlay,duration:this.duration}).play(),9>b("ie")||b("ie")&&b("quirks")?(a=document.createElement('\x3cform enctype\x3d"multipart/form-data" method\x3d"post"\x3e'),a.encoding="multipart/form-data"):(a=document.createElement("form"),a.setAttribute("enctype","multipart/form-data"),a.setAttribute("method","post")),
-a.appendChild(this.fileInput),h.body().appendChild(a),l.send({url:this.url,form:a,handleAs:"json",handle:f.hitch(this,"_handleSend"),content:this.onBeforeSend()}))},_handleSend:function(a,b){this.overlay.removeChild(this.overlay.firstChild);this._sent=!0;this._sending=!1;c.set(this.overlay,{opacity:0,border:"none",background:"none"});this.overlay.style.backgroundImage="none";this.fileInput.style.display="none";this.fakeNodeHolder.style.display="none";g.fadeIn({node:this.overlay,duration:this.duration}).play(250);
-this.disconnect(this._blurListener);this.disconnect(this._focusListener);h.body().removeChild(b.args.form);this.fileInput=null;this.onComplete(a,b,this)},reset:function(a){this._blurTimer&&clearTimeout(this._blurTimer);this.disconnect(this._blurListener);this.disconnect(this._focusListener);this.overlay.style.display="none";this.fakeNodeHolder.style.display="";this.inherited(arguments);this._sending=this._sent=!1;this._blurListener=this.connect(this.fileInput,this.triggerEvent,"_onBlur");this._focusListener=
-this.connect(this.fileInput,"onfocus","_onFocus")},onComplete:function(a,b,c){}});e("dojox.form.FileInputBlind",d,{startup:function(){this.inherited(arguments);this._off=c.get(this.inputNode,"width");this.inputNode.style.display="none";this._fixPosition()},_fixPosition:function(){b("ie")?c.set(this.fileInput,"width","1px"):c.set(this.fileInput,"left","-"+this._off+"px")},reset:function(a){this.inherited(arguments);this._fixPosition()}});return d});
-//# sourceMappingURL=FileInputAuto.js.map
+require({cache:{"url:dojox/form/resources/FileInputAuto.html":"<div class=\"dijitFileInput\">\n\t<input id=\"${id}\" name=\"${name}\" class=\"dijitFileInputReal\" type=\"file\" dojoAttachPoint=\"fileInput\" />\n\t<div class=\"dijitFakeInput\" dojoAttachPoint=\"fakeNodeHolder\">\n\t\t<input class=\"dijitFileInputVisible\" type=\"text\" dojoAttachPoint=\"focusNode, inputNode\" />\n\t\t<div class=\"dijitInline dijitFileInputText\" dojoAttachPoint=\"titleNode\">${label}</div>\n\t\t<div class=\"dijitInline dijitFileInputButton\" dojoAttachPoint=\"cancelNode\" dojoAttachEvent=\"onclick:reset\">${cancelText}</div>\n\t</div>\n\t<div class=\"dijitProgressOverlay\" dojoAttachPoint=\"overlay\">&nbsp;</div>\n</div>\n"}});
+define("dojox/form/FileInputAuto",["dojo/_base/declare","dojo/_base/lang","dojo/_base/fx","dojo/_base/window","dojo/dom-style","dojo/_base/sniff","dojo/text!./resources/FileInputAuto.html","dojox/form/FileInput","dojo/io/iframe"],function(_1,_2,fx,_3,_4,_5,_6,_7,_8){
+var _9=_1("dojox.form.FileInputAuto",_7,{url:"",blurDelay:2000,duration:500,uploadMessage:"Uploading ...",triggerEvent:"onblur",_sent:false,templateString:_6,onBeforeSend:function(){
+return {};
+},startup:function(){
+this._blurListener=this.connect(this.fileInput,this.triggerEvent,"_onBlur");
+this._focusListener=this.connect(this.fileInput,"onfocus","_onFocus");
+this.inherited(arguments);
+},_onFocus:function(){
+if(this._blurTimer){
+clearTimeout(this._blurTimer);
+}
+},_onBlur:function(){
+if(this._blurTimer){
+clearTimeout(this._blurTimer);
+}
+if(!this._sent){
+this._blurTimer=setTimeout(_2.hitch(this,"_sendFile"),this.blurDelay);
+}
+},setMessage:function(_a){
+this.overlay.removeChild(this.overlay.firstChild);
+this.overlay.appendChild(document.createTextNode(_a));
+},_sendFile:function(e){
+if(this._sent||this._sending||!this.fileInput.value){
+return;
+}
+this._sending=true;
+_4.set(this.fakeNodeHolder,"display","none");
+_4.set(this.overlay,{opacity:0,display:"block"});
+this.setMessage(this.uploadMessage);
+fx.fadeIn({node:this.overlay,duration:this.duration}).play();
+var _b;
+if(_5("ie")<9||(_5("ie")&&_5("quirks"))){
+_b=document.createElement("<form enctype=\"multipart/form-data\" method=\"post\">");
+_b.encoding="multipart/form-data";
+}else{
+_b=document.createElement("form");
+_b.setAttribute("enctype","multipart/form-data");
+_b.setAttribute("method","post");
+}
+_b.appendChild(this.fileInput);
+_3.body().appendChild(_b);
+_8.send({url:this.url,form:_b,handleAs:"json",handle:_2.hitch(this,"_handleSend"),content:this.onBeforeSend()});
+},_handleSend:function(_c,_d){
+this.overlay.removeChild(this.overlay.firstChild);
+this._sent=true;
+this._sending=false;
+_4.set(this.overlay,{opacity:0,border:"none",background:"none"});
+this.overlay.style.backgroundImage="none";
+this.fileInput.style.display="none";
+this.fakeNodeHolder.style.display="none";
+fx.fadeIn({node:this.overlay,duration:this.duration}).play(250);
+this.disconnect(this._blurListener);
+this.disconnect(this._focusListener);
+_3.body().removeChild(_d.args.form);
+this.fileInput=null;
+this.onComplete(_c,_d,this);
+},reset:function(e){
+if(this._blurTimer){
+clearTimeout(this._blurTimer);
+}
+this.disconnect(this._blurListener);
+this.disconnect(this._focusListener);
+this.overlay.style.display="none";
+this.fakeNodeHolder.style.display="";
+this.inherited(arguments);
+this._sent=false;
+this._sending=false;
+this._blurListener=this.connect(this.fileInput,this.triggerEvent,"_onBlur");
+this._focusListener=this.connect(this.fileInput,"onfocus","_onFocus");
+},onComplete:function(_e,_f,_10){
+}});
+_1("dojox.form.FileInputBlind",_9,{startup:function(){
+this.inherited(arguments);
+this._off=_4.get(this.inputNode,"width");
+this.inputNode.style.display="none";
+this._fixPosition();
+},_fixPosition:function(){
+if(_5("ie")){
+_4.set(this.fileInput,"width","1px");
+}else{
+_4.set(this.fileInput,"left","-"+(this._off)+"px");
+}
+},reset:function(e){
+this.inherited(arguments);
+this._fixPosition();
+}});
+return _9;
+});

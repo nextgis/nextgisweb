@@ -5,5 +5,6 @@
 */
 
 //>>built
-define("dojo/errors/CancelError",["./create"],function(a){return a("CancelError",null,null,{dojoType:"cancel",log:!1})});
-//# sourceMappingURL=CancelError.js.map
+define("dojo/errors/CancelError",["./create"],function(_1){
+return _1("CancelError",null,null,{dojoType:"cancel",log:false});
+});

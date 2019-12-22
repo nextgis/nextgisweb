@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/pt-pt/PasteFromWord",{pasteFromWord:"Colar do Word",instructions:"Cole o conte\u00fado do Word na caixa de texto abaixo. Ap\u00f3s estar satisfeito com o conte\u00fado a inserir, prima o bot\u00e3o de colagem. Para cancelar a inser\u00e7\u00e3o de texto, prima o bot\u00e3o de cancelamento."});
-//# sourceMappingURL=PasteFromWord.js.map
+define("dojox/editor/plugins/nls/pt-pt/PasteFromWord",({"pasteFromWord":"Colar do Word","instructions":"Cole o conteúdo do Word na caixa de texto abaixo. Após estar satisfeito com o conteúdo a inserir, prima o botão de colagem. Para cancelar a inserção de texto, prima o botão de cancelamento."}));

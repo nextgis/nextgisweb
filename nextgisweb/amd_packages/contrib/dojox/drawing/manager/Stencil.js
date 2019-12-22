@@ -1,15 +1,322 @@
 //>>built
-define("dojox/drawing/manager/Stencil",["dojo","../util/oo","../defaults"],function(c,f,g){var e;return f.declare(function(a){e=a.surface;this.canvas=a.canvas;this.undo=a.undo;this.mouse=a.mouse;this.keys=a.keys;this.anchors=a.anchors;this.stencils={};this.selectedStencils={};this._mouseHandle=this.mouse.register(this);c.connect(this.keys,"onArrow",this,"onArrow");c.connect(this.keys,"onEsc",this,"deselect");c.connect(this.keys,"onDelete",this,"onDelete")},{_dragBegun:!1,_wasDragged:!1,_secondClick:!1,
-_isBusy:!1,setRecentStencil:function(a){this.recent=a},getRecentStencil:function(){return this.recent},register:function(a){if(a.isText&&!a.editMode&&a.deleteEmptyCreate&&!a.getText())return console.warn("EMPTY CREATE DELETE",a),a.destroy(),!1;this.stencils[a.id]=a;this.setRecentStencil(a);a.execText&&(a._text&&!a.editMode&&this.selectItem(a),a.connect("execText",this,function(){a.isText&&a.deleteEmptyModify&&!a.getText()?(console.warn("EMPTY MOD DELETE",a),this.deleteItem(a)):a.selectOnExec&&this.selectItem(a)}));
-a.connect("deselect",this,function(){!this._isBusy&&this.isSelected(a)&&this.deselectItem(a)});a.connect("select",this,function(){this._isBusy||this.isSelected(a)||this.selectItem(a)});return a},unregister:function(a){a&&(a.selected&&this.onDeselect(a),delete this.stencils[a.id])},onArrow:function(a){this.hasSelected()&&(this.saveThrottledState(),this.group.applyTransform({dx:a.x,dy:a.y}))},_throttleVrl:null,_throttle:!1,throttleTime:400,_lastmxx:-1,_lastmxy:-1,saveMoveState:function(){var a=this.group.getTransform();
-if(a.dx!=this._lastmxx||a.dy!=this._lastmxy)this._lastmxx=a.dx,this._lastmxy=a.dy,this.undo.add({before:c.hitch(this.group,"setTransform",a)})},saveThrottledState:function(){clearTimeout(this._throttleVrl);clearInterval(this._throttleVrl);this._throttleVrl=setTimeout(c.hitch(this,function(){this._throttle=!1;this.saveMoveState()}),this.throttleTime);this._throttle||(this._throttle=!0,this.saveMoveState())},unDelete:function(a){for(var b in a)a[b].render(),this.onSelect(a[b])},onDelete:function(a){!0!==
-a&&this.undo.add({before:c.hitch(this,"unDelete",this.selectedStencils),after:c.hitch(this,"onDelete",!0)});this.withSelected(function(a){this.anchors.remove(a);var b=a.id;a.destroy();delete this.stencils[b]});this.selectedStencils={}},deleteItem:function(a){if(this.hasSelected()){var b=[],d;for(d in this.selectedStencils)if(this.selectedStencils.id==a.id){if(1==this.hasSelected()){this.onDelete();return}}else b.push(this.selectedStencils.id);this.deselect();this.selectItem(a);this.onDelete();c.forEach(b,
-function(a){this.selectItem(a)},this)}else this.selectItem(a),this.onDelete()},removeAll:function(){this.selectAll();this._isBusy=!0;this.onDelete();this.stencils={};this._isBusy=!1},setSelectionGroup:function(){this.withSelected(function(a){this.onDeselect(a,!0)});this.group&&(e.remove(this.group),this.group.removeShape());this.group=e.createGroup();this.group.setTransform({dx:0,dy:0});this.withSelected(function(a){this.group.add(a.container);a.select()})},setConstraint:function(){var a=Infinity,
-b=Infinity;this.withSelected(function(d){d=d.getBounds();a=Math.min(d.y1,a);b=Math.min(d.x1,b)});this.constrain={l:-b,t:-a}},onDeselect:function(a,b){b||delete this.selectedStencils[a.id];this.anchors.remove(a);e.add(a.container);a.selected&&a.deselect();a.applyTransform(this.group.getTransform())},deselectItem:function(a){this.onDeselect(a)},deselect:function(){this.withSelected(function(a){this.onDeselect(a)});this._wasDragged=this._dragBegun=!1},onSelect:function(a){a||console.error("null stencil is not selected:",
-this.stencils);this.selectedStencils[a.id]||(this.selectedStencils[a.id]=a,this.group.add(a.container),a.select(),1==this.hasSelected()&&this.anchors.add(a,this.group))},selectAll:function(){this._isBusy=!0;for(var a in this.stencils)this.selectItem(a);this._isBusy=!1},selectItem:function(a){a=this.stencils["string"==typeof a?a:a.id];this.setSelectionGroup();this.onSelect(a);this.group.moveToFront();this.setConstraint()},onLabelDoubleClick:function(a){this.selectedStencils[a.id]&&this.deselect()},
-onStencilDoubleClick:function(a){this.selectedStencils[a.id]&&this.selectedStencils[a.id].edit&&(a=this.selectedStencils[a.id],a.editMode=!0,this.deselect(),a.edit())},onAnchorUp:function(){this.setConstraint()},onStencilDown:function(a,b){if(this.stencils[a.id])if(this.setRecentStencil(this.stencils[a.id]),this._isBusy=!0,this.selectedStencils[a.id]&&this.keys.meta)this.onDeselect(this.selectedStencils[a.id]),1==this.hasSelected()&&this.withSelected(function(a){this.anchors.add(a,this.group)}),this.group.moveToFront(),
-this.setConstraint();else if(this.selectedStencils[a.id]){var d=this.group.getTransform();this._offx=a.x-d.dx;this._offy=a.y-d.dy}else this.keys.meta||this.deselect(),this.selectItem(a.id),d=this.group.getTransform(),this._offx=a.x-d.dx,this._offy=a.y-d.dx,this.orgx=a.x,this.orgy=a.y,this._isBusy=!1,this.undo.add({before:function(){},after:function(){}})},onLabelDown:function(a,b){this.onStencilDown(a,b)},onStencilUp:function(a){},onLabelUp:function(a){this.onStencilUp(a)},onStencilDrag:function(a){if(this._dragBegun){this.saveThrottledState();
-var b=a.x-a.last.x,d=a.y-a.last.y,c=this.constrain,e=g.anchors.marginZero,b=a.x-this._offx,d=a.y-this._offy;b<c.l+e&&(b=c.l+e);d<c.t+e&&(d=c.t+e);this.group.setTransform({dx:b,dy:d})}else this.onBeginDrag(a),this._dragBegun=!0},onLabelDrag:function(a){this.onStencilDrag(a)},onDragEnd:function(a){this._dragBegun=!1},onBeginDrag:function(a){this._wasDragged=!0},onDown:function(a){this.deselect()},onStencilOver:function(a){c.style(a.id,"cursor","move")},onStencilOut:function(a){c.style(a.id,"cursor",
-"crosshair")},exporter:function(){var a=[],b;for(b in this.stencils)this.stencils[b].enabled&&a.push(this.stencils[b].exporter());return a},listStencils:function(){return this.stencils},toSelected:function(a){var b=Array.prototype.slice.call(arguments).splice(1),d;for(d in this.selectedStencils){var c=this.selectedStencils[d];c[a].apply(c,b)}},withSelected:function(a){a=c.hitch(this,a);for(var b in this.selectedStencils)a(this.selectedStencils[b])},withUnselected:function(a){a=c.hitch(this,a);for(var b in this.stencils)!this.stencils[b].selected&&
-a(this.stencils[b])},withStencils:function(a){a=c.hitch(this,a);for(var b in this.stencils)a(this.stencils[b])},hasSelected:function(){var a=0,b;for(b in this.selectedStencils)a++;return a},isSelected:function(a){return!!this.selectedStencils[a.id]}})});
-//# sourceMappingURL=Stencil.js.map
+define("dojox/drawing/manager/Stencil",["dojo","../util/oo","../defaults"],function(_1,oo,_2){
+var _3,_4;
+return oo.declare(function(_5){
+_3=_5.surface;
+this.canvas=_5.canvas;
+this.undo=_5.undo;
+this.mouse=_5.mouse;
+this.keys=_5.keys;
+this.anchors=_5.anchors;
+this.stencils={};
+this.selectedStencils={};
+this._mouseHandle=this.mouse.register(this);
+_1.connect(this.keys,"onArrow",this,"onArrow");
+_1.connect(this.keys,"onEsc",this,"deselect");
+_1.connect(this.keys,"onDelete",this,"onDelete");
+},{_dragBegun:false,_wasDragged:false,_secondClick:false,_isBusy:false,setRecentStencil:function(_6){
+this.recent=_6;
+},getRecentStencil:function(){
+return this.recent;
+},register:function(_7){
+if(_7.isText&&!_7.editMode&&_7.deleteEmptyCreate&&!_7.getText()){
+console.warn("EMPTY CREATE DELETE",_7);
+_7.destroy();
+return false;
+}
+this.stencils[_7.id]=_7;
+this.setRecentStencil(_7);
+if(_7.execText){
+if(_7._text&&!_7.editMode){
+this.selectItem(_7);
+}
+_7.connect("execText",this,function(){
+if(_7.isText&&_7.deleteEmptyModify&&!_7.getText()){
+console.warn("EMPTY MOD DELETE",_7);
+this.deleteItem(_7);
+}else{
+if(_7.selectOnExec){
+this.selectItem(_7);
+}
+}
+});
+}
+_7.connect("deselect",this,function(){
+if(!this._isBusy&&this.isSelected(_7)){
+this.deselectItem(_7);
+}
+});
+_7.connect("select",this,function(){
+if(!this._isBusy&&!this.isSelected(_7)){
+this.selectItem(_7);
+}
+});
+return _7;
+},unregister:function(_8){
+if(_8){
+_8.selected&&this.onDeselect(_8);
+delete this.stencils[_8.id];
+}
+},onArrow:function(_9){
+if(this.hasSelected()){
+this.saveThrottledState();
+this.group.applyTransform({dx:_9.x,dy:_9.y});
+}
+},_throttleVrl:null,_throttle:false,throttleTime:400,_lastmxx:-1,_lastmxy:-1,saveMoveState:function(){
+var mx=this.group.getTransform();
+if(mx.dx==this._lastmxx&&mx.dy==this._lastmxy){
+return;
+}
+this._lastmxx=mx.dx;
+this._lastmxy=mx.dy;
+this.undo.add({before:_1.hitch(this.group,"setTransform",mx)});
+},saveThrottledState:function(){
+clearTimeout(this._throttleVrl);
+clearInterval(this._throttleVrl);
+this._throttleVrl=setTimeout(_1.hitch(this,function(){
+this._throttle=false;
+this.saveMoveState();
+}),this.throttleTime);
+if(this._throttle){
+return;
+}
+this._throttle=true;
+this.saveMoveState();
+},unDelete:function(_a){
+for(var s in _a){
+_a[s].render();
+this.onSelect(_a[s]);
+}
+},onDelete:function(_b){
+if(_b!==true){
+this.undo.add({before:_1.hitch(this,"unDelete",this.selectedStencils),after:_1.hitch(this,"onDelete",true)});
+}
+this.withSelected(function(m){
+this.anchors.remove(m);
+var id=m.id;
+m.destroy();
+delete this.stencils[id];
+});
+this.selectedStencils={};
+},deleteItem:function(_c){
+if(this.hasSelected()){
+var _d=[];
+for(var m in this.selectedStencils){
+if(this.selectedStencils.id==_c.id){
+if(this.hasSelected()==1){
+this.onDelete();
+return;
+}
+}else{
+_d.push(this.selectedStencils.id);
+}
+}
+this.deselect();
+this.selectItem(_c);
+this.onDelete();
+_1.forEach(_d,function(id){
+this.selectItem(id);
+},this);
+}else{
+this.selectItem(_c);
+this.onDelete();
+}
+},removeAll:function(){
+this.selectAll();
+this._isBusy=true;
+this.onDelete();
+this.stencils={};
+this._isBusy=false;
+},setSelectionGroup:function(){
+this.withSelected(function(m){
+this.onDeselect(m,true);
+});
+if(this.group){
+_3.remove(this.group);
+this.group.removeShape();
+}
+this.group=_3.createGroup();
+this.group.setTransform({dx:0,dy:0});
+this.withSelected(function(m){
+this.group.add(m.container);
+m.select();
+});
+},setConstraint:function(){
+var t=Infinity,l=Infinity;
+this.withSelected(function(m){
+var o=m.getBounds();
+t=Math.min(o.y1,t);
+l=Math.min(o.x1,l);
+});
+this.constrain={l:-l,t:-t};
+},onDeselect:function(_e,_f){
+if(!_f){
+delete this.selectedStencils[_e.id];
+}
+this.anchors.remove(_e);
+_3.add(_e.container);
+_e.selected&&_e.deselect();
+_e.applyTransform(this.group.getTransform());
+},deselectItem:function(_10){
+this.onDeselect(_10);
+},deselect:function(){
+this.withSelected(function(m){
+this.onDeselect(m);
+});
+this._dragBegun=false;
+this._wasDragged=false;
+},onSelect:function(_11){
+if(!_11){
+console.error("null stencil is not selected:",this.stencils);
+}
+if(this.selectedStencils[_11.id]){
+return;
+}
+this.selectedStencils[_11.id]=_11;
+this.group.add(_11.container);
+_11.select();
+if(this.hasSelected()==1){
+this.anchors.add(_11,this.group);
+}
+},selectAll:function(){
+this._isBusy=true;
+for(var m in this.stencils){
+this.selectItem(m);
+}
+this._isBusy=false;
+},selectItem:function(_12){
+var id=typeof (_12)=="string"?_12:_12.id;
+var _13=this.stencils[id];
+this.setSelectionGroup();
+this.onSelect(_13);
+this.group.moveToFront();
+this.setConstraint();
+},onLabelDoubleClick:function(obj){
+if(this.selectedStencils[obj.id]){
+this.deselect();
+}
+},onStencilDoubleClick:function(obj){
+if(this.selectedStencils[obj.id]){
+if(this.selectedStencils[obj.id].edit){
+var m=this.selectedStencils[obj.id];
+m.editMode=true;
+this.deselect();
+m.edit();
+}
+}
+},onAnchorUp:function(){
+this.setConstraint();
+},onStencilDown:function(obj,evt){
+if(!this.stencils[obj.id]){
+return;
+}
+this.setRecentStencil(this.stencils[obj.id]);
+this._isBusy=true;
+if(this.selectedStencils[obj.id]&&this.keys.meta){
+if(_1.isMac&&this.keys.cmmd){
+}
+this.onDeselect(this.selectedStencils[obj.id]);
+if(this.hasSelected()==1){
+this.withSelected(function(m){
+this.anchors.add(m,this.group);
+});
+}
+this.group.moveToFront();
+this.setConstraint();
+return;
+}else{
+if(this.selectedStencils[obj.id]){
+var mx=this.group.getTransform();
+this._offx=obj.x-mx.dx;
+this._offy=obj.y-mx.dy;
+return;
+}else{
+if(!this.keys.meta){
+this.deselect();
+}else{
+}
+}
+}
+this.selectItem(obj.id);
+mx=this.group.getTransform();
+this._offx=obj.x-mx.dx;
+this._offy=obj.y-mx.dx;
+this.orgx=obj.x;
+this.orgy=obj.y;
+this._isBusy=false;
+this.undo.add({before:function(){
+},after:function(){
+}});
+},onLabelDown:function(obj,evt){
+this.onStencilDown(obj,evt);
+},onStencilUp:function(obj){
+},onLabelUp:function(obj){
+this.onStencilUp(obj);
+},onStencilDrag:function(obj){
+if(!this._dragBegun){
+this.onBeginDrag(obj);
+this._dragBegun=true;
+}else{
+this.saveThrottledState();
+var x=obj.x-obj.last.x,y=obj.y-obj.last.y,c=this.constrain,mz=_2.anchors.marginZero;
+x=obj.x-this._offx;
+y=obj.y-this._offy;
+if(x<c.l+mz){
+x=c.l+mz;
+}
+if(y<c.t+mz){
+y=c.t+mz;
+}
+this.group.setTransform({dx:x,dy:y});
+}
+},onLabelDrag:function(obj){
+this.onStencilDrag(obj);
+},onDragEnd:function(obj){
+this._dragBegun=false;
+},onBeginDrag:function(obj){
+this._wasDragged=true;
+},onDown:function(obj){
+this.deselect();
+},onStencilOver:function(obj){
+_1.style(obj.id,"cursor","move");
+},onStencilOut:function(obj){
+_1.style(obj.id,"cursor","crosshair");
+},exporter:function(){
+var _14=[];
+for(var m in this.stencils){
+this.stencils[m].enabled&&_14.push(this.stencils[m].exporter());
+}
+return _14;
+},listStencils:function(){
+return this.stencils;
+},toSelected:function(_15){
+var _16=Array.prototype.slice.call(arguments).splice(1);
+for(var m in this.selectedStencils){
+var _17=this.selectedStencils[m];
+_17[_15].apply(_17,_16);
+}
+},withSelected:function(_18){
+var f=_1.hitch(this,_18);
+for(var m in this.selectedStencils){
+f(this.selectedStencils[m]);
+}
+},withUnselected:function(_19){
+var f=_1.hitch(this,_19);
+for(var m in this.stencils){
+!this.stencils[m].selected&&f(this.stencils[m]);
+}
+},withStencils:function(_1a){
+var f=_1.hitch(this,_1a);
+for(var m in this.stencils){
+f(this.stencils[m]);
+}
+},hasSelected:function(){
+var ln=0;
+for(var m in this.selectedStencils){
+ln++;
+}
+return ln;
+},isSelected:function(_1b){
+return !!this.selectedStencils[_1b.id];
+}});
+});

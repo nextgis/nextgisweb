@@ -1,4 +1,24 @@
 //>>built
-define("dojox/mvc/getStateful",["dojo/_base/array","dojo/_base/lang","dojo/Stateful","./StatefulArray"],function(e,b,f,g){var d=function(a,c){return(c||d)["getStateful"+(c||d).getType(a).replace(/^[a-z]/,function(a){return a.toUpperCase()})](a)};return b.setObject("dojox.mvc.getStateful",b.mixin(d,{getType:function(a){return b.isArray(a)?"array":null!=a&&"[object Object]"=={}.toString.call(a)?"object":"value"},getStatefulArray:function(a){return new g(e.map(a,function(a){return d(a,this)},this))},
-getStatefulObject:function(a){var c=new f,b;for(b in a)c[b]=d(a[b],this);return c},getStatefulValue:function(a){return a}}))});
-//# sourceMappingURL=getStateful.js.map
+define("dojox/mvc/getStateful",["dojo/_base/array","dojo/_base/lang","dojo/Stateful","./StatefulArray"],function(_1,_2,_3,_4){
+var _5={getType:function(v){
+return _2.isArray(v)?"array":v!=null&&{}.toString.call(v)=="[object Object]"?"object":"value";
+},getStatefulArray:function(a){
+return new _4(_1.map(a,function(_6){
+return _7(_6,this);
+},this));
+},getStatefulObject:function(o){
+var _8=new _3();
+for(var s in o){
+_8[s]=_7(o[s],this);
+}
+return _8;
+},getStatefulValue:function(v){
+return v;
+}};
+var _7=function(_9,_a){
+return (_a||_7)["getStateful"+(_a||_7).getType(_9).replace(/^[a-z]/,function(c){
+return c.toUpperCase();
+})](_9);
+};
+return _2.setObject("dojox.mvc.getStateful",_2.mixin(_7,_5));
+});

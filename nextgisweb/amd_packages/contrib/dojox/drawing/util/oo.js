@@ -1,4 +1,46 @@
 //>>built
-define("dojox/drawing/util/oo",[],function(){return{declare:function(){var b,c,e=0,a=arguments;2>a.length&&console.error("drawing.util.oo.declare; not enough arguments");2==a.length?(b=a[0],c=a[1]):(a=Array.prototype.slice.call(arguments),c=a.pop(),b=a.pop(),e=1);for(var d in c)b.prototype[d]=c[d];e&&(a.unshift(b),b=this.extend.apply(this,a));return b},extend:function(){var b=arguments,c=b[0];2>b.length&&console.error("drawing.util.oo.extend; not enough arguments");for(var e=function(){for(var a=
-1;a<b.length;a++)b[a].prototype.constructor.apply(this,arguments);c.prototype.constructor.apply(this,arguments)},a=1;a<b.length;a++)for(var d in b[a].prototype)e.prototype[d]=b[a].prototype[d];for(d in c.prototype)e.prototype[d]=c.prototype[d];return e}}});
-//# sourceMappingURL=oo.js.map
+define("dojox/drawing/util/oo",[],function(){
+return {declare:function(){
+var f,o,_1=0,a=arguments;
+if(a.length<2){
+console.error("drawing.util.oo.declare; not enough arguments");
+}
+if(a.length==2){
+f=a[0];
+o=a[1];
+}else{
+a=Array.prototype.slice.call(arguments);
+o=a.pop();
+f=a.pop();
+_1=1;
+}
+for(var n in o){
+f.prototype[n]=o[n];
+}
+if(_1){
+a.unshift(f);
+f=this.extend.apply(this,a);
+}
+return f;
+},extend:function(){
+var a=arguments,_2=a[0];
+if(a.length<2){
+console.error("drawing.util.oo.extend; not enough arguments");
+}
+var f=function(){
+for(var i=1;i<a.length;i++){
+a[i].prototype.constructor.apply(this,arguments);
+}
+_2.prototype.constructor.apply(this,arguments);
+};
+for(var i=1;i<a.length;i++){
+for(var n in a[i].prototype){
+f.prototype[n]=a[i].prototype[n];
+}
+}
+for(n in _2.prototype){
+f.prototype[n]=_2.prototype[n];
+}
+return f;
+}};
+});

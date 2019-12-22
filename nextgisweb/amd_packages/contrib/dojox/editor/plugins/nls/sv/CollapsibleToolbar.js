@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/sv/CollapsibleToolbar",{collapse:"Komprimera redigeringsverktygsf\u00e4ltet",expand:"Expandera redigeringsverktygsf\u00e4ltet"});
-//# sourceMappingURL=CollapsibleToolbar.js.map
+define("dojox/editor/plugins/nls/sv/CollapsibleToolbar",({"collapse":"Komprimera redigeringsverktygsfältet","expand":"Expandera redigeringsverktygsfältet"}));

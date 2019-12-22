@@ -1006,10 +1006,10 @@ define([
 				if(this.layout.cells.length){
 					this.scroller.updateRowCount(inRowCount);
 				}
-				this._resize();
 				if(this.layout.cells.length){
 					this.setScrollTop(this.scrollTop);
 				}
+				this._resize();
 			}
 		},
 
@@ -2620,8 +2620,9 @@ return {
 define([
 	"../main",
 	"dojo/_base/lang",
-	"dojo/dom"
-], function(dojox, lang, dom){
+	"dojo/dom",
+	"dojo/_base/sniff"
+], function(dojox, lang, dom, has){
 
 	var dgu = lang.getObject("grid.util", true, dojox);
 
@@ -2636,12 +2637,55 @@ dgu = {
 	dgu.rowIndexTag = "gridRowIndex";
 	dgu.gridViewTag = "gridView";
 
-
 	dgu.fire = function(ob, ev, args){
+		// Find parent node that scrolls, either vertically or horizontally
+		function getScrollParent(node, horizontal){
+			if(node == null) {
+				return null;
+			}
+
+			var dimension = horizontal ? 'Width' : 'Height';
+			if(node['scroll' + dimension] > node['client' + dimension]){
+				return node;
+			}else{
+				return getScrollParent(node.parentNode, horizontal);
+			}
+		}
+
+		// In Webkit browsers focusing an element will scroll this element into view.
+		// This may even happen if the element already is in view, but near the edge.
+		// This may move the element away from the mouse cursor on the first click
+		// of a double click and you end up hitting a different element.
+		// Avoid this by storing the scroll position and restoring it after focusing.
+		var verticalScrollParent, horizontalScrollParent, scrollTop, scrollLeft, obNode;
+		if(has("webkit") && (ev == "focus")){
+			obNode = ob.domNode ? ob.domNode : ob;
+			verticalScrollParent = getScrollParent(obNode, false);
+			if(verticalScrollParent){
+				scrollTop = verticalScrollParent.scrollTop;
+			}
+			horizontalScrollParent = getScrollParent(obNode, true);
+			if(horizontalScrollParent){
+				scrollLeft = horizontalScrollParent.scrollLeft;
+			}
+		}
+
 		var fn = ob && ev && ob[ev];
-		return fn && (args ? fn.apply(ob, args) : ob[ev]());
+		var result = fn && (args ? fn.apply(ob, args) : ob[ev]());
+
+		// Restore scrolling position
+		if(has("webkit") && (ev == "focus")){
+			if(verticalScrollParent){
+				verticalScrollParent.scrollTop = scrollTop;
+			}
+			if(horizontalScrollParent){
+				horizontalScrollParent.scrollLeft = scrollLeft;
+			}
+		}
+
+		return result;
 	};
-	
+
 	dgu.setStyleHeightPx = function(inElement, inHeight){
 		if(inHeight >= 0){
 			var s = inElement.style;
@@ -2651,7 +2695,7 @@ dgu = {
 			}
 		}
 	};
-	
+
 	dgu.mouseEvents = [ 'mouseover', 'mouseout', /*'mousemove',*/ 'mousedown', 'mouseup', 'click', 'dblclick', 'contextmenu' ];
 
 	dgu.keyEvents = [ 'keyup', 'keydown', 'keypress' ];
@@ -2668,14 +2712,14 @@ dgu = {
 		inNode && inNode.parentNode && inNode.parentNode.removeChild(inNode);
 		return inNode;
 	};
-	
+
 	dgu.arrayCompare = function(inA, inB){
 		for(var i=0,l=inA.length; i<l; i++){
 			if(inA[i] != inB[i]){return false;}
 		}
 		return (inA.length == inB.length);
 	};
-	
+
 	dgu.arrayInsert = function(inArray, inIndex, inValue){
 		if(inArray.length <= inIndex){
 			inArray[inIndex] = inValue;
@@ -2683,11 +2727,11 @@ dgu = {
 			inArray.splice(inIndex, 0, inValue);
 		}
 	};
-	
+
 	dgu.arrayRemove = function(inArray, inIndex){
 		inArray.splice(inIndex, 1);
 	};
-	
+
 	dgu.arraySwap = function(inArray, inI, inJ){
 		var cache = inArray[inI];
 		inArray[inI] = inArray[inJ];
@@ -2697,6 +2741,7 @@ dgu = {
 	return dgu;
 
 });
+
 },
 'dojox/grid/_Layout':function(){
 define([
@@ -3088,11 +3133,14 @@ define([
 			//		grid row index
 			// returns:
 			//		html for a given grid cell
-			var f, i=this.grid.edit.info, d=this.get ? this.get(inRowIndex, inItem) : (this.value || this.defaultValue);
-			d = (d && d.replace && this.grid.escapeHTMLInData) ? d.replace(/&/g, '&amp;').replace(/</g, '&lt;') : d;
-			if(this.editable && (this.alwaysEditing || (i.rowIndex==inRowIndex && i.cell==this))){
+			var i = this.grid.edit.info;
+			var d = this.get ? this.get(inRowIndex, inItem) : (this.value || this.defaultValue);
+			if (d && d.replace && this.grid.escapeHTMLInData) {
+				d = d.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+			}
+			if (this.editable && (this.alwaysEditing || (i.rowIndex==inRowIndex && i.cell==this))){
 				return this.formatEditing(i.value ? i.value : d, inRowIndex);
-			}else{
+			} else {
 				return this._defaultFormat(d, [d, inRowIndex, this]);
 			}
 		},
@@ -3315,6 +3363,10 @@ define([
 		keyFilter: null,
 		formatEditing: function(inDatum, inRowIndex){
 			this.needFormatNode(inDatum, inRowIndex);
+			if (inDatum && inDatum.replace) {
+				// escape quotes to avoid XSS
+				inDatum = inDatum.replace(/"/g, '&quot;')
+			}
 			return '<input class="dojoxGridInput" type="text" value="' + inDatum + '">';
 		},
 		formatNode: function(inNode, inDatum, inRowIndex){
@@ -3465,6 +3517,7 @@ define([
 	return BaseCell;
 
 });
+
 },
 'dijit/_Widget':function(){
 define([
@@ -4592,8 +4645,12 @@ define([
 						}
 						break;
 					case "innerText":
+						// Deprecated, use "textContent" instead.
 						mapNode.innerHTML = "";
 						mapNode.appendChild(this.ownerDocument.createTextNode(value));
+						break;
+					case "textContent":
+						mapNode.textContent = value;
 						break;
 					case "innerHTML":
 						mapNode.innerHTML = value;
@@ -9157,7 +9214,7 @@ var Container = declare("dojo.dnd.Container", Evented, {
 		//		event processor for onselectevent and ondragevent
 		// e: Event
 		//		mouse event
-		if(!this.skipForm || !dnd.isFormElement(e)){
+		if(!this.withHandles && (!this.skipForm || !dnd.isFormElement(e))){
 			e.stopPropagation();
 			e.preventDefault();
 		}
@@ -10570,6 +10627,8 @@ define(["dojo/_base/kernel","dojo/_base/lang", "dojo/_base/sniff", "dojo/ready",
 		var m, s;
 		if(!measuringNode){
 			m = measuringNode = Window.doc.createElement("div");
+			// Due to fixing the parent node's width below, texts which contain white-spaces would be wrapped. Avoid this.
+			m.style.whiteSpace = "nowrap";
 			// Container that we can set constraints on so that it doesn't
 			// trigger a scrollbar.
 			var c = Window.doc.createElement("div");
@@ -10687,6 +10746,7 @@ define(["dojo/_base/kernel","dojo/_base/lang", "dojo/_base/sniff", "dojo/ready",
 	});
 	return dhm;
 });
+
 },
 'dojox/grid/_Builder':function(){
 define([
@@ -10951,20 +11011,23 @@ define([
 
 		// time critical: generate html using cache and data source
 		generateHtml: function(inDataIndex, inRowIndex){
-			var
-				html = this.getTableArray(),
-				v = this.view, dir,
-				cells = v.structure.cells,
-				item = this.grid.getItem(inRowIndex);
+			var html = this.getTableArray();
+			var v = this.view;
+			var cells = v.structure.cells;
+			var item = this.grid.getItem(inRowIndex);
+			var dir;
 
 			util.fire(this.view, "onBeforeRow", [inRowIndex, cells]);
-			for(var j=0, row; (row=cells[j]); j++){
+			for(var j=0, row; (row = cells[j]); j++){
 				if(row.hidden || row.header){
 					continue;
 				}
 				html.push(!row.invisible ? '<tr>' : '<tr class="dojoxGridInvisible">');
 				for(var i=0, cell, m, cc, cs; (cell=row[i]); i++){
-					m = cell.markup; cc = cell.customClasses = []; cs = cell.customStyles = [];
+					m = cell.markup;
+					cc = cell.customClasses = [];
+					cs = cell.customStyles = [];
+
 					// content (format can fill in cc and cs as side-effects)
 					m[5] = cell.format(inRowIndex, item);
 					// classes
@@ -10972,7 +11035,7 @@ define([
 					// styles
 					m[3] = cs.join(';');
 					dir = cell.textDir || this.grid.textDir;
-					if(dir){
+					if (dir) {
 					    m[3] += this._getTextDirStyle(dir, cell, inRowIndex);
 					}
 					// in-place concat

@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/ko/Breadcrumb",{nodeActions:"${nodeName} \uc870\uce58",selectContents:"\ucee8\ud150\uce20 \uc120\ud0dd",selectElement:"\uc694\uc18c \uc120\ud0dd",deleteElement:"\uc694\uc18c \uc0ad\uc81c",deleteContents:"\ucee8\ud150\uce20 \uc0ad\uc81c",moveStart:"\ucee4\uc11c\ub97c \uc774\ub3d9\ud558\uc5ec \uc2dc\uc791",moveEnd:"\ucee4\uc11c\ub97c \uc774\ub3d9\ud558\uc5ec \uc885\ub8cc"});
-//# sourceMappingURL=Breadcrumb.js.map
+define("dojox/editor/plugins/nls/ko/Breadcrumb",({"nodeActions":"${nodeName} 조치","selectContents":"컨텐츠 선택","selectElement":"요소 선택","deleteElement":"요소 삭제","deleteContents":"컨텐츠 삭제","moveStart":"커서를 이동하여 시작","moveEnd":"커서를 이동하여 종료"}));

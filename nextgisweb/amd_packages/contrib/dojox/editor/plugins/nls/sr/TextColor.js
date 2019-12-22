@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/sr/TextColor",{setButtonText:"Podesi",cancelButtonText:"Otka\u017ei"});
-//# sourceMappingURL=TextColor.js.map
+define("dojox/editor/plugins/nls/sr/TextColor",{"setButtonText":"Podesi","cancelButtonText":"Otkaži"});

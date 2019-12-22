@@ -1,5 +1,36 @@
 //>>built
-define("dojox/mobile/bidi/Switch",["dojo/_base/declare","./common","dojo/dom-class"],function(d,a,c){return d(null,{postCreate:function(){this.inherited(arguments);!this.textDir&&this.getParent()&&this.getParent().get("textDir")&&this.set("textDir",this.getParent().get("textDir"))},buildRendering:function(){this.inherited(arguments);this.isLeftToRight()||(c.add(this.left,"mblSwitchBgLeftRtl"),c.add(this.left.firstChild,"mblSwitchTextLeftRtl"),c.add(this.right,"mblSwitchBgRightRtl"),c.add(this.right.firstChild,
-"mblSwitchTextRightRtl"))},_newState:function(a){return this.isLeftToRight()?this.inherited(arguments):this.inner.offsetLeft<-(this._width/2)?"on":"off"},_setLeftLabelAttr:function(b){this.inherited(arguments);this.left.firstChild.innerHTML=a.enforceTextDirWithUcc(this.left.firstChild.innerHTML,this.textDir)},_setRightLabelAttr:function(b){this.inherited(arguments);this.right.firstChild.innerHTML=a.enforceTextDirWithUcc(this.right.firstChild.innerHTML,this.textDir)},_setTextDirAttr:function(b){!b||
-this._created&&this.textDir===b||(this.textDir=b,this.left.firstChild.innerHTML=a.removeUCCFromText(this.left.firstChild.innerHTML),this.left.firstChild.innerHTML=a.enforceTextDirWithUcc(this.left.firstChild.innerHTML,this.textDir),this.right.firstChild.innerHTML=a.removeUCCFromText(this.right.firstChild.innerHTML),this.right.firstChild.innerHTML=a.enforceTextDirWithUcc(this.right.firstChild.innerHTML,this.textDir))}})});
-//# sourceMappingURL=Switch.js.map
+define("dojox/mobile/bidi/Switch",["dojo/_base/declare","./common","dojo/dom-class"],function(_1,_2,_3){
+return _1(null,{postCreate:function(){
+this.inherited(arguments);
+if(!this.textDir&&this.getParent()&&this.getParent().get("textDir")){
+this.set("textDir",this.getParent().get("textDir"));
+}
+},buildRendering:function(){
+this.inherited(arguments);
+if(!this.isLeftToRight()){
+_3.add(this.left,"mblSwitchBgLeftRtl");
+_3.add(this.left.firstChild,"mblSwitchTextLeftRtl");
+_3.add(this.right,"mblSwitchBgRightRtl");
+_3.add(this.right.firstChild,"mblSwitchTextRightRtl");
+}
+},_newState:function(_4){
+if(this.isLeftToRight()){
+return this.inherited(arguments);
+}
+return (this.inner.offsetLeft<-(this._width/2))?"on":"off";
+},_setLeftLabelAttr:function(_5){
+this.inherited(arguments);
+this.left.firstChild.innerHTML=_2.enforceTextDirWithUcc(this.left.firstChild.innerHTML,this.textDir);
+},_setRightLabelAttr:function(_6){
+this.inherited(arguments);
+this.right.firstChild.innerHTML=_2.enforceTextDirWithUcc(this.right.firstChild.innerHTML,this.textDir);
+},_setTextDirAttr:function(_7){
+if(_7&&(!this._created||this.textDir!==_7)){
+this.textDir=_7;
+this.left.firstChild.innerHTML=_2.removeUCCFromText(this.left.firstChild.innerHTML);
+this.left.firstChild.innerHTML=_2.enforceTextDirWithUcc(this.left.firstChild.innerHTML,this.textDir);
+this.right.firstChild.innerHTML=_2.removeUCCFromText(this.right.firstChild.innerHTML);
+this.right.firstChild.innerHTML=_2.enforceTextDirWithUcc(this.right.firstChild.innerHTML,this.textDir);
+}
+}});
+});

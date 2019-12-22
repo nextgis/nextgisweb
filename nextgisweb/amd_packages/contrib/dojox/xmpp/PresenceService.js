@@ -1,13 +1,156 @@
 //>>built
-define("dojox/xmpp/PresenceService",["dojo","dijit","dojox"],function(g,h,c){g.provide("dojox.xmpp.PresenceService");c.xmpp.presence={UPDATE:201,SUBSCRIPTION_REQUEST:202,SUBSCRIPTION_SUBSTATUS_NONE:204,SUBSCRIPTION_NONE:"none",SUBSCRIPTION_FROM:"from",SUBSCRIPTION_TO:"to",SUBSCRIPTION_BOTH:"both",SUBSCRIPTION_REQUEST_PENDING:"pending",STATUS_ONLINE:"online",STATUS_AWAY:"away",STATUS_CHAT:"chat",STATUS_DND:"dnd",STATUS_EXTENDED_AWAY:"xa",STATUS_OFFLINE:"offline",STATUS_INVISIBLE:"invisible"};g.declare("dojox.xmpp.PresenceService",
-null,{constructor:function(a){this.session=a;this.isInvisible=!1;this.presence=this.avatarHash=null;this.restrictedContactjids={}},publish:function(a){this.presence=a;this._setPresence()},sendAvatarHash:function(a){this.avatarHash=a;this._setPresence()},_setPresence:function(){var a=this.presence,b={xmlns:"jabber:client"};a&&a.to&&(b.to=a.to);a.show&&a.show==c.xmpp.presence.STATUS_OFFLINE&&(b.type="unavailable");if(a.show&&a.show==c.xmpp.presence.STATUS_INVISIBLE)this._setInvisible(),this.isInvisible=
-!0;else{this.isInvisible&&this._setVisible();b=new c.string.Builder(c.xmpp.util.createElement("presence",b,!1));a.show&&a.show!=c.xmpp.presence.STATUS_OFFLINE&&(b.append(c.xmpp.util.createElement("show",{},!1)),b.append(a.show),b.append("\x3c/show\x3e"));a.status&&(b.append(c.xmpp.util.createElement("status",{},!1)),b.append(a.status),b.append("\x3c/status\x3e"));this.avatarHash&&(b.append(c.xmpp.util.createElement("x",{xmlns:"vcard-temp:x:update"},!1)),b.append(c.xmpp.util.createElement("photo",
-{},!1)),b.append(this.avatarHash),b.append("\x3c/photo\x3e"),b.append("\x3c/x\x3e"));if(a.priority&&a.show!=c.xmpp.presence.STATUS_OFFLINE){if(127<a.priority||-128>a.priority)a.priority=5;b.append(c.xmpp.util.createElement("priority",{},!1));b.append(a.priority);b.append("\x3c/priority\x3e")}b.append("\x3c/presence\x3e");this.session.dispatchPacket(b.toString())}},toggleBlockContact:function(a){this.restrictedContactjids[a]||(this.restrictedContactjids[a]=this._createRestrictedJid());this.restrictedContactjids[a].blocked=
-!this.restrictedContactjids[a].blocked;this._updateRestricted();return this.restrictedContactjids},toggleContactInvisiblity:function(a){this.restrictedContactjids[a]||(this.restrictedContactjids[a]=this._createRestrictedJid());this.restrictedContactjids[a].invisible=!this.restrictedContactjids[a].invisible;this._updateRestricted();return this.restrictedContactjids},_createRestrictedJid:function(){return{invisible:!1,blocked:!1}},_updateRestricted:function(){var a={id:this.session.getNextIqId(),from:this.session.jid+
-"/"+this.session.resource,type:"set"},b=new c.string.Builder(c.xmpp.util.createElement("iq",a,!1));b.append(c.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},!1));b.append(c.xmpp.util.createElement("list",{name:"iwcRestrictedContacts"},!1));var f=1,d;for(d in this.restrictedContactjids){var e=this.restrictedContactjids[d];e.blocked||e.invisible?(b.append(c.xmpp.util.createElement("item",{value:c.xmpp.util.encodeJid(d),action:"deny",order:f++},!1)),e.blocked&&b.append(c.xmpp.util.createElement("message",
-{},!0)),e.invisible&&b.append(c.xmpp.util.createElement("presence-out",{},!0)),b.append("\x3c/item\x3e")):delete this.restrictedContactjids[d]}b.append("\x3c/list\x3e");b.append("\x3c/query\x3e");b.append("\x3c/iq\x3e");a=new c.string.Builder(c.xmpp.util.createElement("iq",a,!1));a.append(c.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},!1));a.append(c.xmpp.util.createElement("active",{name:"iwcRestrictedContacts"},!0));a.append("\x3c/query\x3e");a.append("\x3c/iq\x3e");this.session.dispatchPacket(b.toString());
-this.session.dispatchPacket(a.toString())},_setVisible:function(){var a={id:this.session.getNextIqId(),from:this.session.jid+"/"+this.session.resource,type:"set"},a=new c.string.Builder(c.xmpp.util.createElement("iq",a,!1));a.append(c.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},!1));a.append(c.xmpp.util.createElement("active",{},!0));a.append("\x3c/query\x3e");a.append("\x3c/iq\x3e");this.session.dispatchPacket(a.toString())},_setInvisible:function(){var a={id:this.session.getNextIqId(),
-from:this.session.jid+"/"+this.session.resource,type:"set"},b=new c.string.Builder(c.xmpp.util.createElement("iq",a,!1));b.append(c.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},!1));b.append(c.xmpp.util.createElement("list",{name:"invisible"},!1));b.append(c.xmpp.util.createElement("item",{action:"deny",order:"1"},!1));b.append(c.xmpp.util.createElement("presence-out",{},!0));b.append("\x3c/item\x3e");b.append("\x3c/list\x3e");b.append("\x3c/query\x3e");b.append("\x3c/iq\x3e");a={id:this.session.getNextIqId(),
-from:this.session.jid+"/"+this.session.resource,type:"set"};a=new c.string.Builder(c.xmpp.util.createElement("iq",a,!1));a.append(c.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},!1));a.append(c.xmpp.util.createElement("active",{name:"invisible"},!0));a.append("\x3c/query\x3e");a.append("\x3c/iq\x3e");this.session.dispatchPacket(b.toString());this.session.dispatchPacket(a.toString())},_manageSubscriptions:function(a,b){if(a){-1==a.indexOf("@")&&(a+="@"+this.session.domain);var f=c.xmpp.util.createElement("presence",
-{to:a,type:b},!0);this.session.dispatchPacket(f)}},subscribe:function(a){this._manageSubscriptions(a,"subscribe")},approveSubscription:function(a){this._manageSubscriptions(a,"subscribed")},unsubscribe:function(a){this._manageSubscriptions(a,"unsubscribe")},declineSubscription:function(a){this._manageSubscriptions(a,"unsubscribed")},cancelSubscription:function(a){this._manageSubscriptions(a,"unsubscribed")}})});
-//# sourceMappingURL=PresenceService.js.map
+define("dojox/xmpp/PresenceService",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.xmpp.PresenceService");
+_3.xmpp.presence={UPDATE:201,SUBSCRIPTION_REQUEST:202,SUBSCRIPTION_SUBSTATUS_NONE:204,SUBSCRIPTION_NONE:"none",SUBSCRIPTION_FROM:"from",SUBSCRIPTION_TO:"to",SUBSCRIPTION_BOTH:"both",SUBSCRIPTION_REQUEST_PENDING:"pending",STATUS_ONLINE:"online",STATUS_AWAY:"away",STATUS_CHAT:"chat",STATUS_DND:"dnd",STATUS_EXTENDED_AWAY:"xa",STATUS_OFFLINE:"offline",STATUS_INVISIBLE:"invisible"};
+_1.declare("dojox.xmpp.PresenceService",null,{constructor:function(_4){
+this.session=_4;
+this.isInvisible=false;
+this.avatarHash=null;
+this.presence=null;
+this.restrictedContactjids={};
+},publish:function(_5){
+this.presence=_5;
+this._setPresence();
+},sendAvatarHash:function(_6){
+this.avatarHash=_6;
+this._setPresence();
+},_setPresence:function(){
+var _7=this.presence;
+var p={xmlns:"jabber:client"};
+if(_7&&_7.to){
+p.to=_7.to;
+}
+if(_7.show&&_7.show==_3.xmpp.presence.STATUS_OFFLINE){
+p.type="unavailable";
+}
+if(_7.show&&_7.show==_3.xmpp.presence.STATUS_INVISIBLE){
+this._setInvisible();
+this.isInvisible=true;
+return;
+}
+if(this.isInvisible){
+this._setVisible();
+}
+var _8=new _3.string.Builder(_3.xmpp.util.createElement("presence",p,false));
+if(_7.show&&_7.show!=_3.xmpp.presence.STATUS_OFFLINE){
+_8.append(_3.xmpp.util.createElement("show",{},false));
+_8.append(_7.show);
+_8.append("</show>");
+}
+if(_7.status){
+_8.append(_3.xmpp.util.createElement("status",{},false));
+_8.append(_7.status);
+_8.append("</status>");
+}
+if(this.avatarHash){
+_8.append(_3.xmpp.util.createElement("x",{xmlns:"vcard-temp:x:update"},false));
+_8.append(_3.xmpp.util.createElement("photo",{},false));
+_8.append(this.avatarHash);
+_8.append("</photo>");
+_8.append("</x>");
+}
+if(_7.priority&&_7.show!=_3.xmpp.presence.STATUS_OFFLINE){
+if(_7.priority>127||_7.priority<-128){
+_7.priority=5;
+}
+_8.append(_3.xmpp.util.createElement("priority",{},false));
+_8.append(_7.priority);
+_8.append("</priority>");
+}
+_8.append("</presence>");
+this.session.dispatchPacket(_8.toString());
+},toggleBlockContact:function(_9){
+if(!this.restrictedContactjids[_9]){
+this.restrictedContactjids[_9]=this._createRestrictedJid();
+}
+this.restrictedContactjids[_9].blocked=!this.restrictedContactjids[_9].blocked;
+this._updateRestricted();
+return this.restrictedContactjids;
+},toggleContactInvisiblity:function(_a){
+if(!this.restrictedContactjids[_a]){
+this.restrictedContactjids[_a]=this._createRestrictedJid();
+}
+this.restrictedContactjids[_a].invisible=!this.restrictedContactjids[_a].invisible;
+this._updateRestricted();
+return this.restrictedContactjids;
+},_createRestrictedJid:function(){
+return {invisible:false,blocked:false};
+},_updateRestricted:function(){
+var _b={id:this.session.getNextIqId(),from:this.session.jid+"/"+this.session.resource,type:"set"};
+var _c=new _3.string.Builder(_3.xmpp.util.createElement("iq",_b,false));
+_c.append(_3.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},false));
+_c.append(_3.xmpp.util.createElement("list",{name:"iwcRestrictedContacts"},false));
+var _d=1;
+for(var _e in this.restrictedContactjids){
+var _f=this.restrictedContactjids[_e];
+if(_f.blocked||_f.invisible){
+_c.append(_3.xmpp.util.createElement("item",{value:_3.xmpp.util.encodeJid(_e),action:"deny",order:_d++},false));
+if(_f.blocked){
+_c.append(_3.xmpp.util.createElement("message",{},true));
+}
+if(_f.invisible){
+_c.append(_3.xmpp.util.createElement("presence-out",{},true));
+}
+_c.append("</item>");
+}else{
+delete this.restrictedContactjids[_e];
+}
+}
+_c.append("</list>");
+_c.append("</query>");
+_c.append("</iq>");
+var _10=new _3.string.Builder(_3.xmpp.util.createElement("iq",_b,false));
+_10.append(_3.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},false));
+_10.append(_3.xmpp.util.createElement("active",{name:"iwcRestrictedContacts"},true));
+_10.append("</query>");
+_10.append("</iq>");
+this.session.dispatchPacket(_c.toString());
+this.session.dispatchPacket(_10.toString());
+},_setVisible:function(){
+var _11={id:this.session.getNextIqId(),from:this.session.jid+"/"+this.session.resource,type:"set"};
+var req=new _3.string.Builder(_3.xmpp.util.createElement("iq",_11,false));
+req.append(_3.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},false));
+req.append(_3.xmpp.util.createElement("active",{},true));
+req.append("</query>");
+req.append("</iq>");
+this.session.dispatchPacket(req.toString());
+},_setInvisible:function(){
+var _12={id:this.session.getNextIqId(),from:this.session.jid+"/"+this.session.resource,type:"set"};
+var req=new _3.string.Builder(_3.xmpp.util.createElement("iq",_12,false));
+req.append(_3.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},false));
+req.append(_3.xmpp.util.createElement("list",{name:"invisible"},false));
+req.append(_3.xmpp.util.createElement("item",{action:"deny",order:"1"},false));
+req.append(_3.xmpp.util.createElement("presence-out",{},true));
+req.append("</item>");
+req.append("</list>");
+req.append("</query>");
+req.append("</iq>");
+_12={id:this.session.getNextIqId(),from:this.session.jid+"/"+this.session.resource,type:"set"};
+var _13=new _3.string.Builder(_3.xmpp.util.createElement("iq",_12,false));
+_13.append(_3.xmpp.util.createElement("query",{xmlns:"jabber:iq:privacy"},false));
+_13.append(_3.xmpp.util.createElement("active",{name:"invisible"},true));
+_13.append("</query>");
+_13.append("</iq>");
+this.session.dispatchPacket(req.toString());
+this.session.dispatchPacket(_13.toString());
+},_manageSubscriptions:function(_14,_15){
+if(!_14){
+return;
+}
+if(_14.indexOf("@")==-1){
+_14+="@"+this.session.domain;
+}
+var req=_3.xmpp.util.createElement("presence",{to:_14,type:_15},true);
+this.session.dispatchPacket(req);
+},subscribe:function(_16){
+this._manageSubscriptions(_16,"subscribe");
+},approveSubscription:function(_17){
+this._manageSubscriptions(_17,"subscribed");
+},unsubscribe:function(_18){
+this._manageSubscriptions(_18,"unsubscribe");
+},declineSubscription:function(_19){
+this._manageSubscriptions(_19,"unsubscribed");
+},cancelSubscription:function(_1a){
+this._manageSubscriptions(_1a,"unsubscribed");
+}});
+});

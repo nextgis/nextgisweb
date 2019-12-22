@@ -1,5 +1,98 @@
 //>>built
-define("dojox/grid/enhanced/plugins/Search","dojo/_base/kernel dojo/_base/lang dojo/_base/declare dojo/_base/array dojo/data/util/filter ../../EnhancedGrid ../_Plugin".split(" "),function(k,h,n,l,m,p,q){k=n("dojox.grid.enhanced.plugins.Search",q,{name:"search",constructor:function(a,b){this.grid=a;b=b&&h.isObject(b)?b:{};this._cacheSize=b.cacheSize||-1;a.searchRow=h.hitch(this,"searchRow")},searchRow:function(a,b){if(h.isFunction(b)){h.isString(a)&&(a=m.patternToRegExp(a));var d=!1;if(a instanceof
-RegExp)d=!0;else if(h.isObject(a)){var e=!0,f;for(f in a)h.isString(a[f])&&(a[f]=m.patternToRegExp(a[f])),e=!1;if(e)return}else return;this._search(a,0,b,d)}},_search:function(a,b,d,e){var f=this,c=this._cacheSize,g={start:b,query:this.grid.query,sort:this.grid.getSortProps(),queryOptions:this.grid.queryOptions,onBegin:function(a){f._storeSize=a},onComplete:function(g){l.some(g,function(c,g){return f._checkRow(c,a,e)?(d(b+g,c),!0):!1})||(0<c&&b+c<f._storeSize?f._search(a,b+c,d,e):d(-1,null))}};0<
-c&&(g.count=c);this.grid._storeLayerFetch(g)},_checkRow:function(a,b,d){var e=this.grid,f=e.store,c,e=l.filter(e.layout.cells,function(a){return!a.hidden});if(d)return l.some(e,function(c){try{if(c.field)return 0<=String(f.getValue(a,c.field)).search(b)}catch(r){}return!1});for(c in b)if(b[c]instanceof RegExp){for(d=e.length-1;0<=d;--d)if(e[d].field==c)try{if(0>String(f.getValue(a,c)).search(b[c]))return!1;break}catch(g){return!1}if(0>d)return!1}return!0}});p.registerPlugin(k);return k});
-//# sourceMappingURL=Search.js.map
+define("dojox/grid/enhanced/plugins/Search",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/declare","dojo/_base/array","dojo/data/util/filter","../../EnhancedGrid","../_Plugin"],function(_1,_2,_3,_4,_5,_6,_7){
+var _8=_3("dojox.grid.enhanced.plugins.Search",_7,{name:"search",constructor:function(_9,_a){
+this.grid=_9;
+_a=(_a&&_2.isObject(_a))?_a:{};
+this._cacheSize=_a.cacheSize||-1;
+_9.searchRow=_2.hitch(this,"searchRow");
+},searchRow:function(_b,_c){
+if(!_2.isFunction(_c)){
+return;
+}
+if(_2.isString(_b)){
+_b=_5.patternToRegExp(_b);
+}
+var _d=false;
+if(_b instanceof RegExp){
+_d=true;
+}else{
+if(_2.isObject(_b)){
+var _e=true;
+for(var _f in _b){
+if(_2.isString(_b[_f])){
+_b[_f]=_5.patternToRegExp(_b[_f]);
+}
+_e=false;
+}
+if(_e){
+return;
+}
+}else{
+return;
+}
+}
+this._search(_b,0,_c,_d);
+},_search:function(_10,_11,_12,_13){
+var _14=this,cnt=this._cacheSize,_15={start:_11,query:this.grid.query,sort:this.grid.getSortProps(),queryOptions:this.grid.queryOptions,onBegin:function(_16){
+_14._storeSize=_16;
+},onComplete:function(_17){
+if(!_4.some(_17,function(_18,i){
+if(_14._checkRow(_18,_10,_13)){
+_12(_11+i,_18);
+return true;
+}
+return false;
+})){
+if(cnt>0&&_11+cnt<_14._storeSize){
+_14._search(_10,_11+cnt,_12,_13);
+}else{
+_12(-1,null);
+}
+}
+}};
+if(cnt>0){
+_15.count=cnt;
+}
+this.grid._storeLayerFetch(_15);
+},_checkRow:function(_19,_1a,_1b){
+var g=this.grid,s=g.store,i,_1c,_1d=_4.filter(g.layout.cells,function(_1e){
+return !_1e.hidden;
+});
+if(_1b){
+return _4.some(_1d,function(_1f){
+try{
+if(_1f.field){
+return String(s.getValue(_19,_1f.field)).search(_1a)>=0;
+}
+}
+catch(e){
+}
+return false;
+});
+}else{
+for(_1c in _1a){
+if(_1a[_1c] instanceof RegExp){
+for(i=_1d.length-1;i>=0;--i){
+if(_1d[i].field==_1c){
+try{
+if(String(s.getValue(_19,_1c)).search(_1a[_1c])<0){
+return false;
+}
+break;
+}
+catch(e){
+return false;
+}
+}
+}
+if(i<0){
+return false;
+}
+}
+}
+return true;
+}
+}});
+_6.registerPlugin(_8);
+return _8;
+});

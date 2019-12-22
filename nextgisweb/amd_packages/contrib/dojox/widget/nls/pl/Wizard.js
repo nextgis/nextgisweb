@@ -1,3 +1,2 @@
 //>>built
-define("dojox/widget/nls/pl/Wizard",{next:"Dalej",previous:"Wstecz",done:"Gotowe"});
-//# sourceMappingURL=Wizard.js.map
+define("dojox/widget/nls/pl/Wizard",({next:"Dalej",previous:"Wstecz",done:"Gotowe"}));

@@ -5,5 +5,18 @@
 */
 
 //>>built
-define("dojo/debounce",[],function(){return function(b,c){var a;return function(){a&&clearTimeout(a);var d=this,e=arguments;a=setTimeout(function(){b.apply(d,e)},c)}}});
-//# sourceMappingURL=debounce.js.map
+define("dojo/debounce",[],function(){
+return function(cb,_1){
+var _2;
+return function(){
+if(_2){
+clearTimeout(_2);
+}
+var _3=this;
+var a=arguments;
+_2=setTimeout(function(){
+cb.apply(_3,a);
+},_1);
+};
+};
+});

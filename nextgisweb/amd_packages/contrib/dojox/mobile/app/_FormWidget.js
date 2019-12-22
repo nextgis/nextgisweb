@@ -1,8 +1,113 @@
 //>>built
-define("dojox/mobile/app/_FormWidget",["dojo","dijit","dojox","dojo/require!dojo/window,dijit/_WidgetBase,dijit/focus"],function(b,e,d){b.provide("dojox.mobile.app._FormWidget");b.experimental("dojox.mobile.app._FormWidget");b.require("dojo.window");b.require("dijit._WidgetBase");b.require("dijit.focus");b.declare("dojox.mobile.app._FormWidget",e._WidgetBase,{name:"",alt:"",value:"",type:"text",disabled:!1,intermediateChanges:!1,scrollOnFocus:!1,attributeMap:b.delegate(e._WidgetBase.prototype.attributeMap,
-{value:"focusNode",id:"focusNode",alt:"focusNode",title:"focusNode"}),postMixInProperties:function(){this.nameAttrSetting=this.name?'name\x3d"'+this.name.replace(/'/g,"\x26quot;")+'"':"";this.inherited(arguments)},postCreate:function(){this.inherited(arguments);this.connect(this.domNode,"onmousedown","_onMouseDown")},_setDisabledAttr:function(a){this.disabled=a;b.attr(this.focusNode,"disabled",a);this.valueNode&&b.attr(this.valueNode,"disabled",a)},_onFocus:function(a){this.scrollOnFocus&&b.window.scrollIntoView(this.domNode);
-this.inherited(arguments)},isFocusable:function(){return!this.disabled&&!this.readOnly&&this.focusNode&&"none"!=b.style(this.domNode,"display")},focus:function(){this.focusNode.focus()},compare:function(a,b){return"number"==typeof a&&"number"==typeof b?isNaN(a)&&isNaN(b)?0:a-b:a>b?1:a<b?-1:0},onChange:function(a){},_onChangeActive:!1,_handleOnChange:function(a,c){this._lastValue=a;void 0!=this._lastValueReported||null!==c&&this._onChangeActive||(this._resetValue=this._lastValueReported=a);!this.intermediateChanges&&
-!c&&void 0!==c||typeof a==typeof this._lastValueReported&&0==this.compare(a,this._lastValueReported)||(this._lastValueReported=a,this._onChangeActive&&(this._onChangeHandle&&clearTimeout(this._onChangeHandle),this._onChangeHandle=setTimeout(b.hitch(this,function(){this._onChangeHandle=null;this.onChange(a)}),0)))},create:function(){this.inherited(arguments);this._onChangeActive=!0},destroy:function(){this._onChangeHandle&&(clearTimeout(this._onChangeHandle),this.onChange(this._lastValueReported));
-this.inherited(arguments)},_onMouseDown:function(a){if(this.isFocusable())var c=this.connect(b.body(),"onmouseup",function(){this.isFocusable()&&this.focus();this.disconnect(c)})},selectInputText:function(a,c,f){var d=b.global;a=b.byId(a);isNaN(c)&&(c=0);isNaN(f)&&(f=a.value?a.value.length:0);e.focus(a);d.getSelection&&a.setSelectionRange&&a.setSelectionRange(c,f)}});b.declare("dojox.mobile.app._FormValueWidget",d.mobile.app._FormWidget,{readOnly:!1,attributeMap:b.delegate(d.mobile.app._FormWidget.prototype.attributeMap,
-{value:"",readOnly:"focusNode"}),_setReadOnlyAttr:function(a){this.readOnly=a;b.attr(this.focusNode,"readOnly",a)},postCreate:function(){this.inherited(arguments);void 0===this._resetValue&&(this._resetValue=this.value)},_setValueAttr:function(a,b){this.value=a;this._handleOnChange(a,b)},_getValueAttr:function(){return this._lastValue},undo:function(){this._setValueAttr(this._lastValueReported,!1)},reset:function(){this._hasBeenBlurred=!1;this._setValueAttr(this._resetValue,!0)}})});
-//# sourceMappingURL=_FormWidget.js.map
+define("dojox/mobile/app/_FormWidget",["dojo","dijit","dojox","dojo/require!dojo/window,dijit/_WidgetBase,dijit/focus"],function(_1,_2,_3){
+_1.provide("dojox.mobile.app._FormWidget");
+_1.experimental("dojox.mobile.app._FormWidget");
+_1.require("dojo.window");
+_1.require("dijit._WidgetBase");
+_1.require("dijit.focus");
+_1.declare("dojox.mobile.app._FormWidget",_2._WidgetBase,{name:"",alt:"",value:"",type:"text",disabled:false,intermediateChanges:false,scrollOnFocus:false,attributeMap:_1.delegate(_2._WidgetBase.prototype.attributeMap,{value:"focusNode",id:"focusNode",alt:"focusNode",title:"focusNode"}),postMixInProperties:function(){
+this.nameAttrSetting=this.name?("name=\""+this.name.replace(/'/g,"&quot;")+"\""):"";
+this.inherited(arguments);
+},postCreate:function(){
+this.inherited(arguments);
+this.connect(this.domNode,"onmousedown","_onMouseDown");
+},_setDisabledAttr:function(_4){
+this.disabled=_4;
+_1.attr(this.focusNode,"disabled",_4);
+if(this.valueNode){
+_1.attr(this.valueNode,"disabled",_4);
+}
+},_onFocus:function(e){
+if(this.scrollOnFocus){
+_1.window.scrollIntoView(this.domNode);
+}
+this.inherited(arguments);
+},isFocusable:function(){
+return !this.disabled&&!this.readOnly&&this.focusNode&&(_1.style(this.domNode,"display")!="none");
+},focus:function(){
+this.focusNode.focus();
+},compare:function(_5,_6){
+if(typeof _5=="number"&&typeof _6=="number"){
+return (isNaN(_5)&&isNaN(_6))?0:_5-_6;
+}else{
+if(_5>_6){
+return 1;
+}else{
+if(_5<_6){
+return -1;
+}else{
+return 0;
+}
+}
+}
+},onChange:function(_7){
+},_onChangeActive:false,_handleOnChange:function(_8,_9){
+this._lastValue=_8;
+if(this._lastValueReported==undefined&&(_9===null||!this._onChangeActive)){
+this._resetValue=this._lastValueReported=_8;
+}
+if((this.intermediateChanges||_9||_9===undefined)&&((typeof _8!=typeof this._lastValueReported)||this.compare(_8,this._lastValueReported)!=0)){
+this._lastValueReported=_8;
+if(this._onChangeActive){
+if(this._onChangeHandle){
+clearTimeout(this._onChangeHandle);
+}
+this._onChangeHandle=setTimeout(_1.hitch(this,function(){
+this._onChangeHandle=null;
+this.onChange(_8);
+}),0);
+}
+}
+},create:function(){
+this.inherited(arguments);
+this._onChangeActive=true;
+},destroy:function(){
+if(this._onChangeHandle){
+clearTimeout(this._onChangeHandle);
+this.onChange(this._lastValueReported);
+}
+this.inherited(arguments);
+},_onMouseDown:function(e){
+if(this.isFocusable()){
+var _a=this.connect(_1.body(),"onmouseup",function(){
+if(this.isFocusable()){
+this.focus();
+}
+this.disconnect(_a);
+});
+}
+},selectInputText:function(_b,_c,_d){
+var _e=_1.global;
+var _f=_1.doc;
+_b=_1.byId(_b);
+if(isNaN(_c)){
+_c=0;
+}
+if(isNaN(_d)){
+_d=_b.value?_b.value.length:0;
+}
+_2.focus(_b);
+if(_e["getSelection"]&&_b.setSelectionRange){
+_b.setSelectionRange(_c,_d);
+}
+}});
+_1.declare("dojox.mobile.app._FormValueWidget",_3.mobile.app._FormWidget,{readOnly:false,attributeMap:_1.delegate(_3.mobile.app._FormWidget.prototype.attributeMap,{value:"",readOnly:"focusNode"}),_setReadOnlyAttr:function(_10){
+this.readOnly=_10;
+_1.attr(this.focusNode,"readOnly",_10);
+},postCreate:function(){
+this.inherited(arguments);
+if(this._resetValue===undefined){
+this._resetValue=this.value;
+}
+},_setValueAttr:function(_11,_12){
+this.value=_11;
+this._handleOnChange(_11,_12);
+},_getValueAttr:function(){
+return this._lastValue;
+},undo:function(){
+this._setValueAttr(this._lastValueReported,false);
+},reset:function(){
+this._hasBeenBlurred=false;
+this._setValueAttr(this._resetValue,true);
+}});
+});

@@ -1,3 +1,15 @@
 //>>built
-define("dijit/tree/model",["dojo/_base/declare"],function(b){return b("dijit.tree.model",null,{destroy:function(){},getRoot:function(a){},mayHaveChildren:function(a){},getChildren:function(a,c){},isItem:function(a){},getIdentity:function(a){},getLabel:function(a){},newItem:function(a,c,b,d){},pasteItem:function(a,c,b,d,e,f){},onChange:function(a){},onChildrenChange:function(a,b){}})});
-//# sourceMappingURL=model.js.map
+define("dijit/tree/model",["dojo/_base/declare"],function(_1){
+return _1("dijit.tree.model",null,{destroy:function(){
+},getRoot:function(_2){
+},mayHaveChildren:function(_3){
+},getChildren:function(_4,_5){
+},isItem:function(_6){
+},getIdentity:function(_7){
+},getLabel:function(_8){
+},newItem:function(_9,_a,_b,_c){
+},pasteItem:function(_d,_e,_f,_10,_11,_12){
+},onChange:function(_13){
+},onChildrenChange:function(_14,_15){
+}});
+});

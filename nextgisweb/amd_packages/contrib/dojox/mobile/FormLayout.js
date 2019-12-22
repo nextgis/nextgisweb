@@ -1,4 +1,21 @@
 //>>built
-define("dojox/mobile/FormLayout",["dojo/_base/declare","dojo/dom-class","./Container","dojo/has","dojo/has!dojo-bidi?dojox/mobile/bidi/FormLayout"],function(c,a,b,d,e){b=c(d("dojo-bidi")?"dojox.mobile.NonBidiFormLayout":"dojox.mobile.FormLayout",b,{columns:"auto",rightAlign:!1,baseClass:"mblFormLayout",buildRendering:function(){this.inherited(arguments);"auto"==this.columns?a.add(this.domNode,"mblFormLayoutAuto"):"single"==this.columns?a.add(this.domNode,"mblFormLayoutSingleCol"):"two"==this.columns&&
-a.add(this.domNode,"mblFormLayoutTwoCol");this.rightAlign&&a.add(this.domNode,"mblFormLayoutRightAlign")}});return d("dojo-bidi")?c("dojox.mobile.FormLayout",[b,e]):b});
-//# sourceMappingURL=FormLayout.js.map
+define("dojox/mobile/FormLayout",["dojo/_base/declare","dojo/dom-class","./Container","dojo/has","dojo/has!dojo-bidi?dojox/mobile/bidi/FormLayout"],function(_1,_2,_3,_4,_5){
+var _6=_1(_4("dojo-bidi")?"dojox.mobile.NonBidiFormLayout":"dojox.mobile.FormLayout",_3,{columns:"auto",rightAlign:false,baseClass:"mblFormLayout",buildRendering:function(){
+this.inherited(arguments);
+if(this.columns=="auto"){
+_2.add(this.domNode,"mblFormLayoutAuto");
+}else{
+if(this.columns=="single"){
+_2.add(this.domNode,"mblFormLayoutSingleCol");
+}else{
+if(this.columns=="two"){
+_2.add(this.domNode,"mblFormLayoutTwoCol");
+}
+}
+}
+if(this.rightAlign){
+_2.add(this.domNode,"mblFormLayoutRightAlign");
+}
+}});
+return _4("dojo-bidi")?_1("dojox.mobile.FormLayout",[_6,_5]):_6;
+});

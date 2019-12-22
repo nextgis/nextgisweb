@@ -5620,9 +5620,10 @@ define(["./kernel"], function(dojo){
 'dojo/promise/all':function(){
 define([
 	"../_base/array",
+	"../_base/lang",
 	"../Deferred",
 	"../when"
-], function(array, Deferred, when){
+], function(array, lang, Deferred, when){
 	"use strict";
 
 	// module:
@@ -5647,7 +5648,7 @@ define([
 		// returns: dojo/promise/Promise
 
 		var object, array;
-		if(objectOrArray instanceof Array){
+		if(lang.isArray(objectOrArray)){
 			array = objectOrArray;
 		}else if(objectOrArray && typeof objectOrArray === "object"){
 			object = objectOrArray;
@@ -6969,8 +6970,12 @@ define([
 						}
 						break;
 					case "innerText":
+						// Deprecated, use "textContent" instead.
 						mapNode.innerHTML = "";
 						mapNode.appendChild(this.ownerDocument.createTextNode(value));
+						break;
+					case "textContent":
+						mapNode.textContent = value;
 						break;
 					case "innerHTML":
 						mapNode.innerHTML = value;
@@ -9293,6 +9298,11 @@ define([
 			// Can't use "disabled" in this.focusNode as a test because on IE, that's true for all nodes.
 			if(/^(button|input|select|textarea|optgroup|option|fieldset)$/i.test(this.focusNode.tagName)){
 				domAttr.set(this.focusNode, 'disabled', value);
+				// IE has a Caret Browsing mode (hit F7 to activate) where disabled textboxes can be modified
+				// textboxes marked readonly if disabled to avoid this issue.
+				if (has('trident') && 'readOnly' in this) {
+					domAttr.set(this.focusNode, 'readonly', value || this.readOnly);
+				}
 			}else{
 				this.focusNode.setAttribute("aria-disabled", value ? "true" : "false");
 			}
@@ -9528,8 +9538,9 @@ define([
 	"dojo/keys", // keys.ESCAPE
 	"dojo/_base/lang",
 	"dojo/on",
+	"dojo/sniff", // has("webkit")
 	"./_FormWidgetMixin"
-], function(declare, domAttr, keys, lang, on, _FormWidgetMixin){
+], function(declare, domAttr, keys, lang, on, has, _FormWidgetMixin){
 
 	// module:
 	//		dijit/form/_FormValueMixin
@@ -9550,7 +9561,13 @@ define([
 		readOnly: false,
 
 		_setReadOnlyAttr: function(/*Boolean*/ value){
-			domAttr.set(this.focusNode, 'readOnly', value);
+			// IE has a Caret Browsing mode (hit F7 to activate) where disabled textboxes can be modified
+			// focusNode enforced readonly if currently disabled to avoid this issue.
+			if (has('trident') && 'disabled' in this) {
+				domAttr.set(this.focusNode, 'readOnly', value || this.disabled);
+			} else {
+				domAttr.set(this.focusNode, 'readOnly', value);
+			}
 			this._set("readOnly", value);
 		},
 

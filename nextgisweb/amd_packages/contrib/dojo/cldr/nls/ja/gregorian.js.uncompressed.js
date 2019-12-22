@@ -1,7 +1,7 @@
 define(
 "dojo/cldr/nls/ja/gregorian", //begin v1.x content
 {
-	"dateFormatItem-Ehm": "a K 時 mm 分 (E)",
+	"dateFormatItem-Ehm": "aK:mm (E)",
 	"days-standAlone-short": [
 		"日",
 		"月",
@@ -257,7 +257,6 @@ define(
 	],
 	"eraNames": [
 		"紀元前",
-		"西暦紀元前",
 		"西暦"
 	],
 	"dateFormatItem-yMMMd": "y年M月d日",
@@ -285,12 +284,12 @@ define(
 	"field-tue-relative+0": "今週の火曜日",
 	"field-tue-relative+1": "来週の火曜日",
 	"dayPeriods-format-wide-am": "午前",
-	"dateFormatItem-EHm": "HH 時 mm 分 (E)",
+	"dateFormatItem-EHm": "H:mm (E)",
 	"field-mon-relative+0": "今週の月曜日",
 	"field-mon-relative+1": "来週の月曜日",
-	"dateFormat-short": "y/MM/dd",
-	"dateFormatItem-EHms": "HH 時 mm 分 ss 秒 (E)",
-	"dateFormatItem-Ehms": "a K 時 mm 分 ss 秒 (E)",
+	"dateFormat-short": "y年M月d日",
+	"dateFormatItem-EHms": "H:mm:ss (E)",
+	"dateFormatItem-Ehms": "aK:mm:ss (E)",
 	"dayPeriods-format-narrow-noon": "正午",
 	"field-second": "秒",
 	"field-sat-relative+-1": "先週の土曜日",
@@ -301,7 +300,7 @@ define(
 	"dateFormatItem-Ed": "d日(E)",
 	"dateTimeFormats-appendItem-Timezone": "{0} {1}",
 	"field-week": "週",
-	"dateFormat-medium": "y/MM/dd",
+	"dateFormat-medium": "y年M月d日",
 	"field-year-relative+0": "今年",
 	"field-week-relative+-1": "先週",
 	"field-year-relative+1": "翌年",

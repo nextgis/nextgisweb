@@ -1,3 +1,2 @@
 //>>built
-define("dojox/widget/nls/ja/Wizard",{next:"\u6b21\u3078",previous:"\u524d\u3078",done:"\u5b8c\u4e86"});
-//# sourceMappingURL=Wizard.js.map
+define("dojox/widget/nls/ja/Wizard",({next:"次へ",previous:"前へ",done:"完了"}));

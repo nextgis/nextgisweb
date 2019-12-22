@@ -1,3 +1,10 @@
 //>>built
-define("dojox/mobile/bidi/TreeView",["dojo/_base/declare"],function(b){return b(null,{_customizeListItem:function(a){a.textDir=this.textDir;this.isLeftToRight()||(a.dir="rtl",a.transitionDir=-1)}})});
-//# sourceMappingURL=TreeView.js.map
+define("dojox/mobile/bidi/TreeView",["dojo/_base/declare"],function(_1){
+return _1(null,{_customizeListItem:function(_2){
+_2.textDir=this.textDir;
+if(!this.isLeftToRight()){
+_2.dir="rtl";
+_2.transitionDir=-1;
+}
+}});
+});

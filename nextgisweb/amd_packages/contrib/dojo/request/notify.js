@@ -5,6 +5,34 @@
 */
 
 //>>built
-define("dojo/request/notify",["../Evented","../_base/lang","./util"],function(d,g,h){function e(a,b){return f.on(a,b)}var b=0,k=[].slice,f=g.mixin(new d,{onsend:function(a){b||this.emit("start");b++},_onload:function(a){this.emit("done",a)},_onerror:function(a){this.emit("done",a)},_ondone:function(a){0>=--b&&(b=0,this.emit("stop"))},emit:function(a,b){var c=d.prototype.emit.apply(this,arguments);this["_on"+a]&&this["_on"+a].apply(this,k.call(arguments,1));return c}});e.emit=function(a,b,c){return f.emit(a,
-b,c)};return h.notify=e});
-//# sourceMappingURL=notify.js.map
+define("dojo/request/notify",["../Evented","../_base/lang","./util"],function(_1,_2,_3){
+var _4=0,_5=[].slice;
+var _6=_2.mixin(new _1,{onsend:function(_7){
+if(!_4){
+this.emit("start");
+}
+_4++;
+},_onload:function(_8){
+this.emit("done",_8);
+},_onerror:function(_9){
+this.emit("done",_9);
+},_ondone:function(_a){
+if(--_4<=0){
+_4=0;
+this.emit("stop");
+}
+},emit:function(_b,_c){
+var _d=_1.prototype.emit.apply(this,arguments);
+if(this["_on"+_b]){
+this["_on"+_b].apply(this,_5.call(arguments,1));
+}
+return _d;
+}});
+function _e(_f,_10){
+return _6.on(_f,_10);
+};
+_e.emit=function(_11,_12,_13){
+return _6.emit(_11,_12,_13);
+};
+return _3.notify=_e;
+});

@@ -1,3 +1,17 @@
 //>>built
-define("dojox/lang/functional/zip",["dojo/_base/lang","./lambda"],function(g,c){g.mixin(c,{zip:function(){for(var b=arguments[0].length,e=arguments.length,a=1,c=Array(b),d,f;a<e;b=Math.min(b,arguments[a++].length));for(a=0;a<b;++a){f=Array(e);for(d=0;d<e;f[d]=arguments[d][a],++d);c[a]=f}return c},unzip:function(b){return c.zip.apply(null,b)}})});
-//# sourceMappingURL=zip.js.map
+define("dojox/lang/functional/zip",["dojo/_base/lang","./lambda"],function(_1,df){
+_1.mixin(df,{zip:function(){
+var n=arguments[0].length,m=arguments.length,i=1,t=new Array(n),j,p;
+for(;i<m;n=Math.min(n,arguments[i++].length)){
+}
+for(i=0;i<n;++i){
+p=new Array(m);
+for(j=0;j<m;p[j]=arguments[j][i],++j){
+}
+t[i]=p;
+}
+return t;
+},unzip:function(a){
+return df.zip.apply(null,a);
+}});
+});

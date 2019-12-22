@@ -1,6 +1,38 @@
 //>>built
-require({cache:{"url:dojox/calendar/templates/MobileHorizontalRenderer.html":'\x3cdiv class\x3d"dojoxCalendarEvent dojoxCalendarHorizontal" onselectstart\x3d"return false;"\x3e\n\t\x3cdiv class\x3d"bg" \x3e\x3c/div\x3e\n\t\x3cdiv style\x3d"position:absolute;left:2px;bottom:2px"\x3e\x3cspan data-dojo-attach-point\x3d"beforeIcon" class\x3d"beforeIcon"\x3e\u25c4\x3c/span\x3e\x3c/div\x3e\t\n\t\x3cdiv data-dojo-attach-point\x3d"labelContainer" class\x3d"labels"\x3e\t\t\n\t\t\x3cspan data-dojo-attach-point\x3d"startTimeLabel" class\x3d"startTime"\x3e\x3c/span\x3e\n\t\t\x3cspan data-dojo-attach-point\x3d"summaryLabel" class\x3d"summary"\x3e\x3c/span\x3e\n\t\t\x3cspan  data-dojo-attach-point\x3d"endTimeLabel" class\x3d"endTime"\x3e\x3c/span\x3e\n\t\x3c/div\x3e\n\t\x3cdiv style\x3d"position:absolute;right:2px;bottom:2px"\x3e\x3cspan data-dojo-attach-point\x3d"afterIcon" class\x3d"afterIcon"\x3e\u25ba\x3c/span\x3e\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"moveHandle" class\x3d"moveHandle" \x3e\x3c/div\x3e\t\n\t\x3cdiv data-dojo-attach-point\x3d"resizeStartHandle" class\x3d"resizeHandle resizeStartHandle"\x3e\x3cdiv\x3e\x3c/div\x3e\x3c/div\x3e\t\n\t\x3cdiv data-dojo-attach-point\x3d"resizeEndHandle" class\x3d"resizeHandle resizeEndHandle"\x3e\x3cdiv\x3e\x3c/div\x3e\x3c/div\x3e\t\n\x3c/div\x3e\n'}});
-define("dojox/calendar/MobileHorizontalRenderer","dojo/_base/declare dojo/dom-style dijit/_WidgetBase dijit/_TemplatedMixin ./_RendererMixin dojo/text!./templates/MobileHorizontalRenderer.html".split(" "),function(c,b,g,h,k,l){return c("dojox.calendar.MobileHorizontalRenderer",[g,h,k],{templateString:l,_orientation:"horizontal",mobile:!0,visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:32,endTimeLabel:30},_displayValue:"inline",arrowPadding:12,_isElementVisible:function(d,
-e,f,c){var a;a=this.isLeftToRight();"startTimeLabel"==d&&(this.labelContainer&&(a&&f||!a&&e)?b.set(this.labelContainer,"marginRight",this.arrowPadding+"px"):b.set(this.labelContainer,"marginRight",0),this.labelContainer&&(!a&&f||a&&e)?b.set(this.labelContainer,"marginLeft",this.arrowPadding+"px"):b.set(this.labelContainer,"marginLeft",0));switch(d){case "startTimeLabel":a=this.item.startTime;if(this.item.allDay||this.owner.isStartOfDay(a))return!1;break;case "endTimeLabel":if(a=this.item.endTime,
-this.item.allDay||this.owner.isStartOfDay(a))return!1}return this.inherited(arguments)},postCreate:function(){this.inherited(arguments);this._applyAttributes()}})});
-//# sourceMappingURL=MobileHorizontalRenderer.js.map
+require({cache:{"url:dojox/calendar/templates/MobileHorizontalRenderer.html":"<div class=\"dojoxCalendarEvent dojoxCalendarHorizontal\" onselectstart=\"return false;\">\n\t<div class=\"bg\" ></div>\n\t<div style=\"position:absolute;left:2px;bottom:2px\"><span data-dojo-attach-point=\"beforeIcon\" class=\"beforeIcon\">◄</span></div>\t\n\t<div data-dojo-attach-point=\"labelContainer\" class=\"labels\">\t\t\n\t\t<span data-dojo-attach-point=\"startTimeLabel\" class=\"startTime\"></span>\n\t\t<span data-dojo-attach-point=\"summaryLabel\" class=\"summary\"></span>\n\t\t<span  data-dojo-attach-point=\"endTimeLabel\" class=\"endTime\"></span>\n\t</div>\n\t<div style=\"position:absolute;right:2px;bottom:2px\"><span data-dojo-attach-point=\"afterIcon\" class=\"afterIcon\">►</span></div>\n\t<div data-dojo-attach-point=\"moveHandle\" class=\"moveHandle\" ></div>\t\n\t<div data-dojo-attach-point=\"resizeStartHandle\" class=\"resizeHandle resizeStartHandle\"><div></div></div>\t\n\t<div data-dojo-attach-point=\"resizeEndHandle\" class=\"resizeHandle resizeEndHandle\"><div></div></div>\t\n</div>\n"}});
+define("dojox/calendar/MobileHorizontalRenderer",["dojo/_base/declare","dojo/dom-style","dijit/_WidgetBase","dijit/_TemplatedMixin","./_RendererMixin","dojo/text!./templates/MobileHorizontalRenderer.html"],function(_1,_2,_3,_4,_5,_6){
+return _1("dojox.calendar.MobileHorizontalRenderer",[_3,_4,_5],{templateString:_6,_orientation:"horizontal",mobile:true,visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:32,endTimeLabel:30},_displayValue:"inline",arrowPadding:12,_isElementVisible:function(_7,_8,_9,_a){
+var d;
+var _b=this.isLeftToRight();
+if(_7=="startTimeLabel"){
+if(this.labelContainer&&(_b&&_9||!_b&&_8)){
+_2.set(this.labelContainer,"marginRight",this.arrowPadding+"px");
+}else{
+_2.set(this.labelContainer,"marginRight",0);
+}
+if(this.labelContainer&&(!_b&&_9||_b&&_8)){
+_2.set(this.labelContainer,"marginLeft",this.arrowPadding+"px");
+}else{
+_2.set(this.labelContainer,"marginLeft",0);
+}
+}
+switch(_7){
+case "startTimeLabel":
+d=this.item.startTime;
+if(this.item.allDay||this.owner.isStartOfDay(d)){
+return false;
+}
+break;
+case "endTimeLabel":
+d=this.item.endTime;
+if(this.item.allDay||this.owner.isStartOfDay(d)){
+return false;
+}
+break;
+}
+return this.inherited(arguments);
+},postCreate:function(){
+this.inherited(arguments);
+this._applyAttributes();
+}});
+});

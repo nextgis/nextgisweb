@@ -1275,6 +1275,7 @@ div.dijitTabDisabled, .dj_ie div.dijitTabDisabled {
 .dijitTree {
 	overflow: auto;	
 	-webkit-tap-highlight-color: transparent;
+	-moz-user-select: none;
 }
 .dijitTreeContainer {
 	float: left;	

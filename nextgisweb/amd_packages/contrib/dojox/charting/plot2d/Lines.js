@@ -1,3 +1,6 @@
 //>>built
-define("dojox/charting/plot2d/Lines",["dojo/_base/declare","./Default"],function(a,b){return a("dojox.charting.plot2d.Lines",b,{constructor:function(){this.opt.lines=!0}})});
-//# sourceMappingURL=Lines.js.map
+define("dojox/charting/plot2d/Lines",["dojo/_base/declare","./Default"],function(_1,_2){
+return _1("dojox.charting.plot2d.Lines",_2,{constructor:function(){
+this.opt.lines=true;
+}});
+});

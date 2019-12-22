@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/it/TextColor",{setButtonText:"Imposta",cancelButtonText:"Annulla"});
-//# sourceMappingURL=TextColor.js.map
+define("dojox/editor/plugins/nls/it/TextColor",({"setButtonText":"Imposta","cancelButtonText":"Annulla"}));

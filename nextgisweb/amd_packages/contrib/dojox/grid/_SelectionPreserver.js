@@ -1,5 +1,32 @@
 //>>built
-define("dojox/grid/_SelectionPreserver",["dojo/_base/declare","dojo/_base/connect","dojo/_base/lang","dojo/_base/array"],function(e,a,d,f){return e("dojox.grid._SelectionPreserver",null,{constructor:function(b){this.selection=b;var c=this.grid=b.grid;this.reset();this._connects=[a.connect(c,"_setStore",this,"reset"),a.connect(c,"_addItem",this,"_reSelectById"),a.connect(b,"onSelected",d.hitch(this,"_selectById",!0)),a.connect(b,"onDeselected",d.hitch(this,"_selectById",!1)),a.connect(b,"deselectAll",
-this,"reset")]},destroy:function(){this.reset();f.forEach(this._connects,a.disconnect);delete this._connects},reset:function(){this._selectedById={}},_reSelectById:function(b,c){b&&this.grid._hasIdentity&&(this.selection.selected[c]=this._selectedById[this.grid.store.getIdentity(b)])},_selectById:function(b,c){if("none"!=this.selection.mode&&this.grid._hasIdentity){var a=c,d=this.grid;if("number"==typeof c||"string"==typeof c)a=(a=d._by_idx[c])&&a.item;a&&(this._selectedById[d.store.getIdentity(a)]=
-!!b);return a}}})});
-//# sourceMappingURL=_SelectionPreserver.js.map
+define("dojox/grid/_SelectionPreserver",["dojo/_base/declare","dojo/_base/connect","dojo/_base/lang","dojo/_base/array"],function(_1,_2,_3,_4){
+return _1("dojox.grid._SelectionPreserver",null,{constructor:function(_5){
+this.selection=_5;
+var _6=this.grid=_5.grid;
+this.reset();
+this._connects=[_2.connect(_6,"_setStore",this,"reset"),_2.connect(_6,"_addItem",this,"_reSelectById"),_2.connect(_5,"onSelected",_3.hitch(this,"_selectById",true)),_2.connect(_5,"onDeselected",_3.hitch(this,"_selectById",false)),_2.connect(_5,"deselectAll",this,"reset")];
+},destroy:function(){
+this.reset();
+_4.forEach(this._connects,_2.disconnect);
+delete this._connects;
+},reset:function(){
+this._selectedById={};
+},_reSelectById:function(_7,_8){
+if(_7&&this.grid._hasIdentity){
+this.selection.selected[_8]=this._selectedById[this.grid.store.getIdentity(_7)];
+}
+},_selectById:function(_9,_a){
+if(this.selection.mode=="none"||!this.grid._hasIdentity){
+return;
+}
+var _b=_a,g=this.grid;
+if(typeof _a=="number"||typeof _a=="string"){
+var _c=g._by_idx[_a];
+_b=_c&&_c.item;
+}
+if(_b){
+this._selectedById[g.store.getIdentity(_b)]=!!_9;
+}
+return _b;
+}});
+});

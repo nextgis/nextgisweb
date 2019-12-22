@@ -5,7 +5,109 @@
 */
 
 //>>built
-define("dojo/aspect",[],function(){function n(e,d,h,k){var c=e[d],g="around"==d,a;if(g){var l=h(function(){return c.advice(this,arguments)});a={remove:function(){l&&(l=e=h=null)},advice:function(a,b){return l?l.apply(a,b):c.advice(a,b)}}}else a={remove:function(){if(a.advice){var f=a.previous,b=a.next;b||f?(f?f.next=b:e[d]=b,b&&(b.previous=f)):delete e[d];e=h=a.advice=null}},id:e.nextId++,advice:h,receiveArguments:k};if(c&&!g)if("after"==d){for(;c.next&&(c=c.next););c.next=a;a.previous=c}else"before"==
-d&&(e[d]=a,a.next=c,c.previous=a);else e[d]=a;return a}function m(e){return function(d,h,k,c){var g=d[h],a;g&&g.target==d||(d[h]=a=function(){for(var d=a.nextId,f=arguments,b=a.before;b;)b.advice&&(f=b.advice.apply(this,f)||f),b=b.next;if(a.around)var c=a.around.advice(this,f);for(b=a.after;b&&b.id<d;){if(b.advice)if(b.receiveArguments)var e=b.advice.apply(this,f),c=void 0===e?c:e;else c=b.advice.call(this,c,f);b=b.next}return c},g&&(a.around={advice:function(a,c){return g.apply(a,c)}}),a.target=
-d,a.nextId=a.nextId||0);d=n(a||g,e,k,c);k=null;return d}}var p=m("after"),q=m("before"),r=m("around");return{before:q,around:r,after:p}});
-//# sourceMappingURL=aspect.js.map
+define("dojo/aspect",[],function(){
+"use strict";
+var _1;
+function _2(_3,_4,_5,_6){
+var _7=_3[_4];
+var _8=_4=="around";
+var _9;
+if(_8){
+var _a=_5(function(){
+return _7.advice(this,arguments);
+});
+_9={remove:function(){
+if(_a){
+_a=_3=_5=null;
+}
+},advice:function(_b,_c){
+return _a?_a.apply(_b,_c):_7.advice(_b,_c);
+}};
+}else{
+_9={remove:function(){
+if(_9.advice){
+var _d=_9.previous;
+var _e=_9.next;
+if(!_e&&!_d){
+delete _3[_4];
+}else{
+if(_d){
+_d.next=_e;
+}else{
+_3[_4]=_e;
+}
+if(_e){
+_e.previous=_d;
+}
+}
+_3=_5=_9.advice=null;
+}
+},id:_3.nextId++,advice:_5,receiveArguments:_6};
+}
+if(_7&&!_8){
+if(_4=="after"){
+while(_7.next&&(_7=_7.next)){
+}
+_7.next=_9;
+_9.previous=_7;
+}else{
+if(_4=="before"){
+_3[_4]=_9;
+_9.next=_7;
+_7.previous=_9;
+}
+}
+}else{
+_3[_4]=_9;
+}
+return _9;
+};
+function _f(_10){
+return function(_11,_12,_13,_14){
+var _15=_11[_12],_16;
+if(!_15||_15.target!=_11){
+_11[_12]=_16=function(){
+var _17=_16.nextId;
+var _18=arguments;
+var _19=_16.before;
+while(_19){
+if(_19.advice){
+_18=_19.advice.apply(this,_18)||_18;
+}
+_19=_19.next;
+}
+if(_16.around){
+var _1a=_16.around.advice(this,_18);
+}
+var _1b=_16.after;
+while(_1b&&_1b.id<_17){
+if(_1b.advice){
+if(_1b.receiveArguments){
+var _1c=_1b.advice.apply(this,_18);
+_1a=_1c===_1?_1a:_1c;
+}else{
+_1a=_1b.advice.call(this,_1a,_18);
+}
+}
+_1b=_1b.next;
+}
+return _1a;
+};
+if(_15){
+_16.around={advice:function(_1d,_1e){
+return _15.apply(_1d,_1e);
+}};
+}
+_16.target=_11;
+_16.nextId=_16.nextId||0;
+}
+var _1f=_2((_16||_15),_10,_13,_14);
+_13=null;
+return _1f;
+};
+};
+var _20=_f("after");
+var _21=_f("before");
+var _22=_f("around");
+return {before:_21,around:_22,after:_20};
+});

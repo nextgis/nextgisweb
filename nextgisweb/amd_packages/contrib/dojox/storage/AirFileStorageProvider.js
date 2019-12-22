@@ -1,10 +1,167 @@
 //>>built
-define("dojox/storage/AirFileStorageProvider",["dojo","dijit","dojox","dojo/require!dojox/storage/manager,dojox/storage/Provider"],function(g,m,f){g.provide("dojox.storage.AirFileStorageProvider");g.require("dojox.storage.manager");g.require("dojox.storage.Provider");g.isAIR&&function(){if(!e)var e={};e.File=window.runtime.flash.filesystem.File;e.FileStream=window.runtime.flash.filesystem.FileStream;e.FileMode=window.runtime.flash.filesystem.FileMode;g.declare("dojox.storage.AirFileStorageProvider",
-[f.storage.Provider],{initialized:!1,_storagePath:"__DOJO_STORAGE/",initialize:function(){this.initialized=!1;try{var a=e.File.applicationStorageDirectory.resolvePath(this._storagePath);a.exists||a.createDirectory();this.initialized=!0}catch(c){}f.storage.manager.loaded()},isAvailable:function(){return!0},put:function(a,c,b,d){if(0==this.isValidKey(a))throw Error("Invalid key given: "+a);d=d||this.DEFAULT_NAMESPACE;if(0==this.isValidKey(d))throw Error("Invalid namespace given: "+d);try{this.remove(a,
-d);var h=e.File.applicationStorageDirectory.resolvePath(this._storagePath+d);h.exists||h.createDirectory();var g=h.resolvePath(a),f=new e.FileStream;f.open(g,e.FileMode.WRITE);f.writeObject(c);f.close()}catch(l){b(this.FAILED,a,l.toString(),d);return}b&&b(this.SUCCESS,a,null,d)},get:function(a,c){if(0==this.isValidKey(a))throw Error("Invalid key given: "+a);c=c||this.DEFAULT_NAMESPACE;var b=null,d=e.File.applicationStorageDirectory.resolvePath(this._storagePath+c+"/"+a);if(d.exists&&!d.isDirectory){var h=
-new e.FileStream;h.open(d,e.FileMode.READ);b=h.readObject();h.close()}return b},getNamespaces:function(){var a=[this.DEFAULT_NAMESPACE],c=e.File.applicationStorageDirectory.resolvePath(this._storagePath).getDirectoryListing(),b;for(b=0;b<c.length;b++)c[b].isDirectory&&c[b].name!=this.DEFAULT_NAMESPACE&&a.push(c[b].name);return a},getKeys:function(a){a=a||this.DEFAULT_NAMESPACE;if(0==this.isValidKey(a))throw Error("Invalid namespace given: "+a);var c=[];a=e.File.applicationStorageDirectory.resolvePath(this._storagePath+
-a);if(a.exists&&a.isDirectory){a=a.getDirectoryListing();var b;for(b=0;b<a.length;b++)c.push(a[b].name)}return c},clear:function(a){if(0==this.isValidKey(a))throw Error("Invalid namespace given: "+a);a=e.File.applicationStorageDirectory.resolvePath(this._storagePath+a);a.exists&&a.isDirectory&&a.deleteDirectory(!0)},remove:function(a,c){c=c||this.DEFAULT_NAMESPACE;var b=e.File.applicationStorageDirectory.resolvePath(this._storagePath+c+"/"+a);b.exists&&!b.isDirectory&&b.deleteFile()},putMultiple:function(a,
-c,b,d){if(!1===this.isValidKeyArray(a)||!c instanceof Array||a.length!=c.length)throw Error("Invalid arguments: keys \x3d ["+a+"], values \x3d ["+c+"]");if(null==d||"undefined"==typeof d)d=this.DEFAULT_NAMESPACE;if(0==this.isValidKey(d))throw Error("Invalid namespace given: "+d);this._statusHandler=b;try{for(var e=0;e<a.length;e++)this.put(a[e],c[e],null,d)}catch(k){b&&b(this.FAILED,a,k.toString(),d);return}b&&b(this.SUCCESS,a,null,d)},getMultiple:function(a,c){if(!1===this.isValidKeyArray(a))throw Error("Invalid key array given: "+
-a);if(null==c||"undefined"==typeof c)c=this.DEFAULT_NAMESPACE;if(0==this.isValidKey(c))throw Error("Invalid namespace given: "+c);for(var b=[],d=0;d<a.length;d++)b[d]=this.get(a[d],c);return b},removeMultiple:function(a,c){c=c||this.DEFAULT_NAMESPACE;for(var b=0;b<a.length;b++)this.remove(a[b],c)},isPermanent:function(){return!0},getMaximumSize:function(){return this.SIZE_NO_LIMIT},hasSettingsUI:function(){return!1},showSettingsUI:function(){throw Error(this.declaredClass+" does not support a storage settings user-interface");
-},hideSettingsUI:function(){throw Error(this.declaredClass+" does not support a storage settings user-interface");}});f.storage.manager.register("dojox.storage.AirFileStorageProvider",new f.storage.AirFileStorageProvider);f.storage.manager.initialize()}()});
-//# sourceMappingURL=AirFileStorageProvider.js.map
+define("dojox/storage/AirFileStorageProvider",["dojo","dijit","dojox","dojo/require!dojox/storage/manager,dojox/storage/Provider"],function(_1,_2,_3){
+_1.provide("dojox.storage.AirFileStorageProvider");
+_1.require("dojox.storage.manager");
+_1.require("dojox.storage.Provider");
+if(_1.isAIR){
+(function(){
+if(!_4){
+var _4={};
+}
+_4.File=window.runtime.flash.filesystem.File;
+_4.FileStream=window.runtime.flash.filesystem.FileStream;
+_4.FileMode=window.runtime.flash.filesystem.FileMode;
+_1.declare("dojox.storage.AirFileStorageProvider",[_3.storage.Provider],{initialized:false,_storagePath:"__DOJO_STORAGE/",initialize:function(){
+this.initialized=false;
+try{
+var _5=_4.File.applicationStorageDirectory.resolvePath(this._storagePath);
+if(!_5.exists){
+_5.createDirectory();
+}
+this.initialized=true;
+}
+catch(e){
+}
+_3.storage.manager.loaded();
+},isAvailable:function(){
+return true;
+},put:function(_6,_7,_8,_9){
+if(this.isValidKey(_6)==false){
+throw new Error("Invalid key given: "+_6);
+}
+_9=_9||this.DEFAULT_NAMESPACE;
+if(this.isValidKey(_9)==false){
+throw new Error("Invalid namespace given: "+_9);
+}
+try{
+this.remove(_6,_9);
+var _a=_4.File.applicationStorageDirectory.resolvePath(this._storagePath+_9);
+if(!_a.exists){
+_a.createDirectory();
+}
+var _b=_a.resolvePath(_6);
+var _c=new _4.FileStream();
+_c.open(_b,_4.FileMode.WRITE);
+_c.writeObject(_7);
+_c.close();
+}
+catch(e){
+_8(this.FAILED,_6,e.toString(),_9);
+return;
+}
+if(_8){
+_8(this.SUCCESS,_6,null,_9);
+}
+},get:function(_d,_e){
+if(this.isValidKey(_d)==false){
+throw new Error("Invalid key given: "+_d);
+}
+_e=_e||this.DEFAULT_NAMESPACE;
+var _f=null;
+var _10=_4.File.applicationStorageDirectory.resolvePath(this._storagePath+_e+"/"+_d);
+if(_10.exists&&!_10.isDirectory){
+var _11=new _4.FileStream();
+_11.open(_10,_4.FileMode.READ);
+_f=_11.readObject();
+_11.close();
+}
+return _f;
+},getNamespaces:function(){
+var _12=[this.DEFAULT_NAMESPACE];
+var dir=_4.File.applicationStorageDirectory.resolvePath(this._storagePath);
+var _13=dir.getDirectoryListing(),i;
+for(i=0;i<_13.length;i++){
+if(_13[i].isDirectory&&_13[i].name!=this.DEFAULT_NAMESPACE){
+_12.push(_13[i].name);
+}
+}
+return _12;
+},getKeys:function(_14){
+_14=_14||this.DEFAULT_NAMESPACE;
+if(this.isValidKey(_14)==false){
+throw new Error("Invalid namespace given: "+_14);
+}
+var _15=[];
+var dir=_4.File.applicationStorageDirectory.resolvePath(this._storagePath+_14);
+if(dir.exists&&dir.isDirectory){
+var _16=dir.getDirectoryListing(),i;
+for(i=0;i<_16.length;i++){
+_15.push(_16[i].name);
+}
+}
+return _15;
+},clear:function(_17){
+if(this.isValidKey(_17)==false){
+throw new Error("Invalid namespace given: "+_17);
+}
+var dir=_4.File.applicationStorageDirectory.resolvePath(this._storagePath+_17);
+if(dir.exists&&dir.isDirectory){
+dir.deleteDirectory(true);
+}
+},remove:function(key,_18){
+_18=_18||this.DEFAULT_NAMESPACE;
+var _19=_4.File.applicationStorageDirectory.resolvePath(this._storagePath+_18+"/"+key);
+if(_19.exists&&!_19.isDirectory){
+_19.deleteFile();
+}
+},putMultiple:function(_1a,_1b,_1c,_1d){
+if(this.isValidKeyArray(_1a)===false||!_1b instanceof Array||_1a.length!=_1b.length){
+throw new Error("Invalid arguments: keys = ["+_1a+"], values = ["+_1b+"]");
+}
+if(_1d==null||typeof _1d=="undefined"){
+_1d=this.DEFAULT_NAMESPACE;
+}
+if(this.isValidKey(_1d)==false){
+throw new Error("Invalid namespace given: "+_1d);
+}
+this._statusHandler=_1c;
+try{
+for(var i=0;i<_1a.length;i++){
+this.put(_1a[i],_1b[i],null,_1d);
+}
+}
+catch(e){
+if(_1c){
+_1c(this.FAILED,_1a,e.toString(),_1d);
+}
+return;
+}
+if(_1c){
+_1c(this.SUCCESS,_1a,null,_1d);
+}
+},getMultiple:function(_1e,_1f){
+if(this.isValidKeyArray(_1e)===false){
+throw new Error("Invalid key array given: "+_1e);
+}
+if(_1f==null||typeof _1f=="undefined"){
+_1f=this.DEFAULT_NAMESPACE;
+}
+if(this.isValidKey(_1f)==false){
+throw new Error("Invalid namespace given: "+_1f);
+}
+var _20=[];
+for(var i=0;i<_1e.length;i++){
+_20[i]=this.get(_1e[i],_1f);
+}
+return _20;
+},removeMultiple:function(_21,_22){
+_22=_22||this.DEFAULT_NAMESPACE;
+for(var i=0;i<_21.length;i++){
+this.remove(_21[i],_22);
+}
+},isPermanent:function(){
+return true;
+},getMaximumSize:function(){
+return this.SIZE_NO_LIMIT;
+},hasSettingsUI:function(){
+return false;
+},showSettingsUI:function(){
+throw new Error(this.declaredClass+" does not support a storage settings user-interface");
+},hideSettingsUI:function(){
+throw new Error(this.declaredClass+" does not support a storage settings user-interface");
+}});
+_3.storage.manager.register("dojox.storage.AirFileStorageProvider",new _3.storage.AirFileStorageProvider());
+_3.storage.manager.initialize();
+})();
+}
+});

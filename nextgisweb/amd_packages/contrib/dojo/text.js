@@ -5,7 +5,95 @@
 */
 
 //>>built
-define("dojo/text",["./_base/kernel","require","./has","./request"],function(r,t,v,u){var k;k=function(a,c,b){u(a,{sync:!!c,headers:{"X-Requested-With":null}}).then(b)};var e={},l=function(a){if(a){a=a.replace(/^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im,"");var c=a.match(/<body[^>]*>\s*([\s\S]+)\s*<\/body>/im);c&&(a=c[1])}else a="";return a},p={},h={};r.cache=function(a,c,b){var d;"string"==typeof a?/\//.test(a)?(d=a,b=c):d=t.toUrl(a.replace(/\./g,"/")+(c?"/"+c:"")):(d=a+"",b=c);a=
-void 0!=b&&"string"!=typeof b?b.value:b;b=b&&b.sanitize;if("string"==typeof a)return e[d]=a,b?l(a):a;if(null===a)return delete e[d],null;d in e||k(d,!0,function(a){e[d]=a});return b?l(e[d]):e[d]};return{dynamic:!0,normalize:function(a,c){var b=a.split("!"),d=b[0];return(/^\./.test(d)?c(d):d)+(b[1]?"!"+b[1]:"")},load:function(a,c,b){a=a.split("!");var d=1<a.length,m=a[0],f=c.toUrl(a[0]);a="url:"+f;var g=p,n=function(a){b(d?l(a):a)};m in e?g=e[m]:c.cache&&a in c.cache?g=c.cache[a]:f in e&&(g=e[f]);
-if(g===p)if(h[f])h[f].push(n);else{var q=h[f]=[n];k(f,!c.async,function(a){e[m]=e[f]=a;for(var b=0;b<q.length;)q[b++](a);delete h[f]})}else n(g)}}});
-//# sourceMappingURL=text.js.map
+define("dojo/text",["./_base/kernel","require","./has","./request"],function(_1,_2,_3,_4){
+var _5;
+if(1){
+_5=function(_6,_7,_8){
+_4(_6,{sync:!!_7,headers:{"X-Requested-With":null}}).then(_8);
+};
+}else{
+if(_2.getText){
+_5=_2.getText;
+}else{
+console.error("dojo/text plugin failed to load because loader does not support getText");
+}
+}
+var _9={},_a=function(_b){
+if(_b){
+_b=_b.replace(/^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im,"");
+var _c=_b.match(/<body[^>]*>\s*([\s\S]+)\s*<\/body>/im);
+if(_c){
+_b=_c[1];
+}
+}else{
+_b="";
+}
+return _b;
+},_d={},_e={};
+_1.cache=function(_f,url,_10){
+var key;
+if(typeof _f=="string"){
+if(/\//.test(_f)){
+key=_f;
+_10=url;
+}else{
+key=_2.toUrl(_f.replace(/\./g,"/")+(url?("/"+url):""));
+}
+}else{
+key=_f+"";
+_10=url;
+}
+var val=(_10!=undefined&&typeof _10!="string")?_10.value:_10,_11=_10&&_10.sanitize;
+if(typeof val=="string"){
+_9[key]=val;
+return _11?_a(val):val;
+}else{
+if(val===null){
+delete _9[key];
+return null;
+}else{
+if(!(key in _9)){
+_5(key,true,function(_12){
+_9[key]=_12;
+});
+}
+return _11?_a(_9[key]):_9[key];
+}
+}
+};
+return {dynamic:true,normalize:function(id,_13){
+var _14=id.split("!"),url=_14[0];
+return (/^\./.test(url)?_13(url):url)+(_14[1]?"!"+_14[1]:"");
+},load:function(id,_15,_16){
+var _17=id.split("!"),_18=_17.length>1,_19=_17[0],url=_15.toUrl(_17[0]),_1a="url:"+url,_1b=_d,_1c=function(_1d){
+_16(_18?_a(_1d):_1d);
+};
+if(_19 in _9){
+_1b=_9[_19];
+}else{
+if(_15.cache&&_1a in _15.cache){
+_1b=_15.cache[_1a];
+}else{
+if(url in _9){
+_1b=_9[url];
+}
+}
+}
+if(_1b===_d){
+if(_e[url]){
+_e[url].push(_1c);
+}else{
+var _1e=_e[url]=[_1c];
+_5(url,!_15.async,function(_1f){
+_9[_19]=_9[url]=_1f;
+for(var i=0;i<_1e.length;){
+_1e[i++](_1f);
+}
+delete _e[url];
+});
+}
+}else{
+_1c(_1b);
+}
+}};
+});

@@ -1,5 +1,65 @@
 //>>built
-define("dijit/form/_RadioButtonMixin","dojo/_base/array dojo/_base/declare dojo/dom-attr dojo/_base/lang dojo/query!css2 ../registry".split(" "),function(d,f,g,e,h,k){return f("dijit.form._RadioButtonMixin",null,{type:"radio",_getRelatedWidgets:function(){var a=[];h("input[type\x3dradio]",this.focusNode.form||this.ownerDocument).forEach(e.hitch(this,function(b){b.name==this.name&&b.form==this.focusNode.form&&(b=k.getEnclosingWidget(b))&&a.push(b)}));return a},_setCheckedAttr:function(a){this.inherited(arguments);
-this._created&&a&&d.forEach(this._getRelatedWidgets(),e.hitch(this,function(a){a!=this&&a.checked&&a.set("checked",!1)}))},_getSubmitValue:function(a){return null==a?"on":a},_onClick:function(a){if(this.checked||this.disabled)return a.stopPropagation(),a.preventDefault(),!1;if(this.readOnly)return a.stopPropagation(),a.preventDefault(),d.forEach(this._getRelatedWidgets(),e.hitch(this,function(a){g.set(this.focusNode||this.domNode,"checked",a.checked)})),!1;var b=!1,c;d.some(this._getRelatedWidgets(),
-function(a){return a.checked?(c=a,!0):!1});this.checked=!0;c&&(c.checked=!1);if(!1===this.onClick(a)||a.defaultPrevented)b=!0;this.checked=!1;c&&(c.checked=!0);b?a.preventDefault():this.set("checked",!0);return!b}})});
-//# sourceMappingURL=_RadioButtonMixin.js.map
+define("dijit/form/_RadioButtonMixin",["dojo/_base/array","dojo/_base/declare","dojo/dom-attr","dojo/_base/lang","dojo/query!css2","../registry"],function(_1,_2,_3,_4,_5,_6){
+return _2("dijit.form._RadioButtonMixin",null,{type:"radio",_getRelatedWidgets:function(){
+var _7=[];
+_5("input[type=radio]",this.focusNode.form||this.ownerDocument).forEach(_4.hitch(this,function(_8){
+if(_8.name==this.name&&_8.form==this.focusNode.form){
+var _9=_6.getEnclosingWidget(_8);
+if(_9){
+_7.push(_9);
+}
+}
+}));
+return _7;
+},_setCheckedAttr:function(_a){
+this.inherited(arguments);
+if(!this._created){
+return;
+}
+if(_a){
+_1.forEach(this._getRelatedWidgets(),_4.hitch(this,function(_b){
+if(_b!=this&&_b.checked){
+_b.set("checked",false);
+}
+}));
+}
+},_getSubmitValue:function(_c){
+return _c==null?"on":_c;
+},_onClick:function(e){
+if(this.checked||this.disabled){
+e.stopPropagation();
+e.preventDefault();
+return false;
+}
+if(this.readOnly){
+e.stopPropagation();
+e.preventDefault();
+_1.forEach(this._getRelatedWidgets(),_4.hitch(this,function(_d){
+_3.set(this.focusNode||this.domNode,"checked",_d.checked);
+}));
+return false;
+}
+var _e=false;
+var _f;
+_1.some(this._getRelatedWidgets(),function(_10){
+if(_10.checked){
+_f=_10;
+return true;
+}
+return false;
+});
+this.checked=true;
+_f&&(_f.checked=false);
+if(this.onClick(e)===false||e.defaultPrevented){
+_e=true;
+}
+this.checked=false;
+_f&&(_f.checked=true);
+if(_e){
+e.preventDefault();
+}else{
+this.set("checked",true);
+}
+return !_e;
+}});
+});

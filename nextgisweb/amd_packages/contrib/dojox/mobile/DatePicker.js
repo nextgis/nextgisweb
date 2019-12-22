@@ -1,3 +1,4 @@
 //>>built
-define("dojox/mobile/DatePicker",["dojo/_base/lang","./_PickerChooser!DatePicker"],function(a,b){return a.setObject("dojox.mobile.DatePicker",b)});
-//# sourceMappingURL=DatePicker.js.map
+define("dojox/mobile/DatePicker",["dojo/_base/lang","./_PickerChooser!DatePicker"],function(_1,_2){
+return _1.setObject("dojox.mobile.DatePicker",_2);
+});

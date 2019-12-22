@@ -1,4 +1,21 @@
 //>>built
-define("dojox/mobile/bidi/ToolBarButton",["dojo/_base/declare","dojo/_base/lang","dojo/dom-class"],function(a,e,b){return a(null,{buildRendering:function(){this.inherited(arguments);if(!this.isLeftToRight()&&this.arrow){var c="left"===this.arrow?"mblToolBarButtonHasLeftArrow":"mblToolBarButtonHasRightArrow",a="left"===this.arrow?"mblToolBarButtonRightArrow":"mblToolBarButtonLeftArrow",d="left"===this.arrow?"mblToolBarButtonHasRightArrow":"mblToolBarButtonHasLeftArrow";b.remove(this.arrowNode,"left"===
-this.arrow?"mblToolBarButtonLeftArrow":"mblToolBarButtonRightArrow");b.add(this.arrowNode,a);b.remove(this.domNode,c);b.add(this.domNode,d)}},_setLabelAttr:function(a){this.inherited(arguments);this.isLeftToRight()||b.toggle(this.tableNode,"mblToolBarButtonTextRtl",a||this.arrow)}})});
-//# sourceMappingURL=ToolBarButton.js.map
+define("dojox/mobile/bidi/ToolBarButton",["dojo/_base/declare","dojo/_base/lang","dojo/dom-class"],function(_1,_2,_3){
+return _1(null,{buildRendering:function(){
+this.inherited(arguments);
+if(!this.isLeftToRight()&&this.arrow){
+var _4=(this.arrow==="left"?"mblToolBarButtonLeftArrow":"mblToolBarButtonRightArrow");
+var _5=(this.arrow==="left"?"mblToolBarButtonHasLeftArrow":"mblToolBarButtonHasRightArrow");
+var _6=(this.arrow==="left"?"mblToolBarButtonRightArrow":"mblToolBarButtonLeftArrow");
+var _7=(this.arrow==="left"?"mblToolBarButtonHasRightArrow":"mblToolBarButtonHasLeftArrow");
+_3.remove(this.arrowNode,_4);
+_3.add(this.arrowNode,_6);
+_3.remove(this.domNode,_5);
+_3.add(this.domNode,_7);
+}
+},_setLabelAttr:function(_8){
+this.inherited(arguments);
+if(!this.isLeftToRight()){
+_3.toggle(this.tableNode,"mblToolBarButtonTextRtl",_8||this.arrow);
+}
+}});
+});

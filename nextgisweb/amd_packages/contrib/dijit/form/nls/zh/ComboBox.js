@@ -1,3 +1,2 @@
 //>>built
-define("dijit/form/nls/zh/ComboBox",{previousMessage:"\u5148\u524d\u9009\u9879",nextMessage:"\u66f4\u591a\u9009\u9879"});
-//# sourceMappingURL=ComboBox.js.map
+define("dijit/form/nls/zh/ComboBox",({previousMessage:"先前选项",nextMessage:"更多选项"}));

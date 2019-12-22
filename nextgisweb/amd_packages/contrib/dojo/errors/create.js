@@ -5,5 +5,32 @@
 */
 
 //>>built
-define("dojo/errors/create",["../_base/lang"],function(g){return function(h,e,a,k){a=a||Error;var b=function(f){if(a===Error){Error.captureStackTrace&&Error.captureStackTrace(this,b);var c=Error.call(this,f),d;for(d in c)c.hasOwnProperty(d)&&(this[d]=c[d]);this.message=f;this.stack=c.stack}else a.apply(this,arguments);e&&e.apply(this,arguments)};b.prototype=g.delegate(a.prototype,k);b.prototype.name=h;return b.prototype.constructor=b}});
-//# sourceMappingURL=create.js.map
+define("dojo/errors/create",["../_base/lang"],function(_1){
+return function(_2,_3,_4,_5){
+_4=_4||Error;
+var _6=function(_7){
+if(_4===Error){
+if(Error.captureStackTrace){
+Error.captureStackTrace(this,_6);
+}
+var _8=Error.call(this,_7),_9;
+for(_9 in _8){
+if(_8.hasOwnProperty(_9)){
+this[_9]=_8[_9];
+}
+}
+this.message=_7;
+this.stack=_8.stack;
+}else{
+_4.apply(this,arguments);
+}
+if(_3){
+_3.apply(this,arguments);
+}
+};
+_6.prototype=_1.delegate(_4.prototype,_5);
+_6.prototype.name=_2;
+_6.prototype.constructor=_6;
+return _6;
+};
+});

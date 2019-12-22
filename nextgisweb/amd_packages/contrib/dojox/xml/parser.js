@@ -1,7 +1,131 @@
 //>>built
-define("dojox/xml/parser",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/array","dojo/_base/window","dojo/_base/sniff"],function(c){c.getObject("xml.parser",!0,dojox);dojox.xml.parser.parse=function(b,d){var a=c.doc,e;d=d||"text/xml";if(b&&c.trim(b)&&"DOMParser"in c.global){e=(new DOMParser).parseFromString(b,d);a=e.documentElement;if("parsererror"==a.nodeName&&"http://www.mozilla.org/newlayout/xml/parsererror.xml"==a.namespaceURI){var f=a.getElementsByTagNameNS("http://www.mozilla.org/newlayout/xml/parsererror.xml",
-"sourcetext")[0];f&&(f=f.firstChild.data);throw Error("Error parsing text "+a.firstChild.data+" \n"+f);}return e}if("ActiveXObject"in c.global){a=function(a){return"MSXML"+a+".DOMDocument"};a=["Microsoft.XMLDOM",a(6),a(4),a(3),a(2)];c.some(a,function(a){try{e=new ActiveXObject(a)}catch(h){return!1}return!0});if(b&&e&&(e.async=!1,e.loadXML(b),a=e.parseError,0!==a.errorCode))throw Error("Line: "+a.line+"\nCol: "+a.linepos+"\nReason: "+a.reason+"\nError Code: "+a.errorCode+"\nSource: "+a.srcText);if(e)return e}else if(a.implementation&&
-a.implementation.createDocument){if(b&&c.trim(b)&&a.createElement){f=a.createElement("xml");f.innerHTML=b;var g=a.implementation.createDocument("foo","",null);c.forEach(f.childNodes,function(a){g.importNode(a,!0)});return g}return a.implementation.createDocument("","",null)}return null};dojox.xml.parser.textContent=function(b,d){if(1<arguments.length)return dojox.xml.parser.replaceChildren(b,(b.ownerDocument||c.doc).createTextNode(d)),d;if(void 0!==b.textContent)return b.textContent;var a="";b&&c.forEach(b.childNodes,
-function(b){switch(b.nodeType){case 1:case 5:a+=dojox.xml.parser.textContent(b);break;case 3:case 2:case 4:a+=b.nodeValue}});return a};dojox.xml.parser.replaceChildren=function(b,d){var a=[];c.isIE&&c.forEach(b.childNodes,function(b){a.push(b)});dojox.xml.parser.removeChildren(b);c.forEach(a,c.destroy);c.isArray(d)?c.forEach(d,function(a){b.appendChild(a)}):b.appendChild(d)};dojox.xml.parser.removeChildren=function(b){for(var c=b.childNodes.length;b.hasChildNodes();)b.removeChild(b.firstChild);return c};
-dojox.xml.parser.innerXML=function(b){return b.innerXML?b.innerXML:b.xml?b.xml:"undefined"!=typeof XMLSerializer?(new XMLSerializer).serializeToString(b):null};return dojox.xml.parser});
-//# sourceMappingURL=parser.js.map
+define("dojox/xml/parser",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/array","dojo/_base/window","dojo/_base/sniff"],function(_1){
+_1.getObject("xml.parser",true,dojox);
+dojox.xml.parser.parse=function(_2,_3){
+var _4=_1.doc;
+var _5;
+_3=_3||"text/xml";
+if(_2&&_1.trim(_2)&&"DOMParser" in _1.global){
+var _6=new DOMParser();
+_5=_6.parseFromString(_2,_3);
+var de=_5.documentElement;
+var _7="http://www.mozilla.org/newlayout/xml/parsererror.xml";
+if(de.nodeName=="parsererror"&&de.namespaceURI==_7){
+var _8=de.getElementsByTagNameNS(_7,"sourcetext")[0];
+if(_8){
+_8=_8.firstChild.data;
+}
+throw new Error("Error parsing text "+de.firstChild.data+" \n"+_8);
+}
+return _5;
+}else{
+if("ActiveXObject" in _1.global){
+var ms=function(n){
+return "MSXML"+n+".DOMDocument";
+};
+var dp=["Microsoft.XMLDOM",ms(6),ms(4),ms(3),ms(2)];
+_1.some(dp,function(p){
+try{
+_5=new ActiveXObject(p);
+}
+catch(e){
+return false;
+}
+return true;
+});
+if(_2&&_5){
+_5.async=false;
+_5.loadXML(_2);
+var pe=_5.parseError;
+if(pe.errorCode!==0){
+throw new Error("Line: "+pe.line+"\n"+"Col: "+pe.linepos+"\n"+"Reason: "+pe.reason+"\n"+"Error Code: "+pe.errorCode+"\n"+"Source: "+pe.srcText);
+}
+}
+if(_5){
+return _5;
+}
+}else{
+if(_4.implementation&&_4.implementation.createDocument){
+if(_2&&_1.trim(_2)&&_4.createElement){
+var _9=_4.createElement("xml");
+_9.innerHTML=_2;
+var _a=_4.implementation.createDocument("foo","",null);
+_1.forEach(_9.childNodes,function(_b){
+_a.importNode(_b,true);
+});
+return _a;
+}else{
+return _4.implementation.createDocument("","",null);
+}
+}
+}
+}
+return null;
+};
+dojox.xml.parser.textContent=function(_c,_d){
+if(arguments.length>1){
+var _e=_c.ownerDocument||_1.doc;
+dojox.xml.parser.replaceChildren(_c,_e.createTextNode(_d));
+return _d;
+}else{
+if(_c.textContent!==undefined){
+return _c.textContent;
+}
+var _f="";
+if(_c){
+_1.forEach(_c.childNodes,function(_10){
+switch(_10.nodeType){
+case 1:
+case 5:
+_f+=dojox.xml.parser.textContent(_10);
+break;
+case 3:
+case 2:
+case 4:
+_f+=_10.nodeValue;
+}
+});
+}
+return _f;
+}
+};
+dojox.xml.parser.replaceChildren=function(_11,_12){
+var _13=[];
+if(_1.isIE){
+_1.forEach(_11.childNodes,function(_14){
+_13.push(_14);
+});
+}
+dojox.xml.parser.removeChildren(_11);
+_1.forEach(_13,_1.destroy);
+if(!_1.isArray(_12)){
+_11.appendChild(_12);
+}else{
+_1.forEach(_12,function(_15){
+_11.appendChild(_15);
+});
+}
+};
+dojox.xml.parser.removeChildren=function(_16){
+var _17=_16.childNodes.length;
+while(_16.hasChildNodes()){
+_16.removeChild(_16.firstChild);
+}
+return _17;
+};
+dojox.xml.parser.innerXML=function(_18){
+if(_18.innerXML){
+return _18.innerXML;
+}else{
+if(_18.xml){
+return _18.xml;
+}else{
+if(typeof XMLSerializer!="undefined"){
+return (new XMLSerializer()).serializeToString(_18);
+}
+}
+}
+return null;
+};
+return dojox.xml.parser;
+});

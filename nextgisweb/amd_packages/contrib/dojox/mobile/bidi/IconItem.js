@@ -1,4 +1,24 @@
 //>>built
-define("dojox/mobile/bidi/IconItem",["dojo/_base/declare","./common"],function(c,b){return c(null,{_applyAttributes:function(){!this.textDir&&this.getParent()&&this.getParent().get("textDir")&&(this.textDir=this.getParent().get("textDir"));this.inherited(arguments)},_setLabelAttr:function(a){this.textDir&&(a=b.enforceTextDirWithUcc(a,this.textDir));this.inherited(arguments)},_setTextDirAttr:function(a){a&&this.textDir!==a&&(this.textDir=a,this.labelNode.innerHTML=b.removeUCCFromText(this.labelNode.innerHTML),
-this.labelNode.innerHTML=b.enforceTextDirWithUcc(this.labelNode.innerHTML,this.textDir),this.paneWidget&&(this.paneWidget.labelNode.innerHTML=b.removeUCCFromText(this.paneWidget.labelNode.innerHTML),this.paneWidget.labelNode.innerHTML=b.enforceTextDirWithUcc(this.paneWidget.labelNode.innerHTML,this.textDir)))}})});
-//# sourceMappingURL=IconItem.js.map
+define("dojox/mobile/bidi/IconItem",["dojo/_base/declare","./common"],function(_1,_2){
+return _1(null,{_applyAttributes:function(){
+if(!this.textDir&&this.getParent()&&this.getParent().get("textDir")){
+this.textDir=this.getParent().get("textDir");
+}
+this.inherited(arguments);
+},_setLabelAttr:function(_3){
+if(this.textDir){
+_3=_2.enforceTextDirWithUcc(_3,this.textDir);
+}
+this.inherited(arguments);
+},_setTextDirAttr:function(_4){
+if(_4&&this.textDir!==_4){
+this.textDir=_4;
+this.labelNode.innerHTML=_2.removeUCCFromText(this.labelNode.innerHTML);
+this.labelNode.innerHTML=_2.enforceTextDirWithUcc(this.labelNode.innerHTML,this.textDir);
+if(this.paneWidget){
+this.paneWidget.labelNode.innerHTML=_2.removeUCCFromText(this.paneWidget.labelNode.innerHTML);
+this.paneWidget.labelNode.innerHTML=_2.enforceTextDirWithUcc(this.paneWidget.labelNode.innerHTML,this.textDir);
+}
+}
+}});
+});

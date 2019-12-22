@@ -1,5 +1,96 @@
 //>>built
-define("dojox/collections/ArrayList",["dojo/_base/kernel","dojo/_base/array","./_base"],function(f,g,d){d.ArrayList=function(e){var b=[];e&&(b=b.concat(e));this.count=b.length;this.add=function(a){b.push(a);this.count=b.length};this.addRange=function(a){if(a.getIterator)for(a=a.getIterator();!a.atEnd();)this.add(a.get());else for(var c=0;c<a.length;c++)b.push(a[c]);this.count=b.length};this.clear=function(){b.splice(0,b.length);this.count=0};this.clone=function(){return new d.ArrayList(b)};this.contains=
-function(a){for(var c=0;c<b.length;c++)if(b[c]==a)return!0;return!1};this.forEach=function(a,c){f.forEach(b,a,c)};this.getIterator=function(){return new d.Iterator(b)};this.indexOf=function(a){for(var c=0;c<b.length;c++)if(b[c]==a)return c;return-1};this.insert=function(a,c){b.splice(a,0,c);this.count=b.length};this.item=function(a){return b[a]};this.remove=function(a){a=this.indexOf(a);0<=a&&b.splice(a,1);this.count=b.length};this.removeAt=function(a){b.splice(a,1);this.count=b.length};this.reverse=
-function(){b.reverse()};this.sort=function(a){a?b.sort(a):b.sort()};this.setByIndex=function(a,c){b[a]=c;this.count=b.length};this.toArray=function(){return[].concat(b)};this.toString=function(a){return b.join(a||",")}};return d.ArrayList});
-//# sourceMappingURL=ArrayList.js.map
+define("dojox/collections/ArrayList",["dojo/_base/kernel","dojo/_base/array","./_base"],function(_1,_2,_3){
+_3.ArrayList=function(_4){
+var _5=[];
+if(_4){
+_5=_5.concat(_4);
+}
+this.count=_5.length;
+this.add=function(_6){
+_5.push(_6);
+this.count=_5.length;
+};
+this.addRange=function(a){
+if(a.getIterator){
+var e=a.getIterator();
+while(!e.atEnd()){
+this.add(e.get());
+}
+this.count=_5.length;
+}else{
+for(var i=0;i<a.length;i++){
+_5.push(a[i]);
+}
+this.count=_5.length;
+}
+};
+this.clear=function(){
+_5.splice(0,_5.length);
+this.count=0;
+};
+this.clone=function(){
+return new _3.ArrayList(_5);
+};
+this.contains=function(_7){
+for(var i=0;i<_5.length;i++){
+if(_5[i]==_7){
+return true;
+}
+}
+return false;
+};
+this.forEach=function(fn,_8){
+_1.forEach(_5,fn,_8);
+};
+this.getIterator=function(){
+return new _3.Iterator(_5);
+};
+this.indexOf=function(_9){
+for(var i=0;i<_5.length;i++){
+if(_5[i]==_9){
+return i;
+}
+}
+return -1;
+};
+this.insert=function(i,_a){
+_5.splice(i,0,_a);
+this.count=_5.length;
+};
+this.item=function(i){
+return _5[i];
+};
+this.remove=function(_b){
+var i=this.indexOf(_b);
+if(i>=0){
+_5.splice(i,1);
+}
+this.count=_5.length;
+};
+this.removeAt=function(i){
+_5.splice(i,1);
+this.count=_5.length;
+};
+this.reverse=function(){
+_5.reverse();
+};
+this.sort=function(fn){
+if(fn){
+_5.sort(fn);
+}else{
+_5.sort();
+}
+};
+this.setByIndex=function(i,_c){
+_5[i]=_c;
+this.count=_5.length;
+};
+this.toArray=function(){
+return [].concat(_5);
+};
+this.toString=function(_d){
+return _5.join((_d||","));
+};
+};
+return _3.ArrayList;
+});

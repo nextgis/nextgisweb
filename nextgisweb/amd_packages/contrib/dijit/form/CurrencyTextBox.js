@@ -1,4 +1,16 @@
 //>>built
-define("dijit/form/CurrencyTextBox",["dojo/currency","dojo/_base/declare","dojo/_base/lang","./NumberTextBox"],function(a,f,c,e){return f("dijit.form.CurrencyTextBox",e,{currency:"",baseClass:"dijitTextBox dijitCurrencyTextBox",_formatter:a.format,_parser:a.parse,_regExpGenerator:a.regexp,parse:function(b,a){var d=this.inherited(arguments);isNaN(d)&&/\d+/.test(b)&&(d=c.hitch(c.delegate(this,{_parser:e.prototype._parser}),"inherited")(arguments));return d},_setConstraintsAttr:function(b){!b.currency&&
-this.currency&&(b.currency=this.currency);this.inherited(arguments,[a._mixInDefaults(c.mixin(b,{exponent:!1}))])}})});
-//# sourceMappingURL=CurrencyTextBox.js.map
+define("dijit/form/CurrencyTextBox",["dojo/currency","dojo/_base/declare","dojo/_base/lang","./NumberTextBox"],function(_1,_2,_3,_4){
+var _5=_2("dijit.form.CurrencyTextBox",_4,{currency:"",baseClass:"dijitTextBox dijitCurrencyTextBox",_formatter:_1.format,_parser:_1.parse,_regExpGenerator:_1.regexp,parse:function(_6,_7){
+var v=this.inherited(arguments);
+if(isNaN(v)&&/\d+/.test(_6)){
+v=_3.hitch(_3.delegate(this,{_parser:_4.prototype._parser}),"inherited")(arguments);
+}
+return v;
+},_setConstraintsAttr:function(_8){
+if(!_8.currency&&this.currency){
+_8.currency=this.currency;
+}
+this.inherited(arguments,[_1._mixInDefaults(_3.mixin(_8,{exponent:false}))]);
+}});
+return _5;
+});

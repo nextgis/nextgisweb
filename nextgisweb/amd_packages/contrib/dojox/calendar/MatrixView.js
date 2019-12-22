@@ -1,58 +1,1258 @@
 //>>built
-require({cache:{"url:dojox/calendar/templates/MatrixView.html":'\x3cdiv data-dojo-attach-events\x3d"keydown:_onKeyDown"\x3e\n\t\x3cdiv  class\x3d"dojoxCalendarYearColumnHeader" data-dojo-attach-point\x3d"yearColumnHeader"\x3e\n\t\t\x3ctable\x3e\x3ctr\x3e\x3ctd\x3e\x3cspan data-dojo-attach-point\x3d"yearColumnHeaderContent"\x3e\x3c/span\x3e\x3c/td\x3e\x3c/tr\x3e\x3c/table\x3e\t\t\n\t\x3c/div\x3e\t\n\t\x3cdiv data-dojo-attach-point\x3d"columnHeader" class\x3d"dojoxCalendarColumnHeader"\x3e\n\t\t\x3ctable data-dojo-attach-point\x3d"columnHeaderTable" class\x3d"dojoxCalendarColumnHeaderTable" cellpadding\x3d"0" cellspacing\x3d"0"\x3e\x3c/table\x3e\n\t\x3c/div\x3e\t\t\n\t\x3cdiv dojoAttachPoint\x3d"rowHeader" class\x3d"dojoxCalendarRowHeader"\x3e\n\t\t\x3ctable data-dojo-attach-point\x3d"rowHeaderTable" class\x3d"dojoxCalendarRowHeaderTable" cellpadding\x3d"0" cellspacing\x3d"0"\x3e\x3c/table\x3e\n\t\x3c/div\x3e\t\n\t\x3cdiv dojoAttachPoint\x3d"grid" class\x3d"dojoxCalendarGrid"\x3e\n\t\t\x3ctable data-dojo-attach-point\x3d"gridTable" class\x3d"dojoxCalendarGridTable" cellpadding\x3d"0" cellspacing\x3d"0"\x3e\x3c/table\x3e\n\t\x3c/div\x3e\t\n\t\x3cdiv data-dojo-attach-point\x3d"itemContainer" class\x3d"dojoxCalendarContainer" data-dojo-attach-event\x3d"mousedown:_onGridMouseDown,mouseup:_onGridMouseUp,ondblclick:_onGridDoubleClick,touchstart:_onGridTouchStart,touchmove:_onGridTouchMove,touchend:_onGridTouchEnd"\x3e\n\t\t\x3ctable data-dojo-attach-point\x3d"itemContainerTable" class\x3d"dojoxCalendarContainerTable" cellpadding\x3d"0" cellspacing\x3d"0" style\x3d"width:100%"\x3e\x3c/table\x3e\n\t\x3c/div\x3e\t\n\x3c/div\x3e\n'}});
-define("dojox/calendar/MatrixView","dojo/_base/declare dojo/_base/array dojo/_base/event dojo/_base/lang dojo/_base/sniff dojo/_base/fx dojo/_base/html dojo/on dojo/dom dojo/dom-class dojo/dom-style dojo/dom-geometry dojo/dom-construct dojo/query dojo/i18n ./ViewBase dojo/text!./templates/MatrixView.html dijit/_TemplatedMixin".split(" "),function(F,K,G,t,y,B,C,z,L,l,p,x,n,w,E,H,I,J){return F("dojox.calendar.MatrixView",[H,J],{templateString:I,baseClass:"dojoxCalendarMatrixView",_setTabIndexAttr:"domNode",
-viewKind:"matrix",renderData:null,startDate:null,refStartTime:null,refEndTime:null,columnCount:7,rowCount:5,horizontalRenderer:null,labelRenderer:null,expandRenderer:null,horizontalDecorationRenderer:null,percentOverlap:0,verticalGap:2,horizontalRendererHeight:17,labelRendererHeight:14,expandRendererHeight:15,cellPaddingTop:16,expandDuration:300,expandEasing:null,layoutDuringResize:!1,roundToDay:!0,showCellLabel:!0,scrollable:!1,resizeCursor:"e-resize",constructor:function(){this.invalidatingProperties=
-"columnCount rowCount startDate horizontalRenderer horizontalDecaorationRenderer labelRenderer expandRenderer rowHeaderDatePattern columnHeaderLabelLength cellHeaderShortPattern cellHeaderLongPattern percentOverlap verticalGap horizontalRendererHeight labelRendererHeight expandRendererHeight cellPaddingTop roundToDay itemToRendererKindFunc layoutPriorityFunction formatItemTimeFunc textDir items".split(" ");this._ddRendererList=[];this._ddRendererPool=[];this._rowHeaderHandles=[]},destroy:function(a){this._cleanupRowHeader();
-this.inherited(arguments)},postCreate:function(){this.inherited(arguments);this._initialized=!0;this.invalidRendering||this.refreshRendering()},_createRenderData:function(){var a={};a.dateLocaleModule=this.dateLocaleModule;a.dateClassObj=this.dateClassObj;a.dateModule=this.dateModule;a.dates=[];a.columnCount=this.get("columnCount");a.rowCount=this.get("rowCount");a.sheetHeight=this.itemContainer.offsetHeight;this._computeRowsHeight(a);var b=this.get("startDate");null==b&&(b=new a.dateClassObj);this.startDate=
-b=this.floorToDay(b,!1,a);for(var c=0;c<a.rowCount;c++){a.dates.push([]);for(var d=0;d<a.columnCount;d++)a.dates[c].push(b),b=this.addAndFloor(b,"day",1)}a.startTime=this.newDate(a.dates[0][0],a);a.endTime=this.newDate(a.dates[a.rowCount-1][a.columnCount-1],a);a.endTime=a.dateModule.add(a.endTime,"day",1);a.endTime=this.floorToDay(a.endTime,!0);this.displayedItemsInvalidated&&!this._isEditing?(this.displayedItemsInvalidated=!1,this._computeVisibleItems(a)):this.renderData&&(a.items=this.renderData.items);
-this.displayedDecorationItemsInvalidated?a.decorationItems=this.decorationStoreManager._computeVisibleItems(a):this.renderData&&(a.decorationItems=this.renderData.decorationItems);a.rtl=!this.isLeftToRight();return a},_validateProperties:function(){this.inherited(arguments);if(1>this.columnCount||isNaN(this.columnCount))this.columnCount=1;if(1>this.rowCount||isNaN(this.rowCount))this.rowCount=1;if(isNaN(this.percentOverlap)||0>this.percentOverlap||100<this.percentOverlap)this.percentOverlap=0;if(isNaN(this.verticalGap)||
-0>this.verticalGap)this.verticalGap=2;if(isNaN(this.horizontalRendererHeight)||1>this.horizontalRendererHeight)this.horizontalRendererHeight=17;if(isNaN(this.labelRendererHeight)||1>this.labelRendererHeight)this.labelRendererHeight=14;if(isNaN(this.expandRendererHeight)||1>this.expandRendererHeight)this.expandRendererHeight=15},_setStartDateAttr:function(a){this.displayedItemsInvalidated=!0;this._set("startDate",a)},_setColumnCountAttr:function(a){this.displayedItemsInvalidated=!0;this._set("columnCount",
-a)},_setRowCountAttr:function(a){this.displayedItemsInvalidated=!0;this._set("rowCount",a)},__fixEvt:function(a){a.sheet="primary";a.source=this;return a},_formatRowHeaderLabel:function(a){return this.rowHeaderDatePattern?this.renderData.dateLocaleModule.format(a,{selector:"date",datePattern:this.rowHeaderDatePattern}):this.getWeekNumberLabel(a)},_formatColumnHeaderLabel:function(a){return this.renderData.dateLocaleModule.getNames("days",this.columnHeaderLabelLength?this.columnHeaderLabelLength:"wide",
-"standAlone")[a.getDay()]},cellHeaderShortPattern:null,cellHeaderLongPattern:null,_formatGridCellLabel:function(a,b,c){0==b&&0==c||1==a.getDate()?this.cellHeaderLongPattern?b=this.cellHeaderLongPattern:(b=E.getLocalization("dojo.cldr",this._calendar),b=b["dateFormatItem-MMMd"]):this.cellHeaderShortPattern?b=this.cellHeaderShortPattern:(b=E.getLocalization("dojo.cldr",this._calendar),b=b["dateFormatItem-d"]);return this.renderData.dateLocaleModule.format(a,{selector:"date",datePattern:b})},refreshRendering:function(){this.inherited(arguments);
-if(this.domNode){this._validateProperties();var a=this.renderData,b=this.renderData=this._createRenderData();this._createRendering(b,a);this._layoutDecorationRenderers(b);this._layoutRenderers(b)}},_createRendering:function(a,b){if(0>=a.rowHeight)a.columnCount=1,a.rowCount=1,a.invalidRowHeight=!0;else{if(b&&this.itemContainerTable){var c=w(".dojoxCalendarItemContainerRow",this.itemContainerTable);b.rowCount=c.length}this._buildColumnHeader(a,b);this._buildRowHeader(a,b);this._buildGrid(a,b);this._buildItemContainer(a,
-b);this.buttonContainer&&null!=this.owner&&this.owner.currentView==this&&p.set(this.buttonContainer,{right:0,left:0})}},_buildColumnHeader:function(a,b){var c=this.columnHeaderTable;if(c){var d=a.columnCount-(b?b.columnCount:0);8==y("ie")&&(null==this._colTableSave?this._colTableSave=t.clone(c):0>d&&(this.columnHeader.removeChild(c),n.destroy(c),this.columnHeaderTable=c=t.clone(this._colTableSave),this.columnHeader.appendChild(c),d=a.columnCount));var e=w("tbody",c),f=w("tr",c),e=1==e.length?e[0]:
-C.create("tbody",null,c),f=1==f.length?f[0]:n.create("tr",null,e);if(0<d)for(e=0;e<d;e++)n.create("td",null,f);else for(d=-d,e=0;e<d;e++)f.removeChild(f.lastChild);w("td",c).forEach(function(b,c){b.className="";var d=a.dates[0][c];this._setText(b,this._formatColumnHeaderLabel(d));0==c?l.add(b,"first-child"):c==this.renderData.columnCount-1&&l.add(b,"last-child");this.styleColumnHeaderCell(b,d,a)},this);this.yearColumnHeaderContent&&this._setText(this.yearColumnHeaderContent,a.dateLocaleModule.format(a.dates[0][0],
-{selector:"date",datePattern:"yyyy"}))}},styleColumnHeaderCell:function(a,b,c){l.add(a,this._cssDays[b.getDay()]);this.isWeekEnd(b)&&l.add(a,"dojoxCalendarWeekend")},_rowHeaderHandles:null,_cleanupRowHeader:function(){for(;0<this._rowHeaderHandles.length;)for(var a=this._rowHeaderHandles.pop();0<a.length;)a.pop().remove()},_rowHeaderClick:function(a){var b=w("td",this.rowHeaderTable).indexOf(a.currentTarget);this._onRowHeaderClick({index:b,date:this.renderData.dates[b][0],triggerEvent:a})},_buildRowHeader:function(a,
-b){var c=this.rowHeaderTable;if(c){var d=w("tbody",c),e,d=1==d.length?d[0]:n.create("tbody",null,c),f=a.rowCount-(b?b.rowCount:0);if(0<f)for(var g=0;g<f;g++){e=n.create("tr",null,d);e=n.create("td",null,e);var h=[];h.push(z(e,"click",t.hitch(this,this._rowHeaderClick)));y("touch")||(h.push(z(e,"mousedown",function(a){l.add(a.currentTarget,"Active")})),h.push(z(e,"mouseup",function(a){l.remove(a.currentTarget,"Active")})),h.push(z(e,"mouseover",function(a){l.add(a.currentTarget,"Hover")})),h.push(z(e,
-"mouseout",function(a){l.remove(a.currentTarget,"Hover")})));this._rowHeaderHandles.push(h)}else for(f=-f,g=0;g<f;g++)for(d.removeChild(d.lastChild),e=this._rowHeaderHandles.pop();0<e.length;)e.pop().remove();w("tr",c).forEach(function(b,c){p.set(b,"height",this._getRowHeight(c)+"px");var d=a.dates[c][0],e=w("td",b)[0];e.className="";0==c&&l.add(e,"first-child");c==this.renderData.rowCount-1&&l.add(e,"last-child");this.styleRowHeaderCell(e,d,a);this._setText(e,this._formatRowHeaderLabel(d))},this)}},
-styleRowHeaderCell:function(a,b,c){},_buildGrid:function(a,b){var c=this.gridTable;if(c){var d=w("tr",c),e=a.rowCount-d.length,f=0<e,g=a.columnCount-(d?w("td",d[0]).length:0);8==y("ie")&&(null==this._gridTableSave?this._gridTableSave=t.clone(c):0>g&&(this.grid.removeChild(c),n.destroy(c),this.gridTable=c=t.clone(this._gridTableSave),this.grid.appendChild(c),g=a.columnCount,e=a.rowCount,f=!0));d=w("tbody",c);d=1==d.length?d[0]:n.create("tbody",null,c);if(f)for(var h=0;h<e;h++)n.create("tr",null,d);
-else for(e=-e,h=0;h<e;h++)d.removeChild(d.lastChild);var q=a.rowCount-e,m=f||0<g,g=m?g:-g;w("tr",c).forEach(function(b,c){if(m){var d=c>=q?a.columnCount:g;for(c=0;c<d;c++){var e=n.create("td",null,b);n.create("span",null,e)}}else for(c=0;c<g;c++)b.removeChild(b.lastChild)});w("tr",c).forEach(function(b,c){p.set(b,"height",this._getRowHeight(c)+"px");b.className="";0==c&&l.add(b,"first-child");c==a.rowCount-1&&l.add(b,"last-child");w("td",b).forEach(function(b,d){b.className="";0==d&&l.add(b,"first-child");
-d==a.columnCount-1&&l.add(b,"last-child");var e=a.dates[c][d],f=w("span",b)[0];this._setText(f,this.showCellLabel?this._formatGridCellLabel(e,c,d):null);this.styleGridCell(b,e,a)},this)},this)}},styleGridCellFunc:null,defaultStyleGridCell:function(a,b,c){l.add(a,this._cssDays[b.getDay()]);c=this.dateModule;this.isToday(b)?l.add(a,"dojoxCalendarToday"):null!=this.refStartTime&&null!=this.refEndTime&&(0<=c.compare(b,this.refEndTime)||0>=c.compare(c.add(b,"day",1),this.refStartTime))?l.add(a,"dojoxCalendarDayDisabled"):
-this.isWeekEnd(b)&&l.add(a,"dojoxCalendarWeekend")},styleGridCell:function(a,b,c){this.styleGridCellFunc?this.styleGridCellFunc(a,b,c):this.defaultStyleGridCell(a,b,c)},_buildItemContainer:function(a,b){var c=this.itemContainerTable;if(c){var d=[],e=a.rowCount-(b?b.rowCount:0);8==y("ie")&&(null==this._itemTableSave?this._itemTableSave=t.clone(c):0>e&&(this.itemContainer.removeChild(c),this._recycleItemRenderers(!0),this._recycleExpandRenderers(!0),n.destroy(c),this.itemContainerTable=c=t.clone(this._itemTableSave),
-this.itemContainer.appendChild(c),e=a.columnCount));var f=w("tbody",c),g,f=1==f.length?f[0]:n.create("tbody",null,c);if(0<e)for(var h=0;h<e;h++)g=n.create("tr",null,f),l.add(g,"dojoxCalendarItemContainerRow"),g=n.create("td",null,g),g=n.create("div",null,g),l.add(g,"dojoxCalendarContainerRow");else for(e=-e,h=0;h<e;h++)f.removeChild(f.lastChild);w(".dojoxCalendarItemContainerRow",c).forEach(function(a,b){p.set(a,"height",this._getRowHeight(b)+"px");d.push(a.childNodes[0].childNodes[0])},this);a.cells=
-d}},resize:function(a){this.inherited(arguments);this._resizeHandler(null,!1)},_resizeHandler:function(a,b){var c=this.renderData;if(null==c)this.refreshRendering();else{if(c.sheetHeight!=this.itemContainer.offsetHeight&&(c.sheetHeight=this.itemContainer.offsetHeight,-1==this.getExpandedRowIndex()?(this._computeRowsHeight(),this._resizeRows()):this.expandRow(c.expandedRow,c.expandedRowCol,0,null,!0),c.invalidRowHeight)){delete c.invalidRowHeight;this.renderData=null;this.displayedItemsInvalidated=
-!0;this.refreshRendering();return}this.layoutDuringResize||b?setTimeout(t.hitch(this,function(){this._layoutRenderers(this.renderData);this._layoutDecorationRenderers(this.renderData)}),20):(p.set(this.itemContainer,"opacity",0),this._recycleItemRenderers(),this._recycleExpandRenderers(),void 0!=this._resizeTimer&&clearTimeout(this._resizeTimer),this._resizeTimer=setTimeout(t.hitch(this,function(){delete this._resizeTimer;this._resizeRowsImpl(this.itemContainer,"tr");this._layoutRenderers(this.renderData);
-this._layoutDecorationRenderers(this.renderData);0==this.resizeAnimationDuration?p.set(this.itemContainer,"opacity",1):B.fadeIn({node:this.itemContainer,curve:[0,1]}).play(this.resizeAnimationDuration)}),200))}},resizeAnimationDuration:0,getExpandedRowIndex:function(){return null==this.renderData.expandedRow?-1:this.renderData.expandedRow},collapseRow:function(a,b,c){var d=this.renderData;void 0==c&&(c=!0);void 0==a&&(a=this.expandDuration);if(d&&null!=d.expandedRow&&-1!=d.expandedRow)if(c&&a){c=
-d.expandedRow;var e=d.expandedRowHeight;delete d.expandedRow;this._computeRowsHeight(d);var f=this._getRowHeight(c);d.expandedRow=c;this._recycleExpandRenderers();this._recycleItemRenderers();p.set(this.itemContainer,"display","none");this._expandAnimation=new B.Animation({curve:[e,f],duration:a,easing:b,onAnimate:t.hitch(this,function(a){this._expandRowImpl(Math.floor(a))}),onEnd:t.hitch(this,function(a){this._expandAnimation=null;this._collapseRowImpl(!1);this._resizeRows();p.set(this.itemContainer,
-"display","block");setTimeout(t.hitch(this,function(){this._layoutRenderers(d)}),100);this.onExpandAnimationEnd(!1)})});this._expandAnimation.play()}else this._collapseRowImpl(c)},_collapseRowImpl:function(a){var b=this.renderData;delete b.expandedRow;delete b.expandedRowHeight;this._computeRowsHeight(b);if(void 0==a||a)this._resizeRows(),this._layoutRenderers(b)},expandRow:function(a,b,c,d,e){var f=this.renderData;if(!f||0>a||a>=f.rowCount)return-1;if(void 0==b||0>b||b>=f.columnCount)b=-1;void 0==
-e&&(e=!0);void 0==c&&(c=this.expandDuration);void 0==d&&(d=this.expandEasing);var g=this._getRowHeight(a),h=f.sheetHeight-Math.ceil(this.cellPaddingTop*(f.rowCount-1));f.expandedRow=a;f.expandedRowCol=b;f.expandedRowHeight=h;e&&(c?(this._recycleExpandRenderers(),this._recycleItemRenderers(),p.set(this.itemContainer,"display","none"),this._expandAnimation=new B.Animation({curve:[g,h],duration:c,delay:50,easing:d,onAnimate:t.hitch(this,function(a){this._expandRowImpl(Math.floor(a))}),onEnd:t.hitch(this,
-function(){this._expandAnimation=null;p.set(this.itemContainer,"display","block");setTimeout(t.hitch(this,function(){this._expandRowImpl(h,!0)}),100);this.onExpandAnimationEnd(!0)})}),this._expandAnimation.play()):this._expandRowImpl(h,!0))},_expandRowImpl:function(a,b){var c=this.renderData;c.expandedRowHeight=a;this._computeRowsHeight(c,c.sheetHeight-a);this._resizeRows();b&&this._layoutRenderers(c)},onExpandAnimationEnd:function(a){},_resizeRows:function(){0>=this._getRowHeight(0)||(this.rowHeaderTable&&
-this._resizeRowsImpl(this.rowHeaderTable,"tr"),this.gridTable&&this._resizeRowsImpl(this.gridTable,"tr"),this.itemContainerTable&&this._resizeRowsImpl(this.itemContainerTable,"tr"))},_computeRowsHeight:function(a,b){var c=null==a?this.renderData:a;b=b||c.sheetHeight;b--;7==y("ie")&&(b-=c.rowCount);if(1==c.rowCount)c.rowHeight=b,c.rowHeightFirst=b,c.rowHeightLast=b;else{var d=null==c.expandedRow?c.rowCount:c.rowCount-1,e=b/d,f;f=b-Math.floor(e)*d;var g=Math.abs(b-Math.ceil(e)*d),d=1;f<g?(e=Math.floor(e),
-g=f):(d=-1,e=Math.ceil(e));f=e+d*Math.floor(g/2);c.rowHeight=e;c.rowHeightFirst=f;c.rowHeightLast=f+g%2*d}},_getRowHeight:function(a){var b=this.renderData;return a==b.expandedRow?b.expandedRowHeight:0==b.expandedRow&&1==a||0==a?b.rowHeightFirst:b.expandedRow==this.renderData.rowCount-1&&a==this.renderData.rowCount-2||a==this.renderData.rowCount-1?b.rowHeightLast:b.rowHeight},_resizeRowsImpl:function(a,b){dojo.query(b,a).forEach(function(a,b){p.set(a,"height",this._getRowHeight(b)+"px")},this)},_setHorizontalRendererAttr:function(a){this._destroyRenderersByKind("horizontal");
-this._set("horizontalRenderer",a)},_setLabelRendererAttr:function(a){this._destroyRenderersByKind("label");this._set("labelRenderer",a)},_destroyExpandRenderer:function(a){a.destroyRecursive&&a.destroyRecursive();C.destroy(a.domNode)},_setExpandRendererAttr:function(a){for(;0<this._ddRendererList.length;)this._destroyExpandRenderer(this._ddRendererList.pop());var b=this._ddRendererPool;if(b)for(;0<b.length;)this._destroyExpandRenderer(b.pop());this._set("expandRenderer",a)},_ddRendererList:null,_ddRendererPool:null,
-_getExpandRenderer:function(a,b,c,d,e){if(null==this.expandRenderer)return null;var f=this._ddRendererPool.pop();null==f&&(f=new this.expandRenderer);this._ddRendererList.push(f);f.set("owner",this);f.set("date",a);f.set("items",b);f.set("rowIndex",c);f.set("columnIndex",d);f.set("expanded",e);return f},_recycleExpandRenderers:function(a){for(var b=0;b<this._ddRendererList.length;b++){var c=this._ddRendererList[b];c.set("Up",!1);c.set("Down",!1);a&&c.domNode.parentNode.removeChild(c.domNode);p.set(c.domNode,
-"display","none")}this._ddRendererPool=this._ddRendererPool.concat(this._ddRendererList);this._ddRendererList=[]},_defaultItemToRendererKindFunc:function(a){return 1440<=Math.abs(this.renderData.dateModule.difference(a.startTime,a.endTime,"minute"))?"horizontal":"label"},naturalRowsHeight:null,_roundItemToDay:function(a){var b=a.startTime;a=a.endTime;this.isStartOfDay(b)||(b=this.floorToDay(b,!1,this.renderData));this.isStartOfDay(a)||(a=this.renderData.dateModule.add(a,"day",1),a=this.floorToDay(a,
-!0));return{startTime:b,endTime:a}},_sortItemsFunction:function(a,b){this.roundToDay&&(a=this._roundItemToDay(a),b=this._roundItemToDay(b));var c=this.dateModule.compare(a.startTime,b.startTime);0==c&&(c=-1*this.dateModule.compare(a.endTime,b.endTime));return c},_overlapLayoutPass3:function(a){for(var b=0,c=0,d=[],e=x.position(this.gridTable).x,f=0;f<this.renderData.columnCount;f++){for(var g=!1,c=x.position(this._getCellAt(0,f)),b=c.x-e,c=b+c.w,h=a.length-1;0<=h&&!g;h--)for(var q=0;q<a[h].length;q++)if(g=
-a[h][q],g=g.start<c&&b<g.end){d[f]=h+1;break}g||(d[f]=0)}return d},applyRendererZIndex:function(a,b,c,d,e,f){p.set(b.container,{zIndex:e||d?b.renderer.mobile?100:0:void 0==a.lane?1:a.lane+1})},_layoutDecorationRenderers:function(a){null==a||null==a.decorationItems||0>=a.rowHeight||(this.gridTable&&null==this._expandAnimation&&null!=this.horizontalDecorationRenderer?(this._layoutStep=a.columnCount,this.renderData.gridTablePosX=x.position(this.gridTable).x,this.inherited(arguments)):this.decorationRendererManager.recycleItemRenderers())},
-_layoutRenderers:function(a){null==a||null==a.items||0>=a.rowHeight||(!this.gridTable||null!=this._expandAnimation||null==this.horizontalRenderer&&null==this.labelRenderer?this._recycleItemRenderers():(this.renderData.gridTablePosX=x.position(this.gridTable).x,this._layoutStep=a.columnCount,this._recycleExpandRenderers(),this._hiddenItems=[],this._offsets=[],this.naturalRowsHeight=[],this.inherited(arguments)))},_offsets:null,_layoutInterval:function(a,b,c,d,e,f){if(null!=this.renderData.cells)if("dataItems"===
-f){var g=[];a=[];for(var h=0;h<e.length;h++){var q=e[h],m=this._itemToRendererKind(q);"horizontal"==m?g.push(q):"label"==m&&a.push(q)}e=this.getExpandedRowIndex();if(-1==e||e==b){e=[];h=null;q=[];if(0<g.length&&this.horizontalRenderer)var h=this._createHorizontalLayoutItems(b,c,d,g,f),k=this._computeHorizontalOverlapLayout(h,q);var r,g=[];0<a.length&&this.labelRenderer&&(r=this._createLabelLayoutItems(b,c,d,a),this._computeLabelOffsets(r,g));c=this._computeColHasHiddenItems(b,q,g);null!=h&&this._layoutHorizontalItemsImpl(b,
-h,k,c,e,f);null!=r&&this._layoutLabelItemsImpl(b,r,c,e,q,f);this._layoutExpandRenderers(b,c,e);this._hiddenItems[b]=e}}else this.horizontalDecorationRenderer&&(h=this._createHorizontalLayoutItems(b,c,d,e,f),null!=h&&this._layoutHorizontalItemsImpl(b,h,null,!1,null,f))},_createHorizontalLayoutItems:function(a,b,c,d,e){var f=this.renderData,g=f.dateModule,h=f.rtl?-1:1,q=[];e="decorationItems"===e;for(var m=0;m<d.length;m++){var k=d[m],r=this.computeRangeOverlap(f,k.startTime,k.endTime,b,c),D=g.difference(b,
-this.floorToDay(r[0],!1,f),"day"),l=f.dates[a][D],u=x.position(this._getCellAt(a,D,!1)),p=u.x-f.gridTablePosX;f.rtl&&(p+=u.w);if(e&&!k.isAllDay||!e&&!this.roundToDay&&!k.allDay)p+=h*this.computeProjectionOnDate(f,l,r[0],u.w);var p=Math.ceil(p),n=g.difference(b,this.floorToDay(r[1],!1,f),"day"),v;n>f.columnCount-1?(u=x.position(this._getCellAt(a,f.columnCount-1,!1)),v=f.rtl?u.x-f.gridTablePosX:u.x-f.gridTablePosX+u.w):(l=f.dates[a][n],u=x.position(this._getCellAt(a,n,!1)),v=u.x-f.gridTablePosX,f.rtl&&
-(v+=u.w),!e&&this.roundToDay?this.isStartOfDay(r[1])||(v+=h*u.w):v+=h*this.computeProjectionOnDate(f,l,r[1],u.w));v=Math.floor(v);f.rtl&&(l=v,v=p,p=l);v>p&&(k=t.mixin({start:p,end:v,range:r,item:k,startOffset:D,endOffset:n},k),q.push(k))}return q},_computeHorizontalOverlapLayout:function(a,b){for(var c=this.renderData,d=this.horizontalRendererHeight,e=this.computeOverlapping(a,this._overlapLayoutPass3),f=this.percentOverlap/100,g=0;g<c.columnCount;g++){var h=e.addedPassRes[g],q=c.rtl?c.columnCount-
-g-1:g;b[q]=0==f?0==h?0:1==h?d:d+(h-1)*(d+this.verticalGap):0==h?0:h*d-(h-1)*f*d+this.verticalGap;b[q]+=this.cellPaddingTop}return e},_createLabelLayoutItems:function(a,b,c,d){if(null!=this.labelRenderer){for(var e=this.renderData,f=e.dateModule,g=[],h=0;h<d.length;h++){var q=d[h];a=this.floorToDay(q.startTime,!1,e);for(var m=this.dateModule.compare;-1==m(a,q.endTime)&&-1==m(a,c);){var k=f.add(a,"day",1),k=this.floorToDay(k,!0),k=this.computeRangeOverlap(e,q.startTime,q.endTime,a,k),r=f.difference(b,
-this.floorToDay(k[0],!1,e),"day");if(r>=this.columnCount)break;if(0<=r){var p=g[r];null==p&&(p=[],g[r]=p);p.push(t.mixin({startOffset:r,range:k,item:q},q))}a=f.add(a,"day",1);this.floorToDay(a,!0)}}return g}},_computeLabelOffsets:function(a,b){for(var c=0;c<this.renderData.columnCount;c++)b[c]=null==a[c]?0:a[c].length*(this.labelRendererHeight+this.verticalGap)},_computeColHasHiddenItems:function(a,b,c){for(var d=[],e=this._getRowHeight(a),f,g=0,h=0;h<this.renderData.columnCount;h++)f=null==b||null==
-b[h]?this.cellPaddingTop:b[h],f+=null==c||null==c[h]?0:c[h],f>g&&(g=f),d[h]=f>e;this.naturalRowsHeight[a]=g;return d},_layoutHorizontalItemsImpl:function(a,b,c,d,e,f){c=this.renderData.cells[a];a=this._getRowHeight(a);for(var g=this.horizontalRendererHeight,h=this.percentOverlap/100,q=0;q<b.length;q++){var m=b[q],k=m.lane;if("dataItems"===f){var r=this.cellPaddingTop,r=0==h?r+k*(g+this.verticalGap):r+k*(g-h*g),k=!1,l=a;if(this.expandRenderer){for(l=m.startOffset;l<=m.endOffset;l++)if(d[l]){k=!0;break}l=
-k?a-this.expandRendererHeight:a}if(r+g<=l){var k=this._createRenderer(m,"horizontal",this.horizontalRenderer,"dojoxCalendarHorizontal"),t=(l=this.isItemBeingEdited(m)&&!this.liveLayout&&this._isEditing)?a-this.cellPaddingTop:g,u=m.end-m.start;9<=y("ie")&&m.start+u<this.itemContainer.offsetWidth&&u++;p.set(k.container,{top:(l?this.cellPaddingTop:r)+"px",left:m.start+"px",width:u+"px",height:t+"px"});this._applyRendererLayout(m,k,c,u,t,"horizontal")}else for(r=m.startOffset;r<m.endOffset;r++)null==
-e[r]?e[r]=[m.item]:e[r].push(m.item)}else k=this.decorationRendererManager.createRenderer(m,"horizontal",this.horizontalDecorationRenderer,"dojoxCalendarDecoration"),t=a,u=m.end-m.start,9<=y("ie")&&m.start+u<this.itemContainer.offsetWidth&&u++,p.set(k.container,{top:"0",left:m.start+"px",width:u+"px",height:t+"px"}),n.place(k.container,c),p.set(k.container,"display","block")}},_layoutLabelItemsImpl:function(a,b,c,d,e){for(var f,g,h=this.renderData,q=h.cells[a],m=this._getRowHeight(a),k=this.labelRendererHeight,
-l=x.getMarginBox(this.itemContainer).w,n=0;n<b.length;n++)if(f=b[n],null!=f){f.sort(t.hitch(this,function(a,b){return this.dateModule.compare(a.range[0],b.range[0])}));var w=this.expandRenderer?c[n]?m-this.expandRendererHeight:m:m;g=null==e||null==e[n]?this.cellPaddingTop:e[n]+this.verticalGap;for(var u=x.position(this._getCellAt(a,n)),y=u.x-h.gridTablePosX,A=0;A<f.length;A++){if(g+k+this.verticalGap<=w){var v=f[A];t.mixin(v,{start:y,end:y+u.w});var z=this._createRenderer(v,"label",this.labelRenderer,
-"dojoxCalendarLabel"),B=this.isItemBeingEdited(v)&&!this.liveLayout&&this._isEditing,C=B?this._getRowHeight(a)-this.cellPaddingTop:k;h.rtl&&(v.start=l-v.end,v.end=v.start+u.w);p.set(z.container,{top:(B?this.cellPaddingTop:g)+"px",left:v.start+"px",width:u.w+"px",height:C+"px"});this._applyRendererLayout(v,z,q,u.w,C,"label")}else break;g+=k+this.verticalGap}for(;A<f.length;A++)null==d[n]?d[n]=[f[A]]:d[n].push(f[A])}},_applyRendererLayout:function(a,b,c,d,e,f){var g=this.isItemBeingEdited(a),h=this.isItemSelected(a),
-l=this.isItemHovered(a),m=this.isItemFocused(a),k=b.renderer;k.set("hovered",l);k.set("selected",h);k.set("edited",g);k.set("focused",this.showFocus?m:!1);k.set("moveEnabled",this.isItemMoveEnabled(a._item,f));k.set("storeState",this.getItemStoreState(a));"label"!=f&&k.set("resizeEnabled",this.isItemResizeEnabled(a,f));this.applyRendererZIndex(a,b,l,h,g,m);k.updateRendering&&k.updateRendering(d,e);n.place(b.container,c);p.set(b.container,"display","block")},_getCellAt:function(a,b,c){void 0!=c&&1!=
-c||this.isLeftToRight()||(b=this.renderData.columnCount-1-b);return this.gridTable.childNodes[0].childNodes[a].childNodes[b]},_layoutExpandRenderers:function(a,b,c){if(this.expandRenderer){var d=this.renderData;if(d.expandedRow==a)null!=d.expandedRowCol&&-1!=d.expandedRowCol&&this._layoutExpandRendererImpl(d.expandedRow,d.expandedRowCol,null,!0);else if(null==d.expandedRow)for(var e=0;e<d.columnCount;e++)b[e]&&this._layoutExpandRendererImpl(a,d.rtl?d.columnCount-1-e:e,c[e],!1)}},_layoutExpandRendererImpl:function(a,
-b,c,d){var e=this.renderData,f=t.clone(e.dates[a][b]),g=null,h=e.cells[a],g=this._getExpandRenderer(f,c,a,b,d);a=x.position(this._getCellAt(a,b));a.x-=e.gridTablePosX;this.layoutExpandRenderer(g,f,c,a,this.expandRendererHeight);n.place(g.domNode,h);p.set(g.domNode,"display","block")},layoutExpandRenderer:function(a,b,c,d,e){p.set(a.domNode,{left:d.x+"px",width:d.w+"px",height:e+"px",top:d.h-e-1+"px"})},_onItemEditBeginGesture:function(a){var b=this._edProps,c=b.editedItem,d=a.dates,e=this.newDate("resizeEnd"==
-b.editKind?c.endTime:c.startTime);"label"!=b.rendererKind&&"move"==a.editKind&&(c.allDay||this.roundToDay)&&(b.dayOffset=this.renderData.dateModule.difference(this.floorToDay(d[0],!1,this.renderData),e,"day"));this.inherited(arguments)},_computeItemEditingTimes:function(a,b,c,d,e){var f=this.renderData.dateModule,g=this._edProps;if("label"!=c)if(a.allDay||this.roundToDay){var h=this.isStartOfDay(d[0]);switch(b){case "resizeEnd":!h&&a.allDay&&(d[0]=f.add(d[0],"day",1));case "resizeStart":h||(d[0]=
-this.floorToDay(d[0],!0));break;case "move":d[0]=f.add(d[0],"day",g.dayOffset);break;case "resizeBoth":h||(d[0]=this.floorToDay(d[0],!0)),this.isStartOfDay(d[1])||(d[1]=this.floorToDay(f.add(d[1],"day",1),!0))}}else d=this.inherited(arguments);return d},getTime:function(a,b,c,d){var e=this.renderData;null!=a&&(c=x.position(this.itemContainer,!0),a.touches?(d=void 0==d?0:d,b=a.touches[d].pageX-c.x,c=a.touches[d].pageY-c.y):(b=a.pageX-c.x,c=a.pageY-c.y));d=x.getContentBox(this.itemContainer);0>b?b=
-0:b>d.w&&(b=d.w-1);0>c?c=0:c>d.h&&(c=d.h-1);a=x.getMarginBox(this.itemContainer).w/e.columnCount;c=null==e.expandedRow?Math.floor(c/(x.getMarginBox(this.itemContainer).h/e.rowCount)):e.expandedRow;d=x.getContentBox(this.itemContainer);e.rtl&&(b=d.w-b);d=Math.floor(b/a);b=Math.floor(1440*(b-d*a)/a);a=null;c<e.dates.length&&d<this.renderData.dates[c].length&&(a=this.newDate(this.renderData.dates[c][d]),a=this.renderData.dateModule.add(a,"minute",b));return a},_onGridMouseUp:function(a){this.inherited(arguments);
-this._gridMouseDown&&(this._gridMouseDown=!1,this._onGridClick({date:this.getTime(a),triggerEvent:a}))},_onGridTouchEnd:function(a){this.inherited(arguments);var b=this._gridProps;b&&(this._isEditing||(b.fromItem||b.editingOnStart||this.selectFromEvent(a,null,null,!0),b.fromItem||(this._pendingDoubleTap&&this._pendingDoubleTap.grid?(this._onGridDoubleClick({date:this.getTime(this._gridProps.event),triggerEvent:this._gridProps.event}),clearTimeout(this._pendingDoubleTap.timer),delete this._pendingDoubleTap):
-(this._onGridClick({date:this.getTime(this._gridProps.event),triggerEvent:this._gridProps.event}),this._pendingDoubleTap={grid:!0,timer:setTimeout(t.hitch(this,function(){delete this._pendingDoubleTap}),this.doubleTapDelay)}))),this._gridProps=null)},_onRowHeaderClick:function(a){this._dispatchCalendarEvt(a,"onRowHeaderClick")},onRowHeaderClick:function(a){},expandRendererClickHandler:function(a,b){G.stop(a);var c=b.get("rowIndex"),d=b.get("columnIndex");this._onExpandRendererClick(t.mixin(this._createItemEditEvent(),
-{rowIndex:c,columnIndex:d,renderer:b,triggerEvent:a,date:this.renderData.dates[c][d]}))},onExpandRendererClick:function(a){},_onExpandRendererClick:function(a){this._dispatchCalendarEvt(a,"onExpandRendererClick");a.isDefaultPrevented()||(-1!=this.getExpandedRowIndex()?this.collapseRow():this.expandRow(a.rowIndex,a.columnIndex))},snapUnit:"minute",snapSteps:15,minDurationUnit:"minute",minDurationSteps:15,triggerExtent:3,liveLayout:!1,stayInView:!0,allowStartEndSwap:!0,allowResizeLessThan24H:!1})});
-//# sourceMappingURL=MatrixView.js.map
+require({cache:{"url:dojox/calendar/templates/MatrixView.html":"<div data-dojo-attach-events=\"keydown:_onKeyDown\">\n\t<div  class=\"dojoxCalendarYearColumnHeader\" data-dojo-attach-point=\"yearColumnHeader\">\n\t\t<table><tr><td><span data-dojo-attach-point=\"yearColumnHeaderContent\"></span></td></tr></table>\t\t\n\t</div>\t\n\t<div data-dojo-attach-point=\"columnHeader\" class=\"dojoxCalendarColumnHeader\">\n\t\t<table data-dojo-attach-point=\"columnHeaderTable\" class=\"dojoxCalendarColumnHeaderTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\t\t\n\t<div dojoAttachPoint=\"rowHeader\" class=\"dojoxCalendarRowHeader\">\n\t\t<table data-dojo-attach-point=\"rowHeaderTable\" class=\"dojoxCalendarRowHeaderTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\t\n\t<div dojoAttachPoint=\"grid\" class=\"dojoxCalendarGrid\">\n\t\t<table data-dojo-attach-point=\"gridTable\" class=\"dojoxCalendarGridTable\" cellpadding=\"0\" cellspacing=\"0\"></table>\n\t</div>\t\n\t<div data-dojo-attach-point=\"itemContainer\" class=\"dojoxCalendarContainer\" data-dojo-attach-event=\"mousedown:_onGridMouseDown,mouseup:_onGridMouseUp,ondblclick:_onGridDoubleClick,touchstart:_onGridTouchStart,touchmove:_onGridTouchMove,touchend:_onGridTouchEnd\">\n\t\t<table data-dojo-attach-point=\"itemContainerTable\" class=\"dojoxCalendarContainerTable\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%\"></table>\n\t</div>\t\n</div>\n"}});
+define("dojox/calendar/MatrixView",["dojo/_base/declare","dojo/_base/array","dojo/_base/event","dojo/_base/lang","dojo/_base/sniff","dojo/_base/fx","dojo/_base/html","dojo/on","dojo/dom","dojo/dom-class","dojo/dom-style","dojo/dom-geometry","dojo/dom-construct","dojo/query","dojo/i18n","./ViewBase","dojo/text!./templates/MatrixView.html","dijit/_TemplatedMixin"],function(_1,_2,_3,_4,_5,fx,_6,on,_7,_8,_9,_a,_b,_c,_d,_e,_f,_10){
+return _1("dojox.calendar.MatrixView",[_e,_10],{templateString:_f,baseClass:"dojoxCalendarMatrixView",_setTabIndexAttr:"domNode",viewKind:"matrix",renderData:null,startDate:null,refStartTime:null,refEndTime:null,columnCount:7,rowCount:5,horizontalRenderer:null,labelRenderer:null,expandRenderer:null,horizontalDecorationRenderer:null,percentOverlap:0,verticalGap:2,horizontalRendererHeight:17,labelRendererHeight:14,expandRendererHeight:15,cellPaddingTop:16,expandDuration:300,expandEasing:null,layoutDuringResize:false,roundToDay:true,showCellLabel:true,scrollable:false,resizeCursor:"e-resize",constructor:function(){
+this.invalidatingProperties=["columnCount","rowCount","startDate","horizontalRenderer","horizontalDecaorationRenderer","labelRenderer","expandRenderer","rowHeaderDatePattern","columnHeaderLabelLength","cellHeaderShortPattern","cellHeaderLongPattern","percentOverlap","verticalGap","horizontalRendererHeight","labelRendererHeight","expandRendererHeight","cellPaddingTop","roundToDay","itemToRendererKindFunc","layoutPriorityFunction","formatItemTimeFunc","textDir","items"];
+this._ddRendererList=[];
+this._ddRendererPool=[];
+this._rowHeaderHandles=[];
+},destroy:function(_11){
+this._cleanupRowHeader();
+this.inherited(arguments);
+},postCreate:function(){
+this.inherited(arguments);
+this._initialized=true;
+if(!this.invalidRendering){
+this.refreshRendering();
+}
+},_createRenderData:function(){
+var rd={};
+rd.dateLocaleModule=this.dateLocaleModule;
+rd.dateClassObj=this.dateClassObj;
+rd.dateModule=this.dateModule;
+rd.dates=[];
+rd.columnCount=this.get("columnCount");
+rd.rowCount=this.get("rowCount");
+rd.sheetHeight=this.itemContainer.offsetHeight;
+this._computeRowsHeight(rd);
+var d=this.get("startDate");
+if(d==null){
+d=new rd.dateClassObj();
+}
+d=this.floorToDay(d,false,rd);
+this.startDate=d;
+for(var row=0;row<rd.rowCount;row++){
+rd.dates.push([]);
+for(var col=0;col<rd.columnCount;col++){
+rd.dates[row].push(d);
+d=this.addAndFloor(d,"day",1);
+}
+}
+rd.startTime=this.newDate(rd.dates[0][0],rd);
+rd.endTime=this.newDate(rd.dates[rd.rowCount-1][rd.columnCount-1],rd);
+rd.endTime=rd.dateModule.add(rd.endTime,"day",1);
+rd.endTime=this.floorToDay(rd.endTime,true);
+if(this.displayedItemsInvalidated&&!this._isEditing){
+this.displayedItemsInvalidated=false;
+this._computeVisibleItems(rd);
+}else{
+if(this.renderData){
+rd.items=this.renderData.items;
+}
+}
+if(this.displayedDecorationItemsInvalidated){
+rd.decorationItems=this.decorationStoreManager._computeVisibleItems(rd);
+}else{
+if(this.renderData){
+rd.decorationItems=this.renderData.decorationItems;
+}
+}
+rd.rtl=!this.isLeftToRight();
+return rd;
+},_validateProperties:function(){
+this.inherited(arguments);
+if(this.columnCount<1||isNaN(this.columnCount)){
+this.columnCount=1;
+}
+if(this.rowCount<1||isNaN(this.rowCount)){
+this.rowCount=1;
+}
+if(isNaN(this.percentOverlap)||this.percentOverlap<0||this.percentOverlap>100){
+this.percentOverlap=0;
+}
+if(isNaN(this.verticalGap)||this.verticalGap<0){
+this.verticalGap=2;
+}
+if(isNaN(this.horizontalRendererHeight)||this.horizontalRendererHeight<1){
+this.horizontalRendererHeight=17;
+}
+if(isNaN(this.labelRendererHeight)||this.labelRendererHeight<1){
+this.labelRendererHeight=14;
+}
+if(isNaN(this.expandRendererHeight)||this.expandRendererHeight<1){
+this.expandRendererHeight=15;
+}
+},_setStartDateAttr:function(_12){
+this.displayedItemsInvalidated=true;
+this._set("startDate",_12);
+},_setColumnCountAttr:function(_13){
+this.displayedItemsInvalidated=true;
+this._set("columnCount",_13);
+},_setRowCountAttr:function(_14){
+this.displayedItemsInvalidated=true;
+this._set("rowCount",_14);
+},__fixEvt:function(e){
+e.sheet="primary";
+e.source=this;
+return e;
+},_formatRowHeaderLabel:function(d){
+if(this.rowHeaderDatePattern){
+return this.renderData.dateLocaleModule.format(d,{selector:"date",datePattern:this.rowHeaderDatePattern});
+}else{
+return this.getWeekNumberLabel(d);
+}
+},_formatColumnHeaderLabel:function(d){
+return this.renderData.dateLocaleModule.getNames("days",this.columnHeaderLabelLength?this.columnHeaderLabelLength:"wide","standAlone")[d.getDay()];
+},cellHeaderShortPattern:null,cellHeaderLongPattern:null,_formatGridCellLabel:function(d,row,col){
+var _15=row==0&&col==0||d.getDate()==1;
+var _16,rb;
+if(_15){
+if(this.cellHeaderLongPattern){
+_16=this.cellHeaderLongPattern;
+}else{
+rb=_d.getLocalization("dojo.cldr",this._calendar);
+_16=rb["dateFormatItem-MMMd"];
+}
+}else{
+if(this.cellHeaderShortPattern){
+_16=this.cellHeaderShortPattern;
+}else{
+rb=_d.getLocalization("dojo.cldr",this._calendar);
+_16=rb["dateFormatItem-d"];
+}
+}
+return this.renderData.dateLocaleModule.format(d,{selector:"date",datePattern:_16});
+},refreshRendering:function(){
+this.inherited(arguments);
+if(!this.domNode){
+return;
+}
+this._validateProperties();
+var _17=this.renderData;
+var rd=this.renderData=this._createRenderData();
+this._createRendering(rd,_17);
+this._layoutDecorationRenderers(rd);
+this._layoutRenderers(rd);
+},_createRendering:function(_18,_19){
+if(_18.rowHeight<=0){
+_18.columnCount=1;
+_18.rowCount=1;
+_18.invalidRowHeight=true;
+return;
+}
+if(_19){
+if(this.itemContainerTable){
+var _1a=_c(".dojoxCalendarItemContainerRow",this.itemContainerTable);
+_19.rowCount=_1a.length;
+}
+}
+this._buildColumnHeader(_18,_19);
+this._buildRowHeader(_18,_19);
+this._buildGrid(_18,_19);
+this._buildItemContainer(_18,_19);
+if(this.buttonContainer&&this.owner!=null&&this.owner.currentView==this){
+_9.set(this.buttonContainer,{"right":0,"left":0});
+}
+},_buildColumnHeader:function(_1b,_1c){
+var _1d=this.columnHeaderTable;
+if(!_1d){
+return;
+}
+var _1e=_1b.columnCount-(_1c?_1c.columnCount:0);
+if(_5("ie")==8){
+if(this._colTableSave==null){
+this._colTableSave=_4.clone(_1d);
+}else{
+if(_1e<0){
+this.columnHeader.removeChild(_1d);
+_b.destroy(_1d);
+_1d=_4.clone(this._colTableSave);
+this.columnHeaderTable=_1d;
+this.columnHeader.appendChild(_1d);
+_1e=_1b.columnCount;
+}
+}
+}
+var _1f=_c("tbody",_1d);
+var trs=_c("tr",_1d);
+var _20,tr,td;
+if(_1f.length==1){
+_20=_1f[0];
+}else{
+_20=_6.create("tbody",null,_1d);
+}
+if(trs.length==1){
+tr=trs[0];
+}else{
+tr=_b.create("tr",null,_20);
+}
+if(_1e>0){
+for(var i=0;i<_1e;i++){
+td=_b.create("td",null,tr);
+}
+}else{
+_1e=-_1e;
+for(var i=0;i<_1e;i++){
+tr.removeChild(tr.lastChild);
+}
+}
+_c("td",_1d).forEach(function(td,i){
+td.className="";
+var d=_1b.dates[0][i];
+this._setText(td,this._formatColumnHeaderLabel(d));
+if(i==0){
+_8.add(td,"first-child");
+}else{
+if(i==this.renderData.columnCount-1){
+_8.add(td,"last-child");
+}
+}
+this.styleColumnHeaderCell(td,d,_1b);
+},this);
+if(this.yearColumnHeaderContent){
+var d=_1b.dates[0][0];
+this._setText(this.yearColumnHeaderContent,_1b.dateLocaleModule.format(d,{selector:"date",datePattern:"yyyy"}));
+}
+},styleColumnHeaderCell:function(_21,_22,_23){
+_8.add(_21,this._cssDays[_22.getDay()]);
+if(this.isWeekEnd(_22)){
+_8.add(_21,"dojoxCalendarWeekend");
+}
+},_rowHeaderHandles:null,_cleanupRowHeader:function(){
+while(this._rowHeaderHandles.length>0){
+var _24=this._rowHeaderHandles.pop();
+while(_24.length>0){
+_24.pop().remove();
+}
+}
+},_rowHeaderClick:function(e){
+var _25=_c("td",this.rowHeaderTable).indexOf(e.currentTarget);
+this._onRowHeaderClick({index:_25,date:this.renderData.dates[_25][0],triggerEvent:e});
+},_buildRowHeader:function(_26,_27){
+var _28=this.rowHeaderTable;
+if(!_28){
+return;
+}
+var _29=_c("tbody",_28);
+var _2a,tr,td;
+if(_29.length==1){
+_2a=_29[0];
+}else{
+_2a=_b.create("tbody",null,_28);
+}
+var _2b=_26.rowCount-(_27?_27.rowCount:0);
+if(_2b>0){
+for(var i=0;i<_2b;i++){
+tr=_b.create("tr",null,_2a);
+td=_b.create("td",null,tr);
+var h=[];
+h.push(on(td,"click",_4.hitch(this,this._rowHeaderClick)));
+if(!_5("touch")){
+h.push(on(td,"mousedown",function(e){
+_8.add(e.currentTarget,"Active");
+}));
+h.push(on(td,"mouseup",function(e){
+_8.remove(e.currentTarget,"Active");
+}));
+h.push(on(td,"mouseover",function(e){
+_8.add(e.currentTarget,"Hover");
+}));
+h.push(on(td,"mouseout",function(e){
+_8.remove(e.currentTarget,"Hover");
+}));
+}
+this._rowHeaderHandles.push(h);
+}
+}else{
+_2b=-_2b;
+for(var i=0;i<_2b;i++){
+_2a.removeChild(_2a.lastChild);
+var _2c=this._rowHeaderHandles.pop();
+while(_2c.length>0){
+_2c.pop().remove();
+}
+}
+}
+_c("tr",_28).forEach(function(tr,i){
+_9.set(tr,"height",this._getRowHeight(i)+"px");
+var d=_26.dates[i][0];
+var td=_c("td",tr)[0];
+td.className="";
+if(i==0){
+_8.add(td,"first-child");
+}
+if(i==this.renderData.rowCount-1){
+_8.add(td,"last-child");
+}
+this.styleRowHeaderCell(td,d,_26);
+this._setText(td,this._formatRowHeaderLabel(d));
+},this);
+},styleRowHeaderCell:function(_2d,_2e,_2f){
+},_buildGrid:function(_30,_31){
+var _32=this.gridTable;
+if(!_32){
+return;
+}
+var _33=_c("tr",_32);
+var _34=_30.rowCount-_33.length;
+var _35=_34>0;
+var _36=_30.columnCount-(_33?_c("td",_33[0]).length:0);
+if(_5("ie")==8){
+if(this._gridTableSave==null){
+this._gridTableSave=_4.clone(_32);
+}else{
+if(_36<0){
+this.grid.removeChild(_32);
+_b.destroy(_32);
+_32=_4.clone(this._gridTableSave);
+this.gridTable=_32;
+this.grid.appendChild(_32);
+_36=_30.columnCount;
+_34=_30.rowCount;
+_35=true;
+}
+}
+}
+var _37=_c("tbody",_32);
+var _38;
+if(_37.length==1){
+_38=_37[0];
+}else{
+_38=_b.create("tbody",null,_32);
+}
+if(_35){
+for(var i=0;i<_34;i++){
+_b.create("tr",null,_38);
+}
+}else{
+_34=-_34;
+for(var i=0;i<_34;i++){
+_38.removeChild(_38.lastChild);
+}
+}
+var _39=_30.rowCount-_34;
+var _3a=_35||_36>0;
+_36=_3a?_36:-_36;
+_c("tr",_32).forEach(function(tr,i){
+if(_3a){
+var len=i>=_39?_30.columnCount:_36;
+for(var i=0;i<len;i++){
+var td=_b.create("td",null,tr);
+_b.create("span",null,td);
+}
+}else{
+for(var i=0;i<_36;i++){
+tr.removeChild(tr.lastChild);
+}
+}
+});
+_c("tr",_32).forEach(function(tr,row){
+_9.set(tr,"height",this._getRowHeight(row)+"px");
+tr.className="";
+if(row==0){
+_8.add(tr,"first-child");
+}
+if(row==_30.rowCount-1){
+_8.add(tr,"last-child");
+}
+_c("td",tr).forEach(function(td,col){
+td.className="";
+if(col==0){
+_8.add(td,"first-child");
+}
+if(col==_30.columnCount-1){
+_8.add(td,"last-child");
+}
+var d=_30.dates[row][col];
+var _3b=_c("span",td)[0];
+this._setText(_3b,this.showCellLabel?this._formatGridCellLabel(d,row,col):null);
+this.styleGridCell(td,d,_30);
+},this);
+},this);
+},styleGridCellFunc:null,defaultStyleGridCell:function(_3c,_3d,_3e){
+_8.add(_3c,this._cssDays[_3d.getDay()]);
+var cal=this.dateModule;
+if(this.isToday(_3d)){
+_8.add(_3c,"dojoxCalendarToday");
+}else{
+if(this.refStartTime!=null&&this.refEndTime!=null&&(cal.compare(_3d,this.refEndTime)>=0||cal.compare(cal.add(_3d,"day",1),this.refStartTime)<=0)){
+_8.add(_3c,"dojoxCalendarDayDisabled");
+}else{
+if(this.isWeekEnd(_3d)){
+_8.add(_3c,"dojoxCalendarWeekend");
+}
+}
+}
+},styleGridCell:function(_3f,_40,_41){
+if(this.styleGridCellFunc){
+this.styleGridCellFunc(_3f,_40,_41);
+}else{
+this.defaultStyleGridCell(_3f,_40,_41);
+}
+},_buildItemContainer:function(_42,_43){
+var _44=this.itemContainerTable;
+if(!_44){
+return;
+}
+var _45=[];
+var _46=_42.rowCount-(_43?_43.rowCount:0);
+if(_5("ie")==8){
+if(this._itemTableSave==null){
+this._itemTableSave=_4.clone(_44);
+}else{
+if(_46<0){
+this.itemContainer.removeChild(_44);
+this._recycleItemRenderers(true);
+this._recycleExpandRenderers(true);
+_b.destroy(_44);
+_44=_4.clone(this._itemTableSave);
+this.itemContainerTable=_44;
+this.itemContainer.appendChild(_44);
+_46=_42.columnCount;
+}
+}
+}
+var _47=_c("tbody",_44);
+var _48,tr,td,div;
+if(_47.length==1){
+_48=_47[0];
+}else{
+_48=_b.create("tbody",null,_44);
+}
+if(_46>0){
+for(var i=0;i<_46;i++){
+tr=_b.create("tr",null,_48);
+_8.add(tr,"dojoxCalendarItemContainerRow");
+td=_b.create("td",null,tr);
+div=_b.create("div",null,td);
+_8.add(div,"dojoxCalendarContainerRow");
+}
+}else{
+_46=-_46;
+for(var i=0;i<_46;i++){
+_48.removeChild(_48.lastChild);
+}
+}
+_c(".dojoxCalendarItemContainerRow",_44).forEach(function(tr,i){
+_9.set(tr,"height",this._getRowHeight(i)+"px");
+_45.push(tr.childNodes[0].childNodes[0]);
+},this);
+_42.cells=_45;
+},resize:function(_49){
+this.inherited(arguments);
+this._resizeHandler(null,false);
+},_resizeHandler:function(e,_4a){
+var rd=this.renderData;
+if(rd==null){
+this.refreshRendering();
+return;
+}
+if(rd.sheetHeight!=this.itemContainer.offsetHeight){
+rd.sheetHeight=this.itemContainer.offsetHeight;
+var _4b=this.getExpandedRowIndex();
+if(_4b==-1){
+this._computeRowsHeight();
+this._resizeRows();
+}else{
+this.expandRow(rd.expandedRow,rd.expandedRowCol,0,null,true);
+}
+if(rd.invalidRowHeight){
+delete rd.invalidRowHeight;
+this.renderData=null;
+this.displayedItemsInvalidated=true;
+this.refreshRendering();
+return;
+}
+}
+if(this.layoutDuringResize||_4a){
+setTimeout(_4.hitch(this,function(){
+this._layoutRenderers(this.renderData);
+this._layoutDecorationRenderers(this.renderData);
+}),20);
+}else{
+_9.set(this.itemContainer,"opacity",0);
+this._recycleItemRenderers();
+this._recycleExpandRenderers();
+if(this._resizeTimer!=undefined){
+clearTimeout(this._resizeTimer);
+}
+this._resizeTimer=setTimeout(_4.hitch(this,function(){
+delete this._resizeTimer;
+this._resizeRowsImpl(this.itemContainer,"tr");
+this._layoutRenderers(this.renderData);
+this._layoutDecorationRenderers(this.renderData);
+if(this.resizeAnimationDuration==0){
+_9.set(this.itemContainer,"opacity",1);
+}else{
+fx.fadeIn({node:this.itemContainer,curve:[0,1]}).play(this.resizeAnimationDuration);
+}
+}),200);
+}
+},resizeAnimationDuration:0,getExpandedRowIndex:function(){
+return this.renderData.expandedRow==null?-1:this.renderData.expandedRow;
+},collapseRow:function(_4c,_4d,_4e){
+var rd=this.renderData;
+if(_4e==undefined){
+_4e=true;
+}
+if(_4c==undefined){
+_4c=this.expandDuration;
+}
+if(rd&&rd.expandedRow!=null&&rd.expandedRow!=-1){
+if(_4e&&_4c){
+var _4f=rd.expandedRow;
+var _50=rd.expandedRowHeight;
+delete rd.expandedRow;
+this._computeRowsHeight(rd);
+var _51=this._getRowHeight(_4f);
+rd.expandedRow=_4f;
+this._recycleExpandRenderers();
+this._recycleItemRenderers();
+_9.set(this.itemContainer,"display","none");
+this._expandAnimation=new fx.Animation({curve:[_50,_51],duration:_4c,easing:_4d,onAnimate:_4.hitch(this,function(_52){
+this._expandRowImpl(Math.floor(_52));
+}),onEnd:_4.hitch(this,function(_53){
+this._expandAnimation=null;
+this._collapseRowImpl(false);
+this._resizeRows();
+_9.set(this.itemContainer,"display","block");
+setTimeout(_4.hitch(this,function(){
+this._layoutRenderers(rd);
+}),100);
+this.onExpandAnimationEnd(false);
+})});
+this._expandAnimation.play();
+}else{
+this._collapseRowImpl(_4e);
+}
+}
+},_collapseRowImpl:function(_54){
+var rd=this.renderData;
+delete rd.expandedRow;
+delete rd.expandedRowHeight;
+this._computeRowsHeight(rd);
+if(_54==undefined||_54){
+this._resizeRows();
+this._layoutRenderers(rd);
+}
+},expandRow:function(_55,_56,_57,_58,_59){
+var rd=this.renderData;
+if(!rd||_55<0||_55>=rd.rowCount){
+return -1;
+}
+if(_56==undefined||_56<0||_56>=rd.columnCount){
+_56=-1;
+}
+if(_59==undefined){
+_59=true;
+}
+if(_57==undefined){
+_57=this.expandDuration;
+}
+if(_58==undefined){
+_58=this.expandEasing;
+}
+var _5a=this._getRowHeight(_55);
+var _5b=rd.sheetHeight-Math.ceil(this.cellPaddingTop*(rd.rowCount-1));
+rd.expandedRow=_55;
+rd.expandedRowCol=_56;
+rd.expandedRowHeight=_5b;
+if(_59){
+if(_57){
+this._recycleExpandRenderers();
+this._recycleItemRenderers();
+_9.set(this.itemContainer,"display","none");
+this._expandAnimation=new fx.Animation({curve:[_5a,_5b],duration:_57,delay:50,easing:_58,onAnimate:_4.hitch(this,function(_5c){
+this._expandRowImpl(Math.floor(_5c));
+}),onEnd:_4.hitch(this,function(){
+this._expandAnimation=null;
+_9.set(this.itemContainer,"display","block");
+setTimeout(_4.hitch(this,function(){
+this._expandRowImpl(_5b,true);
+}),100);
+this.onExpandAnimationEnd(true);
+})});
+this._expandAnimation.play();
+}else{
+this._expandRowImpl(_5b,true);
+}
+}
+},_expandRowImpl:function(_5d,_5e){
+var rd=this.renderData;
+rd.expandedRowHeight=_5d;
+this._computeRowsHeight(rd,rd.sheetHeight-_5d);
+this._resizeRows();
+if(_5e){
+this._layoutRenderers(rd);
+}
+},onExpandAnimationEnd:function(_5f){
+},_resizeRows:function(){
+if(this._getRowHeight(0)<=0){
+return;
+}
+if(this.rowHeaderTable){
+this._resizeRowsImpl(this.rowHeaderTable,"tr");
+}
+if(this.gridTable){
+this._resizeRowsImpl(this.gridTable,"tr");
+}
+if(this.itemContainerTable){
+this._resizeRowsImpl(this.itemContainerTable,"tr");
+}
+},_computeRowsHeight:function(_60,max){
+var rd=_60==null?this.renderData:_60;
+max=max||rd.sheetHeight;
+max--;
+if(_5("ie")==7){
+max-=rd.rowCount;
+}
+if(rd.rowCount==1){
+rd.rowHeight=max;
+rd.rowHeightFirst=max;
+rd.rowHeightLast=max;
+return;
+}
+var _61=rd.expandedRow==null?rd.rowCount:rd.rowCount-1;
+var rhx=max/_61;
+var rhf,rhl,rh;
+var _62=max-(Math.floor(rhx)*_61);
+var _63=Math.abs(max-(Math.ceil(rhx)*_61));
+var _64;
+var _65=1;
+if(_62<_63){
+rh=Math.floor(rhx);
+_64=_62;
+}else{
+_65=-1;
+rh=Math.ceil(rhx);
+_64=_63;
+}
+rhf=rh+_65*Math.floor(_64/2);
+rhl=rhf+_65*(_64%2);
+rd.rowHeight=rh;
+rd.rowHeightFirst=rhf;
+rd.rowHeightLast=rhl;
+},_getRowHeight:function(_66){
+var rd=this.renderData;
+if(_66==rd.expandedRow){
+return rd.expandedRowHeight;
+}else{
+if(rd.expandedRow==0&&_66==1||_66==0){
+return rd.rowHeightFirst;
+}else{
+if(rd.expandedRow==this.renderData.rowCount-1&&_66==this.renderData.rowCount-2||_66==this.renderData.rowCount-1){
+return rd.rowHeightLast;
+}else{
+return rd.rowHeight;
+}
+}
+}
+},_resizeRowsImpl:function(_67,_68){
+dojo.query(_68,_67).forEach(function(tr,i){
+_9.set(tr,"height",this._getRowHeight(i)+"px");
+},this);
+},_setHorizontalRendererAttr:function(_69){
+this._destroyRenderersByKind("horizontal");
+this._set("horizontalRenderer",_69);
+},_setLabelRendererAttr:function(_6a){
+this._destroyRenderersByKind("label");
+this._set("labelRenderer",_6a);
+},_destroyExpandRenderer:function(_6b){
+if(_6b["destroyRecursive"]){
+_6b.destroyRecursive();
+}
+_6.destroy(_6b.domNode);
+},_setExpandRendererAttr:function(_6c){
+while(this._ddRendererList.length>0){
+this._destroyExpandRenderer(this._ddRendererList.pop());
+}
+var _6d=this._ddRendererPool;
+if(_6d){
+while(_6d.length>0){
+this._destroyExpandRenderer(_6d.pop());
+}
+}
+this._set("expandRenderer",_6c);
+},_ddRendererList:null,_ddRendererPool:null,_getExpandRenderer:function(_6e,_6f,_70,_71,_72){
+if(this.expandRenderer==null){
+return null;
+}
+var ir=this._ddRendererPool.pop();
+if(ir==null){
+ir=new this.expandRenderer();
+}
+this._ddRendererList.push(ir);
+ir.set("owner",this);
+ir.set("date",_6e);
+ir.set("items",_6f);
+ir.set("rowIndex",_70);
+ir.set("columnIndex",_71);
+ir.set("expanded",_72);
+return ir;
+},_recycleExpandRenderers:function(_73){
+for(var i=0;i<this._ddRendererList.length;i++){
+var ir=this._ddRendererList[i];
+ir.set("Up",false);
+ir.set("Down",false);
+if(_73){
+ir.domNode.parentNode.removeChild(ir.domNode);
+}
+_9.set(ir.domNode,"display","none");
+}
+this._ddRendererPool=this._ddRendererPool.concat(this._ddRendererList);
+this._ddRendererList=[];
+},_defaultItemToRendererKindFunc:function(_74){
+var dur=Math.abs(this.renderData.dateModule.difference(_74.startTime,_74.endTime,"minute"));
+return dur>=1440?"horizontal":"label";
+},naturalRowsHeight:null,_roundItemToDay:function(_75){
+var s=_75.startTime,e=_75.endTime;
+if(!this.isStartOfDay(s)){
+s=this.floorToDay(s,false,this.renderData);
+}
+if(!this.isStartOfDay(e)){
+e=this.renderData.dateModule.add(e,"day",1);
+e=this.floorToDay(e,true);
+}
+return {startTime:s,endTime:e};
+},_sortItemsFunction:function(a,b){
+if(this.roundToDay){
+a=this._roundItemToDay(a);
+b=this._roundItemToDay(b);
+}
+var res=this.dateModule.compare(a.startTime,b.startTime);
+if(res==0){
+res=-1*this.dateModule.compare(a.endTime,b.endTime);
+}
+return res;
+},_overlapLayoutPass3:function(_76){
+var pos=0,_77=0;
+var res=[];
+var _78=_a.position(this.gridTable).x;
+for(var col=0;col<this.renderData.columnCount;col++){
+var _79=false;
+var _7a=_a.position(this._getCellAt(0,col));
+pos=_7a.x-_78;
+_77=pos+_7a.w;
+for(var _7b=_76.length-1;_7b>=0&&!_79;_7b--){
+for(var i=0;i<_76[_7b].length;i++){
+var _7c=_76[_7b][i];
+_79=_7c.start<_77&&pos<_7c.end;
+if(_79){
+res[col]=_7b+1;
+break;
+}
+}
+}
+if(!_79){
+res[col]=0;
+}
+}
+return res;
+},applyRendererZIndex:function(_7d,_7e,_7f,_80,_81,_82){
+_9.set(_7e.container,{"zIndex":_81||_80?_7e.renderer.mobile?100:0:_7d.lane==undefined?1:_7d.lane+1});
+},_layoutDecorationRenderers:function(_83){
+if(_83==null||_83.decorationItems==null||_83.rowHeight<=0){
+return;
+}
+if(!this.gridTable||this._expandAnimation!=null||this.horizontalDecorationRenderer==null){
+this.decorationRendererManager.recycleItemRenderers();
+return;
+}
+this._layoutStep=_83.columnCount;
+this.renderData.gridTablePosX=_a.position(this.gridTable).x;
+this.inherited(arguments);
+},_layoutRenderers:function(_84){
+if(_84==null||_84.items==null||_84.rowHeight<=0){
+return;
+}
+if(!this.gridTable||this._expandAnimation!=null||(this.horizontalRenderer==null&&this.labelRenderer==null)){
+this._recycleItemRenderers();
+return;
+}
+this.renderData.gridTablePosX=_a.position(this.gridTable).x;
+this._layoutStep=_84.columnCount;
+this._recycleExpandRenderers();
+this._hiddenItems=[];
+this._offsets=[];
+this.naturalRowsHeight=[];
+this.inherited(arguments);
+},_offsets:null,_layoutInterval:function(_85,_86,_87,end,_88,_89){
+if(this.renderData.cells==null){
+return;
+}
+if(_89==="dataItems"){
+var _8a=[];
+var _8b=[];
+for(var i=0;i<_88.length;i++){
+var _8c=_88[i];
+var _8d=this._itemToRendererKind(_8c);
+if(_8d=="horizontal"){
+_8a.push(_8c);
+}else{
+if(_8d=="label"){
+_8b.push(_8c);
+}
+}
+}
+var _8e=this.getExpandedRowIndex();
+if(_8e!=-1&&_8e!=_86){
+return;
+}
+var _8f;
+var _90=[];
+var _91=null;
+var _92=[];
+if(_8a.length>0&&this.horizontalRenderer){
+var _91=this._createHorizontalLayoutItems(_86,_87,end,_8a,_89);
+var _93=this._computeHorizontalOverlapLayout(_91,_92);
+}
+var _94;
+var _95=[];
+if(_8b.length>0&&this.labelRenderer){
+_94=this._createLabelLayoutItems(_86,_87,end,_8b);
+this._computeLabelOffsets(_94,_95);
+}
+var _96=this._computeColHasHiddenItems(_86,_92,_95);
+if(_91!=null){
+this._layoutHorizontalItemsImpl(_86,_91,_93,_96,_90,_89);
+}
+if(_94!=null){
+this._layoutLabelItemsImpl(_86,_94,_96,_90,_92,_89);
+}
+this._layoutExpandRenderers(_86,_96,_90);
+this._hiddenItems[_86]=_90;
+}else{
+if(this.horizontalDecorationRenderer){
+var _91=this._createHorizontalLayoutItems(_86,_87,end,_88,_89);
+if(_91!=null){
+this._layoutHorizontalItemsImpl(_86,_91,null,false,null,_89);
+}
+}
+}
+},_createHorizontalLayoutItems:function(_97,_98,_99,_9a,_9b){
+var rd=this.renderData;
+var cal=rd.dateModule;
+var _9c=rd.rtl?-1:1;
+var _9d=[];
+var _9e=_9b==="decorationItems";
+for(var i=0;i<_9a.length;i++){
+var _9f=_9a[i];
+var _a0=this.computeRangeOverlap(rd,_9f.startTime,_9f.endTime,_98,_99);
+var _a1=cal.difference(_98,this.floorToDay(_a0[0],false,rd),"day");
+var _a2=rd.dates[_97][_a1];
+var _a3=_a.position(this._getCellAt(_97,_a1,false));
+var _a4=_a3.x-rd.gridTablePosX;
+if(rd.rtl){
+_a4+=_a3.w;
+}
+if(_9e&&!_9f.isAllDay||!_9e&&!this.roundToDay&&!_9f.allDay){
+_a4+=_9c*this.computeProjectionOnDate(rd,_a2,_a0[0],_a3.w);
+}
+_a4=Math.ceil(_a4);
+var _a5=cal.difference(_98,this.floorToDay(_a0[1],false,rd),"day");
+var end;
+if(_a5>rd.columnCount-1){
+_a3=_a.position(this._getCellAt(_97,rd.columnCount-1,false));
+if(rd.rtl){
+end=_a3.x-rd.gridTablePosX;
+}else{
+end=_a3.x-rd.gridTablePosX+_a3.w;
+}
+}else{
+_a2=rd.dates[_97][_a5];
+_a3=_a.position(this._getCellAt(_97,_a5,false));
+end=_a3.x-rd.gridTablePosX;
+if(rd.rtl){
+end+=_a3.w;
+}
+if(!_9e&&this.roundToDay){
+if(!this.isStartOfDay(_a0[1])){
+end+=_9c*_a3.w;
+}
+}else{
+end+=_9c*this.computeProjectionOnDate(rd,_a2,_a0[1],_a3.w);
+}
+}
+end=Math.floor(end);
+if(rd.rtl){
+var t=end;
+end=_a4;
+_a4=t;
+}
+if(end>_a4){
+var _a6=_4.mixin({start:_a4,end:end,range:_a0,item:_9f,startOffset:_a1,endOffset:_a5},_9f);
+_9d.push(_a6);
+}
+}
+return _9d;
+},_computeHorizontalOverlapLayout:function(_a7,_a8){
+var rd=this.renderData;
+var _a9=this.horizontalRendererHeight;
+var _aa=this.computeOverlapping(_a7,this._overlapLayoutPass3);
+var _ab=this.percentOverlap/100;
+for(var i=0;i<rd.columnCount;i++){
+var _ac=_aa.addedPassRes[i];
+var _ad=rd.rtl?rd.columnCount-i-1:i;
+if(_ab==0){
+_a8[_ad]=_ac==0?0:_ac==1?_a9:_a9+(_ac-1)*(_a9+this.verticalGap);
+}else{
+_a8[_ad]=_ac==0?0:_ac*_a9-(_ac-1)*(_ab*_a9)+this.verticalGap;
+}
+_a8[_ad]+=this.cellPaddingTop;
+}
+return _aa;
+},_createLabelLayoutItems:function(_ae,_af,_b0,_b1){
+if(this.labelRenderer==null){
+return;
+}
+var d;
+var rd=this.renderData;
+var cal=rd.dateModule;
+var _b2=[];
+for(var i=0;i<_b1.length;i++){
+var _b3=_b1[i];
+d=this.floorToDay(_b3.startTime,false,rd);
+var _b4=this.dateModule.compare;
+while(_b4(d,_b3.endTime)==-1&&_b4(d,_b0)==-1){
+var _b5=cal.add(d,"day",1);
+_b5=this.floorToDay(_b5,true);
+var _b6=this.computeRangeOverlap(rd,_b3.startTime,_b3.endTime,d,_b5);
+var _b7=cal.difference(_af,this.floorToDay(_b6[0],false,rd),"day");
+if(_b7>=this.columnCount){
+break;
+}
+if(_b7>=0){
+var _b8=_b2[_b7];
+if(_b8==null){
+_b8=[];
+_b2[_b7]=_b8;
+}
+_b8.push(_4.mixin({startOffset:_b7,range:_b6,item:_b3},_b3));
+}
+d=cal.add(d,"day",1);
+this.floorToDay(d,true);
+}
+}
+return _b2;
+},_computeLabelOffsets:function(_b9,_ba){
+for(var i=0;i<this.renderData.columnCount;i++){
+_ba[i]=_b9[i]==null?0:_b9[i].length*(this.labelRendererHeight+this.verticalGap);
+}
+},_computeColHasHiddenItems:function(_bb,_bc,_bd){
+var res=[];
+var _be=this._getRowHeight(_bb);
+var h;
+var _bf=0;
+for(var i=0;i<this.renderData.columnCount;i++){
+h=_bc==null||_bc[i]==null?this.cellPaddingTop:_bc[i];
+h+=_bd==null||_bd[i]==null?0:_bd[i];
+if(h>_bf){
+_bf=h;
+}
+res[i]=h>_be;
+}
+this.naturalRowsHeight[_bb]=_bf;
+return res;
+},_layoutHorizontalItemsImpl:function(_c0,_c1,_c2,_c3,_c4,_c5){
+var rd=this.renderData;
+var _c6=rd.cells[_c0];
+var _c7=this._getRowHeight(_c0);
+var _c8=this.horizontalRendererHeight;
+var _c9=this.percentOverlap/100;
+for(var i=0;i<_c1.length;i++){
+var _ca=_c1[i];
+var _cb=_ca.lane;
+if(_c5==="dataItems"){
+var _cc=this.cellPaddingTop;
+if(_c9==0){
+_cc+=_cb*(_c8+this.verticalGap);
+}else{
+_cc+=_cb*(_c8-_c9*_c8);
+}
+var exp=false;
+var _cd=_c7;
+if(this.expandRenderer){
+for(var off=_ca.startOffset;off<=_ca.endOffset;off++){
+if(_c3[off]){
+exp=true;
+break;
+}
+}
+_cd=exp?_c7-this.expandRendererHeight:_c7;
+}
+if(_cc+_c8<=_cd){
+var ir=this._createRenderer(_ca,"horizontal",this.horizontalRenderer,"dojoxCalendarHorizontal");
+var _ce=this.isItemBeingEdited(_ca)&&!this.liveLayout&&this._isEditing;
+var h=_ce?_c7-this.cellPaddingTop:_c8;
+var w=_ca.end-_ca.start;
+if(_5("ie")>=9&&_ca.start+w<this.itemContainer.offsetWidth){
+w++;
+}
+_9.set(ir.container,{"top":(_ce?this.cellPaddingTop:_cc)+"px","left":_ca.start+"px","width":w+"px","height":h+"px"});
+this._applyRendererLayout(_ca,ir,_c6,w,h,"horizontal");
+}else{
+for(var d=_ca.startOffset;d<_ca.endOffset;d++){
+if(_c4[d]==null){
+_c4[d]=[_ca.item];
+}else{
+_c4[d].push(_ca.item);
+}
+}
+}
+}else{
+var ir=this.decorationRendererManager.createRenderer(_ca,"horizontal",this.horizontalDecorationRenderer,"dojoxCalendarDecoration");
+var h=_c7;
+var w=_ca.end-_ca.start;
+if(_5("ie")>=9&&_ca.start+w<this.itemContainer.offsetWidth){
+w++;
+}
+_9.set(ir.container,{"top":"0","left":_ca.start+"px","width":w+"px","height":h+"px"});
+_b.place(ir.container,_c6);
+_9.set(ir.container,"display","block");
+}
+}
+},_layoutLabelItemsImpl:function(_cf,_d0,_d1,_d2,_d3){
+var _d4,_d5;
+var rd=this.renderData;
+var _d6=rd.cells[_cf];
+var _d7=this._getRowHeight(_cf);
+var _d8=this.labelRendererHeight;
+var _d9=_a.getMarginBox(this.itemContainer).w;
+for(var i=0;i<_d0.length;i++){
+_d4=_d0[i];
+if(_d4!=null){
+_d4.sort(_4.hitch(this,function(a,b){
+return this.dateModule.compare(a.range[0],b.range[0]);
+}));
+var _da=this.expandRenderer?(_d1[i]?_d7-this.expandRendererHeight:_d7):_d7;
+_d5=_d3==null||_d3[i]==null?this.cellPaddingTop:_d3[i]+this.verticalGap;
+var _db=_a.position(this._getCellAt(_cf,i));
+var _dc=_db.x-rd.gridTablePosX;
+for(var j=0;j<_d4.length;j++){
+if(_d5+_d8+this.verticalGap<=_da){
+var _dd=_d4[j];
+_4.mixin(_dd,{start:_dc,end:_dc+_db.w});
+var ir=this._createRenderer(_dd,"label",this.labelRenderer,"dojoxCalendarLabel");
+var _de=this.isItemBeingEdited(_dd)&&!this.liveLayout&&this._isEditing;
+var h=_de?this._getRowHeight(_cf)-this.cellPaddingTop:_d8;
+if(rd.rtl){
+_dd.start=_d9-_dd.end;
+_dd.end=_dd.start+_db.w;
+}
+_9.set(ir.container,{"top":(_de?this.cellPaddingTop:_d5)+"px","left":_dd.start+"px","width":_db.w+"px","height":h+"px"});
+this._applyRendererLayout(_dd,ir,_d6,_db.w,h,"label");
+}else{
+break;
+}
+_d5+=_d8+this.verticalGap;
+}
+for(var j;j<_d4.length;j++){
+if(_d2[i]==null){
+_d2[i]=[_d4[j]];
+}else{
+_d2[i].push(_d4[j]);
+}
+}
+}
+}
+},_applyRendererLayout:function(_df,ir,_e0,w,h,_e1){
+var _e2=this.isItemBeingEdited(_df);
+var _e3=this.isItemSelected(_df);
+var _e4=this.isItemHovered(_df);
+var _e5=this.isItemFocused(_df);
+var _e6=ir.renderer;
+_e6.set("hovered",_e4);
+_e6.set("selected",_e3);
+_e6.set("edited",_e2);
+_e6.set("focused",this.showFocus?_e5:false);
+_e6.set("moveEnabled",this.isItemMoveEnabled(_df._item,_e1));
+_e6.set("storeState",this.getItemStoreState(_df));
+if(_e1!="label"){
+_e6.set("resizeEnabled",this.isItemResizeEnabled(_df,_e1));
+}
+this.applyRendererZIndex(_df,ir,_e4,_e3,_e2,_e5);
+if(_e6.updateRendering){
+_e6.updateRendering(w,h);
+}
+_b.place(ir.container,_e0);
+_9.set(ir.container,"display","block");
+},_getCellAt:function(_e7,_e8,rtl){
+if((rtl==undefined||rtl==true)&&!this.isLeftToRight()){
+_e8=this.renderData.columnCount-1-_e8;
+}
+return this.gridTable.childNodes[0].childNodes[_e7].childNodes[_e8];
+},_layoutExpandRenderers:function(_e9,_ea,_eb){
+if(!this.expandRenderer){
+return;
+}
+var rd=this.renderData;
+if(rd.expandedRow==_e9){
+if(rd.expandedRowCol!=null&&rd.expandedRowCol!=-1){
+this._layoutExpandRendererImpl(rd.expandedRow,rd.expandedRowCol,null,true);
+}
+}else{
+if(rd.expandedRow==null){
+for(var i=0;i<rd.columnCount;i++){
+if(_ea[i]){
+this._layoutExpandRendererImpl(_e9,rd.rtl?rd.columnCount-1-i:i,_eb[i],false);
+}
+}
+}
+}
+},_layoutExpandRendererImpl:function(_ec,_ed,_ee,_ef){
+var rd=this.renderData;
+var d=_4.clone(rd.dates[_ec][_ed]);
+var ir=null;
+var _f0=rd.cells[_ec];
+ir=this._getExpandRenderer(d,_ee,_ec,_ed,_ef);
+var dim=_a.position(this._getCellAt(_ec,_ed));
+dim.x-=rd.gridTablePosX;
+this.layoutExpandRenderer(ir,d,_ee,dim,this.expandRendererHeight);
+_b.place(ir.domNode,_f0);
+_9.set(ir.domNode,"display","block");
+},layoutExpandRenderer:function(_f1,_f2,_f3,_f4,_f5){
+_9.set(_f1.domNode,{"left":_f4.x+"px","width":_f4.w+"px","height":_f5+"px","top":(_f4.h-_f5-1)+"px"});
+},_onItemEditBeginGesture:function(e){
+var p=this._edProps;
+var _f6=p.editedItem;
+var _f7=e.dates;
+var _f8=this.newDate(p.editKind=="resizeEnd"?_f6.endTime:_f6.startTime);
+if(p.rendererKind=="label"){
+}else{
+if(e.editKind=="move"&&(_f6.allDay||this.roundToDay)){
+var cal=this.renderData.dateModule;
+p.dayOffset=cal.difference(this.floorToDay(_f7[0],false,this.renderData),_f8,"day");
+}
+}
+this.inherited(arguments);
+},_computeItemEditingTimes:function(_f9,_fa,_fb,_fc,_fd){
+var cal=this.renderData.dateModule;
+var p=this._edProps;
+if(_fb=="label"){
+}else{
+if(_f9.allDay||this.roundToDay){
+var _fe=this.isStartOfDay(_fc[0]);
+switch(_fa){
+case "resizeEnd":
+if(!_fe&&_f9.allDay){
+_fc[0]=cal.add(_fc[0],"day",1);
+}
+case "resizeStart":
+if(!_fe){
+_fc[0]=this.floorToDay(_fc[0],true);
+}
+break;
+case "move":
+_fc[0]=cal.add(_fc[0],"day",p.dayOffset);
+break;
+case "resizeBoth":
+if(!_fe){
+_fc[0]=this.floorToDay(_fc[0],true);
+}
+if(!this.isStartOfDay(_fc[1])){
+_fc[1]=this.floorToDay(cal.add(_fc[1],"day",1),true);
+}
+break;
+}
+}else{
+_fc=this.inherited(arguments);
+}
+}
+return _fc;
+},getTime:function(e,x,y,_ff){
+var rd=this.renderData;
+if(e!=null){
+var _100=_a.position(this.itemContainer,true);
+if(e.touches){
+_ff=_ff==undefined?0:_ff;
+x=e.touches[_ff].pageX-_100.x;
+y=e.touches[_ff].pageY-_100.y;
+}else{
+x=e.pageX-_100.x;
+y=e.pageY-_100.y;
+}
+}
+var r=_a.getContentBox(this.itemContainer);
+if(x<0){
+x=0;
+}else{
+if(x>r.w){
+x=r.w-1;
+}
+}
+if(y<0){
+y=0;
+}else{
+if(y>r.h){
+y=r.h-1;
+}
+}
+var w=_a.getMarginBox(this.itemContainer).w;
+var colW=w/rd.columnCount;
+var row;
+if(rd.expandedRow==null){
+row=Math.floor(y/(_a.getMarginBox(this.itemContainer).h/rd.rowCount));
+}else{
+row=rd.expandedRow;
+}
+var r=_a.getContentBox(this.itemContainer);
+if(rd.rtl){
+x=r.w-x;
+}
+var col=Math.floor(x/colW);
+var tm=Math.floor((x-(col*colW))*1440/colW);
+var date=null;
+if(row<rd.dates.length&&col<this.renderData.dates[row].length){
+date=this.newDate(this.renderData.dates[row][col]);
+date=this.renderData.dateModule.add(date,"minute",tm);
+}
+return date;
+},_onGridMouseUp:function(e){
+this.inherited(arguments);
+if(this._gridMouseDown){
+this._gridMouseDown=false;
+this._onGridClick({date:this.getTime(e),triggerEvent:e});
+}
+},_onGridTouchEnd:function(e){
+this.inherited(arguments);
+var g=this._gridProps;
+if(g){
+if(!this._isEditing){
+if(!g.fromItem&&!g.editingOnStart){
+this.selectFromEvent(e,null,null,true);
+}
+if(!g.fromItem){
+if(this._pendingDoubleTap&&this._pendingDoubleTap.grid){
+this._onGridDoubleClick({date:this.getTime(this._gridProps.event),triggerEvent:this._gridProps.event});
+clearTimeout(this._pendingDoubleTap.timer);
+delete this._pendingDoubleTap;
+}else{
+this._onGridClick({date:this.getTime(this._gridProps.event),triggerEvent:this._gridProps.event});
+this._pendingDoubleTap={grid:true,timer:setTimeout(_4.hitch(this,function(){
+delete this._pendingDoubleTap;
+}),this.doubleTapDelay)};
+}
+}
+}
+this._gridProps=null;
+}
+},_onRowHeaderClick:function(e){
+this._dispatchCalendarEvt(e,"onRowHeaderClick");
+},onRowHeaderClick:function(e){
+},expandRendererClickHandler:function(e,_101){
+_3.stop(e);
+var ri=_101.get("rowIndex");
+var ci=_101.get("columnIndex");
+this._onExpandRendererClick(_4.mixin(this._createItemEditEvent(),{rowIndex:ri,columnIndex:ci,renderer:_101,triggerEvent:e,date:this.renderData.dates[ri][ci]}));
+},onExpandRendererClick:function(e){
+},_onExpandRendererClick:function(e){
+this._dispatchCalendarEvt(e,"onExpandRendererClick");
+if(!e.isDefaultPrevented()){
+if(this.getExpandedRowIndex()!=-1){
+this.collapseRow();
+}else{
+this.expandRow(e.rowIndex,e.columnIndex);
+}
+}
+},snapUnit:"minute",snapSteps:15,minDurationUnit:"minute",minDurationSteps:15,triggerExtent:3,liveLayout:false,stayInView:true,allowStartEndSwap:true,allowResizeLessThan24H:false});
+});

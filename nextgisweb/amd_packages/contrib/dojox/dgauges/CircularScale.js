@@ -1,9 +1,154 @@
 //>>built
-define("dojox/dgauges/CircularScale",["dojo/_base/declare","dojox/gfx","./ScaleBase","./_circularUtils"],function(t,q,u,d){return t("dojox.dgauges.CircularScale",u,{originX:50,originY:50,radius:50,startAngle:0,endAngle:180,orientation:"clockwise",constructor:function(){this.labelPosition="inside";this.addInvalidatingProperties("originX originY radius startAngle endAngle orientation".split(" "))},_getOrientationNum:function(){return"cclockwise"==this.orientation?-1:1},positionForValue:function(a){var b=
-d.computeTotalAngle(this.startAngle,this.endAngle,this.orientation);a=this.scaler.positionForValue(a);return d.modAngle(this.startAngle+this._getOrientationNum()*b*a,360)},_positionForTickItem:function(a){var b=d.computeTotalAngle(this.startAngle,this.endAngle,this.orientation);return d.modAngle(this.startAngle+this._getOrientationNum()*b*a.position,360)},valueForPosition:function(a){if(this.positionInRange(a))var b=d.modAngle(this._getOrientationNum()*(a-this.startAngle),360),e=d.computeTotalAngle(this.startAngle,
-this.endAngle,this.orientation),b=b/e;else b=d.modAngle(this.startAngle-a,360),e=360-b,a=d.modAngle(this.endAngle-a,360),b=Math.min(b,e)<Math.min(a,360-a)?0:1;return this.scaler.valueForPosition(b)},positionInRange:function(a){if(this.startAngle==this.endAngle)return!0;a=d.modAngle(a,360);return 1==this._getOrientationNum()?this.startAngle<this.endAngle?a>=this.startAngle&&a<=this.endAngle:!(a>this.endAngle&&a<this.startAngle):this.startAngle<this.endAngle?!(a>this.startAngle&&a<this.endAngle):a>=
-this.endAngle&&a<=this.startAngle},_distance:function(a,b,e,g){return Math.sqrt((e-a)*(e-a)+(g-b)*(g-b))},_layoutLabel:function(a,b,e,g,d,f,k){var l=this._getFont();b=q._base._getTextBox(b,{font:q.makeFontString(q.makeParameters(q.defaultFont,l))}).w;var l=q.normalizedLength(l.size),m=e+Math.cos(f)*d-b/2,n=g-Math.sin(f)*d-l/2,c,p=[];c=m;var h;h=-Math.tan(f)*c+g+Math.tan(f)*e;h>=n&&h<=n+l&&p.push({x:c,y:h});c=m+b;h=-Math.tan(f)*c+g+Math.tan(f)*e;h>=n&&h<=n+l&&p.push({x:c,y:h});c=n;h=-1/Math.tan(f)*
-c+e+1/Math.tan(f)*g;h>=m&&h<=m+b&&p.push({x:h,y:c});c=n+l;h=-1/Math.tan(f)*c+e+1/Math.tan(f)*g;h>=m&&h<=m+b&&p.push({x:h,y:c});if("inside"==k)for(k=0;k<p.length;k++){if(c=p[k],c=this._distance(c.x,c.y,e,g)-d,0<=c){m=e+Math.cos(f)*(d-c)-b/2;n=g-Math.sin(f)*(d-c)-l/2;break}}else for(k=0;k<p.length;k++)if(c=p[k],c=this._distance(c.x,c.y,e,g)-d,0>=c){m=e+Math.cos(f)*(d-c)-b/2;n=g-Math.sin(f)*(d-c)-l/2;break}a&&a.setTransform([{dx:m+b/2,dy:n+l}])},refreshRendering:function(){this.inherited(arguments);
-if(this._gfxGroup&&this.scaler){this.startAngle=d.modAngle(this.startAngle,360);this.endAngle=d.modAngle(this.endAngle,360);this._ticksGroup.clear();for(var a,b,e=this.scaler.computeTicks(),g,r=0;r<e.length;r++){b=e[r];a=this.tickShapeFunc(this._ticksGroup,this,b);g=this._gauge._computeBoundingBox(a);var f;f=b.position?this._positionForTickItem(b):this.positionForValue(b.value);a&&a.setTransform([{dx:this.originX,dy:this.originY},q.matrix.rotateg(f),{dx:this.radius-g.width-2*g.x,dy:0}]);if(b=this.tickLabelFunc(b)){a=
-this._ticksGroup.createText({x:0,y:0,text:b,align:"middle"}).setFont(this._getFont()).setFill(this._getFont().color?this._getFont().color:"black");var k=this.radius,k="inside"==this.labelPosition?k-(g.width+this.labelGap):k+this.labelGap;this._layoutLabel(a,b,this.originX,this.originY,k,d.toRadians(360-f),this.labelPosition)}}for(var l in this._indicatorsIndex)this._indicatorsRenderers[l]=this._indicatorsIndex[l].invalidateRendering()}}})});
-//# sourceMappingURL=CircularScale.js.map
+define("dojox/dgauges/CircularScale",["dojo/_base/declare","dojox/gfx","./ScaleBase","./_circularUtils"],function(_1,_2,_3,_4){
+return _1("dojox.dgauges.CircularScale",_3,{originX:50,originY:50,radius:50,startAngle:0,endAngle:180,orientation:"clockwise",constructor:function(){
+this.labelPosition="inside";
+this.addInvalidatingProperties(["originX","originY","radius","startAngle","endAngle","orientation"]);
+},_getOrientationNum:function(){
+return this.orientation=="cclockwise"?-1:1;
+},positionForValue:function(_5){
+var _6=_4.computeTotalAngle(this.startAngle,this.endAngle,this.orientation);
+var _7=this.scaler.positionForValue(_5);
+return _4.modAngle(this.startAngle+this._getOrientationNum()*_6*_7,360);
+},_positionForTickItem:function(_8){
+var _9=_4.computeTotalAngle(this.startAngle,this.endAngle,this.orientation);
+return _4.modAngle(this.startAngle+this._getOrientationNum()*_9*_8.position,360);
+},valueForPosition:function(_a){
+if(!this.positionInRange(_a)){
+var _b=_4.modAngle(this.startAngle-_a,360);
+var _c=360-_b;
+var _d=_4.modAngle(this.endAngle-_a,360);
+var _e=360-_d;
+var _f;
+if(Math.min(_b,_c)<Math.min(_d,_e)){
+_f=0;
+}else{
+_f=1;
+}
+}else{
+var _10=_4.modAngle(this._getOrientationNum()*(_a-this.startAngle),360);
+var _11=_4.computeTotalAngle(this.startAngle,this.endAngle,this.orientation);
+_f=_10/_11;
+}
+return this.scaler.valueForPosition(_f);
+},positionInRange:function(_12){
+if(this.startAngle==this.endAngle){
+return true;
+}
+_12=_4.modAngle(_12,360);
+if(this._getOrientationNum()==1){
+if(this.startAngle<this.endAngle){
+return _12>=this.startAngle&&_12<=this.endAngle;
+}else{
+return !(_12>this.endAngle&&_12<this.startAngle);
+}
+}else{
+if(this.startAngle<this.endAngle){
+return !(_12>this.startAngle&&_12<this.endAngle);
+}else{
+return _12>=this.endAngle&&_12<=this.startAngle;
+}
+}
+},_distance:function(x1,y1,x2,y2){
+return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+},_layoutLabel:function(_13,txt,ox,oy,_14,_15,_16){
+var _17=this._getFont();
+var box=_2._base._getTextBox(txt,{font:_2.makeFontString(_2.makeParameters(_2.defaultFont,_17))});
+var tw=box.w;
+var fz=_17.size;
+var th=_2.normalizedLength(fz);
+var tfx=ox+Math.cos(_15)*_14-tw/2;
+var tfy=oy-Math.sin(_15)*_14-th/2;
+var _18;
+var _19=[];
+_18=tfx;
+var ipx=_18;
+var ipy=-Math.tan(_15)*_18+oy+Math.tan(_15)*ox;
+if(ipy>=tfy&&ipy<=tfy+th){
+_19.push({x:ipx,y:ipy});
+}
+_18=tfx+tw;
+ipx=_18;
+ipy=-Math.tan(_15)*_18+oy+Math.tan(_15)*ox;
+if(ipy>=tfy&&ipy<=tfy+th){
+_19.push({x:ipx,y:ipy});
+}
+_18=tfy;
+ipx=-1/Math.tan(_15)*_18+ox+1/Math.tan(_15)*oy;
+ipy=_18;
+if(ipx>=tfx&&ipx<=tfx+tw){
+_19.push({x:ipx,y:ipy});
+}
+_18=tfy+th;
+ipx=-1/Math.tan(_15)*_18+ox+1/Math.tan(_15)*oy;
+ipy=_18;
+if(ipx>=tfx&&ipx<=tfx+tw){
+_19.push({x:ipx,y:ipy});
+}
+var dif;
+if(_16=="inside"){
+for(var it=0;it<_19.length;it++){
+var ip=_19[it];
+dif=this._distance(ip.x,ip.y,ox,oy)-_14;
+if(dif>=0){
+tfx=ox+Math.cos(_15)*(_14-dif)-tw/2;
+tfy=oy-Math.sin(_15)*(_14-dif)-th/2;
+break;
+}
+}
+}else{
+for(it=0;it<_19.length;it++){
+ip=_19[it];
+dif=this._distance(ip.x,ip.y,ox,oy)-_14;
+if(dif<=0){
+tfx=ox+Math.cos(_15)*(_14-dif)-tw/2;
+tfy=oy-Math.sin(_15)*(_14-dif)-th/2;
+break;
+}
+}
+}
+if(_13){
+_13.setTransform([{dx:tfx+tw/2,dy:tfy+th}]);
+}
+},refreshRendering:function(){
+this.inherited(arguments);
+if(!this._gfxGroup||!this.scaler){
+return;
+}
+this.startAngle=_4.modAngle(this.startAngle,360);
+this.endAngle=_4.modAngle(this.endAngle,360);
+this._ticksGroup.clear();
+var _1a;
+var _1b;
+var _1c;
+var _1d=this.scaler.computeTicks();
+var _1e;
+for(var i=0;i<_1d.length;i++){
+var _1f=_1d[i];
+_1a=this.tickShapeFunc(this._ticksGroup,this,_1f);
+_1e=this._gauge._computeBoundingBox(_1a);
+var a;
+if(_1f.position){
+a=this._positionForTickItem(_1f);
+}else{
+a=this.positionForValue(_1f.value);
+}
+if(_1a){
+_1a.setTransform([{dx:this.originX,dy:this.originY},_2.matrix.rotateg(a),{dx:this.radius-_1e.width-2*_1e.x,dy:0}]);
+}
+_1c=this.tickLabelFunc(_1f);
+if(_1c){
+_1b=this._ticksGroup.createText({x:0,y:0,text:_1c,align:"middle"}).setFont(this._getFont()).setFill(this._getFont().color?this._getFont().color:"black");
+var rad=this.radius;
+if(this.labelPosition=="inside"){
+rad-=(_1e.width+this.labelGap);
+}else{
+rad+=this.labelGap;
+}
+this._layoutLabel(_1b,_1c,this.originX,this.originY,rad,_4.toRadians(360-a),this.labelPosition);
+}
+}
+for(var key in this._indicatorsIndex){
+this._indicatorsRenderers[key]=this._indicatorsIndex[key].invalidateRendering();
+}
+}});
+});

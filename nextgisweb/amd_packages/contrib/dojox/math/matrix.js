@@ -1,10 +1,245 @@
 //>>built
-define("dojox/math/matrix",["dojo","dojox"],function(n,m){n.getObject("math.matrix",!0,m);n.mixin(m.math.matrix,{iDF:0,ALMOST_ZERO:1E-10,multiply:function(b,c){var f=b.length,d=b[0].length,a=c.length,e=c[0].length;if(d!=a)return console.warn("Can't multiply matricies of sizes "+d+","+f+" and "+e+","+a),[[0]];for(var a=[],g=0;g<f;g++){a[g]=[];for(var k=0;k<e;k++)for(var h=a[g][k]=0;h<d;h++)a[g][k]+=b[g][h]*c[h][k]}return a},product:function(){if(0==arguments.length)return console.warn("can't multiply 0 matrices!"),
-1;for(var b=arguments[0],c=1;c<arguments.length;c++)b=this.multiply(b,arguments[c]);return b},sum:function(){if(0==arguments.length)return console.warn("can't sum 0 matrices!"),0;var b=this.copy(arguments[0]),c=b.length;if(0==c)return console.warn("can't deal with matrices of 0 rows!"),0;var f=b[0].length;if(0==f)return console.warn("can't deal with matrices of 0 cols!"),0;for(var d=1;d<arguments.length;++d){var a=arguments[d];if(a.length!=c||a[0].length!=f)return console.warn("can't add matrices of different dimensions: first dimensions were "+
-c+"x"+f+", current dimensions are "+a.length+"x"+a[0].length),0;for(var e=0;e<c;e++)for(var g=0;g<f;g++)b[e][g]+=a[e][g]}return b},inverse:function(b){if(1==b.length&&1==b[0].length)return[[1/b[0][0]]];var c=b.length,f=this.create(c,c),d=this.adjoint(b),a=this.determinant(b);b=0;if(0==a)return console.warn("Determinant Equals 0, Not Invertible."),[[0]];b=1/a;for(a=0;a<c;a++)for(var e=0;e<c;e++)f[a][e]=b*d[a][e];return f},determinant:function(b){if(b.length!=b[0].length)return console.warn("Can't calculate the determinant of a non-squre matrix!"),
-0;var c=b.length,f=1;b=this.upperTriangle(b);for(var d=0;d<c;d++){var a=b[d][d];if(Math.abs(a)<this.ALMOST_ZERO)return 0;f*=a}return f*=this.iDF},upperTriangle:function(b){b=this.copy(b);var c=0,c=0,f=b.length,d=1;this.iDF=1;for(var a=0;a<f-1;a++){"number"!=typeof b[a][a]&&console.warn("non-numeric entry found in a numeric matrix: m["+a+"]["+a+"]\x3d"+b[a][a]);for(var d=1,e=0;0==b[a][a]&&!e;)if(a+d>=f)this.iDF=0,e=1;else{for(var g=0;g<f;g++)c=b[a][g],b[a][g]=b[a+d][g],b[a+d][g]=c;d++;this.iDF*=-1}for(d=
-a+1;d<f;d++)if("number"!=typeof b[d][a]&&console.warn("non-numeric entry found in a numeric matrix: m["+d+"]["+a+"]\x3d"+b[d][a]),"number"!=typeof b[a][d]&&console.warn("non-numeric entry found in a numeric matrix: m["+a+"]["+d+"]\x3d"+b[a][d]),0!=b[a][a])for(c=-1*b[d][a]/b[a][a],e=a;e<f;e++)b[d][e]=c*b[a][e]+b[d][e]}return b},create:function(b,c,f){f=f||0;for(var d=[],a=0;a<c;a++){d[a]=[];for(var e=0;e<b;e++)d[a][e]=f}return d},ones:function(b,c){return this.create(b,c,1)},zeros:function(b,c){return this.create(b,
-c)},identity:function(b,c){c=c||1;for(var f=[],d=0;d<b;d++){f[d]=[];for(var a=0;a<b;a++)f[d][a]=d==a?c:0}return f},adjoint:function(b){var c=b.length;if(1>=c)return console.warn("Can't find the adjoint of a matrix with a dimension less than 2"),[[0]];if(b.length!=b[0].length)return console.warn("Can't find the adjoint of a non-square matrix"),[[0]];for(var f=this.create(c,c),d=this.create(c-1,c-1),a=0,e=0,g=0,k=0,h=a=0;h<c;h++)for(var l=0;l<c;l++){for(a=g=0;a<c;a++)if(a!=h){for(e=k=0;e<c;e++)e!=l&&
-(d[g][k]=b[a][e],k++);g++}a=this.determinant(d);f[h][l]=Math.pow(-1,h+l)*a}return this.transpose(f)},transpose:function(b){for(var c=this.create(b.length,b[0].length),f=0;f<b.length;f++)for(var d=0;d<b[f].length;d++)c[d][f]=b[f][d];return c},format:function(b,c){c=c||5;for(var f=b.length,d=0<f?b[0].length:0,a="",e=0;e<f;e++){for(var a=a+"| ",g=0;g<d;g++){var k=c,h=Math.pow(10,k),h=(Math.round(b[e][g]*h)/h).toString();"-"!=h.charAt(0)&&(h=" "+h);for(-1<h.indexOf(".")&&(h+=".");h.length<k+3;)h+="0";
-a+=h+" "}a+="|\n"}return a},copy:function(b){for(var c=b.length,f=b[0].length,d=this.create(f,c),a=0;a<c;a++)for(var e=0;e<f;e++)d[a][e]=b[a][e];return d},scale:function(b,c){b=this.copy(b);for(var f=b.length,d=b[0].length,a=0;a<f;a++)for(var e=0;e<d;e++)b[a][e]*=c;return b}});return m.math.matrix});
-//# sourceMappingURL=matrix.js.map
+define("dojox/math/matrix",["dojo","dojox"],function(_1,_2){
+_1.getObject("math.matrix",true,_2);
+_1.mixin(_2.math.matrix,{iDF:0,ALMOST_ZERO:1e-10,multiply:function(a,b){
+var ay=a.length,ax=a[0].length,by=b.length,bx=b[0].length;
+if(ax!=by){
+console.warn("Can't multiply matricies of sizes "+ax+","+ay+" and "+bx+","+by);
+return [[0]];
+}
+var c=[];
+for(var k=0;k<ay;k++){
+c[k]=[];
+for(var i=0;i<bx;i++){
+c[k][i]=0;
+for(var m=0;m<ax;m++){
+c[k][i]+=a[k][m]*b[m][i];
+}
+}
+}
+return c;
+},product:function(){
+if(arguments.length==0){
+console.warn("can't multiply 0 matrices!");
+return 1;
+}
+var m=arguments[0];
+for(var i=1;i<arguments.length;i++){
+m=this.multiply(m,arguments[i]);
+}
+return m;
+},sum:function(){
+if(arguments.length==0){
+console.warn("can't sum 0 matrices!");
+return 0;
+}
+var m=this.copy(arguments[0]);
+var _3=m.length;
+if(_3==0){
+console.warn("can't deal with matrices of 0 rows!");
+return 0;
+}
+var _4=m[0].length;
+if(_4==0){
+console.warn("can't deal with matrices of 0 cols!");
+return 0;
+}
+for(var i=1;i<arguments.length;++i){
+var _5=arguments[i];
+if(_5.length!=_3||_5[0].length!=_4){
+console.warn("can't add matrices of different dimensions: first dimensions were "+_3+"x"+_4+", current dimensions are "+_5.length+"x"+_5[0].length);
+return 0;
+}
+for(var r=0;r<_3;r++){
+for(var c=0;c<_4;c++){
+m[r][c]+=_5[r][c];
+}
+}
+}
+return m;
+},inverse:function(a){
+if(a.length==1&&a[0].length==1){
+return [[1/a[0][0]]];
+}
+var _6=a.length,m=this.create(_6,_6),mm=this.adjoint(a),_7=this.determinant(a),dd=0;
+if(_7==0){
+console.warn("Determinant Equals 0, Not Invertible.");
+return [[0]];
+}else{
+dd=1/_7;
+}
+for(var i=0;i<_6;i++){
+for(var j=0;j<_6;j++){
+m[i][j]=dd*mm[i][j];
+}
+}
+return m;
+},determinant:function(a){
+if(a.length!=a[0].length){
+console.warn("Can't calculate the determinant of a non-squre matrix!");
+return 0;
+}
+var _8=a.length,_9=1,b=this.upperTriangle(a);
+for(var i=0;i<_8;i++){
+var _a=b[i][i];
+if(Math.abs(_a)<this.ALMOST_ZERO){
+return 0;
+}
+_9*=_a;
+}
+_9*=this.iDF;
+return _9;
+},upperTriangle:function(m){
+m=this.copy(m);
+var f1=0,_b=0,_c=m.length,v=1;
+this.iDF=1;
+for(var _d=0;_d<_c-1;_d++){
+if(typeof m[_d][_d]!="number"){
+console.warn("non-numeric entry found in a numeric matrix: m["+_d+"]["+_d+"]="+m[_d][_d]);
+}
+v=1;
+var _e=0;
+while((m[_d][_d]==0)&&!_e){
+if(_d+v>=_c){
+this.iDF=0;
+_e=1;
+}else{
+for(var r=0;r<_c;r++){
+_b=m[_d][r];
+m[_d][r]=m[_d+v][r];
+m[_d+v][r]=_b;
+}
+v++;
+this.iDF*=-1;
+}
+}
+for(var _f=_d+1;_f<_c;_f++){
+if(typeof m[_f][_d]!="number"){
+console.warn("non-numeric entry found in a numeric matrix: m["+_f+"]["+_d+"]="+m[_f][_d]);
+}
+if(typeof m[_d][_f]!="number"){
+console.warn("non-numeric entry found in a numeric matrix: m["+_d+"]["+_f+"]="+m[_d][_f]);
+}
+if(m[_d][_d]!=0){
+var f1=(-1)*m[_f][_d]/m[_d][_d];
+for(var i=_d;i<_c;i++){
+m[_f][i]=f1*m[_d][i]+m[_f][i];
+}
+}
+}
+}
+return m;
+},create:function(a,b,_10){
+_10=_10||0;
+var m=[];
+for(var i=0;i<b;i++){
+m[i]=[];
+for(var j=0;j<a;j++){
+m[i][j]=_10;
+}
+}
+return m;
+},ones:function(a,b){
+return this.create(a,b,1);
+},zeros:function(a,b){
+return this.create(a,b);
+},identity:function(_11,_12){
+_12=_12||1;
+var m=[];
+for(var i=0;i<_11;i++){
+m[i]=[];
+for(var j=0;j<_11;j++){
+m[i][j]=(i==j?_12:0);
+}
+}
+return m;
+},adjoint:function(a){
+var tms=a.length;
+if(tms<=1){
+console.warn("Can't find the adjoint of a matrix with a dimension less than 2");
+return [[0]];
+}
+if(a.length!=a[0].length){
+console.warn("Can't find the adjoint of a non-square matrix");
+return [[0]];
+}
+var m=this.create(tms,tms),ap=this.create(tms-1,tms-1);
+var ii=0,jj=0,ia=0,ja=0,det=0;
+for(var i=0;i<tms;i++){
+for(var j=0;j<tms;j++){
+ia=0;
+for(ii=0;ii<tms;ii++){
+if(ii==i){
+continue;
+}
+ja=0;
+for(jj=0;jj<tms;jj++){
+if(jj==j){
+continue;
+}
+ap[ia][ja]=a[ii][jj];
+ja++;
+}
+ia++;
+}
+det=this.determinant(ap);
+m[i][j]=Math.pow(-1,(i+j))*det;
+}
+}
+return this.transpose(m);
+},transpose:function(a){
+var m=this.create(a.length,a[0].length);
+for(var i=0;i<a.length;i++){
+for(var j=0;j<a[i].length;j++){
+m[j][i]=a[i][j];
+}
+}
+return m;
+},format:function(a,_13){
+_13=_13||5;
+function _14(x,dp){
+var fac=Math.pow(10,dp);
+var a=Math.round(x*fac)/fac;
+var b=a.toString();
+if(b.charAt(0)!="-"){
+b=" "+b;
+}
+if(b.indexOf(".")>-1){
+b+=".";
+}
+while(b.length<dp+3){
+b+="0";
+}
+return b;
+};
+var ya=a.length;
+var xa=ya>0?a[0].length:0;
+var _15="";
+for(var y=0;y<ya;y++){
+_15+="| ";
+for(var x=0;x<xa;x++){
+_15+=_14(a[y][x],_13)+" ";
+}
+_15+="|\n";
+}
+return _15;
+},copy:function(a){
+var ya=a.length,xa=a[0].length,m=this.create(xa,ya);
+for(var y=0;y<ya;y++){
+for(var x=0;x<xa;x++){
+m[y][x]=a[y][x];
+}
+}
+return m;
+},scale:function(a,_16){
+a=this.copy(a);
+var ya=a.length,xa=a[0].length;
+for(var y=0;y<ya;y++){
+for(var x=0;x<xa;x++){
+a[y][x]*=_16;
+}
+}
+return a;
+}});
+return _2.math.matrix;
+});

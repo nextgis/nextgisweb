@@ -1,9 +1,112 @@
 //>>built
-define("dojox/xmpp/sasl",["dojo","dijit","dojox","dojo/require!dojox/xmpp/util,dojo/AdapterRegistry,dojox/encoding/digests/MD5"],function(c,p,b){c.provide("dojox.xmpp.sasl");c.require("dojox.xmpp.util");c.require("dojo.AdapterRegistry");c.require("dojox.encoding.digests.MD5");b.xmpp.sasl.saslNS="urn:ietf:params:xml:ns:xmpp-sasl";c.declare("dojox.xmpp.sasl._Base",null,{mechanism:null,closeAuthTag:!0,constructor:function(a){this.session=a;this.startAuth()},startAuth:function(){var a=new b.string.Builder(b.xmpp.util.createElement("auth",
-{xmlns:b.xmpp.sasl.saslNS,mechanism:this.mechanism},this.closeAuthTag));this.appendToAuth(a);this.session.dispatchPacket(a.toString())},appendToAuth:function(a){},onChallenge:function(a){if(this.first_challenge)this.onSecondChallenge(a);else this.first_challenge=!0,this.onFirstChallenge(a)},onFirstChallenge:function(){},onSecondChallenge:function(){},onSuccess:function(){this.session.sendRestart()}});c.declare("dojox.xmpp.sasl.SunWebClientAuth",b.xmpp.sasl._Base,{mechanism:"SUN-COMMS-CLIENT-PROXY-AUTH"});
-c.declare("dojox.xmpp.sasl.Plain",b.xmpp.sasl._Base,{mechanism:"PLAIN",closeAuthTag:!1,appendToAuth:function(a){var d=this.session.jid,c=this.session.jid.indexOf("@");-1!=c&&(d=this.session.jid.substring(0,c));d=this.session.jid+"\x00"+d+"\x00"+this.session.password;d=b.xmpp.util.Base64.encode(d);a.append(d);a.append("\x3c/auth\x3e");delete this.session.password}});c.declare("dojox.xmpp.sasl.DigestMD5",b.xmpp.sasl._Base,{mechanism:"DIGEST-MD5",onFirstChallenge:function(a){var d=b.encoding.digests,
-c=b.encoding.digests.outputTypes,g=function(a){return d.MD5(a,c.Hex)},e={realm:"",nonce:"",qop:"auth",maxbuf:65536};b.xmpp.util.Base64.decode(a.firstChild.nodeValue).replace(/([a-z]+)=([^,]+)/g,function(a,b,c){c=c.replace(/^"(.+)"$/,"$1");e[b]=c});var h="";switch(e.qop){case "auth-int":case "auth-conf":h=":00000000000000000000000000000000";case "auth":break;default:return!1}a=d.MD5(1234567890*Math.random(),c.Hex);var m="xmpp/"+this.session.domain,k=this.session.jid,f=this.session.jid.indexOf("@");
--1!=f&&(k=this.session.jid.substring(0,f));var k=b.xmpp.util.encodeJid(k),l=new b.string.Builder;l.append(d.MD5(k+":"+e.realm+":"+this.session.password,c.String),":",e.nonce+":"+a);delete this.session.password;var h=":"+m+h,n="AUTHENTICATE"+h,f=new b.string.Builder;f.append(g(l.toString()),":",e.nonce,":00000001:",a,":",e.qop,":");l=new b.string.Builder;l.append('username\x3d"',k,'",','realm\x3d"',e.realm,'",',"nonce\x3d",e.nonce,",",'cnonce\x3d"',a,'",','nc\x3d"00000001",qop\x3d"',e.qop,'",digest-uri\x3d"',
-m,'",','response\x3d"',g(f.toString()+g(n)),'",charset\x3d"utf-8"');a=new b.string.Builder(b.xmpp.util.createElement("response",{xmlns:b.xmpp.xmpp.SASL_NS},!1));a.append(b.xmpp.util.Base64.encode(l.toString()));a.append("\x3c/response\x3e");this.rspauth=g(f.toString()+g(h));this.session.dispatchPacket(a.toString())},onSecondChallenge:function(a){a=b.xmpp.util.Base64.decode(a.firstChild.nodeValue);this.rspauth==a.substring(8)&&(a=new b.string.Builder(b.xmpp.util.createElement("response",{xmlns:b.xmpp.xmpp.SASL_NS},
-!0)),this.session.dispatchPacket(a.toString()))}});b.xmpp.sasl.registry=new c.AdapterRegistry;b.xmpp.sasl.registry.register("SUN-COMMS-CLIENT-PROXY-AUTH",function(a){return"SUN-COMMS-CLIENT-PROXY-AUTH"==a},function(a,c){return new b.xmpp.sasl.SunWebClientAuth(c)});b.xmpp.sasl.registry.register("DIGEST-MD5",function(a){return"DIGEST-MD5"==a},function(a,c){return new b.xmpp.sasl.DigestMD5(c)});b.xmpp.sasl.registry.register("PLAIN",function(a){return"PLAIN"==a},function(a,c){return new b.xmpp.sasl.Plain(c)})});
-//# sourceMappingURL=sasl.js.map
+define("dojox/xmpp/sasl",["dojo","dijit","dojox","dojo/require!dojox/xmpp/util,dojo/AdapterRegistry,dojox/encoding/digests/MD5"],function(_1,_2,_3){
+_1.provide("dojox.xmpp.sasl");
+_1.require("dojox.xmpp.util");
+_1.require("dojo.AdapterRegistry");
+_1.require("dojox.encoding.digests.MD5");
+_3.xmpp.sasl.saslNS="urn:ietf:params:xml:ns:xmpp-sasl";
+_1.declare("dojox.xmpp.sasl._Base",null,{mechanism:null,closeAuthTag:true,constructor:function(_4){
+this.session=_4;
+this.startAuth();
+},startAuth:function(){
+var _5=new _3.string.Builder(_3.xmpp.util.createElement("auth",{xmlns:_3.xmpp.sasl.saslNS,mechanism:this.mechanism},this.closeAuthTag));
+this.appendToAuth(_5);
+this.session.dispatchPacket(_5.toString());
+},appendToAuth:function(_6){
+},onChallenge:function(_7){
+if(!this.first_challenge){
+this.first_challenge=true;
+this.onFirstChallenge(_7);
+}else{
+this.onSecondChallenge(_7);
+}
+},onFirstChallenge:function(){
+},onSecondChallenge:function(){
+},onSuccess:function(){
+this.session.sendRestart();
+}});
+_1.declare("dojox.xmpp.sasl.SunWebClientAuth",_3.xmpp.sasl._Base,{mechanism:"SUN-COMMS-CLIENT-PROXY-AUTH"});
+_1.declare("dojox.xmpp.sasl.Plain",_3.xmpp.sasl._Base,{mechanism:"PLAIN",closeAuthTag:false,appendToAuth:function(_8){
+var id=this.session.jid;
+var _9=this.session.jid.indexOf("@");
+if(_9!=-1){
+id=this.session.jid.substring(0,_9);
+}
+var _a=this.session.jid+"\x00"+id+"\x00"+this.session.password;
+_a=_3.xmpp.util.Base64.encode(_a);
+_8.append(_a);
+_8.append("</auth>");
+delete this.session.password;
+}});
+_1.declare("dojox.xmpp.sasl.DigestMD5",_3.xmpp.sasl._Base,{mechanism:"DIGEST-MD5",onFirstChallenge:function(_b){
+var _c=_3.encoding.digests;
+var _d=_3.encoding.digests.outputTypes;
+var _e=function(n){
+return _c.MD5(n,_d.Hex);
+};
+var H=function(s){
+return _c.MD5(s,_d.String);
+};
+var _f=_3.xmpp.util.Base64.decode(_b.firstChild.nodeValue);
+var ch={realm:"",nonce:"",qop:"auth",maxbuf:65536};
+_f.replace(/([a-z]+)=([^,]+)/g,function(t,k,v){
+v=v.replace(/^"(.+)"$/,"$1");
+ch[k]=v;
+});
+var _10="";
+switch(ch.qop){
+case "auth-int":
+case "auth-conf":
+_10=":00000000000000000000000000000000";
+case "auth":
+break;
+default:
+return false;
+}
+var _11=_c.MD5(Math.random()*1234567890,_d.Hex);
+var _12="xmpp/"+this.session.domain;
+var _13=this.session.jid;
+var _14=this.session.jid.indexOf("@");
+if(_14!=-1){
+_13=this.session.jid.substring(0,_14);
+}
+_13=_3.xmpp.util.encodeJid(_13);
+var A1=new _3.string.Builder();
+A1.append(H(_13+":"+ch.realm+":"+this.session.password),":",ch.nonce+":"+_11);
+delete this.session.password;
+var _15=":"+_12+_10;
+var A2="AUTHENTICATE"+_15;
+var _16=new _3.string.Builder();
+_16.append(_e(A1.toString()),":",ch.nonce,":00000001:",_11,":",ch.qop,":");
+var ret=new _3.string.Builder();
+ret.append("username=\"",_13,"\",","realm=\"",ch.realm,"\",","nonce=",ch.nonce,",","cnonce=\"",_11,"\",","nc=\"00000001\",qop=\"",ch.qop,"\",digest-uri=\"",_12,"\",","response=\"",_e(_16.toString()+_e(A2)),"\",charset=\"utf-8\"");
+var _17=new _3.string.Builder(_3.xmpp.util.createElement("response",{xmlns:_3.xmpp.xmpp.SASL_NS},false));
+_17.append(_3.xmpp.util.Base64.encode(ret.toString()));
+_17.append("</response>");
+this.rspauth=_e(_16.toString()+_e(_15));
+this.session.dispatchPacket(_17.toString());
+},onSecondChallenge:function(msg){
+var _18=_3.xmpp.util.Base64.decode(msg.firstChild.nodeValue);
+if(this.rspauth==_18.substring(8)){
+var _19=new _3.string.Builder(_3.xmpp.util.createElement("response",{xmlns:_3.xmpp.xmpp.SASL_NS},true));
+this.session.dispatchPacket(_19.toString());
+}else{
+}
+}});
+_3.xmpp.sasl.registry=new _1.AdapterRegistry();
+_3.xmpp.sasl.registry.register("SUN-COMMS-CLIENT-PROXY-AUTH",function(_1a){
+return _1a=="SUN-COMMS-CLIENT-PROXY-AUTH";
+},function(_1b,_1c){
+return new _3.xmpp.sasl.SunWebClientAuth(_1c);
+});
+_3.xmpp.sasl.registry.register("DIGEST-MD5",function(_1d){
+return _1d=="DIGEST-MD5";
+},function(_1e,_1f){
+return new _3.xmpp.sasl.DigestMD5(_1f);
+});
+_3.xmpp.sasl.registry.register("PLAIN",function(_20){
+return _20=="PLAIN";
+},function(_21,_22){
+return new _3.xmpp.sasl.Plain(_22);
+});
+});

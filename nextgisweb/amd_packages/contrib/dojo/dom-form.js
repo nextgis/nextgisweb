@@ -5,7 +5,77 @@
 */
 
 //>>built
-define("dojo/dom-form",["./_base/lang","./dom","./io-query","./json"],function(p,n,q,r){var g={fieldToObject:function(a){var c=null;if(a=n.byId(a)){var b=a.name,f=(a.type||"").toLowerCase();if(b&&f&&!a.disabled)if("radio"==f||"checkbox"==f)a.checked&&(c=a.value);else if(a.multiple)for(c=[],a=[a.firstChild];a.length;)for(b=a.pop();b;b=b.nextSibling)if(1==b.nodeType&&"option"==b.tagName.toLowerCase())b.selected&&c.push(b.value);else{b.nextSibling&&a.push(b.nextSibling);b.firstChild&&a.push(b.firstChild);
-break}else c=a.value}return c},toObject:function(a){var c={};a=n.byId(a).elements;for(var b=0,f=a.length;b<f;++b){var d=a[b],e=d.name,k=(d.type||"").toLowerCase();if(e&&k&&0>"file|submit|image|reset|button".indexOf(k)&&!d.disabled){var l=c,m=e,d=g.fieldToObject(d);if(null!==d){var h=l[m];"string"==typeof h?l[m]=[h,d]:p.isArray(h)?h.push(d):l[m]=d}"image"==k&&(c[e+".x"]=c[e+".y"]=c[e].x=c[e].y=0)}}return c},toQuery:function(a){return q.objectToQuery(g.toObject(a))},toJson:function(a,c){return r.stringify(g.toObject(a),
-null,c?4:0)}};return g});
-//# sourceMappingURL=dom-form.js.map
+define("dojo/dom-form",["./_base/lang","./dom","./io-query","./json"],function(_1,_2,_3,_4){
+function _5(_6,_7,_8){
+if(_8===null){
+return;
+}
+var _9=_6[_7];
+if(typeof _9=="string"){
+_6[_7]=[_9,_8];
+}else{
+if(_1.isArray(_9)){
+_9.push(_8);
+}else{
+_6[_7]=_8;
+}
+}
+};
+var _a="file|submit|image|reset|button";
+var _b={fieldToObject:function fieldToObject(_c){
+var _d=null;
+_c=_2.byId(_c);
+if(_c){
+var _e=_c.name,_f=(_c.type||"").toLowerCase();
+if(_e&&_f&&!_c.disabled){
+if(_f=="radio"||_f=="checkbox"){
+if(_c.checked){
+_d=_c.value;
+}
+}else{
+if(_c.multiple){
+_d=[];
+var _10=[_c.firstChild];
+while(_10.length){
+for(var _11=_10.pop();_11;_11=_11.nextSibling){
+if(_11.nodeType==1&&_11.tagName.toLowerCase()=="option"){
+if(_11.selected){
+_d.push(_11.value);
+}
+}else{
+if(_11.nextSibling){
+_10.push(_11.nextSibling);
+}
+if(_11.firstChild){
+_10.push(_11.firstChild);
+}
+break;
+}
+}
+}
+}else{
+_d=_c.value;
+}
+}
+}
+}
+return _d;
+},toObject:function formToObject(_12){
+var ret={},_13=_2.byId(_12).elements;
+for(var i=0,l=_13.length;i<l;++i){
+var _14=_13[i],_15=_14.name,_16=(_14.type||"").toLowerCase();
+if(_15&&_16&&_a.indexOf(_16)<0&&!_14.disabled){
+_5(ret,_15,_b.fieldToObject(_14));
+if(_16=="image"){
+ret[_15+".x"]=ret[_15+".y"]=ret[_15].x=ret[_15].y=0;
+}
+}
+}
+return ret;
+},toQuery:function formToQuery(_17){
+return _3.objectToQuery(_b.toObject(_17));
+},toJson:function formToJson(_18,_19){
+return _4.stringify(_b.toObject(_18),null,_19?4:0);
+}};
+return _b;
+});

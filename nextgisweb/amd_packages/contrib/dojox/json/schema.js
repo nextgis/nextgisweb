@@ -1,9 +1,180 @@
 //>>built
-define("dojox/json/schema",["dojo/_base/kernel","dojox","dojo/_base/array"],function(q,h){q.getObject("json.schema",!0,h);h.json.schema.validate=function(e,m){return this._validate(e,m,!1)};h.json.schema.checkPropertyChange=function(e,m,h){return this._validate(e,m,h||"property")};h.json.schema.mustBeValid=function(e){if(!e.valid)throw new TypeError(q.map(e.errors,function(e){return"for property "+e.property+": "+e.message}).join(", "));};h.json.schema._validate=function(e,h,n){function l(b,a,k,d){function c(a){f.push({property:k,
-message:a})}function g(a,b){if(a){if(!("string"!=typeof a||"any"==a||("null"==a?null===b:typeof b==a)||b instanceof Array&&"array"==a||"integer"==a&&0===b%1))return[{property:k,message:typeof b+" value found, but a "+a+" is required"}];if(a instanceof Array){for(var c=[],d=0;d<a.length&&(c=g(a[d],b)).length;d++);if(c.length)return c}else if("object"==typeof a)return c=f,f=[],l(b,a,k),d=f,f=c,d}return[]}var e;k+=k?"number"==typeof d?"["+d+"]":"undefined"==typeof d?"":"."+d:d;if(("object"!=typeof a||
-a instanceof Array)&&(k||"function"!=typeof a))return"function"==typeof a?Object(b)instanceof a||c("is not an instance of the class/constructor "+a.name):a&&c("Invalid schema/property definition "+a),null;n&&a.readonly&&c("is a readonly field, it can not be changed");a["extends"]&&l(b,a["extends"],k,d);if(void 0===b)a.optional||c("is missing and it is not optional");else if(f=f.concat(g(a.type,b)),a.disallow&&!g(a.disallow,b).length&&c(" disallowed value was matched"),null!==b){if(b instanceof Array){if(a.items)if(a.items instanceof
-Array)for(d=0,e=b.length;d<e;d++)f.concat(l(b[d],a.items[d],k,d));else for(d=0,e=b.length;d<e;d++)f.concat(l(b[d],a.items,k,d));a.minItems&&b.length<a.minItems&&c("There must be a minimum of "+a.minItems+" in the array");a.maxItems&&b.length>a.maxItems&&c("There must be a maximum of "+a.maxItems+" in the array")}else a.properties&&f.concat(m(b,a.properties,k,a.additionalProperties));a.pattern&&"string"==typeof b&&!b.match(a.pattern)&&c("does not match the regex pattern "+a.pattern);a.maxLength&&"string"==
-typeof b&&b.length>a.maxLength&&c("may only be "+a.maxLength+" characters long");a.minLength&&"string"==typeof b&&b.length<a.minLength&&c("must be at least "+a.minLength+" characters long");typeof b==typeof a.minimum&&a.minimum>b&&c("must have a minimum value of "+a.minimum);typeof b==typeof a.maximum&&a.maximum<b&&c("must have a maximum value of "+a.maximum);if(a["enum"]){d=a["enum"];e=d.length;for(var h,p=0;p<e;p++)if(d[p]===b){h=1;break}h||c("does not have a value in the enumeration "+d.join(", "))}"number"==
-typeof a.maxDecimal&&b.toString().match(new RegExp("\\.[0-9]{"+(a.maxDecimal+1)+",}"))&&c("may only have "+a.maxDecimal+" digits of decimal places")}return null}function m(b,a,e,d){if("object"==typeof a){("object"!=typeof b||b instanceof Array)&&f.push({property:e,message:"an object is required"});for(var c in a)if(a.hasOwnProperty(c)&&("_"!=c.charAt(0)||"_"!=c.charAt(1))){var g=b[c];l(g,a[c],e,c)}}for(c in b)!b.hasOwnProperty(c)||"_"==c.charAt(0)&&"_"==c.charAt(1)||!a||a[c]||!1!==d||f.push({property:e,
-message:typeof g+"The property "+c+" is not defined in the schema and the schema does not allow additional properties"}),g=a&&a[c]&&a[c].requires,!g||g in b||f.push({property:e,message:"the presence of the property "+c+" requires that "+g+" also be present"}),g=b[c],!a||"object"!=typeof a||c in a||l(g,d,e,c),!n&&g&&g.$schema&&(f=f.concat(l(g,g.$schema,e,c)));return f}var f=[];h&&l(e,h,"",n||"");!n&&e&&e.$schema&&l(e,e.$schema,"","");return{valid:!f.length,errors:f}};return h.json.schema});
-//# sourceMappingURL=schema.js.map
+define("dojox/json/schema",["dojo/_base/kernel","dojox","dojo/_base/array"],function(_1,_2){
+_1.getObject("json.schema",true,_2);
+_2.json.schema.validate=function(_3,_4){
+return this._validate(_3,_4,false);
+};
+_2.json.schema.checkPropertyChange=function(_5,_6,_7){
+return this._validate(_5,_6,_7||"property");
+};
+_2.json.schema.mustBeValid=function(_8){
+if(!_8.valid){
+throw new TypeError(_1.map(_8.errors,function(_9){
+return "for property "+_9.property+": "+_9.message;
+}).join(", "));
+}
+};
+_2.json.schema._validate=function(_a,_b,_c){
+var _d=[];
+function _e(_f,_10,_11,i){
+var l;
+_11+=_11?typeof i=="number"?"["+i+"]":typeof i=="undefined"?"":"."+i:i;
+function _12(_13){
+_d.push({property:_11,message:_13});
+};
+if((typeof _10!="object"||_10 instanceof Array)&&(_11||typeof _10!="function")){
+if(typeof _10=="function"){
+if(!(Object(_f) instanceof _10)){
+_12("is not an instance of the class/constructor "+_10.name);
+}
+}else{
+if(_10){
+_12("Invalid schema/property definition "+_10);
+}
+}
+return null;
+}
+if(_c&&_10.readonly){
+_12("is a readonly field, it can not be changed");
+}
+if(_10["extends"]){
+_e(_f,_10["extends"],_11,i);
+}
+function _14(_15,_16){
+if(_15){
+if(typeof _15=="string"&&_15!="any"&&(_15=="null"?_16!==null:typeof _16!=_15)&&!(_16 instanceof Array&&_15=="array")&&!(_15=="integer"&&_16%1===0)){
+return [{property:_11,message:(typeof _16)+" value found, but a "+_15+" is required"}];
+}
+if(_15 instanceof Array){
+var _17=[];
+for(var j=0;j<_15.length;j++){
+if(!(_17=_14(_15[j],_16)).length){
+break;
+}
+}
+if(_17.length){
+return _17;
+}
+}else{
+if(typeof _15=="object"){
+var _18=_d;
+_d=[];
+_e(_16,_15,_11);
+var _19=_d;
+_d=_18;
+return _19;
+}
+}
+}
+return [];
+};
+if(_f===undefined){
+if(!_10.optional){
+_12("is missing and it is not optional");
+}
+}else{
+_d=_d.concat(_14(_10.type,_f));
+if(_10.disallow&&!_14(_10.disallow,_f).length){
+_12(" disallowed value was matched");
+}
+if(_f!==null){
+if(_f instanceof Array){
+if(_10.items){
+if(_10.items instanceof Array){
+for(i=0,l=_f.length;i<l;i++){
+_d.concat(_e(_f[i],_10.items[i],_11,i));
+}
+}else{
+for(i=0,l=_f.length;i<l;i++){
+_d.concat(_e(_f[i],_10.items,_11,i));
+}
+}
+}
+if(_10.minItems&&_f.length<_10.minItems){
+_12("There must be a minimum of "+_10.minItems+" in the array");
+}
+if(_10.maxItems&&_f.length>_10.maxItems){
+_12("There must be a maximum of "+_10.maxItems+" in the array");
+}
+}else{
+if(_10.properties){
+_d.concat(_1a(_f,_10.properties,_11,_10.additionalProperties));
+}
+}
+if(_10.pattern&&typeof _f=="string"&&!_f.match(_10.pattern)){
+_12("does not match the regex pattern "+_10.pattern);
+}
+if(_10.maxLength&&typeof _f=="string"&&_f.length>_10.maxLength){
+_12("may only be "+_10.maxLength+" characters long");
+}
+if(_10.minLength&&typeof _f=="string"&&_f.length<_10.minLength){
+_12("must be at least "+_10.minLength+" characters long");
+}
+if(typeof _10.minimum!==undefined&&typeof _f==typeof _10.minimum&&_10.minimum>_f){
+_12("must have a minimum value of "+_10.minimum);
+}
+if(typeof _10.maximum!==undefined&&typeof _f==typeof _10.maximum&&_10.maximum<_f){
+_12("must have a maximum value of "+_10.maximum);
+}
+if(_10["enum"]){
+var _1b=_10["enum"];
+l=_1b.length;
+var _1c;
+for(var j=0;j<l;j++){
+if(_1b[j]===_f){
+_1c=1;
+break;
+}
+}
+if(!_1c){
+_12("does not have a value in the enumeration "+_1b.join(", "));
+}
+}
+if(typeof _10.maxDecimal=="number"&&(_f.toString().match(new RegExp("\\.[0-9]{"+(_10.maxDecimal+1)+",}")))){
+_12("may only have "+_10.maxDecimal+" digits of decimal places");
+}
+}
+}
+return null;
+};
+function _1a(_1d,_1e,_1f,_20){
+if(typeof _1e=="object"){
+if(typeof _1d!="object"||_1d instanceof Array){
+_d.push({property:_1f,message:"an object is required"});
+}
+for(var i in _1e){
+if(_1e.hasOwnProperty(i)&&!(i.charAt(0)=="_"&&i.charAt(1)=="_")){
+var _21=_1d[i];
+var _22=_1e[i];
+_e(_21,_22,_1f,i);
+}
+}
+}
+for(i in _1d){
+if(_1d.hasOwnProperty(i)&&!(i.charAt(0)=="_"&&i.charAt(1)=="_")&&_1e&&!_1e[i]&&_20===false){
+_d.push({property:_1f,message:(typeof _21)+"The property "+i+" is not defined in the schema and the schema does not allow additional properties"});
+}
+var _23=_1e&&_1e[i]&&_1e[i].requires;
+if(_23&&!(_23 in _1d)){
+_d.push({property:_1f,message:"the presence of the property "+i+" requires that "+_23+" also be present"});
+}
+_21=_1d[i];
+if(_1e&&typeof _1e=="object"&&!(i in _1e)){
+_e(_21,_20,_1f,i);
+}
+if(!_c&&_21&&_21.$schema){
+_d=_d.concat(_e(_21,_21.$schema,_1f,i));
+}
+}
+return _d;
+};
+if(_b){
+_e(_a,_b,"",_c||"");
+}
+if(!_c&&_a&&_a.$schema){
+_e(_a,_a.$schema,"","");
+}
+return {valid:!_d.length,errors:_d};
+};
+return _2.json.schema;
+});

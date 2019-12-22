@@ -1,10 +1,172 @@
 //>>built
-define("dojox/app/controllers/Load","require dojo/_base/lang dojo/_base/declare dojo/on dojo/Deferred dojo/when dojo/dom-style ../Controller".split(" "),function(n,k,p,t,l,g,u,q,v){return p("dojox.app.controllers.Load",q,{_waitingQueue:[],constructor:function(a,b){this.events={"app-init":this.init,"app-load":this.load}},init:function(a){g(this.createView(a.parent,null,null,{templateString:a.templateString,controller:a.controller},null,a.type),function(b){g(b.start(),a.callback)})},load:function(a){this.app.log("in app/controllers/Load event.viewId\x3d"+
-a.viewId+" event \x3d",a);for(var b=[],c=(a.viewId||"").split("+");0<c.length;){var f=c.shift();b.push(f)}var e;this.proceedLoadViewDef=new l;if(b&&1<b.length){for(var d=0;d<b.length-1;d++)c=k.clone(a),c.callback=null,c.viewId=b[d],this._waitingQueue.push(c);this.proceedLoadView(this._waitingQueue.shift());g(this.proceedLoadViewDef,k.hitch(this,function(){var c=k.clone(a);c.viewId=b[d];return e=this.loadView(c)}))}else return e=this.loadView(a)},proceedLoadView:function(a){var b=this.loadView(a);
-g(b,k.hitch(this,function(){this.app.log("in app/controllers/Load proceedLoadView back from loadView for event",a);var b=this._waitingQueue.shift();b?(this.app.log("in app/controllers/Load proceedLoadView back from loadView calling this.proceedLoadView(nextEvt) for ",b),this.proceedLoadView(b)):(this._waitingQueue=[],this.proceedLoadViewDef.resolve())}))},loadView:function(a){var b=a.parent||this.app,c=(a.viewId||"").split(","),f=c.shift(),c=c.join(","),e=a.params||"";this._defaultHasPlus=this._handleDefault=
-!1;b=this.loadChild(b,f,c,e,a);a.callback&&g(b,k.hitch(this,function(){this._handleDefault&&!a.initLoad&&(this.app.log("logTransitions:",""," emit app-transition this.childViews\x3d["+this.childViews+"]"),this.app.emit("app-transition",{viewId:this.childViews,defaultView:!0,forceTransitionNone:a.forceTransitionNone,opts:{params:e}}));a.callback(this._handleDefault,this._defaultHasPlus)}));return b},createChild:function(a,b,c,f){var e=a.id+"_"+b;!f&&a.views[b]&&a.views[b].defaultParams&&(f=a.views[b].defaultParams);
-if(c=a.children[e])return f&&(c.params=f),this.app.log("in app/controllers/Load createChild view is already loaded so return the loaded view with the new parms ",c),c;var d=new l;g(this.createView(a,e,b,null,f,a.views[b].type),function(b){a.children[e]=b;g(b.start(),function(a){d.resolve(a)})});return d},createView:function(a,b,c,f,e,d){var h=new l,g=this.app;n([d?d:"../View"],function(d){d=new d(k.mixin({app:g,id:b,name:c,parent:a},{params:e},f));h.resolve(d)});return h},loadChild:function(a,b,c,
-f,e){if(!a)throw Error("No parent for Child '"+b+"'.");if(!b){var d=a.defaultView?a.defaultView.split(","):"default";a.defaultView&&!e.initLoad?(d=this._getViewNamesFromDefaults(a),this.app.log("logTransitions:","Load:loadChild","setting _handleDefault true for parent.defaultView childViews\x3d["+d+"]"),this._handleDefault=!0,0<=a.defaultView.indexOf("+")&&(this._defaultHasPlus=!0)):(b=d.shift(),c=d.join(","))}var h=new l,m;try{m=this.createChild(a,b,c,f)}catch(r){return console.warn("logTransitions:",
-"","emit reject load exception for \x3d["+b+"]",r),h.reject("load child '"+b+"' error."),h.promise}g(m,k.hitch(this,function(a){if(!c&&a.defaultView){var d=this._getViewNamesFromDefaults(a);this.app.log("logTransitions:","Load:loadChild"," setting _handleDefault \x3d true child.defaultView childViews\x3d["+d+"]");this._handleDefault=!0;0<=a.defaultView.indexOf("+")&&(this._defaultHasPlus=!0);this.childViews=d;h.resolve()}d=c.split(",");b=d.shift();c=d.join(",");b?(a=this.loadChild(a,b,c,f,e),g(a,
-function(){h.resolve()},function(){h.reject("load child '"+b+"' error.")})):h.resolve()}),function(){console.warn("loadChildDeferred.REJECT() for ["+b+"] subIds\x3d["+c+"]");h.reject("load child '"+b+"' error.")});return h.promise},_getViewNamesFromDefaults:function(a){for(var b=a.parent,c=a.name,f="";b!==this.app;)c=b.name+","+c,b=b.parent;a=a.defaultView.split("+");for(var e in a)a[e]=c+","+a[e];return f=a.join("+")}})});
-//# sourceMappingURL=Load.js.map
+define("dojox/app/controllers/Load",["require","dojo/_base/lang","dojo/_base/declare","dojo/on","dojo/Deferred","dojo/when","dojo/dom-style","../Controller"],function(_1,_2,_3,on,_4,_5,_6,_7,_8){
+return _3("dojox.app.controllers.Load",_7,{_waitingQueue:[],constructor:function(_9,_a){
+this.events={"app-init":this.init,"app-load":this.load};
+},init:function(_b){
+_5(this.createView(_b.parent,null,null,{templateString:_b.templateString,controller:_b.controller},null,_b.type),function(_c){
+_5(_c.start(),_b.callback);
+});
+},load:function(_d){
+this.app.log("in app/controllers/Load event.viewId="+_d.viewId+" event =",_d);
+var _e=_d.viewId||"";
+var _f=[];
+var _10=_e.split("+");
+while(_10.length>0){
+var _11=_10.shift();
+_f.push(_11);
+}
+var def;
+this.proceedLoadViewDef=new _4();
+if(_f&&_f.length>1){
+for(var i=0;i<_f.length-1;i++){
+var _12=_2.clone(_d);
+_12.callback=null;
+_12.viewId=_f[i];
+this._waitingQueue.push(_12);
+}
+this.proceedLoadView(this._waitingQueue.shift());
+_5(this.proceedLoadViewDef,_2.hitch(this,function(){
+var _13=_2.clone(_d);
+_13.viewId=_f[i];
+def=this.loadView(_13);
+return def;
+}));
+}else{
+def=this.loadView(_d);
+return def;
+}
+},proceedLoadView:function(_14){
+var def=this.loadView(_14);
+_5(def,_2.hitch(this,function(){
+this.app.log("in app/controllers/Load proceedLoadView back from loadView for event",_14);
+var _15=this._waitingQueue.shift();
+if(_15){
+this.app.log("in app/controllers/Load proceedLoadView back from loadView calling this.proceedLoadView(nextEvt) for ",_15);
+this.proceedLoadView(_15);
+}else{
+this._waitingQueue=[];
+this.proceedLoadViewDef.resolve();
+}
+}));
+},loadView:function(_16){
+var _17=_16.parent||this.app;
+var _18=_16.viewId||"";
+var _19=_18.split(",");
+var _1a=_19.shift();
+var _1b=_19.join(",");
+var _1c=_16.params||"";
+this._handleDefault=false;
+this._defaultHasPlus=false;
+var def=this.loadChild(_17,_1a,_1b,_1c,_16);
+if(_16.callback){
+_5(def,_2.hitch(this,function(){
+if(this._handleDefault&&!_16.initLoad){
+this.app.log("logTransitions:",""," emit app-transition this.childViews=["+this.childViews+"]");
+this.app.emit("app-transition",{viewId:this.childViews,defaultView:true,forceTransitionNone:_16.forceTransitionNone,opts:{params:_1c}});
+}
+_16.callback(this._handleDefault,this._defaultHasPlus);
+}));
+}
+return def;
+},createChild:function(_1d,_1e,_1f,_20){
+var id=_1d.id+"_"+_1e;
+if(!_20&&_1d.views[_1e]&&_1d.views[_1e].defaultParams){
+_20=_1d.views[_1e].defaultParams;
+}
+var _21=_1d.children[id];
+if(_21){
+if(_20){
+_21.params=_20;
+}
+this.app.log("in app/controllers/Load createChild view is already loaded so return the loaded view with the new parms ",_21);
+return _21;
+}
+var def=new _4();
+_5(this.createView(_1d,id,_1e,null,_20,_1d.views[_1e].type),function(_22){
+_1d.children[id]=_22;
+_5(_22.start(),function(_23){
+def.resolve(_23);
+});
+});
+return def;
+},createView:function(_24,id,_25,_26,_27,_28){
+var def=new _4();
+var app=this.app;
+_1([_28?_28:"../View"],function(_29){
+var _2a=new _29(_2.mixin({"app":app,"id":id,"name":_25,"parent":_24},{"params":_27},_26));
+def.resolve(_2a);
+});
+return def;
+},loadChild:function(_2b,_2c,_2d,_2e,_2f){
+if(!_2b){
+throw Error("No parent for Child '"+_2c+"'.");
+}
+if(!_2c){
+var _30=_2b.defaultView?_2b.defaultView.split(","):"default";
+if(_2b.defaultView&&!_2f.initLoad){
+var _31=this._getViewNamesFromDefaults(_2b);
+this.app.log("logTransitions:","Load:loadChild","setting _handleDefault true for parent.defaultView childViews=["+_31+"]");
+this._handleDefault=true;
+if(_2b.defaultView.indexOf("+")>=0){
+this._defaultHasPlus=true;
+}
+}else{
+_2c=_30.shift();
+_2d=_30.join(",");
+}
+}
+var _32=new _4();
+var _33;
+try{
+_33=this.createChild(_2b,_2c,_2d,_2e);
+}
+catch(ex){
+console.warn("logTransitions:","","emit reject load exception for =["+_2c+"]",ex);
+_32.reject("load child '"+_2c+"' error.");
+return _32.promise;
+}
+_5(_33,_2.hitch(this,function(_34){
+if(!_2d&&_34.defaultView){
+var _35=this._getViewNamesFromDefaults(_34);
+this.app.log("logTransitions:","Load:loadChild"," setting _handleDefault = true child.defaultView childViews=["+_35+"]");
+this._handleDefault=true;
+if(_34.defaultView.indexOf("+")>=0){
+this._defaultHasPlus=true;
+}
+this.childViews=_35;
+_32.resolve();
+}
+var _36=_2d.split(",");
+_2c=_36.shift();
+_2d=_36.join(",");
+if(_2c){
+var _37=this.loadChild(_34,_2c,_2d,_2e,_2f);
+_5(_37,function(){
+_32.resolve();
+},function(){
+_32.reject("load child '"+_2c+"' error.");
+});
+}else{
+_32.resolve();
+}
+}),function(){
+console.warn("loadChildDeferred.REJECT() for ["+_2c+"] subIds=["+_2d+"]");
+_32.reject("load child '"+_2c+"' error.");
+});
+return _32.promise;
+},_getViewNamesFromDefaults:function(_38){
+var _39=_38.parent;
+var _3a=_38.name;
+var _3b="";
+while(_39!==this.app){
+_3a=_39.name+","+_3a;
+_39=_39.parent;
+}
+var _3c=_38.defaultView.split("+");
+for(var _3d in _3c){
+_3c[_3d]=_3a+","+_3c[_3d];
+}
+_3b=_3c.join("+");
+return _3b;
+}});
+});

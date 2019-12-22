@@ -1,3 +1,7 @@
 //>>built
-define("dojox/charting/plot2d/MarkersOnly",["dojo/_base/declare","./Default"],function(a,b){return a("dojox.charting.plot2d.MarkersOnly",b,{constructor:function(){this.opt.lines=!1;this.opt.markers=!0}})});
-//# sourceMappingURL=MarkersOnly.js.map
+define("dojox/charting/plot2d/MarkersOnly",["dojo/_base/declare","./Default"],function(_1,_2){
+return _1("dojox.charting.plot2d.MarkersOnly",_2,{constructor:function(){
+this.opt.lines=false;
+this.opt.markers=true;
+}});
+});

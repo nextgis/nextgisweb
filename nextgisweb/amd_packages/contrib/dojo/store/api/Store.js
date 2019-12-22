@@ -5,6 +5,36 @@
 */
 
 //>>built
-define("dojo/store/api/Store",["../../_base/declare"],function(d){var c=d(null,{idProperty:"id",queryEngine:null,get:function(a){},getIdentity:function(a){},put:function(a,b){},add:function(a,b){},remove:function(a){delete this.index[a];for(var b=this.data,d=this.idProperty,c=0,e=b.length;c<e;c++)if(b[c][d]==a){b.splice(c,1);break}},query:function(a,b){},transaction:function(){},getChildren:function(a,b){},getMetadata:function(a){}});c.PutDirectives=d(null,{});c.SortInformation=d(null,{});c.QueryOptions=
-d(null,{});c.QueryResults=d(null,{forEach:function(a,b){},filter:function(a,b){},map:function(a,b){},then:function(a,b){},observe:function(a,b){},total:0});c.Transaction=d(null,{commit:function(){},abort:function(a,b){}});return c});
-//# sourceMappingURL=Store.js.map
+define("dojo/store/api/Store",["../../_base/declare"],function(_1){
+var _2=_1(null,{idProperty:"id",queryEngine:null,get:function(id){
+},getIdentity:function(_3){
+},put:function(_4,_5){
+},add:function(_6,_7){
+},remove:function(id){
+delete this.index[id];
+var _8=this.data,_9=this.idProperty;
+for(var i=0,l=_8.length;i<l;i++){
+if(_8[i][_9]==id){
+_8.splice(i,1);
+return;
+}
+}
+},query:function(_a,_b){
+},transaction:function(){
+},getChildren:function(_c,_d){
+},getMetadata:function(_e){
+}});
+_2.PutDirectives=_1(null,{});
+_2.SortInformation=_1(null,{});
+_2.QueryOptions=_1(null,{});
+_2.QueryResults=_1(null,{forEach:function(_f,_10){
+},filter:function(_11,_12){
+},map:function(_13,_14){
+},then:function(_15,_16){
+},observe:function(_17,_18){
+},total:0});
+_2.Transaction=_1(null,{commit:function(){
+},abort:function(_19,_1a){
+}});
+return _2;
+});

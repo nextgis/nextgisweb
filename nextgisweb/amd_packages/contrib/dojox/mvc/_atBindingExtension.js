@@ -1,3 +1,7 @@
 //>>built
-define("dojox/mvc/_atBindingExtension",["dojo/_base/config","dojo/has","dijit/_WidgetBase","./atBindingExtension"],function(b,a,c,d){a.add("mvc-extension-per-widget",(b.mvc||{}).extensionPerWidget);a("mvc-extension-per-widget")||d(c.prototype)});
-//# sourceMappingURL=_atBindingExtension.js.map
+define("dojox/mvc/_atBindingExtension",["dojo/_base/config","dojo/has","dijit/_WidgetBase","./atBindingExtension"],function(_1,_2,_3,_4){
+_2.add("mvc-extension-per-widget",(_1["mvc"]||{}).extensionPerWidget);
+if(!_2("mvc-extension-per-widget")){
+_4(_3.prototype);
+}
+});

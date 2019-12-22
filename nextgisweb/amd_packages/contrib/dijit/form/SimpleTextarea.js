@@ -1,5 +1,46 @@
 //>>built
-define("dijit/form/SimpleTextarea",["dojo/_base/declare","dojo/dom-class","dojo/sniff","./TextBox"],function(h,k,g,l){return h("dijit.form.SimpleTextarea",l,{baseClass:"dijitTextBox dijitTextArea",rows:"3",cols:"20",templateString:"\x3ctextarea ${!nameAttrSetting} data-dojo-attach-point\x3d'focusNode,containerNode,textbox' autocomplete\x3d'off'\x3e\x3c/textarea\x3e",postMixInProperties:function(){!this.value&&this.srcNodeRef&&(this.value=this.srcNodeRef.value);this.inherited(arguments)},buildRendering:function(){this.inherited(arguments);
-g("ie")&&this.cols&&k.add(this.textbox,"dijitTextAreaCols")},filter:function(d){d&&(d=d.replace(/\r/g,""));return this.inherited(arguments)},_onInput:function(d){if(this.maxLength){var a=parseInt(this.maxLength),b=this.textbox.value.replace(/\r/g,""),a=b.length-a;if(0<a){var e=this.textbox;if(e.selectionStart){var c=e.selectionStart,f=0;g("opera")&&(f=(this.textbox.value.substring(0,c).match(/\r/g)||[]).length);this.textbox.value=b.substring(0,c-a-f)+b.substring(c-f);e.setSelectionRange(c-a,c-a)}else this.ownerDocument.selection&&
-(e.focus(),b=this.ownerDocument.selection.createRange(),b.moveStart("character",-a),b.text="",b.select())}}this.inherited(arguments)}})});
-//# sourceMappingURL=SimpleTextarea.js.map
+define("dijit/form/SimpleTextarea",["dojo/_base/declare","dojo/dom-class","dojo/sniff","./TextBox"],function(_1,_2,_3,_4){
+return _1("dijit.form.SimpleTextarea",_4,{baseClass:"dijitTextBox dijitTextArea",rows:"3",cols:"20",templateString:"<textarea ${!nameAttrSetting} data-dojo-attach-point='focusNode,containerNode,textbox' autocomplete='off'></textarea>",postMixInProperties:function(){
+if(!this.value&&this.srcNodeRef){
+this.value=this.srcNodeRef.value;
+}
+this.inherited(arguments);
+},buildRendering:function(){
+this.inherited(arguments);
+if(_3("ie")&&this.cols){
+_2.add(this.textbox,"dijitTextAreaCols");
+}
+},filter:function(_5){
+if(_5){
+_5=_5.replace(/\r/g,"");
+}
+return this.inherited(arguments);
+},_onInput:function(e){
+if(this.maxLength){
+var _6=parseInt(this.maxLength);
+var _7=this.textbox.value.replace(/\r/g,"");
+var _8=_7.length-_6;
+if(_8>0){
+var _9=this.textbox;
+if(_9.selectionStart){
+var _a=_9.selectionStart;
+var cr=0;
+if(_3("opera")){
+cr=(this.textbox.value.substring(0,_a).match(/\r/g)||[]).length;
+}
+this.textbox.value=_7.substring(0,_a-_8-cr)+_7.substring(_a-cr);
+_9.setSelectionRange(_a-_8,_a-_8);
+}else{
+if(this.ownerDocument.selection){
+_9.focus();
+var _b=this.ownerDocument.selection.createRange();
+_b.moveStart("character",-_8);
+_b.text="";
+_b.select();
+}
+}
+}
+}
+this.inherited(arguments);
+}});
+});

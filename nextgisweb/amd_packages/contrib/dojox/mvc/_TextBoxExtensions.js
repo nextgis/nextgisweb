@@ -1,4 +1,21 @@
 //>>built
-define("dojox/mvc/_TextBoxExtensions",["dojo/_base/lang","dijit/_WidgetBase","dijit/form/ValidationTextBox","dijit/form/NumberTextBox"],function(e,b,c,d){var f=c.prototype.isValid;c.prototype.isValid=function(a){return!1!==this.inherited("isValid",arguments)&&f.apply(this,[a])};var g=d.prototype.isValid;d.prototype.isValid=function(a){return!1!==this.inherited("isValid",arguments)&&g.apply(this,[a])};e.isFunction(b.prototype.isValid)||(b.prototype.isValid=function(){var a=this.get("valid");return"undefined"==
-typeof a?!0:a});b.prototype._setValidAttr=function(a){this._set("valid",a);this.validate()}});
-//# sourceMappingURL=_TextBoxExtensions.js.map
+define("dojox/mvc/_TextBoxExtensions",["dojo/_base/lang","dijit/_WidgetBase","dijit/form/ValidationTextBox","dijit/form/NumberTextBox"],function(_1,_2,_3,_4){
+var _5=_3.prototype.isValid;
+_3.prototype.isValid=function(_6){
+return (this.inherited("isValid",arguments)!==false&&_5.apply(this,[_6]));
+};
+var _7=_4.prototype.isValid;
+_4.prototype.isValid=function(_8){
+return (this.inherited("isValid",arguments)!==false&&_7.apply(this,[_8]));
+};
+if(!_1.isFunction(_2.prototype.isValid)){
+_2.prototype.isValid=function(){
+var _9=this.get("valid");
+return typeof _9=="undefined"?true:_9;
+};
+}
+_2.prototype._setValidAttr=function(_a){
+this._set("valid",_a);
+this.validate();
+};
+});

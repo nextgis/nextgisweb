@@ -1,3 +1,11 @@
 //>>built
-define("dojox/mobile/TransitionEvent",["dojo/_base/declare","dojo/on"],function(a,b){return a("dojox.mobile.TransitionEvent",null,{constructor:function(a,b,c){this.transitionOptions=b;this.target=a;this.triggerEvent=c||null},dispatch:function(){b.emit(this.target,"startTransition",{bubbles:!0,cancelable:!0,detail:this.transitionOptions,triggerEvent:this.triggerEvent})}})});
-//# sourceMappingURL=TransitionEvent.js.map
+define("dojox/mobile/TransitionEvent",["dojo/_base/declare","dojo/on"],function(_1,on){
+return _1("dojox.mobile.TransitionEvent",null,{constructor:function(_2,_3,_4){
+this.transitionOptions=_3;
+this.target=_2;
+this.triggerEvent=_4||null;
+},dispatch:function(){
+var _5={bubbles:true,cancelable:true,detail:this.transitionOptions,triggerEvent:this.triggerEvent};
+var _6=on.emit(this.target,"startTransition",_5);
+}});
+});

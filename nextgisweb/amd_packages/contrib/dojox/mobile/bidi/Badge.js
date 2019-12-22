@@ -1,3 +1,11 @@
 //>>built
-define("dojox/mobile/bidi/Badge",["dojo/_base/declare","./common"],function(c,b){return c(null,{textDir:"",setValue:function(a){this.domNode.firstChild.innerHTML=b.enforceTextDirWithUcc(a,this.textDir)},setTextDir:function(a){this.textDir!==a&&(this.textDir=a,this.domNode.firstChild.innerHTML=b.enforceTextDirWithUcc(b.removeUCCFromText(this.domNode.firstChild.innerHTML),this.textDir))}})});
-//# sourceMappingURL=Badge.js.map
+define("dojox/mobile/bidi/Badge",["dojo/_base/declare","./common"],function(_1,_2){
+return _1(null,{textDir:"",setValue:function(_3){
+this.domNode.firstChild.innerHTML=_2.enforceTextDirWithUcc(_3,this.textDir);
+},setTextDir:function(_4){
+if(this.textDir!==_4){
+this.textDir=_4;
+this.domNode.firstChild.innerHTML=_2.enforceTextDirWithUcc(_2.removeUCCFromText(this.domNode.firstChild.innerHTML),this.textDir);
+}
+}});
+});

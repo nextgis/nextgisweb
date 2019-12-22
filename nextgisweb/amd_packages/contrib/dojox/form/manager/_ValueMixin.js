@@ -1,4 +1,40 @@
 //>>built
-define("dojox/form/manager/_ValueMixin",["dojo/_base/lang","dojo/_base/kernel","dojo/_base/declare"],function(c,f,e){return e("dojox.form.manager._ValueMixin",null,{elementValue:function(a,b){return a in this.formWidgets?this.formWidgetValue(a,b):this.formNodes&&a in this.formNodes?this.formNodeValue(a,b):this.formPointValue(a,b)},gatherFormValues:function(a){var b=this.inspectFormWidgets(function(a){return this.formWidgetValue(a)},a);this.inspectFormNodes&&c.mixin(b,this.inspectFormNodes(function(a){return this.formNodeValue(a)},
-a));c.mixin(b,this.inspectAttachedPoints(function(a){return this.formPointValue(a)},a));return b},setFormValues:function(a){a&&(this.inspectFormWidgets(function(a,c,d){this.formWidgetValue(a,d)},a),this.inspectFormNodes&&this.inspectFormNodes(function(a,c,d){this.formNodeValue(a,d)},a),this.inspectAttachedPoints(function(a,c,d){this.formPointValue(a,d)},a));return this}})});
-//# sourceMappingURL=_ValueMixin.js.map
+define("dojox/form/manager/_ValueMixin",["dojo/_base/lang","dojo/_base/kernel","dojo/_base/declare"],function(_1,_2,_3){
+return _3("dojox.form.manager._ValueMixin",null,{elementValue:function(_4,_5){
+if(_4 in this.formWidgets){
+return this.formWidgetValue(_4,_5);
+}
+if(this.formNodes&&_4 in this.formNodes){
+return this.formNodeValue(_4,_5);
+}
+return this.formPointValue(_4,_5);
+},gatherFormValues:function(_6){
+var _7=this.inspectFormWidgets(function(_8){
+return this.formWidgetValue(_8);
+},_6);
+if(this.inspectFormNodes){
+_1.mixin(_7,this.inspectFormNodes(function(_9){
+return this.formNodeValue(_9);
+},_6));
+}
+_1.mixin(_7,this.inspectAttachedPoints(function(_a){
+return this.formPointValue(_a);
+},_6));
+return _7;
+},setFormValues:function(_b){
+if(_b){
+this.inspectFormWidgets(function(_c,_d,_e){
+this.formWidgetValue(_c,_e);
+},_b);
+if(this.inspectFormNodes){
+this.inspectFormNodes(function(_f,_10,_11){
+this.formNodeValue(_f,_11);
+},_b);
+}
+this.inspectAttachedPoints(function(_12,_13,_14){
+this.formPointValue(_12,_14);
+},_b);
+}
+return this;
+}});
+});

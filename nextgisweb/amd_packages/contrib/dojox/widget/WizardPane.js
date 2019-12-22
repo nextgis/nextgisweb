@@ -1,4 +1,39 @@
 //>>built
-define("dojox/widget/WizardPane",["dojo/_base/lang","dojo/_base/declare","dijit/layout/ContentPane"],function(a,d,e){return d("dojox.widget.WizardPane",e,{canGoBack:!0,passFunction:null,doneFunction:null,startup:function(){this.inherited(arguments);this.isFirstChild&&(this.canGoBack=!1);a.isString(this.passFunction)&&(this.passFunction=a.getObject(this.passFunction));a.isString(this.doneFunction)&&this.doneFunction&&(this.doneFunction=a.getObject(this.doneFunction))},_onShow:function(){this.isFirstChild&&
-(this.canGoBack=!1);this.inherited(arguments)},_checkPass:function(){var b=!0;if(this.passFunction&&a.isFunction(this.passFunction)){var c=this.passFunction();switch(typeof c){case "boolean":b=c;break;case "string":alert(c),b=!1}}return b},done:function(){this.doneFunction&&a.isFunction(this.doneFunction)&&this.doneFunction()}})});
-//# sourceMappingURL=WizardPane.js.map
+define("dojox/widget/WizardPane",["dojo/_base/lang","dojo/_base/declare","dijit/layout/ContentPane"],function(_1,_2,_3){
+return _2("dojox.widget.WizardPane",_3,{canGoBack:true,passFunction:null,doneFunction:null,startup:function(){
+this.inherited(arguments);
+if(this.isFirstChild){
+this.canGoBack=false;
+}
+if(_1.isString(this.passFunction)){
+this.passFunction=_1.getObject(this.passFunction);
+}
+if(_1.isString(this.doneFunction)&&this.doneFunction){
+this.doneFunction=_1.getObject(this.doneFunction);
+}
+},_onShow:function(){
+if(this.isFirstChild){
+this.canGoBack=false;
+}
+this.inherited(arguments);
+},_checkPass:function(){
+var r=true;
+if(this.passFunction&&_1.isFunction(this.passFunction)){
+var _4=this.passFunction();
+switch(typeof _4){
+case "boolean":
+r=_4;
+break;
+case "string":
+alert(_4);
+r=false;
+break;
+}
+}
+return r;
+},done:function(){
+if(this.doneFunction&&_1.isFunction(this.doneFunction)){
+this.doneFunction();
+}
+}});
+});

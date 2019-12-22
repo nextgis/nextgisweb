@@ -135,13 +135,19 @@ define("dijit/form/NumberTextBox", [
 			this._decimalInfo = getDecimalInfo(constraints);
 		},
 
-		_onFocus: function(){
+		_onFocus: function(/*String*/ by){
 			if(this.disabled || this.readOnly){ return; }
 			var val = this.get('value');
 			if(typeof val == "number" && !isNaN(val)){
 				var formattedValue = this.format(val, this.constraints);
 				if(formattedValue !== undefined){
 					this.textbox.value = formattedValue;
+					// when NumberTextBox or descendants (i.e. CurrencyTextBox) format textbox.value when focused
+					// all browsers except Chrome will select textbox contents when tabbed to by keyboard
+					// force selection if not focused by mouse
+					if (by !== "mouse") {
+						this.textbox.select();
+					}
 				}
 			}
 			this.inherited(arguments);

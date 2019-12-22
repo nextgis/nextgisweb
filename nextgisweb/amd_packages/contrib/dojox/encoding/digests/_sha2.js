@@ -1,4 +1,45 @@
 //>>built
-define("dojox/encoding/digests/_sha2",[],function(){return function(a,g,l,k){function d(b,c){c=c||a.outputTypes.Base64;var e=a.digest(a.toWord(b),8*b.length,k,g);switch(c){case a.outputTypes.Raw:return e;case a.outputTypes.Hex:return a.toHex(e);case a.outputTypes.String:return a._toString(e);default:return a.toBase64(e)}}d.hmac=function(b,c,e){e=e||a.outputTypes.Base64;var h=a.toWord(c);16<h.length&&(h=a.digest(h,8*c.length,k,g));var d=l/32,m=Array(d);c=Array(d);for(var f=0;f<d;f++)m[f]=h[f]^909522486,
-c[f]=h[f]^1549556828;b=a.digest(m.concat(a.toWord(b)),l+8*b.length,k,g);b=a.digest(c.concat(b),l+g,k,g);switch(e){case a.outputTypes.Raw:return b;case a.outputTypes.Hex:return a.toHex(b);case a.outputTypes.String:return a._toString(b);default:return a.toBase64(b)}};d._hmac=d.hmac;return d}});
-//# sourceMappingURL=_sha2.js.map
+define("dojox/encoding/digests/_sha2",[],function(){
+return function(_1,_2,_3,_4){
+function _5(_6,_7){
+_7=_7||_1.outputTypes.Base64;
+var wa=_1.digest(_1.toWord(_6),_6.length*8,_4,_2);
+switch(_7){
+case _1.outputTypes.Raw:
+return wa;
+case _1.outputTypes.Hex:
+return _1.toHex(wa);
+case _1.outputTypes.String:
+return _1._toString(wa);
+default:
+return _1.toBase64(wa);
+}
+};
+_5.hmac=function(_8,_9,_a){
+_a=_a||_1.outputTypes.Base64;
+var wa=_1.toWord(_9);
+if(wa.length>16){
+wa=_1.digest(wa,_9.length*8,_4,_2);
+}
+var _b=_3/32,_c=new Array(_b),_d=new Array(_b);
+for(var i=0;i<_b;i++){
+_c[i]=wa[i]^909522486;
+_d[i]=wa[i]^1549556828;
+}
+var r1=_1.digest(_c.concat(_1.toWord(_8)),_3+_8.length*8,_4,_2);
+var r2=_1.digest(_d.concat(r1),_3+_2,_4,_2);
+switch(_a){
+case _1.outputTypes.Raw:
+return r2;
+case _1.outputTypes.Hex:
+return _1.toHex(r2);
+case _1.outputTypes.String:
+return _1._toString(r2);
+default:
+return _1.toBase64(r2);
+}
+};
+_5._hmac=_5.hmac;
+return _5;
+};
+});

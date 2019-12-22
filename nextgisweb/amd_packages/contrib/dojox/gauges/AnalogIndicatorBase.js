@@ -1,8 +1,125 @@
 //>>built
-define("dojox/gauges/AnalogIndicatorBase","dojo/_base/lang dojo/_base/declare dojo/_base/connect dojo/_base/fx dojox/gfx ./_Indicator".split(" "),function(t,u,v,w,l,x){return u("dojox.gauges.AnalogIndicatorBase",[x],{draw:function(h,e){if(this.shape)this._move(e);else{this.text&&(this.text.parent.remove(this.text),this.text=null);var c=this._gauge._getAngle(Math.min(Math.max(this.value,this._gauge.min),this._gauge.max));this.color=this.color||"#000000";this.length=this.length||this._gauge.radius;
-this.width=this.width||1;this.offset=this.offset||0;this.highlight=this.highlight||"#D0D0D0";var b=this._getShapes(h,this._gauge,this);if(b){if(1<b.length){this.shape=h.createGroup();for(var f=0;f<b.length;f++)this.shape.add(b[f])}else this.shape=b[0];this.shape.setTransform([{dx:this._gauge.cx,dy:this._gauge.cy},l.matrix.rotateg(c)]);this.shape.connect("onmouseover",this,this.handleMouseOver);this.shape.connect("onmouseout",this,this.handleMouseOut);this.shape.connect("onmousedown",this,this.handleMouseDown);
-this.shape.connect("touchstart",this,this.handleTouchStart)}this.label&&((b=this.direction)||(b="outside"),f="inside"==b?-this.length+this.offset-5:this.length+this.offset+5,c=this._gauge._getRadians(90-c),this._layoutLabel(h,this.label+"",this._gauge.cx,this._gauge.cy,f,c,b));this.currentValue=this.value}},_layoutLabel:function(h,e,c,b,f,g,m){var k=this.font?this.font:l.defaultFont,r=l._base._getTextBox(e,{font:l.makeFontString(l.makeParameters(l.defaultFont,k))}).w,k=l.normalizedLength(k.size),
-n=c+Math.cos(g)*f-r/2,p=b-Math.sin(g)*f-k/2,a,q=[];a=n;var d;d=-Math.tan(g)*a+b+Math.tan(g)*c;d>=p&&d<=p+k&&q.push({x:a,y:d});a=n+r;d=-Math.tan(g)*a+b+Math.tan(g)*c;d>=p&&d<=p+k&&q.push({x:a,y:d});a=p;d=-1/Math.tan(g)*a+c+1/Math.tan(g)*b;d>=n&&d<=n+r&&q.push({x:d,y:a});a=p+k;d=-1/Math.tan(g)*a+c+1/Math.tan(g)*b;d>=n&&d<=n+r&&q.push({x:d,y:a});if("inside"==m)for(m=0;m<q.length;m++){if(a=q[m],a=this._distance(a.x,a.y,c,b)-f,0<=a){n=c+Math.cos(g)*(f-a)-r/2;p=b-Math.sin(g)*(f-a)-k/2;break}}else for(m=
-0;m<q.length;m++)if(a=q[m],a=this._distance(a.x,a.y,c,b)-f,0>=a){n=c+Math.cos(g)*(f-a)-r/2;p=b-Math.sin(g)*(f-a)-k/2;break}this.text=this._gauge.drawText(h,e,n+r/2,p+k,"middle",this.color,this.font)},_distance:function(h,e,c,b){return Math.sqrt((c-h)*(c-h)+(b-e)*(b-e))},_move:function(h){var e=Math.min(Math.max(this.value,this._gauge.min),this._gauge.max),c=this.currentValue;h?(h=this._gauge._getAngle(e),this.shape.setTransform([{dx:this._gauge.cx,dy:this._gauge.cy},l.matrix.rotateg(h)]),this.currentValue=
-e):c!=e&&(e=new w.Animation({curve:[c,e],duration:this.duration,easing:this.easing}),v.connect(e,"onAnimate",t.hitch(this,function(b){this.shape.setTransform([{dx:this._gauge.cx,dy:this._gauge.cy},l.matrix.rotateg(this._gauge._getAngle(b))]);this.currentValue=b})),e.play())}})});
-//# sourceMappingURL=AnalogIndicatorBase.js.map
+define("dojox/gauges/AnalogIndicatorBase",["dojo/_base/lang","dojo/_base/declare","dojo/_base/connect","dojo/_base/fx","dojox/gfx","./_Indicator"],function(_1,_2,_3,fx,_4,_5){
+return _2("dojox.gauges.AnalogIndicatorBase",[_5],{draw:function(_6,_7){
+if(this.shape){
+this._move(_7);
+}else{
+if(this.text){
+this.text.parent.remove(this.text);
+this.text=null;
+}
+var a=this._gauge._getAngle(Math.min(Math.max(this.value,this._gauge.min),this._gauge.max));
+this.color=this.color||"#000000";
+this.length=this.length||this._gauge.radius;
+this.width=this.width||1;
+this.offset=this.offset||0;
+this.highlight=this.highlight||"#D0D0D0";
+var _8=this._getShapes(_6,this._gauge,this);
+if(_8){
+if(_8.length>1){
+this.shape=_6.createGroup();
+for(var s=0;s<_8.length;s++){
+this.shape.add(_8[s]);
+}
+}else{
+this.shape=_8[0];
+}
+this.shape.setTransform([{dx:this._gauge.cx,dy:this._gauge.cy},_4.matrix.rotateg(a)]);
+this.shape.connect("onmouseover",this,this.handleMouseOver);
+this.shape.connect("onmouseout",this,this.handleMouseOut);
+this.shape.connect("onmousedown",this,this.handleMouseDown);
+this.shape.connect("touchstart",this,this.handleTouchStart);
+}
+if(this.label){
+var _9=this.direction;
+if(!_9){
+_9="outside";
+}
+var _a;
+if(_9=="inside"){
+_a=-this.length+this.offset-5;
+}else{
+_a=this.length+this.offset+5;
+}
+var _b=this._gauge._getRadians(90-a);
+this._layoutLabel(_6,this.label+"",this._gauge.cx,this._gauge.cy,_a,_b,_9);
+}
+this.currentValue=this.value;
+}
+},_layoutLabel:function(_c,_d,ox,oy,_e,_f,_10){
+var _11=this.font?this.font:_4.defaultFont;
+var box=_4._base._getTextBox(_d,{font:_4.makeFontString(_4.makeParameters(_4.defaultFont,_11))});
+var tw=box.w;
+var fz=_11.size;
+var th=_4.normalizedLength(fz);
+var tfx=ox+Math.cos(_f)*_e-tw/2;
+var tfy=oy-Math.sin(_f)*_e-th/2;
+var _12;
+var _13=[];
+_12=tfx;
+var ipx=_12;
+var ipy=-Math.tan(_f)*_12+oy+Math.tan(_f)*ox;
+if(ipy>=tfy&&ipy<=tfy+th){
+_13.push({x:ipx,y:ipy});
+}
+_12=tfx+tw;
+ipx=_12;
+ipy=-Math.tan(_f)*_12+oy+Math.tan(_f)*ox;
+if(ipy>=tfy&&ipy<=tfy+th){
+_13.push({x:ipx,y:ipy});
+}
+_12=tfy;
+ipx=-1/Math.tan(_f)*_12+ox+1/Math.tan(_f)*oy;
+ipy=_12;
+if(ipx>=tfx&&ipx<=tfx+tw){
+_13.push({x:ipx,y:ipy});
+}
+_12=tfy+th;
+ipx=-1/Math.tan(_f)*_12+ox+1/Math.tan(_f)*oy;
+ipy=_12;
+if(ipx>=tfx&&ipx<=tfx+tw){
+_13.push({x:ipx,y:ipy});
+}
+var dif;
+if(_10=="inside"){
+for(var it=0;it<_13.length;it++){
+var ip=_13[it];
+dif=this._distance(ip.x,ip.y,ox,oy)-_e;
+if(dif>=0){
+tfx=ox+Math.cos(_f)*(_e-dif)-tw/2;
+tfy=oy-Math.sin(_f)*(_e-dif)-th/2;
+break;
+}
+}
+}else{
+for(it=0;it<_13.length;it++){
+ip=_13[it];
+dif=this._distance(ip.x,ip.y,ox,oy)-_e;
+if(dif<=0){
+tfx=ox+Math.cos(_f)*(_e-dif)-tw/2;
+tfy=oy-Math.sin(_f)*(_e-dif)-th/2;
+break;
+}
+}
+}
+this.text=this._gauge.drawText(_c,_d,tfx+tw/2,tfy+th,"middle",this.color,this.font);
+},_distance:function(x1,y1,x2,y2){
+return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+},_move:function(_14){
+var v=Math.min(Math.max(this.value,this._gauge.min),this._gauge.max),c=this.currentValue;
+if(_14){
+var _15=this._gauge._getAngle(v);
+this.shape.setTransform([{dx:this._gauge.cx,dy:this._gauge.cy},_4.matrix.rotateg(_15)]);
+this.currentValue=v;
+}else{
+if(c!=v){
+var _16=new fx.Animation({curve:[c,v],duration:this.duration,easing:this.easing});
+_3.connect(_16,"onAnimate",_1.hitch(this,function(_17){
+this.shape.setTransform([{dx:this._gauge.cx,dy:this._gauge.cy},_4.matrix.rotateg(this._gauge._getAngle(_17))]);
+this.currentValue=_17;
+}));
+_16.play();
+}
+}
+}});
+});

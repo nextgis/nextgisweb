@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/sr/SafePaste",{instructions:"Direktno nalepljivanje je onemogu\u0107eno. Nalepite sadr\u017eaj u ovaj dijalog koriste\u0107i standardne tasterske kontrole pregleda\u010da ili kontrole menija za nalepljivanje  Kada ste zadovoljni sa sadr\u017eajem za umetanje, kliknite na dugme Nalepi.  Da otka\u017eete umetanje sadr\u017eaja, kliknite na dugme Otka\u017ei."});
-//# sourceMappingURL=SafePaste.js.map
+define("dojox/editor/plugins/nls/sr/SafePaste",{"instructions":"Direktno nalepljivanje je onemogućeno. Nalepite sadržaj u ovaj dijalog koristeći standardne tasterske kontrole pregledača ili kontrole menija za nalepljivanje  Kada ste zadovoljni sa sadržajem za umetanje, kliknite na dugme Nalepi.  Da otkažete umetanje sadržaja, kliknite na dugme Otkaži."});

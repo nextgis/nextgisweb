@@ -1,6 +1,61 @@
 //>>built
-define("dojox/treemap/DrillDownUp","dojo/_base/lang dojo/_base/event dojo/_base/declare dojo/on dojo/dom-geometry dojo/dom-construct dojo/dom-style dojo/_base/fx dojo/has!touch?dojox/gesture/tap".split(" "),function(d,k,n,h,e,l,f,m,g){return n("dojox.treemap.DrillDownUp",null,{postCreate:function(){this.inherited(arguments);this.own(h(this.domNode,"dblclick",d.hitch(this,this._onDoubleClick)));g&&this.own(h(this.domNode,g.doubletap,d.hitch(this,this._onDoubleClick)))},_onDoubleClick:function(b){var a=
-this._getRendererFromTarget(b.target);if(a.item){var c=a.item;if(this._isLeaf(c)&&(c=a.parentItem,a=this.itemToRenderer[this.getIdentity(c)],null==a))return;this.rootItem==c?this.drillUp(a):this.drillDown(a);k.stop(b)}},drillUp:function(b){var a=b.item;this.domNode.removeChild(b);var c=this._getRenderer(a).parentItem;this.set("rootItem",c);this.validateRendering();l.place(b,this.domNode);f.set(b,"zIndex",40);a=e.position(this._getRenderer(a),!0);c=e.getMarginBox(this.domNode);m.animateProperty({node:b,
-duration:500,properties:{left:{end:a.x-c.l},top:{end:a.y-c.t},height:{end:a.h},width:{end:a.w}},onAnimate:d.hitch(this,function(a){a=e.getContentBox(b);this._layoutGroupContent(b,a.w,a.h,b.level+1,!1,!0)}),onEnd:d.hitch(this,function(){this.domNode.removeChild(b)})}).play()},drillDown:function(b){var a=e.getMarginBox(this.domNode),c=b.item,h=b.parentNode,g=e.position(b,!0);h.removeChild(b);l.place(b,this.domNode);f.set(b,{left:g.x-a.l+"px",top:g.y-a.t+"px"});var k=f.get(b,"zIndex");f.set(b,"zIndex",
-40);m.animateProperty({node:b,duration:500,properties:{left:{end:a.l},top:{end:a.t},height:{end:a.h},width:{end:a.w}},onAnimate:d.hitch(this,function(a){a=e.getContentBox(b);this._layoutGroupContent(b,a.w,a.h,b.level+1,!1)}),onEnd:d.hitch(this,function(){f.set(b,"zIndex",k);this.set("rootItem",c)})}).play()}})});
-//# sourceMappingURL=DrillDownUp.js.map
+define("dojox/treemap/DrillDownUp",["dojo/_base/lang","dojo/_base/event","dojo/_base/declare","dojo/on","dojo/dom-geometry","dojo/dom-construct","dojo/dom-style","dojo/_base/fx","dojo/has!touch?dojox/gesture/tap"],function(_1,_2,_3,on,_4,_5,_6,fx,_7){
+return _3("dojox.treemap.DrillDownUp",null,{postCreate:function(){
+this.inherited(arguments);
+this.own(on(this.domNode,"dblclick",_1.hitch(this,this._onDoubleClick)));
+if(_7){
+this.own(on(this.domNode,_7.doubletap,_1.hitch(this,this._onDoubleClick)));
+}
+},_onDoubleClick:function(e){
+var _8=this._getRendererFromTarget(e.target);
+if(_8.item){
+var _9=_8.item;
+if(this._isLeaf(_9)){
+_9=_8.parentItem;
+_8=this.itemToRenderer[this.getIdentity(_9)];
+if(_8==null){
+return;
+}
+}
+if(this.rootItem==_9){
+this.drillUp(_8);
+}else{
+this.drillDown(_8);
+}
+_2.stop(e);
+}
+},drillUp:function(_a){
+var _b=_a.item;
+this.domNode.removeChild(_a);
+var _c=this._getRenderer(_b).parentItem;
+this.set("rootItem",_c);
+this.validateRendering();
+_5.place(_a,this.domNode);
+_6.set(_a,"zIndex",40);
+var _d=_4.position(this._getRenderer(_b),true);
+var _e=_4.getMarginBox(this.domNode);
+fx.animateProperty({node:_a,duration:500,properties:{left:{end:_d.x-_e.l},top:{end:_d.y-_e.t},height:{end:_d.h},width:{end:_d.w}},onAnimate:_1.hitch(this,function(_f){
+var box=_4.getContentBox(_a);
+this._layoutGroupContent(_a,box.w,box.h,_a.level+1,false,true);
+}),onEnd:_1.hitch(this,function(){
+this.domNode.removeChild(_a);
+})}).play();
+},drillDown:function(_10){
+var box=_4.getMarginBox(this.domNode);
+var _11=_10.item;
+var _12=_10.parentNode;
+var _13=_4.position(_10,true);
+_12.removeChild(_10);
+_5.place(_10,this.domNode);
+_6.set(_10,{left:(_13.x-box.l)+"px",top:(_13.y-box.t)+"px"});
+var _14=_6.get(_10,"zIndex");
+_6.set(_10,"zIndex",40);
+fx.animateProperty({node:_10,duration:500,properties:{left:{end:box.l},top:{end:box.t},height:{end:box.h},width:{end:box.w}},onAnimate:_1.hitch(this,function(_15){
+var _16=_4.getContentBox(_10);
+this._layoutGroupContent(_10,_16.w,_16.h,_10.level+1,false);
+}),onEnd:_1.hitch(this,function(){
+_6.set(_10,"zIndex",_14);
+this.set("rootItem",_11);
+})}).play();
+}});
+});

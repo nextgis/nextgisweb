@@ -1,9 +1,126 @@
 //>>built
-define("dojox/drawing/plugins/drawing/GreekPalette","dojo dijit/popup ../../library/greek dijit/focus dijit/_Widget dijit/_TemplatedMixin dijit/_PaletteMixin dojo/i18n!dojox/editor/plugins/nls/latinEntities".split(" "),function(b,e,h,m,n,p,q,r){var t=b.declare(null,{constructor:function(a){this._alias=a},getValue:function(){return this._alias},fillCell:function(a){a.innerHTML="\x26"+this._alias+";"}});return b.declare("dojox.drawing.plugins.drawing.GreekPalette",[n,p,q],{postMixInProperties:function(){var a=
-0,b;for(b in h)a++;var a=Math.floor(Math.sqrt(a)),g=0,k=[],c=[];for(b in h)g++,c.push(b),0===g%a&&(k.push(c),c=[]);0<c.length&&k.push(c);this._palette=k},show:function(a){b.mixin(a,{popup:this});e.open(a)},onChange:function(a){var b=this._textBlock;e.hide(this);b.insertText(this._pushChangeTo,a);b._dropMode=!1},onCancel:function(a){e.hide(this);this._textBlock._dropMode=!1},templateString:'\x3cdiv class\x3d"dojoxEntityPalette"\x3e\n\t\x3ctable\x3e\n\t\t\x3ctbody\x3e\n\t\t\t\x3ctr\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3ctable class\x3d"dijitPaletteTable"\x3e\n\t\t\t\t\t\t\x3ctbody dojoAttachPoint\x3d"gridNode"\x3e\x3c/tbody\x3e\n\t\t\t\t   \x3c/table\x3e\n\t\t\t\t\x3c/td\x3e\n\t\t\t\x3c/tr\x3e\n\t\t\t\x3ctr\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3ctable dojoAttachPoint\x3d"previewPane" class\x3d"dojoxEntityPalettePreviewTable"\x3e\n\t\t\t\t\t\t\x3ctbody\x3e\n\t\t\t\t\t\t\t\x3ctr\x3e\n\t\t\t\t\t\t\t\t\x3ctd class\x3d"dojoxEntityPalettePreviewDetailEntity"\x3eType: \x3cspan class\x3d"dojoxEntityPalettePreviewDetail" dojoAttachPoint\x3d"previewNode"\x3e\x3c/span\x3e\x3c/td\x3e\n\t\t\t\t\t\t\t\x3c/tr\x3e\n\t\t\t\t\t\t\x3c/tbody\x3e\n\t\t\t\t\t\x3c/table\x3e\n\t\t\t\t\x3c/td\x3e\n\t\t\t\x3c/tr\x3e\n\t\t\x3c/tbody\x3e\n\t\x3c/table\x3e\n\x3c/div\x3e',
-baseClass:"dojoxEntityPalette",showPreview:!0,dyeClass:t,paletteClass:"editorLatinEntityPalette",cellClass:"dojoxEntityPaletteCell",buildRendering:function(){this.inherited(arguments);this._preparePalette(this._palette,r);var a=b.query(".dojoxEntityPaletteCell",this.gridNode);b.forEach(a,function(a){this.connect(a,"onmouseenter","_onCellMouseEnter")},this)},_onCellMouseEnter:function(a){this.showPreview&&this._displayDetails(a.target)},_onCellClick:function(a){var f="click"==a.type?a.currentTarget:
-this._currentFocus,g=this._getDye(f).getValue();this._setCurrent(f);setTimeout(b.hitch(this,function(){m(f);this._setValueAttr(g,!0)}));b.removeClass(f,"dijitPaletteCellHover");b.stopEvent(a)},postCreate:function(){this.inherited(arguments);this.showPreview||b.style(this.previewNode,"display","none");e.moveOffScreen(this)},_setCurrent:function(a){"_currentFocus"in this&&(b.attr(this._currentFocus,"tabIndex","-1"),b.removeClass(this._currentFocus,"dojoxEntityPaletteCellHover"));if(this._currentFocus=
-a)b.attr(a,"tabIndex",this.tabIndex),b.addClass(this._currentFocus,"dojoxEntityPaletteCellHover");this.showPreview&&this._displayDetails(a)},_displayDetails:function(a){(a=this._getDye(a))?(a=a.getValue(),this.previewNode.innerHTML=a):(this.previewNode.innerHTML="",this.descNode.innerHTML="")},_preparePalette:function(a,f){this._cells=[];for(var g=this._blankGif,k="string"===typeof this.dyeClass?b.getObject(this.dyeClass):this.dyeClass,c=0;c<a.length;c++)for(var e=b.create("tr",{tabIndex:"-1"},this.gridNode),
-l=0;l<a[c].length;l++){var d=a[c][l];if(d){var h=new k(d),d=b.create("td",{"class":this.cellClass,tabIndex:"-1",title:f[d]});h.fillCell(d,g);this.connect(d,"ondijitclick","_onCellClick");this._trackMouseState(d,this.cellClass);b.place(d,e);d.idx=this._cells.length;this._cells.push({node:d,dye:h})}}this._xDim=a[0].length;this._yDim=a.length},_navigateByArrow:function(a){a={38:-this._xDim,40:this._xDim,39:this.isLeftToRight()?1:-1,37:this.isLeftToRight()?-1:1}[a.keyCode];a=this._currentFocus.idx+a;
-a<this._cells.length&&-1<a&&this._setCurrent(this._cells[a].node)}})});
-//# sourceMappingURL=GreekPalette.js.map
+define("dojox/drawing/plugins/drawing/GreekPalette",["dojo","dijit/popup","../../library/greek","dijit/focus","dijit/_Widget","dijit/_TemplatedMixin","dijit/_PaletteMixin","dojo/i18n!dojox/editor/plugins/nls/latinEntities"],function(_1,_2,_3,_4,_5,_6,_7,_8){
+var _9=_1.declare(null,{constructor:function(_a){
+this._alias=_a;
+},getValue:function(){
+return this._alias;
+},fillCell:function(_b){
+_b.innerHTML="&"+this._alias+";";
+}});
+return _1.declare("dojox.drawing.plugins.drawing.GreekPalette",[_5,_6,_7],{postMixInProperties:function(){
+var _c=_3;
+var _d=0;
+var _e;
+for(_e in _c){
+_d++;
+}
+var _f=Math.floor(Math.sqrt(_d));
+var _10=_f;
+var _11=0;
+var _12=[];
+var row=[];
+for(_e in _c){
+_11++;
+row.push(_e);
+if(_11%_10===0){
+_12.push(row);
+row=[];
+}
+}
+if(row.length>0){
+_12.push(row);
+}
+this._palette=_12;
+},show:function(obj){
+_1.mixin(obj,{popup:this});
+_2.open(obj);
+},onChange:function(val){
+var _13=this._textBlock;
+_2.hide(this);
+_13.insertText(this._pushChangeTo,val);
+_13._dropMode=false;
+},onCancel:function(_14){
+_2.hide(this);
+this._textBlock._dropMode=false;
+},templateString:"<div class=\"dojoxEntityPalette\">\n"+"\t<table>\n"+"\t\t<tbody>\n"+"\t\t\t<tr>\n"+"\t\t\t\t<td>\n"+"\t\t\t\t\t<table class=\"dijitPaletteTable\">\n"+"\t\t\t\t\t\t<tbody dojoAttachPoint=\"gridNode\"></tbody>\n"+"\t\t\t\t   </table>\n"+"\t\t\t\t</td>\n"+"\t\t\t</tr>\n"+"\t\t\t<tr>\n"+"\t\t\t\t<td>\n"+"\t\t\t\t\t<table dojoAttachPoint=\"previewPane\" class=\"dojoxEntityPalettePreviewTable\">\n"+"\t\t\t\t\t\t<tbody>\n"+"\t\t\t\t\t\t\t<tr>\n"+"\t\t\t\t\t\t\t\t<td class=\"dojoxEntityPalettePreviewDetailEntity\">Type: <span class=\"dojoxEntityPalettePreviewDetail\" dojoAttachPoint=\"previewNode\"></span></td>\n"+"\t\t\t\t\t\t\t</tr>\n"+"\t\t\t\t\t\t</tbody>\n"+"\t\t\t\t\t</table>\n"+"\t\t\t\t</td>\n"+"\t\t\t</tr>\n"+"\t\t</tbody>\n"+"\t</table>\n"+"</div>",baseClass:"dojoxEntityPalette",showPreview:true,dyeClass:_9,paletteClass:"editorLatinEntityPalette",cellClass:"dojoxEntityPaletteCell",buildRendering:function(){
+this.inherited(arguments);
+var _15=_8;
+this._preparePalette(this._palette,_15);
+var _16=_1.query(".dojoxEntityPaletteCell",this.gridNode);
+_1.forEach(_16,function(_17){
+this.connect(_17,"onmouseenter","_onCellMouseEnter");
+},this);
+},_onCellMouseEnter:function(e){
+if(this.showPreview){
+this._displayDetails(e.target);
+}
+},_onCellClick:function(evt){
+var _18=evt.type=="click"?evt.currentTarget:this._currentFocus,_19=this._getDye(_18).getValue();
+this._setCurrent(_18);
+setTimeout(_1.hitch(this,function(){
+_4(_18);
+this._setValueAttr(_19,true);
+}));
+_1.removeClass(_18,"dijitPaletteCellHover");
+_1.stopEvent(evt);
+},postCreate:function(){
+this.inherited(arguments);
+if(!this.showPreview){
+_1.style(this.previewNode,"display","none");
+}
+_2.moveOffScreen(this);
+},_setCurrent:function(_1a){
+if("_currentFocus" in this){
+_1.attr(this._currentFocus,"tabIndex","-1");
+_1.removeClass(this._currentFocus,"dojoxEntityPaletteCellHover");
+}
+this._currentFocus=_1a;
+if(_1a){
+_1.attr(_1a,"tabIndex",this.tabIndex);
+_1.addClass(this._currentFocus,"dojoxEntityPaletteCellHover");
+}
+if(this.showPreview){
+this._displayDetails(_1a);
+}
+},_displayDetails:function(_1b){
+var dye=this._getDye(_1b);
+if(dye){
+var _1c=dye.getValue();
+var _1d=dye._alias;
+this.previewNode.innerHTML=_1c;
+}else{
+this.previewNode.innerHTML="";
+this.descNode.innerHTML="";
+}
+},_preparePalette:function(_1e,_1f){
+this._cells=[];
+var url=this._blankGif;
+var _20=typeof this.dyeClass==="string"?_1.getObject(this.dyeClass):this.dyeClass;
+for(var row=0;row<_1e.length;row++){
+var _21=_1.create("tr",{tabIndex:"-1"},this.gridNode);
+for(var col=0;col<_1e[row].length;col++){
+var _22=_1e[row][col];
+if(_22){
+var _23=new _20(_22);
+var _24=_1.create("td",{"class":this.cellClass,tabIndex:"-1",title:_1f[_22]});
+_23.fillCell(_24,url);
+this.connect(_24,"ondijitclick","_onCellClick");
+this._trackMouseState(_24,this.cellClass);
+_1.place(_24,_21);
+_24.idx=this._cells.length;
+this._cells.push({node:_24,dye:_23});
+}
+}
+}
+this._xDim=_1e[0].length;
+this._yDim=_1e.length;
+},_navigateByArrow:function(evt){
+var _25={38:-this._xDim,40:this._xDim,39:this.isLeftToRight()?1:-1,37:this.isLeftToRight()?-1:1};
+var _26=_25[evt.keyCode];
+var _27=this._currentFocus.idx+_26;
+if(_27<this._cells.length&&_27>-1){
+var _28=this._cells[_27].node;
+this._setCurrent(_28);
+}
+}});
+});

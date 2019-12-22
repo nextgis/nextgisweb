@@ -1,5 +1,56 @@
 //>>built
-define("dojox/charting/plot3d/Bars",["dojo/_base/kernel","dojo/_base/declare","dojo/_base/Color","dojo/has","./Base"],function(n,e,f,p,q){return e("dojox.charting.plot3d.Bars",q,{constructor:function(a,d,b){this.depth="auto";this.gap=0;this.data=[];this.material={type:"plastic",finish:"dull",color:"lime"};b&&("depth"in b&&(this.depth=b.depth),"gap"in b&&(this.gap=b.gap),"material"in b&&(a=b.material,"string"==typeof a||a instanceof f?this.material.color=a:this.material=a))},getDepth:function(){if("auto"==
-this.depth){var a=this.width;this.data&&this.data.length&&(a/=this.data.length);return a-2*this.gap}return this.depth},generate:function(a,d){if(!this.data)return this;for(var b=this.width/this.data.length,g=0,e="auto"==this.depth?b-2*this.gap:this.depth,l=this.height,c=this.data,f=Math.max,h=void 0,c="string"==typeof c?c.split(""):c,h=h||n.global,k=c[0],m=1;m<c.length;k=f.call(h,k,c[m++]));l/=k;d||(d=a.view);for(c=0;c<this.data.length;++c,g+=b)d.createCube({bottom:{x:g+this.gap,y:0,z:0},top:{x:g+
-b-this.gap,y:this.data[c]*l,z:e}}).setFill(this.material);p("dojo-bidi")&&this._checkOrientation(a)}})});
-//# sourceMappingURL=Bars.js.map
+define("dojox/charting/plot3d/Bars",["dojo/_base/kernel","dojo/_base/declare","dojo/_base/Color","dojo/has","./Base"],function(_1,_2,_3,_4,_5){
+var _6=function(a,f,o){
+a=typeof a=="string"?a.split(""):a;
+o=o||_1.global;
+var z=a[0];
+for(var i=1;i<a.length;z=f.call(o,z,a[i++])){
+}
+return z;
+};
+return _2("dojox.charting.plot3d.Bars",_5,{constructor:function(_7,_8,_9){
+this.depth="auto";
+this.gap=0;
+this.data=[];
+this.material={type:"plastic",finish:"dull",color:"lime"};
+if(_9){
+if("depth" in _9){
+this.depth=_9.depth;
+}
+if("gap" in _9){
+this.gap=_9.gap;
+}
+if("material" in _9){
+var m=_9.material;
+if(typeof m=="string"||m instanceof _3){
+this.material.color=m;
+}else{
+this.material=m;
+}
+}
+}
+},getDepth:function(){
+if(this.depth=="auto"){
+var w=this.width;
+if(this.data&&this.data.length){
+w=w/this.data.length;
+}
+return w-2*this.gap;
+}
+return this.depth;
+},generate:function(_a,_b){
+if(!this.data){
+return this;
+}
+var _c=this.width/this.data.length,_d=0,_e=this.depth=="auto"?_c-2*this.gap:this.depth,_f=this.height/_6(this.data,Math.max);
+if(!_b){
+_b=_a.view;
+}
+for(var i=0;i<this.data.length;++i,_d+=_c){
+_b.createCube({bottom:{x:_d+this.gap,y:0,z:0},top:{x:_d+_c-this.gap,y:this.data[i]*_f,z:_e}}).setFill(this.material);
+}
+if(_4("dojo-bidi")){
+this._checkOrientation(_a);
+}
+}});
+});

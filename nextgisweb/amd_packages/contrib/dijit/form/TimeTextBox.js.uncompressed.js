@@ -1,10 +1,11 @@
 define("dijit/form/TimeTextBox", [
 	"dojo/_base/declare", // declare
 	"dojo/keys", // keys.DOWN_ARROW keys.ENTER keys.ESCAPE keys.TAB keys.UP_ARROW
+	"dojo/query",
 	"dojo/_base/lang", // lang.hitch
 	"../_TimePicker",
 	"./_DateTimeTextBox"
-], function(declare, keys, lang, _TimePicker, _DateTimeTextBox){
+], function(declare, keys, query, lang, _TimePicker, _DateTimeTextBox){
 
 	// module:
 	//		dijit/form/TimeTextBox
@@ -45,6 +46,18 @@ define("dijit/form/TimeTextBox", [
 
 		openDropDown: function(/*Function*/ callback){
 			this.inherited(arguments);
+
+			// Fix #18683
+			var selectedNode = query(".dijitTimePickerItemSelected", this.dropDown.domNode),
+				parentNode=this.dropDown.domNode.parentNode;
+			if(selectedNode[0]){
+				// Center the selected node in the client area of the popup.
+				parentNode.scrollTop=selectedNode[0].offsetTop-(parentNode.clientHeight-selectedNode[0].clientHeight)/2;
+			}else{
+				// There is no currently selected value. Position the list so that the median
+				// node is visible.
+				parentNode.scrollTop=(parentNode.scrollHeight-parentNode.clientHeight)/2;
+            }
 
 			// For screen readers, as user arrows through values, populate <input> with latest value.
 			this.dropDown.on("input", lang.hitch(this, function(){

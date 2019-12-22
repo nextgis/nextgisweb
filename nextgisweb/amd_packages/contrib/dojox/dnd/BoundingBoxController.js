@@ -1,6 +1,48 @@
 //>>built
-define("dojox/dnd/BoundingBoxController",["dojo","dojox"],function(a,d){return a.declare("dojox.dnd.BoundingBoxController",null,{_startX:null,_startY:null,_endX:null,_endY:null,constructor:function(b,c){this.events=[a.connect(a.doc,"onmousedown",this,"_onMouseDown"),a.connect(a.doc,"onmouseup",this,"_onMouseUp"),a.connect(a.doc,"onscroll",this,"_finishSelecting")];this.subscriptions=[a.subscribe("/dojox/bounding/cancel",this,"_finishSelecting")];a.forEach(b,function(b){b.selectByBBox&&this.subscriptions.push(a.subscribe("/dojox/dnd/bounding",
-b,"selectByBBox"))},this);this.domNode=a.byId(c);a.style(this.domNode,{position:"absolute",display:"none"})},destroy:function(){a.forEach(this.events,a.disconnect);a.forEach(this.subscriptions,a.unsubscribe);this.domNode=null},shouldStartDrawingBox:function(a){return!0},boundingBoxIsViable:function(a){return!0},_onMouseDown:function(b){this.shouldStartDrawingBox(b)&&a.mouseButtons.isLeft(b)&&(null==this._startX&&(this._startX=b.clientX,this._startY=b.clientY),this.events.push(a.connect(a.doc,"onmousemove",
-this,"_onMouseMove")))},_onMouseMove:function(a){this._endX=a.clientX;this._endY=a.clientY;this._drawBoundingBox()},_onMouseUp:function(b){null!==this._endX&&this.boundingBoxIsViable(b)&&a.publish("/dojox/dnd/bounding",[this._startX,this._startY,this._endX,this._endY]);this._finishSelecting()},_finishSelecting:function(){null!==this._startX&&(a.disconnect(this.events.pop()),a.style(this.domNode,"display","none"),this._endX=this._startX=null)},_drawBoundingBox:function(){a.style(this.domNode,{left:Math.min(this._startX,
-this._endX)+"px",top:Math.min(this._startY,this._endY)+"px",width:Math.abs(this._startX-this._endX)+"px",height:Math.abs(this._startY-this._endY)+"px",display:""})}})});
-//# sourceMappingURL=BoundingBoxController.js.map
+define("dojox/dnd/BoundingBoxController",["dojo","dojox"],function(_1,_2){
+return _1.declare("dojox.dnd.BoundingBoxController",null,{_startX:null,_startY:null,_endX:null,_endY:null,constructor:function(_3,_4){
+this.events=[_1.connect(_1.doc,"onmousedown",this,"_onMouseDown"),_1.connect(_1.doc,"onmouseup",this,"_onMouseUp"),_1.connect(_1.doc,"onscroll",this,"_finishSelecting")];
+this.subscriptions=[_1.subscribe("/dojox/bounding/cancel",this,"_finishSelecting")];
+_1.forEach(_3,function(_5){
+if(_5.selectByBBox){
+this.subscriptions.push(_1.subscribe("/dojox/dnd/bounding",_5,"selectByBBox"));
+}
+},this);
+this.domNode=_1.byId(_4);
+_1.style(this.domNode,{position:"absolute",display:"none"});
+},destroy:function(){
+_1.forEach(this.events,_1.disconnect);
+_1.forEach(this.subscriptions,_1.unsubscribe);
+this.domNode=null;
+},shouldStartDrawingBox:function(_6){
+return true;
+},boundingBoxIsViable:function(_7){
+return true;
+},_onMouseDown:function(_8){
+if(this.shouldStartDrawingBox(_8)&&_1.mouseButtons.isLeft(_8)){
+if(this._startX==null){
+this._startX=_8.clientX;
+this._startY=_8.clientY;
+}
+this.events.push(_1.connect(_1.doc,"onmousemove",this,"_onMouseMove"));
+}
+},_onMouseMove:function(_9){
+this._endX=_9.clientX;
+this._endY=_9.clientY;
+this._drawBoundingBox();
+},_onMouseUp:function(_a){
+if(this._endX!==null&&this.boundingBoxIsViable(_a)){
+_1.publish("/dojox/dnd/bounding",[this._startX,this._startY,this._endX,this._endY]);
+}
+this._finishSelecting();
+},_finishSelecting:function(){
+if(this._startX!==null){
+_1.disconnect(this.events.pop());
+_1.style(this.domNode,"display","none");
+this._startX=null;
+this._endX=null;
+}
+},_drawBoundingBox:function(){
+_1.style(this.domNode,{left:Math.min(this._startX,this._endX)+"px",top:Math.min(this._startY,this._endY)+"px",width:Math.abs(this._startX-this._endX)+"px",height:Math.abs(this._startY-this._endY)+"px",display:""});
+}});
+});

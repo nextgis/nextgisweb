@@ -1,3 +1,2 @@
 //>>built
-define("dojox/widget/nls/es/FilePicker",{name:"Nombre",path:"V\u00eda de acceso",size:"Tama\u00f1o (en bytes)"});
-//# sourceMappingURL=FilePicker.js.map
+define("dojox/widget/nls/es/FilePicker",({name:"Nombre",path:"Vía de acceso",size:"Tamaño (en bytes)"}));

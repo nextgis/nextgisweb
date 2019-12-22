@@ -1,7 +1,82 @@
 //>>built
-define("dojox/gauges/BarGauge","dojo/_base/declare dojo/_base/lang dojo/_base/array dojo/_base/html dojo/_base/event dojox/gfx ./_Gauge ./BarLineIndicator dojo/dom-geometry".split(" "),function(h,f,k,q,l,m,n,p,e){return h("dojox.gauges.BarGauge",n,{dataX:5,dataY:5,dataWidth:0,dataHeight:0,_defaultIndicator:p,startup:function(){this.getChildren&&k.forEach(this.getChildren(),function(b){b.startup()});this.dataWidth||(this.dataWidth=this.gaugeWidth-10);this.dataHeight||(this.dataHeight=this.gaugeHeight-
-10);this.inherited(arguments)},_getPosition:function(b){return this.dataX+Math.floor((b-this.min)/(this.max-this.min)*this.dataWidth)},_getValueForPosition:function(b){return(b-this.dataX)*(this.max-this.min)/this.dataWidth+this.min},drawRange:function(b,a){a.shape&&(a.shape.parent.remove(a.shape),a.shape=null);var c=this._getPosition(a.low),e=this._getPosition(a.high),d=b.createRect({x:c,y:this.dataY,width:e-c,height:this.dataHeight});if(f.isArray(a.color)||f.isString(a.color))d.setStroke({color:a.color}),
-d.setFill(a.color);else if(a.color.type){var g=this.dataY+this.dataHeight/2;a.color.x1=c;a.color.x2=e;a.color.y1=g;a.color.y2=g;d.setFill(a.color);d.setStroke({color:a.color.colors[0].color})}else m.svg&&(d.setStroke({color:"green"}),d.setFill("green"),d.getEventSource().setAttribute("class",a.color.style));d.connect("onmouseover",f.hitch(this,this._handleMouseOverRange,a));d.connect("onmouseout",f.hitch(this,this._handleMouseOutRange,a));a.shape=d},getRangeUnderMouse:function(b){var a=null,c=e.getContentBox(this.gaugeContent);
-b=this._getValueForPosition(b.clientX-c.x);if(this._rangeData)for(c=0;c<this._rangeData.length&&!a;c++)Number(this._rangeData[c].low)<=b&&Number(this._rangeData[c].high)>=b&&(a=this._rangeData[c]);return a},_dragIndicator:function(b,a){this._dragIndicatorAt(b,a.pageX,a.pageY);l.stop(a)},_dragIndicatorAt:function(b,a,c){c=e.position(b.gaugeContent,!0);a=b._getValueForPosition(a-c.x);a<b.min&&(a=b.min);a>b.max&&(a=b.max);b._drag.value=a;b._drag.onDragMove(b._drag);b._drag.draw(this._indicatorsGroup,
-!0);b._drag.valueChanged()}})});
-//# sourceMappingURL=BarGauge.js.map
+define("dojox/gauges/BarGauge",["dojo/_base/declare","dojo/_base/lang","dojo/_base/array","dojo/_base/html","dojo/_base/event","dojox/gfx","./_Gauge","./BarLineIndicator","dojo/dom-geometry"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9){
+return _1("dojox.gauges.BarGauge",_7,{dataX:5,dataY:5,dataWidth:0,dataHeight:0,_defaultIndicator:_8,startup:function(){
+if(this.getChildren){
+_3.forEach(this.getChildren(),function(_a){
+_a.startup();
+});
+}
+if(!this.dataWidth){
+this.dataWidth=this.gaugeWidth-10;
+}
+if(!this.dataHeight){
+this.dataHeight=this.gaugeHeight-10;
+}
+this.inherited(arguments);
+},_getPosition:function(_b){
+return this.dataX+Math.floor((_b-this.min)/(this.max-this.min)*this.dataWidth);
+},_getValueForPosition:function(_c){
+return (_c-this.dataX)*(this.max-this.min)/this.dataWidth+this.min;
+},drawRange:function(_d,_e){
+if(_e.shape){
+_e.shape.parent.remove(_e.shape);
+_e.shape=null;
+}
+var x1=this._getPosition(_e.low);
+var x2=this._getPosition(_e.high);
+var _f=_d.createRect({x:x1,y:this.dataY,width:x2-x1,height:this.dataHeight});
+if(_2.isArray(_e.color)||_2.isString(_e.color)){
+_f.setStroke({color:_e.color});
+_f.setFill(_e.color);
+}else{
+if(_e.color.type){
+var y=this.dataY+this.dataHeight/2;
+_e.color.x1=x1;
+_e.color.x2=x2;
+_e.color.y1=y;
+_e.color.y2=y;
+_f.setFill(_e.color);
+_f.setStroke({color:_e.color.colors[0].color});
+}else{
+if(_6.svg){
+_f.setStroke({color:"green"});
+_f.setFill("green");
+_f.getEventSource().setAttribute("class",_e.color.style);
+}
+}
+}
+_f.connect("onmouseover",_2.hitch(this,this._handleMouseOverRange,_e));
+_f.connect("onmouseout",_2.hitch(this,this._handleMouseOutRange,_e));
+_e.shape=_f;
+},getRangeUnderMouse:function(e){
+var _10=null;
+var pos=_9.getContentBox(this.gaugeContent);
+var x=e.clientX-pos.x;
+var _11=this._getValueForPosition(x);
+if(this._rangeData){
+for(var i=0;(i<this._rangeData.length)&&!_10;i++){
+if((Number(this._rangeData[i].low)<=_11)&&(Number(this._rangeData[i].high)>=_11)){
+_10=this._rangeData[i];
+}
+}
+}
+return _10;
+},_dragIndicator:function(_12,e){
+this._dragIndicatorAt(_12,e.pageX,e.pageY);
+_5.stop(e);
+},_dragIndicatorAt:function(_13,x,y){
+var pos=_9.position(_13.gaugeContent,true);
+var xl=x-pos.x;
+var _14=_13._getValueForPosition(xl);
+if(_14<_13.min){
+_14=_13.min;
+}
+if(_14>_13.max){
+_14=_13.max;
+}
+_13._drag.value=_14;
+_13._drag.onDragMove(_13._drag);
+_13._drag.draw(this._indicatorsGroup,true);
+_13._drag.valueChanged();
+}});
+});

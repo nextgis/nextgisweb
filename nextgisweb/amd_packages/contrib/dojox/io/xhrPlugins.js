@@ -1,7 +1,106 @@
 //>>built
-define("dojox/io/xhrPlugins",["dojo/_base/kernel","dojo/_base/xhr","dojo/AdapterRegistry"],function(b,m,n){function e(){return k=dojox.io.xhrPlugins.plainXhr=k||b._defaultXhr||m}b.getObject("io.xhrPlugins",!0,dojox);var d,k;dojox.io.xhrPlugins.register=function(){var g=e();d||(d=new n,b[b._defaultXhr?"_defaultXhr":"xhr"]=function(b,c,a){return d.match.apply(d,arguments)},d.register("xhr",function(b,c){if(!c.url.match(/^\w*:\/\//))return!0;var a=window.location.href.match(/^.*?\/\/.*?\//)[0];return c.url.substring(0,
-a.length)==a},g));return d.register.apply(d,arguments)};dojox.io.xhrPlugins.addProxy=function(g){var h=e();dojox.io.xhrPlugins.register("proxy",function(b,a){return!0},function(c,a,p){a.url=g+encodeURIComponent(a.url);return h.call(b,c,a,p)})};var f;dojox.io.xhrPlugins.addCrossSiteXhr=function(g,h){var c=e();if(void 0===f&&window.XMLHttpRequest)try{(new XMLHttpRequest).open("GET","http://testing-cross-domain-capability.com",!0),f=!0,b.config.noRequestedWithHeaders=!0}catch(a){f=!1}dojox.io.xhrPlugins.register("cs-xhr",
-function(a,b){return(f||window.XDomainRequest&&!0!==b.sync&&("GET"==a||"POST"==a||h))&&b.url.substring(0,g.length)==g},f?c:function(){var a=b._xhrObj;b._xhrObj=function(){function a(a,c){return function(){b.readyState=c;b.status=a}}var b=new XDomainRequest;b.readyState=1;b.setRequestHeader=function(){};b.getResponseHeader=function(a){return"Content-Type"==a?b.contentType:null};b.onload=a(200,4);b.onprogress=a(200,3);b.onerror=a(404,4);return b};var c=(h?h(e()):e()).apply(b,arguments);b._xhrObj=a;
-return c})};dojox.io.xhrPlugins.fullHttpAdapter=function(g,h){return function(c,a,d){var e={},f={};"GET"!=c&&(f["http-method"]=c,a.putData&&h&&(e["http-content"]=a.putData,delete a.putData,d=!1),a.postData&&h&&(e["http-content"]=a.postData,delete a.postData,d=!1),c="POST");for(var l in a.headers){var k=l.match(/^X-/)?l.substring(2).replace(/-/g,"_").toLowerCase():"http-"+l;f[k]=a.headers[l]}a.query=b.objectToQuery(f);b._ioAddQueryToUrl(a);a.content=b.mixin(a.content||{},e);return g.call(b,c,a,d)}};
-return dojox.io.xhrPlugins});
-//# sourceMappingURL=xhrPlugins.js.map
+define("dojox/io/xhrPlugins",["dojo/_base/kernel","dojo/_base/xhr","dojo/AdapterRegistry"],function(_1,_2,_3){
+_1.getObject("io.xhrPlugins",true,dojox);
+var _4;
+var _5;
+function _6(){
+return _5=dojox.io.xhrPlugins.plainXhr=_5||_1._defaultXhr||_2;
+};
+dojox.io.xhrPlugins.register=function(){
+var _7=_6();
+if(!_4){
+_4=new _3();
+_1[_1._defaultXhr?"_defaultXhr":"xhr"]=function(_8,_9,_a){
+return _4.match.apply(_4,arguments);
+};
+_4.register("xhr",function(_b,_c){
+if(!_c.url.match(/^\w*:\/\//)){
+return true;
+}
+var _d=window.location.href.match(/^.*?\/\/.*?\//)[0];
+return _c.url.substring(0,_d.length)==_d;
+},_7);
+}
+return _4.register.apply(_4,arguments);
+};
+dojox.io.xhrPlugins.addProxy=function(_e){
+var _f=_6();
+dojox.io.xhrPlugins.register("proxy",function(_10,_11){
+return true;
+},function(_12,_13,_14){
+_13.url=_e+encodeURIComponent(_13.url);
+return _f.call(_1,_12,_13,_14);
+});
+};
+var _15;
+dojox.io.xhrPlugins.addCrossSiteXhr=function(url,_16){
+var _17=_6();
+if(_15===undefined&&window.XMLHttpRequest){
+try{
+var xhr=new XMLHttpRequest();
+xhr.open("GET","http://testing-cross-domain-capability.com",true);
+_15=true;
+_1.config.noRequestedWithHeaders=true;
+}
+catch(e){
+_15=false;
+}
+}
+dojox.io.xhrPlugins.register("cs-xhr",function(_18,_19){
+return (_15||(window.XDomainRequest&&_19.sync!==true&&(_18=="GET"||_18=="POST"||_16)))&&(_19.url.substring(0,url.length)==url);
+},_15?_17:function(){
+var _1a=_1._xhrObj;
+_1._xhrObj=function(){
+var xdr=new XDomainRequest();
+xdr.readyState=1;
+xdr.setRequestHeader=function(){
+};
+xdr.getResponseHeader=function(_1b){
+return _1b=="Content-Type"?xdr.contentType:null;
+};
+function _1c(_1d,_1e){
+return function(){
+xdr.readyState=_1e;
+xdr.status=_1d;
+};
+};
+xdr.onload=_1c(200,4);
+xdr.onprogress=_1c(200,3);
+xdr.onerror=_1c(404,4);
+return xdr;
+};
+var dfd=(_16?_16(_6()):_6()).apply(_1,arguments);
+_1._xhrObj=_1a;
+return dfd;
+});
+};
+dojox.io.xhrPlugins.fullHttpAdapter=function(_1f,_20){
+return function(_21,_22,_23){
+var _24={};
+var _25={};
+if(_21!="GET"){
+_25["http-method"]=_21;
+if(_22.putData&&_20){
+_24["http-content"]=_22.putData;
+delete _22.putData;
+_23=false;
+}
+if(_22.postData&&_20){
+_24["http-content"]=_22.postData;
+delete _22.postData;
+_23=false;
+}
+_21="POST";
+}
+for(var i in _22.headers){
+var _26=i.match(/^X-/)?i.substring(2).replace(/-/g,"_").toLowerCase():("http-"+i);
+_25[_26]=_22.headers[i];
+}
+_22.query=_1.objectToQuery(_25);
+_1._ioAddQueryToUrl(_22);
+_22.content=_1.mixin(_22.content||{},_24);
+return _1f.call(_1,_21,_22,_23);
+};
+};
+return dojox.io.xhrPlugins;
+});

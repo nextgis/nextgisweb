@@ -1,8 +1,83 @@
 //>>built
-define("dojox/xmpp/ChatService",["dojo","dijit","dojox"],function(d,f,c){d.provide("dojox.xmpp.ChatService");c.xmpp.chat={CHAT_STATE_NS:"http://jabber.org/protocol/chatstates",ACTIVE_STATE:"active",COMPOSING_STATE:"composing",INACTIVE_STATE:"inactive",PAUSED_STATE:"paused",GONE_STATE:"gone"};d.declare("dojox.xmpp.ChatService",null,{state:"",constructor:function(){this.state="";this.chatid=Math.round(1E15*Math.random())},receiveMessage:function(b,a){if(b&&!a)this.onNewMessage(b)},setSession:function(b){this.session=
-b},setState:function(b){this.state!=b&&(this.state=b)},invite:function(b){if(!this.uid){if(!b||""==b)throw Error("ChatService::invite() contact is NULL");this.uid=b;var a=new c.string.Builder(c.xmpp.util.createElement("message",{xmlns:"jabber:client",to:this.uid,from:this.session.jid+"/"+this.session.resource,type:"chat"},!1));a.append(c.xmpp.util.createElement("thread",{},!1));a.append(this.chatid);a.append("\x3c/thread\x3e");a.append(c.xmpp.util.createElement("active",{xmlns:c.xmpp.chat.CHAT_STATE_NS},
-!0));a.append("\x3c/message\x3e");this.session.dispatchPacket(a.toString());this.onInvite(b);this.setState(c.xmpp.chat.CHAT_STATE_NS)}},sendMessage:function(b){if(this.uid&&(b.body&&""!=b.body||b.xhtml)){var a=new c.string.Builder(c.xmpp.util.createElement("message",{xmlns:"jabber:client",to:this.uid,from:this.session.jid+"/"+this.session.resource,type:"chat"},!1)),d=c.xmpp.util.createElement("html",{xmlns:c.xmpp.xmpp.XHTML_IM_NS},!1),e=c.xmpp.util.createElement("body",{"xml:lang":this.session.lang,
-xmlns:c.xmpp.xmpp.XHTML_BODY_NS},!1)+b.body+"\x3c/body\x3e";b=c.xmpp.util.createElement("body",{},!1)+c.xmpp.util.stripHtml(b.body)+"\x3c/body\x3e";a.subject&&""!=a.subject&&(a.append(c.xmpp.util.createElement("subject",{},!1)),a.append(a.subject),a.append("\x3c/subject\x3e"));a.append(b);a.append(d);a.append(e);a.append("\x3c/html\x3e");a.append(c.xmpp.util.createElement("thread",{},!1));a.append(this.chatid);a.append("\x3c/thread\x3e");this.useChatStates&&a.append(c.xmpp.util.createElement("active",
-{xmlns:c.xmpp.chat.CHAT_STATE_NS},!0));a.append("\x3c/message\x3e");this.session.dispatchPacket(a.toString())}},sendChatState:function(b){if(this.useChatState&&!this.firstMessage&&b!=this._currentState){var a=new c.string.Builder(c.xmpp.util.createElement("message",{xmlns:"jabber:client",to:this.uid,from:this.session.jid+"/"+this.session.resource,type:"chat"},!1));a.append(c.xmpp.util.createElement(b,{xmlns:c.xmpp.chat.CHAT_STATE_NS},!0));this._currentState=b;a.append("\x3cthread\x3e");a.append(this.chatid);
-a.append("\x3c/thread\x3e\x3c/message\x3e");this.session.dispatchPacket(a.toString())}},onNewMessage:function(b){},onInvite:function(b){}})});
-//# sourceMappingURL=ChatService.js.map
+define("dojox/xmpp/ChatService",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.xmpp.ChatService");
+_3.xmpp.chat={CHAT_STATE_NS:"http://jabber.org/protocol/chatstates",ACTIVE_STATE:"active",COMPOSING_STATE:"composing",INACTIVE_STATE:"inactive",PAUSED_STATE:"paused",GONE_STATE:"gone"};
+_1.declare("dojox.xmpp.ChatService",null,{state:"",constructor:function(){
+this.state="";
+this.chatid=Math.round(Math.random()*1000000000000000);
+},receiveMessage:function(_4,_5){
+if(_4&&!_5){
+this.onNewMessage(_4);
+}
+},setSession:function(_6){
+this.session=_6;
+},setState:function(_7){
+if(this.state!=_7){
+this.state=_7;
+}
+},invite:function(_8){
+if(this.uid){
+return;
+}
+if(!_8||_8==""){
+throw new Error("ChatService::invite() contact is NULL");
+}
+this.uid=_8;
+var _9={xmlns:"jabber:client",to:this.uid,from:this.session.jid+"/"+this.session.resource,type:"chat"};
+var _a=new _3.string.Builder(_3.xmpp.util.createElement("message",_9,false));
+_a.append(_3.xmpp.util.createElement("thread",{},false));
+_a.append(this.chatid);
+_a.append("</thread>");
+_a.append(_3.xmpp.util.createElement("active",{xmlns:_3.xmpp.chat.CHAT_STATE_NS},true));
+_a.append("</message>");
+this.session.dispatchPacket(_a.toString());
+this.onInvite(_8);
+this.setState(_3.xmpp.chat.CHAT_STATE_NS);
+},sendMessage:function(_b){
+if(!this.uid){
+return;
+}
+if((!_b.body||_b.body=="")&&!_b.xhtml){
+return;
+}
+var _c={xmlns:"jabber:client",to:this.uid,from:this.session.jid+"/"+this.session.resource,type:"chat"};
+var _d=new _3.string.Builder(_3.xmpp.util.createElement("message",_c,false));
+var _e=_3.xmpp.util.createElement("html",{"xmlns":_3.xmpp.xmpp.XHTML_IM_NS},false);
+var _f=_3.xmpp.util.createElement("body",{"xml:lang":this.session.lang,"xmlns":_3.xmpp.xmpp.XHTML_BODY_NS},false)+_b.body+"</body>";
+var _10=_3.xmpp.util.createElement("body",{},false)+_3.xmpp.util.stripHtml(_b.body)+"</body>";
+if(_d.subject&&_d.subject!=""){
+_d.append(_3.xmpp.util.createElement("subject",{},false));
+_d.append(_d.subject);
+_d.append("</subject>");
+}
+_d.append(_10);
+_d.append(_e);
+_d.append(_f);
+_d.append("</html>");
+_d.append(_3.xmpp.util.createElement("thread",{},false));
+_d.append(this.chatid);
+_d.append("</thread>");
+if(this.useChatStates){
+_d.append(_3.xmpp.util.createElement("active",{xmlns:_3.xmpp.chat.CHAT_STATE_NS},true));
+}
+_d.append("</message>");
+this.session.dispatchPacket(_d.toString());
+},sendChatState:function(_11){
+if(!this.useChatState||this.firstMessage){
+return;
+}
+if(_11==this._currentState){
+return;
+}
+var req={xmlns:"jabber:client",to:this.uid,from:this.session.jid+"/"+this.session.resource,type:"chat"};
+var _12=new _3.string.Builder(_3.xmpp.util.createElement("message",req,false));
+_12.append(_3.xmpp.util.createElement(_11,{xmlns:_3.xmpp.chat.CHAT_STATE_NS},true));
+this._currentState=_11;
+_12.append("<thread>");
+_12.append(this.chatid);
+_12.append("</thread></message>");
+this.session.dispatchPacket(_12.toString());
+},onNewMessage:function(msg){
+},onInvite:function(_13){
+}});
+});

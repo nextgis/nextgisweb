@@ -1,6 +1,67 @@
 //>>built
-define("dojox/mobile/bidi/ListItem",["dojo/_base/declare","dojo/_base/array","dojo/dom-construct","./common","dojo/_base/window"],function(g,h,e,a,f){return g(null,{_applyAttributes:function(){!this.textDir&&this.getParent()&&this.getParent().get("textDir")&&(this.textDir=this.getParent().get("textDir"));this.inherited(arguments);this.textDir&&this._applyTextDirToTextElements()},_setRightTextAttr:function(b){this.templateString||this.rightTextNode||(this.rightTextNode=e.create("div",{className:"mblListItemRightText"},
-this.labelNode,"before"));this.rightTextNode&&(this.rightText=b,this.rightTextNode.innerHTML=this._cv?this._cv(b):b,this.textDir&&(this.rightTextNode.innerHTML=a.enforceTextDirWithUcc(this.rightTextNode.innerHTML,this.textDir)))},_setLabelAttr:function(b){this.inherited("_setLabelAttr",arguments);this.labelNode.innerHTML=a.enforceTextDirWithUcc(this.labelNode.innerHTML,this.textDir)},_applyTextDirToTextElements:function(){if(this.labelNode.innerHTML)this.labelNode.innerHTML=a.removeUCCFromText(this.labelNode.innerHTML),
-this.labelNode.innerHTML=a.enforceTextDirWithUcc(this.labelNode.innerHTML,this.textDir),this.labelNode.style.cssText="text-align: start";else{var b=0;h.forEach(this.domNode.childNodes,function(c){var d;0===b?3!==c.nodeType||c.nodeValue!==a.MARK.RLE&&c.nodeValue!==a.MARK.LRE?(d=1===c.nodeType&&1===c.childNodes.length?c.firstChild:c,3===d.nodeType&&d.nodeValue&&-1!=d.nodeValue.search(/[.\S]/)&&(b=1,d=f.doc.createTextNode("rtl"===this.getTextDir(d.nodeValue).toLowerCase()?a.MARK.RLE:a.MARK.LRE),e.place(d,
-c,"before"))):(c.nodeValue=c.nodeValue===a.MARK.RLE?a.MARK.LRE:a.MARK.RLE,b=2):1===b&&"div"===c.nodeName.toLowerCase()&&(b=2,d=f.doc.createTextNode(a.MARK.PDF),e.place(d,c,"before"))},this)}},_setTextDirAttr:function(b){b&&this.textDir!==b&&(this.textDir=b,this._applyTextDirToTextElements(),this.rightTextNode&&(this.rightTextNode.innerHTML=a.removeUCCFromText(this.rightTextNode.innerHTML),this.rightTextNode.innerHTML=a.enforceTextDirWithUcc(this.rightTextNode.innerHTML,this.textDir)))}})});
-//# sourceMappingURL=ListItem.js.map
+define("dojox/mobile/bidi/ListItem",["dojo/_base/declare","dojo/_base/array","dojo/dom-construct","./common","dojo/_base/window"],function(_1,_2,_3,_4,_5){
+return _1(null,{_applyAttributes:function(){
+if(!this.textDir&&this.getParent()&&this.getParent().get("textDir")){
+this.textDir=this.getParent().get("textDir");
+}
+this.inherited(arguments);
+if(this.textDir){
+this._applyTextDirToTextElements();
+}
+},_setRightTextAttr:function(_6){
+if(!this.templateString&&!this.rightTextNode){
+this.rightTextNode=_3.create("div",{className:"mblListItemRightText"},this.labelNode,"before");
+}
+if(this.rightTextNode){
+this.rightText=_6;
+this.rightTextNode.innerHTML=this._cv?this._cv(_6):_6;
+if(this.textDir){
+this.rightTextNode.innerHTML=_4.enforceTextDirWithUcc(this.rightTextNode.innerHTML,this.textDir);
+}
+}
+},_setLabelAttr:function(_7){
+this.inherited("_setLabelAttr",arguments);
+this.labelNode.innerHTML=_4.enforceTextDirWithUcc(this.labelNode.innerHTML,this.textDir);
+},_applyTextDirToTextElements:function(){
+if(this.labelNode.innerHTML){
+this.labelNode.innerHTML=_4.removeUCCFromText(this.labelNode.innerHTML);
+this.labelNode.innerHTML=_4.enforceTextDirWithUcc(this.labelNode.innerHTML,this.textDir);
+this.labelNode.style.cssText="text-align: start";
+return;
+}
+var _8=0;
+_2.forEach(this.domNode.childNodes,function(_9){
+var _a;
+if(_8===0){
+if(_9.nodeType===3&&(_9.nodeValue===_4.MARK.RLE||_9.nodeValue===_4.MARK.LRE)){
+_9.nodeValue=(_9.nodeValue===_4.MARK.RLE)?_4.MARK.LRE:_4.MARK.RLE;
+_8=2;
+return;
+}
+var _b=(_9.nodeType===1&&_9.childNodes.length===1)?_9.firstChild:_9;
+if(_b.nodeType===3&&_b.nodeValue){
+if(_b.nodeValue.search(/[.\S]/)!=-1){
+_8=1;
+_a=_5.doc.createTextNode((this.getTextDir(_b.nodeValue).toLowerCase()==="rtl")?_4.MARK.RLE:_4.MARK.LRE);
+_3.place(_a,_9,"before");
+}
+}
+}else{
+if(_8===1&&_9.nodeName.toLowerCase()==="div"){
+_8=2;
+_a=_5.doc.createTextNode(_4.MARK.PDF);
+_3.place(_a,_9,"before");
+}
+}
+},this);
+},_setTextDirAttr:function(_c){
+if(_c&&this.textDir!==_c){
+this.textDir=_c;
+this._applyTextDirToTextElements();
+if(this.rightTextNode){
+this.rightTextNode.innerHTML=_4.removeUCCFromText(this.rightTextNode.innerHTML);
+this.rightTextNode.innerHTML=_4.enforceTextDirWithUcc(this.rightTextNode.innerHTML,this.textDir);
+}
+}
+}});
+});

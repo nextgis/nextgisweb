@@ -1,3 +1,2 @@
 //>>built
-define("dijit/form/nls/hu/Textarea",{iframeEditTitle:"szerkeszt\u00e9si ter\u00fclet",iframeFocusTitle:"szerkeszt\u00e9si ter\u00fclet keret"});
-//# sourceMappingURL=Textarea.js.map
+define("dijit/form/nls/hu/Textarea",({iframeEditTitle:"szerkesztési terület",iframeFocusTitle:"szerkesztési terület keret"}));

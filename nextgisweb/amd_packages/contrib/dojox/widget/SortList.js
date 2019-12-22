@@ -1,8 +1,79 @@
 //>>built
-define("dojox/widget/SortList",["dojo","dijit","dojox","dojo/require!dijit/layout/_LayoutWidget,dijit/_Templated"],function(b,c,f){b.provide("dojox.widget.SortList");b.experimental("dojox.widget.SortList");b.require("dijit.layout._LayoutWidget");b.require("dijit._Templated");b.declare("dojox.widget.SortList",[c.layout._LayoutWidget,c._Templated],{title:"",heading:"",descending:!0,selected:null,sortable:!0,store:"",key:"name",baseClass:"dojoxSortList",templateString:b.cache("dojox.widget","SortList/SortList.html",
-'\x3cdiv class\x3d"sortList" id\x3d"${id}"\x3e\n\t\t\x3cdiv class\x3d"sortListTitle" dojoAttachPoint\x3d"titleNode"\x3e\n\t\t\x3cdiv class\x3d"dijitInline sortListIcon"\x3e\x26thinsp;\x3c/div\x3e\n\t\t\x3cspan dojoAttachPoint\x3d"focusNode"\x3e${title}\x3c/span\x3e\n\t\t\x3c/div\x3e\n\t\t\x3cdiv class\x3d"sortListBodyWrapper" dojoAttachEvent\x3d"onmouseover: _set, onmouseout: _unset, onclick:_handleClick" dojoAttachPoint\x3d"bodyWrapper"\x3e\n\t\t\x3cul dojoAttachPoint\x3d"containerNode" class\x3d"sortListBody"\x3e\x3c/ul\x3e\n\t\x3c/div\x3e\n\x3c/div\x3e'),
-_addItem:function(a){b.create("li",{innerHTML:this.store.getValue(a,this.key).replace(/</g,"\x26lt;")},this.containerNode)},postCreate:function(){if(this.store){this.store=b.getObject(this.store);var a={onItem:b.hitch(this,"_addItem"),onComplete:b.hitch(this,"onSort")};this.store.fetch(a)}else this.onSort();this.inherited(arguments)},startup:function(){this.inherited(arguments);this.heading&&(this.setTitle(this.heading),this.title=this.heading);setTimeout(b.hitch(this,"resize"),5);this.sortable&&
-this.connect(this.titleNode,"onclick","onSort")},resize:function(){this.inherited(arguments);var a=this._contentBox.h-b.style(this.titleNode,"height")-10;this.bodyWrapper.style.height=Math.abs(a)+"px"},onSort:function(a){a=b.query("li",this.domNode);this.sortable&&(this.descending=!this.descending,b.addClass(this.titleNode,this.descending?"sortListDesc":"sortListAsc"),b.removeClass(this.titleNode,this.descending?"sortListAsc":"sortListDesc"),a.sort(this._sorter),this.descending&&a.reverse());var e=
-0;b.forEach(a,function(a){b[0===e++%2?"addClass":"removeClass"](a,"sortListItemOdd");this.containerNode.appendChild(a)},this)},_set:function(a){a.target!==this.bodyWrapper&&b.addClass(a.target,"sortListItemHover")},_unset:function(a){b.removeClass(a.target,"sortListItemHover")},_handleClick:function(a){b.toggleClass(a.target,"sortListItemSelected");a.target.focus();this._updateValues(a.target.innerHTML)},_updateValues:function(){this._selected=b.query("li.sortListItemSelected",this.containerNode);
-this.selected=[];b.forEach(this._selected,function(a){this.selected.push(a.innerHTML)},this);this.onChanged(arguments)},_sorter:function(a,b){var c=a.innerHTML,d=b.innerHTML;return c>d?1:c<d?-1:0},setTitle:function(a){this.focusNode.innerHTML=this.title=a},onChanged:function(){}})});
-//# sourceMappingURL=SortList.js.map
+define("dojox/widget/SortList",["dojo","dijit","dojox","dojo/require!dijit/layout/_LayoutWidget,dijit/_Templated"],function(_1,_2,_3){
+_1.provide("dojox.widget.SortList");
+_1.experimental("dojox.widget.SortList");
+_1.require("dijit.layout._LayoutWidget");
+_1.require("dijit._Templated");
+_1.declare("dojox.widget.SortList",[_2.layout._LayoutWidget,_2._Templated],{title:"",heading:"",descending:true,selected:null,sortable:true,store:"",key:"name",baseClass:"dojoxSortList",templateString:_1.cache("dojox.widget","SortList/SortList.html","<div class=\"sortList\" id=\"${id}\">\n\t\t<div class=\"sortListTitle\" dojoAttachPoint=\"titleNode\">\n\t\t<div class=\"dijitInline sortListIcon\">&thinsp;</div>\n\t\t<span dojoAttachPoint=\"focusNode\">${title}</span>\n\t\t</div>\n\t\t<div class=\"sortListBodyWrapper\" dojoAttachEvent=\"onmouseover: _set, onmouseout: _unset, onclick:_handleClick\" dojoAttachPoint=\"bodyWrapper\">\n\t\t<ul dojoAttachPoint=\"containerNode\" class=\"sortListBody\"></ul>\n\t</div>\n</div>"),_addItem:function(_4){
+_1.create("li",{innerHTML:this.store.getValue(_4,this.key).replace(/</g,"&lt;")},this.containerNode);
+},postCreate:function(){
+if(this.store){
+this.store=_1.getObject(this.store);
+var _5={onItem:_1.hitch(this,"_addItem"),onComplete:_1.hitch(this,"onSort")};
+this.store.fetch(_5);
+}else{
+this.onSort();
+}
+this.inherited(arguments);
+},startup:function(){
+this.inherited(arguments);
+if(this.heading){
+this.setTitle(this.heading);
+this.title=this.heading;
+}
+setTimeout(_1.hitch(this,"resize"),5);
+if(this.sortable){
+this.connect(this.titleNode,"onclick","onSort");
+}
+},resize:function(){
+this.inherited(arguments);
+var _6=((this._contentBox.h)-(_1.style(this.titleNode,"height")))-10;
+this.bodyWrapper.style.height=Math.abs(_6)+"px";
+},onSort:function(e){
+var _7=_1.query("li",this.domNode);
+if(this.sortable){
+this.descending=!this.descending;
+_1.addClass(this.titleNode,((this.descending)?"sortListDesc":"sortListAsc"));
+_1.removeClass(this.titleNode,((this.descending)?"sortListAsc":"sortListDesc"));
+_7.sort(this._sorter);
+if(this.descending){
+_7.reverse();
+}
+}
+var i=0;
+_1.forEach(_7,function(_8){
+_1[(i++)%2===0?"addClass":"removeClass"](_8,"sortListItemOdd");
+this.containerNode.appendChild(_8);
+},this);
+},_set:function(e){
+if(e.target!==this.bodyWrapper){
+_1.addClass(e.target,"sortListItemHover");
+}
+},_unset:function(e){
+_1.removeClass(e.target,"sortListItemHover");
+},_handleClick:function(e){
+_1.toggleClass(e.target,"sortListItemSelected");
+e.target.focus();
+this._updateValues(e.target.innerHTML);
+},_updateValues:function(){
+this._selected=_1.query("li.sortListItemSelected",this.containerNode);
+this.selected=[];
+_1.forEach(this._selected,function(_9){
+this.selected.push(_9.innerHTML);
+},this);
+this.onChanged(arguments);
+},_sorter:function(a,b){
+var _a=a.innerHTML;
+var _b=b.innerHTML;
+if(_a>_b){
+return 1;
+}
+if(_a<_b){
+return -1;
+}
+return 0;
+},setTitle:function(_c){
+this.focusNode.innerHTML=this.title=_c;
+},onChanged:function(){
+}});
+});

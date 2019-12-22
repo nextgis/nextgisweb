@@ -1,9 +1,119 @@
 //>>built
-define("dojox/mobile/FilteredListMixin","require dojo/_base/array dojo/_base/declare dojo/_base/lang dojo/dom dojo/dom-class dojo/dom-construct dojo/aspect dijit/registry ./SearchBox ./ScrollableView ./viewRegistry".split(" "),function(e,h,k,c,q,l,d,m,n,f,p,g){return k("dojox.mobile.FilteredListMixin",null,{filterBoxRef:null,placeHolder:"",filterBoxVisible:!0,_filterBox:null,_createdFilterBox:null,_createdScrollableView:null,startup:function(){if(!this._started){this.inherited(arguments);if(this.filterBoxRef)if((this._filterBox=
-n.byId(this.filterBoxRef))&&this._filterBox.isInstanceOf(f))this._filterBox.set("searchAttr",this.labelProperty?this.labelProperty:"label"),this._filterBox.placeHolder||this._filterBox.set("placeHolder",this.placeHolder),this._filterBox.on("search",c.hitch(this,"_onFilter"));else throw Error("Cannot find a widget of type dojox/mobile/SearchBox or subclass at the specified filterBoxRef: "+this.filterBoxRef);else{this._createdFilterBox=this._filterBox=new f({searchAttr:this.labelProperty?this.labelProperty:
-"label",ignoreCase:!0,incremental:!0,onSearch:c.hitch(this,"_onFilter"),selectOnClick:!0,placeHolder:this.placeHolder});this._createdScrollableView=new p;var a=this.domNode;this.domNode.parentNode.replaceChild(this._createdScrollableView.domNode,this.domNode);d.place(a,this._createdScrollableView.containerNode);a=d.create("div");d.place(this._createdFilterBox.domNode,a);d.place(a,this._createdScrollableView.domNode,"before");this.filterBoxClass&&l.add(a,this.filterBoxClass);this._createdFilterBox.startup();
-this._createdScrollableView.startup();this._createdScrollableView.resize()}var b=g.getEnclosingScrollable(this.domNode);b&&this.connect(b,"onFlickAnimationEnd",c.hitch(this,function(){this._filterBox.focusNode.value||(this._previousUnfilteredScrollPos=b.getPos())}));this.store?this._initStore():this._createStore(this._initStore)}},_setFilterBoxVisibleAttr:function(a){this._set("filterBoxVisible",a);this._filterBox&&this._filterBox.domNode&&(this._filterBox.domNode.style.display=a?"":"none")},_setPlaceHolderAttr:function(a){this._set("placeHolder",
-a);this._filterBox&&this._filterBox.set("placeHolder",a)},getFilterBox:function(){return this._filterBox},getScrollableView:function(){return this._createdScrollableView},_initStore:function(){var a=this.store;a.get&&a.query?this._filterBox.store=a:e(["dojo/store/DataStore"],c.hitch(this,function(b){a=new b({store:a});this._filterBox.store=a}))},_createStore:function(a){e(["./_StoreListMixin","dojo/store/Memory"],c.hitch(this,function(b,d){k.safeMixin(this,new b);this.append=!0;this.createListItem=
-function(a){return a.listItem};m.before(this,"generateList",function(){h.forEach(this.getChildren(),function(a){a.domNode.parentNode.removeChild(a.domNode)})});var e=[],f=null;h.forEach(this.getChildren(),function(a){f=a.label?a.label:a.domNode.innerText||a.domNode.textContent;e.push({label:f,listItem:a})});var g=new d({idProperty:"label",data:{items:e}});this.store=null;this.query={};this.setStore(g,this.query,this.queryOptions);c.hitch(this,a)()}))},_onFilter:function(a,b,c){!1!==this.onFilter(a,
-b,c)&&(this.setQuery(b),(a=g.getEnclosingScrollable(this.domNode))&&a.scrollTo(this._filterBox.focusNode.value?{x:0,y:0}:this._previousUnfilteredScrollPos||{x:0,y:0}))},onFilter:function(){},destroy:function(a){this.inherited(arguments);this._createdFilterBox&&(this._createdFilterBox.destroy(a),this._createdFilterBox=null);this._createdScrollableView&&(this._createdScrollableView.destroy(a),this._createdScrollableView=null)}})});
-//# sourceMappingURL=FilteredListMixin.js.map
+define("dojox/mobile/FilteredListMixin",["require","dojo/_base/array","dojo/_base/declare","dojo/_base/lang","dojo/dom","dojo/dom-class","dojo/dom-construct","dojo/aspect","dijit/registry","./SearchBox","./ScrollableView","./viewRegistry"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c){
+return _3("dojox.mobile.FilteredListMixin",null,{filterBoxRef:null,placeHolder:"",filterBoxVisible:true,_filterBox:null,_createdFilterBox:null,_createdScrollableView:null,startup:function(){
+if(this._started){
+return;
+}
+this.inherited(arguments);
+if(this.filterBoxRef){
+this._filterBox=_9.byId(this.filterBoxRef);
+if(this._filterBox&&this._filterBox.isInstanceOf(_a)){
+this._filterBox.set("searchAttr",this.labelProperty?this.labelProperty:"label");
+if(!this._filterBox.placeHolder){
+this._filterBox.set("placeHolder",this.placeHolder);
+}
+this._filterBox.on("search",_4.hitch(this,"_onFilter"));
+}else{
+throw new Error("Cannot find a widget of type dojox/mobile/SearchBox or subclass "+"at the specified filterBoxRef: "+this.filterBoxRef);
+}
+}else{
+this._filterBox=new _a({searchAttr:this.labelProperty?this.labelProperty:"label",ignoreCase:true,incremental:true,onSearch:_4.hitch(this,"_onFilter"),selectOnClick:true,placeHolder:this.placeHolder});
+this._createdFilterBox=this._filterBox;
+this._createdScrollableView=new _b();
+var _d=this.domNode,_e=this.domNode.parentNode;
+_e.replaceChild(this._createdScrollableView.domNode,this.domNode);
+_7.place(_d,this._createdScrollableView.containerNode);
+var _f=_7.create("div");
+_7.place(this._createdFilterBox.domNode,_f);
+_7.place(_f,this._createdScrollableView.domNode,"before");
+if(this.filterBoxClass){
+_6.add(_f,this.filterBoxClass);
+}
+this._createdFilterBox.startup();
+this._createdScrollableView.startup();
+this._createdScrollableView.resize();
+}
+var sv=_c.getEnclosingScrollable(this.domNode);
+if(sv){
+this.connect(sv,"onFlickAnimationEnd",_4.hitch(this,function(){
+if(!this._filterBox.focusNode.value){
+this._previousUnfilteredScrollPos=sv.getPos();
+}
+}));
+}
+if(!this.store){
+this._createStore(this._initStore);
+}else{
+this._initStore();
+}
+},_setFilterBoxVisibleAttr:function(_10){
+this._set("filterBoxVisible",_10);
+if(this._filterBox&&this._filterBox.domNode){
+this._filterBox.domNode.style.display=_10?"":"none";
+}
+},_setPlaceHolderAttr:function(_11){
+this._set("placeHolder",_11);
+if(this._filterBox){
+this._filterBox.set("placeHolder",_11);
+}
+},getFilterBox:function(){
+return this._filterBox;
+},getScrollableView:function(){
+return this._createdScrollableView;
+},_initStore:function(){
+var _12=this.store;
+if(!_12.get||!_12.query){
+_1(["dojo/store/DataStore"],_4.hitch(this,function(_13){
+_12=new _13({store:_12});
+this._filterBox.store=_12;
+}));
+}else{
+this._filterBox.store=_12;
+}
+},_createStore:function(_14){
+_1(["./_StoreListMixin","dojo/store/Memory"],_4.hitch(this,function(_15,_16){
+_3.safeMixin(this,new _15());
+this.append=true;
+this.createListItem=function(_17){
+return _17.listItem;
+};
+_8.before(this,"generateList",function(){
+_2.forEach(this.getChildren(),function(_18){
+_18.domNode.parentNode.removeChild(_18.domNode);
+});
+});
+var _19=[];
+var _1a=null;
+_2.forEach(this.getChildren(),function(_1b){
+_1a=_1b.label?_1b.label:(_1b.domNode.innerText||_1b.domNode.textContent);
+_19.push({label:_1a,listItem:_1b});
+});
+var _1c={items:_19};
+var _1d=new _16({idProperty:"label",data:_1c});
+this.store=null;
+this.query={};
+this.setStore(_1d,this.query,this.queryOptions);
+_4.hitch(this,_14)();
+}));
+},_onFilter:function(_1e,_1f,_20){
+if(this.onFilter(_1e,_1f,_20)===false){
+return;
+}
+this.setQuery(_1f);
+var sv=_c.getEnclosingScrollable(this.domNode);
+if(sv){
+sv.scrollTo(this._filterBox.focusNode.value?{x:0,y:0}:this._previousUnfilteredScrollPos||{x:0,y:0});
+}
+},onFilter:function(){
+},destroy:function(_21){
+this.inherited(arguments);
+if(this._createdFilterBox){
+this._createdFilterBox.destroy(_21);
+this._createdFilterBox=null;
+}
+if(this._createdScrollableView){
+this._createdScrollableView.destroy(_21);
+this._createdScrollableView=null;
+}
+}});
+});

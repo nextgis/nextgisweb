@@ -1,4 +1,22 @@
 //>>built
-define("dojox/mobile/_TimePickerMixin",["dojo/_base/declare","dojo/dom-class","dojo/date/locale"],function(c,e,d){return c("dojox.mobile._TimePickerMixin",null,{reset:function(){var a=new Date,b=a.getHours()+"",a=a.getMinutes(),a=(10>a?"0":"")+a;this.set("colors",[b,a]);this.values?(this.set("values",this.values),this.values=null):this.values12?(this.set("values12",this.values12),this.values12=null):this.set("values",[b,a])},_getDateAttr:function(){var a=this.get("values");return d.parse(a[0]+":"+
-a[1],{timePattern:"H:m",selector:"time"})}})});
-//# sourceMappingURL=_TimePickerMixin.js.map
+define("dojox/mobile/_TimePickerMixin",["dojo/_base/declare","dojo/dom-class","dojo/date/locale"],function(_1,_2,_3){
+return _1("dojox.mobile._TimePickerMixin",null,{reset:function(){
+var _4=new Date(),h=_4.getHours()+"",m=_4.getMinutes();
+m=(m<10?"0":"")+m;
+this.set("colors",[h,m]);
+if(this.values){
+this.set("values",this.values);
+this.values=null;
+}else{
+if(this.values12){
+this.set("values12",this.values12);
+this.values12=null;
+}else{
+this.set("values",[h,m]);
+}
+}
+},_getDateAttr:function(){
+var v=this.get("values");
+return _3.parse(v[0]+":"+v[1],{timePattern:"H:m",selector:"time"});
+}});
+});

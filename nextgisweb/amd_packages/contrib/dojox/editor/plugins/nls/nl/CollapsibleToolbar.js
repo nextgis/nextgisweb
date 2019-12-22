@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/nl/CollapsibleToolbar",{collapse:"Editor-werkbalk samenvouwen",expand:"Editor-werkbalk uitvouwen"});
-//# sourceMappingURL=CollapsibleToolbar.js.map
+define("dojox/editor/plugins/nls/nl/CollapsibleToolbar",({"collapse":"Editor-werkbalk samenvouwen","expand":"Editor-werkbalk uitvouwen"}));

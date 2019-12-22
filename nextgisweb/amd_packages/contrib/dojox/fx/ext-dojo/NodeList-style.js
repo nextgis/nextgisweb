@@ -1,3 +1,18 @@
 //>>built
-define("dojox/fx/ext-dojo/NodeList-style",["dojo/_base/lang","dojo/query","dojo/NodeList-fx","dojo/fx","../style"],function(g,a,h,e,f){a=a.NodeList;g.extend(a,{addClassFx:function(b,c){return e.combine(this.map(function(d){return f.addClass(d,b,c)}))},removeClassFx:function(b,c){return e.combine(this.map(function(d){return f.removeClass(d,b,c)}))},toggleClassFx:function(b,c,d){return e.combine(this.map(function(a){return f.toggleClass(a,b,c,d)}))}});return a});
-//# sourceMappingURL=NodeList-style.js.map
+define("dojox/fx/ext-dojo/NodeList-style",["dojo/_base/lang","dojo/query","dojo/NodeList-fx","dojo/fx","../style"],function(_1,_2,_3,_4,_5){
+var _6=_2.NodeList;
+_1.extend(_6,{addClassFx:function(_7,_8){
+return _4.combine(this.map(function(n){
+return _5.addClass(n,_7,_8);
+}));
+},removeClassFx:function(_9,_a){
+return _4.combine(this.map(function(n){
+return _5.removeClass(n,_9,_a);
+}));
+},toggleClassFx:function(_b,_c,_d){
+return _4.combine(this.map(function(n){
+return _5.toggleClass(n,_b,_c,_d);
+}));
+}});
+return _6;
+});

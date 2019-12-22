@@ -5,7 +5,71 @@
 */
 
 //>>built
-define("dojo/string",["./_base/kernel","./_base/lang"],function(h,e){var k=/[&<>'"\/]/g,l={"\x26":"\x26amp;","\x3c":"\x26lt;","\x3e":"\x26gt;",'"':"\x26quot;","'":"\x26#x27;","/":"\x26#x2F;"},c={};e.setObject("dojo.string",c);c.escape=function(a){return a?a.replace(k,function(a){return l[a]}):""};c.rep=function(a,b){if(0>=b||!a)return"";for(var d=[];;){b&1&&d.push(a);if(!(b>>=1))break;a+=a}return d.join("")};c.pad=function(a,b,d,m){d||(d="0");a=String(a);b=c.rep(d,Math.ceil((b-a.length)/d.length));
-return m?a+b:b+a};c.substitute=function(a,b,d,c){c=c||h.global;d=d?e.hitch(c,d):function(a){return a};return a.replace(/\$\{([^\s\:\}]*)(?:\:([^\s\:\}]+))?\}/g,function(a,f,g){if(""==f)return"$";a=e.getObject(f,!1,b);g&&(a=e.getObject(g,!1,c).call(c,a,f));g=d(a,f);if("undefined"===typeof g)throw Error('string.substitute could not find key "'+f+'" in template');return g.toString()})};c.trim=String.prototype.trim?e.trim:function(a){a=a.replace(/^\s+/,"");for(var b=a.length-1;0<=b;b--)if(/\S/.test(a.charAt(b))){a=
-a.substring(0,b+1);break}return a};return c});
-//# sourceMappingURL=string.js.map
+define("dojo/string",["./_base/kernel","./_base/lang"],function(_1,_2){
+var _3=/[&<>'"\/]/g;
+var _4={"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#x27;","/":"&#x2F;"};
+var _5={};
+_2.setObject("dojo.string",_5);
+_5.escape=function(_6){
+if(!_6){
+return "";
+}
+return _6.replace(_3,function(c){
+return _4[c];
+});
+};
+_5.rep=function(_7,_8){
+if(_8<=0||!_7){
+return "";
+}
+var _9=[];
+for(;;){
+if(_8&1){
+_9.push(_7);
+}
+if(!(_8>>=1)){
+break;
+}
+_7+=_7;
+}
+return _9.join("");
+};
+_5.pad=function(_a,_b,ch,_c){
+if(!ch){
+ch="0";
+}
+var _d=String(_a),_e=_5.rep(ch,Math.ceil((_b-_d.length)/ch.length));
+return _c?_d+_e:_e+_d;
+};
+_5.substitute=function(_f,map,_10,_11){
+_11=_11||_1.global;
+_10=_10?_2.hitch(_11,_10):function(v){
+return v;
+};
+return _f.replace(/\$\{([^\s\:\}]*)(?:\:([^\s\:\}]+))?\}/g,function(_12,key,_13){
+if(key==""){
+return "$";
+}
+var _14=_2.getObject(key,false,map);
+if(_13){
+_14=_2.getObject(_13,false,_11).call(_11,_14,key);
+}
+var _15=_10(_14,key);
+if(typeof _15==="undefined"){
+throw new Error("string.substitute could not find key \""+key+"\" in template");
+}
+return _15.toString();
+});
+};
+_5.trim=String.prototype.trim?_2.trim:function(str){
+str=str.replace(/^\s+/,"");
+for(var i=str.length-1;i>=0;i--){
+if(/\S/.test(str.charAt(i))){
+str=str.substring(0,i+1);
+break;
+}
+}
+return str;
+};
+return _5;
+});

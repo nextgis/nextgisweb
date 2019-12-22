@@ -1,5 +1,44 @@
 //>>built
-define("dijit/_WidgetsInTemplateMixin",["dojo/_base/array","dojo/aspect","dojo/_base/declare","dojo/_base/lang","dojo/parser"],function(e,k,f,g,h){return f("dijit._WidgetsInTemplateMixin",null,{_earlyTemplatedStartup:!1,contextRequire:null,_beforeFillContent:function(){if(/dojoType|data-dojo-type/i.test(this.domNode.innerHTML)){var a=this.domNode;this.containerNode&&!this.searchContainerNode&&(this.containerNode.stopParser=!0);h.parse(a,{noStart:!this._earlyTemplatedStartup,template:!0,inherited:{dir:this.dir,
-lang:this.lang,textDir:this.textDir},propsThis:this,contextRequire:this.contextRequire,scope:"dojo"}).then(g.hitch(this,function(a){this._startupWidgets=a;for(var b=0;b<a.length;b++)this._processTemplateNode(a[b],function(a,c){return a[c]},function(a,c,b){return c in a?a.connect(a,c,b):a.on(c,b,!0)});this.containerNode&&this.containerNode.stopParser&&delete this.containerNode.stopParser}));if(!this._startupWidgets)throw Error(this.declaredClass+": parser returned unfilled promise (probably waiting for module auto-load), unsupported by _WidgetsInTemplateMixin.   Must pre-load all supporting widgets before instantiation.");
-}},_processTemplateNode:function(a,d,b){return d(a,"dojoType")||d(a,"data-dojo-type")?!0:this.inherited(arguments)},startup:function(){e.forEach(this._startupWidgets,function(a){a&&!a._started&&a.startup&&a.startup()});this._startupWidgets=null;this.inherited(arguments)}})});
-//# sourceMappingURL=_WidgetsInTemplateMixin.js.map
+define("dijit/_WidgetsInTemplateMixin",["dojo/_base/array","dojo/aspect","dojo/_base/declare","dojo/_base/lang","dojo/parser"],function(_1,_2,_3,_4,_5){
+return _3("dijit._WidgetsInTemplateMixin",null,{_earlyTemplatedStartup:false,contextRequire:null,_beforeFillContent:function(){
+if(/dojoType|data-dojo-type/i.test(this.domNode.innerHTML)){
+var _6=this.domNode;
+if(this.containerNode&&!this.searchContainerNode){
+this.containerNode.stopParser=true;
+}
+_5.parse(_6,{noStart:!this._earlyTemplatedStartup,template:true,inherited:{dir:this.dir,lang:this.lang,textDir:this.textDir},propsThis:this,contextRequire:this.contextRequire,scope:"dojo"}).then(_4.hitch(this,function(_7){
+this._startupWidgets=_7;
+for(var i=0;i<_7.length;i++){
+this._processTemplateNode(_7[i],function(n,p){
+return n[p];
+},function(_8,_9,_a){
+if(_9 in _8){
+return _8.connect(_8,_9,_a);
+}else{
+return _8.on(_9,_a,true);
+}
+});
+}
+if(this.containerNode&&this.containerNode.stopParser){
+delete this.containerNode.stopParser;
+}
+}));
+if(!this._startupWidgets){
+throw new Error(this.declaredClass+": parser returned unfilled promise (probably waiting for module auto-load), "+"unsupported by _WidgetsInTemplateMixin.   Must pre-load all supporting widgets before instantiation.");
+}
+}
+},_processTemplateNode:function(_b,_c,_d){
+if(_c(_b,"dojoType")||_c(_b,"data-dojo-type")){
+return true;
+}
+return this.inherited(arguments);
+},startup:function(){
+_1.forEach(this._startupWidgets,function(w){
+if(w&&!w._started&&w.startup){
+w.startup();
+}
+});
+this._startupWidgets=null;
+this.inherited(arguments);
+}});
+});

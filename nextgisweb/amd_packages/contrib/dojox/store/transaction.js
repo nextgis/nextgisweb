@@ -1,5 +1,91 @@
 //>>built
-define("dojox/store/transaction",["dojo/store/Memory","dojo/store/Cache","dojo/when","dojo/aspect","dojo/_base/lang"],function(t,u,l,v,w){var q,r={},x=1;return function(a){function m(b){return function y(e,g){var d=this;if(k){var f=c[b](e,g);l(f,null,function(b){d.errorHandler(b)&&(k=!1,g.error=b,y.call(d,e,g),k=!0)});return f}var a="remove"===b?e:d.getIdentity(e);void 0!==a&&(f=h.get(a));return l(f,function(d){return l(n.add({objectId:a,method:b,target:e,previous:d,options:g,storeId:p}),function(){return e})})}}
-a=a||{};var c=a.masterStore,h=a.cachingStore,p=c.id||c.storeName||c.name||(c.id=x++);p&&(r[p]=c);var n=a.transactionLogStore||q||(q=new t),k=!0;v.before(c,"notify",function(b,a){b?h.put(b):h.remove(a)});return new u(w.delegate(c,{put:m("put"),add:m("add"),remove:m("remove"),errorHandler:function(b){console.error(b);return!0},commit:function(){k=!0;var b=this;return n.query({}).map(function(a){var c=a.method,e=r[a.storeId],g=a.target,d;try{d=e[c](g,a.options)}catch(f){d=b.errorHandler(f);if(!0===d)return f;
-!1===d&&("add"===c?h.remove(a.objectId):h.put(g),e.notify&&e.notify("add"===c?null:a.previous,"remove"===c?void 0:a.objectId));d=f}n.remove(a.id);return d})},transaction:function(){k=!1;var a=this;return{commit:function(){return a.commit()}}}}),h,a)}});
-//# sourceMappingURL=transaction.js.map
+define("dojox/store/transaction",["dojo/store/Memory","dojo/store/Cache","dojo/when","dojo/aspect","dojo/_base/lang"],function(_1,_2,_3,_4,_5){
+var _6;
+var _7={};
+var _8=1;
+return function(_9){
+_9=_9||{};
+var _a=_9.masterStore;
+var _b=_9.cachingStore;
+var _c=_a.id||_a.storeName||_a.name||(_a.id=_8++);
+if(_c){
+_7[_c]=_a;
+}
+var _d=_9.transactionLogStore||_6||(_6=new _1());
+var _e=true;
+function _f(_10){
+return function execute(_11,_12){
+var _13=this;
+if(_e){
+var _14=_a[_10](_11,_12);
+_3(_14,null,function(e){
+if(_13.errorHandler(e)){
+_e=false;
+_12.error=e;
+_15.call(_13,_11,_12);
+_e=true;
+}
+});
+return _14;
+}else{
+var _16=_10==="remove"?_11:_13.getIdentity(_11);
+if(_16!==undefined){
+var _17=_b.get(_16);
+}
+return _3(_17,function(_18){
+return _3(_d.add({objectId:_16,method:_10,target:_11,previous:_18,options:_12,storeId:_c}),function(){
+return _11;
+});
+});
+}
+};
+};
+_4.before(_a,"notify",function(_19,_1a){
+if(_19){
+_b.put(_19);
+}else{
+_b.remove(_1a);
+}
+});
+return new _2(_5.delegate(_a,{put:_f("put"),add:_f("add"),remove:_f("remove"),errorHandler:function(_1b){
+console.error(_1b);
+return true;
+},commit:function(){
+_e=true;
+var _1c=this;
+return _d.query({}).map(function(_1d){
+var _1e=_1d.method;
+var _1f=_7[_1d.storeId];
+var _20=_1d.target;
+var _21;
+try{
+_21=_1f[_1e](_20,_1d.options);
+}
+catch(e){
+_21=_1c.errorHandler(e);
+if(_21===true){
+return e;
+}else{
+if(_21===false){
+if(_1e==="add"){
+_b.remove(_1d.objectId);
+}else{
+_b.put(_20);
+}
+_1f.notify&&_1f.notify(_1e==="add"?null:_1d.previous,_1e==="remove"?undefined:_1d.objectId);
+}
+}
+_21=e;
+}
+_d.remove(_1d.id);
+return _21;
+});
+},transaction:function(){
+_e=false;
+var _22=this;
+return {commit:function(){
+return _22.commit();
+}};
+}}),_b,_9);
+};
+});

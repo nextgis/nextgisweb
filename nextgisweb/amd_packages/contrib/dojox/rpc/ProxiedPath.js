@@ -1,3 +1,21 @@
 //>>built
-define("dojox/rpc/ProxiedPath",["dojo","dojox","dojox/rpc/Service"],function(g,e){e.rpc.envelopeRegistry.register("PROXIED-PATH",function(b){return"PROXIED-PATH"==b},{serialize:function(b,f,c){var a,d=e.rpc.getTarget(b,f);if(g.isArray(c))for(a=0;a<c.length;a++)d+="/"+(null==c[a]?"":c[a]);else for(a in c)d+="/"+a+"/"+c[a];return{data:"",target:(f.proxyUrl||b.proxyUrl)+"?url\x3d"+encodeURIComponent(d)}},deserialize:function(b){return b}})});
-//# sourceMappingURL=ProxiedPath.js.map
+define("dojox/rpc/ProxiedPath",["dojo","dojox","dojox/rpc/Service"],function(_1,_2){
+_2.rpc.envelopeRegistry.register("PROXIED-PATH",function(_3){
+return _3=="PROXIED-PATH";
+},{serialize:function(_4,_5,_6){
+var i;
+var _7=_2.rpc.getTarget(_4,_5);
+if(_1.isArray(_6)){
+for(i=0;i<_6.length;i++){
+_7+="/"+(_6[i]==null?"":_6[i]);
+}
+}else{
+for(i in _6){
+_7+="/"+i+"/"+_6[i];
+}
+}
+return {data:"",target:(_5.proxyUrl||_4.proxyUrl)+"?url="+encodeURIComponent(_7)};
+},deserialize:function(_8){
+return _8;
+}});
+});

@@ -1,4 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/zh/AutoSave",{saveLabel:"\u4fdd\u5b58",saveSettingLabelOn:"\u8bbe\u7f6e\u81ea\u52a8\u4fdd\u5b58\u65f6\u95f4\u95f4\u9694...",saveSettingLabelOff:"\u5173\u95ed\u81ea\u52a8\u4fdd\u5b58",saveSettingdialogTitle:"\u81ea\u52a8\u4fdd\u5b58",saveSettingdialogDescription:"\u6307\u5b9a\u81ea\u52a8\u4fdd\u5b58\u65f6\u95f4\u95f4\u9694",saveSettingdialogParamName:"\u81ea\u52a8\u4fdd\u5b58\u65f6\u95f4\u95f4\u9694",saveSettingdialogParamLabel:"\u6700\u5c0f",saveSettingdialogButtonOk:"\u8bbe\u7f6e\u65f6\u95f4\u95f4\u9694",
-saveSettingdialogButtonCancel:"\u53d6\u6d88",saveMessageSuccess:"\u5df2\u4fdd\u5b58\u5230 ${0}",saveMessageFail:"\u672a\u80fd\u4fdd\u5b58\u5230 ${0}"});
-//# sourceMappingURL=AutoSave.js.map
+define("dojox/editor/plugins/nls/zh/AutoSave",({"saveLabel":"保存","saveSettingLabelOn":"设置自动保存时间间隔...","saveSettingLabelOff":"关闭自动保存","saveSettingdialogTitle":"自动保存","saveSettingdialogDescription":"指定自动保存时间间隔","saveSettingdialogParamName":"自动保存时间间隔","saveSettingdialogParamLabel":"最小","saveSettingdialogButtonOk":"设置时间间隔","saveSettingdialogButtonCancel":"取消","saveMessageSuccess":"已保存到 ${0}","saveMessageFail":"未能保存到 ${0}"}));

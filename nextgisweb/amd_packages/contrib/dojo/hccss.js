@@ -5,6 +5,31 @@
 */
 
 //>>built
-define("dojo/hccss","require ./_base/config ./dom-class ./dom-style ./has ./domReady ./_base/window".split(" "),function(f,g,h,k,b,l,c){b.add("highcontrast",function(){var a=c.doc.createElement("div");try{a.style.cssText='border: 1px solid; border-color:red green; position: absolute; height: 5px; top: -999px;background-image: url("'+(g.blankGif||f.toUrl("./resources/blank.gif"))+'");';c.body().appendChild(a);var d=k.getComputedStyle(a),e=d.backgroundImage;return d.borderTopColor==d.borderRightColor||
-e&&("none"==e||"url(invalid-url:)"==e)}catch(m){return console.warn("hccss: exception detecting high-contrast mode, document is likely hidden: "+m.toString()),!1}finally{8>=b("ie")?a.outerHTML="":c.body().removeChild(a)}});l(function(){b("highcontrast")&&h.add(c.body(),"dj_a11y")});return b});
-//# sourceMappingURL=hccss.js.map
+define("dojo/hccss",["require","./_base/config","./dom-class","./dom-style","./has","./domReady","./_base/window"],function(_1,_2,_3,_4,_5,_6,_7){
+_5.add("highcontrast",function(){
+var _8=_7.doc.createElement("div");
+try{
+_8.style.cssText="border: 1px solid; border-color:red green; position: absolute; height: 5px; top: -999px;"+"background-image: url(\""+(_2.blankGif||_1.toUrl("./resources/blank.gif"))+"\");";
+_7.body().appendChild(_8);
+var cs=_4.getComputedStyle(_8),_9=cs.backgroundImage;
+return cs.borderTopColor==cs.borderRightColor||(_9&&(_9=="none"||_9=="url(invalid-url:)"));
+}
+catch(e){
+console.warn("hccss: exception detecting high-contrast mode, document is likely hidden: "+e.toString());
+return false;
+}
+finally{
+if(_5("ie")<=8){
+_8.outerHTML="";
+}else{
+_7.body().removeChild(_8);
+}
+}
+});
+_6(function(){
+if(_5("highcontrast")){
+_3.add(_7.body(),"dj_a11y");
+}
+});
+return _5;
+});

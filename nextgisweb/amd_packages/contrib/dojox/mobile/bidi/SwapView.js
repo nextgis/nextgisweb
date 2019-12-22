@@ -1,3 +1,20 @@
 //>>built
-define("dojox/mobile/bidi/SwapView",["dojo/_base/declare"],function(b){return b(null,{_callParentFunction:!1,nextView:function(a){if(this.isLeftToRight()||this._callParentFunction)return this._callParentFunction=!1,this.inherited(arguments);this._callParentFunction=!0;return this.previousView(a)},previousView:function(a){if(this.isLeftToRight()||this._callParentFunction)return this._callParentFunction=!1,this.inherited(arguments);this._callParentFunction=!0;return this.nextView(a)}})});
-//# sourceMappingURL=SwapView.js.map
+define("dojox/mobile/bidi/SwapView",["dojo/_base/declare"],function(_1){
+return _1(null,{_callParentFunction:false,nextView:function(_2){
+if(this.isLeftToRight()||this._callParentFunction){
+this._callParentFunction=false;
+return this.inherited(arguments);
+}else{
+this._callParentFunction=true;
+return this.previousView(_2);
+}
+},previousView:function(_3){
+if(this.isLeftToRight()||this._callParentFunction){
+this._callParentFunction=false;
+return this.inherited(arguments);
+}else{
+this._callParentFunction=true;
+return this.nextView(_3);
+}
+}});
+});

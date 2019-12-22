@@ -1,4 +1,42 @@
 //>>built
-define("dojox/lang/oo/general",["dojo","dijit","dojox","dojo/require!dojox/lang/oo/Decorator"],function(e,h,g){e.provide("dojox.lang.oo.general");e.require("dojox.lang.oo.Decorator");(function(){var b=g.lang.oo,d=b.makeDecorator,b=b.general,f=e.isFunction;b.augment=d(function(b,c,a){return"undefined"==typeof a?c:a});b.override=d(function(b,c,a){return"undefined"!=typeof a?c:a});b.shuffle=d(function(b,c,a){return f(a)?function(){return a.apply(this,c.apply(this,arguments))}:a});b.wrap=d(function(b,
-c,a){return function(){return c.call(this,a,arguments)}});b.tap=d(function(b,c,a){return function(){c.apply(this,arguments);return this}});b.before=d(function(b,c,a){return f(a)?function(){c.apply(this,arguments);return a.apply(this,arguments)}:c});b.after=d(function(b,c,a){return f(a)?function(){a.apply(this,arguments);return c.apply(this,arguments)}:c})})()});
-//# sourceMappingURL=general.js.map
+define("dojox/lang/oo/general",["dojo","dijit","dojox","dojo/require!dojox/lang/oo/Decorator"],function(_1,_2,_3){
+_1.provide("dojox.lang.oo.general");
+_1.require("dojox.lang.oo.Decorator");
+(function(){
+var oo=_3.lang.oo,md=oo.makeDecorator,_4=oo.general,_5=_1.isFunction;
+_4.augment=md(function(_6,_7,_8){
+return typeof _8=="undefined"?_7:_8;
+});
+_4.override=md(function(_9,_a,_b){
+return typeof _b!="undefined"?_a:_b;
+});
+_4.shuffle=md(function(_c,_d,_e){
+return _5(_e)?function(){
+return _e.apply(this,_d.apply(this,arguments));
+}:_e;
+});
+_4.wrap=md(function(_f,_10,_11){
+return function(){
+return _10.call(this,_11,arguments);
+};
+});
+_4.tap=md(function(_12,_13,_14){
+return function(){
+_13.apply(this,arguments);
+return this;
+};
+});
+_4.before=md(function(_15,_16,_17){
+return _5(_17)?function(){
+_16.apply(this,arguments);
+return _17.apply(this,arguments);
+}:_16;
+});
+_4.after=md(function(_18,_19,_1a){
+return _5(_1a)?function(){
+_1a.apply(this,arguments);
+return _19.apply(this,arguments);
+}:_19;
+});
+})();
+});

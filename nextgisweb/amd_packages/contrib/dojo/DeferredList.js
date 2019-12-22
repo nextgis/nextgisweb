@@ -5,6 +5,53 @@
 */
 
 //>>built
-define("dojo/DeferredList",["./_base/kernel","./_base/Deferred","./_base/array"],function(b,c,d){b.DeferredList=function(a,b,k,l,m){var f=[];c.call(this);var e=this;0!==a.length||b||this.resolve([0,[]]);var g=0;d.forEach(a,function(c,d){function h(b,c){f[d]=[b,c];g++;g===a.length&&e.resolve(f)}c.then(function(a){b?e.resolve([d,a]):h(!0,a)},function(a){k?e.reject(a):h(!1,a);if(l)return null;throw a;})})};b.DeferredList.prototype=new c;b.DeferredList.prototype.gatherResults=function(a){a=new b.DeferredList(a,
-!1,!0,!1);a.addCallback(function(a){var b=[];d.forEach(a,function(a){b.push(a[1])});return b});return a};return b.DeferredList});
-//# sourceMappingURL=DeferredList.js.map
+define("dojo/DeferredList",["./_base/kernel","./_base/Deferred","./_base/array"],function(_1,_2,_3){
+_1.DeferredList=function(_4,_5,_6,_7,_8){
+var _9=[];
+_2.call(this);
+var _a=this;
+if(_4.length===0&&!_5){
+this.resolve([0,[]]);
+}
+var _b=0;
+_3.forEach(_4,function(_c,i){
+_c.then(function(_d){
+if(_5){
+_a.resolve([i,_d]);
+}else{
+_e(true,_d);
+}
+},function(_f){
+if(_6){
+_a.reject(_f);
+}else{
+_e(false,_f);
+}
+if(_7){
+return null;
+}
+throw _f;
+});
+function _e(_10,_11){
+_9[i]=[_10,_11];
+_b++;
+if(_b===_4.length){
+_a.resolve(_9);
+}
+};
+});
+};
+_1.DeferredList.prototype=new _2();
+_1.DeferredList.prototype.gatherResults=function(_12){
+var d=new _1.DeferredList(_12,false,true,false);
+d.addCallback(function(_13){
+var ret=[];
+_3.forEach(_13,function(_14){
+ret.push(_14[1]);
+});
+return ret;
+});
+return d;
+};
+return _1.DeferredList;
+});

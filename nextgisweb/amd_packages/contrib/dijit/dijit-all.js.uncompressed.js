@@ -986,6 +986,7 @@ define([
 	"dojo/on",
 	"dojo/ready",
 	"dojo/sniff", // has("ie") has("opera") has("dijit-legacy-requires")
+	"dojo/touch",
 	"dojo/window", // winUtils.getBox, winUtils.get
 	"dojo/dnd/Moveable", // Moveable
 	"dojo/dnd/TimedMoveable", // TimedMoveable
@@ -1003,7 +1004,7 @@ define([
 	"./a11yclick",	// template uses ondijitclick
 	"dojo/i18n!./nls/common"
 ], function(require, array, aspect, declare, Deferred,
-			dom, domClass, domGeometry, domStyle, fx, i18n, keys, lang, on, ready, has, winUtils,
+			dom, domClass, domGeometry, domStyle, fx, i18n, keys, lang, on, ready, has, touch, winUtils,
 			Moveable, TimedMoveable, focus, manager, _Widget, _TemplatedMixin, _CssStateMixin, _FormMixin, _DialogMixin,
 			DialogUnderlay, ContentPane, utils, template){
 
@@ -1097,6 +1098,9 @@ define([
 
 			aspect.after(this, "onExecute", lang.hitch(this, "hide"), true);
 			aspect.after(this, "onCancel", lang.hitch(this, "hide"), true);
+			on(this.closeButtonNode, touch.press, function(e){
+				e.stopPropagation();
+			});
 
 			this._modalconnects = [];
 		},
@@ -1404,14 +1408,33 @@ define([
 					viewport.h *= this.maxRatio;
 
 					var bb = domGeometry.position(this.domNode);
-					if(bb.w >= viewport.w || bb.h >= viewport.h){
+					this._shrunk = false;
+					// First check and limit width, because limiting the width may increase the height due to word wrapping.
+					if(bb.w >= viewport.w){
 						dim = {
-							w: Math.min(bb.w, viewport.w),
-							h: Math.min(bb.h, viewport.h)
+							w: viewport.w
 						};
+						domGeometry.setMarginBox(this.domNode, dim);
+						bb = domGeometry.position(this.domNode);
 						this._shrunk = true;
-					}else{
-						this._shrunk = false;
+					}
+					// Now check and limit the height
+					if(bb.h >= viewport.h){
+						if(!dim){
+							dim = {
+								w: bb.w
+							};
+						}
+						dim.h = viewport.h;
+						this._shrunk = true;
+					}
+					if(dim){
+						if(!dim.w){
+							dim.w = bb.w;
+						}
+						if(!dim.h){
+							dim.h = bb.h;
+						}
 					}
 				}
 
@@ -3439,7 +3462,7 @@ define([
 			try{
 				this.onLoadDeferred.resolve(data);
 			}catch(e){
-				console.error('Error ' + this.widgetId + ' running custom onLoad code: ' + e.message);
+				console.error('Error ' + (this.widgetId || this.id) + ' running custom onLoad code: ' + e.message);
 			}
 		},
 
@@ -4366,7 +4389,7 @@ define(["./_base/kernel", "./_base/lang", "./_base/array", "./_base/declare", ".
 					}).then(function(results){
 							return self.parseResults = results;
 						}, function(e){
-							self._onError('Content', e, "Error parsing in _ContentSetter#" + this.id);
+							self._onError('Content', e, "Error parsing in _ContentSetter#" + self.id);
 						});
 				}catch(e){
 					this._onError('Content', e, "Error parsing in _ContentSetter#" + this.id);
@@ -5462,6 +5485,7 @@ define([
 				// is separate from the iframe's document.
 				if(this.document && this.document.body){
 					domStyle.set(this.document.body, "color", domStyle.get(this.iframe, "color"));
+					domStyle.set(this.document.body, "background-color", domStyle.get(this.iframe, "background-color"));
 				}
 			}catch(e){ /* Squelch any errors caused by focus change if hidden during a state change */
 			}
@@ -6716,7 +6740,8 @@ define([
 			var disabled = this.get("disabled");
 			if(this.button){
 				try{
-					enabled = !disabled && e.queryCommandEnabled(c);
+					var implFunc = e._implCommand(c);
+					enabled = !disabled && (this[implFunc] ? this[implFunc](c) : e.queryCommandEnabled(c));
 					if(this.enabled !== enabled){
 						this.enabled = enabled;
 						this.button.set('disabled', !enabled);
@@ -8711,6 +8736,15 @@ define([
 
 			return command;
 		},
+		_implCommand: function(/*String*/ cmd){
+			// summary:
+			//		Used as the function name where we might
+			//		find an override for advice on support
+			//		for this command by the target browser.
+			// tags:
+			//		private
+			return  "_" + this._normalizeCommand(cmd) + "EnabledImpl";
+		},
 
 		_qcaCache: {},
 		queryCommandAvailable: function(/*String*/ command){
@@ -8870,7 +8904,7 @@ define([
 			//Check to see if we have any over-rides for commands, they will be functions on this
 			//widget of the form _commandEnabledImpl.  If we don't, fall through to the basic native
 			//command of the browser.
-			var implFunc = "_" + command + "EnabledImpl";
+			var implFunc = this._implCommand(command);
 
 			if(this[implFunc]){
 				return  this[implFunc](command);
@@ -11306,6 +11340,7 @@ define([
 	"dojo/dom-construct", // domConstruct.place
 	"dojo/i18n", // i18n.getLocalization
 	"dojo/_base/lang", // lang.delegate lang.hitch lang.isString
+	"dojo/string",
 	"dojo/store/Memory", // MemoryStore
 	"../../registry", // registry.getUniqueId
 	"../../_Widget",
@@ -11315,7 +11350,7 @@ define([
 	"../_Plugin",
 	"../range",
 	"dojo/i18n!../nls/FontChoice"
-], function(require, array, declare, domConstruct, i18n, lang, MemoryStore,
+], function(require, array, declare, domConstruct, i18n, lang, stringUtil, MemoryStore,
 	registry, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, FilteringSelect, _Plugin, rangeapi){
 
 	// module:
@@ -11481,12 +11516,34 @@ define([
 			}
 		},
 
+		_normalizeFontName: function (value) {
+			// summary:
+			//		Function used to choose one font name when the value is a list of font names
+			//		like "Verdana, Arial, Helvetica, sans-serif"
+			var allowedValues = this.values;
+			if (!value || !allowedValues) {
+				return value;
+			}
+			var fontNames = value.split(',');
+			if (fontNames.length > 1) {
+				for (var i = 0, l = fontNames.length; i < l; i++) {
+					var fontName = stringUtil.trim(fontNames[i]);
+					var pos = array.indexOf(allowedValues, fontName);
+					if (pos > -1) {
+						return fontName;
+					}
+				}
+			}
+			return value;
+		},
+
 		_setValueAttr: function(value, priorityChange){
 			// summary:
 			//		Over-ride for the default action of setting the
 			//		widget value, maps the input to known values
 
 			priorityChange = priorityChange !== false;
+			value = this._normalizeFontName(value);
 			if(this.generic){
 				var map = {
 					"Arial": "sans-serif",
@@ -11840,7 +11897,9 @@ define([
 				if(quoted){
 					value = quoted[1];
 				}
-
+				if (_c === "fontSize" && !value) {
+					value = 3;  // default to "small" since Editor starts out with 16px font which is considered "small".
+				}
 				if(_c === "formatBlock"){
 					if(!value || value == "p"){
 						// Some browsers (WebKit) doesn't actually get the tag info right.
@@ -16723,6 +16782,7 @@ define([
 			// summary:
 			//		Over-ridable function that connects tag specific events.
 			this.editor.onLoadDeferred.then(lang.hitch(this, function(){
+				this.own(on(this.editor.editNode, "mouseup", lang.hitch(this, "_onMouseUp")));
 				this.own(on(this.editor.editNode, "dblclick", lang.hitch(this, "_onDblClick")));
 			}));
 		},
@@ -16756,6 +16816,16 @@ define([
 				args.urlInput = args.urlInput.replace(/"/g, "&quot;");
 			}
 			return args;
+		},
+
+		_createlinkEnabledImpl: function() {
+			// summary:
+			//		This function implements the test for if the create link
+			//		command should be enabled or not. This plugin supports
+			//		link creation even without selected text.
+			// tags:
+			//		protected
+			return true;
 		},
 
 		setValue: function(args){
@@ -16933,6 +17003,34 @@ define([
 							}
 						});
 					}, 10);
+				}
+			}
+		},
+
+		_onMouseUp: function(){
+			// summary:
+			//		Function to define a behavior on mouse up on the element
+			//		type this dialog edits to move the cursor just outside
+			//		anchor tags when clicking on their edges.
+			// tags:
+			//		protected.
+			if(has('ff')){
+				var a = this.editor.selection.getAncestorElement(this.tag);
+				if(a){
+					var selection = rangeapi.getSelection(this.editor.window);
+					var range = selection.getRangeAt(0);
+					if(range.collapsed && a.childNodes.length){
+						var test = range.cloneRange();
+						test.selectNodeContents(a.childNodes[a.childNodes.length - 1]);
+						test.setStart(a.childNodes[0], 0);
+						if(range.compareBoundaryPoints(test.START_TO_START, test) !== 1){
+							// cursor is before or at the test start
+							range.setStartBefore(a);
+						}else if(range.compareBoundaryPoints(test.END_TO_START, test) !== -1){
+							// cursor is before or at the test end
+							range.setStartAfter(a);
+						}
+					}
 				}
 			}
 		}
@@ -21702,10 +21800,23 @@ define([
 			//		Focus on the specified node (which must be visible)
 			// tags:
 			//		protected
-
-			var scrollLeft = this.domNode.scrollLeft;
+                        var tmp = [];
+                        for(var domNode = this.domNode; 
+                            domNode && domNode.tagName && domNode.tagName.toUpperCase() !== 'IFRAME';
+                            domNode = domNode.parentNode) {
+                            tmp.push({
+                                domNode: domNode.contentWindow || domNode,
+                                scrollLeft: domNode.scrollLeft || 0,
+                                scrollTop: domNode.scrollTop || 0
+                            });
+                        }
 			this.focusChild(node);
-			this.domNode.scrollLeft = scrollLeft;
+			this.defer(function() {
+                            for (var i = 0, max = tmp.length; i < max; i++) {
+                                tmp[i].domNode.scrollLeft = tmp[i].scrollLeft;
+                                tmp[i].domNode.scrollTop = tmp[i].scrollTop;
+                            }
+			}, 0);
 		},
 
 		_onNodeMouseEnter: function(/*dijit/_WidgetBase*/ /*===== node =====*/){
@@ -24923,13 +25034,19 @@ define([
 			this._decimalInfo = getDecimalInfo(constraints);
 		},
 
-		_onFocus: function(){
+		_onFocus: function(/*String*/ by){
 			if(this.disabled || this.readOnly){ return; }
 			var val = this.get('value');
 			if(typeof val == "number" && !isNaN(val)){
 				var formattedValue = this.format(val, this.constraints);
 				if(formattedValue !== undefined){
 					this.textbox.value = formattedValue;
+					// when NumberTextBox or descendants (i.e. CurrencyTextBox) format textbox.value when focused
+					// all browsers except Chrome will select textbox contents when tabbed to by keyboard
+					// force selection if not focused by mouse
+					if (by !== "mouse") {
+						this.textbox.select();
+					}
 				}
 			}
 			this.inherited(arguments);
@@ -27701,10 +27818,11 @@ define([
 define([
 	"dojo/_base/declare", // declare
 	"dojo/keys", // keys.DOWN_ARROW keys.ENTER keys.ESCAPE keys.TAB keys.UP_ARROW
+	"dojo/query",
 	"dojo/_base/lang", // lang.hitch
 	"../_TimePicker",
 	"./_DateTimeTextBox"
-], function(declare, keys, lang, _TimePicker, _DateTimeTextBox){
+], function(declare, keys, query, lang, _TimePicker, _DateTimeTextBox){
 
 	// module:
 	//		dijit/form/TimeTextBox
@@ -27745,6 +27863,18 @@ define([
 
 		openDropDown: function(/*Function*/ callback){
 			this.inherited(arguments);
+
+			// Fix #18683
+			var selectedNode = query(".dijitTimePickerItemSelected", this.dropDown.domNode),
+				parentNode=this.dropDown.domNode.parentNode;
+			if(selectedNode[0]){
+				// Center the selected node in the client area of the popup.
+				parentNode.scrollTop=selectedNode[0].offsetTop-(parentNode.clientHeight-selectedNode[0].clientHeight)/2;
+			}else{
+				// There is no currently selected value. Position the list so that the median
+				// node is visible.
+				parentNode.scrollTop=(parentNode.scrollHeight-parentNode.clientHeight)/2;
+            }
 
 			// For screen readers, as user arrows through values, populate <input> with latest value.
 			this.dropDown.on("input", lang.hitch(this, function(){

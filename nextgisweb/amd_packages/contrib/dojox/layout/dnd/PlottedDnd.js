@@ -1,20 +1,394 @@
 //>>built
-define("dojox/layout/dnd/PlottedDnd",["dojo","dijit","dojox","dojo/require!dojo/dnd/Source,dojo/dnd/Manager,dojox/layout/dnd/Avatar"],function(c,g,e){c.provide("dojox.layout.dnd.PlottedDnd");c.require("dojo.dnd.Source");c.require("dojo.dnd.Manager");c.require("dojox.layout.dnd.Avatar");c.declare("dojox.layout.dnd.PlottedDnd",[c.dnd.Source],{GC_OFFSET_X:c.dnd.manager().OFFSET_X,GC_OFFSET_Y:c.dnd.manager().OFFSET_Y,constructor:function(a,b){this.childBoxes=null;this.dropIndicator=new e.layout.dnd.DropIndicator("dndDropIndicator",
-"div");this.withHandles=b.withHandles;this.handleClasses=b.handleClasses;this.opacity=b.opacity;this.allowAutoScroll=b.allowAutoScroll;this.dom=b.dom;this.skipForm=this.singular=!0;this._over=!1;this.defaultHandleClass="GcDndHandle";this.isDropped=!1;this._timer=null;this.isOffset=b.isOffset?!0:!1;this.offsetDrag=b.offsetDrag?b.offsetDrag:{x:0,y:0};this.hideSource=b.hideSource?b.hideSource:!0;this._drop=this.dropIndicator.create()},_calculateCoords:function(a){c.forEach(this.node.childNodes,function(b){var d=
-c.coords(b,!0);b.coords={xy:d,w:b.offsetWidth/2,h:b.offsetHeight/2,mw:d.w};a&&(b.coords.mh=d.h)},this)},_legalMouseDown:function(a){if(!this.withHandles)return!0;for(a=a.target;a&&a!=this.node;a=a.parentNode)if(c.hasClass(a,this.defaultHandleClass))return!0;return!1},setDndItemSelectable:function(a,b){for(var d=a;d&&a!=this.node;d=d.parentNode)if(c.hasClass(d,"dojoDndItem")){c.setSelectable(d,b);break}},getDraggedWidget:function(a){for(;a&&"body"!=a.nodeName.toLowerCase()&&!c.hasClass(a,"dojoDndItem");)a=
-a.parentNode;return a?g.byNode(a):null},isAccepted:function(a){return(a=a?a.getAttribute("dndtype"):null)&&a in this.accept},onDndStart:function(a,b,d){this.firstIndicator=a==this;this._calculateCoords(!0);var f=c.dnd.manager();b[0].coords?(this._drop.style.height=b[0].coords.mh+"px",c.style(f.avatar.node,"width",b[0].coords.mw+"px")):this._drop.style.height=f.avatar.node.clientHeight+"px";this.dndNodes=b;e.layout.dnd.PlottedDnd.superclass.onDndStart.call(this,a,b,d);a==this&&this.hideSource&&c.forEach(b,
-function(a){c.style(a,"display","none")})},onDndCancel:function(){if(c.dnd.manager().source==this&&this.hideSource){var a=this.getSelectedNodes();c.forEach(a,function(a){c.style(a,"display","")})}e.layout.dnd.PlottedDnd.superclass.onDndCancel.call(this);this.deleteDashedZone()},onDndDrop:function(a,b,c,f){try{if(this.isAccepted(b[0]))a==this&&this._over&&this.dropObject&&(this.current=this.dropObject.c),e.layout.dnd.PlottedDnd.superclass.onDndDrop.call(this,a,b,c,f),this._calculateCoords(!0);else this.onDndCancel()}catch(h){console.warn(h)}},
-onMouseDown:function(a){null==this.current?this.selection={}:this.current==this.anchor&&(this.anchor=null);if(null!==this.current){var b=c.coords(this.current,!0);this.current.coords={xy:b,w:this.current.offsetWidth/2,h:this.current.offsetHeight/2,mh:b.h,mw:b.w};this._drop.style.height=this.current.coords.mh+"px";if(this.isOffset){if(0==this.offsetDrag.x&&0==this.offsetDrag.y){var d=!0,b=c.coords(this._getChildByEvent(a));this.offsetDrag.x=b.x-a.pageX;this.offsetDrag.y=b.y-a.clientY}16>this.offsetDrag.y&&
-null!=this.current&&(this.offsetDrag.y=this.GC_OFFSET_Y);b=c.dnd.manager();b.OFFSET_X=this.offsetDrag.x;b.OFFSET_Y=this.offsetDrag.y;d&&(this.offsetDrag.x=0,this.offsetDrag.y=0)}}c.dnd.isFormElement(a)?this.setDndItemSelectable(a.target,!0):(this.containerSource=!0,(d=this.getDraggedWidget(a.target))&&d.dragRestriction||e.layout.dnd.PlottedDnd.superclass.onMouseDown.call(this,a))},onMouseUp:function(a){e.layout.dnd.PlottedDnd.superclass.onMouseUp.call(this,a);this.containerSource=!1;!c.isIE&&this.mouseDown&&
-this.setDndItemSelectable(a.target,!0);a=c.dnd.manager();a.OFFSET_X=this.GC_OFFSET_X;a.OFFSET_Y=this.GC_OFFSET_Y},onMouseMove:function(a){var b=c.dnd.manager();if(this.isDragging){var d=!1;if(null!=this.current||null==this.current&&!this.dropObject)if(this.isAccepted(b.nodes[0])||this.containerSource)d=this.setIndicatorPosition(a);if(this.current!=this.targetAnchor||d!=this.before)this._markTargetAnchor(d),b.canDrop(!this.current||b.source!=this||!(this.current.id in this.selection));this.allowAutoScroll&&
-this._checkAutoScroll(a)}else this.mouseDown&&this.isSource&&(d=this.getSelectedNodes(),d.length&&b.startDrag(this,d,this.copyState(c.isCopyKey(a)))),this.allowAutoScroll&&this._stopAutoScroll()},_markTargetAnchor:function(a){if(this.current!=this.targetAnchor||this.before!=a)this.targetAnchor=this.current,this.targetBox=null,this.before=a},_unmarkTargetAnchor:function(){this.targetAnchor&&(this.targetBox=this.targetAnchor=null,this.before=!0)},setIndicatorPosition:function(a){var b=!1;if(this.current){if(!this.current.coords||
-this.allowAutoScroll)this.current.coords={xy:c.coords(this.current,!0),w:this.current.offsetWidth/2,h:this.current.offsetHeight/2};b=this.horizontal?a.pageX-this.current.coords.xy.x<this.current.coords.w:a.pageY-this.current.coords.xy.y<this.current.coords.h;this.insertDashedZone(b)}else this.dropObject||this.insertDashedZone(!1);return b},onOverEvent:function(){this._over=!0;e.layout.dnd.PlottedDnd.superclass.onOverEvent.call(this);if(this.isDragging){var a=c.dnd.manager();!this.current&&!this.dropObject&&
-this.getSelectedNodes()[0]&&this.isAccepted(a.nodes[0])&&this.insertDashedZone(!1)}},onOutEvent:function(){this.containerSource=this._over=!1;e.layout.dnd.PlottedDnd.superclass.onOutEvent.call(this);this.dropObject&&this.deleteDashedZone()},deleteDashedZone:function(){this._drop.style.display="none";for(var a=this._drop.nextSibling;null!=a;)a.coords.xy.y-=parseInt(this._drop.style.height),a=a.nextSibling;delete this.dropObject},insertDashedZone:function(a){if(this.dropObject){if(a==this.dropObject.b&&
-(this.current&&this.dropObject.c==this.current.id||!this.current&&!this.dropObject.c))return;this.deleteDashedZone()}this.dropObject={n:this._drop,c:this.current?this.current.id:null,b:a};if(this.current)if(c.place(this._drop,this.current,a?"before":"after"),this.firstIndicator)this.firstIndicator=!1;else for(a=this._drop.nextSibling;null!=a;)a.coords.xy.y+=parseInt(this._drop.style.height),a=a.nextSibling;else this.node.appendChild(this._drop);this._drop.style.display=""},insertNodes:function(a,
-b,d,f){if(this.dropObject)c.style(this.dropObject.n,"display","none"),e.layout.dnd.PlottedDnd.superclass.insertNodes.call(this,!0,b,!0,this.dropObject.n),this.deleteDashedZone();else return e.layout.dnd.PlottedDnd.superclass.insertNodes.call(this,a,b,d,f);if(a=g.byId(b[0].getAttribute("widgetId")))e.layout.dnd._setGcDndHandle(a,this.withHandles,this.handleClasses),this.hideSource&&c.style(a.domNode,"display","")},_checkAutoScroll:function(a){this._timer&&clearTimeout(this._timer);this._stopAutoScroll();
-var b=this.dom,c=this._sumAncestorProperties(b,"offsetTop");a.pageY-b.offsetTop+30>b.clientHeight?(this.autoScrollActive=!0,this._autoScrollDown(b)):0<b.scrollTop&&30>a.pageY-c&&(this.autoScrollActive=!0,this._autoScrollUp(b))},_autoScrollUp:function(a){this.autoScrollActive&&0<a.scrollTop&&(a.scrollTop-=30,this._timer=setTimeout(c.hitch(this,"_autoScrollUp",a),100))},_autoScrollDown:function(a){this.autoScrollActive&&a.scrollTop<a.scrollHeight-a.clientHeight&&(a.scrollTop+=30,this._timer=setTimeout(c.hitch(this,
-"_autoScrollDown",a),100))},_stopAutoScroll:function(){this.autoScrollActive=!1},_sumAncestorProperties:function(a,b){a=c.byId(a);if(!a)return 0;for(var d=0;a;){var f=a[b];if(f&&(d+=f-0,a==c.body()))break;a=a.parentNode}return d}});e.layout.dnd._setGcDndHandle=function(a,b,d,f){f||c.query(".GcDndHandle",a.domNode).removeClass("GcDndHandle");if(b){b=!1;for(f=d.length-1;0<=f;f--){var e=c.query("."+d[f],a.domNode)[0];if(e&&(b=!0,"GcDndHandle"!=d[f])){var g=c.query(".GcDndHandle",a.domNode);0==g.length?
-c.removeClass(a.domNode,"GcDndHandle"):g.removeClass("GcDndHandle");c.addClass(e,"GcDndHandle")}}b||c.addClass(a.domNode,"GcDndHandle")}else c.addClass(a.domNode,"GcDndHandle")};c.declare("dojox.layout.dnd.DropIndicator",null,{constructor:function(a,b){this.tag=b||"div";this.style=a||null},isInserted:function(){return this.node.parentNode&&1==this.node.parentNode.nodeType},create:function(){if(this.node&&this.isInserted())return this.node;var a=c.doc.createElement(this.tag);this.style?(a.className=
-this.style,a.style.height="90px"):c.style(a,{position:"relative",border:"1px dashed #F60",margin:"2px",height:"90px"});return this.node=a},destroy:function(){this.node&&this.isInserted()&&(this.node.parentNode.removeChild(this.node),this.node=null)}});c.extend(c.dnd.Manager,{canDrop:function(a){a=this.target&&a;this.canDropFlag!=a&&(this.canDropFlag=a,this.avatar&&this.avatar.update())},makeAvatar:function(){return"dojox.layout.dnd.PlottedDnd"==this.source.declaredClass?new e.layout.dnd.Avatar(this,
-this.source.opacity):new c.dnd.Avatar(this)}});c.isIE&&(e.layout.dnd.handdleIE=[c.subscribe("/dnd/start",null,function(){IEonselectstart=document.body.onselectstart;document.body.onselectstart=function(){return!1}}),c.subscribe("/dnd/cancel",null,function(){document.body.onselectstart=IEonselectstart}),c.subscribe("/dnd/drop",null,function(){document.body.onselectstart=IEonselectstart})],c.addOnWindowUnload(function(){c.forEach(e.layout.dnd.handdleIE,c.unsubscribe)}))});
-//# sourceMappingURL=PlottedDnd.js.map
+define("dojox/layout/dnd/PlottedDnd",["dojo","dijit","dojox","dojo/require!dojo/dnd/Source,dojo/dnd/Manager,dojox/layout/dnd/Avatar"],function(_1,_2,_3){
+_1.provide("dojox.layout.dnd.PlottedDnd");
+_1.require("dojo.dnd.Source");
+_1.require("dojo.dnd.Manager");
+_1.require("dojox.layout.dnd.Avatar");
+_1.declare("dojox.layout.dnd.PlottedDnd",[_1.dnd.Source],{GC_OFFSET_X:_1.dnd.manager().OFFSET_X,GC_OFFSET_Y:_1.dnd.manager().OFFSET_Y,constructor:function(_4,_5){
+this.childBoxes=null;
+this.dropIndicator=new _3.layout.dnd.DropIndicator("dndDropIndicator","div");
+this.withHandles=_5.withHandles;
+this.handleClasses=_5.handleClasses;
+this.opacity=_5.opacity;
+this.allowAutoScroll=_5.allowAutoScroll;
+this.dom=_5.dom;
+this.singular=true;
+this.skipForm=true;
+this._over=false;
+this.defaultHandleClass="GcDndHandle";
+this.isDropped=false;
+this._timer=null;
+this.isOffset=(_5.isOffset)?true:false;
+this.offsetDrag=(_5.offsetDrag)?_5.offsetDrag:{x:0,y:0};
+this.hideSource=_5.hideSource?_5.hideSource:true;
+this._drop=this.dropIndicator.create();
+},_calculateCoords:function(_6){
+_1.forEach(this.node.childNodes,function(_7){
+var c=_1.coords(_7,true);
+_7.coords={xy:c,w:_7.offsetWidth/2,h:_7.offsetHeight/2,mw:c.w};
+if(_6){
+_7.coords.mh=c.h;
+}
+},this);
+},_legalMouseDown:function(e){
+if(!this.withHandles){
+return true;
+}
+for(var _8=(e.target);_8&&_8!=this.node;_8=_8.parentNode){
+if(_1.hasClass(_8,this.defaultHandleClass)){
+return true;
+}
+}
+return false;
+},setDndItemSelectable:function(_9,_a){
+for(var _b=_9;_b&&_9!=this.node;_b=_b.parentNode){
+if(_1.hasClass(_b,"dojoDndItem")){
+_1.setSelectable(_b,_a);
+return;
+}
+}
+},getDraggedWidget:function(_c){
+var _d=_c;
+while(_d&&_d.nodeName.toLowerCase()!="body"&&!_1.hasClass(_d,"dojoDndItem")){
+_d=_d.parentNode;
+}
+return (_d)?_2.byNode(_d):null;
+},isAccepted:function(_e){
+var _f=(_e)?_e.getAttribute("dndtype"):null;
+return (_f&&_f in this.accept);
+},onDndStart:function(_10,_11,_12){
+this.firstIndicator=(_10==this);
+this._calculateCoords(true);
+var m=_1.dnd.manager();
+if(_11[0].coords){
+this._drop.style.height=_11[0].coords.mh+"px";
+_1.style(m.avatar.node,"width",_11[0].coords.mw+"px");
+}else{
+this._drop.style.height=m.avatar.node.clientHeight+"px";
+}
+this.dndNodes=_11;
+_3.layout.dnd.PlottedDnd.superclass.onDndStart.call(this,_10,_11,_12);
+if(_10==this&&this.hideSource){
+_1.forEach(_11,function(n){
+_1.style(n,"display","none");
+});
+}
+},onDndCancel:function(){
+var m=_1.dnd.manager();
+if(m.source==this&&this.hideSource){
+var _13=this.getSelectedNodes();
+_1.forEach(_13,function(n){
+_1.style(n,"display","");
+});
+}
+_3.layout.dnd.PlottedDnd.superclass.onDndCancel.call(this);
+this.deleteDashedZone();
+},onDndDrop:function(_14,_15,_16,_17){
+try{
+if(!this.isAccepted(_15[0])){
+this.onDndCancel();
+}else{
+if(_14==this&&this._over&&this.dropObject){
+this.current=this.dropObject.c;
+}
+_3.layout.dnd.PlottedDnd.superclass.onDndDrop.call(this,_14,_15,_16,_17);
+this._calculateCoords(true);
+}
+}
+catch(e){
+console.warn(e);
+}
+},onMouseDown:function(e){
+if(this.current==null){
+this.selection={};
+}else{
+if(this.current==this.anchor){
+this.anchor=null;
+}
+}
+if(this.current!==null){
+var c=_1.coords(this.current,true);
+this.current.coords={xy:c,w:this.current.offsetWidth/2,h:this.current.offsetHeight/2,mh:c.h,mw:c.w};
+this._drop.style.height=this.current.coords.mh+"px";
+if(this.isOffset){
+if(this.offsetDrag.x==0&&this.offsetDrag.y==0){
+var _18=true;
+var _19=_1.coords(this._getChildByEvent(e));
+this.offsetDrag.x=_19.x-e.pageX;
+this.offsetDrag.y=_19.y-e.clientY;
+}
+if(this.offsetDrag.y<16&&this.current!=null){
+this.offsetDrag.y=this.GC_OFFSET_Y;
+}
+var m=_1.dnd.manager();
+m.OFFSET_X=this.offsetDrag.x;
+m.OFFSET_Y=this.offsetDrag.y;
+if(_18){
+this.offsetDrag.x=0;
+this.offsetDrag.y=0;
+}
+}
+}
+if(_1.dnd.isFormElement(e)){
+this.setDndItemSelectable(e.target,true);
+}else{
+this.containerSource=true;
+var _1a=this.getDraggedWidget(e.target);
+if(_1a&&_1a.dragRestriction){
+}else{
+_3.layout.dnd.PlottedDnd.superclass.onMouseDown.call(this,e);
+}
+}
+},onMouseUp:function(e){
+_3.layout.dnd.PlottedDnd.superclass.onMouseUp.call(this,e);
+this.containerSource=false;
+if(!_1.isIE&&this.mouseDown){
+this.setDndItemSelectable(e.target,true);
+}
+var m=_1.dnd.manager();
+m.OFFSET_X=this.GC_OFFSET_X;
+m.OFFSET_Y=this.GC_OFFSET_Y;
+},onMouseMove:function(e){
+var m=_1.dnd.manager();
+if(this.isDragging){
+var _1b=false;
+if(this.current!=null||(this.current==null&&!this.dropObject)){
+if(this.isAccepted(m.nodes[0])||this.containerSource){
+_1b=this.setIndicatorPosition(e);
+}
+}
+if(this.current!=this.targetAnchor||_1b!=this.before){
+this._markTargetAnchor(_1b);
+m.canDrop(!this.current||m.source!=this||!(this.current.id in this.selection));
+}
+if(this.allowAutoScroll){
+this._checkAutoScroll(e);
+}
+}else{
+if(this.mouseDown&&this.isSource){
+var _1c=this.getSelectedNodes();
+if(_1c.length){
+m.startDrag(this,_1c,this.copyState(_1.isCopyKey(e)));
+}
+}
+if(this.allowAutoScroll){
+this._stopAutoScroll();
+}
+}
+},_markTargetAnchor:function(_1d){
+if(this.current==this.targetAnchor&&this.before==_1d){
+return;
+}
+this.targetAnchor=this.current;
+this.targetBox=null;
+this.before=_1d;
+},_unmarkTargetAnchor:function(){
+if(!this.targetAnchor){
+return;
+}
+this.targetAnchor=null;
+this.targetBox=null;
+this.before=true;
+},setIndicatorPosition:function(e){
+var _1e=false;
+if(this.current){
+if(!this.current.coords||this.allowAutoScroll){
+this.current.coords={xy:_1.coords(this.current,true),w:this.current.offsetWidth/2,h:this.current.offsetHeight/2};
+}
+_1e=this.horizontal?(e.pageX-this.current.coords.xy.x)<this.current.coords.w:(e.pageY-this.current.coords.xy.y)<this.current.coords.h;
+this.insertDashedZone(_1e);
+}else{
+if(!this.dropObject){
+this.insertDashedZone(false);
+}
+}
+return _1e;
+},onOverEvent:function(){
+this._over=true;
+_3.layout.dnd.PlottedDnd.superclass.onOverEvent.call(this);
+if(this.isDragging){
+var m=_1.dnd.manager();
+if(!this.current&&!this.dropObject&&this.getSelectedNodes()[0]&&this.isAccepted(m.nodes[0])){
+this.insertDashedZone(false);
+}
+}
+},onOutEvent:function(){
+this._over=false;
+this.containerSource=false;
+_3.layout.dnd.PlottedDnd.superclass.onOutEvent.call(this);
+if(this.dropObject){
+this.deleteDashedZone();
+}
+},deleteDashedZone:function(){
+this._drop.style.display="none";
+var _1f=this._drop.nextSibling;
+while(_1f!=null){
+_1f.coords.xy.y-=parseInt(this._drop.style.height);
+_1f=_1f.nextSibling;
+}
+delete this.dropObject;
+},insertDashedZone:function(_20){
+if(this.dropObject){
+if(_20==this.dropObject.b&&((this.current&&this.dropObject.c==this.current.id)||(!this.current&&!this.dropObject.c))){
+return;
+}else{
+this.deleteDashedZone();
+}
+}
+this.dropObject={n:this._drop,c:this.current?this.current.id:null,b:_20};
+if(this.current){
+_1.place(this._drop,this.current,_20?"before":"after");
+if(!this.firstIndicator){
+var _21=this._drop.nextSibling;
+while(_21!=null){
+_21.coords.xy.y+=parseInt(this._drop.style.height);
+_21=_21.nextSibling;
+}
+}else{
+this.firstIndicator=false;
+}
+}else{
+this.node.appendChild(this._drop);
+}
+this._drop.style.display="";
+},insertNodes:function(_22,_23,_24,_25){
+if(this.dropObject){
+_1.style(this.dropObject.n,"display","none");
+_3.layout.dnd.PlottedDnd.superclass.insertNodes.call(this,true,_23,true,this.dropObject.n);
+this.deleteDashedZone();
+}else{
+return _3.layout.dnd.PlottedDnd.superclass.insertNodes.call(this,_22,_23,_24,_25);
+}
+var _26=_2.byId(_23[0].getAttribute("widgetId"));
+if(_26){
+_3.layout.dnd._setGcDndHandle(_26,this.withHandles,this.handleClasses);
+if(this.hideSource){
+_1.style(_26.domNode,"display","");
+}
+}
+},_checkAutoScroll:function(e){
+if(this._timer){
+clearTimeout(this._timer);
+}
+this._stopAutoScroll();
+var _27=this.dom,y=this._sumAncestorProperties(_27,"offsetTop");
+if((e.pageY-_27.offsetTop+30)>_27.clientHeight){
+this.autoScrollActive=true;
+this._autoScrollDown(_27);
+}else{
+if((_27.scrollTop>0)&&(e.pageY-y)<30){
+this.autoScrollActive=true;
+this._autoScrollUp(_27);
+}
+}
+},_autoScrollUp:function(_28){
+if(this.autoScrollActive&&_28.scrollTop>0){
+_28.scrollTop-=30;
+this._timer=setTimeout(_1.hitch(this,"_autoScrollUp",_28),100);
+}
+},_autoScrollDown:function(_29){
+if(this.autoScrollActive&&(_29.scrollTop<(_29.scrollHeight-_29.clientHeight))){
+_29.scrollTop+=30;
+this._timer=setTimeout(_1.hitch(this,"_autoScrollDown",_29),100);
+}
+},_stopAutoScroll:function(){
+this.autoScrollActive=false;
+},_sumAncestorProperties:function(_2a,_2b){
+_2a=_1.byId(_2a);
+if(!_2a){
+return 0;
+}
+var _2c=0;
+while(_2a){
+var val=_2a[_2b];
+if(val){
+_2c+=val-0;
+if(_2a==_1.body()){
+break;
+}
+}
+_2a=_2a.parentNode;
+}
+return _2c;
+}});
+_3.layout.dnd._setGcDndHandle=function(_2d,_2e,_2f,_30){
+var cls="GcDndHandle";
+if(!_30){
+_1.query(".GcDndHandle",_2d.domNode).removeClass(cls);
+}
+if(!_2e){
+_1.addClass(_2d.domNode,cls);
+}else{
+var _31=false;
+for(var i=_2f.length-1;i>=0;i--){
+var _32=_1.query("."+_2f[i],_2d.domNode)[0];
+if(_32){
+_31=true;
+if(_2f[i]!=cls){
+var _33=_1.query("."+cls,_2d.domNode);
+if(_33.length==0){
+_1.removeClass(_2d.domNode,cls);
+}else{
+_33.removeClass(cls);
+}
+_1.addClass(_32,cls);
+}
+}
+}
+if(!_31){
+_1.addClass(_2d.domNode,cls);
+}
+}
+};
+_1.declare("dojox.layout.dnd.DropIndicator",null,{constructor:function(cn,tag){
+this.tag=tag||"div";
+this.style=cn||null;
+},isInserted:function(){
+return (this.node.parentNode&&this.node.parentNode.nodeType==1);
+},create:function(){
+if(this.node&&this.isInserted()){
+return this.node;
+}
+var h="90px",el=_1.doc.createElement(this.tag);
+if(this.style){
+el.className=this.style;
+el.style.height=h;
+}else{
+_1.style(el,{position:"relative",border:"1px dashed #F60",margin:"2px",height:h});
+}
+this.node=el;
+return el;
+},destroy:function(){
+if(!this.node||!this.isInserted()){
+return;
+}
+this.node.parentNode.removeChild(this.node);
+this.node=null;
+}});
+_1.extend(_1.dnd.Manager,{canDrop:function(_34){
+var _35=this.target&&_34;
+if(this.canDropFlag!=_35){
+this.canDropFlag=_35;
+if(this.avatar){
+this.avatar.update();
+}
+}
+},makeAvatar:function(){
+return (this.source.declaredClass=="dojox.layout.dnd.PlottedDnd")?new _3.layout.dnd.Avatar(this,this.source.opacity):new _1.dnd.Avatar(this);
+}});
+if(_1.isIE){
+_3.layout.dnd.handdleIE=[_1.subscribe("/dnd/start",null,function(){
+IEonselectstart=document.body.onselectstart;
+document.body.onselectstart=function(){
+return false;
+};
+}),_1.subscribe("/dnd/cancel",null,function(){
+document.body.onselectstart=IEonselectstart;
+}),_1.subscribe("/dnd/drop",null,function(){
+document.body.onselectstart=IEonselectstart;
+})];
+_1.addOnWindowUnload(function(){
+_1.forEach(_3.layout.dnd.handdleIE,_1.unsubscribe);
+});
+}
+});

@@ -1,4 +1,22 @@
 //>>built
-define("dojox/mobile/CheckBox",["dojo/_base/declare","dojo/dom-construct","dijit/form/_CheckBoxMixin","./ToggleButton","./sniff"],function(c,b,d,e,f){return c("dojox.mobile.CheckBox",[e,d],{baseClass:"mblCheckBox",_setTypeAttr:function(){},buildRendering:function(){this.templateString||this.srcNodeRef||(this.srcNodeRef=b.create("input",{type:this.type}));this.inherited(arguments);this.templateString||(this.focusNode=this.domNode);if(f("windows-theme")){var a=b.create("span",{className:"mblCheckableInputContainer"});
-a.appendChild(this.domNode.cloneNode());this.labelNode=b.create("span",{className:"mblCheckableInputDecorator"},a);this.domNode=a;this.focusNode=a.firstChild}},_getValueAttr:function(){return this.checked?this.value:!1}})});
-//# sourceMappingURL=CheckBox.js.map
+define("dojox/mobile/CheckBox",["dojo/_base/declare","dojo/dom-construct","dijit/form/_CheckBoxMixin","./ToggleButton","./sniff"],function(_1,_2,_3,_4,_5){
+return _1("dojox.mobile.CheckBox",[_4,_3],{baseClass:"mblCheckBox",_setTypeAttr:function(){
+},buildRendering:function(){
+if(!this.templateString&&!this.srcNodeRef){
+this.srcNodeRef=_2.create("input",{type:this.type});
+}
+this.inherited(arguments);
+if(!this.templateString){
+this.focusNode=this.domNode;
+}
+if(_5("windows-theme")){
+var _6=_2.create("span",{className:"mblCheckableInputContainer"});
+_6.appendChild(this.domNode.cloneNode());
+this.labelNode=_2.create("span",{className:"mblCheckableInputDecorator"},_6);
+this.domNode=_6;
+this.focusNode=_6.firstChild;
+}
+},_getValueAttr:function(){
+return (this.checked?this.value:false);
+}});
+});

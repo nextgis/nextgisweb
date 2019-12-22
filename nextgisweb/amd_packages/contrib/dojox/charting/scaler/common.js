@@ -1,4 +1,59 @@
 //>>built
-define("dojox/charting/scaler/common",["dojo/_base/lang"],function(l){var g=function(a,d){return Math.abs(a-d)<=1E-6*(Math.abs(a)+Math.abs(d))},m=l.getObject("dojox.charting.scaler.common",!0),e={};return l.mixin(m,{doIfLoaded:function(a,d,f){if(void 0===e[a])try{e[a]=require(a)}catch(n){e[a]=null}return e[a]?d(e[a]):f()},getNumericLabel:function(a,d,f){var e="";m.doIfLoaded("dojo/number",function(b){e=(f.fixed?b.format(a,{places:0>d?-d:0}):b.format(a))||""},function(){e=f.fixed?a.toFixed(0>d?-d:
-0):a.toString()});if(f.labelFunc){var c=f.labelFunc(e,a,d);if(c)return c}if(f.labels){for(var c=f.labels,b=0,h=c.length;b<h;){var k=Math.floor((b+h)/2);c[k].value<a?b=k+1:h=k}if(b<c.length&&g(c[b].value,a))return c[b].text;--b;if(0<=b&&b<c.length&&g(c[b].value,a))return c[b].text;b+=2;if(b<c.length&&g(c[b].value,a))return c[b].text}return e}})});
-//# sourceMappingURL=common.js.map
+define("dojox/charting/scaler/common",["dojo/_base/lang"],function(_1){
+var eq=function(a,b){
+return Math.abs(a-b)<=0.000001*(Math.abs(a)+Math.abs(b));
+};
+var _2=_1.getObject("dojox.charting.scaler.common",true);
+var _3={};
+return _1.mixin(_2,{doIfLoaded:function(_4,_5,_6){
+if(_3[_4]===undefined){
+try{
+_3[_4]=require(_4);
+}
+catch(e){
+_3[_4]=null;
+}
+}
+if(_3[_4]){
+return _5(_3[_4]);
+}else{
+return _6();
+}
+},getNumericLabel:function(_7,_8,_9){
+var _a="";
+_2.doIfLoaded("dojo/number",function(_b){
+_a=(_9.fixed?_b.format(_7,{places:_8<0?-_8:0}):_b.format(_7))||"";
+},function(){
+_a=_9.fixed?_7.toFixed(_8<0?-_8:0):_7.toString();
+});
+if(_9.labelFunc){
+var r=_9.labelFunc(_a,_7,_8);
+if(r){
+return r;
+}
+}
+if(_9.labels){
+var l=_9.labels,lo=0,hi=l.length;
+while(lo<hi){
+var _c=Math.floor((lo+hi)/2),_d=l[_c].value;
+if(_d<_7){
+lo=_c+1;
+}else{
+hi=_c;
+}
+}
+if(lo<l.length&&eq(l[lo].value,_7)){
+return l[lo].text;
+}
+--lo;
+if(lo>=0&&lo<l.length&&eq(l[lo].value,_7)){
+return l[lo].text;
+}
+lo+=2;
+if(lo<l.length&&eq(l[lo].value,_7)){
+return l[lo].text;
+}
+}
+return _a;
+}});
+});

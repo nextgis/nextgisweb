@@ -2,9 +2,10 @@ define("dojox/form/uploader/_HTML5", [
 	"dojo/_base/declare",
 	"dojo/_base/lang",
 	"dojo/_base/array",
-	"dojo"
-],function(declare, lang, arrayUtil, dojo){
-
+	"dojo",
+	"dojo/request",
+	"dojo/has"
+],function(declare, lang, arrayUtil, dojo, request, has){
 	return declare("dojox.form.uploader._HTML5", [], {
 		// summary:
 		//		A mixin for dojox/form/Uploader that adds HTML5 multiple-file upload capabilities and
@@ -93,9 +94,56 @@ define("dojox/form/uploader/_HTML5", [
 					fd.append(nm, data[nm]);
 				}
 			}
+
+			var self = this;
+			var deferred = request(
+				this.getUrl(),
+				{
+					method: "POST",
+					data: fd,
+					handleAs: "json",
+					uploadProgress: true,
+					headers: {
+						Accept: "application/json"
+					}
+				},
+				true
+			);
+
+			deferred.promise.response
+				.otherwise(function (error){
+					console.error(error);
+					console.error(error.response.text);
+					self.onError(error);
+				})
+			;
 	
-			var xhr = this.createXhr();
-			xhr.send(fd);
+			function onProgressHandler(event){
+				self._xhrProgress(event);
+
+				if(event.type !== "load"){
+					return;
+				}
+
+				self.onComplete(deferred.response.data);
+
+				// Disconnect event handlers when done
+				deferred.response.xhr.removeEventListener("load", onProgressHandler, false);
+				deferred.response.xhr.upload.removeEventListener("progress", onProgressHandler, false);
+
+				deferred = null;
+			}
+
+			if(has("native-xhr2")){
+				// Use addEventListener directly to pass the raw events to Uploader#_xhrProgress
+				deferred.response.xhr.addEventListener("load", onProgressHandler, false);
+				deferred.response.xhr.upload.addEventListener("progress", onProgressHandler, false);
+			}else{
+				// If the browser doesn't have upload events, notify when the upload is complete
+				deferred.promise.then(function(data){
+					self.onComplete(data);
+				});
+			}
 		},
 	
 		_xhrProgress: function(evt){
@@ -116,50 +164,7 @@ define("dojox/form/uploader/_HTML5", [
 				}
 				this.onProgress(o);
 			}
-		},
-	
-		createXhr: function(){
-			var xhr = new XMLHttpRequest();
-			var timer;
-			xhr.upload.addEventListener("progress", lang.hitch(this, "_xhrProgress"), false);
-			xhr.addEventListener("load", lang.hitch(this, "_xhrProgress"), false);
-			xhr.addEventListener("error", lang.hitch(this, function(evt){
-				this.onError(evt);
-				clearInterval(timer);
-			}), false);
-			xhr.addEventListener("abort", lang.hitch(this, function(evt){
-				this.onAbort(evt);
-				clearInterval(timer);
-			}), false);
-			xhr.onreadystatechange = lang.hitch(this, function(){
-				if(xhr.readyState === 4){
-	//				console.info("COMPLETE")
-					clearInterval(timer);
-					try{
-						this.onComplete(JSON.parse(xhr.responseText.replace(/^\{\}&&/,'')));
-					}catch(e){
-						var msg = "Error parsing server result:";
-						console.error(msg, e);
-						console.error(xhr.responseText);
-						this.onError(msg, e);
-					}
-				}
-			});
-			xhr.open("POST", this.getUrl());
-			xhr.setRequestHeader("Accept","application/json");
-			
-			timer = setInterval(lang.hitch(this, function(){
-				try{
-					if(typeof(xhr.statusText)){} // accessing this error throws an error. Awesomeness.
-				}catch(e){
-					//this.onError("Error uploading file."); // not always an error.
-					clearInterval(timer);
-				}
-			}),250);
-	
-			return xhr;
 		}
-	
 	});
 
 });

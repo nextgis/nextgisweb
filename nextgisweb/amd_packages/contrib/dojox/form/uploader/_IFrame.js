@@ -1,4 +1,40 @@
 //>>built
-define("dojox/form/uploader/_IFrame","dojo/query dojo/dom-construct dojo/_base/declare dojo/_base/lang dojo/_base/array dojo/dom-form dojo/request/iframe".split(" "),function(l,d,e,m,h,n,k){return e("dojox.form.uploader._IFrame",[],{postMixInProperties:function(){this.inherited(arguments);"iframe"===this.uploadType&&(this.uploadType="iframe",this.upload=this.uploadIFrame)},uploadIFrame:function(b){var g={},c;this.getForm();var e=this.getUrl(),f=this;b=b||{};b.uploadType=this.uploadType;c=d.place('\x3cform enctype\x3d"multipart/form-data" method\x3d"post"\x3e\x3c/form\x3e',
-this.domNode);h.forEach(this._inputs,function(a,b){""!==a.value&&(c.appendChild(a),g[a.name]=a.value)},this);if(b)for(nm in b)void 0===g[nm]&&d.create("input",{name:nm,value:b[nm],type:"hidden"},c);k.post(e,{form:c,handleAs:"json",content:b}).then(function(a){d.destroy(c);if(a.ERROR||a.error)f.onError(a);else f.onComplete(a)},function(a){console.error("error parsing server result",a);d.destroy(c);f.onError(a)})}})});
-//# sourceMappingURL=_IFrame.js.map
+define("dojox/form/uploader/_IFrame",["dojo/query","dojo/dom-construct","dojo/_base/declare","dojo/_base/lang","dojo/_base/array","dojo/dom-form","dojo/request/iframe"],function(_1,_2,_3,_4,_5,_6,_7){
+return _3("dojox.form.uploader._IFrame",[],{postMixInProperties:function(){
+this.inherited(arguments);
+if(this.uploadType==="iframe"){
+this.uploadType="iframe";
+this.upload=this.uploadIFrame;
+}
+},uploadIFrame:function(_8){
+var _9={},_a,_b=this.getForm(),_c=this.getUrl(),_d=this;
+_8=_8||{};
+_8.uploadType=this.uploadType;
+_a=_2.place("<form enctype=\"multipart/form-data\" method=\"post\"></form>",this.domNode);
+_5.forEach(this._inputs,function(n,i){
+if(n.value!==""){
+_a.appendChild(n);
+_9[n.name]=n.value;
+}
+},this);
+if(_8){
+for(nm in _8){
+if(_9[nm]===undefined){
+_2.create("input",{name:nm,value:_8[nm],type:"hidden"},_a);
+}
+}
+}
+_7.post(_c,{form:_a,handleAs:"json",content:_8}).then(function(_e){
+_2.destroy(_a);
+if(_e["ERROR"]||_e["error"]){
+_d.onError(_e);
+}else{
+_d.onComplete(_e);
+}
+},function(_f){
+console.error("error parsing server result",_f);
+_2.destroy(_a);
+_d.onError(_f);
+});
+}});
+});

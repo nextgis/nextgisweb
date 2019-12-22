@@ -1,4 +1,23 @@
 //>>built
-define("dojox/mobile/_ListTouchMixin",["dojo/_base/declare","dojo/touch","./sniff","dijit/form/_ListBase"],function(f,g,b,h){return f("dojox.mobile._ListTouchMixin",h,{postCreate:function(){this.inherited(arguments);if((10===b("ie")||!b("ie")&&6<b("trident"))&&"undefined"!==typeof MSGesture){this._listConnect(g.press,"_onPress");var c=this,a=new MSGesture,d;this._onPress=function(e){a.target=c.domNode;a.addPointer(e.pointerId);d=e.target};this.on("MSGestureTap",function(a){c._onClick(a,d)})}else this._listConnect("click",
-"_onClick")},_onClick:function(b,a){this._setSelectedAttr(a);this.onClick(a)}})});
-//# sourceMappingURL=_ListTouchMixin.js.map
+define("dojox/mobile/_ListTouchMixin",["dojo/_base/declare","dojo/touch","./sniff","dijit/form/_ListBase"],function(_1,_2,_3,_4){
+return _1("dojox.mobile._ListTouchMixin",_4,{postCreate:function(){
+this.inherited(arguments);
+if(!((_3("ie")===10||(!_3("ie")&&_3("trident")>6))&&typeof (MSGesture)!=="undefined")){
+this._listConnect("click","_onClick");
+}else{
+this._listConnect(_2.press,"_onPress");
+var _5=this,_6=new MSGesture(),_7;
+this._onPress=function(e){
+_6.target=_5.domNode;
+_6.addPointer(e.pointerId);
+_7=e.target;
+};
+this.on("MSGestureTap",function(e){
+_5._onClick(e,_7);
+});
+}
+},_onClick:function(_8,_9){
+this._setSelectedAttr(_9);
+this.onClick(_9);
+}});
+});

@@ -1,7 +1,78 @@
 //>>built
-define("dojox/drawing/manager/Canvas",["dojo","../util/oo","dojox/gfx"],function(b,f,c){return f.declare(function(a){b.mixin(this,a);var d=b.contentBox(this.srcRefNode);this.height=this.parentHeight=a.height||d.h;this.width=this.parentWidth=a.width||d.w;this.domNode=b.create("div",{id:"canvasNode"},this.srcRefNode);b.style(this.domNode,{width:this.width,height:"auto"});b.setSelectable(this.domNode,!1);this.id=this.id||this.util.uid("surface");this.gfxSurface=c.createSurface(this.domNode,this.width,
-this.height);this.gfxSurface.whenLoaded(this,function(){setTimeout(b.hitch(this,function(){this.surfaceReady=!0;b.isIE||"silverlight"!=c.renderer||(this.id=this.domNode.firstChild.id);this.underlay=this.gfxSurface.createGroup();this.surface=this.gfxSurface.createGroup();this.overlay=this.gfxSurface.createGroup();this.surface.setTransform({dx:0,dy:0,xx:1,yy:1});this.gfxSurface.getDimensions=b.hitch(this.gfxSurface,"getDimensions");a.callback&&a.callback(this.domNode)}),500)});this._mouseHandle=this.mouse.register(this)},
-{zoom:1,useScrollbars:!0,baseClass:"drawingCanvas",resize:function(a,b){this.parentWidth=a;this.parentHeight=b;this.setDimensions(a,b)},setDimensions:function(a,d,g,c){var e=this.getScrollWidth();this.width=Math.max(a,this.parentWidth);this.height=Math.max(d,this.parentHeight);this.height>this.parentHeight&&(this.width-=e);this.width>this.parentWidth&&(this.height-=e);this.mouse.resize(this.width,this.height);this.gfxSurface.setDimensions(this.width,this.height);this.domNode.parentNode.scrollTop=
-c||0;this.domNode.parentNode.scrollLeft=g||0;this.useScrollbars?b.style(this.domNode.parentNode,{overflowY:this.height>this.parentHeight?"scroll":"hidden",overflowX:this.width>this.parentWidth?"scroll":"hidden"}):b.style(this.domNode.parentNode,{overflowY:"hidden",overflowX:"hidden"})},setZoom:function(a){this.zoom=a;this.surface.setTransform({xx:a,yy:a});this.setDimensions(this.width*a,this.height*a)},onScroll:function(){},getScrollOffset:function(){return{top:this.domNode.parentNode.scrollTop,left:this.domNode.parentNode.scrollLeft}},
-getScrollWidth:function(){var a=b.create("div");a.innerHTML='\x3cdiv style\x3d"width:50px;height:50px;overflow:hidden;position:absolute;top:0;left:-1000px;"\x3e\x3cdiv style\x3d"height:100px;"\x3e\x3c/div\x3e';a=a.firstChild;b.body().appendChild(a);var d=b.contentBox(a).h;b.style(a,"overflow","scroll");var c=d-b.contentBox(a).h;b.destroy(a);this.getScrollWidth=function(){return c};return c}})});
-//# sourceMappingURL=Canvas.js.map
+define("dojox/drawing/manager/Canvas",["dojo","../util/oo","dojox/gfx"],function(_1,oo,_2){
+return oo.declare(function(_3){
+_1.mixin(this,_3);
+var _4=_1.contentBox(this.srcRefNode);
+this.height=this.parentHeight=_3.height||_4.h;
+this.width=this.parentWidth=_3.width||_4.w;
+this.domNode=_1.create("div",{id:"canvasNode"},this.srcRefNode);
+_1.style(this.domNode,{width:this.width,height:"auto"});
+_1.setSelectable(this.domNode,false);
+this.id=this.id||this.util.uid("surface");
+this.gfxSurface=_2.createSurface(this.domNode,this.width,this.height);
+this.gfxSurface.whenLoaded(this,function(){
+setTimeout(_1.hitch(this,function(){
+this.surfaceReady=true;
+if(_1.isIE){
+}else{
+if(_2.renderer=="silverlight"){
+this.id=this.domNode.firstChild.id;
+}else{
+}
+}
+this.underlay=this.gfxSurface.createGroup();
+this.surface=this.gfxSurface.createGroup();
+this.overlay=this.gfxSurface.createGroup();
+this.surface.setTransform({dx:0,dy:0,xx:1,yy:1});
+this.gfxSurface.getDimensions=_1.hitch(this.gfxSurface,"getDimensions");
+if(_3.callback){
+_3.callback(this.domNode);
+}
+}),500);
+});
+this._mouseHandle=this.mouse.register(this);
+},{zoom:1,useScrollbars:true,baseClass:"drawingCanvas",resize:function(_5,_6){
+this.parentWidth=_5;
+this.parentHeight=_6;
+this.setDimensions(_5,_6);
+},setDimensions:function(_7,_8,_9,_a){
+var sw=this.getScrollWidth();
+this.width=Math.max(_7,this.parentWidth);
+this.height=Math.max(_8,this.parentHeight);
+if(this.height>this.parentHeight){
+this.width-=sw;
+}
+if(this.width>this.parentWidth){
+this.height-=sw;
+}
+this.mouse.resize(this.width,this.height);
+this.gfxSurface.setDimensions(this.width,this.height);
+this.domNode.parentNode.scrollTop=_a||0;
+this.domNode.parentNode.scrollLeft=_9||0;
+if(this.useScrollbars){
+_1.style(this.domNode.parentNode,{overflowY:this.height>this.parentHeight?"scroll":"hidden",overflowX:this.width>this.parentWidth?"scroll":"hidden"});
+}else{
+_1.style(this.domNode.parentNode,{overflowY:"hidden",overflowX:"hidden"});
+}
+},setZoom:function(_b){
+this.zoom=_b;
+this.surface.setTransform({xx:_b,yy:_b});
+this.setDimensions(this.width*_b,this.height*_b);
+},onScroll:function(){
+},getScrollOffset:function(){
+return {top:this.domNode.parentNode.scrollTop,left:this.domNode.parentNode.scrollLeft};
+},getScrollWidth:function(){
+var p=_1.create("div");
+p.innerHTML="<div style=\"width:50px;height:50px;overflow:hidden;position:absolute;top:0;left:-1000px;\"><div style=\"height:100px;\"></div>";
+var _c=p.firstChild;
+_1.body().appendChild(_c);
+var _d=_1.contentBox(_c).h;
+_1.style(_c,"overflow","scroll");
+var _e=_d-_1.contentBox(_c).h;
+_1.destroy(_c);
+this.getScrollWidth=function(){
+return _e;
+};
+return _e;
+}});
+});

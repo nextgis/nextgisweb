@@ -1,8 +1,87 @@
 //>>built
-require({cache:{"url:dojox/form/resources/UploaderFileList.html":'\x3cdiv class\x3d"dojoxUploaderFileList"\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"progressNode" class\x3d"dojoxUploaderFileListProgress"\x3e\n\t\t\x3cdiv data-dojo-attach-point\x3d"percentBarNode" class\x3d"dojoxUploaderFileListProgressBar"\x3e\x3c/div\x3e\n\t\t\x3cdiv data-dojo-attach-point\x3d"percentTextNode" class\x3d"dojoxUploaderFileListPercentText"\x3e0%\x3c/div\x3e\n\t\x3c/div\x3e\n\t\x3ctable class\x3d"dojoxUploaderFileListTable"\x3e\n\t\t\x3cthead\x3e\n\t\t\t\x3ctr class\x3d"dojoxUploaderFileListHeader"\x3e\n\t\t\t\t\x3cth class\x3d"dojoxUploaderIndex"\x3e${headerIndex}\x3c/th\x3e\n\t\t\t\t\x3cth class\x3d"dojoxUploaderIcon"\x3e${headerType}\x3c/th\x3e\n\t\t\t\t\x3cth class\x3d"dojoxUploaderFileName"\x3e${headerFilename}\x3c/th\x3e\n\t\t\t\t\x3cth class\x3d"dojoxUploaderFileSize" data-dojo-attach-point\x3d"sizeHeader"\x3e${headerFilesize}\x3c/th\x3e\n\t\t\t\x3c/tr\x3e\n\t\t\x3c/thead\x3e\n\t\t\x3ctbody class\x3d"dojoxUploaderFileListContent" data-dojo-attach-point\x3d"listNode"\x3e\x3c/tbody\x3e\n\t\x3c/table\x3e\n\x3cdiv\x3e'}});
-define("dojox/form/uploader/FileList","dojo/_base/fx dojo/dom-style dojo/dom-class dojo/_base/declare dojo/_base/lang dojo/_base/array dijit/_base/manager dojox/form/uploader/_Base dojo/text!../resources/UploaderFileList.html".split(" "),function(k,d,f,l,h,m,n,p,q){return l("dojox.form.uploader.FileList",p,{uploaderId:"",uploader:null,headerIndex:"#",headerType:"Type",headerFilename:"File Name",headerFilesize:"Size",_upCheckCnt:0,rowAmt:0,templateString:q,postCreate:function(){this.setUploader();
-this.hideProgress()},reset:function(){for(var a=0;a<this.rowAmt;a++)this.listNode.deleteRow(0);this.rowAmt=0},setUploader:function(){if(!this.uploaderId&&!this.uploader)console.warn("uploaderId not passed to UploaderFileList");else if(this.uploaderId&&!this.uploader)this.uploader=n.byId(this.uploaderId);else if(4<this._upCheckCnt){console.warn("uploader not found for ID ",this.uploaderId);return}this.uploader?(this.connect(this.uploader,"onChange","_onUploaderChange"),this.connect(this.uploader,"reset",
-"reset"),this.connect(this.uploader,"onBegin",function(){this.showProgress(!0)}),this.connect(this.uploader,"onProgress","_progress"),this.connect(this.uploader,"onComplete",function(){setTimeout(h.hitch(this,function(){this.hideProgress(!0)}),1250)}),(this._fileSizeAvail={html5:1,flash:1}[this.uploader.uploadType])||(this.sizeHeader.style.display="none")):(this._upCheckCnt++,setTimeout(h.hitch(this,"setUploader"),250))},hideProgress:function(a){this._hideShowProgress(a?{ani:!0,endDisp:"none",beg:15,
-end:0}:{endDisp:"none",ani:!1})},showProgress:function(a){this._hideShowProgress(a?{ani:!0,endDisp:"block",beg:0,end:15}:{endDisp:"block",ani:!1})},_progress:function(a){this.percentTextNode.innerHTML=a.percent;d.set(this.percentBarNode,"width",a.percent)},_hideShowProgress:function(a){var e=this.progressNode,c=function(){d.set(e,"display",a.endDisp)};a.ani?(d.set(e,"display","block"),k.animateProperty({node:e,properties:{height:{start:a.beg,end:a.end,units:"px"}},onEnd:c}).play()):c()},_onUploaderChange:function(a){this.reset();
-m.forEach(a,function(a,c){this._addRow(c+1,this.getFileType(a.name),a.name,a.size)},this)},_addRow:function(a,e,c,d){var b,g=this.listNode.insertRow(-1);b=g.insertCell(-1);f.add(b,"dojoxUploaderIndex");b.innerHTML=a;b=g.insertCell(-1);f.add(b,"dojoxUploaderIcon");b.innerHTML=e;b=g.insertCell(-1);f.add(b,"dojoxUploaderFileName");b.innerHTML=c;this._fileSizeAvail&&(b=g.insertCell(-1),f.add(b,"dojoxUploaderSize"),b.innerHTML=this.convertBytes(d).value);this.rowAmt++}})});
-//# sourceMappingURL=FileList.js.map
+require({cache:{"url:dojox/form/resources/UploaderFileList.html":"<div class=\"dojoxUploaderFileList\">\n\t<div data-dojo-attach-point=\"progressNode\" class=\"dojoxUploaderFileListProgress\">\n\t\t<div data-dojo-attach-point=\"percentBarNode\" class=\"dojoxUploaderFileListProgressBar\"></div>\n\t\t<div data-dojo-attach-point=\"percentTextNode\" class=\"dojoxUploaderFileListPercentText\">0%</div>\n\t</div>\n\t<table class=\"dojoxUploaderFileListTable\">\n\t\t<thead>\n\t\t\t<tr class=\"dojoxUploaderFileListHeader\">\n\t\t\t\t<th class=\"dojoxUploaderIndex\">${headerIndex}</th>\n\t\t\t\t<th class=\"dojoxUploaderIcon\">${headerType}</th>\n\t\t\t\t<th class=\"dojoxUploaderFileName\">${headerFilename}</th>\n\t\t\t\t<th class=\"dojoxUploaderFileSize\" data-dojo-attach-point=\"sizeHeader\">${headerFilesize}</th>\n\t\t\t</tr>\n\t\t</thead>\n\t\t<tbody class=\"dojoxUploaderFileListContent\" data-dojo-attach-point=\"listNode\"></tbody>\n\t</table>\n<div>"}});
+define("dojox/form/uploader/FileList",["dojo/_base/fx","dojo/dom-style","dojo/dom-class","dojo/_base/declare","dojo/_base/lang","dojo/_base/array","dijit/_base/manager","dojox/form/uploader/_Base","dojo/text!../resources/UploaderFileList.html"],function(fx,_1,_2,_3,_4,_5,_6,_7,_8){
+return _3("dojox.form.uploader.FileList",_7,{uploaderId:"",uploader:null,headerIndex:"#",headerType:"Type",headerFilename:"File Name",headerFilesize:"Size",_upCheckCnt:0,rowAmt:0,templateString:_8,postCreate:function(){
+this.setUploader();
+this.hideProgress();
+},reset:function(){
+for(var i=0;i<this.rowAmt;i++){
+this.listNode.deleteRow(0);
+}
+this.rowAmt=0;
+},setUploader:function(){
+if(!this.uploaderId&&!this.uploader){
+console.warn("uploaderId not passed to UploaderFileList");
+}else{
+if(this.uploaderId&&!this.uploader){
+this.uploader=_6.byId(this.uploaderId);
+}else{
+if(this._upCheckCnt>4){
+console.warn("uploader not found for ID ",this.uploaderId);
+return;
+}
+}
+}
+if(this.uploader){
+this.connect(this.uploader,"onChange","_onUploaderChange");
+this.connect(this.uploader,"reset","reset");
+this.connect(this.uploader,"onBegin",function(){
+this.showProgress(true);
+});
+this.connect(this.uploader,"onProgress","_progress");
+this.connect(this.uploader,"onComplete",function(){
+setTimeout(_4.hitch(this,function(){
+this.hideProgress(true);
+}),1250);
+});
+if(!(this._fileSizeAvail={"html5":1,"flash":1}[this.uploader.uploadType])){
+this.sizeHeader.style.display="none";
+}
+}else{
+this._upCheckCnt++;
+setTimeout(_4.hitch(this,"setUploader"),250);
+}
+},hideProgress:function(_9){
+var o=_9?{ani:true,endDisp:"none",beg:15,end:0}:{endDisp:"none",ani:false};
+this._hideShowProgress(o);
+},showProgress:function(_a){
+var o=_a?{ani:true,endDisp:"block",beg:0,end:15}:{endDisp:"block",ani:false};
+this._hideShowProgress(o);
+},_progress:function(_b){
+this.percentTextNode.innerHTML=_b.percent;
+_1.set(this.percentBarNode,"width",_b.percent);
+},_hideShowProgress:function(o){
+var _c=this.progressNode;
+var _d=function(){
+_1.set(_c,"display",o.endDisp);
+};
+if(o.ani){
+_1.set(_c,"display","block");
+fx.animateProperty({node:_c,properties:{height:{start:o.beg,end:o.end,units:"px"}},onEnd:_d}).play();
+}else{
+_d();
+}
+},_onUploaderChange:function(_e){
+this.reset();
+_5.forEach(_e,function(f,i){
+this._addRow(i+1,this.getFileType(f.name),f.name,f.size);
+},this);
+},_addRow:function(_f,_10,_11,_12){
+var c,r=this.listNode.insertRow(-1);
+c=r.insertCell(-1);
+_2.add(c,"dojoxUploaderIndex");
+c.innerHTML=_f;
+c=r.insertCell(-1);
+_2.add(c,"dojoxUploaderIcon");
+c.innerHTML=_10;
+c=r.insertCell(-1);
+_2.add(c,"dojoxUploaderFileName");
+c.innerHTML=_11;
+if(this._fileSizeAvail){
+c=r.insertCell(-1);
+_2.add(c,"dojoxUploaderSize");
+c.innerHTML=this.convertBytes(_12).value;
+}
+this.rowAmt++;
+}});
+});

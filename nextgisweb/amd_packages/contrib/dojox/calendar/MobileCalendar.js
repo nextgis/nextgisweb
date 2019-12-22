@@ -1,5 +1,17 @@
 //>>built
-require({cache:{"url:dojox/calendar/templates/MobileCalendar.html":'\x3cdiv\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"viewContainer" class\x3d"viewContainer"\x3e\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"buttonContainer" class\x3d"buttonContainer"\x3e\n\t\t\t\x3cbutton data-dojo-attach-point\x3d"previousButton" data-dojo-type\x3d"dojox.mobile.Button" \x3e\u25c4\x3c/button\x3e\n\t\t\t\x3cbutton data-dojo-attach-point\x3d"todayButton" data-dojo-type\x3d"dojox.mobile.Button" \x3eToday\x3c/button\x3e\n\t\t\t\x3cbutton data-dojo-attach-point\x3d"dayButton" data-dojo-type\x3d"dojox.mobile.Button" \x3eDay\x3c/button\x3e\n\t\t\t\x3cbutton data-dojo-attach-point\x3d"weekButton" data-dojo-type\x3d"dojox.mobile.Button" \x3eWeek\x3c/button\x3e\t\t\t\n\t\t\t\x3cbutton data-dojo-attach-point\x3d"monthButton" data-dojo-type\x3d"dojox.mobile.Button" \x3eMonth\x3c/button\x3e\n\t\t\x3cbutton data-dojo-attach-point\x3d"nextButton" data-dojo-type\x3d"dojox.mobile.Button" \x3e\u25ba\x3c/button\x3e\n\t\x3c/div\x3e\n\x3c/div\x3e\n'}});
-define("dojox/calendar/MobileCalendar","dojo/_base/declare dojo/_base/lang ./CalendarBase ./ColumnView ./ColumnViewSecondarySheet ./MobileVerticalRenderer ./MatrixView ./MobileHorizontalRenderer ./LabelRenderer ./ExpandRenderer ./Touch dojo/text!./templates/MobileCalendar.html dojox/mobile/Button".split(" "),function(b,c,h,k,l,m,n,e,p,f,d,q){return b("dojox.calendar.MobileCalendar",h,{templateString:q,_createDefaultViews:function(){var a=b([l,d]),a=b([k,d])(c.mixin({secondarySheetClass:a,verticalRenderer:m,
-horizontalRenderer:e,expandRenderer:f},this.columnViewProps)),g=b([n,d])(c.mixin({horizontalRenderer:e,labelRenderer:p,expandRenderer:f},this.matrixViewProps));this.columnView=a;this.matrixView=g;a=[a,g];this.installDefaultViewsActions(a);return a},installDefaultViewsActions:function(a){this.matrixView.on("rowHeaderClick",c.hitch(this,this.matrixViewRowHeaderClick));this.columnView.on("columnHeaderClick",c.hitch(this,this.columnViewColumnHeaderClick))}})});
-//# sourceMappingURL=MobileCalendar.js.map
+require({cache:{"url:dojox/calendar/templates/MobileCalendar.html":"<div>\n\t<div data-dojo-attach-point=\"viewContainer\" class=\"viewContainer\"></div>\n\t<div data-dojo-attach-point=\"buttonContainer\" class=\"buttonContainer\">\n\t\t\t<button data-dojo-attach-point=\"previousButton\" data-dojo-type=\"dojox.mobile.Button\" >◄</button>\n\t\t\t<button data-dojo-attach-point=\"todayButton\" data-dojo-type=\"dojox.mobile.Button\" >Today</button>\n\t\t\t<button data-dojo-attach-point=\"dayButton\" data-dojo-type=\"dojox.mobile.Button\" >Day</button>\n\t\t\t<button data-dojo-attach-point=\"weekButton\" data-dojo-type=\"dojox.mobile.Button\" >Week</button>\t\t\t\n\t\t\t<button data-dojo-attach-point=\"monthButton\" data-dojo-type=\"dojox.mobile.Button\" >Month</button>\n\t\t<button data-dojo-attach-point=\"nextButton\" data-dojo-type=\"dojox.mobile.Button\" >►</button>\n\t</div>\n</div>\n"}});
+define("dojox/calendar/MobileCalendar",["dojo/_base/declare","dojo/_base/lang","./CalendarBase","./ColumnView","./ColumnViewSecondarySheet","./MobileVerticalRenderer","./MatrixView","./MobileHorizontalRenderer","./LabelRenderer","./ExpandRenderer","./Touch","dojo/text!./templates/MobileCalendar.html","dojox/mobile/Button"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c){
+return _1("dojox.calendar.MobileCalendar",_3,{templateString:_c,_createDefaultViews:function(){
+var _d=_1([_5,_b]);
+var _e=_1([_4,_b])(_2.mixin({secondarySheetClass:_d,verticalRenderer:_6,horizontalRenderer:_8,expandRenderer:_a},this.columnViewProps));
+var _f=_1([_7,_b])(_2.mixin({horizontalRenderer:_8,labelRenderer:_9,expandRenderer:_a},this.matrixViewProps));
+this.columnView=_e;
+this.matrixView=_f;
+var _10=[_e,_f];
+this.installDefaultViewsActions(_10);
+return _10;
+},installDefaultViewsActions:function(_11){
+this.matrixView.on("rowHeaderClick",_2.hitch(this,this.matrixViewRowHeaderClick));
+this.columnView.on("columnHeaderClick",_2.hitch(this,this.columnViewColumnHeaderClick));
+}});
+});

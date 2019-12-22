@@ -1,3 +1,2 @@
 //>>built
-define("dojox/atom/widget/nls/ko/FeedEntryEditor",{doNew:"[\uc0c8\ub85c \uc791\uc131]",edit:"[\ud3b8\uc9d1]",save:"[\uc800\uc7a5]",cancel:"[\ucde8\uc18c]"});
-//# sourceMappingURL=FeedEntryEditor.js.map
+define("dojox/atom/widget/nls/ko/FeedEntryEditor",({doNew:"[새로 작성]",edit:"[편집]",save:"[저장]",cancel:"[취소]"}));

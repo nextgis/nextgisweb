@@ -1,4 +1,14 @@
 //>>built
-require({cache:{"url:dijit/templates/Fieldset.html":'\x3cfieldset\x3e\n\t\x3clegend data-dojo-attach-event\x3d"ondijitclick:_onTitleClick, onkeydown:_onTitleKey"\n\t\t\tdata-dojo-attach-point\x3d"titleBarNode, titleNode"\x3e\n\t\t\x3cspan data-dojo-attach-point\x3d"arrowNode" class\x3d"dijitInline dijitArrowNode" role\x3d"presentation"\x3e\x3c/span\n\t\t\x3e\x3cspan data-dojo-attach-point\x3d"arrowNodeInner" class\x3d"dijitArrowNodeInner"\x3e\x3c/span\n\t\t\x3e\x3cspan data-dojo-attach-point\x3d"titleNode, focusNode" class\x3d"dijitFieldsetLegendNode" id\x3d"${id}_titleNode"\x3e\x3c/span\x3e\n\t\x3c/legend\x3e\n\t\x3cdiv class\x3d"dijitFieldsetContentOuter" data-dojo-attach-point\x3d"hideNode" role\x3d"presentation"\x3e\n\t\t\x3cdiv class\x3d"dijitReset" data-dojo-attach-point\x3d"wipeNode" role\x3d"presentation"\x3e\n\t\t\t\x3cdiv class\x3d"dijitFieldsetContentInner" data-dojo-attach-point\x3d"containerNode" role\x3d"region"\n\t\t\t\t \tid\x3d"${id}_pane" aria-labelledby\x3d"${id}_titleNode"\x3e\n\t\t\t\t\x3c!-- nested divs because wipeIn()/wipeOut() doesn\'t work right on node w/padding etc.  Put padding on inner div. --\x3e\n\t\t\t\x3c/div\x3e\n\t\t\x3c/div\x3e\n\t\x3c/div\x3e\n\x3c/fieldset\x3e\n'}});
-define("dijit/Fieldset",["dojo/_base/declare","dojo/query!css2","dijit/TitlePane","dojo/text!./templates/Fieldset.html","./a11yclick"],function(b,c,d,e){return b("dijit.Fieldset",d,{baseClass:"dijitFieldset",title:"",open:!0,templateString:e,postCreate:function(){if(!this.title){var a=c("legend",this.containerNode);a.length&&(this.set("title",a[0].innerHTML),a[0].parentNode.removeChild(a[0]))}this.inherited(arguments)}})});
-//# sourceMappingURL=Fieldset.js.map
+require({cache:{"url:dijit/templates/Fieldset.html":"<fieldset>\n\t<legend data-dojo-attach-event=\"ondijitclick:_onTitleClick, onkeydown:_onTitleKey\"\n\t\t\tdata-dojo-attach-point=\"titleBarNode, titleNode\">\n\t\t<span data-dojo-attach-point=\"arrowNode\" class=\"dijitInline dijitArrowNode\" role=\"presentation\"></span\n\t\t><span data-dojo-attach-point=\"arrowNodeInner\" class=\"dijitArrowNodeInner\"></span\n\t\t><span data-dojo-attach-point=\"titleNode, focusNode\" class=\"dijitFieldsetLegendNode\" id=\"${id}_titleNode\"></span>\n\t</legend>\n\t<div class=\"dijitFieldsetContentOuter\" data-dojo-attach-point=\"hideNode\" role=\"presentation\">\n\t\t<div class=\"dijitReset\" data-dojo-attach-point=\"wipeNode\" role=\"presentation\">\n\t\t\t<div class=\"dijitFieldsetContentInner\" data-dojo-attach-point=\"containerNode\" role=\"region\"\n\t\t\t\t \tid=\"${id}_pane\" aria-labelledby=\"${id}_titleNode\">\n\t\t\t\t<!-- nested divs because wipeIn()/wipeOut() doesn't work right on node w/padding etc.  Put padding on inner div. -->\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</fieldset>\n"}});
+define("dijit/Fieldset",["dojo/_base/declare","dojo/query!css2","dijit/TitlePane","dojo/text!./templates/Fieldset.html","./a11yclick"],function(_1,_2,_3,_4){
+return _1("dijit.Fieldset",_3,{baseClass:"dijitFieldset",title:"",open:true,templateString:_4,postCreate:function(){
+if(!this.title){
+var _5=_2("legend",this.containerNode);
+if(_5.length){
+this.set("title",_5[0].innerHTML);
+_5[0].parentNode.removeChild(_5[0]);
+}
+}
+this.inherited(arguments);
+}});
+});

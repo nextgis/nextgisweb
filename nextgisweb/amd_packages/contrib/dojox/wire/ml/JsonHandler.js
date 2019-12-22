@@ -1,4 +1,21 @@
 //>>built
-define("dojox/wire/ml/JsonHandler",["dojo","dijit","dojox","dojo/require!dojox/wire/ml/RestHandler,dojox/wire/_base,dojox/wire/ml/util"],function(a,g,f){a.provide("dojox.wire.ml.JsonHandler");a.require("dojox.wire.ml.RestHandler");a.require("dojox.wire._base");a.require("dojox.wire.ml.util");a.declare("dojox.wire.ml.JsonHandler",f.wire.ml.RestHandler,{contentType:"text/json",handleAs:"json",headers:{Accept:"*/json"},_getContent:function(c,d){var e=null;if("POST"==c||"PUT"==c){var b=d?d[0]:void 0;
-b&&(e=a.isString(b)?b:a.toJson(b))}return e}})});
-//# sourceMappingURL=JsonHandler.js.map
+define("dojox/wire/ml/JsonHandler",["dojo","dijit","dojox","dojo/require!dojox/wire/ml/RestHandler,dojox/wire/_base,dojox/wire/ml/util"],function(_1,_2,_3){
+_1.provide("dojox.wire.ml.JsonHandler");
+_1.require("dojox.wire.ml.RestHandler");
+_1.require("dojox.wire._base");
+_1.require("dojox.wire.ml.util");
+_1.declare("dojox.wire.ml.JsonHandler",_3.wire.ml.RestHandler,{contentType:"text/json",handleAs:"json",headers:{"Accept":"*/json"},_getContent:function(_4,_5){
+var _6=null;
+if(_4=="POST"||_4=="PUT"){
+var p=(_5?_5[0]:undefined);
+if(p){
+if(_1.isString(p)){
+_6=p;
+}else{
+_6=_1.toJson(p);
+}
+}
+}
+return _6;
+}});
+});

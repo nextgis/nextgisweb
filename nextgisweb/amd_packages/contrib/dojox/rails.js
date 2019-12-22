@@ -1,8 +1,107 @@
 //>>built
-define("dojox/rails",["dojo","dijit","dojox","dojo/require!dojo/NodeList-traverse"],function(b,r,g){b.provide("dojox.rails");b.require("dojo.NodeList-traverse");g.rails.live=function(a,h,k){b.isIE&&h.match(/^(on)?submit$/i)?g.rails.live(a,"click",function(a){a=a.target;var e=a.tagName.toLowerCase();if(("input"==e||"button"==e)&&"submit"==b.attr(a,"type").toLowerCase()&&(a=b.query(a).closest("form"),a.length))var f=b.connect(a[0],"submit",function(a){b.disconnect(f);k.call(a.target,a)})}):b.connect(b.body(),
-h,function(f){var e=b.query(f.target).closest(a);e.length&&k.call(e[0],f)})};b.ready(function(a,h,k){return function(){var f=a.query,e=h.live,g=f("meta[name\x3dcsrf-token]").attr("content"),n=f("meta[name\x3dcsrf-param]").attr("content"),m=function(a,c){return b.place('\x3cform style\x3d"display:none" method\x3d"post" action\x3d"'+a+'"\x3e\x3cinput type\x3d"hidden" name\x3d"_method" value\x3d"'+c+'" /\x3e\x3cinput type\x3d"hidden" name\x3d"'+n+'" value\x3d"'+g+'" /\x3e\x3c/form\x3e',b.body())},p=
-function(d){a.forEach(d,function(c){if(!a.attr(c,"disabled")){var d="input"==c.tagName.toLowerCase()?"value":"innerHTML",b=a.attr(c,"data-disable-with"),e=a.attr(c,d);a.attr(c,"disabled",!0);a.attr(c,"data-original-value",e);a.attr(c,d,b)}})},q={text:"text",json:"application/json","json-comment-optional":"text","json-comment-filtered":"text",javascript:"application/javascript",xml:"text/xml"},l=function(d){var c=d.target,b=c.tagName.toLowerCase(),e="form"==b.toLowerCase()?a.formToObject(c):{},f=a.attr(c,
-"data-type")||"javascript",g=(a.attr(c,"method")||a.attr(c,"data-method")||"get").toLowerCase(),h=a.attr(c,"action")||a.attr(c,"href");"form"!=b&&"get"!=g&&(c=m(h,g),g="POST");d.preventDefault();a.publish("ajax:before",[c]);a.xhr(g,{url:h,headers:{Accept:q[f]},content:e,handleAs:f,load:function(b,d){a.publish("ajax:success",[c,b,d])},error:function(b,d){a.publish("ajax:failure",[c,b,d])},handle:function(b,d){a.publish("ajax:complete",[c,b,d])}});a.publish("ajax:after",[c])};e("*[data-confirm]","click",
-function(b){k.confirm(a.attr(b.target,"data-confirm"))?a.attr(b.target,"data-remote")&&l(b):b.preventDefault()});a.subscribe("ajax:complete",function(b){f("*[data-disable-with][disabled]",b).forEach(function(c){var b="input"==c.tagName.toLowerCase()?"value":"innerHTML",d=a.attr(c,"data-original-value");a.attr(c,"disabled",!1);a.attr(c,"data-original-value",null);a.attr(c,b,d)})});e("a[data-remote]:not([data-confirm])","click",l);e("a[data-method]:not([data-remote])","click",function(a){var c=a.target,
-c=m(c.href,b.attr(c,"data-method"));a.preventDefault();c.submit()});e("form","submit",function(b){var c=b.target,d=f("*[data-disable-with]",c);d.length&&p(d);a.attr(c,"data-remote")&&(b.preventDefault(),l(b))})}}(b,g.rails,b.global))});
-//# sourceMappingURL=rails.js.map
+define("dojox/rails",["dojo","dijit","dojox","dojo/require!dojo/NodeList-traverse"],function(_1,_2,_3){
+_1.provide("dojox.rails");
+_1.require("dojo.NodeList-traverse");
+_3.rails.live=function(_4,_5,fn){
+if(_1.isIE&&_5.match(/^(on)?submit$/i)){
+_3.rails.live(_4,"click",function(_6){
+var _7=_6.target,_8=_7.tagName.toLowerCase();
+if((_8=="input"||_8=="button")&&_1.attr(_7,"type").toLowerCase()=="submit"){
+var _9=_1.query(_7).closest("form");
+if(_9.length){
+var h=_1.connect(_9[0],"submit",function(_a){
+_1.disconnect(h);
+fn.call(_a.target,_a);
+});
+}
+}
+});
+}else{
+_1.connect(_1.body(),_5,function(_b){
+var nl=_1.query(_b.target).closest(_4);
+if(nl.length){
+fn.call(nl[0],_b);
+}
+});
+}
+};
+_1.ready((function(d,dr,dg){
+return function(){
+var q=d.query,_c=dr.live,_d=q("meta[name=csrf-token]").attr("content"),_e=q("meta[name=csrf-param]").attr("content");
+var _f=function(url,_10){
+var _11="<form style=\"display:none\" method=\"post\" action=\""+url+"\">"+"<input type=\"hidden\" name=\"_method\" value=\""+_10+"\" />"+"<input type=\"hidden\" name=\""+_e+"\" value=\""+_d+"\" />"+"</form>";
+return _1.place(_11,_1.body());
+};
+var _12=function(_13){
+d.forEach(_13,function(_14){
+if(!d.attr(_14,"disabled")){
+var _15=_14.tagName.toLowerCase()=="input"?"value":"innerHTML";
+var _16=d.attr(_14,"data-disable-with");
+var _17=d.attr(_14,_15);
+d.attr(_14,"disabled",true);
+d.attr(_14,"data-original-value",_17);
+d.attr(_14,_15,_16);
+}
+});
+};
+var _18={"text":"text","json":"application/json","json-comment-optional":"text","json-comment-filtered":"text","javascript":"application/javascript","xml":"text/xml"};
+var _19=function(evt){
+var el=evt.target,tag=el.tagName.toLowerCase();
+var _1a=tag.toLowerCase()=="form"?d.formToObject(el):{},_1b=d.attr(el,"data-type")||"javascript",_1c=(d.attr(el,"method")||d.attr(el,"data-method")||"get").toLowerCase(),url=d.attr(el,"action")||d.attr(el,"href");
+if(tag!="form"&&_1c!="get"){
+el=_f(url,_1c);
+_1c="POST";
+}
+evt.preventDefault();
+d.publish("ajax:before",[el]);
+var _1d=d.xhr(_1c,{url:url,headers:{"Accept":_18[_1b]},content:_1a,handleAs:_1b,load:function(_1e,_1f){
+d.publish("ajax:success",[el,_1e,_1f]);
+},error:function(_20,_21){
+d.publish("ajax:failure",[el,_20,_21]);
+},handle:function(_22,_23){
+d.publish("ajax:complete",[el,_22,_23]);
+}});
+d.publish("ajax:after",[el]);
+};
+var _24=function(el){
+q("*[data-disable-with][disabled]",el).forEach(function(_25){
+var _26=_25.tagName.toLowerCase()=="input"?"value":"innerHTML";
+var _27=d.attr(_25,"data-original-value");
+d.attr(_25,"disabled",false);
+d.attr(_25,"data-original-value",null);
+d.attr(_25,_26,_27);
+});
+};
+var _28=function(evt){
+var el=evt.target,_29=_f(el.href,_1.attr(el,"data-method"));
+evt.preventDefault();
+_29.submit();
+};
+var _2a=function(evt){
+var el=evt.target,_2b=q("*[data-disable-with]",el);
+if(_2b.length){
+_12(_2b);
+}
+if(d.attr(el,"data-remote")){
+evt.preventDefault();
+_19(evt);
+}
+};
+var _2c=function(evt){
+var _2d=dg.confirm(d.attr(evt.target,"data-confirm"));
+if(!_2d){
+evt.preventDefault();
+}else{
+if(d.attr(evt.target,"data-remote")){
+_19(evt);
+}
+}
+};
+_c("*[data-confirm]","click",_2c);
+d.subscribe("ajax:complete",_24);
+_c("a[data-remote]:not([data-confirm])","click",_19);
+_c("a[data-method]:not([data-remote])","click",_28);
+_c("form","submit",_2a);
+};
+})(_1,_3.rails,_1.global));
+});

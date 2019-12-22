@@ -1,3 +1,2 @@
 //>>built
-define("dojox/atom/widget/nls/fr/FeedViewerEntry",{deleteButton:"[Supprimer]"});
-//# sourceMappingURL=FeedViewerEntry.js.map
+define("dojox/atom/widget/nls/fr/FeedViewerEntry",({deleteButton:"[Supprimer]"}));

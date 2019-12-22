@@ -1,6 +1,105 @@
 //>>built
-define("dojox/wire/ml/Action",["dojo","dijit","dojox","dojo/require!dijit/_Widget,dijit/_Container,dojox/wire/Wire,dojox/wire/ml/util"],function(a,f,e){a.provide("dojox.wire.ml.Action");a.require("dijit._Widget");a.require("dijit._Container");a.require("dojox.wire.Wire");a.require("dojox.wire.ml.util");a.declare("dojox.wire.ml.Action",[f._Widget,f._Container],{trigger:"",triggerEvent:"",triggerTopic:"",postCreate:function(){this._connect()},_connect:function(){if(this.triggerEvent)if(this.trigger){var c=
-e.wire.ml._getValue(this.trigger);c&&(c[this.triggerEvent]||(c[this.triggerEvent]=function(){}),this._triggerHandle=a.connect(c,this.triggerEvent,this,"run"))}else{if("onload"==this.triggerEvent.toLowerCase()){var b=this;a.addOnLoad(function(){b._run.apply(b,arguments)})}}else this.triggerTopic&&(this._triggerHandle=a.subscribe(this.triggerTopic,this,"run"))},_disconnect:function(){this._triggerHandle&&(this.triggerTopic?a.unsubscribe(this.triggerTopic,this._triggerHandle):a.disconnect(this._triggerHandle))},
-run:function(){var c=this.getChildren(),b;for(b in c){var a=c[b];if(a instanceof e.wire.ml.ActionFilter&&!a.filter.apply(a,arguments))return}this._run.apply(this,arguments)},_run:function(){var a=this.getChildren(),b;for(b in a){var d=a[b];d instanceof e.wire.ml.Action&&d.run.apply(d,arguments)}},uninitialize:function(){this._disconnect();return!0}});a.declare("dojox.wire.ml.ActionFilter",f._Widget,{required:"",requiredValue:"",type:"",message:"",error:"",filter:function(){if(""===this.required)return!0;
-var a=e.wire.ml._getValue(this.required,arguments);if(""===this.requiredValue){if(a)return!0}else{var b=this.requiredValue;if(""!==this.type){var d=this.type.toLowerCase();"boolean"===d?b="false"===b.toLowerCase()?!1:!0:"number"===d&&(b=parseInt(b,10))}if(a===b)return!0}this.message&&(this.error?e.wire.ml._setValue(this.error,this.message):alert(this.message));return!1}})});
-//# sourceMappingURL=Action.js.map
+define("dojox/wire/ml/Action",["dojo","dijit","dojox","dojo/require!dijit/_Widget,dijit/_Container,dojox/wire/Wire,dojox/wire/ml/util"],function(_1,_2,_3){
+_1.provide("dojox.wire.ml.Action");
+_1.require("dijit._Widget");
+_1.require("dijit._Container");
+_1.require("dojox.wire.Wire");
+_1.require("dojox.wire.ml.util");
+_1.declare("dojox.wire.ml.Action",[_2._Widget,_2._Container],{trigger:"",triggerEvent:"",triggerTopic:"",postCreate:function(){
+this._connect();
+},_connect:function(){
+if(this.triggerEvent){
+if(this.trigger){
+var _4=_3.wire.ml._getValue(this.trigger);
+if(_4){
+if(!_4[this.triggerEvent]){
+_4[this.triggerEvent]=function(){
+};
+}
+this._triggerHandle=_1.connect(_4,this.triggerEvent,this,"run");
+}
+}else{
+var _5=this.triggerEvent.toLowerCase();
+if(_5=="onload"){
+var _6=this;
+_1.addOnLoad(function(){
+_6._run.apply(_6,arguments);
+});
+}
+}
+}else{
+if(this.triggerTopic){
+this._triggerHandle=_1.subscribe(this.triggerTopic,this,"run");
+}
+}
+},_disconnect:function(){
+if(this._triggerHandle){
+if(this.triggerTopic){
+_1.unsubscribe(this.triggerTopic,this._triggerHandle);
+}else{
+_1.disconnect(this._triggerHandle);
+}
+}
+},run:function(){
+var _7=this.getChildren();
+for(var i in _7){
+var _8=_7[i];
+if(_8 instanceof _3.wire.ml.ActionFilter){
+if(!_8.filter.apply(_8,arguments)){
+return;
+}
+}
+}
+this._run.apply(this,arguments);
+},_run:function(){
+var _9=this.getChildren();
+for(var i in _9){
+var _a=_9[i];
+if(_a instanceof _3.wire.ml.Action){
+_a.run.apply(_a,arguments);
+}
+}
+},uninitialize:function(){
+this._disconnect();
+return true;
+}});
+_1.declare("dojox.wire.ml.ActionFilter",_2._Widget,{required:"",requiredValue:"",type:"",message:"",error:"",filter:function(){
+if(this.required===""){
+return true;
+}else{
+var _b=_3.wire.ml._getValue(this.required,arguments);
+if(this.requiredValue===""){
+if(_b){
+return true;
+}
+}else{
+var _c=this.requiredValue;
+if(this.type!==""){
+var _d=this.type.toLowerCase();
+if(_d==="boolean"){
+if(_c.toLowerCase()==="false"){
+_c=false;
+}else{
+_c=true;
+}
+}else{
+if(_d==="number"){
+_c=parseInt(_c,10);
+}
+}
+}
+if(_b===_c){
+return true;
+}
+}
+}
+if(this.message){
+if(this.error){
+_3.wire.ml._setValue(this.error,this.message);
+}else{
+alert(this.message);
+}
+}
+return false;
+}});
+});

@@ -1,5 +1,34 @@
 //>>built
-require({cache:{"url:dijit/templates/MenuBar.html":'\x3cdiv class\x3d"dijitMenuBar dijitMenuPassive" data-dojo-attach-point\x3d"containerNode" role\x3d"menubar" tabIndex\x3d"${tabIndex}"\n\t \x3e\x3c/div\x3e\n'}});
-define("dijit/MenuBar",["dojo/_base/declare","dojo/keys","./_MenuBase","dojo/text!./templates/MenuBar.html"],function(c,d,e,f){return c("dijit.MenuBar",e,{templateString:f,baseClass:"dijitMenuBar",popupDelay:0,_isMenuBar:!0,_orient:["below"],_moveToPopup:function(a){if(this.focusedChild&&this.focusedChild.popup&&!this.focusedChild.disabled)this.onItemClick(this.focusedChild,a)},focusChild:function(a){this.inherited(arguments);this.activated&&a.popup&&!a.disabled&&this._openItemPopup(a,!0)},_onChildDeselect:function(a){this.currentPopupItem==
-a&&(this.currentPopupItem=null,a._closePopup());this.inherited(arguments)},_onLeftArrow:function(){this.focusPrev()},_onRightArrow:function(){this.focusNext()},_onDownArrow:function(a){this._moveToPopup(a)},_onUpArrow:function(){},onItemClick:function(a,b){!a.popup||!a.popup.isShowingNow||/^key/.test(b.type)&&b.keyCode===d.DOWN_ARROW?this.inherited(arguments):(a.focusNode.focus(),this._cleanUp(!0))}})});
-//# sourceMappingURL=MenuBar.js.map
+require({cache:{"url:dijit/templates/MenuBar.html":"<div class=\"dijitMenuBar dijitMenuPassive\" data-dojo-attach-point=\"containerNode\" role=\"menubar\" tabIndex=\"${tabIndex}\"\n\t ></div>\n"}});
+define("dijit/MenuBar",["dojo/_base/declare","dojo/keys","./_MenuBase","dojo/text!./templates/MenuBar.html"],function(_1,_2,_3,_4){
+return _1("dijit.MenuBar",_3,{templateString:_4,baseClass:"dijitMenuBar",popupDelay:0,_isMenuBar:true,_orient:["below"],_moveToPopup:function(_5){
+if(this.focusedChild&&this.focusedChild.popup&&!this.focusedChild.disabled){
+this.onItemClick(this.focusedChild,_5);
+}
+},focusChild:function(_6){
+this.inherited(arguments);
+if(this.activated&&_6.popup&&!_6.disabled){
+this._openItemPopup(_6,true);
+}
+},_onChildDeselect:function(_7){
+if(this.currentPopupItem==_7){
+this.currentPopupItem=null;
+_7._closePopup();
+}
+this.inherited(arguments);
+},_onLeftArrow:function(){
+this.focusPrev();
+},_onRightArrow:function(){
+this.focusNext();
+},_onDownArrow:function(_8){
+this._moveToPopup(_8);
+},_onUpArrow:function(){
+},onItemClick:function(_9,_a){
+if(_9.popup&&_9.popup.isShowingNow&&(!/^key/.test(_a.type)||_a.keyCode!==_2.DOWN_ARROW)){
+_9.focusNode.focus();
+this._cleanUp(true);
+}else{
+this.inherited(arguments);
+}
+}});
+});

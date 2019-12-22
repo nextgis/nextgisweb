@@ -1,11 +1,240 @@
 //>>built
-define("dojox/dtl/tag/logic",["dojo/_base/lang","../_base"],function(m,l){var g=m.getObject("tag.logic",!0,l);g.IfNode=m.extend(function(a,b,d,c){this.bools=a;this.trues=b;this.falses=d;this.type=c},{render:function(a,b){var d,c,e;if("or"==this.type){for(d=0;c=this.bools[d];d++)if(e=c[0],c=c[1],(c=c.resolve(a))&&!e||e&&!c)return this.falses&&(b=this.falses.unrender(a,b)),this.trues?this.trues.render(a,b,this):b;this.trues&&(b=this.trues.unrender(a,b));return this.falses?this.falses.render(a,b,this):
-b}for(d=0;c=this.bools[d];d++)if(e=c[0],c=c[1],c=c.resolve(a),c==e)return this.trues&&(b=this.trues.unrender(a,b)),this.falses?this.falses.render(a,b,this):b;this.falses&&(b=this.falses.unrender(a,b));return this.trues?this.trues.render(a,b,this):b},unrender:function(a,b){b=this.trues?this.trues.unrender(a,b):b;return b=this.falses?this.falses.unrender(a,b):b},clone:function(a){var b=this.trues?this.trues.clone(a):null;a=this.falses?this.falses.clone(a):null;return new this.constructor(this.bools,
-b,a,this.type)}});g.IfEqualNode=m.extend(function(a,b,d,c,e){this.var1=new l._Filter(a);this.var2=new l._Filter(b);this.trues=d;this.falses=c;this.negate=e},{render:function(a,b){var d=this.var1.resolve(a),c=this.var2.resolve(a),d="undefined"!=typeof d?d:"",c="undefined"!=typeof d?c:"";if(this.negate&&d!=c||!this.negate&&d==c)return this.falses&&(b=this.falses.unrender(a,b,this)),this.trues?this.trues.render(a,b,this):b;this.trues&&(b=this.trues.unrender(a,b,this));return this.falses?this.falses.render(a,
-b,this):b},unrender:function(a,b){return g.IfNode.prototype.unrender.call(this,a,b)},clone:function(a){var b=this.trues?this.trues.clone(a):null;a=this.falses?this.falses.clone(a):null;return new this.constructor(this.var1.getExpression(),this.var2.getExpression(),b,a,this.negate)}});g.ForNode=m.extend(function(a,b,d,c){this.assign=a;this.loop=new l._Filter(b);this.reversed=d;this.nodelist=c;this.pool=[]},{render:function(a,b){var d,c,e,h=!1,f=this.assign;for(e=0;e<f.length;e++)if("undefined"!=typeof a[f[e]]){h=
-!0;a=a.push();break}!h&&a.forloop&&(h=!0,a=a.push());e=this.loop.resolve(a)||[];var k=[];if(m.isObject(e)&&!m.isArrayLike(e))for(d in e)k.push([d,e[d]]);else k=e;for(d=k.length;d<this.pool.length;d++)this.pool[d].unrender(a,b,this);this.reversed&&(k=k.slice(0).reverse());var g=a.forloop={parentloop:a.get("forloop",{})};for(d=c=0;d<k.length;d++){var l=k[d];g.counter0=c;g.counter=c+1;g.revcounter0=k.length-c-1;g.revcounter=k.length-c;g.first=!c;g.last=c==k.length-1;if(m.isArrayLike(l))if(1<f.length){h||
-(h=!0,a=a.push());var n={};for(e=0;e<l.length&&e<f.length;e++)n[f[e]]=l[e];m.mixin(a,n)}else a[f[0]]=l[1];else a[f[0]]=l;c+1>this.pool.length&&this.pool.push(this.nodelist.clone(b));b=this.pool[c++].render(a,b,this)}delete a.forloop;if(h)a=a.pop();else for(e=0;e<f.length;e++)delete a[f[e]];return b},unrender:function(a,b){for(var d=0,c;c=this.pool[d];d++)b=c.unrender(a,b);return b},clone:function(a){return new this.constructor(this.assign,this.loop.getExpression(),this.reversed,this.nodelist.clone(a))}});
-m.mixin(g,{if_:function(a,b){var d,c,e,h=[],f=b.contents.split();f.shift();b=f.join(" ");f=b.split(" and ");if(1==f.length)e="or",f=b.split(" or ");else for(e="and",d=0;d<f.length;d++)if(-1!=f[d].indexOf(" or "))throw Error("'if' tags can't mix 'and' and 'or'");for(d=0;c=f[d];d++){var k=!1;0==c.indexOf("not ")&&(c=c.slice(4),k=!0);h.push([k,new l._Filter(c)])}d=a.parse(["else","endif"]);c=!1;b=a.next_token();"else"==b.contents&&(c=a.parse(["endif"]),a.next_token());return new g.IfNode(h,d,c,e)},_ifequal:function(a,
-b,d){var c=b.split_contents();if(3!=c.length)throw Error(c[0]+" takes two arguments");var e="end"+c[0],h=a.parse(["else",e]),f=!1;b=a.next_token();"else"==b.contents&&(f=a.parse([e]),a.next_token());return new g.IfEqualNode(c[1],c[2],h,f,d)},ifequal:function(a,b){return g._ifequal(a,b)},ifnotequal:function(a,b){return g._ifequal(a,b,!0)},for_:function(a,b){var d=b.contents.split();if(4>d.length)throw Error("'for' statements should have at least four words: "+b.contents);var c="reversed"==d[d.length-
-1],e=c?-3:-2;if("in"!=d[d.length+e])throw Error("'for' tag received an invalid argument: "+b.contents);for(var h=d.slice(1,e).join(" ").split(/ *, */),f=0;f<h.length;f++)if(!h[f]||-1!=h[f].indexOf(" "))throw Error("'for' tag received an invalid argument: "+b.contents);f=a.parse(["endfor"]);a.next_token();return new g.ForNode(h,d[d.length+e+1],c,f)}});return g});
-//# sourceMappingURL=logic.js.map
+define("dojox/dtl/tag/logic",["dojo/_base/lang","../_base"],function(_1,dd){
+var _2=_1.getObject("tag.logic",true,dd);
+var _3=dd.text;
+_2.IfNode=_1.extend(function(_4,_5,_6,_7){
+this.bools=_4;
+this.trues=_5;
+this.falses=_6;
+this.type=_7;
+},{render:function(_8,_9){
+var i,_a,_b,_c,_d;
+if(this.type=="or"){
+for(i=0;_a=this.bools[i];i++){
+_b=_a[0];
+_c=_a[1];
+_d=_c.resolve(_8);
+if((_d&&!_b)||(_b&&!_d)){
+if(this.falses){
+_9=this.falses.unrender(_8,_9);
+}
+return (this.trues)?this.trues.render(_8,_9,this):_9;
+}
+}
+if(this.trues){
+_9=this.trues.unrender(_8,_9);
+}
+return (this.falses)?this.falses.render(_8,_9,this):_9;
+}else{
+for(i=0;_a=this.bools[i];i++){
+_b=_a[0];
+_c=_a[1];
+_d=_c.resolve(_8);
+if(_d==_b){
+if(this.trues){
+_9=this.trues.unrender(_8,_9);
+}
+return (this.falses)?this.falses.render(_8,_9,this):_9;
+}
+}
+if(this.falses){
+_9=this.falses.unrender(_8,_9);
+}
+return (this.trues)?this.trues.render(_8,_9,this):_9;
+}
+return _9;
+},unrender:function(_e,_f){
+_f=(this.trues)?this.trues.unrender(_e,_f):_f;
+_f=(this.falses)?this.falses.unrender(_e,_f):_f;
+return _f;
+},clone:function(_10){
+var _11=(this.trues)?this.trues.clone(_10):null;
+var _12=(this.falses)?this.falses.clone(_10):null;
+return new this.constructor(this.bools,_11,_12,this.type);
+}});
+_2.IfEqualNode=_1.extend(function(_13,_14,_15,_16,_17){
+this.var1=new dd._Filter(_13);
+this.var2=new dd._Filter(_14);
+this.trues=_15;
+this.falses=_16;
+this.negate=_17;
+},{render:function(_18,_19){
+var _1a=this.var1.resolve(_18);
+var _1b=this.var2.resolve(_18);
+_1a=(typeof _1a!="undefined")?_1a:"";
+_1b=(typeof _1a!="undefined")?_1b:"";
+if((this.negate&&_1a!=_1b)||(!this.negate&&_1a==_1b)){
+if(this.falses){
+_19=this.falses.unrender(_18,_19,this);
+}
+return (this.trues)?this.trues.render(_18,_19,this):_19;
+}
+if(this.trues){
+_19=this.trues.unrender(_18,_19,this);
+}
+return (this.falses)?this.falses.render(_18,_19,this):_19;
+},unrender:function(_1c,_1d){
+return _2.IfNode.prototype.unrender.call(this,_1c,_1d);
+},clone:function(_1e){
+var _1f=this.trues?this.trues.clone(_1e):null;
+var _20=this.falses?this.falses.clone(_1e):null;
+return new this.constructor(this.var1.getExpression(),this.var2.getExpression(),_1f,_20,this.negate);
+}});
+_2.ForNode=_1.extend(function(_21,_22,_23,_24){
+this.assign=_21;
+this.loop=new dd._Filter(_22);
+this.reversed=_23;
+this.nodelist=_24;
+this.pool=[];
+},{render:function(_25,_26){
+var i,j,k;
+var _27=false;
+var _28=this.assign;
+for(k=0;k<_28.length;k++){
+if(typeof _25[_28[k]]!="undefined"){
+_27=true;
+_25=_25.push();
+break;
+}
+}
+if(!_27&&_25.forloop){
+_27=true;
+_25=_25.push();
+}
+var _29=this.loop.resolve(_25)||[];
+var _2a=_1.isObject(_29)&&!_1.isArrayLike(_29);
+var _2b=[];
+if(_2a){
+for(var key in _29){
+_2b.push([key,_29[key]]);
+}
+}else{
+_2b=_29;
+}
+for(i=_2b.length;i<this.pool.length;i++){
+this.pool[i].unrender(_25,_26,this);
+}
+if(this.reversed){
+_2b=_2b.slice(0).reverse();
+}
+var _2c=_25.forloop={parentloop:_25.get("forloop",{})};
+var j=0;
+for(i=0;i<_2b.length;i++){
+var _2d=_2b[i];
+_2c.counter0=j;
+_2c.counter=j+1;
+_2c.revcounter0=_2b.length-j-1;
+_2c.revcounter=_2b.length-j;
+_2c.first=!j;
+_2c.last=(j==_2b.length-1);
+if(_1.isArrayLike(_2d)){
+if(_28.length>1){
+if(!_27){
+_27=true;
+_25=_25.push();
+}
+var _2e={};
+for(k=0;k<_2d.length&&k<_28.length;k++){
+_2e[_28[k]]=_2d[k];
+}
+_1.mixin(_25,_2e);
+}else{
+_25[_28[0]]=_2d[1];
+}
+}else{
+_25[_28[0]]=_2d;
+}
+if(j+1>this.pool.length){
+this.pool.push(this.nodelist.clone(_26));
+}
+_26=this.pool[j++].render(_25,_26,this);
+}
+delete _25.forloop;
+if(_27){
+_25=_25.pop();
+}else{
+for(k=0;k<_28.length;k++){
+delete _25[_28[k]];
+}
+}
+return _26;
+},unrender:function(_2f,_30){
+for(var i=0,_31;_31=this.pool[i];i++){
+_30=_31.unrender(_2f,_30);
+}
+return _30;
+},clone:function(_32){
+return new this.constructor(this.assign,this.loop.getExpression(),this.reversed,this.nodelist.clone(_32));
+}});
+_1.mixin(_2,{if_:function(_33,_34){
+var i,_35,_36,_37=[],_38=_34.contents.split();
+_38.shift();
+_34=_38.join(" ");
+_38=_34.split(" and ");
+if(_38.length==1){
+_36="or";
+_38=_34.split(" or ");
+}else{
+_36="and";
+for(i=0;i<_38.length;i++){
+if(_38[i].indexOf(" or ")!=-1){
+throw new Error("'if' tags can't mix 'and' and 'or'");
+}
+}
+}
+for(i=0;_35=_38[i];i++){
+var not=false;
+if(_35.indexOf("not ")==0){
+_35=_35.slice(4);
+not=true;
+}
+_37.push([not,new dd._Filter(_35)]);
+}
+var _39=_33.parse(["else","endif"]);
+var _3a=false;
+var _34=_33.next_token();
+if(_34.contents=="else"){
+_3a=_33.parse(["endif"]);
+_33.next_token();
+}
+return new _2.IfNode(_37,_39,_3a,_36);
+},_ifequal:function(_3b,_3c,_3d){
+var _3e=_3c.split_contents();
+if(_3e.length!=3){
+throw new Error(_3e[0]+" takes two arguments");
+}
+var end="end"+_3e[0];
+var _3f=_3b.parse(["else",end]);
+var _40=false;
+var _3c=_3b.next_token();
+if(_3c.contents=="else"){
+_40=_3b.parse([end]);
+_3b.next_token();
+}
+return new _2.IfEqualNode(_3e[1],_3e[2],_3f,_40,_3d);
+},ifequal:function(_41,_42){
+return _2._ifequal(_41,_42);
+},ifnotequal:function(_43,_44){
+return _2._ifequal(_43,_44,true);
+},for_:function(_45,_46){
+var _47=_46.contents.split();
+if(_47.length<4){
+throw new Error("'for' statements should have at least four words: "+_46.contents);
+}
+var _48=_47[_47.length-1]=="reversed";
+var _49=(_48)?-3:-2;
+if(_47[_47.length+_49]!="in"){
+throw new Error("'for' tag received an invalid argument: "+_46.contents);
+}
+var _4a=_47.slice(1,_49).join(" ").split(/ *, */);
+for(var i=0;i<_4a.length;i++){
+if(!_4a[i]||_4a[i].indexOf(" ")!=-1){
+throw new Error("'for' tag received an invalid argument: "+_46.contents);
+}
+}
+var _4b=_45.parse(["endfor"]);
+_45.next_token();
+return new _2.ForNode(_4a,_47[_47.length+_49+1],_48,_4b);
+}});
+return _2;
+});

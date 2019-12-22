@@ -5,7 +5,86 @@
 */
 
 //>>built
-define("dojo/promise/instrumentation",["./tracer","../has","../_base/lang","../_base/array"],function(g,l,h,m){function n(c,a,b){if(!c||!1!==c.log){var d="";c&&c.stack&&(d+=c.stack);a&&a.stack&&(d+="\n    ----------------------------------------\n    rejected"+a.stack.split("\n").slice(1).join("\n").replace(/^\s+/," "));b&&b.stack&&(d+="\n    ----------------------------------------\n"+b.stack);console.error(c,d)}}function q(c,a,b,d){a||n(c,b,d)}function r(c,a,b,d){m.some(e,function(b){if(b.error===
-c)return a&&(b.handled=!0),!0})||e.push({error:c,rejection:b,handled:a,deferred:d,timestamp:(new Date).getTime()});k||(k=setTimeout(p,f))}function p(){var c=(new Date).getTime(),a=c-f;e=m.filter(e,function(b){return b.timestamp<a?(b.handled||n(b.error,b.rejection,b.deferred),!1):!0});k=e.length?setTimeout(p,e[0].timestamp+f-c):!1}l.add("config-useDeferredInstrumentation","report-unhandled-rejections");var e=[],k=!1,f=1E3;return function(c){var a=l("config-useDeferredInstrumentation");if(a){g.on("resolved",
-h.hitch(console,"log","resolved"));g.on("rejected",h.hitch(console,"log","rejected"));g.on("progress",h.hitch(console,"log","progress"));var b=[];"string"===typeof a&&(b=a.split(","),a=b.shift());if("report-rejections"===a)c.instrumentRejected=q;else if("report-unhandled-rejections"===a||!0===a||1===a)c.instrumentRejected=r,f=parseInt(b[0],10)||f;else throw Error("Unsupported instrumentation usage \x3c"+a+"\x3e");}}});
-//# sourceMappingURL=instrumentation.js.map
+define("dojo/promise/instrumentation",["./tracer","../has","../_base/lang","../_base/array"],function(_1,_2,_3,_4){
+_2.add("config-useDeferredInstrumentation","report-unhandled-rejections");
+function _5(_6,_7,_8){
+if(_6&&_6.log===false){
+return;
+}
+var _9="";
+if(_6&&_6.stack){
+_9+=_6.stack;
+}
+if(_7&&_7.stack){
+_9+="\n    ----------------------------------------\n    rejected"+_7.stack.split("\n").slice(1).join("\n").replace(/^\s+/," ");
+}
+if(_8&&_8.stack){
+_9+="\n    ----------------------------------------\n"+_8.stack;
+}
+console.error(_6,_9);
+};
+function _a(_b,_c,_d,_e){
+if(!_c){
+_5(_b,_d,_e);
+}
+};
+var _f=[];
+var _10=false;
+var _11=1000;
+function _12(_13,_14,_15,_16){
+if(!_4.some(_f,function(obj){
+if(obj.error===_13){
+if(_14){
+obj.handled=true;
+}
+return true;
+}
+})){
+_f.push({error:_13,rejection:_15,handled:_14,deferred:_16,timestamp:new Date().getTime()});
+}
+if(!_10){
+_10=setTimeout(_17,_11);
+}
+};
+function _17(){
+var now=new Date().getTime();
+var _18=now-_11;
+_f=_4.filter(_f,function(obj){
+if(obj.timestamp<_18){
+if(!obj.handled){
+_5(obj.error,obj.rejection,obj.deferred);
+}
+return false;
+}
+return true;
+});
+if(_f.length){
+_10=setTimeout(_17,_f[0].timestamp+_11-now);
+}else{
+_10=false;
+}
+};
+return function(_19){
+var _1a=_2("config-useDeferredInstrumentation");
+if(_1a){
+_1.on("resolved",_3.hitch(console,"log","resolved"));
+_1.on("rejected",_3.hitch(console,"log","rejected"));
+_1.on("progress",_3.hitch(console,"log","progress"));
+var _1b=[];
+if(typeof _1a==="string"){
+_1b=_1a.split(",");
+_1a=_1b.shift();
+}
+if(_1a==="report-rejections"){
+_19.instrumentRejected=_a;
+}else{
+if(_1a==="report-unhandled-rejections"||_1a===true||_1a===1){
+_19.instrumentRejected=_12;
+_11=parseInt(_1b[0],10)||_11;
+}else{
+throw new Error("Unsupported instrumentation usage <"+_1a+">");
+}
+}
+}
+};
+});

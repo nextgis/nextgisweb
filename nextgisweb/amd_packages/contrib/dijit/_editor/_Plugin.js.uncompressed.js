@@ -144,7 +144,8 @@ define("dijit/_editor/_Plugin", [
 			var disabled = this.get("disabled");
 			if(this.button){
 				try{
-					enabled = !disabled && e.queryCommandEnabled(c);
+					var implFunc = e._implCommand(c);
+					enabled = !disabled && (this[implFunc] ? this[implFunc](c) : e.queryCommandEnabled(c));
 					if(this.enabled !== enabled){
 						this.enabled = enabled;
 						this.button.set('disabled', !enabled);

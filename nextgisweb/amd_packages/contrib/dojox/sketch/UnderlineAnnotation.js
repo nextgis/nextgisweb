@@ -1,8 +1,102 @@
 //>>built
-define("dojox/sketch/UnderlineAnnotation",["./Annotation","./Anchor"],function(){var b=dojox.sketch;b.UnderlineAnnotation=function(a,e){b.Annotation.call(this,a,e);this.transform={dx:0,dy:0};this.start={x:0,y:0};this.property("label","#");this.lineShape=this.labelShape=null};b.UnderlineAnnotation.prototype=new b.Annotation;var c=b.UnderlineAnnotation.prototype;c.constructor=b.UnderlineAnnotation;c.type=function(){return"Underline"};c.getType=function(){return b.UnderlineAnnotation};c.apply=function(a){if(a){a.documentElement&&
-(a=a.documentElement);this.readCommonAttrs(a);for(var b=0;b<a.childNodes.length;b++){var c=a.childNodes[b];if("text"==c.localName&&(this.property("label",c.childNodes[0].nodeValue),c=c.getAttribute("style").match(/fill:([^;]+);/))){var d=this.property("stroke");d.collor=c[1];this.property("stroke",d);this.property("fill",d.collor)}}}};c.initialize=function(a){this.apply(a);this.shape=this.figure.group.createGroup();this.shape.getEventSource().setAttribute("id",this.id);this.labelShape=this.shape.createText({x:0,
-y:0,text:this.property("label"),decoration:"underline",align:"start"});this.labelShape.getEventSource().setAttribute("id",this.id+"-labelShape");this.lineShape=this.shape.createLine({x1:1,x2:this.labelShape.getTextWidth(),y1:2,y2:2});this.lineShape.getEventSource().setAttribute("shape-rendering","crispEdges");this.draw()};c.destroy=function(){this.shape&&(this.shape.remove(this.labelShape),this.shape.remove(this.lineShape),this.figure.group.remove(this.shape),this.shape=this.lineShape=this.labelShape=
-null)};c.getBBox=function(){var a=this.getTextBox(),b=this.figure.zoomFactor;return{x:0,y:(-1*a.h+4)/b,width:(a.w+2)/b,height:a.h/b}};c.draw=function(a){this.apply(a);this.shape.setTransform(this.transform);this.labelShape.setShape({x:0,y:0,text:this.property("label")}).setFill(this.property("fill"));this.zoom()};c.zoom=function(a){if(this.labelShape){a=a||this.figure.zoomFactor;var c="vml"==dojox.gfx.renderer?0:2/a;b.Annotation.prototype.zoom.call(this,a);a="vml"==dojox.gfx.renderer?1:a;this.lineShape.setShape({x1:0,
-x2:this.getBBox().width-c,y1:2,y2:2}).setStroke({color:this.property("fill"),width:1/a});this.mode==b.Annotation.Modes.Edit&&this.drawBBox()}};c.serialize=function(){this.property("stroke");return"\x3cg "+this.writeCommonAttrs()+'\x3e\x3ctext style\x3d"fill:'+this.property("fill")+';" font-weight\x3d"bold" text-decoration\x3d"underline" x\x3d"0" y\x3d"0"\x3e'+this.property("label")+"\x3c/text\x3e\x3c/g\x3e"};dojo.declare("dojox.sketch.UnderlineAnnotationTool",b.AnnotationTool,{onMouseDown:function(){},
-onMouseUp:function(){var a=this.figure;a._start&&(a._end={x:0,y:0},this._create(a._start,{x:a._start.x+10,y:a._start.y+10}))},onMouseMove:function(){}});b.Annotation.register("Underline",b.UnderlineAnnotationTool);return dojox.sketch.UnderlineAnnotation});
-//# sourceMappingURL=UnderlineAnnotation.js.map
+define("dojox/sketch/UnderlineAnnotation",["./Annotation","./Anchor"],function(){
+var ta=dojox.sketch;
+ta.UnderlineAnnotation=function(_1,id){
+ta.Annotation.call(this,_1,id);
+this.transform={dx:0,dy:0};
+this.start={x:0,y:0};
+this.property("label","#");
+this.labelShape=null;
+this.lineShape=null;
+};
+ta.UnderlineAnnotation.prototype=new ta.Annotation;
+var p=ta.UnderlineAnnotation.prototype;
+p.constructor=ta.UnderlineAnnotation;
+p.type=function(){
+return "Underline";
+};
+p.getType=function(){
+return ta.UnderlineAnnotation;
+};
+p.apply=function(_2){
+if(!_2){
+return;
+}
+if(_2.documentElement){
+_2=_2.documentElement;
+}
+this.readCommonAttrs(_2);
+for(var i=0;i<_2.childNodes.length;i++){
+var c=_2.childNodes[i];
+if(c.localName=="text"){
+this.property("label",c.childNodes[0].nodeValue);
+var _3=c.getAttribute("style");
+var m=_3.match(/fill:([^;]+);/);
+if(m){
+var _4=this.property("stroke");
+_4.collor=m[1];
+this.property("stroke",_4);
+this.property("fill",_4.collor);
+}
+}
+}
+};
+p.initialize=function(_5){
+this.apply(_5);
+this.shape=this.figure.group.createGroup();
+this.shape.getEventSource().setAttribute("id",this.id);
+this.labelShape=this.shape.createText({x:0,y:0,text:this.property("label"),decoration:"underline",align:"start"});
+this.labelShape.getEventSource().setAttribute("id",this.id+"-labelShape");
+this.lineShape=this.shape.createLine({x1:1,x2:this.labelShape.getTextWidth(),y1:2,y2:2});
+this.lineShape.getEventSource().setAttribute("shape-rendering","crispEdges");
+this.draw();
+};
+p.destroy=function(){
+if(!this.shape){
+return;
+}
+this.shape.remove(this.labelShape);
+this.shape.remove(this.lineShape);
+this.figure.group.remove(this.shape);
+this.shape=this.lineShape=this.labelShape=null;
+};
+p.getBBox=function(){
+var b=this.getTextBox();
+var z=this.figure.zoomFactor;
+return {x:0,y:(b.h*-1+4)/z,width:(b.w+2)/z,height:b.h/z};
+};
+p.draw=function(_6){
+this.apply(_6);
+this.shape.setTransform(this.transform);
+this.labelShape.setShape({x:0,y:0,text:this.property("label")}).setFill(this.property("fill"));
+this.zoom();
+};
+p.zoom=function(_7){
+if(this.labelShape){
+_7=_7||this.figure.zoomFactor;
+var _8=dojox.gfx.renderer=="vml"?0:2/_7;
+ta.Annotation.prototype.zoom.call(this,_7);
+_7=dojox.gfx.renderer=="vml"?1:_7;
+this.lineShape.setShape({x1:0,x2:this.getBBox().width-_8,y1:2,y2:2}).setStroke({color:this.property("fill"),width:1/_7});
+if(this.mode==ta.Annotation.Modes.Edit){
+this.drawBBox();
+}
+}
+};
+p.serialize=function(){
+var s=this.property("stroke");
+return "<g "+this.writeCommonAttrs()+">"+"<text style=\"fill:"+this.property("fill")+";\" font-weight=\"bold\" text-decoration=\"underline\" "+"x=\"0\" y=\"0\">"+this.property("label")+"</text>"+"</g>";
+};
+dojo.declare("dojox.sketch.UnderlineAnnotationTool",ta.AnnotationTool,{onMouseDown:function(){
+},onMouseUp:function(){
+var f=this.figure;
+if(!f._start){
+return;
+}
+f._end={x:0,y:0};
+this._create(f._start,{x:f._start.x+10,y:f._start.y+10});
+},onMouseMove:function(){
+}});
+ta.Annotation.register("Underline",ta.UnderlineAnnotationTool);
+return dojox.sketch.UnderlineAnnotation;
+});

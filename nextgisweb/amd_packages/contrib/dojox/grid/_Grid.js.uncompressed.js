@@ -990,10 +990,10 @@ define("dojox/grid/_Grid", [
 				if(this.layout.cells.length){
 					this.scroller.updateRowCount(inRowCount);
 				}
-				this._resize();
 				if(this.layout.cells.length){
 					this.setScrollTop(this.scrollTop);
 				}
+				this._resize();
 			}
 		},
 

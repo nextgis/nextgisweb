@@ -1,7 +1,63 @@
 //>>built
-define("dojox/widget/DocTester",["dojo","dijit","dojox","dojo/require!dojo/string,dijit/_Widget,dijit/_Templated,dojox/form/BusyButton,dojox/testing/DocTest"],function(a,g,h){a.provide("dojox.widget.DocTester");a.require("dojo.string");a.require("dijit._Widget");a.require("dijit._Templated");a.require("dojox.form.BusyButton");a.require("dojox.testing.DocTest");a.declare("dojox.widget.DocTester",[g._Widget,g._Templated],{templateString:a.cache("dojox.widget","DocTester/DocTester.html",'\x3cdiv dojoAttachPoint\x3d"domNode" class\x3d"dojoxDocTester"\x3e\n\t\x3cdiv dojoAttachPoint\x3d"containerNode"\x3e\x3c/div\x3e\n\t\x3cbutton dojoType\x3d"dojox.form.BusyButton" busyLabel\x3d"Testing..." dojoAttachPoint\x3d"runButtonNode"\x3eRun tests\x3c/button\x3e\n\t\x3cbutton dojoType\x3d"dijit.form.Button" dojoAttachPoint\x3d"resetButtonNode" style\x3d"display:none;"\x3eReset\x3c/button\x3e\n\t\x3cspan\x3e\n\t\t\x3cspan dojoAttachPoint\x3d"numTestsNode"\x3e0\x3c/span\x3e tests,\n\t\t\x3cspan dojoAttachPoint\x3d"numTestsOkNode"\x3e0\x3c/span\x3e passed,\n\t\t\x3cspan dojoAttachPoint\x3d"numTestsNokNode"\x3e0\x3c/span\x3e failed\n\t\x3c/span\x3e\n\x3c/div\x3e'),
-widgetsInTemplate:!0,_fillContent:function(f){var c=f.innerHTML;this.doctests=new h.testing.DocTest;this.tests=this.doctests.getTestsFromString(this._unescapeHtml(c));f=a.map(this.tests,"return item.line-1");for(var c=c.split("\n"),b='\x3cpre class\x3d"testCase testNum0 odd"\x3e',d=0;d<c.length;d++){var e=a.indexOf(f,d);if(0<e&&-1!=e)var g=e%2?"even":"odd",b=b+'\x3cdiv class\x3d"actualResult"\x3eFAILED, actual result was: \x3cspan class\x3d"result"\x3e\x3c/span\x3e\x3c/div\x3e',b=b+('\x3c/pre\x3e\x3cpre class\x3d"testCase testNum'+
-e+" "+g+'"\x3e');b+=c[d].replace(/^\s+/,"")+"\n"}this.containerNode.innerHTML=b+'\x3cdiv class\x3d"actualResult"\x3eFAILED, actual result was: \x3cspan class\x3d"result"\x3e\x3c/span\x3e\x3c/div\x3e\x3c/pre\x3e'},postCreate:function(){this.inherited("postCreate",arguments);a.connect(this.runButtonNode,"onClick",a.hitch(this,"runTests"));a.connect(this.resetButtonNode,"onClick",a.hitch(this,"reset"));this.numTestsNode.innerHTML=this.tests.length},runTests:function(){for(var f=0,c=0,b=0;b<this.tests.length;b++){var d=
-this.doctests.runTest(this.tests[b].commands,this.tests[b].expectedResult);a.query(".testNum"+b,this.domNode).addClass(d.success?"resultOk":"resultNok");if(d.success)f++,this.numTestsOkNode.innerHTML=f;else{c++;this.numTestsNokNode.innerHTML=c;var e=a.query(".testNum"+b+" .actualResult",this.domNode)[0];a.style(e,"display","inline");a.query(".result",e)[0].innerHTML=a.toJson(d.actualResult)}}this.runButtonNode.cancel();a.style(this.runButtonNode.domNode,"display","none");a.style(this.resetButtonNode.domNode,
-"display","")},reset:function(){a.style(this.runButtonNode.domNode,"display","");a.style(this.resetButtonNode.domNode,"display","none");this.numTestsOkNode.innerHTML="0";this.numTestsNokNode.innerHTML="0";a.query(".actualResult",this.domNode).style("display","none");a.query(".testCase",this.domNode).removeClass("resultOk").removeClass("resultNok")},_unescapeHtml:function(a){return a=String(a).replace(/&amp;/gm,"\x26").replace(/&lt;/gm,"\x3c").replace(/&gt;/gm,"\x3e").replace(/&quot;/gm,'"')}})});
-//# sourceMappingURL=DocTester.js.map
+define("dojox/widget/DocTester",["dojo","dijit","dojox","dojo/require!dojo/string,dijit/_Widget,dijit/_Templated,dojox/form/BusyButton,dojox/testing/DocTest"],function(_1,_2,_3){
+_1.provide("dojox.widget.DocTester");
+_1.require("dojo.string");
+_1.require("dijit._Widget");
+_1.require("dijit._Templated");
+_1.require("dojox.form.BusyButton");
+_1.require("dojox.testing.DocTest");
+_1.declare("dojox.widget.DocTester",[_2._Widget,_2._Templated],{templateString:_1.cache("dojox.widget","DocTester/DocTester.html","<div dojoAttachPoint=\"domNode\" class=\"dojoxDocTester\">\n\t<div dojoAttachPoint=\"containerNode\"></div>\n\t<button dojoType=\"dojox.form.BusyButton\" busyLabel=\"Testing...\" dojoAttachPoint=\"runButtonNode\">Run tests</button>\n\t<button dojoType=\"dijit.form.Button\" dojoAttachPoint=\"resetButtonNode\" style=\"display:none;\">Reset</button>\n\t<span>\n\t\t<span dojoAttachPoint=\"numTestsNode\">0</span> tests,\n\t\t<span dojoAttachPoint=\"numTestsOkNode\">0</span> passed,\n\t\t<span dojoAttachPoint=\"numTestsNokNode\">0</span> failed\n\t</span>\n</div>"),widgetsInTemplate:true,_fillContent:function(_4){
+var _5=_4.innerHTML;
+this.doctests=new _3.testing.DocTest();
+this.tests=this.doctests.getTestsFromString(this._unescapeHtml(_5));
+var _6=_1.map(this.tests,"return item.line-1");
+var _7=_5.split("\n");
+var _8="<div class=\"actualResult\">FAILED, actual result was: <span class=\"result\"></span></div>";
+var _9="<pre class=\"testCase testNum0 odd\">";
+for(var i=0;i<_7.length;i++){
+var _a=_1.indexOf(_6,i);
+if(_a>0&&_a!=-1){
+var _b=_a%2?"even":"odd";
+_9+=_8;
+_9+="</pre><pre class=\"testCase testNum"+_a+" "+_b+"\">";
+}
+_9+=_7[i].replace(/^\s+/,"")+"\n";
+}
+_9+=_8+"</pre>";
+this.containerNode.innerHTML=_9;
+},postCreate:function(){
+this.inherited("postCreate",arguments);
+_1.connect(this.runButtonNode,"onClick",_1.hitch(this,"runTests"));
+_1.connect(this.resetButtonNode,"onClick",_1.hitch(this,"reset"));
+this.numTestsNode.innerHTML=this.tests.length;
+},runTests:function(){
+var _c={ok:0,nok:0};
+for(var i=0;i<this.tests.length;i++){
+var _d=this.doctests.runTest(this.tests[i].commands,this.tests[i].expectedResult);
+_1.query(".testNum"+i,this.domNode).addClass(_d.success?"resultOk":"resultNok");
+if(!_d.success){
+_c.nok++;
+this.numTestsNokNode.innerHTML=_c.nok;
+var _e=_1.query(".testNum"+i+" .actualResult",this.domNode)[0];
+_1.style(_e,"display","inline");
+_1.query(".result",_e)[0].innerHTML=_1.toJson(_d.actualResult);
+}else{
+_c.ok++;
+this.numTestsOkNode.innerHTML=_c.ok;
+}
+}
+this.runButtonNode.cancel();
+_1.style(this.runButtonNode.domNode,"display","none");
+_1.style(this.resetButtonNode.domNode,"display","");
+},reset:function(){
+_1.style(this.runButtonNode.domNode,"display","");
+_1.style(this.resetButtonNode.domNode,"display","none");
+this.numTestsOkNode.innerHTML="0";
+this.numTestsNokNode.innerHTML="0";
+_1.query(".actualResult",this.domNode).style("display","none");
+_1.query(".testCase",this.domNode).removeClass("resultOk").removeClass("resultNok");
+},_unescapeHtml:function(_f){
+_f=String(_f).replace(/&amp;/gm,"&").replace(/&lt;/gm,"<").replace(/&gt;/gm,">").replace(/&quot;/gm,"\"");
+return _f;
+}});
+});

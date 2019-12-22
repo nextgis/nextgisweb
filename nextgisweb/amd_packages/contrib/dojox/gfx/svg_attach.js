@@ -1,9 +1,185 @@
 //>>built
-define("dojox/gfx/svg_attach","dojo/_base/kernel dojo/_base/lang dojo/_base/array dojo/_base/Color ./_base ./svg ./matrix".split(" "),function(n,h,k,l,f,e,p){function q(a){var c=a.rawNode.getAttribute("fill");if("none"==c)a.fillStyle=null;else{var b=null,d=e.getRef(c);if(d)switch(d.tagName.toLowerCase()){case "lineargradient":b=m(f.defaultLinearGradient,d);k.forEach(["x1","y1","x2","y2"],function(a){b[a]=d.getAttribute(a)});break;case "radialgradient":b=m(f.defaultRadialGradient,d);k.forEach(["cx",
-"cy","r"],function(a){b[a]=d.getAttribute(a)});b.cx=d.getAttribute("cx");b.cy=d.getAttribute("cy");b.r=d.getAttribute("r");break;case "pattern":b=h.clone(f.defaultPattern),k.forEach(["x","y","width","height"],function(a){b[a]=d.getAttribute(a)}),b.src=d.firstChild.getAttributeNS(e.xmlns.xlink,"href")}else b=new l(c),c=a.rawNode.getAttribute("fill-opacity"),null!=c&&(b.a=c);a.fillStyle=b}}function m(a,c){var b=h.clone(a);b.colors=[];for(var d=0;d<c.childNodes.length;++d)b.colors.push({offset:c.childNodes[d].getAttribute("offset"),
-color:new l(c.childNodes[d].getAttribute("stop-color"))});return b}function g(a,c){var b=a.shape=h.clone(c),d=a.rawNode,e;for(e in b)b[e]=d.getAttribute(e)}n.experimental("dojox.gfx.svg_attach");e.attachNode=function(a){if(!a)return null;var c=null;switch(a.tagName.toLowerCase()){case e.Rect.nodeType:a=c=new e.Rect(a);g(a,f.defaultRect);a.shape.r=Math.min(a.rawNode.getAttribute("rx"),a.rawNode.getAttribute("ry"));break;case e.Ellipse.nodeType:c=new e.Ellipse(a);g(c,f.defaultEllipse);break;case e.Polyline.nodeType:c=
-new e.Polyline(a);g(c,f.defaultPolyline);break;case e.Path.nodeType:c=new e.Path(a);g(c,f.defaultPath);break;case e.Circle.nodeType:c=new e.Circle(a);g(c,f.defaultCircle);break;case e.Line.nodeType:c=new e.Line(a);g(c,f.defaultLine);break;case e.Image.nodeType:c=new e.Image(a);g(c,f.defaultImage);break;case e.Text.nodeType:if((c=a.getElementsByTagName("textPath"))&&c.length){c=new e.TextPath(a);g(c,f.defaultPath);var b=c;a=b.shape=h.clone(f.defaultTextPath);b=b.rawNode}else b=c=new e.Text(a),a=b.shape=
-h.clone(f.defaultText),b=b.rawNode,a.x=b.getAttribute("x"),a.y=b.getAttribute("y");a.align=b.getAttribute("text-anchor");a.decoration=b.getAttribute("text-decoration");a.rotated=0!=parseFloat(b.getAttribute("rotate"));a.kerning="auto"==b.getAttribute("kerning");a.text=b.firstChild.nodeValue;b=c;a=b.fontStyle=h.clone(f.defaultFont);b=b.rawNode;a.style=b.getAttribute("font-style");a.variant=b.getAttribute("font-variant");a.weight=b.getAttribute("font-weight");a.size=b.getAttribute("font-size");a.family=
-b.getAttribute("font-family");break;default:return null}if(!(c instanceof e.Image)){q(c);var d=c;a=d.rawNode;b=a.getAttribute("stroke");null==b||"none"==b?d.strokeStyle=null:(d=d.strokeStyle=h.clone(f.defaultStroke),b=new l(b),d.color=b,d.color.a=a.getAttribute("stroke-opacity"),d.width=a.getAttribute("stroke-width"),d.cap=a.getAttribute("stroke-linecap"),d.join=a.getAttribute("stroke-linejoin"),"miter"==d.join&&(d.join=a.getAttribute("stroke-miterlimit")),d.style=a.getAttribute("dojoGfxStrokeStyle"))}a=
-c;b=a.rawNode.getAttribute("transform");b.match(/^matrix\(.+\)$/)?(b=b.slice(7,-1).split(","),a.matrix=p.normalize({xx:parseFloat(b[0]),xy:parseFloat(b[2]),yx:parseFloat(b[1]),yy:parseFloat(b[3]),dx:parseFloat(b[4]),dy:parseFloat(b[5])})):a.matrix=null;return c};e.attachSurface=function(a){var c=new e.Surface;c.rawNode=a;a=a.getElementsByTagName("defs");if(0==a.length)return null;c.defNode=a[0];return c};return e});
-//# sourceMappingURL=svg_attach.js.map
+define("dojox/gfx/svg_attach",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/array","dojo/_base/Color","./_base","./svg","./matrix"],function(_1,_2,_3,_4,g,_5,_6){
+_1.experimental("dojox.gfx.svg_attach");
+_5.attachNode=function(_7){
+if(!_7){
+return null;
+}
+var s=null;
+switch(_7.tagName.toLowerCase()){
+case _5.Rect.nodeType:
+s=new _5.Rect(_7);
+_8(s);
+break;
+case _5.Ellipse.nodeType:
+s=new _5.Ellipse(_7);
+_9(s,g.defaultEllipse);
+break;
+case _5.Polyline.nodeType:
+s=new _5.Polyline(_7);
+_9(s,g.defaultPolyline);
+break;
+case _5.Path.nodeType:
+s=new _5.Path(_7);
+_9(s,g.defaultPath);
+break;
+case _5.Circle.nodeType:
+s=new _5.Circle(_7);
+_9(s,g.defaultCircle);
+break;
+case _5.Line.nodeType:
+s=new _5.Line(_7);
+_9(s,g.defaultLine);
+break;
+case _5.Image.nodeType:
+s=new _5.Image(_7);
+_9(s,g.defaultImage);
+break;
+case _5.Text.nodeType:
+var t=_7.getElementsByTagName("textPath");
+if(t&&t.length){
+s=new _5.TextPath(_7);
+_9(s,g.defaultPath);
+_a(s);
+}else{
+s=new _5.Text(_7);
+_b(s);
+}
+_c(s);
+break;
+default:
+return null;
+}
+if(!(s instanceof _5.Image)){
+_d(s);
+_e(s);
+}
+_f(s);
+return s;
+};
+_5.attachSurface=function(_10){
+var s=new _5.Surface();
+s.rawNode=_10;
+var _11=_10.getElementsByTagName("defs");
+if(_11.length==0){
+return null;
+}
+s.defNode=_11[0];
+return s;
+};
+function _d(_12){
+var _13=_12.rawNode.getAttribute("fill");
+if(_13=="none"){
+_12.fillStyle=null;
+return;
+}
+var _14=null,_15=_5.getRef(_13);
+if(_15){
+switch(_15.tagName.toLowerCase()){
+case "lineargradient":
+_14=_16(g.defaultLinearGradient,_15);
+_3.forEach(["x1","y1","x2","y2"],function(x){
+_14[x]=_15.getAttribute(x);
+});
+break;
+case "radialgradient":
+_14=_16(g.defaultRadialGradient,_15);
+_3.forEach(["cx","cy","r"],function(x){
+_14[x]=_15.getAttribute(x);
+});
+_14.cx=_15.getAttribute("cx");
+_14.cy=_15.getAttribute("cy");
+_14.r=_15.getAttribute("r");
+break;
+case "pattern":
+_14=_2.clone(g.defaultPattern);
+_3.forEach(["x","y","width","height"],function(x){
+_14[x]=_15.getAttribute(x);
+});
+_14.src=_15.firstChild.getAttributeNS(_5.xmlns.xlink,"href");
+break;
+}
+}else{
+_14=new _4(_13);
+var _17=_12.rawNode.getAttribute("fill-opacity");
+if(_17!=null){
+_14.a=_17;
+}
+}
+_12.fillStyle=_14;
+};
+function _16(_18,_19){
+var _1a=_2.clone(_18);
+_1a.colors=[];
+for(var i=0;i<_19.childNodes.length;++i){
+_1a.colors.push({offset:_19.childNodes[i].getAttribute("offset"),color:new _4(_19.childNodes[i].getAttribute("stop-color"))});
+}
+return _1a;
+};
+function _e(_1b){
+var _1c=_1b.rawNode,_1d=_1c.getAttribute("stroke");
+if(_1d==null||_1d=="none"){
+_1b.strokeStyle=null;
+return;
+}
+var _1e=_1b.strokeStyle=_2.clone(g.defaultStroke);
+var _1f=new _4(_1d);
+if(_1f){
+_1e.color=_1f;
+_1e.color.a=_1c.getAttribute("stroke-opacity");
+_1e.width=_1c.getAttribute("stroke-width");
+_1e.cap=_1c.getAttribute("stroke-linecap");
+_1e.join=_1c.getAttribute("stroke-linejoin");
+if(_1e.join=="miter"){
+_1e.join=_1c.getAttribute("stroke-miterlimit");
+}
+_1e.style=_1c.getAttribute("dojoGfxStrokeStyle");
+}
+};
+function _f(_20){
+var _21=_20.rawNode.getAttribute("transform");
+if(_21.match(/^matrix\(.+\)$/)){
+var t=_21.slice(7,-1).split(",");
+_20.matrix=_6.normalize({xx:parseFloat(t[0]),xy:parseFloat(t[2]),yx:parseFloat(t[1]),yy:parseFloat(t[3]),dx:parseFloat(t[4]),dy:parseFloat(t[5])});
+}else{
+_20.matrix=null;
+}
+};
+function _c(_22){
+var _23=_22.fontStyle=_2.clone(g.defaultFont),r=_22.rawNode;
+_23.style=r.getAttribute("font-style");
+_23.variant=r.getAttribute("font-variant");
+_23.weight=r.getAttribute("font-weight");
+_23.size=r.getAttribute("font-size");
+_23.family=r.getAttribute("font-family");
+};
+function _9(_24,def){
+var _25=_24.shape=_2.clone(def),r=_24.rawNode;
+for(var i in _25){
+_25[i]=r.getAttribute(i);
+}
+};
+function _8(_26){
+_9(_26,g.defaultRect);
+_26.shape.r=Math.min(_26.rawNode.getAttribute("rx"),_26.rawNode.getAttribute("ry"));
+};
+function _b(_27){
+var _28=_27.shape=_2.clone(g.defaultText),r=_27.rawNode;
+_28.x=r.getAttribute("x");
+_28.y=r.getAttribute("y");
+_28.align=r.getAttribute("text-anchor");
+_28.decoration=r.getAttribute("text-decoration");
+_28.rotated=parseFloat(r.getAttribute("rotate"))!=0;
+_28.kerning=r.getAttribute("kerning")=="auto";
+_28.text=r.firstChild.nodeValue;
+};
+function _a(_29){
+var _2a=_29.shape=_2.clone(g.defaultTextPath),r=_29.rawNode;
+_2a.align=r.getAttribute("text-anchor");
+_2a.decoration=r.getAttribute("text-decoration");
+_2a.rotated=parseFloat(r.getAttribute("rotate"))!=0;
+_2a.kerning=r.getAttribute("kerning")=="auto";
+_2a.text=r.firstChild.nodeValue;
+};
+return _5;
+});

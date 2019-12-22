@@ -1,3 +1,2 @@
 //>>built
-define("dijit/nls/sv/loading",{loadingState:"L\u00e4ser in...",errorState:"Det har intr\u00e4ffat ett fel."});
-//# sourceMappingURL=loading.js.map
+define("dijit/nls/sv/loading",({loadingState:"Läser in...",errorState:"Det har inträffat ett fel."}));

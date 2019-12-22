@@ -5,5 +5,14 @@
 */
 
 //>>built
-define("dojo/data/api/Notification",["../../_base/declare","./Read"],function(a,b){return a("dojo.data.api.Notification",b,{getFeatures:function(){return{"dojo.data.api.Read":!0,"dojo.data.api.Notification":!0}},onSet:function(c,a,b,d){throw Error("Unimplemented API: dojo.data.api.Notification.onSet");},onNew:function(a,b){throw Error("Unimplemented API: dojo.data.api.Notification.onNew");},onDelete:function(a){throw Error("Unimplemented API: dojo.data.api.Notification.onDelete");}})});
-//# sourceMappingURL=Notification.js.map
+define("dojo/data/api/Notification",["../../_base/declare","./Read"],function(_1,_2){
+return _1("dojo.data.api.Notification",_2,{getFeatures:function(){
+return {"dojo.data.api.Read":true,"dojo.data.api.Notification":true};
+},onSet:function(_3,_4,_5,_6){
+throw new Error("Unimplemented API: dojo.data.api.Notification.onSet");
+},onNew:function(_7,_8){
+throw new Error("Unimplemented API: dojo.data.api.Notification.onNew");
+},onDelete:function(_9){
+throw new Error("Unimplemented API: dojo.data.api.Notification.onDelete");
+}});
+});

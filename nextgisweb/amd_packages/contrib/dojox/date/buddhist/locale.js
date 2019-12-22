@@ -1,12 +1,369 @@
 //>>built
-define("dojox/date/buddhist/locale","dojox/main dojo/_base/lang dojo/_base/array dojo/date dojo/i18n dojo/regexp dojo/string ./Date dojo/i18n!dojo/cldr/nls/buddhist".split(" "),function(t,m,n,u,l,v,p,w){function x(d,e,a,g,f){return f.replace(/([a-z])\1*/ig,function(b){var c,a,k=b.charAt(0);b=b.length;var g=["abbr","wide","narrow"];switch(k){case "G":c=e.eraAbbr[0];break;case "y":c=String(d.getFullYear());break;case "M":c=d.getMonth();3>b?(c+=1,a=!0):(k=["months-format",g[b-3]].join("-"),c=e[k][c]);
-break;case "d":c=d.getDate(!0);a=!0;break;case "E":c=d.getDay();3>b?(c+=1,a=!0):(k=["days-format",g[b-3]].join("-"),c=e[k][c]);break;case "a":c=12>d.getHours()?"am":"pm";c=e["dayPeriods-format-wide-"+c];break;case "h":case "H":case "K":case "k":a=d.getHours();switch(k){case "h":c=a%12||12;break;case "H":c=a;break;case "K":c=a%12;break;case "k":c=a||24}a=!0;break;case "m":c=d.getMinutes();a=!0;break;case "s":c=d.getSeconds();a=!0;break;case "S":c=Math.round(d.getMilliseconds()*Math.pow(10,b-3));a=
-!0;break;case "z":if(c=u.getTimezoneName(d.toGregorian()))break;b=4;case "Z":c=d.toGregorian().getTimezoneOffset();c=[0>=c?"+":"-",p.pad(Math.floor(Math.abs(c)/60),2),p.pad(Math.abs(c)%60,2)];4==b&&(c.splice(0,0,"GMT"),c.splice(3,0,":"));c=c.join("");break;default:throw Error("dojox.date.buddhist.locale.formatPattern: invalid pattern char: "+f);}a&&(c=p.pad(c,b));return c})}function q(d,e,a,g){var f=function(b){return b};e=e||f;a=a||f;g=g||f;var b=d.match(/(''|[^'])+/g),c="'"==d.charAt(0);n.forEach(b,
-function(d,k){d?(b[k]=(c?a:e)(d),c=!c):b[k]=""});return g(b.join(""))}function y(d,e,a,g){g=v.escapeString(g);l.normalizeLocale(a.locale);return g.replace(/([a-z])\1*/ig,function(g){var b;b=g.charAt(0);var c=g.length,f="";a.strict?1<c&&(f="0{"+(c-1)+"}"):f="0?";switch(b){case "y":b="\\d+";break;case "M":b=2<c?"\\S+":f+"[1-9]|1[0-2]";break;case "d":b="[12]\\d|"+f+"[1-9]|3[01]";break;case "E":b="\\S+";break;case "h":b=f+"[1-9]|1[0-2]";break;case "k":b=f+"\\d|1[01]";break;case "H":b=f+"\\d|1\\d|2[0-3]";
-break;case "K":b=f+"[1-9]|1\\d|2[0-4]";break;case "m":case "s":b=f+"\\d|[0-5]\\d";break;case "S":b="\\d{"+c+"}";break;case "a":c=a.am||e["dayPeriods-format-wide-am"];f=a.pm||e["dayPeriods-format-wide-pm"];a.strict?b=c+"|"+f:(b=c+"|"+f,c!=c.toLowerCase()&&(b+="|"+c.toLowerCase()),f!=f.toLowerCase()&&(b+="|"+f.toLowerCase()));break;default:b=".*"}d&&d.push(g);return"("+b+")"}).replace(/[\xa0 ]/g,"[\\s\\xa0]")}var h=m.getObject("date.buddhist.locale",!0,t);h.format=function(d,e){e=e||{};var a=l.normalizeLocale(e.locale),
-g=e.formatLength||"short",f=h._getBuddhistBundle(a),b=[],a=m.hitch(this,x,d,f,a,e.fullYear);if("year"==e.selector)return d.getFullYear();if("time"!=e.selector){var c=e.datePattern||f["dateFormat-"+g];c&&b.push(q(c,a))}"date"!=e.selector&&(g=e.timePattern||f["timeFormat-"+g])&&b.push(q(g,a));return b.join(" ")};h.regexp=function(d){return h._parseInfo(d).regexp};h._parseInfo=function(d){d=d||{};var e=l.normalizeLocale(d.locale),e=h._getBuddhistBundle(e),a=d.formatLength||"short",g=d.datePattern||e["dateFormat-"+
-a],a=d.timePattern||e["timeFormat-"+a],f=[];return{regexp:q("date"==d.selector?g:"time"==d.selector?a:"undefined"==typeof a?g:g+" "+a,m.hitch(this,y,f,e,d)),tokens:f,bundle:e}};h.parse=function(d,e){d=d.replace(/[\u200E\u200F\u202A-\u202E]/g,"");e||(e={});var a=h._parseInfo(e),g=a.tokens,f=a.bundle,a=(new RegExp("^"+a.regexp+"$")).exec(d);l.normalizeLocale(e.locale);if(!a)return null;var b=[2513,0,1,0,0,0,0],c="",m=["abbr","wide","narrow"];n.every(a,function(a,d){if(!d)return!0;var h=g[d-1],k=h.length;
-switch(h.charAt(0)){case "y":b[0]=Number(a);break;case "M":if(2<k){if(h=f["months-format-"+m[k-3]].concat(),e.strict||(a=a.replace(".","").toLowerCase(),h=n.map(h,function(a){return a?a.replace(".","").toLowerCase():a})),a=n.indexOf(h,a),-1==a)return!1}else a--;b[1]=Number(a);break;case "D":b[1]=0;case "d":b[2]=Number(a);break;case "a":h=e.am||f["dayPeriods-format-wide-am"];k=e.pm||f["dayPeriods-format-wide-pm"];if(!e.strict){var l=/\./g;a=a.replace(l,"").toLowerCase();h=h.replace(l,"").toLowerCase();
-k=k.replace(l,"").toLowerCase()}if(e.strict&&a!=h&&a!=k)return!1;c=a==k?"p":a==h?"a":"";break;case "K":24==a&&(a=0);case "h":case "H":case "k":b[3]=Number(a);break;case "m":b[4]=Number(a);break;case "s":b[5]=Number(a);break;case "S":b[6]=Number(a)}return!0});a=+b[3];"p"===c&&12>a?b[3]=a+12:"a"===c&&12==a&&(b[3]=0);return new w(b[0],b[1],b[2],b[3],b[4],b[5],b[6])};var r=[];h.addCustomFormats=function(d,e){r.push({pkg:d,name:e})};h._getBuddhistBundle=function(d){var e={};n.forEach(r,function(a){a=l.getLocalization(a.pkg,
-a.name,d);e=m.mixin(e,a)},this);return e};h.addCustomFormats("dojo.cldr","buddhist");h.getNames=function(d,e,a,g,f){var b;g=h._getBuddhistBundle(g);d=[d,a,e];"standAlone"==a&&(a=d.join("-"),b=g[a],1==b[0]&&(b=void 0));d[1]="format";return(b||g[d.join("-")]).concat()};return h});
-//# sourceMappingURL=locale.js.map
+define("dojox/date/buddhist/locale",["dojox/main","dojo/_base/lang","dojo/_base/array","dojo/date","dojo/i18n","dojo/regexp","dojo/string","./Date","dojo/i18n!dojo/cldr/nls/buddhist"],function(_1,_2,_3,dd,_4,_5,_6,_7){
+var _8=_2.getObject("date.buddhist.locale",true,_1);
+function _9(_a,_b,_c,_d,_e){
+return _e.replace(/([a-z])\1*/ig,function(_f){
+var s,pad;
+var c=_f.charAt(0);
+var l=_f.length;
+var _10=["abbr","wide","narrow"];
+switch(c){
+case "G":
+s=_b["eraAbbr"][0];
+break;
+case "y":
+s=String(_a.getFullYear());
+break;
+case "M":
+var m=_a.getMonth();
+if(l<3){
+s=m+1;
+pad=true;
+}else{
+var _11=["months","format",_10[l-3]].join("-");
+s=_b[_11][m];
+}
+break;
+case "d":
+s=_a.getDate(true);
+pad=true;
+break;
+case "E":
+var d=_a.getDay();
+if(l<3){
+s=d+1;
+pad=true;
+}else{
+var _12=["days","format",_10[l-3]].join("-");
+s=_b[_12][d];
+}
+break;
+case "a":
+var _13=(_a.getHours()<12)?"am":"pm";
+s=_b["dayPeriods-format-wide-"+_13];
+break;
+case "h":
+case "H":
+case "K":
+case "k":
+var h=_a.getHours();
+switch(c){
+case "h":
+s=(h%12)||12;
+break;
+case "H":
+s=h;
+break;
+case "K":
+s=(h%12);
+break;
+case "k":
+s=h||24;
+break;
+}
+pad=true;
+break;
+case "m":
+s=_a.getMinutes();
+pad=true;
+break;
+case "s":
+s=_a.getSeconds();
+pad=true;
+break;
+case "S":
+s=Math.round(_a.getMilliseconds()*Math.pow(10,l-3));
+pad=true;
+break;
+case "z":
+s=dd.getTimezoneName(_a.toGregorian());
+if(s){
+break;
+}
+l=4;
+case "Z":
+var _14=_a.toGregorian().getTimezoneOffset();
+var tz=[(_14<=0?"+":"-"),_6.pad(Math.floor(Math.abs(_14)/60),2),_6.pad(Math.abs(_14)%60,2)];
+if(l==4){
+tz.splice(0,0,"GMT");
+tz.splice(3,0,":");
+}
+s=tz.join("");
+break;
+default:
+throw new Error("dojox.date.buddhist.locale.formatPattern: invalid pattern char: "+_e);
+}
+if(pad){
+s=_6.pad(s,l);
+}
+return s;
+});
+};
+_8.format=function(_15,_16){
+_16=_16||{};
+var _17=_4.normalizeLocale(_16.locale);
+var _18=_16.formatLength||"short";
+var _19=_8._getBuddhistBundle(_17);
+var str=[];
+var _1a=_2.hitch(this,_9,_15,_19,_17,_16.fullYear);
+if(_16.selector=="year"){
+var _1b=_15.getFullYear();
+return _1b;
+}
+if(_16.selector!="time"){
+var _1c=_16.datePattern||_19["dateFormat-"+_18];
+if(_1c){
+str.push(_1d(_1c,_1a));
+}
+}
+if(_16.selector!="date"){
+var _1e=_16.timePattern||_19["timeFormat-"+_18];
+if(_1e){
+str.push(_1d(_1e,_1a));
+}
+}
+var _1f=str.join(" ");
+return _1f;
+};
+_8.regexp=function(_20){
+return _8._parseInfo(_20).regexp;
+};
+_8._parseInfo=function(_21){
+_21=_21||{};
+var _22=_4.normalizeLocale(_21.locale);
+var _23=_8._getBuddhistBundle(_22);
+var _24=_21.formatLength||"short";
+var _25=_21.datePattern||_23["dateFormat-"+_24];
+var _26=_21.timePattern||_23["timeFormat-"+_24];
+var _27;
+if(_21.selector=="date"){
+_27=_25;
+}else{
+if(_21.selector=="time"){
+_27=_26;
+}else{
+_27=(typeof (_26)=="undefined")?_25:_25+" "+_26;
+}
+}
+var _28=[];
+var re=_1d(_27,_2.hitch(this,_29,_28,_23,_21));
+return {regexp:re,tokens:_28,bundle:_23};
+};
+_8.parse=function(_2a,_2b){
+_2a=_2a.replace(/[\u200E\u200F\u202A-\u202E]/g,"");
+if(!_2b){
+_2b={};
+}
+var _2c=_8._parseInfo(_2b);
+var _2d=_2c.tokens,_2e=_2c.bundle;
+var re=new RegExp("^"+_2c.regexp+"$");
+var _2f=re.exec(_2a);
+var _30=_4.normalizeLocale(_2b.locale);
+if(!_2f){
+return null;
+}
+var _31,_32;
+var _33=[2513,0,1,0,0,0,0];
+var _34="";
+var _35=0;
+var _36=["abbr","wide","narrow"];
+var _37=_3.every(_2f,function(v,i){
+if(!i){
+return true;
+}
+var _38=_2d[i-1];
+var l=_38.length;
+switch(_38.charAt(0)){
+case "y":
+_33[0]=Number(v);
+break;
+case "M":
+if(l>2){
+var _39=_2e["months-format-"+_36[l-3]].concat();
+if(!_2b.strict){
+v=v.replace(".","").toLowerCase();
+_39=_3.map(_39,function(s){
+return s?s.replace(".","").toLowerCase():s;
+});
+}
+v=_3.indexOf(_39,v);
+if(v==-1){
+return false;
+}
+_35=l;
+}else{
+v--;
+}
+_33[1]=Number(v);
+break;
+case "D":
+_33[1]=0;
+case "d":
+_33[2]=Number(v);
+break;
+case "a":
+var am=_2b.am||_2e["dayPeriods-format-wide-am"],pm=_2b.pm||_2e["dayPeriods-format-wide-pm"];
+if(!_2b.strict){
+var _3a=/\./g;
+v=v.replace(_3a,"").toLowerCase();
+am=am.replace(_3a,"").toLowerCase();
+pm=pm.replace(_3a,"").toLowerCase();
+}
+if(_2b.strict&&v!=am&&v!=pm){
+return false;
+}
+_34=(v==pm)?"p":(v==am)?"a":"";
+break;
+case "K":
+if(v==24){
+v=0;
+}
+case "h":
+case "H":
+case "k":
+_33[3]=Number(v);
+break;
+case "m":
+_33[4]=Number(v);
+break;
+case "s":
+_33[5]=Number(v);
+break;
+case "S":
+_33[6]=Number(v);
+}
+return true;
+});
+var _3b=+_33[3];
+if(_34==="p"&&_3b<12){
+_33[3]=_3b+12;
+}else{
+if(_34==="a"&&_3b==12){
+_33[3]=0;
+}
+}
+var _3c=new _7(_33[0],_33[1],_33[2],_33[3],_33[4],_33[5],_33[6]);
+return _3c;
+};
+function _1d(_3d,_3e,_3f,_40){
+var _41=function(x){
+return x;
+};
+_3e=_3e||_41;
+_3f=_3f||_41;
+_40=_40||_41;
+var _42=_3d.match(/(''|[^'])+/g);
+var _43=_3d.charAt(0)=="'";
+_3.forEach(_42,function(_44,i){
+if(!_44){
+_42[i]="";
+}else{
+_42[i]=(_43?_3f:_3e)(_44);
+_43=!_43;
+}
+});
+return _40(_42.join(""));
+};
+function _29(_45,_46,_47,_48){
+_48=_5.escapeString(_48);
+var _49=_4.normalizeLocale(_47.locale);
+return _48.replace(/([a-z])\1*/ig,function(_4a){
+var s;
+var c=_4a.charAt(0);
+var l=_4a.length;
+var p2="",p3="";
+if(_47.strict){
+if(l>1){
+p2="0"+"{"+(l-1)+"}";
+}
+if(l>2){
+p3="0"+"{"+(l-2)+"}";
+}
+}else{
+p2="0?";
+p3="0{0,2}";
+}
+switch(c){
+case "y":
+s="\\d+";
+break;
+case "M":
+s=(l>2)?"\\S+":p2+"[1-9]|1[0-2]";
+break;
+case "d":
+s="[12]\\d|"+p2+"[1-9]|3[01]";
+break;
+case "E":
+s="\\S+";
+break;
+case "h":
+s=p2+"[1-9]|1[0-2]";
+break;
+case "k":
+s=p2+"\\d|1[01]";
+break;
+case "H":
+s=p2+"\\d|1\\d|2[0-3]";
+break;
+case "K":
+s=p2+"[1-9]|1\\d|2[0-4]";
+break;
+case "m":
+case "s":
+s=p2+"\\d|[0-5]\\d";
+break;
+case "S":
+s="\\d{"+l+"}";
+break;
+case "a":
+var am=_47.am||_46["dayPeriods-format-wide-am"],pm=_47.pm||_46["dayPeriods-format-wide-pm"];
+if(_47.strict){
+s=am+"|"+pm;
+}else{
+s=am+"|"+pm;
+if(am!=am.toLowerCase()){
+s+="|"+am.toLowerCase();
+}
+if(pm!=pm.toLowerCase()){
+s+="|"+pm.toLowerCase();
+}
+}
+break;
+default:
+s=".*";
+}
+if(_45){
+_45.push(_4a);
+}
+return "("+s+")";
+}).replace(/[\xa0 ]/g,"[\\s\\xa0]");
+};
+var _4b=[];
+_8.addCustomFormats=function(_4c,_4d){
+_4b.push({pkg:_4c,name:_4d});
+};
+_8._getBuddhistBundle=function(_4e){
+var _4f={};
+_3.forEach(_4b,function(_50){
+var _51=_4.getLocalization(_50.pkg,_50.name,_4e);
+_4f=_2.mixin(_4f,_51);
+},this);
+return _4f;
+};
+_8.addCustomFormats("dojo.cldr","buddhist");
+_8.getNames=function(_52,_53,_54,_55,_56){
+var _57;
+var _58=_8._getBuddhistBundle(_55);
+var _59=[_52,_54,_53];
+if(_54=="standAlone"){
+var key=_59.join("-");
+_57=_58[key];
+if(_57[0]==1){
+_57=undefined;
+}
+}
+_59[1]="format";
+return (_57||_58[_59.join("-")]).concat();
+};
+return _8;
+});

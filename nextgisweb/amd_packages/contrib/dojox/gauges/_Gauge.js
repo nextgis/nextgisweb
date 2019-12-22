@@ -1,24 +1,445 @@
 //>>built
-define("dojox/gauges/_Gauge","dojo/_base/kernel dojo/_base/declare dojo/_base/lang dojo/_base/html dojo/_base/array dojo/_base/event dojo/_base/connect dojo/dom-construct dijit/_Widget dojox/gfx ./Range dojo/fx/easing".split(" "),function(n,p,l,e,t,f,h,g,q,m,r){n.deprecated("dojox.gauges","Use the new extensible dojox.dgauges framework instead","2.0");var k=0;return p("dojox.gauges._Gauge",[q],{width:0,height:0,background:null,image:null,useRangeStyles:0,useTooltip:!0,majorTicks:null,minorTicks:null,
-_defaultIndicator:null,defaultColors:[[0,84,170,1],[68,119,187,1],[102,153,204,1],[153,187,238,1],[153,204,255,1],[204,238,255,1],[221,238,255,1]],min:null,max:null,surface:null,hideValues:!1,gaugeContent:void 0,_backgroundDefault:{color:"#E0E0E0"},_rangeData:null,_indicatorData:null,_drag:null,_img:null,_overOverlay:!1,_lastHover:"",startup:function(){null===this.image&&(this.image={});this.connect(this.gaugeContent,"onmousedown",this.handleMouseDown);this.connect(this.gaugeContent,"onmousemove",
-this.handleMouseMove);this.connect(this.gaugeContent,"onmouseover",this.handleMouseOver);this.connect(this.gaugeContent,"onmouseout",this.handleMouseOut);this.connect(this.gaugeContent,"touchstart",this.handleTouchStart);this.connect(this.gaugeContent,"touchend",this.handleTouchEnd);this.connect(this.gaugeContent,"touchmove",this.handleTouchMove);l.isArray(this.ranges)||(this.ranges=[]);l.isArray(this.indicators)||(this.indicators=[]);var a=[],b=[],c;if(this.hasChildren()){var d=this.getChildren();
-for(c=0;c<d.length;c++)if(/.*Indicator/.test(d[c].declaredClass))b.push(d[c]);else switch(d[c].declaredClass){case r.prototype.declaredClass:a.push(d[c])}this.ranges=this.ranges.concat(a);this.indicators=this.indicators.concat(b)}this.background||(this.background=this._backgroundDefault);this.background=this.background.color||this.background;this.surface||this.createSurface();this.addRanges(this.ranges);this.minorTicks&&this.minorTicks.interval&&this.setMinorTicks(this.minorTicks);this.majorTicks&&
-this.majorTicks.interval&&this.setMajorTicks(this.majorTicks);for(c=0;c<this.indicators.length;c++)this.addIndicator(this.indicators[c]);this.inherited(arguments)},hasChildren:function(){return 0<this.getChildren().length},buildRendering:function(){var a=this.domNode=this.srcNodeRef?this.srcNodeRef:g.create("div");this.gaugeContent=g.create("div",{className:"dojoxGaugeContent"});this.containerNode=g.create("div");for(this.mouseNode=g.create("div");a.hasChildNodes();)this.containerNode.appendChild(a.firstChild);
-g.place(this.gaugeContent,a);g.place(this.containerNode,a);g.place(this.mouseNode,a)},_setTicks:function(a,b,c){var d;if(a&&l.isArray(a._ticks))for(d=0;d<a._ticks.length;d++)this._removeScaleTick(a._ticks[d]);a={length:b.length,offset:b.offset,noChange:!0};b.color&&(a.color=b.color);b.font&&(a.font=b.font);b.labelPlacement&&(a.direction=b.labelPlacement);b._ticks=[];for(d=this.min;d<=this.max;d+=b.interval)if(d!=this.max||!this._isScaleCircular()){a.value=d;if(c){var e=this._getNumberModule();a.label=
-e?b.fixedPrecision&&b.precision?e.format(d,{places:b.precision}):e.format(d):b.fixedPrecision&&b.precision?d.toFixed(b.precision):d.toString()}b._ticks.push(this._addScaleTick(a,c))}return b},_isScaleCircular:function(){return!1},setMinorTicks:function(a){this.minorTicks=this._setTicks(this.minorTicks,a,!1)},setMajorTicks:function(a){this.majorTicks=this._setTicks(this.majorTicks,a,!0)},postCreate:function(){this.hideValues&&e.style(this.containerNode,"display","none");e.style(this.mouseNode,"width",
-"0");e.style(this.mouseNode,"height","0");e.style(this.mouseNode,"position","absolute");e.style(this.mouseNode,"z-index","100");this.useTooltip&&require(["dijit/Tooltip"],dojo.hitch(this,function(a){a.show("test",this.mouseNode,!this.isLeftToRight());a.hide(this.mouseNode)}))},_getNumberModule:function(){if(0==k)try{k=require("dojo/number")}catch(a){k=null}return k},createSurface:function(){this.gaugeContent.style.width=this.width+"px";this.gaugeContent.style.height=this.height+"px";this.surface=
-m.createSurface(this.gaugeContent,this.width,this.height);this._backgroundGroup=this.surface.createGroup();this._rangeGroup=this.surface.createGroup();this._minorTicksGroup=this.surface.createGroup();this._majorTicksGroup=this.surface.createGroup();this._overlayGroup=this.surface.createGroup();this._indicatorsGroup=this.surface.createGroup();this._foregroundGroup=this.surface.createGroup();this._background=this._backgroundGroup.createRect({x:0,y:0,width:this.width,height:this.height});this._background.setFill(this.background);
-if(this.image.url){var a=this._backgroundGroup;this.image.overlay&&(a=this._overlayGroup);this._img=a.createImage({width:this.image.width||this.width,height:this.image.height||this.height,src:this.image.url});(this.image.x||this.image.y)&&this._img.setTransform({dx:this.image.x||0,dy:this.image.y||0})}},draw:function(){var a;if(this.surface){this.drawBackground(this._backgroundGroup);if(this._rangeData)for(a=0;a<this._rangeData.length;a++)this.drawRange(this._rangeGroup,this._rangeData[a]);if(this._minorTicksData)for(a=
-0;a<this._minorTicksData.length;a++)this._minorTicksData[a].draw(this._minorTicksGroup);if(this._majorTicksData)for(a=0;a<this._majorTicksData.length;a++)this._majorTicksData[a].draw(this._majorTicksGroup);if(this._indicatorData)for(a=0;a<this._indicatorData.length;a++)this._indicatorData[a].draw(this._indicatorsGroup);this.drawForeground(this._foregroundGroup)}},drawBackground:function(a){},drawForeground:function(a){},setBackground:function(a){a||(a=this._backgroundDefault);this.background=a.color||
-a;this._background.setFill(this.background)},addRange:function(a){this.addRanges([a])},addRanges:function(a){this._rangeData||(this._rangeData=[]);for(var b,c=0;c<a.length;c++){b=a[c];if(null===this.min||b.low<this.min)this.min=b.low;if(null===this.max||b.high>this.max)this.max=b.high;if(!b.color){var d=this._rangeData.length%this.defaultColors.length;m.svg&&0<this.useRangeStyles?(d=this._rangeData.length%this.useRangeStyles+1,b.color={style:"dojoxGaugeRange"+d}):(d=this._rangeData.length%this.defaultColors.length,
-b.color=this.defaultColors[d])}this._rangeData[this._rangeData.length]=b}this.draw()},_addScaleTick:function(a,b){a.declaredClass||(a=new this._defaultIndicator(a));a._gauge=this;b?(this._majorTicksData||(this._majorTicksData=[]),this._majorTicksData[this._majorTicksData.length]=a,a.draw(this._majorTicksGroup)):(this._minorTicksData||(this._minorTicksData=[]),this._minorTicksData[this._minorTicksData.length]=a,a.draw(this._minorTicksGroup));return a},_removeScaleTick:function(a){var b;if(this._majorTicksData)for(b=
-0;b<this._majorTicksData.length;b++)if(this._majorTicksData[b]===a){this._majorTicksData.splice(b,1);a.remove();return}if(this._minorTicksData)for(b=0;b<this._minorTicksData.length;b++)if(this._minorTicksData[b]===a){this._minorTicksData.splice(b,1);a.remove();break}},addIndicator:function(a){a.declaredClass||(a=new this._defaultIndicator(a));a._gauge=this;a.hideValue||this.containerNode.appendChild(a.domNode);this._indicatorData||(this._indicatorData=[]);this._indicatorData[this._indicatorData.length]=
-a;a.draw(this._indicatorsGroup);return a},removeIndicator:function(a){for(var b=0;b<this._indicatorData.length;b++)if(this._indicatorData[b]===a){this._indicatorData.splice(b,1);a.remove();break}},moveIndicatorToFront:function(a){a.shape&&a.shape.moveToFront()},drawText:function(a,b,c,d,e,f,g){a=a.createText({x:c,y:d,text:b,align:e});a.setFill(f?f:"black");g&&a.setFont(g);return a},removeText:function(a){a.parent&&a.parent.remove(a)},updateTooltip:function(a,b){this.useTooltip&&require(["dijit/Tooltip"],
-dojo.hitch(this,function(b){this._lastHover!=a&&(""!==a?(b.hide(this.mouseNode),b.show(a,this.mouseNode,!this.isLeftToRight())):b.hide(this.mouseNode),this._lastHover=a)}))},handleMouseOver:function(a){if(this.image&&this.image.overlay&&a.target==this._img.getEventSource()){var b;this._overOverlay=!0;var c=this.getRangeUnderMouse(a);c&&c.hover&&(b=c.hover);this.useTooltip&&!this._drag&&(b?this.updateTooltip(b,a):this.updateTooltip("",a))}},handleMouseOut:function(a){this._overOverlay=!1;this._hideTooltip()},
-handleMouseMove:function(a){if(this.useTooltip&&(a&&(e.style(this.mouseNode,"left",a.pageX+1+"px"),e.style(this.mouseNode,"top",a.pageY+1+"px")),this._overOverlay)){var b=this.getRangeUnderMouse(a);b&&b.hover?this.updateTooltip(b.hover,a):this.updateTooltip("",a)}},handleMouseDown:function(a){var b=this._getInteractiveIndicator();b&&this._handleMouseDownIndicator(b,a)},_handleDragInteractionMouseMove:function(a){this._drag&&(this._dragIndicator(this,a),f.stop(a))},_handleDragInteractionMouseUp:function(a){this._drag=
-null;for(var b=0;b<this._mouseListeners.length;b++)h.disconnect(this._mouseListeners[b]);this._mouseListeners=[];f.stop(a)},_handleMouseDownIndicator:function(a,b){a.noChange||(this._mouseListeners||(this._mouseListeners=[]),this._drag=a,this._mouseListeners.push(h.connect(document,"onmouseup",this,this._handleDragInteractionMouseUp)),this._mouseListeners.push(h.connect(document,"onmousemove",this,this._handleDragInteractionMouseMove)),this._mouseListeners.push(h.connect(document,"ondragstart",this,
-f.stop)),this._mouseListeners.push(h.connect(document,"onselectstart",this,f.stop)),this._dragIndicator(this,b),f.stop(b))},_handleMouseOverIndicator:function(a,b){this.useTooltip&&!this._drag&&(a.hover?require(["dijit/Tooltip"],dojo.hitch(this,function(c){e.style(this.mouseNode,"left",b.pageX+1+"px");e.style(this.mouseNode,"top",b.pageY+1+"px");c.show(a.hover,this.mouseNode,!this.isLeftToRight())})):this.updateTooltip("",b));a.onDragMove&&!a.noChange&&(this.gaugeContent.style.cursor="pointer")},
-_handleMouseOutIndicator:function(a,b){this._hideTooltip();this.gaugeContent.style.cursor="pointer"},_hideTooltip:function(){this.useTooltip&&this.mouseNode&&require(["dijit/Tooltip"],dojo.hitch(this,function(a){a.hide(this.mouseNode)}))},_handleMouseOutRange:function(a,b){this._hideTooltip()},_handleMouseOverRange:function(a,b){this.useTooltip&&!this._drag&&(a.hover?(e.style(this.mouseNode,"left",b.pageX+1+"px"),e.style(this.mouseNode,"top",b.pageY+1+"px"),require(["dijit/Tooltip"],dojo.hitch(this,
-function(b){b.show(a.hover,this.mouseNode,!this.isLeftToRight())}))):this.updateTooltip("",b))},handleTouchStartIndicator:function(a,b){a.noChange||(this._drag=a,f.stop(b))},handleTouchStart:function(a){this._drag=this._getInteractiveIndicator();this.handleTouchMove(a)},handleTouchEnd:function(a){this._drag&&(this._drag=null,f.stop(a))},handleTouchMove:function(a){if(this._drag&&!this._drag.noChange){var b=a.touches[0];this._dragIndicatorAt(this,b.pageX,b.pageY);f.stop(a)}},_getInteractiveIndicator:function(){for(var a=
-0;a<this._indicatorData.length;a++){var b=this._indicatorData[a];if("gauge"==b.interactionMode&&!b.noChange)return b}return null}})});
-//# sourceMappingURL=_Gauge.js.map
+define("dojox/gauges/_Gauge",["dojo/_base/kernel","dojo/_base/declare","dojo/_base/lang","dojo/_base/html","dojo/_base/array","dojo/_base/event","dojo/_base/connect","dojo/dom-construct","dijit/_Widget","dojox/gfx","./Range","dojo/fx/easing"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b){
+_1.deprecated("dojox.gauges","Use the new extensible dojox.dgauges framework instead","2.0");
+var _c=0;
+var _d=0;
+return _2("dojox.gauges._Gauge",[_9],{width:0,height:0,background:null,image:null,useRangeStyles:0,useTooltip:true,majorTicks:null,minorTicks:null,_defaultIndicator:null,defaultColors:[[0,84,170,1],[68,119,187,1],[102,153,204,1],[153,187,238,1],[153,204,255,1],[204,238,255,1],[221,238,255,1]],min:null,max:null,surface:null,hideValues:false,gaugeContent:undefined,_backgroundDefault:{color:"#E0E0E0"},_rangeData:null,_indicatorData:null,_drag:null,_img:null,_overOverlay:false,_lastHover:"",startup:function(){
+if(this.image===null){
+this.image={};
+}
+this.connect(this.gaugeContent,"onmousedown",this.handleMouseDown);
+this.connect(this.gaugeContent,"onmousemove",this.handleMouseMove);
+this.connect(this.gaugeContent,"onmouseover",this.handleMouseOver);
+this.connect(this.gaugeContent,"onmouseout",this.handleMouseOut);
+this.connect(this.gaugeContent,"touchstart",this.handleTouchStart);
+this.connect(this.gaugeContent,"touchend",this.handleTouchEnd);
+this.connect(this.gaugeContent,"touchmove",this.handleTouchMove);
+if(!_3.isArray(this.ranges)){
+this.ranges=[];
+}
+if(!_3.isArray(this.indicators)){
+this.indicators=[];
+}
+var _e=[],_f=[];
+var i;
+if(this.hasChildren()){
+var _10=this.getChildren();
+for(i=0;i<_10.length;i++){
+if(/.*Indicator/.test(_10[i].declaredClass)){
+_f.push(_10[i]);
+continue;
+}
+switch(_10[i].declaredClass){
+case _b.prototype.declaredClass:
+_e.push(_10[i]);
+break;
+}
+}
+this.ranges=this.ranges.concat(_e);
+this.indicators=this.indicators.concat(_f);
+}
+if(!this.background){
+this.background=this._backgroundDefault;
+}
+this.background=this.background.color||this.background;
+if(!this.surface){
+this.createSurface();
+}
+this.addRanges(this.ranges);
+if(this.minorTicks&&this.minorTicks.interval){
+this.setMinorTicks(this.minorTicks);
+}
+if(this.majorTicks&&this.majorTicks.interval){
+this.setMajorTicks(this.majorTicks);
+}
+for(i=0;i<this.indicators.length;i++){
+this.addIndicator(this.indicators[i]);
+}
+this.inherited(arguments);
+},hasChildren:function(){
+return this.getChildren().length>0;
+},buildRendering:function(){
+var n=this.domNode=this.srcNodeRef?this.srcNodeRef:_8.create("div");
+this.gaugeContent=_8.create("div",{className:"dojoxGaugeContent"});
+this.containerNode=_8.create("div");
+this.mouseNode=_8.create("div");
+while(n.hasChildNodes()){
+this.containerNode.appendChild(n.firstChild);
+}
+_8.place(this.gaugeContent,n);
+_8.place(this.containerNode,n);
+_8.place(this.mouseNode,n);
+},_setTicks:function(_11,_12,_13){
+var i;
+if(_11&&_3.isArray(_11._ticks)){
+for(i=0;i<_11._ticks.length;i++){
+this._removeScaleTick(_11._ticks[i]);
+}
+}
+var t={length:_12.length,offset:_12.offset,noChange:true};
+if(_12.color){
+t.color=_12.color;
+}
+if(_12.font){
+t.font=_12.font;
+}
+if(_12.labelPlacement){
+t.direction=_12.labelPlacement;
+}
+_12._ticks=[];
+for(i=this.min;i<=this.max;i+=_12.interval){
+if(i==this.max&&this._isScaleCircular()){
+continue;
+}
+t.value=i;
+if(_13){
+var _14=this._getNumberModule();
+if(_14){
+t.label=(_12.fixedPrecision&&_12.precision)?_14.format(i,{places:_12.precision}):_14.format(i);
+}else{
+t.label=(_12.fixedPrecision&&_12.precision)?i.toFixed(_12.precision):i.toString();
+}
+}
+_12._ticks.push(this._addScaleTick(t,_13));
+}
+return _12;
+},_isScaleCircular:function(){
+return false;
+},setMinorTicks:function(_15){
+this.minorTicks=this._setTicks(this.minorTicks,_15,false);
+},setMajorTicks:function(_16){
+this.majorTicks=this._setTicks(this.majorTicks,_16,true);
+},postCreate:function(){
+if(this.hideValues){
+_4.style(this.containerNode,"display","none");
+}
+_4.style(this.mouseNode,"width","0");
+_4.style(this.mouseNode,"height","0");
+_4.style(this.mouseNode,"position","absolute");
+_4.style(this.mouseNode,"z-index","100");
+if(this.useTooltip){
+require(["dijit/Tooltip"],dojo.hitch(this,function(_17){
+_17.show("test",this.mouseNode,!this.isLeftToRight());
+_17.hide(this.mouseNode);
+}));
+}
+},_getNumberModule:function(){
+if(_d==0){
+try{
+_d=require("dojo/number");
+}
+catch(e){
+_d=null;
+}
+}
+return _d;
+},createSurface:function(){
+this.gaugeContent.style.width=this.width+"px";
+this.gaugeContent.style.height=this.height+"px";
+this.surface=_a.createSurface(this.gaugeContent,this.width,this.height);
+this._backgroundGroup=this.surface.createGroup();
+this._rangeGroup=this.surface.createGroup();
+this._minorTicksGroup=this.surface.createGroup();
+this._majorTicksGroup=this.surface.createGroup();
+this._overlayGroup=this.surface.createGroup();
+this._indicatorsGroup=this.surface.createGroup();
+this._foregroundGroup=this.surface.createGroup();
+this._background=this._backgroundGroup.createRect({x:0,y:0,width:this.width,height:this.height});
+this._background.setFill(this.background);
+if(this.image.url){
+var _18=this._backgroundGroup;
+if(this.image.overlay){
+_18=this._overlayGroup;
+}
+this._img=_18.createImage({width:this.image.width||this.width,height:this.image.height||this.height,src:this.image.url});
+if(this.image.x||this.image.y){
+this._img.setTransform({dx:this.image.x||0,dy:this.image.y||0});
+}
+}
+},draw:function(){
+var i;
+if(!this.surface){
+return;
+}
+this.drawBackground(this._backgroundGroup);
+if(this._rangeData){
+for(i=0;i<this._rangeData.length;i++){
+this.drawRange(this._rangeGroup,this._rangeData[i]);
+}
+}
+if(this._minorTicksData){
+for(i=0;i<this._minorTicksData.length;i++){
+this._minorTicksData[i].draw(this._minorTicksGroup);
+}
+}
+if(this._majorTicksData){
+for(i=0;i<this._majorTicksData.length;i++){
+this._majorTicksData[i].draw(this._majorTicksGroup);
+}
+}
+if(this._indicatorData){
+for(i=0;i<this._indicatorData.length;i++){
+this._indicatorData[i].draw(this._indicatorsGroup);
+}
+}
+this.drawForeground(this._foregroundGroup);
+},drawBackground:function(_19){
+},drawForeground:function(_1a){
+},setBackground:function(_1b){
+if(!_1b){
+_1b=this._backgroundDefault;
+}
+this.background=_1b.color||_1b;
+this._background.setFill(this.background);
+},addRange:function(_1c){
+this.addRanges([_1c]);
+},addRanges:function(_1d){
+if(!this._rangeData){
+this._rangeData=[];
+}
+var _1e;
+for(var i=0;i<_1d.length;i++){
+_1e=_1d[i];
+if((this.min===null)||(_1e.low<this.min)){
+this.min=_1e.low;
+}
+if((this.max===null)||(_1e.high>this.max)){
+this.max=_1e.high;
+}
+if(!_1e.color){
+var _1f=this._rangeData.length%this.defaultColors.length;
+if(_a.svg&&this.useRangeStyles>0){
+_1f=(this._rangeData.length%this.useRangeStyles)+1;
+_1e.color={style:"dojoxGaugeRange"+_1f};
+}else{
+_1f=this._rangeData.length%this.defaultColors.length;
+_1e.color=this.defaultColors[_1f];
+}
+}
+this._rangeData[this._rangeData.length]=_1e;
+}
+this.draw();
+},_addScaleTick:function(_20,_21){
+if(!_20.declaredClass){
+_20=new this._defaultIndicator(_20);
+}
+_20._gauge=this;
+if(_21){
+if(!this._majorTicksData){
+this._majorTicksData=[];
+}
+this._majorTicksData[this._majorTicksData.length]=_20;
+_20.draw(this._majorTicksGroup);
+}else{
+if(!this._minorTicksData){
+this._minorTicksData=[];
+}
+this._minorTicksData[this._minorTicksData.length]=_20;
+_20.draw(this._minorTicksGroup);
+}
+return _20;
+},_removeScaleTick:function(_22){
+var i;
+if(this._majorTicksData){
+for(i=0;i<this._majorTicksData.length;i++){
+if(this._majorTicksData[i]===_22){
+this._majorTicksData.splice(i,1);
+_22.remove();
+return;
+}
+}
+}
+if(this._minorTicksData){
+for(i=0;i<this._minorTicksData.length;i++){
+if(this._minorTicksData[i]===_22){
+this._minorTicksData.splice(i,1);
+_22.remove();
+return;
+}
+}
+}
+},addIndicator:function(_23){
+if(!_23.declaredClass){
+_23=new this._defaultIndicator(_23);
+}
+_23._gauge=this;
+if(!_23.hideValue){
+this.containerNode.appendChild(_23.domNode);
+}
+if(!this._indicatorData){
+this._indicatorData=[];
+}
+this._indicatorData[this._indicatorData.length]=_23;
+_23.draw(this._indicatorsGroup);
+return _23;
+},removeIndicator:function(_24){
+for(var i=0;i<this._indicatorData.length;i++){
+if(this._indicatorData[i]===_24){
+this._indicatorData.splice(i,1);
+_24.remove();
+break;
+}
+}
+},moveIndicatorToFront:function(_25){
+if(_25.shape){
+_25.shape.moveToFront();
+}
+},drawText:function(_26,txt,x,y,_27,_28,_29){
+var t=_26.createText({x:x,y:y,text:txt,align:_27});
+t.setFill(_28?_28:"black");
+if(_29){
+t.setFont(_29);
+}
+return t;
+},removeText:function(t){
+if(t.parent){
+t.parent.remove(t);
+}
+},updateTooltip:function(txt,e){
+if(this.useTooltip){
+require(["dijit/Tooltip"],dojo.hitch(this,function(_2a){
+if(this._lastHover!=txt){
+if(txt!==""){
+_2a.hide(this.mouseNode);
+_2a.show(txt,this.mouseNode,!this.isLeftToRight());
+}else{
+_2a.hide(this.mouseNode);
+}
+this._lastHover=txt;
+}
+}));
+}
+},handleMouseOver:function(e){
+if(this.image&&this.image.overlay){
+if(e.target==this._img.getEventSource()){
+var _2b;
+this._overOverlay=true;
+var r=this.getRangeUnderMouse(e);
+if(r&&r.hover){
+_2b=r.hover;
+}
+if(this.useTooltip&&!this._drag){
+if(_2b){
+this.updateTooltip(_2b,e);
+}else{
+this.updateTooltip("",e);
+}
+}
+}
+}
+},handleMouseOut:function(e){
+this._overOverlay=false;
+this._hideTooltip();
+},handleMouseMove:function(e){
+if(this.useTooltip){
+if(e){
+_4.style(this.mouseNode,"left",e.pageX+1+"px");
+_4.style(this.mouseNode,"top",e.pageY+1+"px");
+}
+if(this._overOverlay){
+var r=this.getRangeUnderMouse(e);
+if(r&&r.hover){
+this.updateTooltip(r.hover,e);
+}else{
+this.updateTooltip("",e);
+}
+}
+}
+},handleMouseDown:function(e){
+var _2c=this._getInteractiveIndicator();
+if(_2c){
+this._handleMouseDownIndicator(_2c,e);
+}
+},_handleDragInteractionMouseMove:function(e){
+if(this._drag){
+this._dragIndicator(this,e);
+_6.stop(e);
+}
+},_handleDragInteractionMouseUp:function(e){
+this._drag=null;
+for(var i=0;i<this._mouseListeners.length;i++){
+_7.disconnect(this._mouseListeners[i]);
+}
+this._mouseListeners=[];
+_6.stop(e);
+},_handleMouseDownIndicator:function(_2d,e){
+if(!_2d.noChange){
+if(!this._mouseListeners){
+this._mouseListeners=[];
+}
+this._drag=_2d;
+this._mouseListeners.push(_7.connect(document,"onmouseup",this,this._handleDragInteractionMouseUp));
+this._mouseListeners.push(_7.connect(document,"onmousemove",this,this._handleDragInteractionMouseMove));
+this._mouseListeners.push(_7.connect(document,"ondragstart",this,_6.stop));
+this._mouseListeners.push(_7.connect(document,"onselectstart",this,_6.stop));
+this._dragIndicator(this,e);
+_6.stop(e);
+}
+},_handleMouseOverIndicator:function(_2e,e){
+if(this.useTooltip&&!this._drag){
+if(_2e.hover){
+require(["dijit/Tooltip"],dojo.hitch(this,function(_2f){
+_4.style(this.mouseNode,"left",e.pageX+1+"px");
+_4.style(this.mouseNode,"top",e.pageY+1+"px");
+_2f.show(_2e.hover,this.mouseNode,!this.isLeftToRight());
+}));
+}else{
+this.updateTooltip("",e);
+}
+}
+if(_2e.onDragMove&&!_2e.noChange){
+this.gaugeContent.style.cursor="pointer";
+}
+},_handleMouseOutIndicator:function(_30,e){
+this._hideTooltip();
+this.gaugeContent.style.cursor="pointer";
+},_hideTooltip:function(){
+if(this.useTooltip&&this.mouseNode){
+require(["dijit/Tooltip"],dojo.hitch(this,function(_31){
+_31.hide(this.mouseNode);
+}));
+}
+},_handleMouseOutRange:function(_32,e){
+this._hideTooltip();
+},_handleMouseOverRange:function(_33,e){
+if(this.useTooltip&&!this._drag){
+if(_33.hover){
+_4.style(this.mouseNode,"left",e.pageX+1+"px");
+_4.style(this.mouseNode,"top",e.pageY+1+"px");
+require(["dijit/Tooltip"],dojo.hitch(this,function(_34){
+_34.show(_33.hover,this.mouseNode,!this.isLeftToRight());
+}));
+}else{
+this.updateTooltip("",e);
+}
+}
+},handleTouchStartIndicator:function(_35,e){
+if(!_35.noChange){
+this._drag=_35;
+_6.stop(e);
+}
+},handleTouchStart:function(e){
+this._drag=this._getInteractiveIndicator();
+this.handleTouchMove(e);
+},handleTouchEnd:function(e){
+if(this._drag){
+this._drag=null;
+_6.stop(e);
+}
+},handleTouchMove:function(e){
+if(this._drag&&!this._drag.noChange){
+var _36=e.touches;
+var _37=_36[0];
+this._dragIndicatorAt(this,_37.pageX,_37.pageY);
+_6.stop(e);
+}
+},_getInteractiveIndicator:function(){
+for(var i=0;i<this._indicatorData.length;i++){
+var _38=this._indicatorData[i];
+if(_38.interactionMode=="gauge"&&!_38.noChange){
+return _38;
+}
+}
+return null;
+}});
+});

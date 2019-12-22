@@ -1,9 +1,162 @@
 //>>built
-define("dojox/data/PicasaStore","dojo/_base/lang dojo/_base/declare dojo/_base/connect dojo/io/script dojo/data/util/simpleFetch dojo/date/stamp".split(" "),function(g,d,h,k,l,f){d=d("dojox.data.PicasaStore",null,{constructor:function(a){a&&a.label&&(this.label=a.label);a&&"urlPreventCache"in a&&(this.urlPreventCache=a.urlPreventCache?!0:!1);a&&"maxResults"in a&&(this.maxResults=parseInt(a.maxResults),this.maxResults||(this.maxResults=20))},_picasaUrl:"http://picasaweb.google.com/data/feed/api/all",
-_storeRef:"_S",label:"title",urlPreventCache:!1,maxResults:20,_assertIsItem:function(a){if(!this.isItem(a))throw Error("dojox.data.PicasaStore: a function was passed an item argument that was not an item");},_assertIsAttribute:function(a){if("string"!==typeof a)throw Error("dojox.data.PicasaStore: a function was passed an attribute argument that was not an attribute name string");},getFeatures:function(){return{"dojo.data.api.Read":!0}},getValue:function(a,b,e){return(a=this.getValues(a,b))&&0<a.length?
-a[0]:e},getAttributes:function(a){return"id published updated category title$type title summary$type summary rights$type rights link author gphoto$id gphoto$name location imageUrlSmall imageUrlMedium imageUrl datePublished dateTaken description".split(" ")},hasAttribute:function(a,b){return this.getValue(a,b)?!0:!1},isItemLoaded:function(a){return this.isItem(a)},loadItem:function(a){},getLabel:function(a){return this.getValue(a,this.label)},getLabelAttributes:function(a){return[this.label]},containsValue:function(a,
-b,e){a=this.getValues(a,b);for(b=0;b<a.length;b++)if(a[b]===e)return!0;return!1},getValues:function(a,b){this._assertIsItem(a);this._assertIsAttribute(b);return"title"===b?[this._unescapeHtml(a.title)]:"author"===b?[this._unescapeHtml(a.author[0].name)]:"datePublished"===b?[dateAtamp.fromISOString(a.published)]:"dateTaken"===b?[f.fromISOString(a.published)]:"updated"===b?[f.fromISOString(a.updated)]:"imageUrlSmall"===b?[a.media.thumbnail[1].url]:"imageUrl"===b?[a.content$src]:"imageUrlMedium"===b?
-[a.media.thumbnail[2].url]:"link"===b?[a.link[1]]:"tags"===b?a.tags.split(" "):"description"===b?[this._unescapeHtml(a.summary)]:[]},isItem:function(a){return a&&a[this._storeRef]===this?!0:!1},close:function(a){},_fetchItems:function(a,b,e){a.query||(a.query={});var c={alt:"jsonm",pp:"1",psc:"G","start-index":"1"};a.query.start&&(c["start-index"]=a.query.start);a.query.tags&&(c.q=a.query.tags);a.query.userid&&(c.uname=a.query.userid);a.query.userids&&(c.ids=a.query.userids);a.query.lang&&(c.hl=a.query.lang);
-c["max-results"]=this.maxResults;var d=this;k.get({url:this._picasaUrl,preventCache:this.urlPreventCache,content:c,callbackParamName:"callback",handle:function(c){b(d._processPicasaData(c),a)}}).addErrback(function(b){h.disconnect(null);e(b,a)})},_processPicasaData:function(a){var b=[];if(a.feed)for(b=a.feed.entry,a=0;a<b.length;a++)b[a][this._storeRef]=this;return b},_unescapeHtml:function(a){a&&(a=a.replace(/&amp;/gm,"\x26").replace(/&lt;/gm,"\x3c").replace(/&gt;/gm,"\x3e").replace(/&quot;/gm,'"'),
-a=a.replace(/&#39;/gm,"'"));return a}});g.extend(d,l);return d});
-//# sourceMappingURL=PicasaStore.js.map
+define("dojox/data/PicasaStore",["dojo/_base/lang","dojo/_base/declare","dojo/_base/connect","dojo/io/script","dojo/data/util/simpleFetch","dojo/date/stamp"],function(_1,_2,_3,_4,_5,_6){
+var _7=_2("dojox.data.PicasaStore",null,{constructor:function(_8){
+if(_8&&_8.label){
+this.label=_8.label;
+}
+if(_8&&"urlPreventCache" in _8){
+this.urlPreventCache=_8.urlPreventCache?true:false;
+}
+if(_8&&"maxResults" in _8){
+this.maxResults=parseInt(_8.maxResults);
+if(!this.maxResults){
+this.maxResults=20;
+}
+}
+},_picasaUrl:"http://picasaweb.google.com/data/feed/api/all",_storeRef:"_S",label:"title",urlPreventCache:false,maxResults:20,_assertIsItem:function(_9){
+if(!this.isItem(_9)){
+throw new Error("dojox.data.PicasaStore: a function was passed an item argument that was not an item");
+}
+},_assertIsAttribute:function(_a){
+if(typeof _a!=="string"){
+throw new Error("dojox.data.PicasaStore: a function was passed an attribute argument that was not an attribute name string");
+}
+},getFeatures:function(){
+return {"dojo.data.api.Read":true};
+},getValue:function(_b,_c,_d){
+var _e=this.getValues(_b,_c);
+if(_e&&_e.length>0){
+return _e[0];
+}
+return _d;
+},getAttributes:function(_f){
+return ["id","published","updated","category","title$type","title","summary$type","summary","rights$type","rights","link","author","gphoto$id","gphoto$name","location","imageUrlSmall","imageUrlMedium","imageUrl","datePublished","dateTaken","description"];
+},hasAttribute:function(_10,_11){
+if(this.getValue(_10,_11)){
+return true;
+}
+return false;
+},isItemLoaded:function(_12){
+return this.isItem(_12);
+},loadItem:function(_13){
+},getLabel:function(_14){
+return this.getValue(_14,this.label);
+},getLabelAttributes:function(_15){
+return [this.label];
+},containsValue:function(_16,_17,_18){
+var _19=this.getValues(_16,_17);
+for(var i=0;i<_19.length;i++){
+if(_19[i]===_18){
+return true;
+}
+}
+return false;
+},getValues:function(_1a,_1b){
+this._assertIsItem(_1a);
+this._assertIsAttribute(_1b);
+if(_1b==="title"){
+return [this._unescapeHtml(_1a.title)];
+}else{
+if(_1b==="author"){
+return [this._unescapeHtml(_1a.author[0].name)];
+}else{
+if(_1b==="datePublished"){
+return [dateAtamp.fromISOString(_1a.published)];
+}else{
+if(_1b==="dateTaken"){
+return [_6.fromISOString(_1a.published)];
+}else{
+if(_1b==="updated"){
+return [_6.fromISOString(_1a.updated)];
+}else{
+if(_1b==="imageUrlSmall"){
+return [_1a.media.thumbnail[1].url];
+}else{
+if(_1b==="imageUrl"){
+return [_1a.content$src];
+}else{
+if(_1b==="imageUrlMedium"){
+return [_1a.media.thumbnail[2].url];
+}else{
+if(_1b==="link"){
+return [_1a.link[1]];
+}else{
+if(_1b==="tags"){
+return _1a.tags.split(" ");
+}else{
+if(_1b==="description"){
+return [this._unescapeHtml(_1a.summary)];
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+return [];
+},isItem:function(_1c){
+if(_1c&&_1c[this._storeRef]===this){
+return true;
+}
+return false;
+},close:function(_1d){
+},_fetchItems:function(_1e,_1f,_20){
+if(!_1e.query){
+_1e.query={};
+}
+var _21={alt:"jsonm",pp:"1",psc:"G"};
+_21["start-index"]="1";
+if(_1e.query.start){
+_21["start-index"]=_1e.query.start;
+}
+if(_1e.query.tags){
+_21.q=_1e.query.tags;
+}
+if(_1e.query.userid){
+_21.uname=_1e.query.userid;
+}
+if(_1e.query.userids){
+_21.ids=_1e.query.userids;
+}
+if(_1e.query.lang){
+_21.hl=_1e.query.lang;
+}
+_21["max-results"]=this.maxResults;
+var _22=this;
+var _23=null;
+var _24=function(_25){
+if(_23!==null){
+_3.disconnect(_23);
+}
+_1f(_22._processPicasaData(_25),_1e);
+};
+var _26={url:this._picasaUrl,preventCache:this.urlPreventCache,content:_21,callbackParamName:"callback",handle:_24};
+var _27=_4.get(_26);
+_27.addErrback(function(_28){
+_3.disconnect(_23);
+_20(_28,_1e);
+});
+},_processPicasaData:function(_29){
+var _2a=[];
+if(_29.feed){
+_2a=_29.feed.entry;
+for(var i=0;i<_2a.length;i++){
+var _2b=_2a[i];
+_2b[this._storeRef]=this;
+}
+}
+return _2a;
+},_unescapeHtml:function(str){
+if(str){
+str=str.replace(/&amp;/gm,"&").replace(/&lt;/gm,"<").replace(/&gt;/gm,">").replace(/&quot;/gm,"\"");
+str=str.replace(/&#39;/gm,"'");
+}
+return str;
+}});
+_1.extend(_7,_5);
+return _7;
+});

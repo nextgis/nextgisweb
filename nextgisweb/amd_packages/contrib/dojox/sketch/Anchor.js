@@ -1,5 +1,59 @@
 //>>built
-define("dojox/sketch/Anchor",["dojo/_base/kernel","dojo/_base/lang","../gfx"],function(e){e.getObject("sketch",!0,dojox);dojox.sketch.Anchor=function(a,b,g){var e=this,f=null;this.type=function(){return"Anchor"};this.annotation=a;this.id=b;this._key="anchor-"+dojox.sketch.Anchor.count++;this.shape=null;this.isControl=null!=g?g:!0;this.beginEdit=function(){this.annotation.beginEdit(dojox.sketch.CommandTypes.Modify)};this.endEdit=function(){this.annotation.endEdit()};this.zoom=function(c){if(this.shape){var d=
-Math.floor(4/c);c="vml"==dojox.gfx.renderer?1:1/c;this.shape.setShape({x:a[b].x-d,y:a[b].y-d,width:2*d,height:2*d}).setStroke({color:"black",width:c})}};this.setBinding=function(c){a[b]={x:a[b].x+c.dx,y:a[b].y+c.dy};a.draw();a.drawBBox()};this.setUndo=function(){a.setUndo()};this.enable=function(){a.shape&&(a.figure._add(this),f={x:a[b].x-4,y:a[b].y-4,width:8,height:8},this.shape=a.shape.createRect(f).setFill([255,255,255,.35]),this.shape.getEventSource().setAttribute("id",e._key),this.shape.getEventSource().setAttribute("shape-rendering",
-"crispEdges"),this.zoom(a.figure.zoomFactor))};this.disable=function(){a.figure._remove(this);a.shape&&a.shape.remove(this.shape);f=this.shape=null}};dojox.sketch.Anchor.count=0;return dojox.sketch.Anchor});
-//# sourceMappingURL=Anchor.js.map
+define("dojox/sketch/Anchor",["dojo/_base/kernel","dojo/_base/lang","../gfx"],function(_1){
+_1.getObject("sketch",true,dojox);
+dojox.sketch.Anchor=function(an,id,_2){
+var _3=this;
+var _4=4;
+var _5=null;
+this.type=function(){
+return "Anchor";
+};
+this.annotation=an;
+this.id=id;
+this._key="anchor-"+dojox.sketch.Anchor.count++;
+this.shape=null;
+this.isControl=(_2!=null)?_2:true;
+this.beginEdit=function(){
+this.annotation.beginEdit(dojox.sketch.CommandTypes.Modify);
+};
+this.endEdit=function(){
+this.annotation.endEdit();
+};
+this.zoom=function(_6){
+if(this.shape){
+var rs=Math.floor(_4/_6);
+var _7=dojox.gfx.renderer=="vml"?1:1/_6;
+this.shape.setShape({x:an[id].x-rs,y:an[id].y-rs,width:rs*2,height:rs*2}).setStroke({color:"black",width:_7});
+}
+};
+this.setBinding=function(pt){
+an[id]={x:an[id].x+pt.dx,y:an[id].y+pt.dy};
+an.draw();
+an.drawBBox();
+};
+this.setUndo=function(){
+an.setUndo();
+};
+this.enable=function(){
+if(!an.shape){
+return;
+}
+an.figure._add(this);
+_5={x:an[id].x-_4,y:an[id].y-_4,width:_4*2,height:_4*2};
+this.shape=an.shape.createRect(_5).setFill([255,255,255,0.35]);
+this.shape.getEventSource().setAttribute("id",_3._key);
+this.shape.getEventSource().setAttribute("shape-rendering","crispEdges");
+this.zoom(an.figure.zoomFactor);
+};
+this.disable=function(){
+an.figure._remove(this);
+if(an.shape){
+an.shape.remove(this.shape);
+}
+this.shape=null;
+_5=null;
+};
+};
+dojox.sketch.Anchor.count=0;
+return dojox.sketch.Anchor;
+});

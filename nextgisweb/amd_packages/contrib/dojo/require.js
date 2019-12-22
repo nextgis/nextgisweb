@@ -5,5 +5,8 @@
 */
 
 //>>built
-define("dojo/require",["./_base/loader"],function(a){return{dynamic:0,normalize:function(a){return a},load:a.require}});
-//# sourceMappingURL=require.js.map
+define("dojo/require",["./_base/loader"],function(_1){
+return {dynamic:0,normalize:function(id){
+return id;
+},load:_1.require};
+});

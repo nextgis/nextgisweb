@@ -1,12 +1,192 @@
 //>>built
-define("dojox/charting/plot2d/Columns","dojo/_base/lang dojo/_base/array dojo/_base/declare dojo/has ./CartesianBase ./_PlotEvents ./common dojox/lang/functional dojox/lang/functional/reversed dojox/lang/utils dojox/gfx/fx".split(" "),function(q,A,G,H,I,J,u,K,L,B,M){var N=L.lambda("item.purgeGroup()"),v=function(){return!1};return G("dojox.charting.plot2d.Columns",[I,J],{defaultParams:{gap:0,animate:null,enableCache:!1},optionalParams:{minBarSize:1,maxBarSize:1,stroke:{},outline:{},shadow:{},fill:{},
-filter:{},styleFunc:null,font:"",fontColor:""},constructor:function(a,d){this.opt=q.clone(q.mixin(this.opt,this.defaultParams));B.updateWithObject(this.opt,d);B.updateWithPattern(this.opt,d,this.optionalParams);this.animate=this.opt.animate;this.renderingOptions={"shape-rendering":"crispEdges"}},getSeriesStats:function(){var a=u.collectSimpleStats(this.series,q.hitch(this,"isNullValue"));a.hmin-=.5;a.hmax+=.5;return a},createRect:function(a,d,b){var e;this.opt.enableCache&&0<a._rectFreePool.length?
-(e=a._rectFreePool.pop(),e.setShape(b),d.add(e)):e=d.createRect(b);this.opt.enableCache&&a._rectUsePool.push(e);return e},render:function(a,d){if(this.zoom&&!this.isDataDirty())return this.performZoom(a,d);this.resetEvents();this.dirty=this.isDirty();var b;this.dirty&&(A.forEach(this.series,N),this._eventSeries={},this.cleanGroup(),b=this.getGroup(),K.forEachRev(this.series,function(a){a.cleanGroup(b)}));var e=this.chart.theme,n=this._hScaler.scaler.getTransformerFromModel(this._hScaler),f=this._vScaler.scaler.getTransformerFromModel(this._vScaler),
-k=Math.max(this._vScaler.bounds.lower,this._vAxis?this._vAxis.naturalBaseline:0),l=f(k),O=this.events(),C=this.getBarProperties(),D=this.series.length;A.forEach(this.series,function(a){a.hidden&&D--});for(var E=this.extractValues(this._hScaler),E=this.rearrangeValues(E,f,l),w=0;w<this.series.length;w++){var c=this.series[w];if(this.dirty||c.dirty){c.cleanGroup();this.opt.enableCache&&(c._rectFreePool=(c._rectFreePool?c._rectFreePool:[]).concat(c._rectUsePool?c._rectUsePool:[]),c._rectUsePool=[]);
-var F=e.next("column",[this.opt,c]),u=Array(c.data.length);if(c.hidden)c.dyn.fill=F.series.fill;else{D--;b=c.group;for(var x=A.some(c.data,function(a){return"number"==typeof a||a&&!a.hasOwnProperty("x")}),B=x?Math.min(c.data.length,Math.ceil(this._hScaler.bounds.to)):c.data.length,h=x?Math.max(0,Math.floor(this._hScaler.bounds.from-1)):0;h<B;++h){var t=c.data[h];if(!this.isNullValue(t)){var r=this.getValue(t,h,w,x);f(r.y);var y=E[w][h],g,p;this.opt.styleFunc||"number"!=typeof t?(g="number"!=typeof t?
-[t]:[],this.opt.styleFunc&&g.push(this.opt.styleFunc(t)),g=e.addMixin(F,"column",g,!0)):g=e.post(F,"column");if(1<=C.width){var z={x:d.l+n(r.x+.5)+C.gap+C.thickness*D,y:a.height-d.b-l-Math.max(y,0),width:C.width,height:Math.abs(y)};g.series.shadow&&(p=q.clone(z),p.x+=g.series.shadow.dx,p.y+=g.series.shadow.dy,p=this.createRect(c,b,p).setFill(g.series.shadow.color).setStroke(g.series.shadow),this.animate&&this._animateColumn(p,a.height-d.b+l,y));var m=this._plotFill(g.series.fill,a,d),m=this._shapeFill(m,
-z),m=this.createRect(c,b,z).setFill(m).setStroke(g.series.stroke);this.overrideShape(m,{index:h,value:r});m.setFilter&&g.series.filter&&m.setFilter(g.series.filter);c.dyn.fill=m.getFill();c.dyn.stroke=m.getStroke();if(O){var v={element:"column",index:h,run:c,shape:m,shadow:p,cx:r.x+.5,cy:r.y,x:x?h:c.data[h].x,y:x?c.data[h]:c.data[h].y};this._connectEvents(v);u[h]=v}!isNaN(r.py)&&r.py>k&&(z.height=y-f(r.py));this.createLabel(b,t,z,g);this.animate&&this._animateColumn(m,a.height-d.b-l,y)}}}this._eventSeries[c.name]=
-u;c.dirty=!1}}else e.skip(),this._reconnectEvents(c.name)}this.dirty=!1;H("dojo-bidi")&&this._checkOrientation(this.group,a,d);return this},getValue:function(a,d,b,e){e?(b="number"==typeof a?a:a.y,a=d):(b=a.y,a=a.x-1);return{x:a,y:b}},extractValues:function(a){for(var d=[],b=this.series.length-1;0<=b;--b){var e=this.series[b];if(this.dirty||e.dirty){var n=A.some(e.data,function(a){return"number"==typeof a||a&&!a.hasOwnProperty("x")}),f=n?Math.max(0,Math.floor(a.bounds.from-1)):0,n=n?Math.min(e.data.length,
-Math.ceil(a.bounds.to)):e.data.length,k=d[b]=[];k.min=f;for(k.max=n;f<n;++f){var l=e.data[f];k[f]=this.isNullValue(l)?0:"number"==typeof l?l:l.y}}}return d},rearrangeValues:function(a,d,b){for(var e=0,n=a.length;e<n;++e){var f=a[e];if(f)for(var k=f.min,l=f.max;k<l;++k){var q=f[k];f[k]=this.isNullValue(q)?0:d(q)-b}}return a},isNullValue:function(a){if(null===a||"undefined"==typeof a)return!0;var d=this._hAxis?this._hAxis.isNullValue:v,b=this._vAxis?this._vAxis.isNullValue:v;return"number"==typeof a?
-b(.5)||d(a):b(isNaN(a.x)?.5:a.x+.5)||null===a.y||d(a.y)},getBarProperties:function(){var a=u.calculateBarSize(this._hScaler.bounds.scale,this.opt);return{gap:a.gap,width:a.size,thickness:0}},_animateColumn:function(a,d,b){0===b&&(b=1);M.animateTransform(q.delegate({shape:a,duration:1200,transform:[{name:"translate",start:[0,d-d/b],end:[0,0]},{name:"scale",start:[1,1/b],end:[1,1]},{name:"original"}]},this.animate)).play()}})});
-//# sourceMappingURL=Columns.js.map
+define("dojox/charting/plot2d/Columns",["dojo/_base/lang","dojo/_base/array","dojo/_base/declare","dojo/has","./CartesianBase","./_PlotEvents","./common","dojox/lang/functional","dojox/lang/functional/reversed","dojox/lang/utils","dojox/gfx/fx"],function(_1,_2,_3,_4,_5,_6,dc,df,_7,du,fx){
+var _8=_7.lambda("item.purgeGroup()");
+var _9=function(){
+return false;
+};
+return _3("dojox.charting.plot2d.Columns",[_5,_6],{defaultParams:{gap:0,animate:null,enableCache:false},optionalParams:{minBarSize:1,maxBarSize:1,stroke:{},outline:{},shadow:{},fill:{},filter:{},styleFunc:null,font:"",fontColor:""},constructor:function(_a,_b){
+this.opt=_1.clone(_1.mixin(this.opt,this.defaultParams));
+du.updateWithObject(this.opt,_b);
+du.updateWithPattern(this.opt,_b,this.optionalParams);
+this.animate=this.opt.animate;
+this.renderingOptions={"shape-rendering":"crispEdges"};
+},getSeriesStats:function(){
+var _c=dc.collectSimpleStats(this.series,_1.hitch(this,"isNullValue"));
+_c.hmin-=0.5;
+_c.hmax+=0.5;
+return _c;
+},createRect:function(_d,_e,_f){
+var _10;
+if(this.opt.enableCache&&_d._rectFreePool.length>0){
+_10=_d._rectFreePool.pop();
+_10.setShape(_f);
+_e.add(_10);
+}else{
+_10=_e.createRect(_f);
+}
+if(this.opt.enableCache){
+_d._rectUsePool.push(_10);
+}
+return _10;
+},render:function(dim,_11){
+if(this.zoom&&!this.isDataDirty()){
+return this.performZoom(dim,_11);
+}
+this.resetEvents();
+this.dirty=this.isDirty();
+var s;
+if(this.dirty){
+_2.forEach(this.series,_8);
+this._eventSeries={};
+this.cleanGroup();
+s=this.getGroup();
+df.forEachRev(this.series,function(_12){
+_12.cleanGroup(s);
+});
+}
+var t=this.chart.theme,ht=this._hScaler.scaler.getTransformerFromModel(this._hScaler),vt=this._vScaler.scaler.getTransformerFromModel(this._vScaler),_13=Math.max(this._vScaler.bounds.lower,this._vAxis?this._vAxis.naturalBaseline:0),_14=vt(_13),_15=this.events(),bar=this.getBarProperties();
+var z=0;
+var _16=this.extractValues(this._hScaler);
+_16=this.rearrangeValues(_16,vt,_14);
+for(var i=0;i<this.series.length;i++){
+var run=this.series[i];
+if(!this.dirty&&!run.dirty){
+t.skip();
+this._reconnectEvents(run.name);
+continue;
+}
+run.cleanGroup();
+if(this.opt.enableCache){
+run._rectFreePool=(run._rectFreePool?run._rectFreePool:[]).concat(run._rectUsePool?run._rectUsePool:[]);
+run._rectUsePool=[];
+}
+var _17=t.next("column",[this.opt,run]),_18=new Array(run.data.length);
+if(run.hidden){
+run.dyn.fill=_17.series.fill;
+continue;
+}
+s=run.group;
+var _19=_2.some(run.data,function(_1a){
+return typeof _1a=="number"||(_1a&&!_1a.hasOwnProperty("x"));
+});
+var min=_19?Math.max(0,Math.floor(this._hScaler.bounds.from-1)):0;
+var max=_19?Math.min(run.data.length,Math.ceil(this._hScaler.bounds.to)):run.data.length;
+for(var j=min;j<max;++j){
+var _1b=run.data[j];
+if(!this.isNullValue(_1b)){
+var val=this.getValue(_1b,j,i,_19),vv=vt(val.y),h=_16[i][j],_1c,_1d;
+if(this.opt.styleFunc||typeof _1b!="number"){
+var _1e=typeof _1b!="number"?[_1b]:[];
+if(this.opt.styleFunc){
+_1e.push(this.opt.styleFunc(_1b));
+}
+_1c=t.addMixin(_17,"column",_1e,true);
+}else{
+_1c=t.post(_17,"column");
+}
+if(bar.width>=1){
+var _1f={x:_11.l+ht(val.x+0.5)+bar.gap+bar.thickness*z,y:dim.height-_11.b-_14-Math.max(h,0),width:bar.width,height:Math.abs(h)};
+if(_1c.series.shadow){
+var _20=_1.clone(_1f);
+_20.x+=_1c.series.shadow.dx;
+_20.y+=_1c.series.shadow.dy;
+_1d=this.createRect(run,s,_20).setFill(_1c.series.shadow.color).setStroke(_1c.series.shadow);
+if(this.animate){
+this._animateColumn(_1d,dim.height-_11.b+_14,h);
+}
+}
+var _21=this._plotFill(_1c.series.fill,dim,_11);
+_21=this._shapeFill(_21,_1f);
+var _22=this.createRect(run,s,_1f).setFill(_21).setStroke(_1c.series.stroke);
+this.overrideShape(_22,{index:j,value:val});
+if(_22.setFilter&&_1c.series.filter){
+_22.setFilter(_1c.series.filter);
+}
+run.dyn.fill=_22.getFill();
+run.dyn.stroke=_22.getStroke();
+if(_15){
+var o={element:"column",index:j,run:run,shape:_22,shadow:_1d,cx:val.x+0.5,cy:val.y,x:_19?j:run.data[j].x,y:_19?run.data[j]:run.data[j].y};
+this._connectEvents(o);
+_18[j]=o;
+}
+if(!isNaN(val.py)&&val.py>_13){
+_1f.height=h-vt(val.py);
+}
+this.createLabel(s,_1b,_1f,_1c);
+if(this.animate){
+this._animateColumn(_22,dim.height-_11.b-_14,h);
+}
+}
+}
+}
+this._eventSeries[run.name]=_18;
+run.dirty=false;
+z++;
+}
+this.dirty=false;
+if(_4("dojo-bidi")){
+this._checkOrientation(this.group,dim,_11);
+}
+return this;
+},getValue:function(_23,j,_24,_25){
+var y,x;
+if(_25){
+if(typeof _23=="number"){
+y=_23;
+}else{
+y=_23.y;
+}
+x=j;
+}else{
+y=_23.y;
+x=_23.x-1;
+}
+return {x:x,y:y};
+},extractValues:function(_26){
+var _27=[];
+for(var i=this.series.length-1;i>=0;--i){
+var run=this.series[i];
+if(!this.dirty&&!run.dirty){
+continue;
+}
+var _28=_2.some(run.data,function(_29){
+return typeof _29=="number"||(_29&&!_29.hasOwnProperty("x"));
+}),min=_28?Math.max(0,Math.floor(_26.bounds.from-1)):0,max=_28?Math.min(run.data.length,Math.ceil(_26.bounds.to)):run.data.length,_2a=_27[i]=[];
+_2a.min=min;
+_2a.max=max;
+for(var j=min;j<max;++j){
+var _2b=run.data[j];
+_2a[j]=this.isNullValue(_2b)?0:(typeof _2b=="number"?_2b:_2b.y);
+}
+}
+return _27;
+},rearrangeValues:function(_2c,_2d,_2e){
+for(var i=0,n=_2c.length;i<n;++i){
+var _2f=_2c[i];
+if(_2f){
+for(var j=_2f.min,k=_2f.max;j<k;++j){
+var _30=_2f[j];
+_2f[j]=this.isNullValue(_30)?0:_2d(_30)-_2e;
+}
+}
+}
+return _2c;
+},isNullValue:function(_31){
+if(_31===null||typeof _31=="undefined"){
+return true;
+}
+var h=this._hAxis?this._hAxis.isNullValue:_9,v=this._vAxis?this._vAxis.isNullValue:_9;
+if(typeof _31=="number"){
+return v(0.5)||h(_31);
+}
+return v(isNaN(_31.x)?0.5:_31.x+0.5)||_31.y===null||h(_31.y);
+},getBarProperties:function(){
+var f=dc.calculateBarSize(this._hScaler.bounds.scale,this.opt);
+return {gap:f.gap,width:f.size,thickness:0};
+},_animateColumn:function(_32,_33,_34){
+if(_34===0){
+_34=1;
+}
+fx.animateTransform(_1.delegate({shape:_32,duration:1200,transform:[{name:"translate",start:[0,_33-(_33/_34)],end:[0,0]},{name:"scale",start:[1,1/_34],end:[1,1]},{name:"original"}]},this.animate)).play();
+}});
+});

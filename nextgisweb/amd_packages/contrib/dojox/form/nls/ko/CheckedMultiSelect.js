@@ -1,3 +1,2 @@
 //>>built
-define("dojox/form/nls/ko/CheckedMultiSelect",{invalidMessage:"\ucd5c\uc18c\ud55c \ud55c \uac00\uc9c0 \ud56d\ubaa9\uc744 \uc120\ud0dd\ud574\uc57c \ud569\ub2c8\ub2e4.",multiSelectLabelText:"{num} \ud56d\ubaa9\uc774 \uc120\ud0dd\ub418\uc5c8\uc2b5\ub2c8\ub2e4."});
-//# sourceMappingURL=CheckedMultiSelect.js.map
+define("dojox/form/nls/ko/CheckedMultiSelect",({invalidMessage:"최소한 한 가지 항목을 선택해야 합니다.",multiSelectLabelText:"{num} 항목이 선택되었습니다."}));

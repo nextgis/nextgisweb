@@ -1,4 +1,42 @@
 //>>built
-define("dojox/mdnd/DropIndicator",["dojo/_base/kernel","dojo/_base/declare","dojo/dom-class","dojo/dom-construct","./AreaManager"],function(a,d,e,f,g){a=d("dojox.mdnd.DropIndicator",null,{node:null,constructor:function(){var b=document.createElement("div"),c=document.createElement("div");b.appendChild(c);e.add(b,"dropIndicator");this.node=b},place:function(b,c,a){a&&(this.node.style.height=a.h+"px");try{return c?b.insertBefore(this.node,c):b.appendChild(this.node),this.node}catch(h){return null}},
-remove:function(){this.node&&(this.node.style.height="",this.node.parentNode&&this.node.parentNode.removeChild(this.node))},destroy:function(){this.node&&(this.node.parentNode&&this.node.parentNode.removeChild(this.node),f.destroy(this.node),delete this.node)}});g.areaManager()._dropIndicator=new a;return a});
-//# sourceMappingURL=DropIndicator.js.map
+define("dojox/mdnd/DropIndicator",["dojo/_base/kernel","dojo/_base/declare","dojo/dom-class","dojo/dom-construct","./AreaManager"],function(_1,_2,_3,_4,_5){
+var di=_2("dojox.mdnd.DropIndicator",null,{node:null,constructor:function(){
+var _6=document.createElement("div");
+var _7=document.createElement("div");
+_6.appendChild(_7);
+_3.add(_6,"dropIndicator");
+this.node=_6;
+},place:function(_8,_9,_a){
+if(_a){
+this.node.style.height=_a.h+"px";
+}
+try{
+if(_9){
+_8.insertBefore(this.node,_9);
+}else{
+_8.appendChild(this.node);
+}
+return this.node;
+}
+catch(e){
+return null;
+}
+},remove:function(){
+if(this.node){
+this.node.style.height="";
+if(this.node.parentNode){
+this.node.parentNode.removeChild(this.node);
+}
+}
+},destroy:function(){
+if(this.node){
+if(this.node.parentNode){
+this.node.parentNode.removeChild(this.node);
+}
+_4.destroy(this.node);
+delete this.node;
+}
+}});
+_5.areaManager()._dropIndicator=new di();
+return di;
+});

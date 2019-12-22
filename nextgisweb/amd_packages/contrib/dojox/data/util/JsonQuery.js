@@ -1,6 +1,79 @@
 //>>built
-define("dojox/data/util/JsonQuery",["dojo","dojox"],function(h,g){return h.declare("dojox.data.util.JsonQuery",null,{useFullIdInQueries:!1,_toJsonQuery:function(a,b){function g(b,e){var m=e.__id;if(m){var c={};c[k.idAttribute]=k.useFullIdInQueries?e.__id:e[k.idAttribute];e=c}for(var d in e){var c=e[d],n=b+(/^[a-zA-Z_][\w_]*$/.test(d)?"."+d:"["+h._escapeString(d)+"]");c&&"object"==typeof c?g(n,c):"*"!=c&&(l+=(f?"":"\x26")+n+(!m&&"string"==typeof c&&a.queryOptions&&a.queryOptions.ignoreCase?"~":"\x3d")+
-(k.simplifiedQuery?encodeURIComponent(c):h.toJson(c)),f=!1)}}var f=!0,k=this;if(a.query&&"object"==typeof a.query){var l="[?(";g("@",a.query);l=f?"":l+")]";a.queryStr=l.replace(/\\"|"/g,function(a){return'"'==a?"'":a})}else a.query&&"*"!=a.query||(a.query="");var d=a.sort;if(d){a.queryStr=a.queryStr||("string"==typeof a.query?a.query:"");f=!0;for(i=0;i<d.length;i++)a.queryStr+=(f?"[":",")+(d[i].descending?"\\":"/")+"@["+h._escapeString(d[i].attribute)+"]",f=!1;a.queryStr+="]"}b&&(a.start||a.count)&&
-(a.queryStr=(a.queryStr||("string"==typeof a.query?a.query:""))+"["+(a.start||"")+":"+(a.count?(a.start||0)+a.count:"")+"]");return"string"==typeof a.queryStr?(a.queryStr=a.queryStr.replace(/\\"|"/g,function(a){return'"'==a?"'":a}),a.queryStr):a.query},jsonQueryPagination:!0,fetch:function(a){this._toJsonQuery(a,this.jsonQueryPagination);return this.inherited(arguments)},isUpdateable:function(){return!0},matchesQuery:function(a,b){b._jsonQuery=b._jsonQuery||g.json.query(this._toJsonQuery(b));return b._jsonQuery([a]).length},
-clientSideFetch:function(a,b){a._jsonQuery=a._jsonQuery||g.json.query(this._toJsonQuery(a));return this.clientSidePaging(a,a._jsonQuery(b))},querySuperSet:function(a,b){return a.query?this.inherited(arguments):b.query}})});
-//# sourceMappingURL=JsonQuery.js.map
+define("dojox/data/util/JsonQuery",["dojo","dojox"],function(_1,_2){
+return _1.declare("dojox.data.util.JsonQuery",null,{useFullIdInQueries:false,_toJsonQuery:function(_3,_4){
+var _5=true;
+var _6=this;
+function _7(_8,_9){
+var _a=_9.__id;
+if(_a){
+var _b={};
+_b[_6.idAttribute]=_6.useFullIdInQueries?_9.__id:_9[_6.idAttribute];
+_9=_b;
+}
+for(var i in _9){
+var _c=_9[i];
+var _d=_8+(/^[a-zA-Z_][\w_]*$/.test(i)?"."+i:"["+_1._escapeString(i)+"]");
+if(_c&&typeof _c=="object"){
+_7(_d,_c);
+}else{
+if(_c!="*"){
+_e+=(_5?"":"&")+_d+((!_a&&typeof _c=="string"&&_3.queryOptions&&_3.queryOptions.ignoreCase)?"~":"=")+(_6.simplifiedQuery?encodeURIComponent(_c):_1.toJson(_c));
+_5=false;
+}
+}
+}
+};
+if(_3.query&&typeof _3.query=="object"){
+var _e="[?(";
+_7("@",_3.query);
+if(!_5){
+_e+=")]";
+}else{
+_e="";
+}
+_3.queryStr=_e.replace(/\\"|"/g,function(t){
+return t=="\""?"'":t;
+});
+}else{
+if(!_3.query||_3.query=="*"){
+_3.query="";
+}
+}
+var _f=_3.sort;
+if(_f){
+_3.queryStr=_3.queryStr||(typeof _3.query=="string"?_3.query:"");
+_5=true;
+for(i=0;i<_f.length;i++){
+_3.queryStr+=(_5?"[":",")+(_f[i].descending?"\\":"/")+"@["+_1._escapeString(_f[i].attribute)+"]";
+_5=false;
+}
+_3.queryStr+="]";
+}
+if(_4&&(_3.start||_3.count)){
+_3.queryStr=(_3.queryStr||(typeof _3.query=="string"?_3.query:""))+"["+(_3.start||"")+":"+(_3.count?(_3.start||0)+_3.count:"")+"]";
+}
+if(typeof _3.queryStr=="string"){
+_3.queryStr=_3.queryStr.replace(/\\"|"/g,function(t){
+return t=="\""?"'":t;
+});
+return _3.queryStr;
+}
+return _3.query;
+},jsonQueryPagination:true,fetch:function(_10){
+this._toJsonQuery(_10,this.jsonQueryPagination);
+return this.inherited(arguments);
+},isUpdateable:function(){
+return true;
+},matchesQuery:function(_11,_12){
+_12._jsonQuery=_12._jsonQuery||_2.json.query(this._toJsonQuery(_12));
+return _12._jsonQuery([_11]).length;
+},clientSideFetch:function(_13,_14){
+_13._jsonQuery=_13._jsonQuery||_2.json.query(this._toJsonQuery(_13));
+return this.clientSidePaging(_13,_13._jsonQuery(_14));
+},querySuperSet:function(_15,_16){
+if(!_15.query){
+return _16.query;
+}
+return this.inherited(arguments);
+}});
+});

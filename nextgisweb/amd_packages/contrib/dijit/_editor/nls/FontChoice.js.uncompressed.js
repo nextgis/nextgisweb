@@ -65,5 +65,6 @@ define("dijit/_editor/nls/FontChoice", { root:
 "ca": true,
 "bg": true,
 "az": true,
-"ar": true
+"ar": true,
+"al": true
 });

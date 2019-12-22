@@ -1,5 +1,74 @@
 //>>built
-define("dojox/geo/openlayers/JsonImport","dojo/_base/declare dojo/_base/xhr dojo/_base/lang dojo/_base/array ./LineString ./Collection ./GeometryFeature".split(" "),function(u,v,c,w,x,y,r){return u("dojox.geo.openlayers.JsonImport",null,{constructor:function(b){this._params=b},loadData:function(){v.get({url:this._params.url,handleAs:"json",sync:!0,load:c.hitch(this,this._gotData),error:c.hitch(this,this._loadError)})},_gotData:function(b){var d=this._params.nextFeature;if(c.isFunction(d)){var a=b.layerExtent,
-n=a[0],e=a[1],f=n+a[2],g=e+a[3],a=b.layerExtentLL,h=a[0],k=a[1],t=k+a[3],l=h+a[2];b=b.features;for(var m in b){var a=b[m].shape,p=null;if(c.isArray(a[0])){var q=[];w.forEach(a,function(a){a=this._makeGeometry(a,n,e,f,g,h,t,l,k);q.push(a)},this);a=new y(q);p=new r(a)}else p=this._makeFeature(a,n,e,f,g,h,t,l,k);d.call(this,p)}d=this._params.complete;c.isFunction(d)&&d.call(this,d)}},_makeGeometry:function(b,d,a,n,e,f,g,h,k){for(var c=[],l=0,m=0;m<b.length-1;m+=2){var p=b[m+1],l=(b[m]-d)/(n-d),q=l*(h-
-f)+f,l=(p-a)/(e-a);c.push({x:q,y:l*(k-g)+g})}return new x(c)},_makeFeature:function(b,d,a,c,e,f,g,h,k){b=this._makeGeometry(b,d,a,c,e,f,g,h,k);return new r(b)},_loadError:function(){var b=this._params.error;c.isFunction(b)&&b.apply(this,parameters)}})});
-//# sourceMappingURL=JsonImport.js.map
+define("dojox/geo/openlayers/JsonImport",["dojo/_base/declare","dojo/_base/xhr","dojo/_base/lang","dojo/_base/array","./LineString","./Collection","./GeometryFeature"],function(_1,_2,_3,_4,_5,_6,_7){
+return _1("dojox.geo.openlayers.JsonImport",null,{constructor:function(_8){
+this._params=_8;
+},loadData:function(){
+var p=this._params;
+_2.get({url:p.url,handleAs:"json",sync:true,load:_3.hitch(this,this._gotData),error:_3.hitch(this,this._loadError)});
+},_gotData:function(_9){
+var nf=this._params.nextFeature;
+if(!_3.isFunction(nf)){
+return;
+}
+var _a=_9.layerExtent;
+var _b=_a[0];
+var _c=_a[1];
+var _d=_b+_a[2];
+var _e=_c+_a[3];
+var _f=_9.layerExtentLL;
+var x1=_f[0];
+var y1=_f[1];
+var x2=x1+_f[2];
+var y2=y1+_f[3];
+var _10=x1;
+var _11=y2;
+var _12=x2;
+var _13=y1;
+var _14=_9.features;
+for(var f in _14){
+var o=_14[f];
+var s=o["shape"];
+var gf=null;
+if(_3.isArray(s[0])){
+var a=new Array();
+_4.forEach(s,function(_15){
+var ls=this._makeGeometry(_15,_b,_c,_d,_e,_10,_11,_12,_13);
+a.push(ls);
+},this);
+var g=new _6(a);
+gf=new _7(g);
+nf.call(this,gf);
+}else{
+gf=this._makeFeature(s,_b,_c,_d,_e,_10,_11,_12,_13);
+nf.call(this,gf);
+}
+}
+var _16=this._params.complete;
+if(_3.isFunction(_16)){
+_16.call(this,_16);
+}
+},_makeGeometry:function(s,ulx,uly,lrx,lry,_17,_18,_19,_1a){
+var a=[];
+var k=0;
+for(var i=0;i<s.length-1;i+=2){
+var x=s[i];
+var y=s[i+1];
+k=(x-ulx)/(lrx-ulx);
+var px=k*(_19-_17)+_17;
+k=(y-uly)/(lry-uly);
+var py=k*(_1a-_18)+_18;
+a.push({x:px,y:py});
+}
+var ls=new _5(a);
+return ls;
+},_makeFeature:function(s,ulx,uly,lrx,lry,_1b,_1c,_1d,_1e){
+var ls=this._makeGeometry(s,ulx,uly,lrx,lry,_1b,_1c,_1d,_1e);
+var gf=new _7(ls);
+return gf;
+},_loadError:function(){
+var f=this._params.error;
+if(_3.isFunction(f)){
+f.apply(this,parameters);
+}
+}});
+});

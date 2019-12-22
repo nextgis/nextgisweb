@@ -1,5 +1,53 @@
 //>>built
-define("dojox/geo/charting/widget/Legend","dojo/_base/kernel dojo/_base/lang dojo/_base/array dojo/_base/declare dojo/_base/html dojo/dom dojo/dom-construct dojo/dom-class dojo/_base/window dijit/_Widget".split(" "),function(p,q,k,l,r,m,b,g,a,n){return l("dojox.geo.charting.widget.Legend",n,{horizontal:!0,legendBody:null,swatchSize:18,map:null,postCreate:function(){this.map&&(this.series=this.map.series,this.domNode.parentNode||m.byId(this.map.container).appendChild(this.domNode),this.refresh())},
-buildRendering:function(){this.domNode=b.create("table",{role:"group","class":"dojoxLegendNode"});this.legendBody=b.create("tbody",null,this.domNode);this.inherited(arguments)},refresh:function(){for(;this.legendBody.lastChild;)b.destroy(this.legendBody.lastChild);this.horizontal&&(g.add(this.domNode,"dojoxLegendHorizontal"),this._tr=a.doc.createElement("tr"),this.legendBody.appendChild(this._tr));var c=this.series;0!=c.length&&k.forEach(c,function(a){this._addLabel(a.color,a.name)},this)},_addLabel:function(c,
-b){var d=a.doc.createElement("td"),e=a.doc.createElement("td"),f=a.doc.createElement("div");g.add(d,"dojoxLegendIcon");g.add(e,"dojoxLegendText");f.style.width=this.swatchSize+"px";f.style.height=this.swatchSize+"px";d.appendChild(f);if(this.horizontal)this._tr.appendChild(d),this._tr.appendChild(e);else{var h=a.doc.createElement("tr");this.legendBody.appendChild(h);h.appendChild(d);h.appendChild(e)}f.style.background=c;e.innerHTML=String(b)}})});
-//# sourceMappingURL=Legend.js.map
+define("dojox/geo/charting/widget/Legend",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/array","dojo/_base/declare","dojo/_base/html","dojo/dom","dojo/dom-construct","dojo/dom-class","dojo/_base/window","dijit/_Widget"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a){
+return _4("dojox.geo.charting.widget.Legend",_a,{horizontal:true,legendBody:null,swatchSize:18,map:null,postCreate:function(){
+if(!this.map){
+return;
+}
+this.series=this.map.series;
+if(!this.domNode.parentNode){
+_6.byId(this.map.container).appendChild(this.domNode);
+}
+this.refresh();
+},buildRendering:function(){
+this.domNode=_7.create("table",{role:"group","class":"dojoxLegendNode"});
+this.legendBody=_7.create("tbody",null,this.domNode);
+this.inherited(arguments);
+},refresh:function(){
+while(this.legendBody.lastChild){
+_7.destroy(this.legendBody.lastChild);
+}
+if(this.horizontal){
+_8.add(this.domNode,"dojoxLegendHorizontal");
+this._tr=_9.doc.createElement("tr");
+this.legendBody.appendChild(this._tr);
+}
+var s=this.series;
+if(s.length==0){
+return;
+}
+_3.forEach(s,function(x){
+this._addLabel(x.color,x.name);
+},this);
+},_addLabel:function(_b,_c){
+var _d=_9.doc.createElement("td");
+var _e=_9.doc.createElement("td");
+var _f=_9.doc.createElement("div");
+_8.add(_d,"dojoxLegendIcon");
+_8.add(_e,"dojoxLegendText");
+_f.style.width=this.swatchSize+"px";
+_f.style.height=this.swatchSize+"px";
+_d.appendChild(_f);
+if(this.horizontal){
+this._tr.appendChild(_d);
+this._tr.appendChild(_e);
+}else{
+var tr=_9.doc.createElement("tr");
+this.legendBody.appendChild(tr);
+tr.appendChild(_d);
+tr.appendChild(_e);
+}
+_f.style.background=_b;
+_e.innerHTML=String(_c);
+}});
+});

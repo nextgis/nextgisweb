@@ -1,13 +1,253 @@
 //>>built
-require({cache:{"url:dojox/form/resources/FilePickerTextBox.html":'\x3cdiv class\x3d"dijit dijitReset dijitInlineTable dijitLeft"\n\tid\x3d"widget_${id}"\n\trole\x3d"combobox" tabIndex\x3d"-1"\n\t\x3e\x3cdiv style\x3d"overflow:hidden;"\n\t\t\x3e\x3cdiv class\x3d\'dijitReset dijitRight dijitButtonNode dijitArrowButton dijitDownArrowButton\'\n\t\t\tdojoAttachPoint\x3d"downArrowNode,_buttonNode,_popupStateNode" role\x3d"presentation"\n\t\t\t\x3e\x3cdiv class\x3d"dijitArrowButtonInner"\x3e\x26thinsp;\x3c/div\n\t\t\t\x3e\x3cdiv class\x3d"dijitArrowButtonChar"\x3e\x26#9660;\x3c/div\n\t\t\x3e\x3c/div\n\t\t\x3e\x3cdiv class\x3d"dijitReset dijitValidationIcon"\x3e\x3cbr\x3e\x3c/div\n\t\t\x3e\x3cdiv class\x3d"dijitReset dijitValidationIconText"\x3e\x26Chi;\x3c/div\n\t\t\x3e\x3cdiv class\x3d"dijitReset dijitInputField"\n\t\t\t\x3e\x3cinput type\x3d"text" autocomplete\x3d"off" ${!nameAttrSetting} class\x3d\'dijitReset\'\n\t\t\t\tdojoAttachEvent\x3d\'onkeypress:_onKey\' \n\t\t\t\tdojoAttachPoint\x3d\'textbox,focusNode\' role\x3d"textbox" aria-haspopup\x3d"true" aria-autocomplete\x3d"list"\n\t\t/\x3e\x3c/div\n\t\x3e\x3c/div\n\x3e\x3c/div\x3e\n'}});
-define("dojox/form/FilePickerTextBox","dojo/_base/lang dojo/_base/array dojo/_base/event dojo/window dijit/focus dijit/registry dijit/form/_TextBoxMixin dijit/form/ValidationTextBox dijit/_HasDropDown dojox/widget/FilePicker dojo/text!./resources/FilePickerTextBox.html dojo/_base/declare dojo/keys".split(" "),function(f,r,m,u,v,w,p,x,y,z,A,B,d){return B("dojox.form.FilePickerTextBox",[x,y],{baseClass:"dojoxFilePickerTextBox",templateString:A,searchDelay:500,valueItem:null,numPanes:2.25,postMixInProperties:function(){this.inherited(arguments);
-this.dropDown=new z(this.constraints)},postCreate:function(){this.inherited(arguments);this.connect(this.dropDown,"onChange",this._onWidgetChange);this.connect(this.focusNode,"onblur","_focusBlur");this.connect(this.focusNode,"onfocus","_focusFocus");this.connect(this.focusNode,"ondblclick",function(){p.selectInputText(this.focusNode)})},_setValueAttr:function(a,c,b){if(!this._searchInProgress){this.inherited(arguments);a=a||"";var e=this.dropDown.get("pathValue")||"";a!==e&&(this._skip=!0,e=f.hitch(this,
-"_setBlurValue"),this.dropDown._setPathValueAttr(a,!b,this._settingBlurValue?e:null))}},_onWidgetChange:function(a){if(!a&&this.focusNode.value)this._hasValidPath=!1,this.focusNode.value="";else{this.valueItem=a;if(a=this.dropDown._getPathValueAttr(a))this._hasValidPath=!0;this._skip||this._setValueAttr(a,void 0,!0);delete this._skip}this.validate()},startup:function(){this.dropDown._started||this.dropDown.startup();this.inherited(arguments)},openDropDown:function(){this.dropDown.domNode.style.width=
-"0px";"minPaneWidth"in(this.constraints||{})||this.dropDown.set("minPaneWidth",this.domNode.offsetWidth/this.numPanes);this.inherited(arguments)},toggleDropDown:function(){this.inherited(arguments);this._opened&&this.dropDown.set("pathValue",this.get("value"))},_focusBlur:function(a){a.explicitOriginalTarget!=this.focusNode||this._allowBlur?this._menuFocus&&(this.dropDown._updateClass(this._menuFocus,"Item",{Hover:!1}),delete this._menuFocus):window.setTimeout(f.hitch(this,function(){this._allowBlur||
-this.focus()}),1)},_focusFocus:function(a){this._menuFocus&&this.dropDown._updateClass(this._menuFocus,"Item",{Hover:!1});delete this._menuFocus;if(a=v.curNode)if(a=w.byNode(a))this._menuFocus=a.domNode;this._menuFocus&&this.dropDown._updateClass(this._menuFocus,"Item",{Hover:!0});delete this._allowBlur},_onBlur:function(){this._allowBlur=!0;delete this.dropDown._savedFocus;this.inherited(arguments)},_setBlurValue:function(){this.dropDown&&!this._settingBlurValue?(this._settingBlurValue=!0,this.set("value",
-this.focusNode.value)):(delete this._settingBlurValue,this.inherited(arguments))},parse:function(a,c){if(this._hasValidPath||this._hasSelection)return a;var b=this.dropDown,e=b.topDir,d=b.pathSeparator,b=b.get("pathValue"),k=function(a){e.length&&0===a.indexOf(e)&&(a=a.substring(e.length));d&&a[a.length-1]==d&&(a=a.substring(0,a.length-1));return a},b=k(b);if(k(a)==b)return a},_startSearchFromInput:function(){var a=this.dropDown,c=this.focusNode,b=c.value,d=b,h=a.topDir;this._hasSelection&&p.selectInputText(c,
-d.length);this._hasSelection=!1;h.length&&0===b.indexOf(h)&&(b=b.substring(h.length));var k=b.split(a.pathSeparator),m=f.hitch(this,function(b){var e=k[b],g=a.getChildren()[b],q;this._searchInProgress=!0;var h=f.hitch(this,function(){delete this._searchInProgress});!e&&!g||this._opened||this.toggleDropDown();if(e&&g){var t=f.hitch(this,function(){q&&this.disconnect(q);delete q;var l=g._menu.getChildren(),f=r.filter(l,function(a){return a.label==e})[0],n=r.filter(l,function(a){return 0===a.label.indexOf(e)})[0];
-if(f&&(k.length>b+1&&f.children||!f.children))b++,g._menu.onItemClick(f,{type:"internal",stopPropagation:function(){},preventDefault:function(){}}),k[b]?m(b):h();else{g._setSelected(null);if(n&&k.length===b+1){a._setInProgress=!0;a._removeAfter(g);delete a._setInProgress;l=n.label;n.children&&(l+=a.pathSeparator);l=l.substring(e.length);window.setTimeout(function(){u.scrollIntoView(n.domNode)},1);c.value=d+l;p.selectInputText(c,d.length);this._hasSelection=!0;try{n.focusNode.focus()}catch(C){}}else this._menuFocus&&
-this.dropDown._updateClass(this._menuFocus,"Item",{Hover:!1,Focus:!1}),delete this._menuFocus;h()}});g.isLoaded?t():q=this.connect(g,"onLoad",t)}else g&&(g._setSelected(null),a._setInProgress=!0,a._removeAfter(g),delete a._setInProgress),h()});m(0)},_onKey:function(a){if(!this.disabled&&!this.readOnly){var c=a.charOrCode;c==d.DOWN_ARROW&&(this._allowBlur=!0);if(c==d.ENTER&&this._opened)this.dropDown.onExecute(),p.selectInputText(this.focusNode,this.focusNode.value.length),this._hasSelection=!1,m.stop(a);
-else if(c!=d.RIGHT_ARROW&&c!=d.LEFT_ARROW&&c!=d.TAB||!this._hasSelection){this.inherited(arguments);var b=!1;c!=d.BACKSPACE&&c!=d.DELETE||!this._hasSelection?b=c==d.BACKSPACE||c==d.DELETE||" "==c?!0:""!==a.keyChar:this._hasSelection=!1;this._searchTimer&&window.clearTimeout(this._searchTimer);delete this._searchTimer;b&&(this._hasSelection=this._hasValidPath=!1,this._searchTimer=window.setTimeout(f.hitch(this,"_startSearchFromInput"),this.searchDelay+1))}else this._startSearchFromInput(),m.stop(a)}}})});
-//# sourceMappingURL=FilePickerTextBox.js.map
+require({cache:{"url:dojox/form/resources/FilePickerTextBox.html":"<div class=\"dijit dijitReset dijitInlineTable dijitLeft\"\n\tid=\"widget_${id}\"\n\trole=\"combobox\" tabIndex=\"-1\"\n\t><div style=\"overflow:hidden;\"\n\t\t><div class='dijitReset dijitRight dijitButtonNode dijitArrowButton dijitDownArrowButton'\n\t\t\tdojoAttachPoint=\"downArrowNode,_buttonNode,_popupStateNode\" role=\"presentation\"\n\t\t\t><div class=\"dijitArrowButtonInner\">&thinsp;</div\n\t\t\t><div class=\"dijitArrowButtonChar\">&#9660;</div\n\t\t></div\n\t\t><div class=\"dijitReset dijitValidationIcon\"><br></div\n\t\t><div class=\"dijitReset dijitValidationIconText\">&Chi;</div\n\t\t><div class=\"dijitReset dijitInputField\"\n\t\t\t><input type=\"text\" autocomplete=\"off\" ${!nameAttrSetting} class='dijitReset'\n\t\t\t\tdojoAttachEvent='onkeypress:_onKey' \n\t\t\t\tdojoAttachPoint='textbox,focusNode' role=\"textbox\" aria-haspopup=\"true\" aria-autocomplete=\"list\"\n\t\t/></div\n\t></div\n></div>\n"}});
+define("dojox/form/FilePickerTextBox",["dojo/_base/lang","dojo/_base/array","dojo/_base/event","dojo/window","dijit/focus","dijit/registry","dijit/form/_TextBoxMixin","dijit/form/ValidationTextBox","dijit/_HasDropDown","dojox/widget/FilePicker","dojo/text!./resources/FilePickerTextBox.html","dojo/_base/declare","dojo/keys"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d){
+return _c("dojox.form.FilePickerTextBox",[_8,_9],{baseClass:"dojoxFilePickerTextBox",templateString:_b,searchDelay:500,valueItem:null,numPanes:2.25,postMixInProperties:function(){
+this.inherited(arguments);
+this.dropDown=new _a(this.constraints);
+},postCreate:function(){
+this.inherited(arguments);
+this.connect(this.dropDown,"onChange",this._onWidgetChange);
+this.connect(this.focusNode,"onblur","_focusBlur");
+this.connect(this.focusNode,"onfocus","_focusFocus");
+this.connect(this.focusNode,"ondblclick",function(){
+_7.selectInputText(this.focusNode);
+});
+},_setValueAttr:function(_e,_f,_10){
+if(!this._searchInProgress){
+this.inherited(arguments);
+_e=_e||"";
+var _11=this.dropDown.get("pathValue")||"";
+if(_e!==_11){
+this._skip=true;
+var fx=_1.hitch(this,"_setBlurValue");
+this.dropDown._setPathValueAttr(_e,!_10,this._settingBlurValue?fx:null);
+}
+}
+},_onWidgetChange:function(_12){
+if(!_12&&this.focusNode.value){
+this._hasValidPath=false;
+this.focusNode.value="";
+}else{
+this.valueItem=_12;
+var _13=this.dropDown._getPathValueAttr(_12);
+if(_13){
+this._hasValidPath=true;
+}
+if(!this._skip){
+this._setValueAttr(_13,undefined,true);
+}
+delete this._skip;
+}
+this.validate();
+},startup:function(){
+if(!this.dropDown._started){
+this.dropDown.startup();
+}
+this.inherited(arguments);
+},openDropDown:function(){
+this.dropDown.domNode.style.width="0px";
+if(!("minPaneWidth" in (this.constraints||{}))){
+this.dropDown.set("minPaneWidth",(this.domNode.offsetWidth/this.numPanes));
+}
+this.inherited(arguments);
+},toggleDropDown:function(){
+this.inherited(arguments);
+if(this._opened){
+this.dropDown.set("pathValue",this.get("value"));
+}
+},_focusBlur:function(e){
+if(e.explicitOriginalTarget==this.focusNode&&!this._allowBlur){
+window.setTimeout(_1.hitch(this,function(){
+if(!this._allowBlur){
+this.focus();
+}
+}),1);
+}else{
+if(this._menuFocus){
+this.dropDown._updateClass(this._menuFocus,"Item",{"Hover":false});
+delete this._menuFocus;
+}
+}
+},_focusFocus:function(e){
+if(this._menuFocus){
+this.dropDown._updateClass(this._menuFocus,"Item",{"Hover":false});
+}
+delete this._menuFocus;
+var _14=_5.curNode;
+if(_14){
+_14=_6.byNode(_14);
+if(_14){
+this._menuFocus=_14.domNode;
+}
+}
+if(this._menuFocus){
+this.dropDown._updateClass(this._menuFocus,"Item",{"Hover":true});
+}
+delete this._allowBlur;
+},_onBlur:function(){
+this._allowBlur=true;
+delete this.dropDown._savedFocus;
+this.inherited(arguments);
+},_setBlurValue:function(){
+if(this.dropDown&&!this._settingBlurValue){
+this._settingBlurValue=true;
+this.set("value",this.focusNode.value);
+}else{
+delete this._settingBlurValue;
+this.inherited(arguments);
+}
+},parse:function(_15,_16){
+if(this._hasValidPath||this._hasSelection){
+return _15;
+}
+var dd=this.dropDown,_17=dd.topDir,sep=dd.pathSeparator;
+var _18=dd.get("pathValue");
+var _19=function(v){
+if(_17.length&&v.indexOf(_17)===0){
+v=v.substring(_17.length);
+}
+if(sep&&v[v.length-1]==sep){
+v=v.substring(0,v.length-1);
+}
+return v;
+};
+_18=_19(_18);
+var val=_19(_15);
+if(val==_18){
+return _15;
+}
+return undefined;
+},_startSearchFromInput:function(){
+var dd=this.dropDown,fn=this.focusNode;
+var val=fn.value,_1a=val,_1b=dd.topDir;
+if(this._hasSelection){
+_7.selectInputText(fn,_1a.length);
+}
+this._hasSelection=false;
+if(_1b.length&&val.indexOf(_1b)===0){
+val=val.substring(_1b.length);
+}
+var _1c=val.split(dd.pathSeparator);
+var _1d=_1.hitch(this,function(idx){
+var dir=_1c[idx];
+var _1e=dd.getChildren()[idx];
+var _1f;
+this._searchInProgress=true;
+var _20=_1.hitch(this,function(){
+delete this._searchInProgress;
+});
+if((dir||_1e)&&!this._opened){
+this.toggleDropDown();
+}
+if(dir&&_1e){
+var fx=_1.hitch(this,function(){
+if(_1f){
+this.disconnect(_1f);
+}
+delete _1f;
+var _21=_1e._menu.getChildren();
+var _22=_2.filter(_21,function(i){
+return i.label==dir;
+})[0];
+var _23=_2.filter(_21,function(i){
+return (i.label.indexOf(dir)===0);
+})[0];
+if(_22&&((_1c.length>idx+1&&_22.children)||(!_22.children))){
+idx++;
+_1e._menu.onItemClick(_22,{type:"internal",stopPropagation:function(){
+},preventDefault:function(){
+}});
+if(_1c[idx]){
+_1d(idx);
+}else{
+_20();
+}
+}else{
+_1e._setSelected(null);
+if(_23&&_1c.length===idx+1){
+dd._setInProgress=true;
+dd._removeAfter(_1e);
+delete dd._setInProgress;
+var _24=_23.label;
+if(_23.children){
+_24+=dd.pathSeparator;
+}
+_24=_24.substring(dir.length);
+window.setTimeout(function(){
+_4.scrollIntoView(_23.domNode);
+},1);
+fn.value=_1a+_24;
+_7.selectInputText(fn,_1a.length);
+this._hasSelection=true;
+try{
+_23.focusNode.focus();
+}
+catch(e){
+}
+}else{
+if(this._menuFocus){
+this.dropDown._updateClass(this._menuFocus,"Item",{"Hover":false,"Focus":false});
+}
+delete this._menuFocus;
+}
+_20();
+}
+});
+if(!_1e.isLoaded){
+_1f=this.connect(_1e,"onLoad",fx);
+}else{
+fx();
+}
+}else{
+if(_1e){
+_1e._setSelected(null);
+dd._setInProgress=true;
+dd._removeAfter(_1e);
+delete dd._setInProgress;
+}
+_20();
+}
+});
+_1d(0);
+},_onKey:function(e){
+if(this.disabled||this.readOnly){
+return;
+}
+var c=e.charOrCode;
+if(c==_d.DOWN_ARROW){
+this._allowBlur=true;
+}
+if(c==_d.ENTER&&this._opened){
+this.dropDown.onExecute();
+_7.selectInputText(this.focusNode,this.focusNode.value.length);
+this._hasSelection=false;
+_3.stop(e);
+return;
+}
+if((c==_d.RIGHT_ARROW||c==_d.LEFT_ARROW||c==_d.TAB)&&this._hasSelection){
+this._startSearchFromInput();
+_3.stop(e);
+return;
+}
+this.inherited(arguments);
+var _25=false;
+if((c==_d.BACKSPACE||c==_d.DELETE)&&this._hasSelection){
+this._hasSelection=false;
+}else{
+if(c==_d.BACKSPACE||c==_d.DELETE||c==" "){
+_25=true;
+}else{
+_25=e.keyChar!=="";
+}
+}
+if(this._searchTimer){
+window.clearTimeout(this._searchTimer);
+}
+delete this._searchTimer;
+if(_25){
+this._hasValidPath=false;
+this._hasSelection=false;
+this._searchTimer=window.setTimeout(_1.hitch(this,"_startSearchFromInput"),this.searchDelay+1);
+}
+}});
+});

@@ -306,7 +306,7 @@ define("dojo/html", ["./_base/kernel", "./_base/lang", "./_base/array", "./_base
 					}).then(function(results){
 							return self.parseResults = results;
 						}, function(e){
-							self._onError('Content', e, "Error parsing in _ContentSetter#" + this.id);
+							self._onError('Content', e, "Error parsing in _ContentSetter#" + self.id);
 						});
 				}catch(e){
 					this._onError('Content', e, "Error parsing in _ContentSetter#" + this.id);

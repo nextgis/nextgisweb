@@ -1,15 +1,256 @@
 //>>built
-define("dojox/charting/plot2d/Default","dojo/_base/lang dojo/_base/declare dojo/_base/array dojo/has ./CartesianBase ./_PlotEvents ./common dojox/lang/functional dojox/lang/functional/reversed dojox/lang/utils dojox/gfx/fx".split(" "),function(w,F,d,L,M,N,x,O,P,y,Q){var R=P.lambda("item.purgeGroup()");return F("dojox.charting.plot2d.Default",[M,N],{defaultParams:{lines:!0,areas:!1,markers:!1,tension:"",animate:!1,enableCache:!1,interpolate:!1},optionalParams:{stroke:{},outline:{},shadow:{},fill:{},
-filter:{},styleFunc:null,font:"",fontColor:"",marker:"",markerStroke:{},markerOutline:{},markerShadow:{},markerFill:{},markerFont:"",markerFontColor:"",zeroLine:0},constructor:function(g,c){this.opt=w.clone(w.mixin(this.opt,this.defaultParams));y.updateWithObject(this.opt,c);y.updateWithPattern(this.opt,c,this.optionalParams);this.animate=this.opt.animate},createPath:function(g,c,b){var h;this.opt.enableCache&&0<g._pathFreePool.length?(h=g._pathFreePool.pop(),h.setShape(b),c.add(h)):h=c.createPath(b);
-this.opt.enableCache&&g._pathUsePool.push(h);return h},buildSegments:function(g,c){for(var b=this.series[g],h=c?Math.min(b.data.length,Math.ceil(this._hScaler.bounds.to)):b.data.length,l=null,k=[],d=c?Math.max(0,Math.floor(this._hScaler.bounds.from-1)):0;d<h;d++)if(!this.isNullValue(b.data[d]))l||(l=[],k.push({index:d,rseg:l})),l.push(c&&b.data[d].hasOwnProperty("y")?b.data[d].y:b.data[d]);else if(!this.opt.interpolate||c)l=null;return k},render:function(g,c){if(this.zoom&&!this.isDataDirty())return this.performZoom(g,
-c);this.resetEvents();this.dirty=this.isDirty();var b;this.dirty&&(d.forEach(this.series,R),this._eventSeries={},this.cleanGroup(),this.getGroup().setTransform(null),b=this.getGroup(),O.forEachRev(this.series,function(a){a.cleanGroup(b)}));for(var h=this.chart.theme,l,k,y=this.events(),z=0;z<this.series.length;z++){var a=this.series[z];if(this.dirty||a.dirty)if(a.cleanGroup(),this.opt.enableCache&&(a._pathFreePool=(a._pathFreePool?a._pathFreePool:[]).concat(a._pathUsePool?a._pathUsePool:[]),a._pathUsePool=
-[]),a.data.length){var f=h.next(this.opt.areas?"area":"line",[this.opt,a],!0),e,G=this._hScaler.scaler.getTransformerFromModel(this._hScaler),A=this._vScaler.scaler.getTransformerFromModel(this._vScaler),F=this._eventSeries[a.name]=Array(a.data.length);b=a.group;if(a.hidden){this.opt.lines&&(a.dyn.stroke=f.series.stroke);if(a.markers||void 0===a.markers&&this.opt.markers)a.dyn.markerFill=f.marker.fill,a.dyn.markerStroke=f.marker.stroke,a.dyn.marker=f.symbol;this.opt.areas&&(a.dyn.fill=f.series.fill)}else{for(var B=
-d.some(a.data,function(a){return"number"==typeof a||a&&!a.hasOwnProperty("x")}),C=this.buildSegments(z,B),t=0;t<C.length;t++){var n=C[t];e=B?d.map(n.rseg,function(a,b){return{x:G(b+n.index+1)+c.l,y:g.height-c.b-A(a),data:a}},this):d.map(n.rseg,function(a){return{x:G(a.x)+c.l,y:g.height-c.b-A(a.y),data:a}},this);if(B&&this.opt.interpolate)for(;t<C.length;)t++,(n=C[t])&&(e=e.concat(d.map(n.rseg,function(a,b){return{x:G(b+n.index+1)+c.l,y:g.height-c.b-A(a),data:a}},this)));var p=this.opt.tension?x.curve(e,
-this.opt.tension):"";if(this.opt.areas&&1<e.length){var u=this._plotFill(f.series.fill,g,c),q=w.clone(e),v=g.height-c.b;isNaN(this.opt.zeroLine)||(v=Math.max(c.t,Math.min(g.height-c.b-A(this.opt.zeroLine),v)));this.opt.tension?a.dyn.fill=b.createPath(p+" "+("L"+q[q.length-1].x+","+v+" L"+q[0].x+","+v+" L"+q[0].x+","+q[0].y)).setFill(u).getFill():(q.push({x:e[e.length-1].x,y:v}),q.push({x:e[0].x,y:v}),q.push(e[0]),a.dyn.fill=b.createPolyline(q).setFill(u).getFill())}if(this.opt.lines||this.opt.markers)l=
-f.series.stroke,f.series.outline&&(k=a.dyn.outline=x.makeStroke(f.series.outline),k.width=2*k.width+(l&&l.width||0));this.opt.markers&&(a.dyn.marker=f.symbol);var D=null,H=null,I=null;if(l&&f.series.shadow&&1<e.length){var r=f.series.shadow,u=d.map(e,function(a){return{x:a.x+r.dx,y:a.y+r.dy}});this.opt.lines&&(a.dyn.shadow=this.opt.tension?b.createPath(x.curve(u,this.opt.tension)).setStroke(r).getStroke():b.createPolyline(u).setStroke(r).getStroke());this.opt.markers&&f.marker.shadow&&(r=f.marker.shadow,
-I=d.map(u,function(c){return this.createPath(a,b,"M"+c.x+" "+c.y+" "+f.symbol).setStroke(r).setFill(r.color)},this))}if(this.opt.lines&&1<e.length){var E;k&&(a.dyn.outline=this.opt.tension?b.createPath(p).setStroke(k).getStroke():b.createPolyline(e).setStroke(k).getStroke());a.dyn.stroke=this.opt.tension?(E=b.createPath(p)).setStroke(l).getStroke():(E=b.createPolyline(e)).setStroke(l).getStroke();E.setFilter&&f.series.filter&&E.setFilter(f.series.filter)}p=null;if(this.opt.markers){var m=f,D=Array(e.length),
-H=Array(e.length);k=null;m.marker.outline&&(k=x.makeStroke(m.marker.outline),k.width=2*k.width+(m.marker.stroke?m.marker.stroke.width:0));d.forEach(e,function(c,e){if(this.opt.styleFunc||"number"!=typeof c.data){var d="number"!=typeof c.data?[c.data]:[];this.opt.styleFunc&&d.push(this.opt.styleFunc(c.data));m=h.addMixin(f,"marker",d,!0)}else m=h.post(f,"marker");d="M"+c.x+" "+c.y+" "+m.symbol;k&&(H[e]=this.createPath(a,b,d).setStroke(k));D[e]=this.createPath(a,b,d).setStroke(m.marker.stroke).setFill(m.marker.fill)},
-this);a.dyn.markerFill=m.marker.fill;a.dyn.markerStroke=m.marker.stroke;!p&&this.opt.labels&&(p=D[0].getBoundingBox());y?d.forEach(D,function(c,b){var d={element:"marker",index:b+n.index,run:a,shape:c,outline:H[b]||null,shadow:I&&I[b]||null,cx:e[b].x,cy:e[b].y};B?(d.x=b+n.index+1,d.y=a.data[b+n.index]):(d.x=n.rseg[b].x,d.y=a.data[b+n.index].y);this._connectEvents(d);F[b+n.index]=d},this):delete this._eventSeries[a.name]}if(this.opt.labels){var J=p?p.width:2,K=p?p.height:2;d.forEach(e,function(a,c){if(this.opt.styleFunc||
-"number"!=typeof a.data){var d="number"!=typeof a.data?[a.data]:[];this.opt.styleFunc&&d.push(this.opt.styleFunc(a.data));m=h.addMixin(f,"marker",d,!0)}else m=h.post(f,"marker");this.createLabel(b,n.rseg[c],{x:a.x-J/2,y:a.y-K/2,width:J,height:K},m)},this)}}a.dirty=!1}}else a.dirty=!1,h.skip();else h.skip(),this._reconnectEvents(a.name)}L("dojo-bidi")&&this._checkOrientation(this.group,g,c);this.animate&&(l=this.getGroup(),Q.animateTransform(w.delegate({shape:l,duration:1200,transform:[{name:"translate",
-start:[0,g.height-c.b],end:[0,0]},{name:"scale",start:[1,0],end:[1,1]},{name:"original"}]},this.animate)).play());this.dirty=!1;return this}})});
-//# sourceMappingURL=Default.js.map
+define("dojox/charting/plot2d/Default",["dojo/_base/lang","dojo/_base/declare","dojo/_base/array","dojo/has","./CartesianBase","./_PlotEvents","./common","dojox/lang/functional","dojox/lang/functional/reversed","dojox/lang/utils","dojox/gfx/fx"],function(_1,_2,_3,_4,_5,_6,dc,df,_7,du,fx){
+var _8=_7.lambda("item.purgeGroup()");
+var _9=1200;
+return _2("dojox.charting.plot2d.Default",[_5,_6],{defaultParams:{lines:true,areas:false,markers:false,tension:"",animate:false,enableCache:false,interpolate:false},optionalParams:{stroke:{},outline:{},shadow:{},fill:{},filter:{},styleFunc:null,font:"",fontColor:"",marker:"",markerStroke:{},markerOutline:{},markerShadow:{},markerFill:{},markerFont:"",markerFontColor:"",zeroLine:0},constructor:function(_a,_b){
+this.opt=_1.clone(_1.mixin(this.opt,this.defaultParams));
+du.updateWithObject(this.opt,_b);
+du.updateWithPattern(this.opt,_b,this.optionalParams);
+this.animate=this.opt.animate;
+},createPath:function(_c,_d,_e){
+var _f;
+if(this.opt.enableCache&&_c._pathFreePool.length>0){
+_f=_c._pathFreePool.pop();
+_f.setShape(_e);
+_d.add(_f);
+}else{
+_f=_d.createPath(_e);
+}
+if(this.opt.enableCache){
+_c._pathUsePool.push(_f);
+}
+return _f;
+},buildSegments:function(i,_10){
+var run=this.series[i],min=_10?Math.max(0,Math.floor(this._hScaler.bounds.from-1)):0,max=_10?Math.min(run.data.length,Math.ceil(this._hScaler.bounds.to)):run.data.length,_11=null,_12=[];
+for(var j=min;j<max;j++){
+if(!this.isNullValue(run.data[j])){
+if(!_11){
+_11=[];
+_12.push({index:j,rseg:_11});
+}
+_11.push((_10&&run.data[j].hasOwnProperty("y"))?run.data[j].y:run.data[j]);
+}else{
+if(!this.opt.interpolate||_10){
+_11=null;
+}
+}
+}
+return _12;
+},render:function(dim,_13){
+if(this.zoom&&!this.isDataDirty()){
+return this.performZoom(dim,_13);
+}
+this.resetEvents();
+this.dirty=this.isDirty();
+var s;
+if(this.dirty){
+_3.forEach(this.series,_8);
+this._eventSeries={};
+this.cleanGroup();
+this.getGroup().setTransform(null);
+s=this.getGroup();
+df.forEachRev(this.series,function(_14){
+_14.cleanGroup(s);
+});
+}
+var t=this.chart.theme,_15,_16,_17=this.events();
+for(var i=0;i<this.series.length;i++){
+var run=this.series[i];
+if(!this.dirty&&!run.dirty){
+t.skip();
+this._reconnectEvents(run.name);
+continue;
+}
+run.cleanGroup();
+if(this.opt.enableCache){
+run._pathFreePool=(run._pathFreePool?run._pathFreePool:[]).concat(run._pathUsePool?run._pathUsePool:[]);
+run._pathUsePool=[];
+}
+if(!run.data.length){
+run.dirty=false;
+t.skip();
+continue;
+}
+var _18=t.next(this.opt.areas?"area":"line",[this.opt,run],true),_19,ht=this._hScaler.scaler.getTransformerFromModel(this._hScaler),vt=this._vScaler.scaler.getTransformerFromModel(this._vScaler),_1a=this._eventSeries[run.name]=new Array(run.data.length);
+s=run.group;
+if(run.hidden){
+if(this.opt.lines){
+run.dyn.stroke=_18.series.stroke;
+}
+if(run.markers||(run.markers===undefined&&this.opt.markers)){
+run.dyn.markerFill=_18.marker.fill;
+run.dyn.markerStroke=_18.marker.stroke;
+run.dyn.marker=_18.symbol;
+}
+if(this.opt.areas){
+run.dyn.fill=_18.series.fill;
+}
+continue;
+}
+var _1b=_3.some(run.data,function(_1c){
+return typeof _1c=="number"||(_1c&&!_1c.hasOwnProperty("x"));
+});
+var _1d=this.buildSegments(i,_1b);
+for(var seg=0;seg<_1d.length;seg++){
+var _1e=_1d[seg];
+if(_1b){
+_19=_3.map(_1e.rseg,function(v,i){
+return {x:ht(i+_1e.index+1)+_13.l,y:dim.height-_13.b-vt(v),data:v};
+},this);
+}else{
+_19=_3.map(_1e.rseg,function(v){
+return {x:ht(v.x)+_13.l,y:dim.height-_13.b-vt(v.y),data:v};
+},this);
+}
+if(_1b&&this.opt.interpolate){
+while(seg<_1d.length){
+seg++;
+_1e=_1d[seg];
+if(_1e){
+_19=_19.concat(_3.map(_1e.rseg,function(v,i){
+return {x:ht(i+_1e.index+1)+_13.l,y:dim.height-_13.b-vt(v),data:v};
+},this));
+}
+}
+}
+var _1f=this.opt.tension?dc.curve(_19,this.opt.tension):"";
+if(this.opt.areas&&_19.length>1){
+var _20=this._plotFill(_18.series.fill,dim,_13),_21=_1.clone(_19),_22=dim.height-_13.b;
+if(!isNaN(this.opt.zeroLine)){
+_22=Math.max(_13.t,Math.min(dim.height-_13.b-vt(this.opt.zeroLine),_22));
+}
+if(this.opt.tension){
+var _23="L"+_21[_21.length-1].x+","+_22+" L"+_21[0].x+","+_22+" L"+_21[0].x+","+_21[0].y;
+run.dyn.fill=s.createPath(_1f+" "+_23).setFill(_20).getFill();
+}else{
+_21.push({x:_19[_19.length-1].x,y:_22});
+_21.push({x:_19[0].x,y:_22});
+_21.push(_19[0]);
+run.dyn.fill=s.createPolyline(_21).setFill(_20).getFill();
+}
+}
+if(this.opt.lines||this.opt.markers){
+_15=_18.series.stroke;
+if(_18.series.outline){
+_16=run.dyn.outline=dc.makeStroke(_18.series.outline);
+_16.width=2*_16.width+(_15&&_15.width||0);
+}
+}
+if(this.opt.markers){
+run.dyn.marker=_18.symbol;
+}
+var _24=null,_25=null,_26=null;
+if(_15&&_18.series.shadow&&_19.length>1){
+var _27=_18.series.shadow,_28=_3.map(_19,function(c){
+return {x:c.x+_27.dx,y:c.y+_27.dy};
+});
+if(this.opt.lines){
+if(this.opt.tension){
+run.dyn.shadow=s.createPath(dc.curve(_28,this.opt.tension)).setStroke(_27).getStroke();
+}else{
+run.dyn.shadow=s.createPolyline(_28).setStroke(_27).getStroke();
+}
+}
+if(this.opt.markers&&_18.marker.shadow){
+_27=_18.marker.shadow;
+_26=_3.map(_28,function(c){
+return this.createPath(run,s,"M"+c.x+" "+c.y+" "+_18.symbol).setStroke(_27).setFill(_27.color);
+},this);
+}
+}
+if(this.opt.lines&&_19.length>1){
+var _29;
+if(_16){
+if(this.opt.tension){
+run.dyn.outline=s.createPath(_1f).setStroke(_16).getStroke();
+}else{
+run.dyn.outline=s.createPolyline(_19).setStroke(_16).getStroke();
+}
+}
+if(this.opt.tension){
+run.dyn.stroke=(_29=s.createPath(_1f)).setStroke(_15).getStroke();
+}else{
+run.dyn.stroke=(_29=s.createPolyline(_19)).setStroke(_15).getStroke();
+}
+if(_29.setFilter&&_18.series.filter){
+_29.setFilter(_18.series.filter);
+}
+}
+var _2a=null;
+if(this.opt.markers){
+var _2b=_18;
+_24=new Array(_19.length);
+_25=new Array(_19.length);
+_16=null;
+if(_2b.marker.outline){
+_16=dc.makeStroke(_2b.marker.outline);
+_16.width=2*_16.width+(_2b.marker.stroke?_2b.marker.stroke.width:0);
+}
+_3.forEach(_19,function(c,i){
+if(this.opt.styleFunc||typeof c.data!="number"){
+var _2c=typeof c.data!="number"?[c.data]:[];
+if(this.opt.styleFunc){
+_2c.push(this.opt.styleFunc(c.data));
+}
+_2b=t.addMixin(_18,"marker",_2c,true);
+}else{
+_2b=t.post(_18,"marker");
+}
+var _2d="M"+c.x+" "+c.y+" "+_2b.symbol;
+if(_16){
+_25[i]=this.createPath(run,s,_2d).setStroke(_16);
+}
+_24[i]=this.createPath(run,s,_2d).setStroke(_2b.marker.stroke).setFill(_2b.marker.fill);
+},this);
+run.dyn.markerFill=_2b.marker.fill;
+run.dyn.markerStroke=_2b.marker.stroke;
+if(!_2a&&this.opt.labels){
+_2a=_24[0].getBoundingBox();
+}
+if(_17){
+_3.forEach(_24,function(s,i){
+var o={element:"marker",index:i+_1e.index,run:run,shape:s,outline:_25[i]||null,shadow:_26&&_26[i]||null,cx:_19[i].x,cy:_19[i].y};
+if(_1b){
+o.x=i+_1e.index+1;
+o.y=run.data[i+_1e.index];
+}else{
+o.x=_1e.rseg[i].x;
+o.y=run.data[i+_1e.index].y;
+}
+this._connectEvents(o);
+_1a[i+_1e.index]=o;
+},this);
+}else{
+delete this._eventSeries[run.name];
+}
+}
+if(this.opt.labels){
+var _2e=_2a?_2a.width:2;
+var _2f=_2a?_2a.height:2;
+_3.forEach(_19,function(c,i){
+if(this.opt.styleFunc||typeof c.data!="number"){
+var _30=typeof c.data!="number"?[c.data]:[];
+if(this.opt.styleFunc){
+_30.push(this.opt.styleFunc(c.data));
+}
+_2b=t.addMixin(_18,"marker",_30,true);
+}else{
+_2b=t.post(_18,"marker");
+}
+this.createLabel(s,_1e.rseg[i],{x:c.x-_2e/2,y:c.y-_2f/2,width:_2e,height:_2f},_2b);
+},this);
+}
+}
+run.dirty=false;
+}
+if(_4("dojo-bidi")){
+this._checkOrientation(this.group,dim,_13);
+}
+if(this.animate){
+var _31=this.getGroup();
+fx.animateTransform(_1.delegate({shape:_31,duration:_9,transform:[{name:"translate",start:[0,dim.height-_13.b],end:[0,0]},{name:"scale",start:[1,0],end:[1,1]},{name:"original"}]},this.animate)).play();
+}
+this.dirty=false;
+return this;
+}});
+});

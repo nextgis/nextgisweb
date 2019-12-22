@@ -5,7 +5,34 @@
 */
 
 //>>built
-define("dojo/data/api/Read",["../../_base/declare"],function(b){return b("dojo.data.api.Read",null,{getValue:function(a,c,b){throw Error("Unimplemented API: dojo.data.api.Read.getValue");},getValues:function(a,c){throw Error("Unimplemented API: dojo.data.api.Read.getValues");},getAttributes:function(a){throw Error("Unimplemented API: dojo.data.api.Read.getAttributes");},hasAttribute:function(a,c){throw Error("Unimplemented API: dojo.data.api.Read.hasAttribute");},containsValue:function(a,c,b){throw Error("Unimplemented API: dojo.data.api.Read.containsValue");
-},isItem:function(a){throw Error("Unimplemented API: dojo.data.api.Read.isItem");},isItemLoaded:function(a){throw Error("Unimplemented API: dojo.data.api.Read.isItemLoaded");},loadItem:function(a){if(!this.isItemLoaded(a.item))throw Error("Unimplemented API: dojo.data.api.Read.loadItem");},fetch:function(a){throw Error("Unimplemented API: dojo.data.api.Read.fetch");},getFeatures:function(){return{"dojo.data.api.Read":!0}},close:function(a){throw Error("Unimplemented API: dojo.data.api.Read.close");
-},getLabel:function(a){throw Error("Unimplemented API: dojo.data.api.Read.getLabel");},getLabelAttributes:function(a){throw Error("Unimplemented API: dojo.data.api.Read.getLabelAttributes");}})});
-//# sourceMappingURL=Read.js.map
+define("dojo/data/api/Read",["../../_base/declare"],function(_1){
+return _1("dojo.data.api.Read",null,{getValue:function(_2,_3,_4){
+throw new Error("Unimplemented API: dojo.data.api.Read.getValue");
+},getValues:function(_5,_6){
+throw new Error("Unimplemented API: dojo.data.api.Read.getValues");
+},getAttributes:function(_7){
+throw new Error("Unimplemented API: dojo.data.api.Read.getAttributes");
+},hasAttribute:function(_8,_9){
+throw new Error("Unimplemented API: dojo.data.api.Read.hasAttribute");
+},containsValue:function(_a,_b,_c){
+throw new Error("Unimplemented API: dojo.data.api.Read.containsValue");
+},isItem:function(_d){
+throw new Error("Unimplemented API: dojo.data.api.Read.isItem");
+},isItemLoaded:function(_e){
+throw new Error("Unimplemented API: dojo.data.api.Read.isItemLoaded");
+},loadItem:function(_f){
+if(!this.isItemLoaded(_f.item)){
+throw new Error("Unimplemented API: dojo.data.api.Read.loadItem");
+}
+},fetch:function(_10){
+throw new Error("Unimplemented API: dojo.data.api.Read.fetch");
+},getFeatures:function(){
+return {"dojo.data.api.Read":true};
+},close:function(_11){
+throw new Error("Unimplemented API: dojo.data.api.Read.close");
+},getLabel:function(_12){
+throw new Error("Unimplemented API: dojo.data.api.Read.getLabel");
+},getLabelAttributes:function(_13){
+throw new Error("Unimplemented API: dojo.data.api.Read.getLabelAttributes");
+}});
+});

@@ -1,5 +1,74 @@
 //>>built
-define("dojox/encoding/compression/lzw",["dojo/_base/lang","../bits"],function(d,g){var c=d.getObject("dojox.encoding.compression.lzw",!0),f=function(a){for(var b=1,c=2;a>=c;c<<=1,++b);return b};c.Encoder=function(a){this.size=a;this.init()};d.extend(c.Encoder,{init:function(){this.dict={};for(var a=0;a<this.size;++a)this.dict[String.fromCharCode(a)]=a;this.width=f(this.code=this.size);this.p=""},encode:function(a,b){var c=String.fromCharCode(a),d=this.p+c,e=0;if(d in this.dict)return this.p=d,e;
-b.putBits(this.dict[this.p],this.width);0==(this.code&this.code+1)&&b.putBits(this.code++,e=this.width++);this.dict[d]=this.code++;this.p=c;return e+this.width},flush:function(a){if(0==this.p.length)return 0;a.putBits(this.dict[this.p],this.width);this.p="";return this.width}});c.Decoder=function(a){this.size=a;this.init()};d.extend(c.Decoder,{init:function(){this.codes=Array(this.size);for(var a=0;a<this.size;++a)this.codes[a]=String.fromCharCode(a);this.width=f(this.size);this.p=-1},decode:function(a){a=
-a.getBits(this.width);var b;if(a<this.codes.length)b=this.codes[a],0<=this.p&&this.codes.push(this.codes[this.p]+b.substr(0,1));else{if(0==(a&a+1))return this.codes.push(""),++this.width,"";b=this.codes[this.p];b+=b.substr(0,1);this.codes.push(b)}this.p=a;return b}});return c});
-//# sourceMappingURL=lzw.js.map
+define("dojox/encoding/compression/lzw",["dojo/_base/lang","../bits"],function(_1,_2){
+var _3=_1.getObject("dojox.encoding.compression.lzw",true);
+var _4=function(x){
+var w=1;
+for(var v=2;x>=v;v<<=1,++w){
+}
+return w;
+};
+_3.Encoder=function(n){
+this.size=n;
+this.init();
+};
+_1.extend(_3.Encoder,{init:function(){
+this.dict={};
+for(var i=0;i<this.size;++i){
+this.dict[String.fromCharCode(i)]=i;
+}
+this.width=_4(this.code=this.size);
+this.p="";
+},encode:function(_5,_6){
+var c=String.fromCharCode(_5),p=this.p+c,r=0;
+if(p in this.dict){
+this.p=p;
+return r;
+}
+_6.putBits(this.dict[this.p],this.width);
+if((this.code&(this.code+1))==0){
+_6.putBits(this.code++,r=this.width++);
+}
+this.dict[p]=this.code++;
+this.p=c;
+return r+this.width;
+},flush:function(_7){
+if(this.p.length==0){
+return 0;
+}
+_7.putBits(this.dict[this.p],this.width);
+this.p="";
+return this.width;
+}});
+_3.Decoder=function(n){
+this.size=n;
+this.init();
+};
+_1.extend(_3.Decoder,{init:function(){
+this.codes=new Array(this.size);
+for(var i=0;i<this.size;++i){
+this.codes[i]=String.fromCharCode(i);
+}
+this.width=_4(this.size);
+this.p=-1;
+},decode:function(_8){
+var c=_8.getBits(this.width),v;
+if(c<this.codes.length){
+v=this.codes[c];
+if(this.p>=0){
+this.codes.push(this.codes[this.p]+v.substr(0,1));
+}
+}else{
+if((c&(c+1))==0){
+this.codes.push("");
+++this.width;
+return "";
+}
+var x=this.codes[this.p];
+v=x+x.substr(0,1);
+this.codes.push(v);
+}
+this.p=c;
+return v;
+}});
+return _3;
+});

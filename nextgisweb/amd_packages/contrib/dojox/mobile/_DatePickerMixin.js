@@ -1,9 +1,130 @@
 //>>built
-define("dojox/mobile/_DatePickerMixin","dojo/_base/array dojo/_base/declare dojo/_base/lang dojo/date dojo/date/locale dojo/date/stamp".split(" "),function(c,d,g,l,f,k){var h={format:function(a){return f.format(a,{datePattern:this.pattern,selector:"date",locale:this.picker.lang})}},m=g.mixin({initLabels:function(){this.labels=[];if(this.labelFrom!==this.labelTo){var a=new Date(this.labelFrom,0,1),b,e;b=this.labelFrom;for(e=0;b<=this.labelTo;b++,e++)a.setFullYear(b),this.labels.push(this.format(a))}}},
-h),n=g.mixin({initLabels:function(){this.labels=[];for(var a=new Date(2E3,0,16),b=0;12>b;b++)a.setMonth(b),this.labels.push(this.format(a))}},h),p=g.mixin({initLabels:function(){this.labels=[];for(var a=new Date(2E3,0,1),b=1;31>=b;b++)a.setDate(b),this.labels.push(this.format(a))}},h);return d("dojox.mobile._DatePickerMixin",null,{yearPattern:"yyyy",monthPattern:"MMM",dayPattern:"d",initSlots:function(){var a=this.slotClasses,b=this.slotProps;a[0]=d(a[0],m);a[1]=d(a[1],n);a[2]=d(a[2],p);b[2].picker=
-b[1].picker=b[0].picker=this;b[0].pattern=this.yearPattern;b[1].pattern=this.monthPattern;b[2].pattern=this.dayPattern;this.reorderSlots()},reorderSlots:function(){if(!this.slotOrder.length){var a=f._parseInfo({locale:this.lang}).bundle["dateFormat-short"].toLowerCase().split(/[^ymd]+/,3);this.slotOrder=c.map(a,function(a){return{y:0,m:1,d:2}[a.charAt(0)]})}},reset:function(){var a=new Date,b=c.map(this.slots,function(b){return b.format(a)});this.set("colors",b);this._disableEndDaysOfMonth();this.value?
-(this.set("value",this.value),this.value=null):this.values?(this.set("values",this.values),this.values=null):this.set("values",b)},_onYearSet:function(){var a=this.slots[0],b=a.get("value");a._previousValue&&b==a._previousValue||(this._disableEndDaysOfMonth(),a._previousValue=b,a._set("value",b),this.onYearSet())},onYearSet:function(){},_onMonthSet:function(){var a=this.slots[1],b=a.get("value");a._previousValue&&b==a._previousValue||(this._disableEndDaysOfMonth(),a._previousValue=b,a._set("value",
-b),this.onMonthSet())},onMonthSet:function(){},_onDaySet:function(){var a=this.slots[2],b=a.get("value");a._previousValue&&b==a._previousValue||this._disableEndDaysOfMonth()||(a._previousValue=b,a._set("value",b),this.onDaySet())},onDaySet:function(){},_disableEndDaysOfMonth:function(){var a=this.slots[0].pattern+"/"+this.slots[1].pattern,b=this.get("values"),a=f.parse(b[0]+"/"+b[1],{datePattern:a,selector:"date",locale:this.lang}),a=l.getDaysInMonth(a),e=!1;a<b[2]&&(e=!0,this.slots[2]._spinToValue(a,
-!1));this.disableValues(a);return e},_getDateAttr:function(){var a=this.get("values"),b=this.slots;return f.parse(a[0]+"/"+a[1]+"/"+a[2],{datePattern:b[0].pattern+"/"+b[1].pattern+"/"+b[2].pattern,selector:"date",locale:this.lang})},_setValuesAttr:function(a){c.forEach(this.getSlots(),function(b,e){var c=a[e];if("number"==typeof c){var d=[1970,1,1];d.splice(e,1,c-0);c=b.format(new Date(d[0],d[1]-1,d[2]))}b.set("value",c)})},_setValueAttr:function(a){var b=k.fromISOString(a);this.set("values",c.map(this.slots,
-function(a){return a.format(b)}))},_getValueAttr:function(){return k.toISOString(this.get("date"),{selector:"date"})}})});
-//# sourceMappingURL=_DatePickerMixin.js.map
+define("dojox/mobile/_DatePickerMixin",["dojo/_base/array","dojo/_base/declare","dojo/_base/lang","dojo/date","dojo/date/locale","dojo/date/stamp"],function(_1,_2,_3,_4,_5,_6){
+var _7={format:function(d){
+return _5.format(d,{datePattern:this.pattern,selector:"date",locale:this.picker.lang});
+}};
+var _8=_3.mixin({initLabels:function(){
+this.labels=[];
+if(this.labelFrom!==this.labelTo){
+var d=new Date(this.labelFrom,0,1);
+var i,_9;
+for(i=this.labelFrom,_9=0;i<=this.labelTo;i++,_9++){
+d.setFullYear(i);
+this.labels.push(this.format(d));
+}
+}
+}},_7);
+var _a=_3.mixin({initLabels:function(){
+this.labels=[];
+var d=new Date(2000,0,16);
+for(var i=0;i<12;i++){
+d.setMonth(i);
+this.labels.push(this.format(d));
+}
+}},_7);
+var _b=_3.mixin({initLabels:function(){
+this.labels=[];
+var d=new Date(2000,0,1);
+for(var i=1;i<=31;i++){
+d.setDate(i);
+this.labels.push(this.format(d));
+}
+}},_7);
+return _2("dojox.mobile._DatePickerMixin",null,{yearPattern:"yyyy",monthPattern:"MMM",dayPattern:"d",initSlots:function(){
+var c=this.slotClasses,p=this.slotProps;
+c[0]=_2(c[0],_8);
+c[1]=_2(c[1],_a);
+c[2]=_2(c[2],_b);
+p[2].picker=p[1].picker=p[0].picker=this;
+p[0].pattern=this.yearPattern;
+p[1].pattern=this.monthPattern;
+p[2].pattern=this.dayPattern;
+this.reorderSlots();
+},reorderSlots:function(){
+if(this.slotOrder.length){
+return;
+}
+var a=_5._parseInfo({locale:this.lang}).bundle["dateFormat-short"].toLowerCase().split(/[^ymd]+/,3);
+this.slotOrder=_1.map(a,function(_c){
+return {y:0,m:1,d:2}[_c.charAt(0)];
+});
+},reset:function(){
+var _d=new Date();
+var v=_1.map(this.slots,function(w){
+return w.format(_d);
+});
+this.set("colors",v);
+this._disableEndDaysOfMonth();
+if(this.value){
+this.set("value",this.value);
+this.value=null;
+}else{
+if(this.values){
+this.set("values",this.values);
+this.values=null;
+}else{
+this.set("values",v);
+}
+}
+},_onYearSet:function(){
+var _e=this.slots[0];
+var _f=_e.get("value");
+if(!(_e._previousValue&&_f==_e._previousValue)){
+this._disableEndDaysOfMonth();
+_e._previousValue=_f;
+_e._set("value",_f);
+this.onYearSet();
+}
+},onYearSet:function(){
+},_onMonthSet:function(){
+var _10=this.slots[1];
+var _11=_10.get("value");
+if(!(_10._previousValue&&_11==_10._previousValue)){
+this._disableEndDaysOfMonth();
+_10._previousValue=_11;
+_10._set("value",_11);
+this.onMonthSet();
+}
+},onMonthSet:function(){
+},_onDaySet:function(){
+var _12=this.slots[2];
+var _13=_12.get("value");
+if(!(_12._previousValue&&_13==_12._previousValue)){
+if(!this._disableEndDaysOfMonth()){
+_12._previousValue=_13;
+_12._set("value",_13);
+this.onDaySet();
+}
+}
+},onDaySet:function(){
+},_disableEndDaysOfMonth:function(){
+var pat=this.slots[0].pattern+"/"+this.slots[1].pattern,v=this.get("values"),_14=_5.parse(v[0]+"/"+v[1],{datePattern:pat,selector:"date",locale:this.lang}),_15=_4.getDaysInMonth(_14);
+var _16=false;
+if(_15<v[2]){
+_16=true;
+this.slots[2]._spinToValue(_15,false);
+}
+this.disableValues(_15);
+return _16;
+},_getDateAttr:function(){
+var v=this.get("values"),s=this.slots,pat=s[0].pattern+"/"+s[1].pattern+"/"+s[2].pattern;
+return _5.parse(v[0]+"/"+v[1]+"/"+v[2],{datePattern:pat,selector:"date",locale:this.lang});
+},_setValuesAttr:function(_17){
+_1.forEach(this.getSlots(),function(w,i){
+var v=_17[i];
+if(typeof v=="number"){
+var arr=[1970,1,1];
+arr.splice(i,1,v-0);
+v=w.format(new Date(arr[0],arr[1]-1,arr[2]));
+}
+w.set("value",v);
+});
+},_setValueAttr:function(_18){
+var _19=_6.fromISOString(_18);
+this.set("values",_1.map(this.slots,function(w){
+return w.format(_19);
+}));
+},_getValueAttr:function(){
+return _6.toISOString(this.get("date"),{selector:"date"});
+}});
+});

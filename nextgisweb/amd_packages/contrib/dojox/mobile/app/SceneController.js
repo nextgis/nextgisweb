@@ -1,7 +1,79 @@
 //>>built
-define("dojox/mobile/app/SceneController",["dojo","dijit","dojox","dojo/require!dojox/mobile/_base"],function(b,l,c){b.provide("dojox.mobile.app.SceneController");b.experimental("dojox.mobile.app.SceneController");b.require("dojox.mobile._base");(function(){var h=c.mobile.app,f={};b.declare("dojox.mobile.app.SceneController",c.mobile.View,{stageController:null,keepScrollPos:!1,init:function(a,d){this.sceneName=a;this.params=d;var c=h.resolveTemplate(a);this._deferredInit=new b.Deferred;f[a]?this._setContents(f[a]):
-b.xhrGet({url:c,handleAs:"text"}).addCallback(b.hitch(this,this._setContents));return this._deferredInit},_setContents:function(a){f[this.sceneName]=a;this.domNode.innerHTML="\x3cdiv\x3e"+a+"\x3c/div\x3e";var d="";a=this.sceneName.split("-");for(var e=0;e<a.length;e++)d+=a[e].substring(0,1).toUpperCase()+a[e].substring(1);this.sceneAssistantName=d+="Assistant";var g=this;c.mobile.app.loadResourcesForScene(this.sceneName,function(){if("undefined"!=typeof b.global[d])g._initAssistant();else{var a=h.resolveAssistant(g.sceneName);
-b.xhrGet({url:a,handleAs:"text"}).addCallback(function(a){try{b.eval(a)}catch(k){throw k;}g._initAssistant()})}})},_initAssistant:function(){var a=b.getObject(this.sceneAssistantName);if(!a)throw Error("Unable to resolve scene assistant "+this.sceneAssistantName);this.assistant=new a(this.params);this.assistant.controller=this;this.assistant.domNode=this.domNode.firstChild;this.assistant.setup();this._deferredInit.callback()},query:function(a,d){return b.query(a,d||this.domNode)},parse:function(a){a=
-this._widgets=c.mobile.parser.parse(a||this.domNode,{controller:this});for(var b=0;b<a.length;b++)a[b].set("controller",this)},getWindowSize:function(){return{w:b.global.innerWidth,h:b.global.innerHeight}},showAlertDialog:function(a){b.marginBox(this.assistant.domNode);a=new c.mobile.app.AlertDialog(b.mixin(a,{controller:this}));this.assistant.domNode.appendChild(a.domNode);a.show()},popupSubMenu:function(a){var b=new c.mobile.app.ListSelector({controller:this,destroyOnHide:!0,onChoose:a.onChoose});
-this.assistant.domNode.appendChild(b.domNode);b.set("data",a.choices);b.show(a.fromNode)}})})()});
-//# sourceMappingURL=SceneController.js.map
+define("dojox/mobile/app/SceneController",["dojo","dijit","dojox","dojo/require!dojox/mobile/_base"],function(_1,_2,_3){
+_1.provide("dojox.mobile.app.SceneController");
+_1.experimental("dojox.mobile.app.SceneController");
+_1.require("dojox.mobile._base");
+(function(){
+var _4=_3.mobile.app;
+var _5={};
+_1.declare("dojox.mobile.app.SceneController",_3.mobile.View,{stageController:null,keepScrollPos:false,init:function(_6,_7){
+this.sceneName=_6;
+this.params=_7;
+var _8=_4.resolveTemplate(_6);
+this._deferredInit=new _1.Deferred();
+if(_5[_6]){
+this._setContents(_5[_6]);
+}else{
+_1.xhrGet({url:_8,handleAs:"text"}).addCallback(_1.hitch(this,this._setContents));
+}
+return this._deferredInit;
+},_setContents:function(_9){
+_5[this.sceneName]=_9;
+this.domNode.innerHTML="<div>"+_9+"</div>";
+var _a="";
+var _b=this.sceneName.split("-");
+for(var i=0;i<_b.length;i++){
+_a+=_b[i].substring(0,1).toUpperCase()+_b[i].substring(1);
+}
+_a+="Assistant";
+this.sceneAssistantName=_a;
+var _c=this;
+_3.mobile.app.loadResourcesForScene(this.sceneName,function(){
+var _d;
+if(typeof (_1.global[_a])!="undefined"){
+_c._initAssistant();
+}else{
+var _e=_4.resolveAssistant(_c.sceneName);
+_1.xhrGet({url:_e,handleAs:"text"}).addCallback(function(_f){
+try{
+_1.eval(_f);
+}
+catch(e){
+throw e;
+}
+_c._initAssistant();
+});
+}
+});
+},_initAssistant:function(){
+var cls=_1.getObject(this.sceneAssistantName);
+if(!cls){
+throw Error("Unable to resolve scene assistant "+this.sceneAssistantName);
+}
+this.assistant=new cls(this.params);
+this.assistant.controller=this;
+this.assistant.domNode=this.domNode.firstChild;
+this.assistant.setup();
+this._deferredInit.callback();
+},query:function(_10,_11){
+return _1.query(_10,_11||this.domNode);
+},parse:function(_12){
+var _13=this._widgets=_3.mobile.parser.parse(_12||this.domNode,{controller:this});
+for(var i=0;i<_13.length;i++){
+_13[i].set("controller",this);
+}
+},getWindowSize:function(){
+return {w:_1.global.innerWidth,h:_1.global.innerHeight};
+},showAlertDialog:function(_14){
+var _15=_1.marginBox(this.assistant.domNode);
+var _16=new _3.mobile.app.AlertDialog(_1.mixin(_14,{controller:this}));
+this.assistant.domNode.appendChild(_16.domNode);
+_16.show();
+},popupSubMenu:function(_17){
+var _18=new _3.mobile.app.ListSelector({controller:this,destroyOnHide:true,onChoose:_17.onChoose});
+this.assistant.domNode.appendChild(_18.domNode);
+_18.set("data",_17.choices);
+_18.show(_17.fromNode);
+}});
+})();
+});

@@ -5,14 +5,288 @@
 */
 
 //>>built
-define("dojo/request/iframe","module require ./watch ./util ./handlers ../_base/lang ../io-query ../query ../has ../dom ../dom-construct ../_base/window ../NodeList-dom".split(" "),function(C,D,E,r,F,x,A,G,y,B,t,d){function H(a){return!this.isFulfilled()}function I(a){return!!this._finished}function J(a,b){if(!b)try{var f=a.options,g=c.doc(c._frame),e=f.handleAs;if("html"!==e){if("xml"===e)if("html"===g.documentElement.tagName.toLowerCase()){G("a",g.documentElement).orphan();var d=g.documentElement.innerText||
-g.documentElement.textContent,d=d.replace(/>\s+</g,"\x3e\x3c");a.text=x.trim(d)}else a.data=g;else a.text=g.getElementsByTagName("textarea")[0].value;F(a)}else a.data=g}catch(h){b=h}b?this.reject(b):this._finished?this.resolve(a):this.reject(Error("Invalid dojo/request/iframe request state"))}function K(a){this._callNext()}function c(a,b,f){var d=r.parseArgs(a,r.deepCreate(L,b),!0);a=d.url;b=d.options;if("GET"!==b.method&&"POST"!==b.method)throw Error(b.method+" not supported by dojo/request/iframe");
-c._frame||(c._frame=c.create(c._iframeName,z+"();"));a=r.deferred(d,null,H,I,J,K);a._callNext=function(){this._calledNext||(this._calledNext=!0,c._currentDfd=null,c._fireNextRequest())};a._legacy=f;c._dfdQueue.push(a);c._fireNextRequest();E(a);return f?a:a.promise}var u=C.id.replace(/[\/\.\-]/g,"_"),z=u+"_onload";d.global[z]||(d.global[z]=function(){var a=c._currentDfd;if(a){var b=B.byId(a.response.options.form)||a._tmpForm;if(b){for(var f=a._contentToClean,d=0;d<f.length;d++)for(var e=f[d],l=0;l<
-b.childNodes.length;l++){var h=b.childNodes[l];if(h.name===e){t.destroy(h);break}}a._originalAction&&b.setAttribute("action",a._originalAction);a._originalMethod&&(b.setAttribute("method",a._originalMethod),b.method=a._originalMethod);a._originalTarget&&(b.setAttribute("target",a._originalTarget),b.target=a._originalTarget)}a._tmpForm&&(t.destroy(a._tmpForm),delete a._tmpForm);a._finished=!0}else c._fireNextRequest()});var L={method:"POST"};c.create=function(a,b,c){if(d.global[a])return d.global[a];
-if(d.global.frames[a])return d.global.frames[a];c||(y("config-useXDomain")&&!y("config-dojoBlankHtmlUrl")&&console.warn("dojo/request/iframe: When using cross-domain Dojo builds, please save dojo/resources/blank.html to your domain and set dojoConfig.dojoBlankHtmlUrl to the path on your domain to blank.html"),c=y("config-dojoBlankHtmlUrl")||D.toUrl("dojo/resources/blank.html"));b=t.place('\x3ciframe id\x3d"'+a+'" name\x3d"'+a+'" src\x3d"'+c+'" onload\x3d"'+b+'" style\x3d"position: absolute; left: 1px; top: 1px; height: 1px; width: 1px; visibility: hidden"\x3e',
-d.body());return d.global[a]=b};c.doc=function(a){if(a.contentDocument)return a.contentDocument;var b=a.name;if(b){var c=d.doc.getElementsByTagName("iframe");if(a.document&&c[b].contentWindow&&c[b].contentWindow.document)return c[b].contentWindow.document;if(d.doc.frames[b]&&d.doc.frames[b].document)return d.doc.frames[b].document}return null};c.setSrc=function(a,b,c){a=d.global.frames[a.name];a.contentWindow&&(a=a.contentWindow);try{c?a.location.replace(b):a.location=b}catch(g){}};c._iframeName=
-u+"_IoIframe";c._notifyStart=function(){};c._dfdQueue=[];c._currentDfd=null;c._fireNextRequest=function(){var a;try{if(!c._currentDfd&&c._dfdQueue.length){do a=c._currentDfd=c._dfdQueue.shift();while(a&&(a.canceled||a.isCanceled&&a.isCanceled())&&c._dfdQueue.length);if(!a||a.canceled||a.isCanceled&&a.isCanceled())c._currentDfd=null;else{var b=a.response,f=b.options,g=a._contentToClean=[],e=B.byId(f.form),l=r.notify,h=f.data||null,n;a._legacy||"POST"!==f.method||e?"GET"===f.method&&e&&-1<b.url.indexOf("?")&&
-(n=b.url.slice(b.url.indexOf("?")+1),h=x.mixin(A.queryToObject(n),h)):e=a._tmpForm=t.create("form",{name:u+"_form",style:{position:"absolute",top:"-1000px",left:"-1000px"}},d.body());if(e){if(!a._legacy){var k=e;do k=k.parentNode;while(k&&k!==d.doc.documentElement);k||(e.style.position="absolute",e.style.left="-1000px",e.style.top="-1000px",d.body().appendChild(e));e.name||(e.name=u+"_form")}if(h){var k=function(a,b){t.create("input",{type:"hidden",name:a,value:b},e);g.push(a)},p;for(p in h){var q=
-h[p];if(x.isArray(q)&&1<q.length)for(n=0;n<q.length;n++)k(p,q[n]);else e[p]?e[p].value=q:k(p,q)}}var v=e.getAttributeNode("action"),m=e.getAttributeNode("method"),w=e.getAttributeNode("target");b.url&&(a._originalAction=v?v.value:null,v?v.value=b.url:e.setAttribute("action",b.url));a._legacy?m&&m.value||(m?m.value=f.method:e.setAttribute("method",f.method)):(a._originalMethod=m?m.value:null,m?m.value=f.method:e.setAttribute("method",f.method));a._originalTarget=w?w.value:null;w?w.value=c._iframeName:
-e.setAttribute("target",c._iframeName);e.target=c._iframeName;l&&l.emit("send",b,a.promise.cancel);c._notifyStart(b);e.submit()}else f="",b.options.data&&(f=b.options.data,"string"!==typeof f&&(f=A.objectToQuery(f))),k=b.url+(-1<b.url.indexOf("?")?"\x26":"?")+f,l&&l.emit("send",b,a.promise.cancel),c._notifyStart(b),c.setSrc(c._frame,k,!0)}}}catch(M){a.reject(M)}};r.addCommonMethods(c,["GET","POST"]);return c});
-//# sourceMappingURL=iframe.js.map
+define("dojo/request/iframe",["module","require","./watch","./util","./handlers","../_base/lang","../io-query","../query","../has","../dom","../dom-construct","../_base/window","../NodeList-dom","../NodeList-manipulate"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c){
+var _d=_1.id.replace(/[\/\.\-]/g,"_"),_e=_d+"_onload";
+if(!_c.global[_e]){
+_c.global[_e]=function(){
+var _f=_10._currentDfd;
+if(!_f){
+_10._fireNextRequest();
+return;
+}
+var _11=_f.response,_12=_11.options,_13=_a.byId(_12.form)||_f._tmpForm;
+if(_13){
+var _14=_f._contentToClean;
+for(var i=0;i<_14.length;i++){
+var key=_14[i];
+for(var j=0;j<_13.childNodes.length;j++){
+var _15=_13.childNodes[j];
+if(_15.name===key){
+_b.destroy(_15);
+break;
+}
+}
+}
+_f._originalAction&&_13.setAttribute("action",_f._originalAction);
+if(_f._originalMethod){
+_13.setAttribute("method",_f._originalMethod);
+_13.method=_f._originalMethod;
+}
+if(_f._originalTarget){
+_13.setAttribute("target",_f._originalTarget);
+_13.target=_f._originalTarget;
+}
+}
+if(_f._tmpForm){
+_b.destroy(_f._tmpForm);
+delete _f._tmpForm;
+}
+_f._finished=true;
+};
+}
+function _16(_17,_18,uri){
+if(_c.global[_17]){
+return _c.global[_17];
+}
+if(_c.global.frames[_17]){
+return _c.global.frames[_17];
+}
+if(!uri){
+if(_9("config-useXDomain")&&!_9("config-dojoBlankHtmlUrl")){
+console.warn("dojo/request/iframe: When using cross-domain Dojo builds,"+" please save dojo/resources/blank.html to your domain and set dojoConfig.dojoBlankHtmlUrl"+" to the path on your domain to blank.html");
+}
+uri=(_9("config-dojoBlankHtmlUrl")||_2.toUrl("dojo/resources/blank.html"));
+}
+var _19=_b.place("<iframe id=\""+_17+"\" name=\""+_17+"\" src=\""+uri+"\" onload=\""+_18+"\" style=\"position: absolute; left: 1px; top: 1px; height: 1px; width: 1px; visibility: hidden\">",_c.body());
+_c.global[_17]=_19;
+return _19;
+};
+function _1a(_1b,src,_1c){
+var _1d=_c.global.frames[_1b.name];
+if(_1d.contentWindow){
+_1d=_1d.contentWindow;
+}
+try{
+if(!_1c){
+_1d.location=src;
+}else{
+_1d.location.replace(src);
+}
+}
+catch(e){
+}
+};
+function doc(_1e){
+if(_1e.contentDocument){
+return _1e.contentDocument;
+}
+var _1f=_1e.name;
+if(_1f){
+var _20=_c.doc.getElementsByTagName("iframe");
+if(_1e.document&&_20[_1f].contentWindow&&_20[_1f].contentWindow.document){
+return _20[_1f].contentWindow.document;
+}else{
+if(_c.doc.frames[_1f]&&_c.doc.frames[_1f].document){
+return _c.doc.frames[_1f].document;
+}
+}
+}
+return null;
+};
+function _21(){
+return _b.create("form",{name:_d+"_form",style:{position:"absolute",top:"-1000px",left:"-1000px"}},_c.body());
+};
+function _22(){
+var dfd;
+try{
+if(_10._currentDfd||!_10._dfdQueue.length){
+return;
+}
+do{
+dfd=_10._currentDfd=_10._dfdQueue.shift();
+}while(dfd&&(dfd.canceled||(dfd.isCanceled&&dfd.isCanceled()))&&_10._dfdQueue.length);
+if(!dfd||dfd.canceled||(dfd.isCanceled&&dfd.isCanceled())){
+_10._currentDfd=null;
+return;
+}
+var _23=dfd.response,_24=_23.options,c2c=dfd._contentToClean=[],_25=_a.byId(_24.form),_26=_4.notify,_27=_24.data||null,_28;
+if(!dfd._legacy&&_24.method==="POST"&&!_25){
+_25=dfd._tmpForm=_21();
+}else{
+if(_24.method==="GET"&&_25&&_23.url.indexOf("?")>-1){
+_28=_23.url.slice(_23.url.indexOf("?")+1);
+_27=_6.mixin(_7.queryToObject(_28),_27);
+}
+}
+if(_25){
+if(!dfd._legacy){
+var _29=_25;
+do{
+_29=_29.parentNode;
+}while(_29&&_29!==_c.doc.documentElement);
+if(!_29){
+_25.style.position="absolute";
+_25.style.left="-1000px";
+_25.style.top="-1000px";
+_c.body().appendChild(_25);
+}
+if(!_25.name){
+_25.name=_d+"_form";
+}
+}
+if(_27){
+var _2a=function(_2b,_2c){
+_b.create("input",{type:"hidden",name:_2b,value:_2c},_25);
+c2c.push(_2b);
+};
+for(var x in _27){
+var val=_27[x];
+if(_6.isArray(val)&&val.length>1){
+for(var i=0;i<val.length;i++){
+_2a(x,val[i]);
+}
+}else{
+var n=_8("input[name='"+x+"']",_25);
+if(n.indexOf()==-1){
+_2a(x,val);
+}else{
+n.val(val);
+}
+}
+}
+}
+var _2d=_25.getAttributeNode("action"),_2e=_25.getAttributeNode("method"),_2f=_25.getAttributeNode("target");
+if(_23.url){
+dfd._originalAction=_2d?_2d.value:null;
+if(_2d){
+_2d.value=_23.url;
+}else{
+_25.setAttribute("action",_23.url);
+}
+}
+if(!dfd._legacy){
+dfd._originalMethod=_2e?_2e.value:null;
+if(_2e){
+_2e.value=_24.method;
+}else{
+_25.setAttribute("method",_24.method);
+}
+}else{
+if(!_2e||!_2e.value){
+if(_2e){
+_2e.value=_24.method;
+}else{
+_25.setAttribute("method",_24.method);
+}
+}
+}
+dfd._originalTarget=_2f?_2f.value:null;
+if(_2f){
+_2f.value=_10._iframeName;
+}else{
+_25.setAttribute("target",_10._iframeName);
+}
+_25.target=_10._iframeName;
+_26&&_26.emit("send",_23,dfd.promise.cancel);
+_10._notifyStart(_23);
+_25.submit();
+}else{
+var _30="";
+if(_23.options.data){
+_30=_23.options.data;
+if(typeof _30!=="string"){
+_30=_7.objectToQuery(_30);
+}
+}
+var _31=_23.url+(_23.url.indexOf("?")>-1?"&":"?")+_30;
+_26&&_26.emit("send",_23,dfd.promise.cancel);
+_10._notifyStart(_23);
+_10.setSrc(_10._frame,_31,true);
+}
+}
+catch(e){
+dfd.reject(e);
+}
+};
+function _32(_33){
+return !this.isFulfilled();
+};
+function _34(_35){
+return !!this._finished;
+};
+function _36(_37,_38){
+if(!_38){
+try{
+var _39=_37.options,doc=_10.doc(_10._frame),_3a=_39.handleAs;
+if(_3a!=="html"){
+if(_3a==="xml"){
+if(doc.documentElement.tagName.toLowerCase()==="html"){
+_8("a",doc.documentElement).orphan();
+var _3b=doc.documentElement.innerText||doc.documentElement.textContent;
+_3b=_3b.replace(/>\s+</g,"><");
+_37.text=_6.trim(_3b);
+}else{
+_37.data=doc;
+}
+}else{
+_37.text=doc.getElementsByTagName("textarea")[0].value;
+}
+_5(_37);
+}else{
+_37.data=doc;
+}
+}
+catch(e){
+_38=e;
+}
+}
+if(_38){
+this.reject(_38);
+}else{
+if(this._finished){
+this.resolve(_37);
+}else{
+this.reject(new Error("Invalid dojo/request/iframe request state"));
+}
+}
+};
+function _3c(_3d){
+this._callNext();
+};
+var _3e={method:"POST"};
+function _10(url,_3f,_40){
+var _41=_4.parseArgs(url,_4.deepCreate(_3e,_3f),true);
+url=_41.url;
+_3f=_41.options;
+if(_3f.method!=="GET"&&_3f.method!=="POST"){
+throw new Error(_3f.method+" not supported by dojo/request/iframe");
+}
+if(!_10._frame){
+_10._frame=_10.create(_10._iframeName,_e+"();");
+}
+var dfd=_4.deferred(_41,null,_32,_34,_36,_3c);
+dfd._callNext=function(){
+if(!this._calledNext){
+this._calledNext=true;
+_10._currentDfd=null;
+_10._fireNextRequest();
+}
+};
+dfd._legacy=_40;
+_10._dfdQueue.push(dfd);
+_10._fireNextRequest();
+_3(dfd);
+return _40?dfd:dfd.promise;
+};
+_10.create=_16;
+_10.doc=doc;
+_10.setSrc=_1a;
+_10._iframeName=_d+"_IoIframe";
+_10._notifyStart=function(){
+};
+_10._dfdQueue=[];
+_10._currentDfd=null;
+_10._fireNextRequest=_22;
+_4.addCommonMethods(_10,["GET","POST"]);
+return _10;
+});

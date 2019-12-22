@@ -1,4 +1,32 @@
 //>>built
-define("dojox/fx/scroll","dojo/_base/kernel dojo/_base/lang dojo/_base/fx dojox/fx/_base dojox/fx/_core dojo/dom-geometry dojo/_base/sniff".split(" "),function(c,e,l,d,m,h,n){c.experimental("dojox.fx.scroll");c=e.getObject("dojox.fx",!0);d.smoothScroll=function(a){a.target||(a.target=h.position(a.node));var c=e[n("ie")?"isObject":"isFunction"](a.win.scrollTo),f=a.target.x,g=a.target.y;if(!c)var d=h.position(a.win),f=f-d.x,g=g-d.y;var k=new l.Animation(e.mixin({beforeBegin:function(){this.curve&&delete this.curve;
-var b=c?dojo._docScroll():{x:a.win.scrollLeft,y:a.win.scrollTop};k.curve=new m([b.x,b.y],[b.x+f,b.y+g])},onAnimate:c?function(b){a.win.scrollTo(b[0],b[1])}:function(b){a.win.scrollLeft=b[0];a.win.scrollTop=b[1]}},a));return k};return c.smoothScroll=d.smoothScroll});
-//# sourceMappingURL=scroll.js.map
+define("dojox/fx/scroll",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/fx","dojo/_base/window","dojox/fx/_base","dojox/fx/_core","dojo/dom-geometry","dojo/_base/sniff"],function(_1,_2,_3,_4,_5,_6,_7,_8){
+_1.experimental("dojox.fx.scroll");
+var fx=_2.getObject("dojox.fx",true);
+_5.smoothScroll=function(_9){
+if(!_9.target){
+_9.target=_7.position(_9.node);
+}
+var _a=_9["win"]===_4.global,_b={x:_9.target.x,y:_9.target.y};
+if(!_a){
+var _c=_7.position(_9.win);
+_b.x-=_c.x;
+_b.y-=_c.y;
+}
+var _d=(_a)?(function(_e){
+_9.win.scrollTo(_e[0],_e[1]);
+}):(function(_f){
+_9.win.scrollLeft=_f[0];
+_9.win.scrollTop=_f[1];
+});
+var _10=new _3.Animation(_2.mixin({beforeBegin:function(){
+if(this.curve){
+delete this.curve;
+}
+var _11=_a?dojo._docScroll():{x:_9.win.scrollLeft,y:_9.win.scrollTop};
+_10.curve=new _6([_11.x,_11.y],[_11.x+_b.x,_11.y+_b.y]);
+},onAnimate:_d},_9));
+return _10;
+};
+fx.smoothScroll=_5.smoothScroll;
+return _5.smoothScroll;
+});

@@ -1574,10 +1574,23 @@ define("dijit/Tree", [
 			//		Focus on the specified node (which must be visible)
 			// tags:
 			//		protected
-
-			var scrollLeft = this.domNode.scrollLeft;
+                        var tmp = [];
+                        for(var domNode = this.domNode; 
+                            domNode && domNode.tagName && domNode.tagName.toUpperCase() !== 'IFRAME';
+                            domNode = domNode.parentNode) {
+                            tmp.push({
+                                domNode: domNode.contentWindow || domNode,
+                                scrollLeft: domNode.scrollLeft || 0,
+                                scrollTop: domNode.scrollTop || 0
+                            });
+                        }
 			this.focusChild(node);
-			this.domNode.scrollLeft = scrollLeft;
+			this.defer(function() {
+                            for (var i = 0, max = tmp.length; i < max; i++) {
+                                tmp[i].domNode.scrollLeft = tmp[i].scrollLeft;
+                                tmp[i].domNode.scrollTop = tmp[i].scrollTop;
+                            }
+			}, 0);
 		},
 
 		_onNodeMouseEnter: function(/*dijit/_WidgetBase*/ /*===== node =====*/){

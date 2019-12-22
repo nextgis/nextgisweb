@@ -1,4 +1,27 @@
 //>>built
-define("dojox/analytics/plugins/idle","dojo/_base/lang ../_base dojo/_base/config dojo/ready dojo/aspect dojo/_base/window".split(" "),function(b,a,d,e,f,g){return a.plugins.idle=new function(){this.addData=b.hitch(a,"addData","idle");this.idleTime=d.idleTime||6E4;this.idle=!0;this.setIdle=function(){this.addData("isIdle");this.idle=!0};e(b.hitch(this,function(){for(var a=["onmousemove","onkeydown","onclick","onscroll"],c=0;c<a.length;c++)f.after(g.doc,a[c],b.hitch(this,function(a){this.idle?(this.idle=
-!1,this.addData("isActive")):clearTimeout(this.idleTimer);this.idleTimer=setTimeout(b.hitch(this,"setIdle"),this.idleTime)}),!0)}))}});
-//# sourceMappingURL=idle.js.map
+define("dojox/analytics/plugins/idle",["dojo/_base/lang","../_base","dojo/_base/config","dojo/ready","dojo/aspect","dojo/_base/window"],function(_1,_2,_3,_4,_5,_6){
+return (_2.plugins.idle=new (function(){
+this.addData=_1.hitch(_2,"addData","idle");
+this.idleTime=_3["idleTime"]||60000;
+this.idle=true;
+this.setIdle=function(){
+this.addData("isIdle");
+this.idle=true;
+};
+_4(_1.hitch(this,function(){
+var _7=["onmousemove","onkeydown","onclick","onscroll"];
+for(var i=0;i<_7.length;i++){
+_5.after(_6.doc,_7[i],_1.hitch(this,function(e){
+if(this.idle){
+this.idle=false;
+this.addData("isActive");
+this.idleTimer=setTimeout(_1.hitch(this,"setIdle"),this.idleTime);
+}else{
+clearTimeout(this.idleTimer);
+this.idleTimer=setTimeout(_1.hitch(this,"setIdle"),this.idleTime);
+}
+}),true);
+}
+}));
+})());
+});

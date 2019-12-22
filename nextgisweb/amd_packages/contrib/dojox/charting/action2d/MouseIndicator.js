@@ -1,7 +1,58 @@
 //>>built
-define("dojox/charting/action2d/MouseIndicator","dojo/_base/lang dojo/_base/declare dojo/_base/connect dojo/_base/window dojo/sniff ./ChartAction ./_IndicatorElement dojox/lang/utils dojo/_base/event dojo/_base/array".split(" "),function(f,g,b,c,d,h,k,e,l,m){return g("dojox.charting.action2d.MouseIndicator",h,{defaultParams:{series:"",vertical:!0,autoScroll:!0,fixed:!0,precision:0,lines:!0,labels:!0,markers:!0},optionalParams:{lineStroke:{},outlineStroke:{},shadowStroke:{},lineFill:{},stroke:{},outline:{},
-shadow:{},fill:{},fillFunc:null,labelFunc:null,font:"",fontColor:"",markerStroke:{},markerOutline:{},markerShadow:{},markerFill:{},markerSymbol:"",offset:{},start:!1,mouseOver:!1},constructor:function(a,b,c){this.opt=f.clone(this.defaultParams);e.updateWithObject(this.opt,c);e.updateWithPattern(this.opt,c,this.optionalParams);this._listeners=this.opt.mouseOver?[{eventName:"onmousemove",methodName:"onMouseMove"}]:[{eventName:"onmousedown",methodName:"onMouseDown"}];this._uName="mouseIndicator"+this.opt.series;
-this._handles=[];this.connect()},_disconnectHandles:function(){d("ie")&&this.chart.node.releaseCapture();m.forEach(this._handles,b.disconnect);this._handles=[]},connect:function(){this.inherited(arguments);this.chart.addPlot(this._uName,{type:k,inter:this})},disconnect:function(){if(this._isMouseDown)this.onMouseUp();this.chart.removePlot(this._uName);this.inherited(arguments);this._disconnectHandles()},onChange:function(a){},onMouseDown:function(a){this._isMouseDown=!0;d("ie")?(this._handles.push(b.connect(this.chart.node,
-"onmousemove",this,"onMouseMove")),this._handles.push(b.connect(this.chart.node,"onmouseup",this,"onMouseUp")),this.chart.node.setCapture()):(this._handles.push(b.connect(c.doc,"onmousemove",this,"onMouseMove")),this._handles.push(b.connect(c.doc,"onmouseup",this,"onMouseUp")));this._onMouseSingle(a)},onMouseMove:function(a){(this._isMouseDown||this.opt.mouseOver)&&this._onMouseSingle(a)},_onMouseSingle:function(a){var b=this.chart.getPlot(this._uName);b.pageCoord={x:a.pageX,y:a.pageY};b.dirty=!0;
-this.chart.render();l.stop(a)},onMouseUp:function(a){a=this.chart.getPlot(this._uName);a.stopTrack();this._isMouseDown=!1;this._disconnectHandles();a.pageCoord=null;a.dirty=!0;this.chart.render()}})});
-//# sourceMappingURL=MouseIndicator.js.map
+define("dojox/charting/action2d/MouseIndicator",["dojo/_base/lang","dojo/_base/declare","dojo/_base/connect","dojo/_base/window","dojo/sniff","./ChartAction","./_IndicatorElement","dojox/lang/utils","dojo/_base/event","dojo/_base/array"],function(_1,_2,_3,_4,_5,_6,_7,du,_8,_9){
+return _2("dojox.charting.action2d.MouseIndicator",_6,{defaultParams:{series:"",vertical:true,autoScroll:true,fixed:true,precision:0,lines:true,labels:true,markers:true},optionalParams:{lineStroke:{},outlineStroke:{},shadowStroke:{},lineFill:{},stroke:{},outline:{},shadow:{},fill:{},fillFunc:null,labelFunc:null,font:"",fontColor:"",markerStroke:{},markerOutline:{},markerShadow:{},markerFill:{},markerSymbol:"",offset:{},start:false,mouseOver:false},constructor:function(_a,_b,_c){
+this.opt=_1.clone(this.defaultParams);
+du.updateWithObject(this.opt,_c);
+du.updateWithPattern(this.opt,_c,this.optionalParams);
+this._listeners=this.opt.mouseOver?[{eventName:"onmousemove",methodName:"onMouseMove"}]:[{eventName:"onmousedown",methodName:"onMouseDown"}];
+this._uName="mouseIndicator"+this.opt.series;
+this._handles=[];
+this.connect();
+},_disconnectHandles:function(){
+if(_5("ie")){
+this.chart.node.releaseCapture();
+}
+_9.forEach(this._handles,_3.disconnect);
+this._handles=[];
+},connect:function(){
+this.inherited(arguments);
+this.chart.addPlot(this._uName,{type:_7,inter:this});
+},disconnect:function(){
+if(this._isMouseDown){
+this.onMouseUp();
+}
+this.chart.removePlot(this._uName);
+this.inherited(arguments);
+this._disconnectHandles();
+},onChange:function(_d){
+},onMouseDown:function(_e){
+this._isMouseDown=true;
+if(_5("ie")){
+this._handles.push(_3.connect(this.chart.node,"onmousemove",this,"onMouseMove"));
+this._handles.push(_3.connect(this.chart.node,"onmouseup",this,"onMouseUp"));
+this.chart.node.setCapture();
+}else{
+this._handles.push(_3.connect(_4.doc,"onmousemove",this,"onMouseMove"));
+this._handles.push(_3.connect(_4.doc,"onmouseup",this,"onMouseUp"));
+}
+this._onMouseSingle(_e);
+},onMouseMove:function(_f){
+if(this._isMouseDown||this.opt.mouseOver){
+this._onMouseSingle(_f);
+}
+},_onMouseSingle:function(_10){
+var _11=this.chart.getPlot(this._uName);
+_11.pageCoord={x:_10.pageX,y:_10.pageY};
+_11.dirty=true;
+this.chart.render();
+_8.stop(_10);
+},onMouseUp:function(_12){
+var _13=this.chart.getPlot(this._uName);
+_13.stopTrack();
+this._isMouseDown=false;
+this._disconnectHandles();
+_13.pageCoord=null;
+_13.dirty=true;
+this.chart.render();
+}});
+});

@@ -260,20 +260,23 @@ define("dojox/grid/_Builder", [
 
 		// time critical: generate html using cache and data source
 		generateHtml: function(inDataIndex, inRowIndex){
-			var
-				html = this.getTableArray(),
-				v = this.view, dir,
-				cells = v.structure.cells,
-				item = this.grid.getItem(inRowIndex);
+			var html = this.getTableArray();
+			var v = this.view;
+			var cells = v.structure.cells;
+			var item = this.grid.getItem(inRowIndex);
+			var dir;
 
 			util.fire(this.view, "onBeforeRow", [inRowIndex, cells]);
-			for(var j=0, row; (row=cells[j]); j++){
+			for(var j=0, row; (row = cells[j]); j++){
 				if(row.hidden || row.header){
 					continue;
 				}
 				html.push(!row.invisible ? '<tr>' : '<tr class="dojoxGridInvisible">');
 				for(var i=0, cell, m, cc, cs; (cell=row[i]); i++){
-					m = cell.markup; cc = cell.customClasses = []; cs = cell.customStyles = [];
+					m = cell.markup;
+					cc = cell.customClasses = [];
+					cs = cell.customStyles = [];
+
 					// content (format can fill in cc and cs as side-effects)
 					m[5] = cell.format(inRowIndex, item);
 					// classes
@@ -281,7 +284,7 @@ define("dojox/grid/_Builder", [
 					// styles
 					m[3] = cs.join(';');
 					dir = cell.textDir || this.grid.textDir;
-					if(dir){
+					if (dir) {
 					    m[3] += this._getTextDirStyle(dir, cell, inRowIndex);
 					}
 					// in-place concat

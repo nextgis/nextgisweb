@@ -1,3 +1,26 @@
 //>>built
-define("dojox/fx/_core",["dojo/_base/lang","dojo/_base/array","./_base"],function(h,a,k){var l=function(b,f){this.start=b;this.end=f;var g=h.isArray(b),d=g?[]:f-b;g?(a.forEach(this.start,function(e,c){d[c]=this.end[c]-e},this),this.getValue=function(e){var c=[];a.forEach(this.start,function(b,a){c[a]=d[a]*e+b},this);return c}):this.getValue=function(a){return d*a+this.start}};return k._Line=l});
-//# sourceMappingURL=_core.js.map
+define("dojox/fx/_core",["dojo/_base/lang","dojo/_base/array","./_base"],function(_1,_2,_3){
+var _4=function(_5,_6){
+this.start=_5;
+this.end=_6;
+var _7=_1.isArray(_5),d=(_7?[]:_6-_5);
+if(_7){
+_2.forEach(this.start,function(s,i){
+d[i]=this.end[i]-s;
+},this);
+this.getValue=function(n){
+var _8=[];
+_2.forEach(this.start,function(s,i){
+_8[i]=(d[i]*n)+s;
+},this);
+return _8;
+};
+}else{
+this.getValue=function(n){
+return (d*n)+this.start;
+};
+}
+};
+_3._Line=_4;
+return _4;
+});

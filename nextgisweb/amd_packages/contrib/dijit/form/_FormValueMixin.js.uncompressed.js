@@ -4,8 +4,9 @@ define("dijit/form/_FormValueMixin", [
 	"dojo/keys", // keys.ESCAPE
 	"dojo/_base/lang",
 	"dojo/on",
+	"dojo/sniff", // has("webkit")
 	"./_FormWidgetMixin"
-], function(declare, domAttr, keys, lang, on, _FormWidgetMixin){
+], function(declare, domAttr, keys, lang, on, has, _FormWidgetMixin){
 
 	// module:
 	//		dijit/form/_FormValueMixin
@@ -26,7 +27,13 @@ define("dijit/form/_FormValueMixin", [
 		readOnly: false,
 
 		_setReadOnlyAttr: function(/*Boolean*/ value){
-			domAttr.set(this.focusNode, 'readOnly', value);
+			// IE has a Caret Browsing mode (hit F7 to activate) where disabled textboxes can be modified
+			// focusNode enforced readonly if currently disabled to avoid this issue.
+			if (has('trident') && 'disabled' in this) {
+				domAttr.set(this.focusNode, 'readOnly', value || this.disabled);
+			} else {
+				domAttr.set(this.focusNode, 'readOnly', value);
+			}
 			this._set("readOnly", value);
 		},
 

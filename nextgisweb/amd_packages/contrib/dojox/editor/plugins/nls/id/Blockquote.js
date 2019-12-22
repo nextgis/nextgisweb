@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/id/Blockquote",{blockquote:"Blockquote"});
-//# sourceMappingURL=Blockquote.js.map
+define("dojox/editor/plugins/nls/id/Blockquote",({"blockquote":"Blockquote"}));

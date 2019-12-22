@@ -162,22 +162,7 @@
 				[]
 			],
 			[
-				"Android 3",
-				"holodark",
-				[]
-			],
-			[
-				"Android 4",
-				"holodark",
-				[]
-			],
-			[
-				"Android 5",
-				"holodark",
-				[]
-			],
-			[
-				"Android 6",
+				"Android [3-9]",
 				"holodark",
 				[]
 			],
@@ -202,32 +187,12 @@
 				[]
 			],
 			[
-				"iPhone;.*OS 7_",
+				"iPhone;.*OS ([7-9]|1[0-9])_",
 				"ios7",
 				[]
 			],
 			[
-				"iPhone;.*OS 8_",
-				"ios7",
-				[]
-			],
-			[
-				"iPhone;.*OS 9_",
-				"ios7",
-				[]
-			],
-			[
-				"iPad;.*OS 7_",
-				"ios7",
-				[]
-			],
-			[
-				"iPad;.*OS 8_",
-				"ios7",
-				[]
-			],
-			[
-				"iPad;.*OS 9_",
+				"iPad;.*OS ([7-9]|1[0-9])_",
 				"ios7",
 				[]
 			],

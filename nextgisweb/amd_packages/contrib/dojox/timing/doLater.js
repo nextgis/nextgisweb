@@ -1,3 +1,17 @@
 //>>built
-define("dojox/timing/doLater",["./_base"],function(a){dojo.experimental("dojox.timing.doLater");a.doLater=function(c,b,d){if(c)return!1;var e=a.doLater.caller,f=a.doLater.caller.arguments;b=b||dojo.global;setTimeout(function(){e.apply(b,f)},d||100);return!0};return a.doLater});
-//# sourceMappingURL=doLater.js.map
+define("dojox/timing/doLater",["./_base"],function(_1){
+dojo.experimental("dojox.timing.doLater");
+_1.doLater=function(_2,_3,_4){
+if(_2){
+return false;
+}
+var _5=_1.doLater.caller,_6=_1.doLater.caller.arguments;
+_4=_4||100;
+_3=_3||dojo.global;
+setTimeout(function(){
+_5.apply(_3,_6);
+},_4);
+return true;
+};
+return _1.doLater;
+});

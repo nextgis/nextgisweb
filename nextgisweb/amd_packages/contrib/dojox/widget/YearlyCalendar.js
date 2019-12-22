@@ -1,3 +1,8 @@
 //>>built
-define("dojox/widget/YearlyCalendar",["dojo/_base/declare","./_CalendarBase","./_CalendarYear"],function(a,c,d){return a("dojox.widget.YearlyCalendar",[c,d],{_makeDate:function(a){var b=new Date;b.setFullYear(a);return b}})});
-//# sourceMappingURL=YearlyCalendar.js.map
+define("dojox/widget/YearlyCalendar",["dojo/_base/declare","./_CalendarBase","./_CalendarYear"],function(_1,_2,_3){
+return _1("dojox.widget.YearlyCalendar",[_2,_3],{_makeDate:function(_4){
+var _5=new Date();
+_5.setFullYear(_4);
+return _5;
+}});
+});

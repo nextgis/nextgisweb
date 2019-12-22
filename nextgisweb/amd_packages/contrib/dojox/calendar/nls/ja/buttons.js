@@ -1,3 +1,2 @@
 //>>built
-define("dojox/calendar/nls/ja/buttons",{previousButton:"\u25c4",nextButton:"\u25ba",todayButton:"\u4eca\u65e5",dayButton:"\u65e5",weekButton:"\u9031",fourDaysButton:"4 \u65e5\u9593",monthButton:"\u6708"});
-//# sourceMappingURL=buttons.js.map
+define("dojox/calendar/nls/ja/buttons",{previousButton:"◄",nextButton:"►",todayButton:"今日",dayButton:"日",weekButton:"週",fourDaysButton:"4 日間",monthButton:"月"});

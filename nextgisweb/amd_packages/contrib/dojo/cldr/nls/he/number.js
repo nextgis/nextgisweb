@@ -5,5 +5,4 @@
 */
 
 //>>built
-define("dojo/cldr/nls/he/number",{group:",",percentSign:"%",exponential:"E",scientificFormat:"#E0",percentFormat:"#,##0%",list:";",infinity:"\u221e",minusSign:"\u200e-",decimal:".",superscriptingExponent:"\u00d7",nan:"NaN",perMille:"\u2030",decimalFormat:"#,##0.###",currencyFormat:"#,##0.00\u00a0\u00a4",plusSign:"\u200e+","decimalFormat-long":"\u200f000 \u05d8\u05e8\u05d9\u05dc\u05d9\u05d5\u05df","decimalFormat-short":"000T"});
-//# sourceMappingURL=number.js.map
+define("dojo/cldr/nls/he/number",{"group":",","percentSign":"%","exponential":"E","scientificFormat":"#E0","percentFormat":"#,##0%","list":";","infinity":"∞","minusSign":"-","decimal":".","superscriptingExponent":"×","nan":"NaN","perMille":"‰","decimalFormat":"#,##0.###","currencyFormat":"#,##0.00 ¤","plusSign":"+","decimalFormat-long":"000 טריליון","decimalFormat-short":"000 ביל׳"});

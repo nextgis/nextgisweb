@@ -1,9 +1,244 @@
 //>>built
-define("dojox/wire/Wire",["dojo","dijit","dojox","dojo/require!dojox/wire/_base"],function(d,m,h){d.provide("dojox.wire.Wire");d.require("dojox.wire._base");d.declare("dojox.wire.Wire",null,{_wireClass:"dojox.wire.Wire",constructor:function(b){d.mixin(this,b);if(this.converter)if(d.isString(this.converter)){b=d.getObject(this.converter);if(d.isFunction(b))try{var a=new b;a&&!d.isFunction(a.convert)?this.converter={convert:b}:this.converter=a}catch(c){}else d.isObject(b)&&d.isFunction(b.convert)&&
-(this.converter=b);d.isString(this.converter)&&(this.converter=(a=h.wire._getClass(this.converter))?new a:void 0)}else d.isFunction(this.converter)&&(this.converter={convert:this.converter})},getValue:function(b){var a=void 0,a=h.wire.isWire(this.object)?this.object.getValue(b):this.object||b;if(this.property){b=this.property.split(".");for(var c in b){if(!a)return a;a=this._getPropertyValue(a,b[c])}}c=void 0;if(c=this._getValue?this._getValue(a):a)this.type&&("string"==this.type?c=c.toString():"number"==
-this.type?c=parseInt(c,10):"boolean"==this.type?c="false"!=c:"array"==this.type&&(d.isArray(c)||(c=[c]))),this.converter&&this.converter.convert&&(c=this.converter.convert(c,this));return c},setValue:function(b,a){var c=void 0,c=h.wire.isWire(this.object)?this.object.getValue(a):this.object||a,e=void 0,f;if(this.property){if(!c)if(h.wire.isWire(this.object))c={},this.object.setValue(c,a);else throw Error(this._wireClass+".setValue(): invalid object");for(var e=this.property.split("."),d=e.length-
-1,k=0;k<d;k++){var l=e[k];f=this._getPropertyValue(c,l);f||(f={},this._setPropertyValue(c,l,f));c=f}e=e[d]}if(this._setValue){if(e&&(f=this._getPropertyValue(c,e),f||(f={},this._setPropertyValue(c,e,f)),c=f),f=this._setValue(c,b),!c&&f)if(h.wire.isWire(this.object))this.object.setValue(f,a);else throw Error(this._wireClass+".setValue(): invalid object");}else if(e)this._setPropertyValue(c,e,b);else if(h.wire.isWire(this.object))this.object.setValue(b,a);else throw Error(this._wireClass+".setValue(): invalid property");
-},_getPropertyValue:function(b,a){var c=void 0,e=a.indexOf("[");if(0<=e){var f=a.indexOf("]"),f=a.substring(e+1,f),g=null;0===e?g=b:(a=a.substring(0,e),(g=this._getPropertyValue(b,a))&&!d.isArray(g)&&(g=[g]));g&&(c=g[f])}else b.getPropertyValue?c=b.getPropertyValue(a):(c="get"+a.charAt(0).toUpperCase()+a.substring(1),c=this._useGet(b)?b.get(a):this._useAttr(b)?b.attr(a):b[c]?b[c]():b[a]);return c},_setPropertyValue:function(b,a,c){var e=a.indexOf("[");if(0<=e){var f=a.indexOf("]"),f=a.substring(e+
-1,f),d=null;0===e?d=b:(a=a.substring(0,e),d=this._getPropertyValue(b,a),d||(d=[],this._setPropertyValue(b,a,d)));d[f]=c}else if(b.setPropertyValue)b.setPropertyValue(a,c);else if(e="set"+a.charAt(0).toUpperCase()+a.substring(1),this._useSet(b))b.set(a,c);else if(this._useAttr(b))b.attr(a,c);else if(b[e])b[e](c);else b[a]=c},_useGet:function(b){var a=!1;d.isFunction(b.get)&&(a=!0);return a},_useSet:function(b){var a=!1;d.isFunction(b.set)&&(a=!0);return a},_useAttr:function(b){var a=!1;d.isFunction(b.attr)&&
-(a=!0);return a}})});
-//# sourceMappingURL=Wire.js.map
+define("dojox/wire/Wire",["dojo","dijit","dojox","dojo/require!dojox/wire/_base"],function(_1,_2,_3){
+_1.provide("dojox.wire.Wire");
+_1.require("dojox.wire._base");
+_1.declare("dojox.wire.Wire",null,{_wireClass:"dojox.wire.Wire",constructor:function(_4){
+_1.mixin(this,_4);
+if(this.converter){
+if(_1.isString(this.converter)){
+var _5=_1.getObject(this.converter);
+if(_1.isFunction(_5)){
+try{
+var _6=new _5();
+if(_6&&!_1.isFunction(_6["convert"])){
+this.converter={convert:_5};
+}else{
+this.converter=_6;
+}
+}
+catch(e){
+}
+}else{
+if(_1.isObject(_5)){
+if(_1.isFunction(_5["convert"])){
+this.converter=_5;
+}
+}
+}
+if(_1.isString(this.converter)){
+var _7=_3.wire._getClass(this.converter);
+if(_7){
+this.converter=new _7();
+}else{
+this.converter=undefined;
+}
+}
+}else{
+if(_1.isFunction(this.converter)){
+this.converter={convert:this.converter};
+}
+}
+}
+},getValue:function(_8){
+var _9=undefined;
+if(_3.wire.isWire(this.object)){
+_9=this.object.getValue(_8);
+}else{
+_9=(this.object||_8);
+}
+if(this.property){
+var _a=this.property.split(".");
+for(var i in _a){
+if(!_9){
+return _9;
+}
+_9=this._getPropertyValue(_9,_a[i]);
+}
+}
+var _b=undefined;
+if(this._getValue){
+_b=this._getValue(_9);
+}else{
+_b=_9;
+}
+if(_b){
+if(this.type){
+if(this.type=="string"){
+_b=_b.toString();
+}else{
+if(this.type=="number"){
+_b=parseInt(_b,10);
+}else{
+if(this.type=="boolean"){
+_b=(_b!="false");
+}else{
+if(this.type=="array"){
+if(!_1.isArray(_b)){
+_b=[_b];
+}
+}
+}
+}
+}
+}
+if(this.converter&&this.converter.convert){
+_b=this.converter.convert(_b,this);
+}
+}
+return _b;
+},setValue:function(_c,_d){
+var _e=undefined;
+if(_3.wire.isWire(this.object)){
+_e=this.object.getValue(_d);
+}else{
+_e=(this.object||_d);
+}
+var _f=undefined;
+var o;
+if(this.property){
+if(!_e){
+if(_3.wire.isWire(this.object)){
+_e={};
+this.object.setValue(_e,_d);
+}else{
+throw new Error(this._wireClass+".setValue(): invalid object");
+}
+}
+var _10=this.property.split(".");
+var _11=_10.length-1;
+for(var i=0;i<_11;i++){
+var p=_10[i];
+o=this._getPropertyValue(_e,p);
+if(!o){
+o={};
+this._setPropertyValue(_e,p,o);
+}
+_e=o;
+}
+_f=_10[_11];
+}
+if(this._setValue){
+if(_f){
+o=this._getPropertyValue(_e,_f);
+if(!o){
+o={};
+this._setPropertyValue(_e,_f,o);
+}
+_e=o;
+}
+var _12=this._setValue(_e,_c);
+if(!_e&&_12){
+if(_3.wire.isWire(this.object)){
+this.object.setValue(_12,_d);
+}else{
+throw new Error(this._wireClass+".setValue(): invalid object");
+}
+}
+}else{
+if(_f){
+this._setPropertyValue(_e,_f,_c);
+}else{
+if(_3.wire.isWire(this.object)){
+this.object.setValue(_c,_d);
+}else{
+throw new Error(this._wireClass+".setValue(): invalid property");
+}
+}
+}
+},_getPropertyValue:function(_13,_14){
+var _15=undefined;
+var i1=_14.indexOf("[");
+if(i1>=0){
+var i2=_14.indexOf("]");
+var _16=_14.substring(i1+1,i2);
+var _17=null;
+if(i1===0){
+_17=_13;
+}else{
+_14=_14.substring(0,i1);
+_17=this._getPropertyValue(_13,_14);
+if(_17&&!_1.isArray(_17)){
+_17=[_17];
+}
+}
+if(_17){
+_15=_17[_16];
+}
+}else{
+if(_13.getPropertyValue){
+_15=_13.getPropertyValue(_14);
+}else{
+var _18="get"+_14.charAt(0).toUpperCase()+_14.substring(1);
+if(this._useGet(_13)){
+_15=_13.get(_14);
+}else{
+if(this._useAttr(_13)){
+_15=_13.attr(_14);
+}else{
+if(_13[_18]){
+_15=_13[_18]();
+}else{
+_15=_13[_14];
+}
+}
+}
+}
+}
+return _15;
+},_setPropertyValue:function(_19,_1a,_1b){
+var i1=_1a.indexOf("[");
+if(i1>=0){
+var i2=_1a.indexOf("]");
+var _1c=_1a.substring(i1+1,i2);
+var _1d=null;
+if(i1===0){
+_1d=_19;
+}else{
+_1a=_1a.substring(0,i1);
+_1d=this._getPropertyValue(_19,_1a);
+if(!_1d){
+_1d=[];
+this._setPropertyValue(_19,_1a,_1d);
+}
+}
+_1d[_1c]=_1b;
+}else{
+if(_19.setPropertyValue){
+_19.setPropertyValue(_1a,_1b);
+}else{
+var _1e="set"+_1a.charAt(0).toUpperCase()+_1a.substring(1);
+if(this._useSet(_19)){
+_19.set(_1a,_1b);
+}else{
+if(this._useAttr(_19)){
+_19.attr(_1a,_1b);
+}else{
+if(_19[_1e]){
+_19[_1e](_1b);
+}else{
+_19[_1a]=_1b;
+}
+}
+}
+}
+}
+},_useGet:function(_1f){
+var _20=false;
+if(_1.isFunction(_1f.get)){
+_20=true;
+}
+return _20;
+},_useSet:function(_21){
+var _22=false;
+if(_1.isFunction(_21.set)){
+_22=true;
+}
+return _22;
+},_useAttr:function(_23){
+var _24=false;
+if(_1.isFunction(_23.attr)){
+_24=true;
+}
+return _24;
+}});
+});

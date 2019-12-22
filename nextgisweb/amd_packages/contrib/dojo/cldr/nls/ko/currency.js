@@ -5,6 +5,4 @@
 */
 
 //>>built
-define("dojo/cldr/nls/ko/currency",{HKD_displayName:"\ud64d\ucf69 \ub2ec\ub7ec",CHF_displayName:"\uc2a4\uc704\uc2a4 \ud504\ub791",JPY_symbol:"JP\u00a5",CAD_displayName:"\uce90\ub098\ub2e4 \ub2ec\ub7ec",HKD_symbol:"HK$",CNY_displayName:"\uc911\uad6d \uc704\uc548\ud654",USD_symbol:"US$",AUD_displayName:"\ud638\uc8fc \ub2ec\ub7ec",JPY_displayName:"\uc77c\ubcf8 \uc5d4\ud654",CAD_symbol:"CA$",USD_displayName:"\ubbf8\uad6d \ub2ec\ub7ec",EUR_symbol:"\u20ac",CNY_symbol:"CN\u00a5",GBP_displayName:"\uc601\uad6d\ub839 \ud30c\uc6b4\ub4dc \uc2a4\ud138\ub9c1",
-GBP_symbol:"\u00a3",AUD_symbol:"AU$",EUR_displayName:"\uc720\ub85c\ud654"});
-//# sourceMappingURL=currency.js.map
+define("dojo/cldr/nls/ko/currency",{"HKD_displayName":"홍콩 달러","CHF_displayName":"스위스 프랑","JPY_symbol":"JP¥","CAD_displayName":"캐나다 달러","HKD_symbol":"HK$","CNY_displayName":"중국 위안화","USD_symbol":"US$","AUD_displayName":"호주 달러","JPY_displayName":"일본 엔화","CAD_symbol":"CA$","USD_displayName":"미국 달러","EUR_symbol":"€","CNY_symbol":"CN¥","GBP_displayName":"파운드","GBP_symbol":"£","AUD_symbol":"AU$","EUR_displayName":"유로"});

@@ -5,5 +5,26 @@
 */
 
 //>>built
-define("dojo/dnd/common",["../sniff","../_base/kernel","../_base/lang","../dom"],function(c,d,e,f){var b=e.getObject("dojo.dnd",!0);b.getCopyKeyState=function(a){return a[c("mac")?"metaKey":"ctrlKey"]};b._uniqueId=0;b.getUniqueId=function(){var a;do a=d._scopeName+"Unique"+ ++b._uniqueId;while(f.byId(a));return a};b._empty={};b.isFormElement=function(a){a=a.target;3==a.nodeType&&(a=a.parentNode);return 0<=" a button textarea input select option ".indexOf(" "+a.tagName.toLowerCase()+" ")};return b});
-//# sourceMappingURL=common.js.map
+define("dojo/dnd/common",["../sniff","../_base/kernel","../_base/lang","../dom"],function(_1,_2,_3,_4){
+var _5=_3.getObject("dojo.dnd",true);
+_5.getCopyKeyState=function(_6){
+return _6[_1("mac")?"metaKey":"ctrlKey"];
+};
+_5._uniqueId=0;
+_5.getUniqueId=function(){
+var id;
+do{
+id=_2._scopeName+"Unique"+(++_5._uniqueId);
+}while(_4.byId(id));
+return id;
+};
+_5._empty={};
+_5.isFormElement=function(e){
+var t=e.target;
+if(t.nodeType==3){
+t=t.parentNode;
+}
+return " a button textarea input select option ".indexOf(" "+t.tagName.toLowerCase()+" ")>=0;
+};
+return _5;
+});

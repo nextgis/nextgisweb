@@ -45,6 +45,12 @@ define("dijit/_editor/plugins/ViewSource", [
 		//		Defaults to true.
 		stripIFrames: true,
 
+		// stripEventHandlers: [public] Boolean
+		//		Boolean flag used to indicate if event handler attributes like onload should be
+		//		stripped from the document.
+		//		Defaults to true.
+		stripEventHandlers: true,
+
 		// readOnly: [const] Boolean
 		//		Boolean flag used to indicate if the source view should be readonly or not.
 		//		Cannot be changed after initialization of the plugin.
@@ -101,6 +107,15 @@ define("dijit/_editor/plugins/ViewSource", [
 			this.editor = editor;
 			this._initButton();
 
+			// Filter the html content when it is set and retrieved in the editor.
+			this.removeValueFilterHandles();
+			this._setValueFilterHandle = aspect.before(this.editor, "setValue", lang.hitch(this, function (html) {
+				return [this._filter(html)];
+			}));
+			this._getValueFilterHandle = aspect.after(this.editor, "getValue", lang.hitch(this, function (html) {
+				return this._filter(html);
+			}));
+
 			this.editor.addKeyHandler(keys.F12, true, true, lang.hitch(this, function(e){
 				// Move the focus before switching
 				// It'll focus back.  Hiding a focused
@@ -146,9 +161,6 @@ define("dijit/_editor/plugins/ViewSource", [
 						return cmd.toLowerCase() === "viewsource";
 					};
 					this.editor.onDisplayChanged();
-					html = ed.get("value");
-					html = this._filter(html);
-					ed.set("value", html);
 					array.forEach(edPlugins, function(p){
 						// Turn off any plugins not controlled by queryCommandenabled.
 						if(p && !(p instanceof ViewSource) && p.isInstanceOf(_Plugin)){
@@ -164,7 +176,7 @@ define("dijit/_editor/plugins/ViewSource", [
 						};
 					}
 
-					this.sourceArea.value = html;
+					this.sourceArea.value = ed.get("value");
 
 					// Since neither iframe nor textarea have margin, border, or padding,
 					// just set sizes equal.
@@ -229,7 +241,7 @@ define("dijit/_editor/plugins/ViewSource", [
 
 					this._setListener = aspect.after(this.editor, "setValue", lang.hitch(this, function(htmlTxt){
 						htmlTxt = htmlTxt || "";
-						htmlTxt = this._filter(htmlTxt);
+						// htmlTxt was filtered in setValue before aspect.
 						this.sourceArea.value = htmlTxt;
 					}), true);
 				}else{
@@ -256,8 +268,8 @@ define("dijit/_editor/plugins/ViewSource", [
 					ed.queryCommandEnabled = ed._sourceQueryCommandEnabled;
 					if(!this._readOnly){
 						html = this.sourceArea.value;
-						html = this._filter(html);
 						ed.beginEditing();
+						// html will be filtered in setValue aspect.
 						ed.set("value", html);
 						ed.endEditing();
 					}
@@ -477,6 +489,22 @@ define("dijit/_editor/plugins/ViewSource", [
 			return html;
 		},
 
+		_stripEventHandlers: function (html) {
+			if(html){
+				// Find all tags that contain an event handler attribute (an on* attribute).
+				var matches = html.match(/<[a-z]+?\b(.*?on.*?(['"]).*?\2.*?)+>/gim);
+				if(matches){
+					for(var i = 0, l = matches.length; i < l; i++){
+						// For each tag, remove only the event handler attributes.
+						var match = matches[i];
+						var replacement = match.replace(/\s+on[a-z]*\s*=\s*(['"])(.*?)\1/igm, "");
+						html = html.replace(match, replacement);
+					}
+				}
+			}
+			return html;
+		},
+
 		_filter: function(html){
 			// summary:
 			//		Internal function to perform some filtering on the HTML.
@@ -494,8 +522,22 @@ define("dijit/_editor/plugins/ViewSource", [
 				if(this.stripIFrames){
 					html = this._stripIFrames(html);
 				}
+				if(this.stripEventHandlers){
+					html = this._stripEventHandlers(html);
+				}
 			}
 			return html;
+		},
+
+		removeValueFilterHandles: function () {
+			if (this._setValueFilterHandle) {
+				this._setValueFilterHandle.remove();
+				delete this._setValueFilterHandle;
+			}
+			if (this._getValueFilterHandle) {
+				this._getValueFilterHandle.remove();
+				delete this._getValueFilterHandle;
+			}
 		},
 
 		setSourceAreaCaret: function(){
@@ -532,6 +574,7 @@ define("dijit/_editor/plugins/ViewSource", [
 				this._setListener.remove();
 				delete this._setListener;
 			}
+			this.removeValueFilterHandles();
 			this.inherited(arguments);
 		}
 	});
@@ -543,7 +586,8 @@ define("dijit/_editor/plugins/ViewSource", [
 			readOnly: ("readOnly" in args) ? args.readOnly : false,
 			stripComments: ("stripComments" in args) ? args.stripComments : true,
 			stripScripts: ("stripScripts" in args) ? args.stripScripts : true,
-			stripIFrames: ("stripIFrames" in args) ? args.stripIFrames : true
+			stripIFrames: ("stripIFrames" in args) ? args.stripIFrames : true,
+			stripEventHandlers: ("stripEventHandlers" in args) ? args.stripEventHandlers : true
 		});
 	};
 

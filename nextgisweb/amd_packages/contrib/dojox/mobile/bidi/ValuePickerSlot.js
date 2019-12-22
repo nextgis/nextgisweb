@@ -1,4 +1,21 @@
 //>>built
-define("dojox/mobile/bidi/ValuePickerSlot",["dojo/_base/declare","./common"],function(c,b){return c(null,{postCreate:function(){!this.textDir&&this.getParent()&&this.getParent().get("textDir")&&(this.textDir=this.getParent().get("textDir"))},_getValueAttr:function(){return b.removeUCCFromText(this.inputNode.value)},_setValueAttr:function(a){this.inherited(arguments);this._applyTextDirToValueNode()},_setTextDirAttr:function(a){a&&this.textDir!==a&&(this.textDir=a,this._applyTextDirToValueNode())},
-_applyTextDirToValueNode:function(){this.inputNode.value=b.removeUCCFromText(this.inputNode.value);this.inputNode.value=b.enforceTextDirWithUcc(this.inputNode.value,this.textDir)}})});
-//# sourceMappingURL=ValuePickerSlot.js.map
+define("dojox/mobile/bidi/ValuePickerSlot",["dojo/_base/declare","./common"],function(_1,_2){
+return _1(null,{postCreate:function(){
+if(!this.textDir&&this.getParent()&&this.getParent().get("textDir")){
+this.textDir=this.getParent().get("textDir");
+}
+},_getValueAttr:function(){
+return _2.removeUCCFromText(this.inputNode.value);
+},_setValueAttr:function(_3){
+this.inherited(arguments);
+this._applyTextDirToValueNode();
+},_setTextDirAttr:function(_4){
+if(_4&&this.textDir!==_4){
+this.textDir=_4;
+this._applyTextDirToValueNode();
+}
+},_applyTextDirToValueNode:function(){
+this.inputNode.value=_2.removeUCCFromText(this.inputNode.value);
+this.inputNode.value=_2.enforceTextDirWithUcc(this.inputNode.value,this.textDir);
+}});
+});

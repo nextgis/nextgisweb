@@ -1,5 +1,46 @@
 //>>built
-define("dojox/mobile/Audio",["dojo/_base/declare","dojo/dom-construct","dojo/sniff","dijit/_Contained","dijit/_WidgetBase"],function(f,e,d,g,h){return f("dojox.mobile.Audio",[h,g],{source:null,width:"200px",height:"15px",_playable:!1,_tag:"audio",constructor:function(){this.source=[]},buildRendering:function(){this.domNode=this.srcNodeRef||e.create(this._tag)},_getEmbedRegExp:function(){return d("ff")?/audio\/mpeg/i:d("ie")?/audio\/wav/i:null},startup:function(){if(!this._started){this.inherited(arguments);
-var a,c,b;if(this.domNode.canPlayType)if(0<this.source.length)for(a=0,c=this.source.length;a<c;a++)e.create("source",{src:this.source[a].src,type:this.source[a].type},this.domNode),this._playable=this._playable||!!this.domNode.canPlayType(this.source[a].type);else for(a=0,c=this.domNode.childNodes.length;a<c;a++)b=this.domNode.childNodes[a],1===b.nodeType&&"SOURCE"===b.nodeName&&(this.source.push({src:b.src,type:b.type}),this._playable=this._playable||!!this.domNode.canPlayType(b.type));d.add("mobile-embed-audio-video-support",
-!0);if(d("mobile-embed-audio-video-support")&&!this._playable)for(a=0,c=this.source.length,b=this._getEmbedRegExp();a<c;a++)if(this.source[a].type.match(b)){a=e.create("embed",{src:this.source[0].src,type:this.source[0].type,width:this.width,height:this.height});this.domNode.parentNode.replaceChild(a,this.domNode);this.domNode=a;this._playable=!0;break}}}})});
-//# sourceMappingURL=Audio.js.map
+define("dojox/mobile/Audio",["dojo/_base/declare","dojo/dom-construct","dojo/sniff","dijit/_Contained","dijit/_WidgetBase"],function(_1,_2,_3,_4,_5){
+return _1("dojox.mobile.Audio",[_5,_4],{source:null,width:"200px",height:"15px",_playable:false,_tag:"audio",constructor:function(){
+this.source=[];
+},buildRendering:function(){
+this.domNode=this.srcNodeRef||_2.create(this._tag);
+},_getEmbedRegExp:function(){
+return _3("ff")?/audio\/mpeg/i:_3("ie")?/audio\/wav/i:null;
+},startup:function(){
+if(this._started){
+return;
+}
+this.inherited(arguments);
+var i,_6,re;
+if(this.domNode.canPlayType){
+if(this.source.length>0){
+for(i=0,_6=this.source.length;i<_6;i++){
+_2.create("source",{src:this.source[i].src,type:this.source[i].type},this.domNode);
+this._playable=this._playable||!!this.domNode.canPlayType(this.source[i].type);
+}
+}else{
+for(i=0,_6=this.domNode.childNodes.length;i<_6;i++){
+var n=this.domNode.childNodes[i];
+if(n.nodeType===1&&n.nodeName==="SOURCE"){
+this.source.push({src:n.src,type:n.type});
+this._playable=this._playable||!!this.domNode.canPlayType(n.type);
+}
+}
+}
+}
+_3.add("mobile-embed-audio-video-support",true);
+if(_3("mobile-embed-audio-video-support")){
+if(!this._playable){
+for(i=0,_6=this.source.length,re=this._getEmbedRegExp();i<_6;i++){
+if(this.source[i].type.match(re)){
+var _7=_2.create("embed",{src:this.source[0].src,type:this.source[0].type,width:this.width,height:this.height});
+this.domNode.parentNode.replaceChild(_7,this.domNode);
+this.domNode=_7;
+this._playable=true;
+break;
+}
+}
+}
+}
+}});
+});

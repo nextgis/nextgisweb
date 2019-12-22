@@ -1,29 +1,659 @@
 //>>built
-define("dojox/charting/Chart","../main dojo/_base/lang dojo/_base/array dojo/_base/declare dojo/dom-style dojo/dom dojo/dom-geometry dojo/dom-construct dojo/_base/Color dojo/sniff ./Element ./SimpleTheme ./Series ./axis2d/common dojox/gfx/shape dojox/gfx dojo/has!dojo-bidi?./bidi/Chart dojox/lang/functional dojox/lang/functional/fold dojox/lang/functional/reversed".split(" "),function(q,z,g,A,r,H,n,B,C,p,h,I,J,K,D,k,L,d){function E(a,b){a&&b&&(a.min=Math.min(a.min,b.min),a.max=Math.max(a.max,b.max));
-return a||b}function t(a,b){var c={},e={};g.forEach(a,function(a){var b=c[a.name]=a.getSeriesStats();a.hAxis&&(e[a.hAxis]=E(e[a.hAxis],{min:b.hmin,max:b.hmax}));a.vAxis&&(e[a.vAxis]=E(e[a.vAxis],{min:b.vmin,max:b.vmax}))});g.forEach(a,function(a){var f=c[a.name];if(a.hAxis){var d=e[a.hAxis];f.hmin=d.min;f.hmax=d.max}a.vAxis&&(d=e[a.vAxis],f.vmin=d.min,f.vmax=d.max);a.initializeScalers(b,f)})}var m=z.getObject("charting",!0,q),u=d.lambda("item.clear()"),v=d.lambda("item.purgeGroup()"),w=d.lambda("item.destroy()"),
-x=d.lambda("item.dirty \x3d false"),y=d.lambda("item.dirty \x3d true"),F=d.lambda("item.name"),G={l:10,t:10,r:10,b:10};q=A(p("dojo-bidi")?"dojox.charting.NonBidiChart":"dojox.charting.Chart",null,{constructor:function(a,b){b||(b={});this.margins=b.margins||G;this._customMargins=!!b.margins;this.stroke=b.stroke;this.fill=b.fill;this.delayInMs=b.delayInMs||200;this.title=b.title;this.titleGap=b.titleGap;this.titlePos=b.titlePos;this.titleFont=b.titleFont;this.titleFontColor=b.titleFontColor;this.titleAlign=
-b.titleAlign;this.chartTitle=null;this.htmlLabels=!0;"htmlLabels"in b&&(this.htmlLabels=b.htmlLabels);this.theme=null;this.axes={};this.stack=[];this.plots={};this.series=[];this.runs={};this.dirty=!0;this.node=H.byId(a);var c=n.getMarginBox(a);this.surface=k.createSurface(this.node,c.w||400,c.h||300);-1==this.surface.declaredClass.indexOf("vml")&&(this._nativeClip=!0)},destroy:function(){g.forEach(this.series,w);g.forEach(this.stack,w);d.forIn(this.axes,w);this.surface.destroy();this.chartTitle&&
-this.chartTitle.tagName&&B.destroy(this.chartTitle)},getCoords:function(){var a=this.node,b=r.getComputedStyle(a),b=n.getMarginBox(a,b),a=n.position(a,!0);b.x=a.x;b.y=a.y;return b},setTheme:function(a){this.theme=a.clone();this._customMargins||(this.margins=this.theme.chart.margins||G);this.dirty=!0;return this},addAxis:function(a,b){var c;c=b&&b.type||"Default";if("string"==typeof c){if(!m.axis2d||!m.axis2d[c])throw Error("Can't find axis: "+c+" - Check require() dependencies.");c=new m.axis2d[c](this,
-b)}else c=new c(this,b);c.name=a;c.dirty=!0;a in this.axes&&this.axes[a].destroy();this.axes[a]=c;this.dirty=!0;return this},getAxis:function(a){return this.axes[a]},removeAxis:function(a){a in this.axes&&(this.axes[a].destroy(),delete this.axes[a],this.dirty=!0);return this},addPlot:function(a,b){var c;c=b&&b.type||"Default";if("string"==typeof c){if(!m.plot2d||!m.plot2d[c])throw Error("Can't find plot: "+c+" - didn't you forget to dojo.require() it?");c=new m.plot2d[c](this,b)}else c=new c(this,
-b);c.name=a;c.dirty=!0;a in this.plots?(this.stack[this.plots[a]].destroy(),this.stack[this.plots[a]]=c):(this.plots[a]=this.stack.length,this.stack.push(c));this.dirty=!0;return this},getPlot:function(a){return this.stack[this.plots[a]]},removePlot:function(a){if(a in this.plots){var b=this.plots[a];delete this.plots[a];this.stack[b].destroy();this.stack.splice(b,1);d.forIn(this.plots,function(a,c,l){a>b&&(l[c]=a-1)});var c=g.filter(this.series,function(b){return b.plot!=a});c.length<this.series.length&&
-(g.forEach(this.series,function(b){b.plot==a&&b.destroy()}),this.runs={},g.forEach(c,function(a,b){this.runs[a.plot]=b},this),this.series=c);this.dirty=!0}return this},getPlotOrder:function(){return d.map(this.stack,F)},setPlotOrder:function(a){var b={},c=d.filter(a,function(a){if(!(a in this.plots)||a in b)return!1;b[a]=1;return!0},this);c.length<this.stack.length&&d.forEach(this.stack,function(a){a=a.name;a in b||c.push(a)});a=d.map(c,function(a){return this.stack[this.plots[a]]},this);d.forEach(a,
-function(a,b){this.plots[a.name]=b},this);this.stack=a;this.dirty=!0;return this},movePlotToFront:function(a){if(a in this.plots){var b=this.plots[a];if(b){var c=this.getPlotOrder();c.splice(b,1);c.unshift(a);return this.setPlotOrder(c)}}return this},movePlotToBack:function(a){if(a in this.plots){var b=this.plots[a];if(b<this.stack.length-1){var c=this.getPlotOrder();c.splice(b,1);c.push(a);return this.setPlotOrder(c)}}return this},addSeries:function(a,b,c){b=new J(this,b,c);b.name=a;a in this.runs?
-(this.series[this.runs[a]].destroy(),this.series[this.runs[a]]=b):(this.runs[a]=this.series.length,this.series.push(b));this.dirty=!0;!("ymin"in b)&&"min"in b&&(b.ymin=b.min);!("ymax"in b)&&"max"in b&&(b.ymax=b.max);return this},getSeries:function(a){return this.series[this.runs[a]]},removeSeries:function(a){if(a in this.runs){var b=this.runs[a];delete this.runs[a];this.series[b].destroy();this.series.splice(b,1);d.forIn(this.runs,function(a,e,f){a>b&&(f[e]=a-1)});this.dirty=!0}return this},updateSeries:function(a,
-b,c){a in this.runs&&(a=this.series[this.runs[a]],a.update(b),c?this.dirty=!0:(this._invalidateDependentPlots(a.plot,!1),this._invalidateDependentPlots(a.plot,!0)));return this},getSeriesOrder:function(a){return d.map(d.filter(this.series,function(b){return b.plot==a}),F)},setSeriesOrder:function(a){var b,c={},e=d.filter(a,function(a){if(!(a in this.runs)||a in c)return!1;var f=this.series[this.runs[a]];if(b){if(f.plot!=b)return!1}else b=f.plot;c[a]=1;return!0},this);d.forEach(this.series,function(a){var f=
-a.name;f in c||a.plot!=b||e.push(f)});this.series=d.map(e,function(a){return this.series[this.runs[a]]},this).concat(d.filter(this.series,function(a){return a.plot!=b}));d.forEach(this.series,function(a,b){this.runs[a.name]=b},this);this.dirty=!0;return this},moveSeriesToFront:function(a){if(a in this.runs){var b=this.runs[a],c=this.getSeriesOrder(this.series[b].plot);if(a!=c[0])return c.splice(b,1),c.unshift(a),this.setSeriesOrder(c)}return this},moveSeriesToBack:function(a){if(a in this.runs){var b=
-this.runs[a],c=this.getSeriesOrder(this.series[b].plot);if(a!=c[c.length-1])return c.splice(b,1),c.push(a),this.setSeriesOrder(c)}return this},resize:function(a,b){switch(arguments.length){case 1:n.setMarginBox(this.node,a);break;case 2:n.setMarginBox(this.node,{w:a,h:b})}var c=n.getMarginBox(this.node),e=this.surface.getDimensions();return e.width!=c.w||e.height!=c.h?(this.surface.setDimensions(c.w,c.h),this.dirty=!0,this.render()):this},getGeometry:function(){var a={};d.forIn(this.axes,function(b){b.initialized()&&
-(a[b.name]={name:b.name,vertical:b.vertical,scaler:b.scaler,ticks:b.ticks})});return a},setAxisWindow:function(a,b,c,e){var f=this.axes[a];f&&(f.setWindow(b,c),g.forEach(this.stack,function(b){if(b.hAxis==a||b.vAxis==a)b.zoom=e}));return this},setWindow:function(a,b,c,e,f){"plotArea"in this||this.calculateGeometry();d.forIn(this.axes,function(f){var d,l;d=f.getScaler().bounds;l=d.span/(d.upper-d.lower);f.vertical?(d=b,l=e/l/d):(d=a,l=c/l/d);f.setWindow(d,l)});g.forEach(this.stack,function(a){a.zoom=
-f});return this},zoomIn:function(a,b,c){var e=this.axes[a];if(e){var e=e.getScaler().bounds,f=Math.min(b[0],b[1]),d=Math.max(b[0],b[1]),f=b[0]<e.lower?e.lower:f,d=b[1]>e.upper?e.upper:d;this.setAxisWindow(a,(e.upper-e.lower)/(d-f),f-e.lower);c?this.delayedRender():this.render()}},calculateGeometry:function(){if(this.dirty)return this.fullGeometry();var a=g.filter(this.stack,function(a){return a.dirty||a.hAxis&&this.axes[a.hAxis].dirty||a.vAxis&&this.axes[a.vAxis].dirty},this);t(a,this.plotArea);return this},
-fullGeometry:function(){this._makeDirty();g.forEach(this.stack,u);this.theme||this.setTheme(new I);g.forEach(this.series,function(a){if(!(a.plot in this.plots)){if(!m.plot2d||!m.plot2d.Default)throw Error("Can't find plot: Default - didn't you forget to dojo.require() it?");var b=new m.plot2d.Default(this,{});b.name=a.plot;this.plots[a.plot]=this.stack.length;this.stack.push(b)}this.stack[this.plots[a.plot]].addSeries(a)},this);g.forEach(this.stack,function(a){a.assignAxes&&a.assignAxes(this.axes)},
-this);var a=this.dim=this.surface.getDimensions();a.width=k.normalizedLength(a.width);a.height=k.normalizedLength(a.height);d.forIn(this.axes,u);t(this.stack,a);var b=this.offsets={l:0,r:0,t:0,b:0},c=this;d.forIn(this.axes,function(a){p("dojo-bidi")&&c._resetLeftBottom(a);d.forIn(a.getOffsets(),function(a,c){b[c]=Math.max(a,b[c])})});if(this.title){this.titleGap=0==this.titleGap?0:this.titleGap||this.theme.chart.titleGap||20;this.titlePos=this.titlePos||this.theme.chart.titlePos||"top";this.titleFont=
-this.titleFont||this.theme.chart.titleFont;this.titleFontColor=this.titleFontColor||this.theme.chart.titleFontColor||"black";this.titleAlign=this.titleAlign||this.theme&&this.theme.chart&&this.theme.chart.titleAlign||"middle";var e=k.normalizedLength(k.splitFontString(this.titleFont).size);b["top"==this.titlePos?"t":"b"]+=e+this.titleGap}d.forIn(this.margins,function(a,c){b[c]+=a});this.plotArea={width:a.width-b.l-b.r,height:a.height-b.t-b.b};d.forIn(this.axes,u);t(this.stack,this.plotArea);return this},
-render:function(){this._delayedRenderHandle&&(clearTimeout(this._delayedRenderHandle),this._delayedRenderHandle=null);this.theme&&this.theme.clear();if(this.dirty)return this.fullRender();this.calculateGeometry();d.forEachRev(this.stack,function(a){a.render(this.dim,this.offsets)},this);d.forIn(this.axes,function(a){a.render(this.dim,this.offsets)},this);this._makeClean();return this},fullRender:function(){this.fullGeometry();var a=this.offsets,b=this.dim,c=Math.max(0,b.width-a.l-a.r),e=Math.max(0,
-b.height-a.t-a.b);g.forEach(this.series,v);d.forIn(this.axes,v);g.forEach(this.stack,v);var f=this.surface.children;if(D.dispose)for(var l=0;l<f.length;++l)D.dispose(f[l]);this.chartTitle&&this.chartTitle.tagName&&B.destroy(this.chartTitle);this.surface.clear();this.chartTitle=null;this._renderChartBackground(b,a);this._renderPlotBackground(b,a,c,e);d.foldr(this.stack,function(c,e){return e.render(b,a),0},0);this._nativeClip||this._renderChartBackground(b,a);this.title&&this._renderTitle(b,a);d.forIn(this.axes,
-function(c){c.render(b,a)});this._makeClean();return this},_renderTitle:function(a,b){var c="canvas"==k.renderer&&this.htmlLabels||!p("ie")&&!p("opera")&&this.htmlLabels?"html":"gfx",e=k.normalizedLength(k.splitFontString(this.titleFont).size),f=k._base._getTextBox(this.title,{font:this.titleFont}),d=this.titleAlign,g=p("dojo-bidi")&&this.isRightToLeft(),h=a.width/2;"edge"===d?(d="left",h=g?a.width-(b.r+f.w):b.l):"middle"!=d&&(g&&(d="left"===d?"right":"left"),"left"===d?h=this.margins.l:"right"===
-d&&(d="left",h=a.width-(this.margins.l+f.w)));this.chartTitle=K.createText[c](this,this.surface,h,"top"==this.titlePos?e+this.margins.t:a.height-this.margins.b,d,this.title,this.titleFont,this.titleFontColor)},_renderChartBackground:function(a,b){var c=this.theme,e,d=void 0!==this.fill?this.fill:c.chart&&c.chart.fill,c=void 0!==this.stroke?this.stroke:c.chart&&c.chart.stroke;if("inherit"==d)for(e=this.node,d=new C(r.get(e,"backgroundColor"));0==d.a&&e!=document.documentElement;)d=new C(r.get(e,"backgroundColor")),
-e=e.parentNode;d&&(this._nativeClip?(d=h.prototype._shapeFill(h.prototype._plotFill(d,a),{x:0,y:0,width:a.width+1,height:a.height+1}),this.surface.createRect({width:a.width+1,height:a.height+1}).setFill(d)):(d=h.prototype._plotFill(d,a,b),b.l&&(e={x:0,y:0,width:b.l,height:a.height+1},this.surface.createRect(e).setFill(h.prototype._shapeFill(d,e))),b.r&&(e={x:a.width-b.r,y:0,width:b.r+1,height:a.height+2},this.surface.createRect(e).setFill(h.prototype._shapeFill(d,e))),b.t&&(e={x:0,y:0,width:a.width+
-1,height:b.t},this.surface.createRect(e).setFill(h.prototype._shapeFill(d,e))),b.b&&(e={x:0,y:a.height-b.b,width:a.width+1,height:b.b+2},this.surface.createRect(e).setFill(h.prototype._shapeFill(d,e)))));c&&this.surface.createRect({width:a.width-1,height:a.height-1}).setStroke(c)},_renderPlotBackground:function(a,b,c,d){var e=this.theme,g=e.plotarea&&e.plotarea.fill,e=e.plotarea&&e.plotarea.stroke,k={x:b.l-1,y:b.t-1,width:c+2,height:d+2};g&&(g=h.prototype._shapeFill(h.prototype._plotFill(g,a,b),k),
-this.surface.createRect(k).setFill(g));e&&this.surface.createRect({x:b.l,y:b.t,width:c+1,height:d+1}).setStroke(e)},delayedRender:function(){this._delayedRenderHandle||(this._delayedRenderHandle=setTimeout(z.hitch(this,function(){this.render()}),this.delayInMs));return this},connectToPlot:function(a,b,c){return a in this.plots?this.stack[this.plots[a]].connect(b,c):null},fireEvent:function(a,b,c){if(a in this.runs){var d=this.series[this.runs[a]].plot;d in this.plots&&(d=this.stack[this.plots[d]])&&
-d.fireEvent(a,b,c)}return this},_makeClean:function(){g.forEach(this.axes,x);g.forEach(this.stack,x);g.forEach(this.series,x);this.dirty=!1},_makeDirty:function(){g.forEach(this.axes,y);g.forEach(this.stack,y);g.forEach(this.series,y);this.dirty=!0},_invalidateDependentPlots:function(a,b){if(a in this.plots){var c=this.stack[this.plots[a]],d,f=b?"vAxis":"hAxis";c[f]?(d=this.axes[c[f]])&&d.dependOnData()&&(d.dirty=!0,g.forEach(this.stack,function(a){a[f]&&a[f]==c[f]&&(a.dirty=!0)})):c.dirty=!0}},setDir:function(a){return this},
-_resetLeftBottom:function(a){},formatTruncatedLabel:function(a,b,c){}});return p("dojo-bidi")?A("dojox.charting.Chart",[q,L]):q});
-//# sourceMappingURL=Chart.js.map
+define("dojox/charting/Chart",["../main","dojo/_base/lang","dojo/_base/array","dojo/_base/declare","dojo/dom-style","dojo/dom","dojo/dom-geometry","dojo/dom-construct","dojo/_base/Color","dojo/sniff","./Element","./SimpleTheme","./Series","./axis2d/common","dojox/gfx/shape","dojox/gfx","dojo/has!dojo-bidi?./bidi/Chart","dojox/lang/functional","dojox/lang/functional/fold","dojox/lang/functional/reversed"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f,g,_10,_11){
+var dc=_2.getObject("charting",true,_1),_12=_11.lambda("item.clear()"),_13=_11.lambda("item.purgeGroup()"),_14=_11.lambda("item.destroy()"),_15=_11.lambda("item.dirty = false"),_16=_11.lambda("item.dirty = true"),_17=_11.lambda("item.name"),_18={l:10,t:10,r:10,b:10};
+var _19=_4(_a("dojo-bidi")?"dojox.charting.NonBidiChart":"dojox.charting.Chart",null,{constructor:function(_1a,_1b){
+if(!_1b){
+_1b={};
+}
+this.margins=_1b.margins||_18;
+this._customMargins=!!_1b.margins;
+this.stroke=_1b.stroke;
+this.fill=_1b.fill;
+this.delayInMs=_1b.delayInMs||200;
+this.title=_1b.title;
+this.titleGap=_1b.titleGap;
+this.titlePos=_1b.titlePos;
+this.titleFont=_1b.titleFont;
+this.titleFontColor=_1b.titleFontColor;
+this.titleAlign=_1b.titleAlign;
+this.chartTitle=null;
+this.htmlLabels=true;
+if("htmlLabels" in _1b){
+this.htmlLabels=_1b.htmlLabels;
+}
+this.theme=null;
+this.axes={};
+this.stack=[];
+this.plots={};
+this.series=[];
+this.runs={};
+this.dirty=true;
+this.node=_6.byId(_1a);
+var box=_7.getMarginBox(_1a);
+this.surface=g.createSurface(this.node,box.w||400,box.h||300);
+if(this.surface.declaredClass.indexOf("vml")==-1){
+this._nativeClip=true;
+}
+},destroy:function(){
+_3.forEach(this.series,_14);
+_3.forEach(this.stack,_14);
+_11.forIn(this.axes,_14);
+this.surface.destroy();
+if(this.chartTitle&&this.chartTitle.tagName){
+_8.destroy(this.chartTitle);
+}
+},getCoords:function(){
+var _1c=this.node;
+var s=_5.getComputedStyle(_1c),_1d=_7.getMarginBox(_1c,s);
+var abs=_7.position(_1c,true);
+_1d.x=abs.x;
+_1d.y=abs.y;
+return _1d;
+},setTheme:function(_1e){
+this.theme=_1e.clone();
+if(!this._customMargins){
+this.margins=this.theme.chart.margins||_18;
+}
+this.dirty=true;
+return this;
+},addAxis:function(_1f,_20){
+var _21,_22=_20&&_20.type||"Default";
+if(typeof _22=="string"){
+if(!dc.axis2d||!dc.axis2d[_22]){
+throw Error("Can't find axis: "+_22+" - Check "+"require() dependencies.");
+}
+_21=new dc.axis2d[_22](this,_20);
+}else{
+_21=new _22(this,_20);
+}
+_21.name=_1f;
+_21.dirty=true;
+if(_1f in this.axes){
+this.axes[_1f].destroy();
+}
+this.axes[_1f]=_21;
+this.dirty=true;
+return this;
+},getAxis:function(_23){
+return this.axes[_23];
+},removeAxis:function(_24){
+if(_24 in this.axes){
+this.axes[_24].destroy();
+delete this.axes[_24];
+this.dirty=true;
+}
+return this;
+},addPlot:function(_25,_26){
+var _27,_28=_26&&_26.type||"Default";
+if(typeof _28=="string"){
+if(!dc.plot2d||!dc.plot2d[_28]){
+throw Error("Can't find plot: "+_28+" - didn't you forget to dojo"+".require() it?");
+}
+_27=new dc.plot2d[_28](this,_26);
+}else{
+_27=new _28(this,_26);
+}
+_27.name=_25;
+_27.dirty=true;
+if(_25 in this.plots){
+this.stack[this.plots[_25]].destroy();
+this.stack[this.plots[_25]]=_27;
+}else{
+this.plots[_25]=this.stack.length;
+this.stack.push(_27);
+}
+this.dirty=true;
+return this;
+},getPlot:function(_29){
+return this.stack[this.plots[_29]];
+},removePlot:function(_2a){
+if(_2a in this.plots){
+var _2b=this.plots[_2a];
+delete this.plots[_2a];
+this.stack[_2b].destroy();
+this.stack.splice(_2b,1);
+_11.forIn(this.plots,function(idx,_2c,_2d){
+if(idx>_2b){
+_2d[_2c]=idx-1;
+}
+});
+var ns=_3.filter(this.series,function(run){
+return run.plot!=_2a;
+});
+if(ns.length<this.series.length){
+_3.forEach(this.series,function(run){
+if(run.plot==_2a){
+run.destroy();
+}
+});
+this.runs={};
+_3.forEach(ns,function(run,_2e){
+this.runs[run.plot]=_2e;
+},this);
+this.series=ns;
+}
+this.dirty=true;
+}
+return this;
+},getPlotOrder:function(){
+return _11.map(this.stack,_17);
+},setPlotOrder:function(_2f){
+var _30={},_31=_11.filter(_2f,function(_32){
+if(!(_32 in this.plots)||(_32 in _30)){
+return false;
+}
+_30[_32]=1;
+return true;
+},this);
+if(_31.length<this.stack.length){
+_11.forEach(this.stack,function(_33){
+var _34=_33.name;
+if(!(_34 in _30)){
+_31.push(_34);
+}
+});
+}
+var _35=_11.map(_31,function(_36){
+return this.stack[this.plots[_36]];
+},this);
+_11.forEach(_35,function(_37,i){
+this.plots[_37.name]=i;
+},this);
+this.stack=_35;
+this.dirty=true;
+return this;
+},movePlotToFront:function(_38){
+if(_38 in this.plots){
+var _39=this.plots[_38];
+if(_39){
+var _3a=this.getPlotOrder();
+_3a.splice(_39,1);
+_3a.unshift(_38);
+return this.setPlotOrder(_3a);
+}
+}
+return this;
+},movePlotToBack:function(_3b){
+if(_3b in this.plots){
+var _3c=this.plots[_3b];
+if(_3c<this.stack.length-1){
+var _3d=this.getPlotOrder();
+_3d.splice(_3c,1);
+_3d.push(_3b);
+return this.setPlotOrder(_3d);
+}
+}
+return this;
+},addSeries:function(_3e,_3f,_40){
+var run=new _d(this,_3f,_40);
+run.name=_3e;
+if(_3e in this.runs){
+this.series[this.runs[_3e]].destroy();
+this.series[this.runs[_3e]]=run;
+}else{
+this.runs[_3e]=this.series.length;
+this.series.push(run);
+}
+this.dirty=true;
+if(!("ymin" in run)&&"min" in run){
+run.ymin=run.min;
+}
+if(!("ymax" in run)&&"max" in run){
+run.ymax=run.max;
+}
+return this;
+},getSeries:function(_41){
+return this.series[this.runs[_41]];
+},removeSeries:function(_42){
+if(_42 in this.runs){
+var _43=this.runs[_42];
+delete this.runs[_42];
+this.series[_43].destroy();
+this.series.splice(_43,1);
+_11.forIn(this.runs,function(idx,_44,_45){
+if(idx>_43){
+_45[_44]=idx-1;
+}
+});
+this.dirty=true;
+}
+return this;
+},updateSeries:function(_46,_47,_48){
+if(_46 in this.runs){
+var run=this.series[this.runs[_46]];
+run.update(_47);
+if(_48){
+this.dirty=true;
+}else{
+this._invalidateDependentPlots(run.plot,false);
+this._invalidateDependentPlots(run.plot,true);
+}
+}
+return this;
+},getSeriesOrder:function(_49){
+return _11.map(_11.filter(this.series,function(run){
+return run.plot==_49;
+}),_17);
+},setSeriesOrder:function(_4a){
+var _4b,_4c={},_4d=_11.filter(_4a,function(_4e){
+if(!(_4e in this.runs)||(_4e in _4c)){
+return false;
+}
+var run=this.series[this.runs[_4e]];
+if(_4b){
+if(run.plot!=_4b){
+return false;
+}
+}else{
+_4b=run.plot;
+}
+_4c[_4e]=1;
+return true;
+},this);
+_11.forEach(this.series,function(run){
+var _4f=run.name;
+if(!(_4f in _4c)&&run.plot==_4b){
+_4d.push(_4f);
+}
+});
+var _50=_11.map(_4d,function(_51){
+return this.series[this.runs[_51]];
+},this);
+this.series=_50.concat(_11.filter(this.series,function(run){
+return run.plot!=_4b;
+}));
+_11.forEach(this.series,function(run,i){
+this.runs[run.name]=i;
+},this);
+this.dirty=true;
+return this;
+},moveSeriesToFront:function(_52){
+if(_52 in this.runs){
+var _53=this.runs[_52],_54=this.getSeriesOrder(this.series[_53].plot);
+if(_52!=_54[0]){
+_54.splice(_53,1);
+_54.unshift(_52);
+return this.setSeriesOrder(_54);
+}
+}
+return this;
+},moveSeriesToBack:function(_55){
+if(_55 in this.runs){
+var _56=this.runs[_55],_57=this.getSeriesOrder(this.series[_56].plot);
+if(_55!=_57[_57.length-1]){
+_57.splice(_56,1);
+_57.push(_55);
+return this.setSeriesOrder(_57);
+}
+}
+return this;
+},resize:function(_58,_59){
+switch(arguments.length){
+case 1:
+_7.setMarginBox(this.node,_58);
+break;
+case 2:
+_7.setMarginBox(this.node,{w:_58,h:_59});
+break;
+}
+var box=_7.getMarginBox(this.node);
+var d=this.surface.getDimensions();
+if(d.width!=box.w||d.height!=box.h){
+this.surface.setDimensions(box.w,box.h);
+this.dirty=true;
+return this.render();
+}else{
+return this;
+}
+},getGeometry:function(){
+var ret={};
+_11.forIn(this.axes,function(_5a){
+if(_5a.initialized()){
+ret[_5a.name]={name:_5a.name,vertical:_5a.vertical,scaler:_5a.scaler,ticks:_5a.ticks};
+}
+});
+return ret;
+},setAxisWindow:function(_5b,_5c,_5d,_5e){
+var _5f=this.axes[_5b];
+if(_5f){
+_5f.setWindow(_5c,_5d);
+_3.forEach(this.stack,function(_60){
+if(_60.hAxis==_5b||_60.vAxis==_5b){
+_60.zoom=_5e;
+}
+});
+}
+return this;
+},setWindow:function(sx,sy,dx,dy,_61){
+if(!("plotArea" in this)){
+this.calculateGeometry();
+}
+_11.forIn(this.axes,function(_62){
+var _63,_64,_65=_62.getScaler().bounds,s=_65.span/(_65.upper-_65.lower);
+if(_62.vertical){
+_63=sy;
+_64=dy/s/_63;
+}else{
+_63=sx;
+_64=dx/s/_63;
+}
+_62.setWindow(_63,_64);
+});
+_3.forEach(this.stack,function(_66){
+_66.zoom=_61;
+});
+return this;
+},zoomIn:function(_67,_68,_69){
+var _6a=this.axes[_67];
+if(_6a){
+var _6b,_6c,_6d=_6a.getScaler().bounds;
+var _6e=Math.min(_68[0],_68[1]);
+var _6f=Math.max(_68[0],_68[1]);
+_6e=_68[0]<_6d.lower?_6d.lower:_6e;
+_6f=_68[1]>_6d.upper?_6d.upper:_6f;
+_6b=(_6d.upper-_6d.lower)/(_6f-_6e);
+_6c=_6e-_6d.lower;
+this.setAxisWindow(_67,_6b,_6c);
+if(_69){
+this.delayedRender();
+}else{
+this.render();
+}
+}
+},calculateGeometry:function(){
+if(this.dirty){
+return this.fullGeometry();
+}
+var _70=_3.filter(this.stack,function(_71){
+return _71.dirty||(_71.hAxis&&this.axes[_71.hAxis].dirty)||(_71.vAxis&&this.axes[_71.vAxis].dirty);
+},this);
+_72(_70,this.plotArea);
+return this;
+},fullGeometry:function(){
+this._makeDirty();
+_3.forEach(this.stack,_12);
+if(!this.theme){
+this.setTheme(new _c());
+}
+_3.forEach(this.series,function(run){
+if(!(run.plot in this.plots)){
+if(!dc.plot2d||!dc.plot2d.Default){
+throw Error("Can't find plot: Default - didn't you forget to dojo"+".require() it?");
+}
+var _73=new dc.plot2d.Default(this,{});
+_73.name=run.plot;
+this.plots[run.plot]=this.stack.length;
+this.stack.push(_73);
+}
+this.stack[this.plots[run.plot]].addSeries(run);
+},this);
+_3.forEach(this.stack,function(_74){
+if(_74.assignAxes){
+_74.assignAxes(this.axes);
+}
+},this);
+var dim=this.dim=this.surface.getDimensions();
+dim.width=g.normalizedLength(dim.width);
+dim.height=g.normalizedLength(dim.height);
+_11.forIn(this.axes,_12);
+_72(this.stack,dim);
+var _75=this.offsets={l:0,r:0,t:0,b:0};
+var _76=this;
+_11.forIn(this.axes,function(_77){
+if(_a("dojo-bidi")){
+_76._resetLeftBottom(_77);
+}
+_11.forIn(_77.getOffsets(),function(o,i){
+_75[i]=Math.max(o,_75[i]);
+});
+});
+if(this.title){
+this.titleGap=(this.titleGap==0)?0:this.titleGap||this.theme.chart.titleGap||20;
+this.titlePos=this.titlePos||this.theme.chart.titlePos||"top";
+this.titleFont=this.titleFont||this.theme.chart.titleFont;
+this.titleFontColor=this.titleFontColor||this.theme.chart.titleFontColor||"black";
+this.titleAlign=this.titleAlign||this.theme&&this.theme.chart&&this.theme.chart.titleAlign||"middle";
+var _78=g.normalizedLength(g.splitFontString(this.titleFont).size);
+_75[this.titlePos=="top"?"t":"b"]+=(_78+this.titleGap);
+}
+_11.forIn(this.margins,function(o,i){
+_75[i]+=o;
+});
+this.plotArea={width:dim.width-_75.l-_75.r,height:dim.height-_75.t-_75.b};
+_11.forIn(this.axes,_12);
+_72(this.stack,this.plotArea);
+return this;
+},render:function(){
+if(this._delayedRenderHandle){
+clearTimeout(this._delayedRenderHandle);
+this._delayedRenderHandle=null;
+}
+if(this.theme){
+this.theme.clear();
+}
+if(this.dirty){
+return this.fullRender();
+}
+this.calculateGeometry();
+_11.forEachRev(this.stack,function(_79){
+_79.render(this.dim,this.offsets);
+},this);
+_11.forIn(this.axes,function(_7a){
+_7a.render(this.dim,this.offsets);
+},this);
+this._makeClean();
+return this;
+},fullRender:function(){
+this.fullGeometry();
+var _7b=this.offsets,dim=this.dim;
+var w=Math.max(0,dim.width-_7b.l-_7b.r),h=Math.max(0,dim.height-_7b.t-_7b.b);
+_3.forEach(this.series,_13);
+_11.forIn(this.axes,_13);
+_3.forEach(this.stack,_13);
+var _7c=this.surface.children;
+if(_f.dispose){
+for(var i=0;i<_7c.length;++i){
+_f.dispose(_7c[i]);
+}
+}
+if(this.chartTitle&&this.chartTitle.tagName){
+_8.destroy(this.chartTitle);
+}
+this.surface.clear();
+this.chartTitle=null;
+this._renderChartBackground(dim,_7b);
+if(this._nativeClip){
+this._renderPlotBackground(dim,_7b,w,h);
+}else{
+this._renderPlotBackground(dim,_7b,w,h);
+}
+_11.foldr(this.stack,function(z,_7d){
+return _7d.render(dim,_7b),0;
+},0);
+if(!this._nativeClip){
+this._renderChartBackground(dim,_7b);
+}
+if(this.title){
+this._renderTitle(dim,_7b);
+}
+_11.forIn(this.axes,function(_7e){
+_7e.render(dim,_7b);
+});
+this._makeClean();
+return this;
+},_renderTitle:function(dim,_7f){
+var _80=(g.renderer=="canvas")&&this.htmlLabels,_81=_80||!_a("ie")&&!_a("opera")&&this.htmlLabels?"html":"gfx",_82=g.normalizedLength(g.splitFontString(this.titleFont).size),_83=g._base._getTextBox(this.title,{font:this.titleFont});
+var _84=this.titleAlign;
+var _85=_a("dojo-bidi")&&this.isRightToLeft();
+var _86=dim.width/2;
+if(_84==="edge"){
+_84="left";
+if(_85){
+_86=dim.width-(_7f.r+_83.w);
+}else{
+_86=_7f.l;
+}
+}else{
+if(_84!="middle"){
+if(_85){
+_84=_84==="left"?"right":"left";
+}
+if(_84==="left"){
+_86=this.margins.l;
+}else{
+if(_84==="right"){
+_84="left";
+_86=dim.width-(this.margins.l+_83.w);
+}
+}
+}
+}
+this.chartTitle=_e.createText[_81](this,this.surface,_86,this.titlePos=="top"?_82+this.margins.t:dim.height-this.margins.b,_84,this.title,this.titleFont,this.titleFontColor);
+},_renderChartBackground:function(dim,_87){
+var t=this.theme,_88;
+var _89=this.fill!==undefined?this.fill:(t.chart&&t.chart.fill);
+var _8a=this.stroke!==undefined?this.stroke:(t.chart&&t.chart.stroke);
+if(_89=="inherit"){
+var _8b=this.node;
+_89=new _9(_5.get(_8b,"backgroundColor"));
+while(_89.a==0&&_8b!=document.documentElement){
+_89=new _9(_5.get(_8b,"backgroundColor"));
+_8b=_8b.parentNode;
+}
+}
+if(_89){
+if(this._nativeClip){
+_89=_b.prototype._shapeFill(_b.prototype._plotFill(_89,dim),{x:0,y:0,width:dim.width+1,height:dim.height+1});
+this.surface.createRect({width:dim.width+1,height:dim.height+1}).setFill(_89);
+}else{
+_89=_b.prototype._plotFill(_89,dim,_87);
+if(_87.l){
+_88={x:0,y:0,width:_87.l,height:dim.height+1};
+this.surface.createRect(_88).setFill(_b.prototype._shapeFill(_89,_88));
+}
+if(_87.r){
+_88={x:dim.width-_87.r,y:0,width:_87.r+1,height:dim.height+2};
+this.surface.createRect(_88).setFill(_b.prototype._shapeFill(_89,_88));
+}
+if(_87.t){
+_88={x:0,y:0,width:dim.width+1,height:_87.t};
+this.surface.createRect(_88).setFill(_b.prototype._shapeFill(_89,_88));
+}
+if(_87.b){
+_88={x:0,y:dim.height-_87.b,width:dim.width+1,height:_87.b+2};
+this.surface.createRect(_88).setFill(_b.prototype._shapeFill(_89,_88));
+}
+}
+}
+if(_8a){
+this.surface.createRect({width:dim.width-1,height:dim.height-1}).setStroke(_8a);
+}
+},_renderPlotBackground:function(dim,_8c,w,h){
+var t=this.theme;
+var _8d=t.plotarea&&t.plotarea.fill;
+var _8e=t.plotarea&&t.plotarea.stroke;
+var _8f={x:_8c.l-1,y:_8c.t-1,width:w+2,height:h+2};
+if(_8d){
+_8d=_b.prototype._shapeFill(_b.prototype._plotFill(_8d,dim,_8c),_8f);
+this.surface.createRect(_8f).setFill(_8d);
+}
+if(_8e){
+this.surface.createRect({x:_8c.l,y:_8c.t,width:w+1,height:h+1}).setStroke(_8e);
+}
+},delayedRender:function(){
+if(!this._delayedRenderHandle){
+this._delayedRenderHandle=setTimeout(_2.hitch(this,function(){
+this.render();
+}),this.delayInMs);
+}
+return this;
+},connectToPlot:function(_90,_91,_92){
+return _90 in this.plots?this.stack[this.plots[_90]].connect(_91,_92):null;
+},fireEvent:function(_93,_94,_95){
+if(_93 in this.runs){
+var _96=this.series[this.runs[_93]].plot;
+if(_96 in this.plots){
+var _97=this.stack[this.plots[_96]];
+if(_97){
+_97.fireEvent(_93,_94,_95);
+}
+}
+}
+return this;
+},_makeClean:function(){
+_3.forEach(this.axes,_15);
+_3.forEach(this.stack,_15);
+_3.forEach(this.series,_15);
+this.dirty=false;
+},_makeDirty:function(){
+_3.forEach(this.axes,_16);
+_3.forEach(this.stack,_16);
+_3.forEach(this.series,_16);
+this.dirty=true;
+},_invalidateDependentPlots:function(_98,_99){
+if(_98 in this.plots){
+var _9a=this.stack[this.plots[_98]],_9b,_9c=_99?"vAxis":"hAxis";
+if(_9a[_9c]){
+_9b=this.axes[_9a[_9c]];
+if(_9b&&_9b.dependOnData()){
+_9b.dirty=true;
+_3.forEach(this.stack,function(p){
+if(p[_9c]&&p[_9c]==_9a[_9c]){
+p.dirty=true;
+}
+});
+}
+}else{
+_9a.dirty=true;
+}
+}
+},setDir:function(dir){
+return this;
+},_resetLeftBottom:function(_9d){
+},formatTruncatedLabel:function(_9e,_9f,_a0){
+}});
+function _a1(_a2){
+return {min:_a2.hmin,max:_a2.hmax};
+};
+function _a3(_a4){
+return {min:_a4.vmin,max:_a4.vmax};
+};
+function _a5(_a6,h){
+_a6.hmin=h.min;
+_a6.hmax=h.max;
+};
+function _a7(_a8,v){
+_a8.vmin=v.min;
+_a8.vmax=v.max;
+};
+function _a9(_aa,_ab){
+if(_aa&&_ab){
+_aa.min=Math.min(_aa.min,_ab.min);
+_aa.max=Math.max(_aa.max,_ab.max);
+}
+return _aa||_ab;
+};
+function _72(_ac,_ad){
+var _ae={},_af={};
+_3.forEach(_ac,function(_b0){
+var _b1=_ae[_b0.name]=_b0.getSeriesStats();
+if(_b0.hAxis){
+_af[_b0.hAxis]=_a9(_af[_b0.hAxis],_a1(_b1));
+}
+if(_b0.vAxis){
+_af[_b0.vAxis]=_a9(_af[_b0.vAxis],_a3(_b1));
+}
+});
+_3.forEach(_ac,function(_b2){
+var _b3=_ae[_b2.name];
+if(_b2.hAxis){
+_a5(_b3,_af[_b2.hAxis]);
+}
+if(_b2.vAxis){
+_a7(_b3,_af[_b2.vAxis]);
+}
+_b2.initializeScalers(_ad,_b3);
+});
+};
+return _a("dojo-bidi")?_4("dojox.charting.Chart",[_19,_10]):_19;
+});

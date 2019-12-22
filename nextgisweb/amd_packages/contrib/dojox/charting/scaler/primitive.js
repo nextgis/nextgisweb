@@ -1,4 +1,23 @@
 //>>built
-define("dojox/charting/scaler/primitive",["dojo/_base/lang"],function(d){var e=d.getObject("dojox.charting.scaler.primitive",!0);return d.mixin(e,{buildScaler:function(a,b,c,f){a==b&&(a-=.5,b+=.5);return{bounds:{lower:a,upper:b,from:a,to:b,scale:c/(b-a),span:c},scaler:e}},buildTicks:function(a,b){return{major:[],minor:[],micro:[]}},getTransformerFromModel:function(a){var b=a.bounds.from,c=a.bounds.scale;return function(a){return(a-b)*c}},getTransformerFromPlot:function(a){var b=a.bounds.from,c=a.bounds.scale;
-return function(a){return a/c+b}}})});
-//# sourceMappingURL=primitive.js.map
+define("dojox/charting/scaler/primitive",["dojo/_base/lang"],function(_1){
+var _2=_1.getObject("dojox.charting.scaler.primitive",true);
+return _1.mixin(_2,{buildScaler:function(_3,_4,_5,_6){
+if(_3==_4){
+_3-=0.5;
+_4+=0.5;
+}
+return {bounds:{lower:_3,upper:_4,from:_3,to:_4,scale:_5/(_4-_3),span:_5},scaler:_2};
+},buildTicks:function(_7,_8){
+return {major:[],minor:[],micro:[]};
+},getTransformerFromModel:function(_9){
+var _a=_9.bounds.from,_b=_9.bounds.scale;
+return function(x){
+return (x-_a)*_b;
+};
+},getTransformerFromPlot:function(_c){
+var _d=_c.bounds.from,_e=_c.bounds.scale;
+return function(x){
+return x/_e+_d;
+};
+}});
+});

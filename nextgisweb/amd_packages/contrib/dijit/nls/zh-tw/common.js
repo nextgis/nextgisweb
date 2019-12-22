@@ -1,3 +1,2 @@
 //>>built
-define("dijit/nls/zh-tw/common",{buttonOk:"\u78ba\u5b9a",buttonCancel:"\u53d6\u6d88",buttonSave:"\u5132\u5b58",itemClose:"\u95dc\u9589"});
-//# sourceMappingURL=common.js.map
+define("dijit/nls/zh-tw/common",({buttonOk:"確定",buttonCancel:"取消",buttonSave:"儲存",itemClose:"關閉"}));

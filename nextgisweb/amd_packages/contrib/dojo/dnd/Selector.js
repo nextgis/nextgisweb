@@ -5,13 +5,233 @@
 */
 
 //>>built
-define("dojo/dnd/Selector","../_base/array ../_base/declare ../_base/kernel ../_base/lang ../dom ../dom-construct ../mouse ../_base/NodeList ../on ../touch ./common ./Container".split(" "),function(n,p,q,k,f,r,t,u,l,m,e,v){var h=p("dojo.dnd.Selector",v,{constructor:function(b,a){a||(a={});this.singular=a.singular;this.autoSync=a.autoSync;this.selection={};this.anchor=null;this.simpleSelection=!1;this.events.push(l(this.node,m.press,k.hitch(this,"onMouseDown")),l(this.node,m.release,k.hitch(this,"onMouseUp")))},
-singular:!1,getSelectedNodes:function(){var b=new u,a=e._empty,c;for(c in this.selection)c in a||b.push(f.byId(c));return b},selectNone:function(){return this._removeSelection()._removeAnchor()},selectAll:function(){this.forInItems(function(b,a){this._addItemClass(f.byId(a),"Selected");this.selection[a]=1},this);return this._removeAnchor()},deleteSelectedNodes:function(){var b=e._empty,a;for(a in this.selection)if(!(a in b)){var c=f.byId(a);this.delItem(a);r.destroy(c)}this.anchor=null;this.selection=
-{};return this},forInSelectedItems:function(b,a){a=a||q.global;var c=this.selection,d=e._empty,g;for(g in c)g in d||b.call(a,this.getItem(g),g,this)},sync:function(){h.superclass.sync.call(this);this.anchor&&!this.getItem(this.anchor.id)&&(this.anchor=null);var b=[],a=e._empty,c;for(c in this.selection)c in a||this.getItem(c)||b.push(c);n.forEach(b,function(a){delete this.selection[a]},this);return this},insertNodes:function(b,a,c,d){var e=this._normalizedCreator;this._normalizedCreator=function(a,
-c){var d=e.call(this,a,c);b?(this.anchor?this.anchor!=d.node&&(this._removeItemClass(d.node,"Anchor"),this._addItemClass(d.node,"Selected")):(this.anchor=d.node,this._removeItemClass(d.node,"Selected"),this._addItemClass(this.anchor,"Anchor")),this.selection[d.node.id]=1):(this._removeItemClass(d.node,"Selected"),this._removeItemClass(d.node,"Anchor"));return d};h.superclass.insertNodes.call(this,a,c,d);this._normalizedCreator=e;return this},destroy:function(){h.superclass.destroy.call(this);this.selection=
-this.anchor=null},onMouseDown:function(b){this.autoSync&&this.sync();if(this.current)if(!this.singular&&!e.getCopyKeyState(b)&&!b.shiftKey&&this.current.id in this.selection)this.simpleSelection=!0,t.isLeft(b)&&(b.stopPropagation(),b.preventDefault());else{if(!this.singular&&b.shiftKey){e.getCopyKeyState(b)||this._removeSelection();var a=this.getAllNodes();if(a.length&&(this.anchor||(this.anchor=a[0],this._addItemClass(this.anchor,"Anchor")),this.selection[this.anchor.id]=1,this.anchor!=this.current)){for(var c=
-0,d;c<a.length&&(d=a[c],d!=this.anchor&&d!=this.current);++c);for(++c;c<a.length;++c){d=a[c];if(d==this.anchor||d==this.current)break;this._addItemClass(d,"Selected");this.selection[d.id]=1}this._addItemClass(this.current,"Selected");this.selection[this.current.id]=1}}else this.singular?this.anchor==this.current?e.getCopyKeyState(b)&&this.selectNone():(this.selectNone(),this.anchor=this.current,this._addItemClass(this.anchor,"Anchor"),this.selection[this.current.id]=1):e.getCopyKeyState(b)?this.anchor==
-this.current?(delete this.selection[this.anchor.id],this._removeAnchor()):this.current.id in this.selection?(this._removeItemClass(this.current,"Selected"),delete this.selection[this.current.id]):(this.anchor&&(this._removeItemClass(this.anchor,"Anchor"),this._addItemClass(this.anchor,"Selected")),this.anchor=this.current,this._addItemClass(this.current,"Anchor"),this.selection[this.current.id]=1):this.current.id in this.selection||(this.selectNone(),this.anchor=this.current,this._addItemClass(this.current,
-"Anchor"),this.selection[this.current.id]=1);b.stopPropagation();b.preventDefault()}},onMouseUp:function(){this.simpleSelection&&(this.simpleSelection=!1,this.selectNone(),this.current&&(this.anchor=this.current,this._addItemClass(this.anchor,"Anchor"),this.selection[this.current.id]=1))},onMouseMove:function(){this.simpleSelection=!1},onOverEvent:function(){this.onmousemoveEvent=l(this.node,m.move,k.hitch(this,"onMouseMove"))},onOutEvent:function(){this.onmousemoveEvent&&(this.onmousemoveEvent.remove(),
-delete this.onmousemoveEvent)},_removeSelection:function(){var b=e._empty,a;for(a in this.selection)if(!(a in b)){var c=f.byId(a);c&&this._removeItemClass(c,"Selected")}this.selection={};return this},_removeAnchor:function(){this.anchor&&(this._removeItemClass(this.anchor,"Anchor"),this.anchor=null);return this}});return h});
-//# sourceMappingURL=Selector.js.map
+define("dojo/dnd/Selector",["../_base/array","../_base/declare","../_base/kernel","../_base/lang","../dom","../dom-construct","../mouse","../_base/NodeList","../on","../touch","./common","./Container"],function(_1,_2,_3,_4,_5,_6,_7,_8,on,_9,_a,_b){
+var _c=_2("dojo.dnd.Selector",_b,{constructor:function(_d,_e){
+if(!_e){
+_e={};
+}
+this.singular=_e.singular;
+this.autoSync=_e.autoSync;
+this.selection={};
+this.anchor=null;
+this.simpleSelection=false;
+this.events.push(on(this.node,_9.press,_4.hitch(this,"onMouseDown")),on(this.node,_9.release,_4.hitch(this,"onMouseUp")));
+},singular:false,getSelectedNodes:function(){
+var t=new _8();
+var e=_a._empty;
+for(var i in this.selection){
+if(i in e){
+continue;
+}
+t.push(_5.byId(i));
+}
+return t;
+},selectNone:function(){
+return this._removeSelection()._removeAnchor();
+},selectAll:function(){
+this.forInItems(function(_f,id){
+this._addItemClass(_5.byId(id),"Selected");
+this.selection[id]=1;
+},this);
+return this._removeAnchor();
+},deleteSelectedNodes:function(){
+var e=_a._empty;
+for(var i in this.selection){
+if(i in e){
+continue;
+}
+var n=_5.byId(i);
+this.delItem(i);
+_6.destroy(n);
+}
+this.anchor=null;
+this.selection={};
+return this;
+},forInSelectedItems:function(f,o){
+o=o||_3.global;
+var s=this.selection,e=_a._empty;
+for(var i in s){
+if(i in e){
+continue;
+}
+f.call(o,this.getItem(i),i,this);
+}
+},sync:function(){
+_c.superclass.sync.call(this);
+if(this.anchor){
+if(!this.getItem(this.anchor.id)){
+this.anchor=null;
+}
+}
+var t=[],e=_a._empty;
+for(var i in this.selection){
+if(i in e){
+continue;
+}
+if(!this.getItem(i)){
+t.push(i);
+}
+}
+_1.forEach(t,function(i){
+delete this.selection[i];
+},this);
+return this;
+},insertNodes:function(_10,_11,_12,_13){
+var _14=this._normalizedCreator;
+this._normalizedCreator=function(_15,_16){
+var t=_14.call(this,_15,_16);
+if(_10){
+if(!this.anchor){
+this.anchor=t.node;
+this._removeItemClass(t.node,"Selected");
+this._addItemClass(this.anchor,"Anchor");
+}else{
+if(this.anchor!=t.node){
+this._removeItemClass(t.node,"Anchor");
+this._addItemClass(t.node,"Selected");
+}
+}
+this.selection[t.node.id]=1;
+}else{
+this._removeItemClass(t.node,"Selected");
+this._removeItemClass(t.node,"Anchor");
+}
+return t;
+};
+_c.superclass.insertNodes.call(this,_11,_12,_13);
+this._normalizedCreator=_14;
+return this;
+},destroy:function(){
+_c.superclass.destroy.call(this);
+this.selection=this.anchor=null;
+},onMouseDown:function(e){
+if(this.autoSync){
+this.sync();
+}
+if(!this.current){
+return;
+}
+if(!this.singular&&!_a.getCopyKeyState(e)&&!e.shiftKey&&(this.current.id in this.selection)){
+this.simpleSelection=true;
+if(_7.isLeft(e)){
+e.stopPropagation();
+e.preventDefault();
+}
+return;
+}
+if(!this.singular&&e.shiftKey){
+if(!_a.getCopyKeyState(e)){
+this._removeSelection();
+}
+var c=this.getAllNodes();
+if(c.length){
+if(!this.anchor){
+this.anchor=c[0];
+this._addItemClass(this.anchor,"Anchor");
+}
+this.selection[this.anchor.id]=1;
+if(this.anchor!=this.current){
+var i=0,_17;
+for(;i<c.length;++i){
+_17=c[i];
+if(_17==this.anchor||_17==this.current){
+break;
+}
+}
+for(++i;i<c.length;++i){
+_17=c[i];
+if(_17==this.anchor||_17==this.current){
+break;
+}
+this._addItemClass(_17,"Selected");
+this.selection[_17.id]=1;
+}
+this._addItemClass(this.current,"Selected");
+this.selection[this.current.id]=1;
+}
+}
+}else{
+if(this.singular){
+if(this.anchor==this.current){
+if(_a.getCopyKeyState(e)){
+this.selectNone();
+}
+}else{
+this.selectNone();
+this.anchor=this.current;
+this._addItemClass(this.anchor,"Anchor");
+this.selection[this.current.id]=1;
+}
+}else{
+if(_a.getCopyKeyState(e)){
+if(this.anchor==this.current){
+delete this.selection[this.anchor.id];
+this._removeAnchor();
+}else{
+if(this.current.id in this.selection){
+this._removeItemClass(this.current,"Selected");
+delete this.selection[this.current.id];
+}else{
+if(this.anchor){
+this._removeItemClass(this.anchor,"Anchor");
+this._addItemClass(this.anchor,"Selected");
+}
+this.anchor=this.current;
+this._addItemClass(this.current,"Anchor");
+this.selection[this.current.id]=1;
+}
+}
+}else{
+if(!(this.current.id in this.selection)){
+this.selectNone();
+this.anchor=this.current;
+this._addItemClass(this.current,"Anchor");
+this.selection[this.current.id]=1;
+}
+}
+}
+}
+e.stopPropagation();
+e.preventDefault();
+},onMouseUp:function(){
+if(!this.simpleSelection){
+return;
+}
+this.simpleSelection=false;
+this.selectNone();
+if(this.current){
+this.anchor=this.current;
+this._addItemClass(this.anchor,"Anchor");
+this.selection[this.current.id]=1;
+}
+},onMouseMove:function(){
+this.simpleSelection=false;
+},onOverEvent:function(){
+this.onmousemoveEvent=on(this.node,_9.move,_4.hitch(this,"onMouseMove"));
+},onOutEvent:function(){
+if(this.onmousemoveEvent){
+this.onmousemoveEvent.remove();
+delete this.onmousemoveEvent;
+}
+},_removeSelection:function(){
+var e=_a._empty;
+for(var i in this.selection){
+if(i in e){
+continue;
+}
+var _18=_5.byId(i);
+if(_18){
+this._removeItemClass(_18,"Selected");
+}
+}
+this.selection={};
+return this;
+},_removeAnchor:function(){
+if(this.anchor){
+this._removeItemClass(this.anchor,"Anchor");
+this.anchor=null;
+}
+return this;
+}});
+return _c;
+});

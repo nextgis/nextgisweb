@@ -5,5 +5,6 @@
 */
 
 //>>built
-define("dojo/request",["./request/default!"],function(a){return a});
-//# sourceMappingURL=request.js.map
+define("dojo/request",["./request/default!"],function(_1){
+return _1;
+});

@@ -5,6 +5,41 @@
 */
 
 //>>built
-define("dojo/gears",["./_base/lang","./sniff"],function(c,d){var b={};c.setObject("dojo.gears",b);b._gearsObject=function(){var a,b=c.getObject("google.gears");if(b)return b;if("undefined"!=typeof GearsFactory)a=new GearsFactory;else if(d("ie"))try{a=new ActiveXObject("Gears.Factory")}catch(e){}else navigator.mimeTypes["application/x-googlegears"]&&(a=document.createElement("object"),a.setAttribute("type","application/x-googlegears"),a.setAttribute("width",0),a.setAttribute("height",0),a.style.display=
-"none",document.documentElement.appendChild(a));if(!a)return null;c.setObject("google.gears.factory",a);return c.getObject("google.gears")};b.available=!!b._gearsObject()||0;return b});
-//# sourceMappingURL=gears.js.map
+define("dojo/gears",["./_base/lang","./sniff"],function(_1,_2){
+var _3={};
+_1.setObject("dojo.gears",_3);
+_3._gearsObject=function(){
+var _4;
+var _5=_1.getObject("google.gears");
+if(_5){
+return _5;
+}
+if(typeof GearsFactory!="undefined"){
+_4=new GearsFactory();
+}else{
+if(_2("ie")){
+try{
+_4=new ActiveXObject("Gears.Factory");
+}
+catch(e){
+}
+}else{
+if(navigator.mimeTypes["application/x-googlegears"]){
+_4=document.createElement("object");
+_4.setAttribute("type","application/x-googlegears");
+_4.setAttribute("width",0);
+_4.setAttribute("height",0);
+_4.style.display="none";
+document.documentElement.appendChild(_4);
+}
+}
+}
+if(!_4){
+return null;
+}
+_1.setObject("google.gears.factory",_4);
+return _1.getObject("google.gears");
+};
+_3.available=(!!_3._gearsObject())||0;
+return _3;
+});

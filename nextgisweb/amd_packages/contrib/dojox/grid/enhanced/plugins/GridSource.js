@@ -1,6 +1,78 @@
 //>>built
-define("dojox/grid/enhanced/plugins/GridSource",["dojo/_base/declare","dojo/_base/array","dojo/_base/lang","dojo/dnd/Source","./DnD"],function(n,h,g,p,r){var l=function(b){for(var a=b[0],c=1;c<b.length;++c)a=a.concat(b[c]);return a},m=g.getObject("dojox.grid.enhanced.plugins.GridDnDSource");return n("dojox.grid.enhanced.plugins.GridSource",p,{accept:["grid/cells","grid/rows","grid/cols","text"],insertNodesForGrid:!1,markupFactory:function(b,a){cls=g.getObject("dojox.grid.enhanced.plugins.GridSource");
-return new cls(a,b)},checkAcceptance:function(b,a){if(b instanceof m){if(a[0]){var c=b.getItem(a[0].id);if(c&&(0<=h.indexOf(c.type,"grid/rows")||0<=h.indexOf(c.type,"grid/cells"))&&!b.dndPlugin._allDnDItemsLoaded())return!1}this.sourcePlugin=b.dndPlugin}return this.inherited(arguments)},onDraggingOver:function(){this.sourcePlugin&&(this.sourcePlugin._isSource=!0)},onDraggingOut:function(){this.sourcePlugin&&(this.sourcePlugin._isSource=!1)},onDropExternal:function(b,a,c){if(b instanceof m){var d=
-h.map(a,function(a){return b.getItem(a.id).data}),k=b.getItem(a[0].id),e=k.dndPlugin.grid,g=k.type[0],f;try{switch(g){case "grid/cells":a[0].innerHTML=this.getCellContent(e,d[0].min,d[0].max)||"";this.onDropGridCells(e,d[0].min,d[0].max);break;case "grid/rows":f=l(d);a[0].innerHTML=this.getRowContent(e,f)||"";this.onDropGridRows(e,f);break;case "grid/cols":f=l(d),a[0].innerHTML=this.getColumnContent(e,f)||"",this.onDropGridColumns(e,f)}this.insertNodesForGrid&&(this.selectNone(),this.insertNodes(!0,
-[a[0]],this.before,this.current));k.dndPlugin.onDragOut(!c)}catch(q){console.warn("GridSource.onDropExternal() error:",q)}}else this.inherited(arguments)},getCellContent:function(b,a,c){},getRowContent:function(b,a){},getColumnContent:function(b,a){},onDropGridCells:function(b,a,c){},onDropGridRows:function(b,a){},onDropGridColumns:function(b,a){}})});
-//# sourceMappingURL=GridSource.js.map
+define("dojox/grid/enhanced/plugins/GridSource",["dojo/_base/declare","dojo/_base/array","dojo/_base/lang","dojo/dnd/Source","./DnD"],function(_1,_2,_3,_4,_5){
+var _6=function(_7){
+var a=_7[0];
+for(var i=1;i<_7.length;++i){
+a=a.concat(_7[i]);
+}
+return a;
+};
+var _8=_3.getObject("dojox.grid.enhanced.plugins.GridDnDSource");
+return _1("dojox.grid.enhanced.plugins.GridSource",_4,{accept:["grid/cells","grid/rows","grid/cols","text"],insertNodesForGrid:false,markupFactory:function(_9,_a){
+cls=_3.getObject("dojox.grid.enhanced.plugins.GridSource");
+return new cls(_a,_9);
+},checkAcceptance:function(_b,_c){
+if(_b instanceof _8){
+if(_c[0]){
+var _d=_b.getItem(_c[0].id);
+if(_d&&(_2.indexOf(_d.type,"grid/rows")>=0||_2.indexOf(_d.type,"grid/cells")>=0)&&!_b.dndPlugin._allDnDItemsLoaded()){
+return false;
+}
+}
+this.sourcePlugin=_b.dndPlugin;
+}
+return this.inherited(arguments);
+},onDraggingOver:function(){
+if(this.sourcePlugin){
+this.sourcePlugin._isSource=true;
+}
+},onDraggingOut:function(){
+if(this.sourcePlugin){
+this.sourcePlugin._isSource=false;
+}
+},onDropExternal:function(_e,_f,_10){
+if(_e instanceof _8){
+var _11=_2.map(_f,function(_12){
+return _e.getItem(_12.id).data;
+});
+var _13=_e.getItem(_f[0].id);
+var _14=_13.dndPlugin.grid;
+var _15=_13.type[0];
+var _16;
+try{
+switch(_15){
+case "grid/cells":
+_f[0].innerHTML=this.getCellContent(_14,_11[0].min,_11[0].max)||"";
+this.onDropGridCells(_14,_11[0].min,_11[0].max);
+break;
+case "grid/rows":
+_16=_6(_11);
+_f[0].innerHTML=this.getRowContent(_14,_16)||"";
+this.onDropGridRows(_14,_16);
+break;
+case "grid/cols":
+_16=_6(_11);
+_f[0].innerHTML=this.getColumnContent(_14,_16)||"";
+this.onDropGridColumns(_14,_16);
+break;
+}
+if(this.insertNodesForGrid){
+this.selectNone();
+this.insertNodes(true,[_f[0]],this.before,this.current);
+}
+_13.dndPlugin.onDragOut(!_10);
+}
+catch(e){
+console.warn("GridSource.onDropExternal() error:",e);
+}
+}else{
+this.inherited(arguments);
+}
+},getCellContent:function(_17,_18,_19){
+},getRowContent:function(_1a,_1b){
+},getColumnContent:function(_1c,_1d){
+},onDropGridCells:function(_1e,_1f,_20){
+},onDropGridRows:function(_21,_22){
+},onDropGridColumns:function(_23,_24){
+}});
+});

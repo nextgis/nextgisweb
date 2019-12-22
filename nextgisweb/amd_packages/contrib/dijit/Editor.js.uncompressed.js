@@ -819,6 +819,7 @@ define("dijit/Editor", [
 				// is separate from the iframe's document.
 				if(this.document && this.document.body){
 					domStyle.set(this.document.body, "color", domStyle.get(this.iframe, "color"));
+					domStyle.set(this.document.body, "background-color", domStyle.get(this.iframe, "background-color"));
 				}
 			}catch(e){ /* Squelch any errors caused by focus change if hidden during a state change */
 			}

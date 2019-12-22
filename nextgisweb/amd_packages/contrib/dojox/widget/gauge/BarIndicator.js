@@ -1,3 +1,6 @@
 //>>built
-define("dojox/widget/gauge/BarIndicator",["dojo","dijit","dojox","dojo/require!dojox/gauges/BarIndicator"],function(a,c,b){a.provide("dojox.widget.gauge.BarIndicator");a.require("dojox.gauges.BarIndicator");b.widget.gauge.BarIndicator=b.gauges.BarIndicator});
-//# sourceMappingURL=BarIndicator.js.map
+define("dojox/widget/gauge/BarIndicator",["dojo","dijit","dojox","dojo/require!dojox/gauges/BarIndicator"],function(_1,_2,_3){
+_1.provide("dojox.widget.gauge.BarIndicator");
+_1.require("dojox.gauges.BarIndicator");
+_3.widget.gauge.BarIndicator=_3.gauges.BarIndicator;
+});

@@ -75,6 +75,11 @@ define("dijit/form/_FormWidgetMixin", [
 			// Can't use "disabled" in this.focusNode as a test because on IE, that's true for all nodes.
 			if(/^(button|input|select|textarea|optgroup|option|fieldset)$/i.test(this.focusNode.tagName)){
 				domAttr.set(this.focusNode, 'disabled', value);
+				// IE has a Caret Browsing mode (hit F7 to activate) where disabled textboxes can be modified
+				// textboxes marked readonly if disabled to avoid this issue.
+				if (has('trident') && 'readOnly' in this) {
+					domAttr.set(this.focusNode, 'readonly', value || this.readOnly);
+				}
 			}else{
 				this.focusNode.setAttribute("aria-disabled", value ? "true" : "false");
 			}

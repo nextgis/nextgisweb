@@ -1,3 +1,3 @@
 //>>built
-define("dojox/drawing",["./drawing/_base"],function(){});
-//# sourceMappingURL=drawing.js.map
+define("dojox/drawing",["./drawing/_base"],function(){
+});

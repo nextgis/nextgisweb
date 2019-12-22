@@ -1,5 +1,52 @@
 //>>built
-define("dojox/gfx/svg_mask",["dojo/_base/declare","dojo/_base/lang","./_base","./shape","./svg"],function(e,c,g,f,d){c.extend(d.Shape,{mask:null,setMask:function(a){var b=this.rawNode;a?(b.setAttribute("mask","url(#"+a.shape.id+")"),this.mask=a):(b.removeAttribute("mask"),this.mask=null);return this},getMask:function(){return this.mask}});var b=d.Mask=e("dojox.gfx.svg.Mask",d.Shape,{constructor:function(){f.Container._init.call(this);this.shape=b.defaultMask},setRawNode:function(a){this.rawNode=a},
-setShape:function(a){a.id||(a=c.mixin({id:g._base._getUniqueId()},a));this.inherited(arguments,[a])}});b.nodeType="mask";b.defaultMask={id:null,x:0,y:0,width:1,height:1,maskUnits:"objectBoundingBox",maskContentUnits:"userSpaceOnUse"};c.extend(b,d.Container);c.extend(b,f.Creator);c.extend(b,d.Creator);e=d.Surface;var h=e.prototype.add,k=e.prototype.remove;c.extend(e,{createMask:function(a){return this.createObject(b,a)},add:function(a){a instanceof b?(this.defNode.appendChild(a.rawNode),a.parent=this):
-h.apply(this,arguments);return this},remove:function(a,c){a instanceof b&&this.defNode==a.rawNode.parentNode?(this.defNode.removeChild(a.rawNode),a.parent=null):k.apply(this,arguments);return this}})});
-//# sourceMappingURL=svg_mask.js.map
+define("dojox/gfx/svg_mask",["dojo/_base/declare","dojo/_base/lang","./_base","./shape","./svg"],function(_1,_2,_3,_4,_5){
+_2.extend(_5.Shape,{mask:null,setMask:function(_6){
+var _7=this.rawNode;
+if(_6){
+_7.setAttribute("mask","url(#"+_6.shape.id+")");
+this.mask=_6;
+}else{
+_7.removeAttribute("mask");
+this.mask=null;
+}
+return this;
+},getMask:function(){
+return this.mask;
+}});
+var _8=_5.Mask=_1("dojox.gfx.svg.Mask",_5.Shape,{constructor:function(){
+_4.Container._init.call(this);
+this.shape=_8.defaultMask;
+},setRawNode:function(_9){
+this.rawNode=_9;
+},setShape:function(_a){
+if(!_a.id){
+_a=_2.mixin({id:_3._base._getUniqueId()},_a);
+}
+this.inherited(arguments,[_a]);
+}});
+_8.nodeType="mask";
+_8.defaultMask={id:null,x:0,y:0,width:1,height:1,maskUnits:"objectBoundingBox",maskContentUnits:"userSpaceOnUse"};
+_2.extend(_8,_5.Container);
+_2.extend(_8,_4.Creator);
+_2.extend(_8,_5.Creator);
+var _b=_5.Surface,_c=_b.prototype.add,_d=_b.prototype.remove;
+_2.extend(_b,{createMask:function(_e){
+return this.createObject(_8,_e);
+},add:function(_f){
+if(_f instanceof _8){
+this.defNode.appendChild(_f.rawNode);
+_f.parent=this;
+}else{
+_c.apply(this,arguments);
+}
+return this;
+},remove:function(_10,_11){
+if(_10 instanceof _8&&this.defNode==_10.rawNode.parentNode){
+this.defNode.removeChild(_10.rawNode);
+_10.parent=null;
+}else{
+_d.apply(this,arguments);
+}
+return this;
+}});
+});

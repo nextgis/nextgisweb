@@ -1,3 +1,14 @@
 //>>built
-define("dojox/mobile/bidi/_ComboBoxMenu",["dojo/_base/declare","dojo/dom-construct","dojo/dom-class","dojo/dom-style"],function(b,d,a,c){return b(null,{buildRendering:function(){this.inherited(arguments);this.isLeftToRight()||(this.containerNode.style.left="auto",c.set(this.containerNode,{position:"absolute",top:0,right:0}),a.remove(this.previousButton,"mblComboBoxMenuItem"),a.add(this.previousButton,"mblComboBoxMenuItemRtl"),a.remove(this.nextButton,"mblComboBoxMenuItem"),a.add(this.nextButton,"mblComboBoxMenuItemRtl"))}})});
-//# sourceMappingURL=_ComboBoxMenu.js.map
+define("dojox/mobile/bidi/_ComboBoxMenu",["dojo/_base/declare","dojo/dom-construct","dojo/dom-class","dojo/dom-style"],function(_1,_2,_3,_4){
+return _1(null,{buildRendering:function(){
+this.inherited(arguments);
+if(!this.isLeftToRight()){
+this.containerNode.style.left="auto";
+_4.set(this.containerNode,{position:"absolute",top:0,right:0});
+_3.remove(this.previousButton,"mblComboBoxMenuItem");
+_3.add(this.previousButton,"mblComboBoxMenuItemRtl");
+_3.remove(this.nextButton,"mblComboBoxMenuItem");
+_3.add(this.nextButton,"mblComboBoxMenuItemRtl");
+}
+}});
+});

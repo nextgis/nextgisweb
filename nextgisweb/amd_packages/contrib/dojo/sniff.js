@@ -5,8 +5,51 @@
 */
 
 //>>built
-define("dojo/sniff",["./has"],function(a){var c=navigator,b=c.userAgent,c=c.appVersion,d=parseFloat(c);a.add("air",0<=b.indexOf("AdobeAIR"));a.add("wp",parseFloat(b.split("Windows Phone")[1])||void 0);a.add("msapp",parseFloat(b.split("MSAppHost/")[1])||void 0);a.add("khtml",0<=c.indexOf("Konqueror")?d:void 0);a.add("edge",parseFloat(b.split("Edge/")[1])||void 0);a.add("opr",parseFloat(b.split("OPR/")[1])||void 0);a.add("webkit",!a("wp")&&!a("edge")&&parseFloat(b.split("WebKit/")[1])||void 0);a.add("chrome",
-!a("edge")&&!a("opr")&&parseFloat(b.split("Chrome/")[1])||void 0);a.add("android",!a("wp")&&parseFloat(b.split("Android ")[1])||void 0);a.add("safari",!(0<=c.indexOf("Safari"))||a("wp")||a("chrome")||a("android")||a("edge")||a("opr")?void 0:parseFloat(c.split("Version/")[1]));a.add("mac",0<=c.indexOf("Macintosh"));a.add("quirks","BackCompat"==document.compatMode);if(!a("wp")&&b.match(/(iPhone|iPod|iPad)/)){var f=RegExp.$1.replace(/P/,"p"),e=b.match(/OS ([\d_]+)/)?RegExp.$1:"1",e=parseFloat(e.replace(/_/,
-".").replace(/_/g,""));a.add(f,e);a.add("ios",e)}a.add("bb",(0<=b.indexOf("BlackBerry")||0<=b.indexOf("BB10"))&&parseFloat(b.split("Version/")[1])||void 0);a.add("trident",parseFloat(c.split("Trident/")[1])||void 0);a.add("svg","undefined"!==typeof SVGAngle);a("webkit")||(0<=b.indexOf("Opera")&&a.add("opera",9.8<=d?parseFloat(b.split("Version/")[1])||d:d),!(0<=b.indexOf("Gecko"))||a("wp")||a("khtml")||a("trident")||a("edge")||a.add("mozilla",d),a("mozilla")&&a.add("ff",parseFloat(b.split("Firefox/")[1]||
-b.split("Minefield/")[1])||void 0),document.all&&!a("opera")&&(b=parseFloat(c.split("MSIE ")[1])||void 0,(c=document.documentMode)&&5!=c&&Math.floor(b)!=c&&(b=c),a.add("ie",b)),a.add("wii","undefined"!=typeof opera&&opera.wiiremote));return a});
-//# sourceMappingURL=sniff.js.map
+define("dojo/sniff",["./has"],function(_1){
+if(1){
+var n=navigator,_2=n.userAgent,_3=n.appVersion,tv=parseFloat(_3);
+_1.add("air",_2.indexOf("AdobeAIR")>=0);
+_1.add("wp",parseFloat(_2.split("Windows Phone")[1])||undefined);
+_1.add("msapp",parseFloat(_2.split("MSAppHost/")[1])||undefined);
+_1.add("khtml",_3.indexOf("Konqueror")>=0?tv:undefined);
+_1.add("edge",parseFloat(_2.split("Edge/")[1])||undefined);
+_1.add("opr",parseFloat(_2.split("OPR/")[1])||undefined);
+_1.add("webkit",!_1("wp")&&!_1("edge")&&parseFloat(_2.split("WebKit/")[1])||undefined);
+_1.add("chrome",!_1("edge")&&!_1("opr")&&parseFloat(_2.split("Chrome/")[1])||undefined);
+_1.add("android",!_1("wp")&&parseFloat(_2.split("Android ")[1])||undefined);
+_1.add("safari",_3.indexOf("Safari")>=0&&!_1("wp")&&!_1("chrome")&&!_1("android")&&!_1("edge")&&!_1("opr")?parseFloat(_3.split("Version/")[1]):undefined);
+_1.add("mac",_3.indexOf("Macintosh")>=0);
+_1.add("quirks",document.compatMode=="BackCompat");
+if(!_1("wp")&&_2.match(/(iPhone|iPod|iPad)/)){
+var p=RegExp.$1.replace(/P/,"p");
+var v=_2.match(/OS ([\d_]+)/)?RegExp.$1:"1";
+var os=parseFloat(v.replace(/_/,".").replace(/_/g,""));
+_1.add(p,os);
+_1.add("ios",os);
+}
+_1.add("bb",(_2.indexOf("BlackBerry")>=0||_2.indexOf("BB10")>=0)&&parseFloat(_2.split("Version/")[1])||undefined);
+_1.add("trident",parseFloat(_3.split("Trident/")[1])||undefined);
+_1.add("svg",typeof SVGAngle!=="undefined");
+if(!_1("webkit")){
+if(_2.indexOf("Opera")>=0){
+_1.add("opera",tv>=9.8?parseFloat(_2.split("Version/")[1])||tv:tv);
+}
+if(_2.indexOf("Gecko")>=0&&!_1("wp")&&!_1("khtml")&&!_1("trident")&&!_1("edge")){
+_1.add("mozilla",tv);
+}
+if(_1("mozilla")){
+_1.add("ff",parseFloat(_2.split("Firefox/")[1]||_2.split("Minefield/")[1])||undefined);
+}
+if(document.all&&!_1("opera")){
+var _4=parseFloat(_3.split("MSIE ")[1])||undefined;
+var _5=document.documentMode;
+if(_5&&_5!=5&&Math.floor(_4)!=_5){
+_4=_5;
+}
+_1.add("ie",_4);
+}
+_1.add("wii",typeof opera!="undefined"&&opera.wiiremote);
+}
+}
+return _1;
+});

@@ -17,6 +17,7 @@ define("dijit/Dialog", [
 	"dojo/on",
 	"dojo/ready",
 	"dojo/sniff", // has("ie") has("opera") has("dijit-legacy-requires")
+	"dojo/touch",
 	"dojo/window", // winUtils.getBox, winUtils.get
 	"dojo/dnd/Moveable", // Moveable
 	"dojo/dnd/TimedMoveable", // TimedMoveable
@@ -34,7 +35,7 @@ define("dijit/Dialog", [
 	"./a11yclick",	// template uses ondijitclick
 	"dojo/i18n!./nls/common"
 ], function(require, array, aspect, declare, Deferred,
-			dom, domClass, domGeometry, domStyle, fx, i18n, keys, lang, on, ready, has, winUtils,
+			dom, domClass, domGeometry, domStyle, fx, i18n, keys, lang, on, ready, has, touch, winUtils,
 			Moveable, TimedMoveable, focus, manager, _Widget, _TemplatedMixin, _CssStateMixin, _FormMixin, _DialogMixin,
 			DialogUnderlay, ContentPane, utils, template){
 
@@ -128,6 +129,9 @@ define("dijit/Dialog", [
 
 			aspect.after(this, "onExecute", lang.hitch(this, "hide"), true);
 			aspect.after(this, "onCancel", lang.hitch(this, "hide"), true);
+			on(this.closeButtonNode, touch.press, function(e){
+				e.stopPropagation();
+			});
 
 			this._modalconnects = [];
 		},
@@ -435,14 +439,33 @@ define("dijit/Dialog", [
 					viewport.h *= this.maxRatio;
 
 					var bb = domGeometry.position(this.domNode);
-					if(bb.w >= viewport.w || bb.h >= viewport.h){
+					this._shrunk = false;
+					// First check and limit width, because limiting the width may increase the height due to word wrapping.
+					if(bb.w >= viewport.w){
 						dim = {
-							w: Math.min(bb.w, viewport.w),
-							h: Math.min(bb.h, viewport.h)
+							w: viewport.w
 						};
+						domGeometry.setMarginBox(this.domNode, dim);
+						bb = domGeometry.position(this.domNode);
 						this._shrunk = true;
-					}else{
-						this._shrunk = false;
+					}
+					// Now check and limit the height
+					if(bb.h >= viewport.h){
+						if(!dim){
+							dim = {
+								w: bb.w
+							};
+						}
+						dim.h = viewport.h;
+						this._shrunk = true;
+					}
+					if(dim){
+						if(!dim.w){
+							dim.w = bb.w;
+						}
+						if(!dim.h){
+							dim.h = bb.h;
+						}
 					}
 				}
 

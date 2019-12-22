@@ -1,4 +1,33 @@
 //>>built
-define("dojox/io/xhrWindowNamePlugin","dojo/_base/kernel dojo/_base/json dojo/_base/xhr dojox/io/xhrPlugins dojox/io/windowName dojox/io/httpParse dojox/secure/capability".split(" "),function(c,n,p,e,k,q,l){c.getObject("io.xhrWindowNamePlugin",!0,dojox);dojox.io.xhrWindowNamePlugin=function(b,f,m){e.register("windowName",function(c,a){return!0!==a.sync&&("GET"==c||"POST"==c||f)&&a.url.substring(0,b.length)==b},function(b,a,e){var g=k.send,h=a.load;a.load=void 0;var d=(f?f(g,!0):g)(b,a,e);d.addCallback(function(a){var b=
-d.ioArgs;b.xhr={getResponseHeader:function(a){return c.queryToObject(b.hash.match(/[^#]*$/)[0])[a]}};return"json"==b.handleAs?(m||l.validate(a,["Date"],{}),c.fromJson(a)):c._contentHandlers[b.handleAs||"text"]({responseText:a})});(a.load=h)&&d.addCallback(h);return d})};return dojox.io.xhrWindowNamePlugin});
-//# sourceMappingURL=xhrWindowNamePlugin.js.map
+define("dojox/io/xhrWindowNamePlugin",["dojo/_base/kernel","dojo/_base/json","dojo/_base/xhr","dojox/io/xhrPlugins","dojox/io/windowName","dojox/io/httpParse","dojox/secure/capability"],function(_1,_2,_3,_4,_5,_6,_7){
+_1.getObject("io.xhrWindowNamePlugin",true,dojox);
+dojox.io.xhrWindowNamePlugin=function(_8,_9,_a){
+_4.register("windowName",function(_b,_c){
+return _c.sync!==true&&(_b=="GET"||_b=="POST"||_9)&&(_c.url.substring(0,_8.length)==_8);
+},function(_d,_e,_f){
+var _10=_5.send;
+var _11=_e.load;
+_e.load=undefined;
+var dfd=(_9?_9(_10,true):_10)(_d,_e,_f);
+dfd.addCallback(function(_12){
+var _13=dfd.ioArgs;
+_13.xhr={getResponseHeader:function(_14){
+return _1.queryToObject(_13.hash.match(/[^#]*$/)[0])[_14];
+}};
+if(_13.handleAs=="json"){
+if(!_a){
+_7.validate(_12,["Date"],{});
+}
+return _1.fromJson(_12);
+}
+return _1._contentHandlers[_13.handleAs||"text"]({responseText:_12});
+});
+_e.load=_11;
+if(_11){
+dfd.addCallback(_11);
+}
+return dfd;
+});
+};
+return dojox.io.xhrWindowNamePlugin;
+});

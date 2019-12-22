@@ -5,7 +5,84 @@
 */
 
 //>>built
-define("dojo/_base/url",["./kernel"],function(g){var h=/^(([^:/?#]+):)?(\/\/([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/,k=/^((([^\[:]+):)?([^@]+)@)?(\[([^\]]+)\]|([^\[:]*))(:([0-9]+))?$/,f=function(){for(var c=arguments,a=[c[0]],e=1;e<c.length;e++)if(c[e]){var b=new f(c[e]+""),a=new f(a[0]+"");if(""==b.path&&!b.scheme&&!b.authority&&!b.query)null!=b.fragment&&(a.fragment=b.fragment),b=a;else if(!b.scheme&&(b.scheme=a.scheme,!b.authority&&(b.authority=a.authority,"/"!=b.path.charAt(0)))){for(var a=(a.path.substring(0,
-a.path.lastIndexOf("/")+1)+b.path).split("/"),d=0;d<a.length;d++)"."==a[d]?d==a.length-1?a[d]="":(a.splice(d,1),d--):0<d&&(1!=d||""!=a[0])&&".."==a[d]&&".."!=a[d-1]&&(d==a.length-1?(a.splice(d,1),a[d-1]=""):(a.splice(d-1,2),d-=2));b.path=a.join("/")}a=[];b.scheme&&a.push(b.scheme,":");b.authority&&a.push("//",b.authority);a.push(b.path);b.query&&a.push("?",b.query);b.fragment&&a.push("#",b.fragment)}this.uri=a.join("");c=this.uri.match(h);this.scheme=c[2]||(c[1]?"":null);this.authority=c[4]||(c[3]?
-"":null);this.path=c[5];this.query=c[7]||(c[6]?"":null);this.fragment=c[9]||(c[8]?"":null);null!=this.authority&&(c=this.authority.match(k),this.user=c[3]||null,this.password=c[4]||null,this.host=c[6]||c[7],this.port=c[9]||null)};f.prototype.toString=function(){return this.uri};return g._Url=f});
-//# sourceMappingURL=url.js.map
+define("dojo/_base/url",["./kernel"],function(_1){
+var _2=new RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?$"),_3=new RegExp("^((([^\\[:]+):)?([^@]+)@)?(\\[([^\\]]+)\\]|([^\\[:]*))(:([0-9]+))?$"),_4=function(){
+var n=null,_5=arguments,_6=[_5[0]];
+for(var i=1;i<_5.length;i++){
+if(!_5[i]){
+continue;
+}
+var _7=new _4(_5[i]+""),_8=new _4(_6[0]+"");
+if(_7.path==""&&!_7.scheme&&!_7.authority&&!_7.query){
+if(_7.fragment!=n){
+_8.fragment=_7.fragment;
+}
+_7=_8;
+}else{
+if(!_7.scheme){
+_7.scheme=_8.scheme;
+if(!_7.authority){
+_7.authority=_8.authority;
+if(_7.path.charAt(0)!="/"){
+var _9=_8.path.substring(0,_8.path.lastIndexOf("/")+1)+_7.path;
+var _a=_9.split("/");
+for(var j=0;j<_a.length;j++){
+if(_a[j]=="."){
+if(j==_a.length-1){
+_a[j]="";
+}else{
+_a.splice(j,1);
+j--;
+}
+}else{
+if(j>0&&!(j==1&&_a[0]=="")&&_a[j]==".."&&_a[j-1]!=".."){
+if(j==(_a.length-1)){
+_a.splice(j,1);
+_a[j-1]="";
+}else{
+_a.splice(j-1,2);
+j-=2;
+}
+}
+}
+}
+_7.path=_a.join("/");
+}
+}
+}
+}
+_6=[];
+if(_7.scheme){
+_6.push(_7.scheme,":");
+}
+if(_7.authority){
+_6.push("//",_7.authority);
+}
+_6.push(_7.path);
+if(_7.query){
+_6.push("?",_7.query);
+}
+if(_7.fragment){
+_6.push("#",_7.fragment);
+}
+}
+this.uri=_6.join("");
+var r=this.uri.match(_2);
+this.scheme=r[2]||(r[1]?"":n);
+this.authority=r[4]||(r[3]?"":n);
+this.path=r[5];
+this.query=r[7]||(r[6]?"":n);
+this.fragment=r[9]||(r[8]?"":n);
+if(this.authority!=n){
+r=this.authority.match(_3);
+this.user=r[3]||n;
+this.password=r[4]||n;
+this.host=r[6]||r[7];
+this.port=r[9]||n;
+}
+};
+_4.prototype.toString=function(){
+return this.uri;
+};
+return _1._Url=_4;
+});

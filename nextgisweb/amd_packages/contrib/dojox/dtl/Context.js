@@ -1,4 +1,55 @@
 //>>built
-define("dojox/dtl/Context",["dojo/_base/lang","./_base"],function(h,d){return d.Context=h.extend(function(a){this._this={};d._Context.call(this,a)},d._Context.prototype,{getKeys:function(){var a=[],b;for(b in this)this.hasOwnProperty(b)&&"_this"!=b&&a.push(b);return a},extend:function(a){return h.delegate(this,a)},filter:function(a){var b=new d.Context,f=[],c,g;if(a instanceof d.Context)f=a.getKeys();else if("object"==typeof a)for(var e in a)f.push(e);else for(c=0;g=arguments[c];c++)"string"==typeof g&&
-f.push(g);c=0;for(e;e=f[c];c++)b[e]=this[e];return b},setThis:function(a){this._this=a},getThis:function(){return this._this},hasKey:function(a){return this._getter&&"undefined"!=typeof this._getter(a)||"undefined"!=typeof this[a]?!0:!1}})});
-//# sourceMappingURL=Context.js.map
+define("dojox/dtl/Context",["dojo/_base/lang","./_base"],function(_1,dd){
+return dd.Context=_1.extend(function(_2){
+this._this={};
+dd._Context.call(this,_2);
+},dd._Context.prototype,{getKeys:function(){
+var _3=[];
+for(var _4 in this){
+if(this.hasOwnProperty(_4)&&_4!="_this"){
+_3.push(_4);
+}
+}
+return _3;
+},extend:function(_5){
+return _1.delegate(this,_5);
+},filter:function(_6){
+var _7=new dd.Context();
+var _8=[];
+var i,_9;
+if(_6 instanceof dd.Context){
+_8=_6.getKeys();
+}else{
+if(typeof _6=="object"){
+for(var _a in _6){
+_8.push(_a);
+}
+}else{
+for(i=0;_9=arguments[i];i++){
+if(typeof _9=="string"){
+_8.push(_9);
+}
+}
+}
+}
+for(i=0,_a;_a=_8[i];i++){
+_7[_a]=this[_a];
+}
+return _7;
+},setThis:function(_b){
+this._this=_b;
+},getThis:function(){
+return this._this;
+},hasKey:function(_c){
+if(this._getter){
+var _d=this._getter(_c);
+if(typeof _d!="undefined"){
+return true;
+}
+}
+if(typeof this[_c]!="undefined"){
+return true;
+}
+return false;
+}});
+});

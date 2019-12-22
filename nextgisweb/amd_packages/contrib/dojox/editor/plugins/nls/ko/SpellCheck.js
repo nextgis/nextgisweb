@@ -1,4 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/ko/SpellCheck",{widgetLabel:"\ub9de\ucda4\ubc95 \uac80\uc0ac \uc77c\uad04\ucc98\ub9ac",unfound:"\ucc3e\uc744 \uc218 \uc5c6\uc74c",skip:"\uac74\ub108\ub6f0\uae30",skipAll:"\ubaa8\ub450 \uac74\ub108\ub6f0\uae30",toDic:"\uc0ac\uc804\uc5d0 \ucd94\uac00",suggestions:"\uc81c\uc548",replace:"\ub300\uccb4",replaceWith:"\ub2e4\uc74c\uc73c\ub85c \ub300\uccb4",replaceAll:"\ubaa8\ub450 \ub300\uccb4",cancel:"\ucde8\uc18c",msg:"\ub9de\ucda4\ubc95 \uc624\ub958 \uc5c6\uc74c",iSkip:"\uc774 \ud56d\ubaa9 \uac74\ub108\ub6f0\uae30",
-iSkipAll:"\ub2e4\uc74c\uacfc \uac19\uc774 \ubaa8\ub450 \uac74\ub108\ub6f0\uae30",iMsg:"\ub9de\ucda4\ubc95 \uc81c\uc548 \uc5c6\uc74c"});
-//# sourceMappingURL=SpellCheck.js.map
+define("dojox/editor/plugins/nls/ko/SpellCheck",({widgetLabel:"맞춤법 검사 일괄처리",unfound:"찾을 수 없음",skip:"건너뛰기",skipAll:"모두 건너뛰기",toDic:"사전에 추가",suggestions:"제안",replace:"대체",replaceWith:"다음으로 대체",replaceAll:"모두 대체",cancel:"취소",msg:"맞춤법 오류 없음",iSkip:"이 항목 건너뛰기",iSkipAll:"다음과 같이 모두 건너뛰기",iMsg:"맞춤법 제안 없음"}));

@@ -1,10 +1,112 @@
 //>>built
-require({cache:{"url:dijit/templates/TitlePane.html":'\x3cdiv\x3e\n\t\x3cdiv data-dojo-attach-event\x3d"ondijitclick:_onTitleClick, onkeydown:_onTitleKey"\n\t\t\tclass\x3d"dijitTitlePaneTitle" data-dojo-attach-point\x3d"titleBarNode" id\x3d"${id}_titleBarNode"\x3e\n\t\t\x3cdiv class\x3d"dijitTitlePaneTitleFocus" data-dojo-attach-point\x3d"focusNode"\x3e\n\t\t\t\x3cspan data-dojo-attach-point\x3d"arrowNode" class\x3d"dijitInline dijitArrowNode" role\x3d"presentation"\x3e\x3c/span\n\t\t\t\x3e\x3cspan data-dojo-attach-point\x3d"arrowNodeInner" class\x3d"dijitArrowNodeInner"\x3e\x3c/span\n\t\t\t\x3e\x3cspan data-dojo-attach-point\x3d"titleNode" class\x3d"dijitTitlePaneTextNode"\x3e\x3c/span\x3e\n\t\t\x3c/div\x3e\n\t\x3c/div\x3e\n\t\x3cdiv class\x3d"dijitTitlePaneContentOuter" data-dojo-attach-point\x3d"hideNode" role\x3d"presentation"\x3e\n\t\t\x3cdiv class\x3d"dijitReset" data-dojo-attach-point\x3d"wipeNode" role\x3d"presentation"\x3e\n\t\t\t\x3cdiv class\x3d"dijitTitlePaneContentInner" data-dojo-attach-point\x3d"containerNode" role\x3d"region" id\x3d"${id}_pane" aria-labelledby\x3d"${id}_titleBarNode"\x3e\n\t\t\t\t\x3c!-- nested divs because wipeIn()/wipeOut() doesn\'t work right on node w/padding etc.  Put padding on inner div. --\x3e\n\t\t\t\x3c/div\x3e\n\t\t\x3c/div\x3e\n\t\x3c/div\x3e\n\x3c/div\x3e\n'}});
-define("dijit/TitlePane","dojo/_base/array dojo/_base/declare dojo/dom dojo/dom-attr dojo/dom-class dojo/dom-geometry dojo/fx dojo/has dojo/_base/kernel dojo/keys ./_CssStateMixin ./_TemplatedMixin ./layout/ContentPane dojo/text!./templates/TitlePane.html ./_base/manager ./a11yclick".split(" "),function(h,c,k,d,e,f,g,l,m,n,p,q,r,t,u){c=c("dijit.TitlePane",[r,q,p],{title:"",_setTitleAttr:{node:"titleNode",type:"innerHTML"},open:!0,toggleable:!0,tabIndex:"0",duration:u.defaultDuration,baseClass:"dijitTitlePane",
-templateString:t,doLayout:!1,_setTooltipAttr:{node:"focusNode",type:"attribute",attribute:"title"},buildRendering:function(){this.inherited(arguments);k.setSelectable(this.titleNode,!1)},postCreate:function(){this.inherited(arguments);this.toggleable&&this._trackMouseState(this.titleBarNode,this.baseClass+"Title");var a=this.hideNode,b=this.wipeNode;this._wipeIn=g.wipeIn({node:b,duration:this.duration,beforeBegin:function(){a.style.display=""}});this._wipeOut=g.wipeOut({node:b,duration:this.duration,
-onEnd:function(){a.style.display="none"}})},_setOpenAttr:function(a,b){h.forEach([this._wipeIn,this._wipeOut],function(a){a&&"playing"==a.status()&&a.stop()});b?this[a?"_wipeIn":"_wipeOut"].play():this.hideNode.style.display=this.wipeNode.style.display=a?"":"none";if(this._started)if(a)this._onShow();else this.onHide();this.containerNode.setAttribute("aria-hidden",a?"false":"true");this.focusNode.setAttribute("aria-pressed",a?"true":"false");this._set("open",a);this._setCss()},_setToggleableAttr:function(a){this.focusNode.setAttribute("role",
-a?"button":"heading");a?(this.focusNode.setAttribute("aria-controls",this.id+"_pane"),this.focusNode.setAttribute("tabIndex",this.tabIndex),this.focusNode.setAttribute("aria-pressed",this.open)):(d.remove(this.focusNode,"aria-controls"),d.remove(this.focusNode,"tabIndex"),d.remove(this.focusNode,"aria-pressed"));this._set("toggleable",a);this._setCss()},_setContentAttr:function(a){this.open&&this._wipeOut&&"playing"!=this._wipeOut.status()?(this._wipeIn&&"playing"==this._wipeIn.status()&&this._wipeIn.stop(),
-f.setMarginBox(this.wipeNode,{h:f.getMarginBox(this.wipeNode).h}),this.inherited(arguments),this._wipeIn?this._wipeIn.play():this.hideNode.style.display=""):this.inherited(arguments)},toggle:function(){this._setOpenAttr(!this.open,!0)},_setCss:function(){var a=this.titleBarNode||this.focusNode,b=this._titleBarClass;this._titleBarClass=this.baseClass+"Title"+(this.toggleable?"":"Fixed")+(this.open?"Open":"Closed");e.replace(a,this._titleBarClass,b||"");e.replace(a,this._titleBarClass.replace("TitlePaneTitle",
-""),(b||"").replace("TitlePaneTitle",""));this.arrowNodeInner.innerHTML=this.open?"-":"+"},_onTitleKey:function(a){a.keyCode==n.DOWN_ARROW&&this.open&&(this.containerNode.focus(),a.preventDefault())},_onTitleClick:function(){this.toggleable&&this.toggle()},setTitle:function(a){m.deprecated("dijit.TitlePane.setTitle() is deprecated.  Use set('title', ...) instead.","","2.0");this.set("title",a)}});l("dojo-bidi")&&c.extend({_setTitleAttr:function(a){this._set("title",a);this.titleNode.innerHTML=a;this.applyTextDir(this.titleNode)},
-_setTooltipAttr:function(a){this._set("tooltip",a);this.textDir&&(a=this.enforceTextDirWithUcc(null,a));d.set(this.focusNode,"title",a)},_setTextDirAttr:function(a){this._created&&this.textDir!=a&&(this._set("textDir",a),this.set("title",this.title),this.set("tooltip",this.tooltip))}});return c});
-//# sourceMappingURL=TitlePane.js.map
+require({cache:{"url:dijit/templates/TitlePane.html":"<div>\n\t<div data-dojo-attach-event=\"ondijitclick:_onTitleClick, onkeydown:_onTitleKey\"\n\t\t\tclass=\"dijitTitlePaneTitle\" data-dojo-attach-point=\"titleBarNode\" id=\"${id}_titleBarNode\">\n\t\t<div class=\"dijitTitlePaneTitleFocus\" data-dojo-attach-point=\"focusNode\">\n\t\t\t<span data-dojo-attach-point=\"arrowNode\" class=\"dijitInline dijitArrowNode\" role=\"presentation\"></span\n\t\t\t><span data-dojo-attach-point=\"arrowNodeInner\" class=\"dijitArrowNodeInner\"></span\n\t\t\t><span data-dojo-attach-point=\"titleNode\" class=\"dijitTitlePaneTextNode\"></span>\n\t\t</div>\n\t</div>\n\t<div class=\"dijitTitlePaneContentOuter\" data-dojo-attach-point=\"hideNode\" role=\"presentation\">\n\t\t<div class=\"dijitReset\" data-dojo-attach-point=\"wipeNode\" role=\"presentation\">\n\t\t\t<div class=\"dijitTitlePaneContentInner\" data-dojo-attach-point=\"containerNode\" role=\"region\" id=\"${id}_pane\" aria-labelledby=\"${id}_titleBarNode\">\n\t\t\t\t<!-- nested divs because wipeIn()/wipeOut() doesn't work right on node w/padding etc.  Put padding on inner div. -->\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n"}});
+define("dijit/TitlePane",["dojo/_base/array","dojo/_base/declare","dojo/dom","dojo/dom-attr","dojo/dom-class","dojo/dom-geometry","dojo/fx","dojo/has","dojo/_base/kernel","dojo/keys","./_CssStateMixin","./_TemplatedMixin","./layout/ContentPane","dojo/text!./templates/TitlePane.html","./_base/manager","./a11yclick"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f){
+var _10=_2("dijit.TitlePane",[_d,_c,_b],{title:"",_setTitleAttr:{node:"titleNode",type:"innerHTML"},open:true,toggleable:true,tabIndex:"0",duration:_f.defaultDuration,baseClass:"dijitTitlePane",templateString:_e,doLayout:false,_setTooltipAttr:{node:"focusNode",type:"attribute",attribute:"title"},buildRendering:function(){
+this.inherited(arguments);
+_3.setSelectable(this.titleNode,false);
+},postCreate:function(){
+this.inherited(arguments);
+if(this.toggleable){
+this._trackMouseState(this.titleBarNode,this.baseClass+"Title");
+}
+var _11=this.hideNode,_12=this.wipeNode;
+this._wipeIn=_7.wipeIn({node:_12,duration:this.duration,beforeBegin:function(){
+_11.style.display="";
+}});
+this._wipeOut=_7.wipeOut({node:_12,duration:this.duration,onEnd:function(){
+_11.style.display="none";
+}});
+},_setOpenAttr:function(_13,_14){
+_1.forEach([this._wipeIn,this._wipeOut],function(_15){
+if(_15&&_15.status()=="playing"){
+_15.stop();
+}
+});
+if(_14){
+var _16=this[_13?"_wipeIn":"_wipeOut"];
+_16.play();
+}else{
+this.hideNode.style.display=this.wipeNode.style.display=_13?"":"none";
+}
+if(this._started){
+if(_13){
+this._onShow();
+}else{
+this.onHide();
+}
+}
+this.containerNode.setAttribute("aria-hidden",_13?"false":"true");
+this.focusNode.setAttribute("aria-pressed",_13?"true":"false");
+this._set("open",_13);
+this._setCss();
+},_setToggleableAttr:function(_17){
+this.focusNode.setAttribute("role",_17?"button":"heading");
+if(_17){
+this.focusNode.setAttribute("aria-controls",this.id+"_pane");
+this.focusNode.setAttribute("tabIndex",this.tabIndex);
+this.focusNode.setAttribute("aria-pressed",this.open);
+}else{
+_4.remove(this.focusNode,"aria-controls");
+_4.remove(this.focusNode,"tabIndex");
+_4.remove(this.focusNode,"aria-pressed");
+}
+this._set("toggleable",_17);
+this._setCss();
+},_setContentAttr:function(_18){
+if(!this.open||!this._wipeOut||this._wipeOut.status()=="playing"){
+this.inherited(arguments);
+}else{
+if(this._wipeIn&&this._wipeIn.status()=="playing"){
+this._wipeIn.stop();
+}
+_6.setMarginBox(this.wipeNode,{h:_6.getMarginBox(this.wipeNode).h});
+this.inherited(arguments);
+if(this._wipeIn){
+this._wipeIn.play();
+}else{
+this.hideNode.style.display="";
+}
+}
+},toggle:function(){
+this._setOpenAttr(!this.open,true);
+},_setCss:function(){
+var _19=this.titleBarNode||this.focusNode;
+var _1a=this._titleBarClass;
+this._titleBarClass=this.baseClass+"Title"+(this.toggleable?"":"Fixed")+(this.open?"Open":"Closed");
+_5.replace(_19,this._titleBarClass,_1a||"");
+_5.replace(_19,this._titleBarClass.replace("TitlePaneTitle",""),(_1a||"").replace("TitlePaneTitle",""));
+this.arrowNodeInner.innerHTML=this.open?"-":"+";
+},_onTitleKey:function(e){
+if(e.keyCode==_a.DOWN_ARROW&&this.open){
+this.containerNode.focus();
+e.preventDefault();
+}
+},_onTitleClick:function(){
+if(this.toggleable){
+this.toggle();
+}
+},setTitle:function(_1b){
+_9.deprecated("dijit.TitlePane.setTitle() is deprecated.  Use set('title', ...) instead.","","2.0");
+this.set("title",_1b);
+}});
+if(_8("dojo-bidi")){
+_10.extend({_setTitleAttr:function(_1c){
+this._set("title",_1c);
+this.titleNode.innerHTML=_1c;
+this.applyTextDir(this.titleNode);
+},_setTooltipAttr:function(_1d){
+this._set("tooltip",_1d);
+if(this.textDir){
+_1d=this.enforceTextDirWithUcc(null,_1d);
+}
+_4.set(this.focusNode,"title",_1d);
+},_setTextDirAttr:function(_1e){
+if(this._created&&this.textDir!=_1e){
+this._set("textDir",_1e);
+this.set("title",this.title);
+this.set("tooltip",this.tooltip);
+}
+}});
+}
+return _10;
+});

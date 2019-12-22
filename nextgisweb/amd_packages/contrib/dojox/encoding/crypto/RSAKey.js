@@ -1,4 +1,54 @@
 //>>built
-define("dojox/encoding/crypto/RSAKey",["dojo/_base/kernel","dojo/_base/declare","../../math/BigInteger","../../math/random/Simple"],function(g,h,e,k){g.experimental("dojox.encoding.crypto.RSAKey");var l=function(){return new k};return h("dojox.encoding.crypto.RSAKey",null,{constructor:function(b){this.rngf=b||l;this.e=0;this.n=this.d=this.p=this.q=this.dmp1=this.dmq1=this.coeff=null},setPublic:function(b,a){if(b&&a&&b.length&&a.length)this.n=new e(b,16),this.e=parseInt(a,16);else throw Error("Invalid RSA public key");
-},encrypt:function(b){var a;a=this.n.bitLength()+7>>3;var c=this.rngf;if(a<b.length+11)throw Error("Message too long for RSA");for(var d=Array(a),f=b.length;f&&a;)d[--a]=b.charCodeAt(--f);d[--a]=0;b=c();for(c=[0];2<a;){for(c[0]=0;0==c[0];)b.nextBytes(c);d[--a]=c[0]}d[--a]=2;d[--a]=0;b.destroy();a=new e(d);if(!a)return null;a=a.modPowInt(this.e,this.n);if(!a)return null;a=a.toString(16);return a.length%2?"0"+a:a}})});
-//# sourceMappingURL=RSAKey.js.map
+define("dojox/encoding/crypto/RSAKey",["dojo/_base/kernel","dojo/_base/declare","../../math/BigInteger","../../math/random/Simple"],function(_1,_2,_3,_4){
+_1.experimental("dojox.encoding.crypto.RSAKey");
+var _5=function(){
+return new _4();
+};
+function _6(s,n,_7){
+if(n<s.length+11){
+throw new Error("Message too long for RSA");
+}
+var ba=new Array(n);
+var i=s.length;
+while(i&&n){
+ba[--n]=s.charCodeAt(--i);
+}
+ba[--n]=0;
+var _8=_7();
+var x=[0];
+while(n>2){
+x[0]=0;
+while(x[0]==0){
+_8.nextBytes(x);
+}
+ba[--n]=x[0];
+}
+ba[--n]=2;
+ba[--n]=0;
+_8.destroy();
+return new _3(ba);
+};
+return _2("dojox.encoding.crypto.RSAKey",null,{constructor:function(_9){
+this.rngf=_9||_5;
+this.e=0;
+this.n=this.d=this.p=this.q=this.dmp1=this.dmq1=this.coeff=null;
+},setPublic:function(N,E){
+if(N&&E&&N.length&&E.length){
+this.n=new _3(N,16);
+this.e=parseInt(E,16);
+}else{
+throw new Error("Invalid RSA public key");
+}
+},encrypt:function(_a){
+var m=_6(_a,(this.n.bitLength()+7)>>3,this.rngf);
+if(!m){
+return null;
+}
+var c=m.modPowInt(this.e,this.n);
+if(!c){
+return null;
+}
+var h=c.toString(16);
+return h.length%2?"0"+h:h;
+}});
+});

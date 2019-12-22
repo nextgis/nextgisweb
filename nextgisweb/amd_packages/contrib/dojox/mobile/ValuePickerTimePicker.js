@@ -1,7 +1,84 @@
 //>>built
-define("dojox/mobile/ValuePickerTimePicker","dojo/_base/declare dojo/dom-class ./_TimePickerMixin ./ToolBarButton ./ValuePicker ./ValuePickerSlot".split(" "),function(e,c,f,g,h,d){return e("dojox.mobile.ValuePickerTimePicker",[h,f],{readOnly:!1,is24h:!1,hourPlusBtnLabel:"",hourPlusBtnLabelRef:"",minutePlusBtnLabel:"",minutePlusBtnLabelRef:"",hourMinusBtnLabel:"",hourMinusBtnLabelRef:"",minuteMinusBtnLabel:"",minuteMinusBtnLabelRef:"",slotClasses:[d,d],slotProps:[{labelFrom:0,labelTo:23,style:{width:"72px"}},
-{labelFrom:0,labelTo:59,zeroPad:2,style:{width:"72px"}}],buildRendering:function(){var a=this.slotProps;a[0].readOnly=a[1].readOnly=this.readOnly;this._setBtnLabels(a);this.inherited(arguments);a=this.slots[0].items;this._zero=a.slice(0,1);this._pm=a.slice(13);c.add(this.domNode,"mblValuePickerTimePicker");c.add(this.slots[0].domNode,"mblValuePickerTimePickerHourSlot");c.add(this.slots[1].domNode,"mblValuePickerTimePickerMinuteSlot");this.ampmButton=new g;this.addChild(this.ampmButton);this._conn=
-[this.connect(this.ampmButton,"onClick","onBtnClick")];this.set("is24h",this.is24h)},to12h:function(a){var b=a[0]-0,c=12>b?"AM":"PM";0==b?b=12:12<b&&(b-=12);return[b+"",a[1],c]},to24h:function(a){var b=a[0]-0,b="AM"==a[2]?12==b?0:b:12==b?b:b+12;return[b+"",a[1]]},onBtnClick:function(){var a="AM"==this.ampmButton.get("label")?"PM":"AM",b=this.get("values12");b[2]=a;this.set("values12",b);if(this.onValueChanged)this.onValueChanged(this.slots[0])},_setIs24hAttr:function(a){var b=this.slots[0].items;
-a&&24!=b.length?this.slots[0].items=this._zero.concat(b).concat(this._pm):a||12==b.length||(b.splice(0,1),b.splice(12));b=this.get("values");this._set("is24h",a);this.ampmButton.domNode.style.display=a?"none":"";this.set("values",b)},_getValuesAttr:function(){var a=this.inherited(arguments);return this.is24h?a:this.to24h([a[0],a[1],this.ampmButton.get("label")])},_setValuesAttr:function(a){this.is24h||(a=this.to12h(a),this.ampmButton.set("label",a[2]));this.inherited(arguments)},_getValues12Attr:function(){return this.to12h(this._getValuesAttr())},
-_setValues12Attr:function(a){this.set("values",this.to24h(a))},_setBtnLabels:function(a){a[0].plusBtnLabel=this.hourPlusBtnLabel;a[0].plusBtnLabelRef=this.hourPlusBtnLabelRef;a[0].minusBtnLabel=this.hourMinusBtnLabel;a[0].minusBtnLabelRef=this.hourMinusBtnLabelRef;a[1].plusBtnLabel=this.minutePlusBtnLabel;a[1].plusBtnLabelRef=this.minutePlusBtnLabelRef;a[1].minusBtnLabel=this.minuteMinusBtnLabel;a[1].minusBtnLabelRef=this.minuteMinusBtnLabelRef}})});
-//# sourceMappingURL=ValuePickerTimePicker.js.map
+define("dojox/mobile/ValuePickerTimePicker",["dojo/_base/declare","dojo/dom-class","./_TimePickerMixin","./ToolBarButton","./ValuePicker","./ValuePickerSlot"],function(_1,_2,_3,_4,_5,_6){
+return _1("dojox.mobile.ValuePickerTimePicker",[_5,_3],{readOnly:false,is24h:false,hourPlusBtnLabel:"",hourPlusBtnLabelRef:"",minutePlusBtnLabel:"",minutePlusBtnLabelRef:"",hourMinusBtnLabel:"",hourMinusBtnLabelRef:"",minuteMinusBtnLabel:"",minuteMinusBtnLabelRef:"",slotClasses:[_6,_6],slotProps:[{labelFrom:0,labelTo:23,style:{width:"72px"}},{labelFrom:0,labelTo:59,zeroPad:2,style:{width:"72px"}}],buildRendering:function(){
+var p=this.slotProps;
+p[0].readOnly=p[1].readOnly=this.readOnly;
+this._setBtnLabels(p);
+this.inherited(arguments);
+var _7=this.slots[0].items;
+this._zero=_7.slice(0,1);
+this._pm=_7.slice(13);
+_2.add(this.domNode,"mblValuePickerTimePicker");
+_2.add(this.slots[0].domNode,"mblValuePickerTimePickerHourSlot");
+_2.add(this.slots[1].domNode,"mblValuePickerTimePickerMinuteSlot");
+this.ampmButton=new _4();
+this.addChild(this.ampmButton);
+this._conn=[this.connect(this.ampmButton,"onClick","onBtnClick")];
+this.set("is24h",this.is24h);
+},to12h:function(a){
+var h=a[0]-0;
+var _8=h<12?"AM":"PM";
+if(h==0){
+h=12;
+}else{
+if(h>12){
+h=h-12;
+}
+}
+return [h+"",a[1],_8];
+},to24h:function(a){
+var h=a[0]-0;
+if(a[2]=="AM"){
+h=h==12?0:h;
+}else{
+h=h==12?h:h+12;
+}
+return [h+"",a[1]];
+},onBtnClick:function(){
+var _9=this.ampmButton.get("label")=="AM"?"PM":"AM";
+var v=this.get("values12");
+v[2]=_9;
+this.set("values12",v);
+if(this.onValueChanged){
+this.onValueChanged(this.slots[0]);
+}
+},_setIs24hAttr:function(_a){
+var _b=this.slots[0].items;
+if(_a&&_b.length!=24){
+this.slots[0].items=this._zero.concat(_b).concat(this._pm);
+}else{
+if(!_a&&_b.length!=12){
+_b.splice(0,1);
+_b.splice(12);
+}
+}
+var v=this.get("values");
+this._set("is24h",_a);
+this.ampmButton.domNode.style.display=_a?"none":"";
+this.set("values",v);
+},_getValuesAttr:function(){
+var v=this.inherited(arguments);
+return this.is24h?v:this.to24h([v[0],v[1],this.ampmButton.get("label")]);
+},_setValuesAttr:function(_c){
+if(this.is24h){
+this.inherited(arguments);
+}else{
+_c=this.to12h(_c);
+this.ampmButton.set("label",_c[2]);
+this.inherited(arguments);
+}
+},_getValues12Attr:function(){
+return this.to12h(this._getValuesAttr());
+},_setValues12Attr:function(_d){
+this.set("values",this.to24h(_d));
+},_setBtnLabels:function(_e){
+_e[0].plusBtnLabel=this.hourPlusBtnLabel;
+_e[0].plusBtnLabelRef=this.hourPlusBtnLabelRef;
+_e[0].minusBtnLabel=this.hourMinusBtnLabel;
+_e[0].minusBtnLabelRef=this.hourMinusBtnLabelRef;
+_e[1].plusBtnLabel=this.minutePlusBtnLabel;
+_e[1].plusBtnLabelRef=this.minutePlusBtnLabelRef;
+_e[1].minusBtnLabel=this.minuteMinusBtnLabel;
+_e[1].minusBtnLabelRef=this.minuteMinusBtnLabelRef;
+}});
+});

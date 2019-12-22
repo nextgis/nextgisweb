@@ -1,12 +1,210 @@
 //>>built
-define("dojox/rpc/Service",["dojo","dojox","dojo/AdapterRegistry","dojo/_base/url"],function(e,f){e.declare("dojox.rpc.Service",null,{constructor:function(a,c){function b(a){a._baseUrl=new e._Url(e.isBrowser?location.href:e.config.baseUrl,d||".")+"";f._smd=a;for(var c in f._smd.services){a=c.split(".");for(var b=f,g=0;g<a.length-1;g++)b=b[a[g]]||(b[a[g]]={});b[a[a.length-1]]=f._generateService(c,f._smd.services[c])}}var d,f=this;if(a)if(e.isString(a)||a instanceof e._Url){d=a instanceof e._Url?a+
-"":a;var g=e._getText(d);if(g)b(e.fromJson(g));else throw Error("Unable to load SMD from "+a);}else b(a);this._options=c?c:{};this._requestId=0},_generateService:function(a,c){if(this[a])throw Error("WARNING: "+a+" already exists for service. Unable to generate function");c.name=a;var b=e.hitch(this,"_executeMethod",c),d=f.rpc.transportRegistry.match(c.transport||this._smd.transport);d.getExecutor&&(b=d.getExecutor(b,c,this));d=c.returns||(c._schema={});d._service=b;b.servicePath="/"+a+"/";b._schema=
-d;b.id=f.rpc.Service._nextId++;return b},_getRequest:function(a,c){var b=this._smd,d,k=f.rpc.envelopeRegistry.match(a.envelope||b.envelope||"NONE"),g=(a.parameters||[]).concat(b.parameters||[]);if(k.namedParams){if(1==c.length&&e.isObject(c[0]))c=c[0];else{var h={};for(d=0;d<a.parameters.length;d++)"undefined"==typeof c[d]&&a.parameters[d].optional||(h[a.parameters[d].name]=c[d]);c=h}if(a.strictParameters||b.strictParameters)for(d in c){for(var h=!1,l=0;l<g.length;l++)g[l].name==d&&(h=!0);h||delete c[d]}for(d=
-0;d<g.length;d++)if(h=g[d],!h.optional&&h.name&&!c[h.name])if(h["default"])c[h.name]=h["default"];else if(!(h.name in c))throw Error("Required parameter "+h.name+" was omitted");}else g&&g[0]&&g[0].name&&1==c.length&&e.isObject(c[0])&&(c=!1===k.namedParams?f.rpc.toOrdered(g,c):c[0]);e.isObject(this._options)&&(c=e.mixin(c,this._options));d=a._schema||a.returns;g=k.serialize.apply(this,[b,a,c]);g._envDef=k;return e.mixin(g,{sync:this._options.sync||f.rpc._sync,contentType:a.contentType||b.contentType||
-g.contentType,headers:a.headers||b.headers||g.headers||{},target:g.target||f.rpc.getTarget(b,a),transport:a.transport||b.transport||g.transport,envelope:a.envelope||b.envelope||g.envelope,timeout:a.timeout||b.timeout,callbackParamName:a.callbackParamName||b.callbackParamName,rpcObjectParamName:a.rpcObjectParamName||b.rpcObjectParamName,schema:d,handleAs:g.handleAs||"auto",preventCache:a.preventCache||b.preventCache,frameDoc:this._options.frameDoc||void 0})},_executeMethod:function(a){var c=[],b;for(b=
-1;b<arguments.length;b++)c.push(arguments[b]);var d=this._getRequest(a,c),c=f.rpc.transportRegistry.match(d.transport).fire(d);c.addBoth(function(a){return d._envDef.deserialize.call(this,a)});return c}});f.rpc.getTarget=function(a,c){var b=a._baseUrl;a.target&&(b=new e._Url(b,a.target)+"");c.target&&(b=new e._Url(b,c.target)+"");return b};f.rpc.toOrdered=function(a,c){if(e.isArray(c))return c;for(var b=[],d=0;d<a.length;d++)b.push(c[a[d].name]);return b};f.rpc.transportRegistry=new e.AdapterRegistry(!0);
-f.rpc.envelopeRegistry=new e.AdapterRegistry(!0);f.rpc.envelopeRegistry.register("URL",function(a){return"URL"==a},{serialize:function(a,c,b){return{data:e.objectToQuery(b),transport:"POST"}},deserialize:function(a){return a},namedParams:!0});f.rpc.envelopeRegistry.register("JSON",function(a){return"JSON"==a},{serialize:function(a,c,b){return{data:e.toJson(b),handleAs:"json",contentType:"application/json"}},deserialize:function(a){return a}});f.rpc.envelopeRegistry.register("PATH",function(a){return"PATH"==
-a},{serialize:function(a,c,b){var d;a=f.rpc.getTarget(a,c);if(e.isArray(b))for(d=0;d<b.length;d++)a+="/"+b[d];else for(d in b)a+="/"+d+"/"+b[d];return{data:"",target:a}},deserialize:function(a){return a}});f.rpc.transportRegistry.register("POST",function(a){return"POST"==a},{fire:function(a){a.url=a.target;a.postData=a.data;return e.rawXhrPost(a)}});f.rpc.transportRegistry.register("GET",function(a){return"GET"==a},{fire:function(a){a.url=a.target+(a.data?"?"+(a.rpcObjectParamName?a.rpcObjectParamName+
-"\x3d":"")+a.data:"");return e.xhrGet(a)}});f.rpc.transportRegistry.register("JSONP",function(a){return"JSONP"==a},{fire:function(a){a.url=a.target+(-1==a.target.indexOf("?")?"?":"\x26")+(a.rpcObjectParamName?a.rpcObjectParamName+"\x3d":"")+a.data;a.callbackParamName=a.callbackParamName||"callback";return e.io.script.get(a)}});f.rpc.Service._nextId=1;e._contentHandlers.auto=function(a){var c=e._contentHandlers,b=a.getResponseHeader("Content-Type");return b?b.match(/\/.*json/)?c.json(a):b.match(/\/javascript/)?
-c.javascript(a):b.match(/\/xml/)?c.xml(a):c.text(a):c.text(a)};return f.rpc.Service});
-//# sourceMappingURL=Service.js.map
+define("dojox/rpc/Service",["dojo","dojox","dojo/AdapterRegistry","dojo/_base/url"],function(_1,_2){
+_1.declare("dojox.rpc.Service",null,{constructor:function(_3,_4){
+var _5;
+var _6=this;
+function _7(_8){
+_8._baseUrl=new _1._Url((_1.isBrowser?location.href:_1.config.baseUrl),_5||".")+"";
+_6._smd=_8;
+for(var _9 in _6._smd.services){
+var _a=_9.split(".");
+var _b=_6;
+for(var i=0;i<_a.length-1;i++){
+_b=_b[_a[i]]||(_b[_a[i]]={});
+}
+_b[_a[_a.length-1]]=_6._generateService(_9,_6._smd.services[_9]);
+}
+};
+if(_3){
+if((_1.isString(_3))||(_3 instanceof _1._Url)){
+if(_3 instanceof _1._Url){
+_5=_3+"";
+}else{
+_5=_3;
+}
+var _c=_1._getText(_5);
+if(!_c){
+throw new Error("Unable to load SMD from "+_3);
+}else{
+_7(_1.fromJson(_c));
+}
+}else{
+_7(_3);
+}
+}
+this._options=(_4?_4:{});
+this._requestId=0;
+},_generateService:function(_d,_e){
+if(this[_d]){
+throw new Error("WARNING: "+_d+" already exists for service. Unable to generate function");
+}
+_e.name=_d;
+var _f=_1.hitch(this,"_executeMethod",_e);
+var _10=_2.rpc.transportRegistry.match(_e.transport||this._smd.transport);
+if(_10.getExecutor){
+_f=_10.getExecutor(_f,_e,this);
+}
+var _11=_e.returns||(_e._schema={});
+var _12="/"+_d+"/";
+_11._service=_f;
+_f.servicePath=_12;
+_f._schema=_11;
+_f.id=_2.rpc.Service._nextId++;
+return _f;
+},_getRequest:function(_13,_14){
+var smd=this._smd;
+var i;
+var _15=_2.rpc.envelopeRegistry.match(_13.envelope||smd.envelope||"NONE");
+var _16=(_13.parameters||[]).concat(smd.parameters||[]);
+if(_15.namedParams){
+if((_14.length==1)&&_1.isObject(_14[0])){
+_14=_14[0];
+}else{
+var _17={};
+for(i=0;i<_13.parameters.length;i++){
+if(typeof _14[i]!="undefined"||!_13.parameters[i].optional){
+_17[_13.parameters[i].name]=_14[i];
+}
+}
+_14=_17;
+}
+if(_13.strictParameters||smd.strictParameters){
+for(i in _14){
+var _18=false;
+for(var j=0;j<_16.length;j++){
+if(_16[j].name==i){
+_18=true;
+}
+}
+if(!_18){
+delete _14[i];
+}
+}
+}
+for(i=0;i<_16.length;i++){
+var _19=_16[i];
+if(!_19.optional&&_19.name&&!_14[_19.name]){
+if(_19["default"]){
+_14[_19.name]=_19["default"];
+}else{
+if(!(_19.name in _14)){
+throw new Error("Required parameter "+_19.name+" was omitted");
+}
+}
+}
+}
+}else{
+if(_16&&_16[0]&&_16[0].name&&(_14.length==1)&&_1.isObject(_14[0])){
+if(_15.namedParams===false){
+_14=_2.rpc.toOrdered(_16,_14);
+}else{
+_14=_14[0];
+}
+}
+}
+if(_1.isObject(this._options)){
+_14=_1.mixin(_14,this._options);
+}
+var _1a=_13._schema||_13.returns;
+var _1b=_15.serialize.apply(this,[smd,_13,_14]);
+_1b._envDef=_15;
+var _1c=(_13.contentType||smd.contentType||_1b.contentType);
+return _1.mixin(_1b,{sync:this._options.sync||_2.rpc._sync,contentType:_1c,headers:_13.headers||smd.headers||_1b.headers||{},target:_1b.target||_2.rpc.getTarget(smd,_13),transport:_13.transport||smd.transport||_1b.transport,envelope:_13.envelope||smd.envelope||_1b.envelope,timeout:_13.timeout||smd.timeout,callbackParamName:_13.callbackParamName||smd.callbackParamName,rpcObjectParamName:_13.rpcObjectParamName||smd.rpcObjectParamName,schema:_1a,handleAs:_1b.handleAs||"auto",preventCache:_13.preventCache||smd.preventCache,frameDoc:this._options.frameDoc||undefined});
+},_executeMethod:function(_1d){
+var _1e=[];
+var i;
+for(i=1;i<arguments.length;i++){
+_1e.push(arguments[i]);
+}
+var _1f=this._getRequest(_1d,_1e);
+var _20=_2.rpc.transportRegistry.match(_1f.transport).fire(_1f);
+_20.addBoth(function(_21){
+return _1f._envDef.deserialize.call(this,_21);
+});
+return _20;
+}});
+_2.rpc.getTarget=function(smd,_22){
+var _23=smd._baseUrl;
+if(smd.target){
+_23=new _1._Url(_23,smd.target)+"";
+}
+if(_22.target){
+_23=new _1._Url(_23,_22.target)+"";
+}
+return _23;
+};
+_2.rpc.toOrdered=function(_24,_25){
+if(_1.isArray(_25)){
+return _25;
+}
+var _26=[];
+for(var i=0;i<_24.length;i++){
+_26.push(_25[_24[i].name]);
+}
+return _26;
+};
+_2.rpc.transportRegistry=new _1.AdapterRegistry(true);
+_2.rpc.envelopeRegistry=new _1.AdapterRegistry(true);
+_2.rpc.envelopeRegistry.register("URL",function(str){
+return str=="URL";
+},{serialize:function(smd,_27,_28){
+var d=_1.objectToQuery(_28);
+return {data:d,transport:"POST"};
+},deserialize:function(_29){
+return _29;
+},namedParams:true});
+_2.rpc.envelopeRegistry.register("JSON",function(str){
+return str=="JSON";
+},{serialize:function(smd,_2a,_2b){
+var d=_1.toJson(_2b);
+return {data:d,handleAs:"json",contentType:"application/json"};
+},deserialize:function(_2c){
+return _2c;
+}});
+_2.rpc.envelopeRegistry.register("PATH",function(str){
+return str=="PATH";
+},{serialize:function(smd,_2d,_2e){
+var i;
+var _2f=_2.rpc.getTarget(smd,_2d);
+if(_1.isArray(_2e)){
+for(i=0;i<_2e.length;i++){
+_2f+="/"+_2e[i];
+}
+}else{
+for(i in _2e){
+_2f+="/"+i+"/"+_2e[i];
+}
+}
+return {data:"",target:_2f};
+},deserialize:function(_30){
+return _30;
+}});
+_2.rpc.transportRegistry.register("POST",function(str){
+return str=="POST";
+},{fire:function(r){
+r.url=r.target;
+r.postData=r.data;
+return _1.rawXhrPost(r);
+}});
+_2.rpc.transportRegistry.register("GET",function(str){
+return str=="GET";
+},{fire:function(r){
+r.url=r.target+(r.data?"?"+((r.rpcObjectParamName)?r.rpcObjectParamName+"=":"")+r.data:"");
+return _1.xhrGet(r);
+}});
+_2.rpc.transportRegistry.register("JSONP",function(str){
+return str=="JSONP";
+},{fire:function(r){
+r.url=r.target+((r.target.indexOf("?")==-1)?"?":"&")+((r.rpcObjectParamName)?r.rpcObjectParamName+"=":"")+r.data;
+r.callbackParamName=r.callbackParamName||"callback";
+return _1.io.script.get(r);
+}});
+_2.rpc.Service._nextId=1;
+_1._contentHandlers.auto=function(xhr){
+var _31=_1._contentHandlers;
+var _32=xhr.getResponseHeader("Content-Type");
+var _33=!_32?_31.text(xhr):_32.match(/\/.*json/)?_31.json(xhr):_32.match(/\/javascript/)?_31.javascript(xhr):_32.match(/\/xml/)?_31.xml(xhr):_31.text(xhr);
+return _33;
+};
+return _2.rpc.Service;
+});

@@ -1,32 +1,614 @@
 //>>built
-define("dojox/editor/plugins/SpellCheck","dojo dijit dojo/io/script dijit/popup dijit/_Widget dijit/_Templated dijit/_editor/_Plugin dijit/form/TextBox dijit/form/DropDownButton dijit/TooltipDialog dijit/form/MultiSelect dijit/Menu dojo/i18n!dojox/editor/plugins/nls/SpellCheck".split(" "),function(d,m,C,y,z,A,B){d.experimental("dojox.editor.plugins.SpellCheck");var t=d.declare("dojox.editor.plugins._spellCheckControl",[z,A],{widgetsInTemplate:!0,templateString:"\x3ctable role\x3d'presentation' class\x3d'dijitEditorSpellCheckTable'\x3e\x3ctr\x3e\x3ctd colspan\x3d'3' class\x3d'alignBottom'\x3e\x3clabel for\x3d'${textId}' id\x3d'${textId}_label'\x3e${unfound}\x3c/label\x3e\x3cdiv class\x3d'dijitEditorSpellCheckBusyIcon' id\x3d'${id}_progressIcon'\x3e\x3c/div\x3e\x3c/td\x3e\x3c/tr\x3e\x3ctr\x3e\x3ctd class\x3d'dijitEditorSpellCheckBox'\x3e\x3cinput dojoType\x3d'dijit.form.TextBox' required\x3d'false' intermediateChanges\x3d'true' class\x3d'dijitEditorSpellCheckBox' dojoAttachPoint\x3d'unfoundTextBox' id\x3d'${textId}'/\x3e\x3c/td\x3e\x3ctd\x3e\x3cbutton dojoType\x3d'dijit.form.Button' class\x3d'blockButton' dojoAttachPoint\x3d'skipButton'\x3e${skip}\x3c/button\x3e\x3c/td\x3e\x3ctd\x3e\x3cbutton dojoType\x3d'dijit.form.Button' class\x3d'blockButton' dojoAttachPoint\x3d'skipAllButton'\x3e${skipAll}\x3c/button\x3e\x3c/td\x3e\x3c/tr\x3e\x3ctr\x3e\x3ctd class\x3d'alignBottom'\x3e\x3clabel for\x3d'${selectId}'\x3e${suggestions}\x3c/td\x3e\x3c/label\x3e\x3ctd colspan\x3d'2'\x3e\x3cbutton dojoType\x3d'dijit.form.Button' class\x3d'blockButton' dojoAttachPoint\x3d'toDicButton'\x3e${toDic}\x3c/button\x3e\x3c/td\x3e\x3c/tr\x3e\x3ctr\x3e\x3ctd\x3e\x3cselect dojoType\x3d'dijit.form.MultiSelect' id\x3d'${selectId}' class\x3d'dijitEditorSpellCheckBox listHeight' dojoAttachPoint\x3d'suggestionSelect'\x3e\x3c/select\x3e\x3c/td\x3e\x3ctd colspan\x3d'2'\x3e\x3cbutton dojoType\x3d'dijit.form.Button' class\x3d'blockButton' dojoAttachPoint\x3d'replaceButton'\x3e${replace}\x3c/button\x3e\x3cdiv class\x3d'topMargin'\x3e\x3cbutton dojoType\x3d'dijit.form.Button' class\x3d'blockButton' dojoAttachPoint\x3d'replaceAllButton'\x3e${replaceAll}\x3c/button\x3e\x3cdiv\x3e\x3c/td\x3e\x3c/tr\x3e\x3ctr\x3e\x3ctd\x3e\x3cdiv class\x3d'topMargin'\x3e\x3cbutton dojoType\x3d'dijit.form.Button' dojoAttachPoint\x3d'cancelButton'\x3e${cancel}\x3c/button\x3e\x3c/div\x3e\x3c/td\x3e\x3ctd\x3e\x3c/td\x3e\x3ctd\x3e\x3c/td\x3e\x3c/tr\x3e\x3c/table\x3e",
-constructor:function(){this.isOpen=this.isChanged=this.ignoreChange=!1;this.closable=!0},postMixInProperties:function(){this.id=m.getUniqueId(this.declaredClass.replace(/\./g,"_"));this.textId=this.id+"_textBox";this.selectId=this.id+"_select"},postCreate:function(){var a=this.suggestionSelect;d.removeAttr(a.domNode,"multiple");a.addItems=function(a){var b=this,e=null;a&&0<a.length&&d.forEach(a,function(a,c){e=d.create("option",{innerHTML:a,value:a},b.domNode);0==c&&(e.selected=!0)})};a.removeItems=
-function(){d.empty(this.domNode)};a.deselectAll=function(){this.containerNode.selectedIndex=-1};this.connect(this,"onKeyPress","_cancel");this.connect(this.unfoundTextBox,"onKeyPress","_enter");this.connect(this.unfoundTextBox,"onChange","_unfoundTextBoxChange");this.connect(this.suggestionSelect,"onKeyPress","_enter");this.connect(this.skipButton,"onClick","onSkip");this.connect(this.skipAllButton,"onClick","onSkipAll");this.connect(this.toDicButton,"onClick","onAddToDic");this.connect(this.replaceButton,
-"onClick","onReplace");this.connect(this.replaceAllButton,"onClick","onReplaceAll");this.connect(this.cancelButton,"onClick","onCancel")},onSkip:function(){},onSkipAll:function(){},onAddToDic:function(){},onReplace:function(){},onReplaceAll:function(){},onCancel:function(){},onEnter:function(){},focus:function(){this.unfoundTextBox.focus()},_cancel:function(a){a.keyCode==d.keys.ESCAPE&&(this.onCancel(),d.stopEvent(a))},_enter:function(a){a.keyCode==d.keys.ENTER&&(this.onEnter(),d.stopEvent(a))},_unfoundTextBoxChange:function(){var a=
-this.textId+"_label";this.ignoreChange?d.byId(a).innerHTML=this.unfound:(d.byId(a).innerHTML=this.replaceWith,this.isChanged=!0,this.suggestionSelect.deselectAll())},_setUnfoundWordAttr:function(a){this.unfoundTextBox.set("value",a||"")},_getUnfoundWordAttr:function(){return this.unfoundTextBox.get("value")},_setSuggestionListAttr:function(a){var b=this.suggestionSelect;a=a||[];b.removeItems();b.addItems(a)},_getSelectedWordAttr:function(){var a=this.suggestionSelect.getSelected();return a&&0<a.length?
-a[0].value:this.unfoundTextBox.get("value")},_setDisabledAttr:function(a){this.skipButton.set("disabled",a);this.skipAllButton.set("disabled",a);this.toDicButton.set("disabled",a);this.replaceButton.set("disabled",a);this.replaceAllButton.set("disabled",a)},_setInProgressAttr:function(a){d.toggleClass(this.id+"_progressIcon","hidden",!a)}}),x=d.declare("dojox.editor.plugins._SpellCheckScriptMultiPart",null,{ACTION_QUERY:"query",ACTION_UPDATE:"update",callbackHandle:"callback",maxBufferLength:100,
-delimiter:" ",label:"response",_timeout:3E4,SEC:1E3,constructor:function(){this.serviceEndPoint="";this._queue=[];this.isWorking=!1;this.exArgs=null;this._counter=0},send:function(a,b){var c=this,e=this.delimiter,f=this.maxBufferLength,g=this.label,m=this.serviceEndPoint,u=this.callbackHandle,r=this.exArgs,v=this._timeout,q=0,h=0;this._result||(this._result=[]);b=b||this.ACTION_QUERY;var k=function(){var n=[],l=0;if(a&&0<a.length){c.isWorking=!0;var k=a.length;do{q=h+1;if((h+=f)>k)h=k;else for(;e&&
-a.charAt(h)!=e&&h<=k;)h++;n.push({l:q,r:h});l++}while(h<k);d.forEach(n,function(f,e){var h={url:m,action:b,timeout:v,callbackParamName:u,handle:function(a,b){if(++c._counter<=this.size&&!(a instanceof Error)&&a[g]&&d.isArray(a[g])){var f=this.offset;d.forEach(a[g],function(a){a.offset+=f});c._result[this.number]=a[g]}c._counter==this.size&&(c._finalizeCollection(this.action),c.isWorking=!1,0<c._queue.length&&c._queue.shift()())}};h.content=r?d.mixin(r,{action:b,content:a.substring(f.l-1,f.r)}):{action:b,
-content:a.substring(f.l-1,f.r)};h.size=l;h.number=e;h.offset=f.l-1;d.io.script.get(h)})}};c.isWorking?c._queue.push(k):k()},_finalizeCollection:function(a){for(var b=this._result,c=b.length,e=0;e<c;e++)var f=b.shift(),b=b.concat(f);if(a==this.ACTION_QUERY)this.onLoad(b);this._counter=0;this._result=[]},onLoad:function(a){},setWaitingTime:function(a){this._timeout=a*this.SEC}}),p=d.declare("dojox.editor.plugins.SpellCheck",[B],{url:"",bufferLength:100,interactive:!1,timeout:30,button:null,_editor:null,
-exArgs:null,_cursorSpan:'\x3cspan class\x3d"cursorPlaceHolder"\x3e\x3c/span\x3e',_cursorSelector:"cursorPlaceHolder",_incorrectWordsSpan:"\x3cspan class\x3d'incorrectWordPlaceHolder'\x3e${text}\x3c/span\x3e",_ignoredIncorrectStyle:{cursor:"inherit",borderBottom:"none",backgroundColor:"transparent"},_normalIncorrectStyle:{cursor:"pointer",borderBottom:"1px dotted red",backgroundColor:"yellow"},_highlightedIncorrectStyle:{borderBottom:"1px dotted red",backgroundColor:"#b3b3ff"},_selector:"incorrectWordPlaceHolder",
-_maxItemNumber:3,constructor:function(){this._spanList=[];this._cache={};this._enabled=!0;this._iterator=0},setEditor:function(a){this._editor=a;this._initButton();this._setNetwork();this._connectUp()},_initButton:function(){var a=this,b=this._strings=d.i18n.getLocalization("dojox.editor.plugins","SpellCheck"),c=this._dialog=new m.TooltipDialog;c.set("content",this._dialogContent=new t({unfound:b.unfound,skip:b.skip,skipAll:b.skipAll,toDic:b.toDic,suggestions:b.suggestions,replaceWith:b.replaceWith,
-replace:b.replace,replaceAll:b.replaceAll,cancel:b.cancel}));this.button=new m.form.DropDownButton({label:b.widgetLabel,showLabel:!1,iconClass:"dijitEditorSpellCheckIcon",dropDown:c,id:m.getUniqueId(this.declaredClass.replace(/\./g,"_"))+"_dialogPane",closeDropDown:function(b){if(a._dialogContent.closable){a._dialogContent.isOpen=!1;if(d.isIE){var c=a._iterator,e=a._spanList;c<e.length&&0<=c&&d.style(e[c],a._normalIncorrectStyle)}this._opened&&(y.close(this.dropDown),b&&this.focus(),this._opened=
-!1,this.state="")}}});a._dialogContent.isOpen=!1;c.domNode.setAttribute("aria-label",this._strings.widgetLabel)},_setNetwork:function(){var a=this.exArgs;if(!this._service){var b=this._service=new x;b.serviceEndPoint=this.url;b.maxBufferLength=this.bufferLength;b.setWaitingTime(this.timeout);a&&(delete a.name,delete a.url,delete a.interactive,delete a.timeout,b.exArgs=a)}},_connectUp:function(){var a=this._editor,b=this._dialogContent;this.connect(this.button,"set","_disabled");this.connect(this._service,
-"onLoad","_loadData");this.connect(this._dialog,"onOpen","_openDialog");this.connect(a,"onKeyPress","_keyPress");this.connect(a,"onLoad","_submitContent");this.connect(b,"onSkip","_skip");this.connect(b,"onSkipAll","_skipAll");this.connect(b,"onAddToDic","_add");this.connect(b,"onReplace","_replace");this.connect(b,"onReplaceAll","_replaceAll");this.connect(b,"onCancel","_cancel");this.connect(b,"onEnter","_enter");a.contentPostFilters.push(this._spellCheckFilter);d.publish(m._scopeName+".Editor.plugin.SpellCheck.getParser",
-[this]);this.parser||console.error("Can not get the word parser!")},_disabled:function(a,b){"disabled"==a&&(b?(this._iterator=0,this._spanList=[]):this.interactive&&!b&&this._service&&this._submitContent(!0),this._enabled=!b)},_keyPress:function(a){if(this.interactive){var b=a.charCode;a.altKey||b!=d.keys.SPACE?(a.ctrlKey&&(118==b||86==b)||!a.ctrlKey&&a.charCode)&&this._submitContent(!0):this._submitContent()}},_loadData:function(a){var b=this._cache,c=this._editor.get("value"),e=this._dialogContent;
-this._iterator=0;d.forEach(a,function(a){b[a.text]=a.suggestion;b[a.text].correct=!1});this._enabled&&(e.closable=!1,this._markIncorrectWords(c,b),e.closable=!0,this._dialogContent.isOpen&&(this._iterator=-1,this._skip()))},_openDialog:function(){var a=this._dialogContent;a.ignoreChange=!0;a.set("unfoundWord","");a.set("suggestionList",null);a.set("disabled",!0);a.set("inProgress",!0);a.isOpen=!0;a.closable=!1;this._submitContent();a.closable=!0},_skip:function(a,b){var c=this._dialogContent,e=this._spanList||
-[],f=e.length,g=this._iterator;c.closable=!1;c.isChanged=!1;c.ignoreChange=!0;for(!b&&0<=g&&g<f&&this._skipWord(g);++g<f&&1==e[g].edited;);g<f?(this._iterator=g,this._populateDialog(g),this._selectWord(g)):(this._iterator=-1,c.set("unfoundWord",this._strings.msg),c.set("suggestionList",null),c.set("disabled",!0),c.set("inProgress",!1));setTimeout(function(){d.isWebKit&&c.skipButton.focus();c.focus();c.ignoreChange=!1;c.closable=!0},0)},_skipAll:function(){this._dialogContent.closable=!1;this._skipWordAll(this._iterator);
-this._skip()},_add:function(){var a=this._dialogContent;a.closable=!1;a.isOpen=!0;this._addWord(this._iterator,a.get("unfoundWord"));this._skip()},_replace:function(){var a=this._dialogContent,b=this._iterator,c=a.get("selectedWord");a.closable=!1;this._replaceWord(b,c);this._skip(null,!0)},_replaceAll:function(){var a=this._dialogContent,b=this._spanList,c=b.length,e=b[this._iterator].innerHTML.toLowerCase(),f=a.get("selectedWord");a.closable=!1;for(a=0;a<c;a++)b[a].innerHTML.toLowerCase()==e&&this._replaceWord(a,
-f);this._skip(null,!0)},_cancel:function(){this._dialogContent.closable=!0;this._editor.focus()},_enter:function(){this._dialogContent.isChanged?this._replace():this._skip()},_query:function(a){var b=this._service,c=this._cache;a=this.parser.parseIntoWords(this._html2Text(a))||[];var e=[];d.forEach(a,function(a){a=a.toLowerCase();c[a]||(c[a]=[],c[a].correct=!0,e.push(a))});0<e.length?b.send(e.join(" ")):b.isWorking||this._loadData([])},_html2Text:function(a){for(var b=[],c=!1,e=a?a.length:0,d=0;d<
-e;d++)"\x3c"==a.charAt(d)&&(c=!0),1==c?b.push(" "):b.push(a.charAt(d)),"\x3e"==a.charAt(d)&&(c=!1);return b.join("")},_getBookmark:function(a){var b=this._editor,c=this._cursorSpan;b.execCommand("inserthtml",c);for(var b=b.get("value"),c=b.indexOf(c),d=-1;++d<c&&a.charAt(d)==b.charAt(d););return d},_moveToBookmark:function(){var a=this._editor,b=d.query("."+this._cursorSelector,a.document);if(b=b&&b[0])a._sCall("selectElement",[b]),a._sCall("collapse",[!0]),(a=b.parentNode)&&a.removeChild(b)},_submitContent:function(a){if(a){var b=
-this;this._delayHandler&&(clearTimeout(this._delayHandler),this._delayHandler=null);setTimeout(function(){b._query(b._editor.get("value"))},3E3)}else this._query(this._editor.get("value"))},_populateDialog:function(a){var b=this._spanList,c=this._cache,d=this._dialogContent;d.set("disabled",!1);a<b.length&&0<b.length&&(a=b[a].innerHTML,d.set("unfoundWord",a),d.set("suggestionList",c[a.toLowerCase()]),d.set("inProgress",!1))},_markIncorrectWords:function(a,b){for(var c=this,e=this.parser,f=this._editor,
-g=this._incorrectWordsSpan,p=this._normalIncorrectStyle,u=this._selector,r=e.parseIntoWords(this._html2Text(a).toLowerCase()),e=e.getIndices(),v=this._cursorSpan,q=this._getBookmark(a),h=!1,k=a.split(""),n=null,n=r.length-1;0<=n;n--){var l=r[n];if(b[l]&&!b[l].correct){var l=e[n],t=r[n].length,w=l+t;w<=q&&!h&&(k.splice(q,0,v),h=!0);k.splice(l,t,d.string.substitute(g,{text:a.substring(l,w)}));l<q&&q<w&&!h&&(h=k[l].split(""),h.splice(39+q-l,0,v),k[l]=h.join(""),h=!0)}}h||(k.splice(q,0,v),h=!0);f.set("value",
-k.join(""));f._cursorToStart=!1;this._moveToBookmark();n=this._spanList=d.query("."+this._selector,f.document);n.forEach(function(a,b){a.id=u+b});this.interactive||delete p.cursor;n.style(p);this.interactive&&(c._contextMenu&&(c._contextMenu.uninitialize(),c._contextMenu=null),c._contextMenu=new m.Menu({targetNodeIds:[f.iframe],bindDomNode:function(a){a=d.byId(a);var e,h;"iframe"==a.tagName.toLowerCase()?(h=a,this._iframeContentWindow(h),e=d.body(f.document)):e=a==d.body()?d.doc.documentElement:a;
-var g={node:a,iframe:h};d.attr(a,"_dijitMenu"+this.id,this._bindings.push(g));var k=d.hitch(this,function(a){return[d.connect(a,this.leftClickToOpen?"onclick":"oncontextmenu",this,function(a){var e=a.target,g=c._strings;if(d.hasClass(e,u)&&!e.edited){d.stopEvent(a);var k=c._maxItemNumber,l=e.id.substring(u.length),n=b[e.innerHTML.toLowerCase()],q=n.length;this.destroyDescendants();if(0==q)this.addChild(new m.MenuItem({label:g.iMsg,disabled:!0}));else for(var p=0;p<k&&p<q;p++)this.addChild(new m.MenuItem({label:n[p],
-onClick:function(){var a=n[p];return function(){c._replaceWord(l,a);f.focus()}}()}));this.addChild(new m.MenuSeparator);this.addChild(new m.MenuItem({label:g.iSkip,onClick:function(){c._skipWord(l);f.focus()}}));this.addChild(new m.MenuItem({label:g.iSkipAll,onClick:function(){c._skipWordAll(l);f.focus()}}));this.addChild(new m.MenuSeparator);this.addChild(new m.MenuItem({label:g.toDic,onClick:function(){c._addWord(l);f.focus()}}));this._scheduleOpen(e,h,{x:a.pageX,y:a.pageY})}}),d.connect(a,"onkeydown",
-this,function(a){a.shiftKey&&a.keyCode==d.keys.F10&&(d.stopEvent(a),this._scheduleOpen(a.target,h))})]});g.connects=e?k(e):[];h&&(g.onloadHandler=d.hitch(this,function(){this._iframeContentWindow(h);var a=d.body(f.document);g.connects=k(a)}),h.addEventListener?h.addEventListener("load",g.onloadHandler,!1):h.attachEvent("onload",g.onloadHandler))}}))},_selectWord:function(a){var b=this._editor,c=this._spanList;a<c.length&&0<c.length&&(b._sCall("selectElement",[c[a]]),b._sCall("collapse",[!0]),this._findText(c[a].innerHTML,
-!1,!1),d.isIE&&d.style(c[a],this._highlightedIncorrectStyle))},_replaceWord:function(a,b){var c=this._spanList;c[a].innerHTML=b;d.style(c[a],this._ignoredIncorrectStyle);c[a].edited=!0},_skipWord:function(a){var b=this._spanList;d.style(b[a],this._ignoredIncorrectStyle);this._cache[b[a].innerHTML.toLowerCase()].correct=!0;b[a].edited=!0},_skipWordAll:function(a,b){var c=this._spanList,d=c.length;b=b||c[a].innerHTML.toLowerCase();for(var f=0;f<d;f++)c[f].edited||c[f].innerHTML.toLowerCase()!=b||this._skipWord(f)},
-_addWord:function(a,b){var c=this._service;c.send(b||this._spanList[a].innerHTML.toLowerCase(),c.ACTION_UPDATE);this._skipWordAll(a,b)},_findText:function(a,b,c){var d=this._editor,f=d.window,g=!1;a&&(f.find?g=f.find(a,b,c,!1,!1,!1,!1):(f=d.document,f.selection&&(this._editor.focus(),d=f.body.createTextRange(),(g=f.selection?f.selection.createRange():null)&&(c?d.setEndPoint("EndToStart",g):d.setEndPoint("StartToEnd",g)),b=b?4:0,c&&(b|=1),(g=d.findText(a,d.text.length,b))&&d.select())));return g},
-_spellCheckFilter:function(a){return a.replace(/<span class=["']incorrectWordPlaceHolder["'].*?>(.*?)<\/span>/g,"$1")}});p._SpellCheckControl=t;p._SpellCheckScriptMultiPart=x;d.subscribe(m._scopeName+".Editor.getPlugin",null,function(a){a.plugin||"spellcheck"!==a.args.name.toLowerCase()||(a.plugin=new p({url:"url"in a.args?a.args.url:"",interactive:"interactive"in a.args?a.args.interactive:!1,bufferLength:"bufferLength"in a.args?a.args.bufferLength:100,timeout:"timeout"in a.args?a.args.timeout:30,
-exArgs:a.args}))});return p});
-//# sourceMappingURL=SpellCheck.js.map
+define("dojox/editor/plugins/SpellCheck",["dojo","dijit","dojo/io/script","dijit/popup","dijit/_Widget","dijit/_Templated","dijit/_editor/_Plugin","dijit/form/TextBox","dijit/form/DropDownButton","dijit/TooltipDialog","dijit/form/MultiSelect","dijit/Menu","dojo/i18n!dojox/editor/plugins/nls/SpellCheck"],function(_1,_2,_3,_4,_5,_6,_7){
+_1.experimental("dojox.editor.plugins.SpellCheck");
+var _8=_1.declare("dojox.editor.plugins._spellCheckControl",[_5,_6],{widgetsInTemplate:true,templateString:"<table role='presentation' class='dijitEditorSpellCheckTable'>"+"<tr><td colspan='3' class='alignBottom'><label for='${textId}' id='${textId}_label'>${unfound}</label>"+"<div class='dijitEditorSpellCheckBusyIcon' id='${id}_progressIcon'></div></td></tr>"+"<tr>"+"<td class='dijitEditorSpellCheckBox'><input dojoType='dijit.form.TextBox' required='false' intermediateChanges='true' "+"class='dijitEditorSpellCheckBox' dojoAttachPoint='unfoundTextBox' id='${textId}'/></td>"+"<td><button dojoType='dijit.form.Button' class='blockButton' dojoAttachPoint='skipButton'>${skip}</button></td>"+"<td><button dojoType='dijit.form.Button' class='blockButton' dojoAttachPoint='skipAllButton'>${skipAll}</button></td>"+"</tr>"+"<tr>"+"<td class='alignBottom'><label for='${selectId}'>${suggestions}</td></label>"+"<td colspan='2'><button dojoType='dijit.form.Button' class='blockButton' dojoAttachPoint='toDicButton'>${toDic}</button></td>"+"</tr>"+"<tr>"+"<td>"+"<select dojoType='dijit.form.MultiSelect' id='${selectId}' "+"class='dijitEditorSpellCheckBox listHeight' dojoAttachPoint='suggestionSelect'></select>"+"</td>"+"<td colspan='2'>"+"<button dojoType='dijit.form.Button' class='blockButton' dojoAttachPoint='replaceButton'>${replace}</button>"+"<div class='topMargin'><button dojoType='dijit.form.Button' class='blockButton' "+"dojoAttachPoint='replaceAllButton'>${replaceAll}</button><div>"+"</td>"+"</tr>"+"<tr>"+"<td><div class='topMargin'><button dojoType='dijit.form.Button' dojoAttachPoint='cancelButton'>${cancel}</button></div></td>"+"<td></td>"+"<td></td>"+"</tr>"+"</table>",constructor:function(){
+this.ignoreChange=false;
+this.isChanged=false;
+this.isOpen=false;
+this.closable=true;
+},postMixInProperties:function(){
+this.id=_2.getUniqueId(this.declaredClass.replace(/\./g,"_"));
+this.textId=this.id+"_textBox";
+this.selectId=this.id+"_select";
+},postCreate:function(){
+var _9=this.suggestionSelect;
+_1.removeAttr(_9.domNode,"multiple");
+_9.addItems=function(_a){
+var _b=this;
+var o=null;
+if(_a&&_a.length>0){
+_1.forEach(_a,function(_c,i){
+o=_1.create("option",{innerHTML:_c,value:_c},_b.domNode);
+if(i==0){
+o.selected=true;
+}
+});
+}
+};
+_9.removeItems=function(){
+_1.empty(this.domNode);
+};
+_9.deselectAll=function(){
+this.containerNode.selectedIndex=-1;
+};
+this.connect(this,"onKeyPress","_cancel");
+this.connect(this.unfoundTextBox,"onKeyPress","_enter");
+this.connect(this.unfoundTextBox,"onChange","_unfoundTextBoxChange");
+this.connect(this.suggestionSelect,"onKeyPress","_enter");
+this.connect(this.skipButton,"onClick","onSkip");
+this.connect(this.skipAllButton,"onClick","onSkipAll");
+this.connect(this.toDicButton,"onClick","onAddToDic");
+this.connect(this.replaceButton,"onClick","onReplace");
+this.connect(this.replaceAllButton,"onClick","onReplaceAll");
+this.connect(this.cancelButton,"onClick","onCancel");
+},onSkip:function(){
+},onSkipAll:function(){
+},onAddToDic:function(){
+},onReplace:function(){
+},onReplaceAll:function(){
+},onCancel:function(){
+},onEnter:function(){
+},focus:function(){
+this.unfoundTextBox.focus();
+},_cancel:function(_d){
+if(_d.keyCode==_1.keys.ESCAPE){
+this.onCancel();
+_1.stopEvent(_d);
+}
+},_enter:function(_e){
+if(_e.keyCode==_1.keys.ENTER){
+this.onEnter();
+_1.stopEvent(_e);
+}
+},_unfoundTextBoxChange:function(){
+var id=this.textId+"_label";
+if(!this.ignoreChange){
+_1.byId(id).innerHTML=this["replaceWith"];
+this.isChanged=true;
+this.suggestionSelect.deselectAll();
+}else{
+_1.byId(id).innerHTML=this["unfound"];
+}
+},_setUnfoundWordAttr:function(_f){
+_f=_f||"";
+this.unfoundTextBox.set("value",_f);
+},_getUnfoundWordAttr:function(){
+return this.unfoundTextBox.get("value");
+},_setSuggestionListAttr:function(_10){
+var _11=this.suggestionSelect;
+_10=_10||[];
+_11.removeItems();
+_11.addItems(_10);
+},_getSelectedWordAttr:function(){
+var _12=this.suggestionSelect.getSelected();
+if(_12&&_12.length>0){
+return _12[0].value;
+}else{
+return this.unfoundTextBox.get("value");
+}
+},_setDisabledAttr:function(_13){
+this.skipButton.set("disabled",_13);
+this.skipAllButton.set("disabled",_13);
+this.toDicButton.set("disabled",_13);
+this.replaceButton.set("disabled",_13);
+this.replaceAllButton.set("disabled",_13);
+},_setInProgressAttr:function(_14){
+var id=this.id+"_progressIcon";
+_1.toggleClass(id,"hidden",!_14);
+}});
+var _15=_1.declare("dojox.editor.plugins._SpellCheckScriptMultiPart",null,{ACTION_QUERY:"query",ACTION_UPDATE:"update",callbackHandle:"callback",maxBufferLength:100,delimiter:" ",label:"response",_timeout:30000,SEC:1000,constructor:function(){
+this.serviceEndPoint="";
+this._queue=[];
+this.isWorking=false;
+this.exArgs=null;
+this._counter=0;
+},send:function(_16,_17){
+var _18=this,dt=this.delimiter,mbl=this.maxBufferLength,_19=this.label,_1a=this.serviceEndPoint,_1b=this.callbackHandle,_1c=this.exArgs,_1d=this._timeout,l=0,r=0;
+if(!this._result){
+this._result=[];
+}
+_17=_17||this.ACTION_QUERY;
+var _1e=function(){
+var _1f=[];
+var _20=0;
+if(_16&&_16.length>0){
+_18.isWorking=true;
+var len=_16.length;
+do{
+l=r+1;
+if((r+=mbl)>len){
+r=len;
+}else{
+while(dt&&_16.charAt(r)!=dt&&r<=len){
+r++;
+}
+}
+_1f.push({l:l,r:r});
+_20++;
+}while(r<len);
+_1.forEach(_1f,function(_21,_22){
+var _23={url:_1a,action:_17,timeout:_1d,callbackParamName:_1b,handle:function(_24,_25){
+if(++_18._counter<=this.size&&!(_24 instanceof Error)&&_24[_19]&&_1.isArray(_24[_19])){
+var _26=this.offset;
+_1.forEach(_24[_19],function(_27){
+_27.offset+=_26;
+});
+_18._result[this.number]=_24[_19];
+}
+if(_18._counter==this.size){
+_18._finalizeCollection(this.action);
+_18.isWorking=false;
+if(_18._queue.length>0){
+(_18._queue.shift())();
+}
+}
+}};
+_23.content=_1c?_1.mixin(_1c,{action:_17,content:_16.substring(_21.l-1,_21.r)}):{action:_17,content:_16.substring(_21.l-1,_21.r)};
+_23.size=_20;
+_23.number=_22;
+_23.offset=_21.l-1;
+_1.io.script.get(_23);
+});
+}
+};
+if(!_18.isWorking){
+_1e();
+}else{
+_18._queue.push(_1e);
+}
+},_finalizeCollection:function(_28){
+var _29=this._result,len=_29.length;
+for(var i=0;i<len;i++){
+var _2a=_29.shift();
+_29=_29.concat(_2a);
+}
+if(_28==this.ACTION_QUERY){
+this.onLoad(_29);
+}
+this._counter=0;
+this._result=[];
+},onLoad:function(_2b){
+},setWaitingTime:function(_2c){
+this._timeout=_2c*this.SEC;
+}});
+var _2d=_1.declare("dojox.editor.plugins.SpellCheck",[_7],{url:"",bufferLength:100,interactive:false,timeout:30,button:null,_editor:null,exArgs:null,_cursorSpan:"<span class=\"cursorPlaceHolder\"></span>",_cursorSelector:"cursorPlaceHolder",_incorrectWordsSpan:"<span class='incorrectWordPlaceHolder'>${text}</span>",_ignoredIncorrectStyle:{"cursor":"inherit","borderBottom":"none","backgroundColor":"transparent"},_normalIncorrectStyle:{"cursor":"pointer","borderBottom":"1px dotted red","backgroundColor":"yellow"},_highlightedIncorrectStyle:{"borderBottom":"1px dotted red","backgroundColor":"#b3b3ff"},_selector:"incorrectWordPlaceHolder",_maxItemNumber:3,constructor:function(){
+this._spanList=[];
+this._cache={};
+this._enabled=true;
+this._iterator=0;
+},setEditor:function(_2e){
+this._editor=_2e;
+this._initButton();
+this._setNetwork();
+this._connectUp();
+},_initButton:function(){
+var _2f=this,_30=(this._strings=_1.i18n.getLocalization("dojox.editor.plugins","SpellCheck")),_31=(this._dialog=new _2.TooltipDialog());
+_31.set("content",(this._dialogContent=new _8({unfound:_30["unfound"],skip:_30["skip"],skipAll:_30["skipAll"],toDic:_30["toDic"],suggestions:_30["suggestions"],replaceWith:_30["replaceWith"],replace:_30["replace"],replaceAll:_30["replaceAll"],cancel:_30["cancel"]})));
+this.button=new _2.form.DropDownButton({label:_30["widgetLabel"],showLabel:false,iconClass:"dijitEditorSpellCheckIcon",dropDown:_31,id:_2.getUniqueId(this.declaredClass.replace(/\./g,"_"))+"_dialogPane",closeDropDown:function(_32){
+if(_2f._dialogContent.closable){
+_2f._dialogContent.isOpen=false;
+if(_1.isIE){
+var pos=_2f._iterator,_33=_2f._spanList;
+if(pos<_33.length&&pos>=0){
+_1.style(_33[pos],_2f._normalIncorrectStyle);
+}
+}
+if(this._opened){
+_4.close(this.dropDown);
+if(_32){
+this.focus();
+}
+this._opened=false;
+this.state="";
+}
+}
+}});
+_2f._dialogContent.isOpen=false;
+_31.domNode.setAttribute("aria-label",this._strings["widgetLabel"]);
+},_setNetwork:function(){
+var _34=this.exArgs;
+if(!this._service){
+var _35=(this._service=new _15());
+_35.serviceEndPoint=this.url;
+_35.maxBufferLength=this.bufferLength;
+_35.setWaitingTime(this.timeout);
+if(_34){
+delete _34.name;
+delete _34.url;
+delete _34.interactive;
+delete _34.timeout;
+_35.exArgs=_34;
+}
+}
+},_connectUp:function(){
+var _36=this._editor,_37=this._dialogContent;
+this.connect(this.button,"set","_disabled");
+this.connect(this._service,"onLoad","_loadData");
+this.connect(this._dialog,"onOpen","_openDialog");
+this.connect(_36,"onKeyPress","_keyPress");
+this.connect(_36,"onLoad","_submitContent");
+this.connect(_37,"onSkip","_skip");
+this.connect(_37,"onSkipAll","_skipAll");
+this.connect(_37,"onAddToDic","_add");
+this.connect(_37,"onReplace","_replace");
+this.connect(_37,"onReplaceAll","_replaceAll");
+this.connect(_37,"onCancel","_cancel");
+this.connect(_37,"onEnter","_enter");
+_36.contentPostFilters.push(this._spellCheckFilter);
+_1.publish(_2._scopeName+".Editor.plugin.SpellCheck.getParser",[this]);
+if(!this.parser){
+console.error("Can not get the word parser!");
+}
+},_disabled:function(_38,_39){
+if(_38=="disabled"){
+if(_39){
+this._iterator=0;
+this._spanList=[];
+}else{
+if(this.interactive&&!_39&&this._service){
+this._submitContent(true);
+}
+}
+this._enabled=!_39;
+}
+},_keyPress:function(evt){
+if(this.interactive){
+var v=118,V=86,cc=evt.charCode;
+if(!evt.altKey&&cc==_1.keys.SPACE){
+this._submitContent();
+}else{
+if((evt.ctrlKey&&(cc==v||cc==V))||(!evt.ctrlKey&&evt.charCode)){
+this._submitContent(true);
+}
+}
+}
+},_loadData:function(_3a){
+var _3b=this._cache,_3c=this._editor.get("value"),_3d=this._dialogContent;
+this._iterator=0;
+_1.forEach(_3a,function(d){
+_3b[d.text]=d.suggestion;
+_3b[d.text].correct=false;
+});
+if(this._enabled){
+_3d.closable=false;
+this._markIncorrectWords(_3c,_3b);
+_3d.closable=true;
+if(this._dialogContent.isOpen){
+this._iterator=-1;
+this._skip();
+}
+}
+},_openDialog:function(){
+var _3e=this._dialogContent;
+_3e.ignoreChange=true;
+_3e.set("unfoundWord","");
+_3e.set("suggestionList",null);
+_3e.set("disabled",true);
+_3e.set("inProgress",true);
+_3e.isOpen=true;
+_3e.closable=false;
+this._submitContent();
+_3e.closable=true;
+},_skip:function(evt,_3f){
+var _40=this._dialogContent,_41=this._spanList||[],len=_41.length,_42=this._iterator;
+_40.closable=false;
+_40.isChanged=false;
+_40.ignoreChange=true;
+if(!_3f&&_42>=0&&_42<len){
+this._skipWord(_42);
+}
+while(++_42<len&&_41[_42].edited==true){
+}
+if(_42<len){
+this._iterator=_42;
+this._populateDialog(_42);
+this._selectWord(_42);
+}else{
+this._iterator=-1;
+_40.set("unfoundWord",this._strings["msg"]);
+_40.set("suggestionList",null);
+_40.set("disabled",true);
+_40.set("inProgress",false);
+}
+setTimeout(function(){
+if(_1.isWebKit){
+_40.skipButton.focus();
+}
+_40.focus();
+_40.ignoreChange=false;
+_40.closable=true;
+},0);
+},_skipAll:function(){
+this._dialogContent.closable=false;
+this._skipWordAll(this._iterator);
+this._skip();
+},_add:function(){
+var _43=this._dialogContent;
+_43.closable=false;
+_43.isOpen=true;
+this._addWord(this._iterator,_43.get("unfoundWord"));
+this._skip();
+},_replace:function(){
+var _44=this._dialogContent,_45=this._iterator,_46=_44.get("selectedWord");
+_44.closable=false;
+this._replaceWord(_45,_46);
+this._skip(null,true);
+},_replaceAll:function(){
+var _47=this._dialogContent,_48=this._spanList,len=_48.length,_49=_48[this._iterator].innerHTML.toLowerCase(),_4a=_47.get("selectedWord");
+_47.closable=false;
+for(var _4b=0;_4b<len;_4b++){
+if(_48[_4b].innerHTML.toLowerCase()==_49){
+this._replaceWord(_4b,_4a);
+}
+}
+this._skip(null,true);
+},_cancel:function(){
+this._dialogContent.closable=true;
+this._editor.focus();
+},_enter:function(){
+if(this._dialogContent.isChanged){
+this._replace();
+}else{
+this._skip();
+}
+},_query:function(_4c){
+var _4d=this._service,_4e=this._cache,_4f=this.parser.parseIntoWords(this._html2Text(_4c))||[];
+var _50=[];
+_1.forEach(_4f,function(_51){
+_51=_51.toLowerCase();
+if(!_4e[_51]){
+_4e[_51]=[];
+_4e[_51].correct=true;
+_50.push(_51);
+}
+});
+if(_50.length>0){
+_4d.send(_50.join(" "));
+}else{
+if(!_4d.isWorking){
+this._loadData([]);
+}
+}
+},_html2Text:function(_52){
+var _53=[],_54=false,len=_52?_52.length:0;
+for(var i=0;i<len;i++){
+if(_52.charAt(i)=="<"){
+_54=true;
+}
+if(_54==true){
+_53.push(" ");
+}else{
+_53.push(_52.charAt(i));
+}
+if(_52.charAt(i)==">"){
+_54=false;
+}
+}
+return _53.join("");
+},_getBookmark:function(_55){
+var ed=this._editor,cp=this._cursorSpan;
+ed.execCommand("inserthtml",cp);
+var nv=ed.get("value"),_56=nv.indexOf(cp),i=-1;
+while(++i<_56&&_55.charAt(i)==nv.charAt(i)){
+}
+return i;
+},_moveToBookmark:function(){
+var ed=this._editor,cps=_1.query("."+this._cursorSelector,ed.document),_57=cps&&cps[0];
+if(_57){
+ed._sCall("selectElement",[_57]);
+ed._sCall("collapse",[true]);
+var _58=_57.parentNode;
+if(_58){
+_58.removeChild(_57);
+}
+}
+},_submitContent:function(_59){
+if(_59){
+var _5a=this,_5b=3000;
+if(this._delayHandler){
+clearTimeout(this._delayHandler);
+this._delayHandler=null;
+}
+setTimeout(function(){
+_5a._query(_5a._editor.get("value"));
+},_5b);
+}else{
+this._query(this._editor.get("value"));
+}
+},_populateDialog:function(_5c){
+var _5d=this._spanList,_5e=this._cache,_5f=this._dialogContent;
+_5f.set("disabled",false);
+if(_5c<_5d.length&&_5d.length>0){
+var _60=_5d[_5c].innerHTML;
+_5f.set("unfoundWord",_60);
+_5f.set("suggestionList",_5e[_60.toLowerCase()]);
+_5f.set("inProgress",false);
+}
+},_markIncorrectWords:function(_61,_62){
+var _63=this,_64=this.parser,_65=this._editor,_66=this._incorrectWordsSpan,_67=this._normalIncorrectStyle,_68=this._selector,_69=_64.parseIntoWords(this._html2Text(_61).toLowerCase()),_6a=_64.getIndices(),_6b=this._cursorSpan,_6c=this._getBookmark(_61),_6d="<span class='incorrectWordPlaceHolder'>".length,_6e=false,_6f=_61.split(""),_70=null;
+for(var i=_69.length-1;i>=0;i--){
+var _71=_69[i];
+if(_62[_71]&&!_62[_71].correct){
+var _72=_6a[i],len=_69[i].length,end=_72+len;
+if(end<=_6c&&!_6e){
+_6f.splice(_6c,0,_6b);
+_6e=true;
+}
+_6f.splice(_72,len,_1.string.substitute(_66,{text:_61.substring(_72,end)}));
+if(_72<_6c&&_6c<end&&!_6e){
+var tmp=_6f[_72].split("");
+tmp.splice(_6d+_6c-_72,0,_6b);
+_6f[_72]=tmp.join("");
+_6e=true;
+}
+}
+}
+if(!_6e){
+_6f.splice(_6c,0,_6b);
+_6e=true;
+}
+_65.set("value",_6f.join(""));
+_65._cursorToStart=false;
+this._moveToBookmark();
+_70=this._spanList=_1.query("."+this._selector,_65.document);
+_70.forEach(function(_73,i){
+_73.id=_68+i;
+});
+if(!this.interactive){
+delete _67.cursor;
+}
+_70.style(_67);
+if(this.interactive){
+if(_63._contextMenu){
+_63._contextMenu.uninitialize();
+_63._contextMenu=null;
+}
+_63._contextMenu=new _2.Menu({targetNodeIds:[_65.iframe],bindDomNode:function(_74){
+_74=_1.byId(_74);
+var cn;
+var _75,win;
+if(_74.tagName.toLowerCase()=="iframe"){
+_75=_74;
+win=this._iframeContentWindow(_75);
+cn=_1.body(_65.document);
+}else{
+cn=(_74==_1.body()?_1.doc.documentElement:_74);
+}
+var _76={node:_74,iframe:_75};
+_1.attr(_74,"_dijitMenu"+this.id,this._bindings.push(_76));
+var _77=_1.hitch(this,function(cn){
+return [_1.connect(cn,this.leftClickToOpen?"onclick":"oncontextmenu",this,function(evt){
+var _78=evt.target,_79=_63._strings;
+if(_1.hasClass(_78,_68)&&!_78.edited){
+_1.stopEvent(evt);
+var _7a=_63._maxItemNumber,id=_78.id,_7b=id.substring(_68.length),_7c=_62[_78.innerHTML.toLowerCase()],_7d=_7c.length;
+this.destroyDescendants();
+if(_7d==0){
+this.addChild(new _2.MenuItem({label:_79["iMsg"],disabled:true}));
+}else{
+for(var i=0;i<_7a&&i<_7d;i++){
+this.addChild(new _2.MenuItem({label:_7c[i],onClick:(function(){
+var idx=_7b,txt=_7c[i];
+return function(){
+_63._replaceWord(idx,txt);
+_65.focus();
+};
+})()}));
+}
+}
+this.addChild(new _2.MenuSeparator());
+this.addChild(new _2.MenuItem({label:_79["iSkip"],onClick:function(){
+_63._skipWord(_7b);
+_65.focus();
+}}));
+this.addChild(new _2.MenuItem({label:_79["iSkipAll"],onClick:function(){
+_63._skipWordAll(_7b);
+_65.focus();
+}}));
+this.addChild(new _2.MenuSeparator());
+this.addChild(new _2.MenuItem({label:_79["toDic"],onClick:function(){
+_63._addWord(_7b);
+_65.focus();
+}}));
+this._scheduleOpen(_78,_75,{x:evt.pageX,y:evt.pageY});
+}
+}),_1.connect(cn,"onkeydown",this,function(evt){
+if(evt.shiftKey&&evt.keyCode==_1.keys.F10){
+_1.stopEvent(evt);
+this._scheduleOpen(evt.target,_75);
+}
+})];
+});
+_76.connects=cn?_77(cn):[];
+if(_75){
+_76.onloadHandler=_1.hitch(this,function(){
+var win=this._iframeContentWindow(_75),cn=_1.body(_65.document);
+_76.connects=_77(cn);
+});
+if(_75.addEventListener){
+_75.addEventListener("load",_76.onloadHandler,false);
+}else{
+_75.attachEvent("onload",_76.onloadHandler);
+}
+}
+}});
+}
+},_selectWord:function(_7e){
+var ed=this._editor,_7f=this._spanList;
+if(_7e<_7f.length&&_7f.length>0){
+ed._sCall("selectElement",[_7f[_7e]]);
+ed._sCall("collapse",[true]);
+this._findText(_7f[_7e].innerHTML,false,false);
+if(_1.isIE){
+_1.style(_7f[_7e],this._highlightedIncorrectStyle);
+}
+}
+},_replaceWord:function(_80,_81){
+var _82=this._spanList;
+_82[_80].innerHTML=_81;
+_1.style(_82[_80],this._ignoredIncorrectStyle);
+_82[_80].edited=true;
+},_skipWord:function(_83){
+var _84=this._spanList;
+_1.style(_84[_83],this._ignoredIncorrectStyle);
+this._cache[_84[_83].innerHTML.toLowerCase()].correct=true;
+_84[_83].edited=true;
+},_skipWordAll:function(_85,_86){
+var _87=this._spanList,len=_87.length;
+_86=_86||_87[_85].innerHTML.toLowerCase();
+for(var i=0;i<len;i++){
+if(!_87[i].edited&&_87[i].innerHTML.toLowerCase()==_86){
+this._skipWord(i);
+}
+}
+},_addWord:function(_88,_89){
+var _8a=this._service;
+_8a.send(_89||this._spanList[_88].innerHTML.toLowerCase(),_8a.ACTION_UPDATE);
+this._skipWordAll(_88,_89);
+},_findText:function(txt,_8b,_8c){
+var ed=this._editor,win=ed.window,_8d=false;
+if(txt){
+if(win.find){
+_8d=win.find(txt,_8b,_8c,false,false,false,false);
+}else{
+var doc=ed.document;
+if(doc.selection){
+this._editor.focus();
+var _8e=doc.body.createTextRange();
+var _8f=doc.selection?doc.selection.createRange():null;
+if(_8f){
+if(_8c){
+_8e.setEndPoint("EndToStart",_8f);
+}else{
+_8e.setEndPoint("StartToEnd",_8f);
+}
+}
+var _90=_8b?4:0;
+if(_8c){
+_90=_90|1;
+}
+_8d=_8e.findText(txt,_8e.text.length,_90);
+if(_8d){
+_8e.select();
+}
+}
+}
+}
+return _8d;
+},_spellCheckFilter:function(_91){
+var _92=/<span class=["']incorrectWordPlaceHolder["'].*?>(.*?)<\/span>/g;
+return _91.replace(_92,"$1");
+}});
+_2d._SpellCheckControl=_8;
+_2d._SpellCheckScriptMultiPart=_15;
+_1.subscribe(_2._scopeName+".Editor.getPlugin",null,function(o){
+if(o.plugin){
+return;
+}
+var _93=o.args.name.toLowerCase();
+if(_93==="spellcheck"){
+o.plugin=new _2d({url:("url" in o.args)?o.args.url:"",interactive:("interactive" in o.args)?o.args.interactive:false,bufferLength:("bufferLength" in o.args)?o.args.bufferLength:100,timeout:("timeout" in o.args)?o.args.timeout:30,exArgs:o.args});
+}
+});
+return _2d;
+});

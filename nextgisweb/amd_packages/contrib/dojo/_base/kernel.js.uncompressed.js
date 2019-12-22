@@ -1,4 +1,4 @@
-define("dojo/_base/kernel", ["../has", "./config", "require", "module"], function(has, config, require, module){
+define("dojo/_base/kernel", ["../global", "../has", "./config", "require", "module"], function(global, has, config, require, module){
 	// module:
 	//		dojo/_base/kernel
 
@@ -10,7 +10,6 @@ define("dojo/_base/kernel", ["../has", "./config", "require", "module"], functio
 
 		// create dojo, dijit, and dojox
 		// FIXME: in 2.0 remove dijit, dojox being created by dojo
-		global = (function () { return this; })(),
 		dijit = {},
 		dojox = {},
 		dojo = {
@@ -80,7 +79,7 @@ define("dojo/_base/kernel", ["../has", "./config", "require", "module"], functio
 	dojo.isAsync = ! 1  || require.async;
 	dojo.locale = config.locale;
 
-	var rev = "$Rev: 594ed6f $".match(/[0-9a-f]{7,}/);
+	var rev = "$Rev:$".match(/[0-9a-f]{7,}/);
 	dojo.version = {
 		// summary:
 		//		Version number of the Dojo Toolkit
@@ -93,7 +92,7 @@ define("dojo/_base/kernel", ["../has", "./config", "require", "module"], functio
 		//		- flag: String: Descriptor flag. If total version is "1.2.0beta1", will be "beta1"
 		//		- revision: Number: The Git rev from which dojo was pulled
 
-		major: 1, minor: 12, patch: 2, flag: "",
+		major: 1, minor: 16, patch: 0, flag: "",
 		revision: rev ? rev[0] : NaN,
 		toString: function(){
 			var v = dojo.version;

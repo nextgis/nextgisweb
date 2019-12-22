@@ -1,5 +1,58 @@
 //>>built
-define("dojox/validate/_base",["dojo/_base/lang","dojo/regexp","dojo/number","./regexp"],function(g,m,k,l){var c=g.getObject("dojox.validate",!0);c.isText=function(b,a){a="object"==typeof a?a:{};return/^\s*$/.test(b)||"number"==typeof a.length&&a.length!=b.length||"number"==typeof a.minlength&&a.minlength>b.length||"number"==typeof a.maxlength&&a.maxlength<b.length?!1:!0};c._isInRangeCache={};c.isInRange=function(b,a){b=k.parse(b,a);if(isNaN(b))return!1;a="object"==typeof a?a:{};var h="number"==typeof a.max?
-a.max:Infinity,e="number"==typeof a.min?a.min:-Infinity,d=c._isInRangeCache,f=b+"max"+h+"min"+e+"dec"+("string"==typeof a.decimal?a.decimal:".");if("undefined"!=typeof d[f])return d[f];d[f]=!(b<e||b>h);return d[f]};c.isNumberFormat=function(b,a){return(new RegExp("^"+l.numberFormat(a)+"$","i")).test(b)};c.isValidLuhn=function(b){var a=0,c,e;g.isString(b)||(b=String(b));b=b.replace(/[- ]/g,"");c=b.length%2;for(var d=0;d<b.length;d++)e=parseInt(b.charAt(d)),d%2==c&&(e*=2),9<e&&(e-=9),a+=e;return!(a%
-10)};return c});
-//# sourceMappingURL=_base.js.map
+define("dojox/validate/_base",["dojo/_base/lang","dojo/regexp","dojo/number","./regexp"],function(_1,_2,_3,_4){
+var _5=_1.getObject("dojox.validate",true);
+_5.isText=function(_6,_7){
+_7=(typeof _7=="object")?_7:{};
+if(/^\s*$/.test(_6)){
+return false;
+}
+if(typeof _7.length=="number"&&_7.length!=_6.length){
+return false;
+}
+if(typeof _7.minlength=="number"&&_7.minlength>_6.length){
+return false;
+}
+if(typeof _7.maxlength=="number"&&_7.maxlength<_6.length){
+return false;
+}
+return true;
+};
+_5._isInRangeCache={};
+_5.isInRange=function(_8,_9){
+_8=_3.parse(_8,_9);
+if(isNaN(_8)){
+return false;
+}
+_9=(typeof _9=="object")?_9:{};
+var _a=(typeof _9.max=="number")?_9.max:Infinity,_b=(typeof _9.min=="number")?_9.min:-Infinity,_c=(typeof _9.decimal=="string")?_9.decimal:".",_d=_5._isInRangeCache,_e=_8+"max"+_a+"min"+_b+"dec"+_c;
+if(typeof _d[_e]!="undefined"){
+return _d[_e];
+}
+_d[_e]=!(_8<_b||_8>_a);
+return _d[_e];
+};
+_5.isNumberFormat=function(_f,_10){
+var re=new RegExp("^"+_4.numberFormat(_10)+"$","i");
+return re.test(_f);
+};
+_5.isValidLuhn=function(_11){
+var sum=0,_12,_13;
+if(!_1.isString(_11)){
+_11=String(_11);
+}
+_11=_11.replace(/[- ]/g,"");
+_12=_11.length%2;
+for(var i=0;i<_11.length;i++){
+_13=parseInt(_11.charAt(i));
+if(i%2==_12){
+_13*=2;
+}
+if(_13>9){
+_13-=9;
+}
+sum+=_13;
+}
+return !(sum%10);
+};
+return _5;
+});

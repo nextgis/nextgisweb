@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/sr/SpellCheck",{widgetLabel:"Provera pravopisa paketa",unfound:"Nije prona\u0111eno",skip:"Presko\u010di",skipAll:"Presko\u010di sve",toDic:"Dodaj u re\u010dnik",suggestions:"Predlozi",replace:"Zameni",replaceWith:"Zameni sa",replaceAll:"Zameni sve",cancel:"Otka\u017ei",msg:"Nisu prona\u0111ene pravopisne gre\u0161ke",iSkip:"Presko\u010di ovo",iSkipAll:"Presko\u010di sve ovakvo",iMsg:"Nema predloga pravopisa"});
-//# sourceMappingURL=SpellCheck.js.map
+define("dojox/editor/plugins/nls/sr/SpellCheck",{widgetLabel:"Provera pravopisa paketa",unfound:"Nije pronađeno",skip:"Preskoči",skipAll:"Preskoči sve",toDic:"Dodaj u rečnik",suggestions:"Predlozi",replace:"Zameni",replaceWith:"Zameni sa",replaceAll:"Zameni sve",cancel:"Otkaži",msg:"Nisu pronađene pravopisne greške",iSkip:"Preskoči ovo",iSkipAll:"Preskoči sve ovakvo",iMsg:"Nema predloga pravopisa"});

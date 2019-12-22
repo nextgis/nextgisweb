@@ -1,6 +1,65 @@
 //>>built
-define("dijit/form/_ComboBoxMenu","dojo/_base/declare dojo/dom-class dojo/dom-style dojo/keys ../_WidgetBase ../_TemplatedMixin ./_ComboBoxMenuMixin ./_ListMouseMixin".split(" "),function(e,b,f,c,g,h,k,l){return e("dijit.form._ComboBoxMenu",[g,h,l,k],{templateString:"\x3cdiv class\x3d'dijitReset dijitMenu' data-dojo-attach-point\x3d'containerNode' style\x3d'overflow: auto; overflow-x: hidden;' role\x3d'listbox'\x3e\x3cdiv class\x3d'dijitMenuItem dijitMenuPreviousButton' data-dojo-attach-point\x3d'previousButton' role\x3d'option'\x3e\x3c/div\x3e\x3cdiv class\x3d'dijitMenuItem dijitMenuNextButton' data-dojo-attach-point\x3d'nextButton' role\x3d'option'\x3e\x3c/div\x3e\x3c/div\x3e",
-baseClass:"dijitComboBoxMenu",postCreate:function(){this.inherited(arguments);this.isLeftToRight()||(b.add(this.previousButton,"dijitMenuItemRtl"),b.add(this.nextButton,"dijitMenuItemRtl"));this.containerNode.setAttribute("role","listbox")},_createMenuItem:function(){var a=this.ownerDocument.createElement("div");a.className="dijitReset dijitMenuItem"+(this.isLeftToRight()?"":" dijitMenuItemRtl");a.setAttribute("role","option");return a},onHover:function(a){b.add(a,"dijitMenuItemHover")},onUnhover:function(a){b.remove(a,
-"dijitMenuItemHover")},onSelect:function(a){b.add(a,"dijitMenuItemSelected")},onDeselect:function(a){b.remove(a,"dijitMenuItemSelected")},_page:function(a){var b=0,c=this.domNode.scrollTop,e=f.get(this.domNode,"height");for(this.getHighlightedOption()||this.selectNextNode();b<e;){var d=this.getHighlightedOption();if(a){if(!d.previousSibling||"none"==d.previousSibling.style.display)break;this.selectPreviousNode()}else{if(!d.nextSibling||"none"==d.nextSibling.style.display)break;this.selectNextNode()}d=
-this.domNode.scrollTop;b+=(d-c)*(a?-1:1);c=d}},handleKey:function(a){switch(a.keyCode){case c.DOWN_ARROW:return this.selectNextNode(),!1;case c.PAGE_DOWN:return this._page(!1),!1;case c.UP_ARROW:return this.selectPreviousNode(),!1;case c.PAGE_UP:return this._page(!0),!1;default:return!0}}})});
-//# sourceMappingURL=_ComboBoxMenu.js.map
+define("dijit/form/_ComboBoxMenu",["dojo/_base/declare","dojo/dom-class","dojo/dom-style","dojo/keys","../_WidgetBase","../_TemplatedMixin","./_ComboBoxMenuMixin","./_ListMouseMixin"],function(_1,_2,_3,_4,_5,_6,_7,_8){
+return _1("dijit.form._ComboBoxMenu",[_5,_6,_8,_7],{templateString:"<div class='dijitReset dijitMenu' data-dojo-attach-point='containerNode' style='overflow: auto; overflow-x: hidden;' role='listbox'>"+"<div class='dijitMenuItem dijitMenuPreviousButton' data-dojo-attach-point='previousButton' role='option'></div>"+"<div class='dijitMenuItem dijitMenuNextButton' data-dojo-attach-point='nextButton' role='option'></div>"+"</div>",baseClass:"dijitComboBoxMenu",postCreate:function(){
+this.inherited(arguments);
+if(!this.isLeftToRight()){
+_2.add(this.previousButton,"dijitMenuItemRtl");
+_2.add(this.nextButton,"dijitMenuItemRtl");
+}
+this.containerNode.setAttribute("role","listbox");
+},_createMenuItem:function(){
+var _9=this.ownerDocument.createElement("div");
+_9.className="dijitReset dijitMenuItem"+(this.isLeftToRight()?"":" dijitMenuItemRtl");
+_9.setAttribute("role","option");
+return _9;
+},onHover:function(_a){
+_2.add(_a,"dijitMenuItemHover");
+},onUnhover:function(_b){
+_2.remove(_b,"dijitMenuItemHover");
+},onSelect:function(_c){
+_2.add(_c,"dijitMenuItemSelected");
+},onDeselect:function(_d){
+_2.remove(_d,"dijitMenuItemSelected");
+},_page:function(up){
+var _e=0;
+var _f=this.domNode.scrollTop;
+var _10=_3.get(this.domNode,"height");
+if(!this.getHighlightedOption()){
+this.selectNextNode();
+}
+while(_e<_10){
+var _11=this.getHighlightedOption();
+if(up){
+if(!_11.previousSibling||_11.previousSibling.style.display=="none"){
+break;
+}
+this.selectPreviousNode();
+}else{
+if(!_11.nextSibling||_11.nextSibling.style.display=="none"){
+break;
+}
+this.selectNextNode();
+}
+var _12=this.domNode.scrollTop;
+_e+=(_12-_f)*(up?-1:1);
+_f=_12;
+}
+},handleKey:function(evt){
+switch(evt.keyCode){
+case _4.DOWN_ARROW:
+this.selectNextNode();
+return false;
+case _4.PAGE_DOWN:
+this._page(false);
+return false;
+case _4.UP_ARROW:
+this.selectPreviousNode();
+return false;
+case _4.PAGE_UP:
+this._page(true);
+return false;
+default:
+return true;
+}
+}});
+});

@@ -5,7 +5,68 @@
 */
 
 //>>built
-define("dojo/io/iframe","../_base/config ../_base/json ../_base/kernel ../_base/lang ../_base/xhr ../sniff ../_base/window ../dom ../dom-construct ../query require ../aspect ../request/iframe".split(" "),function(m,n,h,g,l,b,p,q,u,v,w,r,e){h.deprecated("dojo/io/iframe","Use dojo/request/iframe.","2.0");b=e._iframeName;b=b.substring(0,b.lastIndexOf("_"));var f=g.delegate(e,{create:function(){return f._frame=e.create.apply(e,arguments)},get:null,post:null,send:function(a){var d,c=l._ioSetArgs(a,function(a){d&&
-d.cancel()},function(a){var b=null;a=a.ioArgs;try{var c=a.handleAs;"xml"===c||"html"===c?b=d.response.data:(b=d.response.text,"json"===c?b=n.fromJson(b):"javascript"===c&&(b=h.eval(b)))}catch(t){b=t}return b},function(a,b){b.ioArgs._hasError=!0;return a}),b=c.ioArgs,f="GET",k=q.byId(a.form);a.method&&"POST"===a.method.toUpperCase()&&k&&(f="POST");a={method:f,handleAs:"json"===a.handleAs||"javascript"===a.handleAs?"text":a.handleAs,form:a.form,query:k?null:a.content,data:k?a.content:null,timeout:a.timeout,
-ioArgs:b};a.method&&(a.method=a.method.toUpperCase());if(m.ioPublish&&h.publish&&!1!==b.args.ioPublish)var g=r.after(e,"_notifyStart",function(a){a.options.ioArgs===b&&(g.remove(),l._ioNotifyStart(c))},!0);d=e(b.url,a,!0);b._callNext=d._callNext;d.then(function(){c.resolve(c)}).otherwise(function(a){c.ioArgs.error=a;c.reject(a)});return c},_iframeOnload:p.global[b+"_onload"]});g.setObject("dojo.io.iframe",f);return f});
-//# sourceMappingURL=iframe.js.map
+define("dojo/io/iframe",["../_base/config","../_base/json","../_base/kernel","../_base/lang","../_base/xhr","../sniff","../_base/window","../dom","../dom-construct","../query","require","../aspect","../request/iframe"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d){
+_3.deprecated("dojo/io/iframe","Use dojo/request/iframe.","2.0");
+var _e=_d._iframeName;
+_e=_e.substring(0,_e.lastIndexOf("_"));
+var _f=_4.delegate(_d,{create:function(){
+return _f._frame=_d.create.apply(_d,arguments);
+},get:null,post:null,send:function(_10){
+var _11;
+var dfd=_5._ioSetArgs(_10,function(dfd){
+_11&&_11.cancel();
+},function(dfd){
+var _12=null,_13=dfd.ioArgs;
+try{
+var _14=_13.handleAs;
+if(_14==="xml"||_14==="html"){
+_12=_11.response.data;
+}else{
+_12=_11.response.text;
+if(_14==="json"){
+_12=_2.fromJson(_12);
+}else{
+if(_14==="javascript"){
+_12=_3.eval(_12);
+}
+}
+}
+}
+catch(e){
+_12=e;
+}
+return _12;
+},function(_15,dfd){
+dfd.ioArgs._hasError=true;
+return _15;
+});
+var _16=dfd.ioArgs;
+var _17="GET",_18=_8.byId(_10.form);
+if(_10.method&&_10.method.toUpperCase()==="POST"&&_18){
+_17="POST";
+}
+var _19={method:_17,handleAs:_10.handleAs==="json"||_10.handleAs==="javascript"?"text":_10.handleAs,form:_10.form,query:_18?null:_10.content,data:_18?_10.content:null,timeout:_10.timeout,ioArgs:_16};
+if(_19.method){
+_19.method=_19.method.toUpperCase();
+}
+if(_1.ioPublish&&_3.publish&&_16.args.ioPublish!==false){
+var _1a=_c.after(_d,"_notifyStart",function(_1b){
+if(_1b.options.ioArgs===_16){
+_1a.remove();
+_5._ioNotifyStart(dfd);
+}
+},true);
+}
+_11=_d(_16.url,_19,true);
+_16._callNext=_11._callNext;
+_11.then(function(){
+dfd.resolve(dfd);
+}).otherwise(function(_1c){
+dfd.ioArgs.error=_1c;
+dfd.reject(_1c);
+});
+return dfd;
+},_iframeOnload:_7.global[_e+"_onload"]});
+_4.setObject("dojo.io.iframe",_f);
+return _f;
+});

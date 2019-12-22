@@ -1,6 +1,58 @@
 //>>built
-define("dojox/dgauges/TextIndicator","dojo/_base/lang dojo/_base/declare dojo/_base/sniff dojo/_base/array dojo/on dojox/gfx ./IndicatorBase".split(" "),function(c,d,e,f,l,g,h){return d("dojox.dgauges.TextIndicator",h,{font:null,x:0,y:0,align:"middle",color:"black",indicator:null,labelFunc:null,constructor:function(){this.addInvalidatingProperties(["indicator"]);f.forEach("x y font align color labelFunc".split(" "),c.hitch(this,function(a){this.watch(a,this._resetText)}));this.watch("indicator",c.hitch(this,
-this._indicatorChanged))},postscript:function(a){this.inherited(arguments);a&&a.indicator&&this._indicatorChanged("indicator",null,a.indicator)},_resetText:function(){this._textCreated=!1;this.invalidateRendering()},_valueWatcher:null,_indicatorChanged:function(a,b,k){this._valueWatcher&&this._valueWatcher.unwatch();this._valueWatcher=k.watch("value",c.hitch(this,this.refreshRendering))},_getFont:function(){var a=this.font;!a&&this._gauge&&(a=this._gauge.font);a||(a=g.defaultFont);return a},_textCreated:!1,
-_textInstance:null,_createText:function(a,b,c,d,e,f,g){return a.createText({x:e,y:f,text:d,align:g}).setFont(b).setFill(c)},refreshRendering:function(){if(null!=this._gfxGroup){var a;a=this.indicator?this.indicator.value:this.value;this.labelFunc&&(a=this.labelFunc(a));var b=e("iphone");if(!this._textCreated||void 0!=b&&5>b)this._gfxGroup.clear(),b=this._getFont(),this._textInstance=this._createText(this._gfxGroup,b,b.color?b.color:this.color,"",this.x,this.y,this.align),this._textCreated=!0;this._textInstance.setShape({text:a});
-return this._textInstance}}})});
-//# sourceMappingURL=TextIndicator.js.map
+define("dojox/dgauges/TextIndicator",["dojo/_base/lang","dojo/_base/declare","dojo/_base/sniff","dojo/_base/array","dojo/on","dojox/gfx","./IndicatorBase"],function(_1,_2,_3,_4,on,_5,_6){
+return _2("dojox.dgauges.TextIndicator",_6,{font:null,x:0,y:0,align:"middle",color:"black",indicator:null,labelFunc:null,constructor:function(){
+this.addInvalidatingProperties(["indicator"]);
+var _7=["x","y","font","align","color","labelFunc"];
+_4.forEach(_7,_1.hitch(this,function(_8){
+this.watch(_8,this._resetText);
+}));
+this.watch("indicator",_1.hitch(this,this._indicatorChanged));
+},postscript:function(_9){
+this.inherited(arguments);
+if(_9&&_9.indicator){
+this._indicatorChanged("indicator",null,_9.indicator);
+}
+},_resetText:function(){
+this._textCreated=false;
+this.invalidateRendering();
+},_valueWatcher:null,_indicatorChanged:function(_a,_b,_c){
+if(this._valueWatcher){
+this._valueWatcher.unwatch();
+}
+this._valueWatcher=_c.watch("value",_1.hitch(this,this.refreshRendering));
+},_getFont:function(){
+var _d=this.font;
+if(!_d&&this._gauge){
+_d=this._gauge.font;
+}
+if(!_d){
+_d=_5.defaultFont;
+}
+return _d;
+},_textCreated:false,_textInstance:null,_createText:function(_e,_f,_10,_11,x,y,_12){
+var _13=_e.createText({x:x,y:y,text:_11,align:_12}).setFont(_f).setFill(_10);
+return _13;
+},refreshRendering:function(){
+if(this._gfxGroup==null){
+return;
+}
+var _14;
+if(this.indicator){
+_14=this.indicator.value;
+}else{
+_14=this.value;
+}
+if(this.labelFunc){
+_14=this.labelFunc(_14);
+}
+var _15=_3("iphone");
+if(!this._textCreated||(_15!=undefined&&_15<5)){
+this._gfxGroup.clear();
+var _16=this._getFont();
+this._textInstance=this._createText(this._gfxGroup,_16,_16.color?_16.color:this.color,"",this.x,this.y,this.align);
+this._textCreated=true;
+}
+this._textInstance.setShape({text:_14});
+return this._textInstance;
+}});
+});

@@ -5,8 +5,159 @@
 */
 
 //>>built
-define("dojo/request/util","exports ../errors/RequestError ../errors/CancelError ../Deferred ../io-query ../_base/array ../_base/lang ../promise/Promise ../has".split(" "),function(f,q,m,r,n,t,h,u,v){function w(b){return p(b)}function x(b){return void 0!==b.data?b.data:b.text}f.deepCopy=function(b,c){for(var e in c){var d=b[e],a=c[e];d!==a&&(d&&"object"===typeof d&&a&&"object"===typeof a?f.deepCopy(d,a):b[e]=a)}return b};f.deepCreate=function(b,c){c=c||{};var e=h.delegate(b),d,a;for(d in b)(a=b[d])&&
-"object"===typeof a&&(e[d]=f.deepCreate(a,c[d]));return f.deepCopy(e,c)};var p=Object.freeze||function(b){return b};f.deferred=function(b,c,e,d,a,k){var g=new r(function(a){c&&c(g,b);return a&&(a instanceof q||a instanceof m)?a:new m("Request canceled",b)});g.response=b;g.isValid=e;g.isReady=d;g.handleResponse=a;e=g.then(w).otherwise(function(a){a.response=b;throw a;});f.notify&&e.then(h.hitch(f.notify,"emit","load"),h.hitch(f.notify,"emit","error"));d=e.then(x);a=new u;for(var l in d)d.hasOwnProperty(l)&&
-(a[l]=d[l]);a.response=e;p(a);k&&g.then(function(a){k.call(g,a)},function(a){k.call(g,b,a)});g.promise=a;g.then=a.then;return g};f.addCommonMethods=function(b,c){t.forEach(c||["GET","POST","PUT","DELETE"],function(c){b[("DELETE"===c?"DEL":c).toLowerCase()]=function(d,a){a=h.delegate(a||{});a.method=c;return b(d,a)}})};f.parseArgs=function(b,c,e){var d=c.data,a=c.query;!d||e||"object"!==typeof d||v("native-xhr2")&&(d instanceof ArrayBuffer||d instanceof Blob)||(c.data=n.objectToQuery(d));a?("object"===
-typeof a&&(a=n.objectToQuery(a)),c.preventCache&&(a+=(a?"\x26":"")+"request.preventCache\x3d"+ +new Date)):c.preventCache&&(a="request.preventCache\x3d"+ +new Date);b&&a&&(b+=(~b.indexOf("?")?"\x26":"?")+a);return{url:b,options:c,getHeader:function(a){return null}}};f.checkStatus=function(b){b=b||0;return 200<=b&&300>b||304===b||1223===b||!b}});
-//# sourceMappingURL=util.js.map
+define("dojo/request/util",["exports","../errors/RequestError","../errors/CancelError","../Deferred","../io-query","../_base/array","../_base/lang","../promise/Promise","../has"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9){
+function _a(_b){
+return _9("native-arraybuffer")&&_b instanceof ArrayBuffer;
+};
+function _c(_d){
+return _9("native-blob")&&_d instanceof Blob;
+};
+function _e(_f){
+if(typeof Element!=="undefined"){
+return _f instanceof Element;
+}
+return _f.nodeType===1;
+};
+function _10(_11){
+return _9("native-formdata")&&_11 instanceof FormData;
+};
+function _12(_13){
+return _13&&typeof _13==="object"&&!_10(_13)&&!_e(_13)&&!_c(_13)&&!_a(_13);
+};
+_1.deepCopy=function(_14,_15){
+for(var _16 in _15){
+var _17=_14[_16],_18=_15[_16];
+if(_17!==_18){
+if(_12(_18)){
+if(Object.prototype.toString.call(_18)==="[object Date]"){
+_14[_16]=new Date(_18);
+}else{
+if(_7.isArray(_18)){
+_14[_16]=_1.deepCopyArray(_18);
+}else{
+if(_17&&typeof _17==="object"){
+_1.deepCopy(_17,_18);
+}else{
+_14[_16]=_1.deepCopy({},_18);
+}
+}
+}
+}else{
+_14[_16]=_18;
+}
+}
+}
+return _14;
+};
+_1.deepCopyArray=function(_19){
+var _1a=[];
+for(var i=0,l=_19.length;i<l;i++){
+var _1b=_19[i];
+if(typeof _1b==="object"){
+_1a.push(_1.deepCopy({},_1b));
+}else{
+_1a.push(_1b);
+}
+}
+return _1a;
+};
+_1.deepCreate=function deepCreate(_1c,_1d){
+_1d=_1d||{};
+var _1e=_7.delegate(_1c),_1f,_20;
+for(_1f in _1c){
+_20=_1c[_1f];
+if(_20&&typeof _20==="object"){
+_1e[_1f]=_1.deepCreate(_20,_1d[_1f]);
+}
+}
+return _1.deepCopy(_1e,_1d);
+};
+var _21=Object.freeze||function(obj){
+return obj;
+};
+function _22(_23){
+return _21(_23);
+};
+function _24(_25){
+return _25.data!==undefined?_25.data:_25.text;
+};
+_1.deferred=function deferred(_26,_27,_28,_29,_2a,_2b){
+var def=new _4(function(_2c){
+_27&&_27(def,_26);
+if(!_2c||!(_2c instanceof _2)&&!(_2c instanceof _3)){
+return new _3("Request canceled",_26);
+}
+return _2c;
+});
+def.response=_26;
+def.isValid=_28;
+def.isReady=_29;
+def.handleResponse=_2a;
+function _2d(_2e){
+_2e.response=_26;
+throw _2e;
+};
+var _2f=def.then(_22).otherwise(_2d);
+if(_1.notify){
+_2f.then(_7.hitch(_1.notify,"emit","load"),_7.hitch(_1.notify,"emit","error"));
+}
+var _30=_2f.then(_24);
+var _31=new _8();
+for(var _32 in _30){
+if(_30.hasOwnProperty(_32)){
+_31[_32]=_30[_32];
+}
+}
+_31.response=_2f;
+_21(_31);
+if(_2b){
+def.then(function(_33){
+_2b.call(def,_33);
+},function(_34){
+_2b.call(def,_26,_34);
+});
+}
+def.promise=_31;
+def.then=_31.then;
+return def;
+};
+_1.addCommonMethods=function addCommonMethods(_35,_36){
+_6.forEach(_36||["GET","POST","PUT","DELETE"],function(_37){
+_35[(_37==="DELETE"?"DEL":_37).toLowerCase()]=function(url,_38){
+_38=_7.delegate(_38||{});
+_38.method=_37;
+return _35(url,_38);
+};
+});
+};
+_1.parseArgs=function parseArgs(url,_39,_3a){
+var _3b=_39.data,_3c=_39.query;
+if(_3b&&!_3a){
+if(typeof _3b==="object"&&(!(_9("native-xhr2"))||!(_a(_3b)||_c(_3b)))){
+_39.data=_5.objectToQuery(_3b);
+}
+}
+if(_3c){
+if(typeof _3c==="object"){
+_3c=_5.objectToQuery(_3c);
+}
+if(_39.preventCache){
+_3c+=(_3c?"&":"")+"request.preventCache="+(+(new Date));
+}
+}else{
+if(_39.preventCache){
+_3c="request.preventCache="+(+(new Date));
+}
+}
+if(url&&_3c){
+url+=(~url.indexOf("?")?"&":"?")+_3c;
+}
+return {url:url,options:_39,getHeader:function(_3d){
+return null;
+}};
+};
+_1.checkStatus=function(_3e){
+_3e=_3e||0;
+return (_3e>=200&&_3e<300)||_3e===304||_3e===1223||!_3e;
+};
+});

@@ -1,4 +1,23 @@
 //>>built
-define("dojox/mobile/SpinWheel",["dojo/_base/declare","dojo/_base/array","dojo/dom-construct","./_PickerBase","./SpinWheelSlot"],function(b,c,d,e){return b("dojox.mobile.SpinWheel",e,{baseClass:"mblSpinWheel",buildRendering:function(){this.inherited(arguments);d.create("div",{className:"mblSpinWheelBar"},this.domNode)},startup:function(){this._started||(this.centerPos=Math.round(this.domNode.offsetHeight/2),this.inherited(arguments))},resize:function(){this.centerPos=Math.round(this.domNode.offsetHeight/
-2);c.forEach(this.getChildren(),function(a){a.resize&&a.resize()})},addChild:function(a,b){this.inherited(arguments);this._started&&a.setInitialValue()}})});
-//# sourceMappingURL=SpinWheel.js.map
+define("dojox/mobile/SpinWheel",["dojo/_base/declare","dojo/_base/array","dojo/dom-construct","./_PickerBase","./SpinWheelSlot"],function(_1,_2,_3,_4){
+return _1("dojox.mobile.SpinWheel",_4,{baseClass:"mblSpinWheel",buildRendering:function(){
+this.inherited(arguments);
+_3.create("div",{className:"mblSpinWheelBar"},this.domNode);
+},startup:function(){
+if(this._started){
+return;
+}
+this.centerPos=Math.round(this.domNode.offsetHeight/2);
+this.inherited(arguments);
+},resize:function(){
+this.centerPos=Math.round(this.domNode.offsetHeight/2);
+_2.forEach(this.getChildren(),function(_5){
+_5.resize&&_5.resize();
+});
+},addChild:function(_6,_7){
+this.inherited(arguments);
+if(this._started){
+_6.setInitialValue();
+}
+}});
+});

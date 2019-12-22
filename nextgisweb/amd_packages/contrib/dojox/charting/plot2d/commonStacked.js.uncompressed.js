@@ -152,42 +152,6 @@ define("dojox/charting/plot2d/commonStacked", [
 
 			return values;
 		},
-
-		getIndexValue: function(series, i, index, isNullValue){
-			var value = 0, v, j;
-			for(j = 0; j <= i; ++j){
-				v = series[j].data[index];
-				if(!isNullValue(v)){
-					if(isNaN(v)){ v = v.y || 0; }
-					value += v;
-				}
-			}
-			return value;
-		},
-
-		getValue: function(series, i, x, isNullValue){
-			var value = null, j, z;
-			for(j = 0; j <= i; ++j){
-				for(z = 0; z < series[j].data.length; z++){
-					v = series[j].data[z];
-					if(!isNullValue(v)){
-						if(v.x == x){
-							if(!value){
-								value = {x: x};
-							}
-							if(v.y != null){
-								if(value.y == null){
-									value.y = 0;
-								}
-								value.y += v.y;
-							}
-							break;
-						}else if(v.x > x){break;}
-					}
-				}
-			}
-			return value;
-		},
 		
 		getIndexValue: function(series, i, index, isNullValue){
 			var value = 0, v, j, pvalue;

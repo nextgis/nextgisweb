@@ -1,8 +1,74 @@
 //>>built
-define("dojox/mvc/Generate","dojo/_base/array dojo/_base/lang dojo/_base/declare ./_Container ./at ./Group dijit/form/TextBox".split(" "),function(h,e,k,l,m){return k("dojox.mvc.Generate",[l],{_counter:0,_defaultWidgetMapping:{String:"dijit/form/TextBox"},_defaultClassMapping:{Label:"generate-label-cell",String:"generate-dijit-cell",Heading:"generate-heading",Row:"row"},_defaultIdNameMapping:{String:"textbox_t"},children:null,_relTargetProp:"children",startup:function(){this.inherited(arguments);
-this._setChildrenAttr(this.children)},_setChildrenAttr:function(a){var c=this.children;this._set("children",a);this.binding!=a&&this.set("ref",a);!this._started||this._builtOnce&&c==a||(this._builtOnce=!0,this._buildContained(a))},_buildContained:function(a){a&&(this._destroyBody(),this._counter=0,this.srcNodeRef.innerHTML=this._generateBody(a),this._createBody())},_generateBody:function(a,c){function b(a,b){if(f?a&&e.isFunction(a.toPlainObject):!e.isFunction(a))e.isArray(a)?d.push(this._generateRepeat(a,
-b)):(f?!a.value:null!=a&&"[object Object]"=={}.toString.call(a)||(a||{}).set&&(a||{}).watch)?d.push(this._generateGroup(a,b,c)):d.push(this._generateTextBox(b,f))}if(void 0===a)return"";var d=[],f=e.isFunction(a.toPlainObject);if(e.isArray(a))h.forEach(a,b,this);else for(var g in a)a.hasOwnProperty(g)&&b.call(this,a[g],g);return d.join("")},_generateRepeat:function(a,c){var b=this.classMapping&&this.classMapping.Heading?this.classMapping.Heading:this._defaultClassMapping.Heading;return"\x3cdiv data-dojo-type\x3d\"dojox/mvc/Group\" data-dojo-props\x3d\"target: at('rel:', '"+
-c+'\')" + id\x3d"'+this.id+"_r"+this._counter++ +'"\x3e\x3cdiv class\x3d"'+b+'"\x3e'+c+"\x3c/div\x3e"+this._generateBody(a,!0)+"\x3c/div\x3e"},_generateGroup:function(a,c,b){var d=["\x3cdiv data-dojo-type\x3d\"dojox/mvc/Group\" data-dojo-props\x3d\"target: at('rel:', '"+c+'\')" + id\x3d"'+this.id+"_g"+this._counter++ +'"\x3e'];b||d.push('\x3cdiv class\x3d"'+(this.classMapping&&this.classMapping.Heading?this.classMapping.Heading:this._defaultClassMapping.Heading)+'"\x3e'+c+"\x3c/div\x3e");d.push(this._generateBody(a)+
-"\x3c/div\x3e");return d.join("")},_generateTextBox:function(a,c){var b=this.idNameMapping?this.idNameMapping.String:this._defaultIdNameMapping.String,b=b+this._counter++;return'\x3cdiv class\x3d"'+(this.classMapping&&this.classMapping.Row?this.classMapping.Row:this._defaultClassMapping.Row)+'"\x3e\x3clabel class\x3d"'+(this.classMapping&&this.classMapping.Label?this.classMapping.Label:this._defaultClassMapping.Label)+'"\x3e'+a+':\x3c/label\x3e\x3cinput class\x3d"'+(this.classMapping&&this.classMapping.String?
-this.classMapping.String:this._defaultClassMapping.String)+'" data-dojo-type\x3d"'+(this.widgetMapping?this.widgetMapping.String:this._defaultWidgetMapping.String)+'" data-dojo-props\x3d"name: \''+b+"', "+("value: at('rel:"+(c&&a||"")+"', '"+(c?"value":a)+"')")+'" id\x3d"'+b+'"\x3e\x3c/input\x3e\x3c/div\x3e'}})});
-//# sourceMappingURL=Generate.js.map
+define("dojox/mvc/Generate",["dojo/_base/array","dojo/_base/lang","dojo/_base/declare","./_Container","./at","./Group","dijit/form/TextBox"],function(_1,_2,_3,_4,at){
+return _3("dojox.mvc.Generate",[_4],{_counter:0,_defaultWidgetMapping:{"String":"dijit/form/TextBox"},_defaultClassMapping:{"Label":"generate-label-cell","String":"generate-dijit-cell","Heading":"generate-heading","Row":"row"},_defaultIdNameMapping:{"String":"textbox_t"},children:null,_relTargetProp:"children",startup:function(){
+this.inherited(arguments);
+this._setChildrenAttr(this.children);
+},_setChildrenAttr:function(_5){
+var _6=this.children;
+this._set("children",_5);
+if(this.binding!=_5){
+this.set("ref",_5);
+}
+if(this._started&&(!this._builtOnce||_6!=_5)){
+this._builtOnce=true;
+this._buildContained(_5);
+}
+},_buildContained:function(_7){
+if(!_7){
+return;
+}
+this._destroyBody();
+this._counter=0;
+this.srcNodeRef.innerHTML=this._generateBody(_7);
+this._createBody();
+},_generateBody:function(_8,_9){
+if(_8===void 0){
+return "";
+}
+var _a=[];
+var _b=_2.isFunction(_8.toPlainObject);
+function _c(_d,_e){
+if(_b?(_d&&_2.isFunction(_d.toPlainObject)):!_2.isFunction(_d)){
+if(_2.isArray(_d)){
+_a.push(this._generateRepeat(_d,_e));
+}else{
+if(_b?_d.value:((_d==null||{}.toString.call(_d)!="[object Object]")&&(!(_d||{}).set||!(_d||{}).watch))){
+_a.push(this._generateTextBox(_e,_b));
+}else{
+_a.push(this._generateGroup(_d,_e,_9));
+}
+}
+}
+};
+if(_2.isArray(_8)){
+_1.forEach(_8,_c,this);
+}else{
+for(var s in _8){
+if(_8.hasOwnProperty(s)){
+_c.call(this,_8[s],s);
+}
+}
+}
+return _a.join("");
+},_generateRepeat:function(_f,_10){
+var _11=(this.classMapping&&this.classMapping["Heading"])?this.classMapping["Heading"]:this._defaultClassMapping["Heading"];
+return "<div data-dojo-type=\"dojox/mvc/Group\" data-dojo-props=\"target: at('rel:', '"+_10+"')\" + id=\""+this.id+"_r"+this._counter++ +"\">"+"<div class=\""+_11+"\">"+_10+"</div>"+this._generateBody(_f,true)+"</div>";
+},_generateGroup:function(_12,_13,_14){
+var _15=["<div data-dojo-type=\"dojox/mvc/Group\" data-dojo-props=\"target: at('rel:', '"+_13+"')\" + id=\""+this.id+"_g"+this._counter++ +"\">"];
+if(!_14){
+var _16=(this.classMapping&&this.classMapping["Heading"])?this.classMapping["Heading"]:this._defaultClassMapping["Heading"];
+_15.push("<div class=\""+_16+"\">"+_13+"</div>");
+}
+_15.push(this._generateBody(_12)+"</div>");
+return _15.join("");
+},_generateTextBox:function(_17,_18){
+var _19=this.idNameMapping?this.idNameMapping["String"]:this._defaultIdNameMapping["String"];
+_19=_19+this._counter++;
+var _1a=this.widgetMapping?this.widgetMapping["String"]:this._defaultWidgetMapping["String"];
+var _1b=(this.classMapping&&this.classMapping["Label"])?this.classMapping["Label"]:this._defaultClassMapping["Label"];
+var _1c=(this.classMapping&&this.classMapping["String"])?this.classMapping["String"]:this._defaultClassMapping["String"];
+var _1d=(this.classMapping&&this.classMapping["Row"])?this.classMapping["Row"]:this._defaultClassMapping["Row"];
+var _1e="value: at('rel:"+(_18&&_17||"")+"', '"+(_18?"value":_17)+"')";
+return "<div class=\""+_1d+"\">"+"<label class=\""+_1b+"\">"+_17+":</label>"+"<input class=\""+_1c+"\" data-dojo-type=\""+_1a+"\""+" data-dojo-props=\"name: '"+_19+"', "+_1e+"\" id=\""+_19+"\"></input>"+"</div>";
+}});
+});

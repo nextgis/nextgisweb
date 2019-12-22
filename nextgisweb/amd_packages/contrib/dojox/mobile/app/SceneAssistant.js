@@ -1,4 +1,24 @@
 //>>built
-define("dojox/mobile/app/SceneAssistant",["dojo","dijit","dojox"],function(a,b,e){a.provide("dojox.mobile.app.SceneAssistant");a.experimental("dojox.mobile.app.SceneAssistant");a.declare("dojox.mobile.app.SceneAssistant",null,{constructor:function(){},setup:function(){},activate:function(a){},deactivate:function(){},destroy:function(){var c=a.query("\x3e [widgetId]",this.containerNode).map(b.byNode);a.forEach(c,function(a){a.destroyRecursive()});this.disconnect()},connect:function(c,b,d){this._connects||
-(this._connects=[]);this._connects.push(a.connect(c,b,d))},disconnect:function(){a.forEach(this._connects,a.disconnect);this._connects=[]}})});
-//# sourceMappingURL=SceneAssistant.js.map
+define("dojox/mobile/app/SceneAssistant",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.mobile.app.SceneAssistant");
+_1.experimental("dojox.mobile.app.SceneAssistant");
+_1.declare("dojox.mobile.app.SceneAssistant",null,{constructor:function(){
+},setup:function(){
+},activate:function(_4){
+},deactivate:function(){
+},destroy:function(){
+var _5=_1.query("> [widgetId]",this.containerNode).map(_2.byNode);
+_1.forEach(_5,function(_6){
+_6.destroyRecursive();
+});
+this.disconnect();
+},connect:function(_7,_8,_9){
+if(!this._connects){
+this._connects=[];
+}
+this._connects.push(_1.connect(_7,_8,_9));
+},disconnect:function(){
+_1.forEach(this._connects,_1.disconnect);
+this._connects=[];
+}});
+});

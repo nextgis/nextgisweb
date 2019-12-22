@@ -1,7 +1,79 @@
 //>>built
-define("dojox/mobile/Overlay","dojo/_base/declare dojo/_base/lang dojo/sniff dojo/_base/window dojo/dom-class dojo/dom-geometry dojo/dom-style dojo/window dijit/_WidgetBase dojo/_base/array dijit/registry dojo/touch ./viewRegistry ./_css3".split(" "),function(m,n,f,g,c,h,k,p,q,r,t,u,v,l){return m("dojox.mobile.Overlay",q,{baseClass:"mblOverlay mblOverlayHidden",buildRendering:function(){this.inherited(arguments);this.containerNode||(this.containerNode=this.domNode)},_reposition:function(){var a=h.position(this.domNode),
-b=p.getBox(),c=v.getEnclosingScrollable(this.domNode);c&&(b.t-=c.getPos().y);if(a.y+a.h!=b.h||"absolute"!=k.get(this.domNode,"position")&&3>f("android"))a.y=b.t+b.h-a.h,k.set(this.domNode,{position:"absolute",top:a.y+"px",bottom:"auto"});return a},show:function(a){r.forEach(t.findWidgets(this.domNode),function(a){a&&"auto"==a.height&&"function"==typeof a.resize&&a.resize()});var b=this._reposition();a&&(a=h.position(a),b.y<a.y&&(g.global.scrollBy(0,a.y+a.h-b.y),this._reposition()));var d=this.domNode;
-c.replace(d,["mblCoverv","mblIn"],["mblOverlayHidden","mblRevealv","mblOut","mblReverse","mblTransition"]);this.defer(function(){var a=this.connect(d,l.name("transitionEnd"),function(){this.disconnect(a);c.remove(d,["mblCoverv","mblIn","mblTransition"]);this._reposition()});c.add(d,"mblTransition")},100);var e=!1;this._moveHandle=this.connect(g.doc.documentElement,u.move,function(){e=!0});this._repositionTimer=setInterval(n.hitch(this,function(){e?e=!1:this._reposition()}),50);return b},hide:function(){var a=
-this.domNode;this._moveHandle&&(this.disconnect(this._moveHandle),this._moveHandle=null,clearInterval(this._repositionTimer),this._repositionTimer=null);f("css3-animations")?(c.replace(a,["mblRevealv","mblOut","mblReverse"],["mblCoverv","mblIn","mblOverlayHidden","mblTransition"]),this.defer(function(){var b=this.connect(a,l.name("transitionEnd"),function(){this.disconnect(b);c.replace(a,["mblOverlayHidden"],["mblRevealv","mblOut","mblReverse","mblTransition"])});c.add(a,"mblTransition")},100)):c.replace(a,
-["mblOverlayHidden"],["mblCoverv","mblIn","mblRevealv","mblOut","mblReverse"])},onBlur:function(a){return!1}})});
-//# sourceMappingURL=Overlay.js.map
+define("dojox/mobile/Overlay",["dojo/_base/declare","dojo/_base/lang","dojo/sniff","dojo/_base/window","dojo/dom-class","dojo/dom-geometry","dojo/dom-style","dojo/window","dijit/_WidgetBase","dojo/_base/array","dijit/registry","dojo/touch","./viewRegistry","./_css3"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e){
+return _1("dojox.mobile.Overlay",_9,{baseClass:"mblOverlay mblOverlayHidden",buildRendering:function(){
+this.inherited(arguments);
+if(!this.containerNode){
+this.containerNode=this.domNode;
+}
+},_reposition:function(){
+var _f=_6.position(this.domNode);
+var vp=_8.getBox();
+var _10=_d.getEnclosingScrollable(this.domNode);
+if(_10){
+vp.t-=_10.getPos().y;
+}
+if((_f.y+_f.h)!=vp.h||(_7.get(this.domNode,"position")!="absolute"&&_3("android")<3)){
+_f.y=vp.t+vp.h-_f.h;
+_7.set(this.domNode,{position:"absolute",top:_f.y+"px",bottom:"auto"});
+}
+return _f;
+},show:function(_11){
+_a.forEach(_b.findWidgets(this.domNode),function(w){
+if(w&&w.height=="auto"&&typeof w.resize=="function"){
+w.resize();
+}
+});
+var _12=this._reposition();
+if(_11){
+var _13=_6.position(_11);
+if(_12.y<_13.y){
+_4.global.scrollBy(0,_13.y+_13.h-_12.y);
+this._reposition();
+}
+}
+var _14=this.domNode;
+_5.replace(_14,["mblCoverv","mblIn"],["mblOverlayHidden","mblRevealv","mblOut","mblReverse","mblTransition"]);
+this.defer(function(){
+var _15=this.connect(_14,_e.name("transitionEnd"),function(){
+this.disconnect(_15);
+_5.remove(_14,["mblCoverv","mblIn","mblTransition"]);
+this._reposition();
+});
+_5.add(_14,"mblTransition");
+},100);
+var _16=false;
+this._moveHandle=this.connect(_4.doc.documentElement,_c.move,function(){
+_16=true;
+});
+this._repositionTimer=setInterval(_2.hitch(this,function(){
+if(_16){
+_16=false;
+return;
+}
+this._reposition();
+}),50);
+return _12;
+},hide:function(){
+var _17=this.domNode;
+if(this._moveHandle){
+this.disconnect(this._moveHandle);
+this._moveHandle=null;
+clearInterval(this._repositionTimer);
+this._repositionTimer=null;
+}
+if(_3("css3-animations")){
+_5.replace(_17,["mblRevealv","mblOut","mblReverse"],["mblCoverv","mblIn","mblOverlayHidden","mblTransition"]);
+this.defer(function(){
+var _18=this.connect(_17,_e.name("transitionEnd"),function(){
+this.disconnect(_18);
+_5.replace(_17,["mblOverlayHidden"],["mblRevealv","mblOut","mblReverse","mblTransition"]);
+});
+_5.add(_17,"mblTransition");
+},100);
+}else{
+_5.replace(_17,["mblOverlayHidden"],["mblCoverv","mblIn","mblRevealv","mblOut","mblReverse"]);
+}
+},onBlur:function(e){
+return false;
+}});
+});

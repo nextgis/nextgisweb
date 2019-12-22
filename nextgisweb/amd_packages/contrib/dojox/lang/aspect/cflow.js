@@ -1,3 +1,36 @@
 //>>built
-define("dojox/lang/aspect/cflow",["dojo","dijit","dojox"],function(k,m,l){k.provide("dojox.lang.aspect.cflow");(function(){var f=l.lang.aspect;f.cflow=function(g,a){1<arguments.length&&!(a instanceof Array)&&(a=[a]);for(var h=f.getContextStack(),c=h.length-1;0<=c;--c){var b=h[c];if(!g||b.instance==g){if(!a)return!0;for(var b=b.joinPoint.targetName,d=a.length-1;0<=d;--d){var e=a[d];if(e instanceof RegExp){if(e.test(b))return!0}else if(b==e)return!0}}}return!1}})()});
-//# sourceMappingURL=cflow.js.map
+define("dojox/lang/aspect/cflow",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.aspect.cflow");
+(function(){
+var _4=_3.lang.aspect;
+_4.cflow=function(_5,_6){
+if(arguments.length>1&&!(_6 instanceof Array)){
+_6=[_6];
+}
+var _7=_4.getContextStack();
+for(var i=_7.length-1;i>=0;--i){
+var c=_7[i];
+if(_5&&c.instance!=_5){
+continue;
+}
+if(!_6){
+return true;
+}
+var n=c.joinPoint.targetName;
+for(var j=_6.length-1;j>=0;--j){
+var m=_6[j];
+if(m instanceof RegExp){
+if(m.test(n)){
+return true;
+}
+}else{
+if(n==m){
+return true;
+}
+}
+}
+}
+return false;
+};
+})();
+});

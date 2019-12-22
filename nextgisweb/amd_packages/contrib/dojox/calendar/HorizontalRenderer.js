@@ -1,6 +1,44 @@
 //>>built
-require({cache:{"url:dojox/calendar/templates/HorizontalRenderer.html":'\x3cdiv class\x3d"dojoxCalendarEvent dojoxCalendarHorizontal" onselectstart\x3d"return false;"\x3e\n\t\x3cdiv class\x3d"bg" \x3e\x3c/div\x3e\n\t\x3cdiv style\x3d"position:absolute;left:2px;bottom:2px" data-dojo-attach-point\x3d"beforeIcon" class\x3d"beforeIcon"\x3e\x26#x25C0;\x3c/div\x3e\t\n\t\x3cdiv data-dojo-attach-point\x3d"labelContainer" class\x3d"labels"\x3e\t\t\n\t\t\x3cspan data-dojo-attach-point\x3d"startTimeLabel" class\x3d"startTime"\x3e\x3c/span\x3e\n\t\t\x3cspan data-dojo-attach-point\x3d"summaryLabel" class\x3d"summary"\x3e\x3c/span\x3e\n\t\t\x3cspan  data-dojo-attach-point\x3d"endTimeLabel" class\x3d"endTime"\x3e\x3c/span\x3e\n\t\x3c/div\x3e\n\t\x3cdiv style\x3d"position:absolute;right:2px;bottom:2px" data-dojo-attach-point\x3d"afterIcon" class\x3d"afterIcon"\x3e\x26#x25B6;\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"moveHandle" class\x3d"handle moveHandle" \x3e\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"resizeStartHandle" class\x3d"handle resizeStartHandle"\x3e\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"resizeEndHandle" class\x3d"handle resizeEndHandle" \x3e\x3c/div\x3e\t\n\x3c/div\x3e\n'}});
-define("dojox/calendar/HorizontalRenderer","dojo/_base/declare dojo/dom-style dijit/_WidgetBase dijit/_TemplatedMixin ./_RendererMixin dojo/text!./templates/HorizontalRenderer.html".split(" "),function(d,c,g,h,k,l){return d("dojox.calendar.HorizontalRenderer",[g,h,k],{templateString:l,_orientation:"horizontal",visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:32,endTimeLabel:30},_displayValueMap:{beforeIcon:"inline",afterIcon:"inline"},_displayValue:"inline",
-arrowPadding:12,_isElementVisible:function(b,e,f,d){var a;a=this.isLeftToRight();"startTimeLabel"==b&&(this.labelContainer&&(a&&f||!a&&e)?c.set(this.labelContainer,"marginRight",this.arrowPadding+"px"):c.set(this.labelContainer,"marginRight",0),this.labelContainer&&(!a&&f||a&&e)?c.set(this.labelContainer,"marginLeft",this.arrowPadding+"px"):c.set(this.labelContainer,"marginLeft",0));switch(b){case "startTimeLabel":a=this.item.startTime;if(this.item.allDay||this.owner.isStartOfDay(a))return!1;break;
-case "endTimeLabel":if(a=this.item.endTime,this.item.allDay||this.owner.isStartOfDay(a))return!1}return this.inherited(arguments)},getDisplayValue:function(b){return(b=this._displayValueMap[b])?b:this._displayValue},postCreate:function(){this.inherited(arguments);this._applyAttributes()}})});
-//# sourceMappingURL=HorizontalRenderer.js.map
+require({cache:{"url:dojox/calendar/templates/HorizontalRenderer.html":"<div class=\"dojoxCalendarEvent dojoxCalendarHorizontal\" onselectstart=\"return false;\">\n\t<div class=\"bg\" ></div>\n\t<div style=\"position:absolute;left:2px;bottom:2px\" data-dojo-attach-point=\"beforeIcon\" class=\"beforeIcon\">&#x25C0;</div>\t\n\t<div data-dojo-attach-point=\"labelContainer\" class=\"labels\">\t\t\n\t\t<span data-dojo-attach-point=\"startTimeLabel\" class=\"startTime\"></span>\n\t\t<span data-dojo-attach-point=\"summaryLabel\" class=\"summary\"></span>\n\t\t<span  data-dojo-attach-point=\"endTimeLabel\" class=\"endTime\"></span>\n\t</div>\n\t<div style=\"position:absolute;right:2px;bottom:2px\" data-dojo-attach-point=\"afterIcon\" class=\"afterIcon\">&#x25B6;</div>\n\t<div data-dojo-attach-point=\"moveHandle\" class=\"handle moveHandle\" ></div>\n\t<div data-dojo-attach-point=\"resizeStartHandle\" class=\"handle resizeStartHandle\"></div>\n\t<div data-dojo-attach-point=\"resizeEndHandle\" class=\"handle resizeEndHandle\" ></div>\t\n</div>\n"}});
+define("dojox/calendar/HorizontalRenderer",["dojo/_base/declare","dojo/dom-style","dijit/_WidgetBase","dijit/_TemplatedMixin","./_RendererMixin","dojo/text!./templates/HorizontalRenderer.html"],function(_1,_2,_3,_4,_5,_6){
+return _1("dojox.calendar.HorizontalRenderer",[_3,_4,_5],{templateString:_6,_orientation:"horizontal",visibilityLimits:{resizeStartHandle:50,resizeEndHandle:-1,summaryLabel:15,startTimeLabel:32,endTimeLabel:30},_displayValueMap:{"beforeIcon":"inline","afterIcon":"inline"},_displayValue:"inline",arrowPadding:12,_isElementVisible:function(_7,_8,_9,_a){
+var d;
+var _b=this.isLeftToRight();
+if(_7=="startTimeLabel"){
+if(this.labelContainer&&(_b&&_9||!_b&&_8)){
+_2.set(this.labelContainer,"marginRight",this.arrowPadding+"px");
+}else{
+_2.set(this.labelContainer,"marginRight",0);
+}
+if(this.labelContainer&&(!_b&&_9||_b&&_8)){
+_2.set(this.labelContainer,"marginLeft",this.arrowPadding+"px");
+}else{
+_2.set(this.labelContainer,"marginLeft",0);
+}
+}
+switch(_7){
+case "startTimeLabel":
+d=this.item.startTime;
+if(this.item.allDay||this.owner.isStartOfDay(d)){
+return false;
+}
+break;
+case "endTimeLabel":
+d=this.item.endTime;
+if(this.item.allDay||this.owner.isStartOfDay(d)){
+return false;
+}
+break;
+}
+return this.inherited(arguments);
+},getDisplayValue:function(_c){
+var _d=this._displayValueMap[_c];
+if(_d){
+return _d;
+}
+return this._displayValue;
+},postCreate:function(){
+this.inherited(arguments);
+this._applyAttributes();
+}});
+});

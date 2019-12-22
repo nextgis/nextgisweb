@@ -1,11 +1,204 @@
 //>>built
-define("dojox/storage/FlashStorageProvider",["dojo","dijit","dojox","dojo/require!dojox/flash,dojox/storage/manager,dojox/storage/Provider"],function(e,h,c){e.provide("dojox.storage.FlashStorageProvider");e.require("dojox.flash");e.require("dojox.storage.manager");e.require("dojox.storage.Provider");e.declare("dojox.storage.FlashStorageProvider",c.storage.Provider,{initialized:!1,_available:null,_statusHandler:null,_flashReady:!1,_pageReady:!1,initialize:function(){if(1!=e.config.disableFlashStorage){c.flash.addLoadedListener(e.hitch(this,
-function(){(this._flashReady=!0,this._pageReady)&&this._loaded()}));var a=e.moduleUrl("dojox","storage/Storage.swf").toString();c.flash.setSwf(a,!1);e.connect(e,"loaded",this,function(){this._pageReady=!0;this._flashReady&&this._pageReady&&this._loaded()})}},setFlushDelay:function(a){if(null===a||"undefined"===typeof a||isNaN(a))throw Error("Invalid argunment: "+a);c.flash.comm.setFlushDelay(String(a))},getFlushDelay:function(){return Number(c.flash.comm.getFlushDelay())},flush:function(a){if(null==
-a||"undefined"==typeof a)a=c.storage.DEFAULT_NAMESPACE;c.flash.comm.flush(a)},isAvailable:function(){return this._available=!e.config.disableFlashStorage},put:function(a,b,d,f){if(!this.isValidKey(a))throw Error("Invalid key given: "+a);f||(f=c.storage.DEFAULT_NAMESPACE);if(!this.isValidKey(f))throw Error("Invalid namespace given: "+f);this._statusHandler=d;b=e.isString(b)?"string:"+b:e.toJson(b);c.flash.comm.put(a,b,f)},putMultiple:function(a,b,d,f){if(!this.isValidKeyArray(a)||!b instanceof Array||
-a.length!=b.length)throw Error("Invalid arguments: keys \x3d ["+a+"], values \x3d ["+b+"]");f||(f=c.storage.DEFAULT_NAMESPACE);if(!this.isValidKey(f))throw Error("Invalid namespace given: "+f);this._statusHandler=d;a=a.join(",");d=[];for(var g=0;g<b.length;g++)e.isString(b[g])?b[g]="string:"+b[g]:b[g]=e.toJson(b[g]),d[g]=b[g].length;b=b.join("");d=d.join(",");c.flash.comm.putMultiple(a,b,d,f)},get:function(a,b){if(!this.isValidKey(a))throw Error("Invalid key given: "+a);b||(b=c.storage.DEFAULT_NAMESPACE);
-if(!this.isValidKey(b))throw Error("Invalid namespace given: "+b);var d=c.flash.comm.get(a,b);return""==d?null:this._destringify(d)},getMultiple:function(a,b){if(!this.isValidKeyArray(a))throw new ("Invalid key array given: "+a);b||(b=c.storage.DEFAULT_NAMESPACE);if(!this.isValidKey(b))throw Error("Invalid namespace given: "+b);for(var d=a.join(","),d=c.flash.comm.getMultiple(d,b),d=eval("("+d+")"),f=0;f<d.length;f++)d[f]=""==d[f]?null:this._destringify(d[f]);return d},_destringify:function(a){return a=
-e.isString(a)&&/^string:/.test(a)?a.substring(7):e.fromJson(a)},getKeys:function(a){a||(a=c.storage.DEFAULT_NAMESPACE);if(!this.isValidKey(a))throw Error("Invalid namespace given: "+a);a=c.flash.comm.getKeys(a);if(null==a||"null"==a)a="";a=a.split(",");a.sort();return a},getNamespaces:function(){var a=c.flash.comm.getNamespaces();if(null==a||"null"==a)a=c.storage.DEFAULT_NAMESPACE;a=a.split(",");a.sort();return a},clear:function(a){a||(a=c.storage.DEFAULT_NAMESPACE);if(!this.isValidKey(a))throw Error("Invalid namespace given: "+
-a);c.flash.comm.clear(a)},remove:function(a,b){b||(b=c.storage.DEFAULT_NAMESPACE);if(!this.isValidKey(b))throw Error("Invalid namespace given: "+b);c.flash.comm.remove(a,b)},removeMultiple:function(a,b){this.isValidKeyArray(a)||e.raise("Invalid key array given: "+a);b||(b=c.storage.DEFAULT_NAMESPACE);if(!this.isValidKey(b))throw Error("Invalid namespace given: "+b);var d=a.join(",");c.flash.comm.removeMultiple(d,b)},isPermanent:function(){return!0},getMaximumSize:function(){return c.storage.SIZE_NO_LIMIT},
-hasSettingsUI:function(){return!0},showSettingsUI:function(){c.flash.comm.showSettings();c.flash.obj.setVisible(!0);c.flash.obj.center()},hideSettingsUI:function(){c.flash.obj.setVisible(!1);e.isFunction(c.storage.onHideSettingsUI)&&c.storage.onHideSettingsUI.call(null)},getResourceList:function(){return[]},_loaded:function(){this._allNamespaces=this.getNamespaces();this.initialized=!0;c.storage.manager.loaded()},_onStatus:function(a,b,d){var f=c.storage,e=c.flash.obj;a==f.PENDING?(e.center(),e.setVisible(!0)):
-e.setVisible(!1);f._statusHandler&&f._statusHandler.call(null,a,b,null,d)}});c.storage.manager.register("dojox.storage.FlashStorageProvider",new c.storage.FlashStorageProvider)});
-//# sourceMappingURL=FlashStorageProvider.js.map
+define("dojox/storage/FlashStorageProvider",["dojo","dijit","dojox","dojo/require!dojox/flash,dojox/storage/manager,dojox/storage/Provider"],function(_1,_2,_3){
+_1.provide("dojox.storage.FlashStorageProvider");
+_1.require("dojox.flash");
+_1.require("dojox.storage.manager");
+_1.require("dojox.storage.Provider");
+_1.declare("dojox.storage.FlashStorageProvider",_3.storage.Provider,{initialized:false,_available:null,_statusHandler:null,_flashReady:false,_pageReady:false,initialize:function(){
+if(_1.config["disableFlashStorage"]==true){
+return;
+}
+_3.flash.addLoadedListener(_1.hitch(this,function(){
+this._flashReady=true;
+if(this._flashReady&&this._pageReady){
+this._loaded();
+}
+}));
+var _4=_1.moduleUrl("dojox","storage/Storage.swf").toString();
+_3.flash.setSwf(_4,false);
+_1.connect(_1,"loaded",this,function(){
+this._pageReady=true;
+if(this._flashReady&&this._pageReady){
+this._loaded();
+}
+});
+},setFlushDelay:function(_5){
+if(_5===null||typeof _5==="undefined"||isNaN(_5)){
+throw new Error("Invalid argunment: "+_5);
+}
+_3.flash.comm.setFlushDelay(String(_5));
+},getFlushDelay:function(){
+return Number(_3.flash.comm.getFlushDelay());
+},flush:function(_6){
+if(_6==null||typeof _6=="undefined"){
+_6=_3.storage.DEFAULT_NAMESPACE;
+}
+_3.flash.comm.flush(_6);
+},isAvailable:function(){
+return (this._available=!_1.config["disableFlashStorage"]);
+},put:function(_7,_8,_9,_a){
+if(!this.isValidKey(_7)){
+throw new Error("Invalid key given: "+_7);
+}
+if(!_a){
+_a=_3.storage.DEFAULT_NAMESPACE;
+}
+if(!this.isValidKey(_a)){
+throw new Error("Invalid namespace given: "+_a);
+}
+this._statusHandler=_9;
+if(_1.isString(_8)){
+_8="string:"+_8;
+}else{
+_8=_1.toJson(_8);
+}
+_3.flash.comm.put(_7,_8,_a);
+},putMultiple:function(_b,_c,_d,_e){
+if(!this.isValidKeyArray(_b)||!_c instanceof Array||_b.length!=_c.length){
+throw new Error("Invalid arguments: keys = ["+_b+"], values = ["+_c+"]");
+}
+if(!_e){
+_e=_3.storage.DEFAULT_NAMESPACE;
+}
+if(!this.isValidKey(_e)){
+throw new Error("Invalid namespace given: "+_e);
+}
+this._statusHandler=_d;
+var _f=_b.join(",");
+var _10=[];
+for(var i=0;i<_c.length;i++){
+if(_1.isString(_c[i])){
+_c[i]="string:"+_c[i];
+}else{
+_c[i]=_1.toJson(_c[i]);
+}
+_10[i]=_c[i].length;
+}
+var _11=_c.join("");
+var _12=_10.join(",");
+_3.flash.comm.putMultiple(_f,_11,_12,_e);
+},get:function(key,_13){
+if(!this.isValidKey(key)){
+throw new Error("Invalid key given: "+key);
+}
+if(!_13){
+_13=_3.storage.DEFAULT_NAMESPACE;
+}
+if(!this.isValidKey(_13)){
+throw new Error("Invalid namespace given: "+_13);
+}
+var _14=_3.flash.comm.get(key,_13);
+if(_14==""){
+return null;
+}
+return this._destringify(_14);
+},getMultiple:function(_15,_16){
+if(!this.isValidKeyArray(_15)){
+throw new ("Invalid key array given: "+_15);
+}
+if(!_16){
+_16=_3.storage.DEFAULT_NAMESPACE;
+}
+if(!this.isValidKey(_16)){
+throw new Error("Invalid namespace given: "+_16);
+}
+var _17=_15.join(",");
+var _18=_3.flash.comm.getMultiple(_17,_16);
+var _19=eval("("+_18+")");
+for(var i=0;i<_19.length;i++){
+_19[i]=(_19[i]=="")?null:this._destringify(_19[i]);
+}
+return _19;
+},_destringify:function(_1a){
+if(_1.isString(_1a)&&(/^string:/.test(_1a))){
+_1a=_1a.substring("string:".length);
+}else{
+_1a=_1.fromJson(_1a);
+}
+return _1a;
+},getKeys:function(_1b){
+if(!_1b){
+_1b=_3.storage.DEFAULT_NAMESPACE;
+}
+if(!this.isValidKey(_1b)){
+throw new Error("Invalid namespace given: "+_1b);
+}
+var _1c=_3.flash.comm.getKeys(_1b);
+if(_1c==null||_1c=="null"){
+_1c="";
+}
+_1c=_1c.split(",");
+_1c.sort();
+return _1c;
+},getNamespaces:function(){
+var _1d=_3.flash.comm.getNamespaces();
+if(_1d==null||_1d=="null"){
+_1d=_3.storage.DEFAULT_NAMESPACE;
+}
+_1d=_1d.split(",");
+_1d.sort();
+return _1d;
+},clear:function(_1e){
+if(!_1e){
+_1e=_3.storage.DEFAULT_NAMESPACE;
+}
+if(!this.isValidKey(_1e)){
+throw new Error("Invalid namespace given: "+_1e);
+}
+_3.flash.comm.clear(_1e);
+},remove:function(key,_1f){
+if(!_1f){
+_1f=_3.storage.DEFAULT_NAMESPACE;
+}
+if(!this.isValidKey(_1f)){
+throw new Error("Invalid namespace given: "+_1f);
+}
+_3.flash.comm.remove(key,_1f);
+},removeMultiple:function(_20,_21){
+if(!this.isValidKeyArray(_20)){
+_1.raise("Invalid key array given: "+_20);
+}
+if(!_21){
+_21=_3.storage.DEFAULT_NAMESPACE;
+}
+if(!this.isValidKey(_21)){
+throw new Error("Invalid namespace given: "+_21);
+}
+var _22=_20.join(",");
+_3.flash.comm.removeMultiple(_22,_21);
+},isPermanent:function(){
+return true;
+},getMaximumSize:function(){
+return _3.storage.SIZE_NO_LIMIT;
+},hasSettingsUI:function(){
+return true;
+},showSettingsUI:function(){
+_3.flash.comm.showSettings();
+_3.flash.obj.setVisible(true);
+_3.flash.obj.center();
+},hideSettingsUI:function(){
+_3.flash.obj.setVisible(false);
+if(_1.isFunction(_3.storage.onHideSettingsUI)){
+_3.storage.onHideSettingsUI.call(null);
+}
+},getResourceList:function(){
+return [];
+},_loaded:function(){
+this._allNamespaces=this.getNamespaces();
+this.initialized=true;
+_3.storage.manager.loaded();
+},_onStatus:function(_23,key,_24){
+var ds=_3.storage;
+var dfo=_3.flash.obj;
+if(_23==ds.PENDING){
+dfo.center();
+dfo.setVisible(true);
+}else{
+dfo.setVisible(false);
+}
+if(ds._statusHandler){
+ds._statusHandler.call(null,_23,key,null,_24);
+}
+}});
+_3.storage.manager.register("dojox.storage.FlashStorageProvider",new _3.storage.FlashStorageProvider());
+});

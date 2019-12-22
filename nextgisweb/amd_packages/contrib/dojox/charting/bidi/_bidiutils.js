@@ -1,3 +1,18 @@
 //>>built
-define("dojox/charting/bidi/_bidiutils",{reverseMatrix:function(a,d,b,c){var h=b.l-b.r;b=c?-1:1;var e=0,f=0,g=1;d=c?d.width+h:0;c=0;a.matrix&&(b*=Math.abs(a.matrix.xx),g=a.matrix.yy,e=a.matrix.xy,f=a.matrix.yx,c=a.matrix.xy);a.setTransform({xx:b,xy:e,yx:f,yy:g,dx:d,dy:c})}});
-//# sourceMappingURL=_bidiutils.js.map
+define("dojox/charting/bidi/_bidiutils",{reverseMatrix:function(_1,_2,_3,_4){
+var _5=_3.l-_3.r;
+var xx=_4?-1:1;
+var xy=0;
+var yx=0;
+var yy=1;
+var dx=_4?_2.width+_5:0;
+var dy=0;
+if(_1.matrix){
+xx=xx*Math.abs(_1.matrix.xx);
+yy=_1.matrix.yy;
+xy=_1.matrix.xy;
+yx=_1.matrix.yx;
+dy=_1.matrix.xy;
+}
+_1.setTransform({xx:xx,xy:xy,yx:yx,yy:yy,dx:dx,dy:dy});
+}});

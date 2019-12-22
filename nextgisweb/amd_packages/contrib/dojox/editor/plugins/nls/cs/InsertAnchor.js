@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/cs/InsertAnchor",{insertAnchor:"Vlo\u017eit kotvu",title:"Vlastnosti kotvy",anchor:"N\u00e1zev:",text:"Popis:",set:"Nastavit",cancel:"Storno"});
-//# sourceMappingURL=InsertAnchor.js.map
+define("dojox/editor/plugins/nls/cs/InsertAnchor",({insertAnchor:"Vložit kotvu",title:"Vlastnosti kotvy",anchor:"Název:",text:"Popis:",set:"Nastavit",cancel:"Storno"}));

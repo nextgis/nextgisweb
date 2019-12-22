@@ -1,4 +1,60 @@
 //>>built
-define("dojox/fx/ext-dojo/reverse",["dojo/_base/fx","dojo/fx","dojo/_base/lang","dojo/fx/easing","dojox/fx"],function(c,r,q,d,t){q.extend(c.Animation,{_reversed:!1,reverse:function(c,h){var e="playing"==this.status();this.pause();this._reversed=!this._reversed;var f=this.duration,k=f*this._percent,l=f-k,m=(new Date).valueOf(),n=this.curve._properties,b=this.properties,a;this._endTime=m+k;this._startTime=m-l;e&&this.gotoPercent(l/f);for(a in b)e=b[a].start,b[a].start=n[a].start=b[a].end,b[a].end=n[a].end=
-e;if(this._reversed){if(!this.rEase)if(this.fEase=this.easing,h)this.rEase=h;else{var p,g;for(a in d)if(this.easing==d[a]){p=a;break}p?(/InOut/.test(a)||!/In|Out/i.test(a)?this.rEase=this.easing:g=/In/.test(a)?a.replace("In","Out"):a.replace("Out","In"),g&&(this.rEase=d[g])):this.rEase=this.easing}this.easing=this.rEase}else this.easing=this.fEase;c||"playing"==this.status()||this.play();return this}});return c.Animation});
-//# sourceMappingURL=reverse.js.map
+define("dojox/fx/ext-dojo/reverse",["dojo/_base/fx","dojo/fx","dojo/_base/lang","dojo/fx/easing","dojox/fx"],function(_1,_2,_3,_4,_5){
+var _6={_reversed:false,reverse:function(_7,_8){
+var _9=this.status()=="playing";
+this.pause();
+this._reversed=!this._reversed;
+var d=this.duration,_a=d*this._percent,_b=d-_a,_c=new Date().valueOf(),cp=this.curve._properties,p=this.properties,nm;
+this._endTime=_c+_a;
+this._startTime=_c-_b;
+if(_9){
+this.gotoPercent(_b/d);
+}
+for(nm in p){
+var _d=p[nm].start;
+p[nm].start=cp[nm].start=p[nm].end;
+p[nm].end=cp[nm].end=_d;
+}
+if(this._reversed){
+if(!this.rEase){
+this.fEase=this.easing;
+if(_8){
+this.rEase=_8;
+}else{
+var de=_4,_e,_f;
+for(nm in de){
+if(this.easing==de[nm]){
+_e=nm;
+break;
+}
+}
+if(_e){
+if(/InOut/.test(nm)||!/In|Out/i.test(nm)){
+this.rEase=this.easing;
+}else{
+if(/In/.test(nm)){
+_f=nm.replace("In","Out");
+}else{
+_f=nm.replace("Out","In");
+}
+}
+if(_f){
+this.rEase=_4[_f];
+}
+}else{
+this.rEase=this.easing;
+}
+}
+}
+this.easing=this.rEase;
+}else{
+this.easing=this.fEase;
+}
+if(!_7&&this.status()!="playing"){
+this.play();
+}
+return this;
+}};
+_3.extend(_1.Animation,_6);
+return _1.Animation;
+});

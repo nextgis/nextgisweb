@@ -1,3 +1,4 @@
 //>>built
-define("dojox/collections",["./collections/_base"],function(a){return a});
-//# sourceMappingURL=collections.js.map
+define("dojox/collections",["./collections/_base"],function(_1){
+return _1;
+});

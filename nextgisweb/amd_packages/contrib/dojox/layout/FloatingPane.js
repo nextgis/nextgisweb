@@ -1,13 +1,182 @@
 //>>built
-require({cache:{"url:dojox/layout/resources/FloatingPane.html":'\x3cdiv class\x3d"dojoxFloatingPane" id\x3d"${id}"\x3e\n\t\x3cdiv tabindex\x3d"0" role\x3d"button" class\x3d"dojoxFloatingPaneTitle" dojoAttachPoint\x3d"focusNode"\x3e\n\t\t\x3cspan dojoAttachPoint\x3d"closeNode" dojoAttachEvent\x3d"onclick: close" class\x3d"dojoxFloatingCloseIcon"\x3e\x3c/span\x3e\n\t\t\x3cspan dojoAttachPoint\x3d"maxNode" dojoAttachEvent\x3d"onclick: maximize" class\x3d"dojoxFloatingMaximizeIcon"\x3e\x26thinsp;\x3c/span\x3e\n\t\t\x3cspan dojoAttachPoint\x3d"restoreNode" dojoAttachEvent\x3d"onclick: _restore" class\x3d"dojoxFloatingRestoreIcon"\x3e\x26thinsp;\x3c/span\x3e\t\n\t\t\x3cspan dojoAttachPoint\x3d"dockNode" dojoAttachEvent\x3d"onclick: minimize" class\x3d"dojoxFloatingMinimizeIcon"\x3e\x26thinsp;\x3c/span\x3e\n\t\t\x3cspan dojoAttachPoint\x3d"titleNode" class\x3d"dijitInline dijitTitleNode"\x3e\x3c/span\x3e\n\t\x3c/div\x3e\n\t\x3cdiv dojoAttachPoint\x3d"canvas" class\x3d"dojoxFloatingPaneCanvas"\x3e\n\t\t\x3cdiv dojoAttachPoint\x3d"containerNode" role\x3d"region" tabindex\x3d"-1" class\x3d"${contentClass}"\x3e\n\t\t\x3c/div\x3e\n\t\t\x3cspan dojoAttachPoint\x3d"resizeHandle" class\x3d"dojoxFloatingResizeHandle"\x3e\x3c/span\x3e\n\t\x3c/div\x3e\n\x3c/div\x3e\n'}});
-define("dojox/layout/FloatingPane","dojo/_base/kernel dojo/_base/lang dojo/_base/window dojo/_base/declare dojo/_base/fx dojo/_base/connect dojo/_base/array dojo/_base/sniff dojo/window dojo/dom dojo/dom-class dojo/dom-geometry dojo/dom-construct dojo/touch dijit/_TemplatedMixin dijit/_Widget dijit/BackgroundIframe dijit/registry dojo/dnd/Moveable ./ContentPane ./ResizeHandle dojo/text!./resources/FloatingPane.html ./Dock".split(" "),function(g,c,m,n,h,p,f,q,r,t,e,d,u,k,v,w,x,l,y,z,A,B,C){g.experimental("dojox.layout.FloatingPane");
-return n("dojox.layout.FloatingPane",[z,v],{closable:!0,dockable:!0,resizable:!1,maxable:!1,resizeAxis:"xy",title:"",dockTo:"",duration:400,contentClass:"dojoxFloatingPaneContent",_showAnim:null,_hideAnim:null,_dockNode:null,_restoreState:{},_allFPs:[],_startZ:100,templateString:B,attributeMap:c.delegate(w.prototype.attributeMap,{title:{type:"innerHTML",node:"titleNode"}}),postCreate:function(){this.inherited(arguments);new y(this.domNode,{handle:this.focusNode});this.dockable||(this.dockNode.style.display=
-"none");this.closable||(this.closeNode.style.display="none");this.maxable||(this.maxNode.style.display="none",this.restoreNode.style.display="none");this.resizable?this.domNode.style.width=d.getMarginBox(this.domNode).w+"px":this.resizeHandle.style.display="none";this._allFPs.push(this);this.domNode.style.position="absolute";this.bgIframe=new x(this.domNode);this._naturalState=d.position(this.domNode)},startup:function(){if(!this._started){this.inherited(arguments);this.resizable&&(q("ie")?this.canvas.style.overflow=
-"auto":this.containerNode.style.overflow="auto",this._resizeHandle=new A({targetId:this.id,resizeAxis:this.resizeAxis},this.resizeHandle));if(this.dockable){var a=this.dockTo;this.dockTo=this.dockTo?l.byId(this.dockTo):l.byId("dojoxGlobalFloatingDock");if(!this.dockTo){var b;a?(b=a,a=t.byId(a)):(a=u.create("div",null,m.body()),e.add(a,"dojoxFloatingDockDefault"),b="dojoxGlobalFloatingDock");this.dockTo=new C({id:b,autoPosition:"south"},a);this.dockTo.startup()}"none"!=this.domNode.style.display&&
-"hidden"!=this.domNode.style.visibility||this.minimize()}this.connect(this.focusNode,k.press,"bringToTop");this.connect(this.domNode,k.press,"bringToTop");this.resize(d.position(this.domNode));this._started=!0}},setTitle:function(a){g.deprecated("pane.setTitle","Use pane.set('title', someTitle)","2.0");this.set("title",a)},close:function(){this.closable&&(p.unsubscribe(this._listener),this.hide(c.hitch(this,function(){this.destroyRecursive()})))},hide:function(a){h.fadeOut({node:this.domNode,duration:this.duration,
-onEnd:c.hitch(this,function(){this.domNode.style.display="none";this.domNode.style.visibility="hidden";this.dockTo&&this.dockable&&this.dockTo._positionDock(null);a&&a()})}).play()},show:function(a){h.fadeIn({node:this.domNode,duration:this.duration,beforeBegin:c.hitch(this,function(){this.domNode.style.display="";this.domNode.style.visibility="visible";this.dockTo&&this.dockable&&this.dockTo._positionDock(null);"function"==typeof a&&a();this._isDocked=!1;this._dockNode&&(this._dockNode.destroy(),
-this._dockNode=null)})}).play();var b=d.getContentBox(this.domNode);this.resize(c.mixin(d.position(this.domNode),{w:b.w,h:b.h}));this._onShow()},minimize:function(){this._isDocked||this.hide(c.hitch(this,"_dock"))},maximize:function(){this._maximized||(this._naturalState=d.position(this.domNode),this._isDocked&&(this.show(),setTimeout(c.hitch(this,"maximize"),this.duration)),e.add(this.focusNode,"floatingPaneMaximized"),this.resize(r.getBox()),this._maximized=!0)},_restore:function(){this._maximized&&
-(this.resize(this._naturalState),e.remove(this.focusNode,"floatingPaneMaximized"),this._maximized=!1)},_dock:function(){!this._isDocked&&this.dockable&&(this._dockNode=this.dockTo.addNode(this),this._isDocked=!0)},resize:function(a){this._naturalState=a=a||this._naturalState;var b=this.domNode.style;"t"in a?b.top=a.t+"px":"y"in a&&(b.top=a.y+"px");"l"in a?b.left=a.l+"px":"x"in a&&(b.left=a.x+"px");b.width=a.w+"px";b.height=a.h+"px";a={l:0,t:0,w:a.w,h:a.h-this.focusNode.offsetHeight};d.setMarginBox(this.canvas,
-a);this._checkIfSingleChild();this._singleChild&&this._singleChild.resize&&this._singleChild.resize(a)},bringToTop:function(){var a=f.filter(this._allFPs,function(a){return a!==this},this);a.sort(function(a,c){return a.domNode.style.zIndex-c.domNode.style.zIndex});a.push(this);f.forEach(a,function(a,c){a.domNode.style.zIndex=this._startZ+2*c;e.remove(a.domNode,"dojoxFloatingPaneFg")},this);e.add(this.domNode,"dojoxFloatingPaneFg")},destroy:function(){this._allFPs.splice(f.indexOf(this._allFPs,this),
-1);this._resizeHandle&&this._resizeHandle.destroy();this.inherited(arguments)}})});
-//# sourceMappingURL=FloatingPane.js.map
+require({cache:{"url:dojox/layout/resources/FloatingPane.html":"<div class=\"dojoxFloatingPane\" id=\"${id}\">\n\t<div tabindex=\"0\" role=\"button\" class=\"dojoxFloatingPaneTitle\" dojoAttachPoint=\"focusNode\">\n\t\t<span dojoAttachPoint=\"closeNode\" dojoAttachEvent=\"onclick: close\" class=\"dojoxFloatingCloseIcon\"></span>\n\t\t<span dojoAttachPoint=\"maxNode\" dojoAttachEvent=\"onclick: maximize\" class=\"dojoxFloatingMaximizeIcon\">&thinsp;</span>\n\t\t<span dojoAttachPoint=\"restoreNode\" dojoAttachEvent=\"onclick: _restore\" class=\"dojoxFloatingRestoreIcon\">&thinsp;</span>\t\n\t\t<span dojoAttachPoint=\"dockNode\" dojoAttachEvent=\"onclick: minimize\" class=\"dojoxFloatingMinimizeIcon\">&thinsp;</span>\n\t\t<span dojoAttachPoint=\"titleNode\" class=\"dijitInline dijitTitleNode\"></span>\n\t</div>\n\t<div dojoAttachPoint=\"canvas\" class=\"dojoxFloatingPaneCanvas\">\n\t\t<div dojoAttachPoint=\"containerNode\" role=\"region\" tabindex=\"-1\" class=\"${contentClass}\">\n\t\t</div>\n\t\t<span dojoAttachPoint=\"resizeHandle\" class=\"dojoxFloatingResizeHandle\"></span>\n\t</div>\n</div>\n"}});
+define("dojox/layout/FloatingPane",["dojo/_base/kernel","dojo/_base/lang","dojo/_base/window","dojo/_base/declare","dojo/_base/fx","dojo/_base/connect","dojo/_base/array","dojo/_base/sniff","dojo/window","dojo/dom","dojo/dom-class","dojo/dom-geometry","dojo/dom-construct","dojo/touch","dijit/_TemplatedMixin","dijit/_Widget","dijit/BackgroundIframe","dijit/registry","dojo/dnd/Moveable","./ContentPane","./ResizeHandle","dojo/text!./resources/FloatingPane.html","./Dock"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f,_10,_11,_12,_13,_14,_15,_16,_17){
+_1.experimental("dojox.layout.FloatingPane");
+return _4("dojox.layout.FloatingPane",[_14,_f],{closable:true,dockable:true,resizable:false,maxable:false,resizeAxis:"xy",title:"",dockTo:"",duration:400,contentClass:"dojoxFloatingPaneContent",_showAnim:null,_hideAnim:null,_dockNode:null,_restoreState:{},_allFPs:[],_startZ:100,templateString:_16,attributeMap:_2.delegate(_10.prototype.attributeMap,{title:{type:"innerHTML",node:"titleNode"}}),postCreate:function(){
+this.inherited(arguments);
+new _13(this.domNode,{handle:this.focusNode});
+if(!this.dockable){
+this.dockNode.style.display="none";
+}
+if(!this.closable){
+this.closeNode.style.display="none";
+}
+if(!this.maxable){
+this.maxNode.style.display="none";
+this.restoreNode.style.display="none";
+}
+if(!this.resizable){
+this.resizeHandle.style.display="none";
+}else{
+this.domNode.style.width=_c.getMarginBox(this.domNode).w+"px";
+}
+this._allFPs.push(this);
+this.domNode.style.position="absolute";
+this.bgIframe=new _11(this.domNode);
+this._naturalState=_c.position(this.domNode);
+},startup:function(){
+if(this._started){
+return;
+}
+this.inherited(arguments);
+if(this.resizable){
+if(_8("ie")){
+this.canvas.style.overflow="auto";
+}else{
+this.containerNode.style.overflow="auto";
+}
+this._resizeHandle=new _15({targetId:this.id,resizeAxis:this.resizeAxis},this.resizeHandle);
+}
+if(this.dockable){
+var _18=this.dockTo;
+if(this.dockTo){
+this.dockTo=_12.byId(this.dockTo);
+}else{
+this.dockTo=_12.byId("dojoxGlobalFloatingDock");
+}
+if(!this.dockTo){
+var _19,_1a;
+if(_18){
+_19=_18;
+_1a=_a.byId(_18);
+}else{
+_1a=_d.create("div",null,_3.body());
+_b.add(_1a,"dojoxFloatingDockDefault");
+_19="dojoxGlobalFloatingDock";
+}
+this.dockTo=new _17({id:_19,autoPosition:"south"},_1a);
+this.dockTo.startup();
+}
+if((this.domNode.style.display=="none")||(this.domNode.style.visibility=="hidden")){
+this.minimize();
+}
+}
+this.connect(this.focusNode,_e.press,"bringToTop");
+this.connect(this.domNode,_e.press,"bringToTop");
+this.resize(_c.position(this.domNode));
+this._started=true;
+},setTitle:function(_1b){
+_1.deprecated("pane.setTitle","Use pane.set('title', someTitle)","2.0");
+this.set("title",_1b);
+},close:function(){
+if(!this.closable){
+return;
+}
+_6.unsubscribe(this._listener);
+this.hide(_2.hitch(this,function(){
+this.destroyRecursive();
+}));
+},hide:function(_1c){
+_5.fadeOut({node:this.domNode,duration:this.duration,onEnd:_2.hitch(this,function(){
+this.domNode.style.display="none";
+this.domNode.style.visibility="hidden";
+if(this.dockTo&&this.dockable){
+this.dockTo._positionDock(null);
+}
+if(_1c){
+_1c();
+}
+})}).play();
+},show:function(_1d){
+var _1e=_5.fadeIn({node:this.domNode,duration:this.duration,beforeBegin:_2.hitch(this,function(){
+this.domNode.style.display="";
+this.domNode.style.visibility="visible";
+if(this.dockTo&&this.dockable){
+this.dockTo._positionDock(null);
+}
+if(typeof _1d=="function"){
+_1d();
+}
+this._isDocked=false;
+if(this._dockNode){
+this._dockNode.destroy();
+this._dockNode=null;
+}
+})}).play();
+var _1f=_c.getContentBox(this.domNode);
+this.resize(_2.mixin(_c.position(this.domNode),{w:_1f.w,h:_1f.h}));
+this._onShow();
+},minimize:function(){
+if(!this._isDocked){
+this.hide(_2.hitch(this,"_dock"));
+}
+},maximize:function(){
+if(this._maximized){
+return;
+}
+this._naturalState=_c.position(this.domNode);
+if(this._isDocked){
+this.show();
+setTimeout(_2.hitch(this,"maximize"),this.duration);
+}
+_b.add(this.focusNode,"floatingPaneMaximized");
+this.resize(_9.getBox());
+this._maximized=true;
+},_restore:function(){
+if(this._maximized){
+this.resize(this._naturalState);
+_b.remove(this.focusNode,"floatingPaneMaximized");
+this._maximized=false;
+}
+},_dock:function(){
+if(!this._isDocked&&this.dockable){
+this._dockNode=this.dockTo.addNode(this);
+this._isDocked=true;
+}
+},resize:function(dim){
+dim=dim||this._naturalState;
+this._naturalState=dim;
+var dns=this.domNode.style;
+if("t" in dim){
+dns.top=dim.t+"px";
+}else{
+if("y" in dim){
+dns.top=dim.y+"px";
+}
+}
+if("l" in dim){
+dns.left=dim.l+"px";
+}else{
+if("x" in dim){
+dns.left=dim.x+"px";
+}
+}
+dns.width=dim.w+"px";
+dns.height=dim.h+"px";
+var _20={l:0,t:0,w:dim.w,h:(dim.h-this.focusNode.offsetHeight)};
+_c.setMarginBox(this.canvas,_20);
+this._checkIfSingleChild();
+if(this._singleChild&&this._singleChild.resize){
+this._singleChild.resize(_20);
+}
+},bringToTop:function(){
+var _21=_7.filter(this._allFPs,function(i){
+return i!==this;
+},this);
+_21.sort(function(a,b){
+return a.domNode.style.zIndex-b.domNode.style.zIndex;
+});
+_21.push(this);
+_7.forEach(_21,function(w,x){
+w.domNode.style.zIndex=this._startZ+(x*2);
+_b.remove(w.domNode,"dojoxFloatingPaneFg");
+},this);
+_b.add(this.domNode,"dojoxFloatingPaneFg");
+},destroy:function(){
+this._allFPs.splice(_7.indexOf(this._allFPs,this),1);
+if(this._resizeHandle){
+this._resizeHandle.destroy();
+}
+this.inherited(arguments);
+}});
+});

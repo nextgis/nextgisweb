@@ -1,3 +1,2 @@
 //>>built
-define("dijit/form/nls/ko/validate",{invalidMessage:"\uc785\ub825\ub41c \uac12\uc774 \uc62c\ubc14\ub974\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.",missingMessage:"\uc774 \uac12\uc740 \ud544\uc218\uc785\ub2c8\ub2e4.",rangeMessage:"\uc774 \uac12\uc740 \ubc94\uc704\ub97c \ubc97\uc5b4\ub0a9\ub2c8\ub2e4."});
-//# sourceMappingURL=validate.js.map
+define("dijit/form/nls/ko/validate",({invalidMessage:"입력된 값이 올바르지 않습니다.",missingMessage:"이 값은 필수입니다.",rangeMessage:"이 값은 범위를 벗어납니다."}));

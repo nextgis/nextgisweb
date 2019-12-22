@@ -1,5 +1,52 @@
 //>>built
-define("dojox/mobile/_StoreListMixin","dojo/_base/array dojo/_base/declare ./_StoreMixin ./ListItem dojo/has dojo/has!dojo-bidi?dojox/mobile/bidi/_StoreListMixin".split(" "),function(d,f,c,g,e,h){c=f(e("dojo-bidi")?"dojox.mobile._NonBidiStoreListMixin":"dojox.mobile._StoreListMixin",c,{append:!1,itemMap:null,itemRenderer:g,buildRendering:function(){this.inherited(arguments);if(this.store){var a=this.store;this.store=null;this.setStore(a,this.query,this.queryOptions)}},createListItem:function(a){return new this.itemRenderer(this._createItemProperties(a))},
-_createItemProperties:function(a){var b={};a.label||(b.label=a[this.labelProperty]);e("dojo-bidi")&&"undefined"==typeof b.dir&&(b.dir=this.isLeftToRight()?"ltr":"rtl");for(var c in a)b[this.itemMap&&this.itemMap[c]||c]=a[c];return b},_setDirAttr:function(a){return a},generateList:function(a){this.append||d.forEach(this.getChildren(),function(a){a.destroyRecursive()});d.forEach(a,function(a,c){this.addChild(this.createListItem(a));a[this.childrenProperty]&&d.forEach(a[this.childrenProperty],function(a,
-b){this.addChild(this.createListItem(a))},this)},this)},onComplete:function(a){this.generateList(a)},onError:function(){},onAdd:function(a,b){this.addChild(this.createListItem(a),b)},onUpdate:function(a,b){this.getChildren()[b].set(this._createItemProperties(a))},onDelete:function(a,b){this.getChildren()[b].destroyRecursive()}});return e("dojo-bidi")?f("dojox.mobile._StoreListMixin",[c,h]):c});
-//# sourceMappingURL=_StoreListMixin.js.map
+define("dojox/mobile/_StoreListMixin",["dojo/_base/array","dojo/_base/declare","./_StoreMixin","./ListItem","dojo/has","dojo/has!dojo-bidi?dojox/mobile/bidi/_StoreListMixin"],function(_1,_2,_3,_4,_5,_6){
+var _7=_2(_5("dojo-bidi")?"dojox.mobile._NonBidiStoreListMixin":"dojox.mobile._StoreListMixin",_3,{append:false,itemMap:null,itemRenderer:_4,buildRendering:function(){
+this.inherited(arguments);
+if(!this.store){
+return;
+}
+var _8=this.store;
+this.store=null;
+this.setStore(_8,this.query,this.queryOptions);
+},createListItem:function(_9){
+return new this.itemRenderer(this._createItemProperties(_9));
+},_createItemProperties:function(_a){
+var _b={};
+if(!_a["label"]){
+_b["label"]=_a[this.labelProperty];
+}
+if(_5("dojo-bidi")&&typeof _b["dir"]=="undefined"){
+_b["dir"]=this.isLeftToRight()?"ltr":"rtl";
+}
+for(var _c in _a){
+_b[(this.itemMap&&this.itemMap[_c])||_c]=_a[_c];
+}
+return _b;
+},_setDirAttr:function(_d){
+return _d;
+},generateList:function(_e){
+if(!this.append){
+_1.forEach(this.getChildren(),function(_f){
+_f.destroyRecursive();
+});
+}
+_1.forEach(_e,function(_10,_11){
+this.addChild(this.createListItem(_10));
+if(_10[this.childrenProperty]){
+_1.forEach(_10[this.childrenProperty],function(_12,_13){
+this.addChild(this.createListItem(_12));
+},this);
+}
+},this);
+},onComplete:function(_14){
+this.generateList(_14);
+},onError:function(){
+},onAdd:function(_15,_16){
+this.addChild(this.createListItem(_15),_16);
+},onUpdate:function(_17,_18){
+this.getChildren()[_18].set(this._createItemProperties(_17));
+},onDelete:function(_19,_1a){
+this.getChildren()[_1a].destroyRecursive();
+}});
+return _5("dojo-bidi")?_2("dojox.mobile._StoreListMixin",[_7,_6]):_7;
+});

@@ -1,3 +1,42 @@
 //>>built
-define("dojox/lang/oo/rearrange",["dojo","dijit","dojox"],function(h,p,n){h.provide("dojox.lang.oo.rearrange");(function(){var k=h._extraNames,l=k.length,m=Object.prototype.toString,e={};n.lang.oo.rearrange=function(c,g){var a,b,d,f;for(a in g)b=g[a],b&&"[object String]"!=m.call(b)||(d=c[a],a in e&&e[a]===d||(delete c[a]||(c[a]=void 0),b&&(c[b]=d)));if(l)for(f=0;f<l;++f)a=k[f],b=g[a],b&&"[object String]"!=m.call(b)||(d=c[a],a in e&&e[a]===d||(delete c[a]||(c[a]=void 0),b&&(c[b]=d)));return c}})()});
-//# sourceMappingURL=rearrange.js.map
+define("dojox/lang/oo/rearrange",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.lang.oo.rearrange");
+(function(){
+var _4=_1._extraNames,_5=_4.length,_6=Object.prototype.toString,_7={};
+_3.lang.oo.rearrange=function(_8,_9){
+var _a,_b,_c,i,t;
+for(_a in _9){
+_b=_9[_a];
+if(!_b||_6.call(_b)=="[object String]"){
+_c=_8[_a];
+if(!(_a in _7)||_7[_a]!==_c){
+if(!(delete _8[_a])){
+_8[_a]=undefined;
+}
+if(_b){
+_8[_b]=_c;
+}
+}
+}
+}
+if(_5){
+for(i=0;i<_5;++i){
+_a=_4[i];
+_b=_9[_a];
+if(!_b||_6.call(_b)=="[object String]"){
+_c=_8[_a];
+if(!(_a in _7)||_7[_a]!==_c){
+if(!(delete _8[_a])){
+_8[_a]=undefined;
+}
+if(_b){
+_8[_b]=_c;
+}
+}
+}
+}
+}
+return _8;
+};
+})();
+});

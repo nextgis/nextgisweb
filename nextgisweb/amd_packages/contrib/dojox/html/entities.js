@@ -1,14 +1,77 @@
 //>>built
-define("dojox/html/entities",["dojo/_base/lang"],function(k){var e=k.getObject("dojox.html.entities",!0),g=function(b,a){var f,c;if(a._encCache&&a._encCache.regexp&&a._encCache.mapper&&a.length==a._encCache.length)f=a._encCache.mapper,c=a._encCache.regexp;else{f={};c=["["];var d;for(d=0;d<a.length;d++)f[a[d][0]]="\x26"+a[d][1]+";",c.push(a[d][0]);c.push("]");c=new RegExp(c.join(""),"g");a._encCache={mapper:f,regexp:c,length:a.length}}return b=b.replace(c,function(a){return f[a]})},h=function(b,a){var f,
-c;if(a._decCache&&a._decCache.regexp&&a._decCache.mapper&&a.length==a._decCache.length)f=a._decCache.mapper,c=a._decCache.regexp;else{f={};c=["("];var d;for(d=0;d<a.length;d++){var e="\x26"+a[d][1]+";";d&&c.push("|");f[e]=a[d][0];c.push(e)}c.push(")");c=new RegExp(c.join(""),"g");a._decCache={mapper:f,regexp:c,length:a.length}}return b=b.replace(c,function(a){return f[a]})};e.html=[["\x26","amp"],['"',"quot"],["\x3c","lt"],["\x3e","gt"],["\u00a0","nbsp"]];e.latin=[["\u00a1","iexcl"],["\u00a2","cent"],
-["\u00a3","pound"],["\u20ac","euro"],["\u00a4","curren"],["\u00a5","yen"],["\u00a6","brvbar"],["\u00a7","sect"],["\u00a8","uml"],["\u00a9","copy"],["\u00aa","ordf"],["\u00ab","laquo"],["\u00ac","not"],["\u00ad","shy"],["\u00ae","reg"],["\u00af","macr"],["\u00b0","deg"],["\u00b1","plusmn"],["\u00b2","sup2"],["\u00b3","sup3"],["\u00b4","acute"],["\u00b5","micro"],["\u00b6","para"],["\u00b7","middot"],["\u00b8","cedil"],["\u00b9","sup1"],["\u00ba","ordm"],["\u00bb","raquo"],["\u00bc","frac14"],["\u00bd",
-"frac12"],["\u00be","frac34"],["\u00bf","iquest"],["\u00c0","Agrave"],["\u00c1","Aacute"],["\u00c2","Acirc"],["\u00c3","Atilde"],["\u00c4","Auml"],["\u00c5","Aring"],["\u00c6","AElig"],["\u00c7","Ccedil"],["\u00c8","Egrave"],["\u00c9","Eacute"],["\u00ca","Ecirc"],["\u00cb","Euml"],["\u00cc","Igrave"],["\u00cd","Iacute"],["\u00ce","Icirc"],["\u00cf","Iuml"],["\u00d0","ETH"],["\u00d1","Ntilde"],["\u00d2","Ograve"],["\u00d3","Oacute"],["\u00d4","Ocirc"],["\u00d5","Otilde"],["\u00d6","Ouml"],["\u00d7",
-"times"],["\u00d8","Oslash"],["\u00d9","Ugrave"],["\u00da","Uacute"],["\u00db","Ucirc"],["\u00dc","Uuml"],["\u00dd","Yacute"],["\u00de","THORN"],["\u00df","szlig"],["\u00e0","agrave"],["\u00e1","aacute"],["\u00e2","acirc"],["\u00e3","atilde"],["\u00e4","auml"],["\u00e5","aring"],["\u00e6","aelig"],["\u00e7","ccedil"],["\u00e8","egrave"],["\u00e9","eacute"],["\u00ea","ecirc"],["\u00eb","euml"],["\u00ec","igrave"],["\u00ed","iacute"],["\u00ee","icirc"],["\u00ef","iuml"],["\u00f0","eth"],["\u00f1","ntilde"],
-["\u00f2","ograve"],["\u00f3","oacute"],["\u00f4","ocirc"],["\u00f5","otilde"],["\u00f6","ouml"],["\u00f7","divide"],["\u00f8","oslash"],["\u00f9","ugrave"],["\u00fa","uacute"],["\u00fb","ucirc"],["\u00fc","uuml"],["\u00fd","yacute"],["\u00fe","thorn"],["\u00ff","yuml"],["\u0192","fnof"],["\u0391","Alpha"],["\u0392","Beta"],["\u0393","Gamma"],["\u0394","Delta"],["\u0395","Epsilon"],["\u0396","Zeta"],["\u0397","Eta"],["\u0398","Theta"],["\u0399","Iota"],["\u039a","Kappa"],["\u039b","Lambda"],["\u039c",
-"Mu"],["\u039d","Nu"],["\u039e","Xi"],["\u039f","Omicron"],["\u03a0","Pi"],["\u03a1","Rho"],["\u03a3","Sigma"],["\u03a4","Tau"],["\u03a5","Upsilon"],["\u03a6","Phi"],["\u03a7","Chi"],["\u03a8","Psi"],["\u03a9","Omega"],["\u03b1","alpha"],["\u03b2","beta"],["\u03b3","gamma"],["\u03b4","delta"],["\u03b5","epsilon"],["\u03b6","zeta"],["\u03b7","eta"],["\u03b8","theta"],["\u03b9","iota"],["\u03ba","kappa"],["\u03bb","lambda"],["\u03bc","mu"],["\u03bd","nu"],["\u03be","xi"],["\u03bf","omicron"],["\u03c0",
-"pi"],["\u03c1","rho"],["\u03c2","sigmaf"],["\u03c3","sigma"],["\u03c4","tau"],["\u03c5","upsilon"],["\u03c6","phi"],["\u03c7","chi"],["\u03c8","psi"],["\u03c9","omega"],["\u03d1","thetasym"],["\u03d2","upsih"],["\u03d6","piv"],["\u2022","bull"],["\u2026","hellip"],["\u2032","prime"],["\u2033","Prime"],["\u203e","oline"],["\u2044","frasl"],["\u2118","weierp"],["\u2111","image"],["\u211c","real"],["\u2122","trade"],["\u2135","alefsym"],["\u2190","larr"],["\u2191","uarr"],["\u2192","rarr"],["\u2193",
-"darr"],["\u2194","harr"],["\u21b5","crarr"],["\u21d0","lArr"],["\u21d1","uArr"],["\u21d2","rArr"],["\u21d3","dArr"],["\u21d4","hArr"],["\u2200","forall"],["\u2202","part"],["\u2203","exist"],["\u2205","empty"],["\u2207","nabla"],["\u2208","isin"],["\u2209","notin"],["\u220b","ni"],["\u220f","prod"],["\u2211","sum"],["\u2212","minus"],["\u2217","lowast"],["\u221a","radic"],["\u221d","prop"],["\u221e","infin"],["\u2220","ang"],["\u2227","and"],["\u2228","or"],["\u2229","cap"],["\u222a","cup"],["\u222b",
-"int"],["\u2234","there4"],["\u223c","sim"],["\u2245","cong"],["\u2248","asymp"],["\u2260","ne"],["\u2261","equiv"],["\u2264","le"],["\u2265","ge"],["\u2282","sub"],["\u2283","sup"],["\u2284","nsub"],["\u2286","sube"],["\u2287","supe"],["\u2295","oplus"],["\u2297","otimes"],["\u22a5","perp"],["\u22c5","sdot"],["\u2308","lceil"],["\u2309","rceil"],["\u230a","lfloor"],["\u230b","rfloor"],["\u2329","lang"],["\u232a","rang"],["\u25ca","loz"],["\u2660","spades"],["\u2663","clubs"],["\u2665","hearts"],
-["\u2666","diams"],["\u0152","OElig"],["\u0153","oelig"],["\u0160","Scaron"],["\u0161","scaron"],["\u0178","Yuml"],["\u02c6","circ"],["\u02dc","tilde"],["\u2002","ensp"],["\u2003","emsp"],["\u2009","thinsp"],["\u200c","zwnj"],["\u200d","zwj"],["\u200e","lrm"],["\u200f","rlm"],["\u2013","ndash"],["\u2014","mdash"],["\u2018","lsquo"],["\u2019","rsquo"],["\u201a","sbquo"],["\u201c","ldquo"],["\u201d","rdquo"],["\u201e","bdquo"],["\u2020","dagger"],["\u2021","Dagger"],["\u2030","permil"],["\u2039","lsaquo"],
-["\u203a","rsaquo"]];e.encode=function(b,a){b&&(a?b=g(b,a):(b=g(b,e.html),b=g(b,e.latin)));return b};e.decode=function(b,a){b&&(a?b=h(b,a):(b=h(b,e.html),b=h(b,e.latin)));return b};return e});
-//# sourceMappingURL=entities.js.map
+define("dojox/html/entities",["dojo/_base/lang"],function(_1){
+var _2=_1.getObject("dojox.html.entities",true);
+var _3=function(_4,_5){
+var _6,_7;
+if(_5._encCache&&_5._encCache.regexp&&_5._encCache.mapper&&_5.length==_5._encCache.length){
+_6=_5._encCache.mapper;
+_7=_5._encCache.regexp;
+}else{
+_6={};
+_7=["["];
+var i;
+for(i=0;i<_5.length;i++){
+_6[_5[i][0]]="&"+_5[i][1]+";";
+_7.push(_5[i][0]);
+}
+_7.push("]");
+_7=new RegExp(_7.join(""),"g");
+_5._encCache={mapper:_6,regexp:_7,length:_5.length};
+}
+_4=_4.replace(_7,function(c){
+return _6[c];
+});
+return _4;
+};
+var _8=function(_9,_a){
+var _b,_c;
+if(_a._decCache&&_a._decCache.regexp&&_a._decCache.mapper&&_a.length==_a._decCache.length){
+_b=_a._decCache.mapper;
+_c=_a._decCache.regexp;
+}else{
+_b={};
+_c=["("];
+var i;
+for(i=0;i<_a.length;i++){
+var e="&"+_a[i][1]+";";
+if(i){
+_c.push("|");
+}
+_b[e]=_a[i][0];
+_c.push(e);
+}
+_c.push(")");
+_c=new RegExp(_c.join(""),"g");
+_a._decCache={mapper:_b,regexp:_c,length:_a.length};
+}
+_9=_9.replace(_c,function(c){
+return _b[c];
+});
+return _9;
+};
+_2.html=[["&","amp"],["\"","quot"],["<","lt"],[">","gt"],[" ","nbsp"]];
+_2.latin=[["¡","iexcl"],["¢","cent"],["£","pound"],["€","euro"],["¤","curren"],["¥","yen"],["¦","brvbar"],["§","sect"],["¨","uml"],["©","copy"],["ª","ordf"],["«","laquo"],["¬","not"],["­","shy"],["®","reg"],["¯","macr"],["°","deg"],["±","plusmn"],["²","sup2"],["³","sup3"],["´","acute"],["µ","micro"],["¶","para"],["·","middot"],["¸","cedil"],["¹","sup1"],["º","ordm"],["»","raquo"],["¼","frac14"],["½","frac12"],["¾","frac34"],["¿","iquest"],["À","Agrave"],["Á","Aacute"],["Â","Acirc"],["Ã","Atilde"],["Ä","Auml"],["Å","Aring"],["Æ","AElig"],["Ç","Ccedil"],["È","Egrave"],["É","Eacute"],["Ê","Ecirc"],["Ë","Euml"],["Ì","Igrave"],["Í","Iacute"],["Î","Icirc"],["Ï","Iuml"],["Ð","ETH"],["Ñ","Ntilde"],["Ò","Ograve"],["Ó","Oacute"],["Ô","Ocirc"],["Õ","Otilde"],["Ö","Ouml"],["×","times"],["Ø","Oslash"],["Ù","Ugrave"],["Ú","Uacute"],["Û","Ucirc"],["Ü","Uuml"],["Ý","Yacute"],["Þ","THORN"],["ß","szlig"],["à","agrave"],["á","aacute"],["â","acirc"],["ã","atilde"],["ä","auml"],["å","aring"],["æ","aelig"],["ç","ccedil"],["è","egrave"],["é","eacute"],["ê","ecirc"],["ë","euml"],["ì","igrave"],["í","iacute"],["î","icirc"],["ï","iuml"],["ð","eth"],["ñ","ntilde"],["ò","ograve"],["ó","oacute"],["ô","ocirc"],["õ","otilde"],["ö","ouml"],["÷","divide"],["ø","oslash"],["ù","ugrave"],["ú","uacute"],["û","ucirc"],["ü","uuml"],["ý","yacute"],["þ","thorn"],["ÿ","yuml"],["ƒ","fnof"],["Α","Alpha"],["Β","Beta"],["Γ","Gamma"],["Δ","Delta"],["Ε","Epsilon"],["Ζ","Zeta"],["Η","Eta"],["Θ","Theta"],["Ι","Iota"],["Κ","Kappa"],["Λ","Lambda"],["Μ","Mu"],["Ν","Nu"],["Ξ","Xi"],["Ο","Omicron"],["Π","Pi"],["Ρ","Rho"],["Σ","Sigma"],["Τ","Tau"],["Υ","Upsilon"],["Φ","Phi"],["Χ","Chi"],["Ψ","Psi"],["Ω","Omega"],["α","alpha"],["β","beta"],["γ","gamma"],["δ","delta"],["ε","epsilon"],["ζ","zeta"],["η","eta"],["θ","theta"],["ι","iota"],["κ","kappa"],["λ","lambda"],["μ","mu"],["ν","nu"],["ξ","xi"],["ο","omicron"],["π","pi"],["ρ","rho"],["ς","sigmaf"],["σ","sigma"],["τ","tau"],["υ","upsilon"],["φ","phi"],["χ","chi"],["ψ","psi"],["ω","omega"],["ϑ","thetasym"],["ϒ","upsih"],["ϖ","piv"],["•","bull"],["…","hellip"],["′","prime"],["″","Prime"],["‾","oline"],["⁄","frasl"],["℘","weierp"],["ℑ","image"],["ℜ","real"],["™","trade"],["ℵ","alefsym"],["←","larr"],["↑","uarr"],["→","rarr"],["↓","darr"],["↔","harr"],["↵","crarr"],["⇐","lArr"],["⇑","uArr"],["⇒","rArr"],["⇓","dArr"],["⇔","hArr"],["∀","forall"],["∂","part"],["∃","exist"],["∅","empty"],["∇","nabla"],["∈","isin"],["∉","notin"],["∋","ni"],["∏","prod"],["∑","sum"],["−","minus"],["∗","lowast"],["√","radic"],["∝","prop"],["∞","infin"],["∠","ang"],["∧","and"],["∨","or"],["∩","cap"],["∪","cup"],["∫","int"],["∴","there4"],["∼","sim"],["≅","cong"],["≈","asymp"],["≠","ne"],["≡","equiv"],["≤","le"],["≥","ge"],["⊂","sub"],["⊃","sup"],["⊄","nsub"],["⊆","sube"],["⊇","supe"],["⊕","oplus"],["⊗","otimes"],["⊥","perp"],["⋅","sdot"],["⌈","lceil"],["⌉","rceil"],["⌊","lfloor"],["⌋","rfloor"],["〈","lang"],["〉","rang"],["◊","loz"],["♠","spades"],["♣","clubs"],["♥","hearts"],["♦","diams"],["Œ","OElig"],["œ","oelig"],["Š","Scaron"],["š","scaron"],["Ÿ","Yuml"],["ˆ","circ"],["˜","tilde"],[" ","ensp"],[" ","emsp"],[" ","thinsp"],["‌","zwnj"],["‍","zwj"],["‎","lrm"],["‏","rlm"],["–","ndash"],["—","mdash"],["‘","lsquo"],["’","rsquo"],["‚","sbquo"],["“","ldquo"],["”","rdquo"],["„","bdquo"],["†","dagger"],["‡","Dagger"],["‰","permil"],["‹","lsaquo"],["›","rsaquo"]];
+_2.encode=function(_d,m){
+if(_d){
+if(!m){
+_d=_3(_d,_2.html);
+_d=_3(_d,_2.latin);
+}else{
+_d=_3(_d,m);
+}
+}
+return _d;
+};
+_2.decode=function(_e,m){
+if(_e){
+if(!m){
+_e=_8(_e,_2.html);
+_e=_8(_e,_2.latin);
+}else{
+_e=_8(_e,m);
+}
+}
+return _e;
+};
+return _2;
+});

@@ -1,3 +1,7 @@
 //>>built
-define("dojox/charting/themes/PlotKit/orange",["./base","../../Theme"],function(a,b){a.orange=a.base.clone();a.orange.chart.fill=a.orange.plotarea.fill="#f5eee6";a.orange.colors=b.defineColors({hue:31,saturation:60,low:40,high:88});return a.orange});
-//# sourceMappingURL=orange.js.map
+define("dojox/charting/themes/PlotKit/orange",["./base","../../Theme"],function(pk,_1){
+pk.orange=pk.base.clone();
+pk.orange.chart.fill=pk.orange.plotarea.fill="#f5eee6";
+pk.orange.colors=_1.defineColors({hue:31,saturation:60,low:40,high:88});
+return pk.orange;
+});

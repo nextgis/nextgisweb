@@ -1,5 +1,37 @@
 //>>built
-define("dojox/drawing/tools/Arrow","dojo/_base/lang ../util/oo ../manager/_registry ./Line ../annotations/Arrow ../util/positioning".split(" "),function(d,b,e,f,c,g){b=b.declare(f,function(a){this.arrowStart&&(this.begArrow=new c({stencil:this,idx1:0,idx2:1}));this.arrowEnd&&(this.endArrow=new c({stencil:this,idx1:1,idx2:0}));this.points.length&&(this.render(),a.label&&this.setLabel(a.label))},{draws:!0,type:"dojox.drawing.tools.Arrow",baseRender:!1,arrowStart:!1,arrowEnd:!0,labelPosition:function(){var a=
-this.data,a=g.label({x:a.x1,y:a.y1},{x:a.x2,y:a.y2});return{x:a.x,y:a.y}},onUp:function(a){if(!this.created&&this.shape){var b=this.points;this.util.distance(b[0].x,b[0].y,b[1].x,b[1].y)<this.minimumSize?this.remove(this.shape,this.hit):(a=this.util.snapAngle(a,this.angleSnap/180),this.setPoints([{x:b[0].x,y:b[0].y},{x:a.x,y:a.y}]),this.renderedOnce=!0,this.onRender(this))}}});d.setObject("dojox.drawing.tools.Arrow",b);b.setup={name:"dojox.drawing.tools.Arrow",tooltip:"Arrow Tool",iconClass:"iconArrow"};
-e.register(b.setup,"tool");return b});
-//# sourceMappingURL=Arrow.js.map
+define("dojox/drawing/tools/Arrow",["dojo/_base/lang","../util/oo","../manager/_registry","./Line","../annotations/Arrow","../util/positioning"],function(_1,oo,_2,_3,_4,_5){
+var _6=oo.declare(_3,function(_7){
+if(this.arrowStart){
+this.begArrow=new _4({stencil:this,idx1:0,idx2:1});
+}
+if(this.arrowEnd){
+this.endArrow=new _4({stencil:this,idx1:1,idx2:0});
+}
+if(this.points.length){
+this.render();
+_7.label&&this.setLabel(_7.label);
+}
+},{draws:true,type:"dojox.drawing.tools.Arrow",baseRender:false,arrowStart:false,arrowEnd:true,labelPosition:function(){
+var d=this.data;
+var pt=_5.label({x:d.x1,y:d.y1},{x:d.x2,y:d.y2});
+return {x:pt.x,y:pt.y};
+},onUp:function(_8){
+if(this.created||!this.shape){
+return;
+}
+var p=this.points;
+var _9=this.util.distance(p[0].x,p[0].y,p[1].x,p[1].y);
+if(_9<this.minimumSize){
+this.remove(this.shape,this.hit);
+return;
+}
+var pt=this.util.snapAngle(_8,this.angleSnap/180);
+this.setPoints([{x:p[0].x,y:p[0].y},{x:pt.x,y:pt.y}]);
+this.renderedOnce=true;
+this.onRender(this);
+}});
+_1.setObject("dojox.drawing.tools.Arrow",_6);
+_6.setup={name:"dojox.drawing.tools.Arrow",tooltip:"Arrow Tool",iconClass:"iconArrow"};
+_2.register(_6.setup,"tool");
+return _6;
+});

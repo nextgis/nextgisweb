@@ -1,5 +1,38 @@
 //>>built
-define("dojox/widget/rotator/ThumbnailController","dojo/_base/declare dojo/_base/connect dojo/_base/lang dojo/_base/event dojo/aspect dojo/dom-attr dojo/dom-class dojo/dom-construct dojo/query".split(" "),function(m,t,g,n,p,f,q,h,r){return m("dojox.widget.rotator.ThumbnailController",null,{rotator:null,constructor:function(a,b){g.mixin(this,a);this._domNode=b;var c=this.rotator;if(c){for(;b.firstChild;)b.removeChild(b.firstChild);for(var d=0;d<c.panes.length;d++){var e=c.panes[d].node,k=f.get(e,"thumbsrc")||
-f.get(e,"src"),l=f.get(e,"alt")||"";/img/i.test(e.tagName)&&function(a){h.create("a",{classname:"dojoxRotatorThumb dojoxRotatorThumb"+a+" "+(a==c.idx?"dojoxRotatorThumbSelected":""),href:k,onclick:function(b){n.stop(b);c&&c.control.apply(c,["go",a])},title:l,innerHTML:'\x3cimg src\x3d"'+k+'" alt\x3d"'+l+'"/\x3e'},b)}(d)}p.after(c,"onUpdate",g.hitch(this,"_onUpdate"),!0)}},destroy:function(){h.destroy(this._domNode)},_onUpdate:function(a){var b=this.rotator;"onAfterTransition"==a&&(a=r(".dojoxRotatorThumb",
-this._domNode).removeClass("dojoxRotatorThumbSelected"),b.idx<a.length&&q.add(a[b.idx],"dojoxRotatorThumbSelected"))}})});
-//# sourceMappingURL=ThumbnailController.js.map
+define("dojox/widget/rotator/ThumbnailController",["dojo/_base/declare","dojo/_base/connect","dojo/_base/lang","dojo/_base/event","dojo/aspect","dojo/dom-attr","dojo/dom-class","dojo/dom-construct","dojo/query"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9){
+var _a="dojoxRotatorThumb",_b=_a+"Selected";
+return _1("dojox.widget.rotator.ThumbnailController",null,{rotator:null,constructor:function(_c,_d){
+_3.mixin(this,_c);
+this._domNode=_d;
+var r=this.rotator;
+if(r){
+while(_d.firstChild){
+_d.removeChild(_d.firstChild);
+}
+for(var i=0;i<r.panes.length;i++){
+var n=r.panes[i].node,s=_6.get(n,"thumbsrc")||_6.get(n,"src"),t=_6.get(n,"alt")||"";
+if(/img/i.test(n.tagName)){
+(function(j){
+_8.create("a",{classname:_a+" "+_a+j+" "+(j==r.idx?_b:""),href:s,onclick:function(e){
+_4.stop(e);
+if(r){
+r.control.apply(r,["go",j]);
+}
+},title:t,innerHTML:"<img src=\""+s+"\" alt=\""+t+"\"/>"},_d);
+})(i);
+}
+}
+_5.after(r,"onUpdate",_3.hitch(this,"_onUpdate"),true);
+}
+},destroy:function(){
+_8.destroy(this._domNode);
+},_onUpdate:function(_e){
+var r=this.rotator;
+if(_e=="onAfterTransition"){
+var n=_9("."+_a,this._domNode).removeClass(_b);
+if(r.idx<n.length){
+_7.add(n[r.idx],_b);
+}
+}
+}});
+});

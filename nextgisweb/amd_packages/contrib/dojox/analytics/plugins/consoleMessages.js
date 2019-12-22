@@ -1,3 +1,18 @@
 //>>built
-define("dojox/analytics/plugins/consoleMessages",["dojo/_base/lang","../_base","dojo/_base/config","dojo/aspect"],function(d,b,a,g){var e=d.getObject("dojox.analytics.plugins.consoleMessages",!0);e.addData=d.hitch(b,"addData","consoleMessages");b=a.consoleLogFuncs||["error","warn","info","rlog"];console||(console={});for(a=0;a<b.length;a++){var c=b[a],f=d.hitch(e,"addData",c);console[c]?g.after(console,c,f,!0):console[c]=f}return e});
-//# sourceMappingURL=consoleMessages.js.map
+define("dojox/analytics/plugins/consoleMessages",["dojo/_base/lang","../_base","dojo/_base/config","dojo/aspect"],function(_1,_2,_3,_4){
+var _5=_1.getObject("dojox.analytics.plugins.consoleMessages",true);
+_5.addData=_1.hitch(_2,"addData","consoleMessages");
+var _6=_3["consoleLogFuncs"]||["error","warn","info","rlog"];
+if(!console){
+console={};
+}
+for(var i=0;i<_6.length;i++){
+var _7=_6[i],_8=_1.hitch(_5,"addData",_7);
+if(console[_7]){
+_4.after(console,_7,_8,true);
+}else{
+console[_7]=_8;
+}
+}
+return _5;
+});

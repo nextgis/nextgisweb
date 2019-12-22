@@ -1,5 +1,25 @@
 //>>built
-require({cache:{"url:dojox/calendar/templates/VerticalRenderer.html":'\x3cdiv class\x3d"dojoxCalendarEvent dojoxCalendarVertical" onselectstart\x3d"return false;"\x3e\n\t\x3cdiv class\x3d"bg"\x3e\x3c/div\x3e\n\t\x3cdl style\x3d"width:100%;"\x3e\n\t\t\x3cdd data-dojo-attach-point\x3d"beforeIcon" class\x3d"beforeIcon"\x3e\x26#x25B2;\x3c/dd\x3e\n\t\t\x3cdd data-dojo-attach-point\x3d"startTimeLabel" class\x3d"startTime"\x3e\x3c/dd\x3e\n\t\t\x3cdd data-dojo-attach-point\x3d"summaryLabel" class\x3d"summary"\x3e\x3c/dd\x3e\n\t\x3c/dl\x3e\t\n\t\x3cspan data-dojo-attach-point\x3d"afterIcon" class\x3d"afterIcon"\x3e\x26#x25BC;\x3c/span\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"moveHandle" class\x3d"handle moveHandle" \x3e\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"resizeStartHandle" class\x3d"handle resizeStartHandle"\x3e\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"resizeEndHandle" class\x3d"handle resizeEndHandle" \x3e\x3c/div\x3e\n\t\x3cdiv data-dojo-attach-point\x3d"endTimeLabel" class\x3d"endTime"\x3e\x3c/div\x3e\n\x3c/div\x3e\n'}});
-define("dojox/calendar/VerticalRenderer",["dojo/_base/declare","dijit/_WidgetBase","dijit/_TemplatedMixin","./_RendererMixin","dojo/text!./templates/VerticalRenderer.html"],function(b,c,d,e,f){return b("dojox.calendar.VerticalRenderer",[c,d,e],{templateString:f,postCreate:function(){this.inherited(arguments);this._applyAttributes()},_isElementVisible:function(b,c,d,e){var a;switch(b){case "startTimeLabel":a=this.item.startTime;if(this.item.allDay||this.owner.isStartOfDay(a))return!1;break;case "endTimeLabel":if(a=
-this.item.endTime,this.item.allDay||this.owner.isStartOfDay(a))return!1}return this.inherited(arguments)}})});
-//# sourceMappingURL=VerticalRenderer.js.map
+require({cache:{"url:dojox/calendar/templates/VerticalRenderer.html":"<div class=\"dojoxCalendarEvent dojoxCalendarVertical\" onselectstart=\"return false;\">\n\t<div class=\"bg\"></div>\n\t<dl style=\"width:100%;\">\n\t\t<dd data-dojo-attach-point=\"beforeIcon\" class=\"beforeIcon\">&#x25B2;</dd>\n\t\t<dd data-dojo-attach-point=\"startTimeLabel\" class=\"startTime\"></dd>\n\t\t<dd data-dojo-attach-point=\"summaryLabel\" class=\"summary\"></dd>\n\t</dl>\t\n\t<span data-dojo-attach-point=\"afterIcon\" class=\"afterIcon\">&#x25BC;</span>\n\t<div data-dojo-attach-point=\"moveHandle\" class=\"handle moveHandle\" ></div>\n\t<div data-dojo-attach-point=\"resizeStartHandle\" class=\"handle resizeStartHandle\"></div>\n\t<div data-dojo-attach-point=\"resizeEndHandle\" class=\"handle resizeEndHandle\" ></div>\n\t<div data-dojo-attach-point=\"endTimeLabel\" class=\"endTime\"></div>\n</div>\n"}});
+define("dojox/calendar/VerticalRenderer",["dojo/_base/declare","dijit/_WidgetBase","dijit/_TemplatedMixin","./_RendererMixin","dojo/text!./templates/VerticalRenderer.html"],function(_1,_2,_3,_4,_5){
+return _1("dojox.calendar.VerticalRenderer",[_2,_3,_4],{templateString:_5,postCreate:function(){
+this.inherited(arguments);
+this._applyAttributes();
+},_isElementVisible:function(_6,_7,_8,_9){
+var d;
+switch(_6){
+case "startTimeLabel":
+d=this.item.startTime;
+if(this.item.allDay||this.owner.isStartOfDay(d)){
+return false;
+}
+break;
+case "endTimeLabel":
+d=this.item.endTime;
+if(this.item.allDay||this.owner.isStartOfDay(d)){
+return false;
+}
+break;
+}
+return this.inherited(arguments);
+}});
+});

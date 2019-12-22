@@ -1,5 +1,23 @@
 //>>built
-define("dojox/xmpp/widget/ChatSession",["dojo","dijit","dojox","dojo/require!dijit/layout/LayoutContainer,dijit/_Templated"],function(a,b,c){a.provide("dojox.xmpp.widget.ChatSession");a.require("dijit.layout.LayoutContainer");a.require("dijit._Templated");a.declare("dojox.xmpp.widget.ChatSession",[b.layout.LayoutContainer,b._Templated],{templateString:a.cache("dojox.xmpp.widget","templates/ChatSession.html",'\x3cdiv\x3e\n\x3cdiv dojoAttachPoint\x3d"messages" dojoType\x3d"dijit.layout.ContentPane" layoutAlign\x3d"client" style\x3d"overflow:auto"\x3e\n\x3c/div\x3e\n\x3cdiv dojoType\x3d"dijit.layout.ContentPane" layoutAlign\x3d"bottom" style\x3d"border-top: 2px solid #333333; height: 35px;"\x3e\x3cinput dojoAttachPoint\x3d"chatInput" dojoAttachEvent\x3d"onkeypress: onKeyPress" style\x3d"width: 100%;height: 35px;" /\x3e\x3c/div\x3e\n\x3c/div\x3e'),
-enableSubWidgets:!0,widgetsInTemplate:!0,widgetType:"ChatSession",chatWith:null,instance:null,postCreate:function(){},displayMessage:function(a,b){a&&(this.messages.domNode.innerHTML+="\x3cb\x3e"+(a.from?this.chatWith:"me")+":\x3c/b\x3e "+a.body+"\x3cbr/\x3e",this.goToLastMessage())},goToLastMessage:function(){this.messages.domNode.scrollTop=this.messages.domNode.scrollHeight},onKeyPress:function(b){(b.keyCode||b.charCode)==a.keys.ENTER&&""!=this.chatInput.value&&(this.instance.sendMessage({body:this.chatInput.value}),
-this.displayMessage({body:this.chatInput.value},"out"),this.chatInput.value="")}})});
-//# sourceMappingURL=ChatSession.js.map
+define("dojox/xmpp/widget/ChatSession",["dojo","dijit","dojox","dojo/require!dijit/layout/LayoutContainer,dijit/_Templated"],function(_1,_2,_3){
+_1.provide("dojox.xmpp.widget.ChatSession");
+_1.require("dijit.layout.LayoutContainer");
+_1.require("dijit._Templated");
+_1.declare("dojox.xmpp.widget.ChatSession",[_2.layout.LayoutContainer,_2._Templated],{templateString:_1.cache("dojox.xmpp.widget","templates/ChatSession.html","<div>\n<div dojoAttachPoint=\"messages\" dojoType=\"dijit.layout.ContentPane\" layoutAlign=\"client\" style=\"overflow:auto\">\n</div>\n<div dojoType=\"dijit.layout.ContentPane\" layoutAlign=\"bottom\" style=\"border-top: 2px solid #333333; height: 35px;\"><input dojoAttachPoint=\"chatInput\" dojoAttachEvent=\"onkeypress: onKeyPress\" style=\"width: 100%;height: 35px;\" /></div>\n</div>"),enableSubWidgets:true,widgetsInTemplate:true,widgetType:"ChatSession",chatWith:null,instance:null,postCreate:function(){
+},displayMessage:function(_4,_5){
+if(_4){
+var _6=_4.from?this.chatWith:"me";
+this.messages.domNode.innerHTML+="<b>"+_6+":</b> "+_4.body+"<br/>";
+this.goToLastMessage();
+}
+},goToLastMessage:function(){
+this.messages.domNode.scrollTop=this.messages.domNode.scrollHeight;
+},onKeyPress:function(e){
+var _7=e.keyCode||e.charCode;
+if((_7==_1.keys.ENTER)&&(this.chatInput.value!="")){
+this.instance.sendMessage({body:this.chatInput.value});
+this.displayMessage({body:this.chatInput.value},"out");
+this.chatInput.value="";
+}
+}});
+});

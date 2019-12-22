@@ -1,4 +1,43 @@
 //>>built
-define("dojox/drawing/util/typeset",["../library/greek"],function(c){return{convertHTML:function(b){return b?b.replace(/&([^;]+);/g,function(b,a){if("#"==a.charAt(0)){var d=+a.substr(1);if(!isNaN(d))return String.fromCharCode(d)}else if(c[a])return String.fromCharCode(c[a]);console.warn("no HTML conversion for ",b);return b}):b},convertLaTeX:function(b){return b?b.replace(/\\([a-zA-Z]+)/g,function(b,a){if(c[a])return String.fromCharCode(c[a]);if("mu"==a.substr(0,2))return String.fromCharCode(c.mu)+
-a.substr(2);if("theta"==a.substr(0,5))return String.fromCharCode(c.theta)+a.substr(5);if("phi"==a.substr(0,3))return String.fromCharCode(c.phi)+a.substr(3)}).replace(/\\\\/g,"\\"):b}}});
-//# sourceMappingURL=typeset.js.map
+define("dojox/drawing/util/typeset",["../library/greek"],function(_1){
+return {convertHTML:function(_2){
+if(_2){
+return _2.replace(/&([^;]+);/g,function(_3,_4){
+if(_4.charAt(0)=="#"){
+var _5=+_4.substr(1);
+if(!isNaN(_5)){
+return String.fromCharCode(_5);
+}
+}else{
+if(_1[_4]){
+return String.fromCharCode(_1[_4]);
+}
+}
+console.warn("no HTML conversion for ",_3);
+return _3;
+});
+}
+return _2;
+},convertLaTeX:function(_6){
+if(_6){
+return _6.replace(/\\([a-zA-Z]+)/g,function(_7,_8){
+if(_1[_8]){
+return String.fromCharCode(_1[_8]);
+}else{
+if(_8.substr(0,2)=="mu"){
+return String.fromCharCode(_1["mu"])+_8.substr(2);
+}else{
+if(_8.substr(0,5)=="theta"){
+return String.fromCharCode(_1["theta"])+_8.substr(5);
+}else{
+if(_8.substr(0,3)=="phi"){
+return String.fromCharCode(_1["phi"])+_8.substr(3);
+}
+}
+}
+}
+}).replace(/\\\\/g,"\\");
+}
+return _6;
+}};
+});

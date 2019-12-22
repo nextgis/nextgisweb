@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/fi/SpellCheck",{widgetLabel:"Er\u00e4oikoluku",unfound:"Ei l\u00f6ydy",skip:"Ohita",skipAll:"Ohita kaikki",toDic:"Lis\u00e4\u00e4 sanastoon",suggestions:"Ehdotukset",replace:"Korvaa",replaceWith:"Korvaava",replaceAll:"Korvaa kaikki",cancel:"Peruuta",msg:"Kirjoitusvirheit\u00e4 ei l\u00f6ytynyt",iSkip:"Ohita t\u00e4m\u00e4",iSkipAll:"Ohita kaikki samanlaiset",iMsg:"Ei oikeinkirjoitusehdotuksia"});
-//# sourceMappingURL=SpellCheck.js.map
+define("dojox/editor/plugins/nls/fi/SpellCheck",({widgetLabel:"Eräoikoluku",unfound:"Ei löydy",skip:"Ohita",skipAll:"Ohita kaikki",toDic:"Lisää sanastoon",suggestions:"Ehdotukset",replace:"Korvaa",replaceWith:"Korvaava",replaceAll:"Korvaa kaikki",cancel:"Peruuta",msg:"Kirjoitusvirheitä ei löytynyt",iSkip:"Ohita tämä",iSkipAll:"Ohita kaikki samanlaiset",iMsg:"Ei oikeinkirjoitusehdotuksia"}));

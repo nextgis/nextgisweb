@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/zh/InsertAnchor",{insertAnchor:"\u63d2\u5165\u951a\u70b9",title:"\u951a\u70b9\u5c5e\u6027",anchor:"\u540d\u79f0\uff1a",text:"\u8bf4\u660e\uff1a",set:"\u96c6",cancel:"\u53d6\u6d88"});
-//# sourceMappingURL=InsertAnchor.js.map
+define("dojox/editor/plugins/nls/zh/InsertAnchor",({insertAnchor:"插入锚点",title:"锚点属性",anchor:"名称：",text:"说明：",set:"集",cancel:"取消"}));

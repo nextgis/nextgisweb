@@ -1,5 +1,61 @@
 //>>built
-define("dojox/io/xhrMultiPart",["dojo/_base/kernel","dojo/_base/array","dojo/_base/xhr","dojo/query","dojox/uuid/generateRandomUuid"],function(f,m,n,h,k){function g(a,e){if(!a.name&&!a.content)throw Error("Each part of a multi-part request requires 'name' and 'content'.");var b=[];b.push("--"+e,'Content-Disposition: form-data; name\x3d"'+a.name+'"'+(a.filename?'; filename\x3d"'+a.filename+'"':""));if(a.contentType){var c="Content-Type: "+a.contentType;a.charset&&(c+="; Charset\x3d"+a.charset);b.push(c)}a.contentTransferEncoding&&
-b.push("Content-Transfer-Encoding: "+a.contentTransferEncoding);b.push("",a.content);return b}function l(a,e){var b=f.formToObject(a),c=[],d;for(d in b)f.isArray(b[d])?f.forEach(b[d],function(a){c=c.concat(g({name:d,content:a},e))}):c=c.concat(g({name:d,content:b[d]},e));return c}f.getObject("io.xhrMultiPart",!0,dojox);dojox.io.xhrMultiPart=function(a){if(!a.file&&!a.content&&!a.form)throw Error("content, file or form must be provided to dojox.io.xhrMultiPart's arguments");var e=k(),b=[],c="";if(a.file||
-a.content){var d=a.file||a.content;f.forEach(f.isArray(d)?d:[d],function(a){b=b.concat(g(a,e))})}else if(a.form){if(h("input[type\x3dfile]",a.form).length)throw Error("dojox.io.xhrMultiPart cannot post files that are values of an INPUT TYPE\x3dFILE.  Use dojo.io.iframe.send() instead.");b=l(a.form,e)}b.length&&(b.push("--"+e+"--",""),c=b.join("\r\n"));return f.rawXhrPost(f.mixin(a,{contentType:"multipart/form-data; boundary\x3d"+e,postData:c}))};return dojox.io.xhrMultiPart});
-//# sourceMappingURL=xhrMultiPart.js.map
+define("dojox/io/xhrMultiPart",["dojo/_base/kernel","dojo/_base/array","dojo/_base/xhr","dojo/query","dojox/uuid/generateRandomUuid"],function(_1,_2,_3,_4,_5){
+_1.getObject("io.xhrMultiPart",true,dojox);
+function _6(_7,_8){
+if(!_7["name"]&&!_7["content"]){
+throw new Error("Each part of a multi-part request requires 'name' and 'content'.");
+}
+var _9=[];
+_9.push("--"+_8,"Content-Disposition: form-data; name=\""+_7.name+"\""+(_7["filename"]?"; filename=\""+_7.filename+"\"":""));
+if(_7["contentType"]){
+var ct="Content-Type: "+_7.contentType;
+if(_7["charset"]){
+ct+="; Charset="+_7.charset;
+}
+_9.push(ct);
+}
+if(_7["contentTransferEncoding"]){
+_9.push("Content-Transfer-Encoding: "+_7.contentTransferEncoding);
+}
+_9.push("",_7.content);
+return _9;
+};
+function _a(_b,_c){
+var o=_1.formToObject(_b),_d=[];
+for(var p in o){
+if(_1.isArray(o[p])){
+_1.forEach(o[p],function(_e){
+_d=_d.concat(_6({name:p,content:_e},_c));
+});
+}else{
+_d=_d.concat(_6({name:p,content:o[p]},_c));
+}
+}
+return _d;
+};
+dojox.io.xhrMultiPart=function(_f){
+if(!_f["file"]&&!_f["content"]&&!_f["form"]){
+throw new Error("content, file or form must be provided to dojox.io.xhrMultiPart's arguments");
+}
+var _10=_5(),tmp=[],out="";
+if(_f["file"]||_f["content"]){
+var v=_f["file"]||_f["content"];
+_1.forEach((_1.isArray(v)?v:[v]),function(_11){
+tmp=tmp.concat(_6(_11,_10));
+});
+}else{
+if(_f["form"]){
+if(_4("input[type=file]",_f["form"]).length){
+throw new Error("dojox.io.xhrMultiPart cannot post files that are values of an INPUT TYPE=FILE.  Use dojo.io.iframe.send() instead.");
+}
+tmp=_a(_f["form"],_10);
+}
+}
+if(tmp.length){
+tmp.push("--"+_10+"--","");
+out=tmp.join("\r\n");
+}
+return _1.rawXhrPost(_1.mixin(_f,{contentType:"multipart/form-data; boundary="+_10,postData:out}));
+};
+return dojox.io.xhrMultiPart;
+});

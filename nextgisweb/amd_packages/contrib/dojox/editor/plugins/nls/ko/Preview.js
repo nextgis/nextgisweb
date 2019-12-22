@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/ko/Preview",{preview:"\ubbf8\ub9ac\ubcf4\uae30"});
-//# sourceMappingURL=Preview.js.map
+define("dojox/editor/plugins/nls/ko/Preview",({"preview":"미리보기"}));

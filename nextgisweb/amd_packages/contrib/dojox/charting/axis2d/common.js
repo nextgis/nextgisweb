@@ -1,6 +1,91 @@
 //>>built
-define("dojox/charting/axis2d/common",["dojo/_base/lang","dojo/_base/window","dojo/dom-geometry","dojox/gfx","dojo/has"],function(h,g,t,q,u){var p=h.getObject("dojox.charting.axis2d.common",!0),r=function(b){b.marginLeft="0px";b.marginTop="0px";b.marginRight="0px";b.marginBottom="0px";b.paddingLeft="0px";b.paddingTop="0px";b.paddingRight="0px";b.paddingBottom="0px";b.borderLeftWidth="0px";b.borderTopWidth="0px";b.borderRightWidth="0px";b.borderBottomWidth="0px"};return h.mixin(p,{createText:{gfx:function(b,
-c,e,g,k,l,m,n){return c.createText({x:e,y:g,text:l,align:k}).setFont(m).setFill(n)},html:function(b,c,e,h,k,l,m,n,d){c=g.doc.createElement("div");var a=c.style,f;b.getTextDir&&(c.dir=b.getTextDir(l));r(a);a.font=m;c.innerHTML=String(l).replace(/\s/g,"\x26nbsp;");a.color=n;a.position="absolute";a.left="-10000px";g.body().appendChild(c);var p=q.normalizedLength(q.splitFontString(m).size);d||(c.getBoundingClientRect?(f=c.getBoundingClientRect(),f=f.width||f.right-f.left):f=t.getMarginBox(c).w);"rtl"==
-c.dir&&(e+=d?d:f);g.body().removeChild(c);a.position="relative";if(d)switch(a.width=d+"px",k){case "middle":a.textAlign="center";a.left=e-d/2+"px";break;case "end":a.textAlign="right";a.left=e-d+"px";break;default:a.left=e+"px",a.textAlign="left"}else switch(k){case "middle":a.left=Math.floor(e-f/2)+"px";break;case "end":a.left=Math.floor(e-f)+"px";break;default:a.left=Math.floor(e)+"px"}a.top=Math.floor(h-p)+"px";a.whiteSpace="nowrap";d=g.doc.createElement("div");a=d.style;r(a);a.width="0px";a.height=
-"0px";d.appendChild(c);b.node.insertBefore(d,b.node.firstChild);u("dojo-bidi")&&b.htmlElementsRegistry.push([d,e,h,k,l,m,n]);return d}}})});
-//# sourceMappingURL=common.js.map
+define("dojox/charting/axis2d/common",["dojo/_base/lang","dojo/_base/window","dojo/dom-geometry","dojox/gfx","dojo/has"],function(_1,_2,_3,g,_4){
+var _5=_1.getObject("dojox.charting.axis2d.common",true);
+var _6=function(s){
+s.marginLeft="0px";
+s.marginTop="0px";
+s.marginRight="0px";
+s.marginBottom="0px";
+s.paddingLeft="0px";
+s.paddingTop="0px";
+s.paddingRight="0px";
+s.paddingBottom="0px";
+s.borderLeftWidth="0px";
+s.borderTopWidth="0px";
+s.borderRightWidth="0px";
+s.borderBottomWidth="0px";
+};
+var _7=function(n){
+if(n["getBoundingClientRect"]){
+var _8=n.getBoundingClientRect();
+return _8.width||(_8.right-_8.left);
+}else{
+return _3.getMarginBox(n).w;
+}
+};
+return _1.mixin(_5,{createText:{gfx:function(_9,_a,x,y,_b,_c,_d,_e){
+return _a.createText({x:x,y:y,text:_c,align:_b}).setFont(_d).setFill(_e);
+},html:function(_f,_10,x,y,_11,_12,_13,_14,_15){
+var p=_2.doc.createElement("div"),s=p.style,_16;
+if(_f.getTextDir){
+p.dir=_f.getTextDir(_12);
+}
+_6(s);
+s.font=_13;
+p.innerHTML=String(_12).replace(/\s/g,"&nbsp;");
+s.color=_14;
+s.position="absolute";
+s.left="-10000px";
+_2.body().appendChild(p);
+var _17=g.normalizedLength(g.splitFontString(_13).size);
+if(!_15){
+_16=_7(p);
+}
+if(p.dir=="rtl"){
+x+=_15?_15:_16;
+}
+_2.body().removeChild(p);
+s.position="relative";
+if(_15){
+s.width=_15+"px";
+switch(_11){
+case "middle":
+s.textAlign="center";
+s.left=(x-_15/2)+"px";
+break;
+case "end":
+s.textAlign="right";
+s.left=(x-_15)+"px";
+break;
+default:
+s.left=x+"px";
+s.textAlign="left";
+break;
+}
+}else{
+switch(_11){
+case "middle":
+s.left=Math.floor(x-_16/2)+"px";
+break;
+case "end":
+s.left=Math.floor(x-_16)+"px";
+break;
+default:
+s.left=Math.floor(x)+"px";
+break;
+}
+}
+s.top=Math.floor(y-_17)+"px";
+s.whiteSpace="nowrap";
+var _18=_2.doc.createElement("div"),w=_18.style;
+_6(w);
+w.width="0px";
+w.height="0px";
+_18.appendChild(p);
+_f.node.insertBefore(_18,_f.node.firstChild);
+if(_4("dojo-bidi")){
+_f.htmlElementsRegistry.push([_18,x,y,_11,_12,_13,_14]);
+}
+return _18;
+}}});
+});

@@ -1,4 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/zh/SpellCheck",{widgetLabel:"\u6279\u5904\u7406\u62fc\u5199\u68c0\u67e5",unfound:"\u627e\u4e0d\u5230",skip:"\u8df3\u8fc7",skipAll:"\u5168\u90e8\u8df3\u8fc7",toDic:"\u6dfb\u52a0\u5230\u5b57\u5178",suggestions:"\u5efa\u8bae",replace:"\u66ff\u6362",replaceWith:"\u66ff\u6362\u6210",replaceAll:"\u5168\u90e8\u66ff\u6362",cancel:"\u53d6\u6d88",msg:"\u672a\u627e\u5230\u62fc\u5199\u9519\u8bef",iSkip:"\u8df3\u8fc7\u6b64\u5904",iSkipAll:"\u8df3\u8fc7\u6240\u6709\u4e0e\u6b64\u5904\u76f8\u540c\u7684\u5730\u65b9",
-iMsg:"\u6ca1\u6709\u62fc\u5199\u5efa\u8bae"});
-//# sourceMappingURL=SpellCheck.js.map
+define("dojox/editor/plugins/nls/zh/SpellCheck",({widgetLabel:"批处理拼写检查",unfound:"找不到",skip:"跳过",skipAll:"全部跳过",toDic:"添加到字典",suggestions:"建议",replace:"替换",replaceWith:"替换成",replaceAll:"全部替换",cancel:"取消",msg:"未找到拼写错误",iSkip:"跳过此处",iSkipAll:"跳过所有与此处相同的地方",iMsg:"没有拼写建议"}));

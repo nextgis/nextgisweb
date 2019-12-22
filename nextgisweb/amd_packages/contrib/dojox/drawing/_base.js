@@ -1,3 +1,5 @@
 //>>built
-define("dojox/drawing/_base",["dojo","./annotations/Label","./Drawing"],function(a,c,b){a.experimental("dojox.drawing");return b});
-//# sourceMappingURL=_base.js.map
+define("dojox/drawing/_base",["dojo","./annotations/Label","./Drawing"],function(_1,L,_2){
+_1.experimental("dojox.drawing");
+return _2;
+});

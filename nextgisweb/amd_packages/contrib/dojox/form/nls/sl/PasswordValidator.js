@@ -1,3 +1,2 @@
 //>>built
-define("dojox/form/nls/sl/PasswordValidator",{nomatchMessage:"Gesli se ne ujemata.",badPasswordMessage:"Neveljavno geslo."});
-//# sourceMappingURL=PasswordValidator.js.map
+define("dojox/form/nls/sl/PasswordValidator",({nomatchMessage:"Gesli se ne ujemata.",badPasswordMessage:"Neveljavno geslo."}));

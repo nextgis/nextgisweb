@@ -1,11 +1,180 @@
 //>>built
-define("dojox/drawing/ui/Toolbar",["dojo","../library/icons","../util/common","../Drawing","../manager/_registry"],function(c,w,x,z,h){return c.declare("dojox.drawing.ui.Toolbar",[],{constructor:function(b,a){if(b.drawing)this.drawing=this.toolDrawing=b.drawing,this.width=this.toolDrawing.width,this.height=this.toolDrawing.height,this.strSelected=b.selected,this.strTools=b.tools,this.strPlugs=b.plugs,this._mixprops(["padding","margin","size","radius"],b),this.addBack(),this.orient=b.orient?b.orient:
-!1;else{var n=c.marginBox(a);this.width=n.w;this.height=n.h;this.strSelected=c.attr(a,"selected");this.strTools=c.attr(a,"tools");this.strPlugs=c.attr(a,"plugs");this._mixprops(["padding","margin","size","radius"],a);this.toolDrawing=new z({mode:"ui"},a);this.orient=c.attr(a,"orient")}this.horizontal=this.orient?"H"==this.orient:this.width>this.height;this.toolDrawing.ready?(this.makeButtons(),!this.strSelected&&this.drawing.defaults.clickMode&&this.drawing.mouse.setCursor("default")):c.connect(this.toolDrawing,
-"onSurfaceReady",this,function(){c.disconnect(b);this.drawing=h.getRegistered("drawing",c.attr(a,"drawingId"));this.makeButtons();if(!this.strSelected&&this.drawing.defaults.clickMode)var b=c.connect(this.drawing,"onSurfaceReady",this,function(){c.disconnect(b);this.drawing.mouse.setCursor("default")})})},padding:10,margin:5,size:30,radius:3,toolPlugGap:20,strSelected:"",strTools:"",strPlugs:"",makeButtons:function(){this.buttons=[];this.plugins=[];var b=this.padding,a=this.padding,n=this.size,k=
-this.size,r=this.radius,p=this.margin,t={place:"BR",size:2,mult:4};if(this.strTools){var q=[],g=h.getRegistered("tool"),u={},m;for(m in g){var l=x.abbr(m);u[l]=g[m];"all"==this.strTools&&(q.push(l),l=h.getRegistered("tool",m),l.secondary&&q.push(l.secondary.name))}"all"!=this.strTools&&(g=this.strTools.split(","),c.forEach(g,function(a){a=c.trim(a);q.push(a);a=h.getRegistered("tool",u[a].name);a.secondary&&q.push(a.secondary.name)},this));c.forEach(q,function(e){e=c.trim(e);var d=!1;if(-1<e.indexOf("Secondary")){var d=
-e.substring(0,e.indexOf("Secondary")),d=h.getRegistered("tool",u[d].name).secondary,f=d.label;this[e]=d.funct;d.setup&&c.hitch(this,d.setup)();f=this.toolDrawing.addUI("button",{data:{x:b,y:a,width:n,height:k/2,r:r},toolType:e,secondary:!0,text:f,shadow:t,scope:this,callback:this[e]});d.postSetup&&c.hitch(this,d.postSetup,f)();d=!0}else f=this.toolDrawing.addUI("button",{data:{x:b,y:a,width:n,height:k,r:r},toolType:e,icon:w[e],shadow:t,scope:this,callback:"onToolClick"});h.register(f,"button");this.buttons.push(f);
-this.strSelected==e&&(f.select(),this.selected=f,this.drawing.setTool(f.toolType));this.horizontal?b+=k+p:a+=d?k/2+p:k+p},this)}this.horizontal?b+=this.toolPlugGap:a+=this.toolPlugGap;if(this.strPlugs){var g=[],l=h.getRegistered("plugin"),v={};for(m in l){var y=x.abbr(m);v[y]=l[m];"all"==this.strPlugs&&g.push(y)}"all"!=this.strPlugs&&(g=this.strPlugs.split(","),c.map(g,function(a){return c.trim(a)}));c.forEach(g,function(e){var d=c.trim(e);if(0!=v[e].button){var f=this.toolDrawing.addUI("button",
-{data:{x:b,y:a,width:n,height:k,r:r},toolType:d,icon:w[d],shadow:t,scope:this,callback:"onPlugClick"});h.register(f,"button");this.plugins.push(f);this.horizontal?b+=k+p:a+=k+p}d={};0==v[e].button?d={name:this.drawing.stencilTypeMap[e]}:d={name:this.drawing.stencilTypeMap[e],options:{button:f}};this.drawing.addPlugin(d)},this)}c.connect(this.drawing,"onRenderStencil",this,"onRenderStencil")},onRenderStencil:function(c){this.drawing.defaults.clickMode&&(this.drawing.mouse.setCursor("default"),this.selected&&
-this.selected.deselect(),this.selected=null)},addTool:function(){},addPlugin:function(){},addBack:function(){this.toolDrawing.addUI("rect",{data:{x:0,y:0,width:this.width,height:this.size+2*this.padding,fill:"#ffffff",borderWidth:0}})},onToolClick:function(b){this.drawing.defaults.clickMode&&this.drawing.mouse.setCursor("crosshair");c.forEach(this.buttons,function(a){a.id==b.id?(a.select(),this.selected=a,this.drawing.setTool(b.toolType)):a.secondary||a.deselect()},this)},onPlugClick:function(c){},
-_mixprops:function(b,a){c.forEach(b,function(b){this[b]=a.tagName?null===c.attr(a,b)?this[b]:c.attr(a,b):void 0===a[b]?this[b]:a[b]},this)}})});
-//# sourceMappingURL=Toolbar.js.map
+define("dojox/drawing/ui/Toolbar",["dojo","../library/icons","../util/common","../Drawing","../manager/_registry"],function(_1,_2,_3,_4,_5){
+return _1.declare("dojox.drawing.ui.Toolbar",[],{constructor:function(_6,_7){
+if(_6.drawing){
+this.toolDrawing=_6.drawing;
+this.drawing=this.toolDrawing;
+this.width=this.toolDrawing.width;
+this.height=this.toolDrawing.height;
+this.strSelected=_6.selected;
+this.strTools=_6.tools;
+this.strPlugs=_6.plugs;
+this._mixprops(["padding","margin","size","radius"],_6);
+this.addBack();
+this.orient=_6.orient?_6.orient:false;
+}else{
+var _8=_1.marginBox(_7);
+this.width=_8.w;
+this.height=_8.h;
+this.strSelected=_1.attr(_7,"selected");
+this.strTools=_1.attr(_7,"tools");
+this.strPlugs=_1.attr(_7,"plugs");
+this._mixprops(["padding","margin","size","radius"],_7);
+this.toolDrawing=new _4({mode:"ui"},_7);
+this.orient=_1.attr(_7,"orient");
+}
+this.horizontal=this.orient?this.orient=="H":this.width>this.height;
+if(this.toolDrawing.ready){
+this.makeButtons();
+if(!this.strSelected&&this.drawing.defaults.clickMode){
+this.drawing.mouse.setCursor("default");
+}
+}else{
+var c=_1.connect(this.toolDrawing,"onSurfaceReady",this,function(){
+_1.disconnect(c);
+this.drawing=_5.getRegistered("drawing",_1.attr(_7,"drawingId"));
+this.makeButtons();
+if(!this.strSelected&&this.drawing.defaults.clickMode){
+var c=_1.connect(this.drawing,"onSurfaceReady",this,function(){
+_1.disconnect(c);
+this.drawing.mouse.setCursor("default");
+});
+}
+});
+}
+},padding:10,margin:5,size:30,radius:3,toolPlugGap:20,strSelected:"",strTools:"",strPlugs:"",makeButtons:function(){
+this.buttons=[];
+this.plugins=[];
+var x=this.padding,y=this.padding,w=this.size,h=this.size,r=this.radius,g=this.margin,_9=_2,s={place:"BR",size:2,mult:4};
+if(this.strTools){
+var _a=[];
+var _b=_5.getRegistered("tool");
+var _c={};
+for(var nm in _b){
+var _d=_3.abbr(nm);
+_c[_d]=_b[nm];
+if(this.strTools=="all"){
+_a.push(_d);
+var _e=_5.getRegistered("tool",nm);
+if(_e.secondary){
+_a.push(_e.secondary.name);
+}
+}
+}
+if(this.strTools!="all"){
+var _f=this.strTools.split(",");
+_1.forEach(_f,function(_10){
+_10=_1.trim(_10);
+_a.push(_10);
+var _11=_5.getRegistered("tool",_c[_10].name);
+if(_11.secondary){
+_a.push(_11.secondary.name);
+}
+},this);
+}
+_1.forEach(_a,function(t){
+t=_1.trim(t);
+var _12=false;
+if(t.indexOf("Secondary")>-1){
+var _13=t.substring(0,t.indexOf("Secondary"));
+var sec=_5.getRegistered("tool",_c[_13].name).secondary;
+var _14=sec.label;
+this[t]=sec.funct;
+if(sec.setup){
+_1.hitch(this,sec.setup)();
+}
+var btn=this.toolDrawing.addUI("button",{data:{x:x,y:y,width:w,height:h/2,r:r},toolType:t,secondary:true,text:_14,shadow:s,scope:this,callback:this[t]});
+if(sec.postSetup){
+_1.hitch(this,sec.postSetup,btn)();
+}
+_12=true;
+}else{
+var btn=this.toolDrawing.addUI("button",{data:{x:x,y:y,width:w,height:h,r:r},toolType:t,icon:_9[t],shadow:s,scope:this,callback:"onToolClick"});
+}
+_5.register(btn,"button");
+this.buttons.push(btn);
+if(this.strSelected==t){
+btn.select();
+this.selected=btn;
+this.drawing.setTool(btn.toolType);
+}
+if(this.horizontal){
+x+=h+g;
+}else{
+var _15=_12?h/2+g:h+g;
+y+=_15;
+}
+},this);
+}
+if(this.horizontal){
+x+=this.toolPlugGap;
+}else{
+y+=this.toolPlugGap;
+}
+if(this.strPlugs){
+var _16=[];
+var _17=_5.getRegistered("plugin");
+var _18={};
+for(var nm in _17){
+var _19=_3.abbr(nm);
+_18[_19]=_17[nm];
+if(this.strPlugs=="all"){
+_16.push(_19);
+}
+}
+if(this.strPlugs!="all"){
+_16=this.strPlugs.split(",");
+_1.map(_16,function(p){
+return _1.trim(p);
+});
+}
+_1.forEach(_16,function(p){
+var t=_1.trim(p);
+if(_18[p].button!=false){
+var btn=this.toolDrawing.addUI("button",{data:{x:x,y:y,width:w,height:h,r:r},toolType:t,icon:_9[t],shadow:s,scope:this,callback:"onPlugClick"});
+_5.register(btn,"button");
+this.plugins.push(btn);
+if(this.horizontal){
+x+=h+g;
+}else{
+y+=h+g;
+}
+}
+var _1a={};
+_18[p].button==false?_1a={name:this.drawing.stencilTypeMap[p]}:_1a={name:this.drawing.stencilTypeMap[p],options:{button:btn}};
+this.drawing.addPlugin(_1a);
+},this);
+}
+_1.connect(this.drawing,"onRenderStencil",this,"onRenderStencil");
+},onRenderStencil:function(_1b){
+if(this.drawing.defaults.clickMode){
+this.drawing.mouse.setCursor("default");
+this.selected&&this.selected.deselect();
+this.selected=null;
+}
+},addTool:function(){
+},addPlugin:function(){
+},addBack:function(){
+this.toolDrawing.addUI("rect",{data:{x:0,y:0,width:this.width,height:this.size+(this.padding*2),fill:"#ffffff",borderWidth:0}});
+},onToolClick:function(_1c){
+if(this.drawing.defaults.clickMode){
+this.drawing.mouse.setCursor("crosshair");
+}
+_1.forEach(this.buttons,function(b){
+if(b.id==_1c.id){
+b.select();
+this.selected=b;
+this.drawing.setTool(_1c.toolType);
+}else{
+if(!b.secondary){
+b.deselect();
+}
+}
+},this);
+},onPlugClick:function(_1d){
+},_mixprops:function(_1e,_1f){
+_1.forEach(_1e,function(p){
+this[p]=_1f.tagName?_1.attr(_1f,p)===null?this[p]:_1.attr(_1f,p):_1f[p]===undefined?this[p]:_1f[p];
+},this);
+}});
+});

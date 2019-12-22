@@ -1,5 +1,64 @@
 //>>built
-define("dijit/form/_ListMouseMixin",["dojo/_base/declare","dojo/on","dojo/touch","./_ListBase"],function(e,g,h,f){return e("dijit.form._ListMouseMixin",f,{postCreate:function(){this.inherited(arguments);this.domNode.dojoClick=!0;this._listConnect("click","_onClick");this._listConnect("mousedown","_onMouseDown");this._listConnect("mouseup","_onMouseUp");this._listConnect("mouseover","_onMouseOver");this._listConnect("mouseout","_onMouseOut")},_onClick:function(b,a){this._setSelectedAttr(a,!1);this._deferredClick&&
-this._deferredClick.remove();this._deferredClick=this.defer(function(){this._deferredClick=null;this.onClick(a)})},_onMouseDown:function(b,a){this._hoveredNode&&(this.onUnhover(this._hoveredNode),this._hoveredNode=null);this._isDragging=!0;this._setSelectedAttr(a,!1)},_onMouseUp:function(b,a){this._isDragging=!1;var c=this.selected,d=this._hoveredNode;c&&a==c?this.defer(function(){this._onClick(b,c)}):d&&this.defer(function(){this._onClick(b,d)})},_onMouseOut:function(b,a){this._hoveredNode&&(this.onUnhover(this._hoveredNode),
-this._hoveredNode=null);this._isDragging&&(this._cancelDrag=(new Date).getTime()+1E3)},_onMouseOver:function(b,a){this._cancelDrag&&((new Date).getTime()>this._cancelDrag&&(this._isDragging=!1),this._cancelDrag=null);this._hoveredNode=a;this.onHover(a);this._isDragging&&this._setSelectedAttr(a,!1)}})});
-//# sourceMappingURL=_ListMouseMixin.js.map
+define("dijit/form/_ListMouseMixin",["dojo/_base/declare","dojo/on","dojo/touch","./_ListBase"],function(_1,on,_2,_3){
+return _1("dijit.form._ListMouseMixin",_3,{postCreate:function(){
+this.inherited(arguments);
+this.domNode.dojoClick=true;
+this._listConnect("click","_onClick");
+this._listConnect("mousedown","_onMouseDown");
+this._listConnect("mouseup","_onMouseUp");
+this._listConnect("mouseover","_onMouseOver");
+this._listConnect("mouseout","_onMouseOut");
+},_onClick:function(_4,_5){
+this._setSelectedAttr(_5,false);
+if(this._deferredClick){
+this._deferredClick.remove();
+}
+this._deferredClick=this.defer(function(){
+this._deferredClick=null;
+this.onClick(_5);
+});
+},_onMouseDown:function(_6,_7){
+if(this._hoveredNode){
+this.onUnhover(this._hoveredNode);
+this._hoveredNode=null;
+}
+this._isDragging=true;
+this._setSelectedAttr(_7,false);
+},_onMouseUp:function(_8,_9){
+this._isDragging=false;
+var _a=this.selected;
+var _b=this._hoveredNode;
+if(_a&&_9==_a){
+this.defer(function(){
+this._onClick(_8,_a);
+});
+}else{
+if(_b){
+this.defer(function(){
+this._onClick(_8,_b);
+});
+}
+}
+},_onMouseOut:function(_c,_d){
+if(this._hoveredNode){
+this.onUnhover(this._hoveredNode);
+this._hoveredNode=null;
+}
+if(this._isDragging){
+this._cancelDrag=(new Date()).getTime()+1000;
+}
+},_onMouseOver:function(_e,_f){
+if(this._cancelDrag){
+var _10=(new Date()).getTime();
+if(_10>this._cancelDrag){
+this._isDragging=false;
+}
+this._cancelDrag=null;
+}
+this._hoveredNode=_f;
+this.onHover(_f);
+if(this._isDragging){
+this._setSelectedAttr(_f,false);
+}
+}});
+});

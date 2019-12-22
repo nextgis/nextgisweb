@@ -1,13 +1,147 @@
 //>>built
-define("dojox/gfx3d/lighting",["dojo/_base/lang","dojo/_base/Color","dojo/_base/declare","dojox/gfx/_base","./_base"],function(q,m,n,p,l){var a=l.lighting={black:function(){return{r:0,g:0,b:0,a:1}},white:function(){return{r:1,g:1,b:1,a:1}},toStdColor:function(b){b=p.normalizeColor(b);return{r:b.r/255,g:b.g/255,b:b.b/255,a:b.a}},fromStdColor:function(b){return new m([Math.round(255*b.r),Math.round(255*b.g),Math.round(255*b.b),b.a])},scaleColor:function(b,a){return{r:b*a.r,g:b*a.g,b:b*a.b,a:b*a.a}},
-addColor:function(b,a){return{r:b.r+a.r,g:b.g+a.g,b:b.b+a.b,a:b.a+a.a}},multiplyColor:function(b,a){return{r:b.r*a.r,g:b.g*a.g,b:b.b*a.b,a:b.a*a.a}},saturateColor:function(a){return{r:0>a.r?0:1<a.r?1:a.r,g:0>a.g?0:1<a.g?1:a.g,b:0>a.b?0:1<a.b?1:a.b,a:0>a.a?0:1<a.a?1:a.a}},mixColor:function(b,c,d){return a.addColor(a.scaleColor(d,b),a.scaleColor(1-d,c))},diff2Color:function(a,c){var b=a.r-c.r,e=a.g-c.g,f=a.b-c.b,g=a.a-c.a;return b*b+e*e+f*f+g*g},length2Color:function(a){return a.r*a.r+a.g*a.g+a.b*a.b+
-a.a*a.a},dot:function(a,c){return a.x*c.x+a.y*c.y+a.z*c.z},scale:function(a,c){return{x:a*c.x,y:a*c.y,z:a*c.z}},add:function(a,c){return{x:a.x+c.x,y:a.y+c.y,z:a.z+c.z}},saturate:function(a){return Math.min(Math.max(a,0),1)},length:function(a){return Math.sqrt(l.lighting.dot(a,a))},normalize:function(b){return a.scale(1/a.length(b),b)},faceforward:function(a,c){var b=l.lighting,e=0>b.dot(c,a)?1:-1;return b.scale(e,a)},reflect:function(a,c){var b=l.lighting;return b.add(a,b.scale(-2*b.dot(a,c),c))},
-diffuse:function(b,c){for(var d=a.black(),e=0;e<c.length;++e)var f=c[e],g=a.dot(a.normalize(f.direction),b),d=a.addColor(d,a.scaleColor(g,f.color));return a.saturateColor(d)},specular:function(b,c,d,e){for(var f=a.black(),g=0;g<e.length;++g)var h=e[g],k=a.normalize(a.add(a.normalize(h.direction),c)),k=Math.pow(Math.max(0,a.dot(b,k)),1/d),f=a.addColor(f,a.scaleColor(k,h.color));return a.saturateColor(f)},phong:function(b,c,d,e){b=a.normalize(b);for(var f=a.black(),g=0;g<e.length;++g)var h=e[g],k=a.reflect(a.scale(-1,
-a.normalize(c)),b),k=Math.pow(Math.max(0,a.dot(k,a.normalize(h.direction))),d),f=a.addColor(f,a.scaleColor(k,h.color));return a.saturateColor(f)}};n("dojox.gfx3d.lighting.Model",null,{constructor:function(b,c,d,e){this.incident=a.normalize(b);this.lights=[];for(b=0;b<c.length;++b){var f=c[b];this.lights.push({direction:a.normalize(f.direction),color:a.toStdColor(f.color)})}this.ambient=a.toStdColor(d.color?d.color:"white");this.ambient=a.scaleColor(d.intensity,this.ambient);this.ambient=a.scaleColor(this.ambient.a,
-this.ambient);this.ambient.a=1;this.specular=a.toStdColor(e?e:"white");this.specular=a.scaleColor(this.specular.a,this.specular);this.specular.a=1;this.npr_cool={r:0,g:0,b:.4,a:1};this.npr_warm={r:.4,g:.4,b:.2,a:1};this.npr_alpha=.2;this.npr_scale=this.npr_beta=.6},constant:function(b,c,d){d=a.toStdColor(d);b=d.a;d=a.scaleColor(b,d);d.a=b;return a.fromStdColor(a.saturateColor(d))},matte:function(b,c,d){"string"==typeof c&&(c=a.finish[c]);d=a.toStdColor(d);b=a.faceforward(a.normalize(b),this.incident);
-var e=a.scaleColor(c.Ka,this.ambient),f=a.saturate(-4*a.dot(b,this.incident));b=a.scaleColor(f*c.Kd,a.diffuse(b,this.lights));e=a.scaleColor(d.a,a.multiplyColor(d,a.addColor(e,b)));e.a=d.a;return a.fromStdColor(a.saturateColor(e))},metal:function(b,c,d){"string"==typeof c&&(c=a.finish[c]);d=a.toStdColor(d);b=a.faceforward(a.normalize(b),this.incident);var e=a.scale(-1,this.incident),f;f=a.scaleColor(c.Ka,this.ambient);var g=a.saturate(-4*a.dot(b,this.incident));b="phong"in c?a.scaleColor(g*c.Ks*c.phong,
-a.phong(b,e,c.phong_size,this.lights)):a.scaleColor(g*c.Ks,a.specular(b,e,c.roughness,this.lights));f=a.scaleColor(d.a,a.addColor(a.multiplyColor(d,f),a.multiplyColor(this.specular,b)));f.a=d.a;return a.fromStdColor(a.saturateColor(f))},plastic:function(b,c,d){"string"==typeof c&&(c=a.finish[c]);d=a.toStdColor(d);b=a.faceforward(a.normalize(b),this.incident);var e=a.scale(-1,this.incident),f;f=a.scaleColor(c.Ka,this.ambient);var g=a.saturate(-4*a.dot(b,this.incident)),h=a.scaleColor(g*c.Kd,a.diffuse(b,
-this.lights));b="phong"in c?a.scaleColor(g*c.Ks*c.phong,a.phong(b,e,c.phong_size,this.lights)):a.scaleColor(g*c.Ks,a.specular(b,e,c.roughness,this.lights));f=a.scaleColor(d.a,a.addColor(a.multiplyColor(d,a.addColor(f,h)),a.multiplyColor(this.specular,b)));f.a=d.a;return a.fromStdColor(a.saturateColor(f))},npr:function(b,c,d){"string"==typeof c&&(c=a.finish[c]);d=a.toStdColor(d);b=a.faceforward(a.normalize(b),this.incident);var e=a.scaleColor(c.Ka,this.ambient),f=a.saturate(-4*a.dot(b,this.incident));
-c=a.scaleColor(f*c.Kd,a.diffuse(b,this.lights));e=a.scaleColor(d.a,a.multiplyColor(d,a.addColor(e,c)));c=a.addColor(this.npr_cool,a.scaleColor(this.npr_alpha,e));f=a.addColor(this.npr_warm,a.scaleColor(this.npr_beta,e));b=(1+a.dot(this.incident,b))/2;e=a.scaleColor(this.npr_scale,a.addColor(e,a.mixColor(c,f,b)));e.a=d.a;return a.fromStdColor(a.saturateColor(e))}});l.lighting.finish={defaults:{Ka:.1,Kd:.6,Ks:0,roughness:.05},dull:{Ka:.1,Kd:.6,Ks:.5,roughness:.15},shiny:{Ka:.1,Kd:.6,Ks:1,roughness:.001},
-glossy:{Ka:.1,Kd:.6,Ks:1,roughness:1E-4},phong_dull:{Ka:.1,Kd:.6,Ks:.5,phong:.5,phong_size:1},phong_shiny:{Ka:.1,Kd:.6,Ks:1,phong:1,phong_size:200},phong_glossy:{Ka:.1,Kd:.6,Ks:1,phong:1,phong_size:300},luminous:{Ka:1,Kd:0,Ks:0,roughness:.05},metalA:{Ka:.35,Kd:.3,Ks:.8,roughness:.05},metalB:{Ka:.3,Kd:.4,Ks:.7,roughness:1/60},metalC:{Ka:.25,Kd:.5,Ks:.8,roughness:.0125},metalD:{Ka:.15,Kd:.6,Ks:.8,roughness:.01},metalE:{Ka:.1,Kd:.7,Ks:.8,roughness:1/120}};return a});
-//# sourceMappingURL=lighting.js.map
+define("dojox/gfx3d/lighting",["dojo/_base/lang","dojo/_base/Color","dojo/_base/declare","dojox/gfx/_base","./_base"],function(_1,_2,_3,_4,_5){
+var _6=_5.lighting={black:function(){
+return {r:0,g:0,b:0,a:1};
+},white:function(){
+return {r:1,g:1,b:1,a:1};
+},toStdColor:function(c){
+c=_4.normalizeColor(c);
+return {r:c.r/255,g:c.g/255,b:c.b/255,a:c.a};
+},fromStdColor:function(c){
+return new _2([Math.round(255*c.r),Math.round(255*c.g),Math.round(255*c.b),c.a]);
+},scaleColor:function(s,c){
+return {r:s*c.r,g:s*c.g,b:s*c.b,a:s*c.a};
+},addColor:function(a,b){
+return {r:a.r+b.r,g:a.g+b.g,b:a.b+b.b,a:a.a+b.a};
+},multiplyColor:function(a,b){
+return {r:a.r*b.r,g:a.g*b.g,b:a.b*b.b,a:a.a*b.a};
+},saturateColor:function(c){
+return {r:c.r<0?0:c.r>1?1:c.r,g:c.g<0?0:c.g>1?1:c.g,b:c.b<0?0:c.b>1?1:c.b,a:c.a<0?0:c.a>1?1:c.a};
+},mixColor:function(c1,c2,s){
+return _6.addColor(_6.scaleColor(s,c1),_6.scaleColor(1-s,c2));
+},diff2Color:function(c1,c2){
+var r=c1.r-c2.r;
+var g=c1.g-c2.g;
+var b=c1.b-c2.b;
+var a=c1.a-c2.a;
+return r*r+g*g+b*b+a*a;
+},length2Color:function(c){
+return c.r*c.r+c.g*c.g+c.b*c.b+c.a*c.a;
+},dot:function(a,b){
+return a.x*b.x+a.y*b.y+a.z*b.z;
+},scale:function(s,v){
+return {x:s*v.x,y:s*v.y,z:s*v.z};
+},add:function(a,b){
+return {x:a.x+b.x,y:a.y+b.y,z:a.z+b.z};
+},saturate:function(v){
+return Math.min(Math.max(v,0),1);
+},length:function(v){
+return Math.sqrt(_5.lighting.dot(v,v));
+},normalize:function(v){
+return _6.scale(1/_6.length(v),v);
+},faceforward:function(n,i){
+var p=_5.lighting;
+var s=p.dot(i,n)<0?1:-1;
+return p.scale(s,n);
+},reflect:function(i,n){
+var p=_5.lighting;
+return p.add(i,p.scale(-2*p.dot(i,n),n));
+},diffuse:function(_7,_8){
+var c=_6.black();
+for(var i=0;i<_8.length;++i){
+var l=_8[i],d=_6.dot(_6.normalize(l.direction),_7);
+c=_6.addColor(c,_6.scaleColor(d,l.color));
+}
+return _6.saturateColor(c);
+},specular:function(_9,v,_a,_b){
+var c=_6.black();
+for(var i=0;i<_b.length;++i){
+var l=_b[i],h=_6.normalize(_6.add(_6.normalize(l.direction),v)),s=Math.pow(Math.max(0,_6.dot(_9,h)),1/_a);
+c=_6.addColor(c,_6.scaleColor(s,l.color));
+}
+return _6.saturateColor(c);
+},phong:function(_c,v,_d,_e){
+_c=_6.normalize(_c);
+var c=_6.black();
+for(var i=0;i<_e.length;++i){
+var l=_e[i],r=_6.reflect(_6.scale(-1,_6.normalize(v)),_c),s=Math.pow(Math.max(0,_6.dot(r,_6.normalize(l.direction))),_d);
+c=_6.addColor(c,_6.scaleColor(s,l.color));
+}
+return _6.saturateColor(c);
+}};
+_3("dojox.gfx3d.lighting.Model",null,{constructor:function(_f,_10,_11,_12){
+this.incident=_6.normalize(_f);
+this.lights=[];
+for(var i=0;i<_10.length;++i){
+var l=_10[i];
+this.lights.push({direction:_6.normalize(l.direction),color:_6.toStdColor(l.color)});
+}
+this.ambient=_6.toStdColor(_11.color?_11.color:"white");
+this.ambient=_6.scaleColor(_11.intensity,this.ambient);
+this.ambient=_6.scaleColor(this.ambient.a,this.ambient);
+this.ambient.a=1;
+this.specular=_6.toStdColor(_12?_12:"white");
+this.specular=_6.scaleColor(this.specular.a,this.specular);
+this.specular.a=1;
+this.npr_cool={r:0,g:0,b:0.4,a:1};
+this.npr_warm={r:0.4,g:0.4,b:0.2,a:1};
+this.npr_alpha=0.2;
+this.npr_beta=0.6;
+this.npr_scale=0.6;
+},constant:function(_13,_14,_15){
+_15=_6.toStdColor(_15);
+var _16=_15.a,_17=_6.scaleColor(_16,_15);
+_17.a=_16;
+return _6.fromStdColor(_6.saturateColor(_17));
+},matte:function(_18,_19,_1a){
+if(typeof _19=="string"){
+_19=_6.finish[_19];
+}
+_1a=_6.toStdColor(_1a);
+_18=_6.faceforward(_6.normalize(_18),this.incident);
+var _1b=_6.scaleColor(_19.Ka,this.ambient),_1c=_6.saturate(-4*_6.dot(_18,this.incident)),_1d=_6.scaleColor(_1c*_19.Kd,_6.diffuse(_18,this.lights)),_1e=_6.scaleColor(_1a.a,_6.multiplyColor(_1a,_6.addColor(_1b,_1d)));
+_1e.a=_1a.a;
+return _6.fromStdColor(_6.saturateColor(_1e));
+},metal:function(_1f,_20,_21){
+if(typeof _20=="string"){
+_20=_6.finish[_20];
+}
+_21=_6.toStdColor(_21);
+_1f=_6.faceforward(_6.normalize(_1f),this.incident);
+var v=_6.scale(-1,this.incident),_22,_23,_24=_6.scaleColor(_20.Ka,this.ambient),_25=_6.saturate(-4*_6.dot(_1f,this.incident));
+if("phong" in _20){
+_22=_6.scaleColor(_25*_20.Ks*_20.phong,_6.phong(_1f,v,_20.phong_size,this.lights));
+}else{
+_22=_6.scaleColor(_25*_20.Ks,_6.specular(_1f,v,_20.roughness,this.lights));
+}
+_23=_6.scaleColor(_21.a,_6.addColor(_6.multiplyColor(_21,_24),_6.multiplyColor(this.specular,_22)));
+_23.a=_21.a;
+return _6.fromStdColor(_6.saturateColor(_23));
+},plastic:function(_26,_27,_28){
+if(typeof _27=="string"){
+_27=_6.finish[_27];
+}
+_28=_6.toStdColor(_28);
+_26=_6.faceforward(_6.normalize(_26),this.incident);
+var v=_6.scale(-1,this.incident),_29,_2a,_2b=_6.scaleColor(_27.Ka,this.ambient),_2c=_6.saturate(-4*_6.dot(_26,this.incident)),_2d=_6.scaleColor(_2c*_27.Kd,_6.diffuse(_26,this.lights));
+if("phong" in _27){
+_29=_6.scaleColor(_2c*_27.Ks*_27.phong,_6.phong(_26,v,_27.phong_size,this.lights));
+}else{
+_29=_6.scaleColor(_2c*_27.Ks,_6.specular(_26,v,_27.roughness,this.lights));
+}
+_2a=_6.scaleColor(_28.a,_6.addColor(_6.multiplyColor(_28,_6.addColor(_2b,_2d)),_6.multiplyColor(this.specular,_29)));
+_2a.a=_28.a;
+return _6.fromStdColor(_6.saturateColor(_2a));
+},npr:function(_2e,_2f,_30){
+if(typeof _2f=="string"){
+_2f=_6.finish[_2f];
+}
+_30=_6.toStdColor(_30);
+_2e=_6.faceforward(_6.normalize(_2e),this.incident);
+var _31=_6.scaleColor(_2f.Ka,this.ambient),_32=_6.saturate(-4*_6.dot(_2e,this.incident)),_33=_6.scaleColor(_32*_2f.Kd,_6.diffuse(_2e,this.lights)),_34=_6.scaleColor(_30.a,_6.multiplyColor(_30,_6.addColor(_31,_33))),_35=_6.addColor(this.npr_cool,_6.scaleColor(this.npr_alpha,_34)),_36=_6.addColor(this.npr_warm,_6.scaleColor(this.npr_beta,_34)),d=(1+_6.dot(this.incident,_2e))/2,_34=_6.scaleColor(this.npr_scale,_6.addColor(_34,_6.mixColor(_35,_36,d)));
+_34.a=_30.a;
+return _6.fromStdColor(_6.saturateColor(_34));
+}});
+_5.lighting.finish={defaults:{Ka:0.1,Kd:0.6,Ks:0,roughness:0.05},dull:{Ka:0.1,Kd:0.6,Ks:0.5,roughness:0.15},shiny:{Ka:0.1,Kd:0.6,Ks:1,roughness:0.001},glossy:{Ka:0.1,Kd:0.6,Ks:1,roughness:0.0001},phong_dull:{Ka:0.1,Kd:0.6,Ks:0.5,phong:0.5,phong_size:1},phong_shiny:{Ka:0.1,Kd:0.6,Ks:1,phong:1,phong_size:200},phong_glossy:{Ka:0.1,Kd:0.6,Ks:1,phong:1,phong_size:300},luminous:{Ka:1,Kd:0,Ks:0,roughness:0.05},metalA:{Ka:0.35,Kd:0.3,Ks:0.8,roughness:1/20},metalB:{Ka:0.3,Kd:0.4,Ks:0.7,roughness:1/60},metalC:{Ka:0.25,Kd:0.5,Ks:0.8,roughness:1/80},metalD:{Ka:0.15,Kd:0.6,Ks:0.8,roughness:1/100},metalE:{Ka:0.1,Kd:0.7,Ks:0.8,roughness:1/120}};
+return _6;
+});

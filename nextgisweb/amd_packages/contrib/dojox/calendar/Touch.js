@@ -1,16 +1,253 @@
 //>>built
-define("dojox/calendar/Touch","dojo/_base/array dojo/_base/lang dojo/_base/declare dojo/dom dojo/dom-geometry dojo/_base/window dojo/on dojo/_base/event dojo/keys".split(" "),function(k,f,r,n,u,t,l,h,v){return r("dojox.calendar.Touch",null,{touchStartEditingTimer:500,touchEndEditingTimer:1E4,postMixInProperties:function(){this.on("rendererCreated",f.hitch(this,function(b){var a=b.renderer.renderer;this.own(l(a.domNode,"touchstart",f.hitch(this,function(b){this._onRendererTouchStart(b,a)})))}))},_onRendererTouchStart:function(b,
-a){var c=this._edProps;c&&c.endEditingTimer&&(clearTimeout(c.endEditingTimer),c.endEditingTimer=null);var d=a.item.item;c&&c.endEditingTimer&&(clearTimeout(c.endEditingTimer),c.endEditingTimer=null);null!=c&&c.item!=d&&(c.startEditingTimer&&clearTimeout(c.startEditingTimer),this._endItemEditing("touch",!1),c=null);if(!c){var e=[];e.push(l(t.doc,"touchend",f.hitch(this,this._docEditingTouchEndHandler)));e.push(l(this.itemContainer,"touchmove",f.hitch(this,this._docEditingTouchMoveHandler)));this._setEditingProperties({touchMoved:!1,
-item:d,renderer:a,rendererKind:a.rendererKind,event:b,handles:e,liveLayout:this.liveLayout});c=this._edProps}this._isEditing?(f.mixin(c,this._getTouchesOnRenderers(b,c.editedItem)),this._startTouchItemEditingGesture(b)):1<b.touches.length?h.stop(b):(this._touchSelectionTimer=setTimeout(f.hitch(this,function(){this._saveSelectedItems=this.get("selectedItems");this.selectFromEvent(b,d._item,a,!1)?this._pendingSelectedItem=d:delete this._saveSelectedItems;this._touchSelectionTimer=null}),200),c.start=
-{x:b.touches[0].screenX,y:b.touches[0].screenY},this.isItemEditable(c.item,c.rendererKind)&&(this._edProps.startEditingTimer=setTimeout(f.hitch(this,function(){this._touchSelectionTimer&&(clearTimeout(this._touchSelectionTimer),delete this._touchSelectionTime);this._pendingSelectedItem?(this.dispatchChange(null==this._saveSelectedItems?null:this._saveSelectedItems[0],this._pendingSelectedItem,null,b),delete this._saveSelectedItems,delete this._pendingSelectedItem):this.selectFromEvent(b,d._item,a);
-this._startItemEditing(c.item,"touch",b);c.moveTouchIndex=0;this._startItemEditingGesture([this.getTime(b)],"move","touch",b)}),this.touchStartEditingTimer)))},_docEditingTouchMoveHandler:function(b){var a=this._edProps,c=b.touches[0].screenX,d=b.touches[0].screenY;a.startEditingTimer&&(25<Math.abs(c-a.start.x)||25<Math.abs(d-a.start.y))&&(clearTimeout(a.startEditingTimer),a.startEditingTimer=null,clearTimeout(this._touchSelectionTimer),this._touchSelectionTimer=null,this._pendingSelectedItem&&(delete this._pendingSelectedItem,
-this.selectFromEvent(b,null,null,!1)));!a.touchMoved&&(10<Math.abs(c-a.start.x)||10<Math.abs(d-a.start.y))&&(a.touchMoved=!0);if(this._editingGesture&&(h.stop(b),a.itemBeginDispatched)){var c=[],d="resizeEnd"==a.editKind?a.editedItem.endTime:a.editedItem.startTime,e=a.editedItem.subColumn;switch(a.editKind){case "move":e=null==a.moveTouchIndex||0>a.moveTouchIndex?0:a.moveTouchIndex;c[0]=this.getTime(b,-1,-1,e);e=this.getSubColumn(b,-1,-1,e);break;case "resizeStart":c[0]=this.getTime(b,-1,-1,a.resizeStartTouchIndex);
-break;case "resizeEnd":c[0]=this.getTime(b,-1,-1,a.resizeEndTouchIndex);break;case "resizeBoth":c[0]=this.getTime(b,-1,-1,a.resizeStartTouchIndex),c[1]=this.getTime(b,-1,-1,a.resizeEndTouchIndex)}this._moveOrResizeItemGesture(c,"touch",b,e);"move"==a.editKind?-1==this.renderData.dateModule.compare(a.editedItem.startTime,d)?this.ensureVisibility(a.editedItem.startTime,a.editedItem.endTime,"start",this.autoScrollTouchMargin):this.ensureVisibility(a.editedItem.startTime,a.editedItem.endTime,"end",this.autoScrollTouchMargin):
-"resizeStart"==b.editKind||"resizeBoth"==b.editKind?this.ensureVisibility(a.editedItem.startTime,a.editedItem.endTime,"start",this.autoScrollTouchMargin):this.ensureVisibility(a.editedItem.startTime,a.editedItem.endTime,"end",this.autoScrollTouchMargin)}},autoScrollTouchMargin:10,_docEditingTouchEndHandler:function(b){h.stop(b);var a=this._edProps;a.startEditingTimer&&(clearTimeout(a.startEditingTimer),a.startEditingTimer=null);this._isEditing?(f.mixin(a,this._getTouchesOnRenderers(b,a.editedItem)),
-this._editingGesture&&(0==a.touchesLen?(this._endItemEditingGesture("touch",b),0<this.touchEndEditingTimer&&(a.endEditingTimer=setTimeout(f.hitch(this,function(){this._endItemEditing("touch",!1)}),this.touchEndEditingTimer))):(this._editingGesture&&this._endItemEditingGesture("touch",b),this._startTouchItemEditingGesture(b)))):(a.touchMoved?(this._saveSelectedItems&&(this.set("selectedItems",this._saveSelectedItems),delete this._saveSelectedItems,delete this._pendingSelectedItem),k.forEach(a.handles,
-function(a){a.remove()})):(h.stop(b),k.forEach(a.handles,function(a){a.remove()}),this._touchSelectionTimer?(clearTimeout(this._touchSelectionTimer),this.selectFromEvent(b,a.item._item,a.renderer,!0)):this._pendingSelectedItem&&(this.dispatchChange(0==this._saveSelectedItems.length?null:this._saveSelectedItems[0],this._pendingSelectedItem,null,b),delete this._saveSelectedItems,delete this._pendingSelectedItem),this._pendingDoubleTap&&this._pendingDoubleTap.item==a.item?(this._onItemDoubleClick({triggerEvent:b,
-renderer:a.renderer,item:a.item._item}),clearTimeout(this._pendingDoubleTap.timer),delete this._pendingDoubleTap):(this._pendingDoubleTap={item:a.item,timer:setTimeout(f.hitch(this,function(){delete this._pendingDoubleTap}),this.doubleTapDelay)},this._onItemClick({triggerEvent:b,renderer:a.renderer,item:a.item._item}))),this._edProps=null)},_startTouchItemEditingGesture:function(b){var a=this._edProps,c=-1!=a.resizeStartTouchIndex,d=-1!=a.resizeEndTouchIndex;c&&d||this._editingGesture&&2==a.touchesLen&&
-(d&&"resizeStart"==a.editKind||c&&"resizeEnd"==a.editKind)?(this._editingGesture&&"resizeBoth"!=a.editKind&&this._endItemEditingGesture("touch",b),a.editKind="resizeBoth",this._startItemEditingGesture([this.getTime(b,-1,-1,a.resizeStartTouchIndex),this.getTime(b,-1,-1,a.resizeEndTouchIndex)],a.editKind,"touch",b)):c&&1==a.touchesLen&&!this._editingGesture?this._startItemEditingGesture([this.getTime(b,-1,-1,a.resizeStartTouchIndex)],"resizeStart","touch",b):d&&1==a.touchesLen&&!this._editingGesture?
-this._startItemEditingGesture([this.getTime(b,-1,-1,a.resizeEndTouchIndex)],"resizeEnd","touch",b):this._startItemEditingGesture([this.getTime(b)],"move","touch",b)},_getTouchesOnRenderers:function(b,a){for(var c=this._getStartEndRenderers(a),d=-1,e=-1,f=-1,h=null!=c[0]&&null!=c[0].resizeStartHandle,l=null!=c[1]&&null!=c[1].resizeEndHandle,m=0,p=!1,k=this.rendererManager.itemToRenderer[a.id],g=0;g<b.touches.length;g++){-1==d&&h&&(p=n.isDescendant(b.touches[g].target,c[0].resizeStartHandle))&&(d=g,
-m++);-1==e&&l&&(p=n.isDescendant(b.touches[g].target,c[1].resizeEndHandle))&&(e=g,m++);if(-1==d&&-1==e)for(var q=0;q<k.length;q++)if(p=n.isDescendant(b.touches[g].target,k[q].container)){f=g;m++;break}if(-1!=d&&-1!=e&&-1!=f)break}return{touchesLen:m,resizeStartTouchIndex:d,resizeEndTouchIndex:e,moveTouchIndex:f}}})});
-//# sourceMappingURL=Touch.js.map
+define("dojox/calendar/Touch",["dojo/_base/array","dojo/_base/lang","dojo/_base/declare","dojo/dom","dojo/dom-geometry","dojo/_base/window","dojo/on","dojo/_base/event","dojo/keys"],function(_1,_2,_3,_4,_5,_6,on,_7,_8){
+return _3("dojox.calendar.Touch",null,{touchStartEditingTimer:500,touchEndEditingTimer:10000,postMixInProperties:function(){
+this.on("rendererCreated",_2.hitch(this,function(_9){
+var _a=_9.renderer.renderer;
+this.own(on(_a.domNode,"touchstart",_2.hitch(this,function(e){
+this._onRendererTouchStart(e,_a);
+})));
+}));
+},_onRendererTouchStart:function(e,_b){
+var p=this._edProps;
+if(p&&p.endEditingTimer){
+clearTimeout(p.endEditingTimer);
+p.endEditingTimer=null;
+}
+var _c=_b.item.item;
+if(p&&p.endEditingTimer){
+clearTimeout(p.endEditingTimer);
+p.endEditingTimer=null;
+}
+if(p!=null&&p.item!=_c){
+if(p.startEditingTimer){
+clearTimeout(p.startEditingTimer);
+}
+this._endItemEditing("touch",false);
+p=null;
+}
+if(!p){
+var _d=[];
+_d.push(on(_6.doc,"touchend",_2.hitch(this,this._docEditingTouchEndHandler)));
+_d.push(on(this.itemContainer,"touchmove",_2.hitch(this,this._docEditingTouchMoveHandler)));
+this._setEditingProperties({touchMoved:false,item:_c,renderer:_b,rendererKind:_b.rendererKind,event:e,handles:_d,liveLayout:this.liveLayout});
+p=this._edProps;
+}
+if(this._isEditing){
+_2.mixin(p,this._getTouchesOnRenderers(e,p.editedItem));
+this._startTouchItemEditingGesture(e);
+}else{
+if(e.touches.length>1){
+_7.stop(e);
+return;
+}
+this._touchSelectionTimer=setTimeout(_2.hitch(this,function(){
+this._saveSelectedItems=this.get("selectedItems");
+var _e=this.selectFromEvent(e,_c._item,_b,false);
+if(_e){
+this._pendingSelectedItem=_c;
+}else{
+delete this._saveSelectedItems;
+}
+this._touchSelectionTimer=null;
+}),200);
+p.start={x:e.touches[0].screenX,y:e.touches[0].screenY};
+if(this.isItemEditable(p.item,p.rendererKind)){
+this._edProps.startEditingTimer=setTimeout(_2.hitch(this,function(){
+if(this._touchSelectionTimer){
+clearTimeout(this._touchSelectionTimer);
+delete this._touchSelectionTime;
+}
+if(this._pendingSelectedItem){
+this.dispatchChange(this._saveSelectedItems==null?null:this._saveSelectedItems[0],this._pendingSelectedItem,null,e);
+delete this._saveSelectedItems;
+delete this._pendingSelectedItem;
+}else{
+this.selectFromEvent(e,_c._item,_b);
+}
+this._startItemEditing(p.item,"touch",e);
+p.moveTouchIndex=0;
+this._startItemEditingGesture([this.getTime(e)],"move","touch",e);
+}),this.touchStartEditingTimer);
+}
+}
+},_docEditingTouchMoveHandler:function(e){
+var p=this._edProps;
+var _f={x:e.touches[0].screenX,y:e.touches[0].screenY};
+if(p.startEditingTimer&&(Math.abs(_f.x-p.start.x)>25||Math.abs(_f.y-p.start.y)>25)){
+clearTimeout(p.startEditingTimer);
+p.startEditingTimer=null;
+clearTimeout(this._touchSelectionTimer);
+this._touchSelectionTimer=null;
+if(this._pendingSelectedItem){
+delete this._pendingSelectedItem;
+this.selectFromEvent(e,null,null,false);
+}
+}
+if(!p.touchMoved&&(Math.abs(_f.x-p.start.x)>10||Math.abs(_f.y-p.start.y)>10)){
+p.touchMoved=true;
+}
+if(this._editingGesture){
+_7.stop(e);
+if(p.itemBeginDispatched){
+var _10=[];
+var d=p.editKind=="resizeEnd"?p.editedItem.endTime:p.editedItem.startTime;
+var _11=p.editedItem.subColumn;
+switch(p.editKind){
+case "move":
+var _12=p.moveTouchIndex==null||p.moveTouchIndex<0?0:p.moveTouchIndex;
+_10[0]=this.getTime(e,-1,-1,_12);
+_11=this.getSubColumn(e,-1,-1,_12);
+break;
+case "resizeStart":
+_10[0]=this.getTime(e,-1,-1,p.resizeStartTouchIndex);
+break;
+case "resizeEnd":
+_10[0]=this.getTime(e,-1,-1,p.resizeEndTouchIndex);
+break;
+case "resizeBoth":
+_10[0]=this.getTime(e,-1,-1,p.resizeStartTouchIndex);
+_10[1]=this.getTime(e,-1,-1,p.resizeEndTouchIndex);
+break;
+}
+this._moveOrResizeItemGesture(_10,"touch",e,_11);
+if(p.editKind=="move"){
+if(this.renderData.dateModule.compare(p.editedItem.startTime,d)==-1){
+this.ensureVisibility(p.editedItem.startTime,p.editedItem.endTime,"start",this.autoScrollTouchMargin);
+}else{
+this.ensureVisibility(p.editedItem.startTime,p.editedItem.endTime,"end",this.autoScrollTouchMargin);
+}
+}else{
+if(e.editKind=="resizeStart"||e.editKind=="resizeBoth"){
+this.ensureVisibility(p.editedItem.startTime,p.editedItem.endTime,"start",this.autoScrollTouchMargin);
+}else{
+this.ensureVisibility(p.editedItem.startTime,p.editedItem.endTime,"end",this.autoScrollTouchMargin);
+}
+}
+}
+}
+},autoScrollTouchMargin:10,_docEditingTouchEndHandler:function(e){
+_7.stop(e);
+var p=this._edProps;
+if(p.startEditingTimer){
+clearTimeout(p.startEditingTimer);
+p.startEditingTimer=null;
+}
+if(this._isEditing){
+_2.mixin(p,this._getTouchesOnRenderers(e,p.editedItem));
+if(this._editingGesture){
+if(p.touchesLen==0){
+this._endItemEditingGesture("touch",e);
+if(this.touchEndEditingTimer>0){
+p.endEditingTimer=setTimeout(_2.hitch(this,function(){
+this._endItemEditing("touch",false);
+}),this.touchEndEditingTimer);
+}
+}else{
+if(this._editingGesture){
+this._endItemEditingGesture("touch",e);
+}
+this._startTouchItemEditingGesture(e);
+}
+}
+}else{
+if(!p.touchMoved){
+_7.stop(e);
+_1.forEach(p.handles,function(_13){
+_13.remove();
+});
+if(this._touchSelectionTimer){
+clearTimeout(this._touchSelectionTimer);
+this.selectFromEvent(e,p.item._item,p.renderer,true);
+}else{
+if(this._pendingSelectedItem){
+this.dispatchChange(this._saveSelectedItems.length==0?null:this._saveSelectedItems[0],this._pendingSelectedItem,null,e);
+delete this._saveSelectedItems;
+delete this._pendingSelectedItem;
+}
+}
+if(this._pendingDoubleTap&&this._pendingDoubleTap.item==p.item){
+this._onItemDoubleClick({triggerEvent:e,renderer:p.renderer,item:p.item._item});
+clearTimeout(this._pendingDoubleTap.timer);
+delete this._pendingDoubleTap;
+}else{
+this._pendingDoubleTap={item:p.item,timer:setTimeout(_2.hitch(this,function(){
+delete this._pendingDoubleTap;
+}),this.doubleTapDelay)};
+this._onItemClick({triggerEvent:e,renderer:p.renderer,item:p.item._item});
+}
+this._edProps=null;
+}else{
+if(this._saveSelectedItems){
+this.set("selectedItems",this._saveSelectedItems);
+delete this._saveSelectedItems;
+delete this._pendingSelectedItem;
+}
+_1.forEach(p.handles,function(_14){
+_14.remove();
+});
+this._edProps=null;
+}
+}
+},_startTouchItemEditingGesture:function(e){
+var p=this._edProps;
+var _15=p.resizeStartTouchIndex!=-1;
+var _16=p.resizeEndTouchIndex!=-1;
+if(_15&&_16||this._editingGesture&&p.touchesLen==2&&(_16&&p.editKind=="resizeStart"||_15&&p.editKind=="resizeEnd")){
+if(this._editingGesture&&p.editKind!="resizeBoth"){
+this._endItemEditingGesture("touch",e);
+}
+p.editKind="resizeBoth";
+this._startItemEditingGesture([this.getTime(e,-1,-1,p.resizeStartTouchIndex),this.getTime(e,-1,-1,p.resizeEndTouchIndex)],p.editKind,"touch",e);
+}else{
+if(_15&&p.touchesLen==1&&!this._editingGesture){
+this._startItemEditingGesture([this.getTime(e,-1,-1,p.resizeStartTouchIndex)],"resizeStart","touch",e);
+}else{
+if(_16&&p.touchesLen==1&&!this._editingGesture){
+this._startItemEditingGesture([this.getTime(e,-1,-1,p.resizeEndTouchIndex)],"resizeEnd","touch",e);
+}else{
+this._startItemEditingGesture([this.getTime(e)],"move","touch",e);
+}
+}
+}
+},_getTouchesOnRenderers:function(e,_17){
+var irs=this._getStartEndRenderers(_17);
+var _18=-1;
+var _19=-1;
+var _1a=-1;
+var _1b=irs[0]!=null&&irs[0].resizeStartHandle!=null;
+var _1c=irs[1]!=null&&irs[1].resizeEndHandle!=null;
+var len=0;
+var _1d=false;
+var _1e=this.rendererManager.itemToRenderer[_17.id];
+for(var i=0;i<e.touches.length;i++){
+if(_18==-1&&_1b){
+_1d=_4.isDescendant(e.touches[i].target,irs[0].resizeStartHandle);
+if(_1d){
+_18=i;
+len++;
+}
+}
+if(_19==-1&&_1c){
+_1d=_4.isDescendant(e.touches[i].target,irs[1].resizeEndHandle);
+if(_1d){
+_19=i;
+len++;
+}
+}
+if(_18==-1&&_19==-1){
+for(var j=0;j<_1e.length;j++){
+_1d=_4.isDescendant(e.touches[i].target,_1e[j].container);
+if(_1d){
+_1a=i;
+len++;
+break;
+}
+}
+}
+if(_18!=-1&&_19!=-1&&_1a!=-1){
+break;
+}
+}
+return {touchesLen:len,resizeStartTouchIndex:_18,resizeEndTouchIndex:_19,moveTouchIndex:_1a};
+}});
+});

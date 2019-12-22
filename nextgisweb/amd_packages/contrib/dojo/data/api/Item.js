@@ -5,5 +5,6 @@
 */
 
 //>>built
-define("dojo/data/api/Item",["../../_base/declare"],function(a){return a(null,{})});
-//# sourceMappingURL=Item.js.map
+define("dojo/data/api/Item",["../../_base/declare"],function(_1){
+return _1(null,{});
+});

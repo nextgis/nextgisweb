@@ -1,6 +1,153 @@
 //>>built
-define("dojox/collections/SortedList",["dojo/_base/kernel","dojo/_base/array","./_base"],function(m,p,e){e.SortedList=function(f){var n=this,d={},c=[],h=function(a,b){return a.key>b.key?1:a.key<b.key?-1:0},g=function(){c=[];for(var a=n.getIterator();!a.atEnd();)c.push(a.get());c.sort(h)},l={};this.count=c.length;this.add=function(a,b){d[a]||(d[a]=new e.DictionaryEntry(a,b),this.count=c.push(d[a]),c.sort(h))};this.clear=function(){d={};c=[];this.count=c.length};this.clone=function(){return new e.SortedList(this)};
-this.contains=this.containsKey=function(a){return l[a]?!1:null!=d[a]};this.containsValue=function(a){for(var b=this.getIterator();!b.atEnd();)if(b.get().value==a)return!0;return!1};this.copyTo=function(a,b){for(var c=this.getIterator(),d=b;!c.atEnd();)a.splice(d,0,c.get()),d++};this.entry=function(a){return d[a]};this.forEach=function(a,b){m.forEach(c,a,b)};this.getByIndex=function(a){return c[a].valueOf()};this.getIterator=function(){return new e.DictionaryIterator(d)};this.getKey=function(a){return c[a].key};
-this.getKeyList=function(){for(var a=[],b=this.getIterator();!b.atEnd();)a.push(b.get().key);return a};this.getValueList=function(){for(var a=[],b=this.getIterator();!b.atEnd();)a.push(b.get().value);return a};this.indexOfKey=function(a){for(var b=0;b<c.length;b++)if(c[b].key==a)return b;return-1};this.indexOfValue=function(a){for(var b=0;b<c.length;b++)if(c[b].value==a)return b;return-1};this.item=function(a){if(a in d&&!l[a])return d[a].valueOf()};this.remove=function(a){delete d[a];g();this.count=
-c.length};this.removeAt=function(a){delete d[c[a].key];g();this.count=c.length};this.replace=function(a,b){if(d[a])return d[a]=new e.DictionaryEntry(a,b),g(),!0;this.add(a,b);return!1};this.setByIndex=function(a,b){d[c[a].key].value=b;g();this.count=c.length};if(f){for(f=f.getIterator();!f.atEnd();){var k=f.get();c[c.length]=d[k.key]=new e.DictionaryEntry(k.key,k.value)}c.sort(h)}};return e.SortedList});
-//# sourceMappingURL=SortedList.js.map
+define("dojox/collections/SortedList",["dojo/_base/kernel","dojo/_base/array","./_base"],function(_1,_2,_3){
+_3.SortedList=function(_4){
+var _5=this;
+var _6={};
+var q=[];
+var _7=function(a,b){
+if(a.key>b.key){
+return 1;
+}
+if(a.key<b.key){
+return -1;
+}
+return 0;
+};
+var _8=function(){
+q=[];
+var e=_5.getIterator();
+while(!e.atEnd()){
+q.push(e.get());
+}
+q.sort(_7);
+};
+var _9={};
+this.count=q.length;
+this.add=function(k,v){
+if(!_6[k]){
+_6[k]=new _3.DictionaryEntry(k,v);
+this.count=q.push(_6[k]);
+q.sort(_7);
+}
+};
+this.clear=function(){
+_6={};
+q=[];
+this.count=q.length;
+};
+this.clone=function(){
+return new _3.SortedList(this);
+};
+this.contains=this.containsKey=function(k){
+if(_9[k]){
+return false;
+}
+return (_6[k]!=null);
+};
+this.containsValue=function(o){
+var e=this.getIterator();
+while(!e.atEnd()){
+var _a=e.get();
+if(_a.value==o){
+return true;
+}
+}
+return false;
+};
+this.copyTo=function(_b,i){
+var e=this.getIterator();
+var _c=i;
+while(!e.atEnd()){
+_b.splice(_c,0,e.get());
+_c++;
+}
+};
+this.entry=function(k){
+return _6[k];
+};
+this.forEach=function(fn,_d){
+_1.forEach(q,fn,_d);
+};
+this.getByIndex=function(i){
+return q[i].valueOf();
+};
+this.getIterator=function(){
+return new _3.DictionaryIterator(_6);
+};
+this.getKey=function(i){
+return q[i].key;
+};
+this.getKeyList=function(){
+var _e=[];
+var e=this.getIterator();
+while(!e.atEnd()){
+_e.push(e.get().key);
+}
+return _e;
+};
+this.getValueList=function(){
+var _f=[];
+var e=this.getIterator();
+while(!e.atEnd()){
+_f.push(e.get().value);
+}
+return _f;
+};
+this.indexOfKey=function(k){
+for(var i=0;i<q.length;i++){
+if(q[i].key==k){
+return i;
+}
+}
+return -1;
+};
+this.indexOfValue=function(o){
+for(var i=0;i<q.length;i++){
+if(q[i].value==o){
+return i;
+}
+}
+return -1;
+};
+this.item=function(k){
+if(k in _6&&!_9[k]){
+return _6[k].valueOf();
+}
+return undefined;
+};
+this.remove=function(k){
+delete _6[k];
+_8();
+this.count=q.length;
+};
+this.removeAt=function(i){
+delete _6[q[i].key];
+_8();
+this.count=q.length;
+};
+this.replace=function(k,v){
+if(!_6[k]){
+this.add(k,v);
+return false;
+}else{
+_6[k]=new _3.DictionaryEntry(k,v);
+_8();
+return true;
+}
+};
+this.setByIndex=function(i,o){
+_6[q[i].key].value=o;
+_8();
+this.count=q.length;
+};
+if(_4){
+var e=_4.getIterator();
+while(!e.atEnd()){
+var _10=e.get();
+q[q.length]=_6[_10.key]=new _3.DictionaryEntry(_10.key,_10.value);
+}
+q.sort(_7);
+}
+};
+return _3.SortedList;
+});

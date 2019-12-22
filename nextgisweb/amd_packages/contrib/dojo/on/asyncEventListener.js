@@ -5,5 +5,37 @@
 */
 
 //>>built
-define("dojo/on/asyncEventListener",["../on","../has","../_base/window","../dom-construct","../domReady!"],function(f,g,a,c){function h(d){var a={},b;for(b in d)a[b]=d[b];return a}var e,b=!1;if(c){a=c.create("input",{type:"button"},a.body());f.once(a,"click",function(a){e=a});a.click();try{b=void 0===e.clientX}catch(d){b=!0}finally{c.destroy(a)}}g.add("native-async-event-support",!b);return function(a){return b?function(b){a.call(this,h(b))}:a}});
-//# sourceMappingURL=asyncEventListener.js.map
+define("dojo/on/asyncEventListener",["../on","../has","../_base/window","../dom-construct","../domReady!"],function(on,_1,_2,_3){
+var _4,_5,_6=false;
+if(_3){
+_4=_3.create("input",{type:"button"},_2.body()),on.once(_4,"click",function(e){
+_5=e;
+});
+_4.click();
+try{
+_6=_5.clientX===undefined;
+}
+catch(e){
+_6=true;
+}
+finally{
+_3.destroy(_4);
+}
+}
+_1.add("native-async-event-support",!_6);
+function _7(_8){
+var _9={},i;
+for(i in _8){
+_9[i]=_8[i];
+}
+return _9;
+};
+return function(_a){
+if(_6){
+return function(e){
+_a.call(this,_7(e));
+};
+}
+return _a;
+};
+});

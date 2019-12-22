@@ -5,6 +5,73 @@
 */
 
 //>>built
-define("dojo/ready",["./_base/kernel","./has","require","./domReady","./_base/lang"],function(a,h,b,c,k){var p=0,f=[],l=0;h=function(){p=1;a._postLoad=a.config.afterOnLoad=!0;g()};var g=function(){if(!l){for(l=1;p&&(!c||0==c._Q.length)&&(b.idle?b.idle():1)&&f.length;){var a=f.shift();try{a()}catch(d){if(d.info=d.message,b.signal)b.signal("error",d);else throw d;}}l=0}};b.on&&b.on("idle",g);c&&(c._onQEmpty=g);var m=a.ready=a.addOnLoad=function(b,d,c){var e=k._toArray(arguments);"number"!=typeof b?
-(c=d,d=b,b=1E3):e.shift();c=c?k.hitch.apply(a,e):function(){d()};c.priority=b;for(e=0;e<f.length&&b>=f[e].priority;e++);f.splice(e,0,c);g()},n=a.config.addOnLoad;if(n)m[k.isArray(n)?"apply":"call"](a,n);a.config.parseOnLoad&&!a.isAsync&&m(99,function(){a.parser||(a.deprecated("Add explicit require(['dojo/parser']);","","2.0"),b(["dojo/parser"]))});c?c(h):h();return m});
-//# sourceMappingURL=ready.js.map
+define("dojo/ready",["./_base/kernel","./has","require","./domReady","./_base/lang"],function(_1,_2,_3,_4,_5){
+var _6=0,_7=[],_8=0,_9=function(){
+_6=1;
+_1._postLoad=_1.config.afterOnLoad=true;
+_a();
+},_a=function(){
+if(_8){
+return;
+}
+_8=1;
+while(_6&&(!_4||_4._Q.length==0)&&(_3.idle?_3.idle():true)&&_7.length){
+var f=_7.shift();
+try{
+f();
+}
+catch(e){
+e.info=e.message;
+if(_3.signal){
+_3.signal("error",e);
+}else{
+throw e;
+}
+}
+}
+_8=0;
+};
+_3.on&&_3.on("idle",_a);
+if(_4){
+_4._onQEmpty=_a;
+}
+var _b=_1.ready=_1.addOnLoad=function(_c,_d,_e){
+var _f=_5._toArray(arguments);
+if(typeof _c!="number"){
+_e=_d;
+_d=_c;
+_c=1000;
+}else{
+_f.shift();
+}
+_e=_e?_5.hitch.apply(_1,_f):function(){
+_d();
+};
+_e.priority=_c;
+for(var i=0;i<_7.length&&_c>=_7[i].priority;i++){
+}
+_7.splice(i,0,_e);
+_a();
+};
+1||_2.add("dojo-config-addOnLoad",1);
+if(1){
+var dca=_1.config.addOnLoad;
+if(dca){
+_b[(_5.isArray(dca)?"apply":"call")](_1,dca);
+}
+}
+if(1&&_1.config.parseOnLoad&&!_1.isAsync){
+_b(99,function(){
+if(!_1.parser){
+_1.deprecated("Add explicit require(['dojo/parser']);","","2.0");
+_3(["dojo/parser"]);
+}
+});
+}
+if(_4){
+_4(_9);
+}else{
+_9();
+}
+return _b;
+});

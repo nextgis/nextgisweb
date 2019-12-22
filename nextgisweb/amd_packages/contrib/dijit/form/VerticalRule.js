@@ -1,3 +1,4 @@
 //>>built
-define("dijit/form/VerticalRule",["dojo/_base/declare","./HorizontalRule"],function(a,b){return a("dijit.form.VerticalRule",b,{templateString:'\x3cdiv class\x3d"dijitRuleContainer dijitRuleContainerV"\x3e\x3c/div\x3e',_positionPrefix:'\x3cdiv class\x3d"dijitRuleMark dijitRuleMarkV" style\x3d"top:',_isHorizontal:!1})});
-//# sourceMappingURL=VerticalRule.js.map
+define("dijit/form/VerticalRule",["dojo/_base/declare","./HorizontalRule"],function(_1,_2){
+return _1("dijit.form.VerticalRule",_2,{templateString:"<div class=\"dijitRuleContainer dijitRuleContainerV\"></div>",_positionPrefix:"<div class=\"dijitRuleMark dijitRuleMarkV\" style=\"top:",_isHorizontal:false});
+});

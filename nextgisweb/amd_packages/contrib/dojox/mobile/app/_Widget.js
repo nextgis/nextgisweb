@@ -1,4 +1,16 @@
 //>>built
-define("dojox/mobile/app/_Widget",["dojo","dijit","dojox","dojo/require!dijit/_WidgetBase"],function(a,b,e){a.provide("dojox.mobile.app._Widget");a.experimental("dojox.mobile.app._Widget");a.require("dijit._WidgetBase");a.declare("dojox.mobile.app._Widget",b._WidgetBase,{getScroll:function(){return{x:a.global.scrollX,y:a.global.scrollY}},connect:function(b,c,d){return"dblclick"!=c.toLowerCase()&&"ondblclick"!=c.toLowerCase()||!a.global.Mojo?this.inherited(arguments):this.connect(b,Mojo.Event.tap,
-d)}})});
-//# sourceMappingURL=_Widget.js.map
+define("dojox/mobile/app/_Widget",["dojo","dijit","dojox","dojo/require!dijit/_WidgetBase"],function(_1,_2,_3){
+_1.provide("dojox.mobile.app._Widget");
+_1.experimental("dojox.mobile.app._Widget");
+_1.require("dijit._WidgetBase");
+_1.declare("dojox.mobile.app._Widget",_2._WidgetBase,{getScroll:function(){
+return {x:_1.global.scrollX,y:_1.global.scrollY};
+},connect:function(_4,_5,fn){
+if(_5.toLowerCase()=="dblclick"||_5.toLowerCase()=="ondblclick"){
+if(_1.global["Mojo"]){
+return this.connect(_4,Mojo.Event.tap,fn);
+}
+}
+return this.inherited(arguments);
+}});
+});

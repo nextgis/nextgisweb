@@ -5,6 +5,7 @@ define("dijit/_editor/plugins/FontChoice", [
 	"dojo/dom-construct", // domConstruct.place
 	"dojo/i18n", // i18n.getLocalization
 	"dojo/_base/lang", // lang.delegate lang.hitch lang.isString
+	"dojo/string",
 	"dojo/store/Memory", // MemoryStore
 	"../../registry", // registry.getUniqueId
 	"../../_Widget",
@@ -14,7 +15,7 @@ define("dijit/_editor/plugins/FontChoice", [
 	"../_Plugin",
 	"../range",
 	"dojo/i18n!../nls/FontChoice"
-], function(require, array, declare, domConstruct, i18n, lang, MemoryStore,
+], function(require, array, declare, domConstruct, i18n, lang, stringUtil, MemoryStore,
 	registry, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, FilteringSelect, _Plugin, rangeapi){
 
 	// module:
@@ -180,12 +181,34 @@ define("dijit/_editor/plugins/FontChoice", [
 			}
 		},
 
+		_normalizeFontName: function (value) {
+			// summary:
+			//		Function used to choose one font name when the value is a list of font names
+			//		like "Verdana, Arial, Helvetica, sans-serif"
+			var allowedValues = this.values;
+			if (!value || !allowedValues) {
+				return value;
+			}
+			var fontNames = value.split(',');
+			if (fontNames.length > 1) {
+				for (var i = 0, l = fontNames.length; i < l; i++) {
+					var fontName = stringUtil.trim(fontNames[i]);
+					var pos = array.indexOf(allowedValues, fontName);
+					if (pos > -1) {
+						return fontName;
+					}
+				}
+			}
+			return value;
+		},
+
 		_setValueAttr: function(value, priorityChange){
 			// summary:
 			//		Over-ride for the default action of setting the
 			//		widget value, maps the input to known values
 
 			priorityChange = priorityChange !== false;
+			value = this._normalizeFontName(value);
 			if(this.generic){
 				var map = {
 					"Arial": "sans-serif",
@@ -539,7 +562,9 @@ define("dijit/_editor/plugins/FontChoice", [
 				if(quoted){
 					value = quoted[1];
 				}
-
+				if (_c === "fontSize" && !value) {
+					value = 3;  // default to "small" since Editor starts out with 16px font which is considered "small".
+				}
 				if(_c === "formatBlock"){
 					if(!value || value == "p"){
 						// Some browsers (WebKit) doesn't actually get the tag info right.

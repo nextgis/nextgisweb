@@ -1,8 +1,82 @@
 //>>built
-define("dojox/grid/bidi/_BidiMixin","../../main dojo/_base/lang ../_Builder dijit/_BidiSupport ../_Grid ../cells/_base ../cells/dijit".split(" "),function(h,d,k,g,n,l,m){d.extend(n,{setCellNodeTextDirection:function(a,b,c){this.getCell(a).getNode(b).style.direction=c||""},getCellNodeTextDirection:function(a,b){return this.getCell(a).getNode(b).style.direction},_setTextDirAttr:function(a){this.textDir=a;this.render()}});d.extend(k._ContentBuilder,{_getTextDirStyle:function(a,b,c){var d=this.grid.getItem(c);
-"auto"===a&&(b=b.get?b.get(c,d):b.value||b.defaultValue)&&(a=g.prototype._checkContextual(b));return" direction:"+a+";"}});d.extend(k._HeaderBuilder,{_getTextDirStyle:function(a,b,c){"auto"===a&&(b=c||b.name||b.grid.getCellName(b))&&(a=g.prototype._checkContextual(b));return" direction:"+a+"; "}});d.extend(l.Cell,{LRE:"\u202a",RLE:"\u202b",PDF:"\u202c",KEY_HANDLER:'onkeyup\x3d\' javascript:(function(){var target; if (event.target) target \x3d event.target; else if (event.srcElement) target \x3d event.srcElement; if(!target) return;var regExMatch \x3d /[A-Za-z\u05d0-\u065f\u066a-\u06ef\u06fa-\u07ff\ufb1d-\ufdff\ufe70-\ufefc]/.exec(target.value);target.dir \x3d regExMatch ? ( regExMatch[0] \x3c\x3d "z" ? "ltr" : "rtl" ) : target.dir ? target.dir : "ltr"; })();\'',
-_getTextDirMarkup:function(a){var b="",c=this.textDir||this.grid.textDir;c&&("auto"===c&&(b=this.KEY_HANDLER,c=g.prototype._checkContextual(a)),b+=" dir\x3d'"+c+"'; ");return b},formatEditing:function(a,b){this.needFormatNode(a,b);return'\x3cinput class\x3d"dojoxGridInput" '+this._getTextDirMarkup(a)+' type\x3d"text" value\x3d"'+a+'"\x3e'},_enforceTextDirWithUcc:function(a,b){a="auto"===a?g.prototype._checkContextual(b):a;return("rtl"===a?this.RLE:this.LRE)+b+this.PDF}});d.extend(l.Select,{_getValueCallOrig:h.grid.cells.Select.prototype.getValue,
-getValue:function(a){(a=this._getValueCallOrig(a))&&(this.textDir||this.grid.textDir)&&(a=a.replace(/\u202A|\u202B|\u202C/g,""));return a},formatEditing:function(a,b){this.needFormatNode(a,b);for(var c=['\x3cselect dir \x3d "'+(this.grid.isLeftToRight()?"ltr":"rtl")+'" class\x3d"dojoxGridSelect"\x3e'],d=0,e,f;void 0!==(e=this.options[d])&&void 0!==(f=this.values[d]);d++){f=f.replace?f.replace(/&/g,"\x26amp;").replace(/</g,"\x26lt;"):f;e=e.replace?e.replace(/&/g,"\x26amp;").replace(/</g,"\x26lt;"):
-e;if(this.textDir||this.grid.textDir)e=this._enforceTextDirWithUcc(this.textDir||this.grid.textDir,e);c.push("\x3coption",a==f?" selected":"",' value \x3d "'+f+'"',"\x3e",e,"\x3c/option\x3e")}c.push("\x3c/select\x3e");return c.join("")}});d.extend(m.ComboBox,{getWidgetPropsCallOrig:h.grid.cells.ComboBox.prototype.getWidgetProps,getWidgetProps:function(a){a=this.getWidgetPropsCallOrig(a);if(this.textDir||this.grid.textDir)a.textDir=this.textDir||this.grid.textDir;return a}});d.extend(m._Widget,{getWidgetPropsCallOrig:h.grid.cells._Widget.prototype.getWidgetProps,
-getWidgetProps:function(a){a=this.getWidgetPropsCallOrig(a);if(this.textDir||this.grid.textDir)a.textDir=this.textDir||this.grid.textDir;return a}})});
-//# sourceMappingURL=_BidiMixin.js.map
+define("dojox/grid/bidi/_BidiMixin",["../../main","dojo/_base/lang","../_Builder","dijit/_BidiSupport","../_Grid","../cells/_base","../cells/dijit"],function(_1,_2,_3,_4,_5,_6,_7){
+_2.extend(_5,{setCellNodeTextDirection:function(_8,_9,_a){
+this.getCell(_8).getNode(_9).style.direction=_a||"";
+},getCellNodeTextDirection:function(_b,_c){
+return this.getCell(_b).getNode(_c).style.direction;
+},_setTextDirAttr:function(_d){
+this.textDir=_d;
+this.render();
+}});
+_2.extend(_3._ContentBuilder,{_getTextDirStyle:function(_e,_f,_10){
+var _11=this.grid.getItem(_10),ret="";
+if(_e==="auto"){
+var _12=_f.get?_f.get(_10,_11):(_f.value||_f.defaultValue);
+if(_12){
+_e=_4.prototype._checkContextual(_12);
+}
+}
+ret=" direction:"+_e+";";
+return ret;
+}});
+_2.extend(_3._HeaderBuilder,{_getTextDirStyle:function(_13,_14,_15){
+if(_13==="auto"){
+var _16=_15||_14.name||_14.grid.getCellName(_14);
+if(_16){
+_13=_4.prototype._checkContextual(_16);
+}
+}
+return (" direction:"+_13+"; ");
+}});
+_2.extend(_6.Cell,{LRE:"‪",RLE:"‫",PDF:"‬",KEY_HANDLER:"onkeyup=' javascript:(function(){"+"var target; if (event.target) target = event.target; else if (event.srcElement) target = event.srcElement; if(!target) return;"+"var regExMatch = /[A-Za-zא-ٟ٪-ۯۺ-߿יִ-﷿ﹰ-ﻼ]/.exec(target.value);"+"target.dir = regExMatch ? ( regExMatch[0] <= \"z\" ? \"ltr\" : \"rtl\" ) : target.dir ? target.dir : \"ltr\"; })();'",_getTextDirMarkup:function(_17){
+var _18="",_19=this.textDir||this.grid.textDir;
+if(_19){
+if(_19==="auto"){
+_18=this.KEY_HANDLER;
+_19=_4.prototype._checkContextual(_17);
+}
+_18+=" dir='"+_19+"'; ";
+}
+return _18;
+},formatEditing:function(_1a,_1b){
+this.needFormatNode(_1a,_1b);
+return "<input class=\"dojoxGridInput\" "+this._getTextDirMarkup(_1a)+" type=\"text\" value=\""+_1a+"\">";
+},_enforceTextDirWithUcc:function(_1c,_1d){
+_1c=(_1c==="auto")?_4.prototype._checkContextual(_1d):_1c;
+return (_1c==="rtl"?this.RLE:this.LRE)+_1d+this.PDF;
+}});
+_2.extend(_6.Select,{_getValueCallOrig:_1.grid.cells.Select.prototype.getValue,getValue:function(_1e){
+var ret=this._getValueCallOrig(_1e);
+if(ret&&(this.textDir||this.grid.textDir)){
+ret=ret.replace(/\u202A|\u202B|\u202C/g,"");
+}
+return ret;
+},formatEditing:function(_1f,_20){
+this.needFormatNode(_1f,_20);
+var h=["<select dir = \""+(this.grid.isLeftToRight()?"ltr":"rtl")+"\" class=\"dojoxGridSelect\">"];
+for(var i=0,o,v;((o=this.options[i])!==undefined)&&((v=this.values[i])!==undefined);i++){
+v=v.replace?v.replace(/&/g,"&amp;").replace(/</g,"&lt;"):v;
+o=o.replace?o.replace(/&/g,"&amp;").replace(/</g,"&lt;"):o;
+if(this.textDir||this.grid.textDir){
+o=this._enforceTextDirWithUcc(this.textDir||this.grid.textDir,o);
+}
+h.push("<option",(_1f==v?" selected":"")," value = \""+v+"\"",">",o,"</option>");
+}
+h.push("</select>");
+return h.join("");
+}});
+_2.extend(_7.ComboBox,{getWidgetPropsCallOrig:_1.grid.cells.ComboBox.prototype.getWidgetProps,getWidgetProps:function(_21){
+var ret=this.getWidgetPropsCallOrig(_21);
+if(this.textDir||this.grid.textDir){
+ret.textDir=this.textDir||this.grid.textDir;
+}
+return ret;
+}});
+_2.extend(_7._Widget,{getWidgetPropsCallOrig:_1.grid.cells._Widget.prototype.getWidgetProps,getWidgetProps:function(_22){
+var ret=this.getWidgetPropsCallOrig(_22);
+if(this.textDir||this.grid.textDir){
+ret.textDir=this.textDir||this.grid.textDir;
+}
+return ret;
+}});
+});

@@ -1,21 +1,414 @@
 //>>built
-require({cache:{"url:dojox/calc/templates/Grapher.html":'\x3cdiv\x3e\n\x3cdiv data-dojo-attach-point\x3d"chartsParent" class\x3d"dojoxCalcChartHolder"\x3e\x3c/div\x3e\n\x3cdiv data-dojo-attach-point\x3d"outerDiv"\x3e\n\x3cdiv data-dojo-type\x3d"dijit.form.DropDownButton" data-dojo-attach-point\x3d"windowOptions" class\x3d"dojoxCalcDropDownForWindowOptions" title\x3d"Window Options"\x3e\n\t\x3cdiv\x3eWindow Options\x3c/div\x3e\n\t\x3cdiv data-dojo-type\x3d"dijit.TooltipDialog" data-dojo-attach-point\x3d"windowOptionsInside" class\x3d"dojoxCalcTooltipDialogForWindowOptions" title\x3d""\x3e\n\t\t\x3ctable class\x3d"dojoxCalcGraphOptionTable"\x3e\n\t\t\t\x3ctr\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\tWidth:\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.TextBox" data-dojo-attach-point\x3d"graphWidth" class\x3d"dojoxCalcGraphWidth" value\x3d"500" /\x3e\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\tHeight:\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.TextBox" data-dojo-attach-point\x3d"graphHeight" class\x3d"dojoxCalcGraphHeight" value\x3d"500" /\x3e\n\t\t\t\t\x3c/td\x3e\n\t\t\t\x3c/tr\x3e\n\t\t\t\x3ctr\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\tX \x3e\x3d\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.TextBox" data-dojo-attach-point\x3d"graphMinX" class\x3d"dojoxCalcGraphMinX" value\x3d"-10" /\x3e\n\t\t\t\t\x3c/td\x3e\n\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\tX \x3c\x3d\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.TextBox" data-dojo-attach-point\x3d"graphMaxX" class\x3d"dojoxCalcGraphMaxX" value\x3d"10" /\x3e\n\t\t\t\t\x3c/td\x3e\n\t\t\t\x3c/tr\x3e\n\t\t\t\x3ctr\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\tY \x3e\x3d\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.TextBox" data-dojo-attach-point\x3d"graphMinY" class\x3d"dojoxCalcGraphMinY" value\x3d"-10" /\x3e\n\t\t\t\t\x3c/td\x3e\n\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\tY \x3c\x3d\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.TextBox" data-dojo-attach-point\x3d"graphMaxY" class\x3d"dojoxCalcGraphMaxY" value\x3d"10" /\x3e\n\t\t\t\t\x3c/td\x3e\n\t\t\t\x3c/tr\x3e\n\t\t\x3c/table\x3e\n\t\x3c/div\x3e\n\x3c/div\x3e\n\n\x3cBR\x3e\n\n\x3cdiv class\x3d"dojoxCalcGrapherFuncOuterDiv"\x3e\n\t\x3ctable class\x3d"dojoxCalcGrapherFuncTable" data-dojo-attach-point\x3d"graphTable"\x3e\n\t\x3c/table\x3e\n\x3c/div\x3e\n\n\x3cdiv data-dojo-type\x3d"dijit.form.DropDownButton" data-dojo-attach-point\x3d\'addFuncButton\' class\x3d"dojoxCalcDropDownAddingFunction"\x3e\n\t\x3cdiv\x3eAdd Function\x3c/div\x3e\n\t\x3cdiv data-dojo-type\x3d"dijit.TooltipDialog" data-dojo-attach-point\x3d"addFuncInside" class\x3d"dojoxCalcTooltipDialogAddingFunction" title\x3d""\x3e\n\t\t\x3ctable class\x3d"dojoxCalcGrapherModeTable"\x3e\n\t\t\t\x3ctr\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\tMode:\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3cselect data-dojo-type\x3d"dijit.form.Select" data-dojo-attach-point\x3d"funcMode" class\x3d"dojoxCalcFunctionModeSelector"\x3e\n\t\t\t\t\t\t\x3coption value\x3d"y\x3d" selected\x3d"selected"\x3ey\x3d\x3c/option\x3e\n\t\t\t\t\t\t\x3coption value\x3d"x\x3d"\x3ex\x3d\x3c/option\x3e\n\t\t\t\t\t\x3c/select\x3e\n\t\t\t\t\x3c/td\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\x3c/tr\x3e\n\t\n\t\t\t\x3ctr\x3e\n\t\t\t\t\x3ctd\x3e\n\t\t\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.Button" data-dojo-attach-point\x3d"createFunc" class\x3d"dojoxCalcAddFunctionButton" label\x3d"Create" /\x3e\n\t\t\t\t\x3c/td\x3e\n\t\t\t\x3c/tr\x3e\n\t\t\x3c/table\x3e\n\t\x3c/div\x3e\n\x3c/div\x3e\n\x3cBR\x3e\n\x3cBR\x3e\n\x3ctable class\x3d"dijitInline dojoxCalcGrapherLayout"\x3e\n\t\x3ctr\x3e\n\t\t\x3ctd class\x3d"dojoxCalcGrapherButtonContainer"\x3e\n\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.Button" class\x3d"dojoxCalcGrapherButton" data-dojo-attach-point\x3d\'selectAllButton\' label\x3d"Select All" /\x3e\n\t\t\x3c/td\x3e\n\t\t\x3ctd class\x3d"dojoxCalcGrapherButtonContainer"\x3e\n\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.Button" class\x3d"dojoxCalcGrapherButton" data-dojo-attach-point\x3d\'deselectAllButton\' label\x3d"Deselect All" /\x3e\n\t\t\x3c/td\x3e\n\t\x3c/tr\x3e\n\t\x3ctr\x3e\n\t\t\x3ctd class\x3d"dojoxCalcGrapherButtonContainer"\x3e\n\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.Button" class\x3d"dojoxCalcGrapherButton" data-dojo-attach-point\x3d\'drawButton\'label\x3d"Draw Selected" /\x3e\n\t\t\x3c/td\x3e\n\t\t\x3ctd class\x3d"dojoxCalcGrapherButtonContainer"\x3e\n\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.Button" class\x3d"dojoxCalcGrapherButton" data-dojo-attach-point\x3d\'eraseButton\' label\x3d"Erase Selected" /\x3e\n\t\t\x3c/td\x3e\n\t\x3c/tr\x3e\n\t\x3ctr\x3e\n\t\t\x3ctd class\x3d"dojoxCalcGrapherButtonContainer"\x3e\n\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.Button" class\x3d"dojoxCalcGrapherButton" data-dojo-attach-point\x3d\'deleteButton\' label\x3d"Delete Selected" /\x3e\n\t\t\x3c/td\x3e\n\t\t\x3ctd class\x3d"dojoxCalcGrapherButtonContainer"\x3e\n\t\t\t\x3cinput data-dojo-type\x3d"dijit.form.Button" class\x3d"dojoxCalcGrapherButton" data-dojo-attach-point\x3d\'closeButton\' label\x3d"Close" /\x3e\n\t\t\x3c/td\x3e\n\t\x3c/tr\x3e\n\x3c/table\x3e\n\x3c/div\x3e\n\x3c/div\x3e\n'}});
-define("dojox/calc/Grapher","dojo/_base/declare dojo/_base/lang dojo/_base/window dojo/dom-construct dojo/dom-class dojo/dom-style dijit/_WidgetBase dijit/_WidgetsInTemplateMixin dijit/_TemplatedMixin dojox/math/_base dijit/registry dijit/form/DropDownButton dijit/TooltipDialog dijit/form/TextBox dijit/form/CheckBox dijit/ColorPalette dojox/charting/Chart dojox/charting/axis2d/Default dojox/charting/plot2d/Default dojox/charting/plot2d/Lines dojox/charting/themes/Tufte dojo/colors dojo/text!./templates/Grapher.html dojox/calc/_Executor dijit/form/Button dijit/form/Select".split(" "),
-function(r,k,y,m,p,t,z,A,B,L,C,D,E,F,G,H,M,N,O,P,Q,R,I,q){var v=1E-15/9,J=Math.log(2),K={graphNumber:0,fOfX:!0,color:{stroke:"black"}};r=r("dojox.calc.Grapher",[z,B,A],{templateString:I,addXYAxes:function(a){return a.addAxis("x",{max:parseInt(this.graphMaxX.get("value")),min:parseInt(this.graphMinX.get("value")),majorLabels:!0,minorLabels:!0,minorTicks:!1,microTicks:!1,htmlLabels:!0,labelFunc:function(a){return a},maxLabelSize:30,fixUpper:"major",fixLower:"major",majorTick:{length:3}}).addAxis("y",
-{max:parseInt(this.graphMaxY.get("value")),min:parseInt(this.graphMinY.get("value")),labelFunc:function(a){return a},maxLabelSize:50,vertical:!0,microTicks:!1,minorTicks:!0,majorTick:{stroke:"black",length:3}})},selectAll:function(){for(var a=0;a<this.rowCount;a++)this.array[a][this.checkboxIndex].set("checked",!0)},deselectAll:function(){for(var a=0;a<this.rowCount;a++)this.array[a][this.checkboxIndex].set("checked",!1)},drawOne:function(a){},onDraw:function(){},erase:function(a){for(var d=0,c="Series "+
-this.array[a][this.funcNumberIndex]+"_"+d;c in this.array[a][this.chartIndex].runs;)this.array[a][this.chartIndex].removeSeries(c),d++,c="Series "+this.array[a][this.funcNumberIndex]+"_"+d;this.array[a][this.chartIndex].render();this.setStatus(a,"Hidden")},onErase:function(){for(var a=0;a<this.rowCount;a++)this.array[a][this.checkboxIndex].get("checked")&&this.erase(a)},onDelete:function(){for(var a=0;a<this.rowCount;a++)if(this.array[a][this.checkboxIndex].get("checked")){this.erase(a);for(var d=
-0;d<this.functionRef;d++)this.array[a][d]&&this.array[a][d].destroy&&this.array[a][d].destroy();this.graphTable.deleteRow(a);this.array.splice(a,1);this.rowCount--;a--}},checkboxIndex:0,functionMode:1,expressionIndex:2,colorIndex:3,dropDownIndex:4,tooltipIndex:5,colorBoxFieldsetIndex:6,statusIndex:7,chartIndex:8,funcNumberIndex:9,evaluatedExpression:10,functionRef:11,createFunction:function(){var a=this.graphTable.insertRow(-1);this.array[a.rowIndex]=[];var d=a.insertCell(-1),c=m.create("div");d.appendChild(c);
-var f=new G({},c);this.array[a.rowIndex][this.checkboxIndex]=f;p.add(c,"dojoxCalcCheckBox");d=a.insertCell(-1);f=this.funcMode.get("value");c=y.doc.createTextNode(f);d.appendChild(c);this.array[a.rowIndex][this.functionMode]=f;d=a.insertCell(-1);c=m.create("div");d.appendChild(c);f=new F({},c);this.array[a.rowIndex][this.expressionIndex]=f;p.add(c,"dojoxCalcExpressionBox");c=m.create("div");f=new H({changedColor:this.changedColor},c);p.add(c,"dojoxCalcColorPalette");this.array[a.rowIndex][this.colorIndex]=
-f;var c=m.create("div"),g=new E({content:f},c);this.array[a.rowIndex][this.tooltipIndex]=g;p.add(c,"dojoxCalcContainerOfColor");d=a.insertCell(-1);c=m.create("div");d.appendChild(c);var b=m.create("fieldset");t.set(b,{backgroundColor:"black",width:"1em",height:"1em",display:"inline"});this.array[a.rowIndex][this.colorBoxFieldsetIndex]=b;d=new D({label:"Color ",dropDown:g},c);d.containerNode.appendChild(b);this.array[a.rowIndex][this.dropDownIndex]=d;p.add(c,"dojoxCalcDropDownForColor");d=a.insertCell(-1);
-c=m.create("fieldset");c.innerHTML="Hidden";this.array[a.rowIndex][this.statusIndex]=c;p.add(c,"dojoxCalcStatusBox");d.appendChild(c);c=m.create("div");t.set(c,{position:"absolute",left:"0px",top:"0px"});this.chartsParent.appendChild(c);this.array[a.rowIndex][this.chartNodeIndex]=c;p.add(c,"dojoxCalcChart");c=(new dojox.charting.Chart(c)).setTheme(dojox.charting.themes.Tufte).addPlot("default",{type:"Lines",shadow:{dx:1,dy:1,width:2,color:[0,0,0,.3]}});this.addXYAxes(c);this.array[a.rowIndex][this.chartIndex]=
-c;f.set("chart",c);f.set("colorBox",b);f.set("onChange",k.hitch(f,"changedColor"));this.array[a.rowIndex][this.funcNumberIndex]=this.funcNumber++;this.rowCount++},setStatus:function(a,d){this.array[a][this.statusIndex].innerHTML=d},changedColor:function(){for(var a=this.get("chart"),d=this.get("colorBox"),c=0;c<a.series.length;c++)a.series[c].stroke&&a.series[c].stroke.color&&(a.series[c].stroke.color=this.get("value"),a.dirty=!0);a.render();t.set(d,{backgroundColor:this.get("value")})},makeDirty:function(){this.dirty=
-!0},checkDirty1:function(){setTimeout(k.hitch(this,"checkDirty"),0)},checkDirty:function(){if(this.dirty){for(var a=0;a<this.rowCount;a++)this.array[a][this.chartIndex].removeAxis("x"),this.array[a][this.chartIndex].removeAxis("y"),this.addXYAxes(this.array[a][this.chartIndex]);this.onDraw()}this.dirty=!1},postCreate:function(){this.inherited(arguments);this.createFunc.set("onClick",k.hitch(this,"createFunction"));this.selectAllButton.set("onClick",k.hitch(this,"selectAll"));this.deselectAllButton.set("onClick",
-k.hitch(this,"deselectAll"));this.drawButton.set("onClick",k.hitch(this,"onDraw"));this.eraseButton.set("onClick",k.hitch(this,"onErase"));this.deleteButton.set("onClick",k.hitch(this,"onDelete"));this.dirty=!1;this.graphWidth.set("onChange",k.hitch(this,"makeDirty"));this.graphHeight.set("onChange",k.hitch(this,"makeDirty"));this.graphMaxX.set("onChange",k.hitch(this,"makeDirty"));this.graphMinX.set("onChange",k.hitch(this,"makeDirty"));this.graphMaxY.set("onChange",k.hitch(this,"makeDirty"));this.graphMinY.set("onChange",
-k.hitch(this,"makeDirty"));this.windowOptionsInside.set("onClose",k.hitch(this,"checkDirty1"));this.rowCount=this.funcNumber=0;this.array=[]},startup:function(){this.inherited(arguments);var a=C.getEnclosingWidget(this.domNode.parentNode);a&&"function"==typeof a.close?this.closeButton.set("onClick",k.hitch(a,"close")):t.set(this.closeButton.domNode,{display:"none"});this.createFunction();this.array[0][this.checkboxIndex].set("checked",!0);this.onDraw();this.erase(0);this.array[0][this.expressionIndex].value=
-""}});return k.mixin(q,{draw:function(a,d,c){c=k.mixin({},K,c);a.fullGeometry();d=1==c.fOfX?q.generatePoints(d,"x","y",a.axes.x.scaler.bounds.span,a.axes.x.scaler.bounds.lower,a.axes.x.scaler.bounds.upper,a.axes.y.scaler.bounds.lower,a.axes.y.scaler.bounds.upper):q.generatePoints(d,"y","x",a.axes.y.scaler.bounds.span,a.axes.y.scaler.bounds.lower,a.axes.y.scaler.bounds.upper,a.axes.x.scaler.bounds.lower,a.axes.x.scaler.bounds.upper);var f=0;if(0<d.length)for(;f<d.length;f++)0<d[f].length&&a.addSeries("Series "+
-c.graphNumber+"_"+f,d[f],c.color);for(var g="Series "+c.graphNumber+"_"+f;g in a.runs;)a.removeSeries(g),f++,g="Series "+c.graphNumber+"_"+f;a.render();return d},generatePoints:function(a,d,c,f,g,b,k,m){function p(a,b,e,h){for(;b<=e;){var f={};f[d]=(b[d]+e[d])/2;f[c]=a(f[d]);if(h==f[c]||f[d]==e[d]||f[d]==b[d])return f;var g=!0;h<f[c]&&(g=!1);f[c]<e[c]?g?b=f:e=f:f[c]<b[c]&&(g?e=f:b=f)}return NaN}function t(a,b,e){for(var f=[[],[]],h;b[d]<=e[d];){var g=(b[d]+e[d])/2;h={};h[d]=g;h[c]=a(g);var g=h[d],
-k=void 0,k=-1<g&&1>g?0>g?g>=-v?-g:g/Math.ceil(g/v):v:Math.abs(g)*v,g=g+k,k={};k[d]=g;k[c]=a(g);if(Math.abs(k[c])>=Math.abs(h[c]))f[0].push(h),b=k;else{f[1].unshift(h);if(e[d]==h[d])break;e=h}}return f}function r(a,b){var c=!1,d=!1;a<b&&(c=!0);0<b&&(d=!0);return{inc:c,pos:d}}function u(a,b){return(b[c]-a[c])/(b[d]-a[d])}f=1<<Math.ceil(Math.log(f)/J);var n=(b-g)/f;b=[];var h=0,e,l;b[h]=[];for(var q=g,x=0;x<=f;q+=n,x++){g={};g[d]=q;g[c]=a({_name:d,_value:q,_graphing:!0});if(null==g[d]||null==g[c])return{};
-if(!isNaN(g[c])&&!isNaN(g[d]))if(b[h].push(g),3==b[h].length)e=r(u(b[h][b[h].length-3],b[h][b[h].length-2]),u(b[h][b[h].length-2],b[h][b[h].length-1]));else if(!(4>b[h].length)&&(l=r(u(b[h][b[h].length-3],b[h][b[h].length-2]),u(b[h][b[h].length-2],b[h][b[h].length-1])),e.inc!=l.inc||e.pos!=l.pos)){var w=t(a,b[h][b[h].length-3],b[h][b[h].length-1]);g=b[h].pop();b[h].pop();for(e=0;e<w[0].length;e++)b[h].push(w[0][e]);for(e=1;e<w.length;e++)b[++h]=w.pop();b[h].push(g);e=l}}for(;1<b.length;){for(e=0;e<
-b[1].length;e++)b[0][b[0].length-1][d]!=b[1][e][d]&&b[0].push(b[1][e]);b.splice(1,1)}b=b[0];f=0;n=[[]];for(e=0;e<b.length;e++)if(isNaN(b[e][c])||isNaN(b[e][d])){for(;isNaN(b[e][c])||isNaN(b[e][d]);)b.splice(e,1);n[++f]=[];e--}else if(b[e][c]>m||b[e][c]<k){0<e&&b[e-1].y!=k&&b[e-1].y!=m&&(l=u(b[e-1],b[e]),1E200<l?l=1E200:-1E200>l&&(l=-1E200),h=b[e][c]>m?m:k,g=b[e][c]-l*b[e][d],l=(h-g)/l,g={},g[d]=l,g[c]=a(l),g[c]!=h&&(g=p(a,b[e-1],b[e],h)),n[f].push(g),n[++f]=[]);for(;e<b.length&&(b[e][c]>m||b[e][c]<
-k);)e++;if(e>=b.length){0==n[f].length&&n.splice(f,1);break}0<e&&b[e].y!=k&&b[e].y!=m&&(l=u(b[e-1],b[e]),1E200<l?l=1E200:-1E200>l&&(l=-1E200),h=b[e-1][c]>m?m:k,g=b[e][c]-l*b[e][d],l=(h-g)/l,g={},g[d]=l,g[c]=a(l),g[c]!=h&&(g=p(a,b[e-1],b[e],h)),n[f].push(g),n[f].push(b[e]))}else n[f].push(b[e]);return n},Grapher:r})});
-//# sourceMappingURL=Grapher.js.map
+require({cache:{"url:dojox/calc/templates/Grapher.html":"<div>\n<div data-dojo-attach-point=\"chartsParent\" class=\"dojoxCalcChartHolder\"></div>\n<div data-dojo-attach-point=\"outerDiv\">\n<div data-dojo-type=\"dijit.form.DropDownButton\" data-dojo-attach-point=\"windowOptions\" class=\"dojoxCalcDropDownForWindowOptions\" title=\"Window Options\">\n\t<div>Window Options</div>\n\t<div data-dojo-type=\"dijit.TooltipDialog\" data-dojo-attach-point=\"windowOptionsInside\" class=\"dojoxCalcTooltipDialogForWindowOptions\" title=\"\">\n\t\t<table class=\"dojoxCalcGraphOptionTable\">\n\t\t\t<tr>\n\t\t\t\t<td>\n\t\t\t\t\tWidth:\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<input data-dojo-type=\"dijit.form.TextBox\" data-dojo-attach-point=\"graphWidth\" class=\"dojoxCalcGraphWidth\" value=\"500\" />\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\tHeight:\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<input data-dojo-type=\"dijit.form.TextBox\" data-dojo-attach-point=\"graphHeight\" class=\"dojoxCalcGraphHeight\" value=\"500\" />\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t\t<tr>\n\t\t\t\t<td>\n\t\t\t\t\tX >=\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<input data-dojo-type=\"dijit.form.TextBox\" data-dojo-attach-point=\"graphMinX\" class=\"dojoxCalcGraphMinX\" value=\"-10\" />\n\t\t\t\t</td>\n\n\t\t\t\t<td>\n\t\t\t\t\tX <=\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<input data-dojo-type=\"dijit.form.TextBox\" data-dojo-attach-point=\"graphMaxX\" class=\"dojoxCalcGraphMaxX\" value=\"10\" />\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t\t<tr>\n\t\t\t\t<td>\n\t\t\t\t\tY >=\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<input data-dojo-type=\"dijit.form.TextBox\" data-dojo-attach-point=\"graphMinY\" class=\"dojoxCalcGraphMinY\" value=\"-10\" />\n\t\t\t\t</td>\n\n\t\t\t\t<td>\n\t\t\t\t\tY <=\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<input data-dojo-type=\"dijit.form.TextBox\" data-dojo-attach-point=\"graphMaxY\" class=\"dojoxCalcGraphMaxY\" value=\"10\" />\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</table>\n\t</div>\n</div>\n\n<BR>\n\n<div class=\"dojoxCalcGrapherFuncOuterDiv\">\n\t<table class=\"dojoxCalcGrapherFuncTable\" data-dojo-attach-point=\"graphTable\">\n\t</table>\n</div>\n\n<div data-dojo-type=\"dijit.form.DropDownButton\" data-dojo-attach-point='addFuncButton' class=\"dojoxCalcDropDownAddingFunction\">\n\t<div>Add Function</div>\n\t<div data-dojo-type=\"dijit.TooltipDialog\" data-dojo-attach-point=\"addFuncInside\" class=\"dojoxCalcTooltipDialogAddingFunction\" title=\"\">\n\t\t<table class=\"dojoxCalcGrapherModeTable\">\n\t\t\t<tr>\n\t\t\t\t<td>\n\t\t\t\t\tMode:\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<select data-dojo-type=\"dijit.form.Select\" data-dojo-attach-point=\"funcMode\" class=\"dojoxCalcFunctionModeSelector\">\n\t\t\t\t\t\t<option value=\"y=\" selected=\"selected\">y=</option>\n\t\t\t\t\t\t<option value=\"x=\">x=</option>\n\t\t\t\t\t</select>\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t</tr>\n\t\n\t\t\t<tr>\n\t\t\t\t<td>\n\t\t\t\t\t<input data-dojo-type=\"dijit.form.Button\" data-dojo-attach-point=\"createFunc\" class=\"dojoxCalcAddFunctionButton\" label=\"Create\" />\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</table>\n\t</div>\n</div>\n<BR>\n<BR>\n<table class=\"dijitInline dojoxCalcGrapherLayout\">\n\t<tr>\n\t\t<td class=\"dojoxCalcGrapherButtonContainer\">\n\t\t\t<input data-dojo-type=\"dijit.form.Button\" class=\"dojoxCalcGrapherButton\" data-dojo-attach-point='selectAllButton' label=\"Select All\" />\n\t\t</td>\n\t\t<td class=\"dojoxCalcGrapherButtonContainer\">\n\t\t\t<input data-dojo-type=\"dijit.form.Button\" class=\"dojoxCalcGrapherButton\" data-dojo-attach-point='deselectAllButton' label=\"Deselect All\" />\n\t\t</td>\n\t</tr>\n\t<tr>\n\t\t<td class=\"dojoxCalcGrapherButtonContainer\">\n\t\t\t<input data-dojo-type=\"dijit.form.Button\" class=\"dojoxCalcGrapherButton\" data-dojo-attach-point='drawButton'label=\"Draw Selected\" />\n\t\t</td>\n\t\t<td class=\"dojoxCalcGrapherButtonContainer\">\n\t\t\t<input data-dojo-type=\"dijit.form.Button\" class=\"dojoxCalcGrapherButton\" data-dojo-attach-point='eraseButton' label=\"Erase Selected\" />\n\t\t</td>\n\t</tr>\n\t<tr>\n\t\t<td class=\"dojoxCalcGrapherButtonContainer\">\n\t\t\t<input data-dojo-type=\"dijit.form.Button\" class=\"dojoxCalcGrapherButton\" data-dojo-attach-point='deleteButton' label=\"Delete Selected\" />\n\t\t</td>\n\t\t<td class=\"dojoxCalcGrapherButtonContainer\">\n\t\t\t<input data-dojo-type=\"dijit.form.Button\" class=\"dojoxCalcGrapherButton\" data-dojo-attach-point='closeButton' label=\"Close\" />\n\t\t</td>\n\t</tr>\n</table>\n</div>\n</div>\n"}});
+define("dojox/calc/Grapher",["dojo/_base/declare","dojo/_base/lang","dojo/_base/window","dojo/dom-construct","dojo/dom-class","dojo/dom-style","dijit/_WidgetBase","dijit/_WidgetsInTemplateMixin","dijit/_TemplatedMixin","dojox/math/_base","dijit/registry","dijit/form/DropDownButton","dijit/TooltipDialog","dijit/form/TextBox","dijit/form/CheckBox","dijit/ColorPalette","dojox/charting/Chart","dojox/charting/axis2d/Default","dojox/charting/plot2d/Default","dojox/charting/plot2d/Lines","dojox/charting/themes/Tufte","dojo/colors","dojo/text!./templates/Grapher.html","dojox/calc/_Executor","dijit/form/Button","dijit/form/Select"],function(_1,_2,_3,_4,_5,_6,_7,_8,_9,_a,_b,_c,_d,_e,_f,_10,_11,_12,_13,_14,_15,_16,_17,_18){
+var _19=1e-15/9,_1a=1e+200,_1b=Math.log(2),_1c={graphNumber:0,fOfX:true,color:{stroke:"black"}};
+var _1d=_1("dojox.calc.Grapher",[_7,_9,_8],{templateString:_17,addXYAxes:function(_1e){
+return _1e.addAxis("x",{max:parseInt(this.graphMaxX.get("value")),min:parseInt(this.graphMinX.get("value")),majorLabels:true,minorLabels:true,minorTicks:false,microTicks:false,htmlLabels:true,labelFunc:function(_1f){
+return _1f;
+},maxLabelSize:30,fixUpper:"major",fixLower:"major",majorTick:{length:3}}).addAxis("y",{max:parseInt(this.graphMaxY.get("value")),min:parseInt(this.graphMinY.get("value")),labelFunc:function(_20){
+return _20;
+},maxLabelSize:50,vertical:true,microTicks:false,minorTicks:true,majorTick:{stroke:"black",length:3}});
+},selectAll:function(){
+for(var i=0;i<this.rowCount;i++){
+this.array[i][this.checkboxIndex].set("checked",true);
+}
+},deselectAll:function(){
+for(var i=0;i<this.rowCount;i++){
+this.array[i][this.checkboxIndex].set("checked",false);
+}
+},drawOne:function(i){
+},onDraw:function(){
+},erase:function(i){
+var _21=0;
+var _22="Series "+this.array[i][this.funcNumberIndex]+"_"+_21;
+while(_22 in this.array[i][this.chartIndex].runs){
+this.array[i][this.chartIndex].removeSeries(_22);
+_21++;
+_22="Series "+this.array[i][this.funcNumberIndex]+"_"+_21;
+}
+this.array[i][this.chartIndex].render();
+this.setStatus(i,"Hidden");
+},onErase:function(){
+for(var i=0;i<this.rowCount;i++){
+if(this.array[i][this.checkboxIndex].get("checked")){
+this.erase(i);
+}
+}
+},onDelete:function(){
+for(var i=0;i<this.rowCount;i++){
+if(this.array[i][this.checkboxIndex].get("checked")){
+this.erase(i);
+for(var k=0;k<this.functionRef;k++){
+if(this.array[i][k]&&this.array[i][k]["destroy"]){
+this.array[i][k].destroy();
+}
+}
+this.graphTable.deleteRow(i);
+this.array.splice(i,1);
+this.rowCount--;
+i--;
+}
+}
+},checkboxIndex:0,functionMode:1,expressionIndex:2,colorIndex:3,dropDownIndex:4,tooltipIndex:5,colorBoxFieldsetIndex:6,statusIndex:7,chartIndex:8,funcNumberIndex:9,evaluatedExpression:10,functionRef:11,createFunction:function(){
+var tr=this.graphTable.insertRow(-1);
+this.array[tr.rowIndex]=[];
+var td=tr.insertCell(-1);
+var d=_4.create("div");
+td.appendChild(d);
+var _23=new _f({},d);
+this.array[tr.rowIndex][this.checkboxIndex]=_23;
+_5.add(d,"dojoxCalcCheckBox");
+td=tr.insertCell(-1);
+var _24=this.funcMode.get("value");
+d=_3.doc.createTextNode(_24);
+td.appendChild(d);
+this.array[tr.rowIndex][this.functionMode]=_24;
+td=tr.insertCell(-1);
+d=_4.create("div");
+td.appendChild(d);
+var _25=new _e({},d);
+this.array[tr.rowIndex][this.expressionIndex]=_25;
+_5.add(d,"dojoxCalcExpressionBox");
+var b=_4.create("div");
+var _26=new _10({changedColor:this.changedColor},b);
+_5.add(b,"dojoxCalcColorPalette");
+this.array[tr.rowIndex][this.colorIndex]=_26;
+var c=_4.create("div");
+var _27=new _d({content:_26},c);
+this.array[tr.rowIndex][this.tooltipIndex]=_27;
+_5.add(c,"dojoxCalcContainerOfColor");
+td=tr.insertCell(-1);
+d=_4.create("div");
+td.appendChild(d);
+var _28=_4.create("fieldset");
+_6.set(_28,{backgroundColor:"black",width:"1em",height:"1em",display:"inline"});
+this.array[tr.rowIndex][this.colorBoxFieldsetIndex]=_28;
+var _29=new _c({label:"Color ",dropDown:_27},d);
+_29.containerNode.appendChild(_28);
+this.array[tr.rowIndex][this.dropDownIndex]=_29;
+_5.add(d,"dojoxCalcDropDownForColor");
+td=tr.insertCell(-1);
+d=_4.create("fieldset");
+d.innerHTML="Hidden";
+this.array[tr.rowIndex][this.statusIndex]=d;
+_5.add(d,"dojoxCalcStatusBox");
+td.appendChild(d);
+d=_4.create("div");
+_6.set(d,{position:"absolute",left:"0px",top:"0px"});
+this.chartsParent.appendChild(d);
+this.array[tr.rowIndex][this.chartNodeIndex]=d;
+_5.add(d,"dojoxCalcChart");
+var _2a=new dojox.charting.Chart(d).setTheme(dojox.charting.themes.Tufte).addPlot("default",{type:"Lines",shadow:{dx:1,dy:1,width:2,color:[0,0,0,0.3]}});
+this.addXYAxes(_2a);
+this.array[tr.rowIndex][this.chartIndex]=_2a;
+_26.set("chart",_2a);
+_26.set("colorBox",_28);
+_26.set("onChange",_2.hitch(_26,"changedColor"));
+this.array[tr.rowIndex][this.funcNumberIndex]=this.funcNumber++;
+this.rowCount++;
+},setStatus:function(i,_2b){
+this.array[i][this.statusIndex].innerHTML=_2b;
+},changedColor:function(){
+var _2c=this.get("chart");
+var _2d=this.get("colorBox");
+for(var i=0;i<_2c.series.length;i++){
+if(_2c.series[i]["stroke"]){
+if(_2c.series[i].stroke["color"]){
+_2c.series[i]["stroke"].color=this.get("value");
+_2c.dirty=true;
+}
+}
+}
+_2c.render();
+_6.set(_2d,{backgroundColor:this.get("value")});
+},makeDirty:function(){
+this.dirty=true;
+},checkDirty1:function(){
+setTimeout(_2.hitch(this,"checkDirty"),0);
+},checkDirty:function(){
+if(this.dirty){
+for(var i=0;i<this.rowCount;i++){
+this.array[i][this.chartIndex].removeAxis("x");
+this.array[i][this.chartIndex].removeAxis("y");
+this.addXYAxes(this.array[i][this.chartIndex]);
+}
+this.onDraw();
+}
+this.dirty=false;
+},postCreate:function(){
+this.inherited(arguments);
+this.createFunc.set("onClick",_2.hitch(this,"createFunction"));
+this.selectAllButton.set("onClick",_2.hitch(this,"selectAll"));
+this.deselectAllButton.set("onClick",_2.hitch(this,"deselectAll"));
+this.drawButton.set("onClick",_2.hitch(this,"onDraw"));
+this.eraseButton.set("onClick",_2.hitch(this,"onErase"));
+this.deleteButton.set("onClick",_2.hitch(this,"onDelete"));
+this.dirty=false;
+this.graphWidth.set("onChange",_2.hitch(this,"makeDirty"));
+this.graphHeight.set("onChange",_2.hitch(this,"makeDirty"));
+this.graphMaxX.set("onChange",_2.hitch(this,"makeDirty"));
+this.graphMinX.set("onChange",_2.hitch(this,"makeDirty"));
+this.graphMaxY.set("onChange",_2.hitch(this,"makeDirty"));
+this.graphMinY.set("onChange",_2.hitch(this,"makeDirty"));
+this.windowOptionsInside.set("onClose",_2.hitch(this,"checkDirty1"));
+this.funcNumber=0;
+this.rowCount=0;
+this.array=[];
+},startup:function(){
+this.inherited(arguments);
+var _2e=_b.getEnclosingWidget(this.domNode.parentNode);
+if(_2e&&typeof _2e.close=="function"){
+this.closeButton.set("onClick",_2.hitch(_2e,"close"));
+}else{
+_6.set(this.closeButton.domNode,{display:"none"});
+}
+this.createFunction();
+this.array[0][this.checkboxIndex].set("checked",true);
+this.onDraw();
+this.erase(0);
+this.array[0][this.expressionIndex].value="";
+}});
+return _2.mixin(_18,{draw:function(_2f,_30,_31){
+_31=_2.mixin({},_1c,_31);
+_2f.fullGeometry();
+var x;
+var y;
+var _32;
+if(_31.fOfX==true){
+x="x";
+y="y";
+_32=_18.generatePoints(_30,x,y,_2f.axes.x.scaler.bounds.span,_2f.axes.x.scaler.bounds.lower,_2f.axes.x.scaler.bounds.upper,_2f.axes.y.scaler.bounds.lower,_2f.axes.y.scaler.bounds.upper);
+}else{
+x="y";
+y="x";
+_32=_18.generatePoints(_30,x,y,_2f.axes.y.scaler.bounds.span,_2f.axes.y.scaler.bounds.lower,_2f.axes.y.scaler.bounds.upper,_2f.axes.x.scaler.bounds.lower,_2f.axes.x.scaler.bounds.upper);
+}
+var i=0;
+if(_32.length>0){
+for(;i<_32.length;i++){
+if(_32[i].length>0){
+_2f.addSeries("Series "+_31.graphNumber+"_"+i,_32[i],_31.color);
+}
+}
+}
+var _33="Series "+_31.graphNumber+"_"+i;
+while(_33 in _2f.runs){
+_2f.removeSeries(_33);
+i++;
+_33="Series "+_31.graphNumber+"_"+i;
+}
+_2f.render();
+return _32;
+},generatePoints:function(_34,x,y,_35,_36,_37,_38,_39){
+var _3a=(1<<Math.ceil(Math.log(_35)/_1b));
+var dx=(_37-_36)/_3a,_3b=[],_3c=0,_3d,_3e;
+_3b[_3c]=[];
+var i=_36,k,p;
+for(var _3f=0;_3f<=_3a;i+=dx,_3f++){
+p={};
+p[x]=i;
+p[y]=_34({_name:x,_value:i,_graphing:true});
+if(p[x]==null||p[y]==null){
+return {};
+}
+if(isNaN(p[y])||isNaN(p[x])){
+continue;
+}
+_3b[_3c].push(p);
+if(_3b[_3c].length==3){
+_3d=_40(_41(_3b[_3c][_3b[_3c].length-3],_3b[_3c][_3b[_3c].length-2]),_41(_3b[_3c][_3b[_3c].length-2],_3b[_3c][_3b[_3c].length-1]));
+continue;
+}
+if(_3b[_3c].length<4){
+continue;
+}
+_3e=_40(_41(_3b[_3c][_3b[_3c].length-3],_3b[_3c][_3b[_3c].length-2]),_41(_3b[_3c][_3b[_3c].length-2],_3b[_3c][_3b[_3c].length-1]));
+if(_3d.inc!=_3e.inc||_3d.pos!=_3e.pos){
+var a=_42(_34,_3b[_3c][_3b[_3c].length-3],_3b[_3c][_3b[_3c].length-1]);
+p=_3b[_3c].pop();
+_3b[_3c].pop();
+for(var j=0;j<a[0].length;j++){
+_3b[_3c].push(a[0][j]);
+}
+for(k=1;k<a.length;k++){
+_3b[++_3c]=a.pop();
+}
+_3b[_3c].push(p);
+_3d=_3e;
+}
+}
+while(_3b.length>1){
+for(k=0;k<_3b[1].length;k++){
+if(_3b[0][_3b[0].length-1][x]==_3b[1][k][x]){
+continue;
+}
+_3b[0].push(_3b[1][k]);
+}
+_3b.splice(1,1);
+}
+_3b=_3b[0];
+var s=0;
+var _43=[[]];
+for(k=0;k<_3b.length;k++){
+var x1,y1,b,_44;
+if(isNaN(_3b[k][y])||isNaN(_3b[k][x])){
+while(isNaN(_3b[k][y])||isNaN(_3b[k][x])){
+_3b.splice(k,1);
+}
+_43[++s]=[];
+k--;
+}else{
+if(_3b[k][y]>_39||_3b[k][y]<_38){
+if(k>0&&_3b[k-1].y!=_38&&_3b[k-1].y!=_39){
+_44=_41(_3b[k-1],_3b[k]);
+if(_44>_1a){
+_44=_1a;
+}else{
+if(_44<-_1a){
+_44=-_1a;
+}
+}
+if(_3b[k][y]>_39){
+y1=_39;
+}else{
+y1=_38;
+}
+b=_3b[k][y]-_44*_3b[k][x];
+x1=(y1-b)/_44;
+p={};
+p[x]=x1;
+p[y]=_34(x1);
+if(p[y]!=y1){
+p=_45(_34,_3b[k-1],_3b[k],y1);
+}
+_43[s].push(p);
+_43[++s]=[];
+}
+var _46=k;
+while(k<_3b.length&&(_3b[k][y]>_39||_3b[k][y]<_38)){
+k++;
+}
+if(k>=_3b.length){
+if(_43[s].length==0){
+_43.splice(s,1);
+}
+break;
+}
+if(k>0&&_3b[k].y!=_38&&_3b[k].y!=_39){
+_44=_41(_3b[k-1],_3b[k]);
+if(_44>_1a){
+_44=_1a;
+}else{
+if(_44<-_1a){
+_44=-_1a;
+}
+}
+if(_3b[k-1][y]>_39){
+y1=_39;
+}else{
+y1=_38;
+}
+b=_3b[k][y]-_44*_3b[k][x];
+x1=(y1-b)/_44;
+p={};
+p[x]=x1;
+p[y]=_34(x1);
+if(p[y]!=y1){
+p=_45(_34,_3b[k-1],_3b[k],y1);
+}
+_43[s].push(p);
+_43[s].push(_3b[k]);
+}
+}else{
+_43[s].push(_3b[k]);
+}
+}
+}
+return _43;
+function _45(_47,_48,_49,_4a){
+while(_48<=_49){
+var _4b=(_48[x]+_49[x])/2;
+var mid={};
+mid[x]=_4b;
+mid[y]=_47(mid[x]);
+if(_4a==mid[y]||mid[x]==_49[x]||mid[x]==_48[x]){
+return mid;
+}
+var _4c=true;
+if(_4a<mid[y]){
+_4c=false;
+}
+if(mid[y]<_49[y]){
+if(_4c){
+_48=mid;
+}else{
+_49=mid;
+}
+}else{
+if(mid[y]<_48[y]){
+if(!_4c){
+_48=mid;
+}else{
+_49=mid;
+}
+}
+}
+}
+return NaN;
+};
+function _42(_4d,_4e,_4f){
+var _50=[[],[]],_51=_4e,_52=_4f,_53;
+while(_51[x]<=_52[x]){
+var _54=(_51[x]+_52[x])/2;
+_53={};
+_53[x]=_54;
+_53[y]=_4d(_54);
+var rx=_55(_53[x]);
+var _56={};
+_56[x]=rx;
+_56[y]=_4d(rx);
+if(Math.abs(_56[y])>=Math.abs(_53[y])){
+_50[0].push(_53);
+_51=_56;
+}else{
+_50[1].unshift(_53);
+if(_52[x]==_53[x]){
+break;
+}
+_52=_53;
+}
+}
+return _50;
+};
+function _40(_57,_58){
+var _59=false,_5a=false;
+if(_57<_58){
+_59=true;
+}
+if(_58>0){
+_5a=true;
+}
+return {inc:_59,pos:_5a};
+};
+function _55(v){
+var _5b;
+if(v>-1&&v<1){
+if(v<0){
+if(v>=-_19){
+_5b=-v;
+}else{
+_5b=v/Math.ceil(v/_19);
+}
+}else{
+_5b=_19;
+}
+}else{
+_5b=Math.abs(v)*_19;
+}
+return v+_5b;
+};
+function _41(p1,p2){
+return (p2[y]-p1[y])/(p2[x]-p1[x]);
+};
+},Grapher:_1d});
+});

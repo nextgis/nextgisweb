@@ -1,4 +1,38 @@
 //>>built
-define("dojox/wire/ml/DataStore",["dojo","dijit","dojox","dojo/require!dijit/_Widget,dojox/wire/_base"],function(b,f,g){b.provide("dojox.wire.ml.DataStore");b.require("dijit._Widget");b.require("dojox.wire._base");b.declare("dojox.wire.ml.DataStore",f._Widget,{storeClass:"",postCreate:function(){this.store=this._createStore()},_createStore:function(){if(!this.storeClass)return null;var a=g.wire._getClass(this.storeClass);if(!a)return null;for(var b={},e=this.domNode.attributes,d=0;d<e.length;d++){var c=
-e.item(d);c.specified&&!this[c.nodeName]&&(b[c.nodeName]=c.nodeValue)}return new a(b)},getFeatures:function(){return this.store.getFeatures()},fetch:function(a){return this.store.fetch(a)},save:function(a){this.store.save(a)},newItem:function(a){return this.store.newItem(a)},deleteItem:function(a){return this.store.deleteItem(a)},revert:function(){return this.store.revert()}})});
-//# sourceMappingURL=DataStore.js.map
+define("dojox/wire/ml/DataStore",["dojo","dijit","dojox","dojo/require!dijit/_Widget,dojox/wire/_base"],function(_1,_2,_3){
+_1.provide("dojox.wire.ml.DataStore");
+_1.require("dijit._Widget");
+_1.require("dojox.wire._base");
+_1.declare("dojox.wire.ml.DataStore",_2._Widget,{storeClass:"",postCreate:function(){
+this.store=this._createStore();
+},_createStore:function(){
+if(!this.storeClass){
+return null;
+}
+var _4=_3.wire._getClass(this.storeClass);
+if(!_4){
+return null;
+}
+var _5={};
+var _6=this.domNode.attributes;
+for(var i=0;i<_6.length;i++){
+var a=_6.item(i);
+if(a.specified&&!this[a.nodeName]){
+_5[a.nodeName]=a.nodeValue;
+}
+}
+return new _4(_5);
+},getFeatures:function(){
+return this.store.getFeatures();
+},fetch:function(_7){
+return this.store.fetch(_7);
+},save:function(_8){
+this.store.save(_8);
+},newItem:function(_9){
+return this.store.newItem(_9);
+},deleteItem:function(_a){
+return this.store.deleteItem(_a);
+},revert:function(){
+return this.store.revert();
+}});
+});

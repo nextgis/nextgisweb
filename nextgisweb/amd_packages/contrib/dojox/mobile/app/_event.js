@@ -1,6 +1,69 @@
 //>>built
-define("dojox/mobile/app/_event",["dojo","dijit","dojox"],function(b,u,c){b.provide("dojox.mobile.app._event");b.experimental("dojox.mobile.app._event.js");b.mixin(c.mobile.app,{eventMap:{},connectFlick:function(c,d,e){var f,h,k=!1,l,m,n,p,q,g;b.connect("onmousedown",c,function(a){k=!1;f=a.targetTouches?a.targetTouches[0].clientX:a.clientX;h=a.targetTouches?a.targetTouches[0].clientY:a.clientY;g=(new Date).getTime();n=b.connect(c,"onmousemove",r);p=b.connect(c,"onmouseup",t)});var r=function(a){b.stopEvent(a);
-l=a.targetTouches?a.targetTouches[0].clientX:a.clientX;m=a.targetTouches?a.targetTouches[0].clientY:a.clientY;15<Math.abs(Math.abs(l)-Math.abs(f))?(k=!0,q=l>f?"ltr":"rtl"):15<Math.abs(Math.abs(m)-Math.abs(h))&&(k=!0,q=m>h?"ttb":"btt")},t=function(a){b.stopEvent(a);n&&b.disconnect(n);p&&b.disconnect(p);if(k)if(a={target:c,direction:q,duration:(new Date).getTime()-g},d&&e)d[e](a);else e(a)}}});c.mobile.app.isIPhone=b.isSafari&&(-1<navigator.userAgent.indexOf("iPhone")||-1<navigator.userAgent.indexOf("iPod"));
-c.mobile.app.isWebOS=-1<navigator.userAgent.indexOf("webOS");c.mobile.app.isAndroid=-1<navigator.userAgent.toLowerCase().indexOf("android");if(c.mobile.app.isIPhone||c.mobile.app.isAndroid)c.mobile.app.eventMap={onmousedown:"ontouchstart",mousedown:"ontouchstart",onmouseup:"ontouchend",mouseup:"ontouchend",onmousemove:"ontouchmove",mousemove:"ontouchmove"};b._oldConnect=b._connect;b._connect=function(g,d,e,f,h){d=c.mobile.app.eventMap[d]||d;if("flick"==d||"onflick"==d)if(b.global.Mojo)d=Mojo.Event.flick;
-else return c.mobile.app.connectFlick(g,e,f);return b._oldConnect(g,d,e,f,h)}});
-//# sourceMappingURL=_event.js.map
+define("dojox/mobile/app/_event",["dojo","dijit","dojox"],function(_1,_2,_3){
+_1.provide("dojox.mobile.app._event");
+_1.experimental("dojox.mobile.app._event.js");
+_1.mixin(_3.mobile.app,{eventMap:{},connectFlick:function(_4,_5,_6){
+var _7;
+var _8;
+var _9=false;
+var _a;
+var _b;
+var _c;
+var _d;
+var _e;
+var _f;
+var _10=_1.connect("onmousedown",_4,function(_11){
+_9=false;
+_7=_11.targetTouches?_11.targetTouches[0].clientX:_11.clientX;
+_8=_11.targetTouches?_11.targetTouches[0].clientY:_11.clientY;
+_f=(new Date()).getTime();
+_c=_1.connect(_4,"onmousemove",_12);
+_d=_1.connect(_4,"onmouseup",_13);
+});
+var _12=function(_14){
+_1.stopEvent(_14);
+_a=_14.targetTouches?_14.targetTouches[0].clientX:_14.clientX;
+_b=_14.targetTouches?_14.targetTouches[0].clientY:_14.clientY;
+if(Math.abs(Math.abs(_a)-Math.abs(_7))>15){
+_9=true;
+_e=(_a>_7)?"ltr":"rtl";
+}else{
+if(Math.abs(Math.abs(_b)-Math.abs(_8))>15){
+_9=true;
+_e=(_b>_8)?"ttb":"btt";
+}
+}
+};
+var _13=function(_15){
+_1.stopEvent(_15);
+_c&&_1.disconnect(_c);
+_d&&_1.disconnect(_d);
+if(_9){
+var _16={target:_4,direction:_e,duration:(new Date()).getTime()-_f};
+if(_5&&_6){
+_5[_6](_16);
+}else{
+_6(_16);
+}
+}
+};
+}});
+_3.mobile.app.isIPhone=(_1.isSafari&&(navigator.userAgent.indexOf("iPhone")>-1||navigator.userAgent.indexOf("iPod")>-1));
+_3.mobile.app.isWebOS=(navigator.userAgent.indexOf("webOS")>-1);
+_3.mobile.app.isAndroid=(navigator.userAgent.toLowerCase().indexOf("android")>-1);
+if(_3.mobile.app.isIPhone||_3.mobile.app.isAndroid){
+_3.mobile.app.eventMap={onmousedown:"ontouchstart",mousedown:"ontouchstart",onmouseup:"ontouchend",mouseup:"ontouchend",onmousemove:"ontouchmove",mousemove:"ontouchmove"};
+}
+_1._oldConnect=_1._connect;
+_1._connect=function(obj,_17,_18,_19,_1a){
+_17=_3.mobile.app.eventMap[_17]||_17;
+if(_17=="flick"||_17=="onflick"){
+if(_1.global["Mojo"]){
+_17=Mojo.Event.flick;
+}else{
+return _3.mobile.app.connectFlick(obj,_18,_19);
+}
+}
+return _1._oldConnect(obj,_17,_18,_19,_1a);
+};
+});

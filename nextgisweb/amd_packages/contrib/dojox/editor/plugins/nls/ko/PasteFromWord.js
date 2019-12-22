@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/ko/PasteFromWord",{pasteFromWord:"\ub2e8\uc5b4\uc5d0\uc11c \ubd99\uc5ec\ub123\uae30",instructions:"\ub2e8\uc5b4\uc5d0\uc11c \uc544\ub798 \ud14d\uc2a4\ud2b8 \uc0c1\uc790\ub85c \ucee8\ud150\uce20\ub97c \ubd99\uc5ec \ub123\uc73c\uc2ed\uc2dc\uc624. \uc0bd\uc785\ud560 \ucee8\ud150\uce20\uac00 \uc900\ube44\ub418\uba74 \ubd99\uc5ec\ub123\uae30 \ub2e8\ucd94\ub97c \ub204\ub974\uc2ed\uc2dc\uc624. \ud14d\uc2a4\ud2b8 \uc0bd\uc785\uc744 \uc911\ub2e8\ud558\ub824\uba74 \ucde8\uc18c \ub2e8\ucd94\ub97c \ub204\ub974\uc2ed\uc2dc\uc624. "});
-//# sourceMappingURL=PasteFromWord.js.map
+define("dojox/editor/plugins/nls/ko/PasteFromWord",({"pasteFromWord":"단어에서 붙여넣기","instructions":"단어에서 아래 텍스트 상자로 컨텐츠를 붙여 넣으십시오. 삽입할 컨텐츠가 준비되면 붙여넣기 단추를 누르십시오. 텍스트 삽입을 중단하려면 취소 단추를 누르십시오. "}));

@@ -1,3 +1,2 @@
 //>>built
-define("dojox/form/nls/ro/PasswordValidator",{nomatchMessage:"Parolele nu se potrivesc.",badPasswordMessage:"Parol\u0103 invalid\u0103."});
-//# sourceMappingURL=PasswordValidator.js.map
+define("dojox/form/nls/ro/PasswordValidator",({nomatchMessage:"Parolele nu se potrivesc.",badPasswordMessage:"Parolă invalidă."}));

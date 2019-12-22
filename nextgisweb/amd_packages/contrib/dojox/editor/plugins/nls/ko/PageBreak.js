@@ -1,3 +1,2 @@
 //>>built
-define("dojox/editor/plugins/nls/ko/PageBreak",{pageBreak:"\ud398\uc774\uc9c0 \ub098\ub204\uae30"});
-//# sourceMappingURL=PageBreak.js.map
+define("dojox/editor/plugins/nls/ko/PageBreak",({"pageBreak":"페이지 나누기"}));

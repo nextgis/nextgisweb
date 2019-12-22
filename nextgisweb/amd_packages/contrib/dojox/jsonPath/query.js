@@ -1,8 +1,205 @@
 //>>built
-define("dojox/jsonPath/query",["dojo/_base/kernel","dojo/_base/lang"],function(p,x){var n=function(q,n,f){f||(f={});var u=[],p=function(a){return u[a]}.name;if("PATH"==f.resultType&&"RESULT"==f.evalType)throw Error("RESULT based evaluation not supported with PATH based results");var e={resultType:f.resultType||"VALUE",normalize:function(a){var d=[];a=a.replace(/'([^']|'')*'/g,function(a){return p+"("+(u.push(eval(a))-1)+")"});for(var b=-1;b!=d.length;)b=d.length,a=a.replace(/(\??\([^\(\)]*\))/g,function(a){return"#"+
-(d.push(a)-1)});a=a.replace(/[\['](#[0-9]+)[\]']/g,"[$1]").replace(/'?\.'?|\['?/g,";").replace(/;;;|;;/g,";..;").replace(/;$|'?\]|'$/g,"");for(b=-1;b!=a;)b=a,a=a.replace(/#([0-9]+)/g,function(a,b){return d[b]});return a.split(";")},asPaths:function(a){var d,b,e,r,f;for(b=0;b<a.length;b++){e="$";r=a[b];d=1;for(f=r.length;d<f;d++)e+=/^[0-9*]+$/.test(r[d])?"["+r[d]+"]":"['"+r[d]+"']";a[b]=e}return a},exec:function(a,d,b){function l(a,c,b){a&&a.hasOwnProperty(c)&&"VALUE"!=e.resultType&&g.push(k.concat([c]));
-b?m=a[c]:a&&a.hasOwnProperty(c)&&m.push(a[c])}function f(a){m.push(a);g.push(k);e.walk(a,function(b){if("object"===typeof a[b]){var c=k;k=k.concat(b);f(a[b]);k=c}})}function n(a,b){if(b instanceof Array){var c=b.length,d=0,h=c,e=1;a.replace(/^(-?[0-9]*):(-?[0-9]*):?(-?[0-9]*)$/g,function(a,b,c,f){d=parseInt(b||d,10);h=parseInt(c||h,10);e=parseInt(f||e,10)});d=0>d?Math.max(0,d+c):Math.min(c,d);h=0>h?Math.max(0,h+c):Math.min(c,h);for(c=d;c<h;c+=e)l(b,c)}}function p(a,b){var c=b.match(/^_str\(([0-9]+)\)$/);
-return c?u[c[1]]:a}function q(a,c){if(/^\(.*?\)$/.test(c))l(a,e.eval(c,a),b);else if("*"===c)e.walk(a,b&&a instanceof Array?function(b){e.walk(a[b],function(c){l(a[b],c)})}:function(b){l(a,b)});else if(".."===c)f(a);else if(/,/.test(c)){var d,h,g;d=c.split(/'?,'?/);g=0;for(h=d.length;g<h;g++)l(a,p(d[g],c))}else/^\?\(.*?\)$/.test(c)?e.walk(a,function(b){e.eval(c.replace(/^\?\((.*?)\)$/,"$1"),a[b])&&l(a,b)}):/^(-?[0-9]*):(-?[0-9]*):?([0-9]*)$/.test(c)?n(c,a):(c=p(c,c),b&&a instanceof Array&&!/^[0-9*]+$/.test(c)?
-e.walk(a,function(b){l(a[b],c)}):l(a,c,b))}for(var k=["$"],m=b?d:[d],g=[k],v,w;a.length;){v=a.shift();if(null===(d=m)||void 0===d)return d;m=[];w=g;g=[];b?q(d,v):e.walk(d,function(a){k=w[a]||k;q(d[a],v)})}if("BOTH"==e.resultType){g=e.asPaths(g);a=[];var t;for(t=0;t<g.length;t++)a.push({path:g[t],value:m[t]});return a}return"PATH"==e.resultType?e.asPaths(g):m},walk:function(a,d){var b,e;if(a instanceof Array)for(b=0,e=a.length;b<e;b++)b in a&&d(b);else if("object"===typeof a)for(b in a)a.hasOwnProperty(b)&&
-d(b)},eval:function(a,d){try{return q&&d&&eval(a.replace(/@/g,"v"))}catch(b){throw new SyntaxError("jsonPath: "+b.message+": "+a.replace(/@/g,"v").replace(/\^/g,"_a"));}}};return n&&q?e.exec(e.normalize(n).slice(1),q,"RESULT"==f.evalType):!1};p.isAsync||(x.getObject("dojox.jsonPath",!0).query=n);return n});
-//# sourceMappingURL=query.js.map
+define("dojox/jsonPath/query",["dojo/_base/kernel","dojo/_base/lang"],function(_1,_2){
+var _3=function(_4,_5,_6){
+if(!_6){
+_6={};
+}
+var _7=[];
+function _8(i){
+return _7[i];
+};
+var _9=_8.name;
+if(_6.resultType=="PATH"&&_6.evalType=="RESULT"){
+throw Error("RESULT based evaluation not supported with PATH based results");
+}
+var P={resultType:_6.resultType||"VALUE",normalize:function(_a){
+var _b=[];
+_a=_a.replace(/'([^']|'')*'/g,function(t){
+return _9+"("+(_7.push(eval(t))-1)+")";
+});
+var ll=-1;
+while(ll!=_b.length){
+ll=_b.length;
+_a=_a.replace(/(\??\([^\(\)]*\))/g,function($0){
+return "#"+(_b.push($0)-1);
+});
+}
+_a=_a.replace(/[\['](#[0-9]+)[\]']/g,"[$1]").replace(/'?\.'?|\['?/g,";").replace(/;;;|;;/g,";..;").replace(/;$|'?\]|'$/g,"");
+ll=-1;
+while(ll!=_a){
+ll=_a;
+_a=_a.replace(/#([0-9]+)/g,function($0,$1){
+return _b[$1];
+});
+}
+return _a.split(";");
+},asPaths:function(_c){
+var i,j,p,x,n;
+for(j=0;j<_c.length;j++){
+p="$";
+x=_c[j];
+for(i=1,n=x.length;i<n;i++){
+p+=/^[0-9*]+$/.test(x[i])?("["+x[i]+"]"):("['"+x[i]+"']");
+}
+_c[j]=p;
+}
+return _c;
+},exec:function(_d,_e,rb){
+var _f=["$"];
+var _10=rb?_e:[_e];
+var _11=[_f];
+function add(v,p,def){
+if(v&&v.hasOwnProperty(p)&&P.resultType!="VALUE"){
+_11.push(_f.concat([p]));
+}
+if(def){
+_10=v[p];
+}else{
+if(v&&v.hasOwnProperty(p)){
+_10.push(v[p]);
+}
+}
+};
+function _12(v){
+_10.push(v);
+_11.push(_f);
+P.walk(v,function(i){
+if(typeof v[i]==="object"){
+var _13=_f;
+_f=_f.concat(i);
+_12(v[i]);
+_f=_13;
+}
+});
+};
+function _14(loc,val){
+if(val instanceof Array){
+var len=val.length,_15=0,end=len,_16=1;
+loc.replace(/^(-?[0-9]*):(-?[0-9]*):?(-?[0-9]*)$/g,function($0,$1,$2,$3){
+_15=parseInt($1||_15,10);
+end=parseInt($2||end,10);
+_16=parseInt($3||_16,10);
+});
+_15=(_15<0)?Math.max(0,_15+len):Math.min(len,_15);
+end=(end<0)?Math.max(0,end+len):Math.min(len,end);
+var i;
+for(i=_15;i<end;i+=_16){
+add(val,i);
+}
+}
+};
+function _17(str,loc){
+var i=loc.match(/^_str\(([0-9]+)\)$/);
+return i?_7[i[1]]:str;
+};
+function _18(val,loc){
+if(/^\(.*?\)$/.test(loc)){
+add(val,P.eval(loc,val),rb);
+}else{
+if(loc==="*"){
+P.walk(val,rb&&val instanceof Array?function(i){
+P.walk(val[i],function(j){
+add(val[i],j);
+});
+}:function(i){
+add(val,i);
+});
+}else{
+if(loc===".."){
+_12(val);
+}else{
+if(/,/.test(loc)){
+var s,n,i;
+for(s=loc.split(/'?,'?/),i=0,n=s.length;i<n;i++){
+add(val,_17(s[i],loc));
+}
+}else{
+if(/^\?\(.*?\)$/.test(loc)){
+P.walk(val,function(i){
+if(P.eval(loc.replace(/^\?\((.*?)\)$/,"$1"),val[i])){
+add(val,i);
+}
+});
+}else{
+if(/^(-?[0-9]*):(-?[0-9]*):?([0-9]*)$/.test(loc)){
+_14(loc,val);
+}else{
+loc=_17(loc,loc);
+if(rb&&val instanceof Array&&!/^[0-9*]+$/.test(loc)){
+P.walk(val,function(i){
+add(val[i],loc);
+});
+}else{
+add(val,loc,rb);
+}
+}
+}
+}
+}
+}
+}
+};
+var loc,_19;
+while(_d.length){
+loc=_d.shift();
+if((_e=_10)===null||_e===undefined){
+return _e;
+}
+_10=[];
+_19=_11;
+_11=[];
+if(rb){
+_18(_e,loc);
+}else{
+P.walk(_e,function(i){
+_f=_19[i]||_f;
+_18(_e[i],loc);
+});
+}
+}
+if(P.resultType=="BOTH"){
+_11=P.asPaths(_11);
+var _1a=[];
+var i;
+for(i=0;i<_11.length;i++){
+_1a.push({path:_11[i],value:_10[i]});
+}
+return _1a;
+}
+return P.resultType=="PATH"?P.asPaths(_11):_10;
+},walk:function(val,f){
+var i,n,m;
+if(val instanceof Array){
+for(i=0,n=val.length;i<n;i++){
+if(i in val){
+f(i);
+}
+}
+}else{
+if(typeof val==="object"){
+for(m in val){
+if(val.hasOwnProperty(m)){
+f(m);
+}
+}
+}
+}
+},"eval":function(x,v){
+try{
+return _4&&v&&eval(x.replace(/@/g,"v"));
+}
+catch(e){
+throw new SyntaxError("jsonPath: "+e.message+": "+x.replace(/@/g,"v").replace(/\^/g,"_a"));
+}
+}};
+if(_5&&_4){
+return P.exec(P.normalize(_5).slice(1),_4,_6.evalType=="RESULT");
+}
+return false;
+};
+if(!_1.isAsync){
+var obj=_2.getObject("dojox.jsonPath",true);
+obj.query=_3;
+}
+return _3;
+});

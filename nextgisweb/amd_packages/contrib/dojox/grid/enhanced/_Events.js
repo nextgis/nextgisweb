@@ -1,8 +1,119 @@
 //>>built
-define("dojox/grid/enhanced/_Events","dojo/_base/kernel dojo/_base/declare dojo/keys dojo/_base/html dojo/_base/event dojox/grid/_Events".split(" "),function(k,f,b,c,g,h){return f("dojox.grid.enhanced._Events",null,{_events:null,headerCellActiveClass:"dojoxGridHeaderActive",cellActiveClass:"dojoxGridCellActive",rowActiveClass:"dojoxGridRowActive",constructor:function(a){this._events=new h;a.mixin(a,this)},dokeyup:function(a){this.focus.currentArea().keyup(a)},onKeyDown:function(a){if(!a.altKey&&!a.metaKey){var e=
-this.focus,d=this.edit.isEditing();switch(a.keyCode){case b.TAB:if(a.ctrlKey)break;e.tab(a.shiftKey?-1:1,a);break;case b.UP_ARROW:case b.DOWN_ARROW:if(d)break;e.currentArea().move(a.keyCode==b.UP_ARROW?-1:1,0,a);break;case b.LEFT_ARROW:case b.RIGHT_ARROW:if(d)break;d=a.keyCode==b.LEFT_ARROW?1:-1;c._isBodyLtr()&&(d*=-1);e.currentArea().move(0,d,a);break;case b.F10:if(this.menus&&a.shiftKey)this.onRowContextMenu(a);break;default:e.currentArea().keydown(a)}}},domouseup:function(a){if(a.cellNode)this.onMouseUp(a);
-else this.onRowSelectorMouseUp(a)},domousedown:function(a){if(!a.cellNode)this.onRowSelectorMouseDown(a)},onMouseUp:function(a){this[-1==a.rowIndex?"onHeaderCellMouseUp":"onCellMouseUp"](a)},onCellMouseDown:function(a){c.addClass(a.cellNode,this.cellActiveClass);c.addClass(a.rowNode,this.rowActiveClass)},onCellMouseUp:function(a){c.removeClass(a.cellNode,this.cellActiveClass);c.removeClass(a.rowNode,this.rowActiveClass)},onCellClick:function(a){this._events.onCellClick.call(this,a);this.focus.contentMouseEvent(a)},
-onCellDblClick:function(a){this.pluginMgr.isFixedCell(a.cell)||(!(1<this._click.length)||this._click[0]&&this._click[1]||(this._click[0]=this._click[1]=a),this._events.onCellDblClick.call(this,a))},onRowClick:function(a){this.edit.rowClick(a);a.cell&&this.plugin("indirectSelection")||this.selection.clickSelectEvent(a)},onRowContextMenu:function(a){!this.edit.isEditing()&&this.menus&&this.showMenu(a)},onSelectedRegionContextMenu:function(a){this.selectedRegionMenu&&(this.selectedRegionMenu._openMyself({target:a.target,
-coords:a.keyCode!==b.F10&&"pageX"in a?{x:a.pageX,y:a.pageY}:null}),g.stop(a))},onHeaderCellMouseOut:function(a){a.cellNode&&(c.removeClass(a.cellNode,this.cellOverClass),c.removeClass(a.cellNode,this.headerCellActiveClass))},onHeaderCellMouseDown:function(a){a.cellNode&&c.addClass(a.cellNode,this.headerCellActiveClass)},onHeaderCellMouseUp:function(a){a.cellNode&&c.removeClass(a.cellNode,this.headerCellActiveClass)},onHeaderCellClick:function(a){this.focus.currentArea("header");a.cell.isRowSelector||
-this._events.onHeaderCellClick.call(this,a);this.focus.headerMouseEvent(a)},onRowSelectorMouseDown:function(a){this.focus.focusArea("rowHeader",a)},onRowSelectorMouseUp:function(a){},onMouseUpRow:function(a){if(-1!=a.rowIndex)this.onRowMouseUp(a)},onRowMouseUp:function(a){}})});
-//# sourceMappingURL=_Events.js.map
+define("dojox/grid/enhanced/_Events",["dojo/_base/kernel","dojo/_base/declare","dojo/keys","dojo/_base/html","dojo/_base/event","dojox/grid/_Events"],function(_1,_2,_3,_4,_5,_6){
+return _2("dojox.grid.enhanced._Events",null,{_events:null,headerCellActiveClass:"dojoxGridHeaderActive",cellActiveClass:"dojoxGridCellActive",rowActiveClass:"dojoxGridRowActive",constructor:function(_7){
+this._events=new _6();
+_7.mixin(_7,this);
+},dokeyup:function(e){
+this.focus.currentArea().keyup(e);
+},onKeyDown:function(e){
+if(e.altKey||e.metaKey){
+return;
+}
+var _8=this.focus;
+var _9=this.edit.isEditing();
+switch(e.keyCode){
+case _3.TAB:
+if(e.ctrlKey){
+return;
+}
+_8.tab(e.shiftKey?-1:1,e);
+break;
+case _3.UP_ARROW:
+case _3.DOWN_ARROW:
+if(_9){
+return;
+}
+_8.currentArea().move(e.keyCode==_3.UP_ARROW?-1:1,0,e);
+break;
+case _3.LEFT_ARROW:
+case _3.RIGHT_ARROW:
+if(_9){
+return;
+}
+var _a=(e.keyCode==_3.LEFT_ARROW)?1:-1;
+if(_4._isBodyLtr()){
+_a*=-1;
+}
+_8.currentArea().move(0,_a,e);
+break;
+case _3.F10:
+if(this.menus&&e.shiftKey){
+this.onRowContextMenu(e);
+}
+break;
+default:
+_8.currentArea().keydown(e);
+break;
+}
+},domouseup:function(e){
+if(e.cellNode){
+this.onMouseUp(e);
+}else{
+this.onRowSelectorMouseUp(e);
+}
+},domousedown:function(e){
+if(!e.cellNode){
+this.onRowSelectorMouseDown(e);
+}
+},onMouseUp:function(e){
+this[e.rowIndex==-1?"onHeaderCellMouseUp":"onCellMouseUp"](e);
+},onCellMouseDown:function(e){
+_4.addClass(e.cellNode,this.cellActiveClass);
+_4.addClass(e.rowNode,this.rowActiveClass);
+},onCellMouseUp:function(e){
+_4.removeClass(e.cellNode,this.cellActiveClass);
+_4.removeClass(e.rowNode,this.rowActiveClass);
+},onCellClick:function(e){
+this._events.onCellClick.call(this,e);
+this.focus.contentMouseEvent(e);
+},onCellDblClick:function(e){
+if(this.pluginMgr.isFixedCell(e.cell)){
+return;
+}
+if(this._click.length>1&&(!this._click[0]||!this._click[1])){
+this._click[0]=this._click[1]=e;
+}
+this._events.onCellDblClick.call(this,e);
+},onRowClick:function(e){
+this.edit.rowClick(e);
+if(!e.cell||!this.plugin("indirectSelection")){
+this.selection.clickSelectEvent(e);
+}
+},onRowContextMenu:function(e){
+if(!this.edit.isEditing()&&this.menus){
+this.showMenu(e);
+}
+},onSelectedRegionContextMenu:function(e){
+if(this.selectedRegionMenu){
+this.selectedRegionMenu._openMyself({target:e.target,coords:e.keyCode!==_3.F10&&"pageX" in e?{x:e.pageX,y:e.pageY}:null});
+_5.stop(e);
+}
+},onHeaderCellMouseOut:function(e){
+if(e.cellNode){
+_4.removeClass(e.cellNode,this.cellOverClass);
+_4.removeClass(e.cellNode,this.headerCellActiveClass);
+}
+},onHeaderCellMouseDown:function(e){
+if(e.cellNode){
+_4.addClass(e.cellNode,this.headerCellActiveClass);
+}
+},onHeaderCellMouseUp:function(e){
+if(e.cellNode){
+_4.removeClass(e.cellNode,this.headerCellActiveClass);
+}
+},onHeaderCellClick:function(e){
+this.focus.currentArea("header");
+if(!e.cell.isRowSelector){
+this._events.onHeaderCellClick.call(this,e);
+}
+this.focus.headerMouseEvent(e);
+},onRowSelectorMouseDown:function(e){
+this.focus.focusArea("rowHeader",e);
+},onRowSelectorMouseUp:function(e){
+},onMouseUpRow:function(e){
+if(e.rowIndex!=-1){
+this.onRowMouseUp(e);
+}
+},onRowMouseUp:function(e){
+}});
+});

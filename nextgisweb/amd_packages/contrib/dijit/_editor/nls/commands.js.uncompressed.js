@@ -88,5 +88,6 @@ define("dijit/_editor/nls/commands", { root:
 "ca": true,
 "bg": true,
 "az": true,
-"ar": true
+"ar": true,
+"al": true
 });

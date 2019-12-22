@@ -1,9 +1,108 @@
 //>>built
-("undefined"===typeof define?function(e,a){a()}:define)(["dojo/_base/config","dojo/_base/lang","dojo/_base/window","require"],function(e,a,g,r){var d=a&&a.getObject("dojox.mobile",!0)||{};a=new function(){g||(g=window,g.doc=document,g._no_dojo_dm=d);e=e||g.mblConfig||{};for(var a=g.doc.getElementsByTagName("script"),n=0;n<a.length;n++){var p=a[n],m=p.getAttribute("src")||"";if(m.match(/\/deviceTheme\.js/i)){e.baseUrl=m.replace("deviceTheme.js","../../dojo/");if(a=p.getAttribute("data-dojo-config")||
-p.getAttribute("djConfig")){var a=eval("({ "+a+" })"),q;for(q in a)e[q]=a[q]}break}else if(m.match(/\/dojo\.js/i)){e.baseUrl=m.replace("dojo.js","");break}}this.loadCssFile=function(a){var b=g.doc.createElement("link");b.href=a;b.type="text/css";b.rel="stylesheet";a=g.doc.getElementsByTagName("head")[0];a.insertBefore(b,a.firstChild);d.loadedCssFiles.push(b)};this.toUrl=function(a){return r?r.toUrl(a):e.baseUrl+"../"+a};this.setDm=function(a){d=a};this.themeMap=e.themeMap||[["Holodark","holodark",
-[]],["Android 3","holodark",[]],["Android 4","holodark",[]],["Android 5","holodark",[]],["Android 6","holodark",[]],["Android","android",[]],["BlackBerry","blackberry",[]],["BB10","blackberry",[]],["ios7","ios7",[]],["iPhone;.*OS 7_","ios7",[]],["iPhone;.*OS 8_","ios7",[]],["iPhone;.*OS 9_","ios7",[]],["iPad;.*OS 7_","ios7",[]],["iPad;.*OS 8_","ios7",[]],["iPad;.*OS 9_","ios7",[]],["iPhone","iphone",[]],["iPad","iphone",[this.toUrl("dojox/mobile/themes/iphone/ipad.css")]],["WindowsPhone","windows",
-[]],["Windows Phone","windows",[]],["Trident","ios7",[]],["Custom","custom",[]],[".*","ios7",[]]];d.loadedCssFiles=[];this.loadDeviceTheme=function(a){var b=e.mblThemeFiles||d.themeFiles||["@theme"],f,c;c=this.themeMap;var h=a||e.mblUserAgent||(location.search.match(/theme=(\w+)/)?RegExp.$1:navigator.userAgent);for(f=0;f<c.length;f++)if(h.match(new RegExp(c[f][0]))){var k=c[f][1];if("windows"!=k||!e.mblDisableWindowsTheme){h=g.doc.documentElement.className;h=h.replace(new RegExp(" *"+d.currentTheme+
-"_theme"),"")+" "+k+"_theme";g.doc.documentElement.className=h;d.currentTheme=k;f=[].concat(c[f][2]);for(c=0;c<b.length;c++){var l=b[c]instanceof Array||"array"==typeof b[c];l||-1===b[c].indexOf("/")?(h=l?(b[c][0]||"").replace(/\./g,"/"):"dojox/mobile",l=(l?b[c][1]:b[c]).replace(/\./g,"/"),h=h+"/"+("themes/"+k+"/"+("@theme"===l?k:l)+".css")):h=b[c];f.unshift(this.toUrl(h))}for(b=0;b<d.loadedCssFiles.length;b++)k=d.loadedCssFiles[b],k.parentNode.removeChild(k);d.loadedCssFiles=[];for(c=0;c<f.length;c++)b=
-f[c].toString(),1==e["dojo-bidi"]&&-1==b.indexOf("_rtl")&&(k=b.substr(b.lastIndexOf("/")+1),-1!="android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css ProgressIndicator.css Accordion.css GridLayout.css FormLayout.css".indexOf(k)&&this.loadCssFile(b.replace(".css","_rtl.css"))),this.loadCssFile(f[c].toString());a&&d.loadCompatCssFiles&&
-d.loadCompatCssFiles();break}}}};a.loadDeviceTheme();return window.deviceTheme=d.deviceTheme=a});
-//# sourceMappingURL=deviceTheme.js.map
+(typeof define==="undefined"?function(_1,_2){
+_2();
+}:define)(["dojo/_base/config","dojo/_base/lang","dojo/_base/window","require"],function(_3,_4,_5,_6){
+var dm=_4&&_4.getObject("dojox.mobile",true)||{};
+var _7=function(){
+if(!_5){
+_5=window;
+_5.doc=document;
+_5._no_dojo_dm=dm;
+}
+_3=_3||_5.mblConfig||{};
+var _8=_5.doc.getElementsByTagName("script");
+for(var i=0;i<_8.length;i++){
+var n=_8[i];
+var _9=n.getAttribute("src")||"";
+if(_9.match(/\/deviceTheme\.js/i)){
+_3.baseUrl=_9.replace("deviceTheme.js","../../dojo/");
+var _a=(n.getAttribute("data-dojo-config")||n.getAttribute("djConfig"));
+if(_a){
+var _b=eval("({ "+_a+" })");
+for(var _c in _b){
+_3[_c]=_b[_c];
+}
+}
+break;
+}else{
+if(_9.match(/\/dojo\.js/i)){
+_3.baseUrl=_9.replace("dojo.js","");
+break;
+}
+}
+}
+this.loadCssFile=function(_d){
+var _e=_5.doc.createElement("link");
+_e.href=_d;
+_e.type="text/css";
+_e.rel="stylesheet";
+var _f=_5.doc.getElementsByTagName("head")[0];
+_f.insertBefore(_e,_f.firstChild);
+dm.loadedCssFiles.push(_e);
+};
+this.toUrl=function(_10){
+return _6?_6.toUrl(_10):_3.baseUrl+"../"+_10;
+};
+this.setDm=function(_11){
+dm=_11;
+};
+this.themeMap=_3.themeMap||[["Holodark","holodark",[]],["Android [3-9]","holodark",[]],["Android","android",[]],["BlackBerry","blackberry",[]],["BB10","blackberry",[]],["ios7","ios7",[]],["iPhone;.*OS ([7-9]|1[0-9])_","ios7",[]],["iPad;.*OS ([7-9]|1[0-9])_","ios7",[]],["iPhone","iphone",[]],["iPad","iphone",[this.toUrl("dojox/mobile/themes/iphone/ipad.css")]],["WindowsPhone","windows",[]],["Windows Phone","windows",[]],["Trident","ios7",[]],["Custom","custom",[]],[".*","ios7",[]]];
+dm.loadedCssFiles=[];
+this.loadDeviceTheme=function(_12){
+var t=_3.mblThemeFiles||dm.themeFiles||["@theme"];
+var i,j;
+var m=this.themeMap;
+var ua=_12||_3.mblUserAgent||(location.search.match(/theme=(\w+)/)?RegExp.$1:navigator.userAgent);
+for(i=0;i<m.length;i++){
+if(ua.match(new RegExp(m[i][0]))){
+var _13=m[i][1];
+if(_13=="windows"&&_3.mblDisableWindowsTheme){
+continue;
+}
+var cls=_5.doc.documentElement.className;
+cls=cls.replace(new RegExp(" *"+dm.currentTheme+"_theme"),"")+" "+_13+"_theme";
+_5.doc.documentElement.className=cls;
+dm.currentTheme=_13;
+var _14=[].concat(m[i][2]);
+for(j=0;j<t.length;j++){
+var _15=(t[j] instanceof Array||typeof t[j]=="array");
+var _16;
+if(!_15&&t[j].indexOf("/")!==-1){
+_16=t[j];
+}else{
+var pkg=_15?(t[j][0]||"").replace(/\./g,"/"):"dojox/mobile";
+var _17=(_15?t[j][1]:t[j]).replace(/\./g,"/");
+var f="themes/"+_13+"/"+(_17==="@theme"?_13:_17)+".css";
+_16=pkg+"/"+f;
+}
+_14.unshift(this.toUrl(_16));
+}
+for(var k=0;k<dm.loadedCssFiles.length;k++){
+var n=dm.loadedCssFiles[k];
+n.parentNode.removeChild(n);
+}
+dm.loadedCssFiles=[];
+for(j=0;j<_14.length;j++){
+var _18=_14[j].toString();
+if(_3["dojo-bidi"]==true&&_18.indexOf("_rtl")==-1){
+var _19="android.css blackberry.css custom.css iphone.css holodark.css base.css Carousel.css ComboBox.css IconContainer.css IconMenu.css ListItem.css RoundRectCategory.css SpinWheel.css Switch.css TabBar.css ToggleButton.css ToolBarButton.css ProgressIndicator.css Accordion.css GridLayout.css FormLayout.css";
+var _1a=_18.substr(_18.lastIndexOf("/")+1);
+if(_19.indexOf(_1a)!=-1){
+this.loadCssFile(_18.replace(".css","_rtl.css"));
+}
+}
+this.loadCssFile(_14[j].toString());
+}
+if(_12&&dm.loadCompatCssFiles){
+dm.loadCompatCssFiles();
+}
+break;
+}
+}
+};
+};
+var _1b=new _7();
+_1b.loadDeviceTheme();
+window.deviceTheme=dm.deviceTheme=_1b;
+return _1b;
+});

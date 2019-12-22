@@ -1,6 +1,6 @@
 define("dojox/drawing/stencil/_Base", ["dojo", "dojo/fx/easing", "../util/oo", "../annotations/BoxShadow", 
   "../annotations/Angle", "../annotations/Label", "../defaults"], 
-function(dojo, easing, oo, BoxShadow, Angle, LabelExports, defaults){
+function(dojo, easing, oo, BoxShadow, Angle, Label, defaults){
 
 /*=====
 var StencilArgs = {
@@ -844,7 +844,7 @@ var Base = oo.declare(
 			// text: String
 			//		The text to set as the label.
 			if(!this._label){
-				this._label = new LabelExports.Label({
+				this._label = new Label.Label({
 					text:text,
 					util:this.util,
 					mouse:this.mouse,

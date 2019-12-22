@@ -1,12 +1,163 @@
 //>>built
-define("dojox/color/Palette",["dojo/_base/lang","dojo/_base/array","./_base"],function(k,h,c){function t(a,b,d){var e=new c.Palette;e.colors=[];h.forEach(a.colors,function(a){e.colors.push(new c.Color({r:Math.min(255,Math.max(0,"dr"==b?a.r+d:a.r)),g:Math.min(255,Math.max(0,"dg"==b?a.g+d:a.g)),b:Math.min(255,Math.max(0,"db"==b?a.b+d:a.b)),a:Math.min(1,Math.max(0,"da"==b?a.a+d:a.a))}))});return e}function l(a,b,d){var e=new c.Palette;e.colors=[];h.forEach(a.colors,function(a){a=a.toCmy();e.colors.push(c.fromCmy(Math.min(100,
-Math.max(0,"dc"==b?a.c+d:a.c)),Math.min(100,Math.max(0,"dm"==b?a.m+d:a.m)),Math.min(100,Math.max(0,"dy"==b?a.y+d:a.y))))});return e}function p(a,b,d){var e=new c.Palette;e.colors=[];h.forEach(a.colors,function(a){a=a.toCmyk();e.colors.push(c.fromCmyk(Math.min(100,Math.max(0,"dc"==b?a.c+d:a.c)),Math.min(100,Math.max(0,"dm"==b?a.m+d:a.m)),Math.min(100,Math.max(0,"dy"==b?a.y+d:a.y)),Math.min(100,Math.max(0,"dk"==b?a.b+d:a.b))))});return e}function q(a,b,d){var e=new c.Palette;e.colors=[];h.forEach(a.colors,
-function(a){a=a.toHsl();e.colors.push(c.fromHsl(("dh"==b?a.h+d:a.h)%360,Math.min(100,Math.max(0,"ds"==b?a.s+d:a.s)),Math.min(100,Math.max(0,"dl"==b?a.l+d:a.l))))});return e}function r(a,b,d){var e=new c.Palette;e.colors=[];h.forEach(a.colors,function(a){a=a.toHsv();e.colors.push(c.fromHsv(("dh"==b?a.h+d:a.h)%360,Math.min(100,Math.max(0,"ds"==b?a.s+d:a.s)),Math.min(100,Math.max(0,"dv"==b?a.v+d:a.v))))});return e}c.Palette=function(a){this.colors=[];a instanceof c.Palette?this.colors=a.colors.slice(0):
-a instanceof c.Color?this.colors=[null,null,a,null,null]:k.isArray(a)?this.colors=h.map(a.slice(0),function(a){return k.isString(a)?new c.Color(a):a}):k.isString(a)&&(this.colors=[null,null,new c.Color(a),null,null])};k.extend(c.Palette,{transform:function(a){var b=t;if(a.use){var c=a.use.toLowerCase();0==c.indexOf("hs")?b="l"==c.charAt(2)?q:r:0==c.indexOf("cmy")&&(b="k"==c.charAt(3)?p:l)}else if("dc"in a||"dm"in a||"dy"in a)b="dk"in a?p:l;else if("dh"in a||"ds"in a)b="dv"in a?r:q;var c=this,e;for(e in a)"use"!=
-e&&(c=b(c,e,a[e]));return c},clone:function(){return new c.Palette(this)}});k.mixin(c.Palette,{generators:{analogous:function(a){var b=a.high||60,d=a.low||18;a=(k.isString(a.base)?new c.Color(a.base):a.base).toHsv();var e=Math.max(10,95>=a.s?a.s+5:100-(a.s-95)),g=92<=a.v?a.v-9:Math.max(a.v+9,20),f=90>=a.v?Math.max(a.v+5,20):95+Math.ceil((a.v-90)/2),n=[e,1<a.s?a.s-1:21-a.s,a.s,e,e],m=[g,f,a.v,g,f];return new c.Palette(h.map([(a.h+d+360)%360,(a.h+Math.round(d/2)+360)%360,a.h,(a.h-Math.round(b/2)+360)%
-360,(a.h-b+360)%360],function(a,b){return c.fromHsv(a,n[b],m[b])}))},monochromatic:function(a){a=k.isString(a.base)?new c.Color(a.base):a.base;var b=a.toHsv(),d=9<b.s-30?b.s-30:b.s+30,e=b.s,g=20<b.v-20?b.v-20:b.v+60,f=20<b.v-50?b.v-50:b.v+30;return new c.Palette([c.fromHsv(b.h,d,100-.8*(100-b.v)),c.fromHsv(b.h,e,f),a,c.fromHsv(b.h,d,f),c.fromHsv(b.h,e,g)])},triadic:function(a){a=k.isString(a.base)?new c.Color(a.base):a.base;var b=a.toHsv(),d=(b.h-157+360)%360,e=90<b.s?b.s-10:b.s+10,g=95<b.s?b.s-5:
-b.s+5,f=20<b.v-20?b.v-20:b.v+20,n=20<b.v-30?b.v-30:b.v+30,h=70<b.v-30?b.v-30:b.v+30;return new c.Palette([c.fromHsv((b.h+57+360)%360,20<b.s?b.s-10:b.s+10,b.v),c.fromHsv(b.h,e,n),a,c.fromHsv(d,e,f),c.fromHsv(d,g,h)])},complementary:function(a){a=k.isString(a.base)?new c.Color(a.base):a.base;var b=a.toHsv(),d=360>2*b.h+137?2*b.h+137:Math.floor(b.h/2)-137,e=100-.9*(100-b.s),g=Math.min(100,b.s+20),f=20<b.v?b.v-30:b.v+30;return new c.Palette([c.fromHsv(b.h,Math.max(b.s-10,0),Math.min(100,b.v+30)),c.fromHsv(b.h,
-e,f),a,c.fromHsv(d,g,f),c.fromHsv(d,b.s,b.v)])},splitComplementary:function(a){var b=k.isString(a.base)?new c.Color(a.base):a.base,d=a.da||30;a=b.toHsv();var e=360>2*a.h+137?2*a.h+137:Math.floor(a.h/2)-137,g=(e-d+360)%360,d=(e+d)%360,e=100-.9*(100-a.s),f=Math.min(100,a.s+20),h=20<a.v?a.v-30:a.v+30;return new c.Palette([c.fromHsv(g,Math.max(a.s-10,0),Math.min(100,a.v+30)),c.fromHsv(g,e,h),b,c.fromHsv(d,f,h),c.fromHsv(d,a.s,a.v)])},compound:function(a){a=k.isString(a.base)?new c.Color(a.base):a.base;
-var b=a.toHsv(),d=360>2*b.h+18?2*b.h+18:Math.floor(b.h/2)-18,e=360>2*b.h+120?2*b.h+120:Math.floor(b.h/2)-120,g=360>2*b.h+99?2*b.h+99:Math.floor(b.h/2)-99,f=80<b.s-10?b.s-10:b.s+10,h=10<b.s-25?b.s-25:b.s+25,m=80<b.v-20?b.v-20:b.v+20,l=Math.max(b.v,20);return new c.Palette([c.fromHsv(d,10<b.s-40?b.s-40:b.s+40,10<b.v-40?b.v-40:b.v+40),c.fromHsv(d,f,m),a,c.fromHsv(e,h,l),c.fromHsv(g,f,m)])},shades:function(a){a=k.isString(a.base)?new c.Color(a.base):a.base;var b=a.toHsv(),d=100==b.s&&0==b.v?0:b.s,e=20<=
-b.v-25?b.v-25:b.v+55,g=20<=b.v-75?b.v-75:b.v+5,f=Math.max(b.v-10,20);return new c.Palette([new c.fromHsv(b.h,d,20<b.v-50?b.v-50:b.v+30),new c.fromHsv(b.h,d,e),a,new c.fromHsv(b.h,d,g),new c.fromHsv(b.h,d,f)])}},generate:function(a,b){if(k.isFunction(b))return b({base:a});if(c.Palette.generators[b])return c.Palette.generators[b]({base:a});throw Error("dojox.color.Palette.generate: the specified generator ('"+b+"') does not exist.");}});return c.Palette});
-//# sourceMappingURL=Palette.js.map
+define("dojox/color/Palette",["dojo/_base/lang","dojo/_base/array","./_base"],function(_1,_2,_3){
+_3.Palette=function(_4){
+this.colors=[];
+if(_4 instanceof _3.Palette){
+this.colors=_4.colors.slice(0);
+}else{
+if(_4 instanceof _3.Color){
+this.colors=[null,null,_4,null,null];
+}else{
+if(_1.isArray(_4)){
+this.colors=_2.map(_4.slice(0),function(_5){
+if(_1.isString(_5)){
+return new _3.Color(_5);
+}
+return _5;
+});
+}else{
+if(_1.isString(_4)){
+this.colors=[null,null,new _3.Color(_4),null,null];
+}
+}
+}
+}
+};
+function _6(p,_7,_8){
+var _9=new _3.Palette();
+_9.colors=[];
+_2.forEach(p.colors,function(_a){
+var r=(_7=="dr")?_a.r+_8:_a.r,g=(_7=="dg")?_a.g+_8:_a.g,b=(_7=="db")?_a.b+_8:_a.b,a=(_7=="da")?_a.a+_8:_a.a;
+_9.colors.push(new _3.Color({r:Math.min(255,Math.max(0,r)),g:Math.min(255,Math.max(0,g)),b:Math.min(255,Math.max(0,b)),a:Math.min(1,Math.max(0,a))}));
+});
+return _9;
+};
+function _b(p,_c,_d){
+var _e=new _3.Palette();
+_e.colors=[];
+_2.forEach(p.colors,function(_f){
+var o=_f.toCmy(),c=(_c=="dc")?o.c+_d:o.c,m=(_c=="dm")?o.m+_d:o.m,y=(_c=="dy")?o.y+_d:o.y;
+_e.colors.push(_3.fromCmy(Math.min(100,Math.max(0,c)),Math.min(100,Math.max(0,m)),Math.min(100,Math.max(0,y))));
+});
+return _e;
+};
+function _10(p,_11,val){
+var ret=new _3.Palette();
+ret.colors=[];
+_2.forEach(p.colors,function(_12){
+var o=_12.toCmyk(),c=(_11=="dc")?o.c+val:o.c,m=(_11=="dm")?o.m+val:o.m,y=(_11=="dy")?o.y+val:o.y,k=(_11=="dk")?o.b+val:o.b;
+ret.colors.push(_3.fromCmyk(Math.min(100,Math.max(0,c)),Math.min(100,Math.max(0,m)),Math.min(100,Math.max(0,y)),Math.min(100,Math.max(0,k))));
+});
+return ret;
+};
+function _13(p,_14,val){
+var ret=new _3.Palette();
+ret.colors=[];
+_2.forEach(p.colors,function(_15){
+var o=_15.toHsl(),h=(_14=="dh")?o.h+val:o.h,s=(_14=="ds")?o.s+val:o.s,l=(_14=="dl")?o.l+val:o.l;
+ret.colors.push(_3.fromHsl(h%360,Math.min(100,Math.max(0,s)),Math.min(100,Math.max(0,l))));
+});
+return ret;
+};
+function _16(p,_17,val){
+var ret=new _3.Palette();
+ret.colors=[];
+_2.forEach(p.colors,function(_18){
+var o=_18.toHsv(),h=(_17=="dh")?o.h+val:o.h,s=(_17=="ds")?o.s+val:o.s,v=(_17=="dv")?o.v+val:o.v;
+ret.colors.push(_3.fromHsv(h%360,Math.min(100,Math.max(0,s)),Math.min(100,Math.max(0,v))));
+});
+return ret;
+};
+function _19(val,low,_1a){
+return _1a-((_1a-val)*((_1a-low)/_1a));
+};
+_1.extend(_3.Palette,{transform:function(_1b){
+var fn=_6;
+if(_1b.use){
+var use=_1b.use.toLowerCase();
+if(use.indexOf("hs")==0){
+if(use.charAt(2)=="l"){
+fn=_13;
+}else{
+fn=_16;
+}
+}else{
+if(use.indexOf("cmy")==0){
+if(use.charAt(3)=="k"){
+fn=_10;
+}else{
+fn=_b;
+}
+}
+}
+}else{
+if("dc" in _1b||"dm" in _1b||"dy" in _1b){
+if("dk" in _1b){
+fn=_10;
+}else{
+fn=_b;
+}
+}else{
+if("dh" in _1b||"ds" in _1b){
+if("dv" in _1b){
+fn=_16;
+}else{
+fn=_13;
+}
+}
+}
+}
+var _1c=this;
+for(var p in _1b){
+if(p=="use"){
+continue;
+}
+_1c=fn(_1c,p,_1b[p]);
+}
+return _1c;
+},clone:function(){
+return new _3.Palette(this);
+}});
+_1.mixin(_3.Palette,{generators:{analogous:function(_1d){
+var _1e=_1d.high||60,low=_1d.low||18,_1f=_1.isString(_1d.base)?new _3.Color(_1d.base):_1d.base,hsv=_1f.toHsv();
+var h=[(hsv.h+low+360)%360,(hsv.h+Math.round(low/2)+360)%360,hsv.h,(hsv.h-Math.round(_1e/2)+360)%360,(hsv.h-_1e+360)%360];
+var s1=Math.max(10,(hsv.s<=95)?hsv.s+5:(100-(hsv.s-95))),s2=(hsv.s>1)?hsv.s-1:21-hsv.s,v1=(hsv.v>=92)?hsv.v-9:Math.max(hsv.v+9,20),v2=(hsv.v<=90)?Math.max(hsv.v+5,20):(95+Math.ceil((hsv.v-90)/2)),s=[s1,s2,hsv.s,s1,s1],v=[v1,v2,hsv.v,v1,v2];
+return new _3.Palette(_2.map(h,function(hue,i){
+return _3.fromHsv(hue,s[i],v[i]);
+}));
+},monochromatic:function(_20){
+var _21=_1.isString(_20.base)?new _3.Color(_20.base):_20.base,hsv=_21.toHsv();
+var s1=(hsv.s-30>9)?hsv.s-30:hsv.s+30,s2=hsv.s,v1=_19(hsv.v,20,100),v2=(hsv.v-20>20)?hsv.v-20:hsv.v+60,v3=(hsv.v-50>20)?hsv.v-50:hsv.v+30;
+return new _3.Palette([_3.fromHsv(hsv.h,s1,v1),_3.fromHsv(hsv.h,s2,v3),_21,_3.fromHsv(hsv.h,s1,v3),_3.fromHsv(hsv.h,s2,v2)]);
+},triadic:function(_22){
+var _23=_1.isString(_22.base)?new _3.Color(_22.base):_22.base,hsv=_23.toHsv();
+var h1=(hsv.h+57+360)%360,h2=(hsv.h-157+360)%360,s1=(hsv.s>20)?hsv.s-10:hsv.s+10,s2=(hsv.s>90)?hsv.s-10:hsv.s+10,s3=(hsv.s>95)?hsv.s-5:hsv.s+5,v1=(hsv.v-20>20)?hsv.v-20:hsv.v+20,v2=(hsv.v-30>20)?hsv.v-30:hsv.v+30,v3=(hsv.v-30>70)?hsv.v-30:hsv.v+30;
+return new _3.Palette([_3.fromHsv(h1,s1,hsv.v),_3.fromHsv(hsv.h,s2,v2),_23,_3.fromHsv(h2,s2,v1),_3.fromHsv(h2,s3,v3)]);
+},complementary:function(_24){
+var _25=_1.isString(_24.base)?new _3.Color(_24.base):_24.base,hsv=_25.toHsv();
+var h1=((hsv.h*2)+137<360)?(hsv.h*2)+137:Math.floor(hsv.h/2)-137,s1=Math.max(hsv.s-10,0),s2=_19(hsv.s,10,100),s3=Math.min(100,hsv.s+20),v1=Math.min(100,hsv.v+30),v2=(hsv.v>20)?hsv.v-30:hsv.v+30;
+return new _3.Palette([_3.fromHsv(hsv.h,s1,v1),_3.fromHsv(hsv.h,s2,v2),_25,_3.fromHsv(h1,s3,v2),_3.fromHsv(h1,hsv.s,hsv.v)]);
+},splitComplementary:function(_26){
+var _27=_1.isString(_26.base)?new _3.Color(_26.base):_26.base,_28=_26.da||30,hsv=_27.toHsv();
+var _29=((hsv.h*2)+137<360)?(hsv.h*2)+137:Math.floor(hsv.h/2)-137,h1=(_29-_28+360)%360,h2=(_29+_28)%360,s1=Math.max(hsv.s-10,0),s2=_19(hsv.s,10,100),s3=Math.min(100,hsv.s+20),v1=Math.min(100,hsv.v+30),v2=(hsv.v>20)?hsv.v-30:hsv.v+30;
+return new _3.Palette([_3.fromHsv(h1,s1,v1),_3.fromHsv(h1,s2,v2),_27,_3.fromHsv(h2,s3,v2),_3.fromHsv(h2,hsv.s,hsv.v)]);
+},compound:function(_2a){
+var _2b=_1.isString(_2a.base)?new _3.Color(_2a.base):_2a.base,hsv=_2b.toHsv();
+var h1=((hsv.h*2)+18<360)?(hsv.h*2)+18:Math.floor(hsv.h/2)-18,h2=((hsv.h*2)+120<360)?(hsv.h*2)+120:Math.floor(hsv.h/2)-120,h3=((hsv.h*2)+99<360)?(hsv.h*2)+99:Math.floor(hsv.h/2)-99,s1=(hsv.s-40>10)?hsv.s-40:hsv.s+40,s2=(hsv.s-10>80)?hsv.s-10:hsv.s+10,s3=(hsv.s-25>10)?hsv.s-25:hsv.s+25,v1=(hsv.v-40>10)?hsv.v-40:hsv.v+40,v2=(hsv.v-20>80)?hsv.v-20:hsv.v+20,v3=Math.max(hsv.v,20);
+return new _3.Palette([_3.fromHsv(h1,s1,v1),_3.fromHsv(h1,s2,v2),_2b,_3.fromHsv(h2,s3,v3),_3.fromHsv(h3,s2,v2)]);
+},shades:function(_2c){
+var _2d=_1.isString(_2c.base)?new _3.Color(_2c.base):_2c.base,hsv=_2d.toHsv();
+var s=(hsv.s==100&&hsv.v==0)?0:hsv.s,v1=(hsv.v-50>20)?hsv.v-50:hsv.v+30,v2=(hsv.v-25>=20)?hsv.v-25:hsv.v+55,v3=(hsv.v-75>=20)?hsv.v-75:hsv.v+5,v4=Math.max(hsv.v-10,20);
+return new _3.Palette([new _3.fromHsv(hsv.h,s,v1),new _3.fromHsv(hsv.h,s,v2),_2d,new _3.fromHsv(hsv.h,s,v3),new _3.fromHsv(hsv.h,s,v4)]);
+}},generate:function(_2e,_2f){
+if(_1.isFunction(_2f)){
+return _2f({base:_2e});
+}else{
+if(_3.Palette.generators[_2f]){
+return _3.Palette.generators[_2f]({base:_2e});
+}
+}
+throw new Error("dojox.color.Palette.generate: the specified generator ('"+_2f+"') does not exist.");
+}});
+return _3.Palette;
+});
