@@ -196,6 +196,7 @@ def backup(env, dst):
         fd.write('\n'.join(restore_list))
 
     # CUSTOM COMPONENT DATA
+
     logger.info("Dumping components data...")
 
     comp_root = os.path.join(dst, 'component')
@@ -205,7 +206,7 @@ def backup(env, dst):
         comp_dir = os.path.join(comp_root, comp.identity)
         os.mkdir(comp_dir)
 
-        idx_file = IndexFile(os.path.join(comp_dir, '0'))
+        idx_file = IndexFile(os.path.join(comp_dir, '$index'))
         with idx_file.writer() as idx_write:
             for seq, itm in enumerate(comp.backup(), start=1):
                 itm.bind(comp)
@@ -258,9 +259,9 @@ def restore(env, src):
         for comp_identity in os.listdir(comp_root):
             comp = env._components[comp_identity]
             comp_dir = os.path.join(comp_root, comp_identity)
-            idx_fn = os.path.join(comp_dir, '0')
+            idx_fn = os.path.join(comp_dir, '$index')
             if os.path.exists(idx_fn):
-                idx_file = IndexFile(os.path.join(comp_dir, '0'))
+                idx_file = IndexFile(idx_fn)
                 with idx_file.reader() as read:
                     for record in read:
                         itm = BackupBase.registry[record.identity](record.data)
