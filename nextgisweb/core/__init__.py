@@ -20,7 +20,7 @@ from ..i18n import Localizer, Translations
 from .util import _
 from .model import Base, Setting
 from .command import BackupCommand  # NOQA
-from .backup import BackupBase, TableBackup, SequenceBackup  # NOQA
+from .backup import BackupBase  # NOQA
 
 
 class CoreComponent(Component):
@@ -88,31 +88,6 @@ class CoreComponent(Component):
             ('measurement_srid', 4326)
         ):
             self.init_settings(self.identity, k, self._settings.get(k, v))
-
-    def backup(self):
-        metadata = self.env.metadata()
-
-        conn = DBSession.connection()
-
-        for tab in metadata.sorted_tables:
-            yield TableBackup(self, tab.key)
-
-            # Search sequence created automatically for PK
-            # using "table_field_seq" mask and add to archive
-            for col in tab.columns:
-                if col.primary_key:
-                    test_seq_name = tab.name + "_" + col.name + "_seq"
-                    res = conn.execute(
-                        """SELECT relname FROM pg_class
-                        WHERE relkind = 'S' AND relname = %s""",
-                        test_seq_name)
-
-                    row = res.fetchone()
-                    if row:
-                        yield SequenceBackup(self, test_seq_name)
-
-        for seq in metadata._sequences.itervalues():
-            yield SequenceBackup(self, seq.name)
 
     def gtsdir(self, comp):
         """ Get component's file storage folder """

@@ -39,8 +39,14 @@ class Component(object):
     def initialize_db(self):
         pass
 
-    def backup(self):
+    def backup_configure(self, config):
+        pass
+
+    def backup_objects(self):
         return ()
+
+    def maintenance(self):
+        pass
 
     def setup_pyramid(self, config):
         pass

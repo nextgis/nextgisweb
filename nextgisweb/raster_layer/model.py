@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 import subprocess
-from tempfile import NamedTemporaryFile
-from shutil import copy
+import os.path
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -126,9 +125,10 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         fn = env.raster_layer.workdir_filename(self.fileobj)
         return gdal.Open(fn, gdalconst.GA_ReadOnly)
 
-    def build_overview(self):
+    def build_overview(self, missing_only=False):
         fn = env.raster_layer.workdir_filename(self.fileobj)
-        ds = gdal.Open(fn, gdalconst.GA_ReadOnly)
+        if missing_only and os.path.isfile(fn + '.ovr'):
+            return
 
         cursize = max(self.xsize, self.ysize)
         multiplier = 2

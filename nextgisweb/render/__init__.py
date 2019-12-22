@@ -59,3 +59,7 @@ class RenderComponent(Component):
             track_changes=self.tile_cache_track_changes,
             seed=self.tile_cache_seed
         ))
+
+    def backup_configure(self, config):
+        super(RenderComponent, self).backup_configure(config)
+        config.exclude_table_data('tile_cache', '*')
