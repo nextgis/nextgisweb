@@ -155,6 +155,21 @@ class RestoreCommand(Command):
 
 
 @Command.registry.register
+class MaintenanceCommand(Command):
+    identity = 'maintenance'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        for comp in env.chain('maintenance'):
+            logger.debug("Maintenance for component: %s...", comp.identity)
+            comp.maintenance()
+
+
+@Command.registry.register
 class StatisticsCommand(Command):
     identity = 'statistics'
 

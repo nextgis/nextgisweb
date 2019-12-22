@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
+import os.path
 import uuid
+from datetime import datetime, timedelta
 
 from ..component import Component
 from . import command  # NOQA
@@ -47,3 +49,57 @@ class FileUploadComponent(Component):
     settings_info = (
         dict(key='path', desc=u"Uploads storage folder (required)"),
     )
+
+    def maintenance(self):
+        super(FileUploadComponent, self).maintenance()
+        self.cleanup()
+
+    def cleanup(self):
+        self.logger.info("Cleaning up file uploads...")
+        path = self.path
+
+        deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
+        kept_files, kept_dirs, kept_bytes = 0, 0, 0
+
+        cutstamp = datetime.now() - timedelta(days=1)
+
+        for (dirpath, dirnames, filenames) in os.walk(path, topdown=False):
+            relist = False
+
+            for fn in filenames:
+                if not fn.endswith('.meta'):
+                    continue
+
+                metaname = os.path.join(dirpath, fn)
+                dataname = metaname[:-5] + '.data'
+                metastat = os.stat(metaname)
+                datastat = os.stat(dataname)
+                metatime = datetime.fromtimestamp(metastat.st_mtime)
+                datatime = datetime.fromtimestamp(datastat.st_mtime)
+
+                if (metatime < cutstamp) and (datatime < cutstamp):
+                    os.remove(metaname)
+                    os.remove(dataname)
+                    relist = True
+                    deleted_files += 2
+                    deleted_bytes += metastat.st_size + datastat.st_size
+                else:
+                    kept_files += 2
+                    kept_bytes += metastat.st_size + datastat.st_size
+
+            if (
+                (not relist and len(filenames) == 0 and len(dirnames) == 0)
+                or len(os.listdir(dirpath)) == 0  # NOQA: W503
+            ):
+                os.rmdir(dirpath)
+                deleted_dirs += 1
+            else:
+                kept_dirs += 1
+
+        self.logger.info(
+            "Deleted: %d files, %d directories, %d bytes",
+            deleted_files, deleted_dirs, deleted_bytes)
+
+        self.logger.info(
+            "Preserved: %d files, %d directories, %d bytes",
+            kept_files, kept_dirs, kept_bytes)

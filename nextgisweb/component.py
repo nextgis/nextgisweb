@@ -45,6 +45,9 @@ class Component(object):
     def backup_objects(self):
         return ()
 
+    def maintenance(self):
+        pass
+
     def setup_pyramid(self, config):
         pass
 

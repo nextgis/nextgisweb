@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
+import os.path
 import logging
 from shutil import copyfileobj
 from collections import OrderedDict, defaultdict
+
 
 from ..component import Component
 from ..core import BackupBase
@@ -93,3 +95,49 @@ class FileStorageComponent(Component):
     settings_info = (
         dict(key='path', desc=u"Files storage folder (required)"),
     )
+
+    def maintenance(self):
+        super(FileStorageComponent, self).maintenance()
+        self.cleanup()
+
+    def cleanup(self):
+        self.logger.info('Cleaning up file storage...')
+        path = self.path
+
+        deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
+        kept_files, kept_dirs, kept_bytes = 0, 0, 0
+
+        for (dirpath, dirnames, filenames) in os.walk(path, topdown=False):
+            relist = False
+
+            for fn in filenames:
+                obj = FileObj.filter_by(uuid=fn).first()
+                fullfn = os.path.join(dirpath, fn)
+                size = os.stat(fullfn).st_size
+
+                if obj is None:
+                    # TODO: Check modification time and don't remove recently changed files
+                    os.remove(fullfn)
+                    relist = True
+                    deleted_files += 1
+                    deleted_bytes += size
+                else:
+                    kept_files += 1
+                    kept_bytes += size
+
+            if (
+                (not relist and len(filenames) == 0 and len(dirnames) == 0)
+                or len(os.listdir(dirpath)) == 0  # NOQA: W503
+            ):
+                os.rmdir(dirpath)
+                deleted_dirs += 1
+            else:
+                kept_dirs += 1
+
+        self.logger.info(
+            "Deleted: %d files, %d directories, %d bytes",
+            deleted_files, deleted_dirs, deleted_bytes)
+
+        self.logger.info(
+            "Preserved: %d files, %d directories, %d bytes",
+            kept_files, kept_dirs, kept_bytes)
