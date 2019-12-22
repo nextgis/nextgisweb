@@ -217,6 +217,10 @@ def backup(env, dst):
 
                 idx_write(record)
 
+        # Remove empty component directory
+        if len(os.listdir(comp_dir)) == 0:
+            os.rmdir(comp_dir)
+
 
 def restore(env, src):
     con = DBSession.connection()
