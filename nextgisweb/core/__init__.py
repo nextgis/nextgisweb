@@ -66,17 +66,8 @@ class CoreComponent(Component):
 
         self.DBSession = DBSession
 
-        self._backup_path = self.settings.get('backup.filename')
-        self._backup_filename = self.settings.get(
-            'backup.filename', '%Y%m%d-%H%M%S')
-
-        self._backup_upload_bucket = self.settings.get(
-            'backup_upload.bucket', 'ngwbackup')
-        self._backup_upload_server = self.settings.get('backup_upload.server')
-        self._backup_upload_access_key = self.settings.get(
-            'backup_upload.access_key')
-        self._backup_upload_secret_key = self.settings.get(
-            'backup_upload.secret_key')
+        self._backup_path = self.settings.get('backup.path')
+        self._backup_filename = self.settings.get('backup.filename', '%Y%m%d-%H%M%S.ngwbackup')
 
     def initialize_db(self):
         for k, v in (

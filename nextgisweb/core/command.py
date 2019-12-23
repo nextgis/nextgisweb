@@ -64,18 +64,8 @@ class BackupCommand(Command):
             '--no-zip', dest='nozip', action='store_true',
             help='use directory instead of zip-file as backup format')
 
-        settings = env.core.settings
-        if 'backup.path' in settings:
-            default_target = pthjoin(
-                settings['backup.path'],
-                datetime.today().strftime(settings['backup.filename'])
-                + '.ngwbackup')  # NOQA: W503
-        else:
-            default_target = None
-
         parser.add_argument(
-            'target', type=str, metavar='path',
-            default=default_target, nargs='?',
+            'target', type=str, metavar='path', nargs='?',
             help='backup destination path')
 
     @classmethod
