@@ -121,7 +121,33 @@ MVT data can be fetched only for NextGIS Web vector layer.
 
 **The following request returns MVT data**:
 
-.. versionadded:: 3.0.3
+.. versionadded:: 3.0.4
+.. http:get:: /api/component/feature_layer/mvt?x=(int:x)&y=(int:y)&z=(int:z)&resource=(int:id1),(int:id2)...&simplification=(int:s)
+
+    Vector tile request
+
+    :reqheader Accept: must be ``*/*``
+    :reqheader Authorization: optional Basic auth string to authenticate
+    :param id1, id2: Vector or PostGIS layers identifies
+    :param z: zoom level
+    :param x: tile number on x axis (horizontal)
+    :param y: tile number on y axis (vertical)
+    :param s: simplification level (0 - no simplification, 8 - default value)
+    :statuscode 200: no error
+
+.. note:: Vector or PostGIS layers identifies order should be from lower to upper. 
+
+Layers names in MVT will be `ngw:(int:id)`, where id is vector or PostGIS layer identifier. 
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/component/feature_layer/mvt?resource=56&z=11&x=1234&y=543 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+.. deprecated:: 3.0.4
 .. http:get:: /api/resource/(int:id)/(int:z)/(int:x)/(int:y).mvt
 
    MVT request
