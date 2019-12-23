@@ -108,7 +108,7 @@ class OAuthServer(object):
                     if key in userinfo])
 
             # Fallback to userinfo subject
-            if user.display_name is None or user.display_name == '':
+            if user.display_name is None or re.match(r'\s+', user.display_name):
                 user.display_name = userinfo_subject
 
             if self.userinfo_keyname is not None:
