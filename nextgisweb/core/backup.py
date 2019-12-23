@@ -8,6 +8,7 @@ from collections import namedtuple, OrderedDict
 from subprocess import check_call, check_output
 import io
 import json
+from distutils.version import LooseVersion
 from backports.functools_lru_cache import lru_cache
 
 import sqlalchemy as sa
@@ -93,6 +94,16 @@ class BackupConfiguration(object):
         self._exclude_table_data.append('{}.{}'.format(schema, table))
 
 
+def parse_pg_dump_version(output):
+    """ Parse output of pg_dump --version to LooseVersion """
+    output = output.strip()
+    output = re.sub(r'\(.*?\)', ' ', output)
+    m = re.search(r'\d+(?:\.\d+){1,}', output)
+    if m is None:
+        raise ValueError("Unrecognized pg_dump output!")
+    return LooseVersion(m.group(0))
+
+
 def pg_connection_options(env):
     return [
         '--host', env.core.settings['database.host'],
@@ -125,6 +136,15 @@ def backup(env, dst):
     pg_dir = os.path.join(dst, 'postgres')
     os.mkdir(pg_dir)
 
+    pgd_version = parse_pg_dump_version(check_output(['/usr/bin/pg_dump', '--version']))
+    if pgd_version < LooseVersion('9.5'):
+        snp_opt = []
+        logger.warn(
+            "Data inconsistency possible: ---snapshot option is not supported in pg_dump %s!",
+            unicode(pgd_version))
+    else:
+        snp_opt = ['--snapshot={}'.format(snapshot), ]
+
     exc_opt = list()
     if len(config._exclude_table) > 0:
         logger.debug("Excluding table: %s", ', '.join(config._exclude_table))
@@ -139,9 +159,8 @@ def backup(env, dst):
         '/usr/bin/pg_dump',
         '--format=directory',
         '--compress=0',
-        '--snapshot={}'.format(snapshot),
         '--file={}'.format(pg_dir),
-    ] + exc_opt + pg_copt, env=dict(PGPASSWORD=pg_pass))
+    ] + snp_opt + exc_opt + pg_copt, env=dict(PGPASSWORD=pg_pass))
 
     pg_listing = check_output([
         '/usr/bin/pg_restore',
