@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 import os.path
 import uuid
@@ -21,8 +22,9 @@ class FileUploadComponent(Component):
             self.env.core.mksdir(self)
 
     def setup_pyramid(self, config):
-        from . import view
+        from . import view, api
         view.setup_pyramid(self, config)
+        api.setup_pyramid(self, config)
 
     def fileid(self):
         """ Returns new file identifier """
