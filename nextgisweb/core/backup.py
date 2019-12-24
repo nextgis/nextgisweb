@@ -20,7 +20,7 @@ from ..models import DBSession
 logger = logging.getLogger(__name__)
 
 
-IR_FIELDS = ('id', 'identity', 'data')
+IR_FIELDS = ('id', 'identity', 'payload')
 IndexRecord = namedtuple('IndexRecord', IR_FIELDS)
 
 
@@ -63,8 +63,8 @@ class IndexFile(object):
 class BackupBase(object):
     registry = registry_maker()
 
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, payload):
+        self.payload = payload
         self.component = None
 
     def bind(self, component):
@@ -229,9 +229,9 @@ def backup(env, dst):
         with idx_file.writer() as idx_write:
             for seq, itm in enumerate(comp.backup_objects(), start=1):
                 itm.bind(comp)
-                record = IndexRecord(id=seq, identity=itm.identity, data=itm.data)
+                record = IndexRecord(id=seq, identity=itm.identity, payload=itm.payload)
                 if itm.blob:
-                    binfn = os.path.join(comp_dir, unicode(seq))
+                    binfn = os.path.join(comp_dir, '{:08d}'.format(seq))
                     with io.open(binfn, 'wb') as fd:
                         itm.backup(fd)
 
@@ -283,10 +283,10 @@ def restore(env, src):
                 idx_file = IndexFile(idx_fn)
                 with idx_file.reader() as read:
                     for record in read:
-                        itm = BackupBase.registry[record.identity](record.data)
+                        itm = BackupBase.registry[record.identity](record.payload)
                         itm.bind(comp)
                         if itm.blob:
-                            binfn = os.path.join(comp_dir, unicode(record.id))
+                            binfn = os.path.join(comp_dir, '{:08d}'.format(record.id))
                             with io.open(binfn, 'rb') as fd:
                                 itm.restore(fd)
         con.execute('COMMIT')

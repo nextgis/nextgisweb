@@ -4,7 +4,7 @@ import os.path
 import logging
 from shutil import copyfileobj
 from collections import OrderedDict, defaultdict
-
+from operator import itemgetter
 
 from ..component import Component
 from ..core import BackupBase
@@ -20,20 +20,21 @@ logger = logging.getLogger(__name__)
 @BackupBase.registry.register
 class FileObjBackup(BackupBase):
     identity = 'fileobj'
+    plget = itemgetter('component', 'uuid')
 
     def blob(self):
         return True
 
     def backup(self, dst):
-        fileobj = FileObj.filter_by(uuid=self.data['uuid']).one()
-        with open(self.component.filename(fileobj), 'rb') as fd:
+        with open(self.component.filename(self.plget(self.payload)), 'rb') as fd:
             copyfileobj(fd, dst)
 
     def restore(self, src):
-        fileobj = FileObj.filter_by(uuid=self.data['uuid']).one()
-        fn = self.component.filename(fileobj, makedirs=True)
+        fn = self.component.filename(self.plget(self.payload), makedirs=True)
         if os.path.isfile(fn):
-            logger.debug("Skipping restoration of fileobj %s: file already exists!", fileobj.uuid)
+            logger.debug(
+                "Skipping restoration of fileobj %s: file already exists!",
+                self.payload[1])
         else:
             with open(fn, 'wb') as fd:
                 copyfileobj(src, fd)
@@ -51,25 +52,31 @@ class FileStorageComponent(Component):
             self.env.core.mksdir(self)
 
     def backup_objects(self):
-        for fileobj in FileObj.query():
-            yield FileObjBackup(dict(uuid=fileobj.uuid))
+        for fileobj in FileObj.query().order_by(FileObj.component, FileObj.uuid):
+            yield FileObjBackup(OrderedDict(
+                component=fileobj.component,
+                uuid=fileobj.uuid))
 
     def fileobj(self, component):
         obj = FileObj(component=component)
         return obj
 
     def filename(self, fileobj, makedirs=False):
-        assert fileobj.component, "Component not set!"
+        if isinstance(fileobj, FileObj):
+            component = fileobj.component
+            uuid = fileobj.uuid
+        else:
+            component, uuid = fileobj
 
         # Separate in two folder levels by first id characters
-        levels = (fileobj.uuid[0:2], fileobj.uuid[2:4])
-        path = os.path.join(self.path, fileobj.component, *levels)
+        levels = (uuid[0:2], uuid[2:4])
+        path = os.path.join(self.path, component, *levels)
 
         # Create folders if needed
         if makedirs and not os.path.isdir(path):
             os.makedirs(path)
 
-        return os.path.join(path, str(fileobj.uuid))
+        return os.path.join(path, str(uuid))
 
     def query_stat(self):
         # Traverse all objects in file storage and calculate total
