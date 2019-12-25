@@ -6,8 +6,11 @@ import webtest
 TEST_FILENAME = 'file.ext'
 TEST_CONTENT = bytes('content')
 
+TEST_FILENAME2 = 'file2.ext'
+TEST_CONTENT2 = bytes('content2')
 
-def test_upload_post(env, webapp):
+
+def test_upload_post_single(env, webapp):
     resp = webapp.post('/api/component/file_upload/upload', dict(
         file=webtest.Upload(TEST_FILENAME, TEST_CONTENT)))
 
@@ -21,3 +24,18 @@ def test_upload_put(env, webapp):
     datafn, metafn = env.file_upload.get_filename(resp.json['id'])
     with open(datafn, 'rb') as fp:
         assert fp.read() == TEST_CONTENT
+
+
+def test_upload_post_multi(env, webapp):
+    resp = webapp.post('/api/component/file_upload/upload', [
+        ['files[]', webtest.Upload(TEST_FILENAME, TEST_CONTENT)],
+        ['files[]', webtest.Upload(TEST_FILENAME2, TEST_CONTENT2)]
+    ])
+
+    datafn, metafn = env.file_upload.get_filename(resp.json['upload_meta'][0]['id'])
+    with open(datafn, 'rb') as fp:
+        assert fp.read() == TEST_CONTENT
+
+    datafn, metafn = env.file_upload.get_filename(resp.json['upload_meta'][1]['id'])
+    with open(datafn, 'rb') as fp:
+        assert fp.read() == TEST_CONTENT2
