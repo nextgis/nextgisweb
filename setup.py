@@ -37,10 +37,13 @@ requires = [
     'backports.tempfile==1.0',
     'pip==19.2.3', # https://github.com/pypa/pip/issues/7209
     'pyproj==2.2.2',
-    
+
     # TODO: Move to dev or test dependencies
     'pytest',
     'webtest',
+    'flake8',
+    'flake8-future-import',
+    'modernize',
 ]
 
 extras_require = {
