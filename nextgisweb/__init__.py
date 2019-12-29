@@ -1,22 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, unicode_literals, print_function, absolute_import
 import os
 import codecs
 from six.moves.configparser import RawConfigParser
 
-from pyramid.config import Configurator
 from pyramid.paster import setup_logging
-from pyramid.authentication import AuthTktAuthenticationPolicy
-from pyramid.authorization import ACLAuthorizationPolicy
 
-from sqlalchemy import engine_from_config
-
-from .models import (
-    DBSession,
-    Base,
-)
-
-from .component import Component, load_all
 from .env import Env, setenv
 
 

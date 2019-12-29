@@ -23,6 +23,29 @@ from .event import on_data_change
 from .extension import FeatureExtension
 from .api import query_feature_or_not_found
 
+__all__ = [
+    'Feature',
+    'FeatureSet',
+    'LayerField',
+    'LayerFieldsMixin',
+    'GEOM_TYPE',
+    'GEOM_TYPE_OGR',
+    'FIELD_TYPE',
+    'FIELD_TYPE_OGR',
+    'IFeatureLayer',
+    'IWritableFeatureLayer',
+    'IFeatureQuery',
+    'IFeatureQueryFilter',
+    'IFeatureQueryFilterBy',
+    'IFeatureQueryOrderBy',
+    'IFeatureQueryLike',
+    'IFeatureQueryIntersects',
+    'IFeatureQueryClipByBox',
+    'IFeatureQuerySimplify',
+    'on_data_change',
+    'query_feature_or_not_found',
+]
+
 
 class FeatureLayerComponent(Component):
     identity = 'feature_layer'

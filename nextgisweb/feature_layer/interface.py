@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-import osgeo
-
 from osgeo import ogr
-from distutils.version import LooseVersion
 from zope.interface import Interface, Attribute
 
 from ..resource import IResourceBase

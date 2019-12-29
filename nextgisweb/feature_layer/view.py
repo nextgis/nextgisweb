@@ -13,7 +13,6 @@ from ..resource import (
     DataScope,
     resource_factory,
     Widget)
-from ..geometry import geom_from_wkt
 from ..pyramid import viewargs
 from .. import dynmenu as dm
 
