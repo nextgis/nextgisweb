@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 import sys
 import os
@@ -99,10 +99,10 @@ def config(argv=sys.argv):
 
     for comp in Component.registry:
         if hasattr(comp, 'settings_info'):
-            print u'[%s]' % comp.identity
+            print('[%s]' % comp.identity)
 
             if not args.no_comments:
-                print u''
+                print('')
 
             preseedsect = dict(
                 preseedcfg.items(comp.identity)
@@ -113,20 +113,20 @@ def config(argv=sys.argv):
 
             for s in comp.settings_info:
                 if not args.no_comments and 'desc' in s:
-                    print u'# %s ' % s['desc']
+                    print('# %s ' % s['desc'])
 
                 if s['key'] in preseedsect:
-                    print '%s = %s' % (s['key'], preseedsect[s['key']])
+                    print('%s = %s' % (s['key'], preseedsect[s['key']]))
                     preseedkeys.add(s['key'])
 
                 elif 'default' in s:
-                    print '%s = %s' % (s['key'], s['default'])
+                    print('%s = %s' % (s['key'], s['default']))
 
                 elif not args.no_comments:
-                    print '# %s = ' % s['key']
+                    print('# %s = ' % s['key'])
 
             for k, v in preseedsect.iteritems():
                 if k not in preseedkeys:
-                    print '%s = %s' % (k, v)
+                    print('%s = %s' % (k, v))
 
-            print ''
+            print('')
