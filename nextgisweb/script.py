@@ -5,7 +5,7 @@ import sys
 import os
 import codecs
 from argparse import ArgumentParser
-from ConfigParser import RawConfigParser
+from six.moves.configparser import RawConfigParser
 
 from pyramid.paster import setup_logging
 

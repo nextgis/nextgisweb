@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, absolute_import
 import os
 import codecs
-from ConfigParser import RawConfigParser
+from six.moves.configparser import RawConfigParser
 
 from pyramid.config import Configurator
 from pyramid.paster import setup_logging

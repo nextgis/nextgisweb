@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 import os
 import re
 import codecs
-from ConfigParser import RawConfigParser
+from six.moves.configparser import RawConfigParser
 
 import sqlalchemy as sa
 
