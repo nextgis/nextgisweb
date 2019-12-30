@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 
 from .model import Resource
+import six
 
 __all__ = ['Widget', ]
 
@@ -24,8 +25,7 @@ class WidgetBase(object):
         self.request = request
 
 
-class Widget(WidgetBase):
-    __metaclass__ = WidgetMeta
+class Widget(six.with_metaclass(WidgetMeta, WidgetBase)):
     __abstract__ = True
 
     def is_applicable(self):

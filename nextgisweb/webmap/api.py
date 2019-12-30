@@ -85,14 +85,14 @@ def setup_pyramid(comp, config):
 
 def setup_annotations(config):
     config.add_route(
-        'webmap.annotation.collection', '/api/resource/{id:\d+}/annotation/',
+        'webmap.annotation.collection', r'/api/resource/{id:\d+}/annotation/',
         factory=resource_factory
     ) \
         .add_view(annotation_cget, context=WebMap, request_method='GET', renderer='json') \
         .add_view(annotation_cpost, context=WebMap, request_method='POST', renderer='json')
 
     config.add_route(
-        'webmap.annotation.item', '/api/resource/{id:\d+}/annotation/{annotation_id:\d+}',
+        'webmap.annotation.item', r'/api/resource/{id:\d+}/annotation/{annotation_id:\d+}',
         factory=resource_factory
     ) \
         .add_view(annotation_iget, context=WebMap, request_method='GET', renderer='json') \

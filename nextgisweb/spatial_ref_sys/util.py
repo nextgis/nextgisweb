@@ -6,7 +6,7 @@ from osgeo import osr
 COMP_ID = "spatial_ref_sys"
 _ = trstring_factory(COMP_ID)
 
-MI_UNIT_ALIASES =  {
+MI_UNIT_ALIASES = {
     0: "mi",
     1: "km",
     2: "in",
@@ -28,7 +28,7 @@ def update_MI_coord_sys_string(str):
     str = str.strip()
     items = str.split(", ")
     unit_index = 2
-    
+
     if len(items) > unit_index and items[unit_index].isdigit():
         unit = items[unit_index]
         unit = MI_UNIT_ALIASES[int(unit)]
@@ -46,7 +46,7 @@ def convert_projstr_to_wkt(proj_str, format=None, pretty=False):
     sr = osr.SpatialReference()
     wkt = ""
     imports = [
-        ["proj4", "ImportFromProj4"], 
+        ["proj4", "ImportFromProj4"],
         ["epsg", lambda x: sr.ImportFromEPSG(int(x))],
         ["mapinfo", lambda x: sr.ImportFromMICoordSys(
             update_MI_coord_sys_string(x).encode("utf-8"))],

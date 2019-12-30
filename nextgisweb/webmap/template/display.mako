@@ -1,6 +1,6 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<%def name="title()"><% return unicode(obj) %></%def>
+<%def name="title()"><% return six.text_type(obj) %></%def>
 
 <%def name="head()">
     <% import json %>

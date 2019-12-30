@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from StringIO import StringIO
 import json
+from six import StringIO
 
 from PIL import Image
 from pyramid.response import Response, FileResponse

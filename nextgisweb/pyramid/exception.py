@@ -8,12 +8,13 @@ import json
 import logging
 from collections import OrderedDict
 from hashlib import md5
+import six
 
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
 from pyramid.compat import reraise
 from pyramid import httpexceptions
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
 
 from ..core.exception import IUserException, user_exception
@@ -115,11 +116,11 @@ def guru_meditation(tb):
                     # Only file name (without path) taken, so hash
                     # should not depend on package location.
                     os.path.split(fn)[-1],
-                    unicode(line),
+                    six.text_type(line),
                     func,
                     text if text is not None else "",
                 )
-            )
+            ).encode('utf-8')
         )
 
     return tbhash.hexdigest()
@@ -156,10 +157,9 @@ def json_error(request, err_info, exc, exc_info, debug=True):
         tb = traceback.extract_tb(exc_info[2])
         result['guru_meditation'] = guru_meditation(tb)
         if debug:
-            result['traceback'] = map(
-                lambda itm: OrderedDict(zip(
-                    ('file', 'line', 'func', 'text'),
-                    itm)), tb)
+            result['traceback'] = [
+                OrderedDict(zip(('file', 'line', 'func', 'text'), itm))
+                for itm in tb]
 
     return result
 
@@ -167,7 +167,7 @@ def json_error(request, err_info, exc, exc_info, debug=True):
 def json_error_response(request, err_info, exc, exc_info, debug=True):
     return Response(
         json.dumps(json_error(request, err_info, exc, exc_info, debug=debug)),
-        content_type=b'application/json',
+        content_type='application/json', charset='utf-8',
         status_code=err_info_attr(err_info, exc, 'http_status_code', 500))
 
 
@@ -185,9 +185,8 @@ def html_error_response(request, err_info, exc, exc_info, debug=True):
     return response
 
 
+@implementer(IUserException)
 class InternalServerError(Exception):
-    implements(IUserException)
-
     title = _("Internal server error")
     message = _(
         "The server encountered an internal error or misconfiguration "

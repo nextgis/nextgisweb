@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import warnings
+import six
+
 import sqlalchemy.exc
 from sqlalchemy.ext.declarative import declarative_base as sa_declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -20,7 +22,7 @@ class BaseClass(object):
 
     def __init__(self, **kwargs):
         cls = type(self)
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             if not hasattr(cls, k):
                 continue
 

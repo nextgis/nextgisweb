@@ -60,7 +60,7 @@ class ResourceComponent(Component):
             self.perm_cache_instance = PermissionCache.construct(settings)
 
         svalue = settings.get('disabled_cls', None)
-        self.disabled_cls = re.split(',\s*', svalue) if svalue is not None \
+        self.disabled_cls = re.split(r',\s*', svalue) if svalue is not None \
             else list()
 
     def initialize(self):

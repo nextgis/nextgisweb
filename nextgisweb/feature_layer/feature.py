@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from osgeo import ogr
 
+
 class Feature(object):
 
     def __init__(self, layer=None, id=None, fields=None, geom=None, box=None, calculations=None):
@@ -35,8 +36,11 @@ class Feature(object):
         # Otherwise use object id
         return "#%d" % self._id
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
+
+    def __unicode__(self):
+        return self.__str__()
 
     @property
     def fields(self):

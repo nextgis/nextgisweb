@@ -176,6 +176,7 @@ class WebMapItem(Base):
             if a in data:
                 setattr(self, a, data[a])
 
+
 class JSONTextType(TypeDecorator):
     """ SA type decorator for JSON stored as text """
 
@@ -189,7 +190,7 @@ class JSONTextType(TypeDecorator):
     def process_result_value(self, value, dialect):
         if not value:
             return None
-        return json.loads(value)    
+        return json.loads(value)
 
 
 class WebMapAnnotation(Base):

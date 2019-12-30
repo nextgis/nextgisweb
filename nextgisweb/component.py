@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 import logging
+import six
 
 from .registry import registry_maker
 from .package import pkginfo
+
+logger = logging.getLogger(__name__)
 
 
 class ComponentMeta(type):
@@ -15,8 +18,7 @@ class ComponentMeta(type):
             cls.registry.register(cls)
 
 
-class Component(object):
-    __metaclass__ = ComponentMeta
+class Component(six.with_metaclass(ComponentMeta, object)):
 
     identity = None
     """ Component identifier that should be redefined in a
@@ -53,7 +55,7 @@ class Component(object):
 
     @property
     def env(self):
-        """ Environment this component belongs too. Set 
+        """ Environment this component belongs too. Set
         on class exemplar creation and not changed afterwards.
         This attribute should be used instead of global environment
         :py:class:`~nextgisweb.env.env`. """
@@ -111,4 +113,10 @@ def load_all(packages_ignore=None, components_ignore=None):
         for comp in pkginfo.pkg_comp(pkg):
             if comp in components_ignore:
                 continue
-            __import__(pkginfo.comp_mod(comp))
+            try:
+                __import__(pkginfo.comp_mod(comp))
+            except Exception:
+                logger.error(
+                    "Failed to load component '%s' from module '%s'!",
+                    comp, pkginfo.comp_mod(comp))
+                raise

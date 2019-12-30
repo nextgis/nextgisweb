@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
+import six
 
 
 class DynMenu(object):
@@ -31,7 +32,7 @@ class Item(object):
 
     def __init__(self, key):
 
-        if isinstance(key, basestring):
+        if isinstance(key, six.string_types):
             key = tuple(key.split('/'))
         elif key is None:
             key = ()
@@ -56,7 +57,7 @@ class DynItem(Item):
         if not self.key:
             return value
         else:
-            if isinstance(value, basestring):
+            if isinstance(value, six.string_types):
                 value = tuple(value.split('/'))
             return self.key + value
 

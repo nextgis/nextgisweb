@@ -34,7 +34,7 @@ def item_get(context, request):
 
     return Response(
         geojson.dumps(serializer.data), status_code=200,
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def item_put(context, request):
@@ -48,7 +48,7 @@ def item_put(context, request):
 
     return Response(
         json.dumps(result), status_code=200,
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def item_delete(context, request):
@@ -72,7 +72,7 @@ def item_delete(context, request):
 
     return Response(
         json.dumps(None), status_code=200,
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def collection_get(request):
@@ -92,7 +92,7 @@ def collection_get(request):
 
     return Response(
         json.dumps(result, cls=geojson.Encoder), status_code=200,
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def collection_post(request):
@@ -142,7 +142,7 @@ def collection_post(request):
 
     return Response(
         json.dumps(result), status_code=201,
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def permission(resource, request):
@@ -176,7 +176,7 @@ def permission(resource, request):
 
     return Response(
         json.dumps(result), status_code=200,
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def quota(request):
@@ -197,7 +197,7 @@ def quota(request):
 
     return Response(
         json.dumps(result), status_code=200,
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def search(request):
@@ -232,7 +232,7 @@ def search(request):
 
     return Response(
         json.dumps(result, cls=geojson.Encoder), status_code=200,
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def setup_pyramid(comp, config):

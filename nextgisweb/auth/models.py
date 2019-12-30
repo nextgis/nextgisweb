@@ -3,12 +3,12 @@ from __future__ import unicode_literals, print_function, absolute_import
 from collections import OrderedDict
 
 from passlib.hash import sha256_crypt
-from backports.functools_lru_cache import lru_cache
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
 from ..models import declarative_base
-
+from ..compat import lru_cache
+import six
 
 Base = declarative_base()
 
@@ -62,8 +62,11 @@ class User(Principal):
         if password:
             self.password = password
 
-    def __unicode__(self):
+    def __str__(self):
         return self.display_name
+
+    def __unicode__(self):
+        return self.__str__()
 
     def compare(self, other):
         """ Compare two users regarding special users """
@@ -103,7 +106,9 @@ class User(Principal):
         if not hasattr(self, '_admins'):
             self._admins = Group.filter_by(keyname='administrators').one()
 
-        return any([user for user in self._admins.members if user.principal_id == self.principal_id])
+        return any([
+            user for user in self._admins.members
+            if user.principal_id == self.principal_id])
 
     @property
     def password(self):
@@ -159,8 +164,11 @@ class Group(Principal):
 
     principal = orm.relationship(Principal)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.display_name
+
+    def __unicode__(self):
+        return self.__str__()
 
     def is_member(self, user):
         if self.keyname == 'authorized':
@@ -213,7 +221,7 @@ class PasswordHashValue(object):
     def __eq__(self, other):
         if self.value is None:
             return False
-        elif isinstance(other, basestring):
+        elif isinstance(other, six.string_types):
             try:
                 return _password_hash_cache(other, self.value)
             except ValueError:

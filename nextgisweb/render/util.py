@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import struct
+import six
 
 import PIL.ImageStat
 from affine import Affine
@@ -27,7 +29,7 @@ def imgcolor(img):
         if comp[0] != comp[1]:
             return None
 
-    return map(lambda c: c[0], extrema)
+    return [c[0] for c in extrema]
 
 
 def af_transform(a, b):
@@ -40,8 +42,8 @@ def af_transform(a, b):
 
 def affine_from_bounds(a, b):
     # Force arguments to float
-    a = map(float, a)
-    b = map(float, b)
+    a = [float(i) for i in a]
+    b = [float(i) for i in b]
 
     return ~(
         Affine.translation(a[0], a[1]) * Affine.scale(
@@ -54,3 +56,13 @@ def affine_bounds_to_tile(bounds, zoom):
     tilemax = 2 ** zoom
     return affine_from_bounds(
         bounds, (0, tilemax, tilemax, 0))
+
+
+def pack_color(color):
+    """ Pack color tuple to integer value. """
+    return struct.unpack('!i', bytearray(color))[0]
+
+
+def unpack_color(value):
+    """ Unpack color integer value to color tuple. """
+    return tuple(six.iterbytes(struct.pack('!i', value)))

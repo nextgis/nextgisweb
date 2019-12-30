@@ -20,7 +20,7 @@
     if subtitle:
         return tr(subtitle)
     else:
-        return unicode(obj)
+        return six.text_type(obj)
 %></%def>
 
 <%def name="title_block()">

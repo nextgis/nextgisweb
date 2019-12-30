@@ -24,6 +24,7 @@ from babel.messages.frontend import parse_mapping
 from babel.messages.extract import extract_from_dir
 from babel.messages.pofile import write_po, read_po
 from babel.messages.mofile import write_mo
+import six
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,7 @@ def write_jed(fileobj, catalog):
     for msg in catalog:
         if msg.id == '':
             continue
-        data[msg.id] = (msg.string, ) if isinstance(msg.string, basestring) \
+        data[msg.id] = (msg.string, ) if isinstance(msg.string, six.string_types) \
             else msg.string
 
     fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))

@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import os.path
 from uuid import uuid4
+import six
 
 import pytest
 from osgeo import ogr
@@ -23,9 +24,9 @@ def test_from_fields(txn):
         owner_user=User.by_keyname('administrator'),
         geometry_type='POINT',
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=unicode(uuid4().hex),
+        tbl_uuid=six.text_type(uuid4().hex),
     )
-    
+
     res.setup_from_fields([
         dict(keyname='integer', datatype=FIELD_TYPE.INTEGER),
         dict(keyname='bigint', datatype=FIELD_TYPE.BIGINT),
@@ -35,9 +36,9 @@ def test_from_fields(txn):
         dict(keyname='time', datatype=FIELD_TYPE.TIME),
         dict(keyname='datetime', datatype=FIELD_TYPE.DATETIME),
     ])
-    
+
     res.persist()
-    
+
     DBSession.flush()
 
 
@@ -51,9 +52,9 @@ def test_from_ogr(txn, data):
         parent_id=0, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=unicode(uuid4().hex),
+        tbl_uuid=six.text_type(uuid4().hex),
     )
-    
+
     res.persist()
 
     res.setup_from_ogr(layer, lambda x: x)

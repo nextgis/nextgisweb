@@ -3,12 +3,16 @@ from __future__ import unicode_literals, print_function, absolute_import
 import os
 import re
 import codecs
+import logging
+import six
 from six.moves.configparser import RawConfigParser
 
 import sqlalchemy as sa
 
 from .component import Component, load_all
 from .package import pkginfo
+
+logger = logging.getLogger(__name__)
 
 
 class Env(object):
@@ -54,27 +58,35 @@ class Env(object):
 
             setattr(self, identity, instance)
 
-    def chain(self, meth):
+    def chain(self, meth, first='core'):
         """ Building a sequence of method calls with dependencies.
         ``core`` component dependency gets added automatically for all
         components, so that it is returned first.
 
         :param meth: Name of the method to build sequence for. """
 
-        seq = ['core', ]
+        seq = [first, ]
 
         def traverse(components):
             for c in components:
                 if c.identity not in traverse.seq:
                     if hasattr(getattr(c, meth), '_require'):
-                        traverse([self._components[i] for i in getattr(
-                            c, meth)._require])
+                        try:
+                            requirements = [self._components[i] for i in getattr(
+                                c, meth)._require]
+                        except KeyError:
+                            raise Exception(c)
+                        traverse(requirements)
                     traverse.seq.append(c.identity)
 
         traverse.seq = seq
-        traverse(self._components.itervalues())
+        traverse(six.itervalues(self._components))
 
-        return [self._components[i] for i in traverse.seq]
+        result = list([self._components[i] for i in traverse.seq])
+        logger.debug(
+            "Chain for method [%s]: %s", meth,
+            ', '.join([c.identity for c in result]))
+        return result
 
     def initialize(self):
         for c in list(self.chain('initialize')):
@@ -94,7 +106,7 @@ class Env(object):
 
         for comp in self.chain('initialize'):
             if hasattr(comp, 'metadata'):
-                for key, tab in comp.metadata.tables.iteritems():
+                for key, tab in six.iteritems(comp.metadata.tables):
                     ctab = tab.tometadata(metadata)
                     sa.event.listen(
                         ctab, 'after_create',
@@ -124,7 +136,7 @@ class EnvMetaClass(type):
         return _env
 
 
-class env(object):
+class env(six.with_metaclass(EnvMetaClass, object)):
     """ Proxy-class for global environment access. Use it only
     where it is impossible to get access to current environment
     by other means. However in any case, simultaneous work with
@@ -132,4 +144,3 @@ class env(object):
     ever be needed. To get original object for which messages are
     proxied one can use constructor ``env()``. """
 
-    __metaclass__ = EnvMetaClass

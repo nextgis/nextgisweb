@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 import json
 import uuid
 import types
@@ -8,10 +7,10 @@ import zipfile
 import tempfile
 import shutil
 import ctypes
-
-from backports.functools_lru_cache import lru_cache
 from datetime import datetime, time, date
-from zope.interface import implements
+import six
+
+from zope.interface import implementer
 from osgeo import ogr, osr
 
 from sqlalchemy.sql import ColumnElement
@@ -40,6 +39,7 @@ from ..env import env
 from ..geometry import geom_from_wkb, box
 from ..models import declarative_base, DBSession
 from ..layer import SpatialLayerMixin, IBboxLayer
+from ..compat import lru_cache
 
 from ..feature_layer import (
     Feature,
@@ -129,7 +129,9 @@ class TableInfo(object):
         has_z = self.geometry_type in GEOM_TYPE.has_z
 
         if not is_multi or not has_z:
-            for feature in ogrlayer:
+            # TODO: Fix feature iteration in pygdal
+            feature = ogrlayer.GetNextFeature()
+            while feature is not None:
                 geom = feature.GetGeometryRef()
                 gtype = geom.GetGeometryType()
                 if ltype != gtype:
@@ -153,6 +155,7 @@ class TableInfo(object):
 
                 if is_multi and has_z:
                     break
+                feature = ogrlayer.GetNextFeature()
 
             ogrlayer.ResetReading()
 
@@ -254,7 +257,7 @@ class TableInfo(object):
 
         class model(object):
             def __init__(self, **kwargs):
-                for k, v in kwargs.iteritems():
+                for k, v in six.iteritems(kwargs):
                     setattr(self, k, v)
 
         table = db.Table(
@@ -283,7 +286,10 @@ class TableInfo(object):
         is_multi = self.geometry_type in GEOM_TYPE.is_multi
         has_z = self.geometry_type in GEOM_TYPE.has_z
 
-        for fid, feature in enumerate(ogrlayer):
+        # TODO: Fix feature iteration in pygdal
+        feature = ogrlayer.GetNextFeature()
+        fid = 0
+        while feature is not None:
             geom = feature.GetGeometryRef()
 
             gtype = geom.GetGeometryType()
@@ -365,6 +371,9 @@ class TableInfo(object):
 
             DBSession.add(obj)
 
+            feature = ogrlayer.GetNextFeature()
+            fid += 1
+
 
 class VectorLayerField(Base, LayerField):
     identity = 'vector_layer'
@@ -376,13 +385,12 @@ class VectorLayerField(Base, LayerField):
     fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
 
+@implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = _("Vector layer")
 
     __scope__ = DataScope
-
-    implements(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 
     tbl_uuid = db.Column(db.Unicode(32), nullable=False)
     geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
@@ -682,7 +690,7 @@ def _set_encoding(encoding):
 
                 return strdecode
 
-            return lambda (x): x
+            return lambda x: x
 
         def __exit__(self, type, value, traceback):
             if self.encoding:
@@ -813,16 +821,17 @@ def _clipbybox2d_exists():
     )
 
 
+@implementer(
+    IFeatureQuery,
+    IFeatureQueryFilter,
+    IFeatureQueryFilterBy,
+    IFeatureQueryLike,
+    IFeatureQueryIntersects,
+    IFeatureQueryOrderBy,
+    IFeatureQueryClipByBox,
+    IFeatureQuerySimplify,
+)
 class FeatureQueryBase(object):
-    implements(
-        IFeatureQuery,
-        IFeatureQueryFilter,
-        IFeatureQueryFilterBy,
-        IFeatureQueryLike,
-        IFeatureQueryIntersects,
-        IFeatureQueryOrderBy,
-        IFeatureQueryClipByBox,
-        IFeatureQuerySimplify)
 
     def __init__(self):
         self._srs = None
@@ -957,7 +966,7 @@ class FeatureQueryBase(object):
                 selected_fields.append(f)
 
         if self._filter_by:
-            for k, v in self._filter_by.iteritems():
+            for k, v in six.iteritems(self._filter_by):
                 if k == 'id':
                     where.append(table.columns.id == v)
                 else:

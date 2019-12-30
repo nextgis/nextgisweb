@@ -1,7 +1,7 @@
 <% permsets = obj.permission_sets(request.user) %>
 <div class="table-wrapper">
     <table class="pure-table pure-table-horizontal">
-        %for k, scope in obj.scope.iteritems():
+        %for k, scope in six.iteritems(obj.scope):
             <thead><tr>
                 <th style="width: 70%; text-align: inherit;">${tr(scope.label)}</th>
                 <th style="width: 30%; text-align: inherit;"><tt>${k}</tt></th>

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, absolute_import
 from math import log, ceil, floor
 from itertools import product
-from StringIO import StringIO
+from six import StringIO
 
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response

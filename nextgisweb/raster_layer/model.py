@@ -6,7 +6,7 @@ import os.path
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from osgeo import gdal, gdalconst, osr, ogr
 
@@ -32,13 +32,12 @@ Base = declarative_base()
 SUPPORTED_DRIVERS = ('GTiff', )
 
 
+@implementer(IBboxLayer)
 class RasterLayer(Base, Resource, SpatialLayerMixin):
     identity = 'raster_layer'
     cls_display_name = _("Raster layer")
 
     __scope__ = (DataStructureScope, DataScope)
-
-    implements(IBboxLayer)
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 

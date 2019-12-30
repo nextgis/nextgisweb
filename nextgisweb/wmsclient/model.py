@@ -6,7 +6,7 @@ from io import BytesIO
 from datetime import datetime
 from collections import OrderedDict
 
-from zope.interface import implements
+from zope.interface import implementer
 from lxml import etree
 import PIL
 from owslib.wms import WebMapService
@@ -141,8 +141,8 @@ class ConnectionSerializer(Serializer):
         write=ConnectionScope.connect)
 
 
+@implementer(IExtentRenderRequest, ITileRenderRequest)
 class RenderRequest(object):
-    implements(IExtentRenderRequest, ITileRenderRequest)
 
     def __init__(self, style, srs, cond):
         self.style = style
@@ -157,13 +157,12 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
+@implementer(IRenderableStyle)
 class Layer(Base, Resource, SpatialLayerMixin):
     identity = 'wmsclient_layer'
     cls_display_name = _("WMS layer")
 
     __scope__ = (DataStructureScope, DataScope)
-
-    implements(IRenderableStyle)
 
     connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
     wmslayers = db.Column(db.Unicode, nullable=False)

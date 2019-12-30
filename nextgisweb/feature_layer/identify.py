@@ -19,7 +19,7 @@ def identify(request):
     ---
     post:
       summary: Identification service for layers that support IFeatureLayer.
-      description: 
+      description:
       tags:
         - feature_layer
       parameters:

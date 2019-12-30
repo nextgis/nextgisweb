@@ -73,5 +73,5 @@ OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
         "extension": format.extension,
         "single_file": format.single_file,
     }
-    for _, format in EXPORT_FORMAT_OGR.iteritems()
+    for _, format in EXPORT_FORMAT_OGR.items()
 ]

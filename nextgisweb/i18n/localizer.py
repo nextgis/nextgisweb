@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 import os
 import os.path
 import fnmatch
+import six
 
 from babel.support import Translations as BabelTranslations
 
@@ -47,7 +48,7 @@ def translator(translations):
         if translations is not None:
             translated = dugettext_policy(translations, trstr, domain, context)
         if translated == trstr:
-            translated = unicode(trstr)
+            translated = six.text_type(trstr)
 
         if trstr.modarg is not None:
             translated = translated % trstr.modarg

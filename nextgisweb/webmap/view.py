@@ -101,10 +101,10 @@ def setup_pyramid(comp, config):
                 # with no permissions
                 data.update(
                     expanded=item.group_expanded,
-                    children=filter(
+                    children=list(filter(
                         None,
                         map(traverse, item.children)
-                    )
+                    ))
                 )
 
             return data
@@ -147,12 +147,12 @@ def setup_pyramid(comp, config):
         )
 
     config.add_route(
-        'webmap.display', '/resource/{id:\d+}/display',
+        'webmap.display', r'/resource/{id:\d+}/display',
         factory=resource_factory, client=('id',)
     ).add_view(display, context=WebMap, renderer='nextgisweb:webmap/template/display.mako')
 
     config.add_route(
-        'webmap.display.tiny', '/resource/{id:\d+}/display/tiny',
+        'webmap.display.tiny', r'/resource/{id:\d+}/display/tiny',
         factory=resource_factory, client=('id',)
     ).add_view(display, context=WebMap, renderer='nextgisweb:webmap/template/tinyDisplay.mako')
 

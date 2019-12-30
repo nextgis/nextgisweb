@@ -637,7 +637,7 @@ def setup_pyramid(comp, config):
         .add_view(count, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
-        'feature_layer.store', '/api/resource/{id:\d+}/store/',
+        'feature_layer.store', r'/api/resource/{id:\d+}/store/',
         factory=resource_factory) \
         .add_view(store_collection, context=IFeatureLayer, request_method='GET')
 

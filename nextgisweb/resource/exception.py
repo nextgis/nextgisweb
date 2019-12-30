@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import warnings
 
-import zope.interface
+from zope.interface import implementer
 
 from ..core.exception import (
     IUserException,
@@ -52,10 +52,9 @@ class DisplayNameNotUnique(ValidationError):
 
 # TODO: Rewrite old-style resource exception classes
 
+@implementer(IUserException)
 class ResourceError(Exception):
     """ Base class for resource exceptions """
-
-    zope.interface.implements(IUserException)
 
     def __init__(self, message, data=None):
         warnings.warn("{} is deprecated!".format(self.__class__.__name__), DeprecationWarning)

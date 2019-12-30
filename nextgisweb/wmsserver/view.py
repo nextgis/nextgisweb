@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
-
-from StringIO import StringIO
+from six import StringIO
 
 from lxml import etree
 from lxml.builder import ElementMaker
@@ -265,7 +264,7 @@ def _get_legend_graphic(obj, request):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'wmsserver.wms', '/api/resource/{id:\d+}/wms',
+        'wmsserver.wms', r'/api/resource/{id:\d+}/wms',
         factory=resource_factory,
     ).add_view(handler, context=Service)
 

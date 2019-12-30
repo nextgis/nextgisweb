@@ -51,7 +51,7 @@ def favicon(request):
     if os.path.isfile(settings['favicon']):
         return FileResponse(
             settings['favicon'], request=request,
-            content_type=bytes('image/x-icon'))
+            content_type='image/x-icon')
     else:
         raise HTTPNotFound()
 
