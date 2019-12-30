@@ -584,7 +584,7 @@ class FeatureQueryBase(object):
                 fieldmap.append((fld.keyname, clabel))
 
         if self._filter_by:
-            for k, v in self._filter_by.iteritems():
+            for k, v in self._filter_by.items():
                 if k == 'id':
                     select.append_whereclause(idcol == v)
                 else:

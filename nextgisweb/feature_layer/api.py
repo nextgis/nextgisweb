@@ -582,7 +582,7 @@ def store_collection(layer, request):
     result = []
     for fobj in features:
         fdata = dict(
-            [(pref(k), v) for k, v in fobj.fields.iteritems()],
+            [(pref(k), v) for k, v in fobj.fields.items()],
             id=fobj.id, label=fobj.label)
         if box:
             fdata['box'] = fobj.box.bounds

@@ -79,7 +79,7 @@ class Connection(Base, Resource):
             xml=str(self.capcache_xml))
 
         layers = []
-        for lid, layer in service.contents.iteritems():
+        for lid, layer in service.contents.items():
             layers.append(OrderedDict((
                 ('id', lid), ('title', layer.title),
                 ('index', map(int, layer.index.split('.'))),
@@ -258,7 +258,7 @@ class _vendor_params_attr(SP):
         # Remove records to be removed
         map(lambda i: odata.remove(i), rml)
 
-        for k, val in value.iteritems():
+        for k, val in value.items():
             if val is None:
                 continue
 

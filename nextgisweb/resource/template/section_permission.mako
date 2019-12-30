@@ -8,7 +8,7 @@
                 <th style="width: 0%">&nbsp;</th>
             </tr></thead>
             <tbody>
-            %for perm in scope.itervalues(ordered=True):
+            %for perm in scope.values(ordered=True):
             <tr>
                 <td>${tr(perm.label)}</td>
                 <td><tt>${perm.name}</tt></td>

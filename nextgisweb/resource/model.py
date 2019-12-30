@@ -162,8 +162,8 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
         """ Permissions applicable to this resource class """
 
         result = set()
-        for scope in six.itervalues(cls.scope):
-            result.update(scope.itervalues())
+        for scope in cls.scope.values():
+            result.update(scope.values())
 
         return frozenset(result)
 
@@ -194,7 +194,7 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
                         elif rule.action == 'deny':
                             deny.add(perm)
 
-        for scp in six.itervalues(self.scope):
+        for scp in self.scope.values():
             for req in scp.requirements:
                 for a in class_permissions:
                     if req.dst == a and (

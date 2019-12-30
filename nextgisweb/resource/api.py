@@ -169,7 +169,7 @@ def permission(resource, request):
     for k, scope in resource.scope.iteritems():
         sres = OrderedDict()
 
-        for perm in scope.itervalues(ordered=True):
+        for perm in scope.values(ordered=True):
             sres[perm.name] = perm in effective
 
         result[k] = sres

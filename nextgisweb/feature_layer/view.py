@@ -50,7 +50,7 @@ def feature_show(request):
     feature_id = int(request.matchdict['feature_id'])
 
     ext_mid = OrderedDict()
-    for k, ecls in FeatureExtension.registry._dict.iteritems():
+    for k, ecls in FeatureExtension.registry._dict.items():
         if hasattr(ecls, 'display_widget'):
             ext_mid[k] = ecls.display_widget
 

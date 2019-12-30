@@ -80,7 +80,7 @@ class Env(object):
                     traverse.seq.append(c.identity)
 
         traverse.seq = seq
-        traverse(six.itervalues(self._components))
+        traverse(self._components.values())
 
         result = list([self._components[i] for i in traverse.seq])
         logger.debug(
@@ -106,7 +106,7 @@ class Env(object):
 
         for comp in self.chain('initialize'):
             if hasattr(comp, 'metadata'):
-                for key, tab in six.iteritems(comp.metadata.tables):
+                for key, tab in comp.metadata.tables.items():
                     ctab = tab.tometadata(metadata)
                     sa.event.listen(
                         ctab, 'after_create',

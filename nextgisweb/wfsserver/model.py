@@ -73,7 +73,7 @@ class _layers_attr(SP):
             ):
                 setattr(lo, a, lv[a])
 
-        for lrid, lo in m.iteritems():
+        for lrid, lo in m.items():
             if lrid not in keep:
                 srlzr.obj.layers.remove(lo)
 

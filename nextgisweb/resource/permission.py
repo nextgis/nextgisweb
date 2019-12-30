@@ -131,7 +131,7 @@ class ScopeMeta(type):
     def registry(cls):
         return cls.__registry
 
-    def itervalues(cls, ordered=False):
+    def values(cls, ordered=False):
         if ordered:
             f = lambda a: sorted(a, key=lambda i: i._create_order)
         else:
@@ -139,9 +139,12 @@ class ScopeMeta(type):
 
         for v in f(filter(
             lambda v: isinstance(v, Permission),
-            six.itervalues(cls.__dict__)
+            cls.__dict__.values()
         )):
             yield v
+
+    # NOTE: Backward compability
+    itervalues = values
 
 
 class Scope(six.with_metaclass(ScopeMeta, object)):

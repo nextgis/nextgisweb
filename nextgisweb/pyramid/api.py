@@ -116,7 +116,7 @@ def cors_put(request):
     request.require_administrator()
 
     body = request.json_body
-    for k, v in body.iteritems():
+    for k, v in body.items():
         if k == 'allow_origin':
             if v is None:
                 v = []
@@ -153,7 +153,7 @@ def system_name_put(request):
     request.require_administrator()
 
     body = request.json_body
-    for k, v in body.iteritems():
+    for k, v in body.items():
         if k == 'full_name':
             if v is None:
                 v = ''
@@ -178,7 +178,7 @@ def miscellaneous_put(request):
     request.require_administrator()
 
     body = request.json_body
-    for k, v in body.iteritems():
+    for k, v in body.items():
         if k in ('units', 'degree_format', 'measurement_srid'):
             env.core.settings_set('core', k, v)
         else:
@@ -198,7 +198,7 @@ def home_path_put(request):
     request.require_administrator()
 
     body = request.json_body
-    for k, v in body.iteritems():
+    for k, v in body.items():
         if k == 'home_path':
             if v:
                 env.core.settings_set('pyramid', 'home_path', v)

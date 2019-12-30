@@ -101,7 +101,7 @@ def schema(request):
 
     for k, scp in six.iteritems(Scope.registry):
         spermissions = dict()
-        for p in scp.itervalues():
+        for p in scp.values():
             spermissions[p.name] = dict(
                 label=request.localizer.translate(p.label))
 

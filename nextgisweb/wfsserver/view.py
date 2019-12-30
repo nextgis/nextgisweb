@@ -26,7 +26,7 @@ def handler(obj, request):
     # import ipdb; ipdb.set_trace()
     request.resource_permission(ServiceScope.connect)
 
-    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+    params = dict((k.upper(), v) for k, v in request.params.items())
 
     req = params.get('REQUEST')
     post_data = request.body

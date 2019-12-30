@@ -37,7 +37,7 @@ def load_pkginfo(args):
 
 def load_components(args):
     pkginfo = load_pkginfo(args)
-    for cident, cmod in pkginfo['components'].iteritems():
+    for cident, cmod in pkginfo['components'].items():
         if not args.component or cident in args.component:
             yield (cident, cmod)
 
@@ -65,7 +65,7 @@ def write_jed(fileobj, catalog):
 
 def cmd_extract(args):
     pkginfo = load_pkginfo(args)
-    for cident, cmod in pkginfo['components'].iteritems():
+    for cident, cmod in pkginfo['components'].items():
         if args.component is not None and cident not in args.component:
             continue
 
