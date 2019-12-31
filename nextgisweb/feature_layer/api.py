@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 import json
 import os
 import re
-import urllib
 import uuid
 import zipfile
 import itertools
+from six.moves.urllib.parse import unquote
 
 import backports.tempfile
 from collections import OrderedDict
@@ -90,7 +90,7 @@ def export(request):
     else:
         format = format.upper()
 
-    if not format in EXPORT_FORMAT_OGR:
+    if format not in EXPORT_FORMAT_OGR:
         raise ValidationError(
             _("Format '%s' is not supported.") % (format,)
         )
@@ -554,11 +554,11 @@ def store_collection(layer, request):
         query.limit(last - first + 1, first)
 
     field_prefix = json.loads(
-        urllib.unquote(request.headers.get('x-field-prefix', '""')))
-    pref = lambda f: field_prefix + f
+        unquote(request.headers.get('x-field-prefix', '""')))
+    pref = lambda f: field_prefix + f  # NOQA: E731
 
     field_list = json.loads(
-        urllib.unquote(request.headers.get('x-field-list', "[]")))
+        unquote(request.headers.get('x-field-list', "[]")))
     if len(field_list) > 0:
         query.fields(*field_list)
 
@@ -571,7 +571,7 @@ def store_collection(layer, request):
         query.like(like)
 
     sort_re = re.compile(r'sort\(([+-])%s(\w+)\)' % (field_prefix, ))
-    sort = sort_re.search(urllib.unquote(request.query_string))
+    sort = sort_re.search(unquote(request.query_string))
     if sort:
         sort_order = {'+': 'asc', '-': 'desc'}[sort.group(1)]
         sort_colname = sort.group(2)

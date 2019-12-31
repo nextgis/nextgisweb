@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import namedtuple
+from six.moves.urllib.parse import unquote
 
 from ..resource import Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
@@ -8,7 +9,6 @@ from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .adapter import WebMapAdapter
 from .util import _
-import urllib
 
 
 class ExtentWidget(Widget):
@@ -160,7 +160,7 @@ def setup_pyramid(comp, config):
         iframe = request.POST['iframe']
         request.response.headerlist.append(("X-XSS-Protection", "0"))
         return dict(
-            iframe=urllib.unquote(urllib.unquote(iframe))
+            iframe=unquote(unquote(iframe))
         )
 
     config.add_route(

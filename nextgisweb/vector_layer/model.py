@@ -682,11 +682,11 @@ def _set_encoding(encoding):
                 # Set SHAPE_ENCODING value
 
                 # Keep copy of the current value
-                tmp = self.get_option('SHAPE_ENCODING', None)
+                tmp = self.get_option('SHAPE_ENCODING'.encode(), None)
                 self.old_value = self.strdup(tmp)
 
                 # Set new value
-                self.set_option('SHAPE_ENCODING', '')
+                self.set_option('SHAPE_ENCODING'.encode(), ''.encode())
 
                 return strdecode
 
@@ -695,7 +695,7 @@ def _set_encoding(encoding):
         def __exit__(self, type, value, traceback):
             if self.encoding:
                 # Return old value
-                self.set_option('SHAPE_ENCODING', self.old_value)
+                self.set_option('SHAPE_ENCODING'.encode(), self.old_value)
 
     return encoding_section(encoding)
 
@@ -722,10 +722,13 @@ class _source_attr(SP):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
 
-        for feat in ogrlayer:
+        # TODO: Fix feature iteration in pygdal
+        feat = ogrlayer.GetNextFeature()
+        while feat is not None:
             geom = feat.GetGeometryRef()
             if geom is None:
                 raise VE(_("Feature #%d doesn't have geometry.") % feat.GetFID())
+            feat = ogrlayer.GetNextFeature()
 
         ogrlayer.ResetReading()
 
@@ -748,9 +751,14 @@ class _source_attr(SP):
             else:
                 ogrfn = datafile
 
-            with _set_encoding(encoding) as sdecode:
+            if six.PY2:
+                with _set_encoding(encoding) as sdecode:
+                    ogrds = ogr.Open(ogrfn)
+                    recode = sdecode
+            else:
+                # Ignore encoding option in Python 3
                 ogrds = ogr.Open(ogrfn)
-                recode = sdecode
+                recode = lambda x: x   # NOQA: E731
 
             if ogrds is None:
                 raise VE(_("GDAL library failed to open file."))
