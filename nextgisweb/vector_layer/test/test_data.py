@@ -42,10 +42,13 @@ def test_from_fields(txn):
     DBSession.flush()
 
 
-@pytest.mark.parametrize('data', ('point-shapefile', 'point-geojson', 'point-kml'))
-def test_from_ogr(txn, data):
+@pytest.mark.parametrize('data', (
+    'shapefile-point-utf8.zip/layer.shp',
+    'shapefile-point-win1251.zip/layer.shp',
+    'geojson-point.zip/layer.geojson'))
+def test_from_ogr(data, txn):
     src = os.path.join(DATA_PATH, data)
-    dsource = ogr.Open(src)
+    dsource = ogr.Open('/vsizip/' + src)
     layer = dsource.GetLayer(0)
 
     res = VectorLayer(
@@ -61,3 +64,18 @@ def test_from_ogr(txn, data):
     res.load_from_ogr(layer, lambda x: x)
 
     DBSession.flush()
+
+    features = list(res.feature_query()())
+    assert len(features) == 1
+
+    feature = features[0]
+    assert feature.id == 1
+
+    fields = feature.fields
+    assert fields['int'] == -1
+    # TODO: Date, time and datetime tests fails on shapefile
+    # assert fields['date'] == date(2001, 1, 1)
+    # assert fields['time'] == time(23, 59, 59)
+    # assert fields['datetime'] == datetime(2001, 1, 1, 23, 59, 0)
+    assert fields['string'] == "Foo bar"
+    assert fields['unicode'] == 'Значимость этих проблем настолько очевидна, что реализация намеченных плановых заданий требуют определения и уточнения.'  # NOQA: E501
