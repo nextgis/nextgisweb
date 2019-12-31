@@ -113,6 +113,10 @@ class PyramidComponent(Component):
         config.registry.settings['error.exc_response'] = error_handler
         config.include(exception)
 
+        config.add_tween(
+            'nextgisweb.pyramid.util.header_encoding_tween_factory',
+            over=('nextgisweb.pyramid.exception.unhandled_exception_tween_factory', ))
+
         # Access to Env through request.env
         config.add_request_method(
             lambda req: self._env, 'env',

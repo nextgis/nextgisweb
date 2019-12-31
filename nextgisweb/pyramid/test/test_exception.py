@@ -33,6 +33,10 @@ def webapp():
     config = Configurator(settings=settings)
     config.include(exception)
 
+    config.add_tween(
+        'nextgisweb.pyramid.util.header_encoding_tween_factory',
+        over=('nextgisweb.pyramid.exception.unhandled_exception_tween_factory', ))
+
     def view_error(request):
         raise ErrorTest()
 

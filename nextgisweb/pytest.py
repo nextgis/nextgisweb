@@ -37,10 +37,6 @@ def txn():
 
 @pytest.fixture(scope='session')
 def webapp(env):
-    # Disable useless assertion that doesn't work in Python 3 + 2
-    from webtest import lint
-    lint._assert_latin1_str = lambda string, message: string
-
     from webtest import TestApp
     app = env.pyramid.make_app({}).make_wsgi_app()
     yield TestApp(app)
