@@ -129,9 +129,7 @@ class TableInfo(object):
         has_z = self.geometry_type in GEOM_TYPE.has_z
 
         if not is_multi or not has_z:
-            # TODO: Fix feature iteration in pygdal
-            feature = ogrlayer.GetNextFeature()
-            while feature is not None:
+            for feature in ogrlayer:
                 geom = feature.GetGeometryRef()
                 gtype = geom.GetGeometryType()
                 if ltype != gtype:
@@ -155,7 +153,6 @@ class TableInfo(object):
 
                 if is_multi and has_z:
                     break
-                feature = ogrlayer.GetNextFeature()
 
             ogrlayer.ResetReading()
 
@@ -286,10 +283,7 @@ class TableInfo(object):
         is_multi = self.geometry_type in GEOM_TYPE.is_multi
         has_z = self.geometry_type in GEOM_TYPE.has_z
 
-        # TODO: Fix feature iteration in pygdal
-        feature = ogrlayer.GetNextFeature()
-        fid = 0
-        while feature is not None:
+        for fid, feature in enumerate(ogrlayer):
             geom = feature.GetGeometryRef()
 
             gtype = geom.GetGeometryType()
@@ -370,9 +364,6 @@ class TableInfo(object):
                 str(geom), srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
-
-            feature = ogrlayer.GetNextFeature()
-            fid += 1
 
 
 class VectorLayerField(Base, LayerField):
@@ -722,13 +713,10 @@ class _source_attr(SP):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
 
-        # TODO: Fix feature iteration in pygdal
-        feat = ogrlayer.GetNextFeature()
-        while feat is not None:
+        for feat in ogrlayer:
             geom = feat.GetGeometryRef()
             if geom is None:
                 raise VE(_("Feature #%d doesn't have geometry.") % feat.GetFID())
-            feat = ogrlayer.GetNextFeature()
 
         ogrlayer.ResetReading()
 
