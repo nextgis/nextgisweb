@@ -131,6 +131,7 @@ class RestoreCommand(Command):
                     cls.decompress(args.source, tmpdir)
                     yield tmpdir
         else:
+            @contextmanager
             def src_context():
                 yield args.source
 
