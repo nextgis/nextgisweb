@@ -3,15 +3,15 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from pyproj import CRS
 
-from .models import SRS
-from .util import convert_projstr_to_wkt, _
+from ..core.exception import ValidationError
 from ..geometry import (
     geom_from_wkt,
     geom_to_wkt,
     geom_transform as shp_geom_transform,
-    geom_calc as shp_geom_calc
+    geom_calc as shp_geom_calc,
 )
-from nextgisweb.core.exception import ValidationError
+from .models import SRS
+from .util import convert_to_wkt, _
 
 
 def collection(request):
@@ -35,7 +35,7 @@ def get(request):
 def srs_convert(request):
     proj_str = request.POST.get("projStr")
     format = request.POST.get("format")
-    wkt = convert_projstr_to_wkt(proj_str, format, pretty=True)
+    wkt = convert_to_wkt(proj_str, format, pretty=True)
     if not wkt:
         raise ValidationError(_("Invalid SRS definition!"))
 
@@ -79,16 +79,20 @@ def setup_pyramid(comp, config):
         .add_view(srs_convert, request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.geom_transform", r"/api/component/spatial_ref_sys/{id:\d+}/geom_transform") \
+        "spatial_ref_sys.geom_transform",
+        r"/api/component/spatial_ref_sys/{id:\d+}/geom_transform"
+    ) \
         .add_view(geom_transform, request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.geom_length", r"/api/component/spatial_ref_sys/{id:\d+}/geom_length") \
-        .add_view(lambda r: geom_calc(r, "length"), request_method="POST", renderer="json")
+        "spatial_ref_sys.geom_length",
+        r"/api/component/spatial_ref_sys/{id:\d+}/geom_length"
+    ).add_view(lambda r: geom_calc(r, "length"), request_method="POST", renderer="json")
 
     config.add_route(
-        "spatial_ref_sys.geom_area", r"/api/component/spatial_ref_sys/{id:\d+}/geom_area") \
-        .add_view(lambda r: geom_calc(r, "area"), request_method="POST", renderer="json")
+        "spatial_ref_sys.geom_area",
+        r"/api/component/spatial_ref_sys/{id:\d+}/geom_area"
+    ).add_view(lambda r: geom_calc(r, "area"), request_method="POST", renderer="json")
 
     config.add_route(
         "spatial_ref_sys.get", r"/api/component/spatial_ref_sys/{id:\d+}",

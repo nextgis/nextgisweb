@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
+
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
-from osgeo import osr
 
 from .. import db
 from ..models import declarative_base
-from ..core.exception import ValidationError
 
-from .util import _
+from .util import convert_to_proj
 
 Base = declarative_base()
 
@@ -58,14 +58,7 @@ class SRS(Base):
 
     @db.validates('wkt')
     def _validate_wkt(self, key, value):
-        sr = osr.SpatialReference()
-        # value = value.encode('utf-8')
-        # print(value)
-        if sr.ImportFromWkt(value) != 0:
-            raise ValidationError(
-                message=_("Invalid OGC WKT definition!"))
-
-        self.proj4 = sr.ExportToProj4()
+        self.proj4 = convert_to_proj(value)
         return value
 
     def tile_extent(self, tile):
@@ -106,7 +99,7 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
             auth_name = NEW.auth_name, auth_srid = NEW.auth_srid,
             srtext = NEW.wkt, proj4text = NEW.proj4
             WHERE srid = NEW.id;
-            
+
             -- Insert if missing
             INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text)
             SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt, NEW.proj4
@@ -114,7 +107,7 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
 
             RETURN NEW;
         END IF;
-        
+
         IF TG_OP = 'DELETE' THEN
             -- Delete existing row
             DELETE FROM spatial_ref_sys WHERE srid = OLD.id;
