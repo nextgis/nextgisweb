@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
+
 from ..component import Component
+
 from .model import Base, Service
 
 __all__ = ['Service', ]
