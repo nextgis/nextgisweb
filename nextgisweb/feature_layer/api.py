@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 import json
 import os
 import re
@@ -385,7 +385,7 @@ def iget(resource, request):
 
     return Response(
         json.dumps(serialize(result, geom_format=geom_format), cls=geojson.Encoder),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def iput(resource, request):
@@ -402,7 +402,7 @@ def iput(resource, request):
 
     return Response(
         json.dumps(dict(id=feature.id)),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def idelete(resource, request):
@@ -411,7 +411,7 @@ def idelete(resource, request):
     fid = int(request.matchdict['fid'])
     resource.feature_delete(fid)
 
-    return Response(json.dumps(None), content_type=b'application/json')
+    return Response(json.dumps(None), content_type='application/json', charset='utf-8')
 
 
 def cget(resource, request):
@@ -470,7 +470,7 @@ def cget(resource, request):
 
     return Response(
         json.dumps(result, cls=geojson.Encoder),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def cpost(resource, request):
@@ -482,7 +482,7 @@ def cpost(resource, request):
 
     return Response(
         json.dumps(dict(id=fid)),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def cpatch(resource, request):
@@ -512,7 +512,7 @@ def cpatch(resource, request):
 
         result.append(dict(id=fid))
 
-    return Response(json.dumps(result), content_type=b'application/json')
+    return Response(json.dumps(result), content_type='application/json', charset='utf-8')
 
 
 def cdelete(resource, request):
@@ -529,7 +529,7 @@ def cdelete(resource, request):
         resource.feature_delete_all()
         result = True
 
-    return Response(json.dumps(result), content_type=b'application/json')
+    return Response(json.dumps(result), content_type='application/json', charset='utf-8')
 
 
 def count(resource, request):
@@ -540,7 +540,7 @@ def count(resource, request):
 
     return Response(
         json.dumps(dict(total_count=total_count)),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def store_collection(layer, request):

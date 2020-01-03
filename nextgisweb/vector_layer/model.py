@@ -1070,7 +1070,9 @@ class FeatureQueryBase(object):
                     fdict = dict((f.keyname, row[f.keyname])
                                  for f in selected_fields)
                     if self._geom:
-                        geom = geom_from_wkb(str(row['geom']))
+                        geom = geom_from_wkb(
+                            row['geom'].tobytes() if six.PY3
+                            else six.binary_type(row['geom']))
                     else:
                         geom = None
 

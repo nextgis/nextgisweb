@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 from ..feature_layer import FeatureExtension
 from ..models import DBSession
@@ -18,7 +18,7 @@ class FeatureAttachmentExtension(FeatureExtension):
             resource_id=self.layer.id,
             feature_id=feature.id)
 
-        result = map(lambda itm: itm.serialize(), query)
+        result = list(map(lambda itm: itm.serialize(), query))
         return result if len(result) > 0 else None
 
     def deserialize(self, feature, data):

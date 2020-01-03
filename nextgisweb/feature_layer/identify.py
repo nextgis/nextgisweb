@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 from pyramid.response import Response
 
@@ -46,7 +47,8 @@ def identify(request):
           description: success
           schema:
             type: object
-            description: Dictionary where key - layer identifier, value - features count and array of features
+            description: Dictionary where key - layer identifier, value - features count
+            and array of features
     """
     sett_name = 'permissions.disable_check.identify'
     setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
