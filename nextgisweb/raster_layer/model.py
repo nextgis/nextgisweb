@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, absolute_import, print_function, unicode_literals
 import subprocess
 import os.path
+import six
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -63,13 +64,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         if dsdriver.ShortName not in SUPPORTED_DRIVERS:
             raise ValidationError(
-                _(
-                    "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
-                )
-                % dict(
-                    format=dsdriver.ShortName,
-                    all_formats=", ".join(SUPPORTED_DRIVERS),
-                )
+                _("Raster has format '%(format)s', however only following formats are supported: %(all_formats)s.")  # NOQA: E501
+                % dict(format=dsdriver.ShortName, all_formats=", ".join(SUPPORTED_DRIVERS))
             )
 
         if not dsproj or not dsgtran:
@@ -113,7 +109,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
-        self.dtype = band_types.pop()
+        self.dtype = six.text_type(band_types.pop())
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
         self.band_count = ds.RasterCount
@@ -133,7 +129,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         multiplier = 2
         levels = []
 
-        while cursize > PYRAMID_TARGET_SIZE:
+        while cursize > PYRAMID_TARGET_SIZE or len(levels) == 0:
             levels.append(str(multiplier))
             cursize /= 2
             multiplier *= 2
