@@ -10,6 +10,7 @@
     settings = request.env.pyramid.settings
     has_logo = request.env.core.settings_exists('pyramid', 'logo') or \
         ('logo' in settings and os.path.isfile(settings['logo']))
+    return_url = request.GET['return'] if 'return' in request.GET else false
 %>
 
 <div id="header" class="header clearfix">
@@ -34,12 +35,16 @@
     </ul>
     <div class="header__left">
         <div class="header__title">
-            <a class="header__title-logo" href="${request.application_url}">
-            %if has_logo:
-                <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
-            %else:
-                <img class="logo__pic" src="${request.static_url('nextgisweb:static/img/nextgis_logo_s.svg')}"/>
-            %endif
+            <a class="header__title-logo" href="${return_url if return_url else request.application_url}">
+                %if return_url:
+                    <img class="logo__pic" src="${request.static_url('nextgisweb:static/img/return-button.svg')}"/>
+                %else:
+                    %if has_logo:
+                        <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
+                    %else:
+                        <img class="logo__pic" src="${request.static_url('nextgisweb:static/img/nextgis_logo_s.svg')}"/>
+                    %endif
+                %endif
             </a>
             <div class="header__title__inner">
                 ${title}
