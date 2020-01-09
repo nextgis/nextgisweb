@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from pyramid.httpexceptions import HTTPForbidden
+from sqlalchemy.orm.exc import NoResultFound
+
+import json
+
+from pyramid.response import Response
+from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden, HTTPUnprocessableEntity
+from pyramid.security import remember, forget
 
 from ..models import DBSession
 from .models import User, Group
@@ -94,6 +100,37 @@ def register(request):
     return dict(id=obj.id)
 
 
+def login(request):
+    if ('login' not in request.POST) or ('password' not in request.POST):
+        return HTTPUnprocessableEntity()
+    try:
+        user = User.filter_by(keyname=request.POST['login'].strip()).one()
+        if user.password == request.POST['password']:
+            if user.disabled:
+                return HTTPUnauthorized()
+
+            headers = remember(request, user.id)
+
+            return Response(
+                json.dumps({
+                    "keyname": user.keyname,
+                    "display_name": user.display_name,
+                    "description": user.description
+                }), status_code=200,
+                content_type=b'application/json',
+                headers=headers
+            )
+        else:
+            return HTTPUnauthorized()
+    except NoResultFound:
+        return HTTPUnauthorized()
+
+
+def logout(request):
+    headers = forget(request)
+    return Response(json.dumps({}), headers=headers)
+
+
 def setup_pyramid(comp, config):
     config.add_route('auth.user.collection', '/api/component/auth/user/') \
         .add_view(user_cget, request_method='GET', renderer='json') \
@@ -116,3 +153,9 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.register', '/api/component/auth/register') \
         .add_view(register, request_method='POST', renderer='json')
+
+    config.add_route('auth.login_cookies', '/api/component/auth/login') \
+        .add_view(login, request_method='POST', renderer='json')
+
+    config.add_route('auth.logout_cookies', '/api/component/auth/logout') \
+        .add_view(logout, request_method='POST', renderer='json')
