@@ -34,7 +34,7 @@ class ResourceScope(Scope):
 
     create = P(_("Create")).require(read)
     """ Create: a little bit fuzzy rule that is not used currently. The idea was
-    to check Create permission while creating a new resource, 
+    to check Create permission while creating a new resource,
     but currenty only :py:attr:`manage_children` permission is checked
     for child resource. Possibly will have to return to this one
     as it is impossible to restrict creation of resources with certain types without this rule. """
@@ -45,7 +45,7 @@ class ResourceScope(Scope):
 
     delete = P(_("Delete")).require(read)
     """ Delete: permission to remove this resource. Besides that to really remove a resource
-    one will also need :py:attr:`manage_children` permission 
+    one will also need :py:attr:`manage_children` permission
     for parent resource. """
 
     manage_children = P(_("Manage children")).require(read)
@@ -59,7 +59,7 @@ class MetadataScope(Scope):
     """ Set of permissions for resource metadata. Typical example of resource metadata -
     is its description in free form. This description doesn't affect anything
     it's change doesn't change data structure or anything else.
-    As every resource has description this set of permissions is 
+    As every resource has description this set of permissions is
     included for all resources at Resource class level. """
 
     identity = 'metadata'
@@ -71,7 +71,7 @@ class MetadataScope(Scope):
 
 class DataStructureScope(Scope):
     """ Set of permissions for data structure, for example fields structure
-    of vector layer, its change might lead to change 
+    of vector layer, its change might lead to change
     in data itself. """
 
     identity = 'datastruct'
@@ -93,8 +93,8 @@ class DataScope(Scope):
 
 class ConnectionScope(Scope):
     """ Set of permissions for external connection parameters. In some cases
-    we need to store access parameters to external resources. These 
-    parameters may be sensitive, logins and passwords 
+    we need to store access parameters to external resources. These
+    parameters may be sensitive, logins and passwords
     to access remote DB for example. """
 
     identity = 'connection'
@@ -106,9 +106,9 @@ class ConnectionScope(Scope):
 
 
 class ServiceScope(Scope):
-    """ Set of permissions for services such as WMS or WFS. This is 
+    """ Set of permissions for services such as WMS or WFS. This is
     needed to separate permissions for service parameters and its actual usage.
-    Though if service is using other resources inside, we need to 
+    Though if service is using other resources inside, we need to
     their permissions separately. """
 
     identity = 'service'

@@ -24,6 +24,7 @@ from babel.messages.frontend import parse_mapping
 from babel.messages.extract import extract_from_dir
 from babel.messages.pofile import write_po, read_po
 from babel.messages.mofile import write_mo
+import six
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ def load_pkginfo(args):
 
 def load_components(args):
     pkginfo = load_pkginfo(args)
-    for cident, cmod in pkginfo['components'].iteritems():
+    for cident, cmod in pkginfo['components'].items():
         if not args.component or cident in args.component:
             yield (cident, cmod)
 
@@ -56,7 +57,7 @@ def write_jed(fileobj, catalog):
     for msg in catalog:
         if msg.id == '':
             continue
-        data[msg.id] = (msg.string, ) if isinstance(msg.string, basestring) \
+        data[msg.id] = (msg.string, ) if isinstance(msg.string, six.string_types) \
             else msg.string
 
     fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))
@@ -64,7 +65,7 @@ def write_jed(fileobj, catalog):
 
 def cmd_extract(args):
     pkginfo = load_pkginfo(args)
-    for cident, cmod in pkginfo['components'].iteritems():
+    for cident, cmod in pkginfo['components'].items():
         if args.component is not None and cident not in args.component:
             continue
 

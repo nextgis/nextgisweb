@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from UserList import UserList
+from functools import reduce
+import six
+from six.moves import UserList
+
 from bunch import Bunch
 
 __all__ = ['Permission', 'Scope']
@@ -70,8 +73,11 @@ class Permission(object):
         return "<Permission '%s' in scope '%s'>" % (
             self.name, self.scope.identity if self.scope else 'unbound')
 
-    def __unicode__(self):
+    def __str__(self):
         return unicode(self.label)
+
+    def __unicode__(self):
+        return self.__str__()
 
     def is_bound(self):
         return self.name is not None and self.scope is not None
@@ -108,7 +114,7 @@ class ScopeMeta(type):
         if Scope is not None:
             setattr(cls, 'requirements', RequirementList())
 
-        for name, perm in cls.__dict__.iteritems():
+        for name, perm in six.iteritems(cls.__dict__):
             if not isinstance(perm, Permission):
                 continue
 
@@ -125,7 +131,7 @@ class ScopeMeta(type):
     def registry(cls):
         return cls.__registry
 
-    def itervalues(cls, ordered=False):
+    def values(cls, ordered=False):
         if ordered:
             f = lambda a: sorted(a, key=lambda i: i._create_order)
         else:
@@ -133,10 +139,13 @@ class ScopeMeta(type):
 
         for v in f(filter(
             lambda v: isinstance(v, Permission),
-            cls.__dict__.itervalues()
+            cls.__dict__.values()
         )):
             yield v
 
+    # NOTE: Backward compability
+    itervalues = values
 
-class Scope(object):
-    __metaclass__ = ScopeMeta
+
+class Scope(six.with_metaclass(ScopeMeta, object)):
+    pass

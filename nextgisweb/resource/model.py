@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from collections import namedtuple, OrderedDict
 from datetime import datetime
+import six
 
 from bunch import Bunch
 
@@ -96,8 +97,7 @@ class ResourceMeta(db.DeclarativeMeta):
         resource_registry.register(cls)
 
 
-class Resource(Base):
-    __metaclass__ = ResourceMeta
+class Resource(six.with_metaclass(ResourceMeta, Base)):
     registry = resource_registry
 
     identity = 'resource'
@@ -133,8 +133,11 @@ class Resource(Base):
 
     owner_user = db.relationship(User)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.display_name
+
+    def __unicode__(self):
+        return self.__str__()
 
     @classmethod
     def check_parent(cls, parent):
@@ -159,8 +162,8 @@ class Resource(Base):
         """ Permissions applicable to this resource class """
 
         result = set()
-        for scope in cls.scope.itervalues():
-            result.update(scope.itervalues())
+        for scope in cls.scope.values():
+            result.update(scope.values())
 
         return frozenset(result)
 
@@ -191,7 +194,7 @@ class Resource(Base):
                         elif rule.action == 'deny':
                             deny.add(perm)
 
-        for scp in self.scope.itervalues():
+        for scp in self.scope.values():
             for req in scp.requirements:
                 for a in class_permissions:
                     if req.dst == a and (
@@ -329,12 +332,12 @@ class _children_attr(SP):
 
 class _interfaces_attr(SP):
     def getter(self, srlzr):
-        return map(lambda i: i.getName(), providedBy(srlzr.obj))
+        return [i.getName() for i in providedBy(srlzr.obj)]
 
 
 class _scopes_attr(SP):
     def getter(self, srlzr):
-        return srlzr.obj.scope.keys()
+        return list(srlzr.obj.scope.keys())
 
 
 _scp = Resource.scope.resource

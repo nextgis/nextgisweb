@@ -3,6 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from time import sleep
 from uuid import uuid4
 import logging
+import six
 
 import pytest
 from PIL import Image, ImageDraw
@@ -14,6 +15,7 @@ from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.auth import User
 
 from nextgisweb.render.model import ResourceTileCache
+from nextgisweb.render.util import pack_color, unpack_color
 
 
 @pytest.fixture
@@ -23,7 +25,7 @@ def frtc(txn):
         owner_user=User.by_keyname('administrator'),
         geometry_type='POINT',
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=unicode(uuid4().hex)
+        tbl_uuid=six.text_type(uuid4().hex)
     ).persist()
     vector_layer.setup_from_fields([])
 
@@ -58,6 +60,11 @@ def img_cross_green():
 def img_fill():
     result = Image.new('RGBA', (256, 256))
     return result
+
+
+def test_pack_unpack():
+    t = (255, 127, 63, 31)
+    assert unpack_color(pack_color(t)) == t
 
 
 def test_put_get_cross(frtc, img_cross_red, txn):

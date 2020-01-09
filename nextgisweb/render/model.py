@@ -2,12 +2,11 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from datetime import datetime, timedelta
 from uuid import uuid4
-from StringIO import StringIO
 from os import makedirs
 from errno import EEXIST
-import struct
 import os.path
 import sqlite3
+from io import BytesIO
 
 from PIL import Image
 from sqlalchemy import MetaData, Table
@@ -25,7 +24,7 @@ from ..resource import (
 
 from .interface import IRenderableStyle
 from .event import on_style_change, on_data_change
-from .util import imgcolor, affine_bounds_to_tile
+from .util import imgcolor, affine_bounds_to_tile, pack_color, unpack_color
 
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
@@ -159,8 +158,7 @@ class ResourceTileCache(Base):
                 return None
 
         if color is not None:
-            colort = tuple(map(ord, struct.pack('!i', color)))
-            return Image.new('RGBA', (256, 256), colort)
+            return Image.new('RGBA', (256, 256), unpack_color(color))
 
         else:
             cur = self.tilestor.cursor()
@@ -170,7 +168,7 @@ class ResourceTileCache(Base):
 
             if srow is None:
                 return None
-            return Image.open(StringIO(srow[0]))
+            return Image.open(BytesIO(srow[0]))
 
     def put_tile(self, tile, img):
         z, x, y = tile
@@ -180,10 +178,10 @@ class ResourceTileCache(Base):
 
         color = None
         if colortuple is not None:
-            color = struct.unpack('!i', bytearray(colortuple))[0]
+            color = pack_color(colortuple)
 
         if color is None:
-            buf = StringIO()
+            buf = BytesIO()
             img.save(buf, format='PNG')
 
             self.tilestor.execute(
@@ -237,12 +235,12 @@ class ResourceTileCache(Base):
             '   AND y BETWEEN :ymin AND :ymax '
             .format(self.uuid.hex))
 
-        zlist = map(lambda a: a[0], conn.execute(query_z).fetchall())
+        zlist = [a[0] for a in conn.execute(query_z).fetchall()]
         for z in zlist:
             aft = affine_bounds_to_tile((srs.minx, srs.miny, srs.maxx, srs.maxy), z)
 
-            xmin, ymax = map(lambda a: int(a), aft * geom.bounds[0:2])
-            xmax, ymin = map(lambda a: int(a), aft * geom.bounds[2:4])
+            xmin, ymax = [int(a) for a in aft * geom.bounds[0:2]]
+            xmax, ymin = [int(a) for a in aft * geom.bounds[2:4]]
 
             xmin -= 1
             ymin -= 1

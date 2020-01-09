@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from ..i18n import trstring_factory
+from __future__ import division, absolute_import, print_function, unicode_literals
+import six
+
 from osgeo import osr
+
+from ..core.exception import ValidationError
+
+from ..i18n import trstring_factory
 
 COMP_ID = "spatial_ref_sys"
 _ = trstring_factory(COMP_ID)
 
-MI_UNIT_ALIASES =  {
+MI_UNIT_ALIASES = {
     0: "mi",
     1: "km",
     2: "in",
@@ -23,52 +28,56 @@ MI_UNIT_ALIASES =  {
 }
 
 
-def update_MI_coord_sys_string(str):
-    str = str.replace("Earth Projection", "")
-    str = str.strip()
-    items = str.split(", ")
+def normalize_mapinfo_cs(source):
+    source = source.replace("Earth Projection", "").strip()
+    items = source.split(", ")
     unit_index = 2
-    
+
     if len(items) > unit_index and items[unit_index].isdigit():
         unit = items[unit_index]
         unit = MI_UNIT_ALIASES[int(unit)]
         if unit:
             items[unit_index] = "\"%s\"" % unit
         else:
-            raise Exception("MI coord string is not valid")
+            raise ValidationError(
+                message=_("Invalid MapInfo spatial reference system: %s") % source)
     if len(items) == 8:
         items.append("0")
     return "Earth Projection " + ", ".join(items)
 
 
-def convert_projstr_to_wkt(proj_str, format=None, pretty=False):
-    proj_str = proj_str.encode("utf-8")
+def _gdalenc(v):
+    return v.encode('utf-8') if six.PY2 else v
+
+
+def _gdaldec(v):
+    return six.text_type(v)
+
+
+def convert_to_wkt(source, format=None, pretty=False):
     sr = osr.SpatialReference()
-    wkt = ""
-    imports = [
-        ["proj4", "ImportFromProj4"], 
-        ["epsg", lambda x: sr.ImportFromEPSG(int(x))],
-        ["mapinfo", lambda x: sr.ImportFromMICoordSys(
-            update_MI_coord_sys_string(x).encode("utf-8"))],
-        ["esri", lambda x: sr.ImportFromESRI([proj_str.decode("utf-8")])],
-        ["wkt", "ImportFromWkt"]
-    ]
 
-    for imp in imports:
-        format_, method = imp
+    if format == 'proj4':
+        sr.ImportFromProj4(_gdalenc(source))
+    elif format == 'epsg':
+        sr.ImportFromEPSG(int(source))
+    elif format == 'esri':
+        sr.ImportFromESRI([_gdalenc(source)])
+    elif format == 'mapinfo':
+        sr.ImportFromMICoordSys(_gdalenc(normalize_mapinfo_cs(source)))
+    elif format == 'wkt':
+        sr.ImportFromWkt(_gdalenc(source))
+    else:
+        raise ValidationError(
+            message=_("Unknown spatial reference system format: %s!") % format)
 
-        if format and not format_ == format:
-            continue
-
-        if hasattr(method, "__call__"):
-            method_to_call = method
-        else:
-            method_to_call = getattr(sr, method)
-        try:
-            if method_to_call and method_to_call(proj_str) == 0:
-                wkt = sr.ExportToPrettyWkt() if pretty else sr.ExportToWkt()
-                break
-        except:
-            pass
-
+    wkt = _gdaldec(sr.ExportToPrettyWkt() if pretty else sr.ExportToWkt())
     return wkt
+
+
+def convert_to_proj(source):
+    sr = osr.SpatialReference()
+    if sr.ImportFromWkt(_gdalenc(source)) != 0:
+        raise ValidationError(
+            message=_("Invalid OGC WKT definition!"))
+    return _gdaldec(sr.ExportToProj4())

@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import os.path
 from uuid import uuid4
+import six
 
 import pytest
 from osgeo import ogr
@@ -23,9 +24,9 @@ def test_from_fields(txn):
         owner_user=User.by_keyname('administrator'),
         geometry_type='POINT',
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=unicode(uuid4().hex),
+        tbl_uuid=six.text_type(uuid4().hex),
     )
-    
+
     res.setup_from_fields([
         dict(keyname='integer', datatype=FIELD_TYPE.INTEGER),
         dict(keyname='bigint', datatype=FIELD_TYPE.BIGINT),
@@ -35,28 +36,46 @@ def test_from_fields(txn):
         dict(keyname='time', datatype=FIELD_TYPE.TIME),
         dict(keyname='datetime', datatype=FIELD_TYPE.DATETIME),
     ])
-    
+
     res.persist()
-    
+
     DBSession.flush()
 
 
-@pytest.mark.parametrize('data', ('point-shapefile', 'point-geojson', 'point-kml'))
-def test_from_ogr(txn, data):
+@pytest.mark.parametrize('data', (
+    'shapefile-point-utf8.zip/layer.shp',
+    'shapefile-point-win1251.zip/layer.shp',
+    'geojson-point.zip/layer.geojson'))
+def test_from_ogr(data, txn):
     src = os.path.join(DATA_PATH, data)
-    dsource = ogr.Open(src)
+    dsource = ogr.Open('/vsizip/' + src)
     layer = dsource.GetLayer(0)
 
     res = VectorLayer(
         parent_id=0, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=unicode(uuid4().hex),
+        tbl_uuid=six.text_type(uuid4().hex),
     )
-    
+
     res.persist()
 
     res.setup_from_ogr(layer, lambda x: x)
     res.load_from_ogr(layer, lambda x: x)
 
     DBSession.flush()
+
+    features = list(res.feature_query()())
+    assert len(features) == 1
+
+    feature = features[0]
+    assert feature.id == 1
+
+    fields = feature.fields
+    assert fields['int'] == -1
+    # TODO: Date, time and datetime tests fails on shapefile
+    # assert fields['date'] == date(2001, 1, 1)
+    # assert fields['time'] == time(23, 59, 59)
+    # assert fields['datetime'] == datetime(2001, 1, 1, 23, 59, 0)
+    assert fields['string'] == "Foo bar"
+    assert fields['unicode'] == 'Значимость этих проблем настолько очевидна, что реализация намеченных плановых заданий требуют определения и уточнения.'  # NOQA: E501

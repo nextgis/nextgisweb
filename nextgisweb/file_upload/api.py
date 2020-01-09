@@ -57,8 +57,9 @@ def upload_post(request):
         metas.append(meta)
 
     # TODO: Add IFrame support for IE and Flash uploader
-    return Response(json.dumps(dict(upload_meta=metas)),
-                    content_type=b'application/json')
+    return Response(
+        json.dumps(dict(upload_meta=metas)),
+        content_type='application/json', charset='utf-8')
 
 
 def upload_put(request):
@@ -100,8 +101,9 @@ def upload_put(request):
     with open(metafn, 'wb') as fd:
         fd.write(pickle.dumps(meta))
 
-    return Response(json.dumps(meta), status=201,
-                    content_type=b'application/json')
+    return Response(
+        json.dumps(meta), status=201,
+        content_type='application/json', charset='utf-8')
 
 
 def setup_pyramid(comp, config):

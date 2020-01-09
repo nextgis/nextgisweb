@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 import re
 import json
 import os.path
-from urllib2 import unquote
 from datetime import timedelta
 import base64
+from six.moves.urllib.parse import unquote
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
@@ -14,6 +14,7 @@ from ..env import env
 from ..package import pkginfo
 
 from .util import ClientRoutePredicate
+import six
 
 
 def _get_cors_olist():
@@ -115,7 +116,7 @@ def cors_put(request):
     request.require_administrator()
 
     body = request.json_body
-    for k, v in body.iteritems():
+    for k, v in body.items():
         if k == 'allow_origin':
             if v is None:
                 v = []
@@ -130,7 +131,7 @@ def cors_put(request):
 
             for origin in v:
                 if (
-                    not isinstance(origin, basestring) or
+                    not isinstance(origin, six.string_types) or
                     not re.match(
                         r'^https?://[\w\_\-\.]{3,}(:\d{2,5})?$', origin)
                 ):
@@ -152,7 +153,7 @@ def system_name_put(request):
     request.require_administrator()
 
     body = request.json_body
-    for k, v in body.iteritems():
+    for k, v in body.items():
         if k == 'full_name':
             if v is None:
                 v = ''
@@ -177,7 +178,7 @@ def miscellaneous_put(request):
     request.require_administrator()
 
     body = request.json_body
-    for k, v in body.iteritems():
+    for k, v in body.items():
         if k in ('units', 'degree_format', 'measurement_srid'):
             env.core.settings_set('core', k, v)
         else:
@@ -197,7 +198,7 @@ def home_path_put(request):
     request.require_administrator()
 
     body = request.json_body
-    for k, v in body.iteritems():
+    for k, v in body.items():
         if k == 'home_path':
             if v:
                 env.core.settings_set('pyramid', 'home_path', v)
@@ -248,7 +249,7 @@ def locdata(request):
             tdir, locale, 'LC_MESSAGES', component) + '.jed')
         if os.path.isfile(jsonpath):
             return FileResponse(
-                jsonpath, content_type=b'application/json')
+                jsonpath, content_type='application/json')
 
     # For english locale by default return empty translation, if
     # real translation file was not found. This might be needed if
@@ -259,11 +260,11 @@ def locdata(request):
             "domain": component,
             "lang": "en",
             "plural_forms": "nplurals=2; plural=(n != 1);"
-        }}), content_type=b'application/json')
+        }}), content_type='application/json', charset='utf-8')
 
     return Response(json.dumps(dict(
         error="Locale data not found!"
-    )), status_code=404, content_type=b'application/json')
+    )), status_code=404, content_type='application/json', charset='utf-8')
 
 
 def pkg_version(request):
@@ -286,7 +287,7 @@ def custom_css_get(request):
     except KeyError:
         body = ""
 
-    return Response(body, content_type=b'text/css', expires=timedelta(days=1))
+    return Response(body, content_type='text/css', charset='utf-8', expires=timedelta(days=1))
 
 
 def custom_css_put(request):
@@ -315,18 +316,18 @@ def logo_get(request):
 
 def logo_put(request):
     request.require_administrator()
-    
+
     value = request.json_body
 
     if value is None:
         request.env.core.settings_delete('pyramid', 'logo')
-    
+
     else:
         fn, fnmeta = request.env.file_upload.get_filename(value['id'])
         with open(fn, 'r') as fd:
             request.env.core.settings_set(
                 'pyramid', 'logo',
-                base64.b64encode(fd.read())) 
+                base64.b64encode(fd.read()))
 
     return Response()
 
@@ -386,4 +387,3 @@ def setup_pyramid(comp, config):
                      '/api/component/pyramid/home_path') \
         .add_view(home_path_get, request_method='GET', renderer='json') \
         .add_view(home_path_put, request_method='PUT', renderer='json')
-

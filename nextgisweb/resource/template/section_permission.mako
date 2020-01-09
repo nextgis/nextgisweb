@@ -1,14 +1,14 @@
 <% permsets = obj.permission_sets(request.user) %>
 <div class="table-wrapper">
     <table class="pure-table pure-table-horizontal">
-        %for k, scope in obj.scope.iteritems():
+        %for k, scope in six.iteritems(obj.scope):
             <thead><tr>
                 <th style="width: 70%; text-align: inherit;">${tr(scope.label)}</th>
                 <th style="width: 30%; text-align: inherit;"><tt>${k}</tt></th>
                 <th style="width: 0%">&nbsp;</th>
             </tr></thead>
             <tbody>
-            %for perm in scope.itervalues(ordered=True):
+            %for perm in scope.values(ordered=True):
             <tr>
                 <td>${tr(perm.label)}</td>
                 <td><tt>${perm.name}</tt></td>

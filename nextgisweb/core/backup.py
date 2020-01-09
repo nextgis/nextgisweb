@@ -9,13 +9,13 @@ from subprocess import check_call, check_output
 import io
 import json
 from distutils.version import LooseVersion
-from backports.functools_lru_cache import lru_cache
+import six
 
 import sqlalchemy as sa
 
 from ..registry import registry_maker
 from ..models import DBSession
-
+from ..compat import lru_cache
 
 logger = logging.getLogger(__name__)
 
@@ -136,12 +136,14 @@ def backup(env, dst):
     pg_dir = os.path.join(dst, 'postgres')
     os.mkdir(pg_dir)
 
-    pgd_version = parse_pg_dump_version(check_output(['/usr/bin/pg_dump', '--version']))
+    pgd_version = parse_pg_dump_version(check_output(
+        ['/usr/bin/pg_dump', '--version']).decode('utf-8'))
+
     if pgd_version < LooseVersion('9.5'):
         snp_opt = []
         logger.warn(
             "Data inconsistency possible: ---snapshot option is not supported in pg_dump %s!",
-            unicode(pgd_version))
+            six.text_type(pgd_version))
     else:
         snp_opt = ['--snapshot={}'.format(snapshot), ]
 
@@ -165,7 +167,7 @@ def backup(env, dst):
     pg_listing = check_output([
         '/usr/bin/pg_restore',
         '--list', pg_dir
-    ])
+    ]).decode('utf-8')
 
     @lru_cache(maxsize=None)
     def get_cls_relname(oid):

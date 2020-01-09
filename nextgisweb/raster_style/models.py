@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, absolute_import, print_function, unicode_literals
+from six import StringIO
+
 import numpy
 import PIL
-
 from osgeo import gdal, gdalconst, gdal_array
 from pkg_resources import resource_filename
-from zope.interface import implements
-from StringIO import StringIO
+from zope.interface import implementer
 
 from ..models import declarative_base
 from ..resource import Resource, DataScope
@@ -21,8 +21,8 @@ from .util import _
 Base = declarative_base()
 
 
+@implementer(IExtentRenderRequest, ITileRenderRequest)
 class RenderRequest(object):
-    implements(IExtentRenderRequest, ITileRenderRequest)
 
     def __init__(self, style, srs, cond):
         self.style = style
@@ -37,13 +37,12 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
+@implementer(IRenderableStyle, ILegendableStyle)
 class RasterStyle(Base, Resource):
     identity = 'raster_style'
     cls_display_name = _("Raster style")
 
     __scope__ = DataScope
-
-    implements(IRenderableStyle, ILegendableStyle)
 
     # Only RGB, RGBA rasters are supported.
     @classmethod

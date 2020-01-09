@@ -26,7 +26,7 @@ def handler(obj, request):
     # import ipdb; ipdb.set_trace()
     request.resource_permission(ServiceScope.connect)
 
-    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+    params = dict((k.upper(), v) for k, v in request.params.items())
 
     req = params.get('REQUEST')
     post_data = request.body
@@ -106,7 +106,7 @@ def handler(obj, request):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'wfsserver.wfs', '/api/resource/{id:\d+}/wfs',
+        'wfsserver.wfs', r'/api/resource/{id:\d+}/wfs',
         factory=resource_factory
     ).add_view(handler, context=Service)
 

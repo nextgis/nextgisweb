@@ -12,8 +12,8 @@ from ..auth import User
 class BasicAuthenticationPolicy(PyramidBasicAuthAuthenticationPolicy):
 
     def unauthenticated_userid(self, request):
-        """ Standard Pyramid function always returns login as 
-        userid, but we need number representation of ID. We'll 
+        """ Standard Pyramid function always returns login as
+        userid, but we need number representation of ID. We'll
         swap these by parsing request headers. """
 
         username = super(BasicAuthenticationPolicy, self) \

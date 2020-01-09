@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 import pkg_resources
+import six
 
 
 def amd_packages():
@@ -33,7 +34,7 @@ class PkgInfo(object):
         for epoint in epoints:
             pkginfo = epoint.load()()
             components = pkginfo.get('components', dict())
-            for (comp, modname) in components.iteritems():
+            for (comp, modname) in components.items():
                 package = modname.split('.')[0]
                 self._mod_comp[modname] = comp
                 self._comp_mod[comp] = modname
@@ -44,7 +45,7 @@ class PkgInfo(object):
                         .get_distribution(package).version
                 self._pkg_comp[package].append(comp)
 
-        for k, v in self._pkg_comp.iteritems():
+        for k, v in self._pkg_comp.items():
             self._pkg_comp[k] = tuple(v)
 
         self.scanned = True

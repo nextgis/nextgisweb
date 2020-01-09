@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-import json
+from __future__ import division, absolute_import, print_function, unicode_literals
 
-from StringIO import StringIO
+import json
+from six import StringIO
 
 from lxml import etree
 from lxml.builder import ElementMaker
@@ -39,7 +39,7 @@ class ServiceWidget(Widget):
 def handler(obj, request):
     request.resource_permission(ServiceScope.connect)
 
-    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+    params = dict((k.upper(), v) for k, v in request.params.items())
     req = params.get('REQUEST', '').upper()
     service = params.get('SERVICE', '').upper()
 
@@ -128,7 +128,7 @@ def _get_capabilities(obj, request):
 
 
 def _get_map(obj, request):
-    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+    params = dict((k.upper(), v) for k, v in request.params.items())
     p_layers = params.get('LAYERS').split(',')
     p_bbox = map(float, params.get('BBOX').split(','))
     p_width = int(params.get('WIDTH'))
@@ -166,7 +166,7 @@ def _get_map(obj, request):
 
 
 def _get_feature_info(obj, request):
-    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+    params = dict((k.upper(), v) for k, v in request.params.items())
     p_bbox = map(float, params.get('BBOX').split(','))
     p_width = int(params.get('WIDTH'))
     p_height = int(params.get('HEIGHT'))
@@ -250,7 +250,7 @@ def _get_feature_info(obj, request):
 
 
 def _get_legend_graphic(obj, request):
-    params = dict((k.upper(), v) for k, v in request.params.iteritems())
+    params = dict((k.upper(), v) for k, v in request.params.items())
     p_layer = params.get('LAYER')
 
     lmap = dict((l.keyname, l) for l in obj.layers)
@@ -265,7 +265,7 @@ def _get_legend_graphic(obj, request):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'wmsserver.wms', '/api/resource/{id:\d+}/wms',
+        'wmsserver.wms', r'/api/resource/{id:\d+}/wms',
         factory=resource_factory,
     ).add_view(handler, context=Service)
 

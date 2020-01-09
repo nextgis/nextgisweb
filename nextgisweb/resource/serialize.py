@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 import sys
 from collections import OrderedDict
+import six
 
-from zope import interface
+from zope.interface import Interface, implementer
 
 from ..registry import registry_maker
 from ..models import BaseClass
@@ -44,7 +45,7 @@ class SerializerBase(object):
         return self.obj.has_permission(permission, self.user)
 
 
-class ISerializedAttribute(interface.Interface):
+class ISerializedAttribute(Interface):
 
     def bind(self, srlzrcls, attrname):
         pass
@@ -56,8 +57,8 @@ class ISerializedAttribute(interface.Interface):
         pass
 
 
+@implementer(ISerializedAttribute)
 class SerializedProperty(object):
-    interface.implements(ISerializedAttribute)
 
     def __init__(self, read=None, write=None, scope=None, depth=1):
         self.read = read
@@ -145,22 +146,18 @@ class SerializerMeta(type):
         super(SerializerMeta, cls).__init__(name, bases, nmspc)
 
         proptab = []
-        for prop, sp in nmspc.iteritems():
+        for prop, sp in six.iteritems(nmspc):
             if ISerializedAttribute.providedBy(sp):
                 sp.bind(cls, prop)
                 proptab.append((prop, sp))
 
-        cls.proptab = sorted(proptab, cmp=lambda x, y: cmp(
-            getattr(x[1], '__order__', sys.maxint),
-            getattr(y[1], '__order__', sys.maxint)))
+        cls.proptab = sorted(proptab, key=lambda x: getattr(x[1], '__order__', 65535))
 
         if not nmspc.get('__abstract__', False):
             _registry.register(cls)
 
 
-class Serializer(SerializerBase):
-    __metaclass__ = SerializerMeta
-
+class Serializer(six.with_metaclass(SerializerMeta, SerializerBase)):
     registry = _registry
 
     resclass = None
@@ -180,7 +177,7 @@ class Serializer(SerializerBase):
                 except Exception as exc:
                     exc_info = sys.exc_info()
                     self.annotate_exception(exc, sp)
-                    raise exc_info[0], exc_info[1], exc_info[2]
+                    six.reraise(exc_info[0], exc_info[1], exc_info[2])
 
     def annotate_exception(self, exc, sp):
         exc.__srlzr_prprt__ = sp.attrname
@@ -199,7 +196,7 @@ class CompositeSerializer(SerializerBase):
         super(CompositeSerializer, self).__init__(obj, user, data)
 
         self.members = OrderedDict()
-        for ident, mcls in self.registry._dict.iteritems():
+        for ident, mcls in six.iteritems(self.registry._dict):
             if data is None or ident in data:
                 mdata = data[ident] if data else None
                 mobj = mcls(obj, user, mdata)
@@ -207,24 +204,24 @@ class CompositeSerializer(SerializerBase):
                     self.members[ident] = mobj
 
     def serialize(self):
-        for ident, mobj in self.members.iteritems():
+        for ident, mobj in six.iteritems(self.members):
             try:
                 mobj.serialize()
                 self.data[ident] = mobj.data
             except Exception as exc:
                 exc_info = sys.exc_info()
                 self.annotate_exception(exc, mobj)
-                raise exc_info[0], exc_info[1], exc_info[2]
+                six.reraise(exc_info[0], exc_info[1], exc_info[2])
 
     def deserialize(self):
-        for ident, mobj in self.members.iteritems():
+        for ident, mobj in six.iteritems(self.members):
             try:
                 if ident in self.data:
                     mobj.deserialize()
             except Exception as exc:
                 exc_info = sys.exc_info()
                 self.annotate_exception(exc, mobj)
-                raise exc_info[0], exc_info[1], exc_info[2]
+                six.reraise(exc_info[0], exc_info[1], exc_info[2])
 
     def annotate_exception(self, exc, mobj):
         """ Adds information about serializer that called the exception to the exception """
@@ -243,14 +240,14 @@ def serval(value):
         value is None
         or isinstance(value, int)  # NOQA: W503
         or isinstance(value, float)  # NOQA: W503
-        or isinstance(value, basestring)  # NOQA: W503
+        or isinstance(value, six.string_types)  # NOQA: W503
     ):
         return value
 
     elif isinstance(value, dict):
         return dict(map(
             lambda k, v: (serval(k), serval(v)),
-            value.iteritems()))
+            six.iteritems(value)))
 
     elif isinstance(value, BaseClass):
         return dict(map(

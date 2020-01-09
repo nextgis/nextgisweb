@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from StringIO import StringIO
+from __future__ import division, absolute_import, print_function, unicode_literals
 import json
+from io import BytesIO
 
 from PIL import Image
 from pyramid.response import Response, FileResponse
@@ -23,7 +23,7 @@ def download(resource, request):
     ).one()
 
     fn = env.file_storage.filename(obj.fileobj)
-    return FileResponse(fn, content_type=bytes(obj.mime_type), request=request)
+    return FileResponse(fn, content_type=obj.mime_type, request=request)
 
 
 def image(resource, request):
@@ -40,7 +40,7 @@ def image(resource, request):
     exif = None
     try:
         exif = image._getexif()
-    except:
+    except Exception:
         pass
 
     if exif is not None:
@@ -51,14 +51,14 @@ def image(resource, request):
 
     if 'size' in request.GET:
         image.thumbnail(
-            map(int, request.GET['size'].split('x')),
+            list(map(int, request.GET['size'].split('x'))),
             Image.ANTIALIAS)
 
-    buf = StringIO()
+    buf = BytesIO()
     image.save(buf, ext)
     buf.seek(0)
 
-    return Response(body_file=buf, content_type=bytes(obj.mime_type))
+    return Response(body_file=buf, content_type=obj.mime_type)
 
 
 def iget(resource, request):
@@ -71,7 +71,8 @@ def iget(resource, request):
 
     return Response(
         json.dumps(obj.serialize()),
-        content_type=b'application/json')
+        content_type='application/json',
+        charset='utf-8')
 
 
 def idelete(resource, request):
@@ -86,7 +87,8 @@ def idelete(resource, request):
 
     return Response(
         json.dumps(None),
-        content_type=b'application/json')
+        content_type='application/json',
+        charset='utf-8')
 
 
 def iput(resource, request):
@@ -103,7 +105,8 @@ def iput(resource, request):
 
     return Response(
         json.dumps(dict(id=obj.id)),
-        content_type=b'application/json')
+        content_type='application/json',
+        charset='utf-8')
 
 
 def cget(resource, request):
@@ -117,7 +120,8 @@ def cget(resource, request):
 
     return Response(
         json.dumps(result),
-        content_type=b'application/json')
+        content_type='application/json',
+        charset='utf-8')
 
 
 def cpost(resource, request):
@@ -139,7 +143,8 @@ def cpost(resource, request):
 
     return Response(
         json.dumps(dict(id=obj.id)),
-        content_type=b'application/json')
+        content_type='application/json',
+        charset='utf-8')
 
 
 def setup_pyramid(comp, config):

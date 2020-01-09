@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
 import json
-from types import MethodType
 from collections import OrderedDict
 
 from pyramid.response import Response
@@ -18,7 +18,6 @@ from .. import dynmenu as dm
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension
-from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 from .util import _
 
 
@@ -52,7 +51,7 @@ def feature_show(request):
     feature_id = int(request.matchdict['feature_id'])
 
     ext_mid = OrderedDict()
-    for k, ecls in FeatureExtension.registry._dict.iteritems():
+    for k, ecls in FeatureExtension.registry._dict.items():
         if hasattr(ecls, 'display_widget'):
             ext_mid[k] = ecls.display_widget
 
@@ -137,40 +136,40 @@ def export(request):
 def setup_pyramid(comp, config):
     config.add_route(
         'feature_layer.feature.browse',
-        '/resource/{id:\d+}/feature/',
+        r'/resource/{id:\d+}/feature/',
         factory=resource_factory,
         client=('id', )
     ).add_view(feature_browse, context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.feature.show',
-        '/resource/{id:\d+}/feature/{feature_id:\d+}',
+        r'/resource/{id:\d+}/feature/{feature_id:\d+}',
         factory=resource_factory,
         client=('id', 'feature_id')
     ).add_view(feature_show, context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.feature.update',
-        '/resource/{id:\d+}/feature/{feature_id}/update',
+        r'/resource/{id:\d+}/feature/{feature_id}/update',
         factory=resource_factory,
         client=('id', 'feature_id')
     ).add_view(feature_update, context=IFeatureLayer)
 
     config.add_route(
-        'feature_layer.field', '/resource/{id:\d+}/field/',
+        'feature_layer.field', r'/resource/{id:\d+}/field/',
         factory=resource_factory,
         client=('id', )
     ).add_view(field_collection, context=IFeatureLayer, renderer='json')
 
     config.add_route(
         'feature_layer.store.item',
-        '/resource/{id:\d+}/store/{feature_id:\d+}',
+        r'/resource/{id:\d+}/store/{feature_id:\d+}',
         factory=resource_factory,
         client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer)
 
     config.add_route(
-        'feature_layer.export.page', '/resource/{id:\d+}/export',
+        'feature_layer.export.page', r'/resource/{id:\d+}/export',
         factory=resource_factory,
     ).add_view(export, context=IFeatureLayer)
 
@@ -178,29 +177,6 @@ def setup_pyramid(comp, config):
         'feature_layer.test_mvt',
         '/feature_layer/test_mvt'
     ).add_view(test_mvt)
-
-    def client_settings(self, request):
-        editor_widget = OrderedDict()
-        for k, ecls in FeatureExtension.registry._dict.iteritems():
-            if hasattr(ecls, 'editor_widget'):
-                editor_widget[k] = ecls.editor_widget
-
-        return dict(
-            editor_widget=editor_widget,
-            extensions=dict(map(
-                lambda ext: (ext.identity, ext.display_widget),
-                FeatureExtension.registry
-            )),
-            identify=dict(
-                attributes=self.settings['identify.attributes']
-            ),
-            search=dict(
-                nominatim=self.settings['search.nominatim']
-            ),
-            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
-        )
-
-    comp.client_settings = MethodType(client_settings, comp, comp.__class__)
 
     # Layer menu extension
     class LayerMenuExt(dm.DynItem):

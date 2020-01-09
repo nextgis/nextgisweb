@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 import json
 import uuid
 import types
@@ -8,10 +7,10 @@ import zipfile
 import tempfile
 import shutil
 import ctypes
-
-from backports.functools_lru_cache import lru_cache
 from datetime import datetime, time, date
-from zope.interface import implements
+import six
+
+from zope.interface import implementer
 from osgeo import ogr, osr
 
 from sqlalchemy.sql import ColumnElement
@@ -40,6 +39,7 @@ from ..env import env
 from ..geometry import geom_from_wkb, box
 from ..models import declarative_base, DBSession
 from ..layer import SpatialLayerMixin, IBboxLayer
+from ..compat import lru_cache
 
 from ..feature_layer import (
     Feature,
@@ -254,7 +254,7 @@ class TableInfo(object):
 
         class model(object):
             def __init__(self, **kwargs):
-                for k, v in kwargs.iteritems():
+                for k, v in six.iteritems(kwargs):
                     setattr(self, k, v)
 
         table = db.Table(
@@ -376,13 +376,12 @@ class VectorLayerField(Base, LayerField):
     fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
 
+@implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = _("Vector layer")
 
     __scope__ = DataScope
-
-    implements(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 
     tbl_uuid = db.Column(db.Unicode(32), nullable=False)
     geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
@@ -674,20 +673,20 @@ def _set_encoding(encoding):
                 # Set SHAPE_ENCODING value
 
                 # Keep copy of the current value
-                tmp = self.get_option('SHAPE_ENCODING', None)
+                tmp = self.get_option('SHAPE_ENCODING'.encode(), None)
                 self.old_value = self.strdup(tmp)
 
                 # Set new value
-                self.set_option('SHAPE_ENCODING', '')
+                self.set_option('SHAPE_ENCODING'.encode(), ''.encode())
 
                 return strdecode
 
-            return lambda (x): x
+            return lambda x: x
 
         def __exit__(self, type, value, traceback):
             if self.encoding:
                 # Return old value
-                self.set_option('SHAPE_ENCODING', self.old_value)
+                self.set_option('SHAPE_ENCODING'.encode(), self.old_value)
 
     return encoding_section(encoding)
 
@@ -740,9 +739,14 @@ class _source_attr(SP):
             else:
                 ogrfn = datafile
 
-            with _set_encoding(encoding) as sdecode:
+            if six.PY2:
+                with _set_encoding(encoding) as sdecode:
+                    ogrds = ogr.Open(ogrfn)
+                    recode = sdecode
+            else:
+                # Ignore encoding option in Python 3
                 ogrds = ogr.Open(ogrfn)
-                recode = sdecode
+                recode = lambda x: x   # NOQA: E731
 
             if ogrds is None:
                 raise VE(_("GDAL library failed to open file."))
@@ -813,16 +817,17 @@ def _clipbybox2d_exists():
     )
 
 
+@implementer(
+    IFeatureQuery,
+    IFeatureQueryFilter,
+    IFeatureQueryFilterBy,
+    IFeatureQueryLike,
+    IFeatureQueryIntersects,
+    IFeatureQueryOrderBy,
+    IFeatureQueryClipByBox,
+    IFeatureQuerySimplify,
+)
 class FeatureQueryBase(object):
-    implements(
-        IFeatureQuery,
-        IFeatureQueryFilter,
-        IFeatureQueryFilterBy,
-        IFeatureQueryLike,
-        IFeatureQueryIntersects,
-        IFeatureQueryOrderBy,
-        IFeatureQueryClipByBox,
-        IFeatureQuerySimplify)
 
     def __init__(self):
         self._srs = None
@@ -957,7 +962,7 @@ class FeatureQueryBase(object):
                 selected_fields.append(f)
 
         if self._filter_by:
-            for k, v in self._filter_by.iteritems():
+            for k, v in six.iteritems(self._filter_by):
                 if k == 'id':
                     where.append(table.columns.id == v)
                 else:
@@ -1065,7 +1070,9 @@ class FeatureQueryBase(object):
                     fdict = dict((f.keyname, row[f.keyname])
                                  for f in selected_fields)
                     if self._geom:
-                        geom = geom_from_wkb(str(row['geom']))
+                        geom = geom_from_wkb(
+                            row['geom'].tobytes() if six.PY3
+                            else six.binary_type(row['geom']))
                     else:
                         geom = None
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, absolute_import, print_function, unicode_literals
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
 
@@ -117,8 +117,8 @@ class AuthComponent(Component):
 
     settings_info = (
         dict(key='register', description="Allow user registration"),
-        dict(key='login_route_name', description="Name of route for login page (default: 'auth.login')"),
-        dict(key='logout_route_name', description="Name of route for logout page (default: 'auth.logout')"),
+        dict(key='login_route_name', description="Name of route for login page (default: 'auth.login')"),  # NOQA: E501
+        dict(key='logout_route_name', description="Name of route for logout page (default: 'auth.logout')"),  # NOQA: E501
     )
 
 

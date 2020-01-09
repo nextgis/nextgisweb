@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from collections import namedtuple
 import warnings
 
-from zope.interface import Interface, Attribute, implements, classImplements
+from zope.interface import Interface, Attribute, implementer, classImplements
 from zope.interface.interface import adapter_hooks
 
 from ..i18n import TrString, translator
@@ -42,9 +42,8 @@ def adapt_exception_to_user_exception(iface, obj):
             return obj.__user_exception__
 
 
+@implementer(IUserException)
 class UserException(Exception):
-    implements(IUserException)
-
     title = None
     message = None
 
@@ -80,12 +79,15 @@ class UserException(Exception):
 
         _self_attr('http_status_code', http_status_code)
 
-    def __unicode__(self):
+    def __str__(self):
         return "{}: {}".format(
             self.__class__.__name__,
             translator(None)(self.message)
             if isinstance(self.message, TrString)
             else self.message)
+
+    def __unicode__(self):
+        return self.__str__()
 
 
 class ValidationError(UserException):

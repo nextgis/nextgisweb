@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
+
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
-from osgeo import osr
 
 from .. import db
 from ..models import declarative_base
-from ..core.exception import ValidationError
 
-from .util import _
+from .util import convert_to_proj
 
 Base = declarative_base()
 
 SRID_MAX = 998999     # PostGIS maximum srid (srs.id)
 SRID_LOCAL = 990001   # First local srid (srs.id)
 
-WKT_ESPG_4326 = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]'
-WKT_ESPG_3857 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]'
+WKT_ESPG_4326 = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]'  # NOQA: E501
+WKT_ESPG_3857 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]'  # NOQA: E501
 
 
 class SRS(Base):
@@ -30,8 +30,8 @@ class SRS(Base):
         sa.Integer, id_seq, primary_key=True, autoincrement=False,
         server_default=id_seq.next_value())
     display_name = sa.Column(sa.Unicode, nullable=False)
-    auth_name = sa.Column(sa.Unicode) # NULL auth_* used for
-    auth_srid = sa.Column(sa.Integer) # custom local projection
+    auth_name = sa.Column(sa.Unicode)  # NULL auth_* used for
+    auth_srid = sa.Column(sa.Integer)  # custom local projection
     wkt = sa.Column(sa.Unicode, nullable=False)
     proj4 = sa.Column(sa.Unicode, nullable=False)
     minx = sa.Column(sa.Float)
@@ -56,16 +56,9 @@ class SRS(Base):
     def delete(selef):
         raise Exception()
 
-
     @db.validates('wkt')
     def _validate_wkt(self, key, value):
-        sr = osr.SpatialReference()
-        value = value.encode('utf-8')
-        if sr.ImportFromWkt(value) != 0:
-            raise ValidationError(
-                message=_("Invalid OGC WKT definition!"))
-
-        self.proj4 = sr.ExportToProj4()
+        self.proj4 = convert_to_proj(value)
         return value
 
     def tile_extent(self, tile):
@@ -85,8 +78,11 @@ class SRS(Base):
             (extent[1] + extent[3]) / 2,
         )
 
+    def __str__(self):
+        return self.display_name
+
     def __unicode__(self):
-        return  self.display_name
+        return self.__str__()
 
     @property
     def disabled(self):
@@ -103,7 +99,7 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
             auth_name = NEW.auth_name, auth_srid = NEW.auth_srid,
             srtext = NEW.wkt, proj4text = NEW.proj4
             WHERE srid = NEW.id;
-            
+
             -- Insert if missing
             INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text)
             SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt, NEW.proj4
@@ -111,7 +107,7 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
 
             RETURN NEW;
         END IF;
-        
+
         IF TG_OP = 'DELETE' THEN
             -- Delete existing row
             DELETE FROM spatial_ref_sys WHERE srid = OLD.id;

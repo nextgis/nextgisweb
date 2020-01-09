@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import namedtuple
+from six.moves.urllib.parse import unquote
 
 from ..resource import Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
@@ -8,7 +9,6 @@ from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .adapter import WebMapAdapter
 from .util import _
-import urllib
 
 
 class ExtentWidget(Widget):
@@ -101,10 +101,10 @@ def setup_pyramid(comp, config):
                 # with no permissions
                 data.update(
                     expanded=item.group_expanded,
-                    children=filter(
+                    children=list(filter(
                         None,
                         map(traverse, item.children)
-                    )
+                    ))
                 )
 
             return data
@@ -147,12 +147,12 @@ def setup_pyramid(comp, config):
         )
 
     config.add_route(
-        'webmap.display', '/resource/{id:\d+}/display',
+        'webmap.display', r'/resource/{id:\d+}/display',
         factory=resource_factory, client=('id',)
     ).add_view(display, context=WebMap, renderer='nextgisweb:webmap/template/display.mako')
 
     config.add_route(
-        'webmap.display.tiny', '/resource/{id:\d+}/display/tiny',
+        'webmap.display.tiny', r'/resource/{id:\d+}/display/tiny',
         factory=resource_factory, client=('id',)
     ).add_view(display, context=WebMap, renderer='nextgisweb:webmap/template/tinyDisplay.mako')
 
@@ -160,7 +160,7 @@ def setup_pyramid(comp, config):
         iframe = request.POST['iframe']
         request.response.headerlist.append(("X-XSS-Protection", "0"))
         return dict(
-            iframe=urllib.unquote(urllib.unquote(iframe))
+            iframe=unquote(unquote(iframe))
         )
 
     config.add_route(

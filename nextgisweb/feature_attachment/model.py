@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
+import io
+
 from collections import OrderedDict
 from shutil import copyfileobj
 
@@ -51,7 +53,7 @@ class FeatureAttachment(Base):
             srcfile, _ = env.file_upload.get_filename(file_upload['id'])
             dstfile = env.file_storage.filename(self.fileobj, makedirs=True)
 
-            with open(srcfile, 'r') as fs, open(dstfile, 'w') as fd:
+            with io.open(srcfile, 'rb') as fs, io.open(dstfile, 'wb') as fd:
                 copyfileobj(fs, fd)
 
             for k in ('name', 'mime_type', 'size'):

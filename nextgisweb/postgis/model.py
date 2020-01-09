@@ -5,7 +5,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
-from zope.interface import implements
+from zope.interface import implementer
 
 from .. import db
 from ..models import declarative_base
@@ -145,13 +145,12 @@ class PostgisLayerField(Base, LayerField):
     column_name = db.Column(db.Unicode, nullable=False)
 
 
+@implementer(IFeatureLayer, IWritableFeatureLayer)
 class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'postgis_layer'
     cls_display_name = _("PostGIS layer")
 
     __scope__ = DataScope
-
-    implements(IFeatureLayer, IWritableFeatureLayer)
 
     connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
     schema = db.Column(db.Unicode, default=u'public', nullable=False)
@@ -455,6 +454,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         finally:
             conn.close()
 
+
 DataScope.read.require(
     ConnectionScope.connect,
     attr='connection', cls=PostgisLayer)
@@ -496,14 +496,15 @@ class PostgisLayerSerializer(Serializer):
     fields = _fields_action(write=DataStructureScope.write)
 
 
+@implementer(
+    IFeatureQuery,
+    IFeatureQueryFilter,
+    IFeatureQueryFilterBy,
+    IFeatureQueryLike,
+    IFeatureQueryIntersects,
+    IFeatureQueryOrderBy,
+)
 class FeatureQueryBase(object):
-    implements(
-        IFeatureQuery,
-        IFeatureQueryFilter,
-        IFeatureQueryFilterBy,
-        IFeatureQueryLike,
-        IFeatureQueryIntersects,
-        IFeatureQueryOrderBy)
 
     def __init__(self):
         self._srs = None
@@ -583,7 +584,7 @@ class FeatureQueryBase(object):
                 fieldmap.append((fld.keyname, clabel))
 
         if self._filter_by:
-            for k, v in self._filter_by.iteritems():
+            for k, v in self._filter_by.items():
                 if k == 'id':
                     select.append_whereclause(idcol == v)
                 else:

@@ -8,7 +8,7 @@ class WebMapAdapter(object):
     """ Web map adapter is responsible for how layer style
     will be displayed on web map.
 
-    It consists of two parts. First works on the server and implemented as 
+    It consists of two parts. First works on the server and implemented as
     a python-class, second works on fronend and implemented as an AMD module. """
 
     registry = registry_maker()
@@ -16,7 +16,7 @@ class WebMapAdapter(object):
 
 @WebMapAdapter.registry.register
 class TileAdapter(object):
-    """ An adapter that implements visulation of layer style through 
+    """ An adapter that implements visulation of layer style through
     tile service, but the service itself is implemented by other component. """
 
     identity = 'tile'
@@ -26,7 +26,7 @@ class TileAdapter(object):
 
 @WebMapAdapter.registry.register
 class ImageAdapter(object):
-    """ An adapter that implements visulation of layer style through 
+    """ An adapter that implements visulation of layer style through
     WMS-like GetImage request, but the service itself is implemented by other component. """
 
     identity = 'image'

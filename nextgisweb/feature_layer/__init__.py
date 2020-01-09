@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
+from collections import OrderedDict
+
 from ..component import Component, require
 
 from .feature import Feature, FeatureSet
@@ -22,6 +25,7 @@ from .interface import (
 from .event import on_data_change
 from .extension import FeatureExtension
 from .api import query_feature_or_not_found
+from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 
 __all__ = [
     'Feature',
@@ -65,6 +69,27 @@ class FeatureLayerComponent(Component):
         from . import view, api
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
+
+    def client_settings(self, request):
+        editor_widget = OrderedDict()
+        for k, ecls in FeatureExtension.registry._dict.items():
+            if hasattr(ecls, 'editor_widget'):
+                editor_widget[k] = ecls.editor_widget
+
+        return dict(
+            editor_widget=editor_widget,
+            extensions=dict(map(
+                lambda ext: (ext.identity, ext.display_widget),
+                FeatureExtension.registry
+            )),
+            identify=dict(
+                attributes=self.settings['identify.attributes']
+            ),
+            search=dict(
+                nominatim=self.settings['search.nominatim']
+            ),
+            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
+        )
 
     settings_info = (
         dict(key='identify.attributes', desc=u"Show attributes in identification"),

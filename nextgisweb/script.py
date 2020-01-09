@@ -125,7 +125,7 @@ def config(argv=sys.argv):
                 elif not args.no_comments:
                     print('# %s = ' % s['key'])
 
-            for k, v in preseedsect.iteritems():
+            for k, v in preseedsect.items():
                 if k not in preseedkeys:
                     print('%s = %s' % (k, v))
 

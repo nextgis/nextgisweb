@@ -14,7 +14,7 @@
     %for feature in result.features:
         <div style="margin-top: 1ex; font-size: 120%; background-color: #EEE;"> 
             <strong>${idx}.</strong>
-            ${unicode(feature)}
+            ${six.text_type(feature)}
             (<em>${result.keyname}</em>)
         </div>
 

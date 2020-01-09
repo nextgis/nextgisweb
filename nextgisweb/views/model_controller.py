@@ -13,7 +13,7 @@ class DeleteWidget(ObjectWidget):
 
 class ModelController(object):
 
-    def __init__(self, route_prefix, url_base=None, item_path='{id:\d+}',
+    def __init__(self, route_prefix, url_base=None, item_path=r'{id:\d+}',
                  client_base=(), client=('id', )):
         if not url_base:
             url_base = '/%s' % route_prefix

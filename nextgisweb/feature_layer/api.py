@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 import json
 import os
 import re
-import urllib
 import uuid
 import zipfile
 import itertools
+from six.moves.urllib.parse import unquote
 
 import backports.tempfile
 from collections import OrderedDict
@@ -90,7 +90,7 @@ def export(request):
     else:
         format = format.upper()
 
-    if not format in EXPORT_FORMAT_OGR:
+    if format not in EXPORT_FORMAT_OGR:
         raise ValidationError(
             _("Format '%s' is not supported.") % (format,)
         )
@@ -385,7 +385,7 @@ def iget(resource, request):
 
     return Response(
         json.dumps(serialize(result, geom_format=geom_format), cls=geojson.Encoder),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def iput(resource, request):
@@ -402,7 +402,7 @@ def iput(resource, request):
 
     return Response(
         json.dumps(dict(id=feature.id)),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def idelete(resource, request):
@@ -411,7 +411,7 @@ def idelete(resource, request):
     fid = int(request.matchdict['fid'])
     resource.feature_delete(fid)
 
-    return Response(json.dumps(None), content_type=b'application/json')
+    return Response(json.dumps(None), content_type='application/json', charset='utf-8')
 
 
 def cget(resource, request):
@@ -470,7 +470,7 @@ def cget(resource, request):
 
     return Response(
         json.dumps(result, cls=geojson.Encoder),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def cpost(resource, request):
@@ -482,7 +482,7 @@ def cpost(resource, request):
 
     return Response(
         json.dumps(dict(id=fid)),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def cpatch(resource, request):
@@ -512,7 +512,7 @@ def cpatch(resource, request):
 
         result.append(dict(id=fid))
 
-    return Response(json.dumps(result), content_type=b'application/json')
+    return Response(json.dumps(result), content_type='application/json', charset='utf-8')
 
 
 def cdelete(resource, request):
@@ -529,7 +529,7 @@ def cdelete(resource, request):
         resource.feature_delete_all()
         result = True
 
-    return Response(json.dumps(result), content_type=b'application/json')
+    return Response(json.dumps(result), content_type='application/json', charset='utf-8')
 
 
 def count(resource, request):
@@ -540,7 +540,7 @@ def count(resource, request):
 
     return Response(
         json.dumps(dict(total_count=total_count)),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def store_collection(layer, request):
@@ -554,11 +554,11 @@ def store_collection(layer, request):
         query.limit(last - first + 1, first)
 
     field_prefix = json.loads(
-        urllib.unquote(request.headers.get('x-field-prefix', '""')))
-    pref = lambda f: field_prefix + f
+        unquote(request.headers.get('x-field-prefix', '""')))
+    pref = lambda f: field_prefix + f  # NOQA: E731
 
     field_list = json.loads(
-        urllib.unquote(request.headers.get('x-field-list', "[]")))
+        unquote(request.headers.get('x-field-list', "[]")))
     if len(field_list) > 0:
         query.fields(*field_list)
 
@@ -571,7 +571,7 @@ def store_collection(layer, request):
         query.like(like)
 
     sort_re = re.compile(r'sort\(([+-])%s(\w+)\)' % (field_prefix, ))
-    sort = sort_re.search(urllib.unquote(request.query_string))
+    sort = sort_re.search(unquote(request.query_string))
     if sort:
         sort_order = {'+': 'asc', '-': 'desc'}[sort.group(1)]
         sort_colname = sort.group(2)
@@ -582,7 +582,7 @@ def store_collection(layer, request):
     result = []
     for fobj in features:
         fdata = dict(
-            [(pref(k), v) for k, v in fobj.fields.iteritems()],
+            [(pref(k), v) for k, v in fobj.fields.items()],
             id=fobj.id, label=fobj.label)
         if box:
             fdata['box'] = fobj.box.bounds
@@ -637,7 +637,7 @@ def setup_pyramid(comp, config):
         .add_view(count, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
-        'feature_layer.store', '/api/resource/{id:\d+}/store/',
+        'feature_layer.store', r'/api/resource/{id:\d+}/store/',
         factory=resource_factory) \
         .add_view(store_collection, context=IFeatureLayer, request_method='GET')
 

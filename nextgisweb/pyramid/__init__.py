@@ -4,9 +4,9 @@ import os.path
 import re
 import warnings
 from hashlib import md5
-from StringIO import StringIO
 from pkg_resources import resource_filename, get_distribution
 from collections import namedtuple
+from six import StringIO
 
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
@@ -46,13 +46,13 @@ class PyramidComponent(Component):
 
         is_debug = self.env.core.debug
 
+        settings['mako.imports'] = settings.get('mako.imports', []) + [
+            'import six', 'from nextgisweb.i18n import tcheck']
+
         # If debug is on, add mako-filter that checks
         # if the line was translated before output.
-
         if is_debug:
             settings['mako.default_filters'] = ['tcheck', 'h']
-            settings['mako.imports'] = settings.get('mako.imports', []) \
-                + ['from nextgisweb.i18n import tcheck', ]
 
         # If pyramid config doesn't state otherwise, use locale from,
         # core component, while this is not clear why we need that.
@@ -113,6 +113,10 @@ class PyramidComponent(Component):
         config.registry.settings['error.exc_response'] = error_handler
         config.include(exception)
 
+        config.add_tween(
+            'nextgisweb.pyramid.util.header_encoding_tween_factory',
+            over=('nextgisweb.pyramid.exception.unhandled_exception_tween_factory', ))
+
         # Access to Env through request.env
         config.add_request_method(
             lambda req: self._env, 'env',
@@ -166,7 +170,7 @@ class PyramidComponent(Component):
                 warnings.filterwarnings('ignore', r'DEPRECATION: Python 2\.7 will reach')
                 pip_main(['freeze', ])
             h = md5()
-            h.update(buf.getvalue())
+            h.update(buf.getvalue().encode('utf-8'))
             static_key = '/' + h.hexdigest()
         finally:
             sys.stdout = stdout
@@ -207,7 +211,8 @@ class PyramidComponent(Component):
         config.add_route('amd_package', '/static%s/amd/*subpath' % static_key) \
             .add_view('nextgisweb.views.amd_package')
 
-        for comp in self._env.chain('setup_pyramid'):
+        chain = self._env.chain('setup_pyramid', first='pyramid')
+        for comp in chain:
             comp.setup_pyramid(config)
 
         def html_error_handler(request, err_info, exc, exc_info):

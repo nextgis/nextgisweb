@@ -11,6 +11,7 @@ from ..resource import (
     SerializedProperty)
 
 from .util import COMP_ID
+import six
 
 
 Base = declarative_base()
@@ -51,7 +52,7 @@ class ResourceMetadataItem(Base):
     def value(self, value):
         self.vinteger = value if isinstance(value, int) else None
         self.vfloat = value if isinstance(value, float) else None
-        self.vtext = value if isinstance(value, basestring) else None
+        self.vtext = value if isinstance(value, six.string_types) else None
 
 
 class _items_attr(SerializedProperty):
@@ -79,7 +80,7 @@ class _items_attr(SerializedProperty):
         # Remove records to be removed
         map(lambda i: odata.remove(i), rml)
 
-        for k, val in value.iteritems():
+        for k, val in value.items():
             if val is None:
                 continue
 

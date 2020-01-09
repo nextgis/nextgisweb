@@ -3,15 +3,14 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import pytest
 from pyramid.config import Configurator
-import zope.interface
+from zope.interface import implementer
 
 from nextgisweb.core.exception import IUserException
 from nextgisweb.pyramid import exception
 
 
+@implementer(IUserException)
 class ErrorTest(Exception):
-    zope.interface.implements(IUserException)
-
     title = "Test title"
     message = "Test message"
     detail = "Test detail"
@@ -33,6 +32,10 @@ def webapp():
 
     config = Configurator(settings=settings)
     config.include(exception)
+
+    config.add_tween(
+        'nextgisweb.pyramid.util.header_encoding_tween_factory',
+        over=('nextgisweb.pyramid.exception.unhandled_exception_tween_factory', ))
 
     def view_error(request):
         raise ErrorTest()

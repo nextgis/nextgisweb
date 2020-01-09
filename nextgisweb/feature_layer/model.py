@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
+
 from collections import OrderedDict
 
 from osgeo import ogr, osr
@@ -50,8 +52,11 @@ class LayerField(Base):
         primaryjoin='Resource.id == LayerField.layer_id',
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.display_name
+
+    def __unicode__(self):
+        return self.__str__()
 
     def to_dict(self):
         return dict(

@@ -4,10 +4,10 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import webtest
 
 TEST_FILENAME = 'file.ext'
-TEST_CONTENT = bytes('content')
+TEST_CONTENT = 'content'.encode('utf-8')
 
 TEST_FILENAME2 = 'file2.ext'
-TEST_CONTENT2 = bytes('content2')
+TEST_CONTENT2 = 'content2'.encode('utf-8')
 
 
 def test_upload_post_single(env, webapp):

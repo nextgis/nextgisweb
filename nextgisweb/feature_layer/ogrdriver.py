@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
 import collections
 
 
@@ -73,5 +74,5 @@ OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
         "extension": format.extension,
         "single_file": format.single_file,
     }
-    for _, format in EXPORT_FORMAT_OGR.iteritems()
+    for _, format in EXPORT_FORMAT_OGR.items()
 ]
