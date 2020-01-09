@@ -111,8 +111,6 @@ def login(request):
 
             headers = remember(request, user.id)
 
-            print(headers)
-
             return Response(
                 json.dumps({
                     "keyname": user.keyname,
