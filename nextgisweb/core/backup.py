@@ -106,10 +106,10 @@ def parse_pg_dump_version(output):
 
 def pg_connection_options(env):
     return [
-        '--host', env.core.settings['database.host'],
-        '--username', env.core.settings['database.user'],
-        '--dbname', env.core.settings['database.name'],
-    ], env.core.settings['database.password']
+        '--host', env.core.options['database.host'],
+        '--username', env.core.options['database.user'],
+        '--dbname', env.core.options['database.name'],
+    ], env.core.options['database.password']
 
 
 def backup(env, dst):

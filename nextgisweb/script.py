@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
 import sys
 import os
-import codecs
 from argparse import ArgumentParser
-from six.moves.configparser import RawConfigParser
+from textwrap import wrap
 
 from pyramid.paster import setup_logging
 
+from .lib.config import load_config, NO_DEFAULT
 from .env import Env, setenv
 from .command import Command
 
@@ -43,16 +42,7 @@ def main(argv=sys.argv):
     if logging:
         setup_logging(logging)
 
-    cfg = RawConfigParser()
-
-    if config:
-        cfg.readfp(codecs.open(config, 'r', 'utf-8'))
-
-    for section in cfg.sections():
-        for item, value in cfg.items(section):
-            cfg.set(section, item, value % os.environ)
-
-    env = Env(cfg=cfg)
+    env = Env(cfg=load_config(config))
     env.initialize()
 
     setenv(env)
@@ -76,57 +66,46 @@ def config(argv=sys.argv):
     argparser = ArgumentParser()
 
     argparser.add_argument(
-        '--no-comments', dest='no_comments', action='store_true',
+        '--values-only', dest='values_only', action='store_true',
         help="Don't include settings description in comments")
 
-    argparser.add_argument(
-        '--preseed', metavar='file.ini', default=None,
-        help="Presets file")
-
     args = argparser.parse_args(argv[1:])
-
-    # trying to fix utf-8
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
     from .component import Component, load_all
     load_all()
 
-    preseedcfg = RawConfigParser()
-
-    if args.preseed:
-        with codecs.open(args.preseed, 'r', 'utf-8') as fd:
-            preseedcfg.readfp(fd)
-
     for comp in Component.registry:
-        if hasattr(comp, 'settings_info'):
-            print('[%s]' % comp.identity)
+        try:
+            comp_option_annotaions = comp.option_annotations
+        except AttributeError:
+            continue
 
-            if not args.no_comments:
-                print('')
+        def cprint(*lines):
+            if not cprint._section:
+                print("[{}]".format(comp.identity))
+                if not args.values_only:
+                    print()
+                cprint._section = True
+            print(*lines)
 
-            preseedsect = dict(
-                preseedcfg.items(comp.identity)
-                if preseedcfg.has_section(comp.identity)
-                else ())
+        cprint._section = False
 
-            preseedkeys = set()
+        for oa in comp_option_annotaions:
+            default = oa.otype.dumps(oa.default) if oa.default != NO_DEFAULT else ""
 
-            for s in comp.settings_info:
-                if not args.no_comments and 'desc' in s:
-                    print('# %s ' % s['desc'])
+            if not args.values_only:
+                cprint(
+                    "# Option: {key} ({otype})".format(key=oa.key, otype=oa.otype)
+                    + (" (required)" if oa.required else "")  # NOQA: W503
+                    + (" (default: {})".format(default) if default != '' else "")  # NOQA: W503
+                )
+                if oa.doc is not None:
+                    cprint('\n'.join([("#         " + l) for l in wrap(oa.doc, 60)]))
 
-                if s['key'] in preseedsect:
-                    print('%s = %s' % (s['key'], preseedsect[s['key']]))
-                    preseedkeys.add(s['key'])
+            if oa.required:
+                cprint("{key} = ".format(key=oa.key))
+            elif not args.values_only:
+                cprint("; {key} = {default}".format(default=default, key=oa.key))
 
-                elif 'default' in s:
-                    print('%s = %s' % (s['key'], s['default']))
-
-                elif not args.no_comments:
-                    print('# %s = ' % s['key'])
-
-            for k, v in preseedsect.items():
-                if k not in preseedkeys:
-                    print('%s = %s' % (k, v))
-
-            print('')
+            if not args.values_only:
+                cprint()

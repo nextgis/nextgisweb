@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 import logging
+import warnings
 import six
 
+from .lib.config import ConfigOptions
 from .registry import registry_maker
 from .package import pkginfo
 
@@ -29,7 +31,12 @@ class Component(six.with_metaclass(ComponentMeta, object)):
 
     def __init__(self, env, settings):
         self._env = env
+
         self._settings = settings
+        self._options = ConfigOptions(
+            settings, self.option_annotations
+            if hasattr(self, 'option_annotations') else ())
+
         self._logger = logging.getLogger('nextgisweb.comp.' + self.identity)
 
     def initialize(self):
@@ -64,7 +71,14 @@ class Component(six.with_metaclass(ComponentMeta, object)):
 
     @property
     def settings(self):
+        warnings.warn(
+            "Deprecated attribute component.settings, use component.options instead.",
+            DeprecationWarning, stacklevel=2)
         return self._settings
+
+    @property
+    def options(self):
+        return self._options
 
     @property
     def logger(self):

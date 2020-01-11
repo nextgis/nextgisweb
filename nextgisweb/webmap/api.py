@@ -36,7 +36,7 @@ def annotation_from_dict(obj, data):
 
 
 def check_annotation_enabled(request):
-    if not request.env.webmap.settings['annotation']:
+    if not request.env.webmap.options['annotation']:
         raise HTTPNotFound()
 
 

@@ -5,6 +5,7 @@ import os.path
 import uuid
 from datetime import datetime, timedelta
 
+from ..lib.config import Option
 from ..component import Component
 from . import command  # NOQA
 
@@ -15,10 +16,10 @@ class FileUploadComponent(Component):
     identity = 'file_upload'
 
     def initialize(self):
-        self.path = self.settings.get('path') or self.env.core.gtsdir(self)
+        self.path = self.options['path'] or self.env.core.gtsdir(self)
 
     def initialize_db(self):
-        if 'path' not in self.settings:
+        if 'path' not in self.options:
             self.env.core.mksdir(self)
 
     def setup_pyramid(self, config):
@@ -47,10 +48,6 @@ class FileUploadComponent(Component):
 
         base_filename = os.path.join(level_path, fileid)
         return (base_filename + '.data', base_filename + '.meta')
-
-    settings_info = (
-        dict(key='path', desc=u"Uploads storage folder (required)"),
-    )
 
     def maintenance(self):
         super(FileUploadComponent, self).maintenance()
@@ -105,3 +102,7 @@ class FileUploadComponent(Component):
         self.logger.info(
             "Preserved: %d files, %d directories, %d bytes",
             kept_files, kept_dirs, kept_bytes)
+
+    option_annotations = (
+        Option('path', default=None),
+    )

@@ -130,7 +130,7 @@ def setup_pyramid(comp, config):
             drawOrderEnabled=obj.draw_order_enabled,
         )
 
-        if comp.settings['annotation']:
+        if comp.options['annotation']:
             config['annotations'] = dict(
                 enabled=obj.annotation_enabled,
                 default=obj.annotation_default,

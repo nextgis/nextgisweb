@@ -395,14 +395,8 @@ def setup_pyramid(comp, config):
     )
 
     # Login and logout routes names
-    def get_login_route_name():
-        return comp.settings.get('login_route_name', 'auth.login')
-
-    def get_logout_route_name():
-        return comp.settings.get('logout_route_name', 'auth.logout')
-
     def add_globals(event):
-        event['login_route_name'] = get_login_route_name()
-        event['logout_route_name'] = get_logout_route_name()
+        event['login_route_name'] = comp.options['login_route_name']
+        event['logout_route_name'] = comp.options['logout_route_name']
 
     config.add_subscriber(add_globals, BeforeRender)

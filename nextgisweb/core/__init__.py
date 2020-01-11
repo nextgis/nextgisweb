@@ -14,6 +14,7 @@ from sqlalchemy.engine.url import (
 from .. import db
 from ..package import pkginfo
 from ..component import Component
+from ..lib.config import Option
 from ..models import DBSession
 from ..i18n import Localizer, Translations
 
@@ -35,39 +36,26 @@ class CoreComponent(Component):
     def initialize(self):
         Component.initialize(self)
 
-        self.locale_default = self._settings.get('locale.default', 'en')
-        self.locale_available = self._settings.get(
-            'locale.available', 'en ru').split(' ')
+        self.debug = self.options['debug']
+        self.locale_default = self.options['locale.default']
+        self.locale_available = self.options['locale.available']
 
-        setting_debug = self._settings.get('debug', 'false').lower()
-        self.debug = setting_debug in ('true', 'yes', '1')
-
-        if 'support_url' not in self._settings:
-            self._settings['support_url'] = "http://nextgis.com/contact/"
-
+        opt_db = self.options.with_prefix('database')
         sa_url = make_engine_url(EngineURL(
-            'postgresql+psycopg2',
-            host=self._settings.get('database.host', 'localhost'),
-            database=self._settings.get('database.name', 'nextgisweb'),
-            username=self._settings.get('database.user', 'nextgisweb'),
-            password=self._settings.get('database.password', '')
+            'postgresql+psycopg2', host=opt_db['host'], database=opt_db['name'],
+            username=opt_db['user'], password=opt_db['password']
         ))
 
         self.engine = create_engine(sa_url)
         self._sa_engine = self.engine
 
-        setting_check_at_startup = self._settings.get(
-            'database.check_at_startup', 'false').lower()
-        if setting_check_at_startup in ('true', 'yes', '1'):
+        if opt_db['check_at_startup']:
             conn = self._sa_engine.connect()
             conn.close()
 
         DBSession.configure(bind=self._sa_engine)
 
         self.DBSession = DBSession
-
-        self._backup_path = self.settings.get('backup.path')
-        self._backup_filename = self.settings.get('backup.filename', '%Y%m%d-%H%M%S.ngwbackup')
 
     def initialize_db(self):
         for k, v in (
@@ -82,12 +70,12 @@ class CoreComponent(Component):
 
     def gtsdir(self, comp):
         """ Get component's file storage folder """
-        return os.path.join(self.settings['sdir'], comp.identity) \
-            if 'sdir' in self.settings else None
+        return os.path.join(self.options['sdir'], comp.identity) \
+            if 'sdir' in self.options else None
 
     def mksdir(self, comp):
         """ Create file storage folder """
-        self.bmakedirs(self.settings['sdir'], comp.identity)
+        self.bmakedirs(self.options['sdir'], comp.identity)
 
     def bmakedirs(self, base, path):
         fpath = os.path.join(base, path)
@@ -159,31 +147,43 @@ class CoreComponent(Component):
 
         return result
 
-    settings_info = (
-        dict(key='system.name', default="NextGIS Web", desc="GIS name"),
-        dict(key='system.full_name', default="NextGIS Web", desc="Full GIS nane"),
+    option_annotations = (
+        Option('system.name', default="NextGIS Web"),
+        Option('system.full_name', default="NextGIS Web"),
 
-        dict(key='database.host', default='localhost', desc="DB server name"),
-        dict(key='database.name', default='nextgisweb', desc="DB name on the server"),
-        dict(key='database.user', default='nextgisweb', desc="DB user name"),
-        dict(key='database.password', desc="DB user password"),
+        # Database options
+        Option('database.host', default="localhost"),
+        Option('database.name', default="nextgisweb"),
+        Option('database.user', default="nextgisweb"),
+        Option('database.password', secure=True),
+        Option(
+            'database.check_at_startup', bool, default=False,
+            doc="Check database connection at initialization. So if database is not available "
+                "application would not start."),
 
-        dict(key='database.check_at_startup', desc="Check connection of startup"),
+        # Data storage
+        Option(
+            'sdir', required=True, doc="Path to filesytem data storage where data stored along "
+            "with database. Other components file_upload create subdirectories in it."),
 
-        dict(key='packages.ignore', desc="Ignore listed packages"),
-        dict(key='components.ignore', desc="Ignore listed components"),
+        # Backup storage
+        Option(
+            'backup.path',
+            doc="Path to directory in filesystem where backup created if target destination is "
+                "not specified."),
+        Option(
+            'backup.filename', default='%Y%m%d-%H%M%S.ngwbackup',
+            doc="File name template (passed to strftime) for filename in backup.path if backup "
+                "target destination is not specified"),
 
-        dict(key='locale.default', desc="Default locale"),
-        dict(key='locale.available', desc="Available locale"),
-        dict(key='debug', desc="Additional debug tools"),
-        dict(key='sdir', desc="Data storage folder"),
-
-        dict(key='support_url', desc="Support URL"),
-
-        dict(
-            key='permissions.disable_check.rendering',
-            desc="Turn off permission checking for rendering"),
-        dict(
-            key='permissions.disable_check.identify',
-            desc="Turn off permission checking for identification"),
+        # Ignore packages and components
+        Option('packages.ignore'),
+        Option('components.ignore'),
+        # Locale settings
+        Option('locale.default', default='en'),
+        Option('locale.available', list, default=['en', 'ru']),
+        # Other deployment settings
+        Option('support_url', default="http://nextgis.com/contact/"),
+        # Debug settings
+        Option('debug', bool, default=False, doc="Enable additional debug tools."),
     )

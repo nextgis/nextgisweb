@@ -17,6 +17,7 @@ import sentry_sdk
 
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 
+from ..lib.config import Option
 from ..package import pkginfo
 from ..component import Component
 
@@ -61,10 +62,9 @@ class PyramidComponent(Component):
         if plockey not in settings and self.env.core.locale_default is not None:
             settings[plockey] = self.env.core.locale_default
 
-        sentry_dsn = 'sentry_dsn'
-        if sentry_dsn in settings:
+        if 'sentry_dsn' in self.options:
             sentry_sdk.init(
-                settings[sentry_dsn],
+                self.options['sentry_dsn'],
                 integrations=[PyramidIntegration()],
             )
 
@@ -131,8 +131,8 @@ class PyramidComponent(Component):
             event['tr'] = event['request'].localizer.translate
         config.add_subscriber(tr_subscriber, BeforeRender)
 
-        assert 'secret' in settings, 'Secret not set!'
-        authn_policy = AuthenticationPolicy(settings=settings)
+        authn_policy = AuthenticationPolicy(settings=dict(
+            secret=self.options['secret']))
         config.set_authentication_policy(authn_policy)
 
         authz_policy = ACLAuthorizationPolicy()
@@ -240,7 +240,7 @@ class PyramidComponent(Component):
     def client_settings(self, request):
         result = dict()
 
-        result['support_url'] = self.env.core.settings.get('support_url')
+        result['support_url'] = self.env.core.options['support_url']
 
         try:
             result['units'] = self.env.core.settings_get('core', 'units')
@@ -259,9 +259,11 @@ class PyramidComponent(Component):
 
         return result
 
-    settings_info = (
-        dict(key='secret', desc=u"Cookies encryption key (required)"),
-        dict(key='help_page', desc=u"HTML help"),
-        dict(key='favicon', desc=u"Favicon"),
-        dict(key='sentry_dsn', desc=u"Sentry DSN"),
+    option_annotations = (
+        Option('secret', required=True, doc="Cookies encryption key."),
+        Option('help_page.*'),
+        Option('logo'),
+        Option('favicon', default=resource_filename(
+            'nextgisweb', 'static/img/favicon.ico')),
+        Option('sentry_dsn'),
     )

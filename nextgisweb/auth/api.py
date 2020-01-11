@@ -76,7 +76,7 @@ def current_user(request):
 
 
 def register(request):
-    if not request.env.auth.settings_register:
+    if not request.env.auth.options['register']:
         raise HTTPForbidden("Anonymous registration is not allowed!")
 
     # For self-registration only certain attributes of the user are required

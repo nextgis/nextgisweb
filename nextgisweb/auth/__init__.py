@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
 
+from ..lib.config import Option
 from ..component import Component
 from ..models import DBSession
 from .. import db
@@ -17,11 +18,6 @@ __all__ = ['Principal', 'User', 'Group']
 class AuthComponent(Component):
     identity = 'auth'
     metadata = Base.metadata
-
-    def __init__(self, env, settings):
-        super(AuthComponent, self).__init__(env, settings)
-        self.settings_register = settings.get('register', 'false').lower() \
-            in ('true', 'yes', '1')
 
     def initialize_db(self):
         self.initialize_user(
@@ -115,10 +111,14 @@ class AuthComponent(Component):
 
         return obj
 
-    settings_info = (
-        dict(key='register', description="Allow user registration"),
-        dict(key='login_route_name', description="Name of route for login page (default: 'auth.login')"),  # NOQA: E501
-        dict(key='logout_route_name', description="Name of route for logout page (default: 'auth.logout')"),  # NOQA: E501
+    option_annotations = (
+        Option('register', bool, default=False, doc="Allow user registration."),
+        Option(
+            'login_route_name', default='auth.login',
+            doc="Name of route for login page."),
+        Option(
+            'logout_route_name', default='auth.logout',
+            doc="Name of route for logout page."),
     )
 
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ..lib.config import Option
 from ..component import Component
 from .model import Base, Connection, Layer, WMS_VERSIONS
 
@@ -13,7 +14,7 @@ class WMSClientComponent(Component):
         super(WMSClientComponent, self).initialize()
 
         self.headers = {
-            'User-Agent': self.settings.get('user_agent', 'NextGIS Web')
+            'User-Agent': self.options['user_agent']
         }
 
     def setup_pyramid(self, config):
@@ -23,6 +24,6 @@ class WMSClientComponent(Component):
     def client_settings(self, request):
         return dict(wms_versions=WMS_VERSIONS)
 
-    settings_info = (
-        dict(key='user_agent', desc=u"HTTP-header User-Agent"),
+    option_annotations = (
+        Option('user_agent', default="NextGIS Web"),
     )

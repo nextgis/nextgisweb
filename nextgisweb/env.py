@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
-import os
 import re
-import codecs
 import logging
 import six
-from six.moves.configparser import RawConfigParser
+from collections import OrderedDict
 
 import sqlalchemy as sa
 
+from .lib.config import load_config
 from .component import Component, load_all
 from .package import pkginfo
 
@@ -19,17 +18,10 @@ class Env(object):
 
     def __init__(self, cfg=None):
         if cfg is None:
-            cfg = RawConfigParser()
-            cfg.readfp(codecs.open(os.environ.get('NEXTGISWEB_CONFIG'), 'r', 'utf-8'))
+            cfg = load_config(None)
 
-            for section in cfg.sections():
-                for item, value in cfg.items(section):
-                    cfg.set(section, item, value % os.environ)
-
-        cs = dict(cfg.items('core') if cfg.has_section('core') else ())
-
-        packages_ign = re.split(r'[,\s]+', cs.get('packages.ignore', ''))
-        components_ign = re.split(r'[,\s]+', cs.get('components.ignore', ''))
+        packages_ign = re.split(r'[,\s]+', cfg.get('core.packages.ignore', ''))
+        components_ign = re.split(r'[,\s]+', cfg.get('core.components.ignore', ''))
 
         load_all(
             packages_ignore=packages_ign,
@@ -45,12 +37,13 @@ class Env(object):
             if identity in components_ign:
                 continue
 
-            settings = dict(
-                cfg.items(identity)
-                if cfg.has_section(identity)
-                else ())
+            # Extract component options from config
+            cfgprefix = identity + '.'
+            cfgcomp = OrderedDict([
+                (k[len(cfgprefix):], v) for k, v in cfg.items()
+                if k.startswith(cfgprefix)])
 
-            instance = comp_class(env=self, settings=settings)
+            instance = comp_class(env=self, settings=cfgcomp)
             self._components[comp_class.identity] = instance
 
             assert not hasattr(self, identity), \
@@ -114,7 +107,7 @@ class Env(object):
                         # in comments, for debug purposes.
                         sa.DDL(
                             "COMMENT ON TABLE %(fullname)s IS "
-                            + "'" + comp.identity + "'"
+                            + "'" + comp.identity + "'"  # NOQA: W503
                         ))
 
         return metadata
@@ -143,4 +136,3 @@ class env(six.with_metaclass(EnvMetaClass, object)):
     multiple environments is currently not supported an will hardly
     ever be needed. To get original object for which messages are
     proxied one can use constructor ``env()``. """
-

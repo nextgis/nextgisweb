@@ -50,12 +50,6 @@ def identify(request):
             description: Dictionary where key - layer identifier, value - features count
             and array of features
     """
-    sett_name = 'permissions.disable_check.identify'
-    setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
-    if setting_disable_check in ('true', 'yes', '1'):
-        setting_disable_check = True
-    else:
-        setting_disable_check = False
 
     srs = int(request.json_body['srs'])
     geom = geom_from_wkt(request.json_body['geom'], srid=srs)
@@ -69,7 +63,7 @@ def identify(request):
     feature_count = 0
 
     for layer in layer_list:
-        if not setting_disable_check and not layer.has_permission(DataScope.read, request.user):
+        if not layer.has_permission(DataScope.read, request.user):
             result[layer.id] = dict(error="Forbidden")
 
         elif not IFeatureLayer.providedBy(layer):
@@ -91,10 +85,7 @@ def identify(request):
 
             # Add name of parent resource to identification results,
             # if there is no way to get layer name by id on the client
-            if not setting_disable_check:
-                allow = layer.parent.has_permission(PR_R, request.user)
-            else:
-                allow = True
+            allow = layer.parent.has_permission(PR_R, request.user)
 
             if allow:
                 for feature in features:

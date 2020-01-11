@@ -32,10 +32,10 @@ def webmap(env):
 
 @pytest.fixture(scope='module')
 def enable_annotation(env):
-    remember = env.webmap.settings['annotation']
-    env.webmap.settings['annotation'] = True
+    remember = env.webmap.options['annotation']
+    env.webmap.options['annotation'] = True
     yield None
-    env.webmap.settings['annotation'] = remember
+    env.webmap.options['annotation'] = remember
 
 
 def test_annotation_post_get(webapp, webmap, enable_annotation):

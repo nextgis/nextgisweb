@@ -5,6 +5,7 @@ import codecs
 import json
 from pkg_resources import resource_filename
 
+from ..lib.config import Option
 from ..component import Component, require
 from ..auth import User
 from ..models import DBSession
@@ -18,26 +19,6 @@ from .util import _
 class WebMapComponent(Component):
     identity = 'webmap'
     metadata = Base.metadata
-
-    @require('auth')
-    def initialize(self):
-        super(WebMapComponent, self).initialize()
-
-        # Default settings
-        if 'basemaps' not in self.settings:
-            self.settings['basemaps'] = resource_filename(
-                'nextgisweb', 'webmap/basemaps.json')
-
-        self.settings['identify_radius'] = int(self.settings.get(
-            'identify_radius', 10))
-        self.settings['popup_width'] = int(self.settings.get(
-            'popup_width', 300))
-        self.settings['popup_height'] = int(self.settings.get(
-            'popup_height', 200))
-
-        self.settings['annotation'] = self.settings.get(
-            'annotation', 'false'
-        ).lower() in ('true', 'yes')
 
     @require('resource', 'auth')
     def initialize_db(self):
@@ -55,16 +36,16 @@ class WebMapComponent(Component):
         view.setup_pyramid(self, config)
 
     def client_settings(self, request):
-        with codecs.open(self.settings['basemaps'], 'rb', 'utf-8') as fp:
+        with codecs.open(self.options['basemaps'], 'rb', 'utf-8') as fp:
             basemaps = json.load(fp)
 
         return dict(
             basemaps=basemaps,
-            bing_apikey=self.settings.get('bing_apikey'),
-            identify_radius=self.settings.get('identify_radius'),
-            popup_width=self.settings.get('popup_width'),
-            popup_height=self.settings.get('popup_height'),
-            annotation=self.settings.get('annotation'),
+            bing_apikey=self.options['bing_apikey'],
+            identify_radius=self.options['identify_radius'],
+            popup_width=self.options['popup_width'],
+            popup_height=self.options['popup_height'],
+            annotation=self.options['annotation'],
             adapters=dict(
                 (i.identity, dict(display_name=i.display_name))
                 for i in WebMapAdapter.registry
@@ -77,11 +58,13 @@ class WebMapComponent(Component):
         ).group_by(WebMapItem.item_type)
         return dict(item_type=dict(query_item_type.all()))
 
-    settings_info = (
-        dict(key='basemaps', desc="Basemaps description file"),
-        dict(key='bing_apikey', desc="Bing Maps API key"),
-        dict(key='identify_radius', desc="Identification sensitivity (3px)"),
-        dict(key='popup_width', desc="Popup width"),
-        dict(key='popup_height', desc="Popup height"),
-        dict(key='annotation', desc="Turn on / off annotations"),
+    option_annotations = (
+        Option(
+            'basemaps', default=resource_filename('nextgisweb', 'webmap/basemaps.json'),
+            doc="Basemaps description file."),
+        Option('bing_apikey', default=None, doc="Bing Maps API key."),
+        Option('identify_radius', int, default=3, doc="Identification sensitivity."),
+        Option('popup_width', int, default=300, doc="Popup width in pixels."),
+        Option('popup_height', int, default=200, doc="Popup height in pixels."),
+        Option('annotation', bool, default=False, doc="Turn on / off annotations."),
     )

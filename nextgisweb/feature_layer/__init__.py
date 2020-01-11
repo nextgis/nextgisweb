@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from collections import OrderedDict
 
+from ..lib.config import Option
 from ..component import Component, require
 
 from .feature import Feature, FeatureSet
@@ -56,12 +57,6 @@ class FeatureLayerComponent(Component):
     metadata = Base.metadata
 
     def initialize(self):
-        self.settings['identify.attributes'] = \
-            self.settings.get('identify.attributes', 'true').lower() == 'true'
-
-        self.settings['search.nominatim'] = \
-            self.settings.get('search.nominatim', 'true').lower() == 'true'
-
         self.FeatureExtension = FeatureExtension
 
     @require('resource')
@@ -83,15 +78,19 @@ class FeatureLayerComponent(Component):
                 FeatureExtension.registry
             )),
             identify=dict(
-                attributes=self.settings['identify.attributes']
+                attributes=self.options['identify.attributes']
             ),
             search=dict(
-                nominatim=self.settings['search.nominatim']
+                nominatim=self.options['search.nominatim']
             ),
             export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
         )
 
-    settings_info = (
-        dict(key='identify.attributes', desc=u"Show attributes in identification"),
-        dict(key='search.nominatim', desc=u"Use Nominatim while searching")
+    option_annotations = (
+        Option(
+            'identify.attributes', bool, default=True,
+            doc="Show attributes in identification."),
+        Option(
+            'search.nominatim', bool, default=True,
+            doc="Use Nominatim while searching")
     )

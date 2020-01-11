@@ -7,6 +7,7 @@ from shutil import copyfileobj
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
 
+from ..lib.config import Option
 from ..component import Component
 from ..core import BackupBase
 
@@ -46,10 +47,10 @@ class FileStorageComponent(Component):
     metadata = Base.metadata
 
     def initialize(self):
-        self.path = self.settings.get('path') or self.env.core.gtsdir(self)
+        self.path = self.options['path'] or self.env.core.gtsdir(self)
 
     def initialize_db(self):
-        if 'path' not in self.settings:
+        if 'path' not in self.options:
             self.env.core.mksdir(self)
 
     def backup_objects(self):
@@ -100,10 +101,6 @@ class FileStorageComponent(Component):
 
         return result
 
-    settings_info = (
-        dict(key='path', desc=u"Files storage folder (required)"),
-    )
-
     def maintenance(self):
         super(FileStorageComponent, self).maintenance()
         self.cleanup()
@@ -149,3 +146,7 @@ class FileStorageComponent(Component):
         self.logger.info(
             "Preserved: %d files, %d directories, %d bytes",
             kept_files, kept_dirs, kept_bytes)
+
+    option_annotations = (
+        Option('path', default=None),
+    )

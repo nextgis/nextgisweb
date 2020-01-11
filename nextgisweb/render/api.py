@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, print_function, absolute_import
 from math import log, ceil, floor
 from itertools import product
+import six
 from six import StringIO
 
 from PIL import Image, ImageDraw, ImageFont
@@ -15,7 +16,6 @@ from .util import af_transform
 
 
 PD_READ = DataScope.read
-sett_name = 'permissions.disable_check.rendering'
 
 
 def rtoint(arg):
@@ -30,10 +30,10 @@ def tile_debug_info(img, offset=(0, 0), color='black',
     ImageFont.load_default()
     text = []
     if zxy:
-        text.append(unicode(zxy))
+        text.append(six.text_type(zxy))
     if extent:
-        text.append(unicode(extent[0:2]))
-        text.append(unicode(extent[2:4]))
+        text.append(six.text_type(extent[0:2]))
+        text.append(six.text_type(extent[2:4]))
     if msg:
         text.append(msg)
     drw.text((8 + offset[0], 8 + offset[1]), '\n'.join(text), fill=color)
@@ -41,12 +41,6 @@ def tile_debug_info(img, offset=(0, 0), color='black',
 
 
 def tile(request):
-    setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
-    if setting_disable_check in ('true', 'yes', '1'):
-        setting_disable_check = True
-    else:
-        setting_disable_check = False
-
     z = int(request.GET['z'])
     x = int(request.GET['x'])
     y = int(request.GET['y'])
@@ -58,8 +52,7 @@ def tile(request):
     aimg = None
     for resid in p_resource:
         obj = Resource.filter_by(id=resid).one()
-        if not setting_disable_check:
-            request.resource_permission(PD_READ, obj)
+        request.resource_permission(PD_READ, obj)
 
         rimg = None  # Resulting resource image
 
@@ -101,12 +94,6 @@ def tile(request):
 
 
 def image(request):
-    setting_disable_check = request.env.core.settings.get(sett_name, 'false').lower()
-    if setting_disable_check in ('true', 'yes', '1'):
-        setting_disable_check = True
-    else:
-        setting_disable_check = False
-
     p_extent = map(float, request.GET['extent'].split(','))
     p_size = map(int, request.GET['size'].split(','))
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
@@ -125,8 +112,7 @@ def image(request):
     zexact = None
     for resid in p_resource:
         obj = Resource.filter_by(id=resid).one()
-        if not setting_disable_check:
-            request.resource_permission(PD_READ, obj)
+        request.resource_permission(PD_READ, obj)
 
         rimg = None
 

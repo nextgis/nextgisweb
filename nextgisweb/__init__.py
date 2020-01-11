@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
-import os
-import codecs
 import logging
 import six
-from six.moves.configparser import RawConfigParser
 
 from pyramid.paster import setup_logging
 
+from .lib.config import load_config
 from .env import Env, setenv
 
 logger = logging.getLogger(__name__)
@@ -57,14 +55,7 @@ def main(global_config, **settings):
     if 'logging' in settings:
         setup_logging(settings['logging'])
 
-    cfg = RawConfigParser()
-    cfg.readfp(codecs.open(settings['config'], 'r', 'utf-8'))
-
-    for section in cfg.sections():
-        for item, value in cfg.items(section):
-            cfg.set(section, item, value % os.environ)
-
-    env = Env(cfg)
+    env = Env(cfg=load_config(settings.get('config')))
     env.initialize()
 
     setenv(env)

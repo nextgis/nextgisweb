@@ -5,6 +5,7 @@ import re
 from sqlalchemy.orm.exc import NoResultFound
 
 from .. import db
+from ..lib.config import Option
 from ..component import Component, require
 from ..auth import User, Group
 from ..models import DBSession
@@ -29,7 +30,7 @@ from .permission import *   # NOQA
 from .view import *         # NOQA
 from .widget import *       # NOQA
 
-from .persmission_cache import PermissionCache, settings_info as cache_settings_info
+from .persmission_cache import PermissionCache
 
 __all__ = [
     'Resource',
@@ -53,27 +54,16 @@ class ResourceComponent(Component):
         self.perm_cache_enable = False
         self.perm_cache_instance = None
 
-        cache_enabled_sett = settings.get('perm_cache.enable', 'false').lower()
-        self.perm_cache_enable = cache_enabled_sett in ('true', 'yes', '1')
-
         if self.perm_cache_enable:
             self.perm_cache_instance = PermissionCache.construct(settings)
 
-        svalue = settings.get('disabled_cls', None)
-        self.disabled_cls = re.split(r',\s*', svalue) if svalue is not None \
-            else list()
-
     def initialize(self):
         super(ResourceComponent, self).initialize()
-        for item in self.disabled_cls:
+        for item in self.options['disabled_cls']:
             Resource.registry[item]
 
-        self.quota_limit = int(self.settings['quota.limit']) if \
-            'quota.limit' in self.settings else None
-
-        self.quota_resource_cls = re.split(
-            r'[,\s]+', self.settings['quota.resource_cls']) if \
-            'quota.resource_cls' in self.settings else None
+        self.quota_limit = self.options['quota.limit']
+        self.quota_resource_cls = self.options['quota.resource_cls']
 
         self.quota_resource_by_cls = self.parse_quota_resource_by_cls()
 
@@ -154,9 +144,10 @@ class ResourceComponent(Component):
             resource_count=dict(total=total, cls=by_cls),
             last_creation_date=cdate)
 
-    settings_info = (
-        dict(key="disabled_cls", desc="Resource classes disabled for creation"),
-        dict(key="everyone_permissions", desc="Permissions for user Everyone"),
-        dict(key="quota.resource_cls", desc="Countable resources"),
-        dict(key="quota.limit", desc="Quota limit"),
-    ) + cache_settings_info
+    option_annotations = (
+        Option('disabled_cls', list, default=[], doc="Resource classes disabled for creation."),
+        Option('quota.limit', int, default=None),
+        Option('quota.resource_cls', list, default=None),
+        Option('quota.resource_by_cls'),
+        Option('everyone_permissions', doc="Permissions for user Everyone"),
+    )

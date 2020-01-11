@@ -71,10 +71,10 @@ class BackupCommand(Command):
     @classmethod
     def execute(cls, args, env):
         target = args.target
-        autoname = datetime.today().strftime(env.core._backup_filename)
+        autoname = datetime.today().strftime(env.core.options['backup.filename'])
         if target is None:
-            if env.core._backup_path:
-                target = pthjoin(env.core._backup_path, autoname)
+            if env.core.options['backup.path']:
+                target = pthjoin(env.core.options['backup.path'], autoname)
             else:
                 target = NamedTemporaryFile(delete=False).name
                 os.unlink(target)

@@ -4,6 +4,7 @@ import re
 
 from sqlalchemy.orm.exc import NoResultFound
 
+from ..lib.config import Option
 from ..component import Component, require
 
 from .models import Base, MarkerCollection, MarkerCategory, Marker
@@ -20,7 +21,7 @@ class MarkerLibraryComponent(Component):
 
     @require('file_storage')
     def initialize_db(self):
-        if self.settings.get('sjjb', '').lower() in ('yes', 'true'):
+        if self.options['sjjb']:
             self.load_collection('nextgisweb', 'marker_library/sjjb')
 
     def load_collection(self, package, path, keyname=None, display_name=None):
@@ -81,6 +82,6 @@ class MarkerLibraryComponent(Component):
                     package, path + '/' + catname + '/' + fn
                 ))
 
-    settings_info = (
-        dict(key='sjjb', desc="Load SJJB marker collection"),
+    option_annotations = (
+        Option('sjjb', bool, False),
     )

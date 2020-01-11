@@ -6,8 +6,6 @@ import os.path
 from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
-from pkg_resources import resource_filename
-
 from .. import dynmenu as dm
 from ..core.exception import UserException
 
@@ -43,14 +41,10 @@ def help_page(request):
 
 
 def favicon(request):
-    settings = request.env.pyramid.settings
-    if 'favicon' not in settings:
-        settings['favicon'] = resource_filename(
-            'nextgisweb', 'static/img/favicon.ico')
-
-    if os.path.isfile(settings['favicon']):
+    fn_favicon = request.env.pyramid.options['favicon']
+    if os.path.isfile(fn_favicon):
         return FileResponse(
-            settings['favicon'], request=request,
+            fn_favicon, request=request,
             content_type='image/x-icon')
     else:
         raise HTTPNotFound()

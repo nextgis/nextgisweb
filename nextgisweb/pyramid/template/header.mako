@@ -7,9 +7,8 @@
 %>
 
 <%
-    settings = request.env.pyramid.settings
     has_logo = request.env.core.settings_exists('pyramid', 'logo') or \
-        ('logo' in settings and os.path.isfile(settings['logo']))
+        ('logo' in request.env.pyramid.options and os.path.isfile(request.env.pyramid.options['logo']))
     return_url = request.GET['return'] if 'return' in request.GET else false
 %>
 

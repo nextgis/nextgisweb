@@ -46,7 +46,7 @@
 
     <link href="${request.route_url('pyramid.custom_css')}" rel="stylesheet" type="text/css"/>
 
-    %if 'sentry_url' in request.env.pyramid.settings:
+    %if 'sentry_url' in request.env.pyramid.options:
         <%include file="nextgisweb:pyramid/template/sentry.mako" />
     %endif
 
