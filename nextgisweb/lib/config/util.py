@@ -41,7 +41,7 @@ def environ_to_key(name, prefix='NEXTGISWEB'):
 
     name = name.lower()
     plow = prefix.lower()
-    m = re.fullmatch(plow + '_{1,2}([a-z][a-z0-9_]*?)((?:__[a-z0-9][a-z0-9_]*?)+)', name)
+    m = re.match('^' + plow + '_{1,2}([a-z][a-z0-9_]*?)((?:__[a-z0-9][a-z0-9_]*?)+)$', name)
     if m:
         component, keypart = m.groups()
         keycomp = tuple(keypart[2:].split('__'))
@@ -75,7 +75,7 @@ def load_config(filenames, environ=os.environ, environ_prefix='NEXTGISWEB'):
     if filenames is None:
         filenames = environ.get(environ_prefix + '_CONFIG')
 
-    if isinstance(filenames, six.text_type):
+    if isinstance(filenames, six.string_types):
         filenames = filenames.split(':')
 
     result = OrderedDict()

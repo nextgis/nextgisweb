@@ -87,7 +87,12 @@ class List(OptionType):
         return ', '.join(value) if value is not None else ''
 
 
-OptionType.OTYPE_MAPPING[six.text_type] = Text()
+if six.PY2:
+    OptionType.OTYPE_MAPPING[str] = \
+        OptionType.OTYPE_MAPPING[unicode] = Text()  # NOQA: F821
+else:
+    OptionType.OTYPE_MAPPING[str] = Text()
+
 OptionType.OTYPE_MAPPING[bool] = Boolean()
 OptionType.OTYPE_MAPPING[int] = Integer()
 OptionType.OTYPE_MAPPING[list] = List()
