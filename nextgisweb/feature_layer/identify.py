@@ -102,4 +102,5 @@ def identify(request):
 
     return Response(
         geojson.dumps(result),
-        content_type='application/json')
+        content_type='application/json',
+        charset='utf-8')
