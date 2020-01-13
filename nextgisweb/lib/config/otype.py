@@ -47,9 +47,9 @@ class Boolean(OptionType):
 
     def loads(self, value):
         lw = value.lower()
-        if lw in ('true', 'yes'):
+        if lw in ('true', 'yes', '1'):
             return True
-        elif lw in ('false', 'no'):
+        elif lw in ('false', 'no', '0'):
             return False
         else:
             raise ValueError("Invalid boolean value!")
