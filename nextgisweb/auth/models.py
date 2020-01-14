@@ -127,7 +127,7 @@ class User(Principal):
             ('keyname', self.keyname),
             ('superuser', self.superuser),
             ('disabled', self.disabled),
-            ('member_of', map(lambda g: g.id, self.member_of))
+            ('member_of', [g.id for g in self.member_of])
         ))
 
     def deserialize(self, data):
@@ -138,9 +138,8 @@ class User(Principal):
                 setattr(self, a, data[a])
 
         if 'member_of' in data:
-            self.member_of = list(map(
-                lambda gid: Group.filter_by(id=gid).one(),
-                data['member_of']))
+            self.member_of = [Group.filter_by(id=gid).one()
+                              for gid in data['member_of']]
 
     @classmethod
     def by_keyname(cls, keyname):
@@ -188,7 +187,7 @@ class Group(Principal):
             ('description', self.description),
             ('keyname', self.keyname),
             ('register', self.register),
-            ('members', map(lambda u: u.id, self.members))
+            ('members', [u.id for u in self.members])
         ))
 
     def deserialize(self, data):
@@ -198,9 +197,8 @@ class Group(Principal):
                 setattr(self, a, data[a])
 
         if 'members' in data:
-            self.members = list(map(
-                lambda uid: User.filter_by(id=uid).one(),
-                data['members']))
+            self.members = [User.filter_by(id=uid).one()
+                            for uid in data['members']]
 
 
 @lru_cache(maxsize=256)

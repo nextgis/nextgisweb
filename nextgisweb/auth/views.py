@@ -134,9 +134,8 @@ def setup_pyramid(comp, config):
             self.obj.description = self.data['description']
             self.obj.register = self.data['register']
 
-            self.obj.members = map(
-                lambda id: User.filter_by(id=id).one(),
-                self.data['members'])
+            self.obj.members = [User.filter_by(id=id).one()
+                                for id in self.data['members']]
 
         def validate(self):
             result = super(AuthGroupWidget, self).validate()
@@ -230,9 +229,8 @@ def setup_pyramid(comp, config):
             if self.data.get('password', None) is not None:
                 self.obj.password = self.data['password']
 
-            self.obj.member_of = map(
-                lambda id: Group.filter_by(id=id).one(),
-                self.data['member_of'])
+            self.obj.member_of = [Group.filter_by(id=id).one()
+                                  for id in self.data['member_of']]
 
             self.obj.description = self.data['description']
 
