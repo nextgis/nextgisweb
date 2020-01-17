@@ -81,19 +81,16 @@ def load_config(filenames, environ=os.environ, environ_prefix='NEXTGISWEB'):
     result = OrderedDict()
 
     def apply_kv(key, value):
-        if v != '':
+        if value != '':
             result[key] = value
         elif key in result:
             # Remove key for empty value
             del result[key]
 
     for fn in filenames:
-        # Try open file to check file existance and readability
-        with io.open(fn, 'r'):
-            pass
-
-        cfg = RawConfigParser()
-        cfg.read(fn)
+        with io.open(fn, 'r') as fp:
+            cfg = RawConfigParser()
+            (cfg.readfp if six.PY2 else cfg.read_file)(fp)
 
         for section in cfg.sections():
             for k, v in cfg.items(section):
