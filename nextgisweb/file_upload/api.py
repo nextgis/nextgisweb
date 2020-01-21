@@ -12,6 +12,8 @@ from pyramid.response import Response
 
 from ..env import env
 
+BUF_SIZE = 1024 * 1024
+
 
 def upload_post(request):
     """ Upload through standard x-www-form-urlencoded """
@@ -49,7 +51,7 @@ def upload_post(request):
         fn_data, fn_meta = comp.get_filename(fileid, makedirs=True)
 
         with open(fn_data, 'wb') as fd:
-            copyfileobj(ufile.file, fd)
+            copyfileobj(ufile.file, fd, length=BUF_SIZE)
 
         with open(fn_meta, 'wb') as fm:
             fm.write(pickle.dumps(meta))
@@ -86,7 +88,7 @@ def upload_put(request):
     datafn, metafn = comp.get_filename(fileid, makedirs=True)
 
     with open(datafn, 'wb') as fd:
-        copyfileobj(request.body_file, fd)
+        copyfileobj(request.body_file, fd, length=BUF_SIZE)
         meta['size'] = fd.tell()
 
     # If MIME-type was not declared on upload, define independently
