@@ -127,14 +127,13 @@ class LayerFieldsMixin(object):
 class _fields_attr(SP):
 
     def getter(self, srlzr):
-        return map(
-            lambda f: OrderedDict((
+        return [OrderedDict((
                 ('id', f.id), ('keyname', f.keyname),
                 ('datatype', f.datatype), ('typemod', None),
                 ('display_name', f.display_name),
                 ('label_field', f == srlzr.obj.feature_label_field),
-                ('grid_visibility', f.grid_visibility))),
-            srlzr.obj.fields)
+                ('grid_visibility', f.grid_visibility)))
+            for f in srlzr.obj.fields]
 
     def setter(self, srlzr, value):
         obj = srlzr.obj
