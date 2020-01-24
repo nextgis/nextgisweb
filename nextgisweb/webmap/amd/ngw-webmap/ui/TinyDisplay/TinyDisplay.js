@@ -765,6 +765,7 @@ define([
 
             store.fetch({
                 query: {type: "layer", visibility: "true"},
+                sort: {attribute: "position"},
                 queryOptions: {deep: true},
                 onComplete: function (items) {
                     deferred.resolve(items);
