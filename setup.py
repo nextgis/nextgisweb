@@ -38,6 +38,7 @@ requires = [
     'pip==19.2.3',  # https://github.com/pypa/pip/issues/7209
     'pyproj==2.2.2',
     'six',
+    'elasticsearch>=7.0.0,<8.0.0',
 
     # TODO: Move to dev or test dependencies
     'pytest',

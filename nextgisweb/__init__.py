@@ -34,6 +34,7 @@ def pkginfo():
         'wmsclient',
         'wmsserver',
         'file_upload',
+        'audit',
     )
 
     if six.PY3:
