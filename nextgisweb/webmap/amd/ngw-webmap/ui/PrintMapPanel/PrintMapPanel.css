@@ -32,6 +32,7 @@
 
 .printMap-panel div.print-controls-pane .buttons-section {
   margin-top: 10px;
+  text-align: left;
 }
 
 .printMap-panel div.print-controls-pane span.dijitArrowButtonInner {
