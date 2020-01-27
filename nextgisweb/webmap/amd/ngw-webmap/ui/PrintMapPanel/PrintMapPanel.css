@@ -42,6 +42,11 @@
   line-height: 1em;
 }
 
+td.tableContainer-labelCell {
+  vertical-align: top;
+  padding-top: 8px !important;
+}
+
 .dijitButton.export-option .dijitButtonNode {
   background-color: #e5eef7;
   border-color: #c8e5f7;
