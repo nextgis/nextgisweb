@@ -391,6 +391,7 @@ define([
 
                     copy.visibility = null;
                     copy.checked = item.visibility;
+                    copy.position = item.drawOrderPosition;
 
                 } else if (copy.type === "group" || copy.type === "root") {
                     copy.children = array.map(item.children, function (c) { return prepare_item(c); });
@@ -585,7 +586,7 @@ define([
                     array.forEach(events, function (event) {
                         var isChange = array.some(event.params, function (p) {
                             return oldPosition[p] !== newPosition[p];
-                        })
+                        });
                         if (isChange) {
                             commonOptions.detail = event.name;
                             // message should be a string to work correctly with all browsers and systems
@@ -593,7 +594,7 @@ define([
                         }
                     });
                     // on any position change
-                    commonOptions.detail = name
+                    commonOptions.detail = name;
                     parent.postMessage(JSON.stringify(commonOptions), '*');
                 })
             }
@@ -654,7 +655,9 @@ define([
         },
 
         _layersSetup: function () {
-            var widget = this, store = this.itemStore;
+            var widget = this,
+                store = this.itemStore,
+                layer;
 
             this._adaptersSetup();
 
@@ -665,13 +668,17 @@ define([
             store.fetch({
                 query: {type: "layer"},
                 queryOptions: {deep: true},
+                sort: widget.config.drawOrderEnabled ? [{
+                    attribute: "position"
+                }] : null,
                 onItem: function (item) {
-                    widget._layerSetup(item);
+                    console.log(item.label);
+                    console.log(item.id);
+                    layer = widget._layerSetup(item);
                     widget._layer_order.unshift(store.getValue(item, "id"));
-
+                    console.log(widget._layer_order);
                     // Включаем слои, указанные в URL
                     var cond,
-                        layer = widget._layers[store.getValue(item, "id")],
                         visibleStyles = widget._urlParams.styles;
                     if (visibleStyles) {
                         cond = array.indexOf(visibleStyles, store.getValue(item, "styleId")) !== -1;
@@ -711,6 +718,7 @@ define([
             layer.itemConfig = data;
 
             this._layers[data.id] = layer;
+            return layer;
         },
 
         _toolsSetup: function () {
