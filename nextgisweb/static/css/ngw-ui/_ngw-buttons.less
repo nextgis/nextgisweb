@@ -1,0 +1,128 @@
+.ngw-button{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-size: @font-size-md;;
+    font-family: @header-font;
+    height: 36px;
+    padding: 0 16px;
+    border: 0;
+    background: @primary;
+    border-radius: @border-radius-base;
+    color: #fff;
+    box-shadow: none;
+    outline: 0;
+
+    &:hover,
+    &:active,
+    &:focus{
+        outline: 0;
+    }
+
+    &:hover{
+        background-color: darken(@blue, 10%);
+    }
+
+    &--primary{
+        background: @primary;
+        color: #fff;
+        &:hover{
+            background-color: darken(@blue, 10%);
+        }
+    }
+
+    & + .ngw-button{
+        margin-left: 8px;
+    }
+
+    &__inner{
+      position: relative;
+      top: -1px;
+      vertical-align: middle;
+    }
+
+    &--rounded{
+        border-radius: 23px;
+    }
+
+    &--small{
+        font-size: 14px;
+        padding-left: 12px;
+        padding-right: 12px;
+        height: 30px;
+    }
+
+    &--secondary{
+        background-color: @secondary;
+        color: @primary;
+
+        &:hover{
+            background-color: darken(@secondary, 5%);
+        }
+    }
+
+    &--outlined{
+        background-color: transparent;
+        border: 1px solid @primary;
+        color: @primary;
+
+        &.ngw-button--secondary{
+            border-color: @input-border-color;
+            color: @text-muted;
+        }
+
+        &:hover{
+           background-color: transparent;
+           color: @primary;
+           border-color: @primary;
+        }
+    }
+
+    &--icon{
+        padding-left: 7px;
+        padding-right: 12px;
+
+        .ngw-button__icon {
+            margin-right: 4px;
+            color: inherit;
+            opacity: .75;
+        }
+
+        &.ngw-button--small{
+            padding-left: 4px;
+            padding-right: 8px;
+
+            .ngw-button__icon{
+                margin-right: 3px;
+                font-size: 18px;
+            }
+        }
+
+        &.ngw-button--rounded{
+            padding-left: 13px;
+            padding-right: 16px;
+
+            &.ngw-button--small{
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
+
+        &:hover{
+            .ngw-button__icon{
+                color: #fff;
+                opacity: 1;
+            }
+        }
+
+        &.ngw-button--outlined,
+        &.ngw-button--secondary{
+            &:hover{
+                .ngw-button__icon{
+                    color: @primary;
+                }
+            }
+        }
+    }
+}

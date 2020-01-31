@@ -1,5 +1,6 @@
 /* Import */
 /* -- Variables -- */
+/* theme */
 @import "fontello.css";
 .nextgis.claro .padding-block,
 .padding-block {
@@ -562,6 +563,107 @@ a:hover,
 .svgIcon-twitter {
   width: 32px;
   height: 32px;
+}
+.ngw-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-size: 16px;
+  font-family: "lato_local";
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  background: #076dbf;
+  border-radius: 4px;
+  color: #fff;
+  box-shadow: none;
+}
+.ngw-button:hover {
+  background-color: #05518e;
+}
+.ngw-button--primary {
+  background: #076dbf;
+  color: #fff;
+}
+.ngw-button--primary:hover {
+  background-color: #05518e;
+}
+.ngw-button + .ngw-button {
+  margin-left: 8px;
+}
+.ngw-button__inner {
+  position: relative;
+  top: -1px;
+  vertical-align: middle;
+}
+.ngw-button--rounded {
+  border-radius: 23px;
+}
+.ngw-button--small {
+  font-size: 14px;
+  padding-left: 12px;
+  padding-right: 12px;
+  height: 32px;
+}
+.ngw-button__icon {
+  margin-right: 4px;
+  color: inherit;
+}
+.ngw-button--secondary {
+  background-color: #e5eef7;
+  color: #076dbf;
+}
+.ngw-button--secondary:hover {
+  background-color: #d2e1f1;
+}
+.ngw-button--outlined {
+  background-color: transparent;
+  border: 1px solid #076dbf;
+  color: #076dbf;
+}
+.ngw-button--outlined.ngw-button--secondary {
+  border-color: rgba(0, 0, 0, 0.14);
+  color: #212121;
+}
+.ngw-button--outlined.ngw-button--secondary:hover {
+  border-color: rgba(0, 0, 0, 0.14);
+  color: #076dbf;
+}
+.ngw-button--outlined:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  color: #05518e;
+  border-color: #05518e;
+}
+.ngw-button--icon {
+  padding-left: 7px;
+  padding-right: 12px;
+}
+.ngw-button--icon.ngw-button--small {
+  padding-left: 6px;
+  padding-right: 10px;
+}
+.ngw-button--icon.ngw-button--small .ngw-button__icon {
+  margin-right: 3px;
+  font-size: 18px;
+}
+.ngw-button--icon.ngw-button--rounded {
+  padding-left: 13px;
+  padding-right: 16px;
+}
+.ngw-button--icon.ngw-button--rounded.ngw-button--small {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.ngw-button--icon:hover .ngw-button__icon {
+  color: #fff;
+}
+.ngw-button--icon.ngw-button--outlined.ngw-button--secondary .ngw-button__icon {
+  color: #999;
+}
+.ngw-button--icon.ngw-button--outlined:hover .ngw-button__icon,
+.ngw-button--icon.ngw-button--secondary:hover .ngw-button__icon {
+  color: #076dbf;
 }
 /* -- BASE STYLES -- */
 @font-face {
