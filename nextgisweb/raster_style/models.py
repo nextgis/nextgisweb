@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-from six import StringIO
+from six import BytesIO
 
 import numpy
 import PIL
@@ -136,7 +136,7 @@ class RasterStyle(Base, Resource):
         raster_icon = resource_filename('nextgisweb',
                                         'raster_style/iconRaster.png')
         img = PIL.Image.open(raster_icon)
-        buf = StringIO()
+        buf = BytesIO()
         img.save(buf, 'png')
         buf.seek(0)
 
