@@ -39,9 +39,16 @@
             <tbody>
             
             %for doc in docs:
-            <% item = doc['_source'] %>
+            <%
+                rid = doc['_id']
+                item = doc['_source']
+            %>
             <tr>
-                <td>${item['@timestamp']}</td>
+                <td>
+                    <a href="${request.route_url('audit.control_panel.journal.show', id=rid)}">
+                    ${item['@timestamp']}
+                    </a>
+                </td>
                 <td>${item['request']['method']}</td>
                 <td>${item['request']['path']}</td>
                 <td>${item['response']['status_code']}</td>
