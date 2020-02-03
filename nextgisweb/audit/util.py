@@ -29,6 +29,10 @@ def elasticsearch_tween_factory(handler, registry):
                 ("request", OrderedDict(method=request.method, path=request.path)),
             ))
 
+            qstring = request.query_string
+            if qstring != "":
+                body["request"]["query_string"] = qstring
+
             user = request.environ.get("auth.user")
             if user is not None:
                 body['user'] = OrderedDict(
