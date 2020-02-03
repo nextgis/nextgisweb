@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
+from collections import OrderedDict
 
 from ..i18n import trstring_factory
 
@@ -21,24 +22,25 @@ def elasticsearch_tween_factory(handler, registry):
         if not ignore and request.env.audit.audit_enabled:
             timestamp = datetime.now()
             index = es_index(timestamp)
-            doc = request.env.audit.es.index(
-                index=index,
-                body={
-                    "@timestamp": timestamp,
-                    "request": {"method": request.method, "path": request.path},
-                    "user": {
-                        "id": request.user.id,
-                        "keyname": request.user.keyname,
-                        "display_name": request.user.display_name,
-                    },
-                    "response": {
-                        "status_code": response.status_code,
-                        "route_name": request.matched_route.name
-                        if request.matched_route is not None
-                        else "",
-                    },
-                },
-            )
+
+            body = OrderedDict((
+                ("@timestamp", timestamp),
+                ("request", OrderedDict(method=request.method, path=request.path)),
+            ))
+
+            user = request.environ.get("auth.user")
+            if user is not None:
+                body['user'] = OrderedDict(
+                    id=user.id, keyname=user.keyname,
+                    display_name=user.display_name)
+
+            body['response'] = body_response = OrderedDict(
+                status_code=response.status_code)
+
+            if request.matched_route is not None:
+                body_response['route_name'] = request.matched_route.name
+
+            request.env.audit.es.index(index=index, body=body)
 
         return response
 

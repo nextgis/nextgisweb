@@ -1,5 +1,10 @@
 <%inherit file='nextgisweb:templates/base.mako' />
-<%! from nextgisweb.audit.util import _ %>
+<%! 
+    from markupsafe import Markup
+    from nextgisweb.audit.util import _
+
+    NBSP = Markup("&nbsp;")
+%>
 
 <%def name="head()">
     <script>
@@ -39,8 +44,8 @@
                 <td>${item['request']['method']}</td>
                 <td>${item['request']['path']}</td>
                 <td>${item['response']['status_code']}</td>
-                <td>${item['response']['route_name']}</td>
-                <td>${item['user']['keyname']}</td>
+                <td>${item['response']['route_name'] if 'route_name' in item['response'] else NBSP}</td>
+                <td>${item['user']['keyname'] if 'user' in item else NBSP}</td>
             </tr>
             %endfor
 
