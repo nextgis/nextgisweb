@@ -23,9 +23,6 @@ class AuditComponent(Component):
         if self.audit_enabled:
             self.es = Elasticsearch(self.audit_es_host)
 
-            with open(resource_filename('nextgisweb', 'audit/template.json')) as f:
-                self.es.indices.put_template('nextgisweb_audit', body=json.load(f))
-
     def is_service_ready(self):
         if self.audit_enabled:
             while True:
@@ -37,6 +34,12 @@ class AuditComponent(Component):
                     break
                 except (esexc.ConnectionError, esexc.ConnectionTimeout) as exc:
                     yield
+
+    def initialize_db(self):
+        if self.audit_enabled:
+            # OOPS: Elasticsearch mappings are not related to database!
+            with open(resource_filename('nextgisweb', 'audit/template.json')) as f:
+                self.es.indices.put_template('nextgisweb_audit', body=json.load(f))
 
     def setup_pyramid(self, config):
         from . import view
