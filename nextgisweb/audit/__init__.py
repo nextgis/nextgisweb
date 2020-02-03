@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
 import json
+from pkg_resources import resource_filename
 
 from elasticsearch import Elasticsearch
-from pkg_resources import resource_filename
+import elasticsearch.exceptions as esexc
 
 from ..component import Component
 from ..lib.config import Option
+
+from .util import disable_logging
 
 
 class AuditComponent(Component):
@@ -23,6 +25,18 @@ class AuditComponent(Component):
 
             with open(resource_filename('nextgisweb', 'audit/template.json')) as f:
                 self.es.indices.put_template('nextgisweb_audit', body=json.load(f))
+
+    def is_service_ready(self):
+        if self.audit_enabled:
+            while True:
+                try:
+                    with disable_logging():
+                        self.es.cluster.health(
+                            wait_for_status='yellow',
+                            request_timeout=1 / 4)
+                    break
+                except (esexc.ConnectionError, esexc.ConnectionTimeout) as exc:
+                    yield
 
     def setup_pyramid(self, config):
         from . import view

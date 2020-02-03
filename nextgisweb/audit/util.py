@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import logging
 from datetime import datetime
 from collections import OrderedDict
+from contextlib import contextmanager
 
 from ..i18n import trstring_factory
 
@@ -58,3 +60,14 @@ def elasticsearch_tween_factory(handler, registry):
 
 def audit_context(request, model, id):
     request.environ['audit.context'] = (model, id)
+
+
+@contextmanager
+def disable_logging(highest_level=logging.CRITICAL):
+    """ Context manager to temporary prevent log messages """
+    previous_level = logging.root.manager.disable
+    logging.disable(highest_level)
+    try:
+        yield
+    finally:
+        logging.disable(previous_level)
