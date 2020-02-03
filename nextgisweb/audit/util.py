@@ -14,6 +14,7 @@ def es_index(timestamp):
 
 
 def elasticsearch_tween_factory(handler, registry):
+
     def elasticsearch_tween(request):
         ignore = request.path_info.startswith(("/static/", "/_debug_toolbar/"))
 
@@ -40,8 +41,16 @@ def elasticsearch_tween_factory(handler, registry):
             if request.matched_route is not None:
                 body_response['route_name'] = request.matched_route.name
 
+            context = request.environ.get('audit.context')
+            if context is not None:
+                body['context'] = OrderedDict(zip(('model', 'id'), context))
+
             request.env.audit.es.index(index=index, body=body)
 
         return response
 
     return elasticsearch_tween
+
+
+def audit_context(request, model, id):
+    request.environ['audit.context'] = (model, id)

@@ -42,6 +42,13 @@
                    "type":"keyword"
                 }
              }
+          },
+          "context": {
+             "type": "nested",
+             "properties": {
+                "model": { "type": "keyword" },
+                "id": { "type": "keyword" }
+             }
           }
        }
     },

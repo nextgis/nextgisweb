@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
 
@@ -23,11 +23,10 @@ class AuditComponent(Component):
 
             with open(resource_filename('nextgisweb', 'audit/template.json')) as f:
                 self.es.indices.put_template('nextgisweb_audit', body=json.load(f))
-    
+
     def setup_pyramid(self, config):
         from . import view
-        if self.audit_enabled:
-            view.setup_pyramid(self, config)
+        view.setup_pyramid(self, config)
 
     option_annotations = (
         Option('audit.enabled', bool, default=False),

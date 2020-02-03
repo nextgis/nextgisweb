@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
 
 from elasticsearch import NotFoundError
-from .util import _, es_index
 from .. import dynmenu as dm
+
+from .util import _, es_index, audit_context
 
 
 def journal(request):
@@ -49,17 +51,22 @@ def journal(request):
 
 
 def setup_pyramid(comp, config):
-    config.add_tween(
-        'nextgisweb.audit.util.elasticsearch_tween_factory',
-        under=('nextgisweb.pyramid.util.header_encoding_tween_factory',))
+    # This method can be called from other components,
+    # so should be enabled even audit component disabled.
+    config.add_request_method(audit_context)
 
-    config.add_route(
-        'audit.control_panel.journal',
-        '/control-panel/journal'
-    ).add_view(journal, renderer='nextgisweb:audit/template/journal.mako')
+    if comp.audit_enabled:
+        config.add_tween(
+            'nextgisweb.audit.util.elasticsearch_tween_factory',
+            under=('nextgisweb.pyramid.util.header_encoding_tween_factory',))
 
-    comp.env.pyramid.control_panel.add(
-        dm.Label('audit', _("Audit")),
-        dm.Link('audit/journal', _("Journal"), lambda args: (
-            args.request.route_url('audit.control_panel.journal'))),
-    )
+        config.add_route(
+            'audit.control_panel.journal',
+            '/control-panel/journal'
+        ).add_view(journal, renderer='nextgisweb:audit/template/journal.mako')
+
+        comp.env.pyramid.control_panel.add(
+            dm.Label('audit', _("Audit")),
+            dm.Link('audit/journal', _("Journal"), lambda args: (
+                args.request.route_url('audit.control_panel.journal'))),
+        )

@@ -134,6 +134,7 @@ def collection_post(request):
     DBSession.flush()
 
     result = OrderedDict(id=resource.id)
+    request.audit_context('resource', resource.id)
 
     # TODO: Parent is returned only for compatibility
     result['parent'] = dict(id=resource.parent.id)

@@ -33,6 +33,7 @@
                 <th class="sort-default" style="text-align: inherit;">${tr(_("Status code"))}</th>
                 <th class="sort-default" style="text-align: inherit;">${tr(_("Route name"))}</th>
                 <th class="sort-default" style="text-align: inherit;">${tr(_("User"))}</th>
+                <th colspan="2" class="sort-default" style="text-align: inherit;">${tr(_("Context"))}</th>
             </tr></thead>
 
             <tbody>
@@ -46,6 +47,12 @@
                 <td>${item['response']['status_code']}</td>
                 <td>${item['response']['route_name'] if 'route_name' in item['response'] else NBSP}</td>
                 <td>${item['user']['keyname'] if 'user' in item else NBSP}</td>
+                %if 'context' in item:
+                    <td>${item['context']['model']}</td>
+                    <td>${item['context']['id']}</td>
+                %else:
+                    <td colspan="2">&nbsp;</td>
+                %endif
             </tr>
             %endfor
 
