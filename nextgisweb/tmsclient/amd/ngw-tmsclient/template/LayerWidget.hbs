@@ -1,0 +1,18 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${serializePrefix}" style="height: 100%;" class="padding-block">
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 1">
+
+        <div data-dojo-attach-point="wConnection"
+            data-dojo-type="ngw-resource/ResourceBox"
+            data-ngw-serialize="connection"
+            data-dojo-props="cls: 'tmsclient_connection'"
+            title="{{gettext 'TMS connection'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wSRS"
+            data-ngw-serialize="srs"
+            data-dojo-type="ngw-spatial-ref-sys/SRSSelect"
+            title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>
+
+    </div>
+</div>

@@ -1,0 +1,24 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${serializePrefix}"  class="padding-block">
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 1">
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            data-ngw-serialize="base_url"
+            title="{{gettext 'Base URL'}}" style="width: 100%"></div>
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: false"
+            data-dojo-attach-point="wAPIKey"
+            data-ngw-serialize="apikey"
+            title="{{gettext 'API key'}}" style="width: 20em"></div>
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: false"
+            data-dojo-attach-point="wAPIKeyParam"
+            data-ngw-serialize="apikey_param"
+            title="{{gettext 'API key param'}}" style="width: 20em"></div>
+
+    </div>
+</div>
