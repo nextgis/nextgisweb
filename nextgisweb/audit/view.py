@@ -30,7 +30,10 @@ def journal_browse(request):
             body={
                 "query": {
                     "range": {"@timestamp": {"gte": date, "lte": date}}
-                }
+                },
+                "sort": [
+                    {"@timestamp": "desc"},
+                ]
             },
         )
         scroll_id = data['_scroll_id']
