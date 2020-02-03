@@ -76,26 +76,13 @@
                  checked
                  title="{{gettext 'Scale bar'}}"/>
 
-          <select id="scalesSelect"
-                  data-dojo-type="dijit.form.Select"
-                  data-dojo-attach-point="scalesSelect"
-                  title="{{gettext 'Scale'}}"
-                  name="scale"
-                  style="width: 100%;">
-            <option value="none" disabled="disabled" selected>{{gettext 'Select scale'}}</option>
-            <option value="5000">1 : 5 000</option>
-            <option value="10000">1 : 10 000</option>
-            <option value="20000">1 : 20 000</option>
-            <option value="25000">1 : 25 000</option>
-            <option value="50000">1 : 50 000</option>
-            <option value="100000">1 : 100 000</option>
-            <option value="200000">1 : 200 000</option>
-            <option value="500000">1 : 500 000</option>
-            <option value="1000000">1 : 1 000 000</option>
-            <option value="5000000">1 : 5 000 000</option>
-            <option value="5000000">1 : 5 000 000</option>
-            <option value="10000000">1 : 10 000 000</option>
-          </select>
+          <div id="scalesSelect"
+               data-dojo-type="ngw-webmap/ui/ScalesSelect/ScalesSelect"
+               data-dojo-attach-point="scalesSelect"
+               title="{{gettext 'Scale'}}"
+               name="scale"
+               style="width: 100%;">
+          </div>
         </div>
 
         <div class="buttons-section">
@@ -137,7 +124,7 @@
          class="print-map-pane"
          style="overflow: auto; margin: 0; border: none;">
       <div class="print-map-page-wrapper">
-        <div class="print-map-export-wrapper"  data-dojo-attach-point="mapPageContainer">
+        <div class="print-map-export-wrapper" data-dojo-attach-point="mapPageContainer">
           <div class="print-map-page">
             <div class="print-map" data-dojo-attach-point="mapContainer"></div>
           </div>

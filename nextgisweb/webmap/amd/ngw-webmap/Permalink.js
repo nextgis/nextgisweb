@@ -13,14 +13,14 @@ define([
 ], function (declare, array, lang, domConstruct, ioQuery, all, Dialog, TextBox,
              MakeSingleton, ol, i18n) {
     return {
-        getPermalink: function (display, visbleItems, options) {
+        getPermalink: function (display, visibleItems, options) {
             var urlWithoutParams, visibleStyles, center, queryStr,
                 origin, pathname, queryObj;
 
             options = options ? options : {};
 
             visibleStyles = array.map(
-                visbleItems,
+                visibleItems,
                 function (i) {
                     return display.itemStore.dumpItem(i).styleId;
                 }

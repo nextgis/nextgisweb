@@ -4,7 +4,8 @@ import os
 import os.path
 import logging
 from os.path import join as pthjoin
-from datetime import datetime
+from datetime import datetime, timedelta
+from time import sleep
 from tempfile import NamedTemporaryFile
 from contextlib import contextmanager
 from backports.tempfile import TemporaryDirectory
@@ -52,6 +53,43 @@ class InitializeDBCmd():
             # need to force with a cludge
 
             connection.execute("COMMIT")
+
+
+@Command.registry.register
+class WaitForServiceCommand(Command):
+    identity = 'wait_for_service'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        parser.add_argument('--timeout', type=int, default=120)
+
+    @classmethod
+    def execute(cls, args, env):
+        components = [
+            (comp, comp.is_service_ready())
+            for comp in env._components.values()
+            if hasattr(comp, 'is_service_ready')]
+
+        start = datetime.now()
+        timeout = start + timedelta(seconds=args.timeout)
+        backoff = 1 / 8
+        while len(components) > 0:
+            nxt = []
+            for comp, is_service_ready in components:
+                try:
+                    next(is_service_ready)
+                    nxt.append((comp, is_service_ready))
+                except StopIteration:
+                    logger.debug(
+                        "Service ready for component [%s] in %0.2f seconds",
+                        comp.identity, (datetime.now() - start).total_seconds())
+            components = nxt
+            if datetime.now() > timeout:
+                raise RuntimeError("Wait for service failed for components: {}!".format(
+                    ', '.join([comp.identity for comp, it in components])))
+            else:
+                sleep(backoff)
+                backoff = min(2 * backoff, 10)
 
 
 @Command.registry.register
