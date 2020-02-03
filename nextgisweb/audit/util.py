@@ -14,11 +14,11 @@ def es_index(timestamp):
 
 def elasticsearch_tween_factory(handler, registry):
     def elasticsearch_tween(request):
-        is_static = request.path_info.startswith("/static/")
+        ignore = request.path_info.startswith(("/static/", "/_debug_toolbar/"))
 
         response = handler(request)
 
-        if not is_static and request.env.audit.audit_enabled:
+        if not ignore and request.env.audit.audit_enabled:
             timestamp = datetime.now()
             index = es_index(timestamp)
             doc = request.env.audit.es.index(
