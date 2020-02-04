@@ -16,12 +16,15 @@ class AuditComponent(Component):
     identity = 'audit'
 
     def initialize(self):
-        opt_audit = self.options.with_prefix('audit')
-        self.audit_enabled = opt_audit['enabled']
-        self.audit_es_host = opt_audit['es_host']
+        self.audit_enabled = self.options['enabled']
+        self.audit_es_host = self.options['elasticsearch.host']
+        self.audit_es_port = self.options['elasticsearch.port']
 
         if self.audit_enabled:
-            self.es = Elasticsearch(self.audit_es_host)
+            self.es = Elasticsearch('%s:%d' % (
+                 self.audit_es_host,
+                 self.audit_es_port,
+            ))
 
     def is_service_ready(self):
         if self.audit_enabled:
@@ -46,6 +49,9 @@ class AuditComponent(Component):
         view.setup_pyramid(self, config)
 
     option_annotations = (
-        Option('audit.enabled', bool, default=False),
-        Option('audit.es_host'),
+        Option('enabled', bool, default=False),
+        Option('elasticsearch.host', default='elasticsearch'),
+        Option('elasticsearch.port', default=9200),
+        Option('elasticsearch.index.prefix', default='nextgisweb-audit'),
+        Option('elasticsearch.index.suffix', default='%Y.%m'),
     )
