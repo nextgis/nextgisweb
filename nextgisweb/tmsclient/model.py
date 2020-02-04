@@ -33,7 +33,7 @@ class Connection(Base, Resource):
 
     __scope__ = ConnectionScope
 
-    base_url = db.Column(db.Unicode, nullable=False)
+    url_template = db.Column(db.Unicode, nullable=False)
     apikey = db.Column(db.Unicode)
     apikey_param = db.Column(db.Unicode)
 
@@ -56,7 +56,7 @@ class ConnectionSerializer(Serializer):
     _defaults = dict(read=ConnectionScope.read,
                      write=ConnectionScope.write)
 
-    base_url = SP(**_defaults)
+    url_template = SP(**_defaults)
     apikey = SP(**_defaults)
     apikey_param = SP(**_defaults)
 
@@ -94,9 +94,10 @@ class Layer(Base, Resource, SpatialLayerMixin):
         return RenderRequest(self, srs, cond)
 
     def render_image(self, tile):
-        tail = '/%d/%d/%d.png' % tile
+        (z, x, y) = tile
         image = requests.get(
-            self.connection.base_url + tail, params=self.connection.query_params,
+            self.connection.url_template.format(x=x, y=y, z=z),
+            params=self.connection.query_params,
             headers=env.tmsclient.headers
         ).content
 
