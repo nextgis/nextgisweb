@@ -87,7 +87,7 @@ class WaitForServiceCommand(Command):
             if datetime.now() > timeout:
                 raise RuntimeError("Wait for service failed for components: {}!".format(
                     ', '.join([comp.identity for comp, it in components])))
-            else:
+            elif len(components) > 0:
                 sleep(backoff)
                 backoff = min(2 * backoff, 10)
 
