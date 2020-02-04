@@ -70,10 +70,11 @@ class ResourceComponent(Component):
     def parse_quota_resource_by_cls(self):
         quota_resource_by_cls = dict()
 
-        if 'quota.resource_by_cls' not in self.settings:
+        ovalue = self.options.get('quota.resource_by_cls', None)
+        if ovalue is None:
             return quota_resource_by_cls
 
-        quota_resources_pairs = re.split(r'[,\s]+', self.settings['quota.resource_by_cls'])
+        quota_resources_pairs = re.split(r'[,\s]+', ovalue)
         if quota_resources_pairs:
             for pair in quota_resources_pairs:
                 resource_quota = re.split(r'[:\s]+', pair)
