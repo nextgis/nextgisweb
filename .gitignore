@@ -6,13 +6,11 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+*.egg-info
 env/
 build/
 dist/
-eggs/
 sdist/
-*.egg-info/
-*.egg
 node_modules/
 
 # Translations

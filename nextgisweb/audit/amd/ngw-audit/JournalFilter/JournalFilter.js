@@ -33,7 +33,6 @@ define([
         buttonText: i18n.gettext('Search'),
         constructor: function (options) {
             declare.safeMixin(this,options);
-            this.dateTo = '2015-06-03';
             if (!this.dateFrom || !this.dateTo){
                 this._setDefaultDateRange();
             }

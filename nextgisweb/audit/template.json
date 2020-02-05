@@ -15,6 +15,9 @@
                 },
                 "path":{
                    "type":"keyword"
+                },
+                "query_string": {
+                   "type": "keyword"
                 }
              }
           },
@@ -41,6 +44,13 @@
                 "display_name":{
                    "type":"keyword"
                 }
+             }
+          },
+          "context": {
+             "type": "nested",
+             "properties": {
+                "model": { "type": "keyword" },
+                "id": { "type": "keyword" }
              }
           }
        }

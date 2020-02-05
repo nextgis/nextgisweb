@@ -6,6 +6,7 @@ import json
 from pkg_resources import resource_filename
 
 from sqlalchemy import create_engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
     URL as EngineURL,
@@ -56,6 +57,15 @@ class CoreComponent(Component):
         DBSession.configure(bind=self._sa_engine)
 
         self.DBSession = DBSession
+
+    def is_service_ready(self):
+        conn = None
+        while conn is None:
+            try:
+                conn = self._sa_engine.connect()
+            except OperationalError:
+                yield
+        conn.close()
 
     def initialize_db(self):
         for k, v in (

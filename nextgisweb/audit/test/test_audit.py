@@ -47,12 +47,12 @@ def test_audit_user(index, env, webapp):
 @pytest.mark.parametrize("path, route_name", [
     ("/api/resource/0", "resource.item"),
     ("/resource/0", "resource.show"),
-    ("/admin", ""),
+    ("/admin", None),
 ])
 def test_audit_response_route_name(path, route_name, index, env, webapp):
     response = webapp.get(path, expect_errors=True)
     env.audit.es.indices.refresh(index=index)
-    assert one(env.audit.es, index)["response"]["route_name"] == route_name
+    assert one(env.audit.es, index)["response"].get("route_name") == route_name
 
 
 @pytest.mark.parametrize("path", ["/api/resource/0", "/api/resource/-1"])

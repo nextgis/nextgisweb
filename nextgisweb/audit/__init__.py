@@ -1,35 +1,57 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
-
+from __future__ import division, absolute_import, print_function, unicode_literals
 import json
+from pkg_resources import resource_filename
 
 from elasticsearch import Elasticsearch
-from pkg_resources import resource_filename
+import elasticsearch.exceptions as esexc
 
 from ..component import Component
 from ..lib.config import Option
+
+from .util import disable_logging
 
 
 class AuditComponent(Component):
     identity = 'audit'
 
     def initialize(self):
-        opt_audit = self.options.with_prefix('audit')
-        self.audit_enabled = opt_audit['enabled']
-        self.audit_es_host = opt_audit['es_host']
+        self.audit_enabled = self.options['enabled']
+        self.audit_es_host = self.options['elasticsearch.host']
+        self.audit_es_port = self.options['elasticsearch.port']
 
         if self.audit_enabled:
-            self.es = Elasticsearch(self.audit_es_host)
+            self.es = Elasticsearch('%s:%d' % (
+                 self.audit_es_host,
+                 self.audit_es_port,
+            ))
 
+    def is_service_ready(self):
+        if self.audit_enabled:
+            while True:
+                try:
+                    with disable_logging():
+                        self.es.cluster.health(
+                            wait_for_status='yellow',
+                            request_timeout=1 / 4)
+                    break
+                except (esexc.ConnectionError, esexc.ConnectionTimeout) as exc:
+                    yield
+
+    def initialize_db(self):
+        if self.audit_enabled:
+            # OOPS: Elasticsearch mappings are not related to database!
             with open(resource_filename('nextgisweb', 'audit/template.json')) as f:
                 self.es.indices.put_template('nextgisweb_audit', body=json.load(f))
-    
+
     def setup_pyramid(self, config):
         from . import view
-        if self.audit_enabled:
-            view.setup_pyramid(self, config)
+        view.setup_pyramid(self, config)
 
     option_annotations = (
-        Option('audit.enabled', bool, default=False),
-        Option('audit.es_host'),
+        Option('enabled', bool, default=False),
+        Option('elasticsearch.host', default='elasticsearch'),
+        Option('elasticsearch.port', default=9200),
+        Option('elasticsearch.index.prefix', default='nextgisweb-audit'),
+        Option('elasticsearch.index.suffix', default='%Y.%m'),
     )

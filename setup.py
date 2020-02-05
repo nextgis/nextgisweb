@@ -30,7 +30,7 @@ requires = [
     'lxml==4.3.0',
     'passlib==1.7.1',
     'OWSLib==0.17.1',
-    'requests[security]==2.21.0',
+    'requests[security]==2.22.0',
     'babel==2.6.0',
     'sentry-sdk==0.9.0',
     'python-magic==0.4.15',
