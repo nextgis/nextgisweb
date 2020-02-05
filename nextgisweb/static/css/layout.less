@@ -15,6 +15,8 @@
 
 
 @import "ngw-ui/_ngw-buttons";
+@import "ngw-ui/_ngw-toolbar";
+@import "ngw-ui/_ngw-date-picker";
 
 /* -- BASE STYLES -- */
 @font-face {
@@ -333,6 +335,8 @@ table{
         border-left:0;
         padding: .8em 1em;
         line-height: 1.285;
+        text-overflow: ellipsis;
+        overflow: hidden;
 
         &.fit-content {
             width: 1%;
@@ -489,7 +493,8 @@ table{
         background: @white;
         .padding-block;
         margin-bottom: 40px;
-        .box-shadow(0 1px 3px rgba(57,70,78,.3));
+        box-shadow: @elevation-base;
+        border-radius: @border-radius-base;
 
         p:first-child{
             margin-top:0;
@@ -624,7 +629,7 @@ table{
     top:0;
     bottom:0;
     background-color: @white;
-    box-shadow: 0 0 7px rgba(57,70,78,.2);
+    border-left: 1px solid @light-border;
 };
 
 /*-- Meta info --*/

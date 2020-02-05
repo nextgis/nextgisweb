@@ -313,10 +313,10 @@ a:hover,
   text-decoration: none;
 }
 .link--muted {
-  color: #888;
+  color: #777;
 }
 .link--muted:hover {
-  color: #555555;
+  color: #444444;
 }
 .link__icon {
   vertical-align: middle;
@@ -578,6 +578,13 @@ a:hover,
   border-radius: 4px;
   color: #fff;
   box-shadow: none;
+  outline: 0;
+  vertical-align: middle;
+}
+.ngw-button:hover,
+.ngw-button:active,
+.ngw-button:focus {
+  outline: 0;
 }
 .ngw-button:hover {
   background-color: #05518e;
@@ -604,11 +611,7 @@ a:hover,
   font-size: 14px;
   padding-left: 12px;
   padding-right: 12px;
-  height: 32px;
-}
-.ngw-button__icon {
-  margin-right: 4px;
-  color: inherit;
+  height: 30px;
 }
 .ngw-button--secondary {
   background-color: #e5eef7;
@@ -623,25 +626,26 @@ a:hover,
   color: #076dbf;
 }
 .ngw-button--outlined.ngw-button--secondary {
-  border-color: rgba(0, 0, 0, 0.14);
-  color: #212121;
-}
-.ngw-button--outlined.ngw-button--secondary:hover {
-  border-color: rgba(0, 0, 0, 0.14);
-  color: #076dbf;
+  border-color: rgba(0, 0, 0, 0.16);
+  color: #777;
 }
 .ngw-button--outlined:hover {
-  background-color: rgba(0, 0, 0, 0.02);
-  color: #05518e;
-  border-color: #05518e;
+  background-color: transparent;
+  color: #076dbf;
+  border-color: #076dbf;
 }
 .ngw-button--icon {
   padding-left: 7px;
   padding-right: 12px;
 }
+.ngw-button--icon .ngw-button__icon {
+  margin-right: 4px;
+  color: inherit;
+  opacity: .75;
+}
 .ngw-button--icon.ngw-button--small {
-  padding-left: 6px;
-  padding-right: 10px;
+  padding-left: 4px;
+  padding-right: 8px;
 }
 .ngw-button--icon.ngw-button--small .ngw-button__icon {
   margin-right: 3px;
@@ -657,13 +661,37 @@ a:hover,
 }
 .ngw-button--icon:hover .ngw-button__icon {
   color: #fff;
-}
-.ngw-button--icon.ngw-button--outlined.ngw-button--secondary .ngw-button__icon {
-  color: #999;
+  opacity: 1;
 }
 .ngw-button--icon.ngw-button--outlined:hover .ngw-button__icon,
 .ngw-button--icon.ngw-button--secondary:hover .ngw-button__icon {
   color: #076dbf;
+}
+.ngw-toolbar {
+  background-color: #f0f1f3;
+  padding: 12px;
+  display: flex;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(57, 70, 78, 0.3);
+  border-radius: 4px;
+}
+.ngw-toolbar--space-between {
+  justify-content: space-between;
+}
+.ngw-toolbar__inner {
+  margin-top: -4px;
+  margin-bottom: -4px;
+}
+.ngw-toolbar__tool,
+.ngw-toolbar__tool.dijitReset {
+  margin-right: 12px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  vertical-align: middle;
+}
+.ngw-date-picker__field,
+.ngw-date-picker__field.dijitTextBox {
+  width: 110px;
 }
 /* -- BASE STYLES -- */
 @font-face {
@@ -955,6 +983,8 @@ table {
   border-left: 0;
   padding: .8em 1em;
   line-height: 1.285;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .pure-table td.fit-content,
 .pure-table th.fit-content {
@@ -1078,9 +1108,8 @@ table {
   background: #fff;
   padding: 16px;
   margin-bottom: 40px;
-  -webkit-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
-  -moz-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
-  box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
+  box-shadow: 0 1px 2px rgba(57, 70, 78, 0.3);
+  border-radius: 4px;
 }
 .content-box p:first-child {
   margin-top: 0;
@@ -1111,7 +1140,7 @@ table {
   padding: 10px 16px;
   margin-top: 16px;
   margin-bottom: -16px;
-  color: #888;
+  color: #777;
   margin-left: -16px;
   margin-right: -16px;
 }
@@ -1140,9 +1169,8 @@ table {
   background: #fff;
   padding: 16px;
   margin-bottom: 40px;
-  -webkit-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
-  -moz-box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
-  box-shadow: 0 1px 3px rgba(57, 70, 78, 0.3);
+  box-shadow: 0 1px 2px rgba(57, 70, 78, 0.3);
+  border-radius: 4px;
   padding: 30px 24px;
 }
 .sidebar-menu .table-keyvalue__key__inner,
@@ -1234,7 +1262,7 @@ table {
   top: 0;
   bottom: 0;
   background-color: #fff;
-  box-shadow: 0 0 7px rgba(57, 70, 78, 0.2);
+  border-left: 1px solid #efefef;
 }
 /*-- Meta info --*/
 .meta-info {
@@ -1530,11 +1558,22 @@ textarea {
 }
 .nextgis.claro .dijitSelect,
 .nextgis.claro .dijitTextBox {
-  border-radius: 2px;
+  border-radius: 4px;
+  overflow: hidden;
 }
 .nextgis.claro .dijitSelect .dijitInputField,
 .nextgis.claro .dijitTextBox .dijitInputField {
   padding: 2px 4px;
+}
+.nextgis.claro .dijitSelect--medium .dijitInputField,
+.nextgis.claro .dijitTextBox--medium .dijitInputField {
+  padding: 5px;
+}
+.nextgis.claro .dijitSelect,
+.nextgis.claro .dijitSelect .dijitButtonContents,
+.nextgis.claro .dijitTextBox,
+.nextgis.claro .dijitTextBox .dijitButtonNode {
+  border-color: rgba(0, 0, 0, 0.16);
 }
 .nextgis.claro .dijitSelectHover,
 .nextgis.claro .dijitTextBoxHover,
@@ -1544,7 +1583,7 @@ textarea {
   background-color: #fff;
 }
 .nextgis.claro .dijitTextBoxFocused {
-  border-color: #00e69f;
+  border-color: #076dbf;
 }
 .nextgis.claro .dijitTextArea {
   padding: 4px;
@@ -1728,6 +1767,7 @@ textarea {
 .nextgis.claro .dijitMenuItemSelected {
   background-color: rgba(0, 0, 0, 0.04);
   background-image: none;
+  color: #212121;
 }
 .nextgis.claro .dijitComboBoxMenu {
   padding-top: 5px;
@@ -1785,4 +1825,95 @@ textarea {
 .nextgis.claro .dijitDialogUnderlay {
   background: #010910;
   opacity: .75;
+}
+.nextgis.claro .dijitCalendar {
+  background-color: #fff;
+  border: 0;
+}
+.nextgis.claro .dijitCalendar:hover,
+.nextgis.claro .dijitCalendar.dijitCalendarHover,
+.nextgis.claro .dijitCalendar.dijitCalendarActive {
+  background-color: #fff;
+  border: 0;
+}
+.nextgis.claro .dijitCalendar table {
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+.nextgis.claro .dijitCalendar .dijitDropDownButton .dijitButtonNode {
+  border-color: rgba(0, 0, 0, 0.16);
+}
+.nextgis.claro .dijitCalendar .dijitDropDownButton:hover .dijitButtonNode,
+.nextgis.claro .dijitCalendar .dijitDropDownButton.dijitDropDownButtonHover .dijitButtonNode {
+  border-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.nextgis.claro .dijitCalendarPreviousMonth,
+.nextgis.claro .dijitCalendarNextMonth {
+  background-color: #e5eef7;
+  border-bottom-color: #dedede;
+}
+.nextgis.claro .dijitCalendarPreviousMonth .dijitCalendarDateLabel,
+.nextgis.claro .dijitCalendarNextMonth .dijitCalendarDateLabel {
+  border-color: #e5eef7;
+}
+.nextgis.claro .dijitCalendarDateTemplate {
+  font-weight: normal;
+  color: #212121;
+  font-size: 13px;
+}
+.nextgis.claro .dijitCalendarSelectedDate .dijitCalendarDateLabel {
+  background-color: #076dbf;
+  color: #fff;
+  border-color: #076dbf;
+  font-family: "Roboto";
+}
+.nextgis.claro .dijitCalendarSelectedDate.dijitCalendarHoveredDate .dijitCalendarDateLabel {
+  background-color: #05518e;
+  border-color: #05518e;
+  color: #fff;
+}
+.nextgis.claro .dijitCalendarHoveredDate .dijitCalendarDateLabel {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: #076dbf;
+  border-color: rgba(0, 0, 0, 0.04);
+}
+.nextgis.claro .dijitCalendarDayLabel {
+  font-size: 13px;
+  color: #212121;
+}
+.nextgis.claro .dijitCalendarMonthLabel {
+  color: #212121;
+  font-size: 14px;
+}
+.nextgis.claro .dijitCalendarYearLabel {
+  color: #212121;
+  font-size: 14px;
+  padding: 2px 0 3px;
+}
+.nextgis.claro .dijitCalendarNextYear,
+.nextgis.claro .dijitCalendarPreviousYear {
+  color: #212121;
+  font-size: 13px;
+  padding: 2px 4px;
+}
+.nextgis.claro .dijitCalendarNextYear:hover,
+.nextgis.claro .dijitCalendarPreviousYear:hover,
+.nextgis.claro .dijitCalendarNextYear.dijitCalendarNextYearHover,
+.nextgis.claro .dijitCalendarPreviousYear.dijitCalendarNextYearHover,
+.nextgis.claro .dijitCalendarNextYear.dijitCalendarPreviousYearHover,
+.nextgis.claro .dijitCalendarPreviousYear.dijitCalendarPreviousYearHover {
+  padding: 2px 4px;
+  background-color: rgba(0, 0, 0, 0.04);
+  border: 0;
+  border-radius: 4px;
+}
+.nextgis.claro .dijitCalendarPopup {
+  margin-top: 6px;
+}
+.nextgis.claro .dijitCalendarMonthMenu .dijitCalendarMonthLabelHover,
+.nextgis.claro .dijitCalendarMonthMenu .dijitCalendarMonthLabelActive {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.04);
+  background-image: none;
 }

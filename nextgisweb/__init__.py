@@ -103,4 +103,5 @@ def amd_packages():
         ('ngw-file-upload', 'nextgisweb:file_upload/amd/ngw-file-upload'),
         ('ngw-spatial-ref-sys', 'nextgisweb:spatial_ref_sys/amd/ngw-spatial-ref-sys'),
         ('ngw-render', 'nextgisweb:render/amd/ngw-render'),
+        ('ngw-audit', 'nextgisweb:audit/amd/ngw-audit'),
     )
