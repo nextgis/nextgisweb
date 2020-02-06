@@ -60,7 +60,7 @@
                     value: 3,
                     selected: false,
                 }
-            ]">
+            ], defaultRange: 1">
     </div>
     <div data-dojo-type="ngw-pyramid/NGWButton/NGWButton"
         data-dojo-props="size: 'small', type: 'outlined', color: 'secondary', icon: 'publish', label: '${tr(_('Export'))}'">

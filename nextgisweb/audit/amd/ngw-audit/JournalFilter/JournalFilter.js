@@ -31,6 +31,7 @@ define([
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
         templateString: hbsI18n(template, i18n),
         buttonText: i18n.gettext('Search'),
+        defaultRange: 7,
         constructor: function (options) {
             declare.safeMixin(this,options);
             if (!this.dateFrom || !this.dateTo){
@@ -60,11 +61,11 @@ define([
 
             if (!this.dateFrom && !this.dateTo){
                 this.dateTo = getISODate(new Date());
-                this.dateFrom = getISODate(new Date(), -7);
+                this.dateFrom = getISODate(new Date(), -this.defaultRange);
             } else if (!this.dateTo) { 
-                this.dateTo = getISODate(new Date(this.dateFrom.replace(/-/g, ',')), 7);
+                this.dateTo = getISODate(new Date(this.dateFrom.replace(/-/g, ',')), this.defaultRange);
             } else if (!this.dateFrom) {
-                this.dateFrom = getISODate(new Date(this.dateTo.replace(/-/g, ',')), -7);
+                this.dateFrom = getISODate(new Date(this.dateTo.replace(/-/g, ',')), -this.defaultRange);
             }
 
         }
