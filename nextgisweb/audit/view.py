@@ -51,6 +51,7 @@ def journal_browse(request):
 
     return dict(
         title=_("Journal"),
+        maxwidth=True,
         docs=docs,
         dynmenu=request.env.pyramid.control_panel)
 

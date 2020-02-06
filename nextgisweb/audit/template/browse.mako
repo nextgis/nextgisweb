@@ -23,6 +23,21 @@
             });
         });
     </script>
+    <style>
+        .journal-table{
+            table-layout: fixed;
+        }
+
+        .journal-table .circle{
+            position: relative;
+            top: -1;
+            margin-right: 1px;
+        }
+
+        .journal-table tr:hover td:first-child{
+            color: #076dbf;
+        }
+    </style>    
 </%def>
 
 <div class="journal-toolbar ngw-toolbar ngw-toolbar--space-between">
@@ -53,41 +68,67 @@
 </div>
 <div class="content-box">
     <div class="table-wrapper">
-        <table id="journal-table" class="pure-table pure-table-horizontal" style="table-layout: fixed;">
+        <table id="journal-table" class="journal-table pure-table pure-table-horizontal pure-table-horizontal--s">
+            <colgroup>
+                <col width="15%" />
+                <col width="8%"/>
+                <col width="10%"/>
+                <col width="18%"/>
+                <col width="18%" />
+                <col/>
+                <col/>
+                <col width="15%"/>
+            </colgroup>
             <thead><tr> 
-                <th class="sort-default" style="text-align: inherit;">${tr(_('Timestamp'))}</th>
-                <th class="sort-default" style="text-align: inherit;">${tr(_("Method"))}</th>
-                <th class="sort-default" style="text-align: inherit;">${tr(_("Path"))}</th>
-                <th class="sort-default" style="text-align: inherit;">${tr(_("Status code"))}</th>
-                <th class="sort-default" style="text-align: inherit;">${tr(_("Route name"))}</th>
-                <th class="sort-default" style="text-align: inherit;">${tr(_("User"))}</th>
-                <th colspan="2" class="sort-default" style="text-align: inherit;">${tr(_("Context"))}</th>
+                <th class="sort-default" style="text-align: inherit;">${tr(_('Timestamp'))}</th>                
+                <th class="text-center">${tr(_("Status"))}</th>
+                <th class="text-center">${tr(_("Method"))}</th>
+                <th>${tr(_("Path"))}</th>
+                <th>${tr(_("Route name"))}</th>
+                <th colspan="2">${tr(_("Context"))}</th>                
+                <th>${tr(_("User"))}</th>
             </tr></thead>
 
-            <tbody>
+            <tbody class="small-text">
             
             %for doc in docs:
             <%
                 rid = doc['_id']
                 item = doc['_source']
             %>
-            <tr>
-                <td>
+            <tr style="cursor: pointer;" onClick="window.open('${request.route_url('audit.control_panel.journal.show', id=rid)}','_blank');">
+               <!--  <td>
                     <a href="${request.route_url('audit.control_panel.journal.show', id=rid)}">
                     ${item['@timestamp']}
                     </a>
+                </td> -->
+                <td title="${item['@timestamp']}">
+                    <!-- <a href="${request.route_url('audit.control_panel.journal.show', id=rid)}"> -->
+                        05.02.2020 10:32:13
+                    <!-- </a> -->
                 </td>
-                <td>${item['request']['method']}</td>
-                <td>${item['request']['path']}</td>
-                <td>${item['response']['status_code']}</td>
-                <td>${item['response']['route_name'] if 'route_name' in item['response'] else NBSP}</td>
-                <td>${item['user']['keyname'] if 'user' in item else NBSP}</td>
-                %if 'context' in item:
-                    <td>${item['context']['model']}</td>
-                    <td>${item['context']['id']}</td>
+                <td class="text-center">
+                %if item['response']['status_code'] >= 400:
+                    <span class="circle circle--danger"></span>
+                %elif item['response']['status_code'] < 200 or item['response']['status_code'] >= 300:
+                    <span class="circle circle--secondary"></span>
                 %else:
-                    <td colspan="2">&nbsp;</td>
+                    <span class="circle circle--success"></span>
                 %endif
+                    <span class="v-middle">${item['response']['status_code']}</span>
+                </td>
+                <td class="text-center code-text">${item['request']['method']}</td>
+                <td class="code-text" title="${item['request']['path']}">${item['request']['path']}</td>
+                <td class="code-text" title="${item['response']['route_name'] if 'route_name' in item['response'] else NBSP}">
+                    ${item['response']['route_name'] if 'route_name' in item['response'] else NBSP}</td>
+                %if 'context' in item:
+                    <td class="code-text" title="${item['context']['model']}">${item['context']['model']}</td>
+                    <td class="code-text">${item['context']['id']}</td>
+                %else:
+                    <td class="code-text" style="white-space: nowrap; opacity: .8"> --- </td>
+                    <td class="code-text" style="white-space: nowrap; opacity: .8"> --- </td>
+                %endif
+                <td>${item['user']['keyname'] if 'user' in item else NBSP}</td>
             </tr>
             %endfor
 
