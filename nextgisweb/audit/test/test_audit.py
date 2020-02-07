@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import pytest
 
 from datetime import datetime
+from nextgisweb.audit.util import es_index
 
 
 def one(es, index):
@@ -11,9 +12,8 @@ def one(es, index):
 
 
 @pytest.fixture(scope="module")
-def index():
-    timestamp = datetime.now()
-    return timestamp.strftime("%Y.%m")
+def index(env):
+    return es_index(datetime.now())
 
 
 @pytest.fixture(autouse=True, scope="function")

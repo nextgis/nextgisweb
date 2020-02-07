@@ -15,7 +15,7 @@ from .models import User, Group
 
 def user_cget(request):
     request.require_administrator()
-    return map(lambda o: o.serialize(), User.query())
+    return list(map(lambda o: o.serialize(), User.query()))
 
 
 def user_cpost(request):
@@ -43,7 +43,7 @@ def user_iput(request):
 
 def group_cget(request):
     request.require_administrator()
-    return map(lambda o: o.serialize(), Group.query())
+    return list(map(lambda o: o.serialize(), Group.query()))
 
 
 def group_cpost(request):

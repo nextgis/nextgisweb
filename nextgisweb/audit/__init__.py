@@ -19,6 +19,8 @@ class AuditComponent(Component):
         self.audit_enabled = self.options['enabled']
         self.audit_es_host = self.options['elasticsearch.host']
         self.audit_es_port = self.options['elasticsearch.port']
+        self.audit_es_index_prefix = self.options['elasticsearch.index.prefix']
+        self.audit_es_index_suffix = self.options['elasticsearch.index.suffix']
 
         if self.audit_enabled:
             self.es = Elasticsearch('%s:%d' % (
@@ -42,7 +44,9 @@ class AuditComponent(Component):
         if self.audit_enabled:
             # OOPS: Elasticsearch mappings are not related to database!
             with open(resource_filename('nextgisweb', 'audit/template.json')) as f:
-                self.es.indices.put_template('nextgisweb_audit', body=json.load(f))
+                template = json.load(f)
+                template['index_patterns'] = ['%s-*' % (self.audit_es_index_prefix,)]
+                self.es.indices.put_template('nextgisweb_audit', body=template)
 
     def setup_pyramid(self, config):
         from . import view

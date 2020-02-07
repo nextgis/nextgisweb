@@ -6,13 +6,16 @@ from collections import OrderedDict
 from contextlib import contextmanager
 
 from ..i18n import trstring_factory
+from ..env import env
 
 COMP_ID = 'audit'
 _ = trstring_factory(COMP_ID)
 
 
 def es_index(timestamp):
-    return timestamp.strftime("%Y.%m")
+    return "%s-%s" % (
+        env.audit.audit_es_index_prefix,
+        timestamp.strftime(env.audit.audit_es_index_suffix))
 
 
 def elasticsearch_tween_factory(handler, registry):

@@ -6,6 +6,7 @@ from elasticsearch import NotFoundError
 from pyramid.httpexceptions import HTTPNotFound
 
 from .. import dynmenu as dm
+from ..auth.api import user_cget
 
 from .util import _, es_index, audit_context
 
@@ -17,7 +18,7 @@ def journal_browse(request):
     date = timestamp.strftime("%Y-%m-%d")
     date = request.params.get("date", date)
 
-    index = es_index(timestamp)
+    index = "%s-*" % (request.env.audit.audit_es_index_prefix,)
     docs = []
 
     try:
@@ -49,10 +50,24 @@ def journal_browse(request):
     except NotFoundError:
         pass
 
+
+    users = [dict(label=_('All users'), value='*', selected=True)]
+    users.extend(
+        map(
+            lambda user: dict(
+                label=user.get('display_name'),
+                value=user.get('keyname'),
+                selected=False,
+            ),
+            filter(lambda user: not user.get('system'), user_cget(request)),
+        )
+    )
+
     return dict(
         title=_("Journal"),
         maxwidth=True,
         docs=docs,
+        users=users,
         dynmenu=request.env.pyramid.control_panel)
 
 

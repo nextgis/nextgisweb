@@ -1,5 +1,6 @@
 <%inherit file='nextgisweb:templates/base.mako' />
 <%! 
+    import json
     from markupsafe import Markup
     from nextgisweb.audit.util import _
 
@@ -10,15 +11,12 @@
     <script>
         require([
             "dojo/ready",
-            "dojo/parser",
-            "ngw/sorted-table"
+            "dojo/parser"
         ], function(
             ready,
-            parser,
-            sortedTable
+            parser
         ){
             ready(function() {
-                sortedTable(document.getElementById("journal-table"));
                 parser.parse();
             });
         });
@@ -42,25 +40,8 @@
 
 <div class="journal-toolbar ngw-toolbar ngw-toolbar--space-between">
     <div class="ngw-toolbar__inner"
-        data-dojo-type="ngw-audit/JournalFilter/JournalFilter"
-        data-dojo-props="
-            users: [
-                {   
-                    label: 'All users',
-                    value: 1,
-                    selected: true,
-                },
-                {
-                    label: 'administrator',
-                    value: 2,
-                    selected: false,
-                },
-                {
-                    label: 'guest',
-                    value: 3,
-                    selected: false,
-                }
-            ], defaultRange: 1">
+        data-dojo-type='ngw-audit/JournalFilter/JournalFilter'
+        data-dojo-props='users: ${json.dumps(users) | n}, defaultRange: 1'>
     </div>
     <div data-dojo-type="ngw-pyramid/NGWButton/NGWButton"
         data-dojo-props="size: 'small', type: 'outlined', color: 'secondary', icon: 'publish', label: '${tr(_('Export'))}'">
@@ -80,7 +61,7 @@
                 <col width="15%"/>
             </colgroup>
             <thead><tr> 
-                <th class="sort-default" style="text-align: inherit;">${tr(_('Timestamp'))}</th>                
+                <th style="text-align: inherit;">${tr(_('Timestamp'))}</th>
                 <th class="text-center">${tr(_("Status"))}</th>
                 <th class="text-center">${tr(_("Method"))}</th>
                 <th>${tr(_("Path"))}</th>
