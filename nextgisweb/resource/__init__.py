@@ -60,7 +60,10 @@ class ResourceComponent(Component):
     def initialize(self):
         super(ResourceComponent, self).initialize()
         for item in self.options['disabled_cls']:
-            Resource.registry[item]
+            try:
+                Resource.registry[item]
+            except KeyError:
+                self.logger.error("Resource class '%s' from disabled_cls option not found!", item)
 
         self.quota_limit = self.options['quota.limit']
         self.quota_resource_cls = self.options['quota.resource_cls']
