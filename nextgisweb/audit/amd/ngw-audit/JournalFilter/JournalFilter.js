@@ -34,9 +34,12 @@ define([
         defaultRange: 7,
         constructor: function (options) {
             declare.safeMixin(this,options);
+        },
+        buildRendering: function(){            
             if (!this.dateFrom || !this.dateTo){
                 this._setDefaultDateRange();
-            }
+            } 
+            this.inherited(arguments);
         },
         postCreate: function(){
             array.forEach(this.users, lang.hitch(this, function(user){
