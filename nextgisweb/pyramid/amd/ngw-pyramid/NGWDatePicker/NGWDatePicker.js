@@ -34,11 +34,16 @@ define([
         },
         postCreate: function(){
             on(this.dateFromControl, "change", lang.hitch(this, function(){
-                this.dateFrom = this.dateFromControl.value;
+                this.dateFrom = this._dateToString(this.dateFromControl.value);
             }));
             on(this.dateToControl, "change", lang.hitch(this, function(){
-                this.dateTo = this.dateToControl.value;
+                this.dateTo = this._dateToString(this.dateToControl.value);
             }));
+        },
+        _dateToString: function(date){
+            var timeZoneOffset = date.getTimezoneOffset();
+            date.setMinutes(date.getMinutes() - timeZoneOffset);
+            return date.toISOString().slice(0, 10);
         }
     });
 });

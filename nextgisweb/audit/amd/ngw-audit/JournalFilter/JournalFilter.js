@@ -50,6 +50,8 @@ define([
         _setDefaultDateRange() {
             function getISODate(date, offsetDays) {
                 var result;
+                var timeZoneOffset = date.getTimezoneOffset();
+                date.setMinutes(date.getMinutes() - timeZoneOffset);
                 if (!offsetDays) {
                     result = date.toISOString().slice(0, 10);
                 } else {
