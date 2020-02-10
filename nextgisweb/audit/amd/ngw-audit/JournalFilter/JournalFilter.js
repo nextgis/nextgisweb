@@ -1,7 +1,9 @@
 define([
     'dojo/_base/declare',
-    'ngw-pyramid/i18n!pyramid',
+    'ngw-pyramid/i18n!audit',
     'ngw-pyramid/hbs-i18n',
+    'dojo/on',
+    'dojo/io-query',
     'dojo/_base/lang',
     'dojo/dom-class',
     'dojo/dom-construct',
@@ -17,6 +19,8 @@ define([
     declare,
     i18n,
     hbsI18n,
+    on,
+    ioQuery,
     lang,
     domClass,
     domConstruct,
@@ -35,22 +39,32 @@ define([
         constructor: function (options) {
             declare.safeMixin(this,options);
         },
-        buildRendering: function(){            
+        buildRendering: function(){
             if (!this.dateFrom || !this.dateTo){
                 this._setDefaultDateRange();
-            } 
+            }
             this.inherited(arguments);
         },
         postCreate: function(){
             array.forEach(this.users, lang.hitch(this, function(user){
                 this.userSelect.addOption({
                     label: user.label,
-                    value: user.value,
-                    selected: user.selected
+                    value: user.value
                 });
+                if (user.selected) {
+                    this.userSelect.set('value', user.value);
+                }
+            }));
+            on(this.wButton, 'click', lang.hitch(this, function(){
+                query = {
+                    date_from: this.dateRange.dateFrom,
+                    date_to: this.dateRange.dateTo,
+                    user: this.userSelect.get("value")
+                };
+                window.location.href = this.action + "?" + ioQuery.objectToQuery(query);
             }));
         },
-        _setDefaultDateRange() {
+        _setDefaultDateRange: function(){
             function getISODate(date, offsetDays) {
                 var result;
                 var timeZoneOffset = date.getTimezoneOffset();
@@ -72,7 +86,6 @@ define([
             } else if (!this.dateFrom) {
                 this.dateFrom = getISODate(new Date(this.dateTo.replace(/-/g, ',')), -this.defaultRange);
             }
-
         }
     });
 });

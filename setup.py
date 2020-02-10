@@ -39,6 +39,7 @@ requires = [
     'pyproj==2.2.2',
     'six',
     'elasticsearch>=7.0.0,<8.0.0',
+    'elasticsearch-dsl>=7.1.0,<8.0.0',
 
     # TODO: Move to dev or test dependencies
     'pytest',

@@ -49,7 +49,8 @@ class AuditComponent(Component):
                 self.es.indices.put_template('nextgisweb_audit', body=template)
 
     def setup_pyramid(self, config):
-        from . import view
+        from . import api, view
+        api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
     option_annotations = (
