@@ -25,7 +25,7 @@ def journal_browse(request):
     s = s.using(request.env.audit.es)
 
     if user is not None and user != "*":
-        s = s.query('nested', path='user', query=Q('term', **{'user.keyname': user}))
+        s = s.query(Q('term', **{'user.keyname': user}))
 
     if date_from is not None and date_to is not None:
         s = s.query(
