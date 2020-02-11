@@ -2,53 +2,25 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
 from collections import OrderedDict
-from math import ceil
 
-from elasticsearch_dsl import Search, Q
-from elasticsearch_dsl.query import Bool
 from pyramid.httpexceptions import HTTPNotFound
 
 from .. import dynmenu as dm
+from .api import audit_cget
 from .util import _, es_index, audit_context
 
 
 def journal_browse(request):
-    request.require_administrator()
+    hits = audit_cget(request)
 
     date_from = request.params.get("date_from")
     date_to = request.params.get("date_to")
     user = request.params.get("user")
 
-    index = "%s-*" % (request.env.audit.audit_es_index_prefix,)
-
-    s = Search()
-    s = s.using(request.env.audit.es)
-
-    if user is not None and user != "*":
-        s = s.query(Q('term', **{'user.keyname': user}))
-
-    if date_from is not None and date_to is not None:
-        s = s.query(
-            Bool(
-                filter=[
-                    Q('range', **{'@timestamp': {'gte': date_from, 'lte': date_to}})
-                ]
-            )
-        )
-
-    s = s.sort('-@timestamp')
-
-    def hits(page_size=100):
-        response = s.execute()
-        npages = int(ceil(response.hits.total.value / page_size))
-        for npage in range(npages):
-            for hit in s[npage * page_size : (npage + 1) * page_size]:
-                yield hit
-
     return dict(
         title=_("Journal"),
         maxwidth=True,
-        hits=hits(),
+        hits=hits,
         date_from=date_from,
         date_to=date_to,
         user=user,
