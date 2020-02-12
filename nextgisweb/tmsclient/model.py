@@ -86,6 +86,23 @@ class Layer(Base, Resource, SpatialLayerMixin):
         cascade=False, cascade_backrefs=False,
     )
 
+    @property
+    def tilesize(self):
+        return 256
+
+    @property
+    def maxzoom(self):
+        return 14
+
+    @property
+    def extent(self):
+        return dict(
+            minLon=-180.0,
+            maxLon=180.0,
+            minLat=-90.0,
+            maxLat=90.0,
+        )
+
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
