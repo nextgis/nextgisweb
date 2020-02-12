@@ -73,6 +73,7 @@ class WaitForServiceCommand(Command):
         start = datetime.now()
         timeout = start + timedelta(seconds=args.timeout)
         backoff = 1 / 8
+        maxinterval = 10
         while len(components) > 0:
             nxt = []
             for comp, is_service_ready in components:
@@ -85,11 +86,15 @@ class WaitForServiceCommand(Command):
                         comp.identity, (datetime.now() - start).total_seconds())
             components = nxt
             if datetime.now() > timeout:
-                raise RuntimeError("Wait for service failed for components: {}!".format(
+                logger.critical("Wait for service failed in components: {}!".format(
                     ', '.join([comp.identity for comp, it in components])))
+                exit(1)
             elif len(components) > 0:
+                if backoff == maxinterval:
+                    logger.info("Waiting for service next {} seconds in components: {}".format(
+                        backoff, ', '.join([comp.identity for comp, it in components])))
                 sleep(backoff)
-                backoff = min(2 * backoff, 10)
+                backoff = min(2 * backoff, maxinterval)
 
 
 @Command.registry.register
