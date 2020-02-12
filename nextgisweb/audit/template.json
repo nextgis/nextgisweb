@@ -8,7 +8,6 @@
              "type":"date"
           },
           "request":{
-             "type":"nested",
              "properties":{
                 "method":{
                    "type":"keyword"
@@ -22,7 +21,6 @@
              }
           },
           "response":{
-             "type":"nested",
              "properties":{
                 "status_code":{
                    "type":"keyword"
@@ -33,7 +31,6 @@
              }
           },
           "user":{
-             "type":"nested",
              "properties":{
                 "id":{
                    "type":"keyword"
@@ -47,7 +44,6 @@
              }
           },
           "context": {
-             "type": "nested",
              "properties": {
                 "model": { "type": "keyword" },
                 "id": { "type": "keyword" }
