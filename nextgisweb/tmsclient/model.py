@@ -73,7 +73,7 @@ class RenderRequest(object):
 
     def render_extent(self, extent, size):
         if self.srs.id != 4326:
-            raise ValueError('EPSG:%d projection is not supported for rendering')
+            raise ValueError('EPSG:%d projection is not supported for rendering' % self.srs.id)
         return self.style.render_image(extent, size)
 
     def render_tile(self, tile, size):
@@ -86,7 +86,7 @@ class RenderRequest(object):
             return image
         else:
             if self.srs.id != 4326:
-                raise ValueError('EPSG:%d projection is not supported for rendering')
+                raise ValueError('EPSG:%d projection is not supported for rendering' % self.srs.id)
             extent = self.srs.tile_extent(tile)
             return self.style.render_image(extent, (size, size), zoom=tile[0])
 
