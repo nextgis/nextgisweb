@@ -8,12 +8,12 @@ from nextgisweb.models import DBSession
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.spatial_ref_sys.models import (
     SRS, SRID_LOCAL,
-    WKT_ESPG_4326, WKT_ESPG_3857,
+    WKT_EPSG_4326, WKT_EPSG_3857,
     BOUNDS_EPSG_3857)
 
 
 def test_postgis_sync(txn):
-    obj = SRS(wkt=WKT_ESPG_4326, display_name='')
+    obj = SRS(wkt=WKT_EPSG_4326, display_name='')
     obj.persist()
     DBSession.flush()
 
@@ -24,7 +24,7 @@ def test_postgis_sync(txn):
     srtext, = DBSession.connection().execute(qpg, id=obj.id).fetchone()
     assert obj.wkt == srtext
 
-    obj.wkt = WKT_ESPG_3857
+    obj.wkt = WKT_EPSG_3857
     DBSession.flush()
 
     srtext, = DBSession.connection().execute(qpg, id=obj.id).fetchone()
@@ -51,7 +51,7 @@ def test_postgis_transform(txn, x, y, src, dst):
 
 
 def test_wkt_valid():
-    SRS(wkt=WKT_ESPG_4326)
+    SRS(wkt=WKT_EPSG_4326)
 
 
 def test_wkt_invalid():
