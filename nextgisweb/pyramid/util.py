@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import io
+import os
+import os.path
+import errno
+import fcntl
 import six
 
 from ..i18n import trstring_factory
@@ -71,6 +76,26 @@ class JsonPredicate(object):
         return self.val and (
             request.accept.best_match(self.target + self.test) in self.target
             or request.GET.get('format') == 'json')  # NOQA: W503
+
+
+def persistent_secret(fn, secretgen):
+    try:
+        fh = os.open(fn, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except OSError as e:
+        if e.errno == errno.EEXIST:
+            # Failed as the file already exists
+            with io.open(fn, 'r') as fd:
+                fcntl.flock(fd, fcntl.LOCK_EX)
+                return fd.read()
+        else:
+            raise
+
+    # No exception, so the file must have been created successfully
+    with os.fdopen(fh, 'w') as fd:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        secret = secretgen()
+        fd.write(secret)
+        return secret
 
 
 def header_encoding_tween_factory(handler, registry):

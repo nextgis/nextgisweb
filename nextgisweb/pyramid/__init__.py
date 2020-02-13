@@ -3,6 +3,8 @@ import sys
 import os.path
 import re
 import warnings
+import string
+import secrets
 from hashlib import md5
 from pkg_resources import resource_filename, get_distribution
 from collections import namedtuple
@@ -27,7 +29,8 @@ from .util import (
     viewargs,
     ClientRoutePredicate,
     RequestMethodPredicate,
-    JsonPredicate)
+    JsonPredicate,
+    persistent_secret)
 from .auth import AuthenticationPolicy
 from . import exception
 
@@ -131,8 +134,30 @@ class PyramidComponent(Component):
             event['tr'] = event['request'].localizer.translate
         config.add_subscriber(tr_subscriber, BeforeRender)
 
-        authn_policy = AuthenticationPolicy(settings=dict(
-            secret=self.options['secret']))
+        def _gensecret():
+            if 'secret' in self.options:
+                return self.options['secret']
+            alphabet = string.ascii_letters + string.digits
+            slength = 32
+            self.logger.info("Generating pyramid cookie secret (%d chars)...", slength)
+            return ''.join([
+                secrets.choice(alphabet)
+                for i in range(slength)])
+
+        self.env.core.mksdir(self)
+        sdir = self.env.core.gtsdir(self)
+
+        secret = persistent_secret(os.path.join(sdir, 'secret'), _gensecret)
+        if 'secret' in self.options:
+            if self.options['secret'] == secret:
+                self.logger.warn(
+                    "Deprecated option [pyramid.secret]: Now cookie secret is generated "
+                    "automaticaly and stored in data directory. Secret key was copied "
+                    "there and now can be deleted from configuration options.")
+            else:
+                raise RuntimeError("Option [pyramid.secret] mismatch!")
+
+        authn_policy = AuthenticationPolicy(settings=dict(secret=secret))
         config.set_authentication_policy(authn_policy)
 
         authz_policy = ACLAuthorizationPolicy()
@@ -260,7 +285,7 @@ class PyramidComponent(Component):
         return result
 
     option_annotations = (
-        Option('secret', required=True, doc="Cookies encryption key."),
+        Option('secret', doc="Cookies encryption key (deprecated)."),
         Option('help_page.*'),
         Option('logo'),
         Option('favicon', default=resource_filename(
