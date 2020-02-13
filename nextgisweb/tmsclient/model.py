@@ -215,7 +215,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
                 image.paste(tile_image, (x * self.tilesize, y * self.tilesize))
 
         image = image.crop((left_crop, upper_crop, right_crop, bottom_crop))
-        image = image.resize((self.tilesize, self.tilesize))
+        image = image.resize(size)
 
         return image
 
