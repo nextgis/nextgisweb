@@ -23,21 +23,20 @@ def audit_cget(request):
     s = s.using(request.env.audit.es)
     s = s.sort('-@timestamp')
 
-    if user == '__all':
-        pass
-    elif user == '__non_empty':
-        s = s.query(Q('exists', **{'field': 'user.keyname'}))
-    elif user is not None:
-        s = s.query(Q('term', **{'user.keyname': user}))
+    if user is not None and user != '__all':
+        if user == '__non_empty':
+            s = s.query(Q('exists', **{'field': 'user.keyname'}))
+        else:
+            s = s.query(Q('term', **{'user.keyname': user}))
 
-    if date_from is not None and date_to is not None:
-        s = s.query(
-            Bool(
-                filter=[
-                    Q('range', **{'@timestamp': {'gte': date_from, 'lte': date_to}})
-                ]
-            )
-        )
+    if date_from is None and date_to is None:
+        return []
+
+    if date_from is not None:
+        s = s.query(Q('range', **{'@timestamp': {'gte': date_from}}))
+
+    if date_to is not None:
+        s = s.query(Q('range', **{'@timestamp': {'lte': date_to}}))
 
     def hits(page_size=100):
         response = s.execute()
