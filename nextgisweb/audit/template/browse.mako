@@ -45,8 +45,8 @@
 <%
     users = list(
         [
-            dict(label=_("All users"), value="__all"),
-            dict(label=_("Non-empty users"), value="__non_empty"),
+            dict(label=tr(_("All users")), value="__all"),
+            dict(label=tr(_("Non-empty users")), value="__non_empty"),
         ]
         + list(
             map(
@@ -65,7 +65,13 @@
 <div class="journal-toolbar ngw-toolbar ngw-toolbar--space-between">
     <div class="ngw-toolbar__inner"
         data-dojo-type='ngw-audit/JournalFilter/JournalFilter'
-        data-dojo-props='users: ${json.dumps(users) | n}, dateFrom: ${json.dumps(date_from) | n}, dateTo: ${json.dumps(date_to) | n}, defaultRange: 1, action: "${request.route_url('audit.control_panel.journal.browse')}"'>
+        data-dojo-props='
+            users: ${json.dumps(users) | n},
+            dateFrom: ${json.dumps(date_from) | n},
+            dateTo: ${json.dumps(date_to) | n},
+            dateLast: ${json.dumps(hits[-1]['@timestamp']) if len(hits) else "null" | n},
+            defaultRange: 1,
+            action: "${request.route_url('audit.control_panel.journal.browse')}"'>
     </div>
     <div data-dojo-type="ngw-pyramid/NGWButton/NGWButton"
         data-dojo-props="size: 'small', type: 'outlined', color: 'secondary', icon: 'publish', label: '${tr(_('Export'))}'">

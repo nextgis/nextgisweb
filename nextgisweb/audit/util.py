@@ -31,7 +31,10 @@ def elasticsearch_tween_factory(handler, registry):
 
             body = OrderedDict((
                 ("@timestamp", timestamp),
-                ("request", OrderedDict(method=request.method, path=request.path)),
+                ("request", OrderedDict(
+                    method=request.method,
+                    path=request.path,
+                    remote_addr=request.remote_addr)),
             ))
 
             qstring = request.query_string

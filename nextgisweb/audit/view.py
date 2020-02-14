@@ -11,16 +11,25 @@ from .util import _, es_index, audit_context
 
 
 def journal_browse(request):
-    hits = audit_cget(request)
+    request.require_administrator()
 
     date_from = request.params.get("date_from")
     date_to = request.params.get("date_to")
+    date_last = request.params.get("date_last")
     user = request.params.get("user")
+
+    hits = audit_cget(
+        request=request,
+        date_from=date_last or date_from,
+        date_to=date_to,
+        user=user,
+        limit=None
+    )
 
     return dict(
         title=_("Journal"),
         maxwidth=True,
-        hits=hits,
+        hits=list(hits),
         date_from=date_from,
         date_to=date_to,
         user=user,

@@ -15,8 +15,11 @@
                 "path":{
                    "type":"keyword"
                 },
-                "query_string": {
+                "query_string":{
                    "type": "keyword"
+                },
+                "remote_addr":{
+                   "type": "ip"
                 }
              }
           },
