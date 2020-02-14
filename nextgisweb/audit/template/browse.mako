@@ -43,15 +43,23 @@
 </%def>
 
 <%
-    users = [dict(label=_('All users'), value='*')]
-    users.extend(
-        map(
-            lambda u: dict(
-                label=u.get('display_name'), value=u.get('keyname'),
-                selected=(True if u.get('keyname') == user else False)),
-            filter(lambda u: not u.get('system'), user_cget(request)),
+    users = list(
+        [
+            dict(label=_("All users"), value="__all"),
+            dict(label=_("Non-empty users"), value="__non_empty"),
+        ]
+        + list(
+            map(
+                lambda u: dict(
+                    label=u.get("display_name"),
+                    value=u.get("keyname"),
+                ),
+                filter(lambda u: not u.get("system"), user_cget(request)),
+            )
         )
     )
+    for u in users:
+        u['selected'] = u.get('value') == user
 %>
 
 <div class="journal-toolbar ngw-toolbar ngw-toolbar--space-between">

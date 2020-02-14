@@ -23,7 +23,11 @@ def audit_cget(request):
     s = s.using(request.env.audit.es)
     s = s.sort('-@timestamp')
 
-    if user is not None and user != "*":
+    if user == '__all':
+        pass
+    elif user == '__non_empty':
+        s = s.query(Q('exists', **{'field': 'user.keyname'}))
+    elif user is not None:
         s = s.query(Q('term', **{'user.keyname': user}))
 
     if date_from is not None and date_to is not None:
