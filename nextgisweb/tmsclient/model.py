@@ -176,7 +176,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
             return int(coord)
 
         xtilemin = clip(xtilemin, False)
-        ytilemin = clip(xtilemin, False)
+        ytilemin = clip(ytilemin, False)
         xtilemax = clip(xtilemax, True)
         ytilemax = clip(ytilemax, True)
 
