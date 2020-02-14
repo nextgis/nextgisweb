@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from subprocess import check_output, CalledProcessError
 from setuptools import setup, find_packages
 
@@ -46,6 +47,10 @@ requires = [
     'flake8-future-import',
     'modernize',
 ]
+
+if sys.version < (3, 6):
+    requires.append('python2-secrets')
+
 
 extras_require = {
     'dev': ['pdbpp', 'ipython']

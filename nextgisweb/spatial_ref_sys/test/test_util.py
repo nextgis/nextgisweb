@@ -3,10 +3,10 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import pytest
 
-from nextgisweb.spatial_ref_sys.models import WKT_ESPG_4326, WKT_ESPG_3857
+from nextgisweb.spatial_ref_sys.models import WKT_EPSG_4326, WKT_EPSG_3857
 from nextgisweb.spatial_ref_sys.util import convert_to_wkt, normalize_mapinfo_cs
 
-WKT_ESPG_4326_MI = 'GEOGCS["unnamed",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]]'  # NOQA: E501
+WKT_EPSG_4326_MI = 'GEOGCS["unnamed",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]]'  # NOQA: E501
 
 
 @pytest.mark.parametrize(
@@ -38,18 +38,18 @@ def test_normalize_mapinfo_cs(expected, variants):
     'format, source, expected', [
         pytest.param(
             'proj4', '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs',
-            WKT_ESPG_4326, id='proj4-epsg4326'
+            WKT_EPSG_4326, id='proj4-epsg4326'
         ),
         pytest.param(
             'epsg', '4326',
-            WKT_ESPG_4326, id='epsg-epsg4326'
+            WKT_EPSG_4326, id='epsg-epsg4326'
         ),
         pytest.param(
             'epsg', '3857',
-            WKT_ESPG_3857, id='epsg-epsg3857'
+            WKT_EPSG_3857, id='epsg-epsg3857'
         ),
         pytest.param(
-            'mapinfo', 'Earth Projection 1, 104', WKT_ESPG_4326_MI,
+            'mapinfo', 'Earth Projection 1, 104', WKT_EPSG_4326_MI,
             id='mapinfo-epsg4326'
         ),
         pytest.param(
