@@ -155,6 +155,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
         #################################
 
         minlon, minlat, maxlon, maxlat = extent
+        minlat = max(minlat, -85.0511)
+        maxlat = min(maxlat, 85.0511)
 
         # https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Python
         def deg2num(lat_deg, lon_deg):
