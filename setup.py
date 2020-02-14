@@ -48,7 +48,7 @@ requires = [
     'modernize',
 ]
 
-if sys.version < (3, 6):
+if sys.version_info[0:2] < (3, 6):
     requires.append('python2-secrets')
 
 
