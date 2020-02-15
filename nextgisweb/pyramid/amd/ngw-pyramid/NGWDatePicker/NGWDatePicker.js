@@ -1,33 +1,22 @@
 define([
     'dojo/_base/declare',
-    'ngw-pyramid/i18n!pyramid',
-    'ngw-pyramid/hbs-i18n',
     'dojo/_base/lang',
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/on',
-    'dojo/Evented',
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
     'dijit/form/DateTextBox',
+    'ngw-pyramid/i18n!pyramid',
+    'ngw-pyramid/hbs-i18n',
     'dojo/text!./NGWDatePicker.hbs'
 ], function (
-    declare,
-    i18n,
-    hbsI18n,
-    lang,
-    domClass,
-    domConstruct,
-    on,
-    Evented,
-    _WidgetBase,
-    _TemplatedMixin,
-    _WidgetsInTemplateMixin,
-    DateTextBox,
-    template
+    declare, lang, domClass, domConstruct,
+    on, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
+    DateTextBox, i18n, hbsI18n, template
 ) {
-    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Evented], {
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         dateFrom: '',
         dateTo: '',
