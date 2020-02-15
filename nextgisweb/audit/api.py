@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import json
 from math import ceil
 
 from pyramid.response import Response
 
 from elasticsearch_dsl import Search, Q
-from elasticsearch_dsl.query import Bool
 
 
 def audit_cget(request, date_from=None, date_to=None, user=None, limit=None):
@@ -26,10 +26,10 @@ def audit_cget(request, date_from=None, date_to=None, user=None, limit=None):
     if date_from is None and date_to is None:
         return []
 
-    if date_from is not None:
+    if date_from is not None and date_from != '':
         s = s.query(Q('range', **{'@timestamp': {'gte': date_from}}))
 
-    if date_to is not None:
+    if date_to is not None and date_to != '':
         s = s.query(Q('range', **{'@timestamp': {'lte': date_to}}))
 
     def hits(chunk_size=100, limit=None):
@@ -49,7 +49,27 @@ def audit_cget(request, date_from=None, date_to=None, user=None, limit=None):
 
 
 def export(request):
-    return Response()
+    request.require_administrator()
+
+    date_from = request.params.get("date_from")
+    date_to = request.params.get("date_to")
+    user = request.params.get("user")
+
+    hits = audit_cget(
+        request=request,
+        date_from=date_from,
+        date_to=date_to,
+        user=user,
+    )
+    result = [hit.to_dict() for hit in hits]
+
+    content_disposition = (b'attachment; filename=audit.json')
+
+    return Response(
+        text=json.dumps(result, ensure_ascii=False),
+        content_type=b'application/json',
+        content_disposition=content_disposition
+    )
 
 
 def setup_pyramid(comp, config):
