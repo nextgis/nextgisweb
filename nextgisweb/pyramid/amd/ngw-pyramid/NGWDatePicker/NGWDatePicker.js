@@ -6,11 +6,12 @@ define([
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/on',
+    'dojo/Evented',
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
-    "dijit/_WidgetsInTemplateMixin",
-    "dijit/form/DateTextBox",
-    "dojo/text!./NGWDatePicker.hbs"
+    'dijit/_WidgetsInTemplateMixin',
+    'dijit/form/DateTextBox',
+    'dojo/text!./NGWDatePicker.hbs'
 ], function (
     declare,
     i18n,
@@ -19,28 +20,37 @@ define([
     domClass,
     domConstruct,
     on,
+    Evented,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     DateTextBox,
     template
 ) {
-    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Evented], {
         templateString: hbsI18n(template, i18n),
         dateFrom: '',
         dateTo: '',
+
         constructor: function (options) {
-            declare.safeMixin(this,options);
+            declare.safeMixin(this, options);
         },
-        postCreate: function(){
-            on(this.dateFromControl, "change", lang.hitch(this, function(){
-                this.dateFrom = this._dateToString(this.dateFromControl.value);
+
+        postCreate: function () {
+            var dateValue;
+
+            on(this.dateFromControl, 'change', lang.hitch(this, function () {
+                dateValue = this.dateFromControl.value;
+                this.dateFrom = dateValue ? this._dateToString(dateValue) : '';
             }));
-            on(this.dateToControl, "change", lang.hitch(this, function(){
-                this.dateTo = this._dateToString(this.dateToControl.value);
+
+            on(this.dateToControl, 'change', lang.hitch(this, function () {
+                dateValue = this.dateToControl.value;
+                this.dateTo = dateValue ? this._dateToString(dateValue) : '';
             }));
         },
-        _dateToString: function(date){
+
+        _dateToString: function (date) {
             var timeZoneOffset = date.getTimezoneOffset();
             date.setMinutes(date.getMinutes() - timeZoneOffset);
             return date.toISOString().slice(0, 10);

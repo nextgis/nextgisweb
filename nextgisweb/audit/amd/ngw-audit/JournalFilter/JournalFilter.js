@@ -34,17 +34,19 @@ define([
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
         templateString: hbsI18n(template, i18n),
-        buttonText: i18n.gettext('Search'),
         defaultRange: 7,
+
         constructor: function (options) {
             declare.safeMixin(this,options);
         },
+
         buildRendering: function(){
-            if (!this.dateFrom || !this.dateTo){
+            if (this.dateFrom === null || this.dateTo === null){
                 this._setDefaultDateRange();
             }
             this.inherited(arguments);
         },
+
         postCreate: function(){
             array.forEach(this.users, lang.hitch(this, function(user){
                 this.userSelect.addOption({
@@ -64,6 +66,7 @@ define([
                 window.location.href = this.action + "?" + ioQuery.objectToQuery(query);
             }));
         },
+
         _setDefaultDateRange: function(){
             function getISODate(date, offsetDays) {
                 var result;
