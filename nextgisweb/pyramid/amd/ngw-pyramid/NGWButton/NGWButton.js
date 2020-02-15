@@ -26,11 +26,12 @@ define([
         size: "medium", // small, large
         type: "contained", // outlined
         icon: false,
+        iconPosition: 'first',
         rounded: false,
         color: 'primary',
         constructor: function (options) {
             declare.safeMixin(this,options);
-            var options = ['size', 'type', 'color', 'icon', 'rounded'];            
+            var options = ['size', 'type', 'color', 'icon', 'rounded'];
             this.iconName = this.icon;
             this.icon = this.icon ? true : false;
             this.classes = this._getClasses(options);
@@ -38,7 +39,7 @@ define([
         postCreate: function(){
             this._addClasses();
             if (this.label) this.containerNode.innerHTML = this.label;
-            if (this.icon) this._insertIcon(this.iconName);
+            if (this.icon) this._insertIcon(this.iconName, this.iconPosition);
         },
         _getClasses(options) {
             return options
@@ -52,8 +53,11 @@ define([
                domClass.add(this.domNode, cls);
             }));
         },
-        _insertIcon(icon) {
-            var iconNode = domConstruct.place(`<i class='ngw-button__icon material-icons'>${icon}</i>`, this.domNode, 'first');
+        _insertIcon(icon, position) {
+            var cssClasses = '';
+            if (position === 'first') cssClasses = 'ngw-button__icon--prepend';
+            if (position === 'last') cssClasses = 'ngw-button__icon--append';
+            var iconNode = domConstruct.place(`<i class='ngw-button__icon ${cssClasses} material-icons'>${icon}</i>`, this.domNode, position);
         }
     });
 });

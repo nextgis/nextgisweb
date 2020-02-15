@@ -23,6 +23,11 @@
 
     &:hover{
         background-color: darken(@blue, 10%);
+
+        .ngw-button__icon{
+            color: #fff;
+            opacity: 1;
+        }
     }
 
     &--primary{
@@ -75,28 +80,52 @@
 
         &:hover{
            background-color: transparent;
-           color: @primary;
-           border-color: @primary;
+           color: darken(@primary, 10%);
+           border-color: darken(@primary, 10%);
+
+            .ngw-button__icon{
+                color: darken(@primary, 10%);
+            }
+        }
+
+        &.ngw-button--secondary{
+            &:hover{
+                .ngw-button__icon{
+                    color: @primary;
+                }
+            }
         }
     }
 
     &--icon{
-        padding-left: 7px;
-        padding-right: 12px;
-
         .ngw-button__icon {
-            margin-right: 4px;
             color: inherit;
             opacity: .75;
         }
 
-        &.ngw-button--small{
-            padding-left: 4px;
-            padding-right: 8px;
+        .ngw-button__icon--prepend{
+          margin-right: 4px;
+          margin-left: -8px;
+        }
 
+        .ngw-button__icon--append{
+          margin-left: 4px;
+          margin-right: -8px;
+        }
+
+        &.ngw-button--small{
             .ngw-button__icon{
-                margin-right: 3px;
                 font-size: 18px;
+            }
+
+            .ngw-button__icon--prepend{
+              margin-right: 3px;
+              margin-left: -6px;
+            }
+
+            .ngw-button__icon--append{
+              margin-left: 3px;
+              margin-right: -6px;
             }
         }
 
@@ -107,22 +136,6 @@
             &.ngw-button--small{
                 padding-left: 12px;
                 padding-right: 12px;
-            }
-        }
-
-        &:hover{
-            .ngw-button__icon{
-                color: #fff;
-                opacity: 1;
-            }
-        }
-
-        &.ngw-button--outlined,
-        &.ngw-button--secondary{
-            &:hover{
-                .ngw-button__icon{
-                    color: @primary;
-                }
             }
         }
     }

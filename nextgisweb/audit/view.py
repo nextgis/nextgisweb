@@ -23,7 +23,7 @@ def journal_browse(request):
         date_from=date_last or date_from,
         date_to=date_to,
         user=user,
-        limit=None
+        limit=20
     )
 
     return dict(

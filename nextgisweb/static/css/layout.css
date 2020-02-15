@@ -761,6 +761,10 @@ table {
 .ngw-button:hover {
   background-color: #05518e;
 }
+.ngw-button:hover .ngw-button__icon {
+  color: #fff;
+  opacity: 1;
+}
 .ngw-button--primary {
   background: #076dbf;
   color: #fff;
@@ -803,25 +807,37 @@ table {
 }
 .ngw-button--outlined:hover {
   background-color: transparent;
-  color: #076dbf;
-  border-color: #076dbf;
+  color: #05518e;
+  border-color: #05518e;
 }
-.ngw-button--icon {
-  padding-left: 7px;
-  padding-right: 12px;
+.ngw-button--outlined:hover .ngw-button__icon {
+  color: #05518e;
+}
+.ngw-button--outlined.ngw-button--secondary:hover .ngw-button__icon {
+  color: #076dbf;
 }
 .ngw-button--icon .ngw-button__icon {
-  margin-right: 4px;
   color: inherit;
   opacity: .75;
 }
-.ngw-button--icon.ngw-button--small {
-  padding-left: 4px;
-  padding-right: 8px;
+.ngw-button--icon .ngw-button__icon--prepend {
+  margin-right: 4px;
+  margin-left: -8px;
+}
+.ngw-button--icon .ngw-button__icon--append {
+  margin-left: 4px;
+  margin-right: -8px;
 }
 .ngw-button--icon.ngw-button--small .ngw-button__icon {
-  margin-right: 3px;
   font-size: 18px;
+}
+.ngw-button--icon.ngw-button--small .ngw-button__icon--prepend {
+  margin-right: 3px;
+  margin-left: -6px;
+}
+.ngw-button--icon.ngw-button--small .ngw-button__icon--append {
+  margin-left: 3px;
+  margin-right: -6px;
 }
 .ngw-button--icon.ngw-button--rounded {
   padding-left: 13px;
@@ -830,14 +846,6 @@ table {
 .ngw-button--icon.ngw-button--rounded.ngw-button--small {
   padding-left: 12px;
   padding-right: 12px;
-}
-.ngw-button--icon:hover .ngw-button__icon {
-  color: #fff;
-  opacity: 1;
-}
-.ngw-button--icon.ngw-button--outlined:hover .ngw-button__icon,
-.ngw-button--icon.ngw-button--secondary:hover .ngw-button__icon {
-  color: #076dbf;
 }
 .ngw-toolbar {
   background-color: #f0f1f3;

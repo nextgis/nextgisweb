@@ -15,7 +15,8 @@
             "dojo/ready",
             "dojo/parser",
             "ngw-audit/JournalFilter/JournalFilter",
-            "ngw-pyramid/NGWButton/NGWButton"
+            "ngw-pyramid/NGWButton/NGWButton",
+            "ngw-pyramid/NGWPagination/NGWPagination"
         ], function(
             ready,
             parser
@@ -69,7 +70,6 @@
             users: ${json.dumps(users) | n},
             dateFrom: ${json.dumps(date_from) | n},
             dateTo: ${json.dumps(date_to) | n},
-            dateLast: ${json.dumps(hits[-1]['@timestamp']) if len(hits) else "null" | n},
             defaultRange: 1,
             action: "${request.route_url('audit.control_panel.journal.browse')}",
             exportUrl: "${request.route_url('audit.export')}"'>
@@ -135,4 +135,14 @@
             </tbody>
         </table>
     </div>
+</div>
+<div data-dojo-type="ngw-pyramid/NGWPagination/NGWPagination"
+    data-dojo-props='
+        action: "${request.route_url('audit.control_panel.journal.browse')}",
+        nextQuery: {
+            date_from: ${json.dumps(date_from) | n},
+            date_to: ${json.dumps(date_to) | n},
+            date_last: ${json.dumps(hits[-1]['@timestamp']) if len(hits) else "null" | n},
+        }
+    '>
 </div>
