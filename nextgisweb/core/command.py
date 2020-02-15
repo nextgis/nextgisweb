@@ -70,6 +70,16 @@ class WaitForServiceCommand(Command):
             for comp in env._components.values()
             if hasattr(comp, 'is_service_ready')]
 
+        messages = dict()
+        def log_messages(logfunc):
+            for comp, it in components:
+                if messages[comp] is not None:
+                    logfunc(
+                        "Message from [%s]: %s",
+                        comp.identity, 
+                        messages[comp])
+
+
         start = datetime.now()
         timeout = start + timedelta(seconds=args.timeout)
         backoff = 1 / 8
@@ -78,20 +88,24 @@ class WaitForServiceCommand(Command):
             nxt = []
             for comp, is_service_ready in components:
                 try:
-                    next(is_service_ready)
+                    messages[comp] = next(is_service_ready)
                     nxt.append((comp, is_service_ready))
                 except StopIteration:
                     logger.debug(
                         "Service ready for component [%s] in %0.2f seconds",
                         comp.identity, (datetime.now() - start).total_seconds())
+
             components = nxt
             if datetime.now() > timeout:
+                log_messages(logger.error)
                 logger.critical("Wait for service failed in components: {}!".format(
                     ', '.join([comp.identity for comp, it in components])))
                 exit(1)
+
             elif len(components) > 0:
                 if backoff == maxinterval:
-                    logger.info("Waiting for service next {} seconds in components: {}".format(
+                    log_messages(logger.info)
+                    logger.info("Waiting {} seconds to retry in components: {}".format(
                         backoff, ', '.join([comp.identity for comp, it in components])))
                 sleep(backoff)
                 backoff = min(2 * backoff, maxinterval)
