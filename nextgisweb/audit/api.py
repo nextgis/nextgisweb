@@ -63,7 +63,7 @@ def export(request):
     )
     result = [hit.to_dict() for hit in hits]
 
-    content_disposition = (b'attachment; filename=audit.json')
+    content_disposition = b'attachment; filename=audit.json'
 
     return Response(
         text=json.dumps(result, ensure_ascii=False),
