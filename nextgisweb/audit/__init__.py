@@ -38,7 +38,7 @@ class AuditComponent(Component):
                             request_timeout=1 / 4)
                     break
                 except (esexc.ConnectionError, esexc.ConnectionTimeout) as exc:
-                    yield
+                    yield exc.info.message
 
     def initialize_db(self):
         if self.audit_enabled:
