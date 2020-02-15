@@ -57,20 +57,31 @@ define([
                     this.userSelect.set('value', user.value);
                 }
             }));
-            on(this.wButton, 'click', lang.hitch(this, function(){
-                query = {
-                    date_from: this.dateRange.dateFrom,
-                    date_to: this.dateRange.dateTo,
-                    user: this.userSelect.get("value")
-                };
-                window.location.href = this.action + "?" + ioQuery.objectToQuery(query);
+
+            on(this.searchButton, 'click', lang.hitch(this, function(){
+                window.location.href = this.action + "?" + this._getQuery();
             }));
+
+            on(this.exportButton, 'click', lang.hitch(this, function () {
+                window.location.href = this.exportUrl + '?' + this._getQuery();
+            }));
+        },
+
+        _getQuery: function () {
+            var query = {
+                date_from: this.dateRange.dateFrom,
+                date_to: this.dateRange.dateTo,
+                user: this.userSelect.get('value')
+            };
+
+            return ioQuery.objectToQuery(query);
         },
 
         _setDefaultDateRange: function(){
             function getISODate(date, offsetDays) {
-                var result;
-                var timeZoneOffset = date.getTimezoneOffset();
+                var timeZoneOffset = date.getTimezoneOffset(),
+                    result;
+
                 date.setMinutes(date.getMinutes() - timeZoneOffset);
                 if (!offsetDays) {
                     result = date.toISOString().slice(0, 10);

@@ -1,5 +1,5 @@
 <%inherit file='nextgisweb:templates/base.mako' />
-<%! 
+<%!
     import json
     from datetime import datetime
     from markupsafe import Markup
@@ -32,14 +32,14 @@
 
         .journal-table .circle{
             position: relative;
-            top: -1;
+            top: -1px;
             margin-right: 1px;
         }
 
         .journal-table tr:hover td:first-child{
             color: #076dbf;
         }
-    </style>    
+    </style>
 </%def>
 
 <%
@@ -71,11 +71,9 @@
             dateTo: ${json.dumps(date_to) | n},
             dateLast: ${json.dumps(hits[-1]['@timestamp']) if len(hits) else "null" | n},
             defaultRange: 1,
-            action: "${request.route_url('audit.control_panel.journal.browse')}"'>
+            action: "${request.route_url('audit.control_panel.journal.browse')}",
+            exportUrl: "${request.route_url('audit.export')}"'>
     </div>
-    <div data-dojo-type="ngw-pyramid/NGWButton/NGWButton"
-        data-dojo-props="size: 'small', type: 'outlined', color: 'secondary', icon: 'publish', label: '${tr(_('Export'))}'">
-    </div>   
 </div>
 <div class="content-box">
     <div class="table-wrapper">
@@ -90,18 +88,18 @@
                 <col/>
                 <col width="15%"/>
             </colgroup>
-            <thead><tr> 
+            <thead><tr>
                 <th style="text-align: inherit;">${tr(_('Timestamp'))}</th>
                 <th class="text-center">${tr(_("Status"))}</th>
                 <th class="text-center">${tr(_("Method"))}</th>
                 <th>${tr(_("Path"))}</th>
                 <th>${tr(_("Route name"))}</th>
-                <th colspan="2">${tr(_("Context"))}</th>                
+                <th colspan="2">${tr(_("Context"))}</th>
                 <th>${tr(_("User"))}</th>
             </tr></thead>
 
             <tbody class="small-text">
-            
+
             %for hit in hits:
             <%
                 rid = hit.meta.id
