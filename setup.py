@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 import sys
+import io
 from subprocess import check_output, CalledProcessError
 from setuptools import setup, find_packages
+
+with io.open('VERSION', 'r') as fd:
+    VERSION = fd.read().rstrip()
 
 try:
     gv = check_output(['gdal-config', '--version'], universal_newlines=True).strip()
@@ -84,7 +88,7 @@ entry_points = {
 
 setup(
     name='nextgisweb',
-    version='3.1',
+    version=VERSION,
     description='nextgisweb',
     long_description="",
     classifiers=[
