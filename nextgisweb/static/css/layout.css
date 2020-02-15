@@ -861,6 +861,10 @@ table {
   margin-bottom: 4px;
   vertical-align: middle;
 }
+.ngw-toolbar__tool:last-child,
+.ngw-toolbar__tool.dijitReset:last-child {
+  margin-right: 0;
+}
 .ngw-date-picker__field,
 .ngw-date-picker__field.dijitTextBox {
   width: 110px;
