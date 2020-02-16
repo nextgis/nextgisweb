@@ -19,8 +19,8 @@ define([
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         action: "#",
-        prevLabel: 'Backward',
-        nextLabel: 'Forward',
+        prevLabel: i18n.gettext('Backward'),
+        nextLabel: i18n.gettext('Forward'),
         constructor: function (options) {
             declare.safeMixin(this, options);
             this.withPrev = this.prevQuery && typeof this.prevQuery  === 'object';

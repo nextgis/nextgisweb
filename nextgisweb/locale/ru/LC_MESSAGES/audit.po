@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-11 11:21+0000\n"
+"POT-Creation-Date: 2020-02-16 08:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -20,56 +20,60 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: view.py:49 view.py:104
+#: view.py:30 view.py:85
 msgid "Journal"
 msgstr "Журнал"
 
-#: view.py:78
+#: view.py:59
 #, python-format
 msgid "Journal record: %s"
 msgstr "Запись журнала: %s"
 
-#: view.py:103
+#: view.py:84
 msgid "Audit"
 msgstr "Аудит"
 
-#: amd/ngw-audit/JournalFilter/JournalFilter.js:37
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:17
 msgid "Search"
 msgstr "Поиск"
 
-#: template/browse.mako:44
-msgid "All users"
-msgstr "Все пользователи"
-
-#: template/browse.mako:61
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:23
 msgid "Export"
 msgstr "Экспорт"
 
-#: template/browse.mako:78
+#: template/browse.mako:49
+msgid "All users"
+msgstr "Все пользователи"
+
+#: template/browse.mako:50
+msgid "Non-empty users"
+msgstr "Непустые пользователи"
+
+#: template/browse.mako:92
 msgid "Timestamp"
 msgstr "Время"
 
-#: template/browse.mako:79
+#: template/browse.mako:93
 msgid "Status"
 msgstr "Статус"
 
-#: template/browse.mako:80
+#: template/browse.mako:94
 msgid "Method"
 msgstr "Метод"
 
-#: template/browse.mako:81
+#: template/browse.mako:95
 msgid "Path"
 msgstr "Путь"
 
-#: template/browse.mako:82
+#: template/browse.mako:96
 msgid "Route name"
 msgstr "Имя маршрута"
 
-#: template/browse.mako:83
+#: template/browse.mako:97
 msgid "Context"
 msgstr "Контекст"
 
-#: template/browse.mako:84
+#: template/browse.mako:98
 msgid "User"
 msgstr "Пользователь"
 

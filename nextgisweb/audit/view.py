@@ -15,21 +15,33 @@ def journal_browse(request):
 
     date_from = request.params.get("date_from")
     date_to = request.params.get("date_to")
+    date_first = request.params.get("date_first")
     date_last = request.params.get("date_last")
     user = request.params.get("user")
 
-    hits = audit_cget(
+    if date_first is not None and date_last is not None:
+        raise ValueError(_("'date_first' and 'date_last' are mutually exclusive."))
+
+    kwargs = dict(
         request=request,
         date_from=date_last or date_from,
-        date_to=date_to,
+        date_to=date_first or date_to,
         user=user,
         limit=20
     )
 
+    if date_first:
+        kwargs['order'] = 'desc'
+
+    hits = list(audit_cget(**kwargs))
+
+    if date_first:
+        hits = hits[::-1]
+
     return dict(
         title=_("Journal"),
         maxwidth=True,
-        hits=list(hits),
+        hits=hits,
         date_from=date_from,
         date_to=date_to,
         user=user,

@@ -9,13 +9,15 @@ from pyramid.response import Response
 from elasticsearch_dsl import Search, Q
 
 
-def audit_cget(request, date_from=None, date_to=None, user=None, limit=None):
+def audit_cget(
+    request, date_from=None, date_to=None, user=None, order='asc', limit=None
+):
     s = Search(
         using=request.env.audit.es,
         index="%s-*" % (request.env.audit.audit_es_index_prefix,)
     )
     s = s.using(request.env.audit.es)
-    s = s.sort('@timestamp')
+    s = s.sort('%s%s' % ({'asc': '', 'desc': '-'}[order], '@timestamp'))
 
     if user is not None and user != '__all':
         if user == '__non_empty':
