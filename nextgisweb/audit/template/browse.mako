@@ -138,16 +138,18 @@
 </div>
 <div data-dojo-type="ngw-pyramid/NGWPagination/NGWPagination"
     data-dojo-props='
-        action: "${request.route_url('audit.control_panel.journal.browse')}",
-        prevQuery: {
-            date_from: ${json.dumps(date_from) | n},
-            date_to: ${json.dumps(date_to) | n},
-            date_first: ${json.dumps(hits[0]['@timestamp']) if len(hits) else "null" | n}
-        },
-        nextQuery: {
+        action: "${request.route_url('audit.control_panel.journal.browse')}"
+        ,nextQuery: {
+            user: ${json.dumps(user) | n},
             date_from: ${json.dumps(date_from) | n},
             date_to: ${json.dumps(date_to) | n},
             date_last: ${json.dumps(hits[-1]['@timestamp']) if len(hits) else "null" | n}
+        }
+        ,prevQuery: {
+            user: ${json.dumps(user) | n},
+            date_from: ${json.dumps(date_from) | n},
+            date_to: ${json.dumps(date_to) | n},
+            date_first: ${json.dumps(hits[0]['@timestamp']) if len(hits) else "null" | n}
         }
     '>
 </div>

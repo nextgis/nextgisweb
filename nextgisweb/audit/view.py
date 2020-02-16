@@ -10,6 +10,8 @@ from .api import audit_cget
 from .util import _, es_index, audit_context
 
 
+PAGE_SIZE = 20
+
 def journal_browse(request):
     request.require_administrator()
 
@@ -27,7 +29,7 @@ def journal_browse(request):
         date_from=date_last or date_from,
         date_to=date_first or date_to,
         user=user,
-        limit=20
+        limit=PAGE_SIZE
     )
 
     if date_first:
@@ -45,6 +47,7 @@ def journal_browse(request):
         date_from=date_from,
         date_to=date_to,
         user=user,
+        page_size=PAGE_SIZE,
         dynmenu=request.env.pyramid.control_panel)
 
 
