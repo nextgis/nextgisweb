@@ -2,11 +2,14 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
+import unicodecsv
+
 from math import ceil
-
 from pyramid.response import Response
-
+from pyramid.httpexceptions import HTTPNotFound
 from elasticsearch_dsl import Search, Q
+from flatdict import FlatDict
+from six import StringIO
 
 
 def audit_cget(
@@ -63,13 +66,42 @@ def export(request):
         date_to=date_to,
         user=user,
     )
-    result = [hit.to_dict() for hit in hits]
 
-    content_disposition = 'attachment; filename=audit.json'
+    hits = map(lambda h: h.to_dict(), hits)
+    hits = map(lambda h: FlatDict(h, delimiter='.'), hits)
+    hits = list(hits)
+
+    if len(hits) == 0:
+        raise HTTPNotFound()
+
+    buf = StringIO()
+    writer = unicodecsv.writer(buf, dialect='excel')
+
+    headrow = (
+        '@timestamp',
+        'request.method',
+        'request.path',
+        'request.query_string',
+        'request.remote_addr',
+        'response.status_code',
+        'response.route_name',
+        'user.id',
+        'user.keyname',
+        'user.display_name',
+        'context.id',
+        'context.model',
+    )
+    writer.writerow(headrow)
+
+    for hit in hits:
+        datarow = map(lambda key: hit.get(key), headrow)
+        writer.writerow(datarow)
+
+    content_disposition = 'attachment; filename=audit.csv'
 
     return Response(
-        text=json.dumps(result, ensure_ascii=False),
-        content_type='application/json',
+        buf.getvalue(),
+        content_type='text/csv',
         content_disposition=content_disposition
     )
 
