@@ -15,8 +15,8 @@ PAGE_SIZE = 20
 def journal_browse(request):
     request.require_administrator()
 
-    date_from = request.params.get("date_from")
-    date_to = request.params.get("date_to")
+    date_from = request.params.get("date_from", "")
+    date_to = request.params.get("date_to", "")
     date_first = request.params.get("date_first")
     date_last = request.params.get("date_last")
     user = request.params.get("user")
