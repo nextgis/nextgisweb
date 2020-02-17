@@ -25,7 +25,7 @@ from ..resource import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
 )
-from .util import _
+from .util import _, crop_box
 
 Base = declarative_base()
 
@@ -198,14 +198,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
         minx, miny = transform(minlon, minlat)
         maxx, maxy = transform(maxlon, maxlat)
 
-        a0x, a0y, a1x, a1y = self.srs.tile_extent((zoom, xtilemin, ytilemin))
-        b0x, b0y, b1x, b1y = self.srs.tile_extent((zoom, xtilemax, ytilemax))
-
-        left_crop   = 0 if a1x == a0x else round((minx - a0x) / (a1x - a0x) * self.tilesize)
-        right_crop  = 0 if b1x == b0x else round((maxx - b0x) / (b1x - b0x) * self.tilesize)
-        upper_crop  = 0 if a1y == a0y else round((a0y - maxy) / (a0y - a1y) * self.tilesize)
-        bottom_crop = 0 if b1y == b0y else round((b0y - miny) / (b0y - b1y) * self.tilesize)
-
         width = (xtilemax + 1 - xtilemin) * self.tilesize
         height = (ytilemax + 1 - ytilemin) * self.tilesize
 
@@ -216,7 +208,11 @@ class Layer(Base, Resource, SpatialLayerMixin):
                 tile_image = self.get_tile((zoom, xtile, ytile))
                 image.paste(tile_image, (x * self.tilesize, y * self.tilesize))
 
-        image = image.crop((left_crop, upper_crop, right_crop, bottom_crop))
+        a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtilemin, ytilemin))
+        b0x, b1y, b1x, b0y = self.srs.tile_extent((zoom, xtilemax, ytilemax))
+        box = crop_box((a0x, b1y, b1x, a0y), (minx, miny, maxx, maxy), width, height)
+        image = image.crop(box)
+
         image = image.resize(size)
 
         return image
