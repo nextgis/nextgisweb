@@ -26,14 +26,14 @@ def journal_browse(request):
 
     kwargs = dict(
         request=request,
-        date_from=date_last or date_from,
-        date_to=date_first or date_to,
+        date_from=date_first or date_from,
+        date_to=date_last or date_to,
         user=user,
         limit=PAGE_SIZE
     )
 
     if date_first:
-        kwargs['order'] = 'desc'
+        kwargs['order'] = 'asc'
 
     hits = list(audit_cget(**kwargs))
 

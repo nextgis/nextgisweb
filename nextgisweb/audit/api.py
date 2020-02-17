@@ -13,7 +13,7 @@ from six import StringIO
 
 
 def audit_cget(
-    request, date_from=None, date_to=None, user=None, order='asc', limit=None
+    request, date_from=None, date_to=None, user=None, order='desc', limit=None
 ):
     s = Search(
         using=request.env.audit.es,
