@@ -15,4 +15,37 @@
             title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>
 
     </div>
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2">
+
+        <div data-dojo-attach-point="wTileSize"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: 1, places: 0}, trim: true"
+            title="{{gettext 'Tile size, px'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wMaxZoom"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: 0, places: 0}, trim: true"
+            title="{{gettext 'Max zoom'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentLeft"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -180, max: +180}, trim: true"
+            title="{{gettext 'Left, deg.'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentBottom"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
+            title="{{gettext 'Bottom, deg.'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentRight"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -180, max: +180}, trim: true"
+            title="{{gettext 'Right, deg.'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentTop"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
+            title="{{gettext 'Top, deg.'}}" style="width: 100%"></div>
+
+    </div>
 </div>

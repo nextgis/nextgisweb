@@ -99,6 +99,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
     __scope__ = (DataStructureScope, DataScope)
 
     connection_id = db.Column(db.ForeignKey(Connection.id), nullable=False)
+    tilesize = db.Column(db.Integer, default=256)
+    maxzoom = db.Column(db.Integer, default=14)
+    extent_left = db.Column(db.Float, default=-180.0)
+    extent_right = db.Column(db.Float, default=+180.0)
+    extent_bottom = db.Column(db.Float, default=-90.0)
+    extent_top = db.Column(db.Float, default=+90.0)
 
     connection = db.relationship(
         Connection, foreign_keys=connection_id,
@@ -106,20 +112,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
     )
 
     @property
-    def tilesize(self):
-        return 256
-
-    @property
-    def maxzoom(self):
-        return 14
-
-    @property
     def extent(self):
         return dict(
-            minLon=-180.0,
-            maxLon=180.0,
-            minLat=-90.0,
-            maxLat=90.0,
+            minLon=self.extent_left,
+            maxLon=self.extent_right,
+            minLat=self.extent_bottom,
+            maxLat=self.extent_top,
         )
 
     @classmethod
@@ -233,3 +231,9 @@ class LayerSerializer(Serializer):
 
     connection = SRR(**_defaults)
     srs = SR(**_defaults)
+    tilesize = SP(**_defaults)
+    maxzoom = SP(**_defaults)
+    extent_left = SP(**_defaults)
+    extent_right = SP(**_defaults)
+    extent_bottom = SP(**_defaults)
+    extent_top = SP(**_defaults)
