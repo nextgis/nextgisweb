@@ -25,7 +25,8 @@ from ..resource import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
 )
-from .util import _, crop_box
+from ..spatial_ref_sys import SRS
+from .util import _, crop_box, render_zoom
 
 Base = declarative_base()
 
@@ -137,7 +138,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         return PIL.Image.open(BytesIO(result.content))
 
-    def render_image(self, extent, size, zoom=0):
+    def render_image(self, extent, size, zoom=None):
 
         #################################
         #  ":" - requested extent
@@ -155,6 +156,9 @@ class Layer(Base, Resource, SpatialLayerMixin):
         minlon, minlat, maxlon, maxlat = extent
         minlat = max(minlat, -85.0511)
         maxlat = min(maxlat, 85.0511)
+
+        if zoom is None:
+            zoom = render_zoom(SRS.filter_by(id=4326).one(), extent, size, self.tilesize)
 
         # https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Python
         def deg2num(lat_deg, lon_deg):
