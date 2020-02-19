@@ -1,0 +1,26 @@
+<div class="journal-filter">
+    <div class="journal-filter__search">
+        <div class="journal-filter__search-controls">
+            <div class="ngw-toolbar__tool dijitTextBox--medium nowrap"
+                data-dojo-type="ngw-pyramid/NGWDatePicker/NGWDatePicker"
+                data-dojo-props="dateFrom: '${dateFrom}', dateTo: '${dateTo}'"
+                data-dojo-attach-point="dateRange">    
+            </div>
+            <select class="ngw-toolbar__tool dijitTextBox--medium journal-filter__user"
+                name="journal-user"
+                data-dojo-type="dijit/form/Select"
+                data-dojo-attach-point="userSelect">
+            </select>
+        </div>
+        <div class="journal-filter__button ngw-toolbar__tool"
+            data-dojo-type="ngw-pyramid/NGWButton/NGWButton"
+            data-dojo-props="size: 'small', color: 'primary', label: '{{gettext 'Search'}}'"
+            data-dojo-attach-point="searchButton">
+        </div>    
+    </div>
+    <div class="journal-filter__button ngw-toolbar__tool"
+        data-dojo-type="ngw-pyramid/NGWButton/NGWButton"
+        data-dojo-props="size: 'small', type: 'outlined', color: 'secondary', icon: 'publish', label: '{{gettext 'Export'}}'"
+        data-dojo-attach-point="exportButton">
+    </div>
+</div>

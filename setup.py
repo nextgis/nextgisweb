@@ -43,6 +43,10 @@ requires = [
     'pip==19.2.3',  # https://github.com/pypa/pip/issues/7209
     'pyproj==2.2.2',
     'six',
+    'elasticsearch>=7.0.0,<8.0.0',
+    'elasticsearch-dsl>=7.1.0,<8.0.0',
+    'unicodecsv==0.14.1',
+    'flatdict==4.0.1',
 
     # TODO: Move to dev or test dependencies
     'pytest',

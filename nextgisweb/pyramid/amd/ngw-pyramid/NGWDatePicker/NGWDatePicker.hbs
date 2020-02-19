@@ -1,0 +1,13 @@
+<div class="ngw-date-picker" style="display: inline-block;">
+    <input class="ngw-date-picker__field"
+        type="text" name="dateFrom" id="dateFrom" value="${dateFrom}"
+        data-dojo-type="dijit/form/DateTextBox"
+        data-dojo-props="constraints: { datePattern: 'dd.MM.yyyy'}"
+        data-dojo-attach-point="dateFromControl" />
+         —
+    <input class="ngw-date-picker__field"
+        type="text" name="dateTo" id="dateTo" value="${dateTo}"
+        data-dojo-type="dijit/form/DateTextBox" 
+        data-dojo-props="constraints: { datePattern: 'dd.MM.yyyy'}"
+        data-dojo-attach-point="dateToControl" />
+</div>

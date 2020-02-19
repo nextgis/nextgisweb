@@ -1,0 +1,20 @@
+.journal-filter{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.journal-filter__search{
+    display: flex;
+    flex-direction: row;
+    margin-right: 12px;
+}
+
+.journal-filter__search-controls{
+    margin-right: 12px;
+}
+
+.journal-filter__user{
+    width: 150px;
+}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-08-05 13:35+0000\n"
+"POT-Creation-Date: 2020-02-16 08:15+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: exception.py:185 exception.py:238
+#: exception.py:190 exception.py:246
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:186
+#: exception.py:191
 msgid ""
 "The server encountered an internal error or misconfiguration and was "
 "unable to complete your request."
@@ -31,105 +31,108 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:215
+#: exception.py:220
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:216
+#: exception.py:221
 msgid ""
 "The server could not comply with the request since it is either malformed"
 " or otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:223
+#: exception.py:228
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:224
+#: exception.py:229
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:228
+#: exception.py:233
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:229
+#: exception.py:234
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
-msgstr "Возможно, страница удалена либо в адресе допущена ошибка. Исправьте "
-"адрес или вернитесь на главную страницу и попробуйте найти нужную страницу "
-"с помощью навигации."
+msgstr ""
+"Возможно, страница удалена либо в адресе допущена ошибка. Исправьте адрес"
+" или вернитесь на главную страницу и попробуйте найти нужную страницу с "
+"помощью навигации."
 
-#: exception.py:233
+#: exception.py:241
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:234
+#: exception.py:242
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:239
+#: exception.py:247
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
-msgstr "При обработке запроса возникла внутренняя ошибка или сервер настроен "
+msgstr ""
+"При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:246 exception.py:247
+#: exception.py:254 exception.py:255
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:251
+#: exception.py:259
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:252
+#: exception.py:260
 msgid "The server is currently unavailable. Please try again at a later time."
-msgstr "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
+msgstr ""
+"В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: template/header.mako:74 view.py:33
+#: template/header.mako:78 view.py:31
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: template/header.mako:82 view.py:42
+#: template/header.mako:86 view.py:40
 msgid "Help"
 msgstr "Справка"
 
-#: view.py:69 view.py:191
+#: view.py:63 view.py:185
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:77 view.py:197
+#: view.py:71 view.py:191
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:84 view.py:199
+#: view.py:78 view.py:193
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:91 view.py:201
+#: view.py:85 view.py:195
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:98 view.py:195
+#: view.py:92 view.py:189
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:105 view.py:203
+#: view.py:99 view.py:197
 msgid "Miscellaneous"
 msgstr "Разное"
 
-#: view.py:112 view.py:205
+#: view.py:106 view.py:199
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:190
+#: view.py:184
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:194
+#: view.py:188
 msgid "Settings"
 msgstr "Настройки"
 
@@ -179,6 +182,14 @@ msgstr "Неожидаемый ответ сервера"
 #: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:37
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
+
+#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:22
+msgid "Backward"
+msgstr "Назад"
+
+#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:23
+msgid "Forward"
+msgstr "Вперёд"
 
 #: amd/ngw-pyramid/form/RTETextBox.js:61
 msgid "Rich Text Editor"
@@ -298,7 +309,7 @@ msgstr "Система координат для расчётов"
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: template/header.mako:69
+#: template/header.mako:73
 msgid "Resources"
 msgstr "Ресурсы"
 

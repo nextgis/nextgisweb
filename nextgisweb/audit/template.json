@@ -1,0 +1,58 @@
+{
+    "index_patterns":[
+       "nextgisweb_audit-*"
+    ],
+    "mappings":{
+       "properties":{
+          "@timestamp":{
+             "type":"date"
+          },
+          "request":{
+             "properties":{
+                "method":{
+                   "type":"keyword"
+                },
+                "path":{
+                   "type":"keyword"
+                },
+                "query_string":{
+                   "type": "keyword"
+                },
+                "remote_addr":{
+                   "type": "ip"
+                }
+             }
+          },
+          "response":{
+             "properties":{
+                "status_code":{
+                   "type":"keyword"
+                },
+                "route_name":{
+                   "type":"keyword"
+                }
+             }
+          },
+          "user":{
+             "properties":{
+                "id":{
+                   "type":"keyword"
+                },
+                "keyname":{
+                   "type":"keyword"
+                },
+                "display_name":{
+                   "type":"keyword"
+                }
+             }
+          },
+          "context": {
+             "properties": {
+                "model": { "type": "keyword" },
+                "id": { "type": "keyword" }
+             }
+          }
+       }
+    },
+    "version": 1
+ }

@@ -110,6 +110,7 @@ def header_encoding_tween_factory(handler, registry):
         headers = response.headers
         for h in (
             'Content-Type',
+            'Content-Disposition',
         ):
             if h in headers:
                 v = headers[h]

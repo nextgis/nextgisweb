@@ -100,7 +100,7 @@ def cmd_extract(args):
         if len(catalog) > 0:
             logger.info("Component %s: %d messages", cident, len(catalog))
             outfn = resource_filename(args.package, 'locale/%s.pot' % cident)
-            with open(outfn, 'w') as outfd:
+            with open(outfn, 'wb') as outfd:
                 write_po(outfd, catalog, ignore_obsolete=True)
 
 
@@ -162,7 +162,7 @@ def cmd_update(args):
 
         catalog.update(template, True)
 
-        with open(os.path.join(root, pofile), 'w') as fd:
+        with open(os.path.join(root, pofile), 'wb') as fd:
             write_po(fd, catalog)
 
 
@@ -188,7 +188,7 @@ def cmd_compile(args):
             catalog = read_po(fd, locale=locale, domain=component)
 
         mofile = pofile[:-3] + '.mo'
-        with open(os.path.join(locpath, mofile), 'w') as fd:
+        with open(os.path.join(locpath, mofile), 'wb') as fd:
             write_mo(fd, catalog)
 
         jedfile = pofile[:-3] + '.jed'
