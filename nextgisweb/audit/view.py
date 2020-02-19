@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import OrderedDict
 
 from pyramid.httpexceptions import HTTPNotFound
@@ -11,6 +11,7 @@ from .util import _, es_index, audit_context
 
 
 PAGE_SIZE = 20
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 def journal_browse(request):
     request.require_administrator()
@@ -21,19 +22,26 @@ def journal_browse(request):
     date_last = request.params.get("date_last")
     user = request.params.get("user")
 
-    if date_first is not None and date_last is not None:
-        raise ValueError(_("'date_first' and 'date_last' are mutually exclusive."))
-
     kwargs = dict(
         request=request,
-        date_from=date_first or date_from,
-        date_to=date_last or date_to,
         user=user,
         limit=PAGE_SIZE
     )
 
+    if date_first is not None and date_last is not None:
+        raise ValueError(_("'date_first' and 'date_last' are mutually exclusive."))
+
+    if date_last:
+        date_last = datetime.strptime(date_last, DATE_FORMAT) - timedelta(milliseconds=1)
+        date_last = date_last.strftime(DATE_FORMAT)
+
     if date_first:
         kwargs['order'] = 'asc'
+        date_first = datetime.strptime(date_first, DATE_FORMAT) + timedelta(milliseconds=1)
+        date_first = date_first.strftime(DATE_FORMAT)
+
+    kwargs['date_from'] = date_first or date_from
+    kwargs['date_to'] = date_last or date_to
 
     hits = list(audit_cget(**kwargs))
 
