@@ -36,7 +36,7 @@ define([
                     label: this.prevLabel,
                     type: 'outlined',
                     icon: 'arrow_back_ios',
-                    iconPosition: 'last'
+                    iconPosition: 'first'
                 }).placeAt(this.domNode);
             }
             if (this.withNext) {
