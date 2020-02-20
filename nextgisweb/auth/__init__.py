@@ -23,7 +23,7 @@ class AuthComponent(Component):
     def __init__(self, env, settings):
         super(AuthComponent, self).__init__(env, settings)
         self.settings_register = self.options['register']
-        self.oauth = OAuthServer.from_options(self.options.with_prefix('oauth')) \
+        self.oauth = OAuthServer(self.options.with_prefix('oauth')) \
             if self.options['oauth.enabled'] else None
 
     def initialize_db(self):
