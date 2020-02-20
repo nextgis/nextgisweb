@@ -26,7 +26,7 @@ def elasticsearch_tween_factory(handler, registry):
         response = handler(request)
 
         if not ignore and request.env.audit.audit_enabled:
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
             index = es_index(timestamp)
 
             body = OrderedDict((
