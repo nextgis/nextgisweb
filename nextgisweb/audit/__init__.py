@@ -56,7 +56,7 @@ class AuditComponent(Component):
     option_annotations = (
         Option('enabled', bool, default=False),
         Option('elasticsearch.host', default='elasticsearch'),
-        Option('elasticsearch.port', default=9200),
+        Option('elasticsearch.port', int, default=9200),
         Option('elasticsearch.index.prefix', default='nextgisweb-audit'),
         Option('elasticsearch.index.suffix', default='%Y.%m'),
     )
