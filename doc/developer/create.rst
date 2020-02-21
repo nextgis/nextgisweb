@@ -399,6 +399,7 @@ In request payload add only set fields. Other fields will set to default values.
 
    {"id": 25}
 
+
 Batch create features in vector layer
 ----------------------------------------
 
