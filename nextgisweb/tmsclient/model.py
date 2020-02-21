@@ -71,7 +71,8 @@ class RenderRequest(object):
         self.cond = cond
 
     def render_extent(self, extent, size):
-        return self.style.render_image(extent, size, self.srs)
+        zoom = render_zoom(self.srs, extent, size, self.style.tilesize)
+        return self.style.render_image(extent, size, self.srs, zoom)
 
     def render_tile(self, tile, size):
         if self.srs.id == self.style.srs.id:
@@ -83,7 +84,7 @@ class RenderRequest(object):
             return image
         else:
             extent = self.srs.tile_extent(tile)
-            return self.style.render_image(extent, (size, size), self.srs, zoom=tile[0])
+            return self.style.render_image(extent, (size, size), self.srs, tile[0])
 
 
 @implementer(IRenderableStyle)
@@ -132,7 +133,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         return PIL.Image.open(BytesIO(result.content))
 
-    def render_image(self, extent, size, srs, zoom=None):
+    def render_image(self, extent, size, srs, zoom):
 
         #################################
         #  ":" - requested extent
@@ -169,9 +170,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
                 return (p.GetX(), p.GetY())
 
             extent = transform(*extent[0:2]) + transform(*extent[2:4])
-
-        if zoom is None:
-            zoom = render_zoom(self.srs, extent, size, self.tilesize)
 
         xtilemin, ytilemin, xtilemax, ytilemax = self.srs.extent_tile_range(extent, zoom)
 
