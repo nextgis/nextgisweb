@@ -83,6 +83,29 @@ class SRS(Base):
             (extent[1] + extent[3]) / 2,
         )
 
+    def _point_tilexy(self, px, py, ztile):
+        step = min(
+            (self.maxx - self.minx),
+            (self.maxy - self.miny)
+        ) / (2 ** ztile)
+        return ((px - self.minx) / step, (self.maxy - py) / step)
+
+    def extent_tile_range(self, extent, ztile):
+        xtile_min, ytile_max = self._point_tilexy(extent[0], extent[1], ztile)
+        xtile_max, ytile_min = self._point_tilexy(extent[2], extent[3], ztile)
+
+        E = 1e-6
+        if xtile_min % 1 > 1 - E:
+            xtile_min += 1
+        if ytile_min % 1 > 1 - E:
+            ytile_min += 1
+        if xtile_max % 1 < E:
+            xtile_max -= 1
+        if ytile_max % 1 < E:
+            ytile_max -= 1
+
+        return map(int, (xtile_min, ytile_min, xtile_max, ytile_max))
+
     def __str__(self):
         return self.display_name
 

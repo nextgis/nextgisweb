@@ -9,7 +9,7 @@ from nextgisweb.core.exception import ValidationError
 from nextgisweb.spatial_ref_sys.models import (
     SRS, SRID_LOCAL,
     WKT_EPSG_4326, WKT_EPSG_3857,
-    BOUNDS_EPSG_3857)
+    BOUNDS_EPSG_3857, BOUNDS_EPSG_4326)
 
 
 def test_postgis_sync(txn):
@@ -72,3 +72,16 @@ def test_tile_extent(txn, srs_id, tile, expected):
     srs = SRS.filter_by(id=srs_id).one()
     extent = tuple([round(c, 2) for c in srs.tile_extent(tile)])
     assert extent == expected
+
+
+@pytest.mark.parametrize('srs_id, extent, z, expected', (
+    (4326, BOUNDS_EPSG_4326, 0, [0, 0, 1, 0]),
+    (3857, BOUNDS_EPSG_3857, 0, [0, 0, 0, 0]),
+    (4326, (0, 0, 180, 0), 0, [1, 0, 1, 0]),
+    (4326, (-180, -90, 0, 90), 0, [0, 0, 0, 0]),
+    (3857, (-1017529.72, 7005300.77, -978393.96, 7044436.53), 10, [486, 332, 486, 332]),
+))
+def test_extent_tile_range(txn, srs_id, extent, z, expected):
+    srs = SRS.filter_by(id=srs_id).one()
+    tile_range = srs.extent_tile_range(map(float, extent), z)
+    assert tile_range == expected

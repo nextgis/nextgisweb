@@ -160,30 +160,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
         if zoom is None:
             zoom = render_zoom(SRS.filter_by(id=4326).one(), extent, size, self.tilesize)
 
-        # https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Python
-        def deg2num(lat_deg, lon_deg):
-            lat_rad = math.radians(lat_deg)
-            n = 2.0 ** zoom
-            xtile = (lon_deg + 180.0) / 360.0 * n
-            ytile = (1.0 - math.asinh(math.tan(lat_rad)) / math.pi) / 2.0 * n
-            return (xtile, ytile)
-
-        xtilemin, ytilemax = deg2num(minlat, minlon)
-        xtilemax, ytilemin = deg2num(maxlat, maxlon)
-
-        def clip(coord, is_edge_of_tile):
-            E = 1e-6
-            if coord < 0:
-                coord = 0
-            elif is_edge_of_tile and coord % 1 < E:
-                coord -= 1
-            return int(coord)
-
-        xtilemin = clip(xtilemin, False)
-        ytilemin = clip(ytilemin, False)
-        xtilemax = clip(xtilemax, True)
-        ytilemax = clip(ytilemax, True)
-
         src_osr = osr.SpatialReference()
         dst_osr = osr.SpatialReference()
 
@@ -199,6 +175,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         minx, miny = transform(minlon, minlat)
         maxx, maxy = transform(maxlon, maxlat)
+
+        xtilemin, ytilemin, xtilemax, ytilemax = self.srs.extent_tile_range((minx, miny, maxx, maxy), zoom)
 
         width = (xtilemax + 1 - xtilemin) * self.tilesize
         height = (ytilemax + 1 - ytilemin) * self.tilesize
