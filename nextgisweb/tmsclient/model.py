@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-import math
-
 import PIL
 import requests
 from osgeo import osr, ogr
+from pyproj import CRS
 from six import BytesIO
 from zope.interface import implementer
 
@@ -25,7 +24,6 @@ from ..resource import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
 )
-from ..spatial_ref_sys import SRS
 from .util import _, crop_box, render_zoom
 
 Base = declarative_base()
@@ -73,9 +71,7 @@ class RenderRequest(object):
         self.cond = cond
 
     def render_extent(self, extent, size):
-        if self.srs.id != 4326:
-            raise ValueError('EPSG:%d projection is not supported for rendering' % self.srs.id)
-        return self.style.render_image(extent, size)
+        return self.style.render_image(extent, size, self.srs)
 
     def render_tile(self, tile, size):
         if self.srs.id == self.style.srs.id:
@@ -86,10 +82,8 @@ class RenderRequest(object):
 
             return image
         else:
-            if self.srs.id != 4326:
-                raise ValueError('EPSG:%d projection is not supported for rendering' % self.srs.id)
             extent = self.srs.tile_extent(tile)
-            return self.style.render_image(extent, (size, size), zoom=tile[0])
+            return self.style.render_image(extent, (size, size), self.srs, zoom=tile[0])
 
 
 @implementer(IRenderableStyle)
@@ -138,7 +132,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         return PIL.Image.open(BytesIO(result.content))
 
-    def render_image(self, extent, size, zoom=None):
+    def render_image(self, extent, size, srs, zoom=None):
 
         #################################
         #  ":" - requested extent
@@ -153,30 +147,33 @@ class Layer(Base, Resource, SpatialLayerMixin):
         #   ‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾b1
         #################################
 
-        minlon, minlat, maxlon, maxlat = extent
-        minlat = max(minlat, -85.0511)
-        maxlat = min(maxlat, 85.0511)
+        crs = CRS.from_wkt(srs.wkt)
+        if crs.is_geographic:
+            extent = (
+                extent[0], max(extent[1], -85.0511),
+                extent[2], min(extent[3], 85.0511),
+            )
+
+        if srs.id != self.srs.id:
+            src_osr = osr.SpatialReference()
+            dst_osr = osr.SpatialReference()
+
+            src_osr.ImportFromEPSG(srs.id)
+            dst_osr.ImportFromEPSG(self.srs.id)
+            coordTrans = osr.CoordinateTransformation(src_osr, dst_osr)
+
+            def transform(x, y):
+                p = ogr.Geometry(ogr.wkbPoint)
+                p.AddPoint(x, y)
+                p.Transform(coordTrans)
+                return (p.GetX(), p.GetY())
+
+            extent = transform(*extent[0:2]) + transform(*extent[2:4])
 
         if zoom is None:
-            zoom = render_zoom(SRS.filter_by(id=4326).one(), extent, size, self.tilesize)
+            zoom = render_zoom(self.srs, extent, size, self.tilesize)
 
-        src_osr = osr.SpatialReference()
-        dst_osr = osr.SpatialReference()
-
-        src_osr.ImportFromEPSG(4326)
-        dst_osr.ImportFromEPSG(self.srs.id)
-        coordTrans = osr.CoordinateTransformation(src_osr, dst_osr)
-
-        def transform(lon, lat):
-            p = ogr.Geometry(ogr.wkbPoint)
-            p.AddPoint(lon, lat)
-            p.Transform(coordTrans)
-            return (p.GetX(), p.GetY())
-
-        minx, miny = transform(minlon, minlat)
-        maxx, maxy = transform(maxlon, maxlat)
-
-        xtilemin, ytilemin, xtilemax, ytilemax = self.srs.extent_tile_range((minx, miny, maxx, maxy), zoom)
+        xtilemin, ytilemin, xtilemax, ytilemax = self.srs.extent_tile_range(extent, zoom)
 
         width = (xtilemax + 1 - xtilemin) * self.tilesize
         height = (ytilemax + 1 - ytilemin) * self.tilesize
@@ -190,7 +187,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtilemin, ytilemin))
         b0x, b1y, b1x, b0y = self.srs.tile_extent((zoom, xtilemax, ytilemax))
-        box = crop_box((a0x, b1y, b1x, a0y), (minx, miny, maxx, maxy), width, height)
+        box = crop_box((a0x, b1y, b1x, a0y), extent, width, height)
         image = image.crop(box)
 
         image = image.resize(size)
