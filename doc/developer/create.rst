@@ -351,6 +351,7 @@ To create new feature in vector layer execute following request:
    :reqheader Authorization: optional Basic auth string to authenticate
    :<json string geom: geometry in WKT format (geometry type and spatial reference must be corespondent to layer geometry type and spatial reference)
    :<jsonarr fields: attributes array in form of JSON field name - value object
+   :>json int id: new feature identifier
    :statuscode 201: no error
 
 **Example request**:
@@ -398,6 +399,52 @@ In request payload add only set fields. Other fields will set to default values.
 .. sourcecode:: json
 
    {"id": 25}
+
+Add attachment to feature
+--------------------------
+
+Upload attachment as describe in :ref:`ngwdev_file_upload`.
+
+Add new attachment to feature in vector layer execute following request:
+
+.. http:post:: /api/resource/(int:layer_id)/feature/(int:feature_id)/attachment/
+
+   Add attachment request
+
+   :param layer_id: layer resource identifier
+   :param feature_id: feature identifier
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json string name: file name
+   :<json int size: attachment size from upload meta return after uploaded
+   :<json string mime_type: attachment meta from upload meta return after uploaded
+   :json int id: upload file identifier from upload meta return after uploaded
+   :>json int id: new attachment identifier
+   :statuscode 201: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /api/resource/3/feature/1/attachment/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+   {
+     "name": "196.qml",
+     "size": 1401,
+     "mime_type":"application/octet-stream",
+     "file_upload": {
+       "id": "14158d93-3798-4f1f-ba18-f526e86e6e83",
+       "size": 1401
+     }
+   }
+
+**Example response body**:
+
+.. sourcecode:: json
+
+   {"id": 7}
 
 
 Batch create features in vector layer
