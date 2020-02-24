@@ -441,6 +441,7 @@ To search resources execute the following request:
 **Example request**:
 
 Search by keyname
+
 .. sourcecode:: http
 
    GET /api/resource/search/?keyname=satellite HTTP/1.1
@@ -936,9 +937,7 @@ To get feature count in vector layer execute the following request:
 
 .. sourcecode:: json
 
-   {
-     "total_count": 0
-   }
+   { "total_count": 0 }
 
 Get layer extent
 ^^^^^^^^^^^^^^^^^
