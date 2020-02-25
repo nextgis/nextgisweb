@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from ..component import Component
 from ..lib.config import Option
-from .model import Base, Connection, Layer
+from .model import Base, Connection, Layer, SCHEME
 
 __all__ = ['Connection', 'Layer']
 
@@ -18,6 +18,9 @@ class TMSClientComponent(Component):
         self.headers = {
             'User-Agent': self.options['user_agent']
         }
+
+    def client_settings(self, request):
+        return dict(schemes=SCHEME.enum)
 
     def setup_pyramid(self, config):
         from . import view

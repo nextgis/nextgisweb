@@ -29,6 +29,17 @@ from .util import _, crop_box, render_zoom
 Base = declarative_base()
 
 
+class SCHEME(object):
+    XYZ = 'xyz'
+    TMS = 'tms'
+
+    enum = (XYZ, TMS)
+
+
+def toggle_tms_xyz_y(z, y):
+    return (1 << z) - y - 1
+
+
 class Connection(Base, Resource):
     identity = 'tmsclient_connection'
     cls_display_name = _('TMS connection')
@@ -38,6 +49,7 @@ class Connection(Base, Resource):
     url_template = db.Column(db.Unicode, nullable=False)
     apikey = db.Column(db.Unicode)
     apikey_param = db.Column(db.Unicode)
+    scheme = db.Column(db.Enum(*SCHEME.enum), nullable=False, default=SCHEME.XYZ)
 
     @classmethod
     def check_parent(cls, parent):
@@ -61,6 +73,7 @@ class ConnectionSerializer(Serializer):
     url_template = SP(**_defaults)
     apikey = SP(**_defaults)
     apikey_param = SP(**_defaults)
+    scheme = SP(**_defaults)
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
@@ -125,6 +138,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     def get_tile(self, tile):
         z, x, y = tile
+        if self.connection.scheme == SCHEME.TMS:
+            y = toggle_tms_xyz_y(z, y)
         result = requests.get(
             self.connection.url_template.format(x=x, y=y, z=z),
             params=self.connection.query_params,
