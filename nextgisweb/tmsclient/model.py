@@ -88,16 +88,8 @@ class RenderRequest(object):
         return self.style.render_image(extent, size, self.srs, zoom)
 
     def render_tile(self, tile, size):
-        if self.srs.id == self.style.srs.id:
-            image = self.style.get_tile(tile)
-
-            if image.size != (size, size):
-                image = image.resize((size, size))
-
-            return image
-        else:
-            extent = self.srs.tile_extent(tile)
-            return self.style.render_image(extent, (size, size), self.srs, tile[0])
+        extent = self.srs.tile_extent(tile)
+        return self.style.render_image(extent, (size, size), self.srs, tile[0])
 
 
 @implementer(IRenderableStyle)
@@ -208,7 +200,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
         box = crop_box((a0x, b1y, b1x, a0y), extent, width, height)
         image = image.crop(box)
 
-        image = image.resize(size)
+        if image.size != size:
+            image = image.resize(size)
 
         return image
 
