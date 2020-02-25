@@ -108,6 +108,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
     __scope__ = (DataStructureScope, DataScope)
 
     connection_id = db.Column(db.ForeignKey(Connection.id), nullable=False)
+    layer_name = db.Column(db.Unicode)
     tilesize = db.Column(db.Integer, default=256)
     maxzoom = db.Column(db.Integer, default=14)
     extent_left = db.Column(db.Float, default=-180.0)
@@ -140,8 +141,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
         z, x, y = tile
         if self.connection.scheme == SCHEME.TMS:
             y = toggle_tms_xyz_y(z, y)
+
         result = requests.get(
-            self.connection.url_template.format(x=x, y=y, z=z),
+            self.connection.url_template.format(
+                x=x, y=y, z=z,
+                layer=self.layer_name
+            ),
             params=self.connection.query_params,
             headers=env.tmsclient.headers,
         )
@@ -223,6 +228,7 @@ class LayerSerializer(Serializer):
 
     connection = SRR(**_defaults)
     srs = SR(**_defaults)
+    layer_name = SP(**_defaults)
     tilesize = SP(**_defaults)
     maxzoom = SP(**_defaults)
     extent_left = SP(**_defaults)

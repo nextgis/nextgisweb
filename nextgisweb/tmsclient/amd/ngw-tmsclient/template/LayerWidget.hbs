@@ -14,6 +14,11 @@
             data-dojo-type="ngw-spatial-ref-sys/SRSSelect"
             title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>
 
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-attach-point="wLayerName"
+            data-ngw-serialize="layer_name"
+            title="{{gettext 'Layer'}}" style="width: 100%"></div>
+
     </div>
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2">
 

@@ -39,6 +39,7 @@ define([
             value.connection = this.wConnection.get("value");
             value.srs = {id: this.wSRS.get("value")};
             value.tilesize = this.wTileSize.get("value");
+            value.layer_name = this.wLayerName.get("value");
             value.maxzoom = this.wMaxZoom.get("value");
             value.extent_left = this.wExtentLeft.get("value");
             value.extent_right = this.wExtentRight.get("value");
@@ -52,6 +53,7 @@ define([
 
             this.wConnection.set("value", value.connection);
             this.wSRS.set("value", value.srs.id);
+            this.wLayerName.set("value", value.layer_name);
             this.wTileSize.set("value", value.tilesize);
             this.wMaxZoom.set("value", value.maxzoom);
             this.wExtentLeft.set("value", value.extent_left);
