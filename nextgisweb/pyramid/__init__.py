@@ -164,11 +164,9 @@ class PyramidComponent(Component):
         config.set_authorization_policy(authz_policy)
 
         # Help
-        self.help_page = {}
         for key in settings.keys():
-            if key.startswith('help_page'):
-                hploc = key.split('.')[-1]
-                self.help_page[hploc] = settings[key]
+            if key.startswith('help_page.'):
+                self.env.core.init_settings(self.identity, key, settings[key])
 
         # To not clear static cache by hand make it so that
         # URLs are different. Use md5 hash from all installed packages

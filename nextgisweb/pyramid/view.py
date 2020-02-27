@@ -34,7 +34,7 @@ def control_panel(request):
 
 def help_page(request):
     with codecs.open(
-        request.env.pyramid.help_page[request.locale_name], 'rb', 'utf-8'
+        request.env.core.settings_get('pyramid', 'help_page.%s' % request.locale_name), 'rb', 'utf-8'
     ) as fp:
         help_page = fp.read()
     return dict(title=_("Help"), help_page=help_page)
