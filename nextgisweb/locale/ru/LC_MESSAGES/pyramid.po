@@ -149,15 +149,15 @@ msgstr "Скопировано"
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:37
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
 msgid "Technical information"
 msgstr "Техническая информация"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
 msgid "Contact support"
 msgstr "Написать в поддержку"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:43
 msgid "Back to home"
 msgstr "На главную"
 
