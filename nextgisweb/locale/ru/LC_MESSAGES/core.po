@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: __init__.py:80
+#: __init__.py:81
 msgid "NextGIS geoinformation system"
 msgstr "Геоинформационная система NextGIS"
 
