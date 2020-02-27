@@ -16,7 +16,9 @@
           </a>
         </div>
         <div class="error-card__actions-right">
+          {{#if showSupportUrl}}
           <a href="${supportUrl}" target="_blank" class="error-card__contact-link link link--action">${supportText}</a>
+          {{/if}}
           <a href="${mainActionUrl}" class="error-card__main-action dijit dijitReset dijitInline dijitButton--primary dijitButton"
              data-dojo-attach-point="mainAction">
               <span class="dijitReset dijitInline dijitButtonNode">${mainActionText}</span>
