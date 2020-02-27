@@ -78,9 +78,10 @@ class CoreComponent(Component):
             ('system.name', 'NextGIS Web'),
             ('system.full_name', self.localizer().translate(
                 _('NextGIS geoinformation system'))),
+            ('support_url', "https://nextgis.com/contact/"),
             ('units', 'metric'),
             ('degree_format', 'dd'),
-            ('measurement_srid', 4326)
+            ('measurement_srid', 4326),
         ):
             self.init_settings(self.identity, k, self._settings.get(k, v))
 
@@ -220,7 +221,7 @@ class CoreComponent(Component):
         Option('locale.default', default='en'),
         Option('locale.available', list, default=['en', 'ru']),
         # Other deployment settings
-        Option('support_url', default="http://nextgis.com/contact/"),
+        Option('support_url', default="https://nextgis.com/contact/"),
         # Debug settings
         Option('debug', bool, default=False, doc="Enable additional debug tools."),
     )
