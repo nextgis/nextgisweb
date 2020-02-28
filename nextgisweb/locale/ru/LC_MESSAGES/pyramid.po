@@ -96,7 +96,7 @@ msgstr ""
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: template/header.mako:86 view.py:40
+#: template/header.mako:91 view.py:40
 msgid "Help"
 msgstr "Справка"
 

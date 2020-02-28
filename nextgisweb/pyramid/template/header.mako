@@ -80,7 +80,12 @@
                 }
             %endif
 
-            <% help_page = request.env.pyramid.help_page.get(request.locale_name) %>
+            <%
+                try:
+                    help_page = request.env.core.settings_get('pyramid', 'help_page.%s' % request.locale_name)
+                except KeyError:
+                    help_page = None
+            %>
             %if help_page:
                 ,{
                     "text": '${tr(_("Help"))}',
