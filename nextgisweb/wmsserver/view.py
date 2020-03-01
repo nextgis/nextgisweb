@@ -161,7 +161,7 @@ def _get_map(obj, request):
     buf = StringIO()
 
     if p_format == 'image/jpeg':
-        img.save(buf, 'jpeg')
+        img.convert('RGB').save(buf, 'jpeg')
     elif p_format == 'image/png':
         img.save(buf, 'png')
 
