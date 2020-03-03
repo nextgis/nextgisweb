@@ -29,8 +29,6 @@ table{
         border-left:0;
         padding: .8em 1em;
         line-height: 1.285;
-        text-overflow: ellipsis;
-        overflow: hidden;
 
         &.fit-content {
             width: 1%;
@@ -74,6 +72,15 @@ table{
     & + &{
         margin-top: 20px;
     }
+}
+
+.table--layout-fixed{
+  table-layout: fixed;
+
+  td, th {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 }
 
 .pure-table-horizontal--s{
