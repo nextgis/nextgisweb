@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 import os.path
+import io
 import json
 from pkg_resources import resource_filename
 
@@ -42,10 +43,7 @@ class CoreComponent(Component):
         self.locale_available = self.options['locale.available']
 
         opt_db = self.options.with_prefix('database')
-        sa_url = make_engine_url(EngineURL(
-            'postgresql+psycopg2', host=opt_db['host'], database=opt_db['name'],
-            username=opt_db['user'], password=opt_db['password']
-        ))
+        sa_url = self._engine_url()
 
         self.engine = create_engine(sa_url)
         self._sa_engine = self.engine
@@ -59,12 +57,20 @@ class CoreComponent(Component):
         self.DBSession = DBSession
 
     def is_service_ready(self):
-        conn = None
-        while conn is None:
+        while True:
             try:
-                conn = self._sa_engine.connect()
-            except OperationalError:
-                yield
+                sa_url = self._engine_url(error_on_pwfile=True)
+                break
+            except FileNotFoundError as exc:
+                yield "File [{}] is missing!".format(exc.filename)
+
+        sa_engine = create_engine(sa_url)
+        while True:
+            try:
+                conn = sa_engine.connect()
+                break
+            except OperationalError as exc:
+                yield str(exc.orig).rstrip()
         conn.close()
 
     def initialize_db(self):
@@ -157,6 +163,26 @@ class CoreComponent(Component):
 
         return result
 
+    def _engine_url(self, error_on_pwfile=False):
+        opt_db = self.options.with_prefix('database')
+        kwargs = dict()
+        kwargs['host'] = opt_db['host']
+        kwargs['database'] = opt_db['name']
+        kwargs['username'] = opt_db['user']
+
+        if opt_db['password'] is not None:
+            kwargs['password'] = opt_db['password']
+        elif opt_db['pwfile'] is not None:
+            try:
+                with io.open(opt_db['pwfile']) as fd:
+                    kwargs['password'] = fd.read().rstrip()
+            except FileNotFoundError:
+                if error_on_pwfile:
+                    raise
+        
+        return make_engine_url(EngineURL(
+            'postgresql+psycopg2', **kwargs))        
+
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
         Option('system.full_name', default="NextGIS Web"),
@@ -165,7 +191,8 @@ class CoreComponent(Component):
         Option('database.host', default="localhost"),
         Option('database.name', default="nextgisweb"),
         Option('database.user', default="nextgisweb"),
-        Option('database.password', secure=True),
+        Option('database.password', secure=True, default=None),
+        Option('database.pwfile', default=None),
         Option(
             'database.check_at_startup', bool, default=False,
             doc="Check database connection at initialization. So if database is not available "

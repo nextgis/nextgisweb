@@ -1,11 +1,25 @@
 .nextgis.claro{
+
     .dijitSelect,
     .dijitTextBox{
-        border-radius: 2px;
+        border-radius: @border-radius-base;
+        overflow: hidden;
 
         .dijitInputField{
             padding: 2px 4px;
         }
+
+        &--medium{
+            .dijitInputField{
+                padding: 5px;
+            }
+        }
+    }
+
+    .dijitSelect, 
+    .dijitSelect .dijitButtonContents, 
+    .dijitTextBox, .dijitTextBox .dijitButtonNode{
+        border-color: @input-border-color;
     }
 
     .dijitSelectHover, 
@@ -17,7 +31,7 @@
     }
 
     .dijitTextBoxFocused{
-        border-color: #00e69f;
+        border-color: @primary;
     }
 
     .dijitTextArea{

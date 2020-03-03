@@ -63,6 +63,9 @@ def test_wkt_invalid():
     # West and east hemispheres
     (4326, (0, 0, 0), (-180, -90, 0, 90)),
     (4326, (0, 1, 0), (0, -90, 180, 90)),
+    # Check that Y-axis is top to bottom
+    (4326, (1, 0, 0), (-180, 0, -90, 90)),
+    (4326, (1, 3, 1), (90, -90, 180, 0)),
     # Root tile in EPSG:3857
     (3857, (0, 0, 0), BOUNDS_EPSG_3857),
     # Example from mercantile docs rounded to 2 decimal places

@@ -1,0 +1,79 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2020 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2020-02-16 08:06+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: view.py:30 view.py:85
+msgid "Journal"
+msgstr "Журнал"
+
+#: view.py:59
+#, python-format
+msgid "Journal record: %s"
+msgstr "Запись журнала: %s"
+
+#: view.py:84
+msgid "Audit"
+msgstr "Аудит"
+
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:17
+msgid "Search"
+msgstr "Поиск"
+
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:23
+msgid "Export"
+msgstr "Экспорт"
+
+#: template/browse.mako:49
+msgid "All users"
+msgstr "Все пользователи"
+
+#: template/browse.mako:50
+msgid "Non-empty users"
+msgstr "Непустые пользователи"
+
+#: template/browse.mako:92
+msgid "Timestamp"
+msgstr "Время"
+
+#: template/browse.mako:93
+msgid "Status"
+msgstr "Статус"
+
+#: template/browse.mako:94
+msgid "Method"
+msgstr "Метод"
+
+#: template/browse.mako:95
+msgid "Path"
+msgstr "Путь"
+
+#: template/browse.mako:96
+msgid "Route name"
+msgstr "Имя маршрута"
+
+#: template/browse.mako:97
+msgid "Context"
+msgstr "Контекст"
+
+#: template/browse.mako:98
+msgid "User"
+msgstr "Пользователь"
+

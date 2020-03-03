@@ -18,6 +18,7 @@ from ..resource import (
     ServiceScope, DataScope)
 from ..spatial_ref_sys import SRS
 from ..geometry import geom_from_wkt
+from ..feature_layer import IFeatureLayer
 from .. import geojson
 
 from .model import Service
@@ -111,8 +112,12 @@ def _get_capabilities(obj, request):
             E.Name(l.keyname),
             E.Title(l.display_name))
 
-        for srs in SRS.query():
-            lnode.append(E.SRS('EPSG:%d' % srs.id))
+        if IFeatureLayer.providedBy(l.resource.parent):
+            for srs in SRS.query():
+                lnode.append(E.SRS('EPSG:%d' % srs.id))
+        else:
+            # Only Web Mercator is enabled for raster layers
+            lnode.append(E.SRS('EPSG:3857'))
 
         layer.append(lnode)
 
@@ -156,7 +161,7 @@ def _get_map(obj, request):
     buf = BytesIO()
 
     if p_format == 'image/jpeg':
-        img.save(buf, 'jpeg')
+        img.convert('RGB').save(buf, 'jpeg')
     elif p_format == 'image/png':
         img.save(buf, 'png')
 

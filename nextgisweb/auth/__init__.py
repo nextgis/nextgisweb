@@ -61,11 +61,16 @@ class AuthComponent(Component):
             user_id = request.authenticated_userid
             if user_id:
                 user = User.filter_by(id=user_id).one()
-                if user.disabled:
-                    raise UserDisabled()
-                return user
             else:
-                return User.filter_by(keyname='guest').one()
+                user = User.filter_by(keyname='guest').one()
+
+            # Keep user in request environ for audit component
+            request.environ['auth.user'] = user
+
+            if user.disabled:
+                raise UserDisabled()
+
+            return user
 
         def require_administrator(request):
             if not request.user.is_administrator:

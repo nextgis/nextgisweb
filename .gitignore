@@ -11,8 +11,7 @@ env/
 build/
 dist/
 sdist/
-
-
+node_modules/
 
 # Translations
 *.mo
