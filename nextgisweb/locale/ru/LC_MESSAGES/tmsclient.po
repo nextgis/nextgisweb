@@ -1,0 +1,82 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2020 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.2.0.dev0+95658d80\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2020-03-03 08:21+0000\n"
+"PO-Revision-Date: 2020-03-03 08:21+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: amd/ngw-tmsclient/ConnectionWidget.js:34
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:45
+msgid "TMS connection"
+msgstr ""
+
+#: amd/ngw-tmsclient/LayerWidget.js:32 model.py:98
+msgid "TMS layer"
+msgstr "Слой TMS"
+
+#: view.py:24
+msgid "TMS capabilities"
+msgstr "Возможности TMS"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:10
+msgid "URL template"
+msgstr "Шаблон URL"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:16
+msgid "API key"
+msgstr "API-ключ"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:22
+msgid "API key param"
+msgstr "Параметр API-ключа"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:27
+msgid "Scheme"
+msgstr "Схема"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:15
+msgid "Coordinate system"
+msgstr "Система координат"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:20
+msgid "Layer"
+msgstr "Имя слоя"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:28
+msgid "Tile size, px"
+msgstr "Размер тайла, пикс."
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:33
+msgid "Max zoom level"
+msgstr "Максимальный масштабный уровень"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:38
+msgid "Left, deg."
+msgstr "Лево, град."
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:43
+msgid "Bottom, deg."
+msgstr "Низ, град."
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:48
+msgid "Right, deg."
+msgstr "Право, град."
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:53
+msgid "Top, deg."
+msgstr "Верх, град."
+

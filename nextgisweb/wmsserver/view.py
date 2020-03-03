@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
-from six import StringIO
+from six import BytesIO
 
 from lxml import etree
 from lxml.builder import ElementMaker
@@ -158,7 +158,7 @@ def _get_map(obj, request):
         limg = req.render_extent(p_bbox, p_size)
         img.paste(limg, (0, 0), limg)
 
-    buf = StringIO()
+    buf = BytesIO()
 
     if p_format == 'image/jpeg':
         img.convert('RGB').save(buf, 'jpeg')
