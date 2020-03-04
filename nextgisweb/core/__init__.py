@@ -61,7 +61,7 @@ class CoreComponent(Component):
             try:
                 sa_url = self._engine_url(error_on_pwfile=True)
                 break
-            except FileNotFoundError as exc:
+            except IOError as exc:
                 yield "File [{}] is missing!".format(exc.filename)
 
         sa_engine = create_engine(sa_url)
@@ -176,7 +176,7 @@ class CoreComponent(Component):
             try:
                 with io.open(opt_db['pwfile']) as fd:
                     kwargs['password'] = fd.read().rstrip()
-            except FileNotFoundError:
+            except IOError:
                 if error_on_pwfile:
                     raise
         
