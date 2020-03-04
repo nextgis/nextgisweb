@@ -6,7 +6,8 @@ import logging
 from os.path import join as pthjoin
 from datetime import datetime, timedelta
 from time import sleep
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, mkdtemp, mkstemp
+from shutil import rmtree
 from contextlib import contextmanager
 from backports.tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
@@ -143,17 +144,35 @@ class BackupCommand(Command):
         if args.nozip:
             @contextmanager
             def tgt_context():
-                os.mkdir(target)
-                yield target
+                tmpdir = mkdtemp(dir=os.path.split(target)[0])
+                try:
+                    yield tmpdir
+                    logger.debug("Renaming [%s] to [%s]...", tmpdir, target)
+                    os.rename(tmpdir, target)
+                except Exception:
+                    rmtree(tmpdir)
+                    raise
+                    
         else:
             @contextmanager
             def tgt_context():
-                with TemporaryDirectory() as tmpdir:
-                    yield tmpdir
-                    cls.compress(tmpdir, target)
+                tmp_root = os.path.split(target)[0]
+                with TemporaryDirectory(dir=tmp_root) as tmp_dir:
+                    yield tmp_dir
+                    tmp_arch = mkstemp(dir=tmp_root)[1]
+                    os.unlink(tmp_arch)
+                    try:
+                        cls.compress(tmp_dir, tmp_arch)
+                        logger.debug("Renaming [%s] to [%s]...", tmp_arch, target)
+                        os.rename(tmp_arch, target)
+                    except Exception:
+                        os.unlink(tmp_arch)
+                        raise
 
         with tgt_context() as tgt:
             backup(env, tgt)
+
+        print(target)
 
     @classmethod
     def compress(cls, src, dst):

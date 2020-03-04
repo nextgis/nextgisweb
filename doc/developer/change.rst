@@ -16,11 +16,11 @@ Execute following PUT request to change resource.
    :reqheader Authorization: optional Basic auth string to authenticate
    :param id: resource identifier
    :<json jsonobj resource: resource JSON object
-   :<jsonobj string display_name: resource new name
-   :<jsonobj string keyname: resource new key
-   :<jsonobj int id: resource new parent identifier (resource will move to new parent)
-   :<jsonobj string description: resource new description
-   :<jsonobj jsonarr permissions: resource permissions array
+   :<json string display_name: resource new name
+   :<json string keyname: resource new key
+   :<json int id: resource new parent identifier (resource will move to new parent)
+   :<json string description: resource new description
+   :<json jsonarr permissions: resource permissions array
    :statuscode 200: no error
 
 **Example request**:
@@ -100,14 +100,14 @@ To change file bucket execute following PUT request:
    :reqheader Authorization: optional Basic auth string to authenticate
    :param id: resource identifier
    :<json jsonobj resource: resource JSON object
-   :<jsonobj string cls: type (must be ``file_bucket``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<jsonobj jsonobj parent:  parent resource json object
-   :<jsonobj int id: parent resource identifier
-   :<jsonobj string display_name: name
-   :<jsonobj string keyname: key (optional)
-   :<jsonobj string description: description text, HTML supported (optional)
+   :<json string cls: type (must be ``file_bucket``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json jsonobj parent:  parent resource json object
+   :<json int id: parent resource identifier
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: description text, HTML supported (optional)
    :<json jsonobj file_bucket: file bucket JSON object
-   :<jsonobj jsonarr files: array of files should present in bucket: present (which need to delete don't include in array), also new files (upload response JSON object, files == upload_meta)
+   :<json jsonarr files: array of files should present in bucket: present (which need to delete don't include in array), also new files (upload response JSON object, files == upload_meta)
    :statuscode 200: no error
 
 **Example request**:
@@ -172,12 +172,12 @@ To change flookup table execute following PUT request:
    :reqheader Authorization: optional Basic auth string to authenticate
    :param id: resource identifier
    :<json jsonobj resource: resource JSON object
-   :<jsonobj string cls: type (must be ``lookup_table``, for a list of supported types see :ref:`ngwdev_resource_classes`)
-   :<jsonobj int id: parent resource identifier
-   :<jsonobj string display_name: name
-   :<jsonobj string keyname: key (optional)
-   :<jsonobj string description: description text, HTML supported (optional)
-   :<jsonobj jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
+   :<json string cls: type (must be ``lookup_table``, for a list of supported types see :ref:`ngwdev_resource_classes`)
+   :<json int id: parent resource identifier
+   :<json string display_name: name
+   :<json string keyname: key (optional)
+   :<json string description: description text, HTML supported (optional)
+   :<json jsonobj resmeta: metadata JSON object. Key - value JSON object struct.
    :<json jsonobj lookup_table: lookup table values JSON object. Key - value JSON object struct.
    :statuscode 200: no error
 
@@ -306,6 +306,43 @@ body a feature will be created, else - changed.
      {"id": 26}
    ]
 
+Change attachment
+------------------
+
+Only following information can be changed:
+* file name
+* description
+
+To change attachment execute following request:
+
+.. http:put:: /api/resource/(int:layer_id)/feature/(int:feature_id)/attachment/(int:attachment_id)
+
+   Change feature request
+
+   :param layer_id: layer resource identifier
+   :param feature_id: feature identifier
+   :param attachment_id: attachment identifier
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json name: new name
+   :<json description: new description
+   :>json id: attachment identifier
+   :statuscode 200: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   PUT /api/resource/3/feature/1/attachment/4 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+   {"name": "49.qml", "description": "qqq"}
+   
+.. sourcecode:: bash
+
+   curl --user "user:password" 'https://sandbox.nextgis.com/api/resource/9/feature/1/attachment/4' -X PUT -H 'content-type: application/json' -H 'accept: */*' --data-binary '{"name": "49.qml", "description": "qqq"}'
+
 Delete feature
 ---------------
 
@@ -329,7 +366,6 @@ To delete feature from vector layer execute following request:
    Host: ngw_url
    Accept: */*
 
-
 Delete all features
 ---------------------
 
@@ -351,3 +387,68 @@ To delete all feature in vector layer execute following request:
    DELETE /api/resource/3/feature/ HTTP/1.1
    Host: ngw_url
    Accept: */*
+
+Delete attachment
+-----------------
+
+To delete attachment from a feature execute following request:
+
+.. http:delete:: /api/resource/(int:layer_id)/feature/(int:feature_id)/attachment/(int:attachment_id)
+
+   Delete feature request
+
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :param layer_id: resource identifier
+   :param feature_id: feature identifier
+   :param attachment_id: attachment identifier
+   :statuscode 200: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   DELETE /api/resource/3/feature/1/attachment/1 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+.. sourcecode:: bash
+
+   curl --user "user:password" -H 'Accept: */*' -X DELETE 'https://sandbox.nextgis.com/api/resource/9/feature/1/attachment/1'
+
+
+Delete all attachments
+----------------------
+
+To delete all attachments of a feature execute following request:
+
+.. http:put:: /api/resource/(int:layer_id)/feature/(int:feature_id)
+
+   Change feature request
+
+   :param layer_id: layer resource identifier
+   :param feature_id: feature identifier
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<jsonarr extensions: empty attachment array
+   :>json id: feature identifier
+   :statuscode 200: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   PUT /api/resource/3/feature/1 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+   {
+      "extensions":
+      {
+         "attachment":[]
+      }
+   }
+   
+.. sourcecode:: bash
+
+   curl 'https://sandbox.nextgis.com/api/resource/9/feature/1' --user "user:password" -H 'Accept: */*' -X PUT -H 'content-type: application/json' --data-binary '{"extensions":{"attachment":[]}}'

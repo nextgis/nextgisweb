@@ -50,12 +50,18 @@ define([
         },
 
         _highlightFeature: function (e) {
-            var feature;
+            var feature, geometry;
 
             this._source.clear();
 
+            if (e.geom) {
+                geometry = this._wkt.readGeometry(e.geom);
+            } else if (e.olGeometry) {
+                geometry = e.olGeometry;
+            }
+
             feature = new ol.Feature({
-                geometry: this._wkt.readGeometry(e.geom)
+                geometry: geometry
             });
             this._source.addFeature(feature);
 
