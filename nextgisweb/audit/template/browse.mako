@@ -27,10 +27,6 @@
         });
     </script>
     <style>
-        .journal-table{
-            table-layout: fixed;
-        }
-
         .journal-table .circle{
             position: relative;
             top: -1px;
@@ -77,7 +73,7 @@
 </div>
 <div class="content-box">
     <div class="table-wrapper">
-        <table id="journal-table" class="journal-table pure-table pure-table-horizontal pure-table-horizontal--s">
+        <table id="journal-table" class="journal-table pure-table pure-table-horizontal pure-table-horizontal--s table--layout-fixed">
             <colgroup>
                 <col width="15%" />
                 <col width="8%"/>

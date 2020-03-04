@@ -188,7 +188,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
         width = (xtilemax + 1 - xtilemin) * self.tilesize
         height = (ytilemax + 1 - ytilemin) * self.tilesize
 
-        image = PIL.Image.new('RGB', (width, height), color=None)
+        image = PIL.Image.new('RGBA', (width, height))
 
         for x, xtile in enumerate(range(xtilemin, xtilemax + 1)):
             for y, ytile in enumerate(range(ytilemin, ytilemax + 1)):
