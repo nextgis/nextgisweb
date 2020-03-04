@@ -12,3 +12,6 @@ def test_identify(env, webapp):
     }
     resp = webapp.post_json("/api/feature_layer/identify", data, status=200)
     assert resp.json["featureCount"] == 0
+
+
+
