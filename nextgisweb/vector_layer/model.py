@@ -990,7 +990,7 @@ class FeatureQueryBase(object):
                         % (o, supported_operators)
                     )
 
-                if o in ['in', 'notin']:
+                if v and o in ['in', 'notin']:
                     v = v.split(',')
 
                 if o in [
