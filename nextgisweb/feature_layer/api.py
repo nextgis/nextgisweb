@@ -446,6 +446,19 @@ def cget(resource, request):
     if filter_:
         query.filter(*filter_)
 
+    # Ordering
+    order_by = request.GET.get('order_by')
+    order_by_ = []
+    if order_by is not None:
+        for order_def in list(order_by.split(',')):
+            order, colname = re.match('^(\-|\+|%2B)?(.*)$', order_def).groups()
+            if colname is not None:
+                order = ['asc', 'desc'][order == '-']
+                order_by_.append([order, colname])
+
+    if order_by_:
+        query.order_by(*order_by_)
+
     # Filtering by extent
     wkt = request.GET.get('intersects')
     if wkt is not None:
