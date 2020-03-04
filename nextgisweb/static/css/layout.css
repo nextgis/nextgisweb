@@ -427,8 +427,6 @@ table {
   border-left: 0;
   padding: .8em 1em;
   line-height: 1.285;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 .pure-table td.fit-content,
 .pure-table th.fit-content {
@@ -459,6 +457,14 @@ table {
 }
 .pure-table + .pure-table {
   margin-top: 20px;
+}
+.table--layout-fixed {
+  table-layout: fixed;
+}
+.table--layout-fixed td,
+.table--layout-fixed th {
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .pure-table-horizontal--s td,
 .pure-table-horizontal--s th {
