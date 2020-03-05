@@ -28,4 +28,5 @@ class TMSClientComponent(Component):
 
     option_annotations = (
         Option('user_agent', default="NextGIS Web"),
+        Option('timeout', float, default=15),  # seconds
     )

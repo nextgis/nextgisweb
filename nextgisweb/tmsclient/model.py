@@ -62,6 +62,23 @@ class Connection(Base, Resource):
             params[self.apikey_param or 'apikey'] = self.apikey
         return params
 
+    def get_tile(self, tile, layer_name):
+        z, x, y = tile
+        if self.scheme == SCHEME.TMS:
+            y = toggle_tms_xyz_y(z, y)
+
+        result = requests.get(
+            self.url_template.format(
+                x=x, y=y, z=z,
+                layer=layer_name
+            ),
+            params=self.query_params,
+            headers=env.tmsclient.headers,
+            timeout=env.tmsclient.options['timeout']
+        )
+
+        return PIL.Image.open(BytesIO(result.content))
+
 
 class ConnectionSerializer(Serializer):
     identity = Connection.identity
@@ -129,22 +146,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
     def render_request(self, srs, cond=None):
         return RenderRequest(self, srs, cond)
 
-    def get_tile(self, tile):
-        z, x, y = tile
-        if self.connection.scheme == SCHEME.TMS:
-            y = toggle_tms_xyz_y(z, y)
-
-        result = requests.get(
-            self.connection.url_template.format(
-                x=x, y=y, z=z,
-                layer=self.layer_name
-            ),
-            params=self.connection.query_params,
-            headers=env.tmsclient.headers,
-        )
-
-        return PIL.Image.open(BytesIO(result.content))
-
     def render_image(self, extent, size, srs, zoom):
 
         #################################
@@ -192,7 +193,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         for x, xtile in enumerate(range(xtilemin, xtilemax + 1)):
             for y, ytile in enumerate(range(ytilemin, ytilemax + 1)):
-                tile_image = self.get_tile((zoom, xtile, ytile))
+                tile_image = self.connection.get_tile((zoom, xtile, ytile), self.layer_name)
                 image.paste(tile_image, (x * self.tilesize, y * self.tilesize))
 
         a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtilemin, ytilemin))

@@ -71,6 +71,18 @@ class Integer(OptionType):
         return str(value) if value is not None else ''
 
 
+class Float(OptionType):
+
+    def __str__(self):
+        return 'float'
+
+    def loads(self, value):
+        return float(value)
+
+    def dumps(self, value):
+        return str(value) if value is not None else ''
+
+
 class List(OptionType):
 
     def __init__(self, otype=str, separator=r'\s*\,\s*'):
@@ -95,4 +107,5 @@ else:
 
 OptionType.OTYPE_MAPPING[bool] = Boolean()
 OptionType.OTYPE_MAPPING[int] = Integer()
+OptionType.OTYPE_MAPPING[float] = Float()
 OptionType.OTYPE_MAPPING[list] = List()
