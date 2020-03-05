@@ -60,7 +60,7 @@ def cors_tween_factory(handler, registry):
             # headers and terminate this set of steps.
             # http://www.w3.org/TR/cors/#resource-preflight-requests
             if olist is not None and origin in olist:
-                response = Response(content_type=b'text/plain')
+                response = Response(content_type='text/plain')
 
                 def hadd(n, v):
                     response.headerlist.append((str(n), str(v)))
@@ -307,7 +307,7 @@ def logo_get(request):
         logodata = request.env.core.settings_get('pyramid', 'logo')
         bindata = base64.b64decode(logodata)
         return Response(
-            bindata, content_type=b'image/png',
+            bindata, content_type='image/png',
             expires=timedelta(days=1))
 
     except KeyError:

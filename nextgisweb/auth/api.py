@@ -117,7 +117,7 @@ def login(request):
                     "display_name": user.display_name,
                     "description": user.description
                 }), status_code=200,
-                content_type=b'application/json',
+                content_type='application/json',
                 headers=headers
             )
         else:

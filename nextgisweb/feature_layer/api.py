@@ -160,7 +160,7 @@ def export(request):
 
     return Response(
         buf.getvalue(),
-        content_type=b"%s" % str(content_type),
+        content_type=content_type,
         content_disposition=content_disposition,
     )
 
@@ -246,7 +246,7 @@ def mvt(request):
 
             return Response(
                 content,
-                content_type=b"application/vnd.mapbox-vector-tile",
+                content_type="application/vnd.mapbox-vector-tile",
             )
         else:
             return HTTPNoContent()

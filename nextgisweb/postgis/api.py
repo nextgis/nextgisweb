@@ -26,7 +26,7 @@ def inspect_connection(request):
                 views=inspector.get_view_names(schema=schema_name),
                 tables=inspector.get_table_names(schema=schema_name)))
 
-    return Response(json.dumps(result), content_type=b'application/json')
+    return Response(json.dumps(result), content_type='application/json')
 
 
 def inspect_table(request):
@@ -47,7 +47,7 @@ def inspect_table(request):
     except NoSuchTableError:
         raise ValidationError(_("Table (%s) not found in schema (%s)." % (table_name, schema)))
 
-    return Response(json.dumps(result), content_type=b'application/json')
+    return Response(json.dumps(result), content_type='application/json')
 
 
 def setup_pyramid(comp, config):

@@ -129,7 +129,7 @@ def _get_capabilities(obj, request):
 
     return Response(
         etree.tostring(xml, encoding='utf-8'),
-        content_type=b'text/xml')
+        content_type='text/xml')
 
 
 def _get_map(obj, request):
@@ -167,7 +167,7 @@ def _get_map(obj, request):
 
     buf.seek(0)
 
-    return Response(body_file=buf, content_type=bytes(p_format))
+    return Response(body_file=buf, content_type=p_format)
 
 
 def _get_feature_info(obj, request):
@@ -246,12 +246,12 @@ def _get_feature_info(obj, request):
         ]
         return Response(
             json.dumps(result, cls=geojson.Encoder),
-            content_type=b'application/json')
+            content_type='application/json')
 
     return Response(render_template(
         'nextgisweb:wmsserver/template/get_feature_info_html.mako',
         dict(results=results, resource=obj), request=request
-    ), content_type=b'text/html', charset=b'utf-8')
+    ), content_type='text/html', charset='utf-8')
 
 
 def _get_legend_graphic(obj, request):
@@ -265,7 +265,7 @@ def _get_legend_graphic(obj, request):
 
     img = layer.resource.render_legend()
 
-    return Response(body_file=img, content_type=b'image/png')
+    return Response(body_file=img, content_type='image/png')
 
 
 def setup_pyramid(comp, config):
