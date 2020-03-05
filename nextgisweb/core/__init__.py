@@ -134,12 +134,11 @@ class CoreComponent(Component):
             raise KeyError("Setting %s.%s not found!" % (component, name))
 
     def settings_set(self, component, name, value):
-        with transaction.manager:
-            try:
-                obj = Setting.filter_by(component=component, name=name).one()
-            except NoResultFound:
-                obj = Setting(component=component, name=name).persist()
-            obj.value = json.dumps(value)
+        try:
+            obj = Setting.filter_by(component=component, name=name).one()
+        except NoResultFound:
+            obj = Setting(component=component, name=name).persist()
+        obj.value = json.dumps(value)
 
     def settings_delete(self, component, name):
         try:

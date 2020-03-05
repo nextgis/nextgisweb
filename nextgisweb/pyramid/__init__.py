@@ -163,11 +163,6 @@ class PyramidComponent(Component):
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)
 
-        # Help
-        for key in settings.keys():
-            if key.startswith('help_page.'):
-                self.env.core.init_settings(self.identity, key, settings[key])
-
         # To not clear static cache by hand make it so that
         # URLs are different. Use md5 hash from all installed packages
         # which we can get with pip freeze. pip freeze
@@ -254,6 +249,11 @@ class PyramidComponent(Component):
         config.add_renderer('json', json_renderer)
 
         return config
+
+    def initialize_db(self):
+        for key in self.settings.keys():
+            if key.startswith('help_page.'):
+                self.env.core.init_settings(self.identity, key, self.settings[key])
 
     def setup_pyramid(self, config):
         from . import view, api
