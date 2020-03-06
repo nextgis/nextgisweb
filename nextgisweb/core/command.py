@@ -237,6 +237,25 @@ class MaintenanceCommand(Command):
 
 
 @Command.registry.register
+class DumpConfigCommand(Command):
+    identity = 'dump_config'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        for comp in env.chain('initialize'):
+            sprint = False
+            for k, v in comp.options._options.items():
+                if not sprint:
+                    print('[{}]'.format(comp.identity))
+                    sprint = True
+                print("{} = {}".format(k, v))
+
+
+@Command.registry.register
 class StatisticsCommand(Command):
     identity = 'statistics'
 
