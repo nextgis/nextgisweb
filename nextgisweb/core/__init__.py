@@ -4,6 +4,8 @@ import os
 import os.path
 import io
 import json
+import re
+from datetime import datetime
 from pkg_resources import resource_filename
 
 from sqlalchemy import create_engine
@@ -19,11 +21,12 @@ from ..component import Component
 from ..lib.config import Option
 from ..models import DBSession
 from ..i18n import Localizer, Translations
+from ..compat import Path
 
 from .util import _
 from .model import Base, Setting
 from .command import BackupCommand  # NOQA
-from .backup import BackupBase  # NOQA
+from .backup import BackupBase, BackupMetadata  # NOQA
 
 
 class CoreComponent(Component):
@@ -185,6 +188,25 @@ class CoreComponent(Component):
         con_args = self._db_connection_args(error_on_pwfile=error_on_pwfile)
         return make_engine_url(EngineURL(
             'postgresql+psycopg2', **con_args))
+
+    def get_backups(self):
+        backup_path = Path(self.options['backup.path'])
+        backup_filename = self.options['backup.filename']
+
+        # Replace strftime placeholders with '*' in file glob
+        glob_expr = re.sub('(?:%.)+', '*', backup_filename)
+        result = list()
+        for fn in backup_path.glob(glob_expr):
+            relfn = fn.relative_to(backup_path)
+            result.append(BackupMetadata(
+                relfn, datetime.strptime(str(relfn), backup_filename),
+                fn.stat().st_size))
+        result = sorted(result, key=lambda x: x.timestamp, reverse=True)
+        return result
+
+    def backup_filename(self, filename):
+        return os.path.join(self.options['backup.path'], filename)
+
 
     option_annotations = (
         Option('system.name', default="NextGIS Web"),

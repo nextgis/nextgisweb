@@ -65,6 +65,23 @@ def pkginfo(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def backup_browse(request):
+    if not request.env.pyramid.options['backup.download']:
+        raise HTTPNotFound()
+    request.require_administrator()
+    items = request.env.core.get_backups()
+    return dict(
+        title=_("Backups"), items=items,
+        dynmenu=request.env.pyramid.control_panel)
+
+
+def backup_download(request):
+    if not request.env.pyramid.options['backup.download']:
+        raise HTTPNotFound()
+    request.require_administrator()
+    fn = request.env.core.backup_filename(request.matchdict['filename'])
+    return FileResponse(fn)
+
 def cors(request):
     request.require_administrator()
     return dict(
@@ -144,6 +161,16 @@ def setup_pyramid(comp, config):
     ).add_view(pkginfo, renderer=ctpl('pkginfo'))
 
     config.add_route(
+        'pyramid.control_panel.backup.browse',
+        '/control-panel/backup/'
+    ).add_view(backup_browse, renderer=ctpl('backup'))
+
+    config.add_route(
+        'pyramid.control_panel.backup.download',
+        '/control-panel/backup/{filename}'
+    ).add_view(backup_download)
+
+    config.add_route(
         'pyramid.control_panel.cors',
         '/control-panel/cors'
     ).add_view(cors, renderer=ctpl('cors'))
@@ -199,3 +226,7 @@ def setup_pyramid(comp, config):
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
     )
+
+    if comp.options['backup.download']:
+        comp.control_panel.add(dm.Link('info/backups', _("Backups"), lambda args: 
+            args.request.route_url('pyramid.control_panel.backup.browse')))

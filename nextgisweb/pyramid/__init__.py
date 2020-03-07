@@ -290,5 +290,8 @@ class PyramidComponent(Component):
         Option('logo'),
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
+
+        Option('backup.download', bool, default=False),
+
         Option('sentry_dsn'),
     )
