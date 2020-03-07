@@ -163,25 +163,28 @@ class CoreComponent(Component):
 
         return result
 
-    def _engine_url(self, error_on_pwfile=False):
+    def _db_connection_args(self, error_on_pwfile=False):
         opt_db = self.options.with_prefix('database')
-        kwargs = dict()
-        kwargs['host'] = opt_db['host']
-        kwargs['database'] = opt_db['name']
-        kwargs['username'] = opt_db['user']
+        con_args = dict()
+        con_args['host'] = opt_db['host']
+        con_args['database'] = opt_db['name']
+        con_args['username'] = opt_db['user']
 
         if opt_db['password'] is not None:
-            kwargs['password'] = opt_db['password']
+            con_args['password'] = opt_db['password']
         elif opt_db['pwfile'] is not None:
             try:
                 with io.open(opt_db['pwfile']) as fd:
-                    kwargs['password'] = fd.read().rstrip()
+                    con_args['password'] = fd.read().rstrip()
             except IOError:
                 if error_on_pwfile:
                     raise
-        
+        return con_args
+
+    def _engine_url(self, error_on_pwfile=False):
+        con_args = self._db_connection_args(error_on_pwfile=error_on_pwfile)
         return make_engine_url(EngineURL(
-            'postgresql+psycopg2', **kwargs))        
+            'postgresql+psycopg2', **con_args))
 
     option_annotations = (
         Option('system.name', default="NextGIS Web"),

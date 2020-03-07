@@ -15,7 +15,7 @@ def extent(resource, request):
 
     return Response(
         json.dumps(dict(extent=extent)),
-        content_type=b'application/json')
+        content_type='application/json', charset='utf-8')
 
 
 def setup_pyramid(comp, config):

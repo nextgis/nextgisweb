@@ -90,7 +90,7 @@ def tile(request):
     aimg.save(buf, 'png')
     buf.seek(0)
 
-    return Response(body_file=buf, content_type=b'image/png')
+    return Response(body_file=buf, content_type='image/png')
 
 
 def image(request):
@@ -226,7 +226,7 @@ def image(request):
     aimg.save(buf, 'png')
     buf.seek(0)
 
-    return Response(body_file=buf, content_type=b'image/png')
+    return Response(body_file=buf, content_type='image/png')
 
 
 def tile_cache_seed_status(request):
@@ -246,7 +246,7 @@ def tile_cache_seed_status(request):
 def legend(request):
     request.resource_permission(PD_READ)
     result = request.context.render_legend()
-    return Response(body_file=result, content_type=b'image/png')
+    return Response(body_file=result, content_type='image/png')
 
 
 def setup_pyramid(comp, config):
