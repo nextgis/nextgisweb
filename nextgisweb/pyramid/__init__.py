@@ -292,4 +292,5 @@ class PyramidComponent(Component):
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
         Option('sentry_dsn'),
+        Option('desktop_gis_example', default='NextGIS QGIS')
     )
