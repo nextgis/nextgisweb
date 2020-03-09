@@ -90,7 +90,7 @@
                 ,{
                     "text": '${tr(_("Help"))}',
                     %if re.match("^http[s]?", help_page):
-                        "link": '${help_page}'
+                        "link": '${help_page + '?lang=' + request.locale_name}'
                     %else:
                         "link": '${request.route_url("pyramid.help_page")}'
                     %endif
