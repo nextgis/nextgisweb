@@ -2,10 +2,9 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import PIL
-import requests
 from osgeo import osr, ogr
 from pyproj import CRS
-from six import BytesIO
+from six import BytesIO, PY3
 from zope.interface import implementer
 
 from .. import db
@@ -25,6 +24,12 @@ from ..resource import (
     SerializedResourceRelationship as SRR,
 )
 from .util import _, crop_box, render_zoom
+from .session_keeper import get_session
+
+if PY3:
+    import urllib.parse as urlparse
+else:
+    from urlparse import urlparse
 
 Base = declarative_base()
 
@@ -67,7 +72,9 @@ class Connection(Base, Resource):
         if self.scheme == SCHEME.TMS:
             y = toggle_tms_xyz_y(z, y)
 
-        result = requests.get(
+        session = get_session(self.id, urlparse(self.url_template).scheme)
+
+        result = session.get(
             self.url_template.format(
                 x=x, y=y, z=z,
                 layer=layer_name
