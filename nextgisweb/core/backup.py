@@ -94,6 +94,9 @@ class BackupConfiguration(object):
         self._exclude_table_data.append('{}.{}'.format(schema, table))
 
 
+BackupMetadata = namedtuple('BackupMetadata', ['filename', 'timestamp', 'size'])
+
+
 def parse_pg_dump_version(output):
     """ Parse output of pg_dump --version to LooseVersion """
     output = output.strip()

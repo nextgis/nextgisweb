@@ -43,8 +43,6 @@ def main(argv=sys.argv):
         setup_logging(logging)
 
     env = Env(cfg=load_config(config))
-    env.initialize()
-
     setenv(env)
 
     subparsers = argparser.add_subparsers()
@@ -58,6 +56,10 @@ def main(argv=sys.argv):
 
     if args.logging:
         setup_logging(args.logging)
+
+    no_initialize = hasattr(args.command, 'no_initialize') and args.command.no_initialize
+    if not no_initialize:
+        env.initialize()
 
     args.command.execute(args, env)
 
