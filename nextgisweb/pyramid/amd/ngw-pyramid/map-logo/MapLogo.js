@@ -33,7 +33,6 @@ define([
             var map_logo_data = data.map_logo;
             if (map_logo_data !== null) {
                 mapNode.appendChild(createMapLogo(map_logo_data));
-                console.log(mapNode)
             }
         });
     }
