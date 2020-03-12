@@ -27,6 +27,7 @@ define([
     "ngw/route",
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
+    "ngw-pyramid/map-logo/MapLogo",
     // tools
     "../../tool/Base",
     "../../tool/Zoom",
@@ -50,7 +51,7 @@ define([
     declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template,
     lang, array, Deferred, all, number, aspect, ioQuery, domConstruct, ol,
     Map, registry, ContentPane, ToggleButton, Dialog, domStyle, JsonRest, xhr, ItemFileWriteStore, topic,
-    route, i18n, hbsI18n, ToolBase, ToolZoom, ToolMeasure, Identify, MapStatesObserver,
+    route, i18n, hbsI18n, MapLogo, ToolBase, ToolZoom, ToolMeasure, Identify, MapStatesObserver,
     FeatureHighlighter, clientSettings, LinkToMainMap
 ) {
 
@@ -535,6 +536,9 @@ define([
 
                 idx = idx + 1;
             }, this);
+
+            // Инициализация логотипа карты
+            MapLogo(this.mapNode);
 
             this._zoomToInitialExtent();
             this._setBasemap();

@@ -230,6 +230,10 @@ msgstr "Выйти"
 msgid "Sign in"
 msgstr "Войти"
 
+#: amd/ngw-pyramid/map-logo/MapLogo.js:21
+msgid "Get your own Web GIS at nextgis.com"
+msgstr "Сделайте свою Веб ГИС на nextgis.com"
+
 #: amd/ngw-pyramid/template/CORSForm.hbs:17
 msgid ""
 "Enter allowed origins for cross domain requests to use HTTP API of this "

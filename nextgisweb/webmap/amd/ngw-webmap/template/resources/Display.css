@@ -204,17 +204,6 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
         margin-bottom: -1px;
     }
 
-/* Logo */
-
-.map-logo{
-    position: absolute;
-    right: 10px;
-    bottom: 28px;
-    text-decoration: none;
-    line-height: 1;
-    z-index: 1000;
-}
-
 /* leftPanelPane */
 
 .leftPanelPane{
