@@ -332,6 +332,15 @@ def logo_put(request):
     return Response()
 
 
+def map_logo_get(request):
+    try:
+        maplogo_data = request.env.core.settings_get('pyramid', 'map_logo')
+    except KeyError:
+        maplogo_data = None
+
+    return dict(map_logo=maplogo_data)
+
+
 def setup_pyramid(comp, config):
     config.add_tween(
         'nextgisweb.pyramid.api.cors_tween_factory',
@@ -387,3 +396,6 @@ def setup_pyramid(comp, config):
                      '/api/component/pyramid/home_path') \
         .add_view(home_path_get, request_method='GET', renderer='json') \
         .add_view(home_path_put, request_method='PUT', renderer='json')
+
+    config.add_route('pyramid.map_logo', '/api/component/pyramid/map_logo') \
+        .add_view(map_logo_get, request_method='GET', renderer='json')
