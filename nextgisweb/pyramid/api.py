@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 import re
 import json
 import os.path
-from datetime import timedelta
 import base64
+from datetime import timedelta
+from pkg_resources import resource_filename
 from six.moves.urllib.parse import unquote
 
 from pyramid.response import Response, FileResponse
@@ -332,13 +333,15 @@ def logo_put(request):
     return Response()
 
 
-def map_logo_get(request):
-    try:
-        maplogo_data = request.env.core.settings_get('pyramid', 'map_logo')
-    except KeyError:
-        maplogo_data = None
-
-    return dict(map_logo=maplogo_data)
+def brand_logo(request):
+    brand_logo_view = request.env.pyramid.brand_logo_view
+    if brand_logo_view is not None:
+        try:
+            return brand_logo_view(request)
+        except HTTPNotFound:
+            pass
+    
+    return FileResponse(resource_filename('nextgisweb', 'static/img/nextgis.png'))
 
 
 def setup_pyramid(comp, config):
@@ -385,6 +388,11 @@ def setup_pyramid(comp, config):
         .add_view(logo_get, request_method='GET') \
         .add_view(logo_put, request_method='PUT')
 
+    comp.brand_logo_enabled = lambda (request): True
+    comp.brand_logo_view = None
+    config.add_route('pyramid.brand_logo', '/api/component/pyramid/brand_logo') \
+        .add_view(brand_logo, request_method='GET')
+
     # TODO: Add PUT method for changing custom_css setting and GUI
 
     config.add_route('pyramid.miscellaneous',
@@ -396,6 +404,3 @@ def setup_pyramid(comp, config):
                      '/api/component/pyramid/home_path') \
         .add_view(home_path_get, request_method='GET', renderer='json') \
         .add_view(home_path_put, request_method='PUT', renderer='json')
-
-    config.add_route('pyramid.map_logo', '/api/component/pyramid/map_logo') \
-        .add_view(map_logo_get, request_method='GET', renderer='json')
