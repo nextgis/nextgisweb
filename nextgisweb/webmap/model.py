@@ -143,8 +143,13 @@ class WebMapItem(Base):
 
         elif self.item_type == 'layer':
             style_parent_id = None
+            payload = None
             if self.style and self.style.parent:
-                style_parent_id = self.style.parent.id
+                style = self.style
+                style_parent_id = style.parent.id
+
+                if hasattr(style, 'payload') or isinstance(getattr(type(style), 'payload', None), property):
+                    payload = style.payload
 
             return dict(
                 item_type=self.item_type,
@@ -157,6 +162,7 @@ class WebMapItem(Base):
                 layer_max_scale_denom=self.layer_max_scale_denom,
                 layer_adapter=self.layer_adapter,
                 draw_order_position=self.draw_order_position,
+                payload=payload
             )
 
     def from_dict(self, data):
