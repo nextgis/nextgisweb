@@ -340,8 +340,8 @@ def brand_logo(request):
             return brand_logo_view(request)
         except HTTPNotFound:
             pass
-    
-    return FileResponse(resource_filename('nextgisweb', 'static/img/nextgis.png'))
+
+    return FileResponse(resource_filename('nextgisweb', 'static/img/logo_outline.png'))
 
 
 def setup_pyramid(comp, config):
