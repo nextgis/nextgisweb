@@ -251,12 +251,6 @@ class PyramidComponent(Component):
 
         return config
 
-    def initialize_db(self):
-        # Help page
-        for key in self.settings.keys():
-            if key.startswith('help_page.'):
-                self.env.core.init_settings(self.identity, key, self.settings[key])
-
     def setup_pyramid(self, config):
         from . import view, api
         view.setup_pyramid(self, config)

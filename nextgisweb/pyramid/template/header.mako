@@ -81,10 +81,11 @@
             %endif
 
             <%
+                key = 'help_page.' + request.locale_name
                 try:
-                    help_page = request.env.core.settings_get('pyramid', 'help_page.%s' % request.locale_name)
+                    help_page = request.env.core.settings_get('pyramid', key)
                 except KeyError:
-                    help_page = None
+                    help_page = request.env.pyramid.options.get(key, None)
             %>
             %if help_page:
                 ,{
