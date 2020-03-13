@@ -223,6 +223,7 @@ class CoreComponent(Component):
         Option('locale.available', list, default=['en', 'ru']),
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),
+        Option('enable_snippets', bool, default=True),
         # Debug settings
         Option('debug', bool, default=False, doc="Enable additional debug tools."),
     )
