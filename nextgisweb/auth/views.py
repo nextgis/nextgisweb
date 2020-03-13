@@ -247,7 +247,9 @@ def setup_pyramid(comp, config):
                         message=self.request.localizer.translate(
                             _("Login is not unique."))))
 
-            if self.operation == 'edit' and self.data.get('disabled', False):
+            if self.operation == 'edit' and (
+                self.data.get('disabled', False) or 'member_of' in self.data
+            ):
                 admins = Group.filter_by(keyname='administrators').one()
                 if not any([
                     user for user in admins.members
