@@ -309,7 +309,7 @@ msgstr "Градусы, минуты, секунды"
 msgid "Measurement SRID"
 msgstr "Система координат для расчётов"
 
-#: template/base.mako:29
+#: template/base.mako:30
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
