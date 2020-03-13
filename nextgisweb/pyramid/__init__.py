@@ -257,12 +257,6 @@ class PyramidComponent(Component):
             if key.startswith('help_page.'):
                 self.env.core.init_settings(self.identity, key, self.settings[key])
 
-        # Map logo
-        default_map_logo = resource_filename('nextgisweb', 'static/img/logo_outline.png')
-        with open(default_map_logo, 'rb') as f:
-            map_logo_data = base64.b64encode(f.read())
-        self.env.core.settings_set(self.identity, 'map_logo', map_logo_data)
-
     def setup_pyramid(self, config):
         from . import view, api
         view.setup_pyramid(self, config)
