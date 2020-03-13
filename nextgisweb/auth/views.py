@@ -247,6 +247,17 @@ def setup_pyramid(comp, config):
                         message=self.request.localizer.translate(
                             _("Login is not unique."))))
 
+            if self.operation == 'edit' and self.data.get('disabled', False):
+                admins = Group.filter_by(keyname='administrators').one()
+                if not any([
+                    user for user in admins.members
+                    if not user.disabled and user.principal_id != self.obj.principal_id
+                ]):
+                    result = False
+                    self.error.append(dict(
+                        message=self.request.localizer.translate(
+                            _("At least one non-disabled administrator is required."))))
+
             return result
 
         def widget_params(self):
