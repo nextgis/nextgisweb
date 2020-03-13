@@ -279,7 +279,9 @@ class PyramidComponent(Component):
         except KeyError:
             result['measurement_srid'] = 4326
 
-        result['brand_logo'] = dict(enabled=self.brand_logo_enabled(request))
+        result['brand_logo'] = dict(
+            enabled=self.brand_logo_enabled(request),
+            link=self.options['brand_logo_link'])
 
         return result
 
@@ -290,5 +292,6 @@ class PyramidComponent(Component):
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
         Option('sentry_dsn'),
-        Option('desktop_gis_example', default='NextGIS QGIS')
+        Option('desktop_gis_example', default='NextGIS QGIS'),
+        Option('brand_logo_link', default="https://nextgis.com")
     )
