@@ -43,51 +43,55 @@ msgstr "Администратор"
 msgid "Owner"
 msgstr "Владелец"
 
-#: views.py:35
+#: views.py:32
 msgid "Account disabled"
 msgstr "Учетная запись отключена"
 
-#: views.py:42
+#: views.py:40
 msgid "Invalid login or password!"
 msgstr "Неверный логин или пароль!"
 
-#: views.py:75
+#: views.py:76
 msgid "Access denied"
 msgstr "Отказано в доступе"
 
-#: views.py:134
+#: views.py:151
 msgid "Group name is not unique."
 msgstr "Имя группы не уникально."
 
-#: views.py:172
+#: views.py:189
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: views.py:232
+#: views.py:248
 msgid "Login is not unique."
 msgstr "Логин не уникален."
 
-#: views.py:274
+#: views.py:261
+msgid "You can't disable current administrator. At least one enabled administrator is required."
+msgstr "Этого администратора нельзя отключить. Требуется хотя бы один активный администратор."
+
+#: views.py:303
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: views.py:307 views.py:372
+#: views.py:336 views.py:401
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:317 views.py:375
+#: views.py:346 views.py:404
 msgid "Groups"
 msgstr "Группы"
 
-#: views.py:328 views.py:350
+#: views.py:357 views.py:379
 msgid "List"
 msgstr "Список"
 
-#: views.py:333 views.py:355
+#: views.py:362 views.py:384
 msgid "Create"
 msgstr "Создать"
 
-#: views.py:339 views.py:361
+#: views.py:368 views.py:390
 msgid "Edit"
 msgstr "Изменить"
 
