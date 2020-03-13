@@ -274,7 +274,7 @@ class PyramidComponent(Component):
         try:
             result['support_url'] = self.env.core.settings_get('core', 'support_url')
         except KeyError:
-            result['support_url'] = ''
+            result['support_url'] = "https://nextgis.com/contact/"
 
         try:
             result['units'] = self.env.core.settings_get('core', 'units')
