@@ -258,7 +258,7 @@ def setup_pyramid(comp, config):
                     result = False
                     self.error.append(dict(
                         message=self.request.localizer.translate(
-                            _("At least one non-disabled administrator is required."))))
+                            _("You can't disable current administrator. At least one enabled administrator is required."))))  # NOQA
 
             return result
 

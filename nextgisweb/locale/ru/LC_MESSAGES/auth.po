@@ -67,31 +67,31 @@ msgstr "Создать новую группу"
 msgid "Login is not unique."
 msgstr "Логин не уникален."
 
-#: views.py:248
-msgid "At least one non-disabled administrator is required."
-msgstr "Требуется хотя бы один не отключенный администратор."
+#: views.py:261
+msgid "You can't disable current administrator. At least one enabled administrator is required."
+msgstr "Этого администратора нельзя отключить. Требуется хотя бы один активный администратор."
 
-#: views.py:301
+#: views.py:303
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: views.py:334 views.py:399
+#: views.py:336 views.py:401
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:344 views.py:402
+#: views.py:346 views.py:404
 msgid "Groups"
 msgstr "Группы"
 
-#: views.py:355 views.py:377
+#: views.py:357 views.py:379
 msgid "List"
 msgstr "Список"
 
-#: views.py:360 views.py:382
+#: views.py:362 views.py:384
 msgid "Create"
 msgstr "Создать"
 
-#: views.py:366 views.py:388
+#: views.py:368 views.py:390
 msgid "Edit"
 msgstr "Изменить"
 
