@@ -22,10 +22,10 @@
     </div>
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2">
 
-        <div data-dojo-attach-point="wTileSize"
+        <div data-dojo-attach-point="wMinZoom"
             data-dojo-type="dijit/form/NumberTextBox"
-            data-dojo-props="constraints: {min: 1, places: 0}, trim: true"
-            title="{{gettext 'Tile size, px'}}" style="width: 100%"></div>
+            data-dojo-props="constraints: {min: 0, places: 0}, trim: true"
+            title="{{gettext 'Min zoom level'}}" style="width: 100%"></div>
 
         <div data-dojo-attach-point="wMaxZoom"
             data-dojo-type="dijit/form/NumberTextBox"
@@ -51,6 +51,11 @@
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
             title="{{gettext 'Top, deg.'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wTileSize"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: 1, places: 0}, trim: true"
+            title="{{gettext 'Tile size, px'}}" style="width: 100%"></div>
 
     </div>
 </div>
