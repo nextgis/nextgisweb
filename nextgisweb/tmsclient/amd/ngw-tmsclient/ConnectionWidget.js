@@ -44,11 +44,24 @@ define([
             if (this.value) {
                 this.wScheme.set("value", this.value.scheme);
             }
+
+            this.wCapmode.on('change', function(value) {
+                var hold_params = value === "nextgis_geoservices";
+
+                this.wURLTemplate.required = hold_params;
+                this.wURLTemplate.set("disabled", hold_params);
+                this.wAPIKeyParam.set("disabled", hold_params);
+                this.wScheme.set("disabled", hold_params);
+            }.bind(this));
         },
 
         serializeInMixin: function (data) {
-            var apikey = this.wAPIKey.get("value"),
+            var capmode = this.wCapmode.get("value"),
+                apikey = this.wAPIKey.get("value"),
                 apikey_param = this.wAPIKeyParam.get("value");
+            if (capmode === "") {
+                lang.setObject(this.serializePrefix + ".capmode", null, data);
+            }
             if (apikey === "") {
                 lang.setObject(this.serializePrefix + ".apikey", null, data);
             }
