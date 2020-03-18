@@ -5,6 +5,8 @@ import os
 from argparse import ArgumentParser
 from textwrap import wrap
 
+import sentry_sdk
+from sentry_sdk.integrations.excepthook import ExcepthookIntegration
 from pyramid.paster import setup_logging
 
 from .lib.config import load_config, NO_DEFAULT
@@ -20,21 +22,30 @@ def main(argv=sys.argv):
     argparser.add_argument(
         '--logging', help="logging library configuration file")
 
-    config = None
+    config_path = None
     logging = None
 
     i = 1
 
     while i < len(argv):
         if argv[i] == '--config' and (i < len(argv) - 1):
-            config = argv[i + 1]
+            config_path = argv[i + 1]
         if argv[i] == '--logging' and (i < len(argv) - 1):
             logging = argv[i + 1]
 
         i += 2 if argv[i].startswith('--') else 1
 
-    if config is None:
-        config = os.environ.get('NEXTGISWEB_CONFIG')
+    if config_path is None:
+        config_path = os.environ.get('NEXTGISWEB_CONFIG')
+
+    config = load_config(config_path)
+
+    sentry_dsn = config.get('pyramid.sentry_dsn')
+    if sentry_dsn is not None:
+        sentry_sdk.init(
+            sentry_dsn,
+            integrations=[ExcepthookIntegration(always_run=True)],
+        )
 
     if logging is None:
         logging = os.environ.get('NEXTGISWEB_LOGGING')
@@ -42,7 +53,7 @@ def main(argv=sys.argv):
     if logging:
         setup_logging(logging)
 
-    env = Env(cfg=load_config(config))
+    env = Env(cfg=config)
     setenv(env)
 
     subparsers = argparser.add_subparsers()
