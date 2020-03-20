@@ -388,6 +388,27 @@ def iget(resource, request):
         content_type='application/json', charset='utf-8')
 
 
+def item_extent(resource, request):
+    request.resource_permission(PERM_READ)
+
+    feature_id = int(request.matchdict['fid'])
+    query = resource.feature_query()
+    query.srs(SRS.filter_by(id=4326).one())
+    query.box()
+
+    feature = query_feature_or_not_found(query, resource.id, feature_id)
+    maxLon, minLon, maxLat, minLat = feature.box.bounds
+    extent = dict(
+        minLon=minLon,
+        maxLon=maxLon,
+        minLat=minLat,
+        maxLat=maxLat
+    )
+    return Response(
+        json.dumps(dict(extent=extent)),
+        content_type='application/json', charset='utf-8')
+
+
 def iput(resource, request):
     request.resource_permission(PERM_WRITE)
 
@@ -635,6 +656,11 @@ def setup_pyramid(comp, config):
         .add_view(iput, context=IFeatureLayer, request_method='PUT') \
         .add_view(idelete, context=IWritableFeatureLayer,
                   request_method='DELETE')
+
+    config.add_route(
+        'feature_layer.feature.item_extent', '/api/resource/{id}/feature/{fid}/extent',
+        factory=resource_factory) \
+        .add_view(item_extent, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.collection', '/api/resource/{id}/feature/',
