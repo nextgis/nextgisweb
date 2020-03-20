@@ -397,11 +397,11 @@ def item_extent(resource, request):
     query.box()
 
     feature = query_feature_or_not_found(query, resource.id, feature_id)
-    maxLon, minLon, maxLat, minLat = feature.box.bounds
+    minLon, minLat, maxLon, maxLat = feature.box.bounds
     extent = dict(
         minLon=minLon,
-        maxLon=maxLon,
         minLat=minLat,
+        maxLon=maxLon,
         maxLat=maxLat
     )
     return Response(
