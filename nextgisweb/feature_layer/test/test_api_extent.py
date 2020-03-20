@@ -58,25 +58,18 @@ def vector_layer_id():
         DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
 
 
-extent_for_all = {
-    'minLat': 53.7714928132034,
-    'maxLon': 149.779134643755,
-    'minLon': 41.9392773604216,
-    'maxLat': 68.3314641781765
-}
-
 item_one_extent = {
-    'minLat': 61.7460098580695,
-    'maxLon': 41.9392773604216,
-    'minLon': 53.7714928132034,
-    'maxLat': 55.6154358583725
+    'minLat': 53.7714928132034,
+    'maxLat': 61.7460098580695,
+    'minLon': 41.9392773604216,
+    'maxLon': 55.6154358583725,
 }
 
 item_two_extent = {
-    'minLat': 68.3314641781765,
-    'maxLat': 149.779134643755,
-    'minLon': 62.3762455754066,
-    'maxLon': 135.654582071736
+    'minLat': 62.3762455754066,
+    'maxLat': 68.3314641781765,
+    'minLon': 135.654582071736,
+    'maxLon': 149.779134643755,
 }
 
 item_check_list = [
