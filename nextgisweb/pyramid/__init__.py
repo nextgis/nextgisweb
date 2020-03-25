@@ -279,9 +279,14 @@ class PyramidComponent(Component):
         except KeyError:
             result['measurement_srid'] = 4326
 
+        try:
+            company_url = self.env.core.settings_get('pyramid', 'company_url')
+        except KeyError:
+            company_url = self.options['company_url']
+
         result['company_logo'] = dict(
             enabled=self.company_logo_enabled(request),
-            link=self.options['company_url'])
+            link=company_url)
 
         return result
 
