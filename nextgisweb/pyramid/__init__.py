@@ -281,7 +281,7 @@ class PyramidComponent(Component):
 
         result['company_logo'] = dict(
             enabled=self.company_logo_enabled(request),
-            link=self.options['brand_logo_link'])
+            link=self.options['company_url'])
 
         return result
 
@@ -293,5 +293,5 @@ class PyramidComponent(Component):
             'nextgisweb', 'static/img/favicon.ico')),
         Option('sentry_dsn'),
         Option('desktop_gis_example', default='NextGIS QGIS'),
-        Option('brand_logo_link', default="https://nextgis.com")
+        Option('company_url', default="https://nextgis.com")
     )
