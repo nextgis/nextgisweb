@@ -4,7 +4,7 @@ define([
     "ngw/settings!pyramid",
     "ngw-pyramid/i18n!pyramid",
     // css
-    "xstyle/css!./BrandLogo.css"
+    "xstyle/css!./company-logo.css"
 ], function (
     xhr,
     route,
@@ -12,17 +12,17 @@ define([
     i18n
 ) {
     return function (mapNode) {
-        if (settings.brand_logo.enabled) {
+        if (settings.company_logo.enabled) {
             var anchor = document.createElement('a');
             anchor.className = 'map-logo';
 
             var image = document.createElement('img');
-            image.src = route.pyramid.brand_logo();
+            image.src = route.pyramid.company_logo();
 
-            if (settings.brand_logo.link.trim() !== '') {
-                anchor.href = settings.brand_logo.link;
+            if (settings.company_logo.link.trim() !== '') {
+                anchor.href = settings.company_logo.link;
                 anchor.target = '_blank';
-                if (settings.brand_logo.link.search(/:\/\/nextgis/) !== -1) {
+                if (settings.company_logo.link.search(/:\/\/nextgis/) !== -1) {
                     image.alt = i18n.gettext('Get your own Web GIS at nextgis.com');
                 }
             }

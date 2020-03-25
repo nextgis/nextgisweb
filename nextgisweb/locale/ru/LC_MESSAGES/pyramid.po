@@ -199,7 +199,7 @@ msgstr "Визуальный редактор"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: amd/ngw-pyramid/map-logo/BrandLogo.js:26
+#: amd/ngw-pyramid/map-logo/CompanyLogo.js:26
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Создайте свою Веб ГИС на nextgis.com"
 

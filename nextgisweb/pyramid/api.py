@@ -333,11 +333,11 @@ def logo_put(request):
     return Response()
 
 
-def brand_logo(request):
-    brand_logo_view = request.env.pyramid.brand_logo_view
-    if brand_logo_view is not None:
+def company_logo(request):
+    company_logo_view = request.env.pyramid.company_logo_view
+    if company_logo_view is not None:
         try:
-            return brand_logo_view(request)
+            return company_logo_view(request)
         except HTTPNotFound:
             pass
 
@@ -388,10 +388,10 @@ def setup_pyramid(comp, config):
         .add_view(logo_get, request_method='GET') \
         .add_view(logo_put, request_method='PUT')
 
-    comp.brand_logo_enabled = lambda (request): True
-    comp.brand_logo_view = None
-    config.add_route('pyramid.brand_logo', '/api/component/pyramid/brand_logo') \
-        .add_view(brand_logo, request_method='GET')
+    comp.company_logo_enabled = lambda (request): True
+    comp.company_logo_view = None
+    config.add_route('pyramid.company_logo', '/api/component/pyramid/company_logo') \
+        .add_view(company_logo, request_method='GET')
 
     # TODO: Add PUT method for changing custom_css setting and GUI
 

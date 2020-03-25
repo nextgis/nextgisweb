@@ -279,8 +279,8 @@ class PyramidComponent(Component):
         except KeyError:
             result['measurement_srid'] = 4326
 
-        result['brand_logo'] = dict(
-            enabled=self.brand_logo_enabled(request),
+        result['company_logo'] = dict(
+            enabled=self.company_logo_enabled(request),
             link=self.options['brand_logo_link'])
 
         return result
