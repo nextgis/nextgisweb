@@ -2,12 +2,16 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
+    "dojo/request/xhr",
+    "dojo/store/Memory",
     "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
     "ngw-pyramid/i18n!tmsclient",
     "ngw-pyramid/hbs-i18n",
+    "ngw/route",
+    "./LayersDialog",
     // resource
     "dojo/text!./template/LayerWidget.hbs",
     // template
@@ -19,18 +23,64 @@ define([
 ], function (
     declare,
     lang,
+    xhr,
+    Memory,
     ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
     i18n,
     hbsI18n,
+    route,
+    LayersDialog,
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         title: i18n.gettext("TMS layer"),
         serializePrefix: "tmsclient_layer",
+        _store: new Memory({
+            idProperty: "index",
+            getChildren: function () { return []; }
+        }),
+
+        _updateStore: function (data) {
+            this._store.query().forEach(function (item) {
+                this._store.remove(item.index);
+            }.bind(this));
+            for (var i = 0; i < data.length; i++) {
+                var value = lang.clone(data[i]);
+                value.index = i;
+                this._store.add(value);
+            }
+
+            this.btnChooseLayer.set("disabled", data.length === 0);
+        },
+
+        postCreate: function () {
+            this.wConnection.on("update", function (event) {
+                var connection = event.value;
+                xhr.get(route.tmsclient.connection.layers(connection), {
+                    handleAs: "json"
+                }).then(this._updateStore.bind(this));
+            }.bind(this));
+
+            this.btnChooseLayer.on("click", function () {
+                var layersDialog = new LayersDialog({
+                    store: this._store
+                });
+                layersDialog.pick().then(function (data) {
+                    this.wTileSize.set("value", data.tilesize);
+                    this.wLayerName.set("value", data.layer);
+                    this.wMinZoom.set("value", data.minzoom);
+                    this.wMaxZoom.set("value", data.maxzoom);
+                    this.wExtentLeft.set("value", data.bounds[0]);
+                    this.wExtentRight.set("value", data.bounds[2]);
+                    this.wExtentBottom.set("value", data.bounds[1]);
+                    this.wExtentTop.set("value", data.bounds[3]);
+                }.bind(this));
+            }.bind(this));
+        },
 
         serializeInMixin: function (data) {
             if (data[this.serializePrefix] === undefined) { data[this.serializePrefix] = {}; }
@@ -40,6 +90,7 @@ define([
             value.srs = {id: this.wSRS.get("value")};
             value.tilesize = this.wTileSize.get("value");
             value.layer_name = this.wLayerName.get("value");
+            value.minzoom = this.wMinZoom.get("value");
             value.maxzoom = this.wMaxZoom.get("value");
             value.extent_left = this.wExtentLeft.get("value");
             value.extent_right = this.wExtentRight.get("value");
@@ -53,8 +104,9 @@ define([
 
             this.wConnection.set("value", value.connection);
             this.wSRS.set("value", value.srs.id);
-            this.wLayerName.set("value", value.layer_name);
             this.wTileSize.set("value", value.tilesize);
+            this.wLayerName.set("value", value.layer_name);
+            this.wMinZoom.set("value", value.minzoom);
             this.wMaxZoom.set("value", value.maxzoom);
             this.wExtentLeft.set("value", value.extent_left);
             this.wExtentRight.set("value", value.extent_right);

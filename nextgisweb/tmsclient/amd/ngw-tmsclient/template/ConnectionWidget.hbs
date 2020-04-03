@@ -3,7 +3,17 @@
 
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 1">
 
+        <div data-dojo-type="dijit/form/Select"
+            data-dojo-attach-point="wCapmode"
+            data-ngw-serialize="capmode"
+            title="{{gettext 'Capmode'}}" style="width: 20em">
+
+            <option value="">{{gettext 'Custom'}}</option>
+            <option value="nextgis_geoservices">{{gettext 'NextGIS geoservices'}}</option>
+        </div>
+
         <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-attach-point="wURLTemplate"
             data-dojo-props="required: true"
             data-ngw-serialize="url_template"
             placeholder="https://map.example.com/tiles/{layer}/{z}/{x}/{y}.png"

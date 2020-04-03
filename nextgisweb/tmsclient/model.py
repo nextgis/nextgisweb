@@ -22,6 +22,7 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
+    ValidationError,
 )
 from .util import _, crop_box, render_zoom
 from .session_keeper import get_session
@@ -32,6 +33,9 @@ else:
     from urlparse import urlparse
 
 Base = declarative_base()
+
+
+NEXTGIS_GEOSERVICES = 'nextgis_geoservices'
 
 
 class SCHEME(object):
@@ -51,6 +55,7 @@ class Connection(Base, Resource):
 
     __scope__ = ConnectionScope
 
+    capmode = db.Column(db.Enum(NEXTGIS_GEOSERVICES))
     url_template = db.Column(db.Unicode, nullable=False)
     apikey = db.Column(db.Unicode)
     apikey_param = db.Column(db.Unicode)
@@ -87,6 +92,21 @@ class Connection(Base, Resource):
         return PIL.Image.open(BytesIO(result.content))
 
 
+class _capmode_attr(SP):
+
+    def setter(self, srlzr, value):
+        if value is None:
+            pass
+        elif value == NEXTGIS_GEOSERVICES:
+            srlzr.obj.url_template = 'https://geoservices.nextgis.com/raster/{layer}/{z}/{x}/{y}.png'  # NOQA, WIP
+            srlzr.obj.apikey_param = 'apikey'
+            srlzr.obj.scheme = SCHEME.XYZ
+        else:
+            raise ValidationError('Invalid capmode value!')
+
+        super(_capmode_attr, self).setter(srlzr, value)
+
+
 class ConnectionSerializer(Serializer):
     identity = Connection.identity
     resclass = Connection
@@ -98,6 +118,8 @@ class ConnectionSerializer(Serializer):
     apikey = SP(**_defaults)
     apikey_param = SP(**_defaults)
     scheme = SP(**_defaults)
+
+    capmode = _capmode_attr(**_defaults)
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
@@ -126,6 +148,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
     connection_id = db.Column(db.ForeignKey(Connection.id), nullable=False)
     layer_name = db.Column(db.Unicode)
     tilesize = db.Column(db.Integer, default=256)
+    minzoom = db.Column(db.Integer, default=0)
     maxzoom = db.Column(db.Integer, default=14)
     extent_left = db.Column(db.Float, default=-180.0)
     extent_right = db.Column(db.Float, default=+180.0)
@@ -231,6 +254,7 @@ class LayerSerializer(Serializer):
     srs = SR(**_defaults)
     layer_name = SP(**_defaults)
     tilesize = SP(**_defaults)
+    minzoom = SP(**_defaults)
     maxzoom = SP(**_defaults)
     extent_left = SP(**_defaults)
     extent_right = SP(**_defaults)

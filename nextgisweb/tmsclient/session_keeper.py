@@ -4,7 +4,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import requests
 
 
-_sessions = dict()
+_sessions = dict()  # TODO: clear session objects
 
 
 __all__ = ['get_session']
@@ -20,6 +20,7 @@ def get_session(key, scheme):
         pool_maxsize=500
     )
     session.mount(scheme + '://', adapter)
+
     _sessions[key] = session
 
     return session

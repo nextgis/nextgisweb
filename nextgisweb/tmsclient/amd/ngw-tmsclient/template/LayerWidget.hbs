@@ -1,13 +1,23 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
     data-ngw-serialize-prefix="${serializePrefix}" style="height: 100%;" class="padding-block">
 
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 1">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2">
 
         <div data-dojo-attach-point="wConnection"
             data-dojo-type="ngw-resource/ResourceBox"
             data-ngw-serialize="connection"
             data-dojo-props="cls: 'tmsclient_connection'"
             title="{{gettext 'TMS connection'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="btnChooseLayer"
+            data-dojo-type="dijit/form/Button"
+            data-dojo-props="iconClass: 'dijitIconNewTask', showLabel: false, disabled: true"
+            label="{{gettext 'Choose layer'}}">
+        </div>
+
+    </div>
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 1">
 
         <div data-dojo-attach-point="wSRS"
             data-ngw-serialize="srs"
@@ -22,35 +32,47 @@
     </div>
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2">
 
-        <div data-dojo-attach-point="wTileSize"
+        <div data-dojo-attach-point="wMinZoom"
+            data-ngw-serialize="minzoom"
             data-dojo-type="dijit/form/NumberTextBox"
-            data-dojo-props="constraints: {min: 1, places: 0}, trim: true"
-            title="{{gettext 'Tile size, px'}}" style="width: 100%"></div>
+            data-dojo-props="constraints: {min: 0, places: 0}, trim: true"
+            title="{{gettext 'Min zoom level'}}" style="width: 100%"></div>
 
         <div data-dojo-attach-point="wMaxZoom"
+            data-ngw-serialize="maxzoom"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: 0, places: 0}, trim: true"
             title="{{gettext 'Max zoom level'}}" style="width: 100%"></div>
 
         <div data-dojo-attach-point="wExtentLeft"
+            data-ngw-serialize="extent_left"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -180, max: +180}, trim: true"
             title="{{gettext 'Left, deg.'}}" style="width: 100%"></div>
 
         <div data-dojo-attach-point="wExtentBottom"
+            data-ngw-serialize="extent_bottom"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
             title="{{gettext 'Bottom, deg.'}}" style="width: 100%"></div>
 
         <div data-dojo-attach-point="wExtentRight"
+            data-ngw-serialize="extent_right"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -180, max: +180}, trim: true"
             title="{{gettext 'Right, deg.'}}" style="width: 100%"></div>
 
         <div data-dojo-attach-point="wExtentTop"
+            data-ngw-serialize="extent_top"
             data-dojo-type="dijit/form/NumberTextBox"
             data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
             title="{{gettext 'Top, deg.'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wTileSize"
+            data-ngw-serialize="tilesize"
+            data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: 1, places: 0}, trim: true"
+            title="{{gettext 'Tile size, px'}}" style="width: 100%"></div>
 
     </div>
 </div>
