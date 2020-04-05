@@ -292,8 +292,9 @@ class PyramidComponent(Component):
 
     option_annotations = (
         Option('secret', doc="Cookies encryption key (deprecated)."),
-        Option('help_page.*'),
         Option('logo'),
+        Option('help_page.url', default="https://nextgis.com/redirect/{lang}/help/"),
+        Option('help_page.enabled', bool, default=True),
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
         Option('sentry_dsn'),

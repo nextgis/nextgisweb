@@ -80,21 +80,12 @@
                 }
             %endif
 
-            <%
-                key = 'help_page.' + request.locale_name
-                try:
-                    help_page = request.env.core.settings_get('pyramid', key)
-                except KeyError:
-                    help_page = request.env.pyramid.options.get(key, None)
-            %>
-            %if help_page:
+            <% help_page_url = request.env.pyramid.help_page_url(request) %>
+            %if help_page_url is not None:
+                <% help_page_url = help_page_url.format(lang=request.locale_name) %>
                 ,{
                     "text": '${tr(_("Help"))}',
-                    %if re.match("^http[s]?", help_page):
-                        "link": '${help_page + '?lang=' + request.locale_name}'
-                    %else:
-                        "link": '${request.route_url("pyramid.help_page")}'
-                    %endif
+                    "link": '${help_page_url}'
                 }
             %endif
             ],

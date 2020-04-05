@@ -32,14 +32,6 @@ def control_panel(request):
         control_panel=request.env.pyramid.control_panel)
 
 
-def help_page(request):
-    with codecs.open(
-        request.env.core.settings_get('pyramid', 'help_page.%s' % request.locale_name), 'rb', 'utf-8'
-    ) as fp:
-        help_page = fp.read()
-    return dict(title=_("Help"), help_page=help_page)
-
-
 def favicon(request):
     fn_favicon = request.env.pyramid.options['favicon']
     if os.path.isfile(fn_favicon):
@@ -133,9 +125,6 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.control_panel', '/control-panel', client=()) \
         .add_view(control_panel, renderer=ctpl('control_panel'))
 
-    config.add_route('pyramid.help_page', '/help-page') \
-        .add_view(help_page, renderer=ctpl('help_page'))
-
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
 
     config.add_route(
@@ -179,6 +168,10 @@ def setup_pyramid(comp, config):
         .add_view(test_exception_handled)
     config.add_route('pyramid.test_exception_unhandled', '/test/exception/unhandled') \
         .add_view(test_exception_unhandled)
+
+    # Method for help_page customization in components
+    comp.help_page_url = lambda (request): \
+        comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
 
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
