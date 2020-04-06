@@ -9,7 +9,7 @@
     from bunch import Bunch
 %>
 <head>
-    <% system_name = request.env.core.settings_get('core', 'system.full_name') %>
+    <% system_name = request.env.core.system_full_name() %>
 
     <title>
         <% page_title = '' %>

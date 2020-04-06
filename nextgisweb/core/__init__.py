@@ -58,6 +58,8 @@ class CoreComponent(Component):
         self.DBSession = DBSession
 
         # Methods for customization in components
+        self.system_full_name_default = self.options.get(
+            'system.full_name', self.localizer().translate(_('NextGIS geoinformation system')))
         self.support_url_view = lambda request: self.options['support_url']
 
     def is_service_ready(self):
@@ -80,8 +82,6 @@ class CoreComponent(Component):
     def initialize_db(self):
         for k, v in (
             ('system.name', 'NextGIS Web'),
-            ('system.full_name', self.localizer().translate(
-                _('NextGIS geoinformation system'))),
             ('units', 'metric'),
             ('degree_format', 'dd'),
             ('measurement_srid', 4326),
@@ -157,15 +157,17 @@ class CoreComponent(Component):
 
     def query_stat(self):
         result = dict()
-        try:
-            result['full_name'] = self.settings_get('core', 'system.full_name')
-        except KeyError:
-            pass
-
+        result['full_name'] = self.system_full_name()
         result['database_size'] = DBSession.query(db.func.pg_database_size(
             db.func.current_database(),)).scalar()
 
         return result
+
+    def system_full_name(self):
+        try:
+            return self.settings_get(self.identity, 'system.full_name')
+        except KeyError:
+            return self.system_full_name_default
 
     def _engine_url(self, error_on_pwfile=False):
         opt_db = self.options.with_prefix('database')
@@ -185,11 +187,11 @@ class CoreComponent(Component):
                     raise
         
         return make_engine_url(EngineURL(
-            'postgresql+psycopg2', **kwargs))        
+            'postgresql+psycopg2', **kwargs))
 
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
-        Option('system.full_name', default="NextGIS Web"),
+        Option('system.full_name', default=None),
 
         # Database options
         Option('database.host', default="localhost"),
