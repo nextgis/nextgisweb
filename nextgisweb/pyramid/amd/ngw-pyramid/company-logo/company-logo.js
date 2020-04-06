@@ -1,12 +1,10 @@
 define([
-    "dojo/request/xhr",
     "ngw/route",
     "ngw/settings!pyramid",
     "ngw-pyramid/i18n!pyramid",
     // css
     "xstyle/css!./company-logo.css"
 ], function (
-    xhr,
     route,
     settings,
     i18n
@@ -19,7 +17,7 @@ define([
             var image = document.createElement('img');
             image.src = route.pyramid.company_logo();
 
-            if (settings.company_logo.link.trim() !== '') {
+            if (settings.company_logo.link !== null && settings.company_logo.link.trim() !== '') {
                 anchor.href = settings.company_logo.link;
                 anchor.target = '_blank';
                 if (settings.company_logo.link.search(/:\/\/nextgis/) !== -1) {
