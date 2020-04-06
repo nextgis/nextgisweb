@@ -259,10 +259,7 @@ class PyramidComponent(Component):
     def client_settings(self, request):
         result = dict()
 
-        try:
-            result['support_url'] = self.env.core.settings_get('core', 'support_url')
-        except KeyError:
-            result['support_url'] = self.env.core.options['support_url']
+        result['support_url'] = self.env.core.support_url_view(request)
 
         try:
             result['units'] = self.env.core.settings_get('core', 'units')
@@ -279,14 +276,9 @@ class PyramidComponent(Component):
         except KeyError:
             result['measurement_srid'] = 4326
 
-        try:
-            company_url = self.env.core.settings_get('pyramid', 'company_url')
-        except KeyError:
-            company_url = self.options['company_url']
-
         result['company_logo'] = dict(
             enabled=self.company_logo_enabled(request),
-            link=company_url)
+            link=self.company_url_view(request))
 
         return result
 

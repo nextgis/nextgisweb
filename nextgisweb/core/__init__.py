@@ -57,6 +57,9 @@ class CoreComponent(Component):
 
         self.DBSession = DBSession
 
+        # Methods for customization in components
+        self.support_url_view = lambda request: self.options['support_url']
+
     def is_service_ready(self):
         while True:
             try:
