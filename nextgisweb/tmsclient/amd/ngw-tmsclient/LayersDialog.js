@@ -8,7 +8,6 @@ define([
     "dijit/tree/ObjectStoreModel",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
-    "dojox/collections/Set",
     "ngw-pyramid/i18n!tmsclient"
 ], function (
     declare,
@@ -20,7 +19,6 @@ define([
     ObjectStoreModel,
     Button,
     BorderContainer,
-    set,
     i18n
 ) {
     return declare([Dialog], {
@@ -30,12 +28,14 @@ define([
             this.inherited(arguments);
 
             this.tree = new Tree({
+                showRoot: false,
                 model: new ObjectStoreModel({
+                    query: { index: -1 },
                     store: options.store,
                     getLabel: function (item) {
                         return item.layer + ' (' + item.description + ')';
                     },
-                    mayHaveChildren: function () { return false; }
+                    mayHaveChildren: function (object) { return 'children' in object; }
                 }),
                 region: "center",
                 style: "width: 100%; height: 100%;"

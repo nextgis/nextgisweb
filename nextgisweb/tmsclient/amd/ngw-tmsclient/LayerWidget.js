@@ -40,18 +40,18 @@ define([
         title: i18n.gettext("TMS layer"),
         serializePrefix: "tmsclient_layer",
         _store: new Memory({
+            data: [{ index: -1, children: [] }],
             idProperty: "index",
-            getChildren: function () { return []; }
+            getChildren: function (object) { return object.children || []; }
         }),
 
         _updateStore: function (data) {
-            this._store.query().forEach(function (item) {
-                this._store.remove(item.index);
-            }.bind(this));
+            var root = this._store.query({ index: -1 })[0];
+            root.children = [];
             for (var i = 0; i < data.length; i++) {
                 var value = lang.clone(data[i]);
                 value.index = i;
-                this._store.add(value);
+                root.children.push(value);
             }
 
             this.btnChooseLayer.set("disabled", data.length === 0);
