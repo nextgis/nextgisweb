@@ -102,12 +102,17 @@ Base = declarative_base()
 
 class FieldDef(object):
 
-    def __init__(self, key, keyname, datatype, uuid, display_name=None):
+    def __init__(
+        self, key, keyname, datatype, uuid, display_name=None,
+        label_field=None, grid_visibility=None
+    ):
         self.key = key
         self.keyname = keyname
         self.datatype = datatype
         self.uuid = uuid
         self.display_name = display_name
+        self.label_field = label_field
+        self.grid_visibility = grid_visibility
 
 
 class TableInfo(object):
@@ -206,7 +211,9 @@ class TableInfo(object):
                 fld.get('keyname'),
                 fld.get('datatype'),
                 uid,
-                fld.get('display_name')
+                fld.get('display_name'),
+                fld.get('label_field'),
+                fld.get('grid_visibility')
             ))
 
         return self
@@ -241,12 +248,19 @@ class TableInfo(object):
             if f.display_name is None:
                 f.display_name = f.keyname
 
-            layer.fields.append(VectorLayerField(
+            field = VectorLayerField(
                 keyname=f.keyname,
                 datatype=f.datatype,
                 display_name=f.display_name,
                 fld_uuid=f.uuid
-            ))
+            )
+            if f.grid_visibility is not None:
+                field.grid_visibility = f.grid_visibility
+
+            layer.fields.append(field)
+
+            if f.label_field:
+                layer.feature_label_field = field
 
     def setup_metadata(self, tablename=None):
         metadata = db.MetaData(schema='vector_layer' if tablename else None)
