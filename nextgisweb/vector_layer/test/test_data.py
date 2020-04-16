@@ -31,13 +31,15 @@ def test_from_fields(txn):
         dict(keyname='integer', datatype=FIELD_TYPE.INTEGER),
         dict(keyname='bigint', datatype=FIELD_TYPE.BIGINT),
         dict(keyname='real', datatype=FIELD_TYPE.REAL),
-        dict(keyname='string', datatype=FIELD_TYPE.STRING),
+        dict(keyname='string', datatype=FIELD_TYPE.STRING, label_field=True),
         dict(keyname='date', datatype=FIELD_TYPE.DATE),
         dict(keyname='time', datatype=FIELD_TYPE.TIME),
         dict(keyname='datetime', datatype=FIELD_TYPE.DATETIME),
     ])
 
     res.persist()
+
+    assert res.feature_label_field.keyname == 'string'
 
     DBSession.flush()
 
