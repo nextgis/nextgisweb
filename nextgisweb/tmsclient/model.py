@@ -98,7 +98,7 @@ class _capmode_attr(SP):
         if value is None:
             pass
         elif value == NEXTGIS_GEOSERVICES:
-            srlzr.obj.url_template = 'https://geoservices.nextgis.com/raster/{layer}/{z}/{x}/{y}.png'  # NOQA, WIP
+            srlzr.obj.url_template = env.tmsclient.options['nextgis_geoservices.url_template']
             srlzr.obj.apikey_param = 'apikey'
             srlzr.obj.scheme = SCHEME.XYZ
         else:
