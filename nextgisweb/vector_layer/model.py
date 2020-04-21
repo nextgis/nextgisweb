@@ -923,22 +923,22 @@ class FeatureQueryBase(object):
         srsid = self.layer.srs_id if self._srs is None else self._srs.id
 
         geomcol = table.columns.geom
-        geomexpr = db.func.st_transform(geomcol, srsid)
+        geomexpr = func.st_transform(geomcol, srsid)
 
         if self._clip_by_box is not None:
             if _clipbybox2d_exists():
-                clip = db.func.st_setsrid(
-                    db.func.st_makeenvelope(*self._clip_by_box.bounds),
+                clip = func.st_setsrid(
+                    func.st_makeenvelope(*self._clip_by_box.bounds),
                     self._clip_by_box.srid)
-                geomexpr = db.func.st_clipbybox2d(geomexpr, clip)
+                geomexpr = func.st_clipbybox2d(geomexpr, clip)
             else:
-                clip = db.func.st_setsrid(
-                    db.func.st_geomfromtext(self._clip_by_box.wkt),
+                clip = func.st_setsrid(
+                    func.st_geomfromtext(self._clip_by_box.wkt),
                     self._clip_by_box.srid)
-                geomexpr = db.func.st_intersection(geomexpr, clip)
+                geomexpr = func.st_intersection(geomexpr, clip)
 
         if self._simplify is not None:
-            geomexpr = db.func.st_simplifypreservetopology(
+            geomexpr = func.st_simplifypreservetopology(
                 geomexpr, self._simplify
             )
 
@@ -953,20 +953,20 @@ class FeatureQueryBase(object):
                 def compile(expr, compiler, **kw):
                     return "(%s).geom" % str(compiler.process(expr.base))
 
-                columns.append(db.func.st_asewkb(geom(db.func.st_dump(geomexpr))).label('geom'))
+                columns.append(func.st_asewkb(geom(func.st_dump(geomexpr))).label('geom'))
             else:
-                columns.append(db.func.st_asewkb(geomexpr).label('geom'))
+                columns.append(func.st_asewkb(geomexpr).label('geom'))
 
         if self._geom_len:
-            columns.append(db.func.st_length(db.func.geography(
-                db.func.st_transform(geomexpr, 4326))).label('geom_len'))
+            columns.append(func.st_length(func.geography(
+                func.st_transform(geomexpr, 4326))).label('geom_len'))
 
         if self._box:
             columns.extend((
-                db.func.st_xmin(geomexpr).label('box_left'),
-                db.func.st_ymin(geomexpr).label('box_bottom'),
-                db.func.st_xmax(geomexpr).label('box_right'),
-                db.func.st_ymax(geomexpr).label('box_top'),
+                func.st_xmin(geomexpr).label('box_left'),
+                func.st_ymin(geomexpr).label('box_bottom'),
+                func.st_xmax(geomexpr).label('box_right'),
+                func.st_ymax(geomexpr).label('box_top'),
             ))
 
         selected_fields = []
@@ -1051,10 +1051,10 @@ class FeatureQueryBase(object):
             where.append(db.or_(*token))
 
         if self._intersects:
-            intgeom = db.func.st_setsrid(db.func.st_geomfromtext(
+            intgeom = func.st_setsrid(func.st_geomfromtext(
                 self._intersects.wkt), self._intersects.srid)
-            where.append(db.func.st_intersects(
-                geomcol, db.func.st_transform(
+            where.append(func.st_intersects(
+                geomcol, func.st_transform(
                     intgeom, self.layer.srs_id)))
 
         order_criterion = []
@@ -1110,7 +1110,7 @@ class FeatureQueryBase(object):
             @property
             def total_count(self):
                 query = sql.select(
-                    [db.func.count(table.columns.id), ],
+                    [func.count(table.columns.id), ],
                     whereclause=db.and_(*where)
                 )
                 res = DBSession.connection().execute(query)
