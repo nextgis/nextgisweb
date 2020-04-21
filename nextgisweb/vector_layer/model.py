@@ -262,8 +262,8 @@ class TableInfo(object):
             if f.label_field:
                 layer.feature_label_field = field
 
-    def setup_metadata(self, tablename=None):
-        metadata = db.MetaData(schema='vector_layer' if tablename else None)
+    def setup_metadata(self, tablename):
+        metadata = db.MetaData(schema='vector_layer')
         geom_fldtype = _GEOM_TYPE_2_DB[self.geometry_type]
 
         class model(object):
@@ -427,7 +427,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs.id, strdecode)
         tableinfo.setup_layer(self)
 
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
         tableinfo.metadata.create_all(bind=DBSession.connection())
 
         self.tableinfo = tableinfo
@@ -437,7 +437,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             fields, self.srs.id, self.geometry_type)
         tableinfo.setup_layer(self)
 
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
         tableinfo.metadata.create_all(bind=DBSession.connection())
 
         self.tableinfo = tableinfo
@@ -475,7 +475,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.before_feature_update.fire(resource=self, feature=feature)
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         obj = tableinfo.model(id=feature.id)
         for f in tableinfo.fields:
@@ -507,7 +507,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.before_feature_create.fire(resource=self, feature=feature)
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         obj = tableinfo.model()
         for f in tableinfo.fields:
@@ -536,7 +536,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.before_feature_delete.fire(resource=self, feature_id=feature_id)
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         query = self.feature_query()
         query.geom()
@@ -553,7 +553,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.before_all_feature_delete.fire(resource=self)
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         DBSession.query(tableinfo.model).delete()
 
@@ -576,7 +576,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         st_ymin = func.st_ymin
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         model = tableinfo.model
 
@@ -914,7 +914,7 @@ class FeatureQueryBase(object):
 
     def __call__(self):
         tableinfo = TableInfo.from_layer(self.layer)
-        tableinfo.setup_metadata(tablename=self.layer._tablename)
+        tableinfo.setup_metadata(self.layer._tablename)
         table = tableinfo.table
 
         columns = [table.columns.id, ]
