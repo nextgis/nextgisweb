@@ -272,7 +272,7 @@ class TableInfo(object):
                     setattr(self, k, v)
 
         table = db.Table(
-            tablename if tablename else ('lvd_' + str(uuid.uuid4().hex)),
+            tablename,
             metadata, db.Column('id', db.Integer, primary_key=True),
             db.Column('geom', ga.Geometry(
                 dimension=2, srid=self.srs_id,
@@ -390,7 +390,7 @@ class VectorLayerField(Base, LayerField):
     fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
 
-@implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
+@implementer(IFeatureLayer, IFieldEditableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = _("Vector layer")
