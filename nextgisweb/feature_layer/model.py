@@ -139,22 +139,23 @@ class _fields_attr(SP):
         obj = srlzr.obj
 
         fldmap = dict()
-        for idx, fld in reversed(list(enumerate(list(obj.fields)))):
+        for fld in obj.fields:
             fldmap[fld.id] = fld
-            obj.fields.pop(idx)
 
         obj.feature_label_field = None
+
+        new_fields = list()
 
         for fld in value:
             fldid = fld.get('id')
 
-            if fldid:
-                mfld = fldmap.get(fldid)
-                if mfld is None:
+            if fldid is not None:
+                try:
+                    mfld = fldmap.pop(fldid)  # update
+                except KeyError:
                     raise ValidationError(_("Field not found (ID=%d)." % fldid))
             else:
-                mfld = obj.__field_class__(
-                    datatype=fld['datatype'])
+                mfld = obj.field_create(fld['datatype'])  # create
 
             if 'keyname' in fld:
                 mfld.keyname = fld['keyname']
@@ -166,8 +167,12 @@ class _fields_attr(SP):
             if fld.get('label_field', False):
                 obj.feature_label_field = mfld
 
-            obj.fields.append(mfld)
+            new_fields.append(mfld)
 
+        for mfld in fldmap.values():
+            obj.field_delete(mfld)  # delete
+
+        obj.fields = new_fields
         obj.fields.reorder()
 
 

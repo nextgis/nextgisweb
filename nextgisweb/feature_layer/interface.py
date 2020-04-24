@@ -85,6 +85,16 @@ class IFeatureLayer(IResourceBase):
         KeyError exception should be raised. """
 
 
+class IFieldEditableFeatureLayer(IFeatureLayer):
+    """ Feature layer that supports field editing """
+
+    def field_create(self, datatype):
+        """ Create and return a new field without appending to a layer """
+
+    def field_delete(self, field):
+        """ Remove field """
+
+
 class IWritableFeatureLayer(IFeatureLayer):
     """ Feature layer that supports writing """
 

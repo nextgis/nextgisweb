@@ -46,7 +46,7 @@ def vector_layer_id():
                 'geometry': {'type': 'Point', 'coordinates': [0, 0]}
             }, {
                 'type': 'Feature',
-                'properties': {'description': 'about feature2'},
+                'properties': {'price': -1},
                 'geometry': {'type': 'Point', 'coordinates': [0, 0]}
             }]
         }
@@ -65,7 +65,7 @@ def vector_layer_id():
         DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
 
 
-def test_fields(webapp, vector_layer_id):
+def test_fields_edit(webapp, vector_layer_id):
     webapp.authorization = ('Basic', ('administrator', 'admin'))
 
     resp = webapp.get('/api/resource/%d' % vector_layer_id)
@@ -77,3 +77,30 @@ def test_fields(webapp, vector_layer_id):
     feature_fields = resp.json['fields']
 
     assert len(feature_fields) == 2
+
+    fields.append(dict(
+        keyname='new_field',
+        datatype='DATETIME',
+        typemod=None,
+        display_name='new_field',
+        label_field=False,
+        grid_visibility=True
+    ))
+    webapp.put_json('/api/resource/%d' % vector_layer_id, {
+        'feature_layer': {'fields': fields}
+    }, status=200)
+    resp = webapp.get('/api/resource/%d/feature/1' % vector_layer_id)
+    feature_fields = resp.json['fields']
+
+    assert len(feature_fields) == 3
+
+    fields = [fields[2], fields[0]]
+    webapp.put_json('/api/resource/%d' % vector_layer_id, {
+        'feature_layer': {'fields': fields}
+    }, status=200)
+    resp = webapp.get('/api/resource/%d' % vector_layer_id)
+    fields = resp.json['feature_layer']['fields']
+
+    assert len(fields) == 2
+    assert fields[0]['keyname'] == 'new_field'
+    assert fields[1]['keyname'] == 'name'

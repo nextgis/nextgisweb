@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 import json
 import uuid
 import types
@@ -23,6 +23,7 @@ from sqlalchemy import (
     func,
     cast
 )
+import migrate.changeset  # NOQA:F401
 
 from ..event import SafetyEvent
 from .. import db
@@ -51,6 +52,7 @@ from ..feature_layer import (
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     IFeatureLayer,
+    IFieldEditableFeatureLayer,
     IWritableFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -264,6 +266,7 @@ class TableInfo(object):
 
     def setup_metadata(self, tablename):
         metadata = db.MetaData(schema='vector_layer')
+        metadata.bind = env.core.engine
         geom_fldtype = _GEOM_TYPE_2_DB[self.geometry_type]
 
         class model(object):
@@ -468,6 +471,27 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 return f
 
         raise KeyError("Field '%s' not found!" % keyname)
+
+    # IFieldEditableFeatureLayer
+
+    def field_create(self, datatype):
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(self._tablename)
+
+        uid = str(uuid.uuid4().hex)
+        column = db.Column('fld_' + uid, _FIELD_TYPE_2_DB[datatype])
+        column.create(tableinfo.table)
+
+        return VectorLayerField(datatype=datatype, fld_uuid=uid)
+
+    def field_delete(self, field):
+        uid = field.fld_uuid
+        DBSession.delete(field)
+
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(self._tablename)
+        column = tableinfo.table.columns['fld_' + uid]
+        column.drop()
 
     # IWritableFeatureLayer
 
