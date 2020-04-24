@@ -1,7 +1,7 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" class="padding-block">
     <div data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wFile" 
         data-dojo-props="uploaderLinkText: '{{gettext 'Select a dataset'}}',
-                         uploaderHelpText: '{{gettext 'Dataset should be supported by GDAL library.'}}'
+                         uploaderHelpText: '{{gettext 'Dataset should be in GeoTIFF format.'}}'
         "></div>
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 200">
         <div data-dojo-type="ngw-spatial-ref-sys/SRSSelect" data-dojo-attach-point="wSrs" title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>

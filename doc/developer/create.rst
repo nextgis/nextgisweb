@@ -332,9 +332,11 @@ Create vector layer in ogr2ogr:
 
 .. sourcecode:: bash
 
+   $ ogr2ogr -f NGW -overwrite -t_srs EPSG:3857 -lco "KEY=data" 
+   -lco "OVERWRITE=YES"  "NGW:https://sandbox.nextgis.com/resource/464/data" 
+   PG:"dbname=gis" "data"
    
-   ogr2ogr -f NGW -overwrite -t_srs EPSG:3857 -lco "KEY=data" -lco "OVERWRITE=YES"  "NGW:https://sandbox.nextgis.com/resource/464/data" PG:"dbname=gis" "data"
-   #create vector layer with data group 464, layer will have name "data", keyname "data". Layer will take from local PostGIS database, table name is "data"
+Ccreate vector layer with data group 464, layer will have name "data", keyname "data". Layer will take from local PostGIS database, table name is "data".
    
 
 Feature in vector or PostGIS layer
@@ -456,16 +458,27 @@ To create multiple features in vector layer execute following request:
 
     Payload is an array of feature definitions, like in POST request
 
+Example of curl command to create empty vector layer:
+
 .. sourcecode:: bash
 
-#Create empty vector layer
-curl --user "administrator:demodemo" -H "Accept: */*" -X POST -d '{ "resource":{ "cls":"vector_layer", "parent":{ "id":0 }, "display_name":"Foo bar", "keyname":null, "description":null }, "resmeta":{ "items":{ } }, "vector_layer":{ "srs":{ "id":3857 }, "geometry_type": "POINT", "fields": [ { "keyname": "INTEGER_FIELD", "datatype": "INTEGER" } ] } } ' http://dev.nextgis.com/sandbox/api/resource/
+   $ curl --user "administrator:demodemo" -H "Accept: */*" -X POST 
+   -d '{ "resource":{ "cls":"vector_layer", "parent":{ "id":0 }, 
+   "display_name":"Foo bar", "keyname":null, "description":null }, 
+   "resmeta":{ "items":{ } }, "vector_layer":{ "srs":{ "id":3857 }, 
+   "geometry_type": "POINT", "fields": [ { "keyname": "INTEGER_FIELD", 
+   "datatype": "INTEGER" } ] } } ' http://dev.nextgis.com/sandbox/api/resource/
 
-#returning id of new layer: {"id": 994, "parent": {"id": 0}}
+   {"id": 994, "parent": {"id": 0}}
 
-#upload 2 features in new vector layer
-curl --user "administrator:demodemo" -H "Accept: */*" -X PATCH -d '[{   "fields": { "INTEGER_FIELD": 26 }, "geom": "POINT (15112666.6 6059666.6)" },{   "fields": { "INTEGER_FIELD": 27 }, "geom": "POINT (15112666.6 6059666.6)" }]   ' http://dev.nextgis.com/sandbox/api/resource/994/feature/
+Example of curl command to upload two features in new vector layer:
 
+.. sourcecode:: bash
+
+   $ curl --user "administrator:demodemo" -H "Accept: */*" -X PATCH 
+   -d '[{"fields":{"INTEGER_FIELD":26},"geom":"POINT (15112666.6 6059666.6)"},
+   {"fields":{"INTEGER_FIELD": 27},"geom":"POINT (15112666.6 6059666.6)"}]'
+   http://dev.nextgis.com/sandbox/api/resource/994/feature/
 
 Raster layer
 ------------
@@ -889,7 +902,11 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource": {"display_name": "cwm Вебкарта", "parent": {"id": 2317}, "cls": "webmap"}, "webmap": {"root_item": {"item_type": "root", "children": [{"layer_enabled": false, "layer_adapter": "tile", "display_name": "LT05_L1TP_124025_20010603_20161211_01", "layer_style_id": 2284, "item_type": "layer"}]}}}' http://demo.nextgis.com/api/resource/
+   $ curl --user "login:password" -H "Accept: */*" -X POST 
+   -d '{"resource": {"display_name": "cwm Вебкарта", "parent": {"id": 2317}, 
+   "cls": "webmap"}, "webmap": {"root_item": {"item_type": "root", "children": 
+   [{"layer_enabled": false, "layer_adapter": "tile", "display_name": "LT05_L1TP_124025_20010603_20161211_01",
+   "layer_style_id": 2284, "item_type": "layer"}]}}}' http://demo.nextgis.com/api/resource/
 
 WMS Service
 -----------
@@ -962,7 +979,13 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource":{"cls":"wmsserver_service","parent":{"id":0},"display_name":"test1wms","keyname":null,"description":null},"resmeta":{"items":{}},"wmsserver_service":{"layers":[{"keyname":"test1","display_name":"test wms layer","resource_id":127,"min_scale_denom":null,"max_scale_denom":null}]}}' http://demo.nextgis.com/api/resource/
+   $ curl --user "login:password" -H "Accept: */*" -X POST 
+   -d '{"resource":{"cls":"wmsserver_service","parent":{"id":0},
+   "display_name":"test1wms","keyname":null,"description":null},
+   "resmeta":{"items":{}},"wmsserver_service":{"layers":
+   [{"keyname":"test1","display_name":"test wms layer",
+   "resource_id":127,"min_scale_denom":null,"max_scale_denom":null}]}}' 
+   http://demo.nextgis.com/api/resource/
 
    {"id": 131, "parent": {"id": 0}}
 
@@ -1026,7 +1049,12 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource":{"cls":"wmsclient_connection","parent":{"id":0},"display_name":"test connection","keyname":null,"description":null},"resmeta":{"items":{}},"wmsclient_connection":{"url":"http://pkk5.rosreestr.ru/arcgis/services/Cadastre/CadastreWMS/MapServer/WMSServer","username":null,"password":null,"version":"1.1.1","capcache":"query"}}' http://demo.nextgis.com/api/resource/
+   $ curl --user "login:password" -H "Accept: */*" -X POST 
+   -d '{"resource":{"cls":"wmsclient_connection","parent":{"id":0},
+   "display_name":"test connection","keyname":null,"description":null},
+   "resmeta":{"items":{}},"wmsclient_connection":{"url":"http://pkk5.rosreestr.ru/arcgis/services/Cadastre/CadastreWMS/MapServer/WMSServer",
+   "username":null,"password":null,"version":"1.1.1","capcache":"query"}}' 
+   http://demo.nextgis.com/api/resource/
 
    {"id": 131, "parent": {"id": 0}}
 
@@ -1095,7 +1123,12 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   curl --user "login:password" -H "Accept: */*" -X POST -d '{"resource":{"cls":"wmsclient_layer","parent":{"id":0},"display_name":"layer1","keyname":null,"description":null},"resmeta":{"items":{}},"wmsclient_layer":{"connection":{"id":18},"srs":{"id":3857},"imgformat":"image/png","wmslayers":"1,2"}}' http://demo.nextgis.com/api/resource/
+   $ curl --user "login:password" -H "Accept: */*" -X POST 
+   -d '{"resource":{"cls":"wmsclient_layer","parent":{"id":0},
+   "display_name":"layer1","keyname":null,"description":null},
+   "resmeta":{"items":{}},"wmsclient_layer":{"connection":{"id":18},
+   "srs":{"id":3857},"imgformat":"image/png","wmslayers":"1,2"}}' 
+   http://demo.nextgis.com/api/resource/
 
    {"id": 131, "parent": {"id": 0}}
 
@@ -1157,6 +1190,11 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-  curl --user "login:password" -H "Accept: */*" -d '{"resource":{"cls":"tracker","parent":{"id":4141},"display_name":"test4","keyname":null,"description":null},"tracker":{"is_registered":"","unique_id":"971f1-ffc-0f7073","description":"","device_type":"ng_mobile","consumption_lpkm":null},"resmeta":{"items":{}}}' http://demo.nextgis.com/api/resource/
+  $ curl --user "login:password" -H "Accept: */*" 
+  -d '{"resource":{"cls":"tracker","parent":{"id":4141},
+  "display_name":"test4","keyname":null,"description":null},
+  "tracker":{"is_registered":"","unique_id":"971f1-ffc-0f7073",
+  "description":"","device_type":"ng_mobile","consumption_lpkm":null},
+  "resmeta":{"items":{}}}' http://demo.nextgis.com/api/resource/
 
   {"id": 4206, "parent": {"id": 4141}}
