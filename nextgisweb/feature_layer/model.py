@@ -140,9 +140,8 @@ class _fields_attr(SP):
 
         fldmap = dict()
         for idx, fld in reversed(list(enumerate(list(obj.fields)))):
-            if fld.id:
-                fldmap[fld.id] = fld
-                obj.fields.pop(idx)
+            fldmap[fld.id] = fld
+            obj.fields.pop(idx)
 
         obj.feature_label_field = None
 
