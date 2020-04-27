@@ -86,6 +86,7 @@ class FeatureLayerComponent(Component):
                 nominatim=self.options['search.nominatim']
             ),
             export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
+            datatypes=FIELD_TYPE.enum,
         )
 
     option_annotations = (

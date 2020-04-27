@@ -7,14 +7,20 @@ define([
     "dojo/dom-construct",
     "dojo/dom-style",   
     "dojo/dom-class",
+    "dijit/DropDownMenu",
+    "dijit/MenuItem",
+    "dijit/Toolbar",
     "dijit/Tooltip",
     "dijit/layout/ContentPane",
+    "dijit/form/Button",
     "dijit/form/CheckBox",
+    "dijit/form/DropDownButton",
     "dijit/form/ValidationTextBox",
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
+    "ngw/settings!feature_layer",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-resource/serialize",
     "ngw-pyramid/i18n!feature_layer",
@@ -30,14 +36,20 @@ define([
     domConstruct,
     domStyle,
     domClass,
+    DropDownMenu,
+    MenuItem,
+    Toolbar,
     Tooltip,
     ContentPane,
+    Button,
     CheckBox,
+    DropDownButton,
     ValidationTextBox,
     Grid,
     Selection,
     editor,
     DijitRegistry,
+    settings,
     KeynameTextBox,
     serialize,
     i18n
@@ -107,31 +119,28 @@ define([
         style: "padding: 0",
 
         constructor: function () {
-            var store = new Observable(new Memory({idProperty: "fid"}));
-            this.store = store;
-
-            this.grid = new GridClass({ store: this.store });
-
-            this.grid.on("dgrid-datachange", function(evt){
-                if (evt.cell.column.field === "label_field" && evt.value === true) {
-                    store.query({label_field: true}).forEach(function (obj) {
-                        obj.label_field = false;
-                        store.put(obj);
-                    });
-                }
-            });
-
+            this.store = new Observable(new Memory({idProperty: "fid"}));
         },
 
         buildRendering: function () {
             this.inherited(arguments);
-            domClass.add(this.domNode, "ngw-feature-layer-fields-widget");
 
+            domClass.add(this.domNode, "ngw-feature-layer-fields-widget");
             domClass.add(this.domNode, "dgrid-border-fix");
+
+            this.grid = new GridClass({ store: this.store });
+            this.grid.region = "center";
+
+            this.grid.on("dgrid-datachange", function(evt){
+                if (evt.cell.column.field === "label_field" && evt.value === true) {
+                    this.store.query({label_field: true}).forEach(function (obj) {
+                        obj.label_field = false;
+                        this.store.put(obj);
+                    }.bind(this));
+                }
+            });
             domStyle.set(this.grid.domNode, "border", "none");
             
-            domConstruct.place(this.grid.domNode, this.domNode);
-
             new Tooltip({
                 connectId: [this.grid.column("label_field").headerNode],
                 label: i18n.gettext("Label attribute")
@@ -142,6 +151,54 @@ define([
                 label: i18n.gettext("Feature table")
             });
 
+            this.toolbar = new Toolbar({});
+
+            this.addMenu = new DropDownMenu({style: "display: none;"});
+
+            if (this.composite.cls === 'vector_layer') {
+                var store = this.store;
+                var grid = this.grid;
+
+                function add () {
+                    store.add({
+                        datatype: this.value,
+                        grid_visibility: true // FIXME: set default
+                    });
+                }
+
+                function remove () {
+                    for (var key in grid.selection) {
+                        store.remove(key);
+                    }
+                };
+
+                settings.datatypes.forEach(function(datatype) {
+                    this.addMenu.addChild(new MenuItem({
+                        label: datatype,
+                        value: datatype,
+                        showLabel: true,
+                        onClick: add
+                    }));
+                }.bind(this));
+
+                this.toolbar.addChild(new DropDownButton({
+                    label: i18n.gettext("Add"),
+                    iconClass: "dijitIconNewTask",
+                    dropDown: this.addMenu
+                }));
+
+                this.toolbar.addChild(new Button({
+                    label: i18n.gettext("Remove"),
+                    iconClass: "dijitIconDelete",
+                    onClick: remove
+                }));
+
+                this.toolbar.region = "top";
+
+                this.addChild(this.toolbar);
+            }
+            // TODO: fix scroll and ".region"
+            this.addChild(this.grid);
         },
 
         deserializeInMixin: function (data) {
