@@ -203,14 +203,11 @@ define([
                     });
 
                     if (jumpItem) {
-                        var selection = {};
-
                         store.query(function (object) {
                             return object.idx >= selectFrom && object.idx <= selectTo;
                         }).forEach(function (item) {
                             item.fid = item.idx -= direction;
                             store.put(item);
-                            selection[item.idx] = true;
                         });
                         jumpItem.fid = jumpItem.idx = indexTo;
                         store.put(jumpItem);
