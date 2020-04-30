@@ -178,11 +178,16 @@ define([
                     }
 
                     store.query(function (item) {
-                        return item.idx >= next_index;
-                    }).map(function (item) {
+                        return item.idx > next_index;
+                    }).map(function (_item) {
+                        var item = lang.clone(_item);
                         item.fid = item.idx = next_index++;
                         store.put(item);
+                        if (next_index === store.data.length) {
+                            store.remove(next_index);
+                        }
                     });
+                    grid.sort('idx');
                 };
 
                 function sort (direction) {
