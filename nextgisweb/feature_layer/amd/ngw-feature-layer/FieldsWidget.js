@@ -54,8 +54,6 @@ define([
     serialize,
     i18n
 ) {
-    var fid = 1;
-
     var GridClass = declare([Grid, Selection, DijitRegistry], {
         selectionMode: "single",
 
@@ -119,7 +117,7 @@ define([
         style: "padding: 0",
 
         constructor: function () {
-            this.store = new Observable(new Memory({idProperty: "fid"}));
+            this.store = new Observable(new Memory({idProperty: "idx"}));
         },
 
         buildRendering: function () {
@@ -165,8 +163,7 @@ define([
                         // FIXME: set default
                         grid_visibility: true,
                         display_name: "value",
-                        idx: store.data.length + 1,
-                        fid: store.data.length + 1
+                        idx: store.data.length + 1
                     });
                 }
 
@@ -181,7 +178,7 @@ define([
                         return item.idx > next_index;
                     }).map(function (_item) {
                         var item = lang.clone(_item);
-                        item.fid = item.idx = next_index++;
+                        item.idx = next_index++;
                         store.put(item);
                         if (next_index === store.data.length) {
                             store.remove(next_index);
@@ -211,10 +208,10 @@ define([
                         store.query(function (object) {
                             return object.idx >= selectFrom && object.idx <= selectTo;
                         }).forEach(function (item) {
-                            item.fid = item.idx -= direction;
+                            item.idx -= direction;
                             store.put(item);
                         });
-                        jumpItem.fid = jumpItem.idx = indexTo;
+                        jumpItem.idx = indexTo;
                         store.put(jumpItem);
                         // FIXME: grid.set('sort', [{ attribute: 'idx', descending: false }]) not working
                         grid.sort('idx');
@@ -269,8 +266,7 @@ define([
 
             array.forEach(value, function (f) {
                 var c = lang.clone(f);
-                c.idx = idx; idx++;
-                c.fid = fid; fid++;
+                c.idx = idx++;
                 store.put(c);
             });
         },
@@ -283,7 +279,6 @@ define([
             // this might be not wise
             setObject("fields", this.store.query().map(function (src) {
                 var obj = lang.clone(src);
-                obj.fid = undefined;
                 obj.idx = undefined;
                 return obj;
             }));
