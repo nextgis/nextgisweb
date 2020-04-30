@@ -138,9 +138,9 @@ define([
                         this.store.put(obj);
                     }.bind(this));
                 }
-            });
+            }.bind(this));
             domStyle.set(this.grid.domNode, "border", "none");
-            
+
             new Tooltip({
                 connectId: [this.grid.column("label_field").headerNode],
                 label: i18n.gettext("Label attribute")
@@ -162,15 +162,64 @@ define([
                 function add () {
                     store.add({
                         datatype: this.value,
-                        grid_visibility: true // FIXME: set default
+                        // FIXME: set default
+                        grid_visibility: true,
+                        display_name: "value",
+                        idx: store.data.length + 1,
+                        fid: store.data.length + 1
                     });
                 }
 
                 function remove () {
-                    for (var key in grid.selection) {
-                        store.remove(key);
+                    var next_index = Infinity;
+                    for (var index in grid.selection) {
+                        next_index = Math.min(next_index, index);
+                        store.remove(index);
                     }
+
+                    store.query(function (item) {
+                        return item.idx >= next_index;
+                    }).map(function (item) {
+                        item.fid = item.idx = next_index++;
+                        store.put(item);
+                    });
                 };
+
+                function sort (direction) {
+                    var selectFrom, selectTo;
+                    for (var index in grid.selection) {
+                        if (selectFrom === undefined) {
+                            selectFrom = Number.parseInt(index);
+                        }
+                        selectTo = Number.parseInt(index);
+                    }
+
+                    var indexFrom = direction === 1 ? selectFrom - 1 : selectTo + 1;
+                    var indexTo = direction === 1 ? selectTo : selectFrom;
+
+                    var jumpItem;
+                    store.query({ idx: indexFrom }).forEach(function (item) {
+                        jumpItem = item;
+                    });
+
+                    if (jumpItem) {
+                        var selection = {};
+
+                        store.query(function (object) {
+                            return object.idx >= selectFrom && object.idx <= selectTo;
+                        }).forEach(function (item) {
+                            item.fid = item.idx -= direction;
+                            store.put(item);
+                            selection[item.idx] = true;
+                        });
+                        jumpItem.fid = jumpItem.idx = indexTo;
+                        store.put(jumpItem);
+                        // FIXME: grid.set('sort', [{ attribute: 'idx', descending: false }]) not working
+                        grid.sort('idx');
+                        grid.select(selectFrom - direction, selectTo - direction);
+                        
+                    }
+                }
 
                 settings.datatypes.forEach(function(datatype) {
                     this.addMenu.addChild(new MenuItem({
@@ -191,6 +240,16 @@ define([
                     label: i18n.gettext("Remove"),
                     iconClass: "dijitIconDelete",
                     onClick: remove
+                }));
+
+                this.toolbar.addChild(new Button({
+                    label: '\u21E7',
+                    onClick: sort.bind(this, 1)
+                }));
+
+                this.toolbar.addChild(new Button({
+                    label: '\u21E9',
+                    onClick: sort.bind(this, -1)
                 }));
 
                 this.toolbar.region = "top";
