@@ -3,3 +3,7 @@
     right: 16px;
     bottom: auto;
 }
+.tiny-map .map-logo img{
+    width: 91px;
+    height: auto;
+}

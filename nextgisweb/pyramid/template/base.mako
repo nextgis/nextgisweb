@@ -9,7 +9,7 @@
     from bunch import Bunch
 %>
 <head>
-    <% system_name = request.env.core.settings_get('core', 'system.full_name') %>
+    <% system_name = request.env.core.system_full_name() %>
 
     <title>
         <% page_title = '' %>
@@ -24,11 +24,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta property="og:title" content="${page_title}"/>
-    <meta property="og:image" content="http://nextgis.ru/img/webgis-for-social.png"/>
-    <meta property="og:description" content="${tr(_('Your Web GIS at nextgis.com'))}"/>
-    <meta property="og:url" content="${request.url}"/>
-    <meta property="fb:app_id" content="138386829910005"/>
+    %if request.env.core.options['enable_snippets']:
+        <meta property="og:title" content="${page_title}"/>
+        <meta property="og:image" content="https://nextgis.ru/img/webgis-for-social.png"/>
+        <meta property="og:description" content="${tr(_('Your Web GIS at nextgis.com'))}"/>
+        <meta property="og:url" content="${request.url}"/>
+        <meta property="fb:app_id" content="138386829910005"/>
+    %endif
 
     <link href="${request.route_url('pyramid.favicon')}"
         rel="shortcut icon" type="image/x-icon"/>

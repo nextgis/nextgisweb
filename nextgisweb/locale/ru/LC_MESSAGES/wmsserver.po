@@ -47,15 +47,15 @@ msgstr "Мин. масштаб"
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: template/section.mako:5
+#: template/section.mako:6
 msgid "WMS service address"
 msgstr "Адрес WMS сервиса"
 
-#: template/section.mako:9
+#: template/section.mako:10
 msgid ""
-"Use this link in desktop client (e.g. NextGIS QGIS) to access raster "
+"Use this link in desktop client (e.g. {example}) to access raster "
 "representation of your data layers."
-msgstr "Используйте эту ссылку в настольном приложении (например, NextGIS QGIS) для просмотра растрового представления ваших слоёв."
+msgstr "Используйте эту ссылку в настольном приложении (например, {example}) для просмотра растрового представления ваших слоёв."
 
 #~ msgid "WMS URL"
 #~ msgstr "WMS URL"

@@ -43,15 +43,15 @@ msgstr "Наименование"
 msgid "Default count of returned features"
 msgstr "Число возвращаемых объектов по умолчанию"
 
-#: template/section.mako:5
+#: template/section.mako:6
 msgid "WFS service address"
 msgstr "Адрес WFS сервиса"
 
-#: template/section.mako:9
+#: template/section.mako:10
 msgid ""
-"Use this link in desktop client (e.g. NextGIS QGIS) to access and edit "
+"Use this link in desktop client (e.g. {example}) to access and edit "
 "vector data."
-msgstr "Используйте эту ссылку в настольном приложении (например, NextGIS QGIS) для просмотра и редактирования векторных данных."
+msgstr "Используйте эту ссылку в настольном приложении (например, {example}) для просмотра и редактирования векторных данных."
 
 #~ msgid "WFS URL"
 #~ msgstr "WFS URL"
