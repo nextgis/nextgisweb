@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from ..component import Component
+from ..component import Component, require
 from ..lib.config import Option
 from .model import Base, Connection, Layer, SCHEME
 
@@ -22,6 +22,7 @@ class TMSClientComponent(Component):
     def client_settings(self, request):
         return dict(schemes=SCHEME.enum)
 
+    @require('resource')
     def setup_pyramid(self, config):
         from . import api, view
         api.setup_pyramid(self, config)
