@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import sentry_sdk
 from sentry_sdk.integrations.pyramid import PyramidIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
 from ..component import Component
 from ..lib.config import Option
@@ -19,7 +20,10 @@ class SentryComponent(Component):
         if 'dsn' in self.options:
             sentry_sdk.init(
                 self.options['dsn'],
-                integrations=[PyramidIntegration()],
+                integrations=[
+                    PyramidIntegration(),
+                    SqlalchemyIntegration(),
+                ],
             )
 
     option_annotations = (
