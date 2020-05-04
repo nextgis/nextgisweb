@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 def pkginfo():
     components = (
         'core',
+        'sentry',
         'pyramid',
         'auth',
         'resource',

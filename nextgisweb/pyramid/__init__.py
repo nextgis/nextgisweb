@@ -16,9 +16,6 @@ from pyramid.events import BeforeRender
 
 import pyramid_tm
 import pyramid_mako
-import sentry_sdk
-
-from sentry_sdk.integrations.pyramid import PyramidIntegration
 
 from ..lib.config import Option
 from ..package import pkginfo
@@ -65,12 +62,6 @@ class PyramidComponent(Component):
         plockey = 'pyramid.default_locale_name'
         if plockey not in settings and self.env.core.locale_default is not None:
             settings[plockey] = self.env.core.locale_default
-
-        if 'sentry_dsn' in self.options:
-            sentry_sdk.init(
-                self.options['sentry_dsn'],
-                integrations=[PyramidIntegration()],
-            )
 
         config = Configurator(settings=settings)
 

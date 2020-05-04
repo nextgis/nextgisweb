@@ -37,7 +37,7 @@ requires = [
     'OWSLib==0.17.1',
     'requests[security]==2.22.0',
     'babel==2.6.0',
-    'sentry-sdk==0.9.0',
+    'sentry-sdk==0.14.3',
     'python-magic==0.4.15',
     'backports.tempfile==1.0',
     'pip==19.2.3',  # https://github.com/pypa/pip/issues/7209
