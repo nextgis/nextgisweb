@@ -24,8 +24,10 @@ class SentryComponent(Component):
                     PyramidIntegration(),
                     SqlalchemyIntegration(),
                 ],
+                shutdown_timeout=self.options['shutdown_timeout']
             )
 
     option_annotations = (
         Option('dsn'),
+        Option('shutdown_timeout', int, default=30)
     )
