@@ -68,7 +68,7 @@ class Env(object):
                             requirements = [self._components[i] for i in getattr(
                                 c, meth)._require]
                         except KeyError:
-                            raise Exception(c)
+                            raise Exception("Failed to collect requirements for component: %s" % c.identity)
                         traverse(requirements)
                     traverse.seq.append(c.identity)
 
