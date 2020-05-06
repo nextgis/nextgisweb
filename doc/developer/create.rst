@@ -39,6 +39,14 @@ To create new group execute following request.
        "description":"qqq"
       }
     }
+    
+Same steps with curl:
+
+.. sourcecode:: bash
+
+   $ curl --user "login:password" -H "Accept: */*" -X POST
+-d '{"resource": {"display_name": "foldername", "parent": {"id": 0},
+"cls": "resource_group"}, "description" : "Folder created from curl" }' http://demo.nextgis.com/api/resource/
 
 .. _ngwdev_create_pg_conn:
 
