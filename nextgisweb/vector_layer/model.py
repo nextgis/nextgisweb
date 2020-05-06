@@ -23,7 +23,6 @@ from sqlalchemy import (
     func,
     cast
 )
-import migrate.changeset  # NOQA:F401
 
 from ..event import SafetyEvent
 from .. import db
@@ -38,7 +37,7 @@ from ..resource import (
 from ..resource.exception import ValidationError, ResourceError
 from ..env import env
 from ..geometry import geom_from_wkb, box
-from ..models import declarative_base, DBSession
+from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..compat import lru_cache
 
@@ -98,6 +97,8 @@ _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 
 _FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
 _FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
+
+SCHEMA = 'vector_layer'
 
 Base = declarative_base()
 
@@ -265,7 +266,7 @@ class TableInfo(object):
                 layer.feature_label_field = field
 
     def setup_metadata(self, tablename):
-        metadata = db.MetaData(schema='vector_layer')
+        metadata = db.MetaData(schema=SCHEMA)
         metadata.bind = env.core.engine
         geom_fldtype = _GEOM_TYPE_2_DB[self.geometry_type]
 
@@ -475,12 +476,10 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IFieldEditableFeatureLayer
 
     def field_create(self, datatype):
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-
         uid = str(uuid.uuid4().hex)
         column = db.Column('fld_' + uid, _FIELD_TYPE_2_DB[datatype])
-        column.create(tableinfo.table)
+        op = migrate_operation()
+        op.add_column(self._tablename, column, schema=SCHEMA)
 
         return VectorLayerField(datatype=datatype, fld_uuid=uid)
 
@@ -488,10 +487,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         uid = field.fld_uuid
         DBSession.delete(field)
 
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-        column = tableinfo.table.columns['fld_' + uid]
-        column.drop()
+        op = migrate_operation()
+        with op.batch_alter_table(self._tablename, schema=SCHEMA) as batch_op:
+            batch_op.drop_column('fld_' + uid)
 
     # IWritableFeatureLayer
 
@@ -631,12 +629,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 def _vector_layer_listeners(table):
     event.listen(
         table, "after_create",
-        db.DDL("CREATE SCHEMA vector_layer")
+        db.DDL("CREATE SCHEMA %s" % SCHEMA)
     )
 
     event.listen(
         table, "after_drop",
-        db.DDL("DROP SCHEMA IF EXISTS vector_layer CASCADE")
+        db.DDL("DROP SCHEMA IF EXISTS %s CASCADE" % SCHEMA)
     )
 
 

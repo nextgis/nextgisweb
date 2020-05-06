@@ -13,9 +13,9 @@ except CalledProcessError:
     gv = None
 
 requires = [
+    'alembic==1.4.2',
     'pyramid==1.10.1',
     'SQLAlchemy==1.2.16',
-    'sqlalchemy-migrate==0.13.0',
     'transaction==2.4.0',
     'pyramid_tm==2.2.1',
     'pyramid_debugtoolbar==4.5.1',

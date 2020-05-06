@@ -2,6 +2,8 @@
 import warnings
 import six
 
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
 import sqlalchemy.exc
 from sqlalchemy.ext.declarative import declarative_base as sa_declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -66,3 +68,9 @@ def declarative_base():
 
 
 Base = declarative_base()
+
+
+def migrate_operation():
+    connection = DBSession.connection()
+    ctx = MigrationContext.configure(connection)
+    return Operations(ctx)
