@@ -2,15 +2,17 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from collections import namedtuple, OrderedDict
 from datetime import datetime
+from shutil import copyfile
 import six
 
 from bunch import Bunch
 
 from .. import db
+from ..auth import Principal, User, Group
 from ..env import env
+from ..file_storage import FileObj
 from ..models import declarative_base, DBSession
 from ..registry import registry_maker
-from ..auth import Principal, User, Group
 
 from .util import _
 from .interface import providedBy
@@ -119,6 +121,8 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
 
     description = db.Column(db.Unicode)
 
+    preview_fileobj_id = db.Column(db.ForeignKey(FileObj.id))
+
     __mapper_args__ = dict(polymorphic_on=cls)
     __table_args__ = (
         db.CheckConstraint('parent_id IS NOT NULL OR id = 0'),
@@ -132,6 +136,8 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
             order_by=display_name))
 
     owner_user = db.relationship(User)
+
+    preview_fileobj = db.relationship(FileObj, lazy='joined')
 
     def __str__(self):
         return self.display_name
@@ -340,6 +346,23 @@ class _scopes_attr(SP):
         return list(srlzr.obj.scope.keys())
 
 
+class _preview_file_upload_attr(SP):
+
+    def setter(self, srlzr, value):
+        if value is None and srlzr.obj.preview_fileobj is not None:
+            fileobj = srlzr.obj.preview_fileobj
+            srlzr.obj.preview_fileobj = None
+            DBSession.delete(fileobj)
+        else:
+            fileobj = env.file_storage.fileobj(component='resource')
+
+            srcfile, _ = env.file_upload.get_filename(value['id'])
+            dstfile = env.file_storage.filename(fileobj, makedirs=True)
+
+            copyfile(srcfile, dstfile)
+            srlzr.obj.preview_fileobj = fileobj
+
+
 _scp = Resource.scope.resource
 
 
@@ -372,6 +395,8 @@ class ResourceSerializer(Serializer):
     children = _ro(_children_attr)
     interfaces = _ro(_interfaces_attr)
     scopes = _ro(_scopes_attr)
+
+    preview_file_upload = _preview_file_upload_attr(write=MetadataScope.write)
 
     def deserialize(self, *args, **kwargs):
         # As the test for uniqueness within group is dependent on two attributes

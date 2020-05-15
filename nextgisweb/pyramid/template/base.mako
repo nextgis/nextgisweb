@@ -23,12 +23,19 @@
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     %if request.env.core.options['enable_snippets']:
-        <meta property="og:title" content="${page_title}"/>
-        <meta property="og:image" content="https://nextgis.ru/img/webgis-for-social.png"/>
         <meta property="og:description" content="${tr(_('Your Web GIS at nextgis.com'))}"/>
-        <meta property="og:url" content="${request.url}"/>
         <meta property="fb:app_id" content="138386829910005"/>
+    %endif
+
+    <% has_preview = hasattr(request, 'context') and request.context.preview_fileobj_id is not None %>
+    %if request.env.core.options['enable_snippets'] or has_preview:
+        <meta property="og:title" content="${page_title}"/>
+        <meta property="og:url" content="${request.url}"/>
+        <% preview_link = request.route_url('resource.preview', id=request.context.id) \
+            if has_preview else 'https://nextgis.ru/img/webgis-for-social.png'%>
+        <meta property="og:image" content="${preview_link}"/>
     %endif
 
     <link href="${request.route_url('pyramid.favicon')}"

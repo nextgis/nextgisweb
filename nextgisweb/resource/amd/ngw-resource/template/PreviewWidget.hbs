@@ -1,0 +1,14 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="resource" title="Слой" class="padding-block">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels: false">
+
+        <div data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wPreviewFile"
+             data-dojo-props="uploaderLinkText: '{{gettext 'Select a preview image'}}',
+                              uploaderHelpText: '{{gettext 'An image should be in a PNG format.'}}'
+             "></div>
+
+        <button data-dojo-type="dijit/form/Button" data-dojo-attach-point="buttonRestore"
+            class="dijitButton--primary">{{gettext 'Restore default'}}</button>
+
+    </div>
+</div>
