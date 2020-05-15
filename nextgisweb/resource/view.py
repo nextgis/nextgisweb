@@ -187,6 +187,9 @@ class Widget(Widget):
     operation = ('create', 'update')
     amdmod = 'ngw-resource/PreviewWidget'
 
+    def is_applicable(self):
+        return self.obj.check_preview_editable()
+
 
 def setup_pyramid(comp, config):
 

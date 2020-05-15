@@ -63,6 +63,10 @@ class WebMap(Base, Resource):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
+    @classmethod
+    def check_preview_editable(cls):
+        return True
+
     def to_dict(self):
         return dict(
             id=self.id,

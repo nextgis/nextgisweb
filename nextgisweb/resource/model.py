@@ -265,6 +265,13 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
 
         return value
 
+    # Preview
+
+    @classmethod
+    def check_preview_editable(cls):
+        """ Can this resource preview be editable? """
+        return False
+
 
 ResourceScope.read.require(
     ResourceScope.read,
