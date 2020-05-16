@@ -10,7 +10,7 @@ Resources
 Resource classes
 --------------------
 
-There are following resource classes now:
+The current list of resource classes:
 
 * resource_group
 * postgis_layer
