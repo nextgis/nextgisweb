@@ -6,8 +6,8 @@ define([
     "ngw-resource/serialize",
     "ngw-pyramid/hbs-i18n",
     // resource
-    "dojo/text!./template/PreviewWidget.hbs",
-    "ngw-pyramid/i18n!resource",
+    "dojo/text!./template/Widget.hbs",
+    "ngw-pyramid/i18n!resource-social",
     // template
     "dojox/layout/TableContainer",
     "ngw-file-upload/Uploader"
@@ -23,8 +23,8 @@ define([
 ) {
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
-        identity: "resource",
-        title: i18n.gettext("Preview"),
+        identity: "resource_social",
+        title: i18n.gettext("Social"),
 
         postCreate: function () {
             this.inherited(arguments);
@@ -40,10 +40,14 @@ define([
         },
 
         serializeInMixin: function (data) {
+            if (data[this.identity] === undefined) {
+                data[this.identity] = {};
+            }
+
             if (this._restoreDefaultPreview) {
-                data.resource.preview_file_upload = null;
+                data[this.identity].preview_file_upload = null;
             } else if (this.wPreviewFile.data) {
-                data.resource.preview_file_upload = this.wPreviewFile.data;
+                data[this.identity].preview_file_upload = this.wPreviewFile.data;
             }
         }
     });

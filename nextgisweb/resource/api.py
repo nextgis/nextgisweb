@@ -4,12 +4,10 @@ import json
 from collections import OrderedDict
 import zope.event
 
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import FileResponse, Response
+from pyramid.response import Response
 
 from .. import db
 from .. import geojson
-from ..env import env
 from ..models import DBSession
 from ..auth import User
 
@@ -236,14 +234,6 @@ def search(request):
     return Response(
         json.dumps(result, cls=geojson.Encoder), status_code=200,
         content_type='application/json', charset='utf-8')
-
-
-def preview(resource, request):
-    if resource.preview_fileobj is None:
-        raise HTTPNotFound()
-
-    path = env.file_storage.filename(resource.preview_fileobj)
-    return FileResponse(path, content_type='image/png', request=request)
 
 
 def setup_pyramid(comp, config):

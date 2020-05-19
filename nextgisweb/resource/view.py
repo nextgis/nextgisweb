@@ -22,7 +22,7 @@ from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
 from .serialize import CompositeSerializer
-from .widget import CompositeWidget, Widget
+from .widget import CompositeWidget
 from .util import _
 
 __all__ = ['resource_factory', ]
@@ -180,15 +180,6 @@ def widget(request):
     return dict(
         operation=operation, config=widget.config(), id=resid,
         cls=clsid, parent=parent.id if parent else None)
-
-
-class Widget(Widget):
-    resource = Resource
-    operation = ('create', 'update')
-    amdmod = 'ngw-resource/PreviewWidget'
-
-    def is_applicable(self):
-        return self.obj.check_preview_editable()
 
 
 def setup_pyramid(comp, config):

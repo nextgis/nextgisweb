@@ -29,7 +29,9 @@
         <meta property="fb:app_id" content="138386829910005"/>
     %endif
 
-    <% has_preview = hasattr(request, 'context') and request.context.preview_fileobj_id is not None %>
+    <% has_preview = hasattr(request, 'context') and \
+        request.context.social is not None and \
+        request.context.social.preview_fileobj is not None %>
     %if request.env.core.options['enable_snippets'] or has_preview:
         <meta property="og:title" content="${page_title}"/>
         <meta property="og:url" content="${request.url}"/>

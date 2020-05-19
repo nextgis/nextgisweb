@@ -19,6 +19,7 @@ def pkginfo():
         'pyramid',
         'auth',
         'resource',
+        'resource_social',
         'resmeta',
         'spatial_ref_sys',
         'layer',
@@ -103,6 +104,7 @@ def amd_packages():
         # components packages
         ('ngw-pyramid', 'nextgisweb:pyramid/amd/ngw-pyramid'),
         ('ngw-resource', 'nextgisweb:resource/amd/ngw-resource'),
+        ('ngw-resource-social', 'nextgisweb:resource_social/amd/ngw-resource-social'),
         ('ngw-resmeta', 'nextgisweb:resmeta/amd/ngw-resmeta'),
         ('ngw-feature-layer', 'nextgisweb:feature_layer/amd/ngw-feature-layer'),
         ('ngw-feature-description', 'nextgisweb:feature_description/amd/ngw-feature-description'),
