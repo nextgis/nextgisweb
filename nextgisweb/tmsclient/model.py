@@ -194,8 +194,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
             src_osr = osr.SpatialReference()
             dst_osr = osr.SpatialReference()
 
-            src_osr.ImportFromEPSG(srs.id)
-            dst_osr.ImportFromEPSG(self.srs.id)
+            src_osr.ImportFromWkt(srs.wkt)
+            dst_osr.ImportFromWkt(self.srs.wkt)
             coordTrans = osr.CoordinateTransformation(src_osr, dst_osr)
 
             def transform(x, y):
