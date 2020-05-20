@@ -3,7 +3,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import PIL
 from osgeo import osr, ogr
-from pyproj import CRS
 from six import BytesIO, PY3
 from zope.interface import implementer
 
@@ -191,13 +190,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
         #   ‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾b1
         #################################
 
-        crs = CRS.from_wkt(srs.wkt)
-        if crs.is_geographic:
-            extent = (
-                extent[0], max(extent[1], -85.0511),
-                extent[2], min(extent[3], 85.0511),
-            )
-
         if srs.id != self.srs.id:
             src_osr = osr.SpatialReference()
             dst_osr = osr.SpatialReference()
@@ -213,6 +205,11 @@ class Layer(Base, Resource, SpatialLayerMixin):
                 return (p.GetX(), p.GetY())
 
             extent = transform(*extent[0:2]) + transform(*extent[2:4])
+
+        extent = (
+            max(extent[0], self.srs.minx), max(extent[1], self.srs.miny),
+            min(extent[2], self.srs.maxx), min(extent[3], self.srs.maxy),
+        )
 
         xtilemin, ytilemin, xtilemax, ytilemax = self.srs.extent_tile_range(extent, zoom)
 
