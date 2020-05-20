@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+from pyproj import CRS
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
@@ -63,17 +64,32 @@ class SRS(Base):
         self.proj4 = convert_to_proj(value)
         return value
 
+    @property
+    def is_geographic(self):
+        return CRS.from_wkt(self.wkt).is_geographic
+
+    @property
+    def _zero_level_numtiles_x(self):
+        return 2 if self.is_geographic else 1
+
+    @property
+    def _zero_level_numtiles_y(self):
+        return 1
+
+    def _tile_step_x(self, z):
+        return (self.maxx - self.minx) / (2 ** z) / self._zero_level_numtiles_x
+
+    def _tile_step_y(self, z):
+        return (self.maxy - self.miny) / (2 ** z) / self._zero_level_numtiles_y
+
     def tile_extent(self, tile):
         z, x, y = tile
-        step = min(
-            (self.maxx - self.minx),
-            (self.maxy - self.miny)
-        ) / (2 ** z)
+
         return (
-            self.minx + x * step,
-            self.maxy - (y + 1) * step,
-            self.minx + (x + 1) * step,
-            self.maxy - y * step,
+            self.minx + x * self._tile_step_x(z),
+            self.maxy - (y + 1) * self._tile_step_y(z),
+            self.minx + (x + 1) * self._tile_step_x(z),
+            self.maxy - y * self._tile_step_y(z),
         )
 
     def tile_center(self, tile):
@@ -84,11 +100,10 @@ class SRS(Base):
         )
 
     def _point_tilexy(self, px, py, ztile):
-        step = min(
-            (self.maxx - self.minx),
-            (self.maxy - self.miny)
-        ) / (2 ** ztile)
-        return ((px - self.minx) / step, (self.maxy - py) / step)
+        return (
+            (px - self.minx) / self._tile_step_x(ztile),
+            (self.maxy - py) / self._tile_step_y(ztile)
+        )
 
     def extent_tile_range(self, extent, ztile):
         xtile_min, ytile_max = self._point_tilexy(extent[0], extent[1], ztile)
