@@ -27,5 +27,3 @@ Update vector layer in ngw from local geojson file
    ogr2ogr -f NGW -nln "$layer_name"  -append -doo "USERPWD=$login:$password" \
    -doo "BATCH_SIZE=100" -t_srs EPSG:3857 "NGW:$layer_url" preview.geojson
 
-
-https://github.com/nextgis/ngw_external_api_python/blob/9fd06b9a81a2018d3451fbb6f72a85e00d343e21/tests/client.py
