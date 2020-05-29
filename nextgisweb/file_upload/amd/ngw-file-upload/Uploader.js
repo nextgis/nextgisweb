@@ -45,7 +45,7 @@ define([
                 var uploader = new tus.Upload(file, {
                     endpoint: route.file_upload.collection(),
                     storeFingerprintForResuming: false,
-                    chunkSize: 8 * 1024 * 1024,
+                    chunkSize: 16 * 1024 * 1024,
                     metadata: { name: file.name },
 
                     onProgress: function (bytesUploaded, bytesTotal) {

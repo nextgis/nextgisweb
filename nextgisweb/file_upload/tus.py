@@ -3,7 +3,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import pickle
 import json
 from os.path import getsize, isfile
-from shutil import copyfileobj
 from base64 import b64decode
 
 import magic
@@ -53,9 +52,10 @@ def item_patch(request):
 
     with open(fnm, 'r') as fd:
         meta = pickle.loads(fd.read())
+        size = meta['size']
 
-    if upload_offset + request.content_length > meta['size']:
-        # Don't upload more than declared file size
+    # Don't upload more than declared file size.
+    if upload_offset + request.content_length > size:
         return _resp(413)
 
     with open(fnd, 'ab') as fd:
@@ -63,11 +63,22 @@ def item_patch(request):
         if upload_offset != fd.tell():
             return _resp(409)
 
-        # Copy request body to file and store new offset
-        copyfileobj(request.body_file, fd, length=BUF_SIZE)
-        upload_offset = upload_offset + request.content_length
+        # Copy request body to data file. Input streaming is also supported
+        # here is some conditions: uwsgi - does, pserve - doesn't.
+        src_fd = request.body_file
+        while True:
+            buf = src_fd.read(BUF_SIZE)
+            if buf is None:
+                break
+            read = len(buf)
+            if len(buf) == 0:
+                break
+            if upload_offset + read > size:
+                return _resp(413)
+            fd.write(buf)
+            upload_offset += read
 
-    if meta['size'] == upload_offset:
+    if size == upload_offset:
         # File upload completed
         del meta['incomplete']
 
@@ -110,10 +121,8 @@ def _decode_upload_metadata(value):
     result = dict()
     kv = value.split(',')
     for kv in value.split(','):
-        kv = kv.strip()
-        k, v = kv.split(' ', 2)
-        v = b64decode(v)
-        result[k] = v
+        k, v = kv.strip().split(' ', 2)
+        result[k] = b64decode(v)
 
     return result
 
