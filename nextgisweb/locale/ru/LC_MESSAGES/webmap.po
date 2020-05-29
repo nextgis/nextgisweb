@@ -47,56 +47,56 @@ msgstr "Просмотр аннотаций"
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: amd/ngw-webmap/Display.js:218 amd/ngw-webmap/Display.js:1034
+#: amd/ngw-webmap/Display.js:220 amd/ngw-webmap/Display.js:1039
 #: amd/ngw-webmap/ItemWidget.js:247
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:224
+#: amd/ngw-webmap/Display.js:226
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:230 amd/ngw-webmap/Display.js:443
+#: amd/ngw-webmap/Display.js:232 amd/ngw-webmap/Display.js:445
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:236 amd/ngw-webmap/Display.js:338
+#: amd/ngw-webmap/Display.js:238 amd/ngw-webmap/Display.js:340
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:377 amd/ngw-webmap/Display.js:384
+#: amd/ngw-webmap/Display.js:377 amd/ngw-webmap/Display.js:386
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:407 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:409 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:549 amd/ngw-webmap/Display.js:559
+#: amd/ngw-webmap/Display.js:551 amd/ngw-webmap/Display.js:561
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:750 amd/ngw-webmap/tool/Zoom.js:19
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:471
+#: amd/ngw-webmap/Display.js:752 amd/ngw-webmap/tool/Zoom.js:19
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:473
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:751 amd/ngw-webmap/tool/Zoom.js:22
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:472
+#: amd/ngw-webmap/Display.js:753 amd/ngw-webmap/tool/Zoom.js:22
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:474
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:755
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:476
+#: amd/ngw-webmap/Display.js:757
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:478
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:771
+#: amd/ngw-webmap/Display.js:773
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:774
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:485
+#: amd/ngw-webmap/Display.js:776
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:487
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
@@ -166,11 +166,6 @@ msgstr "Показывать аннотации по умолчанию"
 #: amd/ngw-webmap/template/Display.hbs:13
 msgid "Map"
 msgstr "Карта"
-
-#: amd/ngw-webmap/template/Display.hbs:49
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.hbs:25
-msgid "Get your own Web GIS at nextgis.com"
-msgstr "Сделайте свою Веб ГИС на nextgis.com"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:10
 msgid "Left, deg."
@@ -510,7 +505,7 @@ msgstr "Генерация событий"
 msgid "Preview"
 msgstr "Прeдпросмотр"
 
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:502
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:504
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 

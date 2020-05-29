@@ -34,6 +34,7 @@ define([
     "ngw/route",
     "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
+    "ngw-pyramid/company-logo/company-logo",
     // tools
     "ngw-webmap/MapToolbar",
     "ngw-webmap/controls/InitialExtent",
@@ -108,6 +109,7 @@ define([
     route,
     i18n,
     hbsI18n,
+    companyLogo,
     MapToolbar,
     InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure, Identify, FeatureHighlighter,
     NavigationMenu,
@@ -812,6 +814,9 @@ define([
 
                 idx = idx + 1;
             }, this);
+
+            // Инициализация логотипа карты
+            companyLogo(this.mapNode);
 
             this._zoomToInitialExtent();
 

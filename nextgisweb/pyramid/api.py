@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 import re
 import json
 import os.path
-from datetime import timedelta
 import base64
+from datetime import timedelta
+from pkg_resources import resource_filename
 from six.moves.urllib.parse import unquote
 
 from pyramid.response import Response, FileResponse
@@ -332,10 +333,22 @@ def logo_put(request):
     return Response()
 
 
+def company_logo(request):
+    company_logo_view = request.env.pyramid.company_logo_view
+    if company_logo_view is not None:
+        try:
+            return company_logo_view(request)
+        except HTTPNotFound:
+            pass
+
+    return FileResponse(resource_filename('nextgisweb', 'static/img/logo_outline.png'))
+
+
 def setup_pyramid(comp, config):
-    config.add_tween(
-        'nextgisweb.pyramid.api.cors_tween_factory',
-        under=('pyramid_debugtoolbar.toolbar_tween_factory', 'INGRESS'))
+    config.add_tween('nextgisweb.pyramid.api.cors_tween_factory', under=(
+        'nextgisweb.pyramid.exception.handled_exception_tween_factory',
+        'pyramid_debugtoolbar.toolbar_tween_factory',
+        'INGRESS'))
 
     config.add_route('pyramid.cors', '/api/component/pyramid/cors') \
         .add_view(cors_get, request_method='GET', renderer='json') \
@@ -375,6 +388,14 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.logo', '/api/component/pyramid/logo') \
         .add_view(logo_get, request_method='GET') \
         .add_view(logo_put, request_method='PUT')
+
+    # Methods for customization in components
+    comp.company_logo_enabled = lambda (request): True
+    comp.company_logo_view = None
+    comp.company_url_view = lambda (request): comp.options['company_url']
+
+    config.add_route('pyramid.company_logo', '/api/component/pyramid/company_logo') \
+        .add_view(company_logo, request_method='GET')
 
     # TODO: Add PUT method for changing custom_css setting and GUI
 

@@ -29,7 +29,9 @@ define([
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, Evented],{
-        templateString: hbsI18n(template, i18n),
+        templateString: hbsI18n(template, i18n, {
+            showSupportUrl: settings['support_url'] !== null && settings['support_url'].trim() !== ''
+        }),
         errorTitle: "Error",
         error: undefined,
         message: undefined,

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import base64
 import sys
 import os.path
 import re
@@ -15,9 +16,6 @@ from pyramid.events import BeforeRender
 
 import pyramid_tm
 import pyramid_mako
-import sentry_sdk
-
-from sentry_sdk.integrations.pyramid import PyramidIntegration
 
 from ..lib.config import Option
 from ..package import pkginfo
@@ -64,12 +62,6 @@ class PyramidComponent(Component):
         plockey = 'pyramid.default_locale_name'
         if plockey not in settings and self.env.core.locale_default is not None:
             settings[plockey] = self.env.core.locale_default
-
-        if 'sentry_dsn' in self.options:
-            sentry_sdk.init(
-                self.options['sentry_dsn'],
-                integrations=[PyramidIntegration()],
-            )
 
         config = Configurator(settings=settings)
 
@@ -162,13 +154,6 @@ class PyramidComponent(Component):
 
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)
-
-        # Help
-        self.help_page = {}
-        for key in settings.keys():
-            if key.startswith('help_page'):
-                hploc = key.split('.')[-1]
-                self.help_page[hploc] = settings[key]
 
         # To not clear static cache by hand make it so that
         # URLs are different. Use md5 hash from all installed packages
@@ -265,7 +250,7 @@ class PyramidComponent(Component):
     def client_settings(self, request):
         result = dict()
 
-        result['support_url'] = self.env.core.options['support_url']
+        result['support_url'] = self.env.core.support_url_view(request)
 
         try:
             result['units'] = self.env.core.settings_get('core', 'units')
@@ -282,16 +267,23 @@ class PyramidComponent(Component):
         except KeyError:
             result['measurement_srid'] = 4326
 
+        result['company_logo'] = dict(
+            enabled=self.company_logo_enabled(request),
+            link=self.company_url_view(request))
+
         return result
 
     option_annotations = (
         Option('secret', doc="Cookies encryption key (deprecated)."),
-        Option('help_page.*'),
         Option('logo'),
+        Option('help_page.url', default="https://nextgis.com/redirect/{lang}/help/"),
+        Option('help_page.enabled', bool, default=True),
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
 
         Option('backup.download', bool, default=False),
 
         Option('sentry_dsn'),
+        Option('desktop_gis_example', default='NextGIS QGIS'),
+        Option('company_url', default="https://nextgis.com")
     )

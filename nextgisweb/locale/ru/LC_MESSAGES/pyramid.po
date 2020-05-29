@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-02-16 08:15+0000\n"
+"POT-Creation-Date: 2020-03-12 11:28+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -96,7 +96,7 @@ msgstr ""
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: template/header.mako:86 view.py:40
+#: template/header.mako:91 view.py:40
 msgid "Help"
 msgstr "Справка"
 
@@ -149,15 +149,15 @@ msgstr "Скопировано"
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:37
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
 msgid "Technical information"
 msgstr "Техническая информация"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
 msgid "Contact support"
 msgstr "Написать в поддержку"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:43
 msgid "Back to home"
 msgstr "На главную"
 
@@ -198,6 +198,10 @@ msgstr "Визуальный редактор"
 #: amd/ngw-pyramid/form/ScaleTextBox.js:18
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
+
+#: amd/ngw-pyramid/map-logo/CompanyLogo.js:26
+msgid "Get your own Web GIS at nextgis.com"
+msgstr "Создайте свою Веб ГИС на nextgis.com"
 
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:35
 msgid "Create"
@@ -305,7 +309,7 @@ msgstr "Градусы, минуты, секунды"
 msgid "Measurement SRID"
 msgstr "Система координат для расчётов"
 
-#: template/base.mako:29
+#: template/base.mako:30
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
@@ -328,27 +332,3 @@ msgstr "Пакет"
 #: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
-
-#~ msgid "Back"
-#~ msgstr "Назад"
-
-#~ msgid "Not found"
-#~ msgstr "Не найдено"
-
-#~ msgid "Unexpected error"
-#~ msgstr "Неожиданная ошибка"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Request support"
-#~ msgstr "Запросить поддержку"
-
-#~ msgid ""
-#~ "The resource may have been deleted "
-#~ "or an error in the address. "
-#~ "Correct the address or go to the"
-#~ " home page and try to find the"
-#~ " desired resource."
-#~ msgstr ""
-

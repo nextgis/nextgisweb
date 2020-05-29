@@ -31,6 +31,7 @@ There are following resource classes now:
 * formbuilder_form
 * trackers_group
 * tracker
+* collector_project
 
 HTTP API
 ---------

@@ -49,4 +49,4 @@ msgstr "Попробовать еще раз"
 
 #: amd/ngw-file-upload/template/Uploader.hbs:13
 msgid "or use drag and drop"
-msgstr "или перетащите его в эту область"
+msgstr "или перетащите в эту область"

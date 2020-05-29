@@ -14,6 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
+import transaction
 
 from .. import db
 from ..package import pkginfo
@@ -59,6 +60,11 @@ class CoreComponent(Component):
 
         self.DBSession = DBSession
 
+        # Methods for customization in components
+        self.system_full_name_default = self.options.get(
+            'system.full_name', self.localizer().translate(_('NextGIS geoinformation system')))
+        self.support_url_view = lambda request: self.options['support_url']
+
     def is_service_ready(self):
         while True:
             try:
@@ -79,11 +85,9 @@ class CoreComponent(Component):
     def initialize_db(self):
         for k, v in (
             ('system.name', 'NextGIS Web'),
-            ('system.full_name', self.localizer().translate(
-                _('NextGIS geoinformation system'))),
             ('units', 'metric'),
             ('degree_format', 'dd'),
-            ('measurement_srid', 4326)
+            ('measurement_srid', 4326),
         ):
             self.init_settings(self.identity, k, self._settings.get(k, v))
 
@@ -156,15 +160,17 @@ class CoreComponent(Component):
 
     def query_stat(self):
         result = dict()
-        try:
-            result['full_name'] = self.settings_get('core', 'system.full_name')
-        except KeyError:
-            pass
-
+        result['full_name'] = self.system_full_name()
         result['database_size'] = DBSession.query(db.func.pg_database_size(
             db.func.current_database(),)).scalar()
 
         return result
+
+    def system_full_name(self):
+        try:
+            return self.settings_get(self.identity, 'system.full_name')
+        except KeyError:
+            return self.system_full_name_default
 
     def _db_connection_args(self, error_on_pwfile=False):
         opt_db = self.options.with_prefix('database')
@@ -207,10 +213,9 @@ class CoreComponent(Component):
     def backup_filename(self, filename):
         return os.path.join(self.options['backup.path'], filename)
 
-
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
-        Option('system.full_name', default="NextGIS Web"),
+        Option('system.full_name', default=None),
 
         # Database options
         Option('database.host', default="localhost"),
@@ -245,7 +250,8 @@ class CoreComponent(Component):
         Option('locale.default', default='en'),
         Option('locale.available', list, default=['en', 'ru']),
         # Other deployment settings
-        Option('support_url', default="http://nextgis.com/contact/"),
+        Option('support_url', default="https://nextgis.com/contact/"),
+        Option('enable_snippets', bool, default=True),
         # Debug settings
         Option('debug', bool, default=False, doc="Enable additional debug tools."),
     )
