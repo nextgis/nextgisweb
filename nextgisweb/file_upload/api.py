@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
 import pickle
 import json
 import re
-import magic
-
 from shutil import copyfileobj
+
+import magic
 
 from pyramid.response import Response
 
@@ -42,7 +41,7 @@ def upload_post(request):
         meta = dict(
             mime_type=ufile.type,
             name=ufile.filename,
-            size=get_file_size(ufile.file)
+            size=get_file_size(ufile.file),
         )
 
         fileid = comp.fileid()

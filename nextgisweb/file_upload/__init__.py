@@ -23,9 +23,10 @@ class FileUploadComponent(Component):
             self.env.core.mksdir(self)
 
     def setup_pyramid(self, config):
-        from . import view, api
+        from . import view, api, tus
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
+        tus.setup_pyramid(self, config)
 
     def fileid(self):
         """ Returns new file identifier """
