@@ -3,35 +3,38 @@ define([
     "dojo/_base/declare",
     "dojo/Deferred",
     "dojo/request/xhr",
+    "dojo/dom-class",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "tus/tus",
+    "ngw/route",
+    "ngw/settings!file_upload",
     "ngw-pyramid/i18n!file_upload",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/Uploader.hbs",
     "dojox/form/Uploader",
-    "dojo/dom-class",
-    "ngw/route"
 ], function (
     declare,
     Deferred,
     xhr,
+    domClass,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     tus,
+    route,
+    settings,
     i18n,
     hbsI18n,
     template,
-    Uploader,
-    domClass,
-    route
+    Uploader
 ) {
     // Uploader AMD workaround
     Uploader = dojox.form.Uploader;
 
-    if (tus.isSupported) {
+    if (settings.tus.enabled && tus.isSupported) {
+        var chunkSize = settings.tus.chunk_size.default;
         Uploader = declare([Uploader], {
             postMixInProperties: function() {
                 this.upload = this.tusUpload;
@@ -45,13 +48,13 @@ define([
                 var uploader = new tus.Upload(file, {
                     endpoint: route.file_upload.collection(),
                     storeFingerprintForResuming: false,
-                    chunkSize: 16 * 1024 * 1024,
+                    chunkSize: chunkSize,
                     metadata: { name: file.name },
 
                     onProgress: function (bytesUploaded, bytesTotal) {
                         self.onProgress({
                             type: "progress",
-                            percent: (100 * bytesUploaded / bytesTotal).toFixed(1) + "%",
+                            percent: (100 * bytesUploaded / bytesTotal).toFixed(0) + "%",
                         });
                     },
 
@@ -103,7 +106,7 @@ define([
                 label: i18n.gettext("Select"),
                 multiple: false,
                 uploadOnSelect: true,
-                url: route.file_upload.upload(),
+                url: route.file_upload.collection(),
                 name: "file"
             }).placeAt(this.fileUploader);
 
@@ -127,6 +130,7 @@ define([
             this.uploaderWidget.addDropTarget(dropTarget);
             if (this.uploaderLinkText.length) this.fileLink.innerHTML = this.uploaderLinkText;
             if (this.uploaderHelpText.length) this.fileHelp.innerHTML = this.uploaderHelpText;
+            this.maxSize.innerHTML = readableFileSize(settings.max_size) + " " + i18n.gettext("max");
 
             function dragOver(){
                 domClass.add(dropTarget, "uploader__dropzone--active");

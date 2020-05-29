@@ -23,10 +23,9 @@ class FileUploadComponent(Component):
             self.env.core.mksdir(self)
 
     def setup_pyramid(self, config):
-        from . import view, api, tus
+        from . import view, api
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
-        tus.setup_pyramid(self, config)
 
     def fileid(self):
         """ Returns new file identifier """
@@ -104,6 +103,22 @@ class FileUploadComponent(Component):
             "Preserved: %d files, %d directories, %d bytes",
             kept_files, kept_dirs, kept_bytes)
 
+    def client_settings(self, request):
+        return dict(
+            max_size=self.options['max_size'],
+            tus=dict(
+                enabled=self.options['tus.enabled'],
+                chunk_size=dict(
+                    default=self.options['tus.chunk_size.default'],
+                    minimum=self.options['tus.chunk_size.minimum'],
+                )
+            )
+        )
+
     option_annotations = (
         Option('path', default=None),
+        Option('max_size', int, default=2**30),
+        Option('tus.enabled', bool, default=True),
+        Option('tus.chunk_size.default', int, default=16 * 2**20),
+        Option('tus.chunk_size.minimum', int, default=4 * 2**20),
     )
