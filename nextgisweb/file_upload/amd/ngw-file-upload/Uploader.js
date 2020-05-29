@@ -2,9 +2,11 @@
 define([
     "dojo/_base/declare",
     "dojo/Deferred",
+    "dojo/request/xhr",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "tus/tus",
     "ngw-pyramid/i18n!file_upload",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/Uploader.hbs",
@@ -14,9 +16,11 @@ define([
 ], function (
     declare,
     Deferred,
+    xhr,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    tus,
     i18n,
     hbsI18n,
     template,
@@ -26,6 +30,52 @@ define([
 ) {
     // Uploader AMD workaround
     Uploader = dojox.form.Uploader;
+
+    if (tus.isSupported) {
+        Uploader = declare([Uploader], {
+            postMixInProperties: function() {
+                this.upload = this.tusUpload;
+                this.inherited(arguments);
+            },
+            
+            tusUpload: function() {
+                var self = this;
+
+                var file = this._files[0];
+                var uploader = new tus.Upload(file, {
+                    endpoint: route.file_upload.collection(),
+                    storeFingerprintForResuming: false,
+                    chunkSize: 8 * 1024 * 1024,
+                    metadata: { name: file.name },
+
+                    onProgress: function (bytesUploaded, bytesTotal) {
+                        self.onProgress({
+                            type: "progress",
+                            percent: (100 * bytesUploaded / bytesTotal).toFixed(1) + "%",
+                        });
+                    },
+
+                    onError: function (error) {
+                        self.onError(error);
+                    },
+
+                    onSuccess: function () {
+                        xhr.get(uploader.url, {handleAs: 'json'}).then(
+                            function (data) {
+                               self.onComplete({ upload_meta:[data] });
+                            },
+                            function (error) {
+                                self.onError(error);
+                            }
+                        )
+                    }
+                });
+
+                this.onBegin();
+                uploader.start();
+            }
+        });
+    }
 
     function readableFileSize(size) {
         var units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
