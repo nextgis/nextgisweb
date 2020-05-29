@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: nextgisweb 3.2.0.dev0+95658d80\n"
+"Project-Id-Version: nextgisweb 3.4.0.dev1+d5f5567e\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2020-03-03 08:21+0000\n"
-"PO-Revision-Date: 2020-03-03 08:21+0000\n"
+"POT-Creation-Date: 2020-05-29 10:27+0000\n"
+"PO-Revision-Date: 2020-05-29 10:28+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -20,11 +20,11 @@ msgstr ""
 "Generated-By: Babel 2.6.0\n"
 
 #: amd/ngw-tmsclient/ConnectionWidget.js:34
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:45
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:53
 msgid "TMS connection"
 msgstr ""
 
-#: amd/ngw-tmsclient/LayerWidget.js:32 model.py:98
+#: amd/ngw-tmsclient/LayerWidget.js:40 model.py:143
 msgid "TMS layer"
 msgstr "Слой TMS"
 
@@ -32,51 +32,82 @@ msgstr "Слой TMS"
 msgid "TMS capabilities"
 msgstr "Возможности TMS"
 
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:10
+#: amd/ngw-tmsclient/LayersDialog.js:25
+msgid "Select layer"
+msgstr "Выбрать слой"
+
+#: amd/ngw-tmsclient/LayersDialog.js:63
+msgid "OK"
+msgstr "ОК"
+
+#: amd/ngw-tmsclient/LayersDialog.js:72
+msgid "Cancel"
+msgstr "Отмена"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:9
+msgid "Capmode"
+msgstr "Способ"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:11
+msgid "Custom"
+msgstr "Настраиваемый"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:12
+msgid "NextGIS geoservices"
+msgstr "Геосервисы NextGIS"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:20
 msgid "URL template"
 msgstr "Шаблон URL"
 
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:16
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:26
 msgid "API key"
-msgstr "API-ключ"
+msgstr "Ключ API"
 
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:22
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:32
 msgid "API key param"
-msgstr "Параметр API-ключа"
+msgstr "Параметр ключа API"
 
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:27
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:37
 msgid "Scheme"
 msgstr "Схема"
 
 #: amd/ngw-tmsclient/template/LayerWidget.hbs:15
+msgid "Choose a layer"
+msgstr "Выбрать слой"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
 msgid "Coordinate system"
 msgstr "Система координат"
 
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:20
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:30
 msgid "Layer"
 msgstr "Имя слоя"
 
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:28
-msgid "Tile size, px"
-msgstr "Размер тайла, пикс."
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:39
+msgid "Min zoom level"
+msgstr "Минимальный уровень масштаба"
 
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:33
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:45
 msgid "Max zoom level"
-msgstr "Максимальный масштабный уровень"
+msgstr "Максимальный уровень масштаба"
 
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:38
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:51
 msgid "Left, deg."
 msgstr "Лево, град."
 
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:43
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:57
 msgid "Bottom, deg."
 msgstr "Низ, град."
 
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:48
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:63
 msgid "Right, deg."
 msgstr "Право, град."
 
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:53
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:69
 msgid "Top, deg."
 msgstr "Верх, град."
 
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:75
+msgid "Tile size, px"
+msgstr "Размер тайла, пикс."
