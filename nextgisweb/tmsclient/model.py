@@ -190,6 +190,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
         #   ‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾b1
         #################################
 
+        if srs.is_geographic:
+            extent = (
+                extent[0], max(extent[1], -85.0511),
+                extent[2], min(extent[3], 85.0511),
+            )
+
         if srs.id != self.srs.id:
             src_osr = osr.SpatialReference()
             dst_osr = osr.SpatialReference()
