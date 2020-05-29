@@ -42,6 +42,9 @@ from nextgisweb.webmap.model import WebMapScope
                     %if item.cls == "webmap" and WebMapScope.display in permissions:
                         <a class="material-icons icon-viewMap" href="${request.route_url('webmap.display', id=item.id)}" target="_blank" title="${tr(_('Display map'))}"></a>
                     %endif
+                    %if item.cls == "scene_3d":
+                        <a class="material-icons icon-viewMap" href="${request.route_url('scene_3d.display', id=item.id)}" target="_blank" title="${tr(_('Display scene'))}"></a>
+                    %endif
                     %if (item.cls == "vector_layer" or item.cls == "postgis_layer") and DataScope.read in permissions:
                         <a class="material-icons icon-table" href="${request.route_url('feature_layer.feature.browse', id=item.id)}" title="${tr(_('Feature table'))}"></a>
                     %endif
