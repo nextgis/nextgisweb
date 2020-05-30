@@ -10,7 +10,7 @@ Single file upload
 
 Execute folowing request to upload a file:
 
-..  http:post:: /api/component/file_upload/upload
+..  http:post:: /api/component/file_upload/
 
     File upload request.
 
@@ -25,7 +25,7 @@ Next multipart POST request follow. Request includes following form parameters:
 
 .. sourcecode:: http
 
-   POST /api/component/file_upload/upload HTTP/1.1
+   POST /api/component/file_upload/ HTTP/1.1
    Host: ngw_url
    Accept: */*
 
@@ -68,7 +68,7 @@ Also you can create attachment using PUT method, in this case you do not need to
       with closing(requests.get('http://nextgis.ru/wp-content/themes/nextgis_clean/img/ngw_icon.png', auth=ngw_creds, stream=True)) as f:
 
           #upload attachment to nextgisweb
-          req = requests.put(url_dst + '/component/file_upload/upload', data=f, auth=ngw_creds)
+          req = requests.put(url_dst + '/component/file_upload/', data=f, auth=ngw_creds)
           #on some servers needed data=f.content instead
           
           json_data = req.json()
@@ -103,7 +103,7 @@ Multiple file upload
 
 For multiple file upload execute the following request:
 
-..  http:post:: /api/component/file_upload/upload
+..  http:post:: /api/component/file_upload/
 
     Multiple files upload request
 
