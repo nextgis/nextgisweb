@@ -195,7 +195,7 @@ def _collection_post_tus(request):
         if v is not None:
             meta[k] = v
 
-    with open(fnm, 'w') as fd:
+    with open(fnm, 'wb') as fd:
         fd.write(pickle.dumps(meta))
 
     return _tus_response(201, location=request.route_url('file_upload.item', id=fid))
@@ -209,7 +209,7 @@ def _item_head_tus(request):
     if not isfile(fnd):
         _tus_response(404)
 
-    with open(fnm, 'r') as fd:
+    with open(fnm, 'rb') as fd:
         meta = pickle.loads(fd.read())
 
     with open(fnd, 'ab') as fd:
@@ -228,16 +228,14 @@ def _item_get(request):
     if not isfile(fnm):
         raise exc.HTTPNotFound()
 
-    with open(fnm, 'r') as fd:
+    with open(fnm, 'rb') as fd:
         meta = pickle.loads(fd.read())
 
         # Don't return incomplete upload
         if meta.get('incomplete', False):
             raise UploadNotCompleted()
 
-        return Response(
-            json.dumps(meta),
-            content_type='application/json')
+        return Response(json.dumps(meta), content_type='application/json', charset='utf-8')
 
 
 def _item_patch_tus(request):
@@ -256,7 +254,7 @@ def _item_patch_tus(request):
     if not isfile(fnm):
         return _tus_response(404)
 
-    with open(fnm, 'r') as fd:
+    with open(fnm, 'rb') as fd:
         meta = pickle.loads(fd.read())
         size = meta['size']
 
@@ -298,7 +296,7 @@ def _item_patch_tus(request):
             meta['mime_type'] = magic.from_file(fnd, mime=True)
 
         # Save changes to metadata
-        with open(fnm, 'w') as fd:
+        with open(fnm, 'wb') as fd:
             fd.write(pickle.dumps(meta))
 
     return _tus_response(204, upload_offset=upload_offset)
@@ -317,7 +315,8 @@ def _item_delete(request, tus):
     else:
         return Response(
             json.dumps(None),
-            content_type='application/json'
+            content_type='application/json',
+            charset='utf-8',
         )
 
 
@@ -334,12 +333,14 @@ def _tus_resumable_header(request):
 def _tus_response(status, location=None, upload_offset=None, upload_length=None):
     headers = {str("Tus-Resumable"): str("1.0.0")}
 
+    if location is not None:
+        headers[str('Location')] = str(location)
     if upload_offset is not None:
         headers[str('Upload-Offset')] = str(upload_offset)
     if upload_length is not None:
         headers[str('Upload-Length')] = str(upload_length)
 
-    return Response(status=status, location=location, headers=headers)
+    return Response(status=status, headers=headers)
 
 
 def _tus_decode_upload_metadata(value):
@@ -348,7 +349,7 @@ def _tus_decode_upload_metadata(value):
         kv = value.split(',')
         for kv in value.split(','):
             k, v = kv.strip().split(' ', 2)
-            result[k] = b64decode(v)
+            result[k] = b64decode(v).decode('utf-8')
     return result
 
 

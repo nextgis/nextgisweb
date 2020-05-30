@@ -197,7 +197,7 @@ def setup_pyramid(comp, config):
         .add_view(test_exception_unhandled)
 
     # Method for help_page customization in components
-    comp.help_page_url = lambda (request): \
+    comp.help_page_url = lambda request: \
         comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
 
     comp.control_panel = dm.DynMenu(
