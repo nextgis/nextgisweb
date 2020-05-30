@@ -10,4 +10,7 @@ def test(request):
 
 
 def setup_pyramid(comp, config):
-    config.add_route('file_upload.test', '/file_upload/test').add_view(test)
+    config.add_route(
+        'file_upload.test',
+        '/test/file_upload'
+    ).add_view(test)

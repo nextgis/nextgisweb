@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-03-12 11:28+0000\n"
+"POT-Creation-Date: 2020-05-30 09:25+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -96,43 +96,43 @@ msgstr ""
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: template/header.mako:91 view.py:40
-msgid "Help"
-msgstr "Справка"
-
-#: view.py:63 view.py:185
+#: view.py:55 view.py:205
 msgid "Package versions"
 msgstr "Версии пакетов"
 
-#: view.py:71 view.py:191
+#: view.py:66 view.py:224
+msgid "Backups"
+msgstr "Резервные копии"
+
+#: view.py:80 view.py:211
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:78 view.py:193
+#: view.py:87 view.py:213
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:85 view.py:195
+#: view.py:94 view.py:215
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:92 view.py:189
+#: view.py:101 view.py:209
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:99 view.py:197
+#: view.py:108 view.py:217
 msgid "Miscellaneous"
 msgstr "Разное"
 
-#: view.py:106 view.py:199
+#: view.py:115 view.py:219
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:184
+#: view.py:204
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:188
+#: view.py:208
 msgid "Settings"
 msgstr "Настройки"
 
@@ -191,6 +191,10 @@ msgstr "Назад"
 msgid "Forward"
 msgstr "Вперёд"
 
+#: amd/ngw-pyramid/company-logo/company-logo.js:24
+msgid "Get your own Web GIS at nextgis.com"
+msgstr "Создайте свою Веб ГИС на nextgis.com"
+
 #: amd/ngw-pyramid/form/RTETextBox.js:61
 msgid "Rich Text Editor"
 msgstr "Визуальный редактор"
@@ -198,10 +202,6 @@ msgstr "Визуальный редактор"
 #: amd/ngw-pyramid/form/ScaleTextBox.js:18
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
-
-#: amd/ngw-pyramid/map-logo/CompanyLogo.js:26
-msgid "Get your own Web GIS at nextgis.com"
-msgstr "Создайте свою Веб ГИС на nextgis.com"
 
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:35
 msgid "Create"
@@ -309,6 +309,18 @@ msgstr "Градусы, минуты, секунды"
 msgid "Measurement SRID"
 msgstr "Система координат для расчётов"
 
+#: template/backup.mako:12
+msgid "Filename"
+msgstr "Имя файла"
+
+#: template/backup.mako:13
+msgid "Timestamp (UTC)"
+msgstr "Время (UTC)"
+
+#: template/backup.mako:14
+msgid "Size"
+msgstr "Размер"
+
 #: template/base.mako:30
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
@@ -316,6 +328,10 @@ msgstr "Ваши карты онлайн на nextgis.com"
 #: template/header.mako:73
 msgid "Resources"
 msgstr "Ресурсы"
+
+#: template/header.mako:87
+msgid "Help"
+msgstr "Справка"
 
 #: template/pkginfo.mako:22
 msgid "Platform"
@@ -332,3 +348,4 @@ msgstr "Пакет"
 #: template/pkginfo.mako:32
 msgid "Version"
 msgstr "Версия"
+

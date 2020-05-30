@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-08-10 15:15+0300\n"
+"POT-Creation-Date: 2020-05-30 09:28+0000\n"
 "PO-Revision-Date: 2015-09-15 14:53+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,21 +17,33 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.2.0\n"
+"Generated-By: Babel 2.6.0\n"
 
-#: amd/ngw-file-upload/Uploader.js:54
+#: api.py:25
+msgid "Uploaded file too large"
+msgstr "Загруженный файл слишком большой"
+
+#: api.py:30
+msgid "Upload is not completed"
+msgstr "Загрузка не завершена"
+
+#: amd/ngw-file-upload/Uploader.js:106
 msgid "Select"
 msgstr "Выбрать"
 
-#: amd/ngw-file-upload/Uploader.js:99
+#: amd/ngw-file-upload/Uploader.js:133
+msgid "max"
+msgstr "максимум"
+
+#: amd/ngw-file-upload/Uploader.js:152
 msgid "Uploading..."
 msgstr "Идёт загрузка..."
 
-#: amd/ngw-file-upload/Uploader.js:107
+#: amd/ngw-file-upload/Uploader.js:160
 msgid " uploaded..."
 msgstr " загружено..."
 
-#: amd/ngw-file-upload/Uploader.js:136
+#: amd/ngw-file-upload/Uploader.js:186
 msgid "Could not load file!"
 msgstr "Не удалось загрузить файл!"
 
@@ -50,3 +62,4 @@ msgstr "Попробовать еще раз"
 #: amd/ngw-file-upload/template/Uploader.hbs:13
 msgid "or use drag and drop"
 msgstr "или перетащите в эту область"
+
