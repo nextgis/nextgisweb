@@ -37,10 +37,11 @@ def collection(request):
 
     if method == 'OPTIONS':
         headers = {}
-        if comp.options['tus.enabled']:
+        if comp.tus_enabled:
+            headers[str('Tus-Resumable')] = str('1.0.0')
             headers[str('Tus-Version')] = str('1.0.0')
             headers[str('Tus-Extension')] = str('creation,termination')
-            headers[str('Tus-Max-Size')] = str(comp.options['max_size'])
+            headers[str('Tus-Max-Size')] = str(comp.max_size)
         return Response(status=200, headers=headers)
 
     tus = _tus_resumable_header(request)
@@ -99,7 +100,7 @@ def _collection_post(request):
 
     for ufile in ufiles:
         size = get_file_size(ufile.file)
-        if size > comp.options['max_size']:
+        if size > comp.max_size:
             raise UploadedFileTooLarge()
 
         meta = dict(
@@ -128,7 +129,7 @@ def _collection_post(request):
 
 def _collection_put(request):
     comp = env.file_upload
-    if request.content_length > comp.options['max_size']:
+    if request.content_length > comp.max_size:
         raise UploadedFileTooLarge()
 
     mime = request.headers.get("Content-Type")
@@ -174,7 +175,7 @@ def _collection_post_tus(request):
         upload_length = int(request.headers['Upload-Length'])
     except (KeyError, ValueError):
         return _tus_response(400)
-    if upload_length > comp.options['max_size']:
+    if upload_length > comp.max_size:
         return _tus_response(413)
 
     upload_metadata = _tus_decode_upload_metadata(request.headers.get('Upload-Metadata'))
@@ -265,7 +266,7 @@ def _item_patch_tus(request):
 
     # Check minimum chunk size to prevent misconfiguration
     remain = size - upload_offset
-    if request.content_length < min(remain, comp.options['tus.chunk_size.minimum']):
+    if request.content_length < min(remain, comp.tus_chunk_size_minimum):
         return _tus_response(400)
 
     with open(fnd, 'ab') as fd:
