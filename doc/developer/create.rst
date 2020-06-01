@@ -323,7 +323,7 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   $ curl -F file=@/tmp/bld.zip http://demo.nextgis.com/api/component/file_upload/upload
+   $ curl -F file=@/tmp/bld.zip http://demo.nextgis.com/api/component/file_upload/
 
    {"upload_meta": [{"id": "00cc4aa9-cca7-4160-b069-58070dff9399", "name": "bld.zip",
    "mime_type": "application/octet-stream", "size": 62149}]}
@@ -558,7 +558,7 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   $ curl --user "user:password" --upload-file 'tmp/myfile.tif' http://demo.nextgis.com/api/component/file_upload/upload
+   $ curl --user "user:password" --upload-file 'tmp/myfile.tif' http://demo.nextgis.com/api/component/file_upload/
 
    {"id": "a2f381f9-8467-477c-87fa-3f71ecb749a5", "mime_type": "image/tiff", "size": 17549598}
 

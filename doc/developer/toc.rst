@@ -19,3 +19,4 @@ NextGIS Web REST API
    error_report
    vector_data_types
    python_api
+   ogr2ogr

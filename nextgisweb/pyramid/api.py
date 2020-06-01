@@ -390,9 +390,9 @@ def setup_pyramid(comp, config):
         .add_view(logo_put, request_method='PUT')
 
     # Methods for customization in components
-    comp.company_logo_enabled = lambda (request): True
+    comp.company_logo_enabled = lambda request: True
     comp.company_logo_view = None
-    comp.company_url_view = lambda (request): comp.options['company_url']
+    comp.company_url_view = lambda request: comp.options['company_url']
 
     config.add_route('pyramid.company_logo', '/api/component/pyramid/company_logo') \
         .add_view(company_logo, request_method='GET')
