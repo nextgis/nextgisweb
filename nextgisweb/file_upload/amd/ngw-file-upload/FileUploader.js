@@ -11,16 +11,18 @@ define("ngw-file-upload/FileUploader", [
 	"dojo/dom-attr",
 	"dojo/dom-construct",
 	"dojo/dom-form",
+	"dojo/request/xhr",
 	"dijit",
 	"dijit/form/Button",
 	"dojox/form/uploader/_Base",
 	"dojox/form/uploader/_HTML5",
-	"dojox/form/uploader/_IFrame",
-	"dojox/form/uploader/_Flash",
 	"dojo/i18n!dojox/form/nls/Uploader",
-	"dojo/text!dojox/form/resources/Uploader.html"
+	"dojo/text!dojox/form/resources/Uploader.html",
+	"tus/tus",
+	"ngw/route",
+	"ngw/settings!file_upload"
 ],function(kernel, declare, lang, array, connect, win, domStyle, domClass, domGeometry, domAttr, domConstruct,
-			domForm, dijit, Button, Base, HTML5, IFrame, Flash, res, template){
+			domForm, xhr, dijit, Button, Base, HTML5, res, template, tus, route, settings){
 
 	// TODO:
 	//		i18n
@@ -33,7 +35,7 @@ define("ngw-file-upload/FileUploader", [
 	//		Make it so URL can change (current set to Flash on build)
 	//
 
-	return declare("ngw-file-upload.FileUploader", [Base, Button, HTML5, IFrame, Flash], {
+	return declare("ngw-file-upload.FileUploader", [Base, Button, HTML5], {
 		// summary:
 		//		A widget that creates a stylable file-input button, with optional multi-file selection,
 		//		using only HTML elements. Non-HTML5 browsers have fallback options of Flash or an iframe.
@@ -127,12 +129,14 @@ define("ngw-file-upload/FileUploader", [
 			this._inputs = [];
 			this._cons = [];
 			this.force = this.force.toLowerCase();
-			if(this.supports("multiple")){
+			if (settings.tus.enabled && tus.isSupported) {
+				this.upload = this._tusUpload;
+			}else if(this.supports("multiple")){
 				this.uploadType = this.force === 'form' ? 'form' : 'html5';
 			}else{
-				this.uploadType = this.force === 'flash' ? 'flash' : 'iframe';
+				this.onError('This uploader is not supported by your browser!')
 			}
-			
+
 			this.inherited(arguments);
 		},
 		buildRendering: function(){
@@ -400,6 +404,43 @@ define("ngw-file-upload/FileUploader", [
 		_disconnectButton: function(){
 			array.forEach(this._cons, connect.disconnect);
 			this._cons.splice(0,this._cons.length);
+		},
+
+		_tusUpload: function(){
+			var self = this;
+
+			var file = this._files[0];
+			var uploader = new tus.Upload(file, {
+				endpoint: route.file_upload.collection(),
+				storeFingerprintForResuming: false,
+				chunkSize: settings.tus.chunk_size.default,
+				metadata: { name: file.name },
+
+				onProgress: function (bytesUploaded, bytesTotal) {
+					self.onProgress({
+						type: "progress",
+						percent: (100 * bytesUploaded / bytesTotal).toFixed(0) + "%",
+					});
+				},
+
+				onError: function (error) {
+					self.onError(error);
+				},
+
+				onSuccess: function () {
+					xhr.get(uploader.url, {handleAs: 'json'}).then(
+						function (data) {
+						   self.onComplete({ upload_meta:[data] });
+						},
+						function (error) {
+							self.onError(error);
+						}
+					)
+				}
+			});
+
+			this.onBegin();
+			uploader.start();
 		}
 	});
 
