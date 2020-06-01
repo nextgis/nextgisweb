@@ -12,7 +12,7 @@ define([
     "dijit/form/Button",
     "dijit/form/TextBox",
     "dijit/form/Textarea",
-    "dojox/form/Uploader",
+    "ngw-file-upload/FileUploader",
     "put-selector/put",
     "dgrid/OnDemandGrid",
     "dgrid/Selection",

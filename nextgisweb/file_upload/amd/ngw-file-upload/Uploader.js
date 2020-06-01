@@ -13,7 +13,7 @@ define([
     "ngw-pyramid/i18n!file_upload",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/Uploader.hbs",
-    "dojox/form/Uploader",
+    "./FileUploader",
 ], function (
     declare,
     Deferred,
@@ -30,9 +30,6 @@ define([
     template,
     Uploader
 ) {
-    // Uploader AMD workaround
-    Uploader = dojox.form.Uploader;
-
     if (settings.tus.enabled && tus.isSupported) {
         var chunkSize = settings.tus.chunk_size.default;
         Uploader = declare([Uploader], {
