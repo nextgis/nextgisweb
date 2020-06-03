@@ -15,10 +15,12 @@
                 data-dojo-props="cls: 'wmsclient_connection'"
                 title="{{gettext 'WMS connection'}}" style="width: 100%"></div>
 
+            <!-- Do not let users pick SRS. By now only one SRS (EPSG:3857) is supported.
             <div data-dojo-attach-point="wSRS"
                 data-ngw-serialize="srs"
                 data-dojo-type="ngw-spatial-ref-sys/SRSSelect"
                 title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>
+            -->
 
             <div data-dojo-attach-point="wImgFormat"
                 data-ngw-serialize="imgformat"
