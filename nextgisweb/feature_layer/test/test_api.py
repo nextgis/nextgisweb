@@ -94,6 +94,11 @@ def test_fields_edit(webapp, vector_layer_id):
 
     assert len(feature_fields) == 3
 
+    resp = webapp.get('/api/resource/%d' % vector_layer_id)
+    fields = resp.json['feature_layer']['fields']
+
+    assert len(fields) == 3
+
     fields = [fields[2], fields[0]]
     webapp.put_json('/api/resource/%d' % vector_layer_id, {
         'feature_layer': {'fields': fields}
@@ -101,6 +106,16 @@ def test_fields_edit(webapp, vector_layer_id):
     resp = webapp.get('/api/resource/%d' % vector_layer_id)
     fields = resp.json['feature_layer']['fields']
 
-    assert len(fields) == 2
+    assert len(fields) == 3
     assert fields[0]['keyname'] == 'new_field'
     assert fields[1]['keyname'] == 'name'
+    assert fields[2]['keyname'] == 'price'
+
+    fields[2]['deleted'] = True
+    webapp.put_json('/api/resource/%d' % vector_layer_id, {
+        'feature_layer': {'fields': fields}
+    }, status=200)
+    resp = webapp.get('/api/resource/%d' % vector_layer_id)
+    fields = resp.json['feature_layer']['fields']
+
+    assert len(fields) == 2

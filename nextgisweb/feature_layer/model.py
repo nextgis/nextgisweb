@@ -154,6 +154,10 @@ class _fields_attr(SP):
                     mfld = fldmap.pop(fldid)  # update
                 except KeyError:
                     raise ValidationError(_("Field not found (ID=%d)." % fldid))
+
+                if fld.get('deleted', False):
+                    obj.field_delete(mfld)  # delete
+                    continue
             else:
                 mfld = obj.field_create(fld['datatype'])  # create
 
@@ -170,7 +174,7 @@ class _fields_attr(SP):
             new_fields.append(mfld)
 
         for mfld in fldmap.values():
-            obj.field_delete(mfld)  # delete
+            new_fields.append(mfld)  # Keep not mentioned fields
 
         obj.fields = new_fields
         obj.fields.reorder()

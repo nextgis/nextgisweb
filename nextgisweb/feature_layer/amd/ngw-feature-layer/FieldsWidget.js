@@ -57,9 +57,17 @@ define([
     var GridClass = declare([Grid, Selection, DijitRegistry], {
         selectionMode: "single",
 
+        renderRow: function(_item) {
+            var row = this.inherited(arguments);
+            if (_item.deleted) {
+                domClass.add(row, "deleted");
+            }
+            return row;
+        },
+
         columns: [
             { field: "idx", label: "#", sortable: false },
-            
+
             editor({
                 field: "keyname",
                 label: i18n.gettext("Keyname"),
@@ -71,7 +79,7 @@ define([
                     style: "width: 100%; border: none"
                 }
             }),
-            
+
             { field: "datatype", label: i18n.gettext("Type"), sortable: false },
 
             editor({
@@ -171,20 +179,10 @@ define([
                     var next_index = Infinity;
                     for (var index in grid.selection) {
                         next_index = Math.min(next_index, index);
-                        store.remove(index);
-                    }
-
-                    store.query(function (item) {
-                        return item.idx > next_index;
-                    }).map(function (_item) {
-                        var item = lang.clone(_item);
-                        item.idx = next_index++;
+                        var item = store.get(index);
+                        item.deleted = !item.deleted;
                         store.put(item);
-                        if (next_index === store.data.length) {
-                            store.remove(next_index);
-                        }
-                    });
-                    grid.sort('idx');
+                    }
                 };
 
                 function sort (direction) {
@@ -264,10 +262,11 @@ define([
                 store = this.store,
                 idx = 1;
 
-            array.forEach(value, function (f) {
-                var c = lang.clone(f);
-                c.idx = idx++;
-                store.put(c);
+            array.forEach(value, function (_item) {
+                var item = lang.clone(_item);
+                item.idx = idx++;
+                item.deleted = false;
+                store.put(item);
             });
         },
 
