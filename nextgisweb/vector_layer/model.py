@@ -503,6 +503,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         obj.geom = ga.elements.WKTElement(
             str(feature.geom), srid=self.srs_id)
 
+        if feature.geom.geom_type.upper() != self.geometry_type:
+            raise ValidationError(
+                _("Geometry type (%s) does not match geometry column type (%s).")
+                % (feature.geom.geom_type.upper(), self.geometry_type)
+            )
+
         DBSession.add(obj)
         DBSession.flush()
         DBSession.refresh(obj)
