@@ -13,7 +13,7 @@ __all__ = [
 
 class FeatureNotFound(UserException):
     title = _("Feature not found")
-    message = _("Feature with id = %d was not found in resource with = %d.")
+    message = _("Feature with id = %d was not found in resource with id = %d.")
     detail = _("The feature may have been deleted or an error in the address.")
     http_status_code = 404
 

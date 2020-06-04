@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-06-28 01:48+0300\n"
+"POT-Creation-Date: 2020-06-04 21:40+0000\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,40 +19,53 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: api.py:85
+#: api.py:88
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:92
+#: api.py:95
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: model.py:151
+#: exception.py:15
+msgid "Feature not found"
+msgstr "Объект не найден"
+
+#: exception.py:16
+#, python-format
+msgid "Feature with id = %d was not found in resource with id = %d."
+msgstr "Объект с id = %d не найден в ресурсе с id = %d."
+
+#: exception.py:17
+msgid "The feature may have been deleted or an error in the address."
+msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
+
+#: model.py:155
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:142 view.py:45 view.py:214
+#: amd/ngw-feature-layer/FieldsWidget.js:142 view.py:43 view.py:189
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:62 view.py:85
+#: view.py:60 view.py:83
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:135 view.py:220
+#: view.py:133 view.py:195
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:211
+#: view.py:186
 msgid "Vector layer"
 msgstr "Векторный слой"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:192
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:31
-#: amd/ngw-feature-layer/FieldsWidget.js:105 view.py:228
+#: amd/ngw-feature-layer/FieldsWidget.js:105 view.py:203
 msgid "Attributes"
 msgstr "Атрибуты"
 
