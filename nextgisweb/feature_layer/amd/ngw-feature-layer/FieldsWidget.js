@@ -176,9 +176,7 @@ define([
                 }
 
                 function remove () {
-                    var next_index = Infinity;
                     for (var index in grid.selection) {
-                        next_index = Math.min(next_index, index);
                         var item = store.get(index);
                         item.deleted = !item.deleted;
                         store.put(item);
