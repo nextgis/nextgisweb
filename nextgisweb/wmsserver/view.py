@@ -150,7 +150,14 @@ def _get_map(obj, request):
     srs = SRS.filter_by(id=int(p_srs.split(':')[-1])).one()
 
     for lname in p_layers:
-        lobj = lmap[lname]
+        try:
+            lobj = lmap[lname]
+        except KeyError:
+            return _exception(
+                exception="Unknown layer: %s" % lname,
+                code="LayerNotDefined",
+                request=request,
+            )
 
         request.resource_permission(DataScope.read, lobj.resource)
 
@@ -266,6 +273,13 @@ def _get_legend_graphic(obj, request):
     img = layer.resource.render_legend()
 
     return Response(body_file=img, content_type='image/png')
+
+
+def _exception(code, exception, request):
+    return Response(render_template(
+        'nextgisweb:wmsserver/template/wms111exception.mako',
+        dict(code=code, exception=exception), request=request
+    ), content_type='application/vnd.ogc.se_xml', charset='utf-8')
 
 
 def setup_pyramid(comp, config):
