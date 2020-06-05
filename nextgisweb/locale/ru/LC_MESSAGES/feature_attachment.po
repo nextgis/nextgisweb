@@ -21,7 +21,7 @@ msgstr ""
 
 #: exception.py:15
 msgid "Attachment not found"
-msgstr ""
+msgstr "Вложение не найдено"
 
 #: exception.py:16
 #, python-format
