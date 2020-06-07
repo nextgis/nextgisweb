@@ -111,7 +111,7 @@ def test_fields_edit(webapp, vector_layer_id):
     assert fields[1]['keyname'] == 'name'
     assert fields[2]['keyname'] == 'price'
 
-    fields[2]['deleted'] = True
+    fields[2]['delete'] = True
     webapp.put_json('/api/resource/%d' % vector_layer_id, {
         'feature_layer': {'fields': fields}
     }, status=200)

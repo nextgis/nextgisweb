@@ -155,7 +155,7 @@ class _fields_attr(SP):
                 except KeyError:
                     raise ValidationError(_("Field not found (ID=%d)." % fldid))
 
-                if fld.get('deleted', False):
+                if fld.get('delete', False):
                     obj.field_delete(mfld)  # delete
                     continue
             else:

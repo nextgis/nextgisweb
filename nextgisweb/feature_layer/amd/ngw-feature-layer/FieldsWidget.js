@@ -59,7 +59,7 @@ define([
 
         renderRow: function(_item) {
             var row = this.inherited(arguments);
-            if (_item.deleted) {
+            if (_item.delete) {
                 domClass.add(row, "deleted");
             }
             return row;
@@ -178,7 +178,7 @@ define([
                 function remove () {
                     for (var index in grid.selection) {
                         var item = store.get(index);
-                        item.deleted = !item.deleted;
+                        item.delete = !item.delete;
                         store.put(item);
                     }
                 };
@@ -263,7 +263,7 @@ define([
             array.forEach(value, function (_item) {
                 var item = lang.clone(_item);
                 item.idx = idx++;
-                item.deleted = false;
+                item.delete = false;
                 store.put(item);
             });
         },
