@@ -274,9 +274,15 @@ define([
 
             // TODO: We rely on MemoryStore.query being synchronous,
             // this might be not wise
-            setObject("fields", this.store.query().map(function (src) {
+            setObject("fields", this.store.query(
+                function(itm) {
+                    // Skip fields created and deleted in one session
+                    return  !(itm.delete && itm.id == undefined)
+                }
+            ).map(function (src) {
                 var obj = lang.clone(src);
                 obj.idx = undefined;
+                if (!obj.delete) { delete obj.delete };
                 return obj;
             }));
         }
