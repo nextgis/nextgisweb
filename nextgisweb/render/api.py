@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 from math import log, ceil, floor
 from itertools import product
 import six
-from six import StringIO
+from six import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response
@@ -89,7 +89,7 @@ def tile(request):
     if aimg is None:
         aimg = Image.new('RGBA', (256, 256))
 
-    buf = StringIO()
+    buf = BytesIO()
     aimg.save(buf, 'png')
     buf.seek(0)
 
@@ -97,8 +97,8 @@ def tile(request):
 
 
 def image(request):
-    p_extent = map(float, request.GET['extent'].split(','))
-    p_size = map(int, request.GET['size'].split(','))
+    p_extent = tuple(map(float, request.GET['extent'].split(',')))
+    p_size = tuple(map(int, request.GET['size'].split(',')))
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
     p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1') \
         and request.env.render.tile_cache_enabled
@@ -228,7 +228,7 @@ def image(request):
     if aimg is None:
         aimg = Image.new('RGBA', p_size)
 
-    buf = StringIO()
+    buf = BytesIO()
     aimg.save(buf, 'png')
     buf.seek(0)
 
