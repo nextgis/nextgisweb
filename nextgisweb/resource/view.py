@@ -9,6 +9,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 import sqlalchemy.ext.baked
 
+from ..child_action import ChildActions
 from ..views import permalinker
 from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
@@ -333,3 +334,19 @@ def setup_pyramid(comp, config):
 
         ResourceMenu(),
     )
+
+    # Child actions
+
+    Resource.__child_action__ = ChildActions()
+
+    Resource.__child_action__.register(
+        title=_("Update"), priority=20,
+        icon_material='icon-edit',
+        permissions=(PERM_UPDATE,),
+        route='resource.update')
+
+    Resource.__child_action__.register(
+        title=_("Delete"), priority=10,
+        icon_material='icon-close',
+        permissions=(PERM_DELETE,),
+        route='resource.delete')
