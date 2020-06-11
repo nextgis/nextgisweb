@@ -11,6 +11,13 @@ def one(es, index):
     return result["hits"]["hits"][0]["_source"]
 
 
+@pytest.fixture(scope='module', autouse=True)
+def skip_without_es(env):
+    if not hasattr(env.audit, 'es'):
+        pytest.skip("Elasticsearch is not available")
+    yield
+
+
 @pytest.fixture(scope="module")
 def index(env):
     return es_index(datetime.now())
@@ -24,20 +31,20 @@ def delete_index(env, index):
 
 @pytest.mark.parametrize("method", ["GET", "POST", "PUT", "DELETE"])
 def test_audit_request_method(method, index, env, webapp):
-    response = getattr(webapp, method.lower())("/api/resource/0", expect_errors=True)
+    getattr(webapp, method.lower())("/api/resource/0", expect_errors=True)
     env.audit.es.indices.refresh(index=index)
     assert one(env.audit.es, index)["request"]["method"] == method
 
 
 @pytest.mark.parametrize("path", ["/api/resource/0", "/resource/0"])
 def test_audit_request_path(path, index, env, webapp):
-    response = webapp.get(path, expect_errors=True)
+    webapp.get(path, expect_errors=True)
     env.audit.es.indices.refresh(index=index)
     assert one(env.audit.es, index)["request"]["path"] == path
 
 
 def test_audit_user(index, env, webapp):
-    response = webapp.get("/api/resource/0", expect_errors=True)
+    webapp.get("/api/resource/0", expect_errors=True)
     env.audit.es.indices.refresh(index=index)
     assert one(env.audit.es, index)["user"]["id"] == 1
     assert one(env.audit.es, index)["user"]["keyname"] == "guest"
@@ -50,7 +57,7 @@ def test_audit_user(index, env, webapp):
     ("/admin", None),
 ])
 def test_audit_response_route_name(path, route_name, index, env, webapp):
-    response = webapp.get(path, expect_errors=True)
+    webapp.get(path, expect_errors=True)
     env.audit.es.indices.refresh(index=index)
     assert one(env.audit.es, index)["response"].get("route_name") == route_name
 

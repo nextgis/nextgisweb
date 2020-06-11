@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 import json
 import uuid
 import types
@@ -37,7 +37,7 @@ from ..resource import (
 from ..resource.exception import ValidationError, ResourceError
 from ..env import env
 from ..geometry import geom_from_wkb, box
-from ..models import declarative_base, DBSession
+from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..compat import lru_cache
 
@@ -51,6 +51,7 @@ from ..feature_layer import (
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     IFeatureLayer,
+    IFieldEditableFeatureLayer,
     IWritableFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -97,17 +98,24 @@ _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 _FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
 _FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
 
+SCHEMA = 'vector_layer'
+
 Base = declarative_base()
 
 
 class FieldDef(object):
 
-    def __init__(self, key, keyname, datatype, uuid, display_name=None):
+    def __init__(
+        self, key, keyname, datatype, uuid, display_name=None,
+        label_field=None, grid_visibility=None
+    ):
         self.key = key
         self.keyname = keyname
         self.datatype = datatype
         self.uuid = uuid
         self.display_name = display_name
+        self.label_field = label_field
+        self.grid_visibility = grid_visibility
 
 
 class TableInfo(object):
@@ -206,7 +214,9 @@ class TableInfo(object):
                 fld.get('keyname'),
                 fld.get('datatype'),
                 uid,
-                fld.get('display_name')
+                fld.get('display_name'),
+                fld.get('label_field'),
+                fld.get('grid_visibility')
             ))
 
         return self
@@ -241,15 +251,23 @@ class TableInfo(object):
             if f.display_name is None:
                 f.display_name = f.keyname
 
-            layer.fields.append(VectorLayerField(
+            field = VectorLayerField(
                 keyname=f.keyname,
                 datatype=f.datatype,
                 display_name=f.display_name,
                 fld_uuid=f.uuid
-            ))
+            )
+            if f.grid_visibility is not None:
+                field.grid_visibility = f.grid_visibility
 
-    def setup_metadata(self, tablename=None):
-        metadata = db.MetaData(schema='vector_layer' if tablename else None)
+            layer.fields.append(field)
+
+            if f.label_field:
+                layer.feature_label_field = field
+
+    def setup_metadata(self, tablename):
+        metadata = db.MetaData(schema=SCHEMA)
+        metadata.bind = env.core.engine
         geom_fldtype = _GEOM_TYPE_2_DB[self.geometry_type]
 
         class model(object):
@@ -258,7 +276,7 @@ class TableInfo(object):
                     setattr(self, k, v)
 
         table = db.Table(
-            tablename if tablename else ('lvd_' + str(uuid.uuid4().hex)),
+            tablename,
             metadata, db.Column('id', db.Integer, primary_key=True),
             db.Column('geom', ga.Geometry(
                 dimension=2, srid=self.srs_id,
@@ -376,7 +394,7 @@ class VectorLayerField(Base, LayerField):
     fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
 
-@implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
+@implementer(IFeatureLayer, IFieldEditableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = _("Vector layer")
@@ -413,7 +431,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs.id, strdecode)
         tableinfo.setup_layer(self)
 
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
         tableinfo.metadata.create_all(bind=DBSession.connection())
 
         self.tableinfo = tableinfo
@@ -423,7 +441,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             fields, self.srs.id, self.geometry_type)
         tableinfo.setup_layer(self)
 
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
         tableinfo.metadata.create_all(bind=DBSession.connection())
 
         self.tableinfo = tableinfo
@@ -455,13 +473,31 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         raise KeyError("Field '%s' not found!" % keyname)
 
+    # IFieldEditableFeatureLayer
+
+    def field_create(self, datatype):
+        uid = str(uuid.uuid4().hex)
+        column = db.Column('fld_' + uid, _FIELD_TYPE_2_DB[datatype])
+        op = migrate_operation()
+        op.add_column(self._tablename, column, schema=SCHEMA)
+
+        return VectorLayerField(datatype=datatype, fld_uuid=uid)
+
+    def field_delete(self, field):
+        uid = field.fld_uuid
+        DBSession.delete(field)
+
+        op = migrate_operation()
+        with op.batch_alter_table(self._tablename, schema=SCHEMA) as batch_op:
+            batch_op.drop_column('fld_' + uid)
+
     # IWritableFeatureLayer
 
     def feature_put(self, feature):
         self.before_feature_update.fire(resource=self, feature=feature)
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         obj = tableinfo.model(id=feature.id)
         for f in tableinfo.fields:
@@ -493,7 +529,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.before_feature_create.fire(resource=self, feature=feature)
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         obj = tableinfo.model()
         for f in tableinfo.fields:
@@ -502,6 +538,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         obj.geom = ga.elements.WKTElement(
             str(feature.geom), srid=self.srs_id)
+
+        if feature.geom.geom_type.upper() != self.geometry_type:
+            raise ValidationError(
+                _("Geometry type (%s) does not match geometry column type (%s).")
+                % (feature.geom.geom_type.upper(), self.geometry_type)
+            )
 
         DBSession.add(obj)
         DBSession.flush()
@@ -522,7 +564,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.before_feature_delete.fire(resource=self, feature_id=feature_id)
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         query = self.feature_query()
         query.geom()
@@ -539,7 +581,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.before_all_feature_delete.fire(resource=self)
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         DBSession.query(tableinfo.model).delete()
 
@@ -562,7 +604,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         st_ymin = func.st_ymin
 
         tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(tablename=self._tablename)
+        tableinfo.setup_metadata(self._tablename)
 
         model = tableinfo.model
 
@@ -593,12 +635,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 def _vector_layer_listeners(table):
     event.listen(
         table, "after_create",
-        db.DDL("CREATE SCHEMA vector_layer")
+        db.DDL("CREATE SCHEMA %s" % SCHEMA)
     )
 
     event.listen(
         table, "after_drop",
-        db.DDL("DROP SCHEMA IF EXISTS vector_layer CASCADE")
+        db.DDL("DROP SCHEMA IF EXISTS %s CASCADE" % SCHEMA)
     )
 
 
@@ -900,7 +942,7 @@ class FeatureQueryBase(object):
 
     def __call__(self):
         tableinfo = TableInfo.from_layer(self.layer)
-        tableinfo.setup_metadata(tablename=self.layer._tablename)
+        tableinfo.setup_metadata(self.layer._tablename)
         table = tableinfo.table
 
         columns = [table.columns.id, ]
@@ -909,22 +951,22 @@ class FeatureQueryBase(object):
         srsid = self.layer.srs_id if self._srs is None else self._srs.id
 
         geomcol = table.columns.geom
-        geomexpr = db.func.st_transform(geomcol, srsid)
+        geomexpr = func.st_transform(geomcol, srsid)
 
         if self._clip_by_box is not None:
             if _clipbybox2d_exists():
-                clip = db.func.st_setsrid(
-                    db.func.st_makeenvelope(*self._clip_by_box.bounds),
+                clip = func.st_setsrid(
+                    func.st_makeenvelope(*self._clip_by_box.bounds),
                     self._clip_by_box.srid)
-                geomexpr = db.func.st_clipbybox2d(geomexpr, clip)
+                geomexpr = func.st_clipbybox2d(geomexpr, clip)
             else:
-                clip = db.func.st_setsrid(
-                    db.func.st_geomfromtext(self._clip_by_box.wkt),
+                clip = func.st_setsrid(
+                    func.st_geomfromtext(self._clip_by_box.wkt),
                     self._clip_by_box.srid)
-                geomexpr = db.func.st_intersection(geomexpr, clip)
+                geomexpr = func.st_intersection(geomexpr, clip)
 
         if self._simplify is not None:
-            geomexpr = db.func.st_simplifypreservetopology(
+            geomexpr = func.st_simplifypreservetopology(
                 geomexpr, self._simplify
             )
 
@@ -939,20 +981,20 @@ class FeatureQueryBase(object):
                 def compile(expr, compiler, **kw):
                     return "(%s).geom" % str(compiler.process(expr.base))
 
-                columns.append(db.func.st_asewkb(geom(db.func.st_dump(geomexpr))).label('geom'))
+                columns.append(func.st_asewkb(geom(func.st_dump(geomexpr))).label('geom'))
             else:
-                columns.append(db.func.st_asewkb(geomexpr).label('geom'))
+                columns.append(func.st_asewkb(geomexpr).label('geom'))
 
         if self._geom_len:
-            columns.append(db.func.st_length(db.func.geography(
-                db.func.st_transform(geomexpr, 4326))).label('geom_len'))
+            columns.append(func.st_length(func.geography(
+                func.st_transform(geomexpr, 4326))).label('geom_len'))
 
         if self._box:
             columns.extend((
-                db.func.st_xmin(geomexpr).label('box_left'),
-                db.func.st_ymin(geomexpr).label('box_bottom'),
-                db.func.st_xmax(geomexpr).label('box_right'),
-                db.func.st_ymax(geomexpr).label('box_top'),
+                func.st_xmin(geomexpr).label('box_left'),
+                func.st_ymin(geomexpr).label('box_bottom'),
+                func.st_xmax(geomexpr).label('box_right'),
+                func.st_ymax(geomexpr).label('box_top'),
             ))
 
         selected_fields = []
@@ -1037,10 +1079,10 @@ class FeatureQueryBase(object):
             where.append(db.or_(*token))
 
         if self._intersects:
-            intgeom = db.func.st_setsrid(db.func.st_geomfromtext(
+            intgeom = func.st_setsrid(func.st_geomfromtext(
                 self._intersects.wkt), self._intersects.srid)
-            where.append(db.func.st_intersects(
-                geomcol, db.func.st_transform(
+            where.append(func.st_intersects(
+                geomcol, func.st_transform(
                     intgeom, self.layer.srs_id)))
 
         order_criterion = []
@@ -1096,7 +1138,7 @@ class FeatureQueryBase(object):
             @property
             def total_count(self):
                 query = sql.select(
-                    [db.func.count(table.columns.id), ],
+                    [func.count(table.columns.id), ],
                     whereclause=db.and_(*where)
                 )
                 res = DBSession.connection().execute(query)

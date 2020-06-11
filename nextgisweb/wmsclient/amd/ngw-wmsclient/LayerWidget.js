@@ -15,6 +15,7 @@ define([
     "ngw-pyramid/i18n!wmsclient",
     "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
+    "ngw-spatial-ref-sys/SRSSelect",
     // resource
     "dojo/text!./template/LayerWidget.hbs",
     // template
@@ -22,7 +23,6 @@ define([
     "dijit/form/ComboBox",
     "dijit/layout/BorderContainer",
     "dojox/layout/TableContainer",
-    "ngw-spatial-ref-sys/SRSSelect",
     "ngw-resource/ResourceBox",
     "ngw-resource/ResourcePicker"
 ], function (
@@ -41,12 +41,17 @@ define([
     i18n,
     i18nHbs,
     serialize,
+    SRSSelect,
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("WMS layer"),
         templateString: i18nHbs(template, i18n),
         serializePrefix: "wmsclient_layer",
+
+        constructor: function () {
+            this.wSrs = SRSSelect({allSrs: null});
+        },
 
         postCreate: function () {
             this.inherited(arguments);

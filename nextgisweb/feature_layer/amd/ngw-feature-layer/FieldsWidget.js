@@ -7,14 +7,20 @@ define([
     "dojo/dom-construct",
     "dojo/dom-style",   
     "dojo/dom-class",
+    "dijit/DropDownMenu",
+    "dijit/MenuItem",
+    "dijit/Toolbar",
     "dijit/Tooltip",
     "dijit/layout/ContentPane",
+    "dijit/form/Button",
     "dijit/form/CheckBox",
+    "dijit/form/DropDownButton",
     "dijit/form/ValidationTextBox",
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
+    "ngw/settings!feature_layer",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-resource/serialize",
     "ngw-pyramid/i18n!feature_layer",
@@ -30,26 +36,38 @@ define([
     domConstruct,
     domStyle,
     domClass,
+    DropDownMenu,
+    MenuItem,
+    Toolbar,
     Tooltip,
     ContentPane,
+    Button,
     CheckBox,
+    DropDownButton,
     ValidationTextBox,
     Grid,
     Selection,
     editor,
     DijitRegistry,
+    settings,
     KeynameTextBox,
     serialize,
     i18n
 ) {
-    var fid = 1;
-
     var GridClass = declare([Grid, Selection, DijitRegistry], {
         selectionMode: "single",
 
+        renderRow: function(_item) {
+            var row = this.inherited(arguments);
+            if (_item.delete) {
+                domClass.add(row, "deleted");
+            }
+            return row;
+        },
+
         columns: [
             { field: "idx", label: "#", sortable: false },
-            
+
             editor({
                 field: "keyname",
                 label: i18n.gettext("Keyname"),
@@ -61,7 +79,7 @@ define([
                     style: "width: 100%; border: none"
                 }
             }),
-            
+
             { field: "datatype", label: i18n.gettext("Type"), sortable: false },
 
             editor({
@@ -107,30 +125,27 @@ define([
         style: "padding: 0",
 
         constructor: function () {
-            var store = new Observable(new Memory({idProperty: "fid"}));
-            this.store = store;
-
-            this.grid = new GridClass({ store: this.store });
-
-            this.grid.on("dgrid-datachange", function(evt){
-                if (evt.cell.column.field === "label_field" && evt.value === true) {
-                    store.query({label_field: true}).forEach(function (obj) {
-                        obj.label_field = false;
-                        store.put(obj);
-                    });
-                }
-            });
-
+            this.store = new Observable(new Memory({idProperty: "idx"}));
         },
 
         buildRendering: function () {
             this.inherited(arguments);
-            domClass.add(this.domNode, "ngw-feature-layer-fields-widget");
 
+            domClass.add(this.domNode, "ngw-feature-layer-fields-widget");
             domClass.add(this.domNode, "dgrid-border-fix");
+
+            this.grid = new GridClass({ store: this.store });
+            this.grid.region = "center";
+
+            this.grid.on("dgrid-datachange", function(evt){
+                if (evt.cell.column.field === "label_field" && evt.value === true) {
+                    this.store.query({label_field: true}).forEach(function (obj) {
+                        obj.label_field = false;
+                        this.store.put(obj);
+                    }.bind(this));
+                }
+            }.bind(this));
             domStyle.set(this.grid.domNode, "border", "none");
-            
-            domConstruct.place(this.grid.domNode, this.domNode);
 
             new Tooltip({
                 connectId: [this.grid.column("label_field").headerNode],
@@ -142,6 +157,102 @@ define([
                 label: i18n.gettext("Feature table")
             });
 
+            this.toolbar = new Toolbar({});
+
+            this.addMenu = new DropDownMenu({style: "display: none;"});
+
+            if (this.composite.cls === 'vector_layer') {
+                var store = this.store;
+                var grid = this.grid;
+
+                function add () {
+                    store.add({
+                        datatype: this.value,
+                        // FIXME: set default
+                        grid_visibility: true,
+                        display_name: "value",
+                        idx: store.data.length + 1
+                    });
+                }
+
+                function remove () {
+                    for (var index in grid.selection) {
+                        var item = store.get(index);
+                        item.delete = !item.delete;
+                        store.put(item);
+                    }
+                };
+
+                function sort (direction) {
+                    var selectFrom, selectTo;
+                    for (var index in grid.selection) {
+                        if (selectFrom === undefined) {
+                            selectFrom = Number.parseInt(index);
+                        }
+                        selectTo = Number.parseInt(index);
+                    }
+
+                    var indexFrom = direction === 1 ? selectFrom - 1 : selectTo + 1;
+                    var indexTo = direction === 1 ? selectTo : selectFrom;
+
+                    var jumpItem;
+                    store.query({ idx: indexFrom }).forEach(function (item) {
+                        jumpItem = item;
+                    });
+
+                    if (jumpItem) {
+                        store.query(function (object) {
+                            return object.idx >= selectFrom && object.idx <= selectTo;
+                        }).forEach(function (item) {
+                            item.idx -= direction;
+                            store.put(item);
+                        });
+                        jumpItem.idx = indexTo;
+                        store.put(jumpItem);
+                        // FIXME: grid.set('sort', [{ attribute: 'idx', descending: false }]) not working
+                        grid.sort('idx');
+                        grid.select(selectFrom - direction, selectTo - direction);
+                        
+                    }
+                }
+
+                settings.datatypes.forEach(function(datatype) {
+                    this.addMenu.addChild(new MenuItem({
+                        label: datatype,
+                        value: datatype,
+                        showLabel: true,
+                        onClick: add
+                    }));
+                }.bind(this));
+
+                this.toolbar.addChild(new DropDownButton({
+                    label: i18n.gettext("Add"),
+                    iconClass: "dijitIconNewTask",
+                    dropDown: this.addMenu
+                }));
+
+                this.toolbar.addChild(new Button({
+                    label: i18n.gettext("Remove"),
+                    iconClass: "dijitIconDelete",
+                    onClick: remove
+                }));
+
+                this.toolbar.addChild(new Button({
+                    label: '\u21E7',
+                    onClick: sort.bind(this, 1)
+                }));
+
+                this.toolbar.addChild(new Button({
+                    label: '\u21E9',
+                    onClick: sort.bind(this, -1)
+                }));
+
+                this.toolbar.region = "top";
+
+                this.addChild(this.toolbar);
+            }
+            // TODO: fix scroll and ".region"
+            this.addChild(this.grid);
         },
 
         deserializeInMixin: function (data) {
@@ -149,11 +260,11 @@ define([
                 store = this.store,
                 idx = 1;
 
-            array.forEach(value, function (f) {
-                var c = lang.clone(f);
-                c.idx = idx; idx++;
-                c.fid = fid; fid++;
-                store.put(c);
+            array.forEach(value, function (_item) {
+                var item = lang.clone(_item);
+                item.idx = idx++;
+                item.delete = false;
+                store.put(item);
             });
         },
 
@@ -163,10 +274,15 @@ define([
 
             // TODO: We rely on MemoryStore.query being synchronous,
             // this might be not wise
-            setObject("fields", this.store.query().map(function (src) {
+            setObject("fields", this.store.query(
+                function(itm) {
+                    // Skip fields created and deleted in one session
+                    return  !(itm.delete && itm.id == undefined)
+                }
+            ).map(function (src) {
                 var obj = lang.clone(src);
-                obj.fid = undefined;
                 obj.idx = undefined;
+                if (!obj.delete) { delete obj.delete };
                 return obj;
             }));
         }

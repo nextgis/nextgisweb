@@ -10,17 +10,32 @@ from ..resource import DataScope, resource_factory
 from ..env import env
 from ..models import DBSession
 
+from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
+
+
+def attachment_or_not_found(resource_id, feature_id, attachment_id):
+    """ Return attachment filtered by id or raise AttachmentNotFound exception. """
+
+    obj = FeatureAttachment.filter_by(
+        id=attachment_id, resource_id=resource_id,
+        feature_id=feature_id
+    ).one_or_none()
+
+    if obj is None:
+        raise AttachmentNotFound(resource_id, feature_id, attachment_id)
+
+    return obj
 
 
 def download(resource, request):
     request.resource_permission(DataScope.read)
 
-    obj = FeatureAttachment.filter_by(
-        id=request.matchdict['aid'], resource_id=resource.id,
-        feature_id=request.matchdict['fid']
-    ).one()
+    obj = attachment_or_not_found(
+        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
+        attachment_id=int(request.matchdict['aid'])
+    )
 
     fn = env.file_storage.filename(obj.fileobj)
     return FileResponse(fn, content_type=obj.mime_type, request=request)
@@ -29,10 +44,10 @@ def download(resource, request):
 def image(resource, request):
     request.resource_permission(DataScope.read)
 
-    obj = FeatureAttachment.filter_by(
-        id=request.matchdict['aid'], resource_id=resource.id,
-        feature_id=request.matchdict['fid']
-    ).one()
+    obj = attachment_or_not_found(
+        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
+        attachment_id=int(request.matchdict['aid'])
+    )
 
     image = Image.open(env.file_storage.filename(obj.fileobj))
     ext = image.format
@@ -64,10 +79,10 @@ def image(resource, request):
 def iget(resource, request):
     request.resource_permission(DataScope.read)
 
-    obj = FeatureAttachment.filter_by(
-        id=request.matchdict['aid'], resource_id=resource.id,
-        feature_id=request.matchdict['fid']
-    ).one()
+    obj = attachment_or_not_found(
+        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
+        attachment_id=int(request.matchdict['aid'])
+    )
 
     return Response(
         json.dumps(obj.serialize()),
@@ -78,10 +93,10 @@ def iget(resource, request):
 def idelete(resource, request):
     request.resource_permission(DataScope.read)
 
-    obj = FeatureAttachment.filter_by(
-        id=request.matchdict['aid'], resource_id=resource.id,
-        feature_id=request.matchdict['fid']
-    ).one()
+    obj = attachment_or_not_found(
+        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
+        attachment_id=int(request.matchdict['aid'])
+    )
 
     DBSession.delete(obj)
 
@@ -94,10 +109,10 @@ def idelete(resource, request):
 def iput(resource, request):
     request.resource_permission(DataScope.write)
 
-    obj = FeatureAttachment.filter_by(
-        id=request.matchdict['aid'], resource_id=resource.id,
-        feature_id=request.matchdict['fid']
-    ).one()
+    obj = attachment_or_not_found(
+        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
+        attachment_id=int(request.matchdict['aid'])
+    )
 
     obj.deserialize(request.json_body)
 

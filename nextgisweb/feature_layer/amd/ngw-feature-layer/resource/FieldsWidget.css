@@ -5,3 +5,10 @@
 .ngw-feature-layer-fields-widget .field-grid_visibility, 
 .ngw-feature-layer-fields-widget .field-label_field {
     width: 3em; text-align: center; }
+
+.dgrid-row.deleted {
+    text-decoration: line-through;
+}
+.dgrid-row.deleted:not(.dgrid-selected) {
+    background: #e8e8e8
+}

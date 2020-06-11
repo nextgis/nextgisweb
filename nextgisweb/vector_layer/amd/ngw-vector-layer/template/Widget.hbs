@@ -5,9 +5,11 @@
                              uploaderHelpText: '{{gettext 'Dataset should be in ESRI Shapefile (zip) or GeoJSON format.'}}'
     "></div>
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
+        <!-- Do not let users pick SRS. By now only one SRS (EPSG:3857) is supported.
         <div data-dojo-attach-point="wSrs"
             data-dojo-type="ngw-spatial-ref-sys/SRSSelect"
             title="{{gettext 'Spatial reference system'}}" style="width: 100%"></div>
+        -->
 
         <select data-dojo-attach-point="wSourceEncoding"
             data-dojo-type="dijit/form/Select"

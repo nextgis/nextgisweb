@@ -83,6 +83,7 @@ def amd_packages():
         ('svg4everybody', 'nextgisweb:amd_packages/contrib/svg4everybody'),
         ('codemirror', 'nextgisweb:amd_packages/contrib/codemirror'),
         ('jquery', 'nextgisweb:amd_packages/contrib/jquery'),
+        ('tus', 'nextgisweb:amd_packages/contrib/tus'),
 
         # nextgisweb packages
         ('ngw', 'nextgisweb:amd_packages/ngw'),

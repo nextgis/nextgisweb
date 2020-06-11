@@ -17,6 +17,12 @@ class FileUploadComponent(Component):
 
     def initialize(self):
         self.path = self.options['path'] or self.env.core.gtsdir(self)
+        self.max_size = self.options['max_size']
+
+        tus_options = self.options.with_prefix('tus')
+        self.tus_enabled = tus_options['enabled']
+        self.tus_chunk_size_default = tus_options['chunk_size.default']
+        self.tus_chunk_size_minimum = tus_options['chunk_size.minimum']
 
     def initialize_db(self):
         if 'path' not in self.options:
@@ -103,6 +109,22 @@ class FileUploadComponent(Component):
             "Preserved: %d files, %d directories, %d bytes",
             kept_files, kept_dirs, kept_bytes)
 
+    def client_settings(self, request):
+        return dict(
+            max_size=self.max_size,
+            tus=dict(
+                enabled=self.tus_enabled,
+                chunk_size=dict(
+                    default=self.tus_chunk_size_default,
+                    minimum=self.tus_chunk_size_minimum,
+                )
+            )
+        )
+
     option_annotations = (
         Option('path', default=None),
+        Option('max_size', int, default=2**30),
+        Option('tus.enabled', bool, default=True),
+        Option('tus.chunk_size.default', int, default=16 * 2**20),
+        Option('tus.chunk_size.minimum', int, default=4 * 2**20),
     )

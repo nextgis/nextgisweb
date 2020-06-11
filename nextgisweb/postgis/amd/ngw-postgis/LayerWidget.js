@@ -11,6 +11,7 @@ define([
     "ngw-pyramid/i18n!postgis",
     "ngw-pyramid/hbs-i18n",
     "ngw-resource/serialize",
+    "ngw-spatial-ref-sys/SRSSelect",
     "ngw/route",
     // resource
     "dojo/text!./template/LayerWidget.hbs",
@@ -20,8 +21,7 @@ define([
     "dijit/form/ComboBox",
     "dojox/layout/TableContainer",
     "ngw-resource/ResourceBox",
-    "ngw-pyramid/form/IntegerValueTextBox",
-    "ngw-spatial-ref-sys/SRSSelect"
+    "ngw-pyramid/form/IntegerValueTextBox"
 ], function (
     declare,
     array,
@@ -34,6 +34,7 @@ define([
     i18n,
     hbsI18n,
     serialize,
+    SRSSelect,
     route,
     template
 ) {
@@ -41,6 +42,10 @@ define([
         title: i18n.gettext("PostGIS layer"),
         templateString: hbsI18n(template, i18n),
         prefix: "postgis_layer",
+
+        constructor: function () {
+            this.srs = SRSSelect({allSrs: null});
+        },
 
         postCreate: function () {
             this.inherited(arguments);

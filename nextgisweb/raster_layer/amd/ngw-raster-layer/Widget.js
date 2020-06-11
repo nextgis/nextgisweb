@@ -5,13 +5,13 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
+    "ngw-spatial-ref-sys/SRSSelect",
     "ngw-pyramid/i18n!raster_layer",
     "ngw-pyramid/hbs-i18n",
     // resource
     "dojo/text!./template/Widget.hbs",
     // template
     "dojox/layout/TableContainer",
-    "ngw-spatial-ref-sys/SRSSelect",
     "ngw-file-upload/Uploader"
 ], function (
     declare,
@@ -19,6 +19,7 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
+    SRSSelect,
     i18n,
     hbsI18n,
     template
@@ -26,6 +27,10 @@ define([
     return declare("ngw.raster.layer.Widget", [_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         title: i18n.gettext("Raster layer"),
+
+        constructor: function () {
+            this.wSrs = SRSSelect({allSrs: null});
+        },
 
         serializeInMixin: function (data) {
             if (data.raster_layer === undefined) { data.raster_layer = {}; }

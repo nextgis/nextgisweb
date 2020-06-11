@@ -54,10 +54,12 @@
             data-ngw-serialize="geometry_srid"
             title="SRID" style="width: 100%"></div>
 
+        <!-- Do not let users pick SRS. By now only one SRS (EPSG:3857) is supported.
         <div data-dojo-attach-point="srs"
             data-dojo-type="ngw-spatial-ref-sys/SRSSelect"
             data-dojo-props="colspan: 2"
             title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>
+        -->
 
         <select data-dojo-attach-point="fields"
             data-dojo-type="dijit/form/Select"

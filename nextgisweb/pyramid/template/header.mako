@@ -10,13 +10,18 @@
     has_logo = request.env.core.settings_exists('pyramid', 'logo') or \
         ('logo' in request.env.pyramid.options and os.path.isfile(request.env.pyramid.options['logo']))
     return_url = request.GET['return'] if 'return' in request.GET else false
+
+    login_qs = dict()
+    if request.matched_route is None or request.matched_route.name not in (login_route_name, logout_route_name):
+        login_qs['next'] = request.url
+    login_url = request.route_url(login_route_name, _query=login_qs)
 %>
 
 <div id="header" class="header clearfix">
     <ul class="header-nav header__right">
         <li class="header-nav__item">
             %if request.user.keyname == 'guest':
-                <a href="${request.route_url(login_route_name)}">${tr(_('Sign in'))}</a>
+                <a href="${login_url}">${tr(_('Sign in'))}</a>
             %else:
                 <div class="user-avatar" id="userAvatar"></div>
             %endif
@@ -91,7 +96,7 @@
             ],
             class: 'right-menu',
             withOverlay: true,
-            loginLink: '${request.route_url(login_route_name)}',
+            loginLink: '${login_url}',
             %if (request.user.keyname != 'guest'):
               user: '${request.user}',
               logoutLink: '${request.route_url(logout_route_name)}'
