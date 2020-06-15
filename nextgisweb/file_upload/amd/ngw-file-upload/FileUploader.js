@@ -5,12 +5,14 @@ define("ngw-file-upload/FileUploader", [
 	"dojo/_base/array",
 	"dojo/_base/connect",
 	"dojo/_base/window",
+	"dojo/Deferred",
 	"dojo/dom-style",
 	"dojo/dom-class",
 	"dojo/dom-geometry",
 	"dojo/dom-attr",
 	"dojo/dom-construct",
 	"dojo/dom-form",
+	"dojo/promise/all",
 	"dojo/request/xhr",
 	"dijit",
 	"dijit/form/Button",
@@ -21,8 +23,8 @@ define("ngw-file-upload/FileUploader", [
 	"tus/tus",
 	"ngw/route",
 	"ngw/settings!file_upload"
-],function(kernel, declare, lang, array, connect, win, domStyle, domClass, domGeometry, domAttr, domConstruct,
-			domForm, xhr, dijit, Button, Base, HTML5, res, template, tus, route, settings){
+],function(kernel, declare, lang, array, connect, win, Deferred, domStyle, domClass, domGeometry, domAttr, domConstruct,
+			domForm, all, xhr, dijit, Button, Base, HTML5, res, template, tus, route, settings){
 
 	// TODO:
 	//		i18n
@@ -409,38 +411,69 @@ define("ngw-file-upload/FileUploader", [
 		_tusUpload: function(){
 			var self = this;
 
-			var file = this._files[0];
-			var uploader = new tus.Upload(file, {
-				endpoint: route.file_upload.collection(),
-				storeFingerprintForResuming: false,
-				chunkSize: settings.tus.chunk_size.default,
-				metadata: { name: file.name },
+			var uploaders = [];
 
-				onProgress: function (bytesUploaded, bytesTotal) {
-					self.onProgress({
-						type: "progress",
-						percent: (100 * bytesUploaded / bytesTotal).toFixed(0) + "%",
-					});
-				},
+			var total = 0;
+			var progress = [];
+			function uploadedTotal () {
+				return progress.reduce(function(acc, val) { return acc + val; });
+			}
 
-				onError: function (error) {
-					self.onError(error);
-				},
+			for (var i = 0; i < this._files.length; i++) {
+				var file = this._files[i];
 
-				onSuccess: function () {
-					xhr.get(uploader.url, {handleAs: 'json'}).then(
-						function (data) {
-						   self.onComplete({ upload_meta:[data] });
-						},
-						function (error) {
-							self.onError(error);
-						}
-					)
-				}
+				total += file.size;
+				progress.push(0);
+
+				var deferred = new Deferred();
+
+				var uploader = new tus.Upload(file, {
+					endpoint: route.file_upload.collection(),
+					storeFingerprintForResuming: false,
+					chunkSize: settings.tus.chunk_size.default,
+					metadata: { name: file.name },
+					__number: i,
+					__deferred: deferred,
+	
+					onProgress: function (bytesUploaded, bytesTotal) {
+						progress[this.__number] = bytesUploaded;
+
+						var decimal = uploadedTotal() / total;
+						self.onProgress({
+							type:"progress",
+							decimal: decimal,
+							percent: (100 * decimal).toFixed(0) + "%",
+						});
+					},
+
+					onError: function (error) {
+						this.__deferred.reject(error);
+					},
+	
+					onSuccess: function () {
+						xhr.get(uploaders[this.__number].url, {handleAs: 'json'}).then(
+							this.__deferred.resolve,
+							this.__deferred.reject
+						)
+					}
+				});
+
+				uploaders.push(uploader);
+			};
+
+			all(uploaders.map(function (uploader) {
+				return uploader.options.__deferred.promise;
+			})).then(function (data) {
+				self.onComplete({ upload_meta: data });
+			}).catch(function (error){
+				self.onError(error);
 			});
 
 			this.onBegin();
-			uploader.start();
+
+			uploaders.forEach(function (uploader) {
+				uploader.start();
+			})
 		}
 	});
 
