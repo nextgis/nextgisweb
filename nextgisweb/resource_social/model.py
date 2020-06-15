@@ -50,8 +50,6 @@ class _preview_file_upload_attr(SP):
 
             copyfile(srcfile, dstfile)
             social.preview_fileobj = fileobj
-            #log.warn('HI! log into')
-            #log.warn(srcfile)
 
 
 class ResourceSocialSerializer(Serializer):
