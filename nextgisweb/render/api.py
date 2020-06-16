@@ -97,8 +97,8 @@ def tile(request):
 
 
 def image(request):
-    p_extent = map(float, request.GET['extent'].split(','))
-    p_size = map(int, request.GET['size'].split(','))
+    p_extent = tuple(map(float, request.GET['extent'].split(',')))
+    p_size = tuple(map(int, request.GET['size'].split(',')))
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
     p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1') \
         and request.env.render.tile_cache_enabled
