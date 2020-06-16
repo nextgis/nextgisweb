@@ -39,14 +39,24 @@ from nextgisweb.webmap.model import WebMapScope
                 <td>${tr(item.cls_display_name)}</td>
                 <td>${item.owner_user}</td>
                 <td class="children-table__action">
-                    %for action in item.__class__.__child_action__:
-                    %if all(p in permissions for p in action.permissions):
-                        <a class="material-icons ${action.icon_material}" href="${request.route_url(action.route, id=item.id)}" target="_blank" title="${tr(action.title)}"></a>
+                    %if item.cls == "webmap" and WebMapScope.display in permissions:
+                        <a class="material-icons icon-viewMap" href="${request.route_url('webmap.display', id=item.id)}" target="_blank" title="${tr(_('Display map'))}"></a>
                     %endif
-                    %endfor
+                    %if item.cls == "scene_3d":
+                        <a class="material-icons icon-viewMap" href="${request.route_url('scene_3d.display', id=item.id)}" target="_blank" title="${tr(_('Display scene'))}"></a>
+                    %endif
+                    %if (item.cls == "vector_layer" or item.cls == "postgis_layer") and DataScope.read in permissions:
+                        <a class="material-icons icon-table" href="${request.route_url('feature_layer.feature.browse', id=item.id)}" title="${tr(_('Feature table'))}"></a>
+                    %endif
+                    %if ResourceScope.update in permissions:
+                        <a class="material-icons icon-edit" href="${request.route_url('resource.update', id=item.id)}" title="${tr(_('Update'))}"></a>
+                    %endif
+                    %if ResourceScope.delete in permissions:
+                        <a class="material-icons icon-close" href="${request.route_url('resource.delete', id=item.id)}" title="${tr(_('Delete'))}"></a>
+                    %endif
                 </td>
             </tr>
-        %endfor
+        %endfor    
     </tbody>
 </%def>
 

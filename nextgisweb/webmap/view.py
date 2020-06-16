@@ -184,9 +184,3 @@ def setup_pyramid(comp, config):
                 'webmap.display', id=args.obj.id)
 
     WebMap.__dynmenu__.add(DisplayMenu())
-
-    WebMap.__child_action__.register(
-        title=_("Display map"), priority=30,
-        icon_material='icon-viewMap',
-        permissions=(WebMap.scope.webmap.display,),
-        route='webmap.display')

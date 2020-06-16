@@ -203,9 +203,3 @@ def setup_pyramid(comp, config):
         key='fields', title=_(u"Attributes"),
         template="nextgisweb:feature_layer/template/section_fields.mako",
         is_applicable=lambda obj: IFeatureLayer.providedBy(obj))
-
-    Resource.__child_action__.register(
-        title=_("Feature table"), priority=30,
-        icon_material='icon-table',
-        permissions=(PD_READ,),
-        route='feature_layer.feature.browse')
