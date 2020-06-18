@@ -16,6 +16,8 @@ from . import command  # NOQA
 
 __all__ = ['FileStorageComponent', 'FileObj']
 
+BUF_SIZE = 1024 * 1024
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +31,7 @@ class FileObjBackup(BackupBase):
 
     def backup(self, dst):
         with open(self.component.filename(self.plget(self.payload)), 'rb') as fd:
-            copyfileobj(fd, dst)
+            copyfileobj(fd, dst, length=BUF_SIZE)
 
     def restore(self, src):
         fn = self.component.filename(self.plget(self.payload), makedirs=True)
@@ -39,7 +41,7 @@ class FileObjBackup(BackupBase):
                 self.payload[1])
         else:
             with open(fn, 'wb') as fd:
-                copyfileobj(src, fd)
+                copyfileobj(src, fd, length=BUF_SIZE)
 
 
 class FileStorageComponent(Component):
