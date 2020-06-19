@@ -733,6 +733,12 @@ following request:
       }
    }
 
+Obtain layers id and display_name in bash
+
+.. sourcecode:: 
+   curl -u "$login:$password" $url/api/resource/?parent=320 | jq -j '.[] | .resource.id, " ", .resource.display_name, "\n" '
+
+
 .. _ngwdev_resource_properties
 
 Resource properties
