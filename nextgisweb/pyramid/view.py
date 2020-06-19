@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-import codecs
 import os.path
+from time import sleep
+from datetime import datetime, timedelta
 
-from pyramid.response import FileResponse
+from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from .. import dynmenu as dm
@@ -74,6 +75,7 @@ def backup_download(request):
     fn = request.env.core.backup_filename(request.matchdict['filename'])
     return FileResponse(fn)
 
+
 def cors(request):
     request.require_administrator()
     return dict(
@@ -131,6 +133,36 @@ def test_exception_unhandled(request):
         pass
 
     raise UnhandledTestException()
+
+
+def test_timeout(reqest):
+    logger = reqest.env.pyramid.logger
+
+    duration = float(reqest.GET.get('t', '60'))
+    interval = float(reqest.GET['i']) if 'i' in reqest.GET else None
+
+    start = datetime.utcnow()
+    finish = start + timedelta(seconds=duration)
+
+    def generator():
+        idx = 0
+        while True:
+            time_to_sleep = (finish - datetime.utcnow()).total_seconds()
+            if interval is not None:
+                time_to_sleep = min(time_to_sleep, interval)
+            if time_to_sleep < 0:
+                break
+            sleep(time_to_sleep)
+            idx += 1
+            current = datetime.utcnow()
+            elapsed = (current - start).total_seconds()
+            line = "idx = {}, elapsed = {:.3f}, timestamp = {}".format(
+                idx, elapsed, current.isoformat())
+
+            logger.warn("Timeout test: " + line)
+            yield str(line + "\n")
+
+    return Response(app_iter=generator(), content_type='text/plain')
 
 
 def setup_pyramid(comp, config):
@@ -195,6 +227,8 @@ def setup_pyramid(comp, config):
         .add_view(test_exception_handled)
     config.add_route('pyramid.test_exception_unhandled', '/test/exception/unhandled') \
         .add_view(test_exception_unhandled)
+    config.add_route('pyramid.test_timeout', '/test/timeout') \
+        .add_view(test_timeout)
 
     # Method for help_page customization in components
     comp.help_page_url = lambda request: \
