@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+from sqlalchemy.ext.orderinglist import ordering_list
 from .. import db
 from ..models import declarative_base
 from ..resource import (
@@ -35,10 +36,18 @@ class Layer(Base):
     display_name = db.Column(db.Unicode, nullable=False)
     min_scale_denom = db.Column(db.Float, nullable=True)
     max_scale_denom = db.Column(db.Float, nullable=True)
+    position = db.Column(db.Integer, nullable=True)
 
     service = db.relationship(
-        Service, foreign_keys=service_id,
-        backref=db.backref('layers', cascade='all, delete-orphan'))
+        Service,
+        foreign_keys=service_id,
+        backref=db.backref(
+            'layers',
+            cascade='all, delete-orphan',
+            order_by=position,
+            collection_class=ordering_list('position'),
+        ),
+    )
 
     resource = db.relationship(
         Resource, foreign_keys=resource_id,
@@ -59,25 +68,16 @@ class _layers_attr(SP):
         return [l.to_dict() for l in srlzr.obj.layers]
 
     def setter(self, srlzr, value):
-        m = dict((l.resource_id, l) for l in srlzr.obj.layers)
-        keep = set()
+        srlzr.obj.layers = []
         for lv in value:
-            if lv['resource_id'] in m:
-                lo = m[lv['resource_id']]
-                keep.add(lv['resource_id'])
-            else:
-                lo = Layer(resource_id=lv['resource_id'])
-                srlzr.obj.layers.append(lo)
+            lo = Layer(resource_id=lv['resource_id'])
+            srlzr.obj.layers.append(lo)
 
             for a in (
                 'keyname', 'display_name',
                 'min_scale_denom', 'max_scale_denom'
             ):
                 setattr(lo, a, lv[a])
-
-        for lrid, lo in m.items():
-            if lrid not in keep:
-                srlzr.obj.layers.remove(lo)
 
 
 class ServiceSerializer(Serializer):
