@@ -146,9 +146,9 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     connection_id = db.Column(db.ForeignKey(Connection.id), nullable=False)
     layer_name = db.Column(db.Unicode)
-    tilesize = db.Column(db.Integer, default=256)
-    minzoom = db.Column(db.Integer, default=0)
-    maxzoom = db.Column(db.Integer, default=14)
+    tilesize = db.Column(db.Integer, nullable=False, default=256)
+    minzoom = db.Column(db.Integer, nullable=False, default=0)
+    maxzoom = db.Column(db.Integer, nullable=False, default=14)
     extent_left = db.Column(db.Float, default=-180.0)
     extent_right = db.Column(db.Float, default=+180.0)
     extent_bottom = db.Column(db.Float, default=-90.0)
