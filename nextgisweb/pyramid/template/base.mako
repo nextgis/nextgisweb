@@ -26,7 +26,6 @@
 
     %if request.env.core.options['enable_snippets']:
         <meta property="og:description" content="${tr(_('Your Web GIS at nextgis.com'))}"/>
-        <meta property="fb:app_id" content="138386829910005"/>
     %endif
 
     <% has_preview = hasattr(request, 'context') and \
