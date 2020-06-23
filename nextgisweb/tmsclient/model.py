@@ -130,11 +130,15 @@ class RenderRequest(object):
 
     def render_extent(self, extent, size):
         zoom = render_zoom(self.srs, extent, size, self.style.tilesize)
+        zoom = min(max(zoom, self.style.minzoom), self.style.maxzoom)
         return self.style.render_image(extent, size, self.srs, zoom)
 
     def render_tile(self, tile, size):
+        zoom = tile[0]
+        if zoom < self.style.minzoom or zoom > self.style.maxzoom:
+            raise ValidationError(_("Zoom is out of range."))
         extent = self.srs.tile_extent(tile)
-        return self.style.render_image(extent, (size, size), self.srs, tile[0])
+        return self.style.render_image(extent, (size, size), self.srs, zoom)
 
 
 @implementer(IRenderableStyle)

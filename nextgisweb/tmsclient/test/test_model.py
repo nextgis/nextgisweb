@@ -30,6 +30,7 @@ def test_layer(env, webapp):
     resp = webapp.post_json('/api/resource/', data, status=201)
     connection_id = resp.json['id']
 
+    maxzoom = 3
     data = dict(
         resource=dict(
             cls='tmsclient_layer', display_name='test-tms_layer',
@@ -39,10 +40,15 @@ def test_layer(env, webapp):
             connection=dict(id=connection_id),
             srs=dict(id=3857),
             layer_name='hot',
+            minzoom=0,
+            maxzoom=maxzoom,
         ),
     )
     resp = webapp.post_json('/api/resource/', data, status=201)
     layer_id = resp.json['id']
+
+    webapp.get('/api/component/render/tile?z=%d&x=0&y=0&resource=%d' % (
+        maxzoom + 1, layer_id), status=422)
 
     layer = Layer.filter_by(id=layer_id).one()
     srs = SRS.filter_by(id=3857).one()
