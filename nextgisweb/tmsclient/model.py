@@ -7,6 +7,7 @@ from six import BytesIO, PY3
 from zope.interface import implementer
 
 from .. import db
+from ..core.exception import OperationalError
 from ..env import env
 from ..layer import SpatialLayerMixin
 from ..models import declarative_base
@@ -88,7 +89,12 @@ class Connection(Base, Resource):
             timeout=env.tmsclient.options['timeout']
         )
 
-        return PIL.Image.open(BytesIO(result.content))
+        if result.status_code == 200:
+            return PIL.Image.open(BytesIO(result.content))
+        elif result.status_code // 100 == 5:
+            raise OperationalError(_("Third-party service unavailable."))
+        else:
+            return None
 
 
 class _capmode_attr(SP):
@@ -231,6 +237,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
         for x, xtile in enumerate(range(xtilemin, xtilemax + 1)):
             for y, ytile in enumerate(range(ytilemin, ytilemax + 1)):
                 tile_image = self.connection.get_tile((zoom, xtile, ytile), self.layer_name)
+                if tile_image is None:
+                    continue
                 image.paste(tile_image, (x * self.tilesize, y * self.tilesize))
 
         a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtilemin, ytilemin))
