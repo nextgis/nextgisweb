@@ -263,16 +263,14 @@ h2:first-child,
   background-size: 24px 24px;
 }
 .text-withIcon__pic.svgIcon-vector_layer,
-.text-withIcon__pic.svgIcon-raster_layer {
+.text-withIcon__pic.svgIcon-raster_layer,
+.text-withIcon__pic.svgIcon-basemap_layer {
   width: 18px;
   height: 18px;
 }
 .text-withIcon__pic.svgIcon-resource_group {
   width: 24px;
   height: 24px;
-}
-.text-withIcon__pic.svgIcon-postgis_layer {
-  left: -2px;
 }
 .list {
   padding: 8px 0;
@@ -659,7 +657,17 @@ table {
 .svgIcon-formbuilder_form,
 .svgIcon-qgis_raster_style,
 .svgIcon-trackers_group,
-.svgIcon-tracker {
+.svgIcon-tracker,
+.svgIcon-file_bucket,
+.svgIcon-collector_project,
+.svgIcon-model_3d,
+.svgIcon-scene_3d,
+.svgIcon-tileset_3d,
+.svgIcon-tmsclient_connection,
+.svgIcon-tmsclient_layer,
+.svgIcon-tmsclient_layer,
+.svgIcon-style_3d,
+.svgIcon-terrain_provider {
   background: none;
 }
 .svgIcon-mapserver_style {
