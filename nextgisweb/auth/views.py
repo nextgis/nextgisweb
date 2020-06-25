@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import string
+import secrets
+
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound
+from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPBadRequest
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
 
+from ..models import DBSession
 from ..object_widget import ObjectWidget
 from ..views import ModelController, permalinker
 from .. import dynmenu as dm
@@ -43,9 +47,74 @@ def login(request):
     return dict(next_url=next_url)
 
 
+def oauth(request):
+    oaserver = request.env.auth.oauth
+
+    oauth_url = request.route_url('auth.oauth')
+    oauth_path = request.route_path('auth.oauth')
+
+    def cookie_name(state):
+        return 'ngw-oastate-' + state
+
+    if 'error' in request.params:
+        return render_error_message(request)
+
+    elif 'code' in request.params and 'state' in request.params:
+        # Extract next_url from state named cookie
+        try:
+            state = request.params['state']
+            next_url = request.cookies[cookie_name(state)]
+        except KeyError:
+            raise HTTPBadRequest()
+
+        access_token = oaserver.get_access_token(
+            request.params['code'], oauth_url)
+
+        user = oaserver.get_user(access_token)
+        if user is None:
+            return render_error_message(request)
+
+        DBSession.flush()
+        headers = remember(request, user.id)
+
+        response = HTTPFound(location=next_url, headers=headers)
+        response.delete_cookie(cookie_name(state), path=oauth_path)
+
+        return response
+
+    else:
+        next_url = request.params.get('next', request.application_url)
+
+        alphabet = string.ascii_letters + string.digits
+        state = ''.join(secrets.choice(alphabet) for i in range(16))
+        ac_url = oaserver.authorization_code_url(oauth_url, state=state)
+
+        response = HTTPFound(location=ac_url)
+
+        # Store next_url in state named cookie
+        response.set_cookie(
+            cookie_name(state), value=next_url,
+            path=oauth_path, max_age=600, httponly=True)
+
+        return response
+
+
 def logout(request):
     headers = forget(request)
     return HTTPFound(location=request.application_url, headers=headers)
+
+
+def render_error_message(request, message=None):
+    if message is None:
+        message = _("Insufficient permissions to perform this operation.")
+    response = render_to_response(
+        'nextgisweb:auth/template/error.mako',
+        dict(
+            subtitle=_("Access denied"),
+            message=message
+        ), request=request)
+    response.status = 403
+    return response
 
 
 def forbidden_error_response(request, err_info, exc, exc_info, **kwargs):
@@ -71,11 +140,7 @@ def forbidden_error_response(request, err_info, exc, exc_info, **kwargs):
     # Show error message to already authentificated users
     # TODO: We can separately inform blocked users
 
-    response = render_to_response(
-        'nextgisweb:auth/template/forbidden.mako',
-        dict(subtitle=_("Access denied")), request=request)
-    response.status = 403
-    return response
+    return render_error_message(request)
 
 
 def setup_pyramid(comp, config):
@@ -96,6 +161,8 @@ def setup_pyramid(comp, config):
         .add_view(login, renderer='nextgisweb:auth/template/login.mako')
 
     config.add_route('auth.logout', '/logout').add_view(logout)
+
+    config.add_route('auth.oauth', '/oauth').add_view(oauth)
 
     def user_disabled(request):
         headers = forget(request)

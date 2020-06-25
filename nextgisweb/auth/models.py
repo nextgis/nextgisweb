@@ -52,6 +52,7 @@ class User(Principal):
     superuser = sa.Column(sa.Boolean, nullable=False, default=False)
     disabled = sa.Column(sa.Boolean, nullable=False, default=False)
     password_hash = sa.Column(sa.Unicode)
+    oauth_subject = sa.Column(sa.Unicode, unique=True)
     last_activity = sa.Column(sa.DateTime)
 
     __mapper_args__ = dict(polymorphic_identity='U')

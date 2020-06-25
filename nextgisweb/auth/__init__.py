@@ -9,6 +9,7 @@ from ..models import DBSession
 from .. import db
 
 from .models import Base, Principal, User, Group, UserDisabled
+from .oauth import OAuthServer
 from . import command # NOQA
 from .util import _
 
@@ -18,6 +19,12 @@ __all__ = ['Principal', 'User', 'Group']
 class AuthComponent(Component):
     identity = 'auth'
     metadata = Base.metadata
+
+    def __init__(self, env, settings):
+        super(AuthComponent, self).__init__(env, settings)
+        self.settings_register = self.options['register']
+        self.oauth = OAuthServer(self.options.with_prefix('oauth')) \
+            if self.options['oauth.enabled'] else None
 
     def initialize_db(self):
         self.initialize_user(
@@ -118,12 +125,29 @@ class AuthComponent(Component):
 
     option_annotations = (
         Option('register', bool, default=False, doc="Allow user registration."),
+
         Option(
             'login_route_name', default='auth.login',
             doc="Name of route for login page."),
         Option(
             'logout_route_name', default='auth.logout',
             doc="Name of route for logout page."),
+        
+        Option('oauth.enabled', bool, default=False),
+        Option('oauth.register', bool, default=False),
+
+        Option('oauth.client_id'),
+        Option('oauth.client_secret', secure=True),
+
+        Option('oauth.auth_endpoint'),
+        Option('oauth.token_endpoint'),
+        Option('oauth.introspection_endpoint', default=None),
+        Option('oauth.userinfo_endpoint'),
+
+        Option('oauth.userinfo.scope', default=None),
+        Option('oauth.userinfo.subject'),
+        Option('oauth.userinfo.keyname'),
+        Option('oauth.userinfo.display_name'),
     )
 
 

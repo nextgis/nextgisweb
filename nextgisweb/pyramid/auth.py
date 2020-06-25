@@ -4,7 +4,8 @@ from __future__ import unicode_literals, print_function, absolute_import
 from pyramid.authentication import (
     AuthTktAuthenticationPolicy,
     BasicAuthAuthenticationPolicy as
-    PyramidBasicAuthAuthenticationPolicy)
+    PyramidBasicAuthAuthenticationPolicy,
+    CallbackAuthenticationPolicy)
 
 from ..auth import User
 
@@ -27,6 +28,36 @@ class BasicAuthenticationPolicy(PyramidBasicAuthAuthenticationPolicy):
                 return user.id
 
 
+class TokenAuthenticationPolicy(CallbackAuthenticationPolicy):
+
+    def unauthenticated_userid(self, request):
+        authorization = request.headers.get('Authorization')
+        if not authorization:
+            return None
+
+        try:
+            authmeth, token = authorization.split(' ', 1)
+        except ValueError:  # not enough values to unpack
+            return None
+
+        if authmeth.lower() != 'bearer':
+            return None
+
+        oauth = request.env.auth.oauth
+        if oauth is not None:
+            user = oauth.get_user(token, as_resource_server=True)
+            if user is not None:
+                return user.id
+
+        return None
+
+    def remember(self, request, userid):
+        return []
+
+    def forget(self, request):
+        return []
+
+
 class AuthenticationPolicy(object):
 
     def __init__(self, settings):
@@ -46,6 +77,8 @@ class AuthenticationPolicy(object):
 
             BasicAuthenticationPolicy(
                 check=check, realm=b'NextGISWeb'),
+
+            TokenAuthenticationPolicy()
         )
 
     def authenticated_userid(self, request):
