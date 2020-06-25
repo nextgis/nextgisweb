@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import PIL
 from osgeo import osr, ogr
+from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from six import BytesIO, PY3
 from zope.interface import implementer
 
@@ -91,8 +92,12 @@ class Connection(Base, Resource):
 
         if result.status_code == 200:
             return PIL.Image.open(BytesIO(result.content))
+        elif result.status_code == 401:
+            raise HTTPUnauthorized()
+        elif result.status_code == 403:
+            raise HTTPForbidden()
         elif result.status_code // 100 == 5:
-            raise OperationalError(_("Third-party service unavailable."))
+            raise OperationalError("Third-party service unavailable.")
         else:
             return None
 
