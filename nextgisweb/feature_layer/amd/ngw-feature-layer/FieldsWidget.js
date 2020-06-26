@@ -11,7 +11,7 @@ define([
     "dijit/MenuItem",
     "dijit/Toolbar",
     "dijit/Tooltip",
-    "dijit/layout/ContentPane",
+    "dijit/layout/LayoutContainer",
     "dijit/form/Button",
     "dijit/form/CheckBox",
     "dijit/form/DropDownButton",
@@ -40,7 +40,7 @@ define([
     MenuItem,
     Toolbar,
     Tooltip,
-    ContentPane,
+    LayoutContainer,
     Button,
     CheckBox,
     DropDownButton,
@@ -119,7 +119,7 @@ define([
     });
 
 
-    return declare([ContentPane, serialize.Mixin], {
+    return declare([LayoutContainer, serialize.Mixin], {
         title: i18n.gettext("Attributes"),
         prefix: "feature_layer",
         style: "padding: 0",
@@ -132,10 +132,14 @@ define([
             this.inherited(arguments);
 
             domClass.add(this.domNode, "ngw-feature-layer-fields-widget");
-            domClass.add(this.domNode, "dgrid-border-fix");
 
             this.grid = new GridClass({ store: this.store });
             this.grid.region = "center";
+
+            domClass.add(this.grid.domNode, "dgrid-border-fix");
+            domStyle.set(this.grid.domNode, "border", "none");
+
+            this.addChild(this.grid);
 
             this.grid.on("dgrid-datachange", function(evt){
                 if (evt.cell.column.field === "label_field" && evt.value === true) {
@@ -145,7 +149,6 @@ define([
                     }.bind(this));
                 }
             }.bind(this));
-            domStyle.set(this.grid.domNode, "border", "none");
 
             new Tooltip({
                 connectId: [this.grid.column("label_field").headerNode],
@@ -251,8 +254,6 @@ define([
 
                 this.addChild(this.toolbar);
             }
-            // TODO: fix scroll and ".region"
-            this.addChild(this.grid);
         },
 
         deserializeInMixin: function (data) {
