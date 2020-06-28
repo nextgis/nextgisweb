@@ -75,14 +75,14 @@ class WaitForServiceCommand(Command):
             if hasattr(comp, 'is_service_ready')]
 
         messages = dict()
+
         def log_messages(logfunc):
             for comp, it in components:
                 if messages[comp] is not None:
                     logfunc(
                         "Message from [%s]: %s",
-                        comp.identity, 
+                        comp.identity,
                         messages[comp])
-
 
         start = datetime.now()
         timeout = start + timedelta(seconds=args.timeout)
@@ -155,7 +155,7 @@ class BackupCommand(Command):
                 except Exception:
                     rmtree(tmpdir)
                     raise
-                    
+
         else:
             @contextmanager
             def tgt_context():
