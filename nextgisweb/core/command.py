@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import sys
 import os
 import os.path
 import logging
+import fileinput
 from os.path import join as pthjoin
 from datetime import datetime, timedelta
 from time import sleep
@@ -13,6 +15,7 @@ from backports.tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
 
 import transaction
+import unicodecsv as csv
 
 from .. import geojson
 from ..command import Command
@@ -219,6 +222,57 @@ class RestoreCommand(Command):
         logger.debug("Decompressing '%s' to '%s'...", src, dst)
         with ZipFile(src, 'r') as zipf:
             zipf.extractall(dst)
+
+
+@Command.registry.register
+class SQLCommand(Command):
+    identity = 'sql'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        parser.add_argument(
+            'query', type=str, nargs='?', default='',
+            help="SQL query to execute")
+
+        parser.add_argument(
+            '-f', '--file', type=str, nargs='*',
+            help="SQL script from given file")
+
+        parser.add_argument(
+            '-r', '--result', action='store_const', const=True, default=False,
+            help="Print query result to stdout as CSV")
+
+    @classmethod
+    def execute(cls, args, env):
+        con = DBSession.connection()
+        con.begin()
+
+        def _execute(sql):
+            return con.execute(sql)
+
+        sql = args.query
+
+        if sql == '':
+            finput = fileinput.input(args.file if args.file is not None else ['-', ])
+
+            for line in finput:
+                if finput.isfirstline() and sql != '':
+                    res = _execute(sql)
+                    sql = ''
+                sql = sql + '\n' + line
+        elif args.file is not None:
+            raise RuntimeError("Option -f or --file should not be used with query argument")
+
+        if sql != '':
+            res = _execute(sql)
+
+        if args.result:
+            w = csv.writer(sys.stdout, encoding='utf-8')
+            w.writerow(res.keys())
+            for row in res.fetchall():
+                w.writerow(row)
+
+        con.execute('COMMIT')
 
 
 @Command.registry.register
