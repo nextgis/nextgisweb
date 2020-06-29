@@ -81,7 +81,7 @@ class AuthComponent(Component):
                 def update_last_activity(request):
                     with transaction.manager:
                         DBSession.query(User).filter_by(
-                            id=user.id, last_activity=user.last_activity
+                            principal_id=user.id, last_activity=user.last_activity
                         ).update(dict(last_activity=datetime.utcnow()))
                 request.add_finished_callback(update_last_activity)
 
