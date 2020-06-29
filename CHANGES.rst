@@ -1,6 +1,11 @@
 Changes
 =======
 
+3.4.1
+-----
+
+- Fix layout scroll bug in vector layer fields editing.
+
 3.4.0
 -----
 
