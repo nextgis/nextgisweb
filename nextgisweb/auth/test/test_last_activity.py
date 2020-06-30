@@ -16,7 +16,7 @@ def revert_delta(env):
 
 
 def test_last_activity(env, webapp, revert_delta):
-    epsilon = timedelta(milliseconds=10000)
+    epsilon = timedelta(milliseconds=500)
 
     env.auth.options['activity_delta'] = 0
     webapp.get('/resource/0', status='*')
