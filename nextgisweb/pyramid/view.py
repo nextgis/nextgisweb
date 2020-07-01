@@ -20,7 +20,13 @@ def home(request):
         home_path = None
 
     if home_path is not None:
-        return HTTPFound(request.application_url + home_path)
+        if home_path.lower().startswith(('http://', 'https://')):
+            url = home_path
+        elif home_path.startswith('/'):
+            url = request.application_url + home_path
+        else:
+            url = request.application_url + '/' + home_path
+        return HTTPFound(url)
     else:
         return HTTPFound(location=request.route_url('resource.show', id=0))
 
