@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from datetime import datetime, timedelta
 
+from sqlalchemy import text as sa_text
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
 import transaction
@@ -106,11 +107,27 @@ class AuthComponent(Component):
         api.setup_pyramid(self, config)
 
     def query_stat(self):
-        user_stat = DBSession.query(
-            db.func.count(User.id),
+        user_count = DBSession.query(db.func.count(User.id)).scalar()
+
+        last_activity_all = DBSession.query(
+            db.func.max(User.last_activity)).scalar()
+
+        last_activity_authenticated = DBSession.query(
             db.func.max(User.last_activity)
-        ).one()
-        return dict(zip(('user_count', 'last_activity'), user_stat))
+        ).filter(User.keyname != 'guest').scalar()
+
+        last_activity_administrator = DBSession.connection().execute(
+            sa_text('''SELECT max(au.last_activity)
+                       FROM auth_group as ag
+                       INNER JOIN auth_group_user as agu ON agu.group_id = ag.principal_id
+                       INNER JOIN auth_user as au ON au.principal_id = agu.user_id
+                       WHERE ag.keyname = :group_name'''), group_name='administrators').scalar()
+        return dict(
+            user_count=user_count,
+            last_activity_all=last_activity_all,
+            last_activity_authenticated=last_activity_authenticated,
+            last_activity_administrator=last_activity_administrator
+        )
 
     def initialize_user(self, keyname, display_name, **kwargs):
         """ Checks is user with keyname exists in DB and
