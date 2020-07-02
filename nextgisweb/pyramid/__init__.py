@@ -30,6 +30,8 @@ from .util import (
     JsonPredicate,
     persistent_secret)
 from .auth import AuthenticationPolicy
+from .model import Base
+from .session import session_factory
 from . import exception
 
 __all__ = ['viewargs', ]
@@ -40,6 +42,7 @@ DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])
 
 class PyramidComponent(Component):
     identity = 'pyramid'
+    metadata = Base.metadata
 
     def make_app(self, settings=None):
         settings = dict(self._settings, **settings)
@@ -239,6 +242,9 @@ class PyramidComponent(Component):
         config.add_request_method(amd_base, 'amd_base', property=True, reify=True)
 
         config.add_renderer('json', json_renderer)
+
+        # Sessions
+        config.set_session_factory(session_factory())
 
         return config
 

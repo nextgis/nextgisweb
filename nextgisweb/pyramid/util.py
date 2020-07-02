@@ -6,6 +6,7 @@ import os.path
 import errno
 import fcntl
 import six
+from calendar import timegm
 
 from ..i18n import trstring_factory
 
@@ -120,3 +121,7 @@ def header_encoding_tween_factory(handler, registry):
         return response
 
     return header_encoding_tween
+
+
+def datetime_to_unix(dt):
+    return timegm(dt.timetuple())
