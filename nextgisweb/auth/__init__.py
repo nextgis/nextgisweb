@@ -116,12 +116,10 @@ class AuthComponent(Component):
             db.func.max(User.last_activity)
         ).filter(User.keyname != 'guest').scalar()
 
-        last_activity_administrator = DBSession.connection().execute(
-            sa_text('''SELECT max(au.last_activity)
-                       FROM auth_group as ag
-                       INNER JOIN auth_group_user as agu ON agu.group_id = ag.principal_id
-                       INNER JOIN auth_user as au ON au.principal_id = agu.user_id
-                       WHERE ag.keyname = :group_name'''), group_name='administrators').scalar()
+        last_activity_administrator = DBSession.query(
+            db.func.max(User.last_activity)
+        ).filter(User.member_of.any(keyname='administrators')).scalar()
+
         return dict(
             user_count=user_count,
             last_activity_all=last_activity_all,
