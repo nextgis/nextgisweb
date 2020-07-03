@@ -82,9 +82,7 @@ def cors_tween_factory(handler, registry):
                     # http://www.w3.org/TR/cors/#resource-preflight-requests
 
                     hadd(response, 'Access-Control-Allow-Methods', method)
-
-                    if '*' not in olist:
-                        hadd(response, 'Access-Control-Allow-Credentials', 'true')
+                    hadd(response, 'Access-Control-Allow-Credentials', 'true')
 
                     # Add allowed Authorization header for HTTP authentication
                     # from JavaScript. It is a good idea?
@@ -97,8 +95,7 @@ def cors_tween_factory(handler, registry):
 
                     def set_cors_headers(request, response):
                         hadd(response, 'Access-Control-Allow-Origin', origin)
-                        if '*' not in olist:
-                            hadd(response, 'Access-Control-Allow-Credentials', 'true')
+                        hadd(response, 'Access-Control-Allow-Credentials', 'true')
 
                     request.add_response_callback(set_cors_headers)
 
