@@ -3,7 +3,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import text as sa_text
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
 import transaction
@@ -109,22 +108,21 @@ class AuthComponent(Component):
     def query_stat(self):
         user_count = DBSession.query(db.func.count(User.id)).scalar()
 
-        last_activity_all = DBSession.query(
-            db.func.max(User.last_activity)).scalar()
+        la_everyone = DBSession.query(db.func.max(User.last_activity)).scalar()
 
-        last_activity_authenticated = DBSession.query(
-            db.func.max(User.last_activity)
-        ).filter(User.keyname != 'guest').scalar()
+        la_authenticated = DBSession.query(db.func.max(User.last_activity)).filter(
+            User.keyname != 'guest').scalar()
 
-        last_activity_administrator = DBSession.query(
-            db.func.max(User.last_activity)
-        ).filter(User.member_of.any(keyname='administrators')).scalar()
+        la_administrator = DBSession.query(db.func.max(User.last_activity)).filter(
+            User.member_of.any(keyname='administrators')).scalar()
 
         return dict(
             user_count=user_count,
-            last_activity_all=last_activity_all,
-            last_activity_authenticated=last_activity_authenticated,
-            last_activity_administrator=last_activity_administrator
+            last_activity=dict(
+                everyone=la_everyone,
+                authenticated=la_authenticated,
+                administrator=la_administrator,
+            )
         )
 
     def initialize_user(self, keyname, display_name, **kwargs):
