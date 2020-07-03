@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function
 
 from ngwdocker import PackageBase
 
+
 class Package(PackageBase):
 
     def debpackages(self):

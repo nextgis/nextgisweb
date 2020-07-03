@@ -27,7 +27,7 @@ requires = [
     'flufl.enum==4.1.1',
     'waitress==1.2.0',
     'pygdal' + (('==%s.*' % gv) if gv else ''),
-    'psycopg2-binary==2.7.7',
+    'psycopg2==2.8.5',
     'geoalchemy2==0.5.0',
     'shapely==1.6.4.post2',
     'affine==2.2.2',
