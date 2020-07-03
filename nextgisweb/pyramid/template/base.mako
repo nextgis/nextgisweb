@@ -24,19 +24,29 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    %if request.env.core.options['enable_snippets']:
-        <meta property="og:description" content="${tr(_('Your Web GIS at nextgis.com'))}"/>
-    %endif
+    <%
+        preview_link = 'https://nextgis.ru/img/webgis-for-social.png' \
+            if request.env.core.options['enable_snippets'] else None
+        description = tr(_('Your Web GIS at nextgis.com')) \
+            if request.env.core.options['enable_snippets'] else None
 
-    <% has_preview = hasattr(request, 'context') and \
-        request.context.social is not None and \
-        request.context.social.preview_fileobj is not None %>
-    %if request.env.core.options['enable_snippets'] or has_preview:
+        social = request.context.social if hasattr(request, 'context') else None
+        if social is not None:
+            if social.preview_fileobj is not None:
+                preview_link = request.route_url('resource.preview', id=request.context.id)
+            if social.preview_description is not None:
+                description = social.preview_description
+    %>
+
+    %if preview_link is not None or description is not None:
         <meta property="og:title" content="${page_title}"/>
         <meta property="og:url" content="${request.url}"/>
-        <% preview_link = request.route_url('resource.preview', id=request.context.id) \
-            if has_preview else 'https://nextgis.ru/img/webgis-for-social.png'%>
-        <meta property="og:image" content="${preview_link}"/>
+        %if preview_link is not None:
+            <meta property="og:image" content="${preview_link}"/>
+        %endif
+        %if description is not None:
+            <meta property="og:description" content="${description}"/>
+        %endif
     %endif
 
     <link href="${request.route_url('pyramid.favicon')}"

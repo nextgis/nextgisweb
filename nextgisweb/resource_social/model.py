@@ -25,6 +25,7 @@ class ResourceSocial(Base):
 
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     preview_fileobj_id = db.Column(db.ForeignKey(FileObj.id))
+    preview_description = db.Column(db.Unicode)
 
     resource = db.relationship(Resource, backref=db.backref(
         'social', cascade='all, delete-orphan', uselist=False, lazy='joined'))
@@ -52,8 +53,21 @@ class _preview_file_upload_attr(SP):
             social.preview_fileobj = fileobj
 
 
+class _preview_description_attr(SP):
+
+    def getter(self, srlzr):
+        return srlzr.obj.social.preview_description if srlzr.obj.social is not None else None
+
+    def setter(self, srlzr, value):
+        if srlzr.obj.social is None:
+            srlzr.obj.social = ResourceSocial()
+        srlzr.obj.social.preview_description = value
+
+
 class ResourceSocialSerializer(Serializer):
     identity = COMP_ID
     resclass = Resource
 
     preview_file_upload = _preview_file_upload_attr(write=MetadataScope.write)
+    preview_description = _preview_description_attr(
+        read=MetadataScope.read, write=MetadataScope.write)

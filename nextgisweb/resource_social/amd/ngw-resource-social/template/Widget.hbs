@@ -1,14 +1,26 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
     data-ngw-serialize-prefix="resource_social" title="Слой" class="padding-block">
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels: false">
 
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels: false">
         <div data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wPreviewFile"
              data-dojo-props="uploaderLinkText: '{{gettext 'Select a preview image'}}',
-                              uploaderHelpText: '{{gettext 'An image should be in a PNG format.'}}'
-             "></div>
+                              uploaderHelpText: '{{gettext 'An image should be in a PNG format.'}}'"
+             title="{{gettext 'Preview image'}}"></div>
 
-        <button data-dojo-type="dijit/form/Button" data-dojo-attach-point="buttonRestore"
-            class="dijitButton--primary">{{gettext 'Restore default'}}</button>
 
+        <div data-dojo-type="dijit/layout/ContentPane" style="padding: 0 0 10px 0;">
+            <button data-dojo-type="dijit/form/Button" data-dojo-attach-point="buttonRestoreImage"
+                class="dijitButton--primary">{{gettext 'Restore default image'}}</button>
+        </div>
     </div>
+
+    <hr>
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels: true">
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-attach-point="wPreviewDescription"
+            data-ngw-serialize="preview_description"
+            title="{{gettext 'Preview description'}}" style="width: 100%"></div>
+    </div>
+
 </div>

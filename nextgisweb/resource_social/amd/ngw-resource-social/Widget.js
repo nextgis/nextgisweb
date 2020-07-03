@@ -29,13 +29,13 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            this._restoreDefaultPreview = false;
+            this._restoreDefaultImage = false;
 
-            this.buttonRestore.on("click", function () {
-                this._restoreDefaultPreview = true;
+            this.buttonRestoreImage.on("click", function () {
+                this._restoreDefaultImage = true;
 
-                // FIXME: there is no method for uploader reset
-                this.wPreviewFile.destroy();
+                this.wPreviewFile.destroy(); // FIXME: there is no method for uploader reset
+                this.buttonRestoreImage.destroy();
             }.bind(this));
         },
 
@@ -44,10 +44,15 @@ define([
                 data[this.identity] = {};
             }
 
-            if (this._restoreDefaultPreview) {
+            if (this._restoreDefaultImage) {
                 data[this.identity].preview_file_upload = null;
             } else if (this.wPreviewFile.data) {
                 data[this.identity].preview_file_upload = this.wPreviewFile.data;
+            }
+
+            var description = this.wPreviewDescription.get("value");
+            if (description === '') {
+                data[this.identity].preview_description = null;
             }
         }
     });
