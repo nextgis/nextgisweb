@@ -1,6 +1,13 @@
 Changes
 =======
 
+3.5.0
+-----
+
+- Track timestamps for user last activity.
+- Fix bug in CORS implementation for requests returning errors.
+
+
 3.4.1
 -----
 
