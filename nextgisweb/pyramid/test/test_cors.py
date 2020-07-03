@@ -15,10 +15,19 @@ bad_domains = [
 
 @pytest.fixture()
 def cors_settings(env):
-    value = env.core.settings_get('pyramid', 'cors_allow_origin')
+    try:
+        value = env.core.settings_get('pyramid', 'cors_allow_origin')
+    except KeyError:
+        value = None
+
     env.core.settings_set('pyramid', 'cors_allow_origin', good_domains)
+
     yield
-    env.core.settings_set('pyramid', 'cors_allow_origin', value)
+
+    if value is not None:
+        env.core.settings_set('pyramid', 'cors_allow_origin', value)
+    else:
+        env.core.settings_delete('pyramid', 'cors_allow_origin')
 
 
 @pytest.mark.parametrize('domain, resource_exists, expected_ok', (
