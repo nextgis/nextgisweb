@@ -48,10 +48,7 @@ def cors_tween_factory(handler, registry):
         # and terminate this set of steps. The request is outside
         # the scope of this specification.
         # http://www.w3.org/TR/cors/#resource-preflight-requests
-        if (is_api and origin is not None and method is not None and
-                request.method == 'OPTIONS'):
-            # TODO: Add route matching othervise OPTIONS can return 200 OK
-            # other method 404 Not found
+        if is_api and origin is not None:
 
             olist = _get_cors_olist()
 
@@ -61,47 +58,47 @@ def cors_tween_factory(handler, registry):
             # headers and terminate this set of steps.
             # http://www.w3.org/TR/cors/#resource-preflight-requests
             if olist is not None and origin in olist:
-                response = Response(content_type='text/plain')
 
-                def hadd(n, v):
+                def hadd(response, n, v):
                     response.headerlist.append((str(n), str(v)))
 
-                # The Origin header can only contain a single origin as
-                # the user agent will not follow redirects.
-                # http://www.w3.org/TR/cors/#resource-preflight-requests
-                hadd('Access-Control-Allow-Origin', origin)
+                if method is not None and request.method == 'OPTIONS':
 
-                # Add one or more Access-Control-Allow-Methods headers
-                # consisting of (a subset of) the list of methods.
-                # Since the list of methods can be unbounded,
-                # simply returning the method indicated by
-                # Access-Control-Request-Method (if supported) can be enough.
-                # http://www.w3.org/TR/cors/#resource-preflight-requests
-                hadd('Access-Control-Allow-Methods', method)
+                    response = Response(content_type='text/plain')
 
-                if '*' not in olist:
-                    hadd('Access-Control-Allow-Credentials', 'true')
+                    # The Origin header can only contain a single origin as
+                    # the user agent will not follow redirects.
+                    # http://www.w3.org/TR/cors/#resource-preflight-requests
+                    hadd(response, 'Access-Control-Allow-Origin', origin)
 
-                # Add allowed Authorization header for HTTP authentication
-                # from JavaScript. It is a good idea?
-                hadd('Access-Control-Allow-Headers', 'Authorization')
+                    # Add one or more Access-Control-Allow-Methods headers
+                    # consisting of (a subset of) the list of methods.
+                    # Since the list of methods can be unbounded,
+                    # simply returning the method indicated by
+                    # Access-Control-Request-Method (if supported) can be enough.
+                    # http://www.w3.org/TR/cors/#resource-preflight-requests
+                    hadd(response, 'Access-Control-Allow-Methods', method)
 
-                return response
+                    if '*' not in olist:
+                        hadd(response, 'Access-Control-Allow-Credentials', 'true')
+
+                    # Add allowed Authorization header for HTTP authentication
+                    # from JavaScript. It is a good idea?
+                    hadd(response, 'Access-Control-Allow-Headers', 'Authorization')
+
+                    return response
+
+                else:
+
+                    def set_cors_headers(request, response):
+                        hadd(response, 'Access-Control-Allow-Origin', origin)
+                        if '*' not in olist:
+                            hadd(response, 'Access-Control-Allow-Credentials', 'true')
+
+                    request.add_response_callback(set_cors_headers)
 
         # Run default request handler
         response = handler(request)
-
-        if is_api and origin is not None:
-            olist = _get_cors_olist()
-
-            if olist is not None and origin in olist:
-                response.headerlist.append((
-                    str('Access-Control-Allow-Origin'),
-                    str(origin)))
-                if '*' not in olist:
-                    response.headerlist.append((
-                        str('Access-Control-Allow-Credentials'),
-                        str('true')))
 
         return response
 
