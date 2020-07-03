@@ -29,15 +29,15 @@ def cors_tween_factory(handler, registry):
     """ Tween adds Access-Control-* headers for simple and preflighted
     CORS requests """
 
+    def hadd(response, n, v):
+        response.headerlist.append((str(n), str(v)))
+
     def cors_tween(request):
         # Only request under /api/ are handled
         is_api = request.path_info.startswith('/api/')
 
         # Origin header required in CORS requests
         origin = request.headers.get('Origin')
-
-        # Access-Control-Request-Method header of preflight request
-        method = request.headers.get('Access-Control-Request-Method')
 
         # If the Origin header is not present terminate this set of
         # steps. The request is outside the scope of this specification.
@@ -48,6 +48,7 @@ def cors_tween_factory(handler, registry):
         # and terminate this set of steps. The request is outside
         # the scope of this specification.
         # http://www.w3.org/TR/cors/#resource-preflight-requests
+
         if is_api and origin is not None:
 
             olist = _get_cors_olist()
@@ -57,10 +58,11 @@ def cors_tween_factory(handler, registry):
             # in list of origins do not set any additional
             # headers and terminate this set of steps.
             # http://www.w3.org/TR/cors/#resource-preflight-requests
+
             if olist is not None and origin in olist:
 
-                def hadd(response, n, v):
-                    response.headerlist.append((str(n), str(v)))
+                # Access-Control-Request-Method header of preflight request
+                method = request.headers.get('Access-Control-Request-Method')
 
                 if method is not None and request.method == 'OPTIONS':
 
@@ -69,6 +71,7 @@ def cors_tween_factory(handler, registry):
                     # The Origin header can only contain a single origin as
                     # the user agent will not follow redirects.
                     # http://www.w3.org/TR/cors/#resource-preflight-requests
+
                     hadd(response, 'Access-Control-Allow-Origin', origin)
 
                     # Add one or more Access-Control-Allow-Methods headers
@@ -77,6 +80,7 @@ def cors_tween_factory(handler, registry):
                     # simply returning the method indicated by
                     # Access-Control-Request-Method (if supported) can be enough.
                     # http://www.w3.org/TR/cors/#resource-preflight-requests
+
                     hadd(response, 'Access-Control-Allow-Methods', method)
 
                     if '*' not in olist:
@@ -84,6 +88,7 @@ def cors_tween_factory(handler, registry):
 
                     # Add allowed Authorization header for HTTP authentication
                     # from JavaScript. It is a good idea?
+
                     hadd(response, 'Access-Control-Allow-Headers', 'Authorization')
 
                     return response
@@ -98,9 +103,7 @@ def cors_tween_factory(handler, registry):
                     request.add_response_callback(set_cors_headers)
 
         # Run default request handler
-        response = handler(request)
-
-        return response
+        return handler(request)
 
     return cors_tween
 
