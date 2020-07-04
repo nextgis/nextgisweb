@@ -47,11 +47,6 @@
 
     <link href="${request.route_url('pyramid.custom_css')}" rel="stylesheet" type="text/css"/>
 
-    %if 'sentry_url' in request.env.pyramid.options:
-        <%include file="nextgisweb:pyramid/template/sentry.mako" />
-    %endif
-
-
     <script type="text/javascript">
         var ngwConfig = {
             applicationUrl: ${request.application_url | json.dumps, n},
