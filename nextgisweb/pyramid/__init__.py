@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import base64
 import sys
 import os.path
 import re
@@ -171,7 +170,7 @@ class PyramidComponent(Component):
             from pip import main as pip_main
 
         stdout = sys.stdout
-        static_key = ''
+        self.static_key = ''
 
         try:
             buf = StringIO()
@@ -181,7 +180,7 @@ class PyramidComponent(Component):
                 pip_main(['freeze', ])
             h = md5()
             h.update(buf.getvalue().encode('utf-8'))
-            static_key = '/' + h.hexdigest()
+            self.static_key = '/' + h.hexdigest()
         finally:
             sys.stdout = stdout
 
@@ -213,13 +212,6 @@ class PyramidComponent(Component):
                 self.distinfo.append(dinfo)
             else:
                 self.logger.warn("Could not parse pip freeze line: %s", line)
-
-        config.add_static_view(
-            '/static%s/asset' % static_key,
-            'nextgisweb:static', cache_max_age=3600)
-
-        config.add_route('amd_package', '/static%s/amd/*subpath' % static_key) \
-            .add_view('nextgisweb.views.amd_package')
 
         chain = self._env.chain('setup_pyramid', first='pyramid')
         for comp in chain:

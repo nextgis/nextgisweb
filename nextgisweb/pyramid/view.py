@@ -1,16 +1,49 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import sys
+import errno
 import os.path
 from time import sleep
 from datetime import datetime, timedelta
+from pkg_resources import resource_filename
+from six import reraise
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from .. import dynmenu as dm
 from ..core.exception import UserException
+from ..package import amd_packages
+from ..compat import lru_cache
 
 from .util import _
+
+
+def static_amd_file(request):
+    subpath = request.matchdict['subpath']
+    amd_package_name = subpath[0]
+    amd_package_path = '/'.join(subpath[1:])
+
+    ap_base_path = _amd_package_path(amd_package_name)
+    if ap_base_path is None:
+        raise HTTPNotFound()
+
+    try:
+        return FileResponse(
+            os.path.join(ap_base_path, amd_package_path),
+            cache_max_age=3600, request=request)
+    except (OSError, IOError) as exc:
+        if exc.errno in (errno.ENOENT, errno.EISDIR):
+            raise HTTPNotFound()
+        reraise(*sys.exc_info())
+
+
+@lru_cache(maxsize=64)
+def _amd_package_path(name):
+    for p, asset in amd_packages():
+        if p == name:
+            py_package, path = asset.split(':', 1)
+            return resource_filename(py_package, path)
 
 
 def home(request):
@@ -172,6 +205,13 @@ def test_timeout(reqest):
 
 
 def setup_pyramid(comp, config):
+    config.add_static_view(
+        '/static{}/asset'.format(comp.static_key),
+        'nextgisweb:static', cache_max_age=3600)
+
+    config.add_route('amd_package', '/static{}/amd/*subpath'.format(comp.static_key)) \
+        .add_view(static_amd_file)
+
     config.add_route('home', '/').add_view(home)
 
     def ctpl(n):
@@ -261,5 +301,6 @@ def setup_pyramid(comp, config):
     )
 
     if comp.options['backup.download']:
-        comp.control_panel.add(dm.Link('info/backups', _("Backups"), lambda args: 
+        comp.control_panel.add(dm.Link(
+            'info/backups', _("Backups"), lambda args:
             args.request.route_url('pyramid.control_panel.backup.browse')))
