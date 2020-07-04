@@ -144,7 +144,12 @@ def cors_put(request):
 
 
 def system_name_get(request):
-    return dict(full_name=env.core.settings_get('core', 'system.full_name'))
+    try:
+        full_name = env.core.settings_get('core', 'system.full_name')
+    except KeyError:
+        full_name = None
+
+    return dict(full_name=full_name)
 
 
 def system_name_put(request):
@@ -153,10 +158,10 @@ def system_name_put(request):
     body = request.json_body
     for k, v in body.items():
         if k == 'full_name':
-            if v is None:
-                v = ''
-
-            env.core.settings_set('core', 'system.full_name', v)
+            if v is not None and v != "":
+                env.core.settings_set('core', 'system.full_name', v)
+            else:
+                env.core.settings_delete('core', 'system.full_name')
         else:
             raise HTTPBadRequest("Invalid key '%s'" % k)
 
