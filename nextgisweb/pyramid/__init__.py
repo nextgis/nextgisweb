@@ -30,7 +30,7 @@ from .util import (
     JsonPredicate,
     persistent_secret)
 from .auth import AuthenticationPolicy
-from .model import Base
+from .model import Base, Session, SessionStore
 from .session import session_factory
 from . import exception
 
@@ -278,6 +278,11 @@ class PyramidComponent(Component):
             link=self.company_url_view(request))
 
         return result
+
+    def backup_configure(self, config):
+        super(PyramidComponent, self).backup_configure(config)
+        config.exclude_table_data('public', Session.__tablename__)
+        config.exclude_table_data('public', SessionStore.__tablename__)
 
     option_annotations = (
         Option('secret', doc="Cookies encryption key (deprecated)."),
