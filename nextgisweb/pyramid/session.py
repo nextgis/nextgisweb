@@ -19,7 +19,6 @@ cookie_settings = dict(
     max_age=None,
     path='/',
     domain=None,
-    secure=True,
     httponly=True,
     samesite='Lax'
 )
@@ -79,6 +78,7 @@ class WebSession(dict):
 
                 session.persist()
 
+            cookie_settings['secure'] = request.scheme == 'https'
             response.set_cookie(cookie_name, value=session.id, **cookie_settings)
 
         request.add_response_callback(check_save)
