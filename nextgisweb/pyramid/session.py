@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 import six
@@ -16,7 +16,6 @@ from .util import datetime_to_unix
 
 cookie_name = 'session'
 cookie_settings = dict(
-    max_age=None,
     path='/',
     domain=None,
     httponly=True,
@@ -27,11 +26,15 @@ cookie_settings = dict(
 @implementer(ISession)
 class WebSession(dict):
     def __init__(self, request):
+        self._max_age = request.env.pyramid.options['session.max_age']
         self._session_id = request.cookies.get(cookie_name)
         if self._session_id is not None:
             try:
                 # Init session from DB
-                session = Session.filter_by(id=self._session_id).one()
+                actual_date = datetime.utcnow() - timedelta(seconds=self._max_age)
+                session = Session.filter(
+                    Session.id == self._session_id,
+                    Session.last_activity > actual_date).one()
                 for session_kv in session.store:
                     self[session_kv.key] = session_kv.value
                 self.new = False
@@ -79,6 +82,7 @@ class WebSession(dict):
                 session.persist()
 
             cookie_settings['secure'] = request.scheme == 'https'
+            cookie_settings['max_age'] = self._max_age
             response.set_cookie(cookie_name, value=session.id, **cookie_settings)
 
         request.add_response_callback(check_save)

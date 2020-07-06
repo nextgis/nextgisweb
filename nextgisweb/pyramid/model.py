@@ -18,7 +18,8 @@ class Session(Base):
 class SessionStore(Base):
     __tablename__ = 'session_store'
 
-    session_id = db.Column(db.Unicode, db.ForeignKey(Session.id), primary_key=True)
+    session_id = db.Column(db.Unicode, db.ForeignKey(Session.id, ondelete='cascade'),
+                           primary_key=True)
     key = db.Column(db.Unicode(32), primary_key=False)
     value = db.Column(db.Unicode, nullable=False)
 

@@ -6,6 +6,7 @@ import re
 import warnings
 import string
 import secrets
+from datetime import datetime as dt, timedelta
 from hashlib import md5
 from pkg_resources import resource_filename, get_distribution
 from collections import namedtuple
@@ -16,6 +17,7 @@ from pyramid.events import BeforeRender
 
 import pyramid_tm
 import pyramid_mako
+import transaction
 
 from ..lib.config import Option
 from ..package import pkginfo
@@ -279,6 +281,19 @@ class PyramidComponent(Component):
 
         return result
 
+    def maintenance(self):
+        super(PyramidComponent, self).maintenance()
+        self.cleanup()
+
+    def cleanup(self):
+        self.logger.info("Cleaning up sessions...")
+
+        with transaction.manager:
+            actual_date = dt.utcnow() - timedelta(seconds=self.options['session.max_age'])
+            deleted_sessions = Session.filter(Session.last_activity < actual_date).delete()
+
+        self.logger.info("Deleted: %d sessions", deleted_sessions)
+
     def backup_configure(self, config):
         super(PyramidComponent, self).backup_configure(config)
         config.exclude_table_data('public', Session.__tablename__)
@@ -291,6 +306,9 @@ class PyramidComponent(Component):
         Option('help_page.enabled', bool, default=True),
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
+
+        Option('session.max_age', int, default=timedelta(days=7).total_seconds(),
+               doc="Session lifetime in seconds."),
 
         Option('backup.download', bool, default=False),
 
