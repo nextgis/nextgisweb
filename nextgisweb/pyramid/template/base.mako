@@ -25,7 +25,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <%
-        preview_link = 'https://nextgis.ru/img/webgis-for-social.png' \
+        preview_link = request.static_url('nextgisweb:static/img/webgis-for-social.png') \
             if request.env.core.options['enable_snippets'] else None
         description = tr(_('Your Web GIS at nextgis.com')) \
             if request.env.core.options['enable_snippets'] else None
