@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import base64
 import sys
 import os.path
 import re
@@ -33,7 +32,7 @@ from .util import (
     persistent_secret)
 from .auth import AuthenticationPolicy
 from .model import Base, Session, SessionStore
-from .session import session_factory
+from .session import WebSession
 from . import exception
 
 __all__ = ['viewargs', ]
@@ -246,7 +245,7 @@ class PyramidComponent(Component):
         config.add_renderer('json', json_renderer)
 
         # Sessions
-        config.set_session_factory(session_factory())
+        config.set_session_factory(WebSession)
 
         return config
 

@@ -25,7 +25,11 @@ def webapp(env):
 
         for k, v in body.items():
             if k.startswith(prefix):
-                request.session[k] = v
+                if v is None:
+                    if k in request.session:
+                        del request.session[k]
+                else:
+                    request.session[k] = v
 
         return Response()
 
@@ -58,10 +62,24 @@ def read_store(session_id):
     return result
 
 
-def test_session(webapp):
-    kv = dict(_test_A='A')
+def test_session_kv(webapp):
+    kv = dict(_test_A='A', _test_B='B1')
     res = webapp.post_json('/test/session_kv', kv)
-
     session_id = get_session_id(res)
     assert session_id is not None
+    assert read_store(session_id) == kv
+
+    headers = dict(cookie=str('session=%s' % session_id))
+    kv['_test_B'] = 'B2'
+    webapp.post_json('/test/session_kv', kv, headers=headers)
+    assert get_session_id(res) == session_id
+    assert read_store(session_id) == kv
+
+    part = dict(_test_B='B2')
+    webapp.post_json('/test/session_kv', part, headers=headers)
+    kv.update(part)
+    assert read_store(session_id) == kv
+
+    webapp.post_json('/test/session_kv', dict(_test_B=None), headers=headers)
+    del kv['_test_B']
     assert read_store(session_id) == kv
