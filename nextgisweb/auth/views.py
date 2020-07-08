@@ -4,7 +4,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import string
 import secrets
 
-from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPBadRequest
@@ -18,6 +17,7 @@ from .. import dynmenu as dm
 
 from .models import Principal, User, Group, UserDisabled
 
+from .exception import InvalidCredentialsException, DisabledUserException
 from .util import _
 
 
@@ -26,23 +26,15 @@ def login(request):
 
     if request.method == 'POST':
         try:
-            user = User.filter_by(
-                keyname=request.POST['login'].strip()).one()
+            user = request.env.auth.authenticate_with_password(
+                username=request.POST['login'].strip(),
+                password=request.POST['password'])
 
-            if user.password == request.POST['password']:
-                headers = remember(request, user.id)
-                if user.disabled:
-                    return dict(
-                        error=_("Account disabled"),
-                        next_url=next_url)
-                return HTTPFound(location=next_url, headers=headers)
-            else:
-                raise NoResultFound()
+            headers = remember(request, user.id)
+            return HTTPFound(location=next_url, headers=headers)
 
-        except NoResultFound:
-            return dict(
-                error=_("Invalid login or password!"),
-                next_url=next_url)
+        except (InvalidCredentialsException, DisabledUserException) as exc:
+            return dict(error=exc.title, next_url=next_url)
 
     return dict(next_url=next_url)
 
@@ -67,7 +59,7 @@ def oauth(request):
         except KeyError:
             raise HTTPBadRequest()
 
-        access_token = oaserver.get_access_token(
+        access_token = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
 
         user = oaserver.get_user(access_token)

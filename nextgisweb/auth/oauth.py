@@ -15,6 +15,9 @@ class OAuthServer(object):
 
     def __init__(self, options):
         self.register = options['register']
+        self.password = options['password']
+        self.local_auth = options['local_auth']
+
         self.client_id = options['client_id']
         self.client_secret = options['client_secret']
 
@@ -28,6 +31,10 @@ class OAuthServer(object):
         self.userinfo_keyname = options['userinfo.keyname']
         self.userinfo_display_name = options['userinfo.display_name']
 
+        self.endpoint_headers = {}
+        if 'endpoint_authorization' in options:
+            self.endpoint_headers['Authorization'] = options['endpoint_authorization']
+
     def authorization_code_url(self, redirect_uri, **kwargs):
         qs = dict(
             client_id=self.client_id,
@@ -40,23 +47,30 @@ class OAuthServer(object):
 
         return self.auth_endpoint + '?' + urlencode(qs)
 
-    def get_access_token(self, code, redirect_uri):
-        response = requests.post(self.token_endpoint, dict(
-            grant_type='authorization_code',
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            redirect_uri=redirect_uri,
-            code=code
-        ))
+    def grant_type_password(self, username, password):
+        params = dict(grant_type='password', username=username, password=password)
+        self._add_client_params(params)
+
+        response = requests.post(self.token_endpoint, params, headers=self.endpoint_headers)
+        response.raise_for_status()
+
+        tdata = response.json()
+        return tdata
+
+    def grant_type_authorization_code(self, code, redirect_uri):
+        params = dict(grant_type='authorization_code', redirect_uri=redirect_uri, code=code)
+        self._add_client_params(params)
+
+        response = requests.post(self.token_endpoint, params, headers=self.endpoint_headers)
         response.raise_for_status()
 
         data = response.json()
         return data['access_token']
 
     def query_userinfo(self, access_token):
-        response = requests.get(self.userinfo_endpoint, headers={
-            'Authorization': 'Bearer ' + access_token
-        })
+        headers = dict(self.endpoint_headers)
+        headers['Authorization'] = 'Bearer ' + access_token
+        response = requests.get(self.userinfo_endpoint, headers=headers)
         response.raise_for_status()
         return response.json()
 
@@ -65,7 +79,7 @@ class OAuthServer(object):
             client_id=self.client_id,
             client_secret=self.client_secret,
             token=access_token,
-        ))
+        ), headers=self.endpoint_headers)
         response.raise_for_status()
         return response.json()
 
@@ -119,3 +133,10 @@ class OAuthServer(object):
                     idx += 1
 
         return user
+
+    def _add_client_params(self, params):
+        if self.client_id:
+            params['client_id'] = self.client_id
+        if self.client_secret:
+            params['client_secret'] = self.client_secret
+        return params

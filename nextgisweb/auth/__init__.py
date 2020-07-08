@@ -14,8 +14,9 @@ from .. import db
 
 from .models import Base, Principal, User, Group, UserDisabled
 from .oauth import OAuthServer
-from . import command # NOQA
+from .exception import DisabledUserException, InvalidCredentialsException
 from .util import _
+from . import command # NOQA
 
 __all__ = ['Principal', 'User', 'Group']
 
@@ -153,6 +154,35 @@ class AuthComponent(Component):
 
         return obj
 
+    def authenticate_with_password(self, username, password):
+        user = None
+
+        # Step 1: Authentication with local credentials
+
+        q = User.filter_by(keyname=username)
+        if self.oauth and not self.oauth.local_auth:
+            q = q.filter_by(oauth_subject=None)
+
+        try:
+            test_user = q.one()
+            if test_user.password == password:
+                user = test_user
+        except NoResultFound:
+            pass
+
+        # Step 2: Authentication with OAuth password if enabled
+
+        if user is None and self.oauth is not None and self.oauth.password:
+            tdata = self.oauth.grant_type_password(username, password)
+            user = self.oauth.get_user(tdata['access_token'])
+
+        if user is None:
+            raise InvalidCredentialsException()
+        elif user.disabled:
+            raise DisabledUserException()
+
+        return user
+
     option_annotations = (
         Option('register', bool, default=False, doc="Allow user registration."),
 
@@ -165,19 +195,23 @@ class AuthComponent(Component):
 
         Option('oauth.enabled', bool, default=False),
         Option('oauth.register', bool, default=False),
+        Option('oauth.local_auth', bool, default=True),
+        Option('oauth.password', bool, default=False),
 
-        Option('oauth.client_id'),
-        Option('oauth.client_secret', secure=True),
+        Option('oauth.client_id', default=None),
+        Option('oauth.client_secret', default=None, secure=True),
 
-        Option('oauth.auth_endpoint'),
+        Option('oauth.auth_endpoint', default=None),
         Option('oauth.token_endpoint'),
         Option('oauth.introspection_endpoint', default=None),
-        Option('oauth.userinfo_endpoint'),
+        Option('oauth.userinfo_endpoint', default=None),
+
+        Option('oauth.endpoint_authorization', default=None, secure=True),
 
         Option('oauth.userinfo.scope', default=None),
-        Option('oauth.userinfo.subject'),
-        Option('oauth.userinfo.keyname'),
-        Option('oauth.userinfo.display_name'),
+        Option('oauth.userinfo.subject', default=None),
+        Option('oauth.userinfo.keyname', default=None),
+        Option('oauth.userinfo.display_name', default=None),
 
         Option(
             'activity_delta', int, default=600,

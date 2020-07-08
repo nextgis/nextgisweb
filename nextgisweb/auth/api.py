@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from sqlalchemy.orm.exc import NoResultFound
-
 import json
 
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden, HTTPUnprocessableEntity
+from pyramid.httpexceptions import HTTPForbidden, HTTPUnprocessableEntity
 from pyramid.security import remember, forget
 
 from ..models import DBSession
@@ -103,27 +101,20 @@ def register(request):
 def login(request):
     if ('login' not in request.POST) or ('password' not in request.POST):
         return HTTPUnprocessableEntity()
-    try:
-        user = User.filter_by(keyname=request.POST['login'].strip()).one()
-        if user.password == request.POST['password']:
-            if user.disabled:
-                return HTTPUnauthorized()
 
-            headers = remember(request, user.id)
+    user = request.env.auth.authenticate_with_password(
+        username=request.POST['login'].strip(),
+        password=request.POST['password'])
 
-            return Response(
-                json.dumps({
-                    "keyname": user.keyname,
-                    "display_name": user.display_name,
-                    "description": user.description
-                }), status_code=200,
-                content_type='application/json',
-                headers=headers
-            )
-        else:
-            return HTTPUnauthorized()
-    except NoResultFound:
-        return HTTPUnauthorized()
+    headers = remember(request, user.id)
+    return Response(
+        json.dumps({
+            "keyname": user.keyname,
+            "display_name": user.display_name,
+            "description": user.description
+        }), status_code=200,
+        content_type='application/json',
+        headers=headers)
 
 
 def logout(request):
