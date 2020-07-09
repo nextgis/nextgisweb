@@ -640,10 +640,12 @@ def setup_pyramid(comp, config):
         factory=resource_factory) \
         .add_view(view_geojson, context=IFeatureLayer, request_method='GET')
 
-    config.add_route(
-        'feature_layer.export', '/api/resource/{id}/export',
-        factory=resource_factory) \
-        .add_view(export, context=IFeatureLayer, request_method='GET')
+    config.add_view(
+        export,
+        route_name='resource.export',
+        context=IFeatureLayer,
+        request_method='GET',
+    )
 
     config.add_route(
         'feature_layer.mvt', '/api/component/feature_layer/mvt') \

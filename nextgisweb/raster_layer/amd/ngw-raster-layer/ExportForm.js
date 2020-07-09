@@ -10,9 +10,9 @@ define([
     "dojo/data/ObjectStore",
     "dojo/request/xhr",
     "dojo/io-query",
-    "ngw/settings!feature_layer",
+    "ngw/settings!raster_layer",
     "ngw/route",
-    "ngw-pyramid/i18n!feature_layer",
+    "ngw-pyramid/i18n!raster_layer",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/ExportForm.hbs",
     // template
@@ -53,15 +53,11 @@ define([
             this.inherited(arguments);
             this.wFormat.watch('value', lang.hitch(this, function (attr, oldVal, newVal) {
                 var format = this.formatStore.get(newVal);
-                this.wZipped.set('disabled', !format.single_file);
             }));
             this.buttonSave.on('click', lang.hitch(this, function () {
                 var query = {
                     format: this.wFormat.get('value'),
-                    srs: this.wSRS.get('value'),
-                    zipped: this.wZipped.checked ? 'true' : 'false',
-                    fid: this.wFID.get('value'),
-                    encoding: this.wEncoding.get('value')
+                    srs: this.wSRS.get('value')
                 };
                 window.open(route.resource.export({
                     id: this.resid
@@ -76,8 +72,7 @@ define([
                 data: array.map(settings.export_formats, function (format) {
                     return {
                         id: format.extension,
-                        label: format.name,
-                        single_file: format.single_file
+                        label: format.name
                     }
                 })
             }));

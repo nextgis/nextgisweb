@@ -168,10 +168,7 @@ def setup_pyramid(comp, config):
         client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer)
 
-    config.add_route(
-        'feature_layer.export.page', r'/resource/{id:\d+}/export',
-        factory=resource_factory,
-    ).add_view(export, context=IFeatureLayer)
+    config.add_view(export, route_name='resource.export.page', context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.test_mvt',
@@ -194,7 +191,7 @@ def setup_pyramid(comp, config):
                 yield dm.Link(
                     'feature_layer/export', _(u"Save as"),
                     lambda args: args.request.route_url(
-                        "feature_layer.export.page",
+                        "resource.export.page",
                         id=args.obj.id))
 
     Resource.__dynmenu__.add(LayerMenuExt())
