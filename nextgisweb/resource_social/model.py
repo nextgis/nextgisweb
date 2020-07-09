@@ -39,11 +39,7 @@ class _preview_file_upload_attr(SP):
             srlzr.obj.social = ResourceSocial()
 
         social = srlzr.obj.social
-        if value is None and social.preview_fileobj is not None:
-            fileobj = social.preview_fileobj
-            social.preview_fileobj = None
-            DBSession.delete(fileobj)
-        else:
+        if value is not None:
             fileobj = env.file_storage.fileobj(component=COMP_ID)
 
             srcfile, _ = env.file_upload.get_filename(value['id'])
@@ -51,6 +47,10 @@ class _preview_file_upload_attr(SP):
 
             copyfile(srcfile, dstfile)
             social.preview_fileobj = fileobj
+        elif social.preview_fileobj is not None:
+            fileobj = social.preview_fileobj
+            social.preview_fileobj = None
+            DBSession.delete(fileobj)
 
 
 class _preview_description_attr(SP):
