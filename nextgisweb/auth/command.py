@@ -15,11 +15,11 @@ class ChangePasswordCommand():
     def argparser_setup(cls, parser, env):
         parser.add_argument(
             'keyname', type=str, metavar='user',
-            help="Имя пользователя для изменения пароля")
+            help="The user whose password needs to be changed")
 
         parser.add_argument(
             'password', type=str, metavar='password',
-            help="Новый пароль пользователя")
+            help="User's new password")
 
         # FIXME: Set new user password via command line
         # is potentially not secure, need to read from console or file.

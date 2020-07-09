@@ -35,7 +35,7 @@ class InitializeDBCmd():
     def argparser_setup(cls, parser, env):
         parser.add_argument(
             '--drop', action="store_true", default=False,
-            help="Удалить существующие объекты из БД")
+            help="Try to delete existing objects from the database")
 
     @classmethod
     def execute(cls, args, env):
@@ -198,8 +198,7 @@ class RestoreCommand(Command):
     def argparser_setup(cls, parser, env):
         parser.add_argument(
             'source', type=str, metavar='path',
-            help="Исходный файл или директория с резервной копией для"
-            + " восстановления")  # NOQA: W503
+            help="Path (file or directory) to restore backup from")
 
     @classmethod
     def execute(cls, args, env):
