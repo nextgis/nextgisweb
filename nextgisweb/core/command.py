@@ -235,12 +235,12 @@ class SQLCommand(Command):
             help="SQL query to execute")
 
         parser.add_argument(
-            '-f', '--file', type=str, nargs='*',
-            help="SQL script from given file")
+            '-f', '--file', type=str, action='append',
+            help="SQL script from given file (can be used multiple times)")
 
         parser.add_argument(
             '-r', '--result', action='store_const', const=True, default=False,
-            help="Print query result to stdout as CSV")
+            help="Print query result to stdout in CSV format")
 
     @classmethod
     def execute(cls, args, env):
@@ -260,8 +260,9 @@ class SQLCommand(Command):
                     res = _execute(sql)
                     sql = ''
                 sql = sql + '\n' + line
+
         elif args.file is not None:
-            raise RuntimeError("Option -f or --file should not be used with query argument")
+            raise RuntimeError("Option -f or --file shouldn't be used with query argument")
 
         if sql != '':
             res = _execute(sql)
