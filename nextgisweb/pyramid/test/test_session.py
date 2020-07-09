@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+from datetime import datetime, timedelta
+
+from freezegun import freeze_time
 import pytest
 import transaction
 from pyramid.response import Response
@@ -83,3 +86,34 @@ def test_session_kv(webapp):
     webapp.post_json('/test/session_kv', dict(_test_B=None), headers=headers)
     del kv['_test_B']
     assert read_store(session_id) == kv
+
+
+@pytest.fixture()
+def touch_max_age(env):
+    value = env.pyramid.options['session.max_age']
+    yield
+    env.pyramid.options['session.max_age'] = value
+
+
+def test_session_lifetime(env, webapp, touch_max_age):
+    env.pyramid.options['session.max_age'] = 100
+    with freeze_time(datetime(year=2011, month=1, day=1)) as frozen_dt:
+        res = webapp.post_json('/test/session_kv', dict(_test_var=1))
+        session_id = get_session_id(res)
+
+        frozen_dt.tick(timedelta(seconds=90))
+        res = webapp.post_json('/test/session_kv', dict(_test_var=2))
+        assert session_id == get_session_id(res)
+
+        frozen_dt.tick(timedelta(seconds=90))
+        res = webapp.post_json('/test/session_kv', dict(_test_var=3))
+        assert session_id == get_session_id(res)
+
+        frozen_dt.tick(timedelta(seconds=101))
+        res = webapp.post_json('/test/session_kv', dict(_test_var=4))
+        new_session_id = get_session_id(res)
+        assert session_id != new_session_id
+
+        env.pyramid.options['session.max_age'] = 110
+        frozen_dt.tick(timedelta(seconds=100))
+        assert new_session_id == get_session_id(res)
