@@ -236,7 +236,6 @@ class CoreComponent(Component):
 
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),
-        Option('enable_snippets', bool, default=True),
 
         # Debug settings
         Option('debug', bool, default=False, doc="Enable additional debug tools."),
