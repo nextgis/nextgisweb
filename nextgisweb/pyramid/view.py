@@ -392,10 +392,6 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.test_timeout', '/test/timeout') \
         .add_view(test_timeout)
 
-    # Method for help_page customization in components
-    comp.help_page_url = lambda request: \
-        comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
-
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
         dm.Link('info/pkginfo', _("Package versions"), lambda args: (

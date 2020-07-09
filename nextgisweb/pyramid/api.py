@@ -399,6 +399,9 @@ def setup_pyramid(comp, config):
     comp.company_logo_view = None
     comp.company_url_view = lambda request: comp.options['company_url']
 
+    comp.help_page_url_view = lambda (request): \
+        comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
+
     config.add_route('pyramid.company_logo', '/api/component/pyramid/company_logo') \
         .add_view(company_logo, request_method='GET')
 
