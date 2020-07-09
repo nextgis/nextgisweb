@@ -1,1 +1,0 @@
-SQL migrations moved to `migrate/` directory! Migrations until 2018 are available in the file `MIGRATE.old`

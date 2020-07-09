@@ -1,0 +1,1 @@
+ALTER TABLE wfsserver_layer ADD COLUMN maxfeatures integer;
