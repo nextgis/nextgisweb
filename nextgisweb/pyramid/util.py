@@ -5,7 +5,9 @@ import os
 import os.path
 import errno
 import fcntl
+import secrets
 import six
+import string
 from calendar import timegm
 
 from ..i18n import trstring_factory
@@ -77,6 +79,13 @@ class JsonPredicate(object):
         return self.val and (
             request.accept.best_match(self.target + self.test) in self.target
             or request.GET.get('format') == 'json')  # NOQA: W503
+
+
+def gensecret(length):
+    symbols = string.ascii_letters + string.digits
+    return ''.join([
+        secrets.choice(symbols)
+        for i in range(length)])
 
 
 def persistent_secret(fn, secretgen):

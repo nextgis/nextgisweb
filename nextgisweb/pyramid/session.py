@@ -2,9 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 from datetime import datetime, timedelta
-from uuid import uuid4
 
-import six
 import transaction
 from pyramid.interfaces import ISession
 from sqlalchemy.orm.exc import NoResultFound
@@ -13,7 +11,7 @@ from zope.interface import implementer
 from ..models import DBSession
 
 from .model import Session, SessionStore
-from .util import datetime_to_unix
+from .util import gensecret, datetime_to_unix
 
 __all__ = ['WebSession']
 
@@ -77,7 +75,7 @@ class WebSession(dict):
 
                 if self._session_id is None:
                     session = Session(
-                        id=six.text_type(uuid4().hex),
+                        id=gensecret(32),
                         created=datetime.utcnow()
                     )
 

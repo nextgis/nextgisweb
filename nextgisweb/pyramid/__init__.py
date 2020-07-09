@@ -3,8 +3,6 @@ import sys
 import os.path
 import re
 import warnings
-import string
-import secrets
 from datetime import datetime as dt, timedelta
 from hashlib import md5
 from pkg_resources import resource_filename, get_distribution
@@ -29,6 +27,7 @@ from .util import (
     ClientRoutePredicate,
     RequestMethodPredicate,
     JsonPredicate,
+    gensecret,
     persistent_secret)
 from .auth import AuthenticationPolicy
 from .model import Base, Session, SessionStore
@@ -133,12 +132,9 @@ class PyramidComponent(Component):
         def _gensecret():
             if 'secret' in self.options:
                 return self.options['secret']
-            alphabet = string.ascii_letters + string.digits
             slength = 32
             self.logger.info("Generating pyramid cookie secret (%d chars)...", slength)
-            return ''.join([
-                secrets.choice(alphabet)
-                for i in range(slength)])
+            return gensecret(slength)
 
         self.env.core.mksdir(self)
         sdir = self.env.core.gtsdir(self)
