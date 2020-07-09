@@ -62,7 +62,7 @@ def oauth(request):
         access_token = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
 
-        user = oaserver.get_user(access_token)
+        user = oaserver.access_token_to_user(access_token)
         if user is None:
             return render_error_message(request)
 

@@ -83,7 +83,7 @@ class OAuthServer(object):
         response.raise_for_status()
         return response.json()
 
-    def get_user(self, access_token, as_resource_server=False):
+    def access_token_to_user(self, access_token, as_resource_server=False):
         # Use userinfo instead of introspection when introspection not available
         # TODO: This behaivor should be enabled in settings and disabled by default!
         if as_resource_server and self.introspection_endpoint is None:

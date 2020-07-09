@@ -25,8 +25,8 @@ class AuthComponent(Component):
     identity = 'auth'
     metadata = Base.metadata
 
-    def __init__(self, env, settings):
-        super(AuthComponent, self).__init__(env, settings)
+    def initialize(self):
+        super(AuthComponent, self).initialize()
         self.settings_register = self.options['register']
         self.oauth = OAuthServer(self.options.with_prefix('oauth')) \
             if self.options['oauth.enabled'] else None
@@ -174,7 +174,7 @@ class AuthComponent(Component):
 
         if user is None and self.oauth is not None and self.oauth.password:
             tdata = self.oauth.grant_type_password(username, password)
-            user = self.oauth.get_user(tdata['access_token'])
+            user = self.oauth.access_token_to_user(tdata['access_token'])
 
         if user is None:
             raise InvalidCredentialsException()
