@@ -25,27 +25,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <%
-        preview_link = request.static_url('nextgisweb:static/img/webgis-for-social.png') \
-            if request.env.core.options['enable_snippets'] else None
-        description = tr(_('Your Web GIS at nextgis.com')) \
-            if request.env.core.options['enable_snippets'] else None
-
-        social = request.context.social if hasattr(request, 'context') else None
-        if social is not None:
-            if social.preview_fileobj is not None:
-                preview_link = request.route_url('resource.preview', id=request.context.id)
-            if social.preview_description is not None:
-                description = social.preview_description
+        preview_link = request.env.pyramid.preview_link_view(request)
+        image = preview_link['image']
+        description = preview_link['description']
     %>
-
-    %if preview_link is not None or description is not None:
+    %if image is not None or description is not None:
         <meta property="og:title" content="${page_title}"/>
         <meta property="og:url" content="${request.url}"/>
-        %if preview_link is not None:
-            <meta property="og:image" content="${preview_link}"/>
+        %if image is not None:
+            <meta property="og:image" content="${image}"/>
         %endif
         %if description is not None:
-            <meta property="og:description" content="${description}"/>
+            <meta property="og:description" content="${tr(description)}"/>
         %endif
     %endif
 

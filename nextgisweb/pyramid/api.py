@@ -15,7 +15,7 @@ from ..env import env
 from ..package import pkginfo
 from ..core.exception import ValidationError
 
-from .util import ClientRoutePredicate
+from .util import _, ClientRoutePredicate
 import six
 
 
@@ -401,6 +401,24 @@ def setup_pyramid(comp, config):
 
     comp.help_page_url_view = lambda (request): \
         comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
+
+    def preview_link_view(request):
+        if hasattr(request, 'context'):
+            social = request.context.social
+            if social is not None:
+                image = request.route_url('resource.preview', id=request.context.id) \
+                    if social.preview_fileobj is not None else None
+                return dict(
+                    image=image,
+                    description=social.preview_description
+                )
+        return comp.preview_link_default_view(request)
+
+    comp.preview_link_default_view = lambda (request): \
+        dict(image=request.static_url('nextgisweb:static/img/webgis-for-social.png'),
+             description=_("Your Web GIS at nextgis.com"))
+
+    comp.preview_link_view = preview_link_view
 
     config.add_route('pyramid.company_logo', '/api/component/pyramid/company_logo') \
         .add_view(company_logo, request_method='GET')
