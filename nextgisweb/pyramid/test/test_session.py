@@ -58,6 +58,10 @@ def get_session_id(response):
     return None
 
 
+def session_headers(session_id):
+    return dict(cookie=str('session=%s' % session_id))
+
+
 def read_store(session_id):
     result = dict()
     for kv in SessionStore.filter_by(session_id=session_id).all():
@@ -72,7 +76,7 @@ def test_session_kv(webapp):
     assert session_id is not None
     assert read_store(session_id) == kv
 
-    headers = dict(cookie=str('session=%s' % session_id))
+    headers = session_headers(session_id)
     kv['_test_B'] = 'B2'
     webapp.post_json('/test/session_kv', kv, headers=headers)
     assert get_session_id(res) == session_id
@@ -102,18 +106,21 @@ def test_session_lifetime(env, webapp, touch_max_age):
         session_id = get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=90))
-        res = webapp.post_json('/test/session_kv', dict(_test_var=2))
+        headers = session_headers(session_id)
+        res = webapp.post_json('/test/session_kv', dict(_test_var=2), headers=headers)
         assert session_id == get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=90))
-        res = webapp.post_json('/test/session_kv', dict(_test_var=3))
+        res = webapp.post_json('/test/session_kv', dict(_test_var=3), headers=headers)
         assert session_id == get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=101))
-        res = webapp.post_json('/test/session_kv', dict(_test_var=4))
+        res = webapp.post_json('/test/session_kv', dict(_test_var=4), headers=headers)
         new_session_id = get_session_id(res)
         assert session_id != new_session_id
 
         env.pyramid.options['session.max_age'] = 110
         frozen_dt.tick(timedelta(seconds=100))
+        headers = session_headers(new_session_id)
+        res = webapp.post_json('/test/session_kv', dict(_test_var=5), headers=headers)
         assert new_session_id == get_session_id(res)
