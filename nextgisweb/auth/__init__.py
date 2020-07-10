@@ -7,13 +7,13 @@ from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
 import transaction
 
-from ..lib.config import Option
+from ..lib.config import OptionAnnotations, Option
 from ..component import Component
 from ..models import DBSession
 from .. import db
 
 from .models import Base, Principal, User, Group, UserDisabled
-from .oauth import OAuthServer
+from .oauth import OAuthHelper
 from .exception import DisabledUserException, InvalidCredentialsException
 from .util import _
 from . import command # NOQA
@@ -28,7 +28,7 @@ class AuthComponent(Component):
     def initialize(self):
         super(AuthComponent, self).initialize()
         self.settings_register = self.options['register']
-        self.oauth = OAuthServer(self.options.with_prefix('oauth')) \
+        self.oauth = OAuthHelper(self.options.with_prefix('oauth')) \
             if self.options['oauth.enabled'] else None
 
     def initialize_db(self):
@@ -183,40 +183,19 @@ class AuthComponent(Component):
 
         return user
 
-    option_annotations = (
-        Option('register', bool, default=False, doc="Allow user registration."),
+    option_annotations = OptionAnnotations((
+        Option('register', bool, default=False,
+               doc="Allow user registration."),
 
-        Option(
-            'login_route_name', default='auth.login',
-            doc="Name of route for login page."),
-        Option(
-            'logout_route_name', default='auth.logout',
-            doc="Name of route for logout page."),
+        Option('login_route_name', default='auth.login',
+               doc="Name of route for login page."),
 
-        Option('oauth.enabled', bool, default=False),
-        Option('oauth.register', bool, default=False),
-        Option('oauth.local_auth', bool, default=True),
-        Option('oauth.password', bool, default=False),
+        Option('logout_route_name', default='auth.logout',
+               doc="Name of route for logout page."),
 
-        Option('oauth.client_id', default=None),
-        Option('oauth.client_secret', default=None, secure=True),
-
-        Option('oauth.auth_endpoint', default=None),
-        Option('oauth.token_endpoint'),
-        Option('oauth.introspection_endpoint', default=None),
-        Option('oauth.userinfo_endpoint', default=None),
-
-        Option('oauth.endpoint_authorization', default=None, secure=True),
-
-        Option('oauth.userinfo.scope', default=None),
-        Option('oauth.userinfo.subject', default=None),
-        Option('oauth.userinfo.keyname', default=None),
-        Option('oauth.userinfo.display_name', default=None),
-
-        Option(
-            'activity_delta', int, default=600,
-            doc="User last activity update time delta in seconds."),
-    )
+        Option('activity_delta', int, default=600,
+               doc="User last activity update time delta in seconds."),
+    )) + OAuthHelper.option_annotations.with_prefix('oauth')
 
 
 def translate(self, trstring):

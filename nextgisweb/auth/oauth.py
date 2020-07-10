@@ -6,121 +6,99 @@ from six.moves.urllib.parse import urlencode
 
 import requests
 
+from ..lib.config import OptionAnnotations, Option
 from ..models import DBSession
 
 from .models import User, Group
 
 
-class OAuthServer(object):
+class OAuthHelper(object):
 
     def __init__(self, options):
-        self.register = options['register']
-        self.password = options['password']
+        self.options = options
+
+        self.password = options['server.password']
         self.local_auth = options['local_auth']
 
-        self.client_id = options['client_id']
-        self.client_secret = options['client_secret']
-
-        self.auth_endpoint = options['auth_endpoint']
-        self.token_endpoint = options['token_endpoint']
-        self.introspection_endpoint = options['introspection_endpoint']
-        self.userinfo_endpoint = options['userinfo_endpoint']
-
-        self.userinfo_scope = options['userinfo.scope']
-        self.userinfo_subject = options['userinfo.subject']
-        self.userinfo_keyname = options['userinfo.keyname']
-        self.userinfo_display_name = options['userinfo.display_name']
-
-        self.endpoint_headers = {}
-        if 'endpoint_authorization' in options:
-            self.endpoint_headers['Authorization'] = options['endpoint_authorization']
+        self.server_headers = {}
+        if 'server.authorization_header' in options:
+            self.server_headers['Authorization'] = options['server.authorization_header']
 
     def authorization_code_url(self, redirect_uri, **kwargs):
+        # TODO: Implement scope support
+
         qs = dict(
-            client_id=self.client_id,
             response_type='code',
             redirect_uri=redirect_uri,
             **kwargs)
 
-        if self.userinfo_scope is not None:
-            qs['scope'] = self.userinfo_scope
+        if 'client.id' in self.options:
+            qs['client_id'] = self.options['client.id']
 
-        return self.auth_endpoint + '?' + urlencode(qs)
+        return self.options['server.auth_endpoint'] + '?' + urlencode(qs)
 
     def grant_type_password(self, username, password):
-        params = dict(grant_type='password', username=username, password=password)
-        self._add_client_params(params)
+        # TODO: Implement scope support
 
-        response = requests.post(self.token_endpoint, params, headers=self.endpoint_headers)
-        response.raise_for_status()
-
-        tdata = response.json()
-        return tdata
+        return self._server_request('token', dict(
+            grant_type='password',
+            username=username,
+            password=password))
 
     def grant_type_authorization_code(self, code, redirect_uri):
-        params = dict(grant_type='authorization_code', redirect_uri=redirect_uri, code=code)
-        self._add_client_params(params)
+        tdata = self._server_request('token', dict(
+            grant_type='authorization_code',
+            redirect_uri=redirect_uri, code=code))
+        return tdata
 
-        response = requests.post(self.token_endpoint, params, headers=self.endpoint_headers)
-        response.raise_for_status()
-
-        data = response.json()
-        return data['access_token']
-
-    def query_userinfo(self, access_token):
-        headers = dict(self.endpoint_headers)
+    def query_profile(self, access_token):
+        headers = dict(self.server_headers)
         headers['Authorization'] = 'Bearer ' + access_token
-        response = requests.get(self.userinfo_endpoint, headers=headers)
+        response = requests.get(self.options['profile.endpoint'], headers=headers)
         response.raise_for_status()
         return response.json()
 
     def query_introspection(self, access_token):
-        response = requests.post(self.introspection_endpoint, dict(
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            token=access_token,
-        ), headers=self.endpoint_headers)
-        response.raise_for_status()
-        return response.json()
+        return self._server_request('introspection', dict(
+            token=access_token))
 
     def access_token_to_user(self, access_token, as_resource_server=False):
-        # Use userinfo instead of introspection when introspection not available
-        # TODO: This behaivor should be enabled in settings and disabled by default!
-        if as_resource_server and self.introspection_endpoint is None:
-            as_resource_server = False
-
-        if as_resource_server:
-            userinfo = self.query_introspection(access_token)
+        # Use profile (userinfo) endpoint when enabled, othewise use token introspection
+        if self.options['profile.endpoint'] is not None:
+            profile = self.query_profile(access_token)
         else:
-            userinfo = self.query_userinfo(access_token)
+            # TODO: Implement scope support
+            profile = self.query_introspection(access_token)
 
         with DBSession.no_autoflush:
-            userinfo_subject = six.text_type(userinfo[self.userinfo_subject])
-            user = User.filter_by(oauth_subject=userinfo_subject).first()
+            profile_subject = six.text_type(profile[self.options['profile.subject']])
+            user = User.filter_by(oauth_subject=profile_subject).first()
 
             if user is None:
                 # Register new user with default groups
-                if self.register:
-                    user = User(oauth_subject=userinfo_subject).persist()
+                if self.options['register']:
+                    user = User(oauth_subject=profile_subject).persist()
                     user.member_of = Group.filter_by(register=True).all()
                 else:
                     return None
 
-            if self.userinfo_display_name is not None:
+            profile_display_name = self.options.get('profile.display_name', None)
+            if profile_display_name is not None:
                 user.display_name = ' '.join([
-                    six.text_type(userinfo[key])
-                    for key in re.split(r',\s*', self.userinfo_display_name)
-                    if key in userinfo])
+                    six.text_type(profile[key])
+                    for key in re.split(r',\s*', profile_display_name)
+                    if key in profile])
 
-            # Fallback to userinfo subject
+            # Fallback to profile subject
             if user.display_name is None or re.match(r'\s+', user.display_name):
-                user.display_name = userinfo_subject
+                user.display_name = profile_subject
 
-            if self.userinfo_keyname is not None:
+            profile_keyname = self.options.get('profile.keyname', None)
+            if profile_keyname is not None:
                 # Check keyname uniqueness and add numbered suffix
                 idx = 0
                 while True:
-                    candidate = userinfo[self.userinfo_keyname] \
+                    candidate = profile[profile_keyname] \
                         + ('_{}'.format(idx) if idx > 0 else '')
 
                     if User.filter(
@@ -134,9 +112,60 @@ class OAuthServer(object):
 
         return user
 
-    def _add_client_params(self, params):
-        if self.client_id:
-            params['client_id'] = self.client_id
-        if self.client_secret:
-            params['client_secret'] = self.client_secret
-        return params
+    def _server_request(self, endpoint, params):
+        url = self.options['server.{}_endpoint'.format(endpoint)]
+        params = dict(params)
+
+        if 'client.id' in self.options:
+            params['client_id'] = self.options['client.id']
+        if 'client.secret' in self.options:
+            params['client_secret'] = self.options['client.secret']
+
+        response = requests.post(url, params, headers=self.server_headers)
+        response.raise_for_status()
+
+        return response.json()
+
+    option_annotations = OptionAnnotations((
+        Option('enabled', bool, default=False,
+               doc="Enable OAuth authentication."),
+
+        Option('register', bool, default=False,
+               doc="Allow registering new users via OAuth."),
+
+        Option('local_auth', bool, default=True,
+               doc="Allow authentication with local password for OAuth users."),
+
+        Option('client.id', default=None,
+               doc="OAuth client ID"),
+
+        Option('client.secret', default=None, secure=True,
+               doc="OAuth client secret"),
+
+        Option('server.password', bool, default=False,
+               doc="Use password grant type instead of authorization code grant type."),
+
+        Option('server.token_endpoint',
+               doc="OAuth token endpoint URL."),
+
+        Option('server.introspection_endpoint', default=None,
+               doc="OAuth token introspection endpoint URL."),
+
+        Option('server.auth_endpoint', default=None,
+               doc="OAuth authorization code endpoint URL."),
+
+        Option('server.authorization_header', default=None,
+               doc="Add Authorization HTTP header to requests to OAuth server."),
+
+        Option('profile.endpoint', default=None,
+               doc="OpenID Connect endpoint URL"),
+
+        Option('profile.subject', default='sub',
+               doc="OAuth profile subject identifier"),
+
+        Option('profile.keyname', default='preferred_username',
+               doc="OAuth profile keyname (user name)"),
+
+        Option('profile.display_name', default='name',
+               doc="OAuth profile display name"),
+    ))
