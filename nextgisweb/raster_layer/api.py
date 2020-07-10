@@ -25,7 +25,7 @@ def export(request):
 
     srs = int(request.GET.get("srs", request.context.srs.id))
     srs = SRS.filter_by(id=srs).one()
-    format = request.GET.get("format")
+    format = request.GET.get("format", "tif")
 
     if format is None:
         raise ValidationError(_("Output format is not provided."))
