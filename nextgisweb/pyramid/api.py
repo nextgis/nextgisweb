@@ -14,6 +14,7 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from ..env import env
 from ..package import pkginfo
 from ..core.exception import ValidationError
+from ..resource import Resource
 
 from .util import _, ClientRoutePredicate
 import six
@@ -403,7 +404,7 @@ def setup_pyramid(comp, config):
         comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
 
     def preview_link_view(request):
-        if hasattr(request, 'context'):
+        if hasattr(request, 'context') and isinstance(request.context, Resource):
             social = request.context.social
             if social is not None:
                 image = request.route_url('resource.preview', id=request.context.id) \
