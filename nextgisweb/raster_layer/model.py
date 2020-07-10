@@ -9,6 +9,7 @@ import sqlalchemy.orm as orm
 
 from zope.interface import implementer
 
+from collections import OrderedDict
 from osgeo import gdal, gdalconst, osr, ogr
 
 from ..models import declarative_base
@@ -31,6 +32,25 @@ PYRAMID_TARGET_SIZE = 512
 Base = declarative_base()
 
 SUPPORTED_DRIVERS = ('GTiff', )
+
+COLOR_INTERPRETATION = OrderedDict((
+    (gdal.GCI_Undefined, 'Undefined'),
+    (gdal.GCI_GrayIndex, 'GrayIndex'),
+    (gdal.GCI_PaletteIndex, 'PaletteIndex'),
+    (gdal.GCI_RedBand, 'Red'),
+    (gdal.GCI_GreenBand, 'Green'),
+    (gdal.GCI_BlueBand, 'Blue'),
+    (gdal.GCI_AlphaBand, 'Alpha'),
+    (gdal.GCI_HueBand, 'Hue'),
+    (gdal.GCI_SaturationBand, 'Saturation'),
+    (gdal.GCI_LightnessBand, 'Lightness'),
+    (gdal.GCI_CyanBand, 'Cyan'),
+    (gdal.GCI_MagentaBand, 'Magenta'),
+    (gdal.GCI_YellowBand, 'Yellow'),
+    (gdal.GCI_BlackBand, 'Black'),
+    (gdal.GCI_YCbCr_YBand, 'YCbCr_Y'),
+    (gdal.GCI_YCbCr_CbBand, 'YCbCr_Cb'),
+    (gdal.GCI_YCbCr_CrBand, 'YCbCr_Cr')))
 
 
 @implementer(IBboxLayer)
@@ -206,6 +226,16 @@ class _source_attr(SP):
         srlzr.obj.load_file(filedata, env)
 
 
+class _color_interpretation(SP):
+
+    def getter(self, srlzr):
+        ds = gdal.OpenEx(env.raster_layer.workdir_filename(srlzr.obj.fileobj))
+        return [
+            COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
+            for bidx in range(1, srlzr.obj.band_count + 1)
+        ]
+
+
 P_DSS_READ = DataStructureScope.read
 P_DSS_WRITE = DataStructureScope.write
 P_DS_READ = DataScope.read
@@ -223,3 +253,4 @@ class RasterLayerSerializer(Serializer):
     band_count = SP(read=P_DSS_READ)
 
     source = _source_attr(write=P_DS_WRITE)
+    color_interpretation = _color_interpretation(read=P_DSS_READ)

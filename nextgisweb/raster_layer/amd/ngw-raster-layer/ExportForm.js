@@ -22,7 +22,8 @@ define([
     "dijit/form/Select",
     "dijit/form/CheckBox",
     "dijit/form/Button",
-    "dijit/form/TextBox"
+    "dijit/form/TextBox",
+    "dijit/form/MultiSelect"
 ], function (
     declare,
     array,
@@ -57,7 +58,8 @@ define([
             this.buttonSave.on('click', lang.hitch(this, function () {
                 var query = {
                     format: this.wFormat.get('value'),
-                    srs: this.wSRS.get('value')
+                    srs: this.wSRS.get('value'),
+                    bands: this.wBands.get('value')
                 };
                 window.open(route.resource.export({
                     id: this.resid
@@ -89,6 +91,21 @@ define([
                         }
                     })
                 })));
+            }));
+
+            // Multiselect Dojo widget is not associated with a data store/object.
+            // As per the documentation it is just a wrapper over the SELECT HTML element.
+            // As a result we need to use the basic HTML/JS code to add the OPTIONS for the widget.
+            xhr.get(route.resource.item({id: this.resid}), {
+                handleAs: 'json'
+            }).then(lang.hitch(this, function (data) {
+                array.forEach(data.raster_layer.color_interpretation, lang.hitch(this, function (item, idx) {
+                    var opt = document.createElement("option");
+                    opt.text = (idx + 1) + ": " + item;
+                    opt.value = idx + 1;
+                    opt.selected = true;
+                    this.wBands.domNode.options.add(opt)
+                }));
             }));
         }
     });

@@ -26,7 +26,7 @@ def raster_layer_id(env):
         ).persist()
 
         obj.load_file(
-            os.path.join(os.path.split(__file__)[0], "data", "sochi-aster-dem.tif"), env
+            os.path.join(os.path.split(__file__)[0], "data", "sochi-aster-colorized.tif"), env
         )
 
         DBSession.flush()
@@ -53,11 +53,14 @@ def test_export_srs(epsg, webapp, raster_layer_id):
         assert srs.IsSame(srs_expected)
 
 
-@pytest.mark.parametrize("format", ["tif",])
+@pytest.mark.parametrize("format", ["tif", "rsw"])
 def test_export_format(format, webapp, raster_layer_id):
     format_expected = EXPORT_FORMAT_GDAL[format.upper()].name
     webapp.authorization = ("Basic", ("administrator", "admin"))
-    resp = webapp.get("/api/resource/%d/export" % raster_layer_id, params={"format": format})
+    resp = webapp.get(
+        "/api/resource/%d/export" % raster_layer_id,
+        params={"format": format, "bands": [1, 2, 3]},
+    )
     with NamedTemporaryFile() as f:
         f.write(resp.body)
         ds = gdal.OpenEx(f.name)

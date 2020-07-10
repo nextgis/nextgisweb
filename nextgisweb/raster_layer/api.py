@@ -4,7 +4,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import tempfile
 import itertools
 
-from io import BytesIO
 from osgeo import gdal
 from pyramid.response import FileResponse
 
@@ -26,6 +25,7 @@ def export(request):
     srs = int(request.GET.get("srs", request.context.srs.id))
     srs = SRS.filter_by(id=srs).one()
     format = request.GET.get("format", "tif")
+    bands = request.GET.getall("bands")
 
     if format is None:
         raise ValidationError(_("Output format is not provided."))
@@ -44,21 +44,33 @@ def export(request):
     )
 
     filename = "%d.%s" % (request.context.id, driver.extension,)
-
     content_disposition = b"attachment; filename=%s" % filename
 
-    buf = BytesIO()
+    def _warp(source_filename):
+        with tempfile.NamedTemporaryFile(suffix=".%s" % driver.extension) as tmp_file:
+            try:
+                gdal.UseExceptions()
+                gdal.Warp(
+                    tmp_file.name,
+                    source_filename,
+                    options=gdal.WarpOptions(options=wopts),
+                )
+            except RuntimeError as e:
+                raise ValidationError(str(e))
+            finally:
+                gdal.DontUseExceptions()
 
-    with tempfile.NamedTemporaryFile(suffix=".%s" % driver.extension) as tmp_file:
-        gdal.Warp(
-            tmp_file.name,
-            env.raster_layer.workdir_filename(request.context.fileobj),
-            options=gdal.WarpOptions(options=wopts),
-        )
+            response = FileResponse(tmp_file.name, content_type=driver.mime)
+            response.content_disposition = content_disposition
+            return response
 
-        response = FileResponse(tmp_file.name, content_type=driver.mime)
-        response.content_disposition = content_disposition
-        return response
+    source_filename = env.raster_layer.workdir_filename(request.context.fileobj)
+    if len(bands) != request.context.band_count:
+        with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
+            gdal.Translate(tmp_file.name, source_filename, bandList=bands)
+            return _warp(tmp_file.name)
+    else:
+        return _warp(source_filename)
 
 
 def setup_pyramid(comp, config):
