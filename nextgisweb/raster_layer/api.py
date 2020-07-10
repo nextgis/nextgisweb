@@ -24,13 +24,11 @@ def export(request):
 
     srs = int(request.GET.get("srs", request.context.srs.id))
     srs = SRS.filter_by(id=srs).one()
-    format = request.GET.get("format", "tif")
+    format = request.GET.get("format", "GTiff")
     bands = request.GET.getall("bands")
 
     if format is None:
         raise ValidationError(_("Output format is not provided."))
-    else:
-        format = format.upper()
 
     if format not in EXPORT_FORMAT_GDAL:
         raise ValidationError(_("Format '%s' is not supported.") % (format,))

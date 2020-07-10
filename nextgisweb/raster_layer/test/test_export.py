@@ -9,7 +9,6 @@ from osgeo import gdal, osr
 from tempfile import NamedTemporaryFile
 
 from nextgisweb.raster_layer.model import RasterLayer
-from nextgisweb.raster_layer.gdaldriver import EXPORT_FORMAT_GDAL
 from nextgisweb.models import DBSession
 from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
@@ -53,9 +52,8 @@ def test_export_srs(epsg, webapp, raster_layer_id):
         assert srs.IsSame(srs_expected)
 
 
-@pytest.mark.parametrize("format", ["tif", "rsw"])
+@pytest.mark.parametrize("format", ["GTiff", "HFA", "RMF"])
 def test_export_format(format, webapp, raster_layer_id):
-    format_expected = EXPORT_FORMAT_GDAL[format.upper()].name
     webapp.authorization = ("Basic", ("administrator", "admin"))
     resp = webapp.get(
         "/api/resource/%d/export" % raster_layer_id,
@@ -64,4 +62,4 @@ def test_export_format(format, webapp, raster_layer_id):
     with NamedTemporaryFile() as f:
         f.write(resp.body)
         ds = gdal.OpenEx(f.name)
-        assert ds.GetDriver().ShortName == format_expected
+        assert ds.GetDriver().ShortName == format

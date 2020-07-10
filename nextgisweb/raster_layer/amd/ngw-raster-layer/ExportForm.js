@@ -73,8 +73,8 @@ define([
             this.formatStore = new ObjectStore(new Memory({
                 data: array.map(settings.export_formats, function (format) {
                     return {
-                        id: format.extension,
-                        label: format.name
+                        id: format.name,
+                        label: format.display_name
                     }
                 })
             }));
@@ -101,7 +101,7 @@ define([
             }).then(lang.hitch(this, function (data) {
                 array.forEach(data.raster_layer.color_interpretation, lang.hitch(this, function (item, idx) {
                     var opt = document.createElement("option");
-                    opt.text = (idx + 1) + ": " + item;
+                    opt.text = i18n.gettext("Band") + " " + (idx + 1) + (item !== "Undefined" ? " (" + item + ")" : "");
                     opt.value = idx + 1;
                     opt.selected = true;
                     this.wBands.domNode.options.add(opt)
