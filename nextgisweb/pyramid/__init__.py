@@ -243,6 +243,11 @@ class PyramidComponent(Component):
         # Sessions
         config.set_session_factory(WebSession)
 
+        # Replace default locale negotiator with session-based one
+        def _locale_negotiator(request):
+            return request.session.get('pyramid.locale')
+        config.set_locale_negotiator(_locale_negotiator)
+
         return config
 
     def setup_pyramid(self, config):
