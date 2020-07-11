@@ -5,6 +5,7 @@ import six
 from six.moves.urllib.parse import urlencode
 
 import requests
+import zope.event
 
 from ..lib.config import OptionAnnotations, Option
 from ..models import DBSession
@@ -110,6 +111,9 @@ class OAuthHelper(object):
 
                     idx += 1
 
+        event = OnAccessTokenToUser(user, profile)
+        zope.event.notify(event)
+
         return user
 
     def _server_request(self, endpoint, params):
@@ -169,3 +173,18 @@ class OAuthHelper(object):
         Option('profile.display_name', default='name',
                doc="OAuth profile display name"),
     ))
+
+
+class OnAccessTokenToUser(object):
+
+    def __init__(self, user, profile):
+        self._user = user
+        self._profile = profile
+
+    @property
+    def user(self):
+        return self._user
+
+    @property
+    def profile(self):
+        return self._profile

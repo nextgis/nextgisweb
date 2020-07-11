@@ -13,12 +13,12 @@ from ..models import DBSession
 from .. import db
 
 from .models import Base, Principal, User, Group, UserDisabled
-from .oauth import OAuthHelper
+from .oauth import OAuthHelper, OnAccessTokenToUser
 from .exception import DisabledUserException, InvalidCredentialsException
 from .util import _
 from . import command # NOQA
 
-__all__ = ['Principal', 'User', 'Group']
+__all__ = ['Principal', 'User', 'Group', 'OnAccessTokenToUser']
 
 
 class AuthComponent(Component):
