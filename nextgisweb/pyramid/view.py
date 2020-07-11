@@ -83,9 +83,7 @@ def favicon(request):
 
 
 def locale(request):
-    def set_cookie(reqest, response):
-        response.set_cookie('_LOCALE_', request.matchdict['locale'])
-    request.add_response_callback(set_cookie)
+    request.session['pyramid.locale'] = request.matchdict['locale']
     return HTTPFound(location=request.GET['next'])
 
 

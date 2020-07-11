@@ -3,8 +3,7 @@ import sys
 import os.path
 import re
 import warnings
-import string
-import secrets
+from datetime import datetime as dt, timedelta
 from hashlib import md5
 from pkg_resources import resource_filename, get_distribution
 from collections import namedtuple
@@ -15,6 +14,7 @@ from pyramid.events import BeforeRender
 
 import pyramid_tm
 import pyramid_mako
+import transaction
 
 from ..lib.config import Option
 from ..package import pkginfo
@@ -27,8 +27,11 @@ from .util import (
     ClientRoutePredicate,
     RequestMethodPredicate,
     JsonPredicate,
+    gensecret,
     persistent_secret)
 from .auth import AuthenticationPolicy
+from .model import Base, Session, SessionStore
+from .session import WebSession
 from . import exception
 
 __all__ = ['viewargs', ]
@@ -39,6 +42,7 @@ DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])
 
 class PyramidComponent(Component):
     identity = 'pyramid'
+    metadata = Base.metadata
 
     def make_app(self, settings=None):
         settings = dict(self._settings, **settings)
@@ -128,12 +132,9 @@ class PyramidComponent(Component):
         def _gensecret():
             if 'secret' in self.options:
                 return self.options['secret']
-            alphabet = string.ascii_letters + string.digits
             slength = 32
             self.logger.info("Generating pyramid cookie secret (%d chars)...", slength)
-            return ''.join([
-                secrets.choice(alphabet)
-                for i in range(slength)])
+            return gensecret(slength)
 
         self.env.core.mksdir(self)
         sdir = self.env.core.gtsdir(self)
@@ -232,6 +233,14 @@ class PyramidComponent(Component):
 
         config.add_renderer('json', json_renderer)
 
+        # Sessions
+        config.set_session_factory(WebSession)
+
+        # Replace default locale negotiator with session-based one
+        def _locale_negotiator(request):
+            return request.session.get('pyramid.locale')
+        config.set_locale_negotiator(_locale_negotiator)
+
         return config
 
     def setup_pyramid(self, config):
@@ -265,6 +274,24 @@ class PyramidComponent(Component):
 
         return result
 
+    def maintenance(self):
+        super(PyramidComponent, self).maintenance()
+        self.cleanup()
+
+    def cleanup(self):
+        self.logger.info("Cleaning up sessions...")
+
+        with transaction.manager:
+            actual_date = dt.utcnow() - timedelta(seconds=self.options['session.max_age'])
+            deleted_sessions = Session.filter(Session.last_activity < actual_date).delete()
+
+        self.logger.info("Deleted: %d sessions", deleted_sessions)
+
+    def backup_configure(self, config):
+        super(PyramidComponent, self).backup_configure(config)
+        config.exclude_table_data('public', Session.__tablename__)
+        config.exclude_table_data('public', SessionStore.__tablename__)
+
     option_annotations = (
         Option('secret', doc="Cookies encryption key (deprecated)."),
         Option('logo'),
@@ -272,6 +299,9 @@ class PyramidComponent(Component):
         Option('help_page.enabled', bool, default=True),
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
+
+        Option('session.max_age', int, default=timedelta(days=7).total_seconds(),
+               doc="Session lifetime in seconds."),
 
         Option('backup.download', bool, default=False),
 

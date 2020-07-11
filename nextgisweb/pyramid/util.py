@@ -5,7 +5,10 @@ import os
 import os.path
 import errno
 import fcntl
+import secrets
 import six
+import string
+from calendar import timegm
 
 from ..i18n import trstring_factory
 
@@ -78,6 +81,13 @@ class JsonPredicate(object):
             or request.GET.get('format') == 'json')  # NOQA: W503
 
 
+def gensecret(length):
+    symbols = string.ascii_letters + string.digits
+    return ''.join([
+        secrets.choice(symbols)
+        for i in range(length)])
+
+
 def persistent_secret(fn, secretgen):
     try:
         fh = os.open(fn, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
@@ -120,3 +130,7 @@ def header_encoding_tween_factory(handler, registry):
         return response
 
     return header_encoding_tween
+
+
+def datetime_to_unix(dt):
+    return timegm(dt.timetuple())
