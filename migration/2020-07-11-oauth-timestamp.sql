@@ -1,0 +1,1 @@
+ALTER TABLE auth_user ADD COLUMN oauth_tstamp timestamp without time zone;
