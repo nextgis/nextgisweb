@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, print_function, absolute_import
 import re
 import itertools
+from datetime import datetime, timedelta
 import six
 from six.moves.urllib.parse import urlencode
 
@@ -84,6 +85,16 @@ class OAuthHelper(object):
                     user.member_of = Group.filter_by(register=True).all()
                 else:
                     return None
+
+            if (
+                user.oauth_tstamp is not None and
+                self.options['profile.sync_timedelta'] is not None and
+                user.oauth_tstamp + self.options['profile.sync_timedelta'] > datetime.utcnow()
+            ):
+                # Skip profile synchronization
+                return user
+            else:
+                user.oauth_tstamp = datetime.utcnow()
 
             profile_display_name = self.options.get('profile.display_name', None)
             if profile_display_name is not None:
@@ -171,6 +182,9 @@ class OAuthHelper(object):
 
         Option('profile.display_name', default='name',
                doc="OAuth profile display name"),
+
+        Option('profile.sync_timedelta', timedelta, default=None,
+               doc="Minimum time delta between profile synchronization with OAuth server."),
     ))
 
 
