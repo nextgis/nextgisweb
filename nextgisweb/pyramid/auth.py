@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, absolute_import
 
 from pyramid.authentication import (
-    AuthTktAuthenticationPolicy,
+    SessionAuthenticationPolicy,
     BasicAuthAuthenticationPolicy as
     PyramidBasicAuthAuthenticationPolicy,
     CallbackAuthenticationPolicy)
@@ -68,17 +68,18 @@ class AuthenticationPolicy(object):
             else:
                 return user
 
+        session_auth_policy = SessionAuthenticationPolicy()
+        session_auth_policy.userid_key = 'auth.current_user'
+
+        basic_auth_policy = BasicAuthenticationPolicy(
+            check=check, realm=b'NextGIS Web')
+
+        token_auth_policy = TokenAuthenticationPolicy()
+
         self.members = (
-            AuthTktAuthenticationPolicy(
-                secret=settings.get('secret'),
-                cookie_name='tkt', hashalg='sha512',
-                max_age=24 * 3600, reissue_time=3600,
-                http_only=True),
-
-            BasicAuthenticationPolicy(
-                check=check, realm=b'NextGISWeb'),
-
-            TokenAuthenticationPolicy()
+            session_auth_policy,
+            basic_auth_policy,
+            token_auth_policy,
         )
 
     def authenticated_userid(self, request):
