@@ -45,7 +45,7 @@ class TokenAuthenticationPolicy(CallbackAuthenticationPolicy):
 
         oauth = request.env.auth.oauth
         if oauth is not None:
-            user = oauth.access_token_to_user(token, as_resource_server=True)
+            user = oauth.access_token_to_user(token)
             if user is not None:
                 return user.id
 

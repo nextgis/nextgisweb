@@ -10,10 +10,12 @@ import requests
 import zope.event
 
 from ..lib.config import OptionAnnotations, Option
+from .. import db
 from ..models import DBSession
+from ..core.exception import UserException
 
-from .models import User, Group
-from .util import clean_user_keyname
+from .models import User, Group, Base
+from .util import _, clean_user_keyname
 
 
 class OAuthHelper(object):
@@ -63,8 +65,18 @@ class OAuthHelper(object):
         return response.json()
 
     def query_introspection(self, access_token):
-        return self._server_request('introspection', dict(
-            token=access_token))
+        with DBSession.no_autoflush:
+            token = OAuthToken.filter_by(id=access_token).first()
+
+        if token is None:
+            tdata = self._server_request('introspection', dict(
+                token=access_token))
+            token = OAuthToken(id=access_token, data=tdata)
+            token.exp = datetime.utcfromtimestamp(tdata['exp'])
+            token.sub = six.text_type(tdata[self.options['profile.subject']])
+            token.persist()
+
+        return token
 
     def access_token_to_user(self, access_token, as_resource_server=False):
         # Use profile (userinfo) endpoint when enabled, othewise use token introspection
@@ -72,7 +84,10 @@ class OAuthHelper(object):
             profile = self.query_profile(access_token)
         else:
             # TODO: Implement scope support
-            profile = self.query_introspection(access_token)
+            token = self.query_introspection(access_token)
+            profile = token.data
+
+        token.check_expiration()
 
         with DBSession.no_autoflush:
             profile_subject = six.text_type(profile[self.options['profile.subject']])
@@ -201,3 +216,21 @@ class OnAccessTokenToUser(object):
     @property
     def profile(self):
         return self._profile
+
+
+class OAuthToken(Base):
+    __tablename__ = 'auth_oauth_token'
+
+    id = db.Column(db.Unicode, primary_key=True)
+    exp = db.Column(db.DateTime, nullable=False)
+    sub = db.Column(db.Unicode, nullable=False)
+    data = db.Column(db.JSONText, nullable=False)
+
+    def check_expiration(self):
+        if self.exp < datetime.utcnow():
+            raise OAuthAccessTokenExpiredException()
+
+
+class OAuthAccessTokenExpiredException(UserException):
+    title = _("OAuth access token is expired")
+    http_status_code = 403
