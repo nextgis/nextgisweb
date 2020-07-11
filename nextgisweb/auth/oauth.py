@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
 import re
+import itertools
 import six
 from six.moves.urllib.parse import urlencode
 
@@ -11,6 +12,7 @@ from ..lib.config import OptionAnnotations, Option
 from ..models import DBSession
 
 from .models import User, Group
+from .util import clean_user_keyname
 
 
 class OAuthHelper(object):
@@ -96,20 +98,17 @@ class OAuthHelper(object):
 
             profile_keyname = self.options.get('profile.keyname', None)
             if profile_keyname is not None:
-                # Check keyname uniqueness and add numbered suffix
-                idx = 0
-                while True:
-                    candidate = profile[profile_keyname] \
-                        + ('_{}'.format(idx) if idx > 0 else '')
+                base = profile[profile_keyname]
 
+                # Check keyname uniqueness and add numbered suffix
+                for idx in itertools.count():
+                    candidate = clean_user_keyname(base, idx)
                     if User.filter(
                         User.keyname == candidate,
                         User.id != user.id
                     ).first() is None:
                         user.keyname = candidate
                         break
-
-                    idx += 1
 
         event = OnAccessTokenToUser(user, profile)
         zope.event.notify(event)
