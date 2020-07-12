@@ -149,6 +149,7 @@ class OAuthHelper(object):
 
     def _server_request(self, endpoint, params):
         url = self.options['server.{}_endpoint'.format(endpoint)]
+        method = self.options.get('server.{}_method'.format(endpoint), 'POST').lower()
         params = dict(params)
 
         if 'client.id' in self.options:
@@ -156,7 +157,7 @@ class OAuthHelper(object):
         if 'client.secret' in self.options:
             params['client_secret'] = self.options['client.secret']
 
-        response = requests.post(url, params, headers=self.server_headers)
+        response = getattr(requests, method.lower())(url, params, headers=self.server_headers)
         response.raise_for_status()
 
         return response.json()
@@ -193,6 +194,9 @@ class OAuthHelper(object):
 
         Option('server.introspection_endpoint', default=None,
                doc="OAuth token introspection endpoint URL."),
+
+        Option('server.introspection_method', default='POST',
+               doc="Workaround for NGID OAuth implementation."),
 
         Option('server.auth_endpoint', default=None,
                doc="OAuth authorization code endpoint URL."),

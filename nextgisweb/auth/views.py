@@ -62,15 +62,16 @@ def oauth(request):
         except KeyError:
             raise HTTPBadRequest()
 
-        access_token = oaserver.grant_type_authorization_code(
+        tresp = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
 
-        user = oaserver.access_token_to_user(access_token)
+        user = oaserver.access_token_to_user(tresp.access_token)
         if user is None:
             return render_error_message(request)
 
         DBSession.flush()
         headers = remember(request, user.id)
+        token_response_to_session(request, tresp)
 
         response = HTTPFound(location=next_url, headers=headers)
         response.delete_cookie(cookie_name(state), path=oauth_path)
