@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
 from datetime import datetime, timedelta
 
 from freezegun import freeze_time
@@ -16,7 +15,7 @@ prefix = '_test_'
 
 
 @pytest.fixture(scope='module')
-def webapp(env):
+def cwebapp(env):
     from webtest import TestApp
     config = env.pyramid.make_app({})
 
@@ -69,25 +68,25 @@ def read_store(session_id):
     return result
 
 
-def test_session_kv(webapp):
+def test_session_store(cwebapp):
     kv = dict(_test_A='A', _test_B='B1')
-    res = webapp.post_json('/test/session_kv', kv)
+    res = cwebapp.post_json('/test/session_kv', kv)
     session_id = get_session_id(res)
     assert session_id is not None
     assert read_store(session_id) == kv
 
     headers = session_headers(session_id)
     kv['_test_B'] = 'B2'
-    webapp.post_json('/test/session_kv', kv, headers=headers)
+    cwebapp.post_json('/test/session_kv', kv, headers=headers)
     assert get_session_id(res) == session_id
     assert read_store(session_id) == kv
 
     part = dict(_test_B='B2')
-    webapp.post_json('/test/session_kv', part, headers=headers)
+    cwebapp.post_json('/test/session_kv', part, headers=headers)
     kv.update(part)
     assert read_store(session_id) == kv
 
-    webapp.post_json('/test/session_kv', dict(_test_B=None), headers=headers)
+    cwebapp.post_json('/test/session_kv', dict(_test_B=None), headers=headers)
     del kv['_test_B']
     assert read_store(session_id) == kv
 
@@ -99,28 +98,83 @@ def touch_max_age(env):
     env.pyramid.options['session.max_age'] = value
 
 
-def test_session_lifetime(env, webapp, touch_max_age):
+def test_session_lifetime(env, cwebapp, touch_max_age):
     env.pyramid.options['session.max_age'] = 100
     with freeze_time(datetime(year=2011, month=1, day=1)) as frozen_dt:
-        res = webapp.post_json('/test/session_kv', dict(_test_var=1))
+        res = cwebapp.post_json('/test/session_kv', dict(_test_var=1))
         session_id = get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=90))
         headers = session_headers(session_id)
-        res = webapp.post_json('/test/session_kv', dict(_test_var=2), headers=headers)
+        res = cwebapp.post_json('/test/session_kv', dict(_test_var=2), headers=headers)
         assert session_id == get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=90))
-        res = webapp.post_json('/test/session_kv', dict(_test_var=3), headers=headers)
+        res = cwebapp.post_json('/test/session_kv', dict(_test_var=3), headers=headers)
         assert session_id == get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=101))
-        res = webapp.post_json('/test/session_kv', dict(_test_var=4), headers=headers)
+        res = cwebapp.post_json('/test/session_kv', dict(_test_var=4), headers=headers)
         new_session_id = get_session_id(res)
         assert session_id != new_session_id
 
         env.pyramid.options['session.max_age'] = 110
         frozen_dt.tick(timedelta(seconds=100))
         headers = session_headers(new_session_id)
-        res = webapp.post_json('/test/session_kv', dict(_test_var=5), headers=headers)
+        res = cwebapp.post_json('/test/session_kv', dict(_test_var=5), headers=headers)
         assert new_session_id == get_session_id(res)
+
+
+@pytest.mark.parametrize('key, value', (
+    ('str', 'foo'),
+    ('int', 42),
+    ('bool', True),
+    pytest.param('tuple', (1, 2, ('nested', 'tuple')), id='tuple'),
+    pytest.param('k' * 1024, 'v' * 1024, id='big'),
+))
+def test_serialization(key, value, webapp, webapp_handler):
+    def _set(request):
+        request.session[key] = value
+        return Response()
+
+    def _get(request):
+        assert type(request.session[key]) == type(value)
+        assert request.session[key] == value
+        return Response()
+
+    def _del(request):
+        del request.session[key]
+        with pytest.raises(KeyError):
+            del request.session[key]
+        with pytest.raises(KeyError):
+            request.session[key]
+        return Response()
+
+    with webapp_handler(_set):
+        webapp.get('/test/request/')
+
+    with webapp_handler(_get):
+        webapp.get('/test/request/')
+
+    with webapp_handler(_del):
+        webapp.get('/test/request/')
+
+
+def test_exception(webapp, webapp_handler):
+
+    def _handler(request):
+        with pytest.raises(KeyError):
+            request.session['invalid']
+
+        with pytest.raises(KeyError):
+            del request.session['invalid']
+
+        # Session should validate that value is immutable, and
+        # may raise more specific exception.
+        with pytest.raises(ValueError):
+            request.session['mutable'] = ('foo', [], dict())
+
+        return Response()
+
+    with webapp_handler(_handler):
+        webapp.get('/test/request/')
