@@ -14,6 +14,11 @@ from nextgisweb.pyramid import Session, SessionStore
 prefix = '_test_'
 
 
+@pytest.fixture(scope='function', autouse=True)
+def reset(webapp):
+    webapp.reset()
+
+
 @pytest.fixture(scope='module')
 def cwebapp(env):
     from webtest import TestApp
@@ -178,3 +183,37 @@ def test_exception(webapp, webapp_handler):
 
     with webapp_handler(_handler):
         webapp.get('/test/request/')
+
+
+@pytest.mark.parametrize('handler, expect', (
+    ('empty', False),
+    ('attr', False),
+    ('get', False),
+    ('set', True),
+    ('del', False),
+    ('clear', False),
+))
+def test_session_start(handler, expect, webapp, webapp_handler):
+    def _handler(request):
+        if handler == 'empty':
+            pass
+        elif handler == 'attr':
+            request.session
+        elif handler == 'get':
+            with pytest.raises(KeyError):
+                request.session['foo']
+        elif handler == 'set':
+            request.session['foo'] = 'bar'
+        elif handler == 'del':
+            request.session['foo'] = 'bar'
+            del request.session['foo']
+        elif handler == 'clear':
+            request.session['foo'] = 'bar'
+            request.session.clear()
+        else:
+            raise ValueError("Invalid handler: " + handler)
+        return Response()
+
+    with webapp_handler(_handler):
+        webapp.get('/test/request/')
+        assert ('ngwsid' in webapp.cookies) == expect
