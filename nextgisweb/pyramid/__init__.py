@@ -24,7 +24,6 @@ from .util import (
     gensecret,
     persistent_secret,
     pip_freeze)
-from .auth import AuthenticationPolicy
 from .model import Base, Session, SessionStore
 from .session import WebSession
 from . import exception
@@ -145,9 +144,6 @@ class PyramidComponent(Component):
                     "there and now can be deleted from configuration options.")
             else:
                 raise RuntimeError("Option [pyramid.secret] mismatch!")
-
-        authn_policy = AuthenticationPolicy(settings=dict(secret=secret))
-        config.set_authentication_policy(authn_policy)
 
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)

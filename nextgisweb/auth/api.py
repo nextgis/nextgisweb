@@ -106,7 +106,7 @@ def login(request):
         username=request.POST['login'].strip(),
         password=request.POST['password'])
 
-    headers = remember(request, user.id)
+    headers = remember(request, (user.id, tresp))
     return Response(
         json.dumps({
             "keyname": user.keyname,

@@ -102,6 +102,10 @@ class AuthComponent(Component):
         config.add_request_method(user, reify=True)
         config.add_request_method(require_administrator)
 
+        from .policy import AuthenticationPolicy
+        config.set_authentication_policy(AuthenticationPolicy(
+            self, self.options.with_prefix('policy')))
+
         from . import views, api
         views.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
@@ -196,6 +200,13 @@ class AuthComponent(Component):
 
         Option('activity_delta', int, default=600,
                doc="User last activity update time delta in seconds."),
+
+        Option('policy.local.lifetime', timedelta, default=timedelta(days=1),
+               doc="Local authentication lifetime."),
+
+        Option('policy.local.refresh', timedelta, default=timedelta(hours=1),
+               doc="Refresh local authentication lifetime interval.")
+
     )) + OAuthHelper.option_annotations.with_prefix('oauth')
 
 

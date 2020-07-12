@@ -8,7 +8,7 @@ from .util import _
 
 class InvalidCredentialsException(UserException):
     title = _("Invalid credentials")
-    http_status_code = 403
+    http_status_code = 401
 
 
 class DisabledUserException(UserException):

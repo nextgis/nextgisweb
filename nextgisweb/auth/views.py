@@ -30,10 +30,7 @@ def login(request):
                 username=request.POST['login'].strip(),
                 password=request.POST['password'])
 
-            if tresp:
-                token_response_to_session(request, tresp)
-
-            headers = remember(request, user.id)
+            headers = remember(request, (user.id, tresp))
             return HTTPFound(location=next_url, headers=headers)
 
         except (InvalidCredentialsException, DisabledUserException) as exc:
@@ -70,12 +67,10 @@ def oauth(request):
             return render_error_message(request)
 
         DBSession.flush()
-        headers = remember(request, user.id)
-        token_response_to_session(request, tresp)
+        headers = remember(request, (user.id, tresp))
 
         response = HTTPFound(location=next_url, headers=headers)
         response.delete_cookie(cookie_name(state), path=oauth_path)
-
         return response
 
     else:
@@ -93,12 +88,6 @@ def oauth(request):
             path=oauth_path, max_age=600, httponly=True)
 
         return response
-
-
-def token_response_to_session(request, tresp):
-    request.session['auth.oauth.access_token'] = tresp.access_token
-    request.session['auth.oauth.refresh_token'] = tresp.refresh_token
-    request.session['auth.oauth.expires'] = tresp.expires
 
 
 def logout(request):
