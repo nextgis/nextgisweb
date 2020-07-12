@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
+import os
 import logging
 import six
 
@@ -55,10 +56,21 @@ def pkginfo():
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application. """
 
-    if 'logging' in settings:
-        setup_logging(settings['logging'])
+    if 'NEXTGISWEB_LOGGING' in os.environ:
+        setup_logging(os.environ['NEXTGISWEB_LOGGING'])
 
-    env = Env(cfg=load_config(settings.get('config')))
+    if 'logging' in settings:
+        logger.error("Parameter 'logging' was ignored! Use NEXTGISWEB_LOGGING variable instead.")
+
+    if 'config' in settings:
+        logger.error("Parameter 'config' was ignored! Use NEXTGISWEB_CONFIG variable instead.")
+
+    kset = set(settings.keys())
+    kset = kset.difference(set(('logging', 'config')))
+    if len(kset) > 0:
+        logger.warn("Ignored paster's parameters: %s", ', '.join(kset))
+
+    env = Env(cfg=load_config(None))
     env.initialize()
 
     setenv(env)

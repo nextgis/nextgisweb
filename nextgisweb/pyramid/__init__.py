@@ -39,26 +39,34 @@ class PyramidComponent(Component):
     def make_app(self, settings=None):
         settings = dict(self._settings, **settings)
 
-        settings['mako.directories'] = 'nextgisweb:templates/'
-
         is_debug = self.env.core.debug
 
-        settings['mako.imports'] = settings.get('mako.imports', []) + [
-            'import six', 'from nextgisweb.i18n import tcheck']
+        pyramid_includes = [
+            pyramid_tm,
+            pyramid_mako,
+        ]
 
-        # If debug is on, add mako-filter that checks
-        # if the line was translated before output.
-        if is_debug:
-            settings['mako.default_filters'] = ['tcheck', 'h']
+        # Pyramid defaults
+        settings['pyramid.default_locale_name'] = self.env.core.locale_default
+        settings['pyramid.reload_templates'] = is_debug
 
-        # If pyramid config doesn't state otherwise, use locale from,
-        # core component, while this is not clear why we need that.
+        # Mako templates
+        settings['mako.directories'] = 'nextgisweb:templates/'
+        settings['mako.imports'] = ['import six', 'from nextgisweb.i18n import tcheck']
+        settings['mako.default_filters'] = ['tcheck', 'h'] if is_debug else []
 
-        plockey = 'pyramid.default_locale_name'
-        if plockey not in settings and self.env.core.locale_default is not None:
-            settings[plockey] = self.env.core.locale_default
+        # Pyramid debug toolbar
+        dt_opt = self.options.with_prefix('debugtoolbar')
+        if dt_opt.get('enabled', is_debug):
+            import pyramid_debugtoolbar
+            pyramid_includes.append(pyramid_debugtoolbar)
+            settings['debugtoolbar.hosts'] = dt_opt.get('hosts', '0.0.0.0/0' if is_debug else None)
+            settings['debugtoolbar.exclude_prefixes'] = ['/static/', ]
 
         config = Configurator(settings=settings)
+
+        for pinc in pyramid_includes:
+            config.include(pinc)
 
         # Substitute localizer from pyramid with our own, original is
         # too tied to translationstring, that works strangely with string
@@ -111,9 +119,6 @@ class PyramidComponent(Component):
         config.add_request_method(
             lambda req: self._env, 'env',
             property=True)
-
-        config.include(pyramid_tm)
-        config.include(pyramid_mako)
 
         # Filter for quick translation. Defines function tr, which we can use
         # instead of request.localizer.translate in templates.
@@ -247,5 +252,8 @@ class PyramidComponent(Component):
 
         Option('sentry_dsn'),
         Option('desktop_gis_example', default='NextGIS QGIS'),
-        Option('company_url', default="https://nextgis.com")
+        Option('company_url', default="https://nextgis.com"),
+
+        Option('debugtoolbar.enabled', bool),
+        Option('debugtoolbar.hosts'),
     )
