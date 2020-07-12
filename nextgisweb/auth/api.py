@@ -102,7 +102,7 @@ def login(request):
     if ('login' not in request.POST) or ('password' not in request.POST):
         return HTTPUnprocessableEntity()
 
-    user = request.env.auth.authenticate_with_password(
+    user, tresp = request.env.auth.authenticate_with_password(
         username=request.POST['login'].strip(),
         password=request.POST['password'])
 

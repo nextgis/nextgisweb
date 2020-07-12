@@ -26,9 +26,12 @@ def login(request):
 
     if request.method == 'POST':
         try:
-            user = request.env.auth.authenticate_with_password(
+            user, tresp = request.env.auth.authenticate_with_password(
                 username=request.POST['login'].strip(),
                 password=request.POST['password'])
+
+            if tresp:
+                token_response_to_session(request, tresp)
 
             headers = remember(request, user.id)
             return HTTPFound(location=next_url, headers=headers)
@@ -89,6 +92,12 @@ def oauth(request):
             path=oauth_path, max_age=600, httponly=True)
 
         return response
+
+
+def token_response_to_session(request, tresp):
+    request.session['auth.oauth.access_token'] = tresp.access_token
+    request.session['auth.oauth.refresh_token'] = tresp.refresh_token
+    request.session['auth.oauth.expires'] = tresp.expires
 
 
 def logout(request):

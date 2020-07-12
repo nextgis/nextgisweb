@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 import re
 import itertools
 from datetime import datetime, timedelta
+from collections import namedtuple
 import six
 from six.moves.urllib.parse import urlencode
 
@@ -10,6 +11,7 @@ import requests
 import zope.event
 
 from ..lib.config import OptionAnnotations, Option
+from ..compat import datetime_to_timestamp
 from .. import db
 from ..models import DBSession
 from ..core.exception import UserException
@@ -46,16 +48,20 @@ class OAuthHelper(object):
     def grant_type_password(self, username, password):
         # TODO: Implement scope support
 
-        return self._server_request('token', dict(
-            grant_type='password',
+        return self._token_request('password', dict(
             username=username,
             password=password))
 
     def grant_type_authorization_code(self, code, redirect_uri):
-        tdata = self._server_request('token', dict(
-            grant_type='authorization_code',
+        # TODO: Implement scope support
+
+        return self._token_request('authorization_code', dict(
             redirect_uri=redirect_uri, code=code))
-        return tdata
+
+    def grant_type_refresh_token(self, refresh_token, access_token):
+        return self._token_request('refresh_token', dict(
+            refresh_token=refresh_token,
+            access_token=access_token))
 
     def query_profile(self, access_token):
         headers = dict(self.server_headers)
@@ -155,6 +161,14 @@ class OAuthHelper(object):
 
         return response.json()
 
+    def _token_request(self, grant_type, params):
+        data = self._server_request('token', dict(params, grant_type=grant_type))
+        exp = datetime.utcnow() + timedelta(seconds=data['expires_in'])
+        return OAuthGrantResponse(
+            access_token=data['access_token'],
+            refresh_token=data['refresh_token'],
+            expires=datetime_to_timestamp(exp))
+
     option_annotations = OptionAnnotations((
         Option('enabled', bool, default=False,
                doc="Enable OAuth authentication."),
@@ -216,6 +230,10 @@ class OnAccessTokenToUser(object):
     @property
     def profile(self):
         return self._profile
+
+
+OAuthGrantResponse = namedtuple('OAuthGrantResponse', [
+    'access_token', 'refresh_token', 'expires'])
 
 
 class OAuthToken(Base):

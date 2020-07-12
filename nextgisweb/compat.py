@@ -13,3 +13,19 @@ __all__ = [
     'lru_cache',
     'Path'
 ]
+
+
+def datetime_to_timestamp(value):
+    if six.PY3:
+        return value.timestamp()
+    else:
+        from time import mktime
+        return mktime(value.timetuple())
+
+
+def timestamp_to_datetime(value):
+    from datetime import datetime
+    if six.PY3:
+        return datetime.fromtimestamp(value)
+    else:
+        return datetime.utcfromtimestamp(value)

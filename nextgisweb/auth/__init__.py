@@ -154,8 +154,9 @@ class AuthComponent(Component):
 
         return obj
 
-    def authenticate_with_password(self, username, password):
+    def authenticate_with_password(self, username, password, oauth=True):
         user = None
+        tresp = None
 
         # Step 1: Authentication with local credentials
 
@@ -172,16 +173,16 @@ class AuthComponent(Component):
 
         # Step 2: Authentication with OAuth password if enabled
 
-        if user is None and self.oauth is not None and self.oauth.password:
-            tdata = self.oauth.grant_type_password(username, password)
-            user = self.oauth.access_token_to_user(tdata['access_token'])
+        if oauth and user is None and self.oauth is not None and self.oauth.password:
+            tresp = self.oauth.grant_type_password(username, password)
+            user = self.oauth.access_token_to_user(tresp.access_token)
 
         if user is None:
             raise InvalidCredentialsException()
         elif user.disabled:
             raise DisabledUserException()
 
-        return user
+        return (user, tresp)
 
     option_annotations = OptionAnnotations((
         Option('register', bool, default=False,

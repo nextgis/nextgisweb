@@ -1,13 +1,29 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, absolute_import
+from datetime import datetime
 
 from pyramid.authentication import (
-    SessionAuthenticationPolicy,
-    BasicAuthAuthenticationPolicy as
-    PyramidBasicAuthAuthenticationPolicy,
+    SessionAuthenticationPolicy as PyramidSessionAuthenticationPolicy,
+    BasicAuthAuthenticationPolicy as PyramidBasicAuthAuthenticationPolicy,
     CallbackAuthenticationPolicy)
 
+from ..compat import timestamp_to_datetime
 from ..auth import User
+from ..auth.views import token_response_to_session
+
+
+class SessionAuthenticationPolicy(PyramidSessionAuthenticationPolicy):
+
+    def unauthenticated_userid(self, request):
+        userid = super(SessionAuthenticationPolicy, self).unauthenticated_userid(request)
+        if userid is not None:
+            expires = request.session.get('auth.oauth.expires')
+            if expires and timestamp_to_datetime(float(expires)) < datetime.utcnow():
+                tresp = request.env.auth.oauth.grant_type_refresh_token(
+                    refresh_token=request.session['auth.oauth.refresh_token'],
+                    access_token=request.session['auth.oauth.access_token'])
+                token_response_to_session(request, tresp)
+        return userid
 
 
 class BasicAuthenticationPolicy(PyramidBasicAuthAuthenticationPolicy):
