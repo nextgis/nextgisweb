@@ -47,14 +47,12 @@ class OAuthHelper(object):
 
     def grant_type_password(self, username, password):
         # TODO: Implement scope support
-
         return self._token_request('password', dict(
             username=username,
             password=password))
 
     def grant_type_authorization_code(self, code, redirect_uri):
         # TODO: Implement scope support
-
         return self._token_request('authorization_code', dict(
             redirect_uri=redirect_uri, code=code))
 
@@ -62,13 +60,6 @@ class OAuthHelper(object):
         return self._token_request('refresh_token', dict(
             refresh_token=refresh_token,
             access_token=access_token))
-
-    def query_profile(self, access_token):
-        headers = dict(self.server_headers)
-        headers['Authorization'] = 'Bearer ' + access_token
-        response = requests.get(self.options['profile.endpoint'], headers=headers)
-        response.raise_for_status()
-        return response.json()
 
     def query_introspection(self, access_token):
         with DBSession.no_autoflush:
@@ -84,14 +75,10 @@ class OAuthHelper(object):
 
         return token
 
-    def access_token_to_user(self, access_token, as_resource_server=False):
-        # Use profile (userinfo) endpoint when enabled, othewise use token introspection
-        if self.options['profile.endpoint'] is not None:
-            profile = self.query_profile(access_token)
-        else:
-            # TODO: Implement scope support
-            token = self.query_introspection(access_token)
-            profile = token.data
+    def access_token_to_user(self, access_token):
+        # TODO: Implement scope support
+        token = self.query_introspection(access_token)
+        profile = token.data
 
         token.check_expiration()
 
