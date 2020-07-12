@@ -1,19 +1,28 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-import io
+import sys
 import os
+import io
+import re
 import os.path
 import errno
 import fcntl
 import secrets
-import six
 import string
+from subprocess import check_output
+from hashlib import md5
+from collections import namedtuple
 from calendar import timegm
+from logging import getLogger
+from pkg_resources import get_distribution
+import six
 
 from ..i18n import trstring_factory
 
 COMP_ID = 'pyramid'
 _ = trstring_factory(COMP_ID)
+
+_logger = getLogger(__name__)
 
 
 def viewargs(**kw):
@@ -124,7 +133,7 @@ def header_encoding_tween_factory(handler, registry):
         ):
             if h in headers:
                 v = headers[h]
-                if type(h) == unicode or type(v) == unicode:
+                if type(h) == unicode or type(v) == unicode:  # NOQA: F821
                     headers[h.encode('latin-1')] = v.encode('latin-1')
 
         return response
@@ -134,3 +143,50 @@ def header_encoding_tween_factory(handler, registry):
 
 def datetime_to_unix(dt):
     return timegm(dt.timetuple())
+
+
+def pip_freeze():
+    result = getattr(pip_freeze, '_result', None)
+    if result is not None:
+        return result
+
+    buf = check_output(
+        [sys.executable, '-W', 'ignore', '-m', 'pip', 'freeze'],
+        universal_newlines=True)
+    h = md5()
+    h.update(buf.encode('utf-8'))
+    static_key = h.hexdigest()
+
+    # Read installed packages from pip freeze
+    distinfo = []
+    for line in buf.split('\n'):
+        line = line.strip().lower()
+        if line == '':
+            continue
+
+        dinfo = None
+        mpkg = re.match(r'(.+)==(.+)', line)
+        if mpkg:
+            dinfo = DistInfo(
+                name=mpkg.group(1),
+                version=mpkg.group(2),
+                commit=None)
+
+        mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', line)
+        if mgit:
+            dinfo = DistInfo(
+                name=mgit.group(2),
+                version=get_distribution(mgit.group(2)).version,
+                commit=mgit.group(1))
+
+        if dinfo is not None:
+            distinfo.append(dinfo)
+        else:
+            _logger.warn("Could not parse pip freeze line: %s", line)
+
+    result = (static_key, tuple(distinfo))
+    setattr(pip_freeze, '_result', result)
+    return result
+
+
+DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])

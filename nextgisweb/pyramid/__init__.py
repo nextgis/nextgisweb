@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
-import sys
 import os.path
-import re
-import warnings
 from datetime import datetime as dt, timedelta
-from hashlib import md5
-from pkg_resources import resource_filename, get_distribution
-from collections import namedtuple
-from six import StringIO
+from pkg_resources import resource_filename
 
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
@@ -28,16 +22,14 @@ from .util import (
     RequestMethodPredicate,
     JsonPredicate,
     gensecret,
-    persistent_secret)
+    persistent_secret,
+    pip_freeze)
 from .auth import AuthenticationPolicy
 from .model import Base, Session, SessionStore
 from .session import WebSession
 from . import exception
 
 __all__ = ['viewargs', ]
-
-
-DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])
 
 
 class PyramidComponent(Component):
@@ -155,64 +147,9 @@ class PyramidComponent(Component):
         authz_policy = ACLAuthorizationPolicy()
         config.set_authorization_policy(authz_policy)
 
-        # To not clear static cache by hand make it so that
-        # URLs are different. Use md5 hash from all installed packages
-        # which we can get with pip freeze. pip freeze
-        # also returns current commit for packages from
-        # VCS, this also helps.
-
-        # This could've been done better, but right now simply
-        # redirect sys.stdout to StringIO, run pip freeze and
-        # return sys.stdout to initial state.
-
-        try:
-            from pip._internal import main as pip_main
-        except ImportError:
-            from pip import main as pip_main
-
-        stdout = sys.stdout
-        self.static_key = ''
-
-        try:
-            buf = StringIO()
-            sys.stdout = buf
-            with warnings.catch_warnings():
-                warnings.filterwarnings('ignore', r'DEPRECATION: Python 2\.7 will reach')
-                pip_main(['freeze', ])
-            h = md5()
-            h.update(buf.getvalue().encode('utf-8'))
-            self.static_key = '/' + h.hexdigest()
-        finally:
-            sys.stdout = stdout
-
-        self.distinfo = []
-
-        # Read installed packages from pip freeze
-
-        buf.seek(0)
-
-        for line in buf:
-            line = line.strip().lower()
-
-            dinfo = None
-            mpkg = re.match(r'(.+)==(.+)', line)
-            if mpkg:
-                dinfo = DistInfo(
-                    name=mpkg.group(1),
-                    version=mpkg.group(2),
-                    commit=None)
-
-            mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', line)
-            if mgit:
-                dinfo = DistInfo(
-                    name=mgit.group(2),
-                    version=get_distribution(mgit.group(2)).version,
-                    commit=mgit.group(1))
-
-            if dinfo is not None:
-                self.distinfo.append(dinfo)
-            else:
-                self.logger.warn("Could not parse pip freeze line: %s", line)
+        self.static_key = '/' + (
+            pip_freeze()[0] if not is_debug
+            else gensecret(8))
 
         chain = self._env.chain('setup_pyramid', first='pyramid')
         for comp in chain:
@@ -223,13 +160,13 @@ class PyramidComponent(Component):
 
         self.error_handlers.append(html_error_handler)
 
-        def amd_base(request):
-            amds = []
-            for comp in self._env.chain('amd_base'):
-                amds.extend(comp.amd_base)
-            return amds
+        amd_bases = []
+        for comp in self._env.chain('amd_base'):
+            amd_bases.extend(comp.amd_base)
 
-        config.add_request_method(amd_base, 'amd_base', property=True, reify=True)
+        config.add_request_method(
+            lambda req: amd_bases, 'amd_base',
+            property=True)
 
         config.add_renderer('json', json_renderer)
 

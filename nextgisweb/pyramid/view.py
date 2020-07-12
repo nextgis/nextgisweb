@@ -16,7 +16,7 @@ from ..core.exception import UserException
 from ..package import amd_packages
 from ..compat import lru_cache
 
-from .util import _
+from .util import _, pip_freeze
 
 
 def static_amd_file(request):
@@ -91,7 +91,7 @@ def pkginfo(request):
     request.require_administrator()
     return dict(
         title=_("Package versions"),
-        distinfo=request.env.pyramid.distinfo,
+        distinfo=pip_freeze()[1],
         dynmenu=request.env.pyramid.control_panel)
 
 
