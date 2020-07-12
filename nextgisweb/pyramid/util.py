@@ -9,12 +9,14 @@ import errno
 import fcntl
 import secrets
 import string
+import textwrap
 from subprocess import check_output
 from hashlib import md5
 from collections import namedtuple
 from calendar import timegm
 from logging import getLogger
 from pkg_resources import get_distribution
+from distutils.spawn import find_executable
 import six
 
 from ..i18n import trstring_factory
@@ -151,11 +153,11 @@ def pip_freeze():
         return result
 
     buf = check_output(
-        [sys.executable, '-W', 'ignore', '-m', 'pip', 'freeze'],
+        [find_python(), '-W', 'ignore', '-m', 'pip', 'freeze'],
         universal_newlines=True)
     h = md5()
     h.update(buf.encode('utf-8'))
-    static_key = h.hexdigest()
+    static_key = h.hexdigest()[:8]
 
     # Read installed packages from pip freeze
     distinfo = []
@@ -187,6 +189,34 @@ def pip_freeze():
     result = (static_key, tuple(distinfo))
     setattr(pip_freeze, '_result', result)
     return result
+
+
+def find_python():
+    osfile = os.__file__
+
+    def test(path):
+        if not os.path.split(path)[1].lower().startswith('python'):
+            return False
+        if not os.path.isfile(path):
+            return False
+        oscand = check_output([path, '-c', textwrap.dedent("""
+            from __future__ import print_function
+            import os; print(os.__file__)""")])
+        return oscand.strip() == osfile
+
+    candidates = [
+        ('executable', lambda: sys.executable),
+        ('search path', lambda: find_executable('python')),
+    ]
+
+    for cn, cf in candidates:
+        cv = cf()
+        _logger.debug("Testing python %s (%s)", cn, cv)
+        if test(cv):
+            _logger.info("Found matching python interpreter in %s", cv)
+            return cv
+
+    raise RuntimeError("Python executable not found!")
 
 
 DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])

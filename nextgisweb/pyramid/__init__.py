@@ -148,7 +148,7 @@ class PyramidComponent(Component):
         config.set_authorization_policy(authz_policy)
 
         self.static_key = '/' + (
-            pip_freeze()[0] if not is_debug
+            (pip_freeze()[0]) if not is_debug
             else gensecret(8))
 
         chain = self._env.chain('setup_pyramid', first='pyramid')
@@ -160,12 +160,15 @@ class PyramidComponent(Component):
 
         self.error_handlers.append(html_error_handler)
 
-        amd_bases = []
-        for comp in self._env.chain('amd_base'):
-            amd_bases.extend(comp.amd_base)
+        # TODO: Cache it!
+        def _amd_base(request):
+            result = []
+            for comp in self._env.chain('amd_base'):
+                result.extend(comp.amd_base)
+            return result
 
         config.add_request_method(
-            lambda req: amd_bases, 'amd_base',
+            _amd_base, 'amd_base',
             property=True)
 
         config.add_renderer('json', json_renderer)
