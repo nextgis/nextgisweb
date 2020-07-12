@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+from contextlib import contextmanager
 
 import pytest
 
@@ -39,4 +40,22 @@ def txn():
 def webapp(env):
     from webtest import TestApp
     app = env.pyramid.make_app({}).make_wsgi_app()
-    yield TestApp(app)
+    tapp = TestApp(app)
+    yield tapp
+
+
+@pytest.fixture()
+def webapp_handler(env, webapp):
+    pyramid = env.pyramid
+
+    @contextmanager
+    def _decorator(handler):
+        assert pyramid.test_request_handler is None
+        try:
+            pyramid.test_request_handler = handler
+            yield
+        finally:
+            pyramid.test_request_handler = None
+
+    yield _decorator
+    pyramid.test_request_handler = None

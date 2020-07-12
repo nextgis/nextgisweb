@@ -15,7 +15,6 @@ from .util import gensecret, datetime_to_unix
 
 __all__ = ['WebSession']
 
-cookie_name = 'session'
 cookie_settings = dict(
     path='/',
     domain=None,
@@ -31,12 +30,13 @@ class WebSession(dict):
         self._updated = list()
         self._cleared = False
         self._deleted = list()
-        self._max_age = request.env.pyramid.options['session.max_age']
-        self._session_id = request.cookies.get(cookie_name)
+        self._cookie_name = request.env.pyramid.options['session.cookie.name']
+        self._cookie_max_age = request.env.pyramid.options['session.max_age']
+        self._session_id = request.cookies.get(self._cookie_name)
 
         if self._session_id is not None:
             try:
-                actual_date = datetime.utcnow() - timedelta(seconds=self._max_age)
+                actual_date = datetime.utcnow() - timedelta(seconds=self._cookie_max_age)
                 session = Session.filter(
                     Session.id == self._session_id,
                     Session.last_activity > actual_date).one()
@@ -92,8 +92,8 @@ class WebSession(dict):
                 session.persist()
 
             cookie_settings['secure'] = request.scheme == 'https'
-            cookie_settings['max_age'] = self._max_age
-            response.set_cookie(cookie_name, value=session.id, **cookie_settings)
+            cookie_settings['max_age'] = self._cookie_max_age
+            response.set_cookie(self._cookie_name, value=session.id, **cookie_settings)
 
         request.add_response_callback(check_save)
 

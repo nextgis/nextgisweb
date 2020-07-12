@@ -155,6 +155,15 @@ def home_path(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def test_request(request):
+    comp = request.env.pyramid
+    handler = comp.test_request_handler
+    if handler:
+        return handler(request)
+    else:
+        raise ValueError("Invalid test request handler")
+
+
 def test_exception_handled(request):
     class HandledTestException(UserException):
         title = "Title"
@@ -266,6 +275,10 @@ def setup_pyramid(comp, config):
     ).add_view(home_path, renderer=ctpl('home_path'))
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
+
+    comp.test_request_handler = None
+    config.add_route('pyramid.test_request', '/test/request/') \
+        .add_view(test_request)
 
     config.add_route('pyramid.test_exception_handled', '/test/exception/handled') \
         .add_view(test_exception_handled)
