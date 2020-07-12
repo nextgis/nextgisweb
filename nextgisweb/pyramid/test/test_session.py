@@ -53,13 +53,13 @@ def get_session_id(response):
     cookie = SimpleCookie()
     cookie.load(response.headers['Set-Cookie'])
     for key, value in cookie.items():
-        if key == 'session':
+        if key == 'ngwsid':
             return value.value
     return None
 
 
 def session_headers(session_id):
-    return dict(cookie=str('session=%s' % session_id))
+    return dict(cookie=str('ngwsid=%s' % session_id))
 
 
 def read_store(session_id):

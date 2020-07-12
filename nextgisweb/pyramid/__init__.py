@@ -309,6 +309,7 @@ class PyramidComponent(Component):
 
         Option('session.max_age', int, default=timedelta(days=7).total_seconds(),
                doc="Session lifetime in seconds."),
+        Option('session.cookie.name', str, default='ngwsid'),
 
         Option('backup.download', bool, default=False),
 
