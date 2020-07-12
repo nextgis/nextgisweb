@@ -4,6 +4,7 @@ import re
 import itertools
 from datetime import datetime, timedelta
 from collections import namedtuple
+from logging import getLogger
 import six
 from six.moves.urllib.parse import urlencode
 
@@ -18,6 +19,9 @@ from ..core.exception import UserException
 
 from .models import User, Group, Base
 from .util import _, clean_user_keyname
+
+
+_logger = getLogger(__name__)
 
 
 class OAuthHelper(object):
@@ -65,13 +69,16 @@ class OAuthHelper(object):
         with DBSession.no_autoflush:
             token = OAuthToken.filter_by(id=access_token).first()
 
-        if token is None:
+        if token is not None:
+            _logger.debug("Access token was read from cache (%s)", access_token)
+        else:
             tdata = self._server_request('introspection', dict(
                 token=access_token))
             token = OAuthToken(id=access_token, data=tdata)
             token.exp = datetime.utcfromtimestamp(tdata['exp'])
             token.sub = six.text_type(tdata[self.options['profile.subject']])
             token.persist()
+            _logger.debug("Adding access token to cache (%s)", access_token)
 
         return token
 
@@ -143,6 +150,11 @@ class OAuthHelper(object):
             params['client_id'] = self.options['client.id']
         if 'client.secret' in self.options:
             params['client_secret'] = self.options['client.secret']
+
+        _logger.debug(
+            "%s request to %s endpoint: %s",
+            method.upper(), endpoint.upper(),
+            six.text_type(params))
 
         response = getattr(requests, method.lower())(url, params, headers=self.server_headers)
         response.raise_for_status()
