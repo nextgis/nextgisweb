@@ -197,7 +197,7 @@ class WebSession(dict):
         raise NotImplementedError()
 
     def clear(self, *args, **kwargs):
-        self._updated.clear()
-        self._deleted.clear()
+        del self._updated[:]
+        del self._deleted[:]
         self._cleared = True
         return super(WebSession, self).clear(*args, **kwargs)
