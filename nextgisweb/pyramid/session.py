@@ -201,4 +201,5 @@ class WebSession(dict):
         del self._updated[:]
         del self._deleted[:]
         self._cleared = True
+        self._validated = True
         return super(WebSession, self).clear(*args, **kwargs)
