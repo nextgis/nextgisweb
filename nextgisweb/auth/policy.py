@@ -98,9 +98,9 @@ class AuthenticationPolicy(object):
         exp = int(datetime_to_timestamp(datetime.utcnow() + self.options['local.lifetime'])) \
             if tresp is None else tresp.expires
 
-        session['auth.policy.current'] = (atype, user_id, exp) + (
+        session['auth.policy.current'] = (atype, user_id, int(exp)) + ((
             int(datetime_to_timestamp(datetime.utcnow() + self.options['local.refresh'])),
-        ) if atype == 'LOCAL' else ()
+        ) if atype == 'LOCAL' else ())
 
         for k in ('access_token', 'refresh_token'):
             sk = 'auth.policy.{}'.format(k)
