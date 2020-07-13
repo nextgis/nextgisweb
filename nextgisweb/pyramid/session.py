@@ -184,6 +184,7 @@ class WebSession(dict):
         raise NotImplementedError()
 
     def __delitem__(self, key, *args, **kwargs):
+        self._validate(key)
         if key not in self._deleted:
             self._deleted.append(key)
         if key in self._updated:
