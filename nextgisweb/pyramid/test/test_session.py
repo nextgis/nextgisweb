@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+
+import json
 from datetime import datetime, timedelta
 
 from freezegun import freeze_time
@@ -69,7 +71,7 @@ def session_headers(session_id):
 def read_store(session_id):
     result = dict()
     for kv in SessionStore.filter_by(session_id=session_id).all():
-        result[kv.key] = kv.value
+        result[kv.key] = json.loads(kv.value)
     return result
 
 
@@ -130,14 +132,18 @@ def test_session_lifetime(env, cwebapp, touch_max_age):
         assert new_session_id == get_session_id(res)
 
 
-@pytest.mark.parametrize('key, value', (
-    ('str', 'foo'),
-    ('int', 42),
-    ('bool', True),
-    pytest.param('tuple', (1, 2, ('nested', 'tuple')), id='tuple'),
-    pytest.param('k' * 1024, 'v' * 1024, id='big'),
+@pytest.mark.parametrize('key, value, error', (
+    ('NoneType', None, None),
+    ('str', 'foo', None),
+    ('int', 42, None),
+    ('bool', True, None),
+    ('list', [], ValueError),
+    pytest.param('tuple', (1, 2, ('nested', 'tuple')), None, id='tuple'),
+    pytest.param('deep', ('we', ('need', ('to', ('go', ('deeper',))))), None, id='deep'),
+    pytest.param('bad_child', ('ok', (None, (True, ('bad', dict())))), ValueError, id='bad_child'),
+    pytest.param('k' * 1024, 'v' * 1024, KeyError, id='big'),
 ))
-def test_serialization(key, value, webapp, webapp_handler):
+def test_serialization(key, value, error, webapp, webapp_handler):
     def _set(request):
         request.session[key] = value
         return Response()
@@ -156,7 +162,12 @@ def test_serialization(key, value, webapp, webapp_handler):
         return Response()
 
     with webapp_handler(_set):
-        webapp.get('/test/request/')
+        if error is not None:
+            with pytest.raises(error):
+                webapp.get('/test/request/')
+            return
+        else:
+            webapp.get('/test/request/')
 
     with webapp_handler(_get):
         webapp.get('/test/request/')

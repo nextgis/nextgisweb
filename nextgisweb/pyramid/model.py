@@ -6,6 +6,8 @@ from ..models import declarative_base
 
 Base = declarative_base()
 
+KEY_LENGTH = 32
+
 
 class Session(Base):
     __tablename__ = 'session'
@@ -20,7 +22,7 @@ class SessionStore(Base):
 
     session_id = db.Column(db.Unicode, db.ForeignKey(Session.id, ondelete='cascade'),
                            primary_key=True)
-    key = db.Column(db.Unicode(32), primary_key=True)
+    key = db.Column(db.Unicode(KEY_LENGTH), primary_key=True)
     value = db.Column(db.Unicode, nullable=False)
 
     session = db.relationship(
