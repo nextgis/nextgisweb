@@ -136,6 +136,22 @@ class OAuthHelper(object):
                         user.keyname = candidate
                         break
 
+            mof_attr = self.options['profile.member_of.attr']
+            if mof_attr is not None:
+                mof = profile[mof_attr]
+                if not isinstance(mof, list):
+                    raise ValueError()  # FIXME!
+
+                grp_map = dict(map(
+                    lambda i: i.split(':'),
+                    self.options['profile.member_of.map']))
+
+                grp_keyname = list(map(
+                    lambda i: grp_map.get(i, i),
+                    mof))
+
+                user.member_of = Group.filter(Group.keyname.in_(grp_keyname)).all()
+
         event = OnAccessTokenToUser(user, profile)
         zope.event.notify(event)
 
@@ -214,6 +230,9 @@ class OAuthHelper(object):
 
         Option('profile.display_name', default='name',
                doc="OAuth profile display name"),
+
+        Option('profile.member_of.attr', default=None),
+        Option('profile.member_of.map', list, default=[]),
 
         Option('profile.sync_timedelta', timedelta, default=None,
                doc="Minimum time delta between profile synchronization with OAuth server."),
