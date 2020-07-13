@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+from logging import getLogger
 from datetime import datetime
 from base64 import b64decode
 
-
 from ..compat import timestamp_to_datetime, datetime_to_timestamp
+
+
+logger = getLogger(__name__)
 
 
 class AuthenticationPolicy(object):
@@ -24,25 +27,34 @@ class AuthenticationPolicy(object):
 
         current = session.get('auth.policy.current')
         if current is not None:
-            user_id, atype, exp = current.split(',')
-            user_id = int(user_id)
-            atype = atype.upper()
+            atype, user_id, exp = current[0:3]
             exp = timestamp_to_datetime(int(exp))
 
-            expired = exp < datetime.utcnow()
+            now = datetime.utcnow()
+            expired = exp <= now
+
             if atype == 'OAUTH':
+                if len(current) != 3:
+                    raise ValueError("Invalid OAuth session data")
+
                 if expired:
                     tresp = self.oauth.grant_type_refresh_token(
                         refresh_token=session['auth.policy.refresh_token'],
                         access_token=session['auth.policy.access_token'])
                     self.remember((user_id, tresp))
+
                 return user_id
 
             elif atype == 'LOCAL':
                 if expired:
                     return None
 
-                # TODO: Renew here!
+                refresh, = current[3:]
+                if timestamp_to_datetime(refresh) <= now:
+                    session['auth.policy.current'] = current[0:2] + (
+                        int(datetime_to_timestamp(now + self.options['local.lifetime'])),
+                        int(datetime_to_timestamp(now + self.options['local.refresh'])),
+                    )
 
                 return user_id
 
@@ -83,11 +95,12 @@ class AuthenticationPolicy(object):
         user_id, tresp = what
 
         atype = 'LOCAL' if tresp is None else 'OAUTH'
-        exp = datetime_to_timestamp(datetime.utcnow() + self.options['local.lifetime']) \
+        exp = int(datetime_to_timestamp(datetime.utcnow() + self.options['local.lifetime'])) \
             if tresp is None else tresp.expires
 
-        session['auth.policy.current'] = '{},{},{}'.format(
-            user_id, atype, int(exp))
+        session['auth.policy.current'] = (atype, user_id, exp) + (
+            int(datetime_to_timestamp(datetime.utcnow() + self.options['local.refresh'])),
+        ) if atype == 'LOCAL' else ()
 
         for k in ('access_token', 'refresh_token'):
             sk = 'auth.policy.{}'.format(k)
