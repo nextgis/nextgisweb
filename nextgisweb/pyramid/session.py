@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import json
 from datetime import datetime, timedelta
+from six import text_type
 
 import transaction
 from pyramid.interfaces import ISession
@@ -10,7 +12,7 @@ from zope.interface import implementer
 
 from ..models import DBSession
 
-from .model import Session, SessionStore
+from .model import Session, SessionStore, KEY_LENGTH
 from .util import gensecret, datetime_to_unix
 
 __all__ = ['WebSession']
@@ -22,11 +24,34 @@ cookie_settings = dict(
     samesite='Lax'
 )
 
+allowed_types = (
+    type(None),
+    bool,
+    int,
+    text_type,
+    tuple,
+)
+
+
+def validate_key(k):
+    if len(k) > KEY_LENGTH:
+        raise KeyError('Key length exceeded!')
+    return True
+
+
+def validate_value(v):
+    t = type(v)
+    if t not in allowed_types:
+        raise ValueError('Type `%s` is not allowed!' % t)
+    elif t == tuple:
+        return all(validate_value(_v) for _v in v)
+    return True
+
 
 @implementer(ISession)
 class WebSession(dict):
     def __init__(self, request):
-        self._validated = False
+        self._refreshed = False
         self._updated = list()
         self._cleared = False
         self._deleted = list()
@@ -87,7 +112,7 @@ class WebSession(dict):
                             kv = SessionStore.filter_by(session_id=session.id, key=key).one()
                         except NoResultFound:
                             kv = SessionStore(session_id=session.id, key=key).persist()
-                        kv.value = self._get(key)
+                        kv.value = self._get_for_db(key)
 
                 session.persist()
 
@@ -97,31 +122,40 @@ class WebSession(dict):
 
         request.add_response_callback(check_save)
 
-    def _get(self, key):
-        return super(WebSession, self).__getitem__(key)
+    def _get_for_db(self, key):
+        value = super(WebSession, self).__getitem__(key)
+        return json.dumps(value)
 
-    def _set(self, key, value):
+    def _set_from_db(self, key, value):
+        value = json.loads(value)
+
+        def array_to_tuple(v):
+            if type(v) == list:
+                v = tuple(array_to_tuple(_v) for _v in v)
+            return v
+
+        value = array_to_tuple(value)
         super(WebSession, self).__setitem__(key, value)
 
     @property
     def _keys(self):
         return super(WebSession, self).keys()
 
-    def _validate_all(self):
-        if self._validated:
+    def _refresh_all(self):
+        if self._refreshed:
             return
         for kv in SessionStore.filter(SessionStore.session_id == self._session_id,
                                       ~SessionStore.key.in_(self._keys)).all():
-            self._set(kv.key, kv.value)
-        self._validated = True
+            self._set_from_db(kv.key, kv.value)
+        self._refreshed = True
 
-    def _validate(self, key):
-        if self._validated or key in self._keys:
+    def _refresh(self, key):
+        if self._refreshed or key in self._keys:
             return
         if key not in self._deleted:
             try:
                 kv = SessionStore.filter_by(session_id=self._session_id, key=key).one()
-                self._set(key, kv.value)
+                self._set_from_db(key, kv.value)
             except NoResultFound:
                 pass
 
@@ -139,43 +173,45 @@ class WebSession(dict):
     # dict
 
     def __contains__(self, key, *args, **kwargs):
-        self._validate(key)
+        self._refresh(key)
         return super(WebSession, self).__contains__(key, *args, **kwargs)
 
     def keys(self, *args, **kwargs):
-        self._validate_all()
+        self._refresh_all()
         return super(WebSession, self).keys(*args, **kwargs)
 
     def values(self, *args, **kwargs):
-        self._validate_all()
+        self._refresh_all()
         return super(WebSession, self).values(*args, **kwargs)
 
     def items(self, *args, **kwargs):
-        self._validate_all()
+        self._refresh_all()
         return super(WebSession, self).items(*args, **kwargs)
 
     def __len__(self, *args, **kwargs):
-        self._validate_all()
+        self._refresh_all()
         return super(WebSession, self).__len__(*args, **kwargs)
 
     def __getitem__(self, key, *args, **kwargs):
-        self._validate(key)
+        self._refresh(key)
         return super(WebSession, self).__getitem__(key, *args, **kwargs)
 
     def get(self, key, *args, **kwargs):
-        self._validate(key)
+        self._refresh(key)
         return super(WebSession, self).get(key, *args, **kwargs)
 
     def __iter__(self, *args, **kwargs):
-        self._validate_all()
+        self._refresh_all()
         return super(WebSession, self).__iter__(*args, **kwargs)
 
-    def __setitem__(self, key, *args, **kwargs):
+    def __setitem__(self, key, value, *args, **kwargs):
+        validate_key(key)
+        validate_value(value)
         if key not in self._updated:
             self._updated.append(key)
         if key in self._deleted:
             self._deleted.remove(key)
-        return super(WebSession, self).__setitem__(key, *args, **kwargs)
+        return super(WebSession, self).__setitem__(key, value, *args, **kwargs)
 
     def setdefault(self, *args, **kwargs):
         raise NotImplementedError()
@@ -184,7 +220,7 @@ class WebSession(dict):
         raise NotImplementedError()
 
     def __delitem__(self, key, *args, **kwargs):
-        self._validate(key)
+        self._refresh(key)
         if key not in self._deleted:
             self._deleted.append(key)
         if key in self._updated:
@@ -201,5 +237,5 @@ class WebSession(dict):
         del self._updated[:]
         del self._deleted[:]
         self._cleared = True
-        self._validated = True
+        self._refreshed = True
         return super(WebSession, self).clear(*args, **kwargs)
