@@ -2,17 +2,20 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/Deferred",
+    "dojo/dom-class",
     "dojo/dom-construct",
     "dijit/Dialog",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
     "dojox/collections/Set",
     "./Tree",
-    "ngw-pyramid/i18n!resource"
+    "ngw-pyramid/i18n!resource",
+    "xstyle/css!./resource/ResourcePicker.css"
 ], function (
     declare,
     lang,
     Deferred,
+    domClass,
     domConstruct,
     Dialog,
     Button,
@@ -27,13 +30,20 @@ define([
         buildRendering: function () {
             this.inherited(arguments);
 
+            var widget = this;
+
             this.container = new BorderContainer({
                 style: "width: 400px; height: 300px"
             }).placeAt(this);
 
             this.tree = new Tree({
                 region: "center",
-                style: "width: 100%; height: 100%;"
+                style: "width: 100%; height: 100%;",
+                _createTreeNode: function(args) {
+                    var treeNode = this.inherited(arguments);
+                    treeNode.set('disabled', !widget.checkItemAcceptance(args.item));
+                    return treeNode;
+                }
             }).placeAt(this.container);
 
             this.tree.on("click", lang.hitch(this, function () {
