@@ -51,12 +51,14 @@ class OAuthHelper(object):
 
     def grant_type_password(self, username, password):
         # TODO: Implement scope support
+
         return self._token_request('password', dict(
             username=username,
             password=password))
 
     def grant_type_authorization_code(self, code, redirect_uri):
         # TODO: Implement scope support
+
         return self._token_request('authorization_code', dict(
             redirect_uri=redirect_uri, code=code))
 
@@ -81,7 +83,7 @@ class OAuthHelper(object):
                 token=access_token))
             token = OAuthToken(id=access_token, data=tdata)
             token.exp = datetime.utcfromtimestamp(tdata['exp'])
-            token.sub = six.text_type(tdata[self.options['profile.subject']])
+            token.sub = six.text_type(tdata[self.options['profile.subject.attr']])
             token.persist()
             _logger.debug("Adding access token to cache (%s)", access_token)
 
@@ -89,19 +91,17 @@ class OAuthHelper(object):
 
     def access_token_to_user(self, access_token):
         # TODO: Implement scope support
-        token = self.query_introspection(access_token)
-        profile = token.data
 
+        token = self.query_introspection(access_token)
         token.check_expiration()
 
         with DBSession.no_autoflush:
-            profile_subject = six.text_type(profile[self.options['profile.subject']])
-            user = User.filter_by(oauth_subject=profile_subject).first()
+            user = User.filter_by(oauth_subject=token.sub).first()
 
             if user is None:
                 # Register new user with default groups
                 if self.options['register']:
-                    user = User(oauth_subject=profile_subject).persist()
+                    user = User(oauth_subject=token.sub).persist()
                     user.member_of = Group.filter_by(register=True).all()
                 else:
                     return None
@@ -113,51 +113,11 @@ class OAuthHelper(object):
             ):
                 # Skip profile synchronization
                 return user
-            else:
-                user.oauth_tstamp = datetime.utcnow()
 
-            profile_display_name = self.options.get('profile.display_name', None)
-            if profile_display_name is not None:
-                user.display_name = ' '.join([
-                    six.text_type(profile[key])
-                    for key in re.split(r',\s*', profile_display_name)
-                    if key in profile])
+            self._update_user(user, token.data)
+            user.oauth_tstamp = datetime.utcnow()
 
-            # Fallback to profile subject
-            if user.display_name is None or re.match(r'\s+', user.display_name):
-                user.display_name = profile_subject
-
-            profile_keyname = self.options.get('profile.keyname', None)
-            if profile_keyname is not None:
-                base = profile[profile_keyname]
-
-                # Check keyname uniqueness and add numbered suffix
-                for idx in itertools.count():
-                    candidate = clean_user_keyname(base, idx)
-                    if User.filter(
-                        User.keyname == candidate,
-                        User.id != user.id
-                    ).first() is None:
-                        user.keyname = candidate
-                        break
-
-            mof_attr = self.options['profile.member_of.attr']
-            if mof_attr is not None:
-                mof = profile[mof_attr]
-                if not isinstance(mof, list):
-                    raise ValueError()  # FIXME!
-
-                grp_map = dict(map(
-                    lambda i: i.split(':'),
-                    self.options['profile.member_of.map']))
-
-                grp_keyname = list(map(
-                    lambda i: grp_map.get(i, i),
-                    mof))
-
-                user.member_of = Group.filter(Group.keyname.in_(grp_keyname)).all()
-
-        event = OnAccessTokenToUser(user, profile)
+        event = OnAccessTokenToUser(user, token.data)
         zope.event.notify(event)
 
         return user
@@ -189,6 +149,51 @@ class OAuthHelper(object):
             access_token=data['access_token'],
             refresh_token=data['refresh_token'],
             expires=datetime_to_timestamp(exp))
+
+    def _update_user(self, user, token):
+        opts = self.options.with_prefix('profile')
+
+        profile_keyname = opts.get('keyname.attr', None)
+        if profile_keyname is not None:
+            user.keyname = token[profile_keyname]
+
+        # Check keyname uniqueness and add numbered suffix
+        keyname_base = _fallback_value(user.keyname, user.oauth_subject)
+        for idx in itertools.count():
+            candidate = clean_user_keyname(keyname_base, idx)
+            if User.filter(
+                User.keyname == candidate,
+                User.id != user.id
+            ).first() is None:
+                user.keyname = candidate
+                break
+
+        # Full name (display_name)
+        profile_display_name = opts.get('display_name.attr', None)
+        if profile_display_name is not None:
+            user.display_name = ' '.join([
+                six.text_type(token[key])
+                for key in re.split(r',\s*', profile_display_name)
+                if key in token])
+
+        user.display_name = _fallback_value(user.display_name, user.keyname)
+
+        # Group membership (member_of)
+        mof_attr = opts.get('member_of.attr', None)
+        if mof_attr is not None:
+            mof = token[mof_attr]
+            if not isinstance(mof, list):
+                raise ValueError()  # FIXME!
+
+            grp_map = dict(map(
+                lambda i: i.split(':'),
+                opts['member_of.map']))
+
+            grp_keyname = list(map(
+                lambda i: grp_map.get(i, i),
+                mof))
+
+            user.member_of = Group.filter(Group.keyname.in_(grp_keyname)).all()
 
     option_annotations = OptionAnnotations((
         Option('enabled', bool, default=False,
@@ -227,17 +232,17 @@ class OAuthHelper(object):
         Option('profile.endpoint', default=None,
                doc="OpenID Connect endpoint URL"),
 
-        Option('profile.subject', default='sub',
+        Option('profile.subject.attr', default='sub',
                doc="OAuth profile subject identifier"),
 
-        Option('profile.keyname', default='preferred_username',
+        Option('profile.keyname.attr', default='preferred_username',
                doc="OAuth profile keyname (user name)"),
 
-        Option('profile.display_name', default='name',
+        Option('profile.display_name.attr', default='name',
                doc="OAuth profile display name"),
 
         Option('profile.member_of.attr', default=None),
-        Option('profile.member_of.map', list, default=[]),
+        Option('profile.member_of.map', list, default=None),
 
         Option('profile.sync_timedelta', timedelta, default=None,
                doc="Minimum time delta between profile synchronization with OAuth server."),
@@ -284,3 +289,12 @@ class OAuthTokenRefreshException(UserException):
 class OAuthAccessTokenExpiredException(UserException):
     title = _("OAuth access token is expired")
     http_status_code = 403
+
+
+def _fallback_value(*args):
+    for a in args:
+        if not(a is None or (
+            isinstance(a, six.string_types) and a.strip() == ''
+        )):
+            return a
+    raise ValueError("No suitable value found")

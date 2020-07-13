@@ -167,6 +167,9 @@ class ConfigOptionsPrefixProxy(object):
         self._parent = parent
         self._prefix = prefix
 
+    def with_prefix(self, prefix):
+        return self._parent.with_prefix(self._prefix + '.' + prefix)
+
     def _pkey(self, key):
         return self._prefix + '.' + key
 
