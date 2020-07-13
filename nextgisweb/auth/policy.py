@@ -4,7 +4,11 @@ from logging import getLogger
 from datetime import datetime
 from base64 import b64decode
 
+from pyramid.httpexceptions import HTTPUnauthorized
+
 from ..compat import timestamp_to_datetime, datetime_to_timestamp
+
+from .oauth import OAuthTokenRefreshException
 
 
 logger = getLogger(__name__)
@@ -38,10 +42,14 @@ class AuthenticationPolicy(object):
                     raise ValueError("Invalid OAuth session data")
 
                 if expired:
-                    tresp = self.oauth.grant_type_refresh_token(
-                        refresh_token=session['auth.policy.refresh_token'],
-                        access_token=session['auth.policy.access_token'])
-                    self.remember((user_id, tresp))
+                    try:
+                        tresp = self.oauth.grant_type_refresh_token(
+                            refresh_token=session['auth.policy.refresh_token'],
+                            access_token=session['auth.policy.access_token'])
+                        self.remember(request, (user_id, tresp))
+                    except OAuthTokenRefreshException as exc:
+                        self.forget(request)
+                        return None
 
                 return user_id
 
@@ -57,6 +65,9 @@ class AuthenticationPolicy(object):
                     )
 
                 return user_id
+
+            else:
+                raise ValueError("Invalid authentication type: " + atype)
 
         # HTTP based authentication
 
@@ -84,6 +95,9 @@ class AuthenticationPolicy(object):
             if amode == 'BEARER':
                 user = self.oauth.access_token_to_user(value)
                 return user.id
+
+            else:
+                raise HTTPUnauthorized()
 
         return None
 

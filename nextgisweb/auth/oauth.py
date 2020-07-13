@@ -61,9 +61,14 @@ class OAuthHelper(object):
             redirect_uri=redirect_uri, code=code))
 
     def grant_type_refresh_token(self, refresh_token, access_token):
-        return self._token_request('refresh_token', dict(
-            refresh_token=refresh_token,
-            access_token=access_token))
+        try:
+            return self._token_request('refresh_token', dict(
+                refresh_token=refresh_token,
+                access_token=access_token))
+        except requests.HTTPError as exc:
+            if 400 <= exc.response.status_code <= 403:
+                raise OAuthTokenRefreshException()
+            raise exc
 
     def query_introspection(self, access_token):
         with DBSession.no_autoflush:
@@ -269,6 +274,11 @@ class OAuthToken(Base):
     def check_expiration(self):
         if self.exp < datetime.utcnow():
             raise OAuthAccessTokenExpiredException()
+
+
+class OAuthTokenRefreshException(UserException):
+    title = _("OAuth token refresh failed")
+    http_status_code = 401
 
 
 class OAuthAccessTokenExpiredException(UserException):
