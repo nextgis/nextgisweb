@@ -59,6 +59,7 @@ class WebSession(dict):
         self._cookie_name = request.env.pyramid.options['session.cookie.name']
         self._cookie_max_age = request.env.pyramid.options['session.max_age']
         self._session_id = request.cookies.get(self._cookie_name)
+        self._last_activity = None
 
         if self._session_id is not None:
             try:
@@ -68,6 +69,7 @@ class WebSession(dict):
                     Session.last_activity > actual_date).one()
                 self.new = False
                 self.created = datetime_to_unix(session.created)
+                self._last_activity = session.last_activity
             except NoResultFound:
                 self._session_id = None
 
@@ -76,13 +78,9 @@ class WebSession(dict):
             self.created = datetime_to_unix(datetime.utcnow())
 
         def check_save(request, response):
-            nothing_to_update = len(self._updated) == 0
-            nothing_to_delete = (not self._cleared and len(self._deleted) == 0) \
-                or self._session_id is None
-            if nothing_to_update and nothing_to_delete:
-                return
-
             with transaction.manager:
+                utcnow = datetime.utcnow()
+
                 if self._session_id is not None:
                     if self._cleared:
                         SessionStore.filter(
@@ -94,32 +92,35 @@ class WebSession(dict):
                             SessionStore.session_id == self._session_id,
                             SessionStore.key.in_(self._deleted)
                         ).delete(synchronize_session=False)
-                    try:
-                        session = Session.filter_by(id=self._session_id).one()
-                    except NoResultFound:
-                        self._session_id = None
 
-                if self._session_id is None:
-                    session = Session(
-                        id=gensecret(32),
-                        created=datetime.utcnow()
-                    )
+                    activity_delta = timedelta(
+                        seconds=request.env.pyramid.options['session.activity_delta'])
+                    if utcnow - self._last_activity > activity_delta:
+                        DBSession.query(Session).filter_by(
+                            id=self._session_id, last_activity=self._last_activity
+                        ).update(dict(last_activity=utcnow))
 
-                session.last_activity = datetime.utcnow()
+                if len(self._updated) > 0:
+                    if self._session_id is None:
+                        self._session_id = gensecret(32)
+                        Session(
+                            id=self._session_id,
+                            created=utcnow,
+                            last_activity=utcnow
+                        ).persist()
 
-                with DBSession.no_autoflush:
-                    for key in self._updated:
-                        try:
-                            kv = SessionStore.filter_by(session_id=session.id, key=key).one()
-                        except NoResultFound:
-                            kv = SessionStore(session_id=session.id, key=key).persist()
-                        kv.value = self._get_for_db(key)
+                    with DBSession.no_autoflush:
+                        for key in self._updated:
+                            try:
+                                kv = SessionStore.filter_by(session_id=self._session_id, key=key).one()
+                            except NoResultFound:
+                                kv = SessionStore(session_id=self._session_id, key=key).persist()
+                            kv.value = self._get_for_db(key)
 
-                session.persist()
-
-            cookie_settings['secure'] = request.scheme == 'https'
-            cookie_settings['max_age'] = self._cookie_max_age
-            response.set_cookie(self._cookie_name, value=session.id, **cookie_settings)
+            if self._session_id:
+                cookie_settings['secure'] = request.scheme == 'https'
+                cookie_settings['max_age'] = self._cookie_max_age
+                response.set_cookie(self._cookie_name, value=self._session_id, **cookie_settings)
 
         request.add_response_callback(check_save)
 

@@ -99,14 +99,17 @@ def test_session_store(cwebapp):
 
 
 @pytest.fixture()
-def touch_max_age(env):
-    value = env.pyramid.options['session.max_age']
+def save_options(env):
+    max_age = env.pyramid.options['session.max_age']
+    activity_delta = env.pyramid.options['session.activity_delta']
     yield
-    env.pyramid.options['session.max_age'] = value
+    env.pyramid.options['session.max_age'] = max_age
+    env.pyramid.options['session.activity_delta'] = activity_delta
 
 
-def test_session_lifetime(env, cwebapp, touch_max_age):
+def test_session_lifetime(env, cwebapp, save_options):
     env.pyramid.options['session.max_age'] = 100
+    env.pyramid.options['session.activity_delta'] = 0
     with freeze_time(datetime(year=2011, month=1, day=1)) as frozen_dt:
         res = cwebapp.post_json('/test/session_kv', dict(_test_var=1))
         session_id = get_session_id(res)
@@ -130,6 +133,15 @@ def test_session_lifetime(env, cwebapp, touch_max_age):
         headers = session_headers(new_session_id)
         res = cwebapp.post_json('/test/session_kv', dict(_test_var=5), headers=headers)
         assert new_session_id == get_session_id(res)
+
+        env.pyramid.options['session.activity_delta'] = 65
+        frozen_dt.tick(timedelta(seconds=60))
+        res = cwebapp.post_json('/test/session_kv', dict(_test_var=6), headers=headers)
+        assert new_session_id == get_session_id(res)
+
+        frozen_dt.tick(timedelta(seconds=60))
+        res = cwebapp.post_json('/test/session_kv', dict(_test_var=7), headers=headers)
+        assert new_session_id != get_session_id(res)
 
 
 @pytest.mark.parametrize('key, value, error', (
