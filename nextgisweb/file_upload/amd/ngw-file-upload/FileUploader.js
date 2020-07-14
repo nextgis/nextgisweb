@@ -183,6 +183,7 @@ define("ngw-file-upload/FileUploader", [
 			this._buildInitialized = true;
 			this._getButtonStyle(this.domNode);
 			this._setButtonStyle();
+			this.inProgress = false;
 			this.inherited(arguments);
 		},
 	
@@ -198,6 +199,7 @@ define("ngw-file-upload/FileUploader", [
 		},
 	
 		onBegin: function(/*Array*/ dataArray){
+			this.inProgress = true;
 			// summary:
 			//		Fires when upload begins
 		},
@@ -219,6 +221,7 @@ define("ngw-file-upload/FileUploader", [
 		},
 	
 		onComplete: function(/*Object*/ customEvent){
+			this.inProgress = false;
 			// summary:
 			//		stub to connect
 			//		Fires when all files have uploaded
@@ -227,6 +230,7 @@ define("ngw-file-upload/FileUploader", [
 		},
 	
 		onCancel: function(){
+			this.inProgress = false;
 			// summary:
 			//		Stub to connect
 			//		Fires when dialog box has been closed
@@ -234,12 +238,14 @@ define("ngw-file-upload/FileUploader", [
 		},
 	
 		onAbort: function(){
+			this.inProgress = false;
 			// summary:
 			//		Stub to connect
 			//		Fires when upload in progress was canceled
 		},
 	
 		onError: function(/*Object or String*/ evtObject){
+			this.inProgress = false;
 			// summary:
 			//		Fires on errors
 	
