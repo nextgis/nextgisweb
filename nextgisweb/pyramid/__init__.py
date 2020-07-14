@@ -241,9 +241,11 @@ class PyramidComponent(Component):
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
 
+        Option('session.cookie.name', str, default='ngwsid'),
         Option('session.max_age', int, default=timedelta(days=7).total_seconds(),
                doc="Session lifetime in seconds."),
-        Option('session.cookie.name', str, default='ngwsid'),
+        Option('session.activity_delta', int, default=timedelta(hours=1).total_seconds(),
+               doc="Session last activity update time delta in seconds."),
 
         Option('backup.download', bool, default=False),
 
