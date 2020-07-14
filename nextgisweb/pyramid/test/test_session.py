@@ -136,6 +136,7 @@ def test_session_lifetime(env, cwebapp, touch_max_age):
     ('NoneType', None, None),
     ('str', 'foo', None),
     ('int', 42, None),
+    ('float', 3.14159, None),
     ('bool', True, None),
     ('list', [], ValueError),
     pytest.param('tuple', (1, 2, ('nested', 'tuple')), None, id='tuple'),

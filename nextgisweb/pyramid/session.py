@@ -28,6 +28,7 @@ allowed_types = (
     type(None),
     bool,
     int,
+    float,
     text_type,
     tuple,
 )
