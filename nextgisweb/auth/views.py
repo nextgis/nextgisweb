@@ -6,7 +6,7 @@ import secrets
 
 
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPBadRequest
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
 
@@ -110,27 +110,14 @@ def render_error_message(request, message=None):
 
 def forbidden_error_response(request, err_info, exc, exc_info, **kwargs):
     # If user is not authentificated, we can offer him to sign in
-    # TODO: there may be a better way to check if authentificated
-
-    if request.user.keyname == 'guest':
-        # If URL starts with /api/ and user is not authentificated,
-        # then it's probably not a web-interface, but external software,
-        # that can do HTTP auth. Tell it that we can do too.
-        if request.is_api:
-            return HTTPUnauthorized(headers={
-                b'WWW-Authenticate': b'Basic realm="NextGISWeb"'})
-
-        # Others are redirected to login page.
-        elif request.method == 'GET':
-            response = render_to_response(
-                'nextgisweb:auth/template/login.mako',
-                dict(next_url=request.url), request=request)
-            response.status = 403
-            return response
+    if request.method == 'GET' and not request.is_api and request.user.keyname == 'guest':
+        response = render_to_response(
+            'nextgisweb:auth/template/login.mako',
+            dict(next_url=request.url), request=request)
+        response.status = 403
+        return response
 
     # Show error message to already authentificated users
-    # TODO: We can separately inform blocked users
-
     return render_error_message(request)
 
 
