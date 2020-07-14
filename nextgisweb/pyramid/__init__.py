@@ -161,16 +161,13 @@ class PyramidComponent(Component):
 
         self.error_handlers.append(html_error_handler)
 
-        # TODO: Cache it!
-        def _amd_base(request):
-            result = []
-            for comp in self._env.chain('amd_base'):
-                result.extend(comp.amd_base)
-            return result
+        amd_base = []
+        for comp in self._env.chain('amd_base'):
+            amd_base.extend(comp.amd_base)
 
         config.add_request_method(
-            _amd_base, 'amd_base',
-            property=True)
+            lambda r: amd_base, 'amd_base',
+            property=True, reify=True)
 
         config.add_renderer('json', json_renderer)
 
