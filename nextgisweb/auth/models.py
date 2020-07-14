@@ -58,8 +58,6 @@ class User(Principal):
 
     __mapper_args__ = dict(polymorphic_identity='U')
 
-    principal = orm.relationship(Principal)
-
     def __init__(self, password=None, **kwargs):
         super(Principal, self).__init__(**kwargs)
         if password:
@@ -166,8 +164,6 @@ class Group(Principal):
         backref=orm.backref('member_of'))
 
     __mapper_args__ = dict(polymorphic_identity='G')
-
-    principal = orm.relationship(Principal)
 
     def __str__(self):
         return self.display_name

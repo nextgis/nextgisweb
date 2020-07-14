@@ -8,7 +8,10 @@ from pyramid.httpexceptions import HTTPForbidden, HTTPUnprocessableEntity
 from pyramid.security import remember, forget
 
 from ..models import DBSession
+from ..core.exception import ValidationError
+
 from .models import User, Group
+from .util import _
 
 
 def user_cget(request):
@@ -35,8 +38,17 @@ def user_iget(request):
 def user_iput(request):
     request.require_administrator()
     obj = User.filter_by(id=request.matchdict['id']).one()
+    forbid_system_principal(obj)
     obj.deserialize(request.json_body)
     return dict(id=obj.id)
+
+
+def user_idelete(request):
+    request.require_administrator()
+    obj = User.filter_by(id=request.matchdict['id']).one()
+    forbid_system_principal(obj)
+    DBSession.delete(obj)
+    return None
 
 
 def group_cget(request):
@@ -63,8 +75,17 @@ def group_iget(request):
 def group_iput(request):
     request.require_administrator()
     obj = Group.filter_by(id=request.matchdict['id']).one()
+    forbid_system_principal(obj)
     obj.deserialize(request.json_body)
     return dict(id=obj.id)
+
+
+def group_idelete(request):
+    request.require_administrator()
+    obj = Group.filter_by(id=request.matchdict['id']).one()
+    forbid_system_principal(obj)
+    DBSession.delete(obj)
+    return None
 
 
 def current_user(request):
@@ -129,7 +150,8 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.user.item', '/api/component/auth/user/{id}') \
         .add_view(user_iget, request_method='GET', renderer='json') \
-        .add_view(user_iput, request_method='PUT', renderer='json')
+        .add_view(user_iput, request_method='PUT', renderer='json') \
+        .add_view(user_idelete, request_method='DELETE', renderer='json')
 
     config.add_route('auth.group.collection', '/api/component/auth/group/') \
         .add_view(group_cget, request_method='GET', renderer='json') \
@@ -137,7 +159,8 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.group.item', '/api/component/auth/group/{id}') \
         .add_view(group_iget, request_method='GET', renderer='json') \
-        .add_view(group_iput, request_method='PUT', renderer='json')
+        .add_view(group_iput, request_method='PUT', renderer='json') \
+        .add_view(group_idelete, request_method='DELETE', renderer='json')
 
     config.add_route('auth.current_user', '/api/component/auth/current_user') \
         .add_view(current_user, request_method='GET', renderer='json')
@@ -150,3 +173,8 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.logout_cookies', '/api/component/auth/logout') \
         .add_view(logout, request_method='POST', renderer='json')
+
+
+def forbid_system_principal(obj):
+    if obj.system:
+        raise ValidationError(_("System principals couldn't be chanded."))
