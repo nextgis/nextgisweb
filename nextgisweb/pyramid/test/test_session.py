@@ -189,6 +189,32 @@ def test_serialization(key, value, error, webapp, webapp_handler):
         webapp.get('/test/request/')
 
 
+def test_set_del(webapp, webapp_handler):
+
+    def _set(request):
+        request.session['foo'] = 1
+        request.session['bar'] = 1
+        return Response()
+
+    def _del(request):
+        del request.session['foo']
+        request.session['foo'] = 2
+
+        request.session['bar'] = 2
+        del request.session['bar']
+
+        return Response()
+
+    def _check(request):
+        assert request.session['foo'] == 2
+        assert 'bar' not in request.session
+        return Response()
+
+    for req in (_set, _del, _check):
+        with webapp_handler(req):
+            webapp.get('/test/request/')    
+
+
 def test_exception(webapp, webapp_handler):
 
     def _handler(request):
