@@ -20,7 +20,7 @@ class Session(Base):
 class SessionStore(Base):
     __tablename__ = 'pyramid_session_store'
 
-    session_id = db.Column(db.Unicode, db.ForeignKey(Session.id, ondelete='cascade'),
+    session_id = db.Column(db.ForeignKey(Session.id, ondelete='cascade'),
                            primary_key=True)
     key = db.Column(db.Unicode(KEY_LENGTH), primary_key=True)
     value = db.Column(db.Unicode, nullable=False)
