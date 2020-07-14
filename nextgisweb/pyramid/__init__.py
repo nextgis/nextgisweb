@@ -52,7 +52,7 @@ class PyramidComponent(Component):
         # Mako templates
         settings['mako.directories'] = 'nextgisweb:templates/'
         settings['mako.imports'] = ['import six', 'from nextgisweb.i18n import tcheck']
-        settings['mako.default_filters'] = ['tcheck', 'h'] if is_debug else []
+        settings['mako.default_filters'] = ['tcheck', 'h'] if is_debug else ['h', ]
 
         # Pyramid debug toolbar
         dt_opt = self.options.with_prefix('debugtoolbar')
