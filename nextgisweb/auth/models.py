@@ -130,6 +130,9 @@ class User(Principal):
             ('keyname', self.keyname),
             ('superuser', self.superuser),
             ('disabled', self.disabled),
+            ('last_activity', self.last_activity),
+            ('oauth_subject', self.oauth_subject),
+            ('oauth_tstamp', self.oauth_tstamp),
             ('member_of', [g.id for g in self.member_of])
         ))
 
