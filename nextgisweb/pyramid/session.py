@@ -12,7 +12,7 @@ from zope.interface import implementer
 
 from ..models import DBSession
 
-from .model import Session, SessionStore, KEY_LENGTH
+from .model import Session, SessionStore
 from .util import gensecret, datetime_to_unix
 
 __all__ = ['WebSession']
@@ -32,12 +32,6 @@ allowed_types = (
     text_type,
     tuple,
 )
-
-
-def validate_key(k):
-    if len(k) > KEY_LENGTH:
-        raise KeyError('Key length exceeded!')
-    return True
 
 
 def validate_value(v):
@@ -207,7 +201,6 @@ class WebSession(dict):
         return super(WebSession, self).__iter__(*args, **kwargs)
 
     def __setitem__(self, key, value, *args, **kwargs):
-        validate_key(key)
         validate_value(value)
         if key not in self._updated:
             self._updated.append(key)

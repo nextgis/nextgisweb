@@ -156,7 +156,7 @@ def test_session_lifetime(env, cwebapp, save_options):
     pytest.param('tuple', (1, 2, ('nested', 'tuple')), None, id='tuple'),
     pytest.param('deep', ('we', ('need', ('to', ('go', ('deeper',))))), None, id='deep'),
     pytest.param('bad_child', ('ok', (None, (True, ('bad', dict())))), ValueError, id='bad_child'),
-    pytest.param('k' * 1024, 'v' * 1024, KeyError, id='big'),
+    pytest.param('k' * 1024, 'v' * 1024, None, id='big'),
 ))
 def test_serialization(key, value, error, webapp, webapp_handler):
     def _set(request):
@@ -214,7 +214,7 @@ def test_set_del(webapp, webapp_handler):
 
     for req in (_set, _del, _check):
         with webapp_handler(req):
-            webapp.get('/test/request/')    
+            webapp.get('/test/request/')
 
 
 def test_exception(webapp, webapp_handler):
