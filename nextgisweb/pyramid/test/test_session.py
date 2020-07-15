@@ -108,6 +108,8 @@ def save_options(env):
 
 
 def test_session_lifetime(env, cwebapp, save_options):
+    cwebapp.reset()
+
     env.pyramid.options['session.max_age'] = 100
     env.pyramid.options['session.activity_delta'] = 0
     with freeze_time(datetime(year=2011, month=1, day=1)) as frozen_dt:
@@ -154,7 +156,7 @@ def test_session_lifetime(env, cwebapp, save_options):
     pytest.param('tuple', (1, 2, ('nested', 'tuple')), None, id='tuple'),
     pytest.param('deep', ('we', ('need', ('to', ('go', ('deeper',))))), None, id='deep'),
     pytest.param('bad_child', ('ok', (None, (True, ('bad', dict())))), ValueError, id='bad_child'),
-    pytest.param('k' * 1024, 'v' * 1024, KeyError, id='big'),
+    pytest.param('k' * 1024, 'v' * 1024, None, id='big'),
 ))
 def test_serialization(key, value, error, webapp, webapp_handler):
     def _set(request):
@@ -187,6 +189,32 @@ def test_serialization(key, value, error, webapp, webapp_handler):
 
     with webapp_handler(_del):
         webapp.get('/test/request/')
+
+
+def test_set_del(webapp, webapp_handler):
+
+    def _set(request):
+        request.session['foo'] = 1
+        request.session['bar'] = 1
+        return Response()
+
+    def _del(request):
+        del request.session['foo']
+        request.session['foo'] = 2
+
+        request.session['bar'] = 2
+        del request.session['bar']
+
+        return Response()
+
+    def _check(request):
+        assert request.session['foo'] == 2
+        assert 'bar' not in request.session
+        return Response()
+
+    for req in (_set, _del, _check):
+        with webapp_handler(req):
+            webapp.get('/test/request/')
 
 
 def test_exception(webapp, webapp_handler):
