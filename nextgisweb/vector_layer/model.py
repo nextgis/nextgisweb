@@ -660,6 +660,14 @@ VectorLayer.__table__.tometadata = types.MethodType(
     tometadata, VectorLayer.__table__)
 
 
+# Drop data table on vector layer deletion
+@event.listens_for(VectorLayer, 'before_delete')
+def drop_verctor_layer_table(mapper, connection, target):
+    tableinfo = TableInfo.from_layer(target)
+    tableinfo.setup_metadata(target._tablename)
+    tableinfo.metadata.drop_all(bind=connection)
+
+
 def _set_encoding(encoding):
 
     class encoding_section(object):
