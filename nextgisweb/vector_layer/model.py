@@ -2,7 +2,6 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import json
 import uuid
-import types
 import zipfile
 import tempfile
 import shutil
@@ -632,32 +631,17 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         return extent
 
 
-def _vector_layer_listeners(table):
-    event.listen(
-        table, "after_create",
-        db.DDL("CREATE SCHEMA %s" % SCHEMA)
-    )
+# Create vector_layer schema on table creation
+event.listen(
+    VectorLayer.__table__, "after_create",
+    db.DDL("CREATE SCHEMA %s" % SCHEMA),
+    propagate=True)
 
-    event.listen(
-        table, "after_drop",
-        db.DDL("DROP SCHEMA IF EXISTS %s CASCADE" % SCHEMA)
-    )
-
-
-_vector_layer_listeners(VectorLayer.__table__)
-
-
-# DB initialization uses table.tometadata(), however
-# SA doesn't copy event subscriptions in this case.
-
-def tometadata(self, metadata):
-    result = db.Table.tometadata(self, metadata)
-    _vector_layer_listeners(result)
-    return result
-
-
-VectorLayer.__table__.tometadata = types.MethodType(
-    tometadata, VectorLayer.__table__)
+# Drop vector_layer schema on table creation
+event.listen(
+    VectorLayer.__table__, "after_drop",
+    db.DDL("DROP SCHEMA IF EXISTS %s CASCADE" % SCHEMA),
+    propagate=True)
 
 
 # Drop data table on vector layer deletion
