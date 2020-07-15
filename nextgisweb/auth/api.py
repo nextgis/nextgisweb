@@ -4,8 +4,9 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import json
 
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPForbidden, HTTPUnprocessableEntity
+from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.security import remember, forget
+from pyramid.httpexceptions import HTTPForbidden, HTTPUnprocessableEntity
 
 from ..models import DBSession
 from ..core.exception import ValidationError
@@ -123,7 +124,8 @@ def login(request):
     if ('login' not in request.POST) or ('password' not in request.POST):
         return HTTPUnprocessableEntity()
 
-    user, tresp = request.env.auth.authenticate_with_password(
+    auth_policy = request.registry.getUtility(IAuthenticationPolicy)
+    user, tresp = auth_policy.authenticate_with_password(
         username=request.POST['login'].strip(),
         password=request.POST['password'])
 

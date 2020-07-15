@@ -4,11 +4,11 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import string
 import secrets
 
-
+from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 
 from ..models import DBSession
 from ..object_widget import ObjectWidget
@@ -25,12 +25,13 @@ def login(request):
     next_url = request.params.get('next', request.application_url)
 
     if request.method == 'POST':
+        auth_policy = request.registry.getUtility(IAuthenticationPolicy)
         try:
-            user, tresp = request.env.auth.authenticate_with_password(
+            user, tresp = auth_policy.authenticate_with_password(
                 username=request.POST['login'].strip(),
                 password=request.POST['password'])
 
-            headers = remember(request, (user.id, tresp))
+            headers = auth_policy.remember(request, (user.id, tresp))
             return HTTPFound(location=next_url, headers=headers)
 
         except (InvalidCredentialsException, DisabledUserException) as exc:

@@ -1,19 +1,26 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 from logging import getLogger
-from datetime import datetime
+from datetime import datetime, timedelta
 from base64 import b64decode
 
+from zope.interface import implementer
+from sqlalchemy.orm.exc import NoResultFound
+from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.httpexceptions import HTTPUnauthorized
 
+from ..lib.config import OptionAnnotations, Option
 from ..compat import timestamp_to_datetime, datetime_to_timestamp
 
+from .models import User
+from .exception import InvalidCredentialsException, DisabledUserException
 from .oauth import OAuthTokenRefreshException
 
 
 logger = getLogger(__name__)
 
 
+@implementer(IAuthenticationPolicy)
 class AuthenticationPolicy(object):
 
     def __init__(self, comp, options):
@@ -88,7 +95,7 @@ class AuthenticationPolicy(object):
                     value = password
 
                 else:
-                    user, _ = self.comp.authenticate_with_password(
+                    user, _ = self.authenticate_with_password(
                         username, password, oauth=False)
                     return user.id
 
@@ -135,3 +142,41 @@ class AuthenticationPolicy(object):
                 del session[sk]
 
         return ()
+
+    def authenticate_with_password(self, username, password, oauth=True):
+        user = None
+        tresp = None
+
+        # Step 1: Authentication with local credentials
+
+        q = User.filter_by(keyname=username)
+        if self.oauth and not self.oauth.local_auth:
+            q = q.filter_by(oauth_subject=None)
+
+        try:
+            test_user = q.one()
+            if test_user.password == password:
+                user = test_user
+        except NoResultFound:
+            pass
+
+        # Step 2: Authentication with OAuth password if enabled
+
+        if user is None and oauth and self.oauth is not None and self.oauth.password:
+            tresp = self.oauth.grant_type_password(username, password)
+            user = self.oauth.access_token_to_user(tresp.access_token)
+
+        if user is None:
+            raise InvalidCredentialsException()
+        elif user.disabled:
+            raise DisabledUserException()
+
+        return (user, tresp)
+
+    option_annotations = OptionAnnotations((
+        Option('local.lifetime', timedelta, default=timedelta(days=1),
+               doc="Local authentication lifetime."),
+
+        Option('local.refresh', timedelta, default=timedelta(hours=1),
+               doc="Refresh local authentication lifetime interval.")
+    ))

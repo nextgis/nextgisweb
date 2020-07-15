@@ -3,9 +3,9 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from datetime import datetime, timedelta
 
+import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
-import transaction
 
 from ..lib.config import OptionAnnotations, Option
 from ..component import Component
@@ -13,8 +13,8 @@ from ..models import DBSession
 from .. import db
 
 from .models import Base, Principal, User, Group, UserDisabled
+from .policy import AuthenticationPolicy
 from .oauth import OAuthHelper, OnAccessTokenToUser
-from .exception import DisabledUserException, InvalidCredentialsException
 from .util import _
 from . import command # NOQA
 
@@ -102,7 +102,6 @@ class AuthComponent(Component):
         config.add_request_method(user, reify=True)
         config.add_request_method(require_administrator)
 
-        from .policy import AuthenticationPolicy
         config.set_authentication_policy(AuthenticationPolicy(
             self, self.options.with_prefix('policy')))
 
@@ -158,36 +157,6 @@ class AuthComponent(Component):
 
         return obj
 
-    def authenticate_with_password(self, username, password, oauth=True):
-        user = None
-        tresp = None
-
-        # Step 1: Authentication with local credentials
-
-        q = User.filter_by(keyname=username)
-        if self.oauth and not self.oauth.local_auth:
-            q = q.filter_by(oauth_subject=None)
-
-        try:
-            test_user = q.one()
-            if test_user.password == password:
-                user = test_user
-        except NoResultFound:
-            pass
-
-        # Step 2: Authentication with OAuth password if enabled
-
-        if oauth and user is None and self.oauth is not None and self.oauth.password:
-            tresp = self.oauth.grant_type_password(username, password)
-            user = self.oauth.access_token_to_user(tresp.access_token)
-
-        if user is None:
-            raise InvalidCredentialsException()
-        elif user.disabled:
-            raise DisabledUserException()
-
-        return (user, tresp)
-
     option_annotations = OptionAnnotations((
         Option('register', bool, default=False,
                doc="Allow user registration."),
@@ -200,14 +169,10 @@ class AuthComponent(Component):
 
         Option('activity_delta', int, default=600,
                doc="User last activity update time delta in seconds."),
+    ))
 
-        Option('policy.local.lifetime', timedelta, default=timedelta(days=1),
-               doc="Local authentication lifetime."),
-
-        Option('policy.local.refresh', timedelta, default=timedelta(hours=1),
-               doc="Refresh local authentication lifetime interval.")
-
-    )) + OAuthHelper.option_annotations.with_prefix('oauth')
+    option_annotations += OAuthHelper.option_annotations.with_prefix('oauth')
+    option_annotations += AuthenticationPolicy.option_annotations.with_prefix('policy')
 
 
 def translate(self, trstring):
