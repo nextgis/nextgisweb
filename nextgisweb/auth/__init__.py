@@ -14,7 +14,7 @@ from .. import db
 
 from .models import Base, Principal, User, Group, UserDisabled
 from .policy import AuthenticationPolicy
-from .oauth import OAuthHelper, OnAccessTokenToUser
+from .oauth import OAuthHelper, OAuthToken, OnAccessTokenToUser
 from .util import _
 from . import command # NOQA
 
@@ -156,6 +156,15 @@ class AuthComponent(Component):
                 **kwargs).persist()
 
         return obj
+
+    def maintenance(self):
+        with transaction.manager:
+            # Add additional minute for clock skew
+            exp = datetime.utcnow() + timedelta(seconds=60)
+
+            self.logger.debug("Cleaning up expired OAuth tokens (exp < %s)", exp)
+            rows = OAuthToken.filter(OAuthToken.exp < exp).delete()
+            self.logger.info("Expired cached OAuth tokens deleted: %d", rows)
 
     option_annotations = OptionAnnotations((
         Option('register', bool, default=False,
