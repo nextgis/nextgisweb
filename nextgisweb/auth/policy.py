@@ -114,6 +114,8 @@ class AuthenticationPolicy(object):
     def remember(self, request, what):
         session = request.session
         user_id, tresp = what
+        if user_id is None:
+            raise ValueError("Empty user_id in a session")
 
         atype = 'LOCAL' if tresp is None else 'OAUTH'
         exp = int(datetime_to_timestamp(datetime.utcnow() + self.options['local.lifetime'])) \
