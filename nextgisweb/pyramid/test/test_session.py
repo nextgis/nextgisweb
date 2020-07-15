@@ -108,6 +108,8 @@ def save_options(env):
 
 
 def test_session_lifetime(env, cwebapp, save_options):
+    cwebapp.reset()
+
     env.pyramid.options['session.max_age'] = 100
     env.pyramid.options['session.activity_delta'] = 0
     with freeze_time(datetime(year=2011, month=1, day=1)) as frozen_dt:
