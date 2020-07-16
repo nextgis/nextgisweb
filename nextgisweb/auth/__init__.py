@@ -71,14 +71,13 @@ class AuthComponent(Component):
 
         def user(request):
             user_id = request.authenticated_userid
-            if user_id:
-                user = User.filter_by(id=user_id).one()
-            else:
-                user = User.filter_by(keyname='guest').one()
+            user = User.filter(
+                (User.id == user_id) if user_id is not None
+                else (User.keyname == 'guest')).one()
 
             # Set user last activity
-            delta = timedelta(seconds=self.options['activity_delta'])
-            if user.last_activity is None or datetime.now() - user.last_activity > delta:
+            delta = self.options['activity_delta']
+            if user.last_activity is None or (datetime.utcnow() - user.last_activity) > delta:
                 def update_last_activity(request):
                     with transaction.manager:
                         DBSession.query(User).filter_by(
@@ -161,8 +160,8 @@ class AuthComponent(Component):
         with transaction.manager:
             # Add additional minute for clock skew
             exp = datetime.utcnow() + timedelta(seconds=60)
-
             self.logger.debug("Cleaning up expired OAuth tokens (exp < %s)", exp)
+
             rows = OAuthToken.filter(OAuthToken.exp < exp).delete()
             self.logger.info("Expired cached OAuth tokens deleted: %d", rows)
 
@@ -176,7 +175,7 @@ class AuthComponent(Component):
         Option('logout_route_name', default='auth.logout',
                doc="Name of route for logout page."),
 
-        Option('activity_delta', int, default=600,
+        Option('activity_delta', timedelta, default=timedelta(minutes=10),
                doc="User last activity update time delta in seconds."),
     ))
 

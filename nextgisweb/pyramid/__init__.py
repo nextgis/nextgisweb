@@ -220,7 +220,7 @@ class PyramidComponent(Component):
         self.logger.info("Cleaning up sessions...")
 
         with transaction.manager:
-            actual_date = dt.utcnow() - timedelta(seconds=self.options['session.max_age'])
+            actual_date = dt.utcnow() - self.options['session.cookie.max_age']
             deleted_sessions = Session.filter(Session.last_activity < actual_date).delete()
 
         self.logger.info("Deleted: %d sessions", deleted_sessions)
@@ -238,10 +238,13 @@ class PyramidComponent(Component):
         Option('favicon', default=resource_filename(
             'nextgisweb', 'static/img/favicon.ico')),
 
-        Option('session.cookie.name', str, default='ngwsid'),
-        Option('session.max_age', int, default=timedelta(days=7).total_seconds(),
-               doc="Session lifetime in seconds."),
-        Option('session.activity_delta', int, default=timedelta(hours=1).total_seconds(),
+        Option('session.cookie.name', str, default='ngw-sid',
+               doc="Session cookie name"),
+
+        Option('session.cookie.max_age', timedelta, default=timedelta(days=7),
+               doc="Session cookie max_age"),
+
+        Option('session.activity_delta', timedelta, default=timedelta(minutes=10),
                doc="Session last activity update time delta in seconds."),
 
         Option('backup.download', bool, default=False),

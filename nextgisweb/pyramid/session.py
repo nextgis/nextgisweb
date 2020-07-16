@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from six import text_type
 
 import transaction
@@ -51,13 +51,13 @@ class WebSession(dict):
         self._cleared = False
         self._deleted = list()
         self._cookie_name = request.env.pyramid.options['session.cookie.name']
-        self._cookie_max_age = request.env.pyramid.options['session.max_age']
+        self._cookie_max_age = request.env.pyramid.options['session.cookie.max_age']
         self._session_id = request.cookies.get(self._cookie_name)
         self._last_activity = None
 
         if self._session_id is not None:
             try:
-                actual_date = datetime.utcnow() - timedelta(seconds=self._cookie_max_age)
+                actual_date = datetime.utcnow() - self._cookie_max_age
                 session = Session.filter(
                     Session.id == self._session_id,
                     Session.last_activity > actual_date).one()
@@ -87,8 +87,7 @@ class WebSession(dict):
                             SessionStore.key.in_(self._deleted)
                         ).delete(synchronize_session=False)
 
-                    activity_delta = timedelta(
-                        seconds=request.env.pyramid.options['session.activity_delta'])
+                    activity_delta = request.env.pyramid.options['session.activity_delta']
                     if utcnow - self._last_activity > activity_delta:
                         DBSession.query(Session).filter_by(
                             id=self._session_id, last_activity=self._last_activity
@@ -106,14 +105,16 @@ class WebSession(dict):
                     with DBSession.no_autoflush:
                         for key in self._updated:
                             try:
-                                kv = SessionStore.filter_by(session_id=self._session_id, key=key).one()
+                                kv = SessionStore.filter_by(
+                                    session_id=self._session_id,
+                                    key=key).one()
                             except NoResultFound:
                                 kv = SessionStore(session_id=self._session_id, key=key).persist()
                             kv.value = self._get_for_db(key)
 
             if self._session_id:
                 cookie_settings['secure'] = request.scheme == 'https'
-                cookie_settings['max_age'] = self._cookie_max_age
+                cookie_settings['max_age'] = self._cookie_max_age.total_seconds()
                 response.set_cookie(self._cookie_name, value=self._session_id, **cookie_settings)
 
         request.add_response_callback(check_save)

@@ -10,7 +10,7 @@ from nextgisweb.auth import User
 
 @pytest.fixture()
 def revert_delta(env):
-    value = env.file_upload.tus_enabled
+    value = env.auth.options['activity_delta']
     yield
     env.auth.options['activity_delta'] = value
 
@@ -18,16 +18,16 @@ def revert_delta(env):
 def test_last_activity(env, webapp, revert_delta):
     epsilon = timedelta(milliseconds=500)
 
-    env.auth.options['activity_delta'] = 0
+    env.auth.options['activity_delta'] = timedelta(seconds=0)
     webapp.get('/resource/0', status='*')
     last_activity = User.by_keyname('guest').last_activity
     assert datetime.utcnow() - last_activity < epsilon
 
-    env.auth.options['activity_delta'] = 100
+    env.auth.options['activity_delta'] = timedelta(seconds=100)
     webapp.get('/resource/0', status='*')
     assert User.by_keyname('guest').last_activity == last_activity
 
-    env.auth.options['activity_delta'] = 0
+    env.auth.options['activity_delta'] = timedelta(seconds=0)
     webapp.authorization = ('Basic', ('administrator', 'admin'))
     webapp.get('/resource/0', status='*')
     admin_last_activity = User.by_keyname('administrator').last_activity

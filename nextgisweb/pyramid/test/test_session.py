@@ -55,17 +55,23 @@ def cwebapp(env):
         )).delete(synchronize_session=False)
 
 
-def get_session_id(response):
-    cookie = SimpleCookie()
-    cookie.load(response.headers['Set-Cookie'])
-    for key, value in cookie.items():
-        if key == 'ngwsid':
-            return value.value
-    return None
+@pytest.fixture()
+def get_session_id(env):
+    def _wrap(response):
+        cookie = SimpleCookie()
+        cookie.load(response.headers['Set-Cookie'])
+        for key, value in cookie.items():
+            if key == env.pyramid.options['session.cookie.name']:
+                return value.value
+        return None
+    yield _wrap
 
 
-def session_headers(session_id):
-    return dict(cookie=str('ngwsid=%s' % session_id))
+@pytest.fixture()
+def session_headers(env):
+    def _wrap(session_id):
+        return dict(cookie=str('%s=%s' % (env.pyramid.options['session.cookie.name'], session_id)))
+    yield _wrap
 
 
 def read_store(session_id):
@@ -75,7 +81,7 @@ def read_store(session_id):
     return result
 
 
-def test_session_store(cwebapp):
+def test_session_store(cwebapp, get_session_id, session_headers):
     kv = dict(_test_A='A', _test_B='B1')
     res = cwebapp.post_json('/test/session_kv', kv)
     session_id = get_session_id(res)
@@ -100,18 +106,18 @@ def test_session_store(cwebapp):
 
 @pytest.fixture()
 def save_options(env):
-    max_age = env.pyramid.options['session.max_age']
+    max_age = env.pyramid.options['session.cookie.max_age']
     activity_delta = env.pyramid.options['session.activity_delta']
     yield
-    env.pyramid.options['session.max_age'] = max_age
+    env.pyramid.options['session.cookie.max_age'] = max_age
     env.pyramid.options['session.activity_delta'] = activity_delta
 
 
-def test_session_lifetime(env, cwebapp, save_options):
+def test_session_lifetime(env, cwebapp, save_options, get_session_id, session_headers):
     cwebapp.reset()
 
-    env.pyramid.options['session.max_age'] = 100
-    env.pyramid.options['session.activity_delta'] = 0
+    env.pyramid.options['session.cookie.max_age'] = timedelta(seconds=100)
+    env.pyramid.options['session.activity_delta'] = timedelta(seconds=0)
     with freeze_time(datetime(year=2011, month=1, day=1)) as frozen_dt:
         res = cwebapp.post_json('/test/session_kv', dict(_test_var=1))
         session_id = get_session_id(res)
@@ -130,13 +136,13 @@ def test_session_lifetime(env, cwebapp, save_options):
         new_session_id = get_session_id(res)
         assert session_id != new_session_id
 
-        env.pyramid.options['session.max_age'] = 110
+        env.pyramid.options['session.cookie.max_age'] = timedelta(seconds=110)
         frozen_dt.tick(timedelta(seconds=100))
         headers = session_headers(new_session_id)
         res = cwebapp.post_json('/test/session_kv', dict(_test_var=5), headers=headers)
         assert new_session_id == get_session_id(res)
 
-        env.pyramid.options['session.activity_delta'] = 65
+        env.pyramid.options['session.activity_delta'] = timedelta(seconds=65)
         frozen_dt.tick(timedelta(seconds=60))
         res = cwebapp.post_json('/test/session_kv', dict(_test_var=6), headers=headers)
         assert new_session_id == get_session_id(res)
@@ -147,7 +153,7 @@ def test_session_lifetime(env, cwebapp, save_options):
 
 
 @pytest.mark.parametrize('key, value, error', (
-    ('NoneType', None, None),
+    ('none', None, None),
     ('str', 'foo', None),
     ('int', 42, None),
     ('float', 3.14159, None),
@@ -155,8 +161,8 @@ def test_session_lifetime(env, cwebapp, save_options):
     ('list', [], ValueError),
     pytest.param('tuple', (1, 2, ('nested', 'tuple')), None, id='tuple'),
     pytest.param('deep', ('we', ('need', ('to', ('go', ('deeper',))))), None, id='deep'),
-    pytest.param('bad_child', ('ok', (None, (True, ('bad', dict())))), ValueError, id='bad_child'),
-    pytest.param('k' * 1024, 'v' * 1024, None, id='big'),
+    pytest.param('mutable', ('ok', (None, (True, ('bad', dict())))), ValueError, id='mutable'),
+    pytest.param('k' * 1024, 'v' * 1024, None, id='long'),
 ))
 def test_serialization(key, value, error, webapp, webapp_handler):
     def _set(request):
@@ -268,4 +274,4 @@ def test_session_start(handler, expect, webapp, webapp_handler):
 
     with webapp_handler(_handler):
         webapp.get('/test/request/')
-        assert ('ngwsid' in webapp.cookies) == expect
+        assert ('ngw-sid' in webapp.cookies) == expect
