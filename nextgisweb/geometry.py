@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 from inspect import isclass
 
 import shapely.geometry
-from shapely.geometry import base
+from shapely.geometry import base, mapping, shape
 from shapely.ops import transform as map_coords
 from shapely import wkt, wkb
 from pyproj import Transformer
@@ -36,6 +36,17 @@ def box(minx, miny, maxx, maxy, ccw=True, srid=None):
     g.__class__ = globals()[g.__class__.__name__]
     g._srid = srid
     return g
+
+
+def geom_from_geojson(data, srid=None):
+    g = shape(data)
+    g.__class__ = globals()[g.__class__.__name__]
+    g._srid = srid
+    return g
+
+
+def geom_to_geojson(g):
+    return mapping(g)
 
 
 def geom_from_wkt(data, srid=None):

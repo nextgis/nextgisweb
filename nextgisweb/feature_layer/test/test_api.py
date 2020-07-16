@@ -119,3 +119,27 @@ def test_fields_edit(webapp, vector_layer_id):
     fields = resp.json['feature_layer']['fields']
 
     assert len(fields) == 2
+
+
+def test_geom_edit(webapp, vector_layer_id):
+    webapp.authorization = ('Basic', ('administrator', 'admin'))
+
+    feature_url = '/api/resource/%d/feature/1' % vector_layer_id
+
+    feature = webapp.get(feature_url).json
+    assert feature['geom'] == 'POINT (0.0000000000000000 0.0000000000000000)'
+
+    feature = webapp.get(feature_url + '?geom_format=geojson').json
+    assert feature['geom'] == dict(type='Point', coordinates=[0.0, 0.0])
+
+    feature['geom'] = 'POINT (1 0)'
+    webapp.put_json(feature_url, feature)
+    feature = webapp.get(feature_url).json
+    assert feature['geom'] == 'POINT (1.0000000000000000 0.0000000000000000)'
+
+    feature['geom'] = dict(type='Point', coordinates=[1, 2])
+    webapp.put_json(feature_url + '?geom_format=geojson', feature)
+    assert feature == webapp.get(feature_url + '?geom_format=geojson').json
+
+    feature = webapp.get(feature_url).json
+    assert feature['geom'] == 'POINT (1.0000000000000000 2.0000000000000000)'
