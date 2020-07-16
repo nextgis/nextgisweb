@@ -143,3 +143,10 @@ def test_geom_edit(webapp, vector_layer_id):
 
     feature = webapp.get(feature_url).json
     assert feature['geom'] == 'POINT (1.0000000000000000 2.0000000000000000)'
+
+    feature['geom'] = dict(type='Point', coordinates=[90, 45])
+    webapp.put_json(feature_url + '?geom_format=geojson&srs=4326', feature)
+    feature = webapp.get(feature_url + '?geom_format=geojson&srs=3857').json
+    coords = feature['geom']['coordinates']
+    assert round(coords[0], 3) == 10018754.171
+    assert round(coords[1], 3) == 5621521.486

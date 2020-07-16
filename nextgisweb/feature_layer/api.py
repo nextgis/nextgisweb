@@ -14,10 +14,15 @@ from datetime import datetime, date, time
 from io import BytesIO
 
 from osgeo import ogr, gdal
+from pyproj import CRS
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNoContent
 
-from ..geometry import geom_from_geojson, geom_to_geojson, geom_from_wkt, geom_to_wkt, box
+from ..geometry import (
+    geom_from_geojson, geom_to_geojson,
+    geom_from_wkt, geom_to_wkt,
+    geom_transform, box,
+)
 from ..resource import DataScope, ValidationError, Resource, resource_factory
 from ..spatial_ref_sys import SRS
 from .. import geojson
@@ -253,12 +258,26 @@ def mvt(request):
         gdal.Unlink(b"%s" % (vsibuf,))
 
 
-def deserialize(feat, data, geom_format=None):
+def get_transformer(srs_from_id, srs_to_id):
+    if srs_from_id is None or srs_to_id is None or srs_from_id == srs_to_id:
+        return None
+
+    srs_from = SRS.filter_by(id=int(srs_from_id)).one()
+    srs_to = SRS.filter_by(id=int(srs_to_id)).one()
+    crs_from = CRS.from_wkt(srs_from.wkt)
+    crs_to = CRS.from_wkt(srs_to.wkt)
+
+    return lambda g: geom_transform(g, crs_from, crs_to)
+
+
+def deserialize(feat, data, geom_format=None, transformer=None):
     if 'geom' in data:
         if geom_format == 'geojson':
             feat.geom = geom_from_geojson(data['geom'])
         else:
             feat.geom = geom_from_wkt(data['geom'])
+        if transformer is not None:
+            feat.geom = transformer(feat.geom)
 
     if 'fields' in data:
         fdata = data['fields']
@@ -419,8 +438,10 @@ def iput(resource, request):
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
     geom_format = request.GET.get('geom_format')
+    srs = request.GET.get('srs')
+    transformer = get_transformer(srs, resource.srs_id)
 
-    deserialize(feature, request.json_body, geom_format=geom_format)
+    deserialize(feature, request.json_body, geom_format=geom_format, transformer=transformer)
     if IWritableFeatureLayer.providedBy(resource):
         resource.feature_put(feature)
 
@@ -514,9 +535,11 @@ def cpost(resource, request):
     request.resource_permission(PERM_WRITE)
 
     geom_format = request.GET.get('geom_format')
+    srs = request.GET.get('srs')
+    transformer = get_transformer(srs, resource.srs_id)
 
     feature = Feature(layer=resource)
-    deserialize(feature, request.json_body, geom_format=geom_format)
+    deserialize(feature, request.json_body, geom_format=geom_format, transformer=transformer)
     fid = resource.feature_create(feature)
 
     return Response(
@@ -529,12 +552,14 @@ def cpatch(resource, request):
     result = list()
 
     geom_format = request.GET.get('geom_format')
+    srs = request.GET.get('srs')
+    transformer = get_transformer(srs, resource.srs_id)
 
     for fdata in request.json_body:
         if 'id' not in fdata:
             # Create new feature
             feature = Feature(layer=resource)
-            deserialize(feature, fdata, geom_format=geom_format)
+            deserialize(feature, fdata, geom_format=geom_format, transformer=transformer)
             fid = resource.feature_create(feature)
         else:
             # Update existing feature
@@ -548,7 +573,7 @@ def cpatch(resource, request):
             for f in query():
                 feature = f
 
-            deserialize(feature, fdata, geom_format=geom_format)
+            deserialize(feature, fdata, geom_format=geom_format, transformer=transformer)
             resource.feature_put(feature)
 
         result.append(dict(id=fid))
