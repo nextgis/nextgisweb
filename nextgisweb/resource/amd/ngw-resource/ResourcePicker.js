@@ -41,7 +41,7 @@ define([
                 style: "width: 100%; height: 100%;",
                 _createTreeNode: function(args) {
                     var treeNode = this.inherited(arguments);
-                    treeNode.set('disabled', !widget.checkItemAcceptance(args.item));
+                    treeNode.set('disabled', !(args.item.children || widget.checkItemAcceptance(args.item)));
                     return treeNode;
                 }
             }).placeAt(this.container);
