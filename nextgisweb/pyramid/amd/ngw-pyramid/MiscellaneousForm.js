@@ -79,7 +79,7 @@ define([
                 function () {
                     window.location.reload(true);
                 },
-                function (err) { new ErrorDialog({response: err}).show() }
+                ErrorDialog.xhrError
             );
         }
     });

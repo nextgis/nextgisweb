@@ -13,6 +13,7 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
 from ..env import env
 from ..package import pkginfo
+from ..core.exception import ValidationError
 
 from .util import ClientRoutePredicate
 import six
@@ -131,12 +132,16 @@ def cors_put(request):
                 if (
                     not isinstance(origin, six.string_types) or
                     not re.match(
-                        r'^https?://[\w\_\-\.]{3,}(:\d{2,5})?$', origin)
+                        r'^https?://[\w\_\-\.]{3,}(:\d{2,5})?/?$', origin)
                 ):
-                    raise HTTPBadRequest("Invalid origin '%s'" % origin)
+                    raise ValidationError("Invalid origin '%s'" % origin)
 
-                if v.count(origin) != 1:
-                    raise HTTPBadRequest("Duplicate origin '%s'" % origin)
+            # Strip trailing slashes
+            v = [(o[:-1] if o.endswith('/') else o) for o in v]
+
+            for origin in v:
+                if v.count(origin) > 1:
+                    raise ValidationError("Duplicate origin '%s'" % origin)
 
             env.core.settings_set('pyramid', 'cors_allow_origin', v)
         else:

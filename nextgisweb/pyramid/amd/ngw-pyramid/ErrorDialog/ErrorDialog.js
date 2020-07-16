@@ -16,7 +16,7 @@ define([
     ErrorCard,
     i18n
 ) {
-    return declare([Dialog], {
+    var ErrorDialog = declare([Dialog], {
         constructor: function (options) {
             this.inherited(arguments);
             if (options.response) {
@@ -65,5 +65,14 @@ define([
             this.inherited(arguments);
             this.errorCard.startup();
         }
-    })
+    });
+
+    // Static method for easy handling xhr errors
+    ErrorDialog.xhrError = function (error) {
+        var dialog = new ErrorDialog({response: error.response});
+        dialog.show();
+        return dialog;
+    }
+
+    return ErrorDialog;
 })

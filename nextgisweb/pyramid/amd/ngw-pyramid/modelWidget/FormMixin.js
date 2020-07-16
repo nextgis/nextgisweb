@@ -7,6 +7,7 @@ define([
     "dojo/dom-construct",
     "dijit/layout/ContentPane",
     "dijit/form/Button",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "ngw-pyramid/i18n!pyramid"
 ], function (
     declare,
@@ -17,6 +18,7 @@ define([
     domConstruct,
     ContentPane,
     Button,
+    ErrorDialog,
     i18n
 ) {
     // Mixin that turns ngw-pyramid/modelWidget/Widget in model editing form
@@ -84,9 +86,8 @@ define([
             d.then(
                 function (success) { if (!success) { widget.set("disabled", false); } },
                 function (errinfo) {
-                    console.log(errinfo);
-                    alert(i18n.gettext("Unexpected error occurred during the operation."));
                     widget.set("disabled", false);
+                    ErrorDialog.xhrError(errinfo);
                 }
             );
 

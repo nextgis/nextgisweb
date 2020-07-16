@@ -54,7 +54,7 @@ define([
                 data: json.stringify(data)
             }).then(function () {
                 window.location = route.pyramid.control_panel();
-            }, function (err) { new ErrorDialog({response: err}).show() });
+            }, ErrorDialog.xhrError);
         }
     });
 });

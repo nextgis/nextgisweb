@@ -89,7 +89,7 @@ error message:
         }
     })
 
-ErrorDialog can also accept ``dojo/request/xhr`` errors:
+ErrorDialog can also handle ``dojo/request/xhr`` errors:
 
 .. code-block:: javascript
 
@@ -105,10 +105,6 @@ ErrorDialog can also accept ``dojo/request/xhr`` errors:
             handleAs: 'json'
         }).then(
             function (data) { /* everything is alright */ },
-            function (err) {
-                new ErrorDialog({
-                    response: err
-                }).show()
-            }
+            ErrorDialog.xhrError
         )
     })

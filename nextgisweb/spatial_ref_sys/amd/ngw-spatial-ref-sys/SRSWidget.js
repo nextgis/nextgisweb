@@ -107,9 +107,7 @@ define([
                             widget.wkt.set("value", wkt);
                         }
                     },
-                    function (error) {
-                        new ErrorDialog({response: error.response}).show();
-                    }
+                    ErrorDialog.xhrError
                 );
             }
         }

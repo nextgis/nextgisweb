@@ -67,7 +67,7 @@ define([
                 data: json.stringify({allow_origin: olist})
             }).then(
                 function () {},
-                function (err) { new ErrorDialog({response: err}).show() }
+                ErrorDialog.xhrError
             );
         }
     });

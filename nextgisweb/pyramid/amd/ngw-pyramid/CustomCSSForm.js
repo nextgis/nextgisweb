@@ -59,9 +59,7 @@ define([
             xhr.put(API_URL, {
                 headers: { "Content-Type": "text/css" },
                 data: self.widgetBody.get('value')
-            }).then(function () {}, function (err) {
-                new ErrorDialog({response: err}).show();
-            });
+            }).then(function () {}, ErrorDialog.xhrError);
         }
     });
 });
