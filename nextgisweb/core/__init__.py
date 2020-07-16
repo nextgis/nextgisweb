@@ -35,15 +35,12 @@ class CoreComponent(Component):
 
     def __init__(self, env, settings):
         super(CoreComponent, self).__init__(env, settings)
-        self.locale_default = None
-        self.debug = False
-
-    def initialize(self):
-        Component.initialize(self)
-
         self.debug = self.options['debug']
         self.locale_default = self.options['locale.default']
         self.locale_available = self.options['locale.available']
+
+    def initialize(self):
+        Component.initialize(self)
 
         sa_url = self._engine_url()
         self.engine = create_engine(sa_url)

@@ -71,7 +71,7 @@ def environ_substitution(items, environ):
         items[k] = v
 
 
-def load_config(filenames, environ=os.environ, environ_prefix='NEXTGISWEB'):
+def load_config(filenames, environ=os.environ, environ_prefix='NEXTGISWEB', hupper=False):
     if filenames is None:
         filenames = environ.get(environ_prefix + '_CONFIG')
 
@@ -86,6 +86,11 @@ def load_config(filenames, environ=os.environ, environ_prefix='NEXTGISWEB'):
         elif key in result:
             # Remove key for empty value
             del result[key]
+
+    if hupper:
+        from hupper import is_active, get_reloader
+        if is_active():
+            get_reloader().watch_files(filenames)
 
     for fn in filenames:
         with io.open(fn, 'r') as fp:

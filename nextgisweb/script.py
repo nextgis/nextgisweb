@@ -42,7 +42,7 @@ def main(argv=sys.argv):
     if logging:
         setup_logging(logging)
 
-    env = Env(cfg=load_config(config))
+    env = Env(cfg=load_config(config, hupper=True))
     setenv(env)
 
     subparsers = argparser.add_subparsers()
