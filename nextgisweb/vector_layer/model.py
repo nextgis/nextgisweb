@@ -377,8 +377,8 @@ class TableInfo(object):
                 fld_name = strdecode(feature.GetFieldDefnRef(i).GetNameRef())
                 fld_values[self[fld_name].key] = fld_value
 
-            obj = self.model(fid=fid, geom=ga.elements.WKTElement(
-                str(geom), srid=self.srs_id), **fld_values)
+            obj = self.model(fid=fid, geom=ga.elements.WKBElement(
+                bytearray(geom.ExportToWkb()), srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
 
@@ -507,8 +507,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         # This will not let to write empty geometry, but it is not needed yet.
 
         if feature.geom is not None:
-            obj.geom = ga.elements.WKTElement(
-                str(feature.geom), srid=self.srs_id)
+            obj.geom = ga.shape.from_shape(
+                feature.geom, srid=self.srs_id)
 
         DBSession.merge(obj)
 
@@ -535,8 +535,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if f.keyname in feature.fields.keys():
                 setattr(obj, f.key, feature.fields[f.keyname])
 
-        obj.geom = ga.elements.WKTElement(
-            str(feature.geom), srid=self.srs_id)
+        obj.geom = ga.shape.from_shape(
+            feature.geom, srid=self.srs_id)
 
         if feature.geom.geom_type.upper() != self.geometry_type:
             raise ValidationError(
