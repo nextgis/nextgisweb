@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2019-08-29 10:08+0000\n"
+"POT-Creation-Date: 2020-07-10 21:49+0000\n"
 "PO-Revision-Date: 2015-09-13 16:42+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,15 +19,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: amd/ngw-raster-layer/Widget.js:28 model.py:38
+#: api.py:31
+msgid "Output format is not provided."
+msgstr "Выходной формат не указан."
+
+#: api.py:34
+#, python-format
+msgid "Format '%s' is not supported."
+msgstr "Формат '%s' не поддерживается."
+
+#: amd/ngw-raster-layer/Widget.js:29 model.py:59 view.py:31
 msgid "Raster layer"
 msgstr "Растровый слой"
 
-#: model.py:60
+#: model.py:79
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:72
+#: model.py:87
 #, python-format
 msgid ""
 "Raster has format '%(format)s', however only following formats are "
@@ -36,17 +45,41 @@ msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:78
+#: model.py:92
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:89
+#: model.py:103
 msgid "Complex data types are not supported."
 msgstr "Комплексные типы данных не поддерживаются."
 
-#: model.py:160
+#: model.py:176
 msgid "Data type"
 msgstr "Тип данных"
+
+#: view.py:20 view.py:34
+msgid "Save as"
+msgstr "Сохранить как"
+
+#: amd/ngw-raster-layer/ExportForm.js:104
+msgid "Band"
+msgstr "Канал"
+
+#: amd/ngw-raster-layer/template/ExportForm.hbs:13
+msgid "Format"
+msgstr "Формат"
+
+#: amd/ngw-raster-layer/template/ExportForm.hbs:17
+msgid "SRS"
+msgstr "Система координат"
+
+#: amd/ngw-raster-layer/template/ExportForm.hbs:21
+msgid "Bands"
+msgstr "Каналы"
+
+#: amd/ngw-raster-layer/template/ExportForm.hbs:30
+msgid "Save"
+msgstr "Сохранить"
 
 #: amd/ngw-raster-layer/template/Widget.hbs:3
 msgid "Select a dataset"
@@ -56,7 +89,7 @@ msgstr "Выберите растровый слой"
 msgid "Dataset should be in GeoTIFF format."
 msgstr "Файл должен быть в формате GeoTIFF."
 
-#: amd/ngw-raster-layer/template/Widget.hbs:7
+#: amd/ngw-raster-layer/template/Widget.hbs:8
 msgid "Coordinate system"
 msgstr "Система координат"
 
@@ -80,3 +113,4 @@ msgstr "Система координат"
 
 #~ msgid "File UUID"
 #~ msgstr "UUID файла"
+

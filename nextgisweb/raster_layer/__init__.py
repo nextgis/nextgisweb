@@ -5,6 +5,7 @@ import os.path
 from ..component import Component
 
 from .model import Base, RasterLayer
+from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
 from . import command  # NOQA
 
 __all__ = ['RasterLayerComponent', 'RasterLayer']
@@ -19,7 +20,14 @@ class RasterLayerComponent(Component):
         self.wdir = self.env.core.gtsdir(self)
 
     def setup_pyramid(self, config):
-        from . import view # NOQA
+        from . import view, api # NOQA
+        view.setup_pyramid(self, config)
+        api.setup_pyramid(self, config)
+
+    def client_settings(self, request):
+        return dict(
+            export_formats=GDAL_DRIVER_NAME_2_EXPORT_FORMATS,
+        )
 
     def workdir_filename(self, fobj, makedirs=False):
         levels = (fobj.uuid[0:2], fobj.uuid[2:4])

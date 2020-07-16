@@ -262,3 +262,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.search', '/api/resource/search/') \
         .add_view(search, request_method='GET')
+
+    config.add_route(
+        'resource.export', '/api/resource/{id}/export',
+        factory=resource_factory)

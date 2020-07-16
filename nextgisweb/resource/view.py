@@ -233,6 +233,8 @@ def setup_pyramid(comp, config):
 
     _resource_route('tree', r'{id:\d+}/tree', client=('id', )).add_view(tree)
 
+    _resource_route('export.page', r'{id:\d+}/export', request_method='GET')
+
     _route('widget', 'widget', client=()).add_view(widget)
 
     # CRUD
