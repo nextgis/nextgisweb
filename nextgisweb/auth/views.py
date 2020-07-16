@@ -125,10 +125,11 @@ def forbidden_error_response(request, err_info, exc, exc_info, **kwargs):
 
 def setup_pyramid(comp, config):
     def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
-        if err_info.http_status_code == 403:
+        if not request.is_api and not request.is_xhr and err_info.http_status_code == 403:
             return forbidden_error_response(request, err_info, exc, exc_info, **kwargs)
 
-    comp.env.pyramid.error_handlers.append(forbidden_error_handler)
+    # Add it before standard pyramid handlers
+    comp.env.pyramid.error_handlers.insert(0, forbidden_error_handler)
 
     def check_permission(request):
         """ To avoid interdependency of two components:

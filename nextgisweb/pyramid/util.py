@@ -58,40 +58,6 @@ class ClientRoutePredicate(object):
         return "<client>"
 
 
-class RequestMethodPredicate(object):
-    def __init__(self, val, config):
-        if isinstance(val, six.string_types):
-            val = (val, )
-
-        self.val = val
-
-    def text(self):
-        return 'method = %s' % (self.val, )
-
-    phash = text
-
-    def __call__(self, context, request):
-        return request.method in self.val
-
-
-class JsonPredicate(object):
-    target = ('application/json', )
-    test = ('text/html', 'application/xhtml+xml', 'application/xml')
-
-    def __init__(self, val, config):
-        self.val = val
-
-    def text(self):
-        return 'json'
-
-    phash = text
-
-    def __call__(self, context, request):
-        return self.val and (
-            request.accept.best_match(self.target + self.test) in self.target
-            or request.GET.get('format') == 'json')  # NOQA: W503
-
-
 def gensecret(length):
     symbols = string.ascii_letters + string.digits
     return ''.join([

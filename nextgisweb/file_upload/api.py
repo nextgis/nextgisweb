@@ -359,8 +359,8 @@ def setup_pyramid(comp, config):
         'file_upload.upload',
         '/api/component/file_upload/upload'
     ) \
-        .add_view(_collection_post, method='POST') \
-        .add_view(_collection_put, method='PUT')
+        .add_view(_collection_post, request_method='POST') \
+        .add_view(_collection_put, request_method='PUT')
 
     config.add_route(
         'file_upload.collection',

@@ -88,8 +88,8 @@ def objjson(request):
                 objjson=serializer.data)
 
 
-# TODO: Move to API and get rid of json=True
-@viewargs(renderer='json', json=True)
+# TODO: Move to API
+@viewargs(renderer='json')
 def schema(request):
     resources = dict()
     scopes = dict()
