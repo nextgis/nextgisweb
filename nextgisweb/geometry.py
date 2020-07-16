@@ -11,6 +11,10 @@ from sqlalchemy import func
 
 from .models import DBSession
 
+
+""" NB: Use lon/lat in geographic SRS everywhere """
+
+
 for t in dir(shapely.geometry):
     original = getattr(shapely.geometry, t)
     if isclass(original) and issubclass(original, base.BaseGeometry):
@@ -68,7 +72,7 @@ def geom_from_wkb(data, srid=None):
 
 
 def geom_transform(g, crs_from, crs_to):
-    transformer = Transformer.from_crs(crs_from, crs_to)
+    transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
     g = map_coords(transformer.transform, g)
     return g
 
@@ -77,9 +81,9 @@ def geom_calc(g, crs, prop, srid):
     # pyproj < 2.3
     def geodesic_calc_with_postgis():
         fun = dict(length=func.ST_Length, area=func.ST_Area)[prop]
-        query = fun( func.geography( func.ST_FlipCoordinates(
+        query = fun(func.geography(
             func.ST_GeomFromText(geom_to_wkt(g), srid)
-        ) ) )
+        ))
         return DBSession.query(query).scalar()
 
     factor = crs.axis_info[0].unit_conversion_factor

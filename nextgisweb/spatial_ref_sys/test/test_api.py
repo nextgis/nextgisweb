@@ -9,7 +9,7 @@ from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys.models import SRS
 from nextgisweb.geometry import geom_from_wkt
 
-MOSCOW_VLADIVOSTOK = 'LINESTRING(55.75 37.62,43.12 131.9)'
+MOSCOW_VLADIVOSTOK = 'LINESTRING(37.62 55.75,131.9 43.12)'
 LENGTH_SPHERE = 6434561.600305
 LENGTH_FLAT = 10718924.816779
 
