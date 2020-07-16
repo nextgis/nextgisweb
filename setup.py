@@ -50,6 +50,7 @@ requires = [
     'flatdict==4.0.1',
 
     # TODO: Move to dev or test dependencies
+    'freezegun',
     'pytest',
     'webtest',
     'flake8',

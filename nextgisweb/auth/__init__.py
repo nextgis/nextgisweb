@@ -3,31 +3,32 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from datetime import datetime, timedelta
 
+import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
-import transaction
 
-from ..lib.config import Option
+from ..lib.config import OptionAnnotations, Option
 from ..component import Component
 from ..models import DBSession
 from .. import db
 
 from .models import Base, Principal, User, Group, UserDisabled
-from .oauth import OAuthServer
-from . import command # NOQA
+from .policy import AuthenticationPolicy
+from .oauth import OAuthHelper, OAuthToken, OnAccessTokenToUser
 from .util import _
+from . import command # NOQA
 
-__all__ = ['Principal', 'User', 'Group']
+__all__ = ['Principal', 'User', 'Group', 'OnAccessTokenToUser']
 
 
 class AuthComponent(Component):
     identity = 'auth'
     metadata = Base.metadata
 
-    def __init__(self, env, settings):
-        super(AuthComponent, self).__init__(env, settings)
+    def initialize(self):
+        super(AuthComponent, self).initialize()
         self.settings_register = self.options['register']
-        self.oauth = OAuthServer(self.options.with_prefix('oauth')) \
+        self.oauth = OAuthHelper(self.options.with_prefix('oauth')) \
             if self.options['oauth.enabled'] else None
 
     def initialize_db(self):
@@ -70,14 +71,13 @@ class AuthComponent(Component):
 
         def user(request):
             user_id = request.authenticated_userid
-            if user_id:
-                user = User.filter_by(id=user_id).one()
-            else:
-                user = User.filter_by(keyname='guest').one()
+            user = User.filter(
+                (User.id == user_id) if user_id is not None
+                else (User.keyname == 'guest')).one()
 
             # Set user last activity
-            delta = timedelta(seconds=self.options['activity_delta'])
-            if user.last_activity is None or datetime.now() - user.last_activity > delta:
+            delta = self.options['activity_delta']
+            if user.last_activity is None or (datetime.utcnow() - user.last_activity) > delta:
                 def update_last_activity(request):
                     with transaction.manager:
                         DBSession.query(User).filter_by(
@@ -100,6 +100,9 @@ class AuthComponent(Component):
 
         config.add_request_method(user, reify=True)
         config.add_request_method(require_administrator)
+
+        config.set_authentication_policy(AuthenticationPolicy(
+            self, self.options.with_prefix('policy')))
 
         from . import views, api
         views.setup_pyramid(self, config)
@@ -153,36 +156,31 @@ class AuthComponent(Component):
 
         return obj
 
-    option_annotations = (
-        Option('register', bool, default=False, doc="Allow user registration."),
+    def maintenance(self):
+        with transaction.manager:
+            # Add additional minute for clock skew
+            exp = datetime.utcnow() + timedelta(seconds=60)
+            self.logger.debug("Cleaning up expired OAuth tokens (exp < %s)", exp)
 
-        Option(
-            'login_route_name', default='auth.login',
-            doc="Name of route for login page."),
-        Option(
-            'logout_route_name', default='auth.logout',
-            doc="Name of route for logout page."),
+            rows = OAuthToken.filter(OAuthToken.exp < exp).delete()
+            self.logger.info("Expired cached OAuth tokens deleted: %d", rows)
 
-        Option('oauth.enabled', bool, default=False),
-        Option('oauth.register', bool, default=False),
+    option_annotations = OptionAnnotations((
+        Option('register', bool, default=False,
+               doc="Allow user registration."),
 
-        Option('oauth.client_id'),
-        Option('oauth.client_secret', secure=True),
+        Option('login_route_name', default='auth.login',
+               doc="Name of route for login page."),
 
-        Option('oauth.auth_endpoint'),
-        Option('oauth.token_endpoint'),
-        Option('oauth.introspection_endpoint', default=None),
-        Option('oauth.userinfo_endpoint'),
+        Option('logout_route_name', default='auth.logout',
+               doc="Name of route for logout page."),
 
-        Option('oauth.userinfo.scope', default=None),
-        Option('oauth.userinfo.subject'),
-        Option('oauth.userinfo.keyname'),
-        Option('oauth.userinfo.display_name'),
+        Option('activity_delta', timedelta, default=timedelta(minutes=10),
+               doc="User last activity update time delta in seconds."),
+    ))
 
-        Option(
-            'activity_delta', int, default=600,
-            doc="User last activity update time delta in seconds."),
-    )
+    option_annotations += OAuthHelper.option_annotations.with_prefix('oauth')
+    option_annotations += AuthenticationPolicy.option_annotations.with_prefix('policy')
 
 
 def translate(self, trstring):

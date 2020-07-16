@@ -14,7 +14,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
-import transaction
 
 from .. import db
 from ..package import pkginfo
@@ -36,25 +35,16 @@ class CoreComponent(Component):
 
     def __init__(self, env, settings):
         super(CoreComponent, self).__init__(env, settings)
-        self.locale_default = None
-        self.debug = False
-
-    def initialize(self):
-        Component.initialize(self)
-
         self.debug = self.options['debug']
         self.locale_default = self.options['locale.default']
         self.locale_available = self.options['locale.available']
 
-        opt_db = self.options.with_prefix('database')
-        sa_url = self._engine_url()
+    def initialize(self):
+        Component.initialize(self)
 
+        sa_url = self._engine_url()
         self.engine = create_engine(sa_url)
         self._sa_engine = self.engine
-
-        if opt_db['check_at_startup']:
-            conn = self._sa_engine.connect()
-            conn.close()
 
         DBSession.configure(bind=self._sa_engine)
 
@@ -223,35 +213,31 @@ class CoreComponent(Component):
         Option('database.user', default="nextgisweb"),
         Option('database.password', secure=True, default=None),
         Option('database.pwfile', default=None),
-        Option(
-            'database.check_at_startup', bool, default=False,
-            doc="Check database connection at initialization. So if database is not available "
-                "application would not start."),
 
         # Data storage
-        Option(
-            'sdir', required=True, doc="Path to filesytem data storage where data stored along "
-            "with database. Other components file_upload create subdirectories in it."),
+        Option('sdir', required=True, doc="Path to filesytem data storage where data stored along "
+               "with database. Other components file_upload create subdirectories in it."),
 
         # Backup storage
-        Option(
-            'backup.path',
-            doc="Path to directory in filesystem where backup created if target destination is "
-                "not specified."),
-        Option(
-            'backup.filename', default='%Y%m%d-%H%M%S.ngwbackup',
-            doc="File name template (passed to strftime) for filename in backup.path if backup "
-                "target destination is not specified"),
+        Option('backup.path', doc="Path to directory in filesystem where backup created if "
+               "target destination is not specified."),
+
+        Option('backup.filename', default='%Y%m%d-%H%M%S.ngwbackup',
+               doc="File name template (passed to strftime) for filename in backup.path if backup "
+               "target destination is not specified"),
 
         # Ignore packages and components
         Option('packages.ignore'),
         Option('components.ignore'),
+
         # Locale settings
         Option('locale.default', default='en'),
         Option('locale.available', list, default=['en', 'ru']),
+
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),
         Option('enable_snippets', bool, default=True),
+
         # Debug settings
         Option('debug', bool, default=False, doc="Enable additional debug tools."),
     )

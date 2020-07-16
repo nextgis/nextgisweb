@@ -1,16 +1,30 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-import io
+import sys
 import os
+import io
+import re
 import os.path
 import errno
 import fcntl
+import secrets
+import string
+import textwrap
+from subprocess import check_output
+from hashlib import md5
+from collections import namedtuple
+from calendar import timegm
+from logging import getLogger
+from pkg_resources import get_distribution
+from distutils.spawn import find_executable
 import six
 
 from ..i18n import trstring_factory
 
 COMP_ID = 'pyramid'
 _ = trstring_factory(COMP_ID)
+
+_logger = getLogger(__name__)
 
 
 def viewargs(**kw):
@@ -44,38 +58,11 @@ class ClientRoutePredicate(object):
         return "<client>"
 
 
-class RequestMethodPredicate(object):
-    def __init__(self, val, config):
-        if isinstance(val, six.string_types):
-            val = (val, )
-
-        self.val = val
-
-    def text(self):
-        return 'method = %s' % (self.val, )
-
-    phash = text
-
-    def __call__(self, context, request):
-        return request.method in self.val
-
-
-class JsonPredicate(object):
-    target = ('application/json', )
-    test = ('text/html', 'application/xhtml+xml', 'application/xml')
-
-    def __init__(self, val, config):
-        self.val = val
-
-    def text(self):
-        return 'json'
-
-    phash = text
-
-    def __call__(self, context, request):
-        return self.val and (
-            request.accept.best_match(self.target + self.test) in self.target
-            or request.GET.get('format') == 'json')  # NOQA: W503
+def gensecret(length):
+    symbols = string.ascii_letters + string.digits
+    return ''.join([
+        secrets.choice(symbols)
+        for i in range(length)])
 
 
 def persistent_secret(fn, secretgen):
@@ -114,9 +101,88 @@ def header_encoding_tween_factory(handler, registry):
         ):
             if h in headers:
                 v = headers[h]
-                if type(h) == unicode or type(v) == unicode:
+                if type(h) == unicode or type(v) == unicode:  # NOQA: F821
                     headers[h.encode('latin-1')] = v.encode('latin-1')
 
         return response
 
     return header_encoding_tween
+
+
+def datetime_to_unix(dt):
+    return timegm(dt.timetuple())
+
+
+def pip_freeze():
+    result = getattr(pip_freeze, '_result', None)
+    if result is not None:
+        return result
+
+    buf = check_output(
+        [find_python(), '-W', 'ignore', '-m', 'pip', 'freeze'],
+        universal_newlines=True)
+    h = md5()
+    h.update(buf.encode('utf-8'))
+    static_key = h.hexdigest()[:8]
+
+    # Read installed packages from pip freeze
+    distinfo = []
+    for line in buf.split('\n'):
+        line = line.strip().lower()
+        if line == '':
+            continue
+
+        dinfo = None
+        mpkg = re.match(r'(.+)==(.+)', line)
+        if mpkg:
+            dinfo = DistInfo(
+                name=mpkg.group(1),
+                version=mpkg.group(2),
+                commit=None)
+
+        mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', line)
+        if mgit:
+            dinfo = DistInfo(
+                name=mgit.group(2),
+                version=get_distribution(mgit.group(2)).version,
+                commit=mgit.group(1))
+
+        if dinfo is not None:
+            distinfo.append(dinfo)
+        else:
+            _logger.warn("Could not parse pip freeze line: %s", line)
+
+    result = (static_key, tuple(distinfo))
+    setattr(pip_freeze, '_result', result)
+    return result
+
+
+def find_python():
+    osfile = os.__file__
+
+    def test(path):
+        if not os.path.split(path)[1].lower().startswith('python'):
+            return False
+        if not os.path.isfile(path):
+            return False
+        oscand = check_output([path, '-c', textwrap.dedent("""
+            from __future__ import print_function
+            import os; print(os.__file__)""")])
+        return oscand.strip() == osfile
+
+    candidates = [
+        ('executable', lambda: sys.executable),
+        ('search path', lambda: find_executable('python')),
+    ]
+
+    for cn, cf in candidates:
+        cv = cf()
+        _logger.debug("Testing python %s (%s)", cn, cv)
+        if test(cv):
+            _logger.info("Found matching python interpreter in %s", cv)
+            return cv
+
+    raise RuntimeError("Python executable not found!")
+
+
+DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])

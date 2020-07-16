@@ -9,6 +9,8 @@ from pkg_resources import resource_filename
 from six import reraise
 
 from pyramid.response import Response, FileResponse
+from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from .. import dynmenu as dm
@@ -16,7 +18,10 @@ from ..core.exception import UserException
 from ..package import amd_packages
 from ..compat import lru_cache
 
-from .util import _
+from . import exception
+from .session import WebSession
+from .renderer import json_renderer
+from .util import _, gensecret, pip_freeze
 
 
 def static_amd_file(request):
@@ -83,9 +88,7 @@ def favicon(request):
 
 
 def locale(request):
-    def set_cookie(reqest, response):
-        response.set_cookie('_LOCALE_', request.matchdict['locale'])
-    request.add_response_callback(set_cookie)
+    request.session['pyramid.locale'] = request.matchdict['locale']
     return HTTPFound(location=request.GET['next'])
 
 
@@ -93,7 +96,7 @@ def pkginfo(request):
     request.require_administrator()
     return dict(
         title=_("Package versions"),
-        distinfo=request.env.pyramid.distinfo,
+        distinfo=pip_freeze()[1],
         dynmenu=request.env.pyramid.control_panel)
 
 
@@ -157,6 +160,15 @@ def home_path(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def test_request(request):
+    comp = request.env.pyramid
+    handler = comp.test_request_handler
+    if handler:
+        return handler(request)
+    else:
+        raise ValueError("Invalid test request handler")
+
+
 def test_exception_handled(request):
     class HandledTestException(UserException):
         title = "Title"
@@ -205,12 +217,112 @@ def test_timeout(reqest):
 
 
 def setup_pyramid(comp, config):
+    env = comp.env
+    is_debug = env.core.debug
+
+    # Session factory
+    config.set_session_factory(WebSession)
+
+    # Empty authorization policy. Why do we need this?
+    # NOTE: Authentication policy is set up in then authentication component!
+    authz_policy = ACLAuthorizationPolicy()
+    config.set_authorization_policy(authz_policy)
+
+    _setup_pyramid_debugtoolbar(comp, config)
+    _setup_pyramid_tm(comp, config)
+    _setup_pyramid_mako(comp, config)
+
+    # COMMON REQUEST'S ATTRIBUTES
+
+    config.add_request_method(lambda req: env, 'env', property=True)
+    config.add_request_method(
+        lambda req: req.path_info.lower().startswith('/api/'),
+        'is_api', property=True)
+
+    # ERROR HANGLING
+
+    comp.error_handlers = list()
+
+    @comp.error_handlers.append
+    def api_error_handler(request, err_info, exc, exc_info):
+        if request.is_api or request.is_xhr:
+            return exception.json_error_response(
+                request, err_info, exc, exc_info, debug=is_debug)
+
+    @comp.error_handlers.append
+    def html_error_handler(request, err_info, exc, exc_info):
+        return exception.html_error_response(
+            request, err_info, exc, exc_info, debug=is_debug)
+
+    def error_handler(request, err_info, exc, exc_info, **kwargs):
+        for handler in comp.error_handlers:
+            result = handler(request, err_info, exc, exc_info)
+            if result is not None:
+                return result
+
+    config.registry.settings['error.err_response'] = error_handler
+    config.registry.settings['error.exc_response'] = error_handler
+    config.include(exception)
+
+    config.add_tween(
+        'nextgisweb.pyramid.util.header_encoding_tween_factory',
+        over=('nextgisweb.pyramid.exception.unhandled_exception_tween_factory', ))
+
+    # INTERNATIONALIZATION
+
+    # Substitute localizer from pyramid with our own, original is
+    # too tied to translationstring, that works strangely with string
+    # interpolation via % operator.
+    def localizer(request):
+        return request.env.core.localizer(request.locale_name)
+    config.add_request_method(localizer, 'localizer', property=True)
+
+    # Replace default locale negotiator with session-based one
+    def locale_negotiator(request):
+        return request.session.get(
+            'pyramid.locale',
+            env.core.locale_default)
+    config.set_locale_negotiator(locale_negotiator)
+
+    # TODO: Need to get rid of translation dirs!
+    # Currently used only to search for jed-files.
+    from ..package import pkginfo as _pkginfo
+    for pkg in _pkginfo.packages:
+        dirname = resource_filename(pkg, 'locale')
+        if os.path.isdir(dirname):
+            config.add_translation_dirs(dirname)
+
+    # STATIC FILES
+
+    comp.static_key = '/' + (pip_freeze()[0] if not is_debug else gensecret(8))
+
     config.add_static_view(
         '/static{}/asset'.format(comp.static_key),
         'nextgisweb:static', cache_max_age=3600)
 
     config.add_route('amd_package', '/static{}/amd/*subpath'.format(comp.static_key)) \
         .add_view(static_amd_file)
+
+    # Collect external AMD-packages from other components
+    amd_base = []
+    for c in comp._env.chain('amd_base'):
+        amd_base.extend(c.amd_base)
+
+    config.add_request_method(
+        lambda r: amd_base, 'amd_base',
+        property=True, reify=True)
+
+    # RENDERERS
+
+    config.add_renderer('json', json_renderer)
+
+    # Filter for quick translation. Defines function tr, which we can use
+    # instead of request.localizer.translate in mako templates.
+    def tr_subscriber(event):
+        event['tr'] = event['request'].localizer.translate
+    config.add_subscriber(tr_subscriber, BeforeRender)
+
+    # OTHERS
 
     config.add_route('home', '/').add_view(home)
 
@@ -269,6 +381,10 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
+    comp.test_request_handler = None
+    config.add_route('pyramid.test_request', '/test/request/') \
+        .add_view(test_request)
+
     config.add_route('pyramid.test_exception_handled', '/test/exception/handled') \
         .add_view(test_exception_handled)
     config.add_route('pyramid.test_exception_unhandled', '/test/exception/unhandled') \
@@ -304,3 +420,34 @@ def setup_pyramid(comp, config):
         comp.control_panel.add(dm.Link(
             'info/backups', _("Backups"), lambda args:
             args.request.route_url('pyramid.control_panel.backup.browse')))
+
+
+def _setup_pyramid_debugtoolbar(comp, config):
+    dt_opt = comp.options.with_prefix('debugtoolbar')
+    if not dt_opt.get('enabled', comp.env.core.debug):
+        return
+
+    settings = config.registry.settings
+    settings['debugtoolbar.hosts'] = dt_opt.get(
+        'hosts', '0.0.0.0/0' if comp.env.core.debug else None)
+    settings['debugtoolbar.exclude_prefixes'] = ['/static/', ]
+
+    import pyramid_debugtoolbar
+    config.include(pyramid_debugtoolbar)
+
+
+def _setup_pyramid_tm(comp, config):
+    import pyramid_tm
+    config.include(pyramid_tm)
+
+
+def _setup_pyramid_mako(comp, config):
+    settings = config.registry.settings
+
+    settings['pyramid.reload_templates'] = comp.env.core.debug
+    settings['mako.directories'] = 'nextgisweb:templates/'
+    settings['mako.imports'] = ['import six', 'from nextgisweb.i18n import tcheck']
+    settings['mako.default_filters'] = ['tcheck', 'h'] if comp.env.core.debug else ['h', ]
+
+    import pyramid_mako
+    config.include(pyramid_mako)

@@ -14,7 +14,7 @@
         <div class="auth-form__error">${error}</div>
     %endif
 
-    %if request.env.auth.oauth is not None:
+    %if (request.env.auth.oauth is not None) and (not request.env.auth.oauth.password):
         <% oauth_url = request.route_url('auth.oauth', _query=dict(next=next_url) if next_url else None) %>
         <a href="${oauth_url}">${tr(_('Continue with NextGIS ID'))}</a>
     %endif

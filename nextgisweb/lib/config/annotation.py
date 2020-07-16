@@ -46,6 +46,18 @@ class Option(object):
         return self._doc
 
 
+class OptionAnnotations(tuple):
+
+    def with_prefix(self, prefix):
+        def _copy(item):
+            result = item.__class__.__new__(item.__class__)
+            result.__dict__.update(item.__dict__)
+            result._key = prefix + '.' + result.key
+            return result
+
+        return OptionAnnotations(map(_copy, self))
+
+
 class ConfigOptions(object):
 
     def __init__(self, options, annotations):
@@ -154,6 +166,9 @@ class ConfigOptionsPrefixProxy(object):
     def __init__(self, parent, prefix):
         self._parent = parent
         self._prefix = prefix
+
+    def with_prefix(self, prefix):
+        return self._parent.with_prefix(self._prefix + '.' + prefix)
 
     def _pkey(self, key):
         return self._prefix + '.' + key

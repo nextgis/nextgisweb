@@ -354,7 +354,6 @@ def company_logo(request):
 def setup_pyramid(comp, config):
     config.add_tween('nextgisweb.pyramid.api.cors_tween_factory', under=(
         'nextgisweb.pyramid.exception.handled_exception_tween_factory',
-        'pyramid_debugtoolbar.toolbar_tween_factory',
         'INGRESS'))
 
     config.add_route('pyramid.cors', '/api/component/pyramid/cors') \

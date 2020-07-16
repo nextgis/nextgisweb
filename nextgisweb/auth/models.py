@@ -53,11 +53,10 @@ class User(Principal):
     disabled = sa.Column(sa.Boolean, nullable=False, default=False)
     password_hash = sa.Column(sa.Unicode)
     oauth_subject = sa.Column(sa.Unicode, unique=True)
+    oauth_tstamp = sa.Column(sa.DateTime)
     last_activity = sa.Column(sa.DateTime)
 
     __mapper_args__ = dict(polymorphic_identity='U')
-
-    principal = orm.relationship(Principal)
 
     def __init__(self, password=None, **kwargs):
         super(Principal, self).__init__(**kwargs)
@@ -129,6 +128,9 @@ class User(Principal):
             ('keyname', self.keyname),
             ('superuser', self.superuser),
             ('disabled', self.disabled),
+            ('last_activity', self.last_activity),
+            ('oauth_subject', self.oauth_subject),
+            ('oauth_tstamp', self.oauth_tstamp),
             ('member_of', [g.id for g in self.member_of])
         ))
 
@@ -162,8 +164,6 @@ class Group(Principal):
         backref=orm.backref('member_of'))
 
     __mapper_args__ = dict(polymorphic_identity='G')
-
-    principal = orm.relationship(Principal)
 
     def __str__(self):
         return self.display_name

@@ -52,6 +52,8 @@ def handled_exception_tween_factory(handler, registry):
 
         except Exception as exc:
             exc_info = sys.exc_info()
+            if request.path_info.startswith('/test/request/'):
+                reraise(*exc_info)
 
             try:
                 err_info = IUserException(exc)
@@ -76,6 +78,9 @@ def unhandled_exception_tween_factory(handler, registry):
         try:
             return handler(request)
         except Exception as exc:
+            if request.path_info.startswith('/test/request/'):
+                reraise(*sys.exc_info())
+
             _logger.exception("Uncaught %s at %s" % (
                 exc_name(exc), request.url))
 

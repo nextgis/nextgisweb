@@ -4,12 +4,11 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import string
 import secrets
 
-from sqlalchemy.orm.exc import NoResultFound
-
+from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPFound, HTTPBadRequest
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 
 from ..models import DBSession
 from ..object_widget import ObjectWidget
@@ -18,6 +17,7 @@ from .. import dynmenu as dm
 
 from .models import Principal, User, Group, UserDisabled
 
+from .exception import InvalidCredentialsException, DisabledUserException
 from .util import _
 
 
@@ -25,24 +25,18 @@ def login(request):
     next_url = request.params.get('next', request.application_url)
 
     if request.method == 'POST':
+        auth_policy = request.registry.getUtility(IAuthenticationPolicy)
         try:
-            user = User.filter_by(
-                keyname=request.POST['login'].strip()).one()
+            user, tresp = auth_policy.authenticate_with_password(
+                username=request.POST['login'].strip(),
+                password=request.POST['password'])
 
-            if user.password == request.POST['password']:
-                headers = remember(request, user.id)
-                if user.disabled:
-                    return dict(
-                        error=_("Account disabled"),
-                        next_url=next_url)
-                return HTTPFound(location=next_url, headers=headers)
-            else:
-                raise NoResultFound()
+            DBSession.flush()  # Force user.id sequence value
+            headers = auth_policy.remember(request, (user.id, tresp))
+            return HTTPFound(location=next_url, headers=headers)
 
-        except NoResultFound:
-            return dict(
-                error=_("Invalid login or password!"),
-                next_url=next_url)
+        except (InvalidCredentialsException, DisabledUserException) as exc:
+            return dict(error=exc.title, next_url=next_url)
 
     return dict(next_url=next_url)
 
@@ -67,19 +61,18 @@ def oauth(request):
         except KeyError:
             raise HTTPBadRequest()
 
-        access_token = oaserver.get_access_token(
+        tresp = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
 
-        user = oaserver.get_user(access_token)
+        user = oaserver.access_token_to_user(tresp.access_token)
         if user is None:
             return render_error_message(request)
 
         DBSession.flush()
-        headers = remember(request, user.id)
+        headers = remember(request, (user.id, tresp))
 
         response = HTTPFound(location=next_url, headers=headers)
         response.delete_cookie(cookie_name(state), path=oauth_path)
-
         return response
 
     else:
@@ -119,36 +112,24 @@ def render_error_message(request, message=None):
 
 def forbidden_error_response(request, err_info, exc, exc_info, **kwargs):
     # If user is not authentificated, we can offer him to sign in
-    # TODO: there may be a better way to check if authentificated
-
-    if request.user.keyname == 'guest':
-        # If URL starts with /api/ and user is not authentificated,
-        # then it's probably not a web-interface, but external software,
-        # that can do HTTP auth. Tell it that we can do too.
-        if request.is_api:
-            return HTTPUnauthorized(headers={
-                b'WWW-Authenticate': b'Basic realm="NextGISWeb"'})
-
-        # Others are redirected to login page.
-        elif request.method == 'GET':
-            response = render_to_response(
-                'nextgisweb:auth/template/login.mako',
-                dict(next_url=request.url), request=request)
-            response.status = 403
-            return response
+    if request.method == 'GET' and not request.is_api and request.user.keyname == 'guest':
+        response = render_to_response(
+            'nextgisweb:auth/template/login.mako',
+            dict(next_url=request.url), request=request)
+        response.status = 403
+        return response
 
     # Show error message to already authentificated users
-    # TODO: We can separately inform blocked users
-
     return render_error_message(request)
 
 
 def setup_pyramid(comp, config):
     def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
-        if err_info.http_status_code == 403:
+        if not request.is_api and not request.is_xhr and err_info.http_status_code == 403:
             return forbidden_error_response(request, err_info, exc, exc_info, **kwargs)
 
-    comp.env.pyramid.error_handlers.append(forbidden_error_handler)
+    # Add it before standard pyramid handlers
+    comp.env.pyramid.error_handlers.insert(0, forbidden_error_handler)
 
     def check_permission(request):
         """ To avoid interdependency of two components:
