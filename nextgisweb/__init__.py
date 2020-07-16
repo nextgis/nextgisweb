@@ -75,7 +75,7 @@ def main(global_config, **settings):
 
     setenv(env)
 
-    config = env.pyramid.make_app(settings)
+    config = env.pyramid.make_app({})
     return config.make_wsgi_app()
 
 
