@@ -16,7 +16,7 @@ define([
     // template
     "dijit/layout/ContentPane",
     "dijit/layout/BorderContainer",
-    "ngw-file-upload/Uploader",
+    "ngw-file-upload/ImageUploader",
     "dijit/form/Button"
 ], function (
     declare,
@@ -41,6 +41,8 @@ define([
             var self = this;
             this.buttonSave.on("click", function () { self.save(false); });
             this.buttonRestore.on("click", function () { self.save(true); });
+
+            this.wFile.setImageUrl(route.pyramid.logo());
         },
 
         save: function (restoreDefault) {

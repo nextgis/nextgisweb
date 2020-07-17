@@ -1,0 +1,17 @@
+<div class="uploader" data-dojo-attach-point="focusNode">
+    <div class="uploader__dropzone" data-dojo-attach-point="dropTarget">
+		<div class="uploader__inner">
+    		<div data-dojo-attach-point="fileText">
+    			<span class="uploader__info" data-dojo-attach-point="fileInfo"></span>
+		    	<span class="uploader__link">
+		    		<span class="uploader__link__btn" data-dojo-attach-point="fileUploader"></span>
+			    	<a class="uploader__link__text uploader__link__text--start" href="#" data-dojo-attach-point="fileLink">{{gettext 'Select an image'}}</a>
+			    	<a class="uploader__link__text uploader__link__text--complete" href="#">{{gettext 'Overwrite?'}}</a>
+			    	<a class="uploader__link__text uploader__link__text--error" href="#">{{gettext 'Try again'}}</a>
+			    </span>
+		    	<span class="uploader__linkAfter" data-dojo-attach-point="fileLinkAfter">{{gettext 'or use drag and drop'}}.</span>
+		   	</div>
+		   	<div class="uploader__help" data-dojo-attach-point="fileHelp"></div>
+		</div>
+	</div>
+</div>

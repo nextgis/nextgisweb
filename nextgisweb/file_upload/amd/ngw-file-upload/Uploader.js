@@ -91,6 +91,10 @@ define([
             dropTarget.ondrop = dragLeave;
         },
 
+        setAccept: function (accept) {
+            this.uploaderWidget.inputNode.accept = accept;
+        },
+
         uploadBegin: function () {
             this.upload_promise = new Deferred();
             this.uploading = true;
