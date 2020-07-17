@@ -90,8 +90,6 @@ def export(request):
         raise ValidationError(
             _("Output format is not provided.")
         )
-    else:
-        format = format.upper()
 
     if format not in EXPORT_FORMAT_OGR:
         raise ValidationError(
