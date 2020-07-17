@@ -75,8 +75,8 @@ define([
             this.formatStore = new ObjectStore(new Memory({
                 data: array.map(settings.export_formats, function (format) {
                     return {
-                        id: format.extension,
-                        label: format.name,
+                        id: format.name,
+                        label: format.display_name,
                         single_file: format.single_file
                     }
                 })
