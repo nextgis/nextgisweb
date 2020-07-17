@@ -8,14 +8,14 @@ import zipfile
 import itertools
 from six.moves.urllib.parse import unquote
 
+import tempfile
 import backports.tempfile
 from collections import OrderedDict
 from datetime import datetime, date, time
-from io import BytesIO
 
 from osgeo import ogr, gdal
 from pyproj import CRS
-from pyramid.response import Response
+from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPNoContent
 
 from ..geometry import (
@@ -111,9 +111,7 @@ def export(request):
     ogr_layer = _ogr_layer_from_features(
         request.context, query(), ds=ogr_ds, fid=fid)
 
-    buf = BytesIO()
-
-    with backports.tempfile.TemporaryDirectory() as temp_dir:
+    with backports.tempfile.TemporaryDirectory() as tmp_dir:
         filename = "%d.%s" % (
             request.context.id,
             driver.extension,
@@ -128,42 +126,30 @@ def export(request):
             vtopts.append('-preserve_fid')
 
         gdal.VectorTranslate(
-            os.path.join(temp_dir, filename), ogr_ds,
+            os.path.join(tmp_dir, filename), ogr_ds,
             options=gdal.VectorTranslateOptions(options=vtopts)
         )
 
         if zipped or not driver.single_file:
-            with zipfile.ZipFile(
-                buf, "w", zipfile.ZIP_DEFLATED
-            ) as zipf:
-                for root, dirs, files in os.walk(temp_dir):
-                    for file in files:
-                        path = os.path.join(root, file)
-                        zipf.write(
-                            path, os.path.basename(path)
-                        )
-
             content_type = "application/zip"
-            filename = "%s.zip" % (filename,)
-
+            content_disposition = b"attachment; filename=%s" % ("%s.zip" % (filename,))
+            with tempfile.NamedTemporaryFile(suffix=".zip") as tmp_file:
+                with zipfile.ZipFile(tmp_file, "w", zipfile.ZIP_DEFLATED) as zipf:
+                    for root, dirs, files in os.walk(tmp_dir):
+                        for file in files:
+                            path = os.path.join(root, file)
+                            zipf.write(path, os.path.basename(path))
+                response = FileResponse(tmp_file.name, content_type=content_type)
+                response.content_disposition = content_disposition
+                return response
         else:
-            content_type = (
-                driver.mime or "application/octet-stream"
+            content_type = driver.mime or "application/octet-stream"
+            content_disposition = b"attachment; filename=%s" % filename
+            response = FileResponse(
+                os.path.join(tmp_dir, filename), content_type=content_type
             )
-            with open(
-                os.path.join(temp_dir, filename)
-            ) as f:
-                buf.write(f.read())
-
-    content_disposition = (
-        b"attachment; filename=%s" % filename
-    )
-
-    return Response(
-        buf.getvalue(),
-        content_type=content_type,
-        content_disposition=content_disposition,
-    )
+            response.content_disposition = content_disposition
+            return response
 
 
 def mvt(request):
