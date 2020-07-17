@@ -7,8 +7,6 @@
 %>
 
 <%
-    has_logo = request.env.core.settings_exists('pyramid', 'logo') or \
-        ('logo' in request.env.pyramid.options and os.path.isfile(request.env.pyramid.options['logo']))
     return_url = request.GET['return'] if 'return' in request.GET else false
 
     login_qs = dict()
@@ -43,11 +41,11 @@
                 %if return_url:
                     <img class="logo__pic" src="${request.static_url('nextgisweb:static/img/return-button.svg')}"/>
                 %else:
-                    %if has_logo:
-                        <img class="logo__pic" src="${request.route_url('pyramid.logo')}"/>
-                    %else:
-                        <img class="logo__pic" src="${request.static_url('nextgisweb:static/img/nextgis_logo_s.svg')}"/>
-                    %endif
+                    <%
+                        logo_url = request.route_url('pyramid.logo') if request.env.core.settings_exists('pyramid', 'logo') \
+                            else request.static_url('nextgisweb:static/img/nextgis_logo_s.svg')
+                    %>
+                    <img class="logo__pic" src="${logo_url}"/>
                 %endif
             </a>
             <div class="header__title__inner">
