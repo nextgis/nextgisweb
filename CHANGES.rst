@@ -4,7 +4,11 @@ Changes
 3.5.0
 -----
 
-- Track timestamps for user last activity.
+- Raster layer export.
+- Support for ``geom_format`` and ``srs`` in feature layer REST API (POST / PUT requests).
+- Session based OAuth authentication with token refresh support.
+- Delete users and groups via REST API.
+- Track timestamps of user's last activity.
 - Fix bug in CORS implementation for requests returning errors.
 
 
