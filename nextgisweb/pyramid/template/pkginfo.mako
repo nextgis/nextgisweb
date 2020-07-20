@@ -3,22 +3,6 @@
 <%! from platform import platform %>
 <%! import sys %>
 
-<%def name="head()">
-    <script>
-        require([
-            "dojo/ready",
-            "ngw/sorted-table"
-        ], function(
-            ready,
-            sortedTable
-        ){
-            ready(function() {
-                sortedTable(document.getElementById("package-table"));
-            });
-        });
-    </script>
-</%def>
-
 <h2>${tr(_('Platform'))}</h2>
 <p>${"Python %s on %s" % (sys.version, platform())}</p>
 
