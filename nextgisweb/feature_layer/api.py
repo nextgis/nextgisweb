@@ -67,7 +67,7 @@ def _ogr_layer_from_features(layer, features, name=b'', ds=None, fid=None):
 
 
 def view_geojson(request):
-    request.GET["format"] = EXPORT_FORMAT_OGR["GEOJSON"].extension
+    request.GET["format"] = "GeoJSON"
     request.GET["zipped"] = "false"
 
     return export(request)
