@@ -9,8 +9,7 @@ define([
     "dijit/layout/BorderContainer",
     "dojox/collections/Set",
     "./Tree",
-    "ngw-pyramid/i18n!resource",
-    "xstyle/css!./resource/ResourcePicker.css"
+    "ngw-pyramid/i18n!resource"
 ], function (
     declare,
     lang,
