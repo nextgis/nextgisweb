@@ -15,9 +15,9 @@ from ..object_widget import ObjectWidget
 from ..views import ModelController, permalinker
 from .. import dynmenu as dm
 
-from .models import Principal, User, Group, UserDisabled
+from .models import Principal, User, Group
 
-from .exception import InvalidCredentialsException, DisabledUserException
+from .exception import InvalidCredentialsException, UserDisabledException
 from .util import _
 
 
@@ -35,7 +35,7 @@ def login(request):
             headers = auth_policy.remember(request, (user.id, tresp))
             return HTTPFound(location=next_url, headers=headers)
 
-        except (InvalidCredentialsException, DisabledUserException) as exc:
+        except (InvalidCredentialsException, UserDisabledException) as exc:
             return dict(error=exc.title, next_url=next_url)
 
     return dict(next_url=next_url)
@@ -64,6 +64,7 @@ def oauth(request):
         tresp = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
 
+        # TODO: Handle exceptions here!
         user = oaserver.access_token_to_user(tresp.access_token)
         if user is None:
             return render_error_message(request)
@@ -144,12 +145,6 @@ def setup_pyramid(comp, config):
     config.add_route('auth.logout', '/logout').add_view(logout)
 
     config.add_route('auth.oauth', '/oauth').add_view(oauth)
-
-    def user_disabled(request):
-        headers = forget(request)
-        return HTTPFound(location=request.application_url, headers=headers)
-
-    config.add_view(user_disabled, context=UserDisabled)
 
     def principal_dump(request):
         query = Principal.query().with_polymorphic('*')

@@ -18,6 +18,7 @@ from ..models import DBSession
 from ..core.exception import UserException
 
 from .models import User, Group, Base
+from .exception import UserDisabledException
 from .util import _, clean_user_keyname
 
 
@@ -105,6 +106,9 @@ class OAuthHelper(object):
                     user.member_of = Group.filter_by(register=True).all()
                 else:
                     return None
+
+            if user.disabled:
+                raise UserDisabledException()
 
             if (
                 user.oauth_tstamp is not None and

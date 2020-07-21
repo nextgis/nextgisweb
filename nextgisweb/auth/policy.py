@@ -13,7 +13,7 @@ from ..lib.config import OptionAnnotations, Option
 from ..compat import timestamp_to_datetime, datetime_to_timestamp
 
 from .models import User
-from .exception import InvalidCredentialsException, DisabledUserException
+from .exception import InvalidCredentialsException, UserDisabledException
 from .oauth import OAuthTokenRefreshException
 
 
@@ -157,7 +157,9 @@ class AuthenticationPolicy(object):
 
         try:
             test_user = q.one()
-            if test_user.password == password:
+            if test_user.disabled:
+                raise UserDisabledException()
+            elif test_user.password == password:
                 user = test_user
         except NoResultFound:
             pass
@@ -170,8 +172,6 @@ class AuthenticationPolicy(object):
 
         if user is None:
             raise InvalidCredentialsException()
-        elif user.disabled:
-            raise DisabledUserException()
 
         return (user, tresp)
 
