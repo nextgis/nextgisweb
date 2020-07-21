@@ -9,4 +9,5 @@ NextGIS Web for developers
 
    ./developer/toc
    ./internal/toc
+   ./admin/toc
    
