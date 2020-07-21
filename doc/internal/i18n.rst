@@ -27,7 +27,8 @@ All actions on translations are performed using ``nextgisweb-i18n`` command
 line utility from the ``nextgisweb`` package. This utility is an add-on
 to the ``pybabel`` utility from `babel` package with default settings preset.
 
-Рассмотрим локализацию на русский язык на примере несуществующего компонента `bar` из несуществующего пакета `foo`. В этом случае структура каталогов будет выглядеть следующим образом:
+Let's consider localization to Russian on the example of ``bar`` component from
+``foo`` package. In this case, the directory structure will look like this:
 
 ::
 
@@ -37,25 +38,42 @@ to the ``pybabel`` utility from `babel` package with default settings preset.
     │   └── bar
     └── locale
      
-Извлекаем строки из файлов исходного кода с настройками по-умолчанию:
+Extract strings from source code files with default settings:
 
 ::
 
     (env) $ nextgisweb-i18n --package foo extract bar
 
-В результате будет создан pot-файл `foo/foo/locale/bar.pot`. Поскольку этот файл в любой момент можно сгенерировать, не нужно помещать его внутрь системы контроля версий. На основании pot-файла создаем po-файл для русского языка:
+This will create a pot-file `foo/foo/locale/bar.pot`. Since this file can be
+generated at any time, there is no need to put it inside the source control
+system.
+
+Create a po-file for the Russian language based on the pot-file:
 
 ::
 
     (env) $ nextgisweb-i18n --package foo init bar ru
 
-В результате будет создан po-файл `foo/foo/locale/ru/LC_MESSAGES/bar.pot` (это стандартная структура для gettext, возможно мы от нее откажемся в пользу более простой). Этот файл нужно заполнить в соответствии с переводом указанных в нем строк при помощи текстового редактора или специализированного редактора po-файлов. После того как все готово, компилируем po-файлы в mo-файлы, которые так же не нужно помещать в систему контроля версий:
+
+As a result, a po-file `foo/foo/locale/ru/LC_MESSAGES/bar.pot` will be created
+(this is a standard structure for gettext, perhaps sometimes we will replace it
+in favor of a simpler one). This file must be filled in accordance with the
+translation of the strings in it using a text editor or a specialized po-file
+editor.
+
+After this, we compile po-files into mo-files, which also do not need to be
+placed in the version control system:
 
 ::
 
     (env) $ nextgisweb-i18n --package foo compile bar
 
-Ниже приведена итоговая структура каталогов. Файлы `bar.jed` - это аналог mo-файла для javascript-библиотеки `jed <http://slexaxton.github.io/Jed/>`_, которая используется для локализации на стороне клиента. Эти файлы так же создаются на этапе компиляции и представляют из себя json-файлы.
+The resulting directory structure is given bellow. The files `bar.jed` are
+analogous to the mo file for the javascript library `jed`_, which is used for
+client-side internationalization. These files are also created at the
+compilation stage.
+
+.. _jed: http://slexaxton.github.io/Jed/
 
 ::
 
@@ -71,7 +89,9 @@ to the ``pybabel`` utility from `babel` package with default settings preset.
                     ├── bar.mo
                     └── bar.po
 
-На этом первичная локализация завершена, через какое-то время в пакете могли добавится новые строки, в этом случае нужно заново извлечь строки, автоматически обновить po-файл, отредактировать его и снова скомпилировать:
+This completes the initial internationalization, after some time new lines may
+have be added to the package, in this case you need to re-extract the lines,
+automatically update the po-file, edit it and compile again:
 
 ::
 
@@ -81,18 +101,29 @@ to the ``pybabel`` utility from `babel` package with default settings preset.
     (env) $ nextgisweb-i18n --package foo compile bar
 
 
-Cервер
-------
+Server side
+-----------
 
-Python
-^^^^^^
+Python code
+^^^^^^^^^^^
 
-Для обеспечения возможности извлечение строк для перевода их необходимо разметить соответствующим образом. Ниже описано как это сделать, а так же как обеспечить вывод уже переведенных строк пользователю.
+To be able to extract strings for translation, they must be marked up
+appropriately. Below is described how to do this, as well as how to ensure the
+display of already translated strings to the user.
 
-Поскольку код на python выполняется на сервере, один и тот же экземпляр приложения должен иметь возможность обслуживать пользователей с разными локалями, то необходимо использовать двухступенчатую работу со строками: вначале строка отмечается как требующая перевода, затем непосредственно перед выводом пользователю переводится с учетом предпочтений пользователя. Решают эту задачу класс :py:class:`nextgisweb.i18n.trstring.TrString`, который в целом аналогичен классу :py:class:`translationstring.TranslationString`, но с некоторыми дополнительными удобствами в отношении интерполяции строк. Рассмотрим на примере несуществующего компонента `bar` из несуществующего пакета `foo`.
+Since python code is executed on a server, the same application instance must be
+able to serve users with different locales, it is necessary to use a two-step
+work with strings: first, the string is marked as requiring translation, then
+before displaying it to the user, it's translated according to the user's
+preferences. 
+
+The class :py:class:`nextgisweb.i18n.trstring.TrString` solves this problem,
+which is similar to the class :py:class:`translationstring.TranslationString`,
+but with some additional convenience in terms of string interpolation. Let's
+look at the example of the ``bar`` component from the ``foo`` package``.
 
 .. code-block:: text
-    :caption: Структура директории
+    :caption: Sample directory structure
     :name: tree-server
 
     bar
@@ -102,69 +133,96 @@ Python
         └── section.mako
 
 .. code-block:: python
-    :caption: util.py
+    :caption: File util.py
 
     from nextgisweb.i18n import trstring_factory
     _ = trstring_factory('bar')
 
-Функция :py:func:`nextgisweb.i18n.trstring.trstring_factory` позволяет упростить создание строк :py:class:`~nextgisweb.i18n.trstring.TrString` с предопределенным доменом, который указывается в параметрах функции. Для удобства и функция и класс так же доступны для импортирования из модуля :py:mod:`nextgisweb.i18n`, что и показано в примерах.
+Function :py:func:`nextgisweb.i18n.trstring.trstring_factory` allows you to
+simplify creation of strings :py:class:`~nextgisweb.i18n.trstring.TrString` with
+a predefined domain, which is specified in the function parameters. For
+convenience, both the function and the class are also available for import from
+the module :py:mod:`nextgisweb.i18n`, as shown in the examples.
 
 .. code-block:: python
-    :caption: __init__.py #1
+    :caption: File __init__.py #1
 
     from .util import _
     def something():
         return _('Some message for translation')
 
-Использование символа подчеркивания необходимо для корректного извлечения строк для перевода, то есть нельзя импортировать его с другим именем ``from .util import _ as blah`` это не позволит корректно извлечь строки для перевода.
+Usage of the underscore character is necessary for extraction of translation
+strings, so you can't import it with a different name ``from .util import _ as
+blah``, it will break extraction process.
 
-Для перевода в соответствии с предпочтениями пользователя (один пользователь может хотеть английский язык, другой русский) необходимо перевести строку при помощи метода ``request.localizer.translate(trstring)``:
+For string output in accordance with the user's preferences (one user may want
+English, the other Russian), you need to translate the string using the
+``request.localizer.translate(trstring)`` method:
 
 .. code-block:: python
-    :caption: __init__.py #2
+    :caption: File __init__.py #2
 
     @view_config(renderer='string')
     def view(request):
         return request.localizer.translate(something())
 
-Поскольку ``request`` имеет смысл только в веб-сервисе, это значит что на данном этапе не получится использовать локализацию в утилитах командной строки nextgisweb.
+.. note::
 
+    Since ``request`` only makes sense in the web application, this means that
+    currently it isn't possible to use localization in the nextgisweb command
+    line utilities.
 
-Mako
-^^^^
+Mako templates
+^^^^^^^^^^^^^^
 
-Часть требующих перевода строк так же содержится в mako-шаблонах обрабатываемых на сервере. По сути работа mako-шаблонов мало чем отличается от python кода, так что и схема работы такая-же: вначале отмечаем строку для перевода специальной функцией, потом переводим через ``request`` с учетом предпочтений пользователя.
+Some of the strings that require translation are also contained in the
+mako-templates. In fact, the work of mako templates is not much different from
+the python code: first, we mark the string for translation with a special
+function, then we need to translate through ``request``, taking into account the
+user's preferences.
 
 .. code-block:: mako
-    :caption: template/section.mako #1
+    :caption: File template/section.mako #1
 
     <% from foo.bar.util import _ %>
     <div>${request.localizer.translate(_("Another message for translation"))}</div>
 
-Чтобы немного сократить эту длинную запись в контекст mako-шаблона добавлена функция tr(), которая делает то же самое. Таким образом пример приведенный ниже полностью равноценен предыдущему:
+To shorten this long notation a bit, a ``tr()`` function has been added to the
+mako-template's context, which does the same. The example below is completely
+equivalent to the previous one:
 
 .. code-block:: mako
-    :caption: template/section.mako #2
+    :caption: File template/section.mako #2
 
     <% from foo.bar.util import _ %>
     <div>${tr(_("Another message for translation"))}</div>
 
 .. note:: 
 
-    К сожалению, по не очень понятным причинам, не получится использовать эту функцию как модификатор ``${expression | tr}``. Почему-то в этом случае в функцию попадает результат работы стандартного модификатора ``n``, то есть ``markupsafe.Markup``.
+    Unfortunately, it isn't possible use this function as a modifier
+    ``${expression | tr}``. In this case, the result of the standard modifier
+    ``n``, that is ``markupsafe.Markup`` gets into the function.
 
-Для того, чтобы отследить, что все строки требующие перевода были переведены при выводе в шаблоне в режиме отладки (настройка ``debug`` компонента ``core``) к стандартному модификатору ``n`` добавляется специальный модификатор, который проверяет был ли выполнен перевод при помощи ``request.localizer`` и если нет, то в лог выводится соответствующее сообщение.
+In order to track that all strings requiring translation were translated when
+outputting in the template in debug mode (setting ``debug`` of the component
+``core``) a special modifier is added to the standard modifier ``n``, which
+checks whether the translation was performed using ``request.localizer`` and if
+not, then the corresponding warning is displayed in the log.
 
-Kлиент
-------
+Client side
+-----------
 
 Javascript
 ^^^^^^^^^^
 
-При выполнении javascript-кода на клиенте, предпочтения пользователя известны сразу и необходимость в двухступенчатой обработка отсутствует. Это значит, что перевод и отметку строк для перевода можно совместить в одной функции. Для работы с gettext на стороне клиента используется библиотека `jed <http://slexaxton.github.io/Jed/>`_ исходные json-файлы для которой готовятся на сервере при компиляции po-файлов.
+When executing javascript code on the client side, user preferences are already
+known and there is no need for two-step processing. Translation and marking
+strings for translation can be combined in one function. To work with gettext on
+the client side, the `jed`_ library is used. Source jed-files for which are
+prepared on the server during compilation of po-files.
 
 .. code-block:: text
-    :caption: Структура директории
+    :caption: Directory structure
     :name: tree-client
 
     bar
@@ -176,7 +234,7 @@ Javascript
                 └── html.hbs
 
 .. code-block:: javascript
-    :caption: amd/ngw-bar/mod-a.js
+    :caption: File amd/ngw-bar/mod-a.js
 
     define([
         'ngw-pyramid/i18n!bar'
@@ -185,16 +243,21 @@ Javascript
         alert(translated);
     });
 
-В результате загрузки этого модуля будет выведено сообщение, переведенное точно так же как и на сервере, в этом случае используется общий с сервером набор сообщений, то есть то что доступно на сервере доступно и на клиенте.
-
+As a result of loading this module, a message will be displayed, translated in
+exactly the same way as on the server. In this case client and server use the
+same set of strings.
 
 Handlebars
 ^^^^^^^^^^
 
-В dijit-виджетах часто используется построение виджетов на базе шаблона, который тоже может требовать интернационализации. Для этого предусмотрена возможность предварительно пропустить шаблон через шаблонизатор `handlebars <http://handlebarsjs.com/>`_ где при помощи специальных модификаторов обеспечивается как извлечение строк, так и их перевод.
+Dijit-widgets often use template-based construction, which may also require
+internationalization. To do this, it is possible to first pass the template
+through the template engine `handlebars`_.
+
+.. _handlebars: http://handlebarsjs.com/
 
 .. code-block:: javascript
-    :caption: amd/ngw-bar/mod-b.js
+    :caption: File amd/ngw-bar/mod-b.js
 
     define([
         "ngw-pyramid/hbs-i18n",
@@ -212,9 +275,12 @@ Handlebars
 
 .. note::
     
-    Для извлечения строк из шаблонов handlebars необходимо установить NodeJS. Это позволяет использовать оригинальный парсер handlebars на javascript для обработки шаблонов.
+    To extract strings from handlebars templates, you need to have nodejs
+    installed. This allows you to use the original handlebars javascript parser
+    to handle templates.
 
-В случае виджета на базе шаблона, использование handlebars для интернационализации будет выглядеть следующим образом, по сравнению с исходным примером в документации dijit:
+In case of a template-based widget, using handlebars for internationalization
+would look like the original example in the dijit documentation:
 
 .. code-block:: javascript
 
@@ -233,25 +299,18 @@ Handlebars
 
 .. note::
 
-    Согласно используемым настройкам, указанным в файле babel.cfg,
-    шаблоны виджетов должны иметь расширение .hbs и располагаться
-    внутри директории template.
+    According to the settings, specified in the babel.cfg file, widget templates
+    should have the ``.hbs`` extension and be located inside ``template``
+    directory.
 
+Configuration options
+---------------------
 
-Настройки
----------
-
-Язык используемый определяется настройкой ``locale.default`` компонента ``core``. Как было сказано выше, по-умолчанию используется английский язык. Таким образом для того, чтобы все сообщения выводились на русском языке в ``config.ini`` нужно указать (значение этой настройки передается и в настройку pyramid ``pyramid.default_locale_name`` и ``dojoConfig.locale``):
+The default language is determined by the ``locale.default`` setting of the
+``core`` component. English is used by default. Thus, in order for all messages
+to be displayed in Russian in the ``config.ini``, you need to specify:
 
 .. code-block:: ini
 
     [core]
     locale.default = ru
-
-Поскольку mo-файлы не хранятся внутри системы контроля версий, перед запуском необходимо скомпилировать po-файлы для каждого пакета:
-
-::
-
-    (env) $ nextgisweb-i18n --package nextgisweb compile
-
-В веб-интерфейсе пока нет возможности переключать язык, но если это необходимо для тестирования, то к любому запросу можно передать параметр ``__LOCALE__``, который работает точно так же как параметр ``core:locale.default``. Так же можно использовать cookie имененем ``__LOCALE__``, чтобы не передать параметр в каждом запросе вручную.

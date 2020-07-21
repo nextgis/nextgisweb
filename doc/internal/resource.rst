@@ -1,5 +1,5 @@
-Ресурсы
-=======
+Resources
+=========
 
 ..  automodule:: nextgisweb.resource.scope
     :members:
