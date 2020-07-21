@@ -75,6 +75,7 @@ define([
         _setValueAttr: function (value) {
             this.displayName.set("value", value.display_name);
             this.keyname.set("value", value.keyname);
+            this.wOAuthSubject.set("value", value.oauth_subject);
             this.cbDisabled.set("checked", value.disabled);
             this.cbSuperuser.set("checked", value.superuser);
             this.description.set("value", value.description);
