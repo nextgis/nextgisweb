@@ -160,8 +160,8 @@ for ``ngw`` user:
   $ echo ". ~/env/bin/activate" >> ~/.bashrc
   $ echo "export NEXTGISWEB_CONFIG=~/config/config.ini" >> ~/.bashrc
 
-uWSGI server
-------------
+uWSGI
+-----
 
 You can use NextGIS Web with any other WSGI-server like ``gunicorn`` but we
 use uWSGI in most of deployments. So install to the virtualenv:
@@ -197,8 +197,8 @@ browser. Then press ``Ctrl + C`` to halt HTTP server. Complete setup of uWSGI
 for real world production usage is subject for a separate article, so read uWSGI
 documentation.
 
-Systemd integration
--------------------
+Systemd
+-------
 
 To start NextGIS Web with your system you can use systemd-service. Under
 ``root`` create file ``/etc/systemd/system/ngw.service`` with the following contents:

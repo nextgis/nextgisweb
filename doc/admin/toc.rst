@@ -5,3 +5,6 @@ NextGIS Web administrator's guide
    :maxdepth: 3
 
    install
+   backup_restore
+   maintenance
+   configuration
