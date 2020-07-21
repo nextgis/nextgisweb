@@ -15,9 +15,9 @@ System requirements
     distributions. But we run it under LTS-version Ubuntu Linux, and this
     instruction was tested on Ubuntu Linux 18.04.
   
-  - We don't provide support for running NextGIS Web on other distributions.
-    So if you any installation-related issue, please try to reproduce a
-    problem on Ubuntu Linux 18.04 before you report them.
+  - We don't provide community support for running NextGIS Web on other
+    distributions. So if you any installation-related issue, please try to
+    reproduce a problem on Ubuntu Linux 18.04 before you report them.
 
 - PostgreSQL database with PostGIS and hstore extensions enabled:
 
@@ -148,8 +148,9 @@ Now you should initialize database structure with the following command:
   $ nextgisweb initialize_db
 
 After that, you can run builtin HTTP server and check that your web browser can
-reach ``http:://localhost:8080``. NextGIS Web is installed and should work
-properly, but builtin http server is not suitable for production purposes.
+reach ``http:://localhost:8080``. Then press ``Ctrl + C`` to halt HTTP server.
+NextGIS Web is installed and should work properly, but builtin http server is
+not suitable for production purposes.
 
 To simplify subsequent steps add virtualenv initialization to ``.bashrc`` file
 for ``ngw`` user:
@@ -159,3 +160,73 @@ for ``ngw`` user:
   $ echo ". ~/env/bin/activate" >> ~/.bashrc
   $ echo "export NEXTGISWEB_CONFIG=~/config/config.ini" >> ~/.bashrc
 
+uWSGI server
+------------
+
+You can use NextGIS Web with any other WSGI-server like ``gunicorn`` but we
+use uWSGI in most of deployments. So install to the virtualenv:
+
+.. code-block:: none
+
+  $ pip install uwsgi
+
+Then create ``config/uwsgi.ini`` with following contents:
+
+.. code-block:: ini
+
+  [uwsgi]
+  http = 0.0.0.0:8080
+  master = true
+  processes = 4
+  lazy-apps = true
+  enable-threads = true
+  paste = config:%p
+  env = NEXTGISWEB_CONFIG=%d/config.ini
+
+  [app:main]
+  use = egg:nextgisweb
+
+And run uWSGI web server:
+
+.. code-block:: none
+
+  $ uwsgi --ini config/uwsgi.ini
+
+Now you should be able to connect ``http://localhost:8080/`` with your web
+browser. Then press ``Ctrl + C`` to halt HTTP server. Complete setup of uWSGI
+for real world production usage is subject for a separate article, so read uWSGI
+documentation.
+
+Systemd integration
+-------------------
+
+To start NextGIS Web with your system you can use systemd-service. Under
+``root`` create file ``/etc/systemd/system/ngw.service`` with the following contents:
+
+.. code-block:: ini
+
+  [Unit]
+  Requires=network.target
+  After=network.target
+
+  [Service]
+  WorkingDirectory=/srv/ngw
+  ExecStart=/srv/ngw/env/bin/uwsgi --ini config/uwsgi.ini
+  User=ngw
+  Group=ngw
+  Restart=on-failure
+  KillSignal=SIGQUIT
+  Type=notify
+  NotifyAccess=all
+
+  [Install]
+  WantedBy=multi-user.target
+
+Then reload systemd configuration and start service:
+
+.. code-block:: none
+
+  # systemctl daemon-reload
+  # systemctl start ngw.service
+
+Now NextGIS Web will start with your system.
