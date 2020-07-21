@@ -70,6 +70,7 @@ class OAuthHelper(object):
                 access_token=access_token))
         except requests.HTTPError as exc:
             if 400 <= exc.response.status_code <= 403:
+                _logger.debug("Token refresh failed: %s", exc.response.text)
                 raise OAuthTokenRefreshException()
             raise exc
 
@@ -80,12 +81,20 @@ class OAuthHelper(object):
         if token is not None:
             _logger.debug("Access token was read from cache (%s)", access_token)
         else:
-            tdata = self._server_request('introspection', dict(
-                token=access_token))
+            try:
+                tdata = self._server_request('introspection', dict(
+                    token=access_token))
+            except requests.HTTPError as exc:
+                if 400 <= exc.response.status_code <= 403:
+                    _logger.debug("Token verification failed: %s", exc.response.text)
+                    return None
+                raise exc
+
             token = OAuthToken(id=access_token, data=tdata)
             token.exp = datetime.utcfromtimestamp(tdata['exp'])
             token.sub = six.text_type(tdata[self.options['profile.subject.attr']])
             token.persist()
+
             _logger.debug("Adding access token to cache (%s)", access_token)
 
         return token
@@ -94,6 +103,9 @@ class OAuthHelper(object):
         # TODO: Implement scope support
 
         token = self.query_introspection(access_token)
+        if token is None:
+            return None
+
         token.check_expiration()
 
         with DBSession.no_autoflush:
@@ -285,6 +297,11 @@ class OAuthToken(Base):
             raise OAuthAccessTokenExpiredException()
 
 
+class InvalidTokenException(UserException):
+    title = _("Invalid token")
+    http_status_code = 401
+
+
 class OAuthTokenRefreshException(UserException):
     title = _("OAuth token refresh failed")
     http_status_code = 401
@@ -292,7 +309,7 @@ class OAuthTokenRefreshException(UserException):
 
 class OAuthAccessTokenExpiredException(UserException):
     title = _("OAuth access token is expired")
-    http_status_code = 403
+    http_status_code = 401
 
 
 def _fallback_value(*args):

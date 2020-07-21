@@ -101,10 +101,10 @@ class AuthenticationPolicy(object):
 
             if amode == 'BEARER':
                 user = self.oauth.access_token_to_user(value)
-                return user.id
+                if user is not None:
+                    return user.id
 
-            else:
-                raise HTTPUnauthorized()
+            raise HTTPUnauthorized()
 
         return None
 
