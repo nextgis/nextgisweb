@@ -36,6 +36,10 @@ class Layer(Base):
     display_name = db.Column(db.Unicode, nullable=False)
     maxfeatures = db.Column(db.Integer, nullable=True)
 
+    __table_args__ = (
+        db.UniqueConstraint(service_id, keyname),
+    )
+
     service = db.relationship(
         Service, foreign_keys=service_id,
         backref=db.backref('layers', cascade='all, delete-orphan'))
