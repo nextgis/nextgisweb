@@ -25,6 +25,7 @@
     except Exception:
         user_mode = 'guest'
         user_display_name = None
+
 %>
 
 <div id="header" class="header clearfix">
