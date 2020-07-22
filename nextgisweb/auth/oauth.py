@@ -297,8 +297,13 @@ class OAuthToken(Base):
             raise OAuthAccessTokenExpiredException()
 
 
+class AuthorizationException(UserException):
+    title = _("OAuth authorization error")
+    http_status_code = 401
+
+
 class InvalidTokenException(UserException):
-    title = _("Invalid token")
+    title = _("Invalid OAuth token")
     http_status_code = 401
 
 

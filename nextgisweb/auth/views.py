@@ -18,6 +18,7 @@ from .. import dynmenu as dm
 from .models import Principal, User, Group
 
 from .exception import InvalidCredentialsException, UserDisabledException
+from .oauth import InvalidTokenException, AuthorizationException
 from .util import _
 
 
@@ -51,7 +52,7 @@ def oauth(request):
         return 'ngw-oastate-' + state
 
     if 'error' in request.params:
-        return render_error_message(request)
+        raise AuthorizationException()
 
     elif 'code' in request.params and 'state' in request.params:
         # Extract next_url from state named cookie
@@ -64,10 +65,9 @@ def oauth(request):
         tresp = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
 
-        # TODO: Handle exceptions here!
         user = oaserver.access_token_to_user(tresp.access_token)
         if user is None:
-            return render_error_message(request)
+            raise InvalidTokenException()
 
         DBSession.flush()
         headers = remember(request, (user.id, tresp))
@@ -98,38 +98,23 @@ def logout(request):
     return HTTPFound(location=request.application_url, headers=headers)
 
 
-def render_error_message(request, message=None):
-    if message is None:
-        message = _("Insufficient permissions to perform this operation.")
-    response = render_to_response(
-        'nextgisweb:auth/template/error.mako',
-        dict(
-            subtitle=_("Access denied"),
-            message=message
-        ), request=request)
-    response.status = 403
-    return response
-
-
-def forbidden_error_response(request, err_info, exc, exc_info, **kwargs):
+def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
     # If user is not authentificated, we can offer him to sign in
-    if request.method == 'GET' and not request.is_api and request.user.keyname == 'guest':
+    if (
+        request.method == 'GET' and
+        not request.is_api and not request.is_xhr and
+        err_info.http_status_code == 403 and
+        request.authenticated_userid is None
+    ):
         response = render_to_response(
             'nextgisweb:auth/template/login.mako',
             dict(next_url=request.url), request=request)
         response.status = 403
         return response
 
-    # Show error message to already authentificated users
-    return render_error_message(request)
-
 
 def setup_pyramid(comp, config):
-    def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
-        if not request.is_api and not request.is_xhr and err_info.http_status_code == 403:
-            return forbidden_error_response(request, err_info, exc, exc_info, **kwargs)
-
-    # Add it before standard pyramid handlers
+    # Add it before default pyramid handlers
     comp.env.pyramid.error_handlers.insert(0, forbidden_error_handler)
 
     def check_permission(request):
