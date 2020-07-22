@@ -7,7 +7,7 @@ CREATE TABLE pyramid_session (
 
 CREATE TABLE pyramid_session_store (
     session_id character varying(32) NOT NULL,
-    key character varying(32) NOT NULL,
+    key character varying NOT NULL,
     value character varying NOT NULL,
     CONSTRAINT pyramid_session_store_pkey PRIMARY KEY (session_id, key),
     CONSTRAINT pyramid_session_store_session_id_fkey FOREIGN KEY (session_id)
