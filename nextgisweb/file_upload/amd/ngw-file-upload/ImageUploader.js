@@ -11,21 +11,48 @@ define([
     template,
     Uploader,
 ) {
+    /***
+     * Use ImageUploader.get('value') to get image:
+     *   object    - upload_meta
+     *   null      - delete image
+     *   undefined - no changes
+     */
     return declare([Uploader], {
+        _deleteImage: false,
         templateString: hbsI18n(template, i18n),
 
         startup: function () {
             this.inherited(arguments);
 
             this.setAccept('image/png');
+
+            this.btnDeleteImage.on('click', function () {
+                this._deleteImage = true;
+                this.setImageUrl(null);
+            }.bind(this));
+        },
+
+        get: function(property) {
+            if (property === 'value' && this._deleteImage) {
+                return null;
+            } else {
+                return this.inherited(arguments);
+            }
         },
 
         setImageUrl: function (url) {
-            this.dropTarget.style.background = 'url(' + url + ') no-repeat';
+            if (url === null) {
+                //delete this.dropTarget.style.background;
+                this.dropTarget.style.removeProperty('background');
+            } else {
+                this.dropTarget.style.background = 'url(' + url + ') no-repeat';
+            }
         },
 
         uploadBegin: function () {
             this.inherited(arguments);
+
+            this._deleteImage = false;
 
             var files = this.uploaderWidget.inputNode.files;
             if (files.length === 1) {

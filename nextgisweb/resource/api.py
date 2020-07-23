@@ -266,8 +266,3 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.export', '/api/resource/{id}/export',
         factory=resource_factory)
-
-    config.add_route(
-        'resource.preview', '/api/resource/{id}/preview.png',
-        factory=resource_factory
-    ).add_view(preview, request_method='GET')

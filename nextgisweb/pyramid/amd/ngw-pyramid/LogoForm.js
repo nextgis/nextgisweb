@@ -1,8 +1,6 @@
 /*global define, ngwConfig*/
 define([
     "dojo/_base/declare",
-    "dojo/_base/array",
-    "dojo/_base/lang",
     "ngw-pyramid/modelWidget/Widget",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -20,8 +18,6 @@ define([
     "dijit/form/Button"
 ], function (
     declare,
-    array,
-    lang,
     Widget,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -38,25 +34,31 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
-            var self = this;
-            this.buttonSave.on("click", function () { self.save(false); });
-            this.buttonRestore.on("click", function () { self.save(true); });
+
+            this.buttonSave.on("click", this.save.bind(this));
+            this.buttonCancel.on("click", this._go_home);
 
             this.wFile.setImageUrl(route.pyramid.logo());
         },
 
-        save: function (restoreDefault) {
-            var data = null;
-            if (!restoreDefault) {
-                data = this.wFile.get("value");
-            };
-            xhr.put(route.pyramid.logo(), {
-                handleAs: 'json',
-                headers: { "Content-Type": "application/json" },
-                data: json.stringify(data)
-            }).then(function () {
-                window.location = route.pyramid.control_panel();
-            }, ErrorDialog.xhrError);
+        save: function () {
+            var data = this.wFile.get("value");
+            if (data !== undefined) {
+                xhr.put(route.pyramid.logo(), {
+                    handleAs: 'json',
+                    headers: { "Content-Type": "application/json" },
+                    data: json.stringify(data)
+                }).then(
+                    this._go_home,
+                    ErrorDialog.xhrError
+                );
+            } else {
+                this._go_home();
+            }
+        },
+
+        _go_home: function () {
+            window.location = route.pyramid.control_panel();
         }
     });
 });
