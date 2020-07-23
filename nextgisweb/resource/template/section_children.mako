@@ -1,4 +1,6 @@
 <%!
+from bunch import Bunch
+from nextgisweb import dynmenu as dm
 from nextgisweb.resource.util import _
 from nextgisweb.resource.scope import ResourceScope, DataScope
 from nextgisweb.webmap.model import WebMapScope
@@ -39,21 +41,12 @@ from nextgisweb.webmap.model import WebMapScope
                 <td>${tr(item.cls_display_name)}</td>
                 <td>${item.owner_user}</td>
                 <td class="children-table__action">
-                    %if item.cls == "webmap" and WebMapScope.display in permissions:
-                        <a class="material-icons icon-viewMap" href="${request.route_url('webmap.display', id=item.id)}" target="_blank" title="${tr(_('Display map'))}"></a>
-                    %endif
-                    %if item.cls == "scene_3d":
-                        <a class="material-icons icon-viewMap" href="${request.route_url('scene_3d.display', id=item.id)}" target="_blank" title="${tr(_('Display scene'))}"></a>
-                    %endif
-                    %if (item.cls == "vector_layer" or item.cls == "postgis_layer") and DataScope.read in permissions:
-                        <a class="material-icons icon-table" href="${request.route_url('feature_layer.feature.browse', id=item.id)}" title="${tr(_('Feature table'))}"></a>
-                    %endif
-                    %if ResourceScope.update in permissions:
-                        <a class="material-icons icon-edit" href="${request.route_url('resource.update', id=item.id)}" title="${tr(_('Update'))}"></a>
-                    %endif
-                    %if ResourceScope.delete in permissions:
-                        <a class="material-icons icon-close" href="${request.route_url('resource.delete', id=item.id)}" title="${tr(_('Delete'))}"></a>
-                    %endif
+                    <% args = Bunch(obj=item, request=request) %>
+                    %for menu_item in item.__dynmenu__.build(args):
+                        %if isinstance(menu_item, dm.Link) and menu_item.important and menu_item.icon is not None:
+                            <a class="material-icons ${menu_item.icon}" href="${menu_item.url(args)}" target="_blank" title="${tr(_(menu_item.label))}"></a>
+                        %endif
+                    %endfor
                 </td>
             </tr>
         %endfor    
