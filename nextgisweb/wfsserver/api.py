@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from pyramid.response import Response
 
 from ..resource import resource_factory, ServiceScope
+
+from .wfs_handler import WFSHandler
 from .model import Service
 
 from .third_party.FeatureServer.Server import Server, FeatureServerException
@@ -15,10 +17,18 @@ from nextgis_to_fs import NextgiswebDatasource
 NS_XLINK = 'http://www.w3.org/1999/xlink'
 
 
-def handler(obj, request):
-    # import ipdb; ipdb.set_trace()
+def wfs(resource, request):
     request.resource_permission(ServiceScope.connect)
 
+    wfsHandler = WFSHandler(resource, request)
+    try:
+        xml = wfsHandler.response()
+        return Response(xml, content_type='text/xml')
+    except NotImplementedError:
+        return legacy_handler(resource, request)
+
+
+def legacy_handler(obj, request):
     params = dict((k.upper(), v) for k, v in request.params.items())
 
     req = params.get('REQUEST')
@@ -101,4 +111,4 @@ def setup_pyramid(comp, config):
     config.add_route(
         'wfsserver.wfs', r'/api/resource/{id:\d+}/wfs',
         factory=resource_factory
-    ).add_view(handler, context=Service)
+    ).add_view(wfs, context=Service)
