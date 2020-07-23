@@ -36,13 +36,13 @@
 
                 <div data-dojo-type="ngw-resource/ResourcePicker"
                     data-dojo-attach-point="layerPicker"
-                    data-dojo-props="interface: 'IBboxLayer'">
+                    data-dojo-props="interface: 'IBboxLayer', dialogTitle: '{{gettext 'Select vector layer'}}'">
                 </div>
 
             </div>
 
         <div data-dojo-type="ngw-resource/ResourceBox"
-            data-dojo-props="interface: 'IFeatureLayer', colspan: 2"
+            data-dojo-props="interface: 'IFeatureLayer', colspan: 2, dialogTitle: '{{gettext 'Select vector layer'}}'"
             data-ngw-serialize="bookmark_resource"
             title="{{gettext 'Bookmark resource'}}"
             style="width: 100%">

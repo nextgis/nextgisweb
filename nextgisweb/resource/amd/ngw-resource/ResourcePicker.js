@@ -24,12 +24,11 @@ define([
     i18n
 ) {
     return declare([Dialog], {
-        title: i18n.gettext("Select resource"),
-
         buildRendering: function () {
             this.inherited(arguments);
 
             var widget = this;
+            this.title = this.dialogTitle || i18n.gettext("Select resource");
 
             this.container = new BorderContainer({
                 style: "width: 400px; height: 300px"
@@ -61,7 +60,7 @@ define([
                     this.hide();
                 })
             }).placeAt(this.actionBar);
-            
+
             new Button({
                 label: i18n.gettext("Cancel"),
                 onClick: lang.hitch(this, function () {

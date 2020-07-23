@@ -11,7 +11,7 @@ define([
     return declare([PickerBox], {
         buildRendering: function () {
             this.inherited(arguments);
-            this.picker = new ResourcePicker({cls: this.cls, interface: this.interface});
+            this.picker = new ResourcePicker({cls: this.cls, interface: this.interface, dialogTitle: this.dialogTitle });
             this.store = this.picker.tree.store;
         },
 
