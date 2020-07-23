@@ -69,8 +69,8 @@ define([
                 var coord = that.coordinates[code];
                 if (coord) {
                     var pr = proj4(c.wkt);
-                    var x = coord[1];
-                    var y = coord[0];
+                    var x = coord[0];
+                    var y = coord[1];
                     var pushOption = function (opt) {
                         var el = put(
                             "span span $ + span.ngwPopup__coordinates-srs-name $ <", 
