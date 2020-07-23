@@ -1,5 +1,7 @@
 <%page args="dynmenu, args" />
 
+<%namespace file="nextgisweb:pyramid/template/util.mako" import="icon"/>
+
 <% from nextgisweb import dynmenu as dm %>
 
 <script>
@@ -28,18 +30,17 @@
         %endif
         <% url = item.url(args) %>
         <li class="sidebar-menu__item${' sidebar-menu__item--selected' if url == request.url else ''}">
-
-            %if item.icon:
+            ## TODO: Fix CSS styles to support material icons. There is no way to change
+            ## material icons size. Just remove 'and item.icon.startswith('svg:')' and
+            ## layout will be broken.
+            <% show_icon = item.icon and item.icon.startswith('svg:') %>
+            %if show_icon:
                 <a href="${url}" class="sidebar-menu__link text-withIcon text-withIcon_size_s">
-                    <span class="text-withIcon__icon text-withIcon__icon_size_s">
-                        <svg class="text-withIcon__pic svgIcon-${item.icon}"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${request.static_url('nextgisweb:static/svg/svg-symbols.svg')}#${item.icon}"></use></svg>
-                    </span>
-                    ${tr(item.label)}
+                    ${icon(item.icon, size='s')} ${tr(item.label)}
                 </a>
             %else:
                 <a href="${url}" class="sidebar-menu__link">${tr(item.label)}</a>
             %endif
-
         </li>
     %endif
 %endfor

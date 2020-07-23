@@ -5,6 +5,9 @@ from nextgisweb.resource.util import _
 from nextgisweb.resource.scope import ResourceScope, DataScope
 from nextgisweb.webmap.model import WebMapScope
 %>
+
+<%namespace file="nextgisweb:pyramid/template/util.mako" import="icon"/>
+
 <script>
     require([
         "dojo/ready",
@@ -32,9 +35,7 @@ from nextgisweb.webmap.model import WebMapScope
             <tr>
                 <td class="children-table__name">
                     <a class="children-table__name__link text-withIcon" href="${item.permalink(request)}">
-                        <span class="text-withIcon__icon">
-                            <svg class="text-withIcon__pic svgIcon-${item.cls}"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${request.static_url('nextgisweb:static/svg/svg-symbols.svg')}#${item.cls}"></use></svg>
-                        </span>
+                        ${icon('svg:' + item.cls)}
                         ${item.display_name}
                     </a>
                 </td>
@@ -44,7 +45,7 @@ from nextgisweb.webmap.model import WebMapScope
                     <% args = Bunch(obj=item, request=request) %>
                     %for menu_item in item.__dynmenu__.build(args):
                         %if isinstance(menu_item, dm.Link) and menu_item.important and menu_item.icon is not None:
-                            <a class="material-icons ${menu_item.icon}" href="${menu_item.url(args)}" target="_blank" title="${tr(_(menu_item.label))}"></a>
+                            <a href="${menu_item.url(args)}" target="_blank" title="${tr(_(menu_item.label))}">${icon(menu_item.icon)}</a>
                         %endif
                     %endfor
                 </td>
