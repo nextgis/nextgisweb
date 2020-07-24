@@ -99,7 +99,7 @@ class AuthenticationPolicy(object):
                         username, password, oauth=False)
                     return user.id
 
-            if amode == 'BEARER':
+            if amode == 'BEARER' and self.oauth is not None:
                 user = self.oauth.access_token_to_user(value)
                 if user is not None:
                     return user.id
