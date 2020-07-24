@@ -186,7 +186,8 @@ def setup_pyramid(comp, config):
                     'feature_layer/feature-browse', _(u"Feature table"),
                     lambda args: args.request.route_url(
                         "feature_layer.feature.browse",
-                        id=args.obj.id))
+                        id=args.obj.id),
+                    'material:table', True)
 
                 yield dm.Link(
                     'feature_layer/export', _(u"Save as"),

@@ -24,7 +24,11 @@ class DynMenu(object):
             else:
                 result.append(item)
 
-        result.sort(key=lambda item: item.key)
+        # Move operaions back
+        result.sort(key=lambda item: item.key
+                    if item.key[0] == 'operation'
+                    else ('_',) + item.key)
+
         return result
 
 
@@ -78,11 +82,12 @@ class Label(Item):
 
 class Link(Item):
 
-    def __init__(self, key, label, url, icon=None):
+    def __init__(self, key, label, url, icon=None, important=False):
         super(Link, self).__init__(key)
         self._label = label
         self._url = url
         self._icon = icon
+        self._important = important
 
     @property
     def label(self):
@@ -95,3 +100,7 @@ class Link(Item):
     @property
     def icon(self):
         return self._icon
+
+    @property
+    def important(self):
+        return self._important

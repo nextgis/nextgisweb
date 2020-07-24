@@ -303,19 +303,21 @@ def setup_pyramid(comp, config):
                     'create/%s' % ident,
                     cls.cls_display_name,
                     self._url(ident),
-                    cls.identity)
+                    'svg:' + cls.identity)
 
             if PERM_UPDATE in permissions:
                 yield Link(
                     'operation/update', _("Update"),
                     lambda args: args.request.route_url(
-                        'resource.update', id=args.obj.id))
+                        'resource.update', id=args.obj.id),
+                    'material:edit', True)
 
             if PERM_DELETE in permissions:
                 yield Link(
                     'operation/delete', _("Delete"),
                     lambda args: args.request.route_url(
-                        'resource.delete', id=args.obj.id))
+                        'resource.delete', id=args.obj.id),
+                    'material:close', True)
 
             if PERM_READ in permissions:
                 yield Link(
