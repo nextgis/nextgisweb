@@ -88,11 +88,11 @@ define([
                             fx = x.toFixed(6);
                             fy = y.toFixed(6);
                         } else if (degreeFormat == 'ddm') {
-                            fx = CoordinateConverter.DDtoDM(x, { lon: false, needString: true });
-                            fy = CoordinateConverter.DDtoDM(y, { lon: true, needString: true });
+                            fx = CoordinateConverter.DDtoDM(x, { lon: true, needString: true });
+                            fy = CoordinateConverter.DDtoDM(y, { lon: false, needString: true });
                         } else if (degreeFormat == 'dms') {
-                            fx = CoordinateConverter.DDtoDMS(x, { lon: false, needString: true });
-                            fy = CoordinateConverter.DDtoDMS(y, { lon: true, needString: true });
+                            fx = CoordinateConverter.DDtoDMS(x, { lon: true, needString: true });
+                            fy = CoordinateConverter.DDtoDMS(y, { lon: false, needString: true });
                         };
                         pushOption({
                             value: fx + ", " + fy,
