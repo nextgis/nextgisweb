@@ -1,11 +1,13 @@
 define([
     "dojo/_base/declare",
+    'dojo/dom-class',
     "ngw-pyramid/i18n!file_upload",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/ImageUploader.hbs",
     './Uploader'
 ], function (
     declare,
+    domClass,
     i18n,
     hbsI18n,
     template,
@@ -19,6 +21,7 @@ define([
      */
     return declare([Uploader], {
         _deleteImage: false,
+        current_image: '',
         templateString: hbsI18n(template, i18n),
 
         startup: function () {
@@ -26,9 +29,17 @@ define([
 
             this.setAccept('image/png');
 
+            if (this.current_image !== '') {
+                this._setBackgroundImage();
+            } else {
+                this.current_image = null;
+            }
+
             this.btnDeleteImage.on('click', function () {
                 this._deleteImage = true;
-                this.setImageUrl(null);
+
+                this.current_image = null;
+                this._setBackgroundImage();
             }.bind(this));
         },
 
@@ -40,12 +51,13 @@ define([
             }
         },
 
-        setImageUrl: function (url) {
-            if (url === null) {
-                //delete this.dropTarget.style.background;
+        _setBackgroundImage: function () {
+            if (this.current_image === null) {
                 this.dropTarget.style.removeProperty('background');
+                domClass.remove(this.domNode, 'has_image');
             } else {
-                this.dropTarget.style.background = 'url(' + url + ') no-repeat';
+                this.dropTarget.style.background = 'url(' + this.current_image + ') no-repeat';
+                domClass.add(this.domNode, 'has_image');
             }
         },
 
@@ -58,8 +70,8 @@ define([
             if (files.length === 1) {
                 var reader = new FileReader();
                 reader.onloadend = function () {
-                    var image = reader.result;
-                    this.setImageUrl(image);
+                    this.current_image = reader.result;
+                    this._setBackgroundImage();
                 }.bind(this);
                 reader.readAsDataURL(files[0]);
             }

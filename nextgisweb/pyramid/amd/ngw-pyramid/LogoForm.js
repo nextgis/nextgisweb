@@ -37,8 +37,6 @@ define([
 
             this.buttonSave.on("click", this.save.bind(this));
             this.buttonCancel.on("click", this._go_home);
-
-            this.wFile.setImageUrl(route.pyramid.logo());
         },
 
         save: function () {
