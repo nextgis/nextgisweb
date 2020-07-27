@@ -28,7 +28,7 @@ define([
         icon: false,
         iconPosition: 'first',
         rounded: false,
-        color: 'primary',
+        color: 'primary', //secondary
         constructor: function (options) {
             declare.safeMixin(this,options);
             var options = ['size', 'type', 'color', 'icon', 'rounded'];
