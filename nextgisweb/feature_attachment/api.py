@@ -9,6 +9,7 @@ from pyramid.response import Response, FileResponse
 from ..resource import DataScope, resource_factory
 from ..env import env
 from ..models import DBSession
+from ..feature_layer.exception import FeatureNotFound
 
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
@@ -149,6 +150,9 @@ def cpost(resource, request):
     feature = None
     for f in query():
         feature = f
+
+    if feature is None:
+        raise FeatureNotFound(resource.id, request.matchdict['fid'])
 
     obj = FeatureAttachment(resource_id=feature.layer.id, feature_id=feature.id)
     obj.deserialize(request.json_body)
