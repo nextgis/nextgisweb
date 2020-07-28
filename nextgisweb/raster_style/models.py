@@ -4,7 +4,6 @@ from six import BytesIO
 
 import numpy
 import PIL
-import uuid
 from osgeo import gdal, gdalconst, gdal_array
 from pkg_resources import resource_filename
 from zope.interface import implementer
@@ -63,24 +62,23 @@ class RasterStyle(Base, Resource):
         return RenderRequest(self, srs, cond)
 
     def render_image(self, extent, size):
-        dst_path = "/vsimem/%s" % uuid.uuid4()
-        gdal.Warp(
-            dst_path,
+        ds = gdal.Warp(
+            "",
             self.parent.gdal_dataset(),
             options=gdal.WarpOptions(
-                width=size[0], height=size[1], outputBounds=extent
+                width=size[0], height=size[1], outputBounds=extent, format="MEM"
             ),
         )
 
         result = PIL.Image.new("RGBA", size, (0, 0, 0, 0))
 
-        ds = gdal.OpenEx(dst_path)
         band_count = ds.RasterCount
         array = numpy.zeros((size[1], size[0], band_count), numpy.uint8)
 
         for i in range(band_count):
             array[:, :, i] = gdal_array.BandReadAsArray(ds.GetRasterBand(i + 1),)
 
+        ds = None
         wnd = PIL.Image.fromarray(array)
         result.paste(wnd)
 
