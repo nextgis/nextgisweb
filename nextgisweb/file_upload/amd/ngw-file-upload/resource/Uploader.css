@@ -1,8 +1,10 @@
 .uploader{
+  position: relative;
   margin-bottom: 16px;
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(57, 70, 78, 0.3);
+  height: 200px;
 }
 
 .uploader__dropzone{
@@ -44,6 +46,7 @@
 
 .uploader__inner{
   position: relative;
+  max-width: 580px;
 }
 
 .uploader--complete .uploader__link__text--complete{

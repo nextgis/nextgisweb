@@ -4,22 +4,24 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
+    "ngw-pyramid/i18n!resource_social",
     "ngw-pyramid/hbs-i18n",
+    "ngw-file-upload/ImageUploader",
     // resource
     "dojo/text!./template/Widget.hbs",
     "ngw-pyramid/i18n!resource-social",
     // template
     "dojox/layout/TableContainer",
-    "ngw-file-upload/Uploader"
 ], function (
     declare,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
+    i18n,
     hbsI18n,
-    template,
-    i18n
+    ImageUploader,
+    template
 ) {
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
@@ -28,15 +30,7 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
-
             this._restoreDefaultImage = false;
-
-            this.buttonRestoreImage.on("click", function () {
-                this._restoreDefaultImage = true;
-
-                this.wPreviewFile.destroy(); // FIXME: there is no method for uploader reset
-                this.buttonRestoreImage.destroy();
-            }.bind(this));
         },
 
         serializeInMixin: function (data) {

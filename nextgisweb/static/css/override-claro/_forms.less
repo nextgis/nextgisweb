@@ -16,15 +16,15 @@
         }
     }
 
-    .dijitSelect, 
-    .dijitSelect .dijitButtonContents, 
+    .dijitSelect,
+    .dijitSelect .dijitButtonContents,
     .dijitTextBox, .dijitTextBox .dijitButtonNode{
         border-color: @input-border-color;
     }
 
-    .dijitSelectHover, 
+    .dijitSelectHover,
     .dijitTextBoxHover,
-    .dijitSelectFocused, 
+    .dijitSelectFocused,
     .dijitTextBoxFocused{
         background-image:none;
         background-color: #fff;
@@ -46,4 +46,29 @@
 
 .checkbox__label{
     vertical-align: middle;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.input-group{
+    margin-top: 12px;
+    margin-bottom: 12px;
+
+    &:first-child{
+      margin-top: 0;
+    }
+
+    &__label{
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    &--inline{
+        .input-group__label{
+            margin-right: 4px;
+            margin-bottom: 0;
+        }
+    }
 }

@@ -1,20 +1,15 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
     data-ngw-serialize-prefix="resource_social" title="Слой" class="padding-block">
-
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels: false">
-        <div data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wPreviewFile"
-             data-dojo-props="uploaderLinkText: '{{gettext 'Select a preview image'}}',
-                              uploaderHelpText: '{{gettext 'An image should be in a PNG format.'}}'"
-             title="{{gettext 'Preview image'}}"></div>
-
-
-        <div data-dojo-type="dijit/layout/ContentPane" style="padding: 0 0 10px 0;">
-            <button data-dojo-type="dijit/form/Button" data-dojo-attach-point="buttonRestoreImage"
-                class="dijitButton--primary">{{gettext 'Restore default image'}}</button>
-        </div>
+    <div class="input-group">
+      <label class="input-group__label">{{gettext 'Map preview for social media and messengers:'}}</label>
+      <div data-dojo-attach-point="wPreviewFile"
+          data-dojo-type="ngw-file-upload/ImageUploader"
+          data-dojo-props="
+              uploaderLinkText: '{{gettext 'Select a preview image'}}',
+              uploaderHelpText: '{{gettext 'The image should be in JPG or PNG format. Its size should be at least 640×320px (1280×640px for best display)'}}',
+              backgroundSize: 'contain'"></div>
     </div>
 
-    <hr>
 
     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels: true">
         <div data-dojo-type="dijit/form/ValidationTextBox"

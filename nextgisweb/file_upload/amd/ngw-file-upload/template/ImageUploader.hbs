@@ -10,7 +10,7 @@
 			    	<a class="uploader__link__text uploader__link__text--complete" href="#">{{gettext 'Overwrite?'}}</a>
 			    	<a class="uploader__link__text uploader__link__text--error" href="#">{{gettext 'Try again'}}</a>
 			    </span>
-		    	<span class="uploader__linkAfter" data-dojo-attach-point="fileLinkAfter">{{gettext 'or use drag and drop'}}.</span>
+		    	<span class="uploader__linkAfter" data-dojo-attach-point="fileLinkAfter">{{gettext 'or drag and drop here'}}.</span>
 		   	</div>
 		   	<div class="uploader__help" data-dojo-attach-point="fileHelp"></div>
 		</div>
@@ -18,7 +18,6 @@
 	<button class="uploader__delete-btn"
         data-dojo-type="ngw-pyramid/NGWButton/NGWButton"
         data-dojo-attach-point="btnDeleteImage"
-        data-dojo-props="size: 'small', color: 'dark', icon: 'delete', iconPosition: 'first', label: 'Удалить'">
-        Удалить
+        data-dojo-props="size: 'small', color: 'dark', icon: 'delete', iconPosition: 'first', label: '{{gettext 'Delete'}}'">
   </button>
 </div>

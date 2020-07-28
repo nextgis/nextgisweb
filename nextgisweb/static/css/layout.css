@@ -1392,16 +1392,6 @@ a[class*=" icon-"]:hover:before {
   font-size: 16px;
   width: 100%;
 }
-textarea {
-  resize: vertical;
-}
-.input-group {
-  margin-top: 12px;
-  margin-bottom: 12px;
-}
-.input-group--inline .input-group__label {
-  margin-right: 4px;
-}
 /* Children table */
 .children-table__name__link {
   display: block;
@@ -1578,6 +1568,24 @@ textarea {
 .checkbox__label {
   vertical-align: middle;
 }
+textarea {
+  resize: vertical;
+}
+.input-group {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+.input-group:first-child {
+  margin-top: 0;
+}
+.input-group__label {
+  display: inline-block;
+  margin-bottom: 4px;
+}
+.input-group--inline .input-group__label {
+  margin-right: 4px;
+  margin-bottom: 0;
+}
 .nextgis.claro .dijitTabPaneWrapper,
 .nextgis.claro .dijitTabContainerTop-tabs,
 .nextgis.claro .dijitTabContainerBottom-tabs,
@@ -1650,6 +1658,9 @@ textarea {
   border-left-color: #dedede;
   border-right-color: #dedede;
   background-color: #fff;
+}
+.nextgis.claro .dijitTabContainerTopChildWrapper.dijitVisible {
+  overflow: auto;
 }
 .nextgis.claro .dijitEditorIFrameContainer {
   padding: 16px;
