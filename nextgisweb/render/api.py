@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 
-from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
+from ..resource import Resource, ResourceNotFound, DataScope, resource_factory, ValidationError
 
 from .interface import ILegendableStyle, IRenderableStyle
 from .util import af_transform
@@ -52,8 +52,12 @@ def tile(request):
     aimg = None
     for resid in p_resource:
         obj = Resource.filter_by(id=resid).one_or_none()
+
         if obj is None:
             raise ResourceNotFound(resid)
+
+        if not IRenderableStyle.providedBy(obj):
+            raise ValidationError("Resource (ID=%d) cannot be rendered." % (resid,))
 
         request.resource_permission(PD_READ, obj)
 
@@ -115,8 +119,12 @@ def image(request):
     zexact = None
     for resid in p_resource:
         obj = Resource.filter_by(id=resid).one_or_none()
+
         if obj is None:
             raise ResourceNotFound(resid)
+
+        if not IRenderableStyle.providedBy(obj):
+            raise ValidationError("Resource (ID=%d) cannot be rendered." % (resid,))
 
         request.resource_permission(PD_READ, obj)
 
