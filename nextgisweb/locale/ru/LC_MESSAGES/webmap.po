@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-07-23 10:02+0000\n"
+"POT-Creation-Date: 2020-07-28 09:45+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -188,6 +188,9 @@ msgid "Set extent from layer"
 msgstr "Охват по слою"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:39
+msgid "Select layer"
+msgstr "Выберите слой"
+
 #: amd/ngw-webmap/template/ExtentWidget.hbs:45
 msgid "Select vector layer"
 msgstr "Выберите векторный слой"
