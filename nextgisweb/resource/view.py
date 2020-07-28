@@ -307,14 +307,14 @@ def setup_pyramid(comp, config):
 
             if PERM_UPDATE in permissions:
                 yield Link(
-                    'operation/update', _("Update"),
+                    'operation/10-update', _("Update"),
                     lambda args: args.request.route_url(
                         'resource.update', id=args.obj.id),
                     'material:edit', True)
 
             if PERM_DELETE in permissions:
                 yield Link(
-                    'operation/delete', _("Delete"),
+                    'operation/20-delete', _("Delete"),
                     lambda args: args.request.route_url(
                         'resource.delete', id=args.obj.id),
                     'material:close', True)
