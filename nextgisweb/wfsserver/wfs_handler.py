@@ -4,16 +4,31 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from lxml import etree
 from lxml.builder import ElementMaker
 
-from osgeo import ogr
-from six import text_type
+from osgeo import ogr, osr
+from six import BytesIO, text_type
 
 from ..feature_layer import FIELD_TYPE, GEOM_TYPE
+from ..geometry import box, geom_from_wkb
 from ..resource import DataScope
+from ..spatial_ref_sys import SRS
 
 from .model import Layer
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
 VERSION = '2.0.2'
+
+
+nsmap = dict(
+    wfs='http://www.opengis.net/wfs',
+    gml='http://www.opengis.net/gml',
+    ogc='http://www.opengis.net/ogc',
+    fs='http://featureserver.org/fs',
+    xsi='http://www.w3.org/2001/XMLSchema-instance'
+)
+
+
+def ns_attr(ns, attr):
+    return '{{{0}}}{1}'.format(nsmap[ns], attr)
 
 
 def El(tag, attrs=None, parent=None, text=None, namespace=None):
@@ -59,14 +74,22 @@ class WFSHandler():
         if self.p_typenames is None:
             self.p_typenames = params.get('TYPENAME')
         self.p_resulttype = params.get('RESULTTYPE')
+        self.p_bbox = params.get('BBOX')
+        self.p_srsname = params.get('SRSNAME')
 
     def response(self):
-        if self.p_requset == 'GetCapabilities':
-            return self._get_capabilities()
-        elif self.p_requset == 'DescribeFeatureType':
-            return self._describe_feature_type()
-        elif self.p_requset == 'GetFeature':
-            return self._get_feature()
+        if self.request.method == 'GET':
+            if self.p_requset == 'GetCapabilities':
+                return self._get_capabilities()
+            elif self.p_requset == 'DescribeFeatureType':
+                #raise NotImplementedError()
+                return self._describe_feature_type()
+            elif self.p_requset == 'GetFeature':
+                return self._get_feature()
+            else:
+                raise NotImplementedError()
+        elif self.request.method == 'POST':
+            return self._transaction()
         else:
             raise NotImplementedError()
 
@@ -119,7 +142,16 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _describe_feature_type(self):
-        root = El('schema')
+        EM = ElementMaker(nsmap=dict(gml=nsmap['gml'], fs=nsmap['fs']))
+        root = EM('schema', dict(
+            targetNamespace=nsmap['fs'],
+            elementFormDefault='qualified',
+            attributeFormDefault='unqualified',
+            version='0.1',
+            xmlns='http://www.w3.org/2001/XMLSchema'))
+
+        El('import', dict(namespace=nsmap['gml'], schemaLocation='http://schemas.opengis.net/gml/2.0.0/feature.xsd'), parent=root)
+
         typename = self.p_typenames.split(',')
         if len(typename) == 1:
             layer = Layer.filter_by(service_id=self.resource.id, keyname=typename[0]).one()
@@ -127,15 +159,15 @@ class WFSHandler():
                                type='fs:%s_Type' % layer.keyname), parent=root)
             __ctype = El('complexType', dict(name="%s_Type" % layer.keyname), parent=root)
             __ccontent = El('complexContent', parent=__ctype)
-            __ext = El('extension', parent=__ccontent)
+            __ext = El('extension', dict(base='gml:AbstractFeatureType'), parent=__ccontent)
             __seq = El('sequence', parent=__ext)
             for field in layer.resource.fields:
                 if field.datatype == FIELD_TYPE.REAL:
                     datatype = 'double'
                 else:
                     datatype = field.datatype.lower()
-                El('element', dict(name=field.keyname, type=datatype), parent=__seq)
-            El('element', dict(name='geom', type=GEOM_TYPE_TO_GML_TYPE[
+                El('element', dict(minOccurs='0', name=field.keyname, type=datatype), parent=__seq)
+            El('element', dict(minOccurs='0', name='geom', type=GEOM_TYPE_TO_GML_TYPE[
                 layer.resource.geometry_type]), parent=__seq)
         else:
             for keyname in typename:
@@ -147,20 +179,16 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _get_feature(self):
-        nsmap = dict(
-            wfs='http://www.opengis.net/wfs',
-            gml='http://www.opengis.net/gml',
-            fs='http://featureserver.org/fs'
-        )
-
-        def ns_attr(ns, attr):
-            return '{{{0}}}{1}'.format(nsmap[ns], attr)
-
-        EM = ElementMaker(namespace=nsmap['wfs'], nsmap=nsmap)
-        root = EM('FeatureCollection')
-
         layer = Layer.filter_by(service_id=self.resource.id, keyname=self.p_typenames).one()
         feature_layer = layer.resource
+        self.request.resource_permission(DataScope.read, feature_layer)
+
+        EM = ElementMaker(namespace=nsmap['wfs'], nsmap=dict(
+            fs=nsmap['fs'], gml=nsmap['gml'], wfs=nsmap['wfs'],
+            ogc=nsmap['ogc'], xsi=nsmap['xsi']
+        ))
+        root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation'): 'http://www.opengis.net/wfs http://schemas.opengeospatial.net//wfs/1.0.0/WFS-basic.xsd'})
+
         query = feature_layer.feature_query()
 
         if self.p_resulttype == 'hits':
@@ -170,8 +198,26 @@ class WFSHandler():
 
         query.geom()
 
-        osrs = ogr.osr.SpatialReference()
-        osrs.ImportFromWkt(feature_layer.srs.wkt)
+        def parse_srs(value):
+            # 'urn:ogc:def:crs:EPSG::3857' -> 3857
+            return int(value.split(':')[-1])
+
+        if self.p_bbox is not None:
+            bbox_param = self.p_bbox.split(',')
+            box_coords = map(float, bbox_param[:4])
+            box_srid = parse_srs(bbox_param[4])
+            box_geom = box(*box_coords, srid=box_srid)
+            query.intersects(box_geom)
+
+        if self.p_srsname is not None:
+            srs_id = parse_srs(self.p_srsname)
+            srs_out = feature_layer.srs if srs_id == feature_layer.srs_id else SRS.filter_by(id=srs_id).one()
+        else:
+            srs_out = feature_layer.srs
+        query.srs(srs_out)
+
+        osr_out = osr.SpatialReference()
+        osr_out.ImportFromWkt(srs_out.wkt)
 
         for feature in query():
             feature_id = str(feature.id)
@@ -180,7 +226,7 @@ class WFSHandler():
             __feature = El(layer.keyname, dict(fid=feature_id),
                            parent=__member, namespace=nsmap['fs'])
 
-            geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osrs)
+            geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
             gml = geom.ExportToGML(['FORMAT=GML2', 'NAMESPACE_DECL=YES'])
             __geom = El('geom', parent=__feature, namespace=nsmap['fs'])
             __gml = etree.fromstring(gml)
@@ -193,3 +239,63 @@ class WFSHandler():
                 El(field, parent=__feature, namespace=nsmap['fs'], text=value)
 
         return etree.tostring(root)
+
+    def _transaction(self):
+        root = etree.parse(BytesIO(self.request.body)).getroot()
+        if root.tag != ns_attr('wfs', 'Transaction'):
+            raise NotImplementedError()
+
+        layers = dict()
+
+        def find_layer(keyname):
+            if keyname not in layers:
+                layer = Layer.filter_by(service_id=self.resource.id, keyname=keyname).one()
+                feature_layer = layer.resource
+                self.request.resource_permission(DataScope.write, feature_layer)
+                layers[keyname] = feature_layer
+            return layers[keyname]
+
+        _operation = root.find(ns_attr('wfs', 'Update'))
+        keyname = _operation.get('typeName')
+        feature_layer = find_layer(keyname)
+        _filter = _operation.find(ns_attr('ogc', 'Filter'))
+        _feature_id = _filter.find(ns_attr('ogc', 'FeatureId'))
+        fid = int(_feature_id.get('fid'))
+
+        _property = _operation.find(ns_attr('wfs', 'Property'))
+        key = _property.find(ns_attr('wfs', 'Name')).text
+        _value = _property.find(ns_attr('wfs', 'Value'))
+
+        query = feature_layer.feature_query()
+        query.filter_by(id=fid)
+        feature = query().one()
+
+        geom_column = feature_layer.column_geom \
+            if hasattr(feature_layer, 'column_geom') else 'geom'
+
+        if key == geom_column:
+            value = etree.tostring(_value[0])
+            ogr_geom = ogr.CreateGeometryFromGML(value)
+            feature.geom = geom_from_wkb(ogr_geom.ExportToWkb())
+        elif key in feature.fields:
+            feature.fields[key] = _value.text
+        else:
+            raise KeyError("Property %s not found" % key)
+
+        feature_layer.feature_put(feature)
+
+        # Response
+        EM = ElementMaker(namespace=nsmap['wfs'], nsmap=dict(
+            wfs=nsmap['wfs'], ogc=nsmap['ogc'], xsi=nsmap['xsi']
+        ))
+        _response = EM('TransactionResponse', dict(version='1.0.0'))
+
+        _summary = El('TransactionSummary', namespace=nsmap['wfs'], parent=_response)
+        _updated = El('totalUpdated', namespace=nsmap['wfs'], parent=_summary)
+        _updated.text = '1'
+
+        _result = El('TransactionResult', namespace=nsmap['wfs'], parent=_response)
+        _status = El('Status', namespace=nsmap['wfs'], parent=_result)
+        El('SUCCESS', namespace=nsmap['wfs'], parent=_status)
+
+        return etree.tostring(_response)
