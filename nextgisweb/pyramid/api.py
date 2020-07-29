@@ -425,16 +425,20 @@ def setup_pyramid(comp, config):
         comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
 
     def preview_link_view(request):
+        defaults = comp.preview_link_default_view(request)
+
         if hasattr(request, 'context') and isinstance(request.context, Resource):
             social = request.context.social
             if social is not None:
                 image = request.route_url('resource.preview', id=request.context.id) \
-                    if social.preview_fileobj is not None else None
+                    if social.preview_fileobj is not None else defaults['image']
+                description = social.preview_description \
+                    if social.preview_description is not None else defaults['description']
                 return dict(
                     image=image,
-                    description=social.preview_description
+                    description=description
                 )
-        return comp.preview_link_default_view(request)
+        return defaults
 
     comp.preview_link_default_view = lambda (request): \
         dict(image=request.static_url('nextgisweb:static/img/webgis-for-social.png'),
