@@ -4,6 +4,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
+    "ngw/route",
     "ngw-pyramid/i18n!resource_social",
     "ngw-pyramid/hbs-i18n",
     "ngw-file-upload/ImageUploader",
@@ -18,6 +19,7 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
+    route,
     i18n,
     hbsI18n,
     ImageUploader,
@@ -33,15 +35,22 @@ define([
             this._restoreDefaultImage = false;
         },
 
+        deserializeInMixin: function (data) {
+            this.inherited(arguments);
+            if (data[this.identity].preview_image_exists) {
+                var url = route.resource.preview({id: data.resource.id});
+                this.wPreviewFile.setImage(url);
+            }
+        },
+
         serializeInMixin: function (data) {
             if (data[this.identity] === undefined) {
                 data[this.identity] = {};
             }
 
-            if (this._restoreDefaultImage) {
-                data[this.identity].preview_file_upload = null;
-            } else if (this.wPreviewFile.data) {
-                data[this.identity].preview_file_upload = this.wPreviewFile.data;
+            var image = this.wPreviewFile.get('value');
+            if (image !== undefined) {
+                data[this.identity].preview_file_upload = image;
             }
 
             var description = this.wPreviewDescription.get("value");

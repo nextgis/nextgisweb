@@ -30,6 +30,7 @@ define([
     template
 ) {
     return declare([Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+        current_image: null,
         templateString: hbsI18n(template, i18n),
 
         postCreate: function () {
@@ -37,6 +38,13 @@ define([
 
             this.buttonSave.on("click", this.save.bind(this));
             this.buttonCancel.on("click", this._go_home);
+        },
+
+        startup: function () {
+            this.inherited(arguments);
+            if (this.current_image) {
+                this.wFile.setImage(this.current_image);
+            }
         },
 
         save: function () {

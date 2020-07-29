@@ -53,10 +53,18 @@ class _preview_file_upload_attr(SP):
             DBSession.delete(fileobj)
 
 
+class _preview_image_exists(SP):
+
+    def getter(self, srlzr):
+        social = srlzr.obj.social
+        return social is not None and social.preview_fileobj_id is not None
+
+
 class _preview_description_attr(SP):
 
     def getter(self, srlzr):
-        return srlzr.obj.social.preview_description if srlzr.obj.social is not None else None
+        social = srlzr.obj.social
+        return social.preview_description if social is not None else None
 
     def setter(self, srlzr, value):
         if srlzr.obj.social is None:
@@ -69,5 +77,6 @@ class ResourceSocialSerializer(Serializer):
     resclass = Resource
 
     preview_file_upload = _preview_file_upload_attr(write=MetadataScope.write)
+    preview_image_exists = _preview_image_exists(read=MetadataScope.read)
     preview_description = _preview_description_attr(
         read=MetadataScope.read, write=MetadataScope.write)
