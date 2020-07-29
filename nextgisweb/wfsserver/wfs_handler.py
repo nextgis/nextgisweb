@@ -272,66 +272,68 @@ class WFSHandler():
         EM = ElementMaker(namespace=nsmap['wfs'], nsmap=dict(
             wfs=nsmap['wfs'], ogc=nsmap['ogc'], xsi=nsmap['xsi']))
         _response = EM('TransactionResponse', dict(version='1.0.0'))
+
         _summary = El('TransactionSummary', namespace=nsmap['wfs'], parent=_response)
+        summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
 
-        _operation = root[0]
+        for _operation in root:
+            if _operation.tag == ns_attr('wfs', 'Insert'):
+                _layer = _operation[0]
+                keyname = ns_trim(_layer.tag)
+                feature_layer = find_layer(keyname)
 
-        if _operation.tag == ns_attr('wfs', 'Insert'):
-            _layer = _operation[0]
-            keyname = ns_trim(_layer.tag)
-            feature_layer = find_layer(keyname)
-
-            feature = Feature()
-
-            geom_column = get_geom_column(feature_layer)
-
-            for _property in _layer:
-                key = ns_trim(_property.tag)
-                if key == geom_column:
-                    feature.geom = geom_from_gml(_property[0])
-                else:
-                    feature.fields[key] = _property.text
-
-            fid = feature_layer.feature_create(feature)
-
-            _insert = El('InsertResult', namespace=nsmap['wfs'], parent=_response)
-            El('FeatureId', dict(fid=str(fid)), namespace=nsmap['ogc'], parent=_insert)
-
-            El('totalInserted', namespace=nsmap['wfs'], text='1', parent=_summary)
-        else:
-            keyname = _operation.get('typeName')
-            feature_layer = find_layer(keyname)
-
-            _filter = _operation.find(ns_attr('ogc', 'Filter'))
-            _feature_id = _filter.find(ns_attr('ogc', 'FeatureId'))
-            fid = int(_feature_id.get('fid'))
-
-            if _operation.tag == ns_attr('wfs', 'Update'):
-                _property = _operation.find(ns_attr('wfs', 'Property'))
-                key = _property.find(ns_attr('wfs', 'Name')).text
-                _value = _property.find(ns_attr('wfs', 'Value'))
-
-                query = feature_layer.feature_query()
-                query.filter_by(id=fid)
-                feature = query().one()
+                feature = Feature()
 
                 geom_column = get_geom_column(feature_layer)
 
-                if key == geom_column:
-                    feature.geom = geom_from_gml(_value[0])
-                elif key in feature.fields:
-                    feature.fields[key] = _value.text
-                else:
-                    raise KeyError("Property %s not found" % key)
+                for _property in _layer:
+                    key = ns_trim(_property.tag)
+                    if key == geom_column:
+                        feature.geom = geom_from_gml(_property[0])
+                    else:
+                        feature.fields[key] = _property.text
 
-                feature_layer.feature_put(feature)
+                fid = feature_layer.feature_create(feature)
 
-                El('totalUpdated', namespace=nsmap['wfs'], text='1', parent=_summary)
-            elif _operation.tag == ns_attr('wfs', 'Delete'):
-                feature_layer.feature_delete(fid)
-                El('totalDeleted', namespace=nsmap['wfs'], text='1', parent=_summary)
+                _insert = El('InsertResult', namespace=nsmap['wfs'], parent=_response)
+                El('FeatureId', dict(fid=str(fid)), namespace=nsmap['ogc'], parent=_insert)
+
+                summary['totalInserted'] += 1
             else:
-                raise NotImplementedError()
+                keyname = _operation.get('typeName')
+                feature_layer = find_layer(keyname)
+
+                _filter = _operation.find(ns_attr('ogc', 'Filter'))
+                _feature_id = _filter.find(ns_attr('ogc', 'FeatureId'))
+                fid = int(_feature_id.get('fid'))
+
+                if _operation.tag == ns_attr('wfs', 'Update'):
+                    query = feature_layer.feature_query()
+                    query.filter_by(id=fid)
+                    feature = query().one()
+                    for _property in _operation.findall(ns_attr('wfs', 'Property')):
+                        key = _property.find(ns_attr('wfs', 'Name')).text
+                        _value = _property.find(ns_attr('wfs', 'Value'))
+
+                        geom_column = get_geom_column(feature_layer)
+
+                        if key == geom_column:
+                            feature.geom = geom_from_gml(_value[0])
+                        else:
+                            feature.fields[key] = _value.text
+
+                    feature_layer.feature_put(feature)
+
+                    summary['totalUpdated'] += 1
+                elif _operation.tag == ns_attr('wfs', 'Delete'):
+                    feature_layer.feature_delete(fid)
+                    summary['totalDeleted'] += 1
+                else:
+                    raise NotImplementedError()
+
+        for param, value in summary.items():
+            if value > 0:
+                El(param, namespace=nsmap['wfs'], text=str(value), parent=_summary)
 
         _result = El('TransactionResult', namespace=nsmap['wfs'], parent=_response)
         _status = El('Status', namespace=nsmap['wfs'], parent=_result)
