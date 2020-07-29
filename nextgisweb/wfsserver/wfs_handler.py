@@ -7,7 +7,7 @@ from lxml.builder import ElementMaker
 from osgeo import ogr, osr
 from six import BytesIO, text_type
 
-from ..feature_layer import FIELD_TYPE, GEOM_TYPE
+from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..geometry import box, geom_from_wkb
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
@@ -29,6 +29,11 @@ nsmap = dict(
 
 def ns_attr(ns, attr):
     return '{{{0}}}{1}'.format(nsmap[ns], attr)
+
+
+def ns_trim(value):
+    pos = value.find('}')
+    return value[pos + 1:]
 
 
 def El(tag, attrs=None, parent=None, text=None, namespace=None):
@@ -60,6 +65,16 @@ GEOM_TYPE_TO_GML_TYPE = {
     GEOM_TYPE.MULTILINESTRING: 'gml:MultiLineStringPropertyType',
     GEOM_TYPE.MULTIPOLYGON: 'gml:MultiPolygonPropertyType',
 }
+
+
+def get_geom_column(feature_layer):
+    return feature_layer.column_geom if hasattr(feature_layer, 'column_geom') else 'geom'
+
+
+def geom_from_gml(el):
+    value = etree.tostring(el)
+    ogr_geom = ogr.CreateGeometryFromGML(value)
+    return geom_from_wkb(ogr_geom.ExportToWkb())
 
 
 class WFSHandler():
@@ -260,41 +275,63 @@ class WFSHandler():
         _summary = El('TransactionSummary', namespace=nsmap['wfs'], parent=_response)
 
         _operation = root[0]
-        keyname = _operation.get('typeName')
-        feature_layer = find_layer(keyname)
-        _filter = _operation.find(ns_attr('ogc', 'Filter'))
-        _feature_id = _filter.find(ns_attr('ogc', 'FeatureId'))
-        fid = int(_feature_id.get('fid'))
 
-        if _operation.tag == ns_attr('wfs', 'Update'):
-            _property = _operation.find(ns_attr('wfs', 'Property'))
-            key = _property.find(ns_attr('wfs', 'Name')).text
-            _value = _property.find(ns_attr('wfs', 'Value'))
+        if _operation.tag == ns_attr('wfs', 'Insert'):
+            _layer = _operation[0]
+            keyname = ns_trim(_layer.tag)
+            feature_layer = find_layer(keyname)
 
-            query = feature_layer.feature_query()
-            query.filter_by(id=fid)
-            feature = query().one()
+            feature = Feature()
 
-            geom_column = feature_layer.column_geom \
-                if hasattr(feature_layer, 'column_geom') else 'geom'
+            geom_column = get_geom_column(feature_layer)
 
-            if key == geom_column:
-                value = etree.tostring(_value[0])
-                ogr_geom = ogr.CreateGeometryFromGML(value)
-                feature.geom = geom_from_wkb(ogr_geom.ExportToWkb())
-            elif key in feature.fields:
-                feature.fields[key] = _value.text
-            else:
-                raise KeyError("Property %s not found" % key)
+            for _property in _layer:
+                key = ns_trim(_property.tag)
+                if key == geom_column:
+                    feature.geom = geom_from_gml(_property[0])
+                else:
+                    feature.fields[key] = _property.text
 
-            feature_layer.feature_put(feature)
+            fid = feature_layer.feature_create(feature)
 
-            El('totalUpdated', namespace=nsmap['wfs'], text='1', parent=_summary)
-        elif _operation.tag == ns_attr('wfs', 'Delete'):
-            feature_layer.feature_delete(fid)
-            El('totalDeleted', namespace=nsmap['wfs'], text='1', parent=_summary)
+            _insert = El('InsertResult', namespace=nsmap['wfs'], parent=_response)
+            El('FeatureId', dict(fid=str(fid)), namespace=nsmap['ogc'], parent=_insert)
+
+            El('totalInserted', namespace=nsmap['wfs'], text='1', parent=_summary)
         else:
-            raise NotImplementedError()
+            keyname = _operation.get('typeName')
+            feature_layer = find_layer(keyname)
+
+            _filter = _operation.find(ns_attr('ogc', 'Filter'))
+            _feature_id = _filter.find(ns_attr('ogc', 'FeatureId'))
+            fid = int(_feature_id.get('fid'))
+
+            if _operation.tag == ns_attr('wfs', 'Update'):
+                _property = _operation.find(ns_attr('wfs', 'Property'))
+                key = _property.find(ns_attr('wfs', 'Name')).text
+                _value = _property.find(ns_attr('wfs', 'Value'))
+
+                query = feature_layer.feature_query()
+                query.filter_by(id=fid)
+                feature = query().one()
+
+                geom_column = get_geom_column(feature_layer)
+
+                if key == geom_column:
+                    feature.geom = geom_from_gml(_value[0])
+                elif key in feature.fields:
+                    feature.fields[key] = _value.text
+                else:
+                    raise KeyError("Property %s not found" % key)
+
+                feature_layer.feature_put(feature)
+
+                El('totalUpdated', namespace=nsmap['wfs'], text='1', parent=_summary)
+            elif _operation.tag == ns_attr('wfs', 'Delete'):
+                feature_layer.feature_delete(fid)
+                El('totalDeleted', namespace=nsmap['wfs'], text='1', parent=_summary)
+            else:
+                raise NotImplementedError()
 
         _result = El('TransactionResult', namespace=nsmap['wfs'], parent=_response)
         _status = El('Status', namespace=nsmap['wfs'], parent=_result)
