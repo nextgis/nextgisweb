@@ -99,7 +99,7 @@ class OAuthHelper(object):
 
         return token
 
-    def access_token_to_user(self, access_token):
+    def access_token_to_user(self, access_token, merge_user=None):
         # TODO: Implement scope support
 
         token = self.query_introspection(access_token)
@@ -111,16 +111,22 @@ class OAuthHelper(object):
         with DBSession.no_autoflush:
             user = User.filter_by(oauth_subject=token.sub).first()
 
+            if merge_user is not None:
+                if user is not None and user.id != merge_user.id:
+                    raise ValueError("User already exists")
+                user = merge_user
+
             if user is None:
                 # Register new user with default groups
                 if self.options['register']:
-                    user = User(oauth_subject=token.sub).persist()
+                    user = User().persist()
                     user.member_of = Group.filter_by(register=True).all()
                 else:
                     return None
-
-            if user.disabled:
+            elif user.disabled:
                 raise UserDisabledException()
+
+            user.oauth_subject = token.sub
 
             if (
                 user.oauth_tstamp is not None
@@ -129,8 +135,9 @@ class OAuthHelper(object):
             ):
                 # Skip profile synchronization
                 return user
+            elif merge_user is None:
+                self._update_user(user, token.data)
 
-            self._update_user(user, token.data)
             user.oauth_tstamp = datetime.utcnow()
 
         event = OnAccessTokenToUser(user, token.data)

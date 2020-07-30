@@ -90,6 +90,12 @@
                     "link": '${request.route_url("pyramid.control_panel")}'
                 }
             %endif
+            %if user_mode != 'guest':
+                ,{
+                    "text": '${tr(_("User settings"))}',
+                    "link": '${request.route_url("auth.user_settings")}'
+                }
+            %endif
 
             <% help_page_url = request.env.pyramid.help_page_url(request) %>
             %if help_page_url is not None:
