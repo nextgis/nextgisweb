@@ -1,1 +1,0 @@
-This code is based on FeatureServer https://github.com/iocast/featureserver.
