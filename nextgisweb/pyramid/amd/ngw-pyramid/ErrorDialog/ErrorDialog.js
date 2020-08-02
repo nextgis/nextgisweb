@@ -22,7 +22,7 @@ define([
             if (options.response) {
                 var response = options.response;
 
-                if (response.status == undefined || response.status == 0) {
+                if (response.status == undefined || response.status == 0 || response.data == undefined) {
                     this.errorTitle = i18n.gettext("Network error");
                     this.message = i18n.gettext("There is no response from the server or problem connecting to server.");
                     this.detail = i18n.gettext("Check network connectivity and try again later.");
