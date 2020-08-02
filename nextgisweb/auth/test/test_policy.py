@@ -5,6 +5,12 @@ from datetime import timedelta
 from freezegun import freeze_time
 
 
+def test_fixture(ngw_webtest_app, ngw_auth_administrator):
+    resp = ngw_webtest_app.get('/api/component/auth/current_user')
+    assert resp.status_code == 200
+    assert resp.json['keyname'] == 'administrator'
+
+
 def test_http_basic(ngw_webtest_app):
     resp = ngw_webtest_app.get('/api/component/auth/user/', expect_errors=True)
     assert resp.status_code == 403

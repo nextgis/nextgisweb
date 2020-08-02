@@ -13,8 +13,7 @@ def image_compare(im1, im2):
     return np.array_equal(arr1, arr2)
 
 
-def test_layer(ngw_webtest_app):
-    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))
+def test_layer(ngw_webtest_app, ngw_auth_administrator):
     data = dict(
         resource=dict(
             cls='tmsclient_connection', display_name='test-tms_connection',

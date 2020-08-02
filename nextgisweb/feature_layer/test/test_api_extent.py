@@ -96,8 +96,7 @@ item_check_list = [
 
 
 @pytest.mark.parametrize('fid, extent', item_check_list)
-def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid):
-    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))  # FIXME:
+def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid, ngw_auth_administrator):
     req_str = '/api/resource/%d/feature/%d/extent' % (vector_layer_id, fid)
     resp = ngw_webtest_app.get(req_str)
     assert extent == resp.json['extent']

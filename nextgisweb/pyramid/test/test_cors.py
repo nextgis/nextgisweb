@@ -36,9 +36,8 @@ def cors_settings(ngw_env):
     (bad_domains[0], False, False),
     (bad_domains[1], True, False),
 ))
+@pytest.mark.usefixtures('ngw_auth_administrator')
 def test_cors_headers(domain, resource_exists, expected_ok, ngw_webtest_app, cors_settings):
-    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))
-
     url = '/api/resource/%d' % (0 if resource_exists else -1)
     response = ngw_webtest_app.get(url, headers=dict(Origin=str(domain)), status='*')
 
@@ -54,9 +53,8 @@ def test_cors_headers(domain, resource_exists, expected_ok, ngw_webtest_app, cor
     (bad_domains[0], False, False),
     (bad_domains[1], True, False),
 ))
+@pytest.mark.usefixtures('ngw_auth_administrator')
 def test_cors_options(domain, resource_exists, expected_ok, ngw_webtest_app, cors_settings):
-    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))
-
     url = '/api/resource/%d' % (0 if resource_exists else -1)
     response = ngw_webtest_app.options(url, headers={
         'Origin': str(domain),

@@ -14,6 +14,11 @@ from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 
 
+@pytest.fixture(autouse=True)
+def auth_administrator(ngw_auth_administrator):
+    pass
+
+
 @pytest.fixture(scope="module")
 def raster_layer_id(ngw_env):
     with transaction.manager:
@@ -45,7 +50,6 @@ def test_export_srs(epsg, ngw_webtest_app, raster_layer_id):
     srs_expected = osr.SpatialReference()
     srs_expected.ImportFromEPSG(epsg)
 
-    ngw_webtest_app.authorization = ("Basic", ("administrator", "admin"))
     resp = ngw_webtest_app.get("/api/resource/%d/export" % raster_layer_id, params={"srs": epsg})
     with NamedTemporaryFile() as f:
         f.write(resp.body)
@@ -57,7 +61,6 @@ def test_export_srs(epsg, ngw_webtest_app, raster_layer_id):
 
 @pytest.mark.parametrize("format", ["GTiff", "HFA", "RMF"])
 def test_export_format(format, ngw_webtest_app, raster_layer_id):
-    ngw_webtest_app.authorization = ("Basic", ("administrator", "admin"))
     resp = ngw_webtest_app.get(
         "/api/resource/%d/export" % raster_layer_id,
         params={"format": format, "bands": [1, 2, 3]},

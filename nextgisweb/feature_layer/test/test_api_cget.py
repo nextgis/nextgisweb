@@ -60,9 +60,7 @@ def vector_layer_id():
 
 
 @pytest.mark.parametrize('order_by, check', check_list)
-def test_cget_order(ngw_webtest_app, vector_layer_id, order_by, check):
-    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))  # FIXME:
-
+def test_cget_order(ngw_webtest_app, vector_layer_id, order_by, check, ngw_auth_administrator):
     resp = ngw_webtest_app.get(
         "/api/resource/%d/feature/?order_by=%s" % (vector_layer_id, order_by)
     )

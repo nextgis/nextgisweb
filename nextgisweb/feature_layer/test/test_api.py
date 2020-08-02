@@ -64,9 +64,7 @@ def vector_layer_id():
         DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
 
 
-def test_fields_edit(ngw_webtest_app, vector_layer_id):
-    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))
-
+def test_fields_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     resp = ngw_webtest_app.get('/api/resource/%d' % vector_layer_id)
     fields = resp.json['feature_layer']['fields']
 
@@ -120,9 +118,7 @@ def test_fields_edit(ngw_webtest_app, vector_layer_id):
     assert len(fields) == 2
 
 
-def test_geom_edit(ngw_webtest_app, vector_layer_id):
-    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))
-
+def test_geom_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     feature_url = '/api/resource/%d/feature/1' % vector_layer_id
 
     feature = ngw_webtest_app.get(feature_url).json
