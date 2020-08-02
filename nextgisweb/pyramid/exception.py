@@ -85,7 +85,7 @@ def unhandled_exception_tween_factory(handler, registry):
                 _logger.exception("Uncaught exception %s at %s" % (exc_name(exc), request.url))
                 iexc = InternalServerError(sys.exc_info())
                 return exc_response(request, iexc, iexc, iexc.exc_info)
-            except Exception as nexc:
+            except Exception:
                 _logger.exception("Exception while rendering error response at %s", request.url)
                 return httpexceptions.HTTPInternalServerError()
 
@@ -103,12 +103,13 @@ def exc_name(exc):
     return '%s.%s' % (module, name)
 
 
-def err_info_attr(err_info, exc, attr, default=None):
+def err_info_attr(err_info, exc, attr, default=None, warn=True):
     try:
         return getattr(err_info, attr)
     except AttributeError:
-        warnings.warn("Exception {} doesn't provide attribute: {}".format(
-            exc_name(exc), attr))
+        if warn:
+            warnings.warn("Exception {} doesn't provide attribute: {}".format(
+                exc_name(exc), attr))
         return default
 
 
@@ -149,7 +150,7 @@ def json_error(request, err_info, exc, exc_info, debug=True):
     if message is not None:
         result['message'] = request.localizer.translate(message)
 
-    detail = err_info_attr(err_info, exc, 'detail')
+    detail = err_info_attr(err_info, exc, 'detail', warn=False)
     if detail is not None:
         result['detail'] = request.localizer.translate(detail)
 
