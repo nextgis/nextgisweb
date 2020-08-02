@@ -82,6 +82,10 @@ class HTTPTestApp(RequestsSession):
         self.http_server = http_server
         self.application_url = http_server.application_url
 
+    @property
+    def base_url(self):
+        return self.application_url.strip('/')
+
     def request(self, method, url, *args, **kwargs):
         if url.startswith('/'):
             url = self.application_url.strip('/') + url
