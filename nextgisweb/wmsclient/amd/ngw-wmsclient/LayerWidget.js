@@ -50,7 +50,7 @@ define([
         serializePrefix: "wmsclient_layer",
 
         constructor: function () {
-            this.wSrs = SRSSelect({allSrs: null});
+            this.wSRS = SRSSelect({allSrs: null});
         },
 
         postCreate: function () {
