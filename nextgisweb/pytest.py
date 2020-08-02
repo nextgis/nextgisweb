@@ -41,8 +41,8 @@ def webapp(ngw_webtest_factory):
 
 
 @pytest.fixture()
-def webapp_handler(env, webapp):
-    pyramid = env.pyramid
+def webapp_handler(ngw_env):
+    pyramid = ngw_env.pyramid
 
     @contextmanager
     def _decorator(handler):

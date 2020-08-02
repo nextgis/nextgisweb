@@ -19,7 +19,7 @@ from nextgisweb.render.util import pack_color, unpack_color
 
 
 @pytest.fixture
-def frtc(txn):
+def frtc(ngw_txn):
     vector_layer = VectorLayer(
         parent_id=0, display_name='from_fields',
         owner_user=User.by_keyname('administrator'),
@@ -67,26 +67,26 @@ def test_pack_unpack():
     assert unpack_color(pack_color(t)) == t
 
 
-def test_put_get_cross(frtc, img_cross_red, txn):
+def test_put_get_cross(frtc, img_cross_red, ngw_txn):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_cross_red)
     cimg = frtc.get_tile(tile)
     assert cimg.getextrema() == img_cross_red.getextrema()
 
 
-def test_put_get_fill(frtc, img_fill, txn):
+def test_put_get_fill(frtc, img_fill, ngw_txn):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_fill)
     cimg = frtc.get_tile(tile)
     assert cimg.getextrema() == img_fill.getextrema()
 
 
-def test_get_missing(frtc, txn):
+def test_get_missing(frtc, ngw_txn):
     tile = (0, 0, 0)
     assert frtc.get_tile(tile) is None
 
 
-def test_ttl(frtc, img_cross_red, txn):
+def test_ttl(frtc, img_cross_red, ngw_txn):
     tile = (0, 0, 0)
     frtc.ttl = 1
     frtc.put_tile(tile, img_cross_red)
@@ -94,14 +94,14 @@ def test_ttl(frtc, img_cross_red, txn):
     assert frtc.get_tile(tile) is None
 
 
-def test_clear(frtc, img_cross_red, txn):
+def test_clear(frtc, img_cross_red, ngw_txn):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_cross_red)
     frtc.clear()
     assert frtc.get_tile(tile) is None
 
 
-def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, txn, caplog):
+def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, ngw_txn, caplog):
     caplog.set_level(logging.DEBUG)
     tile_invalid = (4, 0, 0)
     tile_valid = (4, 15, 15)

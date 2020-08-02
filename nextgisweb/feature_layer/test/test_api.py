@@ -5,7 +5,6 @@ import json
 import pytest
 import six
 import transaction
-import webtest
 
 from uuid import uuid4
 from osgeo import ogr
@@ -16,13 +15,13 @@ from nextgisweb.spatial_ref_sys.models import SRS
 from nextgisweb.vector_layer import VectorLayer
 
 
-def test_identify(env, webapp):
+def test_identify(ngw_webtest_app):
     data = {
         'srs': 3857,
         'geom': 'POLYGON((0 0,0 1,1 1,1 0,0 0))',
         'layers': []
     }
-    resp = webapp.post_json('/api/feature_layer/identify', data, status=200)
+    resp = ngw_webtest_app.post_json('/api/feature_layer/identify', data, status=200)
     assert resp.json['featureCount'] == 0
 
 
@@ -65,15 +64,15 @@ def vector_layer_id():
         DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
 
 
-def test_fields_edit(webapp, vector_layer_id):
-    webapp.authorization = ('Basic', ('administrator', 'admin'))
+def test_fields_edit(ngw_webtest_app, vector_layer_id):
+    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))
 
-    resp = webapp.get('/api/resource/%d' % vector_layer_id)
+    resp = ngw_webtest_app.get('/api/resource/%d' % vector_layer_id)
     fields = resp.json['feature_layer']['fields']
 
     assert len(fields) == 2
 
-    resp = webapp.get('/api/resource/%d/feature/1' % vector_layer_id)
+    resp = ngw_webtest_app.get('/api/resource/%d/feature/1' % vector_layer_id)
     feature_fields = resp.json['fields']
 
     assert len(feature_fields) == 2
@@ -86,24 +85,24 @@ def test_fields_edit(webapp, vector_layer_id):
         label_field=False,
         grid_visibility=True
     ))
-    webapp.put_json('/api/resource/%d' % vector_layer_id, {
+    ngw_webtest_app.put_json('/api/resource/%d' % vector_layer_id, {
         'feature_layer': {'fields': fields}
     }, status=200)
-    resp = webapp.get('/api/resource/%d/feature/1' % vector_layer_id)
+    resp = ngw_webtest_app.get('/api/resource/%d/feature/1' % vector_layer_id)
     feature_fields = resp.json['fields']
 
     assert len(feature_fields) == 3
 
-    resp = webapp.get('/api/resource/%d' % vector_layer_id)
+    resp = ngw_webtest_app.get('/api/resource/%d' % vector_layer_id)
     fields = resp.json['feature_layer']['fields']
 
     assert len(fields) == 3
 
     fields = [fields[2], fields[0]]
-    webapp.put_json('/api/resource/%d' % vector_layer_id, {
+    ngw_webtest_app.put_json('/api/resource/%d' % vector_layer_id, {
         'feature_layer': {'fields': fields}
     }, status=200)
-    resp = webapp.get('/api/resource/%d' % vector_layer_id)
+    resp = ngw_webtest_app.get('/api/resource/%d' % vector_layer_id)
     fields = resp.json['feature_layer']['fields']
 
     assert len(fields) == 3
@@ -112,41 +111,41 @@ def test_fields_edit(webapp, vector_layer_id):
     assert fields[2]['keyname'] == 'price'
 
     fields[2]['delete'] = True
-    webapp.put_json('/api/resource/%d' % vector_layer_id, {
+    ngw_webtest_app.put_json('/api/resource/%d' % vector_layer_id, {
         'feature_layer': {'fields': fields}
     }, status=200)
-    resp = webapp.get('/api/resource/%d' % vector_layer_id)
+    resp = ngw_webtest_app.get('/api/resource/%d' % vector_layer_id)
     fields = resp.json['feature_layer']['fields']
 
     assert len(fields) == 2
 
 
-def test_geom_edit(webapp, vector_layer_id):
-    webapp.authorization = ('Basic', ('administrator', 'admin'))
+def test_geom_edit(ngw_webtest_app, vector_layer_id):
+    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))
 
     feature_url = '/api/resource/%d/feature/1' % vector_layer_id
 
-    feature = webapp.get(feature_url).json
+    feature = ngw_webtest_app.get(feature_url).json
     assert feature['geom'] == 'POINT (0.0000000000000000 0.0000000000000000)'
 
-    feature = webapp.get(feature_url + '?geom_format=geojson').json
+    feature = ngw_webtest_app.get(feature_url + '?geom_format=geojson').json
     assert feature['geom'] == dict(type='Point', coordinates=[0.0, 0.0])
 
     feature['geom'] = 'POINT (1 0)'
-    webapp.put_json(feature_url, feature)
-    feature = webapp.get(feature_url).json
+    ngw_webtest_app.put_json(feature_url, feature)
+    feature = ngw_webtest_app.get(feature_url).json
     assert feature['geom'] == 'POINT (1.0000000000000000 0.0000000000000000)'
 
     feature['geom'] = dict(type='Point', coordinates=[1, 2])
-    webapp.put_json(feature_url + '?geom_format=geojson', feature)
-    assert feature == webapp.get(feature_url + '?geom_format=geojson').json
+    ngw_webtest_app.put_json(feature_url + '?geom_format=geojson', feature)
+    assert feature == ngw_webtest_app.get(feature_url + '?geom_format=geojson').json
 
-    feature = webapp.get(feature_url).json
+    feature = ngw_webtest_app.get(feature_url).json
     assert feature['geom'] == 'POINT (1.0000000000000000 2.0000000000000000)'
 
     feature['geom'] = dict(type='Point', coordinates=[90, 45])
-    webapp.put_json(feature_url + '?geom_format=geojson&srs=4326', feature)
-    feature = webapp.get(feature_url + '?geom_format=geojson&srs=3857').json
+    ngw_webtest_app.put_json(feature_url + '?geom_format=geojson&srs=4326', feature)
+    feature = ngw_webtest_app.get(feature_url + '?geom_format=geojson&srs=3857').json
     coords = feature['geom']['coordinates']
     assert round(coords[0], 3) == 10018754.171
     assert round(coords[1], 3) == 5621521.486

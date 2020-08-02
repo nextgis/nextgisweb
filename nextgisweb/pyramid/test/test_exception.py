@@ -23,7 +23,7 @@ class ExceptionTest(Exception):
 
 
 @pytest.fixture(scope='module')
-def webapp():
+def app():
     from webtest import TestApp
 
     settings = dict()
@@ -52,8 +52,8 @@ def webapp():
     yield TestApp(config.make_wsgi_app())
 
 
-def test_error(webapp):
-    resp = webapp.get('/error', status=418)
+def test_error(app):
+    resp = app.get('/error', status=418)
     rjson = resp.json
 
     del rjson['guru_meditation']
@@ -65,8 +65,8 @@ def test_error(webapp):
         status_code=418)
 
 
-def test_exception(webapp):
-    resp = webapp.get('/exception', status=500)
+def test_exception(app):
+    resp = app.get('/exception', status=500)
     rjson = resp.json
 
     del rjson['guru_meditation']

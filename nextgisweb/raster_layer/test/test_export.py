@@ -15,7 +15,7 @@ from nextgisweb.spatial_ref_sys import SRS
 
 
 @pytest.fixture(scope="module")
-def raster_layer_id(env):
+def raster_layer_id(ngw_env):
     with transaction.manager:
         obj = RasterLayer(
             parent_id=0,
@@ -25,7 +25,10 @@ def raster_layer_id(env):
         ).persist()
 
         obj.load_file(
-            os.path.join(os.path.split(__file__)[0], "data", "sochi-aster-colorized.tif"), env
+            os.path.join(
+                os.path.split(__file__)[0],
+                "data", "sochi-aster-colorized.tif"
+            ), ngw_env
         )
 
         DBSession.flush()
@@ -37,13 +40,13 @@ def raster_layer_id(env):
         DBSession.delete(RasterLayer.filter_by(id=obj.id).one())
 
 
-@pytest.mark.parametrize("epsg", [4326, 3857,])
-def test_export_srs(epsg, webapp, raster_layer_id):
+@pytest.mark.parametrize("epsg", [4326, 3857, ])
+def test_export_srs(epsg, ngw_webtest_app, raster_layer_id):
     srs_expected = osr.SpatialReference()
     srs_expected.ImportFromEPSG(epsg)
 
-    webapp.authorization = ("Basic", ("administrator", "admin"))
-    resp = webapp.get("/api/resource/%d/export" % raster_layer_id, params={"srs": epsg})
+    ngw_webtest_app.authorization = ("Basic", ("administrator", "admin"))
+    resp = ngw_webtest_app.get("/api/resource/%d/export" % raster_layer_id, params={"srs": epsg})
     with NamedTemporaryFile() as f:
         f.write(resp.body)
         ds = gdal.OpenEx(f.name)
@@ -53,9 +56,9 @@ def test_export_srs(epsg, webapp, raster_layer_id):
 
 
 @pytest.mark.parametrize("format", ["GTiff", "HFA", "RMF"])
-def test_export_format(format, webapp, raster_layer_id):
-    webapp.authorization = ("Basic", ("administrator", "admin"))
-    resp = webapp.get(
+def test_export_format(format, ngw_webtest_app, raster_layer_id):
+    ngw_webtest_app.authorization = ("Basic", ("administrator", "admin"))
+    resp = ngw_webtest_app.get(
         "/api/resource/%d/export" % raster_layer_id,
         params={"format": format, "bands": [1, 2, 3]},
     )

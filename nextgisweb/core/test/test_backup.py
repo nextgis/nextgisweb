@@ -38,5 +38,5 @@ def test_parse_pg_dump_version(output, expected):
     assert parse_pg_dump_version(output) == LooseVersion(expected)
 
 
-def test_dummy_backup(env, tmp_path):
-    backup(env, six.text_type(tmp_path))
+def test_dummy_backup(ngw_env, tmp_path):
+    backup(ngw_env, six.text_type(tmp_path))

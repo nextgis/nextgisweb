@@ -14,7 +14,7 @@ ANNOTATION_SAMPLE = dict(
 
 
 @pytest.fixture(scope='module')
-def webmap(env):
+def webmap(ngw_env):
     with transaction.manager:
         obj = WebMap(
             parent_id=0, display_name=__name__,
@@ -31,22 +31,22 @@ def webmap(env):
 
 
 @pytest.fixture(scope='module')
-def enable_annotation(env):
-    remember = env.webmap.options['annotation']
-    env.webmap.options['annotation'] = True
+def enable_annotation(ngw_env):
+    remember = ngw_env.webmap.options['annotation']
+    ngw_env.webmap.options['annotation'] = True
     yield None
-    env.webmap.options['annotation'] = remember
+    ngw_env.webmap.options['annotation'] = remember
 
 
-def test_annotation_post_get(webapp, webmap, enable_annotation):
-    webapp.authorization = ('Basic', ('administrator', 'admin'))  # FIXME:
+def test_annotation_post_get(ngw_webtest_app, webmap, enable_annotation):
+    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))  # FIXME:
     wmid = webmap.id
-    result = webapp.post_json('/api/resource/%d/annotation/' % wmid, ANNOTATION_SAMPLE)
+    result = ngw_webtest_app.post_json('/api/resource/%d/annotation/' % wmid, ANNOTATION_SAMPLE)
     aid = result.json['id']
 
     assert aid > 0
 
-    adata = webapp.get('/api/resource/%d/annotation/%d' % (wmid, aid)).json
+    adata = ngw_webtest_app.get('/api/resource/%d/annotation/%d' % (wmid, aid)).json
     del adata['id']
 
     assert adata == ANNOTATION_SAMPLE

@@ -18,7 +18,7 @@ DATA_PATH = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'data')
 
 
-def test_from_fields(txn):
+def test_from_fields(ngw_txn):
     res = VectorLayer(
         parent_id=0, display_name='from_fields',
         owner_user=User.by_keyname('administrator'),
@@ -48,7 +48,7 @@ def test_from_fields(txn):
     'shapefile-point-utf8.zip/layer.shp',
     'shapefile-point-win1251.zip/layer.shp',
     'geojson-point.zip/layer.geojson'))
-def test_from_ogr(data, txn):
+def test_from_ogr(data, ngw_txn):
     src = os.path.join(DATA_PATH, data)
     dsource = ogr.Open('/vsizip/' + src)
     layer = dsource.GetLayer(0)

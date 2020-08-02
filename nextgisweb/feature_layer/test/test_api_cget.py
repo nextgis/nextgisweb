@@ -1,23 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
 import random
-import webtest
+import json
+import six
+from uuid import uuid4
 
 import pytest
 import transaction
-import json
-import six
-import os.path
-import pytest
-from uuid import uuid4
 from osgeo import ogr
 
 from nextgisweb.models import DBSession
 
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.spatial_ref_sys.models import SRS
-from nextgisweb.geometry import geom_from_wkt
 from nextgisweb.auth import User
 
 
@@ -65,10 +60,10 @@ def vector_layer_id():
 
 
 @pytest.mark.parametrize('order_by, check', check_list)
-def test_cget_order(webapp, vector_layer_id, order_by, check):
-    webapp.authorization = ('Basic', ('administrator', 'admin'))  # FIXME:
+def test_cget_order(ngw_webtest_app, vector_layer_id, order_by, check):
+    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))  # FIXME:
 
-    resp = webapp.get(
+    resp = ngw_webtest_app.get(
         "/api/resource/%d/feature/?order_by=%s" % (vector_layer_id, order_by)
     )
     ids = [f["id"] for f in resp.json]
@@ -77,7 +72,6 @@ def test_cget_order(webapp, vector_layer_id, order_by, check):
 
 def get_features_for_orderby_test():
     import string
-    import random
     from random import randint
 
     letters = string.ascii_lowercase

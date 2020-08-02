@@ -9,27 +9,27 @@ from nextgisweb.auth import User
 
 
 @pytest.fixture()
-def revert_delta(env):
-    value = env.auth.options['activity_delta']
+def revert_delta(ngw_env):
+    value = ngw_env.auth.options['activity_delta']
     yield
-    env.auth.options['activity_delta'] = value
+    ngw_env.auth.options['activity_delta'] = value
 
 
-def test_last_activity(env, webapp, revert_delta):
+def test_last_activity(ngw_env, ngw_webtest_app, revert_delta):
     epsilon = timedelta(milliseconds=500)
 
-    env.auth.options['activity_delta'] = timedelta(seconds=0)
-    webapp.get('/resource/0', status='*')
+    ngw_env.auth.options['activity_delta'] = timedelta(seconds=0)
+    ngw_webtest_app.get('/resource/0', status='*')
     last_activity = User.by_keyname('guest').last_activity
     assert datetime.utcnow() - last_activity < epsilon
 
-    env.auth.options['activity_delta'] = timedelta(seconds=100)
-    webapp.get('/resource/0', status='*')
+    ngw_env.auth.options['activity_delta'] = timedelta(seconds=100)
+    ngw_webtest_app.get('/resource/0', status='*')
     assert User.by_keyname('guest').last_activity == last_activity
 
-    env.auth.options['activity_delta'] = timedelta(seconds=0)
-    webapp.authorization = ('Basic', ('administrator', 'admin'))
-    webapp.get('/resource/0', status='*')
+    ngw_env.auth.options['activity_delta'] = timedelta(seconds=0)
+    ngw_webtest_app.authorization = ('Basic', ('administrator', 'admin'))
+    ngw_webtest_app.get('/resource/0', status='*')
     admin_last_activity = User.by_keyname('administrator').last_activity
     assert datetime.utcnow() - admin_last_activity < epsilon
     assert User.by_keyname('guest').last_activity == last_activity
