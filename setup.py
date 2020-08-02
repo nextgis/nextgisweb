@@ -77,6 +77,8 @@ entry_points = {
 
     'pytest11': [
         'nextgisweb = nextgisweb.pytest',
+        'nextgisweb.core = nextgisweb.core.test',
+        'nextgisweb.pyramid = nextgisweb.pyramid.test',
     ],
 
     'console_scripts': [
