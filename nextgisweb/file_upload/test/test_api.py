@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+from subprocess import check_call, check_output
 
 import pytest
 import webtest
@@ -87,6 +88,21 @@ def test_tus_method(ngw_webtest_app):
 
     ngw_webtest_app.delete(location, status=200)
     ngw_webtest_app.delete(location, status=404)
+
+
+def test_tus_client(ngw_httptest_app, tmp_path):
+    of = tmp_path / 'sample'
+    check_call(['dd', 'if=/dev/zero', 'of=' + str(of), 'bs=1M', 'count=16'])
+
+    burl = ngw_httptest_app.base_url + '/api/component/file_upload/'
+    furl = check_output(['tusc', 'client', burl, str(of)]).strip()
+    assert furl.strip().startswith(burl)
+
+    response = ngw_httptest_app.get(furl)
+    response.raise_for_status()
+
+    data = response.json()
+    assert data['size'] == 16 * 1024 * 1024
 
 
 def test_post_single(ngw_env, ngw_webtest_app):
