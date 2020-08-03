@@ -15,10 +15,8 @@ ANNOTATION_SAMPLE = dict(
 
 @pytest.fixture(scope='module', autouse=True)
 def enable_annotation(ngw_env):
-    remember = ngw_env.webmap.options['annotation']
-    ngw_env.webmap.options['annotation'] = True
-    yield None
-    ngw_env.webmap.options['annotation'] = remember
+    with ngw_env.webmap.options.override(annotation=True):
+        yield None
 
 
 @pytest.fixture(scope='module')

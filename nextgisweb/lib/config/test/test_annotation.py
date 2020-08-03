@@ -48,7 +48,20 @@ def test_defaults(copts):
         copts.get('default.wo')
 
 
+def test_override(copts):
+    with copts.override({"default.wi": "override"}, root='override'):
+        assert copts['root'] == 'override'
+        assert copts['default.wi'] == 'override'
+    assert copts['root'] == 'root'
+
+
 def test_with_prefix(copts):
     prefixed = copts.with_prefix('root')
+    assert prefixed['a.int'] == 42
+    assert prefixed['b.str'] == 'str'
+
+    with prefixed.override({'a.int': 'override'}):
+        assert prefixed['a.int'] == 'override'
+
     assert prefixed['a.int'] == 42
     assert prefixed['b.str'] == 'str'

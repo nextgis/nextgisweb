@@ -102,11 +102,11 @@ def test_session_store(cwebapp, get_session_id, session_headers):
 
 @pytest.fixture()
 def save_options(ngw_env):
-    max_age = ngw_env.pyramid.options['session.cookie.max_age']
-    activity_delta = ngw_env.pyramid.options['session.activity_delta']
-    yield
-    ngw_env.pyramid.options['session.cookie.max_age'] = max_age
-    ngw_env.pyramid.options['session.activity_delta'] = activity_delta
+    with ngw_env.pyramid.options.override({
+        'session.cookie.max_age': None,
+        'session.activity_delta': None,
+    }):
+        yield
 
 
 def test_session_lifetime(ngw_env, cwebapp, save_options, get_session_id, session_headers):
