@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
 import json
 from uuid import uuid4
 
-from osgeo import ogr
 import pytest
+from osgeo import ogr
 import six
 import transaction
-import webtest
 import xml.etree.ElementTree as ET
 
 from nextgisweb.auth import User
@@ -20,7 +18,6 @@ from nextgisweb.vector_layer import VectorLayer
 @pytest.fixture(scope='module')
 def vector_layer_id():
     with transaction.manager:
-
         obj = VectorLayer(
             parent_id=0, display_name='test_wfs_vector_layer',
             owner_user=User.by_keyname('administrator'),
@@ -56,9 +53,7 @@ def vector_layer_id():
         DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
 
 
-def test_api(webapp, vector_layer_id):
-    webapp.authorization = ('Basic', ('administrator', 'admin'))
-
+def test_api(vector_layer_id, ngw_webtest_app, ngw_auth_administrator):
     data = dict(
         resource=dict(cls='wfsserver_service', display_name="test_wfs", parent=dict(id=0)),
         wfsserver_service=dict(layers=[dict(
@@ -68,10 +63,10 @@ def test_api(webapp, vector_layer_id):
             maxfeatures=1000
         )])
     )
-    resp = webapp.post_json('/api/resource/', data, status=201)
+    resp = ngw_webtest_app.post_json('/api/resource/', data, status=201)
     wfsserver_service_id = resp.json['id']
 
-    resp = webapp.get('/api/resource/%d/wfs' % wfsserver_service_id, dict(
+    resp = ngw_webtest_app.get('/api/resource/%d/wfs' % wfsserver_service_id, dict(
         service='wfs',
         request='GetCapabilities'
     ), status=200)
@@ -81,4 +76,4 @@ def test_api(webapp, vector_layer_id):
     assert layer_elem[0].text == 'points'
     assert layer_elem[3].text == 'EPSG:3857'
 
-    webapp.delete('/api/resource/%d' % wfsserver_service_id, status=200)
+    ngw_webtest_app.delete('/api/resource/%d' % wfsserver_service_id, status=200)
