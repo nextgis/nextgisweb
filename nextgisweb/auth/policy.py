@@ -13,7 +13,7 @@ from ..lib.config import OptionAnnotations, Option
 from ..compat import timestamp_to_datetime, datetime_to_timestamp
 
 from .models import User
-from .exception import InvalidCredentialsException, DisabledUserException
+from .exception import InvalidCredentialsException, UserDisabledException
 from .oauth import OAuthTokenRefreshException
 
 
@@ -27,11 +27,16 @@ class AuthenticationPolicy(object):
         self.comp = comp
         self.oauth = comp.oauth
         self.options = options
+        self.test_user = None
 
     def unauthenticated_userid(self, request):
         return None
 
     def authenticated_userid(self, request):
+        # Override current user in tests via ngw_auth_administrator fixture
+        if self.test_user is not None:
+            return User.by_keyname(self.test_user).id
+
         session = request.session
 
         # Session based authentication
@@ -54,7 +59,7 @@ class AuthenticationPolicy(object):
                             refresh_token=session['auth.policy.refresh_token'],
                             access_token=session['auth.policy.access_token'])
                         self.remember(request, (user_id, tresp))
-                    except OAuthTokenRefreshException as exc:
+                    except OAuthTokenRefreshException:
                         self.forget(request)
                         return None
 
@@ -99,12 +104,12 @@ class AuthenticationPolicy(object):
                         username, password, oauth=False)
                     return user.id
 
-            if amode == 'BEARER':
+            if amode == 'BEARER' and self.oauth is not None:
                 user = self.oauth.access_token_to_user(value)
-                return user.id
+                if user is not None:
+                    return user.id
 
-            else:
-                raise HTTPUnauthorized()
+            raise HTTPUnauthorized()
 
         return None
 
@@ -157,7 +162,9 @@ class AuthenticationPolicy(object):
 
         try:
             test_user = q.one()
-            if test_user.password == password:
+            if test_user.disabled:
+                raise UserDisabledException()
+            elif test_user.password == password:
                 user = test_user
         except NoResultFound:
             pass
@@ -170,8 +177,6 @@ class AuthenticationPolicy(object):
 
         if user is None:
             raise InvalidCredentialsException()
-        elif user.disabled:
-            raise DisabledUserException()
 
         return (user, tresp)
 

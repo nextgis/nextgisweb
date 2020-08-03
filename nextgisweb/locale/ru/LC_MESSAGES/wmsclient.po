@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2018-12-07 16:44+0300\n"
+"POT-Creation-Date: 2020-07-23 12:12+0000\n"
 "PO-Revision-Date: 2015-09-14 00:47+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -24,7 +24,7 @@ msgstr ""
 msgid "WMS connection"
 msgstr "Соединение WMS"
 
-#: amd/ngw-wmsclient/LayerWidget.js:47 model.py:162
+#: amd/ngw-wmsclient/LayerWidget.js:48 model.py:163
 msgid "WMS layer"
 msgstr "Слой WMS"
 
@@ -90,16 +90,20 @@ msgstr "Запросить"
 msgid "Clear"
 msgstr "Очистить"
 
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:21
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:15
+msgid "Select WMS connection"
+msgstr "Выберите соединение WMS"
+
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:22
 msgid "Coordinate system"
 msgstr "Система координат"
 
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:27
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:29
 #: template/section_connection.mako:15
 msgid "Image format"
 msgstr "Формат изображения"
 
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:33
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:35
 msgid "WMS layers"
 msgstr "Слои WMS"
 

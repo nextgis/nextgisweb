@@ -2,6 +2,7 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/Deferred",
+    "dojo/dom-class",
     "dojo/dom-construct",
     "dijit/Dialog",
     "dijit/form/Button",
@@ -13,6 +14,7 @@ define([
     declare,
     lang,
     Deferred,
+    domClass,
     domConstruct,
     Dialog,
     Button,
@@ -22,10 +24,11 @@ define([
     i18n
 ) {
     return declare([Dialog], {
-        title: i18n.gettext("Select resource"),
-
         buildRendering: function () {
             this.inherited(arguments);
+
+            var widget = this;
+            this.title = this.dialogTitle || i18n.gettext("Select resource");
 
             this.container = new BorderContainer({
                 style: "width: 400px; height: 300px"
@@ -33,7 +36,12 @@ define([
 
             this.tree = new Tree({
                 region: "center",
-                style: "width: 100%; height: 100%;"
+                style: "width: 100%; height: 100%;",
+                _createTreeNode: function(args) {
+                    var treeNode = this.inherited(arguments);
+                    treeNode.set('disabled', !(args.item.children || widget.checkItemAcceptance(args.item)));
+                    return treeNode;
+                }
             }).placeAt(this.container);
 
             this.tree.on("click", lang.hitch(this, function () {
@@ -52,7 +60,7 @@ define([
                     this.hide();
                 })
             }).placeAt(this.actionBar);
-            
+
             new Button({
                 label: i18n.gettext("Cancel"),
                 onClick: lang.hitch(this, function () {

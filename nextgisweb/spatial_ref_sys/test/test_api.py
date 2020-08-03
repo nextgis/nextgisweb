@@ -30,8 +30,8 @@ def srs_msk23_id():
         DBSession.delete(SRS.filter_by(id=obj.id).one())
 
 
-def test_geom_transform(webapp, srs_msk23_id):
-    result = webapp.post_json(
+def test_geom_transform(ngw_webtest_app, srs_msk23_id):
+    result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 3857,
         dict(geom=MOSCOW_VLADIVOSTOK, srs=4326)
     )
@@ -39,7 +39,7 @@ def test_geom_transform(webapp, srs_msk23_id):
     g2 = geom_from_wkt("LINESTRING(4187839.2436 7508807.8513,14683040.8356 5330254.9437)")
     assert g2.almost_equals(g1, 4)
 
-    result = webapp.post_json(
+    result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 4326,
         dict(geom=result.json["geom"], srs=3857)
     )
@@ -48,29 +48,29 @@ def test_geom_transform(webapp, srs_msk23_id):
     assert g2.almost_equals(g1, 6)
 
 
-def test_geom_length(webapp, srs_msk23_id):
-    result = webapp.post_json(
+def test_geom_length(ngw_webtest_app, srs_msk23_id):
+    result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_length" % 4326,
         dict(geom=MOSCOW_VLADIVOSTOK)
     )
     assert abs(result.json["value"] - LENGTH_SPHERE) < 1e-6
 
-    result = webapp.post_json(
+    result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_length" % 4326,
         dict(geom=MOSCOW_VLADIVOSTOK)
     )
     assert abs(result.json["value"] - LENGTH_SPHERE) < 1e-6
 
-    result = webapp.post_json(
+    result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_length" % 3857,
         dict(geom=MOSCOW_VLADIVOSTOK, srs=4326)
     )
     assert abs(result.json["value"] - LENGTH_FLAT) < 1e-6
 
 
-def test_geom_area(webapp, srs_msk23_id):
+def test_geom_area(ngw_webtest_app, srs_msk23_id):
     POLY = 'POLYGON((484000 1400000,484000 1400100,484100 1400100,484100 1400000,484000 1400000))'
-    result = webapp.post_json(
+    result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_area" % srs_msk23_id,
         dict(geom=POLY)
     )

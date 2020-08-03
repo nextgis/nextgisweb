@@ -11,6 +11,6 @@ class InvalidCredentialsException(UserException):
     http_status_code = 401
 
 
-class DisabledUserException(UserException):
+class UserDisabledException(UserException):
     title = _("User is disabled")
     http_status_code = 403

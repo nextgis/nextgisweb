@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-01-27 13:00+0000\n"
+"POT-Creation-Date: 2020-07-28 09:45+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -64,7 +64,7 @@ msgstr "Поделиться"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:377 amd/ngw-webmap/Display.js:386
+#: amd/ngw-webmap/Display.js:379 amd/ngw-webmap/Display.js:386
 msgid "Bookmarks"
 msgstr "Закладки"
 
@@ -187,6 +187,14 @@ msgstr "Верх, град."
 msgid "Set extent from layer"
 msgstr "Охват по слою"
 
+#: amd/ngw-webmap/template/ExtentWidget.hbs:39
+msgid "Select layer"
+msgstr "Выберите слой"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:45
+msgid "Select vector layer"
+msgstr "Выберите векторный слой"
+
 #: amd/ngw-webmap/template/ExtentWidget.hbs:47
 msgid "Bookmark resource"
 msgstr "Ресурс закладок"
@@ -194,6 +202,10 @@ msgstr "Ресурс закладок"
 #: amd/ngw-webmap/template/ItemWidget.hbs:14
 msgid "Add layer"
 msgstr "Добавить слой"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr "Выберите стиль слоя"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:33
 msgid "Remove"

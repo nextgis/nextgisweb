@@ -229,7 +229,3 @@ class PasswordHashValue(object):
                 return False
         else:
             raise NotImplementedError()
-
-
-class UserDisabled(Exception):
-    """ Requested user is blocked """

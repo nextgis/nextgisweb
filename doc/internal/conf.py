@@ -12,7 +12,7 @@ copyright = u'2014-2016, NextGIS'
 version = '2'
 release = '2'
 
-language = 'ru'
+language = 'en'
 
 pygments_style = 'sphinx'
 
@@ -27,5 +27,3 @@ autoclass_content = 'both'
 http_index_shortname = 'api'
 
 # -- Options for HTML output ----------------------------------------------
-
-html_theme = 'nature'

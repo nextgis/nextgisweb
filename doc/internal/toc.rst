@@ -1,8 +1,5 @@
-.. sectionauthor:: Дмитрий Барышников <dmitry.baryshnikov@nextgis.ru>
-.. NextGIS Web internal TOC
-
-Для разработчиков NextGIS Web
-=============================
+NextGIS Web internals
+=====================
 
 .. toctree::
    :maxdepth: 3
@@ -12,5 +9,3 @@
    error
    i18n
    test
-   file_upload
-   snippets

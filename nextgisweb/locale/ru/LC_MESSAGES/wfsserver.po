@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-06-05 21:26+0700\n"
+"POT-Creation-Date: 2020-07-23 11:51+0000\n"
 "PO-Revision-Date: 2015-09-14 01:40+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,9 +17,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"Generated-By: Babel 2.6.0\n"
 
-#: model.py:20 view.py:114 amd/ngw-wfsserver/ServiceWidget.js:60
+#: amd/ngw-wfsserver/ServiceWidget.js:57 model.py:20 view.py:115
 msgid "WFS service"
 msgstr "Сервис WFS"
 
@@ -27,19 +27,23 @@ msgstr "Сервис WFS"
 msgid "Add"
 msgstr "Добавить"
 
+#: amd/ngw-wfsserver/template/ServiceWidget.hbs:18
+msgid "Select vector layer"
+msgstr "Выберите векторный слой"
+
 #: amd/ngw-wfsserver/template/ServiceWidget.hbs:27
 msgid "Remove"
 msgstr "Удалить"
 
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:59
+#: amd/ngw-wfsserver/template/ServiceWidget.hbs:62
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:63
+#: amd/ngw-wfsserver/template/ServiceWidget.hbs:66
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:67
+#: amd/ngw-wfsserver/template/ServiceWidget.hbs:70
 msgid "Default count of returned features"
 msgstr "Число возвращаемых объектов по умолчанию"
 
@@ -51,7 +55,9 @@ msgstr "Адрес WFS сервиса"
 msgid ""
 "Use this link in desktop client (e.g. {example}) to access and edit "
 "vector data."
-msgstr "Используйте эту ссылку в настольном приложении (например, {example}) для просмотра и редактирования векторных данных."
+msgstr ""
+"Используйте эту ссылку в настольном приложении (например, {example}) для "
+"просмотра и редактирования векторных данных."
 
 #~ msgid "WFS URL"
 #~ msgstr "WFS URL"

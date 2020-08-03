@@ -4,12 +4,15 @@ Changes
 3.5.0
 -----
 
-- Raster layer export.
+- Raster layer export to GeoTIFF, ERDAS IMAGINE and Panorama RMF formats.
 - Support for ``geom_format`` and ``srs`` in feature layer REST API (POST / PUT requests).
+- Improved resource picker: inappropriate resources are disabled now.
 - Session based OAuth authentication with token refresh support.
 - Delete users and groups via REST API.
 - Track timestamps of user's last activity.
 - Fix bug in CORS implementation for requests returning errors.
+- Fix coordinates display format in webmap's identification pop-up.
+- Fix tile distortion issue for raster styles
 
 
 3.4.1

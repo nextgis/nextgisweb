@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+from warnings import warn
 from contextlib import contextmanager
 
 import pytest
@@ -17,36 +18,31 @@ def _env_initialize():
 
 
 @pytest.fixture(scope='session')
-def env():
+def ngw_env():
     return _env_initialize()
 
 
+@pytest.fixture(scope='session')
+def env(ngw_env):
+    warn("Fixture env is deprecated! Use ngw_env instead.", DeprecationWarning)
+    return ngw_env
+
+
 @pytest.fixture
-def txn():
-    from nextgisweb.models import DBSession
-    from transaction import manager
-    _env_initialize()
-    with manager as t:
-        yield t
-        try:
-            DBSession.flush()
-            t.abort()
-        finally:
-            DBSession.expunge_all()
-            DBSession.expire_all()
+def txn(ngw_txn):
+    warn("Fixture txn is deprecated! Use ngw_txn instead.", DeprecationWarning)
+    return ngw_txn
 
 
 @pytest.fixture(scope='session')
-def webapp(env):
-    from webtest import TestApp
-    app = env.pyramid.make_app({}).make_wsgi_app()
-    tapp = TestApp(app)
-    yield tapp
+def webapp(ngw_webtest_factory):
+    warn("Fixture webapp is deprecated! Use ngw_webtest_app instead.", DeprecationWarning)
+    return ngw_webtest_factory()
 
 
 @pytest.fixture()
-def webapp_handler(env, webapp):
-    pyramid = env.pyramid
+def webapp_handler(ngw_env):
+    pyramid = ngw_env.pyramid
 
     @contextmanager
     def _decorator(handler):

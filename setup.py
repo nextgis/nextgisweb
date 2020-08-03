@@ -52,6 +52,8 @@ requires = [
     # TODO: Move to dev or test dependencies
     'freezegun',
     'pytest',
+    'pytest-watch',
+    'pytest-flake8',
     'webtest',
     'flake8',
     'flake8-future-import',
@@ -77,6 +79,9 @@ entry_points = {
 
     'pytest11': [
         'nextgisweb = nextgisweb.pytest',
+        'nextgisweb.core = nextgisweb.core.test',
+        'nextgisweb.pyramid = nextgisweb.pyramid.test',
+        'nextgiswev.auth = nextgisweb.auth.test',
     ],
 
     'console_scripts': [

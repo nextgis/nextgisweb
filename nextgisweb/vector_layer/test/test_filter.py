@@ -39,16 +39,17 @@ check_list = [
 tests = []
 
 for c in check_list:
-        [key, operator, should_be_true, should_be_false] = c
-        should_array = [should_be_false, should_be_true]
-        for i in range(len(should_array)):
-            s = should_array[i]
-            for v in s:
-                filter_ = [[key, operator, v]]
-                tests.append([filter_, i])
+    [key, operator, should_be_true, should_be_false] = c
+    should_array = [should_be_false, should_be_true]
+    for i in range(len(should_array)):
+        s = should_array[i]
+        for v in s:
+            filter_ = [[key, operator, v]]
+            tests.append([filter_, i])
+
 
 @pytest.fixture
-def resource(txn):
+def resource(ngw_txn):
     src = os.path.join(DATA_PATH, 'geojson-point.zip/layer.geojson')
     dsource = ogr.Open('/vsizip/' + src)
     layer = dsource.GetLayer(0)
@@ -70,7 +71,7 @@ def resource(txn):
 
 
 @pytest.mark.parametrize('data', tests)
-def test_attribution(data, resource, txn):
+def test_attribution(data, resource, ngw_txn):
 
     query = resource.feature_query()
     result = query()
@@ -83,13 +84,5 @@ def test_attribution(data, resource, txn):
     query.filter(*filter_)
     result = query()
     features = list(result)
-    msg = "%s for '%s' should be %s" % (filter_, filtered_field ,data[1])
+    msg = "%s for '%s' should be %s" % (filter_, filtered_field, data[1])
     assert len(features) == data[1], msg
-
-
-
-
-
-        
-
-

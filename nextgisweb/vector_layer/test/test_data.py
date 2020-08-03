@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import os.path
-from uuid import uuid4
 import six
+from datetime import date, time, datetime
+from uuid import uuid4
 
 import pytest
+from osgeo import gdal
 from osgeo import ogr
 
+from nextgisweb.compat import Path
 from nextgisweb.models import DBSession
 from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
@@ -18,7 +21,7 @@ DATA_PATH = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'data')
 
 
-def test_from_fields(txn):
+def test_from_fields(ngw_txn):
     res = VectorLayer(
         parent_id=0, display_name='from_fields',
         owner_user=User.by_keyname('administrator'),
@@ -48,7 +51,7 @@ def test_from_fields(txn):
     'shapefile-point-utf8.zip/layer.shp',
     'shapefile-point-win1251.zip/layer.shp',
     'geojson-point.zip/layer.geojson'))
-def test_from_ogr(data, txn):
+def test_from_ogr(data, ngw_txn):
     src = os.path.join(DATA_PATH, data)
     dsource = ogr.Open('/vsizip/' + src)
     layer = dsource.GetLayer(0)
@@ -81,3 +84,51 @@ def test_from_ogr(data, txn):
     # assert fields['datetime'] == datetime(2001, 1, 1, 23, 59, 0)
     assert fields['string'] == "Foo bar"
     assert fields['unicode'] == 'Значимость этих проблем настолько очевидна, что реализация намеченных плановых заданий требуют определения и уточнения.'  # NOQA: E501
+
+
+def test_type_geojson(ngw_txn):
+    src = Path(__file__).parent / 'data' / 'type.geojson'
+
+    dataset = ogr.Open(str(src))
+    assert dataset is not None, gdal.GetLastErrorMsg()
+
+    layer = dataset.GetLayer(0)
+    assert layer is not None, gdal.GetLastErrorMsg()
+
+    res = VectorLayer(
+        parent_id=0, display_name='from_ogr',
+        owner_user=User.by_keyname('administrator'),
+        srs=SRS.filter_by(id=3857).one(),
+        tbl_uuid=six.text_type(uuid4().hex))
+
+    res.persist()
+
+    res.setup_from_ogr(layer, lambda x: x)
+    res.load_from_ogr(layer, lambda x: x)
+    layer.ResetReading()
+
+    DBSession.flush()
+
+    def field_as(f, n, t):
+        fidx = f.GetFieldIndex(n)
+        if f.IsFieldNull(fidx):
+            return None
+
+        attr = getattr(f, 'GetFieldAs' + t)
+        result = attr(fidx)
+
+        if t in ('Date', 'Time', 'DateTime'):
+            result = [int(v) for v in result]
+
+        return result
+
+    for feat, ref in zip(res.feature_query()(), layer):
+        fields = feat.fields
+        assert fields['null'] == field_as(ref, 'null', None)
+        assert fields['int'] == field_as(ref, 'int', 'Integer')
+        assert fields['real'] == field_as(ref, 'real', 'Double')
+        assert fields['date'] == date(*field_as(ref, 'date', 'DateTime')[0:3])
+        assert fields['time'] == time(*field_as(ref, 'time', 'DateTime')[3:6])
+        assert fields['datetime'] == datetime(*field_as(ref, 'datetime', 'DateTime')[0:6])
+        assert fields['string'] == field_as(ref, 'string', 'String')
+        assert fields['unicode'] == field_as(ref, 'unicode', 'String').decode('utf-8')

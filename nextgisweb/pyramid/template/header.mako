@@ -3,7 +3,9 @@
 <%!
     import os
     import re
+    from six import text_type
     from nextgisweb.pyramid.util import _
+
 %>
 
 <%
@@ -13,12 +15,23 @@
     if request.matched_route is None or request.matched_route.name not in (login_route_name, logout_route_name):
         login_qs['next'] = request.url
     login_url = request.route_url(login_route_name, _query=login_qs)
+
+    # Fetching user details may fail sometimes, especially in error handlers!
+    try:
+        user = request.user
+        user_mode = 'guest' if user.keyname == 'guest' else (
+            'administrator' if user.is_administrator else 'authorized')
+        user_display_name = text_type(user)
+    except Exception:
+        user_mode = 'guest'
+        user_display_name = None
+
 %>
 
 <div id="header" class="header clearfix">
     <ul class="header-nav header__right">
         <li class="header-nav__item">
-            %if request.user.keyname == 'guest':
+            %if user_mode == 'guest':
                 <a href="${login_url}">${tr(_('Sign in'))}</a>
             %else:
                 <div class="user-avatar" id="userAvatar"></div>
@@ -63,9 +76,9 @@
     ], function (
         RightMenu, UserAvatar
     ) {
-        %if request.user.keyname != 'guest':
+        %if user_mode != 'guest':
             (new UserAvatar({
-                userName: '${request.user}',
+                userName: '${user_display_name}',
                 logoutLink: '${request.route_url(logout_route_name)}'
             })).placeAt('userAvatar');
         %endif
@@ -76,7 +89,7 @@
                     "text": '${tr(_("Resources"))}',
                     "link": '${request.route_url("resource.root")}'
                 }
-            %if request.user.is_administrator:
+            %if user_mode == 'administrator':
                 ,{
                     "text": '${tr(_("Control panel"))}',
                     "link": '${request.route_url("pyramid.control_panel")}'
@@ -95,8 +108,8 @@
             class: 'right-menu',
             withOverlay: true,
             loginLink: '${login_url}',
-            %if (request.user.keyname != 'guest'):
-              user: '${request.user}',
+            %if user_mode != 'guest':
+              user: '${user_display_name}',
               logoutLink: '${request.route_url(logout_route_name)}'
             %endif
         })).placeAt('rightMenu');

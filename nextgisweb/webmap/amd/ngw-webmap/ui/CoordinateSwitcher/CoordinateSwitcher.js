@@ -69,8 +69,8 @@ define([
                 var coord = that.coordinates[code];
                 if (coord) {
                     var pr = proj4(c.wkt);
-                    var x = coord[1];
-                    var y = coord[0];
+                    var x = coord[0];
+                    var y = coord[1];
                     var pushOption = function (opt) {
                         var el = put(
                             "span span $ + span.ngwPopup__coordinates-srs-name $ <", 
@@ -88,11 +88,11 @@ define([
                             fx = x.toFixed(6);
                             fy = y.toFixed(6);
                         } else if (degreeFormat == 'ddm') {
-                            fx = CoordinateConverter.DDtoDM(x, { lon: false, needString: true });
-                            fy = CoordinateConverter.DDtoDM(y, { lon: true, needString: true });
+                            fx = CoordinateConverter.DDtoDM(x, { lon: true, needString: true });
+                            fy = CoordinateConverter.DDtoDM(y, { lon: false, needString: true });
                         } else if (degreeFormat == 'dms') {
-                            fx = CoordinateConverter.DDtoDMS(x, { lon: false, needString: true });
-                            fy = CoordinateConverter.DDtoDMS(y, { lon: true, needString: true });
+                            fx = CoordinateConverter.DDtoDMS(x, { lon: true, needString: true });
+                            fy = CoordinateConverter.DDtoDMS(y, { lon: false, needString: true });
                         };
                         pushOption({
                             value: fx + ", " + fy,

@@ -126,5 +126,5 @@ class FileUploadComponent(Component):
         Option('max_size', int, default=8 * 2**30),
         Option('tus.enabled', bool, default=True),
         Option('tus.chunk_size.default', int, default=16 * 2**20),
-        Option('tus.chunk_size.minimum', int, default=4 * 2**20),
+        Option('tus.chunk_size.minimum', int, default=1 * 2**20),
     )

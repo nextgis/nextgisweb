@@ -12,7 +12,8 @@ from ..component import Component
 from ..models import DBSession
 from .. import db
 
-from .models import Base, Principal, User, Group, UserDisabled
+from .models import Base, Principal, User, Group
+from .exception import UserDisabledException
 from .policy import AuthenticationPolicy
 from .oauth import OAuthHelper, OAuthToken, OnAccessTokenToUser
 from .util import _
@@ -75,6 +76,9 @@ class AuthComponent(Component):
                 (User.id == user_id) if user_id is not None
                 else (User.keyname == 'guest')).one()
 
+            if user.disabled:
+                raise UserDisabledException()
+
             # Set user last activity
             delta = self.options['activity_delta']
             if user.last_activity is None or (datetime.utcnow() - user.last_activity) > delta:
@@ -87,9 +91,6 @@ class AuthComponent(Component):
 
             # Keep user in request environ for audit component
             request.environ['auth.user'] = user
-
-            if user.disabled:
-                raise UserDisabled()
 
             return user
 

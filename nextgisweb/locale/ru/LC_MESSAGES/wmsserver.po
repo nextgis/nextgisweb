@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2016-06-05 21:26+0700\n"
+"POT-Creation-Date: 2020-07-23 12:00+0000\n"
 "PO-Revision-Date: 2015-09-14 01:05+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,9 +17,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"Generated-By: Babel 2.6.0\n"
 
-#: model.py:20 view.py:256 amd/ngw-wmsserver/ServiceWidget.js:59
+#: amd/ngw-wmsserver/ServiceWidget.js:55 model.py:21 view.py:293
 msgid "WMS service"
 msgstr "Сервис WMS"
 
@@ -27,23 +27,27 @@ msgstr "Сервис WMS"
 msgid "Add"
 msgstr "Добавить"
 
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr "Выберите стиль слоя"
+
 #: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
 msgid "Remove"
 msgstr "Удалить"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:59
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:62
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:63
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:66
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:67
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:70
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:71
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:74
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
@@ -55,7 +59,9 @@ msgstr "Адрес WMS сервиса"
 msgid ""
 "Use this link in desktop client (e.g. {example}) to access raster "
 "representation of your data layers."
-msgstr "Используйте эту ссылку в настольном приложении (например, {example}) для просмотра растрового представления ваших слоёв."
+msgstr ""
+"Используйте эту ссылку в настольном приложении (например, {example}) для "
+"просмотра растрового представления ваших слоёв."
 
 #~ msgid "WMS URL"
 #~ msgstr "WMS URL"

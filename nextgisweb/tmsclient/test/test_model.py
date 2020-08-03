@@ -3,8 +3,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import numpy as np
 
-import webtest
-
 from nextgisweb.spatial_ref_sys.models import SRS, BOUNDS_EPSG_3857
 from nextgisweb.tmsclient import Layer
 
@@ -15,8 +13,7 @@ def image_compare(im1, im2):
     return np.array_equal(arr1, arr2)
 
 
-def test_layer(env, webapp):
-    webapp.authorization = ('Basic', ('administrator', 'admin'))
+def test_layer(ngw_webtest_app, ngw_auth_administrator):
     data = dict(
         resource=dict(
             cls='tmsclient_connection', display_name='test-tms_connection',
@@ -27,7 +24,7 @@ def test_layer(env, webapp):
             scheme='xyz',
         ),
     )
-    resp = webapp.post_json('/api/resource/', data, status=201)
+    resp = ngw_webtest_app.post_json('/api/resource/', data, status=201)
     connection_id = resp.json['id']
 
     maxzoom = 3
@@ -44,10 +41,10 @@ def test_layer(env, webapp):
             maxzoom=maxzoom,
         ),
     )
-    resp = webapp.post_json('/api/resource/', data, status=201)
+    resp = ngw_webtest_app.post_json('/api/resource/', data, status=201)
     layer_id = resp.json['id']
 
-    webapp.get('/api/component/render/tile?z=%d&x=0&y=0&resource=%d' % (
+    ngw_webtest_app.get('/api/component/render/tile?z=%d&x=0&y=0&resource=%d' % (
         maxzoom + 1, layer_id), status=422)
 
     layer = Layer.filter_by(id=layer_id).one()
@@ -63,5 +60,5 @@ def test_layer(env, webapp):
 
     assert image_compare(image1, image2.crop((0, 0, 256, 256)))
 
-    webapp.delete('/api/resource/%d' % layer_id, status=200)
-    webapp.delete('/api/resource/%d' % connection_id, status=200)
+    ngw_webtest_app.delete('/api/resource/%d' % layer_id, status=200)
+    ngw_webtest_app.delete('/api/resource/%d' % connection_id, status=200)
