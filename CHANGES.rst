@@ -1,6 +1,11 @@
 Changes
 =======
 
+3.4.2
+-----
+
+- Fix WMS layer creation.
+
 3.4.1
 -----
 
