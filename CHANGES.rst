@@ -14,6 +14,10 @@ Changes
 - Fix coordinates display format in webmap's identification pop-up.
 - Fix tile distortion issue for raster styles
 
+3.4.2
+-----
+
+- Fix WMS layer creation.
 
 3.4.1
 -----
