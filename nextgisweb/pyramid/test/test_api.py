@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import pytest
 from nextgisweb.component import Component, load_all
 
 
@@ -10,19 +11,24 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize('component', [c.identity for c in Component.registry])
 
 
-def test_route(webapp):
-    webapp.get('/api/component/pyramid/route')
+@pytest.fixture(scope='module')
+def webtest(ngw_webtest_factory):
+    return ngw_webtest_factory()
 
 
-def test_pkg_version(webapp):
-    webapp.get('/api/component/pyramid/pkg_version')
+def test_route(webtest):
+    webtest.get('/api/component/pyramid/route')
 
 
-def test_settings(component, webapp):
+def test_pkg_version(webtest):
+    webtest.get('/api/component/pyramid/pkg_version')
+
+
+def test_settings(component, webtest):
     if hasattr(Component.registry[component], 'client_settings'):
-        webapp.get('/api/component/pyramid/settings?component={}'.format(component))
+        webtest.get('/api/component/pyramid/settings?component={}'.format(component))
 
 
-def test_locdata(component, webapp):
-    webapp.get('/api/component/pyramid/locdata/{component}/en'.format(
+def test_locdata(component, webtest):
+    webtest.get('/api/component/pyramid/locdata/{component}/en'.format(
         component=component))

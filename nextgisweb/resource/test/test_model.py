@@ -12,7 +12,7 @@ from nextgisweb.resource.serialize import CompositeSerializer
 from nextgisweb.auth import User
 
 
-def test_root_serialize(txn):
+def test_root_serialize(ngw_txn):
     resource = Resource.filter_by(id=0).one()
     srlzr = CompositeSerializer(resource, resource.owner_user)
     srlzr.serialize()
@@ -23,7 +23,7 @@ def test_root_serialize(txn):
     assert data['resource']['cls'] == 'resource_group'
 
 
-def test_same_display_name(txn):
+def test_same_display_name(ngw_txn):
     margs = dict(
         parent_id=0, display_name='display name',
         owner_user=User.by_keyname('administrator'))

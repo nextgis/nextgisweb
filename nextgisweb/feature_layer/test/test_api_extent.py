@@ -1,23 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
-import random
-import webtest
+import json
+import six
 
 import pytest
 import transaction
-import json
-import six
-import os.path
-import pytest
 from uuid import uuid4
 from osgeo import ogr
 
 from nextgisweb.models import DBSession
-
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.spatial_ref_sys.models import SRS
-from nextgisweb.geometry import geom_from_wkt
 from nextgisweb.auth import User
 
 
@@ -37,12 +30,36 @@ def vector_layer_id():
             "name": "polygon_extent",
             "crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:EPSG::3857"}},
             "features": [
-                {"type": "Feature", "properties": {"name": "west"}, "geometry": {"type": "Polygon", "coordinates": [
-                    [[5542180, 8799167], [6191082, 7551279], [4668659, 7126998], [5542180, 8799167]]]}},
-                {"type": "Feature", "properties": {"name": "east"}, "geometry": {"type": "Polygon", "coordinates": [
-                    [[15100999, 10396463], [16498633, 10546209], [16673337, 9223449], [15175872, 8948913], [15100999, 10396463]]]}}
-            ]
+                {
+                    "type": "Feature",
+                    "properties": {"name": "west"},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [5542180, 8799167],
+                            [6191082, 7551279],
+                            [4668659, 7126998],
+                            [5542180, 8799167],
+                        ]],
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "properties": {"name": "east"},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [15100999, 10396463],
+                            [16498633, 10546209],
+                            [16673337, 9223449],
+                            [15175872, 8948913],
+                            [15100999, 10396463],
+                        ]],
+                    },
+                },
+            ],
         }
+
         dsource = ogr.Open(json.dumps(geojson))
         layer = dsource.GetLayer(0)
 
@@ -79,9 +96,7 @@ item_check_list = [
 
 
 @pytest.mark.parametrize('fid, extent', item_check_list)
-def test_item_extent(webapp, vector_layer_id, extent, fid):
-    webapp.authorization = ('Basic', ('administrator', 'admin'))  # FIXME:
+def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid, ngw_auth_administrator):
     req_str = '/api/resource/%d/feature/%d/extent' % (vector_layer_id, fid)
-    resp = webapp.get(req_str)
+    resp = ngw_webtest_app.get(req_str)
     assert extent == resp.json['extent']
-

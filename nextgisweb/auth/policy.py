@@ -27,11 +27,16 @@ class AuthenticationPolicy(object):
         self.comp = comp
         self.oauth = comp.oauth
         self.options = options
+        self.test_user = None
 
     def unauthenticated_userid(self, request):
         return None
 
     def authenticated_userid(self, request):
+        # Override current user in tests via ngw_auth_administrator fixture
+        if self.test_user is not None:
+            return User.by_keyname(self.test_user).id
+
         session = request.session
 
         # Session based authentication
@@ -54,7 +59,7 @@ class AuthenticationPolicy(object):
                             refresh_token=session['auth.policy.refresh_token'],
                             access_token=session['auth.policy.access_token'])
                         self.remember(request, (user_id, tresp))
-                    except OAuthTokenRefreshException as exc:
+                    except OAuthTokenRefreshException:
                         self.forget(request)
                         return None
 

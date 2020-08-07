@@ -5,7 +5,7 @@ from distutils.version import LooseVersion
 from nextgisweb.models import DBSession
 
 
-def test_postgres_version(txn):
+def test_postgres_version(ngw_txn):
     """ Useless PostgreSQL version check """
 
     version = LooseVersion(DBSession.execute(
@@ -13,7 +13,7 @@ def test_postgres_version(txn):
     assert version >= LooseVersion('9.3')
 
 
-def test_postgis_version(txn):
+def test_postgis_version(ngw_txn):
     """ Useless PostgreGIS version check """
 
     version = LooseVersion(DBSession.execute(

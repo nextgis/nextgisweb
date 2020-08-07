@@ -3,6 +3,7 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 import warnings
 import six
 from collections import defaultdict
+from contextlib import contextmanager
 
 from .otype import OptionType
 from .util import NO_DEFAULT
@@ -155,6 +156,32 @@ class ConfigOptions(object):
 
         return value
 
+    @contextmanager
+    def override(self, *args, **kwargs):
+        if len(args) > 1:
+            raise TypeError("Invalid args count")
+        elif len(args) == 1:
+            opts = dict(args[0], **kwargs)
+        else:
+            opts = dict(**kwargs)
+
+        restore = dict()
+        delete = list()
+        for k, v in opts.items():
+            if k not in self._values:
+                delete.append(k)
+            else:
+                restore[k] = self._values[k]
+            self._values[k] = v
+
+        try:
+            yield
+        finally:
+            self._values.update(restore)
+            for k in delete:
+                if k in self._values:
+                    del self._values[k]
+
     def with_prefix(self, prefix):
         """ Key prefixed proxy object for options access. """
 
@@ -167,12 +194,6 @@ class ConfigOptionsPrefixProxy(object):
         self._parent = parent
         self._prefix = prefix
 
-    def with_prefix(self, prefix):
-        return self._parent.with_prefix(self._prefix + '.' + prefix)
-
-    def _pkey(self, key):
-        return self._prefix + '.' + key
-
     def __getitem__(self, key):
         return self._parent[self._pkey(key)]
 
@@ -184,6 +205,23 @@ class ConfigOptionsPrefixProxy(object):
 
     def get(self, key, default=NO_DEFAULT):
         return self._parent.get(self._pkey(key), default=default)
+
+    def with_prefix(self, prefix):
+        return self._parent.with_prefix(self._prefix + '.' + prefix)
+
+    def override(self, *args, **kwargs):
+        if len(args) > 1:
+            raise TypeError("Invalid args count")
+        elif len(args) == 1:
+            opts = dict(args[0], **kwargs)
+        else:
+            opts = dict(**kwargs)
+
+        prefixed = dict([(self._pkey(k), v) for k, v in opts.items()])
+        return self._parent.override(prefixed)
+
+    def _pkey(self, key):
+        return self._prefix + '.' + key
 
 
 class MissingAnnotationWarning(Warning):

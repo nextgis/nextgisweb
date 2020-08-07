@@ -7,12 +7,12 @@ from nextgisweb.models import DBSession
 from nextgisweb.file_storage import FileObj
 
 
-def test_keep_delete(env, txn):
+def test_keep_delete(ngw_env, ngw_txn):
     fo_keep = FileObj(component='test').persist()
-    fn_keep = env.file_storage.filename(fo_keep, makedirs=True)
+    fn_keep = ngw_env.file_storage.filename(fo_keep, makedirs=True)
 
     fo_delete = FileObj(component='test')
-    fn_delete = env.file_storage.filename(fo_delete, makedirs=True)
+    fn_delete = ngw_env.file_storage.filename(fo_delete, makedirs=True)
 
     DBSession.flush()
 
@@ -20,7 +20,7 @@ def test_keep_delete(env, txn):
         with io.open(fn, 'w') as fd:
             fd.write(fn)
 
-    env.file_storage.cleanup()
+    ngw_env.file_storage.cleanup()
 
     assert os.path.isfile(fn_keep)
     assert not os.path.isfile(fn_delete)
