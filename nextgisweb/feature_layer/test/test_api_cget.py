@@ -30,11 +30,10 @@ check_list = [
 
 
 @pytest.fixture(scope='module')
-def vector_layer_id():
+def vector_layer_id(ngw_resource_group):
     with transaction.manager:
-
         obj = VectorLayer(
-            parent_id=0, display_name='vector_layer',
+            parent_id=ngw_resource_group, display_name='vector_layer',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
             tbl_uuid=six.text_type(uuid4().hex),

@@ -14,9 +14,9 @@ from nextgisweb.raster_layer.model import RasterLayer
     ('sochi-aster-colorized.tif', 4),
     ('sochi-aster-dem.tif', 1),
 ])
-def test_load_file(source, band_count, ngw_env, ngw_txn):
+def test_load_file(source, band_count, ngw_env, ngw_txn, ngw_resource_group):
     res = RasterLayer(
-        parent_id=0, display_name='test:{}'.format(source),
+        parent_id=ngw_resource_group, display_name='test:{}'.format(source),
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
     ).persist()

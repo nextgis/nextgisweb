@@ -19,9 +19,9 @@ from nextgisweb.render.util import pack_color, unpack_color
 
 
 @pytest.fixture
-def frtc(ngw_txn):
+def frtc(ngw_resource_group, ngw_txn):
     vector_layer = VectorLayer(
-        parent_id=0, display_name='from_fields',
+        parent_id=ngw_resource_group, display_name='from_fields',
         owner_user=User.by_keyname('administrator'),
         geometry_type='POINT',
         srs=SRS.filter_by(id=3857).one(),

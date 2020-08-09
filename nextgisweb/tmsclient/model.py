@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+from io import BytesIO
+from six.moves.urllib.parse import urlparse
 
 import PIL
 from osgeo import osr, ogr
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
-from six import BytesIO, PY3
 from zope.interface import implementer
 
 from .. import db
@@ -28,10 +29,6 @@ from ..resource import (
 from .util import _, crop_box, render_zoom
 from .session_keeper import get_session
 
-if PY3:
-    import urllib.parse as urlparse
-else:
-    from urlparse import urlparse
 
 Base = declarative_base()
 

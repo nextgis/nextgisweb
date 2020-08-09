@@ -20,10 +20,10 @@ def auth_administrator(ngw_auth_administrator):
 
 
 @pytest.fixture(scope="module")
-def raster_layer_id(ngw_env):
+def raster_layer_id(ngw_env, ngw_resource_group):
     with transaction.manager:
         obj = RasterLayer(
-            parent_id=0,
+            parent_id=ngw_resource_group,
             display_name="raster_layer.test:export",
             owner_user=User.by_keyname("administrator"),
             srs=SRS.filter_by(id=3857).one(),
@@ -59,7 +59,12 @@ def test_export_srs(epsg, ngw_webtest_app, raster_layer_id):
         assert srs.IsSame(srs_expected)
 
 
-@pytest.mark.parametrize("format", ["GTiff", "HFA", "RMF"])
+@pytest.mark.parametrize("format", [
+    "GTiff", "RMF",
+    pytest.param("HFA", marks=pytest.mark.skip(
+        gdal.VersionInfo() <= '2400000',
+        reason="Broken on GDAL <= 2.4"))
+])
 def test_export_format(format, ngw_webtest_app, raster_layer_id):
     resp = ngw_webtest_app.get(
         "/api/resource/%d/export" % raster_layer_id,

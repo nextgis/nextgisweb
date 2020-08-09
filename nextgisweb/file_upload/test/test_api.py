@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 from subprocess import check_call, check_output
+import six
 
 import pytest
 import webtest
@@ -95,7 +96,7 @@ def test_tus_client(ngw_httptest_app, tmp_path):
     check_call(['dd', 'if=/dev/zero', 'of=' + str(of), 'bs=1M', 'count=16'])
 
     burl = ngw_httptest_app.base_url + '/api/component/file_upload/'
-    furl = check_output(['tusc', 'client', burl, str(of)]).strip()
+    furl = six.ensure_text(check_output(['tusc', 'client', burl, str(of)])).strip()
     assert furl.strip().startswith(burl)
 
     response = ngw_httptest_app.get(furl)

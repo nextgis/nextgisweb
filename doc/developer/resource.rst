@@ -918,6 +918,58 @@ Where:
 
 * **resmeta** - resource metadata
 
+Changing resource permissions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To change resource permissions you need to do ``PUT`` request to resource JSON
+endpoint. In general g permissions doesn't different from g
+resource keyname or any other property.
+
+.. sourcecode:: http
+ 
+    PUT /api/resource/10
+
+    {
+      "resource": {
+        "permissions": [
+          {
+            "action": "allow", 
+            "principal": { "id": 10 }, 
+            "identity": "",
+            "scope": "", 
+            "permission": "", 
+            "propagate": true
+          },
+          {
+            "action": "allow", 
+            "principal": { "id": 20 }, 
+            "identity": "",
+            "scope": "resource", 
+            "permission": "read", 
+            "propagate": true
+          }
+        ]
+      }
+    }    
+
+Where:
+
+  * ``action`` - ``allow`` or ``deny``, priority of ``deny`` is higher then
+    ``allow``.
+
+  * ``principal`` - user or group for which this rule applies. Users and groups
+    are principals, so they share same ``id`` space.
+
+  * ``identity`` - resource class for which this rule applies. Empty string
+    means that this rule applies to all resource classes.
+  
+  * ``scope`` - see resource schema, empty string means "All resources".
+
+  * ``permission`` - see resource schem, empty string means "All permissions".
+
+  * ``propagate`` - should this rule apply to child resources or not.
+    
+
 Feature count
 ^^^^^^^^^^^^^
 
