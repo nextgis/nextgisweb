@@ -16,10 +16,10 @@ from nextgisweb.vector_layer import VectorLayer
 
 
 @pytest.fixture(scope='module')
-def vector_layer_id():
+def vector_layer_id(ngw_resource_group):
     with transaction.manager:
         obj = VectorLayer(
-            parent_id=0, display_name='test_wfs_vector_layer',
+            parent_id=ngw_resource_group, display_name='test_wfs_vector_layer',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
             tbl_uuid=six.text_type(uuid4().hex),
@@ -53,9 +53,9 @@ def vector_layer_id():
         DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
 
 
-def test_api(vector_layer_id, ngw_webtest_app, ngw_auth_administrator):
+def test_api(vector_layer_id, ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
     data = dict(
-        resource=dict(cls='wfsserver_service', display_name="test_wfs", parent=dict(id=0)),
+        resource=dict(cls='wfsserver_service', display_name="test_wfs", parent=dict(id=ngw_resource_group)),
         wfsserver_service=dict(layers=[dict(
             keyname="points",
             display_name="points",

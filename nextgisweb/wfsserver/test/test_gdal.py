@@ -25,10 +25,10 @@ def type_geojson_dataset():
 
 
 @pytest.fixture(scope='module')
-def service():
+def service(ngw_resource_group):
     with transaction.manager:
         res_vl = VectorLayer(
-            parent_id=0, display_name='test_vector_layer',
+            parent_id=ngw_resource_group, display_name='test_vector_layer',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
             tbl_uuid=six.text_type(uuid4().hex),
@@ -43,7 +43,7 @@ def service():
         DBSession.flush()
 
         res_wfs = WFSService(
-            parent_id=0, display_name='test_wfsserver_service',
+            parent_id=ngw_resource_group, display_name='test_wfsserver_service',
             owner_user=User.by_keyname('administrator'),
         ).persist()
 
