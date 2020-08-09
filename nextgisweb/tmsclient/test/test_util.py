@@ -15,7 +15,7 @@ from nextgisweb.tmsclient.util import crop_box, render_zoom
     ((100, 100, 900, 700), (200, 200, 400, 300), 100, 100, (13, 67, 38, 83)),
 ))
 def test_crop_box(ngw_txn, src_extent, dst_extent, width, height, expected):
-    box = crop_box(tuple(map(float, src_extent)), tuple(map(float, dst_extent)), width, height)
+    box = crop_box(src_extent, dst_extent, width, height)
     assert box == expected
 
 
@@ -26,5 +26,5 @@ def test_crop_box(ngw_txn, src_extent, dst_extent, width, height, expected):
 ))
 def test_render_zoom(ngw_txn, srs_id, extent, size, tilesize, expected):
     srs = SRS.filter_by(id=srs_id).one()
-    zoom = render_zoom(srs, tuple(map(float, extent)), size, tilesize)
+    zoom = render_zoom(srs, extent, size, tilesize)
     assert zoom == expected
