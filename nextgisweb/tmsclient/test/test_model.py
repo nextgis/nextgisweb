@@ -13,11 +13,11 @@ def image_compare(im1, im2):
     return np.array_equal(arr1, arr2)
 
 
-def test_layer(ngw_webtest_app, ngw_auth_administrator):
+def test_layer(ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
     data = dict(
         resource=dict(
             cls='tmsclient_connection', display_name='test-tms_connection',
-            parent=dict(id=0),
+            parent=dict(id=ngw_resource_group),
         ),
         tmsclient_connection=dict(
             url_template='https://tile.openstreetmap.fr/{layer}/{z}/{x}/{y}.png',
@@ -31,7 +31,7 @@ def test_layer(ngw_webtest_app, ngw_auth_administrator):
     data = dict(
         resource=dict(
             cls='tmsclient_layer', display_name='test-tms_layer',
-            parent=dict(id=0),
+            parent=dict(id=ngw_resource_group),
         ),
         tmsclient_layer=dict(
             connection=dict(id=connection_id),

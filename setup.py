@@ -82,6 +82,7 @@ entry_points = {
         'nextgisweb.core = nextgisweb.core.test',
         'nextgisweb.pyramid = nextgisweb.pyramid.test',
         'nextgiswev.auth = nextgisweb.auth.test',
+        'nextgiswev.resource = nextgisweb.resource.test',
     ],
 
     'console_scripts': [

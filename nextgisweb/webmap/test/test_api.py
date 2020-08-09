@@ -20,10 +20,10 @@ def enable_annotation(ngw_env):
 
 
 @pytest.fixture(scope='module')
-def webmap(ngw_env):
+def webmap(ngw_env, ngw_resource_group):
     with transaction.manager:
         obj = WebMap(
-            parent_id=0, display_name=__name__,
+            parent_id=ngw_resource_group, display_name=__name__,
             owner_user=User.by_keyname('administrator'),
             root_item=WebMapItem(item_type='root')
         ).persist()

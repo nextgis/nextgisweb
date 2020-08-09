@@ -22,6 +22,7 @@ WKT_EPSG_3857 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_19
 BOUNDS_EPSG_4326 = (-180, -90, 180, 90)
 BOUNDS_EPSG_3857 = (-20037508.34, -20037508.34, 20037508.34, 20037508.34)
 
+
 class SRS(Base):
     __tablename__ = 'srs'
 
@@ -119,7 +120,7 @@ class SRS(Base):
         if ytile_max % 1 < E:
             ytile_max -= 1
 
-        return map(int, (xtile_min, ytile_min, xtile_max, ytile_max))
+        return [int(xtile_min), int(ytile_min), int(xtile_max), int(ytile_max)]
 
     def __str__(self):
         return self.display_name

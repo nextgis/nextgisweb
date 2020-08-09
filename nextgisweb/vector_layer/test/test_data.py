@@ -21,9 +21,9 @@ DATA_PATH = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'data')
 
 
-def test_from_fields(ngw_txn):
+def test_from_fields(ngw_resource_group, ngw_txn):
     res = VectorLayer(
-        parent_id=0, display_name='from_fields',
+        parent_id=ngw_resource_group, display_name='from_fields',
         owner_user=User.by_keyname('administrator'),
         geometry_type='POINT',
         srs=SRS.filter_by(id=3857).one(),
@@ -51,13 +51,13 @@ def test_from_fields(ngw_txn):
     'shapefile-point-utf8.zip/layer.shp',
     'shapefile-point-win1251.zip/layer.shp',
     'geojson-point.zip/layer.geojson'))
-def test_from_ogr(data, ngw_txn):
+def test_from_ogr(data, ngw_resource_group, ngw_txn):
     src = os.path.join(DATA_PATH, data)
     dsource = ogr.Open('/vsizip/' + src)
     layer = dsource.GetLayer(0)
 
     res = VectorLayer(
-        parent_id=0, display_name='from_ogr',
+        parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
         tbl_uuid=six.text_type(uuid4().hex),
@@ -86,7 +86,7 @@ def test_from_ogr(data, ngw_txn):
     assert fields['unicode'] == 'Значимость этих проблем настолько очевидна, что реализация намеченных плановых заданий требуют определения и уточнения.'  # NOQA: E501
 
 
-def test_type_geojson(ngw_txn):
+def test_type_geojson(ngw_resource_group, ngw_txn):
     src = Path(__file__).parent / 'data' / 'type.geojson'
 
     dataset = ogr.Open(str(src))
@@ -96,7 +96,7 @@ def test_type_geojson(ngw_txn):
     assert layer is not None, gdal.GetLastErrorMsg()
 
     res = VectorLayer(
-        parent_id=0, display_name='from_ogr',
+        parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
         tbl_uuid=six.text_type(uuid4().hex))
@@ -120,6 +120,9 @@ def test_type_geojson(ngw_txn):
         if t in ('Date', 'Time', 'DateTime'):
             result = [int(v) for v in result]
 
+        if t == 'String' and six.PY2:
+            result = result.decode('utf-8')
+
         return result
 
     for feat, ref in zip(res.feature_query()(), layer):
@@ -131,4 +134,4 @@ def test_type_geojson(ngw_txn):
         assert fields['time'] == time(*field_as(ref, 'time', 'DateTime')[3:6])
         assert fields['datetime'] == datetime(*field_as(ref, 'datetime', 'DateTime')[0:6])
         assert fields['string'] == field_as(ref, 'string', 'String')
-        assert fields['unicode'] == field_as(ref, 'unicode', 'String').decode('utf-8')
+        assert fields['unicode'] == field_as(ref, 'unicode', 'String')

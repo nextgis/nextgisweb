@@ -88,7 +88,7 @@ def test_tile_extent(ngw_txn, srs_id, tile, expected):
 ))
 def test_extent_tile_range(ngw_txn, srs_id, extent, z, expected):
     srs = SRS.filter_by(id=srs_id).one()
-    tile_range = srs.extent_tile_range(map(float, extent), z)
+    tile_range = srs.extent_tile_range(tuple(map(float, extent)), z)
     assert tile_range == expected
 
 
@@ -96,7 +96,7 @@ def test_point_tilexy(ngw_txn):
     zoom = 12
     vdk_x, vdk_y = 14681475, 5329463
     srs_3857 = SRS.filter_by(id=3857).one()
-    assert map(int, srs_3857._point_tilexy(vdk_x, vdk_y, zoom)) == [3548, 1503]
+    assert list(map(int, srs_3857._point_tilexy(vdk_x, vdk_y, zoom))) == [3548, 1503]
 
     srs_3395 = SRS(
         wkt=WKT_EPSG_3395,
@@ -107,4 +107,4 @@ def test_point_tilexy(ngw_txn):
     )
 
     vdk_x, vdk_y = 14681475, 5300249
-    assert map(int, srs_3395._point_tilexy(vdk_x, vdk_y, zoom)) == [3548, 1506]
+    assert list(map(int, srs_3395._point_tilexy(vdk_x, vdk_y, zoom))) == [3548, 1506]

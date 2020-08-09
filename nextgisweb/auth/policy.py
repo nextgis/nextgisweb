@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import six
 from logging import getLogger
 from datetime import datetime, timedelta
 from base64 import b64decode
@@ -85,12 +86,12 @@ class AuthenticationPolicy(object):
 
         ahead = request.headers.get('Authorization')
         if ahead is not None:
-            ahead = ahead.decode('utf-8')
+            ahead = six.ensure_text(ahead)
             amode, value = ahead.split(' ')
             amode = amode.upper()
 
             if amode == 'BASIC':
-                username, password = b64decode(value).split(':')
+                username, password = six.ensure_text(b64decode(value)).split(':')
 
                 # Allow token authorization via basic when
                 # username is empty (for legacy clients).

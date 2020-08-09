@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
+from six import ensure_str
 import tempfile
-import itertools
 
 from osgeo import gdal
 from pyramid.response import FileResponse
@@ -35,31 +34,28 @@ def export(request):
 
     driver = EXPORT_FORMAT_GDAL[format]
 
-    # creation options
-    co = list(driver.options or [])
-    wopts = ["-f", driver.name, "-t_srs", srs.wkt] + list(
-        itertools.chain(*[("-co", o) for o in co])
-    )
-
     filename = "%d.%s" % (request.context.id, driver.extension,)
-    content_disposition = b"attachment; filename=%s" % filename
+    content_disposition = "attachment; filename=%s" % filename
 
     def _warp(source_filename):
         with tempfile.NamedTemporaryFile(suffix=".%s" % driver.extension) as tmp_file:
             try:
                 gdal.UseExceptions()
                 gdal.Warp(
-                    tmp_file.name,
-                    source_filename,
-                    options=gdal.WarpOptions(options=wopts),
+                    tmp_file.name, source_filename,
+                    options=gdal.WarpOptions(
+                        format=driver.name, dstSRS=srs.wkt,
+                        creationOptions=driver.options
+                    ),
                 )
             except RuntimeError as e:
                 raise ValidationError(str(e))
             finally:
                 gdal.DontUseExceptions()
 
-            response = FileResponse(tmp_file.name, content_type=driver.mime)
-            response.content_disposition = content_disposition
+            response = FileResponse(tmp_file.name, content_type=(
+                ensure_str(driver.mime) if driver.mime else None))
+            response.content_disposition = ensure_str(content_disposition)
             return response
 
     source_filename = env.raster_layer.workdir_filename(request.context.fileobj)

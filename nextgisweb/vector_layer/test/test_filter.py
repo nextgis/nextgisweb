@@ -49,13 +49,13 @@ for c in check_list:
 
 
 @pytest.fixture
-def resource(ngw_txn):
+def resource(ngw_txn, ngw_resource_group):
     src = os.path.join(DATA_PATH, 'geojson-point.zip/layer.geojson')
     dsource = ogr.Open('/vsizip/' + src)
     layer = dsource.GetLayer(0)
 
     resource = VectorLayer(
-        parent_id=0, display_name='from_ogr',
+        parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
         tbl_uuid=six.text_type(uuid4().hex),

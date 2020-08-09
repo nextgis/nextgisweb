@@ -135,14 +135,15 @@ def login(request):
             "keyname": user.keyname,
             "display_name": user.display_name,
             "description": user.description
-        }), status_code=200,
-        content_type='application/json',
-        headers=headers)
+        }), status_code=200, headers=headers,
+        content_type='application/json', charset='utf-8')
 
 
 def logout(request):
     headers = forget(request)
-    return Response(json.dumps({}), headers=headers)
+    return Response(
+        json.dumps({}), headers=headers,
+        content_type='application/json', charset='utf-8')
 
 
 def setup_pyramid(comp, config):
