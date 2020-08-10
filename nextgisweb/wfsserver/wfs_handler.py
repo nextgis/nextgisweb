@@ -191,6 +191,10 @@ class WFSHandler():
                 else:
                     datatype = field.datatype.lower()
                 El('element', dict(minOccurs='0', name=field.keyname, type=datatype), parent=__seq)
+
+            if layer.resource.geometry_type not in GEOM_TYPE_TO_GML_TYPE:
+                raise ValidationError("Geometry type not supported: %s"
+                                      % layer.resource.geometry_type)                                      
             El('element', dict(minOccurs='0', name='geom', type=GEOM_TYPE_TO_GML_TYPE[
                 layer.resource.geometry_type]), parent=__seq)
         else:
