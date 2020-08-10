@@ -2,5 +2,5 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from ..i18n import trstring_factory
 
-COMP_ID = 'resource_social'
+COMP_ID = 'social'
 _ = trstring_factory(COMP_ID)

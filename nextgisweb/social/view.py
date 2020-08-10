@@ -7,7 +7,7 @@ from ..resource import Resource, Widget
 class Widget(Widget):
     resource = Resource
     operation = ('create', 'update')
-    amdmod = 'ngw-resource-social/Widget'
+    amdmod = 'ngw-social/Widget'
 
     def is_applicable(self):
         return self.obj.check_social_editable()
