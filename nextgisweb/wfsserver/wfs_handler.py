@@ -7,6 +7,7 @@ from lxml.builder import ElementMaker
 from osgeo import ogr, osr
 from six import BytesIO, text_type
 
+from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..geometry import box, geom_from_wkb
 from ..resource import DataScope
@@ -16,6 +17,10 @@ from .model import Layer
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
 VERSION = '2.0.2'
+VERSION_SUPPORTED = (
+    '2.0.0',
+    VERSION
+)
 
 
 nsmap = dict(
@@ -85,6 +90,9 @@ class WFSHandler():
         # 6.2.5.2 Parameter names shall not be case sensitive
         params = dict((k.upper(), v) for k, v in request.params.items())
         self.p_requset = params.get('REQUEST')
+        self.p_version = params.get('VERSION')
+        if self.p_version is None:
+            self.p_version = VERSION
         self.p_typenames = params.get('TYPENAMES')
         if self.p_typenames is None:
             self.p_typenames = params.get('TYPENAME')
@@ -93,6 +101,8 @@ class WFSHandler():
         self.p_srsname = params.get('SRSNAME')
 
     def response(self):
+        if self.p_version not in VERSION_SUPPORTED:
+            raise ValidationError('Unsupported version')
         if self.request.method == 'GET':
             if self.p_requset == 'GetCapabilities':
                 return self._get_capabilities()
