@@ -409,7 +409,9 @@ def setup_pyramid(comp, config):
         if hasattr(request, 'context') and isinstance(request.context, Resource):
             social = request.context.social
             if social is not None:
-                image = request.route_url('resource.preview', id=request.context.id) \
+                image = request.route_url(
+                    'resource.preview', id=request.context.id,
+                    _query=str(social.preview_fileobj_id)) \
                     if social.preview_fileobj is not None else defaults['image']
                 description = social.preview_description \
                     if social.preview_description is not None else defaults['description']
