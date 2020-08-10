@@ -262,12 +262,13 @@ class WFSHandler():
 
             for field in feature.fields:
                 _field = El(field, parent=__feature, namespace=nsmap['fs'])
-
                 value = feature.fields[field]
                 if value is not None:
                     if not isinstance(value, text_type):
                         value = str(value)
                     _field.text = value
+                else:
+                    _field.set(ns_attr('xsi', 'nil'), 'true')
 
         return etree.tostring(root)
 
