@@ -20,7 +20,7 @@ from .util import COMP_ID
 Base = declarative_base()
 
 
-class ResourceSocial(Base):
+class Social(Base):
     __tablename__ = COMP_ID
 
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
@@ -36,7 +36,7 @@ class _preview_file_upload_attr(SP):
 
     def setter(self, srlzr, value):
         if srlzr.obj.social is None:
-            srlzr.obj.social = ResourceSocial()
+            srlzr.obj.social = Social()
 
         social = srlzr.obj.social
         if value is not None:
@@ -68,11 +68,11 @@ class _preview_description_attr(SP):
 
     def setter(self, srlzr, value):
         if srlzr.obj.social is None:
-            srlzr.obj.social = ResourceSocial()
+            srlzr.obj.social = Social()
         srlzr.obj.social.preview_description = value
 
 
-class ResourceSocialSerializer(Serializer):
+class SocialSerializer(Serializer):
     identity = COMP_ID
     resclass = Resource
 

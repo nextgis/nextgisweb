@@ -7,7 +7,7 @@ from .util import COMP_ID
 from .model import Base
 
 
-class ResourceSocialComponent(Component):
+class SocialComponent(Component):
     identity = COMP_ID
     metadata = Base.metadata
 
