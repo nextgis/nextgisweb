@@ -247,10 +247,13 @@ class WFSHandler():
             __geom.append(__gml)
 
             for field in feature.fields:
+                _field = El(field, parent=__feature, namespace=nsmap['fs'])
+
                 value = feature.fields[field]
-                if not isinstance(value, text_type):
-                    value = str(value)
-                El(field, parent=__feature, namespace=nsmap['fs'], text=value)
+                if value is not None:
+                    if not isinstance(value, text_type):
+                        value = str(value)
+                    _field.text = value
 
         return etree.tostring(root)
 
