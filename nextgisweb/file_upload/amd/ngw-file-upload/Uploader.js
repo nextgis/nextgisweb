@@ -49,6 +49,7 @@ define([
         constructor: function () {
             this.upload_promise = undefined;
             this.docTitle = document.title;
+            this._accept = '';
         },
         postCreate: function () {
             this.uploaderWidget = new Uploader({
@@ -58,6 +59,9 @@ define([
                 url: route.file_upload.collection(),
                 name: "file"
             }).placeAt(this.fileUploader);
+
+            // Keep accept on reset
+            this.connect(this.uploaderWidget, '_createInput', this._setAccept);
 
             var widget = this;
             this.uploaderWidget.on("begin", function () { widget.uploadBegin(); });
@@ -95,7 +99,12 @@ define([
         },
 
         setAccept: function (accept) {
-            this.uploaderWidget.inputNode.accept = accept;
+            this._accept = accept;
+            this._setAccept();
+        },
+
+        _setAccept: function () {
+            this.uploaderWidget.inputNode.accept = this._accept;
         },
 
         uploadBegin: function () {
