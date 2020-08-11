@@ -339,7 +339,8 @@ class WFSHandler():
                         if key == geom_column:
                             feature.geom = geom_from_gml(_value[0])
                         else:
-                            feature.fields[key] = _value.text
+                            value = None if _value is None else _value.text
+                            feature.fields[key] = value
 
                     feature_layer.feature_put(feature)
 
