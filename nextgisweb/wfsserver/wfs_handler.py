@@ -54,11 +54,12 @@ def El(tag, attrs=None, parent=None, text=None, namespace=None):
     return e
 
 
+GML_FORMAT = 'GML3'
 WFS_OPERATIONS = (
     ('GetCapabilities', ()),
     ('DescribeFeatureType', ()),
-    ('GetFeature', ('GML2', )),
-    ('Transaction', ('GML2', )),
+    ('GetFeature', (GML_FORMAT, )),
+    ('Transaction', (GML_FORMAT, )),
 )
 
 
@@ -255,7 +256,7 @@ class WFSHandler():
                            parent=__member, namespace=nsmap['fs'])
 
             geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
-            gml = geom.ExportToGML(['FORMAT=GML2', 'NAMESPACE_DECL=YES'])
+            gml = geom.ExportToGML(['FORMAT=%s' % GML_FORMAT, 'NAMESPACE_DECL=YES'])
             __geom = El('geom', parent=__feature, namespace=nsmap['fs'])
             __gml = etree.fromstring(gml)
             __geom.append(__gml)
