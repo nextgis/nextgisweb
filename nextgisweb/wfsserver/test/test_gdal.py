@@ -110,6 +110,36 @@ def test_compare(key, features):
         vref = getattr(ref, gname)(iref)
 
         if dtst.GetType() == ogr.OFTReal:
-            assert vtst - vref < 1e-6
+            assert abs(vtst - vref) < 1e-6
         else:
             assert vtst == vref
+
+
+@pytest.mark.parametrize('fields', (
+    dict(null='not null', int=42, real=-0.0, string=None, unicode='¯\\_(ツ)_/¯'),
+    dict(null=None, int=2**16, real=3.1415926535897, string='', unicode='مرحبا بالعالم'),
+))
+def test_edit(service, ngw_httptest_app, ngw_auth_administrator, fields):
+    driver = ogr.GetDriverByName(b'WFS')
+    wfs_ds = driver.Open('WFS:' + ngw_httptest_app.base_url + '/api/resource/{}/wfs'.format(
+        service), 1)
+
+    wfs_layer = wfs_ds.GetLayer(0)
+    feature = wfs_layer.GetNextFeature()
+
+    for k, v in fields.items():
+        if v is None:
+            feature.SetFieldNull(k)
+        else:
+            feature.SetField(k, v)
+
+    wfs_layer.SetFeature(feature)
+
+    vector_layer_id = ngw_httptest_app.get('/api/resource/%d' % service) \
+        .json()['wfsserver_service']['layers'][0]['resource_id']
+
+    feature_cmp = ngw_httptest_app.get('/api/resource/%d/feature/1' % vector_layer_id).json()
+
+    for k, v in fields.items():
+        v_cmp = feature_cmp['fields'][k]
+        assert abs(v_cmp - v) < 1e-6 if k == 'real' and v is not None else v_cmp == v
