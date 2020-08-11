@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 import six
+from itertools import product
 from uuid import uuid4
 
 import pytest
@@ -14,6 +15,9 @@ from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.wfsserver.model import Service as WFSService, Layer as WFSLayer
+
+
+TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 
 
 def type_geojson_dataset():
@@ -68,31 +72,39 @@ def service(ngw_resource_group):
 def features(service, ngw_httptest_app, ngw_auth_administrator):
     # Module scope doesn't work here because of function scope fixtures.
     # Let's manually cache result in function attribute _cached_result.
-    if not hasattr(features, '_cached_result'):
-        wfs_ds = ogr.Open('WFS:' + ngw_httptest_app.base_url + '/api/resource/{}/wfs'.format(
-            service))
-        assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
-        wfs_layer = wfs_ds.GetLayer(0)
-        assert wfs_layer is not None, gdal.GetLastErrorMsg()
+    def factory(version):
+        if not hasattr(factory, '_cache'):
+            factory._cache = dict()
 
-        ref_ds = type_geojson_dataset()
-        ref_layer = ref_ds.GetLayer(0)
+        if version not in factory._cache:
+            wfs_ds = ogr.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
+                ngw_httptest_app.base_url, service, version), True)
+            assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
-        features._cached_result = list(zip(wfs_layer, ref_layer))
-        features._wfs_ds = wfs_ds  # Keep GDAL references
-        features._ref_ds = ref_ds  # Keep GDAL references
+            wfs_layer = wfs_ds.GetLayer(0)
+            assert wfs_layer is not None, gdal.GetLastErrorMsg()
 
-    yield features._cached_result
+            ref_ds = type_geojson_dataset()
+            ref_layer = ref_ds.GetLayer(0)
+
+            factory._cache[version] = (
+                list(zip(wfs_layer, ref_layer)),
+                wfs_ds, ref_ds,  # Just for keep GDAL references
+            )
+
+        return factory._cache[version][0]
+
+    return factory
 
 
-@pytest.mark.parametrize('key', (
+@pytest.mark.parametrize('version, key', product(TEST_WFS_VERSIONS, (
     'null', 'int', 'real', 'string', 'unicode',
     # Date, time and datetime types seem to be broken
     # 'date', 'time', 'datetime',
-))
-def test_compare(key, features):
-    for tst, ref in features:
+)))
+def test_compare(version, key, features):
+    for tst, ref in features(version):
         itst = tst.GetFieldIndex(key)
         iref = ref.GetFieldIndex(key)
 
@@ -115,14 +127,15 @@ def test_compare(key, features):
             assert vtst == vref
 
 
-@pytest.mark.parametrize('fields', (
+@pytest.mark.parametrize('version, fields', product(TEST_WFS_VERSIONS, (
     dict(null='not null', int=42, real=-0.0, string=None, unicode='¯\\_(ツ)_/¯'),
     dict(null=None, int=2**16, real=3.1415926535897, string='', unicode='مرحبا بالعالم'),
-))
-def test_edit(service, ngw_httptest_app, ngw_auth_administrator, fields):
-    driver = ogr.GetDriverByName(b'WFS')
-    wfs_ds = driver.Open('WFS:' + ngw_httptest_app.base_url + '/api/resource/{}/wfs'.format(
-        service), 1)
+)))
+def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator):
+    driver = ogr.GetDriverByName(six.ensure_str('WFS'))
+    wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
+        ngw_httptest_app.base_url, service, version), True)
+    assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
     wfs_layer = wfs_ds.GetLayer(0)
     feature = wfs_layer.GetNextFeature()

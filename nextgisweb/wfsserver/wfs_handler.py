@@ -216,7 +216,7 @@ class WFSHandler():
 
             if layer.resource.geometry_type not in GEOM_TYPE_TO_GML_TYPE:
                 raise ValidationError("Geometry type not supported: %s"
-                                      % layer.resource.geometry_type)                                      
+                                      % layer.resource.geometry_type)
             El('element', dict(minOccurs='0', name='geom', type=GEOM_TYPE_TO_GML_TYPE[
                 layer.resource.geometry_type]), parent=__seq)
         else:
