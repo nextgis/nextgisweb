@@ -16,11 +16,13 @@ from ..spatial_ref_sys import SRS
 from .model import Layer
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
-VERSION = '2.0.2'
-VERSION_SUPPORTED = (
-    '2.0.0',
-    VERSION
-)
+v100 = '1.0.0'
+v200 = '2.0.0'
+v202 = '2.0.2'
+VERSION_VIEW_SUPPORTED = (v200, v202)
+VERSION_EDIT_SUPPORTED = (v100, v200, v202)
+
+VERSION_DEFAULT = v202
 
 
 nsmap = dict(
@@ -37,7 +39,7 @@ def ns_attr(ns, attr):
 
 
 def ns_trim(value):
-    pos = value.find('}')
+    pos = max(value.find('}'), value.rfind(':'))
     return value[pos + 1:]
 
 
@@ -88,12 +90,23 @@ class WFSHandler():
         self.resource = resource
         self.request = request
 
+        if self.request.method == 'GET':
+            params = request.params
+        elif self.request.method == 'POST':
+            self.root_body = etree.parse(BytesIO(self.request.body)).getroot()
+            params = self.root_body.attrib
+        else:
+            raise ValidationError("Unsupported request method")
+
         # 6.2.5.2 Parameter names shall not be case sensitive
         params = dict((k.upper(), v) for k, v in request.params.items())
-        self.p_requset = params.get('REQUEST')
+
+        self.p_requset = params.get('REQUEST') if self.request.method == 'GET' \
+            else ns_trim(self.root_body.tag)
+
         self.p_version = params.get('VERSION')
         if self.p_version is None:
-            self.p_version = VERSION
+            self.p_version = VERSION_DEFAULT
         self.p_typenames = params.get('TYPENAMES')
         if self.p_typenames is None:
             self.p_typenames = params.get('TYPENAME')
@@ -102,24 +115,26 @@ class WFSHandler():
         self.p_srsname = params.get('SRSNAME')
 
     def response(self):
-        if self.p_version not in VERSION_SUPPORTED:
-            raise ValidationError('Unsupported version')
-        if self.request.method == 'GET':
-            if self.p_requset == 'GetCapabilities':
-                return self._get_capabilities()
-            elif self.p_requset == 'DescribeFeatureType':
-                return self._describe_feature_type()
-            elif self.p_requset == 'GetFeature':
-                return self._get_feature()
-            else:
-                raise NotImplementedError()
-        elif self.request.method == 'POST':
+        def check_version(supported):
+            if self.p_version not in supported:
+                raise ValidationError("Unsupported version")
+
+        if self.p_requset == 'Transaction':
+            check_version(VERSION_EDIT_SUPPORTED)
             return self._transaction()
+
+        check_version(VERSION_VIEW_SUPPORTED)
+        if self.p_requset == 'GetCapabilities':
+            return self._get_capabilities()
+        elif self.p_requset == 'DescribeFeatureType':
+            return self._describe_feature_type()
+        elif self.p_requset == 'GetFeature':
+            return self._get_feature()
         else:
-            raise NotImplementedError()
+            raise ValidationError("Unsupported request")
 
     def _get_capabilities(self):
-        root = El('WFS_Capabilities', dict(version=VERSION))
+        root = El('WFS_Capabilities', dict(version=VERSION_DEFAULT))
 
         __s = El('Service', parent=root)
         El('Name', parent=__s, text='WFS Server')
@@ -274,9 +289,7 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _transaction(self):
-        root = etree.parse(BytesIO(self.request.body)).getroot()
-        if root.tag != ns_attr('wfs', 'Transaction'):
-            raise NotImplementedError()
+        v_gt200 = self.p_version >= v200
 
         layers = dict()
 
@@ -295,7 +308,7 @@ class WFSHandler():
         _summary = El('TransactionSummary', namespace=nsmap['wfs'], parent=_response)
         summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
 
-        for _operation in root:
+        for _operation in self.root_body:
             if _operation.tag == ns_attr('wfs', 'Insert'):
                 _layer = _operation[0]
                 keyname = ns_trim(_layer.tag)
@@ -320,11 +333,15 @@ class WFSHandler():
                 summary['totalInserted'] += 1
             else:
                 keyname = _operation.get('typeName')
+                if v_gt200:
+                    keyname = ns_trim(keyname)
                 feature_layer = find_layer(keyname)
 
                 _filter = _operation.find(ns_attr('ogc', 'Filter'))
-                _feature_id = _filter.find(ns_attr('ogc', 'FeatureId'))
-                fid = int(_feature_id.get('fid'))
+                resid_tag = 'ResourceId' if v_gt200 else 'FeatureId'
+                resid_attr = 'rid' if v_gt200 else 'fid'
+                _feature_id = _filter.find(ns_attr('ogc', resid_tag))
+                fid = int(_feature_id.get(resid_attr))
 
                 if _operation.tag == ns_attr('wfs', 'Update'):
                     query = feature_layer.feature_query()
