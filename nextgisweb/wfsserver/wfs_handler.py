@@ -19,8 +19,7 @@ from .model import Layer
 v100 = '1.0.0'
 v200 = '2.0.0'
 v202 = '2.0.2'
-VERSION_VIEW_SUPPORTED = (v200, v202)
-VERSION_EDIT_SUPPORTED = (v100, v200, v202)
+VERSION_SUPPORTED = (v100, v200, v202)
 
 VERSION_DEFAULT = v202
 
@@ -121,21 +120,17 @@ class WFSHandler():
         self.p_srsname = params.get('SRSNAME')
 
     def response(self):
-        def check_version(supported):
-            if self.p_version not in supported:
-                raise ValidationError("Unsupported version")
+        if self.p_version not in VERSION_SUPPORTED:
+            raise ValidationError("Unsupported version")
 
-        if self.p_requset == 'Transaction':
-            check_version(VERSION_EDIT_SUPPORTED)
-            return self._transaction()
-
-        check_version(VERSION_VIEW_SUPPORTED)
         if self.p_requset == 'GetCapabilities':
             return self._get_capabilities()
         elif self.p_requset == 'DescribeFeatureType':
             return self._describe_feature_type()
         elif self.p_requset == 'GetFeature':
             return self._get_feature()
+        elif self.p_requset == 'Transaction':
+            return self._transaction()
         else:
             raise ValidationError("Unsupported request")
 
