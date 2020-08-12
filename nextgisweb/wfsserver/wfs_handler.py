@@ -333,9 +333,7 @@ class WFSHandler():
 
                 summary['totalInserted'] += 1
             else:
-                keyname = _operation.get('typeName')
-                if v_gt200:
-                    keyname = ns_trim(keyname)
+                keyname = ns_trim(_operation.get('typeName'))
                 feature_layer = find_layer(keyname)
 
                 _filter = _operation.find(ns_attr('ogc', 'Filter'))
