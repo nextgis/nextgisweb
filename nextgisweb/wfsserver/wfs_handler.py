@@ -135,7 +135,7 @@ class WFSHandler():
             raise ValidationError("Unsupported request")
 
     def _get_capabilities(self):
-        root = El('WFS_Capabilities', dict(version=VERSION_DEFAULT))
+        root = El('WFS_Capabilities', dict(version=self.p_version))
 
         __s = El('Service', parent=root)
         El('Name', parent=__s, text='WFS Server')
