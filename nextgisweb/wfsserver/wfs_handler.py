@@ -104,7 +104,7 @@ class WFSHandler():
             raise ValidationError("Unsupported request method")
 
         # 6.2.5.2 Parameter names shall not be case sensitive
-        params = dict((k.upper(), v) for k, v in request.params.items())
+        params = dict((k.upper(), v) for k, v in params.items())
 
         self.p_requset = params.get('REQUEST') if self.request.method == 'GET' \
             else ns_trim(self.root_body.tag)
