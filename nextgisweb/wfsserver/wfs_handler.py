@@ -28,7 +28,6 @@ nsmap = dict(
     wfs='http://www.opengis.net/wfs',
     gml='http://www.opengis.net/gml',
     ogc='http://www.opengis.net/ogc',
-    fs='http://featureserver.org/fs',
     xsi='http://www.w3.org/2001/XMLSchema-instance'
 )
 
@@ -183,9 +182,9 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _describe_feature_type(self):
-        EM = ElementMaker(nsmap=dict(gml=nsmap['gml'], fs=nsmap['fs']))
+        EM = ElementMaker(nsmap=dict(gml=nsmap['gml']))
         root = EM('schema', dict(
-            targetNamespace=nsmap['fs'],
+            targetNamespace=nsmap['wfs'],
             elementFormDefault='qualified',
             attributeFormDefault='unqualified',
             version='0.1',
@@ -197,7 +196,7 @@ class WFSHandler():
         if len(typename) == 1:
             layer = Layer.filter_by(service_id=self.resource.id, keyname=typename[0]).one()
             El('element', dict(name=layer.keyname, substitutionGroup='gml:_Feature',
-                               type='fs:%s_Type' % layer.keyname), parent=root)
+                               type='%s_Type' % layer.keyname), parent=root)
             __ctype = El('complexType', dict(name="%s_Type" % layer.keyname), parent=root)
             __ccontent = El('complexContent', parent=__ctype)
             __ext = El('extension', dict(base='gml:AbstractFeatureType'), parent=__ccontent)
@@ -229,7 +228,7 @@ class WFSHandler():
         self.request.resource_permission(DataScope.read, feature_layer)
 
         EM = ElementMaker(namespace=nsmap['wfs'], nsmap=dict(
-            fs=nsmap['fs'], gml=nsmap['gml'], wfs=nsmap['wfs'],
+            gml=nsmap['gml'], wfs=nsmap['wfs'],
             ogc=nsmap['ogc'], xsi=nsmap['xsi']
         ))
         root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation'): 'http://www.opengis.net/wfs http://schemas.opengeospatial.net//wfs/1.0.0/WFS-basic.xsd'})
@@ -268,17 +267,16 @@ class WFSHandler():
             feature_id = str(feature.id)
             __member = El('featureMember', {ns_attr('gml', 'id'): feature_id},
                           parent=root, namespace=nsmap['gml'])
-            __feature = El(layer.keyname, dict(fid=feature_id),
-                           parent=__member, namespace=nsmap['fs'])
+            __feature = El(layer.keyname, dict(fid=feature_id), parent=__member)
 
             geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
             gml = geom.ExportToGML(['FORMAT=%s' % GML_FORMAT, 'NAMESPACE_DECL=YES'])
-            __geom = El('geom', parent=__feature, namespace=nsmap['fs'])
+            __geom = El('geom', parent=__feature)
             __gml = etree.fromstring(gml)
             __geom.append(__gml)
 
             for field in feature.fields:
-                _field = El(field, parent=__feature, namespace=nsmap['fs'])
+                _field = El(field, parent=__feature)
                 value = feature.fields[field]
                 if value is not None:
                     if not isinstance(value, text_type):
