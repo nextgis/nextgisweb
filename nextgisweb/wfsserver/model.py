@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import re
+
 from .. import db
+from ..core.exception import ValidationError
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -13,6 +16,8 @@ from ..resource import (
 from .util import _
 
 Base = declarative_base()
+
+keyname_pattern = re.compile('^[A-z][A-z0-9_\\-]*$')
 
 
 class Service(Base, Resource):
@@ -65,6 +70,8 @@ class _layers_attr(SP):
         m = dict((l.resource_id, l) for l in srlzr.obj.layers)
         keep = set()
         for lv in value:
+            if not keyname_pattern.match(lv['keyname']):
+                raise ValidationError("Invalid keyname: %s" % lv['keyname'])
             if lv['resource_id'] in m:
                 lo = m[lv['resource_id']]
                 keep.add(lv['resource_id'])
