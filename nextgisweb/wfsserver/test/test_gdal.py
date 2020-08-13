@@ -129,7 +129,7 @@ def test_compare(version, key, features):
 
 @pytest.mark.parametrize('version, fields', product(TEST_WFS_VERSIONS, (
     dict(null='not null', int=42, real=-0.0, string=None, unicode='¯\\_(ツ)_/¯'),
-    dict(null=None, int=2**16, real=3.1415926535897, string='', unicode='مرحبا بالعالم'),
+    dict(null=None, int=2**16, real=3.1415926535897, string='str', unicode='مرحبا بالعالم'),
 )))
 def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator):
     driver = ogr.GetDriverByName(six.ensure_str('WFS'))
