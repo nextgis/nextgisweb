@@ -17,7 +17,7 @@ from .util import _
 
 Base = declarative_base()
 
-keyname_pattern = re.compile('^[A-z][A-z0-9_\\-]*$')
+keyname_pattern = re.compile(r'^[A-Za-z][\w]*$')
 
 
 class Service(Base, Resource):
