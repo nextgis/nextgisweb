@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, unicode_literals, print_function, absolute_import
 import re
 import logging
 import six
@@ -68,7 +68,7 @@ class Env(object):
                             requirements = [self._components[i] for i in getattr(
                                 c, meth)._require]
                         except KeyError:
-                            raise Exception("Failed to collect requirements for component: %s" % c.identity)
+                            raise Exception("Failed to collect requirements for: %s" % c.identity)
                         traverse(requirements)
                     traverse.seq.append(c.identity)
 

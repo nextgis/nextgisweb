@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime, timedelta
-from collections import OrderedDict
 
 from pyramid.httpexceptions import HTTPNotFound
 
@@ -12,6 +11,7 @@ from .util import _, es_index, audit_context
 
 PAGE_SIZE = 20
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+
 
 def journal_browse(request):
     request.require_administrator()

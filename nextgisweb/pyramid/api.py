@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
 import re
 import json
 import os.path
@@ -130,9 +130,8 @@ def cors_put(request):
 
             for origin in v:
                 if (
-                    not isinstance(origin, six.string_types) or
-                    not re.match(
-                        r'^https?://[\w\_\-\.]{3,}(:\d{2,5})?/?$', origin)
+                    not isinstance(origin, six.string_types)
+                    or not re.match(r'^https?://[\w\_\-\.]{3,}(:\d{2,5})?/?$', origin)
                 ):
                     raise ValidationError("Invalid origin '%s'" % origin)
 

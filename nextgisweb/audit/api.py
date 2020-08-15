@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
-import json
 import unicodecsv
 
 from math import ceil
@@ -47,7 +45,7 @@ def audit_cget(
 
         nchunks = int(ceil(total / chunk_size))
         for nchunk in range(nchunks):
-            for hit in s[nchunk * chunk_size : (nchunk + 1) * chunk_size]:
+            for hit in s[nchunk * chunk_size:(nchunk + 1) * chunk_size]:
                 yield hit
 
     return hits(limit=limit)

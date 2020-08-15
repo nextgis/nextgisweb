@@ -133,7 +133,7 @@ class _fields_attr(SP):
                 ('display_name', f.display_name),
                 ('label_field', f == srlzr.obj.feature_label_field),
                 ('grid_visibility', f.grid_visibility)))
-            for f in srlzr.obj.fields]
+                for f in srlzr.obj.fields]
 
     def setter(self, srlzr, value):
         obj = srlzr.obj

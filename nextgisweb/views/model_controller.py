@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, unicode_literals, print_function, absolute_import
 from pyramid.renderers import render_to_response
 
 from ..models import DBSession
@@ -26,7 +27,8 @@ class ModelController(object):
         self.client = client
 
     def includeme(self, config):
-        route = lambda s: self.route_prefix + '.' + s
+        def route(s):
+            return self.route_prefix + '.' + s
 
         config.add_route(route('create'), self.url_base + '/create',
                          client=self.client_base)

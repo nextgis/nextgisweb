@@ -780,7 +780,9 @@ class _source_attr(SP):
             else:
                 # Ignore encoding option in Python 3
                 ogrds = ogr.Open(ogrfn)
-                recode = lambda x: x   # NOQA: E731
+
+                def recode(x):
+                    return x
 
             if ogrds is None:
                 raise VE(_("GDAL library failed to open file."))

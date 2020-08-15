@@ -24,8 +24,8 @@ class AuditComponent(Component):
 
         if self.audit_enabled:
             self.es = Elasticsearch('%s:%d' % (
-                 self.audit_es_host,
-                 self.audit_es_port,
+                self.audit_es_host,
+                self.audit_es_port,
             ))
 
     def is_service_ready(self):

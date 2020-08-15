@@ -12,7 +12,7 @@ from nextgisweb.tmsclient.util import crop_box, render_zoom
 @pytest.mark.parametrize('src_extent, dst_extent, width, height, expected', (
     ((0, 0, 10, 10), (0, 0, 10, 10), 100, 100, (0, 0, 100, 100)),
     ((0, 0, 10, 10), (0, 0, 5, 5), 10, 10, (0, 5, 5, 10)),
-    ((100, 100, 900, 700), (200, 200, 400, 300), 100, 100, (13, 67, 38, 83)),
+    ((100, 100, 900, 700), (250, 200, 400, 300), 100, 100, (19, 67, 38, 83)),
 ))
 def test_crop_box(ngw_txn, src_extent, dst_extent, width, height, expected):
     box = crop_box(src_extent, dst_extent, width, height)

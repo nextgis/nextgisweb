@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from .base import WebmapLayerPlugin
+from __future__ import division, unicode_literals, print_function, absolute_import
 
 from ...feature_layer import IFeatureLayer, IFeatureQueryLike
+from .base import WebmapLayerPlugin
 
 
 @WebmapLayerPlugin.registry.register

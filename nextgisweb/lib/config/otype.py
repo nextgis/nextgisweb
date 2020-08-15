@@ -23,10 +23,10 @@ class OptionType(object):
         return 'unknown'
 
     def loads(self, value):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def dumps(self, value):
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class Text(OptionType):
