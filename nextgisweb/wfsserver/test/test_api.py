@@ -55,7 +55,9 @@ def vector_layer_id(ngw_resource_group):
 
 def test_api(vector_layer_id, ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
     data = dict(
-        resource=dict(cls='wfsserver_service', display_name="test_wfs", parent=dict(id=ngw_resource_group)),
+        resource=dict(
+            cls='wfsserver_service', display_name="test_wfs",
+            parent=dict(id=ngw_resource_group)),
         wfsserver_service=dict(layers=[dict(
             keyname="points",
             display_name="points",

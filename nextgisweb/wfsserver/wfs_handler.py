@@ -190,7 +190,10 @@ class WFSHandler():
             version='0.1',
             xmlns='http://www.w3.org/2001/XMLSchema'))
 
-        El('import', dict(namespace=nsmap['gml'], schemaLocation='http://schemas.opengis.net/gml/2.0.0/feature.xsd'), parent=root)
+        El('import', dict(
+            namespace=nsmap['gml'],
+            schemaLocation='http://schemas.opengis.net/gml/2.0.0/feature.xsd'
+        ), parent=root)
 
         typename = self.p_typenames.split(',')
         if len(typename) == 1:
@@ -231,7 +234,7 @@ class WFSHandler():
             gml=nsmap['gml'], wfs=nsmap['wfs'],
             ogc=nsmap['ogc'], xsi=nsmap['xsi']
         ))
-        root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation'): 'http://www.opengis.net/wfs http://schemas.opengeospatial.net//wfs/1.0.0/WFS-basic.xsd'})
+        root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation'): 'http://www.opengis.net/wfs http://schemas.opengeospatial.net//wfs/1.0.0/WFS-basic.xsd'})  # NOQA: E501
 
         query = feature_layer.feature_query()
 
@@ -255,7 +258,9 @@ class WFSHandler():
 
         if self.p_srsname is not None:
             srs_id = parse_srs(self.p_srsname)
-            srs_out = feature_layer.srs if srs_id == feature_layer.srs_id else SRS.filter_by(id=srs_id).one()
+            srs_out = feature_layer.srs \
+                if srs_id == feature_layer.srs_id \
+                else SRS.filter_by(id=srs_id).one()
         else:
             srs_out = feature_layer.srs
         query.srs(srs_out)

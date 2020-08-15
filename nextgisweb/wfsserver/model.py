@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
 
 import re
 
@@ -64,10 +64,10 @@ class Layer(Base):
 class _layers_attr(SP):
 
     def getter(self, srlzr):
-        return [l.to_dict() for l in srlzr.obj.layers]
+        return [layer.to_dict() for layer in srlzr.obj.layers]
 
     def setter(self, srlzr, value):
-        m = dict((l.resource_id, l) for l in srlzr.obj.layers)
+        m = dict((layer.resource_id, layer) for layer in srlzr.obj.layers)
         keep = set()
         for lv in value:
             if not keyname_pattern.match(lv['keyname']):

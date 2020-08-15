@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
 
 from ..resource import Widget, Resource
 from .model import Service
