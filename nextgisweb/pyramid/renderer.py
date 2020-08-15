@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function
+from __future__ import division, unicode_literals, print_function, absolute_import
 import datetime
 
 from pyramid.renderers import JSON

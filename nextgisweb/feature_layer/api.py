@@ -108,7 +108,7 @@ def export(request):
     query.geom()
 
     ogr_ds = _ogr_memory_ds()
-    ogr_layer = _ogr_layer_from_features(
+    ogr_layer = _ogr_layer_from_features(  # NOQA: 841
         request.context, query(), ds=ogr_ds, fid=fid)
 
     with backports.tempfile.TemporaryDirectory() as tmp_dir:
@@ -480,7 +480,7 @@ def cget(resource, request):
     order_by_ = []
     if order_by is not None:
         for order_def in list(order_by.split(',')):
-            order, colname = re.match('^(\-|\+|%2B)?(.*)$', order_def).groups()
+            order, colname = re.match(r'^(\-|\+|%2B)?(.*)$', order_def).groups()
             if colname is not None:
                 order = ['asc', 'desc'][order == '-']
                 order_by_.append([order, colname])
@@ -605,7 +605,9 @@ def store_collection(layer, request):
 
     field_prefix = json.loads(
         unquote(request.headers.get('x-field-prefix', '""')))
-    pref = lambda f: field_prefix + f  # NOQA: E731
+
+    def pref(f):
+        return field_prefix + f
 
     field_list = json.loads(
         unquote(request.headers.get('x-field-list', "[]")))

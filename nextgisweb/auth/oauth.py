@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, absolute_import, print_function, unicode_literals
 import re
 import itertools
 from datetime import datetime, timedelta
@@ -123,9 +123,9 @@ class OAuthHelper(object):
                 raise UserDisabledException()
 
             if (
-                user.oauth_tstamp is not None and
-                self.options['profile.sync_timedelta'] is not None and
-                user.oauth_tstamp + self.options['profile.sync_timedelta'] > datetime.utcnow()
+                user.oauth_tstamp is not None
+                and self.options['profile.sync_timedelta'] is not None
+                and user.oauth_tstamp + self.options['profile.sync_timedelta'] > datetime.utcnow()
             ):
                 # Skip profile synchronization
                 return user

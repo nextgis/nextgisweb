@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, unicode_literals, print_function, absolute_import
 from inspect import isclass
 
 import shapely.geometry
@@ -94,8 +94,10 @@ def geom_calc(g, crs, prop, srid):
 
     # pyproj >= 2.3
     # calcs = dict(
-    #     length=lambda: crs.get_geod().geometry_length(g) if crs.is_geographic else g.length * factor,
-    #     area=lambda: crs.get_geod().geometry_area_perimeter(g)[0] if crs.is_geographic else g.area * factor**2
+    #     length=lambda: crs.get_geod().geometry_length(g)
+    #         if crs.is_geographic else g.length * factor,
+    #     area=lambda: crs.get_geod().geometry_area_perimeter(g)[0]
+    #         if crs.is_geographic else g.area * factor**2
     # )
 
     if prop not in calcs:

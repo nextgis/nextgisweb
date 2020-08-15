@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from .base import WebmapLayerPlugin
+from __future__ import division, unicode_literals, print_function, absolute_import
 from pyramid import threadlocal
 
 from ...feature_layer import IFeatureLayer, IWritableFeatureLayer
 from ...feature_layer.view import PD_WRITE
+
+from .base import WebmapLayerPlugin
 
 
 @WebmapLayerPlugin.registry.register

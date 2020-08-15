@@ -31,7 +31,7 @@ EXPORT_FORMAT_GDAL["HFA"] = GDALDriver(
     "HFA",
     "ERDAS IMAGINE HFA (*.img)",
     "img",
-    options = (
+    options=(
         "BLOCKSIZE=64",
     ),
     mime=None

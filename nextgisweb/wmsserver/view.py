@@ -104,15 +104,15 @@ def _get_capabilities(obj, request):
             maxx="180.000000", maxy="85.051129"))
     )
 
-    for l in obj.layers:
-        queryable = '1' if hasattr(l.resource, 'feature_layer') else '0'
+    for lyr in obj.layers:
+        queryable = '1' if hasattr(lyr.resource, 'feature_layer') else '0'
 
         lnode = E.Layer(
             dict(queryable=queryable),
-            E.Name(l.keyname),
-            E.Title(l.display_name))
+            E.Name(lyr.keyname),
+            E.Title(lyr.display_name))
 
-        if IFeatureLayer.providedBy(l.resource.parent):
+        if IFeatureLayer.providedBy(lyr.resource.parent):
             for srs in SRS.query():
                 lnode.append(E.SRS('EPSG:%d' % srs.id))
         else:
@@ -143,7 +143,7 @@ def _get_map(obj, request):
 
     p_size = (p_width, p_height)
 
-    lmap = dict((l.keyname, l) for l in obj.layers)
+    lmap = dict((lyr.keyname, lyr) for lyr in obj.layers)
 
     img = Image.new('RGBA', p_size, (255, 255, 255, 0))
 
@@ -202,11 +202,11 @@ def _get_feature_info(obj, request):
     srs = SRS.filter_by(id=int(p_srs.split(':')[-1])).one()
 
     qgeom = geom_from_wkt((
-        "POLYGON((%(l)f %(b)f, %(l)f %(t)f, " +
-        "%(r)f %(t)f, %(r)f %(b)f, %(l)f %(b)f))"
+        "POLYGON((%(l)f %(b)f, %(l)f %(t)f, "
+        + "%(r)f %(t)f, %(r)f %(b)f, %(l)f %(b)f))"
     ) % qbox, srs.id)
 
-    lmap = dict((l.keyname, l) for l in obj.layers)
+    lmap = dict((lyr.keyname, lyr) for lyr in obj.layers)
 
     results = list()
     fcount = 0
@@ -265,7 +265,7 @@ def _get_legend_graphic(obj, request):
     params = dict((k.upper(), v) for k, v in request.params.items())
     p_layer = params.get('LAYER')
 
-    lmap = dict((l.keyname, l) for l in obj.layers)
+    lmap = dict((lyr.keyname, lyr) for lyr in obj.layers)
     layer = lmap[p_layer]
 
     request.resource_permission(DataScope.read, layer.resource)

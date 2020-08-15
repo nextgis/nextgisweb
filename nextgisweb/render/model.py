@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
 from datetime import datetime, timedelta
 from uuid import uuid4
 from os import makedirs

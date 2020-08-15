@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from .. import dynmenu as dm
 from ..pyramid import viewargs
-from ..resource import Widget, Resource, resource_factory
+from ..resource import Widget, Resource
 
 from .model import RasterLayer
 from .util import _

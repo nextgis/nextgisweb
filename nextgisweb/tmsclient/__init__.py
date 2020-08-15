@@ -29,8 +29,8 @@ class TMSClientComponent(Component):
         view.setup_pyramid(self, config)
 
     option_annotations = (
-        Option('nextgis_geoservices.layers', default='https://geoservices.nextgis.com/config/maps'),
-        Option('nextgis_geoservices.url_template', default='https://geoservices.nextgis.com/raster/{layer}/{z}/{x}/{y}.png'),  # NOQA
+        Option('nextgis_geoservices.layers', default='https://geoservices.nextgis.com/config/maps'),  # NOQA: E501
+        Option('nextgis_geoservices.url_template', default='https://geoservices.nextgis.com/raster/{layer}/{z}/{x}/{y}.png'),  # NOQA: E501
         Option('user_agent', default="NextGIS Web"),
         Option('timeout', float, default=15),  # seconds
     )

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
+
 import requests
 import json
 from io import BytesIO
@@ -87,8 +88,8 @@ class Connection(Base, Resource):
 
         layers.sort(key=lambda i: i['index'])
 
-        for l in layers:
-            del l['index']
+        for layer in layers:
+            del layer['index']
 
         data = OrderedDict((
             ('formats', service.getOperationByName('GetMap').formatOptions),

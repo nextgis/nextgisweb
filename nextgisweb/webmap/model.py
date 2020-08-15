@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import division, unicode_literals, print_function, absolute_import
 import json
 
 from sqlalchemy.ext.orderinglist import ordering_list
@@ -87,7 +87,7 @@ class WebMap(Base, Resource):
 
         if 'extent' in data:
             self.extent_left, self.extent_bottom, \
-            self.extent_right, self.extent_top = data['extent']
+                self.extent_right, self.extent_top = data['extent']
 
         if 'editable' in data:
             self.editable = data['editable']
@@ -148,7 +148,9 @@ class WebMapItem(Base):
                 style = self.style
                 style_parent_id = style.parent.id
 
-                if hasattr(style, 'payload') or isinstance(getattr(type(style), 'payload', None), property):
+                if hasattr(style, 'payload') or isinstance(
+                    getattr(type(style), 'payload', None), property
+                ):
                     payload = style.payload
 
             return dict(

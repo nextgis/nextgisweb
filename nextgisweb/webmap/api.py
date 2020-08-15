@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
 from collections import OrderedDict
 
 from pyramid.httpexceptions import HTTPNotFound
@@ -59,14 +59,16 @@ def annotation_cpost(resource, request):
 def annotation_iget(resource, request):
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
-    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(request.matchdict['annotation_id'])).one()
+    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
+        request.matchdict['annotation_id'])).one()
     return annotation_to_dict(obj)
 
 
 def annotation_iput(resource, request):
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
-    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(request.matchdict['annotation_id'])).one()
+    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
+        request.matchdict['annotation_id'])).one()
     annotation_from_dict(obj, request.json_body)
     return dict(id=obj.id)
 
@@ -74,7 +76,8 @@ def annotation_iput(resource, request):
 def annotation_idelete(resource, request):
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
-    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(request.matchdict['annotation_id'])).one()
+    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
+        request.matchdict['annotation_id'])).one()
     DBSession.delete(obj)
     return None
 

@@ -101,10 +101,10 @@ def logout(request):
 def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
     # If user is not authentificated, we can offer him to sign in
     if (
-        request.method == 'GET' and
-        not request.is_api and not request.is_xhr and
-        err_info.http_status_code == 403 and
-        request.authenticated_userid is None
+        request.method == 'GET'
+        and not request.is_api and not request.is_xhr
+        and err_info.http_status_code == 403
+        and request.authenticated_userid is None
     ):
         response = render_to_response(
             'nextgisweb:auth/template/login.mako',

@@ -65,7 +65,7 @@ class Layer(Base):
 class _layers_attr(SP):
 
     def getter(self, srlzr):
-        return [l.to_dict() for l in srlzr.obj.layers]
+        return [lyr.to_dict() for lyr in srlzr.obj.layers]
 
     def setter(self, srlzr, value):
         srlzr.obj.layers = []

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 from functools import reduce
 import six
 from six.moves import UserList
@@ -132,12 +132,11 @@ class ScopeMeta(type):
         return cls.__registry
 
     def values(cls, ordered=False):
-        if ordered:
-            f = lambda a: sorted(a, key=lambda i: i._create_order)
-        else:
-            f = lambda a: a
+        def _ordered(a):
+            return sorted(a, key=lambda i: i._create_order) \
+                if ordered else a
 
-        for v in f(filter(
+        for v in _ordered(filter(
             lambda v: isinstance(v, Permission),
             cls.__dict__.values()
         )):
