@@ -67,7 +67,9 @@ class WSGITestHelper(object):
     @property
     def http_server(self):
         if self._http_server is None:
-            self._http_server = StopableWSGIServer.create(self.application)
+            self._http_server = StopableWSGIServer.create(
+                self.application,
+                clear_untrusted_proxy_headers=True)
         return self._http_server
 
 

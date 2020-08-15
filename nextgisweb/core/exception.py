@@ -59,9 +59,10 @@ class UserException(Exception):
             message = args[0]
             warnings.warn(
                 "{} accepted message as positional argument instead of keyword!"
-                .format(self.__class__.__name__))
+                .format(self.__class__.__name__),
+                stacklevel=2)
         elif len(args) > 0:
-            raise ValueError("UserException doesn't accept args!")
+            raise ValueError("UserException accepts only keyword arguments!")
 
         def _self_attr(name, value):
             if value is not None:

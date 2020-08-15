@@ -57,7 +57,9 @@ class ResourceError(Exception):
     """ Base class for resource exceptions """
 
     def __init__(self, message, data=None):
-        warnings.warn("{} is deprecated!".format(self.__class__.__name__), DeprecationWarning)
+        warnings.warn(
+            "{} is deprecated!".format(self.__class__.__name__), DeprecationWarning,
+            stacklevel=2)
         self.message = message
         self.data = data if data is not None else dict()
 

@@ -199,7 +199,7 @@ def setup_pyramid(comp, config):
 
         if not resource.has_permission(permission, request.user):
             raise InsufficientPermissions(
-                _("Insufficient '%s' permission in scope '%s' on resource id = %d.") % (
+                message=_("Insufficient '%s' permission in scope '%s' on resource id = %d.") % (
                     permission.name, permission.scope.identity, resource.id
                 ), data=dict(
                     resource=dict(id=resource.id),

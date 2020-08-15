@@ -37,4 +37,6 @@ class ServerCommand(Command):
         app = config.make_wsgi_app()
         logger.debug("WSGI application created")
 
-        serve(app, host=args.host, port=args.port, threads=1)
+        serve(
+            app, host=args.host, port=args.port, threads=1,
+            clear_untrusted_proxy_headers=True)

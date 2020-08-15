@@ -5,7 +5,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 """
 
-from __future__ import unicode_literals
 from .permission import Scope, Permission
 from .util import _
 
