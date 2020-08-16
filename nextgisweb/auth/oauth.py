@@ -215,6 +215,9 @@ class OAuthHelper(object):
         Option('enabled', bool, default=False,
                doc="Enable OAuth authentication."),
 
+        Option('default', bool, default=False,
+               doc="Preffer OAuth authentication over local."),
+
         Option('register', bool, default=False,
                doc="Allow registering new users via OAuth."),
 

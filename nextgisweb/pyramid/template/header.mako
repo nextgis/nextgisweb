@@ -5,16 +5,11 @@
     import re
     from six import text_type
     from nextgisweb.pyramid.util import _
-
 %>
 
 <%
-    return_url = request.GET['return'] if 'return' in request.GET else false
-
-    login_qs = dict()
-    if request.matched_route is None or request.matched_route.name not in (login_route_name, logout_route_name):
-        login_qs['next'] = request.url
-    login_url = request.route_url(login_route_name, _query=login_qs)
+    return_url = request.GET['return'] if 'return' in request.GET else False
+    login_url = request.login_url()
 
     # Fetching user details may fail sometimes, especially in error handlers!
     try:

@@ -98,6 +98,26 @@ def logout(request):
     return HTTPFound(location=request.application_url, headers=headers)
 
 
+def _login_url(request):
+    """ Request method for getting preferred login url (local or OAuth) """
+
+    auth = request.env.auth
+
+    login_qs = dict()
+    if request.matched_route is None or request.matched_route.name not in (
+        auth.options['login_route_name'], auth.options['logout_route_name']
+    ):
+        login_qs['next'] = request.url
+
+    oauth_opts = auth.options.with_prefix('oauth')
+    if oauth_opts['enabled'] and oauth_opts['default'] and not oauth_opts['server.password']:
+        login_url = request.route_url('auth.oauth', _query=login_qs)
+    else:
+        login_url = request.route_url(auth.options['login_route_name'], _query=login_qs)
+
+    return login_url
+
+
 def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
     # If user is not authentificated, we can offer him to sign in
     if (
@@ -106,9 +126,10 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
         and err_info.http_status_code == 403
         and request.authenticated_userid is None
     ):
-        response = render_to_response(
-            'nextgisweb:auth/template/login.mako',
-            dict(next_url=request.url), request=request)
+        response = render_to_response('nextgisweb:auth/template/login.mako', dict(
+            auth_required=request.env.auth.options['oauth.default'],
+            next_url=request.url,
+        ), request=request)
         response.status = 403
         return response
 
@@ -130,6 +151,8 @@ def setup_pyramid(comp, config):
     config.add_route('auth.logout', '/logout').add_view(logout)
 
     config.add_route('auth.oauth', '/oauth').add_view(oauth)
+
+    config.add_request_method(_login_url, name='login_url')
 
     def principal_dump(request):
         query = Principal.query().with_polymorphic('*')
