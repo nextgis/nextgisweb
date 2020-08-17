@@ -39,7 +39,7 @@
                     ${icon(item.icon, size='s')} ${tr(item.label)}
                 </a>
             %else:
-                <a href="${url}" class="sidebar-menu__link">${tr(item.label)}</a>
+                <a href="${url}" target="${item.target}" class="sidebar-menu__link">${tr(item.label)}</a>
             %endif
         </li>
     %endif

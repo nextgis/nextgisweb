@@ -179,7 +179,7 @@ def setup_pyramid(comp, config):
                 yield Link(
                     'webmap/display', _("Display"),
                     self._url(),
-                    'material:viewMap', True)
+                    'material:viewMap', True, '_blank')
 
         def _url(self):
             return lambda args: args.request.route_url(
