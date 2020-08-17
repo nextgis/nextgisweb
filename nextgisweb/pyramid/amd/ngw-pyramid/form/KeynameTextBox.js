@@ -5,7 +5,7 @@ define([
     return declare([ValidationTextBox], {
 
         preamble: function (kwArgs) {
-            kwArgs.pattern = '[A-z][A-z0-9_\\-]*';
+            kwArgs.pattern = '[A-Za-z][A-Za-z0-9_\\-]*';
         },
 
         _getValueAttr: function () {
