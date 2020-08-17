@@ -113,7 +113,7 @@ class OAuthHelper(object):
 
             if merge_user is not None:
                 if user is not None and user.id != merge_user.id:
-                    raise ValueError("User already exists")
+                    raise AuthorizationException(message=_("User already exists"))
                 user = merge_user
 
             if user is None:

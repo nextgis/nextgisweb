@@ -10,7 +10,7 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.events import BeforeRender
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPUnauthorized
+from pyramid.httpexceptions import HTTPFound, HTTPUnauthorized
 
 from ..models import DBSession
 from ..object_widget import ObjectWidget
@@ -62,7 +62,7 @@ def oauth(request):
         try:
             data = json.loads(request.cookies[cookie_name(state)])
         except ValueError:
-            raise HTTPBadRequest()
+            raise AuthorizationException(message=_("State cookie parse error"))
 
         tresp = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
