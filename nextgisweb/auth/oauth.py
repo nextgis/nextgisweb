@@ -231,6 +231,9 @@ class OAuthHelper(object):
         Option('local_auth', bool, default=True,
                doc="Allow authentication with local password for OAuth users."),
 
+        Option('bind', bool, default=True,
+               doc="Allow binding local user to OAuth user."),
+
         Option('client.id', default=None,
                doc="OAuth client ID"),
 
