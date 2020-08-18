@@ -62,7 +62,7 @@ def oauth(request):
         try:
             data = json.loads(request.cookies[cookie_name(state)])
         except ValueError:
-            raise AuthorizationException(message=_("State cookie parse error"))
+            raise AuthorizationException("State cookie parse error")
 
         tresp = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
