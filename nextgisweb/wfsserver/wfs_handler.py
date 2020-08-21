@@ -111,12 +111,16 @@ class WFSHandler():
         self.p_version = params.get('VERSION')
         if self.p_version is None:
             self.p_version = VERSION_DEFAULT
+
         self.p_typenames = params.get('TYPENAMES')
         if self.p_typenames is None:
             self.p_typenames = params.get('TYPENAME')
+
         self.p_resulttype = params.get('RESULTTYPE')
         self.p_bbox = params.get('BBOX')
         self.p_srsname = params.get('SRSNAME')
+        self.p_count = params.get('COUNT')
+        self.p_startindex = params.get('STARTINDEX')
 
     def response(self):
         if self.p_version not in VERSION_SUPPORTED:
@@ -238,13 +242,6 @@ class WFSHandler():
 
         query = feature_layer.feature_query()
 
-        if self.p_resulttype == 'hits':
-            root.set('numberMatched', str(query().total_count))
-            root.set('numberReturned', "0")
-            return etree.tostring(root)
-
-        query.geom()
-
         def parse_srs(value):
             # 'urn:ogc:def:crs:EPSG::3857' -> 3857
             return int(value.split(':')[-1])
@@ -255,6 +252,18 @@ class WFSHandler():
             box_srid = parse_srs(bbox_param[4])
             box_geom = box(*box_coords, srid=box_srid)
             query.intersects(box_geom)
+
+        if self.p_count is not None:
+            limit = int(self.p_count)
+            offset = 0 if self.p_startindex is None else int(self.p_startindex)
+            query.limit(limit, offset)
+
+        if self.p_resulttype == 'hits':
+            root.set('numberMatched', str(query().total_count))
+            root.set('numberReturned', "0")
+            return etree.tostring(root)
+
+        query.geom()
 
         if self.p_srsname is not None:
             srs_id = parse_srs(self.p_srsname)
