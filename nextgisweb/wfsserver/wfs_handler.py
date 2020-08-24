@@ -108,18 +108,12 @@ class WFSHandler():
         self.p_requset = params.get('REQUEST') if self.request.method == 'GET' \
             else ns_trim(self.root_body.tag)
 
-        self.p_version = params.get('VERSION')
-        if self.p_version is None:
-            self.p_version = VERSION_DEFAULT
-
-        self.p_typenames = params.get('TYPENAMES')
-        if self.p_typenames is None:
-            self.p_typenames = params.get('TYPENAME')
-
+        self.p_version = params.get('VERSION', VERSION_DEFAULT)
+        self.p_typenames = params.get('TYPENAMES', params.get('TYPENAME'))
         self.p_resulttype = params.get('RESULTTYPE')
         self.p_bbox = params.get('BBOX')
         self.p_srsname = params.get('SRSNAME')
-        self.p_count = params.get('COUNT')
+        self.p_count = params.get('COUNT', params.get('MAXFEATURES'))
         self.p_startindex = params.get('STARTINDEX')
 
     def response(self):
