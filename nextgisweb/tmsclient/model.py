@@ -25,7 +25,7 @@ from ..resource import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
 )
-from .util import _, crop_box, render_zoom
+from .util import _, crop_box, render_zoom, quad_key
 from .session_keeper import get_session
 
 
@@ -79,6 +79,7 @@ class Connection(Base, Resource):
         result = session.get(
             self.url_template.format(
                 x=x, y=y, z=z,
+                q=quad_key(x, y, z),
                 layer=layer_name
             ),
             params=self.query_params,

@@ -30,3 +30,16 @@ def render_zoom(srs, extent, size, tilesize):
         zoom += 1
 
     return int(zoom)
+
+
+def quad_key(x, y, z):
+    quadKey = ''
+    for i in range(z):
+        digit = 0
+        mask = 1 << i
+        if (x & mask) != 0:
+            digit += 1
+        if (y & mask) != 0:
+            digit += 2
+        quadKey = str(digit) + quadKey
+    return quadKey
