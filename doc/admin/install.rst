@@ -147,10 +147,15 @@ Now you should initialize database structure with the following command:
   $ export NEXTGISWEB_CONFIG=/srv/ngw/config/config.ini
   $ nextgisweb initialize_db
 
-After that, you can run builtin HTTP server and check that your web browser can
-reach ``http:://localhost:8080``. Then press ``Ctrl + C`` to halt HTTP server.
-NextGIS Web is installed and should work properly, but builtin http server is
-not suitable for production purposes.
+After that, you can run builtin HTTP server:
+
+.. code-block:: none
+
+  $ nextgisweb server
+
+Check that your web browser can open ``http://localhost:8080``. Then press
+``Ctrl + C`` to halt HTTP server. NextGIS Web is installed and should work
+properly, but builtin HTTP server is not suitable for production purposes.
 
 To simplify subsequent steps add virtualenv initialization to ``.bashrc`` file
 for ``ngw`` user:
