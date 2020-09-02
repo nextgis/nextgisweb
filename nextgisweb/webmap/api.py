@@ -2,9 +2,10 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 from collections import OrderedDict
 
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from geoalchemy2.shape import to_shape
 
+from ..env import env
 from ..models import DBSession
 from ..resource import resource_factory
 
@@ -82,8 +83,37 @@ def annotation_idelete(resource, request):
     return None
 
 
+def settings_get(request):
+    result = dict()
+    for k in ('identify_radius', 'popup_width', 'popup_height'):
+        try:
+            result[k] = env.core.settings_get('webmap', k)
+        except KeyError:
+            result[k] = env.webmap.options[k]
+
+    return result
+
+
+def settings_put(request):
+    request.require_administrator()
+
+    body = request.json_body
+    for k, v in body.items():
+        if k in ('identify_radius', 'popup_width', 'popup_height'):
+            env.core.settings_set('webmap', k, v)
+        else:
+            raise HTTPBadRequest("Invalid key '%s'" % k)
+
+
 def setup_pyramid(comp, config):
     setup_annotations(config)
+
+    comp.settings_view = settings_get
+
+    config.add_route('webmap.settings',
+                     '/api/component/webmap/settings') \
+        .add_view(settings_get, request_method='GET', renderer='json') \
+        .add_view(settings_put, request_method='PUT', renderer='json')
 
 
 def setup_annotations(config):

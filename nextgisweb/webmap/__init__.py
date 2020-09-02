@@ -39,18 +39,19 @@ class WebMapComponent(Component):
         with codecs.open(self.options['basemaps'], 'rb', 'utf-8') as fp:
             basemaps = json.load(fp)
 
-        return dict(
+        result = dict(
             basemaps=basemaps,
             bing_apikey=self.options['bing_apikey'],
-            identify_radius=self.options['identify_radius'],
-            popup_width=self.options['popup_width'],
-            popup_height=self.options['popup_height'],
             annotation=self.options['annotation'],
             adapters=dict(
                 (i.identity, dict(display_name=i.display_name))
                 for i in WebMapAdapter.registry
             )
         )
+
+        result.update(self.settings_view(request))
+
+        return result
 
     def query_stat(self):
         query_item_type = DBSession.query(

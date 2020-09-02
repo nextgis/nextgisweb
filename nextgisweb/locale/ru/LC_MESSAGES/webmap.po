@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-07-28 09:45+0000\n"
+"POT-Creation-Date: 2020-09-02 16:27+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -31,11 +31,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:28 model.py:37 view.py:172
+#: model.py:28 model.py:37 view.py:180 view.py:201
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:30 view.py:179
+#: model.py:30 view.py:187
 msgid "Display"
 msgstr "Открыть"
 
@@ -46,6 +46,10 @@ msgstr "Просмотр аннотаций"
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:100 model.py:32
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
+
+#: view.py:36 view.py:202
+msgid "Web map settings"
+msgstr "Настройки веб-карты"
 
 #: amd/ngw-webmap/Display.js:220 amd/ngw-webmap/Display.js:1039
 #: amd/ngw-webmap/ItemWidget.js:247
@@ -112,7 +116,7 @@ msgstr "Порядок слоёв"
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:152
+#: amd/ngw-webmap/ItemWidget.js:152 amd/ngw-webmap/template/SettingsForm.hbs:39
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
 msgid "Save"
@@ -243,6 +247,22 @@ msgstr "Ресурс стиля"
 #: amd/ngw-webmap/template/ItemWidget.hbs:127
 msgid "Expanded"
 msgstr "Развернута"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:11
+msgid "Identify popup"
+msgstr "Окно идентификации"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:16
+msgid "Width, px"
+msgstr "Ширина, пикс."
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:21
+msgid "Height, px"
+msgstr "Высота, пикс."
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:30
+msgid "Radius, px"
+msgstr "Радиус, пикс."
 
 #: amd/ngw-webmap/tool/Identify.js:212
 msgid "Attributes"
