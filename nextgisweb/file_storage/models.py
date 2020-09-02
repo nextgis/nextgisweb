@@ -17,6 +17,10 @@ class FileObj(Base):
     component = sa.Column(sa.Unicode, nullable=False)
     uuid = sa.Column(sa.Unicode(32), nullable=False)
 
+    __table_args__ = (
+        sa.Index('fileobj_uuid_component_idx', uuid, component, unique=True),
+    )
+
     def __init__(self, *args, **kwargs):
         Base.__init__(self, *args, **kwargs)
         self.uuid = six.text_type(uuid.uuid4().hex)
