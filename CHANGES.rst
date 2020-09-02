@@ -10,6 +10,7 @@ Changes
 - Session based OAuth authentication with token refresh support.
 - Delete users and groups via REST API.
 - Track timestamps of user's last activity.
+- Customization of webmap's identify popup via control panel.
 - Fix bug in CORS implementation for requests returning errors.
 - Fix coordinates display format in webmap's identification pop-up.
 - Fix tile distortion issue for raster styles
