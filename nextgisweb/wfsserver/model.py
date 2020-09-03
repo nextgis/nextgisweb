@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
+
+import re
 
 from .. import db
+from ..core.exception import ValidationError
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -13,6 +16,8 @@ from ..resource import (
 from .util import _
 
 Base = declarative_base()
+
+keyname_pattern = re.compile(r'^[A-Za-z][\w]*$')
 
 
 class Service(Base, Resource):
@@ -36,6 +41,10 @@ class Layer(Base):
     display_name = db.Column(db.Unicode, nullable=False)
     maxfeatures = db.Column(db.Integer, nullable=True)
 
+    __table_args__ = (
+        db.UniqueConstraint(service_id, keyname),
+    )
+
     service = db.relationship(
         Service, foreign_keys=service_id,
         backref=db.backref('layers', cascade='all, delete-orphan'))
@@ -55,12 +64,14 @@ class Layer(Base):
 class _layers_attr(SP):
 
     def getter(self, srlzr):
-        return [l.to_dict() for l in srlzr.obj.layers]
+        return [layer.to_dict() for layer in srlzr.obj.layers]
 
     def setter(self, srlzr, value):
-        m = dict((l.resource_id, l) for l in srlzr.obj.layers)
+        m = dict((layer.resource_id, layer) for layer in srlzr.obj.layers)
         keep = set()
         for lv in value:
+            if not keyname_pattern.match(lv['keyname']):
+                raise ValidationError("Invalid keyname: %s" % lv['keyname'])
             if lv['resource_id'] in m:
                 lo = m[lv['resource_id']]
                 keep.add(lv['resource_id'])

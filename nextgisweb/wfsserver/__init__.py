@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, unicode_literals, print_function, absolute_import
 from ..component import Component
 from .model import Base, Service
 
@@ -10,5 +11,6 @@ class WFSServerComponent(Component):
     metadata = Base.metadata
 
     def setup_pyramid(self, config):
-        from . import view
+        from . import api, view
+        api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)

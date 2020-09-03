@@ -2,7 +2,6 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 import os
 import logging
-import six
 
 from pyramid.paster import setup_logging
 
@@ -34,17 +33,13 @@ def pkginfo():
         'postgis',
         'raster_layer',
         'raster_style',
+        'wfsserver',
         'wmsclient',
         'wmsserver',
         'tmsclient',
         'file_upload',
         'audit',
     )
-
-    if six.PY3:
-        logger.warning("Component [wfsserver] disabled in Python 3 environment!")
-    else:
-        components = components + ('wfsserver', )
 
     return dict(
         components=dict(map(
