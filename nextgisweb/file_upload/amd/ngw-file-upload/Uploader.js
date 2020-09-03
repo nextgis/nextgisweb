@@ -12,6 +12,8 @@ define([
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/Uploader.hbs",
     "./FileUploader",
+    //
+    "xstyle/css!./resource/Uploader.css",
 ], function (
     declare,
     Deferred,
@@ -42,10 +44,12 @@ define([
         showProgressInDocTitle: true,
         uploaderLinkText: "",
         uploaderHelpText: "",
+        stateClasses: ["uploader--start", "uploader--progress", "uploader--complete", "uploader--error"],
 
         constructor: function () {
             this.upload_promise = undefined;
-            this.docTitle = document.title;            
+            this.docTitle = document.title;
+            this._accept = '';
         },
         postCreate: function () {
             this.uploaderWidget = new Uploader({
@@ -55,6 +59,9 @@ define([
                 url: route.file_upload.collection(),
                 name: "file"
             }).placeAt(this.fileUploader);
+
+            // Keep accept on reset
+            this.connect(this.uploaderWidget, '_createInput', this._setAccept);
 
             var widget = this;
             this.uploaderWidget.on("begin", function () { widget.uploadBegin(); });
@@ -91,14 +98,23 @@ define([
             dropTarget.ondrop = dragLeave;
         },
 
+        setAccept: function (accept) {
+            this._accept = accept;
+            this._setAccept();
+        },
+
+        _setAccept: function () {
+            this.uploaderWidget.inputNode.accept = this._accept;
+        },
+
         uploadBegin: function () {
             this.upload_promise = new Deferred();
             this.uploading = true;
             this.data = undefined;
             this.fileInfo.innerHTML = i18n.gettext("Uploading...");
 
-            domClass.remove(this.fileText);
-            domClass.add(this.fileText, "uploader__text--progress");
+            domClass.remove(this.focusNode, this.stateClasses);
+            domClass.add(this.focusNode, "uploader--progress");
         },
 
         uploadProgress: function (evt) {
@@ -121,8 +137,8 @@ define([
             this.fileInfo.innerHTML = this.data.name + " (" + readableFileSize(this.data.size) + ")";
 
             // Change text for choosing file
-            domClass.remove(this.fileText);
-            domClass.add(this.fileText, "uploader__text--complete");
+            domClass.remove(this.focusNode, this.stateClasses);
+            domClass.add(this.focusNode, "uploader--complete");
         },
 
         uploadError: function (error) {
@@ -131,8 +147,16 @@ define([
             this.data = undefined;
             this.fileInfo.innerHTML = i18n.gettext("Could not load file!");
 
-            domClass.remove(this.fileText);
-            domClass.add(this.fileText, "uploader__text--error");
+            domClass.remove(this.focusNode, this.stateClasses);
+            domClass.add(this.focusNode, "uploader--error");
+        },
+
+        uploadReset: function() {
+          this.uploading = false;
+          this.data = undefined;
+          this.fileInfo.innerHTML = "";
+          domClass.remove(this.focusNode, this.stateClasses);
+          domClass.add(this.focusNode, "uploader--start");
         },
 
         _getValueAttr: function () {

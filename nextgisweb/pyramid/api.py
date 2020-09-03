@@ -14,8 +14,9 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from ..env import env
 from ..package import pkginfo
 from ..core.exception import ValidationError
+from ..resource import Resource
 
-from .util import ClientRoutePredicate
+from .util import _, ClientRoutePredicate
 import six
 
 
@@ -398,6 +399,33 @@ def setup_pyramid(comp, config):
     comp.company_logo_enabled = lambda request: True
     comp.company_logo_view = None
     comp.company_url_view = lambda request: comp.options['company_url']
+
+    comp.help_page_url_view = lambda (request): \
+        comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
+
+    def preview_link_view(request):
+        defaults = comp.preview_link_default_view(request)
+
+        if hasattr(request, 'context') and isinstance(request.context, Resource):
+            social = request.context.social
+            if social is not None:
+                image = request.route_url(
+                    'resource.preview', id=request.context.id,
+                    _query=str(social.preview_fileobj_id)) \
+                    if social.preview_fileobj is not None else defaults['image']
+                description = social.preview_description \
+                    if social.preview_description is not None else defaults['description']
+                return dict(
+                    image=image,
+                    description=description
+                )
+        return defaults
+
+    comp.preview_link_default_view = lambda (request): \
+        dict(image=request.static_url('nextgisweb:static/img/webgis-for-social.png'),
+             description=_("Your Web GIS at nextgis.com"))
+
+    comp.preview_link_view = preview_link_view
 
     config.add_route('pyramid.company_logo', '/api/component/pyramid/company_logo') \
         .add_view(company_logo, request_method='GET')

@@ -91,7 +91,7 @@
                 }
             %endif
 
-            <% help_page_url = request.env.pyramid.help_page_url(request) %>
+            <% help_page_url = request.env.pyramid.help_page_url_view(request) %>
             %if help_page_url is not None:
                 <% help_page_url = help_page_url.format(lang=request.locale_name) %>
                 ,{

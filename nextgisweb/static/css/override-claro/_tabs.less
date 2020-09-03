@@ -1,8 +1,8 @@
 .nextgis.claro{
 	.dijitTabPaneWrapper,
-	.dijitTabContainerTop-tabs, 
-	.dijitTabContainerBottom-tabs, 
-	.dijitTabContainerLeft-tabs, 
+	.dijitTabContainerTop-tabs,
+	.dijitTabContainerBottom-tabs,
+	.dijitTabContainerLeft-tabs,
 	.dijitTabContainerRight-tabs{
 		border-color: @light-border-2;
 
@@ -25,7 +25,7 @@
 				color: rgba(0,0,0,.87);
 			}
 		}
-		
+
 		.dijitTabChecked{
 			color: rgba(0,0,0,.87);
 		}
@@ -49,10 +49,14 @@
 		}
 
 		.dijitTabChecked{
-			border-top-color: @blue;			
+			border-top-color: @blue;
 			border-left-color: @light-border-2;
 			border-right-color: @light-border-2;
 			background-color: #fff;
 		}
 	}
+
+  .dijitTabContainerTopChildWrapper.dijitVisible{
+    overflow: auto;
+  }
 }

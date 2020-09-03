@@ -1,0 +1,46 @@
+.uploader--image .uploader__dropzone{
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.uploader--image.uploader--complete{
+  background-color: #F2F4F5;
+  background-position: 0 0, 12px 12px;
+  background-size: 24px 24px;
+  background-image: -webkit-linear-gradient(45deg,rgba(0,0,0,.06) 25%,transparent 0,transparent 75%,rgba(0,0,0,.06) 0,rgba(0,0,0,.06)),-webkit-linear-gradient(45deg,rgba(0,0,0,.06) 25%,transparent 0,transparent 75%,rgba(0,0,0,.06) 0,rgba(0,0,0,.06));
+  background-image: -o-linear-gradient(45deg,rgba(0,0,0,.06) 25%,transparent 25%,transparent 75%,rgba(0,0,0,.06) 75%,rgba(0,0,0,.06)),-o-linear-gradient(45deg,rgba(0,0,0,.06) 25%,transparent 25%,transparent 75%,rgba(0,0,0,.06) 75%,rgba(0,0,0,.06));
+  background-image: linear-gradient(45deg,rgba(0,0,0,.06) 25%,transparent 0,transparent 75%,rgba(0,0,0,.06) 0,rgba(0,0,0,.06)),linear-gradient(45deg,rgba(0,0,0,.06) 25%,transparent 0,transparent 75%,rgba(0,0,0,.06) 0,rgba(0,0,0,.06));
+}
+
+.uploader--image.uploader--complete .uploader__inner,
+.uploader--image.uploader--complete .uploader__dropzone::before{
+  display: none;
+}
+
+.uploader--image.uploader--complete .uploader__dropzone{
+  background-color: transparent;
+}
+
+.uploader--image .uploader__delete-btn{
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: none;
+}
+
+.uploader--image.uploader--complete .uploader__delete-btn{
+  display: inline-flex;
+}
+
+.uploader--image.uploader--auto .uploader__dropzone{
+  background-size: auto;
+}
+
+.uploader--image.uploader--contain .uploader__dropzone{
+  background-size: contain;
+}
+
+.uploader--image.uploader--cover .uploader__dropzone{
+  background-size: cover;
+}

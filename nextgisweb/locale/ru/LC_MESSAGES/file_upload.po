@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-05-30 09:28+0000\n"
+"POT-Creation-Date: 2020-07-28 08:55+0000\n"
 "PO-Revision-Date: 2015-09-15 14:53+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -27,39 +27,53 @@ msgstr "Загруженный файл слишком большой"
 msgid "Upload is not completed"
 msgstr "Загрузка не завершена"
 
-#: amd/ngw-file-upload/Uploader.js:106
+#: amd/ngw-file-upload/Uploader.js:55
 msgid "Select"
 msgstr "Выбрать"
 
-#: amd/ngw-file-upload/Uploader.js:133
+#: amd/ngw-file-upload/Uploader.js:82
 msgid "max"
 msgstr "максимум"
 
-#: amd/ngw-file-upload/Uploader.js:152
+#: amd/ngw-file-upload/Uploader.js:105
 msgid "Uploading..."
 msgstr "Идёт загрузка..."
 
-#: amd/ngw-file-upload/Uploader.js:160
+#: amd/ngw-file-upload/Uploader.js:113
 msgid " uploaded..."
 msgstr " загружено..."
 
-#: amd/ngw-file-upload/Uploader.js:186
+#: amd/ngw-file-upload/Uploader.js:139
 msgid "Could not load file!"
 msgstr "Не удалось загрузить файл!"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:9
+msgid "Select an image"
+msgstr "Выберите изображение"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:10
+#: amd/ngw-file-upload/template/Uploader.hbs:10
+msgid "Overwrite?"
+msgstr "Заменить?"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:11
+#: amd/ngw-file-upload/template/Uploader.hbs:11
+msgid "Try again"
+msgstr "Попробовать еще раз"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:13
+#: amd/ngw-file-upload/template/Uploader.hbs:13
+msgid "or drag and drop here"
+msgstr "или перетащите в эту область"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:21
+msgid "Delete"
+msgstr "Удалить"
 
 #: amd/ngw-file-upload/template/Uploader.hbs:9
 msgid "Select a file"
 msgstr "Выберите файл"
 
-#: amd/ngw-file-upload/template/Uploader.hbs:10
-msgid "Overwrite?"
-msgstr "Заменить?"
-
-#: amd/ngw-file-upload/template/Uploader.hbs:11
-msgid "Try again"
-msgstr "Попробовать еще раз"
-
-#: amd/ngw-file-upload/template/Uploader.hbs:13
-msgid "or use drag and drop"
-msgstr "или перетащите в эту область"
+#~ msgid "or use drag and drop"
+#~ msgstr "или перетащите в эту область"
 

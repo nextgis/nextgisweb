@@ -5,6 +5,7 @@ Changes
 -----
 
 - Raster layer export to GeoTIFF, ERDAS IMAGINE and Panorama RMF formats.
+- Customizable link preview for resources.
 - Support for ``geom_format`` and ``srs`` in feature layer REST API (POST / PUT requests).
 - Improved resource picker: inappropriate resources are disabled now.
 - Session based OAuth authentication with token refresh support.

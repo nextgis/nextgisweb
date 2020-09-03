@@ -7,10 +7,10 @@ import six
 from bunch import Bunch
 
 from .. import db
+from ..auth import Principal, User, Group
 from ..env import env
 from ..models import declarative_base, DBSession
 from ..registry import registry_maker
-from ..auth import Principal, User, Group
 
 from .util import _
 from .interface import providedBy
@@ -258,6 +258,13 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
                 raise ValidationError(_("Resource keyname is not unique."))
 
         return value
+
+    # Preview
+
+    @classmethod
+    def check_social_editable(cls):
+        """ Can this resource social settings be editable? """
+        return False
 
 
 ResourceScope.read.require(

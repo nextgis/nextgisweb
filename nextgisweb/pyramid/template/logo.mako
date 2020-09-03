@@ -2,6 +2,9 @@
 
 <%def name="head()">
     <% import json %>
+    <% current_image = request.route_url('pyramid.logo') if \
+                       request.env.core.settings_exists('pyramid', 'logo') \
+                       else '' %>
     <script type="text/javascript">
         require([
             "ngw-pyramid/LogoForm",
@@ -9,7 +12,9 @@
         ], function (
             LogoForm
         ) {
-            (new LogoForm()).placeAt('form').startup();
+            new LogoForm({
+                current_image: '${current_image}'
+            }).placeAt('form').startup();
         });
     </script>
 </%def>

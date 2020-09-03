@@ -6,25 +6,25 @@
         style="width: 100%; height: 300px">
 
     <div data-dojo-attach-point="wFile"
-        data-dojo-type="ngw-file-upload/Uploader"
+        data-dojo-type="ngw-file-upload/ImageUploader"
         data-dojo-props="
                 region: 'center',
-                uploaderLinkText: '{{gettext 'Upload a PNG logo'}}',
-                uploaderHelpText: '{{gettext 'We recommend height of 45 px and width of up to 200 px. Refresh the page after upload.'}}'
+                uploaderHelpText: '{{gettext 'We recommend height of 45 px and width of up to 200 px.'}}',
+                backgroundSize: 'auto'
     "></div>
 
 
         <div data-dojo-type="dijit/layout/ContentPane"
             data-dojo-props="region: 'bottom'"
             style="padding: 1em 0;">
-            <button data-dojo-type="dijit/form/Button" 
+            <button data-dojo-type="dijit/form/Button"
                 data-dojo-attach-point="buttonSave"
                 class="dijitButton--primary">{{gettext 'Save'}}</button>
-            <button data-dojo-type="dijit/form/Button" 
-                data-dojo-attach-point="buttonRestore"
-                class="dijitButton--primary">{{gettext 'Restore default'}}</button>
+            <button data-dojo-type="dijit/form/Button"
+                data-dojo-attach-point="buttonCancel"
+                class="dijitButton--primary">{{gettext 'Cancel'}}</button>
         </div>
 
-    </div> 
+    </div>
 
 </div>
