@@ -120,7 +120,9 @@ class Timedelta(OptionType):
         raise ValueError("Invalid timedelta value: " + value)
 
     def dumps(self, value):
-        seconds = value.total_seconds(0)
+        if value is None:
+            return ''
+        seconds = int(value.total_seconds())
         for a, m in self._parts:
             if seconds % m == 0:
                 return '{}{}'.format(seconds // m, a)
