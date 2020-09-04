@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+
 import os
 import os.path
 import logging
-from shutil import copyfileobj
 from collections import OrderedDict, defaultdict
+from datetime import datetime as dt, timedelta
+from shutil import copyfileobj
 from operator import itemgetter
 
 from ..lib.config import Option
@@ -109,28 +111,28 @@ class FileStorageComponent(Component):
 
     def cleanup(self):
         self.logger.info('Cleaning up file storage...')
-        path = self.path
 
         deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
         kept_files, kept_dirs, kept_bytes = 0, 0, 0
 
-        for (dirpath, dirnames, filenames) in os.walk(path, topdown=False):
+        delta = timedelta(minutes=30)
+
+        for (dirpath, dirnames, filenames) in os.walk(self.path, topdown=False):
             relist = False
 
             for fn in filenames:
                 obj = FileObj.filter_by(uuid=fn).first()
                 fullfn = os.path.join(dirpath, fn)
-                size = os.stat(fullfn).st_size
+                stat = os.stat(fullfn)
 
-                if obj is None:
-                    # TODO: Check modification time and don't remove recently changed files
+                if obj is None and (dt.utcnow() - dt.utcfromtimestamp(stat.st_ctime) > delta):
                     os.remove(fullfn)
                     relist = True
                     deleted_files += 1
-                    deleted_bytes += size
+                    deleted_bytes += stat.st_size
                 else:
                     kept_files += 1
-                    kept_bytes += size
+                    kept_bytes += stat.st_size
 
             if (
                 (not relist and len(filenames) == 0 and len(dirnames) == 0)
