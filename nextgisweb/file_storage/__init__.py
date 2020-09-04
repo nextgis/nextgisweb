@@ -115,7 +115,7 @@ class FileStorageComponent(Component):
         deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
         kept_files, kept_dirs, kept_bytes = 0, 0, 0
 
-        delta = timedelta(minutes=30)
+        delta = timedelta(hours=4)
 
         for (dirpath, dirnames, filenames) in os.walk(self.path, topdown=False):
             relist = False
