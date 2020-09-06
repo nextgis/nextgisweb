@@ -8,7 +8,7 @@ define([
     "dojo/json",
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
-    "ngw-pyramid/i18n!pyramid",
+    "ngw-pyramid/i18n!webmap",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/SettingsForm.hbs",
     // template
