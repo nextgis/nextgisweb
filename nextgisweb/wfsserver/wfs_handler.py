@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+from datetime import datetime
 from lxml import etree
 from lxml.builder import ElementMaker
 
@@ -252,46 +253,54 @@ class WFSHandler():
             offset = 0 if self.p_startindex is None else int(self.p_startindex)
             query.limit(limit, offset)
 
+        count = 0
+
         if self.p_resulttype == 'hits':
-            root.set('numberMatched', str(query().total_count))
-            root.set('numberReturned', "0")
-            return etree.tostring(root)
-
-        query.geom()
-
-        if self.p_srsname is not None:
-            srs_id = parse_srs(self.p_srsname)
-            srs_out = feature_layer.srs \
-                if srs_id == feature_layer.srs_id \
-                else SRS.filter_by(id=srs_id).one()
+            matched = query().total_count
         else:
-            srs_out = feature_layer.srs
-        query.srs(srs_out)
+            query.geom()
 
-        osr_out = osr.SpatialReference()
-        osr_out.ImportFromWkt(srs_out.wkt)
+            if self.p_srsname is not None:
+                srs_id = parse_srs(self.p_srsname)
+                srs_out = feature_layer.srs \
+                    if srs_id == feature_layer.srs_id \
+                    else SRS.filter_by(id=srs_id).one()
+            else:
+                srs_out = feature_layer.srs
+            query.srs(srs_out)
 
-        for feature in query():
-            feature_id = str(feature.id)
-            __member = El('featureMember', {ns_attr('gml', 'id'): feature_id},
-                          parent=root, namespace=nsmap['gml'])
-            __feature = El(layer.keyname, dict(fid=feature_id), parent=__member)
+            osr_out = osr.SpatialReference()
+            osr_out.ImportFromWkt(srs_out.wkt)
 
-            geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
-            gml = geom.ExportToGML(['FORMAT=%s' % GML_FORMAT, 'NAMESPACE_DECL=YES'])
-            __geom = El('geom', parent=__feature)
-            __gml = etree.fromstring(gml)
-            __geom.append(__gml)
+            for feature in query():
+                feature_id = str(feature.id)
+                __member = El('featureMember', {ns_attr('gml', 'id'): feature_id},
+                              parent=root, namespace=nsmap['gml'])
+                __feature = El(layer.keyname, dict(fid=feature_id), parent=__member)
 
-            for field in feature.fields:
-                _field = El(field, parent=__feature)
-                value = feature.fields[field]
-                if value is not None:
-                    if not isinstance(value, text_type):
-                        value = str(value)
-                    _field.text = value
-                else:
-                    _field.set(ns_attr('xsi', 'nil'), 'true')
+                geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
+                gml = geom.ExportToGML(['FORMAT=%s' % GML_FORMAT, 'NAMESPACE_DECL=YES'])
+                __geom = El('geom', parent=__feature)
+                __gml = etree.fromstring(gml)
+                __geom.append(__gml)
+
+                for field in feature.fields:
+                    _field = El(field, parent=__feature)
+                    value = feature.fields[field]
+                    if value is not None:
+                        if not isinstance(value, text_type):
+                            value = str(value)
+                        _field.text = value
+                    else:
+                        _field.set(ns_attr('xsi', 'nil'), 'true')
+
+                count += 1
+
+            matched = count
+
+        root.set('numberMatched', str(matched))
+        root.set('numberReturned', str(count))
+        root.set('timeStamp', datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f"))
 
         return etree.tostring(root)
 
