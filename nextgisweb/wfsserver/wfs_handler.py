@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+from collections import OrderedDict
 from datetime import datetime
 from lxml import etree
 from lxml.builder import ElementMaker
@@ -25,16 +26,34 @@ VERSION_SUPPORTED = (v100, v200, v202)
 VERSION_DEFAULT = v202
 
 
-nsmap = dict(
-    wfs='http://www.opengis.net/wfs',
-    gml='http://www.opengis.net/gml/3.2',
-    ogc='http://www.opengis.net/ogc',
-    xsi='http://www.w3.org/2001/XMLSchema-instance'
+_nsmap = dict(
+    wfs=OrderedDict((
+        (v100, 'http://www.opengis.net/wfs'),
+        (v200, 'http://www.opengis.net/wfs/2.0'),
+    )),
+    gml=OrderedDict((
+        (v100, 'http://www.opengis.net/gml'),
+        (v200, 'http://www.opengis.net/gml/3.2'),
+    )),
+    ogc=OrderedDict((
+        (v100, 'http://www.opengis.net/ogc'),
+    )),
+    xsi=OrderedDict((
+        (v100, 'http://www.w3.org/2001/XMLSchema-instance'),
+    ))
 )
 
 
-def ns_attr(ns, attr):
-    return '{{{0}}}{1}'.format(nsmap[ns], attr)
+def nsmap(prefix, request_version):
+    item = _nsmap[prefix]
+    for version, value in reversed(item.items()):
+        if version <= request_version:
+            return value
+    return None
+
+
+def ns_attr(ns, attr, request_version):
+    return '{{{0}}}{1}'.format(nsmap(ns, request_version), attr)
 
 
 def ns_trim(value):
@@ -181,16 +200,18 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _describe_feature_type(self):
-        EM = ElementMaker(nsmap=dict(gml=nsmap['gml']))
+        _ns_gml = nsmap('gml', self.p_version)
+
+        EM = ElementMaker(nsmap=dict(gml=_ns_gml))
         root = EM('schema', dict(
-            targetNamespace=nsmap['wfs'],
+            targetNamespace=nsmap('wfs', self.p_version),
             elementFormDefault='qualified',
             attributeFormDefault='unqualified',
             version='0.1',
             xmlns='http://www.w3.org/2001/XMLSchema'))
 
         El('import', dict(
-            namespace=nsmap['gml'],
+            namespace=_ns_gml,
             schemaLocation='http://schemas.opengis.net/gml/2.0.0/feature.xsd'
         ), parent=root)
 
@@ -225,15 +246,25 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _get_feature(self):
+        v_gt200 = self.p_version >= v200
+
+        _ns_wfs = nsmap('wfs', self.p_version)
+        _ns_gml = nsmap('gml', self.p_version)
+
         layer = Layer.filter_by(service_id=self.resource.id, keyname=self.p_typenames).one()
         feature_layer = layer.resource
         self.request.resource_permission(DataScope.read, feature_layer)
 
-        EM = ElementMaker(namespace=nsmap['wfs'], nsmap=dict(
-            gml=nsmap['gml'], wfs=nsmap['wfs'],
-            ogc=nsmap['ogc'], xsi=nsmap['xsi']
+        EM = ElementMaker(namespace=_ns_wfs, nsmap=dict(
+            gml=_ns_gml, wfs=_ns_wfs,
+            ogc=nsmap('ogc', self.p_version), xsi=nsmap('xsi', self.p_version)
         ))
-        root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation'): 'http://www.opengis.net/wfs http://schemas.opengeospatial.net//wfs/1.0.0/WFS-basic.xsd'})  # NOQA: E501
+        schema_location = ' '.join((
+            _ns_wfs,
+            'http://schemas.opengis.net/wfs/2.0.0/wfs.xsd' if v_gt200
+            else 'http://schemas.opengeospatial.net/wfs/1.0.0/WFS-basic.xsd'
+        ))
+        root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation', self.p_version): schema_location})  # NOQA: E501
 
         query = feature_layer.feature_query()
 
@@ -274,8 +305,8 @@ class WFSHandler():
 
             for feature in query():
                 feature_id = str(feature.id)
-                __member = El('featureMember', {ns_attr('gml', 'id'): feature_id},
-                              parent=root, namespace=nsmap['gml'])
+                __member = El('featureMember', {ns_attr('gml', 'id', self.p_version): feature_id},
+                              parent=root, namespace=_ns_gml)
                 __feature = El(layer.keyname, dict(fid=feature_id), parent=__member)
 
                 geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
@@ -292,7 +323,7 @@ class WFSHandler():
                             value = str(value)
                         _field.text = value
                     else:
-                        _field.set(ns_attr('xsi', 'nil'), 'true')
+                        _field.set(ns_attr('xsi', 'nil', self.p_version), 'true')
 
                 count += 1
 
@@ -307,6 +338,9 @@ class WFSHandler():
     def _transaction(self):
         v_gt200 = self.p_version >= v200
 
+        _ns_wfs = nsmap('wfs', self.p_version)
+        _ns_ogc = nsmap('ogc', self.p_version)
+
         layers = dict()
 
         def find_layer(keyname):
@@ -317,15 +351,15 @@ class WFSHandler():
                 layers[keyname] = feature_layer
             return layers[keyname]
 
-        EM = ElementMaker(namespace=nsmap['wfs'], nsmap=dict(
-            wfs=nsmap['wfs'], ogc=nsmap['ogc'], xsi=nsmap['xsi']))
+        EM = ElementMaker(namespace=_ns_wfs, nsmap=dict(
+            wfs=_ns_wfs, ogc=_ns_ogc, xsi=nsmap('xsi', self.p_version)))
         _response = EM('TransactionResponse', dict(version='1.0.0'))
 
-        _summary = El('TransactionSummary', namespace=nsmap['wfs'], parent=_response)
+        _summary = El('TransactionSummary', namespace=_ns_wfs, parent=_response)
         summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
 
         for _operation in self.root_body:
-            if _operation.tag == ns_attr('wfs', 'Insert'):
+            if _operation.tag == ns_attr('wfs', 'Insert', self.p_version):
                 _layer = _operation[0]
                 keyname = ns_trim(_layer.tag)
                 feature_layer = find_layer(keyname)
@@ -343,27 +377,27 @@ class WFSHandler():
 
                 fid = feature_layer.feature_create(feature)
 
-                _insert = El('InsertResult', namespace=nsmap['wfs'], parent=_response)
-                El('FeatureId', dict(fid=str(fid)), namespace=nsmap['ogc'], parent=_insert)
+                _insert = El('InsertResult', namespace=_ns_wfs, parent=_response)
+                El('FeatureId', dict(fid=str(fid)), namespace=_ns_ogc, parent=_insert)
 
                 summary['totalInserted'] += 1
             else:
                 keyname = ns_trim(_operation.get('typeName'))
                 feature_layer = find_layer(keyname)
 
-                _filter = _operation.find(ns_attr('ogc', 'Filter'))
+                _filter = _operation.find(ns_attr('ogc', 'Filter', self.p_version))
                 resid_tag = 'ResourceId' if v_gt200 else 'FeatureId'
                 resid_attr = 'rid' if v_gt200 else 'fid'
-                _feature_id = _filter.find(ns_attr('ogc', resid_tag))
+                _feature_id = _filter.find(ns_attr('ogc', resid_tag, self.p_version))
                 fid = int(_feature_id.get(resid_attr))
 
-                if _operation.tag == ns_attr('wfs', 'Update'):
+                if _operation.tag == ns_attr('wfs', 'Update', self.p_version):
                     query = feature_layer.feature_query()
                     query.filter_by(id=fid)
                     feature = query().one()
-                    for _property in _operation.findall(ns_attr('wfs', 'Property')):
-                        key = _property.find(ns_attr('wfs', 'Name')).text
-                        _value = _property.find(ns_attr('wfs', 'Value'))
+                    for _property in _operation.findall(ns_attr('wfs', 'Property', self.p_version)):
+                        key = _property.find(ns_attr('wfs', 'Name', self.p_version)).text
+                        _value = _property.find(ns_attr('wfs', 'Value', self.p_version))
 
                         geom_column = get_geom_column(feature_layer)
 
@@ -381,7 +415,7 @@ class WFSHandler():
                     feature_layer.feature_put(feature)
 
                     summary['totalUpdated'] += 1
-                elif _operation.tag == ns_attr('wfs', 'Delete'):
+                elif _operation.tag == ns_attr('wfs', 'Delete', self.p_version):
                     feature_layer.feature_delete(fid)
                     summary['totalDeleted'] += 1
                 else:
@@ -389,10 +423,10 @@ class WFSHandler():
 
         for param, value in summary.items():
             if value > 0:
-                El(param, namespace=nsmap['wfs'], text=str(value), parent=_summary)
+                El(param, namespace=_ns_wfs, text=str(value), parent=_summary)
 
-        _result = El('TransactionResult', namespace=nsmap['wfs'], parent=_response)
-        _status = El('Status', namespace=nsmap['wfs'], parent=_result)
-        El('SUCCESS', namespace=nsmap['wfs'], parent=_status)
+        _result = El('TransactionResult', namespace=_ns_wfs, parent=_response)
+        _status = El('Status', namespace=_ns_wfs, parent=_result)
+        El('SUCCESS', namespace=_ns_wfs, parent=_status)
 
         return etree.tostring(_response)
