@@ -27,7 +27,7 @@ VERSION_DEFAULT = v202
 
 nsmap = dict(
     wfs='http://www.opengis.net/wfs',
-    gml='http://www.opengis.net/gml',
+    gml='http://www.opengis.net/gml/3.2',
     ogc='http://www.opengis.net/ogc',
     xsi='http://www.w3.org/2001/XMLSchema-instance'
 )
