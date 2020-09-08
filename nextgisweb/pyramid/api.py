@@ -400,7 +400,7 @@ def setup_pyramid(comp, config):
     comp.company_logo_view = None
     comp.company_url_view = lambda request: comp.options['company_url']
 
-    comp.help_page_url_view = lambda (request): \
+    comp.help_page_url_view = lambda request: \
         comp.options['help_page.url'] if comp.options['help_page.enabled'] else None
 
     def preview_link_view(request):
@@ -421,7 +421,7 @@ def setup_pyramid(comp, config):
                 )
         return defaults
 
-    comp.preview_link_default_view = lambda (request): \
+    comp.preview_link_default_view = lambda request: \
         dict(image=request.static_url('nextgisweb:static/img/webgis-for-social.png'),
              description=_("Your Web GIS at nextgis.com"))
 
