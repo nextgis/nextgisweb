@@ -128,7 +128,22 @@ class WFSHandler():
         self.p_requset = params.get('REQUEST') if self.request.method == 'GET' \
             else ns_trim(self.root_body.tag)
 
-        self.p_version = params.get('VERSION', VERSION_DEFAULT)
+        av = params.get('ACCEPTVERSIONS')
+        self.p_acceptversions = None if av is None else sorted(av.split(','), reverse=True)
+
+        self.p_version = params.get('VERSION')
+        if self.p_version is None:
+            if self.p_acceptversions is not None:
+                for version in self.p_acceptversions:
+                    if version in VERSION_SUPPORTED:
+                        self.p_version = version
+                        break
+            else:
+                self.p_version = VERSION_DEFAULT
+
+        if self.p_version not in VERSION_SUPPORTED:
+            raise ValidationError("Unsupported version")
+
         self.p_typenames = params.get('TYPENAMES', params.get('TYPENAME'))
         self.p_resulttype = params.get('RESULTTYPE')
         self.p_bbox = params.get('BBOX')
@@ -137,9 +152,6 @@ class WFSHandler():
         self.p_startindex = params.get('STARTINDEX')
 
     def response(self):
-        if self.p_version not in VERSION_SUPPORTED:
-            raise ValidationError("Unsupported version")
-
         if self.p_requset == 'GetCapabilities':
             return self._get_capabilities()
         elif self.p_requset == 'DescribeFeatureType':
