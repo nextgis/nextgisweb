@@ -273,6 +273,8 @@ class WFSHandler():
         ))
         schema_location = ' '.join((
             _ns_wfs,
+            _ns_gml,
+            'http://schemas.opengis.net/gml/3.2.1/gml.xsd',
             'http://schemas.opengis.net/wfs/2.0.0/wfs.xsd' if v_gt200
             else 'http://schemas.opengeospatial.net/wfs/1.0.0/WFS-basic.xsd'
         ))
