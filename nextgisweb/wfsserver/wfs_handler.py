@@ -164,19 +164,26 @@ class WFSHandler():
             raise ValidationError("Unsupported request")
 
     def _get_capabilities(self):
-        root = El('WFS_Capabilities', dict(version=self.p_version))
+        EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)))
+        root = EM('WFS_Capabilities', dict(
+            version=self.p_version,
+            xmlns=nsmap('wfs', self.p_version)))
 
         __s = El('Service', parent=root)
         El('Name', parent=__s, text='WFS Server')
         El('Title', parent=__s, text='Web Feature Service Server')
         El('Abstract', parent=__s, text='Supports WFS')
+        El('OnlineResource', parent=__s)
 
         __c = El('Capability', parent=root)
         __r = El('Request', parent=__c)
 
-        wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id)
+        wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id) + '?'
         for wfs_operation, result_formats in WFS_OPERATIONS:
             __wfs_op = El(wfs_operation, parent=__r)
+            if wfs_operation == 'DescribeFeatureType':
+                __lang = El('SchemaDescriptionLanguage', parent=__wfs_op)
+                El('XMLSCHEMA', parent=__lang)
             for request_method in ('Get', 'Post'):
                 __dcp = El('DCPType', parent=__wfs_op)
                 __http = El('HTTP', parent=__dcp)
