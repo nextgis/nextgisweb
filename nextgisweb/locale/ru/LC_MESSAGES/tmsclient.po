@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.4.0.dev1+d5f5567e\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2020-08-24 05:46+0000\n"
+"POT-Creation-Date: 2020-09-10 06:56+0000\n"
 "PO-Revision-Date: 2020-05-29 10:28+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -22,7 +22,7 @@ msgstr ""
 #: amd/ngw-tmsclient/ConnectionWidget.js:34
 #: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:51
 msgid "TMS connection"
-msgstr ""
+msgstr "Соединение TMS"
 
 #: model.py:147
 msgid "Zoom is out of range."
