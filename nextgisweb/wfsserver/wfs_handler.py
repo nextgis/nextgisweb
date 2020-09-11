@@ -234,9 +234,11 @@ class WFSHandler():
             schemaLocation='http://schemas.opengis.net/gml/2.0.0/feature.xsd'
         ), parent=root)
 
-        typename = self.p_typenames.split(',')
-        if len(typename) == 1:
-            layer = Layer.filter_by(service_id=self.resource.id, keyname=typename[0]).one()
+        typenames = [layer.keyname for layer in self.resource.layers] \
+            if self.p_typenames is None else self.p_typenames.split(',')
+
+        if len(typenames) == 1:
+            layer = Layer.filter_by(service_id=self.resource.id, keyname=typenames[0]).one()
             El('element', dict(name=layer.keyname, substitutionGroup='gml:_Feature',
                                type='%s_Type' % layer.keyname), parent=root)
             __ctype = El('complexType', dict(name="%s_Type" % layer.keyname), parent=root)
@@ -256,7 +258,7 @@ class WFSHandler():
             El('element', dict(minOccurs='0', name='geom', type=GEOM_TYPE_TO_GML_TYPE[
                 layer.resource.geometry_type]), parent=__seq)
         else:
-            for keyname in typename:
+            for keyname in typenames:
                 import_url = self.request.route_url(
                     'wfsserver.wfs', id=self.resource.id,
                     _query=dict(REQUEST='DescribeFeatureType', TYPENAME=keyname))
