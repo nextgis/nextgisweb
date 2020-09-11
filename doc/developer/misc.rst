@@ -60,8 +60,8 @@ CSV
    Host: ngw_url
    Accept: */*
 
-TMS
-^^^
+Render
+^^^^^^
 
 **The following request returns TMS from raster layer**:
 
@@ -79,6 +79,20 @@ TMS
     :param z: zoom level
     :param x: tile number on x axis (horizontal)
     :param y: tile number on y axis (vertical)
+    :statuscode 200: no error
+
+**The following request returns image from raster layer**:
+
+.. versionadded:: 3.0
+.. http:get:: /api/component/render/image?extent=(float:minx),(float:miny),(float:maxx),(float:maxy)&size=(int:width),(int:height)&resource=(int:id1),(int:id2)...
+
+    Image request
+
+    :reqheader Accept: must be ``*/*``
+    :reqheader Authorization: optional Basic auth string to authenticate
+    :param id1, id2: style resources id's
+    :param minx, miny, maxx, maxy: image spatial extent
+    :param width, height: output image size
     :statuscode 200: no error
 
 .. note:: Styles order should be from lower to upper.
