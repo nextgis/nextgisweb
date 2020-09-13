@@ -365,6 +365,32 @@ To delete feature from vector layer execute following request:
    DELETE /api/resource/3/feature/1 HTTP/1.1
    Host: ngw_url
    Accept: */*
+   
+Delete features
+---------------
+
+To delete list of features execute following request:
+
+.. http:delete:: /api/resource/(int:layer_id)/feature/
+
+   Delete features request
+
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :param layer_id: resource identifier
+   :<jsonarr int id: feature identifier
+   :statuscode 200: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   DELETE /api/resource/3/feature/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+   
+   [{"id": 25},{"id": 24},{"id": 26}]
+   
 
 Delete all features
 ---------------------
