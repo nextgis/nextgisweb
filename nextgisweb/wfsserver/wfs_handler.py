@@ -19,6 +19,7 @@ from .model import Layer
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
 v100 = '1.0.0'
+v110 = '1.1.0'
 v200 = '2.0.0'
 v202 = '2.0.2'
 VERSION_SUPPORTED = (v100, v200, v202)
@@ -74,12 +75,15 @@ def El(tag, attrs=None, parent=None, text=None, namespace=None):
     return e
 
 
-GML_FORMAT = 'GML3'
+GET_CAPABILITIES = 'GetCapabilities'
+DESCRIBE_FEATURE_TYPE = 'DescribeFeatureType'
+GET_FEATURE = 'GetFeature'
+TRANSACTION = 'Transaction'
 WFS_OPERATIONS = (
-    ('GetCapabilities', ()),
-    ('DescribeFeatureType', ()),
-    ('GetFeature', (GML_FORMAT, )),
-    ('Transaction', (GML_FORMAT, )),
+    GET_CAPABILITIES,
+    DESCRIBE_FEATURE_TYPE,
+    GET_FEATURE,
+    TRANSACTION,
 )
 
 
@@ -151,14 +155,18 @@ class WFSHandler():
         self.p_count = params.get('COUNT', params.get('MAXFEATURES'))
         self.p_startindex = params.get('STARTINDEX')
 
+    @property
+    def gml_format(self):
+        return 'GML3' if self.p_version >= v110 else 'GML2'
+
     def response(self):
-        if self.p_requset == 'GetCapabilities':
+        if self.p_requset == GET_CAPABILITIES:
             return self._get_capabilities()
-        elif self.p_requset == 'DescribeFeatureType':
+        elif self.p_requset == DESCRIBE_FEATURE_TYPE:
             return self._describe_feature_type()
-        elif self.p_requset == 'GetFeature':
+        elif self.p_requset == GET_FEATURE:
             return self._get_feature()
-        elif self.p_requset == 'Transaction':
+        elif self.p_requset == TRANSACTION:
             return self._transaction()
         else:
             raise ValidationError("Unsupported request")
@@ -179,18 +187,18 @@ class WFSHandler():
         __r = El('Request', parent=__c)
 
         wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id) + '?'
-        for wfs_operation, result_formats in WFS_OPERATIONS:
+        for wfs_operation in WFS_OPERATIONS:
             __wfs_op = El(wfs_operation, parent=__r)
-            if wfs_operation == 'DescribeFeatureType':
+            if wfs_operation == DESCRIBE_FEATURE_TYPE:
                 __lang = El('SchemaDescriptionLanguage', parent=__wfs_op)
                 El('XMLSCHEMA', parent=__lang)
+            if wfs_operation == GET_FEATURE:
+                __format = El('ResultFormat', parent=__wfs_op)
+                El(self.gml_format, parent=__format)
             for request_method in ('Get', 'Post'):
                 __dcp = El('DCPType', parent=__wfs_op)
                 __http = El('HTTP', parent=__dcp)
                 El(request_method, dict(onlineResource=wfs_url), parent=__http)
-            for result_format in result_formats:
-                __format = El('ResultFormat', parent=__wfs_op)
-                El(result_format, parent=__format)
 
         __list = El('FeatureTypeList', parent=root)
         __ops = El('Operations', parent=__list)
@@ -334,7 +342,7 @@ class WFSHandler():
                 __feature = El(layer.keyname, dict(fid=feature_id), parent=__member)
 
                 geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
-                gml = geom.ExportToGML(['FORMAT=%s' % GML_FORMAT, 'NAMESPACE_DECL=YES'])
+                gml = geom.ExportToGML(['FORMAT=%s' % self.gml_format, 'NAMESPACE_DECL=YES'])
                 __geom = El('geom', parent=__feature)
                 __gml = etree.fromstring(gml)
                 __geom.append(__gml)
