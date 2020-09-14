@@ -290,8 +290,6 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _get_feature(self):
-        v_gt200 = self.p_version >= v200
-
         _ns_wfs = nsmap('wfs', self.p_version)
         _ns_gml = nsmap('gml', self.p_version)
 
@@ -307,7 +305,7 @@ class WFSHandler():
             _ns_wfs,
             _ns_gml,
             'http://schemas.opengis.net/gml/3.2.1/gml.xsd',
-            'http://schemas.opengis.net/wfs/2.0.0/wfs.xsd' if v_gt200
+            'http://schemas.opengis.net/wfs/2.0.0/wfs.xsd' if self.p_version >= v200
             else 'http://schemas.opengeospatial.net/wfs/1.0.0/WFS-basic.xsd'
         ))
         root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation', self.p_version): schema_location})  # NOQA: E501
@@ -375,9 +373,14 @@ class WFSHandler():
 
             matched = count
 
-        root.set('numberMatched', str(matched))
-        root.set('numberReturned', str(count))
-        root.set('timeStamp', datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f"))
+        if self.p_version == v110:
+            root.set('numberOfFeatures', str(count))
+        elif self.p_version >= v200:
+            root.set('numberMatched', str(matched))
+            root.set('numberReturned', str(count))
+
+        if self.p_version >= v110:
+            root.set('timeStamp', datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f"))
 
         return etree.tostring(root)
 
