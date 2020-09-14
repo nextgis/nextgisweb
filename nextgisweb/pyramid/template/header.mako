@@ -91,10 +91,14 @@
                 }
             %endif
             %if user_mode != 'guest':
+              ## So far we have only one setting, check it
+              <% oauth = request.env.auth.oauth%>
+              %if oauth is not None and oauth.options['enabled'] and oauth.options['bind']:
                 ,{
                     "text": '${tr(_("User settings"))}',
                     "link": '${request.route_url("auth.user_settings")}'
                 }
+              %endif
             %endif
 
             <% help_page_url = request.env.pyramid.help_page_url_view(request) %>
