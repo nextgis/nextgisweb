@@ -213,8 +213,9 @@ class WFSHandler():
                 El('Delete', parent=__ops)
 
             extent = feature_layer.extent
-            El('bbox', dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
-                            minx=str(extent['minLon']), miny=str(extent['minLat'])), parent=__type)
+            bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
+                        minx=str(extent['minLon']), miny=str(extent['minLat']))
+            El('LatLongBoundingBox', bbox, parent=__type)
 
         return etree.tostring(root)
 
