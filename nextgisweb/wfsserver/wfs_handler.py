@@ -177,12 +177,14 @@ class WFSHandler():
             version=self.p_version,
             xmlns=nsmap('wfs', self.p_version)))
 
+        # Service
         __s = El('Service', parent=root)
         El('Name', parent=__s, text='WFS Server')
         El('Title', parent=__s, text='Web Feature Service Server')
         El('Abstract', parent=__s, text='Supports WFS')
         El('OnlineResource', parent=__s)
 
+        # Capability
         __c = El('Capability', parent=root)
         __r = El('Request', parent=__c)
 
@@ -200,6 +202,7 @@ class WFSHandler():
                 __http = El('HTTP', parent=__dcp)
                 El(request_method, dict(onlineResource=wfs_url), parent=__http)
 
+        # FeatureTypeList
         __list = El('FeatureTypeList', parent=root)
         __ops = El('Operations', parent=__list)
         El('Query', parent=__ops)
@@ -224,6 +227,17 @@ class WFSHandler():
             bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
                         minx=str(extent['minLon']), miny=str(extent['minLat']))
             El('LatLongBoundingBox', bbox, parent=__type)
+
+        # Filter_Capabilities
+        _ns_ogc = nsmap('ogc', self.p_version)
+        __filter = El('Filter_Capabilities', namespace=_ns_ogc, parent=root)
+
+        __sc = El('Spatial_Capabilities', namespace=_ns_ogc, parent=__filter)
+        __so = El('Spatial_Operators', namespace=_ns_ogc, parent=__sc)
+        El('BBOX', namespace=_ns_ogc, parent=__so)
+
+        __sc = El('Scalar_Capabilities', namespace=_ns_ogc, parent=__filter)
+        El('Logical_Operators', namespace=_ns_ogc, parent=__sc)
 
         return etree.tostring(root)
 
