@@ -145,3 +145,18 @@ def test_geom_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     coords = feature['geom']['coordinates']
     assert round(coords[0], 3) == 10018754.171
     assert round(coords[1], 3) == 5621521.486
+
+
+def test_cdelete(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+    url = '/api/resource/%d/feature/' % vector_layer_id
+
+    resp = ngw_webtest_app.delete_json(url, [])
+    assert resp.json == []
+
+    resp = ngw_webtest_app.delete_json(url, [dict(id=1)])
+    assert resp.json == [1]
+
+    resp = ngw_webtest_app.delete(url)
+    assert resp.json
+
+    assert ngw_webtest_app.get(url).json == []
