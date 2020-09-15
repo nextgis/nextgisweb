@@ -568,7 +568,7 @@ def cpatch(resource, request):
 def cdelete(resource, request):
     request.resource_permission(PERM_WRITE)
 
-    if request.body and request.json_body:
+    if len(request.body) > 0:
         result = []
         for fdata in request.json_body:
             if 'id' in fdata:
