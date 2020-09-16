@@ -41,6 +41,15 @@ _nsmap = dict(
     )),
     xsi=OrderedDict((
         (v100, 'http://www.w3.org/2001/XMLSchema-instance'),
+    )),
+    ows=OrderedDict((
+        (v200, 'http://www.opengis.net/ows/1.1'),
+    )),
+    xlink=OrderedDict((
+        (v200, 'http://www.w3.org/1999/xlink'),
+    )),
+    fes=OrderedDict((
+        (v200, 'http://www.opengis.net/fes/2.0'),
     ))
 )
 
@@ -79,13 +88,6 @@ GET_CAPABILITIES = 'GetCapabilities'
 DESCRIBE_FEATURE_TYPE = 'DescribeFeatureType'
 GET_FEATURE = 'GetFeature'
 TRANSACTION = 'Transaction'
-WFS_OPERATIONS = (
-    GET_CAPABILITIES,
-    DESCRIBE_FEATURE_TYPE,
-    GET_FEATURE,
-    TRANSACTION,
-)
-
 
 GEOM_TYPE_TO_GML_TYPE = {
     GEOM_TYPE.POINT: 'gml:PointPropertyType',
@@ -161,7 +163,8 @@ class WFSHandler():
 
     def response(self):
         if self.p_requset == GET_CAPABILITIES:
-            return self._get_capabilities()
+            return self._get_capabilities200() if self.p_version >= v200 \
+                else self._get_capabilities()
         elif self.p_requset == DESCRIBE_FEATURE_TYPE:
             return self._describe_feature_type()
         elif self.p_requset == GET_FEATURE:
@@ -171,39 +174,8 @@ class WFSHandler():
         else:
             raise ValidationError("Unsupported request")
 
-    def _get_capabilities(self):
-        EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)))
-        root = EM('WFS_Capabilities', dict(
-            version=self.p_version,
-            xmlns=nsmap('wfs', self.p_version)))
-
-        # Service
-        __s = El('Service', parent=root)
-        El('Name', parent=__s, text='WFS Server')
-        El('Title', parent=__s, text='Web Feature Service Server')
-        El('Abstract', parent=__s, text='Supports WFS')
-        El('OnlineResource', parent=__s)
-
-        # Capability
-        __c = El('Capability', parent=root)
-        __r = El('Request', parent=__c)
-
-        wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id) + '?'
-        for wfs_operation in WFS_OPERATIONS:
-            __wfs_op = El(wfs_operation, parent=__r)
-            if wfs_operation == DESCRIBE_FEATURE_TYPE:
-                __lang = El('SchemaDescriptionLanguage', parent=__wfs_op)
-                El('XMLSCHEMA', parent=__lang)
-            if wfs_operation == GET_FEATURE:
-                __format = El('ResultFormat', parent=__wfs_op)
-                El(self.gml_format, parent=__format)
-            for request_method in ('Get', 'Post'):
-                __dcp = El('DCPType', parent=__wfs_op)
-                __http = El('HTTP', parent=__dcp)
-                El(request_method, dict(onlineResource=wfs_url), parent=__http)
-
-        # FeatureTypeList
-        __list = El('FeatureTypeList', parent=root)
+    def _feature_type_list(self, parent):
+        __list = El('FeatureTypeList', parent=parent)
         __ops = El('Operations', parent=__list)
         El('Query', parent=__ops)
 
@@ -228,6 +200,45 @@ class WFSHandler():
                         minx=str(extent['minLon']), miny=str(extent['minLat']))
             El('LatLongBoundingBox', bbox, parent=__type)
 
+    def _get_capabilities(self):
+        EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)))
+        root = EM('WFS_Capabilities', dict(
+            version=self.p_version,
+            xmlns=nsmap('wfs', self.p_version)))
+
+        # Service
+        __s = El('Service', parent=root)
+        El('Name', parent=__s, text='WFS Server')
+        El('Title', parent=__s, text='Web Feature Service Server')
+        El('Abstract', parent=__s, text='Supports WFS')
+        El('OnlineResource', parent=__s)
+
+        # Operations
+        __c = El('Capability', parent=root)
+        __r = El('Request', parent=__c)
+
+        wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id) + '?'
+        for wfs_operation in (
+            GET_CAPABILITIES,
+            DESCRIBE_FEATURE_TYPE,
+            GET_FEATURE,
+            TRANSACTION,
+        ):
+            __wfs_op = El(wfs_operation, parent=__r)
+            if wfs_operation == DESCRIBE_FEATURE_TYPE:
+                __lang = El('SchemaDescriptionLanguage', parent=__wfs_op)
+                El('XMLSCHEMA', parent=__lang)
+            if wfs_operation == GET_FEATURE:
+                __format = El('ResultFormat', parent=__wfs_op)
+                El(self.gml_format, parent=__format)
+            for request_method in ('Get', 'Post'):
+                __dcp = El('DCPType', parent=__wfs_op)
+                __http = El('HTTP', parent=__dcp)
+                El(request_method, dict(onlineResource=wfs_url), parent=__http)
+
+        # FeatureTypeList
+        self._feature_type_list(root)
+
         # Filter_Capabilities
         _ns_ogc = nsmap('ogc', self.p_version)
         __filter = El('Filter_Capabilities', namespace=_ns_ogc, parent=root)
@@ -238,6 +249,74 @@ class WFSHandler():
 
         __sc = El('Scalar_Capabilities', namespace=_ns_ogc, parent=__filter)
         El('Logical_Operators', namespace=_ns_ogc, parent=__sc)
+
+        return etree.tostring(root)
+
+    def _get_capabilities200(self):
+        _ns_ows = nsmap('ows', self.p_version)
+        _ns_fes = nsmap('fes', self.p_version)
+
+        EM = ElementMaker(nsmap=dict(
+            fes=_ns_fes, ows=_ns_ows, xlink=nsmap('xlink', self.p_version)
+        ))
+        root = EM('WFS_Capabilities', dict(
+            version=self.p_version,
+            xmlns=nsmap('wfs', self.p_version)))
+
+        # Service
+        __service = El('ServiceIdentification', namespace=_ns_ows, parent=root)
+        El('Title', namespace=_ns_ows, parent=__service, text='Web Feature Service Server')
+        El('Abstract', namespace=_ns_ows, parent=__service, text='Supports WFS')
+        El('OnlineResource', namespace=_ns_ows, parent=__service)
+
+        # Operations
+        __op_md = El('OperationsMetadata', namespace=_ns_ows, parent=root)
+
+        wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id) + '?'
+        for wfs_operation in (
+            GET_CAPABILITIES,
+            DESCRIBE_FEATURE_TYPE,
+            GET_FEATURE,
+            TRANSACTION,
+        ):
+            req_methods = ('Get', 'Post') if wfs_operation != TRANSACTION else ('Post', )
+            __dcp = El('DCP', namespace=_ns_ows, parent=__op_md)
+            __http = El('HTTP', namespace=_ns_ows, parent=__dcp)
+            for req_mehtod in req_methods:
+                El(req_mehtod, {ns_attr('xlink', 'href', self.p_version): wfs_url},
+                   namespace=_ns_ows, parent=__http)
+
+        __parameter = El('Parameter', dict(name='version'), namespace=_ns_ows, parent=__op_md)
+        __values = El('AllowedValues', namespace=_ns_ows, parent=__parameter)
+        for version in VERSION_SUPPORTED:
+            El('Value', text=version, namespace=_ns_ows, parent=__values)
+
+        # FeatureTypeList
+        self._feature_type_list(root)
+
+        # Filter_Capabilities
+        __filter = El('Filter_Capabilities', namespace=_ns_fes, parent=root)
+        __conf = El('Conformance', namespace=_ns_fes, parent=__filter)
+
+        def constraint(name, default):
+            __constraint = El('Constraint', dict(name=name),
+                              namespace=_ns_fes, parent=__conf)
+            El('NoValues', namespace=_ns_ows, parent=__constraint)
+            El('DefaultValue', namespace=_ns_ows, parent=__constraint, text=default)
+
+        constraint('ImplementsTransactionalWFS', 'TRUE')
+        constraint('ImplementsQuery', 'FALSE')
+        constraint('ImplementsAdHocQuery', 'FALSE')
+        constraint('ImplementsFunctions', 'FALSE')
+        constraint('ImplementsMinStandardFilter', 'FALSE')
+        constraint('ImplementsStandardFilter', 'FALSE')
+        constraint('ImplementsMinSpatialFilter', 'FALSE')
+        constraint('ImplementsSpatialFilter', 'FALSE')
+        constraint('ImplementsMinTemporalFilter', 'FALSE')
+        constraint('ImplementsTemporalFilter', 'FALSE')
+        constraint('ImplementsVersionNav', 'FALSE')
+        constraint('ImplementsSorting', 'FALSE')
+        constraint('ImplementsExtendedOperators', 'FALSE')
 
         return etree.tostring(root)
 
