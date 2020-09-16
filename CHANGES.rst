@@ -6,13 +6,15 @@ Changes
 
 - Raster layer export to GeoTIFF, ERDAS IMAGINE and Panorama RMF formats.
 - Customizable link preview for resources.
-- Support for ``geom_format`` and ``srs`` in feature layer REST API (POST / PUT requests).
 - Improved resource picker: inappropriate resources are disabled now.
+- New implementation of WFS server which fixes many bugs.
+- Support for ``geom_format`` and ``srs`` in feature layer REST API (POST / PUT requests).
 - Session based OAuth authentication with token refresh support.
 - Delete users and groups via REST API.
 - Track timestamps of user's last activity.
 - Customization of webmap's identify popup via control panel.
 - Speedup cleanup of file storage maintenance and cleanup.
+- Fix bulk feature deletion API when passing an empty list.
 - Fix bug in CORS implementation for requests returning errors.
 - Fix coordinates display format in webmap's identification pop-up.
 - Fix tile distortion issue for raster styles
