@@ -1,12 +1,12 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
     data-ngw-serialize-prefix="${serializePrefix}" title="Слой" class="padding-block">
     <div class="input-group">
-      <label class="input-group__label">{{gettext 'Map preview for social media and messengers:'}}</label>
+      <label class="input-group__label">{{gettext 'Preview for social media and messengers:'}}</label>
       <div data-dojo-attach-point="wPreviewFile"
           data-dojo-type="ngw-file-upload/ImageUploader"
           data-dojo-props="
               uploaderLinkText: '{{gettext 'Select a preview image'}}',
-              uploaderHelpText: '{{gettext 'The image should be in JPG or PNG format. Its size should be at least 640×320px (1280×640px for best display)'}}',
+              uploaderHelpText: '{{gettext 'The image should be in PNG format'}}',
               backgroundSize: 'contain'"></div>
     </div>
 
