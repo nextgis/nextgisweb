@@ -175,9 +175,12 @@ class WFSHandler():
             raise ValidationError("Unsupported request")
 
     def _feature_type_list(self, parent):
+        _ns_ows = nsmap('ows', self.p_version)
+
         __list = El('FeatureTypeList', parent=parent)
-        __ops = El('Operations', parent=__list)
-        El('Query', parent=__ops)
+        if self.p_version < v200:
+            __ops = El('Operations', parent=__list)
+            El('Query', parent=__ops)
 
         for layer in self.resource.layers:
             feature_layer = layer.resource
@@ -187,18 +190,32 @@ class WFSHandler():
             El('Name', parent=__type, text=layer.keyname)
             El('Title', parent=__type, text=layer.display_name)
             El('Abstract', parent=__type)
-            El('SRS', parent=__type, text="EPSG:%s" % layer.resource.srs_id)
+            if self.p_version >= v200:
+                srs_tag = 'DefaultCRS'
+            elif self.p_version == v110:
+                srs_tag = 'DefaultSRS'
+            else:
+                srs_tag = 'SRS'
+            El(srs_tag, parent=__type, text="EPSG:%s" % layer.resource.srs_id)
 
-            __ops = El('Operations', parent=__type)
-            if feature_layer.has_permission(DataScope.write, self.request.user):
-                El('Insert', parent=__ops)
-                El('Update', parent=__ops)
-                El('Delete', parent=__ops)
+            if self.p_version == v100:
+                __ops = El('Operations', parent=__type)
+                if feature_layer.has_permission(DataScope.write, self.request.user):
+                    El('Insert', parent=__ops)
+                    El('Update', parent=__ops)
+                    El('Delete', parent=__ops)
 
             extent = feature_layer.extent
-            bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
-                        minx=str(extent['minLon']), miny=str(extent['minLat']))
-            El('LatLongBoundingBox', bbox, parent=__type)
+            if self.p_version >= v110:
+                __bbox = El('WGS84BoundingBox', namespace=_ns_ows, parent=__type)
+                El('LowerCorner', namespace=_ns_ows, parent=__bbox,
+                   text='%.6f %.6f' % (extent['minLon'], extent['minLat']))
+                El('UpperCorner', namespace=_ns_ows, parent=__bbox,
+                   text='%.6f %.6f' % (extent['maxLon'], extent['maxLat']))
+            else:
+                bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
+                            minx=str(extent['minLon']), miny=str(extent['minLat']))
+                El('LatLongBoundingBox', bbox, parent=__type)
 
     def _get_capabilities(self):
         EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)))
@@ -267,7 +284,9 @@ class WFSHandler():
         __service = El('ServiceIdentification', namespace=_ns_ows, parent=root)
         El('Title', namespace=_ns_ows, parent=__service, text='Web Feature Service Server')
         El('Abstract', namespace=_ns_ows, parent=__service, text='Supports WFS')
-        El('OnlineResource', namespace=_ns_ows, parent=__service)
+        El('ServiceType', namespace=_ns_ows, parent=__service, text='WFS')
+        for version in VERSION_SUPPORTED:
+            El('ServiceTypeVersion', namespace=_ns_ows, parent=__service, text=version)
 
         # Operations
         __op_md = El('OperationsMetadata', namespace=_ns_ows, parent=root)
@@ -279,8 +298,9 @@ class WFSHandler():
             GET_FEATURE,
             TRANSACTION,
         ):
+            __wfs_op = El('Operation', dict(name=wfs_operation), namespace=_ns_ows, parent=__op_md)
             req_methods = ('Get', 'Post') if wfs_operation != TRANSACTION else ('Post', )
-            __dcp = El('DCP', namespace=_ns_ows, parent=__op_md)
+            __dcp = El('DCP', namespace=_ns_ows, parent=__wfs_op)
             __http = El('HTTP', namespace=_ns_ows, parent=__dcp)
             for req_mehtod in req_methods:
                 El(req_mehtod, {ns_attr('xlink', 'href', self.p_version): wfs_url},
