@@ -40,13 +40,21 @@ class SVGSymbolLibrary(Base, Resource):
     def check_parent(self, parent):
         return isinstance(parent, ResourceGroup)
 
+    def find_svg_symbol(self, name):
+        svg_symbol = SVGSymbol.filter_by(
+            svg_symbol_library_id=self.id,
+            name=name
+        ).one_or_none()
+
+        return svg_symbol
+
 
 class SVGSymbol(Base):
     __tablename__ = 'svg_symbol'
 
     id = db.Column(db.Integer, primary_key=True)
     svg_symbol_library_id = db.Column(db.ForeignKey(SVGSymbolLibrary.id), nullable=False)
-    fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=True)
+    fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=False)
     name = db.Column(db.Unicode(255), nullable=False)
 
     __table_args__ = (
@@ -58,6 +66,10 @@ class SVGSymbol(Base):
     svg_symbol_library = db.relationship(
         SVGSymbolLibrary, foreign_keys=svg_symbol_library_id,
         backref=db.backref('files', cascade='all,delete-orphan'))
+
+    @property
+    def path(self):
+        return env.file_storage.filename(self.fileobj)
 
 
 def validate_filename(filename):

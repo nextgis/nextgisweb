@@ -8,23 +8,19 @@ from pyramid.response import FileResponse, Response
 
 from ..resource import DataScope
 
-from .model import SVGSymbolLibrary, SVGSymbol
+from .model import SVGSymbolLibrary
 
 
 def file_download(resource, request):
     request.resource_permission(DataScope.read)
 
     fname = request.matchdict['name']
-    fobj = SVGSymbol.filter_by(
-        svg_symbol_library_id=resource.id,
-        name=fname
-    ).one_or_none()
-    if fobj is None:
+    svg_symbol = resource.find_svg_symbol(fname)
+
+    if svg_symbol is None:
         raise HTTPNotFound()
 
-    filename = request.env.file_storage.filename(fobj.fileobj)
-
-    return FileResponse(filename, content_type='image/svg+xml', request=request)
+    return FileResponse(svg_symbol.path, content_type='image/svg+xml', request=request)
 
 
 def export(resource, request):
