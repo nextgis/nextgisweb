@@ -44,9 +44,9 @@ Same steps with curl:
 
 .. sourcecode:: bash
 
-   $ curl --user "administrator:demodemo" -H "Accept: */*" -X POST
--d '{"cls": "resource_group", "resource": {"display_name": "foldername", "parent": {"id": 0},
- "description" : "Folder created from curl"} }' https://sandbox.nextgis.com/api/resource/
+   curl --user "administrator:demodemo" -H "Accept: */*" -X POST
+   -d '{"cls": "resource_group", "resource": {"display_name": "foldername", "parent": {"id": 0},
+   "description" : "Folder created from curl"} }' https://sandbox.nextgis.com/api/resource/
 
 .. _ngwdev_create_pg_conn:
 
