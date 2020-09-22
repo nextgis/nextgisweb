@@ -12,6 +12,7 @@ from six import BytesIO, text_type
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..geometry import box, geom_from_wkb
+from ..layer import IBboxLayer
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
@@ -205,17 +206,18 @@ class WFSHandler():
                     El('Update', parent=__ops)
                     El('Delete', parent=__ops)
 
-            extent = feature_layer.extent
-            if self.p_version >= v110:
-                __bbox = El('WGS84BoundingBox', namespace=_ns_ows, parent=__type)
-                El('LowerCorner', namespace=_ns_ows, parent=__bbox,
-                   text='%.6f %.6f' % (extent['minLon'], extent['minLat']))
-                El('UpperCorner', namespace=_ns_ows, parent=__bbox,
-                   text='%.6f %.6f' % (extent['maxLon'], extent['maxLat']))
-            else:
-                bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
-                            minx=str(extent['minLon']), miny=str(extent['minLat']))
-                El('LatLongBoundingBox', bbox, parent=__type)
+            if IBboxLayer.providedBy(feature_layer):
+                extent = feature_layer.extent
+                if self.p_version >= v110:
+                    __bbox = El('WGS84BoundingBox', namespace=_ns_ows, parent=__type)
+                    El('LowerCorner', namespace=_ns_ows, parent=__bbox,
+                       text='%.6f %.6f' % (extent['minLon'], extent['minLat']))
+                    El('UpperCorner', namespace=_ns_ows, parent=__bbox,
+                       text='%.6f %.6f' % (extent['maxLon'], extent['maxLat']))
+                else:
+                    bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
+                                minx=str(extent['minLon']), miny=str(extent['minLat']))
+                    El('LatLongBoundingBox', bbox, parent=__type)
 
     def _get_capabilities(self):
         EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)))
