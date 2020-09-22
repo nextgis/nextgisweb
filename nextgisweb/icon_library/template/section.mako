@@ -1,4 +1,4 @@
-<%! from nextgisweb_filebucket.file_bucket.util import _ %>
+<%! from nextgisweb.icon_library.util import _ %>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>
