@@ -13,6 +13,7 @@ define([
     "ngw-pyramid/i18n!social",
     // template
     "dojox/layout/TableContainer",
+    "dijit/form/ValidationTextBox"
 ], function (
     declare,
     _WidgetBase,
