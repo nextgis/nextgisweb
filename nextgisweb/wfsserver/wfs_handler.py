@@ -85,6 +85,10 @@ def El(tag, attrs=None, parent=None, text=None, namespace=None):
     return e
 
 
+def find_tags(element, tag):
+    return element.xpath('.//*[local-name()="%s"]' % tag)
+
+
 GET_CAPABILITIES = 'GetCapabilities'
 DESCRIBE_FEATURE_TYPE = 'DescribeFeatureType'
 GET_FEATURE = 'GetFeature'
@@ -358,8 +362,12 @@ class WFSHandler():
             schemaLocation='http://schemas.opengis.net/gml/2.0.0/feature.xsd'
         ), parent=root)
 
-        typenames = [layer.keyname for layer in self.resource.layers] \
-            if self.p_typenames is None else self.p_typenames.split(',')
+        if self.request.method == 'GET':
+            typenames = [layer.keyname for layer in self.resource.layers] \
+                if self.p_typenames is None else self.p_typenames.split(',')
+        elif self.request.method == 'POST':
+            __typenames = find_tags(self.root_body, 'TypeName')
+            typenames = [__typename.text for __typename in __typenames]
 
         if len(typenames) == 1:
             layer = Layer.filter_by(service_id=self.resource.id, keyname=typenames[0]).one()
@@ -394,7 +402,16 @@ class WFSHandler():
         _ns_wfs = nsmap('wfs', self.p_version)
         _ns_gml = nsmap('gml', self.p_version)
 
-        layer = Layer.filter_by(service_id=self.resource.id, keyname=self.p_typenames).one()
+        if self.request.method == 'GET':
+            typename = self.p_typenames
+        elif self.request.method == 'POST':
+            __query = find_tags(self.root_body, 'Query')[0]
+            for k, v in __query.attrib.items():
+                if k.upper() in ('TYPENAME', 'TYPENAMES'):
+                    typename = v
+                    break
+
+        layer = Layer.filter_by(service_id=self.resource.id, keyname=typename).one()
         feature_layer = layer.resource
         self.request.resource_permission(DataScope.read, feature_layer)
 
