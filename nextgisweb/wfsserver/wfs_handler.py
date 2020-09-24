@@ -128,7 +128,8 @@ class WFSHandler():
         if self.request.method == 'GET':
             params = request.params
         elif self.request.method == 'POST':
-            self.root_body = etree.parse(BytesIO(self.request.body)).getroot()
+            parser = etree.XMLParser(recover=True)
+            self.root_body = etree.parse(BytesIO(self.request.body), parser=parser).getroot()
             params = self.root_body.attrib
         else:
             raise ValidationError("Unsupported request method")
