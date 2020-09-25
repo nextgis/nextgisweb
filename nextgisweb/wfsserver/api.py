@@ -16,7 +16,10 @@ def wfs(resource, request):
     request.resource_permission(ServiceScope.connect)
 
     wfsHandler = WFSHandler(resource, request)
-    xml = wfsHandler.response()
+
+    validateSchema = request.GET.get('validateSchema') == '1'
+    xml = wfsHandler.response(validateSchema)
+
     return Response(xml, content_type='text/xml')
 
 

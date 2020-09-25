@@ -3,9 +3,10 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from collections import OrderedDict
 from datetime import datetime
+from os import path
+
 from lxml import etree
 from lxml.builder import ElementMaker
-
 from osgeo import ogr, osr
 from six import BytesIO, text_type
 
@@ -27,6 +28,8 @@ VERSION_SUPPORTED = (v100, v200, v202)
 
 VERSION_DEFAULT = v202
 
+WFS_SCHEMA_DIR = path.join(path.dirname(
+    path.abspath(__file__)), 'test/xsd/schemas.opengis.net/wfs/')
 
 _nsmap = dict(
     wfs=OrderedDict((
@@ -167,18 +170,29 @@ class WFSHandler():
     def gml_format(self):
         return 'GML3' if self.p_version >= v110 else 'GML2'
 
-    def response(self):
+    def response(self, validateSchema=False):
         if self.p_requset == GET_CAPABILITIES:
-            return self._get_capabilities200() if self.p_version >= v200 \
+            xml = self._get_capabilities200() if self.p_version >= v200 \
                 else self._get_capabilities()
         elif self.p_requset == DESCRIBE_FEATURE_TYPE:
-            return self._describe_feature_type()
+            xml = self._describe_feature_type()
         elif self.p_requset == GET_FEATURE:
-            return self._get_feature()
+            xml = self._get_feature()
         elif self.p_requset == TRANSACTION:
-            return self._transaction()
+            xml = self._transaction()
         else:
             raise ValidationError("Unsupported request")
+
+        if validateSchema:
+            version_dir = '1.0.0' if self.p_version == v100 else '2.0'
+            xsd_file = 'WFS-capabilities.xsd' if self.p_version == v100 \
+                and self.p_requset == GET_CAPABILITIES else 'wfs.xsd'
+            xsd_path = path.join(WFS_SCHEMA_DIR, version_dir, xsd_file)
+            schema = etree.XMLSchema(etree.parse(xsd_path))
+            parser = etree.XMLParser(schema=schema)
+            etree.fromstring(xml, parser=parser)
+
+        return xml
 
     def _feature_type_list(self, parent):
         _ns_ows = nsmap('ows', self.p_version)

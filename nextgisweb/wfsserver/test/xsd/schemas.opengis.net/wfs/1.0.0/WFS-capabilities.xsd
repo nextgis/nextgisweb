@@ -1,0 +1,215 @@
+<xsd:schema xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:ogc="http://www.opengis.net/ogc" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.opengis.net/wfs" elementFormDefault="qualified" version="1.0.0.3">
+   
+   
+   
+   
+
+   
+   <xsd:import namespace="http://www.opengis.net/ogc" schemaLocation="../../filter/1.0.0/filterCapabilities.xsd"/>
+
+   
+   
+   <xsd:element name="Abstract" type="xsd:string"/>
+   
+   <xsd:element name="AccessConstraints" type="xsd:string"/>
+   <xsd:element name="Fees" type="xsd:string"/>
+   
+   <xsd:element name="Keywords" type="xsd:string"/>
+   
+   <xsd:element name="OnlineResource"/>
+   <xsd:element name="SRS" type="xsd:string"/>
+   
+   <xsd:element name="Title" type="xsd:string"/>
+
+   <xsd:element name="Query" type="wfs:EmptyType"/>
+   <xsd:element name="Insert" type="wfs:EmptyType"/>
+   <xsd:element name="Update" type="wfs:EmptyType"/>
+   <xsd:element name="Delete" type="wfs:EmptyType"/>
+   <xsd:element name="Lock" type="wfs:EmptyType"/>
+
+   
+   <xsd:element name="VendorSpecificCapabilities" type="xsd:string"/>
+
+   
+   
+   <xsd:element name="WFS_Capabilities" type="wfs:WFS_CapabilitiesType"/>
+
+   
+   <xsd:complexType name="WFS_CapabilitiesType">
+      <xsd:sequence>
+         
+         <xsd:element name="Service" type="wfs:ServiceType"/>
+
+         
+         <xsd:element name="Capability" type="wfs:CapabilityType"/>
+         <xsd:element name="FeatureTypeList" type="wfs:FeatureTypeListType"/>
+         <xsd:element ref="ogc:Filter_Capabilities"/>
+      </xsd:sequence>
+
+      
+      <xsd:attribute name="version" type="xsd:string" fixed="1.0.0"/>
+
+      
+      <xsd:attribute name="updateSequence" type="xsd:nonNegativeInteger" default="0"/>
+   </xsd:complexType>
+
+   <xsd:complexType name="ServiceType">
+      <xsd:sequence>
+         <xsd:element name="Name" type="xsd:string"/>
+         <xsd:element ref="wfs:Title"/>
+         <xsd:element ref="wfs:Abstract" minOccurs="0"/>
+         <xsd:element ref="wfs:Keywords" minOccurs="0"/>
+         <xsd:element ref="wfs:OnlineResource"/>
+         <xsd:element ref="wfs:Fees" minOccurs="0"/>
+         <xsd:element ref="wfs:AccessConstraints" minOccurs="0"/>
+      </xsd:sequence>
+   </xsd:complexType>
+
+   <xsd:complexType name="CapabilityType">
+      <xsd:sequence>
+         <xsd:element name="Request" type="wfs:RequestType"/>
+         
+         <xsd:element ref="wfs:VendorSpecificCapabilities" minOccurs="0"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="FeatureTypeListType">
+      <xsd:sequence>
+         <xsd:element name="Operations" type="wfs:OperationsType" minOccurs="0"/>
+         <xsd:element name="FeatureType" type="wfs:FeatureTypeType" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+
+   
+   <xsd:complexType name="RequestType">
+      <xsd:choice maxOccurs="unbounded">
+         <xsd:element name="GetCapabilities" type="wfs:GetCapabilitiesType"/>
+         <xsd:element name="DescribeFeatureType" type="wfs:DescribeFeatureTypeType"/>
+         <xsd:element name="Transaction" type="wfs:TransactionType"/>
+         <xsd:element name="GetFeature" type="wfs:GetFeatureTypeType"/>
+         <xsd:element name="GetFeatureWithLock" type="wfs:GetFeatureTypeType"/>
+         <xsd:element name="LockFeature" type="wfs:LockFeatureTypeType"/>
+      </xsd:choice>
+   </xsd:complexType>
+   <xsd:complexType name="GetCapabilitiesType">
+      <xsd:sequence>
+         <xsd:element name="DCPType" type="wfs:DCPTypeType" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="DescribeFeatureTypeType">
+      <xsd:sequence>
+         <xsd:element name="SchemaDescriptionLanguage" type="wfs:SchemaDescriptionLanguageType"/>
+         <xsd:element name="DCPType" type="wfs:DCPTypeType" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="TransactionType">
+      <xsd:sequence>
+         <xsd:element name="DCPType" type="wfs:DCPTypeType" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="GetFeatureTypeType">
+      <xsd:sequence>
+         <xsd:element name="ResultFormat" type="wfs:ResultFormatType"/>
+         <xsd:element name="DCPType" type="wfs:DCPTypeType" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="LockFeatureTypeType">
+      <xsd:sequence>
+         <xsd:element name="DCPType" type="wfs:DCPTypeType" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+
+   
+   <xsd:complexType name="DCPTypeType">
+      <xsd:sequence>
+         <xsd:element name="HTTP" type="wfs:HTTPType"/>
+      </xsd:sequence>
+   </xsd:complexType>
+
+   
+   <xsd:complexType name="FeatureTypeType">
+      <xsd:sequence>
+         <xsd:element name="Name" type="xsd:QName"/>
+         <xsd:element ref="wfs:Title" minOccurs="0"/>
+         <xsd:element ref="wfs:Abstract" minOccurs="0"/>
+         <xsd:element ref="wfs:Keywords" minOccurs="0"/>
+         <xsd:element ref="wfs:SRS"/>
+         <xsd:element name="Operations" type="wfs:OperationsType" minOccurs="0"/>
+         <xsd:element name="LatLongBoundingBox" type="wfs:LatLongBoundingBoxType" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:element name="MetadataURL" type="wfs:MetadataURLType" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="GetType">
+      <xsd:attribute name="onlineResource" type="xsd:string" use="required"/>
+   </xsd:complexType>
+
+   
+   <xsd:complexType name="HTTPType">
+      <xsd:choice maxOccurs="unbounded">
+         
+         <xsd:element name="Get" type="wfs:GetType"/>
+         <xsd:element name="Post" type="wfs:PostType"/>
+      </xsd:choice>
+   </xsd:complexType>
+
+   
+   <xsd:complexType name="LatLongBoundingBoxType">
+      <xsd:attribute name="minx" type="xsd:string" use="required"/>
+      <xsd:attribute name="miny" type="xsd:string" use="required"/>
+      <xsd:attribute name="maxx" type="xsd:string" use="required"/>
+      <xsd:attribute name="maxy" type="xsd:string" use="required"/>
+   </xsd:complexType>
+
+   
+   <xsd:complexType name="MetadataURLType">
+      <xsd:simpleContent>
+         <xsd:extension base="xsd:string">
+            <xsd:attribute name="type" use="required">
+               <xsd:simpleType>
+                  <xsd:restriction base="xsd:NMTOKEN">
+                     <xsd:enumeration value="TC211"/>
+                     <xsd:enumeration value="FGDC"/>
+                  </xsd:restriction>
+               </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="format" use="required">
+               <xsd:simpleType>
+                  <xsd:restriction base="xsd:NMTOKEN">
+                     <xsd:enumeration value="XML"/>
+                     <xsd:enumeration value="SGML"/>
+                     <xsd:enumeration value="TXT"/>
+                  </xsd:restriction>
+               </xsd:simpleType>
+            </xsd:attribute>
+         </xsd:extension>
+      </xsd:simpleContent>
+   </xsd:complexType>
+   <xsd:complexType name="OperationsType">
+      <xsd:choice maxOccurs="unbounded">
+         <xsd:element ref="wfs:Insert"/>
+         <xsd:element ref="wfs:Update"/>
+         <xsd:element ref="wfs:Delete"/>
+         <xsd:element ref="wfs:Query"/>
+         <xsd:element ref="wfs:Lock"/>
+      </xsd:choice>
+   </xsd:complexType>
+   <xsd:complexType name="PostType">
+      <xsd:attribute name="onlineResource" type="xsd:string" use="required"/>
+   </xsd:complexType>
+
+   
+   <xsd:element name="GML2" type="wfs:EmptyType"/>
+   <xsd:complexType name="ResultFormatType">
+      <xsd:sequence maxOccurs="unbounded">
+         <xsd:element ref="wfs:GML2"/>
+      </xsd:sequence>
+   </xsd:complexType>
+
+   
+   <xsd:element name="XMLSCHEMA" type="wfs:EmptyType"/>
+   <xsd:complexType name="SchemaDescriptionLanguageType">
+      <xsd:sequence maxOccurs="unbounded">
+         <xsd:element ref="wfs:XMLSCHEMA"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="EmptyType"/>
+</xsd:schema>

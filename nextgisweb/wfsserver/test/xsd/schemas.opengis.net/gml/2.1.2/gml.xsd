@@ -1,0 +1,16 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" targetNamespace="http://www.opengis.net/gml" elementFormDefault="qualified" version="2.1.2.5">
+    
+    <annotation>
+        <appinfo>gml.xsd v2.1.2.5</appinfo>
+        <documentation xml:lang="en">
+            GML 'all-components' schema. 
+                
+            GML is an OGC Standard.
+            Copyright (c) 2001,2002,2010 Open Geospatial Consortium.
+            To obtain additional rights of use, visit http://www.opengeospatial.org/legal/ .
+        </documentation>
+        </annotation>
+    
+    <include schemaLocation="feature.xsd"/>
+    <include schemaLocation="geometry.xsd"/>
+</schema>

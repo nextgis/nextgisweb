@@ -2,8 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
-import os
-from lxml import etree
+from itertools import product
 from uuid import uuid4
 
 import pytest
@@ -16,6 +15,9 @@ from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.wfsserver.model import Service as WFSService, Layer as WFSLayer
+
+
+TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.0.0', )
 
 
 @pytest.fixture(scope='module')
@@ -71,18 +73,11 @@ def service_id(ngw_resource_group):
         DBSession.delete(WFSService.filter_by(id=res_wfs.id).one())
 
 
-@pytest.mark.skip()
-@pytest.mark.parametrize('version, schema', (
-    ('2.0.0', 'http://schemas.opengis.net/wfs/2.0/wfs.xsd'),
-    ('1.0.0', 'http://schemas.opengis.net/wfs/1.0.0/WFS-capabilities.xsd'),
-))
-def test_xml_valid(version, schema, service_id, ngw_webtest_app, ngw_auth_administrator):
-    resp = ngw_webtest_app.get('/api/resource/%d/wfs' % service_id, dict(
-        request='GetCapabilities',
-        version=version,
-    ))
-
-    schema = etree.XMLSchema(etree.parse(schema))
-
-    parser = etree.XMLParser(schema=schema)
-    etree.fromstring(resp.text.encode('utf-8'), parser=parser)
+@pytest.mark.parametrize('version, query', product(TEST_WFS_VERSIONS, (
+    dict(request='GetCapabilities'),
+    dict(request='GetFeature', typenames='test'),
+)))
+def test_xml_valid(version, query, service_id, ngw_webtest_app, ngw_auth_administrator):
+    query['version'] = version
+    query['validateSchema'] = '1'
+    ngw_webtest_app.get('/api/resource/%d/wfs' % service_id, query, status=200)
