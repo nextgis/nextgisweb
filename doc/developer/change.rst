@@ -56,8 +56,11 @@ Execute following PUT request to change resource.
    
    curl -d '{"resource":{"parent":{"id":373}}}' -u $login:$password -X PUT $url/api/resource/381
 
+**Change display name of resource**
 
-
+.. sourcecode:: bash
+   curl   -X PUT -u administrator:demodemo --data-binary '{"resource":{"display_name":"edit in curl"}}' http://sandbox.nextgis.com/api/resource/492
+   
 Change metadata
 -----------------------------
 
