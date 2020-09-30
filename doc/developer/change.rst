@@ -60,7 +60,49 @@ Execute following PUT request to change resource.
 
 .. sourcecode:: bash
    curl   -X PUT -u administrator:demodemo --data-binary '{"resource":{"display_name":"edit in curl"}}' http://sandbox.nextgis.com/api/resource/492
-   
+
+Change webmap
+-----------------------------
+
+When changing layers in webmap, you should set in PUT query both 'children' and 'item_type' objects.
+
+**Example request**:
+
+.. sourcecode:: python
+
+        layer1 = {
+          "layer_adapter": "tile", 
+          "layer_enabled": None, 
+          "style_parent_id": 454, 
+          "draw_order_position": None, 
+          "layer_max_scale_denom": None, 
+          "payload": None, 
+          "item_type": "layer", 
+          "layer_min_scale_denom": None, 
+          "display_name": "gidro_ln", 
+          "layer_style_id": 478, 
+          "layer_transparency": None
+        }
+        layer2 = {
+          "layer_adapter": "tile", 
+          "layer_enabled": True, 
+          "style_parent_id": 453, 
+          "draw_order_position": None, 
+          "layer_max_scale_denom": None, 
+          "payload": None, 
+          "item_type": "layer", 
+          "layer_min_scale_denom": None, 
+          "display_name": "qml/rast2_ln", 
+          "layer_style_id": 489, 
+          "layer_transparency": None
+        }
+
+        layers = (layer1,layer2)
+        payload = {'webmap':{'root_item':{'item_type':'root', 'children': layers  } }}
+
+        url=self.ngw_url+'/api/resource/'+str(webmap_id)
+        response = requests.put(url, json = payload, auth=self.ngw_creds)
+
 Change metadata
 -----------------------------
 
