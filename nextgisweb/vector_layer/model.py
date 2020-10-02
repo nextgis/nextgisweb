@@ -16,6 +16,7 @@ from sqlalchemy.sql import ColumnElement
 from sqlalchemy.ext.compiler import compiles
 
 import geoalchemy2 as ga
+from geoalchemy2.shape import from_shape as ga_from_shape
 import sqlalchemy.sql as sql
 from sqlalchemy import (
     event,
@@ -507,7 +508,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         # This will not let to write empty geometry, but it is not needed yet.
 
         if feature.geom is not None:
-            obj.geom = ga.shape.from_shape(
+            obj.geom = ga_from_shape(
                 feature.geom, srid=self.srs_id)
 
         DBSession.merge(obj)
@@ -535,7 +536,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if f.keyname in feature.fields.keys():
                 setattr(obj, f.key, feature.fields[f.keyname])
 
-        obj.geom = ga.shape.from_shape(
+        obj.geom = ga_from_shape(
             feature.geom, srid=self.srs_id)
 
         if feature.geom.geom_type.upper() != self.geometry_type:
