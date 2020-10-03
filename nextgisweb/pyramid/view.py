@@ -89,7 +89,7 @@ def favicon(request):
 
 def locale(request):
     request.session['pyramid.locale'] = request.matchdict['locale']
-    return HTTPFound(location=request.GET['next'])
+    return HTTPFound(location=request.GET.get('next', request.application_url))
 
 
 def pkginfo(request):
