@@ -47,11 +47,18 @@ def test_load_config():
         f1.flush()
         f2.flush()
 
-        settings = load_config([f1.name, f2.name], {
-            "NEXTGISWEB__COMP_A__ENV__KEY": "OK",
-            "VAR": "value"
-        })
+        include = "[comp_c]\nkey = value"
+
+        environ = {
+            "NEXTGISWEB_COMP_A__ENV__KEY": "OK",
+            "VAR": "value",
+        }
+
+        settings = load_config(
+            [f1.name, f2.name], include,
+            environ=environ)
 
         assert settings.get('comp_a.missing') is None
         assert 'comp_a.deleted.key' not in settings
         assert settings.get('comp_b.subst') == "value"
+        assert settings.get('comp_c.key') == "value"

@@ -66,7 +66,7 @@ def main(global_config, **settings):
     if len(kset) > 0:
         logger.warn("Ignored paster's parameters: %s", ', '.join(kset))
 
-    env = Env(cfg=load_config(None))
+    env = Env(cfg=load_config(None, None))
     env.initialize()
 
     setenv(env)

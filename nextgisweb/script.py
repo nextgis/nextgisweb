@@ -33,16 +33,13 @@ def main(argv=sys.argv):
 
         i += 2 if argv[i].startswith('--') else 1
 
-    if config is None:
-        config = os.environ.get('NEXTGISWEB_CONFIG')
-
     if logging is None:
         logging = os.environ.get('NEXTGISWEB_LOGGING')
 
     if logging:
         setup_logging(logging)
 
-    env = Env(cfg=load_config(config, hupper=True))
+    env = Env(cfg=load_config(config, None, hupper=True))
     setenv(env)
 
     subparsers = argparser.add_subparsers()

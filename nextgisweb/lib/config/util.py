@@ -71,9 +71,12 @@ def environ_substitution(items, environ):
         items[k] = v
 
 
-def load_config(filenames, environ=os.environ, environ_prefix='NEXTGISWEB', hupper=False):
+def load_config(filenames, include, environ=os.environ, environ_prefix='NEXTGISWEB', hupper=False):
     if filenames is None:
         filenames = environ.get(environ_prefix + '_CONFIG')
+
+    if include is None:
+        include = environ.get(environ_prefix + '_CONFIG_INCLUDE')
 
     if isinstance(filenames, six.string_types):
         filenames = filenames.split(':')
@@ -87,6 +90,14 @@ def load_config(filenames, environ=os.environ, environ_prefix='NEXTGISWEB', hupp
             # Remove key for empty value
             del result[key]
 
+    def load_fp(fp):
+        cfg = RawConfigParser()
+        (cfg.readfp if six.PY2 else cfg.read_file)(fp)
+        for section in cfg.sections():
+            for k, v in cfg.items(section):
+                rkey = '.'.join((section, k))
+                apply_kv(rkey, v)
+
     if hupper:
         from hupper import is_active, get_reloader
         if is_active():
@@ -94,13 +105,11 @@ def load_config(filenames, environ=os.environ, environ_prefix='NEXTGISWEB', hupp
 
     for fn in filenames:
         with io.open(fn, 'r') as fp:
-            cfg = RawConfigParser()
-            (cfg.readfp if six.PY2 else cfg.read_file)(fp)
+            load_fp(fp)
 
-        for section in cfg.sections():
-            for k, v in cfg.items(section):
-                rkey = '.'.join((section, k))
-                apply_kv(rkey, v)
+    if include is not None:
+        fp = io.StringIO(six.ensure_text(include))
+        load_fp(fp)
 
     for k, v in environ.items():
         rkey = environ_to_key(k, prefix=environ_prefix)

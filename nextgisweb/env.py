@@ -18,7 +18,7 @@ class Env(object):
 
     def __init__(self, cfg=None):
         if cfg is None:
-            cfg = load_config(None)
+            cfg = load_config(None, None)
 
         packages_ign = re.split(r'[,\s]+', cfg.get('core.packages.ignore', ''))
         components_ign = re.split(r'[,\s]+', cfg.get('core.components.ignore', ''))
