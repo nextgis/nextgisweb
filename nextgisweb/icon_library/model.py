@@ -40,13 +40,23 @@ class SVGSymbolLibrary(Base, Resource):
     def check_parent(self, parent):
         return isinstance(parent, ResourceGroup)
 
-    def find_svg_symbol(self, name):
-        svg_symbol = SVGSymbol.filter_by(
-            svg_symbol_library_id=self.id,
-            name=name
-        ).one_or_none()
+    def find_svg_symbol(self, candidates):
+        q = SVGSymbol.filter(
+            SVGSymbol.svg_symbol_library_id == self.id,
+            SVGSymbol.name.in_(candidates))
 
-        return svg_symbol
+        min_idx = None
+        min_symb = None
+
+        for symb in q:
+            idx = candidates.index(symb.name)
+            if min_idx is None or min_idx > idx:
+                min_idx = idx
+                min_symb = symb
+                if min_idx == 0:
+                    break
+
+        return min_symb
 
 
 class SVGSymbol(Base):
