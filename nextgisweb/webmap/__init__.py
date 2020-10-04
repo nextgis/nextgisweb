@@ -67,5 +67,5 @@ class WebMapComponent(Component):
         Option('identify_radius', int, default=3, doc="Identification sensitivity."),
         Option('popup_width', int, default=300, doc="Popup width in pixels."),
         Option('popup_height', int, default=200, doc="Popup height in pixels."),
-        Option('annotation', bool, default=False, doc="Turn on / off annotations."),
+        Option('annotation', bool, default=True, doc="Turn on / off annotations."),
     )

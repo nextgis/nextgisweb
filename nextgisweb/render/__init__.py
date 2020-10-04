@@ -61,7 +61,7 @@ class RenderComponent(Component):
         config.exclude_table_data('tile_cache', '*')
 
     option_annotations = (
-        Option('tile_cache.enabled', bool, default=False),
+        Option('tile_cache.enabled', bool, default=True),
         Option('tile_cache.track_changes', bool, default=False),
         Option('tile_cache.seed', bool, default=False),
     )

@@ -1,6 +1,11 @@
 Changes
 =======
 
+3.6.0
+-----
+
+- Tile cache and webmap annotations are enabled by default.
+
 3.5.0
 -----
 
