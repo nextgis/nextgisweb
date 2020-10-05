@@ -223,15 +223,7 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
         return sets.allow - sets.mask - sets.deny
 
     def has_permission(self, permission, user):
-        perm_cache = env.resource.perm_cache_instance
-        if perm_cache:
-            val = perm_cache.get_cached_perm(self, permission, user)  # get perm from cache
-            if val is None:  # cache is empty
-                val = permission in self.permissions(user)
-                perm_cache.add_to_cache(self, permission, user, val)  # add to cache
-            return val
-        else:
-            return permission in self.permissions(user)
+        return permission in self.permissions(user)
 
     # Data validation
 

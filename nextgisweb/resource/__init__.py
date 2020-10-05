@@ -30,7 +30,6 @@ from .permission import *   # NOQA
 from .view import *         # NOQA
 from .widget import *       # NOQA
 
-from .persmission_cache import PermissionCache
 
 __all__ = [  # NOQA: F405
     'Resource',
@@ -46,16 +45,6 @@ __all__ = [  # NOQA: F405
 class ResourceComponent(Component):
     identity = 'resource'
     metadata = Base.metadata
-
-    def __init__(self, env, settings):
-        super(ResourceComponent, self).__init__(env, settings)
-
-        # setup perm cache
-        self.perm_cache_enable = False
-        self.perm_cache_instance = None
-
-        if self.perm_cache_enable:
-            self.perm_cache_instance = PermissionCache.construct(settings)
 
     def initialize(self):
         super(ResourceComponent, self).initialize()
