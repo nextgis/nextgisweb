@@ -1069,6 +1069,7 @@ To get features using filters execute the following request:
    :reqheader Authorization: optional Basic auth string to authenticate
    :param limit: limit feature count adding to return array
    :param offset: skip some features before create features array
+   :param order_by: order results by fields. Add minus char to descending.
    :param intersects: geometry as WKT string. Features intersect with this geometry will added to array
    :param fields: comma separated list of fields in return feature
    :param fld_{field_name_1}...fld_{field_name_N}: field name and value to filter return features. Parameter name forms as ``fld_`` + real field name (keyname). All pairs of field name = value form final ``AND`` SQL query.
@@ -1201,6 +1202,13 @@ end or both. Works only for ``like`` and ``ilike`` operations.
    GET /api/resource/197/feature/?geom_format=geojson&srs=4326 HTTP/1.1
    Host: ngw_url
    Accept: */*
+   
+.. sourcecode:: http
+
+   GET /api/resource/197/feature/?order_by=NAME,-LEISURE HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
    
 **Example response with photo and description**:
 
