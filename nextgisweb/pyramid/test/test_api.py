@@ -24,6 +24,10 @@ def test_pkg_version(webtest):
     webtest.get('/api/component/pyramid/pkg_version')
 
 
+def test_healthcheck(webtest):
+    webtest.get('/api/component/pyramid/healthcheck')
+
+
 def test_settings(component, webtest):
     if hasattr(Component.registry[component], 'client_settings'):
         webtest.get('/api/component/pyramid/settings?component={}'.format(component))

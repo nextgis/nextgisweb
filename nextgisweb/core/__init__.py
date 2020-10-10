@@ -5,6 +5,7 @@ import os.path
 import io
 import json
 import re
+from collections import OrderedDict
 from datetime import datetime
 from pkg_resources import resource_filename
 
@@ -71,6 +72,29 @@ class CoreComponent(Component):
             except OperationalError as exc:
                 yield str(exc.orig).rstrip()
         conn.close()
+
+    def healthcheck(self):
+        try:
+            sa_url = self._engine_url(error_on_pwfile=True)
+        except IOError:
+            return OrderedDict((
+                ('success', False),
+                ('message', "Database password file is missing!")
+            ))
+
+        sa_engine = create_engine(sa_url)
+        try:
+            conn = sa_engine.connect()
+            conn.execute("SELECT 1")
+            conn.close()
+        except OperationalError as exc:
+            msg = str(exc.orig).rstrip()
+            return OrderedDict((
+                ('success', False),
+                ('message', "Database connection failed: " + msg)
+            ))
+
+        return dict(success=True)
 
     def initialize_db(self):
         for k, v in (

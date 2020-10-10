@@ -5,6 +5,7 @@ import json
 import os.path
 import base64
 from datetime import timedelta
+from collections import OrderedDict
 from pkg_resources import resource_filename
 from six.moves.urllib.parse import unquote
 
@@ -279,6 +280,25 @@ def pkg_version(request):
     return dict([(p, pkginfo.pkg_version(p)) for p in pkginfo.packages])
 
 
+def healthcheck(request):
+    components = [
+        comp for comp in env._components.values()
+        if hasattr(comp, 'healthcheck')]
+
+    result = OrderedDict(success=True)
+    result['component'] = OrderedDict()
+
+    for comp in components:
+        cresult = comp.healthcheck()
+        result['success'] = result['success'] and cresult['success']
+        result['component'][comp.identity] = cresult
+
+    return Response(
+        json.dumps(result), content_type="application/json",
+        status_code=200 if result['success'] else 503
+    )
+
+
 def statistics(request):
     request.require_administrator()
 
@@ -380,6 +400,11 @@ def setup_pyramid(comp, config):
         'pyramid.pkg_version',
         '/api/component/pyramid/pkg_version',
     ).add_view(pkg_version, renderer='json')
+
+    config.add_route(
+        'pyramid.healthcheck',
+        '/api/component/pyramid/healthcheck',
+    ).add_view(healthcheck)
 
     config.add_route(
         'pyramid.statistics',
