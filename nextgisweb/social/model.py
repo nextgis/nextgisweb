@@ -28,7 +28,7 @@ class ResourceSocial(Base):
     preview_description = db.Column(db.Unicode)
 
     resource = db.relationship(Resource, backref=db.backref(
-        'social', cascade='all, delete-orphan', uselist=False, lazy='joined'))
+        'social', cascade='all, delete-orphan', uselist=False))
     preview_fileobj = db.relationship(FileObj, lazy='joined')
 
 
