@@ -1,13 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
+import io
 import os
 import os.path
 import fnmatch
-import six
+import logging
+from importlib import import_module
+from pkg_resources import resource_filename
 
+import six
 from babel.support import Translations as BabelTranslations
 
+from ..package import pkginfo
+from ..compat import Path
+
 from .trstring import TrString
+
+
+_logging = logging.getLogger(__name__)
 
 
 class Translations(BabelTranslations):
@@ -25,6 +35,25 @@ class Translations(BabelTranslations):
             with open(os.path.join(directory, mofile), 'rb') as fp:
                 dtrans = Translations(fp=fp, domain=fdomain)
             self.add(dtrans)
+
+    def load_envcomp(self, env, locale):
+        for comp_id, comp in env._components.items():
+            package_path = Path(resource_filename(pkginfo.comp_pkg(comp_id), '')).parent
+
+            mod = import_module(pkginfo.comp_mod(comp_id))
+            locale_path = Path(mod.__path__[0]) / 'locale'
+            mo_path = locale_path / '{}.mo'.format(locale)
+
+            if not mo_path.is_file():
+                locale_path = Path(resource_filename(pkginfo.comp_pkg(comp_id), 'locale'))
+                mo_path = locale_path / locale / 'LC_MESSAGES' / '{}.mo'.format(comp_id)
+
+            if mo_path.is_file():
+                _logging.debug(
+                    "Loading component [%s] translations for locale [%s] from [%s]",
+                    comp_id, locale, str(mo_path.relative_to(package_path)))
+                with io.open(str(mo_path), 'rb') as fp:
+                    self.add(Translations(fp=fp, domain=comp_id))
 
 
 def dugettext_policy(translations, trstr, domain, context):

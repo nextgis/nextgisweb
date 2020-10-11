@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
 import sys
+import io
 import os
 import os.path
 import fnmatch
@@ -25,6 +26,9 @@ from babel.messages.extract import extract_from_dir
 from babel.messages.pofile import write_po, read_po
 from babel.messages.mofile import write_mo
 import six
+
+from nextgisweb.compat import Path
+
 
 logger = logging.getLogger(__name__)
 
@@ -97,41 +101,93 @@ def cmd_extract(args):
                 message, None, [(filename, lineno)],
                 auto_comments=comments, context=context)
 
-        if len(catalog) > 0:
-            logger.info("Component %s: %d messages", cident, len(catalog))
+        logger.info("%d messages extracted from component [%s]", len(catalog), cident)
+
+        locale_path = Path(module.__path__[0]) / 'locale'
+        if locale_path.is_dir():
+            outfn = str(locale_path / '.pot')
+        else:
             outfn = resource_filename(args.package, 'locale/%s.pot' % cident)
-            with open(outfn, 'wb') as outfd:
-                write_po(outfd, catalog, ignore_obsolete=True)
+
+        with io.open(outfn, 'wb') as outfd:
+            write_po(outfd, catalog, ignore_obsolete=True)
 
 
 def cmd_init(args):
     root = resource_filename(args.package, 'locale')
 
     for component, compmod in load_components(args):
-        potfile = os.path.join(root, '%s.pot' % component)
-        if not os.path.isfile(potfile):
-            logger.warning("Component '%s' template file not found! Skipping.", component) # NOQA
+        mod = import_module(compmod)
+        locale_path = Path(mod.__path__[0]) / 'locale'
+        if locale_path.is_dir():
+            pot_file = locale_path / '.pot'
+            po_file = locale_path / ('%s.po' % args.locale)
+            if not pot_file.is_file():
+                logger.error(
+                    "POT-file for component [%s] not found in [%s]",
+                    component, str(pot_file))
+                continue
+        else:
+            pot_file = Path(root) / ('%s.pot' % component)
+            po_file = Path(root) / args.locale / 'LC_MESSAGES' / ('%s.po' % component)
+            if not pot_file.is_file():
+                logger.error(
+                    "POT-file for component [%s] not found in [%s]",
+                    component, str(pot_file))
+                continue
+
+        if po_file.is_file() and not args.force:
+            logger.error(
+                "Component [%s] target file exists! Skipping. Use --force to overwrite.",
+                component)
             continue
 
-        with open(potfile, 'r') as infd:
+        with io.open(str(pot_file), 'r') as infd:
             catalog = read_po(infd, locale=args.locale)
 
         catalog.locale = Locale.parse(args.locale)
         catalog.revision_date = datetime.now(LOCALTZ)
 
-        pofile = os.path.join(
-            root, args.locale, 'LC_MESSAGES',
-            '%s.po' % component)
-
-        if os.path.isfile(pofile) and not args.force:
-            logger.warning("Component '%s' target file exists! Skipping. Use --force to overwrite.", component) # NOQA
-            continue
-
-        with open(pofile, 'w') as outfd:
+        with io.open(str(po_file), 'wb') as outfd:
             write_po(outfd, catalog)
 
 
 def cmd_update(args):
+
+    def _update_file(po_path, pot_path, component, locale):
+        logger.info(
+            "Updating component [%s] locale [%s]...",
+            component, locale)
+
+        with io.open(str(po_path), 'r') as po_fd, io.open(str(pot_path), 'r') as pot_fd:
+            po = read_po(po_fd, locale=locale)
+            pot = read_po(pot_fd)
+
+        po.update(pot, True)
+
+        with io.open(str(po_path), 'wb') as fd:
+            write_po(fd, po)
+
+    components = list(load_components(args))
+    modern_file_layout = list()
+
+    for comp_id, comp_mod in components:
+        locale_path = Path(import_module(comp_mod).__path__[0]) / 'locale'
+        if not locale_path.is_dir() or len(list(locale_path.glob('*.po'))) == 0:
+            continue
+        modern_file_layout.append(comp_id)
+
+        pot_path = locale_path / '.pot'
+        if not pot_path.is_file():
+            logger.error(
+                "POT-file for component [%s] not found in [%s]",
+                comp_id, str(pot_path))
+            continue
+
+        for po_path in locale_path.glob('*.po'):
+            locale = po_path.with_suffix('').name
+            _update_file(po_path, pot_path, comp_id, locale)
+
     root = resource_filename(args.package, 'locale')
     pofiles = []
     for dirname, dirnames, filenames in os.walk(root):
@@ -139,13 +195,19 @@ def cmd_update(args):
             relative = os.path.relpath(os.path.join(dirname, filename), root)
             pofiles.append(relative)
 
-    components = [cid for cid, _ in load_components(args)]
+    comp_ids = [cid for cid, _ in components]
 
     for pofile in pofiles:
         locale = pofile.split(os.sep)[0]
         component = os.path.split(pofile)[1].split('.', 1)[0]
 
-        if component not in components:
+        if component not in comp_ids:
+            continue
+
+        if component in modern_file_layout:
+            logger.warning(
+                "Component [%s] was already updated from new style "
+                "locale file layout! Skipping it.", component)
             continue
 
         logger.info("Updating component '%s' locale '%s'...", component, locale) # NOQA
@@ -167,33 +229,56 @@ def cmd_update(args):
 
 
 def cmd_compile(args):
+
+    def _compile_file(path, component, locale):
+        with io.open(str(path), 'r') as po:
+            catalog = read_po(po, locale=locale, domain=component)
+
+        logger.info(
+            "Compiling component [%s] locale [%s] (%d messages)...",
+            component, locale, len(catalog))
+
+        with io.open(str(path.with_suffix('.mo')), 'wb') as mo:
+            write_mo(mo, catalog)
+
+        with io.open(str(path.with_suffix('.jed')), 'w') as jed:
+            write_jed(jed, catalog)
+
+    components = list(load_components(args))
+    modern_file_layout = list()
+
+    for comp_id, comd_mod in components:
+        locale_path = Path(import_module(comd_mod).__path__[0]) / 'locale'
+        if not locale_path.is_dir() or len(list(locale_path.glob('*.po'))) == 0:
+            continue
+        modern_file_layout.append(comp_id)
+
+        for po_path in locale_path.glob('*.po'):
+            locale = po_path.with_suffix('').name
+            _compile_file(po_path, comp_id, locale)
+
     locpath = resource_filename(args.package, 'locale')
     pofiles = []
     for root, dirnames, filenames in os.walk(locpath):
         for filename in fnmatch.filter(filenames, '*.po'):
             pofiles.append(os.path.join(root, filename)[len(locpath) + 1:])
 
-    components = [cid for cid, _ in load_components(args)]
+    comp_ids = [cid for cid, _ in components]
 
     for pofile in pofiles:
         locale = pofile.split(os.sep, 1)[0]
         component = os.path.split(pofile)[1][:-3]
 
-        if component not in components:
+        if component not in comp_ids:
             continue
 
-        logger.info("Compiling component '%s' locale '%s'...", component, locale) # NOQA
+        if component in modern_file_layout:
+            logger.warning(
+                "Component [%s] was already compliled from new style "
+                "locale file layout! Skipping it.", component)
+            continue
 
-        with open(os.path.join(locpath, pofile), 'r') as fd:
-            catalog = read_po(fd, locale=locale, domain=component)
-
-        mofile = pofile[:-3] + '.mo'
-        with open(os.path.join(locpath, mofile), 'wb') as fd:
-            write_mo(fd, catalog)
-
-        jedfile = pofile[:-3] + '.jed'
-        with codecs.open(os.path.join(locpath, jedfile), 'w', 'utf-8') as fd:
-            write_jed(fd, catalog)
+        _compile_file(Path(os.path.join(locpath, pofile)), component, locale)
 
 
 def main(argv=sys.argv):

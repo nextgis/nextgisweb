@@ -7,7 +7,6 @@ import json
 import re
 from collections import OrderedDict
 from datetime import datetime
-from pkg_resources import resource_filename
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -17,7 +16,6 @@ from sqlalchemy.engine.url import (
     make_url as make_engine_url)
 
 from .. import db
-from ..package import pkginfo
 from ..component import Component
 from ..lib.config import Option
 from ..models import DBSession
@@ -133,8 +131,7 @@ class CoreComponent(Component):
             return self._localizer[locale]
 
         translations = Translations()
-        for pkg in pkginfo.packages:
-            translations.scandir(resource_filename(pkg, 'locale'), locale)
+        translations.load_envcomp(self.env, locale)
 
         lobj = Localizer(locale, translations)
         self._localizer[locale] = lobj
