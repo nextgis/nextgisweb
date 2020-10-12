@@ -541,7 +541,8 @@ class WFSHandler():
         summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
 
         for _operation in self.root_body:
-            if _operation.tag == ns_attr('wfs', 'Insert', self.p_version):
+            operation_tag = ns_trim(_operation.tag)
+            if operation_tag == 'Insert':
                 _layer = _operation[0]
                 keyname = ns_trim(_layer.tag)
                 feature_layer = find_layer(keyname)
@@ -567,19 +568,20 @@ class WFSHandler():
                 keyname = ns_trim(_operation.get('typeName'))
                 feature_layer = find_layer(keyname)
 
-                _filter = _operation.find(ns_attr('ogc', 'Filter', self.p_version))
+                _filter = find_tags(_operation, 'Filter')[0]
                 resid_tag = 'ResourceId' if v_gt200 else 'FeatureId'
                 resid_attr = 'rid' if v_gt200 else 'fid'
-                _feature_id = _filter.find(ns_attr('ogc', resid_tag, self.p_version))
+                _feature_id = find_tags(_filter, resid_tag)[0]
                 fid = int(_feature_id.get(resid_attr))
 
-                if _operation.tag == ns_attr('wfs', 'Update', self.p_version):
+                if operation_tag == 'Update':
                     query = feature_layer.feature_query()
                     query.filter_by(id=fid)
                     feature = query().one()
-                    for _property in _operation.findall(ns_attr('wfs', 'Property', self.p_version)):
-                        key = _property.find(ns_attr('wfs', 'Name', self.p_version)).text
-                        _value = _property.find(ns_attr('wfs', 'Value', self.p_version))
+                    for _property in find_tags(_operation, 'Property'):
+                        key = find_tags(_property, 'Name')[0].text
+                        _values = find_tags(_property, 'Value')
+                        _value = None if len(_values) == 0 else _values[0]
 
                         geom_column = get_geom_column(feature_layer)
 
@@ -597,11 +599,11 @@ class WFSHandler():
                     feature_layer.feature_put(feature)
 
                     summary['totalUpdated'] += 1
-                elif _operation.tag == ns_attr('wfs', 'Delete', self.p_version):
+                elif operation_tag == 'Delete':
                     feature_layer.feature_delete(fid)
                     summary['totalDeleted'] += 1
                 else:
-                    raise NotImplementedError()
+                    raise ValidationError("Unknown operation: %s" % operation_tag)
 
         for param, value in summary.items():
             if value > 0:
