@@ -408,7 +408,7 @@ class WFSHandler():
             for keyname in typenames:
                 import_url = self.request.route_url(
                     'wfsserver.wfs', id=self.resource.id,
-                    _query=dict(REQUEST='DescribeFeatureType', TYPENAME=keyname))
+                    _query=dict(REQUEST=DESCRIBE_FEATURE_TYPE, TYPENAME=keyname))
                 El('import', dict(schemaLocation=import_url), parent=root)
 
         return etree.tostring(root)
@@ -434,10 +434,14 @@ class WFSHandler():
             gml=_ns_gml, wfs=_ns_wfs,
             ogc=nsmap('ogc', self.p_version), xsi=nsmap('xsi', self.p_version)
         ))
+        describe_location = self.request.route_url(
+            'wfsserver.wfs', id=self.resource.id,
+            _query=dict(REQUEST=DESCRIBE_FEATURE_TYPE, SERVICE='WFS',
+                        VERSION=self.p_version, TYPENAME=typename))
         schema_location = ' '.join((
             _ns_wfs,
             _ns_gml,
-            'http://schemas.opengis.net/gml/3.2.1/gml.xsd',
+            describe_location,
             'http://schemas.opengis.net/wfs/2.0.0/wfs.xsd' if self.p_version >= v200
             else 'http://schemas.opengeospatial.net/wfs/1.0.0/WFS-basic.xsd'
         ))
