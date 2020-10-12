@@ -480,13 +480,22 @@ class WFSHandler():
             osr_out = osr.SpatialReference()
             osr_out.ImportFromWkt(srs_out.wkt)
 
+            __boundedBy = El('boundedBy', parent=root, namespace=_ns_gml if self.p_version == v100 else _ns_wfs)
+            minX = maxX = minY = maxY = None
+
             for feature in query():
                 feature_id = str(feature.id)
-                __member = El('featureMember', {ns_attr('gml', 'id', self.p_version): feature_id},
-                              parent=root, namespace=_ns_gml)
+                __member = El('featureMember', parent=root, namespace=_ns_gml)
                 __feature = El(layer.keyname, dict(fid=feature_id), parent=__member)
 
                 geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
+
+                _minX, _maxX, _minY, _maxY = geom.GetEnvelope()
+                minX = _minX if minX is None else min(minX, _minX)
+                minY = _minY if minY is None else min(minY, _minY)
+                maxX = _maxX if maxX is None else max(maxX, _maxX)
+                maxY = _maxY if maxY is None else max(maxY, _maxY)
+
                 gml = geom.ExportToGML(['FORMAT=%s' % self.gml_format, 'NAMESPACE_DECL=YES'])
                 __geom = El('geom', parent=__feature)
                 __gml = etree.fromstring(gml)
@@ -503,6 +512,14 @@ class WFSHandler():
                         _field.set(ns_attr('xsi', 'nil', self.p_version), 'true')
 
                 count += 1
+
+            if self.p_version == v100:
+                _box = El('Box', dict(srsName='EPSG:%d' % srs_out.id), parent=__boundedBy, namespace=_ns_gml)
+                El('coordinates', parent=_box, namespace=_ns_gml, text='%f %f %f %f' % (minX, minY, maxX, maxY))
+            else:
+                _envelope = El('Envelope', dict(srsName='urn:ogc:def:crs:EPSG::%d' % srs_out.id), parent=__boundedBy, namespace=_ns_gml)
+                El('lowerCorner', parent=_envelope, namespace=_ns_gml, text='%f %f' % (minX, minY))
+                El('upperCorner', parent=_envelope, namespace=_ns_gml, text='%f %f' % (maxX, maxY))
 
             matched = count
 
