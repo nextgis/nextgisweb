@@ -140,7 +140,7 @@ class WFSHandler():
         # 6.2.5.2 Parameter names shall not be case sensitive
         params = dict((k.upper(), v) for k, v in params.items())
 
-        self.p_requset = params.get('REQUEST') if self.request.method == 'GET' \
+        self.p_request = params.get('REQUEST') if self.request.method == 'GET' \
             else ns_trim(self.root_body.tag)
 
         av = params.get('ACCEPTVERSIONS')
@@ -171,14 +171,14 @@ class WFSHandler():
         return 'GML3' if self.p_version >= v110 else 'GML2'
 
     def response(self, validateSchema=False):
-        if self.p_requset == GET_CAPABILITIES:
+        if self.p_request == GET_CAPABILITIES:
             xml = self._get_capabilities200() if self.p_version >= v200 \
                 else self._get_capabilities()
-        elif self.p_requset == DESCRIBE_FEATURE_TYPE:
+        elif self.p_request == DESCRIBE_FEATURE_TYPE:
             xml = self._describe_feature_type()
-        elif self.p_requset == GET_FEATURE:
+        elif self.p_request == GET_FEATURE:
             xml = self._get_feature()
-        elif self.p_requset == TRANSACTION:
+        elif self.p_request == TRANSACTION:
             xml = self._transaction()
         else:
             raise ValidationError("Unsupported request")
@@ -186,7 +186,7 @@ class WFSHandler():
         if validateSchema:
             version_dir = '1.0.0' if self.p_version == v100 else '2.0'
             xsd_file = 'WFS-capabilities.xsd' if self.p_version == v100 \
-                and self.p_requset == GET_CAPABILITIES else 'wfs.xsd'
+                and self.p_request == GET_CAPABILITIES else 'wfs.xsd'
             xsd_path = path.join(WFS_SCHEMA_DIR, version_dir, xsd_file)
             schema = etree.XMLSchema(etree.parse(xsd_path))
             parser = etree.XMLParser(schema=schema)
