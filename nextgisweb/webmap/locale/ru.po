@@ -535,7 +535,7 @@ msgstr "Генерация событий"
 
 #: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:67
 msgid "Preview"
-msgstr "Прeдпросмотр"
+msgstr "Предпросмотр"
 
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:504
 msgid "Open full map"
