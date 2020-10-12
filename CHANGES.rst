@@ -8,6 +8,7 @@ Changes
 - Customizable link preview for resources.
 - Improved resource picker: inappropriate resources are disabled now.
 - New implementation of WFS server which fixes many bugs.
+- Quad-key support in TMS connection and layer.
 - Support for ``geom_format`` and ``srs`` in feature layer REST API (POST / PUT requests).
 - Session based OAuth authentication with token refresh support.
 - Delete users and groups via REST API.
