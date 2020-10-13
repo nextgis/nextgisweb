@@ -374,7 +374,8 @@ class WFSHandler():
 
         El('import', dict(
             namespace=_ns_gml,
-            schemaLocation='http://schemas.opengis.net/gml/2.0.0/feature.xsd'
+            schemaLocation='http://schemas.opengis.net/gml/2.1.2/feature.xsd' if self.p_version == v100
+                           else 'http://schemas.opengis.net/gml/3.2.1/feature.xsd'
         ), parent=root)
 
         if self.request.method == 'GET':
@@ -386,7 +387,8 @@ class WFSHandler():
 
         if len(typenames) == 1:
             layer = Layer.filter_by(service_id=self.resource.id, keyname=typenames[0]).one()
-            El('element', dict(name=layer.keyname, substitutionGroup='gml:_Feature',
+            substitutionGroup = 'gml:AbstractFeature' if self.p_version > v100 else 'gml:_Feature'
+            El('element', dict(name=layer.keyname, substitutionGroup=substitutionGroup,
                                type='%s_Type' % layer.keyname), parent=root)
             __ctype = El('complexType', dict(name="%s_Type" % layer.keyname), parent=root)
             __ccontent = El('complexContent', parent=__ctype)
