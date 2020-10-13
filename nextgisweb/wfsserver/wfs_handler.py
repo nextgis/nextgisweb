@@ -203,8 +203,7 @@ class WFSHandler():
                     and self.p_request == GET_CAPABILITIES else 'wfs.xsd'
                 xsd_path = path.join(wfs_schema_dir, version_dir, xsd_file)
             schema = etree.XMLSchema(etree.parse(xsd_path))
-            parser = etree.XMLParser(schema=schema)
-            etree.fromstring(xml, parser=parser)
+            schema.assertValid(etree.XML(xml))
 
         return xml
 
