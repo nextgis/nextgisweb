@@ -379,39 +379,40 @@ class WFSHandler():
         ), parent=root)
 
         if self.request.method == 'GET':
-            typenames = [layer.keyname for layer in self.resource.layers] \
-                if self.p_typenames is None else self.p_typenames.split(',')
+            typenames = None if self.p_typenames is None \
+                else self.p_typenames.split(',')
         elif self.request.method == 'POST':
             __typenames = find_tags(self.root_body, 'TypeName')
-            typenames = [__typename.text for __typename in __typenames]
+            typenames = None if len(__typenames) == 0 \
+                else [__typename.text for __typename in __typenames]
 
-        if len(typenames) == 1:
-            layer = Layer.filter_by(service_id=self.resource.id, keyname=typenames[0]).one()
+        if typenames is None:
+            typenames = [layer.keyname for layer in self.resource.layers]
+
+        for keyname in typenames:
             substitutionGroup = 'gml:AbstractFeature' if self.p_version > v100 else 'gml:_Feature'
-            El('element', dict(name=layer.keyname, substitutionGroup=substitutionGroup,
-                               type='%s_Type' % layer.keyname), parent=root)
-            __ctype = El('complexType', dict(name="%s_Type" % layer.keyname), parent=root)
+            El('element', dict(name=keyname, substitutionGroup=substitutionGroup,
+                               type='%s_Type' % keyname), parent=root)
+
+        for keyname in typenames:
+            layer = Layer.filter_by(service_id=self.resource.id, keyname=keyname).one()
+            feature_layer = layer.resource
+            __ctype = El('complexType', dict(name="%s_Type" % keyname), parent=root)
             __ccontent = El('complexContent', parent=__ctype)
             __ext = El('extension', dict(base='gml:AbstractFeatureType'), parent=__ccontent)
             __seq = El('sequence', parent=__ext)
-            for field in layer.resource.fields:
+            for field in feature_layer.fields:
                 if field.datatype == FIELD_TYPE.REAL:
                     datatype = 'double'
                 else:
                     datatype = field.datatype.lower()
                 El('element', dict(minOccurs='0', name=field.keyname, type=datatype), parent=__seq)
 
-            if layer.resource.geometry_type not in GEOM_TYPE_TO_GML_TYPE:
+            if feature_layer.geometry_type not in GEOM_TYPE_TO_GML_TYPE:
                 raise ValidationError("Geometry type not supported: %s"
-                                      % layer.resource.geometry_type)
+                                      % feature_layer.geometry_type)
             El('element', dict(minOccurs='0', name='geom', type=GEOM_TYPE_TO_GML_TYPE[
-                layer.resource.geometry_type]), parent=__seq)
-        else:
-            for keyname in typenames:
-                import_url = self.request.route_url(
-                    'wfsserver.wfs', id=self.resource.id,
-                    _query=dict(REQUEST=DESCRIBE_FEATURE_TYPE, TYPENAME=keyname))
-                El('import', dict(schemaLocation=import_url), parent=root)
+                feature_layer.geometry_type]), parent=__seq)
 
         return etree.tostring(root)
 
