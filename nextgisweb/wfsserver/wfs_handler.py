@@ -28,8 +28,8 @@ VERSION_SUPPORTED = (v100, v200, v202)
 
 VERSION_DEFAULT = v202
 
-WFS_SCHEMA_DIR = path.join(path.dirname(
-    path.abspath(__file__)), 'test/xsd/schemas.opengis.net/wfs/')
+XSD_DIR = path.join(path.dirname(
+    path.abspath(__file__)), 'test/xsd/')
 
 _nsmap = dict(
     wfs=OrderedDict((
@@ -185,9 +185,13 @@ class WFSHandler():
 
         if validateSchema:
             version_dir = '1.0.0' if self.p_version == v100 else '2.0'
-            xsd_file = 'WFS-capabilities.xsd' if self.p_version == v100 \
-                and self.p_request == GET_CAPABILITIES else 'wfs.xsd'
-            xsd_path = path.join(WFS_SCHEMA_DIR, version_dir, xsd_file)
+            if self.p_request == DESCRIBE_FEATURE_TYPE:
+                xsd_path = path.join(XSD_DIR, 'www.w3.org/2009/XMLSchema/XMLSchema.xsd')
+            else:
+                wfs_schema_dir = path.join(XSD_DIR, 'schemas.opengis.net/wfs/')
+                xsd_file = 'WFS-capabilities.xsd' if self.p_version == v100 \
+                    and self.p_request == GET_CAPABILITIES else 'wfs.xsd'
+                xsd_path = path.join(wfs_schema_dir, version_dir, xsd_file)
             schema = etree.XMLSchema(etree.parse(xsd_path))
             parser = etree.XMLParser(schema=schema)
             etree.fromstring(xml, parser=parser)

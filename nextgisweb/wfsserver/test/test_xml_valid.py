@@ -75,6 +75,7 @@ def service_id(ngw_resource_group):
 
 @pytest.mark.parametrize('version, query', product(TEST_WFS_VERSIONS, (
     dict(request='GetCapabilities'),
+    dict(request='DescribeFeatureType'),
     dict(request='GetFeature', typenames='test'),
 )))
 def test_xml_valid(version, query, service_id, ngw_webtest_app, ngw_auth_administrator):
