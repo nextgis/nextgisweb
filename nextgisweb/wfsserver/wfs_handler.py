@@ -520,7 +520,9 @@ class WFSHandler():
 
                 count += 1
 
-            if self.p_version == v100:
+            if None in (minX, minY, maxX, maxY):
+                El('null', parent=__boundedBy, namespace=_ns_gml, text='unknown')
+            elif self.p_version == v100:
                 _box = El('Box', dict(srsName='EPSG:%d' % srs_out.id), parent=__boundedBy, namespace=_ns_gml)
                 El('coordinates', parent=_box, namespace=_ns_gml, text='%f %f %f %f' % (minX, minY, maxX, maxY))
             else:
