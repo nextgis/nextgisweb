@@ -32,6 +32,9 @@ XSD_DIR = path.join(path.dirname(
     path.abspath(__file__)), 'test/xsd/')
 
 _nsmap = dict(
+    ngw=OrderedDict((
+        (v100, 'https://nextgis.com/wfs'),
+    )),
     wfs=OrderedDict((
         (v100, 'http://www.opengis.net/wfs'),
         (v200, 'http://www.opengis.net/wfs/2.0'),
@@ -73,6 +76,13 @@ def ns_attr(ns, attr, request_version):
 def ns_trim(value):
     pos = max(value.find('}'), value.rfind(':'))
     return value[pos + 1:]
+
+
+def trim_ns_ngw(typenames):
+    result = list()
+    for typename in typenames:
+        result.append(typename[4:] if typename.startswith('ngw:') else typename)
+    return result
 
 
 def El(tag, attrs=None, parent=None, text=None, namespace=None):
@@ -200,18 +210,22 @@ class WFSHandler():
 
     def _feature_type_list(self, parent):
         _ns_ows = nsmap('ows', self.p_version)
+        _ns_ngw = nsmap('ngw', self.p_version)
 
         __list = El('FeatureTypeList', parent=parent)
         if self.p_version < v200:
             __ops = El('Operations', parent=__list)
             El('Query', parent=__ops)
 
+        EM_name = ElementMaker(nsmap=dict(ngw=_ns_ngw))
         for layer in self.resource.layers:
             feature_layer = layer.resource
             if not feature_layer.has_permission(DataScope.read, self.request.user):
                 continue
             __type = El('FeatureType', parent=__list)
-            El('Name', parent=__type, text=layer.keyname)
+            __name = EM_name('Name')
+            __name.text = 'ngw:' + layer.keyname
+            __type.append(__name)
             El('Title', parent=__type, text=layer.display_name)
             El('Abstract', parent=__type)
             if self.p_version >= v200:
@@ -367,8 +381,9 @@ class WFSHandler():
 
     def _describe_feature_type(self):
         _ns_gml = nsmap('gml', self.p_version)
+        _ns_ngw = nsmap('ngw', self.p_version)
 
-        EM = ElementMaker(nsmap=dict(gml=_ns_gml))
+        EM = ElementMaker(nsmap=dict(gml=_ns_gml, ngw=_ns_ngw))
         root = EM('schema', dict(
             targetNamespace=nsmap('wfs', self.p_version),
             elementFormDefault='qualified',
@@ -393,15 +408,17 @@ class WFSHandler():
         if typenames is None:
             typenames = [layer.keyname for layer in self.resource.layers]
 
-        for keyname in typenames:
-            substitutionGroup = 'gml:AbstractFeature' if self.p_version > v100 else 'gml:_Feature'
-            El('element', dict(name=keyname, substitutionGroup=substitutionGroup,
-                               type='%s_Type' % keyname), parent=root)
+        typenames = trim_ns_ngw(typenames)
 
-        for keyname in typenames:
-            layer = Layer.filter_by(service_id=self.resource.id, keyname=keyname).one()
+        for typename in typenames:
+            substitutionGroup = 'gml:AbstractFeature' if self.p_version > v100 else 'gml:_Feature'
+            El('element', dict(name=typename, substitutionGroup=substitutionGroup,
+                               type='ngw:%s_Type' % typename), parent=root)
+
+        for typename in typenames:
+            layer = Layer.filter_by(service_id=self.resource.id, keyname=typename).one()
             feature_layer = layer.resource
-            __ctype = El('complexType', dict(name="%s_Type" % keyname), parent=root)
+            __ctype = El('complexType', dict(name="%s_Type" % typename), parent=root)
             __ccontent = El('complexContent', parent=__ctype)
             __ext = El('extension', dict(base='gml:AbstractFeatureType'), parent=__ccontent)
             __seq = El('sequence', parent=__ext)
@@ -423,6 +440,7 @@ class WFSHandler():
     def _get_feature(self):
         _ns_wfs = nsmap('wfs', self.p_version)
         _ns_gml = nsmap('gml', self.p_version)
+        _ns_ngw = nsmap('ngw', self.p_version)
 
         if self.request.method == 'GET':
             typename = self.p_typenames
@@ -433,18 +451,20 @@ class WFSHandler():
                     typename = v
                     break
 
+        typename = trim_ns_ngw([typename])[0]
+
         layer = Layer.filter_by(service_id=self.resource.id, keyname=typename).one()
         feature_layer = layer.resource
         self.request.resource_permission(DataScope.read, feature_layer)
 
         EM = ElementMaker(namespace=_ns_wfs, nsmap=dict(
-            gml=_ns_gml, wfs=_ns_wfs,
+            gml=_ns_gml, wfs=_ns_wfs, ngw=_ns_ngw,
             ogc=nsmap('ogc', self.p_version), xsi=nsmap('xsi', self.p_version)
         ))
         describe_location = self.request.route_url(
             'wfsserver.wfs', id=self.resource.id,
             _query=dict(REQUEST=DESCRIBE_FEATURE_TYPE, SERVICE='WFS',
-                        VERSION=self.p_version, TYPENAME=typename))
+                        VERSION=self.p_version, TYPENAME='ngw:' + typename))
         schema_location = ' '.join((
             _ns_wfs,
             _ns_gml,
@@ -497,7 +517,7 @@ class WFSHandler():
             for feature in query():
                 feature_id = str(feature.id)
                 __member = El('featureMember', parent=root, namespace=_ns_gml)
-                __feature = El(layer.keyname, dict(fid=feature_id), parent=__member)
+                __feature = El(layer.keyname, dict(fid=feature_id), parent=__member, namespace=_ns_ngw)
 
                 geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
 
@@ -508,12 +528,12 @@ class WFSHandler():
                 maxY = _maxY if maxY is None else max(maxY, _maxY)
 
                 gml = geom.ExportToGML(['FORMAT=%s' % self.gml_format, 'NAMESPACE_DECL=YES'])
-                __geom = El('geom', parent=__feature)
+                __geom = El('geom', parent=__feature, namespace=_ns_ngw)
                 __gml = etree.fromstring(gml)
                 __geom.append(__gml)
 
                 for field in feature.fields:
-                    _field = El(field, parent=__feature)
+                    _field = El(field, parent=__feature, namespace=_ns_ngw)
                     value = feature.fields[field]
                     if value is not None:
                         if not isinstance(value, text_type):
