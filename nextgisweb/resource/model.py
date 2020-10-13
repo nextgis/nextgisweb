@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import logging
 from collections import namedtuple, OrderedDict
 from datetime import datetime
 import six
@@ -22,7 +23,10 @@ from .serialize import (
 from .scope import ResourceScope, MetadataScope
 from .exception import ValidationError, HierarchyError, ForbiddenError, DisplayNameNotUnique
 
+
 __all__ = ['Resource', ]
+
+_logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 

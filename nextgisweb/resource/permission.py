@@ -48,7 +48,7 @@ class Requirement(object):
         self.attr_empty = attr_empty
 
     def __repr__(self):
-        return '<Requirement: (%s) requires (%s) on attr=%s>' % (
+        return '<Requirement: %s requires %s on attr=%s>' % (
             repr(self.dst), repr(self.src), self.attr)
 
 
@@ -70,8 +70,7 @@ class Permission(object):
         self._create_order = Permission.__create_order
 
     def __repr__(self):
-        return "<Permission '%s' in scope '%s'>" % (
-            self.name, self.scope.identity if self.scope else 'unbound')
+        return "<Permission %s:%s>" % (self.scope.identity if self.scope else '*', self.name)
 
     def __str__(self):
         return unicode(self.label)
