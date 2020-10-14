@@ -73,9 +73,6 @@ def test_api(vector_layer_id, ngw_webtest_app, ngw_auth_administrator, ngw_resou
         request='GetCapabilities'
     ), status=200)
 
-    root = ET.fromstring(resp.text.encode('utf-8'))
-    layer_elem = root[2][1]
-    assert layer_elem[0].text == 'points'
-    assert layer_elem[3].text == 'EPSG:3857'
+    ET.fromstring(resp.text.encode('utf-8'))
 
     ngw_webtest_app.delete('/api/resource/%d' % wfsserver_service_id, status=200)
