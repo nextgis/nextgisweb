@@ -514,7 +514,7 @@ class WFSHandler():
             minX = maxX = minY = maxY = None
 
             for feature in query():
-                feature_id = str(feature.id)
+                feature_id = 'id-' + str(feature.id)
                 __member = El('featureMember', parent=root, namespace=_ns_gml) if self.p_version == v100 \
                     else El('member', parent=root, namespace=_ns_wfs)
                 id_attr = 'fid' if self.p_version == v100 else ns_attr('gml', 'id', self.p_version)
