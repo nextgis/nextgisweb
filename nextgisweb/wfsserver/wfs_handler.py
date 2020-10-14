@@ -515,8 +515,10 @@ class WFSHandler():
 
             for feature in query():
                 feature_id = str(feature.id)
-                __member = El('featureMember', parent=root, namespace=_ns_gml)
-                __feature = El(layer.keyname, dict(fid=feature_id), parent=__member, namespace=_ns_ngw)
+                __member = El('featureMember', parent=root, namespace=_ns_gml) if self.p_version == v100 \
+                    else El('member', parent=root, namespace=_ns_wfs)
+                id_attr = 'fid' if self.p_version == v100 else ns_attr('gml', 'id', self.p_version)
+                __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member, namespace=_ns_ngw)
 
                 geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
 
