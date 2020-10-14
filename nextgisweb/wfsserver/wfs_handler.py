@@ -183,7 +183,7 @@ class WFSHandler():
 
     @property
     def gml_format(self):
-        return 'GML3' if self.p_version >= v110 else 'GML2'
+        return 'GML32' if self.p_version >= v110 else 'GML2'
 
     def response(self, validateSchema=False):
         if self.p_request == GET_CAPABILITIES:
