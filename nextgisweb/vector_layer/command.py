@@ -23,7 +23,7 @@ class CleanUpTableCommand():
             SELECT t.table_name
             FROM information_schema.tables t
             LEFT JOIN public.vector_layer v ON 'layer_' || v.tbl_uuid = t.table_name
-            WHERE t.table_schema = '%s' AND v.id IS NULL
+            WHERE t.table_schema = '%s' AND t.table_name ~ '^layer_[0-9a-f]{32}$' AND v.id IS NULL
         ''' % SCHEMA)
 
         con.execute('BEGIN')
