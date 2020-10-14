@@ -78,11 +78,8 @@ def ns_trim(value):
     return value[pos + 1:]
 
 
-def trim_ns_ngw(typenames):
-    result = list()
-    for typename in typenames:
-        result.append(typename[4:] if typename.startswith('ngw:') else typename)
-    return result
+def trim_ns_ngw(value):
+    return value[4:] if value.startswith('ngw:') else value
 
 
 def El(tag, attrs=None, parent=None, text=None, namespace=None):
@@ -100,6 +97,14 @@ def El(tag, attrs=None, parent=None, text=None, namespace=None):
 
 def find_tags(element, tag):
     return element.xpath('.//*[local-name()="%s"]' % tag)
+
+
+def fid_encode(fid):
+    return 'id-' + str(fid)
+
+
+def fid_decode(fid):
+    return int(fid[3:])
 
 
 GET_CAPABILITIES = 'GetCapabilities'
@@ -407,7 +412,7 @@ class WFSHandler():
         if typenames is None:
             typenames = [layer.keyname for layer in self.resource.layers]
 
-        typenames = trim_ns_ngw(typenames)
+        typenames = [trim_ns_ngw(tn) for tn in typenames]
 
         for typename in typenames:
             substitutionGroup = 'gml:AbstractFeature' if self.p_version > v100 else 'gml:_Feature'
@@ -450,7 +455,7 @@ class WFSHandler():
                     typename = v
                     break
 
-        typename = trim_ns_ngw([typename])[0]
+        typename = trim_ns_ngw(typename)
 
         layer = Layer.filter_by(service_id=self.resource.id, keyname=typename).one()
         feature_layer = layer.resource
@@ -514,7 +519,7 @@ class WFSHandler():
             minX = maxX = minY = maxY = None
 
             for feature in query():
-                feature_id = 'id-' + str(feature.id)
+                feature_id = fid_encode(feature.id)
                 __member = El('featureMember', parent=root, namespace=_ns_gml) if self.p_version == v100 \
                     else El('member', parent=root, namespace=_ns_wfs)
                 id_attr = 'fid' if self.p_version == v100 else ns_attr('gml', 'id', self.p_version)
@@ -612,7 +617,7 @@ class WFSHandler():
                 fid = feature_layer.feature_create(feature)
 
                 _insert = El('InsertResult', namespace=_ns_wfs, parent=_response)
-                El('FeatureId', dict(fid=str(fid)), namespace=_ns_ogc, parent=_insert)
+                El('FeatureId', dict(fid=fid_encode(fid)), namespace=_ns_ogc, parent=_insert)
 
                 summary['totalInserted'] += 1
             else:
@@ -623,14 +628,14 @@ class WFSHandler():
                 resid_tag = 'ResourceId' if v_gt200 else 'FeatureId'
                 resid_attr = 'rid' if v_gt200 else 'fid'
                 _feature_id = find_tags(_filter, resid_tag)[0]
-                fid = int(_feature_id.get(resid_attr))
+                fid = fid_decode(_feature_id.get(resid_attr))
 
                 if operation_tag == 'Update':
                     query = feature_layer.feature_query()
                     query.filter_by(id=fid)
                     feature = query().one()
                     for _property in find_tags(_operation, 'Property'):
-                        key = find_tags(_property, 'Name')[0].text
+                        key = trim_ns_ngw(find_tags(_property, 'Name')[0].text)
                         _values = find_tags(_property, 'Value')
                         _value = None if len(_values) == 0 else _values[0]
 
