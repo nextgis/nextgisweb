@@ -5,6 +5,8 @@ Changes
 -----
 
 - Tile cache and webmap annotations are enabled by default.
+- Command to delete orphaned vector layer tables.
+- HTTP API with resource permissions explanation. 
 
 3.5.0
 -----
