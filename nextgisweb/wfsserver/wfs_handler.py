@@ -260,6 +260,22 @@ class WFSHandler():
                                 minx=str(extent['minLon']), miny=str(extent['minLat']))
                     El('LatLongBoundingBox', bbox, parent=__type)
 
+    def _parse_filter(self, __filter):
+        v_gt200 = self.p_version >= v200
+        resid_tag = 'ResourceId' if v_gt200 else 'FeatureId'
+        resid_attr = 'rid' if v_gt200 else 'fid'
+
+        fid = None
+        for __el in __filter:
+            if ns_trim(__el.tag) == resid_tag:
+                if fid is not None:
+                    raise ValueError("Multiple feature ID filter not supported.")
+                else:
+                    fid = fid_decode(__el.get(resid_attr))
+            else:
+                raise ValueError("Filter element '%s' not supported." % __el.tag)
+        return fid
+
     def _get_capabilities(self):
         EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)))
         root = EM('WFS_Capabilities', dict(
@@ -446,11 +462,13 @@ class WFSHandler():
         _ns_gml = nsmap('gml', self.p_version)
         _ns_ngw = nsmap('ngw', self.p_version)
 
+        __query = None
+
         if self.request.method == 'GET':
             typename = self.p_typenames
         elif self.request.method == 'POST':
             __queries = find_tags(self.root_body, 'Query')
-            if len(__queries > 1):
+            if len(__queries) > 1:
                 raise ValidationError("Multiple queries not supported.")
             __query = __queries[0]
             for k, v in __query.attrib.items():
@@ -482,6 +500,13 @@ class WFSHandler():
         root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation', self.p_version): schema_location})  # NOQA: E501
 
         query = feature_layer.feature_query()
+
+        if __query is not None:
+            __filters = find_tags(__query, 'Filter')
+            if len(__filters) == 1:
+                fid = self._parse_filter(__filters[0])
+                if fid is not None:
+                    query.filter_by(id=fid)
 
         def parse_srs(value):
             # 'urn:ogc:def:crs:EPSG::3857' -> 3857
@@ -577,8 +602,6 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _transaction(self):
-        v_gt200 = self.p_version >= v200
-
         _ns_wfs = nsmap('wfs', self.p_version)
         _ns_ogc = nsmap('ogc', self.p_version)
 
@@ -628,10 +651,9 @@ class WFSHandler():
                 feature_layer = find_layer(keyname)
 
                 _filter = find_tags(_operation, 'Filter')[0]
-                resid_tag = 'ResourceId' if v_gt200 else 'FeatureId'
-                resid_attr = 'rid' if v_gt200 else 'fid'
-                _feature_id = find_tags(_filter, resid_tag)[0]
-                fid = fid_decode(_feature_id.get(resid_attr))
+                fid = self._parse_filter(_filter)
+                if fid is None:
+                    raise ValueError("Feature ID filter must be specified.")
 
                 if operation_tag == 'Update':
                     query = feature_layer.feature_query()
