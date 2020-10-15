@@ -449,7 +449,10 @@ class WFSHandler():
         if self.request.method == 'GET':
             typename = self.p_typenames
         elif self.request.method == 'POST':
-            __query = find_tags(self.root_body, 'Query')[0]
+            __queries = find_tags(self.root_body, 'Query')
+            if len(__queries > 1):
+                raise ValidationError("Multiple queries not supported.")
+            __query = __queries[0]
             for k, v in __query.attrib.items():
                 if k.upper() in ('TYPENAME', 'TYPENAMES'):
                     typename = v
