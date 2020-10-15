@@ -189,7 +189,8 @@ def permission_explain(request):
 
     req_user_id = request.params.get('user')
     user = User.filter_by(id=req_user_id).one() if req_user_id is not None else request.user
-    if user != request.user:
+    other_user = user != request.user
+    if other_user:
         request.resource_permission(PERM_CPERM)
 
     resource = request.context
@@ -229,34 +230,41 @@ def permission_explain(request):
                     n_perm['result'] = value._result[perm]
                     n_explain = n_perm['explain'] = list()
                     for item in value._explanation[perm]:
+                        i_res = item.resource
+
+                        n_item = OrderedDict((
+                            ('result', item.result),
+                            ('resource', dict(id=i_res.id) if i_res else None),
+                        ))
+
+                        n_explain.append(n_item)
                         if isinstance(item, ExplainACLRule):
-                            n_explain.append(OrderedDict((
-                                ('result', item[0]),
-                                ('type', 'acl'),
-                                ('action', item.acl_rule.action),
-                                ('principal', _jsonify_principal(item.acl_rule.principal)),
-                                ('scope', item.acl_rule.scope),
-                                ('permission', item.acl_rule.permission),
-                                ('identity', item.acl_rule.identity),
-                                ('propagate', item.acl_rule.propagate),
-                                ('resource', dict(id=item.acl_rule.resource.id)),
-                            )))
+                            n_item['type'] = 'acl_rule'
+                            if i_res.has_permission(PERM_READ, request.user):
+                                n_item['acl_rule'] = OrderedDict((
+                                    ('action', item.acl_rule.action),
+                                    ('principal', _jsonify_principal(item.acl_rule.principal)),
+                                    ('scope', item.acl_rule.scope),
+                                    ('permission', item.acl_rule.permission),
+                                    ('identity', item.acl_rule.identity),
+                                    ('propagate', item.acl_rule.propagate),
+                                ))
+
                         elif isinstance(item, ExplainRequirement):
-                            n_explain.append(OrderedDict((
-                                ('result', item[0]),
-                                ('type', 'requirement'),
-                                ('satisfied', item.satisfied),
-                                ('attr', item.requirement.attr),
-                                ('scope', item.requirement.src.scope.identity),
-                                ('permission', item.requirement.src.name),
-                                ('attr_empty', item.requirement.attr_empty),
-                                ('explain', _explain_jsonify(item.resolver)),
-                            )))
+                            n_item['type'] = 'requirement'
+                            if i_res is None or i_res.has_permission(PERM_READ, request.user):
+                                n_item['requirement'] = OrderedDict((
+                                    ('scope', item.requirement.src.scope.identity),
+                                    ('permission', item.requirement.src.name),
+                                    ('attr', item.requirement.attr),
+                                    ('attr_empty', item.requirement.attr_empty),
+                                ))
+                                n_item['satisfied'] = item.satisfied
+                                n_item['explain'] = _explain_jsonify(item.resolver)
+
                         elif isinstance(item, ExplainDefault):
-                            n_explain.append(OrderedDict((
-                                ('result', item[0]),
-                                ('type', 'default'),
-                            )))
+                            n_item['type'] = 'default'
+
                         else:
                             raise ValueError("Unknown explain item: {}".format(item))
         return result
