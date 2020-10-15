@@ -4,6 +4,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from ..component import Component, require
 
 from .model import Base, VectorLayer
+from . import command  # NOQA
 
 __all__ = [
     'VectorLayerComponent',
