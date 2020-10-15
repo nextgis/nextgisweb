@@ -21,6 +21,7 @@ from .serialize import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR)
 from .scope import ResourceScope, MetadataScope
+from .permission import RequirementList
 from .exception import ValidationError, HierarchyError, ForbiddenError, DisplayNameNotUnique
 
 
@@ -170,6 +171,16 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
             result.update(scope.values())
 
         return frozenset(result)
+
+    @classmethod
+    def class_requirements(cls):
+        result = RequirementList()
+        for scope in cls.scope.values():
+            for req in scope.requirements:
+                if req.cls is None or issubclass(cls, req.cls):
+                    result.append(req)
+        result.toposort()
+        return tuple(result)
 
     def permission_sets(self, user):
         class_permissions = self.class_permissions()

@@ -2,8 +2,6 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from collections import defaultdict, namedtuple
 
-from .permission import RequirementList
-
 
 ExplainDefault = namedtuple('ExplainDefault', ['result', 'resource'])
 ExplainACLRule = namedtuple('ExplainACLRule', ['result', 'resource', 'acl_rule'])
@@ -26,7 +24,7 @@ class PermissionResolver(object):
         return self._resource
 
     def _solve(self, resource, user, permissions, explain):
-        req_list = _resource_requirements(resource)
+        req_list = resource.class_requirements()
 
         # Directly requested permissions
         perm_req = set(permissions if (permissions is not None) else resource.class_permissions())
@@ -39,9 +37,11 @@ class PermissionResolver(object):
             for req in reversed(req_list):
                 if req.attr is None and req.dst in perm_all and req.src not in perm_all:
                     perm_all.add(req.src)
-            for req in req_list:
-                if req.attr is None and req.dst in perm_all and req.src not in perm_all:
-                    assert False, "Permission %r is missing in collected permissions!" % req.src
+
+            if __debug__:
+                for req in req_list:
+                    if req.attr is None and req.dst in perm_all and req.src not in perm_all:
+                        assert False, "Permission %r is missing in permissions" % req.src
 
         perm_rest = set(perm_req)
 
@@ -70,27 +70,29 @@ class PermissionResolver(object):
         if len(perm_rest) == 0:
             return
 
-        req_list = list(filter(lambda req: (
+        req_list = tuple(filter(lambda req: (
             result.get(req.dst) is True
         ), req_list))
 
         # Apply requirement dependencies
 
-        dependencies = defaultdict(list)
-        for req in req_list:
-            dependencies[req.dst].append(req)
+        if __debug__:
+            dependencies = defaultdict(set)
+            for req in req_list:
+                dependencies[req.dst].add(req)
 
         for req in req_list:
             req_dst, req_src = req.dst, req.src
             if req.attr is None:
-                if len(dependencies[req_src]) == 0:
-                    req_satisfied = result[req_src] is True
-                    if not req_satisfied:
-                        result[req_dst] = False
-                        perm_rest.remove(req_dst)
-                    if explain:
-                        explanation[req_dst].append(ExplainRequirement(
-                            result[req_dst], resource, req, req_satisfied, None))
+                assert len(dependencies[req_src]) == 0, "{} evaluated before {}".format(
+                    req, dependencies[req_src])
+                req_satisfied = result[req_src] is True
+                if not req_satisfied:
+                    result[req_dst] = False
+                    perm_rest.remove(req_dst)
+                if explain:
+                    explanation[req_dst].append(ExplainRequirement(
+                        result[req_dst], resource, req, req_satisfied, None))
             else:
                 attrval = getattr(resource, req.attr)
                 if attrval is None:
@@ -110,6 +112,9 @@ class PermissionResolver(object):
                         explanation[req_dst].append(ExplainRequirement(
                             result[req_dst], attrval, req, req_satisfied, attr_resolver))
 
+            if __debug__:
+                dependencies[req_dst].remove(req)
+
 
 def _acl_rules(resource, user, permissions):
     for res in tuple(resource.parents) + (resource, ):
@@ -123,13 +128,3 @@ def _acl_rules(resource, user, permissions):
             for perm in permissions:
                 if rule.cmp_permission(perm):
                     yield perm, rule
-
-
-def _resource_requirements(resource):
-    result = RequirementList()
-    for scope in resource.__class__.scope.values():
-        for req in scope.requirements:
-            if req.cls is None or isinstance(resource, req.cls):
-                result.append(req)
-    result.toposort()
-    return result
