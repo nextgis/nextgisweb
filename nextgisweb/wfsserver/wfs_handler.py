@@ -651,7 +651,8 @@ class WFSHandler():
 
                 fid = feature_layer.feature_create(feature)
 
-                _insert = El('InsertResult', namespace=_ns_wfs, parent=_response)
+                _insert = El('InsertResult' if self.p_version == v100 else 'InsertResults',
+                             namespace=_ns_wfs, parent=_response)
                 El('FeatureId', dict(fid=fid_encode(fid)), namespace=_ns_ogc, parent=_insert)
 
                 summary['totalInserted'] += 1
