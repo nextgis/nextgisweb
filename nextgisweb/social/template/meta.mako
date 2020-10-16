@@ -15,4 +15,5 @@
     %if description is not None:
         <meta property="og:description" content="${tr(description)}"/>
     %endif
+    <meta name="twitter:card" content="summary"/>
 %endif
