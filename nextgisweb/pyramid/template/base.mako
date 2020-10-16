@@ -24,21 +24,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <%
-        preview_link = request.env.pyramid.preview_link_view(request)
-        image = preview_link['image']
-        description = preview_link['description']
-    %>
-    %if image is not None or description is not None:
-        <meta property="og:title" content="${page_title}"/>
-        <meta property="og:url" content="${request.url}"/>
-        %if image is not None:
-            <meta property="og:image" content="${image}"/>
-        %endif
-        %if description is not None:
-            <meta property="og:description" content="${tr(description)}"/>
-        %endif
-    %endif
+    <%include file="nextgisweb:social/template/meta.mako" args="title=page_title"/>
 
     <link href="${request.route_url('pyramid.favicon')}"
         rel="shortcut icon" type="image/x-icon"/>
