@@ -166,7 +166,7 @@ def setup_pyramid(comp, config):
 
     def shared_map_test(request):
         iframe = request.POST['iframe']
-        request.response.headerlist.append(("X-XSS-Protection", "0"))
+        request.response.headerlist.append((str("X-XSS-Protection"), str("0")))
         return dict(
             iframe=unquote(unquote(iframe))
         )
