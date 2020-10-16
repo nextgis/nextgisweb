@@ -15,7 +15,7 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from ..env import env
 from ..package import pkginfo
 from ..core.exception import ValidationError
-from ..resource import Resource
+from ..resource import Resource, MetadataScope
 from ..compat import Path
 
 from .util import _, ClientRoutePredicate
@@ -436,6 +436,9 @@ def setup_pyramid(comp, config):
         defaults = comp.preview_link_default_view(request)
 
         if hasattr(request, 'context') and isinstance(request.context, Resource):
+            if not request.context.has_permission(MetadataScope.read, request.user):
+                return dict(image=None, description=None)
+
             social = request.context.social
             if social is not None:
                 image = request.route_url(
