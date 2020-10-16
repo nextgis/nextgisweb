@@ -5,7 +5,7 @@ from collections import OrderedDict
 from datetime import datetime
 from os import path
 
-from lxml import etree
+from lxml import etree, html
 from lxml.builder import ElementMaker
 from osgeo import ogr, osr
 from six import BytesIO, text_type
@@ -182,6 +182,15 @@ class WFSHandler():
         self.p_startindex = params.get('STARTINDEX')
 
     @property
+    def title(self):
+        return self.resource.display_name
+
+    @property
+    def abstract(self):
+        return html.document_fromstring(self.resource.description).text_content() \
+            if self.resource.description is not None else ''
+
+    @property
     def gml_format(self):
         return 'GML32' if self.p_version >= v110 else 'GML2'
 
@@ -284,9 +293,9 @@ class WFSHandler():
 
         # Service
         __s = El('Service', parent=root)
-        El('Name', parent=__s, text='WFS Server')
-        El('Title', parent=__s, text='Web Feature Service Server')
-        El('Abstract', parent=__s, text='Supports WFS')
+        El('Name', parent=__s, text=self.resource.keyname or 'WFS')
+        El('Title', parent=__s, text=self.title)
+        El('Abstract', parent=__s, text=self.abstract)
         El('OnlineResource', parent=__s)
 
         # Operations
@@ -341,8 +350,8 @@ class WFSHandler():
 
         # Service
         __service = El('ServiceIdentification', namespace=_ns_ows, parent=root)
-        El('Title', namespace=_ns_ows, parent=__service, text='Web Feature Service Server')
-        El('Abstract', namespace=_ns_ows, parent=__service, text='Supports WFS')
+        El('Title', namespace=_ns_ows, parent=__service, text=self.title)
+        El('Abstract', namespace=_ns_ows, parent=__service, text=self.abstract)
         El('ServiceType', namespace=_ns_ows, parent=__service, text='WFS')
         for version in VERSION_SUPPORTED:
             El('ServiceTypeVersion', namespace=_ns_ows, parent=__service, text=version)
