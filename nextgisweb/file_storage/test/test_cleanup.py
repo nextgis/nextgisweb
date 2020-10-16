@@ -1,10 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+
 import os
 import io
+from datetime import timedelta
+
+import pytest
 
 from nextgisweb.models import DBSession
 from nextgisweb.file_storage import FileObj
+
+
+@pytest.fixture(scope='module', autouse=True)
+def off_keep_interfal(ngw_env):
+    value = ngw_env.file_storage.options['cleanup_keep_interval']
+    ngw_env.file_storage.options['cleanup_keep_interval'] = timedelta(seconds=-1)
+    yield
+    ngw_env.file_storage.options['cleanup_keep_interval'] = value
 
 
 def test_keep_delete(ngw_env, ngw_txn):

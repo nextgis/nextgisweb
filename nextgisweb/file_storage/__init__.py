@@ -115,7 +115,7 @@ class FileStorageComponent(Component):
         deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
         kept_files, kept_dirs, kept_bytes = 0, 0, 0
 
-        delta = timedelta(hours=4)
+        delta = self.options['cleanup_keep_interval']
 
         for (dirpath, dirnames, filenames) in os.walk(self.path, topdown=False):
             relist = False
@@ -153,4 +153,5 @@ class FileStorageComponent(Component):
 
     option_annotations = (
         Option('path', default=None),
+        Option('cleanup_keep_interval', default=timedelta(hours=4))
     )
