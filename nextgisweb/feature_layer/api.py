@@ -17,6 +17,7 @@ from osgeo import ogr, gdal
 from pyproj import CRS
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPNoContent
+from sqlalchemy.orm.exc import NoResultFound
 
 from ..geometry import (
     geom_from_geojson, geom_to_geojson,
@@ -24,6 +25,7 @@ from ..geometry import (
     geom_transform, box,
 )
 from ..resource import DataScope, ValidationError, Resource, resource_factory
+from ..resource.exception import ResourceNotFound
 from ..spatial_ref_sys import SRS
 from .. import geojson
 
@@ -194,7 +196,11 @@ def mvt(request):
     vsibuf = ds.GetName()
 
     for resid in resids:
-        obj = Resource.filter_by(id=resid).one()
+        try:
+            obj = Resource.filter_by(id=resid).one()
+        except NoResultFound:
+            raise ResourceNotFound(resid)
+
         request.resource_permission(PERM_READ, obj)
 
         query = obj.feature_query()
