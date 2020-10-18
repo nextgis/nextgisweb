@@ -48,25 +48,60 @@ Authorized data (HTTP AUTH) can be sent with each request.
 Managing users
 ==============
 
-Create new user:
-    
-.. sourcecode:: http
- 
-    POST /api/component/auth/user/
+To create new user execute following request:
 
-    {
+.. http:post:: /api/component/auth/user/
+
+   Request to create new user.
+
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json string display_name: user full name
+   :<json string keyname: user login
+   :<json string description: user description
+   :<json string password: user password
+   :>json id: new user identifier
+   :statuscode 201: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   POST /api/component/auth/user/ HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+   {
       "display_name": "Test user",
       "keyname": "test_user",
       "password":"secret",
       "disabled": false,
       "member_of": [ 5 ]
-    }
+   }
 
+**Example response**:
+
+.. sourcecode:: json
+
+    {
+      "id": 10
+    }
+    
 Get information about existing user with ``id`` returned in previous request:
 
+.. http:get:: /api/component/auth/user/(int:id)
+
+**Example request**:
+
 .. sourcecode:: http
- 
-    GET /api/component/auth/user/10
+
+   GET /api/component/auth/user/10 HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+
+.. sourcecode:: json
 
     {
       "id": 10,
@@ -81,6 +116,7 @@ Get information about existing user with ``id`` returned in previous request:
       "oauth_tstamp": null,
       "member_of": [ 5 ]
     }
+    
 
 Update user details:
 
@@ -149,12 +185,39 @@ Delete previously created user:
 .. sourcecode:: http
  
     DETELE /api/component/auth/user/10
+    
+To get current user details execute following request:
 
+.. http:post:: /api/component/auth/current_user
 
+   Request to get current user details
+
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :>json string keyname: user login
+   :>json string display_name: user name
+   :>json int id: user identifier
+   :statuscode 200: no error
+
+**Example response**:
+
+.. sourcecode:: json
+
+    {
+        "keyname": "administrator",
+        "display_name": "Admin",
+        "id": 4
+    }
+
+    
 Managing groups
 ===============
 
-Create a new group:
+To create new group execute following request:
+
+.. http:post:: /api/component/auth/group
+
+   Request to create new group
 
 .. sourcecode:: http
  
@@ -198,3 +261,557 @@ Delete group:
 .. sourcecode:: http
 
     DELETE /api/component/auth/group/20
+    
+        
+Automatically creating users
+=============================
+
+To self creating user (anonymous user) execute following request:
+
+.. http:post:: /api/component/auth/register
+
+   Request to create new user
+
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :<json string display_name: user full name
+   :<json string keyname: user login
+   :<json string description: user description
+   :<json string password: user password
+   :statuscode 201: no error
+   
+Administrator can configure anonymous user registration to the specific group
+(via setting checkbox on group in administrative user interface).
+
+This feature requires the special section in NGW config file:
+
+.. sourcecode:: config
+
+   [auth]
+   register = true
+
+    
+Get resource permissions
+=========================
+
+Simple output
+--------------
+
+To get resource permissions execute following request. Returned json may vary 
+depends on resource type.
+
+**The following request returns resource permissions**:
+
+.. http:get:: /api/resource/(int:id)/permission
+
+   Permissions request
+
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :param id: resource identifier
+   :statuscode 200: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resource/56/permission HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+
+.. sourcecode:: json
+
+    {
+        "resource": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "delete": true,
+            "manage_children": true,
+            "change_permissions": true
+        },
+        "datastruct": {
+            "read": true,
+            "write": true
+        },
+        "data": {
+            "read": true,
+            "write": true
+        },
+        "metadata": {
+            "read": true,
+            "write": true
+        }
+    }
+
+Detailed output
+----------------
+
+To get explain how permissions were set execute following request. Returned 
+json may vary depends on resource type.
+
+**The following request returns resource permissions explain**:
+
+.. http:get:: /api/resource/(int:id)/permission/explain
+
+   Permissions explain request
+
+   :reqheader Accept: must be ``*/*``
+   :reqheader Authorization: optional Basic auth string to authenticate
+   :param id: resource identifier
+   :statuscode 200: no error
+
+**Example request**:
+
+.. sourcecode:: http
+
+   GET /api/resource/56/permission/explain HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example response**:
+
+.. sourcecode:: json
+
+    {
+        "resource": {
+            "read": {
+                "result": true,
+                "explain": [
+                    {
+                        "result": true,
+                        "resource": {
+                            "id": 0
+                        },
+                        "type": "acl_rule",
+                        "acl_rule": {
+                            "action": "allow",
+                            "principal": {
+                                "id": 2,
+                                "cls": "user",
+                                "keyname": "everyone"
+                            },
+                            "scope": "resource",
+                            "permission": "read",
+                            "identity": "",
+                            "propagate": true
+                        }
+                    },
+                    {
+                        "result": true,
+                        "resource": {
+                            "id": 3880
+                        },
+                        "type": "acl_rule",
+                        "acl_rule": {
+                            "action": "allow",
+                            "principal": {
+                                "id": 2,
+                                "cls": "user",
+                                "keyname": "everyone"
+                            },
+                            "scope": "resource",
+                            "permission": "read",
+                            "identity": "",
+                            "propagate": true
+                        }
+                    },
+                    {
+                        "result": true,
+                        "resource": {
+                            "id": 4232
+                        },
+                        "type": "requirement",
+                        "requirement": {
+                            "scope": "resource",
+                            "permission": "read",
+                            "attr": "parent",
+                            "attr_empty": true
+                        },
+                        "satisfied": true,
+                        "explain": {
+                            "resource": {
+                                "read": {
+                                    "result": true,
+                                    "explain": [
+                                        {
+                                            "result": true,
+                                            "resource": {
+                                                "id": 0
+                                            },
+                                            "type": "acl_rule",
+                                            "acl_rule": {
+                                                "action": "allow",
+                                                "principal": {
+                                                    "id": 2,
+                                                    "cls": "user",
+                                                    "keyname": "everyone"
+                                                },
+                                                "scope": "resource",
+                                                "permission": "read",
+                                                "identity": "",
+                                                "propagate": true
+                                            }
+                                        },
+                                        {
+                                            "result": true,
+                                            "resource": {
+                                                "id": 3880
+                                            },
+                                            "type": "acl_rule",
+                                            "acl_rule": {
+                                                "action": "allow",
+                                                "principal": {
+                                                    "id": 2,
+                                                    "cls": "user",
+                                                    "keyname": "everyone"
+                                                },
+                                                "scope": "resource",
+                                                "permission": "read",
+                                                "identity": "",
+                                                "propagate": true
+                                            }
+                                        },
+                                        {
+                                            "result": true,
+                                            "resource": {
+                                                "id": 3880
+                                            },
+                                            "type": "requirement",
+                                            "requirement": {
+                                                "scope": "resource",
+                                                "permission": "read",
+                                                "attr": "parent",
+                                                "attr_empty": true
+                                            },
+                                            "satisfied": true,
+                                            "explain": {
+                                                "resource": {
+                                                    "read": {
+                                                        "result": true,
+                                                        "explain": [
+                                                            {
+                                                                "result": true,
+                                                                "resource": {
+                                                                    "id": 0
+                                                                },
+                                                                "type": "acl_rule",
+                                                                "acl_rule": {
+                                                                    "action": "allow",
+                                                                    "principal": {
+                                                                        "id": 2,
+                                                                        "cls": "user",
+                                                                        "keyname": "everyone"
+                                                                    },
+                                                                    "scope": "resource",
+                                                                    "permission": "read",
+                                                                    "identity": "",
+                                                                    "propagate": true
+                                                                }
+                                                            },
+                                                            {
+                                                                "result": true,
+                                                                "resource": {
+                                                                    "id": 3880
+                                                                },
+                                                                "type": "acl_rule",
+                                                                "acl_rule": {
+                                                                    "action": "allow",
+                                                                    "principal": {
+                                                                        "id": 2,
+                                                                        "cls": "user",
+                                                                        "keyname": "everyone"
+                                                                    },
+                                                                    "scope": "resource",
+                                                                    "permission": "read",
+                                                                    "identity": "",
+                                                                    "propagate": true
+                                                                }
+                                                            },
+                                                            {
+                                                                "result": true,
+                                                                "resource": {
+                                                                    "id": 0
+                                                                },
+                                                                "type": "requirement",
+                                                                "requirement": {
+                                                                    "scope": "resource",
+                                                                    "permission": "read",
+                                                                    "attr": "parent",
+                                                                    "attr_empty": true
+                                                                },
+                                                                "satisfied": true,
+                                                                "explain": {
+                                                                    "resource": {
+                                                                        "read": {
+                                                                            "result": true,
+                                                                            "explain": [
+                                                                                {
+                                                                                    "result": true,
+                                                                                    "resource": {
+                                                                                        "id": 0
+                                                                                    },
+                                                                                    "type": "acl_rule",
+                                                                                    "acl_rule": {
+                                                                                        "action": "allow",
+                                                                                        "principal": {
+                                                                                            "id": 2,
+                                                                                            "cls": "user",
+                                                                                            "keyname": "everyone"
+                                                                                        },
+                                                                                        "scope": "resource",
+                                                                                        "permission": "read",
+                                                                                        "identity": "",
+                                                                                        "propagate": true
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    "result": true,
+                                                                                    "resource": null,
+                                                                                    "type": "requirement",
+                                                                                    "requirement": {
+                                                                                        "scope": "resource",
+                                                                                        "permission": "read",
+                                                                                        "attr": "parent",
+                                                                                        "attr_empty": true
+                                                                                    },
+                                                                                    "satisfied": false,
+                                                                                    "explain": null
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "create": {
+                "result": false,
+                "explain": [
+                    {
+                        "result": false,
+                        "resource": {
+                            "id": 4234
+                        },
+                        "type": "default"
+                    }
+                ]
+            },
+            "update": {
+                "result": false,
+                "explain": [
+                    {
+                        "result": false,
+                        "resource": {
+                            "id": 4234
+                        },
+                        "type": "default"
+                    }
+                ]
+            },
+            "delete": {
+                "result": false,
+                "explain": [
+                    {
+                        "result": false,
+                        "resource": {
+                            "id": 4234
+                        },
+                        "type": "default"
+                    }
+                ]
+            },
+            "manage_children": {
+                "result": false,
+                "explain": [
+                    {
+                        "result": false,
+                        "resource": {
+                            "id": 4234
+                        },
+                        "type": "default"
+                    }
+                ]
+            },
+            "change_permissions": {
+                "result": false,
+                "explain": [
+                    {
+                        "result": false,
+                        "resource": {
+                            "id": 4234
+                        },
+                        "type": "default"
+                    }
+                ]
+            }
+        },
+        "datastruct": {
+            "read": {
+                "result": true,
+                "explain": [
+                    {
+                        "result": true,
+                        "resource": {
+                            "id": 0
+                        },
+                        "type": "acl_rule",
+                        "acl_rule": {
+                            "action": "allow",
+                            "principal": {
+                                "id": 2,
+                                "cls": "user",
+                                "keyname": "everyone"
+                            },
+                            "scope": "datastruct",
+                            "permission": "read",
+                            "identity": "",
+                            "propagate": true
+                        }
+                    }
+                ]
+            },
+            "write": {
+                "result": false,
+                "explain": [
+                    {
+                        "result": false,
+                        "resource": {
+                            "id": 4234
+                        },
+                        "type": "default"
+                    }
+                ]
+            }
+        },
+        "data": {
+            "read": {
+                "result": true,
+                "explain": [
+                    {
+                        "result": true,
+                        "resource": {
+                            "id": 0
+                        },
+                        "type": "acl_rule",
+                        "acl_rule": {
+                            "action": "allow",
+                            "principal": {
+                                "id": 2,
+                                "cls": "user",
+                                "keyname": "everyone"
+                            },
+                            "scope": "data",
+                            "permission": "read",
+                            "identity": "",
+                            "propagate": true
+                        }
+                    },
+                    {
+                        "result": true,
+                        "resource": {
+                            "id": 4233
+                        },
+                        "type": "requirement",
+                        "requirement": {
+                            "scope": "connection",
+                            "permission": "connect",
+                            "attr": "connection",
+                            "attr_empty": false
+                        },
+                        "satisfied": true,
+                        "explain": {
+                            "connection": {
+                                "connect": {
+                                    "result": true,
+                                    "explain": [
+                                        {
+                                            "result": true,
+                                            "resource": {
+                                                "id": 0
+                                            },
+                                            "type": "acl_rule",
+                                            "acl_rule": {
+                                                "action": "allow",
+                                                "principal": {
+                                                    "id": 2,
+                                                    "cls": "user",
+                                                    "keyname": "everyone"
+                                                },
+                                                "scope": "connection",
+                                                "permission": "connect",
+                                                "identity": "",
+                                                "propagate": true
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "write": {
+                "result": false,
+                "explain": [
+                    {
+                        "result": false,
+                        "resource": {
+                            "id": 4234
+                        },
+                        "type": "default"
+                    }
+                ]
+            }
+        },
+        "metadata": {
+            "read": {
+                "result": true,
+                "explain": [
+                    {
+                        "result": true,
+                        "resource": {
+                            "id": 0
+                        },
+                        "type": "acl_rule",
+                        "acl_rule": {
+                            "action": "allow",
+                            "principal": {
+                                "id": 2,
+                                "cls": "user",
+                                "keyname": "everyone"
+                            },
+                            "scope": "metadata",
+                            "permission": "read",
+                            "identity": "",
+                            "propagate": true
+                        }
+                    }
+                ]
+            },
+            "write": {
+                "result": false,
+                "explain": [
+                    {
+                        "result": false,
+                        "resource": {
+                            "id": 4234
+                        },
+                        "type": "default"
+                    }
+                ]
+            }
+        }
+    }
