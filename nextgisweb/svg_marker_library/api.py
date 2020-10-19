@@ -8,19 +8,19 @@ from pyramid.response import FileResponse, Response
 
 from ..resource import DataScope
 
-from .model import SVGSymbolLibrary
+from .model import SVGMarkerLibrary
 
 
 def file_download(resource, request):
     request.resource_permission(DataScope.read)
 
     fname = request.matchdict['name']
-    svg_symbol = resource.find_svg_symbol(fname)
+    svg_marker = resource.find_svg_marker(fname)
 
-    if svg_symbol is None:
+    if svg_marker is None:
         raise HTTPNotFound()
 
-    return FileResponse(svg_symbol.path, content_type='image/svg+xml', request=request)
+    return FileResponse(svg_marker.path, content_type='image/svg+xml', request=request)
 
 
 def export(resource, request):
@@ -40,9 +40,9 @@ def export(resource, request):
 def setup_pyramid(comp, config):
     config.add_view(
         file_download, route_name='resource.file_download',
-        context=SVGSymbolLibrary, request_method='GET'
+        context=SVGMarkerLibrary, request_method='GET'
     )
 
     config.add_view(
-        export, route_name='resource.export', context=SVGSymbolLibrary, request_method='GET'
+        export, route_name='resource.export', context=SVGMarkerLibrary, request_method='GET'
     )

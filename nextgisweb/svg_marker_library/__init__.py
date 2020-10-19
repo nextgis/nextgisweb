@@ -3,13 +3,13 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from ..component import Component
 
-from .model import Base, SVGSymbolLibrary
+from .model import Base, SVGMarkerLibrary
 
-__all__ = ['SVGSymbolLibrary']
+__all__ = ['SVGMarkerLibrary']
 
 
-class IconLibraryComponent(Component):
-    identity = 'icon_library'
+class SVGMarkerLibraryComponent(Component):
+    identity = 'svg_marker_library'
     metadata = Base.metadata
 
     def setup_pyramid(self, config):

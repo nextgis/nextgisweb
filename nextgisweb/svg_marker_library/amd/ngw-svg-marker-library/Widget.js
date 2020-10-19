@@ -19,7 +19,7 @@ define([
     "ngw/route",
     "ngw-file-upload/FileUploader",
     "ngw-resource/serialize",
-    "ngw-pyramid/i18n!icon_library",
+    "ngw-pyramid/i18n!svg_marker_library",
     // resource
     "xstyle/css!./resource/Widget.css",
     "ngw/dgrid/css"
@@ -60,8 +60,8 @@ define([
 
 
     return declare([LayoutContainer, serialize.Mixin], {
-        title: i18n.gettext("SVG symbol library"),
-        serializePrefix: "svg_symbol_library",
+        title: i18n.gettext("SVG marker library"),
+        serializePrefix: "svg_marker_library",
 
         constructor: function () {
             this.store = new Observable(new Memory({idProperty: "name"}));
@@ -71,7 +71,7 @@ define([
         buildRendering: function () {
             this.inherited(arguments);
 
-            domClass.add(this.domNode, "ngw-svg-symbol-library-widget");
+            domClass.add(this.domNode, "ngw-svg-marker-library-widget");
 
             this.toolbar = new Toolbar({
                 region: 'top'

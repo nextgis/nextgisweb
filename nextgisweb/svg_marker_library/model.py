@@ -27,9 +27,9 @@ Base = declarative_base()
 ALLOWED_EXTENSIONS = ('.svg', )
 
 
-class SVGSymbolLibrary(Base, Resource):
-    identity = 'svg_symbol_library'
-    cls_display_name = _("SVG symbol library")
+class SVGMarkerLibrary(Base, Resource):
+    identity = 'svg_marker_library'
+    cls_display_name = _("SVG marker library")
 
     __scope__ = (DataStructureScope, DataScope)
 
@@ -40,10 +40,10 @@ class SVGSymbolLibrary(Base, Resource):
     def check_parent(self, parent):
         return isinstance(parent, ResourceGroup)
 
-    def find_svg_symbol(self, candidates):
-        q = SVGSymbol.filter(
-            SVGSymbol.svg_symbol_library_id == self.id,
-            SVGSymbol.name.in_(candidates))
+    def find_svg_marker(self, candidates):
+        q = SVGMarker.filter(
+            SVGMarker.svg_marker_library_id == self.id,
+            SVGMarker.name.in_(candidates))
 
         min_idx = None
         min_symb = None
@@ -59,22 +59,22 @@ class SVGSymbolLibrary(Base, Resource):
         return min_symb
 
 
-class SVGSymbol(Base):
-    __tablename__ = 'svg_symbol'
+class SVGMarker(Base):
+    __tablename__ = 'svg_marker'
 
     id = db.Column(db.Integer, primary_key=True)
-    svg_symbol_library_id = db.Column(db.ForeignKey(SVGSymbolLibrary.id), nullable=False)
+    svg_marker_library_id = db.Column(db.ForeignKey(SVGMarkerLibrary.id), nullable=False)
     fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=False)
     name = db.Column(db.Unicode(255), nullable=False)
 
     __table_args__ = (
-        db.UniqueConstraint(svg_symbol_library_id, name),
+        db.UniqueConstraint(svg_marker_library_id, name),
     )
 
     fileobj = db.relationship(FileObj, lazy='joined')
 
-    svg_symbol_library = db.relationship(
-        SVGSymbolLibrary, foreign_keys=svg_symbol_library_id,
+    svg_marker_library = db.relationship(
+        SVGMarkerLibrary, foreign_keys=svg_marker_library_id,
         backref=db.backref('files', cascade='all,delete-orphan'))
 
     @property
@@ -128,9 +128,9 @@ class _archive_attr(SP):
                 with archive.open(file_info.filename, 'r') as sf, open(dstfile, 'w+b') as df:
                     copyfileobj(sf, df)
 
-                svg_symbol = SVGSymbol(name=name, fileobj=fileobj)
+                svg_marker = SVGMarker(name=name, fileobj=fileobj)
 
-                srlzr.obj.files.append(svg_symbol)
+                srlzr.obj.files.append(svg_marker)
 
 
 class _files_attr(SP):
@@ -147,14 +147,14 @@ class _files_attr(SP):
             files_info[name] = f
 
         removed_files = list()
-        for svg_symbol in srlzr.obj.files:
-            if svg_symbol.name not in files_info:  # Removed file
-                removed_files.append(svg_symbol)
+        for svg_marker in srlzr.obj.files:
+            if svg_marker.name not in files_info:  # Removed file
+                removed_files.append(svg_marker)
             else:
-                file_info = files_info.pop(svg_symbol.name)
+                file_info = files_info.pop(svg_marker.name)
                 if 'id' in file_info:  # Updated file
                     srcfile, metafile = env.file_upload.get_filename(file_info['id'])
-                    dstfile = env.file_storage.filename(svg_symbol.fileobj, makedirs=False)
+                    dstfile = env.file_storage.filename(svg_marker.fileobj, makedirs=False)
                     copyfile(srcfile, dstfile)
                 else:  # Untouched file
                     pass
@@ -169,14 +169,14 @@ class _files_attr(SP):
             dstfile = env.file_storage.filename(fileobj, makedirs=True)
             copyfile(srcfile, dstfile)
 
-            svg_symbol = SVGSymbol(name=name, fileobj=fileobj)
+            svg_marker = SVGMarker(name=name, fileobj=fileobj)
 
-            srlzr.obj.files.append(svg_symbol)
+            srlzr.obj.files.append(svg_marker)
 
 
-class SVGSymbolLibrarySerializer(Serializer):
-    identity = SVGSymbolLibrary.identity
-    resclass = SVGSymbolLibrary
+class SVGMarkerLibrarySerializer(Serializer):
+    identity = SVGMarkerLibrary.identity
+    resclass = SVGMarkerLibrary
 
     archive = _archive_attr(
         read=None,
