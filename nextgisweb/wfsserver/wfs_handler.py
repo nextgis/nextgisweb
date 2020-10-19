@@ -181,6 +181,10 @@ class WFSHandler():
         self.p_count = params.get('COUNT', params.get('MAXFEATURES'))
         self.p_startindex = params.get('STARTINDEX')
 
+        self.service_namespace = self.request.route_url(
+            'wfsserver.wfs', id=self.resource.id, _query=dict(
+                VERSION=self.p_version))
+
     @property
     def title(self):
         return self.resource.display_name
@@ -223,7 +227,7 @@ class WFSHandler():
 
     def _feature_type_list(self, parent):
         _ns_ows = nsmap('ows', self.p_version)
-        _ns_ngw = nsmap('ngw', self.p_version)
+        _ns_ngw = self.service_namespace
 
         __list = El('FeatureTypeList', parent=parent)
         if self.p_version < v200:
@@ -410,7 +414,7 @@ class WFSHandler():
 
     def _describe_feature_type(self):
         _ns_gml = nsmap('gml', self.p_version)
-        _ns_ngw = nsmap('ngw', self.p_version)
+        _ns_ngw = self.service_namespace
 
         EM = ElementMaker(nsmap=dict(gml=_ns_gml, ngw=_ns_ngw))
         root = EM('schema', dict(
@@ -469,7 +473,7 @@ class WFSHandler():
     def _get_feature(self):
         _ns_wfs = nsmap('wfs', self.p_version)
         _ns_gml = nsmap('gml', self.p_version)
-        _ns_ngw = nsmap('ngw', self.p_version)
+        _ns_ngw = self.service_namespace
 
         __query = None
 
