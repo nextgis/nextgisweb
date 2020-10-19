@@ -26,7 +26,6 @@ def pkginfo():
         'feature_description',
         'feature_attachment',
         'render',
-        'marker_library',
         'svg_marker_library',
         'webmap',
         'file_storage',
