@@ -26,8 +26,8 @@ COMMENT ON TABLE svg_marker IS 'svg_marker_library';
 COMMENT ON TABLE svg_marker_library IS 'svg_marker_library';
 
 
-DROP TABLE marker;
-DROP TABLE marker_category;
-DROP TABLE marker_collection;
+DROP TABLE IF EXISTS marker;
+DROP TABLE IF EXISTS marker_category;
+DROP TABLE IF EXISTS marker_collection;
 
 DELETE FROM fileobj WHERE component = 'marker_library';
