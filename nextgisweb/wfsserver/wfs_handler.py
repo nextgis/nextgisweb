@@ -4,6 +4,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from collections import OrderedDict
 from datetime import datetime
 from os import path
+from tempfile import NamedTemporaryFile
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
@@ -217,10 +218,14 @@ class WFSHandler():
                 xsd_file = 'WFS-capabilities.xsd' if self.p_version == v100 \
                     and self.p_request == GET_CAPABILITIES else 'wfs.xsd'
                 xsd_path = path.join(wfs_schema_dir, version_dir, xsd_file)
+
                 schema = etree.XMLSchema(file=xsd_path)
+                schema.assertValid(etree.XML(xml))
             elif self.p_request == DESCRIBE_FEATURE_TYPE:
                 xsd_path = path.join(XSD_DIR, 'www.w3.org/2009/XMLSchema/XMLSchema.xsd')
+
                 schema = etree.XMLSchema(file=xsd_path)
+                schema.assertValid(etree.XML(xml))
             elif self.p_request == GET_FEATURE:
                 describe_path = self.request.route_path(
                     'wfsserver.wfs', id=self.resource.id, _query=dict(
@@ -236,19 +241,15 @@ class WFSHandler():
                 for el in describe_root.xpath('.//*[starts-with(@schemaLocation, \'%s\')]' % opengis_url):
                     el.attrib['schemaLocation'] = el.attrib['schemaLocation'].replace(opengis_url, opengis_dir)
 
-                temp_path = str(Path(__file__).parent / 'tmp.xsd')
-                with open(temp_path, 'w') as tmp:
+                with NamedTemporaryFile() as tmp:
                     tmp.write(etree.tostring(describe_root))
+                    tmp.flush()
 
-                _schema = El('schema', dict(elementFormDefault='qualified'), namespace='http://www.w3.org/2001/XMLSchema')
-                El('import', dict(namespace=self.service_namespace, schemaLocation=temp_path), parent=_schema, namespace='http://www.w3.org/2001/XMLSchema')
+                    _schema = El('schema', dict(elementFormDefault='qualified'), namespace='http://www.w3.org/2001/XMLSchema')
+                    El('import', dict(namespace=self.service_namespace, schemaLocation=tmp.name), parent=_schema, namespace='http://www.w3.org/2001/XMLSchema')
 
-                schema = etree.XMLSchema(etree=_schema)
-            else:
-                schema = None
-
-            if schema is not None:
-                schema.assertValid(etree.XML(xml))
+                    schema = etree.XMLSchema(etree=_schema)
+                    schema.assertValid(etree.XML(xml))
 
         return xml
 
