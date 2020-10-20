@@ -453,18 +453,19 @@ class WFSHandler():
             __ccontent = El('complexContent', parent=__ctype)
             __ext = El('extension', dict(base='gml:AbstractFeatureType'), parent=__ccontent)
             __seq = El('sequence', parent=__ext)
-            for field in feature_layer.fields:
-                if field.datatype == FIELD_TYPE.REAL:
-                    datatype = 'double'
-                else:
-                    datatype = field.datatype.lower()
-                El('element', dict(minOccurs='0', name=field.keyname, type=datatype), parent=__seq)
 
             if feature_layer.geometry_type not in GEOM_TYPE_TO_GML_TYPE:
                 raise ValidationError("Geometry type not supported: %s"
                                       % feature_layer.geometry_type)
             El('element', dict(minOccurs='0', name='geom', type=GEOM_TYPE_TO_GML_TYPE[
                 feature_layer.geometry_type]), parent=__seq)
+
+            for field in feature_layer.fields:
+                if field.datatype == FIELD_TYPE.REAL:
+                    datatype = 'double'
+                else:
+                    datatype = field.datatype.lower()
+                El('element', dict(minOccurs='0', name=field.keyname, type=datatype), parent=__seq)
 
         return etree.tostring(root)
 
@@ -574,9 +575,9 @@ class WFSHandler():
                 __gml = etree.fromstring(geom_gml)
                 __geom.append(__gml)
 
-                for field in feature.fields:
-                    _field = El(field, parent=__feature, namespace=self.service_namespace)
-                    value = feature.fields[field]
+                for field in feature_layer.fields:
+                    _field = El(field.keyname, parent=__feature, namespace=self.service_namespace)
+                    value = feature.fields[field.keyname]
                     if value is not None:
                         if not isinstance(value, text_type):
                             value = str(value)
