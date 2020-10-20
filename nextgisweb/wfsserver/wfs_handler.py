@@ -458,14 +458,14 @@ class WFSHandler():
                 raise ValidationError("Geometry type not supported: %s"
                                       % feature_layer.geometry_type)
             El('element', dict(minOccurs='0', name='geom', type=GEOM_TYPE_TO_GML_TYPE[
-                feature_layer.geometry_type]), parent=__seq)
+                feature_layer.geometry_type], nillable='true'), parent=__seq)
 
             for field in feature_layer.fields:
                 if field.datatype == FIELD_TYPE.REAL:
                     datatype = 'double'
                 else:
                     datatype = field.datatype.lower()
-                El('element', dict(minOccurs='0', name=field.keyname, type=datatype), parent=__seq)
+                El('element', dict(minOccurs='0', name=field.keyname, type=datatype, nillable='true'), parent=__seq)
 
         return etree.tostring(root)
 
