@@ -500,6 +500,8 @@ class WFSHandler():
             for field in feature_layer.fields:
                 if field.datatype == FIELD_TYPE.REAL:
                     datatype = 'double'
+                elif field.datatype == FIELD_TYPE.DATETIME:
+                    datatype = 'dateTime'
                 else:
                     datatype = field.datatype.lower()
                 El('element', dict(minOccurs='0', name=field.keyname, type=datatype, nillable='true'), parent=__seq)
@@ -614,7 +616,9 @@ class WFSHandler():
                     _field = El(field.keyname, parent=__feature, namespace=self.service_namespace)
                     value = feature.fields[field.keyname]
                     if value is not None:
-                        if not isinstance(value, text_type):
+                        if isinstance(value, datetime):
+                            value = value.isoformat()
+                        elif not isinstance(value, text_type):
                             value = str(value)
                         _field.text = value
                     else:
