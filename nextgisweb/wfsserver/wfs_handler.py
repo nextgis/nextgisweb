@@ -142,7 +142,7 @@ def geom_from_gml(el):
 
 
 class WFSHandler():
-    def __init__(self, resource, request):
+    def __init__(self, resource, request, force_schema_validation=False):
         self.resource = resource
         self.request = request
 
@@ -184,8 +184,8 @@ class WFSHandler():
         self.p_count = params.get('COUNT', params.get('MAXFEATURES'))
         self.p_startindex = params.get('STARTINDEX')
 
-        self.p_validate_schema = params.get('VALIDATESCHEMA', 'FALSE').upper() \
-            in ('1', 'YES', 'TRUE')
+        self.p_validate_schema = force_schema_validation or (
+            params.get('VALIDATESCHEMA', 'FALSE').upper() in ('1', 'YES', 'TRUE'))
 
         self.service_namespace = self.request.route_url(
             'wfsserver.wfs', id=self.resource.id, _query=dict(
@@ -256,6 +256,8 @@ class WFSHandler():
 
                     schema = etree.XMLSchema(etree=_schema)
                     schema.assertValid(etree.XML(xml))
+            else:
+                raise ValidationError("Schema validation isn't supported for {} request".format(self.p_request))
 
         return xml
 

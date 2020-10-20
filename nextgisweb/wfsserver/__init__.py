@@ -10,6 +10,10 @@ class WFSServerComponent(Component):
     identity = 'wfsserver'
     metadata = Base.metadata
 
+    def __init__(self, *args, **kwargs):
+        super(WFSServerComponent, self).__init__(*args, **kwargs)
+        self.force_schema_validation = False
+
     def setup_pyramid(self, config):
         from . import api, view
         api.setup_pyramid(self, config)

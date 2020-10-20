@@ -30,7 +30,11 @@ def wfs(resource, request):
         else:
             six.reraise(*sys.exc_info())
 
-    xml = WFSHandler(resource, request).response()
+    fsv = request.env.wfsserver.force_schema_validation
+    xml = WFSHandler(
+        resource, request,
+        force_schema_validation=fsv,
+    ).response()
     return Response(xml, content_type='text/xml')
 
 

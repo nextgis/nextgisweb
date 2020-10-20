@@ -89,6 +89,6 @@ for version in TEST_WFS_VERSIONS:
 
 @pytest.mark.parametrize('version, query', XML_VALID_FIXTURES)
 def test_schema(version, query, service_id, ngw_webtest_app, ngw_auth_administrator):
-    query['version'] = version
-    query['validateSchema'] = '1'
+    query['VERSION'] = version
+    query['VALIDATESCHEMA'] = '1'
     ngw_webtest_app.get('/api/resource/%d/wfs' % service_id, query, status=200)
