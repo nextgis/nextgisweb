@@ -552,7 +552,7 @@ class WFSHandler():
             for feature in query():
                 feature_id = fid_encode(feature.id)
                 __member = El('featureMember', parent=root, namespace=gml['ns']) if self.p_version == v100 \
-                    else El('member', parent=root, namespace=gml['ns'])
+                    else El('member', parent=root, namespace=wfs['ns'])
                 id_attr = 'fid' if self.p_version == v100 else ns_attr('gml', 'id', self.p_version)
                 __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member, namespace=self.service_namespace)
 
