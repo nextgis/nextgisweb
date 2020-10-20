@@ -98,6 +98,18 @@ def features(service, ngw_httptest_app, ngw_auth_administrator):
     return factory
 
 
+@pytest.mark.parametrize('version', TEST_WFS_VERSIONS)
+def test_layer_name(version, service, ngw_httptest_app, ngw_auth_administrator):
+    driver = ogr.GetDriverByName(six.ensure_str('WFS'))
+    wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
+        ngw_httptest_app.base_url, service, version), True)
+    assert wfs_ds is not None, gdal.GetLastErrorMsg()
+
+    wfs_layer = wfs_ds.GetLayer(0)
+    assert wfs_layer is not None, gdal.GetLastErrorMsg()
+    assert wfs_layer.GetName() == 'test'
+
+
 @pytest.mark.parametrize('version, key', product(TEST_WFS_VERSIONS, (
     'null', 'int', 'real', 'string', 'unicode',
     # Date, time and datetime types seem to be broken
