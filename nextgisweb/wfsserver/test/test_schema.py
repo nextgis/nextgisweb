@@ -2,7 +2,6 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
-from itertools import product
 from uuid import uuid4
 
 import pytest
@@ -73,12 +72,23 @@ def service_id(ngw_resource_group):
         DBSession.delete(WFSService.filter_by(id=res_wfs.id).one())
 
 
-@pytest.mark.parametrize('version, query', product(TEST_WFS_VERSIONS, (
-    dict(request='GetCapabilities'),
-    dict(request='DescribeFeatureType'),
-    dict(request='GetFeature', typenames='test'),
-)))
-def test_xml_valid(version, query, service_id, ngw_webtest_app, ngw_auth_administrator):
+XML_VALID_FIXTURES = []
+for version in TEST_WFS_VERSIONS:
+    XML_VALID_FIXTURES.extend((
+        pytest.param(
+            version, dict(request='GetCapabilities'),
+            id='{}-GetCapabilities'.format(version)),
+        pytest.param(
+            version, dict(request='DescribeFeatureType'),
+            id='{}-DescribeFeatureType'.format(version)),
+        pytest.param(
+            version, dict(request='GetFeature', typenames='test'),
+            id='{}-GetFeature'.format(version)),
+    ))
+
+
+@pytest.mark.parametrize('version, query', XML_VALID_FIXTURES)
+def test_schema(version, query, service_id, ngw_webtest_app, ngw_auth_administrator):
     query['version'] = version
     query['validateSchema'] = '1'
     ngw_webtest_app.get('/api/resource/%d/wfs' % service_id, query, status=200)
