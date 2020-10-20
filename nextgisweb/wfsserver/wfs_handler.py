@@ -409,6 +409,7 @@ class WFSHandler():
 
     def _describe_feature_type(self):
         gml = nsmap('gml', self.p_version)
+        wfs = nsmap('wfs', self.p_version)
 
         EM = ElementMaker(nsmap=dict(gml=gml['ns'], ngw=self.service_namespace))
         root = EM('schema', dict(
@@ -421,6 +422,10 @@ class WFSHandler():
         El('import', dict(
             namespace=gml['ns'],
             schemaLocation=gml['loc']
+        ), parent=root)
+        El('import', dict(
+            namespace=wfs['ns'],
+            schemaLocation=wfs['loc']
         ), parent=root)
 
         if self.request.method == 'GET':
