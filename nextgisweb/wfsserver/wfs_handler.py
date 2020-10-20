@@ -79,7 +79,10 @@ def ns_trim(value):
 
 
 def trim_ns_ngw(value):
-    return value[4:] if value.startswith('ngw:') else value
+    result = value
+    while result.startswith('ngw:'):
+        result = result[4:]
+    return result
 
 
 def El(tag, attrs=None, parent=None, text=None, namespace=None):
@@ -473,7 +476,7 @@ class WFSHandler():
         if typenames is None:
             typenames = [layer.keyname for layer in self.resource.layers]
 
-        typenames = [trim_ns_ngw(tn) for tn in typenames]
+        typenames = map(trim_ns_ngw, typenames)
 
         for typename in typenames:
             substitutionGroup = 'gml:AbstractFeature' if self.p_version > v100 else 'gml:_Feature'
