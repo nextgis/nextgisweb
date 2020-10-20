@@ -33,8 +33,8 @@ XSD_DIR = path.join(path.dirname(
 
 _nsmap = dict(
     wfs=OrderedDict((
-        (v100, ('http://www.opengis.net/wfs', 'http://schemas.opengeospatial.net/wfs/1.0.0/WFS-basic.xsd')),
-        (v200, ('http://www.opengis.net/wfs/2.0', 'http://schemas.opengis.net/wfs/2.0.0/wfs.xsd')),
+        (v100, ('http://www.opengis.net/wfs', 'http://schemas.opengis.net/wfs/1.0.0/WFS-basic.xsd')),
+        (v200, ('http://www.opengis.net/wfs/2.0', 'http://schemas.opengis.net/wfs/2.0/wfs.xsd')),
     )),
     gml=OrderedDict((
         (v100, ('http://www.opengis.net/gml', 'http://schemas.opengis.net/gml/2.1.2/feature.xsd')),
