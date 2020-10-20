@@ -181,6 +181,9 @@ class WFSHandler():
         self.p_count = params.get('COUNT', params.get('MAXFEATURES'))
         self.p_startindex = params.get('STARTINDEX')
 
+        self.p_validate_schema = params.get('VALIDATESCHEMA', 'FALSE').upper() \
+            in ('1', 'YES', 'TRUE')
+
         self.service_namespace = self.request.route_url(
             'wfsserver.wfs', id=self.resource.id, _query=dict(
                 VERSION=self.p_version))
@@ -198,7 +201,7 @@ class WFSHandler():
     def gml_format(self):
         return 'GML32' if self.p_version >= v110 else 'GML2'
 
-    def response(self, validateSchema=False):
+    def response(self):
         if self.p_request == GET_CAPABILITIES:
             xml = self._get_capabilities200() if self.p_version >= v200 \
                 else self._get_capabilities()
@@ -211,7 +214,7 @@ class WFSHandler():
         else:
             raise ValidationError("Unsupported request")
 
-        if validateSchema:
+        if self.p_validate_schema:
             if self.p_request == GET_CAPABILITIES:
                 version_dir = '1.0.0' if self.p_version == v100 else '2.0'
                 wfs_schema_dir = path.join(XSD_DIR, 'schemas.opengis.net/wfs/')

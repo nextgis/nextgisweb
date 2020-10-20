@@ -30,11 +30,7 @@ def wfs(resource, request):
         else:
             six.reraise(*sys.exc_info())
 
-    wfsHandler = WFSHandler(resource, request)
-
-    validateSchema = request.GET.get('validateSchema') == '1'
-    xml = wfsHandler.response(validateSchema)
-
+    xml = WFSHandler(resource, request).response()
     return Response(xml, content_type='text/xml')
 
 
