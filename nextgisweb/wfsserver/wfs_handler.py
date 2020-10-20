@@ -32,45 +32,42 @@ XSD_DIR = path.join(path.dirname(
     path.abspath(__file__)), 'test/xsd/')
 
 _nsmap = dict(
-    ngw=OrderedDict((
-        (v100, 'https://nextgis.com/wfs'),
-    )),
     wfs=OrderedDict((
-        (v100, 'http://www.opengis.net/wfs'),
-        (v200, 'http://www.opengis.net/wfs/2.0'),
+        (v100, ('http://www.opengis.net/wfs', 'http://schemas.opengeospatial.net/wfs/1.0.0/WFS-basic.xsd')),
+        (v200, ('http://www.opengis.net/wfs/2.0', 'http://schemas.opengis.net/wfs/2.0.0/wfs.xsd')),
     )),
     gml=OrderedDict((
-        (v100, 'http://www.opengis.net/gml'),
-        (v200, 'http://www.opengis.net/gml/3.2'),
+        (v100, ('http://www.opengis.net/gml', 'http://schemas.opengis.net/gml/2.1.2/feature.xsd')),
+        (v200, ('http://www.opengis.net/gml/3.2', 'http://schemas.opengis.net/gml/3.2.1/feature.xsd')),
     )),
     ogc=OrderedDict((
-        (v100, 'http://www.opengis.net/ogc'),
+        (v100, ('http://www.opengis.net/ogc', None)),
     )),
     xsi=OrderedDict((
-        (v100, 'http://www.w3.org/2001/XMLSchema-instance'),
+        (v100, ('http://www.w3.org/2001/XMLSchema-instance', None)),
     )),
     ows=OrderedDict((
-        (v200, 'http://www.opengis.net/ows/1.1'),
+        (v200, ('http://www.opengis.net/ows/1.1', None)),
     )),
     xlink=OrderedDict((
-        (v200, 'http://www.w3.org/1999/xlink'),
+        (v200, ('http://www.w3.org/1999/xlink', None)),
     )),
     fes=OrderedDict((
-        (v200, 'http://www.opengis.net/fes/2.0'),
+        (v200, ('http://www.opengis.net/fes/2.0', None)),
     ))
 )
 
 
 def nsmap(prefix, request_version):
     item = _nsmap[prefix]
-    for version, value in reversed(item.items()):
+    for version, (ns, loc) in reversed(item.items()):
         if version <= request_version:
-            return value
-    return None
+            return dict(ns=ns, loc=loc)
+    raise ValidationError("Namespace %s not found for version %s." % (prefix, request_version))
 
 
 def ns_attr(ns, attr, request_version):
-    return '{{{0}}}{1}'.format(nsmap(ns, request_version), attr)
+    return '{{{0}}}{1}'.format(nsmap(ns, request_version)['ns'], attr)
 
 
 def ns_trim(value):
@@ -226,15 +223,12 @@ class WFSHandler():
         return xml
 
     def _feature_type_list(self, parent):
-        _ns_ows = nsmap('ows', self.p_version)
-        _ns_ngw = self.service_namespace
-
         __list = El('FeatureTypeList', parent=parent)
         if self.p_version < v200:
             __ops = El('Operations', parent=__list)
             El('Query', parent=__ops)
 
-        EM_name = ElementMaker(nsmap=dict(ngw=_ns_ngw))
+        EM_name = ElementMaker(nsmap=dict(ngw=self.service_namespace))
         for layer in self.resource.layers:
             feature_layer = layer.resource
             if not feature_layer.has_permission(DataScope.read, self.request.user):
@@ -263,6 +257,7 @@ class WFSHandler():
             if IBboxLayer.providedBy(feature_layer):
                 extent = feature_layer.extent
                 if self.p_version >= v110:
+                    _ns_ows = nsmap('ows', self.p_version)['ns']
                     __bbox = El('WGS84BoundingBox', namespace=_ns_ows, parent=__type)
                     El('LowerCorner', namespace=_ns_ows, parent=__bbox,
                        text='%.6f %.6f' % (extent['minLon'], extent['minLat']))
@@ -290,10 +285,10 @@ class WFSHandler():
         return fid
 
     def _get_capabilities(self):
-        EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)))
+        EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)['ns']))
         root = EM('WFS_Capabilities', dict(
             version=self.p_version,
-            xmlns=nsmap('wfs', self.p_version)))
+            xmlns=nsmap('wfs', self.p_version)['ns']))
 
         # Service
         __s = El('Service', parent=root)
@@ -329,7 +324,7 @@ class WFSHandler():
         self._feature_type_list(root)
 
         # Filter_Capabilities
-        _ns_ogc = nsmap('ogc', self.p_version)
+        _ns_ogc = nsmap('ogc', self.p_version)['ns']
         __filter = El('Filter_Capabilities', namespace=_ns_ogc, parent=root)
 
         __sc = El('Spatial_Capabilities', namespace=_ns_ogc, parent=__filter)
@@ -342,15 +337,15 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _get_capabilities200(self):
-        _ns_ows = nsmap('ows', self.p_version)
-        _ns_fes = nsmap('fes', self.p_version)
+        _ns_ows = nsmap('ows', self.p_version)['ns']
+        _ns_fes = nsmap('fes', self.p_version)['ns']
 
         EM = ElementMaker(nsmap=dict(
-            fes=_ns_fes, ows=_ns_ows, xlink=nsmap('xlink', self.p_version)
+            fes=_ns_fes, ows=_ns_ows, xlink=nsmap('xlink', self.p_version)['ns']
         ))
         root = EM('WFS_Capabilities', dict(
             version=self.p_version,
-            xmlns=nsmap('wfs', self.p_version)))
+            xmlns=nsmap('wfs', self.p_version)['ns']))
 
         # Service
         __service = El('ServiceIdentification', namespace=_ns_ows, parent=root)
@@ -413,21 +408,19 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _describe_feature_type(self):
-        _ns_gml = nsmap('gml', self.p_version)
-        _ns_ngw = self.service_namespace
+        gml = nsmap('gml', self.p_version)
 
-        EM = ElementMaker(nsmap=dict(gml=_ns_gml, ngw=_ns_ngw))
+        EM = ElementMaker(nsmap=dict(gml=gml['ns'], ngw=self.service_namespace))
         root = EM('schema', dict(
-            targetNamespace=nsmap('wfs', self.p_version),
+            targetNamespace=nsmap('wfs', self.p_version)['ns'],
             elementFormDefault='qualified',
             attributeFormDefault='unqualified',
             version='0.1',
             xmlns='http://www.w3.org/2001/XMLSchema'))
 
         El('import', dict(
-            namespace=_ns_gml,
-            schemaLocation='http://schemas.opengis.net/gml/2.1.2/feature.xsd' if self.p_version == v100
-                           else 'http://schemas.opengis.net/gml/3.2.1/feature.xsd'
+            namespace=gml['ns'],
+            schemaLocation=gml['loc']
         ), parent=root)
 
         if self.request.method == 'GET':
@@ -471,9 +464,8 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _get_feature(self):
-        _ns_wfs = nsmap('wfs', self.p_version)
-        _ns_gml = nsmap('gml', self.p_version)
-        _ns_ngw = self.service_namespace
+        wfs = nsmap('wfs', self.p_version)
+        gml = nsmap('gml', self.p_version)
 
         __query = None
 
@@ -495,20 +487,18 @@ class WFSHandler():
         feature_layer = layer.resource
         self.request.resource_permission(DataScope.read, feature_layer)
 
-        EM = ElementMaker(namespace=_ns_wfs, nsmap=dict(
-            gml=_ns_gml, wfs=_ns_wfs, ngw=_ns_ngw,
-            ogc=nsmap('ogc', self.p_version), xsi=nsmap('xsi', self.p_version)
+        EM = ElementMaker(namespace=wfs['ns'], nsmap=dict(
+            gml=gml['ns'], wfs=wfs['ns'], ngw=self.service_namespace,
+            ogc=nsmap('ogc', self.p_version)['ns'], xsi=nsmap('xsi', self.p_version)['ns']
         ))
         describe_location = self.request.route_url(
             'wfsserver.wfs', id=self.resource.id,
             _query=dict(REQUEST=DESCRIBE_FEATURE_TYPE, SERVICE='WFS',
                         VERSION=self.p_version, TYPENAME='ngw:' + typename))
         schema_location = ' '.join((
-            _ns_wfs,
-            _ns_gml,
-            describe_location,
-            'http://schemas.opengis.net/wfs/2.0.0/wfs.xsd' if self.p_version >= v200
-            else 'http://schemas.opengeospatial.net/wfs/1.0.0/WFS-basic.xsd'
+            wfs['ns'], wfs['loc'],
+            gml['ns'], gml['loc'],
+            self.service_namespace, describe_location
         ))
         root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation', self.p_version): schema_location})  # NOQA: E501
 
@@ -556,15 +546,15 @@ class WFSHandler():
             osr_out = osr.SpatialReference()
             osr_out.ImportFromWkt(srs_out.wkt)
 
-            __boundedBy = El('boundedBy', parent=root, namespace=_ns_gml if self.p_version == v100 else _ns_wfs)
+            __boundedBy = El('boundedBy', parent=root, namespace=gml['ns'] if self.p_version == v100 else wfs['ns'])
             minX = maxX = minY = maxY = None
 
             for feature in query():
                 feature_id = fid_encode(feature.id)
-                __member = El('featureMember', parent=root, namespace=_ns_gml) if self.p_version == v100 \
-                    else El('member', parent=root, namespace=_ns_wfs)
+                __member = El('featureMember', parent=root, namespace=gml['ns']) if self.p_version == v100 \
+                    else El('member', parent=root, namespace=gml['ns'])
                 id_attr = 'fid' if self.p_version == v100 else ns_attr('gml', 'id', self.p_version)
-                __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member, namespace=_ns_ngw)
+                __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member, namespace=self.service_namespace)
 
                 geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
 
@@ -574,13 +564,13 @@ class WFSHandler():
                 maxX = _maxX if maxX is None else max(maxX, _maxX)
                 maxY = _maxY if maxY is None else max(maxY, _maxY)
 
-                gml = geom.ExportToGML(['FORMAT=%s' % self.gml_format, 'NAMESPACE_DECL=YES'])
-                __geom = El('geom', parent=__feature, namespace=_ns_ngw)
-                __gml = etree.fromstring(gml)
+                geom_gml = geom.ExportToGML(['FORMAT=%s' % self.gml_format, 'NAMESPACE_DECL=YES'])
+                __geom = El('geom', parent=__feature, namespace=self.service_namespace)
+                __gml = etree.fromstring(geom_gml)
                 __geom.append(__gml)
 
                 for field in feature.fields:
-                    _field = El(field, parent=__feature, namespace=_ns_ngw)
+                    _field = El(field, parent=__feature, namespace=self.service_namespace)
                     value = feature.fields[field]
                     if value is not None:
                         if not isinstance(value, text_type):
@@ -592,14 +582,14 @@ class WFSHandler():
                 count += 1
 
             if None in (minX, minY, maxX, maxY):
-                El('null', parent=__boundedBy, namespace=_ns_gml, text='unknown')
+                El('null', parent=__boundedBy, namespace=gml['ns'], text='unknown')
             elif self.p_version == v100:
-                _box = El('Box', dict(srsName='EPSG:%d' % srs_out.id), parent=__boundedBy, namespace=_ns_gml)
-                El('coordinates', parent=_box, namespace=_ns_gml, text='%f %f %f %f' % (minX, minY, maxX, maxY))
+                _box = El('Box', dict(srsName='EPSG:%d' % srs_out.id), parent=__boundedBy, namespace=gml['ns'])
+                El('coordinates', parent=_box, namespace=gml['ns'], text='%f %f %f %f' % (minX, minY, maxX, maxY))
             else:
-                _envelope = El('Envelope', dict(srsName='urn:ogc:def:crs:EPSG::%d' % srs_out.id), parent=__boundedBy, namespace=_ns_gml)
-                El('lowerCorner', parent=_envelope, namespace=_ns_gml, text='%f %f' % (minX, minY))
-                El('upperCorner', parent=_envelope, namespace=_ns_gml, text='%f %f' % (maxX, maxY))
+                _envelope = El('Envelope', dict(srsName='urn:ogc:def:crs:EPSG::%d' % srs_out.id), parent=__boundedBy, namespace=gml['ns'])
+                El('lowerCorner', parent=_envelope, namespace=gml['ns'], text='%f %f' % (minX, minY))
+                El('upperCorner', parent=_envelope, namespace=gml['ns'], text='%f %f' % (maxX, maxY))
 
             matched = count
 
@@ -615,8 +605,8 @@ class WFSHandler():
         return etree.tostring(root)
 
     def _transaction(self):
-        _ns_wfs = nsmap('wfs', self.p_version)
-        _ns_ogc = nsmap('ogc', self.p_version)
+        _ns_wfs = nsmap('wfs', self.p_version)['ns']
+        _ns_ogc = nsmap('ogc', self.p_version)['ns']
 
         layers = dict()
 
@@ -629,7 +619,7 @@ class WFSHandler():
             return layers[keyname]
 
         EM = ElementMaker(namespace=_ns_wfs, nsmap=dict(
-            wfs=_ns_wfs, ogc=_ns_ogc, xsi=nsmap('xsi', self.p_version)))
+            wfs=_ns_wfs, ogc=_ns_ogc, xsi=nsmap('xsi', self.p_version)['ns']))
         _response = EM('TransactionResponse', dict(version='1.0.0'))
 
         _summary = El('TransactionSummary', namespace=_ns_wfs, parent=_response)
