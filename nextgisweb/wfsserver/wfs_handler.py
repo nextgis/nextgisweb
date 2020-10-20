@@ -412,7 +412,7 @@ class WFSHandler():
 
         EM = ElementMaker(nsmap=dict(gml=gml['ns'], ngw=self.service_namespace))
         root = EM('schema', dict(
-            targetNamespace=nsmap('wfs', self.p_version)['ns'],
+            targetNamespace=self.service_namespace,
             elementFormDefault='qualified',
             attributeFormDefault='unqualified',
             version='0.1',
