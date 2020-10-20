@@ -8,8 +8,10 @@ from os import path
 from lxml import etree, html
 from lxml.builder import ElementMaker
 from osgeo import ogr, osr
+from pyramid.request import Request
 from six import BytesIO, text_type
 
+from ..compat import Path
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..geometry import box, geom_from_wkb
@@ -209,16 +211,44 @@ class WFSHandler():
             raise ValidationError("Unsupported request")
 
         if validateSchema:
-            version_dir = '1.0.0' if self.p_version == v100 else '2.0'
-            if self.p_request == DESCRIBE_FEATURE_TYPE:
-                xsd_path = path.join(XSD_DIR, 'www.w3.org/2009/XMLSchema/XMLSchema.xsd')
-            else:
+            if self.p_request == GET_CAPABILITIES:
+                version_dir = '1.0.0' if self.p_version == v100 else '2.0'
                 wfs_schema_dir = path.join(XSD_DIR, 'schemas.opengis.net/wfs/')
                 xsd_file = 'WFS-capabilities.xsd' if self.p_version == v100 \
                     and self.p_request == GET_CAPABILITIES else 'wfs.xsd'
                 xsd_path = path.join(wfs_schema_dir, version_dir, xsd_file)
-            schema = etree.XMLSchema(etree.parse(xsd_path))
-            schema.assertValid(etree.XML(xml))
+                schema = etree.XMLSchema(file=xsd_path)
+            elif self.p_request == DESCRIBE_FEATURE_TYPE:
+                xsd_path = path.join(XSD_DIR, 'www.w3.org/2009/XMLSchema/XMLSchema.xsd')
+                schema = etree.XMLSchema(file=xsd_path)
+            elif self.p_request == GET_FEATURE:
+                describe_path = self.request.route_path(
+                    'wfsserver.wfs', id=self.resource.id, _query=dict(
+                        REQUEST=DESCRIBE_FEATURE_TYPE, SERVICE='WFS',
+                        VERSION=self.p_version, TYPENAME='ngw:' + self.p_typenames))
+                subreq = Request.blank(describe_path)
+                subreq.headers = self.request.headers
+                resp = self.request.invoke_subrequest(subreq)
+                describe_root = etree.XML(resp.body)
+
+                opengis_url = 'http://schemas.opengis.net'
+                opengis_dir = path.join(XSD_DIR, 'schemas.opengis.net')
+                for el in describe_root.xpath('.//*[starts-with(@schemaLocation, \'%s\')]' % opengis_url):
+                    el.attrib['schemaLocation'] = el.attrib['schemaLocation'].replace(opengis_url, opengis_dir)
+
+                temp_path = str(Path(__file__).parent / 'tmp.xsd')
+                with open(temp_path, 'w') as tmp:
+                    tmp.write(etree.tostring(describe_root))
+
+                _schema = El('schema', dict(elementFormDefault='qualified'), namespace='http://www.w3.org/2001/XMLSchema')
+                El('import', dict(namespace=self.service_namespace, schemaLocation=temp_path), parent=_schema, namespace='http://www.w3.org/2001/XMLSchema')
+
+                schema = etree.XMLSchema(etree=_schema)
+            else:
+                schema = None
+
+            if schema is not None:
+                schema.assertValid(etree.XML(xml))
 
         return xml
 
@@ -458,7 +488,7 @@ class WFSHandler():
                 raise ValidationError("Geometry type not supported: %s"
                                       % feature_layer.geometry_type)
             El('element', dict(minOccurs='0', name='geom', type=GEOM_TYPE_TO_GML_TYPE[
-                feature_layer.geometry_type], nillable='true'), parent=__seq)
+                feature_layer.geometry_type]), parent=__seq)
 
             for field in feature_layer.fields:
                 if field.datatype == FIELD_TYPE.REAL:
@@ -475,19 +505,17 @@ class WFSHandler():
 
         __query = None
 
-        if self.request.method == 'GET':
-            typename = self.p_typenames
-        elif self.request.method == 'POST':
+        if self.request.method == 'POST':
             __queries = find_tags(self.root_body, 'Query')
             if len(__queries) > 1:
                 raise ValidationError("Multiple queries not supported.")
             __query = __queries[0]
             for k, v in __query.attrib.items():
                 if k.upper() in ('TYPENAME', 'TYPENAMES'):
-                    typename = v
+                    self.p_typenames = v
                     break
 
-        typename = trim_ns_ngw(typename)
+        typename = trim_ns_ngw(self.p_typenames)
 
         layer = Layer.filter_by(service_id=self.resource.id, keyname=typename).one()
         feature_layer = layer.resource
