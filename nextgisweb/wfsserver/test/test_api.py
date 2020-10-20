@@ -69,8 +69,8 @@ def test_api(vector_layer_id, ngw_webtest_app, ngw_auth_administrator, ngw_resou
     wfsserver_service_id = resp.json['id']
 
     resp = ngw_webtest_app.get('/api/resource/%d/wfs' % wfsserver_service_id, dict(
-        service='wfs',
-        request='GetCapabilities'
+        service='wfs', request='GetCapabilities',
+        validateschema='YES',
     ), status=200)
 
     ET.fromstring(resp.text.encode('utf-8'))

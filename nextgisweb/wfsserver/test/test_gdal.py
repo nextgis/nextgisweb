@@ -78,7 +78,7 @@ def features(service, ngw_httptest_app, ngw_auth_administrator):
             factory._cache = dict()
 
         if version not in factory._cache:
-            wfs_ds = ogr.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
+            wfs_ds = ogr.Open("WFS:{}/api/resource/{}/wfs?VERSION={}&VALIDATESCHEMA=YES".format(
                 ngw_httptest_app.base_url, service, version), True)
             assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
@@ -133,11 +133,13 @@ def test_compare(version, key, features):
 )))
 def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator):
     driver = ogr.GetDriverByName(six.ensure_str('WFS'))
-    wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
+    wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}&VALIDATESCHEMA=YES".format(
         ngw_httptest_app.base_url, service, version), True)
     assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
     wfs_layer = wfs_ds.GetLayer(0)
+    assert wfs_layer is not None, gdal.GetLastErrorMsg()
+
     feature = wfs_layer.GetNextFeature()
 
     for k, v in fields.items():
