@@ -600,7 +600,10 @@ class WFSHandler():
                 maxX = _maxX if maxX is None else max(maxX, _maxX)
                 maxY = _maxY if maxY is None else max(maxY, _maxY)
 
-                geom_gml = geom.ExportToGML(['FORMAT=%s' % self.gml_format, 'NAMESPACE_DECL=YES'])
+                geom_gml = geom.ExportToGML([
+                    'FORMAT=%s' % self.gml_format,
+                    'NAMESPACE_DECL=YES',
+                    'GMLID=geom-%s' % feature_id])
                 __geom = El('geom', parent=__feature)
                 __gml = etree.fromstring(geom_gml)
                 __geom.append(__gml)
