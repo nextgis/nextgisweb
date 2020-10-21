@@ -90,7 +90,7 @@ def validate_filename(filename):
 
 def cut_extension(filename):
     name, ext = os.path.splitext(filename)
-    if ext not in ALLOWED_EXTENSIONS:
+    if ext.lower() not in ALLOWED_EXTENSIONS:
         raise ValidationError("File \"%s\" has an invalid extension" % filename)
     return name
 
