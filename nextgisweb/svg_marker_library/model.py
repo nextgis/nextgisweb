@@ -40,23 +40,13 @@ class SVGMarkerLibrary(Base, Resource):
     def check_parent(self, parent):
         return isinstance(parent, ResourceGroup)
 
-    def find_svg_marker(self, candidates):
-        q = SVGMarker.filter(
-            SVGMarker.svg_marker_library_id == self.id,
-            SVGMarker.name.in_(candidates))
+    def find_svg_marker(self, name):
+        svg_marker = SVGMarker.filter_by(
+            svg_symbol_library_id=self.id,
+            name=name
+        ).one_or_none()
 
-        min_idx = None
-        min_symb = None
-
-        for symb in q:
-            idx = candidates.index(symb.name)
-            if min_idx is None or min_idx > idx:
-                min_idx = idx
-                min_symb = symb
-                if min_idx == 0:
-                    break
-
-        return min_symb
+        return svg_marker
 
 
 class SVGMarker(Base):

@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+from os import path
+
 from ..component import Component
+from ..lib.config import Option, OptionAnnotations
 
 from .model import Base, SVGMarkerLibrary
 
 __all__ = ['SVGMarkerLibrary']
+
+PRESET_DIR = path.join(path.dirname(__file__), 'preset/')
 
 
 class SVGMarkerLibraryComponent(Component):
@@ -16,3 +21,7 @@ class SVGMarkerLibraryComponent(Component):
         from . import api, view  # NOQA
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
+
+    option_annotations = OptionAnnotations((
+        Option('svg_paths', list, default=[PRESET_DIR], doc="Search paths for SVG files."),
+    ))
