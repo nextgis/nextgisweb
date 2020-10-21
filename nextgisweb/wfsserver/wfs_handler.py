@@ -210,7 +210,7 @@ class WFSHandler():
             raise ValidationError("Unsupported request")
 
         if self.p_validate_schema:
-            if self.p_request == GET_CAPABILITIES:
+            if self.p_request in (GET_CAPABILITIES, TRANSACTION):
                 version_dir = '1.0.0' if self.p_version == v100 else '2.0'
                 wfs_schema_dir = path.join(XSD_DIR, 'schemas.opengis.net/wfs/')
                 xsd_file = 'WFS-capabilities.xsd' if self.p_version == v100 \
@@ -658,10 +658,14 @@ class WFSHandler():
 
         EM = ElementMaker(namespace=_ns_wfs, nsmap=dict(
             wfs=_ns_wfs, ogc=_ns_ogc, xsi=nsmap('xsi', self.p_version)['ns']))
-        _response = EM('TransactionResponse', dict(version='1.0.0'))
+        _response = EM('WFS_TransactionResponse' if self.p_version == v100
+                       else 'TransactionResponse', dict(version=self.p_version))
 
-        _summary = El('TransactionSummary', namespace=_ns_wfs, parent=_response)
-        summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
+        show_summary = self.p_version >= v200
+
+        if show_summary:
+            _summary = El('TransactionSummary', namespace=_ns_wfs, parent=_response)
+            summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
 
         for _operation in self.root_body:
             operation_tag = ns_trim(_operation.tag)
@@ -687,7 +691,8 @@ class WFSHandler():
                              namespace=_ns_wfs, parent=_response)
                 El('FeatureId', dict(fid=fid_encode(fid)), namespace=_ns_ogc, parent=_insert)
 
-                summary['totalInserted'] += 1
+                if show_summary:
+                    summary['totalInserted'] += 1
             else:
                 keyname = ns_trim(_operation.get('typeName'))
                 feature_layer = find_layer(keyname)
@@ -721,19 +726,23 @@ class WFSHandler():
 
                     feature_layer.feature_put(feature)
 
-                    summary['totalUpdated'] += 1
+                    if show_summary:
+                        summary['totalUpdated'] += 1
                 elif operation_tag == 'Delete':
                     feature_layer.feature_delete(fid)
-                    summary['totalDeleted'] += 1
+                    if show_summary:
+                        summary['totalDeleted'] += 1
                 else:
                     raise ValidationError("Unknown operation: %s" % operation_tag)
 
-        for param, value in summary.items():
-            if value > 0:
-                El(param, namespace=_ns_wfs, text=str(value), parent=_summary)
+        if show_summary:
+            for param, value in summary.items():
+                if value > 0:
+                    El(param, namespace=_ns_wfs, text=str(value), parent=_summary)
 
-        _result = El('TransactionResult', namespace=_ns_wfs, parent=_response)
-        _status = El('Status', namespace=_ns_wfs, parent=_result)
-        El('SUCCESS', namespace=_ns_wfs, parent=_status)
+        if self.p_version == v100:
+            _result = El('TransactionResult', namespace=_ns_wfs, parent=_response)
+            _status = El('Status', namespace=_ns_wfs, parent=_result)
+            El('SUCCESS', namespace=_ns_wfs, parent=_status)
 
         return etree.tostring(_response)
