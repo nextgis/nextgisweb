@@ -12,7 +12,6 @@ from osgeo import ogr, osr
 from pyramid.request import Request
 from six import BytesIO, text_type
 
-from ..compat import Path
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..geometry import box, geom_from_wkb
@@ -76,13 +75,6 @@ def ns_attr(ns, attr, request_version):
 def ns_trim(value):
     pos = max(value.find('}'), value.rfind(':'))
     return value[pos + 1:]
-
-
-def trim_ns_ngw(value):
-    result = value
-    while result.startswith('ngw:'):
-        result = result[4:]
-    return result
 
 
 def El(tag, attrs=None, parent=None, text=None, namespace=None):
@@ -188,8 +180,8 @@ class WFSHandler():
             params.get('VALIDATESCHEMA', 'FALSE').upper() in ('1', 'YES', 'TRUE'))
 
         self.service_namespace = self.request.route_url(
-            'wfsserver.wfs', id=self.resource.id, _query=dict(
-                VERSION=self.p_version))
+           'wfsserver.wfs', id=self.resource.id, _query=dict(
+               VERSION=self.p_version))
 
     @property
     def title(self):
@@ -236,7 +228,7 @@ class WFSHandler():
                 describe_path = self.request.route_path(
                     'wfsserver.wfs', id=self.resource.id, _query=dict(
                         REQUEST=DESCRIBE_FEATURE_TYPE, SERVICE='WFS',
-                        VERSION=self.p_version, TYPENAME='ngw:' + self.p_typenames))
+                        VERSION=self.p_version, TYPENAME=self.p_typenames))
                 subreq = Request.blank(describe_path)
                 subreq.headers = self.request.headers
                 resp = self.request.invoke_subrequest(subreq)
@@ -274,7 +266,7 @@ class WFSHandler():
                 continue
             __type = El('FeatureType', parent=__list)
             __name = EM_name('Name')
-            __name.text = 'ngw:' + layer.keyname
+            __name.text = layer.keyname
             __type.append(__name)
             El('Title', parent=__type, text=layer.display_name)
             El('Abstract', parent=__type)
@@ -478,8 +470,6 @@ class WFSHandler():
         if typenames is None:
             typenames = [layer.keyname for layer in self.resource.layers]
 
-        typenames = map(trim_ns_ngw, typenames)
-
         for typename in typenames:
             substitutionGroup = 'gml:AbstractFeature' if self.p_version > v100 else 'gml:_Feature'
             El('element', dict(name=typename, substitutionGroup=substitutionGroup,
@@ -526,9 +516,7 @@ class WFSHandler():
                     self.p_typenames = v
                     break
 
-        typename = trim_ns_ngw(self.p_typenames)
-
-        layer = Layer.filter_by(service_id=self.resource.id, keyname=typename).one()
+        layer = Layer.filter_by(service_id=self.resource.id, keyname=self.p_typenames).one()
         feature_layer = layer.resource
         self.request.resource_permission(DataScope.read, feature_layer)
 
@@ -539,13 +527,16 @@ class WFSHandler():
         describe_location = self.request.route_url(
             'wfsserver.wfs', id=self.resource.id,
             _query=dict(REQUEST=DESCRIBE_FEATURE_TYPE, SERVICE='WFS',
-                        VERSION=self.p_version, TYPENAME='ngw:' + typename))
+                        VERSION=self.p_version, TYPENAME=self.p_typenames))
         schema_location = ' '.join((
             wfs['ns'], wfs['loc'],
             gml['ns'], gml['loc'],
             self.service_namespace, describe_location
         ))
-        root = EM('FeatureCollection', {ns_attr('xsi', 'schemaLocation', self.p_version): schema_location})  # NOQA: E501
+        root = EM('FeatureCollection', {
+            'xmlns': self.service_namespace,
+            ns_attr('xsi', 'schemaLocation', self.p_version): schema_location
+        })
 
         query = feature_layer.feature_query()
 
@@ -599,7 +590,7 @@ class WFSHandler():
                 __member = El('featureMember', parent=root, namespace=gml['ns']) if self.p_version == v100 \
                     else El('member', parent=root, namespace=wfs['ns'])
                 id_attr = 'fid' if self.p_version == v100 else ns_attr('gml', 'id', self.p_version)
-                __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member, namespace=self.service_namespace)
+                __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member)
 
                 geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
 
@@ -610,12 +601,12 @@ class WFSHandler():
                 maxY = _maxY if maxY is None else max(maxY, _maxY)
 
                 geom_gml = geom.ExportToGML(['FORMAT=%s' % self.gml_format, 'NAMESPACE_DECL=YES'])
-                __geom = El('geom', parent=__feature, namespace=self.service_namespace)
+                __geom = El('geom', parent=__feature)
                 __gml = etree.fromstring(geom_gml)
                 __geom.append(__gml)
 
                 for field in feature_layer.fields:
-                    _field = El(field.keyname, parent=__feature, namespace=self.service_namespace)
+                    _field = El(field.keyname, parent=__feature)
                     value = feature.fields[field.keyname]
                     if value is not None:
                         if isinstance(value, datetime):
@@ -711,7 +702,7 @@ class WFSHandler():
                     query.filter_by(id=fid)
                     feature = query().one()
                     for _property in find_tags(_operation, 'Property'):
-                        key = trim_ns_ngw(find_tags(_property, 'Name')[0].text)
+                        key = find_tags(_property, 'Name')[0].text
                         _values = find_tags(_property, 'Value')
                         _value = None if len(_values) == 0 else _values[0]
 
