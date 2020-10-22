@@ -316,12 +316,13 @@ def deserialize(feat, data, geom_format=None, transformer=None):
 def serialize(feat, keys=None, geom_format=None):
     result = OrderedDict(id=feat.id)
 
-    if geom_format is not None and geom_format.lower() == "geojson":
-        geom = geom_to_geojson(feat.geom)
-    else:
-        geom = geom_to_wkt(feat.geom)
+    if feat.geom is not None:
+        if geom_format is not None and geom_format.lower() == "geojson":
+            geom = geom_to_geojson(feat.geom)
+        else:
+            geom = geom_to_wkt(feat.geom)
 
-    result['geom'] = geom
+        result['geom'] = geom
 
     result['fields'] = OrderedDict()
     for fld in feat.layer.fields:
@@ -382,11 +383,13 @@ def query_feature_or_not_found(query, resource_id, feature_id):
 def iget(resource, request):
     request.resource_permission(PERM_READ)
 
+    geom_skip = request.GET.get("geom", 'yes') == 'no'
     geom_format = request.GET.get("geom_format")
     srs = request.GET.get("srs")
 
     query = resource.feature_query()
-    query.geom()
+    if not geom_skip:
+        query.geom()
 
     if srs is not None:
         query.srs(SRS.filter_by(id=int(srs)).one())
@@ -452,6 +455,7 @@ def idelete(resource, request):
 def cget(resource, request):
     request.resource_permission(PERM_READ)
 
+    geom_skip = request.GET.get("geom", 'yes') == 'no'
     geom_format = request.GET.get("geom_format")
     srs = request.GET.get("srs")
 
@@ -509,7 +513,8 @@ def cget(resource, request):
     if fields:
         query.fields(*fields)
 
-    query.geom()
+    if not geom_skip:
+        query.geom()
 
     result = [
         serialize(feature, fields, geom_format=geom_format)
