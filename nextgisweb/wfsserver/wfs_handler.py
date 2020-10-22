@@ -180,8 +180,7 @@ class WFSHandler():
             params.get('VALIDATESCHEMA', 'FALSE').upper() in ('1', 'YES', 'TRUE'))
 
         self.service_namespace = self.request.route_url(
-           'wfsserver.wfs', id=self.resource.id, _query=dict(
-               VERSION=self.p_version))
+            'wfsserver.wfs', id=self.resource.id)
 
     @property
     def title(self):
