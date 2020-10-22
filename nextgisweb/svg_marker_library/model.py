@@ -42,7 +42,7 @@ class SVGMarkerLibrary(Base, Resource):
 
     def find_svg_marker(self, name):
         svg_marker = SVGMarker.filter_by(
-            svg_symbol_library_id=self.id,
+            svg_marker_library_id=self.id,
             name=name
         ).one_or_none()
 
