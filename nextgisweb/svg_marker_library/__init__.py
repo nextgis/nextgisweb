@@ -6,9 +6,9 @@ from os import path
 from ..component import Component
 from ..lib.config import Option, OptionAnnotations
 
-from .model import Base, SVGMarkerLibrary
+from .model import Base, SVGMarker, SVGMarkerLibrary
 
-__all__ = ['SVGMarkerLibrary']
+__all__ = ['SVGMarker', 'SVGMarkerLibrary']
 
 PRESET_DIR = path.join(path.dirname(__file__), 'preset/')
 
