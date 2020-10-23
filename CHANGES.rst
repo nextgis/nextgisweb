@@ -4,6 +4,7 @@ Changes
 3.6.0
 -----
 
+- Major improvements and bug fixes in WFS protocol implementation.
 - Tile cache and webmap annotations are enabled by default.
 - Command to delete orphaned vector layer tables.
 - HTTP API with resource permissions explanation. 
