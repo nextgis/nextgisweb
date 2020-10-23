@@ -389,10 +389,9 @@ def iget(resource, request):
 
     query = resource.feature_query()
     if not geom_skip:
+        if srs is not None:
+            query.srs(SRS.filter_by(id=int(srs)).one())
         query.geom()
-
-    if srs is not None:
-        query.srs(SRS.filter_by(id=int(srs)).one())
 
     result = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
@@ -461,9 +460,6 @@ def cget(resource, request):
 
     query = resource.feature_query()
 
-    if srs is not None:
-        query.srs(SRS.filter_by(id=int(srs)).one())
-
     # Paging
     limit = request.GET.get('limit')
     offset = request.GET.get('offset', 0)
@@ -514,6 +510,8 @@ def cget(resource, request):
         query.fields(*fields)
 
     if not geom_skip:
+        if srs is not None:
+            query.srs(SRS.filter_by(id=int(srs)).one())
         query.geom()
 
     result = [
