@@ -68,6 +68,18 @@ def _ogr_layer_from_features(layer, features, name=b'', ds=None, fid=None):
     return ogr_layer
 
 
+def _extensions(extensions, layer):
+    result = []
+
+    ext_filter = None if extensions is None else extensions.split(',')
+
+    for cls in FeatureExtension.registry:
+        if ext_filter is None or cls.identity in ext_filter:
+            result.append((cls.identity, cls(layer)))
+
+    return result
+
+
 def view_geojson(request):
     request.GET["format"] = "GeoJSON"
     request.GET["zipped"] = "false"
@@ -316,7 +328,7 @@ def deserialize(feat, data, geom_format='wkt', transformer=None):
                 ext.deserialize(feat, data['extensions'][cls.identity])
 
 
-def serialize(feat, keys=None, geom_format='wkt'):
+def serialize(feat, keys=None, geom_format='wkt', extensions=[]):
     result = OrderedDict(id=feat.id)
 
     if feat.geom is not None:
@@ -366,9 +378,8 @@ def serialize(feat, keys=None, geom_format='wkt'):
         result['fields'][fld.keyname] = fval
 
     result['extensions'] = OrderedDict()
-    for cls in FeatureExtension.registry:
-        ext = cls(feat.layer)
-        result['extensions'][cls.identity] = ext.serialize(feat)
+    for identity, ext in extensions:
+        result['extensions'][identity] = ext.serialize(feat)
 
     return result
 
@@ -391,6 +402,7 @@ def iget(resource, request):
     geom_skip = request.GET.get("geom", 'yes').lower() == 'no'
     geom_format = request.GET.get("geom_format", 'wkt').lower()
     srs = request.GET.get("srs")
+    extensions = _extensions(request.GET.get("extensions"), resource)
 
     query = resource.feature_query()
     if not geom_skip:
@@ -398,10 +410,12 @@ def iget(resource, request):
             query.srs(SRS.filter_by(id=int(srs)).one())
         query.geom()
 
-    result = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
+    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
+
+    result = serialize(feature, geom_format=geom_format, extensions=extensions)
 
     return Response(
-        json.dumps(serialize(result, geom_format=geom_format), cls=geojson.Encoder),
+        json.dumps(result, cls=geojson.Encoder),
         content_type='application/json', charset='utf-8')
 
 
@@ -462,6 +476,7 @@ def cget(resource, request):
     geom_skip = request.GET.get("geom", 'yes') == 'no'
     geom_format = request.GET.get("geom_format", 'wkt').lower()
     srs = request.GET.get("srs")
+    extensions = _extensions(request.GET.get("extensions"), resource)
 
     query = resource.feature_query()
 
@@ -520,7 +535,7 @@ def cget(resource, request):
         query.geom()
 
     result = [
-        serialize(feature, fields, geom_format=geom_format)
+        serialize(feature, fields, geom_format=geom_format, extensions=extensions)
         for feature in query()
     ]
 
