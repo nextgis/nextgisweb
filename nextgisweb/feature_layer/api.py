@@ -260,12 +260,15 @@ def get_transformer(srs_from_id, srs_to_id):
     return lambda g: geom_transform(g, crs_from, crs_to)
 
 
-def deserialize(feat, data, geom_format=None, transformer=None):
+def deserialize(feat, data, geom_format='wkt', transformer=None):
     if 'geom' in data:
-        if geom_format == 'geojson':
+        if geom_format == 'wkt':
+            feat.geom = geom_from_wkt(data['geom'])
+        elif geom_format == 'geojson':
             feat.geom = geom_from_geojson(data['geom'])
         else:
-            feat.geom = geom_from_wkt(data['geom'])
+            raise ValidationError(_("Geometry format '%s' is not supported.") % geom_format)
+
         if transformer is not None:
             feat.geom = transformer(feat.geom)
 
@@ -313,14 +316,16 @@ def deserialize(feat, data, geom_format=None, transformer=None):
                 ext.deserialize(feat, data['extensions'][cls.identity])
 
 
-def serialize(feat, keys=None, geom_format=None):
+def serialize(feat, keys=None, geom_format='wkt'):
     result = OrderedDict(id=feat.id)
 
     if feat.geom is not None:
-        if geom_format is not None and geom_format.lower() == "geojson":
+        if geom_format == 'wkt':
+            geom = geom_to_wkt(feat.geom)
+        elif geom_format == 'geojson':
             geom = geom_to_geojson(feat.geom)
         else:
-            geom = geom_to_wkt(feat.geom)
+            raise ValidationError(_("Geometry format '%s' is not supported.") % geom_format)
 
         result['geom'] = geom
 
@@ -383,8 +388,8 @@ def query_feature_or_not_found(query, resource_id, feature_id):
 def iget(resource, request):
     request.resource_permission(PERM_READ)
 
-    geom_skip = request.GET.get("geom", 'yes') == 'no'
-    geom_format = request.GET.get("geom_format")
+    geom_skip = request.GET.get("geom", 'yes').lower() == 'no'
+    geom_format = request.GET.get("geom_format", 'wkt').lower()
     srs = request.GET.get("srs")
 
     query = resource.feature_query()
@@ -429,7 +434,7 @@ def iput(resource, request):
 
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
-    geom_format = request.GET.get('geom_format')
+    geom_format = request.GET.get('geom_format', 'wkt').lower()
     srs = request.GET.get('srs')
     transformer = get_transformer(srs, resource.srs_id)
 
@@ -455,7 +460,7 @@ def cget(resource, request):
     request.resource_permission(PERM_READ)
 
     geom_skip = request.GET.get("geom", 'yes') == 'no'
-    geom_format = request.GET.get("geom_format")
+    geom_format = request.GET.get("geom_format", 'wkt').lower()
     srs = request.GET.get("srs")
 
     query = resource.feature_query()
@@ -527,7 +532,7 @@ def cget(resource, request):
 def cpost(resource, request):
     request.resource_permission(PERM_WRITE)
 
-    geom_format = request.GET.get('geom_format')
+    geom_format = request.GET.get('geom_format', 'wkt').lower()
     srs = request.GET.get('srs')
     transformer = get_transformer(srs, resource.srs_id)
 
@@ -544,7 +549,7 @@ def cpatch(resource, request):
     request.resource_permission(PERM_WRITE)
     result = list()
 
-    geom_format = request.GET.get('geom_format')
+    geom_format = request.GET.get('geom_format', 'wkt').lower()
     srs = request.GET.get('srs')
     transformer = get_transformer(srs, resource.srs_id)
 
