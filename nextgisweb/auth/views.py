@@ -136,8 +136,10 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
         and request.authenticated_userid is None
     ):
         response = render_to_response('nextgisweb:auth/template/login.mako', dict(
-            auth_required=request.env.auth.options['oauth.default'],
-            next_url=request.url,
+            auth_required=(
+                request.env.auth.options['oauth.enabled']
+                and request.env.auth.options['oauth.default']
+            ), next_url=request.url,
         ), request=request)
         response.status = 403
         return response
