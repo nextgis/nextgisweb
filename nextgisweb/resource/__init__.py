@@ -139,6 +139,7 @@ class ResourceComponent(Component):
 
     option_annotations = (
         Option('disabled_cls', list, default=[], doc="Resource classes disabled for creation."),
+        Option('disable.*', bool, default=False, doc="Disable creation of specific resources."),
         Option('quota.limit', int, default=None),
         Option('quota.resource_cls', list, default=None),
         Option('quota.resource_by_cls'),

@@ -280,7 +280,7 @@ def setup_pyramid(comp, config):
         def build(self, args):
             permissions = args.obj.permissions(args.request.user)
             for ident, cls in six.iteritems(Resource.registry._dict):
-                if ident in comp.options['disabled_cls']:
+                if ident in comp.options['disabled_cls'] or comp.options['disable.' + ident]:
                     continue
 
                 if not cls.check_parent(args.obj):
