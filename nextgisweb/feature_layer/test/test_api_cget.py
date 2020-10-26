@@ -93,3 +93,14 @@ def get_features_for_orderby_test():
         features.append(feature)
 
     return features
+
+
+def test_cget_extensions(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+    resp = ngw_webtest_app.get('/api/resource/%d/feature/' % vector_layer_id)
+    assert len(resp.json[0]['extensions'].keys()) > 0
+
+    resp = ngw_webtest_app.get('/api/resource/%d/feature/?extensions=' % vector_layer_id)
+    assert len(resp.json[0]['extensions'].keys()) == 0
+
+    resp = ngw_webtest_app.get('/api/resource/%d/feature/?extensions=description,attachment' % vector_layer_id)
+    assert resp.json[0]['extensions'] == dict(description=None, attachment=None)

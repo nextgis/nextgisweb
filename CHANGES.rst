@@ -8,6 +8,7 @@ Changes
 - Tile cache and webmap annotations are enabled by default.
 - Command to delete orphaned vector layer tables.
 - HTTP API with resource permissions explanation. 
+- Support for ``geom`` and ``extensions`` in feature layer REST API.
 
 3.5.0
 -----
