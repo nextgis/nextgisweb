@@ -40,6 +40,20 @@ def tile_debug_info(img, offset=(0, 0), color='black',
     return img
 
 
+def image_response(img, empty_code, size):
+    if img is None:
+        if empty_code in ('204', '404'):
+            return Response(status=empty_code)
+        else:
+            img = Image.new('RGBA', size)
+
+    buf = BytesIO()
+    img.save(buf, 'png')
+    buf.seek(0)
+
+    return Response(body_file=buf, content_type='image/png')
+
+
 def tile(request):
     z = int(request.GET['z'])
     x = int(request.GET['x'])
@@ -48,6 +62,7 @@ def tile(request):
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
     p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1') \
         and request.env.render.tile_cache_enabled
+    p_empty_code = request.GET.get('nd', '200')
 
     aimg = None
     for resid in p_resource:
@@ -76,6 +91,9 @@ def tile(request):
             req = obj.render_request(obj.srs)
             rimg = req.render_tile((z, x, y), 256)
 
+            if rimg is None:
+                continue
+
             if cached:
                 tcache.put_tile((z, x, y), rimg)
 
@@ -89,15 +107,7 @@ def tile(request):
                     "Image (ID=%d) must have mode %s, but it is %s mode." %
                     (obj.id, aimg.mode, rimg.mode))
 
-    # If there were no resources for rendering, return empty image
-    if aimg is None:
-        aimg = Image.new('RGBA', (256, 256))
-
-    buf = BytesIO()
-    aimg.save(buf, 'png')
-    buf.seek(0)
-
-    return Response(body_file=buf, content_type='image/png')
+    return image_response(aimg, p_empty_code, (256, 256))
 
 
 def image(request):
@@ -106,6 +116,7 @@ def image(request):
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
     p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1') \
         and request.env.render.tile_cache_enabled
+    p_empty_code = request.GET.get('nd', '200')
 
     # Print tile debug info on resulting image
     tdi = request.GET.get('tdi', '').lower() in ('yes', 'true')
@@ -203,6 +214,9 @@ def image(request):
             req = obj.render_request(obj.srs)
             rimg = req.render_extent(ext_extent, ext_size)
 
+            if rimg is None:
+                continue
+
             if cached:
                 for tx, ty in product(tx_range, ty_range):
                     t_offset = at_t2i * (tx, ty)
@@ -232,15 +246,7 @@ def image(request):
                     "Image (ID=%d) must have mode %s, but it is %s mode." %
                     (obj.id, aimg.mode, rimg.mode))
 
-    # If there were no resources for rendering, return empty image
-    if aimg is None:
-        aimg = Image.new('RGBA', p_size)
-
-    buf = BytesIO()
-    aimg.save(buf, 'png')
-    buf.seek(0)
-
-    return Response(body_file=buf, content_type='image/png')
+    return image_response(aimg, p_empty_code, p_size)
 
 
 def tile_cache_seed_status(request):
