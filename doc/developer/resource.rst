@@ -1061,7 +1061,7 @@ To get features using filters execute the following request:
 
 .. versionadded:: 3.1
 
-.. http:get:: /api/resource/(int:id)/feature/?limit=(int:limit)&offset=(int:offset)&intersects=(string:wkt_string)&fields=(string:field_name_1,string:field_name_2,...)&fld_{field_name_1}=(string:value)&fld_{field_name_2}=(string:value)&fld_{field_name_3}__ilike=(string:value)&fld_{field_name_4}__like=(string:value)
+.. http:get:: /api/resource/(int:id)/feature/?limit=(int:limit)&offset=(int:offset)&intersects=(string:wkt_string)&fields=(string:field_name_1,string:field_name_2,...)&fld_{field_name_1}=(string:value)&fld_{field_name_2}=(string:value)&fld_{field_name_3}__ilike=(string:value)&fld_{field_name_4}__like=(string:value)&extensions=(string:extensions)
 
    Get features with parameters
 
@@ -1076,6 +1076,8 @@ To get features using filters execute the following request:
    :param fld_{field_name_1}__{operation}...fld_{field_name_N}__{operation}: field name and value to filter return features using operation statement. Supported operations are: ``gt``, ``lt``, ``ge``, ``le``, ``eq``, ``ne``, ``like``, ``ilike``. All pairs of field name - operation - value form final ``AND`` SQL query.
    :param geom_format: ``geojson`` - output geometry in geojson format instead of WKT
    :param srs: EPSG code - reproject geometry to EPSG
+   :param geom: yes - return geometry, no - don't return geomtry (deaults yes)
+   :param extensions: comma separated list of extensions. Available ``description`` and ``attachments``. Defaults to ``description,attachments`` 
    :>jsonarray features: features array
    :statuscode 200: no error
 
@@ -1255,6 +1257,22 @@ end or both. Works only for ``like`` and ``ilike`` operations.
         }
     }
   ]
+ 
+**Example request to get features without geometry**:
+
+.. sourcecode:: http
+
+   GET api/resource/442/feature/?geom=no HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
+**Example request to get features without extensions**:
+
+.. sourcecode:: http
+
+   GET api/resource/442/feature/?extensions= HTTP/1.1
+   Host: ngw_url
+   Accept: */*
 
 Attachment
 ^^^^^^^^^^^
