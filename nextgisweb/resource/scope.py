@@ -65,8 +65,8 @@ class MetadataScope(Scope):
     identity = 'metadata'
     label = _("Metadata")
 
-    read = P(_("Read"))                   #: Read
-    write = P(_("Write")).require(read)   #: Write
+    read = P(_("Read")).require(ResourceScope.read)  #: Read
+    write = P(_("Write")).require(read)  #: Write
 
 
 class DataStructureScope(Scope):
@@ -77,8 +77,8 @@ class DataStructureScope(Scope):
     identity = 'datastruct'
     label = _("Data structure")
 
-    read = P(_("Read"))                   #: Read
-    write = P(_("Write")).require(read)   #: Write
+    read = P(_("Read")).require(ResourceScope.read)  #: Read
+    write = P(_("Write")).require(read)  #: Write
 
 
 class DataScope(Scope):
@@ -87,8 +87,8 @@ class DataScope(Scope):
     identity = 'data'
     label = _("Data")
 
-    read = P(_("Read"))                   #: Read
-    write = P(_("Write")).require(read)   #: Write
+    read = P(_("Read")).require(ResourceScope.read)  #: Read
+    write = P(_("Write")).require(read)  #: Write
 
 
 class ConnectionScope(Scope):
@@ -100,9 +100,9 @@ class ConnectionScope(Scope):
     identity = 'connection'
     label = _("Connection")
 
-    read = P(_("Read"))
+    read = P(_("Read")).require(ResourceScope.read)
     write = P(_("Write")).require(read)
-    connect = P(_("Connect"))
+    connect = P(_("Connect")).require(ResourceScope.read)
 
 
 class ServiceScope(Scope):
@@ -114,5 +114,5 @@ class ServiceScope(Scope):
     identity = 'service'
     label = _('Service')
 
-    connect = P(_("Connect"))                       #: Connection
+    connect = P(_("Connect")).require(ResourceScope.read)  #: Connection
     configure = P(_("Configure")).require(connect)  #: Configuration
