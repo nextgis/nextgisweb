@@ -31,6 +31,7 @@ from .. import geojson
 
 from .interface import (
     IFeatureLayer,
+    IFeatureQueryLike,
     IWritableFeatureLayer,
     IFeatureQueryClipByBox,
     IFeatureQuerySimplify,
@@ -500,6 +501,11 @@ def cget(resource, request):
 
     if filter_:
         query.filter(*filter_)
+
+    # Like
+    like = request.GET.get('like')
+    if like is not None and IFeatureQueryLike.providedBy(query):
+        query.like(like)
 
     # Ordering
     order_by = request.GET.get('order_by')
