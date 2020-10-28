@@ -112,7 +112,7 @@ class ResourceTileCache(Base):
                 CREATE TABLE IF NOT EXISTS tile (
                     z INTEGER, x INTEGER, y INTEGER,
                     tstamp INTEGER NOT NULL,
-                    data BLOB NOT NULL,
+                    data BLOB,
                     PRIMARY KEY (z, x, y)
                 )
             """)
@@ -148,17 +148,17 @@ class ResourceTileCache(Base):
         ), z=z, x=x, y=y).fetchone()
 
         if trow is None:
-            return None
+            return False, None
 
         color, tstamp = trow
 
         if self.ttl is not None:
             expdt = TIMESTAMP_EPOCH + timedelta(seconds=tstamp + self.ttl)
             if expdt <= datetime.utcnow():
-                return None
+                return False, None
 
         if color is not None:
-            return Image.new('RGBA', (256, 256), unpack_color(color))
+            return True, Image.new('RGBA', (256, 256), unpack_color(color))
 
         else:
             cur = self.tilestor.cursor()
@@ -167,22 +167,29 @@ class ResourceTileCache(Base):
                 (z, x, y)).fetchone()
 
             if srow is None:
-                return None
-            return Image.open(BytesIO(srow[0]))
+                return False, None
+
+            img = None if srow[0] is None else Image.open(BytesIO(srow[0]))
+
+            return True, img
 
     def put_tile(self, tile, img):
         z, x, y = tile
         tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
 
-        colortuple = imgcolor(img)
-
         color = None
-        if colortuple is not None:
-            color = pack_color(colortuple)
+        if img is not None:
+            colortuple = imgcolor(img)
+            if colortuple is not None:
+                color = pack_color(colortuple)
 
         if color is None:
-            buf = BytesIO()
-            img.save(buf, format='PNG')
+            if img is None:
+                value = None
+            else:
+                buf = BytesIO()
+                img.save(buf, format='PNG')
+                value = buf.getvalue()
 
             self.tilestor.execute(
                 "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
@@ -191,7 +198,7 @@ class ResourceTileCache(Base):
             try:
                 self.tilestor.execute(
                     "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                    (z, x, y, tstamp, buf.getvalue()))
+                    (z, x, y, tstamp, value))
 
             except sqlite3.IntegrityError:
                 # NOTE: Race condition with other proccess may occurs here.
