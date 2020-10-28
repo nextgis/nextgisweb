@@ -5,11 +5,13 @@ Changes
 -----
 
 - Major improvements and bug fixes in WFS protocol implementation.
+- Permission model changes: now any action on resource requires ``read`` permission
+  from scope ``resource`` on the resource and its parent.
 - Vector layer export to GeoPackage format.
 - Tile cache and webmap annotations are enabled by default.
 - Command to delete orphaned vector layer tables.
 - HTTP API with resource permissions explanation. 
-- Support for ``geom`` and ``extensions`` in feature layer REST API.
+- Support for ``like``, ``geom`` and ``extensions`` in feature layer REST API.
 
 3.5.0
 -----
