@@ -5,6 +5,7 @@ Changes
 -----
 
 - Major improvements and bug fixes in WFS protocol implementation.
+- Vector layer export to GeoPackage format.
 - Tile cache and webmap annotations are enabled by default.
 - Command to delete orphaned vector layer tables.
 - HTTP API with resource permissions explanation. 

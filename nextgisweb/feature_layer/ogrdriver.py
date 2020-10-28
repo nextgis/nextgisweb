@@ -74,6 +74,17 @@ EXPORT_FORMAT_OGR["MapInfo File"] = OGRDriver(
     mime=None,
 )
 
+EXPORT_FORMAT_OGR["GPKG"] = OGRDriver(
+    "GPKG",
+    "GeoPackage (*.gpkg)",
+    "gpkg",
+    single_file=True,
+    fid_support=True,
+    options=None,
+    mime="application/geopackage+vnd.sqlite3",
+)
+
+
 OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
     {
         "name": format.name,
