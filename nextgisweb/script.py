@@ -68,6 +68,10 @@ def config(argv=sys.argv):
         '--values-only', dest='values_only', action='store_true',
         help="Don't include settings description in comments")
 
+    argparser.add_argument(
+        '--env-vars', dest='env_vars', action='store_true', default=False,
+        help="Print settings as environment variables")
+
     args = argparser.parse_args(argv[1:])
 
     from .component import Component, load_all
@@ -81,7 +85,10 @@ def config(argv=sys.argv):
 
         def cprint(*lines):
             if not cprint._section:
-                print("[{}]".format(comp.identity))
+                if args.env_vars:
+                    print("## COMPONENT: {}".format(comp.identity))
+                else:
+                    print("[{}]".format(comp.identity))
                 if not args.values_only:
                     print()
                 cprint._section = True
@@ -101,10 +108,21 @@ def config(argv=sys.argv):
                 if oa.doc is not None:
                     cprint('\n'.join([("#         " + line) for line in wrap(oa.doc, 60)]))
 
-            if oa.required:
-                cprint("{key} = ".format(key=oa.key))
-            elif not args.values_only:
-                cprint("; {key} = {default}".format(default=default, key=oa.key))
+            if args.env_vars:
+                vname = 'NEXTGISWEB_{}__{}'.format(
+                    comp.identity,
+                    oa.key.replace('.', '__'),
+                ).upper()
+                if oa.required:
+                    cprint('{}='.format(vname))
+                elif not args.values_only:
+                    cprint('# {}={}'.format(vname, default))
+
+            else:
+                if oa.required:
+                    cprint("{key} = ".format(key=oa.key))
+                elif not args.values_only:
+                    cprint("; {key} = {default}".format(default=default, key=oa.key))
 
             if not args.values_only:
                 cprint()
