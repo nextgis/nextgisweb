@@ -27,9 +27,9 @@ class WebMapScope(Scope):
     identity = 'webmap'
     label = _("Web map")
 
-    display = Permission(_("Display"))
-    annotation_read = Permission(_("View annotations"))
-    annotation_write = Permission(_("Edit annotations"))
+    display = Permission(_("Display")).require(ResourceScope.read)
+    annotation_read = Permission(_("View annotations")).require(ResourceScope.read)
+    annotation_write = Permission(_("Edit annotations")).require(ResourceScope.read)
 
 
 class WebMap(Base, Resource):
