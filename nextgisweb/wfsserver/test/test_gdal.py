@@ -145,7 +145,7 @@ def test_compare(version, key, features):
 
 @pytest.mark.parametrize('version, fields', product(TEST_WFS_VERSIONS, (
     dict(null='not null', int=42, real=-0.0, string=None, unicode='¯\\_(ツ)_/¯', geom='POINT(1 1)'),
-    dict(null=None, int=2**16, real=3.1415926535897, string='str', unicode='مرحبا بالعالم', geom='POINT(0.1, -3.1'),
+    dict(null=None, int=2**16, real=3.1415926535897, string='str', unicode='مرحبا بالعالم', geom='POINT(0.1 -3.1)'),
 )))
 def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator):
     driver = ogr.GetDriverByName(six.ensure_str('WFS'))
@@ -160,8 +160,8 @@ def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator
 
     for k, v in fields.items():
         if k == 'geom':
-            geom = feature.GetGeometryRef()
             geom = ogr.CreateGeometryFromWkt(v)
+            assert geom is not None, gdal.GetLastErrorMsg()
             feature.SetGeometry(geom)
         elif v is None:
             feature.SetFieldNull(k)
@@ -169,7 +169,7 @@ def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator
             feature.SetField(k, v)
 
     err = wfs_layer.SetFeature(feature)
-    assert err == 0, "SetFeature failed"
+    assert err == 0, gdal.GetLastErrorMsg()
 
     vector_layer_id = ngw_httptest_app.get('/api/resource/%d' % service) \
         .json()['wfsserver_service']['layers'][0]['resource_id']
@@ -178,14 +178,14 @@ def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator
 
     for k, v in fields.items():
         if k == 'geom':
-            v_cmp = feature_cmp['geom']
+            geom_cmp = ogr.CreateGeometryFromWkt(feature_cmp['geom'])
+            assert geom_cmp.Equals(geom)
         else:
             v_cmp = feature_cmp['fields'][k]
-
-        if k == 'real' and v is not None:
-            assert abs(v_cmp - v) < 1e-6
-        else:
-            assert v_cmp == v
+            if k == 'real' and v is not None:
+                assert abs(v_cmp - v) < 1e-6
+            else:
+                assert v_cmp == v
 
 
 @pytest.mark.parametrize('version', TEST_WFS_VERSIONS)
@@ -202,6 +202,7 @@ def test_create_delete(version, service, ngw_httptest_app, ngw_auth_administrato
     feature = ogr.Feature(wfs_layer.GetLayerDefn())
 
     geom = ogr.CreateGeometryFromWkt('POINT(1 1)')
+    feature.SetGeometry(geom)
 
     err = wfs_layer.CreateFeature(feature)
     assert err == 0, gdal.GetLastErrorMsg()
