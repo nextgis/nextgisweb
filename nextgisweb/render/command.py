@@ -93,7 +93,8 @@ class TileCacheSeedCommand():
             for z, rx, ry, count in rlevel:
                 # TODO: Add meta tile support
                 for x, y in product(range(*rx), range(*ry)):
-                    if tc.get_tile((z, x, y)) is None:
+                    cache_exists, img = tc.get_tile((z, x, y))
+                    if not cache_exists:
                         req = rend_res.render_request(srs)
                         rimg = req.render_tile((z, x, y), 256)
                         tc.put_tile((z, x, y), rimg)
