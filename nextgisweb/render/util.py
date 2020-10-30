@@ -15,6 +15,8 @@ _ = trstring_factory(COMP_ID)
 
 def imgcolor(img):
     """ Check image color and return color tuple if all pixels have same color """
+    if img is None:
+        return (0, 0, 0, 0)
 
     # Min and max values for each channel
     extrema = PIL.ImageStat.Stat(img).extrema

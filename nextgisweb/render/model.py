@@ -112,7 +112,7 @@ class ResourceTileCache(Base):
                 CREATE TABLE IF NOT EXISTS tile (
                     z INTEGER, x INTEGER, y INTEGER,
                     tstamp INTEGER NOT NULL,
-                    data BLOB,
+                    data BLOB NOT NULL,
                     PRIMARY KEY (z, x, y)
                 )
             """)
@@ -158,7 +158,10 @@ class ResourceTileCache(Base):
                 return False, None
 
         if color is not None:
-            return True, Image.new('RGBA', (256, 256), unpack_color(color))
+            colors = unpack_color(color)
+            if colors[3] == 0:
+                return True, None
+            return True, Image.new('RGBA', (256, 256), colors)
 
         else:
             cur = self.tilestor.cursor()
@@ -169,27 +172,20 @@ class ResourceTileCache(Base):
             if srow is None:
                 return False, None
 
-            img = None if srow[0] is None else Image.open(BytesIO(srow[0]))
-
-            return True, img
+            return True, Image.open(BytesIO(srow[0]))
 
     def put_tile(self, tile, img):
         z, x, y = tile
         tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
 
         color = None
-        if img is not None:
-            colortuple = imgcolor(img)
-            if colortuple is not None:
-                color = pack_color(colortuple)
+        colortuple = imgcolor(img)
+        if colortuple is not None:
+            color = pack_color(colortuple)
 
         if color is None:
-            if img is None:
-                value = None
-            else:
-                buf = BytesIO()
-                img.save(buf, format='PNG')
-                value = buf.getvalue()
+            buf = BytesIO()
+            img.save(buf, format='PNG')
 
             self.tilestor.execute(
                 "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
@@ -198,7 +194,7 @@ class ResourceTileCache(Base):
             try:
                 self.tilestor.execute(
                     "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                    (z, x, y, tstamp, value))
+                    (z, x, y, tstamp, buf.getvalue()))
 
             except sqlite3.IntegrityError:
                 # NOTE: Race condition with other proccess may occurs here.
