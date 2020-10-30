@@ -46,6 +46,10 @@ def service(ngw_resource_group):
 
         DBSession.flush()
 
+        # NOTE: GDAL doesn't support time fields in GML / WFS. It completely breaks
+        # XSD schema parsing. Delete the time field to pass tests.
+        DBSession.delete(res_vl.field_by_keyname('time'))
+
         res_wfs = WFSService(
             parent_id=ngw_resource_group, display_name='test_wfsserver_service',
             owner_user=User.by_keyname('administrator'),
