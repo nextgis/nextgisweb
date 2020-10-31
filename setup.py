@@ -48,6 +48,7 @@ requires = [
     'elasticsearch-dsl>=7.1.0,<8.0.0',
     'unicodecsv==0.14.1',
     'flatdict==4.0.1',
+    'psutil==5.7.3',
 
     # TODO: Move to dev or test dependencies
     'freezegun',
