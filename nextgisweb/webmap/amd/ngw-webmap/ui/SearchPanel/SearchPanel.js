@@ -161,8 +161,7 @@ define([
                                     ndeferred.reject();
                                 }
                             }, function (err) {
-                                // Если что-то пошло не так с конкретным слоем,
-                                // то все равно продолжаем поиск по следующему
+                                // Continue with other layer if some layer is failed
                                 ndeferred.resolve();
                             }).otherwise(lang.hitch(widget, widget._breakOrError));
                         }).otherwise(lang.hitch(widget, widget._breakOrError));
@@ -174,7 +173,6 @@ define([
                 if (featureLayersettings.search.nominatim) {
                     var ndeferred = new Deferred();
 
-                    // Посылаем запрос на геокодирование
                     deferred.then(lang.hitch(this, function (limit) {
                         var NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search/";
                         var CALLBACK = "json_callback";
@@ -187,10 +185,7 @@ define([
                         script.get(NOMINATIM_SEARCH_URL, jsonpArgs).then(lang.hitch(this, function (data) {
                             array.forEach(data, function (place) {
                                 if (limit > 0) {
-                                    // Отформатируем ответ в виде удобном для отображения
-                                    // и покажем в списке ответов:
-
-                                    // Координаты приходят в WGS84
+                                    // Coordinates come in WGS84
                                     var extent = [
                                         parseFloat(place.boundingbox[2]),
                                         parseFloat(place.boundingbox[0]),
@@ -220,8 +215,7 @@ define([
                             }
                          }));
                     }), function (err) {
-                        // Если что-то пошло не так с конкретным слоем,
-                        // то все равно продолжаем поиск по следующему
+                        // Continue with other layer if some layer is failed
                         ndeferred.resolve();
                     }).otherwise(lang.hitch(widget, widget._breakOrError));
 

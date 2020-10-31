@@ -137,7 +137,7 @@ define([
             // Coordinates
             this._displayCoordinates();
 
-            // создаем виждеты для всех расширений IFeatureLayer
+            // Create widgets for each IFeatureLayer extension
             var deferreds = [];
 
             this.extWidgetClasses = {};
@@ -204,8 +204,7 @@ define([
 
                     widget.featureContainer.addChild(widget.extController);
 
-                    // Показываем виджет с атрибутами в том случае, если
-                    // это не отключено в настройках
+                    // Show feature attributes widget until it's not disabled by settings.
                     if (featureLayersettings.identify.attributes) {
                         var fwidget = new FieldsDisplayWidget({
                             resourceId: lid, featureId: fid,
@@ -304,13 +303,8 @@ define([
         label: i18n.gettext("Identify"),
         iconClass: "iconIdentify",
 
-        // Радиус для поиска объектов в пикселях
         pixelRadius: webmapSettings.identify_radius,
-
-        // Ширина popup
         popupWidth: webmapSettings.popup_width,
-
-        // Высота popup,
         popupHeight: webmapSettings.popup_height,
 
 
@@ -376,7 +370,6 @@ define([
                     layerLabels[this.display.itemStore.getValue(i, "layerId")] = this.display.itemStore.getValue(i, "label");
                 }, this);
 
-                // XHR-запрос к сервису
                 xhr.post(route.feature_layer.identify(), {
                     handleAs: "json",
                     data: json.stringify(request),
@@ -390,7 +383,7 @@ define([
 
         },
 
-        // WKT-строка геометрии поиска объектов для точки pixel
+        // Build WKT geometry for identification at given pixel
         _requestGeomString: function (pixel) {
             var olMap = this.map.olMap,
                 bounds;
@@ -437,7 +430,6 @@ define([
             this._popup.setTitle(i18n.gettext("Features") + ": " + response.featureCount);
             this._popup.setPosition(point);
 
-            // Обработчик закрытия
             on(this._popup._closeSpan, "click", lang.hitch(this, function () {
                 this._popup.setPosition(undefined);
                 topic.publish("feature.unhighlight");

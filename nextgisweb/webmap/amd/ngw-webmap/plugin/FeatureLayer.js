@@ -33,7 +33,6 @@ define([
             });
             this.toolbar.addChild(this.btnZoomToFeature);
             
-            // При изменении выделенной строки изменяем доступность кнопок
             this.watch('selectedRow', function (attr, oldVal, newVal) {
                 widget.btnZoomToFeature.set('disabled', newVal === null);
                 if (newVal) {

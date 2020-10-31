@@ -298,7 +298,7 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            // Список адаптеров
+            // Adapters list
             this.wLayerAdapter.set("store", this.adaptersStore);
 
             // Create tree without model is not possible, so create it manually
@@ -348,7 +348,7 @@ define([
                 widget.btnDeleteItem.set("disabled", true);
             });
 
-            // Настраиваемый порядок слоёв
+            // Set up layer ordering
             this.btnLayerOrder.on("click", lang.hitch(this, function () {
                 this.layerOrder.show();
             }));

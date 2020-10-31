@@ -120,20 +120,6 @@ define([
                 onClick: add
             }));
 
-/*            this.addMenu.addChild(new MenuItem({
-                label: "Integer",
-                value: "integer",
-                showLabel: true,
-                onClick: add
-            }));
-
-            this.addMenu.addChild(new MenuItem({
-                label: "Float",
-                value: "float",
-                showLabel: true,
-                onClick: add
-            }));*/
-
             this.toolbar.addChild(new DropDownButton({
                 label: i18n.gettext("Add"),
                 iconClass: "dijitIconNewTask",
@@ -183,7 +169,7 @@ define([
                     if (isNaN(value)) { value = 0.0 }
                 }
 
-                // Пустые ключи не записываем, хотя почему
+                // Ignore empty keys
                 if (f.key != "") { items[f.key] = value }
             });
 

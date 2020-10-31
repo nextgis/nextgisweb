@@ -114,37 +114,27 @@ define([
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
 
-        // Загрузка разных видов модулей: adapter, basemap, plugin
+        // AMD module loading: adapter, basemap, plugin
         _midDeferred: undefined,
 
-        // Инициализация хранилища элементов веб-карты
         _itemStoreDeferred: undefined,
-
-        // Виджет карты с базовыми слоями создан
         _mapDeferred: undefined,
-
-        // Слои элементов карты созданы
         _layersDeferred: undefined,
-
-        // Вызов после postCreate
         _postCreateDeferred: undefined,
-
-        // Вызов после startup
         _startupDeferred: undefined,
 
-        // GET-параметры: подложка, слои, центр, разрешение
+        // Permalink params
         _urlParams: undefined,
 
-        // Текущая подложка
+        // Current basemap
         _baseLayer: undefined,
 
-        // Для загрузки изображения
+        // For image loading
         assetUrl: ngwConfig.assetUrl,
 
         constructor: function (options) {
             declare.safeMixin(this, options);
 
-            // Извлекаем GET-параметры из URL
             this._urlParams = (function(){
                 var url, query, queryObject;
                 url = window.location.toString();
@@ -168,14 +158,14 @@ define([
 
             var widget = this;
 
-            // Асинхронная загрузка необходимых модулей
+            // AMD module loading
             this._midDeferred = {};
             this._mid = {};
             var mids = this.config.mid;
 
             this.clientSettings = clientSettings;
 
-            // Добавляем MID базовых карт
+            // Add basemap's AMD modules
             array.forEach(clientSettings.basemaps, function (bm) {
                 mids.basemap.push(bm.base.mid);
             });
@@ -198,7 +188,7 @@ define([
                 });
             }, this);
 
-            // Плагины уровня карты
+            // Map plugins
             var wmpmids = Object.keys(this.config.webmapPlugin);
             var deferred = new LoggedDeferred("_midDeferred.webmapPlugin");
 
@@ -214,7 +204,6 @@ define([
                 deferred.resolve(obj);
             });
 
-            // Хранилище
             this._itemStoreSetup();
 
             this._mapDeferred.then(
@@ -256,14 +245,14 @@ define([
                 })
             ).then(undefined, function (err) { console.error(err); });
 
-            // Загружаем закладки, когда кнопка будет готова
+            // TODO: Remove useless code
             this._postCreateDeferred.then(
                 function () {
                     //widget.loadBookmarks();
                 }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Карта
+            // Map and plugins
             all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
                 function () {
                     widget._pluginsSetup(true);
@@ -290,7 +279,7 @@ define([
                }
             ).then(undefined, function (err) { console.error(err); });
 
-            // Слои элементов
+            // Setup layers
             all([this._midDeferred.adapter, this._itemStoreDeferred]).then(
                 function () {
                     widget._layersSetup();
@@ -299,10 +288,9 @@ define([
 
             all([this._layersDeferred, this._mapSetup]).then(
                 function () {
-                    // Добавляем слои на карту
                     widget._mapAddLayers();
 
-                    // Связываем изменение чекбокса с видимостью слоя
+                    // Bind checkboxes and layer visibility
                     var store = widget.itemStore;
                     store.on("Set", function (item, attr, oldVal, newVal) {
                         if (attr === "checked" && store.getValue(item, "type") === "layer") {
@@ -315,15 +303,13 @@ define([
             ).then(undefined, function (err) { console.error(err); });
 
 
-            // Иструменты по-умолчанию и плагины
+            // Tools and plugins
             all([this._midDeferred.plugin, this._layersDeferred]).then(
                 function () {
                     widget._toolsSetup();
                     widget._pluginsSetup();
                 }
             ).then(undefined, function (err) { console.error(err); });
-
-            // Инструменты
             this.tools = [];
         },
 
@@ -351,7 +337,7 @@ define([
                             display.bookmarkMenu.addChild(new MenuItem({
                                 label: f.label,
                                 onClick: function () {
-                                    // Отдельно запрашиваем экстент объекта
+                                    // Request feature extent
                                     xhr.get(route.feature_layer.store.item({
                                         id: display.config.bookmarkLayerId,
                                         feature_id: f.id
@@ -369,7 +355,7 @@ define([
                     }
                 );
             } else {
-                // Если слой с закладками не указан, то прячем кнопку
+                // Hide bookmarks button
                 domStyle.set(this.bookmarkButton.domNode, "display", "none");
             }
         },
@@ -378,8 +364,6 @@ define([
             var itemConfigById = {};
 
             function prepare_item(item) {
-                // В хранилище переносим только самое необходимое и то, что
-                // может меняться в процессе работы с картой.
                 var copy = {
                     id: item.id,
                     type: item.type,
@@ -398,7 +382,6 @@ define([
                     copy.children = array.map(item.children, function (c) { return prepare_item(c); });
                 }
 
-                // Для всего остального строим индекс
                 itemConfigById[item.id] = item;
 
                 return copy;
@@ -425,8 +408,6 @@ define([
                 },
                 onComplete: function () {
                     widget.itemStore.on("Set", function (item, attr) {
-                        // При изменении атрибута checked следим за изменениями
-                        // в списке видимых слоев
                         if (attr === "checked") { widget._itemStoreVisibility(item); }
                     });
 
@@ -457,7 +438,6 @@ define([
         _mapSetup: function () {
             var widget = this;
 
-            // Инициализация карты
             this.map = new Map({
                 target: this.mapNode,
                 controls: [
@@ -505,12 +485,12 @@ define([
                 }));
             }
 
-            // При изменении размеров контейнера пересчитываем размер карты
+            // Resize OpenLayers Map on container resize
             aspect.after(this.mapPane, "resize", function() {
                 widget.map.olMap.updateSize();
             });
 
-            // Инициализация базовых слоев
+            // Basemaps initialization
             var idx = 0;
             array.forEach(clientSettings.basemaps, function (bm) {
                 var MID = this._mid.basemap[bm.base.mid];
@@ -537,7 +517,6 @@ define([
                 idx = idx + 1;
             }, this);
 
-            // Инициализация логотипа карты
             companyLogo(this.mapNode);
 
             this._zoomToInitialExtent();
@@ -649,7 +628,6 @@ define([
         },
 
         _adaptersSetup: function () {
-            // Создаем экземпляры всех классов адаптеров
             this._adapters = {};
             array.forEach(Object.keys(this._mid.adapter), function (k) {
                 this._adapters[k] = new this._mid.adapter[k]({
@@ -665,10 +643,10 @@ define([
 
             this._adaptersSetup();
 
-            this._layers = {};              // Список всех слоев по id
-            this._layer_order = [];         // Порядок слоев от нижнего к верхнему
+            this._layers = {};              // Layer index by id
+            this._layer_order = [];         // Layers from back to front
 
-            // Инициализация слоев
+            // Layers initialization
             store.fetch({
                 query: {type: "layer"},
                 queryOptions: {deep: true},
@@ -681,7 +659,7 @@ define([
                     layer = widget._layerSetup(item);
                     widget._layer_order.unshift(store.getValue(item, "id"));
                     console.log(widget._layer_order);
-                    // Включаем слои, указанные в URL
+                    // Turn on layers from permalink
                     var cond,
                         visibleStyles = widget._urlParams.styles;
                     if (visibleStyles) {
@@ -791,7 +769,6 @@ define([
         },
 
         dumpItem: function () {
-            // Выгружает значение выбранного слоя из itemStore в виде Object
             return this.itemStore.dumpItem(this.item);
         }
     });

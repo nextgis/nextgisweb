@@ -272,8 +272,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                     colfound_geom = True
 
                 elif row['column_name'] in ('id', 'geom'):
-                    # FIXME: На данный момент наличие полей id или
-                    # geom полностью ломает векторный слой
+                    # TODO: Currently id and geom fields break vector layer. We should fix it!
                     pass
 
                 else:
