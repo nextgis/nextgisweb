@@ -115,9 +115,8 @@ def test_layer_name(version, service, ngw_httptest_app, ngw_auth_administrator):
 
 
 @pytest.mark.parametrize('version, key', product(TEST_WFS_VERSIONS, (
-    'null', 'int', 'real', 'string', 'unicode',
-    # Date, time and datetime types seem to be broken
-    # 'date', 'time', 'datetime',
+    'null', 'int', 'real', 'string', 'unicode', 'date', 'datetime',
+    # Time fields seem to be borken in GDAL and are removed from data
 )))
 def test_compare(version, key, features):
     for tst, ref in features(version):
@@ -127,20 +126,31 @@ def test_compare(version, key, features):
         dtst = tst.GetFieldDefnRef(itst)
         dref = ref.GetFieldDefnRef(iref)
         assert tst.IsFieldNull(itst) == ref.IsFieldNull(iref)
-        assert ogr.GetFieldTypeName(dtst.GetType()) == ogr.GetFieldTypeName(dref.GetType())
 
-        if dref.GetType() == ogr.OFTReal:
-            gname = 'GetFieldAsDouble'
+        tp_tst, tp_ref = dtst.GetType(), dref.GetType()
+        if tp_tst == ogr.OFTString and tp_ref == ogr.OFTDate:
+            vref = ref.GetFieldAsString(iref).replace('/', '-')
+            assert tst.GetFieldAsString(itst) == vref
+        elif tp_tst == ogr.OFTString and tp_ref == ogr.OFTDateTime:
+            vref = ref.GetFieldAsString(iref).replace('/', '-').replace(' ', 'T')
+            assert tst.GetFieldAsString(itst) == vref
         else:
-            gname = 'GetFieldAs' + ogr.GetFieldTypeName(dref.GetType())
+            tn_tst = ogr.GetFieldTypeName(dtst.GetType())
+            tn_ref = ogr.GetFieldTypeName(dref.GetType())
+            assert tn_tst == tn_ref, "Field type mismatch"
 
-        vtst = getattr(tst, gname)(itst)
-        vref = getattr(ref, gname)(iref)
+            if dref.GetType() == ogr.OFTReal:
+                gname = 'GetFieldAsDouble'
+            else:
+                gname = 'GetFieldAs' + ogr.GetFieldTypeName(dref.GetType())
 
-        if dtst.GetType() == ogr.OFTReal:
-            assert abs(vtst - vref) < 1e-6
-        else:
-            assert vtst == vref
+            vtst = getattr(tst, gname)(itst)
+            vref = getattr(ref, gname)(iref)
+
+            if dtst.GetType() == ogr.OFTReal:
+                assert abs(vtst - vref) < 1e-6
+            else:
+                assert vtst == vref
 
 
 @pytest.mark.parametrize('version, fields', product(TEST_WFS_VERSIONS, (
