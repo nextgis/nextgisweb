@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import os
 import json
 import uuid
 import zipfile
 import tempfile
-import shutil
 import ctypes
 from datetime import datetime, time, date
 import six
@@ -769,18 +769,20 @@ class _source_attr(SP):
 
         try:
             if iszip:
-                ogrfn = tempfile.mkdtemp()
-                zipfile.ZipFile(datafile, 'r').extractall(path=ogrfn)
+                # File with *.zip extension is required to get /vsizip/ to work.
+                zipextfn = tempfile.mktemp('.zip')
+                os.symlink(datafile, zipextfn)
+                ogrfn = '/vsizip/' + zipextfn
             else:
                 ogrfn = datafile
 
             if six.PY2:
                 with _set_encoding(encoding) as sdecode:
-                    ogrds = ogr.Open(ogrfn)
+                    ogrds = ogr.Open(ogrfn, 0)
                     recode = sdecode
             else:
                 # Ignore encoding option in Python 3
-                ogrds = ogr.Open(ogrfn)
+                ogrds = ogr.Open(ogrfn, 0)
 
                 def recode(x):
                     return x
@@ -803,7 +805,7 @@ class _source_attr(SP):
 
         finally:
             if iszip:
-                shutil.rmtree(ogrfn)
+                os.unlink(zipextfn)
 
 
 class _fields_attr(SP):
