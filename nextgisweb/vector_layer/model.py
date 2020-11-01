@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-import os
 import json
 import uuid
 import zipfile
-import tempfile
 import ctypes
 from datetime import datetime, time, date
 import six
@@ -766,46 +764,34 @@ class _source_attr(SP):
         encoding = value.get('encoding', 'utf-8')
 
         iszip = zipfile.is_zipfile(datafile)
+        ogrfn = ('/vsizip/{%s}' % datafile) if iszip else datafile
 
-        try:
-            if iszip:
-                # File with *.zip extension is required to get /vsizip/ to work.
-                zipextfn = tempfile.mktemp('.zip')
-                os.symlink(datafile, zipextfn)
-                ogrfn = '/vsizip/' + zipextfn
-            else:
-                ogrfn = datafile
-
-            if six.PY2:
-                with _set_encoding(encoding) as sdecode:
-                    ogrds = ogr.Open(ogrfn, 0)
-                    recode = sdecode
-            else:
-                # Ignore encoding option in Python 3
+        if six.PY2:
+            with _set_encoding(encoding) as sdecode:
                 ogrds = ogr.Open(ogrfn, 0)
+                recode = sdecode
+        else:
+            # Ignore encoding option in Python 3
+            ogrds = ogr.Open(ogrfn, 0)
 
-                def recode(x):
-                    return x
+            def recode(x):
+                return x
 
-            if ogrds is None:
-                raise VE(_("GDAL library failed to open file."))
+        if ogrds is None:
+            raise VE(_("GDAL library failed to open file."))
 
-            drivername = ogrds.GetDriver().GetName()
+        drivername = ogrds.GetDriver().GetName()
 
-            if drivername not in ('ESRI Shapefile', 'GeoJSON', 'KML'):
-                raise VE(_("Unsupport OGR driver: %s.") % drivername)
+        if drivername not in ('ESRI Shapefile', 'GeoJSON', 'KML'):
+            raise VE(_("Unsupport OGR driver: %s.") % drivername)
 
-            ogrlayer = self._ogrds(ogrds)
-            geomtype = ogrlayer.GetGeomType()
-            if geomtype not in _GEOM_OGR_2_TYPE:
-                raise VE(_("Unsupported geometry type: '%s'. Probable reason: data contain mixed geometries.") % (  # NOQA: E501
-                    ogr.GeometryTypeToName(geomtype) if geomtype is not None else None))
+        ogrlayer = self._ogrds(ogrds)
+        geomtype = ogrlayer.GetGeomType()
+        if geomtype not in _GEOM_OGR_2_TYPE:
+            raise VE(_("Unsupported geometry type: '%s'. Probable reason: data contain mixed geometries.") % (  # NOQA: E501
+                ogr.GeometryTypeToName(geomtype) if geomtype is not None else None))
 
-            self._ogrlayer(srlzr.obj, ogrlayer, recode)
-
-        finally:
-            if iszip:
-                os.unlink(zipextfn)
+        self._ogrlayer(srlzr.obj, ogrlayer, recode)
 
 
 class _fields_attr(SP):
