@@ -12,6 +12,7 @@ Changes
 - Command to delete orphaned vector layer tables.
 - HTTP API with resource permissions explanation. 
 - Support for ``like``, ``geom`` and ``extensions`` in feature layer REST API.
+- Support for GeoJSON files in ZIP-archive and faster ZIP-archive unpacking.
 - Lookup table component is part of ``nextgisweb`` core package ``nextgisweb``.
 
 3.5.0
