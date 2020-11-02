@@ -647,6 +647,8 @@ class WFSHandler():
     def _transaction(self):
         _ns_wfs = nsmap('wfs', self.p_version)['ns']
         _ns_ogc = nsmap('ogc', self.p_version)['ns']
+        if self.p_version >= v200:
+            _ns_fes = nsmap('fes', self.p_version)['ns']
 
         layers = dict()
 
@@ -688,10 +690,15 @@ class WFSHandler():
                         feature.fields[key] = _property.text
 
                 fid = feature_layer.feature_create(feature)
+                fid_str = fid_encode(fid)
 
                 _insert = El('InsertResult' if self.p_version == v100 else 'InsertResults',
                              namespace=_ns_wfs, parent=_response)
-                El('FeatureId', dict(fid=fid_encode(fid)), namespace=_ns_ogc, parent=_insert)
+                if self.p_version == v100:
+                    El('FeatureId', dict(fid=fid_str), namespace=_ns_ogc, parent=_insert)
+                else:
+                    _feature = El('Feature', namespace=_ns_wfs, parent=_insert)
+                    El('ResourceId', dict(rid=fid_str), namespace=_ns_fes, parent=_feature)
 
                 if show_summary:
                     summary['totalInserted'] += 1
