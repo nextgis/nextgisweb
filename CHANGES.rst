@@ -7,6 +7,7 @@ Changes
 - Major improvements and bug fixes in WFS protocol implementation.
 - Permission model changes: now any action on resource requires ``read`` permission
   from scope ``resource`` on the resource and its parent.
+- PostGIS layer extent calculation and improved extent calculation in vector layer.
 - Vector layer export to GeoPackage format.
 - Tile cache and webmap annotations are enabled by default.
 - Command to delete orphaned vector layer tables.
