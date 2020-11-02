@@ -25,7 +25,7 @@ from ..resource import (
     ResourceGroup)
 from ..env import env
 from ..geometry import geom_from_wkt, box
-from ..layer import SpatialLayerMixin
+from ..layer import IBboxLayer, SpatialLayerMixin
 from ..feature_layer import (
     Feature,
     FeatureSet,
@@ -146,7 +146,7 @@ class PostgisLayerField(Base, LayerField):
     column_name = db.Column(db.Unicode, nullable=False)
 
 
-@implementer(IFeatureLayer, IWritableFeatureLayer)
+@implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'postgis_layer'
     cls_display_name = _("PostGIS layer")
@@ -451,6 +451,50 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         try:
             conn.execute(stmt)
+        finally:
+            conn.close()
+
+    # IBboxLayer
+    @property
+    def extent(self):
+        st_force2d = db.func.st_force2d
+        st_transform = db.func.st_transform
+        st_extent = db.func.st_extent
+        st_setsrid = db.func.st_setsrid
+        st_xmax = db.func.st_xmax
+        st_xmin = db.func.st_xmin
+        st_ymax = db.func.st_ymax
+        st_ymin = db.func.st_ymin
+
+        tab = db.sql.table(self.table)
+        tab.schema = self.schema
+
+        geomcol = db.sql.column(self.column_geom)
+
+        bbox = st_extent(st_transform(st_setsrid(db.cast(
+            st_force2d(geomcol), ga.Geometry), self.srs_id), 4326)
+        ).label('bbox')
+        sq = db.select([bbox], tab).alias('t')
+
+        fields = (
+            st_xmax(sq.c.bbox),
+            st_xmin(sq.c.bbox),
+            st_ymax(sq.c.bbox),
+            st_ymin(sq.c.bbox),
+        )
+
+        try:
+            conn = self.connection.get_connection()
+            maxLon, minLon, maxLat, minLat = conn.execute(db.select(fields)).first()
+
+            extent = dict(
+                minLon=minLon,
+                maxLon=maxLon,
+                minLat=minLat,
+                maxLat=maxLat
+            )
+
+            return extent
         finally:
             conn.close()
 
