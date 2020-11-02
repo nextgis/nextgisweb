@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 
+from ..compat import Path
 from ..resource import Resource, ResourceNotFound, DataScope, resource_factory, ValidationError
 
 from .interface import ILegendableStyle, IRenderableStyle
@@ -16,6 +17,9 @@ from .util import af_transform
 
 
 PD_READ = DataScope.read
+
+with open(str(Path(__file__).parent / 'empty_256x256.png'), 'rb') as f:
+    EMPTY_TILE_256x256 = f.read()
 
 
 def rtoint(arg):
@@ -44,6 +48,8 @@ def image_response(img, empty_code, size):
     if img is None:
         if empty_code in ('204', '404'):
             return Response(status=empty_code)
+        elif size == (256, 256):
+            return Response(EMPTY_TILE_256x256, content_type='image/png')
         else:
             img = Image.new('RGBA', size)
 
