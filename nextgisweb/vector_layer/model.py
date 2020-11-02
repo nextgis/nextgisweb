@@ -606,17 +606,16 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         model = tableinfo.model
 
-        fields = (
-            st_extent(st_transform(st_setsrid(cast(
-                st_force2d(model.geom), ga.Geometry), self.srs_id), 4326)),
-        )
-        bbox = DBSession.query(*fields).label('bbox')
+        bbox = st_extent(st_transform(st_setsrid(cast(
+            st_force2d(model.geom), ga.Geometry), self.srs_id), 4326)
+        ).label('bbox')
+        sq = DBSession.query(bbox).subquery()
 
         fields = (
-            st_xmax(bbox),
-            st_xmin(bbox),
-            st_ymax(bbox),
-            st_ymin(bbox),
+            st_xmax(sq.c.bbox),
+            st_xmin(sq.c.bbox),
+            st_ymax(sq.c.bbox),
+            st_ymin(sq.c.bbox),
         )
         maxLon, minLon, maxLat, minLat = DBSession.query(*fields).one()
 
