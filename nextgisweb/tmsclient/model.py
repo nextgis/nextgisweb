@@ -202,49 +202,67 @@ class Layer(Base, Resource, SpatialLayerMixin):
         #   ‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾b1
         #################################
 
-        if srs.is_geographic:
-            extent = (
+        def transform_extent(extent, src_osr, dst_osr):
+            ct = osr.CoordinateTransformation(src_osr, dst_osr)
+
+            def transform_point(x, y):
+                p = ogr.Geometry(ogr.wkbPoint)
+                p.AddPoint(x, y)
+                p.Transform(ct)
+                return (p.GetX(), p.GetY())
+
+            return transform_point(*extent[0:2]) + transform_point(*extent[2:4])
+
+        def prepare_geog_extent(extent):
+            return (
                 extent[0], max(extent[1], -85.0511),
                 extent[2], min(extent[3], 85.0511),
             )
 
+        dst_osr = osr.SpatialReference()
+        dst_osr.ImportFromWkt(self.srs.wkt)
+
+        extent_max = prepare_geog_extent((self.extent_left, self.extent_bottom, self.extent_right, self.extent_top))
+        if self.srs.id != 4326:
+            wgs84_osr = osr.SpatialReference()
+            wgs84_osr.ImportFromEPSG(4326)
+            extent_max = transform_extent(extent_max, wgs84_osr, dst_osr)
+
+        if srs.is_geographic:
+            extent = prepare_geog_extent(extent)
+
         if srs.id != self.srs.id:
-            src_osr = osr.SpatialReference()
-            dst_osr = osr.SpatialReference()
+            req_osr = osr.SpatialReference()
+            req_osr.ImportFromWkt(srs.wkt)
+            extent = transform_extent(extent, req_osr, dst_osr)
 
-            src_osr.ImportFromWkt(srs.wkt)
-            dst_osr.ImportFromWkt(self.srs.wkt)
-            coordTrans = osr.CoordinateTransformation(src_osr, dst_osr)
+        xtile_from, ytile_from, xtile_to, ytile_to = self.srs.extent_tile_range(extent, zoom)
 
-            def transform(x, y):
-                p = ogr.Geometry(ogr.wkbPoint)
-                p.AddPoint(x, y)
-                p.Transform(coordTrans)
-                return (p.GetX(), p.GetY())
-
-            extent = transform(*extent[0:2]) + transform(*extent[2:4])
-
-        extent = (
-            max(extent[0], self.srs.minx), max(extent[1], self.srs.miny),
-            min(extent[2], self.srs.maxx), min(extent[3], self.srs.maxy),
-        )
-
-        xtilemin, ytilemin, xtilemax, ytilemax = self.srs.extent_tile_range(extent, zoom)
-
-        width = (xtilemax + 1 - xtilemin) * self.tilesize
-        height = (ytilemax + 1 - ytilemin) * self.tilesize
+        width = (xtile_to + 1 - xtile_from) * self.tilesize
+        height = (ytile_to + 1 - ytile_from) * self.tilesize
 
         image = PIL.Image.new('RGBA', (width, height))
 
-        for x, xtile in enumerate(range(xtilemin, xtilemax + 1)):
-            for y, ytile in enumerate(range(ytilemin, ytilemax + 1)):
+        xtile_min, ytile_min, xtile_max, ytile_max = self.srs.extent_tile_range(extent_max, zoom)
+
+        x_offset = max(xtile_min - xtile_from, 0)
+        y_offset = max(ytile_min - ytile_from, 0)
+
+        for x, xtile in enumerate(
+            range(xtile_from + x_offset, min(xtile_to, xtile_max) + 1),
+            start=x_offset
+        ):
+            for y, ytile in enumerate(
+                range(ytile_from + y_offset, min(ytile_to, ytile_max) + 1),
+                start=y_offset
+            ):
                 tile_image = self.connection.get_tile((zoom, xtile, ytile), self.layer_name)
                 if tile_image is None:
                     continue
                 image.paste(tile_image, (x * self.tilesize, y * self.tilesize))
 
-        a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtilemin, ytilemin))
-        b0x, b1y, b1x, b0y = self.srs.tile_extent((zoom, xtilemax, ytilemax))
+        a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtile_from, ytile_from))
+        b0x, b1y, b1x, b0y = self.srs.tile_extent((zoom, xtile_to, ytile_to))
         box = crop_box((a0x, b1y, b1x, a0y), extent, width, height)
         image = image.crop(box)
 
