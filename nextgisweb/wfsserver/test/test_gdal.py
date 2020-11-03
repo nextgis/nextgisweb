@@ -155,7 +155,7 @@ def test_compare(version, key, features):
 
 @pytest.mark.parametrize('version, fields', product(TEST_WFS_VERSIONS, (
     dict(null='not null', int=42, real=-0.0, string=None, unicode='¯\\_(ツ)_/¯', geom='POINT(1 1)'),
-    dict(null=None, int=2**16, real=3.1415926535897, string='str', unicode='مرحبا بالعالم', geom='POINT(0.1 -3.1)'),
+    dict(null=None, int=2**16, real=3.1415926535897, string='str', unicode='مرحبا بالعالم', geom='POINT(0.1 -3.1)'),  # NOQA: E501
 )))
 def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator):
     driver = ogr.GetDriverByName(six.ensure_str('WFS'))
@@ -198,11 +198,10 @@ def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator
                 assert v_cmp == v
 
 
-@pytest.mark.parametrize('version', TEST_WFS_VERSIONS)
+@pytest.mark.parametrize('version', [
+    pytest.param(v, marks=pytest.mark.xfail(v >= '2.0.0', reason="GDAL doesn't work correctly with WFS 2.x"))  # NOQA: E501
+    for v in TEST_WFS_VERSIONS])
 def test_create_delete(version, service, ngw_httptest_app, ngw_auth_administrator):
-    if version >= '2.0.0':
-        pytest.skip('GDAL does not work correctly with WFS %s version.' % version)
-
     driver = ogr.GetDriverByName(six.ensure_str('WFS'))
     wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
         ngw_httptest_app.base_url, service, version), True)
