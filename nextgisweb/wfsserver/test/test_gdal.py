@@ -200,6 +200,9 @@ def test_edit(version, fields, service, ngw_httptest_app, ngw_auth_administrator
 
 @pytest.mark.parametrize('version', TEST_WFS_VERSIONS)
 def test_create_delete(version, service, ngw_httptest_app, ngw_auth_administrator):
+    if version >= '2.0.0':
+        pytest.skip('GDAL does not work correctly with WFS %s version.' % version)
+
     driver = ogr.GetDriverByName(six.ensure_str('WFS'))
     wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
         ngw_httptest_app.base_url, service, version), True)
@@ -215,4 +218,8 @@ def test_create_delete(version, service, ngw_httptest_app, ngw_auth_administrato
     feature.SetGeometry(geom)
 
     err = wfs_layer.CreateFeature(feature)
+    assert err == 0, gdal.GetLastErrorMsg()
+
+    fid = feature.GetFID()
+    err = wfs_layer.DeleteFeature(fid)
     assert err == 0, gdal.GetLastErrorMsg()

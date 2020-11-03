@@ -94,12 +94,13 @@ def find_tags(element, tag):
     return element.xpath('.//*[local-name()="%s"]' % tag)
 
 
-def fid_encode(fid):
-    return 'id-' + str(fid)
+def fid_encode(fid, layer_name):
+    return '%s.%d' % (layer_name, fid)
 
 
-def fid_decode(fid):
-    return int(fid[3:])
+def fid_decode(fid, layer_name):
+    int_pos = len(layer_name) + 1
+    return int(fid[int_pos:])
 
 
 GET_CAPABILITIES = 'GetCapabilities'
@@ -298,7 +299,7 @@ class WFSHandler():
                                 minx=str(extent['minLon']), miny=str(extent['minLat']))
                     El('LatLongBoundingBox', bbox, parent=__type)
 
-    def _parse_filter(self, __filter):
+    def _parse_filter(self, __filter, keyname):
         v_gt200 = self.p_version >= v200
         resid_tag = 'ResourceId' if v_gt200 else 'FeatureId'
         resid_attr = 'rid' if v_gt200 else 'fid'
@@ -309,7 +310,7 @@ class WFSHandler():
                 if fid is not None:
                     raise ValueError("Multiple feature ID filter not supported.")
                 else:
-                    fid = fid_decode(__el.get(resid_attr))
+                    fid = fid_decode(__el.get(resid_attr), keyname)
             else:
                 raise ValueError("Filter element '%s' not supported." % __el.tag)
         return fid
@@ -542,7 +543,7 @@ class WFSHandler():
         if __query is not None:
             __filters = find_tags(__query, 'Filter')
             if len(__filters) == 1:
-                fid = self._parse_filter(__filters[0])
+                fid = self._parse_filter(__filters[0], layer.keyname)
                 if fid is not None:
                     query.filter_by(id=fid)
 
@@ -585,7 +586,7 @@ class WFSHandler():
             minX = maxX = minY = maxY = None
 
             for feature in query():
-                feature_id = fid_encode(feature.id)
+                feature_id = fid_encode(feature.id, layer.keyname)
                 __member = El('featureMember', parent=root, namespace=gml['ns']) if self.p_version == v100 \
                     else El('member', parent=root, namespace=wfs['ns'])
                 id_attr = 'fid' if self.p_version == v100 else ns_attr('gml', 'id', self.p_version)
@@ -690,7 +691,7 @@ class WFSHandler():
                         feature.fields[key] = _property.text
 
                 fid = feature_layer.feature_create(feature)
-                fid_str = fid_encode(fid)
+                fid_str = fid_encode(fid, keyname)
 
                 _insert = El('InsertResult' if self.p_version == v100 else 'InsertResults',
                              namespace=_ns_wfs, parent=_response)
@@ -707,7 +708,7 @@ class WFSHandler():
                 feature_layer = find_layer(keyname)
 
                 _filter = find_tags(_operation, 'Filter')[0]
-                fid = self._parse_filter(_filter)
+                fid = self._parse_filter(_filter, keyname)
                 if fid is None:
                     raise ValueError("Feature ID filter must be specified.")
 
