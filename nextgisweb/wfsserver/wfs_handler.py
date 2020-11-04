@@ -115,12 +115,12 @@ GEOM_TYPE_TO_GML_TYPE = {
     GEOM_TYPE.MULTIPOINT: 'gml:MultiPointPropertyType',
     GEOM_TYPE.MULTILINESTRING: 'gml:MultiLineStringPropertyType',
     GEOM_TYPE.MULTIPOLYGON: 'gml:MultiPolygonPropertyType',
-    GEOM_TYPE.POINTZ: 'gml:PointZPropertyType',
-    GEOM_TYPE.LINESTRINGZ: 'gml:LineStringZPropertyType',
-    GEOM_TYPE.POLYGONZ: 'gml:PolygonZPropertyType',
-    GEOM_TYPE.MULTIPOINTZ: 'gml:MultiPointZPropertyType',
-    GEOM_TYPE.MULTILINESTRINGZ: 'gml:MultiLineStringZPropertyType',
-    GEOM_TYPE.MULTIPOLYGONZ: 'gml:MultiPolygonZPropertyType',
+    GEOM_TYPE.POINTZ: 'gml:PointPropertyType',
+    GEOM_TYPE.LINESTRINGZ: 'gml:LineStringPropertyType',
+    GEOM_TYPE.POLYGONZ: 'gml:PolygonPropertyType',
+    GEOM_TYPE.MULTIPOINTZ: 'gml:MultiPointPropertyType',
+    GEOM_TYPE.MULTILINESTRINGZ: 'gml:MultiLineStringPropertyType',
+    GEOM_TYPE.MULTIPOLYGONZ: 'gml:MultiPolygonPropertyType',
 }
 
 
