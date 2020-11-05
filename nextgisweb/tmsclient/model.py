@@ -241,12 +241,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
         width = (xtile_to + 1 - xtile_from) * self.tilesize
         height = (ytile_to + 1 - ytile_from) * self.tilesize
 
-        image = PIL.Image.new('RGBA', (width, height))
-
         xtile_min, ytile_min, xtile_max, ytile_max = self.srs.extent_tile_range(extent_max, zoom)
 
         x_offset = max(xtile_min - xtile_from, 0)
         y_offset = max(ytile_min - ytile_from, 0)
+
+        image = None
 
         for x, xtile in enumerate(
             range(xtile_from + x_offset, min(xtile_to, xtile_max) + 1),
@@ -259,7 +259,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
                 tile_image = self.connection.get_tile((zoom, xtile, ytile), self.layer_name)
                 if tile_image is None:
                     continue
+                if image is None:
+                    image = PIL.Image.new('RGBA', (width, height))
                 image.paste(tile_image, (x * self.tilesize, y * self.tilesize))
+
+        if image is None:
+            return None
 
         a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtile_from, ytile_from))
         b0x, b1y, b1x, b0y = self.srs.tile_extent((zoom, xtile_to, ytile_to))
