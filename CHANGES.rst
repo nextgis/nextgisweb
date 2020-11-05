@@ -9,12 +9,14 @@ Changes
   from scope ``resource`` on the resource and its parent.
 - PostGIS layer extent calculation and improved extent calculation in vector layer.
 - Vector layer export to GeoPackage format.
+- Faster processing of empty tiles and images.
 - Tile cache and webmap annotations are enabled by default.
 - Command to delete orphaned vector layer tables.
 - HTTP API with resource permissions explanation. 
 - Support for ``like``, ``geom`` and ``extensions`` in feature layer REST API.
 - Support for GeoJSON files in ZIP-archive and faster ZIP-archive unpacking.
 - Lookup table component is part of ``nextgisweb`` core package ``nextgisweb``.
+- Fix TMS layer tile composition in case of extent outside the bounds.
 
 3.5.0
 -----
