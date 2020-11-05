@@ -28,6 +28,7 @@ define([
                         + "?resource=" + queryObject["resource"]
                         + "&extent=" + queryObject["BBOX"]
                         + "&size=" + queryObject["WIDTH"] + "," + queryObject["HEIGHT"]
+                        + "&nd=204"
                         + "#" + Date.now(); // in-memory cache busting
                 }
             });
