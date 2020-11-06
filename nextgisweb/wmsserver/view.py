@@ -166,7 +166,8 @@ def _get_map(obj, request):
 
         req = lobj.resource.render_request(srs)
         limg = req.render_extent(p_bbox, p_size)
-        img.paste(limg, (0, 0), limg)
+        if limg is not None:
+            img.paste(limg, (0, 0), limg)
 
     buf = BytesIO()
 
