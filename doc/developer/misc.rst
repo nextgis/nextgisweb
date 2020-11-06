@@ -18,6 +18,7 @@ GeoJSON
 
 .. deprecated:: 2.2
 .. http:get:: /resource/(int:id)/geojson/
+   :deprecated:
 
 .. versionadded:: 3.0
 .. http:get:: /api/resource/(int:id)/geojson
@@ -65,9 +66,6 @@ Render
 
 **The following request returns TMS from raster layer**:
 
-.. deprecated:: 2.2
-.. http:get:: /resource/(int:id)/tms?z=(int:z)&x=(int:x)&y=(int:y)
-
 .. versionadded:: 3.0
 .. http:get:: /api/component/render/tile?z=(int:z)&x=(int:x)&y=(int:y)&resource=(int:id1),(int:id2)...
 
@@ -75,11 +73,14 @@ Render
 
     :reqheader Accept: must be ``*/*``
     :reqheader Authorization: optional Basic auth string to authenticate
-    :param id1, id2: style resources id's
-    :param z: zoom level
-    :param x: tile number on x axis (horizontal)
-    :param y: tile number on y axis (vertical)
+    :query id1, id2: style resources id's
+    :query z: zoom level
+    :query x: tile number on x axis (horizontal)
+    :query y: tile number on y axis (vertical)
+    :query nd: Return code if tile not present. Available values are: 204, 404, 200. 200 defaults if no parameter provided.
     :statuscode 200: no error
+    :statuscode 204: no tile
+    :statuscode 404: no tile
 
 **The following request returns image from raster layer**:
 
@@ -90,9 +91,9 @@ Render
 
     :reqheader Accept: must be ``*/*``
     :reqheader Authorization: optional Basic auth string to authenticate
-    :param id1, id2: style resources id's
-    :param minx, miny, maxx, maxy: image spatial extent
-    :param width, height: output image size
+    :query id1, id2: style resources id's
+    :query minx, miny, maxx, maxy: image spatial extent
+    :query width, height: output image size
     :statuscode 200: no error
 
 .. note:: Styles order should be from lower to upper.
@@ -142,11 +143,11 @@ MVT data can be fetched only for NextGIS Web vector layer.
 
     :reqheader Accept: must be ``*/*``
     :reqheader Authorization: optional Basic auth string to authenticate
-    :param id1, id2: Vector or PostGIS layers identifies
-    :param z: zoom level
-    :param x: tile number on x axis (horizontal)
-    :param y: tile number on y axis (vertical)
-    :param s: simplification level (0 - no simplification, 8 - default value)
+    :query id1, id2: Vector or PostGIS layers identifies
+    :query z: zoom level
+    :query x: tile number on x axis (horizontal)
+    :query y: tile number on y axis (vertical)
+    :query s: simplification level (0 - no simplification, 8 - default value)
     :statuscode 200: no error
 
 .. note:: Vector or PostGIS layers identifies order should be from lower to upper. 
@@ -165,7 +166,8 @@ Layers names in MVT will be `ngw:(int:id)`, where id is vector or PostGIS layer 
 .. http:get:: /api/resource/(int:id)/(int:z)/(int:x)/(int:y).mvt
 
    MVT request
-
+   
+   :deprecated:
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :param id: resource identifier
