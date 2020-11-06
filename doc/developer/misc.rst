@@ -8,17 +8,13 @@ Get resource data
 
 Geodatata can be fetched for vector and raster layers. For vector layers
 (PostGIS and Vector) geodata returns in :term:`GeoJSON` or :term:`CSV` formats.
-For raster layers (Raster, :term:`WMS`) - tiles (:term:`TMS`:) or image.
+For raster layers (Raster, :term:`WMS`) - tiles (:term:`TMS`) or image.
 For QGIS styles - qml file.
 
 GeoJSON
 ^^^^^^^
 
 **The following request returns GeoJSON file from vector layer**:
-
-.. deprecated:: 2.2
-.. http:get:: /resource/(int:id)/geojson/
-   :deprecated:
 
 .. versionadded:: 3.0
 .. http:get:: /api/resource/(int:id)/geojson
@@ -77,7 +73,7 @@ Render
     :query z: zoom level
     :query x: tile number on x axis (horizontal)
     :query y: tile number on y axis (vertical)
-    :query nd: Return code if tile not present. Available values are: 204, 404, 200. 200 defaults if no parameter provided.
+    :query nd: Return code if tile not present. Available values are: 204, 404, 200. Defaults to 200.
     :statuscode 200: no error
     :statuscode 204: no tile
     :statuscode 404: no tile
