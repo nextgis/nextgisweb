@@ -7,6 +7,7 @@ import zipstream
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
 
+from ..compat import lru_cache
 from ..env import env
 from ..resource import DataScope
 
@@ -39,10 +40,12 @@ def export(resource, request):
     )
 
 
-def lookup_marker(name, library=None):
+@lru_cache(maxsize=256)
+def lookup_marker(name, library_id=None):
     validate_filename(name)
 
-    if library is not None:
+    if library_id is not None:
+        library = SVGMarkerLibrary.filter_by(id=library_id).one()
         svg_marker = library.find_svg_marker(name)
         if svg_marker is not None:
             return svg_marker.path
