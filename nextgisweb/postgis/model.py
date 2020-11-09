@@ -472,7 +472,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         geomcol = db.sql.column(self.column_geom)
 
         bbox = st_extent(st_transform(st_setsrid(db.cast(
-            st_force2d(geomcol), ga.Geometry), self.srs_id), 4326)
+            st_force2d(geomcol), ga.Geometry), self.geometry_srid), 4326)
         ).label('bbox')
         sq = db.select([bbox], tab).alias('t')
 
