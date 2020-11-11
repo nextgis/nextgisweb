@@ -23,6 +23,13 @@ define([
             });
         },
 
+        _setValueAttr: function (value) {
+            if (value === undefined) {
+                return;
+            }
+            return this.inherited(arguments);
+        },
+
         _buttonClick: function () {
             if (this.disabled) {
                 return;
