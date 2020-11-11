@@ -24,6 +24,9 @@ define([
         },
 
         _buttonClick: function () {
+            if (this.disabled) {
+                return;
+            }
             this.inherited(arguments);
             this.picker.pick().then(lang.hitch(this, function (itm) {
                 this.set("value", {id: itm.id});
