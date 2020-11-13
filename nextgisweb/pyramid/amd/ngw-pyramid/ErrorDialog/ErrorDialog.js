@@ -17,9 +17,9 @@ define([
     i18n
 ) {
     var ErrorDialog = declare([Dialog], {
-        constructor: function (options) {
+        constructor: function (error, options) {
             this.inherited(arguments);
-            if (options.response) {
+            if (options && options.response) {
                 var response = options.response;
 
                 if (response.status == undefined || response.status == 0 || response.data == undefined) {
@@ -36,16 +36,20 @@ define([
                     this.errorTitle = i18n.gettext("Unexpected server response");
                     this.message = i18n.gettext("Something went wrong.");
                 };
+            } else {
+                this.errorTitle = error.title;
+                this.message = error.message;
+                this.error = error;
+            }
 
-                this.errorCard = new ErrorCard({
-                    error: data || {},
-                    errorTitle: this.errorTitle,
-                    message: this.message,
-                    detail: this.detail,
-                    mainActionText: 'OK',
-                    mainActionUrl: '#'
-                });
-            };
+            this.errorCard = new ErrorCard({
+                error: error,
+                errorTitle: this.errorTitle,
+                message: this.message,
+                detail: this.detail,
+                mainActionText: 'OK',
+                mainActionUrl: '#'
+            });
         },
 
         buildRendering: function () {
@@ -69,7 +73,7 @@ define([
 
     // Static method for easy handling xhr errors
     ErrorDialog.xhrError = function (error) {
-        var dialog = new ErrorDialog({response: error.response});
+        var dialog = new ErrorDialog(error, {response: error.response});
         dialog.show();
         return dialog;
     }
