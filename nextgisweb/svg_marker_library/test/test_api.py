@@ -19,7 +19,7 @@ FOLDER2 = path.join(DATA_DIR, 'folder2/')
 
 @pytest.fixture(scope='module', autouse=True)
 def options(ngw_env):
-    with ngw_env.svg_marker_library.options.override({'svg_paths': [FOLDER1, FOLDER2]}):
+    with ngw_env.svg_marker_library.options.override({'path': [FOLDER1, FOLDER2]}):
         yield
 
 
@@ -84,5 +84,5 @@ def test_lookup(svg_lib, ngw_env, ngw_webtest_app):
     assert lookup_marker('marker2') == filename(marker2.fileobj)
 
     svg_marker_library.cache.clear()
-    with svg_marker_library.options.override({'svg_paths': [FOLDER1]}):
+    with svg_marker_library.options.override({'path': [FOLDER1]}):
         assert lookup_marker('marker1') == path.join(FOLDER1, 'marker1.svg')

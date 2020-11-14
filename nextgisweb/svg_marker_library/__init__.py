@@ -44,7 +44,7 @@ class SVGMarkerLibraryComponent(Component):
                 return result
 
         name = name + '.svg'
-        for svg_dir in self.options['svg_paths']:
+        for svg_dir in self.options['path']:
             candidate = path.join(svg_dir, name)
             if path.isfile(candidate):
                 self.cache[ckey] = candidate
@@ -53,5 +53,5 @@ class SVGMarkerLibraryComponent(Component):
         return None
 
     option_annotations = OptionAnnotations((
-        Option('svg_paths', list, default=[PRESET_DIR], doc="Search paths for SVG files."),
+        Option('path', list, default=[PRESET_DIR], doc="Search paths for SVG files."),
     ))
