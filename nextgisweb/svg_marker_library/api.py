@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from os import path
-
 import zipstream
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
 
-from ..compat import lru_cache
-from ..env import env
 from ..resource import DataScope
 
-from .model import SVGMarkerLibrary, validate_filename
+from .model import SVGMarkerLibrary
 
 
 def file_download(resource, request):
@@ -40,28 +36,7 @@ def export(resource, request):
     )
 
 
-@lru_cache(maxsize=256)
-def lookup_marker(name, library_id=None):
-    validate_filename(name)
-
-    if library_id is not None:
-        library = SVGMarkerLibrary.filter_by(id=library_id).one()
-        svg_marker = library.find_svg_marker(name)
-        if svg_marker is not None:
-            return svg_marker.path
-
-    name = name + '.svg'
-    for svg_dir in env.svg_marker_library.options['svg_paths']:
-        candidate = path.join(svg_dir, name)
-        if path.isfile(candidate):
-            return candidate
-
-    return None
-
-
 def setup_pyramid(comp, config):
-    comp.lookup_marker = lookup_marker
-
     config.add_view(
         file_download, route_name='resource.file_download',
         context=SVGMarkerLibrary, request_method='GET'

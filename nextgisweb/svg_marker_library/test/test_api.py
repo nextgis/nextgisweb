@@ -19,10 +19,8 @@ FOLDER2 = path.join(DATA_DIR, 'folder2/')
 
 @pytest.fixture(scope='module', autouse=True)
 def options(ngw_env):
-    value = ngw_env.svg_marker_library.options['svg_paths']
-    ngw_env.svg_marker_library.options['svg_paths'] = [FOLDER2, FOLDER1]
-    yield
-    ngw_env.svg_marker_library.options['svg_paths'] = value
+    with ngw_env.svg_marker_library.options.override({'svg_paths': [FOLDER1, FOLDER2]}):
+        yield
 
 
 @pytest.fixture(scope='module')
@@ -62,11 +60,14 @@ def svg_lib(ngw_env, ngw_resource_group):
 
 
 def test_lookup(svg_lib, ngw_env, ngw_webtest_app):
+    svg_marker_library = ngw_env.svg_marker_library
+    file_storage = ngw_env.file_storage
+
     def lookup_marker(name):
-        return ngw_env.svg_marker_library.lookup_marker(name, library=svg_lib)
+        return svg_marker_library.lookup(name, library=svg_lib)
 
     def filename(fileobj):
-        return ngw_env.file_storage.filename(fileobj, makedirs=False)
+        return file_storage.filename(fileobj, makedirs=False)
 
     marker1 = svg_lib.find_svg_marker('marker1')
     marker2 = svg_lib.find_svg_marker('marker2')
@@ -75,12 +76,13 @@ def test_lookup(svg_lib, ngw_env, ngw_webtest_app):
     assert lookup_marker('marker2') == filename(marker2.fileobj)
     assert lookup_marker('marker3') == path.join(FOLDER1, 'marker3.svg')
 
+    svg_marker_library.cache.clear()
     with transaction.manager:
         DBSession.delete(marker1)
 
-    assert lookup_marker('marker1') == path.join(FOLDER2, 'marker1.svg')
+    assert lookup_marker('marker1') == path.join(FOLDER1, 'marker1.svg')
     assert lookup_marker('marker2') == filename(marker2.fileobj)
 
-    ngw_env.svg_marker_library.options['svg_paths'] = [FOLDER1]
-
-    assert lookup_marker('marker1') == path.join(FOLDER1, 'marker1.svg')
+    svg_marker_library.cache.clear()
+    with svg_marker_library.options.override({'svg_paths': [FOLDER1]}):
+        assert lookup_marker('marker1') == path.join(FOLDER1, 'marker1.svg')
