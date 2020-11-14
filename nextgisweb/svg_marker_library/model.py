@@ -15,8 +15,7 @@ from ..resource import (
     Resource,
     Serializer,
     SerializedProperty as SP,
-    DataStructureScope,
-    DataScope,
+    ResourceScope,
     ValidationError,
     ResourceGroup)
 
@@ -30,8 +29,6 @@ ALLOWED_EXTENSIONS = ('.svg', )
 class SVGMarkerLibrary(Base, Resource):
     identity = 'svg_marker_library'
     cls_display_name = _("SVG marker library")
-
-    __scope__ = (DataStructureScope, DataScope)
 
     stuuid = db.Column(db.Unicode(32))
     tstamp = db.Column(db.DateTime())
@@ -167,13 +164,8 @@ class SVGMarkerLibrarySerializer(Serializer):
     identity = SVGMarkerLibrary.identity
     resclass = SVGMarkerLibrary
 
-    archive = _archive_attr(
-        read=None,
-        write=DataStructureScope.write)
-
-    files = _files_attr(
-        read=DataStructureScope.read,
-        write=DataStructureScope.write)
+    archive = _archive_attr(read=None, write=ResourceScope.update)
+    files = _files_attr(read=ResourceScope.read, write=ResourceScope.update)
 
     def deserialize(self):
         if 'files' in self.data and 'archive' in self.data:
