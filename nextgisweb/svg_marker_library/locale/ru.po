@@ -1,0 +1,49 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2020 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.6.0.dev7+85b1bc12.dirty\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2020-11-14 21:05+0000\n"
+"PO-Revision-Date: 2020-11-14 21:06+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: amd/ngw-svg-marker-library/Widget.js:63 model.py:32 view.py:19 view.py:32
+msgid "SVG marker library"
+msgstr "Библиотека маркеров SVG"
+
+#: view.py:23
+msgid "Export"
+msgstr "Экспорт"
+
+#: amd/ngw-svg-marker-library/Widget.js:55
+msgid "File name"
+msgstr "Имя файла"
+
+#: amd/ngw-svg-marker-library/Widget.js:83
+msgid "Upload files"
+msgstr "Загрузить файлы"
+
+#: amd/ngw-svg-marker-library/Widget.js:103
+msgid "Upload archive"
+msgstr "Загрузить архив"
+
+#: amd/ngw-svg-marker-library/Widget.js:134
+msgid "Delete"
+msgstr "Удалить"
+
+#: template/section.mako:6
+msgid "Name"
+msgstr "Имя"
+

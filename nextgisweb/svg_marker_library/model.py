@@ -73,7 +73,6 @@ class SVGMarker(Base):
 
 
 def validate_filename(filename):
-    # Проверяем на вещи типа ".." в имени файла или "/" в начале.
     if os.path.isabs(filename) or filename != os.path.normpath(filename):
         raise ValidationError("Insecure filename.")
 
