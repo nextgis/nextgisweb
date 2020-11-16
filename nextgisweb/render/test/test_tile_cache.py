@@ -58,7 +58,13 @@ def img_cross_green():
 
 @pytest.fixture
 def img_fill():
-    result = Image.new('RGBA', (256, 256))
+    result = Image.new('RGBA', (256, 256), (100, 100, 100, 100))
+    return result
+
+
+@pytest.fixture
+def img_empty():
+    result = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
     return result
 
 
@@ -70,20 +76,28 @@ def test_pack_unpack():
 def test_put_get_cross(frtc, img_cross_red, ngw_txn):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_cross_red)
-    cimg = frtc.get_tile(tile)
-    assert cimg.getextrema() == img_cross_red.getextrema()
+    exists, cimg = frtc.get_tile(tile)
+    assert exists and cimg.getextrema() == img_cross_red.getextrema()
 
 
 def test_put_get_fill(frtc, img_fill, ngw_txn):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_fill)
-    cimg = frtc.get_tile(tile)
-    assert cimg.getextrema() == img_fill.getextrema()
+    exists, cimg = frtc.get_tile(tile)
+    assert exists and cimg.getextrema() == img_fill.getextrema()
+
+
+def test_put_get_empty(frtc, img_empty, ngw_txn):
+    tile = (0, 0, 0)
+    frtc.put_tile(tile, img_empty)
+    exists, cimg = frtc.get_tile(tile)
+    assert exists and cimg is None
 
 
 def test_get_missing(frtc, ngw_txn):
     tile = (0, 0, 0)
-    assert frtc.get_tile(tile) is None
+    exists, cimg = frtc.get_tile(tile)
+    assert not exists
 
 
 def test_ttl(frtc, img_cross_red, ngw_txn):
@@ -91,14 +105,16 @@ def test_ttl(frtc, img_cross_red, ngw_txn):
     frtc.ttl = 1
     frtc.put_tile(tile, img_cross_red)
     sleep(1)
-    assert frtc.get_tile(tile) is None
+    exists, cimg = frtc.get_tile(tile)
+    assert not exists
 
 
 def test_clear(frtc, img_cross_red, ngw_txn):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_cross_red)
     frtc.clear()
-    assert frtc.get_tile(tile) is None
+    exists, cimg = frtc.get_tile(tile)
+    assert not exists
 
 
 def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, ngw_txn, caplog):
@@ -113,9 +129,13 @@ def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, ngw_txn, cap
         *frtc.resource.srs.tile_center(tile_invalid),
         srid=None))
 
-    assert frtc.get_tile(tile_invalid) is None
-    assert frtc.get_tile(tile_valid).getextrema() == img_cross_red.getextrema()
+    exists, cimg = frtc.get_tile(tile_invalid)
+    assert not exists
+
+    exists, cimg = frtc.get_tile(tile_valid)
+    assert exists and cimg.getextrema() == img_cross_red.getextrema()
 
     # Update previously invalidated tile
     frtc.put_tile(tile_invalid, img_cross_green)
-    assert frtc.get_tile(tile_invalid).getextrema() == img_cross_green.getextrema()
+    exists, cimg = frtc.get_tile(tile_invalid)
+    assert exists and cimg.getextrema() == img_cross_green.getextrema()
