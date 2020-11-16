@@ -74,13 +74,6 @@ def validate_filename(filename):
         raise ValidationError("Insecure filename.")
 
 
-def cut_extension(filename):
-    name, ext = os.path.splitext(filename)
-    if ext.lower() not in ALLOWED_EXTENSIONS:
-        raise ValidationError("File \"%s\" has an invalid extension" % filename)
-    return name
-
-
 class _archive_attr(SP):
 
     def setter(self, srlzr, value):
@@ -106,7 +99,9 @@ class _archive_attr(SP):
 
                 validate_filename(file_info.filename)
 
-                name = cut_extension(file_info.filename)
+                name, ext = os.path.splitext(filename)
+                if ext.lower() not in ALLOWED_EXTENSIONS:
+                    raise ValidationError("File \"%s\" has an invalid extension" % filename)
 
                 fileobj = env.file_storage.fileobj(component=COMP_ID)
 
@@ -129,7 +124,9 @@ class _files_attr(SP):
         for f in value:
             filename = f.pop('name')
             validate_filename(filename)
-            name = cut_extension(filename)
+            name, ext = os.path.splitext(filename)
+            if 'id' in f and ext.lower() not in ALLOWED_EXTENSIONS:
+                raise ValidationError("File \"%s\" has an invalid extension" % filename)
             files_info[name] = f
 
         removed_files = list()
