@@ -91,13 +91,12 @@ class _archive_attr(SP):
         DBSession.flush()
 
         with zipfile.ZipFile(archive_name, mode='r', allowZip64=True) as archive:
-
             for file_info in archive.infolist():
-
                 if is_dir(file_info):
                     continue
 
-                validate_filename(file_info.filename)
+                filename = file_info.filename
+                validate_filename(filename)
 
                 name, ext = os.path.splitext(filename)
                 if ext.lower() not in ALLOWED_EXTENSIONS:
@@ -106,12 +105,10 @@ class _archive_attr(SP):
                 fileobj = env.file_storage.fileobj(component=COMP_ID)
 
                 dstfile = env.file_storage.filename(fileobj, makedirs=True)
-                with archive.open(file_info.filename, 'r') as sf, open(dstfile, 'w+b') as df:
+                with archive.open(filename, 'r') as sf, open(dstfile, 'w+b') as df:
                     copyfileobj(sf, df)
 
-                svg_marker = SVGMarker(name=name, fileobj=fileobj)
-
-                srlzr.obj.files.append(svg_marker)
+                srlzr.obj.files.append(SVGMarker(name=name, fileobj=fileobj))
 
 
 class _files_attr(SP):
