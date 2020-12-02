@@ -64,6 +64,7 @@ First you need to install required packages:
 
 .. code-block:: none
 
+  # add-apt-repository ppa:nextgis/ppa
   # apt install python python-dev virtualenv python-virtualenv
   # apt install git curl
   # apt install build-essential libssl-dev libgdal-dev libgeos-dev \
