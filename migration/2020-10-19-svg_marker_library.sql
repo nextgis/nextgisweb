@@ -8,6 +8,8 @@ CREATE TABLE svg_marker_library
         REFERENCES resource (id)
 );
 
+CREATE SEQUENCE svg_marker_id_seq;
+
 CREATE TABLE svg_marker
 (
     id integer NOT NULL DEFAULT nextval('svg_marker_id_seq'::regclass),
@@ -17,13 +19,13 @@ CREATE TABLE svg_marker
     CONSTRAINT svg_marker_pkey PRIMARY KEY (id),
     CONSTRAINT svg_marker_svg_marker_library_id_name_key UNIQUE (svg_marker_library_id, name),
     CONSTRAINT svg_marker_fileobj_id_fkey FOREIGN KEY (fileobj_id)
-        REFERENCES fileobj (id)
+        REFERENCES fileobj (id),
     CONSTRAINT svg_marker_svg_marker_library_id_fkey FOREIGN KEY (svg_marker_library_id)
         REFERENCES svg_marker_library (id)
 );
 
-COMMENT ON TABLE svg_marker IS 'svg_marker_library';
 COMMENT ON TABLE svg_marker_library IS 'svg_marker_library';
+COMMENT ON TABLE svg_marker IS 'svg_marker_library';
 
 
 DROP TABLE IF EXISTS marker;
