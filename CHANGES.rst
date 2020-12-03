@@ -17,6 +17,7 @@ Changes
 - Support for GeoJSON files in ZIP-archive and faster ZIP-archive unpacking.
 - Lookup table component is part of ``nextgisweb`` core package ``nextgisweb``.
 - Fix TMS layer tile composition in case of extent outside the bounds.
+- SVG marker library resource available to renderers.
 
 3.5.0
 -----

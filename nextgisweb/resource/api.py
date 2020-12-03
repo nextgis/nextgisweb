@@ -366,3 +366,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.export', '/api/resource/{id}/export',
         factory=resource_factory)
+
+    config.add_route(
+        'resource.file_download', r'/api/resource/{id:\d+}/file/{name:.*}',
+        factory=resource_factory)

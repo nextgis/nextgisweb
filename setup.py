@@ -49,6 +49,8 @@ requires = [
     'unicodecsv==0.14.1',
     'flatdict==4.0.1',
     'psutil==5.7.3',
+    'zipstream-new==1.1.7',
+    'cachetools==3.1.1',
 
     # TODO: Move to dev or test dependencies
     'freezegun',
