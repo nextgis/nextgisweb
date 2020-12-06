@@ -1,0 +1,13 @@
+.dijitClearButtonContainer {
+    float: right;
+    border-width: 0 0 0 1px !important;
+}
+
+.dijitClearButtonInner {
+    border: 1px solid #ffffff;
+    margin: 0;
+    width: 16px;
+    background: no-repeat center;
+    color: grey;
+    text-align: center;
+}
