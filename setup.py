@@ -121,6 +121,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     test_suite='nextgisweb',
+    python_requires=">=2.7.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4",
     install_requires=requires,
     extras_require=extras_require,
     tests_require=['nose', ],
