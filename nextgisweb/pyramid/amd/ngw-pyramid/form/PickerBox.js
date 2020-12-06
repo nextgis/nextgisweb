@@ -5,7 +5,9 @@ define([
     "dojo/when",
     "dojo/json",
     "dijit/form/MappedTextBox",
-    "dojo/text!./template/PickerBox.html"
+    "dojo/text!./template/PickerBox.html",
+    // css
+    "xstyle/css!./resource/PickerBox.css"
 ], function (
     declare,
     lang,
@@ -58,8 +60,12 @@ define([
             return this._value;
         },
 
-        _buttonClick: function () {
+        _selectButtonClick: function () {
             this.emit("pick", {});
+        },
+
+        _clearButtonClick: function () {
+            this.emit("pick", null)
         }
     });
 });

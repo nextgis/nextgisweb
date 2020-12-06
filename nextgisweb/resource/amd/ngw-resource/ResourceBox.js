@@ -13,6 +13,9 @@ define([
             this.inherited(arguments);
             this.picker = new ResourcePicker({cls: this.cls, interface: this.interface, dialogTitle: this.dialogTitle });
             this.store = this.picker.tree.store;
+            if (this.required) {
+                this._clearButtonNode.style.display = 'none';
+            }
         },
 
         getLabel: function (value) {
@@ -30,7 +33,7 @@ define([
             return this.inherited(arguments);
         },
 
-        _buttonClick: function () {
+        _selectButtonClick: function () {
             if (this.disabled) {
                 return;
             }
@@ -41,6 +44,14 @@ define([
                     resource: itm
                 });
             }));
+        },
+
+        _clearButtonClick: function () {
+            if (this.disabled) {
+                return;
+            }
+            this.inherited(arguments);
+            this.set("value", null);
         }
     });
 });

@@ -1,18 +1,25 @@
 <div class="dijit dijitReset dijitInline dijitLeft"
     role="combobox"
     aria-haspopup="true"
-    data-dojo-attach-point="_popupStateNode"
-    ><div class='dijitReset dijitRight dijitButtonNode dijitArrowButton dijitArrowButtonContainer'
-        data-dojo-attach-point="_buttonNode" role="presentation"
-        data-dojo-attach-event="click: _buttonClick"
-        ><input class="dijitReset dijitInputField dijitArrowButtonInner" value="&#9660; " type="text" tabIndex="-1" readonly="readonly" role="button presentation" aria-hidden="true"
-            ${_buttonInputDisabled}
-    /></div
-    ><div class='dijitReset dijitValidationContainer'
-        ><input class="dijitReset dijitInputField dijitValidationIcon dijitValidationInner" value="&#935; " type="text" tabIndex="-1" readonly="readonly" role="presentation"
-    /></div
-    ><div class="dijitReset dijitInputField dijitInputContainer"
-        ><input class='dijitReset dijitInputInner' ${!nameAttrSetting} type="text" autocomplete="off"
-            data-dojo-attach-point="textbox,focusNode" role="textbox"
-    /></div
-></div>
+    data-dojo-attach-point="_popupStateNode">
+
+    <div class='dijitReset dijitRight dijitButtonNode dijitArrowButton dijitArrowButtonContainer'
+        data-dojo-attach-point="_selectButtonNode" role="presentation"
+        data-dojo-attach-event="click: _selectButtonClick">
+        <input class="dijitReset dijitInputField dijitArrowButtonInner" value="&#9660; " type="text" tabIndex="-1" readonly="readonly" role="button presentation" aria-hidden="true"
+            ${_buttonInputDisabled}/>
+    </div>
+    <div class='dijitReset dijitRight dijitButtonNode dijitClearButtonContainer'
+        data-dojo-attach-point="_clearButtonNode"
+        data-dojo-attach-event="click: _clearButtonClick">
+        <input class="dijitReset dijitInputField dijitClearButtonInner" value="&#10799;" type="text" tabIndex="-1" readonly="readonly" role="button" aria-hidden="true"
+            ${_buttonInputDisabled}/>
+    </div>
+    <div class='dijitReset dijitValidationContainer'>
+        <input class="dijitReset dijitInputField dijitValidationIcon dijitValidationInner" value="&#935; " type="text" tabIndex="-1" readonly="readonly" role="presentation"/>
+    </div>
+    <div class="dijitReset dijitInputField dijitInputContainer">
+        <input class='dijitReset dijitInputInner' ${!nameAttrSetting} type="text" autocomplete="off"
+            data-dojo-attach-point="textbox,focusNode" role="textbox"/>
+    </div>
+</div>
