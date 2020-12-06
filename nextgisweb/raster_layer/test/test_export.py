@@ -61,7 +61,7 @@ def test_export_srs(epsg, ngw_webtest_app, raster_layer_id):
 
 @pytest.mark.parametrize("format", [
     "GTiff", "RMF",
-    pytest.param("HFA", marks=pytest.mark.skip(
+    pytest.param("HFA", marks=pytest.mark.skipif(
         gdal.VersionInfo() <= '2400000',
         reason="Broken on GDAL <= 2.4"))
 ])
