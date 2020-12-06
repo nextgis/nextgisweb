@@ -13,6 +13,11 @@ except CalledProcessError:
     gv = None
 
 requires = [
+    # Do not use a specific version of system-like packages because their presence is expected
+    'pip',
+    'six',
+
+    # Other dependencies
     'alembic==1.4.2',
     'pyramid==1.10.1',
     'SQLAlchemy==1.2.16',
@@ -41,9 +46,7 @@ requires = [
     'sentry-sdk==0.14.3',
     'python-magic==0.4.15',
     'backports.tempfile==1.0',
-    'pip==19.2.3',  # https://github.com/pypa/pip/issues/7209
     'pyproj==2.2.2',
-    'six',
     'elasticsearch>=7.0.0,<8.0.0',
     'elasticsearch-dsl>=7.1.0,<8.0.0',
     'unicodecsv==0.14.1',
