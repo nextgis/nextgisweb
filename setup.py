@@ -31,7 +31,7 @@ requires = [
     'bunch==1.0.1',
     'flufl.enum==4.1.1',
     'waitress==1.2.0',
-    'pygdal' + (('==%s.*' % gv) if gv else ''),
+    'pygdal>=2.3.0' + ((',==%s.*' % gv) if gv else ''),
     'psycopg2==2.8.5',
     'geoalchemy2==0.5.0',
     'shapely==1.6.4.post2',
