@@ -14,6 +14,7 @@ from pyramid.renderers import render as render_template
 from pyramid.httpexceptions import HTTPBadRequest
 
 from ..render import ILegendableStyle
+from ..lib.ows import parse_request
 from ..resource import (
     Resource, Widget, resource_factory,
     ServiceScope, DataScope)
@@ -41,7 +42,8 @@ class ServiceWidget(Widget):
 def handler(obj, request):
     request.resource_permission(ServiceScope.connect)
 
-    params = dict((k.upper(), v) for k, v in request.params.items())
+    params, root_body = parse_request(request)
+
     req = params.get('REQUEST', '').upper()
     service = params.get('SERVICE', '').upper()
 

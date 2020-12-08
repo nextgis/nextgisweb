@@ -3,8 +3,11 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 
 import re
 
+from zope.interface import implementer
+
 from .. import db
 from ..core.exception import ValidationError
+from ..lib.ows import IOWService
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -20,6 +23,7 @@ Base = declarative_base()
 keyname_pattern = re.compile(r'^[A-Za-z][\w]*$')
 
 
+@implementer(IOWService)
 class Service(Base, Resource):
     identity = 'wfsserver_service'
     cls_display_name = _("WFS service")

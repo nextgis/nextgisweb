@@ -16,6 +16,7 @@ from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..geometry import box, geom_from_wkb
 from ..layer import IBboxLayer
+from ..lib.ows import parse_request, get_work_version
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
@@ -139,34 +140,14 @@ class WFSHandler():
         self.resource = resource
         self.request = request
 
-        if self.request.method == 'GET':
-            params = request.params
-        elif self.request.method == 'POST':
-            parser = etree.XMLParser(recover=True)
-            self.root_body = etree.parse(BytesIO(self.request.body), parser=parser).getroot()
-            params = self.root_body.attrib
-        else:
+        if self.request.method not in ('GET', 'POST'):
             raise ValidationError("Unsupported request method")
 
-        # 6.2.5.2 Parameter names shall not be case sensitive
-        params = dict((k.upper(), v) for k, v in params.items())
+        params, self.root_body = parse_request(request)
 
-        self.p_request = params.get('REQUEST') if self.request.method == 'GET' \
-            else ns_trim(self.root_body.tag)
+        self.p_request = params.get('REQUEST')
 
-        av = params.get('ACCEPTVERSIONS')
-        self.p_acceptversions = None if av is None else sorted(av.split(','), reverse=True)
-
-        self.p_version = params.get('VERSION')
-        if self.p_version is None:
-            if self.p_acceptversions is not None:
-                for version in self.p_acceptversions:
-                    if version in VERSION_SUPPORTED:
-                        self.p_version = version
-                        break
-            else:
-                self.p_version = VERSION_DEFAULT
-
+        self.p_version = get_work_version(params.get('VERSION'), params.get('ACCEPTVERSIONS'), VERSION_SUPPORTED, VERSION_DEFAULT)
         if self.p_version not in VERSION_SUPPORTED:
             raise ValidationError("Unsupported version")
 

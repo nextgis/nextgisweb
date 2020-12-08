@@ -2,7 +2,10 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 from sqlalchemy.ext.orderinglist import ordering_list
+from zope.interface import implementer
+
 from .. import db
+from ..lib.ows import IOWService
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -16,6 +19,7 @@ from .util import _
 Base = declarative_base()
 
 
+@implementer(IOWService)
 class Service(Base, Resource):
     identity = 'wmsserver_service'
     cls_display_name = _("WMS service")
