@@ -13,6 +13,7 @@ from pyramid.response import Response
 from pyramid.renderers import render as render_template
 from pyramid.httpexceptions import HTTPBadRequest
 
+from ..render import ILegendableStyle
 from ..resource import (
     Resource, Widget, resource_factory,
     ServiceScope, DataScope)
@@ -273,6 +274,11 @@ def _get_legend_graphic(obj, request):
     layer = lmap[p_layer]
 
     request.resource_permission(DataScope.read, layer.resource)
+
+    if not ILegendableStyle.providedBy(ILegendableStyle):
+        return _exception(
+            exception="Legend is not available for this layer",
+            code=None, request=request)
 
     img = layer.resource.render_legend()
 
