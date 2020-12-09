@@ -57,7 +57,7 @@ class Connection(Base, Resource):
     apikey = db.Column(db.Unicode)
     apikey_param = db.Column(db.Unicode)
     scheme = db.Column(db.Enum(*SCHEME.enum), nullable=False, default=SCHEME.XYZ)
-    verify = db.Column(db.Boolean, nullable=False, default=True)
+    skip_verify = db.Column(db.Boolean, nullable=False, default=False)
 
     @classmethod
     def check_parent(cls, parent):
@@ -86,7 +86,7 @@ class Connection(Base, Resource):
             params=self.query_params,
             headers=env.tmsclient.headers,
             timeout=env.tmsclient.options['timeout'],
-            verify=self.verify
+            verify=not self.skip_verify
         )
 
         if result.status_code == 200:
@@ -127,7 +127,7 @@ class ConnectionSerializer(Serializer):
     apikey = SP(**_defaults)
     apikey_param = SP(**_defaults)
     scheme = SP(**_defaults)
-    verify = SP(**_defaults)
+    skip_verify = SP(**_defaults)
 
     capmode = _capmode_attr(**_defaults)
 
