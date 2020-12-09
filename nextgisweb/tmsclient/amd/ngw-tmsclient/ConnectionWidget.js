@@ -15,6 +15,7 @@ define([
     // template
     "dijit/form/ValidationTextBox",
     "dijit/form/Select",
+    "dijit/form/CheckBox",
     "dojox/layout/TableContainer"
 ], function (
     declare,
