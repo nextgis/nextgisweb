@@ -4,7 +4,7 @@ from io import BytesIO
 from six.moves.urllib.parse import urlparse
 
 import PIL
-from osgeo import osr, ogr
+from osgeo import osr, ogr, gdal
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from zope.interface import implementer
 
@@ -220,11 +220,15 @@ class Layer(Base, Resource, SpatialLayerMixin):
             )
 
         dst_osr = osr.SpatialReference()
+        if gdal.__version__ >= '3.0.0':
+            dst_osr.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
         dst_osr.ImportFromWkt(self.srs.wkt)
 
         extent_max = prepare_geog_extent((self.extent_left, self.extent_bottom, self.extent_right, self.extent_top))
         if self.srs.id != 4326:
             wgs84_osr = osr.SpatialReference()
+            if gdal.__version__ >= '3.0.0':
+                wgs84_osr.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
             wgs84_osr.ImportFromEPSG(4326)
             extent_max = transform_extent(extent_max, wgs84_osr, dst_osr)
 
@@ -233,6 +237,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         if srs.id != self.srs.id:
             req_osr = osr.SpatialReference()
+            if gdal.__version__ >= '3.0.0':
+                req_osr.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
             req_osr.ImportFromWkt(srs.wkt)
             extent = transform_extent(extent, req_osr, dst_osr)
 
