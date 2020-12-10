@@ -73,6 +73,7 @@ Render
     :query z: zoom level
     :query x: tile number on x axis (horizontal)
     :query y: tile number on y axis (vertical)
+    :query cache: optional parameter (defaults true). If value set false tile will render from scratch
     :query nd: Return code if tile not present. Available values are: 204, 404, 200. Defaults to 200.
     :statuscode 200: no error
     :statuscode 204: no tile
@@ -90,6 +91,7 @@ Render
     :query id1, id2: style resources id's
     :query minx, miny, maxx, maxy: image spatial extent
     :query width, height: output image size
+    :query cache: optional parameter (defaults true). If value set false tile will render from scratch
     :statuscode 200: no error
 
 .. note:: Styles order should be from lower to upper.
