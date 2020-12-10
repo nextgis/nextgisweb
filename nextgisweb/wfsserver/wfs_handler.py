@@ -318,19 +318,20 @@ class WFSHandler():
             version=self.p_version,
             xmlns=nsmap('wfs', self.p_version)['ns']))
 
+        wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id)
+
         # Service
         __s = El('Service', parent=root)
         El('Name', parent=__s, text=self.resource.keyname or 'WFS')
         El('Title', parent=__s, text=self.title)
         El('Abstract', parent=__s, text=self.abstract)
-        El('OnlineResource', parent=__s)
+        El('OnlineResource', text=wfs_url, parent=__s)
 
         # Operations
         __c = El('Capability', parent=root)
         __r = El('Request', parent=__c)
 
-            wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id) + '?'
-            for wfs_operation in (
+        for wfs_operation in (
             GET_CAPABILITIES,
             DESCRIBE_FEATURE_TYPE,
             GET_FEATURE,
@@ -343,9 +344,12 @@ class WFSHandler():
             if wfs_operation == GET_FEATURE:
                 __format = El('ResultFormat', parent=__wfs_op)
                 El(self.gml_format, parent=__format)
-            for request_method in ('Get', 'Post'):
+
             __dcp = El('DCPType', parent=__wfs_op)
             __http = El('HTTP', parent=__dcp)
+            for request_method in ('Get', 'Post'):
+                if wfs_operation == TRANSACTION and request_method != 'Post':
+                    continue
                 El(request_method, dict(onlineResource=wfs_url), parent=__http)
 
         # FeatureTypeList
