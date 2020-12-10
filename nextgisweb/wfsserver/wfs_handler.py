@@ -304,16 +304,13 @@ class WFSHandler():
         resid_tag = 'ResourceId' if v_gt200 else 'FeatureId'
         resid_attr = 'rid' if v_gt200 else 'fid'
 
-        fid = None
+        fids = list()
         for __el in __filter:
             if ns_trim(__el.tag) == resid_tag:
-                if fid is not None:
-                    raise ValueError("Multiple feature ID filter not supported.")
-                else:
-                    fid = fid_decode(__el.get(resid_attr), keyname)
+                fids.append(fid_decode(__el.get(resid_attr), keyname))
             else:
                 raise ValueError("Filter element '%s' not supported." % __el.tag)
-        return fid
+        return fids
 
     def _get_capabilities(self):
         EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)['ns']))
@@ -332,8 +329,8 @@ class WFSHandler():
         __c = El('Capability', parent=root)
         __r = El('Request', parent=__c)
 
-        wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id) + '?'
-        for wfs_operation in (
+            wfs_url = self.request.route_url('wfsserver.wfs', id=self.resource.id) + '?'
+            for wfs_operation in (
             GET_CAPABILITIES,
             DESCRIBE_FEATURE_TYPE,
             GET_FEATURE,
@@ -347,8 +344,8 @@ class WFSHandler():
                 __format = El('ResultFormat', parent=__wfs_op)
                 El(self.gml_format, parent=__format)
             for request_method in ('Get', 'Post'):
-                __dcp = El('DCPType', parent=__wfs_op)
-                __http = El('HTTP', parent=__dcp)
+            __dcp = El('DCPType', parent=__wfs_op)
+            __http = El('HTTP', parent=__dcp)
                 El(request_method, dict(onlineResource=wfs_url), parent=__http)
 
         # FeatureTypeList
@@ -543,9 +540,9 @@ class WFSHandler():
         if __query is not None:
             __filters = find_tags(__query, 'Filter')
             if len(__filters) == 1:
-                fid = self._parse_filter(__filters[0], layer.keyname)
-                if fid is not None:
-                    query.filter_by(id=fid)
+                fids = self._parse_filter(__filters[0], layer.keyname)
+                if len(fids) > 0:
+                    query.filter(('id', 'in', ','.join((str(fid) for fid in fids))))
 
         def parse_srs(value):
             # 'urn:ogc:def:crs:EPSG::3857' -> 3857
@@ -708,13 +705,13 @@ class WFSHandler():
                 feature_layer = find_layer(keyname)
 
                 _filter = find_tags(_operation, 'Filter')[0]
-                fid = self._parse_filter(_filter, keyname)
-                if fid is None:
+                fids = self._parse_filter(_filter, keyname)
+                if len(fids) == 0:
                     raise ValueError("Feature ID filter must be specified.")
 
                 if operation_tag == 'Update':
                     query = feature_layer.feature_query()
-                    query.filter_by(id=fid)
+                    query.filter(('id', 'in', ','.join((str(fid) for fid in fids))))
                     feature = query().one()
                     for _property in find_tags(_operation, 'Property'):
                         key = find_tags(_property, 'Name')[0].text
@@ -739,7 +736,8 @@ class WFSHandler():
                     if show_summary:
                         summary['totalUpdated'] += 1
                 elif operation_tag == 'Delete':
-                    feature_layer.feature_delete(fid)
+                    for fid in fids:
+                        feature_layer.feature_delete(fid)
                     if show_summary:
                         summary['totalDeleted'] += 1
                 else:
