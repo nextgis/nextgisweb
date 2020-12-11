@@ -184,7 +184,7 @@ Delete previously created user:
 
 .. sourcecode:: http
  
-    DETELE /api/component/auth/user/10
+    DELETE /api/component/auth/user/10
     
 To get current user details execute following request:
 
