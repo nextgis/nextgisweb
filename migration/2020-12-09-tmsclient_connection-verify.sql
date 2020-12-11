@@ -1,2 +1,2 @@
-ALTER TABLE public.tmsclient_connection
-    ADD COLUMN skip_verify boolean NOT NULL DEFAULT false;
+ALTER TABLE tmsclient_connection
+    ADD COLUMN insecure boolean NOT NULL DEFAULT false;
