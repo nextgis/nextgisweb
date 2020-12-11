@@ -12,6 +12,7 @@ from zope.interface import implementer
 from collections import OrderedDict
 from osgeo import gdal, gdalconst, osr, ogr
 
+from ..lib.osrhelper import traditional_axis_mapping
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -187,6 +188,10 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         src_osr.ImportFromEPSG(int(self.srs.id))
         dst_osr.ImportFromEPSG(4326)
+
+        traditional_axis_mapping(src_osr)
+        traditional_axis_mapping(dst_osr)
+
         coordTrans = osr.CoordinateTransformation(src_osr, dst_osr)
 
         ds = self.gdal_dataset()
