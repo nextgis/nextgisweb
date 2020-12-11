@@ -12,9 +12,6 @@ from .wfs_handler import WFSHandler
 from .model import Service
 
 
-NS_XLINK = 'http://www.w3.org/1999/xlink'
-
-
 def wfs(resource, request):
     try:
         request.resource_permission(ServiceScope.connect)
