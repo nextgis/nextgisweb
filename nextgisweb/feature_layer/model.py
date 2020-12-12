@@ -46,6 +46,10 @@ class LayerField(Base):
         'polymorphic_identity': identity,
         'polymorphic_on': cls
     }
+    __table_args__ = (
+        db.UniqueConstraint(layer_id, keyname),
+        db.UniqueConstraint(layer_id, display_name),
+    )
 
     layer = db.relationship(
         Resource,
