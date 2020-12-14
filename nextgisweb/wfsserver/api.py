@@ -4,16 +4,19 @@ import sys
 import six
 
 from pyramid.response import Response
-from pyramid.exception import json_error
 
+from ..pyramid.exception import json_error
 from ..resource import resource_factory, ServiceScope
-from ..core.exception import InsufficientPermissions
+from ..core.exception import InsufficientPermissions, UserException
 
 from .wfs_handler import WFSHandler
 from .model import Service
 
 
 def wfs(resource, request):
+    # TODO: Remove test exception
+    raise UserException("Test exception")
+
     try:
         request.resource_permission(ServiceScope.connect)
     except InsufficientPermissions:
@@ -37,6 +40,9 @@ def wfs(resource, request):
 
 
 def error_renderer(request, err_info, exc, exc_info, debug=True):
+    # TODO: Remove test exception
+    return Response(str(exc), content_type='text/plain')
+
     _json_error = json_error(request, err_info, exc, exc_info, debug=debug)
     err_title = _json_error['title']
     err_message  = _json_error['message']

@@ -24,7 +24,7 @@ from ..compat import lru_cache
 from . import exception
 from .session import WebSession
 from .renderer import json_renderer
-from .util import _, pip_freeze
+from .util import _, pip_freeze, ErrorRendererPredicate
 
 _logger = logging.getLogger(__name__)
 
@@ -249,10 +249,17 @@ def setup_pyramid(comp, config):
     comp.error_handlers = list()
     @comp.error_handlers.append
     def error_renderer_handler(request, err_info, exc, exc_info):
-        # TODO
-        if hasattr(request, 'error_renderer'):
-            return request.error_renderer(
-                request, err_info, exc, exc_info, debug=is_debug)
+        error_renderer = None
+
+        mroute = request.matched_route
+        if mroute is not None:
+            for predicate in mroute.predicates:
+                if isinstance(predicate, ErrorRendererPredicate):
+                    error_renderer = predicate.val
+                    break
+
+        if error_renderer is not None:
+            return error_renderer(request, err_info, exc, exc_info, debug=is_debug)
 
     @comp.error_handlers.append
     def api_error_handler(request, err_info, exc, exc_info):
