@@ -5,9 +5,7 @@ from lxml import etree
 
 from six import BytesIO
 
-from .interface import IOWService
-
-__all__ = ['parse_request', 'IOWService', 'get_exception_template']
+__all__ = ['parse_request', 'get_exception_template']
 
 
 def _ns_trim(value):
@@ -50,4 +48,4 @@ def get_work_version(p_version, p_acceptversions, version_supported, version_def
     return version if version in version_supported else None
 
 
-from .exception import get_exception_template
+#from .exception import get_exception_template

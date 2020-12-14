@@ -18,7 +18,6 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from .. import dynmenu as dm
 from ..core.exception import UserException
-from ..lib.ows import IOWService
 from ..package import amd_packages
 from ..compat import lru_cache
 
@@ -249,9 +248,10 @@ def setup_pyramid(comp, config):
 
     comp.error_handlers = list()
     @comp.error_handlers.append
-    def ows_error_handler(request, err_info, exc, exc_info):
-        if hasattr(request, 'context') and IOWService.providedBy(request.context):
-            return exception.ows_error_response(
+    def error_renderer_handler(request, err_info, exc, exc_info):
+        # TODO
+        if hasattr(request, 'error_renderer'):
+            return request.error_renderer(
                 request, err_info, exc, exc_info, debug=is_debug)
 
     @comp.error_handlers.append

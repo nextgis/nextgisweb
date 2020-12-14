@@ -54,6 +54,22 @@ class ClientRoutePredicate(object):
         return "<client>"
 
 
+class ErrorRendererPredicate(object):
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return 'error_renderer'
+
+    phash = text
+
+    def __call__(self, context, request):
+        return True
+
+    def __repr__(self):
+        return "<error_renderer>"
+
+
 def gensecret(length):
     symbols = string.ascii_letters + string.digits
     return ''.join([

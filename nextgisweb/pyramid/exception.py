@@ -18,7 +18,6 @@ from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
 
 from ..core.exception import IUserException, user_exception
-from ..lib.ows import get_exception_template
 from .util import _
 
 
@@ -171,26 +170,6 @@ def json_error(request, err_info, exc, exc_info, debug=True):
                 for itm in tb]
 
     return result
-
-
-def ows_error_response(request, err_info, exc, exc_info, debug=True):
-    _json_error = json_error(request, err_info, exc, exc_info, debug=debug)
-    err_title = _json_error['title']
-    err_message  = _json_error['message']
-
-    if err_title is not None and err_message is not None:
-        exception = '%s: %s' % (err_title, err_message)
-    elif err_message is not None:
-        exception = err_message
-    else:
-        exception = "Unknown error"
-
-    template = get_exception_template(request)
-    xml = render_template(template, dict(code=None, exception=exception), request=request)
-
-    return Response(
-        xml, content_type='application/xml', charset='utf-8',
-        status_code=_json_error['status_code'])
 
 
 def json_error_response(request, err_info, exc, exc_info, debug=True):
