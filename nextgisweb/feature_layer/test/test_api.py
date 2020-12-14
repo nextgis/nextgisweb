@@ -160,3 +160,39 @@ def test_cdelete(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     assert resp.json
 
     assert ngw_webtest_app.get(url).json == []
+
+
+def test_fields_unique(ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
+    url = '/api/resource/'
+
+    fields = [dict(
+        keyname='keyname1',
+        display_name='display_name1',
+        datatype='STRING'
+    ), dict(
+        keyname='keyname1',
+        display_name='display_name2',
+        datatype='STRING'
+    )]
+
+    body = dict(
+        resource=dict(
+            cls='vector_layer',
+            parent=dict(id=ngw_resource_group),
+            display_name='layer_fields_unique'
+        ),
+        vector_layer=dict(
+            srs=dict(id=3857),
+            geometry_type='POINT',
+            fields=fields
+        )
+    )
+
+    ngw_webtest_app.post_json(url, body, status=422)
+
+    fields[1]['keyname'] = 'keyname2'
+    fields[1]['display_name'] = 'display_name1'
+    ngw_webtest_app.post_json(url, body, status=422)
+
+    fields[1]['display_name'] = 'display_name2'
+    ngw_webtest_app.post_json(url, body, status=200)
