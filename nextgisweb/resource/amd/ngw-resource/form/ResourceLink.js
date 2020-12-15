@@ -19,6 +19,9 @@ define([
         templateString: template,
 
         _setValueAttr: function (id) {
+            if (typeof id !== 'number') {
+                return;
+            }
             this.link.href = route.resource.show({id: id});
             xhr.get(route.resource.item({id: id}), {
                 handleAs: "json",
