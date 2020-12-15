@@ -16,7 +16,9 @@ Changes
 - Support for ``like``, ``geom`` and ``extensions`` in feature layer REST API.
 - Support for GeoJSON files in ZIP-archive and faster ZIP-archive unpacking.
 - Lookup table component is part of ``nextgisweb`` core package ``nextgisweb``.
+- Ability to disable SSL certificate check for TMS connection.
 - Fix TMS layer tile composition in case of extent outside the bounds.
+- Fix GDAL > 3 compability issues, including axis orientation.
 - SVG marker library resource available to renderers.
 
 3.5.0
