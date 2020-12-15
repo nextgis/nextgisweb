@@ -164,6 +164,33 @@ class WFSHandler():
         self.service_namespace = self.request.route_url(
             'wfsserver.wfs', id=self.resource.id)
 
+    @staticmethod
+    def exception_response(request, err_title, err_message):
+        if err_title is not None and err_message is not None:
+            message = '%s: %s' % (err_title, err_message)
+        elif err_message is not None:
+            message = err_message
+        else:
+            message = "Unknown error"
+
+        params, root_body = parse_request(request)
+        version = get_work_version(params.get('VERSION'), params.get('ACCEPTVERSIONS'), \
+            VERSION_SUPPORTED, VERSION_DEFAULT)
+
+        if version >= v200:
+            root = El('ExceptionReport', dict(
+                version=version,
+                xmlns=nsmap('ows', version)['ns']))
+            _exc = El('Exception', parent=root)
+            El('ExceptionText', parent=_exc, text=message)
+        else:
+            root = El('ServiceExceptionReport', dict(
+                version='1.2.0',
+                xmlns=nsmap('ogc', version)['ns']))
+            El('ServiceException', parent=root, text=message)
+
+        return etree.tostring(root)
+
     @property
     def title(self):
         return self.resource.display_name

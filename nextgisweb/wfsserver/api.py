@@ -8,15 +8,13 @@ from pyramid.response import Response
 from ..pyramid.exception import json_error
 from ..resource import resource_factory, ServiceScope
 from ..core.exception import InsufficientPermissions, UserException
+from ..lib.ows import parse_request, get_work_version
 
 from .wfs_handler import WFSHandler
 from .model import Service
 
 
 def wfs(resource, request):
-    # TODO: Remove test exception
-    raise UserException("Test exception")
-
     try:
         request.resource_permission(ServiceScope.connect)
     except InsufficientPermissions:
@@ -40,22 +38,10 @@ def wfs(resource, request):
 
 
 def error_renderer(request, err_info, exc, exc_info, debug=True):
-    # TODO: Remove test exception
-    return Response(str(exc), content_type='text/plain')
-
     _json_error = json_error(request, err_info, exc, exc_info, debug=debug)
-    err_title = _json_error['title']
-    err_message  = _json_error['message']
 
-    if err_title is not None and err_message is not None:
-        exception = '%s: %s' % (err_title, err_message)
-    elif err_message is not None:
-        exception = err_message
-    else:
-        exception = "Unknown error"
-
-    #template = get_exception_template(request)
-    #xml = render_template(template, dict(code=None, exception=exception), request=request)
+    xml = WFSHandler.exception_response(
+        request, _json_error.get('title'), _json_error.get('message'))
 
     return Response(
         xml, content_type='application/xml', charset='utf-8',

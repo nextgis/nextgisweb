@@ -46,6 +46,3 @@ def get_work_version(p_version, p_acceptversions, version_supported, version_def
             version = version_default
 
     return version if version in version_supported else None
-
-
-#from .exception import get_exception_template
