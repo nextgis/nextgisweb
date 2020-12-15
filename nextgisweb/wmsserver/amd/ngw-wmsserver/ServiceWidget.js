@@ -18,6 +18,7 @@ define([
     "dojo/text!./template/ServiceWidget.hbs",
     // template
     "ngw-resource/ResourcePicker",
+    "ngw-resource/form/ResourceLink",
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
     "dijit/layout/BorderContainer",
@@ -146,6 +147,7 @@ define([
                     widget.widgetItemDisplayName.set("value", widget.getItemValue("display_name"));
                     widget.wLayerMinScale.set("value", widget.getItemValue("min_scale_denom"));
                     widget.wLayerMaxScale.set("value", widget.getItemValue("max_scale_denom"));
+                    widget.widgetItemLink.set("value", widget.getItemValue("resource_id"));
 
                     // Initially the side panel with current element properties is 
                     // hidden. As the element is selected - open it up.
