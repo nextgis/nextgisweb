@@ -29,7 +29,6 @@ define([
     "dgrid/Keyboard",
     "dgrid/extensions/DnD",
     "dgrid/extensions/DijitRegistry",
-    "ngw/route",
     "ngw-resource/serialize",
     "ngw-resource/ResourcePicker",
     "ngw-pyramid/i18n!webmap",
@@ -49,6 +48,7 @@ define([
     "dijit/form/NumberTextBox",
     "dijit/form/Select",
     "ngw-resource/Tree",
+    "ngw-resource/form/ResourceLink",
 
     //css
     "xstyle/css!./template/resources/ItemWidget.css"
@@ -82,7 +82,6 @@ define([
     Keyboard,
     DnD,
     DijitRegistry,
-    route,
     serialize,
     ResourcePicker,
     i18n,
@@ -327,7 +326,6 @@ define([
                             "item_type": "layer",
                             "display_name": itm.display_name,
                             "layer_style_id": itm.id,
-                            "layer_style_url": this.iurl(itm.id),
                             "layer_enabled": false,
                             "layer_transparency": null,
                             "layer_min_scale_denom": null,
@@ -369,7 +367,7 @@ define([
                         widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale_denom"));
                         widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale_denom"));
                         widget.wLayerAdapter.set("value", widget.getItemValue("layer_adapter"));
-                        widget.wLayerStyle.set("value", widget.getItemValue("layer_style_url"));
+                        widget.wLayerStyle.set("value", widget.getItemValue("layer_style_id"));
                     }
 
                     // Initially the side panel with current element properties is 
@@ -481,9 +479,6 @@ define([
                     var element = {};
                     for (var key in i) {
                         if (key !== "children") { element[key] = i[key]; }
-                        if (key == "layer_style_id") {
-                            element.layer_style_url = widget.iurl(i[key]);
-                        }
                     }
                     var new_item = widget.itemStore.newItem(element, {parent: parent, attribute: "children"});
                     if (i.children) { traverse(i, new_item); }
@@ -491,12 +486,6 @@ define([
             }
             traverse(value, this.itemModel.root);
             this.layerOrder.set("enabled", data.webmap.draw_order_enabled);
-        },
-
-        iurl: function (id) {
-            return route.resource.show({
-                id: id
-            });
         }
     });
 });
