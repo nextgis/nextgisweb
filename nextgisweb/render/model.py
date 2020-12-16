@@ -3,10 +3,12 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 from datetime import datetime, timedelta
 from uuid import uuid4
 from os import makedirs
+from threading import Thread
 from errno import EEXIST
 import os.path
 import sqlite3
 from io import BytesIO
+from Queue import Queue
 
 from PIL import Image
 from sqlalchemy import MetaData, Table
@@ -32,6 +34,42 @@ TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 Base = declarative_base(dependencies=('resource', ))
 
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
+
+
+class TilestorWriter:
+    __instance = None
+    def __init__(self):
+        if TilestorWriter.__instance is None:
+            self.queue = Queue()
+            self._worker = Thread(target=self._job)
+            self._worker.daemon = True
+            self._worker.start()
+
+    @classmethod
+    def getInstance(cls):
+        if cls.__instance is None:
+            cls.__instance = TilestorWriter()
+        return cls.__instance
+
+    def _job(self):
+        while True:
+            data = self.queue.get()
+            tilestor = data['tilestor']
+            z, x, y = data['z'], data['x'], data['y']
+
+            tilestor.execute(
+                "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
+                (z, x, y))
+
+            try:
+                tilestor.execute(
+                    "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
+                    (z, x, y, data['tstamp'], data['value']))
+
+            except sqlite3.IntegrityError:
+                # NOTE: Race condition with other proccess may occurs here.
+                # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
+                pass
 
 
 class ResourceTileCache(Base):
@@ -97,11 +135,13 @@ class ResourceTileCache(Base):
         if self._tilestor is None:
             try:
                 p = self.tilestor_path(create=False)
-                self._tilestor = sqlite3.connect(p, isolation_level=None)
+                self._tilestor = sqlite3.connect(
+                    p, isolation_level=None, check_same_thread=False)
             except sqlite3.OperationalError:
                 # SQLite db not found, create it
                 p = self.tilestor_path(create=True)
-                self._tilestor = sqlite3.connect(p, isolation_level=None)
+                self._tilestor = sqlite3.connect(
+                    p, isolation_level=None, check_same_thread=False)
 
             self._tilestor.text_factory = bytes
             cur = self._tilestor.cursor()
@@ -187,19 +227,10 @@ class ResourceTileCache(Base):
             buf = BytesIO()
             img.save(buf, format='PNG')
 
-            self.tilestor.execute(
-                "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
-                (z, x, y))
-
-            try:
-                self.tilestor.execute(
-                    "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                    (z, x, y, tstamp, buf.getvalue()))
-
-            except sqlite3.IntegrityError:
-                # NOTE: Race condition with other proccess may occurs here.
-                # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
-                pass
+            writer = TilestorWriter.getInstance()
+            writer.queue.put(dict(
+                tilestor=self.tilestor, z=z, x=x, y=y, tstamp=tstamp, value=buf.getvalue()
+            ))
 
         conn = DBSession.connection()
         conn.execute(db.sql.text(
