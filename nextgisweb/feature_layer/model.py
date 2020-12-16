@@ -183,12 +183,12 @@ class _fields_attr(SP):
         # Check unique names
         fields_len = len(new_fields)
         for i in range(fields_len):
-            keyname = new_fields[i].get('keyname')
-            display_name = new_fields[i].get('display_name')
+            keyname = new_fields[i].keyname
+            display_name = new_fields[i].display_name
             for j in range(i+1, fields_len):
-                if keyname == new_fields[j].get('keyname'):
+                if keyname == new_fields[j].keyname:
                     raise ValidationError("Field keyname (%s) is not unique." % keyname)
-                if display_name == new_fields[j].get('display_name'):
+                if display_name == new_fields[j].display_name:
                     raise ValidationError("Field display_name (%s) is not unique." % display_name)
 
         obj.fields = new_fields
