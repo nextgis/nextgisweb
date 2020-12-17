@@ -10,6 +10,7 @@ import sqlite3
 from io import BytesIO
 from Queue import Queue
 
+import transaction
 from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
@@ -41,6 +42,8 @@ class TilestorWriter:
     def __init__(self):
         if TilestorWriter.__instance is None:
             self.queue = Queue()
+
+            self._DBSession = None
             self._worker = Thread(target=self._job)
             self._worker.daemon = True
             self._worker.start()
@@ -53,23 +56,41 @@ class TilestorWriter:
 
     def _job(self):
         while True:
+            if self._DBSession is None:
+                self._DBSession = DBSession()
+
             data = self.queue.get()
-            tilestor = data['tilestor']
             z, x, y = data['z'], data['x'], data['y']
+            tstamp = data['tstamp']
+            uuid = data['uuid']
+            color = data['color']
 
-            tilestor.execute(
-                "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
-                (z, x, y))
-
-            try:
+            tilestor = data.get('tilestor')
+            if tilestor is not None:
                 tilestor.execute(
-                    "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                    (z, x, y, data['tstamp'], data['value']))
+                    "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
+                    (z, x, y))
 
-            except sqlite3.IntegrityError:
-                # NOTE: Race condition with other proccess may occurs here.
-                # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
-                pass
+                try:
+                    tilestor.execute(
+                        "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
+                        (z, x, y, tstamp, data['value']))
+
+                except sqlite3.IntegrityError:
+                    # NOTE: Race condition with other proccess may occurs here.
+                    # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
+                    pass
+
+            with transaction.manager:
+                conn = self._DBSession.connection()
+                conn.execute(db.sql.text(
+                    'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
+                    'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
+                    'VALUES (:z, :x, :y, :color, :tstamp)'.format(uuid)
+                ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+
+                # Force zope session management to commit changes
+                mark_changed(self._DBSession)
 
 
 class ResourceTileCache(Base):
@@ -223,24 +244,22 @@ class ResourceTileCache(Base):
         if colortuple is not None:
             color = pack_color(colortuple)
 
+        params = dict(
+            z=z, x=x, y=y,
+            tstamp=tstamp,
+            uuid=self.uuid.hex,
+            color=color
+        )
+
         if color is None:
             buf = BytesIO()
             img.save(buf, format='PNG')
 
-            writer = TilestorWriter.getInstance()
-            writer.queue.put(dict(
-                tilestor=self.tilestor, z=z, x=x, y=y, tstamp=tstamp, value=buf.getvalue()
-            ))
+            params['tilestor'] = self.tilestor
+            params['value'] = buf.getvalue()
 
-        conn = DBSession.connection()
-        conn.execute(db.sql.text(
-            'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
-            'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
-            'VALUES (:z, :x, :y, :color, :tstamp)'.format(self.uuid.hex)
-        ), z=z, x=x, y=y, color=color, tstamp=tstamp)
-
-        # Force zope session management to commit changes
-        mark_changed(DBSession())
+        writer = TilestorWriter.getInstance()
+        writer.queue.put(params)
 
     def initialize(self):
         self.sameta.create_all(bind=DBSession.connection())
