@@ -42,7 +42,8 @@ class CoreComponent(Component):
         Component.initialize(self)
 
         sa_url = self._engine_url()
-        self.engine = create_engine(sa_url)
+        self.engine = create_engine(sa_url, connect_args=dict(
+            options='-c lock_timeout=5000'))
         self._sa_engine = self.engine
 
         DBSession.configure(bind=self._sa_engine)
