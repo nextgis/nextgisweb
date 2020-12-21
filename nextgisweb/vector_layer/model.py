@@ -245,9 +245,19 @@ class TableInfo(object):
         layer.geometry_type = self.geometry_type
 
         layer.fields = []
+        _keynames = []
+        _display_names = []
         for f in self.fields:
             if f.display_name is None:
                 f.display_name = f.keyname
+
+            # Check unique names
+            if f.keyname in _keynames:
+                raise ValidationError("Field keyname (%s) is not unique." % f.keyname)
+            if f.display_name in _display_names:
+                raise ValidationError("Field display_name (%s) is not unique." % f.display_name)
+            _keynames.append(f.keyname)
+            _display_names.append(f.display_name)
 
             field = VectorLayerField(
                 keyname=f.keyname,

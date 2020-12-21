@@ -188,12 +188,11 @@ def test_fields_unique(ngw_webtest_app, ngw_auth_administrator, ngw_resource_gro
         )
     )
 
-    # FIXME: 500 error
-    # ngw_webtest_app.post_json(url_create, body_create, status=422)
+    ngw_webtest_app.post_json(url_create, body_create, status=422)
 
     fields[1]['keyname'] = 'keyname2'
     fields[1]['display_name'] = 'display_name1'
-    # ngw_webtest_app.post_json(url_create, body_create, status=422)
+    ngw_webtest_app.post_json(url_create, body_create, status=422)
 
     fields[1]['display_name'] = 'display_name2'
     res = ngw_webtest_app.post_json(url_create, body_create, status=201)
