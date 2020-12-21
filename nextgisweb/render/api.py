@@ -211,7 +211,7 @@ def image(request):
                         rimg = Image.new('RGBA', p_size)
 
                     if tdi:
-                        msg='CACHED'
+                        msg = 'CACHED'
                         if timg is None:
                             timg = Image.new('RGBA', p_size)
                             msg += ' EMPTY'

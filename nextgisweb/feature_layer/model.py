@@ -185,7 +185,7 @@ class _fields_attr(SP):
         for i in range(fields_len):
             keyname = new_fields[i].keyname
             display_name = new_fields[i].display_name
-            for j in range(i+1, fields_len):
+            for j in range(i + 1, fields_len):
                 if keyname == new_fields[j].keyname:
                     raise ValidationError("Field keyname (%s) is not unique." % keyname)
                 if display_name == new_fields[j].display_name:

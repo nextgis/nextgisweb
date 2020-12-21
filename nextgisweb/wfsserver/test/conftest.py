@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import pytest
 
+
 @pytest.fixture(scope='function', autouse=True)
 def force_schema_validation(ngw_env):
     comp = ngw_env.wfsserver

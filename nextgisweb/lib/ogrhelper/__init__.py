@@ -34,7 +34,7 @@ def read_layer_features(layer, geometry_format=None):
         yield (
             feat.GetFID(), geom, [
                 (fname, fget(feat, fidx) if not feat.IsFieldNull(fidx) else None)
-                for (fidx, fname, fget) in fieldmap
+                for (fidx, fname, fget) in fieldmap  # NOQA: F812
             ]
         )
 
