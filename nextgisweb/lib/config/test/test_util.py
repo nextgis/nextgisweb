@@ -22,9 +22,9 @@ def test_environ_substitution():
         environ_substitution(items, {'BAR': 'Tom'})
     assert items['two'] == "Bye, Tom!"
 
-    with pytest.raises(KeyError):
-        items['three'] = "${MISSING}"
-        environ_substitution(items, {})
+    items['three'] = "${MISSING}"
+    environ_substitution(items, {})
+    assert items['three'] == "${MISSING}"
 
 
 def test_load_config():

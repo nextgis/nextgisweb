@@ -63,7 +63,11 @@ def environ_substitution(items, environ):
         return environ[m.group(1)]
 
     def shl_sub(m):
-        return environ[m.group(1)]
+        variable = m.group(1)
+        if variable in environ:
+            return environ[variable]
+        else:
+            return m.group(0)
 
     for k, v in list(items.items()):
         v = dpr_re.sub(dpr_sub, v)
