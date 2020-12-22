@@ -107,6 +107,18 @@ Create a ``package`` directory and clone NextGIS Web repository here:
   $ cd package
   $ git clone https://github.com/nextgis/nextgisweb.git
 
+Keep in mind that ``master`` default branch is development and unstable. So if
+you are going to install NextGIS Web in production environment you should use
+the latest tagged version:
+
+.. code-block:: none
+
+  $ cd nextgisweb
+  $ git checkout $(git tag -l '*.*.*' | tail -1)
+  $ $ git describe --tags
+  3.5.1
+  $ cd ..
+
 Now install ``nextgisweb`` python package into virtualenv in editable mode and
 compile i18n translations:
 
