@@ -19,6 +19,10 @@ System requirements
     distributions. So if you any installation-related issue, please try to
     reproduce a problem on Ubuntu Linux 20.04 before you report them.
 
+- Python 2.7 or Python >= 3.6. NextGIS Web is in transition from Python 2 to
+  Python 3 now, but Python 2.7 installation is more stable. So examples bellow
+  use Python 2.7.
+
 - PostgreSQL database with PostGIS and hstore extensions enabled:
 
   - The minimum required versions are PostgreSQL 9.5 and PostGIS 2.4.
