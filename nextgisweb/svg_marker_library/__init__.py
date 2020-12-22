@@ -4,7 +4,7 @@ from os import path
 
 from cachetools import TTLCache
 
-from ..component import Component
+from ..component import Component, require
 from ..lib.config import Option, OptionAnnotations
 
 from .model import Base, SVGMarker, SVGMarkerLibrary, validate_filename
@@ -21,6 +21,7 @@ class SVGMarkerLibraryComponent(Component):
     def initialize(self):
         self.cache = TTLCache(maxsize=128, ttl=60)
 
+    @require('resource')
     def setup_pyramid(self, config):
         from . import api, view  # NOQA
         api.setup_pyramid(self, config)
