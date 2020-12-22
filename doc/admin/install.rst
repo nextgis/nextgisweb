@@ -9,15 +9,15 @@ install.
 System requirements
 -------------------
 
-- Modern Linux distribution like Ubuntu Linux 18.04:
+- Modern Linux distribution like Ubuntu Linux 20.04:
 
   - We expect that NextGIS Web can be installed on most modern Linux
     distributions. But we run it under LTS-version Ubuntu Linux, and this
-    instruction was tested on Ubuntu Linux 18.04.
+    instruction was tested on Ubuntu Linux 20.04.
   
   - We don't provide community support for running NextGIS Web on other
     distributions. So if you any installation-related issue, please try to
-    reproduce a problem on Ubuntu Linux 18.04 before you report them.
+    reproduce a problem on Ubuntu Linux 20.04 before you report them.
 
 - PostgreSQL database with PostGIS and hstore extensions enabled:
 
@@ -33,7 +33,7 @@ System requirements
 
   - PostgreSQL and PostGIS installation is out-of-scope for this instruction.
     But for testing purpose you can use snippet bellow to install PostgreSQL 
-    and PostGIS on Ubuntu Linux 18.04 as ``root`` user:
+    and PostGIS on Ubuntu Linux 20.04 as ``root`` user:
 
     .. code-block:: none
 
@@ -64,7 +64,7 @@ First you need to install required packages:
 
 .. code-block:: none
 
-  # apt install python python-dev virtualenv python-virtualenv
+  # apt install python2 python2-dev python3-virtualenv
   # apt install git curl
   # apt install build-essential libssl-dev libgdal-dev libgeos-dev \
     gdal-bin libxml2-dev libxslt1-dev zlib1g-dev libjpeg-turbo8-dev \
@@ -92,7 +92,7 @@ Now create a virtualenv directory and activate virtualenv:
 
 .. code-block:: none
 
-  $ virtualenv env
+  $ virtualenv -p /usr/bin/python2 env
   $ . env/bin/activate
 
 Create a ``package`` directory and clone NextGIS Web repository here:
