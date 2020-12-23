@@ -33,7 +33,7 @@ class Feature(object):
             # use it for naming.
             value = self._fields[self._layer.feature_label_field.keyname]
             if value is not None:
-                return unicode(value)
+                return str(value)
 
         # Otherwise use object id
         return "#%d" % self._id

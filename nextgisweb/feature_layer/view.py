@@ -120,7 +120,7 @@ def store_item(layer, request):
 
     return Response(
         json.dumps(result, cls=geojson.Encoder),
-        content_type='application/json')
+        content_type='application/json', charset='utf-8')
 
 
 @viewargs(renderer='nextgisweb:feature_layer/template/test_mvt.mako')

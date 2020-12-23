@@ -299,7 +299,7 @@ def healthcheck(request):
 
     return Response(
         json.dumps(result), content_type="application/json",
-        status_code=200 if result['success'] else 503
+        status_code=200 if result['success'] else 503, charset='utf-8'
     )
 
 

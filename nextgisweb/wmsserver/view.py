@@ -258,7 +258,7 @@ def _get_feature_info(obj, request):
         ]
         return Response(
             json.dumps(result, cls=geojson.Encoder),
-            content_type='application/json')
+            content_type='application/json', charset='utf-8')
 
     return Response(render_template(
         'nextgisweb:wmsserver/template/get_feature_info_html.mako',

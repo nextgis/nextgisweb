@@ -216,7 +216,7 @@ def test_timeout(reqest):
                 idx, elapsed, current.isoformat())
 
             logger.warn("Timeout test: " + line)
-            yield str(line + "\n")
+            yield (line + "\n").encode('utf-8')
 
     return Response(app_iter=generator(), content_type='text/plain')
 
