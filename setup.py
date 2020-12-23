@@ -54,7 +54,6 @@ requires = [
     'psutil==5.7.3',
     'zipstream-new==1.1.7',
     'cachetools==3.1.1',
-    'watchdog==0.10.5',
 
     # TODO: Move to dev or test dependencies
     'freezegun',
@@ -69,6 +68,7 @@ requires = [
 
 if sys.version_info[0:2] < (3, 6):
     requires.append('python2-secrets')
+    requires.append('watchdog==0.10.5')
 
 
 extras_require = {
