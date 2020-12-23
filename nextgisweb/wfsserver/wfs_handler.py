@@ -10,7 +10,7 @@ from lxml import etree, html
 from lxml.builder import ElementMaker
 from osgeo import ogr, osr
 from pyramid.request import Request
-from six import BytesIO, text_type
+from six import BytesIO, text_type, ensure_str
 
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
@@ -130,7 +130,7 @@ def get_geom_column(feature_layer):
 
 def geom_from_gml(el):
     value = etree.tostring(el)
-    ogr_geom = ogr.CreateGeometryFromGML(value)
+    ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
     return geom_from_wkb(ogr_geom.ExportToWkb())
 
 

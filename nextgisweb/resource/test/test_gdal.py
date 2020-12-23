@@ -23,8 +23,8 @@ def test_resource_group(drv, ngw_httptest_app, ngw_auth_administrator, ngw_resou
         'DESCRIPTION=test resource group'])
     assert ds is not None, gdal.GetLastErrorMsg()
 
-    assert ds.GetMetadataItem(b'description', b'') == 'test resource group'
+    assert ds.GetMetadataItem(ensure_str('description'), ensure_str('')) == 'test resource group'
 
     url_delete = 'NGW:' + ngw_httptest_app.base_url + '/resource/{}'.format(
-        ds.GetMetadataItem(b'id', b''))
+        ds.GetMetadataItem(ensure_str('id'), ensure_str('')))
     assert drv.Delete(url_delete) == gdal.CE_None, gdal.GetLastErrorMsg()
