@@ -6,7 +6,7 @@ import io
 import json
 import re
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -42,8 +42,9 @@ class CoreComponent(Component):
         Component.initialize(self)
 
         sa_url = self._engine_url()
+        lock_timeout_ms = self.options['database.lock_timeout'].seconds * 1000
         self.engine = create_engine(sa_url, connect_args=dict(
-            options='-c lock_timeout=5000'))
+            options='-c lock_timeout=%d' % lock_timeout_ms))
         self._sa_engine = self.engine
 
         DBSession.configure(bind=self._sa_engine)
@@ -235,6 +236,7 @@ class CoreComponent(Component):
         Option('database.user', default="nextgisweb"),
         Option('database.password', secure=True, default=None),
         Option('database.pwfile', default=None),
+        Option('database.lock_timeout', timedelta, default=timedelta(seconds=30)),
 
         # Data storage
         Option('sdir', required=True, doc="Path to filesytem data storage where data stored along "
