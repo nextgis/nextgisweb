@@ -547,10 +547,13 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         obj.geom = ga_from_shape(
             feature.geom, srid=self.srs_id)
 
-        if feature.geom.geom_type.upper() != self.geometry_type:
+        geom_type = feature.geom.geom_type.upper()
+        if feature.geom.has_z:
+            geom_type += 'Z'
+        if geom_type != self.geometry_type:
             raise ValidationError(
                 _("Geometry type (%s) does not match geometry column type (%s).")
-                % (feature.geom.geom_type.upper(), self.geometry_type)
+                % (geom_type, self.geometry_type)
             )
 
         DBSession.add(obj)
