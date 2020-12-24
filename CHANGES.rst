@@ -4,7 +4,7 @@ Changes
 3.7.0
 -----
 
-
+- Fix infinite wait of database lock, including during vector layer deletion.
 
 3.6.0
 -----
