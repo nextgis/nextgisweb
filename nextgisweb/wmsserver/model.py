@@ -2,6 +2,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 from sqlalchemy.ext.orderinglist import ordering_list
+from zope.interface import implementer
+
 from .. import db
 from ..models import declarative_base
 from ..resource import (

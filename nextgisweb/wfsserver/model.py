@@ -3,6 +3,8 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 
 import re
 
+from zope.interface import implementer
+
 from .. import db
 from ..core.exception import ValidationError
 from ..models import declarative_base

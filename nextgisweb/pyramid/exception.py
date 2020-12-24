@@ -10,7 +10,7 @@ from collections import OrderedDict
 from hashlib import md5
 import six
 
-from pyramid.renderers import render_to_response
+from pyramid.renderers import render_to_response, render as render_template
 from pyramid.response import Response
 from pyramid.compat import reraise
 from pyramid import httpexceptions

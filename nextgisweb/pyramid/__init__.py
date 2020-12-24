@@ -13,6 +13,7 @@ from .config import Configurator
 from .util import (
     viewargs,
     ClientRoutePredicate,
+    ErrorRendererPredicate,
     gensecret,
     persistent_secret)
 from .model import Base, Session, SessionStore
@@ -30,6 +31,7 @@ class PyramidComponent(Component):
         config = Configurator(settings=settings)
 
         config.add_route_predicate('client', ClientRoutePredicate)
+        config.add_route_predicate('error_renderer', ErrorRendererPredicate)
 
         def _gensecret():
             self.logger.info("Generating pyramid cookie secret...")

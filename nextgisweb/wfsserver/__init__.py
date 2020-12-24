@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
-from ..component import Component
-from .model import Base, Service
 
-__all__ = ['Service', ]
+from ..component import Component
+
+from .model import Base, Service
+from .wfs_handler import VERSION_DEFAULT, VERSION_SUPPORTED
+
+__all__ = ['Service', 'VERSION_DEFAULT', 'VERSION_SUPPORTED']
 
 
 class WFSServerComponent(Component):
