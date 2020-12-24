@@ -4,6 +4,7 @@ Changes
 3.7.0
 -----
 
+- Add support of 1.1.0 version in WFS server implementation.
 - Fix infinite wait of database lock, including during vector layer deletion.
 
 3.6.0

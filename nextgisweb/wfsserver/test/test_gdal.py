@@ -17,7 +17,7 @@ from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.wfsserver.model import Service as WFSService, Layer as WFSLayer
 
 
-TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.0.0', )
+TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 
 
 def type_geojson_dataset(filename):
@@ -200,15 +200,14 @@ for version in TEST_WFS_VERSIONS:
                 id='{}-points-f1'.format(version),
             ))
 
-        if version >= '1.1.0' or layer != 'pointz':
-            test_create_delete_params.append(pytest.param(
-                version, layer, 'POINT Z (0 0 -1)' if layer == 'pointz' else 'POINT (0 0)',
-                id="{}-{}".format(version, layer),
-                marks=pytest.mark.xfail(
-                    version >= '2.0.0',
-                    reason="GDAL doesn't work correctly with WFS 2.x"
-                ),
-            ))
+        test_create_delete_params.append(pytest.param(
+            version, layer, 'POINT Z (0 0 -1)' if layer == 'pointz' else 'POINT (0 0)',
+            id="{}-{}".format(version, layer),
+            marks=pytest.mark.xfail(
+                version >= '2.0.0',
+                reason="GDAL doesn't work correctly with WFS 2.x"
+            ),
+        ))
 
 
 @pytest.mark.parametrize('version, layer, fields, wkt', test_edit_params)

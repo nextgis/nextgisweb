@@ -16,7 +16,7 @@ from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.wfsserver.model import Service as WFSService, Layer as WFSLayer
 
 
-TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.0.0', )
+TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 
 
 @pytest.fixture(scope='module')
