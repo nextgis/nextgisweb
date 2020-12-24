@@ -5,7 +5,7 @@ Vector layer data types
 
 .. _ngwdev_field_types:
 
-The following vector layer field types are supported:
+The following vector layer field types (datatype) are supported:
 
 * INTEGER - number
 * BIGINT - long number
@@ -15,7 +15,7 @@ The following vector layer field types are supported:
 * TIME - time
 * DATETIME - timestamp
 
-The following vector layer geometry types are supported:
+The following vector layer geometry types (geometry_type) are supported:
 
 * POINT
 * LINESTRING
