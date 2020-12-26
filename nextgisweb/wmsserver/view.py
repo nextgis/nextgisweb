@@ -175,7 +175,7 @@ def _get_map(obj, request):
     if p_format == 'image/jpeg':
         img.convert('RGB').save(buf, 'jpeg')
     elif p_format == 'image/png':
-        img.save(buf, 'png')
+        img.save(buf, 'png', compress_level=3)
 
     buf.seek(0)
 

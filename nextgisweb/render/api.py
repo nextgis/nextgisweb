@@ -54,7 +54,7 @@ def image_response(img, empty_code, size):
             img = Image.new('RGBA', size)
 
     buf = BytesIO()
-    img.save(buf, 'png')
+    img.save(buf, 'png', compress_level=3)
     buf.seek(0)
 
     return Response(body_file=buf, content_type='image/png')
