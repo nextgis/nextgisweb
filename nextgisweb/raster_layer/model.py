@@ -92,16 +92,23 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         if not dsproj or not dsgtran:
             raise ValidationError(_("Raster files without projection info are not supported."))
 
-        band_types = set(
-            gdal.GetDataTypeName(band.DataType)
-            for band in (
-                ds.GetRasterBand(bidx)
-                for bidx in range(1, ds.RasterCount + 1)
-            )
-        )
+        data_type = None
+        alpha_band = None
+        has_nodata = None
+        for bidx in range(1, ds.RasterCount + 1):
+            band = ds.GetRasterBand(bidx)
 
-        if len(band_types) != 1:
-            raise ValidationError(_("Complex data types are not supported."))
+            if data_type is None:
+                data_type = band.DataType
+            elif data_type != band.DataType:
+                raise ValidationError(_("Complex data types are not supported."))
+
+            if band.GetRasterColorInterpretation() == gdal.GCI_AlphaBand:
+                assert alpha_band is None, "Multiple alpha bands found!"
+                alpha_band = bidx
+            else:
+                has_nodata = (has_nodata is None or has_nodata) and (
+                    band.GetNoDataValue() is not None)
 
         src_osr = osr.SpatialReference()
         src_osr.ImportFromWkt(dsproj)
@@ -116,8 +123,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.fileobj = fobj
 
         if reproject:
-            cmd = ['gdalwarp', '-of', 'GTiff',
-                   '-t_srs', 'EPSG:%d' % self.srs.id]
+            cmd = ['gdalwarp', '-of', 'GTiff', '-t_srs', 'EPSG:%d' % self.srs.id]
+            if not has_nodata and alpha_band is None:
+                cmd.append('-dstalpha')
         else:
             cmd = ['gdal_translate', '-of', 'GTiff']
 
@@ -128,7 +136,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
-        self.dtype = six.text_type(band_types.pop())
+        self.dtype = six.text_type(gdal.GetDataTypeName(data_type))
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
         self.band_count = ds.RasterCount
