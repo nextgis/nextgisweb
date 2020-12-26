@@ -63,10 +63,10 @@ class RasterStyle(Base, Resource):
 
     def render_image(self, extent, size):
         ds = gdal.Warp(
-            "",
-            self.parent.gdal_dataset(),
+            "", self.parent.gdal_dataset(),
             options=gdal.WarpOptions(
-                width=size[0], height=size[1], outputBounds=extent, format="MEM"
+                width=size[0], height=size[1], outputBounds=extent, format="MEM",
+                warpOptions=['UNIFIED_SRC_NODATA=ON'], dstAlpha=True,
             ),
         )
 
