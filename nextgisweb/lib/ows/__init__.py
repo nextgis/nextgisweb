@@ -21,7 +21,7 @@ def parse_request(request):
         params = request.params
     elif request.method == 'POST':
         parser = etree.XMLParser(recover=True)
-        root_body = etree.parse(BytesIO(request.body), parser=parser)
+        root_body = etree.parse(BytesIO(request.body), parser=parser).getroot()
         params = root_body.attrib
         params['REQUEST'] = _ns_trim(root_body.tag)
     else:
