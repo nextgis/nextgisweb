@@ -276,9 +276,7 @@ def _get_legend_graphic(obj, request):
     request.resource_permission(DataScope.read, layer.resource)
 
     if not ILegendableStyle.providedBy(ILegendableStyle):
-        return _exception(
-            exception="Legend is not available for this layer",
-            code=None, request=request)
+        raise ValidationError("Legend is not available for this layer")
 
     img = layer.resource.render_legend()
 
