@@ -10,7 +10,7 @@ from lxml import etree, html
 from lxml.builder import ElementMaker
 from osgeo import ogr, osr
 from pyramid.request import Request
-from six import BytesIO, text_type, ensure_str
+from six import text_type, ensure_str
 
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
@@ -333,7 +333,6 @@ class WFSHandler():
             elif tag == 'FeatureId':  # 1.0.0 and 1.1.0
                 resid_attr = 'fid'
             else:
-                1/0
                 raise ValueError("Filter element '%s' not supported." % __el.tag)
             fid = __el.get(resid_attr)
             fids.append(fid_decode(fid, keyname))
