@@ -2,9 +2,7 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 from datetime import datetime, timedelta
 from uuid import uuid4
-from os import makedirs
 from threading import Thread
-from errno import EEXIST
 import os.path
 import sqlite3
 from io import BytesIO
@@ -15,6 +13,7 @@ from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
+from ..compat import Path
 from ..env import env
 from .. import db
 from ..models import declarative_base, DBSession
@@ -39,6 +38,7 @@ SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 
 class TilestorWriter:
     __instance = None
+
     def __init__(self):
         if TilestorWriter.__instance is None:
             self.queue = Queue()
@@ -188,13 +188,7 @@ class ResourceTileCache(Base):
             if not os.path.isdir(d):
                 if not os.path.isdir(tcpath):
                     raise RuntimeError("Path '{}' doen't exists!".format(tcpath))
-                try:
-                    makedirs(d)
-                except OSError as exc:
-                    # Ignore 'File exists' error in concurency conditions
-                    # TODO: Add exist_ok=True for Python3 instead of exception
-                    if exc.errno != EEXIST:
-                        raise
+                Path(d).mkdir(parents=True, exist_ok=True)
 
         return os.path.join(d, suuid)
 
