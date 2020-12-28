@@ -36,6 +36,30 @@ Base = declarative_base(dependencies=('resource', ))
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 
 
+def get_tile_db(db_path):
+    p = Path(db_path)
+    if not p.parent.exists():
+        p.parent.mkdir(parents=True)
+    connection = sqlite3.connect(
+        db_path, isolation_level=None, check_same_thread=False)
+
+    connection.text_factory = bytes
+    cur = connection.cursor()
+
+    # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
+    cur.execute("PRAGMA page_size = 8192")
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS tile (
+            z INTEGER, x INTEGER, y INTEGER,
+            tstamp INTEGER NOT NULL,
+            data BLOB NOT NULL,
+            PRIMARY KEY (z, x, y)
+        )
+    """)
+
+    return connection
+
+
 class TilestorWriter:
     __instance = None
 
@@ -60,13 +84,31 @@ class TilestorWriter:
                 self._DBSession = DBSession()
 
             data = self.queue.get()
-            z, x, y = data['z'], data['x'], data['y']
-            tstamp = data['tstamp']
-            uuid = data['uuid']
-            color = data['color']
 
-            tilestor = data.get('tilestor')
-            if tilestor is not None:
+            z, x, y = data['tile']
+            tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+
+            img = data['img']
+
+            colortuple = imgcolor(img)
+            color = pack_color(colortuple) if colortuple is not None else None
+
+            with transaction.manager:
+                conn = self._DBSession.connection()
+                conn.execute(db.sql.text(
+                    'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
+                    'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
+                    'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
+                ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+
+                # Force zope session management to commit changes
+                mark_changed(self._DBSession)
+
+            if color is None:
+                buf = BytesIO()
+                img.save(buf, format='PNG', compress_level=3)
+
+                tilestor = get_tile_db(data['db_path'])
                 tilestor.execute(
                     "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
                     (z, x, y))
@@ -74,23 +116,11 @@ class TilestorWriter:
                 try:
                     tilestor.execute(
                         "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                        (z, x, y, tstamp, data['value']))
-
+                        (z, x, y, tstamp, buf.getvalue()))
                 except sqlite3.IntegrityError:
                     # NOTE: Race condition with other proccess may occurs here.
                     # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
                     pass
-
-            with transaction.manager:
-                conn = self._DBSession.connection()
-                conn.execute(db.sql.text(
-                    'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
-                    'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
-                    'VALUES (:z, :x, :y, :color, :tstamp)'.format(uuid)
-                ), z=z, x=x, y=y, color=color, tstamp=tstamp)
-
-                # Force zope session management to commit changes
-                mark_changed(self._DBSession)
 
 
 class ResourceTileCache(Base):
@@ -154,43 +184,16 @@ class ResourceTileCache(Base):
     @property
     def tilestor(self):
         if self._tilestor is None:
-            try:
-                p = self.tilestor_path(create=False)
-                self._tilestor = sqlite3.connect(
-                    p, isolation_level=None, check_same_thread=False)
-            except sqlite3.OperationalError:
-                # SQLite db not found, create it
-                p = self.tilestor_path(create=True)
-                self._tilestor = sqlite3.connect(
-                    p, isolation_level=None, check_same_thread=False)
-
-            self._tilestor.text_factory = bytes
-            cur = self._tilestor.cursor()
-
-            # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
-            cur.execute("PRAGMA page_size = 8192")
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS tile (
-                    z INTEGER, x INTEGER, y INTEGER,
-                    tstamp INTEGER NOT NULL,
-                    data BLOB NOT NULL,
-                    PRIMARY KEY (z, x, y)
-                )
-            """)
+            self._tilestor = get_tile_db(self.tilestor_path)
 
         return self._tilestor
 
-    def tilestor_path(self, create=False):
+    @property
+    def tilestor_path(self):
         tcpath = env.render.tile_cache_path
         suuid = self.uuid.hex
-        d = os.path.join(tcpath, suuid[0:2], suuid[2:4])
-        if create:
-            if not os.path.isdir(d):
-                if not os.path.isdir(tcpath):
-                    raise RuntimeError("Path '{}' doen't exists!".format(tcpath))
-                Path(d).mkdir(parents=True, exist_ok=True)
 
-        return os.path.join(d, suuid)
+        return os.path.join(tcpath, suuid[0:2], suuid[2:4], suuid)
 
     def get_tile(self, tile):
         z, x, y = tile
@@ -230,27 +233,12 @@ class ResourceTileCache(Base):
             return True, Image.open(BytesIO(srow[0]))
 
     def put_tile(self, tile, img):
-        z, x, y = tile
-        tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
-
-        color = None
-        colortuple = imgcolor(img)
-        if colortuple is not None:
-            color = pack_color(colortuple)
-
         params = dict(
-            z=z, x=x, y=y,
-            tstamp=tstamp,
+            tile=tile,
+            img=img,
             uuid=self.uuid.hex,
-            color=color
+            db_path=self.tilestor_path
         )
-
-        if color is None:
-            buf = BytesIO()
-            img.save(buf, format='PNG', compress_level=3)
-
-            params['tilestor'] = self.tilestor
-            params['value'] = buf.getvalue()
 
         writer = TilestorWriter.getInstance()
         writer.queue.put(params)
