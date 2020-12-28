@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import re
+
 from sqlalchemy.ext.orderinglist import ordering_list
 
 from .. import db
+from ..core.exception import ValidationError
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -15,6 +18,8 @@ from ..resource import (
 from .util import _
 
 Base = declarative_base()
+
+keyname_pattern = re.compile(r'^[A-Za-z][\w]*$')
 
 
 class Service(Base, Resource):
@@ -71,6 +76,8 @@ class _layers_attr(SP):
     def setter(self, srlzr, value):
         srlzr.obj.layers = []
         for lv in value:
+            if not keyname_pattern.match(lv['keyname']):
+                raise ValidationError("Invalid keyname: %s" % lv['keyname'])
             lo = Layer(resource_id=lv['resource_id'])
             srlzr.obj.layers.append(lo)
 
