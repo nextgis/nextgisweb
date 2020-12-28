@@ -48,6 +48,23 @@ EXPORT_FORMAT_OGR["CSV"] = OGRDriver(
         "CREATE_CSVT=YES",
         "GEOMETRY_NAME=GEOM",
         "WRITE_BOM=YES",
+        "SEPARATOR=COMMA",
+    ),
+    single_file=True,
+    fid_support=False,
+    mime="text/csv",
+)
+
+EXPORT_FORMAT_OGR["CSV_MSEXCEL"] = OGRDriver(
+    "CSV",
+    "CSV for Microsoft Excel (*.csv)",
+    "csv",
+    options=(
+        "GEOMETRY=AS_WKT",
+        "CREATE_CSVT=YES",
+        "GEOMETRY_NAME=GEOM",
+        "WRITE_BOM=YES",
+        "SEPARATOR=SEMICOLON",
     ),
     single_file=True,
     fid_support=False,
