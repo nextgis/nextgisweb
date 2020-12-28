@@ -253,7 +253,7 @@ class ResourceTileCache(Base):
 
         if color is None:
             buf = BytesIO()
-            img.save(buf, format='PNG')
+            img.save(buf, format='PNG', compress_level=3)
 
             params['tilestor'] = self.tilestor
             params['value'] = buf.getvalue()
