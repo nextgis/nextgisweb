@@ -104,9 +104,9 @@ EXPORT_FORMAT_OGR["GPKG"] = OGRDriver(
 
 OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
     {
-        "name": format.name,
+        "name": format_id,
         "display_name": format.display_name,
         "single_file": format.single_file,
     }
-    for _, format in EXPORT_FORMAT_OGR.items()
+    for format_id, format in EXPORT_FORMAT_OGR.items()
 ]
