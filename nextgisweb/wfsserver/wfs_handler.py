@@ -653,7 +653,7 @@ class WFSHandler():
         if self.p_bbox is not None:
             bbox_param = self.p_bbox.split(',')
             box_coords = map(float, bbox_param[:4])
-            box_srid = parse_srs(bbox_param[4]) if len(bbox_param) == 5 else None
+            box_srid = parse_srs(bbox_param[4]) if len(bbox_param) == 5 else feature_layer.srs_id
             box_geom = box(*box_coords, srid=box_srid)
             query.intersects(box_geom)
 
