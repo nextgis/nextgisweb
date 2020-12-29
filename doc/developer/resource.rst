@@ -1070,13 +1070,13 @@ To get features using filters execute the following request:
    :param limit: limit feature count adding to return array
    :param offset: skip some features before create features array
    :param order_by: order results by fields. Add minus char to descending.
-   :param intersects: geometry as WKT string. Features intersect with this geometry will added to array
+   :param intersects: geometry as WKT string in EPSG:3857. Features intersect with this geometry will added to array
    :param fields: comma separated list of fields in return feature
    :param fld_{field_name_1}...fld_{field_name_N}: field name and value to filter return features. Parameter name forms as ``fld_`` + real field name (keyname). All pairs of field name = value form final ``AND`` SQL query.
    :param fld_{field_name_1}__{operation}...fld_{field_name_N}__{operation}: field name and value to filter return features using operation statement. Supported operations are: ``gt``, ``lt``, ``ge``, ``le``, ``eq``, ``ne``, ``like``, ``ilike``. All pairs of field name - operation - value form final ``AND`` SQL query.
    :param geom_format: ``geojson`` - output geometry in geojson format instead of WKT
    :param srs: EPSG code - reproject geometry to EPSG
-   :param geom: yes - return geometry, no - don't return geomtry (deaults yes)
+   :param geom: yes - return geometry, no - don't return geometry (defaults yes)
    :param extensions: comma separated list of extensions. Available ``description`` and ``attachments``. Defaults to ``description,attachments`` 
    :>jsonarray features: features array
    :statuscode 200: no error
