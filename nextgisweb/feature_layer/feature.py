@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 from osgeo import ogr
+from six import ensure_str
 
 
 class Feature(object):
@@ -33,7 +34,7 @@ class Feature(object):
             # use it for naming.
             value = self._fields[self._layer.feature_label_field.keyname]
             if value is not None:
-                return str(value)
+                return ensure_str(value)
 
         # Otherwise use object id
         return "#%d" % self._id
