@@ -42,6 +42,7 @@ class SRS(Base):
     miny = sa.Column(sa.Float)
     maxx = sa.Column(sa.Float)
     maxy = sa.Column(sa.Float)
+    catalog_id = sa.Column(sa.Integer, unique=True)
 
     __table_args__ = (
         db.CheckConstraint(

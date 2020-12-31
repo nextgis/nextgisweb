@@ -1,0 +1,33 @@
+<div data-dojo-type="${baseClass}"
+    data-dojo-attach-point="focusNode">
+
+        <div data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region: 'center'"
+            style="padding: 1em 0;">
+
+                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 200">
+
+                    <div data-dojo-type="dijit/form/TextBox"
+                        readOnly="true"
+                        data-dojo-attach-point="wDisplayName"
+                        title="{{gettext 'Display name'}}" style="width: 100%">
+                    </div>
+                    <textarea data-dojo-type="dijit/form/SimpleTextarea"
+                        readOnly="true"
+                        data-dojo-attach-point="wWKT"
+                        data-dojo-props="rows: 4, colspan: 2"
+                        title="{{gettext 'OGC WKT definition'}}"
+                        style="width: 100%; box-sizing: border-box"></textarea>
+
+                </div>
+        </div>
+
+        <div data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region: 'bottom'"
+            style="padding: 1em 0;">
+            <button data-dojo-type="dijit/form/Button"
+                data-dojo-attach-point="buttonImport"
+                class="dijitButton--primary">{{gettext 'Import'}}</button>
+        </div>
+
+</div>

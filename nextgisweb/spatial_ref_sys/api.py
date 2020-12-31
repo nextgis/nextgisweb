@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import requests
 from pyproj import CRS
 
 from ..core.exception import ValidationError
+from ..env import env
 from ..geometry import (
     geom_from_wkt,
     geom_to_wkt,
     geom_transform as shp_geom_transform,
     geom_calc as shp_geom_calc,
 )
+from ..models import DBSession
+
 from .models import SRS
 from .util import convert_to_wkt, _
 
@@ -70,6 +74,43 @@ def geom_calc(request, prop):
     return dict(value=value)
 
 
+def get_srs_from_catalog(catalog_id):
+    catalog_url = env.spatial_ref_sys.options['catalog.url']
+    url = catalog_url + str(catalog_id)
+    res = requests.get(url)
+    res.raise_for_status()
+
+    return res.json()
+
+
+def catalog_item(request):
+    request.require_administrator()
+
+    
+    catalog_id = int(request.matchdict['id'])
+    srs = get_srs_from_catalog(catalog_id)
+
+    return dict(display_name=srs['display_name'], wkt=srs['wkt'])
+
+
+def catalog_import(request):
+    request.require_administrator()
+
+    catalog_id = int(request.json_body['catalog_id'])
+    srs = get_srs_from_catalog(catalog_id)
+
+    obj = SRS(
+        display_name=srs['display_name'],
+        # auth_name=srs['auth_name'],
+        # auth_srid=srs['auth_srid'],
+        wkt=srs['wkt'],
+        catalog_id=srs['id']
+    ).persist()
+    DBSession.flush()
+
+    return dict(id=obj.id)
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         "spatial_ref_sys.collection", "/api/component/spatial_ref_sys/",
@@ -97,3 +138,12 @@ def setup_pyramid(comp, config):
     config.add_route(
         "spatial_ref_sys.get", r"/api/component/spatial_ref_sys/{id:\d+}",
     ).add_view(get, request_method="GET", renderer="json")
+
+    if comp.options['catalog.enabled']:
+        config.add_route(
+            "spatial_ref_sys.catalog.item", r"/api/component/spatial_ref_sys/catalog/{id:\d+}",
+        ).add_view(catalog_item, request_method="GET", renderer="json")
+
+        config.add_route(
+            "spatial_ref_sys.catalog.import", r"/api/component/spatial_ref_sys/catalog/import",
+        ).add_view(catalog_import, request_method="POST", renderer="json")
