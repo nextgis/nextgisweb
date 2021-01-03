@@ -54,6 +54,8 @@ requires = [
     'psutil==5.7.3',
     'zipstream-new==1.1.7',
     'cachetools==3.1.1',
+    'networkx',
+
 
     # TODO: Move to dev or test dependencies
     'freezegun',
