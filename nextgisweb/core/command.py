@@ -16,12 +16,19 @@ from zipfile import ZipFile, is_zipfile
 
 import transaction
 import unicodecsv as csv
+from dateutil.parser import isoparse
 
 from .. import geojson
+from ..compat import Path
 from ..command import Command
 from ..models import DBSession
+from ..lib.migration import (
+    revid, REVID_ZERO, MigrationKey, resolve,
+    UninstallOperation, RewindOperation,
+    PythonModuleMigration, SQLScriptMigration)
 
 from .backup import backup, restore
+from .migration import MigrationRegistry, MigrationContext
 
 
 logger = logging.getLogger(__name__)
@@ -325,3 +332,234 @@ class StatisticsCommand(Command):
                 result[comp.identity] = comp.query_stat()
 
         print(geojson.dumps(result, ensure_ascii=False, indent=2).encode('utf-8'))
+
+
+@Command.registry.register
+class MigrationStatusCommand(Command):
+    identity = 'migration.status'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        reg = MigrationRegistry(env)
+        cstate = reg.read_state()
+        print("A |    | Migration                      | Message")
+        for m in reg._all_migrations.values():
+            print("{} | {}{} | {:30} | {}".format(
+                '+' if m.key in cstate else ' ',
+                'F' if m._has_forward else ' ',
+                'R' if m._has_rewind else ' ',
+                m.component + ':' + m.revision, m._message))
+
+
+@Command.registry.register
+class MigrationCreateCommand(Command):
+    identity = 'migration.create'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        parser.add_argument('component', type=str)
+        parser.add_argument('message', type=str)
+        parser.add_argument('-f', '--format', type=str, default='sql', choices=('sql', 'python'))
+        parser.add_argument('-m', '--merge', action='store_true', default=False)
+        parser.add_argument('-p', '--parents', type=str, nargs='+', metavar='PARENT')
+        parser.add_argument('-d', '--date', type=str, default=None)
+
+    @classmethod
+    def execute(cls, args, env):
+        reg = MigrationRegistry(env)
+        graph = reg.graph
+        component = args.component
+
+        if args.parents is None:
+            heads = list(graph.select('head', component=component))
+            if args.merge and len(heads) <= 1:
+                raise RuntimeError("Nothing to merge!")
+            elif args.merge and len(heads) > 2:
+                raise RuntimeError("{} heads found, unable to merge!")
+            elif len(heads) == 1 or (args.merge and len(heads) == 2):
+                parents = [h.revision for h in heads]
+            elif len(heads) == 0:
+                parents = (REVID_ZERO, )
+            else:
+                raise RuntimeError("Use --parents option!")
+        else:
+            parents = args.parents
+
+        date = isoparse(args.date) if args.date is not None else datetime.now()
+        revision = revid(date)
+        mcls = {'python': PythonModuleMigration, 'sql': SQLScriptMigration}[args.format]
+
+        mpath = reg.migration_path(component)
+        if not mpath.exists():
+            logger.info("Creating directory {}".format(mpath))
+            mpath.mkdir()
+
+        outfiles = mcls.template(
+            reg.migration_path(component), revision, parents=parents,
+            date=date, message=args.message)
+
+        cwd = Path().resolve()
+        outfiles = [p.resolve().relative_to(cwd) for p in outfiles]
+
+        print("Migration [{}:{}] created:\n* ".format(
+            component, revision) + '\n* '.join(map(str, outfiles)))
+
+
+class MigrationApplyCommand(Command):
+    identity = None
+    subcmd = None
+    subarg = None
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        if cls.subarg == 'component':
+            parser.add_argument('component', nargs='+')
+        elif cls.subarg == 'revision':
+            parser.add_argument('revision')
+
+        parser.add_argument('--no-dry-run', action='store_true')
+        parser.add_argument('--no-execute', action='store_true')
+
+    @classmethod
+    def execute(cls, args, env):
+        reg = MigrationRegistry(env)
+        graph = reg.graph
+
+        cstate = {r: False for r in graph._nodes}
+
+        dry_run = not args.no_dry_run
+
+        if hasattr(args, 'component'):
+            components = args.component
+        if hasattr(args, 'revision'):
+            mkey = MigrationKey(*args.revision.split(':'))
+            assert mkey in cstate
+
+        destructive = False
+        of_install, of_uninstall = False, False
+        of_forward, of_rewind = False, False
+
+        if cls.subcmd == 'init':
+            tstate = {r: True for r in graph.select('head')}
+            of_install = True
+
+        elif cls.subcmd == 'install':
+            cstate.update(reg.read_state())
+            tstate = dict(cstate)
+            for c in components:
+                tstate.update({k: True for k in graph.select('head', component=c)})
+            of_install = True
+
+        elif cls.subcmd == 'uninstall':
+            destructive = True
+            cstate.update(reg.read_state())
+            tstate = dict()
+            for cid in components:
+                tstate.update({k: False for k in graph.select('all', component=cid)})
+            of_uninstall = True
+
+        elif cls.subcmd == 'upgrade':
+            cstate.update(reg.read_state())
+            tstate = {r: True for r in graph.select('head')}
+            of_install = True
+            of_forward = True
+
+        elif cls.subcmd == 'forward':
+            cstate.update(reg.read_state())
+            tstate = dict(cstate)
+            tstate[mkey] = True
+            of_forward = True
+
+        elif cls.subcmd == 'rewind':
+            destructive = True
+            cstate.update(reg.read_state())
+            tstate = dict(cstate)
+            tstate[mkey] = False
+            of_rewind = True
+
+        operations = graph.operations(
+            install=of_install, uninstall=of_uninstall,
+            forward=of_forward, rewind=of_rewind)
+
+        solution = resolve(operations, cstate, tstate)
+        if solution is None:
+            print("No migration solution found! Exitting!")
+            exit(1)
+
+        if not destructive:
+            for op in solution:
+                if isinstance(op, (UninstallOperation, RewindOperation)):
+                    raise RuntimeError("Destructive operation protection!")
+
+        if len(solution) == 0:
+            print("There are no changes required. It's OK!")
+            exit(0)
+
+        elif dry_run:
+            print("The following operations would be applied:\n")
+            for idx, op in enumerate(solution, start=1):
+                print("{:3d}. {}".format(idx, op))
+            print("\nUse --no-dry-run option to actually run them.")
+            exit(0)
+
+        elif args.no_execute:
+            state = dict(cstate)
+            for op in solution:
+                state = op.apply(state)
+            with transaction.manager:
+                reg.write_state(state)
+
+        else:
+            print("Executing the following migrations:\n")
+            for idx, op in enumerate(solution, start=1):
+                print("{:3d}. {}".format(idx, op))
+            print("")
+
+            ctx = MigrationContext(reg, env)
+            ctx.execute_operations(solution, cstate)
+
+            print("Migration operations completed!")
+
+
+@Command.registry.register
+class InitMigrationCommand(MigrationApplyCommand):
+    identity = 'migration.init'
+    subcmd = 'init'
+
+
+@Command.registry.register
+class InstallMigrationCommand(MigrationApplyCommand):
+    identity = 'migration.install'
+    subcmd = 'install'
+    subarg = 'component'
+
+
+@Command.registry.register
+class UninstallMigrationCommand(MigrationApplyCommand):
+    identity = 'migration.uninstall'
+    subcmd = 'uninstall'
+    subarg = 'component'
+
+
+@Command.registry.register
+class UpgradeMigrationCommand(MigrationApplyCommand):
+    identity = 'migration.upgrade'
+    subcmd = 'upgrade'
+
+
+@Command.registry.register
+class ForwardMigrationCommand(MigrationApplyCommand):
+    identity = 'migration.forward'
+    subcmd = 'forward'
+    subarg = 'revision'
+
+
+@Command.registry.register
+class RewindMigrationCommand(MigrationApplyCommand):
+    identity = 'migration.rewind'
+    subcmd = 'rewind'
+    subarg = 'revision'

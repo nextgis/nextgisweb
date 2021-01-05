@@ -101,6 +101,7 @@ class Env(object):
             if hasattr(comp, 'metadata'):
                 for key, tab in comp.metadata.tables.items():
                     ctab = tab.tometadata(metadata)
+                    ctab._component_identity = comp.identity
                     sa.event.listen(
                         ctab, 'after_create',
                         # After table creation write component's name
