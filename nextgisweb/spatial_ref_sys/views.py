@@ -35,7 +35,9 @@ def catalog_browse(request):
             for srs in res.json():
                 srs_list.append(dict(
                     id=srs['id'],
-                    display_name=srs['display_name']
+                    display_name=srs['display_name'],
+                    auth_name=srs['auth_name'],
+                    auth_srid=srs['auth_srid'],
                 ))
         elif res.status_code in (401, 403):
             error_msg = "Catalog auth error"
