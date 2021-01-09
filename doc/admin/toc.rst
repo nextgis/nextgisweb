@@ -8,3 +8,4 @@ NextGIS Web administrator's guide
    backup_restore
    maintenance
    configuration
+   upgrade
