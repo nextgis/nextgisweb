@@ -178,6 +178,16 @@ class MigrationContext(object):
 
     def execute_uninstall(self, operations, state):
         components = [op.component for op in operations]
+
+        # Protection against uninstalling important components
+        not_uninstallable = set((
+            'core', 'file_storage', 'spatial_ref_sys',
+            'auth', 'resource'))
+        danger = set(components) & not_uninstallable
+        if len(danger) > 0:
+            raise RuntimeError('Components {} is not uninstallable!'.format(
+                ', '.join(danger)))
+
         _logger.info("Uninstallation for components: {}".format(', '.join(components)))
 
         metadata, tables = self._metadata_for_components(components)
