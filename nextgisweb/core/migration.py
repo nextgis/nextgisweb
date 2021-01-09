@@ -69,7 +69,7 @@ class MigrationRegistry(Registry):
 
         # Set all ancestor migrations to applied state
         if ancestors:
-            for anc in self.graph.ancestors(result.keys(), True):
+            for anc in self.graph.ancestors(tuple(result.keys()), True):
                 if anc not in result:
                     _logger.warn("Setting [{}] to applied state".format(anc))
                     result[anc] = True

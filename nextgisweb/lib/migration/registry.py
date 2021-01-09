@@ -227,7 +227,7 @@ class Registry(object):
                 self.add(m)
 
     def validate(self):
-        mkeys = self._all_migrations.keys()
+        mkeys = list(self._all_migrations.keys())
         mkeys.sort(key=lambda i: i.revision)
         self._all_migrations = OrderedDict(((k, self._all_migrations[k]) for k in mkeys))
         self._validated = True
