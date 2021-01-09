@@ -20,7 +20,7 @@ from ..resource import (
 
 from .util import _
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 
 class WebMapScope(Scope):

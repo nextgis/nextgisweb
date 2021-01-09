@@ -30,7 +30,7 @@ from .util import _, crop_box, render_zoom, quad_key
 from .session_keeper import get_session
 
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 
 NEXTGIS_GEOSERVICES = 'nextgis_geoservices'

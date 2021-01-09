@@ -29,7 +29,7 @@ from .util import imgcolor, affine_bounds_to_tile, pack_color, unpack_color
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 

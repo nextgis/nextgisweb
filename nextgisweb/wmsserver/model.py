@@ -17,7 +17,7 @@ from ..resource import (
 
 from .util import _
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 keyname_pattern = re.compile(r'^[A-Za-z][\w]*$')
 

@@ -14,7 +14,7 @@ from .util import COMP_ID
 import six
 
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 
 class ResourceMetadataItem(Base):

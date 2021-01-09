@@ -30,7 +30,7 @@ from .util import _
 
 PYRAMID_TARGET_SIZE = 512
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 SUPPORTED_DRIVERS = ('GTiff', )
 

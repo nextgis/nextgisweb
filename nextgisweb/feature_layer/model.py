@@ -22,7 +22,7 @@ from .interface import (
 
 from .util import _
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 

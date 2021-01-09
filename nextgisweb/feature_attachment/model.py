@@ -11,7 +11,7 @@ from ..models import declarative_base
 from ..resource import Resource
 from ..file_storage import FileObj
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
 class FeatureAttachment(Base):

@@ -5,7 +5,7 @@ from .. import db
 from ..models import declarative_base
 from ..resource import Resource
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
 class FeatureDescription(Base):

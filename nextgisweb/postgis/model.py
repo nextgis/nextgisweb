@@ -44,7 +44,7 @@ from ..feature_layer import (
 
 from .util import _
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
 GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"),

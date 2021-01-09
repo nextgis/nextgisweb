@@ -36,7 +36,7 @@ from ..render import (
 
 from .util import _
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 WMS_VERSIONS = ('1.1.1', '1.3.0')
 

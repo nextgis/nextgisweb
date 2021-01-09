@@ -21,7 +21,7 @@ from ..resource import (
 
 from .util import _, COMP_ID
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 ALLOWED_EXTENSIONS = ('.svg', )
 

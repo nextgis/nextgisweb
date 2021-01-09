@@ -18,7 +18,7 @@ from ..render import (
 
 from .util import _
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', ))
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)

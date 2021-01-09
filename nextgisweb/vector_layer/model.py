@@ -98,7 +98,7 @@ _FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
 
 SCHEMA = 'vector_layer'
 
-Base = declarative_base()
+Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
 class FieldDef(object):

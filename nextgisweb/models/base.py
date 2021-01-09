@@ -59,12 +59,15 @@ class BaseClass(object):
 _CLASS_REGISTRY = dict()
 
 
-def declarative_base():
-    return sa_declarative_base(
+def declarative_base(dependencies=None):
+    result = sa_declarative_base(
         cls=BaseClass,
         constructor=None,
         class_registry=_CLASS_REGISTRY,
     )
+    dependencies = () if dependencies is None else dependencies
+    result.metadata.dependencies = dependencies
+    return result
 
 
 Base = declarative_base()
