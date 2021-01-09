@@ -15,6 +15,7 @@ from backports.tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
 
 import transaction
+from zope.sqlalchemy import mark_changed
 import unicodecsv as csv
 from dateutil.parser import isoparse
 
@@ -59,11 +60,13 @@ class InitializeDBCmd():
             for comp in env.chain('initialize_db'):
                 comp.initialize_db()
 
-            # It's unclear why, but if transaction only
-            # ran DDL operators, then it will not be saved
-            # need to force with a cludge
+            # Set migrations status
+            reg = MigrationRegistry(env)
+            nstate = {k: True for k in reg.graph.select('all')}
+            reg.write_state(nstate)
 
-            connection.execute("COMMIT")
+            # DDL commands don't change session status!
+            mark_changed(DBSession())
 
 
 @Command.registry.register

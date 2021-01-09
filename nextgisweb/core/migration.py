@@ -174,6 +174,13 @@ class MigrationContext(object):
 
         for op in operations:
             state = op.apply(state)
+
+        # Run initialize_db after component installation
+        for comp in self.env.chain('initialize_db'):
+            if comp.identity in components:
+                _logger.debug("Executing initialize_db for [{}] component".format(comp.identity))
+                comp.initialize_db()
+
         return state
 
     def execute_uninstall(self, operations, state):
