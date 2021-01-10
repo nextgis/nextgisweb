@@ -18,7 +18,7 @@ follows:
 
 .. code-block:: none
 
-  # systemctl stop ngw.service
+  # systemctl stop ngw.service ngw-maintenance.timer
   # su ngw -c "nextgisweb backup"
 
 
@@ -70,6 +70,9 @@ After that you return to ``ngw`` home directory:
 Applying migrations
 -------------------
 
+Upgrading from 3.7.0 or higher
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Automatic database migrations were introduced in version ``3.7.0``. If you're
 upgrading from ``3.7.0`` or higher, check required migrations with:
 
@@ -82,6 +85,9 @@ And then apply them with:
 .. code-block:: none
 
   $ nextgisweb migration.upgrade --no-dry-run
+
+Upgrading from previous versions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In case of upgrade from a version before ``3.7.0``, you should manually apply
 SQL migrations from ``package/nextgisweb/migration`` directory before you run
@@ -109,5 +115,8 @@ commands given above:
 Starting services
 -----------------
 
-Now you can start services back. It depends on installation method and was
-described in previous sections.
+Now you can start services back. It may look as follows:
+
+.. code-block:: none
+
+  # systemctl start ngw.service ngw-maintenance.timer
