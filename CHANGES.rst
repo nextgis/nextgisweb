@@ -4,6 +4,7 @@ Changes
 3.7.0
 -----
 
+- Add database migrations framework and automatic migrations applying.
 - Add support of 1.1.0 version in WFS server implementation.
 - Improved handling of NODATA values in raster layer and raster style.
 - Compression level of PNG images is set to 3 which is much faster.
