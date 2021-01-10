@@ -4,9 +4,9 @@ Error handling
 Backend
 -------
 
-Any exception that needs to be reported to the user must implement
-interface :class:`nextgisweb.core.exception.IUserException`. It can be
-done via subclassing exception from base exception classes from
+Any exception that needs to be reported to the user must implement interface
+:class:`nextgisweb.core.exception.IUserException`. It can be done via
+subclassing exception from base exception classes from
 :mod:`nextgisweb.core.exception` module or per object basis via
 :meth:`nextgisweb.core.exception.user_exception` method.
 
@@ -78,33 +78,33 @@ error message:
 
 .. code-block:: javascript
 
-    require(["ngw-pyramid/ErrorDialog/ErrorDialog"], function (ErrorDialog) {
-        // ...
-        if (somethingWentWrong) {
-            new ErrorDialog({
-                title: i18n.gettext("Unexpected error"),
-                message: i18.gettext("Something went wrong."),
-                detail: i18.gettext("Please try again later.")
-            }).show()
-        }
-    })
+  require(["ngw-pyramid/ErrorDialog/ErrorDialog"], function (ErrorDialog) {
+      // ...
+      if (somethingWentWrong) {
+          new ErrorDialog({
+              title: i18n.gettext("Unexpected error"),
+              message: i18.gettext("Something went wrong."),
+              detail: i18.gettext("Please try again later.")
+          }).show()
+      }
+  })
 
 ErrorDialog can also handle ``dojo/request/xhr`` errors:
 
 .. code-block:: javascript
 
-    require([
-        "dojo/request/xhr",
-        "ngw-pyramid/ErrorDialog"
-    ], function (
-        xhr,
-        ErrorDialog
-    ) {
-        xhr(API_URL, {
-            requestMethod: 'GET',
-            handleAs: 'json'
-        }).then(
-            function (data) { /* everything is alright */ },
-            ErrorDialog.xhrError
-        )
-    })
+  require([
+      "dojo/request/xhr",
+      "ngw-pyramid/ErrorDialog"
+  ], function (
+      xhr,
+      ErrorDialog
+  ) {
+      xhr(API_URL, {
+          requestMethod: 'GET',
+          handleAs: 'json'
+      }).then(
+          function (data) { /* everything is alright */ },
+          ErrorDialog.xhrError
+      )
+  })
