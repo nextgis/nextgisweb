@@ -33,18 +33,18 @@ Let's consider localization to Russian on the example of ``bar`` component from
 ::
 
   foo
-  ├── setup.py
   ├── foo
-  │   └── bar
-  └── locale
-     
+  │   └── bar
+  │       └── locale
+  └── setup.py     
+
 Extract strings from source code files with default settings:
 
 ::
 
   (env) $ nextgisweb-i18n --package foo extract bar
 
-This will create a pot-file `foo/foo/locale/bar.pot`. Since this file can be
+This will create a pot-file `foo/bar/locale/.pot`. Since this file can be
 generated at any time, there is no need to put it inside the source control
 system.
 
@@ -54,11 +54,9 @@ Create a po-file for the Russian language based on the pot-file:
 
   (env) $ nextgisweb-i18n --package foo init bar ru
 
-As a result, a po-file `foo/foo/locale/ru/LC_MESSAGES/bar.pot` will be created
-(this is a standard structure for gettext, perhaps sometimes we will replace it
-in favor of a simpler one). This file must be filled in accordance with the
-translation of the strings in it using a text editor or a specialized po-file
-editor.
+As a result, the po-file ``foo/bar/locale/ru.po`` will be created. This file
+must be filled in accordance with the translation of the strings in it using a
+text editor or a specialized po-file editor.
 
 After this, we compile po-files into mo-files, which also do not need to be
 placed in the version control system:
@@ -77,16 +75,13 @@ compilation stage.
 ::
 
   foo
-  ├── setup.py
-  └── foo
-     ├── bar
-     └── locale
-         ├── bar.pot
-         └── ru
-             └── LC_MESSAGES
-                 ├── bar.jed
-                 ├── bar.mo
-                 └── bar.po
+  ├── foo
+  │   └── bar
+  │       └── locale
+  │           ├── .pot
+  │           ├── ru.mo
+  │           └── ru.po
+  └── setup.py
 
 This completes the initial internationalization, after some time new lines may
 have be added to the package, in this case you need to re-extract the lines,
@@ -96,7 +91,7 @@ automatically update the po-file, edit it and compile again:
 
   (env) $ nextgisweb-i18n --package foo extract bar
   (env) $ nextgisweb-i18n --package foo update bar
-  (env) $ nano foo/foo/locale/ru/LC_MESSAGES/bar.po
+  (env) $ nano foo/bar/locale/ru.po
   (env) $ nextgisweb-i18n --package foo compile bar
 
 
