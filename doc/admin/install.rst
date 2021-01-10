@@ -115,7 +115,7 @@ the latest tagged version:
 
   $ cd nextgisweb
   $ git checkout $(git tag -l '*.*.*' | tail -1)
-  $ $ git describe --tags
+  $ git describe --tags
   3.5.1
   $ cd ..
 
@@ -141,6 +141,7 @@ Now go to the home directory and create directory structure:
 Create ``config/config.ini`` with following contents:
 
 .. code-block:: ini
+  :caption: File ``config/config.ini``
 
   [core]
 
@@ -173,6 +174,13 @@ Check that your web browser can open ``http://localhost:8080``. Then press
 ``Ctrl + C`` to halt HTTP server. NextGIS Web is installed and should work
 properly, but builtin HTTP server is not suitable for production purposes.
 
+You may also check ``nextgisweb maintenance`` command, which is required to run
+periodically. This command cleans up unused data, such as old file uploads.
+
+.. code-block:: none
+
+  $ nextgisweb maintenance
+
 To simplify subsequent steps add virtualenv initialization to ``.bashrc`` file
 for ``ngw`` user:
 
@@ -194,6 +202,7 @@ use uWSGI in most of deployments. So install to the virtualenv:
 Then create ``config/uwsgi.ini`` with following contents:
 
 .. code-block:: ini
+  :caption: File ``config/uwsgi.ini``
 
   [uwsgi]
   http = 0.0.0.0:8080
@@ -222,9 +231,11 @@ Systemd
 -------
 
 To start NextGIS Web with your system you can use systemd-service. Under
-``root`` create file ``/etc/systemd/system/ngw.service`` with the following contents:
+``root`` create service file ``/etc/systemd/system/ngw.service`` with the
+following contents:
 
 .. code-block:: ini
+  :caption: File ``/etc/systemd/system/ngw.service``
 
   [Unit]
   Requires=network.target
@@ -243,11 +254,48 @@ To start NextGIS Web with your system you can use systemd-service. Under
   [Install]
   WantedBy=multi-user.target
 
-Then reload systemd configuration and start service:
+Also, you may want to periodic execution of ``nextgisweb maintenance``. To
+achieve this, create service (``/etc/systemd/system/ngw-maintenance.service``)
+and timer (``/etc/systemd/system/ngw-maintenance.timer``) files:
+
+.. code-block:: ini
+  :caption: File ``/etc/systemd/system/ngw-maintenance.service``
+
+  [Unit]
+  Description=NextGIS Web maintenance task
+  Wants=ngw-maintenance.timer
+
+  [Service]
+  Type=simple
+  WorkingDirectory=/srv/ngw
+  Environment="NEXTGISWEB_CONFIG=/srv/ngw/config/config.ini"
+  ExecStart=/srv/ngw/env/bin/nextgisweb maintenance
+  User=ngw
+  Group=ngw
+
+  [Install]
+  WantedBy=multi-user.target
+
+.. code-block:: ini
+  :caption: File ``/etc/systemd/system/ngw-maintenance.service``
+
+  [Unit]
+  Description=NextGIS Web maintenance timer
+  Requires=ngw-maintenance.service
+
+  [Timer]
+  OnCalendar=Mon *-*-* 00:30:00
+  Unit=ngw-maintenance.service
+
+  [Install]
+  WantedBy=multi-user.target
+
+Then reload systemd configuration, enable and start service and timer:
 
 .. code-block:: none
 
   # systemctl daemon-reload
-  # systemctl start ngw.service
+  # systemctl enable ngw.service ngw-maintenance.timer
+  # systemctl start ngw.service ngw-maintenance.timer
 
 Now NextGIS Web will start with your system.
