@@ -6,8 +6,8 @@ create database migrations. Migrations change a database structure from one
 state to another.
 
 NextGIS Web provides some tools to work with database migrations. These tools
-were inspired by `alembic library <https://alembic.sqlalchemy.org/>`_ supporting
-multiple components and dependencies between migrations.
+were inspired by `alembic library <https://alembic.sqlalchemy.org/>`_  with the
+additional support of multiple components and dependencies between migrations.
 
 Under the hood, it's based on git-like tree structure with branches for each
 component separately. Single migration is like git's commit which can be applied
@@ -59,11 +59,11 @@ rewinding migration, which drops the column and brings a database state to the
 previous.
 
 You have to put SQL instructions into these files. Don't remove migrations
-metadata in the first lines of files and remove a generated placeholder.
-
-For example ``2c12ca17-add-other-column.fw.sql``:
+metadata in the first lines of files and remove a generated placeholder. For
+example:
 
 .. code-block:: sql
+  :caption: File ``2c12ca17-add-other-column.fw.sql``
 
   /*** {
       "revision": "2c12ca17", "parents": ["00000000"],
@@ -73,9 +73,8 @@ For example ``2c12ca17-add-other-column.fw.sql``:
 
   ALTER TABLE foo_model ADD COLUMN other text;
 
-And ``2c12ca17-add-other-column.rw.sql``:
-
 .. code-block:: sql
+  :caption: File ``2c12ca17-add-other-column.rw.sql``
 
   /*** { "revision": "2c12ca17" } ***/
 
@@ -92,6 +91,22 @@ Or undo it with:
 .. code-block:: none
 
   $ nextgisweb migration.rewind --no-dry-run foo:2c12ca17
+
+.. note::
+
+  Each ``nextgisweb migration.*`` command which changes a database state doesn't
+  change without ``--no-dry-run`` option. You can use commands without this
+  option to review what command will do.
+
+To review the current database state you can use ``nextgisweb migration.status``
+command. It will show this migration:
+
+.. code-block:: none
+
+  $ nextgisweb migration.status
+  A |    | Migration                      | Message
+  + |    | foo:00000000                   | Initial migration
+  + | FR | foo:2c12ca17                   | Add other column
 
 After that, you have to commit these files to git repository. The command
 ``nextgisweb migration.upgrade`` will apply them during the standard upgrade
