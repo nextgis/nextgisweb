@@ -516,7 +516,7 @@ following request:
 
 .. sourcecode:: json
    
-   {
+  [ {
       "resource": {
          "id": 730,
          "cls": "webmap",
@@ -731,7 +731,7 @@ following request:
             }
          ]
       }
-   }
+   } ]
 
 Obtain layers id and display_name in bash
 
