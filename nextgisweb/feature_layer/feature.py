@@ -4,6 +4,8 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from osgeo import ogr
 from six import ensure_str
 
+from .interface import FIELD_TYPE
+
 
 class Feature(object):
 
@@ -32,9 +34,13 @@ class Feature(object):
         if self._layer and self._layer.feature_label_field:
             # If object is linked to a layer and naming field is set for a layer
             # use it for naming.
-            value = self._fields[self._layer.feature_label_field.keyname]
+            label_field = self._layer.feature_label_field
+            value = self._fields[label_field.keyname]
             if value is not None:
-                return ensure_str(value)
+                if label_field.datatype == FIELD_TYPE.STRING:
+                    return ensure_str(value)
+                else:
+                    return '{}'.format(value)
 
         # Otherwise use object id
         return "#%d" % self._id
