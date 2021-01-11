@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import json
+
 import requests
 from pyproj import CRS
 
@@ -74,6 +76,38 @@ def geom_calc(request, prop):
     return dict(value=value)
 
 
+def catalog_collection(request):
+    query = dict()
+
+    q = request.GET.get('q')
+    if q is not None:
+        query['q'] = q
+
+    lat = request.GET.get('lat')
+    lon = request.GET.get('lon')
+    if lat is not None and lon is not None:
+        query['intersects'] = json.dumps(dict(
+            type='Point',
+            coordinates=(float(lon), float(lat))
+        ))
+
+    catalog_url = env.spatial_ref_sys.options['catalog.url']
+    url = catalog_url + 'v1/spatial_ref_sys/'
+    res = requests.get(url, query)
+    res.raise_for_status()
+
+    items = list()
+    for srs in res.json():
+        items.append(dict(
+            id=srs['id'],
+            display_name=srs['display_name'],
+            auth_name=srs['auth_name'],
+            auth_srid=srs['auth_srid']
+        ))
+
+    return items
+
+
 def get_srs_from_catalog(catalog_id):
     catalog_url = env.spatial_ref_sys.options['catalog.url']
     url = catalog_url + 'v1/spatial_ref_sys/' + str(catalog_id)
@@ -139,6 +173,10 @@ def setup_pyramid(comp, config):
     ).add_view(get, request_method="GET", renderer="json")
 
     if comp.options['catalog.enabled']:
+        config.add_route(
+            "spatial_ref_sys.catalog.collection", r"/api/component/spatial_ref_sys/catalog/",
+        ).add_view(catalog_collection, request_method="GET", renderer="json")
+
         config.add_route(
             "spatial_ref_sys.catalog.item", r"/api/component/spatial_ref_sys/catalog/{id:\d+}",
         ).add_view(catalog_item, request_method="GET", renderer="json")

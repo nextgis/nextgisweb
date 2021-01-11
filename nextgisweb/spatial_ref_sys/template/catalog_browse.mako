@@ -1,11 +1,7 @@
 <%inherit file='nextgisweb:templates/base.mako' />
 <%! from nextgisweb.spatial_ref_sys.util import _ %>
 
-%if error_msg is not None:
-    <div class="content-box" style="background-color: #deb4a9">
-        ${error_msg}
-    </div>
-%endif
+<div id="error-message" class="content-box" style="display:none; background-color: #deb4a9"></div>
 
 
 <%def name="head()">
@@ -13,7 +9,7 @@
         require([
             "dojo/ready",
             "ngw/sorted-table",
-            "ngw-spatial-ref-sys/catalog_filter",
+            "ngw-spatial-ref-sys/catalog_browse",
         ], function(
             ready,
             sortedTable,
@@ -21,14 +17,21 @@
         ){
             ready(function() {
                 sortedTable(document.getElementById("catalog-table"));
-                catalogFilter(document.getElementById("catalog-filter"));
             });
         });
     </script>
 </%def>
 
 <div class="content-box">
-    <input id="catalog-filter" type="text"/>
+    <form id="search-form">
+        <input id="text-filter" type="text submit" placeholder="${tr(_('Search'))}"
+            style="width: 250px"/>
+        <input id="lat-filter" type="number" min="-90" max="90" placeholder="${tr(_('Latitude'))}, °"
+            style="margin-left: 50px; width: 90px"/>
+        <input id="lon-filter" type="number" min="-180" max="180" placeholder="${tr(_('Longitude'))}, °"
+            style="width: 90px"/>
+        <input type="submit" style="display: none">
+    </form>
 </div>
 
 <div class="content-box">
@@ -42,21 +45,7 @@
                     <th class="no-sort" style="width: 0px;">&nbsp;</th>
                 </tr>
             </thead>
-            <tbody>
-                %for obj in obj_list:
-                    <tr class="srs-row">
-                        <td class="col-searchable">${obj['display_name']}</td>
-                        <td class="col-searchable">${obj['auth_name']}</td>
-                        <td class="col-searchable">${obj['auth_srid']}</td>
-                        
-                        <td class="fit-content">
-                            <a class="material-icons icon-viewMap" target="_blank"
-                               href="${request.route_url('srs.catalog.import', id=obj['id'])}"
-                               title="${tr(_('View'))}"></a>
-                        </td>
-                    </tr>
-                %endfor
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
 </div>

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
 
-import requests
-
 from ..object_widget import ObjectWidget
 from ..views import ModelController, DeleteWidget, permalinker
 from .. import dynmenu as dm
@@ -21,33 +19,8 @@ def check_permission(request):
 
 def catalog_browse(request):
     check_permission(request)
-
-    error_msg = None
-    srs_list = list()
-
-    catalog_url = request.env.spatial_ref_sys.options['catalog.url']
-    try:
-        res = requests.get(catalog_url, timeout=30)
-    except Exception:
-        error_msg = "Unknown error"
-    else:
-        if res.status_code == 200:
-            for srs in res.json():
-                srs_list.append(dict(
-                    id=srs['id'],
-                    display_name=srs['display_name'],
-                    auth_name=srs['auth_name'],
-                    auth_srid=srs['auth_srid'],
-                ))
-        elif res.status_code in (401, 403):
-            error_msg = "Catalog auth error"
-        else:
-            error_msg = "Unknown error"
-
     return dict(
         title=_("Spatial reference system catalog"),
-        obj_list=srs_list,
-        error_msg=error_msg,
         dynmenu=request.env.pyramid.control_panel)
 
 
@@ -232,5 +205,5 @@ def setup_pyramid(comp, config):
 
         config.add_route(
             'srs.catalog.import',
-            r'/srs/catalog/{id:\d+}',
+            r'/srs/catalog/{id:\d+}', client=('id',)
         ).add_view(catalog_import, renderer='nextgisweb:spatial_ref_sys/template/catalog_import.mako')
