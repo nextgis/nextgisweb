@@ -76,7 +76,7 @@ def geom_calc(request, prop):
 
 def get_srs_from_catalog(catalog_id):
     catalog_url = env.spatial_ref_sys.options['catalog.url']
-    url = catalog_url + str(catalog_id)
+    url = catalog_url + 'v1/spatial_ref_sys/' + str(catalog_id)
     res = requests.get(url)
     res.raise_for_status()
 
@@ -86,7 +86,6 @@ def get_srs_from_catalog(catalog_id):
 def catalog_item(request):
     request.require_administrator()
 
-    
     catalog_id = int(request.matchdict['id'])
     srs = get_srs_from_catalog(catalog_id)
 
