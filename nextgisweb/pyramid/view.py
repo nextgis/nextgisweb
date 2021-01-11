@@ -2,7 +2,6 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import sys
 import errno
-import json
 import os
 import os.path
 import logging
@@ -18,7 +17,7 @@ from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from .. import dynmenu as dm
-from ..core.exception import UserException, user_exception
+from ..core.exception import UserException
 from ..package import amd_packages
 from ..compat import lru_cache
 
@@ -237,16 +236,6 @@ def setup_pyramid(comp, config):
     _setup_pyramid_debugtoolbar(comp, config)
     _setup_pyramid_tm(comp, config)
     _setup_pyramid_mako(comp, config)
-
-    # PYRAMID REDEFINED METHODS
-    def json_body(req):
-        try:
-            return json.loads(req.body, encoding=req.charset)
-        except ValueError as exc:
-            user_exception(exc, title="JSON parse error", http_status_code=400)
-            reraise(*sys.exc_info())
-    config.add_request_method(json_body, 'json_body', property=True)
-    config.add_request_method(json_body, 'json', property=True)
 
     # COMMON REQUEST'S ATTRIBUTES
 

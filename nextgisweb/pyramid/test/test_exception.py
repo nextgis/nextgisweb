@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import pytest
 from pyramid.config import Configurator
+from pyramid.response import Response
 from zope.interface import implementer
 
 from nextgisweb.core.exception import IUserException
@@ -49,6 +50,14 @@ def app():
     config.add_route('exception', '/exception')
     config.add_view(view_exception, route_name='exception')
 
+    def view_json(request):
+        request.json
+        request.json_body
+        return Response('OK', status_code=200)
+
+    config.add_route('json', '/json')
+    config.add_view(view_json, route_name='json')
+
     yield TestApp(config.make_wsgi_app())
 
 
@@ -78,3 +87,8 @@ def test_exception(app):
     assert rjson == dict(
         title="Internal server error", status_code=500,
         exception='nextgisweb.pyramid.exception.InternalServerError')
+
+
+def test_json(app):
+    data = r'{"almost": "json" . }'
+    app.post('/json', data, {'Content-Type': str('application/json')}, status=400)

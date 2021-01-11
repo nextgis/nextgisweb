@@ -10,7 +10,7 @@ from collections import OrderedDict
 from hashlib import md5
 import six
 
-from pyramid.renderers import render_to_response, render as render_template
+from pyramid.renderers import render_to_response
 from pyramid.response import Response
 from pyramid.compat import reraise
 from pyramid import httpexceptions
@@ -33,6 +33,16 @@ def includeme(config):
 
     config.add_tween(ERR_TFACTORY, over=(TM_TFACTORY, 'MAIN'), under=(DT_TFACTORY, 'INGRESS'))
     config.add_tween(EXC_TFACTORY, over=(DT_TFACTORY, ERR_TFACTORY))
+
+    # PYRAMID REDEFINED METHODS FOR ERROR HANDLING
+    def json_body(req):
+        try:
+            return json.loads(req.body, encoding=req.charset)
+        except ValueError as exc:
+            user_exception(exc, title="JSON parse error", http_status_code=400)
+            reraise(*sys.exc_info())
+    config.add_request_method(json_body, 'json_body', property=True)
+    config.add_request_method(json_body, 'json', property=True)
 
 
 def handled_exception_tween_factory(handler, registry):
