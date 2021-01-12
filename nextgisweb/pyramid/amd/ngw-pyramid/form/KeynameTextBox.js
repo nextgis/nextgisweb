@@ -6,7 +6,7 @@ define([
 
         preamble: function (kwArgs) {
             if (kwArgs.pattern === undefined) {
-                kwArgs.pattern = '[A-z][A-z0-9_\\-]*';
+                kwArgs.pattern = '[A-Za-z][\\w-]*';
             }
         },
 
