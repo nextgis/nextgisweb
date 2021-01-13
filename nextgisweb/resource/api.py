@@ -171,7 +171,7 @@ def permission(resource, request):
     effective = resource.permissions(user)
 
     result = OrderedDict()
-    for k, scope in resource.scope.iteritems():
+    for k, scope in resource.scope.items():
         sres = OrderedDict()
 
         for perm in scope.values(ordered=True):

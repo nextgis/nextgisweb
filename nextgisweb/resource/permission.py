@@ -73,7 +73,7 @@ class Permission(object):
         return "<Permission %s:%s>" % (self.scope.identity if self.scope else '*', self.name)
 
     def __str__(self):
-        return unicode(self.label)
+        return str(self.label)
 
     def __unicode__(self):
         return self.__str__()
