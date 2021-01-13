@@ -5,6 +5,7 @@ import json
 
 import string
 import secrets
+import zope.event
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.events import BeforeRender
@@ -24,6 +25,29 @@ from .oauth import InvalidTokenException, AuthorizationException
 from .util import _
 
 
+class OnUserLogin(object):
+
+    def __init__(self, user, request, next_url):
+        self._user = user
+        self._request = request
+        self._next_url = next_url
+
+    @property
+    def user(self):
+        return self._user
+
+    @property
+    def request(self):
+        return self._request
+
+    @property
+    def next_url(self):
+        return self._next_url
+
+    def set_next_url(self, url):
+        self._next_url = url
+
+
 def login(request):
     next_url = request.params.get('next', request.application_url)
 
@@ -36,7 +60,11 @@ def login(request):
 
             DBSession.flush()  # Force user.id sequence value
             headers = auth_policy.remember(request, (user.id, tresp))
-            return HTTPFound(location=next_url, headers=headers)
+
+            event = OnUserLogin(user, request, next_url)
+            zope.event.notify(event)
+
+            return HTTPFound(location=event.next_url, headers=headers)
 
         except (InvalidCredentialsException, UserDisabledException) as exc:
             return dict(error=exc.title, next_url=next_url)

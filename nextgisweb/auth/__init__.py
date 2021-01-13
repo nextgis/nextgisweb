@@ -17,9 +17,10 @@ from .exception import UserDisabledException
 from .policy import AuthenticationPolicy
 from .oauth import OAuthHelper, OAuthToken, OnAccessTokenToUser
 from .util import _
+from .views import OnUserLogin
 from . import command # NOQA
 
-__all__ = ['Principal', 'User', 'Group', 'OnAccessTokenToUser']
+__all__ = ['Principal', 'User', 'Group', 'OnAccessTokenToUser', 'OnUserLogin']
 
 
 class AuthComponent(Component):
