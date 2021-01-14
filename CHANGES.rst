@@ -10,6 +10,8 @@ Changes
 - Compression level of PNG images is set to 3 which is much faster.
 - New "CSV for Microsoft Excel" export format for better Excel compatibility.
 - Fix infinite wait of database lock, including during vector layer deletion.
+- Improved handling of invalid JSON bodies in RESP API, now correct error
+  message returns.
 
 3.6.0
 -----
