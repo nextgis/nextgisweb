@@ -201,3 +201,9 @@ def setup_pyramid(comp, config):
         key='fields', title=_(u"Attributes"),
         template="nextgisweb:feature_layer/template/section_fields.mako",
         is_applicable=lambda obj: IFeatureLayer.providedBy(obj))
+
+    Resource.__psection__.register(
+        key='description',
+        title=_(u"Access to the layer by API"),
+        template='nextgisweb:feature_layer/template/section_api_layer.mako',
+        is_applicable=lambda obj: IFeatureLayer.providedBy(obj))

@@ -503,6 +503,12 @@ table {
   line-height: 1.05em;
   vertical-align: top;
 }
+.material-icons.material-icons-help_outline:before {
+  content: "\e8fd";
+}
+.material-icons.material-icons-exit_to_app:before {
+  content: "\e879";
+}
 .material-icons.icon-caret:before {
   content: "\E5C5";
 }
@@ -1108,6 +1114,44 @@ a[class*=" icon-"]:hover:before {
 .content-box > .table-wrapper > .pure-table-horizontal--s th:last-child {
   padding-right: 16px;
 }
+.content-box .row-title {
+  margin-bottom: 5px;
+}
+.content-box .row-title .text {
+  display: inline-block;
+}
+.content-box .row-title .help {
+  font-size: 1.35em;
+  vertical-align: top;
+  cursor: pointer;
+}
+.content-box .row-title .help .tooltip-content {
+  display: none;
+}
+.content-box .row-input-info {
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  border-radius: 4px;
+  width: 100%;
+}
+.content-box .row-input-info .text {
+  display: inline-block;
+  margin: 6px 0 0 5px;
+  width: 90%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.content-box .row-input-info .copy-button {
+  display: inline-block;
+  float: right;
+  padding-top: 5px;
+  padding-right: 3px;
+}
+.content-box .row-input-info .copy-button span.material-icons {
+  font-size: 22px;
+}
 .lt-ie9 .content-box {
   border: 1px solid #efefef;
 }
@@ -1125,6 +1169,18 @@ a[class*=" icon-"]:hover:before {
 }
 .content-box__info:first-child {
   margin-top: -16px;
+}
+.content-box__description {
+  margin-top: -16px;
+  margin-bottom: 24px;
+}
+/* Help tooltip */
+.tooltip-help {
+  max-width: 400px;
+}
+.tooltip-help .material-icons-exit_to_app {
+  font-size: 15px;
+  vertical-align: text-bottom;
 }
 /* Sidebar */
 .sidebar {
