@@ -27,7 +27,7 @@ def export(resource, request):
 
     zip_stream = zipstream.ZipFile(mode='w', compression=zipstream.ZIP_DEFLATED, allowZip64=True)
     for f in resource.files:
-        zip_stream.write(f.path, arcname=f.name)
+        zip_stream.write(f.path, arcname='%s.svg' % f.name)
 
     return Response(
         app_iter=zip_stream,

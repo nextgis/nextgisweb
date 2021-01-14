@@ -23,8 +23,6 @@ from .util import _, COMP_ID
 
 Base = declarative_base(dependencies=('resource', ))
 
-ALLOWED_EXTENSIONS = ('.svg', )
-
 
 class SVGMarkerLibrary(Base, Resource):
     identity = 'svg_marker_library'
@@ -99,7 +97,7 @@ class _archive_attr(SP):
                 validate_filename(filename)
 
                 name, ext = os.path.splitext(filename)
-                if ext.lower() not in ALLOWED_EXTENSIONS:
+                if ext.lower() != '.svg':
                     raise ValidationError("File \"%s\" has an invalid extension" % filename)
 
                 fileobj = env.file_storage.fileobj(component=COMP_ID)
@@ -122,7 +120,7 @@ class _files_attr(SP):
             filename = f.pop('name')
             validate_filename(filename)
             name, ext = os.path.splitext(filename)
-            if 'id' in f and ext.lower() not in ALLOWED_EXTENSIONS:
+            if 'id' in f and ext.lower() != '.svg':
                 raise ValidationError("File \"%s\" has an invalid extension" % filename)
             files_info[name] = f
 
