@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-06-04 21:40+0000\n"
+"POT-Creation-Date: 2021-01-14 08:35+0000\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,14 +19,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: api.py:88
+#: api.py:106
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:95
+#: api.py:111
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
+
+#: api.py:283 api.py:341
+#, python-format
+msgid "Geometry format '%s' is not supported."
+msgstr "Формат геометрии '%s' не поддерживается."
 
 #: exception.py:15
 msgid "Feature not found"
@@ -41,12 +46,12 @@ msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
-#: model.py:155
+#: model.py:160
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:142 view.py:43 view.py:189
+#: amd/ngw-feature-layer/FieldsWidget.js:160 view.py:43 view.py:186
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -55,19 +60,23 @@ msgstr "Таблица объектов"
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:133 view.py:195
+#: view.py:133 view.py:193
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:186
+#: view.py:183
 msgid "Vector layer"
 msgstr "Векторный слой"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:192
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:31
-#: amd/ngw-feature-layer/FieldsWidget.js:105 view.py:203
+#: amd/ngw-feature-layer/FieldsWidget.js:123 view.py:201
 msgid "Attributes"
 msgstr "Атрибуты"
+
+#: view.py:207
+msgid "Access to the layer by API"
+msgstr "Доступ к слою по API"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:78
 msgid "Attribute: "
@@ -86,7 +95,7 @@ msgid "NULL"
 msgstr "NULL"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:258
-#: amd/ngw-feature-layer/template/ExportForm.hbs:39
+#: amd/ngw-feature-layer/template/ExportForm.hbs:40
 msgid "Save"
 msgstr "Сохранить"
 
@@ -102,47 +111,55 @@ msgstr "Удалить объект?"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:55 template/section_fields.mako:5
+#: amd/ngw-feature-layer/FieldsWidget.js:73 template/section_fields.mako:5
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:65 template/section_fields.mako:6
+#: amd/ngw-feature-layer/FieldsWidget.js:83 template/section_fields.mako:6
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:69 template/section_fields.mako:7
+#: amd/ngw-feature-layer/FieldsWidget.js:87 template/section_fields.mako:7
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:83
+#: amd/ngw-feature-layer/FieldsWidget.js:101
 msgid "FT"
 msgstr "ТО"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:93
+#: amd/ngw-feature-layer/FieldsWidget.js:111
 msgid "LA"
 msgstr "АН"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:137
+#: amd/ngw-feature-layer/FieldsWidget.js:155
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: amd/ngw-feature-layer/template/ExportForm.hbs:12
+#: amd/ngw-feature-layer/FieldsWidget.js:232
+msgid "Add"
+msgstr "Добавить"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:238
+msgid "Remove"
+msgstr "Удалить"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:13
 msgid "Format"
 msgstr "Формат"
 
-#: amd/ngw-feature-layer/template/ExportForm.hbs:16
+#: amd/ngw-feature-layer/template/ExportForm.hbs:17
 msgid "SRS"
 msgstr "Система координат"
 
-#: amd/ngw-feature-layer/template/ExportForm.hbs:20
+#: amd/ngw-feature-layer/template/ExportForm.hbs:21
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: amd/ngw-feature-layer/template/ExportForm.hbs:27
+#: amd/ngw-feature-layer/template/ExportForm.hbs:28
 msgid "FID field"
 msgstr "Поле FID"
 
-#: amd/ngw-feature-layer/template/ExportForm.hbs:31
+#: amd/ngw-feature-layer/template/ExportForm.hbs:32
 msgid "Zip archive"
 msgstr "Zip архив"
 
@@ -161,6 +178,34 @@ msgstr "Удалить"
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:25
 msgid "Search..."
 msgstr "Поиск..."
+
+#: template/section_api_layer.mako:4
+msgid "Use the addresses below to retrieve layer data from other applications."
+msgstr "Используйте указанные ниже адреса для получения данных слоя из других приложений."
+
+#: template/section_api_layer.mako:8
+msgid "MVT Vector Tiles"
+msgstr "Векторные тайлы MVT"
+
+#: template/section_api_layer.mako:12
+msgid ""
+"The Mapbox Vector Tile is an efficient encoding for map data into vector "
+"tiles that can be rendered dynamically."
+msgstr ""
+"Векторные тайлы MVT это эффективное кодирование данных карты в векторные тайлы "
+"которые могут быть динамически отрисованы."
+
+#: template/section_api_layer.mako:15
+msgid ""
+"https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-"
+"vector-tiles"
+msgstr ""
+"https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#mvt-"
+"vector-tiles"
+
+#: template/section_api_layer.mako:16
+msgid "Read more"
+msgstr "Подробнее"
 
 #: template/section_fields.mako:8
 msgid "Table"
