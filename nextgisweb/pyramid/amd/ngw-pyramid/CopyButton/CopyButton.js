@@ -55,7 +55,12 @@ define([
         copy: function(){
             var widget = this;
 
-            this.targetInput.value = this.target["" + this.targetAttribute];
+            if (lang.isFunction(this.targetAttribute)) {
+                this.targetInput.value = this.targetAttribute(this.target);
+            } else {
+                this.targetInput.value = this.target["" + this.targetAttribute];
+            }
+
             this.targetInput.style.display = 'block';
             this.targetInput.select();
 
