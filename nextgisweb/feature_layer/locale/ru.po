@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-01-14 08:35+0000\n"
+"POT-Creation-Date: 2021-01-15 10:03+0000\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -179,10 +179,6 @@ msgstr "Удалить"
 msgid "Search..."
 msgstr "Поиск..."
 
-#: template/section_api_layer.mako:4
-msgid "Use the addresses below to retrieve layer data from other applications."
-msgstr "Используйте указанные ниже адреса для получения данных слоя из других приложений."
-
 #: template/section_api_layer.mako:8
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
@@ -192,8 +188,8 @@ msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
 msgstr ""
-"Векторные тайлы MVT это эффективное кодирование данных карты в векторные тайлы "
-"которые могут быть динамически отрисованы."
+"Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
+"тайлы которые могут быть динамически отрисованы."
 
 #: template/section_api_layer.mako:15
 msgid ""

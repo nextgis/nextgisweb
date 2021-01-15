@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.1\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2019-05-26 15:09+0300\n"
+"POT-Creation-Date: 2021-01-15 13:06+0000\n"
 "PO-Revision-Date: 2019-05-26 15:09+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,19 +19,57 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: amd/ngw-render/TileCacheWidget.js:25
+#: view.py:24
+msgid "Access to the layer by API"
+msgstr "Доступ к слою по API"
+
+#: amd/ngw-render/TileCacheWidget.js:27
 msgid "Tile cache"
 msgstr "Тайловый кэш"
 
-#: amd/ngw-render/template/TileCacheWidget.hbs:8
+#: amd/ngw-render/template/TileCacheWidget.hbs:9
 msgid "Enabled"
 msgstr "Включен"
 
 #: amd/ngw-render/template/TileCacheWidget.hbs:13
+msgid "Allow using tiles in non-tile requests"
+msgstr "Разрешить тайлы для запросов изображений"
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:18
 msgid "Max zoom level"
 msgstr "Максимальный масштабный уровень"
 
-#: amd/ngw-render/template/TileCacheWidget.hbs:18
+#: amd/ngw-render/template/TileCacheWidget.hbs:23
 msgid "TTL, sec."
 msgstr "TTL, сек."
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:28
+msgid "Track changes"
+msgstr "Отслеживать изменения"
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:34
+msgid "Seed zoom level"
+msgstr "Заполнить масштабный уровень"
+
+#: template/section_api_renderable.mako:8
+msgid "TMS service"
+msgstr "TMS сервис"
+
+#: template/section_api_renderable.mako:12
+msgid ""
+"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web "
+"map is a map displayed in a browser by seamlessly joining dozens of "
+"individually requested image."
+msgstr ""
+"TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта "
+"- это карта, отображаемая в браузере путем бесшовного соединения десятков"
+" индивидуально запрашиваемых изображений (тайлов)."
+
+#: template/section_api_renderable.mako:15
+msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
+
+#: template/section_api_renderable.mako:16
+msgid "Read more"
+msgstr "Подробнее"
 

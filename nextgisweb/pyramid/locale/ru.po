@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-01-14 08:41+0000\n"
+"POT-Creation-Date: 2021-01-15 10:05+0000\n"
 "PO-Revision-Date: 2015-09-13 16:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -23,11 +23,11 @@ msgstr ""
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: exception.py:198 exception.py:254
+#: exception.py:208 exception.py:264
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:199
+#: exception.py:209
 msgid ""
 "The server encountered an internal error or misconfiguration and was "
 "unable to complete your request."
@@ -35,29 +35,29 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:228
+#: exception.py:238
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:229
+#: exception.py:239
 msgid ""
 "The server could not comply with the request since it is either malformed"
 " or otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:236
+#: exception.py:246
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:237
+#: exception.py:247
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:241
+#: exception.py:251
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:242
+#: exception.py:252
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -66,15 +66,15 @@ msgstr ""
 " или вернитесь на главную страницу и попробуйте найти нужную страницу с "
 "помощью навигации."
 
-#: exception.py:249
+#: exception.py:259
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:250
+#: exception.py:260
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:255
+#: exception.py:265
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -82,15 +82,15 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:262 exception.py:263
+#: exception.py:272 exception.py:273
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:267
+#: exception.py:277
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:268
+#: exception.py:278
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
