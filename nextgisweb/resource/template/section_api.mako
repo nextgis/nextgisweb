@@ -1,5 +1,5 @@
 <% import json %>
-<%! from nextgisweb.pyramid.util import _ %>
+<%! from nextgisweb.resource.util import _ %>
 
 <div class="content-box__description">${tr(_("Use the addresses below to retrieve layer data from other applications."))}</div>
 
