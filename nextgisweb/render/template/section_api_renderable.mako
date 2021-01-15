@@ -1,7 +1,7 @@
 <% import json %>
 <%! from nextgisweb.feature_layer.util import _ %>
 
-<%inherit file="nextgisweb:templates/section_api.mako"/>
+<%inherit file="nextgisweb:resource/template/section_api.mako"/>
 
 <%block name="content">
     <div class="row-title">
