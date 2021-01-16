@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-01-15 10:03+0000\n"
+"POT-Creation-Date: 2021-01-16 12:13+0000\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -75,8 +75,8 @@ msgid "Attributes"
 msgstr "Атрибуты"
 
 #: view.py:207
-msgid "Access to the layer by API"
-msgstr "Доступ к слою по API"
+msgid "External access"
+msgstr "Внешний доступ"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:78
 msgid "Attribute: "

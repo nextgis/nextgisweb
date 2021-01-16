@@ -1,7 +1,7 @@
 <% import json %>
 <%! from nextgisweb.resource.util import _ %>
 
-<div class="content-box__description">${tr(_("Use the addresses below to retrieve layer data from other applications."))}</div>
+<div class="content-box__description">${tr(_("Use these links to plug data into external applications."))}</div>
 
 <div class="content-box section-api">
     <%block name="content"/>

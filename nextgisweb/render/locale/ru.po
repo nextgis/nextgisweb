@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.1\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2021-01-15 13:06+0000\n"
+"POT-Creation-Date: 2021-01-16 12:12+0000\n"
 "PO-Revision-Date: 2019-05-26 15:09+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -20,8 +20,8 @@ msgstr ""
 "Generated-By: Babel 2.6.0\n"
 
 #: view.py:24
-msgid "Access to the layer by API"
-msgstr "Доступ к слою по API"
+msgid "External access"
+msgstr "Внешний доступ"
 
 #: amd/ngw-render/TileCacheWidget.js:27
 msgid "Tile cache"

@@ -21,6 +21,6 @@ class TileCacheWidget(Widget):
 def setup_pyramid(comp, config):
     Resource.__psection__.register(
         key='description',
-        title=_(u"Access to the layer by API"),
+        title=_(u"External access"),
         template='nextgisweb:render/template/section_api_renderable.mako',
         is_applicable=lambda obj: IRenderableStyle.providedBy(obj))
