@@ -41,7 +41,7 @@
         %endif
 
         <div class="pure-control-group">
-            <input name="login" type="text" required placeholder="${tr(_('Login'))}">
+            <input autofocus name="login" type="text" required placeholder="${tr(_('Login'))}">
         </div>
         <div class="pure-control-group">
             <input name="password" type="password" required placeholder="${tr(_('Password'))}">
