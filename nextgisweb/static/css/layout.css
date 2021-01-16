@@ -1142,6 +1142,7 @@ a[class*=" icon-"]:hover:before {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  user-select: all;
 }
 .content-box .row-input-info .copy-button {
   display: inline-block;
