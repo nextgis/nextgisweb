@@ -22,6 +22,7 @@ from .serialize import (
     SerializedResourceRelationship)
 from .util import _
 
+from .events import *    # NOQA
 from .exception import *    # NOQA
 from .interface import *    # NOQA
 from .model import *        # NOQA
@@ -32,6 +33,8 @@ from .widget import *       # NOQA
 
 
 __all__ = [  # NOQA: F405
+    'AfterResourceCollectionPost',
+    'AfterResourcePut',
     'Resource',
     'IResourceBase',
     'Serializer',
