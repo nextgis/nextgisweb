@@ -21,9 +21,10 @@
         </div>
     </div>
     <div class="row-input-info">
+        <% url_tms = request.route_url('render.tile', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}' %>
         <div class="text"
-             data-value="${request.route_url('render.tile', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}'}">
-            ${request.route_url('render.tile', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}'}
+             data-value="${url_tms}">
+            ${url_tms}
         </div>
     </div>
 </%block>

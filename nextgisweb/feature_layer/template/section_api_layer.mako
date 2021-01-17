@@ -21,9 +21,9 @@
         </div>
     </div>
     <div class="row-input-info">
-        <div class="text"
-             data-value="${request.route_url('feature_layer.mvt', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}'}">
-            ${request.route_url('feature_layer.mvt', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}'}
+        <% url_mvt = request.route_url('feature_layer.mvt', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}' %>
+        <div class="text" data-value="${url_mvt}">
+            ${url_mvt}
         </div>
     </div>
 </%block>
