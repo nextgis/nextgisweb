@@ -20,6 +20,9 @@ class Env(object):
         if cfg is None:
             cfg = load_config(None, None)
 
+        if len(cfg) == 0:
+            logger.info("Creating environment without any configuration.")
+
         packages_ign = re.split(r'[,\s]+', cfg.get('core.packages.ignore', ''))
         components_ign = re.split(r'[,\s]+', cfg.get('core.components.ignore', ''))
 
