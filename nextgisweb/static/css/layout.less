@@ -89,7 +89,7 @@ body {
 a:hover [class^="icon-"]:before,
 a:hover [class*=" icon-"]:before,
 a[class^="icon-"]:hover:before,
-a[class*=" icon-"]:hover:before,{
+a[class*=" icon-"]:hover:before{
     color:@yellow;
 }
 
@@ -384,6 +384,53 @@ a[class*=" icon-"]:hover:before,{
                 }
             }
         }
+
+        .row-title {
+            margin-bottom: 5px;
+
+            .text {
+                display: inline-block;
+            }
+
+            .help {
+                font-size: 1.35em;
+                vertical-align: top;
+                cursor: pointer;
+
+                .tooltip-content {
+                    display: none;
+                }
+            }
+        }
+
+        .row-input-info {
+            display: inline-block;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+            border-radius: 4px;
+            width: 100%;
+
+            .text {
+                display: inline-block;
+                margin: 6px 0 0 5px;
+                width: 90%;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                user-select: all;
+            }
+
+            .copy-button {
+                display: inline-block;
+                float: right;
+                padding-top: 5px;
+                padding-right: 3px;
+
+                span.material-icons {
+                    font-size: 22px;
+                }
+            }
+        }
     }
 
     .lt-ie9 .content-box{
@@ -405,6 +452,21 @@ a[class*=" icon-"]:hover:before,{
         .content-box__info:first-child{
             margin-top: -16px;
         }
+
+.content-box__description {
+    margin-top: -16px;
+    margin-bottom: 24px;
+}
+
+/* Help tooltip */
+.tooltip-help {
+    max-width: 400px;
+
+    .icon-exitToApp {
+        font-size: 15px;
+        vertical-align: text-bottom;
+    }
+}
 
 /* Sidebar */
 
