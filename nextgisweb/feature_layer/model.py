@@ -15,6 +15,7 @@ from ..resource import (
     Serializer,
     SerializedProperty as SP)
 from ..resource.exception import ValidationError
+from ..lookup_table import LookupTable
 
 from .interface import (
     FIELD_TYPE,
@@ -22,7 +23,7 @@ from .interface import (
 
 from .util import _
 
-Base = declarative_base(dependencies=('resource', ))
+Base = declarative_base(dependencies=('resource', 'lookup_table'))
 
 _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 
@@ -39,6 +40,7 @@ class LayerField(Base):
     datatype = db.Column(db.Enum(*FIELD_TYPE.enum), nullable=False)
     display_name = db.Column(db.Unicode, nullable=False)
     grid_visibility = db.Column(db.Boolean, nullable=False, default=True)
+    lookup_table_id = db.Column(db.ForeignKey(LookupTable.id))
 
     identity = __tablename__
 
@@ -52,9 +54,10 @@ class LayerField(Base):
     )
 
     layer = db.relationship(
-        Resource,
-        primaryjoin='Resource.id == LayerField.layer_id',
-    )
+        Resource, primaryjoin='Resource.id == LayerField.layer_id')
+
+    lookup_table = db.relationship(
+        LookupTable, primaryjoin='LayerField.lookup_table_id == LookupTable.id')
 
     def __str__(self):
         return self.display_name
@@ -129,6 +132,7 @@ class LayerFieldsMixin(object):
 
 
 class _fields_attr(SP):
+    # TODO: Add lookup_table attribute
 
     def getter(self, srlzr):
         return [OrderedDict((
