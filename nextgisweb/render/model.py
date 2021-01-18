@@ -6,7 +6,7 @@ from threading import Thread
 import os.path
 import sqlite3
 from io import BytesIO
-from Queue import Queue
+from Queue import Queue, Full
 
 import transaction
 from PIL import Image
@@ -34,6 +34,9 @@ TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 Base = declarative_base(dependencies=('resource', ))
 
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
+
+QUEUE_MAXSIZE = 20
+QUEUE_TIMEOUT = 10  # seconds
 
 
 def get_tile_db(db_path):
@@ -65,9 +68,8 @@ class TilestorWriter:
 
     def __init__(self):
         if TilestorWriter.__instance is None:
-            self.queue = Queue()
+            self.queue = Queue(maxsize=QUEUE_MAXSIZE)
 
-            self._DBSession = None
             self._worker = Thread(target=self._job)
             self._worker.daemon = True
             self._worker.start()
@@ -80,9 +82,6 @@ class TilestorWriter:
 
     def _job(self):
         while True:
-            if self._DBSession is None:
-                self._DBSession = DBSession()
-
             data = self.queue.get()
 
             z, x, y = data['tile']
@@ -94,7 +93,7 @@ class TilestorWriter:
             color = pack_color(colortuple) if colortuple is not None else None
 
             with transaction.manager:
-                conn = self._DBSession.connection()
+                conn = DBSession.connection()
                 conn.execute(db.sql.text(
                     'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
                     'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
@@ -102,7 +101,7 @@ class TilestorWriter:
                 ), z=z, x=x, y=y, color=color, tstamp=tstamp)
 
                 # Force zope session management to commit changes
-                mark_changed(self._DBSession)
+                mark_changed(DBSession())
 
             if color is None:
                 buf = BytesIO()
@@ -241,7 +240,10 @@ class ResourceTileCache(Base):
         )
 
         writer = TilestorWriter.getInstance()
-        writer.queue.put(params)
+        try:
+            writer.queue.put(params, block=True, timeout=QUEUE_TIMEOUT)
+        except Full:
+            env.render.logger.error("Tile writer queue full for z=%d x=%d y=%d" % tile)
 
     def initialize(self):
         self.sameta.create_all(bind=DBSession.connection())
