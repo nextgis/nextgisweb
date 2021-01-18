@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:css": "lessc nextgisweb/static/css/layout.less > nextgisweb/static/css/layout.css",
+    "build:css": "lessc --js nextgisweb/static/css/layout.less > nextgisweb/static/css/layout.css",
     "watch:css": "onchange 'nextgisweb/static/css/*.less' -- npm run build:css"
   },
   "repository": {
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/nextgis/nextgisweb#readme",
   "devDependencies": {
-    "less": "^2.7.3",
+    "less": "^4.1.0",
     "onchange": "^3.2.1"
   }
 }
