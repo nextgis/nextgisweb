@@ -3,7 +3,12 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 
 from ..component import Component
 
-from .model import Base
+from .model import Base, LookupTable
+
+__all__ = [
+    'LookupTableComponent',
+    'LookupTable',
+]
 
 
 class LookupTableComponent(Component):
