@@ -9,57 +9,57 @@
 // version: v3.0.2 (2014-06-17)
 
 // TABLE OF MIXINS:	
-	// animation
-	// animation-delay
-	// animation-direction
-	// animation-duration
-	// animation-fill-mode
-	// animation-iteration-count
-	// animation-name
-	// animation-play-state
-	// animation-timing-function
-	// appearance
-	// background-clip
-	// background-image
-	// background-origin
-	// background-size
-	// blur
-	// border-bottom-left-radius
-	// border-bottom-right-radius
-	// border-image
-	// border-radius
-	// border-top-left-radius
-	// border-top-right-radius
-	// box-shadow
-	// box-sizing
-	// calc
-	// filter
-	// font-face
-	// grayscale
-	// keyframes
-	// opacity
-	// placeholder
-	// rotate
-	// rotate3d
-	// rotateX
-	// rotateY
-	// rotateZ
-	// size
-	// transform
-	// transform-origin
-	// transform-style
-	// transition
-	// transition-delay
-	// transition-duration
-	// transition-property
-	// transition-timing-function
-	// translate
-	// translate3d
-	// translateX
-	// translateY
-	// translateZ
+// animation
+// animation-delay
+// animation-direction
+// animation-duration
+// animation-fill-mode
+// animation-iteration-count
+// animation-name
+// animation-play-state
+// animation-timing-function
+// appearance
+// background-clip
+// background-image
+// background-origin
+// background-size
+// blur
+// border-bottom-left-radius
+// border-bottom-right-radius
+// border-image
+// border-radius
+// border-top-left-radius
+// border-top-right-radius
+// box-shadow
+// box-sizing
+// calc
+// filter
+// font-face
+// grayscale
+// keyframes
+// opacity
+// placeholder
+// rotate
+// rotate3d
+// rotateX
+// rotateY
+// rotateZ
+// size
+// transform
+// transform-origin
+// transform-style
+// transition
+// transition-delay
+// transition-duration
+// transition-property
+// transition-timing-function
+// translate
+// translate3d
+// translateX
+// translateY
+// translateZ
 
-	
+
 .animation(...) {
   @process: ~`(function(t){return t=t||"none",/^[^, ]*,/.test(t)&&(t=t.replace(/(?:,)(?![^(]*\))/g,"")),t})((function(){var t="@{arguments}";return t=t.replace(/^\[|\]$/g,"")})())`;
   -webkit-animation: @process;
@@ -169,37 +169,52 @@
 
 .border-bottom-left-radius(...) {
   @process: ~`(function(e){e=e||"0";var t=/\d/gi,r=/(?:\s|^)(\.?\d+\.?\d*)(?![^(]*\)|\w|%|\.)/gi;return/^[^, ]*,/.test(e)&&(e=e.replace(/(?:,)(?![^(]*\))/g,"")),t.test(e)&&(e=e.replace(r,function(e){return 0==e&&e||e+"px"})),e})((function(){var e="@{arguments}";return e=e.replace(/^\[|\]$/g,"")})())`;
-  -webkit-border-bottom-left-radius: @process; -webkit-background-clip: padding-box; 
-  -moz-border-radius-bottomleft: @process; -moz-background-clip: padding; 
-  border-bottom-left-radius: @process; background-clip: padding-box; 
+  -webkit-border-bottom-left-radius: @process;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius-bottomleft: @process;
+  -moz-background-clip: padding;
+  border-bottom-left-radius: @process;
+  background-clip: padding-box;
 }
 
 .border-bottom-right-radius(...) {
   @process: ~`(function(e){e=e||"0";var t=/\d/gi,r=/(?:\s|^)(\.?\d+\.?\d*)(?![^(]*\)|\w|%|\.)/gi;return/^[^, ]*,/.test(e)&&(e=e.replace(/(?:,)(?![^(]*\))/g,"")),t.test(e)&&(e=e.replace(r,function(e){return 0==e&&e||e+"px"})),e})((function(){var e="@{arguments}";return e=e.replace(/^\[|\]$/g,"")})())`;
-  -webkit-border-bottom-right-radius: @process; -webkit-background-clip: padding-box; 
-  -moz-border-radius-bottomright: @process; -moz-background-clip: padding; 
-  border-bottom-right-radius: @process; background-clip: padding-box; 
+  -webkit-border-bottom-right-radius: @process;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius-bottomright: @process;
+  -moz-background-clip: padding;
+  border-bottom-right-radius: @process;
+  background-clip: padding-box;
 }
 
 .border-radius(...) {
   @process: ~`(function(e){e=e||"0";var t=/\d/gi,r=/(?:\s|^)(\.?\d+\.?\d*)(?![^(]*\)|\w|%|\.)/gi;return/^[^, ]*,/.test(e)&&(e=e.replace(/(?:,)(?![^(]*\))/g,"")),t.test(e)&&(e=e.replace(r,function(e){return 0==e&&e||e+"px"})),e})((function(){var e="@{arguments}";return e=e.replace(/^\[|\]$/g,"")})())`;
-  -webkit-border-radius: @process; -webkit-background-clip: padding-box; 
-  -moz-border-radius: @process; -moz-background-clip: padding; 
-  border-radius: @process; background-clip: padding-box; 
+  -webkit-border-radius: @process;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: @process;
+  -moz-background-clip: padding;
+  border-radius: @process;
+  background-clip: padding-box;
 }
 
 .border-top-left-radius(...) {
   @process: ~`(function(e){e=e||"0";var t=/\d/gi,r=/(?:\s|^)(\.?\d+\.?\d*)(?![^(]*\)|\w|%|\.)/gi;return/^[^, ]*,/.test(e)&&(e=e.replace(/(?:,)(?![^(]*\))/g,"")),t.test(e)&&(e=e.replace(r,function(e){return 0==e&&e||e+"px"})),e})((function(){var e="@{arguments}";return e=e.replace(/^\[|\]$/g,"")})())`;
-  -webkit-border-top-left-radius: @process; -webkit-background-clip: padding-box; 
-  -moz-border-radius-topleft: @process; -moz-background-clip: padding; 
-  border-top-left-radius: @process; background-clip: padding-box; 
+  -webkit-border-top-left-radius: @process;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius-topleft: @process;
+  -moz-background-clip: padding;
+  border-top-left-radius: @process;
+  background-clip: padding-box;
 }
 
 .border-top-right-radius(...) {
   @process: ~`(function(e){e=e||"0";var t=/\d/gi,r=/(?:\s|^)(\.?\d+\.?\d*)(?![^(]*\)|\w|%|\.)/gi;return/^[^, ]*,/.test(e)&&(e=e.replace(/(?:,)(?![^(]*\))/g,"")),t.test(e)&&(e=e.replace(r,function(e){return 0==e&&e||e+"px"})),e})((function(){var e="@{arguments}";return e=e.replace(/^\[|\]$/g,"")})())`;
-  -webkit-border-top-right-radius: @process; -webkit-background-clip: padding-box; 
-  -moz-border-radius-topright: @process; -moz-background-clip: padding; 
-  border-top-right-radius: @process; background-clip: padding-box; 
+  -webkit-border-top-right-radius: @process;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius-topright: @process;
+  -moz-background-clip: padding;
+  border-top-right-radius: @process;
+  background-clip: padding-box;
 }
 
 .box-shadow(...) {
@@ -229,9 +244,9 @@
   font-family: "@{fontname}";
   src: url("@{fontfile}.eot");
   src: url("@{fontfile}.eot?#iefix") format("embedded-opentype"),
-       url("@{fontfile}.woff") format("woff"),
-       url("@{fontfile}.ttf") format("truetype"),
-       url("@{fontfile}.svg#@{fontname}") format("svg");
+  url("@{fontfile}.woff") format("woff"),
+  url("@{fontfile}.ttf") format("truetype"),
+  url("@{fontfile}.svg#@{fontname}") format("svg");
   font-weight: @fontweight;
   font-style: @fontstyle;
 }
@@ -246,8 +261,10 @@
 
 .keyframes(...) {
   @process: ~`(function(e){function r(r,t,c){var i="}\n",u=n.split(/(^[a-zA-Z0-9-]+),/g),s=t+" "+u[1]+"{",o=["-webkit-","-moz-","-ms-",""];c?a.forEach(function(r){-1!==e.indexOf(r)&&(u[2]=u[2].replace(new RegExp(r,"g"),function(e){return c+e}))}):u[2]=u[2].replace(/{([^}]+)}/g,function(e,r){var t=r.split(";");t.forEach(function(e,r){a.forEach(function(n){-1!==e.indexOf(n)&&(t[r]="",o.forEach(function(a){t[r]+=e.trim().replace(new RegExp(n,"g"),function(e){return a+e})+";"}))})});var n=t.join(";").replace(/;;/g,";");return e.replace(r,n)}),s+=u[2]+i,"start"==r?e="0; } \n"+s:"startend"==r?e="0; } \n"+s.replace(i,""):e+="end"==r?s.replace(i,""):s}e=e||8121991;var t="@{state}",n=e;if(8121991==e)return e;var a=["animation","transform","filter"];switch(t){case"1":r("start","@-webkit-keyframes","-webkit-"),r(null,"@-moz-keyframes","-moz-"),r(null,"@-o-keyframes","-o-"),r("end","@keyframes");break;case"2":r("start","@-webkit-keyframes","-webkit-"),r(null,"@-moz-keyframes","-moz-"),r("end","@keyframes");break;case"3":r("start","@-webkit-keyframes","-webkit-"),r(null,"@-moz-keyframes","-moz-"),r("end","@-o-keyframes","-o-");break;case"4":r("start","@-webkit-keyframes","-webkit-"),r(null,"@-o-keyframes","-o-"),r("end","@keyframes");break;case"5":r("start","@-webkit-keyframes","-webkit-"),r("end","@-moz-keyframes","-moz-");break;case"6":r("start","@-webkit-keyframes","-webkit-"),r("end","@-o-keyframes","-o-");break;case"7":r("start","@-webkit-keyframes","-webkit-"),r("end","@keyframes");break;case"8":r("startend","@-webkit-keyframes","-webkit-");break;case"9":r("start","@-moz-keyframes","-moz-"),r(null,"@-o-keyframes","-o-"),r("end","@keyframes");break;case"10":r("start","@-moz-keyframes","-moz-"),r("end","@-o-keyframes","-o-");break;case"11":r("start","@-moz-keyframes","-moz-"),r("end","@keyframes");break;case"12":r("startend","@-moz-keyframes","-moz-");break;case"13":r("start","@-o-keyframes","-o-"),r("end","@keyframes");break;case"14":r("startend","@-o-keyframes","-o-");break;case"15":r("startend","@keyframes")}return e})((function(){var e="@{arguments}";return e=e.replace(/^\[|\]$/g,"")})())`;
-  @state: 1; lesshat-selector { -lh-property: @process; }
-
+  @state: 1;
+  lesshat-selector {
+    -lh-property: @process;
+  }
 
 
 }
@@ -255,7 +272,8 @@
 .opacity(...) {
   @process_ms: ~`(function(e){return e=e||"filter: alpha(opacity=100)","alpha(opacity="+Math.floor(100*e)+")"})((function(){var e="@{arguments}";return e=e.replace(/^\[|\]$/g,"")})())`;
   @process: ~`(function(e){return e=e||"1"})((function(){var e="@{arguments}";return e=e.replace(/^\[|\]$/g,"")})())`;
-   zoom: 1; filter: @process_ms;
+  zoom: 1;
+  filter: @process_ms;
   -webkit-opacity: @process;
   -moz-opacity: @process;
   opacity: @process;
@@ -338,7 +356,8 @@
   }
 
   .process(@width, @height) when (ispixel(@height)), (isem(@height)), (ispercentage(@height)), (iskeyword(@height)) {
-    .kittens(@width) when (ispixel(@width)), (isem(@width)), (ispercentage(@width)), (iskeyword(@width)) {}
+    .kittens(@width) when (ispixel(@width)), (isem(@width)), (ispercentage(@width)), (iskeyword(@width)) {
+    }
     .kittens(@width) when not (ispixel(@width)) and not (isem(@width)) and not (ispercentage(@width)) and not (iskeyword(@width)) {
       width: ~`@{width} + @{unit}`;
       height: @height;
@@ -475,33 +494,32 @@
 }
 
 .retina-image(@sprites, @i: 1) when (@i <= length(@sprites)) {
-	@sprite: extract(@sprites, @i);
-	@file: "../img/sprite@2x.png";
-	@width: extract(@sprite, 7);
-	@height: extract(@sprite, 8);
-	@posx: extract(@sprite, 3);
-	@posy: extract(@sprite, 4);
-	@sprite-name: e(extract(@sprite, 10));
-	.@{sprite-name}-retina{
-		background-size: @width @height;
-		background-image: url('@{file}');
-	}
-	.@{sprite-name} {
-		@media
-		(-webkit-min-device-pixel-ratio: 1.25),
-		(~`"-o-min-device-pixel-ratio: 1.25/1"`),
-		(min--moz-device-pixel-ratio: 1.25),
-		(-moz-min-device-pixel-ratio: 1.25),
-		(-ms-min-device-pixel-ratio: 1.25),
-		(min-device-pixel-ratio: 1.25),
-		(min-resolution: 120dpi),
-		(min-resolution: 1.25dppx) {
-		  background-size: @width @height;
-		  background-image: url('@{file}');
-		}
-	}
-	
-	
-	.retina-image(@sprites, @i + 1);
+  @sprite: extract(@sprites, @i);
+  @file: "../img/sprite@2x.png";
+  @width: extract(@sprite, 7);
+  @height: extract(@sprite, 8);
+  @posx: extract(@sprite, 3);
+  @posy: extract(@sprite, 4);
+  @sprite-name: e(extract(@sprite, 10));
+  .@{sprite-name}-retina {
+    background-size: @width @height;
+    background-image: url('@{file}');
+  }
+  .@{sprite-name} {
+    @media (-webkit-min-device-pixel-ratio: 1.25),
+    (-o-min-device-pixel-ratio: 1.25/1),
+    (min--moz-device-pixel-ratio: 1.25),
+    (-moz-min-device-pixel-ratio: 1.25),
+    (-ms-min-device-pixel-ratio: 1.25),
+    (min-device-pixel-ratio: 1.25),
+    (min-resolution: 120dpi),
+    (min-resolution: 1.25dppx) {
+      background-size: @width @height;
+      background-image: url('@{file}');
+    }
+  }
+
+
+  .retina-image(@sprites, @i + 1);
 }
 

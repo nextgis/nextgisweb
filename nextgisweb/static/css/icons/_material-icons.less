@@ -4,17 +4,17 @@
   font-weight: 400;
   src: url(../font/MaterialIcons-Regular.eot); /* For IE6-8 */
   src: local('Material Icons'),
-       local('MaterialIcons-Regular'),
-       url(../font/MaterialIcons-Regular.woff2) format('woff2'),
-       url(../font/MaterialIcons-Regular.woff) format('woff'),
-       url(../font/MaterialIcons-Regular.ttf) format('truetype');
+  local('MaterialIcons-Regular'),
+  url(../font/MaterialIcons-Regular.woff2) format('woff2'),
+  url(../font/MaterialIcons-Regular.woff) format('woff'),
+  url(../font/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
-  font-size: 24px;  /* Preferred icon size */
+  font-size: 24px; /* Preferred icon size */
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -41,69 +41,81 @@
 /* Icons in :before */
 
 /* Icons */
-[class^="icon-"], [class*=" icon-"]{
-    &:before{
-        display: inline-block;
-    }
+[class^="icon-"], [class*=" icon-"] {
+  &:before {
+    display: inline-block;
+  }
 }
-.material-icons{
-    &:before{
-        font-family: 'Material Icons';
-        display: inline-block;
-    }
-    &.icon-exitToApp:before{
-        content:"\E879";
-    }
 
-    &.icon-personOutline:before{
-        content:"\E7FF";
-    }
+.material-icons {
+  &:before {
+    font-family: 'Material Icons';
+    display: inline-block;
+  }
 
-    &.icon-close:before{
-        content:"\E5CD";
-    }
+  &.icon-exitToApp:before {
+    content: "\E879";
+  }
 
-    &.icon-errorOutline:before{
-        content:"\E001";
-    }
+  &.icon-personOutline:before {
+    content: "\E7FF";
+  }
 
-    &.icon-addAPhoto:before{
-        content:"\E439";
-    }
-    &.icon-menu:before{
-        content:"\E5D2";
-    }
-    &.icon-edit:before{
-        content:"\E3C9";
-        font-size: .95em;
-        line-height: 1.05em;
-        vertical-align: top; 
-    }
-    &.icon-delete:before{
-        content:"\E872";
-        font-size: .95em;
-        line-height: 1.05em;
-        vertical-align: top; 
-    }
-    &.icon-caret:before{
-        content:"\E5C5";
-    }
-    &.icon-caretUp:before{
-        content:"\E5C7";
-    }
-    &.icon-loupe:before{
-        content:"\E8B6";
-    }
-    &.icon-arrowDownward:before{
-        content:"\E5DB";
-    }
-    &.icon-arrowUpward:before{
-        content:"\E5D8";
-    }
-    &.icon-helpOutline:before{
-        content:"\e8fd";
-    }
-    &.icon-exitToApp:before{
-        content:"\e879";
-    }
+  &.icon-close:before {
+    content: "\E5CD";
+  }
+
+  &.icon-errorOutline:before {
+    content: "\E001";
+  }
+
+  &.icon-addAPhoto:before {
+    content: "\E439";
+  }
+
+  &.icon-menu:before {
+    content: "\E5D2";
+  }
+
+  &.icon-edit:before {
+    content: "\E3C9";
+    font-size: .95em;
+    line-height: 1.05em;
+    vertical-align: top;
+  }
+
+  &.icon-delete:before {
+    content: "\E872";
+    font-size: .95em;
+    line-height: 1.05em;
+    vertical-align: top;
+  }
+
+  &.icon-caret:before {
+    content: "\E5C5";
+  }
+
+  &.icon-caretUp:before {
+    content: "\E5C7";
+  }
+
+  &.icon-loupe:before {
+    content: "\E8B6";
+  }
+
+  &.icon-arrowDownward:before {
+    content: "\E5DB";
+  }
+
+  &.icon-arrowUpward:before {
+    content: "\E5D8";
+  }
+
+  &.icon-helpOutline:before {
+    content: "\e8fd";
+  }
+
+  &.icon-exitToApp:before {
+    content: "\e879";
+  }
 }

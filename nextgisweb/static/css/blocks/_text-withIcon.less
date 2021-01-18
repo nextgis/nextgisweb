@@ -1,75 +1,75 @@
-.text-withIcon{
-	position: relative;
-	line-height: 1.285;
-	padding-left: 32px;
+.text-withIcon {
+  position: relative;
+  line-height: 1.285;
+  padding-left: 32px;
 
-	&_size_s{
-		padding-left: 26px;
-	}
+  &_size_s {
+    padding-left: 26px;
+  }
 }
 
 
-.text-withIcon__icon{
-	position: absolute;
-	top: -5px;
-	left:0;
-	width: 24px;
-	height: 24px;
-	line-height: 24px;
-	text-align: center;
+.text-withIcon__icon {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
 
-	.text-withIcon__pic{
-		width: 100%;
-		height: 100%;
-	}
+  .text-withIcon__pic {
+    width: 100%;
+    height: 100%;
+  }
 
-	&_size_s{
-		width: 16px;
-		height: 16px;
-		line-height: 16px;
-		top: -1px;
+  &_size_s {
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    top: -1px;
 
-		.text-withIcon__pic{
-			background-size: 16px 16px;
+    .text-withIcon__pic {
+      background-size: 16px 16px;
 
-			&.svgIcon{
-				&-raster_layer{
-					width: 14px;
-					height: 14px;
-				}
+      &.svgIcon {
+        &-raster_layer {
+          width: 14px;
+          height: 14px;
+        }
 
-				&-vector_layer,
-				&-resource_group{
-					width: 16px;
-					height: 16px;
-				}
+        &-vector_layer,
+        &-resource_group {
+          width: 16px;
+          height: 16px;
+        }
 
-				&-basemap_layer,
-				&-lookup_table{
-					shape-rendering: crispEdges;
-				}
-			}
-		}
-	}
+        &-basemap_layer,
+        &-lookup_table {
+          shape-rendering: crispEdges;
+        }
+      }
+    }
+  }
 }
 
-.text-withIcon__pic{
-	position: relative;
-	vertical-align: middle;
-	background: url("../svg/default_resource.svg") center center no-repeat;
-	background-size: 24px 24px;
+.text-withIcon__pic {
+  position: relative;
+  vertical-align: middle;
+  background: url("../svg/default_resource.svg") center center no-repeat;
+  background-size: 24px 24px;
 
-	&.svgIcon{
-		&-vector_layer,
-		&-raster_layer,
-    &-basemap_layer{
-			width: 	18px;
-			height: 18px;
-		}
+  &.svgIcon {
+    &-vector_layer,
+    &-raster_layer,
+    &-basemap_layer {
+      width: 18px;
+      height: 18px;
+    }
 
-		&-resource_group{
-			width: 	24px;
-			height: 24px;
-		}
-	}
+    &-resource_group {
+      width: 24px;
+      height: 24px;
+    }
+  }
 }

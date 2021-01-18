@@ -1,18 +1,18 @@
-.nextgis.claro{
+.nextgis.claro {
 
-  .dijitButton{
+  .dijitButton {
 
-    &--primary, &--default{
+    &--primary, &--default {
       margin: 0;
       border-radius: 23px;
       font-size: @font-size-md;
 
       & + .dijitButton--primary,
-      & + .dijitButton--default{
+      & + .dijitButton--default {
         margin-left: 8px;
       }
 
-      &.dijitButtonDisabled{
+      &.dijitButtonDisabled {
         background: #ddd;
         color: #999;
       }
@@ -23,33 +23,33 @@
         font-size: inherit;
         background-image: none;
         background-color: inherit;
-        border:0;
+        border: 0;
         color: inherit;
         border-radius: 23px;
         padding: 0 16px;
         font-family: @header-font;
         transition: none;
 
-        .dijitReset{
+        .dijitReset {
           line-height: inherit;
         }
 
-        *{
+        * {
           vertical-align: baseline;
         }
       }
     }
 
-    &--primary{
+    &--primary {
       background-color: @blue;
       color: #fff;
 
-      &:hover{
+      &:hover {
         background: darken(@blue, 10%);
       }
     }
 
-    &--default{
+    &--default {
       background-color: @lightBlue;
       color: @blue;
     }
@@ -65,13 +65,13 @@
       }
     }
 
-    &--signal{
+    &--signal {
 
-      .dijitButtonContents{
+      .dijitButtonContents {
         position: relative;
       }
 
-      .dijitButtonContents::after{
+      .dijitButtonContents::after {
         content: "";
         position: absolute;
         left: -1px;
@@ -84,8 +84,8 @@
         display: none;
       }
 
-      &-active{
-        .dijitButtonContents::after{
+      &-active {
+        .dijitButtonContents::after {
           display: block;
         }
       }

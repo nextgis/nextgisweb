@@ -1,29 +1,29 @@
-.ngw-toolbar{
-    background-color: @gray-bg;
-    padding: 12px;
-    display: flex;
-    margin-bottom: 16px;
-    box-shadow: @elevation-base;
-    border-radius: @border-radius-base;
+.ngw-toolbar {
+  background-color: @gray-bg;
+  padding: 12px;
+  display: flex;
+  margin-bottom: 16px;
+  box-shadow: @elevation-base;
+  border-radius: @border-radius-base;
 
-    &--space-between{
-        justify-content: space-between;
+  &--space-between {
+    justify-content: space-between;
+  }
+
+  &__inner {
+    margin-top: -4px;
+    margin-bottom: -4px;
+  }
+
+  &__tool,
+  &__tool.dijitReset {
+    margin-right: 12px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    vertical-align: middle;
+
+    &:last-child {
+      margin-right: 0;
     }
-
-    &__inner{
-        margin-top: -4px;
-        margin-bottom: -4px;
-    }
-
-    &__tool,
-    &__tool.dijitReset{
-        margin-right: 12px;
-        margin-top: 4px;
-        margin-bottom: 4px;
-        vertical-align: middle;
-
-        &:last-child{
-            margin-right: 0;
-        }
-    }
+  }
 }

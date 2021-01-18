@@ -1,28 +1,28 @@
-@import "settings/_variables";
+@import "../settings/_variables";
 
-a, .link{
-    color: @blue;
-    text-decoration: underline;
-    cursor: pointer;
+a, .link {
+  color: @blue;
+  text-decoration: underline;
+  cursor: pointer;
 
-    &:hover{
-        color: @link-hover;
-        border-color: @link-hover;
-        border-color: fade(@link-hover, 40%);
-    }
+  &:hover {
+    color: @link-hover;
+    border-color: @link-hover;
+    border-color: fade(@link-hover, 40%);
+  }
 }
 
-.link{
-  &--action{
+.link {
+  &--action {
     font-family: @header-font;
     font-size: @font-size-md;
     text-decoration: none;
   }
 
-  &--muted{
+  &--muted {
     color: @text-muted;
 
-    &:hover{
+    &:hover {
       color: darken(@text-muted, 20%);
     }
   }
@@ -32,8 +32,8 @@ a, .link{
     transition: transform .3s;
   }
 
-  &--dropdown.active{
-    .link__icon{
+  &--dropdown.active {
+    .link__icon {
       transform: rotate(-180deg);
     }
   }

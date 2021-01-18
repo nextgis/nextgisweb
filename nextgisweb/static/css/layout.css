@@ -224,7 +224,7 @@ a:hover,
 }
 .link__icon {
   vertical-align: middle;
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 .link--dropdown.active .link__icon {
   transform: rotate(-180deg);
@@ -244,7 +244,7 @@ a:hover,
   -webkit-animation: progress-circular-dash 1.4s ease-in-out infinite;
   animation: progress-circular-dash 1.4s ease-in-out infinite;
   stroke-linecap: round;
-  stroke-dasharray: 80,200;
+  stroke-dasharray: 80, 200;
   stroke-dashoffset: 0px;
 }
 .progress-circular__overlay {
@@ -264,7 +264,7 @@ a:hover,
     stroke-dashoffset: -15px;
   }
   100% {
-    stroke-dasharray: 100,200;
+    stroke-dasharray: 100, 200;
     stroke-dashoffset: -125px;
   }
 }
@@ -304,7 +304,7 @@ table {
   transition: background-color 0.4s;
   vertical-align: middle;
   border-left: 0;
-  padding: .8em 1em;
+  padding: 0.8em 1em;
   line-height: 1.285;
 }
 .pure-table td.fit-content,
@@ -357,7 +357,7 @@ table {
 }
 .table-keyvalue td,
 .table-keyvalue th {
-  padding-top: .615em;
+  padding-top: 0.615em;
   padding-bottom: 0;
   border-bottom-color: transparent;
   padding-left: 0;
@@ -493,13 +493,13 @@ table {
 }
 .material-icons.icon-edit:before {
   content: "\E3C9";
-  font-size: .95em;
+  font-size: 0.95em;
   line-height: 1.05em;
   vertical-align: top;
 }
 .material-icons.icon-delete:before {
   content: "\E872";
-  font-size: .95em;
+  font-size: 0.95em;
   line-height: 1.05em;
   vertical-align: top;
 }
@@ -726,7 +726,7 @@ table {
 }
 .ngw-button--icon .ngw-button__icon {
   color: inherit;
-  opacity: .75;
+  opacity: 0.75;
 }
 .ngw-button--icon .ngw-button__icon--prepend {
   margin-right: 4px;
@@ -966,7 +966,7 @@ a[class*=" icon-"]:hover:before {
 }
 .header-nav__item > a:hover {
   color: inherit;
-  opacity: .76;
+  opacity: 0.76;
 }
 .header-nav__item > .material-icons {
   display: inline;
@@ -975,7 +975,7 @@ a[class*=" icon-"]:hover:before {
 }
 .header-nav__item > .material-icons:hover {
   color: inherit;
-  opacity: .76;
+  opacity: 0.76;
 }
 .header__left {
   padding-right: 250px;
@@ -1696,7 +1696,7 @@ textarea {
 .nextgis.claro .dijitTabContainerRight-tabs .dijitTab {
   padding: 0px 12px;
   text-transform: uppercase;
-  letter-spacing: .8px;
+  letter-spacing: 0.8px;
   font-size: 13px;
   background: none;
   border: 1px solid transparent;
@@ -1905,7 +1905,7 @@ textarea {
   cursor: pointer;
 }
 .nextgis.claro .dijitTreeNodeDisabled {
-  opacity: .24;
+  opacity: 0.24;
 }
 .nextgis.claro .dijitTreeNodeDisabled * {
   cursor: not-allowed;
@@ -1926,7 +1926,7 @@ textarea {
 }
 .nextgis.claro .dijitDialogUnderlay {
   background: #010910;
-  opacity: .75;
+  opacity: 0.75;
 }
 .nextgis.claro .dijitCalendar {
   background-color: #fff;
