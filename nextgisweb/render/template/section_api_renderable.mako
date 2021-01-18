@@ -1,5 +1,5 @@
 <% import json %>
-<%! from nextgisweb.feature_layer.util import _ %>
+<%! from nextgisweb.render.util import _ %>
 
 <%inherit file="nextgisweb:resource/template/section_api.mako"/>
 
