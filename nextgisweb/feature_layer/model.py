@@ -133,16 +133,18 @@ class LayerFieldsMixin(object):
 
 
 class _fields_attr(SP):
-    # TODO: Add lookup_table attribute
 
     def getter(self, srlzr):
         return [OrderedDict((
-                ('id', f.id), ('keyname', f.keyname),
-                ('datatype', f.datatype), ('typemod', None),
-                ('display_name', f.display_name),
-                ('label_field', f == srlzr.obj.feature_label_field),
-                ('grid_visibility', f.grid_visibility)))
-                for f in srlzr.obj.fields]
+            ('id', f.id), ('keyname', f.keyname),
+            ('datatype', f.datatype), ('typemod', None),
+            ('display_name', f.display_name),
+            ('label_field', f == srlzr.obj.feature_label_field),
+            ('grid_visibility', f.grid_visibility),
+            ('lookup_table', (
+                dict(id=f.lookup_table.id)
+                if f.lookup_table else None)),
+        )) for f in srlzr.obj.fields]
 
     def setter(self, srlzr, value):
         obj = srlzr.obj
@@ -176,6 +178,10 @@ class _fields_attr(SP):
                 mfld.display_name = fld['display_name']
             if 'grid_visibility' in fld:
                 mfld.grid_visibility = fld['grid_visibility']
+            if 'lookup_table' in fld:
+                # TODO: Handle errors: wrong schema, missing lookup table
+                mfld.lookup_table = LookupTable.filter_by(
+                    id=fld['lookup_table']['id']).one()
 
             if fld.get('label_field', False):
                 obj.feature_label_field = mfld
