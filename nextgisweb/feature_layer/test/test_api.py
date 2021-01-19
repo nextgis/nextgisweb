@@ -2,6 +2,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
+from itertools import product
+
 import pytest
 import six
 import transaction
@@ -10,6 +12,7 @@ from uuid import uuid4
 from osgeo import ogr
 
 from nextgisweb.auth import User
+from nextgisweb.feature_layer.ogrdriver import EXPORT_FORMAT_OGR
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys.models import SRS
 from nextgisweb.vector_layer import VectorLayer
@@ -222,3 +225,11 @@ def test_fields_unique(ngw_webtest_app, ngw_auth_administrator, ngw_resource_gro
     ngw_webtest_app.put_json(url_layer, body_update, status=200)
 
     ngw_webtest_app.delete(url_layer)
+
+
+@pytest.mark.parametrize('fmt, zipped, srs', product(
+    EXPORT_FORMAT_OGR.keys(), ('true', 'false'), (4326, 3857)
+))
+def test_export(fmt, zipped, srs, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+    ngw_webtest_app.get('/api/resource/%d/export' % vector_layer_id,
+                        dict(format=fmt, zipped=zipped, srs=srs), status=200)

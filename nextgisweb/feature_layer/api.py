@@ -6,6 +6,7 @@ import re
 import uuid
 import zipfile
 import itertools
+from six import ensure_str
 from six.moves.urllib.parse import unquote
 
 import tempfile
@@ -48,8 +49,8 @@ PERM_WRITE = DataScope.write
 
 
 def _ogr_memory_ds():
-    return gdal.GetDriverByName(b'Memory').Create(
-        b'', 0, 0, 0, gdal.GDT_Unknown)
+    return gdal.GetDriverByName(ensure_str('Memory')).Create(
+        ensure_str(''), 0, 0, 0, gdal.GDT_Unknown)
 
 
 def _ogr_ds(driver, options):
@@ -58,7 +59,7 @@ def _ogr_ds(driver, options):
     )
 
 
-def _ogr_layer_from_features(layer, features, name=b'', ds=None, fid=None):
+def _ogr_layer_from_features(layer, features, name='', ds=None, fid=None):
     ogr_layer = layer.to_ogr(ds, name=name, fid=fid)
     layer_defn = ogr_layer.GetLayerDefn()
 
@@ -147,7 +148,7 @@ def export(request):
 
         if zipped or not driver.single_file:
             content_type = "application/zip"
-            content_disposition = b"attachment; filename=%s" % ("%s.zip" % (filename,))
+            content_disposition = "attachment; filename=%s" % ("%s.zip" % (filename,))
             with tempfile.NamedTemporaryFile(suffix=".zip") as tmp_file:
                 with zipfile.ZipFile(tmp_file, "w", zipfile.ZIP_DEFLATED) as zipf:
                     for root, dirs, files in os.walk(tmp_dir):
@@ -159,7 +160,7 @@ def export(request):
                 return response
         else:
             content_type = driver.mime or "application/octet-stream"
-            content_disposition = b"attachment; filename=%s" % filename
+            content_disposition = "attachment; filename=%s" % filename
             response = FileResponse(
                 os.path.join(tmp_dir, filename), content_type=content_type
             )

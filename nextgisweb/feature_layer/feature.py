@@ -88,12 +88,12 @@ class Feature(object):
         )
 
         for field in self.fields:
-            ogr_feature[field.encode("utf8")] = self.fields[
+            ogr_feature[ensure_str(field)] = self.fields[
                 field
             ]
 
         if fid is not None:
-            ogr_feature[fid.encode("utf8")] = self.id
+            ogr_feature[ensure_str(fid)] = self.id
 
         return ogr_feature
 
