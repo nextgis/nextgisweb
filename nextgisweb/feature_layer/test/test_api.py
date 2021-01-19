@@ -150,21 +150,6 @@ def test_geom_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     assert round(coords[1], 3) == 5621521.486
 
 
-def test_cdelete(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
-    url = '/api/resource/%d/feature/' % vector_layer_id
-
-    resp = ngw_webtest_app.delete_json(url, [])
-    assert resp.json == []
-
-    resp = ngw_webtest_app.delete_json(url, [dict(id=1)])
-    assert resp.json == [1]
-
-    resp = ngw_webtest_app.delete(url)
-    assert resp.json
-
-    assert ngw_webtest_app.get(url).json == []
-
-
 def test_fields_unique(ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
     url_create = '/api/resource/'
 
@@ -233,3 +218,28 @@ def test_fields_unique(ngw_webtest_app, ngw_auth_administrator, ngw_resource_gro
 def test_export(fmt, zipped, srs, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     ngw_webtest_app.get('/api/resource/%d/export' % vector_layer_id,
                         dict(format=fmt, zipped=zipped, srs=srs), status=200)
+
+
+@pytest.mark.parametrize('extent, simplification, padding', (
+    (4096, 6.5, 0.1),
+    (2048, 4.1, 0.01),
+))
+def test_mvt(extent, simplification, padding, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+    params = dict(z=0, x=0, y=0, resource=vector_layer_id,
+                  extent=extent, simplification=simplification, padding=padding)
+    ngw_webtest_app.get('/api/component/feature_layer/mvt', params, status=200)
+
+
+def test_cdelete(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+    url = '/api/resource/%d/feature/' % vector_layer_id
+
+    resp = ngw_webtest_app.delete_json(url, [])
+    assert resp.json == []
+
+    resp = ngw_webtest_app.delete_json(url, [dict(id=1)])
+    assert resp.json == [1]
+
+    resp = ngw_webtest_app.delete(url)
+    assert resp.json
+
+    assert ngw_webtest_app.get(url).json == []

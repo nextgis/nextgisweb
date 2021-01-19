@@ -54,7 +54,7 @@ def _ogr_memory_ds():
 
 
 def _ogr_ds(driver, options):
-    return ogr.GetDriverByName(driver).CreateDataSource(
+    return ogr.GetDriverByName(ensure_str(driver)).CreateDataSource(
         "/vsimem/%s" % uuid.uuid4(), options=options
     )
 
@@ -205,7 +205,7 @@ def mvt(request):
         "COMPRESS=NO",
     ]
 
-    ds = _ogr_ds(b"MVT", options)
+    ds = _ogr_ds("MVT", options)
 
     vsibuf = ds.GetName()
 
@@ -229,7 +229,7 @@ def mvt(request):
             query.simplify(tolerance * simplification)
 
         _ogr_layer_from_features(
-            obj, query(), name=b"ngw:%d" % obj.id, ds=ds)
+            obj, query(), name="ngw:%d" % obj.id, ds=ds)
 
     # flush changes
     ds = None
@@ -239,7 +239,7 @@ def mvt(request):
     )
 
     try:
-        f = gdal.VSIFOpenL(b"%s" % (filepath,), b"rb")
+        f = gdal.VSIFOpenL(ensure_str(filepath), ensure_str("rb"))
 
         if f is not None:
             # SEEK_END = 2
@@ -259,7 +259,7 @@ def mvt(request):
             return HTTPNoContent()
 
     finally:
-        gdal.Unlink(b"%s" % (vsibuf,))
+        gdal.Unlink(ensure_str(vsibuf))
 
 
 def get_transformer(srs_from_id, srs_to_id):
