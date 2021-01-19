@@ -17,12 +17,14 @@ define([
     "dojo/_base/array",
     "dojo/request/xhr",
     "dojo/Deferred",
+    "dojo/promise/all",
     "dojo/store/Observable",
     "dojo/dom-style",
     // ngw
     "ngw/route",
     "ngw-pyramid/i18n!feature_layer",
     "ngw-pyramid/hbs-i18n",
+    "ngw-lookup-table/cached",
     "./FeatureStore",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
@@ -49,12 +51,14 @@ define([
     array,
     xhr,
     Deferred,
+    all,
     Observable,
     domStyle,
     // ngw
     route,
     i18n,
     hbsI18n,
+    lookupTableCached,
     FeatureStore
 ) {
     // Base class ggrid which is them wrapped in dijit widget
@@ -83,10 +87,23 @@ define([
 
             xhr.get(route.feature_layer.field({id: this.layerId}), {
                 handleAs: "json"
-            }).then(
+            }).then(              
                 function (data) {
                     widget._fields = data;
-                    widget.initializeGrid();
+                    widget._lookupTableData = {};
+
+                    var lookupTableDefereds = [];
+                    array.forEach(data, function (field) {
+                        if (field.lookup_table != null) {
+                            lookupTableDefereds.push(
+                                lookupTableCached.load(field.lookup_table.id)
+                            );
+                        }
+                    });
+
+                    all(lookupTableDefereds).then(function () {
+                        widget.initializeGrid();
+                    });
                 }
             );
 
@@ -136,11 +153,24 @@ define([
             var fields = [];
 
             array.forEach(this._fields, function (f) {
-                columns.push({
+                var colDefn = {
                     field: "F:" + f.keyname,
                     label: f.display_name,
                     hidden: !f.grid_visibility
-                });
+                };
+
+                if (f.lookup_table != null) {
+                    colDefn.get = function (object) {
+                        var value = object['F:' + f.keyname];
+                        if (f.lookup_table != null) {
+                            var repr = lookupTableCached.lookup(f.lookup_table.id, value);
+                            if (repr !== null) { value = "[" + value + "] " + repr };
+                        };
+                        return value;
+                    }
+                };
+
+                columns.push(colDefn);
                 fields.push(f.keyname);
             });
 

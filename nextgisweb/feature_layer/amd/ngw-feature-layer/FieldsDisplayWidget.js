@@ -5,10 +5,12 @@ define([
     "dojo/date/locale",
     "dojo/request/xhr",
     "dojo/dom-class",
+    "dojo/promise/all",
     "dojox/validate/regexp",
     "put-selector/put",
     "ngw/route",
     "ngw-pyramid/i18n!feature_layer",
+    "ngw-lookup-table/cached",
     "./DisplayWidget",
     // css
     "xstyle/css!./resource/FieldsDisplayWidget.css"
@@ -19,10 +21,12 @@ define([
     locale,
     xhr,
     domClass,
+    all,
     regexp,
     put,
     route,
     i18n,
+    lookupTableCached,
     DisplayWidget
 ) {
     var fieldsCache = {};
@@ -38,7 +42,6 @@ define([
 
         buildRendering: function () {
             this.inherited(arguments);
-
             domClass.add(this.domNode, "ngw-feature-layer-FieldsDisplayWidget");
         },
 
@@ -54,12 +57,18 @@ define([
                     handleAs: "json"
                 }).then(lang.hitch(this, function (data) {
                     var fieldmap = {};
+                    var deferreds = [];
                     array.forEach(data.feature_layer.fields, function (itm) {
                         fieldmap[itm.keyname] = itm;
+                        if (itm.lookup_table !== null) {
+                            deferreds.push(lookupTableCached.load(itm.lookup_table.id));
+                        }
                     });
 
                     fieldsCache[this.resourceId] = fieldmap;
-                    this._render(value, fieldmap);
+                    all(deferreds).then(lang.hitch(this, function () {
+                        this._render(value, fieldmap);
+                    }));
                 }));
             }
         },
@@ -95,6 +104,10 @@ define([
                     if (this.urlRE.test(val)) {
                         put(tbody, "tr th.display_name $ < td.value a[href=$][target='_blank'] $", fieldmap[k].display_name, val, val);
                     } else {
+                        if (field.lookup_table !== null) {
+                            var lval = lookupTableCached.lookup(field.lookup_table.id, val);
+                            if (lval !== null) { val = "[" + val + "] " + lval }
+                        };
                         put(tbody, "tr th.display_name $ < td.value $", fieldmap[k].display_name, val);
                     }
                 } else {
