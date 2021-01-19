@@ -772,6 +772,9 @@ class _source_attr(SP):
             obj.load_from_ogr(ogrlayer, recode)
 
     def setter(self, srlzr, value):
+        if srlzr.obj.id is not None:
+            raise ValidationError("Source parameter does not apply to update vector layer.")
+
         datafile, metafile = env.file_upload.get_filename(value['id'])
         encoding = value.get('encoding', 'utf-8')
 
