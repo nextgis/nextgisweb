@@ -6,7 +6,7 @@ from threading import Thread
 import os.path
 import sqlite3
 from io import BytesIO
-from Queue import Queue, Full
+from six.moves.queue import Queue, Full
 
 import transaction
 from PIL import Image
