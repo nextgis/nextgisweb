@@ -9,7 +9,7 @@ from ..dynmenu import DynItem, Label, Link
 from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .adapter import WebMapAdapter
-from .util import _
+from .util import get_recursive_values, _
 
 
 class ExtentWidget(Widget):
@@ -207,4 +207,4 @@ def setup_pyramid(comp, config):
         key='description',
         title=_(u"External access"),
         template='nextgisweb:webmap/template/section_api_webmap.mako',
-        is_applicable=lambda obj: obj.cls == 'webmap')
+        is_applicable=lambda obj: obj.cls == 'webmap' and get_recursive_values(obj))
