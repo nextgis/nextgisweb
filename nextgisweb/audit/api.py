@@ -105,7 +105,7 @@ def export(request):
 
 
 def setup_pyramid(comp, config):
-    if comp.audit_enabled:
+    if comp.audit_es_enabled:
         config.add_route(
             'audit.export', '/api/component/audit/export') \
             .add_view(export, request_method='GET')

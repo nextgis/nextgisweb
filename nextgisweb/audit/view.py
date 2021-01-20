@@ -90,21 +90,22 @@ def setup_pyramid(comp, config):
 
     if comp.audit_enabled:
         config.add_tween(
-            'nextgisweb.audit.util.elasticsearch_tween_factory',
+            'nextgisweb.audit.util.audit_tween_factory',
             under=('nextgisweb.pyramid.util.header_encoding_tween_factory',))
 
-        config.add_route(
-            'audit.control_panel.journal.browse',
-            '/control-panel/journal/'
-        ).add_view(journal_browse, renderer='nextgisweb:audit/template/browse.mako')
+        if comp.audit_es_enabled:
+            config.add_route(
+                'audit.control_panel.journal.browse',
+                '/control-panel/journal/'
+            ).add_view(journal_browse, renderer='nextgisweb:audit/template/browse.mako')
 
-        config.add_route(
-            'audit.control_panel.journal.show',
-            '/control-panel/journal/{id}'
-        ).add_view(journal_show, renderer='nextgisweb:audit/template/show.mako')
+            config.add_route(
+                'audit.control_panel.journal.show',
+                '/control-panel/journal/{id}'
+            ).add_view(journal_show, renderer='nextgisweb:audit/template/show.mako')
 
-        comp.env.pyramid.control_panel.add(
-            dm.Label('audit', _("Audit")),
-            dm.Link('audit/journal', _("Journal"), lambda args: (
-                args.request.route_url('audit.control_panel.journal.browse'))),
-        )
+            comp.env.pyramid.control_panel.add(
+                dm.Label('audit', _("Audit")),
+                dm.Link('audit/journal', _("Journal"), lambda args: (
+                    args.request.route_url('audit.control_panel.journal.browse'))),
+            )
