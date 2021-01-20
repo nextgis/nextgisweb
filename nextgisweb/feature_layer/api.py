@@ -114,6 +114,14 @@ def export(request):
 
     driver = EXPORT_FORMAT_OGR[format]
 
+    # dataset creation options (configurable by user)
+    dsco = list()
+    if driver.dsco_configurable is not None:
+        for option in driver.dsco_configurable:
+            option = option.split(":")[0]
+            if option in request.GET:
+                dsco.append("%s=%s" % (option, request.GET.get(option)))
+
     # layer creation options
     lco = list(driver.options or [])
 
@@ -133,10 +141,14 @@ def export(request):
             driver.extension,
         )
 
-        vtopts = [
-            '-f', driver.name,
-            '-t_srs', srs.wkt,
-        ] + list(itertools.chain(*[('-lco', o) for o in lco]))
+        vtopts = (
+            [
+                "-f", driver.name,
+                "-t_srs", srs.wkt,
+            ]
+            + list(itertools.chain(*[("-lco", o) for o in lco]))
+            + list(itertools.chain(*[("-dsco", o) for o in dsco]))
+        )
 
         if driver.fid_support and fid is None:
             vtopts.append('-preserve_fid')

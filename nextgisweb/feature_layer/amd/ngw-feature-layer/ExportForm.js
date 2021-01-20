@@ -6,6 +6,7 @@ define([
     "ngw-pyramid/modelWidget/Widget",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "dijit/form/TextBox",
     "dojo/store/Memory",
     "dojo/data/ObjectStore",
     "dojo/request/xhr",
@@ -21,8 +22,7 @@ define([
     "dojox/layout/TableContainer",
     "dijit/form/Select",
     "dijit/form/CheckBox",
-    "dijit/form/Button",
-    "dijit/form/TextBox"
+    "dijit/form/Button"
 ], function (
     declare,
     array,
@@ -30,6 +30,7 @@ define([
     Widget,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    TextBox,
     Memory,
     ObjectStore,
     xhr,
@@ -47,6 +48,8 @@ define([
 
         constructor: function (params) {
             declare.safeMixin(this, params);
+            this.lco_widgets = [];
+            this.dsco_widgets = [];
         },
 
         postCreate: function () {
@@ -54,7 +57,31 @@ define([
             this.wFormat.watch('value', lang.hitch(this, function (attr, oldVal, newVal) {
                 var format = this.formatStore.get(newVal);
                 this.wZipped.set('disabled', !format.single_file);
+
+                // TODO: add support for lco configuration
+
+                // Remove existing dsco (Dataset Creation Option) widgets
+                array.forEach(this.dsco_widgets, function (dscoWidget) {
+                    // https://bugs.dojotoolkit.org/ticket/16935
+                    this.wTableContainer.removeChild(dscoWidget);
+                    dscoWidget.destroy();
+                }, this);
+                this.dsco_widgets = [];
+                this.wTableContainer._children = [];
+
+                // Create dsco widgets upon a driver change
+                array.forEach(format.dsco_configurable, function (dsco) {
+                    var dscoWidget = new TextBox({
+                        label: dsco.split(":")[0],
+                        value: dsco.split(":")[1],
+                        style: "width: 100%"
+                    });
+                    this.dsco_widgets.push(dscoWidget);
+                    this.wTableContainer.addChild(dscoWidget);
+                }, this);
+                this.wTableContainer.layout();
             }));
+
             this.buttonSave.on('click', lang.hitch(this, function () {
                 var query = {
                     format: this.wFormat.get('value'),
@@ -63,6 +90,11 @@ define([
                     fid: this.wFID.get('value'),
                     encoding: this.wEncoding.get('value')
                 };
+
+                array.forEach(this.dsco_widgets, function (dscoWidget) {
+                    query[dscoWidget.get('label')] = dscoWidget.get('value');
+                });
+
                 window.open(route.resource.export({
                     id: this.resid
                 }) + '?' + ioQuery.objectToQuery(query));
@@ -77,7 +109,9 @@ define([
                     return {
                         id: format.name,
                         label: format.display_name,
-                        single_file: format.single_file
+                        single_file: format.single_file,
+                        lco_configurable: format.lco_configurable,
+                        dsco_configurable: format.dsco_configurable
                     }
                 })
             }));

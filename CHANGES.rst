@@ -13,6 +13,7 @@ Changes
 - Improved handling of invalid JSON bodies in RESP API, now correct error
   message returns.
 - Vector layer export to MapInfo MIF/MID format.
+- Vector layer export to Panorama SXF format.
 
 3.6.0
 -----

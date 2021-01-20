@@ -6,7 +6,9 @@
         <div data-dojo-type="dijit/layout/ContentPane"
             data-dojo-props="region: 'center'"
             style="padding: 1em 0;">
-            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 200">
+            <div data-dojo-type="dojox/layout/TableContainer"
+              data-dojo-attach-point="wTableContainer"
+              data-dojo-props="cols:1, labelWidth: 200">
                 <select data-dojo-type="dijit/form/Select"
                     data-dojo-attach-point="wFormat"
                     data-dojo-props="sortByLabel: false"
