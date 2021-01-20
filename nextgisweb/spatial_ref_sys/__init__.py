@@ -3,6 +3,7 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component
+from ..lib.config import Option
 from .util import COMP_ID
 from .models import Base, SRS, SRSMixin, WKT_EPSG_4326, WKT_EPSG_3857
 
@@ -46,3 +47,8 @@ class SpatialRefSysComponent(Component):
 
     def query_stat(self):
         return dict(count=SRS.query().count())
+
+    option_annotations = (
+        Option('catalog.enabled', bool, default=False),
+        Option('catalog.url'),
+    )

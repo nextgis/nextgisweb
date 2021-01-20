@@ -9,14 +9,28 @@ from .models import SRS
 from .util import _
 
 
+def check_permission(request):
+    """ To avoid interdependency of two components:
+    auth and security, permissions to edit SRS
+    are limited by administrators group membership criterion"""
+
+    request.require_administrator()
+
+
+def catalog_browse(request):
+    check_permission(request)
+    return dict(
+        title=_("Spatial reference system catalog"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
+def catalog_import(request):
+    check_permission(request)
+    catalog_id = int(request.matchdict['id'])
+    return dict(catalog_id=catalog_id, dynmenu=request.env.pyramid.control_panel)
+
+
 def setup_pyramid(comp, config):
-
-    def check_permission(request):
-        """ To avoid interdependency of two components:
-        auth and security, permissions to edit SRS
-        are limited by administrators group membership criterion"""
-
-        request.require_administrator()
 
     class SRSDeleteWidget(DeleteWidget):
         def validate(self):
@@ -153,6 +167,12 @@ def setup_pyramid(comp, config):
                 lambda kwargs: kwargs.request.route_url('srs.create')
             )
 
+            if comp.options['catalog.enabled']:
+                yield dm.Link(
+                    self.sub('catalog/browse'), _("Catalog"),
+                    lambda kwargs: kwargs.request.route_url('srs.catalog')
+                )
+
             if 'obj' in kwargs and isinstance(kwargs.obj, SRS):
                 yield dm.Link(
                     self.sub('edit'), _("Edit"),
@@ -176,3 +196,14 @@ def setup_pyramid(comp, config):
         dm.Label('spatial_ref_sys', _("Spatial reference systems")),
         SRSMenu('spatial_ref_sys'),
     )
+
+    if comp.options['catalog.enabled']:
+        config.add_route(
+            'srs.catalog',
+            '/srs/catalog'
+        ).add_view(catalog_browse, renderer='nextgisweb:spatial_ref_sys/template/catalog_browse.mako')
+
+        config.add_route(
+            'srs.catalog.import',
+            r'/srs/catalog/{id:\d+}', client=('id',)
+        ).add_view(catalog_import, renderer='nextgisweb:spatial_ref_sys/template/catalog_import.mako')
