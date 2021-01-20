@@ -169,7 +169,7 @@ def setup_pyramid(comp, config):
 
             if comp.options['catalog.enabled']:
                 yield dm.Link(
-                    self.sub('catalog/browse'), _("Import from catalog"),
+                    self.sub('catalog/browse'), _("Catalog"),
                     lambda kwargs: kwargs.request.route_url('srs.catalog')
                 )
 
