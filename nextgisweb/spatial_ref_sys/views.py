@@ -27,7 +27,13 @@ def catalog_browse(request):
 def catalog_import(request):
     check_permission(request)
     catalog_id = int(request.matchdict['id'])
-    return dict(catalog_id=catalog_id, dynmenu=request.env.pyramid.control_panel)
+    catalog_url = request.env.spatial_ref_sys.options['catalog.url']
+    item_url = catalog_url + '/srs/' + str(catalog_id)
+    return dict(
+        title=_("Spatial reference system") + ' #%d' % catalog_id,
+        item_url=item_url,
+        catalog_id=catalog_id,
+        dynmenu=request.env.pyramid.control_panel)
 
 
 def setup_pyramid(comp, config):

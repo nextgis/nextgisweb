@@ -9,7 +9,10 @@
         ], function (
             CatalogImportForm
         ) {
-            (new CatalogImportForm({catalog_id: ${catalog_id}})).placeAt('form').startup();
+            (new CatalogImportForm({
+                catalog_id: ${catalog_id},
+                item_url: "${item_url}"
+            })).placeAt('form').startup();
         });
     </script>
 </%def>

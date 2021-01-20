@@ -92,7 +92,7 @@ def catalog_collection(request):
         ))
 
     catalog_url = env.spatial_ref_sys.options['catalog.url']
-    url = catalog_url + 'v1/spatial_ref_sys/'
+    url = catalog_url + '/api/v1/spatial_ref_sys/'
     res = requests.get(url, query)
     res.raise_for_status()
 
@@ -110,7 +110,7 @@ def catalog_collection(request):
 
 def get_srs_from_catalog(catalog_id):
     catalog_url = env.spatial_ref_sys.options['catalog.url']
-    url = catalog_url + 'v1/spatial_ref_sys/' + str(catalog_id)
+    url = catalog_url + '/api/v1/spatial_ref_sys/' + str(catalog_id)
     res = requests.get(url)
     res.raise_for_status()
 
