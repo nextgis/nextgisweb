@@ -81,10 +81,20 @@ EXPORT_FORMAT_OGR["DXF"] = OGRDriver(
     mime="application/dxf",
 )
 
-EXPORT_FORMAT_OGR["MapInfo File"] = OGRDriver(
+EXPORT_FORMAT_OGR["MapInfo File (TAB)"] = OGRDriver(
     "MapInfo File",
     "MapInfo TAB (*.tab)",
     "tab",
+    single_file=False,
+    fid_support=False,
+    options=None,
+    mime=None,
+)
+
+EXPORT_FORMAT_OGR["MapInfo File (MIF/MID)"] = OGRDriver(
+    "MapInfo File",
+    "MapInfo MIF/MID (*.mif/*.mid)",
+    "mif",
     single_file=False,
     fid_support=False,
     options=None,

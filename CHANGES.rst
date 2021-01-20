@@ -12,6 +12,7 @@ Changes
 - Fix infinite wait of database lock, including during vector layer deletion.
 - Improved handling of invalid JSON bodies in RESP API, now correct error
   message returns.
+- Vector layer export to MapInfo MIF/MID format.
 
 3.6.0
 -----
