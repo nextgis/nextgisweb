@@ -25,11 +25,11 @@
 <div class="content-box">
     <form id="search-form">
         <input id="text-filter" type="text submit" placeholder="${tr(_('Search'))}"
-            style="width: 250px"/>
+            style="width: 20em"/>
         <input id="lat-filter" type="number" min="-90" max="90" placeholder="${tr(_('Latitude'))}, °"
-            style="margin-left: 50px; width: 90px"/>
+            style="margin-left: 3em; width: 8em"/>
         <input id="lon-filter" type="number" min="-180" max="180" placeholder="${tr(_('Longitude'))}, °"
-            style="width: 90px"/>
+            style="margin-left: 1em; width: 8em"/>
         <input type="submit" style="display: none">
     </form>
 </div>
