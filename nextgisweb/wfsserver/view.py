@@ -15,7 +15,7 @@ class ServiceWidget(Widget):
 
 def setup_pyramid(comp, config):
     Resource.__psection__.register(
-        key='wfsserver', priority=50,
-        title=_("WFS service"),
+        key='description',
+        title=_("External access"),
         is_applicable=lambda obj: obj.cls == 'wfsserver_service',
-        template='nextgisweb:wfsserver/template/section.mako')
+        template='nextgisweb:wfsserver/template/section_api_wfs.mako')

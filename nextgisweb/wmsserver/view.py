@@ -316,7 +316,7 @@ def setup_pyramid(comp, config):
     ).add_view(handler, context=Service)
 
     Resource.__psection__.register(
-        key='wmsserver', priority=50,
-        title=_("WMS service"),
+        key='description',
+        title=_(u"External access"),
         is_applicable=lambda obj: obj.cls == 'wmsserver_service',
-        template='nextgisweb:wmsserver/template/section.mako')
+        template='nextgisweb:wmsserver/template/section_api_wms.mako')

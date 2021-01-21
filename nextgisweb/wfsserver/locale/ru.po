@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-07-23 11:51+0000\n"
+"POT-Creation-Date: 2021-01-18 19:48+0000\n"
 "PO-Revision-Date: 2015-09-14 01:40+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,9 +19,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: amd/ngw-wfsserver/ServiceWidget.js:57 model.py:20 view.py:115
+#: amd/ngw-wfsserver/ServiceWidget.js:58 model.py:25
+#: template/section_api_wfs.mako:7
 msgid "WFS service"
 msgstr "Сервис WFS"
+
+#: view.py:19
+msgid "External access"
+msgstr "Внешний доступ"
 
 #: amd/ngw-wfsserver/template/ServiceWidget.hbs:14
 msgid "Add"
@@ -47,17 +52,25 @@ msgstr "Наименование"
 msgid "Default count of returned features"
 msgstr "Число возвращаемых объектов по умолчанию"
 
-#: template/section.mako:6
-msgid "WFS service address"
-msgstr "Адрес WFS сервиса"
+#: amd/ngw-wfsserver/template/ServiceWidget.hbs:74
+msgid "Resource"
+msgstr "Ресурс"
 
-#: template/section.mako:10
+#: template/section_api_wfs.mako:11
 msgid ""
-"Use this link in desktop client (e.g. {example}) to access and edit "
-"vector data."
+"Web Feature Service (WFS) provides an interface allowing requests for "
+"geographical features across the web using platform-independent calls."
 msgstr ""
-"Используйте эту ссылку в настольном приложении (например, {example}) для "
-"просмотра и редактирования векторных данных."
+"Web Feature Service (WFS) предоставляет интерфейс, позволяющий запрашивать географические "
+"сущности, используя независимые от используемой платформы вызовы."
+
+#: template/section_api_wfs.mako:14
+msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service"
+msgstr "https://docs.nextgis.ru/docs_ngweb/source/layers.html#c-wfs"
+
+#: template/section_api_wfs.mako:15
+msgid "Read more"
+msgstr "Подробнее"
 
 #~ msgid "WFS URL"
 #~ msgstr "WFS URL"

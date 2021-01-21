@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-09-02 16:27+0000\n"
+"POT-Creation-Date: 2021-01-18 22:27+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -51,56 +51,60 @@ msgstr "Редактировать аннотации"
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: amd/ngw-webmap/Display.js:220 amd/ngw-webmap/Display.js:1039
-#: amd/ngw-webmap/ItemWidget.js:247
+#: view.py:208
+msgid "External access"
+msgstr "Внешний доступ"
+
+#: amd/ngw-webmap/Display.js:209 amd/ngw-webmap/Display.js:1002
+#: amd/ngw-webmap/ItemWidget.js:246
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:226
+#: amd/ngw-webmap/Display.js:215
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:232 amd/ngw-webmap/Display.js:445
+#: amd/ngw-webmap/Display.js:221 amd/ngw-webmap/Display.js:431
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:238 amd/ngw-webmap/Display.js:340
+#: amd/ngw-webmap/Display.js:227 amd/ngw-webmap/Display.js:326
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:379 amd/ngw-webmap/Display.js:386
+#: amd/ngw-webmap/Display.js:365 amd/ngw-webmap/Display.js:372
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:409 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:395 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:551 amd/ngw-webmap/Display.js:561
+#: amd/ngw-webmap/Display.js:530 amd/ngw-webmap/Display.js:540
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:752 amd/ngw-webmap/tool/Zoom.js:19
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:473
+#: amd/ngw-webmap/Display.js:720 amd/ngw-webmap/tool/Zoom.js:19
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:453
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:753 amd/ngw-webmap/tool/Zoom.js:22
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:474
+#: amd/ngw-webmap/Display.js:721 amd/ngw-webmap/tool/Zoom.js:22
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:454
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:757
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:478
+#: amd/ngw-webmap/Display.js:725
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:773
+#: amd/ngw-webmap/Display.js:741
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:776
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:487
+#: amd/ngw-webmap/Display.js:744
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:467
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
@@ -108,21 +112,21 @@ msgstr "Отменить поворот"
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
-#: amd/ngw-webmap/ItemWidget.js:98 amd/ngw-webmap/template/ItemWidget.hbs:41
+#: amd/ngw-webmap/ItemWidget.js:97 amd/ngw-webmap/template/ItemWidget.hbs:41
 msgid "Layer order"
 msgstr "Порядок слоёв"
 
-#: amd/ngw-webmap/ItemWidget.js:148
+#: amd/ngw-webmap/ItemWidget.js:147
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:152 amd/ngw-webmap/template/SettingsForm.hbs:39
+#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:39
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-webmap/ItemWidget.js:313 amd/ngw-webmap/template/ItemWidget.hbs:26
+#: amd/ngw-webmap/ItemWidget.js:312 amd/ngw-webmap/template/ItemWidget.hbs:26
 msgid "Add group"
 msgstr "Добавить группу"
 
@@ -139,7 +143,7 @@ msgstr "Редактировать аннотацию"
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:75
+#: amd/ngw-webmap/plugin/FeatureLayer.js:74
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -176,30 +180,30 @@ msgid "Left, deg."
 msgstr "Лево, град."
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:16
-msgid "Bottom, deg."
-msgstr "Низ, град."
+msgid "Top, deg."
+msgstr "Верх, град."
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:22
 msgid "Right, deg."
 msgstr "Право, град."
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:28
-msgid "Top, deg."
-msgstr "Верх, град."
+msgid "Bottom, deg."
+msgstr "Низ, град."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:35
+#: amd/ngw-webmap/template/ExtentWidget.hbs:34
 msgid "Set extent from layer"
 msgstr "Охват по слою"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:39
+#: amd/ngw-webmap/template/ExtentWidget.hbs:38
 msgid "Select layer"
 msgstr "Выберите слой"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:45
+#: amd/ngw-webmap/template/ExtentWidget.hbs:44
 msgid "Select vector layer"
 msgstr "Выберите векторный слой"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:47
+#: amd/ngw-webmap/template/ExtentWidget.hbs:46
 msgid "Bookmark resource"
 msgstr "Ресурс закладок"
 
@@ -216,7 +220,7 @@ msgid "Remove"
 msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:73
-#: amd/ngw-webmap/template/ItemWidget.hbs:123
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
 msgid "Display name"
 msgstr "Наименование"
 
@@ -240,11 +244,11 @@ msgstr "Макс. масштаб"
 msgid "Adapter"
 msgstr "Адаптер"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:107
+#: amd/ngw-webmap/template/ItemWidget.hbs:106
 msgid "Style resource"
 msgstr "Ресурс стиля"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:127
+#: amd/ngw-webmap/template/ItemWidget.hbs:126
 msgid "Expanded"
 msgstr "Развернута"
 
@@ -264,19 +268,19 @@ msgstr "Высота, пикс."
 msgid "Radius, px"
 msgstr "Радиус, пикс."
 
-#: amd/ngw-webmap/tool/Identify.js:212
+#: amd/ngw-webmap/tool/Identify.js:211
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:246
+#: amd/ngw-webmap/tool/Identify.js:245
 msgid "Feature"
 msgstr "Объект"
 
-#: amd/ngw-webmap/tool/Identify.js:304 amd/ngw-webmap/tool/Identify.js:326
+#: amd/ngw-webmap/tool/Identify.js:303 amd/ngw-webmap/tool/Identify.js:320
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:437
+#: amd/ngw-webmap/tool/Identify.js:430
 msgid "Features"
 msgstr "Объектов"
 
@@ -501,11 +505,11 @@ msgid "Search on the map"
 msgstr "Поиск по карте"
 
 #: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:160
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:218
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:213
 msgid "Refine search criterion"
 msgstr "Уточните критерий поиска"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:234
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:228
 msgid "Not found"
 msgstr "Не найдено"
 
@@ -517,29 +521,51 @@ msgstr "Ссылка на карту"
 msgid "Social networks"
 msgstr "Соцсети"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:17
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:16
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:19
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:18
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:42
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:41
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:49
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:48
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:67
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:66
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:504
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
 msgid "Open full map"
 msgstr "Открыть карту целиком"
+
+#: template/section_api_webmap.mako:7
+msgid "TMS service"
+msgstr "TMS сервис"
+
+#: template/section_api_webmap.mako:11
+msgid ""
+"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web "
+"map is a map displayed in a browser by seamlessly joining dozens of "
+"individually requested image."
+msgstr ""
+"TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта "
+"- это карта, отображаемая в браузере путем бесшовного соединения десятков"
+" индивидуально запрашиваемых изображений (тайлов)."
+
+#: template/section_api_webmap.mako:14
+msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
+
+#: template/section_api_webmap.mako:15
+msgid "Read more"
+msgstr "Подробнее"
 
 #~ msgid "Zoom to layer extent"
 #~ msgstr "Увеличить до слоя"

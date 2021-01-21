@@ -48,6 +48,7 @@ class RenderComponent(Component):
     def setup_pyramid(self, config):
         from . import api, view # NOQA
         api.setup_pyramid(self, config)
+        view.setup_pyramid(self, config)
 
     def client_settings(self, request):
         return dict(tile_cache=dict(

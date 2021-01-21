@@ -3,13 +3,13 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 from collections import namedtuple
 from six.moves.urllib.parse import unquote
 
-from ..resource import Widget, resource_factory
+from ..resource import Resource, Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
 
 from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .adapter import WebMapAdapter
-from .util import _
+from .util import get_recursive_values, _
 
 
 class ExtentWidget(Widget):
@@ -202,3 +202,9 @@ def setup_pyramid(comp, config):
         Link('webmap/settings', _("Web map settings"), lambda args: (
             args.request.route_url('webmap.control_panel.settings')))
     )
+
+    Resource.__psection__.register(
+        key='description',
+        title=_(u"External access"),
+        template='nextgisweb:webmap/template/section_api_webmap.mako',
+        is_applicable=lambda obj: obj.cls == 'webmap' and get_recursive_values(obj))

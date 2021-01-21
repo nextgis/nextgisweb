@@ -224,7 +224,7 @@ a:hover,
 }
 .link__icon {
   vertical-align: middle;
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 .link--dropdown.active .link__icon {
   transform: rotate(-180deg);
@@ -244,7 +244,7 @@ a:hover,
   -webkit-animation: progress-circular-dash 1.4s ease-in-out infinite;
   animation: progress-circular-dash 1.4s ease-in-out infinite;
   stroke-linecap: round;
-  stroke-dasharray: 80,200;
+  stroke-dasharray: 80, 200;
   stroke-dashoffset: 0px;
 }
 .progress-circular__overlay {
@@ -264,7 +264,7 @@ a:hover,
     stroke-dashoffset: -15px;
   }
   100% {
-    stroke-dasharray: 100,200;
+    stroke-dasharray: 100, 200;
     stroke-dashoffset: -125px;
   }
 }
@@ -304,7 +304,7 @@ table {
   transition: background-color 0.4s;
   vertical-align: middle;
   border-left: 0;
-  padding: .8em 1em;
+  padding: 0.8em 1em;
   line-height: 1.285;
 }
 .pure-table td.fit-content,
@@ -357,7 +357,7 @@ table {
 }
 .table-keyvalue td,
 .table-keyvalue th {
-  padding-top: .615em;
+  padding-top: 0.615em;
   padding-bottom: 0;
   border-bottom-color: transparent;
   padding-left: 0;
@@ -493,13 +493,13 @@ table {
 }
 .material-icons.icon-edit:before {
   content: "\E3C9";
-  font-size: .95em;
+  font-size: 0.95em;
   line-height: 1.05em;
   vertical-align: top;
 }
 .material-icons.icon-delete:before {
   content: "\E872";
-  font-size: .95em;
+  font-size: 0.95em;
   line-height: 1.05em;
   vertical-align: top;
 }
@@ -517,6 +517,12 @@ table {
 }
 .material-icons.icon-arrowUpward:before {
   content: "\E5D8";
+}
+.material-icons.icon-helpOutline:before {
+  content: "\e8fd";
+}
+.material-icons.icon-exitToApp:before {
+  content: "\e879";
 }
 .svgIcon-mapserver_style,
 .svgIcon-postgis_connection,
@@ -720,7 +726,7 @@ table {
 }
 .ngw-button--icon .ngw-button__icon {
   color: inherit;
-  opacity: .75;
+  opacity: 0.75;
 }
 .ngw-button--icon .ngw-button__icon--prepend {
   margin-right: 4px;
@@ -960,7 +966,7 @@ a[class*=" icon-"]:hover:before {
 }
 .header-nav__item > a:hover {
   color: inherit;
-  opacity: .76;
+  opacity: 0.76;
 }
 .header-nav__item > .material-icons {
   display: inline;
@@ -969,7 +975,7 @@ a[class*=" icon-"]:hover:before {
 }
 .header-nav__item > .material-icons:hover {
   color: inherit;
-  opacity: .76;
+  opacity: 0.76;
 }
 .header__left {
   padding-right: 250px;
@@ -1108,6 +1114,45 @@ a[class*=" icon-"]:hover:before {
 .content-box > .table-wrapper > .pure-table-horizontal--s th:last-child {
   padding-right: 16px;
 }
+.content-box .row-title {
+  margin-bottom: 5px;
+}
+.content-box .row-title .text {
+  display: inline-block;
+}
+.content-box .row-title .help {
+  font-size: 1.35em;
+  vertical-align: top;
+  cursor: pointer;
+}
+.content-box .row-title .help .tooltip-content {
+  display: none;
+}
+.content-box .row-input-info {
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  border-radius: 4px;
+  width: 100%;
+}
+.content-box .row-input-info .text {
+  display: inline-block;
+  margin: 6px 0 0 5px;
+  width: 90%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  user-select: all;
+}
+.content-box .row-input-info .copy-button {
+  display: inline-block;
+  float: right;
+  padding-top: 5px;
+  padding-right: 3px;
+}
+.content-box .row-input-info .copy-button span.material-icons {
+  font-size: 22px;
+}
 .lt-ie9 .content-box {
   border: 1px solid #efefef;
 }
@@ -1125,6 +1170,18 @@ a[class*=" icon-"]:hover:before {
 }
 .content-box__info:first-child {
   margin-top: -16px;
+}
+.content-box__description {
+  margin-top: -16px;
+  margin-bottom: 24px;
+}
+/* Help tooltip */
+.tooltip-help {
+  max-width: 400px;
+}
+.tooltip-help .icon-exitToApp {
+  font-size: 15px;
+  vertical-align: text-bottom;
 }
 /* Sidebar */
 .sidebar {
@@ -1184,6 +1241,45 @@ a[class*=" icon-"]:hover:before {
 .sidebar-menu > .table-wrapper > .pure-table-horizontal--s td:last-child,
 .sidebar-menu > .table-wrapper > .pure-table-horizontal--s th:last-child {
   padding-right: 16px;
+}
+.sidebar-menu .row-title {
+  margin-bottom: 5px;
+}
+.sidebar-menu .row-title .text {
+  display: inline-block;
+}
+.sidebar-menu .row-title .help {
+  font-size: 1.35em;
+  vertical-align: top;
+  cursor: pointer;
+}
+.sidebar-menu .row-title .help .tooltip-content {
+  display: none;
+}
+.sidebar-menu .row-input-info {
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  border-radius: 4px;
+  width: 100%;
+}
+.sidebar-menu .row-input-info .text {
+  display: inline-block;
+  margin: 6px 0 0 5px;
+  width: 90%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  user-select: all;
+}
+.sidebar-menu .row-input-info .copy-button {
+  display: inline-block;
+  float: right;
+  padding-top: 5px;
+  padding-right: 3px;
+}
+.sidebar-menu .row-input-info .copy-button span.material-icons {
+  font-size: 22px;
 }
 .sidebar-menu__heading {
   line-height: 1.25;
@@ -1600,7 +1696,7 @@ textarea {
 .nextgis.claro .dijitTabContainerRight-tabs .dijitTab {
   padding: 0px 12px;
   text-transform: uppercase;
-  letter-spacing: .8px;
+  letter-spacing: 0.8px;
   font-size: 13px;
   background: none;
   border: 1px solid transparent;
@@ -1809,7 +1905,7 @@ textarea {
   cursor: pointer;
 }
 .nextgis.claro .dijitTreeNodeDisabled {
-  opacity: .24;
+  opacity: 0.24;
 }
 .nextgis.claro .dijitTreeNodeDisabled * {
   cursor: not-allowed;
@@ -1830,7 +1926,7 @@ textarea {
 }
 .nextgis.claro .dijitDialogUnderlay {
   background: #010910;
-  opacity: .75;
+  opacity: 0.75;
 }
 .nextgis.claro .dijitCalendar {
   background-color: #fff;

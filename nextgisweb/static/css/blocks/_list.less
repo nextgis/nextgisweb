@@ -1,50 +1,50 @@
-.list{
+.list {
   padding: 8px 0;
   list-style-type: none;
   background-color: #fff;
   font-size: 16px;
 
-  .list__item{
+  .list__item {
     display: block;
     padding: 0 16px;
     height: 48px;
-    line-height:48px;
+    line-height: 48px;
     white-space: nowrap;
     color: @text-color;
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    a{
+    a {
       color: @text-color;
       text-decoration: none;
     }
 
     &:hover,
-    &:focus{
-      background-color: rgba(0,0,0,.04);
+    &:focus {
+      background-color: rgba(0, 0, 0, .04);
       color: @text-color;
       text-decoration: none;
     }
 
-    &--link{
+    &--link {
       cursor: pointer;
     }
   }
 
-  &--s{
+  &--s {
     font-size: 14px;
-    padding-top:4px;
+    padding-top: 4px;
     padding-bottom: 4px;
 
-    .list__item{
+    .list__item {
       height: 32px;
-      line-height:32px;
+      line-height: 32px;
     }
   }
 
-  &--multirow{
-    .list__item{
+  &--multirow {
+    .list__item {
       height: auto;
       line-height: inherit;
       padding-top: 8px;

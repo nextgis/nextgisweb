@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-01-19 20:15+0000\n"
+"POT-Creation-Date: 2021-01-16 12:13+0000\n"
 "PO-Revision-Date: 2015-09-13 13:13+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,16 +19,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: api.py:107
+#: api.py:106
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:112
+#: api.py:111
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:284 api.py:342
+#: api.py:283 api.py:341
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
@@ -46,7 +46,7 @@ msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
-#: model.py:172
+#: model.py:160
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
@@ -69,10 +69,14 @@ msgid "Vector layer"
 msgstr "Векторный слой"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:192
-#: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
+#: amd/ngw-feature-layer/FieldsDisplayWidget.js:31
 #: amd/ngw-feature-layer/FieldsWidget.js:123 view.py:201
 msgid "Attributes"
 msgstr "Атрибуты"
+
+#: view.py:207
+msgid "External access"
+msgstr "Внешний доступ"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:78
 msgid "Attribute: "
@@ -107,15 +111,15 @@ msgstr "Удалить объект?"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:73 template/section_fields.mako:12
+#: amd/ngw-feature-layer/FieldsWidget.js:73 template/section_fields.mako:5
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:83 template/section_fields.mako:13
+#: amd/ngw-feature-layer/FieldsWidget.js:83 template/section_fields.mako:6
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:87 template/section_fields.mako:14
+#: amd/ngw-feature-layer/FieldsWidget.js:87 template/section_fields.mako:7
 msgid "Display name"
 msgstr "Наименование"
 
@@ -180,6 +184,31 @@ msgid "Lookup table"
 msgstr "Справочник"
 
 #: template/section_fields.mako:18
+#: template/section_api_layer.mako:8
+msgid "MVT Vector Tiles"
+msgstr "Векторные тайлы MVT"
+
+#: template/section_api_layer.mako:12
+msgid ""
+"The Mapbox Vector Tile is an efficient encoding for map data into vector "
+"tiles that can be rendered dynamically."
+msgstr ""
+"Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
+"тайлы которые могут быть динамически отрисованы."
+
+#: template/section_api_layer.mako:15
+msgid ""
+"https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-"
+"vector-tiles"
+msgstr ""
+"https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#mvt-"
+"vector-tiles"
+
+#: template/section_api_layer.mako:16
+msgid "Read more"
+msgstr "Подробнее"
+
+#: template/section_fields.mako:8
 msgid "Table"
 msgstr "Таблица"
 

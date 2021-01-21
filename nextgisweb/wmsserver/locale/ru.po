@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-07-23 12:00+0000\n"
+"POT-Creation-Date: 2021-01-18 19:40+0000\n"
 "PO-Revision-Date: 2015-09-14 01:05+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,9 +19,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: amd/ngw-wmsserver/ServiceWidget.js:55 model.py:21 view.py:293
+#: amd/ngw-wmsserver/ServiceWidget.js:56 model.py:27
+#: template/section_api_wms.mako:7
 msgid "WMS service"
 msgstr "Сервис WMS"
+
+#: view.py:320
+msgid "External access"
+msgstr "Внешний доступ"
 
 #: amd/ngw-wmsserver/template/ServiceWidget.hbs:14
 msgid "Add"
@@ -51,18 +56,29 @@ msgstr "Мин. масштаб"
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: template/section.mako:6
-msgid "WMS service address"
-msgstr "Адрес WMS сервиса"
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
+msgid "Resource"
+msgstr "Ресурс"
 
-#: template/section.mako:10
+#: template/section_api_wms.mako:11
 msgid ""
-"Use this link in desktop client (e.g. {example}) to access raster "
-"representation of your data layers."
+"Web Map Service (WMS) is a standard protocol developed by the Open "
+"Geospatial Consortium for serving georeferenced map images. These images "
+"are typically produced by a map server from data provided by a GIS "
+"database."
 msgstr ""
-"Используйте эту ссылку в настольном приложении (например, {example}) для "
-"просмотра растрового представления ваших слоёв."
+"Web Map Service (WMS) - это стандартный протокол, разработанный Open "
+"Geospatial Consortium для предоставления географически привязанных "
+"изображений. Эти изображения обычно генерируются картографическим "
+"сервером из данных базы данных ГИС."
 
-#~ msgid "WMS URL"
-#~ msgstr "WMS URL"
+#: template/section_api_wms.mako:14
+msgid ""
+"https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-"
+"connection"
+msgstr "https://docs.nextgis.ru/docs_ngweb/source/layers.html#id9"
+
+#: template/section_api_wms.mako:15
+msgid "Read more"
+msgstr "Подробнее"
 
