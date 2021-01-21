@@ -21,7 +21,7 @@ def es_index(timestamp):
 
 
 def to_nsjdon(data):
-    return geojson.dumps(data) + '\n'
+    return geojson.dumps(data)
 
 
 def audit_tween_factory(handler, registry):
@@ -67,6 +67,7 @@ def audit_tween_factory(handler, registry):
             if comp.audit_es_enabled:
                 index = es_index(timestamp)
                 comp.es.index(index=index, body=body)
+
             if comp.audit_file_enabled:
                 data = to_nsjdon(body)
                 print(data, file=comp.file)
