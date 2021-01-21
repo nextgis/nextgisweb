@@ -39,6 +39,9 @@ class AuditComponent(Component):
                 self.audit_es_port,
             ))
 
+        if self.audit_file_enabled:
+            self.file = open(self.options['file'], 'a')
+
     def is_service_ready(self):
         if self.audit_es_enabled:
             while True:

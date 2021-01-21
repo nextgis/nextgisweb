@@ -31,7 +31,9 @@ def audit_tween_factory(handler, registry):
 
         response = handler(request)
 
-        if not ignore and request.env.audit.audit_enabled:
+        comp = request.env.audit
+
+        if not ignore and comp.audit_enabled:
             timestamp = datetime.utcnow()
 
             body = OrderedDict((
@@ -62,13 +64,13 @@ def audit_tween_factory(handler, registry):
             if context is not None:
                 body['context'] = OrderedDict(zip(('model', 'id'), context))
 
-            if request.env.audit.audit_es_enabled:
+            if comp.audit_es_enabled:
                 index = es_index(timestamp)
-                request.env.audit.es.index(index=index, body=body)
-            if request.env.audit.audit_file_enabled:
-                with open(request.env.audit.options['file'], 'a') as f:
-                    data = to_nsjdon(body)
-                    print(data, file=f)
+                comp.es.index(index=index, body=body)
+            if comp.audit_file_enabled:
+                data = to_nsjdon(body)
+                print(data, file=comp.file)
+                comp.file.flush()
 
         return response
 
