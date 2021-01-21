@@ -121,6 +121,9 @@ class TilestorWriter:
                     # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
                     pass
 
+            if 'answer_queue' in data:
+                data['answer_queue'].put_nowait(None)
+
 
 class ResourceTileCache(Base):
     __tablename__ = 'resource_tile_cache'
@@ -139,6 +142,8 @@ class ResourceTileCache(Base):
     seed_status = db.Column(db.Enum(*SEED_STATUS_ENUM))
     seed_progress = db.Column(db.Integer)
     seed_total = db.Column(db.Integer)
+
+    async_writing = False
 
     resource = db.relationship(Resource, backref=db.backref(
         'tile_cache', cascade='all, delete-orphan', uselist=False))
@@ -240,10 +245,21 @@ class ResourceTileCache(Base):
         )
 
         writer = TilestorWriter.getInstance()
+
+        if self.async_writing:
+            answer_queue = Queue(maxsize=1)
+            params['answer_queue'] = answer_queue
+
         try:
             writer.queue.put(params, block=True, timeout=QUEUE_TIMEOUT)
         except Full:
             env.render.logger.error("Tile writer queue full for z=%d x=%d y=%d" % tile)
+
+        if self.async_writing:
+            try:
+                answer_queue.get()
+            except Exception:
+                pass
 
     def initialize(self):
         self.sameta.create_all(bind=DBSession.connection())
@@ -258,42 +274,43 @@ class ResourceTileCache(Base):
 
     def invalidate(self, geom):
         srs = self.resource.srs
-        conn = DBSession.connection()
+        with transaction.manager:
+            conn = DBSession.connection()
 
-        # TODO: This query uses sequnce scan and should be rewritten
-        query_z = db.sql.text(
-            'SELECT DISTINCT z FROM tile_cache."{}"'
-            .format(self.uuid.hex))
+            # TODO: This query uses sequnce scan and should be rewritten
+            query_z = db.sql.text(
+                'SELECT DISTINCT z FROM tile_cache."{}"'
+                .format(self.uuid.hex))
 
-        query_delete = db.sql.text(
-            'DELETE FROM tile_cache."{0}" '
-            'WHERE z = :z '
-            '   AND x BETWEEN :xmin AND :xmax '
-            '   AND y BETWEEN :ymin AND :ymax '
-            .format(self.uuid.hex))
+            query_delete = db.sql.text(
+                'DELETE FROM tile_cache."{0}" '
+                'WHERE z = :z '
+                '   AND x BETWEEN :xmin AND :xmax '
+                '   AND y BETWEEN :ymin AND :ymax '
+                .format(self.uuid.hex))
 
-        zlist = [a[0] for a in conn.execute(query_z).fetchall()]
-        for z in zlist:
-            aft = affine_bounds_to_tile((srs.minx, srs.miny, srs.maxx, srs.maxy), z)
+            zlist = [a[0] for a in conn.execute(query_z).fetchall()]
+            for z in zlist:
+                aft = affine_bounds_to_tile((srs.minx, srs.miny, srs.maxx, srs.maxy), z)
 
-            xmin, ymax = [int(a) for a in aft * geom.bounds[0:2]]
-            xmax, ymin = [int(a) for a in aft * geom.bounds[2:4]]
+                xmin, ymax = [int(a) for a in aft * geom.bounds[0:2]]
+                xmax, ymin = [int(a) for a in aft * geom.bounds[2:4]]
 
-            xmin -= 1
-            ymin -= 1
-            xmax += 1
-            ymax += 1
+                xmin -= 1
+                ymin -= 1
+                xmax += 1
+                ymax += 1
 
-            env.render.logger.debug(
-                'Removing tiles for z=%d x=%d..%d y=%d..%d',
-                z, xmin, xmax, ymin, ymax)
+                env.render.logger.debug(
+                    'Removing tiles for z=%d x=%d..%d y=%d..%d',
+                    z, xmin, xmax, ymin, ymax)
 
-            conn.execute(
-                query_delete, z=z,
-                xmin=xmin, ymin=ymin,
-                xmax=xmax, ymax=ymax)
+                conn.execute(
+                    query_delete, z=z,
+                    xmin=xmin, ymin=ymin,
+                    xmax=xmax, ymax=ymax)
 
-        mark_changed(DBSession())
+            mark_changed(DBSession())
 
     def update_seed_status(self, value, progress=None, total=None):
         self.seed_status = value

@@ -6,6 +6,7 @@ import logging
 import six
 
 import pytest
+import transaction
 from PIL import Image, ImageDraw
 
 from nextgisweb.geometry import Point
@@ -19,23 +20,30 @@ from nextgisweb.render.util import pack_color, unpack_color
 
 
 @pytest.fixture
-def frtc(ngw_resource_group, ngw_txn):
-    vector_layer = VectorLayer(
-        parent_id=ngw_resource_group, display_name='from_fields',
-        owner_user=User.by_keyname('administrator'),
-        geometry_type='POINT',
-        srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=six.text_type(uuid4().hex)
-    ).persist()
-    vector_layer.setup_from_fields([])
+def frtc(ngw_resource_group):
+    with transaction.manager:
+        vector_layer = VectorLayer(
+            parent_id=ngw_resource_group, display_name='from_fields',
+            owner_user=User.by_keyname('administrator'),
+            geometry_type='POINT',
+            srs=SRS.filter_by(id=3857).one(),
+            tbl_uuid=six.text_type(uuid4().hex)
+        ).persist()
+        vector_layer.setup_from_fields([])
 
-    result = ResourceTileCache(
-        resource=vector_layer,
-    ).persist()
+        result = ResourceTileCache(
+            resource=vector_layer,
+        ).persist()
+        result.async_writing = True
 
-    DBSession.flush()
-    result.initialize()
-    return result
+        DBSession.flush()
+        result.initialize()
+
+    yield result
+
+    with transaction.manager:
+        DBSession.delete(ResourceTileCache.filter_by(resource_id=result.resource_id).one())
+        DBSession.delete(VectorLayer.filter_by(id=vector_layer.id).one())
 
 
 @pytest.fixture
@@ -73,34 +81,34 @@ def test_pack_unpack():
     assert unpack_color(pack_color(t)) == t
 
 
-def test_put_get_cross(frtc, img_cross_red, ngw_txn):
+def test_put_get_cross(frtc, img_cross_red):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_cross_red)
     exists, cimg = frtc.get_tile(tile)
     assert exists and cimg.getextrema() == img_cross_red.getextrema()
 
 
-def test_put_get_fill(frtc, img_fill, ngw_txn):
+def test_put_get_fill(frtc, img_fill):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_fill)
     exists, cimg = frtc.get_tile(tile)
     assert exists and cimg.getextrema() == img_fill.getextrema()
 
 
-def test_put_get_empty(frtc, img_empty, ngw_txn):
+def test_put_get_empty(frtc, img_empty):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_empty)
     exists, cimg = frtc.get_tile(tile)
     assert exists and cimg is None
 
 
-def test_get_missing(frtc, ngw_txn):
+def test_get_missing(frtc):
     tile = (0, 0, 0)
     exists, cimg = frtc.get_tile(tile)
     assert not exists
 
 
-def test_ttl(frtc, img_cross_red, ngw_txn):
+def test_ttl(frtc, img_cross_red):
     tile = (0, 0, 0)
     frtc.ttl = 1
     frtc.put_tile(tile, img_cross_red)
@@ -109,7 +117,7 @@ def test_ttl(frtc, img_cross_red, ngw_txn):
     assert not exists
 
 
-def test_clear(frtc, img_cross_red, ngw_txn):
+def test_clear(frtc, img_cross_red):
     tile = (0, 0, 0)
     frtc.put_tile(tile, img_cross_red)
     frtc.clear()
@@ -117,7 +125,7 @@ def test_clear(frtc, img_cross_red, ngw_txn):
     assert not exists
 
 
-def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, ngw_txn, caplog):
+def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, caplog):
     caplog.set_level(logging.DEBUG)
     tile_invalid = (4, 0, 0)
     tile_valid = (4, 15, 15)
