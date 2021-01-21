@@ -68,7 +68,8 @@ def resource_factory(request):
         ).filter_by(id=bindparam('id')), res_cls)
 
     obj = bq_obj(DBSession()).params(id=res_id).one()
-    request.audit_context('resource', res_id)
+    request.audit_context(res_cls, res_id)
+
     return obj
 
 
