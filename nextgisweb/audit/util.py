@@ -27,13 +27,17 @@ def to_nsjdon(data):
 def audit_tween_factory(handler, registry):
 
     def audit_tween(request):
-        ignore = request.path_info.startswith(("/static/", "/_debug_toolbar/"))
+        comp = request.env.audit
+
+        ignore = False
+        for f in comp.request_filters:
+            ignore = ignore or not f(request)
+            if ignore:
+                break
 
         response = handler(request)
 
-        comp = request.env.audit
-
-        if not ignore and comp.audit_enabled:
+        if not ignore:
             timestamp = datetime.utcnow()
 
             body = OrderedDict((

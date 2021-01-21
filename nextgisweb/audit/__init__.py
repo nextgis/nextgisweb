@@ -42,6 +42,37 @@ class AuditComponent(Component):
         if self.audit_file_enabled:
             self.file = open(self.options['file'], 'a')
 
+        # Setup filters from options
+        self.request_filters = request_filters = []
+
+        if self.audit_enabled:
+            request_filters.append(lambda req: not req.path_info.startswith(
+                ("/static/", "/_debug_toolbar/", "/favicon.ico")))
+
+            f_method_inc = self.options['request_method.include']
+            if f_method_inc is not None:
+                f_method_inc = tuple(f_method_inc)
+                request_filters.append(
+                    lambda req: req.method in f_method_inc)
+
+            f_method_exc = self.options['request_method.exclude']
+            if f_method_exc is not None:
+                f_method_exc = tuple(f_method_exc)
+                request_filters.append(
+                    lambda req: req.method not in f_method_exc)
+
+            f_path_inc = self.options['request_path.include']
+            if f_path_inc is not None:
+                f_path_inc = tuple(f_path_inc)
+                request_filters.append(
+                    lambda req: req.path_info.startswith(f_path_inc))
+
+            f_path_exc = self.options['request_path.exclude']
+            if f_path_exc is not None:
+                f_path_exc = tuple(f_path_exc)
+                request_filters.append(
+                    lambda req: not req.path_info.startswith(f_path_exc))
+
     def is_service_ready(self):
         if self.audit_es_enabled:
             while True:
@@ -74,4 +105,14 @@ class AuditComponent(Component):
         Option('elasticsearch.index.prefix', default='nextgisweb-audit'),
         Option('elasticsearch.index.suffix', default='%Y.%m'),
         Option('file', doc='Log events in ndjson format'),
+
+        Option('request_method.include', list, default=None,
+               doc="Log only given request methods"),
+        Option('request_method.exclude', list, default=None,
+               doc="Don't log given request methods"),
+
+        Option('request_path.include', list, default=None,
+               doc="Log only given request path prefixes"),
+        Option('request_path.exclude', list, default=None,
+               doc="Don't log given request path prefixes"),
     )
