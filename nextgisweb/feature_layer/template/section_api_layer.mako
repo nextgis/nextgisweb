@@ -10,12 +10,15 @@
             <div class="tooltip-content">
                 <div class="tooltip-help">
                     ${tr(_('The Mapbox Vector Tile is an efficient encoding for map data into vector tiles that can be rendered dynamically.'))}
-                    <br/>
-                    <a target="_blank"
-                       href="${tr(_('https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles'))}">
-                        ${tr(_("Read more"))}
-                    </a>
-                    <div class="material-icons icon-exitToApp"></div>
+
+                    %if request.env.pyramid.options['nextgis_external_docs_links']:
+                        <br/>
+                        <a target="_blank"
+                           href="${tr(_('https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles'))}">
+                            ${tr(_("Read more"))}
+                        </a>
+                        <div class="material-icons icon-exitToApp"></div>
+                    %endif
                 </div>
             </div>
         </div>

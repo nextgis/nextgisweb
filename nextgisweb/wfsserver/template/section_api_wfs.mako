@@ -9,12 +9,15 @@
             <div class="tooltip-content">
                 <div class="tooltip-help">
                     ${tr(_('Web Feature Service (WFS) provides an interface allowing requests for geographical features across the web using platform-independent calls.'))}
-                    <br/>
-                    <a target="_blank"
-                       href="${tr(_('https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service'))}">
-                        ${tr(_("Read more"))}
-                    </a>
-                    <div class="material-icons icon-exitToApp"></div>
+
+                    %if request.env.pyramid.options['nextgis_external_docs_links']:
+                        <br/>
+                        <a target="_blank"
+                           href="${tr(_('https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service'))}">
+                            ${tr(_("Read more"))}
+                        </a>
+                        <div class="material-icons icon-exitToApp"></div>
+                    %endif
                 </div>
             </div>
         </div>

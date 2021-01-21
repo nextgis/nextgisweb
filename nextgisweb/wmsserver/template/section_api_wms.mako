@@ -9,12 +9,15 @@
             <div class="tooltip-content">
                 <div class="tooltip-help">
                     ${tr(_('Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database.'))}
-                    <br/>
-                    <a target="_blank"
-                       href="${tr(_('https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection'))}">
-                        ${tr(_("Read more"))}
-                    </a>
-                    <div class="material-icons icon-exitToApp"></div>
+
+                    %if request.env.pyramid.options['nextgis_external_docs_links']:
+                        <br/>
+                        <a target="_blank"
+                           href="${tr(_('https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection'))}">
+                            ${tr(_("Read more"))}
+                        </a>
+                        <div class="material-icons icon-exitToApp"></div>
+                    %endif
                 </div>
             </div>
         </div>

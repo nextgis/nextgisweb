@@ -9,12 +9,15 @@
             <div class="tooltip-content">
                 <div class="tooltip-help">
                     ${tr(_('TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map is a map displayed in a browser by seamlessly joining dozens of individually requested image.'))}
-                    <br/>
-                    <a target="_blank"
-                       href="${tr(_('https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render'))}">
-                        ${tr(_("Read more"))}
-                    </a>
-                    <div class="material-icons icon-exitToApp"></div>
+
+                    %if request.env.pyramid.options['nextgis_external_docs_links']:
+                        <br/>
+                        <a target="_blank"
+                           href="${tr(_('https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render'))}">
+                            ${tr(_("Read more"))}
+                        </a>
+                        <div class="material-icons icon-exitToApp"></div>
+                    %endif
                 </div>
             </div>
         </div>

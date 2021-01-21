@@ -105,6 +105,7 @@ class PyramidComponent(Component):
         Option('favicon', default=resource_filename('nextgisweb', 'static/img/favicon.ico')),
         Option('company_url', default="https://nextgis.com"),
         Option('desktop_gis_example', default='NextGIS QGIS'),
+        Option('nextgis_external_docs_links', default=True),
 
         Option('backup.download', bool, default=False),
 
