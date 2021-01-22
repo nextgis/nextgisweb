@@ -4,7 +4,7 @@ import os
 import os.path
 
 from ..lib.config import Option
-from ..component import Component
+from ..component import Component, require
 
 from . import command  # NOQA
 from .interface import (
@@ -45,6 +45,7 @@ class RenderComponent(Component):
         if not os.path.isdir(self.tile_cache_path):
             os.makedirs(self.tile_cache_path)
 
+    @require('resource')
     def setup_pyramid(self, config):
         from . import api, view # NOQA
         api.setup_pyramid(self, config)
