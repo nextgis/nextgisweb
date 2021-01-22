@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import re
+from datetime import datetime
 from lxml import etree
 
 from owslib.crs import Crs
@@ -27,6 +28,7 @@ from ..feature_layer import (
 )
 from ..geometry import geom_from_wkb
 from ..layer import SpatialLayerMixin
+from ..lib.ows import FIELD_TYPE_WFS
 from ..models import declarative_base
 from ..resource import (
     ConnectionScope,
@@ -43,6 +45,15 @@ from ..resource import (
 )
 
 from .util import _, COMP_ID
+
+WFS_2_FIELD_TYPE = {
+    FIELD_TYPE_WFS.INTEGER: FIELD_TYPE.INTEGER,
+    FIELD_TYPE_WFS.DOUBLE: FIELD_TYPE.REAL,
+    FIELD_TYPE_WFS.STRING: FIELD_TYPE.STRING,
+    FIELD_TYPE_WFS.DATE: FIELD_TYPE.DATE,
+    FIELD_TYPE_WFS.TIME: FIELD_TYPE.TIME,
+    FIELD_TYPE_WFS.DATETIME: FIELD_TYPE.DATETIME,
+}
 
 Base = declarative_base()
 
@@ -206,6 +217,10 @@ class WFSConnection(Base, Resource):
         if not get_count:
             _members = find_tags(root, 'member')
 
+            fld_map = dict()
+            for field in layer.fields:
+                fld_map[field.keyname] = field.datatype
+
             features = []
             for _member in _members:
                 _feature = _member[0]
@@ -216,12 +231,29 @@ class WFSConnection(Base, Resource):
                     key = ns_trim(_property.tag)
                     if key == layer.column_geom:
                         geom = geom_from_gml(_property[0])
-                    if _property.attrib.get('xsi:nil', 'false') == 'true':
+                        continue
+
+                    datatype = fld_map[key]
+                    nil_attr = r'{http://www.w3.org/2001/XMLSchema-instance}nil'
+                    if _property.attrib.get(nil_attr, 'false') == 'true':
                         value = None
-                    elif _property.text is None:
-                        value = ''
+                    elif datatype == FIELD_TYPE.INTEGER:
+                        value = int(_property.text)
+                    elif datatype == FIELD_TYPE.REAL:
+                        value = float(_property.text)
+                    elif datatype == FIELD_TYPE.STRING:
+                        if _property.text is None:
+                            value = ''
+                        else:
+                            value = _property.text
+                    elif datatype == FIELD_TYPE.DATE:
+                        value = datetime.fromisoformat(_property.text)
+                    elif datatype == FIELD_TYPE.TIME:
+                        value = datetime.strptime(_property.text, r'%H:%M:%S')
+                    elif datatype == FIELD_TYPE.DATETIME:
+                        value = datetime.fromisoformat(_property.text)
                     else:
-                        value = _property.text
+                        raise ValidationError("Unknown data type: %s" % datatype)
                     fields[key] = value
 
                 fid = _feature.attrib['{http://www.opengis.net/gml/3.2}id']
@@ -299,19 +331,8 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if field['name'] == self.column_geom:
                 continue
 
-            if field['type'] == 'integer':
-                datatype = FIELD_TYPE.INTEGER
-            elif field['type'] == 'double':
-                datatype = FIELD_TYPE.REAL
-            elif field['type'] == 'string':
-                datatype = FIELD_TYPE.STRING
-            elif field['type'] == 'date':
-                datatype = FIELD_TYPE.DATE
-            elif field['type'] == 'time':
-                datatype = FIELD_TYPE.TIME
-            elif field['type'] == 'dateTime':
-                datatype = FIELD_TYPE.DATETIME
-            else:
+            datatype = WFS_2_FIELD_TYPE.get(field)
+            if datatype is None:
                 raise ValidationError("Unknown data type: %s" % field['type'])
 
             fopts = dict(display_name=field['name'])

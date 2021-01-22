@@ -8,6 +8,15 @@ from six import BytesIO
 __all__ = ['parse_request', 'get_exception_template']
 
 
+class FIELD_TYPE_WFS(object):
+    INTEGER = 'integer'
+    DOUBLE = 'double'
+    STRING = 'string'
+    DATE = 'date'
+    TIME = 'time'
+    DATETIME = 'dateTime'
+
+
 def _ns_trim(value):
     pos = max(value.find('}'), value.rfind(':'))
     return value[pos + 1:]
