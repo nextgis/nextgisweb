@@ -8,5 +8,13 @@
             data-ngw-serialize="path"
             title="{{gettext 'WFS path'}}" style="width: 100%"></div>
 
+        <div data-dojo-type="dijit/form/Select"
+            data-dojo-attach-point="wVersion"
+            data-ngw-serialize="version"
+            title="{{gettext 'Version'}}" style="width: 20em">
+            <option value="2.0.2" selected="selected">2.0.2</option>
+            <option value="2.0.0">2.0.0</option>
+        </div>
+
     </div>
 </div>

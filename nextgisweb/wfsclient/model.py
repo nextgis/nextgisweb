@@ -182,6 +182,7 @@ class WFSConnectionSerializer(Serializer):
     resclass = WFSConnection
 
     path = SP(read=ConnectionScope.read, write=ConnectionScope.write)
+    version = SP(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 class WFSLayerField(Base, LayerField):
