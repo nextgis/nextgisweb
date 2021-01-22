@@ -150,8 +150,6 @@ class WFSConnection(Base, Resource):
 
         if not get_count:
             _members = find_tags(root, 'featureMember')
-            if get_count:
-                return len(_members)
 
             features = []
             for _member in _members:
