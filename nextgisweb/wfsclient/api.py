@@ -5,7 +5,7 @@ import json
 
 from pyramid.response import Response
 
-from ..resource import ConnectionScope
+from ..resource import ConnectionScope, resource_factory
 
 from .model import WFSConnection
 
@@ -21,17 +21,19 @@ def inspect_connection(resource, request):
 def inspect_layer(resource, request):
     request.resource_permission(ConnectionScope.connect)
 
-    layer_name = request.matchdict['table_name']
+    layer_name = request.matchdict['layer']
     fields = resource.get_fields(layer_name)
 
     return Response(json.dumps(fields), content_type='application/json')
 
 
 def setup_pyramid(comp, config):
-    config.add_view(
-        inspect_connection, route_name='resource.inspect',
-        context=WFSConnection, request_method='GET')
+    config.add_route(
+        'wfsclient.connection.inspect', '/api/resource/{id}/wfs_connection/inspect/',
+        factory=resource_factory) \
+        .add_view(inspect_connection, context=WFSConnection, request_method='GET')
 
-    config.add_view(
-        inspect_layer, route_name='resource.inspect.table',
-        context=WFSConnection, request_method='GET')
+    config.add_route(
+        'wfsclient.connection.inspect.layer', '/api/resource/{id}/wfs_connection/inspect/{layer}/',
+        factory=resource_factory) \
+        .add_view(inspect_layer, context=WFSConnection, request_method='GET')

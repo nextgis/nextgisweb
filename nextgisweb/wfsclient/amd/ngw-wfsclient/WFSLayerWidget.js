@@ -89,7 +89,7 @@ define([
         },
 
         populateLayers: function (connection) {
-            xhr.get(route.resource.inspect(connection.value), {
+            xhr.get(route.wfsclient.connection.inspect(connection.value), {
                 handleAs: 'json'
             }).then(lang.hitch(this, function (response) {
                 var data = array.map(response, function (layer) {
@@ -103,7 +103,7 @@ define([
             if (!layer_name) { return; }
 
             var connection_id = this.wConnection.get('value').id;
-            xhr.get(route.resource.inspect.table(connection_id, this.wLayer.get('value')), {
+            xhr.get(route.wfsclient.connection.inspect.layer(connection_id, this.wLayer.get('value')), {
                 handleAs: 'json',
             }).then(lang.hitch(this, function (response) {
                 var geomcols = [];

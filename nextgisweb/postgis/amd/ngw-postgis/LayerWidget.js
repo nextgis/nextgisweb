@@ -82,7 +82,7 @@ define([
         populateSchemas: function (connection) {
             this.connection = connection.value;
             this.schemas = {};
-            xhr.get(route.resource.inspect(this.connection), {
+            xhr.get(route.postgis.connection.inspect(this.connection), {
                 handleAs: "json"
             }).then(lang.hitch(this, function (response) {
                 array.forEach(response, function (item) {
@@ -105,7 +105,7 @@ define([
 
         populateColumns: function (schema, table) {
             if (!table) { return; }
-            xhr.get(route.resource.inspect.table(this.connection.id, table), {
+            xhr.get(route.postgis.connection.inspect.table(this.connection.id, table), {
                 handleAs: "json",
                 query: { schema: schema }
             }).then(lang.hitch(this, function (response) {
