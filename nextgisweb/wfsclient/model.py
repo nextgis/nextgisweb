@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import re
 from lxml import etree
 
+from owslib.crs import Crs
 import requests
 from osgeo import ogr
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
@@ -66,16 +68,22 @@ def geom_from_gml(el):
 
 
 def get_srid(value):
-    pos = value.rfind(':')
-    return int(value[pos + 1:])
+    try:
+        crs = Crs(value)
+        return crs.code
+    except:
+        return None
 
 
-def str_to_int(s):
-    return int(s.encode('hex'), 16)
+def fid_int(fid, layer_name):
+    m = re.search('^%s\.(\d+)$' % layer_name, fid)
+    if m is None:
+        raise ValidationError("Feature ID encoding is not supported")
+    return int(m.group(1))
 
 
-def int_to_str(num):
-    return hex(num)[2:].decode('hex')
+def fid_str(fid, layer_name):
+    return '%s.%d' % (layer_name, fid)
 
 
 class WFSConnection(Base, Resource):
@@ -96,9 +104,11 @@ class WFSConnection(Base, Resource):
             if 'params' not in kwargs:
                 kwargs['params'] = dict()
             kwargs['params']['version'] = self.version
+            kwargs['params']['service'] = 'WFS'
         elif method == 'POST':
             if xml_root is not None:
                 xml_root.attrib['version'] = self.version
+                xml_root.attrib['service'] = 'WFS'
                 kwargs['data'] = etree.tostring(xml_root)
         else:
             raise NotImplementedError()
@@ -126,28 +136,44 @@ class WFSConnection(Base, Resource):
 
         root = etree.parse(BytesIO(body)).getroot()
 
-        layers = [dict(
-            name=find_tags(el, 'Name')[0].text,
-            srid=get_srid(find_tags(el, 'DefaultCRS')[0].text),
-        ) for el in find_tags(root, 'FeatureType')]
+        layers = []
+        for el in find_tags(root, 'FeatureType'):
+            srid = get_srid(find_tags(el, 'DefaultCRS')[0].text)
+
+            is_supported = type(srid) == int
+            if not is_supported:
+                continue
+
+            layers.append(dict(
+                name=find_tags(el, 'Name')[0].text,
+                srid=srid,
+            ))
 
         return dict(layers=layers)
 
     def get_fields(self, layer_name):
         body = self.request_wfs('GET', params=dict(
-            REQUEST='DescribeFeatureType', TYPENAMES=layer_name))
+            request='DescribeFeatureType', typeNames=layer_name))
 
         root = etree.parse(BytesIO(body)).getroot()
         cplx = find_tags(root, 'complexType')[0]
 
-        fields = [dict(
-            name=el.attrib['name'],
-            type=el.attrib['type'],
-        ) for el in find_tags(cplx, 'element')]
+        fields = []
+        for el in find_tags(cplx, 'element'):
+            field_type = el.attrib.get('type')
+            if field_type is None:
+                restriction = find_tags(cplx, 'restriction')[0]
+                field_type = restriction.attrib['base']
+            if not field_type.startswith('gml:'):
+                field_type = ns_trim(field_type)
+            fields.append(dict(
+                name=el.attrib['name'],
+                type=field_type,
+            ))
 
         return fields
 
-    def get_feature(self, layer, fid=None, get_count=False):
+    def get_feature(self, layer, fid=None, get_count=False, max_features=None):
         req_root = etree.Element('GetFeature')
 
         __query = etree.Element('Query', dict(typeNames=layer.layer_name))
@@ -156,11 +182,14 @@ class WFSConnection(Base, Resource):
         if fid is not None:
             __filter = etree.Element('Filter')
             __query.append(__filter)
-            __rid = etree.Element('ResourceId', dict(rid=int_to_str(fid)))
+            __rid = etree.Element('ResourceId', dict(rid=fid_str(fid, layer.layer_name)))
             __filter.append(__rid)
 
         if get_count:
-            req_root.attrib['RESULTTYPE'] = 'hits'
+            req_root.attrib['resultType'] = 'hits'
+
+        if max_features is not None:
+            req_root.attrib['count'] = str(max_features)
 
         body = self.request_wfs('POST', xml_root=req_root)
 
@@ -192,7 +221,7 @@ class WFSConnection(Base, Resource):
 
                 fid = _feature.attrib['{http://www.opengis.net/gml/3.2}id']
                 features.append(Feature(
-                    layer=layer, id=str_to_int(fid),
+                    layer=layer, id=fid_int(fid, layer.layer_name),
                     fields=fields, geom=geom
                 ))
 
@@ -242,6 +271,9 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         return isinstance(parent, ResourceGroup)
 
     def setup(self):
+        # Check feature id readable
+        features, count = self.connection.get_feature(self, max_features=1)
+
         fdata = dict()
         for f in self.fields:
             fdata[f.keyname] = dict(
@@ -266,8 +298,8 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             elif field['type'] == 'date':
                 datatype = FIELD_TYPE.DATE
             elif field['type'] == 'time':
-                datatype = FIELD_TYPE.time
-            elif field['type'] == 'datetime':
+                datatype = FIELD_TYPE.TIME
+            elif field['type'] == 'dateTime':
                 datatype = FIELD_TYPE.DATETIME
             else:
                 raise ValidationError("Unknown data type: %s" % field['type'])
@@ -279,6 +311,10 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 datatype=datatype,
                 column_name=field['name'],
                 **fopts))
+
+        if self.geometry_type is None:
+            example_feature = features[0]
+            self.geometry_type = example_feature.geom.geom_type.upper()
 
     # IFeatureLayer
 
