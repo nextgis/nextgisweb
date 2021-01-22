@@ -19,6 +19,7 @@ from ..feature_layer import (
     GEOM_TYPE,
     IFeatureLayer,
     IFeatureQuery,
+    IFeatureQueryFilterBy,
     LayerField,
     LayerFieldsMixin,
 )
@@ -90,11 +91,15 @@ class WFSConnection(Base, Resource):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def request_wfs(self, method, **kwargs):
+    def request_wfs(self, method, xml_root=None, **kwargs):
         if method == 'GET':
             if 'params' not in kwargs:
                 kwargs['params'] = dict()
             kwargs['params']['version'] = self.version
+        elif method == 'POST':
+            if xml_root is not None:
+                xml_root.attrib['version'] = self.version
+                kwargs['data'] = etree.tostring(xml_root)
         else:
             raise NotImplementedError()
 
@@ -142,13 +147,23 @@ class WFSConnection(Base, Resource):
 
         return fields
 
-    def get_feature(self, layer, get_count=False):
-        params = dict(REQUEST='GetFeature', TYPENAMES=layer.layer_name)
+    def get_feature(self, layer, fid=None, get_count=False):
+        req_root = etree.Element('GetFeature')
+
+        __query = etree.Element('Query', dict(typeNames=layer.layer_name))
+        req_root.append(__query)
+
+        if fid is not None:
+            __filter = etree.Element('Filter')
+            __query.append(__filter)
+            __rid = etree.Element('ResourceId', dict(rid=int_to_str(fid)))
+            __filter.append(__rid)
 
         if get_count:
-            params['RESULTTYPE'] = 'hits'
+            req_root.attrib['RESULTTYPE'] = 'hits'
 
-        body = self.request_wfs('GET', params=params)
+        body = self.request_wfs('POST', xml_root=req_root)
+
         root = etree.parse(BytesIO(body)).getroot()
 
         features = []
@@ -320,6 +335,7 @@ class WFSLayerSerializer(Serializer):
 
 @implementer(
     IFeatureQuery,
+    IFeatureQueryFilterBy,
 )
 class FeatureQueryBase(object):
 
@@ -331,6 +347,8 @@ class FeatureQueryBase(object):
         self._fields = None
         self._limit = None
         self._offset = None
+
+        self._filter_by = None
 
     def fields(self, *args):
         self._fields = args
@@ -348,8 +366,14 @@ class FeatureQueryBase(object):
     def box(self):
         self._box = True
 
+    def filter_by(self, **kwargs):
+        self._filter_by = kwargs
+
     def __call__(self):
-        features, count = self.layer.connection.get_feature(self.layer)
+        fid = self._filter_by.get('id') if self._filter_by is not None else None
+
+        features, count = self.layer.connection.get_feature(
+            self.layer, fid=fid)
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
