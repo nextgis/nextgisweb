@@ -52,12 +52,10 @@ def inspect_table(request):
 
 
 def setup_pyramid(comp, config):
-    config.add_route(
-        'postgis.connection.inspect', '/api/resource/{id}/inspect/',
-        factory=resource_factory) \
-        .add_view(inspect_connection, context=PostgisConnection, request_method='GET')
+    config.add_view(
+        inspect_connection, route_name='resource.inspect',
+        context=PostgisConnection, request_method='GET')
 
-    config.add_route(
-        'postgis.connection.inspect.table', '/api/resource/{id}/inspect/{table_name}/',
-        factory=resource_factory) \
-        .add_view(inspect_table, context=PostgisConnection, request_method='GET')
+    config.add_view(
+        inspect_table, route_name='resource.inspect.table',
+        context=PostgisConnection, request_method='GET')
