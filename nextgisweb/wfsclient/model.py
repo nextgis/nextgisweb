@@ -9,9 +9,10 @@ from six import BytesIO
 from zope.interface import implementer
 
 from .. import db
-from ..core.exception import OperationalError
+from ..core.exception import ValidationError, OperationalError
 from ..env import env
 from ..feature_layer import (
+    FIELD_TYPE,
     GEOM_TYPE,
     IFeatureLayer,
     IWritableFeatureLayer,
@@ -150,7 +151,43 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         return isinstance(parent, ResourceGroup)
 
     def setup(self):
-        pass  # TODO
+        fdata = dict()
+        for f in self.fields:
+            fdata[f.keyname] = dict(
+                display_name=f.display_name,
+                grid_visibility=f.grid_visibility)
+
+        for f in list(self.fields):
+            self.fields.remove(f)
+
+        self.feature_label_field = None
+
+        for field in self.connection.get_fields(self.layer_name):
+            if field['name'] == self.column_geom:
+                continue
+
+            if field['type'] == 'integer':
+                datatype = FIELD_TYPE.INTEGER
+            elif field['type'] == 'double':
+                datatype = FIELD_TYPE.REAL
+            elif field['type'] == 'string':
+                datatype = FIELD_TYPE.STRING
+            elif field['type'] == 'date':
+                datatype = FIELD_TYPE.DATE
+            elif field['type'] == 'time':
+                datatype = FIELD_TYPE.time
+            elif field['type'] == 'datetime':
+                datatype = FIELD_TYPE.DATETIME
+            else:
+                raise ValidationError("Unknown data type: %s" % field['type'])
+
+            fopts = dict(display_name=field['name'])
+            fopts.update(fdata.get(field['name'], dict()))
+            self.fields.append(WFSLayerField(
+                keyname=field['name'],
+                datatype=datatype,
+                column_name=field['name'],
+                **fopts))
 
     # IFeatureLayer
 
