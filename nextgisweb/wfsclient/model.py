@@ -189,7 +189,7 @@ class WFSConnection(Base, Resource):
 
         return fields
 
-    def get_feature(self, layer, fid=None, get_count=False, max_features=None):
+    def get_feature(self, layer, fid=None, get_count=False, limit=None, offset=None):
         req_root = etree.Element('GetFeature')
 
         __query = etree.Element('Query', dict(typeNames=layer.layer_name))
@@ -204,8 +204,10 @@ class WFSConnection(Base, Resource):
         if get_count:
             req_root.attrib['resultType'] = 'hits'
 
-        if max_features is not None:
-            req_root.attrib['count'] = str(max_features)
+        if limit is not None:
+            req_root.attrib['count'] = str(limit)
+            if offset is not None:
+                req_root.attrib['startindex'] = str(offset)
 
         body = self.request_wfs('POST', xml_root=req_root)
 
@@ -314,7 +316,7 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     def setup(self):
         # Check feature id readable
-        features, count = self.connection.get_feature(self, max_features=1)
+        features, count = self.connection.get_feature(self, count=1)
 
         fdata = dict()
         for f in self.fields:
@@ -437,10 +439,15 @@ class FeatureQueryBase(object):
         self._filter_by = kwargs
 
     def __call__(self):
-        fid = self._filter_by.get('id') if self._filter_by is not None else None
+        params = dict()
+        if self._filter_by is not None:
+            params['fid'] = self._filter_by.get('id')
+        if self._limit is not None:
+            params['limit'] = self._limit
+            params['offset'] = self._offset
 
         features, count = self.layer.connection.get_feature(
-            self.layer, fid=fid)
+            self.layer, **params)
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
