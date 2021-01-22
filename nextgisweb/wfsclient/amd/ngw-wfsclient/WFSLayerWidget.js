@@ -50,7 +50,7 @@ define([
             this.wConnection.on('update', lang.hitch(this, this.populateLayers));
 
             this.wLayer.watch('value', lang.hitch(this, function (attr, oldval, newval) {
-                if (this._deserialized) {
+                if (this._ready()) {
                     var store = this.wLayer.get('store');
                     var item = store.get(newval);
                     this.wGeometrySRID.set('value', item.srid);
@@ -59,7 +59,7 @@ define([
                 this.populateColumns(newval);
             }));
             this.wColumnGeometry.watch('value', lang.hitch(this, function (attr, oldval, newval) {
-                if (this._deserialized) {
+                if (this._ready()) {
                     var store = this.wColumnGeometry.get('store');
                     var item = store.get(newval);
                     var type = item.type
@@ -71,7 +71,11 @@ define([
             }));
         },
 
-        deserialize: function() {
+        _ready: function () {
+            return this.composite.operation == 'create' || this._deserialized;
+        },
+
+        deserialize: function () {
             this.inherited(arguments);
             this._deserialized = true;
         },
@@ -110,7 +114,7 @@ define([
                 }, this);
 
                 this.wColumnGeometry.set('store', new Memory({data: geomcols}));
-                if (this._deserialized && geomcols.length === 1) {
+                if (this._ready() && geomcols.length === 1) {
                     this.wColumnGeometry.set('value', geomcols[0].id);
                 }
             }));
