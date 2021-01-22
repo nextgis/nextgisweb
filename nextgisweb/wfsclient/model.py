@@ -4,6 +4,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from lxml import etree
 
 import requests
+from osgeo import ogr
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from six import BytesIO
 from zope.interface import implementer
@@ -12,13 +13,16 @@ from .. import db
 from ..core.exception import ValidationError, OperationalError
 from ..env import env
 from ..feature_layer import (
+    Feature,
+    FeatureSet,
     FIELD_TYPE,
     GEOM_TYPE,
     IFeatureLayer,
-    IWritableFeatureLayer,
+    IFeatureQuery,
     LayerField,
     LayerFieldsMixin,
 )
+from ..geometry import geom_from_wkb
 from ..layer import SpatialLayerMixin
 from ..models import declarative_base
 from ..resource import (
@@ -41,9 +45,23 @@ Base = declarative_base()
 
 layer_identity = COMP_ID + '_layer'
 
+WFS_VERSIONS = ('1.0.0', '1.1.0', '2.0.0', '2.0.2', )
 
+
+# TODO: WFS helper module
 def find_tags(element, tag):
     return element.xpath('.//*[local-name()="%s"]' % tag)
+
+
+def ns_trim(value):
+    pos = max(value.find('}'), value.rfind(':'))
+    return value[pos + 1:]
+
+
+def geom_from_gml(el):
+    value = etree.tostring(el)
+    ogr_geom = ogr.CreateGeometryFromGML(value)
+    return geom_from_wkb(ogr_geom.ExportToWkb())
 
 
 def get_srid(value):
@@ -58,12 +76,20 @@ class WFSConnection(Base, Resource):
     __scope__ = ConnectionScope
 
     path = db.Column(db.Unicode, nullable=False)
+    version = db.Column(db.Enum(*WFS_VERSIONS), nullable=False)
 
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     def request_wfs(self, method, **kwargs):
+        if method == 'GET':
+            if 'params' not in kwargs:
+                kwargs['params'] = dict()
+            kwargs['params']['version'] = self.version
+        else:
+            raise NotImplementedError()
+
         response = requests.request(
             method, self.path,
             headers=env.wfsclient.headers,
@@ -108,6 +134,50 @@ class WFSConnection(Base, Resource):
 
         return fields
 
+    def get_feature(self, layer, get_count=False):
+        params = dict(REQUEST='GetFeature', TYPENAMES=layer.layer_name)
+
+        gt110 = self.version >= '1.1.0'
+        if get_count and gt110:
+            params['RESULTTYPE'] = 'hits'
+
+        body = self.request_wfs('GET', params=params)
+        root = etree.parse(BytesIO(body)).getroot()
+
+        features = []
+        count = int(root.attrib['numberMatched']) if get_count and gt110 \
+            else len(find_tags(root, 'featureMember'))
+
+        if not get_count:
+            _members = find_tags(root, 'featureMember')
+            if get_count:
+                return len(_members)
+
+            features = []
+            for _member in _members:
+                _feature = _member[0]
+
+                fields = dict()
+                geom = None
+                for _property in _feature:
+                    key = ns_trim(_property.tag)
+                    if key == layer.column_geom:
+                        geom = geom_from_gml(_property[0])
+                    if _property.attrib.get('xsi:nil', 'false') == 'true':
+                        value = None
+                    elif _property.text is None:
+                        value = ''
+                    else:
+                        value = _property.text
+                    fields[key] = value
+
+                features.append(Feature(
+                    layer=layer, id=_member.attrib['{http://www.opengis.net/gml/3.2}id'],  # FIXME
+                    fields=fields, geom=geom
+                ))
+
+        return features, count
+
 
 class WFSConnectionSerializer(Serializer):
     identity = WFSConnection.identity
@@ -126,7 +196,7 @@ class WFSLayerField(Base, LayerField):
     column_name = db.Column(db.Unicode, nullable=False)
 
 
-@implementer(IFeatureLayer, IWritableFeatureLayer)
+@implementer(IFeatureLayer)
 class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = layer_identity
     cls_display_name = _("WFS layer")
@@ -193,7 +263,11 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     @property
     def feature_query(self):
-        pass  # TODO
+
+        class BoundFeatureQuery(FeatureQueryBase):
+            layer = self
+
+        return BoundFeatureQuery
 
     def field_by_keyname(self, keyname):
         for f in self.fields:
@@ -201,20 +275,6 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 return f
 
         raise KeyError("Field '%s' not found!" % keyname)
-
-    # IWritableFeatureLayer
-
-    def feature_create(self, feature):
-        pass  # TODO
-
-    def feature_delete(self, feature_id):
-        pass  # TODO
-
-    def feature_delete_all(self):
-        pass  # TODO
-
-    def feature_put(self, feature):
-        pass  # TODO
 
 
 class _fields_action(SP):
@@ -250,3 +310,50 @@ class WFSLayerSerializer(Serializer):
     def deserialize(self):
         self.data['srs'] = dict(id=3857)
         super(self.__class__, self).deserialize()
+
+
+@implementer(
+    IFeatureQuery,
+)
+class FeatureQueryBase(object):
+
+    def __init__(self):
+        self._srs = None
+        self._geom = False
+        self._box = False
+
+        self._fields = None
+        self._limit = None
+        self._offset = None
+
+    def fields(self, *args):
+        self._fields = args
+
+    def limit(self, limit, offset=0):
+        self._limit = limit
+        self._offset = offset
+
+    def geom(self):
+        self._geom = True
+
+    def srs(self, srs):
+        self._srs = srs
+
+    def box(self):
+        self._box = True
+
+    def __call__(self):
+        features, count = self.layer.connection.get_feature(self.layer)
+
+        class QueryFeatureSet(FeatureSet):
+            layer = self.layer
+
+            def __iter__(self):
+                for feature in features:
+                    yield feature
+
+            @property
+            def total_count(self):
+                return count
+
+        return QueryFeatureSet()
