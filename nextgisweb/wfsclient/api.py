@@ -15,7 +15,8 @@ def inspect_connection(resource, request):
 
     capabilities = resource.get_capabilities()
 
-    return Response(json.dumps(capabilities['layers']), content_type='application/json')
+    return Response(
+        json.dumps(capabilities['layers']), content_type='application/json', charset='utf-8')
 
 
 def inspect_layer(resource, request):
@@ -24,7 +25,7 @@ def inspect_layer(resource, request):
     layer_name = request.matchdict['layer']
     fields = resource.get_fields(layer_name)
 
-    return Response(json.dumps(fields), content_type='application/json')
+    return Response(json.dumps(fields), content_type='application/json', charset='utf-8')
 
 
 def setup_pyramid(comp, config):

@@ -93,6 +93,8 @@ class WFSConnection(Base, Resource):
     __scope__ = ConnectionScope
 
     path = db.Column(db.Unicode, nullable=False)
+    username = db.Column(db.Unicode)
+    password = db.Column(db.Unicode)
     version = db.Column(db.Enum(*WFS_VERSIONS), nullable=False)
 
     @classmethod
@@ -112,6 +114,9 @@ class WFSConnection(Base, Resource):
                 kwargs['data'] = etree.tostring(xml_root)
         else:
             raise NotImplementedError()
+
+        if self.username is not None:
+            kwargs['auth'] = requests.auth.HTTPBasicAuth(self.username, self.password)
 
         response = requests.request(
             method, self.path,
@@ -232,8 +237,13 @@ class WFSConnectionSerializer(Serializer):
     identity = WFSConnection.identity
     resclass = WFSConnection
 
-    path = SP(read=ConnectionScope.read, write=ConnectionScope.write)
-    version = SP(read=ConnectionScope.read, write=ConnectionScope.write)
+    _defaults = dict(read=ConnectionScope.read,
+                     write=ConnectionScope.write)
+
+    path = SP(**_defaults)
+    username = SP(**_defaults)
+    password = SP(**_defaults)
+    version = SP(**_defaults)
 
 
 class WFSLayerField(Base, LayerField):
