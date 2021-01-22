@@ -115,7 +115,7 @@ class WFSConnection(Base, Resource):
 
         layers = [dict(
             name=find_tags(el, 'Name')[0].text,
-            srid=get_srid(find_tags(el, 'SRS')[0].text),
+            srid=get_srid(find_tags(el, 'DefaultCRS')[0].text),
         ) for el in find_tags(root, 'FeatureType')]
 
         return dict(layers=layers)
@@ -137,19 +137,17 @@ class WFSConnection(Base, Resource):
     def get_feature(self, layer, get_count=False):
         params = dict(REQUEST='GetFeature', TYPENAMES=layer.layer_name)
 
-        gt110 = self.version >= '1.1.0'
-        if get_count and gt110:
+        if get_count:
             params['RESULTTYPE'] = 'hits'
 
         body = self.request_wfs('GET', params=params)
         root = etree.parse(BytesIO(body)).getroot()
 
         features = []
-        count = int(root.attrib['numberMatched']) if get_count and gt110 \
-            else len(find_tags(root, 'featureMember'))
+        count = int(root.attrib['numberMatched'])
 
         if not get_count:
-            _members = find_tags(root, 'featureMember')
+            _members = find_tags(root, 'member')
 
             features = []
             for _member in _members:
@@ -170,7 +168,7 @@ class WFSConnection(Base, Resource):
                     fields[key] = value
 
                 features.append(Feature(
-                    layer=layer, id=_member.attrib['{http://www.opengis.net/gml/3.2}id'],  # FIXME
+                    layer=layer, id=_feature.attrib['{http://www.opengis.net/gml/3.2}id'],  # FIXME id types
                     fields=fields, geom=geom
                 ))
 
