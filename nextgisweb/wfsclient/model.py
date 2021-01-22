@@ -69,6 +69,14 @@ def get_srid(value):
     return int(value[pos + 1:])
 
 
+def str_to_int(s):
+    return int(s.encode('hex'), 16)
+
+
+def int_to_str(num):
+    return hex(num)[2:].decode('hex')
+
+
 class WFSConnection(Base, Resource):
     identity = COMP_ID + '_connection'
     cls_display_name = _("WFS connection")
@@ -167,8 +175,9 @@ class WFSConnection(Base, Resource):
                         value = _property.text
                     fields[key] = value
 
+                fid = _feature.attrib['{http://www.opengis.net/gml/3.2}id']
                 features.append(Feature(
-                    layer=layer, id=_feature.attrib['{http://www.opengis.net/gml/3.2}id'],  # FIXME id types
+                    layer=layer, id=str_to_int(fid),
                     fields=fields, geom=geom
                 ))
 
