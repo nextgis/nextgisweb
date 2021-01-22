@@ -8,7 +8,7 @@ from owslib.crs import Crs
 import requests
 from osgeo import ogr
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
-from six import BytesIO
+from six import BytesIO, ensure_str
 from zope.interface import implementer
 
 from .. import db
@@ -63,7 +63,7 @@ def ns_trim(value):
 
 def geom_from_gml(el):
     value = etree.tostring(el)
-    ogr_geom = ogr.CreateGeometryFromGML(value)
+    ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
     return geom_from_wkb(ogr_geom.ExportToWkb())
 
 
