@@ -40,6 +40,7 @@ define([
         title: i18n.gettext('WFS layer'),
         templateString: hbsI18n(template, i18n),
         prefix: 'wfsclient_layer',
+        _deserialized: false,
 
         postCreate: function () {
             this.inherited(arguments);
@@ -49,21 +50,30 @@ define([
             this.wConnection.on('update', lang.hitch(this, this.populateLayers));
 
             this.wLayer.watch('value', lang.hitch(this, function (attr, oldval, newval) {
-                var store = this.wLayer.get('store');
-                var item = store.get(newval);
-                this.wGeometrySRID.set('value', item.srid);
+                if (this._deserialized) {
+                    var store = this.wLayer.get('store');
+                    var item = store.get(newval);
+                    this.wGeometrySRID.set('value', item.srid);
+                }
 
                 this.populateColumns(newval);
             }));
             this.wColumnGeometry.watch('value', lang.hitch(this, function (attr, oldval, newval) {
-                var store = this.wColumnGeometry.get('store');
-                var item = store.get(newval);
-                var type = item.type
-                    .replace(/^gml:/, '')
-                    .replace(/PropertyType$/, '')
-                    .toUpperCase()
-                this.wGeometryType.set('value', type);
+                if (this._deserialized) {
+                    var store = this.wColumnGeometry.get('store');
+                    var item = store.get(newval);
+                    var type = item.type
+                        .replace(/^gml:/, '')
+                        .replace(/PropertyType$/, '')
+                        .toUpperCase();
+                    this.wGeometryType.set('value', type);
+                }
             }));
+        },
+
+        deserialize: function() {
+            this.inherited(arguments);
+            this._deserialized = true;
         },
 
         serializeInMixin: function (data) {
@@ -100,7 +110,7 @@ define([
                 }, this);
 
                 this.wColumnGeometry.set('store', new Memory({data: geomcols}));
-                if (geomcols.length === 1) {
+                if (this._deserialized && geomcols.length === 1) {
                     this.wColumnGeometry.set('value', geomcols[0].id);
                 }
             }));
