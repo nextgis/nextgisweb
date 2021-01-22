@@ -11,7 +11,6 @@ define([
     'ngw-pyramid/i18n!postgis',
     'ngw-pyramid/hbs-i18n',
     'ngw-resource/serialize',
-    'ngw-spatial-ref-sys/SRSSelect',
     'ngw/route',
     // resource
     'dojo/text!./template/WFSLayerWidget.hbs',
@@ -34,7 +33,6 @@ define([
     i18n,
     hbsI18n,
     serialize,
-    SRSSelect,
     route,
     template
 ) {
@@ -42,10 +40,6 @@ define([
         title: i18n.gettext('WFS layer'),
         templateString: hbsI18n(template, i18n),
         prefix: 'wfsclient_layer',
-
-        constructor: function () {
-            this.srs = SRSSelect({allSrs: null});
-        },
 
         postCreate: function () {
             this.inherited(arguments);
