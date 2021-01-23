@@ -9,7 +9,7 @@ def amd_packages():
 
     result = []
     for ep in pkg_resources.iter_entry_points(group='nextgisweb.amd_packages'):
-        result.extend(ep.load()())
+        result.extend(ep.resolve()())
 
     amd_packages.cached_result = tuple(result)
     return result
@@ -31,7 +31,7 @@ class PkgInfo(object):
 
         epoints = pkg_resources.iter_entry_points(group='nextgisweb.packages')
         for epoint in epoints:
-            pkginfo = epoint.load()()
+            pkginfo = epoint.resolve()()
             components = pkginfo.get('components', dict())
             for (comp, modname) in components.items():
                 package = modname.split('.')[0]

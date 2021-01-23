@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 def load_pkginfo(args):
     for ep in iter_entry_points(group='nextgisweb.packages'):
         if ep.name == args.package:
-            return ep.load()()
+            return ep.resolve()()
 
 
 def load_components(args):
