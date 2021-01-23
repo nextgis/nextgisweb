@@ -133,9 +133,15 @@ def get_geom_column(feature_layer):
 
 
 def geom_from_gml(el):
+    srid = parse_srs(el.attrib['srsName']) if 'srsName' in el.attrib else None
     value = etree.tostring(el)
     ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
-    return geom_from_wkb(ogr_geom.ExportToWkb())
+    return geom_from_wkb(ogr_geom.ExportToWkb(), srid=srid)
+
+
+def parse_srs(value):
+    # 'urn:ogc:def:crs:EPSG::3857' -> 3857
+    return int(value.split(':')[-1])
 
 
 class WFSHandler():
@@ -322,10 +328,21 @@ class WFSHandler():
                                 minx=str(extent['minLon']), miny=str(extent['minLat']))
                     El('LatLongBoundingBox', bbox, parent=__type)
 
-    def _parse_filter(self, __filter, keyname):
+    def _parse_filter(self, __filter, layer):
         fids = list()
+        intersects = None
         for __el in __filter:
             tag = ns_trim(__el.tag)
+            if tag == 'Intersects':
+                __value_reference = __el[0]
+                if ns_trim(__value_reference.tag) != 'ValueReference':
+                    raise ValidationError("Intersects parse: ValueReference required")
+                elif __value_reference.text != get_geom_column(layer.resource):
+                    raise ValidationError("Geometry column '%s' not found" % __value_reference.text)
+                __gml = __el[1]
+                intersects = geom_from_gml(__gml)
+                continue
+
             if tag == 'ResourceId':  # 2.0.0
                 resid_attr = 'rid'
             elif tag == 'GmlObjectId':  # 1.1.0
@@ -333,10 +350,10 @@ class WFSHandler():
             elif tag == 'FeatureId':  # 1.0.0 and 1.1.0
                 resid_attr = 'fid'
             else:
-                raise ValueError("Filter element '%s' not supported." % __el.tag)
+                raise ValidationError("Filter element '%s' not supported." % __el.tag)
             fid = __el.get(resid_attr)
-            fids.append(fid_decode(fid, keyname))
-        return fids
+            fids.append(fid_decode(fid, layer.keyname))
+        return fids, intersects
 
     def _get_capabilities100(self):
         EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)['ns']))
@@ -638,23 +655,25 @@ class WFSHandler():
 
         query = feature_layer.feature_query()
 
-        if __query is not None:
-            __filters = find_tags(__query, 'Filter')
-            if len(__filters) == 1:
-                fids = self._parse_filter(__filters[0], layer.keyname)
-                if len(fids) > 0:
-                    query.filter(('id', 'in', ','.join((str(fid) for fid in fids))))
-
-        def parse_srs(value):
-            # 'urn:ogc:def:crs:EPSG::3857' -> 3857
-            return int(value.split(':')[-1])
-
         if self.p_bbox is not None:
             bbox_param = self.p_bbox.split(',')
             box_coords = map(float, bbox_param[:4])
             box_srid = parse_srs(bbox_param[4]) if len(bbox_param) == 5 else feature_layer.srs_id
             box_geom = box(*box_coords, srid=box_srid)
             query.intersects(box_geom)
+
+        if __query is not None:
+            __filters = find_tags(__query, 'Filter')
+            if len(__filters) == 1:
+                fids, intersects = self._parse_filter(__filters[0], layer)
+                if len(fids) > 0:
+                    query.filter(('id', 'in', ','.join((str(fid) for fid in fids))))
+                if intersects is not None:
+                    if self.p_bbox is not None:
+                        raise ValidationError("Parameters conflict: BBOX, Intersects")
+                    query.intersects(intersects)
+            else:
+                raise ValidationError("Multiple filters not supported.")
 
         if self.p_count is not None:
             limit = int(self.p_count)
@@ -755,9 +774,8 @@ class WFSHandler():
         def find_layer(keyname):
             if keyname not in layers:
                 layer = Layer.filter_by(service_id=self.resource.id, keyname=keyname).one()
-                feature_layer = layer.resource
-                self.request.resource_permission(DataScope.write, feature_layer)
-                layers[keyname] = feature_layer
+                self.request.resource_permission(DataScope.write, layer.resource)
+                layers[keyname] = layer
             return layers[keyname]
 
         EM = ElementMaker(namespace=_ns_wfs, nsmap=dict(
@@ -776,7 +794,8 @@ class WFSHandler():
             if operation_tag == 'Insert':
                 _layer = _operation[0]
                 keyname = ns_trim(_layer.tag)
-                feature_layer = find_layer(keyname)
+                layer = find_layer(keyname)
+                feature_layer = layer.resource
 
                 feature = Feature()
 
@@ -807,16 +826,24 @@ class WFSHandler():
                     summary['totalInserted'] += 1
             else:
                 keyname = ns_trim(_operation.get('typeName'))
-                feature_layer = find_layer(keyname)
+                layer = find_layer(keyname)
+                feature_layer = layer.resource
 
                 _filter = find_tags(_operation, 'Filter')[0]
-                fids = self._parse_filter(_filter, keyname)
+                fids, intersects = self._parse_filter(_filter, layer)
+                if intersects is not None:
+                    raise ValidationError("Intersects filter not supported in transaction")
                 if len(fids) == 0:
-                    raise ValueError("Feature ID filter must be specified.")
+                    raise ValidationError("Feature ID filter must be specified.")
 
                 if operation_tag == 'Update':
                     query = feature_layer.feature_query()
-                    query.filter(('id', 'in', ','.join((str(fid) for fid in fids))))
+
+                    if len(fids) != 1:
+                        raise ValidationError("Multiple features not supported in update transaction")
+                    # query.filter(('id', 'in', ','.join((str(fid) for fid in fids))))
+                    query.filter_by(id=fids[0])
+
                     feature = query().one()
                     for _property in find_tags(_operation, 'Property'):
                         key = find_tags(_property, 'Name')[0].text
