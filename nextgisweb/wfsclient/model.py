@@ -7,7 +7,7 @@ from lxml import etree
 
 from owslib.crs import Crs
 import requests
-from osgeo import ogr
+from osgeo import ogr, osr
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from six import BytesIO, ensure_str
 from zope.interface import implementer
@@ -24,6 +24,7 @@ from ..feature_layer import (
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilterBy,
+    IFeatureQueryIntersects,
     LayerField,
     LayerFieldsMixin,
 )
@@ -44,6 +45,7 @@ from ..resource import (
     SerializedResourceRelationship as SRR,
     Serializer,
 )
+from ..spatial_ref_sys import SRS
 
 from .util import _, COMP_ID
 
@@ -190,18 +192,43 @@ class WFSConnection(Base, Resource):
 
         return fields
 
-    def get_feature(self, layer, fid=None, get_count=False, limit=None, offset=None,
-                    srs=None, add_box=False):
+    def get_feature(self, layer, fid=None, intersects=None, get_count=False,
+                    limit=None, offset=None, srs=None, add_box=False):
         req_root = etree.Element('GetFeature')
 
         __query = etree.Element('Query', dict(typeNames=layer.layer_name))
         req_root.append(__query)
 
+        # Filter {
+        __filter = etree.Element('Filter')
+
         if fid is not None:
-            __filter = etree.Element('Filter')
-            __query.append(__filter)
             __rid = etree.Element('ResourceId', dict(rid=fid_str(fid, layer.layer_name)))
             __filter.append(__rid)
+
+        if intersects is not None:
+            __intersects = etree.Element('Intersects')
+            __value_reference = etree.Element('ValueReference')
+            __value_reference.text = layer.column_geom
+            __intersects.append(__value_reference)
+            if intersects.srid is not None:
+                srs_intersects = SRS.filter_by(id=intersects.srid).one()
+            else:
+                srs_intersects = layer.srs
+            osr_intersects = osr.SpatialReference()
+            osr_intersects.ImportFromWkt(srs_intersects.wkt)
+            geom = ogr.CreateGeometryFromWkb(intersects.wkb, osr_intersects)
+            geom_gml = geom.ExportToGML([
+                'FORMAT=GML32',
+                'NAMESPACE_DECL=YES',
+                'GMLID=filter-geom-1'])
+            __gml = etree.fromstring(geom_gml)
+            __intersects.append(__gml)
+            __filter.append(__intersects)
+
+        if len(__filter) > 0:
+            __query.append(__filter)
+        # } Filter
 
         if get_count:
             req_root.attrib['resultType'] = 'hits'
@@ -414,6 +441,7 @@ class WFSLayerSerializer(Serializer):
 @implementer(
     IFeatureQuery,
     IFeatureQueryFilterBy,
+    IFeatureQueryIntersects,
 )
 class FeatureQueryBase(object):
 
@@ -427,6 +455,7 @@ class FeatureQueryBase(object):
         self._offset = None
 
         self._filter_by = None
+        self._intersects = None
 
     def fields(self, *args):
         self._fields = args
@@ -447,6 +476,9 @@ class FeatureQueryBase(object):
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
 
+    def intersects(self, geom):
+        self._intersects = geom
+
     def __call__(self):
         params = dict()
         if self._filter_by is not None:
@@ -458,6 +490,8 @@ class FeatureQueryBase(object):
             params['srs'] = self._srs.id
         if self._box:
             params['add_box'] = True
+        if self._intersects:
+            params['intersects'] = self._intersects
 
         features, count = self.layer.connection.get_feature(
             self.layer, **params)
