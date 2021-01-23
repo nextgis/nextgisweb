@@ -189,7 +189,7 @@ class WFSConnection(Base, Resource):
 
         return fields
 
-    def get_feature(self, layer, fid=None, get_count=False, limit=None, offset=None):
+    def get_feature(self, layer, fid=None, get_count=False, limit=None, offset=None, srs=None):
         req_root = etree.Element('GetFeature')
 
         __query = etree.Element('Query', dict(typeNames=layer.layer_name))
@@ -208,6 +208,9 @@ class WFSConnection(Base, Resource):
             req_root.attrib['count'] = str(limit)
             if offset is not None:
                 req_root.attrib['startindex'] = str(offset)
+
+        if srs is not None:
+            req_root.attrib['srsName'] = str(srs)
 
         body = self.request_wfs('POST', xml_root=req_root)
 
@@ -445,6 +448,8 @@ class FeatureQueryBase(object):
         if self._limit is not None:
             params['limit'] = self._limit
             params['offset'] = self._offset
+        if self._srs is not None:
+            params['srs'] = self._srs.id
 
         features, count = self.layer.connection.get_feature(
             self.layer, **params)
