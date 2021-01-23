@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 import sys
 import io
+import os
+import os.path
+from stat import S_IXUSR, S_IXGRP, S_IXOTH
 from subprocess import check_output, CalledProcessError
 from setuptools import setup, find_packages
+from setuptools.command.develop import develop
+from setuptools.command.install import install
+
 
 with io.open('VERSION', 'r') as fd:
     VERSION = fd.read().rstrip()
@@ -92,18 +98,44 @@ entry_points = {
         'nextgiswev.resource = nextgisweb.resource.test',
     ],
 
-    'console_scripts': [
-        'nextgisweb = nextgisweb.script:main',
-        'nextgisweb-config = nextgisweb.script:config',
-        'nextgisweb-i18n = nextgisweb.i18n.script:main',
-    ],
-
     'nextgisweb.packages': ['nextgisweb = nextgisweb:pkginfo', ],
 
     'nextgisweb.amd_packages': [
         'nextgisweb = nextgisweb:amd_packages',
     ],
 }
+
+
+class DevelopCommand(develop):
+    def run(self):
+        develop.run(self)
+
+        # Builtin console_scripts entrypoint scripts are very slow because of
+        # checking package requirement. So we use generated wrapper scripts.
+
+        bin_dir, _ = os.path.split(sys.executable)
+        for name, module, func in (
+            ('nextgisweb', 'nextgisweb.script', 'main'),
+            ('nextgisweb-config', 'nextgisweb.script', 'config'),
+            ('nextgisweb-i18n', 'nextgisweb.i18n.script', 'main'),
+        ):
+            sf = os.path.join(bin_dir, name)
+            with open(sf, 'w') as fd:
+                fd.write("#!{}\n".format(sys.executable))
+                fd.write("from {} import {} as main\n".format(module, func))
+                fd.write("if __name__ == '__main__': main()\n")
+
+            st = os.stat(sf)
+            os.chmod(sf, st.st_mode | S_IXUSR | S_IXGRP | S_IXOTH)
+
+
+class InstallCommand(install):
+    def run(self):
+        raise RuntimeError(
+            "Only development mode installation "
+            "(pip install -e ...) is supported!")
+        install.run(self)
+
 
 setup(
     name='nextgisweb',
@@ -130,4 +162,8 @@ setup(
     extras_require=extras_require,
     tests_require=['nose', ],
     entry_points=entry_points,
+    cmdclass=dict(
+        develop=DevelopCommand,
+        install=InstallCommand,
+    )
 )
