@@ -15,6 +15,7 @@ from zope.interface import implementer
 from .. import db
 from ..core.exception import ValidationError, OperationalError
 from ..env import env
+from ..geometry import box
 from ..feature_layer import (
     Feature,
     FeatureSet,
@@ -189,7 +190,8 @@ class WFSConnection(Base, Resource):
 
         return fields
 
-    def get_feature(self, layer, fid=None, get_count=False, limit=None, offset=None, srs=None):
+    def get_feature(self, layer, fid=None, get_count=False, limit=None, offset=None,
+                    srs=None, add_box=False):
         req_root = etree.Element('GetFeature')
 
         __query = etree.Element('Query', dict(typeNames=layer.layer_name))
@@ -262,9 +264,13 @@ class WFSConnection(Base, Resource):
                     fields[key] = value
 
                 fid = _feature.attrib['{http://www.opengis.net/gml/3.2}id']
+                if add_box:
+                    _box = box(*geom.bounds)
+                else:
+                    _box = None
                 features.append(Feature(
                     layer=layer, id=fid_int(fid, layer.layer_name),
-                    fields=fields, geom=geom
+                    fields=fields, geom=geom, box=_box
                 ))
 
         return features, count
@@ -450,6 +456,8 @@ class FeatureQueryBase(object):
             params['offset'] = self._offset
         if self._srs is not None:
             params['srs'] = self._srs.id
+        if self._box:
+            params['add_box'] = True
 
         features, count = self.layer.connection.get_feature(
             self.layer, **params)
