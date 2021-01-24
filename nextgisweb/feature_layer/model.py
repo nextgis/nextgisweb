@@ -185,8 +185,10 @@ class _fields_attr(SP):
                 mfld.grid_visibility = fld['grid_visibility']
             if 'lookup_table' in fld:
                 # TODO: Handle errors: wrong schema, missing lookup table
-                mfld.lookup_table = LookupTable.filter_by(
-                    id=fld['lookup_table']['id']).one()
+                ltval = fld['lookup_table']
+                mfld.lookup_table = (
+                    LookupTable.filter_by(id=ltval['id']).one()
+                    if ltval is not None else None)
 
             if fld.get('label_field', False):
                 obj.feature_label_field = mfld
