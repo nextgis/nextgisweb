@@ -36,7 +36,6 @@ Base = declarative_base(dependencies=('resource', ))
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 
 QUEUE_MAXSIZE = 20
-QUEUE_TIMEOUT = 10  # seconds
 
 
 def get_tile_db(db_path):
@@ -251,7 +250,7 @@ class ResourceTileCache(Base):
             params['answer_queue'] = answer_queue
 
         try:
-            writer.queue.put(params, block=True, timeout=QUEUE_TIMEOUT)
+            writer.queue.put_nowait(params)
         except Full:
             env.render.logger.error("Tile writer queue full for z=%d x=%d y=%d" % tile)
 
