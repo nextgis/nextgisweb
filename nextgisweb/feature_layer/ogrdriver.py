@@ -6,8 +6,12 @@ from osgeo import ogr
 from six import ensure_str
 
 
+def get_driver_by_name(name):
+    return ogr.GetDriverByName(ensure_str(name))
+
+
 def test_driver_capability(name, capability):
-    driver = ogr.GetDriverByName(ensure_str(name))
+    driver = get_driver_by_name(name)
     return driver.TestCapability(capability)
 
 
@@ -150,3 +154,8 @@ OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
     for format_id, format in EXPORT_FORMAT_OGR.items()
     if test_driver_capability(format.name, ogr.ODrCCreateDataSource)
 ]
+
+MVT_DRIVER_NAME = "MVT"
+MVT_DRIVER_EXIST = (get_driver_by_name(MVT_DRIVER_NAME) is not None) and \
+                   test_driver_capability(MVT_DRIVER_NAME,
+                                          ogr.ODrCCreateDataSource)
