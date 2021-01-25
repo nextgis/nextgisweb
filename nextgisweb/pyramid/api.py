@@ -15,6 +15,7 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from ..env import env
 from ..package import pkginfo
 from ..core.exception import ValidationError
+from ..models import DBSession
 from ..resource import Resource, MetadataScope
 from ..compat import Path
 
@@ -435,7 +436,8 @@ def setup_pyramid(comp, config):
     def preview_link_view(request):
         defaults = comp.preview_link_default_view(request)
 
-        if hasattr(request, 'context') and isinstance(request.context, Resource):
+        if hasattr(request, 'context') and isinstance(request.context, Resource) \
+            and request.context in DBSession:
             if not request.context.has_permission(MetadataScope.read, request.user):
                 return dict(image=None, description=None)
 
