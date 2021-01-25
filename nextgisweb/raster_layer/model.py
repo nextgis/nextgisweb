@@ -26,7 +26,7 @@ from ..env import env
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..file_storage import FileObj
 
-from .util import _
+from .util import _, calc_overviews_levels
 
 PYRAMID_TARGET_SIZE = 512
 
@@ -152,14 +152,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         if missing_only and os.path.isfile(fn + '.ovr'):
             return
 
-        cursize = max(self.xsize, self.ysize)
-        multiplier = 2
-        levels = []
-
-        while cursize > PYRAMID_TARGET_SIZE or len(levels) == 0:
-            levels.append(str(multiplier))
-            cursize /= 2
-            multiplier *= 2
+        ds = gdal.Open(fn, gdalconst.GA_ReadOnly)
+        levels = map(str, calc_overviews_levels(ds))
+        ds = None
 
         cmd = ['gdaladdo', '-q', '-clean', fn]
 
