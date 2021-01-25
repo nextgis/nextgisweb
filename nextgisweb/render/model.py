@@ -239,7 +239,7 @@ class ResourceTileCache(Base):
     def put_tile(self, tile, img):
         params = dict(
             tile=tile,
-            img=img,
+            img=None if img is None else img.copy(),
             uuid=self.uuid.hex,
             db_path=self.tilestor_path
         )
