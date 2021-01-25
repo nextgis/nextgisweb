@@ -143,8 +143,9 @@ def cget(resource, request):
 def cpost(resource, request):
     request.resource_permission(DataScope.write)
 
+    feature_id = int(request.matchdict['fid'])
     query = resource.feature_query()
-    query.filter_by(id=request.matchdict['fid'])
+    query.filter_by(id=feature_id)
     query.limit(1)
 
     feature = None
@@ -152,7 +153,7 @@ def cpost(resource, request):
         feature = f
 
     if feature is None:
-        raise FeatureNotFound(resource.id, request.matchdict['fid'])
+        raise FeatureNotFound(resource.id, feature_id)
 
     obj = FeatureAttachment(resource_id=feature.layer.id, feature_id=feature.id)
     obj.deserialize(request.json_body)
