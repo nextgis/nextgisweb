@@ -132,7 +132,7 @@ def cget(resource, request):
         feature_id=request.matchdict['fid'],
         resource_id=resource.id)
 
-    result = map(lambda itm: itm.serialize(), query)
+    result = [itm.serialize() for itm in query]
 
     return Response(
         json.dumps(result),
