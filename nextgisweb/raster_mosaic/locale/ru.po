@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.6.0.dev7+d363760aa\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2020-11-16 08:36+0000\n"
+"POT-Creation-Date: 2021-01-26 00:22+0000\n"
 "PO-Revision-Date: 2020-11-15 21:40+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,19 +19,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: amd/ngw-raster-mosaic/Widget.js:24 model.py:35
+#: model.py:37
 msgid "Raster mosaic"
 msgstr "Мозаика растров"
 
-#: model.py:102
+#: model.py:127
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:105
+#: model.py:130
 msgid "Only RGB and RGBA rasters are supported."
 msgstr "Поддерживаются только RGB и RGBA растры."
 
-#: model.py:113
+#: model.py:138
 #, python-format
 msgid ""
 "Raster has format '%(format)s', however only following formats are "
@@ -40,11 +40,11 @@ msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:118
+#: model.py:143
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:129
+#: model.py:154
 msgid "Complex data types are not supported."
 msgstr "Комплексные типы данных не поддерживаются."
 
@@ -64,6 +64,3 @@ msgstr "Загрузить"
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-raster-mosaic/template/Widget.hbs:10
-msgid "Add alpha"
-msgstr "Добавить альфа-канал"

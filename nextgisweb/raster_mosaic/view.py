@@ -9,9 +9,3 @@ class ItemWidget(Widget):
     resource = RasterMosaic
     operation = ('create', 'update')
     amdmod = 'ngw-raster-mosaic/ItemWidget'
-
-
-class RasterMosaicWidget(Widget):
-    resource = RasterMosaic
-    operation = ('create', 'update')
-    amdmod = 'ngw-raster-mosaic/Widget'

@@ -49,7 +49,7 @@ define([
         selectionMode: "single",
         columns: [
             editor({
-                field: "name",
+                field: "display_name",
                 label: i18n.gettext("File name"),
                 autoSave: true,
                 editor: TextBox,
@@ -100,7 +100,7 @@ define([
             this.uploader.on("complete", lang.hitch(this, function (data) {
                 array.forEach(data.upload_meta, function (f) {
                     this.store.put({
-                        name: f.name,
+                        display_name: f.name,
                         file_upload: {
                             id: f.id
                         }
@@ -147,7 +147,7 @@ define([
             array.forEach(value, function (item) {
                 this.store.add({
                     id: item.id,
-                    name: item.name
+                    display_name: item.display_name
                 })
             }, this);
         }
