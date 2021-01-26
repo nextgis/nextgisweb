@@ -4,7 +4,9 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from ..component import Component, require
 
 from .util import COMP_ID
-from .model import Base
+from .model import Base, ResourceMetadataItem
+
+__all__ = ['ResourceMetadataItem']
 
 
 class ResourceMetadataComponent(Component):
