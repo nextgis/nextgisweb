@@ -118,42 +118,50 @@ class TilestorWriter:
             data = self.queue.get()
             self.cstart = clock()
 
-            z, x, y = data['tile']
-            tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+            # Tile cache writer may fall sometimes in case of database connecti
+            # problem for example. So we just skip a tile with error and log an
+            # exception.
+            try:
 
-            img = data['img']
+                z, x, y = data['tile']
+                tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
 
-            colortuple = imgcolor(img)
-            color = pack_color(colortuple) if colortuple is not None else None
+                img = data['img']
 
-            with transaction.manager:
-                conn = DBSession.connection()
-                conn.execute(db.sql.text(
-                    'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
-                    'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
-                    'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
-                ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+                colortuple = imgcolor(img)
+                color = pack_color(colortuple) if colortuple is not None else None
 
-                # Force zope session management to commit changes
-                mark_changed(DBSession())
+                with transaction.manager:
+                    conn = DBSession.connection()
+                    conn.execute(db.sql.text(
+                        'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
+                        'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
+                        'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
+                    ), z=z, x=x, y=y, color=color, tstamp=tstamp)
 
-            if color is None:
-                buf = BytesIO()
-                img.save(buf, format='PNG', compress_level=3)
+                    # Force zope session management to commit changes
+                    mark_changed(DBSession())
 
-                tilestor = get_tile_db(data['db_path'])
-                tilestor.execute(
-                    "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
-                    (z, x, y))
+                if color is None:
+                    buf = BytesIO()
+                    img.save(buf, format='PNG', compress_level=3)
 
-                try:
+                    tilestor = get_tile_db(data['db_path'])
                     tilestor.execute(
-                        "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                        (z, x, y, tstamp, buf.getvalue()))
-                except sqlite3.IntegrityError:
-                    # NOTE: Race condition with other proccess may occurs here.
-                    # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
-                    pass
+                        "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
+                        (z, x, y))
+
+                    try:
+                        tilestor.execute(
+                            "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
+                            (z, x, y, tstamp, buf.getvalue()))
+                    except sqlite3.IntegrityError:
+                        # NOTE: Race condition with other proccess may occurs here.
+                        # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
+                        pass
+
+            except Exception as exc:
+                _logger.exception("Uncaught exception in tile writer: %s", exc.message)
 
             if 'answer_queue' in data:
                 data['answer_queue'].put_nowait(None)
