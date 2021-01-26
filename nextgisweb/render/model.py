@@ -15,7 +15,7 @@ from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
-from ..compat import Path
+from ..compat import Path, lru_cache
 from ..env import env
 from .. import db
 from ..models import declarative_base, DBSession
@@ -39,10 +39,12 @@ Base = declarative_base(dependencies=('resource', ))
 
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 
-QUEUE_MAXSIZE = 128
-QUEUE_STUCK = 1
+QUEUE_MAX_SIZE = 256
+QUEUE_STUCK_TIMEOUT = 2.0
+SQLITE_CON_CACHE = 32
 
 
+@lru_cache(SQLITE_CON_CACHE)
 def get_tile_db(db_path):
     p = Path(db_path)
     if not p.parent.exists():
@@ -93,7 +95,7 @@ class TilestorWriter:
 
     def __init__(self):
         if TilestorWriter.__instance is None:
-            self.queue = Queue(maxsize=QUEUE_MAXSIZE)
+            self.queue = Queue(maxsize=QUEUE_MAX_SIZE)
             self.cstart = None
 
             self._worker = Thread(target=self._job)
@@ -110,7 +112,7 @@ class TilestorWriter:
         cstart = self.cstart
         if cstart is not None:
             cdelta = clock() - cstart
-            if cdelta > QUEUE_STUCK:
+            if cdelta > QUEUE_STUCK_TIMEOUT:
                 raise TileWriterQueueStuckException(
                     "Tile writer queue is stuck for {} seconds.".format(cdelta))
 
