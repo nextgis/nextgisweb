@@ -26,6 +26,9 @@
 <div id="header" class="header clearfix">
     <ul class="header-nav header__right">
         <li class="header-nav__item">
+            <div class="header-resources-filter" id="resourcesFilter"></div>
+        </li>
+        <li class="header-nav__item">
             %if user_mode == 'guest':
                 <a href="${login_url}">${tr(_('Sign in'))}</a>
             %else:
@@ -46,6 +49,7 @@
             <span class="rightMenu-notify has-update-only" style="display: none;"></span>
         </li>
     </ul>
+
     <div class="header__left">
         <div class="header__title">
             <a class="header__title-logo" href="${return_url if return_url else request.application_url}">
@@ -70,10 +74,13 @@
 <script>
     require([
         "ngw-pyramid/right-menu/RightMenu",
-        "ngw-pyramid/user-avatar/UserAvatar"
+        "ngw-pyramid/user-avatar/UserAvatar",
+        "ngw-resource/ResourcesFilter/ResourcesFilter"
     ], function (
-        RightMenu, UserAvatar
+        RightMenu, UserAvatar, ResourcesFilter
     ) {
+        (new ResourcesFilter({})).placeAt('resourcesFilter');
+
         %if user_mode != 'guest':
             (new UserAvatar({
                 userName: '${user_display_name}',

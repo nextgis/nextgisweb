@@ -1,0 +1,40 @@
+.resources-filter {
+  width: 290px;
+}
+
+.nextgis.claro .resources-filter .dijitTextBox .dijitInputField {
+  padding: 5px 4px;
+}
+
+.resources-filter .dijitTextBox .dijitInputInner {
+  font-weight: normal;
+  margin: 0 22px !important;
+  width: 84% !important;
+}
+
+.resources-filter .dijitTextBox .dijitPlaceHolder {
+  font-weight: normal;
+  left: 22px;
+}
+
+.resources-filter .search {
+  position: relative;
+  left: 2px;
+  top: -29px;
+  float: left;
+}
+
+.resources-filter .search:before {
+  content: "\e8b6";
+}
+
+.resources-filter .filter {
+  position: relative;
+  right: 0;
+  top: -29px;
+  float: right;
+}
+
+.resources-filter .filter:before {
+  content: "\e429";
+}

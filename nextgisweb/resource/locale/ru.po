@@ -188,7 +188,7 @@ msgstr "Недостаточно прав, атрибут '%s'."
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:123
+#: view.py:122
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
@@ -196,7 +196,7 @@ msgstr "Дерево ресурсов"
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:137
+#: view.py:136
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
@@ -204,20 +204,20 @@ msgstr "Обновить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:203
+#: view.py:202
 #, python-format
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:261
+#: view.py:260
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:268
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:267
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:275
+#: view.py:274
 msgid "User permissions"
 msgstr "Права пользователя"
 
@@ -322,6 +322,14 @@ msgstr "Изменить"
 #: amd/ngw-resource/ResourcePicker.js:31
 msgid "Select resource"
 msgstr "Выберите ресурс"
+
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.hbs:4
+msgid "Search"
+msgstr "Поиск"
+
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:25
+msgid "Search resources"
+msgstr "Поиск ресурсов"
 
 #: amd/ngw-resource/template/DeleteWidget.hbs:7
 msgid "Confirm deletion of the resource"
