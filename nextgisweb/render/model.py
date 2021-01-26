@@ -55,14 +55,23 @@ def get_tile_db(db_path):
 
     # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
     cur.execute("PRAGMA page_size = 8192")
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS tile (
-            z INTEGER, x INTEGER, y INTEGER,
-            tstamp INTEGER NOT NULL,
-            data BLOB NOT NULL,
-            PRIMARY KEY (z, x, y)
-        )
-    """)
+
+    # CREATE TABLE IF NOT EXISTS causes SQLite database lock. So check the tile
+    # table existance before table creation.
+    table_exists = cur.execute("""
+        SELECT 1 FROM sqlite_master
+        WHERE type='table' AND name='tile'
+    """).fetchone() is not None
+
+    if not table_exists:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS tile (
+                z INTEGER, x INTEGER, y INTEGER,
+                tstamp INTEGER NOT NULL,
+                data BLOB NOT NULL,
+                PRIMARY KEY (z, x, y)
+            )
+        """)
 
     return connection
 
