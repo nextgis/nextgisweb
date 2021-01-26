@@ -2,16 +2,20 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 from datetime import datetime, timedelta
 from uuid import uuid4
-from os import makedirs
-from errno import EEXIST
+from threading import Thread
+import logging
+from time import clock
 import os.path
 import sqlite3
 from io import BytesIO
+from six.moves.queue import Queue, Full
 
+import transaction
 from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
+from ..compat import Path, lru_cache
 from ..env import env
 from .. import db
 from ..models import declarative_base, DBSession
@@ -26,12 +30,152 @@ from .interface import IRenderableStyle
 from .event import on_style_change, on_data_change
 from .util import imgcolor, affine_bounds_to_tile, pack_color, unpack_color
 
+_logger = logging.getLogger(__name__)
+
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 
 Base = declarative_base(dependencies=('resource', ))
 
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
+
+QUEUE_MAX_SIZE = 256
+QUEUE_STUCK_TIMEOUT = 2.0
+SQLITE_CON_CACHE = 32
+
+
+@lru_cache(SQLITE_CON_CACHE)
+def get_tile_db(db_path):
+    p = Path(db_path)
+    if not p.parent.exists():
+        p.parent.mkdir(parents=True)
+    connection = sqlite3.connect(
+        db_path, isolation_level=None, check_same_thread=False)
+
+    connection.text_factory = bytes
+    cur = connection.cursor()
+
+    # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
+    cur.execute("PRAGMA page_size = 8192")
+
+    # CREATE TABLE IF NOT EXISTS causes SQLite database lock. So check the tile
+    # table existance before table creation.
+    table_exists = cur.execute("""
+        SELECT 1 FROM sqlite_master
+        WHERE type='table' AND name='tile'
+    """).fetchone() is not None
+
+    if not table_exists:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS tile (
+                z INTEGER, x INTEGER, y INTEGER,
+                tstamp INTEGER NOT NULL,
+                data BLOB NOT NULL,
+                PRIMARY KEY (z, x, y)
+            )
+        """)
+
+    return connection
+
+
+class TileWriterQueueException(Exception):
+    pass
+
+
+class TileWriterQueueFullException(TileWriterQueueException):
+    pass
+
+
+class TileWriterQueueStuckException(TileWriterQueueException):
+    pass
+
+
+class TilestorWriter:
+    __instance = None
+
+    def __init__(self):
+        if TilestorWriter.__instance is None:
+            self.queue = Queue(maxsize=QUEUE_MAX_SIZE)
+            self.cstart = None
+
+            self._worker = Thread(target=self._job)
+            self._worker.daemon = True
+            self._worker.start()
+
+    @classmethod
+    def getInstance(cls):
+        if cls.__instance is None:
+            cls.__instance = TilestorWriter()
+        return cls.__instance
+
+    def put(self, payload):
+        cstart = self.cstart
+        if cstart is not None:
+            cdelta = clock() - cstart
+            if cdelta > QUEUE_STUCK_TIMEOUT:
+                raise TileWriterQueueStuckException(
+                    "Tile writer queue is stuck for {} seconds.".format(cdelta))
+
+        try:
+            self.queue.put_nowait(payload)
+        except Full:
+            raise TileWriterQueueFullException(
+                "Tile writer queue is full at maxsize {}.".format(
+                    self.queue.maxsize))
+
+    def _job(self):
+        while True:
+            self.cstart = None
+            data = self.queue.get()
+            self.cstart = clock()
+
+            # Tile cache writer may fall sometimes in case of database connecti
+            # problem for example. So we just skip a tile with error and log an
+            # exception.
+            try:
+
+                z, x, y = data['tile']
+                tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+
+                img = data['img']
+
+                colortuple = imgcolor(img)
+                color = pack_color(colortuple) if colortuple is not None else None
+
+                with transaction.manager:
+                    conn = DBSession.connection()
+                    conn.execute(db.sql.text(
+                        'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
+                        'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
+                        'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
+                    ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+
+                    # Force zope session management to commit changes
+                    mark_changed(DBSession())
+
+                if color is None:
+                    buf = BytesIO()
+                    img.save(buf, format='PNG', compress_level=3)
+
+                    tilestor = get_tile_db(data['db_path'])
+                    tilestor.execute(
+                        "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
+                        (z, x, y))
+
+                    try:
+                        tilestor.execute(
+                            "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
+                            (z, x, y, tstamp, buf.getvalue()))
+                    except sqlite3.IntegrityError:
+                        # NOTE: Race condition with other proccess may occurs here.
+                        # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
+                        pass
+
+            except Exception as exc:
+                _logger.exception("Uncaught exception in tile writer: %s", exc.message)
+
+            if 'answer_queue' in data:
+                data['answer_queue'].put_nowait(None)
 
 
 class ResourceTileCache(Base):
@@ -51,6 +195,8 @@ class ResourceTileCache(Base):
     seed_status = db.Column(db.Enum(*SEED_STATUS_ENUM))
     seed_progress = db.Column(db.Integer)
     seed_total = db.Column(db.Integer)
+
+    async_writing = False
 
     resource = db.relationship(Resource, backref=db.backref(
         'tile_cache', cascade='all, delete-orphan', uselist=False))
@@ -95,47 +241,16 @@ class ResourceTileCache(Base):
     @property
     def tilestor(self):
         if self._tilestor is None:
-            try:
-                p = self.tilestor_path(create=False)
-                self._tilestor = sqlite3.connect(p, isolation_level=None)
-            except sqlite3.OperationalError:
-                # SQLite db not found, create it
-                p = self.tilestor_path(create=True)
-                self._tilestor = sqlite3.connect(p, isolation_level=None)
-
-            self._tilestor.text_factory = bytes
-            cur = self._tilestor.cursor()
-
-            # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
-            cur.execute("PRAGMA page_size = 8192")
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS tile (
-                    z INTEGER, x INTEGER, y INTEGER,
-                    tstamp INTEGER NOT NULL,
-                    data BLOB NOT NULL,
-                    PRIMARY KEY (z, x, y)
-                )
-            """)
+            self._tilestor = get_tile_db(self.tilestor_path)
 
         return self._tilestor
 
-    def tilestor_path(self, create=False):
+    @property
+    def tilestor_path(self):
         tcpath = env.render.tile_cache_path
         suuid = self.uuid.hex
-        d = os.path.join(tcpath, suuid[0:2], suuid[2:4])
-        if create:
-            if not os.path.isdir(d):
-                if not os.path.isdir(tcpath):
-                    raise RuntimeError("Path '{}' doen't exists!".format(tcpath))
-                try:
-                    makedirs(d)
-                except OSError as exc:
-                    # Ignore 'File exists' error in concurency conditions
-                    # TODO: Add exist_ok=True for Python3 instead of exception
-                    if exc.errno != EEXIST:
-                        raise
 
-        return os.path.join(d, suuid)
+        return os.path.join(tcpath, suuid[0:2], suuid[2:4], suuid)
 
     def get_tile(self, tile):
         z, x, y = tile
@@ -175,41 +290,32 @@ class ResourceTileCache(Base):
             return True, Image.open(BytesIO(srow[0]))
 
     def put_tile(self, tile, img):
-        z, x, y = tile
-        tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+        params = dict(
+            tile=tile,
+            img=None if img is None else img.copy(),
+            uuid=self.uuid.hex,
+            db_path=self.tilestor_path
+        )
 
-        color = None
-        colortuple = imgcolor(img)
-        if colortuple is not None:
-            color = pack_color(colortuple)
+        writer = TilestorWriter.getInstance()
 
-        if color is None:
-            buf = BytesIO()
-            img.save(buf, format='PNG')
+        if self.async_writing:
+            answer_queue = Queue(maxsize=1)
+            params['answer_queue'] = answer_queue
 
-            self.tilestor.execute(
-                "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
-                (z, x, y))
+        try:
+            writer.put(params)
+        except TileWriterQueueException as exc:
+            _logger.error(
+                "Failed to put tile {} to tile cache for resource {}. {}"
+                .format(params['tile'], self.resource_id, exc.message),
+                exc_info=True)
 
+        if self.async_writing:
             try:
-                self.tilestor.execute(
-                    "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                    (z, x, y, tstamp, buf.getvalue()))
-
-            except sqlite3.IntegrityError:
-                # NOTE: Race condition with other proccess may occurs here.
-                # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
+                answer_queue.get()
+            except Exception:
                 pass
-
-        conn = DBSession.connection()
-        conn.execute(db.sql.text(
-            'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
-            'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
-            'VALUES (:z, :x, :y, :color, :tstamp)'.format(self.uuid.hex)
-        ), z=z, x=x, y=y, color=color, tstamp=tstamp)
-
-        # Force zope session management to commit changes
-        mark_changed(DBSession())
 
     def initialize(self):
         self.sameta.create_all(bind=DBSession.connection())
@@ -224,42 +330,43 @@ class ResourceTileCache(Base):
 
     def invalidate(self, geom):
         srs = self.resource.srs
-        conn = DBSession.connection()
+        with transaction.manager:
+            conn = DBSession.connection()
 
-        # TODO: This query uses sequnce scan and should be rewritten
-        query_z = db.sql.text(
-            'SELECT DISTINCT z FROM tile_cache."{}"'
-            .format(self.uuid.hex))
+            # TODO: This query uses sequnce scan and should be rewritten
+            query_z = db.sql.text(
+                'SELECT DISTINCT z FROM tile_cache."{}"'
+                .format(self.uuid.hex))
 
-        query_delete = db.sql.text(
-            'DELETE FROM tile_cache."{0}" '
-            'WHERE z = :z '
-            '   AND x BETWEEN :xmin AND :xmax '
-            '   AND y BETWEEN :ymin AND :ymax '
-            .format(self.uuid.hex))
+            query_delete = db.sql.text(
+                'DELETE FROM tile_cache."{0}" '
+                'WHERE z = :z '
+                '   AND x BETWEEN :xmin AND :xmax '
+                '   AND y BETWEEN :ymin AND :ymax '
+                .format(self.uuid.hex))
 
-        zlist = [a[0] for a in conn.execute(query_z).fetchall()]
-        for z in zlist:
-            aft = affine_bounds_to_tile((srs.minx, srs.miny, srs.maxx, srs.maxy), z)
+            zlist = [a[0] for a in conn.execute(query_z).fetchall()]
+            for z in zlist:
+                aft = affine_bounds_to_tile((srs.minx, srs.miny, srs.maxx, srs.maxy), z)
 
-            xmin, ymax = [int(a) for a in aft * geom.bounds[0:2]]
-            xmax, ymin = [int(a) for a in aft * geom.bounds[2:4]]
+                xmin, ymax = [int(a) for a in aft * geom.bounds[0:2]]
+                xmax, ymin = [int(a) for a in aft * geom.bounds[2:4]]
 
-            xmin -= 1
-            ymin -= 1
-            xmax += 1
-            ymax += 1
+                xmin -= 1
+                ymin -= 1
+                xmax += 1
+                ymax += 1
 
-            env.render.logger.debug(
-                'Removing tiles for z=%d x=%d..%d y=%d..%d',
-                z, xmin, xmax, ymin, ymax)
+                env.render.logger.debug(
+                    'Removing tiles for z=%d x=%d..%d y=%d..%d',
+                    z, xmin, xmax, ymin, ymax)
 
-            conn.execute(
-                query_delete, z=z,
-                xmin=xmin, ymin=ymin,
-                xmax=xmax, ymax=ymax)
+                conn.execute(
+                    query_delete, z=z,
+                    xmin=xmin, ymin=ymin,
+                    xmax=xmax, ymax=ymax)
 
-        mark_changed(DBSession())
+            mark_changed(DBSession())
 
     def update_seed_status(self, value, progress=None, total=None):
         self.seed_status = value
