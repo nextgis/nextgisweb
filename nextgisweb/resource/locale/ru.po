@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-01-16 12:14+0000\n"
+"POT-Creation-Date: 2021-01-26 14:15+0000\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: __init__.py:88
+#: __init__.py:91
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
@@ -147,12 +147,12 @@ msgstr "Чтение"
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:42 view.py:310
+#: scope.py:42 view.py:311
 msgid "Update"
 msgstr "Изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:97
-#: amd/ngw-resource/PermissionWidget.js:322 scope.py:46 view.py:317
+#: amd/ngw-resource/PermissionWidget.js:322 scope.py:46 view.py:318
 msgid "Delete"
 msgstr "Удалить"
 
@@ -201,51 +201,51 @@ msgstr "Конфигурация"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:87 view.py:324
+#: view.py:88 view.py:325
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:122
+#: view.py:123
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:128 view.py:334
+#: view.py:129 view.py:335
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:136
+#: view.py:137
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: amd/ngw-resource/DeleteWidget.js:22 view.py:143
+#: amd/ngw-resource/DeleteWidget.js:22 view.py:144
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:202
+#: view.py:203
 #, python-format
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr ""
 "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = "
 "%d."
 
-#: view.py:260
+#: view.py:261
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:267
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:268
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:274
+#: view.py:275
 msgid "User permissions"
 msgstr "Права пользователя"
 
 #: amd/ngw-resource/PermissionWidget.js:67
-#: amd/ngw-resource/PermissionWidget.js:134 view.py:335
+#: amd/ngw-resource/PermissionWidget.js:134 view.py:336
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:336
+#: view.py:337
 msgid "Extra"
 msgstr "Дополнительно"
 
@@ -350,6 +350,14 @@ msgstr "Изменить"
 #: amd/ngw-resource/ResourcePicker.js:31
 msgid "Select resource"
 msgstr "Выберите ресурс"
+
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.hbs:4
+msgid "Search"
+msgstr "Поиск"
+
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:25
+msgid "Search resources"
+msgstr "Поиск ресурсов"
 
 #: amd/ngw-resource/template/DeleteWidget.hbs:7
 msgid "Confirm deletion of the resource"

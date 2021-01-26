@@ -961,6 +961,12 @@ a[class*=" icon-"]:hover:before {
   line-height: 34px;
   margin-bottom: auto;
 }
+.header-nav__item > .header-resources-filter {
+  line-height: normal;
+}
+.header-nav__item .header-resources-filter {
+  width: 290px;
+}
 .header-nav__item > a {
   color: inherit;
 }
