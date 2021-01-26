@@ -3,6 +3,8 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 from datetime import datetime, timedelta
 from uuid import uuid4
 from threading import Thread
+import logging
+from time import clock
 import os.path
 import sqlite3
 from io import BytesIO
@@ -28,6 +30,8 @@ from .interface import IRenderableStyle
 from .event import on_style_change, on_data_change
 from .util import imgcolor, affine_bounds_to_tile, pack_color, unpack_color
 
+_logger = logging.getLogger(__name__)
+
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 
@@ -35,7 +39,8 @@ Base = declarative_base(dependencies=('resource', ))
 
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 
-QUEUE_MAXSIZE = 20
+QUEUE_MAXSIZE = 128
+QUEUE_STUCK = 1
 
 
 def get_tile_db(db_path):
@@ -62,12 +67,25 @@ def get_tile_db(db_path):
     return connection
 
 
+class TileWriterQueueException(Exception):
+    pass
+
+
+class TileWriterQueueFullException(TileWriterQueueException):
+    pass
+
+
+class TileWriterQueueStuckException(TileWriterQueueException):
+    pass
+
+
 class TilestorWriter:
     __instance = None
 
     def __init__(self):
         if TilestorWriter.__instance is None:
             self.queue = Queue(maxsize=QUEUE_MAXSIZE)
+            self.cstart = None
 
             self._worker = Thread(target=self._job)
             self._worker.daemon = True
@@ -79,9 +97,26 @@ class TilestorWriter:
             cls.__instance = TilestorWriter()
         return cls.__instance
 
+    def put(self, payload):
+        cstart = self.cstart
+        if cstart is not None:
+            cdelta = clock() - cstart
+            if cdelta > QUEUE_STUCK:
+                raise TileWriterQueueStuckException(
+                    "Tile writer queue is stuck for {} seconds.".format(cdelta))
+
+        try:
+            self.queue.put_nowait(payload)
+        except Full:
+            raise TileWriterQueueFullException(
+                "Tile writer queue is full at maxsize {}.".format(
+                    self.queue.maxsize))
+
     def _job(self):
         while True:
+            self.cstart = None
             data = self.queue.get()
+            self.cstart = clock()
 
             z, x, y = data['tile']
             tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
@@ -250,9 +285,12 @@ class ResourceTileCache(Base):
             params['answer_queue'] = answer_queue
 
         try:
-            writer.queue.put_nowait(params)
-        except Full:
-            env.render.logger.error("Tile writer queue full for z=%d x=%d y=%d" % tile)
+            writer.put(params)
+        except TileWriterQueueException as exc:
+            _logger.error(
+                "Failed to put tile {} to tile cache for resource {}. {}"
+                .format(params['tile'], self.resource_id, exc.message),
+                exc_info=True)
 
         if self.async_writing:
             try:
