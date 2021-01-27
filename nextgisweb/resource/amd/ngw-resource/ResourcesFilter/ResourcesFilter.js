@@ -69,18 +69,18 @@ define([
         },
 
         onSearchSuccess: function (result) {
-            var dtlContext, resultHtml;
+            var templateContext, resultHtml;
             
             result = array.map(result, function (item) {
                 item.url = resourceShowRoute({id: item.resource.id});
                 return item;
             }, this);
 
-            dtlContext = new dtlContext({
+            templateContext = new templateContext({
                 svgUrl: SVG_URL,
                 items: result
             });
-            resultHtml = TEMPLATE_RESULT_DTL.render(dtlContext);
+            resultHtml = TEMPLATE_RESULT_DTL.render(templateContext);
             html.set(this.result, resultHtml);
         },
 
