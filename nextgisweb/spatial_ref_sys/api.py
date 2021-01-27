@@ -8,12 +8,8 @@ from pyproj import CRS
 
 from ..core.exception import ValidationError
 from ..env import env
-from ..geometry import (
-    geom_from_wkt,
-    geom_to_wkt,
-    geom_transform as shp_geom_transform,
-    geom_calc as shp_geom_calc,
-)
+from ..geometry import geom_calc as shp_geom_calc
+from ..lib.geometry import Geometry, Transformer
 from ..models import DBSession
 
 from .models import SRS
@@ -51,28 +47,27 @@ def srs_convert(request):
 def geom_transform(request):
     srs_from = SRS.filter_by(id=int(request.json_body["srs"])).one()
     srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
-    geom = geom_from_wkt(request.json_body["geom"])
+    geom = Geometry.from_wkt(request.json_body["geom"])
 
-    crs_from = CRS.from_wkt(srs_from.wkt)
-    crs_to = CRS.from_wkt(srs_to.wkt)
-    geom_transformed = shp_geom_transform(geom, crs_from, crs_to)
+    transformer = Transformer(srs_from.wkt, srs_to.wkt)
+    geom = transformer.transform(geom)
 
-    return dict(geom=geom_to_wkt(geom_transformed))
+    return dict(geom=geom.wkt)
 
 
 def geom_calc(request, prop):
     srs_from_id = request.json_body["srs"] if "srs" in request.json_body else None
     srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
-    geom = geom_from_wkt(request.json_body["geom"])
+    geom = Geometry.from_wkt(request.json_body["geom"])
 
     crs_to = CRS.from_wkt(srs_to.wkt)
 
     if srs_from_id and srs_from_id != srs_to.id:
         srs_from = SRS.filter_by(id=int(srs_from_id)).one()
-        crs_from = CRS.from_wkt(srs_from.wkt)
-        geom = shp_geom_transform(geom, crs_from, crs_to)
+        transformer = Transformer(srs_from.wkt, srs_to.wkt)
+        geom = transformer.transform(geom)
 
-    value = shp_geom_calc(geom, crs_to, prop, srs_to.id)
+    value = shp_geom_calc(geom.shape, crs_to, prop, srs_to.id)
     return dict(value=value)
 
 

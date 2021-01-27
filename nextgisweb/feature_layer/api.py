@@ -15,16 +15,12 @@ from collections import OrderedDict
 from datetime import datetime, date, time
 
 from osgeo import ogr, gdal
-from pyproj import CRS
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
+from shapely.geometry import box
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..geometry import (
-    geom_from_geojson, geom_to_geojson,
-    geom_from_wkt, geom_to_wkt,
-    geom_transform, box,
-)
+from ..lib.geometry import Geometry, Transformer
 from ..resource import DataScope, ValidationError, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
 from ..spatial_ref_sys import SRS
@@ -209,7 +205,7 @@ def mvt(request):
         maxx + (maxx - minx) * padding,
         maxy + (maxy - miny) * padding,
     )
-    bbox = box(*bbox, srid=merc.id)
+    bbox = Geometry.from_shape(box(*bbox), srid=merc.id)
 
     options = [
         "FORMAT=DIRECTORY",
@@ -277,29 +273,17 @@ def mvt(request):
         gdal.Unlink(ensure_str(vsibuf))
 
 
-def get_transformer(srs_from_id, srs_to_id):
-    if srs_from_id is None or srs_to_id is None or srs_from_id == srs_to_id:
-        return None
-
-    srs_from = SRS.filter_by(id=int(srs_from_id)).one()
-    srs_to = SRS.filter_by(id=int(srs_to_id)).one()
-    crs_from = CRS.from_wkt(srs_from.wkt)
-    crs_to = CRS.from_wkt(srs_to.wkt)
-
-    return lambda g: geom_transform(g, crs_from, crs_to)
-
-
 def deserialize(feat, data, geom_format='wkt', transformer=None):
     if 'geom' in data:
         if geom_format == 'wkt':
-            feat.geom = geom_from_wkt(data['geom'])
+            feat.geom = Geometry.from_wkt(data['geom'])
         elif geom_format == 'geojson':
-            feat.geom = geom_from_geojson(data['geom'])
+            feat.geom = Geometry.from_geojson(data['geom'])
         else:
             raise ValidationError(_("Geometry format '%s' is not supported.") % geom_format)
 
         if transformer is not None:
-            feat.geom = transformer(feat.geom)
+            feat.geom = transformer.transform(feat.geom)
 
     if 'fields' in data:
         fdata = data['fields']
@@ -350,9 +334,9 @@ def serialize(feat, keys=None, geom_format='wkt', extensions=[]):
 
     if feat.geom is not None:
         if geom_format == 'wkt':
-            geom = geom_to_wkt(feat.geom)
+            geom = feat.geom.wkt
         elif geom_format == 'geojson':
-            geom = geom_to_geojson(feat.geom)
+            geom = feat.geom.to_geojson()
         else:
             raise ValidationError(_("Geometry format '%s' is not supported.") % geom_format)
 
@@ -467,7 +451,12 @@ def iput(resource, request):
 
     geom_format = request.GET.get('geom_format', 'wkt').lower()
     srs = request.GET.get('srs')
-    transformer = get_transformer(srs, resource.srs_id)
+
+    if srs is not None:
+        srs_from = SRS.filter_by(id=int(srs)).one()
+        transformer = Transformer(srs_from.wkt, resource.srs.wkt)
+    else:
+        transformer = None
 
     deserialize(feature, request.json_body, geom_format=geom_format, transformer=transformer)
     if IWritableFeatureLayer.providedBy(resource):
@@ -539,14 +528,14 @@ def cget(resource, request):
     # Filtering by extent
     if 'intersects' in request.GET:
         wkt = request.GET['intersects']
-        geom = geom_from_wkt(wkt, srid=resource.srs.id)
+        geom = Geometry.from_wkt(wkt, srid=resource.srs.id)
         query.intersects(geom)
 
     # Workaround to pass really big geometry for intersection filter
     elif request.content_type == 'application/json':
         if 'intersects' in request.json_body:
             wkt = request.json_body['intersects']
-            geom = geom_from_wkt(wkt, srid=resource.srs.id)
+            geom = Geometry.from_wkt(wkt, srid=resource.srs.id)
             query.intersects(geom)
 
     # Selected fields
@@ -578,7 +567,12 @@ def cpost(resource, request):
 
     geom_format = request.GET.get('geom_format', 'wkt').lower()
     srs = request.GET.get('srs')
-    transformer = get_transformer(srs, resource.srs_id)
+
+    if srs is not None:
+        srs_from = SRS.filter_by(id=int(srs)).one()
+        transformer = Transformer(srs_from.wkt, resource.srs.wkt)
+    else:
+        transformer = None
 
     feature = Feature(layer=resource)
     deserialize(feature, request.json_body, geom_format=geom_format, transformer=transformer)
@@ -595,7 +589,12 @@ def cpatch(resource, request):
 
     geom_format = request.GET.get('geom_format', 'wkt').lower()
     srs = request.GET.get('srs')
-    transformer = get_transformer(srs, resource.srs_id)
+
+    if srs is not None:
+        srs_from = SRS.filter_by(id=int(srs)).one()
+        transformer = Transformer(srs_from.wkt, resource.srs.wkt)
+    else:
+        transformer = None
 
     for fdata in request.json_body:
         if 'id' not in fdata:

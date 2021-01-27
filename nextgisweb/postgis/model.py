@@ -2,6 +2,8 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 import geoalchemy2 as ga
 import re
+import six
+from shapely.geometry import box
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.engine.url import (
     URL as EngineURL,
@@ -24,8 +26,8 @@ from ..resource import (
     ForbiddenError,
     ResourceGroup)
 from ..env import env
-from ..geometry import geom_from_wkt, box
 from ..layer import IBboxLayer, SpatialLayerMixin
+from ..lib.geometry import Geometry
 from ..feature_layer import (
     Feature,
     FeatureSet,
@@ -350,7 +352,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         if feature.geom is not None:
             values[self.column_geom] = db.func.st_transform(
-                ga.elements.WKTElement(str(feature.geom), srid=self.srs_id),
+                ga.elements.WKBElement(feature.geom.wkb, srid=self.srs_id),
                 self.geometry_srid)
 
         return values
@@ -553,6 +555,7 @@ class FeatureQueryBase(object):
     def __init__(self):
         self._srs = None
         self._geom = None
+        self._geom_format = 'WKB'
         self._box = None
 
         self._fields = None
@@ -571,6 +574,9 @@ class FeatureQueryBase(object):
 
     def geom(self):
         self._geom = True
+
+    def geom_format(self, geom_format):
+        self._geom_format = geom_format
 
     def box(self):
         self._box = True
@@ -618,7 +624,8 @@ class FeatureQueryBase(object):
         geomexpr = db.func.st_transform(geomcol, srsid)
 
         if self._geom:
-            addcol(db.func.st_astext(geomexpr).label('geom'))
+            wk_fun = db.func.st_asbinary if self._geom_format == 'WKB' else db.func.st_astext
+            addcol(wk_fun(geomexpr).label('geom'))
 
         fieldmap = []
         for idx, fld in enumerate(self.layer.fields, start=1):
@@ -694,6 +701,7 @@ class FeatureQueryBase(object):
             layer = self.layer
 
             _geom = self._geom
+            _geom_format = self._geom_format
             _box = self._box
             _fields = self._fields
             _limit = self._limit
@@ -712,7 +720,12 @@ class FeatureQueryBase(object):
                         fdict = dict((k, row[l]) for k, l in fieldmap)
 
                         if self._geom:
-                            geom = geom_from_wkt(row['geom'])
+                            if self._geom_format == 'WKB':
+                                geom_data = row['geom'].tobytes() if six.PY3 \
+                                    else six.binary_type(row['geom'])
+                                geom = Geometry.from_wkb(geom_data)
+                            else:
+                                geom = Geometry.from_wkt(row['geom'])
                         else:
                             geom = None
 

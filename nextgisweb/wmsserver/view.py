@@ -15,13 +15,13 @@ from pyramid.httpexceptions import HTTPBadRequest
 
 from ..core.exception import ValidationError
 from ..pyramid.exception import json_error
+from ..lib.geometry import Geometry
 from ..lib.ows import parse_request
 from ..render import ILegendableStyle
 from ..resource import (
     Resource, Widget, resource_factory,
     ServiceScope, DataScope)
 from ..spatial_ref_sys import SRS
-from ..geometry import geom_from_wkt
 from ..feature_layer import IFeatureLayer
 from .. import geojson
 
@@ -206,7 +206,7 @@ def _get_feature_info(obj, request):
 
     srs = SRS.filter_by(id=int(p_srs.split(':')[-1])).one()
 
-    qgeom = geom_from_wkt((
+    qgeom = Geometry.from_wkt((
         "POLYGON((%(l)f %(b)f, %(l)f %(t)f, "
         + "%(r)f %(t)f, %(r)f %(b)f, %(l)f %(b)f))"
     ) % qbox, srs.id)

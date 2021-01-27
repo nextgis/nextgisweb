@@ -5,7 +5,7 @@ from pyramid.response import Response
 
 from .interface import IFeatureLayer
 from .. import geojson
-from ..geometry import geom_from_wkt
+from ..lib.geometry import Geometry
 from ..models import DBSession
 from ..resource import (
     Resource,
@@ -52,7 +52,7 @@ def identify(request):
     """
 
     srs = int(request.json_body['srs'])
-    geom = geom_from_wkt(request.json_body['geom'], srid=srs)
+    geom = Geometry.from_wkt(request.json_body['geom'], srid=srs)
     layers = map(int, request.json_body['layers'])
 
     layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
