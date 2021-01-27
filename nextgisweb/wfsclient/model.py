@@ -351,9 +351,6 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         return isinstance(parent, ResourceGroup)
 
     def setup(self):
-        # Check feature id readable
-        features, count = self.connection.get_feature(self, count=1)
-
         fdata = dict()
         for f in self.fields:
             fdata[f.keyname] = dict(
@@ -369,7 +366,7 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if field['name'] == self.column_geom:
                 continue
 
-            datatype = WFS_2_FIELD_TYPE.get(field)
+            datatype = WFS_2_FIELD_TYPE.get(field['type'])
             if datatype is None:
                 raise ValidationError("Unknown data type: %s" % field['type'])
 
@@ -380,6 +377,9 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 datatype=datatype,
                 column_name=field['name'],
                 **fopts))
+
+        # Check feature id readable
+        features, count = self.connection.get_feature(self, limit=1)
 
         if self.geometry_type is None:
             example_feature = features[0]
