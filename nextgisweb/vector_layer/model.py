@@ -518,7 +518,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         if feature.geom is not None:
             obj.geom = ga.elements.WKBElement(
-                feature.geom.wkb, srid=self.srs_id)
+                bytearray(feature.geom.wkb), srid=self.srs_id)
 
         DBSession.merge(obj)
 
@@ -546,7 +546,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 setattr(obj, f.key, feature.fields[f.keyname])
 
         obj.geom = ga.elements.WKBElement(
-            feature.geom.wkb, srid=self.srs_id)
+            bytearray(feature.geom.wkb), srid=self.srs_id)
 
         shape = feature.geom.shape
         geom_type = shape.geom_type.upper()

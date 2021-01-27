@@ -352,7 +352,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         if feature.geom is not None:
             values[self.column_geom] = db.func.st_transform(
-                ga.elements.WKBElement(feature.geom.wkb, srid=self.srs_id),
+                ga.elements.WKBElement(bytearray(feature.geom.wkb), srid=self.srs_id),
                 self.geometry_srid)
 
         return values
