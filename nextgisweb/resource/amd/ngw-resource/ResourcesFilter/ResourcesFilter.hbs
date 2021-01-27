@@ -1,9 +1,11 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
+<div data-dojo-type="${baseClass}"
+     data-dojo-attach-point="elWrapper">
     <div data-dojo-type="dijit/form/TextBox"
-         data-dojo-attach-point="wCls"
+         data-dojo-attach-point="tbSearch"
          data-dojo-props="placeHolder: '{{gettext 'Search'}}'"
          title="${title}" style="width: 100%">
     </div>
     <div class="search material-icons"></div>
     <div class="filter material-icons"></div>
+    <div class="result" data-dojo-attach-point="result"></div>
 </div>
