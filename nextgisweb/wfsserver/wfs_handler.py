@@ -672,7 +672,7 @@ class WFSHandler():
                     if self.p_bbox is not None:
                         raise ValidationError("Parameters conflict: BBOX, Intersects")
                     query.intersects(intersects)
-            else:
+            elif len(__filters) > 1:
                 raise ValidationError("Multiple filters not supported.")
 
         if self.p_count is not None:
