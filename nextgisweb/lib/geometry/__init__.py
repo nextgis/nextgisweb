@@ -92,7 +92,9 @@ class Transformer:
         crs_from = CRS.from_wkt(wkt_from)
         crs_to = CRS.from_wkt(wkt_to)
 
-        if crs_from.equals(crs_to):
+        # pyproj >= 2.5
+        # if crs_from.equals(crs_to):
+        if wkt_from == wkt_to:
             self._transformer = None
         else:
             self._transformer = pyTr.from_crs(crs_from, crs_to, always_xy=True)
