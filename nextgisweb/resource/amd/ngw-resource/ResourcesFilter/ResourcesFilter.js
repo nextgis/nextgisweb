@@ -76,7 +76,7 @@ define([
                 return item;
             }, this);
 
-            templateContext = new templateContext({
+            templateContext = new dtlContext({
                 svgUrl: SVG_URL,
                 items: result
             });
