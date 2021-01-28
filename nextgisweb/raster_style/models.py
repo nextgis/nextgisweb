@@ -50,9 +50,8 @@ class RasterStyle(Base, Resource):
         return (
             parent.cls == "raster_layer"
             and parent.band_count in (3, 4)
-            and parent.dtype
-            in (gdal.GetDataTypeName(gdalconst.GDT_Byte),)
-        )
+            and parent.dtype in (gdal.GetDataTypeName(gdalconst.GDT_Byte),)
+        ) or parent.cls == "raster_mosaic"
 
     @property
     def srs(self):
@@ -62,15 +61,23 @@ class RasterStyle(Base, Resource):
         return RenderRequest(self, srs, cond)
 
     def render_image(self, extent, size):
+        result = PIL.Image.new("RGBA", size, (0, 0, 0, 0))
+
+        if self.parent.cls == "raster_layer":
+            parent_ds = self.parent.gdal_dataset()
+        elif self.parent.cls == "raster_mosaic":
+            parent_ds = self.parent.gdal_dataset(extent=extent, size=size)
+
+        if parent_ds is None:
+            return result
+
         ds = gdal.Warp(
-            "", self.parent.gdal_dataset(),
+            "", parent_ds,
             options=gdal.WarpOptions(
                 width=size[0], height=size[1], outputBounds=extent, format="MEM",
                 warpOptions=['UNIFIED_SRC_NODATA=ON'], dstAlpha=True,
             ),
         )
-
-        result = PIL.Image.new("RGBA", size, (0, 0, 0, 0))
 
         band_count = ds.RasterCount
         array = numpy.zeros((size[1], size[0], band_count), numpy.uint8)
@@ -79,6 +86,7 @@ class RasterStyle(Base, Resource):
             array[:, :, i] = gdal_array.BandReadAsArray(ds.GetRasterBand(i + 1),)
 
         ds = None
+        parent_ds = None
         wnd = PIL.Image.fromarray(array)
         result.paste(wnd)
 

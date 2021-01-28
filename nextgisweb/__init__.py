@@ -33,6 +33,7 @@ def pkginfo():
         'lookup_table',
         'postgis',
         'raster_layer',
+        'raster_mosaic',
         'raster_style',
         'wfsserver',
         'wfsclient',
@@ -47,7 +48,7 @@ def pkginfo():
         components={
             comp: dict(
                 module='nextgisweb.{}'.format(comp),
-                enabled=comp not in ('wfsclient', )
+                enabled=comp not in ('wfsclient', 'raster_mosaic')
             ) for comp in components
         }
     )
@@ -118,6 +119,7 @@ def amd_packages():
         ('ngw-vector-layer', 'nextgisweb:vector_layer/amd/ngw-vector-layer'),
         ('ngw-raster-layer', 'nextgisweb:raster_layer/amd/ngw-raster-layer'),
         ('ngw-svg-marker-library', 'nextgisweb:svg_marker_library/amd/ngw-svg-marker-library'),
+        ('ngw-raster-mosaic', 'nextgisweb:raster_mosaic/amd/ngw-raster-mosaic'),
         ('ngw-webmap', 'nextgisweb:webmap/amd/ngw-webmap'),
         ('ngw-auth', 'nextgisweb:auth/amd/ngw-auth'),
         ('ngw-file-upload', 'nextgisweb:file_upload/amd/ngw-file-upload'),

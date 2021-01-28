@@ -30,19 +30,7 @@ class RasterLayerComponent(Component):
         )
 
     def workdir_filename(self, fobj, makedirs=False):
-        levels = (fobj.uuid[0:2], fobj.uuid[2:4])
-        dname = os.path.join(self.wdir, *levels)
-
-        # Create folders if needed
-        if not os.path.isdir(dname):
-            os.makedirs(dname)
-
-        fname = os.path.join(dname, fobj.uuid)
-        oname = self.env.file_storage.filename(fobj, makedirs=makedirs)
-        if not os.path.isfile(fname):
-            os.symlink(oname, fname)
-
-        return fname
+        return self.env.core.workdir_filename(self, fobj, makedirs)
 
     def maintenance(self):
         super(RasterLayerComponent, self).maintenance()
