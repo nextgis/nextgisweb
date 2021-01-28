@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
 import pkg_resources
+from six import string_types
 
 
 def amd_packages():
@@ -21,6 +22,7 @@ class PkgInfo(object):
         self.scanned = False
         self._mod_comp = dict()
         self._comp_mod = dict()
+        self._comp_enabled = dict()
         self._comp_pkg = dict()
         self._pkg_comp = dict()
         self._pkg_vers = dict()
@@ -33,10 +35,17 @@ class PkgInfo(object):
         for epoint in epoints:
             pkginfo = epoint.resolve()()
             components = pkginfo.get('components', dict())
-            for (comp, modname) in components.items():
+            for (comp, cdefn) in components.items():
+                if isinstance(cdefn, string_types):
+                    cdefn = dict(module=cdefn, enabled=True)
+                if 'enabled' not in cdefn:
+                    cdefn['enabled'] = True
+                modname = cdefn['module']
+
                 package = modname.split('.')[0]
                 self._mod_comp[modname] = comp
                 self._comp_mod[comp] = modname
+                self._comp_enabled[comp] = cdefn['enabled']
                 self._comp_pkg[comp] = package
                 if package not in self._pkg_comp:
                     self._pkg_comp[package] = list()
@@ -62,6 +71,10 @@ class PkgInfo(object):
     def comp_mod(self, comp):
         self.scan()
         return self._comp_mod[comp]
+
+    def comp_enabled(self, comp):
+        self.scan()
+        return self._comp_enabled[comp]
 
     def comp_pkg(self, comp):
         self.scan()

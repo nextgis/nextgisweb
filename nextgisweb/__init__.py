@@ -43,10 +43,12 @@ def pkginfo():
     )
 
     return dict(
-        components=dict(map(
-            lambda i: (i, "nextgisweb.%s" % i),
-            components)
-        )
+        components={
+            comp: dict(
+                module='nextgisweb.{}'.format(comp),
+                enabled=True
+            ) for comp in components
+        }
     )
 
 
