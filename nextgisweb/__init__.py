@@ -35,6 +35,7 @@ def pkginfo():
         'raster_layer',
         'raster_style',
         'wfsserver',
+        'wfsclient',
         'wmsclient',
         'wmsserver',
         'tmsclient',
@@ -46,7 +47,7 @@ def pkginfo():
         components={
             comp: dict(
                 module='nextgisweb.{}'.format(comp),
-                enabled=True
+                enabled=comp not in ('wfsclient', )
             ) for comp in components
         }
     )
@@ -111,6 +112,7 @@ def amd_packages():
         ('ngw-postgis', 'nextgisweb:postgis/amd/ngw-postgis'),
         ('ngw-wmsclient', 'nextgisweb:wmsclient/amd/ngw-wmsclient'),
         ('ngw-wmsserver', 'nextgisweb:wmsserver/amd/ngw-wmsserver'),
+        ('ngw-wfsclient', 'nextgisweb:wfsclient/amd/ngw-wfsclient'),
         ('ngw-wfsserver', 'nextgisweb:wfsserver/amd/ngw-wfsserver'),
         ('ngw-tmsclient', 'nextgisweb:tmsclient/amd/ngw-tmsclient'),
         ('ngw-vector-layer', 'nextgisweb:vector_layer/amd/ngw-vector-layer'),

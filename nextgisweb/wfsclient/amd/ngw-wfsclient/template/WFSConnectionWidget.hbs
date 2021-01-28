@@ -1,0 +1,32 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${prefix}" class="padding-block">
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            data-ngw-serialize="path"
+            title="{{gettext 'WFS path'}}" style="width: 100%"></div>
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: false"
+            data-dojo-attach-point="wUsername"
+            data-ngw-serialize="username"
+            title="{{gettext 'Username'}}" style="width: 20em"></div>
+
+        <div data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: false, type: 'password'"
+            data-dojo-attach-point="wPassword"
+            data-ngw-serialize="password"
+            title="{{gettext 'Password'}}" style="width: 20em"></div>
+
+        <div data-dojo-type="dijit/form/Select"
+            data-dojo-attach-point="wVersion"
+            data-ngw-serialize="version"
+            title="{{gettext 'Version'}}" style="width: 20em">
+            <option value="2.0.2" selected="selected">2.0.2</option>
+            <option value="2.0.0">2.0.0</option>
+        </div>
+
+    </div>
+</div>

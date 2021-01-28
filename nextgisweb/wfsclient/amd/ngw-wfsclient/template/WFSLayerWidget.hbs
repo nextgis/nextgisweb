@@ -1,0 +1,60 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${prefix}" class="padding-block">
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, labelWidth: 150">
+
+        <div data-dojo-attach-point="wConnection"
+            data-dojo-type="ngw-resource/ResourceBox"
+            data-dojo-props="cls: 'wfsclient_connection', required: true, colspan: 2, dialogTitle: '{{gettext 'Select WFS connection'}}'"
+            data-ngw-serialize="connection"
+            title="{{gettext 'Connection'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wLayer"
+            data-dojo-type="dijit/form/ComboBox"
+            data-dojo-props="required: true, searchAttr: 'id', maxHeight: -1"
+            data-ngw-serialize="layer_name"
+            title="{{gettext 'Layer'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wGeometrySRID"
+            data-dojo-type="ngw-pyramid/form/IntegerValueTextBox"
+            data-dojo-props="required: true, disabled: true, placeholder: '{{gettext 'Autodetect'}}'"
+            data-ngw-serialize="geometry_srid"
+            title="SRID" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wColumnGeometry"
+            data-dojo-type="dijit/form/ComboBox"
+            data-dojo-props="required: true, searchAttr: 'id', maxHeight: -1"
+            data-ngw-serialize="column_geom"
+            title="{{gettext 'Geometry column'}}" style="width: 100%"></div>
+
+        <select data-dojo-attach-point="wGeometryType"
+            data-dojo-type="dijit/form/Select"
+            data-dojo-props="required: true, disabled: true"
+            data-ngw-serialize="geometry_type"
+            title="{{gettext 'Geometry type'}}" style="width: 100%">
+
+            <option value="">{{gettext 'Autodetect'}}</option>
+            <option value="POINT">{{gettext 'Point'}}</option>
+            <option value="LINESTRING">{{gettext 'Line'}}</option>
+            <option value="POLYGON">{{gettext 'Polygon'}}</option>
+            <option value="MULTIPOINT">{{gettext 'Multipoint'}}</option>
+            <option value="MULTILINESTRING">{{gettext 'Multiline'}}</option>
+            <option value="MULTIPOLYGON">{{gettext 'Multipolygon'}}</option>
+
+        </select>
+
+        <select data-dojo-attach-point="fields"
+            data-dojo-type="dijit/form/Select"
+            data-dojo-props="colspan: 2"
+            data-ngw-serialize="fields"
+            title="{{gettext 'Attribute definitions'}}"
+            style="width: 100%">
+
+            <option value="keep">{{gettext 'Keep'}}</option>
+            <option value="update">{{gettext 'Reload'}}</option>
+
+        </div>
+
+    </div>
+
+</div>
