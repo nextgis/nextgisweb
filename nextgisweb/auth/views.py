@@ -106,7 +106,10 @@ def oauth(request):
         DBSession.flush()
         headers = remember(request, (user.id, tresp))
 
-        response = HTTPFound(location=data['next_url'], headers=headers)
+        event = OnUserLogin(user, request, data['next_url'])
+        zope.event.notify(event)
+
+        response = HTTPFound(location=event.next_url, headers=headers)
         response.delete_cookie(cookie_name(state), path=oauth_path)
         return response
 
