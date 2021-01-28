@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 from threading import Thread
 import logging
-from time import clock
+from time import time
 import os.path
 import sqlite3
 from io import BytesIO
@@ -111,7 +111,7 @@ class TilestorWriter:
     def put(self, payload):
         cstart = self.cstart
         if cstart is not None:
-            cdelta = clock() - cstart
+            cdelta = time() - cstart
             if cdelta > QUEUE_STUCK_TIMEOUT:
                 raise TileWriterQueueStuckException(
                     "Tile writer queue is stuck for {} seconds.".format(cdelta))
@@ -127,7 +127,7 @@ class TilestorWriter:
         while True:
             self.cstart = None
             data = self.queue.get()
-            self.cstart = clock()
+            self.cstart = time()
 
             # Tile cache writer may fall sometimes in case of database connecti
             # problem for example. So we just skip a tile with error and log an
