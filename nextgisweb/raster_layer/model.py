@@ -153,7 +153,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             return
 
         ds = gdal.Open(fn, gdalconst.GA_ReadOnly)
-        levels = map(str, calc_overviews_levels(ds))
+        levels = list(map(str, calc_overviews_levels(ds)))
         ds = None
 
         cmd = ['gdaladdo', '-q', '-clean', fn]
