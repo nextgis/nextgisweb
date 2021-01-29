@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-01-26 14:15+0000\n"
+"POT-Creation-Date: 2021-01-29 20:10+0000\n"
 "PO-Revision-Date: 2015-09-09 19:49+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -49,7 +49,7 @@ msgstr "Класс ресурса '%s' отключен."
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
-#: exception.py:27
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:19 exception.py:27
 msgid "Resource not found"
 msgstr "Ресурс не найден"
 
@@ -351,11 +351,11 @@ msgstr "Изменить"
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.hbs:4
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.hbs:5
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:25
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:27
 msgid "Search resources"
 msgstr "Поиск ресурсов"
 

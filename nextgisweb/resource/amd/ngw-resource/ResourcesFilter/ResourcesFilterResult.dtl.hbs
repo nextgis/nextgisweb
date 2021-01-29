@@ -5,12 +5,22 @@
             <a class="children-table__name__link text-withIcon" href="{{item.url}}">
                 <span class="text-withIcon__icon text-withIcon__icon_size_s">
                     <svg class="text-withIcon__pic svgIcon-{{item.resource.cls}}">
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{svgUrl}}#{{item.resource.cls}}"></use>
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                             xlink:href="{{svgUrl}}#{{item.resource.cls}}"></use>
                     </svg>
                 </span>
                 {{ item.resource.display_name }}
             </a>
         </li>
         {% endfor %}
+
+        {% ifequal items.length 0 %}
+        <li class="not-found">
+            <a class="children-table__name__link text-withIcon" href="#">
+                <span class="text-withIcon__icon text-withIcon__icon_size_s"></span>
+                {{ tr.notFound }}
+            </a>
+        </li>
+        {% endifequal %}
     </ul>
 </div>
