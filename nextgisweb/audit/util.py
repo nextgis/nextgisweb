@@ -6,6 +6,8 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
 
+import zope.event
+
 from .. import geojson
 from ..env import env
 from ..i18n import trstring_factory
@@ -22,6 +24,26 @@ def es_index(timestamp):
 
 def to_nsjdon(data):
     return geojson.dumps(data)
+
+
+class OnResponse(object):
+
+    def __init__(self, request, response, body):
+        self._request = request
+        self._response = response
+        self._body = body
+
+    @property
+    def request(self):
+        return self._request
+
+    @property
+    def response(self):
+        return self._response
+
+    @property
+    def body(self):
+        return self._body
 
 
 def audit_tween_factory(handler, registry):
@@ -68,12 +90,15 @@ def audit_tween_factory(handler, registry):
             if context is not None:
                 body['context'] = OrderedDict(zip(('model', 'id'), context))
 
+            event = OnResponse(request, response, body)
+            zope.event.notify(event)
+
             if comp.audit_es_enabled:
                 index = es_index(timestamp)
-                comp.es.index(index=index, body=body)
+                comp.es.index(index=index, body=event.body)
 
             if comp.audit_file_enabled:
-                data = to_nsjdon(body)
+                data = to_nsjdon(event.body)
                 print(data, file=comp.file)
                 comp.file.flush()
 

@@ -9,7 +9,9 @@ import elasticsearch.exceptions as esexc
 from ..component import Component
 from ..lib.config import Option
 
-from .util import disable_logging
+from .util import disable_logging, OnResponse
+
+__all__ = ['OnResponse']
 
 
 class AuditComponent(Component):
