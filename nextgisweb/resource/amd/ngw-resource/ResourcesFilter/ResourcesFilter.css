@@ -1,5 +1,6 @@
 .resources-filter {
   width: 290px;
+  position: absolute;
 }
 
 .nextgis.claro .resources-filter .dijitTextBox .dijitInputField {
@@ -43,8 +44,11 @@
   display: block;
 }
 
-.resources-filter .result {
+.resources-filter .result,
+.resources-filter.loading .result {
   display: none;
+  position: absolute;
+  top: 35px;
   width: 100%;
   background: #FFFFFF;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
@@ -65,4 +69,80 @@
 
 .resources-filter .result li a {
   padding-left: 20px;
+}
+
+.resources-filter .result li.not-found {
+  color: gray;
+}
+
+.resources-filter.loading .linear-activity {
+  display: block;
+}
+
+.resources-filter .linear-activity {
+  display: none;
+  overflow: hidden;
+  width: 288px;
+  height: 3px;
+  position: absolute;
+  top: 30px;
+  left: 2px;
+  border-radius: 4px;
+  background-color: #e5eef7;
+  margin: 0;
+}
+
+.resources-filter .determinate {
+  position: relative;
+  max-width: 100%;
+  height: 3px;
+  -webkit-transition: width 500ms ease-out 1s;
+  -moz-transition: width 500ms ease-out 1s;
+  -o-transition: width 500ms ease-out 1s;
+  transition: width 500ms ease-out 1s;
+  background-color: rgba(7, 109, 191, 0.5);
+}
+
+.resources-filter .indeterminate {
+  position: relative;
+  width: 100%;
+  height: 3px;
+}
+
+.resources-filter .indeterminate:before {
+  content: '';
+  position: absolute;
+  height: 3px;
+  background-color: rgba(7, 109, 191, 0.5);
+  animation: indeterminate_first 1.5s infinite ease-out;
+}
+
+.resources-filter .indeterminate:after {
+  content: '';
+  position: absolute;
+  height: 3px;
+  background-color: rgba(7, 109, 191, 0.3);
+  animation: indeterminate_second 1.5s infinite ease-in;
+}
+
+@keyframes indeterminate_first {
+  0% {
+    left: -100%;
+    width: 100%;
+  }
+  100% {
+    left: 100%;
+    width: 10%;
+  }
+}
+
+@keyframes indeterminate_second {
+  0% {
+    left: -150%;
+    width: 100%;
+  }
+  100% {
+    left: 100%;
+    width: 10%;
+  }
 }
