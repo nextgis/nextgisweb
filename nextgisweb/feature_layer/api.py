@@ -534,10 +534,17 @@ def cget(resource, request):
         query.order_by(*order_by_)
 
     # Filtering by extent
-    wkt = request.GET.get('intersects')
-    if wkt is not None:
+    if 'intersects' in request.GET:
+        wkt = request.GET['intersects']
         geom = geom_from_wkt(wkt, srid=resource.srs.id)
         query.intersects(geom)
+
+    # Workaround to pass really big geometry for intersection filter
+    elif request.content_type == 'application/json':
+        if 'intersects' in request.json_body:
+            wkt = request.json_body['intersects']
+            geom = geom_from_wkt(wkt, srid=resource.srs.id)
+            query.intersects(geom)
 
     # Selected fields
     fields = request.GET.get('fields')
