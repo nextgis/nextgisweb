@@ -163,8 +163,11 @@ class Env(object):
         return metadata
 
     option_annotations = OptionAnnotations((
-        Option('package.*', bool, None),
-        Option('component.*', bool, None),
+        Option('package.*', bool, None, doc=(
+            "Disable installed package by setting false.")),
+        Option('component.*', bool, None, doc=(
+            "Enable optional component by setting true. "
+            "Or disable component by setting false.")),
     ))
 
 

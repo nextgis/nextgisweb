@@ -254,20 +254,25 @@ class CoreComponent(Component):
         Option('database.lock_timeout', timedelta, default=timedelta(seconds=30)),
 
         # Data storage
-        Option('sdir', required=True, doc="Path to filesytem data storage where data stored along "
-               "with database. Other components file_upload create subdirectories in it."),
+        Option('sdir', required=True, doc=(
+            "Path to filesytem data storage where data stored along with "
+            "database. Other components file_upload create subdirectories "
+            "in it.")),
 
         # Backup storage
-        Option('backup.path', doc="Path to directory in filesystem where backup created if "
-               "target destination is not specified."),
+        Option('backup.path', doc=(
+            "Path to directory in filesystem where backup created if target "
+            "destination is not specified.")),
 
-        Option('backup.filename', default='%Y%m%d-%H%M%S.ngwbackup',
-               doc="File name template (passed to strftime) for filename in backup.path if backup "
-               "target destination is not specified"),
+        Option('backup.filename', default='%Y%m%d-%H%M%S.ngwbackup', doc=(
+            "File name template (passed to strftime) for filename in "
+            "backup.path if backup target destination is not specified.")),
 
         # Ignore packages and components
-        Option('packages.ignore'),
-        Option('components.ignore'),
+        Option('packages.ignore', doc=(
+            "Deprecated, use environment package.* option instead.")),
+        Option('components.ignore', doc=(
+            "Deperected, use environment component.* option instead.")),
 
         # Locale settings
         Option('locale.default', default='en'),
@@ -277,5 +282,6 @@ class CoreComponent(Component):
         Option('support_url', default="https://nextgis.com/contact/"),
 
         # Debug settings
-        Option('debug', bool, default=False, doc="Enable additional debug tools."),
+        Option('debug', bool, default=False, doc=(
+            "Enable additional debug tools.")),
     )

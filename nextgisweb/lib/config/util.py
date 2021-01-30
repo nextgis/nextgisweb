@@ -50,6 +50,14 @@ def environ_to_key(name, prefix='NEXTGISWEB'):
         return None
 
 
+def key_to_environ(name, prefix='NEXTGISWEB'):
+    """ Convert key to environment variable name """
+
+    return '{}__{}'.format(
+        prefix, name.replace('.', '__')
+    ).upper()
+
+
 def environ_substitution(items, environ):
     """ Substitute values in items from environment variables in two forms:
     "%(DEPRECATED)s" and "${SHELL_STYLE}". """

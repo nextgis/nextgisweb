@@ -10,7 +10,9 @@ from .annotation import (
     MissingDefaultError)
 from .util import (
     NO_DEFAULT,
-    load_config)
+    load_config,
+    environ_to_key,
+    key_to_environ)
 
 
 __all__ = [
@@ -22,4 +24,6 @@ __all__ = [
     MissingDefaultError,
     NO_DEFAULT,
     load_config,
+    'environ_to_key',
+    'key_to_environ',
 ]
