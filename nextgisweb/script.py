@@ -2,11 +2,10 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import sys
 import os
+import logging
 from argparse import ArgumentParser
 from textwrap import wrap
 from contextlib import contextmanager
-
-from pyramid.paster import setup_logging
 
 from .lib.config import (
     Option,
@@ -17,13 +16,16 @@ from .env import Env, setenv
 from .command import Command
 
 
+_logger = logging.getLogger(__name__)
+
+
 def main(argv=sys.argv):
     argparser = ArgumentParser()
 
     argparser.add_argument(
-        '--config', help="nextgisweb configuration file")
+        '--config', help="Configuration file.")
     argparser.add_argument(
-        '--logging', help="logging library configuration file")
+        '--logging', help="Deprecated. Logging library configuration file.")
 
     config = None
     logging = None
@@ -38,14 +40,18 @@ def main(argv=sys.argv):
 
         i += 2 if argv[i].startswith('--') else 1
 
-    if logging is None:
-        logging = os.environ.get('NEXTGISWEB_LOGGING')
-
-    if logging:
-        setup_logging(logging)
-
     env = Env(cfg=load_config(config, None, hupper=True))
     setenv(env)
+
+    if logging is not None:
+        _logger.warning(
+            "Deprecated command line option --logging was ignored! "
+            "Use environment logging.* and logger.* options instead.")
+
+    elif 'NEXTGISWEB_LOGGING' in os.environ:
+        _logger.warning(
+            "Deprecated environment variable NEXTGISWEB_LOGGING was ignored! "
+            "Use environment logging.* and logger.* options instead.")
 
     subparsers = argparser.add_subparsers()
 
@@ -55,9 +61,6 @@ def main(argv=sys.argv):
         subparser.set_defaults(command=cmd)
 
     args = argparser.parse_args(argv[1:])
-
-    if args.logging:
-        setup_logging(args.logging)
 
     no_initialize = hasattr(args.command, 'no_initialize') and args.command.no_initialize
     if not no_initialize:

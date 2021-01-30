@@ -3,8 +3,6 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 import os
 import logging
 
-from pyramid.paster import setup_logging
-
 from .lib.config import load_config
 from .env import Env, setenv
 
@@ -57,8 +55,12 @@ def pkginfo():
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application. """
 
+    env = Env(cfg=load_config(None, None))
+
     if 'NEXTGISWEB_LOGGING' in os.environ:
-        setup_logging(os.environ['NEXTGISWEB_LOGGING'])
+        logger.error(
+            "Environment variable NEXTGISWEB_LOGGING was ignored! Use "
+            "environment logging.* and logger.* options instead.")
 
     if 'logging' in settings:
         logger.error("Parameter 'logging' was ignored! Use NEXTGISWEB_LOGGING variable instead.")
@@ -71,7 +73,6 @@ def main(global_config, **settings):
     if len(kset) > 0:
         logger.warn("Ignored paster's parameters: %s", ', '.join(kset))
 
-    env = Env(cfg=load_config(None, None))
     env.initialize()
 
     setenv(env)

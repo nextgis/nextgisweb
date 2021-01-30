@@ -2,6 +2,7 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 import re
 import logging
+import logging.config
 import six
 from collections import OrderedDict
 
@@ -16,31 +17,31 @@ logger = logging.getLogger(__name__)
 
 class Env(object):
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg=None, setup_logging=True):
         if cfg is None:
             cfg = load_config(None, None)
 
+        cfgenv = _filter_by_prefix(cfg, 'environment.')
+        self.options = ConfigOptions(cfgenv, self.option_annotations)
+        if setup_logging:
+            self.setup_logging()
+
         if len(cfg) == 0:
             logger.info("Creating environment without any configuration.")
-
-        cfgenv = _filter_by_prefix(cfg, 'environment.')
-        optenv = ConfigOptions(cfgenv, self.option_annotations)
 
         cfg_components = OrderedDict()
         cfg_packages = OrderedDict()
 
         # TODO: Maybe there is a better way to iterate over options exists.
         for k, v in cfgenv.items():
-
             if k.startswith('package.'):
                 pi = k[len('package.'):]
-                pv = optenv[k]
+                pv = self.options[k]
                 if pv is not None:
                     cfg_packages[pi] = pv
-
             elif k.startswith('component.'):
                 ci = k[len('component.'):]
-                cv = optenv[k]
+                cv = self.options[k]
                 if cv is not None:
                     cfg_components[ci] = cv
 
@@ -162,12 +163,86 @@ class Env(object):
 
         return metadata
 
+    def setup_logging(self):
+        config = {
+            'version': 1,
+            'formatters': {},
+            'handlers': {
+                'default': {
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'default',
+                },
+            },
+            'root': {
+                'level': self.options['logging.level'],
+                'handlers': ['default'],
+            },
+        }
+
+        config['formatters']['default'] = {
+            'format':
+                ('%(asctime)s ' if self.options['logging.timestamp'] else '')
+                + '%(levelname)-8s [%(name)s] %(message)s'}
+        config['loggers'] = loggers = {}
+
+        has_options = False
+        has_ini_config = 'logging.ini_config' in self.options
+
+        # TODO: Maybe there is a better way to iterate over options exists.
+        logging_options = ['logger.waitress'] + [
+            k for k in self.options._options.keys()
+            if k.startswith(('logging.', 'logger.'))]
+
+        for k in logging_options:
+            v = self.options.get(k)
+            if k.startswith('logger.'):
+                has_options = True
+                qaulname, level = v.split(':', 2)
+                level = level.upper()
+                loggers[qaulname] = dict(
+                    level=level, propagate=False,
+                    handlers=['default'])
+            elif k.startswith('logging.'):
+                if k != 'logging.ini_config':
+                    has_options = True
+
+        logging.captureWarnings(True)
+
+        if has_options or (not has_ini_config):
+            logging.config.dictConfig(config)
+        elif has_ini_config:
+            logging.config.fileConfig(self.options['logging.ini_config'])
+
+        if has_options and has_ini_config:
+            logger.warning(
+                "Environment configuration option logging.ini_cofig was "
+                "ignored because other logging configuration options were "
+                "given.")
+
     option_annotations = OptionAnnotations((
         Option('package.*', bool, None, doc=(
             "Disable installed package by setting false.")),
         Option('component.*', bool, None, doc=(
             "Enable optional component by setting true. "
             "Or disable component by setting false.")),
+
+        Option('logging.level', str, 'WARNING', doc=(
+            "Default logging level which is set to root logger.")),
+        Option('logging.timestamp', bool, default=False, doc=(
+            "Print timestamps in log records or not.")),
+        Option('logging.ini_config', str, doc=(
+            "Deprecated. Load logging configuration from ini-style file.")),
+
+        Option('logger.*', str, doc=(
+            "Set logging level of the specific logger in the following "
+            "format: qualified_name:level. Where qualified_name is a dotted "
+            "python logger name, nextgisweb.env for example. Any key name "
+            "can be used and it affects nothing. But can be used when "
+            "overriding options.")),
+
+        Option('logger.waitress', str, default='waitress:error', doc=(
+            "By default waitress (builtin HTTP server) logger level is set to "
+            "ERROR. It's possible to override this setting here.")),
     ))
 
 
