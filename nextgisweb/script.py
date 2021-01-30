@@ -70,15 +70,22 @@ def main(argv=sys.argv):
 
 
 def config(argv=sys.argv):
+    logging.basicConfig(level=logging.ERROR)
+    logging.captureWarnings(True)
+
     argparser = ArgumentParser()
 
     argparser.add_argument(
         '--values-only', dest='values_only', action='store_true',
-        help="Don't include settings description in comments")
+        help="Don't include settings description in comments.")
 
     argparser.add_argument(
         '--env-vars', dest='env_vars', action='store_true', default=False,
-        help="Print settings as environment variables")
+        help="Print settings as environment variables.")
+
+    argparser.add_argument(
+        'env_or_comp', nargs='?', type=str, default=None,
+        help="Print configuration only for given component or environment.")
 
     args = argparser.parse_args(argv[1:])
 
@@ -88,6 +95,7 @@ def config(argv=sys.argv):
 
     headers = []
     nocomment = args.values_only
+    env_or_comp = args.env_or_comp
 
     @contextmanager
     def _section(header):
@@ -166,6 +174,8 @@ def config(argv=sys.argv):
 
     with _section(_section_header('environment')):
         for oa in Env.option_annotations:
+            if env_or_comp is not None and env_or_comp != 'environment':
+                break
             with _section(_section_option(oa)):
                 _print_option_value('environment', oa)
                 if oa.key == 'package.*':
@@ -209,6 +219,9 @@ def config(argv=sys.argv):
                 _print('')
 
     for comp in Component.registry:
+        if env_or_comp is not None and env_or_comp != comp.identity:
+            continue
+
         with _section(_section_header(comp.identity)):
             try:
                 comp_option_annotaions = comp.option_annotations
