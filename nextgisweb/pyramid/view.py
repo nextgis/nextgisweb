@@ -468,6 +468,22 @@ def _setup_pyramid_debugtoolbar(comp, config):
 
 def _setup_pyramid_tm(comp, config):
     import pyramid_tm
+
+    settings = config.registry.settings
+
+    skip_tm_path_info = (
+        '/static/',
+        '/favicon.ico',
+        '/api/component/pyramid/route',
+        '/api/component/pyramid/locdata/',
+        '/_debug_toolbar/')
+
+    def activate_hook(request):
+        return not request.path_info.startswith(
+            skip_tm_path_info)
+
+    settings['tm.activate_hook'] = activate_hook
+
     config.include(pyramid_tm)
 
 
