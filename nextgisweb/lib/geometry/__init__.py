@@ -9,7 +9,7 @@ from shapely.geometry import mapping, shape
 from shapely.ops import transform as map_coords
 
 
-class Geometry:
+class Geometry(object):
 
     def __init__(self, wkb=None, wkt=None, shape_obj=None, srid=None):
         self._wkb = wkb
@@ -86,7 +86,7 @@ class Geometry:
         return self.shape.simplify(*args, **kwargs)
 
 
-class Transformer:
+class Transformer(object):
 
     def __init__(self, wkt_from, wkt_to):
         crs_from = CRS.from_wkt(wkt_from)
