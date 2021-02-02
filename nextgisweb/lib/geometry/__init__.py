@@ -10,6 +10,7 @@ from shapely.ops import transform as map_coords
 
 
 class Geometry(object):
+    __slots__ = ('_wkb', '_wkt', '_shape', '_srid')
 
     def __init__(self, wkb=None, wkt=None, shape_obj=None, srid=None):
         self._wkb = wkb
