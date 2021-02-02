@@ -12,7 +12,7 @@ def extract(fileobj, keywords, comment_tags, options):
     env['NODE_PATH'] = resource_filename('nextgisweb', 'amd_packages/contrib')
 
     out = check_output(
-        ['nodejs', resource_filename('nextgisweb', 'i18n/hbs.js')],
+        ['node', resource_filename('nextgisweb', 'i18n/hbs.js')],
         stdin=fileobj, stderr=sys.stderr, env=env)
 
     for rec in json.loads(out):
