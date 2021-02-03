@@ -136,7 +136,7 @@ def guru_meditation(tb):
                     os.path.split(fn)[-1],
                     six.text_type(line),
                     func,
-                    text if text is not None else "",
+                    six.ensure_text(text) if text is not None else "",
                 )
             ).encode('utf-8')
         )
