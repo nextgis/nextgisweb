@@ -10,6 +10,7 @@ define([
     "ngw-spatial-ref-sys/SRSSelect",
     // resource
     "dojo/text!./template/Widget.hbs",
+    "ngw/settings!vector_layer",
     // template
     "dojox/layout/TableContainer",
     "ngw-file-upload/Uploader",
@@ -24,7 +25,8 @@ define([
     hbsI18n,
     serialize,
     SRSSelect,
-    template
+    template,
+    settings,
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
@@ -35,18 +37,39 @@ define([
             this.wSrs = SRSSelect({allSrs: null});
         },
 
+        postCreate: function () {
+            if (settings.show_create_mode) {
+                this.modeSwitcher.watch('value', function(attr, oldval, newval) {
+                    var hideFile = newval === 'empty';
+                    this.empty_layer_section.style.display = hideFile ? '' : 'none';
+                    this.file_section.style.display = hideFile ? 'none' : '';
+                }.bind(this));
+            } else {
+                this.mode_section.domNode.style.display = 'none';
+            }
+        },
+
         serializeInMixin: function (data) {
             var prefix = this.prefix,
                 setObject = function (key, value) { lang.setObject(prefix + "." + key, value, data); };
 
             setObject("srs", { id: this.wSrs.get("value") });
-            setObject("source", this.wSourceFile.get("value"));
-            setObject("source.encoding", this.wSourceEncoding.get("value"));
+
+            if (this.modeSwitcher.get("value") === 'file') {
+                setObject("source", this.wSourceFile.get("value"));
+                setObject("source.encoding", this.wSourceEncoding.get("value"));
+            } else {
+                setObject("fields", []);
+                setObject("geometry_type", this.wGeometryType.get("value"));
+            }
         },
 
         validateDataInMixin: function (errback) {
-            return this.wSourceFile.upload_promise !== undefined &&
-                this.wSourceFile.upload_promise.isResolved();
+            if (this.modeSwitcher.get("value") === 'file') {
+                return this.wSourceFile.upload_promise !== undefined &&
+                    this.wSourceFile.upload_promise.isResolved();
+            }
+            return true;
         }
 
     });

@@ -1,24 +1,59 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" class="padding-block">
-    <div data-dojo-attach-point="wSourceFile"
-            data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wFile" 
-            data-dojo-props="uploaderLinkText: '{{gettext 'Select a dataset'}}',
-                             uploaderHelpText: '{{gettext 'Dataset should be in ESRI Shapefile (zip) or GeoJSON format.'}}'
-    "></div>
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
-        <!-- Do not let users pick SRS. By now only one SRS (EPSG:3857) is supported.
-        <div data-dojo-attach-point="wSrs"
-            data-dojo-type="ngw-spatial-ref-sys/SRSSelect"
-            title="{{gettext 'Spatial reference system'}}" style="width: 100%"></div>
-        -->
 
-        <select data-dojo-attach-point="wSourceEncoding"
+    <!-- Do not let users pick SRS. By now only one SRS (EPSG:3857) is supported.
+    <div data-dojo-attach-point="wSrs"
+        data-dojo-type="ngw-spatial-ref-sys/SRSSelect"
+        title="{{gettext 'Spatial reference system'}}" style="width: 100%"></div>
+    -->
+
+    <div data-dojo-attach-point="mode_section"
+         data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150"
+         style="margin-bottom: 1em;">
+        <select data-dojo-attach-point="modeSwitcher"
             data-dojo-type="dijit/form/Select"
-            title="{{gettext 'Encoding'}}" style="width: 100%">
+            title="{{gettext 'Mode'}}" style="width: 100%">
 
-            <option value="utf-8">{{gettext 'UTF-8'}}</option>
-            <option value="windows-1251">{{gettext 'Windows-1251'}}</option>
+            <option value="file" selected="selected">{{gettext 'From file'}}</option>
+            <option value="empty">{{gettext 'Empty layer'}}</option>
 
         </select>
+    </div>
 
+    <div data-dojo-attach-point="empty_layer_section" style="display: none;">
+         <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
+            <select data-dojo-attach-point="wGeometryType"
+                data-dojo-type="dijit/form/Select"
+                data-ngw-serialize="geometry_type"
+                title="{{gettext 'Geometry type'}}" style="width: 100%">
+
+                <option value="POINT">{{gettext 'Point'}}</option>
+                <option value="LINESTRING">{{gettext 'Line'}}</option>
+                <option value="POLYGON">{{gettext 'Polygon'}}</option>
+                <option value="MULTIPOINT">{{gettext 'Multipoint'}}</option>
+                <option value="MULTILINESTRING">{{gettext 'Multiline'}}</option>
+                <option value="MULTIPOLYGON">{{gettext 'Multipolygon'}}</option>
+
+            </select>
+        </div>
+    </div>
+
+    <div data-dojo-attach-point="file_section">
+        <div data-dojo-attach-point="wSourceFile"
+                data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wFile" 
+                data-dojo-props="uploaderLinkText: '{{gettext 'Select a dataset'}}',
+                                uploaderHelpText: '{{gettext 'Dataset should be in ESRI Shapefile (zip) or GeoJSON format.'}}'
+        "></div>
+        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
+
+            <select data-dojo-attach-point="wSourceEncoding"
+                data-dojo-type="dijit/form/Select"
+                title="{{gettext 'Encoding'}}" style="width: 100%">
+
+                <option value="utf-8">{{gettext 'UTF-8'}}</option>
+                <option value="windows-1251">{{gettext 'Windows-1251'}}</option>
+
+            </select>
+
+        </div>
     </div>
 </div>
