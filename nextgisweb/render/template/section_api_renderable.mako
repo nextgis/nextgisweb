@@ -5,7 +5,7 @@
 
 <%block name="content">
     <div class="row-title">
-        <div class="text">${tr(_("TMS service"))}</div>
+        <div class="text">${tr(_("TMS (Tile Map Service)"))}</div>
         <div class="material-icons icon-helpOutline help">
             <div class="tooltip-content">
                 <div class="tooltip-help">

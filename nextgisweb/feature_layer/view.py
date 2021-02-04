@@ -41,7 +41,7 @@ PR_R = ResourceScope.read
 def feature_browse(request):
     request.resource_permission(PD_READ)
     request.resource_permission(PDS_R)
-    return dict(obj=request.context, subtitle=_(u"Feature table"),
+    return dict(obj=request.context, subtitle=_("Feature table"),
                 maxwidth=True, maxheight=True)
 
 
@@ -58,7 +58,7 @@ def feature_show(request):
 
     return dict(
         obj=request.context,
-        subtitle=_(u"Feature #%d") % feature_id,
+        subtitle=_("Feature #%d") % feature_id,
         feature_id=feature_id,
         ext_mid=ext_mid)
 
@@ -81,7 +81,7 @@ def feature_update(request):
         obj=request.context,
         feature_id=feature_id,
         fields=fields,
-        subtitle=_(u"Feature #%d") % feature_id,
+        subtitle=_("Feature #%d") % feature_id,
         maxheight=True)
 
 
@@ -181,17 +181,17 @@ def setup_pyramid(comp, config):
 
         def build(self, args):
             if IFeatureLayer.providedBy(args.obj):
-                yield dm.Label('feature_layer', _(u"Vector layer"))
+                yield dm.Label('feature_layer', _("Features"))
 
                 yield dm.Link(
-                    'feature_layer/feature-browse', _(u"Feature table"),
+                    'feature_layer/feature-browse', _("Table"),
                     lambda args: args.request.route_url(
                         "feature_layer.feature.browse",
                         id=args.obj.id),
                     'material:table', True)
 
                 yield dm.Link(
-                    'feature_layer/export', _(u"Save as"),
+                    'feature_layer/export', _("Save as"),
                     lambda args: args.request.route_url(
                         "resource.export.page",
                         id=args.obj.id))
@@ -201,11 +201,11 @@ def setup_pyramid(comp, config):
     if MVT_DRIVER_EXIST:
         Resource.__psection__.register(
             key='description',
-            title=_(u"External access"),
+            title=_("External access"),
             template='nextgisweb:feature_layer/template/section_api_layer.mako',
             is_applicable=lambda obj: IFeatureLayer.providedBy(obj))
 
     Resource.__psection__.register(
-        key='fields', title=_(u"Attributes"),
+        key='fields', title=_("Attributes"),
         template="nextgisweb:feature_layer/template/section_fields.mako",
         is_applicable=lambda obj: IFeatureLayer.providedBy(obj))

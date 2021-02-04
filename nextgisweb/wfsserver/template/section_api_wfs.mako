@@ -4,7 +4,7 @@
 
 <%block name="content">
     <div class="row-title">
-        <div class="text">${tr(_("WFS service"))}</div>
+        <div class="text">${tr(_("Web Feature Service (WFS)"))}</div>
         <div class="material-icons icon-helpOutline help">
             <div class="tooltip-content">
                 <div class="tooltip-help">

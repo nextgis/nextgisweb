@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.1\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2021-01-16 12:12+0000\n"
+"POT-Creation-Date: 2021-02-02 19:06+0000\n"
 "PO-Revision-Date: 2019-05-26 15:09+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -52,8 +52,8 @@ msgid "Seed zoom level"
 msgstr "Заполнить масштабный уровень"
 
 #: template/section_api_renderable.mako:8
-msgid "TMS service"
-msgstr "TMS сервис"
+msgid "TMS (Tile Map Service)"
+msgstr "TMS (Tile Map Service)"
 
 #: template/section_api_renderable.mako:12
 msgid ""
@@ -65,11 +65,10 @@ msgstr ""
 "- это карта, отображаемая в браузере путем бесшовного соединения десятков"
 " индивидуально запрашиваемых изображений (тайлов)."
 
-#: template/section_api_renderable.mako:15
+#: template/section_api_renderable.mako:17
 msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
 msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
 
-#: template/section_api_renderable.mako:16
+#: template/section_api_renderable.mako:18
 msgid "Read more"
 msgstr "Подробнее"
-

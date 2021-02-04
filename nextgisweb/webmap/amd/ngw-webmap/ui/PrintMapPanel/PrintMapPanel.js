@@ -334,11 +334,13 @@ define([
         },
 
         _buildLogo: function () {
-            var logoElement = query('.map-logo')[0],
+            var mapLogoQuery = query('.map-logo'),
                 newLogoElement,
                 olViewport = query('div.ol-viewport', this.printElement)[0];
 
-            newLogoElement = lang.clone(logoElement);
+            if (mapLogoQuery.length === 0) return false;
+
+            newLogoElement = lang.clone(mapLogoQuery[0]);
             domConstruct.place(newLogoElement, olViewport, 'last');
         },
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-01-18 22:27+0000\n"
+"POT-Creation-Date: 2021-02-02 19:11+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -546,8 +546,8 @@ msgid "Open full map"
 msgstr "Открыть карту целиком"
 
 #: template/section_api_webmap.mako:7
-msgid "TMS service"
-msgstr "TMS сервис"
+msgid "TMS (Tile Map Service)"
+msgstr "TMS (Tile Map Service)"
 
 #: template/section_api_webmap.mako:11
 msgid ""
@@ -559,11 +559,11 @@ msgstr ""
 "- это карта, отображаемая в браузере путем бесшовного соединения десятков"
 " индивидуально запрашиваемых изображений (тайлов)."
 
-#: template/section_api_webmap.mako:14
+#: template/section_api_webmap.mako:16
 msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
 msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
 
-#: template/section_api_webmap.mako:15
+#: template/section_api_webmap.mako:17
 msgid "Read more"
 msgstr "Подробнее"
 
