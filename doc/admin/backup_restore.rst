@@ -60,7 +60,10 @@ Then run ``nextgisweb restore`` command with filename argument:
 
   $ nextgisweb restore backup/20200721-234619.ngwbackup
 
-And then start NextGIS Web service again:
+If you are restoring backup which made from some previous version, it may
+require to apply migrations. The process of applying migrations is described in
+:ref:`"Backup and restore"<applying migrations>` section. Follow instruction from
+there, and then start NextGIS Web service again:
 
 .. code-block:: none
 

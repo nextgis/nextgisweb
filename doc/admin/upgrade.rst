@@ -66,6 +66,7 @@ After that you return to ``ngw`` home directory:
 
   $ cd ~
 
+.. _applying migrations:
 
 Applying migrations
 -------------------
