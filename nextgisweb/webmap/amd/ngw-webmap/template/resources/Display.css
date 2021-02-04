@@ -124,8 +124,8 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
     }
     .ol-control button,
     .ol-control__btn{
-        color: #076dbf;
-        fill: #076dbf;
+        color: var(--primary);
+        fill: var(--primary);
     }
 
     .ol-control:first-child button{
@@ -151,8 +151,6 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
     .ol-control button:hover,
     .ol-control .ol-control__button:hover{
         background-color: #f9fafb;
-        color: #00b77e;
-        fill: #00b77e;
     }
 
 /* Rotate control */

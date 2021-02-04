@@ -17,7 +17,7 @@
 
     .dijitDropDownButton {
       .dijitButtonNode {
-        border-color: @input-border-color;
+        border-color: var(--input-border-color);
       }
 
       &:hover,
@@ -32,24 +32,24 @@
 
   .dijitCalendarPreviousMonth,
   .dijitCalendarNextMonth {
-    background-color: @secondary;
-    border-bottom-color: @light-border-2;
+    background-color: var(--secondary);
+    border-bottom-color: var(--divider-color);
 
     .dijitCalendarDateLabel {
-      border-color: @secondary;
+      border-color: var(--secondary);
     }
   }
 
   .dijitCalendarDateTemplate {
     font-weight: normal;
-    color: @text-color;
+    color: var(--text-base);
     font-size: 13px;
   }
 
   .dijitCalendarSelectedDate .dijitCalendarDateLabel {
-    background-color: @primary;
+    background-color: var(--primary);
     color: #fff;
-    border-color: @primary;
+    border-color: var(--primary);
     font-family: @base-font;
   }
 
@@ -61,29 +61,29 @@
 
   .dijitCalendarHoveredDate .dijitCalendarDateLabel {
     background-color: @hover-bg-base;
-    color: @primary;
+    color: var(--primary);
     border-color: @hover-bg-base;
   }
 
   .dijitCalendarDayLabel {
     font-size: 13px;
-    color: @text-color;
+    color: var(--text-base);
   }
 
   .dijitCalendarMonthLabel {
-    color: @text-color;
+    color: var(--text-base);
     font-size: 14px;
   }
 
   .dijitCalendarYearLabel {
-    color: @text-color;
+    color: var(--text-base);
     font-size: 14px;
     padding: 2px 0 3px;
   }
 
   .dijitCalendarNextYear,
   .dijitCalendarPreviousYear {
-    color: @text-color;
+    color: var(--text-base);
     font-size: 13px;
     padding: 2px 4px;
 

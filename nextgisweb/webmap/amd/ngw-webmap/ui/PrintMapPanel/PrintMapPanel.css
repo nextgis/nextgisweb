@@ -49,7 +49,7 @@ td.tableContainer-labelCell {
 }
 
 .dijitButton.export-option .dijitButtonNode {
-  background-color: #e5eef7;
+  background-color: var(--secondary);
   border-color: #c8e5f7;
   color: #096ebf;
 }

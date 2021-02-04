@@ -2,7 +2,7 @@
 
   .dijitSelect,
   .dijitTextBox {
-    border-radius: @border-radius-base;
+    border-radius: var(--border-radius-root);
     overflow: hidden;
 
     .dijitInputField {
@@ -19,7 +19,7 @@
   .dijitSelect,
   .dijitSelect .dijitButtonContents,
   .dijitTextBox, .dijitTextBox .dijitButtonNode {
-    border-color: @input-border-color;
+    border-color: var(--input-border-color);
   }
 
   .dijitSelectHover,
@@ -31,7 +31,7 @@
   }
 
   .dijitTextBoxFocused {
-    border-color: @primary;
+    border-color: var(--primary);
   }
 
   .dijitTextArea {

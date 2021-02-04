@@ -32,18 +32,11 @@
 {   cursor: ew-resize;
 }
 
-.ol-swipe button{
-    background-color: #00b77e;
-}
-
+.ol-swipe button,
 .ol-swipe button:hover,
 .ol-swipe button:focus,
 .ol-swipe button:active{
-    background-color: #00d18f;
-}
-
-.custom-css .ol-swipe button{
-    background-color: #858585;
+    background-color: var(--accent);
 }
 
 .ol-swipe.horizontal,

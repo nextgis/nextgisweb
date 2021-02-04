@@ -34,7 +34,7 @@
         }
 
         .journal-table tr:hover td:first-child{
-            color: #076dbf;
+            color: var(--primary);
         }
     </style>
 </%def>

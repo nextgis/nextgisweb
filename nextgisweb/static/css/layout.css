@@ -2,6 +2,48 @@
 /* -- Variables -- */
 /* theme */
 @import "fontello.css";
+:root {
+  --primary: #076dbf;
+  --secondary: #e5eef7;
+  --accent: #00C775;
+  --error: #F44336;
+  --warning: #FFBA3F;
+  --success: #00C775;
+  --on-primary-text: #fff;
+  --on-secondary-text: var(--primary);
+  --on-accent-text: #fff;
+  --on-error-text: #fff;
+  --on-warning-text: #fff;
+  --border-radius-root: 4px;
+  --bg-base: #fafafa;
+  --link-color: var(--primary);
+  --link-hover-color: #2196F3;
+  --icon-color: #B3B9BE;
+  --hover-opacity-root: .08;
+  --surface-bg: #EEF4F7;
+  --surface-bg-darker: #f0f1f3;
+  --on-surface-text: var(--text-base);
+  --text-base: #212121;
+  --text-secondary: #808A93;
+  --text-disabled: #AFB8C0;
+  --body-font-family: "Roboto";
+  --body-font-weight: 400;
+  --heading-font-family: "lato_local";
+  --heading-font-weight: 700;
+  --divider-opacity: .12;
+  --divider-color: rgba(0, 0, 0, 0.08);
+  --divider-color-lighter: rgba(0, 0, 0, 0.04);
+  --divider-primary-color: rgba(7, 109, 191, 0.48);
+  --input-border-color: rgba(0, 0, 0, 0.16);
+  --header-bg: #e5eef7;
+  --on-header-text: #076dbf;
+  --user-avatar-bg: var(--primary);
+  --user-avata-text: var(--on-primary-text);
+  --sidebar-bg: #fff;
+  --sidebar-text: var(--text-base);
+  --icon-menu-bg: var(--primary);
+  --icon-menu-text: var(--on-primary-text);
+}
 .nextgis.claro .padding-block,
 .padding-block {
   padding: 16px;
@@ -18,7 +60,7 @@
 }
 .divider {
   height: 1px;
-  background-color: rgba(0, 0, 0, 0.12);
+  background-color: var(--divider-color);
   margin-top: 24px;
   margin-bottom: 20px;
 }
@@ -41,19 +83,19 @@ h3,
 .h1,
 .h2,
 .h3 {
-  font-family: "lato_local";
-  font-weight: bold;
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
+  font-weight: var(--heading-font-weight);
   line-height: 1.1;
 }
 h1,
 .h1 {
   font-size: 24px;
-  color: #000;
+  color: var(--text-base);
 }
 h2,
 .h2 {
   font-size: 18px;
-  color: #212121;
+  color: var(--text-base);
   border-bottom: 0;
   margin-top: 48px;
   padding-bottom: 0;
@@ -64,17 +106,16 @@ h2:first-child,
   margin-top: 0;
 }
 .text-muted {
-  color: #bbb;
-  color: rgba(0, 0, 0, 0.4);
+  color: var(--text-secondary);
 }
 .heading {
   font-size: 13px;
   text-transform: uppercase;
-  font-family: "lato_local";
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
   letter-spacing: 1px;
   word-spacing: 1px;
-  font-weight: normal;
-  color: #777;
+  font-weight: var(--body-font-weight);
+  color: var(--text-secondary);
   margin-bottom: 12px;
   margin-top: 20px;
 }
@@ -165,19 +206,19 @@ h2:first-child,
   height: 48px;
   line-height: 48px;
   white-space: nowrap;
-  color: #212121;
+  color: var(--text-base);
   text-decoration: none;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .list .list__item a {
-  color: #212121;
+  color: var(--text-base);
   text-decoration: none;
 }
 .list .list__item:hover,
 .list .list__item:focus {
   background-color: rgba(0, 0, 0, 0.04);
-  color: #212121;
+  color: var(--text-base);
   text-decoration: none;
 }
 .list .list__item--link {
@@ -201,30 +242,26 @@ h2:first-child,
 }
 a,
 .link {
-  color: #076dbf;
+  color: var(--link-color);
   text-decoration: underline;
   cursor: pointer;
 }
 a:hover,
 .link:hover {
-  color: #2196F3;
-  border-color: #2196F3;
-  border-color: rgba(33, 150, 243, 0.4);
+  color: var(--link-hover-color);
+  border-color: var(--link-hover-color);
 }
 .link--action {
-  font-family: "lato_local";
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
   font-size: 16px;
   text-decoration: none;
 }
 .link--muted {
-  color: #777;
-}
-.link--muted:hover {
-  color: #444444;
+  color: var(--text-secondary);
 }
 .link__icon {
   vertical-align: middle;
-  transition: transform 0.3s;
+  transition: transform .3s;
 }
 .link--dropdown.active .link__icon {
   transform: rotate(-180deg);
@@ -291,20 +328,19 @@ table {
   padding-top: 0;
 }
 .pure-table th {
-  font-weight: bold;
-  color: #aaa;
-  color: rgba(33, 33, 33, 0.86);
+  font-weight: 600;
+  color: var(--text-base);
 }
 .pure-table td,
 .pure-table th {
-  border-bottom: 1px solid #efefef;
+  border-bottom: 1px solid var(--divider-color);
   -webkit-transition: background-color 0.4s;
   -moz-transition: background-color 0.4s;
   -o-transition: background-color 0.4s;
   transition: background-color 0.4s;
   vertical-align: middle;
   border-left: 0;
-  padding: 0.8em 1em;
+  padding: .8em 1em;
   line-height: 1.285;
 }
 .pure-table td.fit-content,
@@ -314,7 +350,7 @@ table {
 }
 .pure-table tbody th {
   text-transform: none;
-  color: #212121;
+  color: var(--text-base);
   font-weight: bold;
   text-align: left;
 }
@@ -357,7 +393,7 @@ table {
 }
 .table-keyvalue td,
 .table-keyvalue th {
-  padding-top: 0.615em;
+  padding-top: .615em;
   padding-bottom: 0;
   border-bottom-color: transparent;
   padding-left: 0;
@@ -369,9 +405,9 @@ table {
 }
 .table-keyvalue td.table-keyvalue__key,
 .table-keyvalue th.table-keyvalue__key {
-  border-bottom-color: #e1e1e1;
+  border-bottom-color: var(--divider-color);
   font-weight: normal;
-  color: #aaa;
+  color: var(--text-secondary);
   letter-spacing: 0;
 }
 .table-keyvalue td.table-keyvalue__value,
@@ -394,7 +430,7 @@ table {
 .table-keyvalue__value__inner {
   position: relative;
   top: 4px;
-  background-color: #fafafa;
+  background-color: var(--bg-base);
 }
 .content-box .table-keyvalue__key__inner,
 .content-box .table-keyvalue__value__inner {
@@ -409,22 +445,22 @@ table {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #076dbf;
+  background-color: var(--primary);
 }
 .circle--primary {
-  background-color: #076dbf;
+  background-color: var(--primary);
 }
 .circle--secondary {
-  background-color: #e5eef7;
+  background-color: var(--secondary);
 }
 .circle--accent {
-  background-color: #00C775;
+  background-color: var(--accent);
 }
 .circle--success {
-  background-color: #00C775;
+  background-color: var(--success);
 }
 .circle--warning {
-  background-color: #FFBA3F;
+  background-color: var(--warning);
 }
 .circle--danger {
   background-color: #EF9A9A;
@@ -453,7 +489,7 @@ table {
   word-wrap: normal;
   white-space: nowrap;
   direction: ltr;
-  color: #999;
+  color: var(--icon-color);
   /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
   /* Support for Safari and Chrome. */
@@ -493,13 +529,13 @@ table {
 }
 .material-icons.icon-edit:before {
   content: "\E3C9";
-  font-size: 0.95em;
+  font-size: .95em;
   line-height: 1.05em;
   vertical-align: top;
 }
 .material-icons.icon-delete:before {
   content: "\E872";
-  font-size: 0.95em;
+  font-size: .95em;
   line-height: 1.05em;
   vertical-align: top;
 }
@@ -643,12 +679,12 @@ table {
   justify-content: center;
   margin: 0;
   font-size: 16px;
-  font-family: "lato_local";
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
   height: 36px;
   padding: 0 16px;
   border: 0;
-  background: #076dbf;
-  border-radius: 4px;
+  background: var(--primary);
+  border-radius: var(--border-radius-root);
   color: #fff;
   box-shadow: none;
   outline: 0;
@@ -660,18 +696,27 @@ table {
   outline: 0;
 }
 .ngw-button:hover {
-  background-color: #05518e;
+  position: relative;
+}
+.ngw-button:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background-color: currentColor;
+  opacity: var(--hover-opacity-root);
+  pointer-events: none;
 }
 .ngw-button:hover .ngw-button__icon {
-  color: #fff;
+  color: var(--on-primary-text);
   opacity: 1;
 }
 .ngw-button--primary {
-  background: #076dbf;
-  color: #fff;
-}
-.ngw-button--primary:hover {
-  background-color: #05518e;
+  background: var(--primary);
+  color: var(--on-primary-text);
 }
 .ngw-button + .ngw-button {
   margin-left: 8px;
@@ -691,11 +736,11 @@ table {
   height: 30px;
 }
 .ngw-button--secondary {
-  background-color: #e5eef7;
-  color: #076dbf;
+  background-color: var(--secondary);
+  color: var(--on-secondary-text);
 }
-.ngw-button--secondary:hover {
-  background-color: #d2e1f1;
+.ngw-button--secondary:hover .ngw-button__icon {
+  color: var(--on-secondary-text);
 }
 .ngw-button--dark {
   background-color: rgba(0, 0, 0, 0.64);
@@ -706,27 +751,27 @@ table {
 }
 .ngw-button--outlined {
   background-color: transparent;
-  border: 1px solid #076dbf;
-  color: #076dbf;
+  border: 1px solid var(--primary);
+  color: var(--primary);
 }
 .ngw-button--outlined.ngw-button--secondary {
-  border-color: rgba(0, 0, 0, 0.16);
-  color: #777;
+  border-color: var(--input-border-color);
+  color: var(--text-secondary);
 }
 .ngw-button--outlined:hover {
   background-color: transparent;
-  color: #05518e;
-  border-color: #05518e;
+  color: var(--on-secondary-text);
+  border-color: var(--primary);
 }
 .ngw-button--outlined:hover .ngw-button__icon {
-  color: #05518e;
+  color: var(--primary);
 }
 .ngw-button--outlined.ngw-button--secondary:hover .ngw-button__icon {
-  color: #076dbf;
+  color: var(--primary);
 }
 .ngw-button--icon .ngw-button__icon {
   color: inherit;
-  opacity: 0.75;
+  opacity: .75;
 }
 .ngw-button--icon .ngw-button__icon--prepend {
   margin-right: 4px;
@@ -756,12 +801,12 @@ table {
   padding-right: 12px;
 }
 .ngw-toolbar {
-  background-color: #f0f1f3;
+  background-color: var(--surface-bg-darker);
   padding: 12px;
   display: flex;
   margin-bottom: 16px;
   box-shadow: 0 1px 2px rgba(57, 70, 78, 0.3);
-  border-radius: 4px;
+  border-radius: var(--border-radius-root);
 }
 .ngw-toolbar--space-between {
   justify-content: space-between;
@@ -815,18 +860,18 @@ table {
   font-style: normal;
 }
 .pure-g [class*="pure-u"] {
-  font-family: "Roboto";
+  font-family: var(--body-font-family), Roboto, sans-serif;
 }
 body,
 html {
   height: 100%;
-  font-family: "Roboto";
+  font-family: var(--body-font-family), 'Roboto', sans-serif;
 }
 body {
   font-size: 14px;
   line-height: 1.55;
-  color: #212121;
-  background-color: #fafafa;
+  color: var(--text-base);
+  background-color: var(--bg-base);
   min-width: 680px;
 }
 .list-unstyled {
@@ -868,7 +913,7 @@ a:hover [class^="icon-"]:before,
 a:hover [class*=" icon-"]:before,
 a[class^="icon-"]:hover:before,
 a[class*=" icon-"]:hover:before {
-  color: #FFBA3F;
+  color: var(--primary);
 }
 .icon-viewMap:before {
   font-family: "fontello";
@@ -891,7 +936,7 @@ a[class*=" icon-"]:hover:before {
   text-decoration: none;
 }
 .icon--link:hover {
-  color: #2196F3;
+  color: var(--link-hover-color);
   text-decoration: none;
 }
 /* -- LAYOUT STYLES -- */
@@ -918,23 +963,33 @@ a[class*=" icon-"]:hover:before {
   position: relative;
   box-sizing: border-box;
   padding: 15px 15px 15px 0;
-  background-color: #e5eef7;
+  background-color: var(--header-bg);
   z-index: 10;
   line-height: 1.5;
   font-size: 15px;
-  font-family: "lato_local", 'Roboto', Arial, sans-serif;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  color: #076dbf;
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
+  color: var(--on-header-text);
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: currentColor;
+  opacity: var(--divider-opacity);
 }
 .header a {
   text-decoration: none;
   color: inherit;
 }
 .header .header__title {
-  display: table;
+  display: flex;
+  align-items: center;
   color: inherit;
   vertical-align: top;
-  font-weight: bold;
+  font-weight: var(--heading-font-weight);
   min-height: 34px;
   margin-top: -7px;
   margin-bottom: -7px;
@@ -947,7 +1002,7 @@ a[class*=" icon-"]:hover:before {
   right: 16px;
   top: 0;
   bottom: 0;
-  font-weight: bold;
+  font-weight: var(--heading-font-weight);
   margin-top: auto;
   margin-bottom: auto;
   height: 34px;
@@ -966,7 +1021,7 @@ a[class*=" icon-"]:hover:before {
 }
 .header-nav__item > a:hover {
   color: inherit;
-  opacity: 0.76;
+  opacity: .76;
 }
 .header-nav__item > .material-icons {
   display: inline;
@@ -975,18 +1030,30 @@ a[class*=" icon-"]:hover:before {
 }
 .header-nav__item > .material-icons:hover {
   color: inherit;
-  opacity: 0.76;
+  opacity: .76;
 }
 .header__left {
   padding-right: 250px;
 }
 .header__title-logo {
-  display: table-cell;
-  vertical-align: middle;
-  border-right: 1px solid #b4d0ea;
+  position: relative;
   min-width: 50px;
   padding: 6px 12px;
   box-sizing: border-box;
+}
+.header__title-logo:after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: currentColor;
+  opacity: var(--divider-opacity);
+  width: 1px;
+  height: 100%;
+  min-height: 34px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 .header__title-logo:hover {
   border-bottom: 0;
@@ -997,8 +1064,6 @@ a[class*=" icon-"]:hover:before {
   margin: -6px auto;
 }
 .header__title__inner {
-  display: table-cell;
-  vertical-align: middle;
   padding-left: 16px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1043,7 +1108,7 @@ a[class*=" icon-"]:hover:before {
   margin-left: 0;
 }
 .user-menu-list .user-menu-list__item.user .icon-user:before {
-  color: #076dbf;
+  color: var(--primary);
 }
 /* -- CONTENT STYLES -- */
 .content {
@@ -1157,11 +1222,11 @@ a[class*=" icon-"]:hover:before {
   border: 1px solid #efefef;
 }
 .content-box__info {
-  background-color: #EEF4F7;
+  background-color: var(--surface-bg);
   padding: 10px 16px;
   margin-top: 16px;
   margin-bottom: -16px;
-  color: #777;
+  color: var(--text-secondary);
   margin-left: -16px;
   margin-right: -16px;
 }
@@ -1187,7 +1252,8 @@ a[class*=" icon-"]:hover:before {
 .sidebar {
   position: relative;
   box-sizing: border-box;
-  background-color: #fff;
+  background-color: var(--sidebar-bg);
+  color: var(--on-sidebar-text);
   z-index: 5;
   overflow: auto;
   min-height: 100%;
@@ -1283,7 +1349,7 @@ a[class*=" icon-"]:hover:before {
 }
 .sidebar-menu__heading {
   line-height: 1.25;
-  border-bottom: 1px solid rgba(39, 85, 119, 0.12);
+  border-bottom: 1px solid var(--divider-color);
   margin-bottom: 8px;
   padding-bottom: 6px;
 }
@@ -1302,7 +1368,7 @@ a[class*=" icon-"]:hover:before {
   position: absolute;
   left: -24px;
   top: 0;
-  background-color: #FFBA3F;
+  background-color: var(--primary);
   zoom: 1;
   filter: alpha(opacity=0);
   -webkit-opacity: 0;
@@ -1322,14 +1388,14 @@ a[class*=" icon-"]:hover:before {
 }
 .sidebar-menu__link {
   display: inline-block;
-  color: #212121;
+  color: var(--on-sidebar-text);
   text-decoration: none;
 }
 .sidebar-menu__link:hover {
-  color: #076dbf;
+  color: var(--primary);
 }
 .sidebar-menu__item--selected .sidebar-menu__link {
-  color: #076dbf;
+  color: var(--primary);
   font-weight: bold;
 }
 .lt-ie9 .sidebar-menu__link:after {
@@ -1345,7 +1411,7 @@ a[class*=" icon-"]:hover:before {
   top: 0;
   bottom: 0;
   background-color: #fff;
-  border-left: 1px solid #efefef;
+  border-left: 1px solid var(--divider-color);
 }
 /*-- Meta info --*/
 .meta-info {
@@ -1358,10 +1424,12 @@ a[class*=" icon-"]:hover:before {
   margin-top: -25px;
 }
 .path__item {
-  color: #aaa;
+  color: var(--text-secondary);
 }
 .path__item:before {
   content: "";
+  position: relative;
+  top: -1px;
   display: inline-block;
   vertical-align: middle;
   width: 4px;
@@ -1372,7 +1440,7 @@ a[class*=" icon-"]:hover:before {
   -moz-background-clip: padding;
   border-radius: 2px;
   background-clip: padding-box;
-  background-color: #FFBA3F;
+  background-color: var(--divider-primary-color);
   margin-left: 3px;
   margin-right: 3px;
 }
@@ -1380,18 +1448,17 @@ a[class*=" icon-"]:hover:before {
   display: none;
 }
 .path__link {
-  color: #aaa;
+  color: var(--text-secondary);
   text-decoration: none;
-  border-bottom: 1px solid #e9e9e9;
+  border-bottom: 1px solid transparent;
 }
 .path__link:hover {
-  color: #076dbf;
-  border-bottom-color: #076dbf;
-  border-bottom-color: rgba(7, 109, 191, 0.4);
+  color: var(--link-hover-color);
+  border-bottom-color: var(--link-hover-color);
 }
 /* -- Permission --*/
 .permission-label {
-  background-color: #999;
+  background-color: var(--icon-color);
   width: 20px;
   height: 20px;
   -webkit-border-radius: 3px;
@@ -1406,13 +1473,13 @@ a[class*=" icon-"]:hover:before {
   line-height: 20px;
 }
 .permission-label.allow {
-  background-color: #00C775;
+  background-color: var(--success);
 }
 .permission-label.deny {
-  background-color: #F77268;
+  background-color: var(--error);
 }
 .permission-label.mask {
-  background-color: #F77268;
+  background-color: var(--error);
 }
 /* Authorization */
 .auth-form {
@@ -1442,11 +1509,11 @@ a[class*=" icon-"]:hover:before {
 .auth-form__btn {
   margin-top: 5px;
   font-size: 16px;
-  background-color: #076dbf;
+  background-color: var(--primary);
   padding: 0 2.5em;
   height: 43px;
   line-height: 43px;
-  font-family: "lato_local";
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
   border-radius: 21px;
 }
 .auth-form__error {
@@ -1495,7 +1562,7 @@ a[class*=" icon-"]:hover:before {
   color: #000;
 }
 .children-table__name__link:hover {
-  color: #076dbf;
+  color: var(--primary);
   text-decoration: none;
 }
 .children-table__action {
@@ -1573,12 +1640,12 @@ a[class*=" icon-"]:hover:before {
 }
 .nextgis.claro .dgrid-header,
 .nextgis.claro .dgrid-footer {
-  background: #EEF4F7;
+  background: var(--surface-bg);
   filter: none;
 }
 .nextgis.claro .dgrid-header .dgrid-cell,
 .nextgis.claro .dgrid-footer .dgrid-cell {
-  border-color: #dedede;
+  border-color: var(--divider-color);
 }
 .nextgis.claro .dgrid-header .dgrid-cell:hover,
 .nextgis.claro .dgrid-footer .dgrid-cell:hover {
@@ -1586,7 +1653,7 @@ a[class*=" icon-"]:hover:before {
   filter: none;
 }
 .nextgis.claro .dgrid-cell {
-  border-color: #dedede;
+  border-color: var(--divider-color);
 }
 .nextgis.claro .dgrid-row {
   background: #fff;
@@ -1627,7 +1694,7 @@ a[class*=" icon-"]:hover:before {
 }
 .nextgis.claro .dijitSelect,
 .nextgis.claro .dijitTextBox {
-  border-radius: 4px;
+  border-radius: var(--border-radius-root);
   overflow: hidden;
 }
 .nextgis.claro .dijitSelect .dijitInputField,
@@ -1642,7 +1709,7 @@ a[class*=" icon-"]:hover:before {
 .nextgis.claro .dijitSelect .dijitButtonContents,
 .nextgis.claro .dijitTextBox,
 .nextgis.claro .dijitTextBox .dijitButtonNode {
-  border-color: rgba(0, 0, 0, 0.16);
+  border-color: var(--input-border-color);
 }
 .nextgis.claro .dijitSelectHover,
 .nextgis.claro .dijitTextBoxHover,
@@ -1652,7 +1719,7 @@ a[class*=" icon-"]:hover:before {
   background-color: #fff;
 }
 .nextgis.claro .dijitTextBoxFocused {
-  border-color: #076dbf;
+  border-color: var(--primary);
 }
 .nextgis.claro .dijitTextArea {
   padding: 4px;
@@ -1687,7 +1754,7 @@ textarea {
 .nextgis.claro .dijitTabContainerBottom-tabs,
 .nextgis.claro .dijitTabContainerLeft-tabs,
 .nextgis.claro .dijitTabContainerRight-tabs {
-  border-color: #dedede;
+  border-color: var(--divider-color);
 }
 .nextgis.claro .dijitTabPaneWrapper .dijitTab,
 .nextgis.claro .dijitTabContainerTop-tabs .dijitTab,
@@ -1696,7 +1763,7 @@ textarea {
 .nextgis.claro .dijitTabContainerRight-tabs .dijitTab {
   padding: 0px 12px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: .8px;
   font-size: 13px;
   background: none;
   border: 1px solid transparent;
@@ -1707,7 +1774,7 @@ textarea {
   -moz-transition: none;
   -o-transition: none;
   transition: none;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--text-secondary);
   height: 39px;
   line-height: 38px;
 }
@@ -1716,14 +1783,14 @@ textarea {
 .nextgis.claro .dijitTabContainerBottom-tabs .dijitTab:hover,
 .nextgis.claro .dijitTabContainerLeft-tabs .dijitTab:hover,
 .nextgis.claro .dijitTabContainerRight-tabs .dijitTab:hover {
-  color: rgba(0, 0, 0, 0.87);
+  color: var(--text-base);
 }
 .nextgis.claro .dijitTabPaneWrapper .dijitTabChecked,
 .nextgis.claro .dijitTabContainerTop-tabs .dijitTabChecked,
 .nextgis.claro .dijitTabContainerBottom-tabs .dijitTabChecked,
 .nextgis.claro .dijitTabContainerLeft-tabs .dijitTabChecked,
 .nextgis.claro .dijitTabContainerRight-tabs .dijitTabChecked {
-  color: rgba(0, 0, 0, 0.87);
+  color: var(--text-base);
 }
 .nextgis.claro .dijitTabPaneWrapper .dijitTabError,
 .nextgis.claro .dijitTabContainerTop-tabs .dijitTabError,
@@ -1750,9 +1817,9 @@ textarea {
   margin-bottom: -1px;
 }
 .nextgis.claro .dijitTabContainerTop-tabs .dijitTabChecked {
-  border-top-color: #076dbf;
-  border-left-color: #dedede;
-  border-right-color: #dedede;
+  border-top-color: var(--primary);
+  border-left-color: var(--divider-color);
+  border-right-color: var(--divider-color);
   background-color: #fff;
 }
 .nextgis.claro .dijitTabContainerTopChildWrapper.dijitVisible {
@@ -1761,10 +1828,28 @@ textarea {
 .nextgis.claro .dijitEditorIFrameContainer {
   padding: 16px;
 }
+.nextgis.claro .dijitButton {
+  cursor: pointer;
+}
+.nextgis.claro .dijitButton:hover {
+  position: relative;
+}
+.nextgis.claro .dijitButton:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background-color: currentColor;
+  opacity: var(--hover-opacity-root);
+  pointer-events: none;
+}
 .nextgis.claro .dijitButton--primary,
 .nextgis.claro .dijitButton--default {
   margin: 0;
-  border-radius: 23px;
+  border-radius: var(--border-radius-root);
   font-size: 16px;
 }
 .nextgis.claro .dijitButton--primary + .dijitButton--primary,
@@ -1787,7 +1872,7 @@ textarea {
   background-color: inherit;
   border: 0;
   color: inherit;
-  border-radius: 23px;
+  border-radius: var(--border-radius-root);
   padding: 0 16px;
   font-family: "lato_local";
   transition: none;
@@ -1801,15 +1886,12 @@ textarea {
   vertical-align: baseline;
 }
 .nextgis.claro .dijitButton--primary {
-  background-color: #076dbf;
-  color: #fff;
-}
-.nextgis.claro .dijitButton--primary:hover {
-  background: #05518e;
+  background-color: var(--primary);
+  color: var(--on-primary-text);
 }
 .nextgis.claro .dijitButton--default {
-  background-color: #e5eef7;
-  color: #076dbf;
+  background-color: var(--secondary);
+  color: var(--on-secondary-text);
 }
 .nextgis.claro .dijitButton--s {
   font-size: 14px;
@@ -1830,8 +1912,8 @@ textarea {
   top: -1px;
   width: 5px;
   height: 5px;
-  border-radius: 50%;
-  background-color: #00b77e;
+  border-radius: var(--border-radius-root);
+  background-color: var(--accent);
   border: 2px solid #fff;
   display: none;
 }
@@ -1857,7 +1939,7 @@ textarea {
 .nextgis.claro .dijitMenuItemSelected {
   background-color: rgba(0, 0, 0, 0.04);
   background-image: none;
-  color: #212121;
+  color: var(--text-base);
 }
 .nextgis.claro .dijitComboBoxMenu {
   padding-top: 5px;
@@ -1905,7 +1987,7 @@ textarea {
   cursor: pointer;
 }
 .nextgis.claro .dijitTreeNodeDisabled {
-  opacity: 0.24;
+  opacity: .24;
 }
 .nextgis.claro .dijitTreeNodeDisabled * {
   cursor: not-allowed;
@@ -1926,7 +2008,7 @@ textarea {
 }
 .nextgis.claro .dijitDialogUnderlay {
   background: #010910;
-  opacity: 0.75;
+  opacity: .75;
 }
 .nextgis.claro .dijitCalendar {
   background-color: #fff;
@@ -1943,7 +2025,7 @@ textarea {
   margin-bottom: 4px;
 }
 .nextgis.claro .dijitCalendar .dijitDropDownButton .dijitButtonNode {
-  border-color: rgba(0, 0, 0, 0.16);
+  border-color: var(--input-border-color);
 }
 .nextgis.claro .dijitCalendar .dijitDropDownButton:hover .dijitButtonNode,
 .nextgis.claro .dijitCalendar .dijitDropDownButton.dijitDropDownButtonHover .dijitButtonNode {
@@ -1952,22 +2034,22 @@ textarea {
 }
 .nextgis.claro .dijitCalendarPreviousMonth,
 .nextgis.claro .dijitCalendarNextMonth {
-  background-color: #e5eef7;
-  border-bottom-color: #dedede;
+  background-color: var(--secondary);
+  border-bottom-color: var(--divider-color);
 }
 .nextgis.claro .dijitCalendarPreviousMonth .dijitCalendarDateLabel,
 .nextgis.claro .dijitCalendarNextMonth .dijitCalendarDateLabel {
-  border-color: #e5eef7;
+  border-color: var(--secondary);
 }
 .nextgis.claro .dijitCalendarDateTemplate {
   font-weight: normal;
-  color: #212121;
+  color: var(--text-base);
   font-size: 13px;
 }
 .nextgis.claro .dijitCalendarSelectedDate .dijitCalendarDateLabel {
-  background-color: #076dbf;
+  background-color: var(--primary);
   color: #fff;
-  border-color: #076dbf;
+  border-color: var(--primary);
   font-family: "Roboto";
 }
 .nextgis.claro .dijitCalendarSelectedDate.dijitCalendarHoveredDate .dijitCalendarDateLabel {
@@ -1977,25 +2059,25 @@ textarea {
 }
 .nextgis.claro .dijitCalendarHoveredDate .dijitCalendarDateLabel {
   background-color: rgba(0, 0, 0, 0.04);
-  color: #076dbf;
+  color: var(--primary);
   border-color: rgba(0, 0, 0, 0.04);
 }
 .nextgis.claro .dijitCalendarDayLabel {
   font-size: 13px;
-  color: #212121;
+  color: var(--text-base);
 }
 .nextgis.claro .dijitCalendarMonthLabel {
-  color: #212121;
+  color: var(--text-base);
   font-size: 14px;
 }
 .nextgis.claro .dijitCalendarYearLabel {
-  color: #212121;
+  color: var(--text-base);
   font-size: 14px;
   padding: 2px 0 3px;
 }
 .nextgis.claro .dijitCalendarNextYear,
 .nextgis.claro .dijitCalendarPreviousYear {
-  color: #212121;
+  color: var(--text-base);
   font-size: 13px;
   padding: 2px 4px;
 }

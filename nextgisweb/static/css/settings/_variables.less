@@ -6,9 +6,9 @@
 @headerHeight: 42px;
 
 @text-color: #212121;
-@light-text: #aaa;
+@light-text: #AFB8C0;
 @light-text-2: #777;
-@text-muted: #777;
+@text-muted: #808A93;
 
 @blue: #076dbf;
 @darkBlue: #036997;
@@ -35,7 +35,7 @@
 
 @font-size-md: 16px;
 
-@icon-color: #999;
+@icon-color: #B3B9BE;
 
 @input-border-color: rgba(0, 0, 0, .16);
 
@@ -48,3 +48,55 @@
 @danger: #F44336;
 @warning: #FFBA3F;
 @success: @green;
+
+:root{
+// Colors
+  --primary: @primary;
+  --secondary: @secondary;
+  --accent: @accent;
+  --error: @danger;
+  --warning: @warning;
+  --success: @success;
+  --on-primary-text: #fff;
+  --on-secondary-text: var(--primary);
+  --on-accent-text: #fff;
+  --on-error-text: #fff;
+  --on-warning-text: #fff;
+// Global
+  --border-radius-root: @border-radius-base;
+  --bg-base: @bgColor;
+  --link-color: var(--primary);
+  --link-hover-color: @link-hover;
+  --icon-color: @icon-color;
+  --hover-opacity-root: .08;
+  --surface-bg: @lightBlue-2;
+  --surface-bg-darker: @gray-bg;
+  --on-surface-text: var(--text-base);
+// Typography
+  --text-base: @text-color;
+  --text-secondary: #808A93;
+  --text-disabled: #AFB8C0;
+  --body-font-family: @base-font;
+  --body-font-weight: 400;
+  --heading-font-family: @header-font;
+  --heading-font-weight: 700;
+// Dividers
+  --divider-opacity: .12; // used for styling dividers of variable colors
+  --divider-color: rgba(0,0,0, .08);
+  --divider-color-lighter: rgba(0,0,0, .04);
+  --divider-primary-color: fade(@primary, 48);
+// Inputs
+  --input-border-color: @input-border-color;
+// Header
+  --header-bg: @secondary;
+  --on-header-text: @primary;
+// User avatar
+  --user-avatar-bg: var(--primary);
+  --user-avata-text: var(--on-primary-text);
+// Sidebar panel (resource type, right menu)
+  --sidebar-bg: #fff;
+  --sidebar-text: var(--text-base);
+// Icon menu (left menu on the map)
+  --icon-menu-bg: var(--primary);
+  --icon-menu-text: var(--on-primary-text)
+}

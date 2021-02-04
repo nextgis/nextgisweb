@@ -40,9 +40,9 @@ body.annotations-edit .ol-popup.annotation:hover .edit-controls {
   cursor: pointer;
   display: block;
   font-size: 16px;
-  color: #777;
+  color: var(--icon-color);
 }
 
 .ol-popup.annotation .edit-controls span:hover {
-  color: #076dbf;
+  color: var(--primary);
 }

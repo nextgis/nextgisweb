@@ -17,13 +17,12 @@ table {
   }
 
   th {
-    font-weight: bold;
-    color: @light-text;
-    color: rgba(33, 33, 33, 0.86);
+    font-weight: 600;
+    color: var(--text-base);
   }
 
   td, th {
-    border-bottom: 1px solid @light-border;
+    border-bottom: 1px solid var(--divider-color);
     .transition(background-color .4s);
     vertical-align: middle;
     border-left: 0;
@@ -39,7 +38,7 @@ table {
   tbody {
     th {
       text-transform: none;
-      color: @text-color;
+      color: var(--text-base);
       font-weight: bold;
       text-align: left;
     }
@@ -109,9 +108,9 @@ table {
     }
 
     &.table-keyvalue__key {
-      border-bottom-color: #e1e1e1;
+      border-bottom-color: var(--divider-color);
       font-weight: normal;
-      color: @light-text;
+      color: var(--text-secondary);
       letter-spacing: 0;
     }
 
@@ -144,7 +143,7 @@ table {
 .table-keyvalue__value__inner {
   position: relative;
   top: 4px;
-  background-color: @bgColor;
+  background-color: var(--bg-base);
 }
 
 .content-box {

@@ -4,12 +4,12 @@
   justify-content: center;
   margin: 0;
   font-size: @font-size-md;;
-  font-family: @header-font;
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
   height: 36px;
   padding: 0 16px;
   border: 0;
-  background: @primary;
-  border-radius: @border-radius-base;
+  background: var(--primary);
+  border-radius: var(--border-radius-root);
   color: #fff;
   box-shadow: none;
   outline: 0;
@@ -22,21 +22,34 @@
   }
 
   &:hover {
-    background-color: darken(@blue, 10%);
+    position: relative;
+
+    &::before{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      background-color: currentColor;
+      opacity: var(--hover-opacity-root);
+      pointer-events: none;
+    }
 
     .ngw-button__icon {
-      color: #fff;
+      color: var(--on-primary-text);
       opacity: 1;
     }
   }
 
   &--primary {
-    background: @primary;
-    color: #fff;
+    background: var(--primary);
+    color: var(--on-primary-text);
 
-    &:hover {
-      background-color: darken(@blue, 10%);
-    }
+    // &:hover {
+    //   background-color: darken(@blue, 10%);
+    // }
   }
 
   & + .ngw-button {
@@ -61,11 +74,13 @@
   }
 
   &--secondary {
-    background-color: @secondary;
-    color: @primary;
+    background-color: var(--secondary);
+    color: var(--on-secondary-text);
 
     &:hover {
-      background-color: darken(@secondary, 5%);
+      .ngw-button__icon {
+        color: var(--on-secondary-text);
+      }
     }
   }
 
@@ -80,28 +95,28 @@
 
   &--outlined {
     background-color: transparent;
-    border: 1px solid @primary;
-    color: @primary;
+    border: 1px solid var(--primary);
+    color: var(--primary);
 
     &.ngw-button--secondary {
-      border-color: @input-border-color;
-      color: @text-muted;
+      border-color: var(--input-border-color);
+      color: var(--text-secondary);
     }
 
     &:hover {
       background-color: transparent;
-      color: darken(@primary, 10%);
-      border-color: darken(@primary, 10%);
+      color: var(--on-secondary-text);
+      border-color: var(--primary);
 
       .ngw-button__icon {
-        color: darken(@primary, 10%);
+        color: var(--primary);
       }
     }
 
     &.ngw-button--secondary {
       &:hover {
         .ngw-button__icon {
-          color: @primary;
+          color: var(--primary);
         }
       }
     }

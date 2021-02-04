@@ -33,7 +33,7 @@
     font-size: 17px;
     font-feature-settings: 'liga';
     vertical-align: middle;
-    color: #999;
+    color: var(--icon-color);
     margin-left: -5px;
     margin-right: -5px;
 }

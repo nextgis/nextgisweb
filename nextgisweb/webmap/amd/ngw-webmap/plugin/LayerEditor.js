@@ -205,7 +205,7 @@ define([
         _buildStandby: function () {
             var standby = new Standby({
                 target: "webmap-wrapper",
-                color: '#e5eef7'
+                color: 'var(--secondary)'
             });
             document.body.appendChild(standby.domNode);
             standby.startup();

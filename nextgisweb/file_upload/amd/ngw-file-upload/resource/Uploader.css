@@ -14,7 +14,8 @@
   justify-content: center;
   height: 100%;
   box-sizing: border-box;
-  background-color: #EEF4F7;
+  background-color: var(--surface-bg);
+  color: var(--on-surface-text);
   padding: 44px 26px 48px;
   text-align: center;
   font-size: 16px;
@@ -28,7 +29,7 @@
     top: 12px;
     right: 12px;
     bottom: 12px;
-    border: 3px dashed #dedede;
+    border: 3px dashed var(--divider-color);
     transition: left .3s, right .3s, top .3s, bottom .3s;
   }
 
@@ -114,14 +115,13 @@
   }
 
   .uploader__link__btn:hover ~ .uploader__link__text{
-    color: #2196F3;
-    border-bottom-color: #2196F3;
-    border-bottom-color: rgba(33, 150, 243, 0.4);
+    color: var(--link-hover-color);
+    border-bottom-color: var(--link-hover-color);
   }
 
 .uploader__help{
   font-size: 14px;
-  color: rgba(0,0,0,.54);
+  color: var(--text-secondary);
   margin-top: 2px;
 }
 
@@ -129,7 +129,7 @@
   font-size: 48px;
     display: block;
     margin-top: 0px;
-    color: rgba(0,0,0,.54);
+    color: var(--icon-color);
     line-height: 1;
     margin-bottom: 4px;
 }

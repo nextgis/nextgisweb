@@ -93,7 +93,7 @@ define([
                     color: 'rgba(7, 109, 191, .2)'
                 }),
                 stroke: new ol.style.Stroke({
-                    color: '#076dbf',
+                    color: getComputedStyle(document.documentElement).getPropertyValue('--primary'),
                     width: 2
                 }),
                 image: new ol.style.Circle({

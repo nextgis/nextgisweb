@@ -66,6 +66,12 @@
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
 
+    <script>
+        window.MSInputMethodContext && 
+        document.documentMode && 
+        require(["ie11-custom-properties/ie11CustomProperties"]);
+    </script>
+    
     %if hasattr(self, 'assets'):
         ${self.assets()}
     %endif

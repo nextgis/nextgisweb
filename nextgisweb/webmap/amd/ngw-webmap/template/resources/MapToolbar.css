@@ -29,8 +29,8 @@
         height: 30px;
         line-height: 29px;
         background: #fff;
-        color: #076dbf;
-        fill: #076dbf;
+        color: var(--primary);
+        fill: var(--primary);
         box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
         transition: none;
         text-shadow: none;
@@ -38,12 +38,10 @@
 
     .claro .map-toolbar .ol-control .dijitButtonNode:hover{
         background: #f9fafb;
-        color: #00b77e;
-        fill: #00b77e;
     }
 
     .claro .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode{
-        background: #00b77e;
+        background: var(--primary);
         color: #fff;
         fill: #fff;
     }

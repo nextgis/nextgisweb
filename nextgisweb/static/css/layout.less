@@ -20,36 +20,36 @@
 
 /* -- BASE STYLES -- */
 @font-face {
-  .font-face(@base-font, ~'../font/roboto-regular', normal, normal);
+  .font-face('Roboto', ~'../font/roboto-regular', normal, normal);
 }
 
 @font-face {
-  .font-face(@base-font, ~'../font/roboto-bold', bold, normal);
+  .font-face('Roboto', ~'../font/roboto-bold', bold, normal);
 }
 
 @font-face {
-  .font-face(@header-font, ~'../font/lato/lato-regular', normal, normal);
+  .font-face('lato_local', ~'../font/lato/lato-regular', normal, normal);
 }
 
 @font-face {
-  .font-face(@header-font, ~'../font/lato/lato-bold', bold, normal);
+  .font-face('lato_local', ~'../font/lato/lato-bold', bold, normal);
 }
 
 
 .pure-g [class *="pure-u"] {
-  font-family: @base-font;
+  font-family: var(--body-font-family), Roboto, sans-serif;
 }
 
 body, html {
   height: 100%;
-  font-family: @base-font;
+  font-family: var(--body-font-family), 'Roboto', sans-serif;
 }
 
 body {
   font-size: 14px;
   line-height: 1.55;
-  color: @text-color;
-  background-color: @bgColor;
+  color: var(--text-base);
+  background-color: var(--bg-base);
   min-width: @min-width;
 }
 
@@ -95,7 +95,7 @@ a:hover [class^="icon-"]:before,
 a:hover [class*=" icon-"]:before,
 a[class^="icon-"]:hover:before,
 a[class*=" icon-"]:hover:before {
-  color: @yellow;
+  color: var(--primary);
 }
 
 .icon-viewMap:before {
@@ -124,7 +124,7 @@ a[class*=" icon-"]:hover:before {
   text-decoration: none;
 
   &:hover {
-    color: @link-hover;
+    color: var(--link-hover-color);
     text-decoration: none;
   }
 }
@@ -156,13 +156,23 @@ a[class*=" icon-"]:hover:before {
   position: relative;
   box-sizing: border-box;
   padding: 15px 15px 15px 0;
-  background-color: @lightBlue;
+  background-color: var(--header-bg);
   z-index: 10;
   line-height: 1.5;
   font-size: 15px;
-  font-family: @header-font, 'Roboto', Arial, sans-serif;
-  border-bottom: 1px solid rgba(0, 0, 0, .04);
-  color: @blue;
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
+  color: var(--on-header-text);
+
+  &::after{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: currentColor;
+    opacity: var(--divider-opacity);
+  }
 
   a {
     text-decoration: none;
@@ -170,10 +180,11 @@ a[class*=" icon-"]:hover:before {
   }
 
   .header__title {
-    display: table;
+    display: flex;
+    align-items: center;
     color: inherit;
     vertical-align: top;
-    font-weight: bold;
+    font-weight: var(--heading-font-weight);
     min-height: 34px;
     margin-top: -7px;
     margin-bottom: -7px;
@@ -188,7 +199,7 @@ a[class*=" icon-"]:hover:before {
   right: 16px;
   top: 0;
   bottom: 0;
-  font-weight: bold;
+  font-weight: var(--heading-font-weight);
   margin-top: auto;
   margin-bottom: auto;
   height: 34px;
@@ -229,12 +240,25 @@ a[class*=" icon-"]:hover:before {
 }
 
 .header__title-logo {
-  display: table-cell;
-  vertical-align: middle;
-  border-right: 1px solid #b4d0ea;
+  position: relative;
   min-width: 50px;
   padding: 6px 12px;
   box-sizing: border-box;
+
+  &:after{
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: currentColor;
+    opacity: var(--divider-opacity);
+    width: 1px;
+    height: 100%;
+    min-height: 34px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
 
   &:hover {
     border-bottom: 0;
@@ -248,8 +272,6 @@ a[class*=" icon-"]:hover:before {
 }
 
 .header__title__inner {
-  display: table-cell;
-  vertical-align: middle;
   padding-left: 16px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -308,7 +330,7 @@ a[class*=" icon-"]:hover:before {
 
     &.user {
       .icon-user:before {
-        color: @blue;
+        color: var(--primary);
       }
     }
   }
@@ -451,11 +473,11 @@ a[class*=" icon-"]:hover:before {
 }
 
 .content-box__info {
-  background-color: @lightBlue-2;
+  background-color: var(--surface-bg);
   padding: 10px 16px;
   margin-top: 16px;
   margin-bottom: -16px;
-  color: @light-text-2;
+  color: var(--text-secondary);
   .padding-block__stretch;
 }
 
@@ -487,7 +509,8 @@ a[class*=" icon-"]:hover:before {
 .sidebar {
   position: relative;
   box-sizing: border-box;
-  background-color: @white;
+  background-color: var(--sidebar-bg);
+  color: var(--on-sidebar-text);
   z-index: 5;
   overflow: auto;
   min-height: 100%;
@@ -504,7 +527,7 @@ a[class*=" icon-"]:hover:before {
 
 .sidebar-menu__heading {
   line-height: 1.25;
-  border-bottom: 1px solid rgba(39, 85, 119, 0.12);
+  border-bottom: 1px solid var(--divider-color);
   margin-bottom: 8px;
   padding-bottom: 6px;
 
@@ -526,7 +549,7 @@ a[class*=" icon-"]:hover:before {
     position: absolute;
     left: -24px;
     top: 0;
-    background-color: @yellow;
+    background-color: var(--primary);
     .opacity(0);
     .transition(opacity .2s);
   }
@@ -540,16 +563,16 @@ a[class*=" icon-"]:hover:before {
 
 .sidebar-menu__link {
   display: inline-block;
-  color: @text-color;
+  color: var(--on-sidebar-text);
   text-decoration: none;
 
   &:hover {
-    color: @blue;
+    color: var(--primary);
   }
 }
 
 .sidebar-menu__item--selected .sidebar-menu__link {
-  color: @blue;
+  color: var(--primary);
   font-weight: bold;
 }
 
@@ -570,7 +593,7 @@ a[class*=" icon-"]:hover:before {
   top: 0;
   bottom: 0;
   background-color: @white;
-  border-left: 1px solid @light-border;
+  border-left: 1px solid var(--divider-color);
 }
 
 ;
@@ -589,15 +612,17 @@ a[class*=" icon-"]:hover:before {
 }
 
 .path__item {
-  color: @light-text;
+  color: var(--text-secondary);
 
   &:before {
     content: "";
+    position: relative;
+    top: -1px;
     display: inline-block;
     vertical-align: middle;
     .size(4px);
     .border-radius(2);
-    background-color: @yellow;
+    background-color: var(--divider-primary-color);
     margin-left: 3px;
     margin-right: 3px;
   }
@@ -608,21 +633,20 @@ a[class*=" icon-"]:hover:before {
 }
 
 .path__link {
-  color: @light-text;
+  color: var(--text-secondary);
   text-decoration: none;
-  border-bottom: 1px solid #e9e9e9;
+  border-bottom: 1px solid transparent;
 
   &:hover {
-    color: @blue;
-    border-bottom-color: @blue;
-    border-bottom-color: fade(@blue, 40%);
+    color: var(--link-hover-color);
+    border-bottom-color: var(--link-hover-color);
   }
 }
 
 /* -- Permission --*/
 
 .permission-label {
-  background-color: #999;
+  background-color: var(--icon-color);
   .size(20px);
   .border-radius(3);
   font-size: 12px;
@@ -631,15 +655,15 @@ a[class*=" icon-"]:hover:before {
   line-height: 20px;
 
   &.allow {
-    background-color: @green;
+    background-color: var(--success);
   }
 
   &.deny {
-    background-color: #F77268;
+    background-color:var(--error);
   }
 
   &.mask {
-    background-color: #F77268;
+    background-color:var(--error);
   }
 }
 
@@ -672,11 +696,11 @@ a[class*=" icon-"]:hover:before {
 .auth-form__btn {
   margin-top: 5px;
   font-size: 16px;
-  background-color: @blue;
+  background-color: var(--primary);
   padding: 0 2.5em;
   height: 43px;
   line-height: 43px;
-  font-family: @header-font;
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
   border-radius: 21px;
 }
 
@@ -723,7 +747,7 @@ a[class*=" icon-"]:hover:before {
   color: @black;
 
   &:hover {
-    color: @blue;
+    color: var(--primary);
     text-decoration: none;
   }
 }

@@ -1,18 +1,18 @@
 h1, h2, h3,
 .h1, .h2, .h3 {
-  font-family: @header-font;
-  font-weight: bold;
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
+  font-weight: var(--heading-font-weight);
   line-height: 1.1;
 }
 
 h1, .h1 {
   font-size: 24px;
-  color: @black;
+  color: var(--text-base);
 }
 
 h2, .h2 {
   font-size: 18px;
-  color: @text-color;
+  color: var(--text-base);
   border-bottom: 0;
   margin-top: 48px;
   padding-bottom: 0;
@@ -24,18 +24,17 @@ h2, .h2 {
 }
 
 .text-muted {
-  color: #bbb;
-  color: rgba(0, 0, 0, .4);
+  color: var(--text-secondary);
 }
 
 .heading {
   font-size: 13px;
   text-transform: uppercase;
-  font-family: @header-font;
+  font-family: var(--heading-font-family), 'lato_local', sans-serif;
   letter-spacing: 1px;
   word-spacing: 1px;
-  font-weight: normal;
-  color: #777;
+  font-weight: var(--body-font-weight);
+  color: var(--text-secondary);
   margin-bottom: 12px;
   margin-top: 20px;
 }

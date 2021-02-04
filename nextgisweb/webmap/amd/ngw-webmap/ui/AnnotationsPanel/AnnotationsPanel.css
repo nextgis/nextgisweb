@@ -21,20 +21,20 @@
   height: 23px;
   line-height: 21px;
   background: #fff;
-  color: #076dbf;
-  fill: #076dbf;
+  color: var(--primary);
+  fill: var(--primary);
   transition: none;
   text-shadow: none;
 }
 
 .annotations-panel .annotations-table-container .ol-control .dijitButtonNode:hover {
   background: #f9fafb;
-  color: #00b77e;
-  fill: #00b77e;
+  color: var(--primary);
+  fill: var(--primary);
 }
 
 .annotations-panel .annotations-table-container .ol-control.dijitToggleButtonChecked .dijitButtonNode {
-  background: #00b77e;
+  background: var(--primary);
   color: #fff;
   fill: #fff;
 }

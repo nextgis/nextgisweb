@@ -22,7 +22,7 @@
 
 .search-panel__header.focus .search-panel__field-icon,
 .search-panel__field-icon:hover{
-    color:#076dbf;
+    color:var(--primary);
 }
 
 .search-panel__field::-webkit-input-placeholder {color:#bbb;}

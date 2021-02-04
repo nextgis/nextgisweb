@@ -1,10 +1,27 @@
 .nextgis.claro {
 
   .dijitButton {
+    cursor: pointer;
+
+    &:hover{
+      position: relative;
+      &::before{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        background-color: currentColor;
+        opacity: var(--hover-opacity-root);
+        pointer-events: none;
+      }
+    }
 
     &--primary, &--default {
       margin: 0;
-      border-radius: 23px;
+      border-radius: var(--border-radius-root);
       font-size: @font-size-md;
 
       & + .dijitButton--primary,
@@ -25,7 +42,7 @@
         background-color: inherit;
         border: 0;
         color: inherit;
-        border-radius: 23px;
+        border-radius: var(--border-radius-root);
         padding: 0 16px;
         font-family: @header-font;
         transition: none;
@@ -41,17 +58,13 @@
     }
 
     &--primary {
-      background-color: @blue;
-      color: #fff;
-
-      &:hover {
-        background: darken(@blue, 10%);
-      }
+      background-color: var(--primary);
+      color: var(--on-primary-text);
     }
 
     &--default {
-      background-color: @lightBlue;
-      color: @blue;
+      background-color: var(--secondary);
+      color: var(--on-secondary-text);
     }
 
     &--s {
@@ -78,8 +91,8 @@
         top: -1px;
         width: 5px;
         height: 5px;
-        border-radius: 50%;
-        background-color: #00b77e;
+        border-radius: var(--border-radius-root);
+        background-color: var(--accent);
         border: 2px solid #fff;
         display: none;
       }

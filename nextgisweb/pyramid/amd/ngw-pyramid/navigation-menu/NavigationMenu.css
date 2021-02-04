@@ -1,8 +1,8 @@
 .navigation-menu{
     width: 50px;
     padding: 8px 0 !important;
-    background-color: #076dbf;
-    color: #fff;
+    background-color: var(--icon-menu-bg, var(--primary));
+    color: var(--icon-menu-text, var(--on-primary-text));
 }
     .navigation-menu__item{
         text-align:center;

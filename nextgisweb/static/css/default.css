@@ -1,6 +1,6 @@
 div.caption { font-size: 20px; padding-top: 8px; font-weight: bold;}
 
-ul.ngwModelWidgetError { border: 1px solid #D46464; margin: 0 0 1ex 0;}
+ul.ngwModelWidgetError { border: 1px solid var(--error); margin: 0 0 1ex 0;}
 ul.ngwModelWidgetError li { padding: .5ex 0;}
 
 
@@ -12,7 +12,7 @@ ul.ngwModelWidgetError li { padding: .5ex 0;}
 
 .dijitTabContainerTopChildWrapper.dijitVisible { height: 100%; }
 
-.CodeMirror { font-size: 12px; border: 1px solid #efefef; background-color: #fff;}
+.CodeMirror { font-size: 12px; border: 1px solid var(--divider-color); background-color: #fff;}
 
 .CodeMirror-autoHeight .CodeMirror {
   height: auto;    

@@ -40,22 +40,22 @@
   height: 30px;
   line-height: 29px;
   background: #fff;
-  color: #076dbf;
-  fill: #076dbf;
+  color: var(--primary);
+  fill: var(--primary);
   transition: none;
   text-shadow: none;
 }
 
 .claro .edit-toolbar .ol-control .dijitButtonNode:hover {
   background: #f9fafb;
-  color: #00b77e;
-  fill: #00b77e;
+  color: var(--primary);
+  fill: var(--primary);
 }
 
 .claro .edit-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode {
-  background: #00b77e;
-  color: #fff;
-  fill: #fff;
+  background: var(--primary);
+  color: var(--on-primary-text);
+  fill: var(--on-primary-text);
 }
 
 .claro .edit-toolbar .ol-control .dijitButtonNode .dijitButtonContents {
