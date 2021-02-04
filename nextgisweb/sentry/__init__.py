@@ -18,6 +18,10 @@ class SentryComponent(Component):
         super(SentryComponent, self).__init__(env, settings)
 
         if 'dsn' in self.options:
+            # Patch MAX_STRING_LENGTH to prevent clipping of big error messages,
+            # especially for mako template tracebacks.
+            sentry_sdk.utils.MAX_STRING_LENGTH = 8192
+
             sentry_sdk.init(
                 self.options['dsn'],
                 integrations=[
