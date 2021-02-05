@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from lxml import etree
 
+from dateutil.parser import isoparse
 from owslib.crs import Crs
 import requests
 from osgeo import ogr, osr
@@ -281,11 +282,11 @@ class WFSConnection(Base, Resource):
                         else:
                             value = _property.text
                     elif datatype == FIELD_TYPE.DATE:
-                        value = datetime.fromisoformat(_property.text)
+                        value = isoparse(_property.text)
                     elif datatype == FIELD_TYPE.TIME:
                         value = datetime.strptime(_property.text, r'%H:%M:%S')
                     elif datatype == FIELD_TYPE.DATETIME:
-                        value = datetime.fromisoformat(_property.text)
+                        value = isoparse(_property.text)
                     else:
                         raise ValidationError("Unknown data type: %s" % datatype)
                     fields[key] = value
