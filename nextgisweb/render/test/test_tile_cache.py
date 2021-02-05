@@ -8,8 +8,9 @@ import six
 import pytest
 import transaction
 from PIL import Image, ImageDraw
+from shapely.geometry import Point
 
-from nextgisweb.geometry import Point
+from nextgisweb.lib.geometry import Geometry
 from nextgisweb.models import DBSession
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.spatial_ref_sys import SRS
@@ -133,8 +134,8 @@ def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, caplog):
     frtc.put_tile(tile_invalid, img_cross_red)
     frtc.put_tile(tile_valid, img_cross_red)
 
-    frtc.invalidate(Point(
-        *frtc.resource.srs.tile_center(tile_invalid),
+    frtc.invalidate(Geometry.from_shape(Point(
+        *frtc.resource.srs.tile_center(tile_invalid)),
         srid=None))
 
     exists, cimg = frtc.get_tile(tile_invalid)

@@ -37,7 +37,7 @@ def test_geom_transform(ngw_webtest_app, srs_msk23_id):
     )
     g1 = geom_from_wkt(result.json["geom"])
     g2 = geom_from_wkt("LINESTRING(4187839.2436 7508807.8513,14683040.8356 5330254.9437)")
-    assert g2.almost_equals(g1, 4)
+    assert g2.shape.almost_equals(g1.shape, 4)
 
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 4326,
@@ -45,7 +45,7 @@ def test_geom_transform(ngw_webtest_app, srs_msk23_id):
     )
     g1 = geom_from_wkt(result.json["geom"])
     g2 = geom_from_wkt(MOSCOW_VLADIVOSTOK)
-    assert g2.almost_equals(g1, 6)
+    assert g2.shape.almost_equals(g1.shape, 6)
 
 
 def test_geom_length(ngw_webtest_app, srs_msk23_id):

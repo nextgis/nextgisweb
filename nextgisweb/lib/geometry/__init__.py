@@ -5,7 +5,10 @@ from warnings import warn
 
 from pyproj import CRS, Transformer as pyTr
 from shapely import wkt, wkb
-from shapely.geometry import mapping, shape
+from shapely.geometry import (
+    mapping as geometry_mapping,
+    shape as geometry_shape,
+    box as geometry_box)
 from shapely.ops import transform as map_coords
 
 
@@ -44,8 +47,14 @@ class Geometry(object):
 
     @staticmethod
     def from_geojson(data, srid=None):
-        shape_obj = shape(data)
+        shape_obj = geometry_shape(data)
         return Geometry.from_shape(shape_obj, srid=srid)
+
+    @staticmethod
+    def from_box(minx, miny, maxx, maxy, srid=None):
+        return Geometry.from_shape(
+            geometry_box(minx, miny, maxx, maxy),
+            srid=srid)
 
     # Base output formats
 
@@ -73,7 +82,7 @@ class Geometry(object):
     # Additional output formats
 
     def to_geojson(self):
-        return mapping(self.shape)
+        return geometry_mapping(self.shape)
 
     # Shapely providers
 
@@ -107,3 +116,35 @@ class Transformer(object):
         else:
             shape_obj = map_coords(self._transformer.transform, geom.shape)
             return Geometry.from_shape(shape_obj)
+
+
+def geom_calc(geom, crs, prop, srid):
+    # pyproj < 2.3
+    def geodesic_calc_with_postgis():
+        # TODO: Remove these cludges after pyproj upgarade
+        from sqlalchemy import func
+        from ...models import DBSession
+
+        fun = dict(length=func.ST_Length, area=func.ST_Area)[prop]
+        query = fun(func.geography(func.ST_GeomFromText(geom.wkt, srid)))
+
+        return DBSession.query(query).scalar()
+
+    factor = crs.axis_info[0].unit_conversion_factor
+    calcs = dict(
+        length=lambda: geodesic_calc_with_postgis() if crs.is_geographic else geom.length * factor,
+        area=lambda: geodesic_calc_with_postgis() if crs.is_geographic else geom.area * factor**2
+    )
+
+    # pyproj >= 2.3
+    # calcs = dict(
+    #     length=lambda: crs.get_geod().geometry_length(geom)
+    #         if crs.is_geographic else geom.length * factor,
+    #     area=lambda: crs.get_geod().geometry_area_perimeter(geom)[0]
+    #         if crs.is_geographic else geom.area * factor**2
+    # )
+
+    if prop not in calcs:
+        return None
+
+    return calcs[prop]()

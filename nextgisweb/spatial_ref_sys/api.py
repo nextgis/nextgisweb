@@ -8,8 +8,7 @@ from pyproj import CRS
 
 from ..core.exception import ValidationError
 from ..env import env
-from ..geometry import geom_calc as shp_geom_calc
-from ..lib.geometry import Geometry, Transformer
+from ..lib.geometry import Geometry, Transformer, geom_calc as shp_geom_calc
 from ..models import DBSession
 
 from .models import SRS
