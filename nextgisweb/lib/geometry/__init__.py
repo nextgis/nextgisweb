@@ -31,28 +31,28 @@ class Geometry(object):
 
     # Base constructors
 
-    @staticmethod
-    def from_wkb(data, srid=None):
-        return Geometry(wkb=data, srid=srid)
+    @classmethod
+    def from_wkb(cls, data, srid=None):
+        return cls(wkb=data, srid=srid)
 
-    @staticmethod
-    def from_wkt(data, srid=None):
-        return Geometry(wkt=data, srid=srid)
+    @classmethod
+    def from_wkt(cls, data, srid=None):
+        return cls(wkt=data, srid=srid)
 
-    @staticmethod
-    def from_shape(data, srid=None):
-        return Geometry(shape_obj=data, srid=srid)
+    @classmethod
+    def from_shape(cls, data, srid=None):
+        return cls(shape_obj=data, srid=srid)
 
     # Additional constructors
 
-    @staticmethod
-    def from_geojson(data, srid=None):
+    @classmethod
+    def from_geojson(cls, data, srid=None):
         shape_obj = geometry_shape(data)
-        return Geometry.from_shape(shape_obj, srid=srid)
+        return cls.from_shape(shape_obj, srid=srid)
 
-    @staticmethod
-    def from_box(minx, miny, maxx, maxy, srid=None):
-        return Geometry.from_shape(
+    @classmethod
+    def from_box(cls, minx, miny, maxx, maxy, srid=None):
+        return cls.from_shape(
             geometry_box(minx, miny, maxx, maxy),
             srid=srid)
 
