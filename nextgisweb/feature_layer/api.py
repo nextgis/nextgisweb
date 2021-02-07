@@ -17,7 +17,7 @@ from datetime import datetime, date, time
 from osgeo import ogr, gdal
 from pyproj import CRS
 from pyramid.response import Response, FileResponse
-from pyramid.httpexceptions import HTTPNoContent
+from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..geometry import (
@@ -39,7 +39,7 @@ from .interface import (
     FIELD_TYPE)
 from .feature import Feature
 from .extension import FeatureExtension
-from .ogrdriver import EXPORT_FORMAT_OGR
+from .ogrdriver import EXPORT_FORMAT_OGR, MVT_DRIVER_EXIST
 from .exception import FeatureNotFound
 from .util import _
 
@@ -181,6 +181,9 @@ def export(request):
 
 
 def mvt(request):
+    if not MVT_DRIVER_EXIST:
+        return HTTPNotFound(explanation='MVT GDAL driver not found')
+
     z = int(request.GET["z"])
     x = int(request.GET["x"])
     y = int(request.GET["y"])
