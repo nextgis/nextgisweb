@@ -316,17 +316,18 @@ class WFSHandler():
 
             if IBboxLayer.providedBy(feature_layer):
                 extent = feature_layer.extent
-                if self.p_version >= v110:
-                    _ns_ows = nsmap('ows', self.p_version)['ns']
-                    __bbox = El('WGS84BoundingBox', namespace=_ns_ows, parent=__type)
-                    El('LowerCorner', namespace=_ns_ows, parent=__bbox,
-                       text='%.6f %.6f' % (extent['minLon'], extent['minLat']))
-                    El('UpperCorner', namespace=_ns_ows, parent=__bbox,
-                       text='%.6f %.6f' % (extent['maxLon'], extent['maxLat']))
-                else:
-                    bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
-                                minx=str(extent['minLon']), miny=str(extent['minLat']))
-                    El('LatLongBoundingBox', bbox, parent=__type)
+                if None not in extent.values():
+                    if self.p_version >= v110:
+                        _ns_ows = nsmap('ows', self.p_version)['ns']
+                        __bbox = El('WGS84BoundingBox', namespace=_ns_ows, parent=__type)
+                        El('LowerCorner', namespace=_ns_ows, parent=__bbox,
+                           text='%.6f %.6f' % (extent['minLon'], extent['minLat']))
+                        El('UpperCorner', namespace=_ns_ows, parent=__bbox,
+                           text='%.6f %.6f' % (extent['maxLon'], extent['maxLat']))
+                    else:
+                        bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
+                                    minx=str(extent['minLon']), miny=str(extent['minLat']))
+                        El('LatLongBoundingBox', bbox, parent=__type)
 
     def _parse_filter(self, __filter, layer):
         fids = list()
