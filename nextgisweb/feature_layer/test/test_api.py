@@ -17,6 +17,8 @@ from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys.models import SRS
 from nextgisweb.vector_layer import VectorLayer
 
+from nextgisweb.test.reload import reload_module
+
 
 def test_identify(ngw_webtest_app):
     data = {
@@ -31,7 +33,6 @@ def test_identify(ngw_webtest_app):
 @pytest.fixture(scope='module')
 def vector_layer_id(ngw_resource_group):
     with transaction.manager:
-
         obj = VectorLayer(
             parent_id=ngw_resource_group, display_name='vector_layer',
             owner_user=User.by_keyname('administrator'),
@@ -228,6 +229,26 @@ def test_mvt(extent, simplification, padding, ngw_webtest_app, vector_layer_id, 
     params = dict(z=0, x=0, y=0, resource=vector_layer_id,
                   extent=extent, simplification=simplification, padding=padding)
     ngw_webtest_app.get('/api/component/feature_layer/mvt', params, status=200)
+
+
+@pytest.mark.parametrize('mvt_driver_exist, status_expected', (
+        (True, 200),
+        (False, 404),
+))
+def test_mvt_should_return_not_found_if_mvt_driver_not_available(mvt_driver_exist, status_expected, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+    import nextgisweb.feature_layer.ogrdriver as ogrdriver
+    old_MVT_DRIVER_EXIST = ogrdriver.MVT_DRIVER_EXIST
+    ogrdriver.MVT_DRIVER_EXIST = mvt_driver_exist
+
+    import nextgisweb.feature_layer.api as api
+    reload_module(api)
+
+    params = dict(z=0, x=0, y=0, resource=vector_layer_id,
+                  extent=2048, simplification=4.1, padding=0.1)
+    ngw_webtest_app.get('/api/component/feature_layer/mvt', params, status=status_expected)
+
+    ogrdriver.MVT_DRIVER_EXIST = old_MVT_DRIVER_EXIST
+    reload_module(api)
 
 
 def test_cdelete(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
