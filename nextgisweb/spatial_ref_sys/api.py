@@ -134,8 +134,6 @@ def catalog_import(request):
 
     obj = SRS(
         display_name=srs['display_name'],
-        # auth_name=srs['auth_name'],
-        # auth_srid=srs['auth_srid'],
         wkt=srs['wkt'],
         catalog_id=srs['id']
     )
