@@ -138,7 +138,14 @@ def catalog_import(request):
         # auth_srid=srs['auth_srid'],
         wkt=srs['wkt'],
         catalog_id=srs['id']
-    ).persist()
+    )
+
+    if None not in (srs['auth_name'], srs['auth_srid'], srs['postgis_srid']):
+        obj.id = srs['postgis_srid']
+        obj.auth_name = srs['auth_name']
+        obj.auth_srid = srs['auth_srid']
+
+    obj.persist()
     DBSession.flush()
 
     return dict(id=obj.id)
