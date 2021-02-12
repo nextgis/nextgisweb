@@ -50,8 +50,8 @@ class LayerField(Base):
         'polymorphic_on': cls
     }
     __table_args__ = (
-        db.UniqueConstraint(layer_id, keyname),
-        db.UniqueConstraint(layer_id, display_name),
+        db.UniqueConstraint(layer_id, keyname, deferrable=True, initially='DEFERRED'),
+        db.UniqueConstraint(layer_id, display_name, deferrable=True, initially='DEFERRED'),
     )
 
     layer = db.relationship(
