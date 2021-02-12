@@ -405,8 +405,12 @@ class MigrationCreateCommand(Command):
             reg.migration_path(component), revision, parents=parents,
             date=date, message=args.message)
 
-        cwd = Path().resolve()
-        outfiles = [p.resolve().relative_to(cwd) for p in outfiles]
+        # Use relative paths only if possible
+        try:
+            cwd = Path().resolve()
+            outfiles = [p.resolve().relative_to(cwd) for p in outfiles]
+        except ValueError:
+            outfiles = [p.resolve() for p in outfiles]
 
         print("Migration [{}:{}] created:\n* ".format(
             component, revision) + '\n* '.join(map(str, outfiles)))
