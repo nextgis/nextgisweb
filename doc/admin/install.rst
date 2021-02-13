@@ -170,7 +170,8 @@ After that, you can run builtin HTTP server:
 
   $ nextgisweb server
 
-Check that your web browser can open ``http://localhost:8080``. Then press
+Check that your web browser can open ``http://localhost:8080``, and then log in
+using the default username ``administrator`` with password ``admin``. Then press
 ``Ctrl + C`` to halt HTTP server. NextGIS Web is installed and should work
 properly, but builtin HTTP server is not suitable for production purposes.
 
