@@ -1,4 +1,7 @@
-<%! from nextgisweb.feature_layer.util import _ %>
+<%!
+    from nextgisweb.feature_layer.util import _
+    from nextgisweb.resource import DataStructureScope
+%>
 <%
     have_lookup_table = False
     for field in obj.fields:
@@ -17,22 +20,24 @@
             %endif
             <th style="text-align: center; width: 20%;">${tr(_("Table"))}</th>
         </tr></thead>
-        %for field in obj.fields:
-            <tr style="${'text-decoration: underline;' if field.id == obj.feature_label_field_id else '' | n}">
-                <td>${field.keyname}</td>
-                <td>${field.datatype}</td>
-                <td>${field.display_name}</td>
-                %if have_lookup_table:
-                    <td style="text-align: center;">
-                    %if field.lookup_table is not None:
-                        <a href="${field.lookup_table.permalink(request)}">${tr(_("Yes"))}</a>
-                    %else:
-                        ${tr(_("No"))}
+        %if DataStructureScope.read in obj.permissions(request.user):
+            %for field in obj.fields:
+                <tr style="${'text-decoration: underline;' if field.id == obj.feature_label_field_id else '' | n}">
+                    <td>${field.keyname}</td>
+                    <td>${field.datatype}</td>
+                    <td>${field.display_name}</td>
+                    %if have_lookup_table:
+                        <td style="text-align: center;">
+                        %if field.lookup_table is not None:
+                            <a href="${field.lookup_table.permalink(request)}">${tr(_("Yes"))}</a>
+                        %else:
+                            ${tr(_("No"))}
+                        %endif
+                        </td>
                     %endif
-                    </td>
-                %endif
-                <td style="text-align: center;">${tr(_("Yes")) if field.grid_visibility else tr(_("No")) | n}</td>
-            </tr>
-        %endfor
+                    <td style="text-align: center;">${tr(_("Yes")) if field.grid_visibility else tr(_("No")) | n}</td>
+                </tr>
+            %endfor
+        %endif
     </table>
 </div>
