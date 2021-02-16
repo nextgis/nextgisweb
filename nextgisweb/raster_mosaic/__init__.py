@@ -10,7 +10,8 @@ class RasterMosaicComponent(Component):
     metadata = Base.metadata
 
     def setup_pyramid(self, config):
-        from . import view
+        from . import api, view
+        api.setup_pyramid(self, config)
 
     def workdir_filename(self, fobj, makedirs=False):
         return self.env.core.workdir_filename(self, fobj, makedirs)
