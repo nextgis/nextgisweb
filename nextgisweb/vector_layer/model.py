@@ -600,7 +600,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         self.after_all_feature_delete.fire(resource=self)
 
-        # TODO: Implement on_data_change
+        geom = box(self.srs.minx, self.srs.miny, self.srs.maxx, self.srs.maxy)
+        on_data_change.fire(self, geom)
 
     # IBboxLayer implementation:
     @property
