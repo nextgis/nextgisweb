@@ -68,4 +68,5 @@ class WebMapComponent(Component):
         Option('popup_width', int, default=300, doc="Popup width in pixels."),
         Option('popup_height', int, default=200, doc="Popup height in pixels."),
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
+        Option('enable_share_panel', default=True),
     )

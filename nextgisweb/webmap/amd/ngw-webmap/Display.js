@@ -179,6 +179,32 @@ define([
         }
     });
 
+    var menuItems = [{
+        title: i18n.gettext('Layers'),
+        icon: 'layers',
+        name: 'layers',
+        value: 'layersPanel'
+    }, {
+        title: i18n.gettext('Search'),
+        icon: 'search',
+        name: 'search',
+        value: 'searchPanel'
+    }];
+    if (webmapClientSettings.enable_share_panel) {
+        menuItems.push({
+            title: i18n.gettext('Share'),
+            icon: 'share',
+            name: 'share',
+            value: 'sharePanel'
+        });
+    }
+    menuItems.push({
+        title: i18n.gettext('Print map'),
+        icon: 'print',
+        name: 'print',
+        value: 'printMapPanel'
+    });
+
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
 
@@ -204,32 +230,7 @@ define([
         emptyModeURLValue: 'none',
 
         activeLeftPanel: 'layersPanel',
-        navigationMenuItems: [
-            {
-                title: i18n.gettext('Layers'),
-                icon: 'layers',
-                name: 'layers',
-                value: 'layersPanel'
-            },
-            {
-                title: i18n.gettext('Search'),
-                icon: 'search',
-                name: 'search',
-                value: 'searchPanel'
-            },
-            {
-                title: i18n.gettext('Share'),
-                icon: 'share',
-                name: 'share',
-                value: 'sharePanel'
-            },
-            {
-                title: i18n.gettext('Print map'),
-                icon: 'print',
-                name: 'print',
-                value: 'printMapPanel'
-            }
-        ],
+        navigationMenuItems: menuItems,
         constructor: function (options) {
             declare.safeMixin(this, options);
 
