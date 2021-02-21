@@ -47,6 +47,7 @@ class WebMap(Base, Resource):
     extent_right = db.Column(db.Float, default=+180)
     extent_bottom = db.Column(db.Float, default=-90)
     extent_top = db.Column(db.Float, default=+90)
+    extent_constrained = db.Column(db.Boolean, default=False)
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(db.Boolean, nullable=False, default=False)
@@ -76,6 +77,7 @@ class WebMap(Base, Resource):
             bookmark_resource_id=self.bookmark_resource_id,
             extent=(self.extent_left, self.extent_bottom,
                     self.extent_right, self.extent_top),
+            extent_constrained=self.extent_constrained,
         )
 
     def from_dict(self, data):
@@ -92,6 +94,9 @@ class WebMap(Base, Resource):
         if 'extent' in data:
             self.extent_left, self.extent_bottom, \
                 self.extent_right, self.extent_top = data['extent']
+        
+        if 'extent_constrained' in data:
+            self.extent_constrained = data['extent_constrained']
 
         if 'editable' in data:
             self.editable = data['editable']
@@ -243,6 +248,7 @@ class WebMapSerializer(Serializer):
     extent_right = SP(**_mdargs)
     extent_bottom = SP(**_mdargs)
     extent_top = SP(**_mdargs)
+    extent_constrained = SP(**_mdargs)
 
     draw_order_enabled = SP(**_mdargs)
     editable = SP(**_mdargs)

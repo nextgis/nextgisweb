@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-02-02 19:11+0000\n"
+"POT-Creation-Date: 2021-02-21 18:19+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -31,11 +31,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:28 model.py:37 view.py:180 view.py:201
+#: model.py:28 model.py:37 view.py:181 view.py:202
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:30 view.py:187
+#: model.py:30 view.py:188
 msgid "Display"
 msgstr "Открыть"
 
@@ -47,68 +47,68 @@ msgstr "Просмотр аннотаций"
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: view.py:36 view.py:202
+#: view.py:36 view.py:203
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:208
+#: view.py:209
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-webmap/Display.js:209 amd/ngw-webmap/Display.js:1002
+#: amd/ngw-webmap/Display.js:183 amd/ngw-webmap/Display.js:1004
 #: amd/ngw-webmap/ItemWidget.js:246
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:215
+#: amd/ngw-webmap/Display.js:188
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:221 amd/ngw-webmap/Display.js:431
+#: amd/ngw-webmap/Display.js:195 amd/ngw-webmap/Display.js:432
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:227 amd/ngw-webmap/Display.js:326
+#: amd/ngw-webmap/Display.js:202 amd/ngw-webmap/Display.js:327
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:365 amd/ngw-webmap/Display.js:372
+#: amd/ngw-webmap/Display.js:366 amd/ngw-webmap/Display.js:373
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:395 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:396 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:530 amd/ngw-webmap/Display.js:540
+#: amd/ngw-webmap/Display.js:531 amd/ngw-webmap/Display.js:541
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:720 amd/ngw-webmap/tool/Zoom.js:19
+#: amd/ngw-webmap/Display.js:722 amd/ngw-webmap/tool/Zoom.js:19
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:453
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:721 amd/ngw-webmap/tool/Zoom.js:22
+#: amd/ngw-webmap/Display.js:723 amd/ngw-webmap/tool/Zoom.js:22
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:454
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:725
+#: amd/ngw-webmap/Display.js:727
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:741
+#: amd/ngw-webmap/Display.js:743
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:744
+#: amd/ngw-webmap/Display.js:746
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:467
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/ExtentWidget.js:33
+#: amd/ngw-webmap/ExtentWidget.js:34
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
@@ -199,11 +199,15 @@ msgstr "Охват по слою"
 msgid "Select layer"
 msgstr "Выберите слой"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:44
+#: amd/ngw-webmap/template/ExtentWidget.hbs:46
+msgid "Constrained extent"
+msgstr "Ограничить охват"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:49
 msgid "Select vector layer"
 msgstr "Выберите векторный слой"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:46
+#: amd/ngw-webmap/template/ExtentWidget.hbs:51
 msgid "Bookmark resource"
 msgstr "Ресурс закладок"
 

@@ -121,6 +121,7 @@ def setup_pyramid(comp, config):
 
         config = dict(
             extent=tmp["extent"],
+            extent_constrained=tmp["extent_constrained"],
             rootItem=traverse(obj.root_item),
             mid=dict(
                 adapter=tuple(display.mid.adapter),
