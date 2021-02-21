@@ -94,7 +94,7 @@ class WebMap(Base, Resource):
         if 'extent' in data:
             self.extent_left, self.extent_bottom, \
                 self.extent_right, self.extent_top = data['extent']
-        
+
         if 'extent_constrained' in data:
             self.extent_constrained = data['extent_constrained']
 

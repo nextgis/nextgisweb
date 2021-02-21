@@ -91,13 +91,14 @@ define([
         this._precompose = lang.hitch(this, this.precompose);
         this._postcompose = lang.hitch(this, this.postcompose);
     };
-    ol.inherits(Swipe, ol.control.Control);
+    Swipe.prototype = Object.create(ol.control.Control.prototype);
+    Swipe.prototype.constructor = Swipe;
 
     Swipe.prototype.setMap = function (map) {
         if (this.getMap()) {
             array.forEach(this.layers, function (layer) {
-                layer.un('precompose', this._precompose);
-                layer.un('postcompose', this._postcompose);
+                layer.un('prerender', this._precompose);
+                layer.un('postrender', this._postcompose);
             }, this);
             this.getMap().render();
         }
@@ -106,8 +107,8 @@ define([
 
         if (map) {
             array.forEach(this.layers, function (layer) {
-                layer.on('precompose', this._precompose);
-                layer.on('postcompose', this._postcompose);
+                layer.on('prerender', this._precompose);
+                layer.on('postrender', this._postcompose);
             }, this);
             map.render();
         }
@@ -118,8 +119,8 @@ define([
             if (this.layers.indexOf(layer) === -1) {
                 this.layers.push(layer);
                 if (this.getMap()) {
-                    layer.on('precompose', this._precompose);
-                    layer.on('postcompose', this._postcompose);
+                    layer.on('prerender', this._precompose);
+                    layer.on('postrender', this._postcompose);
                     this.getMap().render();
                 }
             }
@@ -130,8 +131,8 @@ define([
         array.forEach(layers, function (layer, idx) {
             if (this.layers.indexOf(layer) !== -1) {
                 if (this.getMap()) {
-                    layer.un('precompose', this._precompose);
-                    layer.un('postcompose', this._postcompose);
+                    layer.un('prerender', this._precompose);
+                    layer.un('postrender', this._postcompose);
                     this.layers.splice(idx, 1);
                     this.getMap().render();
                 }
@@ -154,10 +155,17 @@ define([
         ctx.clip();
     };
 
-    Swipe.prototype.postcompose = function (event) {
-        var ctx = event.context;
-        ctx.restore();
-    };
+    Swipe.prototype.postcompose = function (e) {
+        // restore context when decluttering is done
+        // https://github.com/openlayers/openlayers/issues/10096
+        if (e.target.getClassName()!=='ol-layer' && e.target.get('declutter')) {
+          setTimeout(function () {
+            e.context.restore();
+          }, 0);
+        } else {
+          e.context.restore();
+        }
+      };
 
     return Swipe;
 });

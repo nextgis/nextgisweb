@@ -72,7 +72,9 @@ define([
             handleEvent: Control.prototype.handleClickEvent
         });
     };
-    ol.inherits(Control, ol.interaction.Interaction);
+
+    Control.prototype = Object.create(ol.interaction.Interaction.prototype);
+    Control.prototype.constructor = Control;
 
     Control.prototype.handleClickEvent = function(evt) {
         if (evt.type == 'singleclick') {

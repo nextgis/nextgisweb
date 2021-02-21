@@ -63,7 +63,8 @@ define([
         });
     };
 
-    ol.inherits(Popup, ol.Overlay);
+    Popup.prototype = Object.create(ol.Overlay.prototype);
+    Popup.prototype.constructor = Popup;
 
     Popup.prototype.setTitle = function (title) {
         this.titleSpan.innerHTML = title;
