@@ -28,6 +28,7 @@ class SentryComponent(Component):
                     PyramidIntegration(),
                     SqlalchemyIntegration(),
                 ],
+                ignore_errors = [KeyboardInterrupt],
                 environment=self.options['environment'],
                 shutdown_timeout=self.options['shutdown_timeout'],
             )
