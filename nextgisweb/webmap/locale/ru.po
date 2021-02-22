@@ -200,8 +200,8 @@ msgid "Select layer"
 msgstr "Выберите слой"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:46
-msgid "Constrained extent"
-msgstr "Ограничить охват"
+msgid "Constrain to extent"
+msgstr "Фиксировать охват"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:49
 msgid "Select vector layer"
