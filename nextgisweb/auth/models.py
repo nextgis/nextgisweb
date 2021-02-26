@@ -149,6 +149,10 @@ class User(Principal):
     def by_keyname(cls, keyname):
         return cls.filter_by(keyname=keyname).one()
 
+    __table_args__ = (
+        sa.Index('auth_user_lower_keyname_idx', sa.func.lower(keyname), unique=True),
+    )
+
 
 class Group(Principal):
     __tablename__ = 'auth_group'

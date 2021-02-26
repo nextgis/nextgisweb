@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 import six
+import sqlalchemy as sa
 from logging import getLogger
 from datetime import datetime, timedelta
 from base64 import b64decode
@@ -157,7 +158,7 @@ class AuthenticationPolicy(object):
 
         # Step 1: Authentication with local credentials
 
-        q = User.filter_by(keyname=username)
+        q = User.filter(sa.func.lower(User.keyname) == username.lower())
         if self.oauth and not self.oauth.local_auth:
             q = q.filter_by(oauth_subject=None)
 
