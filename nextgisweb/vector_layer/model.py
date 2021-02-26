@@ -100,6 +100,32 @@ SCHEMA = 'vector_layer'
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
+class ERROR_TOLERANCE(object):
+    STRICT = 'STRICT'
+    SAFE = 'SAFE'
+    LOSSY = 'LOSSY'
+    SKIP = 'SKIP'
+
+    enum = (STRICT, SAFE, LOSSY, SKIP)
+
+
+error_tolerance_default = ERROR_TOLERANCE.STRICT
+
+
+class TOGGLE(object):
+    AUTO = 'AUTO'
+    YES = 'YES'
+    NO = 'NO'
+
+    enum = (AUTO, YES, NO)
+
+
+geom_cast_params_default = dict(
+    geometry_type=TOGGLE.AUTO,
+    is_multi=TOGGLE.AUTO,
+    has_z=TOGGLE.AUTO)
+
+
 class FieldDef(object):
 
     def __init__(
@@ -123,44 +149,90 @@ class TableInfo(object):
         self.table = None
         self.model = None
         self.fmap = None
+        self.geometry_type = None
 
     @classmethod
-    def from_ogrlayer(cls, ogrlayer, srs_id, strdecode):
+    def from_ogrlayer(cls, ogrlayer, srs_id, strdecode, geom_cast_params):
         self = cls(srs_id)
 
+        if geom_cast_params['geometry_type'] == GEOM_TYPE.POINT:
+            geom_filter = set(GEOM_TYPE.points)
+        elif geom_cast_params['geometry_type'] == GEOM_TYPE.LINESTRING:
+            geom_filter = set(GEOM_TYPE.linestrings)
+        elif geom_cast_params['geometry_type'] == GEOM_TYPE.POLYGON:
+            geom_filter = set(GEOM_TYPE.polygons)
+        else:
+            geom_filter = set(GEOM_TYPE.enum)
+
+        if geom_cast_params['is_multi'] == TOGGLE.NO:
+            geom_filter -= set(GEOM_TYPE.is_multi)
+        elif geom_cast_params['is_multi'] == TOGGLE.YES:
+            geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
+
+        if geom_cast_params['has_z'] == TOGGLE.NO:
+            geom_filter -= set(GEOM_TYPE.has_z)
+        elif geom_cast_params['has_z'] == TOGGLE.NO:
+            geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
+
         ltype = ogrlayer.GetGeomType()
-        self.geometry_type = _GEOM_OGR_2_TYPE[ltype]
 
-        is_multi = self.geometry_type in GEOM_TYPE.is_multi
-        has_z = self.geometry_type in GEOM_TYPE.has_z
+        if len(geom_filter) == 1:
+            self.geometry_type = geom_filter.pop()
+        if ltype in GEOM_TYPE_OGR:
+            geometry_type = _GEOM_OGR_2_TYPE[ltype]
+            if geometry_type in geom_filter:
+                self.geometry_type = geometry_type
+        else:
+            if len(geom_filter) > 1:
+                is_multi = False
+                has_z = False
 
-        if not is_multi or not has_z:
-            for feature in ogrlayer:
-                geom = feature.GetGeometryRef()
-                gtype = geom.GetGeometryType()
-                if ltype != gtype:
-                    if not is_multi and (
-                        ltype in (ogr.wkbPoint, ogr.wkbPoint25D) and gtype in (ogr.wkbMultiPoint, ogr.wkbMultiPoint25D)  # NOQA: E501
-                        or ltype in (ogr.wkbLineString, ogr.wkbLineString25D) and gtype in (ogr.wkbMultiLineString, ogr.wkbMultiLineString25D)  # NOQA: E501, W503
-                        or ltype in (ogr.wkbPolygon, ogr.wkbPolygon25D) and gtype in (ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D)  # NOQA: E501, W503
-                    ):
-                        self.geometry_type = _GEOM_OGR_2_TYPE[gtype]
-                        ltype = gtype
+                for feature in ogrlayer:
+                    if len(geom_filter) <= 1:
+                        break
+
+                    geom = feature.GetGeometryRef()
+                    if geom is None:
+                        continue
+                    gtype = geom.GetGeometryType()
+                    if gtype not in GEOM_TYPE_OGR:
+                        continue
+                    geometry_type = _GEOM_OGR_2_TYPE[gtype]
+
+                    if geom_cast_params['geometry_type'] == TOGGLE.AUTO:
+                        if geometry_type in GEOM_TYPE.points:
+                            geom_filter = geom_filter.intersection(set(GEOM_TYPE.points))
+                        elif geometry_type in GEOM_TYPE.linestrings:
+                            geom_filter = geom_filter.intersection(set(GEOM_TYPE.linestrings))
+                        elif geometry_type in GEOM_TYPE.polygons:
+                            geom_filter = geom_filter.intersection(set(GEOM_TYPE.polygons))
+
+                    if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi \
+                       and geometry_type in GEOM_TYPE.is_multi:
+                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
                         is_multi = True
 
-                    if not has_z and (
-                        ltype in (ogr.wkbPoint, ogr.wkbMultiPoint) and gtype in (ogr.wkbPoint25D, ogr.wkbMultiPoint25D)  # NOQA: E501
-                        or ltype in (ogr.wkbLineString, ogr.wkbMultiLineString) and gtype in (ogr.wkbLineString25D, ogr.wkbMultiLineString25D)  # NOQA: E501, W503
-                        or ltype in (ogr.wkbPolygon, ogr.wkbMultiPolygon) and gtype in (ogr.wkbPolygon25D, ogr.wkbMultiPolygon25D)  # NOQA: E501, W503
-                    ):
-                        self.geometry_type = _GEOM_OGR_2_TYPE[gtype]
-                        ltype = gtype
+                    if geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z \
+                       and geometry_type in GEOM_TYPE.has_z:
+                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
                         has_z = True
 
-                if is_multi and has_z:
-                    break
+                if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi:
+                    geom_filter = geom_filter - set(GEOM_TYPE.is_multi)
 
-            ogrlayer.ResetReading()
+                if geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z:
+                    geom_filter = geom_filter - set(GEOM_TYPE.has_z)
+
+                ogrlayer.ResetReading()
+
+            if len(geom_filter) == 1:
+                self.geometry_type = geom_filter.pop()
+
+        if self.geometry_type is None:
+            err_msg = _("Could not determine a geometry type.")
+            if len(geom_filter) == 0:
+                err_msg += " " + _("Source layer contains no features satisfying the conditions.")
+            raise VE(err_msg)  # NOQA: E501
 
         self.fields = []
 
@@ -300,7 +372,7 @@ class TableInfo(object):
         self.model = model
         self.fmap = {fld.keyname: fld.key for fld in self.fields}
 
-    def load_from_ogr(self, ogrlayer, strdecode):
+    def load_from_ogr(self, ogrlayer, strdecode, error_tolerance):
         source_osr = ogrlayer.GetSpatialRef()
         target_osr = osr.SpatialReference()
         target_osr.ImportFromEPSG(self.srs_id)
@@ -312,6 +384,11 @@ class TableInfo(object):
 
         for fid, feature in enumerate(ogrlayer):
             geom = feature.GetGeometryRef()
+            if geom is None:
+                if error_tolerance == ERROR_TOLERANCE.SKIP:
+                    continue
+                else:
+                    raise VE(_("Feature #%d doesn't have geometry.") % feature.GetFID())
 
             gtype = geom.GetGeometryType()
             if gtype not in GEOM_TYPE_OGR:
@@ -329,10 +406,34 @@ class TableInfo(object):
                     geom = ogr.ForceToMultiLineString(geom)
                 elif gtype in (ogr.wkbPolygon, ogr.wkbPolygon25D):
                     geom = ogr.ForceToMultiPolygon(geom)
+            elif gtype in (ogr.wkbMultiPoint, ogr.wkbMultiPoint25D,
+                           ogr.wkbMultiLineString, ogr.wkbMultiLineString25D,
+                           ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D):
+                if geom.GetGeometryCount() == 1:
+                    geom = geom.GetGeometryRef(0)
+                elif error_tolerance == ERROR_TOLERANCE.SKIP:
+                    continue
+                else:
+                    raise VE(_("Feature #%d have multiple geometries.") % feature.GetFID())
 
             # Force Z
             if has_z and not geom.Is3D():
                 geom.Set3D(True)
+            elif not has_z and geom.Is3D():
+                geom.Set3D(False)
+
+            # Check geometry valid
+            if not geom.IsValid():
+                gtype_before = geom.GetGeometryType()
+                invalid = True
+                if error_tolerance in (ERROR_TOLERANCE.LOSSY, ERROR_TOLERANCE.SKIP):
+                    geom = geom.Buffer(0)
+                    invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype_before
+                if invalid:
+                    if error_tolerance == ERROR_TOLERANCE.SKIP:
+                        continue
+                    else:
+                        raise VE(_("Feature #%d have invalid geometry.") % feature.GetFID())
 
             # Check geometry type again
             gtype = geom.GetGeometryType()
@@ -436,8 +537,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def _tablename(self):
         return 'layer_%s' % self.tbl_uuid
 
-    def setup_from_ogr(self, ogrlayer, strdecode):
-        tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs.id, strdecode)
+    def setup_from_ogr(self, ogrlayer, strdecode=lambda x: x,
+                       geom_cast_params=geom_cast_params_default):
+        tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs.id, strdecode, geom_cast_params)
         tableinfo.setup_layer(self)
 
         tableinfo.setup_metadata(self._tablename)
@@ -455,8 +557,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         self.tableinfo = tableinfo
 
-    def load_from_ogr(self, ogrlayer, strdecode):
-        self.tableinfo.load_from_ogr(ogrlayer, strdecode)
+    def load_from_ogr(self, ogrlayer, strdecode=lambda x: x,
+                      error_tolerance=error_tolerance_default):
+        self.tableinfo.load_from_ogr(ogrlayer, strdecode, error_tolerance)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (
@@ -757,22 +860,15 @@ class _source_attr(SP):
 
         return ogrlayer
 
-    def _ogrlayer(self, obj, ogrlayer, recode=lambda a: a):
+    def _ogrlayer(self, obj, ogrlayer, error_tolerance, geom_cast_params, recode):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
-
-        for feat in ogrlayer:
-            geom = feat.GetGeometryRef()
-            if geom is None:
-                raise VE(_("Feature #%d doesn't have geometry.") % feat.GetFID())
-
-        ogrlayer.ResetReading()
 
         obj.tbl_uuid = uuid.uuid4().hex
 
         with DBSession.no_autoflush:
-            obj.setup_from_ogr(ogrlayer, recode)
-            obj.load_from_ogr(ogrlayer, recode)
+            obj.setup_from_ogr(ogrlayer, recode, geom_cast_params)
+            obj.load_from_ogr(ogrlayer, recode, error_tolerance)
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
@@ -804,12 +900,29 @@ class _source_attr(SP):
             raise VE(_("Unsupport OGR driver: %s.") % drivername)
 
         ogrlayer = self._ogrds(ogrds)
-        geomtype = ogrlayer.GetGeomType()
-        if geomtype not in _GEOM_OGR_2_TYPE:
-            raise VE(_("Unsupported geometry type: '%s'. Probable reason: data contain mixed geometries.") % (  # NOQA: E501
-                ogr.GeometryTypeToName(geomtype) if geomtype is not None else None))
 
-        self._ogrlayer(srlzr.obj, ogrlayer, recode)
+        error_tolerance = value.get('error_tolerance', error_tolerance_default)
+        if error_tolerance not in ERROR_TOLERANCE.enum:
+            raise VE(_("Unknown 'source.error_tolerance' value."))
+
+        geometry_type = value.get('geometry_type', geom_cast_params_default['geometry_type'])
+        if geometry_type not in ('AUTO', 'POINT', 'LINESTRING', 'POLYGON'):
+            raise VE(_("Unknown 'source.geometry_type' value."))
+
+        is_multi = value.get('is_multi', geom_cast_params_default['is_multi'])
+        if is_multi not in TOGGLE.enum:
+            raise VE(_("Unknown 'source.is_multi' value."))
+
+        has_z = value.get('has_z', geom_cast_params_default['has_z'])
+        if has_z not in TOGGLE.enum:
+            raise VE(_("Unknown 'source.has_z' value."))
+
+        geom_cast_params = dict(
+            geometry_type=geometry_type,
+            is_multi=is_multi,
+            has_z=has_z)
+
+        self._ogrlayer(srlzr.obj, ogrlayer, error_tolerance, geom_cast_params, recode)
 
 
 class _fields_attr(SP):

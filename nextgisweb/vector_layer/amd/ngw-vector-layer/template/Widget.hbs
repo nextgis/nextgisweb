@@ -15,7 +15,6 @@
 
             <option value="file" selected="selected">{{gettext 'From file'}}</option>
             <option value="empty">{{gettext 'Empty layer'}}</option>
-
         </select>
     </div>
 
@@ -32,7 +31,12 @@
                 <option value="MULTIPOINT">{{gettext 'Multipoint'}}</option>
                 <option value="MULTILINESTRING">{{gettext 'Multiline'}}</option>
                 <option value="MULTIPOLYGON">{{gettext 'Multipolygon'}}</option>
-
+                <option value="POINTZ">{{gettext 'PointZ'}}</option>
+                <option value="LINESTRINGZ">{{gettext 'LineZ'}}</option>
+                <option value="POLYGONZ">{{gettext 'PolygonZ'}}</option>
+                <option value="MULTIPOINTZ">{{gettext 'MultipointZ'}}</option>
+                <option value="MULTILINESTRINGZ">{{gettext 'MultilineZ'}}</option>
+                <option value="MULTIPOLYGONZ">{{gettext 'MultipolygonZ'}}</option>
             </select>
         </div>
     </div>
@@ -52,6 +56,44 @@
                 <option value="utf-8">{{gettext 'UTF-8'}}</option>
                 <option value="windows-1251">{{gettext 'Windows-1251'}}</option>
 
+            </select>
+
+            <select data-dojo-attach-point="wSourceErrorTolerance"
+                data-dojo-type="dijit/form/Select"
+                title="{{gettext 'Error tolerance'}}" style="width: 100%">
+
+                <option value="STRICT" selected="selected">{{gettext 'Strict'}}</option>
+                <option value="SAFE">{{gettext 'Safe'}}</option>
+                <option value="LOSSY">{{gettext 'Lossy'}}</option>
+                <option value="SKIP">{{gettext 'Skip'}}</option>
+            </select>
+
+            <select data-dojo-attach-point="wSourceGeometryType"
+                data-dojo-type="dijit/form/Select"
+                title="{{gettext 'Geometry type'}}" style="width: 100%">
+
+                <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
+                <option value="POINT">{{gettext 'Point'}}</option>
+                <option value="LINESTRING">{{gettext 'Line'}}</option>
+                <option value="POLYGON">{{gettext 'Polygon'}}</option>
+            </select>
+
+            <select data-dojo-attach-point="wSourceIsMulti"
+                data-dojo-type="dijit/form/Select"
+                title="{{gettext 'Multi'}}" style="width: 100%">
+
+                <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
+                <option value="YES">{{gettext 'Yes'}}</option>
+                <option value="NO">{{gettext 'No'}}</option>
+            </select>
+
+            <select data-dojo-attach-point="wSourceHasZ"
+                data-dojo-type="dijit/form/Select"
+                title="{{gettext 'Z-coordinate'}}" style="width: 100%">
+
+                <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
+                <option value="YES">{{gettext 'Yes'}}</option>
+                <option value="NO">{{gettext 'No'}}</option>
             </select>
 
         </div>
