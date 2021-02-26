@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from collections import namedtuple
 from logging import getLogger
 import six
+import sqlalchemy as sa
 from six.moves.urllib.parse import urlencode
 
 import requests
@@ -185,7 +186,7 @@ class OAuthHelper(object):
         for idx in itertools.count():
             candidate = clean_user_keyname(keyname_base, idx)
             if User.filter(
-                User.keyname == candidate,
+                sa.func.lowe(User.keyname) == candidate.lower(),
                 User.id != user.id
             ).first() is None:
                 user.keyname = candidate
