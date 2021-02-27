@@ -6,6 +6,7 @@ import json
 import string
 import secrets
 import zope.event
+import sqlalchemy as sa
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.events import BeforeRender
@@ -342,8 +343,9 @@ def setup_pyramid(comp, config):
             self.error = []
 
             if self.operation == 'create':
-                conflict = User.filter_by(
-                    keyname=self.data.get("keyname")).first()
+                conflict = User.filter(
+                    sa.func.lower(User.keyname) == self.data.get("keyname").lower()
+                ).first()
                 if conflict:
                     result = False
                     self.error.append(dict(

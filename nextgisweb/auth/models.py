@@ -147,7 +147,7 @@ class User(Principal):
 
     @classmethod
     def by_keyname(cls, keyname):
-        return cls.filter_by(keyname=keyname).one()
+        return cls.filter(sa.func.lower(User.keyname) == keyname.lower()).one()
 
     __table_args__ = (
         sa.Index('auth_user_lower_keyname_idx', sa.func.lower(keyname), unique=True),
