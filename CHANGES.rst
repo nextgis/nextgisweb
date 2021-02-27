@@ -4,7 +4,11 @@ Changes
 3.8.0
 -----
 
-
+- Ability to constraint a webmap to default extent.
+- A user login is case insensitive when logging in.
+- Configuration option for disabling social networks share buttons.
+- Experimental support for creation of vector layers from GML files.
+- OpenLayers library upgraded to 6.5.0.
 
 3.7.0
 -----
