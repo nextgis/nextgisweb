@@ -8,7 +8,7 @@
             <th>${tr(_("Value"))}</th>
         </tr>
     </thead>
-   % for key, value in obj.val.iteritems():
+   % for key, value in obj.val.items():
    <tr>
        <td>${key}</td>
        <td>${value}</td>
