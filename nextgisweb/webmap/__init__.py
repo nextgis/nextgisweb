@@ -46,7 +46,8 @@ class WebMapComponent(Component):
             adapters=dict(
                 (i.identity, dict(display_name=i.display_name))
                 for i in WebMapAdapter.registry
-            )
+            ),
+            enable_social_networks=self.options['enable_social_networks']
         )
 
         result.update(self.settings_view(request))
@@ -68,5 +69,5 @@ class WebMapComponent(Component):
         Option('popup_width', int, default=300, doc="Popup width in pixels."),
         Option('popup_height', int, default=200, doc="Popup height in pixels."),
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
-        Option('enable_share_panel', bool, default=True),
+        Option('enable_social_networks', bool, default=True),
     )

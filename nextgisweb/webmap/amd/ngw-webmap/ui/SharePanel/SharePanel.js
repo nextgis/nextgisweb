@@ -50,6 +50,11 @@ define([
         },
         postCreate: function(){
             this.inherited(arguments);
+
+            if (!this.socialNetworks) {
+                this.contentWidget.socialNetworks.style.display = 'none';
+            }
+
             svg4everybody();
             this.contentWidget.mapWidthControl.on("change", lang.hitch(this, function(){
                 this.setEmbedCode();
