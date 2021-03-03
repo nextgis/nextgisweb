@@ -196,6 +196,11 @@ class TableInfo(object):
                     if geom is None:
                         continue
                     gtype = geom.GetGeometryType()
+                    if gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
+                       and geom.GetGeometryCount() == 1:
+                        geom = geom.GetGeometryRef(0)
+                        gtype = geom.GetGeometryType()
+
                     if gtype not in GEOM_TYPE_OGR:
                         continue
                     geometry_type = _GEOM_OGR_2_TYPE[gtype]
@@ -392,6 +397,12 @@ class TableInfo(object):
                     raise VE(_("Feature #%d doesn't have geometry.") % feature.GetFID())
 
             gtype = geom.GetGeometryType()
+            if gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
+               and geom.GetGeometryCount() == 1:
+                if error_tolerance != ERROR_TOLERANCE.STRICT:
+                    geom = geom.GetGeometryRef(0)
+                    gtype = geom.GetGeometryType()
+
             if gtype not in GEOM_TYPE_OGR:
                 raise ValidationError(_(
                     "Unknown geometry type: %d (%s).") % (

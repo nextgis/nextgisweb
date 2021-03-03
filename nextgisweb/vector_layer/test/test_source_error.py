@@ -15,6 +15,9 @@ path = Path(nextgisweb.vector_layer.test.__file__).parent / 'data' / 'errors'
 
 
 @pytest.mark.parametrize('data, error_tolerance, geometry_type, is_multi, has_z, expect_error', (
+    ('geom-collection.geojson', 'STRICT', None, None, None, True),
+    ('geom-collection.geojson', 'SAFE', None, None, None, False),
+
     ('incomplete-geom.geojson', 'LOSSY', None, None, None, True),
     ('incomplete-geom.geojson', 'SKIP', None, None, None, False),
 
