@@ -23,6 +23,7 @@ from sqlalchemy import (
 
 from ..event import SafetyEvent
 from .. import db
+from ..core.exception import ValidationError
 from ..resource import (
     Resource,
     DataScope,
@@ -31,7 +32,7 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     ResourceGroup)
-from ..resource.exception import ValidationError, ResourceError
+from ..resource.exception import ResourceError
 from ..env import env
 from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
