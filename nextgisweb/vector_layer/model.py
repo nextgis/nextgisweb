@@ -875,7 +875,11 @@ class _source_attr(SP):
             raise ValidationError("Source parameter does not apply to update vector layer.")
 
         datafile, metafile = env.file_upload.get_filename(value['id'])
-        encoding = value.get('encoding', 'utf-8')
+
+        encoding = srlzr.data.get('encoding')
+        if encoding is None:
+            # backward compatibility
+            encoding = value.get('encoding', 'utf-8')
 
         iszip = zipfile.is_zipfile(datafile)
         ogrfn = ('/vsizip/{%s}' % datafile) if iszip else datafile
@@ -901,21 +905,22 @@ class _source_attr(SP):
 
         ogrlayer = self._ogrds(ogrds)
 
-        error_tolerance = value.get('error_tolerance', error_tolerance_default)
+        error_tolerance = srlzr.data.get('error_tolerance', error_tolerance_default)
         if error_tolerance not in ERROR_TOLERANCE.enum:
-            raise VE(_("Unknown 'source.error_tolerance' value."))
+            raise VE(_("Unknown 'error_tolerance' value."))
 
-        geometry_type = value.get('geometry_type', geom_cast_params_default['geometry_type'])
+        geometry_type = srlzr.data.get(
+            'cast_geometry_type', geom_cast_params_default['geometry_type'])
         if geometry_type not in ('AUTO', 'POINT', 'LINESTRING', 'POLYGON'):
-            raise VE(_("Unknown 'source.geometry_type' value."))
+            raise VE(_("Unknown 'cast_geometry_type' value."))
 
-        is_multi = value.get('is_multi', geom_cast_params_default['is_multi'])
+        is_multi = srlzr.data.get('cast_is_multi', geom_cast_params_default['is_multi'])
         if is_multi not in TOGGLE.enum:
-            raise VE(_("Unknown 'source.is_multi' value."))
+            raise VE(_("Unknown 'cast_is_multi' value."))
 
-        has_z = value.get('has_z', geom_cast_params_default['has_z'])
+        has_z = srlzr.data.get('cast_has_z', geom_cast_params_default['has_z'])
         if has_z not in TOGGLE.enum:
-            raise VE(_("Unknown 'source.has_z' value."))
+            raise VE(_("Unknown 'cast_has_z' value."))
 
         geom_cast_params = dict(
             geometry_type=geometry_type,
@@ -958,9 +963,10 @@ class VectorLayerSerializer(Serializer):
     resclass = VectorLayer
 
     srs = SR(read=P_DSS_READ, write=P_DSS_WRITE)
-    geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
 
     source = _source_attr(read=None, write=P_DS_WRITE)
+
+    geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
     fields = _fields_attr(read=None, write=P_DS_WRITE)
 
 

@@ -49,7 +49,7 @@
         "></div>
         <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
 
-            <select data-dojo-attach-point="wSourceEncoding"
+            <select data-dojo-attach-point="wEncoding"
                 data-dojo-type="dijit/form/Select"
                 title="{{gettext 'Encoding'}}" style="width: 100%">
 
@@ -58,7 +58,7 @@
 
             </select>
 
-            <select data-dojo-attach-point="wSourceErrorTolerance"
+            <select data-dojo-attach-point="wErrorTolerance"
                 data-dojo-type="dijit/form/Select"
                 title="{{gettext 'Error tolerance'}}" style="width: 100%">
 
@@ -68,7 +68,7 @@
                 <option value="SKIP">{{gettext 'Skip'}}</option>
             </select>
 
-            <select data-dojo-attach-point="wSourceGeometryType"
+            <select data-dojo-attach-point="wCastGeometryType"
                 data-dojo-type="dijit/form/Select"
                 title="{{gettext 'Geometry type'}}" style="width: 100%">
 
@@ -78,7 +78,7 @@
                 <option value="POLYGON">{{gettext 'Polygon'}}</option>
             </select>
 
-            <select data-dojo-attach-point="wSourceIsMulti"
+            <select data-dojo-attach-point="wCastIsMulti"
                 data-dojo-type="dijit/form/Select"
                 title="{{gettext 'Multi'}}" style="width: 100%">
 
@@ -87,7 +87,7 @@
                 <option value="NO">{{gettext 'No'}}</option>
             </select>
 
-            <select data-dojo-attach-point="wSourceHasZ"
+            <select data-dojo-attach-point="wCastHasZ"
                 data-dojo-type="dijit/form/Select"
                 title="{{gettext 'Z-coordinate'}}" style="width: 100%">
 

@@ -57,11 +57,11 @@ define([
 
             if (this.modeSwitcher.get("value") === 'file') {
                 setObject("source", this.wSourceFile.get("value"));
-                setObject("source.encoding", this.wSourceEncoding.get("value"));
-                setObject("source.error_tolerance", this.wSourceErrorTolerance.get("value"));
-                setObject("source.geometry_type", this.wSourceGeometryType.get("value"));
-                setObject("source.is_multi", this.wSourceIsMulti.get("value"));
-                setObject("source.has_z", this.wSourceHasZ.get("value"));
+                setObject("encoding", this.wEncoding.get("value"));
+                setObject("error_tolerance", this.wErrorTolerance.get("value"));
+                setObject("cast_geometry_type", this.wCastGeometryType.get("value"));
+                setObject("cast_is_multi", this.wCastIsMulti.get("value"));
+                setObject("cast_has_z", this.wCastHasZ.get("value"));
             } else {
                 setObject("fields", []);
                 setObject("geometry_type", this.wGeometryType.get("value"));
