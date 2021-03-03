@@ -113,9 +113,9 @@ error_tolerance_default = ERROR_TOLERANCE.STRICT
 
 
 class TOGGLE(object):
-    AUTO = 'AUTO'
-    YES = 'YES'
-    NO = 'NO'
+    AUTO = None
+    YES = True
+    NO = False
 
     enum = (AUTO, YES, NO)
 

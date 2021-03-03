@@ -59,9 +59,20 @@ define([
                 setObject("source", this.wSourceFile.get("value"));
                 setObject("encoding", this.wEncoding.get("value"));
                 setObject("error_tolerance", this.wErrorTolerance.get("value"));
-                setObject("cast_geometry_type", this.wCastGeometryType.get("value"));
-                setObject("cast_is_multi", this.wCastIsMulti.get("value"));
-                setObject("cast_has_z", this.wCastHasZ.get("value"));
+                var cast_geometry_type = this.wCastGeometryType.get("value");
+                if (cast_geometry_type === "AUTO") {
+                    cast_geometry_type = null;
+                }
+                setObject("cast_geometry_type", cast_geometry_type);
+                function bool_toggle (value) {
+                    switch (value) {
+                        case 'YES': return true;
+                        case 'NO': return false;
+                    }
+                    return null;
+                }
+                setObject("cast_is_multi", bool_toggle(this.wCastIsMulti.get("value")));
+                setObject("cast_has_z", bool_toggle(this.wCastHasZ.get("value")));
             } else {
                 setObject("fields", []);
                 setObject("geometry_type", this.wGeometryType.get("value"));
