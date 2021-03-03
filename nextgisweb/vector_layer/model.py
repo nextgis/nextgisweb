@@ -912,7 +912,7 @@ class _source_attr(SP):
 
         geometry_type = srlzr.data.get(
             'cast_geometry_type', geom_cast_params_default['geometry_type'])
-        if geometry_type not in ('AUTO', 'POINT', 'LINESTRING', 'POLYGON'):
+        if geometry_type not in (None, 'POINT', 'LINESTRING', 'POLYGON'):
             raise VE(_("Unknown 'cast_geometry_type' value."))
 
         is_multi = srlzr.data.get('cast_is_multi', geom_cast_params_default['is_multi'])
