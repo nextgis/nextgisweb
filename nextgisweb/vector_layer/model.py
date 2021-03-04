@@ -409,12 +409,32 @@ class TableInfo(object):
                     errors.append(_("Feature #%d doesn't have geometry.") % feature.GetFID())
                 continue
 
+            if geom.GetGeometryType() in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
+               and error_tolerance != ERROR_TOLERANCE.STRICT:
+                geom_candidate = None
+                for i in range(geom.GetGeometryCount()):
+                    col_geom = geom.GetGeometryRef(i)
+                    col_gtype = col_geom.GetGeometryType()
+                    if col_gtype not in GEOM_TYPE_OGR:
+                        continue
+                    if (self.geometry_type in GEOM_TYPE.points and col_gtype in (
+                           ogr.wkbPoint, ogr.wkbPoint25D,
+                           ogr.wkbMultiPoint, ogr.wkbMultiPoint25D)) \
+                       or (self.geometry_type in GEOM_TYPE.linestrings and col_gtype in (
+                           ogr.wkbLineString, ogr.wkbLineString25D,
+                           ogr.wkbMultiLineString, ogr.wkbMultiLineString25D)) \
+                       or (self.geometry_type in GEOM_TYPE.polygons and col_gtype in (
+                           ogr.wkbPolygon, ogr.wkbPolygon25D,
+                           ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D)):
+                        if geom_candidate is None:
+                            geom_candidate = col_geom
+                        else:
+                            errors.append(_("Feature #%d have multiple geometries satisfying the conditions.") % feature.GetFID())
+                            continue
+                if geom_candidate is not None:
+                    geom = geom_candidate
+
             gtype = geom.GetGeometryType()
-            if gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
-               and geom.GetGeometryCount() == 1:
-                if error_tolerance != ERROR_TOLERANCE.STRICT:
-                    geom = geom.GetGeometryRef(0)
-                    gtype = geom.GetGeometryType()
 
             if gtype not in GEOM_TYPE_OGR:
                 errors.append(_(
@@ -439,7 +459,7 @@ class TableInfo(object):
                     geom = geom.GetGeometryRef(0)
                 else:
                     if error_tolerance != ERROR_TOLERANCE.SKIP:
-                        errors.append(_("Feature #%d have multiple geometries.") % feature.GetFID())
+                        errors.append(_("Feature #%d have multiple geometries satisfying the conditions.") % feature.GetFID())
                     continue
 
             # Force Z

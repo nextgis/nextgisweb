@@ -32,6 +32,10 @@ path = Path(nextgisweb.vector_layer.test.__file__).parent / 'data' / 'errors'
     ('self-intersection.geojson', 'SAFE', None, None, None, True),
     ('self-intersection.geojson', 'LOSSY', None, None, None, False),
 
+    ('single-geom-collection.geojson', 'STRICT', 'POINT', None, None, True),
+    ('single-geom-collection.geojson', 'SAFE', 'POINT', None, None, False),
+    ('single-geom-collection.geojson', 'SAFE', 'LINESTRING', None, None, True),
+
     ('unclosed-ring.geojson', 'LOSSY', None, None, None, True),
     ('unclosed-ring.geojson', 'SKIP', None, None, None, False),
 ))
