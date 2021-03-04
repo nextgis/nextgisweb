@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+
+import cgi
 import json
 import uuid
 import zipfile
@@ -111,6 +113,13 @@ class ERROR_TOLERANCE(object):
 
 
 error_tolerance_default = ERROR_TOLERANCE.STRICT
+
+
+ERROR_LIMIT = 10
+
+
+def translate(trstring):
+    return env.core.localizer().translate(trstring)
 
 
 class TOGGLE(object):
@@ -388,13 +397,17 @@ class TableInfo(object):
         is_multi = self.geometry_type in GEOM_TYPE.is_multi
         has_z = self.geometry_type in GEOM_TYPE.has_z
 
+        errors = []
+
         for fid, feature in enumerate(ogrlayer):
+            if len(errors) >= ERROR_LIMIT:
+                break
+
             geom = feature.GetGeometryRef()
             if geom is None:
-                if error_tolerance == ERROR_TOLERANCE.SKIP:
-                    continue
-                else:
-                    raise VE(_("Feature #%d doesn't have geometry.") % feature.GetFID())
+                if error_tolerance != ERROR_TOLERANCE.SKIP:
+                    errors.append(_("Feature #%d doesn't have geometry.") % feature.GetFID())
+                continue
 
             gtype = geom.GetGeometryType()
             if gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
@@ -404,9 +417,10 @@ class TableInfo(object):
                     gtype = geom.GetGeometryType()
 
             if gtype not in GEOM_TYPE_OGR:
-                raise ValidationError(_(
-                    "Unknown geometry type: %d (%s).") % (
-                    gtype, ogr.GeometryTypeToName(gtype)))
+                errors.append(_(
+                    "Feature #%d have unknown geometry type: %d (%s).") % (
+                    feature.GetFID(), gtype, ogr.GeometryTypeToName(gtype)))
+                continue
 
             geom.Transform(transform)
 
@@ -423,10 +437,10 @@ class TableInfo(object):
                            ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D):
                 if geom.GetGeometryCount() == 1:
                     geom = geom.GetGeometryRef(0)
-                elif error_tolerance == ERROR_TOLERANCE.SKIP:
-                    continue
                 else:
-                    raise VE(_("Feature #%d have multiple geometries.") % feature.GetFID())
+                    if error_tolerance != ERROR_TOLERANCE.SKIP:
+                        errors.append(_("Feature #%d have multiple geometries.") % feature.GetFID())
+                    continue
 
             # Force Z
             if has_z and not geom.Is3D():
@@ -442,17 +456,17 @@ class TableInfo(object):
                     geom = geom.Buffer(0)
                     invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype_before
                 if invalid:
-                    if error_tolerance == ERROR_TOLERANCE.SKIP:
-                        continue
-                    else:
-                        raise VE(_("Feature #%d have invalid geometry.") % feature.GetFID())
+                    if error_tolerance != ERROR_TOLERANCE.SKIP:
+                        errors.append(_("Feature #%d have invalid geometry.") % feature.GetFID())
+                    continue
 
             # Check geometry type again
             gtype = geom.GetGeometryType()
             if gtype not in GEOM_TYPE_OGR or _GEOM_OGR_2_TYPE[gtype] != self.geometry_type:
-                raise ValidationError(_(
-                    "Unknown geometry type: %d (%s).") % (
-                    gtype, ogr.GeometryTypeToName(gtype)))
+                errors.append(_(
+                    "Feature #%d have unknown geometry type: %d (%s).") % (
+                    feature.GetFID(), gtype, ogr.GeometryTypeToName(gtype)))
+                continue
 
             fld_values = dict()
             for i in range(feature.GetFieldCount()):
@@ -490,12 +504,13 @@ class TableInfo(object):
                     try:
                         fld_value = strdecode(feature.GetFieldAsString(i))
                     except UnicodeDecodeError:
-                        raise ValidationError(_(
+                        errors.append(_(
                             "It seems like declared and actual attributes "
                             "encodings do not match. Unable to decode "
                             "attribute #%(attr)d of feature #%(feat)d. "
                             "Try declaring different encoding.") % dict(
                             feat=fid, attr=i))
+                        continue
 
                 fld_name = strdecode(feature.GetFieldDefnRef(i).GetNameRef())
                 fld_values[self[fld_name].key] = fld_value
@@ -504,6 +519,10 @@ class TableInfo(object):
                 bytearray(geom.ExportToWkb(ogr.wkbNDR)), srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
+
+        if len(errors) > 0:
+            detail = '<br>'.join(cgi.escape(translate(error)) for error in errors)
+            raise VE(_("Vector layer cannot be written due to errors"), detail=detail)
 
 
 class VectorLayerField(Base, LayerField):
