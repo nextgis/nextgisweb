@@ -259,6 +259,9 @@ class OAuthHelper(object):
         Option('server.authorization_header', default=None,
                doc="Add Authorization HTTP header to requests to OAuth server."),
 
+        Option('server.logout_endpoint', default=None,
+               doc="OAuth logout endpoint URL."),
+
         Option('profile.endpoint', default=None,
                doc="OpenID Connect endpoint URL"),
 
