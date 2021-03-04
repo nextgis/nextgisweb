@@ -186,7 +186,7 @@ class OAuthHelper(object):
         for idx in itertools.count():
             candidate = clean_user_keyname(keyname_base, idx)
             if User.filter(
-                sa.func.lowe(User.keyname) == candidate.lower(),
+                sa.func.lower(User.keyname) == candidate.lower(),
                 User.id != user.id
             ).first() is None:
                 user.keyname = candidate
