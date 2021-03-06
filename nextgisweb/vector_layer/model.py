@@ -9,12 +9,11 @@ import six
 
 from zope.interface import implementer
 from osgeo import ogr, osr
-
+from shapely.geometry import box
 from sqlalchemy.sql import ColumnElement
 from sqlalchemy.ext.compiler import compiles
 
 import geoalchemy2 as ga
-from geoalchemy2.shape import from_shape as ga_from_shape
 import sqlalchemy.sql as sql
 from sqlalchemy import (
     event,
@@ -34,9 +33,9 @@ from ..resource import (
     ResourceGroup)
 from ..resource.exception import ValidationError, ResourceError
 from ..env import env
-from ..geometry import geom_from_wkb, box
 from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
+from ..lib.geometry import Geometry
 from ..compat import lru_cache
 
 from ..feature_layer import (
@@ -518,8 +517,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         # This will not let to write empty geometry, but it is not needed yet.
 
         if feature.geom is not None:
-            obj.geom = ga_from_shape(
-                feature.geom, srid=self.srs_id)
+            obj.geom = ga.elements.WKBElement(
+                bytearray(feature.geom.wkb), srid=self.srs_id)
 
         DBSession.merge(obj)
 
@@ -546,11 +545,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if f.keyname in feature.fields.keys():
                 setattr(obj, f.key, feature.fields[f.keyname])
 
-        obj.geom = ga_from_shape(
-            feature.geom, srid=self.srs_id)
+        obj.geom = ga.elements.WKBElement(
+            bytearray(feature.geom.wkb), srid=self.srs_id)
 
-        geom_type = feature.geom.geom_type.upper()
-        if feature.geom.has_z:
+        shape = feature.geom.shape
+        geom_type = shape.geom_type.upper()
+        if shape.has_z:
             geom_type += 'Z'
         if geom_type != self.geometry_type:
             raise ValidationError(
@@ -875,9 +875,10 @@ class FeatureQueryBase(object):
     def __init__(self):
         self._srs = None
         self._geom = None
+        self._single_part = None
+        self._geom_format = 'WKB'
         self._clip_by_box = None
         self._simplify = None
-        self._single_part_geom = None
         self._box = None
 
         self._geom_len = None
@@ -900,6 +901,9 @@ class FeatureQueryBase(object):
     def geom(self, single_part=False):
         self._geom = True
         self._single_part = single_part
+
+    def geom_format(self, geom_format):
+        self._geom_format = geom_format
 
     def clip_by_box(self, box):
         self._clip_by_box = box
@@ -972,6 +976,8 @@ class FeatureQueryBase(object):
             )
 
         if self._geom:
+            wk_fun = func.st_asbinary if self._geom_format == 'WKB' else func.st_astext
+
             if self._single_part:
 
                 class geom(ColumnElement):
@@ -982,9 +988,9 @@ class FeatureQueryBase(object):
                 def compile(expr, compiler, **kw):
                     return "(%s).geom" % str(compiler.process(expr.base))
 
-                columns.append(func.st_asewkb(geom(func.st_dump(geomexpr))).label('geom'))
-            else:
-                columns.append(func.st_asewkb(geomexpr).label('geom'))
+                geomexpr = geom(func.st_dump(geomexpr))
+
+            columns.append(wk_fun(geomexpr).label('geom'))
 
         if self._geom_len:
             columns.append(func.st_length(func.geography(
@@ -1098,6 +1104,7 @@ class FeatureQueryBase(object):
             layer = self.layer
 
             _geom = self._geom
+            _geom_format = self._geom_format
             _geom_len = self._geom_len
             _box = self._box
             _limit = self._limit
@@ -1116,9 +1123,12 @@ class FeatureQueryBase(object):
                     fdict = dict((f.keyname, row[f.keyname])
                                  for f in selected_fields)
                     if self._geom:
-                        geom = geom_from_wkb(
-                            row['geom'].tobytes() if six.PY3
-                            else six.binary_type(row['geom']))
+                        if self._geom_format == 'WKB':
+                            geom_data = row['geom'].tobytes() if six.PY3 \
+                                else six.binary_type(row['geom'])
+                            geom = Geometry.from_wkb(geom_data)
+                        else:
+                            geom = Geometry.from_wkt(row['geom'])
                     else:
                         geom = None
 

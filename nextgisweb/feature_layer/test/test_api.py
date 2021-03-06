@@ -13,6 +13,7 @@ from osgeo import ogr
 
 from nextgisweb.auth import User
 from nextgisweb.feature_layer.ogrdriver import EXPORT_FORMAT_OGR
+from nextgisweb.lib.geometry import Geometry
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys.models import SRS
 from nextgisweb.vector_layer import VectorLayer
@@ -123,10 +124,16 @@ def test_fields_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
 
 
 def test_geom_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+
+    def wkt_compare(wkt1, wkt2):
+        g1 = Geometry.from_wkt(wkt1)
+        g2 = Geometry.from_wkt(wkt2)
+        return g1.shape.equals(g2.shape)
+
     feature_url = '/api/resource/%d/feature/1' % vector_layer_id
 
     feature = ngw_webtest_app.get(feature_url).json
-    assert feature['geom'] == 'POINT (0.0000000000000000 0.0000000000000000)'
+    assert wkt_compare(feature['geom'], 'POINT (0.0 0.0)')
 
     feature = ngw_webtest_app.get(feature_url + '?geom_format=geojson').json
     assert feature['geom'] == dict(type='Point', coordinates=[0.0, 0.0])
@@ -134,14 +141,14 @@ def test_geom_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     feature['geom'] = 'POINT (1 0)'
     ngw_webtest_app.put_json(feature_url, feature)
     feature = ngw_webtest_app.get(feature_url).json
-    assert feature['geom'] == 'POINT (1.0000000000000000 0.0000000000000000)'
+    assert wkt_compare(feature['geom'], 'POINT (1.0 0.0)')
 
     feature['geom'] = dict(type='Point', coordinates=[1, 2])
     ngw_webtest_app.put_json(feature_url + '?geom_format=geojson', feature)
     assert feature == ngw_webtest_app.get(feature_url + '?geom_format=geojson').json
 
     feature = ngw_webtest_app.get(feature_url).json
-    assert feature['geom'] == 'POINT (1.0000000000000000 2.0000000000000000)'
+    assert wkt_compare(feature['geom'], 'POINT (1.0 2.0)')
 
     feature['geom'] = dict(type='Point', coordinates=[90, 45])
     ngw_webtest_app.put_json(feature_url + '?geom_format=geojson&srs=4326', feature)

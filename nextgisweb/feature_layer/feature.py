@@ -77,7 +77,7 @@ class Feature(object):
             type="Feature",
             id=self.id,
             properties=self.fields,
-            geometry=self.geom,
+            geometry=self.geom.shape,
         )
 
     def to_ogr(self, layer_defn, fid=None):

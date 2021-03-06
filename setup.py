@@ -40,7 +40,7 @@ requires = [
     'pygdal' + (('==%s.*' % gv) if gv else ''),  # TODO: Add >=2.3.0
     'psycopg2==2.8.5',
     'geoalchemy2==0.5.0',
-    'shapely==1.6.4.post2',
+    'shapely==1.7.1',
     'affine==2.2.2',
     'geojson==2.4.1',
     'pillow==5.4.1',

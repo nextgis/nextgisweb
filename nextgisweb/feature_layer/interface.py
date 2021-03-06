@@ -134,6 +134,9 @@ class IFeatureQuery(Interface):
     def geom(self):
         """ Include geometry in request result """
 
+    def geom_format(self):
+        """ Initially loaded geometry format """
+
     def srs(self, srs):
         """ Include CRS if
         it was included in request """
