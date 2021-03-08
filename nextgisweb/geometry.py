@@ -32,10 +32,3 @@ def geom_to_wkt(geom):
 
 def geom_from_wkb(data, srid=None):
     return Geometry.from_wkb(data, srid=srid)
-
-
-def geom_transform(geom, crs_from, crs_to):
-    from shapely.ops import transform as map_coords
-    transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
-    geom = map_coords(transformer.transform, geom)
-    return geom
