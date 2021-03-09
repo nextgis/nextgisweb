@@ -137,15 +137,16 @@ def oauth(request):
 
 def logout(request):
     oaserver = request.env.auth.oauth
-    headers = forget(request)
 
     location = request.application_url
 
-    if oaserver.options['enabled']:
+    if request.user.oauth_subject is not None and oaserver is not None:
         logout_endpoint = oaserver.options.get('server.logout_endpoint')
         if logout_endpoint is not None:
             qs = dict(redirect_uri=request.application_url)
             location = logout_endpoint + '?' + urlencode(qs)
+
+    headers = forget(request)
 
     return HTTPFound(location=location, headers=headers)
 
