@@ -405,8 +405,7 @@ class TableInfo(object):
 
             geom = feature.GetGeometryRef()
             if geom is None:
-                if error_tolerance != ERROR_TOLERANCE.SKIP:
-                    errors.append(_("Feature #%d doesn't have geometry.") % feature.GetFID())
+                errors.append(_("Feature #%d doesn't have geometry.") % feature.GetFID())
                 continue
 
             if geom.GetGeometryType() in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
@@ -458,8 +457,7 @@ class TableInfo(object):
                 if geom.GetGeometryCount() == 1:
                     geom = geom.GetGeometryRef(0)
                 else:
-                    if error_tolerance != ERROR_TOLERANCE.SKIP:
-                        errors.append(_("Feature #%d have multiple geometries satisfying the conditions.") % feature.GetFID())
+                    errors.append(_("Feature #%d have multiple geometries satisfying the conditions.") % feature.GetFID())
                     continue
 
             # Force Z
@@ -476,15 +474,19 @@ class TableInfo(object):
                     geom = geom.Buffer(0)
                     invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype_before
                 if invalid:
-                    if error_tolerance != ERROR_TOLERANCE.SKIP:
-                        errors.append(_("Feature #%d have invalid geometry.") % feature.GetFID())
+                    errors.append(_("Feature #%d have invalid geometry.") % feature.GetFID())
                     continue
 
             # Check geometry type again
             gtype = geom.GetGeometryType()
-            if gtype not in GEOM_TYPE_OGR or _GEOM_OGR_2_TYPE[gtype] != self.geometry_type:
+            if gtype not in GEOM_TYPE_OGR:
                 errors.append(_(
                     "Feature #%d have unknown geometry type: %d (%s).") % (
+                    feature.GetFID(), gtype, ogr.GeometryTypeToName(gtype)))
+                continue
+            elif _GEOM_OGR_2_TYPE[gtype] != self.geometry_type:
+                errors.append(_(
+                    "Feature #%d have unsuitable geometry type: %d (%s).") % (
                     feature.GetFID(), gtype, ogr.GeometryTypeToName(gtype)))
                 continue
 
@@ -535,12 +537,15 @@ class TableInfo(object):
                 fld_name = strdecode(feature.GetFieldDefnRef(i).GetNameRef())
                 fld_values[self[fld_name].key] = fld_value
 
+            if len(errors) > 0 and error_tolerance != ERROR_TOLERANCE.SKIP:
+                continue
+
             obj = self.model(fid=fid, geom=ga.elements.WKBElement(
                 bytearray(geom.ExportToWkb(ogr.wkbNDR)), srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
 
-        if len(errors) > 0:
+        if len(errors) > 0 and error_tolerance != ERROR_TOLERANCE.SKIP:
             detail = '<br>'.join(cgi.escape(translate(error)) for error in errors)
             raise VE(_("Vector layer cannot be written due to errors"), detail=detail)
 
