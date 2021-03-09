@@ -47,6 +47,12 @@ define([
             } else {
                 this.mode_section.domNode.style.display = 'none';
             }
+
+            this.wFIDSource.watch('value', function(attr, oldval, newval) {
+                var hideFIDField = newval === 'GDAL';
+                var tableRow = this.wFIDField.domNode.parentElement.parentElement;
+                tableRow.style.display = hideFIDField ? 'none' : '';
+            }.bind(this));
         },
 
         serializeInMixin: function (data) {
@@ -63,6 +69,7 @@ define([
                 if (cast_geometry_type === "AUTO") {
                     cast_geometry_type = null;
                 }
+
                 setObject("cast_geometry_type", cast_geometry_type);
                 function bool_toggle (value) {
                     switch (value) {
@@ -73,6 +80,12 @@ define([
                 }
                 setObject("cast_is_multi", bool_toggle(this.wCastIsMulti.get("value")));
                 setObject("cast_has_z", bool_toggle(this.wCastHasZ.get("value")));
+
+                var fid_source = this.wFIDSource.get("value");
+                setObject("fid_source", fid_source);
+                if (fid_source !== 'GDAL') {
+                    setObject("fid_field", this.wFIDField.get("value"));
+                }
             } else {
                 setObject("fields", []);
                 setObject("geometry_type", this.wGeometryType.get("value"));

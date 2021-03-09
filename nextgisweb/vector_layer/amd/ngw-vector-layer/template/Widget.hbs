@@ -80,7 +80,7 @@
 
             <select data-dojo-attach-point="wCastIsMulti"
                 data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Multi'}}" style="width: 100%">
+                title="{{gettext 'Multi-geometry'}}" style="width: 100%">
 
                 <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
                 <option value="YES">{{gettext 'Yes'}}</option>
@@ -95,6 +95,20 @@
                 <option value="YES">{{gettext 'Yes'}}</option>
                 <option value="NO">{{gettext 'No'}}</option>
             </select>
+
+            <select data-dojo-attach-point="wFIDSource"
+                data-dojo-type="dijit/form/Select"
+                title="{{gettext 'FID source'}}" style="width: 100%">
+
+                <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
+                <option value="GDAL">{{gettext 'GDAL'}}</option>
+                <option value="FIELD">{{gettext 'Field'}}</option>
+            </select>
+
+            <input data-dojo-attach-point="wFIDField"
+                data-dojo-type="dijit/form/TextBox"
+                title="{{gettext 'FID field'}}"
+                value="ngw_id"/ style="width: 100%">
 
         </div>
     </div>
