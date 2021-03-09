@@ -10,7 +10,7 @@ from zope.interface import implementer
 
 from .. import db
 from ..env import env
-from ..geometry import geom_from_geojson
+from ..lib.geometry import Geometry
 from ..models import declarative_base, DBSession
 from ..resource.exception import ValidationError
 from ..resource import (
@@ -169,7 +169,7 @@ class RasterMosaicItem(Base):
         reproject = not src_osr.IsSame(dst_osr)
 
         info = gdal.Info(filename, format='json')
-        geom = geom_from_geojson(info['wgs84Extent'])
+        geom = Geometry.from_geojson(info['wgs84Extent'])
         self.footprint = ga.elements.WKBElement(bytearray(geom.wkb), srid=4326)
         self.fileobj = env.file_storage.fileobj(component='raster_mosaic')
 

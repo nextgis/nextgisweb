@@ -10,13 +10,13 @@ from owslib.crs import Crs
 import requests
 from osgeo import ogr, osr
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
+from shapely.geometry import box
 from six import BytesIO, ensure_str
 from zope.interface import implementer
 
 from .. import db
 from ..core.exception import ValidationError, OperationalError
 from ..env import env
-from ..geometry import box
 from ..feature_layer import (
     Feature,
     FeatureSet,
@@ -29,8 +29,8 @@ from ..feature_layer import (
     LayerField,
     LayerFieldsMixin,
 )
-from ..geometry import geom_from_wkb
 from ..layer import SpatialLayerMixin
+from ..lib.geometry import Geometry
 from ..lib.ows import FIELD_TYPE_WFS
 from ..models import declarative_base
 from ..resource import (
@@ -79,7 +79,7 @@ def ns_trim(value):
 def geom_from_gml(el):
     value = etree.tostring(el)
     ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
-    return geom_from_wkb(ogr_geom.ExportToWkb())
+    return Geometry.from_wkb(ogr_geom.ExportToWkb())
 
 
 def get_srid(value):
