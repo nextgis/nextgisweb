@@ -21,6 +21,9 @@ path = Path(nextgisweb.vector_layer.test.__file__).parent / 'data' / 'errors'
     ('incomplete-geom.geojson', 'LOSSY', None, None, None, True),
     ('incomplete-geom.geojson', 'SKIP', None, None, None, False),
 
+    ('mixed-feature-geom.geojson', 'LOSSY', 'POINT', None, None, True),
+    ('mixed-feature-geom.geojson', 'SKIP', 'POINT', None, None, False),
+
     ('no-features.geojson', 'STRICT', None, None, None, True),
     ('no-features.geojson', 'STRICT', 'POINT', None, None, False),
 
