@@ -140,11 +140,13 @@ def logout(request):
 
     location = request.application_url
 
-    if request.user.oauth_subject is not None and oaserver is not None:
+    if oaserver is not None:
         logout_endpoint = oaserver.options.get('server.logout_endpoint')
         if logout_endpoint is not None:
-            qs = dict(redirect_uri=request.application_url)
-            location = logout_endpoint + '?' + urlencode(qs)
+            current = request.session.get('auth.policy.current')
+            if current is not None and current[0] == 'OAUTH':
+                qs = dict(redirect_uri=request.application_url)
+                location = logout_endpoint + '?' + urlencode(qs)
 
     headers = forget(request)
 
