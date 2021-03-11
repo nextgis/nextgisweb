@@ -7,7 +7,7 @@ import transaction
 from nextgisweb.models import DBSession
 
 from nextgisweb.spatial_ref_sys.models import SRS
-from nextgisweb.geometry import geom_from_wkt
+from nextgisweb.lib.geometry import Geometry
 
 MOSCOW_VLADIVOSTOK = 'LINESTRING(37.62 55.75,131.9 43.12)'
 LENGTH_SPHERE = 6434561.600305
@@ -35,16 +35,16 @@ def test_geom_transform(ngw_webtest_app, srs_msk23_id):
         "/api/component/spatial_ref_sys/%d/geom_transform" % 3857,
         dict(geom=MOSCOW_VLADIVOSTOK, srs=4326)
     )
-    g1 = geom_from_wkt(result.json["geom"])
-    g2 = geom_from_wkt("LINESTRING(4187839.2436 7508807.8513,14683040.8356 5330254.9437)")
+    g1 = Geometry.from_wkt(result.json["geom"])
+    g2 = Geometry.from_wkt("LINESTRING(4187839.2436 7508807.8513,14683040.8356 5330254.9437)")
     assert g2.shape.almost_equals(g1.shape, 4)
 
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 4326,
         dict(geom=result.json["geom"], srs=3857)
     )
-    g1 = geom_from_wkt(result.json["geom"])
-    g2 = geom_from_wkt(MOSCOW_VLADIVOSTOK)
+    g1 = Geometry.from_wkt(result.json["geom"])
+    g2 = Geometry.from_wkt(MOSCOW_VLADIVOSTOK)
     assert g2.shape.almost_equals(g1.shape, 6)
 
 
