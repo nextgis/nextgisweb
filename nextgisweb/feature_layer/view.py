@@ -131,6 +131,7 @@ def test_mvt(request):
 
 @viewargs(renderer='nextgisweb:feature_layer/template/export.mako')
 def export(request):
+    request.resource_permission(PD_READ)
     return dict(obj=request.context, subtitle=_("Save as"), maxheight=True)
 
 
@@ -183,12 +184,13 @@ def setup_pyramid(comp, config):
             if IFeatureLayer.providedBy(args.obj):
                 yield dm.Label('feature_layer', _("Features"))
 
-                yield dm.Link(
-                    'feature_layer/feature-browse', _("Table"),
-                    lambda args: args.request.route_url(
-                        "feature_layer.feature.browse",
-                        id=args.obj.id),
-                    'material:table', True)
+                if args.obj.has_permission(PD_READ, args.request.user):
+                    yield dm.Link(
+                        'feature_layer/feature-browse', _("Table"),
+                        lambda args: args.request.route_url(
+                            "feature_layer.feature.browse",
+                            id=args.obj.id),
+                        'material:table', True)
 
                 yield dm.Link(
                     'feature_layer/export', _("Save as"),
