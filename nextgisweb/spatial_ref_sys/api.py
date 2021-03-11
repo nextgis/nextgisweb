@@ -71,6 +71,8 @@ def geom_calc(request, prop):
 
 
 def catalog_collection(request):
+    request.require_administrator()
+
     query = dict()
 
     q = request.GET.get('q')
