@@ -27,12 +27,24 @@ define([
     var table = document.getElementById('catalog-table');
     var table_body = table.getElementsByTagName('tbody')[0];
 
+    function clear_table () {
+        table_body.innerHTML = "";
+    }
+
+    var searching = false;
+
     search_form.onsubmit = function (event) {
         event.preventDefault();
 
+        if (searching) {
+            return;
+        } else {
+            searching = true;
+        }
+
         set_error(null);
 
-        table_body.innerHTML = "";
+        clear_table();
 
         var query = { q: text_filter.value };
 
@@ -71,6 +83,11 @@ define([
                 importLink.setAttribute("title", i18n.gettext("View"))
                 row.insertCell().appendChild(importLink);
             }
-        }, ErrorDialog.xhrError)
+
+            searching = false;
+        }, function (error) {
+            ErrorDialog.xhrError(error);
+            searching = false;
+        });
     }
 });
