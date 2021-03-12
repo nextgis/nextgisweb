@@ -43,7 +43,7 @@ define([
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         identity: "srs_list",
-        title: i18n.gettext("Spatial Reference System"),
+        title: i18n.gettext("Spatial reference system"),
 
         postCreate: function () {
             if (this.value && this.value.disabled && this.wkt) {
