@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.1\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2021-03-12 12:06+0000\n"
+"POT-Creation-Date: 2021-03-12 13:07+0000\n"
 "PO-Revision-Date: 2019-07-06 17:02+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -124,6 +124,10 @@ msgstr "Наименование"
 #: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:16
 msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
+
+#: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:24
+msgid "View details"
+msgstr "Подробнее"
 
 #: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:33
 msgid "Import"
