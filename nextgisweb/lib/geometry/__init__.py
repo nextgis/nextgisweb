@@ -13,6 +13,9 @@ from shapely.ops import transform as map_coords
 
 
 class Geometry(object):
+    """ Initialization format is kept "as is".
+    Other formats are calculated as needed."""
+
     __slots__ = ('_wkb', '_wkt', '_shape', '_srid')
 
     def __init__(self, wkb=None, wkt=None, shape_obj=None, srid=None):
