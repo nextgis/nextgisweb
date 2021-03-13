@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
 
+import re
 import requests
 import json
 from io import BytesIO
@@ -39,6 +40,8 @@ from .util import _
 Base = declarative_base(dependencies=('resource', ))
 
 WMS_VERSIONS = ('1.1.1', '1.3.0')
+
+url_pattern = re.compile(r'^(https?:\/\/)([a-z0-9\-._~%]+|\[[a-z0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-z0-9\-._~%!$&\'()*+,;=:@]+)*\/?(\?[a-z0-9\-._~%!$&\'()*+,;=:@\/?]*)?$')  # NOQA
 
 
 class Connection(Base, Resource):
@@ -110,6 +113,15 @@ class Connection(Base, Resource):
         return json.loads(self.capcache_json)
 
 
+class _url_attr(SP):
+
+    def setter(self, srlzr, value):
+        if not url_pattern.match(value):
+            raise ValidationError("Service url is not valid.")
+
+        super(_url_attr, self).setter(srlzr, value)
+
+
 class _capcache_attr(SP):
 
     def getter(self, srlzr):
@@ -132,7 +144,7 @@ class ConnectionSerializer(Serializer):
     _defaults = dict(read=ConnectionScope.read,
                      write=ConnectionScope.write)
 
-    url = SP(**_defaults)
+    url = _url_attr(**_defaults)
     version = SP(**_defaults)
     username = SP(**_defaults)
     password = SP(**_defaults)

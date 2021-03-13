@@ -30,6 +30,8 @@ define([
     template,
     settings
 ) {
+    var url_template_re = /^(https?:\/\/)([a-z0-9\-._~%]+|\[[a-z0-9\-._~%!$&'()*+,;=:]+\])+(:[0-9]+)?(\/[a-z0-9\-._~%!$&'()*+,;=:@\{\}]+)*\/?(\?[a-z0-9\-._~%!$&'()*+,;=:@\/\{\}?]*)?$/;
+
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         title: i18n.gettext("TMS connection"),
@@ -54,6 +56,11 @@ define([
                 this.wAPIKeyParam.set("disabled", hold_params);
                 this.wScheme.set("disabled", hold_params);
             }.bind(this));
+
+            this.wURLTemplate.validator = function (value) {
+                var success = url_template_re.test(value);
+                return success;
+            }.bind(this);
         },
 
         serializeInMixin: function (data) {

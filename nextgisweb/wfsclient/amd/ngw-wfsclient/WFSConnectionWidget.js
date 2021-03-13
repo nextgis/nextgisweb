@@ -22,9 +22,20 @@ define([
     serialize,
     template
 ) {
+    var url_re = /^(https?:\/\/)([a-z0-9\-._~%]+|\[[a-z0-9\-._~%!$&'()*+,;=:]+\])+(:[0-9]+)?(\/[a-z0-9\-._~%!$&'()*+,;=:@]+)*\/?(\?[a-z0-9\-._~%!$&'()*+,;=:@\/?]*)?$/;
+
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
         title: i18n.gettext("WFS connection"),
         templateString: hbsI18n(template, i18n),
-        prefix: "wfsclient_connection"
+        prefix: "wfsclient_connection",
+
+        postCreate: function () {
+            this.inherited(arguments);
+
+            this.wPath.validator = function (value) {
+                var success = url_re.test(value);
+                return success;
+            }.bind(this);
+        }
     });
 });
