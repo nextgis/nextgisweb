@@ -103,23 +103,22 @@ SCHEMA = 'vector_layer'
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
-class ERROR_TOLERANCE(object):
-    STRICT = 'STRICT'
-    SAFE = 'SAFE'
-    LOSSY = 'LOSSY'
-    SKIP = 'SKIP'
-
-    enum = (STRICT, SAFE, LOSSY, SKIP)
-
-
-error_tolerance_default = ERROR_TOLERANCE.STRICT
-
-
-ERROR_LIMIT = 10
-
-
 def translate(trstring):
     return env.core.localizer().translate(trstring)
+
+
+class ERROR_FIX(object):
+    NONE = 'NONE'
+    SAFE = 'SAFE'
+    LOSSY = 'LOSSY'
+
+    default = NONE
+    enum = (NONE, SAFE, LOSSY)
+
+
+skip_errors_default = False
+
+error_limit = 10
 
 
 class TOGGLE(object):
@@ -416,7 +415,7 @@ class TableInfo(object):
         self.model = model
         self.fmap = {fld.keyname: fld.key for fld in self.fields}
 
-    def load_from_ogr(self, ogrlayer, strdecode, error_tolerance):
+    def load_from_ogr(self, ogrlayer, strdecode, fix_errors, skip_errors):
         source_osr = ogrlayer.GetSpatialRef()
         target_osr = osr.SpatialReference()
         target_osr.ImportFromEPSG(self.srs_id)
@@ -429,7 +428,7 @@ class TableInfo(object):
         errors = []
 
         for feature in ogrlayer:
-            if len(errors) >= ERROR_LIMIT:
+            if len(errors) >= error_limit:
                 break
 
             if self.fid_field_index is None:
@@ -443,7 +442,7 @@ class TableInfo(object):
                 continue
 
             if geom.GetGeometryType() in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
-               and error_tolerance != ERROR_TOLERANCE.STRICT:
+               and fix_errors != ERROR_FIX.NONE:
                 geom_candidate = None
                 for i in range(geom.GetGeometryCount()):
                     col_geom = geom.GetGeometryRef(i)
@@ -504,7 +503,7 @@ class TableInfo(object):
             if not geom.IsValid():
                 gtype_before = geom.GetGeometryType()
                 invalid = True
-                if error_tolerance in (ERROR_TOLERANCE.LOSSY, ERROR_TOLERANCE.SKIP):
+                if fix_errors == ERROR_FIX.LOSSY:
                     geom = geom.Buffer(0)
                     invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype_before
                 if invalid:
@@ -571,7 +570,7 @@ class TableInfo(object):
                 fld_name = strdecode(feature.GetFieldDefnRef(i).GetNameRef())
                 fld_values[self[fld_name].key] = fld_value
 
-            if len(errors) > 0 and error_tolerance != ERROR_TOLERANCE.SKIP:
+            if len(errors) > 0 and not skip_errors:
                 continue
 
             obj = self.model(fid=fid, geom=ga.elements.WKBElement(
@@ -579,7 +578,7 @@ class TableInfo(object):
 
             DBSession.add(obj)
 
-        if len(errors) > 0 and error_tolerance != ERROR_TOLERANCE.SKIP:
+        if len(errors) > 0 and not skip_errors:
             detail = '<br>'.join(cgi.escape(translate(error)) for error in errors)
             raise VE(_("Vector layer cannot be written due to errors"), detail=detail)
 
@@ -650,8 +649,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.tableinfo = tableinfo
 
     def load_from_ogr(self, ogrlayer, strdecode=lambda x: x,
-                      error_tolerance=error_tolerance_default):
-        self.tableinfo.load_from_ogr(ogrlayer, strdecode, error_tolerance)
+                      fix_errors=ERROR_FIX.default, skip_errors=skip_errors_default):
+        self.tableinfo.load_from_ogr(ogrlayer, strdecode, fix_errors, skip_errors)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (
@@ -952,7 +951,7 @@ class _source_attr(SP):
 
         return ogrlayer
 
-    def _ogrlayer(self, obj, ogrlayer, error_tolerance,
+    def _ogrlayer(self, obj, ogrlayer, fix_errors, skip_errors,
                   geom_cast_params, fid_params, recode):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
@@ -961,7 +960,7 @@ class _source_attr(SP):
 
         with DBSession.no_autoflush:
             obj.setup_from_ogr(ogrlayer, recode, geom_cast_params, fid_params)
-            obj.load_from_ogr(ogrlayer, recode, error_tolerance)
+            obj.load_from_ogr(ogrlayer, recode, fix_errors, skip_errors)
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
@@ -998,9 +997,11 @@ class _source_attr(SP):
 
         ogrlayer = self._ogrds(ogrds)
 
-        error_tolerance = srlzr.data.get('error_tolerance', error_tolerance_default)
-        if error_tolerance not in ERROR_TOLERANCE.enum:
-            raise VE(_("Unknown 'error_tolerance' value."))
+        fix_errors = srlzr.data.get('fix_errors', ERROR_FIX.default)
+        if fix_errors not in ERROR_FIX.enum:
+            raise VE(_("Unknown 'fix_errors' value."))
+
+        skip_errors = srlzr.data.get('skip_errors', skip_errors_default)
 
         geometry_type = srlzr.data.get(
             'cast_geometry_type', geom_cast_params_default['geometry_type'])
@@ -1026,7 +1027,7 @@ class _source_attr(SP):
             fid_field=srlzr.data.get('fid_field')
         )
 
-        self._ogrlayer(srlzr.obj, ogrlayer, error_tolerance,
+        self._ogrlayer(srlzr.obj, ogrlayer, fix_errors, skip_errors,
                        geom_cast_params, fid_params, recode)
 
 

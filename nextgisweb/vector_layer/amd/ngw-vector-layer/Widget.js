@@ -14,7 +14,8 @@ define([
     // template
     "dojox/layout/TableContainer",
     "ngw-file-upload/Uploader",
-    "dijit/form/ComboBox"
+    "dijit/form/ComboBox",
+    "dijit/form/CheckBox"
 ], function (
     declare,
     lang,
@@ -64,7 +65,8 @@ define([
             if (this.modeSwitcher.get("value") === 'file') {
                 setObject("source", this.wSourceFile.get("value"));
                 setObject("encoding", this.wEncoding.get("value"));
-                setObject("error_tolerance", this.wErrorTolerance.get("value"));
+                setObject("fix_errors", this.wFixErrors.get("value"));
+                setObject("skip_errors", this.wSkipErrors.get("value"));
                 var cast_geometry_type = this.wCastGeometryType.get("value");
                 if (cast_geometry_type === "AUTO") {
                     cast_geometry_type = null;

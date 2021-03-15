@@ -58,15 +58,19 @@
 
             </select>
 
-            <select data-dojo-attach-point="wErrorTolerance"
+            <select data-dojo-attach-point="wFixErrors"
                 data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Error tolerance'}}" style="width: 100%">
+                title="{{gettext 'Fix errors'}}" style="width: 100%">
 
-                <option value="STRICT" selected="selected">{{gettext 'Strict'}}</option>
-                <option value="SAFE">{{gettext 'Safe'}}</option>
-                <option value="LOSSY">{{gettext 'Lossy'}}</option>
-                <option value="SKIP">{{gettext 'Skip'}}</option>
+                <option value="NONE" selected="selected">{{gettext 'None'}}</option>
+                <option value="SAFE">{{gettext 'Fix errors without losing data'}}</option>
+                <option value="LOSSY">{{gettext 'Fix errors as far as possible'}}</option>
             </select>
+
+            <input data-dojo-attach-point="wSkipErrors"
+                data-dojo-type="dijit/form/CheckBox"
+                data-dojo-props="value: true"
+                title="{{gettext 'Skip features with unfixable errors'}}">
 
             <select data-dojo-attach-point="wCastGeometryType"
                 data-dojo-type="dijit/form/Select"
