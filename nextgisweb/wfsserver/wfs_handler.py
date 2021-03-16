@@ -142,7 +142,8 @@ def geom_from_gml(el):
 
 def parse_srs(value):
     # 'urn:ogc:def:crs:EPSG::3857' -> 3857
-    return int(value.split(':')[-1])
+    # http://www.opengis.net/def/crs/epsg/0/4326 -> 4326
+    return int(value.split(':')[-1].split('/')[-1])
 
 
 class WFSHandler():
