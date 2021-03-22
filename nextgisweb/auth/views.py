@@ -259,7 +259,7 @@ def setup_pyramid(comp, config):
             result = super(AuthGroupWidget, self).validate()
             self.error = []
 
-            if self.operation == 'create':
+            if self.operation in ('create', 'edit'):
                 conflict = Group.filter_by(
                     keyname=self.data.get("keyname")).first()
                 if conflict:
