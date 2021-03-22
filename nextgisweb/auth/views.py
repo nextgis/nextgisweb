@@ -356,7 +356,7 @@ def setup_pyramid(comp, config):
             result = super(AuthUserWidget, self).validate()
             self.error = []
 
-            if self.operation == 'create':
+            if self.operation in ('create', 'edit'):
                 conflict = User.filter(
                     sa.func.lower(User.keyname) == self.data.get("keyname").lower()
                 ).first()
