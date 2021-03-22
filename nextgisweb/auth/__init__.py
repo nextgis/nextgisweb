@@ -111,7 +111,8 @@ class AuthComponent(Component):
         api.setup_pyramid(self, config)
 
     def query_stat(self):
-        user_count = DBSession.query(db.func.count(User.id)).scalar()
+        user_count = DBSession.query(db.func.count(User.id)).filter(
+            db.not_(User.system)).scalar()
 
         la_everyone = DBSession.query(db.func.max(User.last_activity)).scalar()
 
