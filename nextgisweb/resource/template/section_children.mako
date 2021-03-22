@@ -45,7 +45,7 @@ from nextgisweb.webmap.model import WebMapScope
                     <% args = Bunch(obj=item, request=request) %>
                     %for menu_item in item.__dynmenu__.build(args):
                         %if isinstance(menu_item, dm.Link) and menu_item.important and menu_item.icon is not None:
-                            <a href="${menu_item.url(args)}" target="${menu_item.target}" title="${tr(_(menu_item.label))}">${icon(menu_item.icon)}</a>
+                            <a href="${menu_item.url(args)}" target="${menu_item.target}" title="${tr(menu_item.label)}">${icon(menu_item.icon)}</a>
                         %endif
                     %endfor
                 </td>
