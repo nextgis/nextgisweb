@@ -6,9 +6,14 @@ from passlib.hash import sha256_crypt
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
-from ..models import declarative_base
+from .. import db
+from ..core.exception import ValidationError
+from ..env import env
+from ..models import DBSession, declarative_base
 from ..compat import lru_cache
 import six
+
+from .util import _
 
 Base = declarative_base()
 
@@ -144,6 +149,19 @@ class User(Principal):
         if 'member_of' in data:
             self.member_of = [Group.filter_by(id=gid).one()
                               for gid in data['member_of']]
+
+        user_limit = env.auth.options['user_limit']
+        if user_limit is not None and not self.system and not self.disabled:
+            query = DBSession.query(db.func.count(User.id)).filter(
+                db.and_(db.not_(User.system), db.not_(User.disabled)))
+            if self.id is not None:
+                query = query.filter(User.id != self.id)
+
+            active_user_count = query.scalar()
+            if active_user_count >= user_limit:
+                raise ValidationError(_(
+                    "Maximum number of active users exceeded. The limit is %s."
+                ) % user_limit)
 
     @classmethod
     def by_keyname(cls, keyname):

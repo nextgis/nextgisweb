@@ -247,13 +247,7 @@ def setup_pyramid(comp, config):
         def populate_obj(self):
             super(AuthGroupWidget, self).populate_obj()
 
-            self.obj.display_name = self.data['display_name']
-            self.obj.keyname = self.data['keyname']
-            self.obj.description = self.data['description']
-            self.obj.register = self.data['register']
-
-            self.obj.members = [User.filter_by(id=id).one()
-                                for id in self.data['members']]
+            self.obj.deserialize(self.data)
 
         def validate(self):
             result = super(AuthGroupWidget, self).validate()
@@ -342,18 +336,7 @@ def setup_pyramid(comp, config):
         def populate_obj(self):
             super(AuthUserWidget, self).populate_obj()
 
-            self.obj.display_name = self.data.get('display_name')
-            self.obj.keyname = self.data.get('keyname')
-            self.obj.superuser = self.data.get('superuser', False)
-            self.obj.disabled = self.data.get('disabled', False)
-
-            if self.data.get('password', None) is not None:
-                self.obj.password = self.data['password']
-
-            self.obj.member_of = [Group.filter_by(id=id).one()
-                                  for id in self.data['member_of']]
-
-            self.obj.description = self.data['description']
+            self.obj.deserialize(self.data)
 
         def validate(self):
             result = super(AuthUserWidget, self).validate()
