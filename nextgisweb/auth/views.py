@@ -260,8 +260,11 @@ def setup_pyramid(comp, config):
             self.error = []
 
             if self.operation in ('create', 'edit'):
-                conflict = Group.filter_by(
-                    keyname=self.data.get("keyname")).first()
+                query = Group.filter_by(
+                    keyname=self.data.get("keyname"))
+                if self.operation == 'edit':
+                    query = query.filter(Group.id != self.obj.id)
+                conflict = query.first()
                 if conflict:
                     result = False
                     self.error.append(dict(
@@ -357,9 +360,11 @@ def setup_pyramid(comp, config):
             self.error = []
 
             if self.operation in ('create', 'edit'):
-                conflict = User.filter(
-                    sa.func.lower(User.keyname) == self.data.get("keyname").lower()
-                ).first()
+                query = User.filter(
+                    sa.func.lower(User.keyname) == self.data.get("keyname").lower())
+                if self.operation == 'edit':
+                    query = query.filter(User.id != self.obj.id)
+                conflict = query.first()
                 if conflict:
                     result = False
                     self.error.append(dict(
