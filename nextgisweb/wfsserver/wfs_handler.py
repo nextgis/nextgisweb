@@ -678,8 +678,8 @@ class WFSHandler():
             elif len(__filters) > 1:
                 raise ValidationError("Multiple filters not supported.")
 
-        if self.p_count is not None:
-            limit = int(self.p_count)
+        limit = int(self.p_count) if self.p_count is not None else layer.maxfeatures
+        if limit is not None:
             offset = 0 if self.p_startindex is None else int(self.p_startindex)
             query.limit(limit, offset)
 
