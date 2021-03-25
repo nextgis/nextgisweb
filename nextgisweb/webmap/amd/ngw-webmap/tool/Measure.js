@@ -9,7 +9,7 @@ define([
     "dijit/TooltipDialog",
     "openlayers/ol",
     "ngw/route",
-    "ngw/settings!pyramid",
+    "ngw/settings!webmap",
     "ngw-pyramid/i18n!webmap"
 ], function (
     declare,
@@ -21,7 +21,7 @@ define([
     TooltipDialog,
     ol,
     route,
-    clientSettings,
+    settings,
     i18n
 ) {
     var GEOM_LENGTH_URL = route.spatial_ref_sys.geom_length;
@@ -38,52 +38,119 @@ define([
                 this.customIcon = '<svg class="ol-control__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 326.534 326.535" style="width:18px;height:18px"><path d="M326.533 38.375a38.369 38.369 0 00-23.688-35.451 38.37 38.37 0 00-41.816 8.317l-20.065 20.066 14.577 14.577a8.25 8.25 0 01-11.667 11.667l-14.577-14.577-37.83 37.831 14.576 14.577a8.248 8.248 0 010 11.667 8.25 8.25 0 01-11.667 0L179.8 92.473l-37.831 37.83 14.577 14.576a8.25 8.25 0 01-11.667 11.667l-14.577-14.577-37.83 37.83 14.576 14.577a8.25 8.25 0 010 11.667 8.25 8.25 0 01-11.667 0l-14.577-14.577-37.83 37.831 14.576 14.576a8.25 8.25 0 01-11.667 11.667l-14.576-14.576-20.066 20.066a38.372 38.372 0 0027.133 65.503l249.788-.001a38.377 38.377 0 0027.134-11.238 38.377 38.377 0 0011.239-27.133l-.002-249.786zM249.789 249.79l-118.778.002 118.779-118.78-.001 118.778z"/></svg>';
             }
 
-            function formatUnits (value, units, is_area) {
-                var label, measure, suffix;
+            var SI_m = i18n.gettext('m'),
+                SI_km = i18n.gettext('km'),
+                SI_ft = i18n.gettext('ft'),
+                SI_mi = i18n.gettext('mi'),
+                SI_ha = i18n.gettext('ha'),
+                SI_ac = i18n.gettext('ac');
+
+            function formatUnits (value, is_area) {
+                var label, measure, suffix, places;
+
                 label = is_area ? "S" : "L";
+
+                var m_to_km = 1E-3,
+                    m_to_ft = 1 / 0.3048,
+                    ft_to_mi = 1 / 5280,
+                    m2_to_ha = 1E-4,
+                    m2_to_ac = 1 / 4046.86,
+                    ac_to_mi2 = 1 / 640;
+
                 if (is_area) {
-                    if ((units === "metric") || (units === null)) {
-                        if (value > 10000) {
-                            measure = value / 1000000,
-                            suffix = "km<sup>2</sup>"
-                        } else {
-                            measure = value,
-                            suffix = "m<sup>2</sup>"
-                        };
-                    } else if (units === "imperial") {
-                        value = value * (1 / 4046.86);
-                        if (value > (640 * 100)) {
-                            measure = value / 640,
-                            suffix = "mi<sup>2</sup>"
-                        } else {
-                            measure = value,
-                            suffix = "ac"
-                        };
+                    switch (settings.units_area) {
+                        case "sq_km":
+                            measure = value * m_to_km**2;
+                            suffix = SI_km + "<sup>2</sup>";
+                            break;
+                        case "metric":
+                            if (value > 1E5) {
+                                measure = value * m_to_km**2;
+                                suffix = SI_km + "<sup>2</sup>";
+                            } else {
+                                measure = value;
+                                suffix = SI_m + "<sup>2</sup>";
+                            };
+                            break;
+                        case "ha":
+                            measure = value * m2_to_ha;
+                            suffix = SI_ha;
+                            break;
+                        case "ac":
+                            measure = value * m2_to_ac;
+                            suffix = SI_ac;
+                            break;
+                        case "sq_mi":
+                            measure = value * m2_to_ac * ac_to_mi2;
+                            suffix = SI_mi + "<sup>2</sup>";
+                            break;
+                        case "imperial":
+                            value = value * m2_to_ac;
+                            if (value > (640 * 100)) {
+                                measure = value * ac_to_mi2;
+                                suffix = SI_mi + "<sup>2</sup>";
+                            } else {
+                                measure = value;
+                                suffix = SI_ac;
+                            };
+                            break;
+                        case "sq_ft":
+                            measure = value * m_to_ft**2;
+                            suffix = SI_ft + "<sup>2</sup>";
+                            break;
+                        case "sq_m":
+                        default:
+                            measure = value;
+                            suffix = SI_m + "<sup>2</sup>";
                     }
                 } else {
-                    if ((units === "metric") || (units === null)) {
-                        if (value > 1000) {
-                            measure = value / 1000,
-                            suffix = "km"
-                        } else {
-                            measure = value,
-                            suffix = "m"
-                        };
-                    } else if (units === "imperial") {
-                        value = value * (1 / 0.3048); // feets
-                        if (value > 5280) {
-                            measure = value / 5280,
-                            suffix = "mi"
-                        } else {
-                            measure = value,
-                            suffix = "ft"
-                        };
+                    switch (settings.units_length) {
+                        case "km":
+                            measure = value * m_to_km;
+                            suffix = SI_km;
+                            break;
+                        case "metric":
+                            if (value > 1000) {
+                                measure = value * m_to_km;
+                                suffix = SI_km;
+                            } else {
+                                measure = value;
+                                suffix = SI_m;
+                            };
+                            break;
+                        case "ft":
+                            measure = value * m_to_ft;
+                            suffix = SI_ft;
+                            break;
+                        case "mi":
+                            measure = value * m_to_ft * ft_to_mi;
+                            suffix = SI_mi;
+                            break;
+                        case "imperial":
+                            value = value * m_to_ft;
+                            if (value > 5280) {
+                                measure = value * ft_to_mi;
+                                suffix = SI_mi;
+                            } else {
+                                measure = value;
+                                suffix = SI_ft;
+                            };
+                            break;
+                        case "m":
+                        default:
+                            measure = value;
+                            suffix = SI_m;
                     }
+                }
+                if (measure < 1) {
+                    places = Math.floor(-Math.log10(measure)) + 4;
+                } else {
+                    places = 2;
                 }
                 return [
                     label,
                     "=",
-                    number.format(measure, {places: 2,locale: dojoConfig.locale}),
+                    number.format(measure, {places: places,locale: dojoConfig.locale}),
                     suffix
                 ].join(' ');
             }
@@ -124,7 +191,7 @@ define([
                 return true;
             }
 
-            var units = clientSettings.units;
+            var units = settings.units;
             var mapProj = tool.display.map.olMap.getView().getProjection();
             var mapSRID = mapProj.getCode().match(/EPSG\:(\d+)/)[1];
 
@@ -148,7 +215,7 @@ define([
 
                     function requestMeasure () {
                         id_request = id_actuality;
-                        xhr(measure_url({id: clientSettings.measurement_srid}), {
+                        xhr(measure_url({id: settings.measurement_srid}), {
                             method: "POST",
                             data: JSON.stringify({
                                 geom: new ol.format.WKT().writeGeometry(geom),
@@ -158,7 +225,7 @@ define([
                             handleAs: "json"
                         }).then(function (data) {
                             if (id_request === id_actuality) {
-                                var output = formatUnits(data.value, units, is_area);
+                                var output = formatUnits(data.value, is_area);
                                 tool.tooltip.set("content", output);
                             }
                         });

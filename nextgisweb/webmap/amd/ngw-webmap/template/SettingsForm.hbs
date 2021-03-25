@@ -2,9 +2,7 @@
 
     <div data-dojo-type="dijit/layout/BorderContainer"
         data-dojo-props="gutters: false"
-        style="width: 100%; height: 180px">
-
-
+        style="width: 100%; height: 350px">
 
         <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="region: 'top', cols:2, labelWidth: 120">
 
@@ -19,16 +17,54 @@
                 data-dojo-type="dijit/form/NumberTextBox"
                 data-dojo-props="constraints: {min: 1, places: 0}, trim: true"
                 title="{{gettext 'Height, px'}}" style="width: 100%"></div>
-        
-        </div>
-
-        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="region: 'center', cols:1, labelWidth: 120">
 
             <div data-dojo-attach-point="wIdentifyRadius"
                 data-dojo-type="dijit/form/NumberTextBox"
                 data-dojo-props="constraints: {min: 0, places: 0}, trim: true"
                 title="{{gettext 'Radius, px'}}" style="width: 100%"></div>
-        
+        </div>
+
+        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="region: 'top', cols:2, labelWidth: 120">
+
+            <h3>{{gettext 'Measurement'}}</h3>
+
+            <select data-dojo-type="dijit/form/Select"
+                data-dojo-attach-point="wUnitsLength"
+                title="{{gettext 'Length units'}}" style="width: 100%">
+                <option value="m" selected="selected">{{gettext 'Meters'}}</option>
+                <option value="km">{{gettext 'Kilometers'}}</option>
+                <option value="metric">{{gettext 'Meters/kilometers'}}</option>
+                <option value="ft">{{gettext 'Feet'}}</option>
+                <option value="mi">{{gettext 'Miles'}}</option>
+                <option value="imperial">{{gettext 'Feet/miles'}}</option>
+            </select>
+
+            <select data-dojo-type="dijit/form/Select"
+                data-dojo-attach-point="wUnitsArea"
+                title="{{gettext 'Area units'}}" style="width: 100%">
+                <option value="sq_m" selected="selected">{{gettext 'Sq. meters'}}</option>
+                <option value="sq_km">{{gettext 'Sq. kilometers'}}</option>
+                <option value="metric">{{gettext 'Sq. meters/kilometers'}}</option>
+                <option value="ha">{{gettext 'Hectares'}}</option>
+                <option value="ac">{{gettext 'Acres'}}</option>
+                <option value="sq_mi">{{gettext 'Sq. miles'}}</option>
+                <option value="imperial">{{gettext 'Acres/sq. miles'}}</option>
+                <option value="sq_ft">{{gettext 'Sq. feet'}}</option>
+            </select>
+
+            <select data-dojo-type="dijit/form/Select"
+                data-dojo-attach-point="wDegreeFormat"
+                title="{{gettext 'Degree format'}}" style="width: 100%">
+                <option value="dd" selected="selected">{{gettext 'Decimal degrees'}}</option>
+                <option value="ddm">{{gettext 'Degrees, decimal minutes'}}</option>
+                <option value="dms">{{gettext 'Degrees, minutes, seconds'}}</option>
+            </select>
+
+            <select data-dojo-type="dijit/form/Select"
+                data-dojo-attach-point="wMeasurementSRID"
+                title="{{gettext 'Measurement SRID'}}" style="width: 100%">
+            </select>
+
         </div>
 
         <div data-dojo-type="dijit/layout/ContentPane"

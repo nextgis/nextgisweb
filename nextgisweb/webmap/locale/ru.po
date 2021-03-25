@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-02-21 18:19+0000\n"
+"POT-Creation-Date: 2021-03-25 12:09+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -55,55 +55,55 @@ msgstr "Настройки веб-карты"
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-webmap/Display.js:183 amd/ngw-webmap/Display.js:1004
+#: amd/ngw-webmap/Display.js:207 amd/ngw-webmap/Display.js:1000
 #: amd/ngw-webmap/ItemWidget.js:246
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:188
+#: amd/ngw-webmap/Display.js:213
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:195 amd/ngw-webmap/Display.js:432
+#: amd/ngw-webmap/Display.js:219 amd/ngw-webmap/Display.js:427
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:202 amd/ngw-webmap/Display.js:327
+#: amd/ngw-webmap/Display.js:225 amd/ngw-webmap/Display.js:322
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:366 amd/ngw-webmap/Display.js:373
+#: amd/ngw-webmap/Display.js:361 amd/ngw-webmap/Display.js:368
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:396 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:391 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:531 amd/ngw-webmap/Display.js:541
+#: amd/ngw-webmap/Display.js:527 amd/ngw-webmap/Display.js:537
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:722 amd/ngw-webmap/tool/Zoom.js:19
+#: amd/ngw-webmap/Display.js:718 amd/ngw-webmap/tool/Zoom.js:19
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:453
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:723 amd/ngw-webmap/tool/Zoom.js:22
+#: amd/ngw-webmap/Display.js:719 amd/ngw-webmap/tool/Zoom.js:22
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:454
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:727
+#: amd/ngw-webmap/Display.js:723
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:743
+#: amd/ngw-webmap/Display.js:739
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:746
+#: amd/ngw-webmap/Display.js:742
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:467
 msgid "Reset rotation"
 msgstr "Отменить поворот"
@@ -120,7 +120,7 @@ msgstr "Порядок слоёв"
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:39
+#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:75
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
 msgid "Save"
@@ -256,35 +256,123 @@ msgstr "Ресурс стиля"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:11
+#: amd/ngw-webmap/template/SettingsForm.hbs:9
 msgid "Identify popup"
 msgstr "Окно идентификации"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:16
+#: amd/ngw-webmap/template/SettingsForm.hbs:14
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:21
+#: amd/ngw-webmap/template/SettingsForm.hbs:19
 msgid "Height, px"
 msgstr "Высота, пикс."
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:30
+#: amd/ngw-webmap/template/SettingsForm.hbs:24
 msgid "Radius, px"
 msgstr "Радиус, пикс."
 
-#: amd/ngw-webmap/tool/Identify.js:211
+#: amd/ngw-webmap/template/SettingsForm.hbs:29
+msgid "Measurement"
+msgstr "Измерения"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:33
+msgid "Length units"
+msgstr "Единицы длины"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:34
+msgid "Meters"
+msgstr "Метры"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:35
+msgid "Kilometers"
+msgstr "Километры"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:36
+msgid "Meters/kilometers"
+msgstr "Метры/километры"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:37
+msgid "Feet"
+msgstr "Футы"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:38
+msgid "Miles"
+msgstr "Мили"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:39
+msgid "Feet/miles"
+msgstr "Футы/мили"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:44
+msgid "Area units"
+msgstr "Единицы площади"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:45
+msgid "Sq. meters"
+msgstr "Кв. метры"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:46
+msgid "Sq. kilometers"
+msgstr "Кв. километры"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:47
+msgid "Sq. meters/kilometers"
+msgstr "Кв. метры/километры"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:48
+msgid "Hectares"
+msgstr "Гектары"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:49
+msgid "Acres"
+msgstr "Акры"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:50
+msgid "Sq. miles"
+msgstr "Кв. мили"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:51
+msgid "Acres/sq. miles"
+msgstr "Акры/кв. мили"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:52
+msgid "Sq. feet"
+msgstr "Кв. футы"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:57
+msgid "Degree format"
+msgstr "Формат градусов"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:58
+msgid "Decimal degrees"
+msgstr "Десятичные градусы"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:59
+msgid "Degrees, decimal minutes"
+msgstr "Градусы и десятичные минуты"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:60
+msgid "Degrees, minutes, seconds"
+msgstr "Градусы, минуты, секунды"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:65
+msgid "Measurement SRID"
+msgstr "Система координат для расчётов"
+
+#: amd/ngw-webmap/tool/Identify.js:213
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:245
+#: amd/ngw-webmap/tool/Identify.js:247
 msgid "Feature"
 msgstr "Объект"
 
-#: amd/ngw-webmap/tool/Identify.js:303 amd/ngw-webmap/tool/Identify.js:320
+#: amd/ngw-webmap/tool/Identify.js:305 amd/ngw-webmap/tool/Identify.js:322
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:430
+#: amd/ngw-webmap/tool/Identify.js:432
 msgid "Features"
 msgstr "Объектов"
 
@@ -296,7 +384,31 @@ msgstr "Измерение расстояния"
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:200
+#: amd/ngw-webmap/tool/Measure.js:41
+msgid "m"
+msgstr "м"
+
+#: amd/ngw-webmap/tool/Measure.js:42
+msgid "km"
+msgstr "км"
+
+#: amd/ngw-webmap/tool/Measure.js:43
+msgid "ft"
+msgstr "фут"
+
+#: amd/ngw-webmap/tool/Measure.js:44
+msgid "mi"
+msgstr "миля"
+
+#: amd/ngw-webmap/tool/Measure.js:45
+msgid "ha"
+msgstr "га"
+
+#: amd/ngw-webmap/tool/Measure.js:46
+msgid "ac"
+msgstr "акр"
+
+#: amd/ngw-webmap/tool/Measure.js:268
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
@@ -521,27 +633,27 @@ msgstr "Не найдено"
 msgid "Map link"
 msgstr "Ссылка на карту"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:9
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:10
 msgid "Social networks"
 msgstr "Соцсети"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:16
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:18
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:18
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:20
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:41
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:43
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:48
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:50
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:66
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:68
 msgid "Preview"
 msgstr "Предпросмотр"
 
@@ -570,52 +682,3 @@ msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
 #: template/section_api_webmap.mako:17
 msgid "Read more"
 msgstr "Подробнее"
-
-#~ msgid "Zoom to layer extent"
-#~ msgstr "Увеличить до слоя"
-
-#~ msgid "Hide layers"
-#~ msgstr "Скрыть дерево слоёв"
-
-#~ msgid "Show layers"
-#~ msgstr "Показать дерево слоёв"
-
-#~ msgid "Search..."
-#~ msgstr "Поиск..."
-
-#~ msgid "Searching..."
-#~ msgstr "Идет поиск..."
-
-#~ msgid "Longitude"
-#~ msgstr "Долгота"
-
-#~ msgid "Latitude"
-#~ msgstr "Широта"
-
-#~ msgid "Scale"
-#~ msgstr "Масштаб"
-
-#~ msgid "Permalink"
-#~ msgstr "Ссылка"
-
-#~ msgid "Embedded map settings"
-#~ msgstr "Настройки встраиваемой карты"
-
-#~ msgid "Width"
-#~ msgstr "Ширина"
-
-#~ msgid "Height"
-#~ msgstr "Высота"
-
-#~ msgid "HTML code"
-#~ msgstr "Код для встраивания"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Confirmation"
-#~ msgstr "Подтверждение"
-
-#~ msgid "Finish editing?"
-#~ msgstr "Закончить редактирование?"
-

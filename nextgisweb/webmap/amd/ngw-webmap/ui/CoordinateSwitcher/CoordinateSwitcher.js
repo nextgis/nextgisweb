@@ -8,7 +8,7 @@ define([
     "openlayers/proj4",
     "ngw-pyramid/utils/coordinateConverter",
     "ngw/load-json!api/component/spatial_ref_sys/",
-    "ngw/settings!pyramid",
+    "ngw/settings!webmap",
     //templates
     "xstyle/css!./CoordinateSwitcher.css"
 ], function (
@@ -21,9 +21,9 @@ define([
     proj4,
     CoordinateConverter,
     customCoordinateSystems,
-    settingsPyramid
+    settings
 ) {
-    var degreeFormat = settingsPyramid.degree_format;
+    var degreeFormat = settings.degree_format;
 
     return declare([Select], {
         point: undefined,

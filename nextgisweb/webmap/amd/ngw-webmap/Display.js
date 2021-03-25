@@ -59,7 +59,6 @@ define([
     "./utils/URL",
     // settings
     "ngw/settings!webmap",
-    "ngw/settings!pyramid",
     // template
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",
@@ -117,8 +116,7 @@ define([
     ToolSwipe,
     MapStatesObserver,
     URL,
-    webmapClientSettings,
-    pyramidClientSettings,
+    settings,
     //template
     TabContainer, BorderContainer
 ) {
@@ -248,10 +246,8 @@ define([
             this._mid = {};
             var mids = this.config.mid;
 
-            this.clientSettings = webmapClientSettings;
-
             // Add basemap's AMD modules
-            array.forEach(webmapClientSettings.basemaps, function (bm) {
+            array.forEach(settings.basemaps, function (bm) {
                 mids.basemap.push(bm.base.mid);
             });
 
@@ -432,7 +428,7 @@ define([
                         isOpen: widget.activeLeftPanel === "sharePanel",
                         gutters: false,
                         withCloser: false,
-                        socialNetworks: webmapClientSettings.enable_social_networks,
+                        socialNetworks: settings.enable_social_networks,
                         display: widget
                     });
     
@@ -730,7 +726,7 @@ define([
                 }),
                 new ol.control.ScaleLine({
                     target: widget.rightBottomControlPane,
-                    units: pyramidClientSettings.units,
+                    units: settings.units,
                     minWidth: 48
                 }),
                 new InfoScale({
@@ -760,7 +756,7 @@ define([
 
             // Basemaps initialization
             var idx = 0;
-            array.forEach(webmapClientSettings.basemaps, function (bm) {
+            array.forEach(settings.basemaps, function (bm) {
                 var MID = this._mid.basemap[bm.base.mid];
 
                 var baseOptions = lang.clone(bm.base);

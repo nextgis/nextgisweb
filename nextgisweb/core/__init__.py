@@ -99,9 +99,6 @@ class CoreComponent(Component):
     def initialize_db(self):
         for k, v in (
             ('system.name', 'NextGIS Web'),
-            ('units', 'metric'),
-            ('degree_format', 'dd'),
-            ('measurement_srid', 4326),
         ):
             self.init_settings(self.identity, k, self._settings.get(k, v))
 

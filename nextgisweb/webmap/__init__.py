@@ -30,6 +30,14 @@ class WebMapComponent(Component):
                    owner_user=User.filter_by(keyname='administrator').one(),
                    root_item=WebMapItem(item_type='root')).persist()
 
+        for k, v in (
+            ('units_length', 'm'),
+            ('units_area', 'sq.m'),
+            ('degree_format', 'dd'),
+            ('measurement_srid', 4326),
+        ):
+            self.env.core.init_settings(self.identity, k, v)
+
     def setup_pyramid(self, config):
         from . import api, view
         api.setup_pyramid(self, config)

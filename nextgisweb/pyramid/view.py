@@ -151,13 +151,6 @@ def system_name(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
-def miscellaneous(request):
-    request.require_administrator()
-    return dict(
-        title=_("Miscellaneous"),
-        dynmenu=request.env.pyramid.control_panel)
-
-
 def home_path(request):
     request.require_administrator()
     return dict(
@@ -404,11 +397,6 @@ def setup_pyramid(comp, config):
     ).add_view(system_name, renderer=ctpl('system_name'))
 
     config.add_route(
-        'pyramid.control_panel.miscellaneous',
-        '/control-panel/miscellaneous'
-    ).add_view(miscellaneous, renderer=ctpl('miscellaneous'))
-
-    config.add_route(
         'pyramid.control_panel.home_path',
         '/control-panel/home_path'
     ).add_view(home_path, renderer=ctpl('home_path'))
@@ -440,8 +428,6 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.custom_css'))),
         dm.Link('settings/logo', _("Custom logo"), lambda args: (
             args.request.route_url('pyramid.control_panel.logo'))),
-        dm.Link('settings/miscellaneous', _("Miscellaneous"), lambda args: (
-            args.request.route_url('pyramid.control_panel.miscellaneous'))),
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
     )
