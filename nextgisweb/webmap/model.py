@@ -2,11 +2,13 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 import json
 
+from sqlalchemy import event
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.types import TypeDecorator
 import geoalchemy2 as ga
 
 from .. import db
+from ..env import env
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -17,6 +19,7 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedResourceRelationship as SRR,
     ResourceGroup)
+from ..spatial_ref_sys import SRS
 
 from .util import _
 
@@ -259,3 +262,13 @@ class WebMapSerializer(Serializer):
     bookmark_resource = SRR(**_mdargs)
 
     root_item = _root_item_attr(**_mdargs)
+
+
+@event.listens_for(SRS, 'after_delete')
+def check_measurement_srid(mapper, connection, target):
+    measurement_srid = env.core.settings_get('webmap', 'measurement_srid')
+    if measurement_srid == target.id:
+        connection.execute("""
+            UPDATE setting SET value = 4326
+            WHERE component = 'webmap' AND name = 'measurement_srid'
+        """)
