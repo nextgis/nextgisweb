@@ -36,7 +36,7 @@ Base = declarative_base(dependencies=('resource', ))
 
 NEXTGIS_GEOSERVICES = 'nextgis_geoservices'
 
-url_template_pattern = re.compile(r'^(https?:\/\/)([a-z0-9\-._~%]+|\[[a-z0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-z0-9\-._~%!$&\'()*+,;=:@\{\}]+)*\/?(\?[a-z0-9\-._~%!$&\'()*+,;=:@\/\{\}?]*)?$')  # NOQA
+url_template_pattern = re.compile(r'^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\{\}]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/\{\}?]*)?$', re.IGNORECASE | re.UNICODE)  # NOQA
 
 
 class SCHEME(object):
