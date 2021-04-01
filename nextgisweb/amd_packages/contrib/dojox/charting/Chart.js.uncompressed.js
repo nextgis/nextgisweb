@@ -1,10 +1,10 @@
 define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "dojo/dom-style",
 	"dojo/dom", "dojo/dom-geometry", "dojo/dom-construct","dojo/_base/Color", "dojo/sniff",
-	"./Element", "./SimpleTheme", "./Series", "./axis2d/common", "dojox/gfx/shape",
+	"./Element", "./SimpleTheme", "./Series", "./axis2d/common", "./plot2d/common", "dojox/gfx/shape",
 	"dojox/gfx", "dojo/has!dojo-bidi?./bidi/Chart", "dojox/lang/functional", "dojox/lang/functional/fold", "dojox/lang/functional/reversed"],
 	function(dojox, lang, arr, declare, domStyle,
 	 		 dom, domGeom, domConstruct, Color, has,
-	 		 Element, SimpleTheme, Series, common, shape,
+			 Element, SimpleTheme, Series, common, plot2dCommon, shape,
 	 		 g, BidiChart, func){
 	/*=====
 	var __ChartCtorArgs = {
@@ -44,13 +44,29 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 	=====*/
 
 	var dc = lang.getObject("charting", true, dojox),
-		clear = func.lambda("item.clear()"),
-		purge = func.lambda("item.purgeGroup()"),
-		destroy = func.lambda("item.destroy()"),
-		makeClean = func.lambda("item.dirty = false"),
-		makeDirty = func.lambda("item.dirty = true"),
-		getName = func.lambda("item.name"),
 		defaultMargins = {l: 10, t: 10, r: 10, b: 10};
+
+	function clear (item) {
+		return item.clear();
+	}
+
+	function destroy (item) {
+		return item.destroy();
+	}
+
+	function makeClean (item) {
+		item.dirty = false;
+		return false;
+	}
+
+	function makeDirty (item) {
+		item.dirty = true;
+		return true;
+	}
+
+	function getName (item) {
+		return item.name;
+	}
 
 	var Chart = declare(has("dojo-bidi")? "dojox.charting.NonBidiChart" : "dojox.charting.Chart", null, {
 		// summary:
@@ -124,7 +140,7 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 		//	|			)
 		//	|			.render();
 		//	|	});
-		
+
 		// theme: dojox/charting/SimpleTheme?
 		//		An optional theme to use for styling the chart.
 		// axes: dojox/charting/axis2d/Base{}?
@@ -171,7 +187,7 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 			this.titlePos  = kwArgs.titlePos;
 			this.titleFont = kwArgs.titleFont;
 			this.titleFontColor = kwArgs.titleFontColor;
-			this.titleAlign = kwArgs.titleAlign; // This can be middle, left, right, or edge 
+			this.titleAlign = kwArgs.titleAlign; // This can be middle, left, right, or edge
 															 // edge is left or right aligned with chart plot edge depending on bidi.
 			this.chartTitle = null;
 			this.htmlLabels = true;
@@ -887,7 +903,7 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 				clearTimeout(this._delayedRenderHandle);
 				this._delayedRenderHandle = null;
 			}
-			
+
 			if(this.theme){
 				this.theme.clear();
 			}
@@ -926,9 +942,9 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 			//this.theme.defineColors({num: requiredColors, cache: false});
 
 			// clear old shapes
-			arr.forEach(this.series, purge);
-			func.forIn(this.axes, purge);
-			arr.forEach(this.stack,  purge);
+			arr.forEach(this.series, plot2dCommon.purgeGroup);
+			func.forIn(this.axes, plot2dCommon.purgeGroup);
+			arr.forEach(this.stack, plot2dCommon.purgeGroup);
 			var children = this.surface.children;
 			// starting with 1.9 the registry is optional and thus dispose is
 			if(shape.dispose){
@@ -982,7 +998,7 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 				labelType = forceHtmlLabels || !has("ie") && !has("opera") && this.htmlLabels ? "html" : "gfx",
 				tsize = g.normalizedLength(g.splitFontString(this.titleFont).size),
 				tBox = g._base._getTextBox(this.title,{ font: this.titleFont });
-				
+
 			var titleAlign = this.titleAlign;
 			var isRtl = has("dojo-bidi") && this.isRightToLeft();
 			var posX = dim.width/2; // Default is middle.
@@ -1200,11 +1216,11 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 			}
 		},
 		setDir : function(dir){
-			return this; 
+			return this;
 		},
 		_resetLeftBottom: function(axis){
 		},
-		formatTruncatedLabel: function(element, label, labelType){			
+		formatTruncatedLabel: function(element, label, labelType){
 		}
 	});
 
@@ -1256,6 +1272,6 @@ define("dojox/charting/Chart", ["../main", "dojo/_base/lang", "dojo/_base/array"
 			plot.initializeScalers(plotArea, stats);
 		});
 	}
-	
+
 	return has("dojo-bidi")? declare("dojox.charting.Chart", [Chart, BidiChart]) : Chart;
 });

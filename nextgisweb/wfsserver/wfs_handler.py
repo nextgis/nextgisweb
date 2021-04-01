@@ -142,7 +142,8 @@ def geom_from_gml(el):
 
 def parse_srs(value):
     # 'urn:ogc:def:crs:EPSG::3857' -> 3857
-    return int(value.split(':')[-1])
+    # http://www.opengis.net/def/crs/epsg/0/4326 -> 4326
+    return int(value.split(':')[-1].split('/')[-1])
 
 
 class WFSHandler():
@@ -677,8 +678,8 @@ class WFSHandler():
             elif len(__filters) > 1:
                 raise ValidationError("Multiple filters not supported.")
 
-        if self.p_count is not None:
-            limit = int(self.p_count)
+        limit = int(self.p_count) if self.p_count is not None else layer.maxfeatures
+        if limit is not None:
             offset = 0 if self.p_startindex is None else int(self.p_startindex)
             query.limit(limit, offset)
 

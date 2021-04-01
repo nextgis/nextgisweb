@@ -1,8 +1,6 @@
 define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-	"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx", "dojox/gfx/gradutils"],
-	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx, gradutils){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+	"dojox/lang/functional", "dojox/lang/utils", "dojox/gfx/fx", "dojox/gfx/gradutils"],
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, du, fx, gradutils){
 
 	return declare("dojox.charting.plot2d.Scatter", [CartesianBase, _PlotEvents], {
 		// summary:
@@ -51,7 +49,7 @@ define("dojox/charting/plot2d/Scatter", ["dojo/_base/lang", "dojo/_base/array", 
 			this.dirty = this.isDirty();
 			var s;
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();

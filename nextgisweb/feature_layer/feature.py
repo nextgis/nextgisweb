@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 from osgeo import ogr
-from six import ensure_str
+from six import ensure_str, ensure_text
 
 from .interface import FIELD_TYPE
 
@@ -38,7 +38,7 @@ class Feature(object):
             value = self._fields[label_field.keyname]
             if value is not None:
                 if label_field.datatype == FIELD_TYPE.STRING:
-                    return ensure_str(value)
+                    return ensure_text(value)
                 else:
                     return '{}'.format(value)
 

@@ -1,8 +1,6 @@
 define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-		"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"], 
-	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+		"dojox/lang/functional", "dojox/lang/utils", "dojox/gfx/fx"],
+	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, du, fx){
 
 	//	Candlesticks are based on the Bars plot type; we expect the following passed
 	//	as values in a series:
@@ -106,7 +104,7 @@ define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/dec
 			this.dirty = this.isDirty();
 			var s;
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();
@@ -136,7 +134,7 @@ define("dojox/charting/plot2d/Candlesticks", ["dojo/_base/lang", "dojo/_base/dec
 					continue;
 				}
 				s = run.group;
-                
+
 				for(var j = 0; j < run.data.length; ++j){
 					var v = run.data[j];
 					if(!this.isNullValue(v)){

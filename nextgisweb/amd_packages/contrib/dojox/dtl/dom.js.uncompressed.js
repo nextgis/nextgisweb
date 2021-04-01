@@ -94,7 +94,7 @@ define("dojox/dtl/dom", [
 										var replacement = "";
 										for(var p = 2, pl = pair.length; p < pl; p++){
 											if(p == 2){
-												replacement += "<" + tag + ' dtlinstruction="{% ' + token[k].replace('"', '\\"') + ' %}">';
+												replacement += "<" + tag + ' dtlinstruction="{% ' + token[k].replace(/"/g, '\\"') + ' %}">';
 											}else if(tag == pair[p]) {
 												continue;
 											}else{

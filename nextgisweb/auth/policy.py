@@ -13,6 +13,7 @@ from pyramid.httpexceptions import HTTPUnauthorized
 
 from ..lib.config import OptionAnnotations, Option
 from ..compat import timestamp_to_datetime, datetime_to_timestamp
+from ..core.exception import ValidationError
 
 from .models import User
 from .exception import InvalidCredentialsException, UserDisabledException
@@ -88,11 +89,17 @@ class AuthenticationPolicy(object):
         ahead = request.headers.get('Authorization')
         if ahead is not None:
             ahead = six.ensure_text(ahead)
-            amode, value = ahead.split(' ')
+            items = ahead.split(' ')
+            if len(items) != 2:
+                raise ValidationError("Invalid 'Authorization' header.")
+            amode, value = items
             amode = amode.upper()
 
             if amode == 'BASIC':
-                username, password = six.ensure_text(b64decode(value)).split(':')
+                items = six.ensure_text(b64decode(value)).split(':')
+                if len(items) != 2:
+                    raise ValidationError("Invalid 'Authorization' header.")
+                username, password = items
 
                 # Allow token authorization via basic when
                 # username is empty (for legacy clients).

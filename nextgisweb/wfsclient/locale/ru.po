@@ -1,0 +1,106 @@
+# Russian translations for nextgisweb.
+# Copyright (C) 2021 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.8.0.dev2+b3e7c3b74.dirty\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2021-03-22 21:22+0000\n"
+"PO-Revision-Date: 2021-03-22 21:24+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: amd/ngw-wfsclient/WFSConnectionWidget.js:26 model.py:106
+msgid "WFS connection"
+msgstr "Соединение WFS"
+
+#: amd/ngw-wfsclient/WFSLayerWidget.js:40 model.py:333
+msgid "WFS layer"
+msgstr "Слой WFS"
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:9
+msgid "WFS path"
+msgstr "Адрес WFS"
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:15
+msgid "Username"
+msgstr "Пользователь"
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:21
+msgid "Password"
+msgstr "Пароль"
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:26
+msgid "Version"
+msgstr "Версия"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:8
+msgid "Select WFS connection"
+msgstr "Выберите соединение WFS"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:10
+msgid "Connection"
+msgstr "Соединение"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:16
+msgid "Layer"
+msgstr "Слой"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:20
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:36
+msgid "Autodetect"
+msgstr "Автоматически"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:28
+msgid "Geometry column"
+msgstr "Поле геометрии"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:34
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:37
+msgid "Point"
+msgstr "Точка"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:38
+msgid "Line"
+msgstr "Линия"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:39
+msgid "Polygon"
+msgstr "Полигон"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:40
+msgid "Multipoint"
+msgstr "Мультиточка"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:41
+msgid "Multiline"
+msgstr "Мультилиния"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:42
+msgid "Multipolygon"
+msgstr "Мультиполигон"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:50
+msgid "Attribute definitions"
+msgstr "Описания атрибутов"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:53
+msgid "Keep"
+msgstr "Оставить"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:54
+msgid "Reload"
+msgstr "Загрузить"
+

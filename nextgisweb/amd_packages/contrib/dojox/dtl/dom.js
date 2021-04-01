@@ -65,7 +65,7 @@ for(var k=0,kl=_1c.length;k<kl;k++){
 var _1e="";
 for(var p=2,pl=_13.length;p<pl;p++){
 if(p==2){
-_1e+="<"+tag+" dtlinstruction=\"{% "+_1c[k].replace("\"","\\\"")+" %}\">";
+_1e+="<"+tag+" dtlinstruction=\"{% "+_1c[k].replace(/"/g,"\\\"")+" %}\">";
 }else{
 if(tag==_13[p]){
 continue;

@@ -133,7 +133,7 @@ def geom_calc(geom, crs, prop, srid):
 
         return DBSession.query(query).scalar()
 
-    factor = crs.axis_info[0].unit_conversion_factor
+    factor = crs.axis_info[0].unit_conversion_factor if len(crs.axis_info) > 0 else 1.0
     calcs = dict(
         length=lambda: geodesic_calc_with_postgis() if crs.is_geographic else geom.length * factor,
         area=lambda: geodesic_calc_with_postgis() if crs.is_geographic else geom.area * factor**2

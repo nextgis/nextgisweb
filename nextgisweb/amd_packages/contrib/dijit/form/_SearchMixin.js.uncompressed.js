@@ -133,7 +133,7 @@ define("dijit/form/_SearchMixin", [
 
 			this._prev_key_backspace = false;
 
-			if (key == keys.DELETE || key == keys.BACKSPACE) {
+			if (key === keys.DELETE || key === keys.BACKSPACE) {
 				this._prev_key_backspace = true;
 				this._maskValidSubsetError = true;
 			}

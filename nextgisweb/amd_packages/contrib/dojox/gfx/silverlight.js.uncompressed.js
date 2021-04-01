@@ -1,4 +1,4 @@
-define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/Color", 
+define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/Color",
 		"dojo/on", "dojo/_base/array", "dojo/dom-geometry", "dojo/dom", "dojo/_base/sniff",
 		"./_base", "./shape", "./path", "./registry"],
   function(kernel,lang,declare,color,on,arr,domGeom,dom,has,g,gs,pathLib){
@@ -256,7 +256,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			//		returns the adjusted ("real") transformation matrix
 			return this.matrix;	// dojox/gfx/matrix.Matrix2D
 		},
-		
+
 		setClip: function(clip){
 			// summary:
 			//		sets the clipping area of this shape.
@@ -267,8 +267,8 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			this.inherited(arguments);
 			var r = this.rawNode;
 			if(clip){
-				var clipType = clip ? "width" in clip ? "rect" : 
-								"cx" in clip ? "ellipse" : 
+				var clipType = clip ? "width" in clip ? "rect" :
+								"cx" in clip ? "ellipse" :
 								"points" in clip ? "polyline" : "d" in clip ? "path" : null : null;
 				if(clip && !clipType){
 					return this;
@@ -328,7 +328,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			//		a Sliverlight node
 			this.rawNode = rawNode;
 			this.rawNode.tag = this.getUID();
-			
+
 		},
 		destroy: function(){
 			// summary:
@@ -641,7 +641,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 	});
 	sl.TextPath.nodeType = "text";
 
-	var surfaces = {}, nullFunc = new Function;
+	var surfaces = {}, nullFunc = function () {};
 
 	sl.Surface = declare("dojox.gfx.silverlight.Surface", gs.Surface, {
 		// summary:
@@ -889,13 +889,13 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			if(a.source){
 				// support silverlight 2.0
 				ev.target = a.source;
-				var gfxId = ev.target.tag;				
+				var gfxId = ev.target.tag;
 				ev.gfxTarget = gs.byId(gfxId);
 			}
 		}catch(e){
 			// a.source does not exist in 1.0
 		}
-	
+
 		if(a){
 			try{
 				ev.ctrlKey = a.ctrl;
@@ -914,7 +914,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 		}
 		return ev;
 	}
-	
+
 	function keyFix(s, a){
 		var ev = {
 			keyCode:  a.platformKeyCode,
@@ -932,7 +932,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 		}
 		return ev;
 	}
-	
+
 	var eventNames = {
 		onclick:		{name: "MouseLeftButtonUp", fix: mouseFix},
 		onmouseenter:	{name: "MouseEnter", fix: mouseFix},
@@ -945,7 +945,7 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 		onkeydown:		{name: "KeyDown", fix: keyFix},
 		onkeyup:		{name: "KeyUp", fix: keyFix}
 	};
-	
+
 	var eventsProcessing = {
 		connect: function(name, object, method){
 			return this.on(name, method ? lang.hitch(object, method) : object);
@@ -976,17 +976,16 @@ define("dojox/gfx/silverlight", ["dojo/_base/kernel", "dojo/_base/lang", "dojo/_
 			return token.remove();
 		}
 	};
-	
+
 	lang.extend(sl.Shape, eventsProcessing);
 	lang.extend(sl.Surface, eventsProcessing);
-	
+
 	// patch dojox/gfx
 	g.equalSources = function(a, b){
 		// summary:
 		//		compares event sources, returns true if they are equal
 		return a && b && a.equals(b);
 	};
-	
+
 	return sl;
 });
-

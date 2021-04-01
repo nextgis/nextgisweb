@@ -27,7 +27,7 @@ return _13&&typeof _13==="object"&&!_10(_13)&&!_e(_13)&&!_c(_13)&&!_a(_13);
 _1.deepCopy=function(_14,_15){
 for(var _16 in _15){
 var _17=_14[_16],_18=_15[_16];
-if(_17!==_18){
+if(_16!=="__proto__"&&_17!==_18){
 if(_12(_18)){
 if(Object.prototype.toString.call(_18)==="[object Date]"){
 _14[_16]=new Date(_18);

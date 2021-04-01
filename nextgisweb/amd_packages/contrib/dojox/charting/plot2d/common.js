@@ -205,5 +205,7 @@ return (_26?_28.format(_25,{places:_27}):_28.format(_25))||"";
 },function(){
 return _26?_25.toFixed(_27):_25.toString();
 });
+},purgeGroup:function(_29){
+return _29.purgeGroup();
 }});
 });
