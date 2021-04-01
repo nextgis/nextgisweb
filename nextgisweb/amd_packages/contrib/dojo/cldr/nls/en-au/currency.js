@@ -5,4 +5,4 @@
 */
 
 //>>built
-define("dojo/cldr/nls/en-au/currency",{"EUR_displayName":"Euro","AUD_symbol":"$","USD_symbol":"US$"});
+define("dojo/cldr/nls/en-au/currency",{"CHF_symbol":"CHF","JPY_symbol":"JPY","HKD_symbol":"HKD","USD_symbol":"USD","CAD_symbol":"CAD","EUR_symbol":"EUR","CNY_symbol":"CNY","GBP_symbol":"GBP","AUD_symbol":"$"});

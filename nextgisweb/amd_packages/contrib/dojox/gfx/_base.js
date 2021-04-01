@@ -131,7 +131,8 @@ var t=_25[_26];
 if(t){
 return new t();
 }
-t=_25[_26]=new Function();
+t=_25[_26]=function(){
+};
 t.prototype=g["default"+_26];
 return new t();
 };

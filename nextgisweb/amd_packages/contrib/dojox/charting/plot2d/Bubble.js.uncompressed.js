@@ -1,9 +1,7 @@
-define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has", 
-		"./CartesianBase", "./_PlotEvents", "./common", "dojox/lang/functional", "dojox/lang/functional/reversed",
-		"dojox/lang/utils", "dojox/gfx/fx"], 
-	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
+		"./CartesianBase", "./_PlotEvents", "./common", "dojox/lang/functional",
+		"dojox/lang/utils", "dojox/gfx/fx"],
+	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, du, fx){
 
 	return declare("dojox.charting.plot2d.Bubble", [CartesianBase, _PlotEvents], {
 		// summary:
@@ -60,7 +58,7 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 			this.resetEvents();
 			this.dirty = this.isDirty();
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();
@@ -106,7 +104,7 @@ define("dojox/charting/plot2d/Bubble", ["dojo/_base/lang", "dojo/_base/declare",
 					continue;
 				}
 				s = run.group;
-                
+
 				var frontCircles = null, outlineCircles = null, shadowCircles = null, styleFunc = this.opt.styleFunc;
 
 				var getFinalTheme = function(item){

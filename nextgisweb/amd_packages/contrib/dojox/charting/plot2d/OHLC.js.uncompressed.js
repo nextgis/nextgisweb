@@ -1,8 +1,6 @@
 define("dojox/charting/plot2d/OHLC", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-	"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"],
-	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+	"dojox/lang/functional", "dojox/lang/utils", "dojox/gfx/fx"],
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, du, fx){
 
 	//	Candlesticks are based on the Bars plot type; we expect the following passed
 	//	as values in a series:
@@ -105,7 +103,7 @@ define("dojox/charting/plot2d/OHLC", ["dojo/_base/lang", "dojo/_base/array", "do
 			this.resetEvents();
 			this.dirty = this.isDirty();
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				var s = this.getGroup();

@@ -32,7 +32,7 @@ return;
 }
 var _f=_e.charOrCode;
 this._prev_key_backspace=false;
-if(_f==_2.DELETE||_f==_2.BACKSPACE){
+if(_f===_2.DELETE||_f===_2.BACKSPACE){
 this._prev_key_backspace=true;
 this._maskValidSubsetError=true;
 }

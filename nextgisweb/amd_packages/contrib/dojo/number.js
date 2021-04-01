@@ -32,7 +32,7 @@ _c*=1000;
 if(_d.indexOf("¤")!=-1){
 _f=_e.customs.currencyGroup||_f;
 _10=_e.customs.currencyDecimal||_10;
-_d=_d.replace(/([\s\xa0]*)(\u00a4{1,3})([\s\xa0]*)/,function(_13,_14,_15,_16){
+_d=_d.replace(/([\s\xa0\u202f]*)(\u00a4{1,3})([\s\xa0\u202f]*)/,function(_13,_14,_15,_16){
 var _17=["symbol","currency","displayName"][_15.length-1],_18=_e[_17]||_e.currency||"";
 if(!_18){
 return "";
@@ -199,13 +199,13 @@ return "("+_6._realNumberRegexp(_3b)+")";
 });
 },true);
 if(_37){
-re=re.replace(/([\s\xa0]*)(\u00a4{1,3})([\s\xa0]*)/g,function(_3f,_40,_41,_42){
+re=re.replace(/([\s\xa0\u202f]*)(\u00a4{1,3})([\s\xa0\u202f]*)/g,function(_3f,_40,_41,_42){
 var _43=["symbol","currency","displayName"][_41.length-1],_44=_5.escapeString(_30[_43]||_30.currency||"");
 if(!_44){
 return "";
 }
-_40=_40?"[\\s\\xa0]":"";
-_42=_42?"[\\s\\xa0]":"";
+_40=_40?"[\\s\\xa0\\u202f]":"";
+_42=_42?"[\\s\\xa0\\u202f]":"";
 if(!_30.strict){
 if(_40){
 _40+="*";
@@ -218,7 +218,7 @@ return "(?:"+_40+_44+_42+")?";
 return _40+_44+_42;
 });
 }
-return {regexp:re.replace(/[\xa0 ]/g,"[\\s\\xa0]"),group:_34,decimal:_35,factor:_36};
+return {regexp:re.replace(/[\xa0\u202f ]/g,"[\\s\\xa0\\u202f]"),group:_34,decimal:_35,factor:_36};
 };
 _6.parse=function(_45,_46){
 var _47=_6._parseInfo(_46),_48=(new RegExp("^"+_47.regexp+"$")).exec(_45);
@@ -233,7 +233,7 @@ return NaN;
 _49=_48[2];
 _47.factor*=-1;
 }
-_49=_49.replace(new RegExp("["+_47.group+"\\s\\xa0"+"]","g"),"").replace(_47.decimal,".");
+_49=_49.replace(new RegExp("["+_47.group+"\\s\\xa0\\u202f"+"]","g"),"").replace(_47.decimal,".");
 return _49*_47.factor;
 };
 _6._realNumberRegexp=function(_4a){
@@ -302,6 +302,10 @@ sep="\\s";
 }else{
 if(sep==" "){
 sep="\\s\\xa0";
+}else{
+if(sep==" "){
+sep="\\s\\u202f";
+}
 }
 }
 var grp=_4f.groupSize,_52=_4f.groupSize2;

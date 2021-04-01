@@ -2013,11 +2013,11 @@ return {
 'dojox/charting/Chart':function(){
 define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "dojo/dom-style",
 	"dojo/dom", "dojo/dom-geometry", "dojo/dom-construct","dojo/_base/Color", "dojo/sniff",
-	"./Element", "./SimpleTheme", "./Series", "./axis2d/common", "dojox/gfx/shape",
+	"./Element", "./SimpleTheme", "./Series", "./axis2d/common", "./plot2d/common", "dojox/gfx/shape",
 	"dojox/gfx", "dojo/has!dojo-bidi?./bidi/Chart", "dojox/lang/functional", "dojox/lang/functional/fold", "dojox/lang/functional/reversed"],
 	function(dojox, lang, arr, declare, domStyle,
 	 		 dom, domGeom, domConstruct, Color, has,
-	 		 Element, SimpleTheme, Series, common, shape,
+			 Element, SimpleTheme, Series, common, plot2dCommon, shape,
 	 		 g, BidiChart, func){
 	/*=====
 	var __ChartCtorArgs = {
@@ -2057,13 +2057,29 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 	=====*/
 
 	var dc = lang.getObject("charting", true, dojox),
-		clear = func.lambda("item.clear()"),
-		purge = func.lambda("item.purgeGroup()"),
-		destroy = func.lambda("item.destroy()"),
-		makeClean = func.lambda("item.dirty = false"),
-		makeDirty = func.lambda("item.dirty = true"),
-		getName = func.lambda("item.name"),
 		defaultMargins = {l: 10, t: 10, r: 10, b: 10};
+
+	function clear (item) {
+		return item.clear();
+	}
+
+	function destroy (item) {
+		return item.destroy();
+	}
+
+	function makeClean (item) {
+		item.dirty = false;
+		return false;
+	}
+
+	function makeDirty (item) {
+		item.dirty = true;
+		return true;
+	}
+
+	function getName (item) {
+		return item.name;
+	}
 
 	var Chart = declare(has("dojo-bidi")? "dojox.charting.NonBidiChart" : "dojox.charting.Chart", null, {
 		// summary:
@@ -2137,7 +2153,7 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 		//	|			)
 		//	|			.render();
 		//	|	});
-		
+
 		// theme: dojox/charting/SimpleTheme?
 		//		An optional theme to use for styling the chart.
 		// axes: dojox/charting/axis2d/Base{}?
@@ -2184,7 +2200,7 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 			this.titlePos  = kwArgs.titlePos;
 			this.titleFont = kwArgs.titleFont;
 			this.titleFontColor = kwArgs.titleFontColor;
-			this.titleAlign = kwArgs.titleAlign; // This can be middle, left, right, or edge 
+			this.titleAlign = kwArgs.titleAlign; // This can be middle, left, right, or edge
 															 // edge is left or right aligned with chart plot edge depending on bidi.
 			this.chartTitle = null;
 			this.htmlLabels = true;
@@ -2900,7 +2916,7 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 				clearTimeout(this._delayedRenderHandle);
 				this._delayedRenderHandle = null;
 			}
-			
+
 			if(this.theme){
 				this.theme.clear();
 			}
@@ -2939,9 +2955,9 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 			//this.theme.defineColors({num: requiredColors, cache: false});
 
 			// clear old shapes
-			arr.forEach(this.series, purge);
-			func.forIn(this.axes, purge);
-			arr.forEach(this.stack,  purge);
+			arr.forEach(this.series, plot2dCommon.purgeGroup);
+			func.forIn(this.axes, plot2dCommon.purgeGroup);
+			arr.forEach(this.stack, plot2dCommon.purgeGroup);
 			var children = this.surface.children;
 			// starting with 1.9 the registry is optional and thus dispose is
 			if(shape.dispose){
@@ -2995,7 +3011,7 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 				labelType = forceHtmlLabels || !has("ie") && !has("opera") && this.htmlLabels ? "html" : "gfx",
 				tsize = g.normalizedLength(g.splitFontString(this.titleFont).size),
 				tBox = g._base._getTextBox(this.title,{ font: this.titleFont });
-				
+
 			var titleAlign = this.titleAlign;
 			var isRtl = has("dojo-bidi") && this.isRightToLeft();
 			var posX = dim.width/2; // Default is middle.
@@ -3213,11 +3229,11 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 			}
 		},
 		setDir : function(dir){
-			return this; 
+			return this;
 		},
 		_resetLeftBottom: function(axis){
 		},
-		formatTruncatedLabel: function(element, label, labelType){			
+		formatTruncatedLabel: function(element, label, labelType){
 		}
 	});
 
@@ -3269,7 +3285,7 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 			plot.initializeScalers(plotArea, stats);
 		});
 	}
-	
+
 	return has("dojo-bidi")? declare("dojox.charting.Chart", [Chart, BidiChart]) : Chart;
 });
 
@@ -3722,13 +3738,13 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 
 	var g = lang.getObject("dojox.gfx", true),
 		b = g._base = {};
-	
+
 	// candidates for dojox.style (work on VML and SVG nodes)
 	g._hasClass = function(/*DomNode*/node, /*String*/classStr){
 		// summary:
 		//		Returns whether or not the specified classes are a portion of the
 		//		class list currently applied to the node.
-		
+
 		// return (new RegExp('(^|\\s+)'+classStr+'(\\s+|$)')).test(node.className)	// Boolean
 		var cls = node.getAttribute("className");
 		return cls && (" " + cls + " ").indexOf(" " + classStr + " ") >= 0;  // Boolean
@@ -3766,7 +3782,7 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 			'x-small': 0, 'small': 0, 'medium': 0, 'large': 0, 'x-large': 0,
 			'xx-large': 0
 		};
-		var p, oldStyle;	
+		var p, oldStyle;
 		if(has("ie")){
 			//	We do a font-size fix if and only if one isn't applied already.
 			// NOTE: If someone set the fontSize on the HTML Element, this will kill it.
@@ -3951,22 +3967,22 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 		//		The join style to use when combining path segments. Default value 4.
 		join: 4
 	};
-	
+
 	g.Fill = {
 		// summary:
 		//		Defines how to fill a shape. Four types of fills can be used: solid, linear gradient, radial gradient and pattern.
 		//		See dojox/gfx.LinearGradient, dojox/gfx.RadialGradient and dojox/gfx.Pattern respectively for more information about the properties supported by each type.
-		
+
 		// type: String?
 		//		The type of fill. One of 'linear', 'radial', 'pattern' or undefined. If not specified, a solid fill is assumed.
 		type:"",
-		
+
 		// color: String|dojo/Color?
 		//		The color of a solid fill type.
 		color:null,
-		
+
 	};
-	
+
 	g.LinearGradient = {
 		// summary:
 		//		An object defining the default stylistic properties used for Linear Gradient fills.
@@ -3998,7 +4014,7 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 		//		Default value, [{ offset: 0, color: 'black'},{offset: 1, color: 'white'}], is a gradient from black to white.
 		colors: []
 	};
-	
+
 	g.RadialGradient = {
 		// summary:
 		//		Specifies the properties for RadialGradients using in fills patterns.
@@ -4025,7 +4041,7 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 		//		Default value, [{ offset: 0, color: 'black'},{offset: 1, color: 'white'}], is a gradient from black to white.
 		colors: []
 	};
-	
+
 	g.Pattern = {
 		// summary:
 		//		An object specifying the default properties for a Pattern using in fill operations.
@@ -4084,27 +4100,27 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 	g.Font = {
 		// summary:
 		//		An object specifying the properties for a Font used in text operations.
-	
+
 		// type: String
 		//		Specifies this object is a Font, value 'font'.
 		type: "font",
-	
+
 		// style: String
 		//		The font style, one of 'normal', 'bold', default value 'normal'.
 		style: "normal",
-	
+
 		// variant: String
 		//		The font variant, one of 'normal', ... , default value 'normal'.
 		variant: "normal",
-	
+
 		// weight: String
 		//		The font weight, one of 'normal', ..., default value 'normal'.
 		weight: "normal",
-	
+
 		// size: String
 		//		The font size (including units), default value '10pt'.
 		size: "10pt",
-	
+
 		// family: String
 		//		The font family, one of 'serif', 'sanserif', ..., default value 'serif'.
 		family: "serif"
@@ -4123,7 +4139,7 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 
 			// type: String
 			//		Specifies this object is a Path, default value 'path'.
-			type: "path", 
+			type: "path",
 
 			// path: String
 			//		The path commands. See W32C SVG 1.0 specification.
@@ -4487,7 +4503,7 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 				if(t){
 					return new t();
 				}
-				t = typeCtorCache[type] = new Function();
+				t = typeCtorCache[type] = function () {};
 				t.prototype = g[ "default" + type ];
 				return new t();
 			}
@@ -4714,7 +4730,7 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 			}
 		}
 	});
-	
+
 	/*=====
 		g.createSurface = function(parentNode, width, height){
 			// summary:
@@ -4733,7 +4749,7 @@ function(kernel, lang, Color, has, win, arr, dom, domConstruct, domGeom){
 			//		private
 		};
 	=====*/
-	
+
 	return g; // defaults object api
 });
 
@@ -7466,6 +7482,227 @@ define(["dojo/_base/lang", "dojo/_base/window", "dojo/dom-geometry", "dojox/gfx"
 });
 
 },
+'dojox/charting/plot2d/common':function(){
+define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/Color",
+		"dojox/gfx", "dojox/lang/functional", "../scaler/common"],
+	function(lang, arr, Color, g, df, sc){
+
+	var common = lang.getObject("dojox.charting.plot2d.common", true);
+
+	return lang.mixin(common, {
+		doIfLoaded: sc.doIfLoaded,
+		makeStroke: function(stroke){
+			if(!stroke){ return stroke; }
+			if(typeof stroke == "string" || stroke instanceof Color){
+				stroke = {color: stroke};
+			}
+			return g.makeParameters(g.defaultStroke, stroke);
+		},
+		augmentColor: function(target, color){
+			var t = new Color(target),
+				c = new Color(color);
+			c.a = t.a;
+			return c;
+		},
+		augmentStroke: function(stroke, color){
+			var s = common.makeStroke(stroke);
+			if(s){
+				s.color = common.augmentColor(s.color, color);
+			}
+			return s;
+		},
+		augmentFill: function(fill, color){
+			var fc, c = new Color(color);
+			if(typeof fill == "string" || fill instanceof Color){
+				return common.augmentColor(fill, color);
+			}
+			return fill;
+		},
+
+		defaultStats: {
+			vmin: Number.POSITIVE_INFINITY, vmax: Number.NEGATIVE_INFINITY,
+			hmin: Number.POSITIVE_INFINITY, hmax: Number.NEGATIVE_INFINITY
+		},
+
+		collectSimpleStats: function(series, isNullValue){
+			var stats = lang.delegate(common.defaultStats);
+			for(var i = 0; i < series.length; ++i){
+				var run = series[i];
+				for(var j = 0; j < run.data.length; j++){
+					if(!isNullValue(run.data[j])){
+						if(typeof run.data[j] == "number"){
+							// 1D case
+							var old_vmin = stats.vmin, old_vmax = stats.vmax;
+							arr.forEach(run.data, function(val, i){
+								if(!isNullValue(val)){
+									var x = i + 1, y = val;
+									if(isNaN(y)){ y = 0; }
+									stats.hmin = Math.min(stats.hmin, x);
+									stats.hmax = Math.max(stats.hmax, x);
+									stats.vmin = Math.min(stats.vmin, y);
+									stats.vmax = Math.max(stats.vmax, y);
+								}
+							});
+							if("ymin" in run){ stats.vmin = Math.min(old_vmin, run.ymin); }
+							if("ymax" in run){ stats.vmax = Math.max(old_vmax, run.ymax); }
+						}else{
+							// 2D case
+							var old_hmin = stats.hmin, old_hmax = stats.hmax,
+								old_vmin = stats.vmin, old_vmax = stats.vmax;
+							if(!("xmin" in run) || !("xmax" in run) || !("ymin" in run) || !("ymax" in run)){
+								arr.forEach(run.data, function(val, i){
+									if(!isNullValue(val)){
+										var x = "x" in val ? val.x : i + 1, y = val.y;
+										if(isNaN(x)){ x = 0; }
+										if(isNaN(y)){ y = 0; }
+										stats.hmin = Math.min(stats.hmin, x);
+										stats.hmax = Math.max(stats.hmax, x);
+										stats.vmin = Math.min(stats.vmin, y);
+										stats.vmax = Math.max(stats.vmax, y);
+									}
+								});
+							}
+							if("xmin" in run){ stats.hmin = Math.min(old_hmin, run.xmin); }
+							if("xmax" in run){ stats.hmax = Math.max(old_hmax, run.xmax); }
+							if("ymin" in run){ stats.vmin = Math.min(old_vmin, run.ymin); }
+							if("ymax" in run){ stats.vmax = Math.max(old_vmax, run.ymax); }
+						}
+
+						break;
+					}
+				}
+			}
+			return stats;
+		},
+
+		calculateBarSize: function(/* Number */ availableSize, /* Object */ opt, /* Number? */ clusterSize){
+			if(!clusterSize){
+				clusterSize = 1;
+			}
+			var gap = opt.gap, size = (availableSize - 2 * gap) / clusterSize;
+			if("minBarSize" in opt){
+				size = Math.max(size, opt.minBarSize);
+			}
+			if("maxBarSize" in opt){
+				size = Math.min(size, opt.maxBarSize);
+			}
+			size = Math.max(size, 1);
+			gap = (availableSize - size * clusterSize) / 2;
+			return {size: size, gap: gap};	// Object
+		},
+
+		collectStackedStats: function(series){
+			// collect statistics
+			var stats = lang.clone(common.defaultStats);
+			if(series.length){
+				// 1st pass: find the maximal length of runs
+				stats.hmin = Math.min(stats.hmin, 1);
+				stats.hmax = df.foldl(series, "seed, run -> Math.max(seed, run.data.length)", stats.hmax);
+				// 2nd pass: stack values
+				for(var i = 0; i < stats.hmax; ++i){
+					var v = series[0].data[i];
+					v = v && (typeof v == "number" ? v : v.y);
+					if(isNaN(v)){ v = 0; }
+					stats.vmin = Math.min(stats.vmin, v);
+					for(var j = 1; j < series.length; ++j){
+						var t = series[j].data[i];
+						t = t && (typeof t == "number" ? t : t.y);
+						if(isNaN(t)){ t = 0; }
+						v += t;
+					}
+					stats.vmax = Math.max(stats.vmax, v);
+				}
+			}
+			return stats;
+		},
+
+		curve: function(/* Number[] */a, /* Number|String */tension){
+			//	FIX for #7235, submitted by Enzo Michelangeli.
+			//	Emulates the smoothing algorithms used in a famous, unnamed spreadsheet
+			//		program ;)
+			var array = a.slice(0);
+			if(tension == "x") {
+				array[array.length] = array[0];   // add a last element equal to the first, closing the loop
+			}
+			var p=arr.map(array, function(item, i){
+				if(i==0){ return "M" + item.x + "," + item.y; }
+				if(!isNaN(tension)) { // use standard Dojo smoothing in tension is numeric
+					var dx=item.x-array[i-1].x, dy=array[i-1].y;
+					return "C"+(item.x-(tension-1)*(dx/tension))+","+dy+" "+(item.x-(dx/tension))+","+item.y+" "+item.x+","+item.y;
+				} else if(tension == "X" || tension == "x" || tension == "S") {
+					// use Excel "line smoothing" algorithm (http://xlrotor.com/resources/files.shtml)
+					var p0, p1 = array[i-1], p2 = array[i], p3;
+					var bz1x, bz1y, bz2x, bz2y;
+					var f = 1/6;
+					if(i==1) {
+						if(tension == "x") {
+							p0 = array[array.length-2];
+						} else { // "tension == X || tension == "S"
+							p0 = p1;
+						}
+						f = 1/3;
+					} else {
+						p0 = array[i-2];
+					}
+					if(i==(array.length-1)) {
+						if(tension == "x") {
+							p3 = array[1];
+						} else { // "tension == X || tension == "S"
+							p3 = p2;
+						}
+						f = 1/3;
+					} else {
+						p3 = array[i+1];
+					}
+					var p1p2 = Math.sqrt((p2.x-p1.x)*(p2.x-p1.x)+(p2.y-p1.y)*(p2.y-p1.y));
+					var p0p2 = Math.sqrt((p2.x-p0.x)*(p2.x-p0.x)+(p2.y-p0.y)*(p2.y-p0.y));
+					var p1p3 = Math.sqrt((p3.x-p1.x)*(p3.x-p1.x)+(p3.y-p1.y)*(p3.y-p1.y));
+
+					var p0p2f = p0p2 * f;
+					var p1p3f = p1p3 * f;
+
+					if(p0p2f > p1p2/2 && p1p3f > p1p2/2) {
+						p0p2f = p1p2/2;
+						p1p3f = p1p2/2;
+					} else if(p0p2f > p1p2/2) {
+						p0p2f = p1p2/2;
+						p1p3f = p1p2/2 * p1p3/p0p2;
+					} else if(p1p3f > p1p2/2) {
+						p1p3f = p1p2/2;
+						p0p2f = p1p2/2 * p0p2/p1p3;
+					}
+
+					if(tension == "S") {
+						if(p0 == p1) { p0p2f = 0; }
+						if(p2 == p3) { p1p3f = 0; }
+					}
+
+					bz1x = p1.x + p0p2f*(p2.x - p0.x)/p0p2;
+					bz1y = p1.y + p0p2f*(p2.y - p0.y)/p0p2;
+					bz2x = p2.x - p1p3f*(p3.x - p1.x)/p1p3;
+					bz2y = p2.y - p1p3f*(p3.y - p1.y)/p1p3;
+				}
+				return "C"+(bz1x+","+bz1y+" "+bz2x+","+bz2y+" "+p2.x+","+p2.y);
+			});
+			return p.join(" ");
+		},
+
+		getLabel: function(/*Number*/number, /*Boolean*/fixed, /*Number*/precision){
+			return sc.doIfLoaded("dojo/number", function(numberLib){
+				return (fixed ? numberLib.format(number, {places : precision}) :
+					numberLib.format(number)) || "";
+			}, function(){
+				return fixed ? number.toFixed(precision) : number.toString();
+			});
+		},
+
+		purgeGroup: function (item) {
+			return item.purgeGroup();
+		}
+	});
+});
+
+},
 'dojox/lang/functional':function(){
 define(["./functional/lambda", "./functional/array", "./functional/object"], function(df){
 	return df;
@@ -7857,6 +8094,79 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "./lambda"], function(kernel, la
 	});
 	
 	return df;
+});
+
+},
+'dojox/charting/scaler/common':function(){
+define(["dojo/_base/lang"], function(lang){
+
+	var eq = function(/*Number*/ a, /*Number*/ b){
+		// summary:
+		//		compare two FP numbers for equality
+		return Math.abs(a - b) <= 1e-6 * (Math.abs(a) + Math.abs(b));	// Boolean
+	};
+
+	var common = lang.getObject("dojox.charting.scaler.common", true);
+
+	var testedModules = {};
+
+	return lang.mixin(common, {
+		doIfLoaded: function(moduleName, ifloaded, ifnotloaded){
+			if(testedModules[moduleName] === undefined){
+				try{
+					testedModules[moduleName] = require(moduleName);
+				}catch(e){
+					testedModules[moduleName] = null;
+				}
+			}
+			if(testedModules[moduleName]){
+				return ifloaded(testedModules[moduleName]);
+			}else{
+				return ifnotloaded();
+			}
+		},
+		getNumericLabel: function(/*Number*/ number, /*Number*/ precision, /*Object*/ kwArgs){
+			var def = "";
+			common.doIfLoaded("dojo/number", function(numberLib){
+				def = (kwArgs.fixed ? numberLib.format(number, {places : precision < 0 ? -precision : 0}) :
+					numberLib.format(number)) || "";
+			}, function(){
+				def = kwArgs.fixed ? number.toFixed(precision < 0 ? -precision : 0) : number.toString();
+			});
+			if(kwArgs.labelFunc){
+				var r = kwArgs.labelFunc(def, number, precision);
+				if(r){ return r; }
+				// else fall through to the regular labels search
+			}
+			if(kwArgs.labels){
+				// classic binary search
+				// TODO: working only if the array is sorted per value should be better documented or sorted automatically
+				var l = kwArgs.labels, lo = 0, hi = l.length;
+				while(lo < hi){
+					var mid = Math.floor((lo + hi) / 2), val = l[mid].value;
+					if(val < number){
+						lo = mid + 1;
+					}else{
+						hi = mid;
+					}
+				}
+				// lets take into account FP errors
+				if(lo < l.length && eq(l[lo].value, number)){
+					return l[lo].text;
+				}
+				--lo;
+				if(lo >= 0 && lo < l.length && eq(l[lo].value, number)){
+					return l[lo].text;
+				}
+				lo += 2;
+				if(lo < l.length && eq(l[lo].value, number)){
+					return l[lo].text;
+				}
+				// otherwise we will produce a number
+			}
+			return def;
+		}
+	});
 });
 
 },
@@ -9661,83 +9971,10 @@ define(["dojo/_base/lang", "./common"],
 });
 
 },
-'dojox/charting/scaler/common':function(){
-define(["dojo/_base/lang"], function(lang){
-
-	var eq = function(/*Number*/ a, /*Number*/ b){
-		// summary:
-		//		compare two FP numbers for equality
-		return Math.abs(a - b) <= 1e-6 * (Math.abs(a) + Math.abs(b));	// Boolean
-	};
-
-	var common = lang.getObject("dojox.charting.scaler.common", true);
-
-	var testedModules = {};
-
-	return lang.mixin(common, {
-		doIfLoaded: function(moduleName, ifloaded, ifnotloaded){
-			if(testedModules[moduleName] === undefined){
-				try{
-					testedModules[moduleName] = require(moduleName);
-				}catch(e){
-					testedModules[moduleName] = null;
-				}
-			}
-			if(testedModules[moduleName]){
-				return ifloaded(testedModules[moduleName]);
-			}else{
-				return ifnotloaded();
-			}
-		},
-		getNumericLabel: function(/*Number*/ number, /*Number*/ precision, /*Object*/ kwArgs){
-			var def = "";
-			common.doIfLoaded("dojo/number", function(numberLib){
-				def = (kwArgs.fixed ? numberLib.format(number, {places : precision < 0 ? -precision : 0}) :
-					numberLib.format(number)) || "";
-			}, function(){
-				def = kwArgs.fixed ? number.toFixed(precision < 0 ? -precision : 0) : number.toString();
-			});
-			if(kwArgs.labelFunc){
-				var r = kwArgs.labelFunc(def, number, precision);
-				if(r){ return r; }
-				// else fall through to the regular labels search
-			}
-			if(kwArgs.labels){
-				// classic binary search
-				// TODO: working only if the array is sorted per value should be better documented or sorted automatically
-				var l = kwArgs.labels, lo = 0, hi = l.length;
-				while(lo < hi){
-					var mid = Math.floor((lo + hi) / 2), val = l[mid].value;
-					if(val < number){
-						lo = mid + 1;
-					}else{
-						hi = mid;
-					}
-				}
-				// lets take into account FP errors
-				if(lo < l.length && eq(l[lo].value, number)){
-					return l[lo].text;
-				}
-				--lo;
-				if(lo >= 0 && lo < l.length && eq(l[lo].value, number)){
-					return l[lo].text;
-				}
-				lo += 2;
-				if(lo < l.length && eq(l[lo].value, number)){
-					return l[lo].text;
-				}
-				// otherwise we will produce a number
-			}
-			return def;
-		}
-	});
-});
-
-},
 'dojox/charting/plot2d/Default':function(){
 define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
-		"./CartesianBase", "./_PlotEvents", "./common", "dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"],
-	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
+		"./CartesianBase", "./_PlotEvents", "./common", "dojox/lang/functional", "dojox/lang/utils", "dojox/gfx/fx"],
+	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, du, fx){
 
 	/*=====
 	declare("dojox.charting.plot2d.__DefaultCtorArgs", dojox.charting.plot2d.__CartesianCtorArgs, {
@@ -9841,8 +10078,6 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
 		zeroLine: 0
 	});
 =====*/
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
 
 	var DEFAULT_ANIMATION_LENGTH = 1200;	// in ms
 
@@ -9956,7 +10191,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
 			this.dirty = this.isDirty();
 			var s;
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				this.getGroup().setTransform(null);
@@ -10690,223 +10925,6 @@ dojox.charting.plot2d.__PlotCtorArgs = {
 });
 
 },
-'dojox/charting/plot2d/common':function(){
-define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/Color", 
-		"dojox/gfx", "dojox/lang/functional", "../scaler/common"], 
-	function(lang, arr, Color, g, df, sc){
-	
-	var common = lang.getObject("dojox.charting.plot2d.common", true);
-	
-	return lang.mixin(common, {	
-		doIfLoaded: sc.doIfLoaded,
-		makeStroke: function(stroke){
-			if(!stroke){ return stroke; }
-			if(typeof stroke == "string" || stroke instanceof Color){
-				stroke = {color: stroke};
-			}
-			return g.makeParameters(g.defaultStroke, stroke);
-		},
-		augmentColor: function(target, color){
-			var t = new Color(target),
-				c = new Color(color);
-			c.a = t.a;
-			return c;
-		},
-		augmentStroke: function(stroke, color){
-			var s = common.makeStroke(stroke);
-			if(s){
-				s.color = common.augmentColor(s.color, color);
-			}
-			return s;
-		},
-		augmentFill: function(fill, color){
-			var fc, c = new Color(color);
-			if(typeof fill == "string" || fill instanceof Color){
-				return common.augmentColor(fill, color);
-			}
-			return fill;
-		},
-
-		defaultStats: {
-			vmin: Number.POSITIVE_INFINITY, vmax: Number.NEGATIVE_INFINITY,
-			hmin: Number.POSITIVE_INFINITY, hmax: Number.NEGATIVE_INFINITY
-		},
-
-		collectSimpleStats: function(series, isNullValue){
-			var stats = lang.delegate(common.defaultStats);
-			for(var i = 0; i < series.length; ++i){
-				var run = series[i];
-				for(var j = 0; j < run.data.length; j++){
-					if(!isNullValue(run.data[j])){
-						if(typeof run.data[j] == "number"){
-							// 1D case
-							var old_vmin = stats.vmin, old_vmax = stats.vmax;
-							arr.forEach(run.data, function(val, i){
-								if(!isNullValue(val)){
-									var x = i + 1, y = val;
-									if(isNaN(y)){ y = 0; }
-									stats.hmin = Math.min(stats.hmin, x);
-									stats.hmax = Math.max(stats.hmax, x);
-									stats.vmin = Math.min(stats.vmin, y);
-									stats.vmax = Math.max(stats.vmax, y);
-								}
-							});
-							if("ymin" in run){ stats.vmin = Math.min(old_vmin, run.ymin); }
-							if("ymax" in run){ stats.vmax = Math.max(old_vmax, run.ymax); }
-						}else{
-							// 2D case
-							var old_hmin = stats.hmin, old_hmax = stats.hmax,
-								old_vmin = stats.vmin, old_vmax = stats.vmax;
-							if(!("xmin" in run) || !("xmax" in run) || !("ymin" in run) || !("ymax" in run)){
-								arr.forEach(run.data, function(val, i){
-									if(!isNullValue(val)){
-										var x = "x" in val ? val.x : i + 1, y = val.y;
-										if(isNaN(x)){ x = 0; }
-										if(isNaN(y)){ y = 0; }
-										stats.hmin = Math.min(stats.hmin, x);
-										stats.hmax = Math.max(stats.hmax, x);
-										stats.vmin = Math.min(stats.vmin, y);
-										stats.vmax = Math.max(stats.vmax, y);
-									}
-								});
-							}
-							if("xmin" in run){ stats.hmin = Math.min(old_hmin, run.xmin); }
-							if("xmax" in run){ stats.hmax = Math.max(old_hmax, run.xmax); }
-							if("ymin" in run){ stats.vmin = Math.min(old_vmin, run.ymin); }
-							if("ymax" in run){ stats.vmax = Math.max(old_vmax, run.ymax); }
-						}
-
-						break;
-					}
-				}
-			}
-			return stats;
-		},
-
-		calculateBarSize: function(/* Number */ availableSize, /* Object */ opt, /* Number? */ clusterSize){
-			if(!clusterSize){
-				clusterSize = 1;
-			}
-			var gap = opt.gap, size = (availableSize - 2 * gap) / clusterSize;
-			if("minBarSize" in opt){
-				size = Math.max(size, opt.minBarSize);
-			}
-			if("maxBarSize" in opt){
-				size = Math.min(size, opt.maxBarSize);
-			}
-			size = Math.max(size, 1);
-			gap = (availableSize - size * clusterSize) / 2;
-			return {size: size, gap: gap};	// Object
-		},
-
-		collectStackedStats: function(series){
-			// collect statistics
-			var stats = lang.clone(common.defaultStats);
-			if(series.length){
-				// 1st pass: find the maximal length of runs
-				stats.hmin = Math.min(stats.hmin, 1);
-				stats.hmax = df.foldl(series, "seed, run -> Math.max(seed, run.data.length)", stats.hmax);
-				// 2nd pass: stack values
-				for(var i = 0; i < stats.hmax; ++i){
-					var v = series[0].data[i];
-					v = v && (typeof v == "number" ? v : v.y);
-					if(isNaN(v)){ v = 0; }
-					stats.vmin = Math.min(stats.vmin, v);
-					for(var j = 1; j < series.length; ++j){
-						var t = series[j].data[i];
-						t = t && (typeof t == "number" ? t : t.y);
-						if(isNaN(t)){ t = 0; }
-						v += t;
-					}
-					stats.vmax = Math.max(stats.vmax, v);
-				}
-			}
-			return stats;
-		},
-
-		curve: function(/* Number[] */a, /* Number|String */tension){
-			//	FIX for #7235, submitted by Enzo Michelangeli.
-			//	Emulates the smoothing algorithms used in a famous, unnamed spreadsheet
-			//		program ;)
-			var array = a.slice(0);
-			if(tension == "x") {
-				array[array.length] = array[0];   // add a last element equal to the first, closing the loop
-			}
-			var p=arr.map(array, function(item, i){
-				if(i==0){ return "M" + item.x + "," + item.y; }
-				if(!isNaN(tension)) { // use standard Dojo smoothing in tension is numeric
-					var dx=item.x-array[i-1].x, dy=array[i-1].y;
-					return "C"+(item.x-(tension-1)*(dx/tension))+","+dy+" "+(item.x-(dx/tension))+","+item.y+" "+item.x+","+item.y;
-				} else if(tension == "X" || tension == "x" || tension == "S") {
-					// use Excel "line smoothing" algorithm (http://xlrotor.com/resources/files.shtml)
-					var p0, p1 = array[i-1], p2 = array[i], p3;
-					var bz1x, bz1y, bz2x, bz2y;
-					var f = 1/6;
-					if(i==1) {
-						if(tension == "x") {
-							p0 = array[array.length-2];
-						} else { // "tension == X || tension == "S"
-							p0 = p1;
-						}
-						f = 1/3;
-					} else {
-						p0 = array[i-2];
-					}
-					if(i==(array.length-1)) {
-						if(tension == "x") {
-							p3 = array[1];
-						} else { // "tension == X || tension == "S"
-							p3 = p2;
-						}
-						f = 1/3;
-					} else {
-						p3 = array[i+1];
-					}
-					var p1p2 = Math.sqrt((p2.x-p1.x)*(p2.x-p1.x)+(p2.y-p1.y)*(p2.y-p1.y));
-					var p0p2 = Math.sqrt((p2.x-p0.x)*(p2.x-p0.x)+(p2.y-p0.y)*(p2.y-p0.y));
-					var p1p3 = Math.sqrt((p3.x-p1.x)*(p3.x-p1.x)+(p3.y-p1.y)*(p3.y-p1.y));
-
-					var p0p2f = p0p2 * f;
-					var p1p3f = p1p3 * f;
-
-					if(p0p2f > p1p2/2 && p1p3f > p1p2/2) {
-						p0p2f = p1p2/2;
-						p1p3f = p1p2/2;
-					} else if(p0p2f > p1p2/2) {
-						p0p2f = p1p2/2;
-						p1p3f = p1p2/2 * p1p3/p0p2;
-					} else if(p1p3f > p1p2/2) {
-						p1p3f = p1p2/2;
-						p0p2f = p1p2/2 * p0p2/p1p3;
-					}
-
-					if(tension == "S") {
-						if(p0 == p1) { p0p2f = 0; }
-						if(p2 == p3) { p1p3f = 0; }
-					}
-
-					bz1x = p1.x + p0p2f*(p2.x - p0.x)/p0p2;
-					bz1y = p1.y + p0p2f*(p2.y - p0.y)/p0p2;
-					bz2x = p2.x - p1p3f*(p3.x - p1.x)/p1p3;
-					bz2y = p2.y - p1p3f*(p3.y - p1.y)/p1p3;
-				}
-				return "C"+(bz1x+","+bz1y+" "+bz2x+","+bz2y+" "+p2.x+","+p2.y);
-			});
-			return p.join(" ");
-		},
-		
-		getLabel: function(/*Number*/number, /*Boolean*/fixed, /*Number*/precision){
-			return sc.doIfLoaded("dojo/number", function(numberLib){
-				return (fixed ? numberLib.format(number, {places : precision}) :
-					numberLib.format(number)) || "";
-			}, function(){
-				return fixed ? number.toFixed(precision) : number.toString();
-			});
-		}
-	});
-});
-
-},
 'dojox/charting/scaler/primitive':function(){
 define(["dojo/_base/lang"], 
   function(lang){
@@ -11487,10 +11505,8 @@ define(["dojo/_base/declare", "./Default"], function(declare, Default){
 },
 'dojox/charting/plot2d/Scatter':function(){
 define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-	"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx", "dojox/gfx/gradutils"],
-	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx, gradutils){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+	"dojox/lang/functional", "dojox/lang/utils", "dojox/gfx/fx", "dojox/gfx/gradutils"],
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, du, fx, gradutils){
 
 	return declare("dojox.charting.plot2d.Scatter", [CartesianBase, _PlotEvents], {
 		// summary:
@@ -11539,7 +11555,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 			this.dirty = this.isDirty();
 			var s;
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();
@@ -11979,10 +11995,8 @@ define(["dojo/_base/declare", "./Stacked"], function(declare, Stacked){
 },
 'dojox/charting/plot2d/Columns':function(){
 define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-		"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"],
-	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+		"dojox/lang/functional", "dojox/lang/utils", "dojox/gfx/fx"],
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, du, fx){
 
 	var alwaysFalse = function(){ return false; };
 
@@ -12065,7 +12079,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 			this.dirty = this.isDirty();
 			var s;
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();
@@ -12330,18 +12344,18 @@ define(["dojo/_base/declare", "dojo/_base/array", "./Columns", "./common"],
 },
 'dojox/charting/plot2d/Bars':function(){
 define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-	"dojox/gfx/fx", "dojox/lang/utils", "dojox/lang/functional", "dojox/lang/functional/reversed"], 
-	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, fx, du, df, dfr){
-		
+	"dojox/gfx/fx", "dojox/lang/utils", "dojox/lang/functional"],
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, fx, du, df){
+
 	/*=====
 	declare("dojox.charting.plot2d.__BarCtorArgs", dojox.charting.plot2d.__DefaultCtorArgs, {
 		// summary:
 		//		Additional keyword arguments for bar charts.
-	
+
 		// minBarSize: Number?
 		//		The minimum size for a bar in pixels.  Default is 1.
 		minBarSize: 1,
-	
+
 		// maxBarSize: Number?
 		//		The maximum size for a bar in pixels.  Default is 1.
 		maxBarSize: 1,
@@ -12378,15 +12392,14 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 		// fontColor: String|dojo.Color?
 		//		The color to be used for any text-based elements on the plot.
 		fontColor:	"",
-		
+
 		// enableCache: Boolean?
 		//		Whether the bars rect are cached from one rendering to another. This improves the rendering performance of
 		//		successive rendering but penalize the first rendering.  Default false.
 		enableCache: false
 	});
 	=====*/
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
-	
+
 	var alwaysFalse = function(){ return false; }
 
 	return declare("dojox.charting.plot2d.Bars", [CartesianBase, _PlotEvents], {
@@ -12437,7 +12450,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 			t = stats.hmax, stats.hmax = stats.vmax, stats.vmax = t;
 			return stats; // Object
 		},
-		
+
 		createRect: function(run, creator, params){
 			var rect;
 			if(this.opt.enableCache && run._rectFreePool.length > 0){
@@ -12480,7 +12493,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 			this.resetEvents();
 			var s;
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();
@@ -12490,7 +12503,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 				ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
 				vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler),
 				baseline = Math.max(this._hScaler.bounds.lower,
-					this._hAxis ? this._hAxis.naturalBaseline : 0),				
+					this._hAxis ? this._hAxis.naturalBaseline : 0),
 				baselineWidth = ht(baseline),
 				events = this.events();
 			var bar = this.getBarProperties();
@@ -12498,11 +12511,11 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 			var actualLength = this.series.length;
 			arr.forEach(this.series, function(serie){if(serie.hidden){actualLength--;}});
 			var z = actualLength;
-			
+
 			// Collect and calculate all values
 			var extractedValues = this.extractValues(this._vScaler);
 			extractedValues = this.rearrangeValues(extractedValues, ht, baselineWidth);
-			
+
 			for(var i = 0; i < this.series.length; i++){
 				var run = this.series[i];
 				if(!this.dirty && !run.dirty){
@@ -12524,7 +12537,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 				z--;
 
 				var	eventSeries = new Array(run.data.length);
-				s = run.group;	
+				s = run.group;
 				var indexed = arr.some(run.data, function(item){
 					return typeof item == "number" || (item && !item.hasOwnProperty("x"));
 				});
@@ -12562,13 +12575,13 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 									this._animateBar(sshape, offsets.l + baselineWidth, -w);
 								}
 							}
-							
+
 							var specialFill = this._plotFill(finalTheme.series.fill, dim, offsets);
 							specialFill = this._shapeFill(specialFill, rect);
 							var shape = this.createRect(run, s, rect).setFill(specialFill).setStroke(finalTheme.series.stroke);
 							if(shape.setFilter && finalTheme.series.filter){
 								shape.setFilter(finalTheme.series.filter);
-							}							
+							}
 							run.dyn.fill   = shape.getFill();
 							run.dyn.stroke = shape.getStroke();
 							if(events){
@@ -12671,7 +12684,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 				return v(0.5) || h(value);
 			}
 			return v(isNaN(value.x) ? 0.5 : value.x + 0.5) || value.y === null || h(value.y);
-		},		
+		},
 		getBarProperties: function(){
 			var f = dc.calculateBarSize(this._vScaler.bounds.scale, this.opt);
 			return {gap: f.gap, height: f.size, thickness: 0};
@@ -13901,12 +13914,10 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare", "dojo/dom-g
 
 },
 'dojox/charting/plot2d/Bubble':function(){
-define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has", 
-		"./CartesianBase", "./_PlotEvents", "./common", "dojox/lang/functional", "dojox/lang/functional/reversed",
-		"dojox/lang/utils", "dojox/gfx/fx"], 
-	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
+		"./CartesianBase", "./_PlotEvents", "./common", "dojox/lang/functional",
+		"dojox/lang/utils", "dojox/gfx/fx"],
+	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, du, fx){
 
 	return declare("dojox.charting.plot2d.Bubble", [CartesianBase, _PlotEvents], {
 		// summary:
@@ -13963,7 +13974,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
 			this.resetEvents();
 			this.dirty = this.isDirty();
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();
@@ -14009,7 +14020,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
 					continue;
 				}
 				s = run.group;
-                
+
 				var frontCircles = null, outlineCircles = null, shadowCircles = null, styleFunc = this.opt.styleFunc;
 
 				var getFinalTheme = function(item){
@@ -14147,10 +14158,8 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
 },
 'dojox/charting/plot2d/Candlesticks':function(){
 define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-		"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"], 
-	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+		"dojox/lang/functional", "dojox/lang/utils", "dojox/gfx/fx"],
+	function(lang, declare, arr, has, CartesianBase, _PlotEvents, dc, df, du, fx){
 
 	//	Candlesticks are based on the Bars plot type; we expect the following passed
 	//	as values in a series:
@@ -14254,7 +14263,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
 			this.dirty = this.isDirty();
 			var s;
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();
@@ -14284,7 +14293,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
 					continue;
 				}
 				s = run.group;
-                
+
 				for(var j = 0; j < run.data.length; ++j){
 					var v = run.data[j];
 					if(!this.isNullValue(v)){
@@ -14393,10 +14402,8 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/has",
 },
 'dojox/charting/plot2d/OHLC':function(){
 define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-	"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx"],
-	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
-
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
+	"dojox/lang/functional", "dojox/lang/utils", "dojox/gfx/fx"],
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, df, du, fx){
 
 	//	Candlesticks are based on the Bars plot type; we expect the following passed
 	//	as values in a series:
@@ -14499,7 +14506,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has",
 			this.resetEvents();
 			this.dirty = this.isDirty();
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				var s = this.getGroup();

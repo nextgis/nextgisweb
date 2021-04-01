@@ -1,10 +1,10 @@
-define("dojox/charting/plot2d/common", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/Color", 
-		"dojox/gfx", "dojox/lang/functional", "../scaler/common"], 
+define("dojox/charting/plot2d/common", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/Color",
+		"dojox/gfx", "dojox/lang/functional", "../scaler/common"],
 	function(lang, arr, Color, g, df, sc){
-	
+
 	var common = lang.getObject("dojox.charting.plot2d.common", true);
-	
-	return lang.mixin(common, {	
+
+	return lang.mixin(common, {
 		doIfLoaded: sc.doIfLoaded,
 		makeStroke: function(stroke){
 			if(!stroke){ return stroke; }
@@ -201,7 +201,7 @@ define("dojox/charting/plot2d/common", ["dojo/_base/lang", "dojo/_base/array", "
 			});
 			return p.join(" ");
 		},
-		
+
 		getLabel: function(/*Number*/number, /*Boolean*/fixed, /*Number*/precision){
 			return sc.doIfLoaded("dojo/number", function(numberLib){
 				return (fixed ? numberLib.format(number, {places : precision}) :
@@ -209,6 +209,10 @@ define("dojox/charting/plot2d/common", ["dojo/_base/lang", "dojo/_base/array", "
 			}, function(){
 				return fixed ? number.toFixed(precision) : number.toString();
 			});
+		},
+
+		purgeGroup: function (item) {
+			return item.purgeGroup();
 		}
 	});
 });

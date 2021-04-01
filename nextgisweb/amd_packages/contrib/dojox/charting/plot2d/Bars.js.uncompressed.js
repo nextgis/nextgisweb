@@ -1,16 +1,16 @@
 define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/has", "./CartesianBase", "./_PlotEvents", "./common",
-	"dojox/gfx/fx", "dojox/lang/utils", "dojox/lang/functional", "dojox/lang/functional/reversed"], 
-	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, fx, du, df, dfr){
-		
+	"dojox/gfx/fx", "dojox/lang/utils", "dojox/lang/functional"],
+	function(lang, arr, declare, has, CartesianBase, _PlotEvents, dc, fx, du, df){
+
 	/*=====
 	declare("dojox.charting.plot2d.__BarCtorArgs", dojox.charting.plot2d.__DefaultCtorArgs, {
 		// summary:
 		//		Additional keyword arguments for bar charts.
-	
+
 		// minBarSize: Number?
 		//		The minimum size for a bar in pixels.  Default is 1.
 		minBarSize: 1,
-	
+
 		// maxBarSize: Number?
 		//		The maximum size for a bar in pixels.  Default is 1.
 		maxBarSize: 1,
@@ -47,15 +47,14 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "do
 		// fontColor: String|dojo.Color?
 		//		The color to be used for any text-based elements on the plot.
 		fontColor:	"",
-		
+
 		// enableCache: Boolean?
 		//		Whether the bars rect are cached from one rendering to another. This improves the rendering performance of
 		//		successive rendering but penalize the first rendering.  Default false.
 		enableCache: false
 	});
 	=====*/
-	var purgeGroup = dfr.lambda("item.purgeGroup()");
-	
+
 	var alwaysFalse = function(){ return false; }
 
 	return declare("dojox.charting.plot2d.Bars", [CartesianBase, _PlotEvents], {
@@ -106,7 +105,7 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "do
 			t = stats.hmax, stats.hmax = stats.vmax, stats.vmax = t;
 			return stats; // Object
 		},
-		
+
 		createRect: function(run, creator, params){
 			var rect;
 			if(this.opt.enableCache && run._rectFreePool.length > 0){
@@ -149,7 +148,7 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "do
 			this.resetEvents();
 			var s;
 			if(this.dirty){
-				arr.forEach(this.series, purgeGroup);
+				arr.forEach(this.series, dc.purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				s = this.getGroup();
@@ -159,7 +158,7 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "do
 				ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
 				vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler),
 				baseline = Math.max(this._hScaler.bounds.lower,
-					this._hAxis ? this._hAxis.naturalBaseline : 0),				
+					this._hAxis ? this._hAxis.naturalBaseline : 0),
 				baselineWidth = ht(baseline),
 				events = this.events();
 			var bar = this.getBarProperties();
@@ -167,11 +166,11 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "do
 			var actualLength = this.series.length;
 			arr.forEach(this.series, function(serie){if(serie.hidden){actualLength--;}});
 			var z = actualLength;
-			
+
 			// Collect and calculate all values
 			var extractedValues = this.extractValues(this._vScaler);
 			extractedValues = this.rearrangeValues(extractedValues, ht, baselineWidth);
-			
+
 			for(var i = 0; i < this.series.length; i++){
 				var run = this.series[i];
 				if(!this.dirty && !run.dirty){
@@ -193,7 +192,7 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "do
 				z--;
 
 				var	eventSeries = new Array(run.data.length);
-				s = run.group;	
+				s = run.group;
 				var indexed = arr.some(run.data, function(item){
 					return typeof item == "number" || (item && !item.hasOwnProperty("x"));
 				});
@@ -231,13 +230,13 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "do
 									this._animateBar(sshape, offsets.l + baselineWidth, -w);
 								}
 							}
-							
+
 							var specialFill = this._plotFill(finalTheme.series.fill, dim, offsets);
 							specialFill = this._shapeFill(specialFill, rect);
 							var shape = this.createRect(run, s, rect).setFill(specialFill).setStroke(finalTheme.series.stroke);
 							if(shape.setFilter && finalTheme.series.filter){
 								shape.setFilter(finalTheme.series.filter);
-							}							
+							}
 							run.dyn.fill   = shape.getFill();
 							run.dyn.stroke = shape.getStroke();
 							if(events){
@@ -340,7 +339,7 @@ define("dojox/charting/plot2d/Bars", ["dojo/_base/lang", "dojo/_base/array", "do
 				return v(0.5) || h(value);
 			}
 			return v(isNaN(value.x) ? 0.5 : value.x + 0.5) || value.y === null || h(value.y);
-		},		
+		},
 		getBarProperties: function(){
 			var f = dc.calculateBarSize(this._vScaler.bounds.scale, this.opt);
 			return {gap: f.gap, height: f.size, thickness: 0};
