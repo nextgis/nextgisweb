@@ -47,16 +47,7 @@
                 data-dojo-props="uploaderLinkText: '{{gettext 'Select a dataset'}}',
                                 uploaderHelpText: '{{gettext 'Dataset should be in ESRI Shapefile (zip) or GeoJSON format.'}}'
         "></div>
-        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
-
-            <select data-dojo-attach-point="wEncoding"
-                data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Encoding'}}" style="width: 100%">
-
-                <option value="utf-8">{{gettext 'UTF-8'}}</option>
-                <option value="windows-1251">{{gettext 'Windows-1251'}}</option>
-
-            </select>
+        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, labelWidth: 150">
 
             <select data-dojo-attach-point="wFixErrors"
                 data-dojo-type="dijit/form/Select"
@@ -81,6 +72,11 @@
                 <option value="LINESTRING">{{gettext 'Line'}}</option>
                 <option value="POLYGON">{{gettext 'Polygon'}}</option>
             </select>
+
+            <input data-dojo-attach-point="wSkipOtherGeometryType"
+                data-dojo-type="dijit/form/CheckBox"
+                data-dojo-props="value: true, disabled: true"
+                title="{{gettext 'Load selected geometry type only'}}">
 
             <select data-dojo-attach-point="wCastIsMulti"
                 data-dojo-type="dijit/form/Select"
@@ -113,6 +109,14 @@
                 data-dojo-type="dijit/form/TextBox"
                 title="{{gettext 'FID field'}}"
                 value="ngw_id"/ style="width: 100%">
+
+            <select data-dojo-attach-point="wEncoding"
+                data-dojo-type="dijit/form/Select"
+                title="{{gettext 'Encoding'}}" style="width: 100%">
+
+                <option value="utf-8">{{gettext 'UTF-8'}}</option>
+                <option value="windows-1251">{{gettext 'Windows-1251'}}</option>
+            </select>
 
         </div>
     </div>

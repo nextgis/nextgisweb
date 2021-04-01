@@ -14,35 +14,39 @@ from nextgisweb.spatial_ref_sys import SRS
 path = Path(nextgisweb.vector_layer.test.__file__).parent / 'data' / 'errors'
 
 
-@pytest.mark.parametrize('data, fix_errors, skip_errors, geometry_type, expect_error', (
-    ('geom-collection.geojson', 'NONE', False, None, True),
-    ('geom-collection.geojson', 'SAFE', False, None, False),
+@pytest.mark.parametrize('data, skip_other_geometry_type, fix_errors, \
+                          skip_errors, geometry_type, expect_error', (
+    ('geom-collection.geojson', False, 'NONE', False, None, True),
+    ('geom-collection.geojson', False, 'SAFE', False, None, False),
 
-    ('incomplete-geom.geojson', 'LOSSY', False, None, True),
-    ('incomplete-geom.geojson', 'LOSSY', True, None, False),
+    ('incomplete-geom.geojson', False, 'LOSSY', False, None, True),
+    ('incomplete-geom.geojson', False, 'LOSSY', True, None, False),
 
-    ('mixed-feature-geom.geojson', 'NONE', False, 'POINT', True),
-    ('mixed-feature-geom.geojson', 'NONE', True, 'POINT', False),
+    ('mixed-feature-geom.geojson', False, 'NONE', False, 'POINT', True),
+    ('mixed-feature-geom.geojson', False, 'NONE', True, 'POINT', False),
+    ('mixed-feature-geom.geojson', True, 'NONE', False, 'POINT', False),
 
-    ('no-features.geojson', 'NONE', False, None, True),
-    ('no-features.geojson', 'NONE', False, 'POINT', False),
+    ('no-features.geojson', False, 'NONE', False, None, True),
+    ('no-features.geojson', False, 'NONE', False, 'POINT', False),
 
-    ('non-multi-geom.geojson', 'NONE', False, None, False),
+    ('non-multi-geom.geojson', False, 'NONE', False, None, False),
 
-    ('null-geom.geojson', 'LOSSY', False, None, True),
-    ('null-geom.geojson', 'LOSSY', True, None, False),
+    ('null-geom.geojson', False, 'LOSSY', False, None, True),
+    ('null-geom.geojson', False, 'LOSSY', True, None, False),
+    ('null-geom.geojson', True, 'NONE', False, None, False),
 
-    ('self-intersection.geojson', 'SAFE', False, None, True),
-    ('self-intersection.geojson', 'LOSSY', False, None, False),
+    ('self-intersection.geojson', False, 'SAFE', False, None, True),
+    ('self-intersection.geojson', False, 'LOSSY', False, None, False),
 
-    ('single-geom-collection.geojson', 'NONE', False, 'POINT', True),
-    ('single-geom-collection.geojson', 'SAFE', False, 'POINT', False),
-    ('single-geom-collection.geojson', 'SAFE', False, 'LINESTRING', True),
+    ('single-geom-collection.geojson', False, 'NONE', False, 'POINT', True),
+    ('single-geom-collection.geojson', False, 'SAFE', False, 'POINT', False),
+    ('single-geom-collection.geojson', True, 'NONE', False, 'POINT', False),
+    ('single-geom-collection.geojson', False, 'SAFE', False, 'LINESTRING', True),
 
-    ('unclosed-ring.geojson', 'LOSSY', False, None, True),
-    ('unclosed-ring.geojson', 'LOSSY', True, None, False),
+    ('unclosed-ring.geojson', False, 'LOSSY', False, None, True),
+    ('unclosed-ring.geojson', False, 'LOSSY', True, None, False),
 ))
-def test_create(data, fix_errors, skip_errors, geometry_type,
+def test_create(data, skip_other_geometry_type, fix_errors, skip_errors, geometry_type,
                 expect_error, ngw_resource_group, ngw_txn):
     obj = VectorLayer(
         parent_id=ngw_resource_group, display_name='vector_layer',
@@ -60,8 +64,10 @@ def test_create(data, fix_errors, skip_errors, geometry_type,
         has_z=None)
 
     def fun():
-        obj.setup_from_ogr(layer, geom_cast_params=geom_cast_params)
-        obj.load_from_ogr(layer, fix_errors=fix_errors, skip_errors=skip_errors)
+        obj.setup_from_ogr(layer, skip_other_geometry_type=skip_other_geometry_type,
+                           geom_cast_params=geom_cast_params)
+        obj.load_from_ogr(layer, skip_other_geometry_type=skip_other_geometry_type,
+                          fix_errors=fix_errors, skip_errors=skip_errors)
 
     if expect_error:
         with pytest.raises(ValidationError):

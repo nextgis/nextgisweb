@@ -173,7 +173,8 @@ class TableInfo(object):
         self.fid_field_index = None
 
     @classmethod
-    def from_ogrlayer(cls, ogrlayer, srs_id, strdecode, geom_cast_params, fid_params):
+    def from_ogrlayer(cls, ogrlayer, srs_id, strdecode, skip_other_geometry_type,
+                      geom_cast_params, fid_params):
         self = cls(srs_id)
 
         if geom_cast_params['geometry_type'] == GEOM_TYPE.POINT:
@@ -232,6 +233,8 @@ class TableInfo(object):
                             geom_filter = geom_filter.intersection(set(GEOM_TYPE.linestrings))
                         elif geometry_type in GEOM_TYPE.polygons:
                             geom_filter = geom_filter.intersection(set(GEOM_TYPE.polygons))
+                    elif skip_other_geometry_type and geometry_type not in geom_filter:
+                        continue
 
                     if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi \
                        and geometry_type in GEOM_TYPE.is_multi:
@@ -415,7 +418,7 @@ class TableInfo(object):
         self.model = model
         self.fmap = {fld.keyname: fld.key for fld in self.fields}
 
-    def load_from_ogr(self, ogrlayer, strdecode, fix_errors, skip_errors):
+    def load_from_ogr(self, ogrlayer, strdecode, skip_other_geometry_type, fix_errors, skip_errors):
         source_osr = ogrlayer.GetSpatialRef()
         target_osr = osr.SpatialReference()
         target_osr.ImportFromEPSG(self.srs_id)
@@ -438,7 +441,8 @@ class TableInfo(object):
 
             geom = feature.GetGeometryRef()
             if geom is None:
-                errors.append(_("Feature #%d doesn't have geometry.") % fid)
+                if not skip_other_geometry_type:
+                    errors.append(_("Feature #%d doesn't have geometry.") % fid)
                 continue
 
             if geom.GetGeometryType() in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
@@ -469,9 +473,10 @@ class TableInfo(object):
             gtype = geom.GetGeometryType()
 
             if gtype not in GEOM_TYPE_OGR:
-                errors.append(_(
-                    "Feature #%d have unknown geometry type: %d (%s).") % (
-                    fid, gtype, ogr.GeometryTypeToName(gtype)))
+                if not skip_other_geometry_type:
+                    errors.append(_(
+                        "Feature #%d have unknown geometry type: %d (%s).") % (
+                        fid, gtype, ogr.GeometryTypeToName(gtype)))
                 continue
 
             geom.Transform(transform)
@@ -499,29 +504,30 @@ class TableInfo(object):
             elif not has_z and geom.Is3D():
                 geom.Set3D(False)
 
-            # Check geometry valid
-            if not geom.IsValid():
-                gtype_before = geom.GetGeometryType()
-                invalid = True
-                if fix_errors == ERROR_FIX.LOSSY:
-                    geom = geom.Buffer(0)
-                    invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype_before
-                if invalid:
-                    errors.append(_("Feature #%d have invalid geometry.") % fid)
-                    continue
-
             # Check geometry type again
             gtype = geom.GetGeometryType()
             if gtype not in GEOM_TYPE_OGR:
-                errors.append(_(
-                    "Feature #%d have unknown geometry type: %d (%s).") % (
-                    fid, gtype, ogr.GeometryTypeToName(gtype)))
+                if not skip_other_geometry_type:
+                    errors.append(_(
+                        "Feature #%d have unknown geometry type: %d (%s).") % (
+                        fid, gtype, ogr.GeometryTypeToName(gtype)))
                 continue
             elif _GEOM_OGR_2_TYPE[gtype] != self.geometry_type:
-                errors.append(_(
-                    "Feature #%d have unsuitable geometry type: %d (%s).") % (
-                    fid, gtype, ogr.GeometryTypeToName(gtype)))
+                if not skip_other_geometry_type:
+                    errors.append(_(
+                        "Feature #%d have unsuitable geometry type: %d (%s).") % (
+                        fid, gtype, ogr.GeometryTypeToName(gtype)))
                 continue
+
+            # Check geometry valid
+            if not geom.IsValid():
+                invalid = True
+                if fix_errors == ERROR_FIX.LOSSY:
+                    geom = geom.Buffer(0)
+                    invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
+                if invalid:
+                    errors.append(_("Feature #%d have invalid geometry.") % fid)
+                    continue
 
             fld_values = dict()
             for i in range(feature.GetFieldCount()):
@@ -627,10 +633,11 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         return 'layer_%s' % self.tbl_uuid
 
     def setup_from_ogr(self, ogrlayer, strdecode=lambda x: x,
+                       skip_other_geometry_type=False,
                        geom_cast_params=geom_cast_params_default,
                        fid_params=fid_params_default):
         tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs.id, strdecode,
-                                            geom_cast_params, fid_params)
+                                            skip_other_geometry_type, geom_cast_params, fid_params)
         tableinfo.setup_layer(self)
 
         tableinfo.setup_metadata(self._tablename)
@@ -649,8 +656,10 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.tableinfo = tableinfo
 
     def load_from_ogr(self, ogrlayer, strdecode=lambda x: x,
+                      skip_other_geometry_type=False,
                       fix_errors=ERROR_FIX.default, skip_errors=skip_errors_default):
-        self.tableinfo.load_from_ogr(ogrlayer, strdecode, fix_errors, skip_errors)
+        self.tableinfo.load_from_ogr(ogrlayer, strdecode, skip_other_geometry_type,
+                                     fix_errors, skip_errors)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (
@@ -951,7 +960,7 @@ class _source_attr(SP):
 
         return ogrlayer
 
-    def _ogrlayer(self, obj, ogrlayer, fix_errors, skip_errors,
+    def _ogrlayer(self, obj, ogrlayer, skip_other_geometry_type, fix_errors, skip_errors,
                   geom_cast_params, fid_params, recode):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
@@ -959,8 +968,8 @@ class _source_attr(SP):
         obj.tbl_uuid = uuid.uuid4().hex
 
         with DBSession.no_autoflush:
-            obj.setup_from_ogr(ogrlayer, recode, geom_cast_params, fid_params)
-            obj.load_from_ogr(ogrlayer, recode, fix_errors, skip_errors)
+            obj.setup_from_ogr(ogrlayer, recode, skip_other_geometry_type, geom_cast_params, fid_params)
+            obj.load_from_ogr(ogrlayer, recode, skip_other_geometry_type, fix_errors, skip_errors)
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
@@ -997,6 +1006,8 @@ class _source_attr(SP):
 
         ogrlayer = self._ogrds(ogrds)
 
+        skip_other_geometry_type = srlzr.data.get('skip_other_geometry_type')
+
         fix_errors = srlzr.data.get('fix_errors', ERROR_FIX.default)
         if fix_errors not in ERROR_FIX.enum:
             raise VE(_("Unknown 'fix_errors' value."))
@@ -1027,7 +1038,7 @@ class _source_attr(SP):
             fid_field=srlzr.data.get('fid_field')
         )
 
-        self._ogrlayer(srlzr.obj, ogrlayer, fix_errors, skip_errors,
+        self._ogrlayer(srlzr.obj, ogrlayer, skip_other_geometry_type, fix_errors, skip_errors,
                        geom_cast_params, fid_params, recode)
 
 
