@@ -65,6 +65,8 @@ layer_identity = COMP_ID + '_layer'
 
 WFS_VERSIONS = ('1.0.0', '1.1.0', '2.0.0', '2.0.2', )
 
+url_pattern = re.compile(r'^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/?]*)?$', re.IGNORECASE | re.UNICODE)  # NOQA
+
 
 # TODO: WFS helper module
 def find_tags(element, tag):
@@ -304,6 +306,15 @@ class WFSConnection(Base, Resource):
         return features, count
 
 
+class _path_attr(SP):
+
+    def setter(self, srlzr, value):
+        if not url_pattern.match(value):
+            raise ValidationError("Path is not a valid url.")
+
+        super(_path_attr, self).setter(srlzr, value)
+
+
 class WFSConnectionSerializer(Serializer):
     identity = WFSConnection.identity
     resclass = WFSConnection
@@ -311,7 +322,7 @@ class WFSConnectionSerializer(Serializer):
     _defaults = dict(read=ConnectionScope.read,
                      write=ConnectionScope.write)
 
-    path = SP(**_defaults)
+    path = _path_attr(**_defaults)
     username = SP(**_defaults)
     password = SP(**_defaults)
     version = SP(**_defaults)

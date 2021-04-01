@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+
+import re
 from io import BytesIO
 from six.moves.urllib.parse import urlparse
 
@@ -32,8 +34,9 @@ from .session_keeper import get_session
 
 Base = declarative_base(dependencies=('resource', ))
 
-
 NEXTGIS_GEOSERVICES = 'nextgis_geoservices'
+
+url_template_pattern = re.compile(r'^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\{\}]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/\{\}?]*)?$', re.IGNORECASE | re.UNICODE)  # NOQA
 
 
 class SCHEME(object):
@@ -102,6 +105,15 @@ class Connection(Base, Resource):
             return None
 
 
+class _url_template_attr(SP):
+
+    def setter(self, srlzr, value):
+        if not url_template_pattern.match(value):
+            raise ValidationError("Invalid url template.")
+
+        super(_url_template_attr, self).setter(srlzr, value)
+
+
 class _capmode_attr(SP):
 
     def setter(self, srlzr, value):
@@ -124,7 +136,7 @@ class ConnectionSerializer(Serializer):
     _defaults = dict(read=ConnectionScope.read,
                      write=ConnectionScope.write)
 
-    url_template = SP(**_defaults)
+    url_template = _url_template_attr(**_defaults)
     apikey = SP(**_defaults)
     apikey_param = SP(**_defaults)
     scheme = SP(**_defaults)

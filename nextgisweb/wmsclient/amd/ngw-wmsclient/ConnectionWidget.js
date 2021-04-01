@@ -30,6 +30,8 @@ define([
     template,
     settings
 ) {
+    var url_re = /^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&'()*+,;=:@\/?]*)?$/i;
+
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
         title: i18n.gettext("WMS connection"),
@@ -45,6 +47,11 @@ define([
             if (this.value) {
                 this.wVersion.set("value", this.value.version);
             }
+
+            this.wURL.validator = function (value) {
+                var success = url_re.test(value);
+                return success;
+            }.bind(this);
         },
 
         serializeInMixin: function (data) {
