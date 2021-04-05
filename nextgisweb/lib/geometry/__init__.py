@@ -3,6 +3,7 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 
 from warnings import warn
 
+from osgeo import ogr
 from pyproj import CRS, Transformer as pyTr
 from shapely import wkt, wkb
 from shapely.geometry import (
@@ -16,14 +17,15 @@ class Geometry(object):
     """ Initialization format is kept "as is".
     Other formats are calculated as needed."""
 
-    __slots__ = ('_wkb', '_wkt', '_shape', '_srid')
+    __slots__ = ('_wkb', '_wkt', '_ogr_geom', '_shape', '_srid')
 
-    def __init__(self, wkb=None, wkt=None, shape_obj=None, srid=None):
+    def __init__(self, wkb=None, wkt=None, ogr_geom=None, shape_obj=None, srid=None):
         self._wkb = wkb
         self._wkt = wkt
+        self._ogr_geom = ogr_geom
         self._shape = shape_obj
 
-        if not any((self._wkb, self._wkt, self._shape)):
+        if not any((self._wkb, self._wkt, self._ogr_geom, self._shape)):
             raise ValueError("None base format is not defined.")
 
         self._srid = srid
@@ -41,6 +43,10 @@ class Geometry(object):
     @classmethod
     def from_wkt(cls, data, srid=None):
         return cls(wkt=data, srid=srid)
+
+    @classmethod
+    def from_ogr(cls, data, srid=None):
+        return cls(ogr_geom=data, srid=srid)
 
     @classmethod
     def from_shape(cls, data, srid=None):
@@ -64,22 +70,38 @@ class Geometry(object):
     @property
     def wkb(self):
         if self._wkb is None:
-            self._wkb = self.shape.wkb
+            if self._ogr_geom is None and self._shape is not None:
+                self._wkb = self._shape.wkb
+            else:
+                self._wkb = self.ogr_geom.ExportToWkb()
         return self._wkb
 
     @property
     def wkt(self):
         if self._wkt is None:
-            self._wkt = self.shape.wkt
+            if self._ogr_geom is None and self._shape is not None:
+                self._wkt = self._shape.wkt
+            else:
+                self._wkt = self.ogr_geom.ExportToIsoWkt()
         return self._wkt
+
+    @property
+    def ogr_geom(self):
+        if self._ogr_geom is None:
+            if self._wkb is None and self._wkt is not None:
+                self._ogr_geom = ogr.CreateGeometryFromWkt(self._wkt)
+            else:
+                self._ogr_geom = ogr.CreateGeometryFromWkb(self.wkb)
+        return self._ogr_geom
+
 
     @property
     def shape(self):
         if self._shape is None:
-            if self._wkb is not None:
-                self._shape = wkb.loads(self._wkb)
-            else:
+            if self._wkb is None and self._wkt is not None:
                 self._shape = wkt.loads(self._wkt)
+            else:
+                self._shape = wkb.loads(self.wkb)
         return self._shape
 
     # Additional output formats
