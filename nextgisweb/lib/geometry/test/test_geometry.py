@@ -56,8 +56,9 @@ def _pg_wkt_to_wkb_ext(wkt):
 
 
 def _pg_wkb(wkb):
+    _wkb = wkb.hex() if six.PY3 else wkb.encode('hex')
     return _query_scalar_bytes(sa_func.st_asewkb(
-        sa_func.st_geomfromwkb(sa_func.decode(wkb.encode('hex'), 'hex'))))
+        sa_func.st_geomfromwkb(sa_func.decode(_wkb, 'hex'))))
 
 
 def _query_scalar_bytes(query):
