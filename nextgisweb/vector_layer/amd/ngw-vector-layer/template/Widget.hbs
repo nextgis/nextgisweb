@@ -51,21 +51,27 @@
 
             <select data-dojo-attach-point="wFixErrors"
                 data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Fix errors'}}" style="width: 100%">
+                title="{{gettext 'Fix errors'}}"
+                style="width: 100%" colspan="2">
 
                 <option value="NONE" selected="selected">{{gettext 'None'}}</option>
                 <option value="SAFE">{{gettext 'Fix errors without losing data'}}</option>
                 <option value="LOSSY">{{gettext 'Fix errors as far as possible'}}</option>
             </select>
 
-            <input data-dojo-attach-point="wSkipErrors"
-                data-dojo-type="dijit/form/CheckBox"
-                data-dojo-props="value: true"
-                title="{{gettext 'Skip features with unfixable errors'}}">
+            <div data-dojo-type="dijit/layout/ContentPane"
+                colspan="2" style="width: 100%; padding: 0; margin: 0;">
+                <input data-dojo-attach-point="wSkipErrors"
+                    data-dojo-type="dijit/form/CheckBox"
+                    data-dojo-props="value: true"
+                    id="wSkipErrors">
+                <label for="wSkipErrors">{{gettext 'Skip features with unfixable errors'}}</label>
+            </div>
 
             <select data-dojo-attach-point="wCastGeometryType"
                 data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Geometry type'}}" style="width: 100%">
+                title="{{gettext 'Geometry type'}}"
+                colspan="2" style="width: 100%">
 
                 <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
                 <option value="POINT">{{gettext 'Point'}}</option>
@@ -73,10 +79,13 @@
                 <option value="POLYGON">{{gettext 'Polygon'}}</option>
             </select>
 
-            <input data-dojo-attach-point="wSkipOtherGeometryType"
-                data-dojo-type="dijit/form/CheckBox"
-                data-dojo-props="value: true, disabled: true"
-                title="{{gettext 'Load selected geometry type only'}}">
+            <div data-dojo-type="dijit/layout/ContentPane"
+                colspan="2" style="width: 100%; padding: 0; margin: 0;">
+                <input data-dojo-attach-point="wSkipOtherGeometryType"
+                    data-dojo-type="dijit/form/CheckBox"
+                    data-dojo-props="value: true, disabled: true">
+                <label for="wSkipOtherGeometryType">{{gettext 'Load selected geometry type only'}}</label>
+            </div>
 
             <select data-dojo-attach-point="wCastIsMulti"
                 data-dojo-type="dijit/form/Select"
@@ -112,7 +121,8 @@
 
             <select data-dojo-attach-point="wEncoding"
                 data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Encoding'}}" style="width: 100%">
+                title="{{gettext 'Encoding'}}"
+                colspan="2" style="width: 100%">
 
                 <option value="utf-8">{{gettext 'UTF-8'}}</option>
                 <option value="windows-1251">{{gettext 'Windows-1251'}}</option>

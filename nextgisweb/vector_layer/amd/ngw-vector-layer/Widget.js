@@ -14,6 +14,7 @@ define([
     // template
     "dojox/layout/TableContainer",
     "ngw-file-upload/Uploader",
+    "dijit/layout/ContentPane",
     "dijit/form/ComboBox",
     "dijit/form/CheckBox"
 ], function (
