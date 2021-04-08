@@ -160,7 +160,7 @@ class User(Principal):
             active_user_count = query.scalar()
             if active_user_count >= user_limit:
                 raise ValidationError(_(
-                    "Maximum number of active users exceeded. The limit is %s."
+                    "Maximum number of users is exceeded. The limit is %s."
                 ) % user_limit)
 
     @classmethod

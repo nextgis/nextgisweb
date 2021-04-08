@@ -181,7 +181,7 @@ class AuthComponent(Component):
         Option('activity_delta', timedelta, default=timedelta(minutes=10),
                doc="User last activity update time delta in seconds."),
 
-        Option('user_limit', int, default=None, doc="Limit of active users"),
+        Option('user_limit', int, default=None, doc="Limit of enabled users"),
     ))
 
     option_annotations += OAuthHelper.option_annotations.with_prefix('oauth')
