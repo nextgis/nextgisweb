@@ -47,88 +47,91 @@
                 data-dojo-props="uploaderLinkText: '{{gettext 'Select a dataset'}}',
                                 uploaderHelpText: '{{gettext 'Dataset should be in ESRI Shapefile (zip) or GeoJSON format.'}}'
         "></div>
-        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, labelWidth: 150">
 
-            <select data-dojo-attach-point="wFixErrors"
-                data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Fix errors'}}"
-                style="width: 100%" colspan="2">
+        <div data-dojo-type="dijit/TitlePane" data-dojo-props="title: '{{gettext 'Advanced options'}}', open: false">
+            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, labelWidth: 150">
 
-                <option value="NONE">{{gettext 'None'}}</option>
-                <option value="SAFE">{{gettext 'Without losing data'}}</option>
-                <option value="LOSSY" selected="selected">{{gettext 'Whatever possible'}}</option>
-            </select>
+                <select data-dojo-attach-point="wFixErrors"
+                    data-dojo-type="dijit/form/Select"
+                    title="{{gettext 'Fix errors'}}"
+                    style="width: 100%" colspan="2">
 
-            <div data-dojo-type="dijit/layout/ContentPane"
-                colspan="2" style="width: 100%; padding: 0; margin: 0;">
-                <input data-dojo-attach-point="wSkipErrors"
-                    data-dojo-type="dijit/form/CheckBox"
-                    data-dojo-props="value: true"
-                    id="wSkipErrors" checked="true">
-                <label for="wSkipErrors">{{gettext 'Skip features with unfixable errors'}}</label>
+                    <option value="NONE">{{gettext 'None'}}</option>
+                    <option value="SAFE">{{gettext 'Without losing data'}}</option>
+                    <option value="LOSSY" selected="selected">{{gettext 'Whatever possible'}}</option>
+                </select>
+
+                <div data-dojo-type="dijit/layout/ContentPane"
+                    colspan="2" style="width: 100%; padding: 0; margin: 0;">
+                    <input data-dojo-attach-point="wSkipErrors"
+                        data-dojo-type="dijit/form/CheckBox"
+                        data-dojo-props="value: true"
+                        id="wSkipErrors" checked="true">
+                    <label for="wSkipErrors">{{gettext 'Skip features with unfixable errors'}}</label>
+                </div>
+
+                <select data-dojo-attach-point="wCastGeometryType"
+                    data-dojo-type="dijit/form/Select"
+                    title="{{gettext 'Geometry type'}}"
+                    colspan="2" style="width: 100%">
+
+                    <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
+                    <option value="POINT">{{gettext 'Point'}}</option>
+                    <option value="LINESTRING">{{gettext 'Line'}}</option>
+                    <option value="POLYGON">{{gettext 'Polygon'}}</option>
+                </select>
+
+                <div data-dojo-type="dijit/layout/ContentPane"
+                    colspan="2" style="width: 100%; padding: 0; margin: 0;">
+                    <input data-dojo-attach-point="wSkipOtherGeometryType"
+                        data-dojo-type="dijit/form/CheckBox"
+                        data-dojo-props="value: true, disabled: true"
+                        id="wSkipOtherGeometryType">
+                    <label for="wSkipOtherGeometryType">{{gettext 'Only load features of the selected geometry type'}}</label>
+                </div>
+
+                <select data-dojo-attach-point="wCastIsMulti"
+                    data-dojo-type="dijit/form/Select"
+                    title="{{gettext 'Multi-geometry'}}" style="width: 100%">
+
+                    <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
+                    <option value="YES">{{gettext 'Yes'}}</option>
+                    <option value="NO">{{gettext 'No'}}</option>
+                </select>
+
+                <select data-dojo-attach-point="wCastHasZ"
+                    data-dojo-type="dijit/form/Select"
+                    title="{{gettext 'Z-coordinate'}}" style="width: 100%">
+
+                    <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
+                    <option value="YES">{{gettext 'Yes'}}</option>
+                    <option value="NO">{{gettext 'No'}}</option>
+                </select>
+
+                <select data-dojo-attach-point="wFIDSource"
+                    data-dojo-type="dijit/form/Select"
+                    title="{{gettext 'FID source'}}" style="width: 100%">
+
+                    <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
+                    <option value="GDAL">{{gettext 'GDAL'}}</option>
+                    <option value="FIELD">{{gettext 'Field'}}</option>
+                </select>
+
+                <input data-dojo-attach-point="wFIDField"
+                    data-dojo-type="dijit/form/TextBox"
+                    title="{{gettext 'FID field'}}"
+                    value="ngw_id"/ style="width: 100%">
+
+                <select data-dojo-attach-point="wEncoding"
+                    data-dojo-type="dijit/form/Select"
+                    title="{{gettext 'Encoding'}}"
+                    colspan="2" style="width: 100%">
+
+                    <option value="utf-8">{{gettext 'UTF-8'}}</option>
+                    <option value="windows-1251">{{gettext 'Windows-1251'}}</option>
+                </select>
+
             </div>
-
-            <select data-dojo-attach-point="wCastGeometryType"
-                data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Geometry type'}}"
-                colspan="2" style="width: 100%">
-
-                <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
-                <option value="POINT">{{gettext 'Point'}}</option>
-                <option value="LINESTRING">{{gettext 'Line'}}</option>
-                <option value="POLYGON">{{gettext 'Polygon'}}</option>
-            </select>
-
-            <div data-dojo-type="dijit/layout/ContentPane"
-                colspan="2" style="width: 100%; padding: 0; margin: 0;">
-                <input data-dojo-attach-point="wSkipOtherGeometryType"
-                    data-dojo-type="dijit/form/CheckBox"
-                    data-dojo-props="value: true, disabled: true"
-                    id="wSkipOtherGeometryType">
-                <label for="wSkipOtherGeometryType">{{gettext 'Only load features of the selected geometry type'}}</label>
-            </div>
-
-            <select data-dojo-attach-point="wCastIsMulti"
-                data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Multi-geometry'}}" style="width: 100%">
-
-                <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
-                <option value="YES">{{gettext 'Yes'}}</option>
-                <option value="NO">{{gettext 'No'}}</option>
-            </select>
-
-            <select data-dojo-attach-point="wCastHasZ"
-                data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Z-coordinate'}}" style="width: 100%">
-
-                <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
-                <option value="YES">{{gettext 'Yes'}}</option>
-                <option value="NO">{{gettext 'No'}}</option>
-            </select>
-
-            <select data-dojo-attach-point="wFIDSource"
-                data-dojo-type="dijit/form/Select"
-                title="{{gettext 'FID source'}}" style="width: 100%">
-
-                <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
-                <option value="GDAL">{{gettext 'GDAL'}}</option>
-                <option value="FIELD">{{gettext 'Field'}}</option>
-            </select>
-
-            <input data-dojo-attach-point="wFIDField"
-                data-dojo-type="dijit/form/TextBox"
-                title="{{gettext 'FID field'}}"
-                value="ngw_id"/ style="width: 100%">
-
-            <select data-dojo-attach-point="wEncoding"
-                data-dojo-type="dijit/form/Select"
-                title="{{gettext 'Encoding'}}"
-                colspan="2" style="width: 100%">
-
-                <option value="utf-8">{{gettext 'UTF-8'}}</option>
-                <option value="windows-1251">{{gettext 'Windows-1251'}}</option>
-            </select>
-
         </div>
     </div>
 </div>
