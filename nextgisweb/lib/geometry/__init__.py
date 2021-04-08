@@ -3,7 +3,7 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 
 from warnings import warn
 
-from osgeo import ogr
+from osgeo.ogr import CreateGeometryFromWkb, CreateGeometryFromWkt, wkbNDR
 from pyproj import CRS, Transformer as pyTr
 from shapely import wkt, wkb
 from shapely.geometry import (
@@ -73,7 +73,7 @@ class Geometry(object):
             if self._ogr_geom is None and self._shape is not None:
                 self._wkb = self._shape.wkb
             else:
-                self._wkb = self.ogr_geom.ExportToWkb()
+                self._wkb = self.ogr_geom.ExportToWkb(wkbNDR)
         return self._wkb
 
     @property
@@ -89,9 +89,9 @@ class Geometry(object):
     def ogr_geom(self):
         if self._ogr_geom is None:
             if self._wkb is None and self._wkt is not None:
-                self._ogr_geom = ogr.CreateGeometryFromWkt(self._wkt)
+                self._ogr_geom = CreateGeometryFromWkt(self._wkt)
             else:
-                self._ogr_geom = ogr.CreateGeometryFromWkb(self.wkb)
+                self._ogr_geom = CreateGeometryFromWkb(self.wkb)
         return self._ogr_geom
 
 

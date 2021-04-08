@@ -47,18 +47,18 @@ def test_wkt_wkb(wkt, ngw_txn):
 
 def _pg_wkt_to_wkb_iso(wkt):
     return _query_scalar_bytes(sa_func.st_asbinary(
-        sa_func.st_geomfromtext(wkt)))
+        sa_func.st_geomfromtext(wkt), 'NDR'))
 
 
 def _pg_wkt_to_wkb_ext(wkt):
     return _query_scalar_bytes(sa_func.st_asewkb(
-        sa_func.st_geomfromtext(wkt)))
+        sa_func.st_geomfromtext(wkt), 'NDR'))
 
 
 def _pg_wkb(wkb):
     _wkb = wkb.hex() if six.PY3 else wkb.encode('hex')
     return _query_scalar_bytes(sa_func.st_asewkb(
-        sa_func.st_geomfromwkb(sa_func.decode(_wkb, 'hex'))))
+        sa_func.st_geomfromwkb(sa_func.decode(_wkb, 'hex')), 'NDR'))
 
 
 def _query_scalar_bytes(query):
