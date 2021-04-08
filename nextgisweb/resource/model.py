@@ -285,18 +285,20 @@ class _parent_attr(SRR):
         return True
 
     def setter(self, srlzr, value):
-        oldval = srlzr.obj.parent
+        old_parent = srlzr.obj.parent
         super(_parent_attr, self).setter(srlzr, value)
 
-        if oldval == srlzr.obj.parent:
+        if old_parent == srlzr.obj.parent:
             return
 
-        if srlzr.obj.parent is None or not srlzr.obj.parent.has_permission(
-            ResourceScope.manage_children, srlzr.user
-        ):
-            raise ForbiddenError(
-                _("You are not allowed to manage children of resource with id = %d.")
-                % srlzr.obj.parent.id)
+        if srlzr.obj.parent is None:
+            raise ForbiddenError(_("Resource can not be without a parent."))
+
+        for parent in (old_parent, srlzr.obj.parent):
+            if not parent.has_permission(ResourceScope.manage_children, srlzr.user):
+                raise ForbiddenError(
+                    _("You are not allowed to manage children of resource with id = %d.")
+                    % parent.id)
 
         if not srlzr.obj.check_parent(srlzr.obj.parent):
             raise HierarchyError(
