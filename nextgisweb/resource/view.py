@@ -313,7 +313,8 @@ def setup_pyramid(comp, config):
                         'resource.update', id=args.obj.id),
                     'material:edit', True)
 
-            if PERM_DELETE in permissions:
+            if PERM_DELETE in permissions and args.obj.id != 0 and \
+                    args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user):
                 yield Link(
                     'operation/20-delete', _("Delete"),
                     lambda args: args.request.route_url(
