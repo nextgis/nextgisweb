@@ -388,7 +388,7 @@ class TableInfo(object):
                 fld_values[self[fld_name].key] = fld_value
 
             obj = self.model(fid=fid, geom=ga.elements.WKBElement(
-                bytearray(geom.ExportToWkb()), srid=self.srs_id), **fld_values)
+                bytearray(geom.ExportToWkb(ogr.wkbNDR)), srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
 
@@ -976,7 +976,6 @@ class FeatureQueryBase(object):
             )
 
         if self._geom:
-            wk_fun = func.st_asbinary if self._geom_format == 'WKB' else func.st_astext
 
             if self._single_part:
 
@@ -990,7 +989,12 @@ class FeatureQueryBase(object):
 
                 geomexpr = geom(func.st_dump(geomexpr))
 
-            columns.append(wk_fun(geomexpr).label('geom'))
+            if self._geom_format == 'WKB':
+                geomexpr = func.st_asbinary(geomexpr, 'NDR')
+            else:
+                geomexpr = func.st_astext(geomexpr)
+
+            columns.append(geomexpr.label('geom'))
 
         if self._geom_len:
             columns.append(func.st_length(func.geography(
