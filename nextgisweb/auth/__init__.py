@@ -9,6 +9,7 @@ from pyramid.httpexceptions import HTTPForbidden
 
 from ..lib.config import OptionAnnotations, Option
 from ..component import Component
+from ..core.exception import ValidationError
 from ..models import DBSession
 from .. import db
 
@@ -158,6 +159,20 @@ class AuthComponent(Component):
                 **kwargs).persist()
 
         return obj
+
+    def check_user_limit(self, exclude_id=None):
+        user_limit = self.options['user_limit']
+        if user_limit is not None:
+            query = DBSession.query(db.func.count(User.id)).filter(
+                db.and_(db.not_(User.system), db.not_(User.disabled)))
+            if exclude_id is not None:
+                query = query.filter(User.id != exclude_id)
+
+            active_user_count = query.scalar()
+            if active_user_count >= user_limit:
+                raise ValidationError(_(
+                    "Maximum number of users is exceeded. The limit is %s."
+                ) % user_limit)
 
     def maintenance(self):
         with transaction.manager:

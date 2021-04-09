@@ -12,6 +12,7 @@ from six.moves.urllib.parse import urlencode
 import requests
 import zope.event
 
+from ..env import env
 from ..lib.config import OptionAnnotations, Option
 from ..compat import datetime_to_timestamp
 from .. import db
@@ -121,6 +122,7 @@ class OAuthHelper(object):
                 # Register new user with default groups
                 if self.options['register']:
                     user = User().persist()
+                    env.auth.check_user_limit()
                     user.member_of = Group.filter_by(register=True).all()
                 else:
                     return None

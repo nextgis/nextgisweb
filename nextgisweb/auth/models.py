@@ -150,18 +150,8 @@ class User(Principal):
             self.member_of = [Group.filter_by(id=gid).one()
                               for gid in data['member_of']]
 
-        user_limit = env.auth.options['user_limit']
-        if user_limit is not None and not self.system and not self.disabled:
-            query = DBSession.query(db.func.count(User.id)).filter(
-                db.and_(db.not_(User.system), db.not_(User.disabled)))
-            if self.id is not None:
-                query = query.filter(User.id != self.id)
-
-            active_user_count = query.scalar()
-            if active_user_count >= user_limit:
-                raise ValidationError(_(
-                    "Maximum number of users is exceeded. The limit is %s."
-                ) % user_limit)
+        if not self.system and not self.disabled:
+            env.auth.check_user_limit(self.id)
 
     @classmethod
     def by_keyname(cls, keyname):
