@@ -171,7 +171,7 @@ class AuthComponent(Component):
             active_user_count = query.scalar()
             if active_user_count >= user_limit:
                 raise ValidationError(_(
-                    "Maximum number of users is exceeded. The limit is %s."
+                    "Maximum number of users is exceeded. The limit is %d."
                 ) % user_limit)
 
     def maintenance(self):

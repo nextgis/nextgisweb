@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2020-08-17 12:24+0000\n"
+"POT-Creation-Date: 2021-04-09 03:40+0000\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,29 +19,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: __init__.py:39
+#: __init__.py:41
 msgid "Guest"
 msgstr "Гость"
 
-#: __init__.py:45
+#: __init__.py:47
 msgid "Everyone"
 msgstr "Любой пользователь"
 
-#: __init__.py:51
+#: __init__.py:53
 msgid "Authenticated"
 msgstr "Прошедший проверку"
 
-#: __init__.py:57
+#: __init__.py:59
 msgid "Administrators"
 msgstr "Администраторы"
 
-#: __init__.py:60
+#: __init__.py:62
 msgid "Administrator"
 msgstr "Администратор"
 
-#: __init__.py:68
+#: __init__.py:70
 msgid "Owner"
 msgstr "Владелец"
+
+#: __init__.py:173
+#, python-format
+msgid "Maximum number of users is exceeded. The limit is %d."
+msgstr "Превышено максимальное количество пользователей. Текущий лимит - %d."
 
 #: api.py:183
 msgid "System principals couldn't be chanded."
@@ -55,43 +60,43 @@ msgstr "Неверные данные учетной записи"
 msgid "User is disabled"
 msgstr "Пользователь заблокирован"
 
-#: oauth.py:116
+#: oauth.py:118
 msgid "User is already bound"
 msgstr "Пользователь уже привязан"
 
-#: oauth.py:314
+#: oauth.py:320
 msgid "OAuth authorization error"
 msgstr "Ошибка авторизации OAuth"
 
-#: oauth.py:319
+#: oauth.py:325
 msgid "Invalid OAuth token"
 msgstr "Некорректный токен OAuth"
 
-#: oauth.py:324
+#: oauth.py:330
 msgid "OAuth token refresh failed"
 msgstr "Не удалось выполнить обновление токена OAuth"
 
-#: oauth.py:329
+#: oauth.py:335
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
-#: views.py:150
+#: views.py:198
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: views.py:221
+#: views.py:266
 msgid "Group name is not unique."
 msgstr "Имя группы не уникально."
 
-#: views.py:259
+#: views.py:304
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: views.py:318
+#: views.py:355
 msgid "Login is not unique."
 msgstr "Логин не уникален."
 
-#: views.py:333
+#: views.py:370
 msgid ""
 "You can't disable current administrator. At least one enabled "
 "administrator is required."
@@ -99,27 +104,27 @@ msgstr ""
 "Этого администратора нельзя отключить. Требуется хотя бы один активный "
 "администратор."
 
-#: views.py:376
+#: views.py:413
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: views.py:409 views.py:474
+#: views.py:446 views.py:511
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:419 views.py:477
+#: views.py:456 views.py:514
 msgid "Groups"
 msgstr "Группы"
 
-#: views.py:430 views.py:452
+#: views.py:467 views.py:489
 msgid "List"
 msgstr "Список"
 
-#: views.py:435 views.py:457
+#: views.py:472 views.py:494
 msgid "Create"
 msgstr "Создать"
 
-#: views.py:441 views.py:463
+#: views.py:478 views.py:500
 msgid "Edit"
 msgstr "Изменить"
 
@@ -187,7 +192,7 @@ msgstr "Требуется авторизация"
 msgid "Sign in to Web GIS"
 msgstr "Войти в Веб ГИС"
 
-#: template/login.mako:27 template/login.mako:37 template/user_settings.mako:12
+#: template/login.mako:27 template/login.mako:37 template/user_settings.mako:13
 msgid "Sign in with OAuth"
 msgstr "Войти через OAuth"
 
@@ -195,6 +200,7 @@ msgstr "Войти через OAuth"
 msgid "Sign in"
 msgstr "Войти"
 
-#: template/user_settings.mako:14
+#: template/user_settings.mako:15
 msgid "Your account is bound to NextGIS ID account"
 msgstr "Ваш аккаунт связан с аккаунтом NextGIS ID"
+
