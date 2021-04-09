@@ -72,6 +72,7 @@ class CoreComponent(Component):
             except OperationalError as exc:
                 yield str(exc.orig).rstrip()
         conn.close()
+        sa_engine.dispose()
 
     def healthcheck(self):
         try:
@@ -86,13 +87,15 @@ class CoreComponent(Component):
         try:
             conn = sa_engine.connect()
             conn.execute("SELECT 1")
-            conn.close()
         except OperationalError as exc:
             msg = str(exc.orig).rstrip()
             return OrderedDict((
                 ('success', False),
                 ('message', "Database connection failed: " + msg)
             ))
+        finally:
+            conn.close()
+            sa_engine.dispose()
 
         return dict(success=True)
 
