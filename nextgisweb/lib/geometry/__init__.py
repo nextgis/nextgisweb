@@ -17,15 +17,15 @@ class Geometry(object):
     """ Initialization format is kept "as is".
     Other formats are calculated as needed."""
 
-    __slots__ = ('_wkb', '_wkt', '_ogr_geom', '_shape', '_srid')
+    __slots__ = ('_wkb', '_wkt', '_ogr', '_shape', '_srid')
 
-    def __init__(self, wkb=None, wkt=None, ogr_geom=None, shape_obj=None, srid=None):
+    def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None):
         self._wkb = wkb
         self._wkt = wkt
-        self._ogr_geom = ogr_geom
-        self._shape = shape_obj
+        self._ogr = ogr
+        self._shape = shape
 
-        if not any((self._wkb, self._wkt, self._ogr_geom, self._shape)):
+        if not any((self._wkb, self._wkt, self._ogr, self._shape)):
             raise ValueError("None base format is not defined.")
 
         self._srid = srid
@@ -46,18 +46,18 @@ class Geometry(object):
 
     @classmethod
     def from_ogr(cls, data, srid=None):
-        return cls(ogr_geom=data, srid=srid)
+        return cls(ogr=data, srid=srid)
 
     @classmethod
     def from_shape(cls, data, srid=None):
-        return cls(shape_obj=data, srid=srid)
+        return cls(shape=data, srid=srid)
 
     # Additional constructors
 
     @classmethod
     def from_geojson(cls, data, srid=None):
-        shape_obj = geometry_shape(data)
-        return cls.from_shape(shape_obj, srid=srid)
+        shape = geometry_shape(data)
+        return cls.from_shape(shape, srid=srid)
 
     @classmethod
     def from_box(cls, minx, miny, maxx, maxy, srid=None):
@@ -70,29 +70,29 @@ class Geometry(object):
     @property
     def wkb(self):
         if self._wkb is None:
-            if self._ogr_geom is None and self._shape is not None:
+            if self._ogr is None and self._shape is not None:
                 self._wkb = self._shape.wkb
             else:
-                self._wkb = self.ogr_geom.ExportToWkb(wkbNDR)
+                self._wkb = self.ogr.ExportToWkb(wkbNDR)
         return self._wkb
 
     @property
     def wkt(self):
         if self._wkt is None:
-            if self._ogr_geom is None and self._shape is not None:
+            if self._ogr is None and self._shape is not None:
                 self._wkt = self._shape.wkt
             else:
-                self._wkt = self.ogr_geom.ExportToIsoWkt()
+                self._wkt = self.ogr.ExportToIsoWkt()
         return self._wkt
 
     @property
-    def ogr_geom(self):
-        if self._ogr_geom is None:
+    def ogr(self):
+        if self._ogr is None:
             if self._wkb is None and self._wkt is not None:
-                self._ogr_geom = CreateGeometryFromWkt(self._wkt)
+                self._ogr = CreateGeometryFromWkt(self._wkt)
             else:
-                self._ogr_geom = CreateGeometryFromWkb(self.wkb)
-        return self._ogr_geom
+                self._ogr = CreateGeometryFromWkb(self.wkb)
+        return self._ogr
 
 
     @property
@@ -139,8 +139,8 @@ class Transformer(object):
         if self._transformer is None:
             return geom
         else:
-            shape_obj = map_coords(self._transformer.transform, geom.shape)
-            return Geometry.from_shape(shape_obj)
+            shape = map_coords(self._transformer.transform, geom.shape)
+            return Geometry.from_shape(shape)
 
 
 def geom_calc(geom, crs, prop, srid):
