@@ -45,20 +45,33 @@ def test_wkt_wkb(wkt, ngw_txn):
     assert Geometry.from_wkt(wkt_iso).wkb == wkb_ext, "WKT parsing has failed"
 
 
+def test_wkt_wkb_ogr_shape():
+    wkt = Geometry.from_wkt('POINT Z (1 2 3)')
+    
+    wkb = Geometry.from_wkb(wkt.wkb)
+    assert wkt.wkt == wkb.wkt
+
+    ogr_geom = Geometry.from_ogr(wkb.ogr)
+    assert wkb.wkb == ogr_geom.wkb
+
+    shape = Geometry.from_shape(ogr_geom.shape)
+    assert shape.wkt == wkt.wkt
+
+
 def _pg_wkt_to_wkb_iso(wkt):
     return _query_scalar_bytes(sa_func.st_asbinary(
-        sa_func.st_geomfromtext(wkt)))
+        sa_func.st_geomfromtext(wkt), 'NDR'))
 
 
 def _pg_wkt_to_wkb_ext(wkt):
     return _query_scalar_bytes(sa_func.st_asewkb(
-        sa_func.st_geomfromtext(wkt)))
+        sa_func.st_geomfromtext(wkt), 'NDR'))
 
 
 def _pg_wkb(wkb):
     _wkb = wkb.hex() if six.PY3 else wkb.encode('hex')
     return _query_scalar_bytes(sa_func.st_asewkb(
-        sa_func.st_geomfromwkb(sa_func.decode(_wkb, 'hex'))))
+        sa_func.st_geomfromwkb(sa_func.decode(_wkb, 'hex')), 'NDR'))
 
 
 def _query_scalar_bytes(query):

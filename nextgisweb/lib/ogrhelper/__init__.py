@@ -59,7 +59,7 @@ def _geometry_wkt(ogr_geom):
 
 
 def _geometry_wkb(ogr_geom):
-    return ogr_geom.ExportToWkb()
+    return ogr_geom.ExportToWkb(ogr.wkbNDR)
 
 
 def _get_integer(feat, fidx):

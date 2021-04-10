@@ -624,8 +624,12 @@ class FeatureQueryBase(object):
         geomexpr = db.func.st_transform(geomcol, srsid)
 
         if self._geom:
-            wk_fun = db.func.st_asbinary if self._geom_format == 'WKB' else db.func.st_astext
-            addcol(wk_fun(geomexpr).label('geom'))
+            if self._geom_format == 'WKB':
+                geomexpr = db.func.st_asbinary(geomexpr, 'NDR')
+            else:
+                geomexpr = db.func.st_astext(geomexpr)
+
+            addcol(geomexpr.label('geom'))
 
         fieldmap = []
         for idx, fld in enumerate(self.layer.fields, start=1):

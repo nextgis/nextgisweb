@@ -81,7 +81,7 @@ def ns_trim(value):
 def geom_from_gml(el):
     value = etree.tostring(el)
     ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
-    return Geometry.from_wkb(ogr_geom.ExportToWkb())
+    return Geometry.from_ogr(ogr_geom)
 
 
 def get_srid(value):

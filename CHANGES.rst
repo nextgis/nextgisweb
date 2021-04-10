@@ -8,6 +8,8 @@ Changes
 - A user login is case insensitive when logging in.
 - Configuration option for disabling social networks share buttons.
 - Experimental support for creation of vector layers from GML files.
+- Performance improvements in geometry handling and rendering
+  especially when converting between WKT and WKB formats.
 - OpenLayers library upgraded to 6.5.0.
 - OAuth server logout support via logout redirect endpoint.
 

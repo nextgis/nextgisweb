@@ -137,7 +137,7 @@ def geom_from_gml(el):
     srid = parse_srs(el.attrib['srsName']) if 'srsName' in el.attrib else None
     value = etree.tostring(el)
     ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
-    return Geometry.from_wkb(ogr_geom.ExportToWkb(), srid=srid)
+    return Geometry.from_ogr(ogr_geom, srid=srid)
 
 
 def parse_srs(value):
