@@ -246,6 +246,8 @@ define([
             this._mid = {};
             var mids = this.config.mid;
 
+            this.clientSettings = settings;
+
             // Add basemap's AMD modules
             array.forEach(settings.basemaps, function (bm) {
                 mids.basemap.push(bm.base.mid);
