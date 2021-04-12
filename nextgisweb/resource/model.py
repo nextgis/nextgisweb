@@ -295,7 +295,8 @@ class _parent_attr(SRR):
             raise ForbiddenError(_("Resource can not be without a parent."))
 
         for parent in (old_parent, srlzr.obj.parent):
-            if not parent.has_permission(ResourceScope.manage_children, srlzr.user):
+            if parent is not None and not parent.has_permission(
+                    ResourceScope.manage_children, srlzr.user):
                 raise ForbiddenError(
                     _("You are not allowed to manage children of resource with id = %d.")
                     % parent.id)
