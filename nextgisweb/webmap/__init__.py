@@ -30,14 +30,6 @@ class WebMapComponent(Component):
                    owner_user=User.filter_by(keyname='administrator').one(),
                    root_item=WebMapItem(item_type='root')).persist()
 
-        for k, v in (
-            ('units_length', 'm'),
-            ('units_area', 'sq.m'),
-            ('degree_format', 'dd'),
-            ('measurement_srid', 4326),
-        ):
-            self.env.core.init_settings(self.identity, k, v)
-
     def setup_pyramid(self, config):
         from . import api, view
         api.setup_pyramid(self, config)
@@ -73,9 +65,6 @@ class WebMapComponent(Component):
             'basemaps', default=resource_filename('nextgisweb', 'webmap/basemaps.json'),
             doc="Basemaps description file."),
         Option('bing_apikey', default=None, doc="Bing Maps API key."),
-        Option('identify_radius', int, default=3, doc="Identification sensitivity."),
-        Option('popup_width', int, default=300, doc="Popup width in pixels."),
-        Option('popup_height', int, default=200, doc="Popup height in pixels."),
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
         Option('enable_social_networks', bool, default=True),
     )

@@ -85,12 +85,21 @@ def annotation_idelete(resource, request):
 
 def settings_get(request):
     result = dict()
-    for k in ('identify_radius', 'popup_width', 'popup_height',
-              'units_length', 'units_area', 'degree_format', 'measurement_srid'):
+    for k, default in (
+        ('identify_radius', 3),
+        ('popup_width', 300), 
+        ('popup_height', 200),
+        ('units_length', 'm'),
+        ('units_area', 'sq.m'),
+        ('degree_format', 'dd'), 
+        ('measurement_srid', 4326),
+    ):
         try:
-            result[k] = env.core.settings_get('webmap', k)
+            v = env.core.settings_get('webmap', k)
+            if v is not None:
+                result[k] = v
         except KeyError:
-            result[k] = env.webmap.options[k]
+            result[k] = default
 
     return result
 
