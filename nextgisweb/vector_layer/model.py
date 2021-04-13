@@ -425,9 +425,6 @@ class TableInfo(object):
 
         transform = osr.CoordinateTransformation(source_osr, target_osr)
 
-        is_multi = self.geometry_type in GEOM_TYPE.is_multi
-        has_z = self.geometry_type in GEOM_TYPE.has_z
-
         errors = []
 
         for feature in ogrlayer:
@@ -445,6 +442,7 @@ class TableInfo(object):
                     errors.append(_("Feature #%d doesn't have geometry.") % fid)
                 continue
 
+            # Extract GeometryCollection
             if geom.GetGeometryType() in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
                and fix_errors != ERROR_FIX.NONE:
                 geom_candidate = None
@@ -464,6 +462,8 @@ class TableInfo(object):
                            ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D)):
                         if geom_candidate is None:
                             geom_candidate = col_geom
+                            if fix_errors == ERROR_FIX.LOSSY:
+                                break
                         else:
                             errors.append(_("Feature #%d have multiple geometries satisfying the conditions.") % fid)
                             continue
@@ -472,17 +472,29 @@ class TableInfo(object):
 
             gtype = geom.GetGeometryType()
 
+            # Check geometry type
             if gtype not in GEOM_TYPE_OGR:
                 if not skip_other_geometry_type:
                     errors.append(_(
                         "Feature #%d have unknown geometry type: %d (%s).") % (
                         fid, gtype, ogr.GeometryTypeToName(gtype)))
                 continue
-
-            geom.Transform(transform)
+            elif not any((
+                (self.geometry_type in GEOM_TYPE.points
+                    and _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.points),
+                (self.geometry_type in GEOM_TYPE.linestrings
+                    and _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.linestrings),
+                (self.geometry_type in GEOM_TYPE.polygons
+                    and _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.polygons),
+            )):
+                if not skip_other_geometry_type:
+                    errors.append(_(
+                        "Feature #%d have unsuitable geometry type: %d (%s).") % (
+                        fid, gtype, ogr.GeometryTypeToName(gtype)))
+                continue
 
             # Force single geometries to multi
-            if is_multi:
+            if self.geometry_type in GEOM_TYPE.is_multi:
                 if gtype in (ogr.wkbPoint, ogr.wkbPoint25D):
                     geom = ogr.ForceToMultiPoint(geom)
                 elif gtype in (ogr.wkbLineString, ogr.wkbLineString25D):
@@ -492,32 +504,20 @@ class TableInfo(object):
             elif gtype in (ogr.wkbMultiPoint, ogr.wkbMultiPoint25D,
                            ogr.wkbMultiLineString, ogr.wkbMultiLineString25D,
                            ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D):
-                if geom.GetGeometryCount() == 1:
+                if geom.GetGeometryCount() == 1 or fix_errors == ERROR_FIX.LOSSY:
                     geom = geom.GetGeometryRef(0)
                 else:
                     errors.append(_("Feature #%d have multiple geometries satisfying the conditions.") % fid)
                     continue
 
+            geom.Transform(transform)
+
             # Force Z
+            has_z = self.geometry_type in GEOM_TYPE.has_z
             if has_z and not geom.Is3D():
                 geom.Set3D(True)
             elif not has_z and geom.Is3D():
                 geom.Set3D(False)
-
-            # Check geometry type again
-            gtype = geom.GetGeometryType()
-            if gtype not in GEOM_TYPE_OGR:
-                if not skip_other_geometry_type:
-                    errors.append(_(
-                        "Feature #%d have unknown geometry type: %d (%s).") % (
-                        fid, gtype, ogr.GeometryTypeToName(gtype)))
-                continue
-            elif _GEOM_OGR_2_TYPE[gtype] != self.geometry_type:
-                if not skip_other_geometry_type:
-                    errors.append(_(
-                        "Feature #%d have unsuitable geometry type: %d (%s).") % (
-                        fid, gtype, ogr.GeometryTypeToName(gtype)))
-                continue
 
             # Check geometry valid
             if not geom.IsValid():
