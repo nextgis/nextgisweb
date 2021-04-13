@@ -193,7 +193,7 @@ class TableInfo(object):
 
         if geom_cast_params['has_z'] == TOGGLE.NO:
             geom_filter -= set(GEOM_TYPE.has_z)
-        elif geom_cast_params['has_z'] == TOGGLE.NO:
+        elif geom_cast_params['has_z'] == TOGGLE.YES:
             geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
 
         ltype = ogrlayer.GetGeomType()
