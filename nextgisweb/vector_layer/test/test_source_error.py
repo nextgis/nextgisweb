@@ -190,6 +190,7 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
     if 'exception' in checks:
         with pytest.raises(checks['exception']):
             setup_and_load()
+        DBSession.expunge(obj)
     else:
         setup_and_load()
         
