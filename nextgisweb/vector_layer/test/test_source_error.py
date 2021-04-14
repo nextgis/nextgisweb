@@ -10,73 +10,10 @@ from nextgisweb.models import DBSession
 from nextgisweb.auth import User
 from nextgisweb.compat import Path
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.resource.model import Resource
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.spatial_ref_sys import SRS
 
 path = Path(__file__).parent / 'data' / 'errors'
-
-
-@pytest.mark.parametrize('data, skip_other_geometry_type, fix_errors, \
-                          skip_errors, geometry_type, expect_error', (
-    # ('geom-collection.geojson', False, 'NONE', False, None, True),
-    # ('geom-collection.geojson', False, 'SAFE', False, None, False),
-
-    # ('incomplete-geom.geojson', False, 'LOSSY', False, None, True),
-    # ('incomplete-geom.geojson', False, 'LOSSY', True, None, False),
-
-    # ('mixed-feature-geom.geojson', False, 'NONE', False, 'POINT', True),
-    # ('mixed-feature-geom.geojson', False, 'NONE', True, 'POINT', False),
-    # ('mixed-feature-geom.geojson', True, 'NONE', False, 'POINT', False),
-
-    # ('no-features.geojson', False, 'NONE', False, None, True),
-    # ('no-features.geojson', False, 'NONE', False, 'POINT', False),
-
-    # ('non-multi-geom.geojson', False, 'NONE', False, None, False),
-
-    ('null-geom.geojson', False, 'LOSSY', False, None, True),
-    ('null-geom.geojson', False, 'LOSSY', True, None, False),
-    ('null-geom.geojson', True, 'NONE', False, None, False),
-
-    ('self-intersection.geojson', False, 'SAFE', False, None, True),
-    ('self-intersection.geojson', False, 'LOSSY', False, None, False),
-
-    ('single-geom-collection.geojson', False, 'NONE', False, 'POINT', True),
-    ('single-geom-collection.geojson', False, 'SAFE', False, 'POINT', False),
-    ('single-geom-collection.geojson', True, 'NONE', False, 'POINT', False),
-    ('single-geom-collection.geojson', False, 'SAFE', False, 'LINESTRING', True),
-
-    # ('unclosed-ring.geojson', False, 'LOSSY', False, None, True),
-    # ('unclosed-ring.geojson', False, 'LOSSY', True, None, False),
-))
-def test_create_old(data, skip_other_geometry_type, fix_errors, skip_errors, geometry_type,
-                expect_error, ngw_resource_group, ngw_txn):
-    obj = VectorLayer(
-        parent_id=ngw_resource_group, display_name='vector_layer',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one()
-    )
-
-    src = str(path / data)
-    ds = ogr.Open(src)
-    layer = ds.GetLayer(0)
-
-    geom_cast_params = dict(
-        geometry_type=geometry_type,
-        is_multi=None,
-        has_z=None)
-
-    def fun():
-        obj.setup_from_ogr(layer, skip_other_geometry_type=skip_other_geometry_type,
-                           geom_cast_params=geom_cast_params)
-        obj.load_from_ogr(layer, skip_other_geometry_type=skip_other_geometry_type,
-                          fix_errors=fix_errors, skip_errors=skip_errors)
-
-    if expect_error:
-        with pytest.raises(ValidationError):
-            fun()
-    else:
-        fun()
 
 
 # List of creation test cases: file name, creation options, and final checks.
@@ -115,7 +52,7 @@ CREATE_TEST_PARAMS = (
         # The first POINT should be taken in LOSSY mode.
         'mixed-feature-geom.geojson',
         dict(
-            geometry_type='POINT', skip_other_geometry_type=True, 
+            geometry_type='POINT', skip_other_geometry_type=True,
             fix_errors='LOSSY', is_multi=False),
         dict(geometry_type='POINT', feature_count=2),
     ),
@@ -130,6 +67,49 @@ CREATE_TEST_PARAMS = (
         'non-multi-geom.geojson',
         dict(),
         dict(geometry_type='MULTIPOINT', feature_count=2),
+    ),
+
+    (
+        'null-geom.geojson',
+        dict(skip_other_geometry_type=True),
+        dict(geometry_type='POINT', feature_count=1),
+    ),
+
+    (
+        'self-intersection.geojson',
+        dict(fix_errors='SAFE'),
+        dict(exception=ValidationError),
+    ),
+    (
+        'self-intersection.geojson',
+        dict(fix_errors='LOSSY'),
+        dict(geometry_type='POLYGON', feature_count=1),
+    ),
+
+    (
+        'single-geom-collection.geojson',
+        dict(geometry_type='POINT', fix_errors='SAFE'),
+        dict(geometry_type='POINT', feature_count=1),
+    ),
+    (
+        'single-geom-collection.geojson',
+        dict(geometry_type='POINT', skip_other_geometry_type=True),
+        dict(geometry_type='POINT', feature_count=0),
+    ),
+    (
+        'single-geom-collection.geojson',
+        dict(geometry_type='POINT', fix_errors='LOSSSY'),
+        dict(geometry_type='POINT', feature_count=1),
+    ),
+    (
+        'single-geom-collection.geojson',
+        dict(geometry_type='LINESTRING', fix_errors='SAFE'),
+        dict(exception=ValidationError),
+    ),
+    (
+        'single-geom-collection.geojson',
+        dict(geometry_type='LINESTRING', fix_errors='LOSSY'),
+        dict(geometry_type='LINESTRING', feature_count=1),
     ),
 
     (
@@ -152,6 +132,7 @@ CREATE_TEST_PARAMS = (
         dict(feature_count=1),
     ),
 )
+
 
 @pytest.mark.parametrize('filename, options, checks', CREATE_TEST_PARAMS)
 def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
@@ -193,9 +174,9 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
         DBSession.expunge(obj)
     else:
         setup_and_load()
-        
+
         DBSession.flush()
-        
+
         if 'geometry_type' in checks:
             exp_geometry_type = checks['geometry_type']
             assert obj.geometry_type == exp_geometry_type, \
@@ -209,6 +190,3 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
             assert feature_count == exp_feature_count, \
                 "Expected feature count was {} but got {}".format(
                     exp_feature_count, feature_count)
-
-
-        
