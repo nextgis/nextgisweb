@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-04-09 03:40+0000\n"
+"POT-Creation-Date: 2021-04-15 01:22+0000\n"
 "PO-Revision-Date: 2015-09-14 16:55+0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -45,8 +45,10 @@ msgstr "Владелец"
 
 #: __init__.py:173
 #, python-format
-msgid "Maximum number of users is exceeded. The limit is %d."
-msgstr "Превышено максимальное количество пользователей. Текущий лимит - %d."
+msgid ""
+"Maximum number of users is reached. Your current plan user number limit "
+"is %d."
+msgstr "Превышено максимальное количество пользователей. Лимит текущего плана - %d."
 
 #: api.py:183
 msgid "System principals couldn't be chanded."
@@ -203,4 +205,3 @@ msgstr "Войти"
 #: template/user_settings.mako:15
 msgid "Your account is bound to NextGIS ID account"
 msgstr "Ваш аккаунт связан с аккаунтом NextGIS ID"
-
