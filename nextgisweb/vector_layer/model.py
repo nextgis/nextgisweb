@@ -584,7 +584,7 @@ class TableInfo(object):
             if len(errors) > 0 and not skip_errors:
                 continue
 
-            obj = self.model(fid=fid, geom=ga.elements.WKBElement(
+            obj = self.model(id=fid, geom=ga.elements.WKBElement(
                 bytearray(geom.ExportToWkb(ogr.wkbNDR)), srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
