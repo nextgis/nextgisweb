@@ -141,7 +141,7 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
     ('GDAL', None, 0),
     ('FIELD', 'int', -1),
     ('AUTO', 'int', -1),
-    ('AUTH', 'not_exists', 0),
+    ('AUTO', 'not_exists', 0),
 ))
 def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
     src = Path(__file__).parent / 'data' / 'type.geojson'
