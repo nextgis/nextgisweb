@@ -5,6 +5,7 @@ import os.path
 import io
 import json
 import re
+import warnings
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
@@ -14,6 +15,14 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
+
+
+# Prevent warning about missing __init__.py in migration directory. Is's OK
+# and migration directory is intended for migration scripts.
+warnings.filterwarnings(
+    'ignore', r"^Not importing.*/core/migration.*__init__\.py$",
+    category=ImportWarning)
+
 
 from .. import db
 from ..component import Component
