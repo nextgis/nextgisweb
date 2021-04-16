@@ -401,9 +401,14 @@ class TableInfo(object):
                 for k, v in six.iteritems(kwargs):
                     setattr(self, k, v)
 
+        sequence = db.Sequence(tablename + '_id_seq', start=1,
+                               minvalue=-2**31, metadata=metadata)
         table = db.Table(
             tablename,
-            metadata, db.Column('id', db.Integer, primary_key=True),
+            metadata, db.Column(
+                'id', db.Integer,
+                sequence,
+                primary_key=True),
             db.Column('geom', ga.Geometry(
                 dimension=2, srid=self.srs_id,
                 geometry_type=geom_fldtype)),
@@ -414,6 +419,7 @@ class TableInfo(object):
         db.mapper(model, table)
 
         self.metadata = metadata
+        self.sequence = sequence
         self.table = table
         self.model = model
         self.fmap = {fld.keyname: fld.key for fld in self.fields}
@@ -427,6 +433,7 @@ class TableInfo(object):
 
         errors = []
 
+        max_fid = None
         for feature in ogrlayer:
             if len(errors) >= error_limit:
                 break
@@ -435,6 +442,7 @@ class TableInfo(object):
                 fid = feature.GetFID()
             else:
                 fid = feature.GetFieldAsInteger(self.fid_field_index)
+            max_fid = max(max_fid, fid) if max_fid is not None else fid
 
             geom = feature.GetGeometryRef()
             if geom is None:
@@ -592,6 +600,12 @@ class TableInfo(object):
         if len(errors) > 0 and not skip_errors:
             detail = '<br>'.join(cgi.escape(translate(error)) for error in errors)
             raise VE(_("Vector layer cannot be written due to errors"), detail=detail)
+
+        # Set sequence next value
+        if max_fid is not None:
+            connection = DBSession.connection()
+            connection.execute('ALTER SEQUENCE "%s"."%s" RESTART WITH %d' %
+                               (self.sequence.schema, self.sequence.name, max_fid + 1))
 
 
 class VectorLayerField(Base, LayerField):
