@@ -138,10 +138,11 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
 
 
 @pytest.mark.parametrize('fid_source, fid_field, id_expect', (
+    ('SEQUENCE', None, 1),
     ('GDAL', None, 0),
     ('FIELD', 'int', -1),
     ('AUTO', 'int', -1),
-    ('AUTO', 'not_exists', 0),
+    ('AUTO', 'not_exists', 1),
 ))
 def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
     src = Path(__file__).parent / 'data' / 'type.geojson'
@@ -160,8 +161,8 @@ def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
 
     res.persist()
 
-    res.setup_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
-    res.load_from_ogr(layer)
+    res.setup_from_ogr(layer)
+    res.load_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
 
     DBSession.flush()
 
