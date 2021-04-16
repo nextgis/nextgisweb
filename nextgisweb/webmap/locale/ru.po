@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 0.0\n"
 "Report-Msgid-Bugs-To: info@nextgis.ru\n"
-"POT-Creation-Date: 2021-03-25 12:09+0000\n"
+"POT-Creation-Date: 2021-04-16 09:56+0000\n"
 "PO-Revision-Date: 2015-09-14 15:48+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -31,19 +31,19 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:28 model.py:37 view.py:181 view.py:202
+#: model.py:31 model.py:40 view.py:181 view.py:202
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:30 view.py:188
+#: model.py:33 view.py:188
 msgid "Display"
 msgstr "Открыть"
 
-#: model.py:31
+#: model.py:34
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:100 model.py:32
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:100 model.py:35
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
@@ -55,7 +55,7 @@ msgstr "Настройки веб-карты"
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-webmap/Display.js:207 amd/ngw-webmap/Display.js:1000
+#: amd/ngw-webmap/Display.js:207 amd/ngw-webmap/Display.js:1002
 #: amd/ngw-webmap/ItemWidget.js:246
 msgid "Layers"
 msgstr "Слои"
@@ -64,46 +64,46 @@ msgstr "Слои"
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:219 amd/ngw-webmap/Display.js:427
+#: amd/ngw-webmap/Display.js:219 amd/ngw-webmap/Display.js:429
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:225 amd/ngw-webmap/Display.js:322
+#: amd/ngw-webmap/Display.js:225 amd/ngw-webmap/Display.js:324
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:361 amd/ngw-webmap/Display.js:368
+#: amd/ngw-webmap/Display.js:363 amd/ngw-webmap/Display.js:370
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:391 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:393 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:527 amd/ngw-webmap/Display.js:537
+#: amd/ngw-webmap/Display.js:529 amd/ngw-webmap/Display.js:539
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:718 amd/ngw-webmap/tool/Zoom.js:19
+#: amd/ngw-webmap/Display.js:720 amd/ngw-webmap/tool/Zoom.js:19
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:453
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:719 amd/ngw-webmap/tool/Zoom.js:22
+#: amd/ngw-webmap/Display.js:721 amd/ngw-webmap/tool/Zoom.js:22
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:454
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:723
+#: amd/ngw-webmap/Display.js:725
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:739
+#: amd/ngw-webmap/Display.js:741
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:742
+#: amd/ngw-webmap/Display.js:744
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:467
 msgid "Reset rotation"
 msgstr "Отменить поворот"
@@ -289,8 +289,8 @@ msgid "Kilometers"
 msgstr "Километры"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:36
-msgid "Meters/kilometers"
-msgstr "Метры/километры"
+msgid "Meters/kilometers (auto)"
+msgstr "Метры/километры (авто)"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:37
 msgid "Feet"
@@ -301,8 +301,8 @@ msgid "Miles"
 msgstr "Мили"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:39
-msgid "Feet/miles"
-msgstr "Футы/мили"
+msgid "Feet/miles (auto)"
+msgstr "Футы/мили (авто)"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:44
 msgid "Area units"
@@ -317,8 +317,8 @@ msgid "Sq. kilometers"
 msgstr "Кв. километры"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:47
-msgid "Sq. meters/kilometers"
-msgstr "Кв. метры/километры"
+msgid "Sq. meters/kilometers (auto)"
+msgstr "Кв. метры/километры (авто)"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:48
 msgid "Hectares"
@@ -333,8 +333,8 @@ msgid "Sq. miles"
 msgstr "Кв. мили"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:51
-msgid "Acres/sq. miles"
-msgstr "Акры/кв. мили"
+msgid "Acres/sq. miles (auto)"
+msgstr "Акры/кв. мили (авто)"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:52
 msgid "Sq. feet"
@@ -408,7 +408,7 @@ msgstr "га"
 msgid "ac"
 msgstr "акр"
 
-#: amd/ngw-webmap/tool/Measure.js:268
+#: amd/ngw-webmap/tool/Measure.js:267
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
