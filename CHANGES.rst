@@ -5,6 +5,7 @@ Changes
 -----
 
 - Ability to constraint a webmap to default extent.
+- More length and area units in webmap settings.
 - A user login is case insensitive when logging in.
 - Configuration option for disabling social networks share buttons.
 - Experimental support for creation of vector layers from GML files.
