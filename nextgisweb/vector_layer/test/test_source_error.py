@@ -131,6 +131,25 @@ CREATE_TEST_PARAMS = (
         dict(fix_errors='SAFE'),
         dict(feature_count=1),
     ),
+
+    (
+        # Just check loading of POINTZ layers.
+        'pointz.geojson',
+        dict(geometry_type='POINT'),
+        dict(geometry_type='POINTZ', feature_count=1),
+    ),
+    (
+        # Explicit setting of geometry type.
+        'pointz.geojson',
+        dict(geometry_type='POINT', is_multi=False, has_z=True),
+        dict(geometry_type='POINTZ', feature_count=1),
+    ),
+    (
+        # Z coordinate should be stripped here.
+        'pointz.geojson',
+        dict(geometry_type='POINT', has_z=False, fix_errors='LOSSY'),
+        dict(geometry_type='POINT', feature_count=1),
+    ),
 )
 
 
