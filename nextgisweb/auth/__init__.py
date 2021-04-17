@@ -53,6 +53,8 @@ class AuthComponent(Component):
             display_name=_("Authenticated")
         ).persist()
 
+        adm_opts = self.options.with_prefix('provision.administrator')
+
         self.initialize_group(
             keyname='administrators',
             system=True,
@@ -60,7 +62,8 @@ class AuthComponent(Component):
             members=[self.initialize_user(
                 keyname='administrator',
                 display_name=_("Administrator"),
-                password='admin'
+                password=adm_opts['password'],
+                oauth_subject=adm_opts['oauth_subject'],
             ), ]
         ).persist()
 
@@ -197,6 +200,9 @@ class AuthComponent(Component):
                doc="User last activity update time delta in seconds."),
 
         Option('user_limit', int, default=None, doc="Limit of enabled users"),
+
+        Option('provision.administrator.password', str, default='admin'),
+        Option('provision.administrator.oauth_subject', str, default=None),
     ))
 
     option_annotations += OAuthHelper.option_annotations.with_prefix('oauth')
