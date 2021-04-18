@@ -10,21 +10,24 @@ from nextgisweb.lib.config.util import (
     load_config)
 
 
-def test_environ_substitution():
-    items = OrderedDict()
-
-    items['one'] = "Hi, ${FOO}!"
-    environ_substitution(items, {'FOO': 'John'})
-    assert items['one'] == "Hi, John!"
-
-    items['two'] = "Bye, %(BAR)s!"
-    with pytest.warns(Warning):
-        environ_substitution(items, {'BAR': 'Tom'})
-    assert items['two'] == "Bye, Tom!"
-
-    items['three'] = "${MISSING}"
-    environ_substitution(items, {})
-    assert items['three'] == "${MISSING}"
+@pytest.mark.parametrize('value, environ, expected', (
+    ('${VAR}', {'VAR': 'value'}, 'value'),
+    ('${MIS}', {}, '${MIS}'),
+    ('${VAR:default}', {}, 'default'),
+    ('${VAR?true:false}', {'VAR': 'foo'}, 'true'),
+    ('${VAR?true:false}', {}, 'false'),
+    (r'${MIS:$\{VAR\}}', {}, '${VAR}'),
+    (r'${MIS:$\{VAR\}}', {'VAR': 'value'}, 'value'),
+    (
+        r'${F?$\{B?$\\\{F\\\}\\\:$\\\{B\\\}\:\}:}',
+        {'F': 'foo', 'B': 'bar'},
+        'foo:bar'
+    ),
+))
+def test_environ_substitution(value, environ, expected):
+    items = OrderedDict(key=value)
+    environ_substitution(items, environ)
+    assert items['key'] == expected
 
 
 def test_load_config():
@@ -36,9 +39,6 @@ def test_load_config():
         )))
 
         f2.write('\n'.join((
-            "[comp_b]",
-            "subst = ${VAR}",
-
             "[comp_a]",
             "del.key = ",
             "env.key = ",
@@ -47,7 +47,7 @@ def test_load_config():
         f1.flush()
         f2.flush()
 
-        include = "[comp_c]\nkey = value"
+        include = "[comp_b]\nkey = value"
 
         environ = {
             "NEXTGISWEB_COMP_A__ENV__KEY": "OK",
@@ -60,5 +60,4 @@ def test_load_config():
 
         assert settings.get('comp_a.missing') is None
         assert 'comp_a.deleted.key' not in settings
-        assert settings.get('comp_b.subst') == "value"
-        assert settings.get('comp_c.key') == "value"
+        assert settings.get('comp_b.key') == "value"

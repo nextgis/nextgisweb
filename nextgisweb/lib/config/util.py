@@ -59,29 +59,54 @@ def key_to_environ(name, prefix='NEXTGISWEB'):
 
 
 def environ_substitution(items, environ):
-    """ Substitute values in items from environment variables in two forms:
-    "%(DEPRECATED)s" and "${SHELL_STYLE}". """
+    """ Substitute values in items from environment variables """
 
-    dpr_re = re.compile(r'\%\(([a-z][a-z0-9_]*)\)s', re.IGNORECASE)
-    shl_re = re.compile(r'\$\{([a-z][a-z0-9_]*)\}', re.IGNORECASE)
+    shl_re = re.compile(r'''
+        \$\{
+            ([a-z][a-z0-9_]*)
+            (?:
+                (?:\:
+                    (?P<default>(?:\\.|[^\\\:\}])*)
+                )|
+                (?:\?
+                    (?P<true>(?:\\.|[^\\\:\}])*)
+                    \:
+                    (?P<false>(?:\\.|[^\\\:\}])*)
+                )
+            )?
+        \}
+    ''', re.IGNORECASE | re.VERBOSE)
 
-    def dpr_sub(m):
-        warnings.warn("Deprecated environ subst form %(KEY)s, use ${KEY} instead!".replace(
-            'KEY', m.group(1)), DeprecationWarning)
-        return environ[m.group(1)]
+    unescape_re = re.compile(r'\\(.)')
 
-    def shl_sub(m):
+    def substitute(v):
+        return shl_re.sub(subfn, v)
+
+    def unescape(v):
+        return unescape_re.sub(r'\1', v)
+    
+    def subfn(m):
         variable = m.group(1)
-        if variable in environ:
+
+        default = m.group('default')
+        vtrue, vfalse = m.group('true', 'false')
+
+        if vtrue is not None and vfalse is not None:
+            return substitute(unescape(
+                vtrue if (variable in environ)
+                else vfalse))
+
+        elif variable in environ:
             return environ[variable]
+
+        elif default is not None:
+            return substitute(unescape(default))
+
         else:
             return m.group(0)
 
     for k, v in list(items.items()):
-        v = dpr_re.sub(dpr_sub, v)
-        v = shl_re.sub(shl_sub, v)
-        items[k] = v
-
+        items[k] = substitute(v)
 
 def load_config(filenames, include, environ=os.environ, environ_prefix='NEXTGISWEB', hupper=False):
     if filenames is None:
