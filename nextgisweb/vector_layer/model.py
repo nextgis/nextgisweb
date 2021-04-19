@@ -200,59 +200,56 @@ class TableInfo(object):
 
         if len(geom_filter) == 1:
             self.geometry_type = geom_filter.pop()
-        if ltype in GEOM_TYPE_OGR:
-            geometry_type = _GEOM_OGR_2_TYPE[ltype]
-            if geometry_type in geom_filter:
-                self.geometry_type = geometry_type
-        else:
-            if len(geom_filter) > 1:
-                is_multi = False
-                has_z = False
+        elif ltype in GEOM_TYPE_OGR and _GEOM_OGR_2_TYPE[ltype] in geom_filter:
+            self.geometry_type = _GEOM_OGR_2_TYPE[ltype]
+        elif len(geom_filter) > 1:
+            is_multi = False
+            has_z = False
 
-                for feature in ogrlayer:
-                    if len(geom_filter) <= 1:
-                        break
+            for feature in ogrlayer:
+                if len(geom_filter) <= 1:
+                    break
 
-                    geom = feature.GetGeometryRef()
-                    if geom is None:
-                        continue
+                geom = feature.GetGeometryRef()
+                if geom is None:
+                    continue
+                gtype = geom.GetGeometryType()
+                if gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
+                    and geom.GetGeometryCount() == 1:
+                    geom = geom.GetGeometryRef(0)
                     gtype = geom.GetGeometryType()
-                    if gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
-                       and geom.GetGeometryCount() == 1:
-                        geom = geom.GetGeometryRef(0)
-                        gtype = geom.GetGeometryType()
 
-                    if gtype not in GEOM_TYPE_OGR:
-                        continue
-                    geometry_type = _GEOM_OGR_2_TYPE[gtype]
+                if gtype not in GEOM_TYPE_OGR:
+                    continue
+                geometry_type = _GEOM_OGR_2_TYPE[gtype]
 
-                    if geom_cast_params['geometry_type'] == TOGGLE.AUTO:
-                        if geometry_type in GEOM_TYPE.points:
-                            geom_filter = geom_filter.intersection(set(GEOM_TYPE.points))
-                        elif geometry_type in GEOM_TYPE.linestrings:
-                            geom_filter = geom_filter.intersection(set(GEOM_TYPE.linestrings))
-                        elif geometry_type in GEOM_TYPE.polygons:
-                            geom_filter = geom_filter.intersection(set(GEOM_TYPE.polygons))
-                    elif skip_other_geometry_type and geometry_type not in geom_filter:
-                        continue
+                if geom_cast_params['geometry_type'] == TOGGLE.AUTO:
+                    if geometry_type in GEOM_TYPE.points:
+                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.points))
+                    elif geometry_type in GEOM_TYPE.linestrings:
+                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.linestrings))
+                    elif geometry_type in GEOM_TYPE.polygons:
+                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.polygons))
+                elif skip_other_geometry_type and geometry_type not in geom_filter:
+                    continue
 
-                    if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi \
-                       and geometry_type in GEOM_TYPE.is_multi:
-                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
-                        is_multi = True
+                if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi \
+                    and geometry_type in GEOM_TYPE.is_multi:
+                    geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
+                    is_multi = True
 
-                    if geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z \
-                       and geometry_type in GEOM_TYPE.has_z:
-                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
-                        has_z = True
+                if geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z \
+                    and geometry_type in GEOM_TYPE.has_z:
+                    geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
+                    has_z = True
 
-                if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi:
-                    geom_filter = geom_filter - set(GEOM_TYPE.is_multi)
+            if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi:
+                geom_filter = geom_filter - set(GEOM_TYPE.is_multi)
 
-                if geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z:
-                    geom_filter = geom_filter - set(GEOM_TYPE.has_z)
+            if geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z:
+                geom_filter = geom_filter - set(GEOM_TYPE.has_z)
 
-                ogrlayer.ResetReading()
+            ogrlayer.ResetReading()
 
             if len(geom_filter) == 1:
                 self.geometry_type = geom_filter.pop()
