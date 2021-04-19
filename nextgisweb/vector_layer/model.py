@@ -168,12 +168,13 @@ class TableInfo(object):
         self.metadata = None
         self.table = None
         self.model = None
+        self.fid_field_index = None
         self.fmap = None
         self.geometry_type = None
 
     @classmethod
     def from_ogrlayer(cls, ogrlayer, srs_id, strdecode, skip_other_geometry_type,
-                      geom_cast_params):
+                      fid_params, geom_cast_params):
         self = cls(srs_id)
 
         if geom_cast_params['geometry_type'] == GEOM_TYPE.POINT:
@@ -262,7 +263,27 @@ class TableInfo(object):
         self.fields = []
 
         defn = ogrlayer.GetLayerDefn()
+
+        if fid_params['fid_source'] in (FID_SOURCE.AUTO, FID_SOURCE.FIELD):
+            if fid_params['fid_field'] is not None:
+                idx = defn.GetFieldIndex(fid_params['fid_field'])
+                if idx != -1:
+                    fld_defn = defn.GetFieldDefn(idx)
+                    if fld_defn.GetType() == ogr.OFTInteger:
+                        self.fid_field_index = idx
+
+            if self.fid_field_index is None and fid_params['fid_source'] == FID_SOURCE.FIELD:
+                if fid_params['fid_field'] is None:
+                    raise VE(_("Parameter 'fid_field' is missing."))
+                else:
+                    if idx == -1:
+                        raise VE(_("Field '%s' not found.") % fid_params['fid_field'])
+                    else:
+                        raise VE(_("Field '%s' type is not integer.") % fid_params['fid_field'])
+
         for i in range(defn.GetFieldCount()):
+            if i == self.fid_field_index:
+                continue
             fld_defn = defn.GetFieldDefn(i)
 
             # TODO: Fix invalid field names as done for attributes.
@@ -404,7 +425,7 @@ class TableInfo(object):
         self.fmap = {fld.keyname: fld.key for fld in self.fields}
 
     def load_from_ogr(self, ogrlayer, strdecode, skip_other_geometry_type,
-                      fid_params, fix_errors, skip_errors):
+                      fix_errors, skip_errors):
         source_osr = ogrlayer.GetSpatialRef()
         target_osr = osr.SpatialReference()
         target_osr.ImportFromEPSG(self.srs_id)
@@ -413,34 +434,15 @@ class TableInfo(object):
 
         errors = []
 
-        fid_field_index = None
-        if fid_params['fid_source'] in (FID_SOURCE.AUTO, FID_SOURCE.FIELD):
-            if fid_params['fid_field'] is not None:
-                defn = ogrlayer.GetLayerDefn()
-                idx = defn.GetFieldIndex(fid_params['fid_field'])
-                if idx != -1:
-                    fld_defn = defn.GetFieldDefn(idx)
-                    if fld_defn.GetType() == ogr.OFTInteger:
-                        fid_field_index = idx
-
-            if fid_field_index is None and fid_params['fid_source'] == FID_SOURCE.FIELD:
-                if fid_params['fid_field'] is None:
-                    raise VE(_("Parameter 'fid_field' is missing."))
-                else:
-                    if idx == -1:
-                        raise VE(_("Field '%s' not found.") % fid_params['fid_field'])
-                    else:
-                        raise VE(_("Field '%s' type is not integer.") % fid_params['fid_field'])
-
         max_fid = None
         for i, feature in enumerate(ogrlayer, start=1):
             if len(errors) >= error_limit:
                 break
 
-            if fid_field_index is None:
+            if self.fid_field_index is None:
                 fid = i
             else:
-                fid = feature.GetFieldAsInteger(fid_field_index)
+                fid = feature.GetFieldAsInteger(self.fid_field_index)
             max_fid = max(max_fid, fid) if max_fid is not None else fid
 
             geom = feature.GetGeometryRef()
@@ -543,6 +545,8 @@ class TableInfo(object):
 
             fld_values = dict()
             for i in range(feature.GetFieldCount()):
+                if i == self.fid_field_index:
+                    continue
                 fld_type = feature.GetFieldDefnRef(i).GetType()
 
                 if (not feature.IsFieldSet(i) or feature.IsFieldNull(i)):
@@ -654,8 +658,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                        skip_other_geometry_type=False,
                        fid_params=fid_params_default,
                        geom_cast_params=geom_cast_params_default):
-        tableinfo = TableInfo.from_ogrlayer(ogrlayer, self.srs.id, strdecode,
-                                            skip_other_geometry_type, geom_cast_params)
+        tableinfo = TableInfo.from_ogrlayer(
+            ogrlayer, self.srs.id, strdecode, skip_other_geometry_type,
+            fid_params, geom_cast_params)
         tableinfo.setup_layer(self)
 
         tableinfo.setup_metadata(self._tablename)
@@ -675,10 +680,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     def load_from_ogr(self, ogrlayer, strdecode=lambda x: x,
                       skip_other_geometry_type=False,
-                      fid_params=fid_params_default,
                       fix_errors=ERROR_FIX.default, skip_errors=skip_errors_default):
-        self.tableinfo.load_from_ogr(ogrlayer, strdecode, skip_other_geometry_type,
-                                     fid_params, fix_errors, skip_errors)
+        self.tableinfo.load_from_ogr(
+            ogrlayer, strdecode, skip_other_geometry_type, fix_errors, skip_errors)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (
@@ -988,7 +992,7 @@ class _source_attr(SP):
 
         with DBSession.no_autoflush:
             obj.setup_from_ogr(ogrlayer, recode, skip_other_geometry_type, fid_params, geom_cast_params)
-            obj.load_from_ogr(ogrlayer, recode, skip_other_geometry_type, fid_params, fix_errors, skip_errors)
+            obj.load_from_ogr(ogrlayer, recode, skip_other_geometry_type, fix_errors, skip_errors)
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:

@@ -160,8 +160,8 @@ def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
 
     res.persist()
 
-    res.setup_from_ogr(layer)
-    res.load_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
+    res.setup_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
+    res.load_from_ogr(layer)
 
     DBSession.flush()
 
