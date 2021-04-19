@@ -73,6 +73,7 @@ class Geometry(object):
             if self._ogr is None and self._shape is not None:
                 self._wkb = self._shape.wkb
             else:
+                # ORG is the fastest, so convert to OGR and then to WKB.
                 self._wkb = self.ogr.ExportToWkb(wkbNDR)
         return self._wkb
 
@@ -82,6 +83,7 @@ class Geometry(object):
             if self._ogr is None and self._shape is not None:
                 self._wkt = self._shape.wkt
             else:
+                # ORG is the fastest, so convert to OGR and then to WKT.
                 self._wkt = self.ogr.ExportToIsoWkt()
         return self._wkt
 
@@ -91,6 +93,7 @@ class Geometry(object):
             if self._wkb is None and self._wkt is not None:
                 self._ogr = CreateGeometryFromWkt(self._wkt)
             else:
+                # WKB is the fastest, so convert to WKB and then to OGR.
                 self._ogr = CreateGeometryFromWkb(self.wkb)
         return self._ogr
 
@@ -101,6 +104,7 @@ class Geometry(object):
             if self._wkb is None and self._wkt is not None:
                 self._shape = wkt.loads(self._wkt)
             else:
+                # WKB is the fastest, so convert to WKB and then to shape.
                 self._shape = wkb.loads(self.wkb)
         return self._shape
 

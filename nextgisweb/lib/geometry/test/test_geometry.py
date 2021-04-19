@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
+from itertools import combinations
 import six
 
 import pytest
@@ -56,6 +57,30 @@ def test_wkt_wkb_ogr_shape():
 
     shape = Geometry.from_shape(ogr_geom.shape)
     assert shape.wkt == wkt.wkt
+
+
+@pytest.mark.parametrize('fmt_src, fmt_dst', combinations(
+    ('wkb', 'wkt', 'ogr', 'shape'), 2  
+))
+def test_convert(fmt_src, fmt_dst):
+    geom_wkt = 'POINT Z (1 2 3)'
+    geom_ogr = ogr.CreateGeometryFromWkt(geom_wkt)
+
+    sample = dict(
+        wkb=geom_ogr.ExportToWkb(ogr.wkbNDR),
+        wkt=geom_ogr.ExportToIsoWkt(),
+        ogr=geom_ogr.Clone(),
+        shape=wkt_loads(geom_wkt),
+    )
+
+    val_src = getattr(Geometry, 'from_' + fmt_src)(sample[fmt_src])
+    val_dst = getattr(val_src, fmt_dst)
+    
+    if fmt_dst == 'ogr':
+        assert val_dst.Equal(sample[fmt_dst])
+    else:
+        assert val_dst == sample[fmt_dst]
+    
 
 
 def _pg_wkt_to_wkb_iso(wkt):
