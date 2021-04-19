@@ -139,7 +139,6 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
 
 @pytest.mark.parametrize('fid_source, fid_field, id_expect', (
     ('SEQUENCE', None, 1),
-    ('GDAL', None, 0),
     ('FIELD', 'int', -1),
     ('AUTO', 'int', -1),
     ('AUTO', 'not_exists', 1),

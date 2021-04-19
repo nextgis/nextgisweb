@@ -138,7 +138,6 @@ geom_cast_params_default = dict(
 class FID_SOURCE(object):
     AUTO = 'AUTO'
     SEQUENCE = 'SEQUENCE'
-    GDAL = 'GDAL'
     FIELD = 'FIELD'
 
 
@@ -438,9 +437,7 @@ class TableInfo(object):
             if len(errors) >= error_limit:
                 break
 
-            if fid_params['fid_source'] == FID_SOURCE.GDAL:
-                fid = feature.GetFID()
-            elif fid_field_index is None:
+            if fid_field_index is None:
                 fid = i
             else:
                 fid = feature.GetFieldAsInteger(fid_field_index)

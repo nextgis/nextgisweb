@@ -52,7 +52,7 @@ define([
             }
 
             this.wFIDSource.watch('value', function(attr, oldval, newval) {
-                var hideFIDField = ['GDAL', 'SEQUENCE'].includes(newval);
+                var hideFIDField = newval === 'SEQUENCE';
                 this.wFIDField.set('disabled', hideFIDField);
             }.bind(this));
 
@@ -93,7 +93,7 @@ define([
 
                 var fid_source = this.wFIDSource.get("value");
                 setObject("fid_source", fid_source);
-                if (!['GDAL', 'SEQUENCE'].includes(fid_source)) {
+                if (fid_source !== 'SEQUENCE') {
                     setObject("fid_field", this.wFIDField.get("value"));
                 }
             } else {
