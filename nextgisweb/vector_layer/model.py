@@ -10,7 +10,7 @@ from datetime import datetime, time, date
 import six
 
 from zope.interface import implementer
-from osgeo import ogr, osr
+from osgeo import gdal, ogr, osr
 from shapely.geometry import box
 from sqlalchemy.sql import ColumnElement
 from sqlalchemy.ext.compiler import compiles
@@ -99,6 +99,8 @@ _FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
 _FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
 
 SCHEMA = 'vector_layer'
+DRIVERS_SUPPORTED = ('ESRI Shapefile', 'GeoJSON', 'KML', 'GML')
+OPEN_OPTIONS = ('EXPOSE_FID=NO', )
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
@@ -970,7 +972,29 @@ VE = ValidationError
 
 class _source_attr(SP):
 
-    def _ogrds(self, ogrds):
+    def _ogrds(self, filename, encoding):
+        if six.PY2:
+            with _set_encoding(encoding) as sdecode:
+                ogrds = gdal.OpenEx(filename, 0, allowed_drivers=DRIVERS_SUPPORTED, open_options=OPEN_OPTIONS)
+                strdecode = sdecode
+        else:
+            # Ignore encoding option in Python 3
+            ogrds = gdal.OpenEx(filename, 0, allowed_drivers=DRIVERS_SUPPORTED, open_options=OPEN_OPTIONS)
+
+            def strdecode(x):
+                return x
+
+        if ogrds is None:
+            ogrds = ogr.Open(filename, 0)
+            if ogrds is None:
+                raise VE(_("GDAL library failed to open file."))
+            else:
+                drivername = ogrds.GetDriver().GetName()
+                raise VE(_("Unsupport OGR driver: %s.") % drivername)
+
+        return ogrds, strdecode
+
+    def _ogrlayer(self, ogrds):
         if ogrds.GetLayerCount() < 1:
             raise VE(_("Dataset doesn't contain layers."))
 
@@ -983,16 +1007,16 @@ class _source_attr(SP):
 
         return ogrlayer
 
-    def _ogrlayer(self, obj, ogrlayer, skip_other_geometry_type, fix_errors, skip_errors,
-                  geom_cast_params, fid_params, recode):
+    def _setup_layer(self, obj, ogrlayer, skip_other_geometry_type, fix_errors, skip_errors,
+                     geom_cast_params, fid_params, strdecode):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
 
         obj.tbl_uuid = uuid.uuid4().hex
 
         with DBSession.no_autoflush:
-            obj.setup_from_ogr(ogrlayer, recode, skip_other_geometry_type, fid_params, geom_cast_params)
-            obj.load_from_ogr(ogrlayer, recode, skip_other_geometry_type, fix_errors, skip_errors)
+            obj.setup_from_ogr(ogrlayer, strdecode, skip_other_geometry_type, fid_params, geom_cast_params)
+            obj.load_from_ogr(ogrlayer, strdecode, skip_other_geometry_type, fix_errors, skip_errors)
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
@@ -1008,26 +1032,8 @@ class _source_attr(SP):
         iszip = zipfile.is_zipfile(datafile)
         ogrfn = ('/vsizip/{%s}' % datafile) if iszip else datafile
 
-        if six.PY2:
-            with _set_encoding(encoding) as sdecode:
-                ogrds = ogr.Open(ogrfn, 0)
-                recode = sdecode
-        else:
-            # Ignore encoding option in Python 3
-            ogrds = ogr.Open(ogrfn, 0)
-
-            def recode(x):
-                return x
-
-        if ogrds is None:
-            raise VE(_("GDAL library failed to open file."))
-
-        drivername = ogrds.GetDriver().GetName()
-
-        if drivername not in ('ESRI Shapefile', 'GeoJSON', 'KML', 'GML'):
-            raise VE(_("Unsupport OGR driver: %s.") % drivername)
-
-        ogrlayer = self._ogrds(ogrds)
+        ogrds, strdecode = self._ogrds(ogrfn, encoding)
+        ogrlayer = self._ogrlayer(ogrds)
 
         skip_other_geometry_type = srlzr.data.get('skip_other_geometry_type')
 
@@ -1061,8 +1067,8 @@ class _source_attr(SP):
             fid_field=srlzr.data.get('fid_field')
         )
 
-        self._ogrlayer(srlzr.obj, ogrlayer, skip_other_geometry_type, fix_errors, skip_errors,
-                       geom_cast_params, fid_params, recode)
+        self._setup_layer(srlzr.obj, ogrlayer, skip_other_geometry_type, fix_errors, skip_errors,
+                          geom_cast_params, fid_params, strdecode)
 
 
 class _fields_attr(SP):
