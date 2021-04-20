@@ -116,7 +116,7 @@ class AuthComponent(Component):
 
     def query_stat(self):
         user_count = DBSession.query(db.func.count(User.id)).filter(
-            db.not_(User.system)).scalar()
+            db.and_(db.not_(User.system), db.not_(User.disabled))).scalar()
 
         la_everyone = DBSession.query(db.func.max(User.last_activity)).scalar()
 
