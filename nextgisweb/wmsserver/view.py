@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
+import math
 from six import BytesIO
 
 from lxml import etree, html
@@ -140,10 +141,27 @@ def _get_capabilities(obj, request):
         content_type='text/xml')
 
 
+def geographic_distance(lon_x, lat_x, lon_y, lat_y):
+    """ Approximate calculation from
+        https://qgis.org/api/2.18/qgsscalecalculator_8cpp_source.html#l00091 """
+    lat = (lat_x + lat_y) / 2
+    rads = math.pi / 180.0
+    a = math.cos(lat * rads) ** 2
+    c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
+    ra = 6378000
+
+    e = 0.0810820288
+
+    radius = ra * (1.0 - e**2) / (1.0 - e**2 * math.sin(lat * rads)**2) ** 1.5
+    meters = abs(lon_x - lon_y) / 180.0 * radius * c
+
+    return meters
+
+
 def _get_map(obj, request):
     params = dict((k.upper(), v) for k, v in request.params.items())
     p_layers = params.get('LAYERS').split(',')
-    p_bbox = map(float, params.get('BBOX').split(','))
+    p_bbox = [float(v) for v in params.get('BBOX').split(',')]
     p_width = int(params.get('WIDTH'))
     p_height = int(params.get('HEIGHT'))
     p_format = params.get('FORMAT')
@@ -157,6 +175,19 @@ def _get_map(obj, request):
 
     srs = SRS.filter_by(id=int(p_srs.split(':')[-1])).one()
 
+    def scale(delta, img_px):
+        dpi = 96
+        img_inch = float(img_px) / dpi
+        img_m = img_inch * 0.0254
+
+        return delta / img_m
+
+    if srs.is_geographic:
+        distance = geographic_distance(*p_bbox)
+    else:
+        distance = p_bbox[2] - p_bbox[0]
+    w_scale = scale(distance, p_width)
+
     for lname in p_layers:
         try:
             lobj = lmap[lname]
@@ -165,10 +196,12 @@ def _get_map(obj, request):
 
         request.resource_permission(DataScope.read, lobj.resource)
 
-        req = lobj.resource.render_request(srs)
-        limg = req.render_extent(p_bbox, p_size)
-        if limg is not None:
-            img.paste(limg, (0, 0), limg)
+        if (lobj.min_scale_denom is None or lobj.min_scale_denom < w_scale) and \
+                (lobj.max_scale_denom is None or w_scale < lobj.max_scale_denom):
+            req = lobj.resource.render_request(srs)
+            limg = req.render_extent(p_bbox, p_size)
+            if limg is not None:
+                img.paste(limg, (0, 0), limg)
 
     buf = BytesIO()
 
