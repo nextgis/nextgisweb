@@ -94,7 +94,7 @@ class ResourceComponent(Component):
                 principal=admingrp,
                 action='allow'))
 
-            everyone_permissions = self.options.get('everyone_permissions')
+            everyone_permissions = self.options.get('everyone_permissions', None)
             if everyone_permissions is not None:
                 everyone = User.filter_by(keyname='everyone').one()
                 perm_list = re.split(r'\,\s*', everyone_permissions)
