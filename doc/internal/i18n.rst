@@ -8,19 +8,19 @@ projects based on gettext:
 .. _gettext: http://www.gnu.org/software/gettext
 .. _babel: http://babel.pocoo.org/
 
-1. Extracting strings to translate from sources to pot-file (``extract``)
-2. Creating or updating po-files based on pot-files (``init`` and ``update``)
-3. Compiling po-files into mo-files (``compile``)
+1. Extract strings to translate from sources to pot-file (``extract``)
+2. Create or update po-files based on pot-files (``init`` and ``update``)
+3. Compile po-files into mo-files (``compile``)
 
 All lines that are shown to the user must be written in sources in English and
 only then translated into other languages.
 
 Translation is performed for each component of NextGIS Web separately. As a
-result, there is no way to internationalize strings that are not belongs to any
+result, there is no way to internationalize strings that do not belong to any
 component.
 
-Translations of each component exists within its own ``domain`` in terms of the
-gettext library. In one component one line can be translated in one way, and in
+Translations of each component exist within its own ``domain`` in terms of the
+gettext library. For a component a certain line can be translated in one way, and in
 another - in another, even without the use of contexts.
 
 All actions on translations are performed using ``nextgisweb-i18n`` command line
