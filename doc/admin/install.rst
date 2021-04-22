@@ -50,8 +50,6 @@ System requirements
       nextgisweb=# ALTER TABLE spatial_ref_sys OWNER TO nextgisweb;
       nextgisweb=# ALTER TABLE geography_columns OWNER TO nextgisweb;
       nextgisweb=# ALTER TABLE geometry_columns OWNER TO nextgisweb;
-      nextgisweb=# ALTER TABLE raster_columns OWNER TO nextgisweb;
-      nextgisweb=# ALTER TABLE raster_overviews OWNER TO nextgisweb;
       nextgisweb=# CREATE EXTENSION hstore;
       nextgisweb=# \quit
 
