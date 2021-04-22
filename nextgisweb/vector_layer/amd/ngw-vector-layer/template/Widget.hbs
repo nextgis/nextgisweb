@@ -31,12 +31,12 @@
                 <option value="MULTIPOINT">{{gettext 'Multipoint'}}</option>
                 <option value="MULTILINESTRING">{{gettext 'Multiline'}}</option>
                 <option value="MULTIPOLYGON">{{gettext 'Multipolygon'}}</option>
-                <option value="POINTZ">{{gettext 'PointZ'}}</option>
-                <option value="LINESTRINGZ">{{gettext 'LineZ'}}</option>
-                <option value="POLYGONZ">{{gettext 'PolygonZ'}}</option>
-                <option value="MULTIPOINTZ">{{gettext 'MultipointZ'}}</option>
-                <option value="MULTILINESTRINGZ">{{gettext 'MultilineZ'}}</option>
-                <option value="MULTIPOLYGONZ">{{gettext 'MultipolygonZ'}}</option>
+                <option value="POINTZ">{{gettext 'Point Z'}}</option>
+                <option value="LINESTRINGZ">{{gettext 'Line Z'}}</option>
+                <option value="POLYGONZ">{{gettext 'Polygon Z'}}</option>
+                <option value="MULTIPOINTZ">{{gettext 'Multipoint Z'}}</option>
+                <option value="MULTILINESTRINGZ">{{gettext 'Multiline Z'}}</option>
+                <option value="MULTIPOLYGONZ">{{gettext 'Multipolygon Z'}}</option>
             </select>
         </div>
     </div>
@@ -45,7 +45,7 @@
         <div data-dojo-attach-point="wSourceFile"
                 data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wFile" 
                 data-dojo-props="uploaderLinkText: '{{gettext 'Select a dataset'}}',
-                                uploaderHelpText: '{{gettext 'Dataset should be in ESRI Shapefile (zip) or GeoJSON format.'}}'
+                                uploaderHelpText: '{{gettext 'Dataset should be in ESRI Shapefile (zip), GeoJSON, GML or KML format.'}}'
         "></div>
 
         <div data-dojo-type="dijit/TitlePane" data-dojo-props="title: '{{gettext 'Advanced options'}}', open: false">
@@ -113,7 +113,7 @@
                     title="{{gettext 'FID source'}}" style="width: 100%">
 
                     <option value="AUTO" selected="selected">{{gettext 'Auto'}}</option>
-                    <option value="SEQUENCE">{{gettext 'SEQUENCE'}}</option>
+                    <option value="SEQUENCE">{{gettext 'Sequence'}}</option>
                     <option value="FIELD">{{gettext 'Field'}}</option>
                 </select>
 

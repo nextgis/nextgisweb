@@ -604,7 +604,7 @@ class TableInfo(object):
 
         if len(errors) > 0 and not skip_errors:
             detail = '<br>'.join(cgi.escape(translate(error)) for error in errors)
-            raise VE(_("Vector layer cannot be written due to errors"), detail=detail)
+            raise VE(_("Vector layer cannot be written due to errors."), detail=detail)
 
         # Set sequence next value
         if max_fid is not None:
