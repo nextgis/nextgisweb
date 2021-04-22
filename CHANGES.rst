@@ -11,6 +11,8 @@ Changes
 - Experimental support for creation of vector layers from GML files.
 - Performance improvements in geometry handling and rendering
   especially when converting between WKT and WKB formats.
+- Improved word wrapping in webmap identification popup.
+- Minimum and maximum scale restrictions in WMS server.
 - OpenLayers library upgraded to 6.5.0.
 - OAuth server logout support via logout redirect endpoint.
 
