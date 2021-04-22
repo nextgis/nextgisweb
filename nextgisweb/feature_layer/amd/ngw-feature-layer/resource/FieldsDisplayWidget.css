@@ -9,6 +9,10 @@
     border-bottom: 1px solid #efefef;
 }
 
+.ngw-feature-layer-FieldsDisplayWidget .pure-table tr > td {
+  word-break: break-word;
+}
+
 .ngw-feature-layer-FieldsDisplayWidget.compact .pure-table {
     font-size: 12px;
     line-height: 1.2;
