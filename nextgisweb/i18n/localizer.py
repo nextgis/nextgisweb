@@ -44,10 +44,6 @@ class Translations(BabelTranslations):
             locale_path = Path(mod.__path__[0]) / 'locale'
             mo_path = locale_path / '{}.mo'.format(locale)
 
-            if not mo_path.is_file():
-                locale_path = Path(resource_filename(pkginfo.comp_pkg(comp_id), 'locale'))
-                mo_path = locale_path / locale / 'LC_MESSAGES' / '{}.mo'.format(comp_id)
-
             if mo_path.is_file():
                 _logging.debug(
                     "Loading component [%s] translations for locale [%s] from [%s]",

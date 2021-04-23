@@ -236,10 +236,6 @@ def locdata(request):
     locale_path = Path(mod.__path__[0]) / 'locale'
     jed_path = locale_path / '{}.jed'.format(locale)
 
-    if not jed_path.is_file():
-        locale_path = Path(resource_filename(pkginfo.comp_pkg(component), 'locale'))
-        jed_path = locale_path / locale / 'LC_MESSAGES' / '{}.jed'.format(component)
-
     if jed_path.is_file():
         return FileResponse(str(jed_path), content_type='application/json')
 
