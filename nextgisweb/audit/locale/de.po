@@ -1,0 +1,81 @@
+# German translations for nextgisweb.
+# Copyright (C) 2021 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2021-04-23 13:58+0000\n"
+"PO-Revision-Date: 2021-04-23 13:58+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: view.py:32
+msgid "'date_first' and 'date_last' are mutually exclusive."
+msgstr ""
+
+#: view.py:52 view.py:109
+msgid "Journal"
+msgstr ""
+
+#: view.py:82
+#, python-format
+msgid "Journal record: %s"
+msgstr ""
+
+#: view.py:108
+msgid "Audit"
+msgstr ""
+
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:17
+msgid "Search"
+msgstr ""
+
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:23
+msgid "Export"
+msgstr ""
+
+#: template/browse.mako:45
+msgid "All users"
+msgstr ""
+
+#: template/browse.mako:46
+msgid "Non-empty users"
+msgstr ""
+
+#: template/browse.mako:88
+msgid "Timestamp"
+msgstr ""
+
+#: template/browse.mako:89
+msgid "Status"
+msgstr ""
+
+#: template/browse.mako:90
+msgid "Method"
+msgstr ""
+
+#: template/browse.mako:91
+msgid "Path"
+msgstr ""
+
+#: template/browse.mako:92
+msgid "Route name"
+msgstr ""
+
+#: template/browse.mako:93
+msgid "Context"
+msgstr ""
+
+#: template/browse.mako:94
+msgid "User"
+msgstr ""
+

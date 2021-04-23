@@ -1,0 +1,681 @@
+# German translations for nextgisweb.
+# Copyright (C) 2021 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2021-04-23 14:03+0000\n"
+"PO-Revision-Date: 2021-04-23 14:05+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: __init__.py:28
+msgid "Main web map"
+msgstr ""
+
+#: adapter.py:24
+msgid "Tiles"
+msgstr ""
+
+#: adapter.py:34
+msgid "Image"
+msgstr ""
+
+#: model.py:31 model.py:40 view.py:181 view.py:202
+msgid "Web map"
+msgstr ""
+
+#: model.py:33 view.py:188
+msgid "Display"
+msgstr ""
+
+#: model.py:34
+msgid "View annotations"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:100 model.py:35
+msgid "Edit annotations"
+msgstr ""
+
+#: view.py:36 view.py:203
+msgid "Web map settings"
+msgstr ""
+
+#: view.py:209
+msgid "External access"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:207 amd/ngw-webmap/Display.js:1002
+#: amd/ngw-webmap/ItemWidget.js:246
+msgid "Layers"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:213
+msgid "Search"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:219 amd/ngw-webmap/Display.js:429
+msgid "Share"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:225 amd/ngw-webmap/Display.js:324
+msgid "Print map"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:363 amd/ngw-webmap/Display.js:370
+msgid "Bookmarks"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:393 amd/ngw-webmap/plugin/LayerInfo.js:36
+msgid "Description"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:529 amd/ngw-webmap/Display.js:539
+msgid "Annotations"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:720 amd/ngw-webmap/tool/Zoom.js:19
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:453
+msgid "Zoom in"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:721 amd/ngw-webmap/tool/Zoom.js:22
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:454
+msgid "Zoom out"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:725
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
+msgid "Attributions"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:741
+msgid "Initial extent"
+msgstr ""
+
+#: amd/ngw-webmap/Display.js:744
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:467
+msgid "Reset rotation"
+msgstr ""
+
+#: amd/ngw-webmap/ExtentWidget.js:34
+msgid "Extent and bookmarks"
+msgstr ""
+
+#: amd/ngw-webmap/ItemWidget.js:97 amd/ngw-webmap/template/ItemWidget.hbs:41
+msgid "Layer order"
+msgstr ""
+
+#: amd/ngw-webmap/ItemWidget.js:147
+msgid "Use on the map"
+msgstr ""
+
+#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
+msgid "Save"
+msgstr ""
+
+#: amd/ngw-webmap/ItemWidget.js:312 amd/ngw-webmap/template/ItemWidget.hbs:26
+msgid "Add group"
+msgstr ""
+
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:8
+msgid "Your annotation text"
+msgstr ""
+
+#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.hbs:7
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:122
+msgid "Edit annotation"
+msgstr ""
+
+#: amd/ngw-webmap/plugin/FeatureLayer.js:27
+msgid "Go to"
+msgstr ""
+
+#: amd/ngw-webmap/plugin/FeatureLayer.js:74
+msgid "Feature table"
+msgstr ""
+
+#: amd/ngw-webmap/plugin/LayerEditor.js:79
+msgid "Editing"
+msgstr ""
+
+#: amd/ngw-webmap/plugin/ZoomToLayer.js:24
+msgid "Zoom to layer"
+msgstr ""
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.hbs:10
+msgid "Enable layers editing"
+msgstr ""
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:18
+msgid "Settings"
+msgstr ""
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:30
+msgid "Enable annotations"
+msgstr ""
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:33
+msgid "Show annotations by default"
+msgstr ""
+
+#: amd/ngw-webmap/template/Display.hbs:13
+msgid "Map"
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+msgid "Left, deg."
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:16
+msgid "Top, deg."
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:22
+msgid "Right, deg."
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:28
+msgid "Bottom, deg."
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:34
+msgid "Set extent from layer"
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+msgid "Select layer"
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:46
+msgid "Constrain to extent"
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:49
+msgid "Select vector layer"
+msgstr ""
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:51
+msgid "Bookmark resource"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:14
+msgid "Add layer"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:77
+msgid "Enabled"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:84
+msgid "Transparency"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:89
+msgid "Min scale"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:94
+msgid "Max scale"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:100
+msgid "Adapter"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:106
+msgid "Style resource"
+msgstr ""
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:126
+msgid "Expanded"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:9
+msgid "Identify popup"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:14
+msgid "Width, px"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:19
+msgid "Height, px"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:24
+msgid "Radius, px"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:29
+msgid "Measurement"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:33
+msgid "Length units"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:34
+msgid "Meters"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:35
+msgid "Kilometers"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:36
+msgid "Meters/kilometers (auto)"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:37
+msgid "Feet"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:38
+msgid "Miles"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:39
+msgid "Feet/miles (auto)"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:44
+msgid "Area units"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:45
+msgid "Sq. meters"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:46
+msgid "Sq. kilometers"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:47
+msgid "Sq. meters/kilometers (auto)"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:48
+msgid "Hectares"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:49
+msgid "Acres"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:50
+msgid "Sq. miles"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:51
+msgid "Acres/sq. miles (auto)"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:52
+msgid "Sq. feet"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:57
+msgid "Degree format"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:58
+msgid "Decimal degrees"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:59
+msgid "Degrees, decimal minutes"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:60
+msgid "Degrees, minutes, seconds"
+msgstr ""
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:65
+msgid "Measurement SRID"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Identify.js:213
+msgid "Attributes"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Identify.js:247
+msgid "Feature"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Identify.js:305 amd/ngw-webmap/tool/Identify.js:322
+msgid "Identify"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Identify.js:432
+msgid "Features"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:34
+msgid "Measure distance"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:37
+msgid "Measure area"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:41
+msgid "m"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:42
+msgid "km"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:43
+msgid "ft"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:44
+msgid "mi"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:45
+msgid "ha"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:46
+msgid "ac"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Measure.js:267
+msgid "Double click to finish."
+msgstr ""
+
+#: amd/ngw-webmap/tool/Rotate.js:15
+msgid "Rotate"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Swipe.js:18
+msgid "Vertical swipe"
+msgstr ""
+
+#: amd/ngw-webmap/tool/Swipe.js:22
+msgid "Horizontal swipe"
+msgstr ""
+
+#: amd/ngw-webmap/tool/editing/CreateFeature.js:16
+msgid "Create features"
+msgstr ""
+
+#: amd/ngw-webmap/tool/editing/DeleteFeature.js:16
+msgid "Delete features"
+msgstr ""
+
+#: amd/ngw-webmap/tool/editing/ModifyFeature.js:16
+msgid "Modify features"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:50
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:38
+msgid "Don't save"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:55
+msgid "Delete"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:125
+msgid "Create annotation"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:5
+msgid "Stroke: width / color"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:10
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:46
+msgid "Please enter a numeric value"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:11
+msgid "Invalid width: should be from 0 to 20 px"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:13
+msgid "Stroke width, px"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:18
+msgid "Stroke color"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:25
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:31
+msgid "Fill color"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:38
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:43
+msgid "Circle size, px"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:47
+msgid "Invalid width: should be from 1 to 100 px"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:185
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:201
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:216
+msgid "Error on the server:"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:14
+msgid "Show annotations layer"
+msgstr ""
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
+msgid "Show messages"
+msgstr ""
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:17
+msgid "Stopping editing"
+msgstr ""
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:25
+msgid "Do you want to save changes?"
+msgstr ""
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+msgid "Cancel"
+msgstr ""
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:9
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:94
+msgid "Print"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:18
+msgid "Paper format"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:22
+msgid "Select format"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:24
+msgid "A4 - Portrait"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:25
+msgid "A4 - Landscape"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:26
+msgid "A3 - Portrait"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:27
+msgid "A3 - Landscape"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:28
+msgid "A2 - Portrait"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:29
+msgid "A2 - Landscape"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:30
+msgid "A1 - Portrait"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:31
+msgid "A1 - Landscape"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:32
+msgid "A0 - Portrait"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:33
+msgid "A0 - Landscape"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:34
+msgid "Custom size"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:40
+msgid "Height, mm"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:51
+msgid "Width, mm"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:62
+msgid "Margin, mm"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:72
+msgid "Scale value"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:77
+msgid "Scale bar"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:82
+#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:5
+msgid "Scale"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
+msgid "Save as"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:107
+msgid "JPEG"
+msgstr ""
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:114
+msgid "PNG"
+msgstr ""
+
+#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:8
+msgid "Select scale"
+msgstr ""
+
+#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:24
+msgid "Use Shift+drag for box zooming"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.hbs:7
+msgid "Search on the map"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:160
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:213
+msgid "Refine search criterion"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:228
+msgid "Not found"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:2
+msgid "Map link"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:10
+msgid "Social networks"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:18
+msgid "Embed code for your site"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:20
+msgid "Map size:"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:43
+msgid "Link to main map"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:50
+msgid "Generate events"
+msgstr ""
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:68
+msgid "Preview"
+msgstr ""
+
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
+msgid "Open full map"
+msgstr ""
+
+#: template/section_api_webmap.mako:7
+msgid "TMS (Tile Map Service)"
+msgstr ""
+
+#: template/section_api_webmap.mako:11
+msgid ""
+"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web "
+"map is a map displayed in a browser by seamlessly joining dozens of "
+"individually requested image."
+msgstr ""
+
+#: template/section_api_webmap.mako:16
+msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+msgstr ""
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr ""
+

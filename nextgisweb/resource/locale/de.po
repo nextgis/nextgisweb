@@ -1,0 +1,380 @@
+# German translations for nextgisweb.
+# Copyright (C) 2021 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2021-04-23 14:03+0000\n"
+"PO-Revision-Date: 2021-04-23 14:05+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: __init__.py:91
+msgid "Main resource group"
+msgstr ""
+
+#: api.py:67
+msgid "Root resource could not be deleted."
+msgstr ""
+
+#: api.py:114
+msgid "Resource parent required."
+msgstr ""
+
+#: api.py:117
+msgid "Resource class required."
+msgstr ""
+
+#: api.py:120
+#, python-format
+msgid "Unknown resource class '%s'."
+msgstr ""
+
+#: api.py:126
+#, python-format
+msgid "Resource class '%s' disabled."
+msgstr ""
+
+#: api.py:208
+msgid "Permission not found"
+msgstr ""
+
+#: exception.py:27
+msgid "Resource not found"
+msgstr ""
+
+#: exception.py:28
+#, python-format
+msgid "Resource with id = %d was not found."
+msgstr ""
+
+#: exception.py:29
+msgid ""
+"The resource may have been deleted or an error in the address. Correct "
+"the address or go to the home page and try to find the desired resource."
+msgstr ""
+
+#: exception.py:41
+msgid "Resource display name is not unique"
+msgstr ""
+
+#: exception.py:42
+#, python-format
+msgid "Resource with same display name already exists (id = %d)."
+msgstr ""
+
+#: exception.py:43
+msgid ""
+"Within a single parent resource, each resource must have unique display "
+"name. Give the resource a different display name or rename existing."
+msgstr ""
+
+#: exception.py:68
+msgid "Forbidden"
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:265 exception.py:76
+msgid "Validation error"
+msgstr ""
+
+#: exception.py:81
+msgid "Hierarchy error"
+msgstr ""
+
+#: exception.py:88
+msgid "Operational error"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:95
+#: amd/ngw-resource/PermissionWidget.js:184 amd/ngw-resource/Widget.js:33
+#: amd/ngw-resource/form/ResourceLink.js:35 model.py:109 scope.py:27
+msgid "Resource"
+msgstr ""
+
+#: model.py:252
+msgid "Resource can not be a parent himself."
+msgstr ""
+
+#: model.py:265
+msgid "Resource keyname is not unique."
+msgstr ""
+
+#: model.py:295
+msgid "Resource can not be without a parent."
+msgstr ""
+
+#: model.py:301
+#, python-format
+msgid "You are not allowed to manage children of resource with id = %d."
+msgstr ""
+
+#: model.py:306
+#, python-format
+msgid "Resource can not be a child of resource id = %d."
+msgstr ""
+
+#: model.py:431
+#, python-format
+msgid "Maximum number of resources exceeded. The limit is %s."
+msgstr ""
+
+#: model.py:448
+#, python-format
+msgid "Maximum number of resources '%s' exceeded. The limit is %s."
+msgstr ""
+
+#: model.py:504
+msgid "Resource group"
+msgstr ""
+
+#: scope.py:29 scope.py:68 scope.py:80 scope.py:90 scope.py:103
+msgid "Read"
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:78 scope.py:35
+msgid "Create"
+msgstr ""
+
+#: scope.py:42 view.py:311
+msgid "Update"
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:97
+#: amd/ngw-resource/PermissionWidget.js:322 scope.py:46 view.py:319
+msgid "Delete"
+msgstr ""
+
+#: scope.py:51
+msgid "Manage children"
+msgstr ""
+
+#: scope.py:54
+msgid "Change permissions"
+msgstr ""
+
+#: scope.py:66
+msgid "Metadata"
+msgstr ""
+
+#: scope.py:69 scope.py:81 scope.py:91 scope.py:104
+msgid "Write"
+msgstr ""
+
+#: scope.py:78
+msgid "Data structure"
+msgstr ""
+
+#: scope.py:88
+msgid "Data"
+msgstr ""
+
+#: scope.py:101
+msgid "Connection"
+msgstr ""
+
+#: scope.py:105 scope.py:117
+msgid "Connect"
+msgstr ""
+
+#: scope.py:115
+msgid "Service"
+msgstr ""
+
+#: scope.py:118
+msgid "Configure"
+msgstr ""
+
+#: serialize.py:100
+#, python-format
+msgid "Attribute '%s' forbidden."
+msgstr ""
+
+#: view.py:88 view.py:326
+msgid "JSON view"
+msgstr ""
+
+#: view.py:123
+msgid "Resource tree"
+msgstr ""
+
+#: view.py:129 view.py:336
+msgid "Create resource"
+msgstr ""
+
+#: view.py:137
+msgid "Update resource"
+msgstr ""
+
+#: amd/ngw-resource/DeleteWidget.js:22 view.py:144
+msgid "Delete resource"
+msgstr ""
+
+#: view.py:203
+#, python-format
+msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
+msgstr ""
+
+#: view.py:261
+msgid "Child resources"
+msgstr ""
+
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:268
+msgid "Description"
+msgstr ""
+
+#: view.py:275
+msgid "User permissions"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:67
+#: amd/ngw-resource/PermissionWidget.js:134 view.py:337
+msgid "Action"
+msgstr ""
+
+#: view.py:338
+msgid "Extra"
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:54
+msgid "Please wait. Processing request..."
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:83
+msgid "Create and edit"
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:90
+msgid "Save"
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:257
+#: amd/ngw-resource/CompositeWidget.js:273
+msgid "Unexpected error"
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:258
+msgid "Serialization failed"
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:266
+msgid "Errors found during data validation. Tabs with errors marked in red."
+msgstr ""
+
+#: amd/ngw-resource/CompositeWidget.js:274
+msgid "Validation failed"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:58
+msgid "All resources"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:59
+msgid "All permissions"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:70
+#: amd/ngw-resource/PermissionWidget.js:137
+msgid "Allow"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:71
+#: amd/ngw-resource/PermissionWidget.js:138
+msgid "Deny"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:77
+#: amd/ngw-resource/PermissionWidget.js:143
+msgid "Principal"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:83
+#: amd/ngw-resource/PermissionWidget.js:178
+msgid "Permission"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:105
+#: amd/ngw-resource/PermissionWidget.js:190
+msgid "Propagate"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:108
+msgid "Yes"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:110
+msgid "No"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:121
+msgid "Permission item"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:198
+#: amd/ngw-resource/ResourcePicker.js:56
+msgid "OK"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:207
+#: amd/ngw-resource/ResourcePicker.js:65
+msgid "Cancel"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:241
+msgid "Permissions"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:309
+msgid "Add"
+msgstr ""
+
+#: amd/ngw-resource/PermissionWidget.js:315
+msgid "Edit"
+msgstr ""
+
+#: amd/ngw-resource/ResourcePicker.js:31
+msgid "Select resource"
+msgstr ""
+
+#: amd/ngw-resource/template/DeleteWidget.hbs:7
+msgid "Confirm deletion of the resource"
+msgstr ""
+
+#: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:61
+#: template/section_summary.mako:6
+msgid "Display name"
+msgstr ""
+
+#: amd/ngw-resource/template/Widget.hbs:13 template/section_summary.mako:15
+msgid "Keyname"
+msgstr ""
+
+#: amd/ngw-resource/template/Widget.hbs:18
+msgid "Parent"
+msgstr ""
+
+#: amd/ngw-resource/template/Widget.hbs:23 template/section_children.mako:62
+#: template/section_summary.mako:36
+msgid "Type"
+msgstr ""
+
+#: template/section_api.mako:4
+msgid "Use these links to plug data into external applications."
+msgstr ""
+
+#: template/section_children.mako:63 template/section_summary.mako:44
+msgid "Owner"
+msgstr ""
+
+#: template/section_description.mako:4
+msgid "Resource description is empty."
+msgstr ""
+
