@@ -1,0 +1,121 @@
+# Spanish translations for nextgisweb.
+# Copyright (C) 2021 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2021-04-23 14:03+0000\n"
+"PO-Revision-Date: 2021-04-23 21:24+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: amd/ngw-tmsclient/ConnectionWidget.js:37
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:55
+msgid "TMS connection"
+msgstr ""
+
+#: model.py:163
+msgid "Zoom is out of range."
+msgstr ""
+
+#: amd/ngw-tmsclient/LayerWidget.js:40 model.py:171
+msgid "TMS layer"
+msgstr ""
+
+#: view.py:24
+msgid "TMS capabilities"
+msgstr ""
+
+#: amd/ngw-tmsclient/LayersDialog.js:25
+msgid "Select layer"
+msgstr ""
+
+#: amd/ngw-tmsclient/LayersDialog.js:63
+msgid "OK"
+msgstr ""
+
+#: amd/ngw-tmsclient/LayersDialog.js:72
+msgid "Cancel"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:9
+msgid "Capmode"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:11
+msgid "Custom"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:12
+msgid "NextGIS geoservices"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:20
+msgid "URL template"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:26
+msgid "API key"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:32
+msgid "API key param"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:37
+msgid "Scheme"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:43
+msgid "Skip SSL/TLS certificate verification"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:15
+msgid "Choose a layer"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:30
+msgid "Layer"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:39
+msgid "Min zoom level"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:45
+msgid "Max zoom level"
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:51
+msgid "Left, deg."
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:57
+msgid "Bottom, deg."
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:63
+msgid "Right, deg."
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:69
+msgid "Top, deg."
+msgstr ""
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:75
+msgid "Tile size, px"
+msgstr ""
+
