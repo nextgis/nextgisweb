@@ -280,7 +280,9 @@ define([
                 widget._fwidget.set("value", data.fields);
                 for (var k in loader) {
                     widget._ext[k].set("value", data.extensions[k]);
-                }
+                };
+
+                widget.resize();
             });
         },
 
