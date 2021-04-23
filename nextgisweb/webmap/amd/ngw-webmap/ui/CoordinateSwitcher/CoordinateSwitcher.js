@@ -5,7 +5,7 @@ define([
     "put-selector/put",
     "dijit/form/Select",
     "openlayers/ol",
-    "openlayers/proj4",
+    "proj4/proj4",
     "ngw-pyramid/utils/coordinateConverter",
     "ngw/load-json!api/component/spatial_ref_sys/",
     "ngw/settings!webmap",

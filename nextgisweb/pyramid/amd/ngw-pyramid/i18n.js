@@ -1,7 +1,7 @@
 /* globals console, dojoConfig */
 define([
     "dojo/request/xhr",
-    "jed",
+    "jed/jed",
     "ngw/route",
 ], function (
     xhr,

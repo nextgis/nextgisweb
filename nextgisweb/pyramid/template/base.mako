@@ -53,7 +53,6 @@
             async: true,
             isDebug: true,
             packages: [
-                {name: "jed", main: "jed", location: ${ request.static_url('nextgisweb:static/jed/') | json.dumps, n }},
                 {name: "dist", location: ${ request.route_url('jsrealm.dist', subpath='') | json.dumps, n}},
                 {name: "@nextgisweb", location: ${ request.route_url('jsrealm.dist', subpath='main/@nextgisweb') | json.dumps, n}}
             ],
