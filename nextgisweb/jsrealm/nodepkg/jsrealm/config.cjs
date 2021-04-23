@@ -1,0 +1,22 @@
+const path = require('path');
+const fs = require('fs');
+
+const configRoot = process.env.npm_package_config_nextgisweb_jsrealm_root;
+
+function* packages() {
+    const result = [];
+    const packageJson = JSON.parse(fs.readFileSync(`${configRoot}/package.json`));
+    for (const wsPath of packageJson.workspaces) {
+        const packageJson = JSON.parse(fs.readFileSync(`${wsPath}/package.json`))
+        const packageName = packageJson.name;
+        yield { name: packageName, path: wsPath, json: packageJson }
+    }
+}
+
+module.exports = {
+    debug: process.env.npm_package_config_nextgisweb_core_debug == 'true',
+    rootPath: path.resolve(configRoot),
+    distPath: path.resolve(configRoot + '/dist'),
+    externals: process.env.npm_package_config_nextgisweb_jsrealm_externals.split(','),
+    packages: packages,
+}

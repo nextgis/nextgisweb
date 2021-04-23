@@ -20,7 +20,7 @@ define("ngw-file-upload/FileUploader", [
 	"dojox/form/uploader/_HTML5",
 	"dojo/i18n!dojox/form/nls/Uploader",
 	"dojo/text!dojox/form/resources/Uploader.html",
-	"tus/tus",
+	"@nextgisweb/file-upload/tus-client",
 	"ngw/route",
 	"ngw/settings!file_upload"
 ],function(kernel, declare, lang, array, connect, win, Deferred, domStyle, domClass, domGeometry, domAttr, domConstruct,

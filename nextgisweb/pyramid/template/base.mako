@@ -28,11 +28,11 @@
 
     <link href="${request.route_url('pyramid.favicon')}"
         rel="shortcut icon" type="image/x-icon"/>
-    <link href="${request.static_url('nextgisweb:static/css/pure-0.6.0-min.css')}"
+    <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/pure.css')}"
         rel="stylesheet" type="text/css"/>
-    <link href="${request.static_url('nextgisweb:static/css/default.css')}"
+    <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/default.css')}"
         rel="stylesheet" type="text/css" media="screen"/>
-    <link href="${request.static_url('nextgisweb:static/css/layout.css')}"
+    <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/layout.css')}"
         rel="stylesheet" type="text/css"/>
     <link href="${request.static_url('nextgisweb:static/css/icon.css')}"
         rel="stylesheet" type="text/css" media="screen"/>
@@ -53,7 +53,9 @@
             async: true,
             isDebug: true,
             packages: [
-                {name: "jed", main: "jed", location: ${request.static_url('nextgisweb:static/jed/') | json.dumps, n }}
+                {name: "jed", main: "jed", location: ${ request.static_url('nextgisweb:static/jed/') | json.dumps, n }},
+                {name: "dist", location: ${ request.route_url('jsrealm.dist', subpath='') | json.dumps, n}},
+                {name: "@nextgisweb", location: ${ request.route_url('jsrealm.dist', subpath='main/@nextgisweb') | json.dumps, n}}
             ],
             baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n},
             locale: ${request.locale_name | json.dumps, n}
