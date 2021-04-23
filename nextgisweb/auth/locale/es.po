@@ -1,52 +1,42 @@
-# Spanish translations for nextgisweb.
-# Copyright (C) 2021 NextGIS
-# This file is distributed under the same license as the nextgisweb project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
-"Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2021-04-23 13:59+0000\n"
-"PO-Revision-Date: 2021-04-23 21:24+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
-"Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: es\n"
+
+#: amd/ngw-auth/UserWidget.js:38
+msgid "User"
+msgstr "Usuario"
 
 #: __init__.py:41
 msgid "Guest"
-msgstr ""
+msgstr "Invitado"
 
 #: __init__.py:47
 msgid "Everyone"
-msgstr ""
+msgstr "Todos"
 
 #: __init__.py:53
 msgid "Authenticated"
-msgstr ""
+msgstr "Autentificado"
 
 #: __init__.py:61
 msgid "Administrators"
-msgstr ""
+msgstr "Administradores"
 
 #: __init__.py:64
 msgid "Administrator"
-msgstr ""
+msgstr "Administrador"
 
 #: __init__.py:73
 msgid "Owner"
-msgstr ""
+msgstr "Propietario"
 
 #: __init__.py:176
-#, python-format
-msgid ""
-"Maximum number of users is reached. Your current plan user number limit "
-"is %d."
+msgid "Maximum number of users is reached. Your current plan user number limit is %d."
 msgstr ""
 
 #: api.py:183
@@ -55,11 +45,11 @@ msgstr ""
 
 #: exception.py:10
 msgid "Invalid credentials"
-msgstr ""
+msgstr "Credenciales no válidas"
 
 #: exception.py:15
 msgid "User is disabled"
-msgstr ""
+msgstr "Usuario deshabilitado"
 
 #: oauth.py:118
 msgid "User is already bound"
@@ -87,119 +77,113 @@ msgstr ""
 
 #: views.py:266
 msgid "Group name is not unique."
-msgstr ""
+msgstr "El nombre del grupo no es único."
 
 #: views.py:304
 msgid "Create new group"
-msgstr ""
+msgstr "Crear un grupo nuevo"
 
 #: views.py:355
 msgid "Login is not unique."
-msgstr ""
+msgstr "El usuario no es único."
 
 #: views.py:370
-msgid ""
-"You can't disable current administrator. At least one enabled "
-"administrator is required."
+msgid "You can't disable current administrator. At least one enabled administrator is required."
 msgstr ""
 
 #: views.py:413
 msgid "Create new user"
-msgstr ""
+msgstr "Crear un usuario nuevo"
 
 #: views.py:446 views.py:511
 msgid "Users"
-msgstr ""
+msgstr "Usuarios"
 
 #: views.py:456 views.py:514
 msgid "Groups"
-msgstr ""
+msgstr "Grupos"
 
 #: views.py:467 views.py:489
 msgid "List"
-msgstr ""
+msgstr "Lista"
 
 #: views.py:472 views.py:494
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #: views.py:478 views.py:500
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: amd/ngw-auth/GroupWidget.js:39
 msgid "Group"
-msgstr ""
-
-#: amd/ngw-auth/UserWidget.js:38
-msgid "User"
-msgstr ""
+msgstr "Grupo"
 
 #: amd/ngw-auth/UserWidget.js:47
 msgid "Enter new password here"
-msgstr ""
+msgstr "Ingrese la nueva contraseña"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:7
 #: amd/ngw-auth/template/UserWidget.hbs:8 template/group_browse.mako:25
 #: template/user_browse.mako:25
 msgid "Full name"
-msgstr ""
+msgstr "Nombre completo"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:26
 msgid "Group name"
-msgstr ""
+msgstr "Nombre del grupo"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:19
 #: amd/ngw-auth/template/UserWidget.hbs:45
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:24
 msgid "Assign at registration"
-msgstr ""
+msgstr "Asignar en el registro"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:30
 msgid "Group members"
-msgstr ""
+msgstr "Miembros del grupo"
 
 #: amd/ngw-auth/template/UserWidget.hbs:15 template/login.mako:44
 #: template/user_browse.mako:26
 msgid "Login"
-msgstr ""
+msgstr "Usuario"
 
 #: amd/ngw-auth/template/UserWidget.hbs:23 template/login.mako:47
 msgid "Password"
-msgstr ""
+msgstr "Contraseña"
 
 #: amd/ngw-auth/template/UserWidget.hbs:30
 msgid "OAuth subject"
-msgstr ""
+msgstr "Sujeto de OAuth"
 
 #: amd/ngw-auth/template/UserWidget.hbs:36
 msgid "Disabled"
-msgstr ""
+msgstr "Deshabilitado"
 
 #: amd/ngw-auth/template/UserWidget.hbs:52
 msgid "Groups member"
-msgstr ""
+msgstr "Miembro del grupos"
 
 #: template/login.mako:13
 msgid "Authorization Required"
-msgstr ""
+msgstr "Autorización Requerida"
 
 #: template/login.mako:15
 msgid "Sign in to Web GIS"
-msgstr ""
+msgstr "Conectarse a Web GIS"
 
 #: template/login.mako:27 template/login.mako:37 template/user_settings.mako:13
 msgid "Sign in with OAuth"
-msgstr ""
+msgstr "Conectarse con OAuth"
 
 #: template/login.mako:53
 msgid "Sign in"
-msgstr ""
+msgstr "Conectarse"
 
 #: template/user_settings.mako:15
 msgid "Your account is bound to NextGIS ID account"
-msgstr ""
+msgstr "Su cuenta está vinculada a la cuenta de ID de NextGIS"
 
