@@ -170,6 +170,8 @@ class TilestorWriter:
                         # NOTE: Race condition with other proccess may occurs here.
                         # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
                         pass
+                
+                _logger.debug("Tile was written in %0.3f seconds", time() - self.cstart)
 
             except Exception as exc:
                 _logger.exception("Uncaught exception in tile writer: %s", exc.message)
