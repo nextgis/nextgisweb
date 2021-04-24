@@ -40,8 +40,9 @@ Base = declarative_base(dependencies=('resource', ))
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 
 QUEUE_MAX_SIZE = 256
-QUEUE_STUCK_TIMEOUT = 2.0
-STACK_LOAD_TIMEOUT = 0.2
+QUEUE_STUCK_TIMEOUT = 5.0
+BATCH_MAX_TILES = 32
+BATCH_DEADLINE = 0.5
 SQLITE_CON_CACHE = 32
 
 
@@ -130,21 +131,13 @@ class TilestorWriter:
     def _job(self):
         while True:
             self.cstart = None
+            data = self.queue.get()
+            self.cstart = ptime = time()
 
-            stack_load_start = time()
-            while True:
-                stack_load_delta = time() - stack_load_start
-                if stack_load_delta > STACK_LOAD_TIMEOUT:
-                    break
-                try:
-                    data = self.queue.get(timeout=STACK_LOAD_TIMEOUT - stack_load_delta)
-                except Empty:
-                    break
-                self._write_stack.append(data)
-            if len(self._write_stack) == 0:
-                continue
+            tiles_written = 0
+            time_taken = 0.0
 
-            self.cstart = time()
+            answers = []
 
             # Tile cache writer may fall sometimes in case of database connecti
             # problem for example. So we just skip a tile with error and log an
@@ -152,14 +145,10 @@ class TilestorWriter:
             try:
 
                 with transaction.manager:
-
                     conn = DBSession.connection()
                     tilestor = get_tile_db(data['db_path'])
 
-                    tiles_written = 0
-                    while len(self._write_stack) > 0:
-                        data = self._write_stack.pop()
-
+                    while data is not None:
                         z, x, y = data['tile']
                         tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
 
@@ -190,23 +179,49 @@ class TilestorWriter:
                                 # NOTE: Race condition with other proccess may occurs here.
                                 # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
                                 pass
+
+                        if 'answer_queue' in data:
+                            answers.append(data['answer_queue'])
                         
                         tiles_written += 1
+
+                        ctime = time()
+                        time_taken += ctime - ptime
+
+                        if tiles_written >= BATCH_MAX_TILES:
+                            # Break the batch
+                            data = None
+                        else:
+                            # Try to get next tile for the batch. Or break
+                            # the batch if there is no tiles left.
+                            if time_taken < BATCH_DEADLINE:
+                                try:
+                                    data = self.queue.get(timeout=(
+                                        BATCH_DEADLINE - time_taken))
+                                except Empty:
+                                    data = None
+                            else:
+                                data = None
+
+                        # Do not account queue block time
+                        ptime = time()
 
                     # Force zope session management to commit changes
                     mark_changed(DBSession())
                     tilestor.commit()
 
+                    time_taken += time() - ptime
                     _logger.debug(
                         "%d tiles were written in %0.3f seconds (%0.3f per "
-                        "tile)", tiles_written, time() - self.cstart,
-                        (time() - self.cstart) / tiles_written)
+                        "tile)", tiles_written, time_taken,
+                        time_taken / tiles_written)
+                    
+                # Report about sucess only after transaction commit
+                for a in answers:
+                    a.put_nowait(None)
 
             except Exception as exc:
                 _logger.exception("Uncaught exception in tile writer: %s", exc.message)
-
-            if 'answer_queue' in data:
-                data['answer_queue'].put_nowait(None)
 
 
 class ResourceTileCache(Base):
