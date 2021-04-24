@@ -8,7 +8,7 @@ from time import time
 import os.path
 import sqlite3
 from io import BytesIO
-from six.moves.queue import Queue, Full
+from six.moves.queue import Queue, Empty, Full
 
 import transaction
 from PIL import Image
@@ -41,6 +41,7 @@ SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 
 QUEUE_MAX_SIZE = 256
 QUEUE_STUCK_TIMEOUT = 2.0
+STACK_LOAD_TIMEOUT = 0.2
 SQLITE_CON_CACHE = 32
 
 
@@ -50,7 +51,7 @@ def get_tile_db(db_path):
     if not p.parent.exists():
         p.parent.mkdir(parents=True)
     connection = sqlite3.connect(
-        db_path, isolation_level=None, check_same_thread=False)
+        db_path, isolation_level='DEFERRED', check_same_thread=False)
 
     connection.text_factory = bytes
     cur = connection.cursor()
@@ -74,6 +75,8 @@ def get_tile_db(db_path):
                 PRIMARY KEY (z, x, y)
             )
         """)
+
+        connection.commit()
 
     return connection
 
@@ -101,6 +104,7 @@ class TilestorWriter:
             self._worker = Thread(target=self._job)
             self._worker.daemon = True
             self._worker.start()
+            self._write_stack = []
 
     @classmethod
     def getInstance(cls):
@@ -126,7 +130,20 @@ class TilestorWriter:
     def _job(self):
         while True:
             self.cstart = None
-            data = self.queue.get()
+
+            stack_load_start = time()
+            while True:
+                stack_load_delta = time() - stack_load_start
+                if stack_load_delta > STACK_LOAD_TIMEOUT:
+                    break
+                try:
+                    data = self.queue.get(timeout=STACK_LOAD_TIMEOUT - stack_load_delta)
+                except Empty:
+                    break
+                self._write_stack.append(data)
+            if len(self._write_stack) == 0:
+                continue
+
             self.cstart = time()
 
             # Tile cache writer may fall sometimes in case of database connecti
@@ -134,44 +151,56 @@ class TilestorWriter:
             # exception.
             try:
 
-                z, x, y = data['tile']
-                tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
-
-                img = data['img']
-
-                colortuple = imgcolor(img)
-                color = pack_color(colortuple) if colortuple is not None else None
-
                 with transaction.manager:
+
                     conn = DBSession.connection()
-                    conn.execute(db.sql.text(
-                        'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
-                        'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
-                        'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
-                    ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+                    tilestor = get_tile_db(data['db_path'])
+
+                    tiles_written = 0
+                    while len(self._write_stack) > 0:
+                        data = self._write_stack.pop()
+
+                        z, x, y = data['tile']
+                        tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+
+                        img = data['img']
+
+                        colortuple = imgcolor(img)
+                        color = pack_color(colortuple) if colortuple is not None else None
+
+                        conn.execute(db.sql.text(
+                            'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
+                            'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
+                            'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
+                        ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+
+                        if color is None:
+                            buf = BytesIO()
+                            img.save(buf, format='PNG', compress_level=3)
+
+                            tilestor.execute(
+                                "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
+                                (z, x, y))
+
+                            try:
+                                tilestor.execute(
+                                    "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
+                                    (z, x, y, tstamp, buf.getvalue()))
+                            except sqlite3.IntegrityError:
+                                # NOTE: Race condition with other proccess may occurs here.
+                                # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
+                                pass
+                        
+                        tiles_written += 1
 
                     # Force zope session management to commit changes
                     mark_changed(DBSession())
+                    tilestor.commit()
 
-                if color is None:
-                    buf = BytesIO()
-                    img.save(buf, format='PNG', compress_level=3)
-
-                    tilestor = get_tile_db(data['db_path'])
-                    tilestor.execute(
-                        "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
-                        (z, x, y))
-
-                    try:
-                        tilestor.execute(
-                            "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                            (z, x, y, tstamp, buf.getvalue()))
-                    except sqlite3.IntegrityError:
-                        # NOTE: Race condition with other proccess may occurs here.
-                        # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
-                        pass
-                
-                _logger.debug("Tile was written in %0.3f seconds", time() - self.cstart)
+                    _logger.debug(
+                        "%d tiles were written in %0.3f seconds (%0.3f per "
+                        "tile)", tiles_written, time() - self.cstart,
+                        (time() - self.cstart) / tiles_written)
 
             except Exception as exc:
                 _logger.exception("Uncaught exception in tile writer: %s", exc.message)
