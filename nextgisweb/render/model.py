@@ -43,7 +43,9 @@ QUEUE_MAX_SIZE = 256
 QUEUE_STUCK_TIMEOUT = 5.0
 BATCH_MAX_TILES = 32
 BATCH_DEADLINE = 0.5
+
 SQLITE_CON_CACHE = 32
+SQLITE_TIMEOUT = min(QUEUE_STUCK_TIMEOUT * 2, 30)
 
 
 @lru_cache(SQLITE_CON_CACHE)
@@ -52,7 +54,9 @@ def get_tile_db(db_path):
     if not p.parent.exists():
         p.parent.mkdir(parents=True)
     connection = sqlite3.connect(
-        db_path, isolation_level='DEFERRED', check_same_thread=False)
+        db_path, isolation_level='DEFERRED',
+        timeout=SQLITE_TIMEOUT,
+        check_same_thread=False)
 
     connection.text_factory = bytes
     cur = connection.cursor()
