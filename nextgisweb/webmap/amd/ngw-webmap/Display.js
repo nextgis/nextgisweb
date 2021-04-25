@@ -703,6 +703,7 @@ define([
                 controls: [],
                 view: new ol.View({
                     minZoom: 3,
+                    constrainResolution: true,
                     extent: this.config.extent_constrained ? this._extent : undefined
                 })
             });
