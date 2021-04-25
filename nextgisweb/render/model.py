@@ -57,6 +57,9 @@ def get_tile_db(db_path):
     connection.text_factory = bytes
     cur = connection.cursor()
 
+    # For better concurency and avoiding lock timeout errors during reading:
+    cur.execute("PRAGMA journal_mode = WAL")
+
     # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
     cur.execute("PRAGMA page_size = 8192")
 
