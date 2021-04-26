@@ -1,79 +1,62 @@
-# Spanish translations for nextgisweb.
-# Copyright (C) 2021 NextGIS
-# This file is distributed under the same license as the nextgisweb project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
-"Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2021-04-23 14:04+0000\n"
-"PO-Revision-Date: 2021-04-23 21:24+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
-"Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: es\n"
+
+#: view.py:353
+msgid "External access"
+msgstr "Acceso externo"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:62
+msgid "Keyname"
+msgstr "Nombre clave"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:66
+msgid "Display name"
+msgstr "Nombre para mostrar"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:14
+msgid "Add"
+msgstr "Agregar"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
+msgid "Remove"
+msgstr "Eliminar"
+
+#: template/section_api_wms.mako:17
+msgid "Read more"
+msgstr "Leer mas"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
+msgid "Resource"
+msgstr "Recurso"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr "Seleccione el estilo de la capa"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:70
+msgid "Min scale"
+msgstr "Escala mínima"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:74
+msgid "Max scale"
+msgstr "Escala máxima"
 
 #: amd/ngw-wmsserver/ServiceWidget.js:56 model.py:27
 #: template/section_api_wms.mako:7
 msgid "WMS service"
-msgstr ""
-
-#: view.py:353
-msgid "External access"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:14
-msgid "Add"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:18
-msgid "Select layer\\'s style"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
-msgid "Remove"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:62
-msgid "Keyname"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:66
-msgid "Display name"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:70
-msgid "Min scale"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:74
-msgid "Max scale"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
-msgid "Resource"
-msgstr ""
+msgstr "Servicio WMS"
 
 #: template/section_api_wms.mako:11
-msgid ""
-"Web Map Service (WMS) is a standard protocol developed by the Open "
-"Geospatial Consortium for serving georeferenced map images. These images "
-"are typically produced by a map server from data provided by a GIS "
-"database."
-msgstr ""
+msgid "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database."
+msgstr "Web Map Service (WMS) es un protocolo estándar desarrollado por Open Geospatial Consortium para servir imágenes de mapas georreferenciados. Estas imágenes suelen ser producidas por un servidor de mapas a partir de datos proporcionados por una base de datos GIS."
 
 #: template/section_api_wms.mako:16
-msgid ""
-"https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-"
-"connection"
-msgstr ""
-
-#: template/section_api_wms.mako:17
-msgid "Read more"
-msgstr ""
+msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+msgstr "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
 

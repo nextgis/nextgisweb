@@ -37,11 +37,11 @@ msgstr "Propietario"
 
 #: __init__.py:176
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
-msgstr ""
+msgstr "Se alcanza el número máximo de usuarios. El límite de número de usuarios de su plan actual es %d."
 
 #: api.py:183
 msgid "System principals couldn't be chanded."
-msgstr ""
+msgstr "Las principales del sistema no se pueden cambiar."
 
 #: exception.py:10
 msgid "Invalid credentials"
@@ -53,27 +53,27 @@ msgstr "Usuario deshabilitado"
 
 #: oauth.py:118
 msgid "User is already bound"
-msgstr ""
+msgstr "El usuario ya está vinculado"
 
 #: oauth.py:320
 msgid "OAuth authorization error"
-msgstr ""
+msgstr "Error de autorización de OAuth"
 
 #: oauth.py:325
 msgid "Invalid OAuth token"
-msgstr ""
+msgstr "Token de OAuth no válido"
 
 #: oauth.py:330
 msgid "OAuth token refresh failed"
-msgstr ""
+msgstr "Error al actualizar el token de OAuth"
 
 #: oauth.py:335
 msgid "OAuth access token is expired"
-msgstr ""
+msgstr "El token de acceso de OAuth está caducado"
 
 #: views.py:198
 msgid "User settings"
-msgstr ""
+msgstr "Ajustes del usuario"
 
 #: views.py:266
 msgid "Group name is not unique."
@@ -89,7 +89,7 @@ msgstr "El usuario no es único."
 
 #: views.py:370
 msgid "You can't disable current administrator. At least one enabled administrator is required."
-msgstr ""
+msgstr "No puede deshabilitar al administrador actual. Se requiere al menos un administrador habilitado."
 
 #: views.py:413
 msgid "Create new user"
@@ -133,8 +133,8 @@ msgstr "Nombre completo"
 msgid "Group name"
 msgstr "Nombre del grupo"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:19
-#: amd/ngw-auth/template/UserWidget.hbs:45
+#: amd/ngw-feature-description/DisplayWidget.js:11
+#: amd/ngw-feature-description/EditorWidget.js:14
 msgid "Description"
 msgstr "Descripción"
 

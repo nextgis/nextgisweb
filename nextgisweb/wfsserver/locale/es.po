@@ -1,74 +1,61 @@
-# Spanish translations for nextgisweb.
-# Copyright (C) 2021 NextGIS
-# This file is distributed under the same license as the nextgisweb project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
-"Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2021-04-23 14:03+0000\n"
-"PO-Revision-Date: 2021-04-23 21:24+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
-"Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: es\n"
 
-#: amd/ngw-wfsserver/ServiceWidget.js:58 model.py:25
-msgid "WFS service"
-msgstr ""
-
-#: view.py:19
+#: view.py:353
 msgid "External access"
-msgstr ""
+msgstr "Acceso externo"
 
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:14
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:62
+msgid "Keyname"
+msgstr "Nombre clave"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:66
+msgid "Display name"
+msgstr "Nombre para mostrar"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:14
 msgid "Add"
-msgstr ""
+msgstr "Agregar"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
+msgid "Remove"
+msgstr "Eliminar"
+
+#: template/section_api_wms.mako:17
+msgid "Read more"
+msgstr "Leer mas"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
+msgid "Resource"
+msgstr "Recurso"
 
 #: amd/ngw-wfsserver/template/ServiceWidget.hbs:18
 msgid "Select vector layer"
-msgstr ""
+msgstr "Seleccionar capa vectorial"
 
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:27
-msgid "Remove"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:62
-msgid "Keyname"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:66
-msgid "Display name"
-msgstr ""
+#: amd/ngw-wfsserver/ServiceWidget.js:58 model.py:25
+msgid "WFS service"
+msgstr "Servicio WMS"
 
 #: amd/ngw-wfsserver/template/ServiceWidget.hbs:70
 msgid "Default count of returned features"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:74
-msgid "Resource"
-msgstr ""
+msgstr "Recuento predeterminado de objetos geográficos"
 
 #: template/section_api_wfs.mako:7
 msgid "Web Feature Service (WFS)"
-msgstr ""
+msgstr "Web Feature Service (WFS)"
 
 #: template/section_api_wfs.mako:11
-msgid ""
-"Web Feature Service (WFS) provides an interface allowing requests for "
-"geographical features across the web using platform-independent calls."
-msgstr ""
+msgid "Web Feature Service (WFS) provides an interface allowing requests for geographical features across the web using platform-independent calls."
+msgstr "Web Feature Service (WFS) proporciona una interfaz que permite solicitudes de objetos geográficos en la web mediante llamadas independientes de la plataforma."
 
 #: template/section_api_wfs.mako:16
 msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service"
-msgstr ""
-
-#: template/section_api_wfs.mako:17
-msgid "Read more"
-msgstr ""
+msgstr "https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service"
 

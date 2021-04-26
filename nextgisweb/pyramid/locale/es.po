@@ -1,286 +1,257 @@
-# Spanish translations for nextgisweb.
-# Copyright (C) 2021 NextGIS
-# This file is distributed under the same license as the nextgisweb project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
-"Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2021-04-23 14:01+0000\n"
-"PO-Revision-Date: 2021-04-23 21:24+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
-"Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: es\n"
+
+#: views.py:198
+msgid "User settings"
+msgstr "Ajustes del usuario"
+
+#: views.py:472 views.py:494
+msgid "Create"
+msgstr "Crear"
+
+#: template/login.mako:53
+msgid "Sign in"
+msgstr "Conectarse"
+
+#: template/backup.mako:14
+msgid "Size"
+msgstr "Tamaño"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:98
+msgid "Delete"
+msgstr "Eliminar"
+
+#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
+msgid "Save"
+msgstr "Guardar"
 
 #: api.py:438
 msgid "Your Web GIS at nextgis.com"
-msgstr ""
+msgstr "Tu Web GIS en nextgis.com"
 
 #: exception.py:208 exception.py:264
 msgid "Internal server error"
-msgstr ""
+msgstr "Error interno en el servidor"
 
 #: exception.py:209
-msgid ""
-"The server encountered an internal error or misconfiguration and was "
-"unable to complete your request."
-msgstr ""
+msgid "The server encountered an internal error or misconfiguration and was unable to complete your request."
+msgstr "El servidor no pudo completar su solicitud por una falla interna."
 
 #: exception.py:238
 msgid "Bad request"
-msgstr ""
+msgstr "Solicitud incorrecta"
 
 #: exception.py:239
-msgid ""
-"The server could not comply with the request since it is either malformed"
-" or otherwise incorrect."
-msgstr ""
+msgid "The server could not comply with the request since it is either malformed or otherwise incorrect."
+msgstr "El servidor no pudo completar su solicitud porque es incorrecta o posee errores."
 
-#: exception.py:246
+#: exception.py:68
 msgid "Forbidden"
-msgstr ""
+msgstr "Prohibido"
 
 #: exception.py:247
 msgid "Access was denied to this resource."
-msgstr ""
+msgstr "Acceso denegado al recurso."
 
 #: exception.py:251
 msgid "Page not found"
-msgstr ""
+msgstr "Página no encontrada"
 
 #: exception.py:252
-msgid ""
-"The page may have been deleted or an error in the address. Correct the "
-"address or go to the home page and try to find the desired page."
-msgstr ""
+msgid "The page may have been deleted or an error in the address. Correct the address or go to the home page and try to find the desired page."
+msgstr "La página pudo haber sido borrada o hay un error en el enlace. Corríjalo o diríjase a la página principal e intente encontrar la dirección deseada."
 
 #: exception.py:259
 msgid "Unprocessable entity"
-msgstr ""
+msgstr "Entidad no procesable"
 
 #: exception.py:260
 msgid "Unable to process the contained instructions."
-msgstr ""
+msgstr "No se pueden procesar las instrucciones."
 
 #: exception.py:265
-msgid ""
-"The server has either erred or is incapable of performing the requested "
-"operation."
-msgstr ""
+msgid "The server has either erred or is incapable of performing the requested operation."
+msgstr "El servidor no pudo completar la solicitud."
 
 #: exception.py:272 exception.py:273
 msgid "Not implemented"
-msgstr ""
+msgstr "No implementado"
 
 #: exception.py:277
 msgid "Service unavailable"
-msgstr ""
+msgstr "Servicio no disponible"
 
 #: exception.py:278
 msgid "The server is currently unavailable. Please try again at a later time."
-msgstr ""
+msgstr "El servidor no esta disponible. Por favor, intente más tarde."
 
 #: template/header.mako:89 view.py:81
 msgid "Control panel"
-msgstr ""
+msgstr "Panel de control"
 
 #: view.py:103 view.py:419
 msgid "Package versions"
-msgstr ""
+msgstr "Versiones de paquetes"
 
 #: view.py:114 view.py:437
 msgid "Backups"
-msgstr ""
+msgstr "Copias de seguridad"
 
 #: view.py:129 view.py:425
 msgid "Cross-origin resource sharing (CORS)"
-msgstr ""
+msgstr "Cross-origin resource sharing (CORS)"
 
 #: view.py:136 view.py:427
 msgid "Custom CSS"
-msgstr ""
+msgstr "CSS personalizado"
 
 #: view.py:143 view.py:429
 msgid "Custom logo"
-msgstr ""
+msgstr "Logo personalizado"
 
 #: view.py:150 view.py:423
 msgid "Web GIS name"
-msgstr ""
+msgstr "Nombre del Web GIS"
 
 #: view.py:157 view.py:431
 msgid "Home path"
-msgstr ""
+msgstr "Ruta a la página principal"
 
 #: view.py:418
 msgid "Info"
-msgstr ""
+msgstr "Información"
 
-#: view.py:422
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:18
 msgid "Settings"
-msgstr ""
+msgstr "Configuración"
 
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:30
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:32
 msgid "Copy to clipboard"
-msgstr ""
+msgstr "Copiar al portapapeles"
 
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:33
 msgid "Copied"
-msgstr ""
+msgstr "Copiado"
 
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:34
 msgid "Unable to copy"
-msgstr ""
+msgstr "No se ha podido copiar"
 
 #: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
 msgid "Technical information"
-msgstr ""
+msgstr "Información técnica"
 
 #: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
 msgid "Contact support"
-msgstr ""
+msgstr "Contacta a soporte"
 
 #: amd/ngw-pyramid/ErrorCard/ErrorCard.js:43
 msgid "Back to home"
-msgstr ""
+msgstr "Volver a la página principal"
 
 #: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:29
 msgid "Network error"
-msgstr ""
+msgstr "Error de conexión"
 
 #: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:30
 msgid "There is no response from the server or problem connecting to server."
-msgstr ""
+msgstr "No hay respuesta o hay un problema con el servidor."
 
 #: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:31
 msgid "Check network connectivity and try again later."
-msgstr ""
+msgstr "Compruebe la conexión e intente de nuevo más tarde."
 
 #: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:39
 msgid "Unexpected server response"
-msgstr ""
+msgstr "Respuesta del servidor inesperada"
 
 #: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:40
 msgid "Something went wrong."
-msgstr ""
+msgstr "Algo ocurrió."
 
 #: amd/ngw-pyramid/NGWPagination/NGWPagination.js:22
 msgid "Backward"
-msgstr ""
+msgstr "Atrás"
 
 #: amd/ngw-pyramid/NGWPagination/NGWPagination.js:23
 msgid "Forward"
-msgstr ""
+msgstr "Adelante"
 
 #: amd/ngw-pyramid/company-logo/company-logo.js:24
 msgid "Get your own Web GIS at nextgis.com"
-msgstr ""
+msgstr "Obtén tu propio Web GIS en nextgis.com"
 
 #: amd/ngw-pyramid/form/RTETextBox.js:61
 msgid "Rich Text Editor"
-msgstr ""
+msgstr "Editor de texto"
 
 #: amd/ngw-pyramid/form/ScaleTextBox.js:18
 msgid "Enter the correct scale value, e.g. 1:"
-msgstr ""
-
-#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
-msgid "Create"
-msgstr ""
-
-#: amd/ngw-pyramid/modelWidget/FormMixin.js:39
-#: amd/ngw-pyramid/template/CORSForm.hbs:26
-#: amd/ngw-pyramid/template/CustomCSSForm.hbs:25
-#: amd/ngw-pyramid/template/HomePathForm.hbs:11
-#: amd/ngw-pyramid/template/LogoForm.hbs:22
-#: amd/ngw-pyramid/template/SystemNameForm.hbs:10
-msgid "Save"
-msgstr ""
-
-#: amd/ngw-pyramid/modelWidget/FormMixin.js:41
-msgid "Delete"
-msgstr ""
+msgstr "Ingrese un valor de escala correcto, ej. 1:"
 
 #: amd/ngw-pyramid/right-menu/RightMenu.js:60
 #: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5
 msgid "Sign out"
-msgstr ""
-
-#: amd/ngw-pyramid/right-menu/RightMenu.js:65 template/header.mako:30
-msgid "Sign in"
-msgstr ""
+msgstr "Desconectarse"
 
 #: amd/ngw-pyramid/template/CORSForm.hbs:17
-msgid ""
-"Enter allowed origins for cross domain requests to use HTTP API of this "
-"Web GIS on other websites. One origin per line."
-msgstr ""
+msgid "Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."
+msgstr "Ingrese los dominios permitidos para utilizar la API HTTP de su Web GIS en otros sitios. Uno por linea."
 
 #: amd/ngw-pyramid/template/CORSForm.hbs:18
-msgid ""
-"Please note that different protocols (HTTP and HTTPS) and subdomains "
-"(example.com and www.example.com) are different origins. Wildcards are "
-"not allowed."
-msgstr ""
+msgid "Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are not allowed."
+msgstr "Los diferentes protocolos (HTTP y HTTPS) y subdominios (example.com y www.example.com) son diferentes origines. Los comodínes (*) no estan permitidos."
 
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:17
-msgid ""
-"Enter custom CSS rules here. They will be used to redefine styles, design"
-" for all pages of your Web GIS."
-msgstr ""
+msgid "Enter custom CSS rules here. They will be used to redefine styles, design for all pages of your Web GIS."
+msgstr "Ingrese el CSS personalizado. Será utilizado para redefinir los estilos para todas las páginas de su Web GIS."
 
 #: amd/ngw-pyramid/template/LogoForm.hbs:12
 msgid "We recommend height of 45 px and width of up to 200 px."
-msgstr ""
+msgstr "Recomendamos una altura de 45 px y una anchura de hasta 200 px."
 
-#: amd/ngw-pyramid/template/LogoForm.hbs:25
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: template/backup.mako:12
 msgid "Filename"
-msgstr ""
+msgstr "Nombre del archivo"
 
 #: template/backup.mako:13
 msgid "Timestamp (UTC)"
-msgstr ""
-
-#: template/backup.mako:14
-msgid "Size"
-msgstr ""
+msgstr "Marca temporal (UTC)"
 
 #: template/header.mako:84
 msgid "Resources"
-msgstr ""
-
-#: template/header.mako:98
-msgid "User settings"
-msgstr ""
+msgstr "Recursos"
 
 #: template/header.mako:108
 msgid "Help"
-msgstr ""
+msgstr "Ayuda"
 
 #: template/pkginfo.mako:6
 msgid "Platform"
-msgstr ""
+msgstr "Plataforma"
 
 #: template/pkginfo.mako:9
 msgid "Packages"
-msgstr ""
+msgstr "Paquetes"
 
 #: template/pkginfo.mako:15
 msgid "Package"
-msgstr ""
+msgstr "Paquete"
 
-#: template/pkginfo.mako:16
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:27
 msgid "Version"
-msgstr ""
+msgstr "Versión"
 
