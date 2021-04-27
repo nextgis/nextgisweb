@@ -1,0 +1,158 @@
+# Portuguese (Brazil) translations for nextgisweb.
+# Copyright (C) 2021 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2021-04-23 14:03+0000\n"
+"PO-Revision-Date: 2021-04-27 08:19+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt_BR\n"
+"Language-Team: pt_BR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: api.py:41
+msgid "Invalid SRS definition!"
+msgstr ""
+
+#: api.py:140
+#, python-format
+msgid "Coordinate system (id=%d) already exists."
+msgstr ""
+
+#: util.py:43
+#, python-format
+msgid "Invalid MapInfo spatial reference system: %s"
+msgstr ""
+
+#: util.py:72
+#, python-format
+msgid "Unknown spatial reference system format: %s!"
+msgstr ""
+
+#: util.py:82
+msgid "Invalid OGC WKT definition!"
+msgstr ""
+
+#: views.py:23
+msgid "Spatial reference system catalog"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/SRSWidget.js:46 views.py:33
+msgid "Spatial reference system"
+msgstr ""
+
+#: views.py:51 views.py:127
+msgid "Unable to delete standard coordinate system."
+msgstr ""
+
+#: views.py:76
+msgid "Coordinate system name is not unique."
+msgstr ""
+
+#: views.py:83
+msgid "Cannot change wkt definition of standard coordinate system."
+msgstr ""
+
+#: views.py:109
+msgid "Create new Spatial reference system"
+msgstr ""
+
+#: views.py:156 views.py:202
+msgid "Spatial reference systems"
+msgstr ""
+
+#: views.py:167
+msgid "List"
+msgstr ""
+
+#: views.py:172
+msgid "Create"
+msgstr ""
+
+#: views.py:178
+msgid "Catalog"
+msgstr ""
+
+#: template/srs_browse.mako:35 views.py:184
+msgid "Edit"
+msgstr ""
+
+#: template/srs_browse.mako:37 views.py:192
+msgid "Delete"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:38
+#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:24
+msgid "Import definition"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:53
+msgid "Format"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:68
+msgid "Definition"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:86
+msgid "Cancel"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/catalog_browse.js:54
+msgid "Longitude and latitude must be specified at the same time."
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/catalog_browse.js:83
+msgid "View"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:13
+#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:9
+msgid "Display name"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:19
+#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:16
+msgid "OGC WKT definition"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:24
+msgid "View details"
+msgstr ""
+
+#: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:33
+msgid "Import"
+msgstr ""
+
+#: template/catalog_browse.mako:27
+msgid "Search"
+msgstr ""
+
+#: template/catalog_browse.mako:29
+msgid "Latitude"
+msgstr ""
+
+#: template/catalog_browse.mako:31
+msgid "Longitude"
+msgstr ""
+
+#: template/catalog_browse.mako:42 template/srs_browse.mako:25
+msgid "SRS name"
+msgstr ""
+
+#: template/catalog_browse.mako:43
+msgid "Auth name"
+msgstr ""
+
+#: template/catalog_browse.mako:44
+msgid "Auth SRID"
+msgstr ""
+

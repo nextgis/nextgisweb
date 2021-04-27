@@ -1,0 +1,105 @@
+# Portuguese (Brazil) translations for nextgisweb.
+# Copyright (C) 2021 NextGIS
+# This file is distributed under the same license as the nextgisweb project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nextgisweb 3.8.0.dev2+c4fa4e925.dirty\n"
+"Report-Msgid-Bugs-To: info@nextgis.com\n"
+"POT-Creation-Date: 2021-04-23 14:03+0000\n"
+"PO-Revision-Date: 2021-04-27 08:19+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt_BR\n"
+"Language-Team: pt_BR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: amd/ngw-wfsclient/WFSConnectionWidget.js:28 model.py:108
+msgid "WFS connection"
+msgstr ""
+
+#: amd/ngw-wfsclient/WFSLayerWidget.js:40 model.py:344
+msgid "WFS layer"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:10
+msgid "WFS path"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:16
+msgid "Username"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:22
+msgid "Password"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:27
+msgid "Version"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:8
+msgid "Select WFS connection"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:10
+msgid "Connection"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:16
+msgid "Layer"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:20
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:36
+msgid "Autodetect"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:28
+msgid "Geometry column"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:34
+msgid "Geometry type"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:37
+msgid "Point"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:38
+msgid "Line"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:39
+msgid "Polygon"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:40
+msgid "Multipoint"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:41
+msgid "Multiline"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:42
+msgid "Multipolygon"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:50
+msgid "Attribute definitions"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:53
+msgid "Keep"
+msgstr ""
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:54
+msgid "Reload"
+msgstr ""
+
