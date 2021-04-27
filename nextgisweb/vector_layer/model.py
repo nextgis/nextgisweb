@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-import cgi
 import json
 import uuid
 import zipfile
@@ -39,7 +38,7 @@ from ..env import env
 from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..lib.geometry import Geometry
-from ..compat import lru_cache
+from ..compat import lru_cache, html_escape
 
 from ..feature_layer import (
     Feature,
@@ -603,7 +602,7 @@ class TableInfo(object):
             DBSession.add(obj)
 
         if len(errors) > 0 and not skip_errors:
-            detail = '<br>'.join(cgi.escape(translate(error)) for error in errors)
+            detail = '<br>'.join(html_escape(translate(error)) for error in errors)
             raise VE(_("Vector layer cannot be written due to errors."), detail=detail)
 
         # Set sequence next value

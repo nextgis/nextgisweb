@@ -5,13 +5,16 @@ import six
 if six.PY3:
     from functools import lru_cache
     from pathlib import Path
+    from html import escape as html_escape
 else:
     from backports.functools_lru_cache import lru_cache
     from pathlib2 import Path
+    from cgi import escape as html_escape
 
 __all__ = [
     'lru_cache',
-    'Path'
+    'Path',
+    'html_escape',
 ]
 
 
