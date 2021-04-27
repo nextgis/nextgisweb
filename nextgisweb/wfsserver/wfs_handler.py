@@ -230,7 +230,7 @@ class WFSHandler():
         elif self.p_request == TRANSACTION:
             xml = self._transaction()
         else:
-            raise ValidationError("Unsupported request")
+            raise ValidationError("Unsupported request: '%s'." % self.p_request)
 
         if self.p_validate_schema:
             if self.p_request in (GET_CAPABILITIES, TRANSACTION):
