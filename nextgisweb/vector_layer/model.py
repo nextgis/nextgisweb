@@ -530,19 +530,19 @@ class TableInfo(object):
                 geom.Set3D(False)
 
             # Check geometry valid
-            if not geom.IsValid():
-                invalid = True
-                if fix_errors != ERROR_FIX.NONE:
-                    if _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.polygons:
-                        geom.CloseRings()
-                    if fix_errors == ERROR_FIX.LOSSY and not geom.IsValid():
-                        geom = geom.MakeValid()
-                        if geom is not None and not geom.IsValid():
-                            geom = geom.Buffer(0)
-                    invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
-                if invalid:
-                    errors.append(_("Feature #%d have invalid geometry.") % fid)
-                    continue
+            # if not geom.IsValid():
+            #     invalid = True
+            #     if fix_errors != ERROR_FIX.NONE:
+            #         if _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.polygons:
+            #             geom.CloseRings()
+            #         if fix_errors == ERROR_FIX.LOSSY and not geom.IsValid():
+            #             geom = geom.MakeValid()
+            #             if geom is not None and not geom.IsValid():
+            #                 geom = geom.Buffer(0)
+            #         invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
+            #     if invalid:
+            #         errors.append(_("Feature #%d have invalid geometry.") % fid)
+            #         continue
 
             fld_values = dict()
             for i in range(feature.GetFieldCount()):

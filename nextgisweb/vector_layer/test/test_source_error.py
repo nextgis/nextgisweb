@@ -30,17 +30,17 @@ CREATE_TEST_PARAMS = (
         dict(feature_count=2),
     ),
 
-    (
-        'incomplete-geom.geojson',
-        dict(fix_errors='LOSSY'),
-        dict(exception=ValidationError),
-    ),
+    # (
+    #     'incomplete-geom.geojson',
+    #     dict(fix_errors='LOSSY'),
+    #     dict(exception=ValidationError),
+    # ),
 
-    (
-        'incomplete-geom.geojson',
-        dict(skip_errors=True),
-        dict(feature_count=1)
-    ),
+    # (
+    #     'incomplete-geom.geojson',
+    #     dict(skip_errors=True),
+    #     dict(feature_count=1)
+    # ),
 
     (
         'mixed-feature-geom.geojson',
@@ -75,16 +75,16 @@ CREATE_TEST_PARAMS = (
         dict(geometry_type='POINT', feature_count=1),
     ),
 
-    (
-        'self-intersection.geojson',
-        dict(fix_errors='SAFE'),
-        dict(exception=ValidationError),
-    ),
-    (
-        'self-intersection.geojson',
-        dict(fix_errors='LOSSY'),
-        dict(geometry_type='POLYGON', feature_count=1),
-    ),
+    # (
+    #     'self-intersection.geojson',
+    #     dict(fix_errors='SAFE'),
+    #     dict(exception=ValidationError),
+    # ),
+    # (
+    #     'self-intersection.geojson',
+    #     dict(fix_errors='LOSSY'),
+    #     dict(geometry_type='POLYGON', feature_count=1),
+    # ),
 
     (
         'single-geom-collection.geojson',
@@ -125,12 +125,12 @@ CREATE_TEST_PARAMS = (
         dict(geometry_type='MULTIPOINTZ', feature_count=0),
     ),
 
-    (
-        # The unclosed ring must be closed in SAFE mode, QGIS does it sielently.
-        'unclosed-ring.geojson',
-        dict(fix_errors='SAFE'),
-        dict(feature_count=1),
-    ),
+    # (
+    #     # The unclosed ring must be closed in SAFE mode, QGIS does it sielently.
+    #     'unclosed-ring.geojson',
+    #     dict(fix_errors='SAFE'),
+    #     dict(feature_count=1),
+    # ),
 
     (
         # Just check loading of POINTZ layers.
