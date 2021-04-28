@@ -57,7 +57,11 @@
                 {name: "@nextgisweb", location: ${ request.route_url('jsrealm.dist', subpath='main/@nextgisweb') | json.dumps, n}}
             ],
             baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n},
-            locale: ${request.locale_name | json.dumps, n}
+            locale: ${request.locale_name | json.dumps, n},
+            aliases: [
+                ['ngw/load-json', '@nextgisweb/jsrealm/api/load'],
+                ['ngw-pyramid/i18n', '@nextgisweb/jsrealm/i18n']
+            ]
         };
 
         %if (hasattr(request, 'context') and hasattr(request.context, 'id')):
@@ -66,6 +70,7 @@
     </script>
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
+    <script src="${request.route_url('jsrealm.dist', subpath='main/chunk/runtime.js')}"></script>
 
     <script>
         window.MSInputMethodContext && 

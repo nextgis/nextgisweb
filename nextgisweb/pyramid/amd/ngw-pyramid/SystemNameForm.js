@@ -4,10 +4,8 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dojo/request/xhr",
-    "dojo/json",
-    "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "@nextgisweb/jsrealm/api",
     "ngw-pyramid/i18n!pyramid",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/SystemNameForm.hbs",
@@ -21,15 +19,13 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    xhr,
-    json,
-    route,
     ErrorDialog,
+    api,
     i18n,
     hbsI18n,
     template
 ) {
-    var API_URL = route.pyramid.system_name();
+    var route = api.route('pyramid.system_name');
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: hbsI18n(template, i18n),
@@ -45,28 +41,18 @@ define([
         startup: function () {
             this.inherited(arguments);
             var widget = this;
-            xhr.get(API_URL, {
-                handleAs: 'json'
-            }).then(function (data) {
+            route.get().then(function (data) {
                 widget.wSystemTitle.set('value', data.full_name);
             });
         },
 
         save: function () {
-            xhr.put(API_URL, {
-                handleAs: 'json',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                data: json.stringify({
-                    full_name: this.wSystemTitle.get('value')
-                })
-            }).then(
-                function () {
-                    window.location.reload(true);
-                },
-                ErrorDialog.xhrError
-            );
+            var data = { full_name: this.wSystemTitle.get('value') };
+            route.post({ json: data }).then(function () {
+                window.location.reload(true)
+            }, function (err) {
+                new ErrorDialog(err).show()
+            });
         }
     });
 });

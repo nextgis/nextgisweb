@@ -1,23 +1,10 @@
-define([
-    "dojo/request/xhr",
-    "ngw/route"
-], function (
-    xhr,
-    route
-) {
+define(["@nextgisweb/jsrealm/api"], function (api) {
     return {
         load: function (id, require, load) {
-            xhr.get(route.pyramid.settings(), {
-                handleAs: "json",
-                query: { component: id }
-            }).then(
-                function (data) {
-                    load(data);
-                },
-                function (error) {
-                    load();
-                }
-            );
+            var url = api.routeURL('pyramid.settings') + '?component=' + id;
+            api.request(url).then(function (data) {
+                load(data);
+            })
         }
-    };
+    }
 });
