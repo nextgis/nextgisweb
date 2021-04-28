@@ -118,6 +118,14 @@ module.exports = {
     },
     externals: [
         function ({ context, request }, callback) {
+            // Temporary solution for loaderers
+            if (
+                request.startsWith('@nextgisweb/jsrealm/api/load!') ||
+                request.startsWith('@nextgisweb/jsrealm/i18n!')
+            ) {
+                return callback(null, `amd ${request}`);
+            }
+
             // External nextgisweb AMD module from package
             for (const ext of config.externals) {
                 if (request.startsWith(ext + '/')) {

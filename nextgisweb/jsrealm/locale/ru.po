@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.7.0.dev1+b3265c2c\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2021-01-17 09:36+0000\n"
+"POT-Creation-Date: 2021-04-27 21:44+0000\n"
 "PO-Revision-Date: 2021-01-17 09:52+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,7 +19,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: nodepkg/test-translation.js:4
-msgid "Translated"
+#: nodepkg/jsrealm/api/error.js:12
+msgid "Unknown API error"
+msgstr "Неизвестная ошибка API"
+
+#: nodepkg/jsrealm/api/error.js:19
+msgid "Network error"
+msgstr "Ошибка сети"
+
+#: nodepkg/jsrealm/api/error.js:26
+msgid "Invalid API response"
+msgstr "Ошибка ответа API"
+
+#: nodepkg/jsrealm/demo/translation.js:5
+msgid "Translated text"
 msgstr "Переведенный текст"
 
