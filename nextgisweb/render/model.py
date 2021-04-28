@@ -136,9 +136,15 @@ class TilestorWriter:
                     self.queue.maxsize))
 
     def _job(self):
+        data = None
+
         while True:
             self.cstart = None
-            data = self.queue.get()
+
+            if data is None:
+                data = self.queue.get()
+            db_path = data['db_path']
+
             self.cstart = ptime = time()
 
             tiles_written = 0
@@ -153,9 +159,9 @@ class TilestorWriter:
 
                 with transaction.manager:
                     conn = DBSession.connection()
-                    tilestor = get_tile_db(data['db_path'])
+                    tilestor = get_tile_db(db_path)
 
-                    while data is not None:
+                    while data is not None and data['db_path'] == db_path:
                         z, x, y = data['tile']
                         tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
 
@@ -189,7 +195,7 @@ class TilestorWriter:
 
                         if 'answer_queue' in data:
                             answers.append(data['answer_queue'])
-                        
+
                         tiles_written += 1
 
                         ctime = time()
@@ -222,7 +228,7 @@ class TilestorWriter:
                         "%d tiles were written in %0.3f seconds (%0.3f per "
                         "tile)", tiles_written, time_taken,
                         time_taken / tiles_written)
-                    
+
                 # Report about sucess only after transaction commit
                 for a in answers:
                     a.put_nowait(None)
