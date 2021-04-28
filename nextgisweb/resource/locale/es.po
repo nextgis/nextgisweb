@@ -185,7 +185,7 @@ msgstr "Actualizar"
 
 #: scope.py:51
 msgid "Manage children"
-msgstr "Gobernar a los hijos"
+msgstr "Gestionar a los hijos"
 
 #: scope.py:54
 msgid "Change permissions"
