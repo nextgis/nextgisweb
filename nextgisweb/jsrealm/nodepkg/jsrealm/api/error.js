@@ -1,5 +1,5 @@
 import { BaseError } from 'make-error';
-import CachedJed from '../i18n/CachedJed.js'
+import CachedJed from '../i18n/CachedJed'
 
 // To break circular dependency use cached version of jed
 // which downloads locale data in background.

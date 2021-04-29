@@ -1,5 +1,5 @@
 import { default as jed } from 'jed';
-import loadentry from '../loadentry.js';
+import loadentry from '../loadentry';
 
 const stub = new jed({});
 

@@ -44,7 +44,7 @@ function scanForEntries(pkg) {
 for (const pkg of config.packages()) {
     const entries = (pkg.json.nextgisweb || {}).entrypoints || scanForEntries(pkg);
     for (const ep of entries) {
-        const epName = pkg.name + '/' + ep.replace(/\.(?:js|ts)$/, '');
+        const epName = pkg.name + '/' + ep.replace(/(?:\/index)?\.(js|ts)$/, '');
         const epSource = pkg.name + '/' + ep;
         entryList[epName] = require.resolve(epSource);
 
@@ -68,6 +68,7 @@ module.exports = {
                 exclude: [
                     /node_modules\/core-js/
                 ],
+                resolve: { fullySpecified: false },
                 use: {
                     loader: "babel-loader",
                     options: {

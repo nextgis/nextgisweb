@@ -1,6 +1,6 @@
-import set from 'lodash-es/set.js';
+import set from 'lodash-es/set';
 
-import { request } from './request.js';
+import { request } from './request';
 import routeData from '@nextgisweb/jsrealm/api/load!/api/component/pyramid/route';
 
 export function routeURL(name, ...rest) {

@@ -1,7 +1,7 @@
 import { default as jed } from 'jed';
 
-import { request, route } from '../api.js';
-import CachedJed from './CachedJed.js'
+import { route } from '../api';
+import CachedJed from './CachedJed'
 
 const locale = dojoConfig.locale;
 const stub = new jed({});

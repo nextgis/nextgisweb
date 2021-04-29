@@ -4,7 +4,7 @@ import {
     NetworksResponseError,
     InvalidResponseError,
     ServerResponseError
-} from './error.js';
+} from './error';
 
 
 export async function request(path, options) {

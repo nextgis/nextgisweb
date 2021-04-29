@@ -1,5 +1,5 @@
 /* entry: true */
-import { request, route } from '../api.js';
+import { request, route } from '../api/index.js';
 import ErrorDialog from 'ngw-pyramid/ErrorDialog/ErrorDialog';
 
 export default async () => {
