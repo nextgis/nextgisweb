@@ -80,13 +80,13 @@ class Connection(Base, Resource):
             url=self.url, version=self.version,
             username=self.username,
             password=self.password,
-            xml=str(self.capcache_xml))
+            xml=self.capcache_xml)
 
         layers = []
         for lid, layer in service.contents.items():
             layers.append(OrderedDict((
                 ('id', lid), ('title', layer.title),
-                ('index', map(int, layer.index.split('.'))),
+                ('index', [int(i) for i in layer.index.split('.')]),
             )))
 
         layers.sort(key=lambda i: i['index'])
