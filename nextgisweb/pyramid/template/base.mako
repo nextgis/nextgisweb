@@ -46,7 +46,8 @@
         var ngwConfig = {
             applicationUrl: ${request.application_url | json.dumps, n},
             assetUrl: ${request.static_url('nextgisweb:static/') | json.dumps, n },
-            amdUrl: ${request.route_url('amd_package', subpath="") | json.dumps, n}
+            amdUrl: ${request.route_url('amd_package', subpath="") | json.dumps, n},
+            distUrl: ${request.route_url('jsrealm.dist', subpath='') | json.dumps, n}
         };
 
         var dojoConfig = {

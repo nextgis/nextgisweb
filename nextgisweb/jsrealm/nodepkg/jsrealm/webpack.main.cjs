@@ -5,12 +5,10 @@ const fs = require('fs');
 const glob = require('glob');
 
 const WebpackAssetsManifest = require('webpack-assets-manifest');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-
-const entryList = {};
-const resolveAliases = {};
 
 
 function scanForEntries(pkg) {
@@ -40,17 +38,33 @@ function scanForEntries(pkg) {
     return result;
 }
 
+const entryList = {};
+const entryRules = [];
 
 for (const pkg of config.packages()) {
     const entries = (pkg.json.nextgisweb || {}).entrypoints || scanForEntries(pkg);
     for (const ep of entries) {
         const epName = pkg.name + '/' + ep.replace(/(?:\/index)?\.(js|ts)$/, '');
-        const epSource = pkg.name + '/' + ep;
-        entryList[epName] = require.resolve(epSource);
+        const fullname = require.resolve(pkg.name + '/' + ep);
 
-        // Aliases can be useful for importing without extension, but ESM modules
-        // require an extension to be specified. So we don't use this feature:
-        // resolveAliases[epName + '$'] = epSource;
+        entryList[epName] = fullname;
+
+        // This rule injects the following construction into each entry module
+        // at webpack compilation time:
+        //
+        //     import 'with-chunks!some-entry-name';
+        //
+        // The import is handled by AMD require loader and loads all chunks
+        // required by the entry.
+
+        entryRules.push({
+            test: fullname,
+            exclude: /node_modules/,
+            use: {
+                loader: 'imports-loader',
+                options: { imports: ['side-effects with-chunks!' + epName] }
+            }
+        })
     }
 }
 
@@ -59,10 +73,9 @@ module.exports = {
     mode: config.debug ? 'development' : 'production',
     devtool: config.debug ? 'source-map' : false,
     entry: entryList,
-    resolve: { alias: resolveAliases },
     target: ['web', 'es5'],
     module: {
-        rules: [
+        rules: entryRules.concat([
             {
                 test: /\.(m?js|ts?)$/,
                 exclude: [
@@ -101,10 +114,19 @@ module.exports = {
                     "css-loader"
                 ]
             }
-        ]
+        ])
     },
     plugins: [
         new WebpackAssetsManifest({ entrypoints: true }),
+        new CopyPlugin({
+            // Copy with-chunks!some-entry-name loader directly to the dist
+            // directly. It is written in ES5-compatible way as AMD moduleand
+            // mustn't be processed by webpack runtime loader.
+            patterns: [{
+                from: require.resolve('./with-chunks.js'),
+                to: '@nextgisweb/jsrealm/'
+            }]
+        }),
         new CleanWebpackPlugin(),
         new BundleAnalyzerPlugin({ analyzerMode: 'static' })
     ],
@@ -119,7 +141,12 @@ module.exports = {
     },
     externals: [
         function ({ context, request }, callback) {
-            // Temporary solution for loaderers
+            // Use AMD require loader for with-chunks!some-entry-name imports.
+            if (request.startsWith('with-chunks!')) {
+                return callback(null, `amd ${request}`);
+            }
+
+            // Temporary solution for loaderers.
             if (
                 request.startsWith('@nextgisweb/jsrealm/api/load!') ||
                 request.startsWith('@nextgisweb/jsrealm/i18n!')
@@ -127,7 +154,6 @@ module.exports = {
                 return callback(null, `amd ${request}`);
             }
 
-            // External nextgisweb AMD module from package
             for (const ext of config.externals) {
                 if (request.startsWith(ext + '/')) {
                     return callback(null, `amd ${request}`);
