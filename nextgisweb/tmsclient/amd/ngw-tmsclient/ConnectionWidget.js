@@ -64,9 +64,13 @@ define([
         },
 
         serializeInMixin: function (data) {
-            var capmode = this.wCapmode.get("value"),
+            var url_template = this.wURLTemplate.get("value"),
+                capmode = this.wCapmode.get("value"),
                 apikey = this.wAPIKey.get("value"),
                 apikey_param = this.wAPIKeyParam.get("value");
+            if (url_template === "") {
+                lang.setObject(this.serializePrefix + ".url_template", null, data);
+            }
             if (capmode === "") {
                 lang.setObject(this.serializePrefix + ".capmode", null, data);
             }

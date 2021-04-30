@@ -108,7 +108,7 @@ class Connection(Base, Resource):
 class _url_template_attr(SP):
 
     def setter(self, srlzr, value):
-        if not url_template_pattern.match(value):
+        if value is not None and not url_template_pattern.match(value):
             raise ValidationError("Invalid url template.")
 
         super(_url_template_attr, self).setter(srlzr, value)
