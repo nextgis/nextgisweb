@@ -163,6 +163,7 @@ module.exports = {
         }
     ],
     optimization: {
+        runtimeChunk: { name: 'chunk/runtime' },
         splitChunks: {
             // Generate as many chunks as possible
             chunks: 'all',

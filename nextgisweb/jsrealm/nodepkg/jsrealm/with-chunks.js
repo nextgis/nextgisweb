@@ -8,7 +8,11 @@ define([], function () {
         var tmp = {};
         Object.keys(entrypoints).forEach(function (entry) {
             var value = entrypoints[entry];
-            tmp[entry] = ((value.assets || {}).js || []).slice(0, -1).map(function (c) {
+            // The first chunk is always "chunk/runtime.js", which was already
+            // loaded by a script tag, and the last one is the entry, which will
+            // be loaded by AMD require loader.
+            var chunks = ((value.assets || {}).js || []).slice(1, -1);
+            tmp[entry] = chunks.map(function (c) {
                 return 'dist/main/' + c.slice(0, -3);
             });
         });
