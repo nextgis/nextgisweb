@@ -52,17 +52,22 @@ for (const pkg of config.packages()) {
         // This rule injects the following construction into each entry module
         // at webpack compilation time:
         //
-        //     import 'with-chunks!some-entry-name';
+        //     import '@nextgisweb/jsrealm/with-chunks!some-entry-name';
         //
         // The import is handled by AMD require loader and loads all chunks
         // required by the entry.
 
+        let addCode = `import '@nextgisweb/jsrealm/with-chunks!${epName}';`;
+        if (config.debug) {
+            // To debug the process of loading entries uncomment the following line:
+            // addCode += `\nconsole.debug("Webpack entry '${epName}' is being executed...");`;
+        };
         entryRules.push({
             test: fullname,
             exclude: /node_modules/,
             use: {
                 loader: 'imports-loader',
-                options: { imports: ['side-effects with-chunks!' + epName] }
+                options: { additionalCode: addCode }
             }
         })
     }
@@ -142,18 +147,17 @@ module.exports = {
     externals: [
         function ({ context, request }, callback) {
             // Use AMD require loader for with-chunks!some-entry-name imports.
-            if (request.startsWith('with-chunks!')) {
+            if (request.startsWith('@nextgisweb/jsrealm/with-chunks!')) {
                 return callback(null, `amd ${request}`);
             }
 
-            // Temporary solution for loaderers.
-            if (
-                request.startsWith('@nextgisweb/jsrealm/api/load!') ||
-                request.startsWith('@nextgisweb/jsrealm/i18n!')
-            ) {
-                return callback(null, `amd ${request}`);
+            // Use AMD require loader for all entries.
+            const requestModule = request.replace(/\!.*$/, '');
+            if (entryList[requestModule] !== undefined) {
+                return callback(null, `amd ${request}`);    
             }
 
+            // Use AMD require loader for extrenal dependecies.
             for (const ext of config.externals) {
                 if (request.startsWith(ext + '/')) {
                     return callback(null, `amd ${request}`);
