@@ -1,5 +1,5 @@
 import { default as jed } from 'jed';
-import loadentry from '../loadentry';
+import entrypoint from '../entrypoint';
 
 const stub = new jed({});
 
@@ -8,7 +8,7 @@ window.__cached_jed__ = window.__cached_jed__ || {};
 export default class CachedJed {
     constructor(domain) {
         this.domain = domain;
-        loadentry('@nextgisweb/jsrealm/i18n!' + domain);
+        entrypoint('@nextgisweb/jsrealm/i18n!' + domain);
     }
 
     static put(domain, obj) {

@@ -11,7 +11,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 
-function scanForEntries(pkg) {
+function scanForEntrypoints(pkg) {
     const result = [];
     for (const candidate of glob.sync('**/*.{js,ts}', {
         cwd: pkg.path,
@@ -30,7 +30,7 @@ function scanForEntries(pkg) {
         if (match !== null) {
             let head;
             eval('head = { ' + match[1] + '}');
-            if (head.entry) {
+            if (head.entrypoint) {
                 result.push(candidate);
             }
         }
@@ -38,31 +38,33 @@ function scanForEntries(pkg) {
     return result;
 }
 
-const entryList = {};
-const entryRules = [];
+const entrypointList = {};
+const entrypointRules = [];
 
 for (const pkg of config.packages()) {
-    const entries = (pkg.json.nextgisweb || {}).entrypoints || scanForEntries(pkg);
-    for (const ep of entries) {
+    const entrypoints = (pkg.json.nextgisweb || {}).entrypoints || scanForEntrypoints(pkg);
+    for (const ep of entrypoints) {
         const epName = pkg.name + '/' + ep.replace(/(?:\/index)?\.(js|ts)$/, '');
         const fullname = require.resolve(pkg.name + '/' + ep);
 
-        entryList[epName] = fullname;
+        entrypointList[epName] = fullname;
 
-        // This rule injects the following construction into each entry module
-        // at webpack compilation time:
+        // This rule injects the following construction into each entrypoint
+        // module at webpack compilation time:
         //
-        //     import '@nextgisweb/jsrealm/with-chunks!some-entry-name';
+        //     import '@nextgisweb/jsrealm/with-chunks!some-entrypoint-name';
         //
         // The import is handled by AMD require loader and loads all chunks
-        // required by the entry.
+        // required by the entrypoint.
 
         let addCode = `import '@nextgisweb/jsrealm/with-chunks!${epName}';`;
         if (config.debug) {
-            // To debug the process of loading entries uncomment the following line:
-            // addCode += `\nconsole.debug("Webpack entry '${epName}' is being executed...");`;
+            // To debug the process of loading entrypoints uncomment the
+            // following lines:
+            // const m = `Webpack entrypoint '${epName}' is being executed...`
+            // addCode += `\nconsole.debug("${m}");`;
         };
-        entryRules.push({
+        entrypointRules.push({
             test: fullname,
             exclude: /node_modules/,
             use: {
@@ -77,10 +79,10 @@ for (const pkg of config.packages()) {
 module.exports = {
     mode: config.debug ? 'development' : 'production',
     devtool: config.debug ? 'source-map' : false,
-    entry: entryList,
+    entry: entrypointList,
     target: ['web', 'es5'],
     module: {
-        rules: entryRules.concat([
+        rules: entrypointRules.concat([
             {
                 test: /\.(m?js|ts?)$/,
                 exclude: [
@@ -124,8 +126,8 @@ module.exports = {
     plugins: [
         new WebpackAssetsManifest({ entrypoints: true }),
         new CopyPlugin({
-            // Copy with-chunks!some-entry-name loader directly to the dist
-            // directly. It is written in ES5-compatible way as AMD moduleand
+            // Copy with-chunks!some-entrypoint-name loader directly to the dist
+            // directly. It is written in ES5-compatible way as AMD module and
             // mustn't be processed by webpack runtime loader.
             patterns: [{
                 from: require.resolve('./with-chunks.js'),
@@ -146,18 +148,18 @@ module.exports = {
     },
     externals: [
         function ({ context, request }, callback) {
-            // Use AMD require loader for with-chunks!some-entry-name imports.
+            // Use AMD loader for with-chunks!some-entrypoint-name imports.
             if (request.startsWith('@nextgisweb/jsrealm/with-chunks!')) {
                 return callback(null, `amd ${request}`);
             }
 
-            // Use AMD require loader for all entries.
+            // Use AMD loader for all entrypoints.
             const requestModule = request.replace(/\!.*$/, '');
-            if (entryList[requestModule] !== undefined) {
+            if (entrypointList[requestModule] !== undefined) {
                 return callback(null, `amd ${request}`);    
             }
 
-            // Use AMD require loader for extrenal dependecies.
+            // Use AMD loader for extrenal dependecies.
             for (const ext of config.externals) {
                 if (request.startsWith(ext + '/')) {
                     return callback(null, `amd ${request}`);

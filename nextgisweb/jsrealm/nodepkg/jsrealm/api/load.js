@@ -1,4 +1,4 @@
-/* entry: true */
+/* entrypoint: true */
 import { request } from './request';
 
 export function load(path, require, load) {

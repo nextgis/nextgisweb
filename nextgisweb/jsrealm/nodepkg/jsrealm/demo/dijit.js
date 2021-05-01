@@ -1,5 +1,4 @@
-/* entry: true */
-
+/* entrypoint: true */
 import "./dijit.css";
 import { default as Dialog } from "dijit/Dialog";
 

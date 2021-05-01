@@ -1,8 +1,8 @@
-/* entry: true */
-import loadentry from '../loadentry';
+/* entrypoint: true */
+import entrypoint from '../entrypoint';
 
 export * from './load'
 export * from './hbs'
 
 // Load translation for jsrealm component
-loadentry('@nextgisweb/jsrealm/i18n!jsrealm');
+entrypoint('@nextgisweb/jsrealm/i18n!jsrealm');
