@@ -61,6 +61,7 @@
             locale: ${request.locale_name | json.dumps, n},
             aliases: [
                 ['ngw/load-json', '@nextgisweb/pyramid/api/load'],
+                ['ngw/settings', '@nextgisweb/pyramid/settings'],
                 ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n']
             ]
         };

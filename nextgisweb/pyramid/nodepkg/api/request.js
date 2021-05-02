@@ -1,27 +1,34 @@
-import 'whatwg-fetch';
+import "whatwg-fetch";
 
 import {
     NetworksResponseError,
     InvalidResponseError,
     ServerResponseError
-} from './error';
+} from "./error";
 
 
 export async function request(path, options) {
     options = Object.assign({}, {
-        method: 'GET',
-        credentials: 'same-origin',
+        method: "GET",
+        credentials: "same-origin",
         headers: {},
     }, options);
 
-    const url = ngwConfig.applicationUrl +
-        (path.startsWith('/') ? '' : '/') + path;
+    let urlParams = "";
+    if (options.query !== undefined) {
+        urlParams = "?" + (new URLSearchParams(options.query)).toString();
+        delete options.query;
+    }
 
     if (options.json !== undefined) {
         options.body = JSON.stringify(options.json);
-        options.headers['Content-Type'] = 'application/json';
+        options.headers["Content-Type"] = "application/json";
         delete options.json;
     }
+
+    const url = ngwConfig.applicationUrl +
+        (path.startsWith("/") ? "" : "/") +
+        path + urlParams;
 
     let response;
     try {
@@ -30,8 +37,8 @@ export async function request(path, options) {
         throw new NetworksResponseError();
     }
 
-    const respCType = response.headers.get('content-type');
-    const respJSON = respCType && respCType.includes('application/json');
+    const respCType = response.headers.get("content-type");
+    const respJSON = respCType && respCType.includes("application/json");
 
     if (!respJSON) {
         throw new InvalidResponseError();

@@ -1,10 +1,9 @@
-import { BaseError } from 'make-error';
-import CachedJed from '../i18n/CachedJed'
+import { BaseError } from "make-error";
+import { LazyJed } from "../i18n/jed";
 
 // To break circular dependency use cached version of jed
 // which downloads locale data in background.
-const i18n = new CachedJed('pyramid');
-
+const i18n = new LazyJed("pyramid");
 
 export class BaseAPIError extends BaseError {
     constructor(message) {

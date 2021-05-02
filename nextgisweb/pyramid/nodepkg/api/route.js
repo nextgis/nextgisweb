@@ -1,7 +1,7 @@
-import set from 'lodash-es/set';
+import set from "lodash-es/set";
 
-import { request } from './request';
-import routeData from '@nextgisweb/pyramid/api/load!/api/component/pyramid/route';
+import { request } from "./request";
+import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
 
 export function routeURL(name, ...rest) {
     const [template, ...params] = routeData[name];
@@ -10,7 +10,7 @@ export function routeURL(name, ...rest) {
     let sub;
     if (first === undefined) {
         sub = [];
-    } else if (typeof first === 'object' && first !== null) {
+    } else if (typeof first === "object" && first !== null) {
         if (rest.length > 1) {
             throw new Error("Too many arguments for route(name, object)!");
         };
@@ -34,9 +34,11 @@ export function routeURL(name, ...rest) {
 export function route(name, ...rest) {
     const template = routeURL(name, ...rest);
     const result = {};
-    for (const method of ['get', 'post', 'put', 'delete']) {
+    for (const method of ["get", "post", "put", "delete"]) {
         result[method] = (options) => request(
-            template, Object.apply(options || {}, { method: method })
+            template, Object.assign(options || {}, {
+                method: method.toUpperCase()
+            })
         )
     }
     return result;

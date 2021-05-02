@@ -6,8 +6,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
     "@nextgisweb/pyramid/api",
-    "ngw-pyramid/i18n!pyramid",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/SystemNameForm.hbs",
     // template
     "dijit/form/Button",
@@ -22,13 +21,12 @@ define([
     ErrorDialog,
     api,
     i18n,
-    hbsI18n,
     template
 ) {
     var route = api.route('pyramid.system_name');
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
 
         postCreate: function () {
             this.inherited(arguments);
@@ -48,7 +46,7 @@ define([
 
         save: function () {
             var data = { full_name: this.wSystemTitle.get('value') };
-            route.post({ json: data }).then(function () {
+            route.put({ json: data }).then(function () {
                 window.location.reload(true)
             }, function (err) {
                 new ErrorDialog(err).show()
