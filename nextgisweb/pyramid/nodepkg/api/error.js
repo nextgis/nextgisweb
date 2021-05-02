@@ -3,7 +3,7 @@ import CachedJed from '../i18n/CachedJed'
 
 // To break circular dependency use cached version of jed
 // which downloads locale data in background.
-const i18n = new CachedJed('jsrealm');
+const i18n = new CachedJed('pyramid');
 
 
 export class BaseAPIError extends BaseError {

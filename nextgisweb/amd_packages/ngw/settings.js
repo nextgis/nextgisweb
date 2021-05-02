@@ -1,4 +1,4 @@
-define(["@nextgisweb/jsrealm/api"], function (api) {
+define(["@nextgisweb/pyramid/api"], function (api) {
     return {
         load: function (id, require, load) {
             var url = api.routeURL('pyramid.settings') + '?component=' + id;

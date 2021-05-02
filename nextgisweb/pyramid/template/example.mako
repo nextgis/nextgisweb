@@ -3,9 +3,9 @@
 <%
     from nextgisweb.compat import Path
     import nextgisweb
-    import nextgisweb.jsrealm
+    import nextgisweb.pyramid
 
-    root = Path(nextgisweb.jsrealm.__file__).parent / 'nodepkg' / 'jsrealm' / 'demo'
+    root = Path(nextgisweb.pyramid.__file__).parent / 'nodepkg' / 'example'
     pkgroot = Path(nextgisweb.__file__).parent.parent
     modules = [(f.stem, f.relative_to(pkgroot)) for f in (
         list(root.glob('*.js')) + list(root.glob('*.ts')))]
@@ -14,7 +14,7 @@
 
 <script type="text/javascript">
     function runModule(name, filename) {
-        var moduleName = '@nextgisweb/jsrealm/demo/' + name;
+        var moduleName = '@nextgisweb/pyramid/example/' + name;
         var head = document.getElementById('_head'); head.innerHTML = moduleName + " from " + filename;
         var output = document.getElementById('_output'); output.innerHTML = '';
         var error = document.getElementById('_error'); error.innerHTML = '';

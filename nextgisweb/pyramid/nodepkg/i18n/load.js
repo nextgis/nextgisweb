@@ -8,7 +8,34 @@ const stub = new jed({});
 const promisesLoaded = {};
 const promisesError = {};
 
+export function normalize(req, toAbsMid) {
+    const abs = toAbsMid('.');
+    const parts = abs.split('/');
+    const component = ((parts[0] == "@nextgisweb") ? parts[1] : (
+        parts[0].replace(/^ngw-/, '').replace('-', '_'))).replace(".", "");
+
+    // if (component == req) {
+    //     console.debug(
+    //         `Consider to replace "@nextgisweb/pyramid/i18n!${req}" ` +
+    //         `with "@nextgisweb/pyramid/i18n!" in "${abs}".`
+    //     );
+    // }
+
+    if (req == "") {
+        return component;
+    } else {
+        return req;
+    }
+}
+
 export function load(component, require, load) {
+    if (component == "") {
+        console.error(new Error(
+            "No component identifier was given while importing i18n! " +
+            "Using dummy translation as a fallback."));
+        load(stub);
+    }
+
     let promise = promisesLoaded[component];
     if (promise === undefined) {
         promise = route('pyramid.locdata', component, locale).get();

@@ -18,7 +18,6 @@
         "copy-webpack-plugin": "^8.1.1",
         "core-js": "3",
         "css-loader": "^5.2.4",
-        "error": "^10.4.0",
         "file-loader": "^6.2.0",
         "imports-loader": "^2.0.0",
         "less": "^4.1.1",

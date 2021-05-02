@@ -60,8 +60,8 @@
             baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n},
             locale: ${request.locale_name | json.dumps, n},
             aliases: [
-                ['ngw/load-json', '@nextgisweb/jsrealm/api/load'],
-                ['ngw-pyramid/i18n', '@nextgisweb/jsrealm/i18n']
+                ['ngw/load-json', '@nextgisweb/pyramid/api/load'],
+                ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n']
             ]
         };
 

@@ -418,6 +418,9 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.test_timeout', '/test/timeout') \
         .add_view(test_timeout)
 
+    config.add_route('pyramid.test_example', '/test/pyramid/example') \
+        .add_view(lambda request: {}, renderer="nextgisweb:pyramid/template/example.mako")
+
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
         dm.Link('info/pkginfo', _("Package versions"), lambda args: (

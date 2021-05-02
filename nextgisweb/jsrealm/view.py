@@ -20,9 +20,6 @@ def setup_pyramid(comp, config):
     jsrealm_dist = '/static{}/dist/*subpath'.format(comp.env.pyramid.static_key)
     config.add_route('jsrealm.dist', jsrealm_dist).add_view(dist)
 
-    config.add_route('jsrealm.test.demo', '/test/jsrealm/demo') \
-        .add_view(test, renderer="nextgisweb:jsrealm/template/demo.mako")
-
 
 def dist(request):
     dist_path = request.env.jsrealm.options['dist_path']
@@ -31,7 +28,3 @@ def dist(request):
         return FileResponse(filename, cache_max_age=3600, request=request)
     else:
         raise HTTPNotFound()
-
-
-def test(request):
-    return dict()

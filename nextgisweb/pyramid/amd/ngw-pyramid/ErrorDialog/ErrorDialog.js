@@ -22,7 +22,7 @@ define([
 
             this.errorInfo = {};
 
-            // Temporary solution to detect instance of @nextgisweb/jsrealm/api/BaseAPIError
+            // Temporary solution to detect instance of @nextgisweb/pyramid/api/BaseAPIError
             if (error.data !== undefined && error.name !== undefined && error.name !== undefined) {
                 this.message = error.message;
                 this.detail = error.detail;

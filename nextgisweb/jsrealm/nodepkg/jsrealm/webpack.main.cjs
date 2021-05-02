@@ -47,7 +47,11 @@ for (const pkg of config.packages()) {
         const epName = pkg.name + '/' + ep.replace(/(?:\/index)?\.(js|ts)$/, '');
         const fullname = require.resolve(pkg.name + '/' + ep);
 
-        entrypointList[epName] = fullname;
+        // Library name is required to get relative paths work.
+        entrypointList[epName] = {
+            import: fullname,
+            library: { type: 'amd', name: epName },
+        };
 
         // This rule injects the following construction into each entrypoint
         // module at webpack compilation time:
@@ -138,13 +142,12 @@ module.exports = {
         new BundleAnalyzerPlugin({ analyzerMode: 'static' })
     ],
     output: {
+        path: path.resolve(config.rootPath, 'dist/main'),
         filename: (pathData) => (
             pathData.chunk.name !== undefined ?
                 '[name].js' : 'chunk/[name].js'
         ),
         chunkFilename: 'chunk/[id].js',
-        libraryTarget: 'amd',
-        path: path.resolve(config.rootPath, 'dist/main')
     },
     externals: [
         function ({ context, request }, callback) {

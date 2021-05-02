@@ -1,3 +1,3 @@
-define(["@nextgisweb/jsrealm/api"], function (api) {
+define(["@nextgisweb/pyramid/api"], function (api) {
     return api.compatRoute;
 });

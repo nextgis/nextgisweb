@@ -5,7 +5,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
-    "@nextgisweb/jsrealm/api",
+    "@nextgisweb/pyramid/api",
     "ngw-pyramid/i18n!pyramid",
     "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/SystemNameForm.hbs",
