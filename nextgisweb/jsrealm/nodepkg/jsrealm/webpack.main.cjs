@@ -3,6 +3,7 @@ const config = require('@nextgisweb/jsrealm/config.cjs');
 const path = require('path');
 const fs = require('fs');
 const glob = require('glob');
+const doctrine = require('doctrine');
 
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 const CopyPlugin = require('copy-webpack-plugin');
@@ -20,18 +21,23 @@ function scanForEntrypoints(pkg) {
             'contrib/**',
         ]
     })) {
-        // TODO: Read only first line of the file!
         const content = fs.readFileSync(
             pkg.path + '/' + candidate,
             { encoding: 'utf-8' }
         );
 
-        const match = /^\/\*\s*(.*?)\s*\*\//.exec(content);
-        if (match !== null) {
-            let head;
-            eval('head = { ' + match[1] + '}');
-            if (head.entrypoint) {
-                result.push(candidate);
+        const jsdoc = /\/\*\*.*(?:\*\/$|$(?:\s*\*\s?.*$)*\s*\*\/)/m.exec(content);
+        if (jsdoc !== null) {
+            const payload = doctrine.parse(jsdoc[0], {
+                unwrap: true,
+                tags: ['entrypoint'],
+            });
+            for (const { title } of payload.tags) {
+                if (title == 'entrypoint') {
+                    // console.log(`@entrypoint tag was found in "${pkg.name}/${candidate}"`);
+                    result.push(candidate);
+                    break;
+                }
             }
         }
     }

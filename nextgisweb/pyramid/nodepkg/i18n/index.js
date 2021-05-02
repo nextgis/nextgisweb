@@ -1,4 +1,4 @@
-/* entrypoint: true */
+/** @entrypoint */
 import entrypoint from '@nextgisweb/jsrealm/entrypoint';
 
 export * from './load'

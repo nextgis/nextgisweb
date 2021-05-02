@@ -1,4 +1,4 @@
-/* entrypoint: true */
+/** @entrypoint */
 import range from 'lodash-es/range'
 
 export default async () => {

@@ -1,4 +1,4 @@
-/* entrypoint: true */
+/** @entrypoint */
 interface Foo {
     some: number;
     other: string;

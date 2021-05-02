@@ -1,4 +1,4 @@
-/* entrypoint: true */
+/** @entrypoint */
 import range from 'lodash-es/range';
 import entrypoint from '@nextgisweb/jsrealm/entrypoint';
 

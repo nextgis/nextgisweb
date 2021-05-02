@@ -1,4 +1,4 @@
-/* entrypoint: true */
+/** @entrypoint */
 import { request, route } from '@nextgisweb/pyramid/api';
 import ErrorDialog from 'ngw-pyramid/ErrorDialog/ErrorDialog';
 

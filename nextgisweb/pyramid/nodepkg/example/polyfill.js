@@ -1,4 +1,4 @@
-/* entrypoint: true */
+/** @entrypoint */
 export default async () => {
     alert(Promise);
 }

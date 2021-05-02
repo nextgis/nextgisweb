@@ -1,4 +1,4 @@
-/* entrypoint: true */
+/** @entrypoint */
 export default async () => {
     console.log("Loading module '@nextgisweb/pyramid/example/aux/foo' with absolute path...");
     const foo = await import('@nextgisweb/pyramid/example/aux/foo');
