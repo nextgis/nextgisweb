@@ -206,18 +206,42 @@ not, then the corresponding warning is displayed in the log.
 Client side
 -----------
 
-Javascript
-^^^^^^^^^^
+When executing client-side code, user preferences are already known and there is
+no need for two-step processing. Translation and marking strings for translation
+can be combined into one function. The `jed`_ library is used as `gettext`_
+library implementation with ``.jed`` files precompiled from ``.po`` files on the
+server-side.
 
-When executing javascript code on the client side, user preferences are already
-known and there is no need for two-step processing. Translation and marking
-strings for translation can be combined in one function. To work with gettext on
-the client side, the `jed`_ library is used. Source jed-files for which are
-prepared on the server during compilation of po-files.
+Modern JavaScript
+^^^^^^^^^^^^^^^^^
+
+Consider the following directory structure of ``bar`` component:
 
 .. code-block:: text
   :caption: Directory structure
-  :name: tree-client
+
+  bar
+  └── nodepkg
+      └── bar
+          ├── some-module.js
+          └── package.json
+
+And here is the simple example, where string extraction and translation work:
+
+.. code-block:: javascript
+  :caption: File bar/nodepkg/bar/some-module.js
+
+  import i18n from "@nextgisweb/pyramid/i18n!";
+  
+  const translated = i18n.gettext("Some message for translation");
+  console.log("Localized message: " + translated);
+
+
+Old-style JavaScript
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: text
+  :caption: Directory structure
 
   bar
   └── amd
@@ -231,9 +255,9 @@ prepared on the server during compilation of po-files.
   :caption: File amd/ngw-bar/mod-a.js
 
   define([
-      'ngw-pyramid/i18n!bar'
+      "@nextgisweb/pyramid/i18n!"
   ], function (i18n) {
-      var translated = i18n.gettext('Some message for translation');
+      var translated = i18n.gettext("Some message for translation");
       alert(translated);
   });
 
@@ -254,11 +278,10 @@ through the template engine `handlebars`_.
   :caption: File amd/ngw-bar/mod-b.js
 
   define([
-      "ngw-pyramid/hbs-i18n",
-      "dojo/text!.template/html.hbs",
-      "ngw-pyramid/i18n!bar"
-  ], function (hbsI18n, template, i18n) {
-      var translated = hbsI18n(template, i18n);
+      "@nextgisweb/pyramid/i18n!",
+      "dojo/text!.template/html.hbs"
+  ], function (i18n, template) {
+      var translated = i18n.renderTemplate(template);
       alert(translated);
   });
 
@@ -282,12 +305,11 @@ would look like the original example in the dijit documentation:
       "dojo/_base/declare",
       "dijit/_WidgetBase",
       "dijit/_TemplatedMixin",
-      "ngw-pyramid/hbs-i18n",
-      "dojo/text!./template/SomeWidget.hbs",
-      "ngw-pyramid/i18n!comp"
-  ], function(declare, _WidgetBase, _TemplatedMixin, hbsI18n, template, i18n) {
+      "@nextgisweb/pyramid/i18n!",
+      "dojo/text!./template/SomeWidget.hbs"
+  ], function(declare, _WidgetBase, _TemplatedMixin, i18n, template) {
       return declare([_WidgetBase, _TemplatedMixin], {
-          templateString: hbsI18n(template, i18n)
+          templateString: i18n.renderTemplate(template)
       });
   });
 
