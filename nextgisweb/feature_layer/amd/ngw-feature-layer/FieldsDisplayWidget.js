@@ -9,7 +9,7 @@ define([
     "dojox/validate/regexp",
     "put-selector/put",
     "ngw/route",
-    "ngw-pyramid/i18n!feature_layer",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-lookup-table/cached",
     "./DisplayWidget",
     // css

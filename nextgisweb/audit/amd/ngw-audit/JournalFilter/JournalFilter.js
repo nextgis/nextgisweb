@@ -10,8 +10,7 @@ define([
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
     'dijit/form/Select',
-    'ngw-pyramid/i18n!audit',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     'ngw-pyramid/NGWDatePicker/NGWDatePicker',
     'dojo/text!./JournalFilter.hbs',
     'xstyle/css!./JournalFilter.css'
@@ -19,11 +18,11 @@ define([
     declare, array, lang, on, ioQuery,
     domClass, domConstruct,
     _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    Select, i18n, hbsI18n, NGWDatePicker,
+    Select, i18n, NGWDatePicker,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         defaultRange: 7,
 
         constructor: function (options) {

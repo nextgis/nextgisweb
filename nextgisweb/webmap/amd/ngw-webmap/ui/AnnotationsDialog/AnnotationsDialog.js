@@ -5,7 +5,7 @@ define([
     'dijit/Editor', 'dijit/_editor/plugins/FontChoice', 'dijit/_editor/plugins/TextColor',
     'dojox/layout/TableContainer', 'dijit/form/Textarea', 'dijit/form/TextBox',
     'dijit/form/NumberTextBox', 'dijit/form/Select', 'dijit/form/DropDownButton',
-    'ngw-pyramid/i18n!webmap', 'ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings',
+    '@nextgisweb/pyramid/i18n!', 'ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings',
     'xstyle/css!./AnnotationsDialog.css'
 ], function (declare, lang, domConstruct, domStyle, Deferred, on, Evented, Memory, Dialog,
              Button, ContentPane, BorderContainer, htmlEntities, Editor, FontChoice, TextColor, TableContainer, Textarea,

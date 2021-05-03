@@ -9,8 +9,7 @@ define([
     "dojo/json",
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
-    "ngw-pyramid/i18n!webmap",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/SettingsForm.hbs",
     // template
     "dijit/form/Button",
@@ -30,14 +29,13 @@ define([
     route,
     ErrorDialog,
     i18n,
-    hbsI18n,
     template
 ) {
     var API_URL = route.webmap.settings();
     var SRS_URL = route.spatial_ref_sys.collection();
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
 
         postCreate: function () {
             this.inherited(arguments);

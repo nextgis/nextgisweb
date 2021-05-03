@@ -31,8 +31,7 @@ define([
     "dgrid/extensions/DijitRegistry",
     "ngw-resource/serialize",
     "ngw-resource/ResourcePicker",
-    "ngw-pyramid/i18n!webmap",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     // resource
     "dojo/text!./template/ItemWidget.hbs",
     //"xstyle/css!./template/resource/ItemWidget.css",
@@ -85,7 +84,6 @@ define([
     serialize,
     ResourcePicker,
     i18n,
-    hbsI18n,
     template,
     settings
 ) {
@@ -244,7 +242,7 @@ define([
 
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("Layers"),
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
 
         constructor: function () {
             this.itemStore = new ItemFileWriteStore({data: {

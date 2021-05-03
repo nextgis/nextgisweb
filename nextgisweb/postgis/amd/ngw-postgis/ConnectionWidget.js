@@ -5,8 +5,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "ngw-pyramid/i18n!postgis",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     // resource
     "dojo/text!./template/ConnectionWidget.hbs",
@@ -20,13 +19,12 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     i18n,
-    hbsI18n,
     serialize,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
         title: i18n.gettext("PostGIS connection"),
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         prefix: "postgis_connection",
 
         serializeInMixin: function (data) {

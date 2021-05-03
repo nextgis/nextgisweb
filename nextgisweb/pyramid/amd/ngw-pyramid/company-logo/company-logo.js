@@ -1,7 +1,7 @@
 define([
     "ngw/route",
     "ngw/settings!pyramid",
-    "ngw-pyramid/i18n!pyramid",
+    "@nextgisweb/pyramid/i18n!",
     // css
     "xstyle/css!./company-logo.css"
 ], function (

@@ -5,11 +5,10 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
-    "ngw-pyramid/hbs-i18n",
     // resource
     "ngw/load-json!resource/schema",
     "dojo/text!./template/Widget.hbs",
-    "ngw-pyramid/i18n!resource",
+    "@nextgisweb/pyramid/i18n!",
     // template
     "dojox/layout/TableContainer",
     "ngw-pyramid/form/DisplayNameTextBox",
@@ -22,13 +21,12 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
-    hbsI18n,
     resourceSchema,
     template,
     i18n
 ) {
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         identity: "resource",
         title: i18n.gettext("Resource"),
 

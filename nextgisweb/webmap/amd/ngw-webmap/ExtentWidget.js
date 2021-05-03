@@ -8,8 +8,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
-    "ngw-pyramid/i18n!webmap",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     // resource
     "dojo/text!./template/ExtentWidget.hbs",
     // template
@@ -27,12 +26,11 @@ define([
     _WidgetsInTemplateMixin,
     serialize,
     i18n,
-    hbsI18n,
     template
 ) {
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("Extent and bookmarks"),
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         serializePrefix: "webmap",
 
        postCreate: function () {

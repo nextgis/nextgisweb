@@ -10,8 +10,7 @@ define([
     "dojo/json",
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
-    "ngw-pyramid/i18n!pyramid",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/CustomCSSForm.hbs",
     // template
     "dijit/layout/ContentPane",
@@ -30,13 +29,12 @@ define([
     route,
     ErrorDialog,
     i18n,
-    hbsI18n,
     template
 ) {
     var API_URL = route.pyramid.custom_css();
 
     return declare([Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
 
         postCreate: function () {
             this.inherited(arguments);

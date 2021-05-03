@@ -2,7 +2,7 @@ define([
     'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/array',
     'dojo/on', 'dojo/dom-construct', 'dojo/topic',
     'dijit/_TemplatedMixin', 'dijit/_WidgetsInTemplateMixin', 'dijit/layout/BorderContainer',
-    'dijit/form/CheckBox', 'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n', 'ngw-pyramid/dynamic-panel/DynamicPanel',
+    'dijit/form/CheckBox', '@nextgisweb/pyramid/i18n!', 'ngw-pyramid/dynamic-panel/DynamicPanel',
     'ngw-webmap/ui/AnnotationsManager/AnnotationsManager',
     'ngw-webmap/MapStatesObserver', 'dojo/text!./AnnotationsPanel.hbs',
     // dependencies
@@ -10,7 +10,7 @@ define([
     'dijit/layout/ContentPane', 'ngw-webmap/controls/ToggleControl'
 ], function (
     declare, lang, array, on, domConstruct, topic, _TemplatedMixin, _WidgetsInTemplateMixin,
-    BorderContainer, CheckBox, i18n, hbsI18n, DynamicPanel, AnnotationsManager,
+    BorderContainer, CheckBox, i18n, DynamicPanel, AnnotationsManager,
     MapStatesObserver, template
 ) {
     var ADD_ANNOTATION_STATE_KEY = 'addAnnotation';
@@ -26,7 +26,7 @@ define([
             this._display = options.display;
             
             this.contentWidget = new (declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
-                templateString: hbsI18n(template, i18n),
+                templateString: i18n.renderTemplate(template),
                 region: 'top',
                 gutters: false
             }));

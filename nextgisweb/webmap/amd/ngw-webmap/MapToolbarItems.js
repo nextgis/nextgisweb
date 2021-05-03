@@ -7,13 +7,11 @@ define([
     'dijit/form/ToggleButton',
     './controls/ToggleControl',
     'ngw/route',
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
     'ngw-webmap/MapStatesObserver',
     'dijit/ToolbarSeparator',
     'dijit/form/DropDownButton'
 ], function (declare, lang, domStyle, on,
-             _WidgetBase, ToggleButton, ToggleControl,route, i18n, hbsI18n, MapStatesObserver,
+             _WidgetBase, ToggleButton, ToggleControl,route, MapStatesObserver,
              ToolbarSeparator) {
     return declare([_WidgetBase], {
 

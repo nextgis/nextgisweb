@@ -7,8 +7,7 @@ define([
     "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "ngw-pyramid/i18n!auth",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/UserWidget.hbs",
     "dojo/_base/array",
     // template
@@ -28,12 +27,11 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     i18n,
-    hbsI18n,
     template,
     array
 ) {
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         identity: "auth_user",
         title: i18n.gettext("User"),
 

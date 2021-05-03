@@ -5,7 +5,7 @@ define([
     "dijit/_editor/plugins/LinkDialog",
     "dijit/_editor/plugins/ViewSource",
     "ngw-resource/serialize",
-    "ngw-pyramid/i18n!resource"
+    "@nextgisweb/pyramid/i18n!"
 ], function (
     declare,
     lang,

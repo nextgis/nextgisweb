@@ -8,7 +8,7 @@ define([
     'dojox/layout/TableContainer', 'dojox/dtl', 'dojox/dtl/Context',
     'dijit/form/TextBox', 'dijit/form/NumberTextBox', 'dijit/form/DropDownButton',
     'dijit/DropDownMenu', 'dijit/MenuItem', 'dijit/Toolbar',
-    'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     'ngw/openlayers/Map', 'openlayers/ol', 'openlayers/ol-mapscale', 'openlayers/interactions/DragZoomUnConstrained',
     'dojo/text!./PrintMapPanel.hbs', 'dojo/text!./PrintingPageStyle.css.dtl',
     'dijit/form/Select', 'dijit/TooltipDialog', 'ngw-webmap/ui/ScalesSelect/ScalesSelect',
@@ -24,7 +24,7 @@ define([
     TableContainer, dtl, dtlContext,
     TextBox, NumberTextBox, DropdownButton,
     DropDownMenu, MenuItem, Toolbar,
-    i18n, hbsI18n,
+    i18n,
     Map, ol, olMapScale, DragZoomUnConstrained,
     template, printingCssTemplate) {
     return declare([DynamicPanel, BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -47,7 +47,7 @@ define([
             this.withCloser = false;
 
             this.contentWidget = new (declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
-                templateString: hbsI18n(template, i18n),
+                templateString: i18n.renderTemplate(template),
                 region: 'top',
                 gutters: false
             }));

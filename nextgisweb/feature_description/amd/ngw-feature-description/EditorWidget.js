@@ -1,7 +1,7 @@
 define([
     "dojo/_base/declare",
     "ngw-pyramid/modelWidget/Widget",
-    "ngw-pyramid/i18n!feature_description",
+    "@nextgisweb/pyramid/i18n!",
     "dijit/Editor",
     "dijit/_editor/plugins/LinkDialog"
 ], function (

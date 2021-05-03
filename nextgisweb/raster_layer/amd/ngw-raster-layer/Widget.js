@@ -6,8 +6,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",
-    "ngw-pyramid/i18n!raster_layer",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n",
     // resource
     "dojo/text!./template/Widget.hbs",
     // template
@@ -21,11 +20,10 @@ define([
     serialize,
     SRSSelect,
     i18n,
-    hbsI18n,
     template
 ) {
     return declare("ngw.raster.layer.Widget", [_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Raster layer"),
 
         constructor: function () {

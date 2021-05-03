@@ -7,17 +7,16 @@ define([
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
     'ngw-pyramid/NGWButton/NGWButton',
-    'ngw-pyramid/i18n!pyramid',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     'dojo/text!./NGWPagination.hbs',
     'xstyle/css!./NGWPagination.css'
 ], function (
     declare, lang, on, ioQuery,
     _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    NGWButton, i18n, hbsI18n, template
+    NGWButton, i18n, template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         action: "#",
         prevLabel: i18n.gettext('Backward'),
         nextLabel: i18n.gettext('Forward'),

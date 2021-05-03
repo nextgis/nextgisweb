@@ -10,7 +10,7 @@ define([
     "openlayers/ol",
     "ngw/route",
     "ngw/settings!webmap",
-    "ngw-pyramid/i18n!webmap"
+    "@nextgisweb/pyramid/i18n!"
 ], function (
     declare,
     Base,

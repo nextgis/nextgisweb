@@ -3,7 +3,7 @@ define([
     "dojo/_base/declare",
     "./Base",
     "openlayers/ol",
-    "ngw-pyramid/i18n!webmap",
+    "@nextgisweb/pyramid/i18n!",
     "xstyle/css!./resources/Zoom.css"
 ], function (
     declare,

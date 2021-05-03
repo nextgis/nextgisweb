@@ -6,7 +6,7 @@ define([
     "dojox/image/Lightbox",
     "put-selector/put",
     "ngw/route",
-    "ngw-pyramid/i18n!feature_attachment",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "dojox/image/resources/Lightbox.css",

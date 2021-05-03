@@ -5,7 +5,7 @@ define([
     "dojo/dom-construct",
     "dijit/Dialog",
     "ngw-pyramid/ErrorCard/ErrorCard",
-    "ngw-pyramid/i18n!resource",
+    "@nextgisweb/pyramid/i18n!",
     "xstyle/css!./ErrorDialog.css"
 ], function (
     declare,

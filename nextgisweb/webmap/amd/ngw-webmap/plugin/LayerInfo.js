@@ -4,7 +4,7 @@ define([
     "dojo/dom-construct",
     "dijit/layout/ContentPane",
     "dijit/MenuItem",
-    "ngw-pyramid/i18n!webmap",
+    "@nextgisweb/pyramid/i18n!",
 ], function (
     declare,
     _PluginBase,

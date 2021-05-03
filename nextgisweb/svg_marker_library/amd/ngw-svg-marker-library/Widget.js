@@ -19,7 +19,7 @@ define([
     "ngw/route",
     "ngw-file-upload/FileUploader",
     "ngw-resource/serialize",
-    "ngw-pyramid/i18n!svg_marker_library",
+    "@nextgisweb/pyramid/i18n!",
     // resource
     "xstyle/css!./resource/Widget.css",
     "ngw/dgrid/css"

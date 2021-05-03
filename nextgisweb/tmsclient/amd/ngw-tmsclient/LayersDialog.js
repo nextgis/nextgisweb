@@ -8,7 +8,7 @@ define([
     "dijit/tree/ObjectStoreModel",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
-    "ngw-pyramid/i18n!tmsclient"
+    "@nextgisweb/pyramid/i18n!"
 ], function (
     declare,
     lang,

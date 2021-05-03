@@ -8,7 +8,7 @@ define([
     "dojox/layout/TableContainer",
     "dijit/form/Select",
     "dijit/form/SimpleTextarea",
-    "ngw-pyramid/i18n!spatial_ref_sys"
+    "@nextgisweb/pyramid/i18n!"
 ], function (
     declare, 
     lang, 

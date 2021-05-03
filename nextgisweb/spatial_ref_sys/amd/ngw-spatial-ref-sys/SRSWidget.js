@@ -6,8 +6,7 @@ define([
     "ngw-pyramid/modelWidget/ErrorDisplayMixin",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "ngw-pyramid/i18n!spatial_ref_sys",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
     "dojo/text!./template/SRSWidget.hbs",
@@ -30,7 +29,6 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     i18n,
-    hbsI18n,
     route,
     ErrorDialog,
     template,
@@ -41,7 +39,7 @@ define([
 
     var srsImportDialog = new SRSImportDialog();
     return declare([Widget, ErrorDisplayMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         identity: "srs_list",
         title: i18n.gettext("Spatial reference system"),
 

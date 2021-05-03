@@ -9,7 +9,7 @@ define([
     "dijit/layout/BorderContainer",
     "dojox/collections/Set",
     "./Tree",
-    "ngw-pyramid/i18n!resource"
+    "@nextgisweb/pyramid/i18n!"
 ], function (
     declare,
     lang,

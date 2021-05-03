@@ -1,6 +1,6 @@
 define([
     "dojo/_base/declare",
-    "ngw-pyramid/i18n!feature_description",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget"
 ], function (
     declare,

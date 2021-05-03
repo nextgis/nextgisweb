@@ -1,7 +1,6 @@
 define([
     'dojo/_base/declare',
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     "dijit/_WidgetBase",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
@@ -23,7 +22,6 @@ define([
 ], function (
     declare,
     i18n,
-    hbsI18n,
     _WidgetBase,
     DynamicPanel,
     BorderContainer,
@@ -43,7 +41,7 @@ define([
         inputTimer: undefined,
         statusPane: undefined,
         MAX_SEARCH_RESULTS: 100,
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         activeResult: undefined,
         constructor: function (options) {
             declare.safeMixin(this,options);

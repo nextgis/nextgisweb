@@ -8,8 +8,7 @@ define([
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
-    'ngw-pyramid/i18n!postgis',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     'ngw-resource/serialize',
     'ngw/route',
     // resource
@@ -31,14 +30,13 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     i18n,
-    hbsI18n,
     serialize,
     route,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
         title: i18n.gettext('WFS layer'),
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         prefix: 'wfsclient_layer',
         _deserialized: false,
 

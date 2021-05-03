@@ -23,7 +23,7 @@ define([
     "ngw/settings!feature_layer",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-resource/serialize",
-    "ngw-pyramid/i18n!feature_layer",
+    "@nextgisweb/pyramid/i18n!",
     //
     "xstyle/css!./resource/FieldsWidget.css",
     "ngw/dgrid/css"

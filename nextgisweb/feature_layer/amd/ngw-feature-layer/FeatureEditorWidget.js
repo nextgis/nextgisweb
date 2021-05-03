@@ -18,7 +18,7 @@ define([
     "dojox/layout/TableContainer",
     "ngw/route",
     "ngw-pyramid/form/RTETextBox",
-    "ngw-pyramid/i18n!feature_layer",   
+    "@nextgisweb/pyramid/i18n!",   
     "./loader!",
     "xstyle/css!./resource/FeatureEditorWidget.css"
 ], function (

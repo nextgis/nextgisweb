@@ -1,7 +1,6 @@
 define([
     'dojo/_base/declare',
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -19,7 +18,6 @@ define([
 ], function (
     declare,
     i18n,
-    hbsI18n,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -40,7 +38,7 @@ define([
             var widget=this;
 
             this.contentWidget = new (declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-                templateString: hbsI18n(template, i18n),
+                templateString: i18n.renderTemplate(template),
                 region: 'top',
                 gutters: false,
                 previewMapUrl: displayConfig.testEmbeddedMapUrl,

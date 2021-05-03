@@ -1,6 +1,6 @@
 define([
     'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/array',
-    'dojo/topic', 'ngw-pyramid/i18n!webmap', 'openlayers/ol',
+    'dojo/topic', '@nextgisweb/pyramid/i18n!', 'openlayers/ol',
     'ngw/openlayers/layer/Vector',
 ], function (
     declare, lang, array, topic, i18n, ol, Vector

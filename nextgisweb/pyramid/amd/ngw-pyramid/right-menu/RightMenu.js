@@ -1,6 +1,6 @@
 define([
     'dojo/_base/declare',
-    'ngw-pyramid/i18n!pyramid',
+    '@nextgisweb/pyramid/i18n!',
     "dijit/_TemplatedMixin",
     "dijit/_WidgetBase",
     "dijit/_WidgetsInTemplateMixin",

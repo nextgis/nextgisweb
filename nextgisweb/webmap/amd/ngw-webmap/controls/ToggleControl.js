@@ -2,10 +2,8 @@ define([
     'dojo/_base/declare',
     "dojo/on",
     "dojo/dom-construct",
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
     'dijit/form/ToggleButton'
-], function (declare, on, domConstruct, i18n, hbsI18n, ToggleButton) {
+], function (declare, on, domConstruct, ToggleButton) {
     return declare(ToggleButton, {
         content: "content",
         constructor: function(options){

@@ -4,8 +4,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/ContentPane",
-    "ngw-pyramid/i18n!vector_layer",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",
     // resource
@@ -25,14 +24,13 @@ define([
     _WidgetsInTemplateMixin,
     ContentPane,
     i18n,
-    hbsI18n,
     serialize,
     SRSSelect,
     template,
     settings,
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Vector layer"),
         prefix: "vector_layer",
 

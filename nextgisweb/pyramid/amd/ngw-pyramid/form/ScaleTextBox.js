@@ -3,7 +3,7 @@ define([
     "dijit/_WidgetBase",
     "dojo/number",
     "dijit/form/ValidationTextBox",
-    "ngw-pyramid/i18n!pyramid",
+    "@nextgisweb/pyramid/i18n!",
 ], function (
     declare,
     _WidgetBase,

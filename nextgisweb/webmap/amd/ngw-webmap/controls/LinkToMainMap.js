@@ -2,10 +2,8 @@ define([
     'dojo/_base/declare',
     "dojo/on",
     "dojo/dom-construct",
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
     "openlayers/ol"
-], function (declare, on, domConstruct, i18n, hbsI18n, ol) {
+], function (declare, on, domConstruct, ol) {
     return declare(ol.control.Control, {
         element: undefined,
         target: undefined,

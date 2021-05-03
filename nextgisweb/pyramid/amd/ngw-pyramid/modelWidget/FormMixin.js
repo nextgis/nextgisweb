@@ -8,7 +8,7 @@ define([
     "dijit/layout/ContentPane",
     "dijit/form/Button",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
-    "ngw-pyramid/i18n!pyramid"
+    "@nextgisweb/pyramid/i18n!"
 ], function (
     declare,
     Deferred,

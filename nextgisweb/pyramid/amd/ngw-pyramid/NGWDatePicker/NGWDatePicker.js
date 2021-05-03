@@ -8,16 +8,15 @@ define([
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
     'dijit/form/DateTextBox',
-    'ngw-pyramid/i18n!pyramid',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     'dojo/text!./NGWDatePicker.hbs'
 ], function (
     declare, lang, domClass, domConstruct,
     on, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    DateTextBox, i18n, hbsI18n, template
+    DateTextBox, i18n, template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         dateFrom: '',
         dateTo: '',
 

@@ -4,7 +4,7 @@ define([
     "dojo/request/xhr",
     "dijit/MenuItem",
     "ngw/route",
-    "ngw-pyramid/i18n!webmap",
+    "@nextgisweb/pyramid/i18n!",
     "openlayers/ol"
 ], function (
     declare,

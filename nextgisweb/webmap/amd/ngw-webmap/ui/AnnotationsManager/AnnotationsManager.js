@@ -5,7 +5,7 @@ define([
     'openlayers/ol', 'ngw/route', 'ngw/utils/make-singleton',
     'ngw-webmap/layers/annotations/AnnotationFeature', 'ngw-webmap/layers/annotations/AnnotationsLayer',
     'ngw-webmap/layers/annotations/AnnotationsEditableLayer',
-    'ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog', 'ngw-pyramid/i18n!webmap'
+    'ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog', '@nextgisweb/pyramid/i18n!'
 ], function (
     declare, lang, array, topic, domClass, xhr, json, JsonRest, Memory, all, htmlEntities,
     Standby, ol, route, MakeSingleton, AnnotationFeature, AnnotationsLayer, AnnotationsEditableLayer,

@@ -11,7 +11,7 @@ from nextgisweb.pyramid.exception import json_error
 <script type="text/javascript">
     require([
         "ngw-pyramid/ErrorCard/ErrorCard",
-        "ngw-pyramid/i18n!pyramid",
+        "@nextgisweb/pyramid/i18n!pyramid",
         "dojo/domReady!"
     ], function (
         ErrorCard,

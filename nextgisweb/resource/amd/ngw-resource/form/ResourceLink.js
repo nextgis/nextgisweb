@@ -3,7 +3,7 @@ define([
     "dojo/request/xhr",
     "dijit/form/TextBox",
     "ngw/route",
-    "ngw-pyramid/i18n!resource",
+    "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/ResourceLink.hbs",
     // css
     "xstyle/css!./resource/ResourceLink.css"

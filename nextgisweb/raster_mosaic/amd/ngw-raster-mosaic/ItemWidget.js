@@ -19,7 +19,7 @@ define([
     "ngw/route",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",
-    "ngw-pyramid/i18n!raster_mosaic",
+    "@nextgisweb/pyramid/i18n!",
     //
     "xstyle/css!./resource/ItemWidget.css",
     "ngw/dgrid/css"

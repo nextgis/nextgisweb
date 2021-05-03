@@ -2,7 +2,7 @@ define([
     "dojo/request/xhr",
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
-    "ngw-pyramid/i18n!spatial_ref_sys",
+    "@nextgisweb/pyramid/i18n!",
 ], function (
     xhr,
     route,

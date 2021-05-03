@@ -4,7 +4,7 @@ define([
     'dojo/_base/array', 'dojo/Deferred', 'dijit/layout/TabContainer',
     'dijit/Menu', 'dijit/MenuItem', 'dojo/dom-style',
     'dojo/request/xhr', 'dojo/request/script', 'dojo/topic',
-    'openlayers/ol', 'ngw-pyramid/i18n!webmap',
+    'openlayers/ol', '@nextgisweb/pyramid/i18n!',
     'ngw-feature-layer/FeatureStore', 'ngw-feature-layer/FeatureGrid',
     'dijit/form/Button', 'dijit/form/TextBox', 'dijit/ToolbarSeparator',
     'dijit/popup', 'put-selector/put', 'ngw/route'

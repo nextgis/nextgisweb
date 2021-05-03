@@ -23,7 +23,7 @@ define([
     "ngw/route",
     "openlayers/ol",
     "ngw/openlayers/Popup",
-    "ngw-pyramid/i18n!webmap",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/FieldsDisplayWidget",
     "ngw-feature-layer/FeatureEditorWidget",
     "ngw-webmap/ui/CoordinateSwitcher/CoordinateSwitcher",

@@ -9,7 +9,7 @@ define([
     'dijit/form/TextBox',
     'ngw/utils/make-singleton',
     'openlayers/ol',
-    'ngw-pyramid/i18n!webmap'
+    '@nextgisweb/pyramid/i18n!'
 ], function (declare, array, lang, domConstruct, ioQuery, all, Dialog, TextBox,
              MakeSingleton, ol, i18n) {
     return {

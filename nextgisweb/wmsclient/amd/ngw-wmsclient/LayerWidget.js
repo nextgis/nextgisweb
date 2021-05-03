@@ -12,8 +12,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "put-selector/put",
     "ngw/route",
-    "ngw-pyramid/i18n!wmsclient",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",
     // resource
@@ -39,14 +38,13 @@ define([
     put,
     route,
     i18n,
-    i18nHbs,
     serialize,
     SRSSelect,
     template
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("WMS layer"),
-        templateString: i18nHbs(template, i18n),
+        templateString: i18n.renderTemplate(template),
         serializePrefix: "wmsclient_layer",
 
         constructor: function () {

@@ -3,8 +3,7 @@ define([
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/Stateful',
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     'dojo/query',
     'dojo/dom-construct',
     'dijit/_TemplatedMixin',
@@ -18,7 +17,6 @@ define([
     array,
     Stateful,
     i18n,
-    hbsI18n,
     query,
     domConstruct,
     _TemplatedMixin,
@@ -26,7 +24,7 @@ define([
     template
 ) {
     return declare([Stateful, ContentPane, _TemplatedMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         items: [],
         value: undefined, //selected item
 

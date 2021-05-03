@@ -3,7 +3,7 @@ define([
     'dojo/_base/declare', 'dojo/_base/lang', 'dojo/request/xhr',
     'ngw/route', 'dijit/_WidgetBase', 'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin', 'ngw-resource/serialize',
-    'dijit/form/CheckBox', 'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n',
+    'dijit/form/CheckBox', '@nextgisweb/pyramid/i18n!',
     'ngw/settings!webmap',
     // resource
     'dojo/text!./OtherSettings.hbs',
@@ -12,11 +12,11 @@ define([
 ], function (
     declare, lang, xhr, route,
     _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    serialize, CheckBox, i18n, hbsI18n, settingsWebmap, template
+    serialize, CheckBox, i18n, settingsWebmap, template
 ) {
     return declare([_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext('Settings'),
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         serializePrefix: 'webmap',
         
         postCreate: function () {

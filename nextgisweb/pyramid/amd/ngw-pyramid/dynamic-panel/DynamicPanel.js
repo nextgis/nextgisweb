@@ -1,7 +1,6 @@
 define([
     'dojo/_base/declare',
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     "dojo/query",
     "dojo/_base/lang",
     "dojo/_base/array",
@@ -17,7 +16,6 @@ define([
 ], function (
     declare,
     i18n,
-    hbsI18n,
     query,
     lang,
     array,
@@ -30,7 +28,7 @@ define([
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         title: "",
         contentWidget: undefined,
         isOpen: false,

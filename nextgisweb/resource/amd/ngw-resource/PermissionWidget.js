@@ -23,7 +23,7 @@ define([
     // resource
     "ngw/load-json!auth/principal/dump",
     "ngw/load-json!resource/schema",
-    "ngw-pyramid/i18n!resource",
+    "@nextgisweb/pyramid/i18n!",
     // css
     "xstyle/css!./resource/PermissionWidget.css",
     "ngw/dgrid/css"

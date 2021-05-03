@@ -8,8 +8,7 @@ define([
     "dojo/json",
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
-    "ngw-pyramid/i18n!pyramid",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/CatalogImportForm.hbs",
     // template
     "dijit/form/Button",
@@ -28,7 +27,6 @@ define([
     route,
     ErrorDialog,
     i18n,
-    hbsI18n,
     template
 ) {
     var catalog_item = route.spatial_ref_sys.catalog.item;
@@ -36,7 +34,7 @@ define([
     var catalog_import_url = route.spatial_ref_sys.catalog.import();
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
 
         postCreate: function () {
             this.inherited(arguments);

@@ -2,14 +2,14 @@ define([
     'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/array', 'dojo/on', 'dojo/topic', 'dojo/html', 'dojo/dom-construct',
     'dijit/_WidgetBase', 'dijit/_TemplatedMixin', 'dijit/_WidgetsInTemplateMixin',
     'openlayers/ol', 'openlayers/ol-popup', 'ngw-webmap/layers/annotations/AnnotationFeature',
-    'ngw-pyramid/i18n!webmap', 'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     'ngw/openlayers/layer/Vector', 'dojo/text!./AnnotationsPopup.hbs',
     'xstyle/css!./AnnotationsPopup.css'
 ], function (
     declare, lang, array, on, topic, html, domConstruct, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    ol, olPopup, AnnotationFeature, i18n, hbsI18n, Vector, template
+    ol, olPopup, AnnotationFeature, i18n, Vector, template
 ) {
-    var contentTemplate = hbsI18n(template, i18n);
+    var contentTemplate = i18n.renderTemplate(template);
     
     return declare(null, {
         _popup: null,

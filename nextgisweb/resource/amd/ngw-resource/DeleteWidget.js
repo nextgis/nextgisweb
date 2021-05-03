@@ -3,9 +3,8 @@ define([
     "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "ngw-pyramid/hbs-i18n",
     "dojo/text!./template/DeleteWidget.hbs",
-    "ngw-pyramid/i18n!resource",
+    "@nextgisweb/pyramid/i18n!",
     // template
     "dijit/form/CheckBox"
 ], function (
@@ -13,12 +12,11 @@ define([
     ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    hbsI18n,
     template,
     i18n
 ) {
     return declare([ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Delete resource"),
 
         validateData: function () {

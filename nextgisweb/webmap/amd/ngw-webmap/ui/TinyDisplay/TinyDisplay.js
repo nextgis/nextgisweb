@@ -25,8 +25,7 @@ define([
     "dojo/data/ItemFileWriteStore",
     "dojo/topic",
     "ngw/route",
-    "ngw-pyramid/i18n!webmap",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-pyramid/company-logo/company-logo",
     // tools
     "../../tool/Base",
@@ -51,7 +50,7 @@ define([
     declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template,
     lang, array, Deferred, all, number, aspect, ioQuery, domConstruct, ol,
     Map, registry, ContentPane, ToggleButton, Dialog, domStyle, JsonRest, xhr, ItemFileWriteStore, topic,
-    route, i18n, hbsI18n, companyLogo, ToolBase, ToolZoom, ToolMeasure, Identify, MapStatesObserver,
+    route, i18n, companyLogo, ToolBase, ToolZoom, ToolMeasure, Identify, MapStatesObserver,
     FeatureHighlighter, clientSettings, LinkToMainMap
 ) {
 
@@ -112,7 +111,7 @@ define([
     });
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
 
         // AMD module loading: adapter, basemap, plugin
         _midDeferred: undefined,

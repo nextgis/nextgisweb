@@ -1,7 +1,6 @@
 define([
     'dojo/_base/declare',
-    'ngw-pyramid/i18n!webmap',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
     'dojo/store/JsonRest',
@@ -11,7 +10,6 @@ define([
 ], function (
     declare,
     i18n,
-    hbsI18n,
     DynamicPanel,
     BorderContainer,
     JsonRest,

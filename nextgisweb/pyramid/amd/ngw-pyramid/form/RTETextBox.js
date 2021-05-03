@@ -7,7 +7,7 @@ define([
     "dijit/ConfirmDialog",
     "dijit/Editor",
     "dijit/_editor/plugins/LinkDialog",
-    "ngw-pyramid/i18n!pyramid",
+    "@nextgisweb/pyramid/i18n!",
     // css
     "xstyle/css!./resource/RTETextBox.css"
 ], function (

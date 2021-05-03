@@ -24,7 +24,7 @@ define([
     "ngw-webmap/tool/editing/ModifyFeature",
     "ngw-webmap/tool/editing/DeleteFeature",
     "ngw-webmap/MapStatesObserver",
-    "ngw-pyramid/i18n!webmap"
+    "@nextgisweb/pyramid/i18n!"
 ], function (declare, lang, on, Memory, xhr,
              json, topic, query, domClass, domStyle, all, fnObject, CheckedMenuItem,
              ConfirmDialog, Standby, ol, route, Vector, _PluginBase, FinishEditingDialog,

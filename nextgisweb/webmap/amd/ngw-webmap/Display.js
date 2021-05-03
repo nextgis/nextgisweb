@@ -32,8 +32,7 @@ define([
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
     "ngw/route",
-    "ngw-pyramid/i18n!webmap",
-    "ngw-pyramid/hbs-i18n",
+    "@nextgisweb/pyramid/i18n!",
     "ngw-pyramid/company-logo/company-logo",
     // tools
     "ngw-webmap/MapToolbar",
@@ -107,7 +106,6 @@ define([
     Tree,
     route,
     i18n,
-    hbsI18n,
     companyLogo,
     MapToolbar,
     InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure, Identify, FeatureHighlighter,
@@ -178,7 +176,7 @@ define([
     });
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
 
         // AMD module loading: adapter, basemap, plugin
         _midDeferred: undefined,

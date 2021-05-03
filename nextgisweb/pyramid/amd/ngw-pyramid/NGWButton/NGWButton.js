@@ -1,7 +1,6 @@
 define([
     'dojo/_base/declare',
-    'ngw-pyramid/i18n!pyramid',
-    'ngw-pyramid/hbs-i18n',
+    '@nextgisweb/pyramid/i18n!',
     'dojo/_base/lang',
     'dojo/dom-class',
     'dojo/dom-construct',
@@ -12,7 +11,6 @@ define([
 ], function (
     declare,
     i18n,
-    hbsI18n,
     lang,
     domClass,
     domConstruct,
@@ -22,7 +20,7 @@ define([
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin],{
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         size: "medium", // small, large
         type: "contained", // outlined
         icon: false,
